@@ -25,6 +25,7 @@ export const SEO: React.FC<SEOProps> = ({
             {/* Standard Metadata */}
             <title>{fullTitle}</title>
             <meta name="description" content={description} />
+            <meta name="keywords" content="viagens personalizadas, agência viagens São Paulo, Lollapalooza 2026, Rock in Rio, The Town, viagens melhor idade, turismo 50+, Disney Orlando, roteiros transformação" />
             <link rel="canonical" href={currentUrl} />
 
             {/* Open Graph */}
@@ -40,6 +41,9 @@ export const SEO: React.FC<SEOProps> = ({
             <meta name="twitter:title" content={fullTitle} />
             <meta name="twitter:description" content={description} />
             <meta name="twitter:image" content={image} />
+            
+            {/* Robots */}
+            <meta name="robots" content="index, follow" />
         </Helmet>
     );
 };
