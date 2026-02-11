@@ -13,7 +13,7 @@ const Categories: React.FC = () => {
       tag: "Destino dos Sonhos",
       rotate: "-rotate-2",
       color: "bg-blue-100 text-blue-600",
-      link: "https://orlando.anhanga.tur.br"
+      link: "/orlando"
     },
     {
       title: "Beto Carrero",
@@ -22,7 +22,7 @@ const Categories: React.FC = () => {
       tag: "Radical",
       rotate: "rotate-3",
       color: "bg-yellow-100 text-yellow-700",
-      link: "https://beto.anhanga.tur.br"
+      link: "/beto-carrero"
     },
     {
       title: "Lollapalooza",
@@ -31,7 +31,7 @@ const Categories: React.FC = () => {
       tag: "Festival",
       rotate: "-rotate-1",
       color: "bg-emerald-100 text-emerald-600",
-      link: "https://lolla.anhanga.tur.br"
+      link: "/lollapalooza-2026"
     },
     /* {
       title: "Viagens 50+",
