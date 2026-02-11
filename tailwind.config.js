@@ -20,15 +20,33 @@ export default {
                     yellow: '#fbbf24', // Amber 400
                     dark: '#0f172a', // Slate 900
                     light: '#f0f9ff', // Sky 50
-                }
+                },
+                'fun-yellow': '#FFD23F',
+                'fun-blue': '#3B82F6',
+                'fun-pink': '#EE4266',
+                'fun-green': '#0EAD69',
+                'fun-dark': '#0F172A',
+                'fun-white': '#F8FAFC',
+                anhanga: {
+                    blue: '#0056D2',
+                    darkBlue: '#003B8E',
+                    yellow: '#FFD600',
+                    yellowHover: '#E5C000',
+                    light: '#F4F8FF',
+                },
             },
             fontFamily: {
                 sans: ['Poppins', 'Inter', 'sans-serif'],
                 serif: ['Merriweather', 'serif'], // Fonte editorial para o blog
+                heading: ['Fredoka', 'Outfit', 'sans-serif'],
+                body: ['Nunito', 'Outfit', 'sans-serif'],
             },
             boxShadow: {
                 'glow': '0 0 20px rgba(14, 165, 233, 0.5)',
                 'float': '0 10px 40px -10px rgba(0,0,0,0.15)',
+                'hard': '4px 4px 0px 0px rgba(15, 23, 42, 1)',
+                'hard-lg': '8px 8px 0px 0px rgba(15, 23, 42, 1)',
+                'hard-hover': '6px 6px 0px 0px rgba(15, 23, 42, 1)',
             },
             animation: {
                 'fade-in-up': 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',

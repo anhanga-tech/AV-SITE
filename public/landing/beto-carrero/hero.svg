@@ -1,0 +1,11 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#F8FAFC"/>
+  <rect x="50" y="50" width="700" height="500" rx="20" fill="#FFD23F" fill-opacity="0.2"/>
+  <circle cx="400" cy="300" r="150" fill="#FFD23F"/>
+  <path d="M250 450 C 250 450, 300 350, 400 350 C 500 350, 550 450, 550 450" stroke="#0F172A" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="350" cy="250" r="20" fill="#0F172A"/>
+  <circle cx="450" cy="250" r="20" fill="#0F172A"/>
+  <path d="M300 500 Q 400 550 500 500" stroke="#EE4266" stroke-width="12" stroke-linecap="round"/>
+  <text x="400" y="550" text-anchor="middle" font-family="sans-serif" font-size="24" fill="#0F172A" font-weight="bold">Sua Foto Aqui</text>
+  <rect x="0" y="0" width="800" height="600" rx="0" stroke="#0F172A" stroke-width="20"/>
+</svg>

@@ -1,0 +1,65 @@
+.landing-lollapalooza {
+  scroll-behavior: smooth;
+  font-family: 'Outfit', sans-serif;
+}
+
+.landing-lollapalooza .custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.landing-lollapalooza .custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.landing-lollapalooza .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.landing-lollapalooza .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #0056d2;
+}
+
+.landing-lollapalooza .custom-pin,
+.landing-lollapalooza .custom-poi-pin,
+.landing-lollapalooza .custom-hotel-pin {
+  background: transparent;
+  border: none;
+}
+
+.landing-lollapalooza .pin-pulse {
+  background: rgba(255, 214, 0, 0.4);
+  border-radius: 50%;
+  height: 100%;
+  width: 100%;
+  animation: lolla-pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+@keyframes lolla-pulse-ring {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.landing-lollapalooza .animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  will-change: opacity, transform;
+}
+
+.landing-lollapalooza .animate-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
