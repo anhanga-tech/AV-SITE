@@ -22,7 +22,7 @@ import Users from 'lucide-react/dist/esm/icons/users';
 import DollarSign from 'lucide-react/dist/esm/icons/dollar-sign';
 import Gem from 'lucide-react/dist/esm/icons/gem';
 import Crown from 'lucide-react/dist/esm/icons/crown';
-import { HERO_VIDEOS } from '../data/mediaConfig';
+import { HERO_VIDEOS, optimizeRemoteImageUrl } from '../data/mediaConfig';
 
 // --- DATA: COMPREHENSIVE DESTINATION LIST (IATA & TOURIST HOTSPOTS) ---
 // Baseada em destinos populares de agências de viagem
@@ -166,12 +166,14 @@ const BUDGET_TIERS = [
 ];
 
 const Hero: React.FC = () => {
-  // State for Background Video - Lazy Init to avoid double render & interruption
-  const [backgroundVideo] = useState(() => {
-    const randomIndex = Math.floor(Math.random() * HERO_VIDEOS.length);
-    return HERO_VIDEOS[randomIndex];
-  });
+  // Keep hero media deterministic to improve cache hit and stable CWV.
+  const [backgroundVideo] = useState(() => HERO_VIDEOS[0]);
+  const [shouldRenderVideo, setShouldRenderVideo] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const optimizedPoster = useMemo(
+    () => optimizeRemoteImageUrl(backgroundVideo.poster, 1600, 900),
+    [backgroundVideo.poster]
+  );
 
   // State for Destination
   const [inputValue, setInputValue] = useState('');
@@ -207,9 +209,25 @@ const Hero: React.FC = () => {
   const tripTypeRef = useRef<HTMLDivElement>(null);
   const budgetRef = useRef<HTMLDivElement>(null);
 
+  // Defer video loading on mobile / save-data to reduce LCP impact.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const isSmallScreen = window.matchMedia('(max-width: 1023px)').matches;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const saveData = ((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData) === true;
+
+    if (isSmallScreen || prefersReducedMotion || saveData) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => setShouldRenderVideo(true), 1800);
+    return () => window.clearTimeout(timer);
+  }, []);
+
   // Handle Video Autoplay Robustly
   useEffect(() => {
-    if (videoRef.current) {
+    if (shouldRenderVideo && videoRef.current) {
       // Explicitly set muted property to ensure browser allows autoplay
       videoRef.current.defaultMuted = true;
       videoRef.current.muted = true;
@@ -223,7 +241,7 @@ const Hero: React.FC = () => {
         });
       }
     }
-  }, []); // Run only once as video source is now stable via lazy init
+  }, [shouldRenderVideo]);
 
   // Filter Destinations Logic (Memoized for performance)
   const filteredDestinations = useMemo(() => {
@@ -434,21 +452,34 @@ const Hero: React.FC = () => {
   return (
     <section className="relative w-full min-h-[850px] flex items-center bg-brand-light pb-20 z-20">
 
-      {/* Background Video with Creative Mask */}
+      {/* Background media (image first, deferred video on capable devices) */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <video
-          ref={videoRef}
-          // Key removed to prevent re-mounting on re-renders, state handles initial random selection
-          autoPlay
-          loop
-          muted
-          playsInline
-          poster={backgroundVideo.poster}
-          className="w-full h-full object-cover transition-opacity duration-1000 ease-in-out"
-        >
-          <source src={backgroundVideo.url} type="video/mp4" />
-          Seu navegador não suporta vídeos.
-        </video>
+        {!shouldRenderVideo && (
+          <img
+            src={optimizedPoster}
+            alt=""
+            aria-hidden="true"
+            fetchPriority="high"
+            decoding="async"
+            className="w-full h-full object-cover transition-opacity duration-700 ease-in-out"
+          />
+        )}
+
+        {shouldRenderVideo && (
+          <video
+            ref={videoRef}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="none"
+            poster={optimizedPoster}
+            className="w-full h-full object-cover transition-opacity duration-1000 ease-in-out"
+          >
+            <source src={backgroundVideo.url} type="video/mp4" />
+            Seu navegador não suporta vídeos.
+          </video>
+        )}
 
         {/* Overlay Gradient - Darkened slightly for video text readability */}
         <div className="absolute inset-0 bg-gradient-to-br from-brand-cyan/80 to-blue-900/70 mix-blend-multiply"></div>

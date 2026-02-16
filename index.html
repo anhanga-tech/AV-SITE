@@ -42,13 +42,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- Preconnects (Performance) -->
-  <link rel="preconnect" href="https://destino.betocarrero.com.br">
-  <link rel="preconnect" href="https://api.dicebear.com">
-  <link rel="preconnect" href="https://cdn1.parksmedia.wdprapps.disney.com">
   <link rel="preconnect" href="https://grainy-gradients.vercel.app">
 
   <!-- Preload LCP Image -->
-  <link rel="preload" as="image" href="/assets/LOGO ANHANGA VIAGENS - BRANCO.svg">
+  <link rel="preload" as="image"
+    href="https://images.pexels.com/photos/2868242/pexels-photo-2868242.jpeg?auto=compress&cs=tinysrgb&w=1600&h=900&dpr=1">
   <link
     href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400&display=swap"
     rel="stylesheet">
@@ -126,8 +124,20 @@
   <!-- End Google Tag Manager (noscript) -->
   <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
-  <!-- Start of HubSpot Embed Code -->
-  <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/50895604.js"></script>
+  <!-- Start of HubSpot Embed Code (deferred to reduce main-thread contention) -->
+  <script>
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.id = 'hs-script-loader';
+        script.async = true;
+        script.defer = true;
+        script.src = '//js.hs-scripts.com/50895604.js';
+        document.body.appendChild(script);
+      }, 3500);
+    });
+  </script>
   <!-- End of HubSpot Embed Code -->
   <!-- Tracking Script -->
   <script src="/utm-tracking.js" defer></script>

@@ -47,6 +47,8 @@ export const LazyImage: React.FC<LazyImageProps> = ({
                 <img
                     src={src}
                     alt={alt}
+                    loading={props.loading ?? "lazy"}
+                    fetchPriority={props.fetchPriority ?? "low"}
                     decoding="async"
                     onLoad={() => setIsLoaded(true)}
                     className={`transition-opacity duration-500 w-full h-full object-cover ${isLoaded ? 'opacity-100' : 'opacity-0'}`}

@@ -1,8 +1,8 @@
 import React from 'react';
-import MapPin from 'lucide-react/dist/esm/icons/map-pin';
 import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import TrendingUp from 'lucide-react/dist/esm/icons/trending-up';
-import Star from 'lucide-react/dist/esm/icons/star';
+import { LazyImage } from './ui/LazyImage';
+import { optimizeRemoteImageUrl } from '../data/mediaConfig';
 
 const Categories: React.FC = () => {
   const popularDestinations = [
@@ -77,9 +77,11 @@ const Categories: React.FC = () => {
 
               {/* Image Area */}
               <div className="aspect-square w-full overflow-hidden bg-gray-100 mb-6 relative">
-                <img
-                  src={item.image}
+                <LazyImage
+                  src={optimizeRemoteImageUrl(item.image, 900, 900)}
                   alt={item.title}
+                  loading="lazy"
+                  fetchPriority="low"
                   className="w-full h-full object-cover filter contrast-[1.1] transition-transform duration-700 group-hover:scale-110"
                 />
                 {/* Tag */}

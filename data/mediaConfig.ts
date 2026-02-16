@@ -27,6 +27,53 @@ export const getMediaUrl = (path: string): string => {
     return `${MEDIA_BASE_URL}${path}`;
 };
 
+/**
+ * Optimize remote image URLs to reduce transfer size.
+ * - Pexels: use built-in compression and constrained dimensions
+ * - Other remote hosts: use wsrv.nl proxy to convert/compress as WebP
+ */
+export const optimizeRemoteImageUrl = (
+    rawUrl: string,
+    width: number = 1200,
+    height?: number
+): string => {
+    if (!rawUrl || !rawUrl.startsWith('http')) {
+        return rawUrl;
+    }
+
+    if (rawUrl.includes('images.pexels.com')) {
+        try {
+            const url = new URL(rawUrl);
+            if (!url.searchParams.has('auto')) {
+                url.searchParams.set('auto', 'compress');
+            }
+            if (!url.searchParams.has('cs')) {
+                url.searchParams.set('cs', 'tinysrgb');
+            }
+            if (!url.searchParams.has('w')) {
+                url.searchParams.set('w', String(width));
+            }
+            if (height && !url.searchParams.has('h')) {
+                url.searchParams.set('h', String(height));
+            }
+            if (!url.searchParams.has('dpr')) {
+                url.searchParams.set('dpr', '1');
+            }
+            return url.toString();
+        } catch {
+            return rawUrl;
+        }
+    }
+
+    if (rawUrl.includes('wsrv.nl')) {
+        return rawUrl;
+    }
+
+    const withoutProtocol = rawUrl.replace(/^https?:\/\//, '');
+    const encodedUrl = encodeURIComponent(withoutProtocol);
+    return `https://wsrv.nl/?url=${encodedUrl}&w=${width}&output=webp&q=80`;
+};
+
 // =============================================================================
 // HERO VIDEOS
 // =============================================================================

@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import { useLocation } from 'react-router-dom';
 import Hero from '../components/Hero';
 import Highlights from '../components/Highlights';
 import Categories from '../components/Categories';
-import Destinations from '../components/Destinations';
 import HowItWorks from '../components/HowItWorks';
 import Testimonials from '../components/Testimonials';
 import Blog from '../components/Blog';
@@ -14,6 +13,8 @@ import { OrganizationSchema } from '../components/schemas/OrganizationSchema';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 
 import { SEO } from '../components/SEO';
+
+const Destinations = lazy(() => import('../components/Destinations'));
 
 const Home: React.FC = () => {
   const location = useLocation();
@@ -49,7 +50,9 @@ const Home: React.FC = () => {
       <Hero />
       <Highlights />
       <Categories />
-      <Destinations />
+      <Suspense fallback={<section id="destinos" className="py-24 bg-[#fffdf5]" />}>
+        <Destinations />
+      </Suspense>
       <HowItWorks />
       <FAQ />
       <Testimonials />
