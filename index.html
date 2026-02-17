@@ -119,37 +119,52 @@
   <!-- End Google Tag Manager (noscript) -->
   <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
-  <!-- Defer GTM load to reduce early main-thread/network pressure -->
+  <!-- Defer third-party scripts to user intent/idle to protect TBT -->
   <script>
-    window.addEventListener('load', function () {
-      setTimeout(function () {
-        var f = document.getElementsByTagName('script')[0];
-        var j = document.createElement('script');
-        j.async = true;
-        j.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-T2KGS86G';
-        if (f && f.parentNode) {
-          f.parentNode.insertBefore(j, f);
+    (function () {
+      var loaded = false;
+      var loadThirdParty = function () {
+        if (loaded) return;
+        loaded = true;
+
+        var firstScript = document.getElementsByTagName('script')[0];
+        var gtm = document.createElement('script');
+        gtm.async = true;
+        gtm.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-T2KGS86G';
+        if (firstScript && firstScript.parentNode) {
+          firstScript.parentNode.insertBefore(gtm, firstScript);
         } else {
-          document.body.appendChild(j);
+          document.body.appendChild(gtm);
         }
-      }, 2500);
-    });
+
+        var hubspot = document.createElement('script');
+        hubspot.type = 'text/javascript';
+        hubspot.id = 'hs-script-loader';
+        hubspot.async = true;
+        hubspot.defer = true;
+        hubspot.src = '//js.hs-scripts.com/50895604.js';
+        document.body.appendChild(hubspot);
+      };
+
+      var triggerLoad = function () {
+        loadThirdParty();
+      };
+
+      ['scroll', 'pointerdown', 'keydown', 'touchstart'].forEach(function (eventName) {
+        window.addEventListener(eventName, triggerLoad, { passive: true, once: true });
+      });
+
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(function () { setTimeout(triggerLoad, 1200); }, { timeout: 6000 });
+      } else {
+        setTimeout(triggerLoad, 5000);
+      }
+
+      window.addEventListener('load', function () {
+        setTimeout(triggerLoad, 3000);
+      }, { once: true });
+    })();
   </script>
-  <!-- Start of HubSpot Embed Code (deferred to reduce main-thread contention) -->
-  <script>
-    window.addEventListener('load', function () {
-      setTimeout(function () {
-        var script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.id = 'hs-script-loader';
-        script.async = true;
-        script.defer = true;
-        script.src = '//js.hs-scripts.com/50895604.js';
-        document.body.appendChild(script);
-      }, 3500);
-    });
-  </script>
-  <!-- End of HubSpot Embed Code -->
   <!-- Tracking Script -->
   <script src="/utm-tracking.js" defer></script>
 </body>
