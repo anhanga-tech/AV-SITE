@@ -3,16 +3,11 @@
 
 <head>
 
-  <!-- Google Tag Manager -->
-  <script>(function (w, d, s, l, i) {
-      w[l] = w[l] || []; w[l].push({
-        'gtm.start':
-          new Date().getTime(), event: 'gtm.js'
-      }); var f = d.getElementsByTagName(s)[0],
-        j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-          'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-    })(window, document, 'script', 'dataLayer', 'GTM-T2KGS86G');</script>
-  <!-- End Google Tag Manager -->
+  <!-- Google Tag Manager (init only, script deferred after load) -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+  </script>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="apple-touch-icon" href="/favicon.svg" />
@@ -46,7 +41,7 @@
 
   <!-- Preload LCP Image -->
   <link rel="preload" as="image"
-    href="https://images.pexels.com/photos/2868242/pexels-photo-2868242.jpeg?auto=compress&cs=tinysrgb&w=1600&h=900&dpr=1">
+    href="https://res.cloudinary.com/dzehqrcmm/image/upload/f_auto,q_auto,w_1600,h_900,c_fill/v1771293589/pexels-photo-2868242_hugrsz.jpg">
   <link
     href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400&display=swap"
     rel="stylesheet">
@@ -124,6 +119,22 @@
   <!-- End Google Tag Manager (noscript) -->
   <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
+  <!-- Defer GTM load to reduce early main-thread/network pressure -->
+  <script>
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        var f = document.getElementsByTagName('script')[0];
+        var j = document.createElement('script');
+        j.async = true;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-T2KGS86G';
+        if (f && f.parentNode) {
+          f.parentNode.insertBefore(j, f);
+        } else {
+          document.body.appendChild(j);
+        }
+      }, 2500);
+    });
+  </script>
   <!-- Start of HubSpot Embed Code (deferred to reduce main-thread contention) -->
   <script>
     window.addEventListener('load', function () {

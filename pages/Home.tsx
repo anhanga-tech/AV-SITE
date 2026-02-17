@@ -18,6 +18,8 @@ const Destinations = lazy(() => import('../components/Destinations'));
 
 const Home: React.FC = () => {
   const location = useLocation();
+  const [shouldLoadDestinations, setShouldLoadDestinations] = React.useState(false);
+  const destinationsSentinelRef = React.useRef<HTMLDivElement>(null);
 
   // Efeito para lidar com navegação vinda de outras páginas (ex: Blog -> Seção Home)
   useEffect(() => {
@@ -38,6 +40,25 @@ const Home: React.FC = () => {
     }
   }, [location]);
 
+  useEffect(() => {
+    if (!destinationsSentinelRef.current) return;
+    if (shouldLoadDestinations) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+        if (first?.isIntersecting) {
+          setShouldLoadDestinations(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '300px 0px', threshold: 0.01 }
+    );
+
+    observer.observe(destinationsSentinelRef.current);
+    return () => observer.disconnect();
+  }, [shouldLoadDestinations]);
+
   return (
     <>
       <SEO
@@ -50,9 +71,14 @@ const Home: React.FC = () => {
       <Hero />
       <Highlights />
       <Categories />
-      <Suspense fallback={<section id="destinos" className="py-24 bg-[#fffdf5]" />}>
-        <Destinations />
-      </Suspense>
+      <div id="destinos" ref={destinationsSentinelRef} />
+      {shouldLoadDestinations ? (
+        <Suspense fallback={<section className="py-24 bg-[#fffdf5]" />}>
+          <Destinations />
+        </Suspense>
+      ) : (
+        <section className="py-24 bg-[#fffdf5]" />
+      )}
       <HowItWorks />
       <FAQ />
       <Testimonials />

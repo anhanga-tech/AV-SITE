@@ -209,7 +209,7 @@ const Hero: React.FC = () => {
   const tripTypeRef = useRef<HTMLDivElement>(null);
   const budgetRef = useRef<HTMLDivElement>(null);
 
-  // Defer video loading on mobile / save-data to reduce LCP impact.
+  // Defer video loading on mobile / save-data and wait for user intent.
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -221,8 +221,32 @@ const Hero: React.FC = () => {
       return;
     }
 
-    const timer = window.setTimeout(() => setShouldRenderVideo(true), 1800);
-    return () => window.clearTimeout(timer);
+    let cancelled = false;
+    const enableVideo = () => {
+      if (!cancelled) {
+        setShouldRenderVideo(true);
+      }
+      cleanup();
+    };
+
+    const onIntent = () => enableVideo();
+    const cleanup = () => {
+      window.removeEventListener('scroll', onIntent);
+      window.removeEventListener('pointerdown', onIntent);
+      window.removeEventListener('keydown', onIntent);
+    };
+
+    // Load video only after real interaction, with a long fallback.
+    window.addEventListener('scroll', onIntent, { passive: true, once: true });
+    window.addEventListener('pointerdown', onIntent, { passive: true, once: true });
+    window.addEventListener('keydown', onIntent, { passive: true, once: true });
+
+    const timer = window.setTimeout(enableVideo, 6000);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+      cleanup();
+    };
   }, []);
 
   // Handle Video Autoplay Robustly
