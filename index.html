@@ -192,13 +192,13 @@
       });
 
       if ('requestIdleCallback' in window) {
-        requestIdleCallback(function () { setTimeout(triggerAnalytics, 2500); }, { timeout: 10000 });
+        requestIdleCallback(function () { setTimeout(triggerAnalytics, 12000); }, { timeout: 25000 });
       } else {
-        setTimeout(triggerAnalytics, 8000);
+        setTimeout(triggerAnalytics, 15000);
       }
 
       window.addEventListener('load', function () {
-        setTimeout(triggerAnalytics, 6000);
+        setTimeout(triggerAnalytics, 12000);
       }, { once: true });
 
       // HubSpot only after strong conversion intent or long dwell time.

@@ -521,10 +521,9 @@ const Hero: React.FC = () => {
 
           {/* Fun Typography - Dynamic sizing based on content length */}
           <h1
-            className={`font-extrabold text-white mb-6 leading-[0.9] tracking-tight drop-shadow-lg opacity-0 animate-fade-in-up transition-all duration-500
+            className={`font-extrabold text-white mb-6 leading-[0.9] tracking-tight drop-shadow-lg transition-all duration-500
                 ${validCityForTitle ? 'text-4xl sm:text-5xl md:text-7xl' : 'text-5xl sm:text-6xl md:text-8xl'}
                 `}
-            style={{ animationDelay: '0.2s' }}
           >
             Sua Próxima <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500 relative inline-block pb-2">
@@ -544,13 +543,13 @@ const Hero: React.FC = () => {
             </span>
           </h1>
 
-          <p className="text-white/90 text-xl md:text-2xl max-w-2xl mx-auto mb-12 font-medium leading-relaxed drop-shadow-md opacity-0 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+          <p className="text-white/90 text-xl md:text-2xl max-w-2xl mx-auto mb-12 font-medium leading-relaxed drop-shadow-md">
             Roteiros que parecem feitos à mão. <br />
             Porque sua viagem merece ser única.
           </p>
 
           {/* SEARCH BAR - Extended Ticket Style - Pop In Animation */}
-          <div className="w-full max-w-5xl mx-auto bg-white rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] p-2 relative z-50 border-[6px] border-white/20 backdrop-blur-sm opacity-0 animate-fade-in-up flex flex-col" style={{ animationDelay: '0.4s' }}>
+          <div className="w-full max-w-5xl mx-auto bg-white rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] p-2 relative z-50 border-[6px] border-white/20 backdrop-blur-sm flex flex-col">
 
             {/* --- ROW 1: BASIC INFO --- */}
             <div className="flex flex-col md:flex-row items-center w-full divide-y md:divide-y-0 md:divide-x divide-gray-100">

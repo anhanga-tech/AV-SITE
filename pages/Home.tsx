@@ -63,7 +63,7 @@ const Home: React.FC = () => {
     window.addEventListener('pointerdown', onIntent, { passive: true, once: true });
     window.addEventListener('keydown', onIntent, { passive: true, once: true });
 
-    const timer = window.setTimeout(enable, 3000);
+    const timer = window.setTimeout(enable, 10000);
     return () => {
       cancelled = true;
       window.clearTimeout(timer);
