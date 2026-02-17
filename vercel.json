@@ -7,6 +7,17 @@
       "has": [
         {
           "type": "host",
+          "value": "anhanga.tur.br"
+        }
+      ],
+      "destination": "https://www.anhanga.tur.br/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
           "value": "beto.anhanga.tur.br"
         }
       ],
