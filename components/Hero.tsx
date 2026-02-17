@@ -171,7 +171,7 @@ const Hero: React.FC = () => {
   const [shouldRenderVideo, setShouldRenderVideo] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const optimizedPoster = useMemo(
-    () => optimizeRemoteImageUrl(backgroundVideo.poster, 1600, 900),
+    () => optimizeRemoteImageUrl(backgroundVideo.poster, 1280, 720),
     [backgroundVideo.poster]
   );
 
@@ -484,8 +484,9 @@ const Hero: React.FC = () => {
             alt=""
             aria-hidden="true"
             fetchPriority="high"
+            loading="eager"
             decoding="async"
-            className="w-full h-full object-cover transition-opacity duration-700 ease-in-out"
+            className="w-full h-full object-cover"
           />
         )}
 
@@ -498,18 +499,18 @@ const Hero: React.FC = () => {
             playsInline
             preload="none"
             poster={optimizedPoster}
-            className="w-full h-full object-cover transition-opacity duration-1000 ease-in-out"
+            className="w-full h-full object-cover"
           >
             <source src={backgroundVideo.url} type="video/mp4" />
             Seu navegador não suporta vídeos.
           </video>
         )}
 
-        {/* Overlay Gradient - Darkened slightly for video text readability */}
-        <div className="absolute inset-0 bg-gradient-to-br from-brand-cyan/80 to-blue-900/70 mix-blend-multiply"></div>
+        {/* Keep blending effect on larger screens only to reduce mobile paint cost */}
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-cyan/80 to-blue-900/70 md:mix-blend-multiply"></div>
 
-        {/* Paper Texture Overlay */}
-        <div className="absolute inset-0 opacity-20 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+        {/* Decorative texture hidden on mobile to reduce render overhead */}
+        <div className="hidden md:block absolute inset-0 opacity-20 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
 
         {/* Floating Blobs for Fluidity */}
       </div>
