@@ -7,6 +7,8 @@ interface SEOProps {
     canonical?: string;
     image?: string;
     type?: 'website' | 'article';
+    keywords?: string;
+    robots?: string;
 }
 
 export const SEO: React.FC<SEOProps> = ({
@@ -14,7 +16,9 @@ export const SEO: React.FC<SEOProps> = ({
     description,
     canonical,
     image = 'https://www.anhanga.tur.br/og-image-1200x630.jpg',
-    type = 'website'
+    type = 'website',
+    keywords = 'viagens personalizadas, agência viagens São Paulo, Lollapalooza 2026, Rock in Rio, The Town, viagens melhor idade, turismo 50+, Disney Orlando, roteiros transformação',
+    robots = 'index, follow'
 }) => {
     const siteName = "Anhangá Viagens";
     const fullTitle = `${title} | ${siteName}`;
@@ -25,7 +29,7 @@ export const SEO: React.FC<SEOProps> = ({
             {/* Standard Metadata */}
             <title>{fullTitle}</title>
             <meta name="description" content={description} />
-            <meta name="keywords" content="viagens personalizadas, agência viagens São Paulo, Lollapalooza 2026, Rock in Rio, The Town, viagens melhor idade, turismo 50+, Disney Orlando, roteiros transformação" />
+            <meta name="keywords" content={keywords} />
             <link rel="canonical" href={currentUrl} />
 
             {/* Open Graph */}
@@ -43,7 +47,7 @@ export const SEO: React.FC<SEOProps> = ({
             <meta name="twitter:image" content={image} />
             
             {/* Robots */}
-            <meta name="robots" content="index, follow" />
+            <meta name="robots" content={robots} />
         </Helmet>
     );
 };

@@ -159,7 +159,7 @@ const Header: React.FC = () => {
               href={getBlogHomeUrl()}
               className={`font-medium text-sm transition-colors duration-500 hover:opacity-80 focus:outline-none focus:underline decoration-2 underline-offset-4 ${navTextClass}`}
             >
-              Blog
+              Blog de Viagens
             </a>
           </nav>
 
@@ -220,7 +220,7 @@ const Header: React.FC = () => {
             className="text-gray-700 font-medium py-2 border-b border-gray-50 focus:text-brand-vibrant focus:outline-none"
             onClick={() => setIsMobileMenuOpen(false)}
           >
-            Blog
+            Blog de Viagens
           </a>
           <a
             href={getWhatsAppLink("Olá! Gostaria de falar com um especialista.")}

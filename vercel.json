@@ -3,6 +3,17 @@
   "outputDirectory": "dist",
   "redirects": [
     {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "beto.anhanga.tur.br"
+        }
+      ],
+      "destination": "https://www.anhanga.tur.br/beto-carrero",
+      "permanent": true
+    },
+    {
       "source": "/blog",
       "destination": "https://blog.anhanga.tur.br",
       "permanent": true

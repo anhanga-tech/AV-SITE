@@ -1,16 +1,51 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import { Link } from 'react-router-dom';
 import BetoCarreroApp from '../../components/landings/beto-carrero/BetoCarreroApp';
 import { SEO } from '../../components/SEO';
+import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
+import { FAQPageSchema } from '../../components/schemas/FAQPageSchema';
+import { ServiceSchema } from '../../components/schemas/ServiceSchema';
+
+const BETO_FAQ_ITEMS = [
+  {
+    question: 'O pacote para Beto Carrero inclui ingresso e hospedagem?',
+    answer: 'Sim. Podemos montar pacote com ingresso, hospedagem, transporte e suporte, ajustando tudo ao perfil da sua família.'
+  },
+  {
+    question: 'Qual a duração ideal para viajar ao Beto Carrero?',
+    answer: 'Para aproveitar o parque com conforto, normalmente recomendamos roteiros de 3 a 5 dias, incluindo deslocamento e passeios extras.'
+  },
+  {
+    question: 'A Anhangá ajuda no planejamento com crianças?',
+    answer: 'Sim. Organizamos roteiro com foco em logística familiar, melhores horários de atrações e pontos de apoio para viajar sem estresse.'
+  }
+];
 
 const BetoCarreroLanding: React.FC = () => {
   return (
     <>
       <SEO
-        title="Beto Carrero Sem Stress"
-        description="Pacotes completos para Beto Carrero com aéreo, hotel e ingresso. Planejamento sem burocracia com suporte Anhangá."
+        title="Pacote Beto Carrero com hotel, aéreo e ingresso"
+        description="Pacote Beto Carrero personalizado com hotel, aéreo e ingresso. Planejamento completo para famílias com suporte especializado da Anhangá."
         canonical="https://www.anhanga.tur.br/beto-carrero"
+        keywords="pacote Beto Carrero, viagem Beto Carrero, ingresso Beto Carrero, pacote família Beto Carrero, agência de viagens Beto Carrero"
       />
+      <ServiceSchema
+        name="Pacote Beto Carrero personalizado"
+        description="Planejamento de pacote para Beto Carrero com hotel, ingressos, transporte e suporte especializado."
+        serviceUrl="https://www.anhanga.tur.br/beto-carrero"
+        serviceType="Pacote de viagem para parque temático"
+        areaServed="São Paulo e Brasil"
+        keywords={['pacote Beto Carrero', 'ingresso Beto Carrero', 'viagem em família']}
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', item: 'https://www.anhanga.tur.br/' },
+          { name: 'Pacote Beto Carrero', item: 'https://www.anhanga.tur.br/beto-carrero' }
+        ]}
+      />
+      <FAQPageSchema items={BETO_FAQ_ITEMS} />
       <Helmet>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -20,6 +55,35 @@ const BetoCarreroLanding: React.FC = () => {
         />
       </Helmet>
       <BetoCarreroApp />
+      <section className="bg-[#fffdf5] border-t border-brand-cyan/10 py-14">
+        <div className="container mx-auto px-6 max-w-5xl">
+          <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Pacote Beto Carrero para viajar com tranquilidade</h2>
+          <p className="text-gray-700 text-lg leading-relaxed mb-5">
+            Nosso <strong>pacote Beto Carrero</strong> é desenhado para quem quer curtir o parque sem dor de cabeça com reservas, horários e deslocamentos.
+          </p>
+          <p className="text-gray-700 text-lg leading-relaxed mb-5">
+            Você recebe planejamento completo com opções de hotel, logística e ingressos, além de orientação prática para aproveitar melhor cada dia de viagem em família.
+          </p>
+          <h3 className="text-xl md:text-2xl font-extrabold text-brand-dark mb-3">O que pode entrar no seu pacote</h3>
+          <ul className="list-disc list-inside text-gray-700 space-y-1 mb-6">
+            <li>Hospedagem com localização estratégica</li>
+            <li>Ingressos para o parque e upgrades opcionais</li>
+            <li>Roteiro de atrações por perfil do grupo</li>
+            <li>Suporte por WhatsApp durante a viagem</li>
+          </ul>
+          <div className="flex flex-wrap gap-3">
+            <Link to="/" state={{ targetId: 'contato' }} className="px-5 py-3 rounded-full bg-brand-cyan text-white font-bold">
+              Solicitar orçamento
+            </Link>
+            <Link to="/orlando" className="px-5 py-3 rounded-full bg-white border border-gray-300 text-brand-dark font-semibold">
+              Ver pacotes para Orlando
+            </Link>
+            <a href="https://blog.anhanga.tur.br" className="px-5 py-3 rounded-full bg-white border border-gray-300 text-brand-dark font-semibold">
+              Ver dicas de planejamento
+            </a>
+          </div>
+        </div>
+      </section>
     </>
   );
 };

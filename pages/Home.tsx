@@ -1,5 +1,5 @@
 import React, { useEffect, Suspense, lazy } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Hero from '../components/Hero';
 
 import { OrganizationSchema } from '../components/schemas/OrganizationSchema';
@@ -93,13 +93,39 @@ const Home: React.FC = () => {
   return (
     <>
       <SEO
-        title="Roteiros Personalizados"
-        description="Anhangá: Agência de viagens com roteiros personalizados. Experiências transformadoras em Orlando, Machu Picchu, Europa e Brasil."
+        title="Agência de viagens em São Paulo com roteiros personalizados"
+        description="Planejamento de viagens personalizadas com atendimento consultivo em São Paulo. Pacotes para Orlando, Beto Carrero, Lollapalooza 2026 e experiências para público 50+."
         canonical="https://www.anhanga.tur.br/"
+        keywords="agência de viagens em São Paulo, viagens personalizadas, pacotes para Orlando, pacote Beto Carrero, viagem Lollapalooza 2026, viagens melhor idade 50+, roteiros exclusivos"
       />
       <OrganizationSchema />
       <BreadcrumbSchema items={[{ name: 'Home', item: 'https://www.anhanga.tur.br/' }]} />
       <Hero />
+      <section className="bg-[#fffdf5] border-y border-brand-cyan/10 py-10">
+        <div className="container mx-auto px-6">
+          <h2 className="text-2xl md:text-3xl font-black text-brand-dark mb-3">Pacotes Mais Buscados</h2>
+          <p className="text-gray-600 max-w-3xl mb-6">
+            Acesse os roteiros com maior demanda e fale com um especialista para personalizar datas, orçamento e experiências.
+          </p>
+          <nav aria-label="Atalhos para pacotes de viagem" className="grid md:grid-cols-2 gap-3 text-sm md:text-base">
+            <Link to="/orlando" className="rounded-xl bg-white border border-gray-200 px-4 py-3 font-semibold text-brand-cyan hover:border-brand-cyan/40 transition-colors">
+              Pacotes para Orlando com roteiro personalizado
+            </Link>
+            <Link to="/beto-carrero" className="rounded-xl bg-white border border-gray-200 px-4 py-3 font-semibold text-brand-cyan hover:border-brand-cyan/40 transition-colors">
+              Pacote Beto Carrero com aéreo, hotel e ingresso
+            </Link>
+            <Link to="/lollapalooza-2026" className="rounded-xl bg-white border border-gray-200 px-4 py-3 font-semibold text-brand-cyan hover:border-brand-cyan/40 transition-colors">
+              Viagem para Lollapalooza 2026 com suporte completo
+            </Link>
+            <a
+              href="https://blog.anhanga.tur.br"
+              className="rounded-xl bg-white border border-gray-200 px-4 py-3 font-semibold text-brand-cyan hover:border-brand-cyan/40 transition-colors"
+            >
+              Dicas de viagem e planejamento no blog da Anhangá
+            </a>
+          </nav>
+        </div>
+      </section>
       {shouldRenderBelowFold ? (
         <>
           <Suspense fallback={<section id="experiencia" className="py-24 bg-[#fffdf5]" />}>

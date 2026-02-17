@@ -6,11 +6,11 @@ import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 
 const SiteMap: React.FC = () => {
   const coreLinks = [
-    { to: '/', label: 'Home' },
-    { to: getBlogHomeUrl(), label: 'Blog', external: true },
-    { to: '/orlando', label: 'Orlando' },
-    { to: '/beto-carrero', label: 'Beto Carrero' },
-    { to: '/lollapalooza-2026', label: 'Lollapalooza 2026' },
+    { to: '/', label: 'Agência de Viagens em São Paulo' },
+    { to: getBlogHomeUrl(), label: 'Blog de Viagens e Roteiros', external: true },
+    { to: '/orlando', label: 'Pacotes para Orlando' },
+    { to: '/beto-carrero', label: 'Pacote Beto Carrero' },
+    { to: '/lollapalooza-2026', label: 'Pacotes para Lollapalooza 2026' },
     { to: '/termos-de-uso', label: 'Termos de Uso' },
     { to: '/politica-privacidade', label: 'Política de Privacidade' }
   ];

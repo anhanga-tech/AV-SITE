@@ -46,11 +46,11 @@ const Footer: React.FC = () => {
                     <div>
                         <h4 className="font-bold text-white mb-6 uppercase tracking-wider text-xs">Menu</h4>
                         <ul className="space-y-3 font-medium">
-                            <li><Link to="/" className="hover:text-brand-yellow transition-colors">Home</Link></li>
-                            <li><a href={getBlogHomeUrl()} className="hover:text-brand-yellow transition-colors">Blog</a></li>
-                            <li><Link to="/orlando" className="hover:text-brand-yellow transition-colors">Orlando</Link></li>
-                            <li><Link to="/beto-carrero" className="hover:text-brand-yellow transition-colors">Beto Carrero</Link></li>
-                            <li><Link to="/lollapalooza-2026" className="hover:text-brand-yellow transition-colors">Lollapalooza 2026</Link></li>
+                            <li><Link to="/" className="hover:text-brand-yellow transition-colors">Agência de Viagens em São Paulo</Link></li>
+                            <li><a href={getBlogHomeUrl()} className="hover:text-brand-yellow transition-colors">Blog de Viagens e Roteiros</a></li>
+                            <li><Link to="/orlando" className="hover:text-brand-yellow transition-colors">Pacotes para Orlando</Link></li>
+                            <li><Link to="/beto-carrero" className="hover:text-brand-yellow transition-colors">Pacote Beto Carrero</Link></li>
+                            <li><Link to="/lollapalooza-2026" className="hover:text-brand-yellow transition-colors">Pacotes para Lollapalooza 2026</Link></li>
                             <li><Link to="/mapa-do-site" className="hover:text-brand-yellow transition-colors">Mapa do Site</Link></li>
                             <li><Link to="/termos-de-uso" className="hover:text-brand-yellow transition-colors">Termos de Uso</Link></li>
                             <li><Link to="/politica-privacidade" className="hover:text-brand-yellow transition-colors">Política de Privacidade</Link></li>
