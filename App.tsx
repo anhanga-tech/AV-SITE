@@ -7,10 +7,10 @@ import ScrollToTop from './components/ScrollToTop';
 
 // Pages
 import Home from './pages/Home';
-import BlogList from './pages/BlogList';
-import BlogPost from './pages/BlogPost';
+import BlogRedirect from './pages/BlogRedirect';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
+import SiteMap from './pages/SiteMap';
 import BetoCarreroLanding from './pages/landings/BetoCarreroLanding';
 import LollapaloozaLanding from './pages/landings/LollapaloozaLanding';
 import OrlandoLanding from './pages/landings/OrlandoLanding';
@@ -24,10 +24,11 @@ const MainSiteShell: React.FC = () => {
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/blog" element={<BlogList />} />
-          <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="/blog" element={<BlogRedirect />} />
+          <Route path="/blog/:slug" element={<BlogRedirect />} />
           <Route path="/termos-de-uso" element={<Terms />} />
           <Route path="/politica-privacidade" element={<Privacy />} />
+          <Route path="/mapa-do-site" element={<SiteMap />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

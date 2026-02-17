@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 
 const Terms = () => {
     const metaDescription = "Termos e Condições de Uso da Anhangá Turismo: intermediação, simulações, responsabilidade e privacidade.";
-    const canonicalUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/termos-de-uso`;
+    const canonicalUrl = "https://www.anhanga.tur.br/termos-de-uso";
 
     return (
         <div className="min-h-screen bg-background text-foreground">

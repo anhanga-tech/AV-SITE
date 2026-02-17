@@ -5,9 +5,9 @@ import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import Tag from 'lucide-react/dist/esm/icons/tag';
 import BookOpen from 'lucide-react/dist/esm/icons/book-open';
 import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
-import { Link } from 'react-router-dom';
 import { BLOG_POSTS } from '../data/blogData';
 import { SocialShare } from './SocialShare';
+import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 
 const Blog: React.FC = () => {
     const [hoveredId, setHoveredId] = useState<number | null>(null);
@@ -40,7 +40,7 @@ const Blog: React.FC = () => {
                 {/* Featured Post Layout */}
                 {featuredPost && (
                     <div className="mb-16 group cursor-pointer relative">
-                        <Link to={`/blog/${featuredPost.slug}`}>
+                        <a href={getBlogPostUrl(featuredPost.slug)}>
                             <div className="bg-[#fffdf5] rounded-[2.5rem] p-6 md:p-8 border-4 border-gray-100 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] flex flex-col md:flex-row gap-8 items-center transition-transform duration-300 hover:scale-[1.01]">
 
                                 {/* Featured Image */}
@@ -59,7 +59,7 @@ const Blog: React.FC = () => {
                                     <div className="absolute bottom-4 right-4 z-30">
                                         <SocialShare
                                             minimal
-                                            url={`https://www.anhanga.tur.br/blog/${featuredPost.slug}`}
+                                            url={getBlogPostUrl(featuredPost.slug)}
                                             title={featuredPost.title}
                                             excerpt={featuredPost.excerpt}
                                         />
@@ -96,15 +96,15 @@ const Blog: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
-                        </Link>
+                        </a>
                     </div>
                 )}
 
                 {/* Grid Posts */}
                 <div className="grid md:grid-cols-3 gap-8">
                     {gridPosts.map((post) => (
-                        <Link
-                            to={`/blog/${post.slug}`}
+                        <a
+                            href={getBlogPostUrl(post.slug)}
                             key={post.id}
                             className={`
                                 group bg-white rounded-3xl p-4 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.05)] border border-gray-100
@@ -127,7 +127,7 @@ const Blog: React.FC = () => {
                                 <div className="absolute bottom-3 right-3 z-30">
                                     <SocialShare
                                         minimal
-                                        url={`https://www.anhanga.tur.br/blog/${post.slug}`}
+                                        url={getBlogPostUrl(post.slug)}
                                         title={post.title}
                                         excerpt={post.excerpt}
                                     />
@@ -157,17 +157,17 @@ const Blog: React.FC = () => {
                                     </span>
                                 </div>
                             </div>
-                        </Link>
+                        </a>
                     ))}
                 </div>
 
                 {/* View More Button */}
                 <div className="mt-16 text-center">
-                    <Link to="/blog" className="inline-flex items-center gap-2 px-8 py-4 bg-white border-2 border-gray-200 text-gray-600 rounded-full font-bold hover:border-brand-cyan hover:text-brand-cyan transition-all shadow-sm hover:shadow-md group">
+                    <a href={getBlogHomeUrl()} className="inline-flex items-center gap-2 px-8 py-4 bg-white border-2 border-gray-200 text-gray-600 rounded-full font-bold hover:border-brand-cyan hover:text-brand-cyan transition-all shadow-sm hover:shadow-md group">
                         <Sparkles className="w-4 h-4 text-brand-yellow fill-brand-yellow" />
                         Ver Todos os Artigos
                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </Link>
+                    </a>
                 </div>
             </div>
         </section>

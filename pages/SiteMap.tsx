@@ -1,0 +1,63 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { SEO } from '../components/SEO';
+import { BLOG_POSTS } from '../data/blogData';
+import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
+
+const SiteMap: React.FC = () => {
+  const coreLinks = [
+    { to: '/', label: 'Home' },
+    { to: getBlogHomeUrl(), label: 'Blog', external: true },
+    { to: '/orlando', label: 'Orlando' },
+    { to: '/beto-carrero', label: 'Beto Carrero' },
+    { to: '/lollapalooza-2026', label: 'Lollapalooza 2026' },
+    { to: '/termos-de-uso', label: 'Termos de Uso' },
+    { to: '/politica-privacidade', label: 'Política de Privacidade' }
+  ];
+
+  return (
+    <>
+      <SEO
+        title="Mapa do Site"
+        description="Navegue pelas principais páginas da Anhangá Viagens, incluindo landings, blog e páginas institucionais."
+        canonical="https://www.anhanga.tur.br/mapa-do-site"
+      />
+      <main className="min-h-screen bg-[#fffdf5] pt-32 pb-24">
+        <section className="container mx-auto px-6 max-w-4xl">
+          <h1 className="text-4xl md:text-5xl font-black text-brand-dark mb-6">Mapa do Site</h1>
+          <p className="text-gray-600 mb-10">Acesse rapidamente as principais áreas do site.</p>
+
+          <h2 className="text-2xl font-extrabold text-brand-dark mb-4">Páginas Principais</h2>
+          <ul className="space-y-3 mb-10">
+            {coreLinks.map((link) => (
+              <li key={link.to}>
+                {link.external ? (
+                  <a href={link.to} className="text-brand-cyan hover:underline font-semibold">
+                    {link.label}
+                  </a>
+                ) : (
+                  <Link to={link.to} className="text-brand-cyan hover:underline font-semibold">
+                    {link.label}
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ul>
+
+          <h2 className="text-2xl font-extrabold text-brand-dark mb-4">Blog</h2>
+          <ul className="space-y-3">
+            {BLOG_POSTS.map((post) => (
+              <li key={post.id}>
+                <a href={getBlogPostUrl(post.slug)} className="text-brand-cyan hover:underline font-semibold">
+                  {post.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </main>
+    </>
+  );
+};
+
+export default SiteMap;

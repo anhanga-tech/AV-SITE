@@ -6,6 +6,7 @@ import X from 'lucide-react/dist/esm/icons/x';
 import Phone from 'lucide-react/dist/esm/icons/phone';
 import ChevronDown from 'lucide-react/dist/esm/icons/chevron-down';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { getBlogHomeUrl } from '../utils/blog';
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -154,12 +155,12 @@ const Header: React.FC = () => {
                 )}
               </div>
             ))}
-            <Link
-              to="/blog"
+            <a
+              href={getBlogHomeUrl()}
               className={`font-medium text-sm transition-colors duration-500 hover:opacity-80 focus:outline-none focus:underline decoration-2 underline-offset-4 ${navTextClass}`}
             >
               Blog
-            </Link>
+            </a>
           </nav>
 
           {/* CTA Button */}
@@ -214,13 +215,13 @@ const Header: React.FC = () => {
               </Link>
             )
           ))}
-          <Link
-            to="/blog"
+          <a
+            href={getBlogHomeUrl()}
             className="text-gray-700 font-medium py-2 border-b border-gray-50 focus:text-brand-vibrant focus:outline-none"
             onClick={() => setIsMobileMenuOpen(false)}
           >
             Blog
-          </Link>
+          </a>
           <a
             href={getWhatsAppLink("Olá! Gostaria de falar com um especialista.")}
             target="_blank"

@@ -8,6 +8,7 @@ import Mail from 'lucide-react/dist/esm/icons/mail';
 import MapPin from 'lucide-react/dist/esm/icons/map-pin';
 import Globe2 from 'lucide-react/dist/esm/icons/globe-2';
 import Heart from 'lucide-react/dist/esm/icons/heart';
+import { getBlogHomeUrl } from '../utils/blog';
 
 const Footer: React.FC = () => {
     const currentYear = new Date().getFullYear();
@@ -45,11 +46,14 @@ const Footer: React.FC = () => {
                     <div>
                         <h4 className="font-bold text-white mb-6 uppercase tracking-wider text-xs">Menu</h4>
                         <ul className="space-y-3 font-medium">
-                            <li><a href="#destinos" className="hover:text-brand-yellow transition-colors">Destinos</a></li>
-                            <li><a href="#experiencia" className="hover:text-brand-yellow transition-colors">Experiência</a></li>
-                            <li><a href="#como-funciona" className="hover:text-brand-yellow transition-colors">Como Funciona</a></li>
-                            <li><a href="#depoimentos" className="hover:text-brand-yellow transition-colors">Love Notes</a></li>
-                            <li><Link to="/politica-privacidade" className="hover:text-brand-yellow transition-colors">Políticas</Link></li>
+                            <li><Link to="/" className="hover:text-brand-yellow transition-colors">Home</Link></li>
+                            <li><a href={getBlogHomeUrl()} className="hover:text-brand-yellow transition-colors">Blog</a></li>
+                            <li><Link to="/orlando" className="hover:text-brand-yellow transition-colors">Orlando</Link></li>
+                            <li><Link to="/beto-carrero" className="hover:text-brand-yellow transition-colors">Beto Carrero</Link></li>
+                            <li><Link to="/lollapalooza-2026" className="hover:text-brand-yellow transition-colors">Lollapalooza 2026</Link></li>
+                            <li><Link to="/mapa-do-site" className="hover:text-brand-yellow transition-colors">Mapa do Site</Link></li>
+                            <li><Link to="/termos-de-uso" className="hover:text-brand-yellow transition-colors">Termos de Uso</Link></li>
+                            <li><Link to="/politica-privacidade" className="hover:text-brand-yellow transition-colors">Política de Privacidade</Link></li>
                         </ul>
                     </div>
 
@@ -58,10 +62,12 @@ const Footer: React.FC = () => {
                         <h4 className="font-bold text-white mb-6 uppercase tracking-wider text-xs">Fale Conosco</h4>
                         <ul className="space-y-4 font-medium text-sm">
                             <li className="flex items-center gap-3">
-                                <Phone className="w-5 h-5 text-brand-cyan" /> (11) 5283-3309
+                                <Phone className="w-5 h-5 text-brand-cyan" />
+                                <a href="tel:+551152833309" className="hover:text-brand-yellow transition-colors">(11) 5283-3309</a>
                             </li>
                             <li className="flex items-center gap-3">
-                                <Mail className="w-5 h-5 text-brand-cyan" /> contato@anhanga.tur.br
+                                <Mail className="w-5 h-5 text-brand-cyan" />
+                                <a href="mailto:contato@anhanga.tur.br" className="hover:text-brand-yellow transition-colors">contato@anhanga.tur.br</a>
                             </li>
                             <li className="flex items-start gap-3">
                                 <MapPin className="w-5 h-5 text-brand-cyan shrink-0 mt-1" />

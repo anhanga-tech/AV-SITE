@@ -7,6 +7,8 @@ import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import Search from 'lucide-react/dist/esm/icons/search';
 import BookOpen from 'lucide-react/dist/esm/icons/book-open';
 import { SocialShare } from '../components/SocialShare';
+import { SEO } from '../components/SEO';
+import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 
 const BlogList: React.FC = () => {
     const [hoveredId, setHoveredId] = useState<number | null>(null);
@@ -18,8 +20,18 @@ const BlogList: React.FC = () => {
     );
 
     return (
-        <div className="min-h-screen bg-[#fffdf5] pt-32 pb-24">
-            <div className="container mx-auto px-6">
+        <>
+            <SEO
+                title="Blog de Viagens e Dicas Práticas"
+                description="Dicas, roteiros e conteúdos para planejar viagens personalizadas com mais segurança, economia e experiência."
+                canonical="https://www.anhanga.tur.br/blog"
+            />
+            <BreadcrumbSchema items={[
+                { name: 'Home', item: 'https://www.anhanga.tur.br/' },
+                { name: 'Blog', item: 'https://www.anhanga.tur.br/blog' }
+            ]} />
+            <div className="min-h-screen bg-[#fffdf5] pt-32 pb-24">
+                <div className="container mx-auto px-6">
 
                 {/* Header */}
                 <div className="text-center mb-16 max-w-3xl mx-auto">
@@ -112,8 +124,9 @@ const BlogList: React.FC = () => {
                         <p className="text-gray-400 text-lg font-medium">Nenhum artigo encontrado com esse termo. 🕵️‍♂️</p>
                     </div>
                 )}
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 

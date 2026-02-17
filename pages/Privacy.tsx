@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 
 const Privacy = () => {
     const metaDescription = "Política de Privacidade e Proteção de Dados da Anhangá Turismo: coleta, tratamento, armazenamento e direitos dos titulares.";
-    const canonicalUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/politica-privacidade`;
+    const canonicalUrl = "https://www.anhanga.tur.br/politica-privacidade";
 
     return (
         <div className="min-h-screen bg-background text-foreground">

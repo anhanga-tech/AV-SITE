@@ -1,1 +1,3 @@
+/blog    https://blog.anhanga.tur.br    301!
+/blog/*  https://blog.anhanga.tur.br/:splat  301!
 /*    /index.html   200
