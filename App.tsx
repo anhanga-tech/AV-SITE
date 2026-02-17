@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -7,15 +7,18 @@ import ScrollToTop from './components/ScrollToTop';
 
 // Pages
 import Home from './pages/Home';
-import BlogRedirect from './pages/BlogRedirect';
-import Terms from './pages/Terms';
-import Privacy from './pages/Privacy';
-import SiteMap from './pages/SiteMap';
-import BetoCarreroLanding from './pages/landings/BetoCarreroLanding';
-import LollapaloozaLanding from './pages/landings/LollapaloozaLanding';
-import OrlandoLanding from './pages/landings/OrlandoLanding';
+const BlogRedirect = lazy(() => import('./pages/BlogRedirect'));
+const Terms = lazy(() => import('./pages/Terms'));
+const Privacy = lazy(() => import('./pages/Privacy'));
+const SiteMap = lazy(() => import('./pages/SiteMap'));
+const BetoCarreroLanding = lazy(() => import('./pages/landings/BetoCarreroLanding'));
+const LollapaloozaLanding = lazy(() => import('./pages/landings/LollapaloozaLanding'));
+const OrlandoLanding = lazy(() => import('./pages/landings/OrlandoLanding'));
 
 import { HelmetProvider } from 'react-helmet-async';
+
+const MainRouteFallback: React.FC = () => <section className="min-h-[40vh] bg-white" aria-hidden="true" />;
+const LandingRouteFallback: React.FC = () => <div className="min-h-screen bg-white" aria-hidden="true" />;
 
 const MainSiteShell: React.FC = () => {
   return (
@@ -24,11 +27,11 @@ const MainSiteShell: React.FC = () => {
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/blog" element={<BlogRedirect />} />
-          <Route path="/blog/:slug" element={<BlogRedirect />} />
-          <Route path="/termos-de-uso" element={<Terms />} />
-          <Route path="/politica-privacidade" element={<Privacy />} />
-          <Route path="/mapa-do-site" element={<SiteMap />} />
+          <Route path="/blog" element={<Suspense fallback={<MainRouteFallback />}><BlogRedirect /></Suspense>} />
+          <Route path="/blog/:slug" element={<Suspense fallback={<MainRouteFallback />}><BlogRedirect /></Suspense>} />
+          <Route path="/termos-de-uso" element={<Suspense fallback={<MainRouteFallback />}><Terms /></Suspense>} />
+          <Route path="/politica-privacidade" element={<Suspense fallback={<MainRouteFallback />}><Privacy /></Suspense>} />
+          <Route path="/mapa-do-site" element={<Suspense fallback={<MainRouteFallback />}><SiteMap /></Suspense>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
@@ -44,9 +47,9 @@ function App() {
       <Router>
         <ScrollToTop />
         <Routes>
-          <Route path="/beto-carrero" element={<BetoCarreroLanding />} />
-          <Route path="/lollapalooza-2026" element={<LollapaloozaLanding />} />
-          <Route path="/orlando" element={<OrlandoLanding />} />
+          <Route path="/beto-carrero" element={<Suspense fallback={<LandingRouteFallback />}><BetoCarreroLanding /></Suspense>} />
+          <Route path="/lollapalooza-2026" element={<Suspense fallback={<LandingRouteFallback />}><LollapaloozaLanding /></Suspense>} />
+          <Route path="/orlando" element={<Suspense fallback={<LandingRouteFallback />}><OrlandoLanding /></Suspense>} />
           <Route path="/*" element={<MainSiteShell />} />
         </Routes>
       </Router>
