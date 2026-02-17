@@ -9,7 +9,7 @@ const Categories: React.FC = () => {
     {
       title: "Orlando",
       subtitle: "Magia & Parques",
-      image: "https://res.klook.com/image/upload/c_crop,h_1687,w_3000,x_0,y_312,z_0.2/w_750,h_469,c_fill,q_85/activities/avkqwz1ar2964muauoml.jpg",
+      image: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293380/avkqwz1ar2964muauoml_xivjtk.jpg",
       tag: "Destino dos Sonhos",
       rotate: "-rotate-2",
       color: "bg-blue-100 text-blue-600",
@@ -18,7 +18,7 @@ const Categories: React.FC = () => {
     {
       title: "Beto Carrero",
       subtitle: "Diversão BR",
-      image: "https://destino.betocarrero.com.br/wp-content/uploads/2021/03/Star-Mountain-Beto-Carrero-World-2.jpg",
+      image: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293401/Star-Mountain-Beto-Carrero-World-2_r6n9ij.jpg",
       tag: "Radical",
       rotate: "rotate-3",
       color: "bg-yellow-100 text-yellow-700",
@@ -27,7 +27,7 @@ const Categories: React.FC = () => {
     {
       title: "Lollapalooza",
       subtitle: "Festivais",
-      image: "https://www.riotimesonline.com/wp-content/uploads/2025/08/lollapalooza-brasil-2026-2.webp",
+      image: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293421/lollapalooza-brasil-2026-2_pwrkqg.webp",
       tag: "Festival",
       rotate: "-rotate-1",
       color: "bg-emerald-100 text-emerald-600",

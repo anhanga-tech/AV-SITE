@@ -69,6 +69,17 @@ export const optimizeRemoteImageUrl = (
         return rawUrl;
     }
 
+    if (rawUrl.includes('res.cloudinary.com') && rawUrl.includes('/image/upload/')) {
+        // Inject Cloudinary delivery transformations only if not already present.
+        if (rawUrl.includes('/image/upload/f_') || rawUrl.includes('/image/upload/q_') || rawUrl.includes('/image/upload/w_')) {
+            return rawUrl;
+        }
+        const transforms = height
+            ? `f_auto,q_auto,w_${width},h_${height},c_fill`
+            : `f_auto,q_auto,w_${width}`;
+        return rawUrl.replace('/image/upload/', `/image/upload/${transforms}/`);
+    }
+
     const withoutProtocol = rawUrl.replace(/^https?:\/\//, '');
     const encodedUrl = encodeURIComponent(withoutProtocol);
     return `https://wsrv.nl/?url=${encodedUrl}&w=${width}&output=webp&q=80`;
@@ -87,33 +98,32 @@ export interface HeroVideo {
 export const HERO_VIDEOS: HeroVideo[] = [
     {
         id: 1,
-        // TODO: Replace with CDN URL (e.g., /videos/hero-rio.mp4)
-        url: "https://www.pexels.com/pt-br/download/video/16863167/",
-        poster: "https://images.pexels.com/photos/2868242/pexels-photo-2868242.jpeg",
+        url: "https://res.cloudinary.com/dzehqrcmm/video/upload/f_auto,q_auto,vc_auto/v1771293570/16863167_kbozxi.mp4",
+        poster: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293589/pexels-photo-2868242_hugrsz.jpg",
         description: "Rio de Janeiro / Tropical Brazil"
     },
     {
         id: 2,
-        url: "https://www.pexels.com/pt-br/download/video/7197880/",
-        poster: "https://images.pexels.com/photos/1530259/pexels-photo-1530259.jpeg",
+        url: "https://res.cloudinary.com/dzehqrcmm/video/upload/f_auto,q_auto,vc_auto/v1771293602/7197880_r8nk2w.mp4",
+        poster: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293621/pexels-photo-1530259_iea81k.jpg",
         description: "Paris / Europa"
     },
     {
         id: 3,
-        url: "https://www.pexels.com/pt-br/download/video/4069480/",
-        poster: "https://images.pexels.com/photos/1483053/pexels-photo-1483053.jpeg",
+        url: "https://res.cloudinary.com/dzehqrcmm/video/upload/f_auto,q_auto,vc_auto/v1771293785/4069480-uhd_3840_2160_25fps_mqkuxl.mov",
+        poster: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293814/pexels-photo-1483053_azoiz9.jpg",
         description: "Maldivas / Praia Paradisíaca"
     },
     {
         id: 4,
-        url: "https://www.pexels.com/pt-br/download/video/31312984/",
-        poster: "https://images.pexels.com/photos/12110576/pexels-photo-12110576.jpeg",
+        url: "https://res.cloudinary.com/dzehqrcmm/video/upload/f_auto,q_auto,vc_auto/v1771293836/31312984_af8j6l.mp4",
+        poster: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293870/pexels-photo-12110576_qaeilk.jpg",
         description: "New York / Urbano"
     },
     {
         id: 5,
-        url: "https://www.pexels.com/pt-br/download/video/3120431/",
-        poster: "https://images.pexels.com/photos/4027087/pexels-photo-4027087.jpeg",
+        url: "https://res.cloudinary.com/dzehqrcmm/video/upload/f_auto,q_auto,vc_auto/v1771293881/3120431_c16dlk.mp4",
+        poster: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293923/pexels-photo-4027087_zipkrv.jpg",
         description: "Natureza / Montanhas"
     }
 ];
