@@ -106,7 +106,7 @@ const Button: React.FC<ButtonProps> = ({
       <button
         onClick={handleClick}
         disabled={isLoading}
-        className={`${baseStyles} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className} ${isLoading ? 'cursor-wait opacity-90' : ''}`}
+        className={`btn-whatsapp ${baseStyles} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className} ${isLoading ? 'cursor-wait opacity-90' : ''}`}
         aria-label={computedAriaLabel}
       >
         {isLoading ? (
