@@ -669,14 +669,16 @@ const Hero: React.FC = () => {
                           type="button"
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAdults(prev => Math.max(1, prev - 1)); }}
                           className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-brand-cyan hover:text-brand-cyan transition-all"
+                          aria-label="Remover um adulto"
                         >
                           <Minus className="w-4 h-4" />
                         </button>
-                        <span className="font-bold w-8 text-center text-gray-900">{adults}</span>
+                        <span className="font-bold w-8 text-center text-gray-900" aria-live="polite">{adults}</span>
                         <button
                           type="button"
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAdults(prev => prev + 1); }}
                           className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-brand-cyan hover:text-brand-cyan transition-all"
+                          aria-label="Adicionar um adulto"
                         >
                           <Plus className="w-4 h-4" />
                         </button>
@@ -689,14 +691,16 @@ const Hero: React.FC = () => {
                           type="button"
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleChildChange('remove'); }}
                           className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-brand-cyan hover:text-brand-cyan transition-all"
+                          aria-label="Remover uma criança"
                         >
                           <Minus className="w-4 h-4" />
                         </button>
-                        <span className="font-bold w-8 text-center text-gray-900">{children}</span>
+                        <span className="font-bold w-8 text-center text-gray-900" aria-live="polite">{children}</span>
                         <button
                           type="button"
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleChildChange('add'); }}
                           className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-brand-cyan hover:text-brand-cyan transition-all"
+                          aria-label="Adicionar uma criança"
                         >
                           <Plus className="w-4 h-4" />
                         </button>

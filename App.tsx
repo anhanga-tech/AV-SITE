@@ -24,7 +24,7 @@ const MainSiteShell: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen bg-white">
       <Header />
-      <main className="flex-grow">
+      <main id="main-content" className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/blog" element={<Suspense fallback={<MainRouteFallback />}><BlogRedirect /></Suspense>} />
