@@ -16,6 +16,7 @@ const TRACKING_PARAMS = [
 // Microsoft Ads (hsa_) parameters are captured dynamically - no need to list all
 const HSA_PREFIX = 'hsa_';
 const COOKIE_NAME = 'tracking_data';
+const STORAGE_KEY = 'anhanga_tracking_data';
 const WHATSAPP_NUMBER = '551152833309';
 // Cookie name for GA4 session (dynamic based on measurement ID suffix)
 const GA4_SESSION_COOKIE = '_ga_QDBT5PM4KP';
@@ -113,6 +114,17 @@ const captureTrackingData = (): string | null => {
 
     const urlParams = new URLSearchParams(searchString);
 
+    // 0. Try to load from SessionStorage first for internal consistency
+    try {
+        const stored = sessionStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            const parsed = JSON.parse(stored);
+            Object.assign(trackingData, parsed);
+        }
+    } catch (e) {
+        // Fallback silently if sessionStorage is blocked
+    }
+
     // 1. Try URL parameters first
     TRACKING_PARAMS.forEach(param => {
         const value = urlParams.get(param);
@@ -152,6 +164,11 @@ const captureTrackingData = (): string | null => {
     }
 
     if (foundInUrl || cid || sid) {
+        // Save to SessionStorage if found in URL or new IDs captured
+        try {
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(trackingData));
+        } catch (e) {}
+
         // Construct string with comma separator for readability
         const dataString = Object.keys(trackingData)
             .map(key => `${key}=${trackingData[key]}`)
@@ -220,12 +237,7 @@ initializeTracking();
  * Format: "utm_source=google, gclid=123, cid=456.789, sid=1700000000"
  */
 export const getTrackingRef = (): string | null => {
-    // Return cached data if available
-    if (cachedTrackingData) {
-        return cachedTrackingData;
-    }
-
-    // Try to capture fresh data
+    // Always try to capture fresh data to pick up URL changes in SPA
     return captureTrackingData();
 };
 
