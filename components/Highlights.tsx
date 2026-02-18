@@ -81,6 +81,7 @@ const Highlights: React.FC = () => {
                                 <LazyImage
                                     src="https://images.pexels.com/photos/1450372/pexels-photo-1450372.jpeg"
                                     alt="Praia"
+                                    width={800}
                                     className="w-full object-cover aspect-[4/3] transition-transform duration-1000 group-hover:scale-110"
                                 />
                                 <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-md px-4 py-1 rounded-full text-xs font-bold text-gray-700 shadow-sm transition-transform duration-300 group-hover:scale-110">

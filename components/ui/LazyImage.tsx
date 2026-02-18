@@ -1,11 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import ImageIcon from 'lucide-react/dist/esm/icons/image';
+import { optimizeRemoteImageUrl } from '../../data/mediaConfig';
 
 interface LazyImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
     src: string;
     alt: string;
     className?: string;
     placeholderClassName?: string;
+    width?: number | string;
+    height?: number | string;
 }
 
 export const LazyImage: React.FC<LazyImageProps> = ({
@@ -13,11 +16,23 @@ export const LazyImage: React.FC<LazyImageProps> = ({
     alt,
     className = "",
     placeholderClassName = "bg-gray-200",
+    width,
+    height,
     ...props
 }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isLoaded, setIsLoaded] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
+
+    // Optimize URL only when source or dimensions change
+    const optimizedSrc = useMemo(() => {
+        if (!src) return '';
+        // If width is provided as a number, use it for optimization.
+        // If it's a string (like "100%") or undefined, use default optimization.
+        const numericWidth = typeof width === 'number' ? width : 1200;
+        const numericHeight = typeof height === 'number' ? height : undefined;
+        return optimizeRemoteImageUrl(src, numericWidth, numericHeight);
+    }, [src, width, height]);
 
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
@@ -45,8 +60,10 @@ export const LazyImage: React.FC<LazyImageProps> = ({
             )}
             {isVisible && (
                 <img
-                    src={src}
+                    src={optimizedSrc}
                     alt={alt}
+                    width={width}
+                    height={height}
                     loading={props.loading ?? "lazy"}
                     fetchPriority={props.fetchPriority ?? "low"}
                     decoding="async"
