@@ -384,7 +384,7 @@ const Hero: React.FC = () => {
   const guestSummary = `${adults} Adulto${adults !== 1 ? 's' : ''}${children > 0 ? `, ${children} Chd` : ''}`;
 
   // Calendar Logic
-  const getDaysInMonth = (date: Date) => {
+  function getDaysInMonth(date: Date) {
     const year = date.getFullYear();
     const month = date.getMonth();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -398,7 +398,7 @@ const Hero: React.FC = () => {
       days.push(new Date(year, month, i));
     }
     return days;
-  };
+  }
 
   // Helper to check if a date is in the past (before today)
   const isDateInPast = (date: Date) => {
