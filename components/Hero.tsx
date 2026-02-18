@@ -214,9 +214,6 @@ const Hero: React.FC = () => {
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
-  // Memoize calendar days to avoid redundant calculations on every render of Hero
-  const calendarDays = useMemo(() => getDaysInMonth(currentMonth), [currentMonth]);
-
   // State for Guests
   const [showGuestDropdown, setShowGuestDropdown] = useState(false);
   const [adults, setAdults] = useState(2);
@@ -239,6 +236,26 @@ const Hero: React.FC = () => {
   const calendarRef = useRef<HTMLDivElement>(null);
   const tripTypeRef = useRef<HTMLDivElement>(null);
   const budgetRef = useRef<HTMLDivElement>(null);
+
+  // Calendar Logic
+  const getDaysInMonth = (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDayOfWeek = new Date(year, month, 1).getDay();
+
+    const days = [];
+    for (let i = 0; i < firstDayOfWeek; i++) {
+      days.push(null);
+    }
+    for (let i = 1; i <= daysInMonth; i++) {
+      days.push(new Date(year, month, i));
+    }
+    return days;
+  };
+
+  // Memoize calendar days to avoid redundant calculations on every render of Hero
+  const calendarDays = useMemo(() => getDaysInMonth(currentMonth), [currentMonth]);
 
   // Defer video loading on mobile / save-data and wait for user intent.
   useEffect(() => {
@@ -382,23 +399,6 @@ const Hero: React.FC = () => {
   };
 
   const guestSummary = `${adults} Adulto${adults !== 1 ? 's' : ''}${children > 0 ? `, ${children} Chd` : ''}`;
-
-  // Calendar Logic
-  const getDaysInMonth = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const firstDayOfWeek = new Date(year, month, 1).getDay();
-
-    const days = [];
-    for (let i = 0; i < firstDayOfWeek; i++) {
-      days.push(null);
-    }
-    for (let i = 1; i <= daysInMonth; i++) {
-      days.push(new Date(year, month, i));
-    }
-    return days;
-  };
 
   // Helper to check if a date is in the past (before today)
   const isDateInPast = (date: Date) => {

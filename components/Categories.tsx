@@ -2,7 +2,6 @@ import React from 'react';
 import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import TrendingUp from 'lucide-react/dist/esm/icons/trending-up';
 import { LazyImage } from './ui/LazyImage';
-import { optimizeRemoteImageUrl } from '../data/mediaConfig';
 
 const Categories: React.FC = () => {
   const popularDestinations = [
@@ -78,7 +77,9 @@ const Categories: React.FC = () => {
               {/* Image Area */}
               <div className="aspect-square w-full overflow-hidden bg-gray-100 mb-6 relative">
                 <LazyImage
-                  src={optimizeRemoteImageUrl(item.image, 900, 900)}
+                  src={item.image}
+                  width={900}
+                  height={900}
                   alt={item.title}
                   loading="lazy"
                   fetchPriority="low"
