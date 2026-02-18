@@ -199,8 +199,17 @@ export default async function handler(request: Request) {
 
         const { contents } = await request.json();
 
-        if (!contents) {
-            return new Response(JSON.stringify({ error: 'Contents are required' }), {
+        // Security validation for input
+        if (!contents || !Array.isArray(contents) || contents.length === 0) {
+            return new Response(JSON.stringify({ error: 'Contents must be a non-empty array' }), {
+                status: 400,
+                headers: { 'Content-Type': 'application/json', ...corsHeaders },
+            });
+        }
+
+        // Limit the number of messages to prevent excessive resource consumption (basic DoS protection)
+        if (contents.length > 50) {
+            return new Response(JSON.stringify({ error: 'Too many messages in history' }), {
                 status: 400,
                 headers: { 'Content-Type': 'application/json', ...corsHeaders },
             });
@@ -241,9 +250,10 @@ export default async function handler(request: Request) {
     } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         console.error('SERVER: Error proxying to Gemini:', errorMessage);
+
+        // Don't leak internal error details to the client
         return new Response(JSON.stringify({
-            error: 'Error processing request',
-            details: errorMessage
+            error: 'Error processing request'
         }), {
             status: 500,
             headers: { 'Content-Type': 'application/json', ...corsHeaders },
