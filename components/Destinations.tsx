@@ -560,10 +560,18 @@ const Destinations: React.FC = () => {
 
                         {/* Custom Controls (Stickers) */}
                         <div className="absolute bottom-6 right-6 flex flex-col gap-2 z-[400]">
-                            <button onClick={() => handleZoom('in')} className="w-10 h-10 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all text-gray-700 font-black">
+                            <button
+                                onClick={() => handleZoom('in')}
+                                className="w-10 h-10 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all text-gray-700 font-black"
+                                aria-label="Aumentar zoom no mapa"
+                            >
                                 <Plus className="w-5 h-5" />
                             </button>
-                            <button onClick={() => handleZoom('out')} className="w-10 h-10 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all text-gray-700 font-black">
+                            <button
+                                onClick={() => handleZoom('out')}
+                                className="w-10 h-10 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all text-gray-700 font-black"
+                                aria-label="Diminuir zoom no mapa"
+                            >
                                 <Minus className="w-5 h-5" />
                             </button>
                         </div>
@@ -621,7 +629,11 @@ const Destinations: React.FC = () => {
                         {/* Washi Tape Decor */}
                         <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-32 h-10 bg-red-400/80 rotate-1 backdrop-blur-sm z-20 shadow-sm border-l-2 border-r-2 border-white/40"></div>
 
-                        <button onClick={() => setSelectedDestination(null)} className="absolute top-4 right-4 z-30 bg-white border-2 border-gray-100 p-2 rounded-full shadow-md hover:scale-110 transition-transform text-gray-800">
+                        <button
+                            onClick={() => setSelectedDestination(null)}
+                            className="absolute top-4 right-4 z-30 bg-white border-2 border-gray-100 p-2 rounded-full shadow-md hover:scale-110 transition-transform text-gray-800"
+                            aria-label="Fechar detalhes do destino"
+                        >
                             <X className="w-5 h-5" />
                         </button>
 
