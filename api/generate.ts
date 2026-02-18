@@ -76,12 +76,6 @@ const BUDGET_FALLBACKS = new Set([
     'indefinido'
 ]);
 
-const LOCATION_FALLBACKS = new Set([
-    ...CITY_FALLBACKS,
-    'destino a definir',
-    'origem a definir'
-]);
-
 const BUDGET_TAXONOMY: Record<TripScope, string[]> = {
     national: ['até R$ 10 mil', 'R$ 10-20 mil', 'R$ 20-35 mil', 'R$ 35 mil+'],
     south_america: ['até R$ 20 mil', 'R$ 20-35 mil', 'R$ 35-60 mil', 'R$ 60 mil+'],
@@ -171,20 +165,6 @@ function isCityValueAcceptable(value?: string): boolean {
     if (normalized.length < 2) return false;
 
     return /[a-z]/i.test(normalized);
-}
-
-function isMeaningfulDestination(destination?: string): boolean {
-    if (!destination) return false;
-    const normalized = normalizeText(destination);
-    if (normalized.length <= 1 || LOCATION_FALLBACKS.has(normalized)) return false;
-
-    const parts = normalized
-        .split(/[,\-/|]/)
-        .map((part) => part.trim())
-        .filter(Boolean);
-
-    if (parts.length === 0) return false;
-    return parts.some((part) => !LOCATION_FALLBACKS.has(part));
 }
 
 function normalizeTripScope(value: unknown): TripScope | undefined {
@@ -318,13 +298,10 @@ function validateBudgetToolArgs(rawArgs: unknown): BudgetValidationResult {
     }
 
     const missing: string[] = [];
-    const destinationCityIsFallback = destinationCity ? LOCATION_FALLBACKS.has(normalizeText(destinationCity)) : false;
 
-    if (!isMeaningfulDestination(destination)) missing.push('destination_city');
+    if (!destination) missing.push('destination_city');
     if (!isCityValueAcceptable(originCity)) missing.push('origin_city');
-    if (!isCityValueAcceptable(destinationCity) || (destinationCityIsFallback && !isMeaningfulDestination(destination))) {
-        missing.push('destination_city');
-    }
+    if (!isCityValueAcceptable(destinationCity)) missing.push('destination_city');
     if (!dates) missing.push('dates');
     if (!adults) missing.push('adults');
 
@@ -353,7 +330,7 @@ function validateBudgetToolArgs(rawArgs: unknown): BudgetValidationResult {
         origin_city: originCity,
         origin_region: originRegion,
         destination_city: destinationCity,
-        destination_region: destinationRegion && !LOCATION_FALLBACKS.has(normalizeText(destinationRegion)) ? destinationRegion : '',
+        destination_region: destinationRegion || '',
         trip_scope: tripScope,
         budget_range: normalizeBudgetRange(tripScope, cleanString(raw.budget_range)),
         decision_role: cleanString(raw.decision_role) || 'não informado',

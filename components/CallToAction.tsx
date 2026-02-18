@@ -51,7 +51,8 @@ const CallToAction: React.FC = () => {
                                 href={getWhatsAppLink("Olá! Gostaria de fazer meu check-in e solicitar um orçamento personalizado.")}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-3 bg-brand-dark text-white text-lg font-bold px-8 py-4 rounded-xl shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
+                                className="btn-whatsapp flex items-center gap-3 bg-brand-dark text-white text-lg font-bold px-8 py-4 rounded-xl shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
+                                data-tracking="cta-home-footer"
                             >
                                 <span>Fazer Check-in (WhatsApp)</span>
                                 <MessageSquare className="w-5 h-5" />

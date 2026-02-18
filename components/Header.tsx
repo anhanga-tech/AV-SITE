@@ -83,6 +83,12 @@ const Header: React.FC = () => {
     <header
       className={`fixed top-0 w-full z-50 transition-all duration-500 ease-in-out ${headerClass}`}
     >
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 bg-brand-vibrant text-white px-4 py-2 rounded-md z-[70] font-bold shadow-lg"
+      >
+        Pular para o conteúdo
+      </a>
       <div className="container mx-auto px-6 flex justify-between items-center">
         {/* Logo left */}
         <Link

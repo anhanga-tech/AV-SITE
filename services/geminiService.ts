@@ -39,62 +39,6 @@ const formatLocation = (city?: string, region?: string, fallback = 'A definir'):
   return `${cityText}, ${regionText}`;
 };
 
-const PLACEHOLDER_LOCATION_VALUES = new Set([
-  'a definir',
-  'a confirmar',
-  'nao informado',
-  'não informado',
-  'nao sei',
-  'não sei',
-  'indefinido',
-  'destino a definir',
-  'origem a definir',
-]);
-
-const normalizeText = (value: string): string => {
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/\s+/g, ' ')
-    .trim();
-};
-
-const isPlaceholderLocation = (value?: string): boolean => {
-  if (!value || !value.trim()) return true;
-  const normalized = normalizeText(value);
-  if (PLACEHOLDER_LOCATION_VALUES.has(normalized)) return true;
-
-  const parts = normalized
-    .split(/[,\-/|]/)
-    .map((part) => part.trim())
-    .filter(Boolean);
-
-  if (parts.length === 0) return true;
-  return parts.every((part) => PLACEHOLDER_LOCATION_VALUES.has(part));
-};
-
-const resolveDestinationText = (args: BudgetFunctionArgs): string => {
-  const cityText = args.destination_city?.trim() || '';
-  const regionText = args.destination_region?.trim() || '';
-  const summaryText = args.destination?.trim() || '';
-
-  const hasCity = !isPlaceholderLocation(cityText);
-  const hasRegion = !isPlaceholderLocation(regionText);
-  const hasSummary = !isPlaceholderLocation(summaryText);
-
-  if (hasCity) {
-    return hasRegion ? `${cityText}, ${regionText}` : cityText;
-  }
-
-  if (hasSummary) {
-    return hasRegion ? `${summaryText} (${regionText})` : summaryText;
-  }
-
-  if (hasRegion) return regionText;
-  return 'Destino a definir';
-};
-
 const mapTripScopeLabel = (scope?: string): string => {
   if (scope === 'national') return 'Nacional';
   if (scope === 'south_america') return 'América do Sul';
@@ -160,7 +104,11 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
       }
 
       const originText = formatLocation(args.origin_city, args.origin_region, 'Origem a definir');
-      const destinationText = resolveDestinationText(args);
+      const destinationText = formatLocation(
+        args.destination_city,
+        args.destination_region,
+        args.destination || 'Destino a definir'
+      );
       const scopeText = mapTripScopeLabel(args.trip_scope);
       const budgetText = args.budget_range?.trim() || 'A definir';
       const needText = args.need_summary?.trim() || 'Não informado';
