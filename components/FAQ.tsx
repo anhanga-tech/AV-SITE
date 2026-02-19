@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import ChevronDown from 'lucide-react/dist/esm/icons/chevron-down';
 import ChevronUp from 'lucide-react/dist/esm/icons/chevron-up';
 import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
@@ -14,7 +14,7 @@ interface FAQItemProps {
     idx: number;
 }
 
-const FAQItem: React.FC<FAQItemProps> = ({ question, answer, idx }) => {
+const FAQItem = memo(({ question, answer, idx }: FAQItemProps) => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -62,134 +62,135 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer, idx }) => {
             </div>
         </div>
     );
-};
+});
+
+// Defines the data with strict structure passing React Nodes (JSX) as answer
+// Moved outside component to prevent re-allocation on every render
+const FAQS = [
+    {
+        question: "Quanto custa um roteiro personalizado?",
+        answer: (
+            <div itemProp="text">
+                <p className="mb-4">
+                    O preço varia conforme a complexidade, duração e destino. Nossos roteiros começam
+                    em <strong>R$ 3.800</strong> e podem chegar a <strong>R$ 50.000+</strong> para experiências premium.
+                </p>
+                <strong className="block mb-2 text-brand-dark">Fatores que influenciam o preço:</strong>
+                <ul className="list-disc pl-5 space-y-1 mb-4">
+                    <li>Passagens aéreas (variável conforme data e companhia)</li>
+                    <li>Hospedagem (economia a luxo)</li>
+                    <li>Experiências e passeios</li>
+                    <li>Duração da viagem</li>
+                    <li>Sazonalidade do destino</li>
+                </ul>
+                <p className="border-l-4 border-brand-yellow pl-4 italic">
+                    <strong>Receba uma cotação personalizada gratuitamente!</strong> <br />
+                    Fale com nossos especialistas via WhatsApp.
+                </p>
+            </div>
+        )
+    },
+    {
+        question: "Como funciona a estrutura de preço da Anhangá?",
+        answer: (
+            <div itemProp="text">
+                <p className="mb-4">
+                    Nós montamos seu roteiro dia-a-dia conforme seu estilo e orçamento.
+                    Você recebe uma proposta com todos os custos listados:
+                </p>
+                <ul className="space-y-2 mb-4">
+                    <li className="flex items-center gap-2"><Plane className="w-4 h-4 text-brand-cyan" /> Passagens aéreas (consultamos o melhor preço do dia)</li>
+                    <li className="flex items-center gap-2"><Hotel className="w-4 h-4 text-brand-cyan" /> Hospedagem (você escolhe o nível de conforto)</li>
+                    <li className="flex items-center gap-2"><Ticket className="w-4 h-4 text-brand-cyan" /> Entradas em atrações</li>
+                    <li className="flex items-center gap-2"><MapPin className="w-4 h-4 text-brand-cyan" /> Transporte terrestre</li>
+                    <li className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-brand-cyan" /> Refeições recomendadas (opcionais)</li>
+                </ul>
+                <p className="font-bold text-brand-dark">Só avançamos após sua aprovação. Sem surpresas!</p>
+            </div>
+        )
+    },
+    {
+        question: "Quanto tempo antes devo planejar minha viagem?",
+        answer: (
+            <div itemProp="text">
+                <p className="mb-4">
+                    Recomendamos começar com <strong>3-6 meses de antecedência</strong> para viagens internacionais.
+                    Isso nos permite:
+                </p>
+                <ul className="list-disc pl-5 space-y-1 mb-4">
+                    <li>Consultar as melhores tarifas de passagens aéreas</li>
+                    <li>Garantir hospedagem em alta temporada</li>
+                    <li>Organizar vistos (se necessário)</li>
+                    <li>Ajustar o roteiro conforme preferências</li>
+                </ul>
+                <p>
+                    Mas não se preocupe! Somos especialistas em <span className="text-brand-button font-bold">"milagres de última hora"</span> também - conseguimos viagens em 48 horas em casos urgentes.
+                </p>
+            </div>
+        )
+    },
+    {
+        question: "O que diferencia a Anhangá de outras agências?",
+        answer: (
+            <div itemProp="text">
+                <p className="mb-2"><strong>1. Roteiros 100% personalizados:</strong> Não vendemos pacotes prontos.</p>
+                <p className="mb-2"><strong>2. Sem burocracia:</strong> Cuidamos de vistos, formulários, tudo.</p>
+                <p className="mb-2"><strong>3. Concierge humano:</strong> Fale com especialistas, não robôs.</p>
+                <p className="mb-2"><strong>4. Suporte 24/7:</strong> Temos um "botão de pânico" no WhatsApp.</p>
+                <p><strong>5. Especialistas em transformação:</strong> Viagens que mudam vidas, não apenas destinos.</p>
+            </div>
+        )
+    },
+    {
+        question: "Qual é o processo de planejamento?",
+        answer: (
+            <div itemProp="text">
+                <strong className="block mb-3">4 passos simples:</strong>
+                <ol className="list-decimal pl-5 space-y-3">
+                    <li className="pl-1"><strong className="text-brand-dark">Oie! Vamos conversar?</strong> <br /> Você nos conta seus sonhos e orçamento via WhatsApp</li>
+                    <li className="pl-1"><strong className="text-brand-dark">Desenhando o Sonho</strong> <br /> Nossos especialistas criam um roteiro dia-a-dia personalizado</li>
+                    <li className="pl-1"><strong className="text-brand-dark">Burocracia? Deixa com a gente</strong> <br /> Emitimos voos, hotéis, passeios e parcelamos</li>
+                    <li className="pl-1"><strong className="text-brand-dark">Fui! Partiu Viajar</strong> <br /> Você recebe vouchers organizados. A gente fica de plantão 24h</li>
+                </ol>
+            </div>
+        )
+    },
+    {
+        question: "Como funcionam os pacotes para o Lollapalooza 2026?",
+        answer: (
+            <div itemProp="text">
+                <p className="mb-4">
+                    Somos especialistas em grandes festivais. Nossos pacotes para o <strong>Lollapalooza 2026</strong> incluem translados exclusivos, hospedagem estratégica próxima ao Interlagos e suporte completo para que você foque apenas na música.
+                </p>
+                <p className="font-bold text-brand-dark italic">Garanta seu lugar com antecedência, pois a procura é altíssima!</p>
+            </div>
+        )
+    },
+    {
+        question: "A Anhangá possui roteiros para o público 50+ (Melhor Idade)?",
+        answer: (
+            <div itemProp="text">
+                <p className="mb-4">
+                    Sim! O <strong>Turismo 50+</strong> é um de nossos pilares. Criamos roteiros com ritmo desacelerado, foco em conforto, acessibilidade e experiências culturais enriquecedoras, tanto no Brasil quanto no exterior.
+                </p>
+                <p>Nossa curadoria seleciona hotéis e passeios que priorizam o bem-estar e a segurança deste público exigente.</p>
+            </div>
+        )
+    },
+    {
+        question: "A Anhangá Viagens é uma agência credenciada?",
+        answer: (
+            <div itemProp="text">
+                <p className="mb-2">
+                    Com certeza. Somos uma agência de turismo com <strong>Certificado Cadastur (37.036.732/0001-41)</strong> e parceiros credenciados dos maiores parques do Brasil, como <strong>Beto Carrero World</strong> e <strong>Hopi Hari</strong>.
+                </p>
+                <p>Isso garante segurança jurídica e oficialidade em todos os ingressos e serviços que comercializamos.</p>
+            </div>
+        )
+    }
+];
 
 const FAQ: React.FC = () => {
-    // Defines the data with strict structure passing React Nodes (JSX) as answer
-    const faqs = [
-        {
-            question: "Quanto custa um roteiro personalizado?",
-            answer: (
-                <div itemProp="text">
-                    <p className="mb-4">
-                        O preço varia conforme a complexidade, duração e destino. Nossos roteiros começam
-                        em <strong>R$ 3.800</strong> e podem chegar a <strong>R$ 50.000+</strong> para experiências premium.
-                    </p>
-                    <strong className="block mb-2 text-brand-dark">Fatores que influenciam o preço:</strong>
-                    <ul className="list-disc pl-5 space-y-1 mb-4">
-                        <li>Passagens aéreas (variável conforme data e companhia)</li>
-                        <li>Hospedagem (economia a luxo)</li>
-                        <li>Experiências e passeios</li>
-                        <li>Duração da viagem</li>
-                        <li>Sazonalidade do destino</li>
-                    </ul>
-                    <p className="border-l-4 border-brand-yellow pl-4 italic">
-                        <strong>Receba uma cotação personalizada gratuitamente!</strong> <br />
-                        Fale com nossos especialistas via WhatsApp.
-                    </p>
-                </div>
-            )
-        },
-        {
-            question: "Como funciona a estrutura de preço da Anhangá?",
-            answer: (
-                <div itemProp="text">
-                    <p className="mb-4">
-                        Nós montamos seu roteiro dia-a-dia conforme seu estilo e orçamento.
-                        Você recebe uma proposta com todos os custos listados:
-                    </p>
-                    <ul className="space-y-2 mb-4">
-                        <li className="flex items-center gap-2"><Plane className="w-4 h-4 text-brand-cyan" /> Passagens aéreas (consultamos o melhor preço do dia)</li>
-                        <li className="flex items-center gap-2"><Hotel className="w-4 h-4 text-brand-cyan" /> Hospedagem (você escolhe o nível de conforto)</li>
-                        <li className="flex items-center gap-2"><Ticket className="w-4 h-4 text-brand-cyan" /> Entradas em atrações</li>
-                        <li className="flex items-center gap-2"><MapPin className="w-4 h-4 text-brand-cyan" /> Transporte terrestre</li>
-                        <li className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-brand-cyan" /> Refeições recomendadas (opcionais)</li>
-                    </ul>
-                    <p className="font-bold text-brand-dark">Só avançamos após sua aprovação. Sem surpresas!</p>
-                </div>
-            )
-        },
-        {
-            question: "Quanto tempo antes devo planejar minha viagem?",
-            answer: (
-                <div itemProp="text">
-                    <p className="mb-4">
-                        Recomendamos começar com <strong>3-6 meses de antecedência</strong> para viagens internacionais.
-                        Isso nos permite:
-                    </p>
-                    <ul className="list-disc pl-5 space-y-1 mb-4">
-                        <li>Consultar as melhores tarifas de passagens aéreas</li>
-                        <li>Garantir hospedagem em alta temporada</li>
-                        <li>Organizar vistos (se necessário)</li>
-                        <li>Ajustar o roteiro conforme preferências</li>
-                    </ul>
-                    <p>
-                        Mas não se preocupe! Somos especialistas em <span className="text-brand-button font-bold">"milagres de última hora"</span> também - conseguimos viagens em 48 horas em casos urgentes.
-                    </p>
-                </div>
-            )
-        },
-        {
-            question: "O que diferencia a Anhangá de outras agências?",
-            answer: (
-                <div itemProp="text">
-                    <p className="mb-2"><strong>1. Roteiros 100% personalizados:</strong> Não vendemos pacotes prontos.</p>
-                    <p className="mb-2"><strong>2. Sem burocracia:</strong> Cuidamos de vistos, formulários, tudo.</p>
-                    <p className="mb-2"><strong>3. Concierge humano:</strong> Fale com especialistas, não robôs.</p>
-                    <p className="mb-2"><strong>4. Suporte 24/7:</strong> Temos um "botão de pânico" no WhatsApp.</p>
-                    <p><strong>5. Especialistas em transformação:</strong> Viagens que mudam vidas, não apenas destinos.</p>
-                </div>
-            )
-        },
-        {
-            question: "Qual é o processo de planejamento?",
-            answer: (
-                <div itemProp="text">
-                    <strong className="block mb-3">4 passos simples:</strong>
-                    <ol className="list-decimal pl-5 space-y-3">
-                        <li className="pl-1"><strong className="text-brand-dark">Oie! Vamos conversar?</strong> <br /> Você nos conta seus sonhos e orçamento via WhatsApp</li>
-                        <li className="pl-1"><strong className="text-brand-dark">Desenhando o Sonho</strong> <br /> Nossos especialistas criam um roteiro dia-a-dia personalizado</li>
-                        <li className="pl-1"><strong className="text-brand-dark">Burocracia? Deixa com a gente</strong> <br /> Emitimos voos, hotéis, passeios e parcelamos</li>
-                        <li className="pl-1"><strong className="text-brand-dark">Fui! Partiu Viajar</strong> <br /> Você recebe vouchers organizados. A gente fica de plantão 24h</li>
-                    </ol>
-                </div>
-            )
-        },
-        {
-            question: "Como funcionam os pacotes para o Lollapalooza 2026?",
-            answer: (
-                <div itemProp="text">
-                    <p className="mb-4">
-                        Somos especialistas em grandes festivais. Nossos pacotes para o <strong>Lollapalooza 2026</strong> incluem translados exclusivos, hospedagem estratégica próxima ao Interlagos e suporte completo para que você foque apenas na música.
-                    </p>
-                    <p className="font-bold text-brand-dark italic">Garanta seu lugar com antecedência, pois a procura é altíssima!</p>
-                </div>
-            )
-        },
-        {
-            question: "A Anhangá possui roteiros para o público 50+ (Melhor Idade)?",
-            answer: (
-                <div itemProp="text">
-                    <p className="mb-4">
-                        Sim! O <strong>Turismo 50+</strong> é um de nossos pilares. Criamos roteiros com ritmo desacelerado, foco em conforto, acessibilidade e experiências culturais enriquecedoras, tanto no Brasil quanto no exterior.
-                    </p>
-                    <p>Nossa curadoria seleciona hotéis e passeios que priorizam o bem-estar e a segurança deste público exigente.</p>
-                </div>
-            )
-        },
-        {
-            question: "A Anhangá Viagens é uma agência credenciada?",
-            answer: (
-                <div itemProp="text">
-                    <p className="mb-2">
-                        Com certeza. Somos uma agência de turismo com <strong>Certificado Cadastur (37.036.732/0001-41)</strong> e parceiros credenciados dos maiores parques do Brasil, como <strong>Beto Carrero World</strong> e <strong>Hopi Hari</strong>.
-                    </p>
-                    <p>Isso garante segurança jurídica e oficialidade em todos os ingressos e serviços que comercializamos.</p>
-                </div>
-            )
-        }
-    ];
-
     return (
         <section
             id="faq-section"
@@ -217,7 +218,7 @@ const FAQ: React.FC = () => {
                 </div>
 
                 <div className="space-y-4">
-                    {faqs.map((faq, idx) => (
+                    {FAQS.map((faq, idx) => (
                         <FAQItem key={idx} {...faq} idx={idx} />
                     ))}
                 </div>
@@ -247,5 +248,7 @@ const FAQ: React.FC = () => {
         </section>
     );
 };
+
+FAQItem.displayName = 'FAQItem';
 
 export default FAQ;
