@@ -80,13 +80,29 @@ const Footer: React.FC = () => {
                 {/* Bottom */}
                 <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="flex gap-4 order-2 md:order-1">
-                        <a href="https://instagram.com/anhangaviagens" target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 rounded-full hover:bg-brand-vibrant hover:text-white transition-colors"><Instagram className="w-5 h-5" /></a>
-                        <a href="https://facebook.com/profile.php?id=61585422494271" target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 rounded-full hover:bg-brand-vibrant hover:text-white transition-colors"><Facebook className="w-5 h-5" /></a>
+                        <a
+                            href="https://instagram.com/anhangaviagens"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 bg-white/5 rounded-full hover:bg-brand-vibrant hover:text-white transition-colors"
+                            aria-label="Siga a Anhangá Viagens no Instagram"
+                        >
+                            <Instagram className="w-5 h-5" />
+                        </a>
+                        <a
+                            href="https://facebook.com/profile.php?id=61585422494271"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 bg-white/5 rounded-full hover:bg-brand-vibrant hover:text-white transition-colors"
+                            aria-label="Siga a Anhangá Viagens no Facebook"
+                        >
+                            <Facebook className="w-5 h-5" />
+                        </a>
                     </div>
 
                     <div className="flex flex-col md:items-end gap-2 text-center md:text-right order-1 md:order-2">
                         <div className="text-xs text-gray-500 font-medium flex items-center justify-center md:justify-end gap-1">
-                            Feito com <Heart className="w-3 h-3 text-red-500 fill-current" /> pela <img src={`${baseUrl}assets/LOGO ANHANGA TECH.svg`} alt="Anhangá.tech" className="h-4 w-auto inline-block mx-1 align-sub" /> • {currentYear}
+                            Feito com <Heart className="w-3 h-3 text-red-500 fill-current" aria-hidden="true" /> pela <img src={`${baseUrl}assets/LOGO ANHANGA TECH.svg`} alt="Anhangá.tech" className="h-4 w-auto inline-block mx-1 align-sub" /> • {currentYear}
                         </div>
                         <div className="text-[10px] text-gray-600 font-medium">
                             ANHANGA TURISMO LTDA • CNPJ/Cadastur: 37.036.732/0001-41

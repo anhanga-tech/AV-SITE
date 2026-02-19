@@ -1,5 +1,21 @@
-
 import { getWhatsAppLink } from "../utils/whatsapp";
+
+interface BudgetFunctionArgs {
+  destination?: string;
+  dates?: string;
+  adults?: number;
+  child_ages?: number[];
+  interests?: string;
+  origin_city?: string;
+  origin_region?: string;
+  destination_city?: string;
+  destination_region?: string;
+  trip_scope?: 'national' | 'south_america' | 'international' | string;
+  budget_range?: string;
+  decision_role?: string;
+  need_summary?: string;
+  timeline_window?: string;
+}
 
 interface ChatResponse {
   text?: string;
@@ -12,6 +28,24 @@ interface ChatResponse {
   };
 }
 
+const formatLocation = (city?: string, region?: string, fallback = 'A definir'): string => {
+  const cityText = typeof city === 'string' ? city.trim() : '';
+  const regionText = typeof region === 'string' ? region.trim() : '';
+
+  if (!cityText && !regionText) return fallback;
+  if (!regionText) return cityText || fallback;
+  if (!cityText) return regionText;
+
+  return `${cityText}, ${regionText}`;
+};
+
+const mapTripScopeLabel = (scope?: string): string => {
+  if (scope === 'national') return 'Nacional';
+  if (scope === 'south_america') return 'América do Sul';
+  if (scope === 'international') return 'Internacional';
+  return 'A definir';
+};
+
 export const getTravelAdvice = async (history: { role: 'user' | 'model', text: string }[]): Promise<ChatResponse> => {
   try {
     // Converter histórico simples para o formato da API
@@ -20,9 +54,13 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
       parts: [{ text: msg.text }]
     }));
 
-    // In local development you might want to point this to localhost:3000/api/generate
-    // In production (Vercel), '/api/generate' is automatically routed to the serverless function.
-    const apiEndpoint = '/api/generate';
+    // Detectar ambiente e configurar endpoint
+    const isDev = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+    const apiEndpoint = isDev 
+      ? 'http://localhost:3000/api/generate' 
+      : '/api/generate';
+
+    console.log('[GeminiService] Using endpoint:', apiEndpoint);
 
     const response = await fetch(apiEndpoint, {
       method: 'POST',
@@ -43,6 +81,20 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
         };
       }
 
+      // Handle specific error types
+      if (response.status === 500) {
+        console.error('[GeminiService] Server error:', errorData);
+        throw new Error('Erro interno do servidor');
+      }
+
+      if (response.status === 503) {
+        throw new Error('Serviço temporariamente indisponível');
+      }
+
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('API key missing or invalid');
+      }
+
       throw new Error(errorData.error || `Server responded with ${response.status}`);
     }
 
@@ -56,10 +108,10 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
 
     // 2. Function Call (Orçamento)
     if (data.functionCall && data.functionCall.name === 'generate_budget_link') {
-      const args = data.functionCall.args;
+      const args: BudgetFunctionArgs = data.functionCall.args || {};
 
       // Formatar texto de viajantes
-      const adultsCount = args.adults || 2;
+      const adultsCount = Number.isInteger(args.adults) && (args.adults as number) > 0 ? (args.adults as number) : 2;
       const childAges = Array.isArray(args.child_ages) ? args.child_ages : [];
 
       let travelersText = `${adultsCount} Adulto${adultsCount !== 1 ? 's' : ''}`;
@@ -69,11 +121,23 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
         travelersText += `, ${childAges.length} Criança${childAges.length !== 1 ? 's' : ''} (${agesString})`;
       }
 
+      const originText = formatLocation(args.origin_city, args.origin_region, 'Origem a definir');
+      const destinationText = formatLocation(
+        args.destination_city,
+        args.destination_region,
+        args.destination || 'Destino a definir'
+      );
+      const scopeText = mapTripScopeLabel(args.trip_scope);
+      const budgetText = args.budget_range?.trim() || 'A definir';
+      const needText = args.need_summary?.trim() || 'Não informado';
+      const decisionRoleText = args.decision_role?.trim() || 'Não informado';
+      const timelineText = args.timeline_window?.trim() || 'Não informado';
+
       // Construir link do WhatsApp
-      const text = `Olá! Vim pelo Chatbot da Anhangá. Gostaria de um orçamento:\n\n📍 Destino: ${args.destination}\n📅 Data: ${args.dates || 'A definir'}\n👥 Viajantes: ${travelersText}\n✨ Interesses: ${args.interests || 'Geral'}`;
+      const text = `Olá! Vim pelo Chatbot da Anhangá. Gostaria de um orçamento:\n\n🛫 Origem: ${originText}\n📍 Destino: ${destinationText}\n🌎 Escopo: ${scopeText}\n📅 Data: ${args.dates || 'A definir'}\n👥 Viajantes: ${travelersText}\n💰 Faixa de investimento: ${budgetText}\n✨ Interesses: ${args.interests || 'Geral'}\n🎯 Necessidade principal: ${needText}\n👤 Decisor(a): ${decisionRoleText}\n⏱️ Janela de decisão: ${timelineText}`;
 
       result.budgetLink = {
-        destination: args.destination,
+        destination: destinationText,
         dates: args.dates || 'A definir',
         travelers: travelersText,
         interests: args.interests || '',
@@ -89,11 +153,25 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
     return result;
 
   } catch (error: any) {
-    console.error("Erro ao consultar Gemini via Server:", error);
+    console.error("[GeminiService] Erro ao consultar Gemini:", error);
 
-    // Mensagens de erro amigáveis
-    if (error?.message?.includes('API key missing')) {
-      return { text: "⚠️ Erro de configuração no servidor. A chave da API não foi encontrada." };
+    // Mensagens de erro amigáveis baseadas no tipo de erro
+    if (error?.message?.includes('API key missing') || error?.message?.includes('invalid')) {
+      return { text: "⚠️ Erro de configuração no servidor. A chave da API não foi encontrada ou é inválida." };
+    }
+
+    if (error?.message?.includes('Failed to fetch') || error?.name === 'TypeError') {
+      return { 
+        text: "🔌 Não foi possível conectar ao servidor. Verifique sua conexão com a internet ou tente novamente em alguns instantes." 
+      };
+    }
+
+    if (error?.message?.includes('Erro interno do servidor')) {
+      return { text: "⚙️ Tivemos um problema técnico interno. Por favor, tente novamente em alguns instantes." };
+    }
+
+    if (error?.message?.includes('Serviço temporariamente indisponível')) {
+      return { text: "🕐 Nosso serviço está temporariamente indisponível. Por favor, tente novamente em breve." };
     }
 
     return { text: `Desculpe, tive um problema técnico momentâneo. Poderia tentar novamente?` };
