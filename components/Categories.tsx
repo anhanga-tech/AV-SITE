@@ -2,47 +2,39 @@ import React from 'react';
 import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import TrendingUp from 'lucide-react/dist/esm/icons/trending-up';
 import { LazyImage } from './ui/LazyImage';
-import { optimizeRemoteImageUrl } from '../data/mediaConfig';
+
+// Moved outside component to prevent re-allocation on every render
+const POPULAR_DESTINATIONS = [
+  {
+    title: "Orlando",
+    subtitle: "Magia & Parques",
+    image: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293380/avkqwz1ar2964muauoml_xivjtk.jpg",
+    tag: "Destino dos Sonhos",
+    rotate: "-rotate-2",
+    color: "bg-blue-100 text-blue-600",
+    link: "/orlando"
+  },
+  {
+    title: "Beto Carrero",
+    subtitle: "Diversão BR",
+    image: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293401/Star-Mountain-Beto-Carrero-World-2_r6n9ij.jpg",
+    tag: "Radical",
+    rotate: "rotate-3",
+    color: "bg-yellow-100 text-yellow-700",
+    link: "/beto-carrero"
+  },
+  {
+    title: "Lollapalooza",
+    subtitle: "Festivais",
+    image: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293421/lollapalooza-brasil-2026-2_pwrkqg.webp",
+    tag: "Festival",
+    rotate: "-rotate-1",
+    color: "bg-emerald-100 text-emerald-600",
+    link: "/lollapalooza-2026"
+  }
+];
 
 const Categories: React.FC = () => {
-  const popularDestinations = [
-    {
-      title: "Orlando",
-      subtitle: "Magia & Parques",
-      image: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293380/avkqwz1ar2964muauoml_xivjtk.jpg",
-      tag: "Destino dos Sonhos",
-      rotate: "-rotate-2",
-      color: "bg-blue-100 text-blue-600",
-      link: "/orlando"
-    },
-    {
-      title: "Beto Carrero",
-      subtitle: "Diversão BR",
-      image: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293401/Star-Mountain-Beto-Carrero-World-2_r6n9ij.jpg",
-      tag: "Radical",
-      rotate: "rotate-3",
-      color: "bg-yellow-100 text-yellow-700",
-      link: "/beto-carrero"
-    },
-    {
-      title: "Lollapalooza",
-      subtitle: "Festivais",
-      image: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293421/lollapalooza-brasil-2026-2_pwrkqg.webp",
-      tag: "Festival",
-      rotate: "-rotate-1",
-      color: "bg-emerald-100 text-emerald-600",
-      link: "/lollapalooza-2026"
-    },
-    /* {
-      title: "Viagens 50+",
-      subtitle: "Brasil & Mundo",
-      image: "https://images.pexels.com/photos/3472901/pexels-photo-3472901.jpeg",
-      tag: "Melhor Idade",
-      rotate: "rotate-2",
-      color: "bg-green-100 text-green-700",
-      link: "#contato"
-    } */
-  ];
 
   return (
     <section className="py-24 bg-[#fffdf5] relative">
@@ -62,7 +54,7 @@ const Categories: React.FC = () => {
 
         {/* Polaroid Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 px-4">
-          {popularDestinations.map((item, idx) => (
+          {POPULAR_DESTINATIONS.map((item, idx) => (
             <a
               key={idx}
               href={item.link}
@@ -78,7 +70,9 @@ const Categories: React.FC = () => {
               {/* Image Area */}
               <div className="aspect-square w-full overflow-hidden bg-gray-100 mb-6 relative">
                 <LazyImage
-                  src={optimizeRemoteImageUrl(item.image, 900, 900)}
+                  src={item.image}
+                  width={900}
+                  height={900}
                   alt={item.title}
                   loading="lazy"
                   fetchPriority="low"
