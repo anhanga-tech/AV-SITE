@@ -18,47 +18,47 @@ interface HighlightItem {
     rotate: string;
 }
 
+// Moved outside component to prevent re-allocation on every render
+const HIGHLIGHTS: HighlightItem[] = [
+    {
+        icon: UserCheck,
+        title: "Concierge Humano",
+        description: "Esqueça os robôs. Fale com gente que entende de gente.",
+        bg: "bg-orange-100",
+        accent: "border-orange-200",
+        iconColor: "text-orange-600",
+        rotate: "-rotate-1"
+    },
+    {
+        icon: Sparkles,
+        title: "Roteiros à Mão",
+        description: "Desenhamos cada dia da viagem do zero, só pra você.",
+        bg: "bg-emerald-100",
+        accent: "border-emerald-200",
+        iconColor: "text-emerald-600",
+        rotate: "rotate-2"
+    },
+    {
+        icon: FileCheck,
+        title: "Zero Burocracia",
+        description: "Vistos, formulários e chatices? Deixa com a gente.",
+        bg: "bg-blue-100",
+        accent: "border-blue-200",
+        iconColor: "text-blue-600",
+        rotate: "-rotate-2"
+    },
+    {
+        icon: Compass,
+        title: "Achados Secretos",
+        description: "Lugares autênticos que não estão na primeira página do Google.",
+        bg: "bg-emerald-100",
+        accent: "border-emerald-200",
+        iconColor: "text-emerald-600",
+        rotate: "rotate-1"
+    }
+];
+
 const Highlights: React.FC = () => {
-
-    const highlights: HighlightItem[] = [
-        {
-            icon: UserCheck,
-            title: "Concierge Humano",
-            description: "Esqueça os robôs. Fale com gente que entende de gente.",
-            bg: "bg-orange-100",
-            accent: "border-orange-200",
-            iconColor: "text-orange-600",
-            rotate: "-rotate-1"
-        },
-        {
-            icon: Sparkles,
-            title: "Roteiros à Mão",
-            description: "Desenhamos cada dia da viagem do zero, só pra você.",
-            bg: "bg-emerald-100",
-            accent: "border-emerald-200",
-            iconColor: "text-emerald-600",
-            rotate: "rotate-2"
-        },
-        {
-            icon: FileCheck,
-            title: "Zero Burocracia",
-            description: "Vistos, formulários e chatices? Deixa com a gente.",
-            bg: "bg-blue-100",
-            accent: "border-blue-200",
-            iconColor: "text-blue-600",
-            rotate: "-rotate-2"
-        },
-        {
-            icon: Compass,
-            title: "Achados Secretos",
-            description: "Lugares autênticos que não estão na primeira página do Google.",
-            bg: "bg-emerald-100",
-            accent: "border-emerald-200",
-            iconColor: "text-emerald-600",
-            rotate: "rotate-1"
-        }
-    ];
-
     return (
         <section id="experiencia" className="py-24 bg-[#fffdf5] relative overflow-hidden">
 
@@ -125,7 +125,7 @@ const Highlights: React.FC = () => {
                         </div>
 
                         <div className="grid md:grid-cols-2 gap-8">
-                            {highlights.map((item, idx) => {
+                            {HIGHLIGHTS.map((item, idx) => {
                                 const Icon = item.icon;
                                 return (
                                     <div

@@ -8,53 +8,55 @@ import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import Star from 'lucide-react/dist/esm/icons/star';
 import Heart from 'lucide-react/dist/esm/icons/heart';
 
+// Moved outside component to prevent re-allocation on every render
+const STEPS = [
+  {
+    id: 1,
+    icon: <MessageCircle className="w-8 h-8 text-white" />,
+    title: "Oie! Vamos conversar?",
+    desc: "Nada de formulários chatos. A gente bate um papo no WhatsApp para entender seus sonhos e quanto você quer investir.",
+    color: "bg-brand-yellow",
+    lightColor: "bg-yellow-50",
+    borderColor: "border-yellow-200",
+    rotate: "-rotate-2",
+    sticker: <Heart className="w-20 h-20 text-yellow-400 fill-yellow-400 drop-shadow-md" />
+  },
+  {
+    id: 2,
+    icon: <PenTool className="w-8 h-8 text-white" />,
+    title: "Desenhando o Sonho",
+    desc: "Nossos especialistas criam um roteiro dia-a-dia só seu. Ajustamos cada detalhe até você dizer: 'É isso!'",
+    color: "bg-brand-cyan",
+    lightColor: "bg-sky-50",
+    borderColor: "border-sky-200",
+    rotate: "rotate-3",
+    sticker: <Star className="w-24 h-24 text-sky-400 fill-sky-200 drop-shadow-md" />
+  },
+  {
+    id: 3,
+    icon: <CreditCard className="w-8 h-8 text-white" />,
+    title: "Burocracia? Deixa com a gente",
+    desc: "Aprovado? Ótimo! Nós emitimos voos, hotéis e passeios. Parcelamos tudo e você recebe os vouchers organizadinhos.",
+    color: "bg-emerald-500",
+    lightColor: "bg-emerald-50",
+    borderColor: "border-emerald-200",
+    rotate: "-rotate-1",
+    sticker: <div className="text-8xl drop-shadow-md filter hue-rotate-15">✈️</div>
+  },
+  {
+    id: 4,
+    icon: <Plane className="w-8 h-8 text-white" />,
+    title: "Fui! Partiu Viajar",
+    desc: "Agora é só fazer as malas! E se precisar de algo lá longe? Nosso time fica de plantão 24h por você.",
+    color: "bg-green-500",
+    lightColor: "bg-green-50",
+    borderColor: "border-green-200",
+    rotate: "rotate-2",
+    sticker: <div className="text-8xl drop-shadow-md">🏝️</div>
+  }
+];
+
 const HowItWorks: React.FC = () => {
-  const steps = [
-    {
-      id: 1,
-      icon: <MessageCircle className="w-8 h-8 text-white" />,
-      title: "Oie! Vamos conversar?",
-      desc: "Nada de formulários chatos. A gente bate um papo no WhatsApp para entender seus sonhos e quanto você quer investir.",
-      color: "bg-brand-yellow",
-      lightColor: "bg-yellow-50",
-      borderColor: "border-yellow-200",
-      rotate: "-rotate-2",
-      sticker: <Heart className="w-20 h-20 text-yellow-400 fill-yellow-400 drop-shadow-md" />
-    },
-    {
-      id: 2,
-      icon: <PenTool className="w-8 h-8 text-white" />,
-      title: "Desenhando o Sonho",
-      desc: "Nossos especialistas criam um roteiro dia-a-dia só seu. Ajustamos cada detalhe até você dizer: 'É isso!'",
-      color: "bg-brand-cyan",
-      lightColor: "bg-sky-50",
-      borderColor: "border-sky-200",
-      rotate: "rotate-3",
-      sticker: <Star className="w-24 h-24 text-sky-400 fill-sky-200 drop-shadow-md" />
-    },
-    {
-      id: 3,
-      icon: <CreditCard className="w-8 h-8 text-white" />,
-      title: "Burocracia? Deixa com a gente",
-      desc: "Aprovado? Ótimo! Nós emitimos voos, hotéis e passeios. Parcelamos tudo e você recebe os vouchers organizadinhos.",
-      color: "bg-emerald-500",
-      lightColor: "bg-emerald-50",
-      borderColor: "border-emerald-200",
-      rotate: "-rotate-1",
-      sticker: <div className="text-8xl drop-shadow-md filter hue-rotate-15">✈️</div>
-    },
-    {
-      id: 4,
-      icon: <Plane className="w-8 h-8 text-white" />,
-      title: "Fui! Partiu Viajar",
-      desc: "Agora é só fazer as malas! E se precisar de algo lá longe? Nosso time fica de plantão 24h por você.",
-      color: "bg-green-500",
-      lightColor: "bg-green-50",
-      borderColor: "border-green-200",
-      rotate: "rotate-2",
-      sticker: <div className="text-8xl drop-shadow-md">🏝️</div>
-    }
-  ];
 
   return (
     <section id="como-funciona" className="pt-24 pb-32 relative overflow-hidden bg-[#fffdf5]">
@@ -104,7 +106,7 @@ const HowItWorks: React.FC = () => {
             <div className="md:hidden absolute top-4 bottom-4 left-8 w-1 bg-gray-200 border-l-2 border-dashed border-gray-300 z-0"></div>
 
             <div className="flex flex-col gap-12 md:gap-0">
-                {steps.map((step, idx) => {
+                {STEPS.map((step, idx) => {
                     const isEven = idx % 2 === 0;
                     return (
                         <div key={step.id} className={`flex flex-col md:flex-row items-center w-full relative z-10 ${isEven ? 'md:justify-start' : 'md:justify-end'}`}>
