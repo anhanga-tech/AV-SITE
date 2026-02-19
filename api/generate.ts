@@ -539,8 +539,15 @@ export default async function handler(request: Request) {
     try {
         const apiKey = process.env.GEMINI_API_KEY;
 
+        // Debug logs for environment variables
+        console.log('[Edge Function] Environment check:');
+        console.log('- GEMINI_API_KEY present:', !!apiKey);
+        console.log('- GEMINI_MODEL:', process.env.GEMINI_MODEL || 'gemini-2.0-flash (default)');
+        console.log('- ALLOWED_ORIGIN:', process.env.ALLOWED_ORIGIN || '*');
+
         if (!apiKey) {
             console.error('SERVER: GEMINI_API_KEY not found in environment variables');
+            console.error('SERVER: Available GEMINI_* keys:', Object.keys(process.env).filter(k => k.includes('GEMINI')));
             return new Response(JSON.stringify({
                 error: 'Server configuration error: API key missing'
             }), {
@@ -548,6 +555,8 @@ export default async function handler(request: Request) {
                 headers: { 'Content-Type': 'application/json', ...corsHeaders },
             });
         }
+
+        console.log('SERVER: GEMINI_API_KEY found (length:', apiKey.length, ')');
 
         const { contents } = await request.json();
 

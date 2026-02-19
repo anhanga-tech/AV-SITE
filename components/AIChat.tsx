@@ -1,13 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import MessageCircle from 'lucide-react/dist/esm/icons/message-circle';
-import X from 'lucide-react/dist/esm/icons/x';
-import Send from 'lucide-react/dist/esm/icons/send';
-import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
-import Loader2 from 'lucide-react/dist/esm/icons/loader-2';
-import ExternalLink from 'lucide-react/dist/esm/icons/external-link';
-import Bot from 'lucide-react/dist/esm/icons/bot';
-import User from 'lucide-react/dist/esm/icons/user';
-import CheckCircle2 from 'lucide-react/dist/esm/icons/check-circle-2';
+import { MessageCircle, X, Send, Sparkles, Loader2, ExternalLink, Bot, User, CheckCircle2 } from 'lucide-react';
 import { getTravelAdvice } from '../services/geminiService';
 
 interface Message {

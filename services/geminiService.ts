@@ -54,9 +54,13 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
       parts: [{ text: msg.text }]
     }));
 
-    // In local development you might want to point this to localhost:3000/api/generate
-    // In production (Vercel), '/api/generate' is automatically routed to the serverless function.
-    const apiEndpoint = '/api/generate';
+    // Detectar ambiente e configurar endpoint
+    const isDev = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+    const apiEndpoint = isDev 
+      ? 'http://localhost:3000/api/generate' 
+      : '/api/generate';
+
+    console.log('[GeminiService] Using endpoint:', apiEndpoint);
 
     const response = await fetch(apiEndpoint, {
       method: 'POST',
@@ -75,6 +79,20 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
         return {
           text: `⏳ Você enviou muitas mensagens. Por favor, aguarde ${retryAfter} segundos e tente novamente.\n\nEnquanto isso, você pode falar diretamente conosco pelo WhatsApp!`
         };
+      }
+
+      // Handle specific error types
+      if (response.status === 500) {
+        console.error('[GeminiService] Server error:', errorData);
+        throw new Error('Erro interno do servidor');
+      }
+
+      if (response.status === 503) {
+        throw new Error('Serviço temporariamente indisponível');
+      }
+
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('API key missing or invalid');
       }
 
       throw new Error(errorData.error || `Server responded with ${response.status}`);
@@ -135,11 +153,25 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
     return result;
 
   } catch (error: any) {
-    console.error("Erro ao consultar Gemini via Server:", error);
+    console.error("[GeminiService] Erro ao consultar Gemini:", error);
 
-    // Mensagens de erro amigáveis
-    if (error?.message?.includes('API key missing')) {
-      return { text: "⚠️ Erro de configuração no servidor. A chave da API não foi encontrada." };
+    // Mensagens de erro amigáveis baseadas no tipo de erro
+    if (error?.message?.includes('API key missing') || error?.message?.includes('invalid')) {
+      return { text: "⚠️ Erro de configuração no servidor. A chave da API não foi encontrada ou é inválida." };
+    }
+
+    if (error?.message?.includes('Failed to fetch') || error?.name === 'TypeError') {
+      return { 
+        text: "🔌 Não foi possível conectar ao servidor. Verifique sua conexão com a internet ou tente novamente em alguns instantes." 
+      };
+    }
+
+    if (error?.message?.includes('Erro interno do servidor')) {
+      return { text: "⚙️ Tivemos um problema técnico interno. Por favor, tente novamente em alguns instantes." };
+    }
+
+    if (error?.message?.includes('Serviço temporariamente indisponível')) {
+      return { text: "🕐 Nosso serviço está temporariamente indisponível. Por favor, tente novamente em breve." };
     }
 
     return { text: `Desculpe, tive um problema técnico momentâneo. Poderia tentar novamente?` };
