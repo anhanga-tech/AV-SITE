@@ -610,9 +610,10 @@ export default async function handler(request: Request) {
                 responseText = buildRefinementMessage(validation.missing);
                 responseFunctionCall = undefined;
             } else {
+                const normalizedArgs: Record<string, unknown> = { ...validation.normalizedArgs };
                 responseFunctionCall = {
                     name: 'generate_budget_link',
-                    args: validation.normalizedArgs,
+                    args: normalizedArgs,
                 };
             }
         }
