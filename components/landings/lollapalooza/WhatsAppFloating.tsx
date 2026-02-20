@@ -1,13 +1,14 @@
 import React from 'react';
 import { MessageCircle } from 'lucide-react';
-import { getWhatsAppLink } from './utils/whatsapp';
+import { getWhatsAppLink } from '../../../utils/whatsapp';
+import { WHATSAPP_MESSAGE } from './constants';
 
 /**
  * Botão flutuante do WhatsApp - Versão com Tracking
  * Usa getWhatsAppLink() para incluir automaticamente todos os parâmetros de tracking.
  */
 const WhatsAppFloating: React.FC = () => {
-  const whatsappUrl = getWhatsAppLink();
+  const whatsappUrl = getWhatsAppLink(WHATSAPP_MESSAGE);
 
   return (
     <a

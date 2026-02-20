@@ -1,6 +1,7 @@
 import React from 'react';
 import { MessageCircle } from 'lucide-react';
-import { getWhatsAppLink } from './utils/whatsapp';
+import { getWhatsAppLink } from '../../../utils/whatsapp';
+import { WHATSAPP_MESSAGE } from './constants';
 
 interface ButtonProps {
   text: string;
@@ -29,7 +30,7 @@ const Button: React.FC<ButtonProps> = ({ text, className = '', variant = 'primar
   const widthClass = fullWidth ? "w-full" : "";
 
   // URL gerada com todos os parâmetros de tracking (utm, gclid, fbclid, ttclid, cid, etc.)
-  const whatsappUrl = getWhatsAppLink();
+  const whatsappUrl = getWhatsAppLink(WHATSAPP_MESSAGE);
 
   return (
     <a
