@@ -136,6 +136,19 @@ function normalizeLabel(value: string): string {
     return normalizeText(value).replace(/[–—]/g, '-');
 }
 
+function escapeRegExp(value: string): string {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function hasAliasMatch(text: string, alias: string): boolean {
+    const normalizedAlias = normalizeText(alias);
+    if (!normalizedAlias) return false;
+
+    // Match aliases as independent terms to avoid false positives like "ira" inside "emirados"
+    const pattern = new RegExp(`(?:^|[^a-z0-9])${escapeRegExp(normalizedAlias)}(?:$|[^a-z0-9])`, 'i');
+    return pattern.test(text);
+}
+
 function cleanString(value: unknown): string | undefined {
     if (typeof value !== 'string') return undefined;
     const trimmed = value.trim();
@@ -227,7 +240,7 @@ function detectBlockedDestination(destinationText: string): SafetyBlock | null {
     }
 
     for (const rule of BLOCKED_DESTINATIONS) {
-        const hit = rule.aliases.some((alias) => normalized.includes(alias));
+        const hit = rule.aliases.some((alias) => hasAliasMatch(normalized, alias));
         if (hit) {
             return {
                 category: rule.category,
@@ -444,6 +457,11 @@ DIALOG_STATE
 - Faça no máximo 1 pergunta por resposta quando faltar dado crítico.
 - Exceção: quando estiver a um passo do handoff e faltar mais de um campo obrigatório do orçamento, você pode consolidar em uma única mensagem os itens faltantes.
 - Nunca transforme a conversa em formulário rígido.
+
+CONTEXT_MEMORY_POLICY
+- Reutilize dados já confirmados no histórico (destino, datas, origem, viajantes, orçamento e BANT) e não peça novamente sem necessidade.
+- Se o usuário corrigir apenas 1 campo, mantenha os demais já confirmados e continue do ponto atual.
+- Só volte a perguntar um dado já coletado quando houver contradição explícita ou pedido de mudança.
 
 CITY_COLLECTION_POLICY
 - Cidade é obrigatória para origem e destino.
