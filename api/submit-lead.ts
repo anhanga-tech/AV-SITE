@@ -132,7 +132,7 @@ export default async function handler(request: Request): Promise<Response> {
 
         const validation = validatePayload(rawBody);
 
-        if (!validation.valid) {
+        if (validation.valid === false) {
             return buildErrorResponse(
                 {
                     ok: false,
