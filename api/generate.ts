@@ -1,4 +1,5 @@
-import { GoogleGenAI, Type, FunctionDeclaration } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
+import type { FunctionDeclaration } from "@google/genai";
 
 export const config = {
     runtime: 'edge',
@@ -224,7 +225,7 @@ function normalizeBudgetRange(scope: TripScope, value?: string): string {
     return matched || 'a definir';
 }
 
-function detectBlockedDestination(destinationText: string): SafetyBlock | null {
+export function detectBlockedDestination(destinationText: string): SafetyBlock | null {
     const normalized = normalizeText(destinationText);
     if (!normalized) return null;
 
@@ -445,7 +446,7 @@ const budgetTool: FunctionDeclaration = {
     }
 };
 
-const SYSTEM_INSTRUCTION = `
+export const SYSTEM_INSTRUCTION = `
 Você é o consultor virtual sênior da Anhangá Viagens.
 
 ROLE
