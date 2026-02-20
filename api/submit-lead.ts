@@ -550,7 +550,19 @@ export default async function handler(request: Request): Promise<Response> {
             );
         } else {
             const hubspotData = (await createContactResponse.json().catch(() => ({}))) as HubSpotObjectResponse;
-            contactId = cleanString(hubspotData.id) || 'unknown';
+            const resolvedId = cleanString(hubspotData.id);
+            if (!resolvedId) {
+                return buildErrorResponse(
+                    {
+                        ok: false,
+                        code: 'HUBSPOT_API_ERROR',
+                        error: 'Contato criado mas ID não retornado pelo HubSpot',
+                    },
+                    502,
+                    corsHeaders,
+                );
+            }
+            contactId = resolvedId;
         }
 
         const dealProperties: Record<string, string> = {
