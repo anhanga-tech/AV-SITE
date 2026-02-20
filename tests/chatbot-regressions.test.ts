@@ -50,3 +50,10 @@ test('system prompt should enforce one-question-at-a-time behavior', () => {
         /Evite saudação redundante com pergunta dupla/,
     );
 });
+
+test('system prompt should include friendly under-30-days handoff message', () => {
+    assert.match(
+        SYSTEM_INSTRUCTION,
+        /consultor no WhatsApp para verificar pacotes para outras datas\?/,
+    );
+});
