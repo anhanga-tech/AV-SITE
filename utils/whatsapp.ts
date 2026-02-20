@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react';
 
 const TRACKING_PARAMS = [
     'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
-    'gclid', 'fbclid', 'ttclid', 'wbraid', 'gbraid'
+    'gclid', 'fbclid', 'ttclid', 'wbraid', 'gbraid', 'msclkid'
 ];
 // Microsoft Ads (hsa_) parameters are captured dynamically - no need to list all
 const HSA_PREFIX = 'hsa_';
@@ -126,6 +126,7 @@ const captureTrackingData = (): string | null => {
     }
 
     // 1. Try URL parameters first
+    const msclkid = urlParams.get("msclkid"); if (msclkid) { trackingData["msclkid"] = msclkid; foundInUrl = true; }
     TRACKING_PARAMS.forEach(param => {
         const value = urlParams.get(param);
         if (value) {
@@ -161,6 +162,10 @@ const captureTrackingData = (): string | null => {
     const sid = getGA4SessionId();
     if (sid) {
         trackingData['sid'] = sid;
+    }
+
+    if (trackingData.fbclid && !trackingData.fbc) {
+        trackingData.fbc = `fb.1.${Date.now()}.${trackingData.fbclid}`;
     }
 
     if (foundInUrl || cid || sid) {
