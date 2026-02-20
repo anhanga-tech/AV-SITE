@@ -33,6 +33,7 @@ O site institucional da **Anhangá Viagens** é uma plataforma moderna e interat
 - Node.js 18+
 - Chave da API do Google Gemini
 - Token de app privado do HubSpot (para captura de leads do chatbot)
+- IDs de Pipeline e Stage de Deals no HubSpot
 
 ## 📦 Instalação
 
@@ -58,6 +59,12 @@ O site institucional da **Anhangá Viagens** é uma plataforma moderna e interat
    ```env
    GEMINI_API_KEY=sua_chave_api_aqui
    HUBSPOT_TOKEN=seu_token_do_app_privado
+   HUBSPOT_DEAL_PIPELINE_ID=id_do_pipeline_deals
+   HUBSPOT_DEAL_STAGE_ID=id_do_stage_deals
+   # Opcional (default: bant_summary)
+   HUBSPOT_DEAL_BANT_PROPERTY=bant_summary
+   # Opcional (fallback para tracking não mapeado)
+   HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY=tracking_payload_json
    ```
    > 💡 Obtenha sua chave em: [Google AI Studio](https://aistudio.google.com/apikey)
 
@@ -82,7 +89,7 @@ O projeto está pré-configurado para deploy simplificado em plataformas como Ve
 
 1. Faça o fork do repositório.
 2. Conecte sua conta do GitHub ao Vercel.
-3. Importe o repositório e configure as variáveis de ambiente `GEMINI_API_KEY` e `HUBSPOT_TOKEN` no painel do projeto.
+3. Importe o repositório e configure as variáveis de ambiente `GEMINI_API_KEY`, `HUBSPOT_TOKEN`, `HUBSPOT_DEAL_PIPELINE_ID` e `HUBSPOT_DEAL_STAGE_ID` no painel do projeto.
 4. O deploy será feito automaticamente a cada push para a branch principal.
 
 ### Netlify

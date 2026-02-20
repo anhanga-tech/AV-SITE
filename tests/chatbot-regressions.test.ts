@@ -57,3 +57,10 @@ test('system prompt should include friendly under-30-days handoff message', () =
         /consultor no WhatsApp para verificar pacotes para outras datas\?/,
     );
 });
+
+test('system prompt should mention baggage preference for likely air routes', () => {
+    assert.match(
+        SYSTEM_INSTRUCTION,
+        /baggage_preference/,
+    );
+});

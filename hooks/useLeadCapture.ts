@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
-import { getWhatsAppLink } from '../utils/whatsapp';
-import type { LeadUtms, SubmitLeadRequest, SubmitLeadResponse } from '../types/leadCapture';
+import { getTrackingDataObject, getWhatsAppLink } from '../utils/whatsapp';
+import type { LeadTracking, LeadUtms, SubmitLeadRequest, SubmitLeadResponse } from '../types/leadCapture';
 
 interface LeadDraft {
     firstName: string;
     lastName: string;
     email: string;
     bantSummary: string;
+    origin: string;
+    destination: string;
+    dates: string;
+    baggagePreference: string;
 }
 
 type LeadDraftPartial = Partial<LeadDraft>;
@@ -16,6 +20,8 @@ type SubmitLeadHookResult =
         ok: true;
         whatsappUrl: string;
         contactId: string;
+        dealId?: string;
+        warning?: string;
     }
     | {
         ok: false;
@@ -37,65 +43,102 @@ const EMPTY_LEAD_DRAFT: LeadDraft = {
     lastName: '',
     email: '',
     bantSummary: '',
+    origin: '',
+    destination: '',
+    dates: '',
+    baggagePreference: '',
 };
 
 function cleanValue(value: string): string {
     return value.trim();
 }
 
-function getQueryFromLocation(): URLSearchParams {
-    if (typeof window === 'undefined') return new URLSearchParams();
-
-    let search = window.location.search;
-
-    if (!search && window.location.hash.includes('?')) {
-        const [, hashQuery = ''] = window.location.hash.split('?');
-        if (hashQuery) {
-            search = `?${hashQuery}`;
-        }
-    }
-
-    if (!search && window.location.href.includes('?')) {
-        try {
-            search = new URL(window.location.href).search;
-        } catch {
-            search = '';
-        }
-    }
-
-    return new URLSearchParams(search);
+function toNullable(value: unknown): string | null {
+    if (typeof value !== 'string') return null;
+    const normalized = value.trim();
+    return normalized.length > 0 ? normalized : null;
 }
 
-function getNullableParam(params: URLSearchParams, key: keyof LeadUtms): string | null {
-    const value = params.get(key);
-    if (!value) return null;
-
-    const trimmed = value.trim();
-    return trimmed.length > 0 ? trimmed : null;
+function extractUtms(tracking: LeadTracking): LeadUtms {
+    return {
+        utm_source: tracking.utm_source ?? null,
+        utm_medium: tracking.utm_medium ?? null,
+        utm_campaign: tracking.utm_campaign ?? null,
+        utm_term: tracking.utm_term ?? null,
+        utm_content: tracking.utm_content ?? null,
+    };
 }
 
-function captureInitialUtms(): LeadUtms {
-    const params = getQueryFromLocation();
+function captureInitialTracking(): LeadTracking {
+    const source = getTrackingDataObject() || {};
+
+    const knownKeys = new Set([
+        'utm_source',
+        'utm_medium',
+        'utm_campaign',
+        'utm_term',
+        'utm_content',
+        'cid',
+        'sid',
+        'gclid',
+        'fbclid',
+        'msclkid',
+        'ttclid',
+        'wbraid',
+        'gbraid',
+        'fbc',
+    ]);
+
+    const extras: Record<string, string> = {};
+
+    for (const [key, value] of Object.entries(source)) {
+        if (knownKeys.has(key)) continue;
+        if (typeof value !== 'string') continue;
+
+        const normalized = value.trim();
+        if (!normalized) continue;
+
+        extras[key] = normalized;
+    }
 
     return {
-        utm_source: getNullableParam(params, 'utm_source'),
-        utm_medium: getNullableParam(params, 'utm_medium'),
-        utm_campaign: getNullableParam(params, 'utm_campaign'),
-        utm_term: getNullableParam(params, 'utm_term'),
-        utm_content: getNullableParam(params, 'utm_content'),
+        utm_source: toNullable(source.utm_source),
+        utm_medium: toNullable(source.utm_medium),
+        utm_campaign: toNullable(source.utm_campaign),
+        utm_term: toNullable(source.utm_term),
+        utm_content: toNullable(source.utm_content),
+        cid: toNullable(source.cid),
+        sid: toNullable(source.sid),
+        gclid: toNullable(source.gclid),
+        fbclid: toNullable(source.fbclid),
+        msclkid: toNullable(source.msclkid),
+        ttclid: toNullable(source.ttclid),
+        wbraid: toNullable(source.wbraid),
+        gbraid: toNullable(source.gbraid),
+        fbc: toNullable(source.fbc),
+        extras: Object.keys(extras).length > 0 ? extras : undefined,
     };
 }
 
 function buildWhatsAppMessage(lead: LeadDraft): string {
-    return [
-        'Olá! Finalizei minha qualificação pelo chatbot da Anhangá.',
+    const origin = cleanValue(lead.origin) || 'A definir';
+    const destination = cleanValue(lead.destination) || 'A definir';
+    const dates = cleanValue(lead.dates) || 'A definir';
+    const baggagePreference = cleanValue(lead.baggagePreference);
+
+    const lines = [
+        'Olá! Vim pelo chatbot da Anhangá e gostaria de continuar meu atendimento.',
         '',
-        `👤 Nome: ${lead.firstName} ${lead.lastName}`.trim(),
-        `📧 E-mail: ${lead.email}`,
-        `🎯 Resumo BANT: ${lead.bantSummary}`,
-        '',
-        'Gostaria de continuar meu atendimento com a equipe.',
-    ].join('\n');
+        `🛫 Origem: ${origin}`,
+        `📍 Destino: ${destination}`,
+        `📅 Datas: ${dates}`,
+    ];
+
+    if (baggagePreference) {
+        lines.push(`🧳 Bagagem: ${baggagePreference}`);
+    }
+
+    return lines.join('\n');
 }
 
 function resolveSubmitLeadEndpoint(): string {
@@ -107,13 +150,16 @@ function resolveSubmitLeadEndpoint(): string {
 }
 
 export function useLeadCapture() {
-    const [utms, setUtms] = useState<LeadUtms>(() => captureInitialUtms());
+    const [tracking, setTracking] = useState<LeadTracking>(() => captureInitialTracking());
+    const [utms, setUtms] = useState<LeadUtms>(() => extractUtms(captureInitialTracking()));
     const [leadDraft, setLeadDraftState] = useState<LeadDraft>(EMPTY_LEAD_DRAFT);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        setUtms(captureInitialUtms());
+        const captured = captureInitialTracking();
+        setTracking(captured);
+        setUtms(extractUtms(captured));
     }, []);
 
     const setLeadDraft = (partial: LeadDraftPartial): void => {
@@ -132,6 +178,11 @@ export function useLeadCapture() {
         setError(null);
         setIsSubmitting(true);
 
+        const latestTracking = captureInitialTracking();
+        const latestUtms = extractUtms(latestTracking);
+        setTracking(latestTracking);
+        setUtms(latestUtms);
+
         const merged: LeadDraft = {
             ...leadDraft,
             ...overrides,
@@ -142,7 +193,11 @@ export function useLeadCapture() {
             lastName: cleanValue(merged.lastName),
             email: cleanValue(merged.email).toLowerCase(),
             bantSummary: cleanValue(merged.bantSummary),
-            utms: { ...utms } || EMPTY_UTMS,
+            utms: { ...latestUtms } || EMPTY_UTMS,
+            tracking: {
+                ...latestTracking,
+                ...latestUtms,
+            },
         };
 
         if (!payload.firstName || !payload.lastName || !payload.email || !payload.bantSummary) {
@@ -188,13 +243,17 @@ export function useLeadCapture() {
             }
 
             const contactId = typeof responseData.contactId === 'string' ? responseData.contactId : 'unknown';
-            const whatsappUrl = getWhatsAppLink(buildWhatsAppMessage(payload));
+            const dealId = typeof responseData.dealId === 'string' ? responseData.dealId : undefined;
+            const warning = typeof responseData.warning === 'string' ? responseData.warning : undefined;
+            const whatsappUrl = getWhatsAppLink(buildWhatsAppMessage(merged), { appendTrackingRef: false });
 
             setIsSubmitting(false);
 
             return {
                 ok: true,
                 contactId,
+                dealId,
+                warning,
                 whatsappUrl,
             };
         } catch (requestError: unknown) {
@@ -215,6 +274,7 @@ export function useLeadCapture() {
 
     return {
         utms,
+        tracking,
         leadDraft,
         isSubmitting,
         error,

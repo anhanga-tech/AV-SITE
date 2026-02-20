@@ -6,17 +6,38 @@ export interface LeadUtms {
     utm_content: string | null;
 }
 
+export interface LeadTracking {
+    utm_source: string | null;
+    utm_medium: string | null;
+    utm_campaign: string | null;
+    utm_term: string | null;
+    utm_content: string | null;
+    cid?: string | null;
+    sid?: string | null;
+    gclid?: string | null;
+    fbclid?: string | null;
+    msclkid?: string | null;
+    ttclid?: string | null;
+    wbraid?: string | null;
+    gbraid?: string | null;
+    fbc?: string | null;
+    extras?: Record<string, string>;
+}
+
 export interface SubmitLeadRequest {
     firstName: string;
     lastName: string;
     email: string;
     utms: LeadUtms;
+    tracking?: LeadTracking;
     bantSummary: string;
 }
 
 export interface SubmitLeadSuccess {
     ok: true;
     contactId: string;
+    dealId?: string;
+    warning?: string;
     message: string;
 }
 

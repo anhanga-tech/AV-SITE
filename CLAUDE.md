@@ -15,16 +15,19 @@ npm run dev       # Start dev server at http://localhost:3000
 npm run build     # Production build to /dist
 npm run preview   # Preview production build at http://localhost:4173
 npm run deploy    # Build + deploy to GitHub Pages
+npm run test:regression  # Run regression tests (Node built-in test runner, strip-types)
 ```
 
 ## Environment Variables
 
-Required for AI chatbot functionality:
-- `GEMINI_API_KEY` - Google Gemini API key (get at https://aistudio.google.com/apikey)
-- `GEMINI_MODEL` - Model version (default: `gemini-2.5-flash`)
-- `VITE_BASE_PATH` - Base path for deployment (default: `/`)
-- `VITE_MEDIA_CDN_URL` - Optional CDN base URL for media assets (videos/images)
-- `ALLOWED_ORIGIN` - CORS allowed origin for API (default: `*`)
+```bash
+GEMINI_API_KEY=       # Google Gemini API key (required for chatbot)
+GEMINI_MODEL=         # Model version (default: gemini-2.5-flash)
+HUBSPOT_TOKEN=        # HubSpot private app token (required for lead capture)
+VITE_BASE_PATH=       # Base path for deployment (default: /)
+VITE_MEDIA_CDN_URL=   # Optional CDN base URL for media assets
+ALLOWED_ORIGIN=       # CORS allowed origin for API (default: *)
+```
 
 Copy `.env.example` to `.env` for local development.
 
@@ -32,37 +35,65 @@ Copy `.env.example` to `.env` for local development.
 
 ### Directory Structure
 
-- `/components` - React components (Header, Footer, AIChat, SEO, etc.)
-  - `/ui` - Generic UI components (LazyImage)
-  - `/schemas` - JSON-LD schema components for SEO
-- `/pages` - Page-level route components (Home, BlogList, BlogPost, Terms, Privacy)
-- `/services` - API clients (geminiService.ts for AI chat)
-- `/api` - Vercel Edge Functions (generate.ts proxies Gemini API)
-- `/utils` - Helper functions (whatsapp.ts, share.ts)
-- `/data` - Static content data (blogData.ts, mediaConfig.ts)
-- `/public` - Static assets, sitemap.xml, robots.txt
+- `/api` - Vercel Edge Functions: `generate.ts` (AI chatbot proxy) and `submit-lead.ts` (HubSpot CRM)
+- `/components` - React components; `/ui` for generic UI, `/schemas` for JSON-LD SEO, `/landings` for event landing pages
+- `/pages` - Route-level components (Home, BlogList, BlogPost, BlogRedirect, Terms, Privacy, SiteMap)
+- `/services` - `geminiService.ts`: client-side Gemini API communication
+- `/hooks` - `useLeadCapture.ts`: lead submission hook
+- `/types` - TypeScript types (`leadCapture.ts`)
+- `/utils` - `whatsapp.ts` (UTM tracking + link generation), `share.ts`, `blog.ts`
+- `/data` - `mediaConfig.ts` (media URLs + optimization), `blogData.ts` (static blog content)
 
 ### Key Patterns
 
-**Import Alias:** Use `@/` for root-relative imports (e.g., `@/components/Header`)
+**Import Alias:** Use `@/` for root-relative imports (e.g., `@/components/Header`).
 
-**AI Integration:** The Gemini API is called via a serverless proxy at `/api/generate.ts` to protect the API key. The client-side service is in `/services/geminiService.ts`. The API includes rate limiting (10 requests/minute per IP) and CORS protection.
+**Routing:** BrowserRouter with two layout branches in `App.tsx`:
+- `/beto-carrero`, `/lollapalooza-2026`, `/orlando` → Dedicated landing pages (no Header/Footer/AIChat)
+- All other routes → MainSiteShell (Header + AIChat + Footer)
+- `/blog` and `/blog/:slug` redirect to an external blog domain via `BlogRedirect.tsx`
+- `*` → redirect to `/`
+- Pages are lazy-loaded with `React.lazy` + `Suspense`
 
-**Media Assets:** Centralized in `/data/mediaConfig.ts`. When ready to migrate to CDN, set `VITE_MEDIA_CDN_URL` and update the URLs in the config file.
+**AI Chatbot Flow:**
+1. `AIChat.tsx` collects conversation history and calls `geminiService.ts`
+2. `geminiService.ts` POSTs to `/api/generate` (proxy to Gemini) — uses localhost in dev, `/api/generate` in prod
+3. `/api/generate.ts` runs a BANT qualification dialog (Need, Authority, Budget, Timeline) via a state-machine system prompt, enforces single-question-per-response, and calls the `generate_budget_link` tool when qualification is complete
+4. The budget link response is displayed with a WhatsApp CTA; under-30-day bookings are handed off to a human agent
 
-**Routing:** React Router with hash-based smooth scrolling for same-page navigation. All unknown routes redirect to home.
+**Lead Capture Flow:**
+- On budget link generation, `useLeadCapture.ts` submits to `/api/submit-lead.ts`
+- `submit-lead.ts` creates/updates a HubSpot contact with BANT summary and UTM attribution
+- Error codes: 400 (validation), 401 (bad token), 409 (duplicate email), 500 (server)
 
-**Styling:** Tailwind CSS with custom theme colors (cyan, blue, yellow, dark, light) and fonts (Poppins, Merriweather) defined in `tailwind.config.js`.
+**UTM Tracking (`utils/whatsapp.ts`):**
+- Captures UTM params and click IDs (gclid, fbclid, ttclid, etc.) from URL on page load
+- Extracts GA4 client ID and session ID from cookies
+- Persists to `sessionStorage` + cookies (30-day expiry)
+- `useWhatsAppLink()` hook appends all tracking params to WhatsApp URLs
+- Pushes to GTM `dataLayer` on capture
 
-**SEO:** Dynamic meta tags via React Helmet Async. Schema components in `/components/schemas/` generate JSON-LD structured data.
+**Media Assets (`data/mediaConfig.ts`):**
+- Cloudinary for hero videos and destination images; Pexels as fallback
+- `optimizeRemoteImageUrl()` proxies through wsrv.nl for WebP conversion
+- `optimizeCloudinaryUrl()` applies width/format transforms
+- `generateSrcSet()` builds responsive srcsets
+- To migrate to CDN, set `VITE_MEDIA_CDN_URL`
 
-**Analytics:** Google Tag Manager (GTM-T2KGS86G) and HubSpot tracking are embedded in index.html.
+**API Security (`/api/generate.ts`):**
+- Rate limiting: 10 requests/minute per IP (in-memory)
+- Message history capped at 50 entries; message size limits enforced
+- Block list of 18+ countries/regions (war zones, sanctioned territories)
+- Prompt injection prevention in system instruction
+
+**Styling:** Tailwind CSS with brand colors (cyan, blue, yellow, dark, light) and Anhangá palette (`#0056D2`, `#003B8E`, `#FFD600`). Custom animations (`fade-in-up`, `pop-in`, `float`, `blob`) and shadows (`glow`, `hard`, `float`) defined in `tailwind.config.js`. Fonts: Poppins/Inter (sans), Merriweather (serif/blog), Fredoka/Outfit (heading).
+
+**SEO:** React Helmet Async for dynamic meta tags. Schema components in `/components/schemas/` emit JSON-LD (LocalBusiness, FAQ, Breadcrumb). GTM (GTM-T2KGS86G) and HubSpot tracking in `index.html`.
 
 ### Deployment
 
-Pre-configured for:
-- **Vercel** (primary) - `vercel.json` includes security headers and SPA rewrites
-- **Netlify** - `netlify.toml` configuration
-- **GitHub Pages** - via `npm run deploy` (requires `VITE_BASE_PATH` env var)
+- **Vercel** (primary) — `vercel.json` includes security headers, SPA rewrite, and domain redirects (`anhanga.tur.br` → `www.anhanga.tur.br`)
+- **Netlify** — `netlify.toml`
+- **GitHub Pages** — `npm run deploy` (requires `VITE_BASE_PATH`)
 
-Build output goes to `/dist` directory.
+Build chunks: `react-vendor` and `ai-vendor` (manual split in `vite.config.ts`).

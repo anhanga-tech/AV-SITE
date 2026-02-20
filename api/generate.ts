@@ -39,6 +39,7 @@ interface BudgetToolArgs {
     decision_role?: string;
     need_summary?: string;
     timeline_window?: string;
+    baggage_preference?: string;
     assumed_origin_br?: boolean;
 }
 
@@ -428,6 +429,7 @@ function validateBudgetToolArgs(rawArgs: unknown): BudgetValidationResult {
         decision_role: cleanString(raw.decision_role) || 'não informado',
         need_summary: cleanString(raw.need_summary) || 'não informado',
         timeline_window: cleanString(raw.timeline_window) || 'não informado',
+        baggage_preference: cleanString(raw.baggage_preference) || '',
         assumed_origin_br: assumedOriginBr,
     };
 
@@ -518,6 +520,7 @@ const budgetTool: FunctionDeclaration = {
             decision_role: { type: Type.STRING, description: "Papel de decisão do cliente (decisor principal, compartilha decisão, etc.)." },
             need_summary: { type: Type.STRING, description: "Resumo da necessidade principal (BANT - Need)." },
             timeline_window: { type: Type.STRING, description: "Janela de decisão/embarque (BANT - Timeline)." },
+            baggage_preference: { type: Type.STRING, description: "Preferência de tarifa de bagagem quando houver trecho aéreo (mala de mão ou bagagem despachada)." },
             assumed_origin_br: { type: Type.BOOLEAN, description: "Use true quando origem não for informada e Brasil for assumido." }
         },
         required: ["destination", "destination_city", "origin_city", "dates", "adults"]
@@ -607,6 +610,7 @@ TOOL_CALL_CONTRACT
 - Chame generate_budget_link apenas quando tiver:
   destination, destination_city (ou "a definir" após tentativa), origin_city (ou "a definir" após tentativa), dates (ou "a definir"), adults, e child_ages quando houver crianças.
 - Inclua sempre os campos: origin_city, origin_region, destination_city, destination_region, trip_scope, budget_range, decision_role, need_summary, timeline_window.
+- Quando o trajeto for provavelmente aéreo (ex.: internacional, América do Sul ou longa distância), pergunte preferência de bagagem e inclua baggage_preference quando houver.
 - Não invente qualificação. Se não tiver dado explícito, use "não informado" para decision_role, need_summary e timeline_window.
 - Evite perguntas de confirmação sobre escopo e taxonomia de orçamento; priorize a continuidade para gerar o link.
 - Quando chamar a ferramenta, escreva um texto curto de transição e sem repetir dados técnicos.
