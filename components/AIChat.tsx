@@ -225,7 +225,7 @@ const AIChat: React.FC = () => {
     });
 
     if (result.ok) {
-      return { ok: true, url: result.whatsappUrl };
+      return { ok: true, url: result.whatsappUrl, notice: result.warning };
     }
 
     if (result.code === 'HUBSPOT_DUPLICATE_CONTACT') {
@@ -261,7 +261,13 @@ const AIChat: React.FC = () => {
     }
 
     if (response.budgetLink) {
-        setLeadDraft({ bantSummary: response.budgetLink.bantSummary });
+        setLeadDraft({
+            bantSummary: response.budgetLink.bantSummary,
+            origin: response.budgetLink.origin,
+            destination: response.budgetLink.destination,
+            dates: response.budgetLink.dates,
+            baggagePreference: response.budgetLink.baggagePreference || '',
+        });
 
         setMessages(prev => [...prev, { 
             role: 'model', 
