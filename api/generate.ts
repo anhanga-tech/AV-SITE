@@ -489,6 +489,9 @@ BUDGET_TAXONOMY_POLICY (TOTAL DA VIAGEM)
   - national: até R$ 10 mil | R$ 10-20 mil | R$ 20-35 mil | R$ 35 mil+
   - south_america: até R$ 20 mil | R$ 20-35 mil | R$ 35-60 mil | R$ 60 mil+
   - international: até R$ 35 mil | R$ 35-60 mil | R$ 60-100 mil | R$ 100 mil+
+- Faça o mapeamento de escopo/faixa internamente, sem pedir confirmação técnica ao cliente.
+- Nunca confronte o cliente sobre "orçamento insuficiente" ou force aumento de valor; trate orçamento sensível e mantenha tom acolhedor.
+- Se a faixa informada não encaixar perfeitamente, registre budget_range="a definir" e siga para o handoff.
 - Se origem não for informada após tentativa, use origin_city="a definir".
 - Se UF/país de origem (origin_region) não for informado, assuma Brasil e marque assumed_origin_br=true.
 
@@ -497,6 +500,7 @@ TOOL_CALL_CONTRACT
   destination, destination_city (ou "a definir" após tentativa), origin_city (ou "a definir" após tentativa), dates (ou "a definir"), adults, e child_ages quando houver crianças.
 - Inclua sempre os campos: origin_city, origin_region, destination_city, destination_region, trip_scope, budget_range, decision_role, need_summary, timeline_window.
 - Não invente qualificação. Se não tiver dado explícito, use "não informado" para decision_role, need_summary e timeline_window.
+- Evite perguntas de confirmação sobre escopo e taxonomia de orçamento; priorize a continuidade para gerar o link.
 - Quando chamar a ferramenta, escreva um texto curto de transição e sem repetir dados técnicos.
 
 SAFETY_POLICY
