@@ -177,6 +177,63 @@ export function hasOversizedMessage(contents: unknown, maxMessageLength: number)
     });
 }
 
+function extractRecord(value: unknown): Record<string, unknown> | undefined {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined;
+    return value as Record<string, unknown>;
+}
+
+export function extractBudgetToolCallFromText(
+    text?: string,
+): { name: 'generate_budget_link'; args: Record<string, unknown> } | undefined {
+    if (!text || !text.includes('generate_budget_link')) return undefined;
+
+    const candidates: string[] = [text.trim()];
+
+    const fencedMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    if (fencedMatch?.[1]) {
+        candidates.push(fencedMatch[1].trim());
+    }
+
+    if (text.includes('"tool_call"')) {
+        const start = text.indexOf('{');
+        const end = text.lastIndexOf('}');
+        if (start >= 0 && end > start) {
+            candidates.push(text.slice(start, end + 1).trim());
+        }
+    }
+
+    for (const candidate of candidates) {
+        try {
+            const parsed = JSON.parse(candidate);
+            const record = extractRecord(parsed);
+            if (!record) continue;
+
+            const toolCall = typeof record.tool_call === 'string'
+                ? record.tool_call
+                : typeof record.name === 'string'
+                    ? record.name
+                    : undefined;
+            if (toolCall !== 'generate_budget_link') continue;
+
+            const args = extractRecord(record.arguments ?? record.args);
+            if (!args) continue;
+
+            return { name: 'generate_budget_link', args };
+        } catch {
+            // Ignore invalid candidates and keep scanning
+        }
+    }
+
+    return undefined;
+}
+
+function stripToolCallJsonBlock(text: string): string {
+    return text
+        .replace(/\{[\s\S]*"tool_call"\s*:\s*"generate_budget_link"[\s\S]*\}\s*$/m, '')
+        .replace(/```(?:json)?[\s\S]*?```/gi, '')
+        .trim();
+}
+
 function normalizeAdults(value: unknown): number | undefined {
     const parsed = typeof value === 'number' ? value : Number.parseInt(String(value ?? ''), 10);
     if (!Number.isInteger(parsed) || parsed <= 0) return undefined;
@@ -477,8 +534,10 @@ ROLE
 DIALOG_STATE
 - Siga os estados: DISCOVERY -> QUALIFICATION -> CONFIRMATION -> HANDOFF.
 - Faça no máximo 1 pergunta por resposta quando faltar dado crítico.
+- NUNCA faça duas perguntas na mesma resposta. Se faltar mais de um dado, pergunte apenas o mais crítico agora.
 - Exceção: quando estiver a um passo do handoff e faltar mais de um campo obrigatório do orçamento, você pode consolidar em uma única mensagem os itens faltantes.
 - Nunca transforme a conversa em formulário rígido.
+- Evite saudação redundante com pergunta dupla (ex.: "Como posso ajudar hoje?" + outra pergunta).
 
 CONTEXT_MEMORY_POLICY
 - Reutilize dados já confirmados no histórico (destino, datas, origem, viajantes, orçamento e BANT) e não peça novamente sem necessidade.
@@ -684,6 +743,17 @@ export default async function handler(request: Request) {
 
         let responseText = textPart?.text;
         let responseFunctionCall = functionCallPart?.functionCall;
+
+        if (!responseFunctionCall && responseText) {
+            const fallbackToolCall = extractBudgetToolCallFromText(responseText);
+            if (fallbackToolCall) {
+                responseFunctionCall = fallbackToolCall;
+                responseText = stripToolCallJsonBlock(responseText);
+                if (!responseText) {
+                    responseText = 'Prontinho! ✨ Preparei seu link direto para falar com nossos especialistas. É só clicar abaixo 👇';
+                }
+            }
+        }
 
         if (responseFunctionCall?.name === 'generate_budget_link') {
             const validation = validateBudgetToolArgs(responseFunctionCall.args);
