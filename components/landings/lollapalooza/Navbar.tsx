@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, MessageCircle } from 'lucide-react';
 import { NAVIGATION_LINKS } from './constants';
-import { getWhatsAppLink } from './utils/whatsapp';
+import { getWhatsAppLink } from '../../../utils/whatsapp';
+import { WHATSAPP_MESSAGE } from './constants';
 
 /**
  * Navbar com links de WhatsApp incluindo parâmetros de tracking.
@@ -20,7 +21,7 @@ const Navbar: React.FC = () => {
   }, []);
 
   // URL gerada com todos os parâmetros de tracking
-  const whatsappUrl = getWhatsAppLink();
+  const whatsappUrl = getWhatsAppLink(WHATSAPP_MESSAGE);
   const logoUrl = `${import.meta.env.BASE_URL}assets/LOGO ANHANGA VIAGENS - AZUL.svg`;
 
   return (

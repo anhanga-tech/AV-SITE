@@ -44,6 +44,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     }}
                     className="p-2 bg-white/80 hover:bg-brand-cyan hover:text-white text-gray-400 rounded-full transition-all shadow-sm border border-gray-100"
                     title="Compartilhar"
+                    aria-label="Compartilhar"
                 >
                     <Share2 className="w-4 h-4" />
                 </button>
@@ -55,6 +56,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     }}
                     className={`p-2 rounded-full transition-all shadow-sm border ${copied ? 'bg-green-500 text-white border-green-600' : 'bg-white/80 text-gray-400 border-gray-100 hover:bg-gray-100'}`}
                     title={copied ? "Link copiado!" : "Copiar link"}
+                    aria-label={copied ? "Link copiado com sucesso" : "Copiar link"}
                 >
                     {copied ? <Check className="w-4 h-4" /> : <LinkIcon className="w-4 h-4" />}
                 </button>
@@ -80,6 +82,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     rel="noopener noreferrer"
                     className="p-2.5 bg-[#25D366] text-white rounded-xl hover:scale-110 transition-transform shadow-md"
                     title="Compartilhar no WhatsApp"
+                    aria-label="Compartilhar no WhatsApp"
                 >
                     <MessageCircle className="w-5 h-5 fill-current" />
                 </a>
@@ -89,6 +92,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     rel="noopener noreferrer"
                     className="p-2.5 bg-[#1877F2] text-white rounded-xl hover:scale-110 transition-transform shadow-md"
                     title="Compartilhar no Facebook"
+                    aria-label="Compartilhar no Facebook"
                 >
                     <Facebook className="w-5 h-5 fill-current" />
                 </a>
@@ -98,6 +102,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     rel="noopener noreferrer"
                     className="p-2.5 bg-[#0A66C2] text-white rounded-xl hover:scale-110 transition-transform shadow-md"
                     title="Compartilhar no LinkedIn"
+                    aria-label="Compartilhar no LinkedIn"
                 >
                     <Linkedin className="w-5 h-5 fill-current" />
                 </a>
@@ -107,6 +112,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     onClick={handleNativeShare}
                     className="hidden lg:flex p-2.5 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transition-all shadow-sm"
                     title="Mais opções de compartilhamento"
+                    aria-label="Mais opções de compartilhamento"
                 >
                     <Share2 className="w-5 h-5" />
                 </button>
@@ -116,6 +122,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     onClick={handleCopy}
                     className={`p-2.5 rounded-xl transition-all shadow-sm border ${copied ? 'bg-green-500 text-white border-green-600' : 'bg-gray-100 text-gray-600 border-transparent hover:bg-gray-200'}`}
                     title={copied ? "Link copiado!" : "Copiar link"}
+                    aria-label={copied ? "Link copiado com sucesso" : "Copiar link"}
                 >
                     {copied ? <Check className="w-5 h-5" /> : <LinkIcon className="w-5 h-5" />}
                 </button>

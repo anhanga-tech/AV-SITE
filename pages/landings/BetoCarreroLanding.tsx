@@ -1,6 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
+import { getWhatsAppLink } from '../../utils/whatsapp';
 import BetoCarreroApp from '../../components/landings/beto-carrero/BetoCarreroApp';
 import { SEO } from '../../components/SEO';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
@@ -72,13 +73,19 @@ const BetoCarreroLanding: React.FC = () => {
             <li>Suporte por WhatsApp durante a viagem</li>
           </ul>
           <div className="flex flex-wrap gap-3">
-            <Link to="/" state={{ targetId: 'contato' }} className="px-5 py-3 rounded-full bg-brand-cyan text-white font-bold">
-              Solicitar orçamento
-            </Link>
-            <Link to="/orlando" className="px-5 py-3 rounded-full bg-white border border-gray-300 text-brand-dark font-semibold">
+            <a
+              href={getWhatsAppLink("Olá! Gostaria de um orçamento personalizado para o Beto Carrero.")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-whatsapp px-5 py-3 rounded-full bg-brand-cyan text-white font-bold hover:bg-brand-cyan/90 transition-colors"
+              data-tracking="cta-final-betocarrero"
+            >
+              Falar com especialista no WhatsApp
+            </a>
+            <Link to="/orlando" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ver pacotes para Orlando
             </Link>
-            <a href="https://blog.anhanga.tur.br" className="px-5 py-3 rounded-full bg-white border border-gray-300 text-brand-dark font-semibold">
+            <a href="https://blog.anhanga.tur.br" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ver dicas de planejamento
             </a>
           </div>

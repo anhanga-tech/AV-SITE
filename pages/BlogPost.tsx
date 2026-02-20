@@ -5,7 +5,6 @@ import Calendar from 'lucide-react/dist/esm/icons/calendar';
 import User from 'lucide-react/dist/esm/icons/user';
 import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left';
 import Clock from 'lucide-react/dist/esm/icons/clock';
-import Share2 from 'lucide-react/dist/esm/icons/share-2';
 import Tag from 'lucide-react/dist/esm/icons/tag';
 import { getWhatsAppLink } from '../utils/whatsapp';
 
@@ -34,6 +33,7 @@ const BlogPost: React.FC = () => {
 
                 // Update href with tracking parameters
                 anchor.href = getWhatsAppLink(message);
+                anchor.classList.add('btn-whatsapp');
             });
         }
     }, [post]);
@@ -97,7 +97,6 @@ const BlogPost: React.FC = () => {
                             <ArrowLeft className="w-4 h-4" /> Voltar para o Blog
                         </Link>
                         <div className="max-w-4xl">
-                            {/* Etiqueta Principal - Estilo Sticker */}
                             <div className="flex items-center gap-3 mb-6">
                                 <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 ${post.color} shadow-[4px_4px_0px_rgba(0,0,0,0.3)] font-black text-xs uppercase tracking-widest transform -rotate-1`}>
                                     <Tag className="w-3 h-3 fill-current opacity-50" />
@@ -142,7 +141,6 @@ const BlogPost: React.FC = () => {
                     <div className="w-full lg:w-2/3">
                         <div className="bg-white rounded-[2.5rem] p-8 md:p-14 shadow-xl border border-gray-100">
 
-                            {/* Top Share Section */}
                             <div className="mb-10 pb-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div className="flex items-center gap-3">
                                     <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest ${post.color} bg-opacity-20 border`}>
@@ -158,7 +156,6 @@ const BlogPost: React.FC = () => {
                                 />
                             </div>
 
-                            {/* Corpo do Texto Tipografia Editorial */}
                             <div
                                 ref={contentRef}
                                 className="
@@ -176,7 +173,6 @@ const BlogPost: React.FC = () => {
                                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content || `<p>${post.excerpt}</p><p>Conteúdo completo em breve...</p>`) }}
                             />
 
-                            {/* Share Section */}
                             <div className="mt-16 pt-10 border-t-2 border-dashed border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-6">
                                 <div className="flex items-center gap-2">
                                     <span className="font-bold text-brand-dark text-lg">Gostou? Espalhe a palavra:</span>
@@ -192,14 +188,9 @@ const BlogPost: React.FC = () => {
 
                     {/* Sidebar */}
                     <div className="w-full lg:w-1/3">
-                        {/* Container Sticky que agrupa Autor e Relacionados */}
                         <div className="sticky top-32 space-y-8">
-
-                            {/* Author Widget */}
                             <div className="bg-white rounded-3xl p-8 border-2 border-gray-100 text-center relative overflow-hidden shadow-lg group hover:border-brand-yellow/30 transition-colors">
-                                {/* Decor */}
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-brand-yellow/10 rounded-bl-full -mr-10 -mt-10 transition-all group-hover:scale-110"></div>
-
                                 <div className="w-28 h-28 bg-gray-200 rounded-full mx-auto mb-6 overflow-hidden border-[6px] border-white shadow-xl relative z-10">
                                     <div className="w-full h-full flex items-center justify-center bg-brand-dark text-white text-4xl font-black">
                                         {post.author.charAt(0)}
@@ -210,12 +201,16 @@ const BlogPost: React.FC = () => {
                                 <p className="text-gray-600 font-serif italic text-base mb-8 leading-relaxed">
                                     "Apaixonado por descobrir lugares novos e compartilhar dicas que não estão nos guias turísticos."
                                 </p>
-                                <button className="w-full py-4 bg-white border-2 border-brand-dark text-brand-dark font-black tracking-wide text-sm uppercase rounded-xl hover:bg-brand-dark hover:text-white transition-colors shadow-[4px_4px_0px_#0f172a] active:shadow-none active:translate-x-[4px] active:translate-y-[4px]">
-                                    Seguir Autor
-                                </button>
+                                <a
+                                    href={getWhatsAppLink(`Olá! Gostaria de falar com o especialista ${post.author} sobre viagens.`)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn-whatsapp block w-full py-4 bg-white border-2 border-brand-dark text-brand-dark font-black tracking-wide text-sm uppercase rounded-xl hover:bg-brand-dark hover:text-white transition-colors shadow-[4px_4px_0px_#0f172a] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] text-center"
+                                >
+                                    Falar com Especialista
+                                </a>
                             </div>
 
-                            {/* Related Posts */}
                             <div className="bg-white/50 backdrop-blur-sm p-2 rounded-3xl">
                                 <h3 className="font-black text-xl text-gray-800 mb-6 pl-2 flex items-center gap-2">
                                     <span className="w-1.5 h-6 bg-brand-vibrant rounded-full"></span>
@@ -228,7 +223,6 @@ const BlogPost: React.FC = () => {
                                                 <img src={related.image} alt={related.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                             </div>
                                             <div className="flex flex-col h-full justify-center">
-                                                {/* Etiqueta Lateral Corrigida */}
                                                 <div className="mb-2">
                                                     <span className={`inline-block text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border ${related.color} bg-opacity-50`}>
                                                         {related.category}
@@ -245,9 +239,28 @@ const BlogPost: React.FC = () => {
                                     ))}
                                 </div>
                             </div>
-
                         </div>
                     </div>
+                </div>
+
+                {/* Final CTA Section */}
+                <div className="mt-24 bg-brand-dark rounded-[3rem] p-10 md:p-16 text-center shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-brand-cyan/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                    <h2 className="text-3xl md:text-5xl font-black text-white mb-6 relative z-10">
+                        Gostou do conteúdo? <br />
+                        <span className="text-brand-cyan">Sua viagem começa aqui.</span>
+                    </h2>
+                    <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto relative z-10">
+                        Transformamos essas inspirações em um roteiro real e exclusivo para você.
+                    </p>
+                    <a
+                        href={getWhatsAppLink(`Olá! Li o post "${post.title}" e gostaria de planejar minha viagem.`)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-whatsapp inline-flex items-center gap-3 bg-brand-cyan text-white text-lg font-bold px-10 py-5 rounded-2xl shadow-[4px_4px_0px_#ffffff20] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all relative z-10"
+                    >
+                        Conversar com um Especialista
+                    </a>
                 </div>
             </div>
         </article>

@@ -1,14 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import MessageCircle from 'lucide-react/dist/esm/icons/message-circle';
-import X from 'lucide-react/dist/esm/icons/x';
-import Send from 'lucide-react/dist/esm/icons/send';
-import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
-import Loader2 from 'lucide-react/dist/esm/icons/loader-2';
-import ExternalLink from 'lucide-react/dist/esm/icons/external-link';
-import Bot from 'lucide-react/dist/esm/icons/bot';
-import User from 'lucide-react/dist/esm/icons/user';
-import CheckCircle2 from 'lucide-react/dist/esm/icons/check-circle-2';
+import { MessageCircle, X, Send, Sparkles, Loader2, ExternalLink, Bot, User, CheckCircle2 } from 'lucide-react';
 import { getTravelAdvice } from '../services/geminiService';
+import { useLeadCapture } from '../hooks/useLeadCapture';
 
 interface Message {
     role: 'user' | 'model';
@@ -17,8 +10,21 @@ interface Message {
     actionData?: {
         url: string;
         destination: string;
+        bantSummary: string;
     };
 }
+
+interface LeadFinalizePayload {
+    firstName: string;
+    lastName: string;
+    email: string;
+    bantSummary: string;
+    fallbackUrl: string;
+}
+
+type LeadFinalizeResult =
+    | { ok: true; url: string; notice?: string }
+    | { ok: false; error: string };
 
 // Componente simples para renderizar Markdown básico (Negrito e Quebras de linha)
 const FormattedText: React.FC<{ text: string }> = ({ text }) => {
@@ -57,17 +63,58 @@ const FormattedText: React.FC<{ text: string }> = ({ text }) => {
     );
 };
 
-// Componente para Botão de Ação com Loading
-const ChatActionButton: React.FC<{ url: string; destination?: string }> = ({ url, destination }) => {
-    const [isLoading, setIsLoading] = useState(false);
+// Card de finalização do lead + handoff para WhatsApp
+const ChatActionButton: React.FC<{
+    fallbackUrl: string;
+    destination?: string;
+    defaultBantSummary?: string;
+    isSubmittingLead: boolean;
+    onFinalizeLead: (payload: LeadFinalizePayload) => Promise<LeadFinalizeResult>;
+}> = ({ fallbackUrl, destination, defaultBantSummary, isSubmittingLead, onFinalizeLead }) => {
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
+    const [localError, setLocalError] = useState<string | null>(null);
+    const [notice, setNotice] = useState<string | null>(null);
 
-    const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        setIsLoading(true);
-        setTimeout(() => {
-            window.open(url, '_blank');
-            setIsLoading(false);
-        }, 1500);
+        setLocalError(null);
+        setNotice(null);
+
+        const normalizedFirstName = firstName.trim();
+        const normalizedLastName = lastName.trim();
+        const normalizedEmail = email.trim().toLowerCase();
+
+        if (!normalizedFirstName || !normalizedLastName || !normalizedEmail) {
+            setLocalError('Preencha nome, sobrenome e e-mail para finalizar.');
+            return;
+        }
+
+        const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail);
+        if (!isEmailValid) {
+            setLocalError('Informe um e-mail válido.');
+            return;
+        }
+
+        const result = await onFinalizeLead({
+            firstName: normalizedFirstName,
+            lastName: normalizedLastName,
+            email: normalizedEmail,
+            bantSummary: defaultBantSummary || 'Não informado',
+            fallbackUrl,
+        });
+
+        if (!result.ok) {
+            setLocalError(result.error);
+            return;
+        }
+
+        if (result.notice) {
+            setNotice(result.notice);
+        }
+
+        window.open(result.url, '_blank', 'noopener,noreferrer');
     };
 
     return (
@@ -78,27 +125,59 @@ const ChatActionButton: React.FC<{ url: string; destination?: string }> = ({ url
             </div>
             <div className="p-4">
                 <p className="text-sm text-gray-600 mb-4 leading-relaxed">
-                    Sua solicitação para <strong>{destination}</strong> está pronta. Envie para nossos consultores confirmarem a disponibilidade.
+                    Sua solicitação para <strong>{destination}</strong> está pronta. Finalize seus dados para seguir no WhatsApp com nossa equipe.
                 </p>
-                <a 
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+
+                <div className="grid grid-cols-1 gap-2 mb-3">
+                    <input
+                        type="text"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        placeholder="Nome"
+                        className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant/50"
+                    />
+                    <input
+                        type="text"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        placeholder="Sobrenome"
+                        className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant/50"
+                    />
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="E-mail"
+                        className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant/50"
+                    />
+                </div>
+
+                {localError && (
+                    <p className="text-xs text-red-500 mb-3">{localError}</p>
+                )}
+
+                {notice && (
+                    <p className="text-xs text-amber-600 mb-3">{notice}</p>
+                )}
+
+                <button
+                    type="button"
                     onClick={handleClick}
-                    className={`flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3 px-4 rounded-xl transition-all shadow-md hover:shadow-green-500/30 text-sm group-hover:scale-[1.02] ${isLoading ? 'opacity-90 cursor-wait' : ''}`}
+                    disabled={isSubmittingLead}
+                    className={`btn-whatsapp btn-specialist flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3 px-4 rounded-xl transition-all shadow-md hover:shadow-green-500/30 text-sm group-hover:scale-[1.02] ${isSubmittingLead ? 'opacity-90 cursor-wait' : ''}`}
                 >
-                    {isLoading ? (
+                    {isSubmittingLead ? (
                         <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            <span className="truncate">Abrindo WhatsApp...</span>
+                            <span className="truncate">Salvando lead...</span>
                         </>
                     ) : (
                         <>
-                            <span className="truncate">Finalizar no WhatsApp</span>
+                            <span className="truncate">Salvar e continuar no WhatsApp</span>
                             <ExternalLink className="w-4 h-4" />
                         </>
                     )}
-                </a>
+                </button>
             </div>
         </div>
     );
@@ -113,6 +192,7 @@ const AIChat: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { setLeadDraft, submitLead, isSubmitting: isSubmittingLead } = useLeadCapture();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -128,6 +208,39 @@ const AIChat: React.FC = () => {
         setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [isOpen]);
+
+  const handleFinalizeLead = async (payload: LeadFinalizePayload): Promise<LeadFinalizeResult> => {
+    setLeadDraft({
+      firstName: payload.firstName,
+      lastName: payload.lastName,
+      email: payload.email,
+      bantSummary: payload.bantSummary,
+    });
+
+    const result = await submitLead({
+      firstName: payload.firstName,
+      lastName: payload.lastName,
+      email: payload.email,
+      bantSummary: payload.bantSummary,
+    });
+
+    if (result.ok) {
+      return { ok: true, url: result.whatsappUrl, notice: result.warning };
+    }
+
+    if (result.code === 'HUBSPOT_DUPLICATE_CONTACT') {
+      return {
+        ok: true,
+        url: payload.fallbackUrl,
+        notice: 'Seu contato já estava cadastrado. Vamos continuar no WhatsApp.',
+      };
+    }
+
+    return {
+      ok: false,
+      error: result.error || 'Não foi possível salvar seu lead agora. Tente novamente.',
+    };
+  };
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -148,13 +261,22 @@ const AIChat: React.FC = () => {
     }
 
     if (response.budgetLink) {
+        setLeadDraft({
+            bantSummary: response.budgetLink.bantSummary,
+            origin: response.budgetLink.origin,
+            destination: response.budgetLink.destination,
+            dates: response.budgetLink.dates,
+            baggagePreference: response.budgetLink.baggagePreference || '',
+        });
+
         setMessages(prev => [...prev, { 
             role: 'model', 
             text: 'Orçamento Pronto', 
             isAction: true,
             actionData: {
                 url: response.budgetLink!.url,
-                destination: response.budgetLink!.destination
+                destination: response.budgetLink!.destination,
+                bantSummary: response.budgetLink!.bantSummary
             }
         }]);
     }
@@ -217,8 +339,11 @@ const AIChat: React.FC = () => {
                 {msg.isAction ? (
                     // Renderiza Card de Orçamento (Action Ticket)
                     <ChatActionButton 
-                        url={msg.actionData?.url || '#'} 
+                        fallbackUrl={msg.actionData?.url || '#'}
                         destination={msg.actionData?.destination} 
+                        defaultBantSummary={msg.actionData?.bantSummary}
+                        onFinalizeLead={handleFinalizeLead}
+                        isSubmittingLead={isSubmittingLead}
                     />
                 ) : (
                     // Renderiza Texto Normal com Formatação

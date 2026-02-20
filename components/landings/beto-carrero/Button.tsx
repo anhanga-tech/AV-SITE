@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
-import { MessageCircle, Loader2, ExternalLink } from 'lucide-react';
-import { WHATSAPP_LINK } from './constants';
+import React, { useEffect, useRef } from 'react';
+import { MessageCircle } from 'lucide-react';
+import { getWhatsAppLink } from '../../../utils/whatsapp';
+import { WHATSAPP_MESSAGE } from './constants';
 
 interface ButtonProps {
   text: string;
@@ -26,28 +26,15 @@ const Button: React.FC<ButtonProps> = ({
   tooltipPosition = 'top',
   ariaLabel
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [showToast, setShowToast] = useState(false);
-  const timeoutRef1 = useRef<NodeJS.Timeout | null>(null);
-  const timeoutRef2 = useRef<NodeJS.Timeout | null>(null);
   const isMountedRef = useRef(true);
 
   useEffect(() => {
     isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
-      if (timeoutRef1.current) {
-        clearTimeout(timeoutRef1.current);
-        timeoutRef1.current = null;
-      }
-      if (timeoutRef2.current) {
-        clearTimeout(timeoutRef2.current);
-        timeoutRef2.current = null;
-      }
     };
   }, []);
 
-  // Added explicit ring-offset-white for contrast
   const baseStyles = "inline-flex items-center justify-center font-heading font-bold text-lg md:text-xl px-8 py-4 rounded-full transition-all duration-200 transform hover:-translate-y-1 border-2 border-fun-dark relative z-10 focus:outline-none focus:ring-4 focus:ring-fun-blue focus:ring-offset-2 focus:ring-offset-white";
 
   const variants = {
@@ -57,33 +44,7 @@ const Button: React.FC<ButtonProps> = ({
   };
 
   const handleClick = () => {
-    if (isLoading) return;
-
-    setIsLoading(true);
-
-    // Simulate "preparing" delay for better UX
-    timeoutRef1.current = setTimeout(() => {
-      if (!isMountedRef.current) {
-        return;
-      }
-      if (onClick) onClick();
-
-      // Show confirmation toast
-      setShowToast(true);
-
-      // Navigate to WhatsApp
-      window.open(WHATSAPP_LINK, '_blank', 'noopener,noreferrer');
-
-      setIsLoading(false);
-
-      // Hide toast after 3 seconds
-      timeoutRef2.current = setTimeout(() => {
-        if (!isMountedRef.current) {
-          return;
-        }
-        setShowToast(false);
-      }, 3000);
-    }, 1500);
+    if (onClick) onClick();
   };
 
   const positionStyles = tooltipPosition === 'top'
@@ -98,60 +59,31 @@ const Button: React.FC<ButtonProps> = ({
     ? 'translate-y-2 group-hover:translate-y-0'
     : '-translate-y-2 group-hover:translate-y-0';
 
-  // Construct a descriptive label if not provided
   const computedAriaLabel = ariaLabel || (tooltip ? `${text}. ${tooltip}` : text);
+  const whatsappUrl = getWhatsAppLink(WHATSAPP_MESSAGE);
 
   return (
     <div className={`relative group ${fullWidth ? 'w-full' : 'inline-block'}`}>
-      <button
+      <a
+        href={whatsappUrl}
+        target="_blank"
+        rel="noopener noreferrer"
         onClick={handleClick}
-        disabled={isLoading}
-        className={`${baseStyles} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className} ${isLoading ? 'cursor-wait opacity-90' : ''}`}
+        className={`btn-whatsapp ${baseStyles} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className}`}
         aria-label={computedAriaLabel}
       >
-        {isLoading ? (
-          <>
-            <Loader2 className="w-6 h-6 mr-2 animate-spin" />
-            Preparando Conversa...
-          </>
-        ) : (
-          <>
-            {icon && <MessageCircle className="w-6 h-6 mr-2" />}
-            {text}
-          </>
-        )}
-      </button>
+        {icon && <MessageCircle className="w-6 h-6 mr-2" />}
+        {text}
+      </a>
 
-      {!isLoading && tooltip && (
+      {tooltip && (
         <div className={`absolute left-1/2 transform -translate-x-1/2 w-max max-w-[200px] md:max-w-xs transition-all duration-200 opacity-0 group-hover:opacity-100 pointer-events-none z-50 ${positionStyles} ${animationStyles}`}>
           <div className="bg-fun-dark text-white text-sm font-bold py-2 px-3 rounded-xl shadow-lg border-2 border-white text-center relative">
             {tooltip}
-            {/* Arrow */}
             <div className={`absolute left-1/2 transform -translate-x-1/2 w-3 h-3 bg-fun-dark rotate-45 ${arrowStyles}`}></div>
           </div>
         </div>
       )}
-
-      {/* Global Toast Notification */}
-      {showToast && (() => {
-        const bodyExists = !!document.body;
-        if (!document.body) {
-          return null;
-        }
-        return createPortal(
-          <div
-            className="fixed top-6 left-0 right-0 z-[9999] flex justify-center pointer-events-none animate-bounce"
-            role="status"
-            aria-live="polite"
-          >
-            <div className="bg-fun-green text-white px-6 py-3 rounded-2xl shadow-hard border-2 border-fun-dark flex items-center gap-3">
-              <ExternalLink size={24} strokeWidth={2.5} />
-              <span className="font-heading font-bold text-lg">Abrindo WhatsApp...</span>
-            </div>
-          </div>,
-          document.body
-        );
-      })()}
     </div>
   );
 };
