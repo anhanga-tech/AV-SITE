@@ -85,7 +85,7 @@ const ChatActionButton: React.FC<{ url: string; destination?: string }> = ({ url
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={handleClick}
-                    className={`flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3 px-4 rounded-xl transition-all shadow-md hover:shadow-green-500/30 text-sm group-hover:scale-[1.02] ${isLoading ? 'opacity-90 cursor-wait' : ''}`}
+                    className={`btn-whatsapp btn-specialist flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3 px-4 rounded-xl transition-all shadow-md hover:shadow-green-500/30 text-sm group-hover:scale-[1.02] ${isLoading ? 'opacity-90 cursor-wait' : ''}`}
                 >
                     {isLoading ? (
                         <>

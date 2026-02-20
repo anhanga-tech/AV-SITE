@@ -7,6 +7,7 @@ import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import Search from 'lucide-react/dist/esm/icons/search';
 import BookOpen from 'lucide-react/dist/esm/icons/book-open';
 import { SocialShare } from '../components/SocialShare';
+import { getWhatsAppLink } from '../utils/whatsapp';
 import { SEO } from '../components/SEO';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 
@@ -124,6 +125,24 @@ const BlogList: React.FC = () => {
                         <p className="text-gray-400 text-lg font-medium">Nenhum artigo encontrado com esse termo. 🕵️‍♂️</p>
                     </div>
                 )}
+
+                {/* Final CTA Section */}
+                <div className="mt-24 bg-brand-cyan/10 rounded-[3rem] p-10 md:p-16 text-center border-2 border-brand-cyan/20">
+                    <h2 className="text-3xl md:text-5xl font-black text-brand-dark mb-6">
+                        Pronto para transformar essas dicas em <span className="text-brand-cyan">Realidade?</span>
+                    </h2>
+                    <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
+                        Fale com nossos especialistas e comece a planejar sua viagem personalizada hoje mesmo.
+                    </p>
+                    <a
+                        href={getWhatsAppLink("Olá! Vi o blog da Anhangá e gostaria de solicitar um orçamento personalizado.")}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-whatsapp inline-flex items-center gap-3 bg-brand-dark text-white text-lg font-bold px-10 py-5 rounded-2xl shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
+                    >
+                        Solicitar Orçamento no WhatsApp
+                    </a>
+                </div>
                 </div>
             </div>
         </>

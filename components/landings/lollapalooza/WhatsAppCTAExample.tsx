@@ -1,6 +1,7 @@
 import React from 'react';
 import { useGAClientId } from './hooks/useGAClientId';
-import { getWhatsAppLink } from './utils/whatsapp';
+import { getWhatsAppLink } from '../../../utils/whatsapp';
+import { WHATSAPP_MESSAGE } from './constants';
 
 /**
  * Exemplo de componente de botão CTA para WhatsApp
@@ -13,7 +14,7 @@ export function WhatsAppCTAButton({ dataWhatsappLocation = "example_button_compo
     const handleClick = () => {
         // getWhatsAppLink já captura o Client ID automaticamente
         // e o combina com os parâmetros UTM e GCLID existentes
-        const whatsappUrl = getWhatsAppLink();
+        const whatsappUrl = getWhatsAppLink(WHATSAPP_MESSAGE);
 
         // Abre o link do WhatsApp em uma nova aba
         window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
@@ -49,7 +50,7 @@ export function WhatsAppCTAButton({ dataWhatsappLocation = "example_button_compo
  */
 export function WhatsAppCTALink() {
     const gaClientId = useGAClientId();
-    const whatsappUrl = getWhatsAppLink();
+    const whatsappUrl = getWhatsAppLink(WHATSAPP_MESSAGE);
 
     return (
         <a

@@ -844,7 +844,7 @@ const Hero: React.FC = () => {
                 <button
                   onClick={handleSearch}
                   disabled={isSearchLoading}
-                  className={`w-full md:w-40 h-full min-h-[70px] bg-brand-yellow hover:bg-yellow-400 text-brand-dark rounded-2xl md:rounded-[1.5rem] shadow-lg flex items-center justify-center gap-2 transition-all duration-300 ease-spring hover:scale-105 hover:shadow-xl active:scale-90 group border-2 border-transparent`}
+                  className={`btn-whatsapp w-full md:w-40 h-full min-h-[70px] bg-brand-yellow hover:bg-yellow-400 text-brand-dark rounded-2xl md:rounded-[1.5rem] shadow-lg flex items-center justify-center gap-2 transition-all duration-300 ease-spring hover:scale-105 hover:shadow-xl active:scale-90 group border-2 border-transparent`}
                 >
                   {isSearchLoading ? (
                     <Loader2 className="w-6 h-6 animate-spin" />
