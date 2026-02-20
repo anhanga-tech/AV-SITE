@@ -31,6 +31,284 @@ interface Destination {
     activities: string[];
 }
 
+// Static configuration moved outside component to prevent recreation on every render
+const DESTINATIONS: Destination[] = [
+    // --- AMÉRICAS ---
+    {
+        coords: [28.5383, -81.3792],
+        image: "https://images.pexels.com/photos/3411139/pexels-photo-3411139.jpeg",
+        city: "Orlando",
+        country: "EUA",
+        rating: "4.98",
+        price: "R$ 15.000",
+        description: "Magia dos parques e compras",
+        continent: "América do Norte",
+        details: "A capital mundial da diversão.",
+        activities: ["Disney", "Universal", "Compras"]
+    },
+    {
+        coords: [18.5601, -68.3725],
+        image: "https://images.pexels.com/photos/3675435/pexels-photo-3675435.jpeg",
+        city: "Punta Cana",
+        country: "Rep. Dominicana",
+        rating: "4.95",
+        price: "R$ 3.800",
+        description: "Praias de areia branca",
+        continent: "América Central",
+        details: "Resorts All-Inclusive de luxo.",
+        activities: ["Praia", "Mergulho", "Relax"]
+    },
+    {
+        coords: [21.1619, -86.8515],
+        image: "https://images.pexels.com/photos/20210505/pexels-photo-20210505.jpeg",
+        city: "Cancún",
+        country: "México",
+        rating: "4.89",
+        price: "R$ 4.100",
+        description: "Caribe vibrante",
+        continent: "América do Norte",
+        details: "Beleza do Caribe e cultura Maia.",
+        activities: ["Praia", "Festas", "História"]
+    },
+    // --- AMÉRICA DO SUL ---
+    {
+        coords: [-29.3738, -50.8764],
+        image: "https://images.pexels.com/photos/3101546/pexels-photo-3101546.jpeg",
+        city: "Gramado",
+        country: "Brasil",
+        rating: "4.91",
+        price: "R$ 2.200",
+        description: "Charme na Serra",
+        continent: "América do Sul",
+        details: "Europa no Brasil.",
+        activities: ["Frio", "Chocolate", "Romance"]
+    },
+    {
+        coords: [-22.9068, -43.1729],
+        image: "https://images.pexels.com/photos/2868242/pexels-photo-2868242.jpeg",
+        city: "Rio de Janeiro",
+        country: "Brasil",
+        rating: "4.93",
+        price: "R$ 1.900",
+        description: "Cidade Maravilhosa",
+        continent: "América do Sul",
+        details: "Samba, praias icônicas e paisagens de tirar o fôlego.",
+        activities: ["Cristo Redentor", "Praias", "Pão de Açúcar"]
+    },
+    {
+        coords: [-5.7945, -35.2110],
+        image: "https://images.pexels.com/photos/4265480/pexels-photo-4265480.jpeg",
+        city: "Natal",
+        country: "Brasil",
+        rating: "4.92",
+        price: "R$ 2.300",
+        description: "Cidade do Sol",
+        continent: "América do Sul",
+        details: "Dunas emocionantes, praias mornas e muito sol o ano todo.",
+        activities: ["Genipabu", "Ponta Negra", "Buggy"]
+    },
+    {
+        coords: [-13.1631, -72.5450],
+        image: "https://images.pexels.com/photos/35570962/pexels-photo-35570962.jpeg",
+        city: "Cusco",
+        country: "Peru",
+        rating: "4.98",
+        price: "R$ 4.200",
+        description: "Império Inca",
+        continent: "América do Sul",
+        details: "História viva, lhamas e os mistérios dos Andes.",
+        activities: ["Machu Picchu", "Vale Sagrado", "História"]
+    },
+    {
+        coords: [-33.4489, -70.6693],
+        image: "https://images.pexels.com/photos/7410250/pexels-photo-7410250.jpeg",
+        city: "Santiago",
+        country: "Chile",
+        rating: "4.88",
+        price: "R$ 3.500",
+        description: "Cordilheira e Vinhos",
+        continent: "América do Sul",
+        details: "Neve, vinhos premiados e modernidade aos pés dos Andes.",
+        activities: ["Valle Nevado", "Vinícolas", "Cajón del Maipo"]
+    },
+    {
+        coords: [10.3910, -75.4795],
+        image: "https://images.pexels.com/photos/13804522/pexels-photo-13804522.jpeg",
+        city: "Cartagena",
+        country: "Colômbia",
+        rating: "4.90",
+        price: "R$ 3.900",
+        description: "Caribe Colonial",
+        continent: "América do Sul",
+        details: "Charme histórico, cores vibrantes e mar do Caribe.",
+        activities: ["Cidade Murada", "Ilhas do Rosário", "Café"]
+    },
+
+    // --- EUROPA ---
+    {
+        coords: [48.8566, 2.3522],
+        image: "https://images.pexels.com/photos/1850619/pexels-photo-1850619.jpeg",
+        city: "Paris",
+        country: "França",
+        rating: "4.92",
+        price: "R$ 6.200",
+        description: "Romance e história",
+        continent: "Europa",
+        details: "A Cidade Luz.",
+        activities: ["Torre Eiffel", "Louvre", "Sena"]
+    },
+    {
+        coords: [38.7223, -9.1393],
+        image: "https://images.pexels.com/photos/3763903/pexels-photo-3763903.jpeg",
+        city: "Lisboa",
+        country: "Portugal",
+        rating: "4.96",
+        price: "R$ 5.500",
+        description: "História e fado",
+        continent: "Europa",
+        details: "Charme e azulejos.",
+        activities: ["História", "Comida", "Vinho"]
+    },
+    {
+        coords: [36.3932, 25.4615],
+        image: "https://images.pexels.com/photos/1010657/pexels-photo-1010657.jpeg",
+        city: "Santorini",
+        country: "Grécia",
+        rating: "4.97",
+        price: "R$ 7.800",
+        description: "Pôr do sol mágico",
+        continent: "Europa",
+        details: "Casinhas brancas e mar azul profundo.",
+        activities: ["Vistas", "Vinho", "Praias"]
+    },
+
+    // --- ÁSIA ---
+    {
+        coords: [35.6762, 139.6503],
+        image: "https://images.pexels.com/photos/2506923/pexels-photo-2506923.jpeg",
+        city: "Tóquio",
+        country: "Japão",
+        rating: "4.99",
+        price: "R$ 8.500",
+        description: "Tradição e Futuro",
+        continent: "Ásia",
+        details: "A metrópole mais fascinante do mundo.",
+        activities: ["Tecnologia", "Templos", "Gastronomia"]
+    },
+    {
+        coords: [-8.4095, 115.1889],
+        image: "https://images.pexels.com/photos/2474690/pexels-photo-2474690.jpeg",
+        city: "Bali",
+        country: "Indonésia",
+        rating: "4.94",
+        price: "R$ 6.800",
+        description: "Paraíso Zen",
+        continent: "Ásia",
+        details: "Espiritualidade e natureza exuberante.",
+        activities: ["Praias", "Templos", "Yoga"]
+    },
+    {
+        coords: [25.2048, 55.2708],
+        image: "https://images.pexels.com/photos/3769312/pexels-photo-3769312.jpeg",
+        city: "Dubai",
+        country: "Emirados Árabes",
+        rating: "4.90",
+        price: "R$ 7.200",
+        description: "Luxo no Deserto",
+        continent: "Ásia",
+        details: "Arquitetura futurista e compras.",
+        activities: ["Burj Khalifa", "Deserto", "Shoppings"]
+    },
+    {
+        coords: [13.7563, 100.5018],
+        image: "https://images.pexels.com/photos/1031659/pexels-photo-1031659.jpeg",
+        city: "Bangkok",
+        country: "Tailândia",
+        rating: "4.87",
+        price: "R$ 5.500",
+        description: "Templos Dourados",
+        continent: "Ásia",
+        details: "Cultura vibrante e comida de rua incrível.",
+        activities: ["Grand Palace", "Massagem", "Street Food"]
+    },
+
+    // --- ÁFRICA ---
+    {
+        coords: [-33.9249, 18.4241],
+        image: "https://images.pexels.com/photos/259447/pexels-photo-259447.jpeg",
+        city: "Cidade do Cabo",
+        country: "África do Sul",
+        rating: "4.88",
+        price: "R$ 5.100",
+        description: "Encontro de Oceanos",
+        continent: "África",
+        details: "Montanhas, vinhedos e pinguins.",
+        activities: ["Table Mountain", "Vinhos", "Safári"]
+    },
+    {
+        coords: [30.0444, 31.2357],
+        image: "https://images.pexels.com/photos/3522880/pexels-photo-3522880.jpeg",
+        city: "Cairo",
+        country: "Egito",
+        rating: "4.85",
+        price: "R$ 5.900",
+        description: "Berço da História",
+        continent: "África",
+        details: "Onde o passado encontra o presente.",
+        activities: ["Pirâmides", "Nilo", "Museus"]
+    },
+    {
+        coords: [31.6295, -7.9811],
+        image: "https://images.pexels.com/photos/6752812/pexels-photo-6752812.jpeg",
+        city: "Marrakech",
+        country: "Marrocos",
+        rating: "4.89",
+        price: "R$ 6.100",
+        description: "Cores e Aromas",
+        continent: "África",
+        details: "Uma experiência sensorial única.",
+        activities: ["Medina", "Jardins", "Deserto"]
+    },
+
+    // --- OCEANIA ---
+    {
+        coords: [-33.8688, 151.2093],
+        image: "https://images.pexels.com/photos/2845013/pexels-photo-2845013.jpeg",
+        city: "Sydney",
+        country: "Austrália",
+        rating: "4.92",
+        price: "R$ 9.500",
+        description: "Vibe Australiana",
+        continent: "Oceania",
+        details: "Praias urbanas e arquitetura icônica.",
+        activities: ["Opera House", "Surf", "Cangurus"]
+    },
+    {
+        coords: [-16.5004, -151.7415],
+        image: "https://images.pexels.com/photos/753626/pexels-photo-753626.jpeg",
+        city: "Bora Bora",
+        country: "Polinésia Francesa",
+        rating: "4.99",
+        price: "R$ 12.000",
+        description: "A Lagoa Azul",
+        continent: "Oceania",
+        details: "O destino definitivo de lua de mel.",
+        activities: ["Bungalows", "Mergulho", "Relax"]
+    }
+];
+
+const FILTERS = ['Todos', 'América do Norte', 'América Central', 'América do Sul', 'Europa', 'Ásia', 'África', 'Oceania'];
+
+const CONTINENT_COLORS: Record<string, string> = {
+    'América do Norte': '#0ea5e9',
+    'América Central': '#06b6d4',
+    'América do Sul': '#10b981',
+    'Europa': '#10b981',
+    'Ásia': '#f43f5e', // Rose
+    'África': '#d97706', // Amber
+    'Oceania': '#0891b2', // Cyan-700
+};
+
 // Componente LazyImage Otimizado - REFATORADO PARA COMPONENTE COMPARTILHADO
 // importado de ../components/ui/LazyImage
 
@@ -43,285 +321,10 @@ const Destinations: React.FC = () => {
     const [selectedDestination, setSelectedDestination] = useState<Destination | null>(null);
     const [isBookingLoading, setIsBookingLoading] = useState(false);
 
-    const destinations: Destination[] = useMemo(() => [
-        // --- AMÉRICAS ---
-        {
-            coords: [28.5383, -81.3792],
-            image: "https://images.pexels.com/photos/3411139/pexels-photo-3411139.jpeg",
-            city: "Orlando",
-            country: "EUA",
-            rating: "4.98",
-            price: "R$ 15.000",
-            description: "Magia dos parques e compras",
-            continent: "América do Norte",
-            details: "A capital mundial da diversão.",
-            activities: ["Disney", "Universal", "Compras"]
-        },
-        {
-            coords: [18.5601, -68.3725],
-            image: "https://images.pexels.com/photos/3675435/pexels-photo-3675435.jpeg",
-            city: "Punta Cana",
-            country: "Rep. Dominicana",
-            rating: "4.95",
-            price: "R$ 3.800",
-            description: "Praias de areia branca",
-            continent: "América Central",
-            details: "Resorts All-Inclusive de luxo.",
-            activities: ["Praia", "Mergulho", "Relax"]
-        },
-        {
-            coords: [21.1619, -86.8515],
-            image: "https://images.pexels.com/photos/20210505/pexels-photo-20210505.jpeg",
-            city: "Cancún",
-            country: "México",
-            rating: "4.89",
-            price: "R$ 4.100",
-            description: "Caribe vibrante",
-            continent: "América do Norte",
-            details: "Beleza do Caribe e cultura Maia.",
-            activities: ["Praia", "Festas", "História"]
-        },
-        // --- AMÉRICA DO SUL ---
-        {
-            coords: [-29.3738, -50.8764],
-            image: "https://images.pexels.com/photos/3101546/pexels-photo-3101546.jpeg",
-            city: "Gramado",
-            country: "Brasil",
-            rating: "4.91",
-            price: "R$ 2.200",
-            description: "Charme na Serra",
-            continent: "América do Sul",
-            details: "Europa no Brasil.",
-            activities: ["Frio", "Chocolate", "Romance"]
-        },
-        {
-            coords: [-22.9068, -43.1729],
-            image: "https://images.pexels.com/photos/2868242/pexels-photo-2868242.jpeg",
-            city: "Rio de Janeiro",
-            country: "Brasil",
-            rating: "4.93",
-            price: "R$ 1.900",
-            description: "Cidade Maravilhosa",
-            continent: "América do Sul",
-            details: "Samba, praias icônicas e paisagens de tirar o fôlego.",
-            activities: ["Cristo Redentor", "Praias", "Pão de Açúcar"]
-        },
-        {
-            coords: [-5.7945, -35.2110],
-            image: "https://images.pexels.com/photos/4265480/pexels-photo-4265480.jpeg",
-            city: "Natal",
-            country: "Brasil",
-            rating: "4.92",
-            price: "R$ 2.300",
-            description: "Cidade do Sol",
-            continent: "América do Sul",
-            details: "Dunas emocionantes, praias mornas e muito sol o ano todo.",
-            activities: ["Genipabu", "Ponta Negra", "Buggy"]
-        },
-        {
-            coords: [-13.1631, -72.5450],
-            image: "https://images.pexels.com/photos/35570962/pexels-photo-35570962.jpeg",
-            city: "Cusco",
-            country: "Peru",
-            rating: "4.98",
-            price: "R$ 4.200",
-            description: "Império Inca",
-            continent: "América do Sul",
-            details: "História viva, lhamas e os mistérios dos Andes.",
-            activities: ["Machu Picchu", "Vale Sagrado", "História"]
-        },
-        {
-            coords: [-33.4489, -70.6693],
-            image: "https://images.pexels.com/photos/7410250/pexels-photo-7410250.jpeg",
-            city: "Santiago",
-            country: "Chile",
-            rating: "4.88",
-            price: "R$ 3.500",
-            description: "Cordilheira e Vinhos",
-            continent: "América do Sul",
-            details: "Neve, vinhos premiados e modernidade aos pés dos Andes.",
-            activities: ["Valle Nevado", "Vinícolas", "Cajón del Maipo"]
-        },
-        {
-            coords: [10.3910, -75.4795],
-            image: "https://images.pexels.com/photos/13804522/pexels-photo-13804522.jpeg",
-            city: "Cartagena",
-            country: "Colômbia",
-            rating: "4.90",
-            price: "R$ 3.900",
-            description: "Caribe Colonial",
-            continent: "América do Sul",
-            details: "Charme histórico, cores vibrantes e mar do Caribe.",
-            activities: ["Cidade Murada", "Ilhas do Rosário", "Café"]
-        },
-
-        // --- EUROPA ---
-        {
-            coords: [48.8566, 2.3522],
-            image: "https://images.pexels.com/photos/1850619/pexels-photo-1850619.jpeg",
-            city: "Paris",
-            country: "França",
-            rating: "4.92",
-            price: "R$ 6.200",
-            description: "Romance e história",
-            continent: "Europa",
-            details: "A Cidade Luz.",
-            activities: ["Torre Eiffel", "Louvre", "Sena"]
-        },
-        {
-            coords: [38.7223, -9.1393],
-            image: "https://images.pexels.com/photos/3763903/pexels-photo-3763903.jpeg",
-            city: "Lisboa",
-            country: "Portugal",
-            rating: "4.96",
-            price: "R$ 5.500",
-            description: "História e fado",
-            continent: "Europa",
-            details: "Charme e azulejos.",
-            activities: ["História", "Comida", "Vinho"]
-        },
-        {
-            coords: [36.3932, 25.4615],
-            image: "https://images.pexels.com/photos/1010657/pexels-photo-1010657.jpeg",
-            city: "Santorini",
-            country: "Grécia",
-            rating: "4.97",
-            price: "R$ 7.800",
-            description: "Pôr do sol mágico",
-            continent: "Europa",
-            details: "Casinhas brancas e mar azul profundo.",
-            activities: ["Vistas", "Vinho", "Praias"]
-        },
-
-        // --- ÁSIA ---
-        {
-            coords: [35.6762, 139.6503],
-            image: "https://images.pexels.com/photos/2506923/pexels-photo-2506923.jpeg",
-            city: "Tóquio",
-            country: "Japão",
-            rating: "4.99",
-            price: "R$ 8.500",
-            description: "Tradição e Futuro",
-            continent: "Ásia",
-            details: "A metrópole mais fascinante do mundo.",
-            activities: ["Tecnologia", "Templos", "Gastronomia"]
-        },
-        {
-            coords: [-8.4095, 115.1889],
-            image: "https://images.pexels.com/photos/2474690/pexels-photo-2474690.jpeg",
-            city: "Bali",
-            country: "Indonésia",
-            rating: "4.94",
-            price: "R$ 6.800",
-            description: "Paraíso Zen",
-            continent: "Ásia",
-            details: "Espiritualidade e natureza exuberante.",
-            activities: ["Praias", "Templos", "Yoga"]
-        },
-        {
-            coords: [25.2048, 55.2708],
-            image: "https://images.pexels.com/photos/3769312/pexels-photo-3769312.jpeg",
-            city: "Dubai",
-            country: "Emirados Árabes",
-            rating: "4.90",
-            price: "R$ 7.200",
-            description: "Luxo no Deserto",
-            continent: "Ásia",
-            details: "Arquitetura futurista e compras.",
-            activities: ["Burj Khalifa", "Deserto", "Shoppings"]
-        },
-        {
-            coords: [13.7563, 100.5018],
-            image: "https://images.pexels.com/photos/1031659/pexels-photo-1031659.jpeg",
-            city: "Bangkok",
-            country: "Tailândia",
-            rating: "4.87",
-            price: "R$ 5.500",
-            description: "Templos Dourados",
-            continent: "Ásia",
-            details: "Cultura vibrante e comida de rua incrível.",
-            activities: ["Grand Palace", "Massagem", "Street Food"]
-        },
-
-        // --- ÁFRICA ---
-        {
-            coords: [-33.9249, 18.4241],
-            image: "https://images.pexels.com/photos/259447/pexels-photo-259447.jpeg",
-            city: "Cidade do Cabo",
-            country: "África do Sul",
-            rating: "4.88",
-            price: "R$ 5.100",
-            description: "Encontro de Oceanos",
-            continent: "África",
-            details: "Montanhas, vinhedos e pinguins.",
-            activities: ["Table Mountain", "Vinhos", "Safári"]
-        },
-        {
-            coords: [30.0444, 31.2357],
-            image: "https://images.pexels.com/photos/3522880/pexels-photo-3522880.jpeg",
-            city: "Cairo",
-            country: "Egito",
-            rating: "4.85",
-            price: "R$ 5.900",
-            description: "Berço da História",
-            continent: "África",
-            details: "Onde o passado encontra o presente.",
-            activities: ["Pirâmides", "Nilo", "Museus"]
-        },
-        {
-            coords: [31.6295, -7.9811],
-            image: "https://images.pexels.com/photos/6752812/pexels-photo-6752812.jpeg",
-            city: "Marrakech",
-            country: "Marrocos",
-            rating: "4.89",
-            price: "R$ 6.100",
-            description: "Cores e Aromas",
-            continent: "África",
-            details: "Uma experiência sensorial única.",
-            activities: ["Medina", "Jardins", "Deserto"]
-        },
-
-        // --- OCEANIA ---
-        {
-            coords: [-33.8688, 151.2093],
-            image: "https://images.pexels.com/photos/2845013/pexels-photo-2845013.jpeg",
-            city: "Sydney",
-            country: "Austrália",
-            rating: "4.92",
-            price: "R$ 9.500",
-            description: "Vibe Australiana",
-            continent: "Oceania",
-            details: "Praias urbanas e arquitetura icônica.",
-            activities: ["Opera House", "Surf", "Cangurus"]
-        },
-        {
-            coords: [-16.5004, -151.7415],
-            image: "https://images.pexels.com/photos/753626/pexels-photo-753626.jpeg",
-            city: "Bora Bora",
-            country: "Polinésia Francesa",
-            rating: "4.99",
-            price: "R$ 12.000",
-            description: "A Lagoa Azul",
-            continent: "Oceania",
-            details: "O destino definitivo de lua de mel.",
-            activities: ["Bungalows", "Mergulho", "Relax"]
-        }
-    ], []);
-
-    const filters = ['Todos', 'América do Norte', 'América Central', 'América do Sul', 'Europa', 'Ásia', 'África', 'Oceania'];
-    const continentColors: Record<string, string> = {
-        'América do Norte': '#0ea5e9',
-        'América Central': '#06b6d4',
-        'América do Sul': '#10b981',
-                    'Europa': '#10b981',        'Ásia': '#f43f5e', // Rose
-        'África': '#d97706', // Amber
-        'Oceania': '#0891b2', // Cyan-700
-    };
-
     const filteredDestinations = useMemo(() => {
-        if (activeFilter === 'Todos') return destinations;
-        return destinations.filter(d => d.continent === activeFilter);
-    }, [activeFilter, destinations]);
+        if (activeFilter === 'Todos') return DESTINATIONS;
+        return DESTINATIONS.filter(d => d.continent === activeFilter);
+    }, [activeFilter]);
 
     const handleBookingClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
@@ -421,7 +424,7 @@ const Destinations: React.FC = () => {
         const markerHeight = isMobile ? 48 : 54;
 
         filteredDestinations.forEach((dest, idx) => {
-            const baseColor = continentColors[dest.continent] || '#0ea5e9';
+            const baseColor = CONTINENT_COLORS[dest.continent] || '#0ea5e9';
 
             // Creating a "Lollipop/Tack" style icon using SVG
             const icon = L.divIcon({
@@ -517,7 +520,7 @@ const Destinations: React.FC = () => {
 
                     {/* Filter Pills - Sticker Style */}
                     <div className="flex overflow-x-auto hide-scrollbar gap-3 pb-2 md:pb-0 w-full md:w-auto mt-6 md:mt-0 px-1">
-                        {filters.map(filter => (
+                    {FILTERS.map(filter => (
                             <button
                                 key={filter}
                                 onClick={() => setActiveFilter(filter)}
@@ -560,10 +563,18 @@ const Destinations: React.FC = () => {
 
                         {/* Custom Controls (Stickers) */}
                         <div className="absolute bottom-6 right-6 flex flex-col gap-2 z-[400]">
-                            <button onClick={() => handleZoom('in')} className="w-10 h-10 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all text-gray-700 font-black">
+                            <button
+                                onClick={() => handleZoom('in')}
+                                className="w-10 h-10 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all text-gray-700 font-black"
+                                aria-label="Aumentar zoom no mapa"
+                            >
                                 <Plus className="w-5 h-5" />
                             </button>
-                            <button onClick={() => handleZoom('out')} className="w-10 h-10 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all text-gray-700 font-black">
+                            <button
+                                onClick={() => handleZoom('out')}
+                                className="w-10 h-10 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all text-gray-700 font-black"
+                                aria-label="Diminuir zoom no mapa"
+                            >
                                 <Minus className="w-5 h-5" />
                             </button>
                         </div>
@@ -587,7 +598,12 @@ const Destinations: React.FC = () => {
                             onClick={() => setSelectedDestination(dest)}
                         >
                             <div className="relative h-56 rounded-[1.5rem] overflow-hidden mb-4 border border-gray-100">
-                                <LazyImage src={dest.image} alt={dest.city} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                <LazyImage
+                                    src={dest.image}
+                                    alt={dest.city}
+                                    width={600}
+                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                />
 
                                 {/* Price Tag Sticker */}
                                 <div className="absolute top-4 right-4 bg-white text-brand-dark font-black px-3 py-1 rounded-md shadow-[3px_3px_0px_rgba(0,0,0,0.2)] text-sm rotate-3 group-hover:rotate-6 transition-transform border border-gray-100">
@@ -621,12 +637,21 @@ const Destinations: React.FC = () => {
                         {/* Washi Tape Decor */}
                         <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-32 h-10 bg-red-400/80 rotate-1 backdrop-blur-sm z-20 shadow-sm border-l-2 border-r-2 border-white/40"></div>
 
-                        <button onClick={() => setSelectedDestination(null)} className="absolute top-4 right-4 z-30 bg-white border-2 border-gray-100 p-2 rounded-full shadow-md hover:scale-110 transition-transform text-gray-800">
+                        <button
+                            onClick={() => setSelectedDestination(null)}
+                            className="absolute top-4 right-4 z-30 bg-white border-2 border-gray-100 p-2 rounded-full shadow-md hover:scale-110 transition-transform text-gray-800"
+                            aria-label="Fechar detalhes do destino"
+                        >
                             <X className="w-5 h-5" />
                         </button>
 
                         <div className="w-full md:w-1/2 h-64 md:h-auto relative bg-gray-100 border-b-4 md:border-b-0 md:border-r-4 border-white">
-                            <LazyImage src={selectedDestination.image} alt={selectedDestination.city} className="w-full h-full object-cover" />
+                            <LazyImage
+                                src={selectedDestination.image}
+                                alt={selectedDestination.city}
+                                width={1200}
+                                className="w-full h-full object-cover"
+                            />
                             <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/60 to-transparent"></div>
                             <div className="absolute bottom-6 left-6 text-white">
                                 <h2 className="text-4xl font-black mb-1 drop-shadow-md">{selectedDestination.city}</h2>
