@@ -77,7 +77,7 @@ const BetoCarreroLanding: React.FC = () => {
               href={getWhatsAppLink("Olá! Gostaria de um orçamento personalizado para o Beto Carrero.")}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-5 py-3 rounded-full bg-brand-cyan text-white font-bold hover:bg-brand-cyan/90 transition-colors"
+              className="btn-whatsapp px-5 py-3 rounded-full bg-brand-cyan text-white font-bold hover:bg-brand-cyan/90 transition-colors"
               data-tracking="cta-final-betocarrero"
             >
               Falar com especialista no WhatsApp
