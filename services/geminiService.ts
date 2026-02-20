@@ -25,6 +25,7 @@ interface ChatResponse {
     travelers: string;
     interests: string;
     url: string;
+    bantSummary: string;
   };
 }
 
@@ -132,6 +133,7 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
       const needText = args.need_summary?.trim() || 'Não informado';
       const decisionRoleText = args.decision_role?.trim() || 'Não informado';
       const timelineText = args.timeline_window?.trim() || 'Não informado';
+      const bantSummary = `Need: ${needText} | Authority: ${decisionRoleText} | Budget: ${budgetText} | Timeline: ${timelineText}`;
 
       // Construir link do WhatsApp
       const text = `Olá! Vim pelo Chatbot da Anhangá. Gostaria de um orçamento:\n\n🛫 Origem: ${originText}\n📍 Destino: ${destinationText}\n🌎 Escopo: ${scopeText}\n📅 Data: ${args.dates || 'A definir'}\n👥 Viajantes: ${travelersText}\n💰 Faixa de investimento: ${budgetText}\n✨ Interesses: ${args.interests || 'Geral'}\n🎯 Necessidade principal: ${needText}\n👤 Decisor(a): ${decisionRoleText}\n⏱️ Janela de decisão: ${timelineText}`;
@@ -141,7 +143,8 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
         dates: args.dates || 'A definir',
         travelers: travelersText,
         interests: args.interests || '',
-        url: getWhatsAppLink(text)
+        url: getWhatsAppLink(text),
+        bantSummary
       };
 
       // Fallback: se não veio texto, adicionar um padrão
