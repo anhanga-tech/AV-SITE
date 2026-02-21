@@ -19,6 +19,7 @@ const HERO_INITIAL_BOT_MESSAGE = 'Para onde você sonha em ir? ✈️';
 const ChatCore: React.FC<ChatCoreProps> = ({ mode, externalMessage, onExternalMessageHandled }) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [input, setInput] = useState('');
     const [leadSubmitError, setLeadSubmitError] = useState<string | null>(null);
 
@@ -48,14 +49,22 @@ const ChatCore: React.FC<ChatCoreProps> = ({ mode, externalMessage, onExternalMe
 
     useEffect(() => {
         if (!showConversation) return;
-        const sentinel = messagesEndRef.current;
-        if (!sentinel) return;
-        // Scroll only within the overflow container, never the page viewport
-        const container = sentinel.parentElement;
-        if (container) {
-            container.scrollTop = container.scrollHeight;
+        if (mode === 'hero') {
+            // Hero: scroll the outer wrapper (overflow-y-auto container)
+            const container = scrollContainerRef.current;
+            if (container) {
+                container.scrollTop = container.scrollHeight;
+            }
+        } else {
+            // Widget: scroll within the list's own overflow container
+            const sentinel = messagesEndRef.current;
+            if (!sentinel) return;
+            const container = sentinel.parentElement;
+            if (container) {
+                container.scrollTop = container.scrollHeight;
+            }
         }
-    }, [messages, isLoading, showConversation]);
+    }, [messages, isLoading, showConversation, mode]);
 
     useEffect(() => {
         const timer = window.setTimeout(() => {
@@ -147,9 +156,11 @@ const ChatCore: React.FC<ChatCoreProps> = ({ mode, externalMessage, onExternalMe
     return (
         <div className={mode === 'hero' ? 'flex flex-col w-full' : 'flex flex-col h-full'}>
             {showConversation && (
-                <div className={mode === 'hero'
-                    ? 'transition-all duration-300 ease-in-out opacity-100 max-h-[260px] sm:max-h-[320px] min-h-[170px] sm:min-h-[190px] mb-2 overflow-hidden rounded-2xl bg-black/25 backdrop-blur-sm'
-                    : 'flex-1'}
+                <div
+                    ref={mode === 'hero' ? scrollContainerRef : undefined}
+                    className={mode === 'hero'
+                        ? 'transition-all duration-300 ease-in-out opacity-100 max-h-[260px] sm:max-h-[320px] min-h-[170px] sm:min-h-[190px] mb-2 overflow-y-auto rounded-2xl bg-black/25 backdrop-blur-sm'
+                        : 'flex-1'}
                 >
                     <ChatMessageList
                         mode={mode}

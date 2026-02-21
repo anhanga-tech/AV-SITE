@@ -57,7 +57,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({
     const isHero = mode === 'hero';
 
     const listClassName = isHero
-        ? 'h-full overflow-y-auto space-y-3 px-1 py-2'
+        ? 'space-y-3 px-1 py-2'
         : 'flex-1 overflow-y-auto p-5 bg-slate-50 space-y-6 scroll-smooth';
 
     return (

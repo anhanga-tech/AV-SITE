@@ -2,7 +2,8 @@ const STRUCTURED_CHIPS_REGEX = /\[CHIPS:\s*([^\]]+)\]\s*$/i;
 
 const CHIP_TRIGGERS: Array<{ patterns: string[]; chips: string[] }> = [
     {
-        patterns: ['para onde', 'destino', 'sonha em ir'],
+        // Only match scope-choice questions, not free-text destination city questions
+        patterns: ['para onde', 'sonha em ir', 'escopo da viagem', 'tipo de destino'],
         chips: ['Nacional', 'América do Sul', 'Internacional'],
     },
     {
