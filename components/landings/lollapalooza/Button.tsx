@@ -33,17 +33,20 @@ const Button: React.FC<ButtonProps> = ({ text, className = '', variant = 'primar
   const whatsappUrl = getWhatsAppLink(WHATSAPP_MESSAGE);
 
   return (
-    <a
-      href={whatsappUrl}
-      target="_blank"
-      rel="noopener noreferrer"
+    <button
+      onClick={(e) => {
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
+          detail: { message: WHATSAPP_MESSAGE }
+        }));
+      }}
       className={`btn-whatsapp ${baseStyles} ${variants[variant]} ${widthClass} ${className}`}
       id="btn-whatsapp-cta"
       data-whatsapp-location={dataWhatsappLocation}
     >
       <MessageCircle size={24} />
       <span>{text}</span>
-    </a>
+    </button>
   );
 };
 

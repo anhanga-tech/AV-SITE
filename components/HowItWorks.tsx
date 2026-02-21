@@ -158,16 +158,21 @@ const HowItWorks: React.FC = () => {
                 {/* Blobs behind button - Adjusted opacity and size */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-brand-yellow/30 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-500"></div>
                 
-                <a 
-                    href="#contato"
-                    className="relative z-10 flex items-center gap-4 bg-white text-brand-dark px-10 py-6 rounded-full font-black text-xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.15)] hover:shadow-[0_20px_50px_rgba(8,_112,_184,_0.25)] transform transition-all hover:scale-105 active:scale-95 border-4 border-transparent hover:border-brand-yellow"
+                <button
+                    onClick={(e) => {
+                        e.preventDefault();
+                        window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
+                            detail: { message: "Olá! Vi como a mágica acontece e quero meu roteiro personalizado agora!" }
+                        }));
+                    }}
+                    className="relative z-10 flex items-center gap-4 bg-white text-brand-dark px-10 py-6 rounded-full font-black text-xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.15)] hover:shadow-[0_20px_50px_rgba(8,_112,_184,_0.25)] transform transition-all hover:scale-105 active:scale-95 border-4 border-transparent hover:border-brand-yellow text-left"
                 >
                     <Sparkles className="w-6 h-6 text-brand-yellow fill-brand-yellow" />
                     <span>Quero meu roteiro agora!</span>
                     <div className="w-10 h-10 bg-brand-dark rounded-full flex items-center justify-center text-white">
                         <ArrowRight className="w-5 h-5" />
                     </div>
-                </a>
+                </button>
             </div>
             <p className="mt-6 text-gray-400 font-medium text-sm">
                 (Prometemos: Zero estresse, 100% diversão)

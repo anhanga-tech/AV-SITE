@@ -328,7 +328,7 @@ const Destinations: React.FC = () => {
 
     const handleBookingClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
-        setIsBookingLoading(true);
+        window.dispatchEvent(new CustomEvent("toggle-ai-chat", { detail: { message: `Olá! Gostaria de um orçamento para ${selectedDestination.city}.` } })); setSelectedDestination(null);
         const href = e.currentTarget.href;
         setTimeout(() => {
             window.open(href, '_blank');
@@ -684,15 +684,18 @@ const Destinations: React.FC = () => {
                                 />
                             </div>
 
-                            <a
-                                href={getWhatsAppLink(`Quero cotar ${selectedDestination.city}!`)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                onClick={handleBookingClick}
-                                className={`w-full bg-brand-dark text-white py-4 rounded-xl font-black text-lg hover:bg-brand-vibrant transition-all shadow-[4px_4px_0px_#94a3b8] active:shadow-none active:translate-y-1 flex items-center justify-center gap-2 ${isBookingLoading ? 'opacity-80' : ''}`}
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
+                                        detail: { message: `Olá! Gostaria de um orçamento para ${selectedDestination.city}.` }
+                                    }));
+                                    setSelectedDestination(null);
+                                }}
+                                className={`w-full bg-brand-dark text-white py-4 rounded-xl font-black text-lg hover:bg-brand-vibrant transition-all shadow-[4px_4px_0px_#94a3b8] active:shadow-none active:translate-y-1 flex items-center justify-center gap-2`}
                             >
-                                {isBookingLoading ? <Loader2 className="animate-spin" /> : "Solicitar Orçamento"}
-                            </a>
+                                Solicitar Orçamento
+                            </button>
                         </div>
                     </div>
                 </div>
