@@ -192,7 +192,13 @@ const AIChat: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const messagesRef = useRef<Message[]>(messages);
   const { setLeadDraft, submitLead, isSubmitting: isSubmittingLead } = useLeadCapture();
+
+  // Sync messages with ref to avoid stale closures in event listeners
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -242,13 +248,12 @@ const AIChat: React.FC = () => {
     };
   };
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  const submitMessage = async (text: string) => {
+    if (!text.trim() || isLoading) return;
 
-    const userText = input;
-    setInput('');
+    const userText = text;
     
-    const newHistory: Message[] = [...messages, { role: 'user', text: userText }];
+    const newHistory: Message[] = [...messagesRef.current, { role: 'user', text: userText }];
     setMessages(newHistory);
     setIsLoading(true);
 
@@ -282,9 +287,34 @@ const AIChat: React.FC = () => {
     }
   };
 
+  const handleSend = () => {
+    if (!input.trim()) return;
+    const text = input;
+    setInput('');
+    submitMessage(text);
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') handleSend();
   };
+
+  // Custom Event Listener to open/toggle chat from other components
+  useEffect(() => {
+    const handleToggle = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { detail } = customEvent;
+      setIsOpen(true);
+      if (detail?.message) {
+        // Wait a bit for the transition to start before sending context
+        setTimeout(() => {
+            submitMessage(detail.message);
+        }, 300);
+      }
+    };
+
+    window.addEventListener('toggle-ai-chat', handleToggle);
+    return () => window.removeEventListener('toggle-ai-chat', handleToggle);
+  }, []);
 
   return (
     <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9999] flex flex-col items-end font-sans">
