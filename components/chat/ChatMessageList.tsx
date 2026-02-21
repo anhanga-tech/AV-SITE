@@ -57,7 +57,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({
     const isHero = mode === 'hero';
 
     const listClassName = isHero
-        ? 'overflow-y-auto space-y-3 pr-1'
+        ? 'h-full overflow-y-auto space-y-3 px-1 py-2'
         : 'flex-1 overflow-y-auto p-5 bg-slate-50 space-y-6 scroll-smooth';
 
     return (
@@ -83,7 +83,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({
                                 ? 'bg-brand-yellow text-brand-dark'
                                 : 'bg-brand-vibrant text-white rounded-br-none'
                             : isHero
-                                ? 'bg-white/92 text-gray-800 border border-white/70'
+                                ? 'bg-white text-gray-800 border border-gray-200/60'
                                 : 'bg-white text-gray-700 border border-gray-100 rounded-bl-none'
                     }`}>
                         <FormattedText text={message.text} />

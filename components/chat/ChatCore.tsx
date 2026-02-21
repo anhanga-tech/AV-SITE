@@ -48,7 +48,13 @@ const ChatCore: React.FC<ChatCoreProps> = ({ mode, externalMessage, onExternalMe
 
     useEffect(() => {
         if (!showConversation) return;
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        const sentinel = messagesEndRef.current;
+        if (!sentinel) return;
+        // Scroll only within the overflow container, never the page viewport
+        const container = sentinel.parentElement;
+        if (container) {
+            container.scrollTop = container.scrollHeight;
+        }
     }, [messages, isLoading, showConversation]);
 
     useEffect(() => {
@@ -142,7 +148,7 @@ const ChatCore: React.FC<ChatCoreProps> = ({ mode, externalMessage, onExternalMe
         <div className={mode === 'hero' ? 'flex flex-col w-full' : 'flex flex-col h-full'}>
             {showConversation && (
                 <div className={mode === 'hero'
-                    ? 'transition-all duration-300 ease-in-out opacity-100 max-h-[260px] sm:max-h-[320px] min-h-[170px] sm:min-h-[190px] mb-2'
+                    ? 'transition-all duration-300 ease-in-out opacity-100 max-h-[260px] sm:max-h-[320px] min-h-[170px] sm:min-h-[190px] mb-2 overflow-hidden rounded-2xl bg-black/25 backdrop-blur-sm'
                     : 'flex-1'}
                 >
                     <ChatMessageList
