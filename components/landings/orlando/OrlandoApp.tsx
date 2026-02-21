@@ -81,7 +81,7 @@ function OrlandoApp() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  const whatsappUrl = getWhatsAppLink(WHATSAPP_MESSAGE);
+
 
   return (
     <div className="landing-orlando">

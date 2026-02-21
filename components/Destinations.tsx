@@ -319,22 +319,14 @@ const Destinations: React.FC = () => {
 
     const [activeFilter, setActiveFilter] = useState('Todos');
     const [selectedDestination, setSelectedDestination] = useState<Destination | null>(null);
-    const [isBookingLoading, setIsBookingLoading] = useState(false);
+
 
     const filteredDestinations = useMemo(() => {
         if (activeFilter === 'Todos') return DESTINATIONS;
         return DESTINATIONS.filter(d => d.continent === activeFilter);
     }, [activeFilter]);
 
-    const handleBookingClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-        e.preventDefault();
-        window.dispatchEvent(new CustomEvent("toggle-ai-chat", { detail: { message: `Olá! Gostaria de um orçamento para ${selectedDestination.city}.` } })); setSelectedDestination(null);
-        const href = e.currentTarget.href;
-        setTimeout(() => {
-            window.open(href, '_blank');
-            setIsBookingLoading(false);
-        }, 1500);
-    };
+
 
     // Map Init
     useEffect(() => {

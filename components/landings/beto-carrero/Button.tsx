@@ -60,7 +60,7 @@ const Button: React.FC<ButtonProps> = ({
     : '-translate-y-2 group-hover:translate-y-0';
 
   const computedAriaLabel = ariaLabel || (tooltip ? `${text}. ${tooltip}` : text);
-  const whatsappUrl = getWhatsAppLink(WHATSAPP_MESSAGE);
+
 
   return (
     <div className={`relative group ${fullWidth ? 'w-full' : 'inline-block'}`}>
