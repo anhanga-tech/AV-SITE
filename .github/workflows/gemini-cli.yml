@@ -1,4 +1,4 @@
-            - name: Run Gemini CLI
+- name: Run Gemini CLI
   # You may pin to the exact commit or the version.
   # uses: google-github-actions/run-gemini-cli@68d5a6d2e31ff01029205c58c6bf81cb3d72910b
   uses: google-github-actions/run-gemini-cli@v0.1.3
