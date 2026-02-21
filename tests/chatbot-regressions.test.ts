@@ -64,3 +64,18 @@ test('system prompt should mention baggage preference for likely air routes', ()
         /baggage_preference/,
     );
 });
+
+test('system prompt should include deterministic chips policy', () => {
+    assert.match(
+        SYSTEM_INSTRUCTION,
+        /CHIPS_POLICY/,
+    );
+    assert.match(
+        SYSTEM_INSTRUCTION,
+        /\[CHIPS: Opção 1 \| Opção 2 \| Opção 3\]/,
+    );
+    assert.match(
+        SYSTEM_INSTRUCTION,
+        /Nunca use chips para campos abertos como destino ou datas/,
+    );
+});
