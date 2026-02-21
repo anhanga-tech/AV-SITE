@@ -17,15 +17,17 @@ const ChatInput: React.FC<ChatInputProps> = ({
     onChange,
     onSend,
     disabled = false,
-    placeholder = 'Digite sua dúvida aqui...',
+    placeholder,
     mode,
 }) => {
     const isHero = mode === 'hero';
+    const resolvedPlaceholder = placeholder || (isHero ? 'Para onde você sonha em ir?' : 'Digite sua dúvida aqui...');
+    const inputAriaLabel = isHero ? 'Para onde você sonha em ir?' : 'Digite sua mensagem para o assistente virtual';
 
     return (
-        <div className={isHero ? 'p-3 bg-white/10 border-t border-white/20' : 'p-4 bg-white border-t border-gray-100'}>
+        <div className={isHero ? 'sticky bottom-0 p-2 sm:p-3 bg-transparent' : 'p-4 bg-white border-t border-gray-100'}>
             <div className={isHero
-                ? 'relative flex items-center bg-white rounded-xl border border-white/70 focus-within:ring-2 focus-within:ring-brand-yellow/40'
+                ? 'relative flex items-center bg-white/90 backdrop-blur-sm rounded-2xl border border-white/60 focus-within:ring-2 focus-within:ring-brand-yellow/40'
                 : 'relative flex items-center bg-gray-100 rounded-2xl border border-transparent focus-within:border-brand-vibrant/30 focus-within:bg-white focus-within:ring-4 focus-within:ring-brand-vibrant/10 transition-all'}
             >
                 <input
@@ -39,10 +41,10 @@ const ChatInput: React.FC<ChatInputProps> = ({
                         }
                     }}
                     disabled={disabled}
-                    placeholder={placeholder}
-                    aria-label="Digite sua mensagem para o assistente virtual"
+                    placeholder={resolvedPlaceholder}
+                    aria-label={inputAriaLabel}
                     className={isHero
-                        ? 'flex-1 pl-3 pr-12 py-2.5 bg-transparent text-sm text-brand-dark placeholder:text-gray-400 focus:outline-none disabled:opacity-70'
+                        ? 'flex-1 pl-4 pr-12 py-3 bg-transparent text-sm text-brand-dark placeholder:text-gray-500 focus:outline-none disabled:opacity-70'
                         : 'flex-1 pl-4 pr-12 py-3 bg-transparent focus:outline-none text-sm text-gray-800 placeholder-gray-400 disabled:opacity-70'}
                 />
 
@@ -52,7 +54,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                     disabled={disabled || !value.trim()}
                     aria-label="Enviar mensagem"
                     className={isHero
-                        ? 'absolute right-1.5 p-2 bg-brand-vibrant text-white rounded-lg hover:bg-brand-blue transition-colors disabled:opacity-40 disabled:cursor-not-allowed'
+                        ? 'absolute right-2 p-2 text-brand-yellow hover:text-brand-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed'
                         : 'absolute right-2 p-2 bg-brand-vibrant text-white rounded-xl hover:bg-brand-blue transition-all disabled:opacity-0 disabled:scale-75 focus:outline-none shadow-md'}
                 >
                     <Send className="w-4 h-4" />

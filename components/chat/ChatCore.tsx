@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import ChatMessageList, { type LeadFinalizePayload, type LeadFinalizeResult } from './ChatMessageList';
+import ChatMessageList from './ChatMessageList';
 import ChatInput from './ChatInput';
 import ChatTypingIndicator from './ChatTypingIndicator';
 import ChatChips from './ChatChips';
+import ChatLeadForm from './ChatLeadForm';
+import ChatHandoff from './ChatHandoff';
 import { useLeadCapture } from '../../hooks/useLeadCapture';
 import { useChatSession } from '../../hooks/useChatSession';
-import type { BudgetLinkData } from '../../services/geminiService';
 
 interface ChatCoreProps {
     mode: 'hero' | 'widget';
@@ -13,29 +14,42 @@ interface ChatCoreProps {
     onExternalMessageHandled?: () => void;
 }
 
+const HERO_INITIAL_BOT_MESSAGE = 'Para onde você sonha em ir? ✈️';
+
 const ChatCore: React.FC<ChatCoreProps> = ({ mode, externalMessage, onExternalMessageHandled }) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [input, setInput] = useState('');
-    const { setLeadDraft, submitLead, isSubmitting: isSubmittingLead } = useLeadCapture();
+    const [leadSubmitError, setLeadSubmitError] = useState<string | null>(null);
 
-    const handleBudgetLink = useCallback((budgetLink: BudgetLinkData) => {
-        setLeadDraft({
-            bantSummary: budgetLink.bantSummary,
-            origin: budgetLink.origin,
-            destination: budgetLink.destination,
-            dates: budgetLink.dates,
-            baggagePreference: budgetLink.baggagePreference || '',
-        });
-    }, [setLeadDraft]);
+    const {
+        leadDraft,
+        setLeadDraft,
+        submitLead,
+        isSubmitting: isSubmittingLead,
+    } = useLeadCapture();
 
-    const { messages, isLoading, chips, handoff, sendMessage } = useChatSession({
-        onBudgetLink: handleBudgetLink,
+    const {
+        phase,
+        messages,
+        isLoading,
+        chips,
+        pendingHandoff,
+        handoff,
+        sendMessage,
+        completeLeadForm,
+        resetSession,
+    } = useChatSession({
+        initialPhase: mode === 'hero' ? 'input' : 'conversation',
+        initialAssistantMessage: mode === 'hero' ? HERO_INITIAL_BOT_MESSAGE : undefined,
     });
 
+    const showConversation = phase === 'conversation';
+
     useEffect(() => {
+        if (!showConversation) return;
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages, isLoading, handoff]);
+    }, [messages, isLoading, showConversation]);
 
     useEffect(() => {
         const timer = window.setTimeout(() => {
@@ -43,51 +57,68 @@ const ChatCore: React.FC<ChatCoreProps> = ({ mode, externalMessage, onExternalMe
         }, 120);
 
         return () => window.clearTimeout(timer);
-    }, []);
+    }, [phase]);
 
     useEffect(() => {
         if (!externalMessage?.trim()) return;
 
         const timer = window.setTimeout(() => {
+            if (phase === 'lead-form' || phase === 'handoff') {
+                resetSession();
+                onExternalMessageHandled?.();
+                return;
+            }
             void sendMessage(externalMessage);
             onExternalMessageHandled?.();
-        }, 200);
+        }, 220);
 
         return () => window.clearTimeout(timer);
-    }, [externalMessage, onExternalMessageHandled, sendMessage]);
+    }, [externalMessage, onExternalMessageHandled, phase, resetSession, sendMessage]);
 
-    const handleFinalizeLead = useCallback(async (payload: LeadFinalizePayload): Promise<LeadFinalizeResult> => {
+    const handleLeadSubmit = useCallback(async (data: {
+        firstName: string;
+        lastName: string;
+        email: string;
+        consent: boolean;
+    }) => {
+        if (!pendingHandoff) return;
+
+        setLeadSubmitError(null);
+
         setLeadDraft({
-            firstName: payload.firstName,
-            lastName: payload.lastName,
-            email: payload.email,
-            bantSummary: payload.bantSummary,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            bantSummary: pendingHandoff.bantSummary,
+            origin: pendingHandoff.origin,
+            destination: pendingHandoff.destination,
+            dates: pendingHandoff.dates,
+            baggagePreference: pendingHandoff.baggagePreference || '',
         });
 
         const result = await submitLead({
-            firstName: payload.firstName,
-            lastName: payload.lastName,
-            email: payload.email,
-            bantSummary: payload.bantSummary,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            bantSummary: pendingHandoff.bantSummary,
+            origin: pendingHandoff.origin,
+            destination: pendingHandoff.destination,
+            dates: pendingHandoff.dates,
+            baggagePreference: pendingHandoff.baggagePreference || '',
         });
 
         if (result.ok) {
-            return { ok: true, url: result.whatsappUrl, notice: result.warning };
+            completeLeadForm(pendingHandoff.whatsappUrl);
+            return;
         }
 
         if (result.code === 'HUBSPOT_DUPLICATE_CONTACT') {
-            return {
-                ok: true,
-                url: payload.fallbackUrl,
-                notice: 'Seu contato já estava cadastrado. Vamos continuar no WhatsApp.',
-            };
+            completeLeadForm(pendingHandoff.whatsappUrl);
+            return;
         }
 
-        return {
-            ok: false,
-            error: result.error || 'Não foi possível salvar seu lead agora. Tente novamente.',
-        };
-    }, [setLeadDraft, submitLead]);
+        setLeadSubmitError(result.error || 'Não foi possível salvar seu lead agora. Tente novamente.');
+    }, [completeLeadForm, pendingHandoff, setLeadDraft, submitLead]);
 
     const handleSend = useCallback(() => {
         const text = input.trim();
@@ -101,35 +132,73 @@ const ChatCore: React.FC<ChatCoreProps> = ({ mode, externalMessage, onExternalMe
         void sendMessage(chip);
     }, [sendMessage]);
 
+    const handleResetQuote = useCallback(() => {
+        setLeadSubmitError(null);
+        setInput('');
+        resetSession();
+    }, [resetSession]);
+
     return (
-        <div className={mode === 'hero' ? 'flex flex-col h-[300px] sm:h-[340px]' : 'flex flex-col h-full'}>
-            <ChatMessageList
-                mode={mode}
-                messages={messages}
-                handoff={handoff}
-                isSubmittingLead={isSubmittingLead}
-                onFinalizeLead={handleFinalizeLead}
-                messagesEndRef={messagesEndRef}
-            />
+        <div className={mode === 'hero' ? 'flex flex-col w-full' : 'flex flex-col h-full'}>
+            {showConversation && (
+                <div className={mode === 'hero'
+                    ? 'transition-all duration-300 ease-in-out opacity-100 max-h-[260px] sm:max-h-[320px] min-h-[170px] sm:min-h-[190px] mb-2'
+                    : 'flex-1'}
+                >
+                    <ChatMessageList
+                        mode={mode}
+                        messages={messages}
+                        messagesEndRef={messagesEndRef}
+                    />
+                </div>
+            )}
 
-            <div className={mode === 'hero' ? 'px-3 pb-2 space-y-2 bg-white/5' : 'px-4 pb-3 space-y-2 bg-white'}>
-                {isLoading && <ChatTypingIndicator mode={mode} />}
-                <ChatChips
-                    mode={mode}
-                    chips={chips}
-                    disabled={isLoading}
-                    onSelect={handleChipSelect}
+            {phase === 'lead-form' && pendingHandoff && (
+                <ChatLeadForm
+                    onSubmit={handleLeadSubmit}
+                    isSubmitting={isSubmittingLead}
+                    error={leadSubmitError}
+                    defaultValues={{
+                        firstName: leadDraft.firstName,
+                        lastName: leadDraft.lastName,
+                        email: leadDraft.email,
+                        consent: false,
+                    }}
                 />
-            </div>
+            )}
 
-            <ChatInput
-                mode={mode}
-                inputRef={inputRef}
-                value={input}
-                onChange={setInput}
-                onSend={handleSend}
-                disabled={isLoading}
-            />
+            {phase === 'handoff' && handoff && (
+                <ChatHandoff
+                    whatsappUrl={handoff.whatsappUrl}
+                    onReset={handleResetQuote}
+                />
+            )}
+
+            {(phase === 'input' || phase === 'conversation') && (
+                <>
+                    <div className={mode === 'hero' ? 'px-1 pb-1 space-y-2' : 'px-4 pb-3 space-y-2 bg-white'}>
+                        {showConversation && isLoading && <ChatTypingIndicator mode={mode} />}
+                        {showConversation && (
+                            <ChatChips
+                                mode={mode}
+                                chips={chips}
+                                disabled={isLoading}
+                                onSelect={handleChipSelect}
+                            />
+                        )}
+                    </div>
+
+                    <ChatInput
+                        mode={mode}
+                        inputRef={inputRef}
+                        value={input}
+                        onChange={setInput}
+                        onSend={handleSend}
+                        disabled={isLoading}
+                        placeholder={mode === 'hero' ? 'Para onde você sonha em ir?' : undefined}
+                    />
+                </>
+            )}
         </div>
     );
 };

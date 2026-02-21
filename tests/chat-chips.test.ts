@@ -33,3 +33,19 @@ test('inferFallbackChips should infer budget chips when structured block is miss
 
     assert.deepEqual(chips, ['Até R$ 10 mil', 'R$ 10-20 mil', 'R$ 20-35 mil', 'R$ 35 mil+']);
 });
+
+test('inferFallbackChips should infer adult chips from common prompts', () => {
+    const text = 'Quantos adultos vão viajar?';
+
+    const chips = inferFallbackChips(text);
+
+    assert.deepEqual(chips, ['1', '2', '3', '4+']);
+});
+
+test('inferFallbackChips should infer children chips from common prompts', () => {
+    const text = 'A viagem inclui crianças?';
+
+    const chips = inferFallbackChips(text);
+
+    assert.deepEqual(chips, ['Sim', 'Não']);
+});

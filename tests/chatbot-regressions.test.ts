@@ -72,10 +72,14 @@ test('system prompt should include deterministic chips policy', () => {
     );
     assert.match(
         SYSTEM_INSTRUCTION,
-        /\[CHIPS: Opção 1 \| Opção 2 \| Opção 3\]/,
+        /O bloco deve estar na última linha da resposta/,
     );
     assert.match(
         SYSTEM_INSTRUCTION,
-        /Nunca use chips para campos abertos como destino ou datas/,
+        /\[CHIPS: 1 \| 2 \| 3 \| 4\+\]/,
+    );
+    assert.match(
+        SYSTEM_INSTRUCTION,
+        /\[CHIPS: Sim \| Não\]/,
     );
 });

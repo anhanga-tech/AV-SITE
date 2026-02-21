@@ -10,17 +10,31 @@ interface ChatChipsProps {
 const ChatChips: React.FC<ChatChipsProps> = ({ chips, disabled = false, onSelect, mode }) => {
     if (chips.length === 0) return null;
 
-    const baseClass = mode === 'hero'
-        ? 'bg-white/90 text-brand-dark border border-white hover:bg-white'
+    const isHero = mode === 'hero';
+
+    const wrapperClassName = isHero
+        ? 'flex gap-2 overflow-x-auto no-scrollbar whitespace-nowrap py-1'
+        : 'flex flex-wrap gap-2';
+
+    const baseClass = isHero
+        ? 'bg-brand-yellow text-brand-dark border border-transparent hover:opacity-85'
         : 'bg-white text-brand-dark border border-brand-vibrant/20 hover:bg-brand-light';
 
     return (
-        <div className="flex flex-wrap gap-2" aria-label="Sugestões rápidas">
+        <div className={wrapperClassName} aria-label="Sugestões rápidas">
             {chips.map((chip) => (
                 <button
                     key={chip}
                     type="button"
+                    role="button"
+                    tabIndex={0}
                     onClick={() => onSelect(chip)}
+                    onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            onSelect(chip);
+                        }
+                    }}
                     disabled={disabled}
                     className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${baseClass}`}
                 >

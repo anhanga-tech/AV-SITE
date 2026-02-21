@@ -5,12 +5,21 @@ interface ChatTypingIndicatorProps {
     mode: 'hero' | 'widget';
 }
 
+const TypingDots: React.FC = () => (
+    <div className="flex items-center gap-1 text-sm text-gray-500" aria-label="Digitando">
+        <span className="animate-pulse">●</span>
+        <span className="animate-pulse [animation-delay:120ms]">●</span>
+        <span className="animate-pulse [animation-delay:240ms]">●</span>
+    </div>
+);
+
 const ChatTypingIndicator: React.FC<ChatTypingIndicatorProps> = ({ mode }) => {
     if (mode === 'hero') {
         return (
-            <div className="flex items-center gap-2 text-xs text-white/90 bg-white/15 border border-white/20 rounded-xl px-3 py-2 backdrop-blur-sm">
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                <span>Consultora está digitando...</span>
+            <div className="flex items-center justify-start">
+                <div className="inline-flex items-center px-3 py-2 rounded-2xl bg-white/90 border border-white/70">
+                    <TypingDots />
+                </div>
             </div>
         );
     }
