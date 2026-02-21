@@ -60,21 +60,24 @@ const Button: React.FC<ButtonProps> = ({
     : '-translate-y-2 group-hover:translate-y-0';
 
   const computedAriaLabel = ariaLabel || (tooltip ? `${text}. ${tooltip}` : text);
-  const whatsappUrl = getWhatsAppLink(WHATSAPP_MESSAGE);
+
 
   return (
     <div className={`relative group ${fullWidth ? 'w-full' : 'inline-block'}`}>
-      <a
-        href={whatsappUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={handleClick}
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
+            detail: { message: WHATSAPP_MESSAGE }
+          }));
+          handleClick();
+        }}
         className={`btn-whatsapp ${baseStyles} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className}`}
         aria-label={computedAriaLabel}
       >
         {icon && <MessageCircle className="w-6 h-6 mr-2" />}
         {text}
-      </a>
+      </button>
 
       {tooltip && (
         <div className={`absolute left-1/2 transform -translate-x-1/2 w-max max-w-[200px] md:max-w-xs transition-all duration-200 opacity-0 group-hover:opacity-100 pointer-events-none z-50 ${positionStyles} ${animationStyles}`}>

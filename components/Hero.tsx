@@ -471,7 +471,7 @@ const Hero: React.FC = () => {
   const selectedTripObj = TRIP_OPTIONS.find(t => t.label === tripType);
   const selectedBudgetObj = BUDGET_TIERS.find(b => b.label === budget);
 
-  // Handle Search / WhatsApp Redirect
+  // Handle Search / AI Chat Trigger
   const handleSearch = () => {
     if (!inputValue.trim()) {
       alert("Por favor, informe o destino.");
@@ -494,7 +494,7 @@ const Hero: React.FC = () => {
       ? ` (${childAges.map(a => a ? `${a} anos` : 'Idade N/I').join(', ')})`
       : '';
 
-    let message = `Olá! Vim pelo site. Gostaria de cotar:\n\n`;
+    let message = `Olá! Gostaria de um orçamento para minha próxima viagem:\n\n`;
     message += `📍 *Destino:* ${inputValue}\n`;
     message += `📅 *Ida:* ${startStr}\n`;
     message += `📅 *Volta:* ${endStr}\n`;
@@ -503,12 +503,14 @@ const Hero: React.FC = () => {
     if (tripType) message += `🎭 *Tipo de Viagem:* ${tripType}\n`;
     if (budget) message += `💰 *Orçamento:* ${budget}\n`;
 
-    const whatsappUrl = getWhatsAppLink(message);
+    // Dispara evento para o AIChat
+    window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
+        detail: { message }
+    }));
 
     setTimeout(() => {
-      window.open(whatsappUrl, '_blank');
       setIsSearchLoading(false);
-    }, 1500);
+    }, 1000);
   };
 
   return (

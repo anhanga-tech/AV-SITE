@@ -1,13 +1,16 @@
 import React from 'react';
-import { getWhatsAppLink } from '../utils/whatsapp';
 import MessageSquare from 'lucide-react/dist/esm/icons/message-square';
-import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
-import Ticket from 'lucide-react/dist/esm/icons/ticket';
 import Plane from 'lucide-react/dist/esm/icons/plane';
-import QrCode from 'lucide-react/dist/esm/icons/qr-code';
 import Smartphone from 'lucide-react/dist/esm/icons/smartphone';
 
 const CallToAction: React.FC = () => {
+
+    const handleCTAClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
+            detail: { message: "Olá! Gostaria de fazer meu check-in e solicitar um orçamento personalizado." }
+        }));
+    };
 
     return (
         <section id="contato" className="py-24 bg-brand-light relative overflow-hidden">
@@ -47,16 +50,14 @@ const CallToAction: React.FC = () => {
 
                         {/* Footer / CTA */}
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-                            <a
-                                href={getWhatsAppLink("Olá! Gostaria de fazer meu check-in e solicitar um orçamento personalizado.")}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                            <button
+                                onClick={handleCTAClick}
                                 className="btn-whatsapp flex items-center gap-3 bg-brand-dark text-white text-lg font-bold px-8 py-4 rounded-xl shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
                                 data-tracking="cta-home-footer"
                             >
-                                <span>Fazer Check-in (WhatsApp)</span>
+                                <span>Solicitar Orçamento Personalizado</span>
                                 <MessageSquare className="w-5 h-5" />
-                            </a>
+                            </button>
                         </div>
 
                         {/* Top "Hole" for perforation illusion */}

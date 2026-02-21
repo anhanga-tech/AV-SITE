@@ -95,15 +95,18 @@ const Highlights: React.FC = () => {
                             <p className="text-gray-500 text-lg mb-6 leading-relaxed">
                                 Comece a planejar agora e receba um roteiro prévio sem compromisso.
                             </p>
-                            <a
-                                href={getWhatsAppLink("Olá! Quero conhecer a experiência Anhangá.")}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
+                                        detail: { message: "Olá! Quero conhecer a experiência Anhangá." }
+                                    }));
+                                }}
                                 className="flex items-center justify-center gap-3 w-full bg-brand-dark text-white px-6 py-4 rounded-xl font-bold transition-all duration-300 ease-spring shadow-[4px_4px_0px_#94a3b8] hover:shadow-[2px_2px_0px_#94a3b8] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
                             >
                                 <ShieldCheck className="w-5 h-5" />
                                 <span>Falar com Especialista</span>
-                            </a>
+                            </button>
                         </div>
                     </div>
 

@@ -31,8 +31,14 @@ const BlogPost: React.FC = () => {
                 // Construct message: use existing text or default to post title context
                 const message = currentText || `Olá! Li o post "${post.title}" e gostaria de planejar minha viagem.`;
 
-                // Update href with tracking parameters
-                anchor.href = getWhatsAppLink(message);
+                // Update to trigger chatbot
+                anchor.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
+                        detail: { message }
+                    }));
+                });
+                anchor.href = "#";
                 anchor.classList.add('btn-whatsapp');
             });
         }
@@ -201,14 +207,17 @@ const BlogPost: React.FC = () => {
                                 <p className="text-gray-600 font-serif italic text-base mb-8 leading-relaxed">
                                     "Apaixonado por descobrir lugares novos e compartilhar dicas que não estão nos guias turísticos."
                                 </p>
-                                <a
-                                    href={getWhatsAppLink(`Olá! Gostaria de falar com o especialista ${post.author} sobre viagens.`)}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
+                                            detail: { message: `Olá! Gostaria de falar com o especialista ${post.author} sobre viagens.` }
+                                        }));
+                                    }}
                                     className="btn-whatsapp block w-full py-4 bg-white border-2 border-brand-dark text-brand-dark font-black tracking-wide text-sm uppercase rounded-xl hover:bg-brand-dark hover:text-white transition-colors shadow-[4px_4px_0px_#0f172a] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] text-center"
                                 >
                                     Falar com Especialista
-                                </a>
+                                </button>
                             </div>
 
                             <div className="bg-white/50 backdrop-blur-sm p-2 rounded-3xl">

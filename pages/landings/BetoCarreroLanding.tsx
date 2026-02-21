@@ -73,15 +73,18 @@ const BetoCarreroLanding: React.FC = () => {
             <li>Suporte por WhatsApp durante a viagem</li>
           </ul>
           <div className="flex flex-wrap gap-3">
-            <a
-              href={getWhatsAppLink("Olá! Gostaria de um orçamento personalizado para o Beto Carrero.")}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
+                  detail: { message: "Olá! Gostaria de um orçamento personalizado para o Beto Carrero." }
+                }));
+              }}
               className="btn-whatsapp px-5 py-3 rounded-full bg-brand-cyan text-white font-bold hover:bg-brand-cyan/90 transition-colors"
               data-tracking="cta-final-betocarrero"
             >
-              Falar com especialista no WhatsApp
-            </a>
+              Falar com especialista
+            </button>
             <Link to="/orlando" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ver pacotes para Orlando
             </Link>

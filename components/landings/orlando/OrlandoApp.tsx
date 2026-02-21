@@ -81,7 +81,7 @@ function OrlandoApp() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  const whatsappUrl = getWhatsAppLink(WHATSAPP_MESSAGE);
+
 
   return (
     <div className="landing-orlando">
@@ -119,12 +119,20 @@ function OrlandoApp() {
               </p>
 
               <div className="cta-container">
-                  <a href={whatsappUrl} className="btn-whatsapp main-btn" target="_blank" rel="noopener noreferrer">
+                  <button
+                      onClick={(e) => {
+                          e.preventDefault();
+                          window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
+                              detail: { message: WHATSAPP_MESSAGE }
+                          }));
+                      }}
+                      className="btn-whatsapp main-btn"
+                  >
                       <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                         <path d="M17.472 14.382C17.112 14.382 16.2 13.932 15.984 13.824C15.768 13.716 15.66 13.572 15.552 13.752C15.444 13.932 15.12 14.328 15.012 14.436C14.904 14.544 14.796 14.544 14.58 14.436C14.364 14.328 13.608 14.076 12.744 13.308C12.06 12.708 11.628 11.952 11.484 11.736C11.376 11.52 11.52 11.412 11.628 11.304C11.7 11.232 11.772 11.124 11.88 11.016C11.952 10.908 12.024 10.8 12.096 10.656C12.168 10.512 12.132 10.368 12.096 10.296C12.06 10.224 11.7 9.324 11.556 8.964C11.412 8.604 11.268 8.64 11.16 8.64H10.8C10.692 8.64 10.512 8.676 10.332 8.892C10.152 9.108 9.648 9.576 9.648 10.548C9.648 11.52 10.368 12.456 10.476 12.6C10.584 12.744 13.176 16.632 17.064 18.252C19.836 19.404 19.836 19.404 20.34 19.332C20.844 19.26 21.96 18.648 22.212 17.928C22.464 17.208 22.464 16.596 22.392 16.488C22.32 16.38 22.14 16.308 21.924 16.2C21.708 16.092 20.628 15.552 20.412 15.444C20.196 15.336 20.016 15.264 19.872 15.48C19.728 15.696 19.296 16.2 19.152 16.344C19.008 16.488 18.864 16.524 18.648 16.416C18.432 16.308 17.724 16.056 16.896 15.336L17.472 14.382ZM12.036 0C5.4 0 0 5.4 0 12.036C0 14.16 0.54 16.128 1.512 17.856L0 23.4L5.652 21.924C7.272 22.824 9.144 23.328 11.16 23.328H11.232C17.856 23.328 23.256 17.928 23.256 11.268C23.256 4.608 18.216 0 12.036 0Z" />
                       </svg>
-                      Reservar no WhatsApp
-                  </a>
+                      Solicitar Orçamento
+                  </button>
               </div>
           </div>
 
@@ -326,9 +334,17 @@ function OrlandoApp() {
         </div>
 
         <div className="gallery-cta">
-             <a href={whatsappUrl} className="btn-whatsapp main-btn secondary" target="_blank" rel="noopener noreferrer">
+             <button
+                 onClick={(e) => {
+                     e.preventDefault();
+                     window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
+                         detail: { message: "Olá! Gostaria de ver os pacotes para Orlando." }
+                     }));
+                 }}
+                 className="btn-whatsapp main-btn secondary"
+             >
                 Ver Pacotes
-             </a>
+             </button>
         </div>
       </section>
 
@@ -373,9 +389,17 @@ function OrlandoApp() {
 
              <div className="itinerary-footer">
                 <p>* Personalizamos este roteiro 100% para você!</p>
-                <a href={whatsappUrl} className="btn-whatsapp main-btn" target="_blank" rel="noopener noreferrer">
+                <button
+                    onClick={(e) => {
+                        e.preventDefault();
+                        window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
+                            detail: { message: "Olá! Gostaria de um roteiro personalizado para Orlando baseado na sugestão de 7 dias." }
+                        }));
+                    }}
+                    className="btn-whatsapp main-btn"
+                >
                     Quero esse roteiro!
-                </a>
+                </button>
              </div>
           </div>
       </section>
@@ -392,7 +416,17 @@ function OrlandoApp() {
                   <div className="social-links">
                       <a href="https://instagram.com/anhangaviagens" target="_blank" rel="noopener noreferrer">Instagram</a>
                       <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">Facebook</a>
-                      <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="btn-whatsapp">WhatsApp</a>
+                      <button
+                          onClick={(e) => {
+                              e.preventDefault();
+                              window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
+                                  detail: { message: WHATSAPP_MESSAGE }
+                              }));
+                          }}
+                          className="btn-whatsapp"
+                      >
+                          WhatsApp
+                      </button>
                   </div>
               </div>
           </div>

@@ -134,14 +134,17 @@ const BlogList: React.FC = () => {
                     <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
                         Fale com nossos especialistas e comece a planejar sua viagem personalizada hoje mesmo.
                     </p>
-                    <a
-                        href={getWhatsAppLink("Olá! Vi o blog da Anhangá e gostaria de solicitar um orçamento personalizado.")}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    <button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
+                                detail: { message: "Olá! Vi o blog da Anhangá e gostaria de solicitar um orçamento personalizado." }
+                            }));
+                        }}
                         className="btn-whatsapp inline-flex items-center gap-3 bg-brand-dark text-white text-lg font-bold px-10 py-5 rounded-2xl shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
                     >
-                        Solicitar Orçamento no WhatsApp
-                    </a>
+                        Solicitar Orçamento
+                    </button>
                 </div>
                 </div>
             </div>

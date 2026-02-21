@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { getWhatsAppLink } from '../utils/whatsapp';
 import Menu from 'lucide-react/dist/esm/icons/menu';
@@ -27,7 +26,11 @@ const Header: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleContactClick = () => {
+  const handleContactClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
+        detail: { message: "Olá! Gostaria de falar com um especialista." }
+    }));
     setIsMobileMenuOpen(false);
   };
 
@@ -172,10 +175,9 @@ const Header: React.FC = () => {
           {/* CTA Button */}
           <div className="hidden md:block">
             <a
-              href={getWhatsAppLink("Olá! Gostaria de falar com um especialista.")}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Fale Conosco no WhatsApp"
+              href="#"
+              aria-label="Fale Conosco"
+              onClick={handleContactClick}
               className={`px-5 py-2.5 rounded-full font-medium text-sm transition-all duration-500 flex items-center gap-2 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-vibrant ${buttonClass}`}
             >
               <Phone className="w-4 h-4" />
@@ -229,9 +231,7 @@ const Header: React.FC = () => {
             Blog de Viagens
           </a>
           <a
-            href={getWhatsAppLink("Olá! Gostaria de falar com um especialista.")}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#"
             className="bg-brand-vibrant text-center text-white px-5 py-3 rounded-lg font-bold mt-2 focus:ring-2 focus:ring-offset-2 focus:ring-brand-dark focus:outline-none flex justify-center items-center gap-2"
             onClick={handleContactClick}
           >

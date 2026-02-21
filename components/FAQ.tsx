@@ -85,7 +85,7 @@ const FAQS = [
                 </ul>
                 <p className="border-l-4 border-brand-yellow pl-4 italic">
                     <strong>Receba uma cotação personalizada gratuitamente!</strong> <br />
-                    Fale com nossos especialistas via WhatsApp.
+                    Fale com nossa IA agora mesmo no chat!
                 </p>
             </div>
         )
@@ -147,7 +147,7 @@ const FAQS = [
             <div itemProp="text">
                 <strong className="block mb-3">4 passos simples:</strong>
                 <ol className="list-decimal pl-5 space-y-3">
-                    <li className="pl-1"><strong className="text-brand-dark">Oie! Vamos conversar?</strong> <br /> Você nos conta seus sonhos e orçamento via WhatsApp</li>
+                    <li className="pl-1"><strong className="text-brand-dark">Oie! Vamos conversar?</strong> <br /> Você nos conta seus sonhos e orçamento via Chatbot</li>
                     <li className="pl-1"><strong className="text-brand-dark">Desenhando o Sonho</strong> <br /> Nossos especialistas criam um roteiro dia-a-dia personalizado</li>
                     <li className="pl-1"><strong className="text-brand-dark">Burocracia? Deixa com a gente</strong> <br /> Emitimos voos, hotéis, passeios e parcelamos</li>
                     <li className="pl-1"><strong className="text-brand-dark">Fui! Partiu Viajar</strong> <br /> Você recebe vouchers organizados. A gente fica de plantão 24h</li>

@@ -38,7 +38,6 @@ const MainSiteShell: React.FC = () => {
         </Routes>
       </main>
       <Footer />
-      <AIChat />
     </div>
   );
 };
@@ -54,6 +53,7 @@ function App() {
           <Route path="/orlando" element={<Suspense fallback={<LandingRouteFallback />}><OrlandoLanding /></Suspense>} />
           <Route path="/*" element={<MainSiteShell />} />
         </Routes>
+        <AIChat />
         <Analytics />
         <SpeedInsights />
       </Router>

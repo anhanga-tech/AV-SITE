@@ -11,16 +11,19 @@ const WhatsAppFloating: React.FC = () => {
   const whatsappUrl = getWhatsAppLink(WHATSAPP_MESSAGE);
 
   return (
-    <a
-      href={whatsappUrl}
-      target="_blank"
-      rel="noopener noreferrer"
+    <button
+      onClick={(e) => {
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
+          detail: { message: WHATSAPP_MESSAGE }
+        }));
+      }}
       className="btn-whatsapp fixed bottom-6 right-6 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform duration-300 flex items-center justify-center animate-pulse hover:animate-none"
-      aria-label="Fale conosco no WhatsApp"
+      aria-label="Fale conosco"
       id="btn-whatsapp-floating"
     >
       <MessageCircle size={32} fill="white" className="text-white" />
-    </a>
+    </button>
   );
 };
 
