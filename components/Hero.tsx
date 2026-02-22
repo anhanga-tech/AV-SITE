@@ -214,8 +214,11 @@ const getDaysInMonth = (date: Date) => {
 };
 
 const Hero: React.FC = () => {
-  // Keep hero media deterministic to improve cache hit and stable CWV.
-  const [backgroundVideo] = useState(() => HERO_VIDEOS[0]);
+  // Pick a random video on mount to provide a fresh experience on each visit.
+  const [backgroundVideo] = useState(() => {
+    const randomIndex = Math.floor(Math.random() * HERO_VIDEOS.length);
+    return HERO_VIDEOS[randomIndex];
+  });
   const [shouldRenderVideo, setShouldRenderVideo] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const optimizedPoster = useMemo(

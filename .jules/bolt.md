@@ -15,3 +15,7 @@
 ## 2025-05-16 - Logic and Memoization Refactoring
 **Learning:** Pure utility functions and configuration arrays are frequently redefined inside component bodies in this codebase. Moving these outside, combined with `React.memo` for list items (like `FAQItem`), significantly stabilizes the component tree and reduces memory pressure. Always add `displayName` to memoized components for better DevTools visibility.
 **Action:** Systematically check for and move non-reactive logic and data outside the render loop.
+
+## 2025-05-22 - Randomization with Stable CWV
+**Learning:** Using a lazy initializer in `useState` is an efficient way to pick a random item on component mount without causing re-renders or breaking the stable state during the component's lifecycle. This satisfies requirements for variety while keeping the background stable for the user session.
+**Action:** Use `useState(() => pickRandom())` for initial random states that should not change until the next page load.
