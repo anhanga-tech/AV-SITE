@@ -177,12 +177,12 @@ const ChatCore: React.FC<ChatCoreProps> = ({ mode, externalMessage, onExternalMe
     }, [resetSession]);
 
     return (
-        <div className={mode === 'hero' ? 'flex flex-col w-full' : 'flex flex-col h-full'}>
+        <div className={mode === 'hero' ? 'flex flex-col w-full rounded-sm bg-anhanga-darkBlue/80 border-2 border-slate-900 shadow-hard-lg overflow-hidden' : 'flex flex-col h-full'}>
             {showConversation && (
                 <div
                     ref={mode === 'hero' ? scrollContainerRef : undefined}
                     className={mode === 'hero'
-                        ? 'transition-all duration-300 ease-in-out opacity-100 max-h-[260px] sm:max-h-[320px] min-h-[170px] sm:min-h-[190px] mb-3 overflow-y-auto rounded-sm bg-anhanga-darkBlue border-2 border-slate-900 shadow-hard-lg'
+                        ? 'transition-all duration-300 ease-in-out opacity-100 max-h-[260px] sm:max-h-[320px] min-h-[170px] sm:min-h-[190px] overflow-y-auto'
                         : 'flex-1'}
                 >
                     <ChatMessageList
@@ -222,7 +222,7 @@ const ChatCore: React.FC<ChatCoreProps> = ({ mode, externalMessage, onExternalMe
             {
                 (phase === 'input' || phase === 'conversation') && (
                     <>
-                        <div className={mode === 'hero' ? 'px-1 pb-1 space-y-2' : 'px-4 pb-3 space-y-2 bg-white'}>
+                        <div className={mode === 'hero' ? 'px-3 sm:px-4 pb-1 space-y-2' : 'px-4 pb-3 space-y-2 bg-white'}>
                             {showConversation && isLoading && <ChatTypingIndicator mode={mode} />}
                             {showConversation && (
                                 <ChatChips

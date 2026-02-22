@@ -81,7 +81,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({
                             ? 'bg-anhanga-yellow text-anhanga-darkBlue border-2 border-slate-900 shadow-hard'
                             : 'bg-brand-vibrant text-white rounded-br-none shadow-sm'
                         : isHero
-                            ? 'bg-slate-900 text-white border-2 border-slate-800'
+                            ? 'bg-white/10 text-white backdrop-blur-sm'
                             : 'bg-white text-gray-700 border border-gray-100 rounded-bl-none shadow-sm'
                         }`}>
                         <FormattedText text={message.text} />
