@@ -33,3 +33,5 @@ dist-ssr
 
 # Local tooling and skill repositories
 .gemini/
+
+gha-creds-*.json
