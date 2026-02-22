@@ -190,6 +190,7 @@ const AIChat: React.FC = () => {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isHeroVisible, setIsHeroVisible] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const messagesRef = useRef<Message[]>(messages);
@@ -214,6 +215,30 @@ const AIChat: React.FC = () => {
         setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [isOpen]);
+
+  // Detect hero section visibility to hide floating button
+  useEffect(() => {
+    const heroSection = document.getElementById('hero-section');
+    if (!heroSection) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        // Hero is visible if more than 50% is in viewport
+        setIsHeroVisible(entry.isIntersecting && entry.intersectionRatio > 0.5);
+      },
+      {
+        threshold: [0, 0.5, 1],
+        rootMargin: '-100px 0px 0px 0px' // Consider hero visible only when near top
+      }
+    );
+
+    observer.observe(heroSection);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   const handleFinalizeLead = async (payload: LeadFinalizePayload): Promise<LeadFinalizeResult> => {
     setLeadDraft({
@@ -438,14 +463,15 @@ const AIChat: React.FC = () => {
             group flex items-center justify-center gap-3 
             bg-brand-vibrant hover:bg-brand-blue text-white 
             shadow-2xl hover:shadow-brand-vibrant/50
-            transition-all duration-300 transform hover:scale-110 active:scale-95 
+            transition-opacity duration-300 transform hover:scale-110 active:scale-95 
             focus:outline-none focus:ring-4 focus:ring-brand-vibrant/50 
             z-[100]
             /* Mobile: Circular & Larger Touch Target */
             w-14 h-14 rounded-full p-0
             /* Desktop: Pill Shape */
             sm:w-auto sm:h-auto sm:rounded-full sm:pl-5 sm:pr-6 sm:py-3.5
-            ${isOpen ? 'translate-y-24 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
+            ${isOpen ? 'translate-y-24 opacity-0 pointer-events-none' : ''}
+            ${isHeroVisible && !isOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}
         `}
         aria-label="Abrir assistente virtual"
       >

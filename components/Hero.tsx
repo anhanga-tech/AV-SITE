@@ -22,6 +22,8 @@ import Users from 'lucide-react/dist/esm/icons/users';
 import DollarSign from 'lucide-react/dist/esm/icons/dollar-sign';
 import Gem from 'lucide-react/dist/esm/icons/gem';
 import Crown from 'lucide-react/dist/esm/icons/crown';
+import Clock from 'lucide-react/dist/esm/icons/clock';
+import Tag from 'lucide-react/dist/esm/icons/tag';
 import { HERO_VIDEOS, optimizeRemoteImageUrl } from '../data/mediaConfig';
 
 // --- DATA: COMPREHENSIVE DESTINATION LIST (IATA & TOURIST HOTSPOTS) ---
@@ -171,10 +173,27 @@ const PRE_NORMALIZED_DB = DESTINATIONS_DATABASE.map(d => ({
  * Moved outside to prevent recreation on every render of Hero.
  */
 const QUICK_FEATURES = [
-  { text: "Roteiros Exclusivos", icon: <Sparkles className="w-4 h-4 text-yellow-300" /> },
-  { text: "Suporte 24/7", icon: <Sparkles className="w-4 h-4 text-yellow-300" /> },
-  { text: "Melhores Preços", icon: <Sparkles className="w-4 h-4 text-yellow-300" /> }
+  { text: "Roteiros Exclusivos", icon: Gem, iconColor: "text-yellow-300" },
+  { text: "Suporte 24/7", icon: Clock, iconColor: "text-cyan-300" },
+  { text: "Melhores Preços", icon: Tag, iconColor: "text-green-300" }
 ];
+
+/**
+ * Hook para placeholder rotativo de destinos
+ */
+const useRotatingPlaceholder = (destinations: string[], interval = 3000) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % destinations.length);
+    }, interval);
+
+    return () => clearInterval(timer);
+  }, [destinations.length, interval]);
+
+  return destinations[currentIndex];
+};
 
 // Rich Options for UI
 const TRIP_OPTIONS = [
@@ -222,6 +241,17 @@ const Hero: React.FC = () => {
     () => optimizeRemoteImageUrl(backgroundVideo.poster, 1280, 720),
     [backgroundVideo.poster]
   );
+
+  // Rotating placeholder destinations
+  const rotatingDestinations = useMemo(() => [
+    "Maldivas...",
+    "Fernando de Noronha...",
+    "Orlando...",
+    "Paris...",
+    "Bali...",
+    "Dubai..."
+  ], []);
+  const rotatingPlaceholder = useRotatingPlaceholder(rotatingDestinations, 3000);
 
   // State for Destination
   const [inputValue, setInputValue] = useState('');
@@ -514,7 +544,7 @@ const Hero: React.FC = () => {
   };
 
   return (
-    <section className="relative w-full min-h-[850px] flex items-center bg-brand-light pb-20 z-20">
+    <section id="hero-section" className="relative w-full min-h-[850px] flex items-center bg-brand-light pb-20 z-20">
 
       {/* Background media (image first, deferred video on capable devices) */}
       <div className="absolute inset-0 z-0 overflow-hidden">
@@ -584,13 +614,13 @@ const Hero: React.FC = () => {
             </span>
           </h1>
 
-          <p className="text-white/90 text-xl md:text-2xl max-w-2xl mx-auto mb-12 font-medium leading-relaxed drop-shadow-md">
+          <p className="text-white/90 text-xl md:text-2xl max-w-2xl mx-auto mb-8 font-medium leading-relaxed drop-shadow-md">
             Roteiros que parecem feitos à mão. <br />
             Porque sua viagem merece ser única.
           </p>
 
           {/* SEARCH BAR - Extended Ticket Style - Pop In Animation */}
-          <div className="w-full max-w-5xl mx-auto bg-white rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] p-2 relative z-50 border-[6px] border-white/20 backdrop-blur-sm flex flex-col">
+          <div className="w-full max-w-5xl mx-auto bg-white rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3),0_0_30px_rgba(0,86,210,0.3)] p-2 relative z-50 border-[6px] border-[#0056D2]/20 backdrop-blur-sm flex flex-col">
 
             {/* --- ROW 1: BASIC INFO --- */}
             <div className="flex flex-col md:flex-row items-center w-full divide-y md:divide-y-0 md:divide-x divide-gray-100">
@@ -600,15 +630,25 @@ const Hero: React.FC = () => {
                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-focus-within:text-brand-cyan transition-colors">
                   <MapPin className="w-3 h-3" /> Para onde?
                 </label>
-                <input
-                  type="text"
-                  value={inputValue}
-                  onChange={handleDestinationChange}
-                  onFocus={() => setShowDestSuggestions(true)}
-                  placeholder="Ex: Orlando, Paris, Brasil..."
-                  className="w-full outline-none text-gray-800 font-bold placeholder-gray-300 bg-transparent text-lg md:text-xl truncate transition-colors"
-                  autoComplete="off"
-                />
+                <div className="relative w-full">
+                  <input
+                    type="text"
+                    value={inputValue}
+                    onChange={handleDestinationChange}
+                    onFocus={() => setShowDestSuggestions(true)}
+                    placeholder="Ex: Orlando, Paris, Brasil..."
+                    className="w-full outline-none text-gray-800 font-bold placeholder-gray-300 bg-transparent text-lg md:text-xl truncate transition-colors relative z-10"
+                    autoComplete="off"
+                  />
+                  {!inputValue && (
+                    <div className="absolute left-0 top-0 text-gray-300 pointer-events-none text-lg md:text-xl font-bold flex items-center whitespace-nowrap overflow-hidden">
+                      <span>Para onde você sonha em ir? </span>
+                      <span className="inline-block min-w-[140px] ml-1 opacity-70 transition-opacity duration-500" key={rotatingPlaceholder}>
+                        {rotatingPlaceholder}
+                      </span>
+                    </div>
+                  )}
+                </div>
                 {/* Dropdown - Pop In */}
                 {showDestSuggestions && filteredDestinations.length > 0 && (
                   <div className="absolute top-full left-0 w-full bg-white rounded-2xl shadow-xl border-2 border-gray-100 mt-4 overflow-hidden z-[60] animate-pop-in origin-top">
@@ -905,13 +945,34 @@ const Hero: React.FC = () => {
           </div>
 
           {/* Quick Features - Staggered */}
-          <div className="mt-10 flex flex-wrap justify-center gap-6 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-            {QUICK_FEATURES.map((feat, i) => (
-              <div key={i} className="flex items-center gap-2 text-white/90 font-bold text-sm bg-white/10 px-4 py-2 rounded-full backdrop-blur-md border border-white/10 hover:bg-white/20 transition-all duration-300 hover:scale-105 cursor-default">
-                {feat.icon}
-                {feat.text}
-              </div>
-            ))}
+          <div className="mt-6 flex flex-wrap justify-center gap-6 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+            {QUICK_FEATURES.map((feat, i) => {
+              const IconComponent = feat.icon;
+              return (
+                <div key={i} className="flex items-center gap-2 text-white/90 font-bold text-base bg-white/15 px-5 py-3 rounded-full backdrop-blur-md border border-white/20 hover:bg-white/25 transition-all duration-300 hover:scale-105 cursor-default shadow-lg">
+                  <IconComponent className={`w-5 h-5 ${feat.iconColor}`} />
+                  {feat.text}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* CTA Secundário */}
+          <div className="mt-6 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
+            <a
+              href="#destinos"
+              onClick={(e) => {
+                e.preventDefault();
+                const destinosElement = document.getElementById('destinos');
+                if (destinosElement) {
+                  destinosElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+              }}
+              className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md border-2 border-white/30 text-white font-bold px-6 py-3 rounded-full hover:bg-white/30 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+            >
+              <Compass className="w-5 h-5" />
+              Ver Destinos
+            </a>
           </div>
 
 
