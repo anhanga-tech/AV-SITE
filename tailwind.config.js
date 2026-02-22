@@ -43,6 +43,7 @@ export default {
             },
             boxShadow: {
                 'glow': '0 0 20px rgba(14, 165, 233, 0.5)',
+                'hero-input': '0 0 24px rgba(0, 86, 210, 0.25)',
                 'float': '0 10px 40px -10px rgba(0,0,0,0.15)',
                 'hard': '4px 4px 0px 0px rgba(15, 23, 42, 1)',
                 'hard-lg': '8px 8px 0px 0px rgba(15, 23, 42, 1)',

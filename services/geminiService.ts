@@ -18,16 +18,18 @@ interface BudgetFunctionArgs {
   baggage_preference?: string;
 }
 
-interface ChatResponse {
+export interface BudgetLinkData {
+  origin: string;
+  destination: string;
+  dates: string;
+  baggagePreference?: string;
+  url: string;
+  bantSummary: string;
+}
+
+export interface ChatResponse {
   text?: string;
-  budgetLink?: {
-    origin: string;
-    destination: string;
-    dates: string;
-    baggagePreference?: string;
-    url: string;
-    bantSummary: string;
-  };
+  budgetLink?: BudgetLinkData;
 }
 
 const formatLocation = (city?: string, region?: string, fallback = 'A definir'): string => {

@@ -64,3 +64,22 @@ test('system prompt should mention baggage preference for likely air routes', ()
         /baggage_preference/,
     );
 });
+
+test('system prompt should include deterministic chips policy', () => {
+    assert.match(
+        SYSTEM_INSTRUCTION,
+        /CHIPS_POLICY/,
+    );
+    assert.match(
+        SYSTEM_INSTRUCTION,
+        /O bloco deve estar na última linha da resposta/,
+    );
+    assert.match(
+        SYSTEM_INSTRUCTION,
+        /\[CHIPS: 1 \| 2 \| 3 \| 4\+\]/,
+    );
+    assert.match(
+        SYSTEM_INSTRUCTION,
+        /\[CHIPS: Sim \| Não\]/,
+    );
+});
