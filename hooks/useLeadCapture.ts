@@ -15,13 +15,15 @@ interface LeadDraft {
 
 type LeadDraftPartial = Partial<LeadDraft>;
 
-type SubmitLeadHookResult =
+export type SubmitLeadHookResult =
     | {
         ok: true;
         whatsappUrl: string;
         contactId: string;
         dealId?: string;
         warning?: string;
+        code?: string;
+        error?: string;
     }
     | {
         ok: false;
@@ -193,7 +195,7 @@ export function useLeadCapture() {
             lastName: cleanValue(merged.lastName),
             email: cleanValue(merged.email).toLowerCase(),
             bantSummary: cleanValue(merged.bantSummary),
-            utms: { ...latestUtms } || EMPTY_UTMS,
+            utms: latestUtms || EMPTY_UTMS,
             tracking: {
                 ...latestTracking,
                 ...latestUtms,
@@ -221,7 +223,8 @@ export function useLeadCapture() {
                 body: JSON.stringify(payload),
             });
 
-            const responseData = (await response.json().catch(() => ({}))) as Partial<SubmitLeadResponse>;
+            const parsedData = await response.json().catch(() => ({}));
+            const responseData = parsedData as Record<string, unknown>;
 
             if (!response.ok) {
                 const apiError = typeof responseData.error === 'string'
@@ -284,4 +287,4 @@ export function useLeadCapture() {
     };
 }
 
-export type { LeadDraft, LeadDraftPartial, SubmitLeadHookResult };
+export type { LeadDraft, LeadDraftPartial };

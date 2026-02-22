@@ -57,7 +57,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({
     const isHero = mode === 'hero';
 
     const listClassName = isHero
-        ? 'space-y-3 px-1 py-2'
+        ? 'space-y-3 px-3 py-4'
         : 'flex-1 overflow-y-auto p-5 bg-slate-50 space-y-6 scroll-smooth';
 
     return (
@@ -68,24 +68,22 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({
                     className={`flex items-end gap-3 animate-fade-in-up ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                     {!isHero && (
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border shadow-sm ${
-                            message.role === 'user'
-                                ? 'bg-brand-dark border-gray-700 text-white order-2'
-                                : 'bg-white border-gray-200 text-brand-vibrant'
-                        }`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border shadow-sm ${message.role === 'user'
+                            ? 'bg-slate-900 border-slate-700 text-white order-2'
+                            : 'bg-white border-gray-200 text-brand-vibrant'
+                            }`}>
                             {message.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-5 h-5" />}
                         </div>
                     )}
 
-                    <div className={`max-w-[88%] p-3 sm:p-4 rounded-2xl text-sm shadow-sm ${
-                        message.role === 'user'
-                            ? isHero
-                                ? 'bg-brand-yellow text-brand-dark'
-                                : 'bg-brand-vibrant text-white rounded-br-none'
-                            : isHero
-                                ? 'bg-white text-gray-800 border border-gray-200/60'
-                                : 'bg-white text-gray-700 border border-gray-100 rounded-bl-none'
-                    }`}>
+                    <div className={`max-w-[88%] p-3 sm:p-4 rounded-sm text-sm ${message.role === 'user'
+                        ? isHero
+                            ? 'bg-anhanga-yellow text-anhanga-darkBlue border-2 border-slate-900 shadow-hard'
+                            : 'bg-brand-vibrant text-white rounded-br-none shadow-sm'
+                        : isHero
+                            ? 'bg-slate-900 text-white border-2 border-slate-800'
+                            : 'bg-white text-gray-700 border border-gray-100 rounded-bl-none shadow-sm'
+                        }`}>
                         <FormattedText text={message.text} />
                     </div>
                 </div>

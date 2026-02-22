@@ -182,7 +182,7 @@ const ChatCore: React.FC<ChatCoreProps> = ({ mode, externalMessage, onExternalMe
                 <div
                     ref={mode === 'hero' ? scrollContainerRef : undefined}
                     className={mode === 'hero'
-                        ? 'transition-all duration-300 ease-in-out opacity-100 max-h-[260px] sm:max-h-[320px] min-h-[170px] sm:min-h-[190px] mb-2 overflow-y-auto rounded-2xl bg-black/25 backdrop-blur-sm'
+                        ? 'transition-all duration-300 ease-in-out opacity-100 max-h-[260px] sm:max-h-[320px] min-h-[170px] sm:min-h-[190px] mb-3 overflow-y-auto rounded-sm bg-anhanga-darkBlue border-2 border-slate-900 shadow-hard-lg'
                         : 'flex-1'}
                 >
                     <ChatMessageList
@@ -191,55 +191,62 @@ const ChatCore: React.FC<ChatCoreProps> = ({ mode, externalMessage, onExternalMe
                         messagesEndRef={messagesEndRef}
                     />
                 </div>
-            )}
+            )
+            }
 
-            {phase === 'lead-form' && pendingHandoff && (
-                <ChatLeadForm
-                    onSubmit={handleLeadSubmit}
-                    isSubmitting={isSubmittingLead}
-                    error={leadSubmitError}
-                    defaultValues={{
-                        firstName: leadDraft.firstName,
-                        lastName: leadDraft.lastName,
-                        email: leadDraft.email,
-                        consent: false,
-                    }}
-                />
-            )}
-
-            {phase === 'handoff' && handoff && (
-                <ChatHandoff
-                    whatsappUrl={handoff.whatsappUrl}
-                    onReset={handleResetQuote}
-                />
-            )}
-
-            {(phase === 'input' || phase === 'conversation') && (
-                <>
-                    <div className={mode === 'hero' ? 'px-1 pb-1 space-y-2' : 'px-4 pb-3 space-y-2 bg-white'}>
-                        {showConversation && isLoading && <ChatTypingIndicator mode={mode} />}
-                        {showConversation && (
-                            <ChatChips
-                                mode={mode}
-                                chips={chips}
-                                disabled={isLoading}
-                                onSelect={handleChipSelect}
-                            />
-                        )}
-                    </div>
-
-                    <ChatInput
-                        mode={mode}
-                        inputRef={inputRef}
-                        value={input}
-                        onChange={setInput}
-                        onSend={handleSend}
-                        disabled={isLoading}
-                        placeholder={mode === 'hero' ? (input.trim() === '' ? cyclingPlaceholder : 'Para onde você sonha em ir?') : undefined}
+            {
+                phase === 'lead-form' && pendingHandoff && (
+                    <ChatLeadForm
+                        onSubmit={handleLeadSubmit}
+                        isSubmitting={isSubmittingLead}
+                        error={leadSubmitError}
+                        defaultValues={{
+                            firstName: leadDraft.firstName,
+                            lastName: leadDraft.lastName,
+                            email: leadDraft.email,
+                            consent: false,
+                        }}
                     />
-                </>
-            )}
-        </div>
+                )
+            }
+
+            {
+                phase === 'handoff' && handoff && (
+                    <ChatHandoff
+                        whatsappUrl={handoff.whatsappUrl}
+                        onReset={handleResetQuote}
+                    />
+                )
+            }
+
+            {
+                (phase === 'input' || phase === 'conversation') && (
+                    <>
+                        <div className={mode === 'hero' ? 'px-1 pb-1 space-y-2' : 'px-4 pb-3 space-y-2 bg-white'}>
+                            {showConversation && isLoading && <ChatTypingIndicator mode={mode} />}
+                            {showConversation && (
+                                <ChatChips
+                                    mode={mode}
+                                    chips={chips}
+                                    disabled={isLoading}
+                                    onSelect={handleChipSelect}
+                                />
+                            )}
+                        </div>
+
+                        <ChatInput
+                            mode={mode}
+                            inputRef={inputRef}
+                            value={input}
+                            onChange={setInput}
+                            onSend={handleSend}
+                            disabled={isLoading}
+                            placeholder={mode === 'hero' ? (input.trim() === '' ? cyclingPlaceholder : 'Para onde você sonha em ir?') : undefined}
+                        />
+                    </>
+                )
+            }
+        </div >
     );
 };
 

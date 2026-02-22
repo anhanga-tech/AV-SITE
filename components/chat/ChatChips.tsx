@@ -17,7 +17,7 @@ const ChatChips: React.FC<ChatChipsProps> = ({ chips, disabled = false, onSelect
         : 'flex flex-wrap gap-2';
 
     const baseClass = isHero
-        ? 'bg-brand-yellow text-brand-dark border border-transparent hover:opacity-85'
+        ? 'bg-transparent text-anhanga-yellow border-2 border-anhanga-yellow/80 hover:border-anhanga-yellow hover:bg-anhanga-yellow hover:text-anhanga-darkBlue hover:shadow-hard'
         : 'bg-white text-brand-dark border border-brand-vibrant/20 hover:bg-brand-light';
 
     return (
@@ -36,7 +36,7 @@ const ChatChips: React.FC<ChatChipsProps> = ({ chips, disabled = false, onSelect
                         }
                     }}
                     disabled={disabled}
-                    className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${baseClass}`}
+                    className={`px-3 py-1.5 rounded-sm text-xs font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${baseClass}`}
                 >
                     {chip}
                 </button>

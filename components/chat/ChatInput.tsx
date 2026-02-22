@@ -27,7 +27,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
     return (
         <div className={isHero ? 'sticky bottom-0 p-2 sm:p-3 bg-transparent' : 'p-4 bg-white border-t border-gray-100'}>
             <div className={isHero
-                ? 'relative flex items-center bg-white/90 backdrop-blur-sm rounded-2xl border border-white/60 shadow-hero-input focus-within:ring-2 focus-within:ring-anhanga-blue/30 focus-within:ring-offset-0'
+                ? 'relative flex items-center bg-white rounded-sm border-2 border-slate-900 shadow-hard focus-within:border-anhanga-yellow focus-within:-translate-y-0.5 focus-within:shadow-hard-hover transition-all duration-200'
                 : 'relative flex items-center bg-gray-100 rounded-2xl border border-transparent focus-within:border-brand-vibrant/30 focus-within:bg-white focus-within:ring-4 focus-within:ring-brand-vibrant/10 transition-all'}
             >
                 <input
@@ -44,7 +44,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                     placeholder={resolvedPlaceholder}
                     aria-label={inputAriaLabel}
                     className={isHero
-                        ? 'flex-1 pl-4 pr-12 py-3 bg-transparent text-sm text-brand-dark placeholder:text-gray-500 focus:outline-none disabled:opacity-70'
+                        ? 'flex-1 pl-4 pr-12 py-3 bg-transparent text-sm text-slate-900 font-medium placeholder:text-gray-500 focus:outline-none disabled:opacity-70'
                         : 'flex-1 pl-4 pr-12 py-3 bg-transparent focus:outline-none text-sm text-gray-800 placeholder-gray-400 disabled:opacity-70'}
                 />
 
@@ -54,19 +54,21 @@ const ChatInput: React.FC<ChatInputProps> = ({
                     disabled={disabled || !value.trim()}
                     aria-label="Enviar mensagem"
                     className={isHero
-                        ? 'absolute right-2 p-2 rounded-xl bg-anhanga-blue text-white hover:bg-brand-blue transition-all disabled:opacity-40 disabled:cursor-not-allowed'
+                        ? 'absolute right-0 h-full px-4 rounded-r-sm bg-anhanga-yellow text-anhanga-darkBlue border-l-2 border-slate-900 hover:bg-yellow-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed group'
                         : 'absolute right-2 p-2 bg-brand-vibrant text-white rounded-xl hover:bg-brand-blue transition-all disabled:opacity-0 disabled:scale-75 focus:outline-none shadow-md'}
                 >
-                    <Send className="w-4 h-4" />
+                    <Send className={isHero ? "w-5 h-5 transition-transform group-hover:scale-110" : "w-4 h-4"} />
                 </button>
             </div>
 
-            {!isHero && (
-                <p className="text-[10px] text-center text-gray-400 mt-2">
-                    Nossa IA pode cometer erros. Confirme os dados com o agente.
-                </p>
-            )}
-        </div>
+            {
+                !isHero && (
+                    <p className="text-[10px] text-center text-gray-400 mt-2">
+                        Nossa IA pode cometer erros. Confirme os dados com o agente.
+                    </p>
+                )
+            }
+        </div >
     );
 };
 
