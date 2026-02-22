@@ -54,7 +54,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                     disabled={disabled || !value.trim()}
                     aria-label="Enviar mensagem"
                     className={isHero
-                        ? 'absolute right-2 p-2 text-brand-yellow hover:text-brand-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed'
+                        ? 'absolute right-2 p-2 rounded-xl bg-anhanga-blue text-white hover:bg-brand-blue transition-all disabled:opacity-40 disabled:cursor-not-allowed'
                         : 'absolute right-2 p-2 bg-brand-vibrant text-white rounded-xl hover:bg-brand-blue transition-all disabled:opacity-0 disabled:scale-75 focus:outline-none shadow-md'}
                 >
                     <Send className="w-4 h-4" />
