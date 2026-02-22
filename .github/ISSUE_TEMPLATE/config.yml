@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussão geral
+    url: https://github.com/orgs/community/discussions
+    about: Para dúvidas que não se encaixam nos templates acima, use as discussões.
