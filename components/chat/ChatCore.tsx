@@ -246,7 +246,7 @@ const ChatCore: React.FC<ChatCoreProps> = ({ mode, externalMessage, onExternalMe
                     </>
                 )
             }
-        </div >
+        </div>
     );
 };
 
