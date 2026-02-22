@@ -16,12 +16,20 @@ interface ChatCoreProps {
 
 const HERO_INITIAL_BOT_MESSAGE = 'Para onde você sonha em ir? ✈️';
 
+const HERO_PLACEHOLDER_OPTIONS = [
+    'Para onde você sonha em ir?',
+    'Maldivas...',
+    'Fernando de Noronha...',
+    'Orlando...',
+];
+
 const ChatCore: React.FC<ChatCoreProps> = ({ mode, externalMessage, onExternalMessageHandled }) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [input, setInput] = useState('');
     const [leadSubmitError, setLeadSubmitError] = useState<string | null>(null);
+    const [cyclingPlaceholder, setCyclingPlaceholder] = useState(HERO_PLACEHOLDER_OPTIONS[0]);
 
     const {
         leadDraft,
@@ -73,6 +81,21 @@ const ChatCore: React.FC<ChatCoreProps> = ({ mode, externalMessage, onExternalMe
 
         return () => window.clearTimeout(timer);
     }, [phase]);
+
+    useEffect(() => {
+        if (mode !== 'hero' || input.trim() !== '') return;
+
+        const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (prefersReducedMotion) return;
+
+        let index = 0;
+        const interval = setInterval(() => {
+            index = (index + 1) % HERO_PLACEHOLDER_OPTIONS.length;
+            setCyclingPlaceholder(HERO_PLACEHOLDER_OPTIONS[index]);
+        }, 2500);
+
+        return () => clearInterval(interval);
+    }, [mode, input]);
 
     useEffect(() => {
         if (!externalMessage?.trim()) return;
@@ -212,7 +235,7 @@ const ChatCore: React.FC<ChatCoreProps> = ({ mode, externalMessage, onExternalMe
                         onChange={setInput}
                         onSend={handleSend}
                         disabled={isLoading}
-                        placeholder={mode === 'hero' ? 'Para onde você sonha em ir?' : undefined}
+                        placeholder={mode === 'hero' ? (input.trim() === '' ? cyclingPlaceholder : 'Para onde você sonha em ir?') : undefined}
                     />
                 </>
             )}

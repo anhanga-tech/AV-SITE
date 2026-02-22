@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
+import { Route, Headphones, BadgeDollarSign } from 'lucide-react';
 import HeroChatCard from './HeroChatCard';
 import { HERO_VIDEOS, optimizeRemoteImageUrl } from '../data/mediaConfig';
 
 const QUICK_FEATURES = [
-    { text: 'Roteiros Exclusivos' },
-    { text: 'Suporte 24/7' },
-    { text: 'Melhores Preços' },
+    { text: 'Roteiros Exclusivos', icon: Route },
+    { text: 'Suporte 24/7', icon: Headphones },
+    { text: 'Melhores Preços', icon: BadgeDollarSign },
 ];
 
 const Hero: React.FC = () => {
@@ -74,7 +74,7 @@ const Hero: React.FC = () => {
     }, [shouldRenderVideo]);
 
     return (
-        <section className="relative w-full min-h-[850px] flex items-center bg-brand-light pb-20 z-20">
+        <section id="hero-section" className="relative w-full min-h-[850px] flex items-center bg-brand-light pb-20 z-20">
             <div className="absolute inset-0 z-0 overflow-hidden">
                 {!shouldRenderVideo && (
                     <img
@@ -132,24 +132,39 @@ const Hero: React.FC = () => {
                         </span>
                     </h1>
 
-                    <p className="text-white/90 text-xl md:text-2xl max-w-2xl mx-auto mb-10 font-medium leading-relaxed drop-shadow-md">
+                    <p className="text-white/90 text-xl md:text-2xl max-w-2xl mx-auto mb-6 font-medium leading-relaxed drop-shadow-md">
                         Roteiros que parecem feitos à mão. <br />
                         Porque sua viagem merece ser única.
                     </p>
 
                     <HeroChatCard />
 
-                    <div className="mt-10 flex flex-wrap justify-center gap-6 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-                        {QUICK_FEATURES.map((feature) => (
-                            <div
-                                key={feature.text}
-                                className="flex items-center gap-2 text-white/90 font-bold text-sm bg-white/10 px-4 py-2 rounded-full backdrop-blur-md border border-white/10 hover:bg-white/20 transition-all duration-300 hover:scale-105 cursor-default"
-                            >
-                                <Sparkles className="w-4 h-4 text-yellow-300" />
-                                {feature.text}
-                            </div>
-                        ))}
+                    <div className="mt-6 flex flex-wrap justify-center gap-6 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+                        {QUICK_FEATURES.map((feature) => {
+                            const Icon = feature.icon;
+                            return (
+                                <div
+                                    key={feature.text}
+                                    className="flex items-center gap-2 text-white/90 font-bold text-base bg-white/15 backdrop-blur-md border border-white/25 px-5 py-2.5 rounded-full hover:bg-white/25 transition-all duration-300 hover:scale-105 cursor-default"
+                                >
+                                    <Icon className="w-4 h-4 shrink-0 text-yellow-300" />
+                                    {feature.text}
+                                </div>
+                            );
+                        })}
                     </div>
+
+                    <a
+                        href="#destinos"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            document.getElementById('destinos')?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        className="mt-6 inline-flex items-center gap-2 rounded-full border-2 border-white/80 px-6 py-3 text-base font-bold text-white transition-all duration-300 hover:bg-white/20 hover:border-white focus:outline-none focus:ring-2 focus:ring-white/50 opacity-0 animate-fade-in-up"
+                        style={{ animationDelay: '0.8s' }}
+                    >
+                        Ver Destinos
+                    </a>
                 </div>
             </div>
 

@@ -27,7 +27,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
     return (
         <div className={isHero ? 'sticky bottom-0 p-2 sm:p-3 bg-transparent' : 'p-4 bg-white border-t border-gray-100'}>
             <div className={isHero
-                ? 'relative flex items-center bg-white/90 backdrop-blur-sm rounded-2xl border border-white/60 focus-within:ring-2 focus-within:ring-brand-yellow/40'
+                ? 'relative flex items-center bg-white/90 backdrop-blur-sm rounded-2xl border border-white/60 shadow-hero-input focus-within:ring-2 focus-within:ring-anhanga-blue/30 focus-within:ring-offset-0'
                 : 'relative flex items-center bg-gray-100 rounded-2xl border border-transparent focus-within:border-brand-vibrant/30 focus-within:bg-white focus-within:ring-4 focus-within:ring-brand-vibrant/10 transition-all'}
             >
                 <input

@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { MessageCircle, Sparkles, X } from 'lucide-react';
 import ChatCore from './chat/ChatCore';
 
 const AIChat: React.FC = () => {
+    const location = useLocation();
     const [isOpen, setIsOpen] = useState(false);
     const [externalMessage, setExternalMessage] = useState<string | null>(null);
+    const [heroInView, setHeroInView] = useState(true);
+
+    const isHome = location.pathname === '/';
+    const showFloatingButton = !isOpen && (!isHome || !heroInView);
 
     useEffect(() => {
         const handleToggle = (event: Event) => {
@@ -19,6 +25,27 @@ const AIChat: React.FC = () => {
         window.addEventListener('toggle-ai-chat', handleToggle);
         return () => window.removeEventListener('toggle-ai-chat', handleToggle);
     }, []);
+
+    useEffect(() => {
+        if (!isHome) {
+            setHeroInView(false);
+            return;
+        }
+
+        const el = document.getElementById('hero-section');
+        if (!el) return;
+
+        setHeroInView(true);
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const [entry] = entries;
+                if (entry) setHeroInView(entry.isIntersecting);
+            },
+            { threshold: 0.1, rootMargin: '0px' }
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, [isHome]);
 
     return (
         <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9999] flex flex-col items-end font-sans">
@@ -69,12 +96,12 @@ const AIChat: React.FC = () => {
                     group flex items-center justify-center gap-3
                     bg-brand-vibrant hover:bg-brand-blue text-white
                     shadow-2xl hover:shadow-brand-vibrant/50
-                    transition-all duration-300 transform hover:scale-110 active:scale-95
+                    transition-opacity duration-300 transform hover:scale-110 active:scale-95
                     focus:outline-none focus:ring-4 focus:ring-brand-vibrant/50
                     z-[100]
                     w-14 h-14 rounded-full p-0
                     sm:w-auto sm:h-auto sm:rounded-full sm:pl-5 sm:pr-6 sm:py-3.5
-                    ${isOpen ? 'translate-y-24 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
+                    ${!showFloatingButton ? 'translate-y-24 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
                 `}
                 aria-label="Abrir assistente virtual"
             >
