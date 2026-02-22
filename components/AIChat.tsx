@@ -418,7 +418,7 @@ const AIChat: React.FC = () => {
                 <button 
                   onClick={handleSend} 
                   disabled={isLoading || !input.trim()}
-                  className="absolute right-2 p-2 bg-brand-vibrant text-white rounded-xl hover:bg-brand-blue transition-all disabled:opacity-0 disabled:scale-75 focus:outline-none shadow-md"
+                  className="absolute right-2 p-2 bg-brand-dark text-white rounded-xl hover:bg-brand-blue transition-all disabled:opacity-0 disabled:scale-75 focus:outline-none shadow-md"
                   aria-label="Enviar mensagem"
                 >
                   <Send className="w-4 h-4" />
