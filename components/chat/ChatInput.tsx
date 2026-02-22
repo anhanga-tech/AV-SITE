@@ -68,7 +68,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                     </p>
                 )
             }
-        </div >
+        </div>
     );
 };
 
