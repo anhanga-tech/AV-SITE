@@ -1,24 +1,24 @@
 ---
-name: Nova Funcionalidade
+name: ✨ Nova Funcionalidade
 about: Adicionar uma nova feature ao projeto
 title: "[FEAT] "
 labels: enhancement
 assignees: ''
 ---
 
-## Objetivo
+## 🎯 Objetivo
 <!-- Descreva de forma clara o que essa funcionalidade deve fazer. Uma frase basta. -->
 
-## Contexto
+## 📋 Contexto
 <!-- Por que essa funcionalidade é necessária? Qual problema resolve? -->
 
-## Criterios de Aceitacao
+## ✅ Critérios de Aceitação
 <!-- Liste o que precisa estar funcionando para considerar essa issue concluída. -->
 - [ ]
 - [ ]
 - [ ]
 
-## Escopo Tecnico
+## 🏗️ Escopo Técnico
 <!-- Quais arquivos, componentes ou APIs serão criados ou modificados? -->
 
 **Arquivos envolvidos:**
@@ -32,13 +32,13 @@ assignees: ''
 - [ ] Vercel
 - [ ] Outro: ___
 
-## Solucao Proposta
+## 💡 Solução Proposta
 <!-- Descreva como você imagina que a implementação deve funcionar. Pode ser em alto nível. -->
 
-## Fora do Escopo
-<!-- O que NAO deve ser feito nessa issue para manter o foco. -->
+## 🚫 Fora do Escopo
+<!-- O que NÃO deve ser feito nessa issue para manter o foco. -->
 
-## Referencias
+## 📎 Referências
 <!-- Links úteis, issues relacionadas, documentação, prints, etc. -->
 
 ---

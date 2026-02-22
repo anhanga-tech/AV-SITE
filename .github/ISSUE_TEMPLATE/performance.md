@@ -1,37 +1,37 @@
 ---
-name: Performance
+name: ⚡ Performance
 about: Melhorias de performance (bundle, LCP/CLS, render, caching)
 title: "[PERF] "
 labels: performance
 assignees: ''
 ---
 
-## Objetivo
+## 🎯 Objetivo
 <!-- Qual métrica ou comportamento precisa melhorar? -->
 
-## Contexto
+## 📋 Contexto
 <!-- Onde está lento e em qual fluxo/página? -->
 
-## Metrica/Benchmark
+## 📈 Métrica/Benchmark
 <!-- Preencha com números antes/depois quando possível -->
 - **Antes:**
 - **Depois (esperado):**
 - **Ferramenta:** Lighthouse / Web Vitals / DevTools / logs
 
-## Como reproduzir / medir
+## 🔁 Como reproduzir / medir
 1.
 2.
 3.
 
-## Criterios de Aceitacao
+## ✅ Critérios de Aceitação
 - [ ] Melhoria mensurável (antes/depois)
 - [ ] Sem regressões funcionais
 - [ ] Sem aumentar risco de custo (ex.: chamadas desnecessárias)
 
-## Ideias / Hipoteses
+## 💡 Ideias / Hipóteses
 -
 
-## Evidencias
+## 📎 Evidências
 <!-- Prints do Lighthouse, perf profile, links -->
 
 ---

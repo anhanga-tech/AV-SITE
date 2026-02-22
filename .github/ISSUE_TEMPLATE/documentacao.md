@@ -1,34 +1,34 @@
 ---
-name: Documentacao
+name: 📚 Documentação
 about: Melhorias em docs (README, guias, exemplos, .env.example)
 title: "[DOCS] "
 labels: documentation
 assignees: ''
 ---
 
-## Objetivo
+## 🎯 Objetivo
 <!-- O que você quer documentar/atualizar? -->
 
-## Contexto
+## 📋 Contexto
 <!-- Por que isso é necessário agora? O que está confuso/faltando? -->
 
-## Criterios de Aceitacao
+## ✅ Critérios de Aceitação
 - [ ]
 - [ ]
 
-## Escopo
+## 🏗️ Escopo
 **Arquivos/páginas afetadas:**
 -
 
 **Conteúdo que deve ser incluído:**
 -
 
-## Como validar
+## 🧪 Como validar
 <!-- Como saber que a documentação ficou correta? -->
 - [ ] Links revisados e funcionando
 - [ ] Passos testados (copiar/colar) em ambiente limpo
 
-## Referencias
+## 📎 Referências
 <!-- Links, issues relacionadas, prints, docs externas -->
 
 ---

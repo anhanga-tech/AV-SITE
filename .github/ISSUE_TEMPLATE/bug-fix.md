@@ -1,39 +1,39 @@
 ---
-name: Bug Fix
+name: 🐛 Bug Fix
 about: Reportar e corrigir um comportamento inesperado
 title: "[BUG] "
 labels: bug
 assignees: ''
 ---
 
-## Descricao do Bug
+## 🐛 Descrição do Bug
 <!-- O que está acontecendo de errado? Seja específico. -->
 
-## Como Reproduzir
+## 🔁 Como Reproduzir
 <!-- Passo a passo para reproduzir o problema. -->
 1.
 2.
 3.
 
-## Comportamento Esperado
+## ✅ Comportamento Esperado
 <!-- O que deveria acontecer? -->
 
-## Comportamento Atual
+## ❌ Comportamento Atual
 <!-- O que está acontecendo de fato? -->
 
-## Evidencias
+## 📸 Evidências
 <!-- Prints, vídeos, logs de erro, mensagens do console. Cole aqui. -->
 
 ```
 // Cole logs ou erros aqui
 ```
 
-## Ambiente
+## 🌐 Ambiente
 - **Ambiente:** [ ] Produção (Vercel) [ ] Local
 - **Navegador:**
 - **Dispositivo:** [ ] Desktop [ ] Mobile
 
-## Area Afetada
+## 🏗️ Área Afetada
 - [ ] Chatbot (Gemini)
 - [ ] Integração HubSpot
 - [ ] WhatsApp / Twilio
@@ -42,10 +42,10 @@ assignees: ''
 - [ ] n8n / Automações
 - [ ] Outro: ___
 
-## Causa Provavel
+## 💡 Causa Provável
 <!-- Se você já tem alguma ideia do que pode estar causando o bug, descreva aqui. -->
 
-## Referencias
+## 📎 Referências
 <!-- Issues relacionadas, commits suspeitos, documentação relevante. -->
 
 ---

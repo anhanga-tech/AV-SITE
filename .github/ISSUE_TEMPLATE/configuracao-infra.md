@@ -1,18 +1,18 @@
 ---
-name: Configuracao / Infra
+name: ⚙️ Configuração / Infra
 about: Ajustes de ambiente, integrações, variáveis ou infraestrutura
 title: "[INFRA] "
 labels: infra
 assignees: ''
 ---
 
-## Objetivo
+## 🎯 Objetivo
 <!-- O que precisa ser configurado ou ajustado? -->
 
-## Contexto
+## 📋 Contexto
 <!-- Por que essa configuração é necessária agora? -->
 
-## Tipo de Configuracao
+## 🛠️ Tipo de Configuração
 - [ ] Variáveis de ambiente (.env)
 - [ ] Vercel (deploy, domínio, edge functions)
 - [ ] HubSpot (propriedades, pipelines, webhooks)
@@ -23,32 +23,32 @@ assignees: ''
 - [ ] GitHub Actions / CI
 - [ ] Outro: ___
 
-## Checklist de Implementacao
+## ✅ Checklist de Implementação
 <!-- Liste os passos necessários para completar essa configuração. -->
 - [ ]
 - [ ]
 - [ ]
 
-## Seguranca e LGPD
+## 🔐 Segurança e LGPD
 <!-- Há dados sensíveis ou pessoais envolvidos? Como serão tratados? -->
 - [ ] Nenhum dado pessoal envolvido
 - [ ] Dados pessoais tratados conforme LGPD: ___
 
-## Ambientes Afetados
+## 🌐 Ambientes Afetados
 - [ ] Desenvolvimento (local)
 - [ ] Preview (Vercel)
 - [ ] Produção (Vercel)
 
-## Documentacao Necessaria
+## 📋 Documentação Necessária
 <!-- Essa configuração precisa ser documentada em algum lugar? -->
 - [ ] README
 - [ ] .env.example
 - [ ] Outra: ___
 
-## Impacto e Riscos
+## ⚠️ Impacto e Riscos
 <!-- O que pode ser afetado? Há downtime? Precisa de rollback plan? -->
 
-## Referencias
+## 📎 Referências
 <!-- Documentação oficial, issues relacionadas, tutoriais. -->
 
 ---
