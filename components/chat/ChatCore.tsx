@@ -177,7 +177,7 @@ const ChatCore: React.FC<ChatCoreProps> = ({ mode, externalMessage, onExternalMe
     }, [resetSession]);
 
     return (
-        <div className={mode === 'hero' ? 'flex flex-col w-full rounded-sm bg-anhanga-darkBlue/80 border-2 border-slate-900 shadow-hard-lg overflow-hidden' : 'flex flex-col h-full'}>
+        <div className={mode === 'hero' ? 'flex flex-col w-full rounded-3xl bg-slate-900/40 backdrop-blur-xl lg:backdrop-blur-2xl border border-white/20 shadow-2xl overflow-hidden' : 'flex flex-col h-full'}>
             {showConversation && (
                 <div
                     ref={mode === 'hero' ? scrollContainerRef : undefined}

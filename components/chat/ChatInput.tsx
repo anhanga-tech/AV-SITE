@@ -27,7 +27,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
     return (
         <div className={isHero ? 'sticky bottom-0 p-3 sm:p-4 pt-2 bg-transparent' : 'p-4 bg-white border-t border-gray-100'}>
             <div className={isHero
-                ? 'relative flex items-center bg-white rounded-sm border-2 border-white focus-within:border-anhanga-yellow transition-all duration-200'
+                ? 'relative flex items-center bg-white/5 backdrop-blur-md rounded-full border border-white/20 focus-within:bg-white/10 focus-within:border-white/40 transition-all duration-300'
                 : 'relative flex items-center bg-gray-100 rounded-2xl border border-transparent focus-within:border-brand-vibrant/30 focus-within:bg-white focus-within:ring-4 focus-within:ring-brand-vibrant/10 transition-all'}
             >
                 <input
@@ -44,7 +44,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                     placeholder={resolvedPlaceholder}
                     aria-label={inputAriaLabel}
                     className={isHero
-                        ? 'flex-1 pl-4 pr-12 py-3 bg-transparent text-sm text-slate-900 font-medium placeholder:text-gray-500 focus:outline-none disabled:opacity-70'
+                        ? 'flex-1 pl-4 pr-12 py-3 bg-transparent text-sm text-white font-medium placeholder:text-gray-300 focus:outline-none disabled:opacity-70'
                         : 'flex-1 pl-4 pr-12 py-3 bg-transparent focus:outline-none text-sm text-gray-800 placeholder-gray-400 disabled:opacity-70'}
                 />
 
@@ -54,7 +54,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                     disabled={disabled || !value.trim()}
                     aria-label="Enviar mensagem"
                     className={isHero
-                        ? 'absolute right-0 h-full px-4 rounded-r-sm bg-anhanga-yellow text-anhanga-darkBlue border-l-2 border-white group-focus-within:border-anhanga-yellow hover:bg-yellow-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed group'
+                        ? 'absolute right-1 top-1 bottom-1 aspect-square flex items-center justify-center rounded-full bg-gradient-to-r from-fun-pink to-fun-blue text-white hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed group shadow-md'
                         : 'absolute right-2 p-2 bg-brand-vibrant text-white rounded-xl hover:bg-brand-blue transition-all disabled:opacity-0 disabled:scale-75 focus:outline-none shadow-md'}
                 >
                     <Send className={isHero ? "w-5 h-5 transition-transform group-hover:scale-110" : "w-4 h-4"} />
