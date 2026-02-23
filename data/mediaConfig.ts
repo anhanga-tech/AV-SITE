@@ -41,31 +41,34 @@ export const optimizeRemoteImageUrl = (
         return rawUrl;
     }
 
-    if (rawUrl.includes('images.pexels.com')) {
-        try {
-            const url = new URL(rawUrl);
-            if (!url.searchParams.has('auto')) {
-                url.searchParams.set('auto', 'compress');
-            }
-            if (!url.searchParams.has('cs')) {
-                url.searchParams.set('cs', 'tinysrgb');
-            }
-            if (!url.searchParams.has('w')) {
-                url.searchParams.set('w', String(width));
-            }
-            if (height && !url.searchParams.has('h')) {
-                url.searchParams.set('h', String(height));
-            }
-            if (!url.searchParams.has('dpr')) {
-                url.searchParams.set('dpr', '1');
-            }
-            return url.toString();
-        } catch {
-            return rawUrl;
-        }
+    let parsedUrl: URL;
+    try {
+        parsedUrl = new URL(rawUrl);
+    } catch {
+        // If the URL is not parseable, return it unchanged.
+        return rawUrl;
     }
 
-    if (rawUrl.includes('wsrv.nl')) {
+    if (parsedUrl.hostname === 'images.pexels.com') {
+        if (!parsedUrl.searchParams.has('auto')) {
+            parsedUrl.searchParams.set('auto', 'compress');
+        }
+        if (!parsedUrl.searchParams.has('cs')) {
+            parsedUrl.searchParams.set('cs', 'tinysrgb');
+        }
+        if (!parsedUrl.searchParams.has('w')) {
+            parsedUrl.searchParams.set('w', String(width));
+        }
+        if (height && !parsedUrl.searchParams.has('h')) {
+            parsedUrl.searchParams.set('h', String(height));
+        }
+        if (!parsedUrl.searchParams.has('dpr')) {
+            parsedUrl.searchParams.set('dpr', '1');
+        }
+        return parsedUrl.toString();
+    }
+
+    if (parsedUrl.hostname === 'wsrv.nl') {
         return rawUrl;
     }
 
