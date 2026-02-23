@@ -28,7 +28,7 @@
     "@tailwindcss/typography": "^0.5.19",
     "@types/dompurify": "^3.2.0",
     "@types/node": "^25.3.0",
-    "@vitejs/plugin-react": "^5.0.0",
+    "@vitejs/plugin-react": "^5.1.4",
     "autoprefixer": "^10.4.24",
     "gh-pages": "^6.1.1",
     "postcss": "^8.5.6",
