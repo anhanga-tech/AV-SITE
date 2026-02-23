@@ -29,7 +29,7 @@ assignees: ''
 
 ## ▶️ Como rodar
 <!-- Preencha com comandos reais do repo -->
-- `npm test` / `npm run test` / `npm run test:regression`
+- `pnpm test` / `pnpm test` / `pnpm test:regression`
 
 ## 📎 Evidências
 <!-- Logs, prints do CI, links de runs -->
