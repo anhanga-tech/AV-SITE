@@ -69,15 +69,20 @@ export const optimizeRemoteImageUrl = (
         return rawUrl;
     }
 
-    if (rawUrl.includes('res.cloudinary.com') && rawUrl.includes('/image/upload/')) {
-        // Inject Cloudinary delivery transformations only if not already present.
-        if (rawUrl.includes('/image/upload/f_') || rawUrl.includes('/image/upload/q_') || rawUrl.includes('/image/upload/w_')) {
-            return rawUrl;
+    try {
+        const url = new URL(rawUrl);
+        if (url.hostname === 'res.cloudinary.com' && rawUrl.includes('/image/upload/')) {
+            // Inject Cloudinary delivery transformations only if not already present.
+            if (rawUrl.includes('/image/upload/f_') || rawUrl.includes('/image/upload/q_') || rawUrl.includes('/image/upload/w_')) {
+                return rawUrl;
+            }
+            const transforms = height
+                ? `f_auto,q_auto,w_${width},h_${height},c_fill`
+                : `f_auto,q_auto,w_${width}`;
+            return rawUrl.replace('/image/upload/', `/image/upload/${transforms}/`);
         }
-        const transforms = height
-            ? `f_auto,q_auto,w_${width},h_${height},c_fill`
-            : `f_auto,q_auto,w_${width}`;
-        return rawUrl.replace('/image/upload/', `/image/upload/${transforms}/`);
+    } catch {
+        // If URL parsing fails, fall through to wsrv.nl proxy handling below.
     }
 
     const withoutProtocol = rawUrl.replace(/^https?:\/\//, '');
