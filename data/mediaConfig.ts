@@ -41,43 +41,51 @@ export const optimizeRemoteImageUrl = (
         return rawUrl;
     }
 
-    if (rawUrl.includes('images.pexels.com')) {
-        try {
-            const url = new URL(rawUrl);
-            if (!url.searchParams.has('auto')) {
-                url.searchParams.set('auto', 'compress');
-            }
-            if (!url.searchParams.has('cs')) {
-                url.searchParams.set('cs', 'tinysrgb');
-            }
-            if (!url.searchParams.has('w')) {
-                url.searchParams.set('w', String(width));
-            }
-            if (height && !url.searchParams.has('h')) {
-                url.searchParams.set('h', String(height));
-            }
-            if (!url.searchParams.has('dpr')) {
-                url.searchParams.set('dpr', '1');
-            }
-            return url.toString();
-        } catch {
-            return rawUrl;
-        }
-    }
-
-    if (rawUrl.includes('wsrv.nl')) {
+    let parsedUrl: URL;
+    try {
+        parsedUrl = new URL(rawUrl);
+    } catch {
+        // If the URL is not parseable, return it unchanged.
         return rawUrl;
     }
 
-    if (rawUrl.includes('res.cloudinary.com') && rawUrl.includes('/image/upload/')) {
-        // Inject Cloudinary delivery transformations only if not already present.
-        if (rawUrl.includes('/image/upload/f_') || rawUrl.includes('/image/upload/q_') || rawUrl.includes('/image/upload/w_')) {
-            return rawUrl;
+    if (parsedUrl.hostname === 'images.pexels.com') {
+        if (!parsedUrl.searchParams.has('auto')) {
+            parsedUrl.searchParams.set('auto', 'compress');
         }
-        const transforms = height
-            ? `f_auto,q_auto,w_${width},h_${height},c_fill`
-            : `f_auto,q_auto,w_${width}`;
-        return rawUrl.replace('/image/upload/', `/image/upload/${transforms}/`);
+        if (!parsedUrl.searchParams.has('cs')) {
+            parsedUrl.searchParams.set('cs', 'tinysrgb');
+        }
+        if (!parsedUrl.searchParams.has('w')) {
+            parsedUrl.searchParams.set('w', String(width));
+        }
+        if (height && !parsedUrl.searchParams.has('h')) {
+            parsedUrl.searchParams.set('h', String(height));
+        }
+        if (!parsedUrl.searchParams.has('dpr')) {
+            parsedUrl.searchParams.set('dpr', '1');
+        }
+        return parsedUrl.toString();
+    }
+
+    if (parsedUrl.hostname === 'wsrv.nl') {
+        return rawUrl;
+    }
+
+    try {
+        const url = new URL(rawUrl);
+        if (url.hostname === 'res.cloudinary.com' && rawUrl.includes('/image/upload/')) {
+            // Inject Cloudinary delivery transformations only if not already present.
+            if (rawUrl.includes('/image/upload/f_') || rawUrl.includes('/image/upload/q_') || rawUrl.includes('/image/upload/w_')) {
+                return rawUrl;
+            }
+            const transforms = height
+                ? `f_auto,q_auto,w_${width},h_${height},c_fill`
+                : `f_auto,q_auto,w_${width}`;
+            return rawUrl.replace('/image/upload/', `/image/upload/${transforms}/`);
+        }
+    } catch {
+        // If URL parsing fails, fall through to wsrv.nl proxy handling below.
     }
 
     const withoutProtocol = rawUrl.replace(/^https?:\/\//, '');
@@ -227,6 +235,17 @@ export const getDestinationImage = (city: string): string => {
 // IMAGE OPTIMIZATION HELPERS (for when using Cloudinary)
 // =============================================================================
 
+// Allowed Cloudinary hosts for URL optimization
+const isCloudinaryUrl = (url: string): boolean => {
+    try {
+        const parsed = new URL(url);
+        const host = parsed.hostname.toLowerCase();
+        return host === 'cloudinary.com' || host.endsWith('.cloudinary.com');
+    } catch {
+        return false;
+    }
+};
+
 /**
  * Generate optimized Cloudinary URL
  * @param url Original Cloudinary URL
@@ -239,7 +258,7 @@ export const optimizeCloudinaryUrl = (
     format: 'auto' | 'webp' | 'avif' = 'auto'
 ): string => {
     // Only works with Cloudinary URLs
-    if (!url.includes('cloudinary.com')) {
+    if (!isCloudinaryUrl(url)) {
         return url;
     }
 
@@ -253,7 +272,7 @@ export const optimizeCloudinaryUrl = (
  * Only works with Cloudinary URLs
  */
 export const generateSrcSet = (url: string, sizes: number[] = [400, 800, 1200]): string => {
-    if (!url.includes('cloudinary.com')) {
+    if (!isCloudinaryUrl(url)) {
         return '';
     }
 

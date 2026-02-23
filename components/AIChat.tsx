@@ -7,6 +7,7 @@ import { useLeadCapture } from '../hooks/useLeadCapture';
 interface Message {
     role: 'user' | 'model';
     text: string;
+    chips?: string[];
     isAction?: boolean;
     actionData?: {
         url: string;
@@ -263,7 +264,11 @@ const AIChat: React.FC = () => {
     setIsLoading(false);
 
     if (response.text) {
-        setMessages(prev => [...prev, { role: 'model', text: response.text || '' }]);
+        setMessages(prev => [...prev, { 
+            role: 'model', 
+            text: response.text || '',
+            chips: response.chips 
+        }]);
     }
 
     if (response.budgetLink) {
