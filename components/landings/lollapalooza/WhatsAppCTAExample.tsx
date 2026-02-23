@@ -79,7 +79,7 @@ export function WhatsAppCTAAdvanced() {
 
     React.useEffect(() => {
         // Atualiza o link sempre que o Client ID mudar
-        setWhatsappUrl(getWhatsAppLink());
+        setWhatsappUrl(getWhatsAppLink('Olá! Gostaria de mais informações sobre o Lollapalooza 2026.'));
     }, [gaClientId]);
 
     return (
