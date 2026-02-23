@@ -20,6 +20,7 @@ interface BudgetFunctionArgs {
 
 interface ChatResponse {
   text?: string;
+  chips?: string[];
   budgetLink?: {
     origin: string;
     destination: string;
@@ -99,6 +100,10 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
 
     if (data.text) {
       result.text = data.text;
+    }
+
+    if (data.chips && Array.isArray(data.chips)) {
+      result.chips = data.chips;
     }
 
     if (data.functionCall && data.functionCall.name === 'generate_budget_link') {
