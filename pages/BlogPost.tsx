@@ -19,6 +19,16 @@ const BlogPost: React.FC = () => {
     const post = BLOG_POSTS.find(p => p.slug === slug);
     const contentRef = React.useRef<HTMLDivElement>(null);
 
+    // Validate slug to avoid propagating arbitrary user input into structured data
+    const isValidSlug = (value: unknown): value is string => {
+        if (typeof value !== 'string') return false;
+        // Allow only URL-safe slugs: letters, numbers, dashes and slashes
+        return /^[a-zA-Z0-9\-\/]+$/.test(value);
+    };
+
+    const canonicalBase = 'https://www.anhanga.tur.br/blog';
+    const canonicalUrl = isValidSlug(slug) ? `${canonicalBase}/${slug}` : canonicalBase;
+
     // Update WhatsApp links with tracking
     useEffect(() => {
         if (contentRef.current && post) {
@@ -70,7 +80,7 @@ const BlogPost: React.FC = () => {
                 description={post.excerpt}
                 image={post.image}
                 type="article"
-                canonical={`https://www.anhanga.tur.br/blog/${slug}`}
+                canonical={canonicalUrl}
             />
             <ArticleSchema
                 title={post.title}
@@ -78,12 +88,12 @@ const BlogPost: React.FC = () => {
                 image={post.image}
                 datePublished={post.date}
                 authorName={post.author}
-                url={`https://www.anhanga.tur.br/blog/${slug}`}
+                url={canonicalUrl}
             />
             <BreadcrumbSchema items={[
                 { name: 'Home', item: 'https://www.anhanga.tur.br/' },
                 { name: 'Blog', item: 'https://www.anhanga.tur.br/blog' },
-                { name: post.title, item: `https://www.anhanga.tur.br/blog/${slug}` }
+                { name: post.title, item: canonicalUrl }
             ]} />
 
             {/* Hero Header */}
