@@ -236,24 +236,6 @@ export const getDestinationImage = (city: string): string => {
 // =============================================================================
 
 // Allowed Cloudinary hosts for URL optimization
-const ALLOWED_CLOUDINARY_HOSTS = ['res.cloudinary.com'];
-
-const isCloudinaryUrl = (url: string): boolean => {
-    try {
-        const parsed = new URL(url);
-        return ALLOWED_CLOUDINARY_HOSTS.includes(parsed.hostname);
-    } catch {
-        // If the URL is relative or invalid, do not treat it as Cloudinary
-        return false;
-    }
-};
-
-/**
- * Generate optimized Cloudinary URL
- * @param url Original Cloudinary URL
- * @param width Desired width
- * @param format Output format (auto recommended)
- */
 const isCloudinaryUrl = (url: string): boolean => {
     try {
         const parsed = new URL(url);
@@ -264,6 +246,12 @@ const isCloudinaryUrl = (url: string): boolean => {
     }
 };
 
+/**
+ * Generate optimized Cloudinary URL
+ * @param url Original Cloudinary URL
+ * @param width Desired width
+ * @param format Output format (auto recommended)
+ */
 export const optimizeCloudinaryUrl = (
     url: string,
     width: number = 800,
