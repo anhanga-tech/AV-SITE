@@ -29,16 +29,16 @@ jobs:
         run: pnpm install
 
       - name: Lint
-        run: pnpm lint --if-present
+        run: pnpm run lint --if-present
 
       - name: Type check
-        run: pnpm typecheck --if-present
+        run: pnpm run typecheck --if-present
 
       - name: Run tests
-        run: pnpm test --if-present
+        run: pnpm run test --if-present
 
       - name: Build
-        run: pnpm build
+        run: pnpm run build
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
