@@ -235,7 +235,7 @@ const AIChat: React.FC = () => {
       return { ok: true, url: result.whatsappUrl, notice: result.warning };
     }
 
-    if (!result.ok && (result as any).code === 'HUBSPOT_DUPLICATE_CONTACT') {
+    if (!result.ok && result.code === 'HUBSPOT_DUPLICATE_CONTACT') {
       return {
         ok: true,
         url: payload.fallbackUrl,
