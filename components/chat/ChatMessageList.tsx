@@ -78,7 +78,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({
 
                     <div className={`max-w-[88%] p-3 sm:p-4 text-sm ${message.role === 'user'
                         ? isHero
-                            ? 'bg-gradient-to-r from-fun-pink to-fun-blue text-white shadow-lg rounded-2xl rounded-tr-sm'
+                            ? 'bg-anhanga-blue text-white shadow-lg rounded-2xl rounded-tr-sm'
                             : 'bg-brand-vibrant text-white rounded-2xl rounded-br-none shadow-sm'
                         : isHero
                             ? 'bg-white/10 text-white backdrop-blur-sm border border-white/20 rounded-2xl rounded-tl-sm'
