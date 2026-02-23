@@ -20,14 +20,14 @@
 ### Antes do Deploy:
 
 - [ ] Configure a variável `GEMINI_API_KEY` na plataforma de deploy
-- [ ] Teste o build localmente: `npm run build && npm run preview`
+- [ ] Teste o build localmente: `pnpm build && pnpm preview`
 - [ ] Verifique se todas as rotas funcionam corretamente
 - [ ] Teste o chat AI com a chave de produção
 - [ ] Configure restrições de domínio na API Key (se aplicável)
 
 ### Durante o Deploy:
 
-- [ ] Build command: `npm run build`
+- [ ] Build command: `pnpm build`
 - [ ] Output directory: `dist`
 - [ ] Node version: 18+ (se necessário)
 - [ ] Environment variables: `GEMINI_API_KEY`
@@ -45,7 +45,7 @@
 
 ```bash
 # Instalar CLI
-npm i -g vercel
+pnpm add -g vercel
 
 # Deploy
 vercel --prod
@@ -58,7 +58,7 @@ vercel --prod
 
 ```bash
 # Instalar CLI
-npm i -g netlify-cli
+pnpm add -g netlify-cli
 
 # Deploy
 netlify deploy --prod
@@ -67,7 +67,7 @@ netlify deploy --prod
 **Configurações no netlify.toml (opcional):**
 ```toml
 [build]
-  command = "npm run build"
+  command = "pnpm build"
   publish = "dist"
 
 [build.environment]
@@ -78,13 +78,13 @@ netlify deploy --prod
 
 1. Instale `gh-pages`:
 ```bash
-npm install --save-dev gh-pages
+pnpm install --save-dev gh-pages
 ```
 
 2. Adicione ao `package.json`:
 ```json
 "scripts": {
-  "deploy": "npm run build && gh-pages -d dist"
+  "deploy": "pnpm build && gh-pages -d dist"
 }
 ```
 
@@ -102,7 +102,7 @@ npm install --save-dev gh-pages
 
 4. Deploy:
 ```bash
-npm run deploy
+pnpm deploy
 ```
 
 **Nota**: O `vite.config.ts` já está configurado para usar `VITE_BASE_PATH` automaticamente.
@@ -111,9 +111,9 @@ npm run deploy
 
 ### Build falha
 
-- Verifique se todas as dependências estão instaladas: `npm install`
+- Verifique se todas as dependências estão instaladas: `pnpm install`
 - Verifique se a variável `GEMINI_API_KEY` está configurada
-- Limpe o cache: `rm -rf node_modules dist && npm install`
+- Limpe o cache: `rm -rf node_modules dist && pnpm install`
 
 ### Chat AI não funciona em produção
 

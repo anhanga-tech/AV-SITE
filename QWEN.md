@@ -30,10 +30,10 @@
 ## Comandos de Desenvolvimento
 
 ```bash
-npm run dev       # Inicia servidor de desenvolvimento (http://localhost:3000)
-npm run build     # Gera build de produção na pasta /dist
-npm run preview   # Preview do build (http://localhost:4173)
-npm run deploy    # Build + deploy para GitHub Pages
+pnpm dev       # Inicia servidor de desenvolvimento (http://localhost:3000)
+pnpm build     # Gera build de produção na pasta /dist
+pnpm preview   # Preview do build (http://localhost:4173)
+pnpm deploy    # Build + deploy para GitHub Pages
 ```
 
 ## Variáveis de Ambiente
@@ -158,12 +158,12 @@ Centralizados em `/data/mediaConfig.ts`. Para migrar para CDN:
 |------------|--------------|
 | **Vercel** | `vercel.json` com headers de segurança e rewrites para SPA |
 | **Netlify** | `netlify.toml` com redirects para index.html |
-| **GitHub Pages** | `npm run deploy` (requer `VITE_BASE_PATH`) |
+| **GitHub Pages** | `pnpm deploy` (requer `VITE_BASE_PATH`) |
 
 ### Checklist de Deploy
 
 - [ ] Configurar `GEMINI_API_KEY` na plataforma
-- [ ] Testar build localmente: `npm run build && npm run preview`
+- [ ] Testar build localmente: `pnpm build && pnpm preview`
 - [ ] Verificar funcionalidade do chat AI
 - [ ] Configurar restrições de domínio na API Key (recomendado)
 - [ ] Testar todas as rotas em produção
@@ -179,7 +179,7 @@ A chave do Gemini fica exposta no client-side após o build. Para produção:
 
 ### Build falha
 ```bash
-rm -rf node_modules dist && npm install
+rm -rf node_modules dist && pnpm install
 ```
 
 ### Chat AI não funciona em produção

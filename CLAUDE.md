@@ -11,11 +11,11 @@ Anhangá Viagens is an institutional website for a Brazilian boutique travel age
 ## Development Commands
 
 ```bash
-npm run dev       # Start dev server at http://localhost:3000
-npm run build     # Production build to /dist
-npm run preview   # Preview production build at http://localhost:4173
-npm run deploy    # Build + deploy to GitHub Pages
-npm run test:regression  # Run regression tests (Node built-in test runner, strip-types)
+pnpm dev       # Start dev server at http://localhost:3000
+pnpm build     # Production build to /dist
+pnpm preview   # Preview production build at http://localhost:4173
+pnpm deploy    # Build + deploy to GitHub Pages
+pnpm test:regression  # Run regression tests (Node built-in test runner, strip-types)
 ```
 
 ## Environment Variables
@@ -94,6 +94,6 @@ Copy `.env.example` to `.env` for local development.
 
 - **Vercel** (primary) — `vercel.json` includes security headers, SPA rewrite, and domain redirects (`anhanga.tur.br` → `www.anhanga.tur.br`)
 - **Netlify** — `netlify.toml`
-- **GitHub Pages** — `npm run deploy` (requires `VITE_BASE_PATH`)
+- **GitHub Pages** — `pnpm deploy` (requires `VITE_BASE_PATH`)
 
 Build chunks: `react-vendor` and `ai-vendor` (manual split in `vite.config.ts`).
