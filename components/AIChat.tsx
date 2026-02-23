@@ -384,7 +384,7 @@ const AIChat: React.FC = () => {
                         : 'bg-white text-gray-700 border border-gray-100 rounded-bl-none'
                     }`}>
                       {msg.role === 'model' ? (
-                        <div className="prose prose-sm max-w-none prose-p:text-gray-700 prose-p:leading-relaxed prose-p:m-0 prose-p:mb-2 last:prose-p:mb-0 prose-strong:text-gray-900 prose-strong:font-bold prose-ul:text-gray-700 prose-li:text-gray-700 prose-li:m-0 prose-ul:my-2"><ReactMarkdown>{msg.text}</ReactMarkdown></div>
+                        <ReactMarkdown className="prose prose-sm max-w-none prose-p:text-gray-700 prose-p:leading-relaxed prose-p:m-0 prose-p:mb-2 last:prose-p:mb-0 prose-strong:text-gray-900 prose-strong:font-bold prose-ul:text-gray-700 prose-li:text-gray-700 prose-li:m-0 prose-ul:my-2">{msg.text}</ReactMarkdown>
                       ) : (
                         <FormattedText text={msg.text} />
                       )}
