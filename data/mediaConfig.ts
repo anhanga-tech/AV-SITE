@@ -227,6 +227,19 @@ export const getDestinationImage = (city: string): string => {
 // IMAGE OPTIMIZATION HELPERS (for when using Cloudinary)
 // =============================================================================
 
+// Allowed Cloudinary hosts for URL optimization
+const ALLOWED_CLOUDINARY_HOSTS = ['res.cloudinary.com'];
+
+const isCloudinaryUrl = (url: string): boolean => {
+    try {
+        const parsed = new URL(url);
+        return ALLOWED_CLOUDINARY_HOSTS.includes(parsed.hostname);
+    } catch {
+        // If the URL is relative or invalid, do not treat it as Cloudinary
+        return false;
+    }
+};
+
 /**
  * Generate optimized Cloudinary URL
  * @param url Original Cloudinary URL
