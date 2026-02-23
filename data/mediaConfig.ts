@@ -41,7 +41,7 @@ export const optimizeRemoteImageUrl = (
         return rawUrl;
     }
 
-    let parsedUrl: URL | null = null;
+    let parsedUrl: URL;
     try {
         parsedUrl = new URL(rawUrl);
     } catch {
