@@ -68,7 +68,7 @@ export const optimizeRemoteImageUrl = (
         return parsedUrl.toString();
     }
 
-    if (rawUrl.includes('wsrv.nl')) {
+    if (parsedUrl.hostname === 'wsrv.nl') {
         return rawUrl;
     }
 
