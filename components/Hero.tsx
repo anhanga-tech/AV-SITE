@@ -187,10 +187,10 @@ const TRIP_OPTIONS = [
 ];
 
 const BUDGET_TIERS = [
-  { label: "Econômico", icon: DollarSign, level: 1, desc: "Essencial e inteligente" },
-  { label: "Conforto", icon: Wallet, level: 2, desc: "Equilíbrio ideal" },
-  { label: "Luxo", icon: Gem, level: 3, desc: "Sofisticação e mimos" },
-  { label: "Super Luxo", icon: Crown, level: 4, desc: "Exclusividade total" }
+  { label: "Econômico", icon: DollarSign, level: 1, desc: "Essencial e inteligente", range: "até R$ 1,5 mil" },
+  { label: "Conforto", icon: Wallet, level: 2, desc: "Equilíbrio ideal", range: "R$ 1,5-3 mil" },
+  { label: "Luxo", icon: Gem, level: 3, desc: "Sofisticação e mimos", range: "R$ 3-5 mil" },
+  { label: "Super Luxo", icon: Crown, level: 4, desc: "Exclusividade total", range: "R$ 5 mil+" }
 ];
 
 /**
@@ -504,7 +504,11 @@ const Hero: React.FC = () => {
     message += `👥 *Viajantes:* ${adults} Adt, ${children} Chd${childAgesStr}\n`;
 
     if (tripType) message += `🎭 *Tipo de Viagem:* ${tripType}\n`;
-    if (budget) message += `💰 *Orçamento:* ${budget}\n`;
+    if (budget) {
+      const selectedBudgetObj = BUDGET_TIERS.find(b => b.label === budget);
+      const budgetValue = selectedBudgetObj?.range || budget;
+      message += `💰 *Orçamento:* ${budgetValue}\n`;
+    }
 
     // Dispara evento para o AIChat
     window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
@@ -878,7 +882,11 @@ const Hero: React.FC = () => {
                               {[...Array(opt.level)].map((_, i) => <span key={i}>$</span>)}
                             </div>
                           </div>
-                          <span className="text-sm text-gray-400 font-medium">{opt.desc}</span>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-sm text-gray-400 font-medium">{opt.desc}</span>
+                            <span className="text-xs text-gray-500 font-semibold">•</span>
+                            <span className="text-sm text-gray-600 font-semibold">{opt.range}</span>
+                          </div>
                         </div>
                       </button>
                     ))}

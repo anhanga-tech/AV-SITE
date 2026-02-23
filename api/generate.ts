@@ -79,9 +79,9 @@ const BUDGET_FALLBACKS = new Set([
 ]);
 
 const BUDGET_TAXONOMY: Record<TripScope, string[]> = {
-    national: ['até R$ 10 mil', 'R$ 10-20 mil', 'R$ 20-35 mil', 'R$ 35 mil+'],
-    south_america: ['até R$ 20 mil', 'R$ 20-35 mil', 'R$ 35-60 mil', 'R$ 60 mil+'],
-    international: ['até R$ 35 mil', 'R$ 35-60 mil', 'R$ 60-100 mil', 'R$ 100 mil+'],
+    national: ['até R$ 1,5 mil', 'R$ 1,5-3 mil', 'R$ 3-5 mil', 'R$ 5 mil+'],
+    south_america: ['até R$ 3 mil', 'R$ 3-6 mil', 'R$ 6-10 mil', 'R$ 10 mil+'],
+    international: ['até R$ 4 mil', 'R$ 4-8 mil', 'R$ 8-14 mil', 'R$ 14 mil+'],
 };
 
 const SOUTH_AMERICA_COUNTRIES = [
@@ -547,6 +547,22 @@ CONTEXT_MEMORY_POLICY
 - Se o usuário corrigir apenas 1 campo, mantenha os demais já confirmados e continue do ponto atual.
 - Só volte a perguntar um dado já coletado quando houver contradição explícita ou pedido de mudança.
 
+FORM_CONTEXT_POLICY
+- Quando a conversa iniciar com dados do formulário da hero (destino, datas, viajantes, tipo de viagem, orçamento), trate-os como confirmados sem repetir.
+- Apresente um resumo amigável dos dados recebidos e avance direto para qualificação BANT ou handoff, dependendo do que faltar.
+- Nunca peça novamente um dado já fornecido pelo formulário, a menos que o usuário queira corrigi-lo.
+
+CHIPS_POLICY
+- Chips são sugestões rápidas exibidas abaixo da resposta do bot.
+- Use o campo "chips" no retorno apenas quando fizer sentido guiar o usuário.
+- Exemplos de uso:
+  - Início da conversa: ["Nacional", "América do Sul", "Internacional"]
+  - Após destino informado: ["Só ida", "Ida e volta"]
+  - Orçamento: ["até R$ 1,5 mil", "R$ 1,5-3 mil", "R$ 3-5 mil", "R$ 5 mil+"]
+  - Confirmação: ["Sim, quero o orçamento", "Quero ajustar algo"]
+- Não use chips quando a resposta esperada for aberta (ex: nome da cidade).
+- Máximo de 4 chips por resposta.
+
 CITY_COLLECTION_POLICY
 - Cidade é obrigatória para origem e destino.
 - Formato preferido:
@@ -597,9 +613,9 @@ BUDGET_TAXONOMY_POLICY (TOTAL DA VIAGEM)
   - south_america: destino na América do Sul e não national
   - international: demais casos
 - Faixas válidas:
-  - national: até R$ 10 mil | R$ 10-20 mil | R$ 20-35 mil | R$ 35 mil+
-  - south_america: até R$ 20 mil | R$ 20-35 mil | R$ 35-60 mil | R$ 60 mil+
-  - international: até R$ 35 mil | R$ 35-60 mil | R$ 60-100 mil | R$ 100 mil+
+  - national: até R$ 1,5 mil | R$ 1,5-3 mil | R$ 3-5 mil | R$ 5 mil+
+  - south_america: até R$ 3 mil | R$ 3-6 mil | R$ 6-10 mil | R$ 10 mil+
+  - international: até R$ 4 mil | R$ 4-8 mil | R$ 8-14 mil | R$ 14 mil+
 - Faça o mapeamento de escopo/faixa internamente, sem pedir confirmação técnica ao cliente.
 - Nunca confronte o cliente sobre "orçamento insuficiente" ou force aumento de valor; trate orçamento sensível e mantenha tom acolhedor.
 - Se a faixa informada não encaixar perfeitamente, registre budget_range="a definir" e siga para o handoff.
