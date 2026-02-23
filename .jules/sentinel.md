@@ -13,3 +13,8 @@ This journal documents critical security learnings and vulnerabilities found in 
 **Vulnerability:** Unvalidated input array length for chat history (`contents`).
 **Learning:** APIs that accept arrays without size limits are vulnerable to resource exhaustion. An attacker could send a massive array to consume server memory or excessive API quotas.
 **Prevention:** Always validate input types and enforce maximum length/size limits for arrays in request payloads.
+
+## 2025-05-16 - Rate Limiting and Input Validation in Lead Submission
+**Vulnerability:** Lack of rate limiting and input length limits in the `api/submit-lead.ts` endpoint.
+**Learning:** Publicly accessible endpoints that interact with third-party CRM APIs (like HubSpot) are prime targets for DoS and spam. Without rate limiting, an attacker could exhaust API quotas or flood the database. Missing length limits on string fields also pose a memory exhaustion risk.
+**Prevention:** Implement in-memory rate limiting (even if basic) and enforce strict length validation on all user-provided fields in serverless functions.

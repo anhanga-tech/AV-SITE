@@ -47,7 +47,7 @@ export type SubmitLeadErrorCode =
     | 'HUBSPOT_DUPLICATE_CONTACT'
     | 'HUBSPOT_API_ERROR'
     | 'SERVER_CONFIG_ERROR'
-    | 'METHOD_NOT_ALLOWED';
+    | 'METHOD_NOT_ALLOWED' | 'RATE_LIMIT_EXCEEDED';
 
 export interface SubmitLeadError {
     ok: false;
