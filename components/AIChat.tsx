@@ -403,7 +403,7 @@ const AIChat: React.FC = () => {
                             <div className="flex flex-wrap gap-2">
                                 {msg.chips.map((chip, chipIdx) => (
                                     <button
-                                        key={chipIdx}
+                                        key={`${chip}-${chipIdx}`}
                                         onClick={() => submitMessage(chip)}
                                         className="px-3 py-1.5 bg-white border border-brand-vibrant/30 text-brand-vibrant text-xs font-medium rounded-full hover:bg-brand-vibrant hover:text-white transition-colors shadow-sm"
                                     >
