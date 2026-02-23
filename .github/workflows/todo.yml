@@ -1,0 +1,19 @@
+name: "Run TODO to Issue"
+on:
+  push:
+    branches:
+      - main
+      - Preview
+
+jobs:
+  build:
+    runs-on: "ubuntu-latest"
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: "actions/checkout@v4"
+      - name: "TODO to Issue"
+        uses: "alstr/todo-to-issue-action@v5"
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
