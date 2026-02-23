@@ -193,7 +193,7 @@ export function useLeadCapture() {
             lastName: cleanValue(merged.lastName),
             email: cleanValue(merged.email).toLowerCase(),
             bantSummary: cleanValue(merged.bantSummary),
-            utms: { ...latestUtms } || EMPTY_UTMS,
+            utms: latestUtms,
             tracking: {
                 ...latestTracking,
                 ...latestUtms,
@@ -221,9 +221,10 @@ export function useLeadCapture() {
                 body: JSON.stringify(payload),
             });
 
-            const responseData = (await response.json().catch(() => ({}))) as Partial<SubmitLeadResponse>;
+            const rawData = await response.json().catch(() => ({}));
 
             if (!response.ok) {
+                const responseData = rawData as any;
                 const apiError = typeof responseData.error === 'string'
                     ? responseData.error
                     : 'Falha ao enviar lead para o HubSpot.';
@@ -242,9 +243,9 @@ export function useLeadCapture() {
                 };
             }
 
-            const contactId = typeof responseData.contactId === 'string' ? responseData.contactId : 'unknown';
-            const dealId = typeof responseData.dealId === 'string' ? responseData.dealId : undefined;
-            const warning = typeof responseData.warning === 'string' ? responseData.warning : undefined;
+            const contactId = typeof (rawData as any).contactId === 'string' ? (rawData as any).contactId : 'unknown';
+            const dealId = typeof (rawData as any).dealId === 'string' ? (rawData as any).dealId : undefined;
+            const warning = typeof (rawData as any).warning === 'string' ? (rawData as any).warning : undefined;
             const whatsappUrl = getWhatsAppLink(buildWhatsAppMessage(merged), { appendTrackingRef: false });
 
             setIsSubmitting(false);

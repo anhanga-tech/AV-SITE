@@ -47,8 +47,8 @@
 
 1. **Teste o build local:**
    ```bash
-   npm run build
-   npm run preview
+   pnpm build
+   pnpm preview
    ```
    Acesse `http://localhost:4173` e verifique se tudo funciona.
 
@@ -72,7 +72,7 @@
      ```
 
 3. **Verifique configurações de build:**
-   - Build command: `npm run build`
+   - Build command: `pnpm build`
    - Output directory: `dist`
    - Node version: 18+ (se necessário)
 
@@ -110,7 +110,7 @@ netlify deploy --prod
 
 ### GitHub Pages
 ```bash
-npm run deploy
+pnpm deploy
 ```
 
 ## 🔍 Se Ainda Não Funcionar

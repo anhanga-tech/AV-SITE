@@ -32,10 +32,10 @@ Abra o DevTools (F12) e verifique:
 rm -rf dist node_modules/.vite
 
 # Fazer build
-npm run build
+pnpm build
 
 # Testar localmente
-npm run preview
+pnpm preview
 ```
 
 ### 3. Verificar Variáveis de Ambiente
@@ -71,7 +71,7 @@ npm run preview
 **Solução**: 
 ```bash
 rm -rf node_modules package-lock.json
-npm install
+pnpm install
 ```
 
 ### Erro: "process is not defined"
@@ -95,7 +95,7 @@ npm install
 
 Antes de reportar um problema, verifique:
 
-- [ ] Build local funciona (`npm run build && npm run preview`)
+- [ ] Build local funciona (`pnpm build && pnpm preview`)
 - [ ] Variáveis de ambiente estão configuradas
 - [ ] Base path está correto (se GitHub Pages)
 - [ ] Console do navegador não mostra erros críticos
@@ -106,8 +106,8 @@ Antes de reportar um problema, verifique:
 
 1. **Teste o build local primeiro:**
    ```bash
-   npm run build
-   npm run preview
+   pnpm build
+   pnpm preview
    ```
    Se funcionar localmente, o problema é na configuração da plataforma.
 
@@ -120,7 +120,7 @@ Antes de reportar um problema, verifique:
 3. **Limpe o cache:**
    ```bash
    rm -rf dist node_modules/.vite .vite
-   npm run build
+   pnpm build
    ```
 
 4. **Verifique a versão do Node:**

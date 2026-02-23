@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import SectionTitle from './SectionTitle';
 import Button from './Button';
-import { FAQItem } from '../types';
+import { FAQItem } from './types';
 import { ChevronDown, HelpCircle, Sparkles, ArrowRight } from 'lucide-react';
 
 const items: FAQItem[] = [

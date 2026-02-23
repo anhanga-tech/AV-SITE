@@ -38,7 +38,7 @@
    - `VITE_BASE_PATH`: `/` (raiz)
 
 2. Build settings (já configurado no `netlify.toml`):
-   - Build command: `npm run build`
+   - Build command: `pnpm build`
    - Publish directory: `dist`
 
 3. Deploy!
@@ -52,8 +52,8 @@
 
 2. Execute:
    ```bash
-   npm run build
-   npm run deploy
+   pnpm build
+   pnpm deploy
    ```
 
 ## 🧪 Teste Local
@@ -67,8 +67,8 @@ Para testar como ficará no GitHub Pages:
 
 2. Build e preview:
    ```bash
-   npm run build
-   npm run preview
+   pnpm build
+   pnpm preview
    ```
 
 3. Acesse `http://localhost:4173/nome-do-repo/`
