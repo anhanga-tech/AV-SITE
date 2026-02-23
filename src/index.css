@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "../tailwind.config.js";
 
 @layer base {
     body {
@@ -13,7 +12,6 @@
     h4,
     h5,
     h6 {
-        @apply font-sans;
         font-family: 'Poppins', sans-serif;
     }
 }
