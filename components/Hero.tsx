@@ -898,7 +898,7 @@ const Hero: React.FC = () => {
                   ) : (
                     <>
                       <Search className="w-6 h-6 group-hover:rotate-12 transition-transform duration-300 ease-spring" strokeWidth={2.5} />
-                      <span className="font-black text-lg">Buscar</span>
+                      <span className="font-black text-lg">Planejar Viagem</span>
                     </>
                   )}
                 </button>
@@ -906,6 +906,11 @@ const Hero: React.FC = () => {
 
             </div>
           </div>
+
+          {/* Micro-texto abaixo da barra de busca */}
+          <p className="text-sm text-white/70 text-center mt-3">
+            Sem compromisso • Resposta em até 2h
+          </p>
 
           {/* Quick Features - Staggered */}
           <div className="mt-10 flex flex-wrap justify-center gap-6 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
