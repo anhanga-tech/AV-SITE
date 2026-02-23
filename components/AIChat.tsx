@@ -245,7 +245,7 @@ const AIChat: React.FC = () => {
 
     return {
       ok: false,
-      error: (result as any).error || 'Não foi possível salvar seu lead agora. Tente novamente.',
+      error: result.error || 'Não foi possível salvar seu lead agora. Tente novamente.',
     };
   };
 
