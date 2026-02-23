@@ -255,9 +255,10 @@ function extractChipsFromText(text: string): ExtractChipsResult {
             const cleanedText = text.replace(chipsMatch[0], '').trim();
             return { text: cleanedText, chips: chipsArray };
         }
-    } catch {
-        // Invalid JSON, return original text
-    }
+} catch (error) {
+    // Invalid JSON, log for debugging and return original text
+    console.warn('Failed to parse chips from AI response', { error });
+}
 
     return { text };
 }
