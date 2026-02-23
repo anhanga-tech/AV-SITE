@@ -891,14 +891,14 @@ const Hero: React.FC = () => {
                 <button
                   onClick={handleSearch}
                   disabled={isSearchLoading}
-                  className={`btn-whatsapp w-full md:w-40 h-full min-h-[70px] bg-brand-yellow hover:bg-yellow-400 text-brand-dark rounded-2xl md:rounded-[1.5rem] shadow-lg flex items-center justify-center gap-2 transition-all duration-300 ease-spring hover:scale-105 hover:shadow-xl active:scale-90 group border-2 border-transparent`}
+                  className={`btn-whatsapp w-full md:w-auto h-full min-h-[70px] bg-brand-yellow hover:bg-yellow-400 text-brand-dark rounded-2xl md:rounded-[1.5rem] shadow-lg flex items-center justify-center gap-2 px-6 transition-all duration-300 ease-spring hover:scale-105 hover:shadow-xl active:scale-90 group border-2 border-transparent whitespace-nowrap`}
                 >
                   {isSearchLoading ? (
                     <Loader2 className="w-6 h-6 animate-spin" />
                   ) : (
                     <>
                       <Search className="w-6 h-6 group-hover:rotate-12 transition-transform duration-300 ease-spring" strokeWidth={2.5} />
-                      <span className="font-black text-lg">Buscar</span>
+                      <span className="font-black text-lg">Planejar Viagem</span>
                     </>
                   )}
                 </button>
@@ -906,6 +906,11 @@ const Hero: React.FC = () => {
 
             </div>
           </div>
+
+          {/* Micro-texto abaixo da barra de busca */}
+          <p className="text-sm text-white/70 text-center mt-3">
+            Sem compromisso • Resposta em até 2h
+          </p>
 
           {/* Quick Features - Staggered */}
           <div className="mt-10 flex flex-wrap justify-center gap-6 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>

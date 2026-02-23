@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Sparkles, Loader2, ExternalLink, Bot, User, CheckCircle2 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { getTravelAdvice } from '../services/geminiService';
 import { useLeadCapture } from '../hooks/useLeadCapture';
 
@@ -382,7 +383,13 @@ const AIChat: React.FC = () => {
                         ? 'bg-brand-vibrant text-white rounded-br-none' 
                         : 'bg-white text-gray-700 border border-gray-100 rounded-bl-none'
                     }`}>
-                      <FormattedText text={msg.text} />
+                      {msg.role === 'model' ? (
+                        <ReactMarkdown className="prose prose-sm max-w-none prose-p:text-gray-700 prose-p:leading-relaxed prose-p:m-0 prose-p:mb-2 last:prose-p:mb-0 prose-strong:text-gray-900 prose-strong:font-bold prose-ul:text-gray-700 prose-li:text-gray-700 prose-li:m-0 prose-ul:my-2">
+                          {msg.text}
+                        </ReactMarkdown>
+                      ) : (
+                        <FormattedText text={msg.text} />
+                      )}
                     </div>
                 )}
               </div>
