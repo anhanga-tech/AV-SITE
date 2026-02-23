@@ -235,6 +235,34 @@ function stripToolCallJsonBlock(text: string): string {
         .trim();
 }
 
+// Extract chips JSON block from text (e.g., {"chips": ["option1", "option2"]})
+interface ExtractChipsResult {
+    text: string;
+    chips?: string[];
+}
+
+function extractChipsFromText(text: string): ExtractChipsResult {
+    if (!text) return { text };
+
+    // Match JSON with chips field
+    const chipsMatch = text.match(/\{\s*"chips"\s*:\s*(\[[^\]]*\])\s*\}/);
+    if (!chipsMatch) return { text };
+
+    try {
+        const chipsArray = JSON.parse(chipsMatch[1]);
+        if (Array.isArray(chipsArray) && chipsArray.every(item => typeof item === 'string')) {
+            // Remove the chips JSON block from text
+            const cleanedText = text.replace(chipsMatch[0], '').trim();
+            return { text: cleanedText, chips: chipsArray };
+        }
+} catch (error) {
+    // Invalid JSON, log for debugging and return original text
+    console.warn('Failed to parse chips from AI response', { error });
+}
+
+    return { text };
+}
+
 function normalizeAdults(value: unknown): number | undefined {
     const parsed = typeof value === 'number' ? value : Number.parseInt(String(value ?? ''), 10);
     if (!Number.isInteger(parsed) || parsed <= 0) return undefined;
@@ -797,8 +825,13 @@ export default async function handler(request: Request) {
             }
         }
 
+        // Extract chips from response text if present
+        const { text: cleanedText, chips } = extractChipsFromText(responseText || '');
+        responseText = cleanedText;
+
         return new Response(JSON.stringify({
             text: responseText,
+            chips,
             functionCall: responseFunctionCall
         }), {
             status: 200,

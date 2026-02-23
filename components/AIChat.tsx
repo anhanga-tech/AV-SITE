@@ -7,6 +7,7 @@ import { useLeadCapture } from '../hooks/useLeadCapture';
 interface Message {
     role: 'user' | 'model';
     text: string;
+    chips?: string[];
     isAction?: boolean;
     actionData?: {
         url: string;
@@ -263,7 +264,11 @@ const AIChat: React.FC = () => {
     setIsLoading(false);
 
     if (response.text) {
-        setMessages(prev => [...prev, { role: 'model', text: response.text || '' }]);
+        setMessages(prev => [...prev, { 
+            role: 'model', 
+            text: response.text || '',
+            chips: response.chips 
+        }]);
     }
 
     if (response.budgetLink) {
@@ -377,19 +382,36 @@ const AIChat: React.FC = () => {
                         isSubmittingLead={isSubmittingLead}
                     />
                 ) : (
-                    // Renderiza Texto Normal com Formatação
-                    <div className={`max-w-[85%] p-4 rounded-2xl text-sm shadow-sm ${
-                      msg.role === 'user' 
-                        ? 'bg-brand-vibrant text-white rounded-br-none' 
-                        : 'bg-white text-gray-700 border border-gray-100 rounded-bl-none'
-                    }`}>
-                      {msg.role === 'model' ? (
-                        <ReactMarkdown className="prose prose-sm max-w-none prose-p:text-gray-700 prose-p:leading-relaxed prose-p:m-0 prose-p:mb-2 last:prose-p:mb-0 prose-strong:text-gray-900 prose-strong:font-bold prose-ul:text-gray-700 prose-li:text-gray-700 prose-li:m-0 prose-ul:my-2">
-                          {msg.text}
-                        </ReactMarkdown>
-                      ) : (
-                        <FormattedText text={msg.text} />
-                      )}
+                    // Renderiza Texto Normal com Formatação + Chips
+                    <div className="flex flex-col gap-2 max-w-[85%]">
+                        <div className={`p-4 rounded-2xl text-sm shadow-sm ${
+                          msg.role === 'user' 
+                            ? 'bg-brand-vibrant text-white rounded-br-none' 
+                            : 'bg-white text-gray-700 border border-gray-100 rounded-bl-none'
+                        }`}>
+                          {msg.role === 'model' ? (
+                            <ReactMarkdown className="prose prose-sm max-w-none prose-p:text-gray-700 prose-p:leading-relaxed prose-p:m-0 prose-p:mb-2 last:prose-p:mb-0 prose-strong:text-gray-900 prose-strong:font-bold prose-ul:text-gray-700 prose-li:text-gray-700 prose-li:m-0 prose-ul:my-2">
+                              {msg.text}
+                            </ReactMarkdown>
+                          ) : (
+                            <FormattedText text={msg.text} />
+                          )}
+                        </div>
+                        
+                        {/* Render Chips for bot messages */}
+                        {msg.role === 'model' && msg.chips && msg.chips.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                                {msg.chips.map((chip, chipIdx) => (
+                                    <button
+                                        key={`${chip}-${chipIdx}`}
+                                        onClick={() => submitMessage(chip)}
+                                        className="px-3 py-1.5 bg-white border border-brand-vibrant/30 text-brand-vibrant text-xs font-medium rounded-full hover:bg-brand-vibrant hover:text-white transition-colors shadow-sm"
+                                    >
+                                        {chip}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 )}
               </div>
