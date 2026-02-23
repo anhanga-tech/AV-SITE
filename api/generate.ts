@@ -720,7 +720,7 @@ export default async function handler(request: Request) {
             });
         }
 
-        console.log('SERVER: GEMINI_API_KEY found (length:', apiKey.length, ')');
+        console.log('SERVER: GEMINI_API_KEY is configured');
 
         const { contents } = await request.json();
 
