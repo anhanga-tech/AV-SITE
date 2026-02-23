@@ -233,13 +233,23 @@ export const getDestinationImage = (city: string): string => {
  * @param width Desired width
  * @param format Output format (auto recommended)
  */
+const isCloudinaryUrl = (url: string): boolean => {
+    try {
+        const parsed = new URL(url);
+        const host = parsed.hostname.toLowerCase();
+        return host === 'cloudinary.com' || host.endsWith('.cloudinary.com');
+    } catch {
+        return false;
+    }
+};
+
 export const optimizeCloudinaryUrl = (
     url: string,
     width: number = 800,
     format: 'auto' | 'webp' | 'avif' = 'auto'
 ): string => {
     // Only works with Cloudinary URLs
-    if (!url.includes('cloudinary.com')) {
+    if (!isCloudinaryUrl(url)) {
         return url;
     }
 
@@ -253,7 +263,7 @@ export const optimizeCloudinaryUrl = (
  * Only works with Cloudinary URLs
  */
 export const generateSrcSet = (url: string, sizes: number[] = [400, 800, 1200]): string => {
-    if (!url.includes('cloudinary.com')) {
+    if (!isCloudinaryUrl(url)) {
         return '';
     }
 
