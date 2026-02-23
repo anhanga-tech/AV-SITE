@@ -1,7 +1,7 @@
 import React from 'react';
 import SectionTitle from './SectionTitle';
 import { Clock, Smile, Wallet, Zap, Heart, PiggyBank } from 'lucide-react';
-import { Feature } from '../types';
+import { Feature } from './types';
 
 const features: Feature[] = [
   {

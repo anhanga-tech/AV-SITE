@@ -1,7 +1,7 @@
 import React from 'react';
 import SectionTitle from './SectionTitle';
 import { Star, Quote, CheckCircle2 } from 'lucide-react';
-import { Testimonial } from '../types';
+import { Testimonial } from './types';
 
 const testimonials: Testimonial[] = [
   {
