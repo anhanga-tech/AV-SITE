@@ -1,4 +1,12 @@
 User-agent: *
 Allow: /
 
+# AI Crawlers - Explicitly Allowed for GEO
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: PerplexityBot
+User-agent: Claude-Web
+User-agent: Google-Extended
+Allow: /
+
 Sitemap: https://www.anhanga.tur.br/sitemap.xml
