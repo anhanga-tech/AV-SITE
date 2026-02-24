@@ -4,6 +4,15 @@ export const config = {
     runtime: 'edge',
 };
 
+interface RateLimitEntry {
+    count: number;
+    resetTime: number;
+}
+
+const rateLimitStore = new Map<string, RateLimitEntry>();
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const RATE_LIMIT_MAX_REQUESTS = 5;
+
 interface HubSpotObjectResponse {
     id?: string;
 }
@@ -51,6 +60,29 @@ function buildCorsHeaders(): Record<string, string> {
 
 function cleanString(value: unknown): string {
     return typeof value === 'string' ? value.trim() : '';
+}
+
+function getClientIP(request: Request): string {
+    const forwardedFor = request.headers.get('x-forwarded-for');
+    if (forwardedFor) {
+        const ips = forwardedFor.split(',').map(ip => ip.trim());
+        return ips[ips.length - 1]; // Use the last one for Vercel
+    }
+    const realIP = request.headers.get('x-real-ip');
+    if (realIP) return realIP;
+    return 'unknown';
+}
+
+function checkRateLimit(clientIP: string): { allowed: boolean; resetIn: number } {
+    const now = Date.now();
+    const entry = rateLimitStore.get(clientIP);
+    if (!entry || now > entry.resetTime) {
+        rateLimitStore.set(clientIP, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+        return { allowed: true, resetIn: 0 };
+    }
+    if (entry.count >= RATE_LIMIT_MAX_REQUESTS) return { allowed: false, resetIn: entry.resetTime - now };
+    entry.count++;
+    return { allowed: true, resetIn: 0 };
 }
 
 function normalizeNullable(value: unknown): string | null {
@@ -136,7 +168,11 @@ function validatePayload(payload: unknown): { valid: true; data: SubmitLeadReque
     const bantSummary = cleanString(raw.bantSummary);
 
     if (!firstName || !lastName || !email || !bantSummary) {
-        return { valid: false, error: 'Campos obrigatórios ausentes: firstName, lastName, email e bantSummary.' };
+        return { valid: false, error: 'Campos obrigatórios ausentes.' };
+    }
+
+    if (firstName.length > 100 || lastName.length > 100 || email.length > 255 || bantSummary.length > 5000) {
+        return { valid: false, error: 'Entrada muito longa.' };
     }
 
     if (!EMAIL_REGEX.test(email)) {
@@ -396,6 +432,16 @@ async function createFallbackNote(token: string, contactId: string, body: string
 export default async function handler(request: Request): Promise<Response> {
     const corsHeaders = buildCorsHeaders();
 
+    const clientIP = getClientIP(request);
+    const rateLimit = checkRateLimit(clientIP);
+    if (!rateLimit.allowed) {
+        return buildErrorResponse(
+            { ok: false, code: 'RATE_LIMIT_EXCEEDED', error: 'Muitas tentativas. Tente novamente em breve.' },
+            429,
+            { ...corsHeaders, 'Retry-After': String(Math.ceil(rateLimit.resetIn / 1000)) },
+        );
+    }
+
     if (request.method === 'OPTIONS') {
         return new Response(null, { status: 204, headers: corsHeaders });
     }
@@ -422,7 +468,7 @@ export default async function handler(request: Request): Promise<Response> {
             {
                 ok: false,
                 code: 'SERVER_CONFIG_ERROR',
-                error: 'Server configuration error: HUBSPOT_TOKEN missing',
+                error: 'Erro de configuração do servidor',
             },
             500,
             corsHeaders,
@@ -434,7 +480,7 @@ export default async function handler(request: Request): Promise<Response> {
             {
                 ok: false,
                 code: 'SERVER_CONFIG_ERROR',
-                error: 'Server configuration error: HUBSPOT_DEAL_PIPELINE_ID or HUBSPOT_DEAL_STAGE_ID missing',
+                error: 'Erro de configuração do servidor',
             },
             500,
             corsHeaders,
@@ -486,7 +532,7 @@ export default async function handler(request: Request): Promise<Response> {
                 {
                     ok: false,
                     code: 'HUBSPOT_UNAUTHORIZED',
-                    error: 'Token do HubSpot inválido ou sem permissão.',
+                    error: 'Erro de integração com o CRM',
                 },
                 401,
                 corsHeaders,
@@ -501,7 +547,7 @@ export default async function handler(request: Request): Promise<Response> {
                         {
                             ok: false,
                             code: 'HUBSPOT_API_ERROR',
-                            error: 'Contato duplicado, mas não foi possível localizar o registro existente.',
+                            error: 'Erro ao processar contato',
                         },
                         502,
                         corsHeaders,
@@ -517,7 +563,7 @@ export default async function handler(request: Request): Promise<Response> {
                         {
                             ok: false,
                             code: 'HUBSPOT_UNAUTHORIZED',
-                            error: 'Token do HubSpot inválido ou sem permissão.',
+                            error: 'Erro de integração com o CRM',
                         },
                         401,
                         corsHeaders,
@@ -529,7 +575,7 @@ export default async function handler(request: Request): Promise<Response> {
                     {
                         ok: false,
                         code: 'HUBSPOT_API_ERROR',
-                        error: 'Falha ao recuperar contato existente no HubSpot.',
+                        error: 'Erro ao processar contato',
                     },
                     502,
                     corsHeaders,
@@ -543,7 +589,7 @@ export default async function handler(request: Request): Promise<Response> {
                 {
                     ok: false,
                     code: 'HUBSPOT_API_ERROR',
-                    error: 'Erro ao criar contato no HubSpot.',
+                    error: 'Erro de integração com o CRM',
                 },
                 502,
                 corsHeaders,
@@ -556,7 +602,7 @@ export default async function handler(request: Request): Promise<Response> {
                     {
                         ok: false,
                         code: 'HUBSPOT_API_ERROR',
-                        error: 'Contato criado mas ID não retornado pelo HubSpot',
+                        error: 'Erro de integração com o CRM',
                     },
                     502,
                     corsHeaders,
@@ -586,7 +632,7 @@ export default async function handler(request: Request): Promise<Response> {
                     {
                         ok: false,
                         code: 'HUBSPOT_UNAUTHORIZED',
-                        error: 'Token do HubSpot inválido ou sem permissão.',
+                        error: 'Erro de integração com o CRM',
                     },
                     401,
                     corsHeaders,

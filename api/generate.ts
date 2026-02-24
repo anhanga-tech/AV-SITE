@@ -472,7 +472,8 @@ function getClientIP(request: Request): string {
     // Try various headers that might contain the real IP
     const forwardedFor = request.headers.get('x-forwarded-for');
     if (forwardedFor) {
-        return forwardedFor.split(',')[0].trim();
+        const ips = forwardedFor.split(',').map(ip => ip.trim());
+        return ips[ips.length - 1]; // Use the last one for Vercel
     }
 
     const realIP = request.headers.get('x-real-ip');
@@ -741,7 +742,7 @@ export default async function handler(request: Request) {
             console.error('SERVER: GEMINI_API_KEY not found in environment variables');
             console.error('SERVER: Available GEMINI_* keys:', Object.keys(process.env).filter(k => k.includes('GEMINI')));
             return new Response(JSON.stringify({
-                error: 'Server configuration error: API key missing'
+                error: 'Erro interno de configuração'
             }), {
                 status: 500,
                 headers: { 'Content-Type': 'application/json', ...corsHeaders },
