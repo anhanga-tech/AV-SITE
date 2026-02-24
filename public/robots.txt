@@ -1,5 +1,13 @@
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /login/
+Disallow: /register/
+Disallow: /private/
+Disallow: /staging/
+Disallow: /cdn-cgi/
+Disallow: /_next/
 
 # AI Crawlers - Explicitly Allowed for GEO
 User-agent: GPTBot
