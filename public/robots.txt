@@ -17,4 +17,15 @@ User-agent: Claude-Web
 User-agent: Google-Extended
 Allow: /
 
+# Aggressive SEO Bots - Throttled
+User-agent: AhrefsBot
+User-agent: SemrushBot
+User-agent: DotBot
+User-agent: MJ12bot
+User-agent: BLEXBot
+User-agent: PetalBot
+User-agent: Baiduspider
+User-agent: YandexBot
+Crawl-delay: 2
+
 Sitemap: https://www.anhanga.tur.br/sitemap.xml
