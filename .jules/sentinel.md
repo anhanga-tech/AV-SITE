@@ -18,3 +18,8 @@ This journal documents critical security learnings and vulnerabilities found in 
 **Vulnerability:** Lack of rate limiting and input length limits in the `api/submit-lead.ts` endpoint.
 **Learning:** Publicly accessible endpoints that interact with third-party CRM APIs (like HubSpot) are prime targets for DoS and spam. Without rate limiting, an attacker could exhaust API quotas or flood the database. Missing length limits on string fields also pose a memory exhaustion risk.
 **Prevention:** Implement in-memory rate limiting (even if basic) and enforce strict length validation on all user-provided fields in serverless functions.
+
+## 2025-05-16 - IP Spoofing in Rate Limiting
+**Vulnerability:** Trusting the first value of the `x-forwarded-for` header for client IP identification.
+**Learning:** In many proxy configurations (including Vercel), the `x-forwarded-for` header is a comma-separated list where the client can prepend arbitrary IPs. Trusting the first value allows attackers to spoof their IP and bypass rate limits.
+**Prevention:** Always use the last value in the `x-forwarded-for` chain if the infrastructure (like Vercel or Cloudflare) is known to append the true client IP at the end. Better yet, use platform-specific utilities like `ipAddress(request)` from `@vercel/functions` when available.

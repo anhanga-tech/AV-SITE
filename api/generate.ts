@@ -472,7 +472,8 @@ function getClientIP(request: Request): string {
     // Try various headers that might contain the real IP
     const forwardedFor = request.headers.get('x-forwarded-for');
     if (forwardedFor) {
-        return forwardedFor.split(',')[0].trim();
+        const ips = forwardedFor.split(',').map(ip => ip.trim());
+        return ips[ips.length - 1]; // Use the last one for Vercel
     }
 
     const realIP = request.headers.get('x-real-ip');
