@@ -468,7 +468,7 @@ export default async function handler(request: Request): Promise<Response> {
             {
                 ok: false,
                 code: 'SERVER_CONFIG_ERROR',
-                error: 'Server configuration error: HUBSPOT_TOKEN missing',
+                error: 'Erro de configuração do servidor',
             },
             500,
             corsHeaders,
@@ -480,7 +480,7 @@ export default async function handler(request: Request): Promise<Response> {
             {
                 ok: false,
                 code: 'SERVER_CONFIG_ERROR',
-                error: 'Server configuration error: HUBSPOT_DEAL_PIPELINE_ID or HUBSPOT_DEAL_STAGE_ID missing',
+                error: 'Erro de configuração do servidor',
             },
             500,
             corsHeaders,
@@ -532,7 +532,7 @@ export default async function handler(request: Request): Promise<Response> {
                 {
                     ok: false,
                     code: 'HUBSPOT_UNAUTHORIZED',
-                    error: 'Token do HubSpot inválido ou sem permissão.',
+                    error: 'Erro de integração com o CRM',
                 },
                 401,
                 corsHeaders,
@@ -547,7 +547,7 @@ export default async function handler(request: Request): Promise<Response> {
                         {
                             ok: false,
                             code: 'HUBSPOT_API_ERROR',
-                            error: 'Contato duplicado, mas não foi possível localizar o registro existente.',
+                            error: 'Erro ao processar contato',
                         },
                         502,
                         corsHeaders,
@@ -563,7 +563,7 @@ export default async function handler(request: Request): Promise<Response> {
                         {
                             ok: false,
                             code: 'HUBSPOT_UNAUTHORIZED',
-                            error: 'Token do HubSpot inválido ou sem permissão.',
+                            error: 'Erro de integração com o CRM',
                         },
                         401,
                         corsHeaders,
@@ -575,7 +575,7 @@ export default async function handler(request: Request): Promise<Response> {
                     {
                         ok: false,
                         code: 'HUBSPOT_API_ERROR',
-                        error: 'Falha ao recuperar contato existente no HubSpot.',
+                        error: 'Erro ao processar contato',
                     },
                     502,
                     corsHeaders,
@@ -589,7 +589,7 @@ export default async function handler(request: Request): Promise<Response> {
                 {
                     ok: false,
                     code: 'HUBSPOT_API_ERROR',
-                    error: 'Erro ao criar contato no HubSpot.',
+                    error: 'Erro de integração com o CRM',
                 },
                 502,
                 corsHeaders,
@@ -602,7 +602,7 @@ export default async function handler(request: Request): Promise<Response> {
                     {
                         ok: false,
                         code: 'HUBSPOT_API_ERROR',
-                        error: 'Contato criado mas ID não retornado pelo HubSpot',
+                        error: 'Erro de integração com o CRM',
                     },
                     502,
                     corsHeaders,
@@ -632,7 +632,7 @@ export default async function handler(request: Request): Promise<Response> {
                     {
                         ok: false,
                         code: 'HUBSPOT_UNAUTHORIZED',
-                        error: 'Token do HubSpot inválido ou sem permissão.',
+                        error: 'Erro de integração com o CRM',
                     },
                     401,
                     corsHeaders,

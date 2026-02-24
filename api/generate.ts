@@ -742,7 +742,7 @@ export default async function handler(request: Request) {
             console.error('SERVER: GEMINI_API_KEY not found in environment variables');
             console.error('SERVER: Available GEMINI_* keys:', Object.keys(process.env).filter(k => k.includes('GEMINI')));
             return new Response(JSON.stringify({
-                error: 'Server configuration error: API key missing'
+                error: 'Erro interno de configuração'
             }), {
                 status: 500,
                 headers: { 'Content-Type': 'application/json', ...corsHeaders },
