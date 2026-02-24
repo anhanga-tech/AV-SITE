@@ -29,3 +29,4 @@ User-agent: YandexBot
 Crawl-delay: 2
 
 Sitemap: https://www.anhanga.tur.br/sitemap.xml
+Sitemap: https://blog.anhanga.tur.br/sitemap.xml
