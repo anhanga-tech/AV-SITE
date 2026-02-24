@@ -64,10 +64,14 @@ function cleanString(value: unknown): string {
 
 function getClientIP(request: Request): string {
     const forwardedFor = request.headers.get('x-forwarded-for');
-    if (forwardedFor) return forwardedFor.split(',')[0].trim();
+    if (forwardedFor) {
+        const ips = forwardedFor.split(',');
+        return ips[ips.length - 1].trim(); // Pega o último IP na lista, que é o IP real no Vercel
+    }
     const realIP = request.headers.get('x-real-ip');
     if (realIP) return realIP;
     return 'unknown';
+}
 }
 
 function checkRateLimit(clientIP: string): { allowed: boolean; resetIn: number } {
