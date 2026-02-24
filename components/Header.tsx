@@ -4,8 +4,24 @@ import Menu from 'lucide-react/dist/esm/icons/menu';
 import X from 'lucide-react/dist/esm/icons/x';
 import Phone from 'lucide-react/dist/esm/icons/phone';
 import ChevronDown from 'lucide-react/dist/esm/icons/chevron-down';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { getBlogHomeUrl } from '../utils/blog';
+
+/**
+ * Static navigation links moved outside the component to prevent re-allocation on every render.
+ */
+const NAV_LINKS = [
+  { name: 'Destinos', href: 'destinos' },
+  {
+    name: 'A Anhangá',
+    subLinks: [
+      { name: 'Serviços', href: 'experiencia' },
+      { name: 'Como Funciona', href: 'como-funciona' },
+      { name: 'Depoimentos', href: 'depoimentos' },
+    ],
+  },
+  { name: 'Contato', href: 'contato' },
+];
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -13,16 +29,26 @@ const Header: React.FC = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   const location = useLocation();
-  const navigate = useNavigate();
 
   // Com HashRouter, location.pathname retorna o caminho após a hash (ex: / ou /blog)
   const isHome = location.pathname === '/';
 
   useEffect(() => {
+    let ticking = false;
+    /**
+     * Throttled scroll handler using requestAnimationFrame for optimal performance.
+     * Uses { passive: true } to avoid blocking the main thread during scroll.
+     */
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 20);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -33,19 +59,6 @@ const Header: React.FC = () => {
     }));
     setIsMobileMenuOpen(false);
   };
-
-  const navLinks = [
-    { name: 'Destinos', href: 'destinos' },
-    {
-      name: 'A Anhangá',
-      subLinks: [
-        { name: 'Serviços', href: 'experiencia' },
-        { name: 'Como Funciona', href: 'como-funciona' },
-        { name: 'Depoimentos', href: 'depoimentos' },
-      ],
-    },
-    { name: 'Contato', href: 'contato' },
-  ];
 
   // Função unificada para gerenciar a navegação e o scroll
   const handleNavClick = (e: React.MouseEvent, targetId: string) => {
@@ -111,7 +124,7 @@ const Header: React.FC = () => {
         {/* Menu right */}
         <div className="flex items-center gap-8">
           <nav className="hidden md:flex items-center gap-8" aria-label="Menu Principal">
-            {navLinks.map((link) => (
+            {NAV_LINKS.map((link) => (
               <div
                 key={link.name}
                 className="relative"
@@ -201,7 +214,7 @@ const Header: React.FC = () => {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div id="mobile-menu" className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg py-4 px-6 flex flex-col gap-4 border-t border-gray-100 text-gray-800 animate-fade-in-down">
-          {navLinks.map((link) => (
+          {NAV_LINKS.map((link) => (
             isHome ? (
               <a
                 key={link.name}
