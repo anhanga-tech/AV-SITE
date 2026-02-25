@@ -520,6 +520,11 @@ const Hero: React.FC = () => {
     }, 1000);
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSearch();
+  };
+
   return (
     <section className="relative w-full min-h-[850px] flex items-center bg-brand-light pb-20 z-20">
 
@@ -597,7 +602,10 @@ const Hero: React.FC = () => {
           </p>
 
           {/* SEARCH BAR - Extended Ticket Style - Pop In Animation */}
-          <div className="w-full max-w-5xl mx-auto bg-white rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] p-2 relative z-50 border-[6px] border-white/20 backdrop-blur-sm flex flex-col">
+          <form
+            onSubmit={handleSubmit}
+            className="w-full max-w-5xl mx-auto bg-white rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] p-2 relative z-50 border-[6px] border-white/20 backdrop-blur-sm flex flex-col"
+          >
 
             {/* --- ROW 1: BASIC INFO --- */}
             <div className="flex flex-col md:flex-row items-center w-full divide-y md:divide-y-0 md:divide-x divide-gray-100">
@@ -642,22 +650,31 @@ const Hero: React.FC = () => {
               </div>
 
               {/* 2. Dates */}
-              <div className="w-full md:flex-1 p-3 md:p-6 relative cursor-pointer hover:bg-gray-50/80 transition-all duration-300" ref={calendarRef} onClick={() => setShowCalendar(!showCalendar)}>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan transition-colors">
-                  <Calendar className="w-3 h-3" /> Quando?
-                </label>
-                <div className="flex items-center justify-between">
-                  <span className={`text-lg md:text-xl font-bold truncate transition-colors ${startDate ? "text-gray-800" : "text-gray-300"}`}>
-                    {startDate ? `${formatDateDisplay(startDate)} - ${endDate ? formatDateDisplay(endDate) : '...'}` : "Definir datas"}
+              <div className="w-full md:flex-1 relative group" ref={calendarRef}>
+                <button
+                  type="button"
+                  onClick={() => setShowCalendar(!showCalendar)}
+                  className="w-full p-3 md:p-6 text-left hover:bg-gray-50/80 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
+                  aria-expanded={showCalendar}
+                  aria-haspopup="grid"
+                >
+                  <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan transition-colors">
+                    <Calendar className="w-3 h-3" /> Quando?
                   </span>
-                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${showCalendar ? 'rotate-180' : ''}`} />
-                </div>
+                  <div className="flex items-center justify-between">
+                    <span className={`text-lg md:text-xl font-bold truncate transition-colors ${startDate ? "text-gray-800" : "text-gray-300"}`}>
+                      {startDate ? `${formatDateDisplay(startDate)} - ${endDate ? formatDateDisplay(endDate) : '...'}` : "Definir datas"}
+                    </span>
+                    <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${showCalendar ? 'rotate-180' : ''}`} />
+                  </div>
+                </button>
 
                 {/* Calendar Dropdown */}
                 {showCalendar && (
                   <div onClick={(e) => e.stopPropagation()} className="absolute top-full left-0 md:left-auto md:right-0 bg-white rounded-3xl shadow-2xl border-2 border-gray-100 mt-4 p-6 z-[60] w-full md:w-80 cursor-default animate-pop-in origin-top">
                     <div className="flex items-center justify-between mb-4">
                       <button
+                        type="button"
                         onClick={() => changeMonth(-1)}
                         disabled={!canGoToPreviousMonth()}
                         className={`p-1 rounded-full transition-colors ${canGoToPreviousMonth() ? 'hover:bg-gray-100 text-gray-600' : 'text-gray-300 cursor-not-allowed'}`}
@@ -666,7 +683,7 @@ const Hero: React.FC = () => {
                         <ChevronLeft className="w-5 h-5" />
                       </button>
                       <span className="font-bold text-gray-800">{MONTH_NAMES[currentMonth.getMonth()]} {currentMonth.getFullYear()}</span>
-                      <button onClick={() => changeMonth(1)} className="p-1 hover:bg-gray-100 rounded-full text-gray-600 transition-colors" aria-label="Próximo mês"><ChevronRight className="w-5 h-5" /></button>
+                      <button type="button" onClick={() => changeMonth(1)} className="p-1 hover:bg-gray-100 rounded-full text-gray-600 transition-colors" aria-label="Próximo mês"><ChevronRight className="w-5 h-5" /></button>
                     </div>
                     <div className="grid grid-cols-7 mb-2 text-center text-xs font-bold text-gray-400">
                       {WEEK_DAYS.map((day, i) => <div key={i}>{day}</div>)}
@@ -680,6 +697,7 @@ const Hero: React.FC = () => {
                         return (
                           <button
                             key={i}
+                            type="button"
                             onClick={() => handleDateClick(date)}
                             disabled={isPast}
                             aria-disabled={isPast}
@@ -697,14 +715,22 @@ const Hero: React.FC = () => {
               </div>
 
               {/* 3. Guests */}
-              <div className="w-full md:flex-1 p-3 md:p-6 relative cursor-pointer hover:bg-gray-50/80 transition-all duration-300 md:rounded-tr-[2rem]" ref={guestDropdownRef} onClick={() => setShowGuestDropdown(!showGuestDropdown)}>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan transition-colors">
-                  <User className="w-3 h-3" /> Quem vai?
-                </label>
-                <div className="flex items-center justify-between">
-                  <span className="text-lg md:text-xl font-bold text-gray-800 truncate transition-colors">{guestSummary}</span>
-                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${showGuestDropdown ? 'rotate-180' : ''}`} />
-                </div>
+              <div className="w-full md:flex-1 relative group" ref={guestDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setShowGuestDropdown(!showGuestDropdown)}
+                  className="w-full p-3 md:p-6 text-left hover:bg-gray-50/80 transition-all duration-300 md:rounded-tr-[2rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
+                  aria-expanded={showGuestDropdown}
+                  aria-haspopup="true"
+                >
+                  <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan transition-colors">
+                    <User className="w-3 h-3" /> Quem vai?
+                  </span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg md:text-xl font-bold text-gray-800 truncate transition-colors">{guestSummary}</span>
+                    <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${showGuestDropdown ? 'rotate-180' : ''}`} />
+                  </div>
+                </button>
 
                 {/* Guest Dropdown */}
                 {showGuestDropdown && (
@@ -775,7 +801,7 @@ const Hero: React.FC = () => {
                       </div>
                     )}
 
-                    <button onClick={() => setShowGuestDropdown(false)} className="w-full mt-2 bg-brand-cyan text-white rounded-xl py-3 font-bold hover:bg-brand-cyanDark transition-all active:scale-95 shadow-[0_4px_0px_#0284c7] hover:shadow-[0_2px_0px_#0284c7] hover:translate-y-[2px]">Pronto</button>
+                    <button type="button" onClick={() => setShowGuestDropdown(false)} className="w-full mt-2 bg-brand-cyan text-white rounded-xl py-3 font-bold hover:bg-brand-cyanDark transition-all active:scale-95 shadow-[0_4px_0px_#0284c7] hover:shadow-[0_2px_0px_#0284c7] hover:translate-y-[2px]">Pronto</button>
                   </div>
                 )}
               </div>
@@ -791,21 +817,29 @@ const Hero: React.FC = () => {
             <div className="flex flex-col md:flex-row items-stretch w-full divide-y md:divide-y-0 md:divide-x divide-gray-100">
 
               {/* 4. Trip Type - Redesigned */}
-              <div className="w-full md:flex-1 p-3 md:p-6 relative cursor-pointer hover:bg-gray-50/80 transition-all duration-300" ref={tripTypeRef} onClick={() => setShowTripTypeDropdown(!showTripTypeDropdown)}>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan transition-colors">
-                  <Briefcase className="w-3 h-3" /> Tipo de Viagem
-                </label>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 overflow-hidden">
-                    {selectedTripObj && (
-                      <selectedTripObj.icon className={`w-5 h-5 ${selectedTripObj.color}`} />
-                    )}
-                    <span className={`text-lg md:text-lg font-bold truncate transition-colors ${tripType ? "text-gray-800" : "text-gray-300"}`}>
-                      {tripType || "Lazer, Lua de Mel..."}
-                    </span>
+              <div className="w-full md:flex-1 relative group" ref={tripTypeRef}>
+                <button
+                  type="button"
+                  onClick={() => setShowTripTypeDropdown(!showTripTypeDropdown)}
+                  className="w-full p-3 md:p-6 text-left hover:bg-gray-50/80 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
+                  aria-expanded={showTripTypeDropdown}
+                  aria-haspopup="true"
+                >
+                  <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan transition-colors">
+                    <Briefcase className="w-3 h-3" /> Tipo de Viagem
+                  </span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 overflow-hidden">
+                      {selectedTripObj && (
+                        <selectedTripObj.icon className={`w-5 h-5 ${selectedTripObj.color}`} />
+                      )}
+                      <span className={`text-lg md:text-lg font-bold truncate transition-colors ${tripType ? "text-gray-800" : "text-gray-300"}`}>
+                        {tripType || "Lazer, Lua de Mel..."}
+                      </span>
+                    </div>
+                    <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${showTripTypeDropdown ? 'rotate-180' : ''}`} />
                   </div>
-                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${showTripTypeDropdown ? 'rotate-180' : ''}`} />
-                </div>
+                </button>
 
                 {/* Trip Type Dropdown - Modern Grid */}
                 {showTripTypeDropdown && (
@@ -814,6 +848,7 @@ const Hero: React.FC = () => {
                       {TRIP_OPTIONS.map((type, idx) => (
                         <button
                           key={idx}
+                          type="button"
                           onClick={() => { setTripType(type.label); setShowTripTypeDropdown(false); }}
                           className={`
                                                 flex flex-col items-start gap-2 p-3 rounded-2xl border-2 transition-all duration-200 text-left
@@ -837,23 +872,31 @@ const Hero: React.FC = () => {
               </div>
 
               {/* 5. Budget - Redesigned */}
-              <div className="w-full md:flex-1 p-3 md:p-6 relative cursor-pointer hover:bg-gray-50/80 transition-all duration-300" ref={budgetRef} onClick={() => setShowBudgetDropdown(!showBudgetDropdown)}>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan transition-colors">
-                  <Wallet className="w-3 h-3" /> Orçamento Aprox.
-                </label>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 overflow-hidden">
-                    {selectedBudgetObj && (
-                      <div className="flex text-green-600 font-bold text-xs bg-green-50 px-1.5 py-0.5 rounded-md">
-                        {[...Array(selectedBudgetObj.level)].map((_, i) => <span key={i}>$</span>)}
-                      </div>
-                    )}
-                    <span className={`text-lg md:text-lg font-bold truncate transition-colors ${budget ? "text-gray-800" : "text-gray-300"}`}>
-                      {budget || "Definir padrão"}
-                    </span>
+              <div className="w-full md:flex-1 relative group" ref={budgetRef}>
+                <button
+                  type="button"
+                  onClick={() => setShowBudgetDropdown(!showBudgetDropdown)}
+                  className="w-full p-3 md:p-6 text-left hover:bg-gray-50/80 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
+                  aria-expanded={showBudgetDropdown}
+                  aria-haspopup="true"
+                >
+                  <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan transition-colors">
+                    <Wallet className="w-3 h-3" /> Orçamento Aprox.
+                  </span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 overflow-hidden">
+                      {selectedBudgetObj && (
+                        <div className="flex text-green-600 font-bold text-xs bg-green-50 px-1.5 py-0.5 rounded-md">
+                          {[...Array(selectedBudgetObj.level)].map((_, i) => <span key={i}>$</span>)}
+                        </div>
+                      )}
+                      <span className={`text-lg md:text-lg font-bold truncate transition-colors ${budget ? "text-gray-800" : "text-gray-300"}`}>
+                        {budget || "Definir padrão"}
+                      </span>
+                    </div>
+                    <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${showBudgetDropdown ? 'rotate-180' : ''}`} />
                   </div>
-                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${showBudgetDropdown ? 'rotate-180' : ''}`} />
-                </div>
+                </button>
 
                 {/* Budget Dropdown - Rich List */}
                 {showBudgetDropdown && (
@@ -861,6 +904,7 @@ const Hero: React.FC = () => {
                     {BUDGET_TIERS.map((opt, idx) => (
                       <button
                         key={idx}
+                        type="button"
                         onClick={() => { setBudget(opt.label); setShowBudgetDropdown(false); }}
                         className={`
                                             w-full flex items-center gap-4 p-3 rounded-2xl border-2 transition-all duration-200 mb-2 last:mb-0
@@ -897,7 +941,7 @@ const Hero: React.FC = () => {
               {/* 6. Search Button */}
               <div className="p-2 w-full md:w-auto flex-shrink-0">
                 <button
-                  onClick={handleSearch}
+                  type="submit"
                   disabled={isSearchLoading}
                   className={`btn-whatsapp w-full md:w-auto h-full min-h-[70px] bg-brand-yellow hover:bg-yellow-400 text-brand-dark rounded-2xl md:rounded-[1.5rem] shadow-lg flex items-center justify-center gap-2 px-6 transition-all duration-300 ease-spring hover:scale-105 hover:shadow-xl active:scale-90 group border-2 border-transparent whitespace-nowrap`}
                 >
@@ -913,7 +957,7 @@ const Hero: React.FC = () => {
               </div>
 
             </div>
-          </div>
+          </form>
 
           {/* Micro-texto abaixo da barra de busca */}
           <p className="text-sm text-white/70 text-center mt-3">
