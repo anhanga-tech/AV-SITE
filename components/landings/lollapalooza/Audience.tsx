@@ -5,7 +5,7 @@ import useIntersectionObserver from './hooks/useIntersectionObserver';
 const AudienceCard = ({ icon: Icon, title, description, image }: { icon: any, title: string, description: string, image: string }) => (
   <div className="group relative overflow-hidden rounded-2xl h-80 flex flex-col justify-end p-6 shadow-lg">
     <div className="absolute inset-0">
-      <img src={image} alt="" aria-hidden="true" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+      <img src={image} alt={`Público ${title} - Anhangá Viagens`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
       <div className="absolute inset-0 bg-gradient-to-t from-anhanga-darkBlue/90 via-anhanga-darkBlue/50 to-transparent"></div>
     </div>
     

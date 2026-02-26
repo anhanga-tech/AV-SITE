@@ -43,6 +43,7 @@ const MainSiteShell: React.FC = () => {
 };
 
 function App() {
+  {/* <SEO title="App" description="Main App Entry" /> */}
   return (
     <HelmetProvider>
       <Router>

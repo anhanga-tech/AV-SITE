@@ -245,7 +245,10 @@ const AIChat: React.FC = () => {
       return { ok: true, url: result.whatsappUrl, notice: result.warning };
     }
 
-    if (!result.ok && result.code === 'HUBSPOT_DUPLICATE_CONTACT') {
+    // Se chegou aqui, result.ok é false (narrowed by TypeScript because of the return above)
+    const errorResult = result as { ok: false; error: string; code: string };
+
+    if (errorResult.code === 'HUBSPOT_DUPLICATE_CONTACT') {
       return {
         ok: true,
         url: payload.fallbackUrl,
@@ -255,7 +258,7 @@ const AIChat: React.FC = () => {
 
     return {
       ok: false,
-      error: result.error || 'Não foi possível salvar seu lead agora. Tente novamente.',
+      error: errorResult.error || 'Não foi possível salvar seu lead agora. Tente novamente.',
     };
   };
 
@@ -398,7 +401,9 @@ const AIChat: React.FC = () => {
                         : 'bg-white text-gray-700 border border-gray-100 rounded-bl-none'
                     }`}>
                       {msg.role === 'model' ? (
-                        <ReactMarkdown className="prose prose-sm max-w-none prose-p:text-gray-700 prose-p:leading-relaxed prose-p:m-0 prose-p:mb-2 last:prose-p:mb-0 prose-strong:text-gray-900 prose-strong:font-bold prose-ul:text-gray-700 prose-li:text-gray-700 prose-li:m-0 prose-ul:my-2">{msg.text}</ReactMarkdown>
+                        <div className="prose prose-sm max-w-none prose-p:text-gray-700 prose-p:leading-relaxed prose-p:m-0 prose-p:mb-2 last:prose-p:mb-0 prose-strong:text-gray-900 prose-strong:font-bold prose-ul:text-gray-700 prose-li:text-gray-700 prose-li:m-0 prose-ul:my-2">
+                          <ReactMarkdown>{msg.text}</ReactMarkdown>
+                        </div>
                       ) : (
                         <FormattedText text={msg.text} />
                       )}

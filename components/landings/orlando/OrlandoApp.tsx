@@ -54,6 +54,7 @@ const Badge = ({ className, text, rotation }: BadgeProps) => (
 // --- Main Application ---
 
 function OrlandoApp() {
+  {/* <SEO title="Orlando" description="Orlando Landing Page" /> */}
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
@@ -95,9 +96,9 @@ function OrlandoApp() {
 
       <header>
           <div className="logo">
-              <img src={LOGO_URL} alt="Anhangá Viagens" />
+              <img src={LOGO_URL} alt="Anhangá Viagens Logo" />
           </div>
-          <nav className="nav-links">
+          <nav className="nav-links" aria-label="Navegação Interna">
               <a href="#features">Destaques</a>
               <a href="#parks">Parques</a>
               <a href="#itinerary">Roteiro</a>

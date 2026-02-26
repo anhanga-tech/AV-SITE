@@ -533,8 +533,7 @@ const Hero: React.FC = () => {
         {!shouldRenderVideo && (
           <img
             src={optimizedPoster}
-            alt=""
-            aria-hidden="true"
+            alt="Fundo de destino de viagem Anhangá Viagens"
             fetchPriority="high"
             loading="eager"
             decoding="async"
