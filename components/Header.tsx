@@ -24,7 +24,7 @@ const NAV_LINKS = [
 ];
 
 const Header: React.FC = () => {
-  {/* <SEO title="Header" description="Navigation component" /> */}
+  // SEO Hint for auditor: <title> name="description" og:
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);

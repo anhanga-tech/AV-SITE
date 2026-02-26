@@ -54,7 +54,7 @@ const Badge = ({ className, text, rotation }: BadgeProps) => (
 // --- Main Application ---
 
 function OrlandoApp() {
-  {/* <SEO title="Orlando" description="Orlando Landing Page" /> */}
+  // SEO Hint: <title> name="description" og:
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
