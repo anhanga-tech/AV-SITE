@@ -943,7 +943,7 @@ const Hero: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSearchLoading}
-                  className={`btn-whatsapp w-full md:w-auto h-full min-h-[70px] bg-brand-yellow hover:bg-yellow-400 text-brand-dark rounded-2xl md:rounded-[1.5rem] shadow-lg flex items-center justify-center gap-2 px-6 transition-all duration-300 ease-spring hover:scale-105 hover:shadow-xl active:scale-90 group border-2 border-transparent whitespace-nowrap`}
+                  className={`btn-specialist w-full md:w-auto h-full min-h-[70px] bg-brand-yellow hover:bg-yellow-400 text-brand-dark rounded-2xl md:rounded-[1.5rem] shadow-lg flex items-center justify-center gap-2 px-6 transition-all duration-300 ease-spring hover:scale-105 hover:shadow-xl active:scale-90 group border-2 border-transparent whitespace-nowrap`}
                 >
                   {isSearchLoading ? (
                     <Loader2 className="w-6 h-6 animate-spin" />

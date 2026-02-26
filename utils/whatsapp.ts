@@ -264,7 +264,7 @@ export const getTrackingRef = (): string | null => {
 };
 
 export const getWhatsAppLink = (message: string, options: WhatsAppLinkOptions = {}): string => {
-    const { appendTrackingRef = true } = options;
+    const { appendTrackingRef = false } = options;
     const ref = appendTrackingRef ? getTrackingRef() : null;
 
     let finalMessage = message;

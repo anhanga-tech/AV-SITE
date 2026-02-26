@@ -191,7 +191,7 @@ const Header: React.FC = () => {
               href="#"
               aria-label="Fale Conosco"
               onClick={handleContactClick}
-              className={`px-5 py-2.5 rounded-full font-medium text-sm transition-all duration-500 flex items-center gap-2 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-vibrant ${buttonClass}`}
+              className={`btn-whatsapp btn-specialist px-5 py-2.5 rounded-full font-medium text-sm transition-all duration-500 flex items-center gap-2 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-vibrant ${buttonClass}`}
             >
               <Phone className="w-4 h-4" />
               Fale Conosco
@@ -245,7 +245,7 @@ const Header: React.FC = () => {
           </a>
           <a
             href="#"
-            className="bg-brand-vibrant text-center text-white px-5 py-3 rounded-lg font-bold mt-2 focus:ring-2 focus:ring-offset-2 focus:ring-brand-dark focus:outline-none flex justify-center items-center gap-2"
+            className="btn-whatsapp btn-specialist bg-brand-vibrant text-center text-white px-5 py-3 rounded-lg font-bold mt-2 focus:ring-2 focus:ring-offset-2 focus:ring-brand-dark focus:outline-none flex justify-center items-center gap-2"
             onClick={handleContactClick}
           >
             Fale Conosco
