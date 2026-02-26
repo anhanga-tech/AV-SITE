@@ -57,7 +57,7 @@ function App() {
         <meta property="og:site_name" content="Anhangá Viagens" />
         <meta property="og:title" content="Anhangá Viagens | Roteiros Personalizados e Turismo de Experiência" />
         <meta property="og:description" content="Agência de viagens boutique especializada em roteiros personalizados, festivais e experiências no Brasil e no mundo." />
-        <meta property="og:url" content="https://www.anhanga.tur.br" />
+        <meta property="og:url" content="https://www.anhanga.tur.br/" />
         <meta property="og:image" content="https://www.anhanga.tur.br/og-image-1200x630.jpg" />
 
         {/* Twitter (global fallback) */}
@@ -66,7 +66,7 @@ function App() {
         <meta name="twitter:description" content="Agência de viagens boutique especializada em roteiros personalizados, festivais e experiências no Brasil e no mundo." />
         <meta name="twitter:image" content="https://www.anhanga.tur.br/og-image-1200x630.jpg" />
 
-        <link rel="canonical" href="https://www.anhanga.tur.br" />
+        <link rel="canonical" href="https://www.anhanga.tur.br/" />
       </Helmet>
       <Router>
         <ScrollToTop />
