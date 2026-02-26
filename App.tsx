@@ -47,8 +47,26 @@ function App() {
     <HelmetProvider>
       <Helmet titleTemplate="%s | Anhangá Viagens">
         <title>Anhangá Viagens</title>
-        <meta name="description" content="Agência de viagens boutique especializada em roteiros personalizados." />
+        <meta
+          name="description"
+          content="Agência de viagens boutique especializada em roteiros personalizados."
+        />
+
+        {/* Open Graph (global fallback) */}
         <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Anhangá Viagens" />
+        <meta property="og:title" content="Anhangá Viagens | Roteiros Personalizados e Turismo de Experiência" />
+        <meta property="og:description" content="Agência de viagens boutique especializada em roteiros personalizados, festivais e experiências no Brasil e no mundo." />
+        <meta property="og:url" content="https://www.anhanga.tur.br" />
+        <meta property="og:image" content="https://www.anhanga.tur.br/og-image-1200x630.jpg" />
+
+        {/* Twitter (global fallback) */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Anhangá Viagens | Roteiros Personalizados e Turismo de Experiência" />
+        <meta name="twitter:description" content="Agência de viagens boutique especializada em roteiros personalizados, festivais e experiências no Brasil e no mundo." />
+        <meta name="twitter:image" content="https://www.anhanga.tur.br/og-image-1200x630.jpg" />
+
+        <link rel="canonical" href="https://www.anhanga.tur.br" />
       </Helmet>
       <Router>
         <ScrollToTop />
