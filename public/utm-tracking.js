@@ -61,49 +61,14 @@
             } catch (e) {}
         }
 
-        // 2. Buscar CID e atualizar links
+        // 2. Buscar CID e salvar no tracking
         getGACid((cid) => {
-            if (cid) tracking.cid = cid;
-
-            const dataArr = Object.entries(tracking);
-            if (dataArr.length === 0) return;
-
-            const dataSuffix = ' || Dados: ' + dataArr.map(([k, v]) => k + '=' + v).join(', ');
-
-            // Seleciona todos os botões de WhatsApp
-            const allButtons = document.querySelectorAll('.btn-whatsapp, #btn-whatsapp, a[href*="wa.me"]');
-
-            allButtons.forEach(btn => {
-                const href = btn.getAttribute('href');
-                if (!href || !href.includes('wa.me')) return;
-
-                // Evita duplicação
-                if (href.includes('Dados:') || href.includes('%7C%7C')) return;
-
-                // Extrai o texto atual manualmente (mais robusto que URL API em mobile)
-                const textMatch = href.match(/[?&]text=([^&]*)/);
-                let currentText = textMatch ? decodeURIComponent(textMatch[1]) : '';
-
-                // Limpa sufixos antigos se existirem
-                currentText = currentText.split(' || Dados:')[0].split(' [ref:')[0];
-
-                // Monta a nova mensagem
-                const newText = currentText + dataSuffix;
-                const encodedText = encodeURIComponent(newText);
-
-                // Reconstrói o href de forma simples
-                let newHref;
-                if (textMatch) {
-                    // Substitui o text existente
-                    newHref = href.replace(/([?&]text=)[^&]*/, '$1' + encodedText);
-                } else {
-                    // Adiciona o parâmetro text
-                    const separator = href.includes('?') ? '&' : '?';
-                    newHref = href + separator + 'text=' + encodedText;
-                }
-
-                btn.setAttribute('href', newHref);
-            });
+            if (cid) {
+                tracking.cid = cid;
+                try {
+                    sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(tracking));
+                } catch (e) {}
+            }
         });
     }
 
@@ -114,12 +79,15 @@
         // 1. WhatsApp Button Tracking
         const whatsappButton = target.closest('.btn-whatsapp, #btn-whatsapp, a[href*="wa.me"]');
         if (whatsappButton) {
+            // Extrair o texto do botão de forma robusta
+            const buttonText = (whatsappButton.innerText || whatsappButton.textContent || "").trim() || 'WhatsApp Button';
+
             if (typeof window !== 'undefined' && window.dataLayer) {
                 window.dataLayer.push({
                     event: 'whatsapp_cta_click',
                     event_category: 'engagement',
                     event_label: whatsappButton.getAttribute('href') || 'unknown_whatsapp_link',
-                    button_text: whatsappButton.innerText.trim() || 'WhatsApp Button',
+                    button_text: buttonText,
                     page_location: window.location.href
                 });
             }
@@ -127,24 +95,31 @@
 
         // 2. Specialist CTA Tracking ("Falar com especialista")
         const specialistButton = target.closest('.btn-specialist, [data-specialist-cta], a[href*="#contato"]');
+        const clickable = target.closest('a, button, [role="button"]');
 
-        // Check text content safely
-        const buttonText = target.innerText || target.textContent || "";
-        const isSpecialistText = buttonText.toLowerCase().includes('especialista') ||
-                                buttonText.toLowerCase().includes('orçamento');
+        // Extrair texto do botão ou do elemento clicado (limitado a elementos clicáveis para evitar falsos positivos)
+        let fullButtonText = "";
+        if (specialistButton) {
+            fullButtonText = (specialistButton.innerText || specialistButton.textContent || "").trim();
+        } else if (clickable) {
+            fullButtonText = (clickable.innerText || clickable.textContent || "").trim();
+        }
+
+        const isSpecialistText = fullButtonText && (
+                                fullButtonText.toLowerCase().includes('especialista') ||
+                                fullButtonText.toLowerCase().includes('orçamento') ||
+                                fullButtonText.toLowerCase().includes('consultoria'));
 
         if (specialistButton || isSpecialistText) {
-            // Se for um link de WhatsApp, o tracker acima já cuida disso.
-            // Só disparamos este se não for um link de WhatsApp para evitar duplicidade.
-            if (!whatsappButton) {
-                if (typeof window !== 'undefined' && window.dataLayer) {
-                    window.dataLayer.push({
-                        event: 'specialist_cta_click',
-                        event_category: 'engagement',
-                        event_label: buttonText.trim(),
-                        page_location: window.location.href
-                    });
-                }
+            // Disparamos specialist_cta_click mesmo se for um link de WhatsApp
+            // para garantir que todas as consultas com especialistas sejam rastreadas separadamente.
+            if (typeof window !== 'undefined' && window.dataLayer) {
+                window.dataLayer.push({
+                    event: 'specialist_cta_click',
+                    event_category: 'engagement',
+                    event_label: fullButtonText || 'Specialist CTA',
+                    page_location: window.location.href
+                });
             }
         }
     }, { capture: true });

@@ -287,7 +287,7 @@ const VenueMap: React.FC = () => {
                     <div className="absolute inset-0 z-0">
                       <img
                         src={getOptimizedUrl(poi.image, 400)}
-                        alt=""
+                        alt={`Local: ${poi.name}`}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-30"
                         loading="lazy"
                         decoding="async"

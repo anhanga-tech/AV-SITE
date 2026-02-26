@@ -124,7 +124,7 @@ const LineupSection: React.FC = () => {
                 <div className="w-16 h-16 md:w-24 md:h-24 rounded-full border-4 border-black group-hover:border-anhanga-yellow overflow-hidden relative shadow-lg">
                   <img
                     src={getOptimizedUrl(artist.image, 200)}
-                    alt=""
+                    alt={`Foto de ${artist.name}`}
                     onError={handleImageError}
                     loading="lazy"
                     decoding="async"

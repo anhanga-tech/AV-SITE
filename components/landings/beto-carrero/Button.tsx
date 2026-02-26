@@ -72,7 +72,7 @@ const Button: React.FC<ButtonProps> = ({
           }));
           handleClick();
         }}
-        className={`btn-whatsapp ${baseStyles} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className}`}
+        className={`btn-whatsapp btn-specialist ${baseStyles} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className}`}
         aria-label={computedAriaLabel}
       >
         {icon && <MessageCircle className="w-6 h-6 mr-2" />}

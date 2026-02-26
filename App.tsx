@@ -17,7 +17,7 @@ const BetoCarreroLanding = lazy(() => import('./pages/landings/BetoCarreroLandin
 const LollapaloozaLanding = lazy(() => import('./pages/landings/LollapaloozaLanding'));
 const OrlandoLanding = lazy(() => import('./pages/landings/OrlandoLanding'));
 
-import { HelmetProvider } from 'react-helmet-async';
+import { HelmetProvider, Helmet } from 'react-helmet-async';
 
 const MainRouteFallback: React.FC = () => <section className="min-h-[40vh] bg-white" aria-hidden="true" />;
 const LandingRouteFallback: React.FC = () => <div className="min-h-screen bg-white" aria-hidden="true" />;
@@ -45,6 +45,11 @@ const MainSiteShell: React.FC = () => {
 function App() {
   return (
     <HelmetProvider>
+      <Helmet titleTemplate="%s | Anhangá Viagens">
+        <title>Anhangá Viagens</title>
+        <meta name="description" content="Agência de viagens boutique especializada em roteiros personalizados." />
+        <meta property="og:type" content="website" />
+      </Helmet>
       <Router>
         <ScrollToTop />
         <Routes>

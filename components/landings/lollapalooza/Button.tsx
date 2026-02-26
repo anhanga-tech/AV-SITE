@@ -40,7 +40,7 @@ const Button: React.FC<ButtonProps> = ({ text, className = '', variant = 'primar
           detail: { message: WHATSAPP_MESSAGE }
         }));
       }}
-      className={`btn-whatsapp ${baseStyles} ${variants[variant]} ${widthClass} ${className}`}
+      className={`btn-whatsapp btn-specialist ${baseStyles} ${variants[variant]} ${widthClass} ${className}`}
       id="btn-whatsapp-cta"
       data-whatsapp-location={dataWhatsappLocation}
     >

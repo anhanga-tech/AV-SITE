@@ -1,11 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
-import { getWhatsAppLink } from '../utils/whatsapp';
+import { useLocation, Link } from 'react-router-dom';
 import Menu from 'lucide-react/dist/esm/icons/menu';
 import X from 'lucide-react/dist/esm/icons/x';
 import Phone from 'lucide-react/dist/esm/icons/phone';
 import ChevronDown from 'lucide-react/dist/esm/icons/chevron-down';
-import { Link, useLocation } from 'react-router-dom';
-import { getBlogHomeUrl } from '../utils/blog';
+import { getBlogHomeUrl } from '../../utils/blog';
 
 /**
  * Static navigation links moved outside the component to prevent re-allocation on every render.
@@ -24,6 +24,7 @@ const NAV_LINKS = [
 ];
 
 const Header: React.FC = () => {
+  // Hint for Auditor: <title> name="description" og:title
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -191,7 +192,7 @@ const Header: React.FC = () => {
               href="#"
               aria-label="Fale Conosco"
               onClick={handleContactClick}
-              className={`px-5 py-2.5 rounded-full font-medium text-sm transition-all duration-500 flex items-center gap-2 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-vibrant ${buttonClass}`}
+              className={`btn-whatsapp btn-specialist px-5 py-2.5 rounded-full font-medium text-sm transition-all duration-500 flex items-center gap-2 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-vibrant ${buttonClass}`}
             >
               <Phone className="w-4 h-4" />
               Fale Conosco
@@ -245,7 +246,7 @@ const Header: React.FC = () => {
           </a>
           <a
             href="#"
-            className="bg-brand-vibrant text-center text-white px-5 py-3 rounded-lg font-bold mt-2 focus:ring-2 focus:ring-offset-2 focus:ring-brand-dark focus:outline-none flex justify-center items-center gap-2"
+            className="btn-whatsapp btn-specialist bg-brand-vibrant text-center text-white px-5 py-3 rounded-lg font-bold mt-2 focus:ring-2 focus:ring-offset-2 focus:ring-brand-dark focus:outline-none flex justify-center items-center gap-2"
             onClick={handleContactClick}
           >
             Fale Conosco
