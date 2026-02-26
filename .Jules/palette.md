@@ -5,3 +5,7 @@
 ## 2025-05-22 - PR Hygiene and Verification Artifacts
 **Learning:** Including binary screenshots or redundant verification scripts in a Pull Request can be seen as repository pollution and may lead to rejection during code review.
 **Action:** Clean up all temporary scripts, logs, and screenshots before submitting a PR. Stick to the codebase's established testing and verification patterns.
+
+## 2026-02-25 - Semantic Search Bar Triggers
+**Learning:** Using generic `div` elements for complex search triggers (Dates, Guests, etc.) breaks keyboard navigation and hides interactive state from screen readers. Wrapping search widgets in a semantic `<form>` and using `<button>` with `aria-haspopup` allows users to interact with the search functionality using only the keyboard.
+**Action:** Audit complex UI widgets for non-semantic interactive elements and replace them with buttons/inputs while ensuring nested buttons have `type="button"` to avoid unintended form submissions.
