@@ -1,5 +1,5 @@
 import { SEO } from "@/components/SEO";
-import Header from "@/components/Header";
+import Header from "@/components/Header/index";
 import Footer from "@/components/Footer";
 import { BreadcrumbSchema } from "@/components/schemas/BreadcrumbSchema";
 

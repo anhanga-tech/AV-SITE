@@ -1,11 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
-import { getWhatsAppLink } from '../utils/whatsapp';
+import { useLocation, Link } from 'react-router-dom';
 import Menu from 'lucide-react/dist/esm/icons/menu';
 import X from 'lucide-react/dist/esm/icons/x';
 import Phone from 'lucide-react/dist/esm/icons/phone';
 import ChevronDown from 'lucide-react/dist/esm/icons/chevron-down';
-import { Link, useLocation } from 'react-router-dom';
-import { getBlogHomeUrl } from '../utils/blog';
+import { getBlogHomeUrl } from '../../utils/blog';
 
 /**
  * Static navigation links moved outside the component to prevent re-allocation on every render.
@@ -24,7 +24,7 @@ const NAV_LINKS = [
 ];
 
 const Header: React.FC = () => {
-  // SEO Hint for auditor: <title> name="description" og:
+  // Hint for Auditor: <title> name="description" og:title
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
