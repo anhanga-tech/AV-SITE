@@ -23,7 +23,7 @@ const Terms: React.FC = () => {
         <article className="container mx-auto px-6 max-w-4xl prose prose-lg prose-headings:font-black prose-headings:text-brand-dark prose-p:text-gray-600 prose-a:text-brand-cyan">
           <h1>Termos de Uso</h1>
           <p className="lead text-xl text-gray-500 font-medium mb-10">
-            Última atualização: {new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+            Última atualização: Julho de 2024
           </p>
 
           <h2>1. Introdução</h2>
