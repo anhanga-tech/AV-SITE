@@ -95,18 +95,20 @@
 
         // 2. Specialist CTA Tracking ("Falar com especialista")
         const specialistButton = target.closest('.btn-specialist, [data-specialist-cta], a[href*="#contato"]');
+        const clickable = target.closest('a, button, [role="button"]');
 
-        // Extrair texto do botão ou do elemento clicado
+        // Extrair texto do botão ou do elemento clicado (limitado a elementos clicáveis para evitar falsos positivos)
         let fullButtonText = "";
         if (specialistButton) {
             fullButtonText = (specialistButton.innerText || specialistButton.textContent || "").trim();
-        } else {
-            fullButtonText = (target.innerText || target.textContent || "").trim();
+        } else if (clickable) {
+            fullButtonText = (clickable.innerText || clickable.textContent || "").trim();
         }
 
-        const isSpecialistText = fullButtonText.toLowerCase().includes('especialista') ||
+        const isSpecialistText = fullButtonText && (
+                                fullButtonText.toLowerCase().includes('especialista') ||
                                 fullButtonText.toLowerCase().includes('orçamento') ||
-                                fullButtonText.toLowerCase().includes('consultoria');
+                                fullButtonText.toLowerCase().includes('consultoria'));
 
         if (specialistButton || isSpecialistText) {
             // Disparamos specialist_cta_click mesmo se for um link de WhatsApp
