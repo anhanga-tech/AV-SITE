@@ -8,22 +8,43 @@ const Terms: React.FC = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  const canonicalUrl = "https://www.anhanga.tur.br/termos-de-uso";
+  const metaDescription = "Termos de uso e condições gerais da Anhangá Viagens. Leia sobre nossas políticas de serviço, reservas e responsabilidades.";
+  const lastUpdated = "Fevereiro de 2026"; // Data estática honesta
+
   return (
     <>
       <SEO
         title="Termos de Uso"
-        description="Termos de uso e condições gerais da Anhangá Viagens. Leia sobre nossas políticas de serviço, reservas e responsabilidades."
-        canonical="https://www.anhanga.tur.br/termos-de-uso"
+        description={metaDescription}
+        canonical={canonicalUrl}
       />
       <BreadcrumbSchema items={[
         { name: 'Home', item: 'https://www.anhanga.tur.br/' },
-        { name: 'Termos de Uso', item: 'https://www.anhanga.tur.br/termos-de-uso' }
+        { name: 'Termos de Uso', item: canonicalUrl }
       ]} />
+      
+      {/* Schema restaurado para SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "WebPage",
+                name: "Termos de Uso - Anhangá Viagens",
+                url: canonicalUrl,
+                description: metaDescription,
+                dateModified: "2026-02-26", // Data ISO para robôs
+                inLanguage: "pt-BR"
+            }),
+        }}
+      />
+
       <main className="min-h-screen bg-[#fffdf5] pt-32 pb-24">
         <article className="container mx-auto px-6 max-w-4xl prose prose-lg prose-headings:font-black prose-headings:text-brand-dark prose-p:text-gray-600 prose-a:text-brand-cyan">
           <h1>Termos de Uso</h1>
           <p className="lead text-xl text-gray-500 font-medium mb-10">
-            Última atualização: Julho de 2024
+            Última atualização: {lastUpdated}
           </p>
 
           <h2>1. Introdução</h2>
