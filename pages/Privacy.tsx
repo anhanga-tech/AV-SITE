@@ -5,6 +5,8 @@ import Footer from "@/components/Footer";
 const Privacy = () => {
     const metaDescription = "Política de Privacidade e Proteção de Dados da Anhangá Turismo: coleta, tratamento, armazenamento e direitos dos titulares.";
     const canonicalUrl = "https://www.anhanga.tur.br/politica-privacidade";
+    const lastUpdatedDisplay = "26 de fevereiro de 2026";
+    const lastUpdatedIso = "2026-02-26";
 
     return (
         <div className="min-h-screen bg-background text-foreground">
@@ -18,7 +20,7 @@ const Privacy = () => {
                 <header className="mb-8 text-center">
                     <h1 className="text-3xl md:text-4xl font-merriweather font-bold">Política de Privacidade e Proteção de Dados Pessoais</h1>
                     <p className="mt-2 text-sm md:text-base text-muted-foreground font-inter">
-                        Data de Vigência: {new Date().toLocaleDateString("pt-BR")} | Última Atualização: {new Date().toLocaleDateString("pt-BR")}
+                        Data de Vigência: {lastUpdatedDisplay} | Última Atualização: {lastUpdatedDisplay}
                     </p>
                 </header>
 
@@ -363,6 +365,8 @@ const Privacy = () => {
                         name: "Política de Privacidade - Anhangá Turismo",
                         url: canonicalUrl,
                         description: metaDescription,
+                        dateModified: lastUpdatedIso,
+                        inLanguage: "pt-BR",
                     }),
                 }}
             />

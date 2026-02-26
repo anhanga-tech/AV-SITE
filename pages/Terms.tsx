@@ -1,10 +1,13 @@
 import { SEO } from "@/components/SEO";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { BreadcrumbSchema } from "@/components/schemas/BreadcrumbSchema";
 
 const Terms = () => {
     const metaDescription = "Termos e Condições de Uso da Anhangá Turismo: intermediação, simulações, responsabilidade e privacidade.";
     const canonicalUrl = "https://www.anhanga.tur.br/termos-de-uso";
+    const lastUpdatedDisplay = "26 de fevereiro de 2026";
+    const lastUpdatedIso = "2026-02-26";
 
     return (
         <div className="min-h-screen bg-background text-foreground">
@@ -13,12 +16,16 @@ const Terms = () => {
                 description={metaDescription}
                 canonical={canonicalUrl}
             />
+            <BreadcrumbSchema items={[
+                { name: "Home", item: "https://www.anhanga.tur.br/" },
+                { name: "Termos de Uso", item: canonicalUrl }
+            ]} />
             <Header />
             <main className="container mx-auto px-4 py-10">
                 <header className="mb-8 text-center">
                     <h1 className="text-3xl md:text-4xl font-merriweather font-bold">Termos e Condições de Uso</h1>
                     <p className="mt-2 text-sm md:text-base text-muted-foreground font-inter">
-                        Última atualização: {new Date().toLocaleDateString("pt-BR")}
+                        Última atualização: {lastUpdatedDisplay}
                     </p>
                 </header>
 
@@ -265,6 +272,8 @@ const Terms = () => {
                         name: "Termos e Condições de Uso - Anhangá Turismo",
                         url: canonicalUrl,
                         description: metaDescription,
+                        dateModified: lastUpdatedIso,
+                        inLanguage: "pt-BR",
                     }),
                 }}
             />
