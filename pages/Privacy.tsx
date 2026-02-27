@@ -11,7 +11,7 @@ const Privacy = () => {
     return (
         <div className="min-h-screen bg-background text-foreground">
             <SEO
-                title="Política de Privacidade"
+                title="Política de Privacidade | Anhangá Viagens"
                 description={metaDescription}
                 canonical={canonicalUrl}
             />

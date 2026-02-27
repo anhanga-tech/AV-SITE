@@ -93,7 +93,7 @@ const Home: React.FC = () => {
   return (
     <>
       <SEO
-        title="Agência de viagens em São Paulo com roteiros personalizados"
+        title="Anhangá Viagens | Agência de viagens em São Paulo com roteiros personalizados"
         description="Planejamento de viagens personalizadas com atendimento consultivo em São Paulo. Pacotes para Orlando, Beto Carrero, Lollapalooza 2026 e experiências para público 50+."
         canonical="https://www.anhanga.tur.br/"
         keywords="agência de viagens em São Paulo, viagens personalizadas, pacotes para Orlando, pacote Beto Carrero, viagem Lollapalooza 2026, viagens melhor idade 50+, roteiros exclusivos"

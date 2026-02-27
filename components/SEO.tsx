@@ -21,7 +21,7 @@ export const SEO: React.FC<SEOProps> = ({
     robots = 'index, follow'
 }) => {
     const siteName = "Anhangá Viagens";
-    const fullTitle = `${title} | ${siteName}`;
+    const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
     const currentUrl = canonical || (typeof window !== 'undefined' ? window.location.href : '');
 
     return (

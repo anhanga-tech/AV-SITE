@@ -28,8 +28,8 @@ const OrlandoLanding: React.FC = () => {
   return (
     <>
       <SEO
-        title="Pacotes para Orlando com roteiro personalizado"
-        description="Pacotes para Orlando com suporte de agência em São Paulo: aéreo, hotel, ingressos e roteiro personalizado para Disney e Universal."
+        title="Pacotes para Orlando 2025/2026 com Roteiro Personalizado"
+        description="Pacotes para Orlando 2025 e 2026 com suporte de agência boutique em São Paulo: aéreo, hotel, ingressos e roteiro personalizado para Disney e Universal."
         canonical="https://www.anhanga.tur.br/orlando"
         keywords="pacotes para Orlando, viagem para Orlando, roteiro Disney Orlando, pacote Universal Orlando, agência de viagens Orlando São Paulo"
       />

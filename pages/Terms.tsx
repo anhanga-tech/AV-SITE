@@ -12,7 +12,7 @@ const Terms = () => {
     return (
         <div className="min-h-screen bg-background text-foreground">
             <SEO
-                title="Termos e Condições de Uso"
+                title="Termos e Condições de Uso | Anhangá Viagens"
                 description={metaDescription}
                 canonical={canonicalUrl}
             />
