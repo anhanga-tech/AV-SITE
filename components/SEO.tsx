@@ -22,7 +22,7 @@ export const SEO: React.FC<SEOProps> = ({
 }) => {
     const siteName = "Anhangá Viagens";
     const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
-    const currentUrl = canonical || (typeof window !== 'undefined' ? window.location.href : '');
+    const currentUrl = canonical || (typeof window !== 'undefined' ? window.location.href.replace('https://anhanga.tur.br', 'https://www.anhanga.tur.br') : '');
 
     return (
         <Helmet>

@@ -6,8 +6,8 @@ import { BreadcrumbSchema } from "@/components/schemas/BreadcrumbSchema";
 const Terms = () => {
     const metaDescription = "Termos e Condições de Uso da Anhangá Turismo: intermediação, simulações, responsabilidade e privacidade.";
     const canonicalUrl = "https://www.anhanga.tur.br/termos-de-uso";
-    const lastUpdatedDisplay = "26 de fevereiro de 2026";
-    const lastUpdatedIso = "2026-02-26";
+    const lastUpdatedDisplay = "27 de fevereiro de 2026";
+    const lastUpdatedIso = "2026-02-27";
 
     return (
         <div className="min-h-screen bg-background text-foreground">
