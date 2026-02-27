@@ -58,7 +58,6 @@ test.describe('Chaos & Unhappy Path Suite', () => {
     await homePage.submitSearch();
 
     // Should stay on home or show validation (depends on implementation)
-    // In this app, it seems it just doesn't do much if empty, or stays on page
     await expect(page).toHaveURL(/\/$/);
   });
 });

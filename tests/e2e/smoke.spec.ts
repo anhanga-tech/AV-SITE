@@ -3,22 +3,29 @@ import { HomePage } from './pages/HomePage';
 import { AIChat } from './pages/AIChat';
 
 test.describe('Smoke Suite', () => {
-  test('should load home page and verify key elements', async ({ page }) => {
+  test('should load home page and verify key elements', async ({ page, isMobile }) => {
     const homePage = new HomePage(page);
     await homePage.goto();
 
     await expect(homePage.headerLogo).toBeVisible();
-    await expect(homePage.faleConoscoBtn.first()).toBeVisible();
+
+    if (isMobile) {
+      await expect(homePage.mobileMenuBtn).toBeVisible();
+      await expect(homePage.faleConoscoBtn).not.toBeVisible();
+    } else {
+      await expect(homePage.faleConoscoBtn).toBeVisible();
+    }
+
     await expect(homePage.destinationInput).toBeVisible();
     await expect(homePage.submitSearchBtn).toBeVisible();
   });
 
-  test('should open AI Chatbot via "Fale Conosco" button', async ({ page }) => {
+  test('should open AI Chatbot via "Fale Conosco" button', async ({ page, isMobile }) => {
     const homePage = new HomePage(page);
     const aiChat = new AIChat(page);
 
     await homePage.goto();
-    await homePage.openChatViaHeader();
+    await homePage.openChat(isMobile);
 
     await aiChat.expectVisible();
     await aiChat.expectMessageContaining('Gostaria de falar com um especialista');
@@ -34,8 +41,7 @@ test.describe('Smoke Suite', () => {
     for (const landing of landingPages) {
       await page.goto(landing.path);
       await expect(page).toHaveTitle(landing.title);
-      // Verify no GLOBAL header/footer on landings
-      // Note: OrlandoApp has a .main-footer, but not the global Footer component
+      // Verify no GLOBAL header on landings (which has the .fixed class)
       await expect(page.locator('header.fixed.top-0')).not.toBeVisible();
     }
   });
@@ -46,7 +52,7 @@ test.describe('Smoke Suite', () => {
     await homePage.goto();
 
     await expect(homePage.mobileMenuBtn).toBeVisible();
-    await homePage.mobileMenuBtn.click();
+    await homePage.openMobileMenu();
     await expect(page.locator('#mobile-menu')).toBeVisible();
   });
 });

@@ -11,11 +11,16 @@ export class HomePage {
   readonly budgetBtn: Locator;
   readonly submitSearchBtn: Locator;
   readonly mobileMenuBtn: Locator;
+  readonly mobileFaleConoscoBtn: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.headerLogo = page.locator('header img[alt="Anhangá Viagens"]');
-    this.faleConoscoBtn = page.locator('header .btn-specialist', { hasText: 'Fale Conosco' });
+    // Desktop button (hidden on mobile)
+    this.faleConoscoBtn = page.locator('header .hidden.md\\:block .btn-specialist', { hasText: 'Fale Conosco' });
+    // Mobile button in the drawer (visible only when mobile menu is open)
+    this.mobileFaleConoscoBtn = page.locator('#mobile-menu .btn-specialist', { hasText: 'Fale Conosco' });
+
     this.destinationInput = page.locator('input[placeholder*="Ex: Orlando, Paris, Brasil..."]');
     this.guestsBtn = page.locator('button:has(span:has-text("Nº de Viajantes"))');
     this.datesBtn = page.locator('button:has(span:has-text("Quando você vai?"))');
@@ -42,7 +47,16 @@ export class HomePage {
     await this.submitSearchBtn.click();
   }
 
-  async openChatViaHeader() {
-    await this.faleConoscoBtn.first().click();
+  async openMobileMenu() {
+    await this.mobileMenuBtn.click();
+  }
+
+  async openChat(isMobile: boolean) {
+    if (isMobile) {
+      await this.openMobileMenu();
+      await this.mobileFaleConoscoBtn.click();
+    } else {
+      await this.faleConoscoBtn.click();
+    }
   }
 }
