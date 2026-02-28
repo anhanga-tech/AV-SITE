@@ -3,10 +3,12 @@ import { HomePage } from './pages/HomePage';
 import { AIChat } from './pages/AIChat';
 
 test.describe('Smoke Suite', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+  });
+
   test('should load home page and verify key elements', async ({ page, isMobile }) => {
     const homePage = new HomePage(page);
-    await homePage.goto();
-
     await expect(homePage.headerLogo).toBeVisible();
 
     if (isMobile) {
@@ -24,14 +26,14 @@ test.describe('Smoke Suite', () => {
     const homePage = new HomePage(page);
     const aiChat = new AIChat(page);
 
-    await homePage.goto();
     await homePage.openChat(isMobile);
 
     await aiChat.expectVisible();
+    await aiChat.expectOnlineStatus();
     await aiChat.expectMessageContaining('Gostaria de falar com um especialista');
   });
 
-  test('should navigate to landing pages', async ({ page }) => {
+  test('should navigate to basic landing pages', async ({ page }) => {
     const landingPages = [
       { path: '/orlando', title: /Orlando/i },
       { path: '/beto-carrero', title: /Beto Carrero/i },
@@ -41,7 +43,6 @@ test.describe('Smoke Suite', () => {
     for (const landing of landingPages) {
       await page.goto(landing.path);
       await expect(page).toHaveTitle(landing.title);
-      // Verify no GLOBAL header on landings (which has the .fixed class)
       await expect(page.locator('header.fixed.top-0')).not.toBeVisible();
     }
   });
@@ -49,10 +50,32 @@ test.describe('Smoke Suite', () => {
   test('should verify mobile menu visibility', async ({ page, isMobile }) => {
     test.skip(!isMobile, 'This test is for mobile only');
     const homePage = new HomePage(page);
-    await homePage.goto();
-
     await expect(homePage.mobileMenuBtn).toBeVisible();
     await homePage.openMobileMenu();
     await expect(page.locator('#mobile-menu')).toBeVisible();
+  });
+
+  test('should trigger chatbot from landing pages CTAs', async ({ page }) => {
+    const aiChat = new AIChat(page);
+
+    // Orlando
+    await page.goto('/orlando');
+    await page.locator('button:has-text("Ver Pacotes")').click();
+    await aiChat.expectVisible();
+    await aiChat.expectMessageContaining('Orlando');
+    await aiChat.close();
+
+    // Beto Carrero
+    await page.goto('/beto-carrero');
+    await page.locator('.btn-specialist:visible').first().click();
+    await aiChat.expectVisible();
+    await aiChat.expectMessageContaining('Beto Carrero');
+    await aiChat.close();
+
+    // Lollapalooza
+    await page.goto('/lollapalooza-2026');
+    await page.locator('.btn-specialist:visible').first().click();
+    await aiChat.expectVisible();
+    await aiChat.expectMessageContaining('Lollapalooza');
   });
 });

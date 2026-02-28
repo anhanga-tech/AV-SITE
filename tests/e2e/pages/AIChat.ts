@@ -7,6 +7,7 @@ export class AIChat {
   readonly sendBtn: Locator;
   readonly closeBtn: Locator;
   readonly openBtn: Locator;
+  readonly typingIndicator: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -15,11 +16,18 @@ export class AIChat {
     this.sendBtn = page.locator('button[aria-label="Enviar mensagem"]');
     this.closeBtn = page.locator('button[aria-label="Minimizar chat"]');
     this.openBtn = page.locator('button[aria-label="Abrir assistente virtual"]');
+    this.typingIndicator = page.locator('span:has-text("digitando...")');
   }
 
   async open() {
     if (!(await this.chatDialog.isVisible())) {
       await this.openBtn.click();
+    }
+  }
+
+  async close() {
+    if (await this.chatDialog.isVisible()) {
+      await this.closeBtn.click();
     }
   }
 
@@ -32,8 +40,16 @@ export class AIChat {
     await expect(this.chatDialog).toBeVisible();
   }
 
+  async expectHidden() {
+    await expect(this.chatDialog).not.toBeVisible();
+  }
+
   async expectMessageContaining(text: string) {
     // We use getByText inside the dialog to be agnostic of whether it's model (.prose) or user (p.leading-relaxed)
     await expect(this.chatDialog.getByText(text).first()).toBeVisible();
+  }
+
+  async expectOnlineStatus() {
+    await expect(this.chatDialog.locator('span:has-text("Online agora")')).toBeVisible();
   }
 }
