@@ -8,7 +8,7 @@ const NAV_LINKS = [
   {
     name: 'Sobre Nós',
     subLinks: [
-      { name: 'Nossa História', href: 'nossa-historia' },
+      { name: 'Nossa História', href: 'experiencia' },
       { name: 'Como Funciona', href: 'como-funciona' },
       { name: 'Depoimentos', href: 'depoimentos' },
     ],
