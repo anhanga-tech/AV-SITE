@@ -21,7 +21,9 @@ export const SEO: React.FC<SEOProps> = ({
     robots = 'index, follow'
 }) => {
     const siteName = "Anhangá Viagens";
-    const fullTitle = title.toLowerCase().includes(siteName.toLowerCase()) ? title : `${title} | ${siteName}`;
+    const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const fullTitle = normalize(title).includes(normalize(siteName)) ? title : `${title} | ${siteName}`;
+    // O replace garante www caso a canonical não seja passada explicitamente (todas as páginas devem passar).
     const currentUrl = canonical || (typeof window !== 'undefined' ? window.location.href.replace('https://anhanga.tur.br', 'https://www.anhanga.tur.br') : '');
 
     return (

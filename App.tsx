@@ -45,7 +45,9 @@ const MainSiteShell: React.FC = () => {
 function App() {
   return (
     <HelmetProvider>
-      <Helmet >
+      {/* Fallback global de SEO. Títulos de página devem sempre passar pelo componente <SEO>,
+          que garante o sufixo "| Anhangá Viagens" e evita duplicação. */}
+      <Helmet>
         <title>Anhangá Viagens | Roteiros Personalizados e Turismo de Experiência</title>
         <meta
           name="description"
