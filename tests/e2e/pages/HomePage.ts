@@ -22,11 +22,11 @@ export class HomePage {
     this.mobileFaleConoscoBtn = page.getByTestId('mobile-fale-conosco-btn');
 
     this.destinationInput = page.locator('input[placeholder*="Ex: Orlando, Paris, Brasil..."]');
-    this.guestsBtn = page.locator('button:has(span:has-text("Nº de Viajantes"))');
-    this.datesBtn = page.locator('button:has(span:has-text("Quando você vai?"))');
-    this.tripTypeBtn = page.locator('button:has(span:has-text("Tipo de Viagem"))');
-    this.budgetBtn = page.locator('button:has(span:has-text("Orçamento Aprox."))');
-    this.submitSearchBtn = page.locator('button[type="submit"]:has-text("Planejar Viagem")');
+    this.guestsBtn = page.getByTestId('guests-filter-btn');
+    this.datesBtn = page.getByTestId('dates-filter-btn');
+    this.tripTypeBtn = page.getByTestId('trip-type-filter-btn');
+    this.budgetBtn = page.getByTestId('budget-filter-btn');
+    this.submitSearchBtn = page.getByTestId('submit-search-btn');
     this.mobileMenuBtn = page.locator('button[aria-label="Abrir menu"]');
   }
 

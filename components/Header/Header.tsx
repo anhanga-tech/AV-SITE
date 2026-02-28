@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Phone, Menu, X, ChevronDown } from 'lucide-react';
+import Menu from 'lucide-react/dist/esm/icons/menu';
+import X from 'lucide-react/dist/esm/icons/x';
+import Phone from 'lucide-react/dist/esm/icons/phone';
+import ChevronDown from 'lucide-react/dist/esm/icons/chevron-down';
 import { getBlogHomeUrl } from '@/utils/blog';
 
 const NAV_LINKS = [

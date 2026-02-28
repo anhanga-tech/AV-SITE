@@ -417,7 +417,7 @@ const AIChat: React.FC = () => {
                  <div className="w-8 h-8 rounded-full bg-white border border-gray-200 text-brand-vibrant flex items-center justify-center shadow-sm">
                     <Bot className="w-5 h-5" />
                  </div>
-                 <div className="bg-white px-4 py-3 rounded-2xl rounded-bl-none shadow-sm border border-gray-100 flex items-center gap-2">
+                 <div className="bg-white px-4 py-3 rounded-2xl rounded-bl-none shadow-sm border border-gray-100 flex items-center gap-2" data-testid="chat-typing-indicator">
                     <Loader2 className="w-4 h-4 animate-spin text-brand-vibrant" />
                     <span className="text-xs text-gray-400 font-medium">Anhangá está digitando...</span>
                  </div>
