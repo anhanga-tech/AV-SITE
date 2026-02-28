@@ -57,25 +57,18 @@ test.describe('Smoke Suite', () => {
 
   test('should trigger chatbot from landing pages CTAs', async ({ page }) => {
     const aiChat = new AIChat(page);
+    const ctaTests = [
+      { path: '/orlando', ctaLocator: 'button:has-text("Ver Pacotes")', expectedText: 'Orlando' },
+      { path: '/beto-carrero', ctaLocator: '.btn-specialist:visible', expectedText: 'Beto Carrero' },
+      { path: '/lollapalooza-2026', ctaLocator: '.btn-specialist:visible', expectedText: 'Lollapalooza' },
+    ];
 
-    // Orlando
-    await page.goto('/orlando');
-    await page.locator('button:has-text("Ver Pacotes")').click();
-    await aiChat.expectVisible();
-    await aiChat.expectMessageContaining('Orlando');
-    await aiChat.close();
-
-    // Beto Carrero
-    await page.goto('/beto-carrero');
-    await page.locator('.btn-specialist:visible').first().click();
-    await aiChat.expectVisible();
-    await aiChat.expectMessageContaining('Beto Carrero');
-    await aiChat.close();
-
-    // Lollapalooza
-    await page.goto('/lollapalooza-2026');
-    await page.locator('.btn-specialist:visible').first().click();
-    await aiChat.expectVisible();
-    await aiChat.expectMessageContaining('Lollapalooza');
+    for (const ctaTest of ctaTests) {
+      await page.goto(ctaTest.path);
+      await page.locator(ctaTest.ctaLocator).first().click();
+      await aiChat.expectVisible();
+      await aiChat.expectMessageContaining(ctaTest.expectedText);
+      await aiChat.close();
+    }
   });
 });
