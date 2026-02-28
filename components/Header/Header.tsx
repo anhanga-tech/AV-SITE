@@ -1,21 +1,17 @@
-
 import React, { useState, useEffect } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Menu from 'lucide-react/dist/esm/icons/menu';
 import X from 'lucide-react/dist/esm/icons/x';
 import Phone from 'lucide-react/dist/esm/icons/phone';
 import ChevronDown from 'lucide-react/dist/esm/icons/chevron-down';
-import { getBlogHomeUrl } from '../../utils/blog';
+import { getBlogHomeUrl } from '@/utils/blog';
 
-/**
- * Static navigation links moved outside the component to prevent re-allocation on every render.
- */
 const NAV_LINKS = [
   { name: 'Destinos', href: 'destinos' },
   {
-    name: 'A Anhangá',
+    name: 'Sobre Nós',
     subLinks: [
-      { name: 'Serviços', href: 'experiencia' },
+      { name: 'Nossa História', href: 'nossa-historia' },
       { name: 'Como Funciona', href: 'como-funciona' },
       { name: 'Depoimentos', href: 'depoimentos' },
     ],
@@ -24,22 +20,15 @@ const NAV_LINKS = [
 ];
 
 const Header: React.FC = () => {
-  // Hint for Auditor: <title> name="description" og:title
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   const location = useLocation();
-
-  // Com HashRouter, location.pathname retorna o caminho após a hash (ex: / ou /blog)
   const isHome = location.pathname === '/';
 
   useEffect(() => {
     let ticking = false;
-    /**
-     * Throttled scroll handler using requestAnimationFrame for optimal performance.
-     * Uses { passive: true } to avoid blocking the main thread during scroll.
-     */
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
@@ -61,9 +50,7 @@ const Header: React.FC = () => {
     setIsMobileMenuOpen(false);
   };
 
-  // Função unificada para gerenciar a navegação e o scroll
   const handleNavClick = (e: React.MouseEvent, targetId: string) => {
-    // Se estiver na Home, previne a navegação padrão e faz o scroll suave
     if (isHome) {
       e.preventDefault();
       const element = document.getElementById(targetId);
@@ -72,19 +59,15 @@ const Header: React.FC = () => {
         setIsMobileMenuOpen(false);
       }
     } else {
-      // Se estiver fora da Home, fecha o menu mobile (a navegação ocorre via Link/navigate)
       setIsMobileMenuOpen(false);
     }
   };
 
-  // Força header branco se não estiver na home
   const forceWhiteHeader = !isHome;
-
   const headerClass = isScrolled || forceWhiteHeader
     ? 'bg-white/90 backdrop-blur-md shadow-lg py-3 text-brand-dark'
     : 'bg-transparent py-6 text-white';
 
-  // Lógica de seleção do Logo - usando BASE_URL do Vite para suportar GitHub Pages
   const baseUrl = import.meta.env.BASE_URL;
   const logoSrc = isScrolled || forceWhiteHeader
     ? `${baseUrl}assets/LOGO ANHANGA VIAGENS - AZUL.svg`
@@ -107,7 +90,6 @@ const Header: React.FC = () => {
         Pular para o conteúdo
       </a>
       <div className="container mx-auto px-6 flex justify-between items-center">
-        {/* Logo left */}
         <Link
           to="/"
           className="flex items-center gap-2 group focus:outline-none rounded-lg p-1"
@@ -122,7 +104,6 @@ const Header: React.FC = () => {
           />
         </Link>
 
-        {/* Menu right */}
         <div className="flex items-center gap-8">
           <nav className="hidden md:flex items-center gap-8" aria-label="Menu Principal">
             {NAV_LINKS.map((link) => (
@@ -186,11 +167,11 @@ const Header: React.FC = () => {
             </a>
           </nav>
 
-          {/* CTA Button */}
           <div className="hidden md:block">
             <a
               href="#"
               aria-label="Fale Conosco"
+              data-testid="desktop-fale-conosco-btn"
               onClick={handleContactClick}
               className={`btn-whatsapp btn-specialist px-5 py-2.5 rounded-full font-medium text-sm transition-all duration-500 flex items-center gap-2 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-vibrant ${buttonClass}`}
             >
@@ -199,7 +180,6 @@ const Header: React.FC = () => {
             </a>
           </div>
 
-          {/* Mobile Toggle */}
           <button
             className={`md:hidden p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-yellow transition-colors duration-500 ${mobileToggleClass}`}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -212,7 +192,6 @@ const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div id="mobile-menu" className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg py-4 px-6 flex flex-col gap-4 border-t border-gray-100 text-gray-800 animate-fade-in-down">
           {NAV_LINKS.map((link) => (
@@ -246,6 +225,7 @@ const Header: React.FC = () => {
           </a>
           <a
             href="#"
+            data-testid="mobile-fale-conosco-btn"
             className="btn-whatsapp btn-specialist bg-brand-vibrant text-center text-white px-5 py-3 rounded-lg font-bold mt-2 focus:ring-2 focus:ring-offset-2 focus:ring-brand-dark focus:outline-none flex justify-center items-center gap-2"
             onClick={handleContactClick}
           >
