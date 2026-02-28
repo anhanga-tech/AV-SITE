@@ -10,7 +10,7 @@ export const OrganizationSchema = () => (
                 "name": "Anhangá Viagens",
                 "alternateName": "Anhangá Turismo",
                 "url": "https://www.anhanga.tur.br",
-                "logo": "https://www.anhanga.tur.br/logo.png",
+                "logo": "https://www.anhanga.tur.br/assets/LOGO%20ANHANGA%20VIAGENS%20-%20AZUL.svg",
                 "description": "Agência de viagens boutique especializada em roteiros personalizados, turismo de transformação e pacotes exclusivos.",
                 "telephone": "+55-11-52833309",
                 "email": "contato@anhanga.tur.br",

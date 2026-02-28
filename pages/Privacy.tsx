@@ -5,13 +5,13 @@ import Footer from "@/components/Footer";
 const Privacy = () => {
     const metaDescription = "Política de Privacidade e Proteção de Dados da Anhangá Turismo: coleta, tratamento, armazenamento e direitos dos titulares.";
     const canonicalUrl = "https://www.anhanga.tur.br/politica-privacidade";
-    const lastUpdatedDisplay = "26 de fevereiro de 2026";
-    const lastUpdatedIso = "2026-02-26";
+    const lastUpdatedDisplay = "27 de fevereiro de 2026";
+    const lastUpdatedIso = "2026-02-27";
 
     return (
         <div className="min-h-screen bg-background text-foreground">
             <SEO
-                title="Política de Privacidade"
+                title="Política de Privacidade | Anhangá Viagens"
                 description={metaDescription}
                 canonical={canonicalUrl}
             />

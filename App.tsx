@@ -45,11 +45,11 @@ const MainSiteShell: React.FC = () => {
 function App() {
   return (
     <HelmetProvider>
-      <Helmet titleTemplate="%s | Anhangá Viagens">
-        <title>Anhangá Viagens</title>
+      <Helmet >
+        <title>Anhangá Viagens | Roteiros Personalizados e Turismo de Experiência</title>
         <meta
           name="description"
-          content="Agência de viagens boutique especializada em roteiros personalizados."
+          content="Agência de viagens boutique em São Paulo especializada em roteiros personalizados, festivais e experiências exclusivas."
         />
 
         {/* Open Graph (global fallback) */}

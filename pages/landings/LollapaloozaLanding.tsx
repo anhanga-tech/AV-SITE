@@ -29,8 +29,8 @@ const LollapaloozaLanding: React.FC = () => {
   return (
     <>
       <SEO
-        title="Pacotes para Lollapalooza 2026 com hotel e transporte"
-        description="Pacotes para Lollapalooza 2026 com hotel, transporte e suporte para curtir o festival em São Paulo com planejamento completo."
+        title="Pacotes Lollapalooza 2026: Viagem para o Festival em São Paulo"
+        description="Garanta seu pacote para Lollapalooza 2026 com hotel, transporte e suporte especializado em São Paulo. Planejamento completo para curtir o festival sem preocupações."
         canonical="https://www.anhanga.tur.br/lollapalooza-2026"
         keywords="pacotes Lollapalooza 2026, viagem Lollapalooza São Paulo, hotel para Lollapalooza, pacote festival em São Paulo"
       />
