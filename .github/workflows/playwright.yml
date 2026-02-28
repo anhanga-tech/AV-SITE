@@ -11,21 +11,22 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: pnpm/action-setup@v4
-    - uses: actions/setup-node@v4
+    - uses: actions/checkout@v4.2.2
+    - uses: pnpm/action-setup@v4.1.0
+    - uses: actions/setup-node@v4.2.0
       with:
         node-version: lts/*
         cache: 'pnpm'
     - name: Install dependencies
       run: pnpm install
     - name: Install Playwright Browsers
-      run: pnpm exec playwright install --with-deps
+      # In CI only install Chromium to match the CI-only project set in playwright.config.ts
+      run: pnpm exec playwright install --with-deps chromium
     - name: Run Playwright tests
       run: pnpm exec playwright test
       env:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v4.6.2
       if: always()
       with:
         name: playwright-report
