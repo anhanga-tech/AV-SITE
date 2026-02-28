@@ -35,6 +35,6 @@ export class AIChat {
   }
 
   async expectMessageContaining(text: string) {
-    await expect(this.page.locator('div', { hasText: text }).first()).toBeVisible();
+    await expect(this.chatDialog.locator('.prose', { hasText: text }).first()).toBeVisible();
   }
 }
