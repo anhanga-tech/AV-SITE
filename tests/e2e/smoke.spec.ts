@@ -28,7 +28,8 @@ test.describe('Smoke Suite', () => {
 
     await aiChat.expectVisible();
     await aiChat.expectOnlineStatus();
-    await aiChat.expectMessageContaining('Gostaria de falar com um especialista');
+    // Initial greeting is hardcoded in AIChat.tsx state — not AI-generated, so always deterministic
+    await aiChat.expectMessageContaining('Como posso ajudar hoje?');
   });
 
   test('should navigate to basic landing pages', async ({ page }) => {
@@ -41,7 +42,7 @@ test.describe('Smoke Suite', () => {
     for (const landing of landingPages) {
       await page.goto(landing.path);
       await expect(page).toHaveTitle(landing.title);
-      await expect(page.locator('header.fixed.top-0')).not.toBeVisible();
+      await expect(page.getByTestId('site-header')).not.toBeVisible();
     }
   });
 
@@ -56,6 +57,15 @@ test.describe('Smoke Suite', () => {
 
   test('should trigger chatbot from landing pages CTAs', async ({ page }) => {
     const aiChat = new AIChat(page);
+
+    // Intercept Gemini proxy so tests are deterministic and don't hit the real API
+    await page.route('**/api/generate', route =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ text: 'Claro! Posso te ajudar com isso.' }),
+      })
+    );
 
     // Orlando
     await page.goto('/orlando');

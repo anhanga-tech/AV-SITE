@@ -21,7 +21,7 @@ test.describe('Chaos & Unhappy Path Suite', () => {
     await aiChat.sendMessage('Quero viajar para o Japão');
 
     // Verify UI shows error message
-    await expect(page.locator('div', { hasText: /tivemos um problema técnico interno/i }).first()).toBeVisible();
+    await aiChat.expectMessageContaining('Tivemos um problema técnico interno');
   });
 
   test('should handle slow network simulation during chat', async ({ page }) => {
@@ -43,7 +43,7 @@ test.describe('Chaos & Unhappy Path Suite', () => {
     await aiChat.sendMessage('Testando lentidão');
 
     // Verify typing indicator is visible
-    await expect(page.locator('span', { hasText: /digitando/i })).toBeVisible();
+    await expect(aiChat.typingIndicator).toBeVisible();
 
     // Wait for response after delay
     await aiChat.expectMessageContaining('Respondendo após delay');

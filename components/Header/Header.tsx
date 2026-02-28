@@ -81,6 +81,7 @@ const Header: React.FC = () => {
 
   return (
     <header
+      data-testid="site-header"
       className={`fixed top-0 w-full z-50 transition-all duration-500 ease-in-out ${headerClass}`}
     >
       <a
@@ -99,6 +100,7 @@ const Header: React.FC = () => {
           <img
             src={logoSrc}
             alt="Anhangá Viagens"
+            data-testid="header-logo"
             fetchPriority="high"
             className="h-24 w-auto transition-all duration-300 object-contain"
           />

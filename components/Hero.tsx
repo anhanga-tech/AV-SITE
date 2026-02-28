@@ -616,6 +616,7 @@ const Hero: React.FC = () => {
                 </label>
                 <input
                   type="text"
+                  data-testid="destination-input"
                   value={inputValue}
                   onChange={handleDestinationChange}
                   onFocus={() => setShowDestSuggestions(true)}

@@ -15,13 +15,13 @@ export class HomePage {
 
   constructor(page: Page) {
     this.page = page;
-    this.headerLogo = page.locator('header img[alt="Anhangá Viagens"]');
+    this.headerLogo = page.getByTestId('header-logo');
     // Desktop button via data-testid
     this.faleConoscoBtn = page.getByTestId('desktop-fale-conosco-btn');
     // Mobile button in the drawer via data-testid
     this.mobileFaleConoscoBtn = page.getByTestId('mobile-fale-conosco-btn');
 
-    this.destinationInput = page.locator('input[placeholder*="Ex: Orlando, Paris, Brasil..."]');
+    this.destinationInput = page.getByTestId('destination-input');
     this.guestsBtn = page.getByTestId('guests-filter-btn');
     this.datesBtn = page.getByTestId('dates-filter-btn');
     this.tripTypeBtn = page.getByTestId('trip-type-filter-btn');
