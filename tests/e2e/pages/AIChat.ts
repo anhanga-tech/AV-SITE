@@ -16,7 +16,7 @@ export class AIChat {
     this.sendBtn = page.locator('button[aria-label="Enviar mensagem"]');
     this.closeBtn = page.locator('button[aria-label="Minimizar chat"]');
     this.openBtn = page.locator('button[aria-label="Abrir assistente virtual"]');
-    this.typingIndicator = page.locator('span:has-text("digitando...")');
+    this.typingIndicator = page.getByTestId('chat-typing-indicator');
   }
 
   async open() {

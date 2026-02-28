@@ -3,11 +3,8 @@ import { HomePage } from './pages/HomePage';
 import { AIChat } from './pages/AIChat';
 
 test.describe('Smoke Suite', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-  });
-
   test('should load home page and verify key elements', async ({ page, isMobile }) => {
+    await page.goto('/');
     const homePage = new HomePage(page);
     await expect(homePage.headerLogo).toBeVisible();
 
@@ -23,6 +20,7 @@ test.describe('Smoke Suite', () => {
   });
 
   test('should open AI Chatbot via "Fale Conosco" button', async ({ page, isMobile }) => {
+    await page.goto('/');
     const homePage = new HomePage(page);
     const aiChat = new AIChat(page);
 
@@ -49,6 +47,7 @@ test.describe('Smoke Suite', () => {
 
   test('should verify mobile menu visibility', async ({ page, isMobile }) => {
     test.skip(!isMobile, 'This test is for mobile only');
+    await page.goto('/');
     const homePage = new HomePage(page);
     await expect(homePage.mobileMenuBtn).toBeVisible();
     await homePage.openMobileMenu();

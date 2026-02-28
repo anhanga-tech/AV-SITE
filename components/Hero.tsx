@@ -656,6 +656,7 @@ const Hero: React.FC = () => {
                   className="w-full p-3 md:p-6 text-left hover:bg-gray-50/80 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
                   aria-expanded={showCalendar}
                   aria-haspopup="grid"
+                  data-testid="dates-filter-btn"
                 >
                   <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan transition-colors">
                     <Calendar className="w-3 h-3" /> Quando?
@@ -721,6 +722,7 @@ const Hero: React.FC = () => {
                   className="w-full p-3 md:p-6 text-left hover:bg-gray-50/80 transition-all duration-300 md:rounded-tr-[2rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
                   aria-expanded={showGuestDropdown}
                   aria-haspopup="true"
+                  data-testid="guests-filter-btn"
                 >
                   <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan transition-colors">
                     <User className="w-3 h-3" /> Quem vai?
@@ -823,6 +825,7 @@ const Hero: React.FC = () => {
                   className="w-full p-3 md:p-6 text-left hover:bg-gray-50/80 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
                   aria-expanded={showTripTypeDropdown}
                   aria-haspopup="true"
+                  data-testid="trip-type-filter-btn"
                 >
                   <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan transition-colors">
                     <Briefcase className="w-3 h-3" /> Tipo de Viagem
@@ -878,6 +881,7 @@ const Hero: React.FC = () => {
                   className="w-full p-3 md:p-6 text-left hover:bg-gray-50/80 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
                   aria-expanded={showBudgetDropdown}
                   aria-haspopup="true"
+                  data-testid="budget-filter-btn"
                 >
                   <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan transition-colors">
                     <Wallet className="w-3 h-3" /> Orçamento Aprox.
@@ -942,6 +946,7 @@ const Hero: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSearchLoading}
+                  data-testid="submit-search-btn"
                   className={`btn-specialist w-full md:w-auto h-full min-h-[70px] bg-brand-yellow hover:bg-yellow-400 text-brand-dark rounded-2xl md:rounded-[1.5rem] shadow-lg flex items-center justify-center gap-2 px-6 transition-all duration-300 ease-spring hover:scale-105 hover:shadow-xl active:scale-90 group border-2 border-transparent whitespace-nowrap`}
                 >
                   {isSearchLoading ? (
