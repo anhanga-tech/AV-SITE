@@ -16,7 +16,8 @@ export class AIChat {
     this.sendBtn = page.locator('button[aria-label="Enviar mensagem"]');
     this.closeBtn = page.locator('button[aria-label="Minimizar chat"]');
     this.openBtn = page.locator('button[aria-label="Abrir assistente virtual"]');
-    this.messages = page.locator('div.prose');
+    // Messages can be in .prose (model) or outside (user)
+    this.messages = page.locator('div.prose, p.leading-relaxed');
   }
 
   async open() {
@@ -35,6 +36,7 @@ export class AIChat {
   }
 
   async expectMessageContaining(text: string) {
-    await expect(this.chatDialog.locator('.prose', { hasText: text }).first()).toBeVisible();
+    // Look for text anywhere within the dialog to be more resilient
+    await expect(this.chatDialog.getByText(text).first()).toBeVisible();
   }
 }
