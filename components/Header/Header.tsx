@@ -9,9 +9,9 @@ import { getBlogHomeUrl } from '@/utils/blog';
 const NAV_LINKS = [
   { name: 'Destinos', href: 'destinos' },
   {
-    name: 'A Anhangá',
+    name: 'Sobre Nós',
     subLinks: [
-      { name: 'Serviços', href: 'experiencia' },
+      { name: 'Nossa História', href: 'nossa-historia' },
       { name: 'Como Funciona', href: 'como-funciona' },
       { name: 'Depoimentos', href: 'depoimentos' },
     ],
