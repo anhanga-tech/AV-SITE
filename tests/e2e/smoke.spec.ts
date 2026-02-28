@@ -60,21 +60,21 @@ test.describe('Smoke Suite', () => {
 
     // Orlando
     await page.goto('/orlando');
-    await page.locator('button:has-text("Ver Pacotes")').click();
+    await page.getByTestId('cta-orlando-specialist').click();
     await aiChat.expectVisible();
     await aiChat.expectMessageContaining('Orlando');
     await aiChat.close();
 
     // Beto Carrero
     await page.goto('/beto-carrero');
-    await page.locator('.btn-specialist:visible').first().click();
+    await page.getByTestId('cta-betocarrero-specialist').click();
     await aiChat.expectVisible();
     await aiChat.expectMessageContaining('Beto Carrero');
     await aiChat.close();
 
     // Lollapalooza
     await page.goto('/lollapalooza-2026');
-    await page.locator('.btn-specialist:visible').first().click();
+    await page.getByTestId('cta-lollapalooza-specialist').click();
     await aiChat.expectVisible();
     await aiChat.expectMessageContaining('Lollapalooza');
   });

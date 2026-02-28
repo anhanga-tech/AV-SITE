@@ -84,6 +84,7 @@ const LollapaloozaLanding: React.FC = () => {
               }}
               className="btn-whatsapp btn-specialist px-5 py-3 rounded-full bg-brand-cyan text-white font-bold hover:bg-brand-cyan/90 transition-colors"
               data-tracking="cta-final-lollapalooza"
+              data-testid="cta-lollapalooza-specialist"
             >
               Falar com especialista
             </button>
