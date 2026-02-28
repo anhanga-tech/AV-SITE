@@ -16,10 +16,10 @@ export class HomePage {
   constructor(page: Page) {
     this.page = page;
     this.headerLogo = page.locator('header img[alt="Anhangá Viagens"]');
-    // Desktop button (hidden on mobile)
-    this.faleConoscoBtn = page.locator('header .hidden.md\\:block .btn-specialist', { hasText: 'Fale Conosco' });
-    // Mobile button in the drawer (visible only when mobile menu is open)
-    this.mobileFaleConoscoBtn = page.locator('#mobile-menu .btn-specialist', { hasText: 'Fale Conosco' });
+    // Desktop button via data-testid
+    this.faleConoscoBtn = page.getByTestId('desktop-fale-conosco-btn');
+    // Mobile button in the drawer via data-testid
+    this.mobileFaleConoscoBtn = page.getByTestId('mobile-fale-conosco-btn');
 
     this.destinationInput = page.locator('input[placeholder*="Ex: Orlando, Paris, Brasil..."]');
     this.guestsBtn = page.locator('button:has(span:has-text("Nº de Viajantes"))');
