@@ -47,7 +47,7 @@ const BetoCarreroLanding: React.FC = () => {
         ]}
       />
       <FAQPageSchema items={BETO_FAQ_ITEMS} />
-      <Helmet>
+      <Helmet defer={false}>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link

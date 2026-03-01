@@ -20,17 +20,14 @@ test.describe('SEO Metadata Verification', () => {
       await page.goto(route.path);
 
       // Since we removed all SEO tags from index.html, we must wait for Helmet to inject them.
-      // Use a custom wait to ensure the title is updated or meta tag is present.
-      await page.waitForFunction(() => {
-        const desc = document.querySelector('meta[name="description"]');
-        return desc && desc.getAttribute('content') && desc.getAttribute('content').length > 0;
-      }, { timeout: 10000 });
+      // We wait for the description tag as a signal that the SEO component has rendered.
+      await page.waitForSelector('meta[name="description"]', { state: 'attached', timeout: 10000 });
 
       // 1. Verify Title (must be unique and have the correct suffix)
+      // Use toHaveTitle to wait for the title to be updated by Helmet.
+      await expect(page).toHaveTitle(/Anhangá Viagens/);
       const titles = page.locator('title');
       await expect(titles).toHaveCount(1);
-      const titleText = await page.title();
-      expect(titleText).toContain('Anhangá Viagens');
 
       // 2. Verify Description (must be unique)
       const descriptions = page.locator('meta[name="description"]');

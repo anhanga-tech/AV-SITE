@@ -28,12 +28,15 @@ export const SEO: React.FC<SEOProps> = ({
     ? title
     : `${title} | ${siteName}`;
 
-  // Generate canonical URL: absolute, forced www, forced trailing slash
+  // Generate canonical URL: absolute, forced https and www.anhanga.tur.br, forced trailing slash
   let canonicalUrl = canonical;
   if (!canonicalUrl && typeof window !== 'undefined') {
     const url = new URL(window.location.href);
-    // Force www.anhanga.tur.br
+    // Force production hostname and protocol
+    url.protocol = 'https:';
     url.hostname = 'www.anhanga.tur.br';
+    // Remove port if any (dev server)
+    url.port = '';
     // Force trailing slash on pathname
     if (!url.pathname.endsWith('/')) {
       url.pathname += '/';
@@ -44,7 +47,7 @@ export const SEO: React.FC<SEOProps> = ({
     if (canonicalUrl.startsWith('/')) {
         canonicalUrl = `https://www.anhanga.tur.br${canonicalUrl}`;
     }
-    // Ensure absolute canonicals also have trailing slash
+    // Ensure absolute canonicals also have trailing slash (but not on query strings or hashes)
     if (!canonicalUrl.endsWith('/') && !canonicalUrl.includes('?') && !canonicalUrl.includes('#')) {
         canonicalUrl += '/';
     }

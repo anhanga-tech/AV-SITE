@@ -48,7 +48,7 @@ const OrlandoLanding: React.FC = () => {
         ]}
       />
       <FAQPageSchema items={ORLANDO_FAQ_ITEMS} />
-      <Helmet>
+      <Helmet defer={false}>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -64,7 +64,7 @@ const OrlandoLanding: React.FC = () => {
             Se você busca <strong>pacotes para Orlando</strong> com planejamento profissional, a Anhangá estrutura sua viagem com foco em custo-benefício, logística e experiência.
           </p>
           <p className="text-gray-700 text-lg leading-relaxed mb-5">
-            Definimos roteiro de parques, hospedagem por região, estratégia de ingressos e suporte antes e durante a viagem para você evitar erros comuns e aproveitar melhor cada dia.
+            Definimos roteiro de parques, hospedagem por região, estratégia de ingressos e suporte antes e durante a viagem para você evitar erros comuns e aproveitar melhor cada dia de viagem.
           </p>
           <h3 className="text-xl md:text-2xl font-extrabold text-brand-dark mb-3">O que você pode incluir no pacote</h3>
           <ul className="list-disc list-inside text-gray-700 space-y-1 mb-6">
