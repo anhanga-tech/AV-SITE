@@ -28,29 +28,33 @@ export const SEO: React.FC<SEOProps> = ({
     ? title
     : `${title} | ${siteName}`;
 
-  // Generate canonical URL: absolute, forced https and www.anhanga.tur.br, forced trailing slash
-  let canonicalUrl = canonical;
-  if (!canonicalUrl && typeof window !== 'undefined') {
-    const url = new URL(window.location.href);
-    // Force production hostname and protocol
-    url.protocol = 'https:';
-    url.hostname = 'www.anhanga.tur.br';
-    // Remove port if any (dev server)
-    url.port = '';
-    // Force trailing slash on pathname
-    if (!url.pathname.endsWith('/')) {
-      url.pathname += '/';
+  // Helper to normalize canonical URLs
+  const normalizeCanonical = (urlStr: string): string => {
+    try {
+      const url = new URL(urlStr, 'https://www.anhanga.tur.br');
+
+      // Force production hostname and protocol
+      url.protocol = 'https:';
+      url.hostname = 'www.anhanga.tur.br';
+      url.port = ''; // Remove port (dev/preview servers)
+
+      // Normalize trailing slash on pathname (only if no query or hash)
+      if (!url.search && !url.hash && !url.pathname.endsWith('/')) {
+        url.pathname += '/';
+      }
+
+      return url.toString();
+    } catch (e) {
+      return urlStr;
     }
-    canonicalUrl = url.toString();
-  } else if (canonicalUrl) {
-    // If canonical is provided but relative, make it absolute
-    if (canonicalUrl.startsWith('/')) {
-        canonicalUrl = `https://www.anhanga.tur.br${canonicalUrl}`;
-    }
-    // Ensure absolute canonicals also have trailing slash (but not on query strings or hashes)
-    if (!canonicalUrl.endsWith('/') && !canonicalUrl.includes('?') && !canonicalUrl.includes('#')) {
-        canonicalUrl += '/';
-    }
+  };
+
+  // Generate canonical URL
+  let canonicalUrl = '';
+  if (canonical) {
+    canonicalUrl = normalizeCanonical(canonical);
+  } else if (typeof window !== 'undefined') {
+    canonicalUrl = normalizeCanonical(window.location.href);
   }
 
   return (

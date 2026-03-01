@@ -16,38 +16,37 @@ test.describe('SEO Metadata Verification', () => {
 
   for (const route of routes) {
     test(`Checking metadata for ${route.path}`, async ({ page }) => {
-      // Navigate to the route
-      await page.goto(route.path);
+      // Navigate to the route and wait for network to settle
+      await page.goto(route.path, { waitUntil: 'domcontentloaded' });
 
       // Since we removed all SEO tags from index.html, we must wait for Helmet to inject them.
-      // We wait for the description tag as a signal that the SEO component has rendered.
-      await page.waitForSelector('meta[name="description"]', { state: 'attached', timeout: 10000 });
+      // Use toHaveTitle to wait for the title to be updated by Helmet as the first signal.
+      await expect(page).toHaveTitle(/Anhangá Viagens/, { timeout: 15000 });
 
-      // 1. Verify Title (must be unique and have the correct suffix)
-      // Use toHaveTitle to wait for the title to be updated by Helmet.
-      await expect(page).toHaveTitle(/Anhangá Viagens/);
+      // 1. Verify Title (must be unique)
       const titles = page.locator('title');
-      await expect(titles).toHaveCount(1);
+      await expect(titles).toHaveCount(1, { timeout: 10000 });
 
       // 2. Verify Description (must be unique)
       const descriptions = page.locator('meta[name="description"]');
-      await expect(descriptions).toHaveCount(1);
+      // Wait for it to be attached and have content
+      await expect(descriptions).toHaveCount(1, { timeout: 10000 });
       const descriptionContent = await descriptions.getAttribute('content');
       expect(descriptionContent?.length).toBeGreaterThan(50);
 
       // 3. Verify Canonical (must be unique and follow the standard)
       const canonicals = page.locator('link[rel="canonical"]');
-      await expect(canonicals).toHaveCount(1);
+      await expect(canonicals).toHaveCount(1, { timeout: 10000 });
       const canonicalHref = await canonicals.getAttribute('href');
       expect(canonicalHref).toBe(route.expectedCanonical);
 
       // 4. Verify Open Graph Title (must be unique)
       const ogTitles = page.locator('meta[property="og:title"]');
-      await expect(ogTitles).toHaveCount(1);
+      await expect(ogTitles).toHaveCount(1, { timeout: 10000 });
 
       // 5. Verify Open Graph URL (must be unique and match canonical)
       const ogUrls = page.locator('meta[property="og:url"]');
-      await expect(ogUrls).toHaveCount(1);
+      await expect(ogUrls).toHaveCount(1, { timeout: 10000 });
       expect(await ogUrls.getAttribute('content')).toBe(route.expectedCanonical);
     });
   }
