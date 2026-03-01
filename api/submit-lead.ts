@@ -614,8 +614,9 @@ export default async function handler(request: Request): Promise<Response> {
             contactId = resolvedId;
         }
 
+        const rawDealName = `Lead chatbot - ${payload.firstName} ${payload.lastName} - ${payload.destination}`;
         const dealProperties: Record<string, string> = {
-            dealname: `Lead chatbot - ${payload.firstName} ${payload.lastName} - ${payload.destination}`,
+            dealname: rawDealName.length > 255 ? rawDealName.substring(0, 252) + '...' : rawDealName,
             pipeline: dealPipelineId,
             dealstage: dealStageId,
             [dealBantProperty]: payload.bantSummary,
