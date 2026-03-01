@@ -28,9 +28,10 @@ const TRACKING_PROPERTY_MAP: Record<string, string> = {
     sid: 'ga_session_id',
     gclid: 'hs_google_click_id',
     fbclid: 'hs_facebook_click_id',
-    msclkid: 'hs_linkedin_click_id',
+    msclkid: 'hs_microsoft_click_id',
     ttclid: 'tiktok_id',
     gbraid: 'gbraid',
+    wbraid: 'wbraid',
 };
 
 const KNOWN_TRACKING_KEYS = new Set([
@@ -166,12 +167,13 @@ function validatePayload(payload: unknown): { valid: true; data: SubmitLeadReque
     const lastName = cleanString(raw.lastName);
     const email = cleanString(raw.email).toLowerCase();
     const bantSummary = cleanString(raw.bantSummary);
+    const destination = cleanString(raw.destination);
 
-    if (!firstName || !lastName || !email || !bantSummary) {
+    if (!firstName || !lastName || !email || !bantSummary || !destination) {
         return { valid: false, error: 'Campos obrigatórios ausentes.' };
     }
 
-    if (firstName.length > 100 || lastName.length > 100 || email.length > 255 || bantSummary.length > 5000) {
+    if (firstName.length > 100 || lastName.length > 100 || email.length > 255 || bantSummary.length > 5000 || destination.length > 255) {
         return { valid: false, error: 'Entrada muito longa.' };
     }
 
@@ -189,6 +191,7 @@ function validatePayload(payload: unknown): { valid: true; data: SubmitLeadReque
             lastName,
             email,
             bantSummary,
+            destination,
             utms,
             tracking,
         },
@@ -612,7 +615,7 @@ export default async function handler(request: Request): Promise<Response> {
         }
 
         const dealProperties: Record<string, string> = {
-            dealname: `Lead chatbot - ${payload.firstName} ${payload.lastName}`,
+            dealname: `Lead chatbot - ${payload.firstName} ${payload.lastName} - ${payload.destination}`,
             pipeline: dealPipelineId,
             dealstage: dealStageId,
             [dealBantProperty]: payload.bantSummary,

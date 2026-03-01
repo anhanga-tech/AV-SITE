@@ -33,7 +33,7 @@ function getUrl(input: RequestInfo | URL): string {
     return input.url;
 }
 
-test('mapTrackingToContactProperties should map msclkid to hs_linkedin_click_id', () => {
+test('mapTrackingToContactProperties should map msclkid to hs_microsoft_click_id', () => {
     const mapped = mapTrackingToContactProperties({
         utm_source: null,
         utm_medium: null,
@@ -43,11 +43,13 @@ test('mapTrackingToContactProperties should map msclkid to hs_linkedin_click_id'
         cid: 'ga.123',
         msclkid: 'ms-abc',
         gclid: 'g-xyz',
+        wbraid: 'w-123',
     });
 
     assert.equal(mapped.properties.ga_client_id, 'ga.123');
-    assert.equal(mapped.properties.hs_linkedin_click_id, 'ms-abc');
+    assert.equal(mapped.properties.hs_microsoft_click_id, 'ms-abc');
     assert.equal(mapped.properties.hs_google_click_id, 'g-xyz');
+    assert.equal(mapped.properties.wbraid, 'w-123');
 });
 
 test('submit-lead should create contact and deal on first attempt', async (t) => {
@@ -89,6 +91,7 @@ test('submit-lead should create contact and deal on first attempt', async (t) =>
         lastName: 'William',
         email: 'felipe@example.com',
         bantSummary: 'Need: Praia | Authority: casal | Budget: 20k | Timeline: setembro',
+        destination: 'Rio de Janeiro',
         utms: {
             utm_source: 'google',
             utm_medium: 'cpc',
@@ -122,7 +125,11 @@ test('submit-lead should create contact and deal on first attempt', async (t) =>
     assert.equal(contactProps.ga_session_id, 'sid-1');
     assert.equal(contactProps.hs_google_click_id, 'gclid-1');
     assert.equal(contactProps.hs_facebook_click_id, 'fbclid-1');
-    assert.equal(contactProps.hs_linkedin_click_id, 'msclkid-1');
+    assert.equal(contactProps.hs_microsoft_click_id, 'msclkid-1');
+
+    const dealRequest = calls.find((call) => call.url.endsWith('/crm/v3/objects/deals'));
+    assert.ok(dealRequest, 'deal creation request should exist');
+    assert.equal(dealRequest!.body?.properties?.dealname, 'Lead chatbot - Felipe William - Rio de Janeiro');
 });
 
 test('submit-lead should recover on duplicate contact and still create deal', async (t) => {
@@ -167,6 +174,7 @@ test('submit-lead should recover on duplicate contact and still create deal', as
         lastName: 'William',
         email: 'felipe@example.com',
         bantSummary: 'Need: Praia | Authority: casal | Budget: 20k | Timeline: setembro',
+        destination: 'Paris',
         utms: {},
         tracking: {
             cid: 'cid-2',
@@ -224,6 +232,7 @@ test('submit-lead should create fallback note and return warning when deal fails
         lastName: 'William',
         email: 'felipe@example.com',
         bantSummary: 'Need: Praia | Authority: casal | Budget: 20k | Timeline: setembro',
+        destination: 'Orlando',
         utms: {},
         tracking: {
             utm_source: null,
