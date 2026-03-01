@@ -17,7 +17,7 @@ const BetoCarreroLanding = lazy(() => import('./pages/landings/BetoCarreroLandin
 const LollapaloozaLanding = lazy(() => import('./pages/landings/LollapaloozaLanding'));
 const OrlandoLanding = lazy(() => import('./pages/landings/OrlandoLanding'));
 
-import { HelmetProvider, Helmet } from 'react-helmet-async';
+import { HelmetProvider } from 'react-helmet-async';
 
 const MainRouteFallback: React.FC = () => <section className="min-h-[40vh] bg-white" aria-hidden="true" />;
 const LandingRouteFallback: React.FC = () => <div className="min-h-screen bg-white" aria-hidden="true" />;
@@ -45,30 +45,6 @@ const MainSiteShell: React.FC = () => {
 function App() {
   return (
     <HelmetProvider>
-      {/* Fallback global de SEO. Títulos de página devem sempre passar pelo componente <SEO>,
-          que garante o sufixo "| Anhangá Viagens" e evita duplicação. */}
-      <Helmet>
-        <title>Anhangá Viagens | Roteiros Personalizados e Turismo de Experiência</title>
-        <meta
-          name="description"
-          content="Agência de viagens boutique em São Paulo especializada em roteiros personalizados, festivais e experiências exclusivas."
-        />
-
-        {/* Open Graph (global fallback) */}
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="Anhangá Viagens" />
-        <meta property="og:title" content="Anhangá Viagens | Roteiros Personalizados e Turismo de Experiência" />
-        <meta property="og:description" content="Agência de viagens boutique especializada em roteiros personalizados, festivais e experiências no Brasil e no mundo." />
-        <meta property="og:image" content="https://www.anhanga.tur.br/og-image-1200x630.jpg" />
-
-        {/* Twitter (global fallback) */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Anhangá Viagens | Roteiros Personalizados e Turismo de Experiência" />
-        <meta name="twitter:description" content="Agência de viagens boutique especializada em roteiros personalizados, festivais e experiências no Brasil e no mundo." />
-        <meta name="twitter:image" content="https://www.anhanga.tur.br/og-image-1200x630.jpg" />
-
-        {/* NOTE: Do not set canonical/og:url globally here. They must be page-specific to avoid duplicate signals. */}
-      </Helmet>
       <Router>
         <ScrollToTop />
         <Routes>
