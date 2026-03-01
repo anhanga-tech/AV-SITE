@@ -193,6 +193,7 @@ export function useLeadCapture() {
             lastName: cleanValue(merged.lastName),
             email: cleanValue(merged.email).toLowerCase(),
             bantSummary: cleanValue(merged.bantSummary),
+            destination: cleanValue(merged.destination),
             utms: latestUtms,
             tracking: {
                 ...latestTracking,
@@ -200,9 +201,9 @@ export function useLeadCapture() {
             },
         };
 
-        if (!payload.firstName || !payload.lastName || !payload.email || !payload.bantSummary) {
+        if (!payload.firstName || !payload.lastName || !payload.email || !payload.bantSummary || !payload.destination) {
             setIsSubmitting(false);
-            const validationError = 'Preencha firstName, lastName, email e bantSummary antes de enviar.';
+            const validationError = 'Preencha todos os campos obrigatórios (incluindo destino) antes de enviar.';
             setError(validationError);
 
             return {

@@ -31,6 +31,7 @@ export interface SubmitLeadRequest {
     utms: LeadUtms;
     tracking?: LeadTracking;
     bantSummary: string;
+    destination: string;
 }
 
 export interface SubmitLeadSuccess {

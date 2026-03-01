@@ -35,7 +35,7 @@
     function initWhatsAppTracking() {
         // 1. Capturar Parâmetros da URL
         const urlParams = new URLSearchParams(window.location.search);
-        const params = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid', 'ttclid', 'wbraid', 'gbraid'];
+        const params = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid', 'ttclid', 'wbraid', 'gbraid', 'msclkid'];
 
         // Tenta recuperar de sessionStorage primeiro para manter persistência em navegação interna
         let tracking = {};
@@ -61,7 +61,15 @@
             } catch (e) {}
         }
 
-        // 2. Buscar CID e salvar no tracking
+        // 2. Gerar fbc se temos fbclid mas não fbc (independente de GA)
+        if (tracking.fbclid && !tracking.fbc) {
+            tracking.fbc = `fb.1.${Date.now()}.${tracking.fbclid}`;
+            try {
+                sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(tracking));
+            } catch (e) {}
+        }
+
+        // 3. Buscar CID e salvar no tracking
         getGACid((cid) => {
             if (cid) {
                 tracking.cid = cid;
