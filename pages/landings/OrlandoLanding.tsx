@@ -1,8 +1,8 @@
 import React from 'react';
-import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { getWhatsAppLink } from '../../utils/whatsapp';
 import { SEO } from '../../components/SEO';
+import { LandingFAQ } from '../../components/LandingFAQ';
 import OrlandoApp from '../../components/landings/orlando/OrlandoApp';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../../components/schemas/FAQPageSchema';
@@ -11,12 +11,16 @@ import './orlando.css';
 
 const ORLANDO_FAQ_ITEMS = [
   {
-    question: 'O pacote para Orlando inclui passagem, hotel e ingressos?',
-    answer: 'Montamos pacotes completos ou parciais, incluindo aéreo, hospedagem, ingressos e suporte durante a viagem conforme seu perfil e orçamento.'
+    question: 'Qual a melhor época para viajar para Orlando?',
+    answer: 'Para quem busca economia e parques menos cheios, os meses de maio, setembro e final de outubro são excelentes. Se o foco for clima agradável e eventos sazonais, novembro e dezembro oferecem a magia das festas, embora com maior movimento.'
   },
   {
-    question: 'Qual o melhor período para viajar para Orlando?',
-    answer: 'Normalmente os melhores custos aparecem fora dos grandes feriados. Indicamos datas com melhor relação entre clima, fila nos parques e preço final.'
+    question: 'Preciso de visto americano para viajar para Orlando?',
+    answer: 'Sim, cidadãos brasileiros necessitam de visto americano válido. Nossa equipe orienta sobre os passos necessários e prazos recomendados para que você organize sua documentação com antecedência e segurança.'
+  },
+  {
+    question: 'Qual a duração ideal de uma viagem para Orlando?',
+    answer: 'Para conseguir visitar os principais parques da Disney e Universal com calma, recomendamos uma estadia de 10 a 14 dias. Isso permite intercalar dias intensos de parque com dias de descanso ou compras.'
   },
   {
     question: 'A Anhangá ajuda com roteiro diário dos parques?',
@@ -48,15 +52,17 @@ const OrlandoLanding: React.FC = () => {
         ]}
       />
       <FAQPageSchema items={ORLANDO_FAQ_ITEMS} />
-      <Helmet>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@400;700;900&display=swap"
-          rel="stylesheet"
-        />
-      </Helmet>
+
+      {/* React 19 native resource hints */}
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@400;700;900&display=swap"
+        rel="stylesheet"
+      />
+
       <OrlandoApp />
+      <LandingFAQ items={ORLANDO_FAQ_ITEMS} />
       <section className="bg-[#fffdf5] border-t border-brand-cyan/10 py-14">
         <div className="container mx-auto px-6 max-w-5xl">
           <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Pacote para Orlando sem improviso</h2>
@@ -64,7 +70,7 @@ const OrlandoLanding: React.FC = () => {
             Se você busca <strong>pacotes para Orlando</strong> com planejamento profissional, a Anhangá estrutura sua viagem com foco em custo-benefício, logística e experiência.
           </p>
           <p className="text-gray-700 text-lg leading-relaxed mb-5">
-            Definimos roteiro de parques, hospedagem por região, estratégia de ingressos e suporte antes e durante a viagem para você evitar erros comuns e aproveitar melhor cada dia.
+            Definimos roteiro de parques, hospedagem por região, estratégia de ingressos e suporte antes e durante a viagem para você evitar erros comuns e aproveitar melhor cada dia de viagem.
           </p>
           <h3 className="text-xl md:text-2xl font-extrabold text-brand-dark mb-3">O que você pode incluir no pacote</h3>
           <ul className="list-disc list-inside text-gray-700 space-y-1 mb-6">

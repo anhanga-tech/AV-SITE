@@ -23,3 +23,8 @@ This journal documents critical security learnings and vulnerabilities found in 
 **Vulnerability:** Trusting the first value of the `x-forwarded-for` header for client IP identification.
 **Learning:** In many proxy configurations (including Vercel), the `x-forwarded-for` header is a comma-separated list where the client can prepend arbitrary IPs. Trusting the first value allows attackers to spoof their IP and bypass rate limits.
 **Prevention:** Always use the last value in the `x-forwarded-for` chain if the infrastructure (like Vercel or Cloudflare) is known to append the true client IP at the end. Better yet, use platform-specific utilities like `ipAddress(request)` from `@vercel/functions` when available.
+
+## 2025-05-17 - Resource Exhaustion via Tracking Payload and Unmanaged Maps
+**Vulnerability:** Resource Exhaustion (DoS) due to unmanaged in-memory Rate Limit Maps and unvalidated lengths for nested tracking data in `api/submit-lead.ts`.
+**Learning:** In-memory Maps in serverless/Edge functions can grow indefinitely if many unique keys (IPs) are sent, especially on warm instances. Furthermore, nested objects (like `tracking.extras`) are often overlooked in validation, allowing attackers to inflate payloads with large numbers of keys or very long strings.
+**Prevention:** Always implement periodic cleanup for in-memory stores (e.g., GC when Map size exceeds 1000) and enforce strict hard capacity limits. For nested data, enforce both collection size limits (e.g., max 15 entries) and character length limits for both keys and values.

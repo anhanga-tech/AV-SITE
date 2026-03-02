@@ -88,7 +88,7 @@ const BlogList: React.FC = () => {
                                     <div className="absolute bottom-3 right-3 z-30">
                                         <SocialShare
                                             minimal
-                                            url={`https://www.anhanga.tur.br/blog/${post.slug}`}
+                                            url={`https://blog.anhanga.tur.br/${post.slug}/`}
                                             title={post.title}
                                             excerpt={post.excerpt}
                                         />

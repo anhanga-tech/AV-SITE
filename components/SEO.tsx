@@ -1,24 +1,23 @@
 import React from 'react';
-import { Helmet } from 'react-helmet-async';
 
 interface SEOProps {
-    title: string;
-    description: string;
-    canonical?: string;
-    image?: string;
-    type?: 'website' | 'article';
-    keywords?: string;
-    robots?: string;
+  title?: string;
+  description?: string;
+  canonical?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  keywords?: string;
+  robots?: string;
 }
 
 export const SEO: React.FC<SEOProps> = ({
-    title,
-    description,
-    canonical,
-    image = 'https://www.anhanga.tur.br/og-image-1200x630.jpg',
-    type = 'website',
-    keywords = 'viagens personalizadas, agência viagens São Paulo, Lollapalooza 2026, Rock in Rio, The Town, viagens melhor idade, turismo 50+, Disney Orlando, roteiros transformação',
-    robots = 'index, follow'
+  title = 'Anhangá Viagens | Agência de Viagens Personalizadas',
+  description = 'Agência de viagens boutique em São Paulo com roteiros personalizados, experiências no Brasil e no mundo e suporte especializado.',
+  canonical,
+  image = 'https://www.anhanga.tur.br/og-image-1200x630.jpg',
+  type = 'website',
+  keywords = 'agência de viagens em São Paulo, viagens personalizadas, pacotes para Orlando, pacote Beto Carrero, viagem Lollapalooza 2026, viagens melhor idade 50+, roteiros exclusivos',
+  robots = 'index, follow'
 }) => {
     const siteName = "Anhangá Viagens";
     const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
