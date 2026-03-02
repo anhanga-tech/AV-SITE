@@ -25,7 +25,7 @@ const BlogList: React.FC = () => {
             <SEO
                 title="Blog de Viagens e Dicas Práticas"
                 description="Dicas, roteiros e conteúdos para planejar viagens personalizadas com mais segurança, economia e experiência."
-                canonical="https://www.anhanga.tur.br/blog"
+                canonical="https://blog.anhanga.tur.br/"
             />
             <BreadcrumbSchema items={[
                 { name: 'Home', item: 'https://www.anhanga.tur.br/' },
