@@ -23,16 +23,47 @@ export const SEO: React.FC<SEOProps> = ({
     const siteName = "Anhangá Viagens";
     const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     const fullTitle = normalize(title).includes(normalize(siteName)) ? title : `${title} | ${siteName}`;
-    // O replace garante www caso a canonical não seja passada explicitamente (todas as páginas devem passar).
-    const currentUrl = canonical || (typeof window !== 'undefined' ? window.location.href.replace('https://anhanga.tur.br', 'https://www.anhanga.tur.br') : '');
+
+    // Normalization logic for canonical URL
+    const getCanonicalUrl = () => {
+        if (canonical) return canonical;
+        if (typeof window === 'undefined') return '';
+
+        const url = new URL(window.location.href);
+
+        // Detect subdomain to maintain consistency across main site and blog
+        const isBlogSubdomain = url.hostname.startsWith('blog.');
+        const productionDomain = isBlogSubdomain ? 'blog.anhanga.tur.br' : 'www.anhanga.tur.br';
+
+        // Normalization rules:
+        // 1. Main site (www): Remove trailing slash for subpaths (standard for SPAs)
+        // 2. Blog site (blog): Keep/ensure trailing slash (standard for blog platforms/SEO)
+        let pathname = url.pathname;
+
+        if (isBlogSubdomain) {
+            // Ensure trailing slash for blog
+            if (!pathname.endsWith('/')) {
+                pathname += '/';
+            }
+        } else {
+            // Remove trailing slash for main site subpaths
+            if (pathname.length > 1 && pathname.endsWith('/')) {
+                pathname = pathname.slice(0, -1);
+            }
+        }
+
+        return `https://${productionDomain}${pathname}`;
+    };
+
+    const currentUrl = getCanonicalUrl();
 
     return (
-        <Helmet>
+        <Helmet defer={false}>
             {/* Standard Metadata */}
+            <link rel="canonical" href={currentUrl} />
             <title>{fullTitle}</title>
             <meta name="description" content={description} />
             <meta name="keywords" content={keywords} />
-            <link rel="canonical" href={currentUrl} />
 
             {/* Open Graph */}
             <meta property="og:type" content={type} />

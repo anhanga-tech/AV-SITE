@@ -1,6 +1,6 @@
-import { SEO } from "@/components/SEO";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { SEO } from "../components/SEO";
+import Header from "../components/Header/Header";
+import Footer from "../components/Footer";
 
 const Privacy = () => {
     const metaDescription = "Política de Privacidade e Proteção de Dados da Anhangá Turismo: coleta, tratamento, armazenamento e direitos dos titulares.";

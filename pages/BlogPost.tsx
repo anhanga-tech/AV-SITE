@@ -26,8 +26,8 @@ const BlogPost: React.FC = () => {
         return /^[a-zA-Z0-9\-\/]+$/.test(value);
     };
 
-    const canonicalBase = 'https://www.anhanga.tur.br/blog';
-    const canonicalUrl = isValidSlug(slug) ? `${canonicalBase}/${slug}` : canonicalBase;
+    const canonicalBase = 'https://blog.anhanga.tur.br';
+    const canonicalUrl = isValidSlug(slug) ? `${canonicalBase}/${slug}/` : `${canonicalBase}/`;
 
     // Update WhatsApp links with tracking
     useEffect(() => {
@@ -92,7 +92,7 @@ const BlogPost: React.FC = () => {
             />
             <BreadcrumbSchema items={[
                 { name: 'Home', item: 'https://www.anhanga.tur.br/' },
-                { name: 'Blog', item: 'https://www.anhanga.tur.br/blog' },
+                { name: 'Blog', item: 'https://blog.anhanga.tur.br/' },
                 { name: post.title, item: canonicalUrl }
             ]} />
 
