@@ -1,7 +1,8 @@
 import React from 'react';
 import Button from './Button';
 import { Ticket, Plane, Star, ArrowDownLeft, Sparkles, Zap, ArrowDown } from 'lucide-react';
-import { getBetoAssetUrl } from './assetPath';
+import { optimizeRemoteImageUrl } from '@/data/mediaConfig';
+import { PROD_ASSET_BASE } from './constants';
 
 const Hero: React.FC = () => {
   return (
@@ -75,7 +76,7 @@ const Hero: React.FC = () => {
 
               <div className="bg-gray-200 border-2 border-fun-dark overflow-hidden rounded-sm relative w-full h-full">
                 <img
-                  src={getBetoAssetUrl('grupo-em-frente-ao-castelo.jpg')}
+                  src={optimizeRemoteImageUrl(`${PROD_ASSET_BASE}/grupo-em-frente-ao-castelo.jpg`, 1200)}
                   alt="Grupo em frente ao Castelo Beto Carrero"
                   className="object-cover w-full h-full transform group-hover:scale-110 transition-transform duration-700"
                 />

@@ -25,11 +25,11 @@ const BlogList: React.FC = () => {
             <SEO
                 title="Blog de Viagens e Dicas Práticas"
                 description="Dicas, roteiros e conteúdos para planejar viagens personalizadas com mais segurança, economia e experiência."
-                canonical="https://www.anhanga.tur.br/blog"
+                canonical="https://blog.anhanga.tur.br/"
             />
             <BreadcrumbSchema items={[
                 { name: 'Home', item: 'https://www.anhanga.tur.br/' },
-                { name: 'Blog', item: 'https://www.anhanga.tur.br/blog' }
+                { name: 'Blog', item: 'https://blog.anhanga.tur.br/' }
             ]} />
             <div className="min-h-screen bg-[#fffdf5] pt-32 pb-24">
                 <div className="container mx-auto px-6">
@@ -87,7 +87,7 @@ const BlogList: React.FC = () => {
                                     <div className="absolute bottom-3 right-3 z-30">
                                         <SocialShare
                                             minimal
-                                            url={`https://www.anhanga.tur.br/blog/${post.slug}`}
+                                            url={`https://blog.anhanga.tur.br/${post.slug}/`}
                                             title={post.title}
                                             excerpt={post.excerpt}
                                         />

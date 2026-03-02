@@ -34,16 +34,22 @@ export const SEO: React.FC<SEOProps> = ({
 
       // Force production hostname and protocol
       url.protocol = 'https:';
-      url.hostname = 'www.anhanga.tur.br';
+      if (url.hostname !== 'blog.anhanga.tur.br') {
+        url.hostname = 'www.anhanga.tur.br';
+      }
       url.port = ''; // Remove port (dev/preview servers)
 
-      // Normalize trailing slash on pathname (only if no query or hash)
-      if (!url.search && !url.hash && !url.pathname.endsWith('/')) {
+      // Strip query parameters and hash to prevent duplicate content
+      url.search = '';
+      url.hash = '';
+
+      // Normalize trailing slash on pathname (only for extension-less paths)
+      if (!url.pathname.endsWith('/') && !url.pathname.includes('.')) {
         url.pathname += '/';
       }
 
       return url.toString();
-    } catch (e) {
+    } catch {
       return urlStr;
     }
   };

@@ -28,8 +28,8 @@ const BlogPost: React.FC = () => {
         return /^[a-zA-Z0-9\-\/]+$/.test(value);
     };
 
-    const canonicalBase = 'https://www.anhanga.tur.br/blog';
-    const canonicalUrl = isValidSlug(slug) ? `${canonicalBase}/${slug}` : canonicalBase;
+    const canonicalBase = 'https://blog.anhanga.tur.br';
+    const canonicalUrl = isValidSlug(slug) ? `${canonicalBase}/${slug}/` : `${canonicalBase}/`;
 
     // Update WhatsApp links with tracking
     useEffect(() => {
@@ -65,9 +65,9 @@ const BlogPost: React.FC = () => {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-[#fffdf5]">
                 <h2 className="text-4xl font-black text-brand-dark mb-4 text-center px-6">Ops! Artigo não encontrado.</h2>
-                <Link to="/blog" className="text-brand-cyan font-bold hover:underline flex items-center gap-2">
+                <a href="https://blog.anhanga.tur.br" className="text-brand-cyan font-bold hover:underline flex items-center gap-2">
                     <ArrowLeft className="w-4 h-4" /> Voltar para o Blog
-                </Link>
+                </a>
             </div>
         );
     }
@@ -75,7 +75,7 @@ const BlogPost: React.FC = () => {
     // Related posts (excluding current)
     const relatedPosts = BLOG_POSTS.filter(p => p.id !== post.id).slice(0, 2);
 
-    const sameAs = author?.social ? Object.values(author.social).filter(Boolean) : [];
+    const sameAs = author?.social ? (Object.values(author.social).filter(Boolean) as string[]) : [];
 
     return (
         <article className="min-h-screen bg-[#fffdf5]">
@@ -107,7 +107,7 @@ const BlogPost: React.FC = () => {
             )}
             <BreadcrumbSchema items={[
                 { name: 'Home', item: 'https://www.anhanga.tur.br/' },
-                { name: 'Blog', item: 'https://www.anhanga.tur.br/blog' },
+                { name: 'Blog', item: 'https://blog.anhanga.tur.br/' },
                 { name: post.title, item: canonicalUrl }
             ]} />
 
@@ -124,9 +124,9 @@ const BlogPost: React.FC = () => {
 
                 <div className="absolute inset-0 flex items-end pb-20 pt-32">
                     <div className="container mx-auto px-6">
-                        <Link to="/blog" className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-8 font-bold uppercase tracking-wider text-xs transition-colors backdrop-blur-sm bg-white/10 px-4 py-2 rounded-full w-fit hover:bg-white/20 border border-white/20">
+                        <a href="https://blog.anhanga.tur.br" className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-8 font-bold uppercase tracking-wider text-xs transition-colors backdrop-blur-sm bg-white/10 px-4 py-2 rounded-full w-fit hover:bg-white/20 border border-white/20">
                             <ArrowLeft className="w-4 h-4" /> Voltar para o Blog
-                        </Link>
+                        </a>
                         <div className="max-w-4xl">
                             <div className="flex items-center gap-3 mb-6">
                                 <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 ${post.color} shadow-[4px_4px_0px_rgba(0,0,0,0.3)] font-black text-xs uppercase tracking-widest transform -rotate-1`}>
@@ -181,7 +181,7 @@ const BlogPost: React.FC = () => {
                                 </div>
                                 <SocialShare
                                     minimal
-                                    url={`https://www.anhanga.tur.br/blog/${slug}`}
+                                    url={canonicalUrl}
                                     title={post.title}
                                     excerpt={post.excerpt}
                                 />
@@ -209,7 +209,7 @@ const BlogPost: React.FC = () => {
                                     <span className="font-bold text-brand-dark text-lg">Gostou? Espalhe a palavra:</span>
                                 </div>
                                 <SocialShare
-                                    url={`https://www.anhanga.tur.br/blog/${slug}`}
+                                    url={canonicalUrl}
                                     title={post.title}
                                     excerpt={post.excerpt}
                                 />
