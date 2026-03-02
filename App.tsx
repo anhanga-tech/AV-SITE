@@ -15,6 +15,7 @@ const BlogRedirect = lazy(() => import('./pages/BlogRedirect'));
 const Terms = lazy(() => import('./pages/Terms'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 const SiteMap = lazy(() => import('./pages/SiteMap'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 const BetoCarreroLanding = lazy(() => import('./pages/landings/BetoCarreroLanding'));
 const LollapaloozaLanding = lazy(() => import('./pages/landings/LollapaloozaLanding'));
 const OrlandoLanding = lazy(() => import('./pages/landings/OrlandoLanding'));
@@ -36,7 +37,7 @@ const MainSiteShell: React.FC = () => {
           <Route path="/termos-de-uso" element={<Suspense fallback={<MainRouteFallback />}><Terms /></Suspense>} />
           <Route path="/politica-privacidade" element={<Suspense fallback={<MainRouteFallback />}><Privacy /></Suspense>} />
           <Route path="/mapa-do-site" element={<Suspense fallback={<MainRouteFallback />}><SiteMap /></Suspense>} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Suspense fallback={<MainRouteFallback />}><NotFound /></Suspense>} />
         </Routes>
       </main>
       <Footer />
@@ -51,6 +52,7 @@ function App() {
       <Routes>
         <Route path="/beto-carrero" element={<Suspense fallback={<LandingRouteFallback />}><BetoCarreroLanding /></Suspense>} />
         <Route path="/lollapalooza-2026" element={<Suspense fallback={<LandingRouteFallback />}><LollapaloozaLanding /></Suspense>} />
+        <Route path="/lollapalooza" element={<Navigate to="/lollapalooza-2026" replace />} />
         <Route path="/orlando" element={<Suspense fallback={<LandingRouteFallback />}><OrlandoLanding /></Suspense>} />
         <Route path="/*" element={<MainSiteShell />} />
       </Routes>
