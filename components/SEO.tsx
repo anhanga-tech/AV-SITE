@@ -49,7 +49,7 @@ export const SEO: React.FC<SEOProps> = ({
       }
 
       return url.toString();
-    } catch (e) {
+    } catch {
       return urlStr;
     }
   };
