@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { getWhatsAppLink } from '../../utils/whatsapp';
 import { SEO } from '../../components/SEO';
+import { LandingFAQ } from '../../components/LandingFAQ';
 import LollapaloozaApp from '../../components/landings/lollapalooza/LollapaloozaApp';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../../components/schemas/FAQPageSchema';
@@ -12,12 +13,16 @@ import './lollapalooza.css';
 
 const LOLLAPALOOZA_FAQ_ITEMS = [
   {
-    question: 'O pacote para Lollapalooza 2026 inclui hospedagem e transporte?',
-    answer: 'Sim. Montamos pacote com hotel, deslocamento e suporte local, além de sugerir as melhores regiões para ficar perto do festival.'
+    question: 'Como garantir ingressos para o Lollapalooza 2026?',
+    answer: 'Os ingressos são vendidos em lotes e costumam esgotar rápido. Nossa equipe monitora as aberturas oficiais e pode te auxiliar na logística de compra para garantir que você não perca o festival.'
   },
   {
-    question: 'Vocês ajudam na logística do evento em São Paulo?',
-    answer: 'Sim. Organizamos roteiro de chegada e saída, estratégias para os dias de show e recomendações para evitar custos e filas desnecessárias.'
+    question: 'Qual a melhor região para se hospedar durante o festival?',
+    answer: 'Recomendamos hotéis próximos à linha de trem que atende o Autódromo de Interlagos ou nas regiões de Pinheiros e Vila Olímpia, que oferecem fácil acesso e boa estrutura. Nossos pacotes já incluem as melhores opções de curadoria.'
+  },
+  {
+    question: 'Como funciona o transporte para o Autódromo de Interlagos?',
+    answer: 'A forma mais eficiente é utilizar o trem (Linha 9 - Esmeralda) ou o Lolla Express. Em nossos pacotes, orientamos sobre o melhor trajeto e podemos incluir transfers exclusivos para maior conforto do seu grupo.'
   },
   {
     question: 'Posso personalizar o pacote para Lollapalooza com meu grupo?',
@@ -58,6 +63,7 @@ const LollapaloozaLanding: React.FC = () => {
         />
       </Helmet>
       <LollapaloozaApp />
+      <LandingFAQ items={LOLLAPALOOZA_FAQ_ITEMS} />
       <section className="bg-[#fffdf5] border-t border-brand-cyan/10 py-14">
         <div className="container mx-auto px-6 max-w-5xl">
           <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Pacotes para Lollapalooza 2026 com suporte real</h2>
