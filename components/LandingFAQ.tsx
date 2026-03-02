@@ -78,7 +78,7 @@ export const LandingFAQ: React.FC<LandingFAQProps> = ({
                 <div className="bg-[#fffdf5]/50 rounded-3xl p-4 md:p-8 border border-brand-cyan/10">
                     {items.map((item, idx) => (
                         <FAQItemComponent
-                            key={idx}
+                            key={item.question}
                             {...item}
                             isOpen={openIndex === idx}
                             onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
