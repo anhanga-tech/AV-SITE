@@ -134,26 +134,25 @@ function normalizeTracking(value: unknown, utms: LeadUtms): LeadTracking {
     const extras: Record<string, string> = {};
     let count = 0;
 
-    // Limit the number of extra properties to 15 to prevent payload inflation
-    for (const [key, raw] of Object.entries(extrasInput)) {
-        if (count >= 15) break;
+    const processExtra = (key: string, raw: unknown) => {
         const normalized = normalizeNullable(raw);
         if (normalized) {
             const cleanKey = key.trim().substring(0, 64);
             extras[cleanKey] = normalized;
             count++;
         }
+    };
+
+    // Limit the number of extra properties to 15 to prevent payload inflation
+    for (const [key, raw] of Object.entries(extrasInput)) {
+        if (count >= 15) break;
+        processExtra(key, raw);
     }
 
     for (const [key, raw] of Object.entries(source)) {
         if (count >= 15) break;
         if (key === 'extras' || KNOWN_TRACKING_KEYS.has(key)) continue;
-        const normalized = normalizeNullable(raw);
-        if (normalized) {
-            const cleanKey = key.trim().substring(0, 64);
-            extras[cleanKey] = normalized;
-            count++;
-        }
+        processExtra(key, raw);
     }
 
     return {
