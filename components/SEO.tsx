@@ -33,7 +33,7 @@ export const SEO: React.FC<SEOProps> = ({
 
         // Detect subdomain to maintain consistency across main site and blog
         const isBlogSubdomain = url.hostname.startsWith('blog.');
-        const productionDomain = isBlogSubdomain ? 'blog.anhanga.tur.br' : 'www.anhanga.tur.br';
+        const productionDomain = isBlogSubdomain ? (process.env.REACT_APP_BLOG_DOMAIN || 'blog.anhanga.tur.br') : (process.env.REACT_APP_SITE_DOMAIN || 'www.anhanga.tur.br');
 
         // Normalization rules:
         // 1. Main site (www): Remove trailing slash for subpaths (standard for SPAs)
