@@ -79,9 +79,14 @@ function checkRateLimit(clientIP: string): { allowed: boolean; resetIn: number }
 
     // Clean up expired entries periodically (simple garbage collection)
     if (rateLimitStore.size > 1000) {
+        let checked = 0;
         for (const [key, value] of rateLimitStore.entries()) {
             if (now > value.resetTime) {
                 rateLimitStore.delete(key);
+            }
+            // To avoid performance degradation, only check a subset of the oldest entries.
+            if (++checked >= 200) {
+                break;
             }
         }
     }
