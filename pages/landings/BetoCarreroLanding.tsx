@@ -1,5 +1,4 @@
 import React from 'react';
-import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { getWhatsAppLink } from '../../utils/whatsapp';
 import BetoCarreroApp from '../../components/landings/beto-carrero/BetoCarreroApp';
@@ -34,7 +33,7 @@ const BetoCarreroLanding: React.FC = () => {
       />
       <ServiceSchema
         name="Pacote Beto Carrero personalizado"
-        description="Planejamento de pacote para Beto Carrero com hotel, ingressos, transporte e suporte especializado."
+        description="Planejamento de pacote para Beto Carrero with hotel, ingressos, transporte e suporte especializado."
         serviceUrl="https://www.anhanga.tur.br/beto-carrero"
         serviceType="Pacote de viagem para parque temático"
         areaServed="São Paulo e Brasil"
@@ -47,18 +46,19 @@ const BetoCarreroLanding: React.FC = () => {
         ]}
       />
       <FAQPageSchema items={BETO_FAQ_ITEMS} />
-      <Helmet>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600;700&family=Nunito:wght@400;600;700;800&display=swap"
-          rel="stylesheet"
-        />
-      </Helmet>
+
+      {/* React 19 native resource hints */}
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600;700&family=Nunito:wght@400;600;700;800&display=swap"
+        rel="stylesheet"
+      />
+
       <BetoCarreroApp />
       <section className="bg-[#fffdf5] border-t border-brand-cyan/10 py-14">
         <div className="container mx-auto px-6 max-w-5xl">
-          <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Pacote Beto Carrero para viajar com tranquilidade</h2>
+          <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Pacote Beto Carrero para viajar with tranquilidade</h2>
           <p className="text-gray-700 text-lg leading-relaxed mb-5">
             Nosso <strong>pacote Beto Carrero</strong> é desenhado para quem quer curtir o parque sem dor de cabeça com reservas, horários e deslocamentos.
           </p>

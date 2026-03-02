@@ -1,5 +1,4 @@
 import React from 'react';
-import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { getWhatsAppLink } from '../../utils/whatsapp';
 import { SEO } from '../../components/SEO';
@@ -48,14 +47,15 @@ const OrlandoLanding: React.FC = () => {
         ]}
       />
       <FAQPageSchema items={ORLANDO_FAQ_ITEMS} />
-      <Helmet>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@400;700;900&display=swap"
-          rel="stylesheet"
-        />
-      </Helmet>
+
+      {/* React 19 native resource hints */}
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@400;700;900&display=swap"
+        rel="stylesheet"
+      />
+
       <OrlandoApp />
       <section className="bg-[#fffdf5] border-t border-brand-cyan/10 py-14">
         <div className="container mx-auto px-6 max-w-5xl">
@@ -64,7 +64,7 @@ const OrlandoLanding: React.FC = () => {
             Se você busca <strong>pacotes para Orlando</strong> com planejamento profissional, a Anhangá estrutura sua viagem com foco em custo-benefício, logística e experiência.
           </p>
           <p className="text-gray-700 text-lg leading-relaxed mb-5">
-            Definimos roteiro de parques, hospedagem por região, estratégia de ingressos e suporte antes e durante a viagem para você evitar erros comuns e aproveitar melhor cada dia.
+            Definimos roteiro de parques, hospedagem por região, estratégia de ingressos e suporte antes e durante a viagem para você evitar erros comuns e aproveitar melhor cada dia de viagem.
           </p>
           <h3 className="text-xl md:text-2xl font-extrabold text-brand-dark mb-3">O que você pode incluir no pacote</h3>
           <ul className="list-disc list-inside text-gray-700 space-y-1 mb-6">
