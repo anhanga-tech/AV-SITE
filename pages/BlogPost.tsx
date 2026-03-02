@@ -29,7 +29,7 @@ const BlogPost: React.FC = () => {
     };
 
     const canonicalBase = 'https://blog.anhanga.tur.br';
-    const canonicalUrl = isValidSlug(slug) ? `${canonicalBase}/${slug}` : `${canonicalBase}/`;
+    const canonicalUrl = isValidSlug(slug) ? `${canonicalBase}/${slug}/` : `${canonicalBase}/`;
 
     // Update WhatsApp links with tracking
     useEffect(() => {
@@ -107,7 +107,7 @@ const BlogPost: React.FC = () => {
             )}
             <BreadcrumbSchema items={[
                 { name: 'Home', item: 'https://www.anhanga.tur.br/' },
-                { name: 'Blog', item: 'https://www.anhanga.tur.br/blog' },
+                { name: 'Blog', item: 'https://blog.anhanga.tur.br/' },
                 { name: post.title, item: canonicalUrl }
             ]} />
 
@@ -181,7 +181,7 @@ const BlogPost: React.FC = () => {
                                 </div>
                                 <SocialShare
                                     minimal
-                                    url={`https://www.anhanga.tur.br/blog/${slug}`}
+                                    url={canonicalUrl}
                                     title={post.title}
                                     excerpt={post.excerpt}
                                 />
@@ -209,7 +209,7 @@ const BlogPost: React.FC = () => {
                                     <span className="font-bold text-brand-dark text-lg">Gostou? Espalhe a palavra:</span>
                                 </div>
                                 <SocialShare
-                                    url={`https://www.anhanga.tur.br/blog/${slug}`}
+                                    url={canonicalUrl}
                                     title={post.title}
                                     excerpt={post.excerpt}
                                 />

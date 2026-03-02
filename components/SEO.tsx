@@ -43,8 +43,8 @@ export const SEO: React.FC<SEOProps> = ({
       url.search = '';
       url.hash = '';
 
-      // Normalize trailing slash on pathname
-      if (!url.pathname.endsWith('/')) {
+      // Normalize trailing slash on pathname (only for extension-less paths)
+      if (!url.pathname.endsWith('/') && !url.pathname.includes('.')) {
         url.pathname += '/';
       }
 
