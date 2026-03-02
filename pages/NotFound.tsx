@@ -1,0 +1,132 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import MapPin from 'lucide-react/dist/esm/icons/map-pin';
+import HomeIcon from 'lucide-react/dist/esm/icons/home';
+import Compass from 'lucide-react/dist/esm/icons/compass';
+import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left';
+import { SEO } from '../components/SEO';
+import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
+import { getBlogHomeUrl } from '../utils/blog';
+
+const NotFound: React.FC = () => {
+  return (
+    <>
+      <SEO
+        title="Página não encontrada"
+        description="A página que você procura não foi encontrada. Explore nossos roteiros personalizados e planeje sua próxima aventura."
+        robots="noindex, follow"
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', item: 'https://www.anhanga.tur.br/' },
+          { name: 'Página não encontrada', item: typeof window !== 'undefined' ? window.location.href : 'https://www.anhanga.tur.br/404' }
+        ]}
+      />
+
+      <section className="min-h-[70vh] flex items-center justify-center pt-48 pb-20 px-6 bg-brand-light relative overflow-hidden">
+        {/* Background Decorations */}
+        <div className="absolute top-20 left-10 w-64 h-64 bg-brand-cyan/5 rounded-full blur-3xl animate-blob"></div>
+        <div className="absolute bottom-20 right-10 w-80 h-80 bg-brand-yellow/5 rounded-full blur-3xl animate-blob" style={{ animationDelay: '2s' }}></div>
+
+        <div className="container mx-auto max-w-4xl text-center relative z-10">
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-white shadow-xl mb-8 animate-float">
+            <Compass className="w-12 h-12 text-brand-cyan" />
+          </div>
+
+          <h1 className="text-5xl md:text-7xl font-black text-brand-dark mb-6 leading-tight">
+            Ops! Essa página <br />
+            <span className="text-brand-cyan">pegou outro rumo.</span>
+          </h1>
+
+          <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
+            Parece que o destino que você procurava não está no mapa. Que tal recomeçar a sua jornada por um desses caminhos?
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
+            <Link
+              to="/"
+              className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition-all duration-300 group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-brand-light flex items-center justify-center text-brand-cyan group-hover:bg-brand-cyan group-hover:text-white transition-colors">
+                <HomeIcon className="w-6 h-6" />
+              </div>
+              <div className="text-left">
+                <p className="font-bold text-brand-dark">Página Inicial</p>
+                <p className="text-sm text-gray-500">Voltar ao começo</p>
+              </div>
+            </Link>
+
+            <a
+              href={getBlogHomeUrl()}
+              className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition-all duration-300 group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-brand-light flex items-center justify-center text-brand-cyan group-hover:bg-brand-cyan group-hover:text-white transition-colors">
+                <Compass className="w-6 h-6" />
+              </div>
+              <div className="text-left">
+                <p className="font-bold text-brand-dark">Blog de Viagens</p>
+                <p className="text-sm text-gray-500">Dicas e roteiros</p>
+              </div>
+            </a>
+
+            <Link
+              to="/orlando"
+              className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition-all duration-300 group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-brand-light flex items-center justify-center text-brand-cyan group-hover:bg-brand-cyan group-hover:text-white transition-colors">
+                <MapPin className="w-6 h-6" />
+              </div>
+              <div className="text-left">
+                <p className="font-bold text-brand-dark">Orlando</p>
+                <p className="text-sm text-gray-500">Magia e diversão</p>
+              </div>
+            </Link>
+
+            <Link
+              to="/beto-carrero"
+              className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition-all duration-300 group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-brand-light flex items-center justify-center text-brand-cyan group-hover:bg-brand-cyan group-hover:text-white transition-colors">
+                <MapPin className="w-6 h-6" />
+              </div>
+              <div className="text-left">
+                <p className="font-bold text-brand-dark">Beto Carrero</p>
+                <p className="text-sm text-gray-500">Aventura no Brasil</p>
+              </div>
+            </Link>
+
+            <Link
+              to="/lollapalooza-2026"
+              className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition-all duration-300 group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-brand-light flex items-center justify-center text-brand-cyan group-hover:bg-brand-cyan group-hover:text-white transition-colors">
+                <MapPin className="w-6 h-6" />
+              </div>
+              <div className="text-left">
+                <p className="font-bold text-brand-dark">Lollapalooza</p>
+                <p className="text-sm text-gray-500">Música e experiência</p>
+              </div>
+            </Link>
+          </div>
+
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-brand-cyan font-bold hover:gap-4 transition-all duration-300"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Voltar para a Home
+          </Link>
+        </div>
+
+        {/* Wavy Bottom Separator */}
+        <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none rotate-180">
+          <svg className="relative block w-[calc(100%+1.3px)] h-[60px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#ffffff"></path>
+          </svg>
+        </div>
+      </section>
+    </>
+  );
+};
+
+export default NotFound;
