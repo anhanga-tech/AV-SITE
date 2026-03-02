@@ -8,6 +8,7 @@ import Search from 'lucide-react/dist/esm/icons/search';
 import BookOpen from 'lucide-react/dist/esm/icons/book-open';
 import { SocialShare } from '../components/SocialShare';
 import { getWhatsAppLink } from '../utils/whatsapp';
+import { getBlogHomeUrl } from '../utils/blog';
 import { SEO } from '../components/SEO';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 
@@ -25,11 +26,11 @@ const BlogList: React.FC = () => {
             <SEO
                 title="Blog de Viagens e Dicas Práticas"
                 description="Dicas, roteiros e conteúdos para planejar viagens personalizadas com mais segurança, economia e experiência."
-                canonical="https://blog.anhanga.tur.br/"
+                canonical={getBlogHomeUrl()}
             />
             <BreadcrumbSchema items={[
                 { name: 'Home', item: 'https://www.anhanga.tur.br/' },
-                { name: 'Blog', item: 'https://blog.anhanga.tur.br/' }
+                { name: 'Blog', item: getBlogHomeUrl() }
             ]} />
             <div className="min-h-screen bg-[#fffdf5] pt-32 pb-24">
                 <div className="container mx-auto px-6">
