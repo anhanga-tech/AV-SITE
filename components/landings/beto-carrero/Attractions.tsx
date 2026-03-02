@@ -1,8 +1,13 @@
 import React from 'react';
 import SectionTitle from './SectionTitle';
 import { Flame, Star, Users, Zap, Camera } from 'lucide-react';
-import { getBetoAssetUrl } from './assetPath';
 import { optimizeRemoteImageUrl } from '@/data/mediaConfig';
+
+// Images are served from the production Vercel deployment (root path).
+// Direct absolute URLs are used here so optimizeRemoteImageUrl can proxy
+// them through wsrv.nl for WebP conversion. VITE_BASE_PATH (GitHub Pages)
+// is not supported in this optimization flow.
+const PROD_ASSET_BASE = 'https://www.anhanga.tur.br/landing/beto-carrero';
 
 interface Attraction {
   id: number;
@@ -21,7 +26,7 @@ const attractions: Attraction[] = [
     name: "FireWhip",
     category: "Radical",
     description: "A única montanha-russa invertida do Brasil. 5 loopings e pernas soltas no ar!",
-    image: optimizeRemoteImageUrl(`https://www.anhanga.tur.br${getBetoAssetUrl('firewhip.jpg')}`, 800),
+    image: optimizeRemoteImageUrl(`${PROD_ASSET_BASE}/firewhip.jpg`, 800),
     color: "bg-fun-pink",
     icon: <Flame size={18} strokeWidth={3} className="text-white" />,
     rotation: "rotate-2"
@@ -31,7 +36,7 @@ const attractions: Attraction[] = [
     name: "Hot Wheels",
     category: "Show",
     description: "Manobras radicais, drift e muita velocidade em tamanho real. É de cair o queixo.",
-    image: optimizeRemoteImageUrl(`https://www.anhanga.tur.br${getBetoAssetUrl('hotwheels.png')}`, 800),
+    image: optimizeRemoteImageUrl(`${PROD_ASSET_BASE}/hotwheels.png`, 800),
     color: "bg-fun-yellow",
     icon: <Star size={18} strokeWidth={3} className="text-fun-dark" />,
     rotation: "-rotate-1"
@@ -41,7 +46,7 @@ const attractions: Attraction[] = [
     name: "Crazy River",
     category: "Família",
     description: "Um rafting maluco nas corredeiras. Cuidado: você VAI se molhar.",
-    image: optimizeRemoteImageUrl(`https://www.anhanga.tur.br${getBetoAssetUrl('crazy-river.jpg')}`, 800),
+    image: optimizeRemoteImageUrl(`${PROD_ASSET_BASE}/crazy-river.jpg`, 800),
     color: "bg-fun-green",
     icon: <Users size={18} strokeWidth={3} className="text-white" />,
     rotation: "rotate-1"
@@ -51,7 +56,7 @@ const attractions: Attraction[] = [
     name: "Big Tower",
     category: "Adrenalina",
     description: "100 metros de queda livre. A vista é linda, se você tiver coragem de abrir o olho.",
-    image: optimizeRemoteImageUrl(`https://www.anhanga.tur.br${getBetoAssetUrl('big-tower.jpg')}`, 800),
+    image: optimizeRemoteImageUrl(`${PROD_ASSET_BASE}/big-tower.jpg`, 800),
     color: "bg-fun-blue",
     icon: <Zap size={18} strokeWidth={3} className="text-white" />,
     rotation: "-rotate-2"

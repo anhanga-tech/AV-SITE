@@ -1,8 +1,10 @@
 import React from 'react';
 import Button from './Button';
 import { Ticket, Plane, Star, ArrowDownLeft, Sparkles, Zap, ArrowDown } from 'lucide-react';
-import { getBetoAssetUrl } from './assetPath';
 import { optimizeRemoteImageUrl } from '@/data/mediaConfig';
+
+// See comment in Attractions.tsx — direct production URL required for wsrv.nl proxy.
+const PROD_ASSET_BASE = 'https://www.anhanga.tur.br/landing/beto-carrero';
 
 const Hero: React.FC = () => {
   return (
@@ -76,7 +78,7 @@ const Hero: React.FC = () => {
 
               <div className="bg-gray-200 border-2 border-fun-dark overflow-hidden rounded-sm relative w-full h-full">
                 <img
-                  src={optimizeRemoteImageUrl(`https://www.anhanga.tur.br${getBetoAssetUrl('grupo-em-frente-ao-castelo.jpg')}`, 1200)}
+                  src={optimizeRemoteImageUrl(`${PROD_ASSET_BASE}/grupo-em-frente-ao-castelo.jpg`, 1200)}
                   alt="Grupo em frente ao Castelo Beto Carrero"
                   className="object-cover w-full h-full transform group-hover:scale-110 transition-transform duration-700"
                 />
