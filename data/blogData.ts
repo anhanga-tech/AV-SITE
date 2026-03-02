@@ -262,7 +262,7 @@ export const BLOG_POSTS: BlogPost[] = [
             <p>Se Milão é sofisticada, Bolonha é pura alma. Conhecida como "La Grassa" (a gorda), essa cidade respira gastronomia.</p>
             <p><strong>Experiências imperdíveis:</strong></p>
             <ul>
-                <li>Aula de culinária para aprender a fazer tortellini do zero (suas mãos vão doer, mas vale cada secund)</li>
+                <li>Aula de culinária para aprender a fazer tortellini do zero (suas mãos vão doer, mas vale cada segundo)</li>
                 <li>Almoço em uma osteria local com tagliatelle al ragù (nunca, jamais, chame de "spaghetti bolognese")</li>
                 <li>Tour pelo <strong>Mercato di Mezzo</strong> provando queijos, presuntos e vinhos da região</li>
             </ul>
