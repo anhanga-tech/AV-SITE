@@ -34,7 +34,7 @@ const BetoCarreroLanding: React.FC = () => {
       />
       <ServiceSchema
         name="Pacote Beto Carrero personalizado"
-        description="Planejamento de pacote para Beto Carrero with hotel, ingressos, transporte e suporte especializado."
+        description="Planejamento de pacote para Beto Carrero com hotel, ingressos, transporte e suporte especializado."
         serviceUrl="https://www.anhanga.tur.br/beto-carrero"
         serviceType="Pacote de viagem para parque temático"
         areaServed="São Paulo e Brasil"
