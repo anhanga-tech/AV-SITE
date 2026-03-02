@@ -1,5 +1,4 @@
 import React from 'react';
-import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { getWhatsAppLink } from '../../utils/whatsapp';
 import BetoCarreroApp from '../../components/landings/beto-carrero/BetoCarreroApp';
@@ -52,14 +51,15 @@ const BetoCarreroLanding: React.FC = () => {
         ]}
       />
       <FAQPageSchema items={BETO_FAQ_ITEMS} />
-      <Helmet>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600;700&family=Nunito:wght@400;600;700;800&display=swap"
-          rel="stylesheet"
-        />
-      </Helmet>
+
+      {/* React 19 native resource hints */}
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600;700&family=Nunito:wght@400;600;700;800&display=swap"
+        rel="stylesheet"
+      />
+
       <BetoCarreroApp />
       <LandingFAQ items={BETO_FAQ_ITEMS} />
       <section className="bg-[#fffdf5] border-t border-brand-cyan/10 py-14">
