@@ -76,6 +76,21 @@ function getClientIP(request: Request): string {
 
 function checkRateLimit(clientIP: string): { allowed: boolean; resetIn: number } {
     const now = Date.now();
+
+    // Clean up expired entries periodically (simple garbage collection)
+    if (rateLimitStore.size > 1000) {
+        for (const [key, value] of rateLimitStore.entries()) {
+            if (now > value.resetTime) {
+                rateLimitStore.delete(key);
+            }
+        }
+    }
+
+    // Hard capacity limit to prevent memory exhaustion on warm instances
+    if (rateLimitStore.size >= 2000 && !rateLimitStore.has(clientIP)) {
+        return { allowed: false, resetIn: RATE_LIMIT_WINDOW_MS };
+    }
+
     const entry = rateLimitStore.get(clientIP);
     if (!entry || now > entry.resetTime) {
         rateLimitStore.set(clientIP, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
@@ -86,10 +101,11 @@ function checkRateLimit(clientIP: string): { allowed: boolean; resetIn: number }
     return { allowed: true, resetIn: 0 };
 }
 
-function normalizeNullable(value: unknown): string | null {
+function normalizeNullable(value: unknown, maxLength = 255): string | null {
     if (typeof value !== 'string') return null;
     const trimmed = value.trim();
-    return trimmed.length > 0 ? trimmed : null;
+    if (trimmed.length === 0) return null;
+    return trimmed.length > maxLength ? trimmed.substring(0, maxLength) : trimmed;
 }
 
 function normalizeUtms(value: unknown): LeadUtms {
@@ -111,19 +127,27 @@ function normalizeTracking(value: unknown, utms: LeadUtms): LeadTracking {
         : {};
 
     const extras: Record<string, string> = {};
+    let count = 0;
 
+    // Limit the number of extra properties to 15 to prevent payload inflation
     for (const [key, raw] of Object.entries(extrasInput)) {
+        if (count >= 15) break;
         const normalized = normalizeNullable(raw);
         if (normalized) {
-            extras[key] = normalized;
+            const cleanKey = key.trim().substring(0, 64);
+            extras[cleanKey] = normalized;
+            count++;
         }
     }
 
     for (const [key, raw] of Object.entries(source)) {
+        if (count >= 15) break;
         if (key === 'extras' || KNOWN_TRACKING_KEYS.has(key)) continue;
         const normalized = normalizeNullable(raw);
         if (normalized) {
-            extras[key] = normalized;
+            const cleanKey = key.trim().substring(0, 64);
+            extras[cleanKey] = normalized;
+            count++;
         }
     }
 
