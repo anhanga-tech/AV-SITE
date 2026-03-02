@@ -75,7 +75,7 @@ const BlogPost: React.FC = () => {
     // Related posts (excluding current)
     const relatedPosts = BLOG_POSTS.filter(p => p.id !== post.id).slice(0, 2);
 
-    const sameAs = author?.social ? Object.values(author.social) : [];
+    const sameAs = author?.social ? Object.values(author.social).filter(Boolean) : [];
 
     return (
         <article className="min-h-screen bg-[#fffdf5]">
