@@ -5,8 +5,8 @@ import { test, expect } from '@playwright/test';
  * are correctly set, not duplicated, and follow the canonical standards
  * (absolute URLs, www, and trailing slash).
  *
- * Note: We use paths without trailing slashes in goto() to match App.tsx routes,
- * but the canonical verification expects the normalized trailing slash.
+ * Note: React 19 native hoisting is used. Metadata might take a moment
+ * to stabilize during hydration.
  */
 test.describe('SEO Metadata Verification', () => {
   const routes = [
@@ -25,21 +25,22 @@ test.describe('SEO Metadata Verification', () => {
       // Navigate and wait for full load
       await page.goto(route.path, { waitUntil: 'load', timeout: 30000 });
 
-      // Helmet can be slow to hydrate on CI. We wait for the title change as the first signal.
-      // Since index.html has NO title now, page.title() should eventually contain our brand.
-      await expect(page).toHaveTitle(/Anhangá Viagens/, { timeout: 20000 });
+      // Since index.html has NO SEO tags, we wait for any SEO tag to appear
+      // as a signal that React has hoisted the metadata.
+      // Use .first() if multiple tags temporarily exist during hydration (though React 19 should merge them)
+      const description = page.locator('meta[name="description"]').first();
+      await expect(description).toHaveAttribute('content', /.+/, { timeout: 20000 });
 
-      // 1. Verify Title Uniqueness
+      // 1. Verify Title (must be unique)
+      // Note: React 19 handles title updates. We wait for it to contain our brand.
+      await expect(page).toHaveTitle(/Anhangá Viagens/, { timeout: 10000 });
       const titles = page.locator('title');
-      await expect(titles).toHaveCount(1, { timeout: 10000 });
+      await expect(titles).toHaveCount(1);
 
       // 2. Verify Description Presence and Uniqueness
-      const description = page.locator('meta[name="description"]');
-      // Wait for the element to be present and have a non-empty content attribute
-      await expect(description).toHaveAttribute('content', /.+/, { timeout: 15000 });
-      await expect(description).toHaveCount(1);
-
-      const descriptionContent = await description.getAttribute('content');
+      const descriptions = page.locator('meta[name="description"]');
+      await expect(descriptions).toHaveCount(1);
+      const descriptionContent = await descriptions.getAttribute('content');
       expect(descriptionContent?.length).toBeGreaterThan(50);
 
       // 3. Verify Canonical Uniqueness and Value
