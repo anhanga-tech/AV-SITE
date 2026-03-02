@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('404 Page', () => {
   test('should show the 404 page for non-existent routes', async ({ page }) => {
-    await page.goto('/página-que-não-existe');
+    await page.goto('/this-page-does-not-exist');
 
     // Check title
     await expect(page).toHaveTitle(/Página não encontrada | Anhangá Viagens/);
@@ -12,7 +12,7 @@ test.describe('404 Page', () => {
     await expect(page.getByText('pegou outro rumo.')).toBeVisible();
 
     // Check links are present in the 404 section
-    const main404Section = page.locator('section');
+    const main404Section = page.getByTestId('not-found-section');
     await expect(main404Section.getByRole('link', { name: 'Página Inicial' })).toBeVisible();
     await expect(main404Section.getByRole('link', { name: 'Blog de Viagens' })).toBeVisible();
     await expect(main404Section.getByRole('link', { name: 'Orlando' })).toBeVisible();
@@ -40,7 +40,7 @@ test.describe('404 Page', () => {
 
   test('should navigate back to home from 404 page', async ({ page }) => {
     await page.goto('/404-test');
-    await page.locator('section').getByRole('link', { name: 'Página Inicial' }).click();
+    await page.getByTestId('not-found-section').getByRole('link', { name: 'Página Inicial' }).click();
     await expect(page).toHaveURL('/');
   });
 });

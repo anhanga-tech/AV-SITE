@@ -52,6 +52,7 @@ function App() {
       <Routes>
         <Route path="/beto-carrero" element={<Suspense fallback={<LandingRouteFallback />}><BetoCarreroLanding /></Suspense>} />
         <Route path="/lollapalooza-2026" element={<Suspense fallback={<LandingRouteFallback />}><LollapaloozaLanding /></Suspense>} />
+        <Route path="/lollapalooza" element={<Navigate to="/lollapalooza-2026" replace />} />
         <Route path="/orlando" element={<Suspense fallback={<LandingRouteFallback />}><OrlandoLanding /></Suspense>} />
         <Route path="/*" element={<MainSiteShell />} />
       </Routes>
