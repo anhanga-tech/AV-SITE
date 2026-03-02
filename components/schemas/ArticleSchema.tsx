@@ -6,6 +6,7 @@ interface ArticleSchemaProps {
     image: string;
     datePublished: string;
     authorName: string;
+    authorImage?: string;
     url: string;
 }
 
@@ -15,6 +16,7 @@ export const ArticleSchema: React.FC<ArticleSchemaProps> = ({
     image,
     datePublished,
     authorName,
+    authorImage,
     url
 }) => (
     <script
@@ -27,14 +29,15 @@ export const ArticleSchema: React.FC<ArticleSchemaProps> = ({
                 "image": image,
                 "author": {
                     "@type": "Person",
-                    "name": authorName
+                    "name": authorName,
+                    ...(authorImage && { "image": authorImage })
                 },
                 "publisher": {
                     "@type": "Organization",
                     "name": "Anhangá Viagens",
                     "logo": {
                         "@type": "ImageObject",
-                        "url": "https://www.anhanga.tur.br/logo.png"
+                        "url": "https://www.anhanga.tur.br/assets/LOGO%20ANHANGA%20VIAGENS%20-%20AZUL.svg"
                     }
                 },
                 "datePublished": datePublished,

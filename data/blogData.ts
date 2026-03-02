@@ -1,4 +1,64 @@
 
+export interface Author {
+    id: string;
+    name: string;
+    role: string;
+    bio: string;
+    image?: string;
+    social?: {
+        instagram?: string;
+        linkedin?: string;
+    };
+}
+
+export const AUTHORS: Record<string, Author> = {
+    "ana-souza": {
+        id: "ana-souza",
+        name: "Ana Souza",
+        role: "Dicas de Expert",
+        bio: "Especialista em roteiros para a Disney e apaixonada por transformar viagens em família em momentos mágicos.",
+        image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
+        social: {
+            instagram: "https://www.instagram.com/anhangaviagens"
+        }
+    },
+    "rafa-tech": {
+        id: "rafa-tech",
+        name: "Rafa Tech",
+        role: "Especialista em Planejamento",
+        bio: "Entusiasta de tecnologia e organização, focado em tornar cada etapa da viagem mais eficiente e tranquila.",
+        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80"
+    },
+    "luigi": {
+        id: "luigi",
+        name: "Chef Luigi",
+        role: "Crítico Gastronômico",
+        bio: "Viajante incansável em busca dos melhores sabores do mundo, da alta gastronomia à comida de rua.",
+        image: "https://images.unsplash.com/photo-1583394238182-6f71f3ef0864?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80"
+    },
+    "mariana": {
+        id: "mariana",
+        name: "Mariana S.",
+        role: "Consultora de Viagens Românticas",
+        bio: "Especialista em destinos de luxo e roteiros personalizados para casais em busca de momentos únicos.",
+        image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80"
+    },
+    "carlos": {
+        id: "carlos",
+        name: "Carlos Viajante",
+        role: "Explorador Cultural",
+        bio: "Curioso por natureza, adora descobrir as histórias e tradições por trás de cada destino icônico.",
+        image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80"
+    },
+    "equipe-anhanga": {
+        id: "equipe-anhanga",
+        name: "Equipe Anhangá",
+        role: "Especialistas em Viagens",
+        bio: "Nossa equipe de especialistas compartilha as melhores dicas coletivas para sua próxima aventura.",
+        image: "https://www.anhanga.tur.br/logo.png"
+    }
+};
+
 export interface BlogPost {
     id: number;
     slug: string;
@@ -8,7 +68,8 @@ export interface BlogPost {
     image: string;
     category: string;
     date: string;
-    author: string;
+    author: string; // Mantido para compatibilidade simples em alguns lugares
+    authorId?: string; // Link para o objeto Author
     isFeatured?: boolean;
     color: string;
     rotate: string;
@@ -65,6 +126,7 @@ export const BLOG_POSTS: BlogPost[] = [
         category: "Dicas de Expert",
         date: "12 Dez, 2025",
         author: "Ana Souza",
+        authorId: "ana-souza",
         isFeatured: true,
         color: "text-blue-600 bg-blue-50 border-blue-200",
         rotate: "rotate-0"
@@ -166,6 +228,7 @@ export const BLOG_POSTS: BlogPost[] = [
         category: "Planejamento",
         date: "05 Nov, 2025",
         author: "Rafa Tech",
+        authorId: "rafa-tech",
         color: "text-emerald-600 bg-emerald-50 border-emerald-200",
         rotate: "-rotate-2"
     },
@@ -199,7 +262,7 @@ export const BLOG_POSTS: BlogPost[] = [
             <p>Se Milão é sofisticada, Bolonha é pura alma. Conhecida como "La Grassa" (a gorda), essa cidade respira gastronomia.</p>
             <p><strong>Experiências imperdíveis:</strong></p>
             <ul>
-                <li>Aula de culinária para aprender a fazer tortellini do zero (suas mãos vão doer, mas vale cada segundo)</li>
+                <li>Aula de culinária para aprender a fazer tortellini do zero (suas mãos vão doer, mas vale cada secund)</li>
                 <li>Almoço em uma osteria local com tagliatelle al ragù (nunca, jamais, chame de "spaghetti bolognese")</li>
                 <li>Tour pelo <strong>Mercato di Mezzo</strong> provando queijos, presuntos e vinhos da região</li>
             </ul>
@@ -259,6 +322,7 @@ export const BLOG_POSTS: BlogPost[] = [
         category: "Gastronomia",
         date: "28 Out, 2025",
         author: "Chef Luigi",
+        authorId: "luigi",
         color: "text-green-600 bg-green-50 border-green-200",
         rotate: "rotate-2"
     },
@@ -374,6 +438,7 @@ export const BLOG_POSTS: BlogPost[] = [
         category: "Romance",
         date: "15 Set, 2025",
         author: "Mariana S.",
+        authorId: "mariana",
         color: "text-pink-600 bg-pink-50 border-pink-200",
         rotate: "-rotate-1"
     },
@@ -396,7 +461,7 @@ export const BLOG_POSTS: BlogPost[] = [
 
             <h4>Dia 1: Rockefeller Center e Fifth Avenue</h4>
             <p>Comece pelo cartão postal mais famoso do Natal nova-iorquino: a árvore do Rockefeller Center. Com mais de 22 metros de altura e milhares de luzes LED, ela é acesa oficialmente no início de dezembro em uma cerimônia transmitida ao vivo.</p>
-            <p>Logo ao lado, a pista de patinação no gelo do Rockefeller Center espera por você. Sim, vai estar lotada. Sim, você provavelmente vai cair. Mas a experiência de patinar ali com os prédios ao redor iluminados não tem preço.</p>
+            <p>Logo ao lado, a pista de patinação no gelo do Rockefeller Center espera por você. Sim, vai estar lotada. Sim, você provavelmente vai cair. Mas a experiência de patinar ali com os prédios au redor iluminados não tem preço.</p>
             <p><strong>Depois da patinação:</strong> Caminhe pela Fifth Avenue admirando as vitrines das grandes lojas. Saks Fifth Avenue, Bergdorf Goodman, Tiffany & Co. Cada uma cria displays temáticos elaboradíssimos que valem a visita mesmo se você não for comprar nada.</p>
             <p><strong>Onde comer:</strong> Almoce no The Smith (perto do Lincoln Center) ou no Shake Shack para um hambúrguer clássico americano.</p>
 
@@ -480,6 +545,7 @@ export const BLOG_POSTS: BlogPost[] = [
         category: "Sazonal",
         date: "10 Aug, 2025",
         author: "Carlos Viajante",
+        authorId: "carlos",
         color: "text-red-600 bg-red-50 border-red-200",
         rotate: "rotate-1"
     },
@@ -535,6 +601,7 @@ export const BLOG_POSTS: BlogPost[] = [
         category: "Festivais",
         date: "24 Jan, 2026",
         author: "Equipe Anhangá",
+        authorId: "equipe-anhanga",
         color: "text-orange-600 bg-orange-50 border-orange-200",
         rotate: "rotate-1"
     }

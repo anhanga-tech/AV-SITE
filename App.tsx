@@ -9,6 +9,8 @@ import ScrollToTop from './components/ScrollToTop';
 
 // Pages
 import Home from './pages/Home';
+const BlogList = lazy(() => import('./pages/BlogList'));
+const BlogPost = lazy(() => import('./pages/BlogPost'));
 const BlogRedirect = lazy(() => import('./pages/BlogRedirect'));
 const Terms = lazy(() => import('./pages/Terms'));
 const Privacy = lazy(() => import('./pages/Privacy'));
@@ -29,8 +31,10 @@ const MainSiteShell: React.FC = () => {
       <main id="main-content" className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/blog" element={<Suspense fallback={<MainRouteFallback />}><BlogRedirect /></Suspense>} />
-          <Route path="/blog/:slug" element={<Suspense fallback={<MainRouteFallback />}><BlogRedirect /></Suspense>} />
+          <Route path="/blog" element={<Suspense fallback={<MainRouteFallback />}><BlogList /></Suspense>} />
+          <Route path="/blog/:slug" element={<Suspense fallback={<MainRouteFallback />}><BlogPost /></Suspense>} />
+          <Route path="/old-blog" element={<Suspense fallback={<MainRouteFallback />}><BlogRedirect /></Suspense>} />
+          <Route path="/old-blog/:slug" element={<Suspense fallback={<MainRouteFallback />}><BlogRedirect /></Suspense>} />
           <Route path="/termos-de-uso" element={<Suspense fallback={<MainRouteFallback />}><Terms /></Suspense>} />
           <Route path="/politica-privacidade" element={<Suspense fallback={<MainRouteFallback />}><Privacy /></Suspense>} />
           <Route path="/mapa-do-site" element={<Suspense fallback={<MainRouteFallback />}><SiteMap /></Suspense>} />
