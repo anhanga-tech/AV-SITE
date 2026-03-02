@@ -2,9 +2,7 @@ import React from 'react';
 import Button from './Button';
 import { Ticket, Plane, Star, ArrowDownLeft, Sparkles, Zap, ArrowDown } from 'lucide-react';
 import { optimizeRemoteImageUrl } from '@/data/mediaConfig';
-
-// See comment in Attractions.tsx — direct production URL required for wsrv.nl proxy.
-const PROD_ASSET_BASE = 'https://www.anhanga.tur.br/landing/beto-carrero';
+import { PROD_ASSET_BASE } from './constants';
 
 const Hero: React.FC = () => {
   return (

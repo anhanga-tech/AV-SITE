@@ -2,12 +2,7 @@ import React from 'react';
 import SectionTitle from './SectionTitle';
 import { Flame, Star, Users, Zap, Camera } from 'lucide-react';
 import { optimizeRemoteImageUrl } from '@/data/mediaConfig';
-
-// Images are served from the production Vercel deployment (root path).
-// Direct absolute URLs are used here so optimizeRemoteImageUrl can proxy
-// them through wsrv.nl for WebP conversion. VITE_BASE_PATH (GitHub Pages)
-// is not supported in this optimization flow.
-const PROD_ASSET_BASE = 'https://www.anhanga.tur.br/landing/beto-carrero';
+import { PROD_ASSET_BASE } from './constants';
 
 interface Attraction {
   id: number;
