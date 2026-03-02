@@ -17,8 +17,6 @@ const BetoCarreroLanding = lazy(() => import('./pages/landings/BetoCarreroLandin
 const LollapaloozaLanding = lazy(() => import('./pages/landings/LollapaloozaLanding'));
 const OrlandoLanding = lazy(() => import('./pages/landings/OrlandoLanding'));
 
-import { HelmetProvider } from 'react-helmet-async';
-
 const MainRouteFallback: React.FC = () => <section className="min-h-[40vh] bg-white" aria-hidden="true" />;
 const LandingRouteFallback: React.FC = () => <div className="min-h-screen bg-white" aria-hidden="true" />;
 
@@ -44,20 +42,18 @@ const MainSiteShell: React.FC = () => {
 
 function App() {
   return (
-    <HelmetProvider>
-      <Router>
-        <ScrollToTop />
-        <Routes>
-          <Route path="/beto-carrero" element={<Suspense fallback={<LandingRouteFallback />}><BetoCarreroLanding /></Suspense>} />
-          <Route path="/lollapalooza-2026" element={<Suspense fallback={<LandingRouteFallback />}><LollapaloozaLanding /></Suspense>} />
-          <Route path="/orlando" element={<Suspense fallback={<LandingRouteFallback />}><OrlandoLanding /></Suspense>} />
-          <Route path="/*" element={<MainSiteShell />} />
-        </Routes>
-        <AIChat />
-        <Analytics />
-        <SpeedInsights />
-      </Router>
-    </HelmetProvider>
+    <Router>
+      <ScrollToTop />
+      <Routes>
+        <Route path="/beto-carrero" element={<Suspense fallback={<LandingRouteFallback />}><BetoCarreroLanding /></Suspense>} />
+        <Route path="/lollapalooza-2026" element={<Suspense fallback={<LandingRouteFallback />}><LollapaloozaLanding /></Suspense>} />
+        <Route path="/orlando" element={<Suspense fallback={<LandingRouteFallback />}><OrlandoLanding /></Suspense>} />
+        <Route path="/*" element={<MainSiteShell />} />
+      </Routes>
+      <AIChat />
+      <Analytics />
+      <SpeedInsights />
+    </Router>
   );
 }
 

@@ -2,11 +2,8 @@ import { test, expect } from '@playwright/test';
 
 /**
  * Test to verify that SEO metadata (title, description, canonical)
- * are correctly set, not duplicated, and follow the canonical standards
- * (absolute URLs, www, and trailing slash).
- *
- * Note: React 19 native hoisting is used. Metadata might take a moment
- * to stabilize during hydration.
+ * are correctly set, not duplicated, and follow the canonical standards.
+ * Uses React 19 native hoisting.
  */
 test.describe('SEO Metadata Verification', () => {
   const routes = [
@@ -25,27 +22,24 @@ test.describe('SEO Metadata Verification', () => {
       // Navigate and wait for full load
       await page.goto(route.path, { waitUntil: 'load', timeout: 30000 });
 
-      // Since index.html has NO SEO tags, we wait for any SEO tag to appear
-      // as a signal that React has hoisted the metadata.
-      // Use .first() if multiple tags temporarily exist during hydration (though React 19 should merge them)
-      const description = page.locator('meta[name="description"]').first();
-      await expect(description).toHaveAttribute('content', /.+/, { timeout: 20000 });
+      // Since index.html has NO SEO tags, we wait for the brand title to appear.
+      await expect(page).toHaveTitle(/Anhangá Viagens/, { timeout: 15000 });
 
-      // 1. Verify Title (must be unique)
-      // Note: React 19 handles title updates. We wait for it to contain our brand.
-      await expect(page).toHaveTitle(/Anhangá Viagens/, { timeout: 10000 });
+      // 1. Verify Title Uniqueness
       const titles = page.locator('title');
-      await expect(titles).toHaveCount(1);
+      await expect(titles).toHaveCount(1, { timeout: 10000 });
 
       // 2. Verify Description Presence and Uniqueness
-      const descriptions = page.locator('meta[name="description"]');
-      await expect(descriptions).toHaveCount(1);
-      const descriptionContent = await descriptions.getAttribute('content');
+      const description = page.locator('meta[name="description"]');
+      await expect(description).toHaveAttribute('content', /.+/, { timeout: 10000 });
+      await expect(description).toHaveCount(1);
+
+      const descriptionContent = await description.getAttribute('content');
       expect(descriptionContent?.length).toBeGreaterThan(50);
 
       // 3. Verify Canonical Uniqueness and Value
       const canonical = page.locator('link[rel="canonical"]');
-      await expect(canonical).toHaveAttribute('href', route.expectedCanonical, { timeout: 15000 });
+      await expect(canonical).toHaveAttribute('href', route.expectedCanonical, { timeout: 10000 });
       await expect(canonical).toHaveCount(1);
 
       // 4. Verify Open Graph Title
