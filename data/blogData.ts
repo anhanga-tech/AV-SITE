@@ -461,7 +461,7 @@ export const BLOG_POSTS: BlogPost[] = [
 
             <h4>Dia 1: Rockefeller Center e Fifth Avenue</h4>
             <p>Comece pelo cartão postal mais famoso do Natal nova-iorquino: a árvore do Rockefeller Center. Com mais de 22 metros de altura e milhares de luzes LED, ela é acesa oficialmente no início de dezembro em uma cerimônia transmitida ao vivo.</p>
-            <p>Logo ao lado, a pista de patinação no gelo do Rockefeller Center espera por você. Sim, vai estar lotada. Sim, você provavelmente vai cair. Mas a experiência de patinar ali com os prédios au redor iluminados não tem preço.</p>
+            <p>Logo ao lado, a pista de patinação no gelo do Rockefeller Center espera por você. Sim, vai estar lotada. Sim, você provavelmente vai cair. Mas a experiência de patinar ali com os prédios ao redor iluminados não tem preço.</p>
             <p><strong>Depois da patinação:</strong> Caminhe pela Fifth Avenue admirando as vitrines das grandes lojas. Saks Fifth Avenue, Bergdorf Goodman, Tiffany & Co. Cada uma cria displays temáticos elaboradíssimos que valem a visita mesmo se você não for comprar nada.</p>
             <p><strong>Onde comer:</strong> Almoce no The Smith (perto do Lincoln Center) ou no Shake Shack para um hambúrguer clássico americano.</p>
 
