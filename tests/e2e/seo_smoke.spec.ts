@@ -1,15 +1,18 @@
 
 import { test, expect } from '@playwright/test';
+import fs from 'node:fs';
+import path from 'node:path';
 
-const routes = [
-  '/',
-  '/orlando/',
-  '/beto-carrero/',
-  '/lollapalooza-2026/',
-  '/termos-de-uso/',
-  '/politica-privacidade/',
-  '/mapa-do-site/'
-];
+// Parse routes dynamically from sitemap.xml so the test stays in sync
+// automatically whenever new pages are added to the sitemap.
+const getRoutesFromSitemap = (): string[] => {
+  const sitemapPath = path.resolve(process.cwd(), 'public/sitemap.xml');
+  const sitemapXml = fs.readFileSync(sitemapPath, 'utf-8');
+  const matches = sitemapXml.matchAll(/<loc>(.*?)<\/loc>/g);
+  return Array.from(matches).map(m => new URL(m[1]).pathname);
+};
+
+const routes = getRoutesFromSitemap();
 
 test.describe('SEO Smoke Check', () => {
   for (const route of routes) {
