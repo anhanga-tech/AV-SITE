@@ -166,6 +166,7 @@ const PRE_NORMALIZED_DB = DESTINATIONS_DATABASE.map(d => ({
   nCity: normalizeStr(d.city)
 }));
 
+
 /**
  * Static Quick Features list.
  * Moved outside to prevent recreation on every render of Hero.
