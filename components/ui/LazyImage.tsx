@@ -11,7 +11,15 @@ interface LazyImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
     height?: number | string;
 }
 
-export const LazyImage: React.FC<LazyImageProps> = ({
+/**
+ * Optimized LazyImage component.
+ *
+ * PERFORMANCE WIN:
+ * Wrapped in React.memo to prevent unnecessary re-renders in large lists
+ * (like Destinations or Categories) when parent components update state.
+ * This saves DOM operations and reduces CPU usage during scroll or interaction.
+ */
+export const LazyImage = React.memo<LazyImageProps>(({
     src,
     alt,
     className = "",
@@ -74,4 +82,6 @@ export const LazyImage: React.FC<LazyImageProps> = ({
             )}
         </div>
     );
-};
+});
+
+LazyImage.displayName = 'LazyImage';
