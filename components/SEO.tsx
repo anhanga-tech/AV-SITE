@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 interface SEOProps {
   title?: string;
@@ -19,75 +19,73 @@ export const SEO: React.FC<SEOProps> = ({
   keywords = 'agência de viagens em São Paulo, viagens personalizadas, pacotes para Orlando, pacote Beto Carrero, viagem Lollapalooza 2026, viagens melhor idade 50+, roteiros exclusivos',
   robots = 'index, follow'
 }) => {
-    const siteName = "Anhangá Viagens";
-    const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    const fullTitle = normalize(title).includes(normalize(siteName)) ? title : `${title} | ${siteName}`;
+  const siteName = "Anhangá Viagens";
+  const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-    const getCanonicalUrl = () => {
-        if (canonical) return canonical;
-        if (typeof window === 'undefined') return '';
+  // Ensure title has the site name suffix if it doesn't already
+  const fullTitle = normalize(title).includes(normalize(siteName))
+    ? title
+    : `${title} | ${siteName}`;
 
-        const url = new URL(window.location.href);
+  // Helper to normalize canonical URLs
+  const normalizeCanonical = (urlStr: string): string => {
+    try {
+      const url = new URL(urlStr, 'https://www.anhanga.tur.br');
 
-        const isBlogSubdomain = url.hostname.startsWith('blog.');
-        const productionDomain = isBlogSubdomain ? (import.meta.env.VITE_BLOG_DOMAIN || 'blog.anhanga.tur.br') : (import.meta.env.VITE_SITE_DOMAIN || 'www.anhanga.tur.br');
+      // Force production hostname and protocol
+      url.protocol = 'https:';
+      if (url.hostname !== 'blog.anhanga.tur.br') {
+        url.hostname = 'www.anhanga.tur.br';
+      }
+      url.port = ''; // Remove port (dev/preview servers)
 
-        let pathname = url.pathname;
+      // Strip query parameters and hash to prevent duplicate content
+      url.search = '';
+      url.hash = '';
 
-        if (isBlogSubdomain) {
-            if (!pathname.endsWith('/')) {
-                pathname += '/';
-            }
-        } else {
-            if (pathname.length > 1 && pathname.endsWith('/')) {
-                pathname = pathname.slice(0, -1);
-            }
-        }
+      // Normalize trailing slash on pathname (only for extension-less paths)
+      if (!url.pathname.endsWith('/') && !url.pathname.includes('.')) {
+        url.pathname += '/';
+      }
 
-        return `https://${productionDomain}${pathname}`;
-    };
+      return url.toString();
+    } catch (error) {
+      console.error(`[SEO] Failed to normalize canonical URL: "${urlStr}"`, error);
+      return '';
+    }
+  };
 
-    const currentUrl = getCanonicalUrl();
+  // Generate canonical URL
+  let canonicalUrl = '';
+  if (canonical) {
+    canonicalUrl = normalizeCanonical(canonical);
+  } else if (typeof window !== 'undefined') {
+    canonicalUrl = normalizeCanonical(window.location.href);
+  }
 
-    useEffect(() => {
-        document.title = fullTitle;
+  return (
+    <>
+      <title>{fullTitle}</title>
+      <meta name="description" content={description} />
+      <meta name="keywords" content={keywords} />
+      {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
 
-        const setMeta = (attr: string, key: string, content: string) => {
-            let el = document.querySelector(`meta[${attr}="${key}"]`) as HTMLMetaElement | null;
-            if (!el) {
-                el = document.createElement('meta');
-                el.setAttribute(attr, key);
-                document.head.appendChild(el);
-            }
-            el.setAttribute('content', content);
-        };
+      {/* Open Graph */}
+      <meta property="og:type" content={type} />
+      <meta property="og:title" content={fullTitle} />
+      <meta property="og:description" content={description} />
+      {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+      <meta property="og:image" content={image} />
+      <meta property="og:site_name" content={siteName} />
 
-        setMeta('name', 'description', description);
-        setMeta('name', 'keywords', keywords);
-        setMeta('name', 'robots', robots);
+      {/* Twitter */}
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={fullTitle} />
+      <meta name="twitter:description" content={description} />
+      <meta name="twitter:image" content={image} />
 
-        setMeta('property', 'og:type', type);
-        setMeta('property', 'og:title', fullTitle);
-        setMeta('property', 'og:description', description);
-        setMeta('property', 'og:url', currentUrl);
-        setMeta('property', 'og:image', image);
-        setMeta('property', 'og:site_name', siteName);
-
-        setMeta('name', 'twitter:card', 'summary_large_image');
-        setMeta('name', 'twitter:title', fullTitle);
-        setMeta('name', 'twitter:description', description);
-        setMeta('name', 'twitter:image', image);
-
-        if (currentUrl) {
-            let link = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-            if (!link) {
-                link = document.createElement('link');
-                link.setAttribute('rel', 'canonical');
-                document.head.appendChild(link);
-            }
-            link.setAttribute('href', currentUrl);
-        }
-    }, [fullTitle, description, keywords, robots, type, currentUrl, image]);
-
-    return null;
+      {/* Robots */}
+      <meta name="robots" content={robots} />
+    </>
+  );
 };
