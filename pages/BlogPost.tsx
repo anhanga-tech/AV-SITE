@@ -7,6 +7,7 @@ import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left';
 import Clock from 'lucide-react/dist/esm/icons/clock';
 import Tag from 'lucide-react/dist/esm/icons/tag';
 import { getWhatsAppLink } from '../utils/whatsapp';
+import { optimizeRemoteImageUrl } from '../data/mediaConfig';
 
 import { SEO } from '../components/SEO';
 import { ArticleSchema } from '../components/schemas/ArticleSchema';
@@ -114,7 +115,7 @@ const BlogPost: React.FC = () => {
             {/* Hero Header */}
             <div className="relative h-[60vh] min-h-[500px] w-full overflow-hidden">
                 <img
-                    src={post.image}
+                    src={optimizeRemoteImageUrl(post.image, 1200, 675)}
                     alt={post.title}
                     className="w-full h-full object-cover"
                     // @ts-ignore
@@ -258,7 +259,7 @@ const BlogPost: React.FC = () => {
                                     {relatedPosts.map(related => (
                                         <Link to={`/blog/${related.slug}`} key={related.id} className="group flex gap-5 items-center bg-white p-4 rounded-2xl hover:bg-white hover:shadow-xl transition-all border border-transparent hover:border-gray-100 duration-300">
                                             <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0 border border-gray-100 shadow-sm relative">
-                                                <img src={related.image} alt={related.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                                <img src={optimizeRemoteImageUrl(related.image, 200, 200)} alt={related.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                             </div>
                                             <div className="flex flex-col h-full justify-center">
                                                 <div className="mb-2">
