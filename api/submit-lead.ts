@@ -6,11 +6,11 @@ export const config = {
 
 
 // Placeholder conversion stubs (edge-compatible)
-async function sendGoogleConversion(_event: string, _payload: Record<string, unknown>) {
-    return { success: true } as const;
+async function sendGoogleConversion(_event: string, _payload: Record<string, unknown>): Promise<{ success: boolean; error?: string }> {
+    return { success: true };
 }
-async function sendMetaConversion(_payload: Record<string, unknown>) {
-    return { success: true } as const;
+async function sendMetaConversion(_payload: Record<string, unknown>): Promise<{ success: boolean; error?: string }> {
+    return { success: true };
 }
 
 interface RateLimitEntry {

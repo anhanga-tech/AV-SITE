@@ -5,11 +5,11 @@
 export const config = { runtime: 'edge' };
 
 // Placeholder conversion stubs (edge-compatible)
-async function sendGoogleConversion(_event: string, _payload: Record<string, unknown>) {
-  return { success: true } as const;
+async function sendGoogleConversion(_event: string, _payload: Record<string, unknown>): Promise<{ success: boolean; error?: string }> {
+  return { success: true };
 }
-async function sendMetaConversion(_payload: Record<string, unknown>) {
-  return { success: true } as const;
+async function sendMetaConversion(_payload: Record<string, unknown>): Promise<{ success: boolean; error?: string }> {
+  return { success: true };
 }
 
 export default async function handler(request: Request): Promise<Response> {
