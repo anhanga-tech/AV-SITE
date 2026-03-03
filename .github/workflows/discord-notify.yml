@@ -1,1 +1,33 @@
--
+name: Discord Notifications
+
+on:
+  issues:
+    types: [opened, closed, reopened]
+  pull_request:
+    types: [opened, closed, reopened]
+  project_card:
+    types: [moved]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Discord
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        with:
+          args: |
+            ${{ github.event_name == 'issues' && format('📝 Issue {0}: #{1} - {2}', 
+              github.event.action, 
+              github.event.issue.number, 
+              github.event.issue.title
+            ) || '' }}
+            
+            ${{ github.event_name == 'pull_request' && format('🔀 PR {0}: #{1} - {2}', 
+              github.event.action, 
+              github.event.pull_request.number, 
+              github.event.pull_request.title
+            ) || '' }}
+            
+            Link: ${{ github.event.issue.html_url || github.event.pull_request.html_url }}
