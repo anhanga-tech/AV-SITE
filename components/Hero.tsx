@@ -581,7 +581,7 @@ const Hero: React.FC = () => {
           {/* Fun Typography - Dynamic sizing based on content length */}
           <p
             aria-hidden="true"
-            className={`font-extrabold text-white mb-6 leading-[0.9] tracking-tight drop-shadow-lg transition-all duration-500
+            className={`font-sans font-extrabold text-white mb-6 leading-[0.9] tracking-tight drop-shadow-lg transition-all duration-500
                 ${validCityForTitle ? 'text-4xl sm:text-5xl md:text-7xl' : 'text-5xl sm:text-6xl md:text-8xl'}
                 `}
           >
