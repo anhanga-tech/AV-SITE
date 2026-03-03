@@ -19,67 +19,73 @@ export const SEO: React.FC<SEOProps> = ({
   keywords = 'agência de viagens em São Paulo, viagens personalizadas, pacotes para Orlando, pacote Beto Carrero, viagem Lollapalooza 2026, viagens melhor idade 50+, roteiros exclusivos',
   robots = 'index, follow'
 }) => {
-    const siteName = "Anhangá Viagens";
-    const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    const fullTitle = normalize(title).includes(normalize(siteName)) ? title : `${title} | ${siteName}`;
+  const siteName = "Anhangá Viagens";
+  const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-    // Normalization logic for canonical URL
-    const getCanonicalUrl = () => {
-        if (canonical) return canonical;
-        if (typeof window === 'undefined') return '';
+  // Ensure title has the site name suffix if it doesn't already
+  const fullTitle = normalize(title).includes(normalize(siteName))
+    ? title
+    : `${title} | ${siteName}`;
 
-        const url = new URL(window.location.href);
+  // Helper to normalize canonical URLs
+  const normalizeCanonical = (urlStr: string): string => {
+    try {
+      const url = new URL(urlStr, 'https://www.anhanga.tur.br');
 
-        // Detect subdomain to maintain consistency across main site and blog
-        const isBlogSubdomain = url.hostname.startsWith('blog.');
-        const productionDomain = isBlogSubdomain ? (import.meta.env.VITE_BLOG_DOMAIN || 'blog.anhanga.tur.br') : (import.meta.env.VITE_SITE_DOMAIN || 'www.anhanga.tur.br');
+      // Force production hostname and protocol
+      url.protocol = 'https:';
+      if (url.hostname !== 'blog.anhanga.tur.br') {
+        url.hostname = 'www.anhanga.tur.br';
+      }
+      url.port = ''; // Remove port (dev/preview servers)
 
-        // Normalization rules:
-        // 1. Main site (www): Remove trailing slash for subpaths (standard for SPAs)
-        // 2. Blog site (blog): Keep/ensure trailing slash (standard for blog platforms/SEO)
-        let pathname = url.pathname;
+      // Strip query parameters and hash to prevent duplicate content
+      url.search = '';
+      url.hash = '';
 
-        if (isBlogSubdomain) {
-            // Ensure trailing slash for blog
-            if (!pathname.endsWith('/')) {
-                pathname += '/';
-            }
-        } else {
-            // Remove trailing slash for main site subpaths
-            if (pathname.length > 1 && pathname.endsWith('/')) {
-                pathname = pathname.slice(0, -1);
-            }
-        }
+      // Normalize trailing slash on pathname (only for extension-less paths)
+      if (!url.pathname.endsWith('/') && !url.pathname.includes('.')) {
+        url.pathname += '/';
+      }
 
-        return `https://${productionDomain}${pathname}`;
-    };
+      return url.toString();
+    } catch (error) {
+      console.error('[SEO] Failed to normalize canonical URL: "%s"', urlStr, error);
+      return '';
+    }
+  };
 
-    const currentUrl = getCanonicalUrl();
+  // Generate canonical URL
+  let canonicalUrl = '';
+  if (canonical) {
+    canonicalUrl = normalizeCanonical(canonical);
+  } else if (typeof window !== 'undefined') {
+    canonicalUrl = normalizeCanonical(window.location.href);
+  }
 
-    return (
-        <Helmet defer={false}>
-            {/* Standard Metadata */}
-            <link rel="canonical" href={currentUrl} />
-            <title>{fullTitle}</title>
-            <meta name="description" content={description} />
-            <meta name="keywords" content={keywords} />
+  return (
+    <>
+      <title>{fullTitle}</title>
+      <meta name="description" content={description} />
+      <meta name="keywords" content={keywords} />
+      {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
 
-            {/* Open Graph */}
-            <meta property="og:type" content={type} />
-            <meta property="og:title" content={fullTitle} />
-            <meta property="og:description" content={description} />
-            <meta property="og:url" content={currentUrl} />
-            <meta property="og:image" content={image} />
-            <meta property="og:site_name" content={siteName} />
+      {/* Open Graph */}
+      <meta property="og:type" content={type} />
+      <meta property="og:title" content={fullTitle} />
+      <meta property="og:description" content={description} />
+      {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+      <meta property="og:image" content={image} />
+      <meta property="og:site_name" content={siteName} />
 
-            {/* Twitter */}
-            <meta name="twitter:card" content="summary_large_image" />
-            <meta name="twitter:title" content={fullTitle} />
-            <meta name="twitter:description" content={description} />
-            <meta name="twitter:image" content={image} />
-            
-            {/* Robots */}
-            <meta name="robots" content={robots} />
-        </Helmet>
-    );
+      {/* Twitter */}
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={fullTitle} />
+      <meta name="twitter:description" content={description} />
+      <meta name="twitter:image" content={image} />
+
+      {/* Robots */}
+      <meta name="robots" content={robots} />
+    </>
+  );
 };

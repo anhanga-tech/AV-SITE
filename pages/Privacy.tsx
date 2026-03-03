@@ -1,10 +1,10 @@
-import { SEO } from "../components/SEO";
-import Header from "../components/Header/Header";
-import Footer from "../components/Footer";
+import { SEO } from "@/components/SEO";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const Privacy = () => {
     const metaDescription = "Política de Privacidade e Proteção de Dados da Anhangá Turismo: coleta, tratamento, armazenamento e direitos dos titulares.";
-    const canonicalUrl = "https://www.anhanga.tur.br/politica-privacidade";
+    const canonicalUrl = "https://www.anhanga.tur.br/politica-privacidade/";
     const lastUpdatedDisplay = "27 de fevereiro de 2026";
     const lastUpdatedIso = "2026-02-27";
 

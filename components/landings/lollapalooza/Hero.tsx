@@ -104,7 +104,8 @@ const Hero: React.FC = () => {
         </div>
 
         {/* Main Value Proposition */}
-        <h1 className="flex flex-col items-center justify-center mb-6 md:mb-8 text-white max-w-5xl mx-auto">
+        <h1 className="sr-only">Pacotes para Lollapalooza 2026: Hospedagem e Transporte em São Paulo</h1>
+        <div aria-hidden="true" className="flex flex-col items-center justify-center mb-6 md:mb-8 text-white max-w-5xl mx-auto">
             <div className="flex flex-wrap items-center justify-center gap-x-2 sm:gap-x-4 gap-y-2 mb-2 sm:mb-4">
                 <span className="text-xl sm:text-3xl md:text-5xl font-bold drop-shadow-2xl">no</span>
                 <img 
@@ -118,7 +119,7 @@ const Hero: React.FC = () => {
             <span className="text-xl sm:text-3xl md:text-5xl font-bold leading-tight bg-white text-anhanga-darkBlue px-2 sm:px-4 py-1 sm:py-2 rounded-sm shadow-xl box-decoration-clone">
                 conforto, praticidade e a experiência Anhangá
             </span>
-        </h1>
+        </div>
         
         <p className="text-sm sm:text-lg md:text-xl mb-8 md:mb-10 max-w-2xl mx-auto text-gray-200 font-medium drop-shadow-md leading-relaxed px-2">
           Hospedagem selecionada, transporte exclusivo e suporte dedicado para você só se preocupar em curtir os shows.

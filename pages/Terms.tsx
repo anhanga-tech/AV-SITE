@@ -1,11 +1,11 @@
-import { SEO } from "../components/SEO";
-import Header from "../components/Header/Header";
-import Footer from "../components/Footer";
-import { BreadcrumbSchema } from "../components/schemas/BreadcrumbSchema";
+import { SEO } from "@/components/SEO";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { BreadcrumbSchema } from "@/components/schemas/BreadcrumbSchema";
 
 const Terms = () => {
     const metaDescription = "Termos e Condições de Uso da Anhangá Turismo: intermediação, simulações, responsabilidade e privacidade.";
-    const canonicalUrl = "https://www.anhanga.tur.br/termos-de-uso";
+    const canonicalUrl = "https://www.anhanga.tur.br/termos-de-uso/";
     const lastUpdatedDisplay = "27 de fevereiro de 2026";
     const lastUpdatedIso = "2026-02-27";
 
