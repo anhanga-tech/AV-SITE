@@ -19,7 +19,7 @@ interface LazyImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
  * (like Destinations or Categories) when parent components update state.
  * This saves DOM operations and reduces CPU usage during scroll or interaction.
  */
-export const LazyImage: React.FC<LazyImageProps> = React.memo(({
+export const LazyImage = React.memo<LazyImageProps>(({
     src,
     alt,
     className = "",
