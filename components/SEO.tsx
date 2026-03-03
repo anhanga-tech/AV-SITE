@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 interface SEOProps {
   title?: string;
@@ -23,29 +23,22 @@ export const SEO: React.FC<SEOProps> = ({
     const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     const fullTitle = normalize(title).includes(normalize(siteName)) ? title : `${title} | ${siteName}`;
 
-    // Normalization logic for canonical URL
     const getCanonicalUrl = () => {
         if (canonical) return canonical;
         if (typeof window === 'undefined') return '';
 
         const url = new URL(window.location.href);
 
-        // Detect subdomain to maintain consistency across main site and blog
         const isBlogSubdomain = url.hostname.startsWith('blog.');
         const productionDomain = isBlogSubdomain ? (import.meta.env.VITE_BLOG_DOMAIN || 'blog.anhanga.tur.br') : (import.meta.env.VITE_SITE_DOMAIN || 'www.anhanga.tur.br');
 
-        // Normalization rules:
-        // 1. Main site (www): Remove trailing slash for subpaths (standard for SPAs)
-        // 2. Blog site (blog): Keep/ensure trailing slash (standard for blog platforms/SEO)
         let pathname = url.pathname;
 
         if (isBlogSubdomain) {
-            // Ensure trailing slash for blog
             if (!pathname.endsWith('/')) {
                 pathname += '/';
             }
         } else {
-            // Remove trailing slash for main site subpaths
             if (pathname.length > 1 && pathname.endsWith('/')) {
                 pathname = pathname.slice(0, -1);
             }
@@ -56,30 +49,45 @@ export const SEO: React.FC<SEOProps> = ({
 
     const currentUrl = getCanonicalUrl();
 
-    return (
-        <Helmet defer={false}>
-            {/* Standard Metadata */}
-            <link rel="canonical" href={currentUrl} />
-            <title>{fullTitle}</title>
-            <meta name="description" content={description} />
-            <meta name="keywords" content={keywords} />
+    useEffect(() => {
+        document.title = fullTitle;
 
-            {/* Open Graph */}
-            <meta property="og:type" content={type} />
-            <meta property="og:title" content={fullTitle} />
-            <meta property="og:description" content={description} />
-            <meta property="og:url" content={currentUrl} />
-            <meta property="og:image" content={image} />
-            <meta property="og:site_name" content={siteName} />
+        const setMeta = (attr: string, key: string, content: string) => {
+            let el = document.querySelector(`meta[${attr}="${key}"]`) as HTMLMetaElement | null;
+            if (!el) {
+                el = document.createElement('meta');
+                el.setAttribute(attr, key);
+                document.head.appendChild(el);
+            }
+            el.setAttribute('content', content);
+        };
 
-            {/* Twitter */}
-            <meta name="twitter:card" content="summary_large_image" />
-            <meta name="twitter:title" content={fullTitle} />
-            <meta name="twitter:description" content={description} />
-            <meta name="twitter:image" content={image} />
-            
-            {/* Robots */}
-            <meta name="robots" content={robots} />
-        </Helmet>
-    );
+        setMeta('name', 'description', description);
+        setMeta('name', 'keywords', keywords);
+        setMeta('name', 'robots', robots);
+
+        setMeta('property', 'og:type', type);
+        setMeta('property', 'og:title', fullTitle);
+        setMeta('property', 'og:description', description);
+        setMeta('property', 'og:url', currentUrl);
+        setMeta('property', 'og:image', image);
+        setMeta('property', 'og:site_name', siteName);
+
+        setMeta('name', 'twitter:card', 'summary_large_image');
+        setMeta('name', 'twitter:title', fullTitle);
+        setMeta('name', 'twitter:description', description);
+        setMeta('name', 'twitter:image', image);
+
+        if (currentUrl) {
+            let link = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+            if (!link) {
+                link = document.createElement('link');
+                link.setAttribute('rel', 'canonical');
+                document.head.appendChild(link);
+            }
+            link.setAttribute('href', currentUrl);
+        }
+    }, [fullTitle, description, keywords, robots, type, currentUrl, image]);
+
+    return null;
 };
