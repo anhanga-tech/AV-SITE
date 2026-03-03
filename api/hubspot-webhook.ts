@@ -19,14 +19,18 @@ export default async function handler(request: Request): Promise<Response> {
 
   // TODO: Validate HubSpot webhook signature (HUBSPOT_WEBHOOK_SECRET)
   // Docs: https://developers.hubspot.com/docs/api/webhooks/validating-signatures
-
-  const hubspotToken = process.env.HUBSPOT_TOKEN;
-  if (!hubspotToken) {
-    return new Response(JSON.stringify({ error: 'Missing HUBSPOT_TOKEN' }), { status: 500 });
+  const webhookSecret = process.env.HUBSPOT_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    return new Response(JSON.stringify({ error: 'Missing HUBSPOT_WEBHOOK_SECRET' }), { status: 500 });
   }
 
   const body = await request.text();
-  const events = JSON.parse(body);
+  let events: unknown[];
+  try {
+    events = JSON.parse(body);
+  } catch {
+    return new Response(JSON.stringify({ error: 'Invalid JSON body' }), { status: 400 });
+  }
 
   // TODO: Handle deal stage = closed won
   // TODO: Fetch deal details & associated contact

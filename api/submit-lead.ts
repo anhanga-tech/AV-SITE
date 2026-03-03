@@ -700,7 +700,7 @@ export default async function handler(request: Request): Promise<Response> {
             }
         }
 
-                // --- Conversion tracking (server-side) ---
+        // --- Conversion tracking (server-side) ---
         const googleResult = await sendGoogleConversion('lead_qualificado', {
             gclid: payload.tracking?.gclid,
             email: payload.email,
@@ -735,7 +735,7 @@ export default async function handler(request: Request): Promise<Response> {
             metaSuccess: metaResult.success,
         });
 
-return new Response(
+        return new Response(
             JSON.stringify({
                 ok: true,
                 contactId,
