@@ -76,7 +76,11 @@ export const optimizeRemoteImageUrl = (
         const url = new URL(rawUrl);
         if (url.hostname === 'res.cloudinary.com' && rawUrl.includes('/image/upload/')) {
             // Inject Cloudinary delivery transformations only if not already present.
-            if (rawUrl.includes('/image/upload/f_') || rawUrl.includes('/image/upload/q_') || rawUrl.includes('/image/upload/w_')) {
+            // Check if the first path segment after /image/upload/ looks like a transformation
+            // (Cloudinary transforms always contain underscores, e.g. c_fill, f_auto, w_800).
+            const afterUpload = rawUrl.split('/image/upload/')[1] || '';
+            const firstSegment = afterUpload.split('/')[0];
+            if (/[a-z]_/.test(firstSegment)) {
                 return rawUrl;
             }
             const transforms = height
