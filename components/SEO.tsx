@@ -50,7 +50,7 @@ export const SEO: React.FC<SEOProps> = ({
 
       return url.toString();
     } catch (error) {
-      console.error('[SEO] Failed to normalize canonical URL:', urlStr, error);
+      console.error(`[SEO] Failed to normalize canonical URL: "${urlStr}"`, error);
       return '';
     }
   };
