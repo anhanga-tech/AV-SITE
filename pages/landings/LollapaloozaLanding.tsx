@@ -35,13 +35,13 @@ const LollapaloozaLanding: React.FC = () => {
       <SEO
         title="Pacotes Lollapalooza 2026: Viagem para o Festival em São Paulo"
         description="Garanta seu pacote para Lollapalooza 2026 with hotel, transporte e suporte especializado em São Paulo. Planejamento completo para curtir o festival sem preocupações."
-        canonical="https://www.anhanga.tur.br/lollapalooza-2026"
+        canonical="https://www.anhanga.tur.br/lollapalooza-2026/"
         keywords="pacotes Lollapalooza 2026, viagem Lollapalooza São Paulo, hotel para Lollapalooza, pacote festival em São Paulo"
       />
       <ServiceSchema
         name="Pacotes para Lollapalooza 2026"
         description="Planejamento de viagem para o Lollapalooza 2026 com hospedagem, transporte e suporte especializado."
-        serviceUrl="https://www.anhanga.tur.br/lollapalooza-2026"
+        serviceUrl="https://www.anhanga.tur.br/lollapalooza-2026/"
         serviceType="Pacote de viagem para festival"
         areaServed="São Paulo e Brasil"
         keywords={['pacote Lollapalooza 2026', 'viagem para festival', 'hotel em São Paulo para evento']}
@@ -49,7 +49,7 @@ const LollapaloozaLanding: React.FC = () => {
       <BreadcrumbSchema
         items={[
           { name: 'Home', item: 'https://www.anhanga.tur.br/' },
-          { name: 'Pacotes para Lollapalooza 2026', item: 'https://www.anhanga.tur.br/lollapalooza-2026' }
+          { name: 'Pacotes para Lollapalooza 2026', item: 'https://www.anhanga.tur.br/lollapalooza-2026/' }
         ]}
       />
       <FAQPageSchema items={LOLLAPALOOZA_FAQ_ITEMS} />
