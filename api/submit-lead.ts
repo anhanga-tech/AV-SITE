@@ -1,4 +1,6 @@
 import type { LeadTracking, LeadUtms, SubmitLeadRequest, SubmitLeadResponse } from '../types/leadCapture';
+import { sendGoogleConversion } from '../lib/conversions/google';
+import { sendMetaConversion } from '../lib/conversions/meta';
 
 export const config = {
     runtime: 'edge',
@@ -691,7 +693,42 @@ export default async function handler(request: Request): Promise<Response> {
             }
         }
 
-        return new Response(
+                // --- Conversion tracking (server-side) ---
+        const googleResult = await sendGoogleConversion('lead_qualificado', {
+            gclid: payload.tracking?.gclid,
+            email: payload.email,
+            phone: payload.tracking?.extras?.phone,
+        });
+
+        if (!googleResult.success) {
+            console.warn('GOOGLE_ADS: Lead conversion failed (non-blocking)', googleResult.error);
+        }
+
+        const metaResult = await sendMetaConversion({
+            eventName: 'Lead',
+            email: payload.email,
+            phone: payload.tracking?.extras?.phone,
+            firstName: payload.firstName,
+            lastName: payload.lastName,
+            fbclid: payload.tracking?.fbclid,
+            fbc: payload.tracking?.fbc,
+            contentName: payload.destination,
+            contentType: 'destination_interest',
+        });
+
+        if (!metaResult.success) {
+            console.warn('META: Lead conversion failed (non-blocking)', metaResult.error);
+        }
+
+        console.log('CONVERSION_TRACKING: Lead qualified', {
+            email: payload.email,
+            gclid: payload.tracking?.gclid,
+            fbclid: payload.tracking?.fbclid,
+            googleSuccess: googleResult.success,
+            metaSuccess: metaResult.success,
+        });
+
+return new Response(
             JSON.stringify({
                 ok: true,
                 contactId,
