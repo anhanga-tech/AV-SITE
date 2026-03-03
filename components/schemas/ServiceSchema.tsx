@@ -32,7 +32,7 @@ export const ServiceSchema: React.FC<ServiceSchemaProps> = ({
         provider: {
           '@type': 'TravelAgency',
           name: 'Anhangá Viagens',
-          url: 'https://www.anhanga.tur.br',
+          url: 'https://www.anhanga.tur.br/',
           telephone: '+55-11-52833309',
           address: {
             '@type': 'PostalAddress',

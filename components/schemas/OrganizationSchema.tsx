@@ -6,10 +6,11 @@ export const OrganizationSchema = () => (
         dangerouslySetInnerHTML={{
             __html: JSON.stringify({
                 "@context": "https://schema.org",
-                "@type": "Organization",
+                "@type": "TravelAgency",
+                "@id": "https://www.anhanga.tur.br/#organization",
                 "name": "Anhangá Viagens",
                 "alternateName": "Anhangá Turismo",
-                "url": "https://www.anhanga.tur.br",
+                "url": "https://www.anhanga.tur.br/",
                 "logo": "https://www.anhanga.tur.br/assets/LOGO%20ANHANGA%20VIAGENS%20-%20AZUL.svg",
                 "description": "Agência de viagens boutique especializada em roteiros personalizados, turismo de transformação e pacotes exclusivos.",
                 "telephone": "+55-11-52833309",

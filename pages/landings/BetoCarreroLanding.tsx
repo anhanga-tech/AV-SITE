@@ -33,13 +33,13 @@ const BetoCarreroLanding: React.FC = () => {
       <SEO
         title="Pacote Beto Carrero: Diversão para toda a Família"
         description="Pacote Beto Carrero personalizado com hotel, aéreo e ingresso. Planejamento completo para famílias com suporte especializado da Anhangá Viagens em São Paulo."
-        canonical="https://www.anhanga.tur.br/beto-carrero"
+        canonical="https://www.anhanga.tur.br/beto-carrero/"
         keywords="pacote Beto Carrero, viagem Beto Carrero, ingresso Beto Carrero, pacote família Beto Carrero, agência de viagens Beto Carrero"
       />
       <ServiceSchema
         name="Pacote Beto Carrero personalizado"
         description="Planejamento de pacote para Beto Carrero with hotel, ingressos, transporte e suporte especializado."
-        serviceUrl="https://www.anhanga.tur.br/beto-carrero"
+        serviceUrl="https://www.anhanga.tur.br/beto-carrero/"
         serviceType="Pacote de viagem para parque temático"
         areaServed="São Paulo e Brasil"
         keywords={['pacote Beto Carrero', 'ingresso Beto Carrero', 'viagem em família']}
@@ -47,7 +47,7 @@ const BetoCarreroLanding: React.FC = () => {
       <BreadcrumbSchema
         items={[
           { name: 'Home', item: 'https://www.anhanga.tur.br/' },
-          { name: 'Pacote Beto Carrero', item: 'https://www.anhanga.tur.br/beto-carrero' }
+          { name: 'Pacote Beto Carrero', item: 'https://www.anhanga.tur.br/beto-carrero/' }
         ]}
       />
       <FAQPageSchema items={BETO_FAQ_ITEMS} />

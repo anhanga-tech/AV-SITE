@@ -34,13 +34,13 @@ const OrlandoLanding: React.FC = () => {
       <SEO
         title="Pacotes para Orlando 2025/2026 com Roteiro Personalizado"
         description="Pacotes para Orlando 2025 e 2026 com suporte de agência boutique em São Paulo: aéreo, hotel, ingressos e roteiro personalizado para Disney e Universal."
-        canonical="https://www.anhanga.tur.br/orlando"
+        canonical="https://www.anhanga.tur.br/orlando/"
         keywords="pacotes para Orlando, viagem para Orlando, roteiro Disney Orlando, pacote Universal Orlando, agência de viagens Orlando São Paulo"
       />
       <ServiceSchema
         name="Pacotes para Orlando personalizados"
         description="Planejamento de viagem para Orlando com suporte especializado, incluindo aéreo, hotel, ingressos e roteiro personalizado."
-        serviceUrl="https://www.anhanga.tur.br/orlando"
+        serviceUrl="https://www.anhanga.tur.br/orlando/"
         serviceType="Planejamento de viagem para Orlando"
         areaServed="São Paulo e Brasil"
         keywords={['pacotes para Orlando', 'roteiro Disney', 'viagem Universal']}
@@ -48,7 +48,7 @@ const OrlandoLanding: React.FC = () => {
       <BreadcrumbSchema
         items={[
           { name: 'Home', item: 'https://www.anhanga.tur.br/' },
-          { name: 'Pacotes para Orlando', item: 'https://www.anhanga.tur.br/orlando' }
+          { name: 'Pacotes para Orlando', item: 'https://www.anhanga.tur.br/orlando/' }
         ]}
       />
       <FAQPageSchema items={ORLANDO_FAQ_ITEMS} />
