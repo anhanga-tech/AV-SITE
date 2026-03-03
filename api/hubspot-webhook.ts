@@ -1,8 +1,8 @@
 // api/hubspot-webhook.ts
 // Receives HubSpot webhooks for closed deals and sends conversions (PLACEHOLDER)
 
-import { sendGoogleConversion } from '../lib/conversions/google.ts.ts.ts';
-import { sendMetaConversion } from '../lib/conversions/meta.ts.ts.ts';
+import { sendGoogleConversion } from '../lib/conversions/google.ts';
+import { sendMetaConversion } from '../lib/conversions/meta.ts';
 
 export const config = { runtime: 'edge' };
 

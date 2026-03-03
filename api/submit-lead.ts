@@ -1,6 +1,6 @@
 import type { LeadTracking, LeadUtms, SubmitLeadRequest, SubmitLeadResponse } from '../types/leadCapture';
-import { sendGoogleConversion } from '../lib/conversions/google.ts.ts.ts';
-import { sendMetaConversion } from '../lib/conversions/meta.ts.ts.ts';
+import { sendGoogleConversion } from '../lib/conversions/google.ts';
+import { sendMetaConversion } from '../lib/conversions/meta.ts';
 
 export const config = {
     runtime: 'edge',
