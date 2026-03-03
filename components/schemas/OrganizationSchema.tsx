@@ -72,7 +72,8 @@ export const OrganizationSchema = () => (
                     "Turismo de Transformação",
                     "Orlando & Disney",
                     "Beto Carrero World"
-                ]
+                ],
+                "blog": "https://blog.anhanga.tur.br"
             })
         }}
     />
