@@ -20,7 +20,7 @@ const SiteMap: React.FC = () => {
       <SEO
         title="Mapa do Site | Anhangá Viagens"
         description="Navegue pelas principais páginas da Anhangá Viagens, incluindo landings, blog e páginas institucionais."
-        canonical="https://www.anhanga.tur.br/mapa-do-site"
+        canonical="https://www.anhanga.tur.br/mapa-do-site/"
       />
       <main className="min-h-screen bg-[#fffdf5] pt-32 pb-24">
         <section className="container mx-auto px-6 max-w-4xl">

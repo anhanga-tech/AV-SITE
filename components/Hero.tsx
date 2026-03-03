@@ -571,9 +571,17 @@ const Hero: React.FC = () => {
 
 
 
+          {/* SEO H1 - Hidden from UI, but present for crawlers */}
+          <h1 className="sr-only">
+            {validCityForTitle
+              ? `Agência de Viagens em São Paulo: Sua Próxima Aventura em ${validCityForTitle}`
+              : "Anhangá Viagens: Agência de Viagens em São Paulo com Roteiros Personalizados"}
+          </h1>
+
           {/* Fun Typography - Dynamic sizing based on content length */}
-          <h1
-            className={`font-extrabold text-white mb-6 leading-[0.9] tracking-tight drop-shadow-lg transition-all duration-500
+          <p
+            aria-hidden="true"
+            className={`font-sans font-extrabold text-white mb-6 leading-[0.9] tracking-tight drop-shadow-lg transition-all duration-500
                 ${validCityForTitle ? 'text-4xl sm:text-5xl md:text-7xl' : 'text-5xl sm:text-6xl md:text-8xl'}
                 `}
           >
@@ -593,7 +601,7 @@ const Hero: React.FC = () => {
                 />
               </svg>
             </span>
-          </h1>
+          </p>
 
           <p className="text-white/90 text-xl md:text-2xl max-w-2xl mx-auto mb-12 font-medium leading-relaxed drop-shadow-md">
             Roteiros que parecem feitos à mão. <br />
