@@ -224,7 +224,7 @@ export const BLOG_POSTS: BlogPost[] = [
                 <p class="mb-0 text-emerald-700">Entre em contato e solicite um orçamento personalizado. Vamos ajudar você a organizar cada detalhe da sua viagem, transformando sua experiência em memórias inesquecíveis.</p>
             </div>
         `,
-        image: "https://images.pexels.com/photos/9185786/pexels-photo-9185786.jpeg",
+        image: "https://res.cloudinary.com/dzehqrcmm/image/upload/c_fill,g_auto,w_800/f_auto/q_auto/blog/pexels-photo-9185786.jpg",
         category: "Planejamento",
         date: "05 Nov, 2025",
         author: "Rafa Tech",
@@ -541,7 +541,7 @@ export const BLOG_POSTS: BlogPost[] = [
                 <p class="mb-0 text-red-700">Entre em contato e solicite um orçamento personalizado para sua viagem a Nova York no Natal. Vamos planejar cada detalhe para que você volte com memórias que vão durar para sempre.</p>
             </div>
         `,
-        image: "https://images.pexels.com/photos/35584616/pexels-photo-35584616.jpeg",
+        image: "https://res.cloudinary.com/dzehqrcmm/image/upload/c_fill,g_auto,w_800/f_auto/q_auto/blog/pexels-photo-35584616.jpg",
         category: "Sazonal",
         date: "10 Aug, 2025",
         author: "Carlos Viajante",
@@ -597,7 +597,7 @@ export const BLOG_POSTS: BlogPost[] = [
                 <p class="mb-0 text-orange-700">Fale agora com a equipe da Anhangá Viagens e receba um orçamento personalizado, feito para o seu estilo e seu roteiro. <a href="https://wa.me/551152833309" target="_blank" rel="noopener noreferrer" class="font-bold underline hover:text-orange-900">Clique aqui para conversar</a> e começar o planejamento do seu festival dos sonhos.</p>
             </div>
         `,
-        image: "https://images.pexels.com/photos/1306791/pexels-photo-1306791.jpeg",
+        image: "https://res.cloudinary.com/dzehqrcmm/image/upload/c_fill,g_auto,w_800/f_auto/q_auto/blog/pexels-photo-1306791.jpg",
         category: "Festivais",
         date: "24 Jan, 2026",
         author: "Equipe Anhangá",
