@@ -8,6 +8,7 @@ import Search from 'lucide-react/dist/esm/icons/search';
 import BookOpen from 'lucide-react/dist/esm/icons/book-open';
 import { SocialShare } from '../components/SocialShare';
 import { getWhatsAppLink } from '../utils/whatsapp';
+import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 import { SEO } from '../components/SEO';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 
@@ -87,7 +88,7 @@ const BlogList: React.FC = () => {
                                     <div className="absolute bottom-3 right-3 z-30">
                                         <SocialShare
                                             minimal
-                                            url={`https://blog.anhanga.tur.br/${post.slug}/`}
+                                            url={getBlogPostUrl(post.slug)}
                                             title={post.title}
                                             excerpt={post.excerpt}
                                         />
