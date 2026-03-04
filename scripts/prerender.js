@@ -22,12 +22,16 @@ const PORT = 3001;
 async function prerender() {
   console.log('🚀 Starting pre-rendering...');
 
-  // Start a simple static server
+  const originalIndex = path.join(DIST_DIR, 'index.html');
+  if (!fs.existsSync(originalIndex)) {
+    throw new Error('Vite build output (dist/index.html) not found!');
+  }
+
   const { createServer } = await import('http');
   const sirv = (await import('sirv')).default;
-  const handler = sirv(DIST_DIR, { single: true });
-  const server = createServer((req, res) => handler(req, res));
+  const handler = sirv(DIST_DIR, { single: true, cleanUrls: true });
 
+  const server = createServer((req, res) => handler(req, res));
   server.listen(PORT);
   console.log(`📡 Static server running at http://localhost:${PORT}`);
 
@@ -35,60 +39,81 @@ async function prerender() {
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
 
-  const keepLast = (html, tagPattern) => {
-    const matches = [...html.matchAll(tagPattern)];
-    if (matches.length > 1) {
-      const lastMatch = matches[matches.length - 1][0];
-      html = html.replace(tagPattern, '');
-      html = html.replace('<head>', `<head>${lastMatch}`);
-    }
-    return html;
-  };
-
-  const cleanTags = (html, tagPattern, fallbackValue = null) => {
-    const matches = [...html.matchAll(tagPattern)];
-    if (matches.length > 1) {
-      let bestMatch = matches[matches.length - 1][0];
-      if (fallbackValue) {
-        const nonFallback = matches.find(m => !m[0].includes(fallbackValue));
-        if (nonFallback) {
-          bestMatch = nonFallback[0];
-        }
-      }
-      html = html.replace(tagPattern, '');
-      html = html.replace('<head>', `<head>${bestMatch}`);
-    }
-    return html;
-  };
-
   for (const route of ROUTES) {
     console.log(`📄 Prerendering: ${route}`);
     const page = await browser.newPage();
-
     await page.setViewport({ width: 1280, height: 720 });
 
     await page.goto(`http://localhost:${PORT}${route}`, {
-      waitUntil: 'networkidle0'
+      waitUntil: 'networkidle0',
+      timeout: 60000
     });
 
-    await page.waitForSelector('#root');
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Wait for SPA stability
+    await page.waitForSelector('#root > *', { timeout: 30000 });
+    // Aggressive wait for React 19 metadata hoisting
+    await new Promise(resolve => setTimeout(resolve, 8000));
 
-    let html = await page.content();
+    // Deduplicate metadata in-browser before capturing
+    await page.evaluate(() => {
+      const deduplicate = (selector) => {
+        const elements = Array.from(document.querySelectorAll(selector));
+        if (elements.length <= 1) return;
+        // Keep ONLY the last one (most recent React injection)
+        const last = elements[elements.length - 1];
+        elements.forEach(el => { if (el !== last) el.remove(); });
+      };
 
-    html = cleanTags(html, /<title>[\s\S]*?<\/title>/gi, 'Anhangá Viagens | Agência de Viagens Personalizadas');
-    html = keepLast(html, /<meta name="description" content="[\s\S]*?">/gi);
-    html = keepLast(html, /<meta name="keywords" content="[\s\S]*?">/gi);
-    html = keepLast(html, /<link rel="canonical" href="[\s\S]*?"\/?>/gi);
-    html = keepLast(html, /<meta property="og:[^"]+" content="[^"]+">/gi);
-    html = keepLast(html, /<meta name="twitter:[^"]+" content="[^"]+">/gi);
+      const selectors = [
+        'title',
+        'meta[name="description"]',
+        'meta[name="keywords"]',
+        'meta[name="robots"]',
+        'link[rel="canonical"]'
+      ];
+      selectors.forEach(deduplicate);
 
-    const routePath = route === '/' ? 'index.html' : `${route.slice(1)}/index.html`;
+      [{ p: 'og:', a: 'property' }, { p: 'twitter:', a: 'name' }].forEach(({ p, a }) => {
+        const tags = Array.from(document.querySelectorAll(`meta[${a}^="${p}"]`));
+        const seen = new Map();
+        tags.forEach(tag => {
+          const val = tag.getAttribute(a);
+          if (seen.has(val)) seen.get(val).remove();
+          seen.set(val, tag);
+        });
+      });
+
+      const alternates = Array.from(document.querySelectorAll('link[rel="alternate"][hreflang]'));
+      const langMap = new Map();
+      alternates.forEach(el => {
+        const lang = el.getAttribute('hreflang');
+        if (lang) {
+          if (langMap.has(lang)) {
+            langMap.get(lang).remove();
+          }
+          langMap.set(lang, el);
+        }
+      });
+
+      // Playwright fix: Ensure only ONE description remains
+      const finalDescs = document.querySelectorAll('meta[name="description"]');
+      if (finalDescs.length > 1) {
+          for (let i = 0; i < finalDescs.length - 1; i++) finalDescs[i].remove();
+      }
+
+      // CRITICAL: Remove all data-rh attributes which cause React to think it doesn't own the tags
+      // OR better, move them all to the top of head.
+      // But actually, we just want React 19 to REUSE these tags.
+      // Adding 'data-react-pre-rendered="true"' might help?
+      // No, React 19 looks for hoisted tags.
+    });
+
+    const html = await page.content();
+    const routePath = route === '/' ? 'index.html' : `${route.replace(/^\/|\/$/g, '')}/index.html`;
     const filePath = path.join(DIST_DIR, routePath);
 
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.writeFileSync(filePath, html);
-
     await page.close();
   }
 
