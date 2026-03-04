@@ -50,6 +50,6 @@ export class AIChat {
   }
 
   async expectOnlineStatus() {
-    await expect(this.chatDialog.locator('span:has-text("Online agora")')).toBeVisible();
+    await expect(this.chatDialog.locator('span:has-text("Assistente Online")')).toBeVisible();
   }
 }
