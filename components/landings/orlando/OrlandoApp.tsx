@@ -96,11 +96,9 @@ function OrlandoApp() {
       </svg>
 
       <header>
-          <div className="logo">
           <Link to="/" className="logo">
               <img src={LOGO_URL} alt="Anhangá Viagens Logo" />
           </Link>
-          </div>
           <nav className="nav-links" aria-label="Navegação Interna">
               <a href="#features">Destaques</a>
               <a href="#parks">Parques</a>
