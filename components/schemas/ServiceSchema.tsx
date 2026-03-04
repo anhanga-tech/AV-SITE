@@ -1,10 +1,10 @@
 import React from 'react';
 
 interface AggregateRatingProps {
-  ratingValue: string;
-  reviewCount: string;
-  bestRating?: string;
-  worstRating?: string;
+  ratingValue: number;
+  reviewCount: number;
+  bestRating?: number;
+  worstRating?: number;
 }
 
 interface ServiceSchemaProps {
