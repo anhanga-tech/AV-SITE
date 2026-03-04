@@ -45,7 +45,7 @@ Copie `.env.example` para `.env` e configure:
 GEMINI_API_KEY=sua_chave_api_aqui
 
 # Opcional - Modelo do Gemini (padrão: gemini-3.1-flash-lite-preview)
-GEMINI_MODEL=gemini-3.1-flash-lite-preview
+#GEMINI_MODEL=gemini-3.1-flash-lite-preview
 
 # Opcional - Base path para deploy (padrão: /)
 VITE_BASE_PATH=/
