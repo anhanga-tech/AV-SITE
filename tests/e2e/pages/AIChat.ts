@@ -11,10 +11,10 @@ export class AIChat {
 
   constructor(page: Page) {
     this.page = page;
-    this.chatDialog = page.locator('div[role="dialog"][aria-label="Assistente Virtual de Viagem"]');
-    this.inputField = page.locator('input[aria-label="Digite sua mensagem para o assistente virtual"]');
+    this.chatDialog = page.locator('div[role="dialog"][aria-label="Assistente Virtual Anhangá"]');
+    this.inputField = page.locator('textarea[placeholder="Digite sua dúvida aqui..."]');
     this.sendBtn = page.locator('button[aria-label="Enviar mensagem"]');
-    this.closeBtn = page.locator('button[aria-label="Minimizar chat"]');
+    this.closeBtn = page.locator('button[aria-label="Fechar gaveta"]');
     this.openBtn = page.locator('button[aria-label="Abrir assistente virtual"]');
     this.typingIndicator = page.getByTestId('chat-typing-indicator');
   }
