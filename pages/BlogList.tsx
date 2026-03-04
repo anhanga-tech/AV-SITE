@@ -8,7 +8,8 @@ import Search from 'lucide-react/dist/esm/icons/search';
 import BookOpen from 'lucide-react/dist/esm/icons/book-open';
 import { SocialShare } from '../components/SocialShare';
 import { getWhatsAppLink } from '../utils/whatsapp';
-import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
+import { getBlogHomeUrl } from '../utils/blog';
+import { optimizeRemoteImageUrl } from '../data/mediaConfig';
 import { SEO } from '../components/SEO';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 
@@ -78,8 +79,10 @@ const BlogList: React.FC = () => {
                                 {/* Image Area */}
                                 <div className="relative aspect-[16/10] rounded-2xl overflow-hidden mb-5 bg-gray-100">
                                     <img
-                                        src={post.image}
+                                        src={optimizeRemoteImageUrl(post.image, 640, 400)}
                                         alt={post.title}
+                                        loading="lazy"
+                                        decoding="async"
                                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                     />
                                     <div className="absolute top-3 right-3 bg-white/90 backdrop-blur rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-800 shadow-sm">
