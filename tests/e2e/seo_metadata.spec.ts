@@ -43,13 +43,14 @@ test.describe('SEO Metadata Verification', () => {
       await expect(canonical).toHaveCount(1);
 
       // 4. Verify Hreflang Tags (pt-BR and x-default)
-      const hreflangPtBr = page.locator('link[hreflang="pt-BR"]');
-      await expect(hreflangPtBr).toHaveAttribute('href', route.expectedCanonical, { timeout: 10000 });
-      await expect(hreflangPtBr).toHaveCount(1);
-
-      const hreflangXDefault = page.locator('link[hreflang="x-default"]');
-      await expect(hreflangXDefault).toHaveAttribute('href', route.expectedCanonical, { timeout: 10000 });
-      await expect(hreflangXDefault).toHaveCount(1);
+      const hreflangs = ['pt-BR', 'x-default'];
+      for (const lang of hreflangs) {
+        await test.step(`Verify hreflang="${lang}"`, async () => {
+          const link = page.locator(`link[hreflang="${lang}"]`);
+          await expect(link).toHaveAttribute('href', route.expectedCanonical, { timeout: 10000 });
+          await expect(link).toHaveCount(1);
+        });
+      }
 
       // 5. Verify Open Graph Title
       const ogTitle = page.locator('meta[property="og:title"]');
