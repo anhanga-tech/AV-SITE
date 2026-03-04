@@ -34,7 +34,7 @@ const LollapaloozaLanding: React.FC = () => {
     <>
       <SEO
         title="Pacotes Lollapalooza 2026: Viagem para o Festival em São Paulo"
-        description="Garanta seu pacote para Lollapalooza 2026 with hotel, transporte e suporte especializado em São Paulo. Planejamento completo para curtir o festival sem preocupações."
+        description="Garanta seu pacote para Lollapalooza 2026 com hotel, transporte e suporte especializado em São Paulo. Planejamento completo para curtir o festival sem preocupações."
         canonical="https://www.anhanga.tur.br/lollapalooza-2026/"
         keywords="pacotes Lollapalooza 2026, viagem Lollapalooza São Paulo, hotel para Lollapalooza, pacote festival em São Paulo"
       />
@@ -45,6 +45,7 @@ const LollapaloozaLanding: React.FC = () => {
         serviceType="Pacote de viagem para festival"
         areaServed="São Paulo e Brasil"
         keywords={['pacote Lollapalooza 2026', 'viagem para festival', 'hotel em São Paulo para evento']}
+        aggregateRating={{ ratingValue: 4.94, reviewCount: 3 }}
       />
       <BreadcrumbSchema
         items={[
@@ -68,18 +69,26 @@ const LollapaloozaLanding: React.FC = () => {
         <div className="container mx-auto px-6 max-w-5xl">
           <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Pacotes para Lollapalooza 2026 com suporte real</h2>
           <p className="text-gray-700 text-lg leading-relaxed mb-5">
-            Para quem quer curtir o festival sem caos, nossos <strong>pacotes para Lollapalooza 2026</strong> unem hospedagem estratégica, deslocamento inteligente e suporte para os dias de evento.
+            Para quem quer curtir o festival sem caos, nossos <strong>pacotes para Lollapalooza 2026</strong> unem hospedagem estratégica, deslocamento inteligente e suporte para os dias de evento. São <strong>pacotes de viagem</strong> montados por especialistas que conhecem São Paulo e entendem o ritmo dos grandes festivais de música.
           </p>
           <p className="text-gray-700 text-lg leading-relaxed mb-5">
-            Você viaja com roteiro claro, evita decisões de última hora e ganha mais tempo para aproveitar shows, ativações e experiências em São Paulo.
+            Você viaja com roteiro claro, evita decisões de última hora e ganha mais tempo para aproveitar shows, ativações e experiências em São Paulo. A <strong>Anhangá Viagens</strong> é uma{' '}
+            <Link to="/" className="text-brand-cyan font-semibold hover:underline">
+              agência de viagens boutique em São Paulo
+            </Link>{' '}
+            com foco em atendimento consultivo e <strong>viagens personalizadas</strong> — do planejamento inicial ao suporte no destino.
           </p>
           <h3 className="text-xl md:text-2xl font-extrabold text-brand-dark mb-3">O que pode estar no pacote</h3>
           <ul className="list-disc list-inside text-gray-700 space-y-1 mb-6">
             <li>Hospedagem próxima a rotas de acesso ao festival</li>
-            <li>Transporte com melhor custo-benefício</li>
+            <li>Transporte com melhor custo-benefício (Linha 9 – Esmeralda ou Lolla Express)</li>
             <li>Planejamento diário para os três dias de evento</li>
             <li>Suporte rápido para ajustes durante a viagem</li>
+            <li>Curadoria de restaurantes e experiências em São Paulo ao redor do festival</li>
           </ul>
+          <p className="text-gray-700 text-lg leading-relaxed mb-6">
+            Além do <strong>Lollapalooza</strong>, a Anhangá também organiza <strong>viagens para festivais</strong> como Rock in Rio e The Town, além de <strong>pacotes para Orlando</strong> e outros destinos. Se você está planejando uma viagem completa, explore nossas outras opções abaixo.
+          </p>
           <div className="flex flex-wrap gap-3">
             <button
               onClick={(e) => {
@@ -96,6 +105,9 @@ const LollapaloozaLanding: React.FC = () => {
             </button>
             <Link to="/orlando" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ver pacotes para Orlando
+            </Link>
+            <Link to="/" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+              Conhecer a Anhangá Viagens
             </Link>
             <a href="https://blog.anhanga.tur.br" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ler guia de festivais
