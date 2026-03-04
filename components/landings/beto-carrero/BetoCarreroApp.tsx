@@ -9,6 +9,7 @@ import FAQ from './FAQ';
 import Footer from './Footer';
 import Button from './Button';
 import { Menu, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { getBetoAssetUrl } from './assetPath';
 
 const App: React.FC = () => {
@@ -103,12 +104,11 @@ const App: React.FC = () => {
         <div className="container mx-auto px-4 flex justify-between items-center relative">
 
           {/* Logo Area */}
-          <a
-            href="#"
-            onClick={(e) => { 
-              e.preventDefault();
-              window.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); 
-              handleLinkClick(); 
+          <Link
+            to="/"
+            onClick={() => {
+              window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+              handleLinkClick();
             }}
             className="focus:outline-none focus:ring-4 focus:ring-fun-blue focus:ring-offset-2 rounded-lg px-2 -ml-2 block group relative z-50"
             aria-label="Anhangá Viagens Home"
@@ -118,9 +118,7 @@ const App: React.FC = () => {
               alt="Anhangá Viagens"
               className={`transition-all duration-300 w-auto ${isScrolled ? 'h-9 md:h-16' : 'h-10 md:h-20'}`}
             />
-          </a>
-
-          {/* Desktop Navigation Links */}
+          </Link>
           <div className="hidden lg:flex items-center gap-8 xl:gap-12">
             {navLinks.map((link) => (
               <a
