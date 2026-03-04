@@ -56,8 +56,8 @@ export const ServiceSchema: React.FC<ServiceSchemaProps> = ({
       '@type': 'AggregateRating',
       ratingValue: aggregateRating.ratingValue,
       reviewCount: aggregateRating.reviewCount,
-      bestRating: aggregateRating.bestRating ?? '5',
-      worstRating: aggregateRating.worstRating ?? '1'
+      bestRating: aggregateRating.bestRating ?? 5,
+      worstRating: aggregateRating.worstRating ?? 1
     };
   }
 
