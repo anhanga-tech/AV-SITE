@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Sparkles, Loader2, ExternalLink, Bot, User, CheckCircle2, ChevronRight } from 'lucide-react';
+import { MessageCircle, X, Send, Sparkles, Loader2, ExternalLink, Bot, User, CheckCircle2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { getTravelAdvice } from '../services/geminiService';
 import { useLeadCapture } from '../hooks/useLeadCapture';
@@ -28,41 +28,6 @@ type LeadFinalizeResult =
   | { ok: true; url: string; notice?: string }
   | { ok: false; error: string };
 
-// Formatted text for Markdown
-const FormattedText: React.FC<{ text: string }> = ({ text }) => {
-  const paragraphs = text.split('\n').filter(p => p.trim() !== '');
-
-  return (
-    <div className="space-y-3 font-sans">
-      {paragraphs.map((paragraph, idx) => {
-        const isList = paragraph.trim().startsWith('-');
-        const cleanText = isList ? paragraph.replace('-', '').trim() : paragraph;
-
-        const parts = cleanText.split(/(\*\*.*?\*\*)/g);
-
-        const content = parts.map((part, i) => {
-          if (part.startsWith('**') && part.endsWith('**')) {
-            return <strong key={i} className="font-extrabold text-brand-dark tracking-tight">{part.slice(2, -2)}</strong>;
-          }
-          return part;
-        });
-
-        if (isList) {
-          return (
-            <div key={idx} className="flex items-start gap-3 ml-2">
-              <span className="shrink-0 mt-1">
-                <ChevronRight className="w-4 h-4 text-brand-vibrant" />
-              </span>
-              <span className="leading-relaxed text-gray-800">{content}</span>
-            </div>
-          );
-        }
-
-        return <p key={idx} className="leading-relaxed text-gray-800">{content}</p>;
-      })}
-    </div>
-  );
-};
 
 // Lead action card
 const ChatActionButton: React.FC<{
@@ -419,7 +384,7 @@ const AIChat: React.FC = () => {
                           <ReactMarkdown>{msg.text}</ReactMarkdown>
                         </div>
                       ) : (
-                        <FormattedText text={msg.text} />
+                        <span className="whitespace-pre-wrap">{msg.text}</span>
                       )}
                     </div>
                   )}
@@ -466,6 +431,7 @@ const AIChat: React.FC = () => {
               onChange={handleInput}
               onKeyDown={handleKeyDown}
               placeholder="ESCREVA SUA MENSAGEM..."
+              aria-label="Escreva sua mensagem"
               rows={1}
               className="flex-1 max-h-[120px] pl-4 pr-[60px] py-4 bg-transparent outline-none text-sm text-brand-dark font-bold uppercase placeholder-gray-400 resize-none overflow-y-auto w-full"
             />
@@ -478,6 +444,9 @@ const AIChat: React.FC = () => {
               <Send className="w-5 h-5 ml-1" />
             </button>
           </div>
+          <p className="text-[10px] text-center text-gray-500 mt-2">
+            Nossa IA pode cometer erros. Confirme os dados com o agente.
+          </p>
         </div>
       </div>
     </>
