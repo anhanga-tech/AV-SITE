@@ -57,7 +57,7 @@ const HIGHLIGHTS: HighlightItem[] = [
     }
 ];
 
-const Highlights: React.FC = memo(() => {
+const Highlights = memo(() => {
     return (
         <section id="experiencia" className="py-24 bg-[#fffdf5] relative overflow-hidden">
 
