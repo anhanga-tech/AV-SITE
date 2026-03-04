@@ -465,7 +465,7 @@ const AIChat: React.FC = () => {
           })}
 
           {isLoading && (
-            <div className="flex items-end gap-3 z-10 relative">
+            <div data-testid="chat-typing-indicator" className="flex items-end gap-3 z-10 relative">
               <div className="w-9 h-9 bg-white rounded-full border border-gray-100 text-brand-vibrant flex items-center justify-center shadow-sm">
                 <Bot className="w-5 h-5" />
               </div>
