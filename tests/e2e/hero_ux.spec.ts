@@ -45,7 +45,7 @@ test.describe('Hero UX and Accessibility', () => {
     await expect(calendarHeader.first()).not.toBeVisible();
 
     // Open Guests
-    await page.click('text=2 Adultos');
+    await page.getByTestId('guests-filter-btn').click();
     // The dropdown contains "Adultos", "Crianças", etc.
     const guestLabel = page.getByText('Crianças').first();
     await expect(guestLabel).toBeVisible();
