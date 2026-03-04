@@ -22,7 +22,7 @@ pnpm test:regression  # Run regression tests (Node built-in test runner, strip-t
 
 ```bash
 GEMINI_API_KEY=       # Google Gemini API key (required for chatbot)
-GEMINI_MODEL=         # Model version (default: gemini-2.5-flash)
+GEMINI_MODEL=         # Model version (default: gemini-3.1-flash-lite-preview)
 HUBSPOT_TOKEN=        # HubSpot private app token (required for lead capture)
 VITE_BASE_PATH=       # Base path for deployment (default: /)
 VITE_MEDIA_CDN_URL=   # Optional CDN base URL for media assets

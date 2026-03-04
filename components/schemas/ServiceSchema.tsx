@@ -1,10 +1,10 @@
 import React from 'react';
 
 interface AggregateRatingProps {
-  ratingValue: string;
-  reviewCount: string;
-  bestRating?: string;
-  worstRating?: string;
+  ratingValue: number;
+  reviewCount: number;
+  bestRating?: number;
+  worstRating?: number;
 }
 
 interface ServiceSchemaProps {
@@ -56,8 +56,8 @@ export const ServiceSchema: React.FC<ServiceSchemaProps> = ({
       '@type': 'AggregateRating',
       ratingValue: aggregateRating.ratingValue,
       reviewCount: aggregateRating.reviewCount,
-      bestRating: aggregateRating.bestRating ?? '5',
-      worstRating: aggregateRating.worstRating ?? '1'
+      bestRating: aggregateRating.bestRating ?? 5,
+      worstRating: aggregateRating.worstRating ?? 1
     };
   }
 

@@ -45,7 +45,7 @@ const LollapaloozaLanding: React.FC = () => {
         serviceType="Pacote de viagem para festival"
         areaServed="São Paulo e Brasil"
         keywords={['pacote Lollapalooza 2026', 'viagem para festival', 'hotel em São Paulo para evento']}
-        aggregateRating={{ ratingValue: '4.94', reviewCount: '3' }}
+        aggregateRating={{ ratingValue: 4.94, reviewCount: 3 }}
       />
       <BreadcrumbSchema
         items={[

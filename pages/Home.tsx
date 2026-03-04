@@ -102,57 +102,6 @@ const Home: React.FC = () => {
       <BreadcrumbSchema items={[{ name: 'Home', item: 'https://www.anhanga.tur.br/' }]} />
       <Hero />
 
-      {/* Seção SEO estática — sempre renderizada para crawlers */}
-      <section className="bg-[#fffdf5] border-t border-brand-cyan/10 py-14">
-        <div className="container mx-auto px-6 max-w-5xl">
-          <h2 className="text-2xl md:text-3xl font-extrabold text-brand-dark mb-4">
-            Agência de viagens em São Paulo com atendimento personalizado
-          </h2>
-          <p className="text-gray-700 text-lg leading-relaxed mb-4">
-            A <strong>Anhangá Viagens</strong> é uma agência de viagens boutique em São Paulo especializada em{' '}
-            <strong>roteiros personalizados</strong> e experiências únicas. Montamos{' '}
-            <strong>pacotes de viagem</strong> sob medida para quem quer viajar com planejamento, conforto e
-            suporte real — antes, durante e depois da viagem.
-          </p>
-          <p className="text-gray-700 text-lg leading-relaxed mb-6">
-            Seja para curtir grandes festivais como o{' '}
-            <Link to="/lollapalooza-2026" className="text-brand-cyan font-semibold hover:underline">
-              Lollapalooza 2026
-            </Link>
-            , explorar a magia de{' '}
-            <Link to="/orlando" className="text-brand-cyan font-semibold hover:underline">
-              Orlando e Disney
-            </Link>
-            , conhecer o{' '}
-            <Link to="/beto-carrero" className="text-brand-cyan font-semibold hover:underline">
-              Beto Carrero World
-            </Link>{' '}
-            ou embarcar em uma jornada de turismo de transformação para o público 50+, a Anhangá cuida de cada
-            detalhe da sua viagem.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              to="/lollapalooza-2026"
-              className="px-4 py-2 rounded-full bg-brand-cyan text-white font-semibold text-sm hover:bg-brand-cyan/90 transition-colors"
-            >
-              Lollapalooza 2026
-            </Link>
-            <Link
-              to="/orlando"
-              className="px-4 py-2 rounded-full border border-brand-cyan/40 text-brand-dark font-semibold text-sm hover:border-brand-cyan transition-colors"
-            >
-              Pacotes para Orlando
-            </Link>
-            <Link
-              to="/beto-carrero"
-              className="px-4 py-2 rounded-full border border-brand-cyan/40 text-brand-dark font-semibold text-sm hover:border-brand-cyan transition-colors"
-            >
-              Beto Carrero World
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {shouldRenderBelowFold ? (
         <>
           <Suspense fallback={<section id="experiencia" className="py-24 bg-[#fffdf5]" />}>
