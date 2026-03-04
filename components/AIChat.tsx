@@ -14,6 +14,7 @@ interface Message {
     url: string;
     destination: string;
     bantSummary: string;
+    iataCode?: string;
   };
 }
 
@@ -287,7 +288,8 @@ const AIChat: React.FC = () => {
         actionData: {
           url: response.budgetLink!.url,
           destination: response.budgetLink!.destination,
-          bantSummary: response.budgetLink!.bantSummary
+          bantSummary: response.budgetLink!.bantSummary,
+          iataCode: response.budgetLink!.iataCode
         }
       }]);
     }
@@ -411,11 +413,12 @@ const AIChat: React.FC = () => {
 
                   {/* Bubble */}
                   {msg.isAction ? (
-                    <div className="w-full relative">
+                    <div className="w-full relative mt-3 pt-4">
                       {/* Passport Stamp Overlay */}
                       <PassportStamp
                         destination={msg.actionData?.destination || 'Viagem'}
-                        className="absolute top-[-30px] right-[-10px] sm:right-[10px]"
+                        iataCode={msg.actionData?.iataCode}
+                        className="absolute top-[-25px] right-[-10px] sm:right-[5px] pointer-events-none"
                       />
                       <ChatActionButton
                         fallbackUrl={msg.actionData?.url || '#'}

@@ -28,7 +28,7 @@ export const PassportStamp: React.FC<PassportStampProps> = ({
 
     return (
         <div
-            className={`pointer-events-none select-none absolute z-20 opacity-75 mix-blend-multiply flex items-center justify-center animate-[stamp_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)_forwards] ${className}`}
+            className={`pointer-events-none select-none absolute z-20 opacity-60 flex items-center justify-center animate-[stamp_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)_forwards] ${className}`}
             style={{ transform: `rotate(${rotation}deg)` }}
             aria-hidden="true"
         >
@@ -37,11 +37,11 @@ export const PassportStamp: React.FC<PassportStampProps> = ({
         @keyframes stamp {
           0% { transform: scale(2) rotate(${rotation - 10}deg); opacity: 0; }
           50% { transform: scale(0.9) rotate(${rotation}deg); opacity: 0.9; }
-          100% { transform: scale(1) rotate(${rotation}deg); opacity: 0.75; }
+          100% { transform: scale(1) rotate(${rotation}deg); opacity: 0.60; }
         }
       `}} />
 
-            <div className="relative w-32 h-32 md:w-36 md:h-36 shrink-0">
+            <div className="relative w-24 h-24 md:w-28 md:h-28 shrink-0">
                 {/* Outer distressed ring */}
                 <div className="absolute inset-0 rounded-full border-[3px] border-brand-vibrant border-dashed opacity-80" style={{ clipPath: 'polygon(0% 0%, 100% 0%, 100% 90%, 80% 100%, 0% 100%)' }}></div>
                 <div className="absolute inset-1 rounded-full border-[2px] border-brand-vibrant opacity-60"></div>
@@ -52,23 +52,18 @@ export const PassportStamp: React.FC<PassportStampProps> = ({
                 {/* Content */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-brand-vibrant font-black tracking-tighter uppercase p-2">
 
-                    {/* Top Text Arc (Simulated with absolute positioning) */}
-                    <div className="text-[9px] md:text-[10px] absolute top-5 tracking-widest opacity-90 font-bold">
+                    {/* Top Text Arc */}
+                    <div className="text-[8px] md:text-[9px] absolute top-4 tracking-widest opacity-90 font-bold">
                         ANHANGÁ VIAGENS
                     </div>
 
                     {/* Center Focus (IATA) */}
-                    <div className="text-3xl md:text-4xl mt-3 font-bold opacity-80" style={{ letterSpacing: '-0.05em' }}>
+                    <div className="text-2xl md:text-3xl mt-1 font-bold opacity-85" style={{ letterSpacing: '-0.05em' }}>
                         {displayIata}
                     </div>
 
-                    {/* Destination Name */}
-                    <div className="text-[8px] md:text-[9px] mt-1 text-center font-bold tracking-widest max-w-[80%] truncate opacity-90">
-                        {destination.split(',')[0]}
-                    </div>
-
                     {/* Bottom Text (Date) */}
-                    <div className="text-[9px] absolute bottom-5 font-mono tracking-tight opacity-75">
+                    <div className="text-[8px] absolute bottom-4 font-mono tracking-tight opacity-75">
                         {date}
                     </div>
 

@@ -41,6 +41,7 @@ interface BudgetToolArgs {
     timeline_window?: string;
     baggage_preference?: string;
     assumed_origin_br?: boolean;
+    iata_code?: string;
 }
 
 interface BudgetValidationResult {
@@ -464,6 +465,7 @@ function validateBudgetToolArgs(rawArgs: unknown): BudgetValidationResult {
         timeline_window: cleanString(raw.timeline_window) || 'não informado',
         baggage_preference: cleanString(raw.baggage_preference) || '',
         assumed_origin_br: assumedOriginBr,
+        iata_code: cleanString(raw.iata_code)?.substring(0, 3).toUpperCase() || '',
     };
 
     return {
@@ -555,9 +557,10 @@ const budgetTool: FunctionDeclaration = {
             need_summary: { type: Type.STRING, description: "Resumo da necessidade principal (BANT - Need)." },
             timeline_window: { type: Type.STRING, description: "Janela de decisão/embarque (BANT - Timeline)." },
             baggage_preference: { type: Type.STRING, description: "Preferência de tarifa de bagagem quando houver trecho aéreo (mala de mão ou bagagem despachada)." },
-            assumed_origin_br: { type: Type.BOOLEAN, description: "Use true quando origem não for informada e Brasil for assumido." }
+            assumed_origin_br: { type: Type.BOOLEAN, description: "Use true quando origem não for informada e Brasil for assumido." },
+            iata_code: { type: Type.STRING, description: "Código IATA (3 letras) do aeroporto principal mais próximo do destino pretendido (ex: MCZ para São Miguel dos Milagres, MCO para Orlando)." }
         },
-        required: ["destination", "destination_city", "origin_city", "dates", "adults"]
+        required: ["destination", "destination_city", "origin_city", "dates", "adults", "iata_code"]
     }
 };
 
@@ -587,15 +590,16 @@ FORM_CONTEXT_POLICY
 - Nunca peça novamente um dado já fornecido pelo formulário, a menos que o usuário queira corrigi-lo.
 
 CHIPS_POLICY
-- Chips são sugestões rápidas exibidas abaixo da resposta do bot.
-- Use o campo "chips" no retorno apenas quando fizer sentido guiar o usuário.
+- Chips são MUITO IMPORTANTES. Sempre inclua um array "chips" em TODAS as suas respostas (exceto no momento do handoff final).
+- Forneça de 2 a 4 opções clicáveis como chips para guiar a resposta do usuário e facilitar a navegação.
 - Exemplos de uso:
   - Início da conversa: ["Nacional", "América do Sul", "Internacional"]
-  - Após destino informado: ["Só ida", "Ida e volta"]
+  - Após destino informado: ["Verão/Praia", "Inverno/Neve", "Natureza"]
+  - Ao perguntar origem: ["São Paulo/SP", "Rio de Janeiro/RJ", "Brasília/DF", "Belo Horizonte/MG"]
+  - Ao perguntar mês: ["Próximos 3 meses", "Julho", "Fim do ano", "A definir"]
   - Orçamento: ["até R$ 1,5 mil", "R$ 1,5-3 mil", "R$ 3-5 mil", "R$ 5 mil+"]
-  - Confirmação: ["Sim, quero o orçamento", "Quero ajustar algo"]
-- Não use chips quando a resposta esperada for aberta (ex: nome da cidade).
-- Máximo de 4 chips por resposta.
+  - Confirmação: ["Sim, gerar orçamento", "Quero ajustar os dados"]
+- Tente não usar apenas chips caso o cliente precise de respostas muito abertas (exemplo: nome exato da rua), mas mesmo assim forneça chips de cidades comuns para facilitar.
 
 CITY_COLLECTION_POLICY
 - Cidade é obrigatória para origem e destino.
