@@ -57,7 +57,7 @@ const Categories: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 px-4">
           {POPULAR_DESTINATIONS.map((item, idx) => (
             <Link
-              key={idx}
+              key={item.link}
               to={item.link}
               className={`
                         group bg-white p-4 pb-8 shadow-[0_15px_30px_-10px_rgba(0,0,0,0.15)] 
