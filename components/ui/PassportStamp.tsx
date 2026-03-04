@@ -53,17 +53,17 @@ export const PassportStamp: React.FC<PassportStampProps> = ({
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-brand-vibrant font-black tracking-tighter uppercase p-2">
 
                     {/* Top Text Arc */}
-                    <div className="text-[8px] md:text-[9px] absolute top-4 tracking-widest opacity-90 font-bold">
+                    <div className="text-[7px] md:text-[8px] absolute top-6 tracking-widest opacity-90 font-bold">
                         ANHANGÁ VIAGENS
                     </div>
 
                     {/* Center Focus (IATA) */}
-                    <div className="text-2xl md:text-3xl mt-1 font-bold opacity-85" style={{ letterSpacing: '-0.05em' }}>
+                    <div className="text-2xl md:text-3xl font-bold opacity-85" style={{ letterSpacing: '-0.05em' }}>
                         {displayIata}
                     </div>
 
                     {/* Bottom Text (Date) */}
-                    <div className="text-[8px] absolute bottom-4 font-mono tracking-tight opacity-75">
+                    <div className="text-[7px] md:text-[8px] absolute bottom-6 font-mono tracking-tight opacity-75">
                         {date}
                     </div>
 
