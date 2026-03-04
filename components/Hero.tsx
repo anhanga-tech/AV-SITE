@@ -365,7 +365,7 @@ const Hero: React.FC = () => {
     setShowDestSuggestions(false);
   };
 
-  // Handle Click Outside
+  // Handle Click Outside and Keyboard (Escape)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (guestDropdownRef.current && !guestDropdownRef.current.contains(event.target as Node)) {
@@ -384,8 +384,23 @@ const Hero: React.FC = () => {
         setShowBudgetDropdown(false);
       }
     };
+
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setShowGuestDropdown(false);
+        setShowDestSuggestions(false);
+        setShowCalendar(false);
+        setShowTripTypeDropdown(false);
+        setShowBudgetDropdown(false);
+      }
+    };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEsc);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEsc);
+    };
   }, []);
 
   // Handlers for Guest Logic
@@ -619,10 +634,11 @@ const Hero: React.FC = () => {
 
               {/* 1. Destination */}
               <div className="w-full md:flex-[1.5] p-3 md:p-6 relative group text-left cursor-text hover:bg-gray-50/80 transition-all duration-300 rounded-t-[2rem] md:rounded-tl-[2rem] md:rounded-tr-none" ref={destRef}>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-focus-within:text-brand-cyan transition-colors">
+                <label htmlFor="destination-input" className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-focus-within:text-brand-cyan transition-colors">
                   <MapPin className="w-3 h-3" /> Para onde?
                 </label>
                 <input
+                  id="destination-input"
                   type="text"
                   data-testid="destination-input"
                   value={inputValue}
@@ -631,14 +647,21 @@ const Hero: React.FC = () => {
                   placeholder="Ex: Orlando, Paris, Brasil..."
                   className="w-full outline-none text-gray-800 font-bold placeholder-gray-300 bg-transparent text-lg md:text-xl truncate transition-colors"
                   autoComplete="off"
+                  role="combobox"
+                  aria-autocomplete="list"
+                  aria-expanded={showDestSuggestions && filteredDestinations.length > 0}
+                  aria-haspopup="listbox"
+                  aria-controls="destination-results"
                 />
                 {/* Dropdown - Pop In */}
                 {showDestSuggestions && filteredDestinations.length > 0 && (
                   <div className="absolute top-full left-0 w-full bg-white rounded-2xl shadow-xl border-2 border-gray-100 mt-4 overflow-hidden z-[60] animate-pop-in origin-top">
-                    <ul className="max-h-60 overflow-y-auto custom-scrollbar">
+                    <ul id="destination-results" role="listbox" className="max-h-60 overflow-y-auto custom-scrollbar">
                       {filteredDestinations.map((dest, idx) => (
                         <li
                           key={idx}
+                          role="option"
+                          aria-selected={false}
                           onClick={() => selectDestination(dest)}
                           className="px-6 py-3 hover:bg-brand-light cursor-pointer text-left text-sm text-gray-700 font-medium border-b border-gray-50 last:border-0 flex items-center gap-2 transition-colors"
                         >
@@ -667,7 +690,7 @@ const Hero: React.FC = () => {
                   aria-haspopup="grid"
                   data-testid="dates-filter-btn"
                 >
-                  <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan transition-colors">
+                  <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan group-focus-within:text-brand-cyan transition-colors">
                     <Calendar className="w-3 h-3" /> Quando?
                   </span>
                   <div className="flex items-center justify-between">
@@ -733,7 +756,7 @@ const Hero: React.FC = () => {
                   aria-haspopup="true"
                   data-testid="guests-filter-btn"
                 >
-                  <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan transition-colors">
+                  <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan group-focus-within:text-brand-cyan transition-colors">
                     <User className="w-3 h-3" /> Quem vai?
                   </span>
                   <div className="flex items-center justify-between">
@@ -836,7 +859,7 @@ const Hero: React.FC = () => {
                   aria-haspopup="true"
                   data-testid="trip-type-filter-btn"
                 >
-                  <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan transition-colors">
+                  <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan group-focus-within:text-brand-cyan transition-colors">
                     <Briefcase className="w-3 h-3" /> Tipo de Viagem
                   </span>
                   <div className="flex items-center justify-between">
@@ -892,7 +915,7 @@ const Hero: React.FC = () => {
                   aria-haspopup="true"
                   data-testid="budget-filter-btn"
                 >
-                  <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan transition-colors">
+                  <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan group-focus-within:text-brand-cyan transition-colors">
                     <Wallet className="w-3 h-3" /> Orçamento Aprox.
                   </span>
                   <div className="flex items-center justify-between">
