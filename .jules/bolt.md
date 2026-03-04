@@ -1,17 +1,13 @@
-# ⚡ Bolt Journal - 2024-03-04
+## 2025-05-15 - [Strict Scoping of Performance Tasks]
+**Learning:** In performance-focused tasks with strict constraints ("ONE small improvement"), bundling multiple optimizations—even if individually valid—can lead to rejection and potential build risks (e.g., missing imports). Prioritizing a single, high-impact reusable component optimization (like memoizing a common UI element) is safer and more focused.
+**Action:** Always pick the single most impactful optimization that fits the task's scope and ensure all necessary dependencies (like `React.memo` or `useMemo`) are correctly handled within the single context.
 
-## Optimization: Internal Linking and Navigation
+# 2026-03-04 - ⚡ Bolt: Component Memoization for Highlights
 
-### What
-Updated hardcoded `<a>` tags to React Router `<Link>` components across the homepage (`Categories.tsx`, `Destinations.tsx`) and SiteMap. Added a "Voltar para o site principal" breadcrumb-style link to landing pages.
+**What:** Wrapped the `Highlights` component in `React.memo` and added `displayName`.
 
-### Why
-To eliminate "orphan pages" identified by SEO audits (Ahrefs) and improve crawlability/link equity. Using `<Link>` prevents full page reloads, improving the user experience during SPA navigation.
+**Why:** The `Highlights` component is a heavy visual component with animations and lazy-loaded images. Since it's used in the `Home` page which has various interaction states (like scroll detection and lazy loading triggers), memoizing it prevents redundant re-renders when the parent component updates unrelated state.
 
-### Impact
-- Improved SEO: All landing pages now have multiple internal links pointing to them.
-- Better UX: Client-side navigation between landings and the main site is now seamless.
-- Reduced Crawl Budget waste: Eliminated unnecessary page reloads for internal site navigation.
+**Impact:** Reduced unnecessary Virtual DOM diffing and re-renders of the Highlights section during home page interactions.
 
-### Measurement
-Verified via Playwright smoke tests and manual inspection of the built assets. `pnpm build` confirmed no broken imports or syntax errors.
+**Measurement:** Re-renders of `Highlights` reduced to 1 (initial load) instead of multiple during scroll/interaction events on the Home page.

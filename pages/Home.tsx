@@ -101,6 +101,7 @@ const Home: React.FC = () => {
       <OrganizationSchema />
       <BreadcrumbSchema items={[{ name: 'Home', item: 'https://www.anhanga.tur.br/' }]} />
       <Hero />
+
       {shouldRenderBelowFold ? (
         <>
           <Suspense fallback={<section id="experiencia" className="py-24 bg-[#fffdf5]" />}>

@@ -26,7 +26,12 @@
       "permanent": true
     },
     {
-      "source": "/blog/tag/dicas/?",
+      "source": "/blog/tag/dicas",
+      "destination": "https://blog.anhanga.tur.br/tag/dicas-de-expert/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/tag/dicas/",
       "destination": "https://blog.anhanga.tur.br/tag/dicas-de-expert/",
       "permanent": true
     },
