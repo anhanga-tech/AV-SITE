@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * Test to verify that SEO metadata (title, description, canonical)
+ * Test to verify that SEO metadata (title, description, canonical, hreflang)
  * are correctly set, not duplicated, and follow the canonical standards.
  * Uses React 19 native hoisting.
  */
@@ -42,12 +42,21 @@ test.describe('SEO Metadata Verification', () => {
       await expect(canonical).toHaveAttribute('href', route.expectedCanonical, { timeout: 10000 });
       await expect(canonical).toHaveCount(1);
 
-      // 4. Verify Open Graph Title
+      // 4. Verify Hreflang Tags (pt-BR and x-default)
+      const hreflangPtBr = page.locator('link[hreflang="pt-BR"]');
+      await expect(hreflangPtBr).toHaveAttribute('href', route.expectedCanonical, { timeout: 10000 });
+      await expect(hreflangPtBr).toHaveCount(1);
+
+      const hreflangXDefault = page.locator('link[hreflang="x-default"]');
+      await expect(hreflangXDefault).toHaveAttribute('href', route.expectedCanonical, { timeout: 10000 });
+      await expect(hreflangXDefault).toHaveCount(1);
+
+      // 5. Verify Open Graph Title
       const ogTitle = page.locator('meta[property="og:title"]');
       await expect(ogTitle).toHaveAttribute('content', /.+/, { timeout: 10000 });
       await expect(ogTitle).toHaveCount(1);
 
-      // 5. Verify Open Graph URL (must match canonical)
+      // 6. Verify Open Graph URL (must match canonical)
       const ogUrl = page.locator('meta[property="og:url"]');
       await expect(ogUrl).toHaveAttribute('content', route.expectedCanonical, { timeout: 10000 });
       await expect(ogUrl).toHaveCount(1);

@@ -68,7 +68,13 @@ export const SEO: React.FC<SEOProps> = ({
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
-      {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+      {canonicalUrl && (
+        <>
+          <link rel="canonical" href={canonicalUrl} />
+          <link rel="alternate" hreflang="pt-BR" href={canonicalUrl} />
+          <link rel="alternate" hreflang="x-default" href={canonicalUrl} />
+        </>
+      )}
 
       {/* Open Graph */}
       <meta property="og:type" content={type} />
