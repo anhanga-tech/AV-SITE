@@ -3,6 +3,7 @@ import { MessageCircle, X, Send, Sparkles, Loader2, ExternalLink, Bot, User, Che
 import ReactMarkdown from 'react-markdown';
 import { getTravelAdvice } from '../services/geminiService';
 import { useLeadCapture } from '../hooks/useLeadCapture';
+import { PassportStamp } from './ui/PassportStamp';
 
 interface Message {
   role: 'user' | 'model';
@@ -410,7 +411,12 @@ const AIChat: React.FC = () => {
 
                   {/* Bubble */}
                   {msg.isAction ? (
-                    <div className="w-full">
+                    <div className="w-full relative">
+                      {/* Passport Stamp Overlay */}
+                      <PassportStamp
+                        destination={msg.actionData?.destination || 'Viagem'}
+                        className="absolute top-[-30px] right-[-10px] sm:right-[10px]"
+                      />
                       <ChatActionButton
                         fallbackUrl={msg.actionData?.url || '#'}
                         destination={msg.actionData?.destination}
