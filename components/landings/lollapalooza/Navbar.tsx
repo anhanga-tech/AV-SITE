@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Menu, X, MessageCircle } from 'lucide-react';
 import { NAVIGATION_LINKS } from './constants';
 import { getWhatsAppLink } from '../../../utils/whatsapp';
@@ -28,13 +29,13 @@ const Navbar: React.FC = () => {
     <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'}`} role="navigation" aria-label="Menu principal">
       <div className="container mx-auto px-4 flex justify-between items-center">
         {/* Logo */}
-        <a href="#" className="flex items-center" aria-label="Anhangá Viagens - Página Inicial">
+        <Link to="/" className="flex items-center" aria-label="Anhangá Viagens - Página Inicial">
           <img
             src={logoUrl}
             alt="Anhangá Viagens"
             className={`h-16 md:h-20 w-auto transition-all duration-300 ${!scrolled ? 'brightness-0 invert' : ''}`}
           />
-        </a>
+        </Link>
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">

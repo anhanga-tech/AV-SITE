@@ -18,6 +18,8 @@ import Share from 'lucide-react/dist/esm/icons/share';
 import { SocialShare } from './SocialShare';
 import { LazyImage } from './ui/LazyImage';
 
+import { Link } from "react-router-dom";
+
 interface Destination {
     coords: [number, number];
     image: string;
@@ -29,6 +31,7 @@ interface Destination {
     continent: string;
     details: string;
     activities: string[];
+    landingPage?: string;
 }
 
 // Static configuration moved outside component to prevent recreation on every render
@@ -38,6 +41,7 @@ const DESTINATIONS: Destination[] = [
         coords: [28.5383, -81.3792],
         image: "https://images.pexels.com/photos/3411139/pexels-photo-3411139.jpeg",
         city: "Orlando",
+        landingPage: "/orlando",
         country: "EUA",
         rating: "4.98",
         price: "R$ 15.000",
@@ -71,6 +75,19 @@ const DESTINATIONS: Destination[] = [
         activities: ["Praia", "Festas", "História"]
     },
     // --- AMÉRICA DO SUL ---
+    {
+        coords: [-26.8041, -48.6521],
+        image: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293401/Star-Mountain-Beto-Carrero-World-2_r6n9ij.jpg",
+        city: "Beto Carrero",
+        landingPage: "/beto-carrero",
+        country: "Brasil",
+        rating: "4.92",
+        price: "R$ 1.500",
+        description: "Maior parque temático da AL",
+        continent: "América do Sul",
+        details: "Diversão garantida para toda a família em Santa Catarina.",
+        activities: ["Hot Wheels", "FireWhip", "Zoológico"]
+    },
     {
         coords: [-29.3738, -50.8764],
         image: "https://images.pexels.com/photos/3101546/pexels-photo-3101546.jpeg",
@@ -676,18 +693,29 @@ const Destinations: React.FC = () => {
                                 />
                             </div>
 
-                            <button
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
-                                        detail: { message: `Olá! Gostaria de um orçamento para ${selectedDestination.city}.` }
-                                    }));
-                                    setSelectedDestination(null);
-                                }}
-                                className={`w-full bg-brand-dark text-white py-4 rounded-xl font-black text-lg hover:bg-brand-vibrant transition-all shadow-[4px_4px_0px_#94a3b8] active:shadow-none active:translate-y-1 flex items-center justify-center gap-2`}
-                            >
-                                Solicitar Orçamento
-                            </button>
+                            <div className="flex flex-col gap-3">
+                                {selectedDestination.landingPage && (
+                                    <Link
+                                        to={selectedDestination.landingPage}
+                                        onClick={() => setSelectedDestination(null)}
+                                        className="w-full bg-white border-2 border-brand-dark text-brand-dark py-4 rounded-xl font-black text-lg hover:bg-gray-50 transition-all shadow-[4px_4px_0px_#0f172a] active:shadow-none active:translate-y-1 flex items-center justify-center gap-2"
+                                    >
+                                        Ver detalhes do pacote <ArrowRight className="w-5 h-5" />
+                                    </Link>
+                                )}
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        window.dispatchEvent(new CustomEvent("toggle-ai-chat", {
+                                            detail: { message: `Olá! Gostaria de um orçamento para ${selectedDestination.city}.` }
+                                        }));
+                                        setSelectedDestination(null);
+                                    }}
+                                    className={`w-full bg-brand-dark text-white py-4 rounded-xl font-black text-lg hover:bg-brand-vibrant transition-all shadow-[4px_4px_0px_#94a3b8] active:shadow-none active:translate-y-1 flex items-center justify-center gap-2`}
+                                >
+                                    Solicitar Orçamento
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
