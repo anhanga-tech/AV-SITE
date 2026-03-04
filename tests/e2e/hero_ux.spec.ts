@@ -36,7 +36,7 @@ test.describe('Hero UX and Accessibility', () => {
 
   test('should dismiss other dropdowns with Escape key', async ({ page }) => {
     // Open Calendar
-    await page.click('text=Definir datas');
+    await page.getByTestId('dates-filter-btn').click();
     // Use a more specific locator for the calendar to avoid footer links
     const calendarHeader = page.locator('span.text-gray-800').filter({ hasText: /202[56]/ });
     await expect(calendarHeader.first()).toBeVisible();
