@@ -244,21 +244,22 @@ interface ExtractChipsResult {
 function extractChipsFromText(text: string): ExtractChipsResult {
     if (!text) return { text };
 
-    // Match JSON with chips field
-    const chipsMatch = text.match(/\{\s*"chips"\s*:\s*(\[[^\]]*\])\s*\}/);
+    // Match JSON with chips field or raw markdown arrays like "chips: [...]"
+    const chipsMatch = text.match(/\{\s*"chips"\s*:\s*(\[[^\]]*\])\s*\}/i) || text.match(/\*?\*?chips\*?\*?:\s*(\[[^\]]*\])/i);
+
     if (!chipsMatch) return { text };
 
     try {
-        const chipsArray = JSON.parse(chipsMatch[1]);
+        const chipsArray = JSON.parse(chipsMatch[1].replace(/'/g, '"'));
         if (Array.isArray(chipsArray) && chipsArray.every(item => typeof item === 'string')) {
-            // Remove the chips JSON block from text
+            // Remove the chips block from text
             const cleanedText = text.replace(chipsMatch[0], '').trim();
             return { text: cleanedText, chips: chipsArray };
         }
-} catch (error) {
-    // Invalid JSON, log for debugging and return original text
-    console.warn('Failed to parse chips from AI response', { error });
-}
+    } catch (error) {
+        // Invalid JSON, log for debugging and return original text
+        console.warn('Failed to parse chips from AI response', { error });
+    }
 
     return { text };
 }

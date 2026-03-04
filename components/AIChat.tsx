@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Sparkles, Loader2, ExternalLink, Bot, User, CheckCircle2 } from 'lucide-react';
+import { MessageCircle, X, Send, Sparkles, Loader2, ExternalLink, Bot, User, CheckCircle2, ChevronRight } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { getTravelAdvice } from '../services/geminiService';
 import { useLeadCapture } from '../hooks/useLeadCapture';
@@ -28,6 +28,39 @@ type LeadFinalizeResult =
   | { ok: true; url: string; notice?: string }
   | { ok: false; error: string };
 
+// Formatted text for Markdown
+const FormattedText: React.FC<{ text: string }> = ({ text }) => {
+  const paragraphs = text.split('\n').filter(p => p.trim() !== '');
+
+  return (
+    <div className="space-y-3 font-sans">
+      {paragraphs.map((paragraph, idx) => {
+        const isList = paragraph.trim().startsWith('-');
+        const cleanText = isList ? paragraph.replace('-', '').trim() : paragraph;
+
+        const parts = cleanText.split(/(\*\*.*?\*\*)/g);
+
+        const content = parts.map((part, i) => {
+          if (part.startsWith('**') && part.endsWith('**')) {
+            return <strong key={i} className="font-bold text-gray-900">{part.slice(2, -2)}</strong>;
+          }
+          return part;
+        });
+
+        if (isList) {
+          return (
+            <div key={idx} className="flex items-start gap-2 ml-1">
+              <span className="shrink-0 mt-1.5 w-1.5 h-1.5 bg-brand-vibrant rounded-full opacity-70"></span>
+              <span className="leading-relaxed text-gray-700">{content}</span>
+            </div>
+          );
+        }
+
+        return <p key={idx} className="leading-relaxed text-gray-700">{content}</p>;
+      })}
+    </div>
+  );
+};
 
 // Lead action card
 const ChatActionButton: React.FC<{
@@ -53,13 +86,13 @@ const ChatActionButton: React.FC<{
     const normalizedEmail = email.trim().toLowerCase();
 
     if (!normalizedFirstName || !normalizedLastName || !normalizedEmail) {
-      setLocalError('PREENCHA NOME, SOBRENOME E E-MAIL PARA FINALIZAR.');
+      setLocalError('Preencha nome, sobrenome e e-mail para finalizar.');
       return;
     }
 
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail);
     if (!isEmailValid) {
-      setLocalError('INFORME UM E-MAIL VÁLIDO.');
+      setLocalError('Informe um e-mail válido.');
       return;
     }
 
@@ -84,16 +117,16 @@ const ChatActionButton: React.FC<{
   };
 
   return (
-    <div className="bg-white border-2 border-brand-dark shadow-[4px_4px_0px_rgba(0,0,0,1)] w-full">
-      <div className="bg-brand-vibrant p-3 border-b-2 border-brand-dark flex items-center justify-between">
-        <span className="text-sm font-black tracking-widest text-white uppercase flex items-center gap-2">
-          <CheckCircle2 className="w-5 h-5 text-brand-dark fill-white" />
-          LINK GERADO
+    <div className="bg-white rounded-2xl border border-brand-blue/10 shadow-[0_8px_30px_rgb(0,0,0,0.08)] w-full overflow-hidden transform transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-1">
+      <div className="bg-gradient-to-r from-brand-vibrant/10 to-transparent p-3 flex items-center gap-2 border-b border-gray-100">
+        <CheckCircle2 className="w-5 h-5 text-green-500" />
+        <span className="text-sm font-bold tracking-wide text-brand-dark uppercase">
+          Link Gerado
         </span>
       </div>
-      <div className="p-5">
-        <p className="text-sm text-brand-dark mb-5 font-medium leading-relaxed">
-          Sua solicitação para <strong className="font-black bg-brand-yellow/30 px-1">{destination}</strong> está pronta. Finalize seus dados:
+      <div className="p-5 bg-gradient-to-br from-white to-slate-50/50">
+        <p className="text-sm text-gray-600 mb-5 font-medium leading-relaxed">
+          Sua solicitação para <strong className="font-bold text-brand-vibrant relative px-1"><span className="absolute inset-0 bg-brand-yellow/20 -skew-x-6 rounded"></span><span className="relative">{destination}</span></strong> está pronta. Finalize seus dados:
         </p>
 
         <div className="space-y-3 mb-5">
@@ -101,32 +134,32 @@ const ChatActionButton: React.FC<{
             type="text"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            placeholder="NOME"
-            className="w-full bg-slate-50 border-2 border-gray-300 px-4 py-3 text-sm font-bold uppercase placeholder-gray-400 focus:outline-none focus:border-brand-vibrant focus:bg-white transition-colors"
+            placeholder="Nome"
+            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm"
           />
           <input
             type="text"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-            placeholder="SOBRENOME"
-            className="w-full bg-slate-50 border-2 border-gray-300 px-4 py-3 text-sm font-bold uppercase placeholder-gray-400 focus:outline-none focus:border-brand-vibrant focus:bg-white transition-colors"
+            placeholder="Sobrenome"
+            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm"
           />
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="E-MAIL"
-            className="w-full bg-slate-50 border-2 border-gray-300 px-4 py-3 text-sm font-bold uppercase placeholder-gray-400 focus:outline-none focus:border-brand-vibrant focus:bg-white transition-colors"
+            placeholder="E-mail"
+            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm"
           />
         </div>
 
         {localError && (
-          <div className="bg-red-50 border border-red-200 text-red-600 px-3 py-2 text-xs font-bold mb-4">
+          <div className="bg-red-50/80 text-red-600 px-4 py-3 text-xs font-medium rounded-xl mb-4 border border-red-100">
             {localError}
           </div>
         )}
         {notice && (
-          <div className="bg-amber-50 border border-amber-200 text-amber-700 px-3 py-2 text-xs font-bold mb-4">
+          <div className="bg-amber-50/80 text-amber-700 px-4 py-3 text-xs font-medium rounded-xl mb-4 border border-amber-100">
             {notice}
           </div>
         )}
@@ -135,17 +168,17 @@ const ChatActionButton: React.FC<{
           type="button"
           onClick={handleClick}
           disabled={isSubmittingLead}
-          className={`flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-black uppercase tracking-wide py-4 px-4 border-2 border-brand-dark shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all ${isSubmittingLead ? 'opacity-90 cursor-wait' : ''}`}
+          className={`group flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3.5 px-4 rounded-xl shadow-md hover:shadow-lg transition-all ${isSubmittingLead ? 'opacity-90 cursor-wait' : ''}`}
         >
           {isSubmittingLead ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
-              <span>SALVANDO...</span>
+              <span>Salvando...</span>
             </>
           ) : (
             <>
-              <span>ABRIR WHATSAPP</span>
-              <ExternalLink className="w-5 h-5" />
+              <span>Abrir WhatsApp</span>
+              <ExternalLink className="w-4 h-4 group-hover:scale-110 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
             </>
           )}
         </button>
@@ -205,10 +238,10 @@ const AIChat: React.FC = () => {
       return {
         ok: true,
         url: payload.fallbackUrl,
-        notice: 'SEU CONTATO JÁ ESTAVA CADASTRADO. VAMOS CONTINUAR.',
+        notice: 'Seu contato já estava cadastrado. Vamos continuar.',
       };
     }
-    return { ok: false, error: errorResult.error || 'ERRO AO SALVAR DADOS.' };
+    return { ok: false, error: errorResult.error || 'Erro ao salvar dados.' };
   };
 
   const submitMessage = async (text: string) => {
@@ -294,110 +327,124 @@ const AIChat: React.FC = () => {
         className={`fixed ${isOpen ? 'translate-y-32 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'} 
                     bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9990]
                     flex items-center justify-center gap-3 
-                    bg-brand-dark text-white 
-                    shadow-[6px_6px_0px_rgba(33,53,88,0.2)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]
-                    transition-all duration-300 border-2 border-brand-dark 
-                    w-16 h-16 rounded-none sm:w-auto sm:h-auto sm:px-6 sm:py-4
+                    bg-brand-vibrant text-white 
+                    shadow-[0_8px_30px_rgba(255,107,53,0.3)] hover:shadow-[0_8px_30px_rgba(255,107,53,0.5)] hover:-translate-y-1
+                    transition-all duration-300
+                    w-16 h-16 rounded-2xl sm:w-auto sm:h-auto sm:px-6 sm:py-3.5 sm:rounded-full
                     focus:outline-none focus:ring-4 focus:ring-brand-vibrant/30`}
         aria-label="Abrir assistente virtual"
       >
         <div className="relative flex items-center justify-center">
-          <MessageCircle className="w-8 h-8 text-brand-yellow" />
-          <span className="absolute -top-1 -right-1 w-3 h-3 bg-brand-vibrant border-2 border-brand-dark animate-pulse"></span>
+          <MessageCircle className="w-7 h-7" />
+          <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse border-2 border-brand-vibrant"></span>
         </div>
 
         <div className="text-left hidden sm:flex sm:flex-col">
-          <span className="text-[10px] font-black tracking-widest text-brand-yellow uppercase">ROTEIRO IA</span>
-          <span className="text-sm font-black leading-none uppercase tracking-wide mt-1">AJUDA & COTAÇÃO</span>
+          <span className="text-[10px] font-bold tracking-widest text-white/90 uppercase opacity-90">Roteiro IA</span>
+          <span className="text-sm font-bold leading-none capitalize mt-0.5">Ajuda & Cotação</span>
         </div>
       </button>
 
       {/* Backdrop Overlay */}
       <div
-        className={`fixed inset-0 z-[9998] transition-opacity duration-500 ease-in-out bg-brand-dark/60 backdrop-blur-sm ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        className={`fixed inset-0 z-[9998] transition-opacity duration-300 ease-in-out bg-brand-dark/20 backdrop-blur-sm ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
           }`}
         onClick={() => setIsOpen(false)}
       />
 
-      {/* Drawer Panel */}
+      {/* Drawer Panel - Soft Scrapbook Geometry */}
       <div
-        className={`fixed top-0 right-0 h-full w-full sm:w-[500px] z-[9999] bg-slate-50 border-l-4 border-brand-dark flex flex-col shadow-2xl transition-transform duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isOpen ? 'translate-x-0' : 'translate-x-full'
+        className={`fixed top-0 right-0 h-full w-full sm:w-[450px] z-[9999] bg-[#fdfdfc] flex flex-col shadow-[-10px_0_40px_rgba(0,0,0,0.1)] transition-transform duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] sm:rounded-l-[2rem] overflow-hidden ${isOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
         role="dialog"
         aria-label="Assistente Virtual Anhangá"
       >
-        {/* Header (Brutalist) */}
-        <div className="bg-brand-vibrant px-6 py-6 border-b-4 border-brand-dark flex justify-between items-start shrink-0">
+        {/* Header - Scrapbook Softness */}
+        <div className="bg-white/80 backdrop-blur-md px-6 py-5 border-b border-gray-100 flex justify-between items-center shrink-0 z-10">
           <div className="flex gap-4 items-center">
-            <div className="w-14 h-14 bg-brand-dark border-2 border-white flex items-center justify-center rotate-3 hover:rotate-0 transition-transform">
-              <Sparkles className="w-7 h-7 text-brand-yellow fill-brand-yellow" />
+            <div className="w-12 h-12 bg-gray-50 rounded-[1.25rem] flex items-center justify-center shadow-sm transform -rotate-3 hover:rotate-0 transition-transform">
+              <Sparkles className="w-6 h-6 text-brand-vibrant" />
             </div>
             <div>
-              <h2 className="font-black text-xl text-brand-dark uppercase tracking-wider leading-none">HUB ANHANGÁ</h2>
-              <span className="inline-block mt-2 font-bold text-[10px] px-2 py-0.5 bg-brand-dark text-white uppercase tracking-widest break-words relative overflow-hidden group">
-                <span className="absolute inset-0 w-full h-full bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></span>
-                IA ONLINE
-              </span>
+              <h2 className="font-extrabold text-lg text-brand-dark tracking-tight leading-none">
+                Hub Anhangá
+              </h2>
+              <div className="flex items-center gap-1.5 mt-1 opacity-80">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400"></span>
+                </span>
+                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+                  Assistente Online
+                </span>
+              </div>
             </div>
           </div>
           <button
             onClick={() => setIsOpen(false)}
-            className="bg-brand-dark text-white hover:bg-white hover:text-brand-dark border-2 border-transparent hover:border-brand-dark p-2 transition-colors focus:outline-none"
-            aria-label="Fechar drawer"
+            className="text-gray-400 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-full p-2.5 transition-colors focus:outline-none"
+            aria-label="Fechar gaveta"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth bg-[url('/noise.png')] bg-repeat" style={{ backgroundImage: 'radial-gradient(#e5e7eb 1px, transparent 1px)', backgroundSize: '16px 16px' }}>
+        {/* Messages Area - Scrapbook vibe */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth bg-[#fdfdfc] relative">
+          {/* Fundo suave */}
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, black 1px, transparent 0)', backgroundSize: '32px 32px' }}></div>
+
           {messages.map((msg, idx) => {
             const isLastModelMsg = msg.role === 'model' && idx === messages.map(m => m.role).lastIndexOf('model');
 
             return (
-              <div key={idx} className={`flex flex-col gap-2 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+              <div key={idx} className={`relative flex flex-col gap-2 ${msg.role === 'user' ? 'items-end' : 'items-start'} z-10`}>
                 <div className={`flex items-end gap-3 max-w-[90%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                   {/* Avatar */}
-                  <div className={`w-10 h-10 flex items-center justify-center shrink-0 border-2 border-brand-dark ${msg.role === 'user'
-                      ? 'bg-brand-vibrant text-white'
-                      : 'bg-white text-brand-vibrant shadow-[2px_2px_0px_rgba(0,0,0,1)]'
+                  <div className={`w-9 h-9 flex items-center justify-center shrink-0 rounded-full shadow-sm ${msg.role === 'user'
+                    ? 'bg-brand-dark text-white'
+                    : 'bg-white text-brand-vibrant border border-gray-100'
                     }`}>
-                    {msg.role === 'user' ? <User className="w-5 h-5" /> : <Bot className="w-6 h-6" />}
+                    {msg.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-5 h-5" />}
                   </div>
 
                   {/* Bubble */}
                   {msg.isAction ? (
-                    <ChatActionButton
-                      fallbackUrl={msg.actionData?.url || '#'}
-                      destination={msg.actionData?.destination}
-                      defaultBantSummary={msg.actionData?.bantSummary}
-                      onFinalizeLead={handleFinalizeLead}
-                      isSubmittingLead={isSubmittingLead}
-                    />
+                    <div className="w-full">
+                      <ChatActionButton
+                        fallbackUrl={msg.actionData?.url || '#'}
+                        destination={msg.actionData?.destination}
+                        defaultBantSummary={msg.actionData?.bantSummary}
+                        onFinalizeLead={handleFinalizeLead}
+                        isSubmittingLead={isSubmittingLead}
+                      />
+                    </div>
                   ) : (
-                    <div className={`p-5 text-sm ${msg.role === 'user'
-                        ? 'bg-brand-dark text-white border-2 border-brand-dark shadow-[4px_4px_0px_rgba(255,107,53,1)]'
-                        : 'bg-white text-brand-dark border-2 border-brand-dark shadow-[4px_4px_0px_rgba(0,0,0,1)]'
+                    <div className={`p-4 text-sm shadow-sm ${msg.role === 'user'
+                      ? 'bg-brand-vibrant text-white rounded-2xl rounded-br-sm'
+                      : 'bg-white text-gray-800 border border-gray-100 rounded-2xl rounded-bl-sm'
                       }`}>
                       {msg.role === 'model' ? (
-                        <div className="prose prose-sm max-w-none prose-p:text-gray-800 prose-strong:text-brand-dark prose-strong:font-black prose-ul:text-gray-800">
+                        <div className="prose prose-sm max-w-none prose-p:text-gray-700 prose-p:leading-relaxed prose-strong:text-gray-900 prose-strong:font-bold prose-ul:text-gray-700">
                           <ReactMarkdown>{msg.text}</ReactMarkdown>
                         </div>
                       ) : (
-                        <span className="whitespace-pre-wrap">{msg.text}</span>
+                        <div className="text-white font-medium leading-relaxed max-w-[300px] break-words">
+                          <FormattedText text={msg.text} />
+                        </div>
                       )}
                     </div>
                   )}
                 </div>
 
-                {/* Action Chips (Assigned only to the latest model message if they exist) */}
+                {/* Action Chips */}
                 {isLastModelMsg && msg.chips && msg.chips.length > 0 && (
-                  <div className="flex flex-wrap gap-2 pl-[52px] mt-2">
+                  <div className="flex flex-wrap gap-2 pl-12 mt-1">
                     {msg.chips.map((chip, chipIdx) => (
                       <button
                         key={chipIdx}
                         onClick={() => submitMessage(chip)}
-                        className="text-[11px] font-black uppercase tracking-wider px-3 py-2 bg-white text-brand-dark border-2 border-brand-dark shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:bg-brand-vibrant hover:text-white hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all text-left"
+                        className="text-[12px] font-semibold text-gray-600 bg-white border border-gray-200 px-4 py-2 rounded-xl shadow-sm hover:shadow hover:border-brand-vibrant/30 hover:text-brand-vibrant hover:-translate-y-0.5 transition-all text-left"
                       >
                         {chip}
                       </button>
@@ -409,43 +456,42 @@ const AIChat: React.FC = () => {
           })}
 
           {isLoading && (
-            <div className="flex items-end gap-3">
-              <div className="w-10 h-10 bg-white border-2 border-brand-dark text-brand-vibrant flex items-center justify-center shadow-[2px_2px_0px_rgba(0,0,0,1)]">
-                <Bot className="w-6 h-6" />
+            <div className="flex items-end gap-3 z-10 relative">
+              <div className="w-9 h-9 bg-white rounded-full border border-gray-100 text-brand-vibrant flex items-center justify-center shadow-sm">
+                <Bot className="w-5 h-5" />
               </div>
-              <div className="bg-white px-5 py-4 border-2 border-brand-dark shadow-[4px_4px_0px_rgba(0,0,0,1)] flex items-center gap-3">
-                <Loader2 className="w-5 h-5 animate-spin text-brand-vibrant" />
-                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">PROCESSANDO...</span>
+              <div className="bg-white px-4 py-3 border border-gray-100 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-2.5">
+                <Loader2 className="w-4 h-4 animate-spin text-brand-vibrant" />
+                <span className="text-xs font-medium text-gray-400">Anhangá digitando...</span>
               </div>
             </div>
           )}
-          <div ref={messagesEndRef} className="h-4" />
+          <div ref={messagesEndRef} className="h-2" />
         </div>
 
-        {/* Input Area (Textarea that expands) */}
-        <div className="p-6 bg-white border-t-4 border-brand-dark shrink-0">
-          <div className="relative flex items-end bg-slate-50 border-2 border-brand-dark flex-wrap shadow-[4px_4px_0px_rgba(0,0,0,0.1)] focus-within:shadow-[4px_4px_0px_rgba(255,107,53,0.5)] transition-all">
+        {/* Input Area */}
+        <div className="p-4 sm:p-5 bg-white border-t border-gray-100 shrink-0 z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.02)]">
+          <div className="relative flex items-end bg-slate-50 border border-gray-200 rounded-2xl focus-within:border-brand-vibrant/40 focus-within:bg-white focus-within:ring-4 focus-within:ring-brand-vibrant/10 transition-all">
             <textarea
               ref={inputRef}
               value={input}
               onChange={handleInput}
               onKeyDown={handleKeyDown}
-              placeholder="ESCREVA SUA MENSAGEM..."
-              aria-label="Escreva sua mensagem"
+              placeholder="Digite sua dúvida aqui..."
               rows={1}
-              className="flex-1 max-h-[120px] pl-4 pr-[60px] py-4 bg-transparent outline-none text-sm text-brand-dark font-bold uppercase placeholder-gray-400 resize-none overflow-y-auto w-full"
+              className="flex-1 max-h-[120px] pl-4 pr-[50px] py-4 bg-transparent outline-none text-sm text-gray-700 font-medium placeholder-gray-400 resize-none overflow-y-auto w-full leading-snug"
             />
             <button
               onClick={() => submitMessage(input)}
               disabled={isLoading || !input.trim()}
-              className="absolute right-2 bottom-2 p-3 bg-brand-vibrant text-white border-2 border-brand-dark hover:bg-white hover:text-brand-vibrant transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
+              className="absolute right-2 bottom-2 p-2.5 bg-brand-vibrant text-white rounded-[10px] shadow-sm hover:bg-brand-blue hover:shadow-md transition-all disabled:opacity-0 disabled:scale-75 focus:outline-none"
               aria-label="Enviar mensagem"
             >
-              <Send className="w-5 h-5 ml-1" />
+              <Send className="w-4 h-4 ml-0.5" />
             </button>
           </div>
-          <p className="text-[10px] text-center text-gray-500 mt-2">
-            Nossa IA pode cometer erros. Confirme os dados com o agente.
+          <p className="text-center text-[10px] text-gray-400 mt-2">
+            Nossa IA pode cometer erros. Confirme os dados no WhatsApp.
           </p>
         </div>
       </div>
