@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
   // Também verificar process.env diretamente (importante para Vercel/Netlify)
   // Isso garante que variáveis de ambiente do sistema sejam capturadas
   const geminiApiKey = env.GEMINI_API_KEY || process.env.GEMINI_API_KEY || '';
-  const geminiModel = env.GEMINI_MODEL || process.env.GEMINI_MODEL || 'gemini-3-flash-preview';
+  const geminiModel = env.GEMINI_MODEL || process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite-preview';
 
   // Base path: '/' para Netlify/Vercel, ou '/repo-name/' para GitHub Pages
   // Para GitHub Pages, defina a variável de ambiente VITE_BASE_PATH
