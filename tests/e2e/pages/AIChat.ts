@@ -20,8 +20,14 @@ export class AIChat {
   }
 
   async open() {
-    if (!(await this.chatDialog.isVisible())) {
+    // The drawer hides via translateX (not display:none), so chatDialog.isVisible()
+    // returns true even when closed. Instead, check the open button: it becomes
+    // opacity-0 (invisible to Playwright) when the drawer is open.
+    if (await this.openBtn.isVisible()) {
       await this.openBtn.click();
+      // Wait for the drawer slide-in animation (500ms) to complete by confirming
+      // the send button has entered the viewport before interacting further.
+      await expect(this.sendBtn).toBeInViewport();
     }
   }
 
