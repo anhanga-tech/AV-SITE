@@ -7,9 +7,9 @@ const text2 = `**chips:** [{"text": "Opa"}, "Tudo bom?"]`;
 function extractChipsFromText(text: string) {
     if (!text) return { text };
 
-    const arrayPattern = /(\[(?:[^\[\]]|\{[^{}]*\})*\])/;
-    const chipsMatch = text.match(/\{\s*”chips”\s*:\s*(\[(?:[^\[\]]|\{[^{}]*\})*\])\s*\}/i) ||
-        text.match(/\*?\*?chips\*?\*?:?\*?\*?\s*(\[(?:[^\[\]]|\{[^{}]*\})*\])/i) ||
+    const arrayPattern = /(\[(?:[^\[\]{]|\{[^{}]*\})*\])/;
+    const chipsMatch = text.match(/\{\s*”chips”\s*:\s*(\[(?:[^\[\]{]|\{[^{}]*\})*\])\s*\}/i) ||
+        text.match(/\*?\*?chips\*?\*?:?\*?\*?\s*(\[(?:[^\[\]{]|\{[^{}]*\})*\])/i) ||
         text.match(new RegExp('(?:\\n|^)\\s*' + arrayPattern.source + '\\s*$')); // Fallback: just an array at the end of the string
 
     if (!chipsMatch) return { text };
