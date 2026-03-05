@@ -151,6 +151,7 @@ const App: React.FC = () => {
                 className={`transition-all duration-300 ${isScrolled ? 'py-1 px-3 text-xs lg:py-1.5 lg:px-4 lg:text-sm' : 'py-1.5 px-4 text-sm lg:py-2 lg:px-5 lg:text-base'}`}
                 tooltip="Atendimento rápido"
                 tooltipPosition="bottom"
+                dataTracking="navbar-desktop-betocarrero"
               />
             </div>
 
@@ -177,7 +178,7 @@ const App: React.FC = () => {
               </a>
             ))}
             <div className="pt-2">
-              <Button text="Falar no WhatsApp" variant="secondary" fullWidth={true} onClick={handleLinkClick} />
+              <Button text="Falar no WhatsApp" variant="secondary" fullWidth={true} onClick={handleLinkClick} dataTracking="navbar-mobile-betocarrero" />
             </div>
           </div>
 
@@ -199,12 +200,12 @@ const App: React.FC = () => {
 
       {/* Mobile/Sticky CTA */}
       <div className={`fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur border-t-4 border-fun-dark transition-transform duration-300 z-50 md:hidden ${showSticky ? 'translate-y-0' : 'translate-y-full'}`}>
-        <Button text="Quero meu Pacote" fullWidth={true} tooltip="Clique para iniciar" variant="secondary" />
+        <Button text="Quero meu Pacote" fullWidth={true} tooltip="Clique para iniciar" variant="secondary" dataTracking="sticky-mobile-betocarrero" />
       </div>
 
       {/* Desktop Sticky Bubble */}
       <div className={`fixed bottom-8 right-8 transition-all duration-500 z-50 hidden xl:block ${showSticky ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}>
-        <Button text="Orçamento Rápido" tooltip="Receba em poucos minutos" />
+        <Button text="Orçamento Rápido" tooltip="Receba em poucos minutos" dataTracking="sticky-desktop-betocarrero" />
       </div>
 
     </div>

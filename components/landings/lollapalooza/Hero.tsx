@@ -126,7 +126,7 @@ const Hero: React.FC = () => {
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Button text="Quero meu pacote para o Lolla 2026" className="animate-pulse hover:animate-none w-full sm:w-auto text-sm sm:text-lg px-6 py-3 sm:px-8 sm:py-4" />
+          <Button text="Quero meu pacote para o Lolla 2026" className="animate-pulse hover:animate-none w-full sm:w-auto text-sm sm:text-lg px-6 py-3 sm:px-8 sm:py-4" dataTracking="hero-lolla" />
           
           <button 
             onClick={handleShare}

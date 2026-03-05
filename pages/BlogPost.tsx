@@ -15,6 +15,7 @@ import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { PersonSchema } from '../components/schemas/PersonSchema';
 import { SocialShare } from '../components/SocialShare';
 import DOMPurify from 'dompurify';
+import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 
 const BlogPost: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();

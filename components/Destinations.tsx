@@ -712,7 +712,8 @@ const Destinations: React.FC = () => {
                                         }));
                                         setSelectedDestination(null);
                                     }}
-                                    className={`w-full bg-brand-dark text-white py-4 rounded-xl font-black text-lg hover:bg-brand-vibrant transition-all shadow-[4px_4px_0px_#94a3b8] active:shadow-none active:translate-y-1 flex items-center justify-center gap-2`}
+                                    className={`btn-whatsapp btn-specialist w-full bg-brand-dark text-white py-4 rounded-xl font-black text-lg hover:bg-brand-vibrant transition-all shadow-[4px_4px_0px_#94a3b8] active:shadow-none active:translate-y-1 flex items-center justify-center gap-2`}
+                                    data-tracking={`modal-destinations-${selectedDestination.city.toLowerCase()}`}
                                 >
                                     Solicitar Orçamento
                                 </button>

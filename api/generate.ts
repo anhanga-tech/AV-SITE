@@ -94,18 +94,19 @@ const SOUTH_AMERICA_COUNTRIES = [
 ];
 
 const BLOCKED_DESTINATIONS: Array<{ category: SafetyCategory; country: string; aliases: string[] }> = [
-    { category: 'war', country: 'Israel', aliases: ['israel'] },
-    { category: 'war', country: 'Líbano', aliases: ['libano', 'lebanon'] },
-    { category: 'war', country: 'Palestina', aliases: ['palestina', 'palestine'] },
-    { category: 'war', country: 'Síria', aliases: ['siria', 'syria'] },
-    { category: 'war', country: 'Iêmen', aliases: ['iemen', 'yemen'] },
+    // Middle East Blocklist (per policy #186)
+    ...MIDDLE_EAST_COUNTRIES.map(c => ({
+        category: 'war' as SafetyCategory,
+        country: c.country,
+        aliases: c.aliases
+    })),
+    // Other blocked regions
     { category: 'war', country: 'Ucrânia', aliases: ['ucrania', 'ukraine'] },
     { category: 'war', country: 'Sudão', aliases: ['sudao', 'sudan'] },
     { category: 'war', country: 'Afeganistão', aliases: ['afeganistao', 'afghanistan'] },
     { category: 'sanctions', country: 'Rússia', aliases: ['russia'] },
     { category: 'sanctions', country: 'Bielorrússia', aliases: ['bielorrussia', 'belarus'] },
     { category: 'sanctions', country: 'Coreia do Norte', aliases: ['coreia do norte', 'north korea'] },
-    { category: 'sanctions', country: 'Irã', aliases: ['ira', 'iran'] },
     { category: 'sanctions', country: 'Venezuela', aliases: ['venezuela'] },
     { category: 'sanctions', country: 'Cuba', aliases: ['cuba'] },
     { category: 'instability', country: 'Haiti', aliases: ['haiti'] },
@@ -642,8 +643,9 @@ TOOL_CALL_CONTRACT
 
 SAFETY_POLICY
 - Nunca gerar orçamento para destinos bloqueados abaixo. Em caso de bloqueio, recuse educadamente e sugira alternativa segura.
-- Guerra/Conflito: Israel, Líbano, Palestina, Síria, Iêmen, Ucrânia, Sudão, Afeganistão.
-- Sanções/Colapso: Rússia, Bielorrússia, Coreia do Norte, Irã, Venezuela, Cuba.
+- Oriente Médio (BLOQUEIO TOTAL): Arábia Saudita, Bahrein, Catar, Egito, Emirados Árabes Unidos (Dubai/Abu Dhabi), Iêmen, Irã, Iraque, Israel, Jordânia, Kuwait, Líbano, Omã, Palestina, Síria, Turquia.
+- Guerra/Conflito: Ucrânia, Sudão, Afeganistão.
+- Sanções/Colapso: Rússia, Bielorrússia, Coreia do Norte, Venezuela, Cuba.
 - Instabilidade severa: Haiti, Mianmar, Líbia, Somália, Equador (Costa/Guayaquil).
 - Exceção Equador: Galápagos é permitido, com alerta de cuidado na conexão continental.
 
