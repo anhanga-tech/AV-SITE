@@ -13,18 +13,18 @@ interface RateLimitEntry {
 
 const inMemoryStore = new Map<string, RateLimitEntry>();
 
-function getRedisClient() {
+const redis = (() => {
   const url = process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-  if (!url || !token) {
-    return null;
+  if (url && token) {
+    return new Redis({ url, token });
   }
+  return null;
+})();
 
-  return new Redis({
-    url,
-    token,
-  });
+function getRedisClient() {
+  return redis;
 }
 
 /**
