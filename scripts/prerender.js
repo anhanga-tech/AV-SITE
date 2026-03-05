@@ -71,12 +71,13 @@ async function prerender() {
       waitUntil: 'networkidle0'
     });
 
-    await page.waitForSelector('#root');
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await page.waitForSelector('#root', { timeout: 10000 });
 
     let html = await page.content();
 
-    html = cleanTags(html, /<title>[\s\S]*?<\/title>/gi, 'Anhangá Viagens | Agência de Viagens Personalizadas');
+    // Keep in sync with SEO.tsx default title prop
+    const DEFAULT_TITLE = 'Anhangá Viagens | Agência de Viagens Personalizadas';
+    html = cleanTags(html, /<title>[\s\S]*?<\/title>/gi, DEFAULT_TITLE);
     html = keepLast(html, /<meta name="description" content="[\s\S]*?">/gi);
     html = keepLast(html, /<meta name="keywords" content="[\s\S]*?">/gi);
     html = keepLast(html, /<link rel="canonical" href="[\s\S]*?"\/?>/gi);
@@ -98,6 +99,6 @@ async function prerender() {
 }
 
 prerender().catch(err => {
-  console.error('❌ Pre-rendering failed:', err);
-  process.exit(1);
+  console.warn('⚠️  Pre-rendering failed (build will continue without pre-rendered pages):', err.message);
+  process.exit(0);
 });
