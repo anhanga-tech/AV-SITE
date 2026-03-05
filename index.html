@@ -9,6 +9,11 @@
     window.dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
   </script>
   <meta charset="UTF-8" />
+  <!--
+    SEO metadata is managed dynamically via React 19 hoisting (SEO component)
+    and static HTML is generated during build by scripts/prerender.js.
+    Keep this template clean to avoid hydration mismatches and tag duplication.
+  -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="apple-touch-icon" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
