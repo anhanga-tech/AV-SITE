@@ -19,7 +19,7 @@ jobs:
           prompt: |
             REPO: ${{ github.repository }}
             ISSUE NUMBER: ${{ github.event.issue.number }}
-            TITLE: ${{ github.event.issue.title }}
+            TITLE: "${{ github.event.issue.title }}"
             BODY: ${{ github.event.issue.body }}
             AUTHOR: ${{ github.event.issue.user.login }}
 
@@ -29,23 +29,22 @@ jobs:
             3. Suggest appropriate labels from: bug, enhancement, seo, geo, schema, technical-debt, documentation
             4. Check if it duplicates existing issues
 
-            Available labels in this repo:
-            - bug: Something isn't working
-            - enhancement: New feature or request
-            - seo: Search engine optimization
-            - geo: GEO/Local SEO
-            - schema: Structured data/schema markup
-            - technical-debt: Code maintenance/improvement
-            - documentation: Documentation improvements
+            Routing Rules (MANDATORY):
+            - If TITLE contains "SEO" or "GEO" (case-insensitive): Add to Project #5 ("SEO & GEO Optimization 2026").
+            - If TITLE does NOT contain "SEO" or "GEO": Add to Project #4 ("AV-SITE Project").
 
             Use gh CLI to:
             - `gh issue view [number]` to view the issue
             - `gh search issues "query" --repo ${{ github.repository }}` to find similar issues
             - `gh label list --repo ${{ github.repository }}` to see available labels
             - `gh issue edit [number] --add-label "label1,label2"` to add labels
+            - Add to projects:
+              - Project #4 ID: PVT_kwHODSPH6s4BPrTl
+              - Project #5 ID: PVT_kwHODSPH6s4BP_lK
+              - CMD: `gh project item-add 4 --owner felipewilliam2 --url https://github.com/${{ github.repository }}/issues/${{ github.event.issue.number }}`
+              - OR CMD: `gh project item-add 5 --owner felipewilliam2 --url https://github.com/${{ github.repository }}/issues/${{ github.event.issue.number }}`
 
-            Post a comment summarizing your analysis and apply the appropriate labels.
-            If it appears to be a duplicate, mention the original issue number.
+            Post a comment summarizing your analysis, apply labels, and add to the correct project.
 
           claude_args: |
-            --allowedTools "Bash(gh issue:*),Bash(gh search:*),Bash(gh label:*)"
+            --allowedTools "Bash(gh issue:*),Bash(gh search:*),Bash(gh label:*),Bash(gh project:*)"
