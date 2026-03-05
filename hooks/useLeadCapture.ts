@@ -247,7 +247,7 @@ export function useLeadCapture() {
             const contactId = typeof (rawData as any).contactId === 'string' ? (rawData as any).contactId : 'unknown';
             const dealId = typeof (rawData as any).dealId === 'string' ? (rawData as any).dealId : undefined;
             const warning = typeof (rawData as any).warning === 'string' ? (rawData as any).warning : undefined;
-            const whatsappUrl = getWhatsAppLink(buildWhatsAppMessage(merged), { appendTrackingRef: false });
+            const whatsappUrl = getWhatsAppLink(buildWhatsAppMessage(merged), { appendTrackingRef: true });
 
             setIsSubmitting(false);
 

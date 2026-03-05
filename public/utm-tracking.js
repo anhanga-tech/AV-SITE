@@ -89,6 +89,7 @@
         if (whatsappButton) {
             // Extrair o texto do botão de forma robusta
             const buttonText = (whatsappButton.innerText || whatsappButton.textContent || "").trim() || 'WhatsApp Button';
+            const trackingId = whatsappButton.getAttribute('data-tracking') || whatsappButton.id || 'not_set';
 
             if (typeof window !== 'undefined' && window.dataLayer) {
                 window.dataLayer.push({
@@ -96,13 +97,14 @@
                     event_category: 'engagement',
                     event_label: whatsappButton.getAttribute('href') || 'unknown_whatsapp_link',
                     button_text: buttonText,
+                    cta_id: trackingId,
                     page_location: window.location.href
                 });
             }
         }
 
         // 2. Specialist CTA Tracking ("Falar com especialista")
-        const specialistButton = target.closest('.btn-specialist, [data-specialist-cta], a[href*="#contato"]');
+        const specialistButton = target.closest('.btn-specialist, [data-specialist-cta], a[href*="#contato"], a[href*="#contact"]');
         const clickable = target.closest('a, button, [role="button"]');
 
         // Extrair texto do botão ou do elemento clicado (limitado a elementos clicáveis para evitar falsos positivos)
@@ -119,6 +121,9 @@
                                 fullButtonText.toLowerCase().includes('consultoria'));
 
         if (specialistButton || isSpecialistText) {
+            const sourceElement = specialistButton || clickable;
+            const trackingId = sourceElement ? (sourceElement.getAttribute('data-tracking') || sourceElement.id || 'not_set') : 'not_set';
+
             // Disparamos specialist_cta_click mesmo se for um link de WhatsApp
             // para garantir que todas as consultas com especialistas sejam rastreadas separadamente.
             if (typeof window !== 'undefined' && window.dataLayer) {
@@ -126,6 +131,7 @@
                     event: 'specialist_cta_click',
                     event_category: 'engagement',
                     event_label: fullButtonText || 'Specialist CTA',
+                    cta_id: trackingId,
                     page_location: window.location.href
                 });
             }

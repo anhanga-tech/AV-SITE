@@ -50,7 +50,7 @@ const Hero: React.FC = () => {
           {/* CTA Area */}
           <div className="flex flex-col sm:flex-row items-center gap-6 relative z-20">
             <div className="relative hover:scale-105 transition-transform duration-300">
-              <Button text="Quero Meu Pacote no WhatsApp" tooltip="Resposta rápida!" className="w-full sm:w-auto px-8 py-5 text-xl lg:text-2xl" />
+              <Button text="Quero Meu Pacote no WhatsApp" tooltip="Resposta rápida!" className="w-full sm:w-auto px-8 py-5 text-xl lg:text-2xl" dataTracking="hero-betocarrero" />
             </div>
 
             {/* Hand-drawn Arrow pointing to button (Hidden on mobile to save space) */}

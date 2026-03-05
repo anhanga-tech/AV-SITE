@@ -8,7 +8,7 @@ import Search from 'lucide-react/dist/esm/icons/search';
 import BookOpen from 'lucide-react/dist/esm/icons/book-open';
 import { SocialShare } from '../components/SocialShare';
 import { getWhatsAppLink } from '../utils/whatsapp';
-import { getBlogHomeUrl } from '../utils/blog';
+import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 import { optimizeRemoteImageUrl } from '../data/mediaConfig';
 import { SEO } from '../components/SEO';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';

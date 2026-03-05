@@ -55,10 +55,11 @@ const Navbar: React.FC = () => {
                 detail: { message: WHATSAPP_MESSAGE }
               }));
             }}
-            className="btn-whatsapp bg-anhanga-yellow text-anhanga-darkBlue px-5 py-2 rounded-full font-bold text-sm flex items-center gap-2 hover:bg-anhanga-yellowHover transition-colors shadow-md focus:outline-none focus:ring-4 focus:ring-anhanga-yellow/50"
+            className="btn-whatsapp btn-specialist bg-anhanga-yellow text-anhanga-darkBlue px-5 py-2 rounded-full font-bold text-sm flex items-center gap-2 hover:bg-anhanga-yellowHover transition-colors shadow-md focus:outline-none focus:ring-4 focus:ring-anhanga-yellow/50"
             aria-label="Fale conosco"
             id="btn-whatsapp-header"
             data-whatsapp-location="navbar_desktop_contact_button"
+            data-tracking="navbar-desktop-lolla"
           >
             <MessageCircle size={16} aria-hidden="true" />
             Fale Conosco
@@ -97,9 +98,10 @@ const Navbar: React.FC = () => {
               }));
               setIsOpen(false);
             }}
-            className="btn-whatsapp bg-anhanga-yellow text-anhanga-darkBlue px-8 py-3 rounded-full font-bold focus:outline-none focus:ring-4 focus:ring-anhanga-yellow/50"
+            className="btn-whatsapp btn-specialist bg-anhanga-yellow text-anhanga-darkBlue px-8 py-3 rounded-full font-bold focus:outline-none focus:ring-4 focus:ring-anhanga-yellow/50"
             id="btn-whatsapp-mobile"
             data-whatsapp-location="navbar_mobile_package_button"
+            data-tracking="navbar-mobile-lolla"
           >
             Quero meu pacote
           </button>

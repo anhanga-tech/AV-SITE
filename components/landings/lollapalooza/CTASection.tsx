@@ -22,7 +22,7 @@ const CTASection: React.FC = () => {
         <div className="flex flex-col items-center gap-8">
           {/* Wrapper ajustado para evitar conflito de animação com o Button */}
           <div className="w-full max-w-md mx-auto">
-            <Button text="Quero meu pacote para o Lolla 2026" className="text-xl px-12 py-5 shadow-2xl w-full md:w-auto" dataWhatsappLocation="cta_section_main_button" />
+            <Button text="Quero meu pacote para o Lolla 2026" className="text-xl px-12 py-5 shadow-2xl w-full md:w-auto" dataWhatsappLocation="cta_section_main_button" dataTracking="footer-lolla" />
           </div>
 
           <div className="flex flex-col items-center gap-3 mt-4">
