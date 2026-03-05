@@ -1,9 +1,9 @@
 name: Playwright Tests
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
 permissions:
   contents: read
 jobs:
@@ -18,18 +18,13 @@ jobs:
         node-version: lts/*
         cache: 'pnpm'
     - name: Install dependencies
-      run: pnpm install
+      run: pnpm install --frozen-lockfile
     - name: Install Playwright Browsers
       # In CI only install Chromium to match the CI-only project set in playwright.config.ts
       run: pnpm exec playwright install --with-deps chromium
 
-    - name: Install Puppeteer Browser
-      run: npx puppeteer browsers install chrome
-
     - name: Run Playwright tests
       run: pnpm exec playwright test
-      env:
-        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
     - uses: actions/upload-artifact@v4.6.2
       if: always()
       with:

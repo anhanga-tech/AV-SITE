@@ -99,6 +99,13 @@ const AIChat: React.FC = () => {
       return { ok: true, url: result.whatsappUrl, notice: result.warning };
     }
 
+    if (!('code' in result)) {
+      return {
+        ok: false,
+        error: 'Ocorreu um imprevisto ao processar sua solicitação. Tente novamente.'
+      };
+    }
+
     const errorResult = result;
 
     // Classify error (Option A)
