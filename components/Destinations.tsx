@@ -593,6 +593,7 @@ const Destinations: React.FC = () => {
                             <div className="w-3 h-3 rounded-full bg-red-400 mx-auto -mt-6 mb-2 shadow-sm border border-red-500"></div>
                             <p className="font-serif italic text-gray-700 text-sm leading-tight text-center">
                                 "O mundo é um livro e quem não viaja lê apenas uma página."
+                                <span className="block not-italic text-gray-400 text-xs mt-1">— Santo Agostinho</span>
                             </p>
                         </div>
                     </div>
@@ -616,7 +617,7 @@ const Destinations: React.FC = () => {
 
                                 {/* Price Tag Sticker */}
                                 <div className="absolute top-4 right-4 bg-white text-brand-dark font-black px-3 py-1 rounded-md shadow-[3px_3px_0px_rgba(0,0,0,0.2)] text-sm rotate-3 group-hover:rotate-6 transition-transform border border-gray-100">
-                                    {dest.price}
+                                    A partir de {dest.price}
                                 </div>
                             </div>
 
