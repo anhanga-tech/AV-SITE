@@ -1,0 +1,18 @@
+export const MIDDLE_EAST_COUNTRIES = [
+    { country: 'Arábia Saudita', aliases: ['arabia saudita', 'saudi arabia', 'riad', 'riadh', 'mecca', 'meca', 'jeddah'] },
+    { country: 'Bahrein', aliases: ['bahrein', 'bahrain', 'manama'] },
+    { country: 'Catar', aliases: ['catar', 'qatar', 'doha'] },
+    { country: 'Egito', aliases: ['egito', 'egypt', 'cairo', 'alexandria', 'sharm el sheikh', 'giza'] },
+    { country: 'Emirados Árabes Unidos', aliases: ['emirados arabes', 'eau', 'uae', 'dubai', 'abu dhabi', 'abu dabi'] },
+    { country: 'Iêmen', aliases: ['iemen', 'yemen', 'sanaa'] },
+    { country: 'Irã', aliases: ['ira', 'iran', 'teera', 'tehran'] },
+    { country: 'Iraque', aliases: ['iraque', 'iraq', 'bagda', 'baghdad'] },
+    { country: 'Israel', aliases: ['israel', 'tel aviv', 'jerusalem'] },
+    { country: 'Jordânia', aliases: ['jordania', 'jordan', 'ama', 'amman'] },
+    { country: 'Kuwait', aliases: ['kuwait', 'kuwait city'] },
+    { country: 'Líbano', aliases: ['libano', 'lebanon', 'beirute', 'beirut'] },
+    { country: 'Omã', aliases: ['oma', 'oman', 'mascate', 'muscat'] },
+    { country: 'Palestina', aliases: ['palestina', 'palestine', 'gaza', 'cisjordania', 'west bank'] },
+    { country: 'Síria', aliases: ['siria', 'syria', 'damasco', 'damascus'] },
+    { country: 'Turquia', aliases: ['turquia', 'turkey', 'istambul', 'istanbul', 'ancara', 'ankara', 'capadocia', 'cappadocia'] },
+];

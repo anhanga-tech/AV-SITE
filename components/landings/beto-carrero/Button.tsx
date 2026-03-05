@@ -13,6 +13,7 @@ interface ButtonProps {
   tooltip?: string;
   tooltipPosition?: 'top' | 'bottom';
   ariaLabel?: string;
+  dataTracking?: string;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -24,7 +25,8 @@ const Button: React.FC<ButtonProps> = ({
   className = '',
   tooltip,
   tooltipPosition = 'top',
-  ariaLabel
+  ariaLabel,
+  dataTracking
 }) => {
   const isMountedRef = useRef(true);
 
@@ -74,6 +76,7 @@ const Button: React.FC<ButtonProps> = ({
         }}
         className={`btn-whatsapp btn-specialist ${baseStyles} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className}`}
         aria-label={computedAriaLabel}
+        data-tracking={dataTracking}
       >
         {icon && <MessageCircle className="w-6 h-6 mr-2" />}
         {text}

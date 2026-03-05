@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Sparkles, Loader2, ExternalLink, Bot, User, CheckCircle2, ChevronRight } from 'lucide-react';
+import { MessageCircle, X, Send, Sparkles, Loader2, Bot, User } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { getTravelAdvice } from '../services/geminiService';
 import { useLeadCapture } from '../hooks/useLeadCapture';
 import { PassportStamp } from './ui/PassportStamp';
+import { ChatLeadForm, type LeadFinalizePayload, type LeadFinalizeResult } from './ChatLeadForm';
 
 interface Message {
   role: 'user' | 'model';
@@ -17,18 +18,6 @@ interface Message {
     iataCode?: string;
   };
 }
-
-interface LeadFinalizePayload {
-  firstName: string;
-  lastName: string;
-  email: string;
-  bantSummary: string;
-  fallbackUrl: string;
-}
-
-type LeadFinalizeResult =
-  | { ok: true; url: string; notice?: string }
-  | { ok: false; error: string };
 
 // Formatted text for Markdown
 const FormattedText: React.FC<{ text: string }> = ({ text }) => {
@@ -60,131 +49,6 @@ const FormattedText: React.FC<{ text: string }> = ({ text }) => {
 
         return <p key={idx} className="leading-relaxed text-gray-700">{content}</p>;
       })}
-    </div>
-  );
-};
-
-// Lead action card
-const ChatActionButton: React.FC<{
-  fallbackUrl: string;
-  destination?: string;
-  defaultBantSummary?: string;
-  isSubmittingLead: boolean;
-  onFinalizeLead: (payload: LeadFinalizePayload) => Promise<LeadFinalizeResult>;
-}> = ({ fallbackUrl, destination, defaultBantSummary, isSubmittingLead, onFinalizeLead }) => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [localError, setLocalError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
-
-  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setLocalError(null);
-    setNotice(null);
-
-    const normalizedFirstName = firstName.trim();
-    const normalizedLastName = lastName.trim();
-    const normalizedEmail = email.trim().toLowerCase();
-
-    if (!normalizedFirstName || !normalizedLastName || !normalizedEmail) {
-      setLocalError('Preencha nome, sobrenome e e-mail para finalizar.');
-      return;
-    }
-
-    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail);
-    if (!isEmailValid) {
-      setLocalError('Informe um e-mail válido.');
-      return;
-    }
-
-    const result = await onFinalizeLead({
-      firstName: normalizedFirstName,
-      lastName: normalizedLastName,
-      email: normalizedEmail,
-      bantSummary: defaultBantSummary || 'Não informado',
-      fallbackUrl,
-    });
-
-    if (!result.ok) {
-      setLocalError(result.error);
-      return;
-    }
-
-    if (result.notice) {
-      setNotice(result.notice);
-    }
-
-    window.open(result.url, '_blank', 'noopener,noreferrer');
-  };
-
-  return (
-    <div className="bg-white rounded-2xl border border-brand-blue/10 shadow-[0_8px_30px_rgb(0,0,0,0.08)] w-full overflow-hidden transform transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-1">
-      <div className="bg-gradient-to-r from-brand-vibrant/10 to-transparent p-3 flex items-center gap-2 border-b border-gray-100">
-        <CheckCircle2 className="w-5 h-5 text-green-500" />
-        <span className="text-sm font-bold tracking-wide text-brand-dark uppercase">
-          Link Gerado
-        </span>
-      </div>
-      <div className="p-5 bg-gradient-to-br from-white to-slate-50/50">
-        <p className="text-sm text-gray-600 mb-5 font-medium leading-relaxed">
-          Sua solicitação para <strong className="font-bold text-brand-vibrant relative px-1"><span className="absolute inset-0 bg-brand-yellow/20 -skew-x-6 rounded"></span><span className="relative">{destination}</span></strong> está pronta. Finalize seus dados:
-        </p>
-
-        <div className="space-y-3 mb-5">
-          <input
-            type="text"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            placeholder="Nome"
-            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm"
-          />
-          <input
-            type="text"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            placeholder="Sobrenome"
-            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm"
-          />
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="E-mail"
-            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm"
-          />
-        </div>
-
-        {localError && (
-          <div className="bg-red-50/80 text-red-600 px-4 py-3 text-xs font-medium rounded-xl mb-4 border border-red-100">
-            {localError}
-          </div>
-        )}
-        {notice && (
-          <div className="bg-amber-50/80 text-amber-700 px-4 py-3 text-xs font-medium rounded-xl mb-4 border border-amber-100">
-            {notice}
-          </div>
-        )}
-
-        <button
-          type="button"
-          onClick={handleClick}
-          disabled={isSubmittingLead}
-          className={`group flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3.5 px-4 rounded-xl shadow-md hover:shadow-lg transition-all ${isSubmittingLead ? 'opacity-90 cursor-wait' : ''}`}
-        >
-          {isSubmittingLead ? (
-            <>
-              <Loader2 className="w-5 h-5 animate-spin" />
-              <span>Salvando...</span>
-            </>
-          ) : (
-            <>
-              <span>Abrir WhatsApp</span>
-              <ExternalLink className="w-4 h-4 group-hover:scale-110 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
-            </>
-          )}
-        </button>
-      </div>
     </div>
   );
 };
@@ -235,7 +99,9 @@ const AIChat: React.FC = () => {
       return { ok: true, url: result.whatsappUrl, notice: result.warning };
     }
 
-    const errorResult = result as { ok: false; error: string; code: string };
+    const errorResult = result;
+
+    // Classify error (Option A)
     if (errorResult.code === 'HUBSPOT_DUPLICATE_CONTACT') {
       return {
         ok: true,
@@ -243,7 +109,25 @@ const AIChat: React.FC = () => {
         notice: 'Seu contato já estava cadastrado. Vamos continuar.',
       };
     }
-    return { ok: false, error: errorResult.error || 'Erro ao salvar dados.' };
+
+    if (errorResult.code === 'NETWORK_ERROR' || (errorResult.status && errorResult.status >= 500)) {
+      return {
+        ok: false,
+        error: 'Não conseguimos enviar seus dados agora. Tente novamente em instantes.'
+      };
+    }
+
+    if (errorResult.code === 'VALIDATION_ERROR') {
+      return {
+        ok: false,
+        error: errorResult.error || 'Por favor, verifique os campos do formulário.'
+      };
+    }
+
+    return {
+      ok: false,
+      error: 'Ocorreu um imprevisto ao processar sua solicitação. Tente novamente.'
+    };
   };
 
   const submitMessage = async (text: string) => {
@@ -420,7 +304,7 @@ const AIChat: React.FC = () => {
                         iataCode={msg.actionData?.iataCode}
                         className="absolute top-[-25px] right-[-10px] sm:right-[5px] pointer-events-none"
                       />
-                      <ChatActionButton
+                      <ChatLeadForm
                         fallbackUrl={msg.actionData?.url || '#'}
                         destination={msg.actionData?.destination}
                         defaultBantSummary={msg.actionData?.bantSummary}

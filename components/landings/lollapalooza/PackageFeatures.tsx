@@ -128,7 +128,11 @@ const PackageFeatures: React.FC = () => {
         </div>
 
         <div className="mt-16 text-center">
-          <Button text="Quero viver essa experiência" className="md:text-xl md:px-12 md:py-5" />
+          <Button
+            text="Quero viver essa experiência"
+            className="md:text-xl md:px-12 md:py-5"
+            dataTracking="mid-lolla"
+          />
         </div>
       </div>
     </section>
