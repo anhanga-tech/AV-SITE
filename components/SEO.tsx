@@ -65,27 +65,33 @@ export const SEO: React.FC<SEOProps> = ({
 
   return (
     <>
-      <title>{fullTitle}</title>
-      <meta name="description" content={description} />
-      <meta name="keywords" content={keywords} />
-      {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+      <title suppressHydrationWarning>{fullTitle}</title>
+      <meta name="description" content={description} suppressHydrationWarning />
+      <meta name="keywords" content={keywords} suppressHydrationWarning />
+      {canonicalUrl && (
+        <>
+          <link rel="canonical" href={canonicalUrl} suppressHydrationWarning />
+          <link rel="alternate" hreflang="pt-BR" href={canonicalUrl} suppressHydrationWarning />
+          <link rel="alternate" hreflang="x-default" href={canonicalUrl} suppressHydrationWarning />
+        </>
+      )}
 
       {/* Open Graph */}
-      <meta property="og:type" content={type} />
-      <meta property="og:title" content={fullTitle} />
-      <meta property="og:description" content={description} />
-      {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
-      <meta property="og:image" content={image} />
-      <meta property="og:site_name" content={siteName} />
+      <meta property="og:type" content={type} suppressHydrationWarning />
+      <meta property="og:title" content={fullTitle} suppressHydrationWarning />
+      <meta property="og:description" content={description} suppressHydrationWarning />
+      {canonicalUrl && <meta property="og:url" content={canonicalUrl} suppressHydrationWarning />}
+      <meta property="og:image" content={image} suppressHydrationWarning />
+      <meta property="og:site_name" content={siteName} suppressHydrationWarning />
 
       {/* Twitter */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={fullTitle} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={image} />
+      <meta name="twitter:card" content="summary_large_image" suppressHydrationWarning />
+      <meta name="twitter:title" content={fullTitle} suppressHydrationWarning />
+      <meta name="twitter:description" content={description} suppressHydrationWarning />
+      <meta name="twitter:image" content={image} suppressHydrationWarning />
 
       {/* Robots */}
-      <meta name="robots" content={robots} />
+      <meta name="robots" content={robots} suppressHydrationWarning />
     </>
   );
 };

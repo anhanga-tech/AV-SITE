@@ -6,7 +6,7 @@
   "packageManager": "pnpm@9.15.4",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/prerender.js",
     "preview": "vite preview",
     "deploy": "pnpm build && gh-pages -d dist",
     "test:regression": "node --experimental-strip-types --test tests/*.test.ts",
@@ -27,6 +27,8 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
+    "@prerenderer/renderer-puppeteer": "^1.2.4",
+    "@prerenderer/webpack-plugin": "^5.3.10",
     "@tailwindcss/postcss": "^4.2.1",
     "@tailwindcss/typography": "^0.5.19",
     "@types/dompurify": "^3.2.0",
@@ -35,6 +37,8 @@
     "autoprefixer": "^10.4.27",
     "gh-pages": "^6.1.1",
     "postcss": "^8.5.8",
+    "puppeteer": "^24.38.0",
+    "sirv": "^3.0.2",
     "tailwindcss": "^4.2.1",
     "typescript": "~5.9.3",
     "vite": "^7.3.1"

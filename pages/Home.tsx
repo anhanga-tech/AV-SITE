@@ -1,5 +1,5 @@
 import React, { useEffect, Suspense, lazy } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import Hero from '../components/Hero';
 
 import { OrganizationSchema } from '../components/schemas/OrganizationSchema';
@@ -101,6 +101,7 @@ const Home: React.FC = () => {
       <OrganizationSchema />
       <BreadcrumbSchema items={[{ name: 'Home', item: 'https://www.anhanga.tur.br/' }]} />
       <Hero />
+
       {shouldRenderBelowFold ? (
         <>
           <Suspense fallback={<section id="experiencia" className="py-24 bg-[#fffdf5]" />}>

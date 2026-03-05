@@ -29,7 +29,7 @@ test.describe('Smoke Suite', () => {
     await aiChat.expectVisible();
     await aiChat.expectOnlineStatus();
     // Initial greeting is hardcoded in AIChat.tsx state — not AI-generated, so always deterministic
-    await aiChat.expectMessageContaining('Como posso ajudar hoje?');
+    await aiChat.expectMessageContaining('Olá! Sou seu guia Anhangá');
   });
 
   test('should navigate to basic landing pages', async ({ page }) => {

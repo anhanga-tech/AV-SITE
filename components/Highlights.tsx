@@ -1,5 +1,4 @@
-import React from 'react';
-import { getWhatsAppLink } from '../utils/whatsapp';
+import React, { memo } from 'react';
 import { LazyImage } from './ui/LazyImage';
 import UserCheck from 'lucide-react/dist/esm/icons/user-check';
 import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
@@ -58,7 +57,7 @@ const HIGHLIGHTS: HighlightItem[] = [
     }
 ];
 
-const Highlights: React.FC = () => {
+const Highlights = memo(() => {
     return (
         <section id="experiencia" className="py-24 bg-[#fffdf5] relative overflow-hidden">
 
@@ -80,7 +79,7 @@ const Highlights: React.FC = () => {
                             <div className="relative rounded-2xl overflow-hidden border-8 border-white shadow-[0_10px_30px_rgba(0,0,0,0.1)] rotate-[-3deg] transition-all duration-700 ease-spring group-hover:rotate-0 group-hover:scale-[1.02] group-hover:shadow-2xl">
                                 <LazyImage
                                     src="https://images.pexels.com/photos/1450372/pexels-photo-1450372.jpeg"
-                                    alt="Praia"
+                                    alt="Praia paradisíaca com areia branca e água turquesa — destino exclusivo Anhangá Viagens"
                                     width={800}
                                     className="w-full object-cover aspect-[4/3] transition-transform duration-1000 group-hover:scale-110"
                                 />
@@ -119,12 +118,15 @@ const Highlights: React.FC = () => {
                                     <Sparkles className="w-4 h-4" /> O Jeito Anhangá
                                 </span>
                             </div>
-                            <h2 className="text-4xl md:text-6xl font-black text-brand-dark leading-none">
-                                A gente cuida <br />
+                            <h2 className="text-4xl md:text-5xl font-black text-brand-dark leading-tight mb-6">
+                                Agência de viagens em São Paulo com <br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan to-blue-500">
-                                    do "chato"
+                                    atendimento personalizado
                                 </span>
                             </h2>
+                            <p className="text-gray-600 text-lg md:text-xl font-medium leading-relaxed mb-8">
+                                A <strong>Anhangá Viagens</strong> é uma agência de viagens boutique em São Paulo especializada em roteiros personalizados e experiências únicas. Montamos pacotes de viagem sob medida para quem quer viajar com planejamento, conforto e suporte real — antes, durante e depois da viagem.
+                            </p>
                         </div>
 
                         <div className="grid md:grid-cols-2 gap-8">
@@ -177,6 +179,8 @@ const Highlights: React.FC = () => {
             </div>
         </section>
     );
-};
+});
+
+Highlights.displayName = 'Highlights';
 
 export default Highlights;

@@ -26,7 +26,7 @@ const TESTIMONIALS = [
     {
         name: "William S.",
         destination: "Alemanha",
-        text: "Viajem mais tranquila da vida. Trens, hotéis, tudo organizado perfeitamente.",
+        text: "Viagem mais tranquila da vida. Trens, hotéis, tudo organizado perfeitamente.",
         image: "https://api.dicebear.com/9.x/adventurer/svg?seed=Roberto&backgroundColor=c0aede",
         bg: "bg-emerald-50",
         rotate: "-rotate-1",
@@ -61,6 +61,7 @@ const Testimonials: React.FC = () => {
                         <MessageSquareHeart className="w-4 h-4 text-red-500 fill-red-500" /> Love Notes
                     </div>
                     <h2 className="text-4xl font-black text-brand-dark">Mural do Amor ❤️</h2>
+                    <p className="mt-3 text-gray-500 text-base">Depoimentos reais de quem viajou com a gente</p>
                 </div>
 
                 {/* Carousel Container */}
@@ -110,8 +111,8 @@ const Testimonials: React.FC = () => {
                                                         className="w-full h-full object-cover"
                                                     />
                                                 </div>
-                                                <div className="absolute -bottom-2 -right-2 bg-yellow-300 text-yellow-900 text-xs font-black px-3 py-1 rounded-full shadow-sm -rotate-6 z-20">
-                                                    Verificado
+                                                <div className="absolute -bottom-2 -right-2 bg-yellow-300 text-yellow-900 text-xs font-black px-3 py-1 rounded-full shadow-sm -rotate-6 z-20" title="Depoimento verificado pela equipe Anhangá Viagens">
+                                                    ✓ Cliente Real
                                                 </div>
                                             </div>
 

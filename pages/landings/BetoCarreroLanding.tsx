@@ -51,6 +51,13 @@ const BetoCarreroLanding: React.FC = () => {
         ]}
       />
       <FAQPageSchema items={BETO_FAQ_ITEMS} />
+      <div className="bg-[#fffdf5] py-2 border-b border-gray-100">
+        <div className="container mx-auto px-6">
+          <Link to="/" className="text-sm font-medium text-gray-500 hover:text-brand-cyan transition-colors flex items-center gap-1">
+            ← Voltar para o site principal
+          </Link>
+        </div>
+      </div>
 
       {/* React 19 native resource hints */}
       <link rel="preconnect" href="https://fonts.googleapis.com" />
