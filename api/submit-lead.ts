@@ -60,7 +60,8 @@ function buildCorsHeaders(): Record<string, string> {
 }
 
 function cleanString(value: unknown): string {
-    return typeof value === 'string' ? value.trim() : '';
+    if (typeof value !== 'string') return '';
+    return value.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 function getClientIP(request: Request): string {
@@ -78,7 +79,8 @@ function normalizeNullable(value: unknown, maxLength = 255): string | null {
     if (typeof value !== 'string') return null;
     const trimmed = value.trim();
     if (trimmed.length === 0) return null;
-    return trimmed.length > maxLength ? trimmed.substring(0, maxLength) : trimmed;
+    const sanitized = trimmed.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return sanitized.length > maxLength ? sanitized.substring(0, maxLength) : sanitized;
 }
 
 function normalizeUtms(value: unknown): LeadUtms {
@@ -105,7 +107,7 @@ function normalizeTracking(value: unknown, utms: LeadUtms): LeadTracking {
     const processExtra = (key: string, raw: unknown) => {
         const normalized = normalizeNullable(raw);
         if (normalized) {
-            const cleanKey = key.trim().substring(0, 64);
+            const cleanKey = key.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;').substring(0, 64);
             extras[cleanKey] = normalized;
             count++;
         }
