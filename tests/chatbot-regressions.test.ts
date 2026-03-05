@@ -2,16 +2,46 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { detectBlockedDestination, SYSTEM_INSTRUCTION } from '../api/generate.ts';
 
-test('safety check should not confuse "Emirados" with "Irã"', () => {
+test('safety check should block "Emirados" (Policy #186)', () => {
     const result = detectBlockedDestination('Dubai, Emirados Árabes Unidos');
-    assert.equal(result, null);
+    assert.ok(result, 'UAE must be blocked');
+    assert.equal(result?.country, 'Emirados Árabes Unidos');
 });
 
 test('safety check should still block explicit Iran destinations', () => {
     const result = detectBlockedDestination('Teerã, Irã');
     assert.ok(result, 'Iran must be blocked');
     assert.equal(result?.country, 'Irã');
-    assert.equal(result?.category, 'sanctions');
+});
+
+test('safety check should block all Middle Eastern countries (Policy #186)', () => {
+    const testCases = [
+        { destination: 'Riad, Arábia Saudita', expected: 'Arábia Saudita' },
+        { destination: 'Dubai, Emirados Árabes Unidos', expected: 'Emirados Árabes Unidos' },
+        { destination: 'Doha, Catar', expected: 'Catar' },
+        { destination: 'Istambul, Turquia', expected: 'Turquia' },
+        { destination: 'Cairo, Egito', expected: 'Egito' },
+        { destination: 'Amã, Jordânia', expected: 'Jordânia' },
+        { destination: 'Mascate, Omã', expected: 'Omã' },
+        { destination: 'Kuwait City, Kuwait', expected: 'Kuwait' },
+        { destination: 'Manama, Bahrein', expected: 'Bahrein' },
+        { destination: 'Bagdá, Iraque', expected: 'Iraque' },
+    ];
+
+    for (const { destination, expected } of testCases) {
+        const result = detectBlockedDestination(destination);
+        assert.ok(result, `${destination} must be blocked`);
+        assert.equal(result?.country, expected);
+        assert.equal(result?.category, 'war');
+    }
+});
+
+test('safety check should still allow safe destinations', () => {
+    const safeDestinations = ['Orlando, EUA', 'Paris, França', 'Buenos Aires, Argentina', 'Tóquio, Japão'];
+    for (const destination of safeDestinations) {
+        const result = detectBlockedDestination(destination);
+        assert.equal(result, null, `${destination} should be allowed`);
+    }
 });
 
 test('system prompt should avoid budget pressure before handoff', () => {
