@@ -1,19 +1,10 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import type { FunctionDeclaration } from "@google/genai";
+import { checkRateLimit as checkRateLimitInternal } from '../lib/rate-limit';
 
 export const config = {
     runtime: 'edge',
 };
-
-// =============================================================================
-// RATE LIMITING - Simple in-memory implementation for Edge Functions
-// For production with multiple regions, consider upgrading to Vercel KV or Upstash
-// =============================================================================
-
-interface RateLimitEntry {
-    count: number;
-    resetTime: number;
-}
 
 type TripScope = 'national' | 'south_america' | 'international';
 
@@ -50,9 +41,6 @@ interface BudgetValidationResult {
     normalizedArgs?: BudgetToolArgs;
     safetyBlock?: SafetyBlock;
 }
-
-// In-memory store (resets on cold starts, but effective for basic protection)
-const rateLimitStore = new Map<string, RateLimitEntry>();
 
 // Configuration
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
@@ -509,37 +497,6 @@ function getClientIP(request: Request): string {
     return 'unknown';
 }
 
-function checkRateLimit(clientIP: string): { allowed: boolean; remaining: number; resetIn: number } {
-    const now = Date.now();
-    const entry = rateLimitStore.get(clientIP);
-
-    // Clean up expired entries periodically (simple garbage collection)
-    if (rateLimitStore.size > 1000) {
-        for (const [key, value] of rateLimitStore.entries()) {
-            if (now > value.resetTime) {
-                rateLimitStore.delete(key);
-            }
-        }
-    }
-
-    if (!entry || now > entry.resetTime) {
-        // First request or window expired - create new entry
-        rateLimitStore.set(clientIP, {
-            count: 1,
-            resetTime: now + RATE_LIMIT_WINDOW_MS
-        });
-        return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - 1, resetIn: RATE_LIMIT_WINDOW_MS };
-    }
-
-    if (entry.count >= RATE_LIMIT_MAX_REQUESTS) {
-        // Rate limit exceeded
-        return { allowed: false, remaining: 0, resetIn: entry.resetTime - now };
-    }
-
-    // Increment counter
-    entry.count++;
-    return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - entry.count, resetIn: entry.resetTime - now };
-}
 
 // =============================================================================
 
@@ -733,7 +690,11 @@ export default async function handler(request: Request) {
 
     // Rate limiting check
     const clientIP = getClientIP(request);
-    const rateLimit = checkRateLimit(clientIP);
+    const rateLimit = await checkRateLimitInternal(clientIP, {
+        limit: RATE_LIMIT_MAX_REQUESTS,
+        windowMs: RATE_LIMIT_WINDOW_MS,
+        prefix: 'ratelimit:generate',
+    });
 
     if (!rateLimit.allowed) {
         console.warn(`RATE_LIMIT: IP ${clientIP} exceeded limit. Reset in ${Math.ceil(rateLimit.resetIn / 1000)}s`);
