@@ -116,7 +116,13 @@ const Solution: React.FC = () => {
                      </div>
 
                      {/* Card 3: Ticket Style */}
-                     <div className="group bg-white rounded-xl border-2 border-fun-dark shadow-hard transform -rotate-1 hover:rotate-0 transition-transform duration-300 flex overflow-hidden w-full max-w-sm lg:max-w-md">
+                     <div
+                        onClick={() => window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
+                           detail: { message: "Olá! Gostaria de um orçamento para o Beto Carrero incluindo ingressos oficiais." }
+                        }))}
+                        className="btn-specialist cursor-pointer group bg-white rounded-xl border-2 border-fun-dark shadow-hard transform -rotate-1 hover:rotate-0 transition-transform duration-300 flex overflow-hidden w-full max-w-sm lg:max-w-md"
+                        data-tracking="mid-betocarrero"
+                     >
                         <div className="p-3 pl-4 lg:p-6 lg:pl-8 flex-grow flex items-center gap-4 lg:gap-6">
                            {/* Redesigned Icon: Pink Circle Token */}
                            <div className="w-14 h-14 lg:w-20 lg:h-20 bg-fun-pink rounded-full flex items-center justify-center border-2 border-fun-dark shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] text-white transform -rotate-3 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300 flex-shrink-0">
@@ -349,6 +355,7 @@ const Solution: React.FC = () => {
                         fullWidth={true}
                         onClick={handleCloseModal}
                         tooltip="Ajustamos tudo para você"
+                        dataTracking="modal-betocarrero"
                      />
                   </div>
 

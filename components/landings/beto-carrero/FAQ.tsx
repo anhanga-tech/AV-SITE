@@ -103,6 +103,7 @@ const FAQ: React.FC = () => {
                       variant="primary" 
                       tooltip="É rápido e sem compromisso" 
                       className="text-xl px-10 py-5"
+                      dataTracking="footer-betocarrero"
                     />
                  </div>
                </div>
