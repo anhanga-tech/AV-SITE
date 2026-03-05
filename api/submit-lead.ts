@@ -1,4 +1,5 @@
 import type { LeadTracking, LeadUtms, SubmitLeadRequest, SubmitLeadResponse } from '../types/leadCapture';
+import { checkRateLimit as checkRateLimitInternal } from '../lib/rate-limit.ts';
 
 export const config = {
     runtime: 'edge',
@@ -13,12 +14,6 @@ async function sendMetaConversion(_payload: Record<string, unknown>): Promise<{ 
     return { success: true };
 }
 
-interface RateLimitEntry {
-    count: number;
-    resetTime: number;
-}
-
-const rateLimitStore = new Map<string, RateLimitEntry>();
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
 
@@ -81,38 +76,6 @@ function getClientIP(request: Request): string {
     const realIP = request.headers.get('x-real-ip');
     if (realIP) return realIP;
     return 'unknown';
-}
-
-function checkRateLimit(clientIP: string): { allowed: boolean; resetIn: number } {
-    const now = Date.now();
-
-    // Clean up expired entries periodically (simple garbage collection)
-    if (rateLimitStore.size > 1000) {
-        let checked = 0;
-        for (const [key, value] of rateLimitStore.entries()) {
-            if (now > value.resetTime) {
-                rateLimitStore.delete(key);
-            }
-            // To avoid performance degradation, only check a subset of the oldest entries.
-            if (++checked >= 200) {
-                break;
-            }
-        }
-    }
-
-    // Hard capacity limit to prevent memory exhaustion on warm instances
-    if (rateLimitStore.size >= 2000 && !rateLimitStore.has(clientIP)) {
-        return { allowed: false, resetIn: RATE_LIMIT_WINDOW_MS };
-    }
-
-    const entry = rateLimitStore.get(clientIP);
-    if (!entry || now > entry.resetTime) {
-        rateLimitStore.set(clientIP, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
-        return { allowed: true, resetIn: 0 };
-    }
-    if (entry.count >= RATE_LIMIT_MAX_REQUESTS) return { allowed: false, resetIn: entry.resetTime - now };
-    entry.count++;
-    return { allowed: true, resetIn: 0 };
 }
 
 function normalizeNullable(value: unknown, maxLength = 255): string | null {
@@ -473,7 +436,12 @@ export default async function handler(request: Request): Promise<Response> {
     const corsHeaders = buildCorsHeaders();
 
     const clientIP = getClientIP(request);
-    const rateLimit = checkRateLimit(clientIP);
+    const rateLimit = await checkRateLimitInternal(clientIP, {
+        limit: RATE_LIMIT_MAX_REQUESTS,
+        windowMs: RATE_LIMIT_WINDOW_MS,
+        prefix: 'ratelimit:submit-lead',
+    });
+
     if (!rateLimit.allowed) {
         return buildErrorResponse(
             { ok: false, code: 'RATE_LIMIT_EXCEEDED', error: 'Muitas tentativas. Tente novamente em breve.' },
