@@ -7,14 +7,15 @@ const text2 = `**chips:** [{"text": "Opa"}, "Tudo bom?"]`;
 function extractChipsFromText(text: string) {
     if (!text) return { text };
 
-    const chipsMatch = text.match(/\{\s*"chips"\s*:\s*(\[[^\]]*\])\s*\}/i) ||
-        text.match(/\*?\*?chips\*?\*?:?\*?\*?\s*(\[[^\]]*\])/i) ||
-        text.match(/(?:\n|^)\s*(\[[^\]]*\])\s*$/); // Fallback: just an array at the end of the string
+    const arrayPattern = /(\[(?:[^\[\]]|\{[^{}]*\})*\])/;
+    const chipsMatch = text.match(/\{\s*”chips”\s*:\s*(\[(?:[^\[\]]|\{[^{}]*\})*\])\s*\}/i) ||
+        text.match(/\*?\*?chips\*?\*?:?\*?\*?\s*(\[(?:[^\[\]]|\{[^{}]*\})*\])/i) ||
+        text.match(new RegExp('(?:\\n|^)\\s*' + arrayPattern.source + '\\s*$')); // Fallback: just an array at the end of the string
 
     if (!chipsMatch) return { text };
 
     try {
-        const rawJsonString = chipsMatch[1].replace(/['“”]/g, '"');
+        const rawJsonString = chipsMatch[1].replace(/['””]/g, '”');
         const parsedArray = JSON.parse(rawJsonString);
 
         if (Array.isArray(parsedArray)) {
