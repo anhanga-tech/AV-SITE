@@ -173,7 +173,7 @@ const PRE_NORMALIZED_DB = DESTINATIONS_DATABASE.map(d => ({
 const QUICK_FEATURES = [
   { text: "Roteiros Exclusivos", icon: <Sparkles className="w-4 h-4 text-yellow-300" /> },
   { text: "Suporte 24/7", icon: <Sparkles className="w-4 h-4 text-yellow-300" /> },
-  { text: "Ótimos Preços", icon: <Sparkles className="w-4 h-4 text-yellow-300" /> }
+  { text: "Melhores Preços", icon: <Sparkles className="w-4 h-4 text-yellow-300" /> }
 ];
 
 // Rich Options for UI
@@ -974,7 +974,7 @@ const Hero: React.FC = () => {
 
           {/* Micro-texto abaixo da barra de busca */}
           <p className="text-sm text-white/70 text-center mt-3">
-            Sem compromisso • Resposta em até 2h (dias úteis)
+            Sem compromisso • Resposta em até 2h
           </p>
 
           {/* Quick Features - Staggered */}
