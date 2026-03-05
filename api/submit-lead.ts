@@ -1,5 +1,5 @@
 import type { LeadTracking, LeadUtms, SubmitLeadRequest, SubmitLeadResponse } from '../types/leadCapture';
-import { checkRateLimit as checkRateLimitInternal } from '../lib/rate-limit';
+import { checkRateLimit as checkRateLimitInternal } from '../lib/rate-limit.ts';
 
 export const config = {
     runtime: 'edge',

@@ -12,6 +12,7 @@ interface RateLimitEntry {
 }
 
 const inMemoryStore = new Map<string, RateLimitEntry>();
+const IN_MEMORY_MAX_ENTRIES = 2500;
 
 function getRedisClient() {
   const url = process.env.UPSTASH_REDIS_REST_URL;
@@ -45,18 +46,21 @@ export async function checkRateLimit(
   if (redis) {
     try {
       const key = `${prefix}:${clientIP}`;
+      const windowSeconds = Math.ceil(windowMs / 1000);
 
-      // Use pipeline for atomicity and to avoid race conditions with EXPIRE
+      // Batch reads to reduce network roundtrips; expiry is handled explicitly below.
       const p = redis.pipeline();
       p.incr(key);
       p.ttl(key);
       const [count, ttlResult] = await p.exec() as [number, number];
+      let ttl = ttlResult;
 
-      if (count === 1) {
-        await redis.expire(key, Math.ceil(windowMs / 1000));
+      // Recover from keys with missing expiry to avoid permanent blocks.
+      if (ttl < 0) {
+        await redis.expire(key, windowSeconds);
+        ttl = windowSeconds;
       }
 
-      const ttl = ttlResult;
       const resetIn = ttl > 0 ? ttl * 1000 : windowMs;
 
       return {
@@ -100,6 +104,15 @@ function checkInMemoryRateLimit(
       if (keysToDelete.length > 500) break;
     }
     keysToDelete.forEach(k => inMemoryStore.delete(k));
+  }
+
+  if (inMemoryStore.size >= IN_MEMORY_MAX_ENTRIES && !entry) {
+    console.warn(`RateLimit: In-memory store capacity reached. Rejecting new key for ${clientIP}.`);
+    return {
+      allowed: false,
+      remaining: 0,
+      resetIn: windowMs
+    };
   }
 
   if (!entry || now > entry.resetTime) {
