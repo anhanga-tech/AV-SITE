@@ -9,6 +9,7 @@
     "build": "vite build && node scripts/prerender.js",
     "preview": "vite preview",
     "deploy": "pnpm build && gh-pages -d dist",
+    "typecheck": "tsc --noEmit",
     "test:regression": "node --experimental-strip-types --test tests/*.test.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
@@ -57,6 +58,6 @@
     }
   },
   "engines": {
-    "node": ">=22.6.0"
+    "node": "22.x"
   }
 }

@@ -3,10 +3,6 @@ import type { FunctionDeclaration } from "@google/genai";
 import { checkRateLimit as checkRateLimitInternal } from '../lib/rate-limit.ts';
 import { MIDDLE_EAST_COUNTRIES } from '../utils/constants.ts';
 
-export const config = {
-    runtime: 'edge',
-};
-
 type TripScope = 'national' | 'south_america' | 'international';
 
 type SafetyCategory = 'war' | 'sanctions' | 'instability';

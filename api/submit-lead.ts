@@ -1,10 +1,6 @@
 import type { LeadTracking, LeadUtms, SubmitLeadRequest, SubmitLeadResponse } from '../types/leadCapture';
 import { checkRateLimit as checkRateLimitInternal } from '../lib/rate-limit.ts';
 
-export const config = {
-    runtime: 'edge',
-};
-
 
 // Placeholder conversion stubs (edge-compatible)
 async function sendGoogleConversion(_event: string, _payload: Record<string, unknown>): Promise<{ success: boolean; error?: string }> {
