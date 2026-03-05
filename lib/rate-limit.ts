@@ -12,19 +12,20 @@ interface RateLimitEntry {
 }
 
 const inMemoryStore = new Map<string, RateLimitEntry>();
+const IN_MEMORY_MAX_ENTRIES = 2500;
 
-const redis = (() => {
+function getRedisClient() {
   const url = process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-  if (url && token) {
-    return new Redis({ url, token });
+  if (!url || !token) {
+    return null;
   }
-  return null;
-})();
 
-function getRedisClient() {
-  return redis;
+  return new Redis({
+    url,
+    token,
+  });
 }
 
 /**
@@ -45,13 +46,21 @@ export async function checkRateLimit(
   if (redis) {
     try {
       const key = `${prefix}:${clientIP}`;
-      const count = await redis.incr(key);
+      const windowSeconds = Math.ceil(windowMs / 1000);
 
-      if (count === 1) {
-        await redis.expire(key, Math.ceil(windowMs / 1000));
+      // Batch reads to reduce network roundtrips; expiry is handled explicitly below.
+      const p = redis.pipeline();
+      p.incr(key);
+      p.ttl(key);
+      const [count, ttlResult] = await p.exec() as [number, number];
+      let ttl = ttlResult;
+
+      // Recover from keys with missing expiry to avoid permanent blocks.
+      if (ttl < 0) {
+        await redis.expire(key, windowSeconds);
+        ttl = windowSeconds;
       }
 
-      const ttl = await redis.ttl(key);
       const resetIn = ttl > 0 ? ttl * 1000 : windowMs;
 
       return {
@@ -66,6 +75,21 @@ export async function checkRateLimit(
   }
 
   // In-memory fallback
+  return checkInMemoryRateLimit(clientIP, options);
+}
+
+/**
+ * In-memory rate limiter logic separated for reusability and clarity.
+ */
+function checkInMemoryRateLimit(
+  clientIP: string,
+  options: {
+    limit: number;
+    windowMs: number;
+    prefix: string;
+  }
+): RateLimitResult {
+  const { limit, windowMs, prefix } = options;
   const now = Date.now();
   const key = `${prefix}:${clientIP}`;
   const entry = inMemoryStore.get(key);
@@ -80,6 +104,15 @@ export async function checkRateLimit(
       if (keysToDelete.length > 500) break;
     }
     keysToDelete.forEach(k => inMemoryStore.delete(k));
+  }
+
+  if (inMemoryStore.size >= IN_MEMORY_MAX_ENTRIES && !entry) {
+    console.warn(`RateLimit: In-memory store capacity reached. Rejecting new key for ${clientIP}.`);
+    return {
+      allowed: false,
+      remaining: 0,
+      resetIn: windowMs
+    };
   }
 
   if (!entry || now > entry.resetTime) {
