@@ -132,6 +132,75 @@ test('submit-lead should create contact and deal on first attempt', async (t) =>
     assert.equal(dealRequest!.body?.properties?.dealname, 'Lead chatbot - Felipe William - Rio de Janeiro');
 });
 
+test('submit-lead should sanitize XSS payloads in inputs', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+        restoreEnv();
+    });
+
+    process.env.HUBSPOT_TOKEN = 'test-token';
+    process.env.HUBSPOT_DEAL_PIPELINE_ID = 'pipeline-1';
+    process.env.HUBSPOT_DEAL_STAGE_ID = 'stage-1';
+    process.env.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY = 'contact_tracking_fallback';
+
+    const calls: Array<{ url: string; method: string; body: any }> = [];
+
+    global.fetch = (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+        const url = getUrl(input);
+        const method = init?.method || 'GET';
+        const body = init?.body ? JSON.parse(String(init.body)) : undefined;
+        calls.push({ url, method, body });
+
+        if (url.endsWith('/crm/v3/objects/contacts') && method === 'POST') {
+            return new Response(JSON.stringify({ id: 'contact-1' }), { status: 201 });
+        }
+        if (url.endsWith('/crm/v3/objects/deals') && method === 'POST') {
+            return new Response(JSON.stringify({ id: 'deal-1' }), { status: 201 });
+        }
+        if (url.includes('/associations/')) {
+            return new Response(null, { status: 204 });
+        }
+
+        return new Response(JSON.stringify({}), { status: 200 });
+    }) as typeof fetch;
+
+    const response = await handler(buildRequest({
+        firstName: "<script>alert('xss')</script>John",
+        lastName: "Doe >",
+        email: "john@example.com",
+        bantSummary: "Need: <img src=x onerror=alert(1)>",
+        destination: "Mars <script>",
+        utms: {
+            utm_source: "<svg onload=alert(1)>",
+        },
+        tracking: {
+            extras: {
+                "<p>custom</p>": "<b>value</b>"
+            }
+        }
+    }));
+
+    assert.equal(response.status, 201);
+
+    const contactRequest = calls.find((call) => call.url.endsWith('/crm/v3/objects/contacts'));
+    const contactProps = contactRequest!.body.properties;
+
+    assert.equal(contactProps.firstname, "&lt;script&gt;alert('xss')&lt;/script&gt;John");
+    assert.equal(contactProps.lastname, "Doe &gt;");
+    assert.equal(contactProps.ultimo_utm_source, "&lt;svg onload=alert(1)&gt;");
+
+    const dealRequest = calls.find((call) => call.url.endsWith('/crm/v3/objects/deals'));
+    const dealProps = dealRequest!.body.properties;
+    assert.ok(dealProps.dealname.includes("&lt;script&gt;"));
+    const bantProperty = process.env.HUBSPOT_DEAL_BANT_PROPERTY || 'bant_summary';
+    assert.equal(dealProps[bantProperty], "Need: &lt;img src=x onerror=alert(1)&gt;");
+
+    // Check extras sanitization
+    const extras = JSON.parse(contactProps.contact_tracking_fallback || "{}");
+    assert.ok(extras["&lt;p&gt;custom&lt;/p&gt;"], "Key should be sanitized");
+    assert.equal(extras["&lt;p&gt;custom&lt;/p&gt;"], "&lt;b&gt;value&lt;/b&gt;");
+});
+
 test('submit-lead should recover on duplicate contact and still create deal', async (t) => {
     t.after(() => {
         global.fetch = originalFetch;
@@ -141,6 +210,7 @@ test('submit-lead should recover on duplicate contact and still create deal', as
     process.env.HUBSPOT_TOKEN = 'test-token';
     process.env.HUBSPOT_DEAL_PIPELINE_ID = 'pipeline-1';
     process.env.HUBSPOT_DEAL_STAGE_ID = 'stage-1';
+    process.env.HUBSPOT_DEAL_BANT_PROPERTY = 'bant_summary';
 
     global.fetch = (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
         const url = getUrl(input);
