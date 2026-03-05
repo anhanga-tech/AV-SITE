@@ -99,7 +99,7 @@ const AIChat: React.FC = () => {
       return { ok: true, url: result.whatsappUrl, notice: result.warning };
     }
 
-    const errorResult = result as { ok: false; error: string; code: string; status?: number };
+    const errorResult = result;
 
     // Classify error (Option A)
     if (errorResult.code === 'HUBSPOT_DUPLICATE_CONTACT') {
