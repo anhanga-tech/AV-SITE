@@ -80,7 +80,7 @@ const Highlights: React.FC = () => {
                             <div className="relative rounded-2xl overflow-hidden border-8 border-white shadow-[0_10px_30px_rgba(0,0,0,0.1)] rotate-[-3deg] transition-all duration-700 ease-spring group-hover:rotate-0 group-hover:scale-[1.02] group-hover:shadow-2xl">
                                 <LazyImage
                                     src="https://images.pexels.com/photos/1450372/pexels-photo-1450372.jpeg"
-                                    alt="Praia"
+                                    alt="Praia paradisíaca com areia branca e água turquesa — destino exclusivo Anhangá Viagens"
                                     width={800}
                                     className="w-full object-cover aspect-[4/3] transition-transform duration-1000 group-hover:scale-110"
                                 />
