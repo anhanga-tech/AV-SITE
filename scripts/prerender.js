@@ -35,31 +35,35 @@ async function prerender() {
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
 
-  const keepLast = (html, tagPattern) => {
-    const matches = [...html.matchAll(tagPattern)];
-    if (matches.length > 1) {
-      const lastMatch = matches[matches.length - 1][0];
-      html = html.replace(tagPattern, '');
-      html = html.replace('<head>', `<head>${lastMatch}`);
-    }
-    return html;
-  };
-
   const cleanTags = (html, tagPattern, fallbackValue = null) => {
-    const matches = [...html.matchAll(tagPattern)];
-    if (matches.length > 1) {
-      let bestMatch = matches[matches.length - 1][0];
-      if (fallbackValue) {
-        const nonFallback = matches.find(m => !m[0].includes(fallbackValue));
-        if (nonFallback) {
-          bestMatch = nonFallback[0];
+      const matches = Array.from(html.matchAll(tagPattern));
+      if (matches.length > 1) {
+        let bestMatch = matches[matches.length - 1][0];
+        if (fallbackValue) {
+          const nonFallback = matches.find(m => !m[0].includes(fallbackValue));
+          if (nonFallback) {
+            bestMatch = nonFallback[0];
+          }
         }
+        // First remove all occurrences of the tag
+        html = html.replace(new RegExp(tagPattern, 'gi'), '');
+        // Then insert only the best match at the beginning of the head
+        html = html.replace(/<head>/i, `<head>${bestMatch}`);
       }
-      html = html.replace(tagPattern, '');
-      html = html.replace('<head>', `<head>${bestMatch}`);
-    }
-    return html;
-  };
+      return html;
+    };
+
+    const keepLast = (html, tagPattern) => {
+      const matches = Array.from(html.matchAll(tagPattern));
+      if (matches.length > 1) {
+        const lastMatch = matches[matches.length - 1][0];
+        // First remove all occurrences of the tag
+        html = html.replace(new RegExp(tagPattern, 'gi'), '');
+        // Then insert only the last match at the beginning of the head
+        html = html.replace(/<head>/i, `<head>${lastMatch}`);
+      }
+      return html;
+    };
 
   for (const route of ROUTES) {
     console.log(`📄 Prerendering: ${route}`);
@@ -78,11 +82,12 @@ async function prerender() {
     // Keep in sync with SEO.tsx default title prop
     const DEFAULT_TITLE = 'Anhangá Viagens | Agência de Viagens Personalizadas';
     html = cleanTags(html, /<title>[\s\S]*?<\/title>/gi, DEFAULT_TITLE);
-    html = keepLast(html, /<meta name="description" content="[\s\S]*?">/gi);
-    html = keepLast(html, /<meta name="keywords" content="[\s\S]*?">/gi);
+    html = keepLast(html, /<meta name="description" content="[\s\S]*?"\/?>/gi);
+    html = keepLast(html, /<meta name="keywords" content="[\s\S]*?"\/?>/gi);
+    html = keepLast(html, /<meta name="robots" content="[\s\S]*?"\/?>/gi);
     html = keepLast(html, /<link rel="canonical" href="[\s\S]*?"\/?>/gi);
-    html = keepLast(html, /<meta property="og:[^"]+" content="[^"]+">/gi);
-    html = keepLast(html, /<meta name="twitter:[^"]+" content="[^"]+">/gi);
+    html = keepLast(html, /<meta property="og:[^"]+" content="[^"]+"\/?>/gi);
+    html = keepLast(html, /<meta name="twitter:[^"]+" content="[^"]+"\/?>/gi);
     
     const routePath = route === '/' ? 'index.html' : `${route.slice(1)}/index.html`;
     const filePath = path.join(DIST_DIR, routePath);
