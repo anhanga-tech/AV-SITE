@@ -4,6 +4,7 @@
 */
 
 import React, { useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { getWhatsAppLink } from '../../../utils/whatsapp';
 
 // --- Constants ---
@@ -95,9 +96,9 @@ function OrlandoApp() {
       </svg>
 
       <header>
-          <div className="logo">
+          <Link to="/" className="logo">
               <img src={LOGO_URL} alt="Anhangá Viagens Logo" />
-          </div>
+          </Link>
           <nav className="nav-links" aria-label="Navegação Interna">
               <a href="#features">Destaques</a>
               <a href="#parks">Parques</a>

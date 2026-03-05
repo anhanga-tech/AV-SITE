@@ -1,203 +1,206 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Sparkles, Loader2, ExternalLink, Bot, User, CheckCircle2 } from 'lucide-react';
+import { MessageCircle, X, Send, Sparkles, Loader2, ExternalLink, Bot, User, CheckCircle2, ChevronRight } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { getTravelAdvice } from '../services/geminiService';
 import { useLeadCapture } from '../hooks/useLeadCapture';
+import { PassportStamp } from './ui/PassportStamp';
 
 interface Message {
-    role: 'user' | 'model';
-    text: string;
-    chips?: string[];
-    isAction?: boolean;
-    actionData?: {
-        url: string;
-        destination: string;
-        bantSummary: string;
-    };
+  role: 'user' | 'model';
+  text: string;
+  chips?: string[];
+  isAction?: boolean;
+  actionData?: {
+    url: string;
+    destination: string;
+    bantSummary: string;
+    iataCode?: string;
+  };
 }
 
 interface LeadFinalizePayload {
-    firstName: string;
-    lastName: string;
-    email: string;
-    bantSummary: string;
-    fallbackUrl: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  bantSummary: string;
+  fallbackUrl: string;
 }
 
 type LeadFinalizeResult =
-    | { ok: true; url: string; notice?: string }
-    | { ok: false; error: string };
+  | { ok: true; url: string; notice?: string }
+  | { ok: false; error: string };
 
-// Componente simples para renderizar Markdown básico (Negrito e Quebras de linha)
+// Formatted text for Markdown
 const FormattedText: React.FC<{ text: string }> = ({ text }) => {
-    // Divide por quebras de linha para criar parágrafos
-    const paragraphs = text.split('\n').filter(p => p.trim() !== '');
+  const paragraphs = text.split('\n').filter(p => p.trim() !== '');
 
-    return (
-        <div className="space-y-2">
-            {paragraphs.map((paragraph, idx) => {
-                // Tratamento básico para listas
-                const isList = paragraph.trim().startsWith('-');
-                const cleanText = isList ? paragraph.replace('-', '').trim() : paragraph;
-                
-                // Processa negrito (**texto**)
-                const parts = cleanText.split(/(\*\*.*?\*\*)/g);
-                
-                const content = parts.map((part, i) => {
-                    if (part.startsWith('**') && part.endsWith('**')) {
-                        return <strong key={i} className="font-bold">{part.slice(2, -2)}</strong>;
-                    }
-                    return part;
-                });
+  return (
+    <div className="space-y-3 font-sans">
+      {paragraphs.map((paragraph, idx) => {
+        const isList = paragraph.trim().startsWith('-');
+        const cleanText = isList ? paragraph.replace('-', '').trim() : paragraph;
 
-                if (isList) {
-                    return (
-                        <div key={idx} className="flex items-start gap-2 ml-1">
-                            <span className="w-1.5 h-1.5 bg-current rounded-full mt-2 shrink-0 opacity-60"></span>
-                            <span>{content}</span>
-                        </div>
-                    );
-                }
+        const parts = cleanText.split(/(\*\*.*?\*\*)/g);
 
-                return <p key={idx} className="leading-relaxed">{content}</p>;
-            })}
-        </div>
-    );
-};
-
-// Card de finalização do lead + handoff para WhatsApp
-const ChatActionButton: React.FC<{
-    fallbackUrl: string;
-    destination?: string;
-    defaultBantSummary?: string;
-    isSubmittingLead: boolean;
-    onFinalizeLead: (payload: LeadFinalizePayload) => Promise<LeadFinalizeResult>;
-}> = ({ fallbackUrl, destination, defaultBantSummary, isSubmittingLead, onFinalizeLead }) => {
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [email, setEmail] = useState('');
-    const [localError, setLocalError] = useState<string | null>(null);
-    const [notice, setNotice] = useState<string | null>(null);
-
-    const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        setLocalError(null);
-        setNotice(null);
-
-        const normalizedFirstName = firstName.trim();
-        const normalizedLastName = lastName.trim();
-        const normalizedEmail = email.trim().toLowerCase();
-
-        if (!normalizedFirstName || !normalizedLastName || !normalizedEmail) {
-            setLocalError('Preencha nome, sobrenome e e-mail para finalizar.');
-            return;
-        }
-
-        const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail);
-        if (!isEmailValid) {
-            setLocalError('Informe um e-mail válido.');
-            return;
-        }
-
-        const result = await onFinalizeLead({
-            firstName: normalizedFirstName,
-            lastName: normalizedLastName,
-            email: normalizedEmail,
-            bantSummary: defaultBantSummary || 'Não informado',
-            fallbackUrl,
+        const content = parts.map((part, i) => {
+          if (part.startsWith('**') && part.endsWith('**')) {
+            return <strong key={i} className="font-bold text-gray-900">{part.slice(2, -2)}</strong>;
+          }
+          return part;
         });
 
-        if (!result.ok) {
-            setLocalError(result.error);
-            return;
+        if (isList) {
+          return (
+            <div key={idx} className="flex items-start gap-2 ml-1">
+              <span className="shrink-0 mt-1.5 w-1.5 h-1.5 bg-brand-vibrant rounded-full opacity-70"></span>
+              <span className="leading-relaxed text-gray-700">{content}</span>
+            </div>
+          );
         }
 
-        if (result.notice) {
-            setNotice(result.notice);
-        }
+        return <p key={idx} className="leading-relaxed text-gray-700">{content}</p>;
+      })}
+    </div>
+  );
+};
 
-        window.open(result.url, '_blank', 'noopener,noreferrer');
-    };
+// Lead action card
+const ChatActionButton: React.FC<{
+  fallbackUrl: string;
+  destination?: string;
+  defaultBantSummary?: string;
+  isSubmittingLead: boolean;
+  onFinalizeLead: (payload: LeadFinalizePayload) => Promise<LeadFinalizeResult>;
+}> = ({ fallbackUrl, destination, defaultBantSummary, isSubmittingLead, onFinalizeLead }) => {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [localError, setLocalError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
-    return (
-        <div className="max-w-[85%] bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden group hover:shadow-xl transition-shadow">
-            <div className="bg-brand-vibrant/5 p-4 border-b border-brand-vibrant/10 flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-green-500" />
-                    <span className="text-sm font-bold text-brand-dark">Link Gerado</span>
-            </div>
-            <div className="p-4">
-                <p className="text-sm text-gray-600 mb-4 leading-relaxed">
-                    Sua solicitação para <strong>{destination}</strong> está pronta. Finalize seus dados para seguir no WhatsApp com nossa equipe.
-                </p>
+  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setLocalError(null);
+    setNotice(null);
 
-                <div className="grid grid-cols-1 gap-2 mb-3">
-                    <input
-                        type="text"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        placeholder="Nome"
-                        className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant/50"
-                    />
-                    <input
-                        type="text"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        placeholder="Sobrenome"
-                        className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant/50"
-                    />
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="E-mail"
-                        className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant/50"
-                    />
-                </div>
+    const normalizedFirstName = firstName.trim();
+    const normalizedLastName = lastName.trim();
+    const normalizedEmail = email.trim().toLowerCase();
 
-                {localError && (
-                    <p className="text-xs text-red-500 mb-3">{localError}</p>
-                )}
+    if (!normalizedFirstName || !normalizedLastName || !normalizedEmail) {
+      setLocalError('Preencha nome, sobrenome e e-mail para finalizar.');
+      return;
+    }
 
-                {notice && (
-                    <p className="text-xs text-amber-600 mb-3">{notice}</p>
-                )}
+    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail);
+    if (!isEmailValid) {
+      setLocalError('Informe um e-mail válido.');
+      return;
+    }
 
-                <button
-                    type="button"
-                    onClick={handleClick}
-                    disabled={isSubmittingLead}
-                    className={`btn-whatsapp btn-specialist flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3 px-4 rounded-xl transition-all shadow-md hover:shadow-green-500/30 text-sm group-hover:scale-[1.02] ${isSubmittingLead ? 'opacity-90 cursor-wait' : ''}`}
-                >
-                    {isSubmittingLead ? (
-                        <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            <span className="truncate">Salvando lead...</span>
-                        </>
-                    ) : (
-                        <>
-                            <span className="truncate">Salvar e continuar no WhatsApp</span>
-                            <ExternalLink className="w-4 h-4" />
-                        </>
-                    )}
-                </button>
-            </div>
+    const result = await onFinalizeLead({
+      firstName: normalizedFirstName,
+      lastName: normalizedLastName,
+      email: normalizedEmail,
+      bantSummary: defaultBantSummary || 'Não informado',
+      fallbackUrl,
+    });
+
+    if (!result.ok) {
+      setLocalError(result.error);
+      return;
+    }
+
+    if (result.notice) {
+      setNotice(result.notice);
+    }
+
+    window.open(result.url, '_blank', 'noopener,noreferrer');
+  };
+
+  return (
+    <div className="bg-white rounded-2xl border border-brand-blue/10 shadow-[0_8px_30px_rgb(0,0,0,0.08)] w-full overflow-hidden transform transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-1">
+      <div className="bg-gradient-to-r from-brand-vibrant/10 to-transparent p-3 flex items-center gap-2 border-b border-gray-100">
+        <CheckCircle2 className="w-5 h-5 text-green-500" />
+        <span className="text-sm font-bold tracking-wide text-brand-dark uppercase">
+          Link Gerado
+        </span>
+      </div>
+      <div className="p-5 bg-gradient-to-br from-white to-slate-50/50">
+        <p className="text-sm text-gray-600 mb-5 font-medium leading-relaxed">
+          Sua solicitação para <strong className="font-bold text-brand-vibrant relative px-1"><span className="absolute inset-0 bg-brand-yellow/20 -skew-x-6 rounded"></span><span className="relative">{destination}</span></strong> está pronta. Finalize seus dados:
+        </p>
+
+        <div className="space-y-3 mb-5">
+          <input
+            type="text"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            placeholder="Nome"
+            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm"
+          />
+          <input
+            type="text"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            placeholder="Sobrenome"
+            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm"
+          />
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="E-mail"
+            className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm"
+          />
         </div>
-    );
+
+        {localError && (
+          <div className="bg-red-50/80 text-red-600 px-4 py-3 text-xs font-medium rounded-xl mb-4 border border-red-100">
+            {localError}
+          </div>
+        )}
+        {notice && (
+          <div className="bg-amber-50/80 text-amber-700 px-4 py-3 text-xs font-medium rounded-xl mb-4 border border-amber-100">
+            {notice}
+          </div>
+        )}
+
+        <button
+          type="button"
+          onClick={handleClick}
+          disabled={isSubmittingLead}
+          className={`group flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3.5 px-4 rounded-xl shadow-md hover:shadow-lg transition-all ${isSubmittingLead ? 'opacity-90 cursor-wait' : ''}`}
+        >
+          {isSubmittingLead ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span>Salvando...</span>
+            </>
+          ) : (
+            <>
+              <span>Abrir WhatsApp</span>
+              <ExternalLink className="w-4 h-4 group-hover:scale-110 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
+            </>
+          )}
+        </button>
+      </div>
+    </div>
+  );
 };
 
 const AIChat: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', text: 'Olá! Sou a IA da Anhangá ✈️. \n\nPosso te ajudar com:\n- Dicas de roteiros exclusivos\n- Dúvidas sobre nossos serviços\n- Preparar um **orçamento personalizado**\n\nComo posso ajudar hoje?' }
+    { role: 'model', text: 'Olá! Sou seu guia Anhangá 🧭.\n\nPosso te ajudar com:\n- Roteiros exclusivos\n- Dúvidas sobre o destino\n- **Orçamento personalizado**\n\nVamos começar?' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const messagesRef = useRef<Message[]>(messages);
   const { setLeadDraft, submitLead, isSubmitting: isSubmittingLead } = useLeadCapture();
 
-  // Sync messages with ref to avoid stale closures in event listeners
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
@@ -210,284 +213,298 @@ const AIChat: React.FC = () => {
     scrollToBottom();
   }, [messages, isOpen, isLoading]);
 
-  // Focus input when opened
   useEffect(() => {
     if (isOpen && inputRef.current) {
-        setTimeout(() => inputRef.current?.focus(), 100);
+      setTimeout(() => inputRef.current?.focus(), 300);
     }
   }, [isOpen]);
 
   const handleFinalizeLead = async (payload: LeadFinalizePayload): Promise<LeadFinalizeResult> => {
-    setLeadDraft({
-      firstName: payload.firstName,
-      lastName: payload.lastName,
-      email: payload.email,
-      bantSummary: payload.bantSummary,
-    });
-
-    const result = await submitLead({
-      firstName: payload.firstName,
-      lastName: payload.lastName,
-      email: payload.email,
-      bantSummary: payload.bantSummary,
-    });
+    setLeadDraft({ ...payload });
+    const result = await submitLead({ ...payload });
 
     if (result.ok) {
-      // Dispara evento de conversão/formulário no dataLayer
       if (typeof window !== 'undefined' && (window as any).dataLayer) {
         (window as any).dataLayer.push({
-            event: 'form_submission',
-            form_type: 'ai_chatbot_lead',
-            destination: payload.fallbackUrl.includes('whatsapp') ? 'whatsapp' : 'lead_captured',
-            page_location: window.location.href
+          event: 'form_submission',
+          form_type: 'ai_chatbot_lead',
+          destination: payload.fallbackUrl.includes('whatsapp') ? 'whatsapp' : 'lead_captured',
+          page_location: window.location.href
         });
       }
       return { ok: true, url: result.whatsappUrl, notice: result.warning };
     }
 
-    // Se chegou aqui, result.ok é false (narrowed by TypeScript because of the return above)
     const errorResult = result as { ok: false; error: string; code: string };
-
     if (errorResult.code === 'HUBSPOT_DUPLICATE_CONTACT') {
       return {
         ok: true,
         url: payload.fallbackUrl,
-        notice: 'Seu contato já estava cadastrado. Vamos continuar no WhatsApp.',
+        notice: 'Seu contato já estava cadastrado. Vamos continuar.',
       };
     }
-
-    return {
-      ok: false,
-      error: errorResult.error || 'Não foi possível salvar seu lead agora. Tente novamente.',
-    };
+    return { ok: false, error: errorResult.error || 'Erro ao salvar dados.' };
   };
 
   const submitMessage = async (text: string) => {
     if (!text.trim() || isLoading) return;
 
-    const userText = text;
-    
-    const newHistory: Message[] = [...messagesRef.current, { role: 'user', text: userText }];
+    const newHistory: Message[] = [...messagesRef.current, { role: 'user', text }];
     setMessages(newHistory);
+    setInput('');
+
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.style.height = 'auto'; // reset height
+      }
+    }, 0);
+
     setIsLoading(true);
 
     const response = await getTravelAdvice(newHistory);
-    
     setIsLoading(false);
 
     if (response.text) {
-        setMessages(prev => [...prev, { 
-            role: 'model', 
-            text: response.text || '',
-            chips: response.chips 
-        }]);
+      setMessages(prev => [...prev, {
+        role: 'model',
+        text: response.text || '',
+        chips: response.chips
+      }]);
     }
 
     if (response.budgetLink) {
-        setLeadDraft({
-            bantSummary: response.budgetLink.bantSummary,
-            origin: response.budgetLink.origin,
-            destination: response.budgetLink.destination,
-            dates: response.budgetLink.dates,
-            baggagePreference: response.budgetLink.baggagePreference || '',
-        });
+      setLeadDraft({
+        bantSummary: response.budgetLink.bantSummary,
+        origin: response.budgetLink.origin,
+        destination: response.budgetLink.destination,
+        dates: response.budgetLink.dates,
+        baggagePreference: response.budgetLink.baggagePreference || '',
+      });
 
-        setMessages(prev => [...prev, { 
-            role: 'model', 
-            text: 'Orçamento Pronto', 
-            isAction: true,
-            actionData: {
-                url: response.budgetLink!.url,
-                destination: response.budgetLink!.destination,
-                bantSummary: response.budgetLink!.bantSummary
-            }
-        }]);
+      setMessages(prev => [...prev, {
+        role: 'model',
+        text: 'Orçamento Pronto',
+        isAction: true,
+        actionData: {
+          url: response.budgetLink!.url,
+          destination: response.budgetLink!.destination,
+          bantSummary: response.budgetLink!.bantSummary,
+          iataCode: response.budgetLink!.iataCode
+        }
+      }]);
     }
   };
 
-  const handleSend = () => {
-    if (!input.trim()) return;
-    const text = input;
-    setInput('');
-    submitMessage(text);
+  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+      inputRef.current.style.height = `${Math.min(inputRef.current.scrollHeight, 120)}px`;
+    }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') handleSend();
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      submitMessage(input);
+    }
   };
 
-  // Custom Event Listener to open/toggle chat from other components
   useEffect(() => {
     const handleToggle = (event: Event) => {
       const customEvent = event as CustomEvent;
-      const { detail } = customEvent;
       setIsOpen(true);
-      if (detail?.message) {
-        // Wait a bit for the transition to start before sending context
-        setTimeout(() => {
-            submitMessage(detail.message);
-        }, 300);
+      if (customEvent.detail?.message) {
+        setTimeout(() => submitMessage(customEvent.detail.message), 400);
       }
     };
-
     window.addEventListener('toggle-ai-chat', handleToggle);
     return () => window.removeEventListener('toggle-ai-chat', handleToggle);
   }, []);
 
   return (
-    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9999] flex flex-col items-end font-sans">
-      {isOpen && (
-        <div 
-            className="mb-4 w-[90vw] sm:w-[400px] bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col transition-all duration-300 animate-fade-in-up origin-bottom-right" 
-            style={{ height: '600px', maxHeight: '75vh' }}
-            role="dialog"
-            aria-label="Assistente Virtual de Viagem"
-        >
-          {/* Header */}
-          <div className="bg-gradient-to-br from-brand-vibrant to-brand-blue p-5 text-white flex justify-between items-center shrink-0 shadow-md z-10">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30">
-                  <Sparkles className="w-5 h-5 text-brand-yellow fill-brand-yellow" />
-              </div>
-              <div>
-                  <span className="font-bold block text-base tracking-wide">Assistente Anhangá</span>
-                  <div className="flex items-center gap-1.5 opacity-90">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400"></span>
-                    </span>
-                    <span className="text-xs font-medium">Online agora</span>
-                  </div>
+    <>
+      {/* Floating Toggle Button */}
+      <button
+        onClick={() => setIsOpen(true)}
+        className={`fixed ${isOpen ? 'translate-y-32 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'} 
+                    bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9990]
+                    flex items-center justify-center gap-3 
+                    bg-brand-vibrant text-white 
+                    shadow-[0_8px_30px_rgba(255,107,53,0.3)] hover:shadow-[0_8px_30px_rgba(255,107,53,0.5)] hover:-translate-y-1
+                    transition-all duration-300
+                    w-16 h-16 rounded-2xl sm:w-auto sm:h-auto sm:px-6 sm:py-3.5 sm:rounded-full
+                    focus:outline-none focus:ring-4 focus:ring-brand-vibrant/30`}
+        aria-label="Abrir assistente virtual"
+      >
+        <div className="relative flex items-center justify-center">
+          <MessageCircle className="w-7 h-7" />
+          <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse border-2 border-brand-vibrant"></span>
+        </div>
+
+        <div className="text-left hidden sm:flex sm:flex-col">
+          <span className="text-[10px] font-bold tracking-widest text-white/90 uppercase opacity-90">Roteiro IA</span>
+          <span className="text-sm font-bold leading-none capitalize mt-0.5">Ajuda & Cotação</span>
+        </div>
+      </button>
+
+      {/* Backdrop Overlay */}
+      <div
+        className={`fixed inset-0 z-[9998] transition-opacity duration-300 ease-in-out bg-brand-dark/20 backdrop-blur-sm ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
+        onClick={() => setIsOpen(false)}
+      />
+
+      {/* Drawer Panel - Soft Scrapbook Geometry */}
+      <div
+        className={`fixed top-0 right-0 h-full w-full sm:w-[450px] z-[9999] bg-[#fdfdfc] flex flex-col shadow-[-10px_0_40px_rgba(0,0,0,0.1)] transition-transform duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] sm:rounded-l-[2rem] overflow-hidden ${isOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+        role="dialog"
+        aria-label="Assistente Virtual Anhangá"
+      >
+        {/* Header - Scrapbook Softness */}
+        <div className="bg-white/80 backdrop-blur-md px-6 py-5 border-b border-gray-100 flex justify-between items-center shrink-0 z-10">
+          <div className="flex gap-4 items-center">
+            <div className="w-12 h-12 bg-gray-50 rounded-[1.25rem] flex items-center justify-center shadow-sm transform -rotate-3 hover:rotate-0 transition-transform">
+              <Sparkles className="w-6 h-6 text-brand-vibrant" />
+            </div>
+            <div>
+              <h2 className="font-extrabold text-lg text-brand-dark tracking-tight leading-none">
+                Hub Anhangá
+              </h2>
+              <div className="flex items-center gap-1.5 mt-1 opacity-80">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400"></span>
+                </span>
+                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+                  Assistente Online
+                </span>
               </div>
             </div>
-            <button 
-                onClick={() => setIsOpen(false)} 
-                className="hover:bg-white/20 p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
-                aria-label="Minimizar chat"
-            >
-              <X className="w-5 h-5" />
-            </button>
           </div>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="text-gray-400 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-full p-2.5 transition-colors focus:outline-none"
+            aria-label="Fechar gaveta"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
 
-          {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-5 bg-slate-50 space-y-6 scroll-smooth">
-            {messages.map((msg, idx) => (
-              <div key={idx} className={`flex items-end gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                
-                {/* Avatar */}
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border shadow-sm ${
-                    msg.role === 'user' 
-                    ? 'bg-brand-dark border-gray-700 text-white' 
-                    : 'bg-white border-gray-200 text-brand-vibrant'
-                }`}>
+        {/* Messages Area - Scrapbook vibe */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth bg-[#fdfdfc] relative">
+          {/* Fundo suave */}
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, black 1px, transparent 0)', backgroundSize: '32px 32px' }}></div>
+
+          {messages.map((msg, idx) => {
+            const isLastModelMsg = msg.role === 'model' && idx === messages.map(m => m.role).lastIndexOf('model');
+
+            return (
+              <div key={idx} className={`relative flex flex-col gap-2 ${msg.role === 'user' ? 'items-end' : 'items-start'} z-10`}>
+                <div className={`flex items-end gap-3 max-w-[90%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                  {/* Avatar */}
+                  <div className={`w-9 h-9 flex items-center justify-center shrink-0 rounded-full shadow-sm ${msg.role === 'user'
+                    ? 'bg-brand-dark text-white'
+                    : 'bg-white text-brand-vibrant border border-gray-100'
+                    }`}>
                     {msg.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-5 h-5" />}
-                </div>
+                  </div>
 
-                {/* Message Bubble */}
-                {msg.isAction ? (
-                    // Renderiza Card de Orçamento (Action Ticket)
-                    <ChatActionButton 
+                  {/* Bubble */}
+                  {msg.isAction ? (
+                    <div className="w-full relative mt-3 pt-4">
+                      {/* Passport Stamp Overlay */}
+                      <PassportStamp
+                        destination={msg.actionData?.destination || 'Viagem'}
+                        iataCode={msg.actionData?.iataCode}
+                        className="absolute top-[-25px] right-[-10px] sm:right-[5px] pointer-events-none"
+                      />
+                      <ChatActionButton
                         fallbackUrl={msg.actionData?.url || '#'}
-                        destination={msg.actionData?.destination} 
+                        destination={msg.actionData?.destination}
                         defaultBantSummary={msg.actionData?.bantSummary}
                         onFinalizeLead={handleFinalizeLead}
                         isSubmittingLead={isSubmittingLead}
-                    />
-                ) : (
-                    // Renderiza Texto Normal com Formatação
-                    <div className={`max-w-[85%] p-4 rounded-2xl text-sm shadow-sm ${
-                      msg.role === 'user' 
-                        ? 'bg-brand-vibrant text-white rounded-br-none' 
-                        : 'bg-white text-gray-700 border border-gray-100 rounded-bl-none'
-                    }`}>
+                      />
+                    </div>
+                  ) : (
+                    <div className={`p-4 text-sm shadow-sm ${msg.role === 'user'
+                      ? 'bg-brand-vibrant text-white rounded-2xl rounded-br-sm'
+                      : 'bg-white text-gray-800 border border-gray-100 rounded-2xl rounded-bl-sm'
+                      }`}>
                       {msg.role === 'model' ? (
-                        <div className="prose prose-sm max-w-none prose-p:text-gray-700 prose-p:leading-relaxed prose-p:m-0 prose-p:mb-2 last:prose-p:mb-0 prose-strong:text-gray-900 prose-strong:font-bold prose-ul:text-gray-700 prose-li:text-gray-700 prose-li:m-0 prose-ul:my-2">
+                        <div className="prose prose-sm max-w-none prose-p:text-gray-700 prose-p:leading-relaxed prose-strong:text-gray-900 prose-strong:font-bold prose-ul:text-gray-700">
                           <ReactMarkdown>{msg.text}</ReactMarkdown>
                         </div>
                       ) : (
-                        <FormattedText text={msg.text} />
+                        <div className="text-white font-medium leading-relaxed max-w-[300px] break-words">
+                          <FormattedText text={msg.text} />
+                        </div>
                       )}
                     </div>
+                  )}
+                </div>
+
+                {/* Action Chips */}
+                {isLastModelMsg && msg.chips && msg.chips.length > 0 && (
+                  <div className="flex flex-wrap gap-2 pl-12 mt-1">
+                    {msg.chips.map((chip, chipIdx) => (
+                      <button
+                        key={chipIdx}
+                        onClick={() => submitMessage(chip)}
+                        className="text-[12px] font-semibold text-gray-600 bg-white border border-gray-200 px-4 py-2 rounded-xl shadow-sm hover:shadow hover:border-brand-vibrant/30 hover:text-brand-vibrant hover:-translate-y-0.5 transition-all text-left"
+                      >
+                        {chip}
+                      </button>
+                    ))}
+                  </div>
                 )}
               </div>
-            ))}
-            
-            {isLoading && (
-              <div className="flex items-center gap-3">
-                 <div className="w-8 h-8 rounded-full bg-white border border-gray-200 text-brand-vibrant flex items-center justify-center shadow-sm">
-                    <Bot className="w-5 h-5" />
-                 </div>
-                 <div className="bg-white px-4 py-3 rounded-2xl rounded-bl-none shadow-sm border border-gray-100 flex items-center gap-2" data-testid="chat-typing-indicator">
-                    <Loader2 className="w-4 h-4 animate-spin text-brand-vibrant" />
-                    <span className="text-xs text-gray-400 font-medium">Anhangá está digitando...</span>
-                 </div>
+            );
+          })}
+
+          {isLoading && (
+            <div data-testid="chat-typing-indicator" className="flex items-end gap-3 z-10 relative">
+              <div className="w-9 h-9 bg-white rounded-full border border-gray-100 text-brand-vibrant flex items-center justify-center shadow-sm">
+                <Bot className="w-5 h-5" />
               </div>
-            )}
-            <div ref={messagesEndRef} />
+              <div className="bg-white px-4 py-3 border border-gray-100 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-2.5">
+                <Loader2 className="w-4 h-4 animate-spin text-brand-vibrant" />
+                <span className="text-xs font-medium text-gray-400">Anhangá digitando...</span>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} className="h-2" />
+        </div>
+
+        {/* Input Area */}
+        <div className="p-4 sm:p-5 bg-white border-t border-gray-100 shrink-0 z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.02)]">
+          <div className="relative flex items-end bg-slate-50 border border-gray-200 rounded-2xl focus-within:border-brand-vibrant/40 focus-within:bg-white focus-within:ring-4 focus-within:ring-brand-vibrant/10 transition-all">
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={handleInput}
+              onKeyDown={handleKeyDown}
+              placeholder="Digite sua dúvida aqui..."
+              rows={1}
+              className="flex-1 max-h-[120px] pl-4 pr-[50px] py-4 bg-transparent outline-none text-sm text-gray-700 font-medium placeholder-gray-400 resize-none overflow-y-auto w-full leading-snug"
+            />
+            <button
+              onClick={() => submitMessage(input)}
+              disabled={isLoading || !input.trim()}
+              className="absolute right-2 bottom-2 p-2.5 bg-brand-vibrant text-white rounded-[10px] shadow-sm hover:bg-brand-blue hover:shadow-md transition-all disabled:opacity-0 disabled:scale-75 focus:outline-none"
+              aria-label="Enviar mensagem"
+            >
+              <Send className="w-4 h-4 ml-0.5" />
+            </button>
           </div>
-
-          {/* Input Area */}
-          <div className="p-4 bg-white border-t border-gray-100 shrink-0">
-             <div className="relative flex items-center bg-gray-100 rounded-2xl border border-transparent focus-within:border-brand-vibrant/30 focus-within:bg-white focus-within:ring-4 focus-within:ring-brand-vibrant/10 transition-all">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyPress}
-                  placeholder="Digite sua dúvida aqui..."
-                  aria-label="Digite sua mensagem para o assistente virtual"
-                  className="flex-1 pl-4 pr-12 py-3 bg-transparent focus:outline-none text-sm text-gray-800 placeholder-gray-400"
-                />
-                <button 
-                  onClick={handleSend} 
-                  disabled={isLoading || !input.trim()}
-                  className="absolute right-2 p-2 bg-brand-vibrant text-white rounded-xl hover:bg-brand-blue transition-all disabled:opacity-0 disabled:scale-75 focus:outline-none shadow-md"
-                  aria-label="Enviar mensagem"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
-             </div>
-             <p className="text-[10px] text-center text-gray-400 mt-2">
-                Nossa IA pode cometer erros. Confirme os dados com o agente.
-             </p>
-          </div>
+          <p className="text-center text-[10px] text-gray-400 mt-2">
+            Nossa IA pode cometer erros. Confirme os dados no WhatsApp.
+          </p>
         </div>
-      )}
-
-      {/* Floating Toggle Button - Optimized for Mobile */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`
-            group flex items-center justify-center gap-3 
-            bg-brand-vibrant hover:bg-brand-blue text-white 
-            shadow-2xl hover:shadow-brand-vibrant/50
-            transition-all duration-300 transform hover:scale-110 active:scale-95 
-            focus:outline-none focus:ring-4 focus:ring-brand-vibrant/50 
-            z-[100]
-            /* Mobile: Circular & Larger Touch Target */
-            w-14 h-14 rounded-full p-0
-            /* Desktop: Pill Shape */
-            sm:w-auto sm:h-auto sm:rounded-full sm:pl-5 sm:pr-6 sm:py-3.5
-            ${isOpen ? 'translate-y-24 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
-        `}
-        aria-label="Abrir assistente virtual"
-      >
-        {/* Mobile Pulse Effect */}
-        <span className="absolute inset-0 rounded-full bg-brand-vibrant opacity-30 animate-ping sm:hidden"></span>
-
-        <div className="relative flex items-center justify-center">
-            <MessageCircle className="w-7 h-7 sm:w-8 sm:h-8" />
-            <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-500 rounded-full border-2 border-brand-vibrant animate-pulse sm:top-0 sm:right-0 sm:w-2.5 sm:h-2.5"></span>
-        </div>
-        
-        {/* Text Hidden on Mobile, Visible on Desktop */}
-        <div className="text-left hidden sm:block">
-            <span className="block text-[10px] font-medium text-brand-yellow uppercase tracking-wider">Online</span>
-            <span className="block text-sm font-bold leading-none">Ajuda & Cotação</span>
-        </div>
-      </button>
-    </div>
+      </div>
+    </>
   );
 };
 

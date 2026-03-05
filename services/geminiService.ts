@@ -16,6 +16,7 @@ interface BudgetFunctionArgs {
   need_summary?: string;
   timeline_window?: string;
   baggage_preference?: string;
+  iata_code?: string;
 }
 
 interface ChatResponse {
@@ -28,6 +29,7 @@ interface ChatResponse {
     baggagePreference?: string;
     url: string;
     bantSummary: string;
+    iataCode?: string;
   };
 }
 
@@ -143,6 +145,7 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
         baggagePreference: baggagePreference || undefined,
         url: getWhatsAppLink(messageLines.join('\n'), { appendTrackingRef: false }),
         bantSummary,
+        iataCode: args.iata_code || undefined,
       };
 
       if (!result.text) {

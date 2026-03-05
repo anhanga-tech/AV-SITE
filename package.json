@@ -27,6 +27,8 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
+    "@prerenderer/renderer-puppeteer": "^1.2.4",
+    "@prerenderer/webpack-plugin": "^5.3.10",
     "@tailwindcss/postcss": "^4.2.1",
     "@tailwindcss/typography": "^0.5.19",
     "@types/dompurify": "^3.2.0",

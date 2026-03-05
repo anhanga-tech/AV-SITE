@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import TrendingUp from 'lucide-react/dist/esm/icons/trending-up';
 import { LazyImage } from './ui/LazyImage';
@@ -55,9 +56,9 @@ const Categories: React.FC = () => {
         {/* Polaroid Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 px-4">
           {POPULAR_DESTINATIONS.map((item, idx) => (
-            <a
-              key={idx}
-              href={item.link}
+            <Link
+              key={item.link}
+              to={item.link}
               className={`
                         group bg-white p-4 pb-8 shadow-[0_15px_30px_-10px_rgba(0,0,0,0.15)] 
                         transform transition-transform duration-500 hover:scale-105 hover:z-10 hover:shadow-2xl 
@@ -96,7 +97,7 @@ const Categories: React.FC = () => {
                   <ArrowRight className="w-6 h-6 -rotate-45" />
                 </div>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
 

@@ -1,5 +1,5 @@
 import React, { useEffect, Suspense, lazy } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import Hero from '../components/Hero';
 
 import { OrganizationSchema } from '../components/schemas/OrganizationSchema';

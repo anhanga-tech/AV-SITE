@@ -27,7 +27,7 @@ async function prerender() {
   const sirv = (await import('sirv')).default;
   const handler = sirv(DIST_DIR, { single: true });
   const server = createServer((req, res) => handler(req, res));
-
+  
   server.listen(PORT);
   console.log(`📡 Static server running at http://localhost:${PORT}`);
 
@@ -64,7 +64,7 @@ async function prerender() {
   for (const route of ROUTES) {
     console.log(`📄 Prerendering: ${route}`);
     const page = await browser.newPage();
-
+    
     await page.setViewport({ width: 1280, height: 720 });
 
     await page.goto(`http://localhost:${PORT}${route}`, {
@@ -83,13 +83,13 @@ async function prerender() {
     html = keepLast(html, /<link rel="canonical" href="[\s\S]*?"\/?>/gi);
     html = keepLast(html, /<meta property="og:[^"]+" content="[^"]+">/gi);
     html = keepLast(html, /<meta name="twitter:[^"]+" content="[^"]+">/gi);
-
+    
     const routePath = route === '/' ? 'index.html' : `${route.slice(1)}/index.html`;
     const filePath = path.join(DIST_DIR, routePath);
 
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.writeFileSync(filePath, html);
-
+    
     await page.close();
   }
 
