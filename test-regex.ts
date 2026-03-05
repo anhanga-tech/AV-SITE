@@ -14,7 +14,7 @@ function extractChipsFromText(text: string) {
     if (!chipsMatch) return { text };
 
     try {
-        const rawJsonString = chipsMatch[1].replace(/['“”]/g, '"').replace(/\s+/g, ' ');
+        const rawJsonString = chipsMatch[1].replace(/['“”]/g, '"');
         const parsedArray = JSON.parse(rawJsonString);
 
         if (Array.isArray(parsedArray)) {
