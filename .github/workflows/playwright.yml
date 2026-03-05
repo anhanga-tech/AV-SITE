@@ -22,6 +22,10 @@ jobs:
     - name: Install Playwright Browsers
       # In CI only install Chromium to match the CI-only project set in playwright.config.ts
       run: pnpm exec playwright install --with-deps chromium
+
+    - name: Install Puppeteer Browser
+      run: npx puppeteer browsers install chrome
+
     - name: Run Playwright tests
       run: pnpm exec playwright test
       env:
