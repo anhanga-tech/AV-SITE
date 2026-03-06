@@ -4,13 +4,8 @@
 
 export const config = { runtime: 'edge' };
 
-// Placeholder conversion stubs (edge-compatible)
-async function sendGoogleConversion(_event: string, _payload: Record<string, unknown>): Promise<{ success: boolean; error?: string }> {
-  return { success: true };
-}
-async function sendMetaConversion(_payload: Record<string, unknown>): Promise<{ success: boolean; error?: string }> {
-  return { success: true };
-}
+import { sendGoogleConversion } from '../lib/conversions/google.ts';
+import { sendMetaConversion } from '../lib/conversions/meta.ts';
 
 export default async function handler(request: Request): Promise<Response> {
   if (request.method !== 'POST') {

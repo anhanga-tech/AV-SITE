@@ -1,41 +1,50 @@
 import { test, expect } from '@playwright/test';
 import { AIChat } from './pages/AIChat';
 
-test.describe('AIChat Deep-link Support', () => {
-  test('should open chat automatically when chat=1 is present', async ({ page }) => {
-    // Navigate with chat=1
+test.describe('Deep-link Chat Support', () => {
+  test('should open chat automatically when chat parameter is present', async ({ page }) => {
+    // Navigate with chat=1 (compatible)
     await page.goto('/?chat=1');
+    const aiChat = new AIChat(page);
+    await aiChat.expectVisible();
 
-    const chat = new AIChat(page);
+    // Check if URL is cleaned (params removed)
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.url()).not.toContain('chat=1');
+  });
 
-    // Check if chat dialog is visible (with timeout for the 800ms delay + animation)
-    await expect(chat.chatDialog).toBeVisible({ timeout: 10000 });
+  test('should open chat automatically with ?chat=open', async ({ page }) => {
+    await page.goto('/?chat=open');
+    const aiChat = new AIChat(page);
+    await aiChat.expectVisible();
 
-    // Check if URL was cleaned (params removed)
-    await page.waitForFunction(() => !window.location.search.includes('chat=1'), { timeout: 10000 });
-    const url = new URL(page.url());
-    expect(url.searchParams.has('chat')).toBe(false);
+    // Check if URL is cleaned
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.url()).not.toContain('chat=open');
   });
 
   test('should send custom message when m parameter is present', async ({ page }) => {
     const customMsg = 'Quero viajar para o Japão';
     await page.goto(`/?chat=1&m=${encodeURIComponent(customMsg)}`);
 
-    const chat = new AIChat(page);
-    await expect(chat.chatDialog).toBeVisible({ timeout: 10000 });
+    const aiChat = new AIChat(page);
+    await aiChat.expectVisible();
 
     // Check if the user message appears in the chat
-    await expect(chat.chatDialog.getByText(customMsg)).toBeVisible();
+    await expect(aiChat.chatDialog.getByText(customMsg)).toBeVisible();
   });
 
-  test('should send destination message when destino parameter is present', async ({ page }) => {
-    const destino = 'Paris';
-    await page.goto(`/?chat=1&destino=${encodeURIComponent(destino)}`);
+  test('should open chat and apply context with ?chat=open&destino=Orlando', async ({ page }) => {
+    await page.goto('/?chat=open&destino=Orlando');
+    const aiChat = new AIChat(page);
+    await aiChat.expectVisible();
 
-    const chat = new AIChat(page);
-    await expect(chat.chatDialog).toBeVisible({ timeout: 10000 });
+    // Wait for the message to appear
+    await aiChat.expectMessageContaining('Orlando');
 
-    // Check if the auto-generated message appears
-    await expect(chat.chatDialog.getByText(`Olá! Gostaria de um roteiro personalizado para ${destino}.`)).toBeVisible();
+    // Check if URL is cleaned
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.url()).not.toContain('chat=open');
+    await expect(page.url()).not.toContain('destino=Orlando');
   });
 });
