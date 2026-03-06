@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { AIChat } from './pages/AIChat';
 
+const userMessageSelector = 'div.text-white.font-medium.leading-relaxed';
+
 test.describe('Deep-link Chat Support', () => {
   test('should open chat automatically when chat parameter is present', async ({ page }) => {
     // Navigate with chat=1 (compatible)
@@ -32,7 +34,7 @@ test.describe('Deep-link Chat Support', () => {
 
     // The message must be pre-filled in input (no auto-send)
     await expect(aiChat.inputField).toHaveValue(customMsg);
-    await expect(aiChat.chatDialog.locator('div.text-white.font-medium.leading-relaxed')).toHaveCount(0);
+    await expect(aiChat.chatDialog.locator(userMessageSelector)).toHaveCount(0);
   });
 
   test('should pre-fill destination prompt when destino parameter is present and should not auto-send', async ({ page }) => {
@@ -42,7 +44,7 @@ test.describe('Deep-link Chat Support', () => {
 
     const expectedPrompt = 'Olá! Gostaria de um roteiro personalizado para Orlando.';
     await expect(aiChat.inputField).toHaveValue(expectedPrompt);
-    await expect(aiChat.chatDialog.locator('div.text-white.font-medium.leading-relaxed')).toHaveCount(0);
+    await expect(aiChat.chatDialog.locator(userMessageSelector)).toHaveCount(0);
 
     // Check if URL is cleaned
     await expect(page).toHaveURL(/\/$/);
