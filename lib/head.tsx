@@ -37,6 +37,7 @@ const escapeHtml = (value: string): string =>
     .replaceAll("'", '&#39;');
 
 const escapeAttribute = (value: string | number | boolean): string => escapeHtml(String(value));
+const escapeScriptContent = (value: string): string => value.replaceAll('<', '\\u003c');
 
 const renderAttrs = (tag: HeadTag): string => {
   const attrs = { ...(tag.attrs ?? {}), 'data-av-head': tag.key };
@@ -56,7 +57,7 @@ export const renderHeadTags = (tags: HeadTag[]): string =>
         return `<title ${attrs}>${escapeHtml(tag.textContent ?? '')}</title>`;
       }
       if (tag.tagName === 'script') {
-        return `<script ${attrs}>${tag.innerHTML ?? ''}</script>`;
+        return `<script ${attrs}>${escapeScriptContent(tag.innerHTML ?? '')}</script>`;
       }
       return `<${tag.tagName} ${attrs}>`;
     })
@@ -92,7 +93,7 @@ const applyHeadTag = (tag: HeadTag): HTMLElement => {
   if (tag.tagName === 'title') {
     element.textContent = tag.textContent ?? '';
   } else if (tag.tagName === 'script') {
-    element.innerHTML = tag.innerHTML ?? '';
+    element.innerHTML = escapeScriptContent(tag.innerHTML ?? '');
   } else {
     element.textContent = '';
   }

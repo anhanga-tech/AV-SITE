@@ -9,6 +9,12 @@ export interface RenderResult {
   headHtml: string;
 }
 
+const DEFAULT_SSR_TIMEOUT_MS = 30000;
+const parsedTimeout = Number.parseInt(process.env.SSR_TIMEOUT_MS ?? '', 10);
+const SSR_TIMEOUT_MS = Number.isFinite(parsedTimeout) && parsedTimeout > 0
+  ? parsedTimeout
+  : DEFAULT_SSR_TIMEOUT_MS;
+
 export async function render(url: string): Promise<RenderResult> {
   const headManager = createHeadManager();
 
@@ -25,8 +31,8 @@ export async function render(url: string): Promise<RenderResult> {
       }
       settled = true;
       abort();
-      reject(new Error(`SSR timed out while rendering ${url}`));
-    }, 30000);
+      reject(new Error(`SSR timed out while rendering ${url} after ${SSR_TIMEOUT_MS}ms`));
+    }, SSR_TIMEOUT_MS);
 
     stream.on('data', (chunk) => {
       html += chunk.toString();
