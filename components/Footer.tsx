@@ -47,6 +47,7 @@ const Footer: React.FC = () => {
                         <h4 className="font-bold text-white mb-6 uppercase tracking-wider text-xs">Menu</h4>
                         <ul className="space-y-3 font-medium">
                             <li><Link to="/" className="hover:text-brand-yellow transition-colors">Agência de Viagens em São Paulo</Link></li>
+                            <li><Link to="/sobre" className="hover:text-brand-yellow transition-colors">Sobre a Anhangá Viagens</Link></li>
                             <li><a href={getBlogHomeUrl()} className="hover:text-brand-yellow transition-colors">Blog de Viagens e Roteiros</a></li>
                             <li><Link to="/orlando" className="hover:text-brand-yellow transition-colors">Pacotes para Orlando</Link></li>
                             <li><Link to="/beto-carrero" className="hover:text-brand-yellow transition-colors">Pacote Beto Carrero</Link></li>

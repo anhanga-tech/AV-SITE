@@ -8,6 +8,7 @@ import Clock from 'lucide-react/dist/esm/icons/clock';
 import Tag from 'lucide-react/dist/esm/icons/tag';
 import { getWhatsAppLink } from '../utils/whatsapp';
 import { optimizeRemoteImageUrl } from '../data/mediaConfig';
+import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 
 import { SEO } from '../components/SEO';
 import { ArticleSchema } from '../components/schemas/ArticleSchema';
@@ -91,6 +92,7 @@ const BlogPost: React.FC = () => {
                 description={post.excerpt}
                 image={post.image}
                 datePublished={post.date}
+                dateModified={post.lastUpdated}
                 authorName={author?.name || post.author}
                 authorImage={author?.image}
                 url={canonicalUrl}
@@ -150,7 +152,7 @@ const BlogPost: React.FC = () => {
                                     <div className="p-1.5 bg-white/10 rounded-lg backdrop-blur-md">
                                         <Calendar className="w-4 h-4" />
                                     </div>
-                                    <span>{post.date}</span>
+                                    <span>Publicado em {post.date}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <div className="p-1.5 bg-white/10 rounded-lg backdrop-blur-md">
@@ -173,11 +175,17 @@ const BlogPost: React.FC = () => {
                         <div className="bg-white rounded-[2.5rem] p-8 md:p-14 shadow-xl border border-gray-100">
 
                             <div className="mb-10 pb-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                <div className="flex items-center gap-3">
-                                    <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest ${post.color} bg-opacity-20 border`}>
-                                        {post.category}
-                                    </span>
-                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{post.date}</span>
+                                <div className="flex flex-col gap-2">
+                                    <div className="flex items-center gap-3">
+                                        <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest ${post.color} bg-opacity-20 border`}>
+                                            {post.category}
+                                        </span>
+                                        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{post.date}</span>
+                                    </div>
+                                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1">
+                                        <Clock className="w-3 h-3" />
+                                        Última atualização: {post.lastUpdated || post.date}
+                                    </div>
                                 </div>
                                 <SocialShare
                                     minimal
@@ -204,7 +212,41 @@ const BlogPost: React.FC = () => {
                                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content || `<p>${post.excerpt}</p><p>Conteúdo completo em breve...</p>`) }}
                             />
 
-                            <div className="mt-16 pt-10 border-t-2 border-dashed border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-6">
+                            {/* Author Bio Box - GEO / E-E-A-T */}
+                            <div className="mt-16 p-8 md:p-10 bg-gray-50 rounded-[2rem] border border-gray-100 flex flex-col md:flex-row items-center gap-8 shadow-inner">
+                                <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-md shrink-0">
+                                    {author?.image ? (
+                                        <img src={author.image} alt={author.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center bg-brand-dark text-white text-3xl font-black">
+                                            {(author?.name || post.author).charAt(0)}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="text-center md:text-left">
+                                    <div className="flex flex-col md:flex-row md:items-center gap-2 mb-3">
+                                        <h3 className="text-xl font-black text-brand-dark">Sobre {author?.name || post.author}</h3>
+                                        <span className="px-3 py-1 bg-brand-yellow/20 text-brand-dark text-[10px] font-black uppercase tracking-widest rounded-full w-fit mx-auto md:mx-0">
+                                            {author?.role || 'Travel Expert'}
+                                        </span>
+                                    </div>
+                                    <p className="text-gray-600 font-serif leading-relaxed italic">
+                                        {author?.bio || 'Especialista apaixonado por viagens, com vasta experiência em curadoria de roteiros personalizados e dicas exclusivas para tornar cada jornada inesquecível.'}
+                                    </p>
+                                    {author?.social?.instagram && (
+                                        <a
+                                            href={author.social.instagram}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-block mt-4 text-xs font-black text-brand-cyan hover:text-brand-cyanDark transition-colors uppercase tracking-widest"
+                                        >
+                                            Seguir no Instagram →
+                                        </a>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="mt-12 pt-10 border-t-2 border-dashed border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-6">
                                 <div className="flex items-center gap-2">
                                     <span className="font-bold text-brand-dark text-lg">Gostou? Espalhe a palavra:</span>
                                 </div>

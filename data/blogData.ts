@@ -68,6 +68,7 @@ export interface BlogPost {
     image: string;
     category: string;
     date: string;
+    lastUpdated?: string;
     author: string; // Mantido para compatibilidade simples em alguns lugares
     authorId?: string; // Link para o objeto Author
     isFeatured?: boolean;
@@ -125,6 +126,7 @@ export const BLOG_POSTS: BlogPost[] = [
         image: "https://cdn1.parksmedia.wdprapps.disney.com/resize/mwImage/1/1300/544/75/vision-dam/digital/parks-platform/parks-global-assets/disney-world/events/holiday/entertainment/MKDecor2_0109ZL_0316SD_R3_xak-16x9.jpg?2025-06-09T20:18:33+00:00",
         category: "Dicas de Expert",
         date: "12 Dez, 2025",
+        lastUpdated: "15 Dez, 2025",
         author: "Ana Souza",
         authorId: "ana-souza",
         isFeatured: true,
@@ -600,6 +602,7 @@ export const BLOG_POSTS: BlogPost[] = [
         image: "https://res.cloudinary.com/dzehqrcmm/image/upload/blog/pexels-photo-1306791.jpg",
         category: "Festivais",
         date: "24 Jan, 2026",
+        lastUpdated: "26 Jan, 2026",
         author: "Equipe Anhangá",
         authorId: "equipe-anhanga",
         color: "text-orange-600 bg-orange-50 border-orange-200",

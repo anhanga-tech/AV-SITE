@@ -14,6 +14,7 @@ const HowItWorks = lazy(() => import('../components/HowItWorks'));
 const Testimonials = lazy(() => import('../components/Testimonials'));
 const Blog = lazy(() => import('../components/Blog'));
 const FAQ = lazy(() => import('../components/FAQ'));
+const AboutSection = lazy(() => import('../components/AboutSection'));
 const CallToAction = lazy(() => import('../components/CallToAction'));
 
 const Home: React.FC = () => {
@@ -106,6 +107,9 @@ const Home: React.FC = () => {
         <>
           <Suspense fallback={<section id="experiencia" className="py-24 bg-[#fffdf5]" />}>
             <Highlights />
+          </Suspense>
+          <Suspense fallback={<section className="py-24 bg-[#fffdf5]" />}>
+            <AboutSection />
           </Suspense>
           <Suspense fallback={<section className="py-24 bg-[#fffdf5]" />}>
             <Categories />

@@ -10,10 +10,12 @@ const NAV_LINKS = [
   { name: 'Destinos', href: 'destinos' },
   {
     name: 'Sobre Nós',
+    href: 'sobre',
+    isExternal: false,
     subLinks: [
-      { name: 'Nossa História', href: 'nossa-historia' },
-      { name: 'Como Funciona', href: 'como-funciona' },
-      { name: 'Depoimentos', href: 'depoimentos' },
+      { name: 'Nossa História', href: 'sobre#nossa-historia', internal: true },
+      { name: 'Como Funciona', href: 'como-funciona', internal: false },
+      { name: 'Depoimentos', href: 'depoimentos', internal: false },
     ],
   },
   { name: 'Contato', href: 'contato' },
@@ -50,7 +52,12 @@ const Header: React.FC = () => {
     setIsMobileMenuOpen(false);
   };
 
-  const handleNavClick = (e: React.MouseEvent, targetId: string) => {
+  const handleNavClick = (e: React.MouseEvent, targetId: string, internalLink?: boolean) => {
+    if (internalLink) {
+        setIsMobileMenuOpen(false);
+        return;
+    }
+
     if (isHome) {
       e.preventDefault();
       const element = document.getElementById(targetId);
@@ -144,17 +151,31 @@ const Header: React.FC = () => {
                   <div className="absolute top-full pt-4 w-48 z-10">
                     <div className="bg-white rounded-md shadow-lg py-2 animate-fade-in-down">
                       {link.subLinks.map((subLink) => (
-                        <a
-                          key={subLink.name}
-                          href={`#${subLink.href}`}
-                          onClick={(e) => {
-                            handleNavClick(e, subLink.href);
-                            setActiveDropdown(null);
-                          }}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          {subLink.name}
-                        </a>
+                        subLink.internal ? (
+                          <Link
+                            key={subLink.name}
+                            to={subLink.href.startsWith('sobre') ? `/${subLink.href}` : `/${subLink.href}`}
+                            onClick={() => {
+                              handleNavClick(null as any, subLink.href, true);
+                              setActiveDropdown(null);
+                            }}
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          >
+                            {subLink.name}
+                          </Link>
+                        ) : (
+                          <a
+                            key={subLink.name}
+                            href={`#${subLink.href}`}
+                            onClick={(e) => {
+                              handleNavClick(e, subLink.href);
+                              setActiveDropdown(null);
+                            }}
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          >
+                            {subLink.name}
+                          </a>
+                        )
                       ))}
                     </div>
                   </div>
@@ -197,25 +218,64 @@ const Header: React.FC = () => {
       {isMobileMenuOpen && (
         <div id="mobile-menu" className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg py-4 px-6 flex flex-col gap-4 border-t border-gray-100 text-gray-800 animate-fade-in-down">
           {NAV_LINKS.map((link) => (
-            isHome ? (
-              <a
-                key={link.name}
-                href={`#${link.href}`}
-                className="text-gray-700 font-medium py-2 border-b border-gray-50 focus:text-brand-vibrant focus:outline-none"
-                onClick={(e) => handleNavClick(e, link.href)}
-              >
-                {link.name}
-              </a>
+            link.subLinks ? (
+              <div key={link.name} className="flex flex-col gap-2">
+                <span className="text-gray-400 text-xs font-black uppercase tracking-widest">{link.name}</span>
+                {link.subLinks.map(subLink => (
+                  subLink.internal ? (
+                    <Link
+                      key={subLink.name}
+                      to={subLink.href.startsWith('sobre') ? `/${subLink.href}` : `/${subLink.href}`}
+                      className="text-gray-700 font-medium py-2 pl-4 border-b border-gray-50 focus:text-brand-vibrant focus:outline-none"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {subLink.name}
+                    </Link>
+                  ) : (
+                    isHome ? (
+                      <a
+                        key={subLink.name}
+                        href={`#${subLink.href}`}
+                        className="text-gray-700 font-medium py-2 pl-4 border-b border-gray-50 focus:text-brand-vibrant focus:outline-none"
+                        onClick={(e) => handleNavClick(e, subLink.href)}
+                      >
+                        {subLink.name}
+                      </a>
+                    ) : (
+                      <Link
+                        key={subLink.name}
+                        to="/"
+                        state={{ targetId: subLink.href }}
+                        className="text-gray-700 font-medium py-2 pl-4 border-b border-gray-50 focus:text-brand-vibrant focus:outline-none"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {subLink.name}
+                      </Link>
+                    )
+                  )
+                ))}
+              </div>
             ) : (
-              <Link
-                key={link.name}
-                to="/"
-                state={{ targetId: link.href }}
-                className="text-gray-700 font-medium py-2 border-b border-gray-50 focus:text-brand-vibrant focus:outline-none"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {link.name}
-              </Link>
+              isHome ? (
+                <a
+                  key={link.name}
+                  href={`#${link.href}`}
+                  className="text-gray-700 font-medium py-2 border-b border-gray-50 focus:text-brand-vibrant focus:outline-none"
+                  onClick={(e) => handleNavClick(e, link.href!)}
+                >
+                  {link.name}
+                </a>
+              ) : (
+                <Link
+                  key={link.name}
+                  to="/"
+                  state={{ targetId: link.href }}
+                  className="text-gray-700 font-medium py-2 border-b border-gray-50 focus:text-brand-vibrant focus:outline-none"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {link.name}
+                </Link>
+              )
             )
           ))}
           <a
