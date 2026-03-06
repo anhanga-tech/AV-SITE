@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { getWhatsAppLink } from '../../../utils/whatsapp';
 
 // --- Constants ---
+const SITE_URL = 'https://www.anhanga.tur.br';
 const WHATSAPP_MESSAGE = "Olá! Gostaria de saber mais sobre os pacotes para Orlando.";
 const LOGO_URL = `${import.meta.env.BASE_URL}assets/LOGO ANHANGA VIAGENS - AZUL.svg`;
 
@@ -96,9 +97,9 @@ function OrlandoApp() {
       </svg>
 
       <header>
-          <Link to="/" className="logo">
+          <a href={`${SITE_URL}/`} className="logo">
               <img src={LOGO_URL} alt="Anhangá Viagens Logo" />
-          </Link>
+          </a>
           <nav className="nav-links" aria-label="Navegação Interna">
               <a href="#features">Destaques</a>
               <a href="#parks">Parques</a>
