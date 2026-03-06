@@ -179,7 +179,7 @@ const Hero: React.FC = () => {
           >
             {QUICK_FEATURES.map((feat, i) => (
               <motion.div
-                key={i}
+                key={feat.text}
                 variants={{
                   hidden: { opacity: 0, y: 16, scale: 0.9 },
                   visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 400, damping: 20 } }
