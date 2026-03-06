@@ -213,6 +213,36 @@ const AIChat: React.FC = () => {
     return () => window.removeEventListener('toggle-ai-chat', handleToggle);
   }, []);
 
+  // Deep-link handling (chat=1, m/message, destino)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const shouldOpenChat = urlParams.get('chat') === '1';
+
+    if (shouldOpenChat) {
+      // Pequeno delay para garantir que a página carregou e evitar bloqueio da thread principal
+      const timer = setTimeout(() => {
+        setIsOpen(true);
+
+        const customMessage = urlParams.get('m') || urlParams.get('message');
+        const destination = urlParams.get('destino');
+
+        if (customMessage) {
+          submitMessage(customMessage);
+        } else if (destination) {
+          submitMessage(`Olá! Gostaria de um roteiro personalizado para ${destination}.`);
+        }
+
+        // Limpa os parâmetros da URL para evitar re-trigger em reload (opcional mas recomendado para UX)
+        const newUrl = window.location.pathname + window.location.hash;
+        window.history.replaceState({}, '', newUrl);
+      }, 800);
+
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
   return (
     <>
       {/* Floating Toggle Button */}
