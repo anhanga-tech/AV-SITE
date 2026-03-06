@@ -126,23 +126,19 @@ const Hero: React.FC = () => {
       <div className="container mx-auto px-6 relative z-10 pt-40 pb-12">
         <div className="flex flex-col items-center justify-center text-center">
 
-          {/* SEO H1 - Hidden from UI, but present for crawlers */}
-          <h1 className="sr-only">
-            {validCityForTitle
-              ? `Agência de Viagens em São Paulo: Sua Próxima Aventura em ${validCityForTitle}`
-              : "Anhangá Viagens: Agência de Viagens em São Paulo com Roteiros Personalizados"}
-          </h1>
-
-          {/* Fun Typography - Dynamic sizing based on content length */}
-          <p
-            aria-hidden="true"
+          {/* SEO H1 - Visible with primary keyword integrated */}
+          <h1
             className={`font-sans font-extrabold text-white mb-6 leading-[0.9] tracking-tight drop-shadow-lg transition-all duration-500
                 ${validCityForTitle ? 'text-4xl sm:text-5xl md:text-7xl' : 'text-5xl sm:text-6xl md:text-8xl'}
                 `}
           >
+            <span className="block text-sm sm:text-base font-semibold text-white/80 tracking-widest uppercase mb-3 leading-normal">
+              Agência de Viagens em São Paulo
+            </span>
             Sua Próxima <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500 relative inline-block pb-2">
-              {validCityForTitle ? `Aventura em ${validCityForTitle}` : 'Aventura'}
+              {validCityForTitle ? `Aventura em ${validCityForTitle}` : 'Aventura Personalizada'}
+
               {/* Underline Scribble - orgânico via Framer Motion pathLength */}
               <svg className="absolute w-full h-4 -bottom-0 left-0 text-yellow-400 overflow-visible" viewBox="0 0 100 10" preserveAspectRatio="none">
                 <motion.path
@@ -156,7 +152,7 @@ const Hero: React.FC = () => {
                 />
               </svg>
             </span>
-          </p>
+          </h1>
 
           <p className="text-white/90 text-xl md:text-2xl max-w-2xl mx-auto mb-12 font-medium leading-relaxed drop-shadow-md">
             Roteiros que parecem feitos à mão. <br />
