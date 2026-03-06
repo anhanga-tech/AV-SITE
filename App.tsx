@@ -1,11 +1,12 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, MemoryRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import AIChat from './components/AIChat';
 import ScrollToTop from './components/ScrollToTop';
+import { HeadContext, type HeadManager } from './lib/head';
 
 // Pages
 import Home from './pages/Home';
@@ -47,9 +48,9 @@ const MainSiteShell: React.FC = () => {
   );
 };
 
-function App() {
+const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClientFeatures }) => {
   return (
-    <Router>
+    <>
       <ScrollToTop />
       <Suspense fallback={<LandingRouteFallback />}>
         <Routes>
@@ -60,10 +61,44 @@ function App() {
           <Route path="/*" element={<MainSiteShell />} />
         </Routes>
       </Suspense>
-      <AIChat />
-      <Analytics />
-      <SpeedInsights />
-    </Router>
+      {includeClientFeatures ? (
+        <>
+          <AIChat />
+          <Analytics />
+          <SpeedInsights />
+        </>
+      ) : null}
+    </>
+  );
+};
+
+interface AppProps {
+  router?: 'browser' | 'memory';
+  initialEntries?: string[];
+  headManager?: HeadManager | null;
+  includeClientFeatures?: boolean;
+}
+
+function App({
+  router = 'browser',
+  initialEntries = ['/'],
+  headManager = null,
+  includeClientFeatures = true
+}: AppProps) {
+  const routerNode = router === 'memory' ? (
+    <MemoryRouter initialEntries={initialEntries}>
+      <AppLayout includeClientFeatures={includeClientFeatures} />
+    </MemoryRouter>
+  ) : (
+    <BrowserRouter>
+      <AppLayout includeClientFeatures={includeClientFeatures} />
+    </BrowserRouter>
+  );
+
+  return (
+    <HeadContext.Provider value={headManager}>
+      {routerNode}
+    </HeadContext.Provider>
   );
 }
 

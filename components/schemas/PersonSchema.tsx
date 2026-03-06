@@ -1,4 +1,5 @@
 import React from 'react';
+import { StructuredData } from './StructuredData';
 
 export interface PersonSchemaProps {
     name: string;
@@ -28,11 +29,5 @@ export const PersonSchema: React.FC<PersonSchemaProps> = ({
         ...(sameAs && sameAs.length > 0 && { "sameAs": sameAs })
     };
 
-    return (
-        <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-            defer={false}
-        />
-    );
+    return <StructuredData id="person" data={schema} />;
 };
