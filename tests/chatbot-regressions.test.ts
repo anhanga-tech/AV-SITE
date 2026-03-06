@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { detectBlockedDestination, SYSTEM_INSTRUCTION } from '../api/generate.ts';
+import { detectBlockedDestination } from '../lib/ai/validation.ts';
+import { SYSTEM_INSTRUCTION } from '../lib/ai/prompt.ts';
 
 test('safety check should block "Emirados" (Policy #186)', () => {
     const result = detectBlockedDestination('Dubai, Emirados Árabes Unidos');
