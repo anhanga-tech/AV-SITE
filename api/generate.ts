@@ -48,7 +48,7 @@ export default async function handler(request: Request) {
     });
 
     if (!rateLimit.allowed) {
-        console.warn(\`RATE_LIMIT: IP \${clientIP} exceeded limit. Reset in \${Math.ceil(rateLimit.resetIn / 1000)}s\`);
+        console.warn(`RATE_LIMIT: IP ${clientIP} exceeded limit. Reset in ${Math.ceil(rateLimit.resetIn / 1000)}s`);
         return new Response(JSON.stringify({
             error: 'Muitas requisições. Por favor, aguarde um momento.',
             retryAfter: Math.ceil(rateLimit.resetIn / 1000)
