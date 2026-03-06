@@ -67,8 +67,6 @@ const AIChat: React.FC = () => {
   const { setLeadDraft, submitLead, isSubmitting: isSubmittingLead } = useLeadCapture();
   const location = useLocation();
   const navigate = useNavigate();
-  const processedDeepLink = useRef(false);
-
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
@@ -215,28 +213,39 @@ const AIChat: React.FC = () => {
     };
     window.addEventListener('toggle-ai-chat', handleToggle);
 
-    // Deep-link Support
-    if (!processedDeepLink.current) {
-      const searchParams = new URLSearchParams(location.search);
-      const chatParam = searchParams.get('chat');
-      const destinationParam = searchParams.get('destino');
+    // Deep-link support — open chat and optionally pre-fill a destination message
+    const CHAT_URL_PARAM = 'chat';
+    const DESTINATION_URL_PARAM = 'destino';
+    // Delay message until after the drawer slide-in animation (duration-500) completes
+    const DEEP_LINK_MESSAGE_DELAY_MS = 600;
 
-      if (chatParam === 'open') {
-        processedDeepLink.current = true;
-        setIsOpen(true);
+    const searchParams = new URLSearchParams(location.search);
+    const chatParam = searchParams.get(CHAT_URL_PARAM);
+    const destinationParam = searchParams.get(DESTINATION_URL_PARAM);
 
-        if (destinationParam) {
-          const message = `Olá! Gostaria de informações sobre viagem para ${destinationParam}.`;
-          setTimeout(() => submitMessage(message), 600);
+    if (chatParam === 'open') {
+      setIsOpen(true);
+
+      if (destinationParam) {
+        // Sanitize: allow only letters (incl. accented), spaces, hyphens, and apostrophes
+        // to prevent prompt injection attacks via the URL parameter
+        const sanitizedDestination = destinationParam
+          .trim()
+          .slice(0, 100)
+          .replace(/[^\p{L}\s\-']/gu, '');
+
+        if (sanitizedDestination) {
+          const message = `Olá! Gostaria de informações sobre viagem para ${sanitizedDestination}.`;
+          setTimeout(() => submitMessage(message), DEEP_LINK_MESSAGE_DELAY_MS);
         }
-
-        // Clean URL
-        searchParams.delete('chat');
-        searchParams.delete('destino');
-        const newSearch = searchParams.toString();
-        const newPath = `${location.pathname}${newSearch ? `?${newSearch}` : ''}${location.hash}`;
-        navigate(newPath, { replace: true });
       }
+
+      // Clean URL — remove params to avoid re-triggering on navigation
+      searchParams.delete(CHAT_URL_PARAM);
+      searchParams.delete(DESTINATION_URL_PARAM);
+      const newSearch = searchParams.toString();
+      const newPath = `${location.pathname}${newSearch ? `?${newSearch}` : ''}${location.hash}`;
+      navigate(newPath, { replace: true });
     }
 
     return () => window.removeEventListener('toggle-ai-chat', handleToggle);
