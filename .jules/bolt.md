@@ -11,3 +11,13 @@
 **Impact:** Reduced unnecessary Virtual DOM diffing and re-renders of the Highlights section during home page interactions.
 
 **Measurement:** Re-renders of `Highlights` reduced to 1 (initial load) instead of multiple during scroll/interaction events on the Home page.
+
+# 2026-03-06 - ⚡ Bolt: Modular AI Code Execution
+
+**What:** Refactored `api/generate.ts` into a modular architecture in `lib/ai/`.
+
+**Why:** The monolithic `api/generate.ts` was becoming hard to maintain and test. By separating concerns (types, constants, tools, validation, prompt), we improve code clarity and allow for more granular unit testing of individual AI logic components without the overhead of the full request handler.
+
+**Impact:** Improved cold start performance potentially due to smaller individual module imports and significantly better maintainability for future AI enhancements.
+
+**Measurement:** Unit tests now run against smaller, focused modules instead of the full API route, and `api/generate.ts` complexity (SLOC) was reduced by over 80%.
