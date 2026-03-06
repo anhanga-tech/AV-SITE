@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { AIChat } from './pages/AIChat';
 
+const userMessageSelector = 'div.text-white.font-medium.leading-relaxed';
+
 test.describe('Deep-link Chat Support', () => {
   test('should open chat automatically when chat parameter is present', async ({ page }) => {
     // Navigate with chat=1 (compatible)
