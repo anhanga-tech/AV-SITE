@@ -30,6 +30,25 @@ const REQUIRED_PATTERNS = [
   { label: 'Twitter card', pattern: /<meta\b[^>]*name="twitter:title"[^>]*content="[^"]+"/i },
   { label: 'JSON-LD schema', pattern: /<script\b[^>]*type="application\/ld\+json"[^>]*>[\s\S]*?<\/script>/i }
 ];
+const MANAGED_TEMPLATE_HEAD_TAG_PATTERNS = [
+  /<title\b[^>]*data-av-head="[^"]+"[^>]*>[\s\S]*?<\/title>\s*/gi,
+  /<meta\b[^>]*data-av-head="[^"]+"[^>]*\/?>\s*/gi,
+  /<link\b[^>]*data-av-head="[^"]+"[^>]*\/?>\s*/gi
+];
+const UNIQUE_TAG_PATTERNS = [
+  { label: 'title', pattern: /<title\b[^>]*>/gi },
+  { label: 'meta description', pattern: /<meta\b[^>]*name="description"[^>]*>/gi },
+  { label: 'canonical', pattern: /<link\b[^>]*rel="canonical"[^>]*>/gi },
+  { label: 'og:title', pattern: /<meta\b[^>]*property="og:title"[^>]*>/gi },
+  { label: 'og:description', pattern: /<meta\b[^>]*property="og:description"[^>]*>/gi },
+  { label: 'og:image', pattern: /<meta\b[^>]*property="og:image"[^>]*>/gi },
+  { label: 'og:type', pattern: /<meta\b[^>]*property="og:type"[^>]*>/gi },
+  { label: 'og:url', pattern: /<meta\b[^>]*property="og:url"[^>]*>/gi },
+  { label: 'twitter:card', pattern: /<meta\b[^>]*name="twitter:card"[^>]*>/gi },
+  { label: 'twitter:title', pattern: /<meta\b[^>]*name="twitter:title"[^>]*>/gi },
+  { label: 'twitter:description', pattern: /<meta\b[^>]*name="twitter:description"[^>]*>/gi },
+  { label: 'twitter:image', pattern: /<meta\b[^>]*name="twitter:image"[^>]*>/gi }
+];
 
 const routeToOutputPath = (route) =>
   route === '/' ? path.join(DIST_DIR, 'index.html') : path.join(DIST_DIR, route.slice(1), 'index.html');
@@ -39,8 +58,15 @@ const ensurePrerenderMarker = (html) =>
     attrs.includes('data-prerendered=') ? match : `<html${attrs} data-prerendered="true">`
   );
 
-const stripManagedHeadTags = (template) =>
-  template.replace(/\n?[ \t]*<(title|meta|link|script)\b[^>]*data-av-head="[^"]+"[^>]*>(?:[\s\S]*?<\/title>|[\s\S]*?<\/script>)?/gi, '');
+const stripManagedHeadTags = (template) => {
+  let strippedTemplate = template;
+
+  for (const pattern of MANAGED_TEMPLATE_HEAD_TAG_PATTERNS) {
+    strippedTemplate = strippedTemplate.replace(pattern, '');
+  }
+
+  return strippedTemplate;
+};
 
 const injectRenderedHtml = (template, appHtml, headHtml) => {
   const withManagedHeadRemoved = stripManagedHeadTags(template);
@@ -58,22 +84,7 @@ const validateHtml = (route, html) => {
     }
   }
 
-  const uniqueTagPatterns = [
-    { label: 'title', pattern: /<title\b[^>]*>/gi },
-    { label: 'meta description', pattern: /<meta\b[^>]*name="description"[^>]*>/gi },
-    { label: 'canonical', pattern: /<link\b[^>]*rel="canonical"[^>]*>/gi },
-    { label: 'og:title', pattern: /<meta\b[^>]*property="og:title"[^>]*>/gi },
-    { label: 'og:description', pattern: /<meta\b[^>]*property="og:description"[^>]*>/gi },
-    { label: 'og:image', pattern: /<meta\b[^>]*property="og:image"[^>]*>/gi },
-    { label: 'og:type', pattern: /<meta\b[^>]*property="og:type"[^>]*>/gi },
-    { label: 'og:url', pattern: /<meta\b[^>]*property="og:url"[^>]*>/gi },
-    { label: 'twitter:card', pattern: /<meta\b[^>]*name="twitter:card"[^>]*>/gi },
-    { label: 'twitter:title', pattern: /<meta\b[^>]*name="twitter:title"[^>]*>/gi },
-    { label: 'twitter:description', pattern: /<meta\b[^>]*name="twitter:description"[^>]*>/gi },
-    { label: 'twitter:image', pattern: /<meta\b[^>]*name="twitter:image"[^>]*>/gi }
-  ];
-
-  for (const tag of uniqueTagPatterns) {
+  for (const tag of UNIQUE_TAG_PATTERNS) {
     const matchCount = countMatches(html, tag.pattern);
     if (matchCount !== 1) {
       throw new Error(`Expected exactly 1 ${tag.label} tag in prerendered output for route "${route}", found ${matchCount}`);
