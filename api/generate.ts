@@ -8,8 +8,8 @@ import {
     resolveMaxMessageLength,
     hasOversizedMessage,
     getClientIP,
-    buildCorsHeaders
 } from '../lib/ai/utils.ts';
+import { buildCorsHeaders } from '../lib/network.ts';
 import {
     budgetTool,
     extractBudgetToolCallFromText,
