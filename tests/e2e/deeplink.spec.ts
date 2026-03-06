@@ -23,28 +23,44 @@ test.describe('Deep-link Chat Support', () => {
     await expect(page.url()).not.toContain('chat=open');
   });
 
-  test('should send custom message when m parameter is present', async ({ page }) => {
+  test('should pre-fill input when m parameter is present and should not auto-send', async ({ page }) => {
     const customMsg = 'Quero viajar para o Japão';
     await page.goto(`/?chat=1&m=${encodeURIComponent(customMsg)}`);
 
     const aiChat = new AIChat(page);
     await aiChat.expectVisible();
 
-    // Check if the user message appears in the chat
-    await expect(aiChat.chatDialog.getByText(customMsg)).toBeVisible();
+    // The message must be pre-filled in input (no auto-send)
+    await expect(aiChat.inputField).toHaveValue(customMsg);
+    await expect(aiChat.chatDialog.locator('div.text-white.font-medium.leading-relaxed')).toHaveCount(0);
   });
 
-  test('should open chat and apply context with ?chat=open&destino=Orlando', async ({ page }) => {
-    await page.goto('/?chat=open&destino=Orlando');
+  test('should pre-fill destination prompt when destino parameter is present and should not auto-send', async ({ page }) => {
+    await page.goto('/?chat=1&destino=Orlando');
     const aiChat = new AIChat(page);
     await aiChat.expectVisible();
 
-    // Wait for the message to appear
-    await aiChat.expectMessageContaining('Orlando');
+    const expectedPrompt = 'Olá! Gostaria de um roteiro personalizado para Orlando.';
+    await expect(aiChat.inputField).toHaveValue(expectedPrompt);
+    await expect(aiChat.chatDialog.locator('div.text-white.font-medium.leading-relaxed')).toHaveCount(0);
 
     // Check if URL is cleaned
     await expect(page).toHaveURL(/\/$/);
-    await expect(page.url()).not.toContain('chat=open');
+    await expect(page.url()).not.toContain('chat=1');
     await expect(page.url()).not.toContain('destino=Orlando');
+  });
+
+  test('should preserve UTM parameters when cleaning deep-link params', async ({ page }) => {
+    const customMsg = 'Quero viajar para o Japão';
+    await page.goto(`/?chat=1&m=${encodeURIComponent(customMsg)}&utm_source=instagram&utm_campaign=summer`);
+
+    const aiChat = new AIChat(page);
+    await aiChat.expectVisible();
+
+    await expect(aiChat.inputField).toHaveValue(customMsg);
+    await expect(page).toHaveURL(/utm_source=instagram/);
+    await expect(page).toHaveURL(/utm_campaign=summer/);
+    await expect(page.url()).not.toContain('chat=1');
+    await expect(page.url()).not.toContain('m=');
   });
 });
