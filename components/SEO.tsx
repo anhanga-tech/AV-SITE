@@ -1,4 +1,5 @@
 import React from 'react';
+import { useHeadTags } from '../lib/head';
 
 interface SEOProps {
   title?: string;
@@ -63,35 +64,97 @@ export const SEO: React.FC<SEOProps> = ({
     canonicalUrl = normalizeCanonical(window.location.href);
   }
 
-  return (
-    <>
-      <title suppressHydrationWarning>{fullTitle}</title>
-      <meta name="description" content={description} suppressHydrationWarning />
-      <meta name="keywords" content={keywords} suppressHydrationWarning />
-      {canonicalUrl && (
-        <>
-          <link rel="canonical" href={canonicalUrl} suppressHydrationWarning />
-          <link rel="alternate" hreflang="pt-BR" href={canonicalUrl} suppressHydrationWarning />
-          <link rel="alternate" hreflang="x-default" href={canonicalUrl} suppressHydrationWarning />
-        </>
-      )}
+  useHeadTags([
+    {
+      tagName: 'title',
+      key: 'title',
+      textContent: fullTitle
+    },
+    {
+      tagName: 'meta',
+      key: 'meta:description',
+      attrs: { name: 'description', content: description }
+    },
+    {
+      tagName: 'meta',
+      key: 'meta:keywords',
+      attrs: { name: 'keywords', content: keywords }
+    },
+    {
+      tagName: 'meta',
+      key: 'meta:robots',
+      attrs: { name: 'robots', content: robots }
+    },
+    {
+      tagName: 'meta',
+      key: 'meta:og:type',
+      attrs: { property: 'og:type', content: type }
+    },
+    {
+      tagName: 'meta',
+      key: 'meta:og:title',
+      attrs: { property: 'og:title', content: fullTitle }
+    },
+    {
+      tagName: 'meta',
+      key: 'meta:og:description',
+      attrs: { property: 'og:description', content: description }
+    },
+    {
+      tagName: 'meta',
+      key: 'meta:og:image',
+      attrs: { property: 'og:image', content: image }
+    },
+    {
+      tagName: 'meta',
+      key: 'meta:og:site_name',
+      attrs: { property: 'og:site_name', content: siteName }
+    },
+    {
+      tagName: 'meta',
+      key: 'meta:twitter:card',
+      attrs: { name: 'twitter:card', content: 'summary_large_image' }
+    },
+    {
+      tagName: 'meta',
+      key: 'meta:twitter:title',
+      attrs: { name: 'twitter:title', content: fullTitle }
+    },
+    {
+      tagName: 'meta',
+      key: 'meta:twitter:description',
+      attrs: { name: 'twitter:description', content: description }
+    },
+    {
+      tagName: 'meta',
+      key: 'meta:twitter:image',
+      attrs: { name: 'twitter:image', content: image }
+    },
+    ...(canonicalUrl
+      ? [
+          {
+            tagName: 'link' as const,
+            key: 'link:canonical',
+            attrs: { rel: 'canonical', href: canonicalUrl }
+          },
+          {
+            tagName: 'link' as const,
+            key: 'link:alternate:pt-BR',
+            attrs: { rel: 'alternate', hreflang: 'pt-BR', href: canonicalUrl }
+          },
+          {
+            tagName: 'link' as const,
+            key: 'link:alternate:x-default',
+            attrs: { rel: 'alternate', hreflang: 'x-default', href: canonicalUrl }
+          },
+          {
+            tagName: 'meta' as const,
+            key: 'meta:og:url',
+            attrs: { property: 'og:url', content: canonicalUrl }
+          }
+        ]
+      : [])
+  ]);
 
-      {/* Open Graph */}
-      <meta property="og:type" content={type} suppressHydrationWarning />
-      <meta property="og:title" content={fullTitle} suppressHydrationWarning />
-      <meta property="og:description" content={description} suppressHydrationWarning />
-      {canonicalUrl && <meta property="og:url" content={canonicalUrl} suppressHydrationWarning />}
-      <meta property="og:image" content={image} suppressHydrationWarning />
-      <meta property="og:site_name" content={siteName} suppressHydrationWarning />
-
-      {/* Twitter */}
-      <meta name="twitter:card" content="summary_large_image" suppressHydrationWarning />
-      <meta name="twitter:title" content={fullTitle} suppressHydrationWarning />
-      <meta name="twitter:description" content={description} suppressHydrationWarning />
-      <meta name="twitter:image" content={image} suppressHydrationWarning />
-
-      {/* Robots */}
-      <meta name="robots" content={robots} suppressHydrationWarning />
-    </>
-  );
+  return null;
 };

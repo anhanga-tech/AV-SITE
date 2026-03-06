@@ -1,7 +1,8 @@
-import fs from 'fs';
-import path from 'path';
-import puppeteer from 'puppeteer';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { build } from 'vite';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,93 +18,105 @@ const ROUTES = [
 ];
 
 const DIST_DIR = path.resolve(__dirname, '../dist');
-const PORT = 3001;
+const SSR_OUT_DIR = path.resolve(__dirname, '../.prerender-ssr');
+const SSR_ENTRY = path.resolve(__dirname, '../ssr.tsx');
+const INDEX_FILE = path.join(DIST_DIR, 'index.html');
 
-async function prerender() {
-  console.log('🚀 Starting pre-rendering...');
+const REQUIRED_PATTERNS = [
+  { label: 'title', pattern: /<title\b[^>]*>[\s\S]*?<\/title>/i },
+  { label: 'meta description', pattern: /<meta\b[^>]*name="description"[^>]*content="[^"]+"/i },
+  { label: 'canonical', pattern: /<link\b[^>]*rel="canonical"[^>]*href="https:\/\/www\.anhanga\.tur\.br/i },
+  { label: 'Open Graph', pattern: /<meta\b[^>]*property="og:title"[^>]*content="[^"]+"/i },
+  { label: 'Twitter card', pattern: /<meta\b[^>]*name="twitter:title"[^>]*content="[^"]+"/i },
+  { label: 'JSON-LD schema', pattern: /<script\b[^>]*type="application\/ld\+json"[^>]*>[\s\S]*?<\/script>/i }
+];
 
-  // Start a simple static server
-  const { createServer } = await import('http');
-  const sirv = (await import('sirv')).default;
-  const handler = sirv(DIST_DIR, { single: true });
-  const server = createServer((req, res) => handler(req, res));
-  
-  server.listen(PORT);
-  console.log(`📡 Static server running at http://localhost:${PORT}`);
+const routeToOutputPath = (route) =>
+  route === '/' ? path.join(DIST_DIR, 'index.html') : path.join(DIST_DIR, route.slice(1), 'index.html');
 
-  const browser = await puppeteer.launch({
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
+const ensurePrerenderMarker = (html) =>
+  html.replace(/<html([^>]*)>/i, (match, attrs) =>
+    attrs.includes('data-prerendered=') ? match : `<html${attrs} data-prerendered="true">`
+  );
+
+const injectRenderedHtml = (template, appHtml, headHtml) => {
+  const withRoot = template.replace('<div id="root"></div>', `<div id="root">${appHtml}</div>`);
+  const withHead = withRoot.replace('</head>', `${headHtml}\n</head>`);
+  return ensurePrerenderMarker(withHead);
+};
+
+const validateHtml = (route, html) => {
+  for (const requirement of REQUIRED_PATTERNS) {
+    if (!requirement.pattern.test(html)) {
+      throw new Error(`Missing ${requirement.label} in prerendered output for route "${route}"`);
+    }
+  }
+};
+
+const removeDirectory = (directoryPath) => {
+  if (fs.existsSync(directoryPath)) {
+    fs.rmSync(directoryPath, { recursive: true, force: true });
+  }
+};
+
+async function buildSsrBundle() {
+  removeDirectory(SSR_OUT_DIR);
+
+  await build({
+    configFile: path.resolve(__dirname, '../vite.config.ts'),
+    mode: process.env.NODE_ENV || 'production',
+    build: {
+      ssr: SSR_ENTRY,
+      outDir: SSR_OUT_DIR,
+      emptyOutDir: false,
+      minify: false,
+      sourcemap: false,
+      rollupOptions: {
+        output: {
+          manualChunks: undefined,
+          entryFileNames: 'entry-server.js',
+          format: 'es'
+        }
+      }
+    }
   });
 
-  const cleanTags = (html, tagPattern, fallbackValue = null) => {
-      const matches = Array.from(html.matchAll(tagPattern));
-      if (matches.length > 1) {
-        let bestMatch = matches[matches.length - 1][0];
-        if (fallbackValue) {
-          const nonFallback = matches.find(m => !m[0].includes(fallbackValue));
-          if (nonFallback) {
-            bestMatch = nonFallback[0];
-          }
-        }
-        // First remove all occurrences of the tag
-        html = html.replace(new RegExp(tagPattern, 'gi'), '');
-        // Then insert only the best match at the beginning of the head
-        html = html.replace(/<head>/i, `<head>${bestMatch}`);
-      }
-      return html;
-    };
-
-    const keepLast = (html, tagPattern) => {
-      const matches = Array.from(html.matchAll(tagPattern));
-      if (matches.length > 1) {
-        const lastMatch = matches[matches.length - 1][0];
-        // First remove all occurrences of the tag
-        html = html.replace(new RegExp(tagPattern, 'gi'), '');
-        // Then insert only the last match at the beginning of the head
-        html = html.replace(/<head>/i, `<head>${lastMatch}`);
-      }
-      return html;
-    };
-
-  for (const route of ROUTES) {
-    console.log(`📄 Prerendering: ${route}`);
-    const page = await browser.newPage();
-    
-    await page.setViewport({ width: 1280, height: 720 });
-
-    await page.goto(`http://localhost:${PORT}${route}`, {
-      waitUntil: 'networkidle0'
-    });
-
-    await page.waitForSelector('#root', { timeout: 10000 });
-
-    let html = await page.content();
-
-    // Keep in sync with SEO.tsx default title prop
-    const DEFAULT_TITLE = 'Anhangá Viagens | Agência de Viagens Personalizadas';
-    html = cleanTags(html, /<title>[\s\S]*?<\/title>/gi, DEFAULT_TITLE);
-    html = keepLast(html, /<meta name="description" content="[\s\S]*?"\/?>/gi);
-    html = keepLast(html, /<meta name="keywords" content="[\s\S]*?"\/?>/gi);
-    html = keepLast(html, /<meta name="robots" content="[\s\S]*?"\/?>/gi);
-    html = keepLast(html, /<link rel="canonical" href="[\s\S]*?"\/?>/gi);
-    html = keepLast(html, /<meta property="og:[^"]+" content="[^"]+"\/?>/gi);
-    html = keepLast(html, /<meta name="twitter:[^"]+" content="[^"]+"\/?>/gi);
-    
-    const routePath = route === '/' ? 'index.html' : `${route.slice(1)}/index.html`;
-    const filePath = path.join(DIST_DIR, routePath);
-
-    fs.mkdirSync(path.dirname(filePath), { recursive: true });
-    fs.writeFileSync(filePath, html);
-    
-    await page.close();
-  }
-
-  await browser.close();
-  server.close();
-  console.log('✅ Pre-rendering complete!');
+  const serverEntryUrl = pathToFileURL(path.join(SSR_OUT_DIR, 'entry-server.js')).href;
+  return import(serverEntryUrl);
 }
 
-prerender().catch(err => {
-  console.warn('⚠️  Pre-rendering failed (build will continue without pre-rendered pages):', err.message);
-  process.exit(0);
+async function prerender() {
+  if (!fs.existsSync(INDEX_FILE)) {
+    throw new Error(`Missing client build output at ${INDEX_FILE}. Run "vite build" first.`);
+  }
+
+  console.log('Starting SSR prerender...');
+
+  const template = fs.readFileSync(INDEX_FILE, 'utf8');
+  const serverModule = await buildSsrBundle();
+
+  if (typeof serverModule.render !== 'function') {
+    throw new Error('SSR bundle does not export a render(url) function.');
+  }
+
+  for (const route of ROUTES) {
+    console.log(`Rendering ${route}`);
+    const { appHtml, headHtml } = await serverModule.render(route);
+    const html = injectRenderedHtml(template, appHtml, headHtml);
+
+    validateHtml(route, html);
+
+    const outputPath = routeToOutputPath(route);
+    fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+    fs.writeFileSync(outputPath, html);
+  }
+
+  removeDirectory(SSR_OUT_DIR);
+  console.log('SSR prerender complete.');
+}
+
+prerender().catch((error) => {
+  removeDirectory(SSR_OUT_DIR);
+  console.error('Prerender failed:', error);
+  process.exit(1);
 });

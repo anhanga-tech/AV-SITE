@@ -1,4 +1,5 @@
 import React from 'react';
+import { StructuredData } from './StructuredData';
 
 interface AggregateRatingProps {
   ratingValue: number;
@@ -61,10 +62,5 @@ export const ServiceSchema: React.FC<ServiceSchemaProps> = ({
     };
   }
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
-    />
-  );
+  return <StructuredData id="service" data={schemaData} />;
 };
