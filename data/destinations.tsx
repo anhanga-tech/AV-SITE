@@ -1,4 +1,3 @@
-import React from 'react';
 import Palmtree from 'lucide-react/dist/esm/icons/palmtree';
 import Heart from 'lucide-react/dist/esm/icons/heart';
 import Briefcase from 'lucide-react/dist/esm/icons/briefcase';
@@ -153,9 +152,9 @@ export const PRE_NORMALIZED_DB = DESTINATIONS_DATABASE.map(d => ({
  * Static Quick Features list.
  */
 export const QUICK_FEATURES = [
-  { text: "Roteiros Exclusivos", icon: <Sparkles className="w-4 h-4 text-yellow-300" /> },
-  { text: "Suporte 24/7", icon: <Sparkles className="w-4 h-4 text-yellow-300" /> },
-  { text: "Ótimos Preços", icon: <Sparkles className="w-4 h-4 text-yellow-300" /> }
+  { text: "Roteiros Exclusivos", icon: Sparkles },
+  { text: "Suporte 24/7", icon: Sparkles },
+  { text: "Ótimos Preços", icon: Sparkles }
 ];
 
 // Rich Options for UI

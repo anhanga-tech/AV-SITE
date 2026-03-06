@@ -166,7 +166,7 @@ const Hero: React.FC = () => {
           <div className="mt-10 flex flex-wrap justify-center gap-6 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
             {QUICK_FEATURES.map((feat, i) => (
               <div key={i} className="flex items-center gap-2 text-white/90 font-bold text-sm bg-white/10 px-4 py-2 rounded-full backdrop-blur-md border border-white/10 hover:bg-white/20 transition-all duration-300 hover:scale-105 cursor-default">
-                {feat.icon}
+                <feat.icon className="w-4 h-4 text-yellow-300" />
                 {feat.text}
               </div>
             ))}

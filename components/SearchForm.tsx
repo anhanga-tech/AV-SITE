@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import Search from 'lucide-react/dist/esm/icons/search';
 import MapPin from 'lucide-react/dist/esm/icons/map-pin';
 import ChevronDown from 'lucide-react/dist/esm/icons/chevron-down';
@@ -20,7 +20,6 @@ import {
   BUDGET_TIERS,
   getDaysInMonth
 } from '../data/destinations';
-import { useClickOutside } from '../hooks/useClickOutside';
 
 interface SearchFormProps {
   onDestinationMatch: (city: string | null) => void;
@@ -60,12 +59,43 @@ const SearchForm: React.FC<SearchFormProps> = ({ onDestinationMatch }) => {
   const tripTypeRef = useRef<HTMLDivElement>(null);
   const budgetRef = useRef<HTMLDivElement>(null);
 
-  // Use the custom hook for all dropdowns
-  useClickOutside([guestDropdownRef], () => setShowGuestDropdown(false));
-  useClickOutside([destRef], () => setShowDestSuggestions(false));
-  useClickOutside([calendarRef], () => setShowCalendar(false));
-  useClickOutside([tripTypeRef], () => setShowTripTypeDropdown(false));
-  useClickOutside([budgetRef], () => setShowBudgetDropdown(false));
+  // Single effect to handle all dropdown close-on-outside-click/escape logic
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (destRef.current && !destRef.current.contains(event.target as Node)) {
+        setShowDestSuggestions(false);
+      }
+      if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
+        setShowCalendar(false);
+      }
+      if (guestDropdownRef.current && !guestDropdownRef.current.contains(event.target as Node)) {
+        setShowGuestDropdown(false);
+      }
+      if (tripTypeRef.current && !tripTypeRef.current.contains(event.target as Node)) {
+        setShowTripTypeDropdown(false);
+      }
+      if (budgetRef.current && !budgetRef.current.contains(event.target as Node)) {
+        setShowBudgetDropdown(false);
+      }
+    };
+
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setShowDestSuggestions(false);
+        setShowCalendar(false);
+        setShowGuestDropdown(false);
+        setShowTripTypeDropdown(false);
+        setShowBudgetDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, []);
 
   // Memoize calendar days
   const calendarDays = useMemo(() => getDaysInMonth(currentMonth), [currentMonth]);
