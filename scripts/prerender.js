@@ -39,16 +39,44 @@ const ensurePrerenderMarker = (html) =>
     attrs.includes('data-prerendered=') ? match : `<html${attrs} data-prerendered="true">`
   );
 
+const stripManagedHeadTags = (template) =>
+  template.replace(/\n?[ \t]*<(title|meta|link|script)\b[^>]*data-av-head="[^"]+"[^>]*>(?:[\s\S]*?<\/title>|[\s\S]*?<\/script>)?/gi, '');
+
 const injectRenderedHtml = (template, appHtml, headHtml) => {
-  const withRoot = template.replace('<div id="root"></div>', `<div id="root">${appHtml}</div>`);
+  const withManagedHeadRemoved = stripManagedHeadTags(template);
+  const withRoot = withManagedHeadRemoved.replace('<div id="root"></div>', `<div id="root">${appHtml}</div>`);
   const withHead = withRoot.replace('</head>', `${headHtml}\n</head>`);
   return ensurePrerenderMarker(withHead);
 };
+
+const countMatches = (html, pattern) => Array.from(html.matchAll(pattern)).length;
 
 const validateHtml = (route, html) => {
   for (const requirement of REQUIRED_PATTERNS) {
     if (!requirement.pattern.test(html)) {
       throw new Error(`Missing ${requirement.label} in prerendered output for route "${route}"`);
+    }
+  }
+
+  const uniqueTagPatterns = [
+    { label: 'title', pattern: /<title\b[^>]*>/gi },
+    { label: 'meta description', pattern: /<meta\b[^>]*name="description"[^>]*>/gi },
+    { label: 'canonical', pattern: /<link\b[^>]*rel="canonical"[^>]*>/gi },
+    { label: 'og:title', pattern: /<meta\b[^>]*property="og:title"[^>]*>/gi },
+    { label: 'og:description', pattern: /<meta\b[^>]*property="og:description"[^>]*>/gi },
+    { label: 'og:image', pattern: /<meta\b[^>]*property="og:image"[^>]*>/gi },
+    { label: 'og:type', pattern: /<meta\b[^>]*property="og:type"[^>]*>/gi },
+    { label: 'og:url', pattern: /<meta\b[^>]*property="og:url"[^>]*>/gi },
+    { label: 'twitter:card', pattern: /<meta\b[^>]*name="twitter:card"[^>]*>/gi },
+    { label: 'twitter:title', pattern: /<meta\b[^>]*name="twitter:title"[^>]*>/gi },
+    { label: 'twitter:description', pattern: /<meta\b[^>]*name="twitter:description"[^>]*>/gi },
+    { label: 'twitter:image', pattern: /<meta\b[^>]*name="twitter:image"[^>]*>/gi }
+  ];
+
+  for (const tag of uniqueTagPatterns) {
+    const matchCount = countMatches(html, tag.pattern);
+    if (matchCount !== 1) {
+      throw new Error(`Expected exactly 1 ${tag.label} tag in prerendered output for route "${route}", found ${matchCount}`);
     }
   }
 };
