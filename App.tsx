@@ -28,17 +28,19 @@ const MainSiteShell: React.FC = () => {
     <div className="flex flex-col min-h-screen bg-white">
       <Header />
       <main id="main-content" className="flex-grow">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/blog" element={<Suspense fallback={<MainRouteFallback />}><BlogList /></Suspense>} />
-          <Route path="/blog/:slug" element={<Suspense fallback={<MainRouteFallback />}><BlogPost /></Suspense>} />
-          <Route path="/old-blog" element={<Suspense fallback={<MainRouteFallback />}><BlogRedirect /></Suspense>} />
-          <Route path="/old-blog/:slug" element={<Suspense fallback={<MainRouteFallback />}><BlogRedirect /></Suspense>} />
-          <Route path="/termos-de-uso" element={<Suspense fallback={<MainRouteFallback />}><Terms /></Suspense>} />
-          <Route path="/politica-privacidade" element={<Suspense fallback={<MainRouteFallback />}><Privacy /></Suspense>} />
-          <Route path="/mapa-do-site" element={<Suspense fallback={<MainRouteFallback />}><SiteMap /></Suspense>} />
-          <Route path="*" element={<Suspense fallback={<MainRouteFallback />}><NotFound /></Suspense>} />
-        </Routes>
+        <Suspense fallback={<MainRouteFallback />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/blog" element={<BlogList />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
+            <Route path="/old-blog" element={<BlogRedirect />} />
+            <Route path="/old-blog/:slug" element={<BlogRedirect />} />
+            <Route path="/termos-de-uso" element={<Terms />} />
+            <Route path="/politica-privacidade" element={<Privacy />} />
+            <Route path="/mapa-do-site" element={<SiteMap />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
       </main>
       <Footer />
     </div>
@@ -49,13 +51,15 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
-      <Routes>
-        <Route path="/beto-carrero" element={<Suspense fallback={<LandingRouteFallback />}><BetoCarreroLanding /></Suspense>} />
-        <Route path="/lollapalooza-2026" element={<Suspense fallback={<LandingRouteFallback />}><LollapaloozaLanding /></Suspense>} />
-        <Route path="/lollapalooza" element={<Navigate to="/lollapalooza-2026" replace />} />
-        <Route path="/orlando" element={<Suspense fallback={<LandingRouteFallback />}><OrlandoLanding /></Suspense>} />
-        <Route path="/*" element={<MainSiteShell />} />
-      </Routes>
+      <Suspense fallback={<LandingRouteFallback />}>
+        <Routes>
+          <Route path="/beto-carrero" element={<BetoCarreroLanding />} />
+          <Route path="/lollapalooza-2026" element={<LollapaloozaLanding />} />
+          <Route path="/lollapalooza" element={<Navigate to="/lollapalooza-2026" replace />} />
+          <Route path="/orlando" element={<OrlandoLanding />} />
+          <Route path="/*" element={<MainSiteShell />} />
+        </Routes>
+      </Suspense>
       <AIChat />
       <Analytics />
       <SpeedInsights />
