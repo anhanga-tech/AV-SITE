@@ -104,52 +104,52 @@ const Home: React.FC = () => {
 
       {shouldRenderBelowFold ? (
         <>
-          <Suspense fallback={<section id="experiencia" className="py-24 bg-[#fffdf5]" />}>
+          <Suspense fallback={<section id="experiencia" className="min-h-[700px] bg-[#fffdf5]" aria-hidden="true" />}>
             <Highlights />
           </Suspense>
-          <Suspense fallback={<section className="py-24 bg-[#fffdf5]" />}>
+          <Suspense fallback={<section className="min-h-[300px] bg-[#fffdf5]" aria-hidden="true" />}>
             <Categories />
           </Suspense>
         </>
       ) : (
         <>
-          <section id="experiencia" className="py-24 bg-[#fffdf5]" />
-          <section className="py-24 bg-[#fffdf5]" />
+          <section id="experiencia" className="min-h-[700px] bg-[#fffdf5]" aria-hidden="true" />
+          <section className="min-h-[300px] bg-[#fffdf5]" aria-hidden="true" />
         </>
       )}
       <div id="destinos" ref={destinationsSentinelRef} />
       {shouldRenderBelowFold && shouldLoadDestinations ? (
-        <Suspense fallback={<section className="py-24 bg-[#fffdf5]" />}>
+        <Suspense fallback={<section className="min-h-[900px] bg-[#fffdf5]" aria-hidden="true" />}>
           <Destinations />
         </Suspense>
       ) : (
-        <section className="py-24 bg-[#fffdf5]" />
+        <section className="min-h-[900px] bg-[#fffdf5]" aria-hidden="true" />
       )}
       {shouldRenderBelowFold ? (
         <>
-          <Suspense fallback={<section id="como-funciona" className="py-24 bg-[#fffdf5]" />}>
+          <Suspense fallback={<section id="como-funciona" className="min-h-[800px] bg-[#fffdf5]" aria-hidden="true" />}>
             <HowItWorks />
           </Suspense>
-          <Suspense fallback={<section id="faq" className="py-24 bg-[#fffdf5]" />}>
+          <Suspense fallback={<section id="faq" className="min-h-[600px] bg-[#fffdf5]" aria-hidden="true" />}>
             <FAQ />
           </Suspense>
-          <Suspense fallback={<section id="depoimentos" className="py-24 bg-[#fffdf5]" />}>
+          <Suspense fallback={<section id="depoimentos" className="min-h-[500px] bg-[#fffdf5]" aria-hidden="true" />}>
             <Testimonials />
           </Suspense>
-          <Suspense fallback={<section id="blog" className="py-24 bg-[#fffdf5]" />}>
+          <Suspense fallback={<section id="blog" className="min-h-[500px] bg-[#fffdf5]" aria-hidden="true" />}>
             <Blog />
           </Suspense>
-          <Suspense fallback={<section id="contato" className="py-24 bg-[#fffdf5]" />}>
+          <Suspense fallback={<section id="contato" className="min-h-[400px] bg-[#fffdf5]" aria-hidden="true" />}>
             <CallToAction />
           </Suspense>
         </>
       ) : (
         <>
-          <section id="como-funciona" className="py-24 bg-[#fffdf5]" />
-          <section id="faq" className="py-24 bg-[#fffdf5]" />
-          <section id="depoimentos" className="py-24 bg-[#fffdf5]" />
-          <section id="blog" className="py-24 bg-[#fffdf5]" />
-          <section id="contato" className="py-24 bg-[#fffdf5]" />
+          <section id="como-funciona" className="min-h-[800px] bg-[#fffdf5]" aria-hidden="true" />
+          <section id="faq" className="min-h-[600px] bg-[#fffdf5]" aria-hidden="true" />
+          <section id="depoimentos" className="min-h-[500px] bg-[#fffdf5]" aria-hidden="true" />
+          <section id="blog" className="min-h-[500px] bg-[#fffdf5]" aria-hidden="true" />
+          <section id="contato" className="min-h-[400px] bg-[#fffdf5]" aria-hidden="true" />
         </>
       )}
     </>

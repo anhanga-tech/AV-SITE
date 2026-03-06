@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { HERO_VIDEOS, optimizeRemoteImageUrl } from '../data/mediaConfig';
 import { QUICK_FEATURES } from '../data/destinations';
 import SearchForm from './SearchForm';
@@ -142,16 +143,16 @@ const Hero: React.FC = () => {
             Sua Próxima <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500 relative inline-block pb-2">
               {validCityForTitle ? `Aventura em ${validCityForTitle}` : 'Aventura'}
-              {/* Underline Scribble with Draw Animation */}
+              {/* Underline Scribble - orgânico via Framer Motion pathLength */}
               <svg className="absolute w-full h-4 -bottom-0 left-0 text-yellow-400 overflow-visible" viewBox="0 0 100 10" preserveAspectRatio="none">
-                <path
+                <motion.path
                   d="M0 5 Q 50 15 100 5"
                   stroke="currentColor"
                   strokeWidth="3"
                   fill="none"
-                  className="animate-draw"
-                  strokeDasharray="100"
-                  strokeDashoffset="100"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: 1 }}
+                  transition={{ duration: 1.2, ease: 'easeOut', delay: 0.4 }}
                 />
               </svg>
             </span>
@@ -169,15 +170,28 @@ const Hero: React.FC = () => {
             Sem compromisso • Resposta em até 2h (dias úteis)
           </p>
 
-          {/* Quick Features - Staggered */}
-          <div className="mt-10 flex flex-wrap justify-center gap-6 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+          {/* Quick Features - Staggered Spring */}
+          <motion.div
+            className="mt-10 flex flex-wrap justify-center gap-6"
+            initial="hidden"
+            animate="visible"
+            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1, delayChildren: 0.7 } } }}
+          >
             {QUICK_FEATURES.map((feat, i) => (
-              <div key={i} className="flex items-center gap-2 text-white/90 font-bold text-sm bg-white/10 px-4 py-2 rounded-full backdrop-blur-md border border-white/10 hover:bg-white/20 transition-all duration-300 hover:scale-105 cursor-default">
+              <motion.div
+                key={feat.text}
+                variants={{
+                  hidden: { opacity: 0, y: 16, scale: 0.9 },
+                  visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 400, damping: 20 } }
+                }}
+                className="flex items-center gap-2 text-white/90 font-bold text-sm bg-white/10 px-4 py-2 rounded-full backdrop-blur-md border border-white/10 hover:bg-white/20 transition-all duration-300 cursor-default"
+                whileHover={{ scale: 1.05, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
+              >
                 <feat.icon className="w-4 h-4 text-yellow-300" />
                 {feat.text}
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </div>
 
