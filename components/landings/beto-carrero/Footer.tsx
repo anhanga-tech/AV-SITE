@@ -16,6 +16,8 @@ const Footer: React.FC = () => {
           <img 
             src={getBetoAssetUrl('LOGO ANHANGA VIAGENS - BRANCO.svg')}
             alt="Anhangá Viagens" 
+            width="247"
+            height="128"
             className="h-24 md:h-32 w-auto opacity-90 hover:opacity-100 transition-opacity"
           />
         </div>

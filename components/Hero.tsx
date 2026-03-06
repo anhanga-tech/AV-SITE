@@ -214,11 +214,9 @@ const getDaysInMonth = (date: Date) => {
 };
 
 const Hero: React.FC = () => {
-  // Pick a random video on mount to provide a fresh experience on each visit.
-  const [backgroundVideo] = useState(() => {
-    const randomIndex = Math.floor(Math.random() * HERO_VIDEOS.length);
-    return HERO_VIDEOS[randomIndex];
-  });
+  // PERFORMANCE: Use the first video by default to match the LCP preload in index.html.
+  // Randomization is moved to a useEffect to avoid hydration mismatch and LCP degradation.
+  const [backgroundVideo, setBackgroundVideo] = useState(HERO_VIDEOS[0]);
   const [shouldRenderVideo, setShouldRenderVideo] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const optimizedPoster = useMemo(
@@ -266,6 +264,13 @@ const Hero: React.FC = () => {
 
   // Defer video loading on mobile / save-data and wait for user intent.
   useEffect(() => {
+    // Randomize background after mount for subsequent visits/interactions,
+    // but keep it stable for the initial paint to protect LCP.
+    const randomIndex = Math.floor(Math.random() * HERO_VIDEOS.length);
+    if (randomIndex !== 0) {
+      setBackgroundVideo(HERO_VIDEOS[randomIndex]);
+    }
+
     if (typeof window === 'undefined') return;
 
     const isSmallScreen = window.matchMedia('(max-width: 1023px)').matches;
@@ -549,6 +554,8 @@ const Hero: React.FC = () => {
           <img
             src={optimizedPoster}
             alt="Fundo de destino de viagem Anhangá Viagens"
+            width="1280"
+            height="720"
             fetchPriority="high"
             loading="eager"
             decoding="async"

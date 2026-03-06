@@ -104,6 +104,8 @@ const Header: React.FC = () => {
             alt="Anhangá Viagens"
             data-testid="header-logo"
             fetchPriority="high"
+            width="185"
+            height="96"
             className="h-24 w-auto transition-all duration-300 object-contain"
           />
         </a>

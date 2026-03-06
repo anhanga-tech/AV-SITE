@@ -81,6 +81,8 @@ const BlogList: React.FC = () => {
                                     <img
                                         src={optimizeRemoteImageUrl(post.image, 640, 400)}
                                         alt={post.title}
+                                        width="640"
+                                        height="400"
                                         loading="lazy"
                                         decoding="async"
                                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"

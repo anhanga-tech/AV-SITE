@@ -111,6 +111,8 @@ const Hero: React.FC = () => {
                 <img 
                     src="https://logodownload.org/wp-content/uploads/2022/01/lollapalooza-brasil-logo.png" 
                     alt="Lollapalooza Brasil" 
+                    width="400"
+                    height="112"
                     className="h-12 sm:h-20 md:h-28 w-auto object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]"
                 />
                 <span className="text-xl sm:text-3xl md:text-5xl font-bold drop-shadow-2xl">2026 com</span>

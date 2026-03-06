@@ -128,8 +128,8 @@ const LineupSection: React.FC = () => {
                     onError={handleImageError}
                     loading="lazy"
                     decoding="async"
-                    width={96}
-                    height={96}
+                    width="96"
+                    height="96"
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-tr from-anhanga-blue/40 to-transparent opacity-50"></div>
@@ -167,8 +167,8 @@ const LineupSection: React.FC = () => {
                   onError={handleImageError}
                   loading="lazy"
                   decoding="async"
-                  width={600}
-                  height={800}
+                  width="600"
+                  height="800"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:grayscale-0 grayscale opacity-80"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-90 group-hover:opacity-70 transition-opacity"></div>
@@ -216,8 +216,8 @@ const LineupSection: React.FC = () => {
                           onError={handleImageError}
                           loading="lazy"
                           decoding="async"
-                          width={48}
-                          height={48}
+                          width="48"
+                          height="48"
                           className="w-full h-full object-cover"
                         />
                       </div>

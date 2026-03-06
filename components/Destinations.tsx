@@ -612,6 +612,7 @@ const Destinations: React.FC = () => {
                                     src={dest.image}
                                     alt={dest.city}
                                     width={600}
+                                    height={400}
                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                 />
 
@@ -660,6 +661,7 @@ const Destinations: React.FC = () => {
                                 src={selectedDestination.image}
                                 alt={selectedDestination.city}
                                 width={1200}
+                                height={800}
                                 className="w-full h-full object-cover"
                             />
                             <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/60 to-transparent"></div>

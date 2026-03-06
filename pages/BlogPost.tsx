@@ -117,6 +117,8 @@ const BlogPost: React.FC = () => {
                 <img
                     src={optimizeRemoteImageUrl(post.image, 1200, 675)}
                     alt={post.title}
+                    width="1200"
+                    height="675"
                     className="w-full h-full object-cover"
                     // @ts-ignore
                     fetchpriority="high"
@@ -225,7 +227,7 @@ const BlogPost: React.FC = () => {
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-brand-yellow/10 rounded-bl-full -mr-10 -mt-10 transition-all group-hover:scale-110"></div>
                                 <div className="w-28 h-28 bg-gray-200 rounded-full mx-auto mb-6 overflow-hidden border-[6px] border-white shadow-xl relative z-10">
                                     {author?.image ? (
-                                        <img src={author.image} alt={author.name} className="w-full h-full object-cover" />
+                                        <img src={author.image} alt={author.name} width="112" height="112" loading="lazy" className="w-full h-full object-cover" />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center bg-brand-dark text-white text-4xl font-black">
                                             {(author?.name || post.author).charAt(0)}
@@ -259,7 +261,7 @@ const BlogPost: React.FC = () => {
                                     {relatedPosts.map(related => (
                                         <a href={getBlogPostUrl(related.slug)} key={related.id} className="group flex gap-5 items-center bg-white p-4 rounded-2xl hover:bg-white hover:shadow-xl transition-all border border-transparent hover:border-gray-100 duration-300">
                                             <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0 border border-gray-100 shadow-sm relative">
-                                                <img src={optimizeRemoteImageUrl(related.image, 200, 200)} alt={related.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                                <img src={optimizeRemoteImageUrl(related.image, 200, 200)} alt={related.title} width="200" height="200" loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                             </div>
                                             <div className="flex flex-col h-full justify-center">
                                                 <div className="mb-2">

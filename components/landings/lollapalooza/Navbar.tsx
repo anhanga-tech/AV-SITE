@@ -35,6 +35,8 @@ const Navbar: React.FC = () => {
           <img
             src={logoUrl}
             alt="Anhangá Viagens"
+            width="154"
+            height="80"
             className={`h-16 md:h-20 w-auto transition-all duration-300 ${!scrolled ? 'brightness-0 invert' : ''}`}
           />
         </a>

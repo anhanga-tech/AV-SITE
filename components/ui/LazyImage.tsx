@@ -59,8 +59,19 @@ export const LazyImage = React.memo<LazyImageProps>(({
         return () => observer.disconnect();
     }, []);
 
+    const style = useMemo(() => {
+        if (width && height) {
+            return { aspectRatio: `${width} / ${height}` };
+        }
+        return {};
+    }, [width, height]);
+
     return (
-        <div ref={containerRef} className={`relative overflow-hidden ${className}`}>
+        <div
+            ref={containerRef}
+            className={`relative overflow-hidden ${className}`}
+            style={style}
+        >
             {!isLoaded && (
                 <div className={`absolute inset-0 flex items-center justify-center z-10 ${placeholderClassName}`}>
                     <ImageIcon className="w-8 h-8 text-gray-400 opacity-40" />
