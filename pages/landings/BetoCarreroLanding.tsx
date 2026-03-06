@@ -53,9 +53,9 @@ const BetoCarreroLanding: React.FC = () => {
       <FAQPageSchema items={BETO_FAQ_ITEMS} />
       <div className="bg-[#fffdf5] py-2 border-b border-gray-100">
         <div className="container mx-auto px-6">
-          <Link to="/" className="text-sm font-medium text-gray-500 hover:text-brand-cyan transition-colors flex items-center gap-1">
+          <a href="https://www.anhanga.tur.br/" className="text-sm font-medium text-gray-500 hover:text-brand-cyan transition-colors flex items-center gap-1">
             ← Voltar para o site principal
-          </Link>
+          </a>
         </div>
       </div>
 
@@ -99,9 +99,9 @@ const BetoCarreroLanding: React.FC = () => {
             >
               Falar com especialista
             </button>
-            <Link to="/orlando" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+            <a href="https://www.anhanga.tur.br/orlando/" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ver pacotes para Orlando
-            </Link>
+            </a>
             <a href="https://blog.anhanga.tur.br" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ver dicas de planejamento
             </a>

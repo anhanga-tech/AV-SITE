@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { getWhatsAppLink } from '../../../utils/whatsapp';
 
 // --- Constants ---
+const SITE_URL = 'https://www.anhanga.tur.br';
 const WHATSAPP_MESSAGE = "Olá! Gostaria de saber mais sobre os pacotes para Orlando.";
 const LOGO_URL = `${import.meta.env.BASE_URL}assets/LOGO ANHANGA VIAGENS - AZUL.svg`;
 

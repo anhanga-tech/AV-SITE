@@ -66,9 +66,9 @@ const BlogPost: React.FC = () => {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-[#fffdf5]">
                 <h2 className="text-4xl font-black text-brand-dark mb-4 text-center px-6">Ops! Artigo não encontrado.</h2>
-                <Link to="/" className="text-brand-cyan font-bold hover:underline flex items-center gap-2">
+                <a href="https://www.anhanga.tur.br/" className="text-brand-cyan font-bold hover:underline flex items-center gap-2">
                     <ArrowLeft className="w-4 h-4" /> Voltar para o Blog
-                </Link>
+                </a>
             </div>
         );
     }
@@ -127,9 +127,9 @@ const BlogPost: React.FC = () => {
 
                 <div className="absolute inset-0 flex items-end pb-20 pt-32">
                     <div className="container mx-auto px-6">
-                        <Link to="/" className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-8 font-bold uppercase tracking-wider text-xs transition-colors backdrop-blur-sm bg-white/10 px-4 py-2 rounded-full w-fit hover:bg-white/20 border border-white/20">
+                        <a href="https://www.anhanga.tur.br/" className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-8 font-bold uppercase tracking-wider text-xs transition-colors backdrop-blur-sm bg-white/10 px-4 py-2 rounded-full w-fit hover:bg-white/20 border border-white/20">
                             <ArrowLeft className="w-4 h-4" /> Voltar para o Blog
-                        </Link>
+                        </a>
                         <div className="max-w-4xl">
                             <div className="flex items-center gap-3 mb-6">
                                 <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 ${post.color} shadow-[4px_4px_0px_rgba(0,0,0,0.3)] font-black text-xs uppercase tracking-widest transform -rotate-1`}>
@@ -259,7 +259,7 @@ const BlogPost: React.FC = () => {
                                 </h3>
                                 <div className="space-y-4">
                                     {relatedPosts.map(related => (
-                                        <Link to={`/blog/${related.slug}`} key={related.id} className="group flex gap-5 items-center bg-white p-4 rounded-2xl hover:bg-white hover:shadow-xl transition-all border border-transparent hover:border-gray-100 duration-300">
+                                        <a href={getBlogPostUrl(related.slug)} key={related.id} className="group flex gap-5 items-center bg-white p-4 rounded-2xl hover:bg-white hover:shadow-xl transition-all border border-transparent hover:border-gray-100 duration-300">
                                             <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0 border border-gray-100 shadow-sm relative">
                                                 <img src={optimizeRemoteImageUrl(related.image, 200, 200)} alt={related.title} width="200" height="200" loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                             </div>
@@ -276,7 +276,7 @@ const BlogPost: React.FC = () => {
                                                     <Clock className="w-3 h-3" /> 5 min
                                                 </span>
                                             </div>
-                                        </Link>
+                                        </a>
                                     ))}
                                 </div>
                             </div>

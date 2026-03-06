@@ -5,6 +5,8 @@ import { NAVIGATION_LINKS } from './constants';
 import { getWhatsAppLink } from '../../../utils/whatsapp';
 import { WHATSAPP_MESSAGE } from './constants';
 
+const SITE_URL = 'https://www.anhanga.tur.br';
+
 /**
  * Navbar com links de WhatsApp incluindo parâmetros de tracking.
  * Usa getWhatsAppLink() para capturar automaticamente UTMs, gclid, fbclid, ttclid, cid.
@@ -29,7 +31,7 @@ const Navbar: React.FC = () => {
     <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'}`} role="navigation" aria-label="Menu principal">
       <div className="container mx-auto px-4 flex justify-between items-center">
         {/* Logo */}
-        <Link to="/" className="flex items-center" aria-label="Anhangá Viagens - Página Inicial">
+        <a href={`${SITE_URL}/`} className="flex items-center" aria-label="Anhangá Viagens - Página Inicial">
           <img
             src={logoUrl}
             alt="Anhangá Viagens"
@@ -37,7 +39,7 @@ const Navbar: React.FC = () => {
             height="80"
             className={`h-16 md:h-20 w-auto transition-all duration-300 ${!scrolled ? 'brightness-0 invert' : ''}`}
           />
-        </Link>
+        </a>
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">

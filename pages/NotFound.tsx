@@ -18,12 +18,12 @@ const NotFound: React.FC = () => {
         title="Página não encontrada"
         description="A página que você procura não foi encontrada. Explore nossos roteiros personalizados e planeje sua próxima aventura."
         robots="noindex, follow"
-        canonical={`${SITE_URL}/404`}
+        canonical={`${SITE_URL}/404/`}
       />
       <BreadcrumbSchema
         items={[
           { name: 'Home', item: `${SITE_URL}/` },
-          { name: 'Página não encontrada', item: `${SITE_URL}/404` }
+          { name: 'Página não encontrada', item: `${SITE_URL}/404/` }
         ]}
       />
 
@@ -47,8 +47,8 @@ const NotFound: React.FC = () => {
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
-            <Link
-              to="/"
+            <a
+              href={`${SITE_URL}/`}
               className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition-all duration-300 group"
             >
               <div className="w-12 h-12 rounded-2xl bg-brand-light flex items-center justify-center text-brand-cyan group-hover:bg-brand-cyan group-hover:text-white transition-colors">
@@ -58,7 +58,7 @@ const NotFound: React.FC = () => {
                 <p className="font-bold text-brand-dark">Página Inicial</p>
                 <p className="text-sm text-gray-500">Voltar ao começo</p>
               </div>
-            </Link>
+            </a>
 
             <a
               href={getBlogHomeUrl()}
@@ -73,8 +73,8 @@ const NotFound: React.FC = () => {
               </div>
             </a>
 
-            <Link
-              to="/orlando"
+            <a
+              href={`${SITE_URL}/orlando/`}
               className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition-all duration-300 group"
             >
               <div className="w-12 h-12 rounded-2xl bg-brand-light flex items-center justify-center text-brand-cyan group-hover:bg-brand-cyan group-hover:text-white transition-colors">
@@ -84,12 +84,12 @@ const NotFound: React.FC = () => {
                 <p className="font-bold text-brand-dark">Orlando</p>
                 <p className="text-sm text-gray-500">Magia e diversão</p>
               </div>
-            </Link>
+            </a>
 
             {/* Last 2 cards centered in their own row */}
             <div className="sm:col-span-2 lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4 lg:max-w-2xl lg:mx-auto w-full">
-              <Link
-                to="/beto-carrero"
+              <a
+                href={`${SITE_URL}/beto-carrero/`}
                 className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition-all duration-300 group"
               >
                 <div className="w-12 h-12 rounded-2xl bg-brand-light flex items-center justify-center text-brand-cyan group-hover:bg-brand-cyan group-hover:text-white transition-colors">
@@ -99,10 +99,10 @@ const NotFound: React.FC = () => {
                   <p className="font-bold text-brand-dark">Beto Carrero</p>
                   <p className="text-sm text-gray-500">Aventura no Brasil</p>
                 </div>
-              </Link>
+              </a>
 
-              <Link
-                to="/lollapalooza"
+              <a
+                href={`${SITE_URL}/lollapalooza-2026/`}
                 className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition-all duration-300 group"
               >
                 <div className="w-12 h-12 rounded-2xl bg-brand-light flex items-center justify-center text-brand-cyan group-hover:bg-brand-cyan group-hover:text-white transition-colors">
@@ -112,17 +112,17 @@ const NotFound: React.FC = () => {
                   <p className="font-bold text-brand-dark">Lollapalooza</p>
                   <p className="text-sm text-gray-500">Música e experiência</p>
                 </div>
-              </Link>
+              </a>
             </div>
           </div>
 
-          <Link
-            to="/"
+          <a
+            href={`${SITE_URL}/`}
             className="inline-flex items-center gap-2 text-brand-cyan font-bold hover:gap-4 transition-all duration-300"
           >
             <ArrowLeft className="w-5 h-5" />
             Voltar para a Home
-          </Link>
+          </a>
         </div>
 
         {/* Wavy Bottom Separator */}

@@ -12,6 +12,8 @@ import { Menu, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getBetoAssetUrl } from './assetPath';
 
+const SITE_URL = 'https://www.anhanga.tur.br';
+
 const App: React.FC = () => {
   const [showSticky, setShowSticky] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -104,8 +106,8 @@ const App: React.FC = () => {
         <div className="container mx-auto px-4 flex justify-between items-center relative">
 
           {/* Logo Area */}
-          <Link
-            to="/"
+          <a
+            href={`${SITE_URL}/`}
             onClick={() => {
               window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
               handleLinkClick();
@@ -121,7 +123,7 @@ const App: React.FC = () => {
               fetchPriority="high"
               className={`transition-all duration-300 w-auto ${isScrolled ? 'h-9 md:h-16' : 'h-10 md:h-20'}`}
             />
-          </Link>
+          </a>
           <div className="hidden lg:flex items-center gap-8 xl:gap-12">
             {navLinks.map((link) => (
               <a
