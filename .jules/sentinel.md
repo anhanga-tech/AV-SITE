@@ -11,19 +11,6 @@ Ensured that custom landing page Navbars use `<Link to="/">` which preserves sta
 ### Pattern Discovery
 Standardized the use of `<Link>` for all internal routes to maintain session continuity, which is critical for the AI Chatbot's lead qualification flow that relies on persisted context.
 
-# 🛡️ Sentinel Journal - 2026-03-05
-
-## Security: HSTS Header Implementation for MitM Prevention
-
-### Finding
-The site lacked the HTTP Strict Transport Security (HSTS) header, which could allow Man-in-the-Middle (MitM) attacks by letting browsers access the site over insecure HTTP.
-
-### Resolution
-Added the `Strict-Transport-Security` header to `vercel.json` with `max-age=31536000; includeSubDomains; preload`. This enforces HTTPS for all subdomains and allows the domain to be included in HSTS preload lists.
-
-### Pattern Discovery
-Standardized security headers in `vercel.json` to include HSTS as a baseline for all production deployments, complementing existing headers like `X-Frame-Options` and `X-Content-Type-Options`.
-
 # 🛡️ Sentinel Journal - 2026-03-03
 
 ## Security: Regional Safety Blocklist Hardening

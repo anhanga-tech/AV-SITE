@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { hasOversizedMessage, resolveMaxMessageLength } from '../lib/ai/utils.ts';
+import { hasOversizedMessage, resolveMaxMessageLength } from '../api/generate.ts';
 
 test('resolveMaxMessageLength should default to 4000', () => {
     assert.equal(resolveMaxMessageLength(undefined), 4000);

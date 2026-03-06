@@ -150,7 +150,8 @@ export default async function handler(request: Request): Promise<Response> {
                 );
             }
         } else if (!createContactResponse.ok) {
-            console.error('HUBSPOT: Error creating contact', createContactResponse.status);
+            const hubspotErrorText = await createContactResponse.text().catch(() => '');
+            console.error('HUBSPOT: Error creating contact', createContactResponse.status, hubspotErrorText);
 
             return buildErrorResponse(
                 { ok: false, code: 'HUBSPOT_API_ERROR', error: 'Erro de integração com o CRM' },
@@ -214,7 +215,7 @@ export default async function handler(request: Request): Promise<Response> {
         }
 
         // --- Conversion Tracking (server-side, non-blocking) ---
-        const [googleResult, metaResult] = await Promise.allSettled([
+        const [googleResult, metaResult] = await Promise.all([
             sendGoogleConversion('lead_qualificado', {
                 gclid: payload.tracking?.gclid,
                 email: payload.email,
@@ -233,17 +234,8 @@ export default async function handler(request: Request): Promise<Response> {
             })
         ]);
 
-        if (googleResult.status === 'fulfilled' && !googleResult.value.success) {
-            console.warn('GOOGLE_ADS: Lead conversion failed', googleResult.value.error);
-        } else if (googleResult.status === 'rejected') {
-            console.error('GOOGLE_ADS: Conversion promise rejected', googleResult.reason);
-        }
-
-        if (metaResult.status === 'fulfilled' && !metaResult.value.success) {
-            console.warn('META: Lead conversion failed', metaResult.value.error);
-        } else if (metaResult.status === 'rejected') {
-            console.error('META: Conversion promise rejected', metaResult.reason);
-        }
+        if (!googleResult.success) console.warn('GOOGLE_ADS: Lead conversion failed', googleResult.error);
+        if (!metaResult.success) console.warn('META: Lead conversion failed', metaResult.error);
 
         return new Response(
             JSON.stringify({

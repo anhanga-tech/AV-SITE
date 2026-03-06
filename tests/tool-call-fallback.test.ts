@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { extractBudgetToolCallFromText } from '../lib/ai/tools.ts';
+import { extractBudgetToolCallFromText } from '../api/generate.ts';
 
 test('extractBudgetToolCallFromText should parse JSON tool_call payload from plain text', () => {
     const text = `{ "tool_call": "generate_budget_link", "arguments": { "destination_city": "Cusco", "origin_city": "São Paulo", "dates": "Setembro", "adults": 3 } }`;
