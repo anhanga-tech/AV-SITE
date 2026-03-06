@@ -385,7 +385,9 @@ const AIChat: React.FC = () => {
                       />
                     </div>
                   ) : (
-                    <div className={`p-4 text-sm shadow-sm ${msg.role === 'user'
+                    <div
+                      data-testid={msg.role === 'user' ? 'chat-user-message' : undefined}
+                      className={`p-4 text-sm shadow-sm ${msg.role === 'user'
                       ? 'bg-brand-vibrant text-white rounded-2xl rounded-br-sm'
                       : 'bg-white text-gray-800 border border-gray-100 rounded-2xl rounded-bl-sm'
                       }`}>
