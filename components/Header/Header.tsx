@@ -19,6 +19,8 @@ const NAV_LINKS = [
   { name: 'Contato', href: 'contato' },
 ];
 
+const SITE_URL = 'https://www.anhanga.tur.br';
+
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -91,8 +93,8 @@ const Header: React.FC = () => {
         Pular para o conteúdo
       </a>
       <div className="container mx-auto px-6 flex justify-between items-center">
-        <Link
-          to="/"
+        <a
+          href={`${SITE_URL}/`}
           className="flex items-center gap-2 group focus:outline-none rounded-lg p-1"
           aria-label="Anhangá Viagens - Ir para o topo"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
@@ -104,7 +106,7 @@ const Header: React.FC = () => {
             fetchPriority="high"
             className="h-24 w-auto transition-all duration-300 object-contain"
           />
-        </Link>
+        </a>
 
         <div className="flex items-center gap-8">
           <nav className="hidden md:flex items-center gap-8" aria-label="Menu Principal">
@@ -130,13 +132,12 @@ const Header: React.FC = () => {
                       {link.name}
                     </a>
                   ) : (
-                    <Link
-                      to="/"
-                      state={{ targetId: link.href }}
+                    <a
+                      href={`${SITE_URL}/#${link.href}`}
                       className={`font-medium text-sm transition-colors duration-500 hover:opacity-80 focus:outline-none focus:underline decoration-2 underline-offset-4 cursor-pointer ${navTextClass}`}
                     >
                       {link.name}
-                    </Link>
+                    </a>
                   )
                 )}
 
@@ -208,15 +209,14 @@ const Header: React.FC = () => {
                 {link.name}
               </a>
             ) : (
-              <Link
+              <a
                 key={link.name}
-                to="/"
-                state={{ targetId: link.href }}
+                href={`${SITE_URL}/#${link.href}`}
                 className="text-gray-700 font-medium py-2 border-b border-gray-50 focus:text-brand-vibrant focus:outline-none"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {link.name}
-              </Link>
+              </a>
             )
           ))}
           <a

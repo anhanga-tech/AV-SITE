@@ -4,15 +4,17 @@ import { SEO } from '../components/SEO';
 import { BLOG_POSTS } from '../data/blogData';
 import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 
+const SITE_URL = 'https://www.anhanga.tur.br';
+
 const SiteMap: React.FC = () => {
   const coreLinks = [
-    { to: '/', label: 'Agência de Viagens em São Paulo' },
+    { to: `${SITE_URL}/`, label: 'Agência de Viagens em São Paulo' },
     { to: getBlogHomeUrl(), label: 'Blog de Viagens e Roteiros', external: true },
-    { to: '/orlando', label: 'Pacotes para Orlando' },
-    { to: '/beto-carrero', label: 'Pacote Beto Carrero' },
-    { to: '/lollapalooza-2026', label: 'Pacotes para Lollapalooza 2026' },
-    { to: '/termos-de-uso', label: 'Termos de Uso' },
-    { to: '/politica-privacidade', label: 'Política de Privacidade' }
+    { to: `${SITE_URL}/orlando/`, label: 'Pacotes para Orlando' },
+    { to: `${SITE_URL}/beto-carrero/`, label: 'Pacote Beto Carrero' },
+    { to: `${SITE_URL}/lollapalooza-2026/`, label: 'Pacotes para Lollapalooza 2026' },
+    { to: `${SITE_URL}/termos-de-uso/`, label: 'Termos de Uso' },
+    { to: `${SITE_URL}/politica-privacidade/`, label: 'Política de Privacidade' }
   ];
 
   return (
@@ -31,15 +33,9 @@ const SiteMap: React.FC = () => {
           <ul className="space-y-3 mb-10">
             {coreLinks.map((link) => (
               <li key={link.to}>
-                {link.external ? (
-                  <a href={link.to} className="text-brand-cyan hover:underline font-semibold">
-                    {link.label}
-                  </a>
-                ) : (
-                  <Link to={link.to} className="text-brand-cyan hover:underline font-semibold">
-                    {link.label}
-                  </Link>
-                )}
+                <a href={link.to} className="text-brand-cyan hover:underline font-semibold">
+                  {link.label}
+                </a>
               </li>
             ))}
           </ul>

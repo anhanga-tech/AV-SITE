@@ -56,9 +56,9 @@ const LollapaloozaLanding: React.FC = () => {
       <FAQPageSchema items={LOLLAPALOOZA_FAQ_ITEMS} />
       <div className="bg-[#fffdf5] py-2 border-b border-gray-100 relative z-[60]">
         <div className="container mx-auto px-6">
-          <Link to="/" className="text-sm font-medium text-gray-500 hover:text-brand-cyan transition-colors flex items-center gap-1 font-sans">
+          <a href="https://www.anhanga.tur.br/" className="text-sm font-medium text-gray-500 hover:text-brand-cyan transition-colors flex items-center gap-1 font-sans">
             ← Voltar para o site principal
-          </Link>
+          </a>
         </div>
       </div>
 
@@ -80,9 +80,9 @@ const LollapaloozaLanding: React.FC = () => {
           </p>
           <p className="text-gray-700 text-lg leading-relaxed mb-5">
             Você viaja com roteiro claro, evita decisões de última hora e ganha mais tempo para aproveitar shows, ativações e experiências em São Paulo. A <strong>Anhangá Viagens</strong> é uma{' '}
-            <Link to="/" className="text-brand-cyan font-semibold hover:underline">
+            <a href="https://www.anhanga.tur.br/" className="text-brand-cyan font-semibold hover:underline">
               agência de viagens boutique em São Paulo
-            </Link>{' '}
+            </a>{' '}
             com foco em atendimento consultivo e <strong>viagens personalizadas</strong> — do planejamento inicial ao suporte no destino.
           </p>
           <h3 className="text-xl md:text-2xl font-extrabold text-brand-dark mb-3">O que pode estar no pacote</h3>
@@ -110,12 +110,12 @@ const LollapaloozaLanding: React.FC = () => {
             >
               Falar com especialista
             </button>
-            <Link to="/orlando" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+            <a href="https://www.anhanga.tur.br/orlando/" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ver pacotes para Orlando
-            </Link>
-            <Link to="/" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+            </a>
+            <a href="https://www.anhanga.tur.br/" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Conhecer a Anhangá Viagens
-            </Link>
+            </a>
             <a href="https://blog.anhanga.tur.br" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ler guia de festivais
             </a>
