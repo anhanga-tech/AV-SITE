@@ -21,6 +21,7 @@ test.describe('SEO Smoke Check', () => {
 
       // Wait for metadata (React 19 might take a moment to update document.title)
       await page.waitForFunction(() => document.title.length > 0);
+      await page.waitForLoadState('networkidle');
 
       // 1. Check Title
       const title = await page.title();
@@ -55,6 +56,7 @@ test.describe('SEO Smoke Check', () => {
 
       // 5. Check H1 - Exactly 1 per page
       const h1 = page.locator('h1');
+      await expect(h1.first()).toBeAttached({ timeout: 15000 });
       const h1Count = await h1.count();
       console.log(`Route: ${route} | H1 Count: ${h1Count}`);
 
