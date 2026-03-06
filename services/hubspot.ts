@@ -154,8 +154,7 @@ export async function getContactIdByEmail(token: string, email: string): Promise
     }
 
     if (!response.ok) {
-        const detail = await response.text().catch(() => '');
-        throw new Error(`CONTACT_SEARCH_FAILED:${response.status}:${detail}`);
+        throw new Error(`CONTACT_SEARCH_FAILED:${response.status}`);
     }
 
     const data = (await response.json().catch(() => ({}))) as HubSpotSearchResponse;
@@ -178,8 +177,7 @@ export async function updateContactProperties(token: string, contactId: string, 
     }
 
     if (!response.ok) {
-        const detail = await response.text().catch(() => '');
-        throw new Error(`CONTACT_UPDATE_FAILED:${response.status}:${detail}`);
+        throw new Error(`CONTACT_UPDATE_FAILED:${response.status}`);
     }
 }
 
@@ -197,8 +195,7 @@ export async function createDeal(token: string, properties: Record<string, strin
     }
 
     if (!response.ok) {
-        const detail = await response.text().catch(() => '');
-        throw new Error(`DEAL_CREATE_FAILED:${response.status}:${detail}`);
+        throw new Error(`DEAL_CREATE_FAILED:${response.status}`);
     }
 
     const data = (await response.json().catch(() => ({}))) as HubSpotObjectResponse;
@@ -228,8 +225,7 @@ export async function associateDealToContact(token: string, dealId: string, cont
     }
 
     if (!response.ok) {
-        const detail = await response.text().catch(() => '');
-        throw new Error(`DEAL_ASSOCIATION_FAILED:${response.status}:${detail}`);
+        throw new Error(`DEAL_ASSOCIATION_FAILED:${response.status}`);
     }
 }
 
@@ -252,8 +248,7 @@ export async function createFallbackNote(token: string, contactId: string, body:
     }
 
     if (!noteResponse.ok) {
-        const detail = await noteResponse.text().catch(() => '');
-        throw new Error(`NOTE_CREATE_FAILED:${noteResponse.status}:${detail}`);
+        throw new Error(`NOTE_CREATE_FAILED:${noteResponse.status}`);
     }
 
     const noteData = (await noteResponse.json().catch(() => ({}))) as HubSpotObjectResponse;
@@ -276,7 +271,6 @@ export async function createFallbackNote(token: string, contactId: string, body:
     }
 
     if (!associationResponse.ok) {
-        const detail = await associationResponse.text().catch(() => '');
-        throw new Error(`NOTE_ASSOCIATION_FAILED:${associationResponse.status}:${detail}`);
+        throw new Error(`NOTE_ASSOCIATION_FAILED:${associationResponse.status}`);
     }
 }
