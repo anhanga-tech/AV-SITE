@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { MessageCircle, X, Send, Sparkles, Loader2, Bot, User } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { getTravelAdvice } from '../services/geminiService';
@@ -64,6 +65,9 @@ const AIChat: React.FC = () => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const messagesRef = useRef<Message[]>(messages);
   const { setLeadDraft, submitLead, isSubmitting: isSubmittingLead } = useLeadCapture();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const processedDeepLink = useRef(false);
 
   useEffect(() => {
     messagesRef.current = messages;
@@ -210,8 +214,33 @@ const AIChat: React.FC = () => {
       }
     };
     window.addEventListener('toggle-ai-chat', handleToggle);
+
+    // Deep-link Support
+    if (!processedDeepLink.current) {
+      const searchParams = new URLSearchParams(location.search);
+      const chatParam = searchParams.get('chat');
+      const destinationParam = searchParams.get('destino');
+
+      if (chatParam === 'open') {
+        processedDeepLink.current = true;
+        setIsOpen(true);
+
+        if (destinationParam) {
+          const message = `Olá! Gostaria de informações sobre viagem para ${destinationParam}.`;
+          setTimeout(() => submitMessage(message), 600);
+        }
+
+        // Clean URL
+        searchParams.delete('chat');
+        searchParams.delete('destino');
+        const newSearch = searchParams.toString();
+        const newPath = `${location.pathname}${newSearch ? `?${newSearch}` : ''}${location.hash}`;
+        navigate(newPath, { replace: true });
+      }
+    }
+
     return () => window.removeEventListener('toggle-ai-chat', handleToggle);
-  }, []);
+  }, [location, navigate]);
 
   return (
     <>
