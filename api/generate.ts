@@ -2,6 +2,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 import type { FunctionDeclaration } from "@google/genai";
 import { checkRateLimit as checkRateLimitInternal } from '../lib/rate-limit.ts';
 import { MIDDLE_EAST_COUNTRIES } from '../utils/constants.ts';
+import { buildCorsHeaders, getClientIP } from '../lib/network.ts';
 
 type TripScope = 'national' | 'south_america' | 'international';
 
@@ -473,29 +474,6 @@ function validateBudgetToolArgs(rawArgs: unknown): BudgetValidationResult {
     };
 }
 
-function getClientIP(request: Request): string {
-    // Try various headers that might contain the real IP
-    const forwardedFor = request.headers.get('x-forwarded-for');
-    if (forwardedFor) {
-        const ips = forwardedFor.split(',').map(ip => ip.trim());
-        return ips[ips.length - 1]; // Use the last one for Vercel
-    }
-
-    const realIP = request.headers.get('x-real-ip');
-    if (realIP) {
-        return realIP;
-    }
-
-    // Vercel-specific header
-    const vercelForwardedFor = request.headers.get('x-vercel-forwarded-for');
-    if (vercelForwardedFor) {
-        return vercelForwardedFor.split(',')[0].trim();
-    }
-
-    return 'unknown';
-}
-
-
 // =============================================================================
 
 // Definição da ferramenta para gerar o link (Movemos para o servidor para consistência)
@@ -669,11 +647,7 @@ STYLE
 
 export default async function handler(request: Request) {
     // CORS headers for all responses
-    const corsHeaders = {
-        'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGIN || '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-    };
+    const corsHeaders = buildCorsHeaders();
 
     // Handle CORS preflight
     if (request.method === 'OPTIONS') {

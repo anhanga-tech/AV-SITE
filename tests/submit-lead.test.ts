@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import handler, { mapTrackingToContactProperties } from '../api/submit-lead.ts';
+import handler from '../api/submit-lead.ts';
+import { mapTrackingToContactProperties } from '../services/hubspot.ts';
 
 const originalFetch = global.fetch;
 const originalEnv = {
