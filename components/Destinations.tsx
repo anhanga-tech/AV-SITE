@@ -529,7 +529,7 @@ const Destinations: React.FC = () => {
 
                     {/* Filter Pills - Sticker Style */}
                     <div className="flex overflow-x-auto hide-scrollbar gap-3 pb-2 md:pb-0 w-full md:w-auto mt-6 md:mt-0 px-1">
-                    {FILTERS.map(filter => (
+                        {FILTERS.map(filter => (
                             <button
                                 key={filter}
                                 onClick={() => setActiveFilter(filter)}
@@ -610,7 +610,7 @@ const Destinations: React.FC = () => {
                             <div className="relative h-56 rounded-[1.5rem] overflow-hidden mb-4 border border-gray-100">
                                 <LazyImage
                                     src={dest.image}
-                                    alt={dest.city}
+                                    alt={`${dest.city}, ${dest.country} — pacote de viagem personalizado Anhangá Viagens`}
                                     width={600}
                                     height={400}
                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
