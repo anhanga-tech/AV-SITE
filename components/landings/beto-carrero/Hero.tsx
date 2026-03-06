@@ -79,6 +79,8 @@ const Hero: React.FC = () => {
                 <img
                   src={optimizeRemoteImageUrl(`${PROD_ASSET_BASE}/grupo-em-frente-ao-castelo.jpg`, 1200)}
                   alt="Grupo em frente ao Castelo Beto Carrero"
+                  width="600"
+                  height="800"
                   className="object-cover w-full h-full transform group-hover:scale-110 transition-transform duration-700"
                 />
               </div>

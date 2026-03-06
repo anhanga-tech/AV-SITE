@@ -33,6 +33,8 @@ const Footer: React.FC = () => {
                             <img
                                 src={`${baseUrl}assets/LOGO ANHANGA VIAGENS - BRANCO.svg`}
                                 alt="Anhangá Viagens"
+                                width="247"
+                                height="128"
                                 className="h-32 w-auto object-contain"
                             />
                         </div>
@@ -102,7 +104,7 @@ const Footer: React.FC = () => {
 
                     <div className="flex flex-col md:items-end gap-2 text-center md:text-right order-1 md:order-2">
                         <div className="text-xs text-gray-500 font-medium flex items-center justify-center md:justify-end gap-1">
-                            Feito com <Heart className="w-3 h-3 text-red-500 fill-current" aria-hidden="true" /> pela <img src={`${baseUrl}assets/LOGO ANHANGA TECH.svg`} alt="Anhangá.tech" className="h-4 w-auto inline-block mx-1 align-sub" /> • {currentYear}
+                            Feito com <Heart className="w-3 h-3 text-red-500 fill-current" aria-hidden="true" /> pela <img src={`${baseUrl}assets/LOGO ANHANGA TECH.svg`} alt="Anhangá.tech" width="80" height="16" className="h-4 w-auto inline-block mx-1 align-sub" /> • {currentYear}
                         </div>
                         <div className="text-[10px] text-gray-600 font-medium">
                             ANHANGA TURISMO LTDA • CNPJ/Cadastur: 37.036.732/0001-41

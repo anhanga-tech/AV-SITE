@@ -116,6 +116,9 @@ const App: React.FC = () => {
             <img
               src={getBetoAssetUrl('LOGO ANHANGA VIAGENS - AZUL.svg')}
               alt="Anhangá Viagens"
+              width="154"
+              height="80"
+              fetchPriority="high"
               className={`transition-all duration-300 w-auto ${isScrolled ? 'h-9 md:h-16' : 'h-10 md:h-20'}`}
             />
           </Link>

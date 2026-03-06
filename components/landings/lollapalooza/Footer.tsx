@@ -11,6 +11,8 @@ const Footer: React.FC = () => {
             <img
               src={logoUrl}
               alt="Anhangá Viagens"
+              width="154"
+              height="80"
               className="h-20 w-auto brightness-0 invert opacity-90"
             />
           </div>

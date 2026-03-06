@@ -93,6 +93,9 @@ const Attractions: React.FC = () => {
                 <img
                   src={item.image}
                   alt={item.name}
+                  width="800"
+                  height="1000"
+                  loading="lazy"
                   className="object-cover w-full h-full transform group-hover:scale-110 transition-transform duration-700 filter saturate-[1.1]"
                 />
 
