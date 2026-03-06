@@ -22,12 +22,6 @@ import {
 } from '../lib/ai/validation.ts';
 import { SYSTEM_INSTRUCTION } from '../lib/ai/prompt.ts';
 
-// Re-export for backward compatibility (tests often import from the API file)
-export { resolveMaxMessageLength, hasOversizedMessage } from '../lib/ai/utils.ts';
-export { extractBudgetToolCallFromText } from '../lib/ai/tools.ts';
-export { detectBlockedDestination } from '../lib/ai/validation.ts';
-export { SYSTEM_INSTRUCTION } from '../lib/ai/prompt.ts';
-
 export default async function handler(request: Request) {
     // CORS headers for all responses
     const corsHeaders = {
