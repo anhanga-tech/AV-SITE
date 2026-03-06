@@ -7,7 +7,8 @@ import {
     BLOCKED_DESTINATIONS,
     TRIP_SCOPES
 } from './constants.ts';
-import { normalizeText, normalizeLabel, hasAliasMatch, cleanString } from './utils.ts';
+import { normalizeText, normalizeLabel, hasAliasMatch } from './utils.ts';
+import { cleanString } from '../lead-logic.ts';
 
 export function normalizeAdults(value: unknown): number | undefined {
     const parsed = typeof value === 'number' ? value : Number.parseInt(String(value ?? ''), 10);
@@ -181,7 +182,7 @@ export function validateBudgetToolArgs(rawArgs: unknown): BudgetValidationResult
         missing.push('trip_scope');
     }
 
-    if (missing.length > 0 || !tripScope || !originCity || !destinationCity || !dates || !adults || !destination) {
+    if (missing.length > 0) {
         return {
             valid: false,
             missing,

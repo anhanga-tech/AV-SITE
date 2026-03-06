@@ -24,11 +24,6 @@ export function hasAliasMatch(text: string, alias: string): boolean {
     return pattern.test(text);
 }
 
-/**
- * Re-export cleanString from lead-logic for use in AI modules.
- */
-export { cleanString } from '../lead-logic.ts';
-
 export function resolveMaxMessageLength(rawValue: string | undefined): number {
     const parsed = Number.parseInt(rawValue || '4000', 10);
     return Number.isFinite(parsed) && parsed > 0 ? parsed : 4000;
