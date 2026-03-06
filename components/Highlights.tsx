@@ -170,7 +170,7 @@ const Highlights = memo(() => {
                         <div className="grid md:grid-cols-2 gap-8">
                             {HIGHLIGHTS.map((item, idx) => {
                                 const Icon = item.icon;
-                                const rotateVal = item.rotate === '-rotate-1' ? -1 : item.rotate === 'rotate-2' ? 2 : item.rotate === '-rotate-2' ? -2 : 1;
+                                const rotateVal = parseInt(item.rotate.replace('rotate-', ''), 10) || 0;
                                 return (
                                     <motion.div
                                         key={idx}
