@@ -221,25 +221,22 @@ const AIChat: React.FC = () => {
     const shouldOpenChat = urlParams.get('chat') === '1';
 
     if (shouldOpenChat) {
-      // Pequeno delay para garantir que a página carregou e evitar bloqueio da thread principal
-      const timer = setTimeout(() => {
-        setIsOpen(true);
+      setIsOpen(true);
 
-        const customMessage = urlParams.get('m') || urlParams.get('message');
-        const destination = urlParams.get('destino');
+      const customMessage = urlParams.get('m') || urlParams.get('message');
+      const destination = urlParams.get('destino');
 
-        if (customMessage) {
-          submitMessage(customMessage);
-        } else if (destination) {
-          submitMessage(`Olá! Gostaria de um roteiro personalizado para ${destination}.`);
-        }
+      // Pré-preenche o input em vez de auto-enviar para evitar prompt injection
+      if (customMessage) {
+        setInput(customMessage);
+      } else if (destination) {
+        setInput(`Olá! Gostaria de um roteiro personalizado para ${destination}.`);
+      }
 
-        // Limpa os parâmetros da URL para evitar re-trigger em reload (opcional mas recomendado para UX)
-        const newUrl = window.location.pathname + window.location.hash;
-        window.history.replaceState({}, '', newUrl);
-      }, 800);
-
-      return () => clearTimeout(timer);
+      // Remove apenas os parâmetros de deep-link, preservando UTMs e outros params de rastreamento
+      ['chat', 'm', 'message', 'destino'].forEach(p => urlParams.delete(p));
+      const newSearch = urlParams.toString();
+      window.history.replaceState({}, '', window.location.pathname + (newSearch ? `?${newSearch}` : '') + window.location.hash);
     }
   }, []);
 
