@@ -177,7 +177,7 @@ const About: React.FC = () => {
               }
             ].map((item, i) => (
               <motion.div
-                key={i}
+                key={item.title}
                 className="bg-white p-10 rounded-[2.5rem] border-2 border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300"
                 initial="hidden"
                 whileInView="visible"
