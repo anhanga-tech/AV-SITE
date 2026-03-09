@@ -20,6 +20,15 @@ export interface HubSpotSearchResponse {
     results?: Array<{ id?: string }>;
 }
 
+export interface HubSpotAssociationResponse {
+    results?: Array<{ toObjectId: string }>;
+}
+
+export interface HubSpotObjectWithProperties {
+    id: string;
+    properties: Record<string, string | null>;
+}
+
 /**
  * Generic HubSpot API request wrapper.
  */
@@ -279,4 +288,65 @@ export async function createFallbackNote(token: string, contactId: string, body:
         const detail = await associationResponse.text().catch(() => '');
         throw new Error(`NOTE_ASSOCIATION_FAILED:${associationResponse.status}:${detail}`);
     }
+}
+
+/**
+ * Fetches deal details.
+ */
+export async function getDeal(token: string, dealId: string, properties: string[] = ['amount', 'dealname', 'dealstage']): Promise<HubSpotObjectWithProperties> {
+    const response = await hubspotRequest(token, `/crm/v3/objects/deals/${dealId}?properties=${properties.join(',')}`, {
+        method: 'GET',
+    });
+
+    if (response.status === 401) {
+        throw new Error('UNAUTHORIZED');
+    }
+
+    if (!response.ok) {
+        const detail = await response.text().catch(() => '');
+        throw new Error(`DEAL_FETCH_FAILED:${response.status}:${detail}`);
+    }
+
+    return await response.json();
+}
+
+/**
+ * Fetches the first associated contact ID for a deal.
+ */
+export async function getAssociatedContactId(token: string, dealId: string): Promise<string | null> {
+    const response = await hubspotRequest(token, `/crm/v4/objects/deals/${dealId}/associations/contacts`, {
+        method: 'GET',
+    });
+
+    if (response.status === 401) {
+        throw new Error('UNAUTHORIZED');
+    }
+
+    if (!response.ok) {
+        const detail = await response.text().catch(() => '');
+        throw new Error(`ASSOCIATION_FETCH_FAILED:${response.status}:${detail}`);
+    }
+
+    const data = (await response.json().catch(() => ({}))) as HubSpotAssociationResponse;
+    return data.results?.[0]?.toObjectId || null;
+}
+
+/**
+ * Fetches contact details.
+ */
+export async function getContact(token: string, contactId: string, properties: string[] = ['email', 'firstname', 'lastname', 'phone']): Promise<HubSpotObjectWithProperties> {
+    const response = await hubspotRequest(token, `/crm/v3/objects/contacts/${contactId}?properties=${properties.join(',')}`, {
+        method: 'GET',
+    });
+
+    if (response.status === 401) {
+        throw new Error('UNAUTHORIZED');
+    }
+
+    if (!response.ok) {
+        const detail = await response.text().catch(() => '');
+        throw new Error(`CONTACT_FETCH_FAILED:${response.status}:${detail}`);
+    }
+
+    return await response.json();
 }
