@@ -6,20 +6,26 @@ export const config = { runtime: 'edge' };
 
 import { sendGoogleConversion } from '../lib/conversions/google.ts';
 import { sendMetaConversion } from '../lib/conversions/meta.ts';
+import { validateHubSpotSignature } from '../lib/hubspot-validation.ts';
 
 export default async function handler(request: Request): Promise<Response> {
   if (request.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405 });
   }
 
-  // TODO: Validate HubSpot webhook signature (HUBSPOT_WEBHOOK_SECRET)
-  // Docs: https://developers.hubspot.com/docs/api/webhooks/validating-signatures
   const webhookSecret = process.env.HUBSPOT_WEBHOOK_SECRET;
   if (!webhookSecret) {
     return new Response(JSON.stringify({ error: 'Missing HUBSPOT_WEBHOOK_SECRET' }), { status: 500 });
   }
 
   const body = await request.text();
+
+  // Validate HubSpot webhook signature (V3)
+  const isValid = await validateHubSpotSignature(request, body, webhookSecret);
+  if (!isValid) {
+    return new Response(JSON.stringify({ error: 'Invalid signature' }), { status: 401 });
+  }
+
   let events: unknown[];
   try {
     events = JSON.parse(body);
