@@ -37,8 +37,8 @@ test.describe('Sobre Page E-E-A-T Verification', () => {
     if (isMobile) {
       // Open mobile menu
       await page.getByLabel('Abrir menu').click();
-      // Click 'A Anhangá' in the mobile menu
-      await page.locator('a:has-text("A Anhangá")').click();
+      // Click 'A Anhangá' in the mobile menu (within the header/menu container)
+      await page.locator('#mobile-menu a:has-text("A Anhangá")').click();
     } else {
       // Hover over 'Sobre Nós' (Desktop)
       await page.locator('button:has-text("Sobre Nós")').hover();
