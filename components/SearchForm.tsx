@@ -20,6 +20,7 @@ import {
   BUDGET_TIERS,
   getDaysInMonth
 } from '../data/destinations';
+import { openAiChat } from '../utils/aiChat';
 
 interface SearchFormProps {
   onDestinationMatch: (city: string | null) => void;
@@ -243,9 +244,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ onDestinationMatch }) => {
       message += `💰 *Orçamento:* ${budgetValue}\n`;
     }
 
-    window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
-        detail: { message }
-    }));
+    openAiChat({ message });
 
     setTimeout(() => {
       setIsSearchLoading(false);

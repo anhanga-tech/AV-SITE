@@ -7,6 +7,7 @@ import { LandingFAQ } from '../../components/LandingFAQ';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../../components/schemas/FAQPageSchema';
 import { ServiceSchema } from '../../components/schemas/ServiceSchema';
+import { openAiChat } from '../../utils/aiChat';
 
 const BETO_FAQ_ITEMS = [
   {
@@ -89,9 +90,9 @@ const BetoCarreroLanding: React.FC = () => {
             <button
               onClick={(e) => {
                 e.preventDefault();
-                window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
-                  detail: { message: "Olá! Gostaria de um orçamento personalizado para o Beto Carrero." }
-                }));
+                openAiChat({
+                  message: 'Olá! Gostaria de um orçamento personalizado para o Beto Carrero.'
+                });
               }}
               className="btn-whatsapp btn-specialist px-5 py-3 rounded-full bg-brand-cyan text-white font-bold hover:bg-brand-cyan/90 transition-colors"
               data-tracking="footer-betocarrero"

@@ -17,6 +17,7 @@ import Minus from 'lucide-react/dist/esm/icons/minus';
 import Share from 'lucide-react/dist/esm/icons/share';
 import { SocialShare } from './SocialShare';
 import { LazyImage } from './ui/LazyImage';
+import { openAiChat } from '../utils/aiChat';
 
 import { Link } from "react-router-dom";
 
@@ -709,9 +710,9 @@ const Destinations: React.FC = () => {
                                 <button
                                     onClick={(e) => {
                                         e.preventDefault();
-                                        window.dispatchEvent(new CustomEvent("toggle-ai-chat", {
-                                            detail: { message: `Olá! Gostaria de um orçamento para ${selectedDestination.city}.` }
-                                        }));
+                                        openAiChat({
+                                            message: `Olá! Gostaria de um orçamento para ${selectedDestination.city}.`
+                                        });
                                         setSelectedDestination(null);
                                     }}
                                     className={`btn-whatsapp btn-specialist w-full bg-brand-dark text-white py-4 rounded-xl font-black text-lg hover:bg-brand-vibrant transition-all shadow-[4px_4px_0px_#94a3b8] active:shadow-none active:translate-y-1 flex items-center justify-center gap-2`}

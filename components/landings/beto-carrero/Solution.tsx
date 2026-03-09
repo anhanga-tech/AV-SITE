@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Check, MapPin, Plane, BedDouble, Ticket, MessageCircle, Send, ArrowRight, X, Sun, Fish, Building2, Sparkles } from 'lucide-react';
 import Button from './Button';
+import { openAiChat } from '../../../utils/aiChat';
 
 const Solution: React.FC = () => {
    const [isModalOpen, setIsModalOpen] = useState(false);
@@ -117,9 +118,9 @@ const Solution: React.FC = () => {
 
                      {/* Card 3: Ticket Style */}
                      <div
-                        onClick={() => window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
-                           detail: { message: "Olá! Gostaria de um orçamento para o Beto Carrero incluindo ingressos oficiais." }
-                        }))}
+                        onClick={() => openAiChat({
+                           message: 'Olá! Gostaria de um orçamento para o Beto Carrero incluindo ingressos oficiais.'
+                        })}
                         className="btn-specialist cursor-pointer group bg-white rounded-xl border-2 border-fun-dark shadow-hard transform -rotate-1 hover:rotate-0 transition-transform duration-300 flex overflow-hidden w-full max-w-sm lg:max-w-md"
                         data-tracking="mid-betocarrero"
                      >
