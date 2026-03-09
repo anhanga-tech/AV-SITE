@@ -26,22 +26,22 @@
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-markdown": "^10.1.0",
-    "react-router-dom": "^7.13.1"
+    "react-router-dom": "^7.13.1",
+    "vite": "^7.3.1",
+    "typescript": "~5.9.3",
+    "tailwindcss": "^4.2.1",
+    "postcss": "^8.5.8",
+    "autoprefixer": "^10.4.27",
+    "@vitejs/plugin-react": "^5.0.0",
+    "@tailwindcss/postcss": "^4.2.1",
+    "@tailwindcss/typography": "^0.5.19"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
-    "@tailwindcss/postcss": "^4.2.1",
-    "@tailwindcss/typography": "^0.5.19",
     "@types/dompurify": "^3.2.0",
     "@types/node": "^25.3.5",
-    "@vitejs/plugin-react": "^5.0.0",
-    "autoprefixer": "^10.4.27",
     "gh-pages": "^6.1.1",
-    "postcss": "^8.5.8",
-    "sirv": "^3.0.2",
-    "tailwindcss": "^4.2.1",
-    "typescript": "~5.9.3",
-    "vite": "^7.3.1"
+    "sirv": "^3.0.2"
   },
   "overrides": {
     "rimraf": "^6.1.3",
