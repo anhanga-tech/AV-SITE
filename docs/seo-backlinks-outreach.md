@@ -69,6 +69,6 @@ Os resultados serão monitorados mensalmente utilizando as seguintes métricas:
 ---
 
 ## 📎 Referências Internas
-- [Plano de SEO 2026](PLANO-SEO-2026.md)
-- [Auditoria de SEO](SEO-AUDIT-2026.md)
-- [Competitive Brief de Conteúdo](competitive-brief-conteudo.md)
+- [Plano de SEO 2026](../PLANO-SEO-2026.md)
+- [Auditoria de SEO](../SEO-AUDIT-2026.md)
+- [Competitive Brief de Conteúdo](../competitive-brief-conteudo.md)
