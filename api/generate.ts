@@ -3,6 +3,7 @@ import { checkRateLimit as checkRateLimitInternal } from '../lib/rate-limit.ts';
 import { buildCorsHeaders, getClientIP } from '../lib/network.ts';
 import { budgetTool } from '../lib/ai/tools.ts';
 import { SYSTEM_INSTRUCTION } from '../lib/ai/prompt.ts';
+import { DEFAULT_GEMINI_MODEL } from '../lib/ai/constants.ts';
 import {
     resolveMaxMessageLength,
     hasOversizedMessage,
@@ -67,7 +68,7 @@ export default async function handler(request: Request) {
         // Debug logs for environment variables
         console.log('[Edge Function] Environment check:');
         console.log('- GEMINI_API_KEY present:', !!apiKey);
-        console.log('- GEMINI_MODEL:', process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite-preview (default)');
+        console.log('- GEMINI_MODEL:', process.env.GEMINI_MODEL || `${DEFAULT_GEMINI_MODEL} (default)`);
         console.log('- ALLOWED_ORIGIN:', process.env.ALLOWED_ORIGIN || '*');
 
         if (!apiKey) {
@@ -110,7 +111,7 @@ export default async function handler(request: Request) {
         }
 
         const ai = new GoogleGenAI({ apiKey });
-        const modelName = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite-preview';
+        const modelName = process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
 
         const response = await ai.models.generateContent({
             model: modelName,

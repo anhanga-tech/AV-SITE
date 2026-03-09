@@ -76,7 +76,7 @@ O site institucional da **Anhangá Viagens** é uma plataforma moderna e interat
    ```bash
    pnpm dev
    ```
-   O site estará disponível em `http://localhost:5173` (ou outra porta indicada no terminal).
+   O site estará disponível em `http://localhost:3000` (ou outra porta indicada no terminal).
 
 
 ## 📝 Scripts Disponíveis
