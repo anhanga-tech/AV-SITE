@@ -8,7 +8,6 @@ import { LazyImage } from '../components/ui/LazyImage';
 import ShieldCheck from 'lucide-react/dist/esm/icons/shield-check';
 import Award from 'lucide-react/dist/esm/icons/award';
 import Users from 'lucide-react/dist/esm/icons/users';
-import MapPin from 'lucide-react/dist/esm/icons/map-pin';
 import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
 import Heart from 'lucide-react/dist/esm/icons/heart';
 import Coffee from 'lucide-react/dist/esm/icons/coffee';
@@ -48,7 +47,7 @@ const About: React.FC = () => {
       <SEO
         title="Sobre a Anhangá Viagens | Agência Boutique em São Paulo"
         description="Conheça a história e os valores da Anhangá Viagens. Somos uma agência de turismo certificada pela Cadastur em São Paulo, especializada em roteiros personalizados."
-        canonical="https://www.anhanga.tur.br/sobre"
+        canonical="https://www.anhanga.tur.br/sobre/"
       />
       <OrganizationSchema />
       <BreadcrumbSchema

@@ -24,21 +24,27 @@ test.describe('Sobre Page E-E-A-T Verification', () => {
     await expect(page.locator('text=Curadoria Premium')).toBeVisible();
 
     // Check for Schema tags (Organization)
-    const schema = await page.locator('script[type="application/ld+json"][data-av-head="script:ld-json:organization"]').innerHTML();
+    const schema = await page.locator('script[type="application/ld+json"][data-av-head="script:ld-json:organization"]').first().innerHTML();
     // StructuredData uses escapeScriptContent which replaces < with \u003c
     const schemaData = JSON.parse(schema.replace(/\\u003c/g, '<'));
     expect(schemaData['@type']).toContain('TravelAgency');
     expect(schemaData['taxID']).toBe('37.036.732/0001-41');
   });
 
-  test('should navigate to about page from header', async ({ page }) => {
+  test('should navigate to about page from header', async ({ page, isMobile }) => {
     await page.goto('/');
 
-    // Hover over 'Sobre Nós' (Desktop)
-    await page.locator('button:has-text("Sobre Nós")').hover();
-
-    // Click 'A Anhangá' in the header
-    await page.locator('nav >> a:has-text("A Anhangá")').click();
+    if (isMobile) {
+      // Open mobile menu
+      await page.getByLabel('Abrir menu').click();
+      // Click 'A Anhangá' in the mobile menu
+      await page.locator('a:has-text("A Anhangá")').click();
+    } else {
+      // Hover over 'Sobre Nós' (Desktop)
+      await page.locator('button:has-text("Sobre Nós")').hover();
+      // Click 'A Anhangá' in the header
+      await page.locator('nav >> a:has-text("A Anhangá")').click();
+    }
 
     await expect(page).toHaveURL(/\/sobre/);
   });
