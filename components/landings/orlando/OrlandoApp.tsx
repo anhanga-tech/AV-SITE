@@ -6,6 +6,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { getWhatsAppLink } from '../../../utils/whatsapp';
+import { openAiChat } from '../../../utils/aiChat';
 
 // --- Constants ---
 const SITE_URL = 'https://www.anhanga.tur.br';
@@ -126,9 +127,7 @@ function OrlandoApp() {
                   <button
                       onClick={(e) => {
                           e.preventDefault();
-                          window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
-                              detail: { message: WHATSAPP_MESSAGE }
-                          }));
+                          openAiChat({ message: WHATSAPP_MESSAGE });
                       }}
                       className="btn-whatsapp btn-specialist main-btn"
                       data-tracking="hero-orlando"
@@ -344,9 +343,9 @@ function OrlandoApp() {
              <button
                  onClick={(e) => {
                      e.preventDefault();
-                     window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
-                         detail: { message: "Olá! Gostaria de ver os pacotes para Orlando." }
-                     }));
+                     openAiChat({
+                         message: 'Olá! Gostaria de ver os pacotes para Orlando.'
+                     });
                  }}
                  className="btn-whatsapp btn-specialist main-btn secondary"
                  data-tracking="mid-orlando"
@@ -400,9 +399,9 @@ function OrlandoApp() {
                 <button
                     onClick={(e) => {
                         e.preventDefault();
-                        window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
-                            detail: { message: "Olá! Gostaria de um roteiro personalizado para Orlando baseado na sugestão de 7 dias." }
-                        }));
+                        openAiChat({
+                            message: 'Olá! Gostaria de um roteiro personalizado para Orlando baseado na sugestão de 7 dias.'
+                        });
                     }}
                     className="btn-whatsapp btn-specialist main-btn"
                     data-tracking="itinerary-orlando"
@@ -428,9 +427,7 @@ function OrlandoApp() {
                       <button
                           onClick={(e) => {
                               e.preventDefault();
-                              window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
-                                  detail: { message: WHATSAPP_MESSAGE }
-                              }));
+                              openAiChat({ message: WHATSAPP_MESSAGE });
                           }}
                           className="btn-whatsapp btn-specialist"
                           data-tracking="footer-whatsapp-orlando"

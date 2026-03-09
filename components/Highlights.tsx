@@ -7,6 +7,7 @@ import FileCheck from 'lucide-react/dist/esm/icons/file-check';
 import Compass from 'lucide-react/dist/esm/icons/compass';
 import ShieldCheck from 'lucide-react/dist/esm/icons/shield-check';
 import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
+import { openAiChat } from '../utils/aiChat';
 
 const fadeUp = {
     hidden: { opacity: 0, y: 32 },
@@ -128,9 +129,9 @@ const Highlights = memo(() => {
                             <button
                                 onClick={(e) => {
                                     e.preventDefault();
-                                    window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
-                                        detail: { message: "Olá! Quero conhecer a experiência Anhangá." }
-                                    }));
+                                    openAiChat({
+                                        message: 'Olá! Quero conhecer a experiência Anhangá.'
+                                    });
                                 }}
                                 className="flex items-center justify-center gap-3 w-full bg-brand-dark text-white px-6 py-4 rounded-xl font-bold transition-all duration-300 ease-spring shadow-[4px_4px_0px_#94a3b8] hover:shadow-[2px_2px_0px_#94a3b8] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
                             >

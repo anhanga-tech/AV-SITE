@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { MessageCircle } from 'lucide-react';
 import { getWhatsAppLink } from '../../../utils/whatsapp';
 import { WHATSAPP_MESSAGE } from './constants';
+import { openAiChat } from '../../../utils/aiChat';
 
 interface ButtonProps {
   text: string;
@@ -69,9 +70,7 @@ const Button: React.FC<ButtonProps> = ({
       <button
         onClick={(e) => {
           e.preventDefault();
-          window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
-            detail: { message: WHATSAPP_MESSAGE }
-          }));
+          openAiChat({ message: WHATSAPP_MESSAGE });
           handleClick();
         }}
         className={`btn-whatsapp btn-specialist ${baseStyles} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className}`}

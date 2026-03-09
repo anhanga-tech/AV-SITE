@@ -12,6 +12,7 @@ import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 import { optimizeRemoteImageUrl } from '../data/mediaConfig';
 import { SEO } from '../components/SEO';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
+import { openAiChat } from '../utils/aiChat';
 
 const BlogList: React.FC = () => {
     const [hoveredId, setHoveredId] = useState<number | null>(null);
@@ -143,9 +144,9 @@ const BlogList: React.FC = () => {
                     <button
                         onClick={(e) => {
                             e.preventDefault();
-                            window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
-                                detail: { message: "Olá! Vi o blog da Anhangá e gostaria de solicitar um orçamento personalizado." }
-                            }));
+                            openAiChat({
+                                message: 'Olá! Vi o blog da Anhangá e gostaria de solicitar um orçamento personalizado.'
+                            });
                         }}
                         className="btn-whatsapp inline-flex items-center gap-3 bg-brand-dark text-white text-lg font-bold px-10 py-5 rounded-2xl shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
                     >
