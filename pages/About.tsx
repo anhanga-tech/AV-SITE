@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import { SEO } from '../components/SEO';
 import { OrganizationSchema } from '../components/schemas/OrganizationSchema';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
@@ -13,7 +13,7 @@ import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
 import Heart from 'lucide-react/dist/esm/icons/heart';
 import Coffee from 'lucide-react/dist/esm/icons/coffee';
 
-const fadeUp = {
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 30 },
   visible: (i: number) => ({
     opacity: 1,
