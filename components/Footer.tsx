@@ -51,6 +51,7 @@ const Footer: React.FC = () => {
                         <h4 className="font-bold text-white mb-6 uppercase tracking-wider text-xs">Menu</h4>
                         <ul className="space-y-3 font-medium">
                             <li><a href={`${SITE_URL}/`} className="hover:text-brand-yellow transition-colors">Agência de Viagens em São Paulo</a></li>
+                            <li><a href={`${SITE_URL}/sobre/`} className="hover:text-brand-yellow transition-colors">Sobre a Anhangá</a></li>
                             <li><a href={getBlogHomeUrl()} className="hover:text-brand-yellow transition-colors">Blog de Viagens e Roteiros</a></li>
                             <li><a href={`${SITE_URL}/orlando/`} className="hover:text-brand-yellow transition-colors">Pacotes para Orlando</a></li>
                             <li><a href={`${SITE_URL}/beto-carrero/`} className="hover:text-brand-yellow transition-colors">Pacote Beto Carrero</a></li>
