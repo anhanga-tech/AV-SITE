@@ -36,3 +36,13 @@ Implemented regex-based HTML entity escaping for all user-controlled strings in 
 
 ### Pattern Discovery
 Adopted a "Sanitize at the Edge" pattern for serverless functions. Since DOM-based sanitizers like DOMPurify aren't natively efficient in certain edge environments without a JSDOM-like overhead, simple character escaping provides a robust, low-latency defense-in-depth mechanism for structured data APIs.
+
+# 🛡️ Sentinel Journal - 2026-03-09
+
+## Security: HubSpot Webhook V3 Signature Validation
+
+**Vulnerability:** The HubSpot webhook endpoint (`api/hubspot-webhook.ts`) was a placeholder with no authentication or signature verification, allowing anyone to send arbitrary JSON payloads that could trigger conversion events or bypass security logs.
+
+**Learning:** Webhook endpoints are often left as "TODOs" during initial development. V3 signature validation requires careful construction of the source string (Method + Full URL + Body + Timestamp) and needs to be compatible with Edge Runtime (using `crypto.subtle` instead of Node's `crypto`).
+
+**Prevention:** Always implement signature validation for all external webhook providers using their latest recommended scheme (e.g., HubSpot V3). Ensure constant-time string comparison and replay attack protection via timestamp windows are included.

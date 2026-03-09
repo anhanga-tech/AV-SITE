@@ -1,9 +1,9 @@
 // api/hubspot-webhook.ts
-// Receives HubSpot webhooks for closed deals and sends conversions (PLACEHOLDER)
-
+// Receives HubSpot webhooks for closed deals and sends conversions
 
 export const config = { runtime: 'edge' };
 
+import { validateHubSpotSignature } from '../lib/hubspot-validation.ts';
 import { sendGoogleConversion } from '../lib/conversions/google.ts';
 import { sendMetaConversion } from '../lib/conversions/meta.ts';
 
@@ -12,14 +12,21 @@ export default async function handler(request: Request): Promise<Response> {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405 });
   }
 
-  // TODO: Validate HubSpot webhook signature (HUBSPOT_WEBHOOK_SECRET)
-  // Docs: https://developers.hubspot.com/docs/api/webhooks/validating-signatures
   const webhookSecret = process.env.HUBSPOT_WEBHOOK_SECRET;
   if (!webhookSecret) {
-    return new Response(JSON.stringify({ error: 'Missing HUBSPOT_WEBHOOK_SECRET' }), { status: 500 });
+    console.error('HUBSPOT_WEBHOOK: Missing HUBSPOT_WEBHOOK_SECRET');
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), { status: 500 });
   }
 
   const body = await request.text();
+
+  // Validate HubSpot webhook signature
+  const isValid = await validateHubSpotSignature(request, body, webhookSecret);
+  if (!isValid) {
+    console.warn('HUBSPOT_WEBHOOK: Invalid signature or timestamp');
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+  }
+
   let events: unknown[];
   try {
     events = JSON.parse(body);
