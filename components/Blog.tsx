@@ -1,20 +1,63 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Calendar from 'lucide-react/dist/esm/icons/calendar';
 import User from 'lucide-react/dist/esm/icons/user';
 import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import Tag from 'lucide-react/dist/esm/icons/tag';
 import BookOpen from 'lucide-react/dist/esm/icons/book-open';
 import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
-import { BLOG_POSTS } from '../data/blogData';
+import Loader2 from 'lucide-react/dist/esm/icons/loader-2';
+import { BLOG_POSTS, BlogPost as BlogPostType } from '../data/blogData';
 import { SocialShare } from './SocialShare';
 import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 import { optimizeRemoteImageUrl } from '../data/mediaConfig';
+import { fetchRecentPosts } from '../lib/blog-api';
 
 const Blog: React.FC = () => {
     const [hoveredId, setHoveredId] = useState<number | null>(null);
+    const [posts, setPosts] = useState<BlogPostType[]>(BLOG_POSTS.slice(0, 4));
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        async function loadPosts() {
+            try {
+                // Tenta carregar do cache primeiro (apenas no navegador)
+                if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+                    const cached = localStorage.getItem('dynamic_blog_posts');
+                    const cachedTime = localStorage.getItem('dynamic_blog_posts_time');
+
+                    if (cached && cachedTime) {
+                        const now = Date.now();
+                        const age = now - parseInt(cachedTime, 10);
+                        const ONE_HOUR = 60 * 60 * 1000;
+
+                        if (age < ONE_HOUR) {
+                            setPosts(JSON.parse(cached));
+                            setIsLoading(false);
+                            return;
+                        }
+                    }
+                }
+
+                const fetchedPosts = await fetchRecentPosts(4);
+                if (fetchedPosts && fetchedPosts.length > 0) {
+                    setPosts(fetchedPosts);
+                    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+                        localStorage.setItem('dynamic_blog_posts', JSON.stringify(fetchedPosts));
+                        localStorage.setItem('dynamic_blog_posts_time', Date.now().toString());
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to load dynamic posts, using fallback', error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        loadPosts();
+    }, []);
 
     // Pegamos apenas os primeiros 4 posts para a home
-    const displayPosts = BLOG_POSTS.slice(0, 4);
+    const displayPosts = posts;
     const featuredPost = displayPosts.find(p => p.isFeatured) || displayPosts[0];
     const gridPosts = displayPosts.filter(p => p.id !== featuredPost.id).slice(0, 3);
 
@@ -38,8 +81,16 @@ const Blog: React.FC = () => {
                     </p>
                 </div>
 
+                {/* Loading State */}
+                {isLoading && (
+                    <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+                        <Loader2 className="w-8 h-8 animate-spin mb-4" />
+                        <p className="font-medium">Carregando novidades...</p>
+                    </div>
+                )}
+
                 {/* Featured Post Layout */}
-                {featuredPost && (
+                {!isLoading && featuredPost && (
                     <div className="mb-16 group cursor-pointer relative">
                         <a href={getBlogPostUrl(featuredPost.slug)}>
                             <div className="bg-[#fffdf5] rounded-[2.5rem] p-6 md:p-8 border-4 border-gray-100 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] flex flex-col md:flex-row gap-8 items-center transition-transform duration-300 hover:scale-[1.01]">
@@ -104,7 +155,8 @@ const Blog: React.FC = () => {
                 )}
 
                 {/* Grid Posts */}
-                <div className="grid md:grid-cols-3 gap-8">
+                {!isLoading && (
+                    <div className="grid md:grid-cols-3 gap-8">
                     {gridPosts.map((post) => (
                         <a
                             href={getBlogPostUrl(post.slug)}
@@ -164,7 +216,8 @@ const Blog: React.FC = () => {
                             </div>
                         </a>
                     ))}
-                </div>
+                    </div>
+                )}
 
                 {/* View More Button */}
                 <div className="mt-16 text-center">

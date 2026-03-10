@@ -15,6 +15,7 @@ const BlogPost = lazy(() => import('./pages/BlogPost'));
 const BlogRedirect = lazy(() => import('./pages/BlogRedirect'));
 const Terms = lazy(() => import('./pages/Terms'));
 const Privacy = lazy(() => import('./pages/Privacy'));
+const About = lazy(() => import('./pages/About'));
 const SiteMap = lazy(() => import('./pages/SiteMap'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const BetoCarreroLanding = lazy(() => import('./pages/landings/BetoCarreroLanding'));
@@ -38,6 +39,7 @@ const MainSiteShell: React.FC = () => {
             <Route path="/old-blog/:slug" element={<BlogRedirect />} />
             <Route path="/termos-de-uso" element={<Terms />} />
             <Route path="/politica-privacidade" element={<Privacy />} />
+            <Route path="/sobre" element={<About />} />
             <Route path="/mapa-do-site" element={<SiteMap />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

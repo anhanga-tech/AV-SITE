@@ -51,6 +51,7 @@ const Footer: React.FC = () => {
                         <h4 className="font-bold text-white mb-6 uppercase tracking-wider text-xs">Menu</h4>
                         <ul className="space-y-3 font-medium">
                             <li><a href={`${SITE_URL}/`} className="hover:text-brand-yellow transition-colors">Agência de Viagens em São Paulo</a></li>
+                            <li><a href={`${SITE_URL}/sobre/`} className="hover:text-brand-yellow transition-colors">Sobre a Anhangá</a></li>
                             <li><a href={getBlogHomeUrl()} className="hover:text-brand-yellow transition-colors">Blog de Viagens e Roteiros</a></li>
                             <li><a href={`${SITE_URL}/orlando/`} className="hover:text-brand-yellow transition-colors">Pacotes para Orlando</a></li>
                             <li><a href={`${SITE_URL}/beto-carrero/`} className="hover:text-brand-yellow transition-colors">Pacote Beto Carrero</a></li>
@@ -108,8 +109,12 @@ const Footer: React.FC = () => {
                         <div className="text-xs text-gray-500 font-medium flex items-center justify-center md:justify-end gap-1">
                             Feito com <Heart className="w-3 h-3 text-red-500 fill-current" aria-hidden="true" /> pela <img src={`${baseUrl}assets/LOGO ANHANGA TECH.svg`} alt="Anhangá.tech" width="80" height="16" className="h-4 w-auto inline-block mx-1 align-sub" /> • {currentYear}
                         </div>
-                        <div className="text-[10px] text-gray-600 font-medium">
-                            ANHANGA TURISMO LTDA • CNPJ/Cadastur: 37.036.732/0001-41
+                        <div className="text-[10px] text-gray-600 font-medium flex flex-wrap justify-center md:justify-end gap-x-2">
+                            <span>ANHANGA TURISMO LTDA • CNPJ/Cadastur: <a href="https://cadastur.turismo.gov.br/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline decoration-gray-600 underline-offset-2">37.036.732/0001-41</a></span>
+                            <span className="hidden md:inline">•</span>
+                            <a href="https://www.abav.com.br/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline decoration-gray-600 underline-offset-2">Membro ABAV</a>
+                            <span className="hidden md:inline">•</span>
+                            <a href="https://www.gov.br/turismo/pt-br" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline decoration-gray-600 underline-offset-2">Ministério do Turismo</a>
                         </div>
                         <div className="text-[10px] text-gray-700 font-bold uppercase tracking-widest mt-2">
                             Conteúdo da equipe Anhangá Viagens • Última atualização: {new Date().toLocaleDateString('pt-BR')}
