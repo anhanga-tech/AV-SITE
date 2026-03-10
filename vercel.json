@@ -37,12 +37,12 @@
     },
     {
       "source": "/blog",
-      "destination": "https://blog.anhanga.tur.br",
+      "destination": "https://blog.anhanga.tur.br/",
       "permanent": true
     },
     {
       "source": "/blog/:slug*",
-      "destination": "https://blog.anhanga.tur.br/:slug*",
+      "destination": "https://blog.anhanga.tur.br/:slug*/",
       "permanent": true
     }
   ],

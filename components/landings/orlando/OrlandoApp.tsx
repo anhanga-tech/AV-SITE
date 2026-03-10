@@ -156,7 +156,6 @@ function OrlandoApp() {
                 imgSrc="https://images.unsplash.com/photo-1597466599360-3b9775841aec?auto=format&fit=crop&q=80&w=600"
                 imgAlt="Magic Kingdom style"
                 label="O CASTELO É NOSSO"
-                fetchPriority="high"
                 tape={{ style: { top: '-10px', right: '40px', width: '100px', background: 'rgba(255, 107, 157, 0.6)', transform: 'rotate(10deg)' } }}
               />
 
@@ -166,7 +165,6 @@ function OrlandoApp() {
                 imgSrc="https://www.visittheusa.com/sites/default/files/styles/16_9_1280x720/public/images/hero_media_image/2023-08/fc166dfa-a5b7-45c4-9abe-9482f55baba3.jpeg?h=2992ba0a&itok=avnYaKQ1"
                 imgAlt="Palm Trees"
                 label="SUMMER VIBES ONLY"
-                fetchPriority="high"
               />
 
               <Badge className="badge-1" text="Melhor Preço Garantido" rotation="15deg" />

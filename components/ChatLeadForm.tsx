@@ -86,7 +86,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
     });
 
     if (!result.ok) {
-      setLocalError(result.error);
+      setLocalError((result as { ok: false; error: string }).error);
       return;
     }
 

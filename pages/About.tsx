@@ -53,7 +53,7 @@ const About: React.FC = () => {
       <BreadcrumbSchema
         items={[
           { name: 'Home', item: 'https://www.anhanga.tur.br/' },
-          { name: 'Sobre Nós', item: 'https://www.anhanga.tur.br/sobre' },
+          { name: 'Sobre Nós', item: 'https://www.anhanga.tur.br/sobre/' },
         ]}
       />
 

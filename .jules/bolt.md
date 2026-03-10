@@ -11,3 +11,7 @@
 **Impact:** Reduced unnecessary Virtual DOM diffing and re-renders of the Highlights section during home page interactions.
 
 **Measurement:** Re-renders of `Highlights` reduced to 1 (initial load) instead of multiple during scroll/interaction events on the Home page.
+
+## 2026-03-05 - ⚡ Bolt: CSS-based Hover States
+**Learning:** React state-driven hover effects (`onMouseEnter/Leave`) can cause excessive re-renders in large lists or grids. Replacing them with CSS `group-hover` eliminates JavaScript execution and Virtual DOM diffing during high-frequency interactions.
+**Action:** Always check if a hover effect can be achieved via CSS before reaching for `useState`.
