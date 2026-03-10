@@ -106,6 +106,9 @@ const BetoCarreroLanding: React.FC = () => {
             <a href="https://blog.anhanga.tur.br" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ver dicas de planejamento
             </a>
+            <a href="https://www.betocarrero.com.br/" target="_blank" rel="noopener noreferrer" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+              Site Oficial Beto Carrero
+            </a>
           </div>
         </div>
       </section>
