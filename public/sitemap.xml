@@ -51,6 +51,16 @@
 
   <!-- Institutional -->
   <url>
+    <loc>https://www.anhanga.tur.br/sobre/</loc>
+    <lastmod>2026-03-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg</image:loc>
+      <image:caption>Equipe da Anhangá Viagens - Agência Boutique em São Paulo</image:caption>
+    </image:image>
+  </url>
+  <url>
     <loc>https://www.anhanga.tur.br/termos-de-uso/</loc>
     <lastmod>2026-03-04</lastmod>
     <changefreq>monthly</changefreq>

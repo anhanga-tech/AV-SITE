@@ -40,13 +40,13 @@ const LollapaloozaLanding: React.FC = () => {
         keywords="pacotes Lollapalooza 2026, viagem Lollapalooza São Paulo, hotel para Lollapalooza, pacote festival em São Paulo"
       />
       <ServiceSchema
-        name="Pacotes para Lollapalooza 2026"
-        description="Planejamento de viagem para o Lollapalooza 2026 com hospedagem, transporte e suporte especializado."
+        name="Pacotes para o Lollapalooza Brasil 2026"
+        description="Pacotes de viagem completos para o Lollapalooza 2026 com hotel, transporte exclusivo e suporte especializado em São Paulo."
         serviceUrl="https://www.anhanga.tur.br/lollapalooza-2026/"
         serviceType="Pacote de viagem para festival"
         areaServed="São Paulo e Brasil"
         keywords={['pacote Lollapalooza 2026', 'viagem para festival', 'hotel em São Paulo para evento']}
-        aggregateRating={{ ratingValue: 4.94, reviewCount: 3 }}
+        aggregateRating={{ ratingValue: 4.94, reviewCount: 8 }}
       />
       <BreadcrumbSchema
         items={[

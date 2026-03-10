@@ -12,8 +12,8 @@ const NAV_LINKS = [
   {
     name: 'Sobre Nós',
     subLinks: [
-      { name: 'A Anhangá', href: '/sobre' },
-      { name: 'Nossa História', href: '/sobre#nossa-historia' },
+      { name: 'A Anhangá', href: '/sobre/' },
+      { name: 'Nossa História', href: '/sobre/#nossa-historia' },
       { name: 'Como Funciona', href: 'como-funciona' },
       { name: 'Depoimentos', href: 'depoimentos' },
     ],
@@ -149,8 +149,8 @@ const Header: React.FC = () => {
                   <div className="absolute top-full pt-4 w-48 z-10">
                     <div className="bg-white rounded-md shadow-lg py-2 animate-fade-in-down">
                       {link.subLinks.map((subLink) => {
-                        const isExternalOrPage = subLink.href.startsWith('/');
-                        const href = isExternalOrPage ? subLink.href : (isHome ? `#${subLink.href}` : `${SITE_URL}/#${subLink.href}`);
+                        const isPage = subLink.href.startsWith('/');
+                        const href = isPage ? `${SITE_URL}${subLink.href}` : (isHome ? `#${subLink.href}` : `${SITE_URL}/#${subLink.href}`);
                         return (
                           <a
                             key={subLink.name}
@@ -211,15 +211,15 @@ const Header: React.FC = () => {
           {NAV_LINKS.map((link) => {
             if (link.subLinks) {
               return link.subLinks.map((subLink) => {
-                const isExternalOrPage = subLink.href.startsWith('/');
-                const href = isExternalOrPage ? subLink.href : (isHome ? `#${subLink.href}` : `${SITE_URL}/#${subLink.href}`);
+                const isPage = subLink.href.startsWith('/');
+                const href = isPage ? `${SITE_URL}${subLink.href}` : (isHome ? `#${subLink.href}` : `${SITE_URL}/#${subLink.href}`);
                 return (
                   <a
                     key={subLink.name}
                     href={href}
                     className="text-gray-700 font-medium py-2 border-b border-gray-50 focus:text-brand-vibrant focus:outline-none"
                     onClick={(e) => {
-                      if (!isExternalOrPage && isHome) {
+                      if (!isPage && isHome) {
                         handleNavClick(e, subLink.href);
                       } else {
                         setIsMobileMenuOpen(false);

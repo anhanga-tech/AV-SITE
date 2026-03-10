@@ -38,12 +38,13 @@ const BetoCarreroLanding: React.FC = () => {
         keywords="pacote Beto Carrero, viagem Beto Carrero, ingresso Beto Carrero, pacote família Beto Carrero, agência de viagens Beto Carrero"
       />
       <ServiceSchema
-        name="Pacote Beto Carrero personalizado"
-        description="Planejamento de pacote para Beto Carrero with hotel, ingressos, transporte e suporte especializado."
+        name="Pacote Beto Carrero 2025/2026"
+        description="Planejamento de pacote para o Beto Carrero World com hotel, ingressos, transporte e suporte especializado."
         serviceUrl="https://www.anhanga.tur.br/beto-carrero/"
         serviceType="Pacote de viagem para parque temático"
         areaServed="São Paulo e Brasil"
         keywords={['pacote Beto Carrero', 'ingresso Beto Carrero', 'viagem em família']}
+        aggregateRating={{ ratingValue: 4.9, reviewCount: 12 }}
       />
       <BreadcrumbSchema
         items={[
@@ -72,7 +73,7 @@ const BetoCarreroLanding: React.FC = () => {
       <LandingFAQ items={BETO_FAQ_ITEMS} />
       <section className="bg-[#fffdf5] border-t border-brand-cyan/10 py-14">
         <div className="container mx-auto px-6 max-w-5xl">
-          <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Pacote Beto Carrero para viajar with tranquilidade</h2>
+          <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Pacote Beto Carrero para viajar com tranquilidade</h2>
           <p className="text-gray-700 text-lg leading-relaxed mb-5">
             Nosso <strong>pacote Beto Carrero</strong> é desenhado para quem quer curtir o parque sem dor de cabeça com reservas, horários e deslocamentos.
           </p>
