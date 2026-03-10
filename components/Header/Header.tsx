@@ -156,7 +156,7 @@ const Header: React.FC = () => {
                             key={subLink.name}
                             href={href}
                             onClick={(e) => {
-                              if (!isExternalOrPage && isHome) {
+                              if (!isPage && isHome) {
                                 handleNavClick(e, subLink.href);
                               }
                               setActiveDropdown(null);
