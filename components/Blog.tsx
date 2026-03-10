@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import Calendar from 'lucide-react/dist/esm/icons/calendar';
 import User from 'lucide-react/dist/esm/icons/user';
 import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
@@ -12,8 +12,15 @@ import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 import { optimizeRemoteImageUrl } from '../data/mediaConfig';
 import { fetchRecentPosts } from '../lib/blog-api';
 
-const Blog: React.FC = () => {
-    const [hoveredId, setHoveredId] = useState<number | null>(null);
+/**
+ * Blog Component - Optimizado com memoização e CSS hover
+ *
+ * PERFORMANCE WIN:
+ * 1. Removido estado 'hoveredId' que causava re-render de toda a lista ao passar o mouse.
+ * 2. Substituído por Tailwind 'group-hover' para estilização reativa via CSS.
+ * 3. Envolvido em React.memo para evitar re-renders desnecessários quando a Home atualiza.
+ */
+const Blog: React.FC = memo(() => {
     const [posts, setPosts] = useState<BlogPostType[]>(BLOG_POSTS.slice(0, 4));
     const [isLoading, setIsLoading] = useState(true);
 
@@ -166,8 +173,6 @@ const Blog: React.FC = () => {
                                 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl
                                 ${post.rotate} hover:rotate-0 flex flex-col h-full
                             `}
-                            onMouseEnter={() => setHoveredId(post.id)}
-                            onMouseLeave={() => setHoveredId(null)}
                         >
                             {/* Image Area */}
                             <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-5 bg-gray-100">
@@ -209,7 +214,7 @@ const Blog: React.FC = () => {
                                     <span className="text-xs font-bold text-gray-400 flex items-center gap-1">
                                         <User className="w-3 h-3" /> {post.author}
                                     </span>
-                                    <span className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${hoveredId === post.id ? 'bg-brand-cyan text-white' : 'bg-gray-100 text-gray-400'}`}>
+                                    <span className="w-8 h-8 rounded-full flex items-center justify-center transition-colors bg-gray-100 text-gray-400 group-hover:bg-brand-cyan group-hover:text-white">
                                         <ArrowRight className="w-4 h-4" />
                                     </span>
                                 </div>
@@ -230,6 +235,8 @@ const Blog: React.FC = () => {
             </div>
         </section>
     );
-};
+});
+
+Blog.displayName = 'Blog';
 
 export default Blog;
