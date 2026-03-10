@@ -16,7 +16,7 @@ export async function validateHubSpotSignature(
   // Validate timestamp age (e.g., 5 minutes) to prevent replay attacks
   const now = Date.now();
   const requestTime = parseInt(timestamp, 10);
-  if (isNaN(requestTime) || Math.abs(now - requestTime) > 300000) {
+  if (isNaN(requestTime) || Math.abs(now - requestTime) > (5 * 60 * 1000)) {
     return false;
   }
 
