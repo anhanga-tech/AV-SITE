@@ -11,7 +11,8 @@ const NAV_LINKS = [
   {
     name: 'Sobre Nós',
     subLinks: [
-      { name: 'Nossa História', href: 'nossa-historia' },
+      { name: 'A Anhangá', href: '/sobre' },
+      { name: 'Nossa História', href: '/sobre#nossa-historia' },
       { name: 'Como Funciona', href: 'como-funciona' },
       { name: 'Depoimentos', href: 'depoimentos' },
     ],
@@ -146,19 +147,25 @@ const Header: React.FC = () => {
                 {link.subLinks && activeDropdown === link.name && (
                   <div className="absolute top-full pt-4 w-48 z-10">
                     <div className="bg-white rounded-md shadow-lg py-2 animate-fade-in-down">
-                      {link.subLinks.map((subLink) => (
-                        <a
-                          key={subLink.name}
-                          href={`#${subLink.href}`}
-                          onClick={(e) => {
-                            handleNavClick(e, subLink.href);
-                            setActiveDropdown(null);
-                          }}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          {subLink.name}
-                        </a>
-                      ))}
+                      {link.subLinks.map((subLink) => {
+                        const isExternalOrPage = subLink.href.startsWith('/');
+                        const href = isExternalOrPage ? subLink.href : (isHome ? `#${subLink.href}` : `${SITE_URL}/#${subLink.href}`);
+                        return (
+                          <a
+                            key={subLink.name}
+                            href={href}
+                            onClick={(e) => {
+                              if (!isExternalOrPage && isHome) {
+                                handleNavClick(e, subLink.href);
+                              }
+                              setActiveDropdown(null);
+                            }}
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          >
+                            {subLink.name}
+                          </a>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -200,13 +207,36 @@ const Header: React.FC = () => {
 
       {isMobileMenuOpen && (
         <div id="mobile-menu" className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg py-4 px-6 flex flex-col gap-4 border-t border-gray-100 text-gray-800 animate-fade-in-down">
-          {NAV_LINKS.map((link) => (
-            isHome ? (
+          {NAV_LINKS.map((link) => {
+            if (link.subLinks) {
+              return link.subLinks.map((subLink) => {
+                const isExternalOrPage = subLink.href.startsWith('/');
+                const href = isExternalOrPage ? subLink.href : (isHome ? `#${subLink.href}` : `${SITE_URL}/#${subLink.href}`);
+                return (
+                  <a
+                    key={subLink.name}
+                    href={href}
+                    className="text-gray-700 font-medium py-2 border-b border-gray-50 focus:text-brand-vibrant focus:outline-none"
+                    onClick={(e) => {
+                      if (!isExternalOrPage && isHome) {
+                        handleNavClick(e, subLink.href);
+                      } else {
+                        setIsMobileMenuOpen(false);
+                      }
+                    }}
+                  >
+                    {subLink.name}
+                  </a>
+                );
+              });
+            }
+
+            return isHome ? (
               <a
                 key={link.name}
                 href={`#${link.href}`}
                 className="text-gray-700 font-medium py-2 border-b border-gray-50 focus:text-brand-vibrant focus:outline-none"
-                onClick={(e) => handleNavClick(e, link.href)}
+                onClick={(e) => handleNavClick(e, link.href!)}
               >
                 {link.name}
               </a>
@@ -219,8 +249,8 @@ const Header: React.FC = () => {
               >
                 {link.name}
               </a>
-            )
-          ))}
+            );
+          })}
           <a
             href={getBlogHomeUrl()}
             className="text-gray-700 font-medium py-2 border-b border-gray-50 focus:text-brand-vibrant focus:outline-none"
