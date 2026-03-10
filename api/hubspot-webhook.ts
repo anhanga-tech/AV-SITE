@@ -34,7 +34,7 @@ export default async function handler(request: Request): Promise<Response> {
 
     console.error(`HUBSPOT_WEBHOOK: Missing environment variables: ${missingEnvVars.join(', ')}`);
     return new Response(JSON.stringify({ error: `Missing environment variables: ${missingEnvVars.join(', ')}` }), { status: 500 });
-  }
+    return new Response(JSON.stringify({ error: 'Internal server configuration error.' }), { status: 500 });
 
   const signature = request.headers.get('X-HubSpot-Signature-v3');
   const timestamp = request.headers.get('X-HubSpot-Request-Timestamp');
