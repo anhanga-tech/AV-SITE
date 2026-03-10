@@ -189,7 +189,7 @@ const Highlights = memo(() => {
                                             zIndex: 10,
                                             transition: { type: 'spring', stiffness: 350, damping: 18 }
                                         }}
-                                        style={{ rotate: rotateVal } as React.CSSProperties}
+                                        style={{ rotate: `${rotateVal}deg` }}
                                     >
                                         {/* Washi Tape */}
                                         <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-yellow-50/90 backdrop-blur-sm border-l-2 border-r-2 border-white/40 rotate-1 shadow-sm z-20 opacity-90"></div>
