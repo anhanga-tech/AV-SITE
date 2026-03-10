@@ -25,11 +25,14 @@ export default async function handler(request: Request): Promise<Response> {
   const timestamp = request.headers.get('X-HubSpot-Request-Timestamp');
   const body = await request.text();
 
+  const url = new URL(request.url);
+  const baseUrl = `${url.protocol}//${url.host}${url.pathname}`;
+
   const isValid = await validateHubSpotSignature(
     signature,
     timestamp,
     body,
-    request.url,
+    baseUrl,
     request.method,
     webhookSecret
   );
