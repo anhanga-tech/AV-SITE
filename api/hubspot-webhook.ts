@@ -1,7 +1,7 @@
 // api/hubspot-webhook.ts
 // Receives HubSpot webhooks for closed deals and sends conversions
-
-export const config = { runtime: 'edge' };
+// This handler depends on modules that Vercel does not support in Edge Functions,
+// so it must run on the default Node.js runtime.
 
 import { sendGoogleConversion } from '../lib/conversions/google.ts';
 import { sendMetaConversion } from '../lib/conversions/meta.ts';
