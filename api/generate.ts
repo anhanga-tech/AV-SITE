@@ -20,6 +20,68 @@ import {
 // Configuration
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
 const RATE_LIMIT_MAX_REQUESTS = 10; // Max 10 requests per minute per IP
+const GEMINI_3_DEFAULT_TEMPERATURE = 1.0;
+const LEGACY_DEFAULT_TEMPERATURE = 0.7;
+
+interface ApiErrorShape {
+    status?: number;
+    message?: string;
+    error?: {
+        message?: string;
+        status?: string | number;
+    };
+}
+
+function buildJsonResponse(
+    body: Record<string, unknown>,
+    status: number,
+    corsHeaders: Record<string, string>,
+): Response {
+    return new Response(JSON.stringify(body), {
+        status,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    });
+}
+
+function resolveTemperature(modelName: string): number {
+    const envValue = Number(process.env.GEMINI_TEMPERATURE);
+
+    if (Number.isFinite(envValue) && envValue >= 0) {
+        return envValue;
+    }
+
+    return modelName.startsWith('gemini-3') ? GEMINI_3_DEFAULT_TEMPERATURE : LEGACY_DEFAULT_TEMPERATURE;
+}
+
+function collectTextParts(parts: Array<{ text?: string | null }> | undefined): string | undefined {
+    if (!parts || parts.length === 0) return undefined;
+
+    const text = parts
+        .map((part) => typeof part.text === 'string' ? part.text.trim() : '')
+        .filter(Boolean)
+        .join('\n')
+        .trim();
+
+    return text || undefined;
+}
+
+function buildEmptyModelResponseMessage(): string {
+    return 'Não consegui gerar uma resposta agora. Pode reformular sua pergunta de viagem e tentar novamente?';
+}
+
+function normalizeError(error: unknown): { status?: number; message: string } {
+    if (!error || typeof error !== 'object') {
+        return { message: 'Unknown error' };
+    }
+
+    const candidate = error as ApiErrorShape;
+    const nestedMessage = candidate.error?.message;
+
+    return {
+        status: typeof candidate.status === 'number' ? candidate.status : undefined,
+        message: nestedMessage || candidate.message || 'Unknown error',
+    };
+}
 
 export default async function handler(request: Request) {
     // CORS headers for all responses
@@ -74,12 +136,10 @@ export default async function handler(request: Request) {
         if (!apiKey) {
             console.error('SERVER: GEMINI_API_KEY not found in environment variables');
             console.error('SERVER: Available GEMINI_* keys:', Object.keys(process.env).filter(k => k.includes('GEMINI')));
-            return new Response(JSON.stringify({
+            return buildJsonResponse({
+                code: 'SERVER_CONFIG_ERROR',
                 error: 'Erro interno de configuração'
-            }), {
-                status: 500,
-                headers: { 'Content-Type': 'application/json', ...corsHeaders },
-            });
+            }, 500, corsHeaders);
         }
 
         console.log('SERVER: GEMINI_API_KEY is configured');
@@ -112,6 +172,7 @@ export default async function handler(request: Request) {
 
         const ai = new GoogleGenAI({ apiKey });
         const modelName = process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
+        const temperature = resolveTemperature(modelName);
 
         const response = await ai.models.generateContent({
             model: modelName,
@@ -119,15 +180,17 @@ export default async function handler(request: Request) {
             config: {
                 tools: [{ functionDeclarations: [budgetTool] }],
                 systemInstruction: SYSTEM_INSTRUCTION,
-                temperature: 0.7,
+                temperature,
             }
         });
 
         const candidate = response.candidates?.[0];
-        const textPart = candidate?.content?.parts?.find((part) => part.text);
+        const textPart = collectTextParts(candidate?.content?.parts);
         const functionCallPart = candidate?.content?.parts?.find((part) => part.functionCall);
+        const promptBlockReason = response.promptFeedback?.blockReason;
+        const finishReason = candidate?.finishReason;
 
-        let responseText = textPart?.text;
+        let responseText = response.text?.trim() || textPart;
         let responseFunctionCall = functionCallPart?.functionCall;
 
         if (!responseFunctionCall && responseText) {
@@ -139,6 +202,24 @@ export default async function handler(request: Request) {
                     responseText = 'Prontinho! ✨ Preparei seu link direto para falar com nossos especialistas. É só clicar abaixo 👇';
                 }
             }
+        }
+
+        if (!responseFunctionCall && !responseText) {
+            if (promptBlockReason) {
+                console.warn('SERVER: Gemini blocked prompt', {
+                    blockReason: promptBlockReason,
+                    responseId: response.responseId,
+                    modelVersion: response.modelVersion,
+                });
+            } else {
+                console.warn('SERVER: Gemini returned empty payload', {
+                    finishReason,
+                    responseId: response.responseId,
+                    modelVersion: response.modelVersion,
+                });
+            }
+
+            responseText = buildEmptyModelResponseMessage();
         }
 
         if (responseFunctionCall?.name === 'generate_budget_link') {
@@ -163,30 +244,51 @@ export default async function handler(request: Request) {
         const { text: cleanedText, chips } = extractChipsFromText(responseText || '');
         responseText = cleanedText;
 
-        return new Response(JSON.stringify({
+        return buildJsonResponse({
             text: responseText,
             chips,
             functionCall: responseFunctionCall
-        }), {
-            status: 200,
-            headers: {
-                'Content-Type': 'application/json',
-                'X-RateLimit-Remaining': String(rateLimit.remaining),
-                'X-RateLimit-Reset': String(Math.ceil(rateLimit.resetIn / 1000)),
-                ...corsHeaders
-            },
+        }, 200, {
+            'X-RateLimit-Remaining': String(rateLimit.remaining),
+            'X-RateLimit-Reset': String(Math.ceil(rateLimit.resetIn / 1000)),
+            ...corsHeaders
         });
 
     } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        console.error('SERVER: Error proxying to Gemini:', errorMessage);
+        const normalized = normalizeError(error);
+        console.error('SERVER: Error proxying to Gemini:', normalized);
 
-        // Don't leak internal error details to the client
-        return new Response(JSON.stringify({
+        if (normalized.status === 401 || normalized.status === 403) {
+            return buildJsonResponse({
+                code: 'GEMINI_AUTH_ERROR',
+                error: 'Erro de autenticação com o provedor de IA'
+            }, 401, corsHeaders);
+        }
+
+        if (normalized.status === 429) {
+            return buildJsonResponse({
+                code: 'GEMINI_RATE_LIMIT',
+                error: 'O serviço de IA atingiu o limite temporário de uso'
+            }, 429, corsHeaders);
+        }
+
+        if (normalized.status === 404 && /model/i.test(normalized.message)) {
+            return buildJsonResponse({
+                code: 'GEMINI_MODEL_ERROR',
+                error: 'Modelo Gemini inválido ou indisponível no servidor'
+            }, 500, corsHeaders);
+        }
+
+        if (normalized.status && normalized.status >= 500) {
+            return buildJsonResponse({
+                code: 'GEMINI_UPSTREAM_ERROR',
+                error: 'Serviço de IA temporariamente indisponível'
+            }, 503, corsHeaders);
+        }
+
+        return buildJsonResponse({
+            code: 'GEMINI_INTERNAL_ERROR',
             error: 'Error processing request'
-        }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
+        }, 500, corsHeaders);
     }
 }
