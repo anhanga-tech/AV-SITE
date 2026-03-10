@@ -29,6 +29,28 @@ export interface HubSpotObjectWithProperties {
     properties: Record<string, string | null>;
 }
 
+async function assertHubSpotResponseOk(response: Response, errorCode: string): Promise<void> {
+    if (response.status === 401) {
+        throw new Error('UNAUTHORIZED');
+    }
+
+    if (!response.ok) {
+        const detail = await response.text().catch(() => '');
+        throw new Error(`${errorCode}:${response.status}:${detail}`);
+    }
+}
+
+async function parseHubSpotJsonResponse<T>(response: Response, errorCode: string, fallback?: T): Promise<T> {
+    await assertHubSpotResponseOk(response, errorCode);
+
+    if (fallback !== undefined) {
+        return (await response.json().catch(() => fallback)) as T;
+    }
+
+    return await response.json() as T;
+}
+
+
 /**
  * Generic HubSpot API request wrapper.
  */
@@ -158,16 +180,11 @@ export async function getContactIdByEmail(token: string, email: string): Promise
         }),
     });
 
-    if (response.status === 401) {
-        throw new Error('UNAUTHORIZED');
-    }
-
-    if (!response.ok) {
-        const detail = await response.text().catch(() => '');
-        throw new Error(`CONTACT_SEARCH_FAILED:${response.status}:${detail}`);
-    }
-
-    const data = (await response.json().catch(() => ({}))) as HubSpotSearchResponse;
+    const data = await parseHubSpotJsonResponse<HubSpotSearchResponse>(
+        response,
+        'CONTACT_SEARCH_FAILED',
+        {} as HubSpotSearchResponse,
+    );
     const contactId = cleanString(data.results?.[0]?.id);
 
     return contactId || null;
@@ -182,14 +199,7 @@ export async function updateContactProperties(token: string, contactId: string, 
         body: JSON.stringify({ properties }),
     });
 
-    if (response.status === 401) {
-        throw new Error('UNAUTHORIZED');
-    }
-
-    if (!response.ok) {
-        const detail = await response.text().catch(() => '');
-        throw new Error(`CONTACT_UPDATE_FAILED:${response.status}:${detail}`);
-    }
+    await assertHubSpotResponseOk(response, 'CONTACT_UPDATE_FAILED');
 }
 
 /**
@@ -201,16 +211,11 @@ export async function createDeal(token: string, properties: Record<string, strin
         body: JSON.stringify({ properties }),
     });
 
-    if (response.status === 401) {
-        throw new Error('UNAUTHORIZED');
-    }
-
-    if (!response.ok) {
-        const detail = await response.text().catch(() => '');
-        throw new Error(`DEAL_CREATE_FAILED:${response.status}:${detail}`);
-    }
-
-    const data = (await response.json().catch(() => ({}))) as HubSpotObjectResponse;
+    const data = await parseHubSpotJsonResponse<HubSpotObjectResponse>(
+        response,
+        'DEAL_CREATE_FAILED',
+        {} as HubSpotObjectResponse,
+    );
     const dealId = cleanString(data.id);
     if (!dealId) {
         throw new Error('DEAL_CREATE_FAILED:missing_id');
@@ -232,14 +237,7 @@ export async function associateDealToContact(token: string, dealId: string, cont
         },
     );
 
-    if (response.status === 401) {
-        throw new Error('UNAUTHORIZED');
-    }
-
-    if (!response.ok) {
-        const detail = await response.text().catch(() => '');
-        throw new Error(`DEAL_ASSOCIATION_FAILED:${response.status}:${detail}`);
-    }
+    await assertHubSpotResponseOk(response, 'DEAL_ASSOCIATION_FAILED');
 }
 
 /**
@@ -256,16 +254,11 @@ export async function createFallbackNote(token: string, contactId: string, body:
         }),
     });
 
-    if (noteResponse.status === 401) {
-        throw new Error('UNAUTHORIZED');
-    }
-
-    if (!noteResponse.ok) {
-        const detail = await noteResponse.text().catch(() => '');
-        throw new Error(`NOTE_CREATE_FAILED:${noteResponse.status}:${detail}`);
-    }
-
-    const noteData = (await noteResponse.json().catch(() => ({}))) as HubSpotObjectResponse;
+    const noteData = await parseHubSpotJsonResponse<HubSpotObjectResponse>(
+        noteResponse,
+        'NOTE_CREATE_FAILED',
+        {} as HubSpotObjectResponse,
+    );
     const noteId = cleanString(noteData.id);
     if (!noteId) {
         throw new Error('NOTE_CREATE_FAILED:missing_id');
@@ -280,14 +273,7 @@ export async function createFallbackNote(token: string, contactId: string, body:
         },
     );
 
-    if (associationResponse.status === 401) {
-        throw new Error('UNAUTHORIZED');
-    }
-
-    if (!associationResponse.ok) {
-        const detail = await associationResponse.text().catch(() => '');
-        throw new Error(`NOTE_ASSOCIATION_FAILED:${associationResponse.status}:${detail}`);
-    }
+    await assertHubSpotResponseOk(associationResponse, 'NOTE_ASSOCIATION_FAILED');
 }
 
 /**
@@ -298,16 +284,7 @@ export async function getDeal(token: string, dealId: string, properties: string[
         method: 'GET',
     });
 
-    if (response.status === 401) {
-        throw new Error('UNAUTHORIZED');
-    }
-
-    if (!response.ok) {
-        const detail = await response.text().catch(() => '');
-        throw new Error(`DEAL_FETCH_FAILED:${response.status}:${detail}`);
-    }
-
-    return await response.json();
+    return await parseHubSpotJsonResponse<HubSpotObjectWithProperties>(response, 'DEAL_FETCH_FAILED');
 }
 
 /**
@@ -318,16 +295,11 @@ export async function getAssociatedContactId(token: string, dealId: string): Pro
         method: 'GET',
     });
 
-    if (response.status === 401) {
-        throw new Error('UNAUTHORIZED');
-    }
-
-    if (!response.ok) {
-        const detail = await response.text().catch(() => '');
-        throw new Error(`ASSOCIATION_FETCH_FAILED:${response.status}:${detail}`);
-    }
-
-    const data = await response.json() as HubSpotAssociationResponse;
+    const data = await parseHubSpotJsonResponse<HubSpotAssociationResponse>(
+        response,
+        'ASSOCIATION_FETCH_FAILED',
+        {} as HubSpotAssociationResponse,
+    );
     return data.results?.[0]?.toObjectId || null;
 }
 
@@ -339,14 +311,5 @@ export async function getContact(token: string, contactId: string, properties: s
         method: 'GET',
     });
 
-    if (response.status === 401) {
-        throw new Error('UNAUTHORIZED');
-    }
-
-    if (!response.ok) {
-        const detail = await response.text().catch(() => '');
-        throw new Error(`CONTACT_FETCH_FAILED:${response.status}:${detail}`);
-    }
-
-    return await response.json();
+    return await parseHubSpotJsonResponse<HubSpotObjectWithProperties>(response, 'CONTACT_FETCH_FAILED');
 }

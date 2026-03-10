@@ -1,6 +1,8 @@
 import { MIDDLE_EAST_COUNTRIES } from '../../utils/constants.ts';
 import type { TripScope, SafetyCategory } from './types.ts';
 
+export const DEFAULT_GEMINI_MODEL = 'gemini-3.1-flash-lite-preview';
+
 export const TRIP_SCOPES = new Set<TripScope>(['national', 'south_america', 'international']);
 
 export const CITY_FALLBACKS = new Set([

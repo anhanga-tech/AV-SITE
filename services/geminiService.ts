@@ -56,10 +56,7 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
       parts: [{ text: msg.text }]
     }));
 
-    const isDev = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-    const apiEndpoint = isDev
-      ? 'http://localhost:3000/api/generate'
-      : '/api/generate';
+    const apiEndpoint = '/api/generate';
 
     console.log('[GeminiService] Using endpoint:', apiEndpoint);
 

@@ -1,7 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import handler from '../api/hubspot-webhook.ts';
-import { createHubSpotTestSignature } from './helpers/hubspot-signature.ts';
 
 const originalFetch = global.fetch;
 const originalConsoleLog = console.log;
@@ -23,6 +22,27 @@ function restoreEnv() {
   process.env.GOOGLE_ADS_CONVERSION_LABEL_PURCHASE = originalEnv.GOOGLE_ADS_CONVERSION_LABEL_PURCHASE;
   process.env.META_PIXEL_ID = originalEnv.META_PIXEL_ID;
   process.env.META_ACCESS_TOKEN = originalEnv.META_ACCESS_TOKEN;
+}
+
+async function signRequest(body: string, timestamp: string, secret: string) {
+  const method = 'POST';
+  const url = 'http://localhost/api/hubspot-webhook';
+  const sourceString = method + url + body + timestamp;
+
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(secret);
+  const messageData = encoder.encode(sourceString);
+
+  const cryptoKey = await crypto.subtle.importKey(
+    'raw',
+    keyData,
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+
+  const signatureBuffer = await crypto.subtle.sign('HMAC', cryptoKey, messageData);
+  return btoa(String.fromCharCode(...new Uint8Array(signatureBuffer)));
 }
 
 test('hubspot-webhook should reject invalid signature', async (t) => {
@@ -86,13 +106,7 @@ test('hubspot-webhook should process closed won deal event', async (t) => {
 
   const body = JSON.stringify(events);
   const timestamp = Date.now().toString();
-  const signature = await createHubSpotTestSignature(
-    'POST',
-    'http://localhost/api/hubspot-webhook',
-    body,
-    timestamp,
-    secret
-  );
+  const signature = await signRequest(body, timestamp, secret);
 
   const calls: Array<{ url: string; method: string }> = [];
 
@@ -161,13 +175,7 @@ test('hubspot-webhook should reject non-array payloads', async (t) => {
 
   const body = JSON.stringify({ subscriptionType: 'deal.propertyChange' });
   const timestamp = Date.now().toString();
-  const signature = await createHubSpotTestSignature(
-    'POST',
-    'http://localhost/api/hubspot-webhook',
-    body,
-    timestamp,
-    secret
-  );
+  const signature = await signRequest(body, timestamp, secret);
 
   const response = await handler(new Request('http://localhost/api/hubspot-webhook', {
     method: 'POST',
@@ -180,5 +188,5 @@ test('hubspot-webhook should reject non-array payloads', async (t) => {
   }));
 
   assert.equal(response.status, 400);
-  assert.deepEqual(await response.json(), { error: 'Invalid payload format' });
+  assert.deepEqual(await response.json(), { error: 'Invalid JSON body' });
 });

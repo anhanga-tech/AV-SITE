@@ -19,22 +19,24 @@ const HUBSPOT_URI_DECODE_RULES: Array<[RegExp, string]> = [
   [/%3B/gi, ';']
 ];
 
+function timingSafeEqual(left: string, right: string): boolean {
+  if (left.length !== right.length) {
+    return false;
+  }
+
+  let mismatch = 0;
+  for (let index = 0; index < left.length; index += 1) {
+    mismatch |= left.charCodeAt(index) ^ right.charCodeAt(index);
+  }
+
+  return mismatch === 0;
+}
+
 export function normalizeHubSpotRequestUri(url: string): string {
   return HUBSPOT_URI_DECODE_RULES.reduce(
     (normalizedUrl, [pattern, replacement]) => normalizedUrl.replace(pattern, replacement),
     url
   );
-}
-
-function decodeBase64Value(value: string): ArrayBuffer {
-  const decodedValue = atob(value);
-  const decodedBytes = new Uint8Array(decodedValue.length);
-
-  for (let index = 0; index < decodedValue.length; index += 1) {
-    decodedBytes[index] = decodedValue.charCodeAt(index);
-  }
-
-  return decodedBytes.buffer;
 }
 
 export async function validateHubSpotSignature(
@@ -56,24 +58,21 @@ export async function validateHubSpotSignature(
 
   const normalizedUrl = normalizeHubSpotRequestUri(url);
   const sourceString = method + normalizedUrl + body + timestamp;
+
   const encoder = new TextEncoder();
+  const keyData = encoder.encode(clientSecret);
+  const messageData = encoder.encode(sourceString);
 
-  try {
-    const cryptoKey = await crypto.subtle.importKey(
-      'raw',
-      encoder.encode(clientSecret),
-      { name: 'HMAC', hash: 'SHA-256' },
-      false,
-      ['verify']
-    );
+  const cryptoKey = await crypto.subtle.importKey(
+    'raw',
+    keyData,
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
 
-    return await crypto.subtle.verify(
-      'HMAC',
-      cryptoKey,
-      decodeBase64Value(signature),
-      encoder.encode(sourceString)
-    );
-  } catch {
-    return false;
-  }
+  const signatureBuffer = await crypto.subtle.sign('HMAC', cryptoKey, messageData);
+  const generatedSignature = btoa(String.fromCharCode(...new Uint8Array(signatureBuffer)));
+
+  return timingSafeEqual(generatedSignature, signature);
 }
