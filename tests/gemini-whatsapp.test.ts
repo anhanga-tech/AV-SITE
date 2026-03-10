@@ -84,3 +84,58 @@ test('chatbot whatsapp message should omit baggage line when unavailable', async
     assert.doesNotMatch(text, /Bagagem:/);
     assert.doesNotMatch(text, /\|\| Dados:/);
 });
+
+test('chatbot should show WhatsApp fallback when server returns 500', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+    });
+
+    global.fetch = async () => new Response(
+        JSON.stringify({
+            code: 'GEMINI_INTERNAL_ERROR',
+            error: 'Error processing request',
+        }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } },
+    );
+
+    const response = await getTravelAdvice([{ role: 'user', text: 'teste' }]);
+
+    assert.match(response.text || '', /Tivemos um problema técnico interno/);
+    assert.match(response.text || '', /\[fale conosco no WhatsApp\]\(https:\/\/wa\.me\//);
+});
+
+test('chatbot should explain config error and show WhatsApp fallback when server config is broken', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+    });
+
+    global.fetch = async () => new Response(
+        JSON.stringify({
+            code: 'SERVER_CONFIG_ERROR',
+            error: 'Erro interno de configuração',
+        }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } },
+    );
+
+    const response = await getTravelAdvice([{ role: 'user', text: 'teste' }]);
+
+    assert.match(response.text || '', /problema de configuração no servidor/);
+    assert.match(response.text || '', /\[fale conosco no WhatsApp\]\(https:\/\/wa\.me\//);
+});
+
+test('chatbot should return fallback text when API succeeds without usable content', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+    });
+
+    global.fetch = async () => new Response(
+        JSON.stringify({ chips: [] }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+    );
+
+    const response = await getTravelAdvice([{ role: 'user', text: 'teste' }]);
+
+    assert.match(response.text || '', /Não consegui gerar uma resposta agora/);
+    assert.match(response.text || '', /\[fale conosco no WhatsApp\]\(https:\/\/wa\.me\//);
+    assert.equal(response.budgetLink, undefined);
+});
