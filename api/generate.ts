@@ -20,6 +20,34 @@ import {
 // Configuration
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
 const RATE_LIMIT_MAX_REQUESTS = 10; // Max 10 requests per minute per IP
+const GEMINI_3_DEFAULT_TEMPERATURE = 1.0;
+const LEGACY_DEFAULT_TEMPERATURE = 0.7;
+
+function collectTextParts(parts: Array<{ text?: string | null }> | undefined): string | undefined {
+    if (!parts || parts.length === 0) return undefined;
+
+    const text = parts
+        .map((part) => typeof part.text === 'string' ? part.text.trim() : '')
+        .filter(Boolean)
+        .join('\n')
+        .trim();
+
+    return text || undefined;
+}
+
+function buildEmptyModelResponseMessage(): string {
+    return 'Não consegui gerar uma resposta agora. Pode reformular sua pergunta de viagem e tentar novamente?';
+}
+
+function resolveTemperature(modelName: string): number {
+    const envValue = Number(process.env.GEMINI_TEMPERATURE);
+
+    if (Number.isFinite(envValue) && envValue >= 0) {
+        return envValue;
+    }
+
+    return modelName.startsWith('gemini-3') ? GEMINI_3_DEFAULT_TEMPERATURE : LEGACY_DEFAULT_TEMPERATURE;
+}
 
 export default async function handler(request: Request) {
     // CORS headers for all responses
@@ -112,6 +140,7 @@ export default async function handler(request: Request) {
 
         const ai = new GoogleGenAI({ apiKey });
         const modelName = process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
+        const temperature = resolveTemperature(modelName);
 
         const response = await ai.models.generateContent({
             model: modelName,
@@ -119,15 +148,17 @@ export default async function handler(request: Request) {
             config: {
                 tools: [{ functionDeclarations: [budgetTool] }],
                 systemInstruction: SYSTEM_INSTRUCTION,
-                temperature: 0.7,
+                temperature,
             }
         });
 
         const candidate = response.candidates?.[0];
-        const textPart = candidate?.content?.parts?.find((part) => part.text);
+        const textPart = collectTextParts(candidate?.content?.parts);
         const functionCallPart = candidate?.content?.parts?.find((part) => part.functionCall);
+        const promptBlockReason = response.promptFeedback?.blockReason;
+        const finishReason = candidate?.finishReason;
 
-        let responseText = textPart?.text;
+        let responseText = response.text?.trim() || textPart;
         let responseFunctionCall = functionCallPart?.functionCall;
 
         if (!responseFunctionCall && responseText) {
@@ -139,6 +170,24 @@ export default async function handler(request: Request) {
                     responseText = 'Prontinho! ✨ Preparei seu link direto para falar com nossos especialistas. É só clicar abaixo 👇';
                 }
             }
+        }
+
+        if (!responseFunctionCall && !responseText) {
+            if (promptBlockReason) {
+                console.warn('SERVER: Gemini blocked prompt', {
+                    blockReason: promptBlockReason,
+                    responseId: response.responseId,
+                    modelVersion: response.modelVersion,
+                });
+            } else {
+                console.warn('SERVER: Gemini returned empty payload', {
+                    finishReason,
+                    responseId: response.responseId,
+                    modelVersion: response.modelVersion,
+                });
+            }
+
+            responseText = buildEmptyModelResponseMessage();
         }
 
         if (responseFunctionCall?.name === 'generate_budget_link') {

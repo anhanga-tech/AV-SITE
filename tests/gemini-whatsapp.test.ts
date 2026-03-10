@@ -84,3 +84,22 @@ test('chatbot whatsapp message should omit baggage line when unavailable', async
     assert.doesNotMatch(text, /Bagagem:/);
     assert.doesNotMatch(text, /\|\| Dados:/);
 });
+
+test('chatbot should return fallback text when API succeeds without usable content', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+    });
+
+    global.fetch = async () => new Response(
+        JSON.stringify({ chips: [] }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+    );
+
+    const response = await getTravelAdvice([{ role: 'user', text: 'teste' }]);
+
+    assert.equal(
+        response.text,
+        'Não consegui gerar uma resposta agora. Pode reformular sua pergunta e tentar novamente?',
+    );
+    assert.equal(response.budgetLink, undefined);
+});
