@@ -327,7 +327,7 @@ export async function getAssociatedContactId(token: string, dealId: string): Pro
         throw new Error(`ASSOCIATION_FETCH_FAILED:${response.status}:${detail}`);
     }
 
-    const data = (await response.json().catch(() => ({}))) as HubSpotAssociationResponse;
+    const data = await response.json() as HubSpotAssociationResponse;
     return data.results?.[0]?.toObjectId || null;
 }
 
