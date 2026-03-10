@@ -2,6 +2,7 @@ import React from 'react';
 import { MessageCircle } from 'lucide-react';
 import { getWhatsAppLink } from '../../../utils/whatsapp';
 import { WHATSAPP_MESSAGE } from './constants';
+import { openAiChat } from '../../../utils/aiChat';
 
 /**
  * Botão flutuante do WhatsApp - Versão com Tracking
@@ -14,9 +15,7 @@ const WhatsAppFloating: React.FC = () => {
     <button
       onClick={(e) => {
         e.preventDefault();
-        window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
-          detail: { message: WHATSAPP_MESSAGE }
-        }));
+        openAiChat({ message: WHATSAPP_MESSAGE });
       }}
       className="btn-whatsapp fixed bottom-6 right-6 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform duration-300 flex items-center justify-center animate-pulse hover:animate-none"
       aria-label="Fale conosco"

@@ -7,6 +7,7 @@ import OrlandoApp from '../../components/landings/orlando/OrlandoApp';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../../components/schemas/FAQPageSchema';
 import { ServiceSchema } from '../../components/schemas/ServiceSchema';
+import { openAiChat } from '../../utils/aiChat';
 import './orlando.css';
 
 const ORLANDO_FAQ_ITEMS = [
@@ -90,9 +91,9 @@ const OrlandoLanding: React.FC = () => {
             <button
               onClick={(e) => {
                 e.preventDefault();
-                window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
-                  detail: { message: "Olá! Gostaria de um orçamento personalizado para Orlando." }
-                }));
+                openAiChat({
+                  message: 'Olá! Gostaria de um orçamento personalizado para Orlando.'
+                });
               }}
               className="btn-whatsapp btn-specialist px-5 py-3 rounded-full bg-brand-cyan text-white font-bold hover:bg-brand-cyan/90 transition-colors"
               data-tracking="footer-orlando"

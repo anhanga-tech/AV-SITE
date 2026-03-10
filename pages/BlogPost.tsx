@@ -16,6 +16,7 @@ import { PersonSchema } from '../components/schemas/PersonSchema';
 import { SocialShare } from '../components/SocialShare';
 import DOMPurify from 'dompurify';
 import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
+import { openAiChat } from '../utils/aiChat';
 
 const BlogPost: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -36,6 +37,8 @@ const BlogPost: React.FC = () => {
     useEffect(() => {
         if (contentRef.current && post) {
             const links = contentRef.current.querySelectorAll('a[href^="https://wa.me"]');
+            const cleanupFns: Array<() => void> = [];
+
             links.forEach(link => {
                 const anchor = link as HTMLAnchorElement;
                 const url = new URL(anchor.href);
@@ -45,15 +48,20 @@ const BlogPost: React.FC = () => {
                 const message = currentText || `Olá! Li o post "${post.title}" e gostaria de planejar minha viagem.`;
 
                 // Update to trigger chatbot
-                anchor.addEventListener('click', (e) => {
+                const handleAnchorClick = (e: Event) => {
                     e.preventDefault();
-                    window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
-                        detail: { message }
-                    }));
-                });
+                    openAiChat({ message });
+                };
+
+                anchor.addEventListener('click', handleAnchorClick);
                 anchor.href = "#";
                 anchor.classList.add('btn-whatsapp');
+                cleanupFns.push(() => anchor.removeEventListener('click', handleAnchorClick));
             });
+
+            return () => {
+                cleanupFns.forEach((cleanup) => cleanup());
+            };
         }
     }, [post]);
 
@@ -242,9 +250,9 @@ const BlogPost: React.FC = () => {
                                 <button
                                     onClick={(e) => {
                                         e.preventDefault();
-                                        window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
-                                            detail: { message: `Olá! Gostaria de falar com o especialista ${author?.name || post.author} sobre viagens.` }
-                                        }));
+                                        openAiChat({
+                                            message: `Olá! Gostaria de falar com o especialista ${author?.name || post.author} sobre viagens.`
+                                        });
                                     }}
                                     className="btn-whatsapp btn-specialist block w-full py-4 bg-white border-2 border-brand-dark text-brand-dark font-black tracking-wide text-sm uppercase rounded-xl hover:bg-brand-dark hover:text-white transition-colors shadow-[4px_4px_0px_#0f172a] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] text-center"
                                 >

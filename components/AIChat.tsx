@@ -6,6 +6,7 @@ import { getTravelAdvice } from '../services/geminiService';
 import { useLeadCapture } from '../hooks/useLeadCapture';
 import { PassportStamp } from './ui/PassportStamp';
 import { ChatLeadForm, type LeadFinalizePayload, type LeadFinalizeResult } from './ChatLeadForm';
+import { triggerHaptic } from '../utils/haptics';
 
 interface Message {
   role: 'user' | 'model';
@@ -85,6 +86,20 @@ const AIChat: React.FC = () => {
     }
   }, [isOpen]);
 
+  const openChatDrawer = (enableHaptics: boolean = true) => {
+    if (enableHaptics) {
+      void triggerHaptic('light');
+    }
+    setIsOpen(true);
+  };
+
+  const closeChatDrawer = (enableHaptics: boolean = true) => {
+    if (enableHaptics) {
+      void triggerHaptic('light');
+    }
+    setIsOpen(false);
+  };
+
   const handleFinalizeLead = async (payload: LeadFinalizePayload): Promise<LeadFinalizeResult> => {
     setLeadDraft({ ...payload });
     const result = await submitLead({ ...payload });
@@ -139,8 +154,12 @@ const AIChat: React.FC = () => {
     };
   };
 
-  const submitMessage = async (text: string) => {
+  const submitMessage = async (text: string, enableHaptics: boolean = true) => {
     if (!text.trim() || isLoading) return;
+
+    if (enableHaptics) {
+      void triggerHaptic('medium');
+    }
 
     const newHistory: Message[] = [...messagesRef.current, { role: 'user', text }];
     setMessages(newHistory);
@@ -157,12 +176,14 @@ const AIChat: React.FC = () => {
     const response = await getTravelAdvice(newHistory);
     setIsLoading(false);
 
+    const nextMessages: Message[] = [];
+
     if (response.text) {
-      setMessages(prev => [...prev, {
+      nextMessages.push({
         role: 'model',
         text: response.text || '',
         chips: response.chips
-      }]);
+      });
     }
 
     if (response.budgetLink) {
@@ -174,7 +195,7 @@ const AIChat: React.FC = () => {
         baggagePreference: response.budgetLink.baggagePreference || '',
       });
 
-      setMessages(prev => [...prev, {
+      nextMessages.push({
         role: 'model',
         text: 'Orçamento Pronto',
         isAction: true,
@@ -184,7 +205,15 @@ const AIChat: React.FC = () => {
           bantSummary: response.budgetLink!.bantSummary,
           iataCode: response.budgetLink!.iataCode
         }
-      }]);
+      });
+    }
+
+    if (nextMessages.length > 0) {
+      setMessages(prev => [...prev, ...nextMessages]);
+
+      if (enableHaptics) {
+        void triggerHaptic('heavy');
+      }
     }
   };
 
@@ -208,7 +237,7 @@ const AIChat: React.FC = () => {
       const customEvent = event as CustomEvent;
       setIsOpen(true);
       if (customEvent.detail?.message) {
-        setTimeout(() => submitMessage(customEvent.detail.message), 400);
+        setTimeout(() => submitMessage(customEvent.detail.message, false), 400);
       }
     };
     window.addEventListener('toggle-ai-chat', handleToggle);
@@ -236,7 +265,7 @@ const AIChat: React.FC = () => {
 
         if (sanitizedDestination) {
           const message = `Olá! Gostaria de informações sobre viagem para ${sanitizedDestination}.`;
-          setTimeout(() => submitMessage(message), DEEP_LINK_MESSAGE_DELAY_MS);
+          setTimeout(() => submitMessage(message, false), DEEP_LINK_MESSAGE_DELAY_MS);
         }
       }
 
@@ -282,7 +311,7 @@ const AIChat: React.FC = () => {
     <>
       {/* Floating Toggle Button */}
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={() => openChatDrawer()}
         className={`fixed ${isOpen ? 'translate-y-32 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'} 
                     bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9990]
                     flex items-center justify-center gap-3 
@@ -308,7 +337,7 @@ const AIChat: React.FC = () => {
       <div
         className={`fixed inset-0 z-[9998] transition-opacity duration-300 ease-in-out bg-brand-dark/20 backdrop-blur-sm ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
           }`}
-        onClick={() => setIsOpen(false)}
+        onClick={() => closeChatDrawer()}
       />
 
       {/* Drawer Panel - Soft Scrapbook Geometry */}
@@ -340,7 +369,7 @@ const AIChat: React.FC = () => {
             </div>
           </div>
           <button
-            onClick={() => setIsOpen(false)}
+            onClick={() => closeChatDrawer()}
             className="text-gray-400 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-full p-2.5 transition-colors focus:outline-none"
             aria-label="Fechar gaveta"
           >

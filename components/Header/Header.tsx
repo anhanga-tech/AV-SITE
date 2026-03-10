@@ -5,6 +5,7 @@ import X from 'lucide-react/dist/esm/icons/x';
 import Phone from 'lucide-react/dist/esm/icons/phone';
 import ChevronDown from 'lucide-react/dist/esm/icons/chevron-down';
 import { getBlogHomeUrl } from '@/utils/blog';
+import { openAiChat } from '../../utils/aiChat';
 
 const NAV_LINKS = [
   { name: 'Destinos', href: 'destinos' },
@@ -47,9 +48,9 @@ const Header: React.FC = () => {
 
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
-        detail: { message: "Olá! Gostaria de falar com um especialista." }
-    }));
+    openAiChat({
+      message: 'Olá! Gostaria de falar com um especialista.'
+    });
     setIsMobileMenuOpen(false);
   };
 
