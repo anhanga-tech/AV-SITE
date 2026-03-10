@@ -1,5 +1,4 @@
 import { BlogPost } from '../data/blogData';
-import { cleanString } from './lead-logic';
 
 const RSS_URL = 'https://blog.anhanga.tur.br/rss/';
 
@@ -42,6 +41,40 @@ function extractAttribute(xml: string, tag: string, attr: string): string {
     return match ? match[1] : '';
 }
 
+/**
+ * Aggressive HTML escaping to prevent XSS.
+ */
+function escapeHTML(str: string): string {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+/**
+ * Robust sanitization that works both in Browser and Edge/Node environments.
+ */
+function safeSanitize(text: string): string {
+    if (!text) return '';
+    // Strip HTML tags first to ensure we only have text
+    const stripped = text.replace(/<[^>]*>/g, '');
+    // Then escape potential characters that could be used for injection
+    return escapeHTML(stripped);
+}
+
+/**
+ * Validates and sanitizes image URLs to prevent data: or javascript: URI injection.
+ */
+function safeImageUrl(url: string): string {
+    if (!url) return '';
+    const trimmed = url.trim();
+    // Only allow absolute HTTP(S) URLs to prevent javascript: or data: URI injection
+    if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) return '';
+    return escapeHTML(trimmed);
+}
+
 export async function fetchRecentPosts(limit: number = 4): Promise<BlogPost[]> {
     try {
         const response = await fetch(RSS_URL);
@@ -56,39 +89,44 @@ export async function fetchRecentPosts(limit: number = 4): Promise<BlogPost[]> {
         if (items.length === 0) return [];
 
         return items.map((itemXml, index) => {
-            const title = cleanString(extractTag(itemXml, 'title'));
-            const link = extractTag(itemXml, 'link');
-            const description = extractTag(itemXml, 'description');
-            const content = extractTag(itemXml, 'content:encoded') || extractTag(itemXml, 'encoded');
-            const pubDate = extractTag(itemXml, 'pubDate');
-            const author = cleanString(extractTag(itemXml, 'dc:creator') || extractTag(itemXml, 'creator') || 'Equipe Anhangá');
-            const category = cleanString(extractTag(itemXml, 'category'));
+            const rawTitle = extractTag(itemXml, 'title');
+            const rawLink = extractTag(itemXml, 'link');
+            const rawDescription = extractTag(itemXml, 'description');
+            const rawAuthor = extractTag(itemXml, 'dc:creator') || extractTag(itemXml, 'creator') || 'Equipe Anhangá';
+            const rawCategory = extractTag(itemXml, 'category');
 
             // Try different ways to get the image
-            let imageUrl = extractAttribute(itemXml, 'media:content', 'url');
-            if (!imageUrl) {
-                imageUrl = extractAttribute(itemXml, 'enclosure', 'url');
+            let rawImageUrl = extractAttribute(itemXml, 'media:content', 'url');
+            if (!rawImageUrl) {
+                rawImageUrl = extractAttribute(itemXml, 'enclosure', 'url');
             }
-            if (!imageUrl) {
+            if (!rawImageUrl) {
                 // Try to find an img tag in content:encoded
-                const imgMatch = content.match(/<img[^>]*src="([^"]*)"/i);
-                if (imgMatch) imageUrl = imgMatch[1];
+                const rawContent = extractTag(itemXml, 'content:encoded') || extractTag(itemXml, 'encoded');
+                const imgMatch = rawContent.match(/<img[^>]*src="([^"]*)"/i);
+                if (imgMatch) rawImageUrl = imgMatch[1];
             }
 
-            // Extract slug from link
-            const slug = cleanString(link.replace(/\/$/, '').split('/').pop() || '');
+            // Sanitize all values immediately after extraction
+            const title = safeSanitize(rawTitle);
+            const author = safeSanitize(rawAuthor);
+            const category = safeSanitize(rawCategory);
+            const imageUrl = safeImageUrl(rawImageUrl);
+            const slug = safeSanitize(rawLink.replace(/\/$/, '').split('/').pop() || '');
 
-            const excerpt = description.replace(/<[^>]*>/g, '').substring(0, 150).trim() + (description.length > 150 ? '...' : '');
+            // Create a safe excerpt
+            const excerpt = safeSanitize(rawDescription).substring(0, 150).trim() +
+                           (rawDescription.length > 150 ? '...' : '');
 
             return {
-                id: index + 1000, // Dynamic IDs start at 1000
+                id: index + 1000,
                 slug,
                 title,
-                excerpt: cleanString(excerpt),
-                content: cleanString(content),
-                image: cleanString(imageUrl),
+                excerpt,
+                content: '', // Not used in homepage grid
+                image: imageUrl,
                 category: category || 'Dicas',
-                date: formatDate(pubDate),
+                date: formatDate(extractTag(itemXml, 'pubDate')),
                 author,
                 isFeatured: index === 0,
                 color: COLORS[index % COLORS.length],

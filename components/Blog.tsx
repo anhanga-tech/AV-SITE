@@ -59,7 +59,7 @@ const Blog: React.FC = () => {
     // Pegamos apenas os primeiros 4 posts para a home
     const displayPosts = posts;
     const featuredPost = displayPosts.find(p => p.isFeatured) || displayPosts[0];
-    const gridPosts = featuredPost ? displayPosts.filter(p => p.id !== featuredPost.id).slice(0, 3) : [];
+    const gridPosts = displayPosts.filter(p => p.id !== featuredPost.id).slice(0, 3);
 
     return (
         <section id="blog" className="py-24 bg-white relative overflow-hidden">
