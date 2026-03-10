@@ -58,10 +58,10 @@ function escapeHTML(str: string): string {
  */
 function safeSanitize(text: string): string {
     if (!text) return '';
-    // Strip HTML tags first to ensure we only have text
-    const stripped = text.replace(/<[^>]*>/g, '');
+    // Remove all angle brackets to ensure no tag-like sequences (e.g. "<script") remain
+    const withoutAngles = text.replace(/[<>]/g, '');
     // Then escape potential characters that could be used for injection
-    return escapeHTML(stripped);
+    return escapeHTML(withoutAngles);
 }
 
 /**
