@@ -41,7 +41,7 @@ export default async function handler(request: Request): Promise<Response> {
     return new Response(JSON.stringify({ error: 'Invalid signature' }), { status: 401 });
   }
 
-  let events: any[];
+  let events: HubSpotEvent[];
   try {
     events = JSON.parse(body);
   } catch {
