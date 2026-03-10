@@ -1,6 +1,5 @@
 // api/hubspot-webhook.ts
-// Receives HubSpot webhooks for closed deals and sends conversions (PLACEHOLDER)
-
+// Receives HubSpot webhooks for closed deals and sends conversions
 
 export const config = { runtime: 'edge' };
 
@@ -8,6 +7,13 @@ import { sendGoogleConversion } from '../lib/conversions/google.ts';
 import { sendMetaConversion } from '../lib/conversions/meta.ts';
 import { validateHubSpotSignature } from '../lib/hubspot-validation.ts';
 import { getDeal, getAssociatedContactId, getContact } from '../services/hubspot.ts';
+
+interface HubSpotWebhookEvent {
+  subscriptionType?: string;
+  propertyName?: string;
+  propertyValue?: string;
+  objectId?: string | number;
+}
 
 export default async function handler(request: Request): Promise<Response> {
   if (request.method !== 'POST') {
@@ -18,21 +24,27 @@ export default async function handler(request: Request): Promise<Response> {
   const hubspotToken = process.env.HUBSPOT_TOKEN;
 
   if (!webhookSecret || !hubspotToken) {
-    return new Response(JSON.stringify({ error: 'Missing environment variables' }), { status: 500 });
+    const missingEnvVars: string[] = [];
+    if (!webhookSecret) {
+      missingEnvVars.push('HUBSPOT_WEBHOOK_SECRET');
+    }
+    if (!hubspotToken) {
+      missingEnvVars.push('HUBSPOT_TOKEN');
+    }
+
+    console.error(`HUBSPOT_WEBHOOK: Missing environment variables: ${missingEnvVars.join(', ')}`);
+    return new Response(JSON.stringify({ error: `Missing environment variables: ${missingEnvVars.join(', ')}` }), { status: 500 });
   }
 
   const signature = request.headers.get('X-HubSpot-Signature-v3');
   const timestamp = request.headers.get('X-HubSpot-Request-Timestamp');
   const body = await request.text();
 
-  const url = new URL(request.url);
-  const baseUrl = `${url.protocol}//${url.host}${url.pathname}`;
-
   const isValid = await validateHubSpotSignature(
     signature,
     timestamp,
     body,
-    baseUrl,
+    request.url,
     request.method,
     webhookSecret
   );
@@ -41,9 +53,14 @@ export default async function handler(request: Request): Promise<Response> {
     return new Response(JSON.stringify({ error: 'Invalid signature' }), { status: 401 });
   }
 
-  let events: HubSpotEvent[];
+  let events: HubSpotWebhookEvent[];
   try {
-    events = JSON.parse(body);
+    const parsedBody = JSON.parse(body) as unknown;
+    if (!Array.isArray(parsedBody)) {
+      return new Response(JSON.stringify({ error: 'Invalid payload format' }), { status: 400 });
+    }
+
+    events = parsedBody as HubSpotWebhookEvent[];
   } catch {
     return new Response(JSON.stringify({ error: 'Invalid JSON body' }), { status: 400 });
   }
@@ -77,7 +94,7 @@ export default async function handler(request: Request): Promise<Response> {
           const gclid = contact.properties.hs_google_click_id || undefined;
           const fbclid = contact.properties.hs_facebook_click_id || undefined;
 
-          await Promise.allSettled([
+          const [googleResult, metaResult] = await Promise.allSettled([
             sendGoogleConversion('purchase', {
               value: amount,
               email,
@@ -94,7 +111,25 @@ export default async function handler(request: Request): Promise<Response> {
               fbclid
             })
           ]);
-          console.log(`HUBSPOT_WEBHOOK: Conversion sent for deal ${dealId}`);
+
+          const conversionFailures: string[] = [];
+          if (googleResult.status === 'rejected') {
+            conversionFailures.push(`Google Ads request rejected: ${String(googleResult.reason)}`);
+          } else if (!googleResult.value.success) {
+            conversionFailures.push(`Google Ads request failed: ${googleResult.value.error ?? 'Unknown error'}`);
+          }
+
+          if (metaResult.status === 'rejected') {
+            conversionFailures.push(`Meta request rejected: ${String(metaResult.reason)}`);
+          } else if (!metaResult.value.success) {
+            conversionFailures.push(`Meta request failed: ${metaResult.value.error ?? 'Unknown error'}`);
+          }
+
+          if (conversionFailures.length > 0) {
+            console.warn(`HUBSPOT_WEBHOOK: Conversion tracking incomplete for deal ${dealId}: ${conversionFailures.join('; ')}`);
+          } else {
+            console.log(`HUBSPOT_WEBHOOK: Conversion sent for deal ${dealId}`);
+          }
         }
       } catch (err) {
         console.error(`HUBSPOT_WEBHOOK: Error processing deal ${dealId}:`, err);
