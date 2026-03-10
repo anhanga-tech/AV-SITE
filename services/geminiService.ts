@@ -111,7 +111,7 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
 
       if (response.status === 500) {
         console.error('[GeminiService] Server error:', errorData);
-        if (errorData.code === 'SERVER_CONFIG_ERROR' || errorData.code === 'GEMINI_AUTH_ERROR' || errorData.code === 'GEMINI_MODEL_ERROR') {
+        if (errorData.code === 'SERVER_CONFIG_ERROR' || errorData.code === 'GEMINI_MODEL_ERROR') {
           return {
             text: withContactFallback(
               '⚠️ O chat está com um problema de configuração no servidor. Nossa equipe já precisa revisar isso.'
