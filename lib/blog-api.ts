@@ -1,4 +1,5 @@
 import { BlogPost } from '../data/blogData';
+import { cleanString } from './lead-logic';
 
 const RSS_URL = 'https://blog.anhanga.tur.br/rss/';
 
@@ -55,13 +56,13 @@ export async function fetchRecentPosts(limit: number = 4): Promise<BlogPost[]> {
         if (items.length === 0) return [];
 
         return items.map((itemXml, index) => {
-            const title = extractTag(itemXml, 'title');
+            const title = cleanString(extractTag(itemXml, 'title'));
             const link = extractTag(itemXml, 'link');
             const description = extractTag(itemXml, 'description');
             const content = extractTag(itemXml, 'content:encoded') || extractTag(itemXml, 'encoded');
             const pubDate = extractTag(itemXml, 'pubDate');
-            const author = extractTag(itemXml, 'dc:creator') || extractTag(itemXml, 'creator') || 'Equipe Anhangá';
-            const category = extractTag(itemXml, 'category');
+            const author = cleanString(extractTag(itemXml, 'dc:creator') || extractTag(itemXml, 'creator') || 'Equipe Anhangá');
+            const category = cleanString(extractTag(itemXml, 'category'));
 
             // Try different ways to get the image
             let imageUrl = extractAttribute(itemXml, 'media:content', 'url');
@@ -75,15 +76,17 @@ export async function fetchRecentPosts(limit: number = 4): Promise<BlogPost[]> {
             }
 
             // Extract slug from link
-            const slug = link.replace(/\/$/, '').split('/').pop() || '';
+            const slug = cleanString(link.replace(/\/$/, '').split('/').pop() || '');
+
+            const excerpt = description.replace(/<[^>]*>/g, '').substring(0, 150).trim() + (description.length > 150 ? '...' : '');
 
             return {
                 id: index + 1000, // Dynamic IDs start at 1000
                 slug,
                 title,
-                excerpt: description.replace(/<[^>]*>/g, '').substring(0, 150).trim() + (description.length > 150 ? '...' : ''),
-                content,
-                image: imageUrl,
+                excerpt: cleanString(excerpt),
+                content: cleanString(content),
+                image: cleanString(imageUrl),
                 category: category || 'Dicas',
                 date: formatDate(pubDate),
                 author,
