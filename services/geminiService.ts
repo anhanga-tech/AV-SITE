@@ -150,6 +150,10 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
       }
     }
 
+    if (!result.text && !result.budgetLink) {
+      result.text = 'Não consegui gerar uma resposta agora. Pode reformular sua pergunta e tentar novamente?';
+    }
+
     return result;
 
   } catch (error: any) {
