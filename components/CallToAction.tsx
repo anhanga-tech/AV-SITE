@@ -1,10 +1,10 @@
-import React, { memo } from 'react';
+import React from 'react';
 import MessageSquare from 'lucide-react/dist/esm/icons/message-square';
 import Plane from 'lucide-react/dist/esm/icons/plane';
 import Smartphone from 'lucide-react/dist/esm/icons/smartphone';
 import { openAiChat } from '../utils/aiChat';
 
-const CallToAction: React.FC = memo(() => {
+const CallToAction: React.FC = () => {
 
     const handleCTAClick = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -190,8 +190,6 @@ const CallToAction: React.FC = memo(() => {
             </div>
         </section>
     );
-});
-
-CallToAction.displayName = 'CallToAction';
+};
 
 export default CallToAction;

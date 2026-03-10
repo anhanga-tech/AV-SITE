@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React from 'react';
 import MessageCircle from 'lucide-react/dist/esm/icons/message-circle';
 import PenTool from 'lucide-react/dist/esm/icons/pen-tool';
 import CreditCard from 'lucide-react/dist/esm/icons/credit-card';
@@ -57,7 +57,7 @@ const STEPS = [
   }
 ];
 
-const HowItWorks: React.FC = memo(() => {
+const HowItWorks: React.FC = () => {
 
   return (
     <section id="como-funciona" className="pt-24 pb-32 relative overflow-hidden bg-[#fffdf5]" aria-label="Como Funciona">
@@ -191,8 +191,6 @@ const HowItWorks: React.FC = memo(() => {
 
     </section>
   );
-});
-
-HowItWorks.displayName = 'HowItWorks';
+};
 
 export default HowItWorks;

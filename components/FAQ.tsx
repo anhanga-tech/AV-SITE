@@ -190,7 +190,7 @@ const FAQS = [
     }
 ];
 
-const FAQ: React.FC = memo(() => {
+const FAQ: React.FC = () => {
     return (
         <section
             id="faq-section"
@@ -247,9 +247,8 @@ const FAQ: React.FC = memo(() => {
             `}</style>
         </section>
     );
-});
+};
 
 FAQItem.displayName = 'FAQItem';
-FAQ.displayName = 'FAQ';
 
 export default FAQ;

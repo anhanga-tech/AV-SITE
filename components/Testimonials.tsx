@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import ChevronLeft from 'lucide-react/dist/esm/icons/chevron-left';
 import ChevronRight from 'lucide-react/dist/esm/icons/chevron-right';
 import Quote from 'lucide-react/dist/esm/icons/quote';
@@ -34,7 +34,7 @@ const TESTIMONIALS = [
     }
 ];
 
-const Testimonials: React.FC = memo(() => {
+const Testimonials: React.FC = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const nextSlide = useCallback(() => {
@@ -165,8 +165,6 @@ const Testimonials: React.FC = memo(() => {
             </div>
         </section>
     );
-});
-
-Testimonials.displayName = 'Testimonials';
+};
 
 export default Testimonials;

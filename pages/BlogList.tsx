@@ -1,25 +1,23 @@
-import React, { useState, memo } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BLOG_POSTS } from '../data/blogData';
-import Calendar from 'lucide-react/dist/esm/icons/calendar';
 import User from 'lucide-react/dist/esm/icons/user';
 import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import Search from 'lucide-react/dist/esm/icons/search';
 import BookOpen from 'lucide-react/dist/esm/icons/book-open';
 import { SocialShare } from '../components/SocialShare';
-import { getWhatsAppLink } from '../utils/whatsapp';
-import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
+import { getBlogPostUrl } from '../utils/blog';
 import { optimizeRemoteImageUrl } from '../data/mediaConfig';
 import { SEO } from '../components/SEO';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { openAiChat } from '../utils/aiChat';
 
 /**
- * BlogList Page - Optimizado com CSS hover
+ * BlogList Page - Optimized with CSS hover
  *
  * PERFORMANCE WIN:
- * 1. Removido estado 'hoveredId' que causava re-render da página ao passar o mouse.
- * 2. Substituído por Tailwind 'group-hover' para estilização reativa via CSS.
+ * 1. Removed 'hoveredId' state which caused page re-renders on mouse over.
+ * 2. Replaced with Tailwind 'group-hover' for CSS-native reactive styling.
  */
 const BlogList: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');

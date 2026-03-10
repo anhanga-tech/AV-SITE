@@ -2,7 +2,6 @@ import React, { useState, useEffect, memo } from 'react';
 import Calendar from 'lucide-react/dist/esm/icons/calendar';
 import User from 'lucide-react/dist/esm/icons/user';
 import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
-import Tag from 'lucide-react/dist/esm/icons/tag';
 import BookOpen from 'lucide-react/dist/esm/icons/book-open';
 import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
 import Loader2 from 'lucide-react/dist/esm/icons/loader-2';
@@ -13,12 +12,12 @@ import { optimizeRemoteImageUrl } from '../data/mediaConfig';
 import { fetchRecentPosts } from '../lib/blog-api';
 
 /**
- * Blog Component - Optimizado com memoização e CSS hover
+ * Blog Component - Optimized with memoization and CSS hover
  *
  * PERFORMANCE WIN:
- * 1. Removido estado 'hoveredId' que causava re-render de toda a lista ao passar o mouse.
- * 2. Substituído por Tailwind 'group-hover' para estilização reativa via CSS.
- * 3. Envolvido em React.memo para evitar re-renders desnecessários quando a Home atualiza.
+ * 1. Removed 'hoveredId' state which caused full list re-renders on mouse over.
+ * 2. Replaced with Tailwind 'group-hover' for CSS-native reactive styling.
+ * 3. Wrapped in React.memo to prevent unnecessary re-renders when Home parent updates.
  */
 const Blog: React.FC = memo(() => {
     const [posts, setPosts] = useState<BlogPostType[]>(BLOG_POSTS.slice(0, 4));
@@ -27,7 +26,7 @@ const Blog: React.FC = memo(() => {
     useEffect(() => {
         async function loadPosts() {
             try {
-                // Tenta carregar do cache primeiro (apenas no navegador)
+                // Try to load from cache first (browser only)
                 if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
                     const cached = localStorage.getItem('dynamic_blog_posts');
                     const cachedTime = localStorage.getItem('dynamic_blog_posts_time');
@@ -63,7 +62,6 @@ const Blog: React.FC = memo(() => {
         loadPosts();
     }, []);
 
-    // Pegamos apenas os primeiros 4 posts para a home
     const displayPosts = posts;
     const featuredPost = displayPosts.find(p => p.isFeatured) || displayPosts[0];
     const gridPosts = displayPosts.filter(p => p.id !== featuredPost.id).slice(0, 3);
@@ -98,8 +96,8 @@ const Blog: React.FC = memo(() => {
 
                 {/* Featured Post Layout */}
                 {!isLoading && featuredPost && (
-                    <div className="mb-16 group cursor-pointer relative">
-                        <a href={getBlogPostUrl(featuredPost.slug)}>
+                    <div className="mb-16 cursor-pointer relative">
+                        <a href={getBlogPostUrl(featuredPost.slug)} className="group">
                             <div className="bg-[#fffdf5] rounded-[2.5rem] p-6 md:p-8 border-4 border-gray-100 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] flex flex-col md:flex-row gap-8 items-center transition-transform duration-300 hover:scale-[1.01]">
 
                                 {/* Featured Image */}
