@@ -4,7 +4,8 @@ import { buildCorsHeaders, getClientIP } from '../lib/network';
 import { cleanString, validatePayload } from '../lib/lead-logic';
 import {
     associateDealToContact,
-    buildContactProperties,
+    buildAdditionalContactProperties,
+    buildCoreContactProperties,
     createDeal,
     createFallbackNote,
     getContactIdByEmail,
@@ -35,6 +36,14 @@ interface ParsedHubSpotError {
     detail?: string;
     isUnauthorized: boolean;
     isPropertyError: boolean;
+}
+
+interface FailedContactProperty {
+    key: string;
+    value: string;
+    status?: number;
+    code: 'HUBSPOT_UNAUTHORIZED' | 'HUBSPOT_PROPERTY_ERROR' | 'HUBSPOT_API_ERROR';
+    detail?: string;
 }
 
 type LeadLogLevel = 'info' | 'warn' | 'error';
@@ -134,6 +143,12 @@ function parseHubSpotErrorMessage(message: string): ParsedHubSpotError {
     };
 }
 
+function appendWarning(existing: string | undefined, next: string | undefined): string | undefined {
+    if (!existing) return next;
+    if (!next) return existing;
+    return `${existing} ${next}`;
+}
+
 async function getRateLimitResponse(
     request: Request,
     corsHeaders: Record<string, string>,
@@ -228,32 +243,32 @@ function validateRequestPayload(
 async function recoverDuplicateContact(
     hubspotToken: string,
     email: string,
-    contactProperties: Record<string, string>,
+    coreContactProperties: Record<string, string>,
 ): Promise<string> {
     const existingContactId = await getContactIdByEmail(hubspotToken, email);
     if (!existingContactId) {
         throw new Error('CONTACT_SEARCH_FAILED:404:Contact ID not found for existing email');
     }
 
-    await updateContactProperties(hubspotToken, existingContactId, contactProperties);
+    await updateContactProperties(hubspotToken, existingContactId, coreContactProperties);
     return existingContactId;
 }
 
 async function createOrUpdateContact(
     hubspotToken: string,
     payload: { email: string },
-    contactProperties: Record<string, string>,
+    coreContactProperties: Record<string, string>,
     corsHeaders: Record<string, string>,
     requestId: string,
 ): Promise<string | Response> {
     emitLeadLog('info', requestId, 'contact_create_or_update', {
         email: maskEmail(payload.email),
-        propertyCount: Object.keys(contactProperties).length,
+        propertyCount: Object.keys(coreContactProperties).length,
     });
 
     const createContactResponse = await hubspotRequest(hubspotToken, '/crm/v3/objects/contacts', {
         method: 'POST',
-        body: JSON.stringify({ properties: contactProperties }),
+        body: JSON.stringify({ properties: coreContactProperties }),
     });
 
     if (createContactResponse.status === 401 || createContactResponse.status === 403) {
@@ -280,7 +295,7 @@ async function createOrUpdateContact(
         });
 
         try {
-            const existingContactId = await recoverDuplicateContact(hubspotToken, payload.email, contactProperties);
+            const existingContactId = await recoverDuplicateContact(hubspotToken, payload.email, coreContactProperties);
 
             emitLeadLog('info', requestId, 'contact_create_or_update_success', {
                 mode: 'updated_existing',
@@ -397,6 +412,85 @@ async function createOrUpdateContact(
     return contactId;
 }
 
+async function syncAdditionalContactProperties(
+    hubspotToken: string,
+    contactId: string,
+    additionalProperties: Record<string, string>,
+    payload: {
+        firstName: string;
+        lastName: string;
+        email: string;
+        bantSummary: string;
+    },
+    requestId: string,
+): Promise<string | undefined> {
+    const entries = Object.entries(additionalProperties);
+    if (entries.length === 0) {
+        return undefined;
+    }
+
+    emitLeadLog('info', requestId, 'contact_enrichment_start', {
+        contactId,
+        propertyCount: entries.length,
+    });
+
+    const failedProperties: FailedContactProperty[] = [];
+
+    for (const [key, value] of entries) {
+        try {
+            await updateContactProperties(hubspotToken, contactId, { [key]: value });
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Unknown property sync error';
+            const parsedError = parseHubSpotErrorMessage(message);
+            const errorCode: FailedContactProperty['code'] = parsedError.isUnauthorized
+                ? 'HUBSPOT_UNAUTHORIZED'
+                : parsedError.isPropertyError
+                    ? 'HUBSPOT_PROPERTY_ERROR'
+                    : 'HUBSPOT_API_ERROR';
+
+            failedProperties.push({
+                key,
+                value,
+                status: parsedError.status,
+                code: errorCode,
+                detail: parsedError.detail,
+            });
+
+            emitLeadLog(parsedError.isPropertyError ? 'warn' : 'error', requestId, 'contact_enrichment_failed', {
+                contactId,
+                property: key,
+                code: errorCode,
+                status: parsedError.status,
+                detail: parsedError.detail,
+            });
+        }
+    }
+
+    if (failedProperties.length === 0) {
+        emitLeadLog('info', requestId, 'contact_enrichment_success', {
+            contactId,
+            propertyCount: entries.length,
+        });
+        return undefined;
+    }
+
+    const warningBase = 'Contato salvo, mas alguns dados de rastreamento/UTM não puderam ser gravados automaticamente no HubSpot.';
+    const warningContext = [
+        `Contato HubSpot: ${contactId}`,
+        `Falhas de propriedades: ${failedProperties.map((item) => `${item.key} [${item.code}${item.status ? ` ${item.status}` : ''}]`).join(', ')}`,
+        `Payload não persistido: ${JSON.stringify(Object.fromEntries(failedProperties.map((item) => [item.key, item.value])))}`,
+    ];
+
+    return await createFallbackNoteForLead(
+        hubspotToken,
+        contactId,
+        payload,
+        warningBase,
+        requestId,
+        warningContext,
+    );
+}
+
 function buildDealProperties(
     payload: {
         firstName: string;
@@ -427,6 +521,7 @@ async function createFallbackNoteForLead(
     },
     baseWarning: string,
     requestId: string,
+    extraContext: string[] = [],
 ): Promise<string> {
     try {
         const noteBody = [
@@ -434,6 +529,7 @@ async function createFallbackNoteForLead(
             baseWarning,
             `Lead: ${payload.firstName} ${payload.lastName} <${payload.email}>`,
             `BANT: ${payload.bantSummary}`,
+            ...extraContext,
         ].join('\n');
 
         await createFallbackNote(hubspotToken, contactId, noteBody);
@@ -615,15 +711,24 @@ export default async function handler(request: Request): Promise<Response> {
             ),
         });
 
-        const contactProperties = buildContactProperties(payload);
+        const coreContactProperties = buildCoreContactProperties(payload);
         const contactId = await createOrUpdateContact(
             config.hubspotToken,
             payload,
-            contactProperties,
+            coreContactProperties,
             corsHeaders,
             requestId,
         );
         if (contactId instanceof Response) return contactId;
+
+        const additionalContactProperties = buildAdditionalContactProperties(payload);
+        const contactWarning = await syncAdditionalContactProperties(
+            config.hubspotToken,
+            contactId,
+            additionalContactProperties,
+            payload,
+            requestId,
+        );
 
         const dealResult = await createDealForLead(
             config.hubspotToken,
@@ -643,7 +748,7 @@ export default async function handler(request: Request): Promise<Response> {
                 requestId,
                 contactId,
                 dealId: dealResult.dealId,
-                warning: dealResult.warning,
+                warning: appendWarning(contactWarning, dealResult.warning),
                 message: dealResult.dealId
                     ? 'Contato e deal criados com sucesso no HubSpot.'
                     : 'Contato criado com sucesso no HubSpot.',

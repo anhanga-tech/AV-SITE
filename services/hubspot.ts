@@ -133,10 +133,22 @@ export function mapTrackingToContactProperties(tracking?: LeadTracking): {
  * Builds the full set of contact properties for HubSpot.
  */
 export function buildContactProperties(payload: SubmitLeadRequest): Record<string, string> {
-    const properties: Record<string, string> = {
+    return {
+        ...buildCoreContactProperties(payload),
+        ...buildAdditionalContactProperties(payload),
+    };
+}
+
+export function buildCoreContactProperties(payload: SubmitLeadRequest): Record<string, string> {
+    return {
         firstname: payload.firstName,
         lastname: payload.lastName,
         email: payload.email,
+    };
+}
+
+export function buildAdditionalContactProperties(payload: SubmitLeadRequest): Record<string, string> {
+    const properties: Record<string, string> = {
     };
 
     if (payload.utms.utm_source) properties.ultimo_utm_source = payload.utms.utm_source;
