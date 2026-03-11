@@ -7,6 +7,7 @@ export interface LeadFinalizePayload {
   lastName: string;
   email: string;
   bantSummary: string;
+  destination: string;
   fallbackUrl: string;
 }
 
@@ -82,6 +83,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
       lastName: normalizedLastName,
       email: normalizedEmail,
       bantSummary: defaultBantSummary || 'Não informado',
+      destination: destination || '',
       fallbackUrl,
     });
 
