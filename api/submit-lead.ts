@@ -18,6 +18,7 @@ import { sendMetaConversion } from '../lib/conversions/meta.js';
 
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
+const DEFAULT_RATE_LIMIT_TIMEOUT_MS = 1200;
 
 interface SubmitLeadConfig {
     hubspotToken: string;
@@ -156,17 +157,65 @@ function appendWarning(existing: string | undefined, next: string | undefined): 
     return `${existing} ${next}`;
 }
 
+function getConfiguredTimeoutMs(envKey: string, fallbackMs: number): number {
+    const configured = Number.parseInt(String(process.env[envKey] ?? ''), 10);
+    if (!Number.isFinite(configured) || configured < 100) {
+        return fallbackMs;
+    }
+
+    return configured;
+}
+
+async function runWithTimeout<T>(
+    operation: () => Promise<T>,
+    timeoutMs: number,
+    timeoutMessage: string,
+): Promise<T> {
+    let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
+
+    try {
+        return await Promise.race([
+            operation(),
+            new Promise<T>((_, reject) => {
+                timeoutHandle = setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs);
+            }),
+        ]);
+    } finally {
+        if (timeoutHandle) {
+            clearTimeout(timeoutHandle);
+        }
+    }
+}
+
+function shouldAttemptFallbackNote(parsedError: ParsedHubSpotError): boolean {
+    return !parsedError.isUnauthorized && parsedError.status !== 504;
+}
+
 async function getRateLimitResponse(
     request: Request,
     corsHeaders: Record<string, string>,
     requestId: string,
 ): Promise<Response | null> {
     const clientIP = getClientIP(request);
-    const rateLimit = await checkRateLimitInternal(clientIP, {
-        limit: RATE_LIMIT_MAX_REQUESTS,
-        windowMs: RATE_LIMIT_WINDOW_MS,
-        prefix: 'ratelimit:submit-lead',
-    });
+    let rateLimit;
+
+    try {
+        rateLimit = await runWithTimeout(
+            () => checkRateLimitInternal(clientIP, {
+                limit: RATE_LIMIT_MAX_REQUESTS,
+                windowMs: RATE_LIMIT_WINDOW_MS,
+                prefix: 'ratelimit:submit-lead',
+            }),
+            getConfiguredTimeoutMs('SUBMIT_LEAD_RATE_LIMIT_TIMEOUT_MS', DEFAULT_RATE_LIMIT_TIMEOUT_MS),
+            'RATE_LIMIT_TIMEOUT:504:Rate limit check timed out',
+        );
+    } catch (error: unknown) {
+        emitLeadLog('warn', requestId, 'rate_limit_failed_open', {
+            clientIP,
+            detail: truncateDetail(error instanceof Error ? error.message : String(error)),
+        });
+        return null;
+    }
 
     if (rateLimit.allowed) return null;
 
@@ -477,6 +526,16 @@ async function syncAdditionalContactProperties(
             `Payload não persistido: ${JSON.stringify(failedBatch.properties)}`,
         ];
 
+        if (!shouldAttemptFallbackNote(parsedError)) {
+            emitLeadLog('warn', requestId, 'fallback_note_skipped', {
+                contactId,
+                phase: 'contact_enrichment',
+                code: failedBatch.code,
+                status: failedBatch.status,
+            });
+            return warningBase;
+        }
+
         return await createFallbackNoteForLead(
             hubspotToken,
             contactId,
@@ -598,13 +657,24 @@ async function createDealForLead(
             );
         }
 
+        const warningBase = parsedError.isPropertyError
+            ? 'Contato salvo, mas o deal não foi criado automaticamente por erro de propriedade no HubSpot.'
+            : 'Contato salvo, mas não foi possível criar ou associar o deal automaticamente.';
+        if (!shouldAttemptFallbackNote(parsedError)) {
+            emitLeadLog('warn', requestId, 'fallback_note_skipped', {
+                contactId,
+                phase: 'deal_create',
+                status: parsedError.status,
+                detail: parsedError.detail,
+            });
+            return { warning: warningBase };
+        }
+
         const warning = await createFallbackNoteForLead(
             hubspotToken,
             contactId,
             payload,
-            parsedError.isPropertyError
-                ? 'Contato salvo, mas o deal não foi criado automaticamente por erro de propriedade no HubSpot.'
-                : 'Contato salvo, mas não foi possível criar ou associar o deal automaticamente.',
+            warningBase,
             requestId,
         );
 
@@ -719,27 +789,26 @@ export default async function handler(request: Request): Promise<Response> {
         if (contactId instanceof Response) return contactId;
 
         const additionalContactProperties = buildAdditionalContactProperties(payload);
-        const contactWarning = await syncAdditionalContactProperties(
-            config.hubspotToken,
-            contactId,
-            additionalContactProperties,
-            payload,
-            requestId,
-        );
-
-        const dealResult = await createDealForLead(
-            config.hubspotToken,
-            contactId,
-            payload,
-            config,
-            corsHeaders,
-            requestId,
-        );
+        const [contactWarning, dealResult] = await Promise.all([
+            syncAdditionalContactProperties(
+                config.hubspotToken,
+                contactId,
+                additionalContactProperties,
+                payload,
+                requestId,
+            ),
+            createDealForLead(
+                config.hubspotToken,
+                contactId,
+                payload,
+                config,
+                corsHeaders,
+                requestId,
+            ),
+        ]);
         if (dealResult instanceof Response) return dealResult;
 
-        await trackLeadConversions(payload, requestId);
-
-        return buildSuccessResponse(
+        const response = buildSuccessResponse(
             {
                 ok: true,
                 requestId,
@@ -753,6 +822,14 @@ export default async function handler(request: Request): Promise<Response> {
             201,
             corsHeaders,
         );
+
+        void trackLeadConversions(payload, requestId).catch((conversionError: unknown) => {
+            emitLeadLog('warn', requestId, 'conversions_failed', {
+                detail: truncateDetail(conversionError instanceof Error ? conversionError.message : String(conversionError)),
+            });
+        });
+
+        return response;
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : 'Unknown error';
 

@@ -1,6 +1,8 @@
 import type { LeadTracking, SubmitLeadRequest } from '../types/leadCapture';
 import { cleanString } from '../lib/lead-logic.js';
 
+const DEFAULT_HUBSPOT_REQUEST_TIMEOUT_MS = 1500;
+
 const TRACKING_PROPERTY_MAP: Record<string, string> = {
     cid: 'ga_client_id',
     sid: 'ga_session_id',
@@ -27,6 +29,19 @@ export interface HubSpotAssociationResponse {
 export interface HubSpotObjectWithProperties {
     id: string;
     properties: Record<string, string | null>;
+}
+
+function getHubSpotRequestTimeoutMs(): number {
+    const configured = Number.parseInt(String(process.env.HUBSPOT_REQUEST_TIMEOUT_MS ?? ''), 10);
+    if (!Number.isFinite(configured) || configured < 50) {
+        return DEFAULT_HUBSPOT_REQUEST_TIMEOUT_MS;
+    }
+
+    return configured;
+}
+
+function createHubSpotTimeoutError(path: string, timeoutMs: number): Error {
+    return new Error(`HUBSPOT_TIMEOUT:504:HubSpot request timed out after ${timeoutMs}ms for ${path}`);
 }
 
 async function assertHubSpotResponseOk(response: Response, errorCode: string): Promise<void> {
@@ -62,10 +77,36 @@ export async function hubspotRequest(
     headers.set('Authorization', `Bearer ${token}`);
     headers.set('Content-Type', 'application/json');
 
-    return fetch(`https://api.hubapi.com${path}`, {
-        ...init,
-        headers,
-    });
+    const timeoutMs = getHubSpotRequestTimeoutMs();
+    const controller = new AbortController();
+    const timeoutError = createHubSpotTimeoutError(path, timeoutMs);
+    let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
+
+    try {
+        return await Promise.race([
+            fetch(`https://api.hubapi.com${path}`, {
+                ...init,
+                headers,
+                signal: controller.signal,
+            }),
+            new Promise<Response>((_, reject) => {
+                timeoutHandle = setTimeout(() => {
+                    controller.abort();
+                    reject(timeoutError);
+                }, timeoutMs);
+            }),
+        ]);
+    } catch (error: unknown) {
+        if (error instanceof Error && error.name === 'AbortError') {
+            throw timeoutError;
+        }
+
+        throw error;
+    } finally {
+        if (timeoutHandle) {
+            clearTimeout(timeoutHandle);
+        }
+    }
 }
 
 /**

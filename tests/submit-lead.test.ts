@@ -10,6 +10,8 @@ const originalEnv = {
     HUBSPOT_DEAL_STAGE_ID: process.env.HUBSPOT_DEAL_STAGE_ID,
     HUBSPOT_DEAL_BANT_PROPERTY: process.env.HUBSPOT_DEAL_BANT_PROPERTY,
     HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY: process.env.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY,
+    HUBSPOT_REQUEST_TIMEOUT_MS: process.env.HUBSPOT_REQUEST_TIMEOUT_MS,
+    SUBMIT_LEAD_RATE_LIMIT_TIMEOUT_MS: process.env.SUBMIT_LEAD_RATE_LIMIT_TIMEOUT_MS,
 };
 
 function restoreEnv() {
@@ -18,6 +20,8 @@ function restoreEnv() {
     process.env.HUBSPOT_DEAL_STAGE_ID = originalEnv.HUBSPOT_DEAL_STAGE_ID;
     process.env.HUBSPOT_DEAL_BANT_PROPERTY = originalEnv.HUBSPOT_DEAL_BANT_PROPERTY;
     process.env.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY = originalEnv.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY;
+    process.env.HUBSPOT_REQUEST_TIMEOUT_MS = originalEnv.HUBSPOT_REQUEST_TIMEOUT_MS;
+    process.env.SUBMIT_LEAD_RATE_LIMIT_TIMEOUT_MS = originalEnv.SUBMIT_LEAD_RATE_LIMIT_TIMEOUT_MS;
 }
 
 function buildRequest(body: Record<string, unknown>): Request {
@@ -51,7 +55,7 @@ interface MockHubSpotRequest {
 
 interface MockHubSpotRoute {
     matches: (request: MockHubSpotRequest) => boolean;
-    respond: (request: MockHubSpotRequest) => Response;
+    respond: (request: MockHubSpotRequest) => Response | Promise<Response>;
 }
 
 function buildMockHubSpotRequest(input: RequestInfo | URL, init?: RequestInit): MockHubSpotRequest {
@@ -69,7 +73,7 @@ function createMockHubSpotFetch(calls: MockHubSpotRequest[], routes: MockHubSpot
 
         for (const route of routes) {
             if (route.matches(request)) {
-                return route.respond(request);
+                return await route.respond(request);
             }
         }
 
@@ -551,4 +555,70 @@ test('submit-lead should return requestId and property-specific code when HubSpo
     assert.equal(payload.code, 'HUBSPOT_PROPERTY_ERROR');
     assert.equal(typeof payload.requestId, 'string');
     assert.ok(payload.requestId.length > 0);
+});
+
+test('submit-lead should not hang when HubSpot enrichment times out', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+        restoreEnv();
+    });
+
+    process.env.HUBSPOT_TOKEN = 'test-token';
+    process.env.HUBSPOT_DEAL_PIPELINE_ID = 'pipeline-1';
+    process.env.HUBSPOT_DEAL_STAGE_ID = 'stage-1';
+    process.env.HUBSPOT_REQUEST_TIMEOUT_MS = '100';
+
+    const calls: MockHubSpotRequest[] = [];
+
+    global.fetch = createMockHubSpotFetch(calls, [
+        {
+            matches: ({ url, method }) => url.endsWith('/crm/v3/objects/contacts') && method === 'POST',
+            respond: () => new Response(JSON.stringify({ id: 'contact-timeout' }), { status: 201 }),
+        },
+        {
+            matches: ({ url, method }) => url.endsWith('/crm/v3/objects/contacts/contact-timeout') && method === 'PATCH',
+            respond: () => new Promise<Response>(() => {}),
+        },
+        {
+            matches: ({ url, method }) => url.endsWith('/crm/v3/objects/deals') && method === 'POST',
+            respond: () => new Response(JSON.stringify({ id: 'deal-timeout' }), { status: 201 }),
+        },
+        {
+            matches: ({ url, method }) => url.endsWith('/crm/v4/objects/deals/deal-timeout/associations/default/contacts/contact-timeout') && method === 'PUT',
+            respond: () => new Response(null, { status: 204 }),
+        },
+    ]);
+
+    const response = await handler(buildRequest({
+        firstName: 'Felipe',
+        lastName: 'William',
+        email: 'felipe@example.com',
+        bantSummary: 'Need: Disney | Authority: casal | Budget: 20k | Timeline: junho',
+        destination: 'Orlando',
+        utms: {
+            utm_source: 'google',
+            utm_medium: null,
+            utm_campaign: null,
+            utm_term: null,
+            utm_content: null,
+        },
+        tracking: {
+            cid: 'cid-timeout',
+            utm_source: 'google',
+            utm_medium: null,
+            utm_campaign: null,
+            utm_term: null,
+            utm_content: null,
+        },
+    }));
+
+    assert.equal(response.status, 201);
+    const payload = await response.json();
+
+    assert.equal(payload.ok, true);
+    assert.equal(payload.contactId, 'contact-timeout');
+    assert.equal(payload.dealId, 'deal-timeout');
+    assert.match(payload.warning, /dados de rastreamento\/UTM/i);
+    assert.doesNotMatch(payload.warning, /nota foi registrada/i);
+    assert.equal(calls.some((call) => call.url.endsWith('/crm/v3/objects/notes')), false);
 });
