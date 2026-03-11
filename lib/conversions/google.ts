@@ -26,7 +26,7 @@ export async function sendGoogleConversion(
 
   try {
     console.log('GOOGLE_ADS: Would send conversion', { eventName, conversionId, conversionLabel, ...payload });
-    // TODO: Implement Google Ads API call
+    // Placeholder: implement Google Ads API call.
     return { success: true };
   } catch (error) {
     console.error('GOOGLE_ADS: Conversion failed', error);

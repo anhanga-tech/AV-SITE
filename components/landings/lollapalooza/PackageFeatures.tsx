@@ -1,5 +1,5 @@
 import React from 'react';
-import { BedDouble, BusFront, Headset, Map, Wand2 } from 'lucide-react';
+import { BedDouble, BusFront, Headset, Map, Wand2, type LucideIcon } from 'lucide-react';
 import useIntersectionObserver from './hooks/useIntersectionObserver';
 import Button from './Button';
 
@@ -8,7 +8,7 @@ interface FeatureItem {
   id: string;
   title: string;
   subtitle: string;
-  icon: any;
+  icon: LucideIcon;
   image?: string;
   bgColor?: string; // Para cards sem imagem
   className: string; // Classes de grid (col-span, row-span)

@@ -193,8 +193,8 @@ const captureTrackingDataObject = (): TrackingData | null => {
             cachedTrackingData = dataString;
             cachedTrackingObject = { ...trackingData };
 
-            if (typeof window !== 'undefined' && (window as any).dataLayer) {
-                (window as any).dataLayer.push({
+            if (typeof window !== 'undefined' && window.dataLayer) {
+                window.dataLayer.push({
                     event: 'tracking_data_captured',
                     ...trackingData,
                 });

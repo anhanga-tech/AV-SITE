@@ -128,8 +128,7 @@ const BlogPost: React.FC = () => {
                     width="1200"
                     height="675"
                     className="w-full h-full object-cover"
-                    // @ts-ignore
-                    fetchpriority="high"
+                    fetchPriority="high"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/40 to-transparent opacity-90"></div>
 

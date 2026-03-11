@@ -34,6 +34,16 @@ function getUrl(input: RequestInfo | URL): string {
     return input.url;
 }
 
+interface MockHubSpotRequestBody {
+    properties?: Record<string, unknown>;
+}
+
+interface MockHubSpotRequest {
+    url: string;
+    method: string;
+    body?: MockHubSpotRequestBody;
+}
+
 test('mapTrackingToContactProperties should map msclkid to hs_microsoft_click_id', () => {
     const mapped = mapTrackingToContactProperties({
         utm_source: null,
@@ -64,12 +74,12 @@ test('submit-lead should create contact and deal on first attempt', async (t) =>
     process.env.HUBSPOT_DEAL_STAGE_ID = 'stage-1';
     process.env.HUBSPOT_DEAL_BANT_PROPERTY = 'bant_summary';
 
-    const calls: Array<{ url: string; method: string; body: any }> = [];
+    const calls: MockHubSpotRequest[] = [];
 
     global.fetch = (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
         const url = getUrl(input);
         const method = init?.method || 'GET';
-        const body = init?.body ? JSON.parse(String(init.body)) : undefined;
+        const body = init?.body ? JSON.parse(String(init.body)) as MockHubSpotRequestBody : undefined;
         calls.push({ url, method, body });
 
         if (url.endsWith('/crm/v3/objects/contacts') && method === 'POST') {
@@ -144,12 +154,12 @@ test('submit-lead should sanitize XSS payloads in inputs', async (t) => {
     process.env.HUBSPOT_DEAL_STAGE_ID = 'stage-1';
     process.env.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY = 'contact_tracking_fallback';
 
-    const calls: Array<{ url: string; method: string; body: any }> = [];
+    const calls: MockHubSpotRequest[] = [];
 
     global.fetch = (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
         const url = getUrl(input);
         const method = init?.method || 'GET';
-        const body = init?.body ? JSON.parse(String(init.body)) : undefined;
+        const body = init?.body ? JSON.parse(String(init.body)) as MockHubSpotRequestBody : undefined;
         calls.push({ url, method, body });
 
         if (url.endsWith('/crm/v3/objects/contacts') && method === 'POST') {
@@ -192,12 +202,16 @@ test('submit-lead should sanitize XSS payloads in inputs', async (t) => {
 
     const dealRequest = calls.find((call) => call.url.endsWith('/crm/v3/objects/deals'));
     const dealProps = dealRequest!.body.properties;
-    assert.ok(dealProps.dealname.includes("&lt;script&gt;"));
+    const dealName = typeof dealProps.dealname === 'string' ? dealProps.dealname : '';
+    assert.ok(dealName.includes("&lt;script&gt;"));
     const bantProperty = process.env.HUBSPOT_DEAL_BANT_PROPERTY || 'bant_summary';
     assert.equal(dealProps[bantProperty], "Need: &lt;img src=x onerror=alert(1)&gt;");
 
     // Check extras sanitization
-    const extras = JSON.parse(contactProps.contact_tracking_fallback || "{}");
+    const trackingFallback = typeof contactProps.contact_tracking_fallback === 'string'
+        ? contactProps.contact_tracking_fallback
+        : '{}';
+    const extras = JSON.parse(trackingFallback) as Record<string, string>;
     assert.ok(extras["&lt;p&gt;custom&lt;/p&gt;"], "Key should be sanitized");
     assert.equal(extras["&lt;p&gt;custom&lt;/p&gt;"], "&lt;b&gt;value&lt;/b&gt;");
 });

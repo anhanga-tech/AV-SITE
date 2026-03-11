@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getTrackingDataObject, getWhatsAppLink } from '../utils/whatsapp';
-import type { LeadTracking, LeadUtms, SubmitLeadRequest, SubmitLeadResponse } from '../types/leadCapture';
+import type { LeadTracking, LeadUtms, SubmitLeadRequest } from '../types/leadCapture';
 
 interface LeadDraft {
     firstName: string;
@@ -14,6 +14,14 @@ interface LeadDraft {
 }
 
 type LeadDraftPartial = Partial<LeadDraft>;
+
+type SubmitLeadResponseData = {
+    error?: string;
+    code?: string;
+    contactId?: string;
+    dealId?: string;
+    warning?: string;
+};
 
 type SubmitLeadHookResult =
     | {
@@ -51,6 +59,14 @@ const EMPTY_LEAD_DRAFT: LeadDraft = {
 
 function cleanValue(value: string): string {
     return value.trim();
+}
+
+function asResponseData(value: unknown): SubmitLeadResponseData {
+    if (!value || typeof value !== 'object') {
+        return {};
+    }
+
+    return value as SubmitLeadResponseData;
 }
 
 function toNullable(value: unknown): string | null {
@@ -218,15 +234,14 @@ export function useLeadCapture() {
                 body: JSON.stringify(payload),
             });
 
-            const rawData = await response.json().catch(() => ({}));
+            const rawData = asResponseData(await response.json().catch(() => ({})));
 
             if (!response.ok) {
-                const responseData = rawData as any;
-                const apiError = typeof responseData.error === 'string'
-                    ? responseData.error
+                const apiError = typeof rawData.error === 'string'
+                    ? rawData.error
                     : 'Falha ao enviar lead para o HubSpot.';
-                const apiCode = typeof responseData.code === 'string'
-                    ? responseData.code
+                const apiCode = typeof rawData.code === 'string'
+                    ? rawData.code
                     : 'HUBSPOT_API_ERROR';
 
                 setError(apiError);
@@ -240,9 +255,9 @@ export function useLeadCapture() {
                 };
             }
 
-            const contactId = typeof (rawData as any).contactId === 'string' ? (rawData as any).contactId : 'unknown';
-            const dealId = typeof (rawData as any).dealId === 'string' ? (rawData as any).dealId : undefined;
-            const warning = typeof (rawData as any).warning === 'string' ? (rawData as any).warning : undefined;
+            const contactId = typeof rawData.contactId === 'string' ? rawData.contactId : 'unknown';
+            const dealId = typeof rawData.dealId === 'string' ? rawData.dealId : undefined;
+            const warning = typeof rawData.warning === 'string' ? rawData.warning : undefined;
             const whatsappUrl = getWhatsAppLink(buildWhatsAppMessage(merged), { appendTrackingRef: true });
 
             setIsSubmitting(false);

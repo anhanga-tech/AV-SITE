@@ -27,6 +27,58 @@ export const getMediaUrl = (path: string): string => {
     return `${MEDIA_BASE_URL}${path}`;
 };
 
+function parseRemoteUrl(rawUrl: string): URL | null {
+    try {
+        return new URL(rawUrl);
+    } catch {
+        return null;
+    }
+}
+
+function optimizePexelsUrl(parsedUrl: URL, width: number, height?: number): string {
+    if (!parsedUrl.searchParams.has('auto')) {
+        parsedUrl.searchParams.set('auto', 'compress');
+    }
+    if (!parsedUrl.searchParams.has('cs')) {
+        parsedUrl.searchParams.set('cs', 'tinysrgb');
+    }
+    if (!parsedUrl.searchParams.has('w')) {
+        parsedUrl.searchParams.set('w', String(width));
+    }
+    if (height && !parsedUrl.searchParams.has('h')) {
+        parsedUrl.searchParams.set('h', String(height));
+    }
+    if (!parsedUrl.searchParams.has('dpr')) {
+        parsedUrl.searchParams.set('dpr', '1');
+    }
+
+    return parsedUrl.toString();
+}
+
+function optimizeCloudinaryDeliveryUrl(rawUrl: string, parsedUrl: URL, width: number, height?: number): string | null {
+    if (parsedUrl.hostname !== 'res.cloudinary.com' || !rawUrl.includes('/image/upload/')) {
+        return null;
+    }
+
+    const afterUpload = rawUrl.split('/image/upload/')[1] || '';
+    const firstSegment = afterUpload.split('/')[0];
+    if (/[a-z]_/.test(firstSegment)) {
+        return rawUrl;
+    }
+
+    const transforms = height
+        ? `f_auto,q_auto,w_${width},h_${height},c_fill`
+        : `f_auto,q_auto,w_${width}`;
+
+    return rawUrl.replace('/image/upload/', `/image/upload/${transforms}/`);
+}
+
+function buildWsrvProxyUrl(rawUrl: string, width: number): string {
+    const withoutProtocol = rawUrl.replace(/^https?:\/\//, '');
+    const encodedUrl = encodeURIComponent(withoutProtocol);
+    return `https://wsrv.nl/?url=${encodedUrl}&w=${width}&output=webp&q=80`;
+}
+
 /**
  * Optimize remote image URLs to reduce transfer size.
  * - Pexels: use built-in compression and constrained dimensions
@@ -41,60 +93,25 @@ export const optimizeRemoteImageUrl = (
         return rawUrl;
     }
 
-    let parsedUrl: URL;
-    try {
-        parsedUrl = new URL(rawUrl);
-    } catch {
-        // If the URL is not parseable, return it unchanged.
+    const parsedUrl = parseRemoteUrl(rawUrl);
+    if (!parsedUrl) {
         return rawUrl;
     }
 
     if (parsedUrl.hostname === 'images.pexels.com') {
-        if (!parsedUrl.searchParams.has('auto')) {
-            parsedUrl.searchParams.set('auto', 'compress');
-        }
-        if (!parsedUrl.searchParams.has('cs')) {
-            parsedUrl.searchParams.set('cs', 'tinysrgb');
-        }
-        if (!parsedUrl.searchParams.has('w')) {
-            parsedUrl.searchParams.set('w', String(width));
-        }
-        if (height && !parsedUrl.searchParams.has('h')) {
-            parsedUrl.searchParams.set('h', String(height));
-        }
-        if (!parsedUrl.searchParams.has('dpr')) {
-            parsedUrl.searchParams.set('dpr', '1');
-        }
-        return parsedUrl.toString();
+        return optimizePexelsUrl(parsedUrl, width, height);
     }
 
     if (parsedUrl.hostname === 'wsrv.nl') {
         return rawUrl;
     }
 
-    try {
-        const url = new URL(rawUrl);
-        if (url.hostname === 'res.cloudinary.com' && rawUrl.includes('/image/upload/')) {
-            // Inject Cloudinary delivery transformations only if not already present.
-            // Check if the first path segment after /image/upload/ looks like a transformation
-            // (Cloudinary transforms always contain underscores, e.g. c_fill, f_auto, w_800).
-            const afterUpload = rawUrl.split('/image/upload/')[1] || '';
-            const firstSegment = afterUpload.split('/')[0];
-            if (/[a-z]_/.test(firstSegment)) {
-                return rawUrl;
-            }
-            const transforms = height
-                ? `f_auto,q_auto,w_${width},h_${height},c_fill`
-                : `f_auto,q_auto,w_${width}`;
-            return rawUrl.replace('/image/upload/', `/image/upload/${transforms}/`);
-        }
-    } catch {
-        // If URL parsing fails, fall through to wsrv.nl proxy handling below.
+    const optimizedCloudinaryUrl = optimizeCloudinaryDeliveryUrl(rawUrl, parsedUrl, width, height);
+    if (optimizedCloudinaryUrl) {
+        return optimizedCloudinaryUrl;
     }
 
-    const withoutProtocol = rawUrl.replace(/^https?:\/\//, '');
-    const encodedUrl = encodeURIComponent(withoutProtocol);
-    return `https://wsrv.nl/?url=${encodedUrl}&w=${width}&output=webp&q=80`;
+    return buildWsrvProxyUrl(rawUrl, width);
 };
 
 // =============================================================================

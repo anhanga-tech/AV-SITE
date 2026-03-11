@@ -55,7 +55,7 @@ const Categories: React.FC = () => {
 
         {/* Polaroid Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 px-4">
-          {POPULAR_DESTINATIONS.map((item, idx) => (
+          {POPULAR_DESTINATIONS.map((item) => (
             <Link
               key={item.link}
               to={item.link}

@@ -30,7 +30,7 @@ export async function sendMetaConversion(
 
   try {
     console.log('META: Would send conversion', { pixelId, ...payload });
-    // TODO: Implement Meta CAPI call
+    // Placeholder: implement Meta CAPI call.
     return { success: true };
   } catch (error) {
     console.error('META: Conversion failed', error);
