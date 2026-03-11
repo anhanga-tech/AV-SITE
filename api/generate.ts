@@ -152,7 +152,6 @@ function buildModuleLoadErrorResponse(loadError: unknown): Response {
     return new Response(JSON.stringify({
         code: 'MODULE_LOAD_ERROR',
         error: 'Erro ao carregar dependências do servidor',
-        _debug: msg,
     }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
