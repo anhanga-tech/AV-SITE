@@ -208,17 +208,12 @@ const AIChat: React.FC = () => {
       });
     }
 
-    if (nextMessages.length === 0) {
-      nextMessages.push({
-        role: 'model',
-        text: 'Desculpe, não consegui gerar uma resposta. Poderia tentar novamente?'
-      });
-    }
+    if (nextMessages.length > 0) {
+      setMessages(prev => [...prev, ...nextMessages]);
 
-    setMessages(prev => [...prev, ...nextMessages]);
-
-    if (enableHaptics) {
-      void triggerHaptic('heavy');
+      if (enableHaptics) {
+        void triggerHaptic('heavy');
+      }
     }
   };
 

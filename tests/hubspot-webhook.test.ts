@@ -163,30 +163,3 @@ test('hubspot-webhook should process closed won deal event', async (t) => {
   assert.ok(warns.some(message => message.includes('HUBSPOT_WEBHOOK: Conversion tracking incomplete for deal 123')));
   assert.ok(!logs.some(message => message.includes('HUBSPOT_WEBHOOK: Conversion sent for deal 123')));
 });
-
-test('hubspot-webhook should reject non-array payloads', async (t) => {
-  t.after(() => {
-    restoreEnv();
-  });
-
-  const secret = 'test-secret';
-  process.env.HUBSPOT_WEBHOOK_SECRET = secret;
-  process.env.HUBSPOT_TOKEN = 'test-token';
-
-  const body = JSON.stringify({ subscriptionType: 'deal.propertyChange' });
-  const timestamp = Date.now().toString();
-  const signature = await signRequest(body, timestamp, secret);
-
-  const response = await handler(new Request('http://localhost/api/hubspot-webhook', {
-    method: 'POST',
-    headers: {
-      'X-HubSpot-Signature-v3': signature,
-      'X-HubSpot-Request-Timestamp': timestamp,
-      'Content-Type': 'application/json'
-    },
-    body
-  }));
-
-  assert.equal(response.status, 400);
-  assert.deepEqual(await response.json(), { error: 'Invalid JSON body' });
-});

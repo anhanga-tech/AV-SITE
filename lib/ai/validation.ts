@@ -1,4 +1,4 @@
-import type { TripScope, SafetyBlock, BudgetToolArgs, BudgetValidationResult } from './types.ts';
+import type { TripScope, SafetyBlock, BudgetToolArgs, BudgetValidationResult } from './types';
 import {
     CITY_FALLBACKS,
     BUDGET_FALLBACKS,
@@ -6,9 +6,9 @@ import {
     SOUTH_AMERICA_COUNTRIES,
     BLOCKED_DESTINATIONS,
     TRIP_SCOPES
-} from './constants.ts';
-import { normalizeText, normalizeLabel, hasAliasMatch } from './utils.ts';
-import { cleanString } from '../lead-logic.ts';
+} from './constants';
+import { normalizeText, normalizeLabel, hasAliasMatch } from './utils';
+import { cleanString } from '../lead-logic';
 
 export function normalizeAdults(value: unknown): number | undefined {
     const parsed = typeof value === 'number' ? value : Number.parseInt(String(value ?? ''), 10);

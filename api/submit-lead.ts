@@ -1,7 +1,7 @@
 import type { SubmitLeadResponse } from '../types/leadCapture';
-import { checkRateLimit as checkRateLimitInternal } from '../lib/rate-limit.ts';
-import { buildCorsHeaders, getClientIP } from '../lib/network.ts';
-import { cleanString, validatePayload } from '../lib/lead-logic.ts';
+import { checkRateLimit as checkRateLimitInternal } from '../lib/rate-limit';
+import { buildCorsHeaders, getClientIP } from '../lib/network';
+import { cleanString, validatePayload } from '../lib/lead-logic';
 import {
     associateDealToContact,
     buildContactProperties,
@@ -11,9 +11,9 @@ import {
     hubspotRequest,
     updateContactProperties,
     type HubSpotObjectResponse
-} from '../services/hubspot.ts';
-import { sendGoogleConversion } from '../lib/conversions/google.ts';
-import { sendMetaConversion } from '../lib/conversions/meta.ts';
+} from '../services/hubspot';
+import { sendGoogleConversion } from '../lib/conversions/google';
+import { sendMetaConversion } from '../lib/conversions/meta';
 
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 5;

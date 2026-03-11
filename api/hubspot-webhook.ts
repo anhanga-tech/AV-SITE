@@ -3,10 +3,10 @@
 // This handler depends on modules that Vercel does not support in Edge Functions,
 // so it must run on the default Node.js runtime.
 
-import { sendGoogleConversion } from '../lib/conversions/google.ts';
-import { sendMetaConversion } from '../lib/conversions/meta.ts';
-import { validateHubSpotSignature } from '../lib/hubspot-validation.ts';
-import { getDeal, getAssociatedContactId, getContact } from '../services/hubspot.ts';
+import { sendGoogleConversion } from '../lib/conversions/google';
+import { sendMetaConversion } from '../lib/conversions/meta';
+import { validateHubSpotSignature } from '../lib/hubspot-validation';
+import { getDeal, getAssociatedContactId, getContact } from '../services/hubspot';
 
 interface HubSpotWebhookEvent {
   subscriptionType?: string;

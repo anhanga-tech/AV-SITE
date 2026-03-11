@@ -50,7 +50,6 @@ async function parseHubSpotJsonResponse<T>(response: Response, errorCode: string
     return await response.json() as T;
 }
 
-
 /**
  * Generic HubSpot API request wrapper.
  */
