@@ -92,22 +92,19 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
 
     void triggerHaptic('medium');
 
-    const result = await onFinalizeLead(payload);
-    if (!result.ok) {
-      setLocalError(result.requestId
-        ? `${result.error || 'Não foi possível salvar seus dados agora.'} Ref: ${result.requestId}`
-        : (result.error || 'Não foi possível salvar seus dados agora.'));
-      return;
-    }
-
-    if (result.notice) {
-      setNotice(result.notice);
-    }
-
+    // Open WhatsApp synchronously in the click handler to prevent popup blockers on mobile/Safari
     const whatsappUrl = getWhatsAppUrl(payload);
     const popup = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
     if (!popup) {
       window.location.assign(whatsappUrl);
+    }
+
+    // Submit lead data in the background — user is already heading to WhatsApp
+    const result = await onFinalizeLead(payload);
+    if (!result.ok) {
+      console.warn('Background lead submission failed:', { error: result.error, requestId: result.requestId });
+    } else if (result.notice) {
+      setNotice(result.notice);
     }
   };
 
