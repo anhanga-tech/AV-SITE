@@ -1,3 +1,7 @@
+export const config = {
+    runtime: 'edge',
+};
+
 import { checkRateLimit } from '../lib/rate-limit';
 import { buildCorsHeaders, getClientIP } from '../lib/network';
 import { budgetTool } from '../lib/ai/tools';

@@ -1,3 +1,7 @@
+export const config = {
+    runtime: 'edge',
+};
+
 import type { SubmitLeadRequest, SubmitLeadResponse } from '../types/leadCapture';
 import { checkRateLimit as checkRateLimitInternal } from '../lib/rate-limit';
 import { buildCorsHeaders, getClientIP } from '../lib/network';
