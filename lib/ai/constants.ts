@@ -1,7 +1,7 @@
 import { MIDDLE_EAST_COUNTRIES } from '../../utils/constants';
 import type { TripScope, SafetyCategory } from './types';
 
-export const DEFAULT_GEMINI_MODEL = 'gemini-3-flash-preview';
+export const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash-lite';
 
 export const TRIP_SCOPES = new Set<TripScope>(['national', 'south_america', 'international']);
 
