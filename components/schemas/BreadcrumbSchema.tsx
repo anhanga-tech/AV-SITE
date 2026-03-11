@@ -1,4 +1,5 @@
 import React from 'react';
+import { StructuredData } from './StructuredData';
 
 interface BreadcrumbItem {
     name: string;
@@ -10,19 +11,17 @@ interface BreadcrumbSchemaProps {
 }
 
 export const BreadcrumbSchema: React.FC<BreadcrumbSchemaProps> = ({ items }) => (
-    <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-                "@context": "https://schema.org",
-                "@type": "BreadcrumbList",
-                "itemListElement": items.map((item, index) => ({
-                    "@type": "ListItem",
-                    "position": index + 1,
-                    "name": item.name,
-                    "item": item.item
-                }))
-            })
-        }}
-    />
+  <StructuredData
+    id="breadcrumb"
+    data={{
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": items.map((item, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "name": item.name,
+        "item": item.item
+      }))
+    }}
+  />
 );

@@ -7,6 +7,7 @@ import OrlandoApp from '../../components/landings/orlando/OrlandoApp';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../../components/schemas/FAQPageSchema';
 import { ServiceSchema } from '../../components/schemas/ServiceSchema';
+import { openAiChat } from '../../utils/aiChat';
 import './orlando.css';
 
 const ORLANDO_FAQ_ITEMS = [
@@ -32,18 +33,19 @@ const OrlandoLanding: React.FC = () => {
   return (
     <>
       <SEO
-        title="Pacotes para Orlando 2025/2026 com Roteiro Personalizado"
-        description="Pacotes para Orlando 2025 e 2026 com suporte de agência boutique em São Paulo: aéreo, hotel, ingressos e roteiro personalizado para Disney e Universal."
+        title="Pacotes para Orlando 2026: Roteiro Disney e Universal"
+        description="Planeje sua viagem para Orlando 2026 com roteiro personalizado, ingressos e hospedagem. Atendimento especializado por agência boutique em São Paulo."
         canonical="https://www.anhanga.tur.br/orlando/"
         keywords="pacotes para Orlando, viagem para Orlando, roteiro Disney Orlando, pacote Universal Orlando, agência de viagens Orlando São Paulo"
       />
       <ServiceSchema
-        name="Pacotes para Orlando personalizados"
+        name="Pacotes para Orlando 2025/2026"
         description="Planejamento de viagem para Orlando com suporte especializado, incluindo aéreo, hotel, ingressos e roteiro personalizado."
         serviceUrl="https://www.anhanga.tur.br/orlando/"
         serviceType="Planejamento de viagem para Orlando"
         areaServed="São Paulo e Brasil"
         keywords={['pacotes para Orlando', 'roteiro Disney', 'viagem Universal']}
+        aggregateRating={{ ratingValue: 4.98, reviewCount: 24 }}
       />
       <BreadcrumbSchema
         items={[
@@ -90,9 +92,9 @@ const OrlandoLanding: React.FC = () => {
             <button
               onClick={(e) => {
                 e.preventDefault();
-                window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
-                  detail: { message: "Olá! Gostaria de um orçamento personalizado para Orlando." }
-                }));
+                openAiChat({
+                  message: 'Olá! Gostaria de um orçamento personalizado para Orlando.'
+                });
               }}
               className="btn-whatsapp btn-specialist px-5 py-3 rounded-full bg-brand-cyan text-white font-bold hover:bg-brand-cyan/90 transition-colors"
               data-tracking="footer-orlando"
@@ -105,6 +107,9 @@ const OrlandoLanding: React.FC = () => {
             </a>
             <a href="https://blog.anhanga.tur.br" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ler dicas no blog
+            </a>
+            <a href="https://www.visitorlando.com/" target="_blank" rel="noopener noreferrer" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+              Guia Oficial Visit Orlando
             </a>
           </div>
         </div>

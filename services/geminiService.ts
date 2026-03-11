@@ -33,6 +33,19 @@ interface ChatResponse {
   };
 }
 
+const buildFallbackContactMarkdown = (): string => {
+  const whatsappUrl = getWhatsAppLink(
+    'Olá! Tive um problema no chat do site e gostaria de continuar meu atendimento pelo WhatsApp.',
+    { appendTrackingRef: false },
+  );
+
+  return `Se preferir, [fale conosco no WhatsApp](${whatsappUrl}).`;
+};
+
+const withContactFallback = (message: string): string => {
+  return `${message}\n\n${buildFallbackContactMarkdown()}`;
+};
+
 const formatLocation = (city?: string, region?: string, fallback = 'A definir'): string => {
   const cityText = typeof city === 'string' ? city.trim() : '';
   const regionText = typeof region === 'string' ? region.trim() : '';
@@ -56,10 +69,7 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
       parts: [{ text: msg.text }]
     }));
 
-    const isDev = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-    const apiEndpoint = isDev
-      ? 'http://localhost:3000/api/generate'
-      : '/api/generate';
+    const apiEndpoint = '/api/generate';
 
     console.log('[GeminiService] Using endpoint:', apiEndpoint);
 
@@ -77,21 +87,43 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
       if (response.status === 429) {
         const retryAfter = errorData.retryAfter || 60;
         return {
-          text: `⏳ Você enviou muitas mensagens. Por favor, aguarde ${retryAfter} segundos e tente novamente.\n\nEnquanto isso, você pode falar diretamente conosco pelo WhatsApp!`
+          text: withContactFallback(
+            `⏳ Você enviou muitas mensagens. Por favor, aguarde ${retryAfter} segundos e tente novamente.`
+          )
+        };
+      }
+
+      if (response.status === 401 || response.status === 403) {
+        return {
+          text: withContactFallback(
+            '⚠️ O chat está com um problema de configuração no servidor. Nossa equipe já precisa revisar isso.'
+          )
+        };
+      }
+
+      if (response.status === 503) {
+        return {
+          text: withContactFallback(
+            '🕐 Nosso serviço de IA está temporariamente indisponível no momento.'
+          )
         };
       }
 
       if (response.status === 500) {
         console.error('[GeminiService] Server error:', errorData);
-        throw new Error('Erro interno do servidor');
-      }
+        if (errorData.code === 'SERVER_CONFIG_ERROR' || errorData.code === 'GEMINI_MODEL_ERROR') {
+          return {
+            text: withContactFallback(
+              '⚠️ O chat está com um problema de configuração no servidor. Nossa equipe já precisa revisar isso.'
+            )
+          };
+        }
 
-      if (response.status === 503) {
-        throw new Error('Serviço temporariamente indisponível');
-      }
-
-      if (response.status === 401 || response.status === 403) {
-        throw new Error('API key missing or invalid');
+        return {
+          text: withContactFallback(
+            '⚙️ Tivemos um problema técnico interno. Por favor, tente novamente em alguns instantes.'
+          )
+        };
       }
 
       throw new Error(errorData.error || `Server responded with ${response.status}`);
@@ -153,29 +185,45 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
       }
     }
 
+    if (!result.text && !result.budgetLink) {
+      result.text = withContactFallback(
+        'Não consegui gerar uma resposta agora. Pode reformular sua pergunta e tentar novamente?'
+      );
+    }
+
     return result;
 
   } catch (error: any) {
     console.error("[GeminiService] Erro ao consultar Gemini:", error);
 
     if (error?.message?.includes('API key missing') || error?.message?.includes('invalid')) {
-      return { text: "⚠️ Erro de configuração no servidor. A chave da API não foi encontrada ou é inválida." };
+      return {
+        text: withContactFallback(
+          '⚠️ O chat está com um problema de configuração no servidor. Nossa equipe já precisa revisar isso.'
+        )
+      };
     }
 
     if (error?.message?.includes('Failed to fetch') || error?.name === 'TypeError') {
       return {
-        text: "🔌 Não foi possível conectar ao servidor. Verifique sua conexão com a internet ou tente novamente em alguns instantes."
+        text: withContactFallback(
+          '🔌 Não foi possível conectar ao servidor. Verifique sua conexão com a internet ou tente novamente em alguns instantes.'
+        )
       };
     }
 
-    if (error?.message?.includes('Erro interno do servidor')) {
-      return { text: "⚙️ Tivemos um problema técnico interno. Por favor, tente novamente em alguns instantes." };
-    }
-
     if (error?.message?.includes('Serviço temporariamente indisponível')) {
-      return { text: "🕐 Nosso serviço está temporariamente indisponível. Por favor, tente novamente em breve." };
+      return {
+        text: withContactFallback(
+          '🕐 Nosso serviço está temporariamente indisponível. Por favor, tente novamente em breve.'
+        )
+      };
     }
 
-    return { text: `Desculpe, tive um problema técnico momentâneo. Poderia tentar novamente?` };
+    return {
+      text: withContactFallback(
+        '⚙️ Tivemos um problema técnico interno. Por favor, tente novamente em alguns instantes.'
+      )
+    };
   }
 };

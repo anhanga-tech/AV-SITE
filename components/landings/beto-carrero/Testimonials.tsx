@@ -76,7 +76,7 @@ const Testimonials: React.FC = () => {
                  {/* Author & Verification */}
                  <div className="flex items-center gap-4 border-t-2 border-dashed border-gray-200 pt-6 mt-auto relative z-10">
                    <div className="relative">
-                      <img src={t.avatar} alt={t.name} className="w-14 h-14 rounded-full border-2 border-fun-dark shadow-sm" />
+                      <img src={t.avatar} alt={t.name} width="56" height="56" loading="lazy" className="w-14 h-14 rounded-full border-2 border-fun-dark shadow-sm" />
                       <div className="absolute -bottom-1 -right-1 bg-fun-blue text-white rounded-full p-0.5 border border-white">
                         <CheckCircle2 size={12} strokeWidth={4} />
                       </div>

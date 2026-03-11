@@ -1,5 +1,6 @@
 import React, { useState, memo } from 'react';
 import { Loader2, ExternalLink, CheckCircle2 } from 'lucide-react';
+import { triggerHaptic } from '../utils/haptics';
 
 export interface LeadFinalizePayload {
   firstName: string;
@@ -74,6 +75,8 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
       return;
     }
 
+    void triggerHaptic('medium');
+
     const result = await onFinalizeLead({
       firstName: normalizedFirstName,
       lastName: normalizedLastName,
@@ -83,7 +86,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
     });
 
     if (!result.ok) {
-      setLocalError(result.error);
+      setLocalError((result as { ok: false; error: string }).error);
       return;
     }
 

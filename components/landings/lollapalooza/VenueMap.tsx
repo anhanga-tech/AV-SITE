@@ -288,9 +288,11 @@ const VenueMap: React.FC = () => {
                       <img
                         src={getOptimizedUrl(poi.image, 400)}
                         alt={`Local: ${poi.name}`}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-30"
+                        width="400"
+                        height="300"
                         loading="lazy"
                         decoding="async"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-30"
                       />
                       {/* Overlay para garantir legibilidade do texto sobre a imagem */}
                       <div className={`absolute inset-0 transition-colors duration-300 ${activeIndex === idx ? 'bg-blue-50/90' : 'bg-white/90 group-hover:bg-white/80'

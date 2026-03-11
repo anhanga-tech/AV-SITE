@@ -1,8 +1,122 @@
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
+import { DEFAULT_GEMINI_MODEL } from './lib/ai/constants.ts';
 
-export default defineConfig(({ mode }) => {
+type ApiHandler = (request: Request) => Promise<Response> | Response;
+
+const DEV_API_ROUTES: Record<string, () => Promise<{ default: ApiHandler }>> = {
+  '/api/generate': () => import('./api/generate.ts'),
+  '/api/submit-lead': () => import('./api/submit-lead.ts'),
+  '/api/hubspot-webhook': () => import('./api/hubspot-webhook.ts'),
+};
+
+const METHODS_WITH_BODY = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
+
+async function readRequestBody(req: IncomingMessage): Promise<Buffer> {
+  const chunks: Buffer[] = [];
+
+  for await (const chunk of req) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  }
+
+  return Buffer.concat(chunks);
+}
+
+async function toWebRequest(req: IncomingMessage, origin: string): Promise<Request> {
+  const headers = new Headers();
+
+  for (const [key, value] of Object.entries(req.headers)) {
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        headers.append(key, item);
+      }
+      continue;
+    }
+
+    if (typeof value === 'string') {
+      headers.set(key, value);
+    }
+  }
+
+  const method = req.method?.toUpperCase() || 'GET';
+  const requestInit: RequestInit & { duplex?: 'half' } = {
+    method,
+    headers,
+  };
+
+  if (METHODS_WITH_BODY.has(method)) {
+    const body = await readRequestBody(req);
+
+    if (body.length > 0) {
+      requestInit.body = new Uint8Array(body);
+      requestInit.duplex = 'half';
+    }
+  }
+
+  return new Request(new URL(req.url || '/', origin), requestInit);
+}
+
+async function sendWebResponse(response: Response, res: ServerResponse): Promise<void> {
+  res.statusCode = response.status;
+
+  response.headers.forEach((value, key) => {
+    res.setHeader(key, value);
+  });
+
+  const body = await response.arrayBuffer();
+  res.end(Buffer.from(body));
+}
+
+function apiDevPlugin() {
+  return {
+    name: 'api-dev-plugin',
+    apply: 'serve' as const,
+    configureServer(server: { middlewares: { use: (handler: (req: IncomingMessage, res: ServerResponse, next: () => void) => void | Promise<void>) => void }, ssrFixStacktrace?: (error: Error) => void }) {
+      server.middlewares.use(async (req, res, next) => {
+        if (!req.url?.startsWith('/api/')) {
+          next();
+          return;
+        }
+
+        const pathname = new URL(req.url, 'http://vite.local').pathname;
+        const loadHandler = DEV_API_ROUTES[pathname];
+
+        if (!loadHandler) {
+          next();
+          return;
+        }
+
+        const protoHeader = req.headers['x-forwarded-proto'];
+        const protocol = Array.isArray(protoHeader) ? protoHeader[0] : protoHeader || 'http';
+        const origin = `${protocol}://${req.headers.host || 'localhost:3000'}`;
+
+        try {
+          const { default: handler } = await loadHandler();
+          const request = await toWebRequest(req, origin);
+          const response = await handler(request);
+
+          await sendWebResponse(response, res);
+        } catch (error) {
+          if (error instanceof Error) {
+            server.ssrFixStacktrace?.(error);
+          }
+
+          console.error('[vite-api] Failed to serve %s:', pathname, error);
+
+          if (!res.headersSent) {
+            res.statusCode = 500;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ error: 'Internal dev server error' }));
+          }
+        }
+      });
+    },
+  };
+}
+
+export default defineConfig(({ mode, isSsrBuild }) => {
   // Carregar variáveis de ambiente do arquivo .env e do sistema
   // O segundo parâmetro '.' significa o diretório atual (raiz do projeto)
   // O terceiro parâmetro '' significa carregar TODAS as variáveis (não apenas VITE_*)
@@ -11,7 +125,7 @@ export default defineConfig(({ mode }) => {
   // Também verificar process.env diretamente (importante para Vercel/Netlify)
   // Isso garante que variáveis de ambiente do sistema sejam capturadas
   const geminiApiKey = env.GEMINI_API_KEY || process.env.GEMINI_API_KEY || '';
-  const geminiModel = env.GEMINI_MODEL || process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite-preview';
+  const geminiModel = env.GEMINI_MODEL || process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
 
   // Base path: '/' para Netlify/Vercel, ou '/repo-name/' para GitHub Pages
   // Para GitHub Pages, defina a variável de ambiente VITE_BASE_PATH
@@ -28,7 +142,7 @@ export default defineConfig(({ mode }) => {
       port: 3000,
       host: '0.0.0.0',
     },
-    plugins: [react()],
+    plugins: [react(), apiDevPlugin()],
     define: {
       'process.env.GEMINI_MODEL': JSON.stringify(geminiModel)
     },
@@ -44,7 +158,7 @@ export default defineConfig(({ mode }) => {
       minify: 'esbuild',
       rollupOptions: {
         output: {
-          manualChunks: {
+          manualChunks: isSsrBuild ? undefined : {
             'react-vendor': ['react', 'react-dom', 'react-router-dom'],
             'ai-vendor': ['@google/genai'],
           }

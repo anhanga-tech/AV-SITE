@@ -7,44 +7,75 @@ on:
 jobs:
   triage:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
+      contents: read
       issues: write
-      id-token: write
+      repository-projects: write
     steps:
       - uses: actions/checkout@v4
 
-      - uses: anthropics/claude-code-action@v1
+      # Work around upstream claude-code-action SDK crashes on issues:opened.
+      - uses: actions/setup-node@v4
         with:
-          anthropic_api_key: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          prompt: |
-            REPO: ${{ github.repository }}
-            ISSUE NUMBER: ${{ github.event.issue.number }}
-            TITLE: "${{ github.event.issue.title }}"
-            BODY: ${{ github.event.issue.body }}
-            AUTHOR: ${{ github.event.issue.user.login }}
+          node-version: "22"
 
-            Analyze this new issue and:
-            1. Determine if it's a bug report, feature request, or question
-            2. Assess priority (critical, high, medium, low)
-            3. Suggest appropriate labels from: bug, enhancement, seo, geo, schema, technical-debt, documentation
-            4. Check if it duplicates existing issues
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
 
-            Routing Rules (MANDATORY):
-            - If TITLE contains "SEO" or "GEO" (case-insensitive): Add to Project #5 ("SEO & GEO Optimization 2026").
-            - If TITLE does NOT contain "SEO" or "GEO": Add to Project #4 ("AV-SITE Project").
+      - name: Run Issue Triage
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+          DISABLE_AUTOUPDATER: "1"
+          REPO: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+          PROMPT_FILE: ${{ runner.temp }}/issue-triage-prompt.txt
+        run: |
+          node <<'NODE'
+          const fs = require("fs");
 
-            Use gh CLI to:
-            - `gh issue view [number]` to view the issue
-            - `gh search issues "query" --repo ${{ github.repository }}` to find similar issues
-            - `gh label list --repo ${{ github.repository }}` to see available labels
-            - `gh issue edit [number] --add-label "label1,label2"` to add labels
-            - Add to projects:
-              - Project #4 ID: PVT_kwHODSPH6s4BPrTl
-              - Project #5 ID: PVT_kwHODSPH6s4BP_lK
-              - CMD: `gh project item-add 4 --owner felipewilliam2 --url https://github.com/${{ github.repository }}/issues/${{ github.event.issue.number }}`
-              - OR CMD: `gh project item-add 5 --owner felipewilliam2 --url https://github.com/${{ github.repository }}/issues/${{ github.event.issue.number }}`
+          const prompt = [
+            `REPO: ${process.env.REPO}`,
+            `ISSUE NUMBER: ${process.env.ISSUE_NUMBER}`,
+            `TITLE: "${process.env.ISSUE_TITLE || ""}"`,
+            `BODY: ${process.env.ISSUE_BODY || ""}`,
+            `AUTHOR: ${process.env.ISSUE_AUTHOR || ""}`,
+            "",
+            "Analyze this new issue and:",
+            "1. Determine if it's a bug report, feature request, or question",
+            "2. Assess priority (critical, high, medium, low)",
+            "3. Suggest appropriate labels from: bug, enhancement, seo, geo, schema, technical-debt, documentation",
+            "4. Check if it duplicates existing issues",
+            "",
+            "Routing Rules (MANDATORY):",
+            '- If TITLE contains "SEO" or "GEO" (case-insensitive): Add to Project #5 ("SEO & GEO Optimization 2026").',
+            '- If TITLE does NOT contain "SEO" or "GEO": Add to Project #4 ("AV-SITE Project").',
+            "",
+            "Use gh CLI to:",
+            "- `gh issue view [number]` to view the issue",
+            `- \`gh search issues "query" --repo ${process.env.REPO}\` to find similar issues`,
+            `- \`gh label list --repo ${process.env.REPO}\` to see available labels`,
+            '- `gh issue edit [number] --add-label "label1,label2"` to add labels',
+            "- Add to projects:",
+            "  - Project #4 ID: PVT_kwHODSPH6s4BPrTl",
+            "  - Project #5 ID: PVT_kwHODSPH6s4BP_lK",
+            `  - CMD: \`gh project item-add 4 --owner felipewilliam2 --url https://github.com/${process.env.REPO}/issues/${process.env.ISSUE_NUMBER}\``,
+            `  - OR CMD: \`gh project item-add 5 --owner felipewilliam2 --url https://github.com/${process.env.REPO}/issues/${process.env.ISSUE_NUMBER}\``,
+            "",
+            "Post a comment summarizing your analysis, apply labels, and add to the correct project.",
+            "",
+          ].join("\n");
 
-            Post a comment summarizing your analysis, apply labels, and add to the correct project.
+          fs.writeFileSync(process.env.PROMPT_FILE, prompt);
+          NODE
 
-          claude_args: |
-            --allowedTools "Bash(gh issue:*),Bash(gh search:*),Bash(gh label:*),Bash(gh project:*)"
+          claude -p \
+            --model claude-sonnet-4-6 \
+            --max-turns 5 \
+            --allowedTools "Bash(gh issue:*),Bash(gh search:*),Bash(gh label:*),Bash(gh project:*),Bash(gh api:*)" \
+            < "$PROMPT_FILE"

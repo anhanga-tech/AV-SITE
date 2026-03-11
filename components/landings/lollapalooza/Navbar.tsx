@@ -4,6 +4,7 @@ import { Menu, X, MessageCircle } from 'lucide-react';
 import { NAVIGATION_LINKS } from './constants';
 import { getWhatsAppLink } from '../../../utils/whatsapp';
 import { WHATSAPP_MESSAGE } from './constants';
+import { openAiChat } from '../../../utils/aiChat';
 
 const SITE_URL = 'https://www.anhanga.tur.br';
 
@@ -35,6 +36,8 @@ const Navbar: React.FC = () => {
           <img
             src={logoUrl}
             alt="Anhangá Viagens"
+            width="154"
+            height="80"
             className={`h-16 md:h-20 w-auto transition-all duration-300 ${!scrolled ? 'brightness-0 invert' : ''}`}
           />
         </a>
@@ -53,9 +56,7 @@ const Navbar: React.FC = () => {
           <button
             onClick={(e) => {
               e.preventDefault();
-              window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
-                detail: { message: WHATSAPP_MESSAGE }
-              }));
+              openAiChat({ message: WHATSAPP_MESSAGE });
             }}
             className="btn-whatsapp btn-specialist bg-anhanga-yellow text-anhanga-darkBlue px-5 py-2 rounded-full font-bold text-sm flex items-center gap-2 hover:bg-anhanga-yellowHover transition-colors shadow-md focus:outline-none focus:ring-4 focus:ring-anhanga-yellow/50"
             aria-label="Fale conosco"
@@ -95,9 +96,7 @@ const Navbar: React.FC = () => {
           <button
             onClick={(e) => {
               e.preventDefault();
-              window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
-                detail: { message: WHATSAPP_MESSAGE }
-              }));
+              openAiChat({ message: WHATSAPP_MESSAGE });
               setIsOpen(false);
             }}
             className="btn-whatsapp btn-specialist bg-anhanga-yellow text-anhanga-darkBlue px-8 py-3 rounded-full font-bold focus:outline-none focus:ring-4 focus:ring-anhanga-yellow/50"

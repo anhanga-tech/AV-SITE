@@ -1,5 +1,3 @@
-import { Redis } from '@upstash/redis';
-
 export interface RateLimitResult {
   allowed: boolean;
   remaining: number;
@@ -11,10 +9,15 @@ interface RateLimitEntry {
   resetTime: number;
 }
 
+interface RedisLike {
+  pipeline(): { incr(key: string): void; ttl(key: string): void; exec(): Promise<unknown[]> };
+  expire(key: string, seconds: number): Promise<unknown>;
+}
+
 const inMemoryStore = new Map<string, RateLimitEntry>();
 const IN_MEMORY_MAX_ENTRIES = 2500;
 
-function getRedisClient() {
+async function getRedisClient(): Promise<RedisLike | null> {
   const url = process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
 
@@ -22,10 +25,13 @@ function getRedisClient() {
     return null;
   }
 
-  return new Redis({
-    url,
-    token,
-  });
+  try {
+    const { Redis } = await import('@upstash/redis');
+    return new Redis({ url, token });
+  } catch {
+    console.warn('RateLimit: @upstash/redis not available, using in-memory fallback');
+    return null;
+  }
 }
 
 /**
@@ -41,7 +47,7 @@ export async function checkRateLimit(
   }
 ): Promise<RateLimitResult> {
   const { limit, windowMs, prefix } = options;
-  const redis = getRedisClient();
+  const redis = await getRedisClient();
 
   if (redis) {
     try {

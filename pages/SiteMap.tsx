@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { SEO } from '../components/SEO';
+import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { BLOG_POSTS } from '../data/blogData';
 import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 
@@ -9,6 +10,7 @@ const SITE_URL = 'https://www.anhanga.tur.br';
 const SiteMap: React.FC = () => {
   const coreLinks = [
     { to: `${SITE_URL}/`, label: 'Agência de Viagens em São Paulo' },
+    { to: `${SITE_URL}/sobre/`, label: 'Sobre a Anhangá Viagens' },
     { to: getBlogHomeUrl(), label: 'Blog de Viagens e Roteiros', external: true },
     { to: `${SITE_URL}/orlando/`, label: 'Pacotes para Orlando' },
     { to: `${SITE_URL}/beto-carrero/`, label: 'Pacote Beto Carrero' },
@@ -23,6 +25,12 @@ const SiteMap: React.FC = () => {
         title="Mapa do Site | Anhangá Viagens"
         description="Navegue pelas principais páginas da Anhangá Viagens, incluindo landings, blog e páginas institucionais."
         canonical="https://www.anhanga.tur.br/mapa-do-site/"
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', item: 'https://www.anhanga.tur.br/' },
+          { name: 'Mapa do Site', item: 'https://www.anhanga.tur.br/mapa-do-site/' }
+        ]}
       />
       <main className="min-h-screen bg-[#fffdf5] pt-32 pb-24">
         <section className="container mx-auto px-6 max-w-4xl">

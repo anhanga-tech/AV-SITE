@@ -1,6 +1,7 @@
 import { SEO } from "@/components/SEO";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { BreadcrumbSchema } from "@/components/schemas/BreadcrumbSchema";
 
 const Privacy = () => {
     const metaDescription = "Política de Privacidade e Proteção de Dados da Anhangá Turismo: coleta, tratamento, armazenamento e direitos dos titulares.";
@@ -15,6 +16,10 @@ const Privacy = () => {
                 description={metaDescription}
                 canonical={canonicalUrl}
             />
+            <BreadcrumbSchema items={[
+                { name: "Home", item: "https://www.anhanga.tur.br/" },
+                { name: "Política de Privacidade", item: canonicalUrl }
+            ]} />
             <Header />
             <main className="container mx-auto px-4 py-10">
                 <header className="mb-8 text-center">

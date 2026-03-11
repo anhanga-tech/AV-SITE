@@ -142,10 +142,6 @@ function buildWhatsAppMessage(lead: LeadDraft): string {
 }
 
 function resolveSubmitLeadEndpoint(): string {
-    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-        return 'http://localhost:3000/api/submit-lead';
-    }
-
     return '/api/submit-lead';
 }
 

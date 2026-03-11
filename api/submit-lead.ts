@@ -1,149 +1,26 @@
-import type { LeadTracking, LeadUtms, SubmitLeadRequest, SubmitLeadResponse } from '../types/leadCapture';
-import { checkRateLimit as checkRateLimitInternal } from '../lib/rate-limit.ts';
-
-
-// Placeholder conversion stubs (edge-compatible)
-async function sendGoogleConversion(_event: string, _payload: Record<string, unknown>): Promise<{ success: boolean; error?: string }> {
-    return { success: true };
-}
-async function sendMetaConversion(_payload: Record<string, unknown>): Promise<{ success: boolean; error?: string }> {
-    return { success: true };
-}
+import type { SubmitLeadResponse } from '../types/leadCapture';
+import { checkRateLimit as checkRateLimitInternal } from '../lib/rate-limit';
+import { buildCorsHeaders, getClientIP } from '../lib/network';
+import { cleanString, validatePayload } from '../lib/lead-logic';
+import {
+    associateDealToContact,
+    buildContactProperties,
+    createDeal,
+    createFallbackNote,
+    getContactIdByEmail,
+    hubspotRequest,
+    updateContactProperties,
+    type HubSpotObjectResponse
+} from '../services/hubspot';
+import { sendGoogleConversion } from '../lib/conversions/google';
+import { sendMetaConversion } from '../lib/conversions/meta';
 
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
 
-interface HubSpotObjectResponse {
-    id?: string;
-}
-
-interface HubSpotSearchResponse {
-    results?: Array<{ id?: string }>;
-}
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-const TRACKING_PROPERTY_MAP: Record<string, string> = {
-    cid: 'ga_client_id',
-    sid: 'ga_session_id',
-    gclid: 'hs_google_click_id',
-    fbclid: 'hs_facebook_click_id',
-    msclkid: 'hs_microsoft_click_id',
-    ttclid: 'tiktok_id',
-    gbraid: 'gbraid',
-    wbraid: 'wbraid',
-};
-
-const KNOWN_TRACKING_KEYS = new Set([
-    'utm_source',
-    'utm_medium',
-    'utm_campaign',
-    'utm_term',
-    'utm_content',
-    'cid',
-    'sid',
-    'gclid',
-    'fbclid',
-    'msclkid',
-    'ttclid',
-    'wbraid',
-    'gbraid',
-    'fbc',
-]);
-
-function buildCorsHeaders(): Record<string, string> {
-    return {
-        'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGIN || '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-    };
-}
-
-function cleanString(value: unknown): string {
-    if (typeof value !== 'string') return '';
-    return value.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-function getClientIP(request: Request): string {
-    const forwardedFor = request.headers.get('x-forwarded-for');
-    if (forwardedFor) {
-        const ips = forwardedFor.split(',').map(ip => ip.trim());
-        return ips[ips.length - 1]; // Use the last one for Vercel
-    }
-    const realIP = request.headers.get('x-real-ip');
-    if (realIP) return realIP;
-    return 'unknown';
-}
-
-function normalizeNullable(value: unknown, maxLength = 255): string | null {
-    if (typeof value !== 'string') return null;
-    const trimmed = value.trim();
-    if (trimmed.length === 0) return null;
-    const sanitized = trimmed.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return sanitized.length > maxLength ? sanitized.substring(0, maxLength) : sanitized;
-}
-
-function normalizeUtms(value: unknown): LeadUtms {
-    const source = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
-
-    return {
-        utm_source: normalizeNullable(source.utm_source),
-        utm_medium: normalizeNullable(source.utm_medium),
-        utm_campaign: normalizeNullable(source.utm_campaign),
-        utm_term: normalizeNullable(source.utm_term),
-        utm_content: normalizeNullable(source.utm_content),
-    };
-}
-
-function normalizeTracking(value: unknown, utms: LeadUtms): LeadTracking {
-    const source = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
-    const extrasInput = source.extras && typeof source.extras === 'object'
-        ? (source.extras as Record<string, unknown>)
-        : {};
-
-    const extras: Record<string, string> = {};
-    let count = 0;
-
-    const processExtra = (key: string, raw: unknown) => {
-        const normalized = normalizeNullable(raw);
-        if (normalized) {
-            const cleanKey = key.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;').substring(0, 64);
-            extras[cleanKey] = normalized;
-            count++;
-        }
-    };
-
-    // Limit the number of extra properties to 15 to prevent payload inflation
-    for (const [key, raw] of Object.entries(extrasInput)) {
-        if (count >= 15) break;
-        processExtra(key, raw);
-    }
-
-    for (const [key, raw] of Object.entries(source)) {
-        if (count >= 15) break;
-        if (key === 'extras' || KNOWN_TRACKING_KEYS.has(key)) continue;
-        processExtra(key, raw);
-    }
-
-    return {
-        utm_source: normalizeNullable(source.utm_source) ?? utms.utm_source,
-        utm_medium: normalizeNullable(source.utm_medium) ?? utms.utm_medium,
-        utm_campaign: normalizeNullable(source.utm_campaign) ?? utms.utm_campaign,
-        utm_term: normalizeNullable(source.utm_term) ?? utms.utm_term,
-        utm_content: normalizeNullable(source.utm_content) ?? utms.utm_content,
-        cid: normalizeNullable(source.cid),
-        sid: normalizeNullable(source.sid),
-        gclid: normalizeNullable(source.gclid),
-        fbclid: normalizeNullable(source.fbclid),
-        msclkid: normalizeNullable(source.msclkid),
-        ttclid: normalizeNullable(source.ttclid),
-        wbraid: normalizeNullable(source.wbraid),
-        gbraid: normalizeNullable(source.gbraid),
-        fbc: normalizeNullable(source.fbc),
-        extras: Object.keys(extras).length > 0 ? extras : undefined,
-    };
-}
-
+/**
+ * Builds a standard error response for the API.
+ */
 function buildErrorResponse(
     body: SubmitLeadResponse,
     status: number,
@@ -155,283 +32,15 @@ function buildErrorResponse(
     });
 }
 
-function validatePayload(payload: unknown): { valid: true; data: SubmitLeadRequest } | { valid: false; error: string } {
-    if (!payload || typeof payload !== 'object') {
-        return { valid: false, error: 'Payload inválido.' };
-    }
-
-    const raw = payload as Record<string, unknown>;
-    const firstName = cleanString(raw.firstName);
-    const lastName = cleanString(raw.lastName);
-    const email = cleanString(raw.email).toLowerCase();
-    const bantSummary = cleanString(raw.bantSummary);
-    const destination = cleanString(raw.destination);
-
-    if (!firstName || !lastName || !email || !bantSummary || !destination) {
-        return { valid: false, error: 'Campos obrigatórios ausentes.' };
-    }
-
-    if (firstName.length > 100 || lastName.length > 100 || email.length > 255 || bantSummary.length > 5000 || destination.length > 255) {
-        return { valid: false, error: 'Entrada muito longa.' };
-    }
-
-    if (!EMAIL_REGEX.test(email)) {
-        return { valid: false, error: 'Email inválido.' };
-    }
-
-    const utms = normalizeUtms(raw.utms);
-    const tracking = normalizeTracking(raw.tracking, utms);
-
-    return {
-        valid: true,
-        data: {
-            firstName,
-            lastName,
-            email,
-            bantSummary,
-            destination,
-            utms,
-            tracking,
-        },
-    };
-}
-
-function getTrackingEntries(tracking?: LeadTracking): Record<string, string> {
-    if (!tracking) return {};
-
-    const baseEntries: Record<string, string | null | undefined> = {
-        cid: tracking.cid,
-        sid: tracking.sid,
-        gclid: tracking.gclid,
-        fbclid: tracking.fbclid,
-        msclkid: tracking.msclkid,
-        ttclid: tracking.ttclid,
-        gbraid: tracking.gbraid,
-        wbraid: tracking.wbraid,
-        fbc: tracking.fbc,
-    };
-
-    const normalized: Record<string, string> = {};
-
-    for (const [key, value] of Object.entries(baseEntries)) {
-        if (!value) continue;
-        const trimmed = value.trim();
-        if (!trimmed) continue;
-        normalized[key] = trimmed;
-    }
-
-    if (tracking.extras) {
-        for (const [key, value] of Object.entries(tracking.extras)) {
-            const trimmed = value.trim();
-            if (!trimmed) continue;
-            normalized[key] = trimmed;
-        }
-    }
-
-    return normalized;
-}
-
-export function mapTrackingToContactProperties(tracking?: LeadTracking): {
-    properties: Record<string, string>;
-    unmapped: Record<string, string>;
-} {
-    const values = getTrackingEntries(tracking);
-    const properties: Record<string, string> = {};
-    const unmapped: Record<string, string> = {};
-
-    for (const [key, value] of Object.entries(values)) {
-        const mappedProperty = TRACKING_PROPERTY_MAP[key];
-        if (mappedProperty) {
-            properties[mappedProperty] = value;
-        } else {
-            unmapped[key] = value;
-        }
-    }
-
-    return { properties, unmapped };
-}
-
-function buildContactProperties(payload: SubmitLeadRequest): Record<string, string> {
-    const properties: Record<string, string> = {
-        firstname: payload.firstName,
-        lastname: payload.lastName,
-        email: payload.email,
-    };
-
-    if (payload.utms.utm_source) properties.ultimo_utm_source = payload.utms.utm_source;
-    if (payload.utms.utm_medium) properties.ultimo_utm_medium = payload.utms.utm_medium;
-    if (payload.utms.utm_campaign) properties.ultimo_utm_campaign = payload.utms.utm_campaign;
-    if (payload.utms.utm_term) properties.utm_term = payload.utms.utm_term;
-    if (payload.utms.utm_content) properties.ultimo_utm_content = payload.utms.utm_content;
-
-    const trackingMapping = mapTrackingToContactProperties(payload.tracking);
-    Object.assign(properties, trackingMapping.properties);
-
-    const fallbackProperty = cleanString(process.env.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY);
-    if (fallbackProperty && Object.keys(trackingMapping.unmapped).length > 0) {
-        properties[fallbackProperty] = JSON.stringify(trackingMapping.unmapped);
-    }
-
-    return properties;
-}
-
-async function hubspotRequest(
-    token: string,
-    path: string,
-    init: RequestInit,
-): Promise<Response> {
-    const headers = new Headers(init.headers || {});
-    headers.set('Authorization', `Bearer ${token}`);
-    headers.set('Content-Type', 'application/json');
-
-    return fetch(`https://api.hubapi.com${path}`, {
-        ...init,
-        headers,
-    });
-}
-
-async function getContactIdByEmail(token: string, email: string): Promise<string | null> {
-    const response = await hubspotRequest(token, '/crm/v3/objects/contacts/search', {
-        method: 'POST',
-        body: JSON.stringify({
-            filterGroups: [
-                {
-                    filters: [
-                        {
-                            propertyName: 'email',
-                            operator: 'EQ',
-                            value: email,
-                        },
-                    ],
-                },
-            ],
-            properties: ['email'],
-            limit: 1,
-        }),
-    });
-
-    if (response.status === 401) {
-        throw new Error('UNAUTHORIZED');
-    }
-
-    if (!response.ok) {
-        const detail = await response.text().catch(() => '');
-        throw new Error(`CONTACT_SEARCH_FAILED:${response.status}:${detail}`);
-    }
-
-    const data = (await response.json().catch(() => ({}))) as HubSpotSearchResponse;
-    const contactId = cleanString(data.results?.[0]?.id);
-
-    return contactId || null;
-}
-
-async function updateContactProperties(token: string, contactId: string, properties: Record<string, string>): Promise<void> {
-    const response = await hubspotRequest(token, `/crm/v3/objects/contacts/${contactId}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ properties }),
-    });
-
-    if (response.status === 401) {
-        throw new Error('UNAUTHORIZED');
-    }
-
-    if (!response.ok) {
-        const detail = await response.text().catch(() => '');
-        throw new Error(`CONTACT_UPDATE_FAILED:${response.status}:${detail}`);
-    }
-}
-
-async function createDeal(token: string, properties: Record<string, string>): Promise<string> {
-    const response = await hubspotRequest(token, '/crm/v3/objects/deals', {
-        method: 'POST',
-        body: JSON.stringify({ properties }),
-    });
-
-    if (response.status === 401) {
-        throw new Error('UNAUTHORIZED');
-    }
-
-    if (!response.ok) {
-        const detail = await response.text().catch(() => '');
-        throw new Error(`DEAL_CREATE_FAILED:${response.status}:${detail}`);
-    }
-
-    const data = (await response.json().catch(() => ({}))) as HubSpotObjectResponse;
-    const dealId = cleanString(data.id);
-    if (!dealId) {
-        throw new Error('DEAL_CREATE_FAILED:missing_id');
-    }
-
-    return dealId;
-}
-
-async function associateDealToContact(token: string, dealId: string, contactId: string): Promise<void> {
-    const response = await hubspotRequest(
-        token,
-        `/crm/v4/objects/deals/${dealId}/associations/default/contacts/${contactId}`,
-        {
-            method: 'PUT',
-            body: JSON.stringify({}),
-        },
-    );
-
-    if (response.status === 401) {
-        throw new Error('UNAUTHORIZED');
-    }
-
-    if (!response.ok) {
-        const detail = await response.text().catch(() => '');
-        throw new Error(`DEAL_ASSOCIATION_FAILED:${response.status}:${detail}`);
-    }
-}
-
-async function createFallbackNote(token: string, contactId: string, body: string): Promise<void> {
-    const noteResponse = await hubspotRequest(token, '/crm/v3/objects/notes', {
-        method: 'POST',
-        body: JSON.stringify({
-            properties: {
-                hs_timestamp: new Date().toISOString(),
-                hs_note_body: body,
-            },
-        }),
-    });
-
-    if (noteResponse.status === 401) {
-        throw new Error('UNAUTHORIZED');
-    }
-
-    if (!noteResponse.ok) {
-        const detail = await noteResponse.text().catch(() => '');
-        throw new Error(`NOTE_CREATE_FAILED:${noteResponse.status}:${detail}`);
-    }
-
-    const noteData = (await noteResponse.json().catch(() => ({}))) as HubSpotObjectResponse;
-    const noteId = cleanString(noteData.id);
-    if (!noteId) {
-        throw new Error('NOTE_CREATE_FAILED:missing_id');
-    }
-
-    const associationResponse = await hubspotRequest(
-        token,
-        `/crm/v4/objects/notes/${noteId}/associations/default/contacts/${contactId}`,
-        {
-            method: 'PUT',
-            body: JSON.stringify({}),
-        },
-    );
-
-    if (associationResponse.status === 401) {
-        throw new Error('UNAUTHORIZED');
-    }
-
-    if (!associationResponse.ok) {
-        const detail = await associationResponse.text().catch(() => '');
-        throw new Error(`NOTE_ASSOCIATION_FAILED:${associationResponse.status}:${detail}`);
-    }
-}
-
+/**
+ * Main handler for the submit-lead Edge Function.
+ */
 export default async function handler(request: Request): Promise<Response> {
     const corsHeaders = buildCorsHeaders();
+
+    if (request.method === 'OPTIONS') {
+        return new Response(null, { status: 204, headers: corsHeaders });
+    }
 
     const clientIP = getClientIP(request);
     const rateLimit = await checkRateLimitInternal(clientIP, {
@@ -448,76 +57,47 @@ export default async function handler(request: Request): Promise<Response> {
         );
     }
 
-    if (request.method === 'OPTIONS') {
-        return new Response(null, { status: 204, headers: corsHeaders });
-    }
-
     if (request.method !== 'POST') {
         return buildErrorResponse(
-            {
-                ok: false,
-                code: 'METHOD_NOT_ALLOWED',
-                error: 'Method not allowed',
-            },
+            { ok: false, code: 'METHOD_NOT_ALLOWED', error: 'Method not allowed' },
             405,
             corsHeaders,
         );
     }
 
+    // Load and validate environment variables
     const hubspotToken = process.env.HUBSPOT_TOKEN;
     const dealPipelineId = cleanString(process.env.HUBSPOT_DEAL_PIPELINE_ID);
     const dealStageId = cleanString(process.env.HUBSPOT_DEAL_STAGE_ID);
     const dealBantProperty = cleanString(process.env.HUBSPOT_DEAL_BANT_PROPERTY) || 'bant_summary';
 
-    if (!hubspotToken) {
+    if (!hubspotToken || !dealPipelineId || !dealStageId) {
+        console.error('SERVER_CONFIG_ERROR: Missing required HubSpot environment variables.');
         return buildErrorResponse(
-            {
-                ok: false,
-                code: 'SERVER_CONFIG_ERROR',
-                error: 'Erro de configuração do servidor',
-            },
-            500,
-            corsHeaders,
-        );
-    }
-
-    if (!dealPipelineId || !dealStageId) {
-        return buildErrorResponse(
-            {
-                ok: false,
-                code: 'SERVER_CONFIG_ERROR',
-                error: 'Erro de configuração do servidor',
-            },
+            { ok: false, code: 'SERVER_CONFIG_ERROR', error: 'Erro de configuração do servidor' },
             500,
             corsHeaders,
         );
     }
 
     try {
+        // Parse request body
         let rawBody: unknown;
         try {
             rawBody = await request.json();
         } catch {
             return buildErrorResponse(
-                {
-                    ok: false,
-                    code: 'VALIDATION_ERROR',
-                    error: 'JSON inválido no corpo da requisição.',
-                },
+                { ok: false, code: 'VALIDATION_ERROR', error: 'JSON inválido no corpo da requisição.' },
                 400,
                 corsHeaders,
             );
         }
 
+        // Validate payload
         const validation = validatePayload(rawBody);
-
         if (validation.valid === false) {
             return buildErrorResponse(
-                {
-                    ok: false,
-                    code: 'VALIDATION_ERROR',
-                    error: validation.error,
-                },
+                { ok: false, code: 'VALIDATION_ERROR', error: validation.error },
                 400,
                 corsHeaders,
             );
@@ -526,8 +106,8 @@ export default async function handler(request: Request): Promise<Response> {
         const payload = validation.data;
         const contactProperties = buildContactProperties(payload);
 
+        // --- HubSpot Contact Management ---
         let contactId = '';
-
         const createContactResponse = await hubspotRequest(hubspotToken, '/crm/v3/objects/contacts', {
             method: 'POST',
             body: JSON.stringify({ properties: contactProperties }),
@@ -535,54 +115,36 @@ export default async function handler(request: Request): Promise<Response> {
 
         if (createContactResponse.status === 401) {
             return buildErrorResponse(
-                {
-                    ok: false,
-                    code: 'HUBSPOT_UNAUTHORIZED',
-                    error: 'Erro de integração com o CRM',
-                },
+                { ok: false, code: 'HUBSPOT_UNAUTHORIZED', error: 'Erro de integração com o CRM' },
                 401,
                 corsHeaders,
             );
         }
 
         if (createContactResponse.status === 409) {
+            // Contact already exists, recover and update
             try {
                 const existingContactId = await getContactIdByEmail(hubspotToken, payload.email);
                 if (!existingContactId) {
-                    return buildErrorResponse(
-                        {
-                            ok: false,
-                            code: 'HUBSPOT_API_ERROR',
-                            error: 'Erro ao processar contato',
-                        },
-                        502,
-                        corsHeaders,
-                    );
+                    throw new Error('Contact ID not found for existing email');
                 }
 
                 contactId = existingContactId;
                 await updateContactProperties(hubspotToken, contactId, contactProperties);
             } catch (error: unknown) {
-                const message = error instanceof Error ? error.message : 'Unknown duplicate-contact error';
+                const message = error instanceof Error ? error.message : 'Unknown recovery error';
+                console.error('HUBSPOT: Duplicate contact recovery failed', message);
+
                 if (message.includes('UNAUTHORIZED')) {
                     return buildErrorResponse(
-                        {
-                            ok: false,
-                            code: 'HUBSPOT_UNAUTHORIZED',
-                            error: 'Erro de integração com o CRM',
-                        },
+                        { ok: false, code: 'HUBSPOT_UNAUTHORIZED', error: 'Erro de integração com o CRM' },
                         401,
                         corsHeaders,
                     );
                 }
 
-                console.error('HUBSPOT: Duplicate contact recovery failed', message);
                 return buildErrorResponse(
-                    {
-                        ok: false,
-                        code: 'HUBSPOT_API_ERROR',
-                        error: 'Erro ao processar contato',
-                    },
+                    { ok: false, code: 'HUBSPOT_API_ERROR', error: 'Erro ao processar contato' },
                     502,
                     corsHeaders,
                 );
@@ -592,31 +154,23 @@ export default async function handler(request: Request): Promise<Response> {
             console.error('HUBSPOT: Error creating contact', createContactResponse.status, hubspotErrorText);
 
             return buildErrorResponse(
-                {
-                    ok: false,
-                    code: 'HUBSPOT_API_ERROR',
-                    error: 'Erro de integração com o CRM',
-                },
+                { ok: false, code: 'HUBSPOT_API_ERROR', error: 'Erro de integração com o CRM' },
                 502,
                 corsHeaders,
             );
         } else {
             const hubspotData = (await createContactResponse.json().catch(() => ({}))) as HubSpotObjectResponse;
-            const resolvedId = cleanString(hubspotData.id);
-            if (!resolvedId) {
+            contactId = cleanString(hubspotData.id);
+            if (!contactId) {
                 return buildErrorResponse(
-                    {
-                        ok: false,
-                        code: 'HUBSPOT_API_ERROR',
-                        error: 'Erro de integração com o CRM',
-                    },
+                    { ok: false, code: 'HUBSPOT_API_ERROR', error: 'Erro de integração com o CRM' },
                     502,
                     corsHeaders,
                 );
             }
-            contactId = resolvedId;
         }
 
+        // --- HubSpot Deal Management ---
         const rawDealName = `Lead chatbot - ${payload.firstName} ${payload.lastName} - ${payload.destination}`;
         const dealProperties: Record<string, string> = {
             dealname: rawDealName.length > 255 ? rawDealName.substring(0, 252) + '...' : rawDealName,
@@ -633,20 +187,15 @@ export default async function handler(request: Request): Promise<Response> {
             await associateDealToContact(hubspotToken, dealId, contactId);
         } catch (dealError: unknown) {
             const message = dealError instanceof Error ? dealError.message : 'Unknown deal error';
+            console.error('HUBSPOT: Deal creation/association failed', message);
 
             if (message.includes('UNAUTHORIZED')) {
                 return buildErrorResponse(
-                    {
-                        ok: false,
-                        code: 'HUBSPOT_UNAUTHORIZED',
-                        error: 'Erro de integração com o CRM',
-                    },
+                    { ok: false, code: 'HUBSPOT_UNAUTHORIZED', error: 'Erro de integração com o CRM' },
                     401,
                     corsHeaders,
                 );
             }
-
-            console.error('HUBSPOT: Deal creation/association failed', message);
 
             warning = 'Contato salvo, mas não foi possível criar ou associar o deal automaticamente.';
 
@@ -661,45 +210,32 @@ export default async function handler(request: Request): Promise<Response> {
                 await createFallbackNote(hubspotToken, contactId, noteBody);
                 warning = `${warning} Uma nota foi registrada no contato para acompanhamento manual.`;
             } catch (noteError: unknown) {
-                const noteMessage = noteError instanceof Error ? noteError.message : 'Unknown note fallback error';
-                console.error('HUBSPOT: Note fallback failed', noteMessage);
+                console.error('HUBSPOT: Note fallback failed', noteError);
             }
         }
 
-        // --- Conversion tracking (server-side) ---
-        const googleResult = await sendGoogleConversion('lead_qualificado', {
-            gclid: payload.tracking?.gclid,
-            email: payload.email,
-            phone: payload.tracking?.extras?.phone,
-        });
+        // --- Conversion Tracking (server-side, non-blocking) ---
+        const [googleResult, metaResult] = await Promise.all([
+            sendGoogleConversion('lead_qualificado', {
+                gclid: payload.tracking?.gclid,
+                email: payload.email,
+                phone: payload.tracking?.extras?.phone,
+            }),
+            sendMetaConversion({
+                eventName: 'Lead',
+                email: payload.email,
+                phone: payload.tracking?.extras?.phone,
+                firstName: payload.firstName,
+                lastName: payload.lastName,
+                fbclid: payload.tracking?.fbclid,
+                fbc: payload.tracking?.fbc,
+                contentName: payload.destination,
+                contentType: 'destination_interest',
+            })
+        ]);
 
-        if (!googleResult.success) {
-            console.warn('GOOGLE_ADS: Lead conversion failed (non-blocking)', googleResult.error);
-        }
-
-        const metaResult = await sendMetaConversion({
-            eventName: 'Lead',
-            email: payload.email,
-            phone: payload.tracking?.extras?.phone,
-            firstName: payload.firstName,
-            lastName: payload.lastName,
-            fbclid: payload.tracking?.fbclid,
-            fbc: payload.tracking?.fbc,
-            contentName: payload.destination,
-            contentType: 'destination_interest',
-        });
-
-        if (!metaResult.success) {
-            console.warn('META: Lead conversion failed (non-blocking)', metaResult.error);
-        }
-
-        console.log('CONVERSION_TRACKING: Lead qualified', {
-            email: payload.email,
-            gclid: payload.tracking?.gclid,
-            fbclid: payload.tracking?.fbclid,
-            googleSuccess: googleResult.success,
-            metaSuccess: metaResult.success,
-        });
+        if (!googleResult.success) console.warn('GOOGLE_ADS: Lead conversion failed', googleResult.error);
+        if (!metaResult.success) console.warn('META: Lead conversion failed', metaResult.error);
 
         return new Response(
             JSON.stringify({
@@ -721,11 +257,7 @@ export default async function handler(request: Request): Promise<Response> {
         console.error('SERVER: submit-lead unexpected error:', message);
 
         return buildErrorResponse(
-            {
-                ok: false,
-                code: 'HUBSPOT_API_ERROR',
-                error: 'Erro interno ao processar envio do lead.',
-            },
+            { ok: false, code: 'HUBSPOT_API_ERROR', error: 'Erro interno ao processar envio do lead.' },
             500,
             corsHeaders,
         );

@@ -17,6 +17,7 @@ import Minus from 'lucide-react/dist/esm/icons/minus';
 import Share from 'lucide-react/dist/esm/icons/share';
 import { SocialShare } from './SocialShare';
 import { LazyImage } from './ui/LazyImage';
+import { openAiChat } from '../utils/aiChat';
 
 import { Link } from "react-router-dom";
 
@@ -529,7 +530,7 @@ const Destinations: React.FC = () => {
 
                     {/* Filter Pills - Sticker Style */}
                     <div className="flex overflow-x-auto hide-scrollbar gap-3 pb-2 md:pb-0 w-full md:w-auto mt-6 md:mt-0 px-1">
-                    {FILTERS.map(filter => (
+                        {FILTERS.map(filter => (
                             <button
                                 key={filter}
                                 onClick={() => setActiveFilter(filter)}
@@ -610,8 +611,9 @@ const Destinations: React.FC = () => {
                             <div className="relative h-56 rounded-[1.5rem] overflow-hidden mb-4 border border-gray-100">
                                 <LazyImage
                                     src={dest.image}
-                                    alt={dest.city}
+                                    alt={`${dest.city}, ${dest.country} — pacote de viagem personalizado Anhangá Viagens`}
                                     width={600}
+                                    height={400}
                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                 />
 
@@ -660,6 +662,7 @@ const Destinations: React.FC = () => {
                                 src={selectedDestination.image}
                                 alt={selectedDestination.city}
                                 width={1200}
+                                height={800}
                                 className="w-full h-full object-cover"
                             />
                             <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/60 to-transparent"></div>
@@ -707,9 +710,9 @@ const Destinations: React.FC = () => {
                                 <button
                                     onClick={(e) => {
                                         e.preventDefault();
-                                        window.dispatchEvent(new CustomEvent("toggle-ai-chat", {
-                                            detail: { message: `Olá! Gostaria de um orçamento para ${selectedDestination.city}.` }
-                                        }));
+                                        openAiChat({
+                                            message: `Olá! Gostaria de um orçamento para ${selectedDestination.city}.`
+                                        });
                                         setSelectedDestination(null);
                                     }}
                                     className={`btn-whatsapp btn-specialist w-full bg-brand-dark text-white py-4 rounded-xl font-black text-lg hover:bg-brand-vibrant transition-all shadow-[4px_4px_0px_#94a3b8] active:shadow-none active:translate-y-1 flex items-center justify-center gap-2`}

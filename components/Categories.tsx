@@ -72,8 +72,8 @@ const Categories: React.FC = () => {
               <div className="aspect-square w-full overflow-hidden bg-gray-100 mb-6 relative">
                 <LazyImage
                   src={item.image}
-                  width={900}
-                  height={900}
+                  width={600}
+                  height={600}
                   alt={item.title}
                   loading="lazy"
                   fetchPriority="low"

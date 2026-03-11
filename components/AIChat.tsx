@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { MessageCircle, X, Send, Sparkles, Loader2, Bot, User } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { getTravelAdvice } from '../services/geminiService';
 import { useLeadCapture } from '../hooks/useLeadCapture';
 import { PassportStamp } from './ui/PassportStamp';
 import { ChatLeadForm, type LeadFinalizePayload, type LeadFinalizeResult } from './ChatLeadForm';
+import { triggerHaptic } from '../utils/haptics';
 
 interface Message {
   role: 'user' | 'model';
@@ -64,7 +66,8 @@ const AIChat: React.FC = () => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const messagesRef = useRef<Message[]>(messages);
   const { setLeadDraft, submitLead, isSubmitting: isSubmittingLead } = useLeadCapture();
-
+  const location = useLocation();
+  const navigate = useNavigate();
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
@@ -82,6 +85,20 @@ const AIChat: React.FC = () => {
       setTimeout(() => inputRef.current?.focus(), 300);
     }
   }, [isOpen]);
+
+  const openChatDrawer = (enableHaptics: boolean = true) => {
+    if (enableHaptics) {
+      void triggerHaptic('light');
+    }
+    setIsOpen(true);
+  };
+
+  const closeChatDrawer = (enableHaptics: boolean = true) => {
+    if (enableHaptics) {
+      void triggerHaptic('light');
+    }
+    setIsOpen(false);
+  };
 
   const handleFinalizeLead = async (payload: LeadFinalizePayload): Promise<LeadFinalizeResult> => {
     setLeadDraft({ ...payload });
@@ -137,8 +154,12 @@ const AIChat: React.FC = () => {
     };
   };
 
-  const submitMessage = async (text: string) => {
+  const submitMessage = async (text: string, enableHaptics: boolean = true) => {
     if (!text.trim() || isLoading) return;
+
+    if (enableHaptics) {
+      void triggerHaptic('medium');
+    }
 
     const newHistory: Message[] = [...messagesRef.current, { role: 'user', text }];
     setMessages(newHistory);
@@ -155,12 +176,14 @@ const AIChat: React.FC = () => {
     const response = await getTravelAdvice(newHistory);
     setIsLoading(false);
 
+    const nextMessages: Message[] = [];
+
     if (response.text) {
-      setMessages(prev => [...prev, {
+      nextMessages.push({
         role: 'model',
         text: response.text || '',
         chips: response.chips
-      }]);
+      });
     }
 
     if (response.budgetLink) {
@@ -172,7 +195,7 @@ const AIChat: React.FC = () => {
         baggagePreference: response.budgetLink.baggagePreference || '',
       });
 
-      setMessages(prev => [...prev, {
+      nextMessages.push({
         role: 'model',
         text: 'Orçamento Pronto',
         isAction: true,
@@ -182,7 +205,15 @@ const AIChat: React.FC = () => {
           bantSummary: response.budgetLink!.bantSummary,
           iataCode: response.budgetLink!.iataCode
         }
-      }]);
+      });
+    }
+
+    if (nextMessages.length > 0) {
+      setMessages(prev => [...prev, ...nextMessages]);
+
+      if (enableHaptics) {
+        void triggerHaptic('heavy');
+      }
     }
   };
 
@@ -206,18 +237,81 @@ const AIChat: React.FC = () => {
       const customEvent = event as CustomEvent;
       setIsOpen(true);
       if (customEvent.detail?.message) {
-        setTimeout(() => submitMessage(customEvent.detail.message), 400);
+        setTimeout(() => submitMessage(customEvent.detail.message, false), 400);
       }
     };
     window.addEventListener('toggle-ai-chat', handleToggle);
+
+    // Deep-link support — open chat and optionally pre-fill a destination message
+    const CHAT_URL_PARAM = 'chat';
+    const DESTINATION_URL_PARAM = 'destino';
+    // Delay message until after the drawer slide-in animation (duration-500) completes
+    const DEEP_LINK_MESSAGE_DELAY_MS = 600;
+
+    const searchParams = new URLSearchParams(location.search);
+    const chatParam = searchParams.get(CHAT_URL_PARAM);
+    const destinationParam = searchParams.get(DESTINATION_URL_PARAM);
+
+    if (chatParam === 'open') {
+      setIsOpen(true);
+
+      if (destinationParam) {
+        // Sanitize: allow only letters (incl. accented), spaces, hyphens, and apostrophes
+        // to prevent prompt injection attacks via the URL parameter
+        const sanitizedDestination = destinationParam
+          .trim()
+          .slice(0, 100)
+          .replace(/[^\p{L}\s\-']/gu, '');
+
+        if (sanitizedDestination) {
+          const message = `Olá! Gostaria de informações sobre viagem para ${sanitizedDestination}.`;
+          setTimeout(() => submitMessage(message, false), DEEP_LINK_MESSAGE_DELAY_MS);
+        }
+      }
+
+      // Clean URL — remove params to avoid re-triggering on navigation
+      searchParams.delete(CHAT_URL_PARAM);
+      searchParams.delete(DESTINATION_URL_PARAM);
+      const newSearch = searchParams.toString();
+      const newPath = `${location.pathname}${newSearch ? `?${newSearch}` : ''}${location.hash}`;
+      navigate(newPath, { replace: true });
+    }
+
     return () => window.removeEventListener('toggle-ai-chat', handleToggle);
+  }, [location, navigate]);
+
+  // Deep-link handling (chat=1, m/message, destino)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const shouldOpenChat = urlParams.get('chat') === '1';
+
+    if (shouldOpenChat) {
+      setIsOpen(true);
+
+      const customMessage = urlParams.get('m') || urlParams.get('message');
+      const destination = urlParams.get('destino');
+
+      // Pré-preenche o input em vez de auto-enviar para evitar prompt injection
+      if (customMessage) {
+        setInput(customMessage);
+      } else if (destination) {
+        setInput(`Olá! Gostaria de um roteiro personalizado para ${destination}.`);
+      }
+
+      // Remove apenas os parâmetros de deep-link, preservando UTMs e outros params de rastreamento
+      ['chat', 'm', 'message', 'destino'].forEach(p => urlParams.delete(p));
+      const newSearch = urlParams.toString();
+      window.history.replaceState({}, '', window.location.pathname + (newSearch ? `?${newSearch}` : '') + window.location.hash);
+    }
   }, []);
 
   return (
     <>
       {/* Floating Toggle Button */}
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={() => openChatDrawer()}
         className={`fixed ${isOpen ? 'translate-y-32 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'} 
                     bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9990]
                     flex items-center justify-center gap-3 
@@ -243,7 +337,7 @@ const AIChat: React.FC = () => {
       <div
         className={`fixed inset-0 z-[9998] transition-opacity duration-300 ease-in-out bg-brand-dark/20 backdrop-blur-sm ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
           }`}
-        onClick={() => setIsOpen(false)}
+        onClick={() => closeChatDrawer()}
       />
 
       {/* Drawer Panel - Soft Scrapbook Geometry */}
@@ -275,7 +369,7 @@ const AIChat: React.FC = () => {
             </div>
           </div>
           <button
-            onClick={() => setIsOpen(false)}
+            onClick={() => closeChatDrawer()}
             className="text-gray-400 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-full p-2.5 transition-colors focus:outline-none"
             aria-label="Fechar gaveta"
           >
@@ -320,7 +414,9 @@ const AIChat: React.FC = () => {
                       />
                     </div>
                   ) : (
-                    <div className={`p-4 text-sm shadow-sm ${msg.role === 'user'
+                    <div
+                      data-testid={msg.role === 'user' ? 'chat-user-message' : undefined}
+                      className={`p-4 text-sm shadow-sm ${msg.role === 'user'
                       ? 'bg-brand-vibrant text-white rounded-2xl rounded-br-sm'
                       : 'bg-white text-gray-800 border border-gray-100 rounded-2xl rounded-bl-sm'
                       }`}>

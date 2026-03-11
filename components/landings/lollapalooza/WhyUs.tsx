@@ -18,8 +18,11 @@ const WhyUs: React.FC = () => {
                  <img 
                     src="https://eletrovibez.com/wp-content/uploads/2025/01/Lollapalooza-Brasil-2025-anuncia-line-up-dividido-por-dia-e-e-inicia-vendas-do-Lolla-Double-e-Lolla-Day-1155x770.jpg" 
                     alt="Multidão feliz em um festival de música com confetes e luzes" 
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    width="1155"
+                    height="770"
                     loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-anhanga-darkBlue/80 via-transparent to-transparent opacity-60"></div>
                   

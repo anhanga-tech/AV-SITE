@@ -7,6 +7,7 @@ import { LandingFAQ } from '../../components/LandingFAQ';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../../components/schemas/FAQPageSchema';
 import { ServiceSchema } from '../../components/schemas/ServiceSchema';
+import { openAiChat } from '../../utils/aiChat';
 
 const BETO_FAQ_ITEMS = [
   {
@@ -31,18 +32,19 @@ const BetoCarreroLanding: React.FC = () => {
   return (
     <>
       <SEO
-        title="Pacote Beto Carrero: Diversão para toda a Família"
-        description="Pacote Beto Carrero personalizado com hotel, aéreo e ingresso. Planejamento completo para famílias com suporte especializado da Anhangá Viagens em São Paulo."
+        title="Pacote Beto Carrero 2026: Diversão para toda a Família"
+        description="Garanta seu pacote para o Beto Carrero 2026 com hotel, passagens e ingressos. Planejamento completo para famílias com o suporte da Anhangá Viagens."
         canonical="https://www.anhanga.tur.br/beto-carrero/"
         keywords="pacote Beto Carrero, viagem Beto Carrero, ingresso Beto Carrero, pacote família Beto Carrero, agência de viagens Beto Carrero"
       />
       <ServiceSchema
-        name="Pacote Beto Carrero personalizado"
-        description="Planejamento de pacote para Beto Carrero with hotel, ingressos, transporte e suporte especializado."
+        name="Pacote Beto Carrero 2025/2026"
+        description="Planejamento de pacote para o Beto Carrero World com hotel, ingressos, transporte e suporte especializado."
         serviceUrl="https://www.anhanga.tur.br/beto-carrero/"
         serviceType="Pacote de viagem para parque temático"
         areaServed="São Paulo e Brasil"
         keywords={['pacote Beto Carrero', 'ingresso Beto Carrero', 'viagem em família']}
+        aggregateRating={{ ratingValue: 4.9, reviewCount: 12 }}
       />
       <BreadcrumbSchema
         items={[
@@ -71,7 +73,7 @@ const BetoCarreroLanding: React.FC = () => {
       <LandingFAQ items={BETO_FAQ_ITEMS} />
       <section className="bg-[#fffdf5] border-t border-brand-cyan/10 py-14">
         <div className="container mx-auto px-6 max-w-5xl">
-          <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Pacote Beto Carrero para viajar with tranquilidade</h2>
+          <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Pacote Beto Carrero para viajar com tranquilidade</h2>
           <p className="text-gray-700 text-lg leading-relaxed mb-5">
             Nosso <strong>pacote Beto Carrero</strong> é desenhado para quem quer curtir o parque sem dor de cabeça com reservas, horários e deslocamentos.
           </p>
@@ -89,9 +91,9 @@ const BetoCarreroLanding: React.FC = () => {
             <button
               onClick={(e) => {
                 e.preventDefault();
-                window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
-                  detail: { message: "Olá! Gostaria de um orçamento personalizado para o Beto Carrero." }
-                }));
+                openAiChat({
+                  message: 'Olá! Gostaria de um orçamento personalizado para o Beto Carrero.'
+                });
               }}
               className="btn-whatsapp btn-specialist px-5 py-3 rounded-full bg-brand-cyan text-white font-bold hover:bg-brand-cyan/90 transition-colors"
               data-tracking="footer-betocarrero"
@@ -104,6 +106,9 @@ const BetoCarreroLanding: React.FC = () => {
             </a>
             <a href="https://blog.anhanga.tur.br" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ver dicas de planejamento
+            </a>
+            <a href="https://www.betocarrero.com.br/" target="_blank" rel="noopener noreferrer" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+              Site Oficial Beto Carrero
             </a>
           </div>
         </div>

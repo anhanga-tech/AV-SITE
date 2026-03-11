@@ -8,6 +8,7 @@ export class AIChat {
   readonly closeBtn: Locator;
   readonly openBtn: Locator;
   readonly typingIndicator: Locator;
+  readonly userMessages: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -17,6 +18,7 @@ export class AIChat {
     this.closeBtn = page.locator('button[aria-label="Fechar gaveta"]');
     this.openBtn = page.locator('button[aria-label="Abrir assistente virtual"]');
     this.typingIndicator = page.getByTestId('chat-typing-indicator');
+    this.userMessages = page.getByTestId('chat-user-message');
   }
 
   async open() {
