@@ -1,5 +1,5 @@
-import { MIDDLE_EAST_COUNTRIES } from '../../utils/constants.js';
-import type { TripScope, SafetyCategory } from './types.js';
+import { MIDDLE_EAST_COUNTRIES } from '../../utils/constants';
+import type { TripScope, SafetyCategory } from './types';
 
 export const DEFAULT_GEMINI_MODEL = 'gemini-3.1-flash-lite-preview';
 

@@ -1,31 +1,27 @@
 import { GoogleGenAI } from "@google/genai";
-import { checkRateLimit as checkRateLimitInternal } from '../lib/rate-limit.js';
-import { buildCorsHeaders, getClientIP } from '../lib/network.js';
-import { budgetTool } from '../lib/ai/tools.js';
-import { SYSTEM_INSTRUCTION } from '../lib/ai/prompt.js';
-import { DEFAULT_GEMINI_MODEL } from '../lib/ai/constants.js';
+import { checkRateLimit as checkRateLimitInternal } from '../lib/rate-limit';
+import { buildCorsHeaders, getClientIP } from '../lib/network';
+import { budgetTool } from '../lib/ai/tools';
+import { SYSTEM_INSTRUCTION } from '../lib/ai/prompt';
+import { DEFAULT_GEMINI_MODEL } from '../lib/ai/constants';
 import {
     resolveMaxMessageLength,
     hasOversizedMessage,
     extractBudgetToolCallFromText,
     stripToolCallJsonBlock,
     extractChipsFromText
-} from '../lib/ai/utils.js';
+} from '../lib/ai/utils';
 import {
     validateBudgetToolArgs,
     buildSafetyMessage,
     buildRefinementMessage
-} from '../lib/ai/validation.js';
+} from '../lib/ai/validation';
 
 // Configuration
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
 const RATE_LIMIT_MAX_REQUESTS = 10; // Max 10 requests per minute per IP
 const GEMINI_3_DEFAULT_TEMPERATURE = 1.0;
 const LEGACY_DEFAULT_TEMPERATURE = 0.7;
-
-export const config = {
-    runtime: 'edge', // Fix for Vercel FUNCTION_INVOCATION_FAILED due to environment mismatch
-};
 
 interface ApiErrorShape {
     status?: number;
