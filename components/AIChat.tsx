@@ -468,7 +468,9 @@ const AIChat: React.FC = () => {
         {/* Input Area */}
         <div className="p-4 sm:p-5 bg-white border-t border-gray-100 shrink-0 z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.02)]">
           <div className="relative flex items-end bg-slate-50 border border-gray-200 rounded-2xl focus-within:border-brand-vibrant/40 focus-within:bg-white focus-within:ring-4 focus-within:ring-brand-vibrant/10 transition-all">
+            <label htmlFor="chat-textarea" className="sr-only">Sua mensagem</label>
             <textarea
+              id="chat-textarea"
               ref={inputRef}
               value={input}
               onChange={handleInput}
@@ -480,7 +482,7 @@ const AIChat: React.FC = () => {
             <button
               onClick={() => submitMessage(input)}
               disabled={isLoading || !input.trim()}
-              className="absolute right-2 bottom-2 p-2.5 bg-brand-vibrant text-white rounded-[10px] shadow-sm hover:bg-brand-blue hover:shadow-md transition-all disabled:opacity-0 disabled:scale-75 focus:outline-none"
+              className="absolute right-2 bottom-2 p-2.5 bg-brand-vibrant text-white rounded-[10px] shadow-sm hover:bg-brand-blue hover:shadow-md transition-all disabled:opacity-0 disabled:scale-75 focus-visible:ring-2 focus-visible:ring-brand-vibrant/50 focus:outline-none"
               aria-label="Enviar mensagem"
             >
               <Send className="w-4 h-4 ml-0.5" />

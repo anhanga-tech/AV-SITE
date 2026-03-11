@@ -116,7 +116,9 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
 
         <div className="space-y-3 mb-5">
           <div className="space-y-1">
+            <label htmlFor="lead-first-name" className="sr-only">Nome</label>
             <input
+              id="lead-first-name"
               type="text"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
@@ -127,7 +129,9 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
           </div>
 
           <div className="space-y-1">
+            <label htmlFor="lead-last-name" className="sr-only">Sobrenome</label>
             <input
+              id="lead-last-name"
               type="text"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
@@ -138,7 +142,9 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
           </div>
 
           <div className="space-y-1">
+            <label htmlFor="lead-email" className="sr-only">E-mail</label>
             <input
+              id="lead-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}

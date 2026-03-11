@@ -55,7 +55,9 @@ const BlogList: React.FC = () => {
 
                     {/* Search Bar */}
                     <div className="mt-8 relative max-w-lg mx-auto">
+                        <label htmlFor="blog-search-input" className="sr-only">Buscar artigos</label>
                         <input
+                            id="blog-search-input"
                             type="text"
                             placeholder="Buscar por título ou categoria..."
                             value={searchTerm}

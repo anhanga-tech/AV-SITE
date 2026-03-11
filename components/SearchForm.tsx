@@ -406,8 +406,9 @@ const GuestsField: React.FC<GuestsFieldProps> = ({
           <div className="mb-4 grid grid-cols-2 gap-2 max-h-32 overflow-y-auto pr-1 custom-scrollbar animate-fade-in-up">
             {childAges.map((age, index) => (
               <div key={`child-age-${index}`} className="flex flex-col">
-                <label className="text-[10px] text-gray-400 font-bold mb-1">Idade Criança {index + 1}</label>
+                <label htmlFor={`child-age-input-${index}`} className="text-[10px] text-gray-400 font-bold mb-1">Idade Criança {index + 1}</label>
                 <input
+                  id={`child-age-input-${index}`}
                   type="number"
                   min="0"
                   max="17"
