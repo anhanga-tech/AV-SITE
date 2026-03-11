@@ -1,5 +1,5 @@
 import type { LeadTracking, SubmitLeadRequest } from '../types/leadCapture';
-import { cleanString } from '../lib/lead-logic.ts';
+import { cleanString } from '../lib/lead-logic.js';
 
 const TRACKING_PROPERTY_MAP: Record<string, string> = {
     cid: 'ga_client_id',
