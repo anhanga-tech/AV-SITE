@@ -1,27 +1,11 @@
 export default async function handler() {
-    const results: Record<string, string> = {};
-
-    const modules: [string, string][] = [
-        ['@google/genai', '@google/genai'],
-        ['rate-limit', '../lib/rate-limit'],
-        ['network', '../lib/network'],
-        ['ai/tools', '../lib/ai/tools'],
-        ['ai/prompt', '../lib/ai/prompt'],
-        ['ai/constants', '../lib/ai/constants'],
-        ['ai/utils', '../lib/ai/utils'],
-        ['ai/validation', '../lib/ai/validation'],
-    ];
-
-    for (const [label, path] of modules) {
-        try {
-            await import(path);
-            results[label] = 'OK';
-        } catch (err: unknown) {
-            results[label] = err instanceof Error ? err.message : String(err);
-        }
-    }
-
-    return new Response(JSON.stringify(results, null, 2), {
+    return new Response(JSON.stringify({
+        ok: true,
+        node: process.version,
+        type: typeof import.meta?.url,
+        cwd: process.cwd(),
+        env_keys: Object.keys(process.env).filter(k => k.startsWith('GEMINI') || k.startsWith('UPSTASH')).map(k => k + '=' + (process.env[k] ? 'SET' : 'UNSET')),
+    }, null, 2), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
     });
