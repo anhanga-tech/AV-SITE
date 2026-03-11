@@ -186,6 +186,10 @@ test('submit-lead should create contact and deal on first attempt', async (t) =>
     assert.equal(enrichedContactProps.hs_google_click_id, 'gclid-1');
     assert.equal(enrichedContactProps.hs_facebook_click_id, 'fbclid-1');
     assert.equal(enrichedContactProps.hs_linkedin_click_id, 'msclkid-1');
+    assert.equal(
+        calls.filter((call) => call.url.endsWith('/crm/v3/objects/contacts/contact-1') && call.method === 'PATCH').length,
+        1,
+    );
 
     const dealRequest = calls.find((call) => call.url.endsWith('/crm/v3/objects/deals'));
     assert.ok(dealRequest, 'deal creation request should exist');
@@ -490,6 +494,10 @@ test('submit-lead should keep the contact when optional HubSpot properties fail'
     const enrichedContactProps = collectContactPatchProperties(calls, 'contact-4');
     assert.equal(enrichedContactProps.ga_client_id, 'cid-4');
     assert.equal(enrichedContactProps.ultimo_utm_source, 'google');
+    assert.equal(
+        calls.filter((call) => call.url.endsWith('/crm/v3/objects/contacts/contact-4') && call.method === 'PATCH').length,
+        1,
+    );
 
     const noteRequest = calls.find((call) => call.url.endsWith('/crm/v3/objects/notes') && call.method === 'POST');
     assert.ok(noteRequest, 'fallback note should be created for rejected optional properties');

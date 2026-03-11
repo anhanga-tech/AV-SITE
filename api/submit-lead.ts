@@ -38,9 +38,8 @@ interface ParsedHubSpotError {
     isPropertyError: boolean;
 }
 
-interface FailedContactProperty {
-    key: string;
-    value: string;
+interface FailedContactPropertyBatch {
+    properties: Record<string, string>;
     status?: number;
     code: 'HUBSPOT_UNAUTHORIZED' | 'HUBSPOT_PROPERTY_ERROR' | 'HUBSPOT_API_ERROR';
     detail?: string;
@@ -432,71 +431,61 @@ async function syncAdditionalContactProperties(
     },
     requestId: string,
 ): Promise<string | undefined> {
-    const entries = Object.entries(additionalProperties);
-    if (entries.length === 0) {
+    const propertyEntries = Object.entries(additionalProperties);
+    if (propertyEntries.length === 0) {
         return undefined;
     }
 
     emitLeadLog('info', requestId, 'contact_enrichment_start', {
         contactId,
-        propertyCount: entries.length,
+        propertyCount: propertyEntries.length,
     });
 
-    const failedProperties: FailedContactProperty[] = [];
-
-    for (const [key, value] of entries) {
-        try {
-            await updateContactProperties(hubspotToken, contactId, { [key]: value });
-        } catch (error: unknown) {
-            const message = error instanceof Error ? error.message : 'Unknown property sync error';
-            const parsedError = parseHubSpotErrorMessage(message);
-            const errorCode: FailedContactProperty['code'] = parsedError.isUnauthorized
+    try {
+        await updateContactProperties(hubspotToken, contactId, additionalProperties);
+        emitLeadLog('info', requestId, 'contact_enrichment_success', {
+            contactId,
+            propertyCount: propertyEntries.length,
+        });
+        return undefined;
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Unknown property sync error';
+        const parsedError = parseHubSpotErrorMessage(message);
+        const failedBatch: FailedContactPropertyBatch = {
+            properties: additionalProperties,
+            status: parsedError.status,
+            code: parsedError.isUnauthorized
                 ? 'HUBSPOT_UNAUTHORIZED'
                 : parsedError.isPropertyError
                     ? 'HUBSPOT_PROPERTY_ERROR'
-                    : 'HUBSPOT_API_ERROR';
+                    : 'HUBSPOT_API_ERROR',
+            detail: parsedError.detail,
+        };
 
-            failedProperties.push({
-                key,
-                value,
-                status: parsedError.status,
-                code: errorCode,
-                detail: parsedError.detail,
-            });
-
-            emitLeadLog(parsedError.isPropertyError ? 'warn' : 'error', requestId, 'contact_enrichment_failed', {
-                contactId,
-                property: key,
-                code: errorCode,
-                status: parsedError.status,
-                detail: parsedError.detail,
-            });
-        }
-    }
-
-    if (failedProperties.length === 0) {
-        emitLeadLog('info', requestId, 'contact_enrichment_success', {
+        emitLeadLog(parsedError.isPropertyError ? 'warn' : 'error', requestId, 'contact_enrichment_failed', {
             contactId,
-            propertyCount: entries.length,
+            propertyCount: propertyEntries.length,
+            code: failedBatch.code,
+            status: parsedError.status,
+            detail: parsedError.detail,
         });
-        return undefined;
+
+        const warningBase = 'Contato salvo, mas alguns dados de rastreamento/UTM não puderam ser gravados automaticamente no HubSpot.';
+        const warningContext = [
+            `Contato HubSpot: ${contactId}`,
+            `Falha do enrichment: batch [${failedBatch.code}${failedBatch.status ? ` ${failedBatch.status}` : ''}]`,
+            `Payload não persistido: ${JSON.stringify(failedBatch.properties)}`,
+        ];
+
+        return await createFallbackNoteForLead(
+            hubspotToken,
+            contactId,
+            payload,
+            warningBase,
+            requestId,
+            warningContext,
+        );
     }
-
-    const warningBase = 'Contato salvo, mas alguns dados de rastreamento/UTM não puderam ser gravados automaticamente no HubSpot.';
-    const warningContext = [
-        `Contato HubSpot: ${contactId}`,
-        `Falhas de propriedades: ${failedProperties.map((item) => `${item.key} [${item.code}${item.status ? ` ${item.status}` : ''}]`).join(', ')}`,
-        `Payload não persistido: ${JSON.stringify(Object.fromEntries(failedProperties.map((item) => [item.key, item.value])))}`,
-    ];
-
-    return await createFallbackNoteForLead(
-        hubspotToken,
-        contactId,
-        payload,
-        warningBase,
-        requestId,
-        warningContext,
-    );
 }
 
 function buildDealProperties(
