@@ -718,7 +718,7 @@ export default async function handler(request: Request) {
         // Debug logs for environment variables
         console.log('[Edge Function] Environment check:');
         console.log('- GEMINI_API_KEY present:', !!apiKey);
-        console.log('- GEMINI_MODEL:', process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite-preview (default)');
+        console.log('- GEMINI_MODEL:', process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite (default)');
         console.log('- ALLOWED_ORIGIN:', process.env.ALLOWED_ORIGIN || '*');
 
         if (!apiKey) {
@@ -761,7 +761,7 @@ export default async function handler(request: Request) {
         }
 
         const ai = new GoogleGenAI({ apiKey });
-        const modelName = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite-preview';
+        const modelName = process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite';
 
         const response = await ai.models.generateContent({
             model: modelName,
