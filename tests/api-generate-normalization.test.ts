@@ -66,6 +66,34 @@ test('buildGenerateSuccessBody should expose structured handoff from tool respon
     assert.equal(body.handoff?.iataCode, 'MCO');
 });
 
+test('buildGenerateSuccessBody should refuse international handoff without baggage preference', async () => {
+    const body = await buildGenerateSuccessBody(
+        buildToolResponse({
+            destination: 'Paris',
+            destination_city: 'Paris',
+            destination_region: 'França',
+            origin_city: 'São Paulo',
+            origin_region: 'SP',
+            dates: 'junho de 2026',
+            adults: 2,
+            trip_scope: 'international',
+            need_summary: 'Viagem em casal',
+            decision_role: 'casal',
+            budget_range: 'R$ 30 mil+',
+            timeline_window: 'junho de 2026',
+            iata_code: 'CDG',
+        }, 'Para finalizarmos, você prefere mala de mão ou bagagem despachada?'),
+        {
+            apiKey: 'test-key',
+            modelName: 'test-model',
+            contents: [],
+        },
+    );
+
+    assert.equal(body.handoff, undefined);
+    assert.match(body.text, /preferência de bagagem/i);
+});
+
 test('buildGenerateSuccessBody should repair textual handoff into structured payload', async () => {
     const body = await buildGenerateSuccessBody(
         {

@@ -70,6 +70,16 @@ function asResponseData(value: unknown): SubmitLeadResponseData {
     return value as SubmitLeadResponseData;
 }
 
+function parseResponseData(value: string): SubmitLeadResponseData {
+    if (!value) return {};
+
+    try {
+        return asResponseData(JSON.parse(value));
+    } catch {
+        return {};
+    }
+}
+
 function toNullable(value: unknown): string | null {
     if (typeof value !== 'string') return null;
     const normalized = value.trim();
@@ -166,6 +176,16 @@ function resolveSubmitLeadEndpoint(): string {
     return '/api/submit-lead';
 }
 
+function isHtmlPayload(value: string): boolean {
+    const normalized = value.trim().toLowerCase();
+    return normalized.startsWith('<!doctype html') || normalized.startsWith('<html');
+}
+
+function truncateResponseText(value: string): string {
+    const normalized = value.trim().replace(/\s+/g, ' ');
+    return normalized.length > 180 ? `${normalized.slice(0, 177)}...` : normalized;
+}
+
 export function useLeadCapture() {
     const [tracking, setTracking] = useState<LeadTracking>(() => captureInitialTracking());
     const [utms, setUtms] = useState<LeadUtms>(() => extractUtms(captureInitialTracking()));
@@ -243,12 +263,16 @@ export function useLeadCapture() {
                 body: JSON.stringify(payload),
             });
 
-            const rawData = asResponseData(await response.json().catch(() => ({})));
+            const responseText = await response.text();
+            const rawData = parseResponseData(responseText);
+            const responseRequestId = response.headers.get('x-request-id') || undefined;
 
             if (!response.ok) {
                 const apiError = typeof rawData.error === 'string'
                     ? rawData.error
-                    : 'Falha ao enviar lead para o HubSpot.';
+                    : responseText && !isHtmlPayload(responseText)
+                        ? truncateResponseText(responseText)
+                        : `Falha ao enviar lead para o HubSpot (status ${response.status}).`;
                 const apiCode = typeof rawData.code === 'string'
                     ? rawData.code
                     : 'HUBSPOT_API_ERROR';
@@ -258,14 +282,16 @@ export function useLeadCapture() {
 
                 return {
                     ok: false,
-                    requestId: rawData.requestId,
+                    requestId: rawData.requestId || responseRequestId,
                     error: apiError,
                     code: apiCode,
                     status: response.status,
                 };
             }
 
-            const requestId = typeof rawData.requestId === 'string' ? rawData.requestId : 'unknown';
+            const requestId = typeof rawData.requestId === 'string'
+                ? rawData.requestId
+                : (responseRequestId || 'unknown');
             const contactId = typeof rawData.contactId === 'string' ? rawData.contactId : 'unknown';
             const dealId = typeof rawData.dealId === 'string' ? rawData.dealId : undefined;
             const warning = typeof rawData.warning === 'string' ? rawData.warning : undefined;

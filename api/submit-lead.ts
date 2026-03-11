@@ -94,9 +94,13 @@ function buildErrorResponse(
     status: number,
     corsHeaders: Record<string, string>,
 ): Response {
+    const requestId = typeof body === 'object' && body && 'requestId' in body && typeof body.requestId === 'string'
+        ? body.requestId
+        : undefined;
+
     return new Response(JSON.stringify(body), {
         status,
-        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+        headers: { 'Content-Type': 'application/json', ...(requestId ? { 'X-Request-Id': requestId } : {}), ...corsHeaders },
     });
 }
 
@@ -105,9 +109,13 @@ function buildSuccessResponse(
     status: number,
     corsHeaders: Record<string, string>,
 ): Response {
+    const requestId = typeof body === 'object' && body && 'requestId' in body && typeof body.requestId === 'string'
+        ? body.requestId
+        : undefined;
+
     return new Response(JSON.stringify(body), {
         status,
-        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+        headers: { 'Content-Type': 'application/json', ...(requestId ? { 'X-Request-Id': requestId } : {}), ...corsHeaders },
     });
 }
 
@@ -648,48 +656,48 @@ export default async function handler(request: Request): Promise<Response> {
     const requestId = createRequestId();
     const corsHeaders = buildCorsHeaders();
 
-    if (request.method === 'OPTIONS') {
-        return new Response(null, { status: 204, headers: corsHeaders });
-    }
-
-    const rateLimitResponse = await getRateLimitResponse(request, corsHeaders, requestId);
-    if (rateLimitResponse) return rateLimitResponse;
-
-    if (request.method !== 'POST') {
-        return buildErrorResponse(
-            {
-                ok: false,
-                requestId,
-                code: 'METHOD_NOT_ALLOWED',
-                error: 'Method not allowed',
-            },
-            405,
-            corsHeaders,
-        );
-    }
-
-    const config = getSubmitLeadConfig();
-    if (!config) {
-        emitLeadLog('error', requestId, 'config', {
-            code: 'SERVER_CONFIG_ERROR',
-            hasHubSpotToken: Boolean(process.env.HUBSPOT_TOKEN),
-            hasPipelineId: Boolean(cleanString(process.env.HUBSPOT_DEAL_PIPELINE_ID)),
-            hasDealStageId: Boolean(cleanString(process.env.HUBSPOT_DEAL_STAGE_ID)),
-        });
-
-        return buildErrorResponse(
-            {
-                ok: false,
-                requestId,
-                code: 'SERVER_CONFIG_ERROR',
-                error: 'Erro de configuração do servidor',
-            },
-            500,
-            corsHeaders,
-        );
-    }
-
     try {
+        if (request.method === 'OPTIONS') {
+            return new Response(null, { status: 204, headers: corsHeaders });
+        }
+
+        const rateLimitResponse = await getRateLimitResponse(request, corsHeaders, requestId);
+        if (rateLimitResponse) return rateLimitResponse;
+
+        if (request.method !== 'POST') {
+            return buildErrorResponse(
+                {
+                    ok: false,
+                    requestId,
+                    code: 'METHOD_NOT_ALLOWED',
+                    error: 'Method not allowed',
+                },
+                405,
+                corsHeaders,
+            );
+        }
+
+        const config = getSubmitLeadConfig();
+        if (!config) {
+            emitLeadLog('error', requestId, 'config', {
+                code: 'SERVER_CONFIG_ERROR',
+                hasHubSpotToken: Boolean(process.env.HUBSPOT_TOKEN),
+                hasPipelineId: Boolean(cleanString(process.env.HUBSPOT_DEAL_PIPELINE_ID)),
+                hasDealStageId: Boolean(cleanString(process.env.HUBSPOT_DEAL_STAGE_ID)),
+            });
+
+            return buildErrorResponse(
+                {
+                    ok: false,
+                    requestId,
+                    code: 'SERVER_CONFIG_ERROR',
+                    error: 'Erro de configuração do servidor',
+                },
+                500,
+                corsHeaders,
+            );
+        }
+
         const rawBody = await parseRequestBody(request, corsHeaders, requestId);
         if (rawBody instanceof Response) return rawBody;
 
