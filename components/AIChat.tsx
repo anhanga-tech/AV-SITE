@@ -482,7 +482,7 @@ const AIChat: React.FC = () => {
             <button
               onClick={() => submitMessage(input)}
               disabled={isLoading || !input.trim()}
-              className="absolute right-2 bottom-2 p-2.5 bg-brand-vibrant text-white rounded-[10px] shadow-sm hover:bg-brand-blue hover:shadow-md transition-all disabled:opacity-0 disabled:scale-75 focus-visible:ring-2 focus-visible:ring-brand-vibrant/50 focus:outline-none"
+              className="absolute right-2 bottom-2 p-2.5 bg-brand-vibrant text-white rounded-[10px] shadow-sm hover:bg-brand-blue hover:shadow-md transition-all disabled:opacity-0 disabled:scale-75 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-vibrant/50"
               aria-label="Enviar mensagem"
             >
               <Send className="w-4 h-4 ml-0.5" />
