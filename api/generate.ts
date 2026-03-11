@@ -1,4 +1,3 @@
-import { GoogleGenAI } from "@google/genai";
 import { checkRateLimit } from '../lib/rate-limit';
 import { buildCorsHeaders, getClientIP } from '../lib/network';
 import { budgetTool } from '../lib/ai/tools';
@@ -203,6 +202,7 @@ async function requestModelResponse(
     modelName: string,
     contents: unknown[],
 ): Promise<ModelResponseShape> {
+    const { GoogleGenAI } = await import("@google/genai");
     const ai = new GoogleGenAI({ apiKey });
 
     return await ai.models.generateContent({
@@ -368,10 +368,10 @@ export default async function handler(request: Request) {
         return buildMethodNotAllowedResponse(corsHeaders);
     }
 
-    const rateLimitState = await getRateLimitState(request, corsHeaders);
-    if (rateLimitState instanceof Response) return rateLimitState;
-
     try {
+        const rateLimitState = await getRateLimitState(request, corsHeaders);
+        if (rateLimitState instanceof Response) return rateLimitState;
+
         const apiKey = getConfiguredApiKey(corsHeaders);
         if (apiKey instanceof Response) return apiKey;
 
