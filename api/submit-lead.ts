@@ -1,5 +1,4 @@
 import type { SubmitLeadRequest, SubmitLeadResponse } from '../types/leadCapture';
-import { checkRateLimit as checkRateLimitInternal } from '../lib/rate-limit.js';
 import { buildCorsHeaders, getClientIP } from '../lib/network.js';
 import { cleanString, validatePayload } from '../lib/lead-logic.js';
 import {
@@ -18,7 +17,12 @@ import { sendMetaConversion } from '../lib/conversions/meta.js';
 
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
-const DEFAULT_RATE_LIMIT_TIMEOUT_MS = 1200;
+const SUBMIT_LEAD_RATE_LIMIT_MAX_ENTRIES = 1000;
+
+interface SubmitLeadRateLimitEntry {
+    count: number;
+    resetTime: number;
+}
 
 interface SubmitLeadConfig {
     hubspotToken: string;
@@ -47,6 +51,8 @@ interface FailedContactPropertyBatch {
 }
 
 type LeadLogLevel = 'info' | 'warn' | 'error';
+
+const submitLeadRateLimitStore = new Map<string, SubmitLeadRateLimitEntry>();
 
 function createRequestId(): string {
     if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -157,34 +163,39 @@ function appendWarning(existing: string | undefined, next: string | undefined): 
     return `${existing} ${next}`;
 }
 
-function getConfiguredTimeoutMs(envKey: string, fallbackMs: number): number {
-    const configured = Number.parseInt(String(process.env[envKey] ?? ''), 10);
-    if (!Number.isFinite(configured) || configured < 100) {
-        return fallbackMs;
-    }
+function checkSubmitLeadRateLimit(clientIP: string): { allowed: boolean; resetIn: number } {
+    const now = Date.now();
+    const entry = submitLeadRateLimitStore.get(clientIP);
 
-    return configured;
-}
+    if (submitLeadRateLimitStore.size >= SUBMIT_LEAD_RATE_LIMIT_MAX_ENTRIES && !entry) {
+        for (const [key, value] of submitLeadRateLimitStore.entries()) {
+            if (now > value.resetTime) {
+                submitLeadRateLimitStore.delete(key);
+            }
 
-async function runWithTimeout<T>(
-    operation: () => Promise<T>,
-    timeoutMs: number,
-    timeoutMessage: string,
-): Promise<T> {
-    let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
-
-    try {
-        return await Promise.race([
-            operation(),
-            new Promise<T>((_, reject) => {
-                timeoutHandle = setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs);
-            }),
-        ]);
-    } finally {
-        if (timeoutHandle) {
-            clearTimeout(timeoutHandle);
+            if (submitLeadRateLimitStore.size < SUBMIT_LEAD_RATE_LIMIT_MAX_ENTRIES) {
+                break;
+            }
         }
     }
+
+    if (!entry || now > entry.resetTime) {
+        submitLeadRateLimitStore.set(clientIP, {
+            count: 1,
+            resetTime: now + RATE_LIMIT_WINDOW_MS,
+        });
+
+        return {
+            allowed: true,
+            resetIn: RATE_LIMIT_WINDOW_MS,
+        };
+    }
+
+    entry.count += 1;
+    return {
+        allowed: entry.count <= RATE_LIMIT_MAX_REQUESTS,
+        resetIn: entry.resetTime - now,
+    };
 }
 
 function shouldAttemptFallbackNote(parsedError: ParsedHubSpotError): boolean {
@@ -197,25 +208,7 @@ async function getRateLimitResponse(
     requestId: string,
 ): Promise<Response | null> {
     const clientIP = getClientIP(request);
-    let rateLimit;
-
-    try {
-        rateLimit = await runWithTimeout(
-            () => checkRateLimitInternal(clientIP, {
-                limit: RATE_LIMIT_MAX_REQUESTS,
-                windowMs: RATE_LIMIT_WINDOW_MS,
-                prefix: 'ratelimit:submit-lead',
-            }),
-            getConfiguredTimeoutMs('SUBMIT_LEAD_RATE_LIMIT_TIMEOUT_MS', DEFAULT_RATE_LIMIT_TIMEOUT_MS),
-            'RATE_LIMIT_TIMEOUT:504:Rate limit check timed out',
-        );
-    } catch (error: unknown) {
-        emitLeadLog('warn', requestId, 'rate_limit_failed_open', {
-            clientIP,
-            detail: truncateDetail(error instanceof Error ? error.message : String(error)),
-        });
-        return null;
-    }
+    const rateLimit = checkSubmitLeadRateLimit(clientIP);
 
     if (rateLimit.allowed) return null;
 
