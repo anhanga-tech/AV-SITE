@@ -49,6 +49,34 @@ interface MockHubSpotRequest {
     body?: MockHubSpotRequestBody;
 }
 
+interface MockHubSpotRoute {
+    matches: (request: MockHubSpotRequest) => boolean;
+    respond: (request: MockHubSpotRequest) => Response;
+}
+
+function buildMockHubSpotRequest(input: RequestInfo | URL, init?: RequestInit): MockHubSpotRequest {
+    return {
+        url: getUrl(input),
+        method: init?.method || 'GET',
+        body: init?.body ? JSON.parse(String(init.body)) as MockHubSpotRequestBody : undefined,
+    };
+}
+
+function createMockHubSpotFetch(calls: MockHubSpotRequest[], routes: MockHubSpotRoute[]): typeof fetch {
+    return (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+        const request = buildMockHubSpotRequest(input, init);
+        calls.push(request);
+
+        for (const route of routes) {
+            if (route.matches(request)) {
+                return route.respond(request);
+            }
+        }
+
+        throw new Error(`Unexpected request: ${request.method} ${request.url}`);
+    }) as typeof fetch;
+}
+
 function collectContactPatchProperties(calls: MockHubSpotRequest[], contactId: string): Record<string, unknown> {
     const patches = calls.filter((call) => call.url.endsWith(`/crm/v3/objects/contacts/${contactId}`) && call.method === 'PATCH');
     return Object.assign({}, ...patches.map((call) => call.body?.properties || {}));
@@ -383,46 +411,42 @@ test('submit-lead should keep the contact when optional HubSpot properties fail'
 
     const calls: MockHubSpotRequest[] = [];
 
-    global.fetch = (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-        const url = getUrl(input);
-        const method = init?.method || 'GET';
-        const body = init?.body ? JSON.parse(String(init.body)) as MockHubSpotRequestBody : undefined;
-        calls.push({ url, method, body });
+    global.fetch = createMockHubSpotFetch(calls, [
+        {
+            matches: ({ url, method }) => url.endsWith('/crm/v3/objects/contacts') && method === 'POST',
+            respond: () => new Response(JSON.stringify({ id: 'contact-4' }), { status: 201 }),
+        },
+        {
+            matches: ({ url, method }) => url.endsWith('/crm/v3/objects/contacts/contact-4') && method === 'PATCH',
+            respond: ({ body }) => {
+                const propertyName = Object.keys(body?.properties || {})[0];
+                if (propertyName === 'ultimo_utm_source') {
+                    return new Response(JSON.stringify({
+                        status: 'error',
+                        message: 'Property values were not valid',
+                    }), { status: 400 });
+                }
 
-        if (url.endsWith('/crm/v3/objects/contacts') && method === 'POST') {
-            return new Response(JSON.stringify({ id: 'contact-4' }), { status: 201 });
-        }
-
-        if (url.endsWith('/crm/v3/objects/contacts/contact-4') && method === 'PATCH') {
-            const propertyName = Object.keys(body?.properties || {})[0];
-            if (propertyName === 'ultimo_utm_source') {
-                return new Response(JSON.stringify({
-                    status: 'error',
-                    message: 'Property values were not valid',
-                }), { status: 400 });
-            }
-
-            return new Response(JSON.stringify({ id: 'contact-4' }), { status: 200 });
-        }
-
-        if (url.endsWith('/crm/v3/objects/deals') && method === 'POST') {
-            return new Response(JSON.stringify({ id: 'deal-4' }), { status: 201 });
-        }
-
-        if (url.endsWith('/crm/v4/objects/deals/deal-4/associations/default/contacts/contact-4') && method === 'PUT') {
-            return new Response(null, { status: 204 });
-        }
-
-        if (url.endsWith('/crm/v3/objects/notes') && method === 'POST') {
-            return new Response(JSON.stringify({ id: 'note-contact-warning' }), { status: 201 });
-        }
-
-        if (url.endsWith('/crm/v4/objects/notes/note-contact-warning/associations/default/contacts/contact-4') && method === 'PUT') {
-            return new Response(null, { status: 204 });
-        }
-
-        throw new Error(`Unexpected request: ${method} ${url}`);
-    }) as typeof fetch;
+                return new Response(JSON.stringify({ id: 'contact-4' }), { status: 200 });
+            },
+        },
+        {
+            matches: ({ url, method }) => url.endsWith('/crm/v3/objects/deals') && method === 'POST',
+            respond: () => new Response(JSON.stringify({ id: 'deal-4' }), { status: 201 }),
+        },
+        {
+            matches: ({ url, method }) => url.endsWith('/crm/v4/objects/deals/deal-4/associations/default/contacts/contact-4') && method === 'PUT',
+            respond: () => new Response(null, { status: 204 }),
+        },
+        {
+            matches: ({ url, method }) => url.endsWith('/crm/v3/objects/notes') && method === 'POST',
+            respond: () => new Response(JSON.stringify({ id: 'note-contact-warning' }), { status: 201 }),
+        },
+        {
+            matches: ({ url, method }) => url.endsWith('/crm/v4/objects/notes/note-contact-warning/associations/default/contacts/contact-4') && method === 'PUT',
+            respond: () => new Response(null, { status: 204 }),
+        },
+    ]);
 
     const response = await handler(buildRequest({
         firstName: 'Felipe',
