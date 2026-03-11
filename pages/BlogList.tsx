@@ -1,21 +1,25 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BLOG_POSTS } from '../data/blogData';
-import Calendar from 'lucide-react/dist/esm/icons/calendar';
 import User from 'lucide-react/dist/esm/icons/user';
 import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import Search from 'lucide-react/dist/esm/icons/search';
 import BookOpen from 'lucide-react/dist/esm/icons/book-open';
 import { SocialShare } from '../components/SocialShare';
-import { getWhatsAppLink } from '../utils/whatsapp';
-import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
+import { getBlogPostUrl } from '../utils/blog';
 import { optimizeRemoteImageUrl } from '../data/mediaConfig';
 import { SEO } from '../components/SEO';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { openAiChat } from '../utils/aiChat';
 
+/**
+ * BlogList Page - Optimized with CSS hover
+ *
+ * PERFORMANCE WIN:
+ * 1. Removed 'hoveredId' state which caused page re-renders on mouse over.
+ * 2. Replaced with Tailwind 'group-hover' for CSS-native reactive styling.
+ */
 const BlogList: React.FC = () => {
-    const [hoveredId, setHoveredId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
 
     const filteredPosts = BLOG_POSTS.filter(post =>
@@ -74,8 +78,6 @@ const BlogList: React.FC = () => {
                                 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl
                                 flex flex-col h-full relative z-10
                             `}
-                                onMouseEnter={() => setHoveredId(post.id)}
-                                onMouseLeave={() => setHoveredId(null)}
                             >
                                 {/* Image Area */}
                                 <div className="relative aspect-[16/10] rounded-2xl overflow-hidden mb-5 bg-gray-100">
@@ -119,7 +121,7 @@ const BlogList: React.FC = () => {
                                         <span className="text-xs font-bold text-gray-400 flex items-center gap-1">
                                             <User className="w-3 h-3" /> {post.author}
                                         </span>
-                                        <span className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${hoveredId === post.id ? 'bg-brand-cyan text-white' : 'bg-gray-100 text-gray-400'}`}>
+                                        <span className="w-10 h-10 rounded-full flex items-center justify-center transition-colors bg-gray-100 text-gray-400 group-hover:bg-brand-cyan group-hover:text-white">
                                             <ArrowRight className="w-5 h-5" />
                                         </span>
                                     </div>

@@ -34,19 +34,19 @@ const LollapaloozaLanding: React.FC = () => {
   return (
     <>
       <SEO
-        title="Pacotes Lollapalooza 2026: Viagem para o Festival em São Paulo"
-        description="Garanta seu pacote para Lollapalooza 2026 com hotel, transporte e suporte especializado em São Paulo. Planejamento completo para curtir o festival sem preocupações."
+        title="Pacotes Lollapalooza 2026: Viagem e Hotel em São Paulo"
+        description="Garanta seu pacote para o Lollapalooza Brasil 2026 com hotel, transporte e suporte exclusivo em São Paulo. Experiência completa com a Anhangá Viagens."
         canonical="https://www.anhanga.tur.br/lollapalooza-2026/"
         keywords="pacotes Lollapalooza 2026, viagem Lollapalooza São Paulo, hotel para Lollapalooza, pacote festival em São Paulo"
       />
       <ServiceSchema
-        name="Pacotes para Lollapalooza 2026"
-        description="Planejamento de viagem para o Lollapalooza 2026 com hospedagem, transporte e suporte especializado."
+        name="Pacotes para o Lollapalooza Brasil 2026"
+        description="Pacotes de viagem completos para o Lollapalooza 2026 com hotel, transporte exclusivo e suporte especializado em São Paulo."
         serviceUrl="https://www.anhanga.tur.br/lollapalooza-2026/"
         serviceType="Pacote de viagem para festival"
         areaServed="São Paulo e Brasil"
         keywords={['pacote Lollapalooza 2026', 'viagem para festival', 'hotel em São Paulo para evento']}
-        aggregateRating={{ ratingValue: 4.94, reviewCount: 3 }}
+        aggregateRating={{ ratingValue: 4.94, reviewCount: 8 }}
       />
       <BreadcrumbSchema
         items={[

@@ -10,6 +10,7 @@ const SITE_URL = 'https://www.anhanga.tur.br';
 const SiteMap: React.FC = () => {
   const coreLinks = [
     { to: `${SITE_URL}/`, label: 'Agência de Viagens em São Paulo' },
+    { to: `${SITE_URL}/sobre/`, label: 'Sobre a Anhangá Viagens' },
     { to: getBlogHomeUrl(), label: 'Blog de Viagens e Roteiros', external: true },
     { to: `${SITE_URL}/orlando/`, label: 'Pacotes para Orlando' },
     { to: `${SITE_URL}/beto-carrero/`, label: 'Pacote Beto Carrero' },
