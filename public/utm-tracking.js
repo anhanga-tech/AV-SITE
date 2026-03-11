@@ -6,6 +6,7 @@
 (function () {
     const GA4_MEASUREMENT_ID = 'G-QDBT5PM4KP';
     const SESSION_STORAGE_KEY = 'anhanga_tracking_data';
+    const TRACKING_PARAMS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid', 'ttclid', 'wbraid', 'gbraid', 'msclkid'];
 
     // Captura o Client ID do GA4 de forma robusta
     function getGACid(callback) {
@@ -32,125 +33,160 @@
         return m ? m[1] : null;
     }
 
-    function initWhatsAppTracking() {
-        // 1. Capturar Parâmetros da URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const params = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid', 'ttclid', 'wbraid', 'gbraid', 'msclkid'];
-
-        // Tenta recuperar de sessionStorage primeiro para manter persistência em navegação interna
-        let tracking = {};
+    function readStoredTracking() {
         try {
             const stored = sessionStorage.getItem(SESSION_STORAGE_KEY);
-            if (stored) tracking = JSON.parse(stored);
-        } catch (e) {}
+            return stored ? JSON.parse(stored) : {};
+        } catch {
+            return {};
+        }
+    }
 
-        // Sobrescreve com novos parâmetros da URL se existirem
+    function persistTracking(tracking) {
+        try {
+            sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(tracking));
+        } catch {}
+    }
+
+    function mergeUrlTracking(urlParams, tracking) {
         let foundInUrl = false;
-        params.forEach(p => {
-            const v = urlParams.get(p);
-            if (v) {
-                tracking[p] = v;
-                foundInUrl = true;
-            }
+
+        TRACKING_PARAMS.forEach((param) => {
+            const value = urlParams.get(param);
+            if (!value) return;
+
+            tracking[param] = value;
+            foundInUrl = true;
         });
 
-        // Salva de volta no sessionStorage se encontrou algo novo
-        if (foundInUrl) {
-            try {
-                sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(tracking));
-            } catch (e) {}
-        }
+        return foundInUrl;
+    }
 
-        // 2. Gerar fbc se temos fbclid mas não fbc (independente de GA)
-        if (tracking.fbclid && !tracking.fbc) {
-            tracking.fbc = `fb.1.${Date.now()}.${tracking.fbclid}`;
-            try {
-                sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(tracking));
-            } catch (e) {}
-        }
+    function ensureFacebookClickTracking(tracking) {
+        if (!tracking.fbclid || tracking.fbc) return;
 
-        // 3. Buscar CID e salvar no tracking
+        tracking.fbc = `fb.1.${Date.now()}.${tracking.fbclid}`;
+        persistTracking(tracking);
+    }
+
+    function enrichTrackingWithCid(tracking) {
         getGACid((cid) => {
-            if (cid) {
-                tracking.cid = cid;
-                try {
-                    sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(tracking));
-                } catch (e) {}
-            }
+            if (!cid) return;
+
+            tracking.cid = cid;
+            persistTracking(tracking);
         });
     }
 
-    // --- EVENT DELEGATION LOGIC ---
-    document.body.addEventListener('click', (event) => {
-        const target = event.target;
+    function pushDataLayerEvent(payload) {
+        if (typeof window === 'undefined' || !window.dataLayer) return;
+        window.dataLayer.push(payload);
+    }
 
-        // 1. WhatsApp Button Tracking
-        const whatsappButton = target.closest('.btn-whatsapp, #btn-whatsapp, a[href*="wa.me"]');
-        if (whatsappButton) {
-            // Extrair o texto do botão de forma robusta
-            const buttonText = (whatsappButton.innerText || whatsappButton.textContent || "").trim() || 'WhatsApp Button';
-            const trackingId = whatsappButton.getAttribute('data-tracking') || whatsappButton.id || 'not_set';
+    function getElementText(element, fallback) {
+        if (!element) return fallback;
+        return (element.innerText || element.textContent || '').trim() || fallback;
+    }
 
-            if (typeof window !== 'undefined' && window.dataLayer) {
-                window.dataLayer.push({
-                    event: 'whatsapp_cta_click',
-                    event_category: 'engagement',
-                    event_label: whatsappButton.getAttribute('href') || 'unknown_whatsapp_link',
-                    button_text: buttonText,
-                    cta_id: trackingId,
-                    page_location: window.location.href
-                });
-            }
-        }
+    function getClosestClickable(target) {
+        return target.closest('a, button, [role="button"]');
+    }
 
-        // 2. Specialist CTA Tracking ("Falar com especialista")
+    function getWhatsAppButton(target) {
+        return target.closest('.btn-whatsapp, #btn-whatsapp, a[href*="wa.me"]');
+    }
+
+    function trackWhatsAppClick(target) {
+        const whatsappButton = getWhatsAppButton(target);
+        if (!whatsappButton) return;
+
+        const buttonText = getElementText(whatsappButton, 'WhatsApp Button');
+        const trackingId = whatsappButton.getAttribute('data-tracking') || whatsappButton.id || 'not_set';
+
+        pushDataLayerEvent({
+            event: 'whatsapp_cta_click',
+            event_category: 'engagement',
+            event_label: whatsappButton.getAttribute('href') || 'unknown_whatsapp_link',
+            button_text: buttonText,
+            cta_id: trackingId,
+            page_location: window.location.href
+        });
+    }
+
+    function getSpecialistSourceElement(target) {
         const specialistButton = target.closest('.btn-specialist, [data-specialist-cta], a[href*="#contato"], a[href*="#contact"]');
-        const clickable = target.closest('a, button, [role="button"]');
+        return {
+            specialistButton,
+            clickable: getClosestClickable(target),
+        };
+    }
 
-        // Extrair texto do botão ou do elemento clicado (limitado a elementos clicáveis para evitar falsos positivos)
-        let fullButtonText = "";
-        if (specialistButton) {
-            fullButtonText = (specialistButton.innerText || specialistButton.textContent || "").trim();
-        } else if (clickable) {
-            fullButtonText = (clickable.innerText || clickable.textContent || "").trim();
+    function isSpecialistCtaText(text) {
+        if (!text) return false;
+
+        const normalizedText = text.toLowerCase();
+        return normalizedText.includes('especialista')
+            || normalizedText.includes('orçamento')
+            || normalizedText.includes('consultoria');
+    }
+
+    function trackSpecialistClick(target) {
+        const { specialistButton, clickable } = getSpecialistSourceElement(target);
+        const sourceElement = specialistButton || clickable;
+        const buttonText = specialistButton
+            ? getElementText(specialistButton, '')
+            : getElementText(clickable, '');
+
+        if (!sourceElement || (!specialistButton && !isSpecialistCtaText(buttonText))) {
+            return;
         }
 
-        const isSpecialistText = fullButtonText && (
-                                fullButtonText.toLowerCase().includes('especialista') ||
-                                fullButtonText.toLowerCase().includes('orçamento') ||
-                                fullButtonText.toLowerCase().includes('consultoria'));
+        const trackingId = sourceElement.getAttribute('data-tracking') || sourceElement.id || 'not_set';
+        pushDataLayerEvent({
+            event: 'specialist_cta_click',
+            event_category: 'engagement',
+            event_label: buttonText || 'Specialist CTA',
+            cta_id: trackingId,
+            page_location: window.location.href
+        });
+    }
 
-        if (specialistButton || isSpecialistText) {
-            const sourceElement = specialistButton || clickable;
-            const trackingId = sourceElement ? (sourceElement.getAttribute('data-tracking') || sourceElement.id || 'not_set') : 'not_set';
+    function handleBodyClick(event) {
+        const target = event.target;
+        if (!target || typeof target.closest !== 'function') return;
 
-            // Disparamos specialist_cta_click mesmo se for um link de WhatsApp
-            // para garantir que todas as consultas com especialistas sejam rastreadas separadamente.
-            if (typeof window !== 'undefined' && window.dataLayer) {
-                window.dataLayer.push({
-                    event: 'specialist_cta_click',
-                    event_category: 'engagement',
-                    event_label: fullButtonText || 'Specialist CTA',
-                    cta_id: trackingId,
-                    page_location: window.location.href
-                });
-            }
+        trackWhatsAppClick(target);
+        trackSpecialistClick(target);
+    }
+
+    function handleHubSpotMessage(event) {
+        if (event.data.type !== 'hsFormCallback' || event.data.eventName !== 'onFormSubmitted') {
+            return;
         }
-    }, { capture: true });
+
+        pushDataLayerEvent({
+            event: 'form_submission',
+            form_type: 'hubspot',
+            form_id: event.data.id,
+            page_location: window.location.href
+        });
+    }
+
+    function initWhatsAppTracking() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tracking = readStoredTracking();
+        const foundInUrl = mergeUrlTracking(urlParams, tracking);
+
+        if (foundInUrl) persistTracking(tracking);
+        ensureFacebookClickTracking(tracking);
+        enrichTrackingWithCid(tracking);
+    }
+
+    // --- EVENT DELEGATION LOGIC ---
+    document.body.addEventListener('click', handleBodyClick, { capture: true });
 
     // 3. HubSpot Form Tracking
-    window.addEventListener("message", function(event) {
-        if(event.data.type === 'hsFormCallback' && event.data.eventName === 'onFormSubmitted') {
-            if (typeof window !== 'undefined' && window.dataLayer) {
-                window.dataLayer.push({
-                    'event': 'form_submission',
-                    'form_type': 'hubspot',
-                    'form_id': event.data.id,
-                    'page_location': window.location.href
-                });
-            }
-        }
-    });
+    window.addEventListener("message", handleHubSpotMessage);
 
     // Inicialização: espera a página carregar + delay para GA4
     const init = () => setTimeout(initWhatsAppTracking, 1500);

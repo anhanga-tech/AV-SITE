@@ -134,80 +134,125 @@ export function buildRefinementMessage(missing: string[]): string {
     return `Para montar seu orçamento com precisão, me confirme: ${missingLabels.join(', ')}. Se ainda não souber algum ponto, pode responder "a definir".`;
 }
 
-export function validateBudgetToolArgs(rawArgs: unknown): BudgetValidationResult {
-    if (!rawArgs || typeof rawArgs !== 'object') {
-        return { valid: false, missing: ['destination_city', 'origin_city', 'dates', 'adults'] };
-    }
+function getRawBudgetArgs(rawArgs: unknown): BudgetToolArgs | null {
+    if (!rawArgs || typeof rawArgs !== 'object') return null;
+    return rawArgs as BudgetToolArgs;
+}
 
-    const raw = rawArgs as BudgetToolArgs;
+function buildInvalidBudgetResult(missing: string[], safetyBlock?: SafetyBlock): BudgetValidationResult {
+    return {
+        valid: false,
+        missing,
+        safetyBlock,
+    };
+}
 
+function sanitizeBudgetFields(raw: BudgetToolArgs) {
     const destinationCity = cleanString(raw.destination_city);
     const destinationRegion = cleanString(raw.destination_region);
     const originCity = cleanString(raw.origin_city);
     const providedOriginRegion = cleanString(raw.origin_region);
-
     const destination = cleanString(raw.destination) || [destinationCity, destinationRegion].filter(Boolean).join(', ');
-    const dates = cleanString(raw.dates);
-    const interests = cleanString(raw.interests) || 'Geral';
-    const adults = normalizeAdults(raw.adults);
-    const childAges = normalizeChildAges(raw.child_ages);
 
-    const originRegion = providedOriginRegion || 'Brasil';
-    const assumedOriginBr = !providedOriginRegion;
+    return {
+        destination,
+        dates: cleanString(raw.dates),
+        interests: cleanString(raw.interests) || 'Geral',
+        adults: normalizeAdults(raw.adults),
+        childAges: normalizeChildAges(raw.child_ages),
+        originCity,
+        destinationCity,
+        destinationRegion,
+        originRegion: providedOriginRegion || 'Brasil',
+        assumedOriginBr: !providedOriginRegion,
+        budgetRange: cleanString(raw.budget_range),
+        decisionRole: cleanString(raw.decision_role) || 'não informado',
+        needSummary: cleanString(raw.need_summary) || 'não informado',
+        timelineWindow: cleanString(raw.timeline_window) || 'não informado',
+        baggagePreference: cleanString(raw.baggage_preference) || '',
+        iataCode: cleanString(raw.iata_code)?.substring(0, 3).toUpperCase() || '',
+    };
+}
 
-    const destinationReference = [destination, destinationCity, destinationRegion].filter(Boolean).join(' ');
-    const safetyBlock = detectBlockedDestination(destinationReference);
-    if (safetyBlock) {
-        return {
-            valid: false,
-            missing: [],
-            safetyBlock,
-        };
-    }
-
+function collectMissingBudgetFields(fields: {
+    destination: string;
+    destinationCity: string;
+    originCity: string;
+    dates: string;
+    adults?: number;
+    tripScope?: TripScope;
+}): string[] {
     const missing: string[] = [];
 
-    if (!destination) missing.push('destination_city');
-    if (!isCityValueAcceptable(originCity)) missing.push('origin_city');
-    if (!isCityValueAcceptable(destinationCity)) missing.push('destination_city');
-    if (!dates) missing.push('dates');
-    if (!adults) missing.push('adults');
+    if (!fields.destination) missing.push('destination_city');
+    if (!isCityValueAcceptable(fields.originCity)) missing.push('origin_city');
+    if (!isCityValueAcceptable(fields.destinationCity)) missing.push('destination_city');
+    if (!fields.dates) missing.push('dates');
+    if (!fields.adults) missing.push('adults');
+    if (!fields.tripScope || !TRIP_SCOPES.has(fields.tripScope)) missing.push('trip_scope');
 
-    let tripScope = normalizeTripScope(raw.trip_scope);
-    if (!tripScope && destinationReference) {
-        tripScope = inferTripScope(destinationReference, originRegion);
-    }
+    return missing;
+}
 
-    if (!tripScope || !TRIP_SCOPES.has(tripScope)) {
-        missing.push('trip_scope');
-    }
+function resolveBudgetTripScope(rawTripScope: unknown, destinationReference: string, originRegion: string): TripScope | undefined {
+    const directScope = normalizeTripScope(rawTripScope);
+    if (directScope) return directScope;
+    if (!destinationReference) return undefined;
+    return inferTripScope(destinationReference, originRegion);
+}
 
-    if (missing.length > 0) {
-        return {
-            valid: false,
-            missing,
-        };
-    }
-
-    const normalizedArgs: BudgetToolArgs = {
-        destination,
-        dates,
-        adults,
-        child_ages: childAges,
-        interests,
-        origin_city: originCity,
-        origin_region: originRegion,
-        destination_city: destinationCity,
-        destination_region: destinationRegion || '',
+function buildNormalizedBudgetArgs(
+    fields: ReturnType<typeof sanitizeBudgetFields>,
+    tripScope: TripScope,
+): BudgetToolArgs {
+    return {
+        destination: fields.destination,
+        dates: fields.dates,
+        adults: fields.adults,
+        child_ages: fields.childAges,
+        interests: fields.interests,
+        origin_city: fields.originCity,
+        origin_region: fields.originRegion,
+        destination_city: fields.destinationCity,
+        destination_region: fields.destinationRegion || '',
         trip_scope: tripScope,
-        budget_range: normalizeBudgetRange(tripScope, cleanString(raw.budget_range)),
-        decision_role: cleanString(raw.decision_role) || 'não informado',
-        need_summary: cleanString(raw.need_summary) || 'não informado',
-        timeline_window: cleanString(raw.timeline_window) || 'não informado',
-        baggage_preference: cleanString(raw.baggage_preference) || '',
-        assumed_origin_br: assumedOriginBr,
-        iata_code: cleanString(raw.iata_code)?.substring(0, 3).toUpperCase() || '',
+        budget_range: normalizeBudgetRange(tripScope, fields.budgetRange),
+        decision_role: fields.decisionRole,
+        need_summary: fields.needSummary,
+        timeline_window: fields.timelineWindow,
+        baggage_preference: fields.baggagePreference,
+        assumed_origin_br: fields.assumedOriginBr,
+        iata_code: fields.iataCode,
     };
+}
+
+export function validateBudgetToolArgs(rawArgs: unknown): BudgetValidationResult {
+    const raw = getRawBudgetArgs(rawArgs);
+    if (!raw) {
+        return buildInvalidBudgetResult(['destination_city', 'origin_city', 'dates', 'adults']);
+    }
+
+    const fields = sanitizeBudgetFields(raw);
+    const destinationReference = [fields.destination, fields.destinationCity, fields.destinationRegion].filter(Boolean).join(' ');
+    const safetyBlock = detectBlockedDestination(destinationReference);
+    if (safetyBlock) {
+        return buildInvalidBudgetResult([], safetyBlock);
+    }
+
+    const tripScope = resolveBudgetTripScope(raw.trip_scope, destinationReference, fields.originRegion);
+    const missing = collectMissingBudgetFields({
+        destination: fields.destination,
+        destinationCity: fields.destinationCity,
+        originCity: fields.originCity,
+        dates: fields.dates,
+        adults: fields.adults,
+        tripScope,
+    });
+    if (missing.length > 0) {
+        return buildInvalidBudgetResult(missing);
+    }
+
+    const normalizedArgs = buildNormalizedBudgetArgs(fields, tripScope as TripScope);
 
     return {
         valid: true,

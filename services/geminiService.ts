@@ -33,6 +33,20 @@ interface ChatResponse {
   };
 }
 
+interface GenerateFunctionCall {
+  name?: string;
+  args?: BudgetFunctionArgs;
+}
+
+interface GenerateApiResponse {
+  text?: string;
+  chips?: string[];
+  functionCall?: GenerateFunctionCall;
+  error?: string;
+  code?: string;
+  retryAfter?: number;
+}
+
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
   if (typeof error === 'object' && error !== null && 'message' in error) {
@@ -80,6 +94,137 @@ const cleanOptional = (value?: string): string => {
   return value.trim();
 };
 
+const buildContactFallbackResponse = (message: string): ChatResponse => ({
+  text: withContactFallback(message),
+});
+
+const buildServerErrorResponse = (status: number, errorData: GenerateApiResponse): ChatResponse | null => {
+  if (status === 429) {
+    return buildContactFallbackResponse(
+      `⏳ Você enviou muitas mensagens. Por favor, aguarde ${errorData.retryAfter || 60} segundos e tente novamente.`
+    );
+  }
+
+  if (status === 401 || status === 403) {
+    return buildContactFallbackResponse(
+      '⚠️ O chat está com um problema de configuração no servidor. Nossa equipe já precisa revisar isso.'
+    );
+  }
+
+  if (status === 503) {
+    return buildContactFallbackResponse(
+      '🕐 Nosso serviço de IA está temporariamente indisponível no momento.'
+    );
+  }
+
+  if (status !== 500) return null;
+
+  console.error('[GeminiService] Server error:', errorData);
+  if (errorData.code === 'SERVER_CONFIG_ERROR' || errorData.code === 'GEMINI_MODEL_ERROR') {
+    return buildContactFallbackResponse(
+      '⚠️ O chat está com um problema de configuração no servidor. Nossa equipe já precisa revisar isso.'
+    );
+  }
+
+  return buildContactFallbackResponse(
+    '⚙️ Tivemos um problema técnico interno. Por favor, tente novamente em alguns instantes.'
+  );
+};
+
+function buildBantSummary(args: BudgetFunctionArgs): string {
+  const budgetText = args.budget_range?.trim() || 'A definir';
+  const needText = args.need_summary?.trim() || 'Não informado';
+  const decisionRoleText = args.decision_role?.trim() || 'Não informado';
+  const timelineText = args.timeline_window?.trim() || 'Não informado';
+
+  return `Need: ${needText} | Authority: ${decisionRoleText} | Budget: ${budgetText} | Timeline: ${timelineText}`;
+}
+
+function buildBudgetMessage(args: BudgetFunctionArgs, originText: string, destinationText: string, baggagePreference: string): string {
+  const messageLines = [
+    'Olá! Vim pelo Chatbot da Anhangá. Gostaria de continuar meu atendimento:',
+    '',
+    `🛫 Origem: ${originText}`,
+    `📍 Destino: ${destinationText}`,
+    `📅 Datas: ${args.dates || 'A definir'}`,
+  ];
+
+  if (baggagePreference) {
+    messageLines.push(`🧳 Bagagem: ${baggagePreference}`);
+  }
+
+  return messageLines.join('\n');
+}
+
+function buildBudgetLink(args: BudgetFunctionArgs): ChatResponse['budgetLink'] {
+  const originText = formatLocation(args.origin_city, args.origin_region, 'Origem a definir');
+  const destinationText = formatLocation(
+    args.destination_city,
+    args.destination_region,
+    args.destination || 'Destino a definir'
+  );
+  const baggagePreference = cleanOptional(args.baggage_preference);
+
+  return {
+    origin: originText,
+    destination: destinationText,
+    dates: args.dates || 'A definir',
+    baggagePreference: baggagePreference || undefined,
+    url: getWhatsAppLink(buildBudgetMessage(args, originText, destinationText, baggagePreference), { appendTrackingRef: false }),
+    bantSummary: buildBantSummary(args),
+    iataCode: args.iata_code || undefined,
+  };
+}
+
+function applyGenerateApiData(result: ChatResponse, data: GenerateApiResponse): void {
+  if (data.text) {
+    result.text = data.text;
+  }
+
+  if (data.chips && Array.isArray(data.chips)) {
+    result.chips = data.chips;
+  }
+
+  if (data.functionCall?.name !== 'generate_budget_link') {
+    return;
+  }
+
+  const args = data.functionCall.args || {};
+  result.budgetLink = buildBudgetLink(args);
+
+  if (!result.text) {
+    result.text = "Prontinho! ✨ Preparei seu link direto para falar com nossos especialistas. É só clicar abaixo 👇";
+  }
+}
+
+function buildUnexpectedServiceError(error: unknown): ChatResponse {
+  console.error("[GeminiService] Erro ao consultar Gemini:", error);
+  const errorMessage = getErrorMessage(error);
+  const errorName = getErrorName(error);
+
+  if (errorMessage.includes('API key missing') || errorMessage.includes('invalid')) {
+    return buildContactFallbackResponse(
+      '⚠️ O chat está com um problema de configuração no servidor. Nossa equipe já precisa revisar isso.'
+    );
+  }
+
+  if (errorMessage.includes('Failed to fetch') || errorName === 'TypeError') {
+    return buildContactFallbackResponse(
+      '🔌 Não foi possível conectar ao servidor. Verifique sua conexão com a internet ou tente novamente em alguns instantes.'
+    );
+  }
+
+  if (errorMessage.includes('Serviço temporariamente indisponível')) {
+    return buildContactFallbackResponse(
+      '🕐 Nosso serviço está temporariamente indisponível. Por favor, tente novamente em breve.'
+    );
+  }
+
+  return buildContactFallbackResponse(
+    '⚙️ Tivemos um problema técnico interno. Por favor, tente novamente em alguns instantes.'
+  );
+}
+
 export const getTravelAdvice = async (history: { role: 'user' | 'model', text: string }[]): Promise<ChatResponse> => {
   try {
     const contents = history.map(msg => ({
@@ -100,150 +245,23 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-
-      if (response.status === 429) {
-        const retryAfter = errorData.retryAfter || 60;
-        return {
-          text: withContactFallback(
-            `⏳ Você enviou muitas mensagens. Por favor, aguarde ${retryAfter} segundos e tente novamente.`
-          )
-        };
-      }
-
-      if (response.status === 401 || response.status === 403) {
-        return {
-          text: withContactFallback(
-            '⚠️ O chat está com um problema de configuração no servidor. Nossa equipe já precisa revisar isso.'
-          )
-        };
-      }
-
-      if (response.status === 503) {
-        return {
-          text: withContactFallback(
-            '🕐 Nosso serviço de IA está temporariamente indisponível no momento.'
-          )
-        };
-      }
-
-      if (response.status === 500) {
-        console.error('[GeminiService] Server error:', errorData);
-        if (errorData.code === 'SERVER_CONFIG_ERROR' || errorData.code === 'GEMINI_MODEL_ERROR') {
-          return {
-            text: withContactFallback(
-              '⚠️ O chat está com um problema de configuração no servidor. Nossa equipe já precisa revisar isso.'
-            )
-          };
-        }
-
-        return {
-          text: withContactFallback(
-            '⚙️ Tivemos um problema técnico interno. Por favor, tente novamente em alguns instantes.'
-          )
-        };
-      }
-
+      const errorData = await response.json().catch(() => ({} as GenerateApiResponse));
+      const handledError = buildServerErrorResponse(response.status, errorData);
+      if (handledError) return handledError;
       throw new Error(errorData.error || `Server responded with ${response.status}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as GenerateApiResponse;
     const result: ChatResponse = {};
-
-    if (data.text) {
-      result.text = data.text;
-    }
-
-    if (data.chips && Array.isArray(data.chips)) {
-      result.chips = data.chips;
-    }
-
-    if (data.functionCall && data.functionCall.name === 'generate_budget_link') {
-      const args: BudgetFunctionArgs = data.functionCall.args || {};
-
-      const originText = formatLocation(args.origin_city, args.origin_region, 'Origem a definir');
-      const destinationText = formatLocation(
-        args.destination_city,
-        args.destination_region,
-        args.destination || 'Destino a definir'
-      );
-
-      const budgetText = args.budget_range?.trim() || 'A definir';
-      const needText = args.need_summary?.trim() || 'Não informado';
-      const decisionRoleText = args.decision_role?.trim() || 'Não informado';
-      const timelineText = args.timeline_window?.trim() || 'Não informado';
-      const bantSummary = `Need: ${needText} | Authority: ${decisionRoleText} | Budget: ${budgetText} | Timeline: ${timelineText}`;
-
-      const baggagePreference = cleanOptional(args.baggage_preference);
-
-      const messageLines = [
-        'Olá! Vim pelo Chatbot da Anhangá. Gostaria de continuar meu atendimento:',
-        '',
-        `🛫 Origem: ${originText}`,
-        `📍 Destino: ${destinationText}`,
-        `📅 Datas: ${args.dates || 'A definir'}`,
-      ];
-
-      if (baggagePreference) {
-        messageLines.push(`🧳 Bagagem: ${baggagePreference}`);
-      }
-
-      result.budgetLink = {
-        origin: originText,
-        destination: destinationText,
-        dates: args.dates || 'A definir',
-        baggagePreference: baggagePreference || undefined,
-        url: getWhatsAppLink(messageLines.join('\n'), { appendTrackingRef: false }),
-        bantSummary,
-        iataCode: args.iata_code || undefined,
-      };
-
-      if (!result.text) {
-        result.text = "Prontinho! ✨ Preparei seu link direto para falar com nossos especialistas. É só clicar abaixo 👇";
-      }
-    }
+    applyGenerateApiData(result, data);
 
     if (!result.text && !result.budgetLink) {
-      result.text = withContactFallback(
-        'Não consegui gerar uma resposta agora. Pode reformular sua pergunta e tentar novamente?'
-      );
+      result.text = withContactFallback('Não consegui gerar uma resposta agora. Pode reformular sua pergunta e tentar novamente?');
     }
 
     return result;
 
   } catch (error: unknown) {
-    console.error("[GeminiService] Erro ao consultar Gemini:", error);
-    const errorMessage = getErrorMessage(error);
-    const errorName = getErrorName(error);
-
-    if (errorMessage.includes('API key missing') || errorMessage.includes('invalid')) {
-      return {
-        text: withContactFallback(
-          '⚠️ O chat está com um problema de configuração no servidor. Nossa equipe já precisa revisar isso.'
-        )
-      };
-    }
-
-    if (errorMessage.includes('Failed to fetch') || errorName === 'TypeError') {
-      return {
-        text: withContactFallback(
-          '🔌 Não foi possível conectar ao servidor. Verifique sua conexão com a internet ou tente novamente em alguns instantes.'
-        )
-      };
-    }
-
-    if (errorMessage.includes('Serviço temporariamente indisponível')) {
-      return {
-        text: withContactFallback(
-          '🕐 Nosso serviço está temporariamente indisponível. Por favor, tente novamente em breve.'
-        )
-      };
-    }
-
-    return {
-      text: withContactFallback(
-        '⚙️ Tivemos um problema técnico interno. Por favor, tente novamente em alguns instantes.'
-      )
-    };
+    return buildUnexpectedServiceError(error);
   }
 };

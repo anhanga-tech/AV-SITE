@@ -53,38 +53,44 @@ export function normalizeUtms(value: unknown): LeadUtms {
     };
 }
 
+function toRecord(value: unknown): Record<string, unknown> {
+    return value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
+}
+
+function sanitizeTrackingKey(key: string): string {
+    return key.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;').substring(0, 64);
+}
+
+function normalizeTrackingExtras(source: Record<string, unknown>): Record<string, string> | undefined {
+    const extrasInput = toRecord(source.extras);
+    const extras: Record<string, string> = {};
+
+    const appendExtra = (key: string, raw: unknown) => {
+        if (Object.keys(extras).length >= 15) return;
+
+        const normalized = normalizeNullable(raw);
+        if (!normalized) return;
+
+        extras[sanitizeTrackingKey(key)] = normalized;
+    };
+
+    for (const [key, raw] of Object.entries(extrasInput)) {
+        appendExtra(key, raw);
+    }
+
+    for (const [key, raw] of Object.entries(source)) {
+        if (key === 'extras' || KNOWN_TRACKING_KEYS.has(key)) continue;
+        appendExtra(key, raw);
+    }
+
+    return Object.keys(extras).length > 0 ? extras : undefined;
+}
+
 /**
  * Normalizes tracking parameters.
  */
 export function normalizeTracking(value: unknown, utms: LeadUtms): LeadTracking {
-    const source = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
-    const extrasInput = source.extras && typeof source.extras === 'object'
-        ? (source.extras as Record<string, unknown>)
-        : {};
-
-    const extras: Record<string, string> = {};
-    let count = 0;
-
-    const processExtra = (key: string, raw: unknown) => {
-        const normalized = normalizeNullable(raw);
-        if (normalized) {
-            const cleanKey = key.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;').substring(0, 64);
-            extras[cleanKey] = normalized;
-            count++;
-        }
-    };
-
-    // Limit the number of extra properties to 15 to prevent payload inflation
-    for (const [key, raw] of Object.entries(extrasInput)) {
-        if (count >= 15) break;
-        processExtra(key, raw);
-    }
-
-    for (const [key, raw] of Object.entries(source)) {
-        if (count >= 15) break;
-        if (key === 'extras' || KNOWN_TRACKING_KEYS.has(key)) continue;
-        processExtra(key, raw);
-    }
+    const source = toRecord(value);
 
     return {
         utm_source: normalizeNullable(source.utm_source) ?? utms.utm_source,
@@ -101,7 +107,7 @@ export function normalizeTracking(value: unknown, utms: LeadUtms): LeadTracking 
         wbraid: normalizeNullable(source.wbraid),
         gbraid: normalizeNullable(source.gbraid),
         fbc: normalizeNullable(source.fbc),
-        extras: Object.keys(extras).length > 0 ? extras : undefined,
+        extras: normalizeTrackingExtras(source),
     };
 }
 
