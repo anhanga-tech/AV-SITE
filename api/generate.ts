@@ -23,6 +23,10 @@ const RATE_LIMIT_MAX_REQUESTS = 10; // Max 10 requests per minute per IP
 const GEMINI_3_DEFAULT_TEMPERATURE = 1.0;
 const LEGACY_DEFAULT_TEMPERATURE = 0.7;
 
+export const config = {
+    runtime: 'edge', // Fix for Vercel FUNCTION_INVOCATION_FAILED due to environment mismatch
+};
+
 interface ApiErrorShape {
     status?: number;
     message?: string;
