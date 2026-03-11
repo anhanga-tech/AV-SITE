@@ -1,51 +1,21 @@
-// Diagnostic: lazy-load all dependencies to surface the exact failing module
-let _deps: Awaited<ReturnType<typeof loadDeps>> | null = null;
-
-async function loadDeps() {
-    const [
-        genaiMod,
-        rateLimitMod,
-        networkMod,
-        toolsMod,
-        promptMod,
-        constantsMod,
-        utilsMod,
-        validationMod
-    ] = await Promise.all([
-        import("@google/genai"),
-        import('../lib/rate-limit'),
-        import('../lib/network'),
-        import('../lib/ai/tools'),
-        import('../lib/ai/prompt'),
-        import('../lib/ai/constants'),
-        import('../lib/ai/utils'),
-        import('../lib/ai/validation'),
-    ]);
-    return {
-        GoogleGenAI: genaiMod.GoogleGenAI,
-        checkRateLimitInternal: rateLimitMod.checkRateLimit,
-        buildCorsHeaders: networkMod.buildCorsHeaders,
-        getClientIP: networkMod.getClientIP,
-        budgetTool: toolsMod.budgetTool,
-        SYSTEM_INSTRUCTION: promptMod.SYSTEM_INSTRUCTION,
-        DEFAULT_GEMINI_MODEL: constantsMod.DEFAULT_GEMINI_MODEL,
-        resolveMaxMessageLength: utilsMod.resolveMaxMessageLength,
-        hasOversizedMessage: utilsMod.hasOversizedMessage,
-        extractBudgetToolCallFromText: utilsMod.extractBudgetToolCallFromText,
-        stripToolCallJsonBlock: utilsMod.stripToolCallJsonBlock,
-        extractChipsFromText: utilsMod.extractChipsFromText,
-        validateBudgetToolArgs: validationMod.validateBudgetToolArgs,
-        buildSafetyMessage: validationMod.buildSafetyMessage,
-        buildRefinementMessage: validationMod.buildRefinementMessage,
-    };
-}
-
-async function getDeps() {
-    if (!_deps) _deps = await loadDeps();
-    return _deps;
-}
-
-type Deps = Awaited<ReturnType<typeof getDeps>>;
+import { GoogleGenAI } from "@google/genai";
+import { checkRateLimit } from '../lib/rate-limit';
+import { buildCorsHeaders, getClientIP } from '../lib/network';
+import { budgetTool } from '../lib/ai/tools';
+import { SYSTEM_INSTRUCTION } from '../lib/ai/prompt';
+import { DEFAULT_GEMINI_MODEL } from '../lib/ai/constants';
+import {
+    resolveMaxMessageLength,
+    hasOversizedMessage,
+    extractBudgetToolCallFromText,
+    stripToolCallJsonBlock,
+    extractChipsFromText,
+} from '../lib/ai/utils';
+import {
+    validateBudgetToolArgs,
+    buildSafetyMessage,
+    buildRefinementMessage,
+} from '../lib/ai/validation';
 
 // Configuration
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
@@ -144,28 +114,6 @@ function normalizeError(error: unknown): { status?: number; message: string } {
     };
 }
 
-function buildModuleLoadErrorResponse(loadError: unknown): Response {
-    const msg = loadError instanceof Error ? loadError.message : String(loadError);
-    const stack = loadError instanceof Error ? loadError.stack : undefined;
-    console.error('FATAL: Failed to load dependencies:', msg, stack);
-
-    return new Response(JSON.stringify({
-        code: 'MODULE_LOAD_ERROR',
-        error: 'Erro ao carregar dependências do servidor',
-    }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-    });
-}
-
-async function loadRuntimeDeps(): Promise<Deps | Response> {
-    try {
-        return await getDeps();
-    } catch (loadError: unknown) {
-        return buildModuleLoadErrorResponse(loadError);
-    }
-}
-
 function buildMethodNotAllowedResponse(corsHeaders: Record<string, string>): Response {
     return buildJsonResponse({ error: 'Method not allowed' }, 405, corsHeaders);
 }
@@ -179,11 +127,10 @@ function buildRateLimitHeaders(rateLimit: { resetIn: number; remaining: number }
 
 async function getRateLimitState(
     request: Request,
-    deps: Pick<Deps, 'checkRateLimitInternal' | 'getClientIP'>,
     corsHeaders: Record<string, string>,
-): Promise<Response | { rateLimit: Awaited<ReturnType<Deps['checkRateLimitInternal']>> }> {
-    const clientIP = deps.getClientIP(request);
-    const rateLimit = await deps.checkRateLimitInternal(clientIP, {
+): Promise<Response | { rateLimit: Awaited<ReturnType<typeof checkRateLimit>> }> {
+    const clientIP = getClientIP(request);
+    const rateLimit = await checkRateLimit(clientIP, {
         limit: RATE_LIMIT_MAX_REQUESTS,
         windowMs: RATE_LIMIT_WINDOW_MS,
         prefix: 'ratelimit:generate',
@@ -231,7 +178,6 @@ function getConfiguredApiKey(corsHeaders: Record<string, string>): string | Resp
 
 async function parseGenerateContents(
     request: Request,
-    deps: Pick<Deps, 'resolveMaxMessageLength' | 'hasOversizedMessage'>,
     corsHeaders: Record<string, string>,
 ): Promise<unknown[] | Response> {
     const { contents } = await request.json() as GenerateRequestBody;
@@ -244,8 +190,8 @@ async function parseGenerateContents(
         return buildJsonResponse({ error: 'Too many messages in history' }, 400, corsHeaders);
     }
 
-    const maxMessageLength = deps.resolveMaxMessageLength(process.env.MAX_MESSAGE_LENGTH);
-    if (deps.hasOversizedMessage(contents, maxMessageLength)) {
+    const maxMessageLength = resolveMaxMessageLength(process.env.MAX_MESSAGE_LENGTH);
+    if (hasOversizedMessage(contents, maxMessageLength)) {
         return buildJsonResponse({ error: 'Message too long' }, 400, corsHeaders);
     }
 
@@ -256,16 +202,15 @@ async function requestModelResponse(
     apiKey: string,
     modelName: string,
     contents: unknown[],
-    deps: Pick<Deps, 'GoogleGenAI' | 'budgetTool' | 'SYSTEM_INSTRUCTION'>,
 ): Promise<ModelResponseShape> {
-    const ai = new deps.GoogleGenAI({ apiKey });
+    const ai = new GoogleGenAI({ apiKey });
 
     return await ai.models.generateContent({
         model: modelName,
         contents,
         config: {
-            tools: [{ functionDeclarations: [deps.budgetTool] }],
-            systemInstruction: deps.SYSTEM_INSTRUCTION,
+            tools: [{ functionDeclarations: [budgetTool] }],
+            systemInstruction: SYSTEM_INSTRUCTION,
             temperature: resolveTemperature(modelName),
         }
     }) as ModelResponseShape;
@@ -273,7 +218,6 @@ async function requestModelResponse(
 
 function extractModelOutput(
     response: ModelResponseShape,
-    deps: Pick<Deps, 'extractBudgetToolCallFromText' | 'stripToolCallJsonBlock'>,
 ): { responseText?: string; responseFunctionCall?: ResponseFunctionCall } {
     const candidate = response.candidates?.[0];
     const textPart = collectTextParts(candidate?.content?.parts);
@@ -283,10 +227,10 @@ function extractModelOutput(
     let responseFunctionCall = functionCallPart?.functionCall;
 
     if (!responseFunctionCall && responseText) {
-        const fallbackToolCall = deps.extractBudgetToolCallFromText(responseText);
+        const fallbackToolCall = extractBudgetToolCallFromText(responseText);
         if (fallbackToolCall) {
             responseFunctionCall = fallbackToolCall;
-            responseText = deps.stripToolCallJsonBlock(responseText)
+            responseText = stripToolCallJsonBlock(responseText)
                 || 'Prontinho! ✨ Preparei seu link direto para falar com nossos especialistas. É só clicar abaixo 👇';
         }
     }
@@ -334,22 +278,21 @@ function ensureResponseText(
 
 function normalizeBudgetToolResponse(
     output: { responseText: string; responseFunctionCall?: ResponseFunctionCall },
-    deps: Pick<Deps, 'validateBudgetToolArgs' | 'buildSafetyMessage' | 'buildRefinementMessage'>,
 ): { responseText: string; responseFunctionCall?: ResponseFunctionCall } {
     if (output.responseFunctionCall?.name !== 'generate_budget_link') {
         return output;
     }
 
-    const validation = deps.validateBudgetToolArgs(output.responseFunctionCall.args);
+    const validation = validateBudgetToolArgs(output.responseFunctionCall.args);
     if (validation.safetyBlock) {
         return {
-            responseText: deps.buildSafetyMessage(validation.safetyBlock),
+            responseText: buildSafetyMessage(validation.safetyBlock),
         };
     }
 
     if (!validation.valid || !validation.normalizedArgs) {
         return {
-            responseText: deps.buildRefinementMessage(validation.missing),
+            responseText: buildRefinementMessage(validation.missing),
         };
     }
 
@@ -364,19 +307,10 @@ function normalizeBudgetToolResponse(
 
 function buildGenerateSuccessBody(
     response: ModelResponseShape,
-    deps: Pick<
-        Deps,
-        'extractBudgetToolCallFromText'
-        | 'stripToolCallJsonBlock'
-        | 'validateBudgetToolArgs'
-        | 'buildSafetyMessage'
-        | 'buildRefinementMessage'
-        | 'extractChipsFromText'
-    >,
 ): Record<string, unknown> {
-    const rawOutput = extractModelOutput(response, deps);
-    const normalizedOutput = normalizeBudgetToolResponse(ensureResponseText(response, rawOutput), deps);
-    const { text, chips } = deps.extractChipsFromText(normalizedOutput.responseText);
+    const rawOutput = extractModelOutput(response);
+    const normalizedOutput = normalizeBudgetToolResponse(ensureResponseText(response, rawOutput));
+    const { text, chips } = extractChipsFromText(normalizedOutput.responseText);
 
     return {
         text,
@@ -424,18 +358,8 @@ function buildGeminiErrorResponse(error: unknown, corsHeaders: Record<string, st
 }
 
 export default async function handler(request: Request) {
-    const deps = await loadRuntimeDeps();
-    if (deps instanceof Response) return deps;
-
-    const {
-        GoogleGenAI, checkRateLimitInternal, buildCorsHeaders, getClientIP,
-        budgetTool, SYSTEM_INSTRUCTION, DEFAULT_GEMINI_MODEL,
-        resolveMaxMessageLength, hasOversizedMessage, extractBudgetToolCallFromText,
-        stripToolCallJsonBlock, extractChipsFromText,
-        validateBudgetToolArgs, buildSafetyMessage, buildRefinementMessage,
-    } = deps;
-
     const corsHeaders = buildCorsHeaders();
+
     if (request.method === 'OPTIONS') {
         return new Response(null, { status: 204, headers: corsHeaders });
     }
@@ -444,32 +368,21 @@ export default async function handler(request: Request) {
         return buildMethodNotAllowedResponse(corsHeaders);
     }
 
-    const rateLimitState = await getRateLimitState(request, { checkRateLimitInternal, getClientIP }, corsHeaders);
+    const rateLimitState = await getRateLimitState(request, corsHeaders);
     if (rateLimitState instanceof Response) return rateLimitState;
 
     try {
         const apiKey = getConfiguredApiKey(corsHeaders);
         if (apiKey instanceof Response) return apiKey;
 
-        const contents = await parseGenerateContents(request, { resolveMaxMessageLength, hasOversizedMessage }, corsHeaders);
+        const contents = await parseGenerateContents(request, corsHeaders);
         if (contents instanceof Response) return contents;
 
         const modelName = process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
-        const response = await requestModelResponse(apiKey, modelName, contents, {
-            GoogleGenAI,
-            budgetTool,
-            SYSTEM_INSTRUCTION,
-        });
+        const response = await requestModelResponse(apiKey, modelName, contents);
 
         return buildJsonResponse(
-            buildGenerateSuccessBody(response, {
-                extractBudgetToolCallFromText,
-                stripToolCallJsonBlock,
-                validateBudgetToolArgs,
-                buildSafetyMessage,
-                buildRefinementMessage,
-                extractChipsFromText,
-            }),
+            buildGenerateSuccessBody(response),
             200,
             {
                 ...buildRateLimitHeaders(rateLimitState.rateLimit),
