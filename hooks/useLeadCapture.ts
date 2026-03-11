@@ -40,6 +40,9 @@ export type SubmitLeadHookResult =
         status?: number;
     };
 
+type SubmitLeadSuccessResult = Extract<SubmitLeadHookResult, { ok: true }>;
+type SubmitLeadFailureResult = Extract<SubmitLeadHookResult, { ok: false }>;
+
 const EMPTY_LEAD_DRAFT: LeadDraft = {
     firstName: '',
     lastName: '',
@@ -186,6 +189,98 @@ function truncateResponseText(value: string): string {
     return normalized.length > 180 ? `${normalized.slice(0, 177)}...` : normalized;
 }
 
+function buildSubmitLeadPayload(
+    leadDraft: LeadDraft,
+    overrides: LeadDraftPartial,
+    latestTracking: LeadTracking,
+    latestUtms: LeadUtms,
+): SubmitLeadRequest {
+    const merged = mergeLeadDraft(leadDraft, overrides);
+
+    return {
+        firstName: cleanValue(merged.firstName),
+        lastName: cleanValue(merged.lastName),
+        email: cleanValue(merged.email).toLowerCase(),
+        bantSummary: cleanValue(merged.bantSummary),
+        destination: cleanValue(merged.destination),
+        utms: latestUtms,
+        tracking: {
+            ...latestTracking,
+            ...latestUtms,
+        },
+    };
+}
+
+function getSubmitLeadValidationError(payload: SubmitLeadRequest): string | null {
+    if (!payload.firstName || !payload.lastName || !payload.email || !payload.bantSummary || !payload.destination) {
+        return 'Preencha todos os campos obrigatórios (incluindo destino) antes de enviar.';
+    }
+
+    return null;
+}
+
+type ParsedSubmitLeadResponse = {
+    responseRequestId?: string;
+    responseText: string;
+    rawData: SubmitLeadResponseData;
+};
+
+async function parseSubmitLeadResponse(response: Response): Promise<ParsedSubmitLeadResponse> {
+    const responseText = await response.text();
+
+    return {
+        responseText,
+        rawData: parseResponseData(responseText),
+        responseRequestId: response.headers.get('x-request-id') || undefined,
+    };
+}
+
+function buildSubmitLeadErrorResult(
+    status: number,
+    parsed: ParsedSubmitLeadResponse,
+): SubmitLeadFailureResult {
+    const apiError = typeof parsed.rawData.error === 'string'
+        ? parsed.rawData.error
+        : parsed.responseText && !isHtmlPayload(parsed.responseText)
+            ? truncateResponseText(parsed.responseText)
+            : `Falha ao enviar lead para o HubSpot (status ${status}).`;
+    const apiCode = typeof parsed.rawData.code === 'string'
+        ? parsed.rawData.code
+        : 'HUBSPOT_API_ERROR';
+
+    return {
+        ok: false,
+        requestId: parsed.rawData.requestId || parsed.responseRequestId,
+        error: apiError,
+        code: apiCode,
+        status,
+    };
+}
+
+function buildSubmitLeadSuccessResult(parsed: ParsedSubmitLeadResponse): SubmitLeadSuccessResult {
+    return {
+        ok: true,
+        requestId: typeof parsed.rawData.requestId === 'string'
+            ? parsed.rawData.requestId
+            : (parsed.responseRequestId || 'unknown'),
+        contactId: typeof parsed.rawData.contactId === 'string' ? parsed.rawData.contactId : 'unknown',
+        dealId: typeof parsed.rawData.dealId === 'string' ? parsed.rawData.dealId : undefined,
+        warning: typeof parsed.rawData.warning === 'string' ? parsed.rawData.warning : undefined,
+    };
+}
+
+function buildNetworkErrorResult(requestError: unknown): SubmitLeadFailureResult {
+    const message = requestError instanceof Error
+        ? requestError.message
+        : 'Falha de rede ao enviar lead.';
+
+    return {
+        ok: false,
+        error: message,
+        code: 'NETWORK_ERROR',
+    };
+}
+
 export function useLeadCapture() {
     const [tracking, setTracking] = useState<LeadTracking>(() => captureInitialTracking());
     const [utms, setUtms] = useState<LeadUtms>(() => extractUtms(captureInitialTracking()));
@@ -227,24 +322,11 @@ export function useLeadCapture() {
         setIsSubmitting(true);
 
         const { tracking: latestTracking, utms: latestUtms } = refreshTrackingState();
-        const merged = mergeLeadDraft(leadDraft, overrides);
+        const payload = buildSubmitLeadPayload(leadDraft, overrides, latestTracking, latestUtms);
+        const validationError = getSubmitLeadValidationError(payload);
 
-        const payload: SubmitLeadRequest = {
-            firstName: cleanValue(merged.firstName),
-            lastName: cleanValue(merged.lastName),
-            email: cleanValue(merged.email).toLowerCase(),
-            bantSummary: cleanValue(merged.bantSummary),
-            destination: cleanValue(merged.destination),
-            utms: latestUtms,
-            tracking: {
-                ...latestTracking,
-                ...latestUtms,
-            },
-        };
-
-        if (!payload.firstName || !payload.lastName || !payload.email || !payload.bantSummary || !payload.destination) {
+        if (validationError) {
             setIsSubmitting(false);
-            const validationError = 'Preencha todos os campos obrigatórios (incluindo destino) antes de enviar.';
             setError(validationError);
 
             return {
@@ -263,61 +345,22 @@ export function useLeadCapture() {
                 body: JSON.stringify(payload),
             });
 
-            const responseText = await response.text();
-            const rawData = parseResponseData(responseText);
-            const responseRequestId = response.headers.get('x-request-id') || undefined;
+            const parsed = await parseSubmitLeadResponse(response);
 
             if (!response.ok) {
-                const apiError = typeof rawData.error === 'string'
-                    ? rawData.error
-                    : responseText && !isHtmlPayload(responseText)
-                        ? truncateResponseText(responseText)
-                        : `Falha ao enviar lead para o HubSpot (status ${response.status}).`;
-                const apiCode = typeof rawData.code === 'string'
-                    ? rawData.code
-                    : 'HUBSPOT_API_ERROR';
-
-                setError(apiError);
+                const failure = buildSubmitLeadErrorResult(response.status, parsed);
+                setError(failure.error);
                 setIsSubmitting(false);
-
-                return {
-                    ok: false,
-                    requestId: rawData.requestId || responseRequestId,
-                    error: apiError,
-                    code: apiCode,
-                    status: response.status,
-                };
+                return failure;
             }
 
-            const requestId = typeof rawData.requestId === 'string'
-                ? rawData.requestId
-                : (responseRequestId || 'unknown');
-            const contactId = typeof rawData.contactId === 'string' ? rawData.contactId : 'unknown';
-            const dealId = typeof rawData.dealId === 'string' ? rawData.dealId : undefined;
-            const warning = typeof rawData.warning === 'string' ? rawData.warning : undefined;
-
             setIsSubmitting(false);
-
-            return {
-                ok: true,
-                requestId,
-                contactId,
-                dealId,
-                warning,
-            };
+            return buildSubmitLeadSuccessResult(parsed);
         } catch (requestError: unknown) {
-            const message = requestError instanceof Error
-                ? requestError.message
-                : 'Falha de rede ao enviar lead.';
-
-            setError(message);
+            const failure = buildNetworkErrorResult(requestError);
+            setError(failure.error);
             setIsSubmitting(false);
-
-            return {
-                ok: false,
-                error: message,
-                code: 'NETWORK_ERROR',
-            };
+            return failure;
         }
     };
 
