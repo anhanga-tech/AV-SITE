@@ -105,8 +105,8 @@ const AIChat: React.FC = () => {
     const result = await submitLead({ ...payload });
 
     if (result.ok) {
-      if (typeof window !== 'undefined' && (window as any).dataLayer) {
-        (window as any).dataLayer.push({
+      if (typeof window !== 'undefined' && window.dataLayer) {
+        window.dataLayer.push({
           event: 'form_submission',
           form_type: 'ai_chatbot_lead',
           destination: payload.fallbackUrl.includes('whatsapp') ? 'whatsapp' : 'lead_captured',

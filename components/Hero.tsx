@@ -173,7 +173,7 @@ const Hero: React.FC = () => {
             animate="visible"
             variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1, delayChildren: 0.7 } } }}
           >
-            {QUICK_FEATURES.map((feat, i) => (
+            {QUICK_FEATURES.map((feat) => (
               <motion.div
                 key={feat.text}
                 variants={{

@@ -33,6 +33,24 @@ interface ChatResponse {
   };
 }
 
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === 'string') return message;
+  }
+  return '';
+}
+
+function getErrorName(error: unknown): string {
+  if (error instanceof Error) return error.name;
+  if (typeof error === 'object' && error !== null && 'name' in error) {
+    const name = (error as { name?: unknown }).name;
+    if (typeof name === 'string') return name;
+  }
+  return '';
+}
+
 const buildFallbackContactMarkdown = (): string => {
   const whatsappUrl = getWhatsAppLink(
     'Olá! Tive um problema no chat do site e gostaria de continuar meu atendimento pelo WhatsApp.',
@@ -193,10 +211,12 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
 
     return result;
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[GeminiService] Erro ao consultar Gemini:", error);
+    const errorMessage = getErrorMessage(error);
+    const errorName = getErrorName(error);
 
-    if (error?.message?.includes('API key missing') || error?.message?.includes('invalid')) {
+    if (errorMessage.includes('API key missing') || errorMessage.includes('invalid')) {
       return {
         text: withContactFallback(
           '⚠️ O chat está com um problema de configuração no servidor. Nossa equipe já precisa revisar isso.'
@@ -204,7 +224,7 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
       };
     }
 
-    if (error?.message?.includes('Failed to fetch') || error?.name === 'TypeError') {
+    if (errorMessage.includes('Failed to fetch') || errorName === 'TypeError') {
       return {
         text: withContactFallback(
           '🔌 Não foi possível conectar ao servidor. Verifique sua conexão com a internet ou tente novamente em alguns instantes.'
@@ -212,7 +232,7 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
       };
     }
 
-    if (error?.message?.includes('Serviço temporariamente indisponível')) {
+    if (errorMessage.includes('Serviço temporariamente indisponível')) {
       return {
         text: withContactFallback(
           '🕐 Nosso serviço está temporariamente indisponível. Por favor, tente novamente em breve.'

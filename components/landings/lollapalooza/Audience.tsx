@@ -1,8 +1,15 @@
 import React from 'react';
-import { Users, Heart, Baby } from 'lucide-react';
+import { Users, Heart, Baby, type LucideIcon } from 'lucide-react';
 import useIntersectionObserver from './hooks/useIntersectionObserver';
 
-const AudienceCard = ({ icon: Icon, title, description, image }: { icon: any, title: string, description: string, image: string }) => (
+interface AudienceCardProps {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  image: string;
+}
+
+const AudienceCard = ({ icon: Icon, title, description, image }: AudienceCardProps) => (
   <div className="group relative overflow-hidden rounded-2xl h-80 flex flex-col justify-end p-6 shadow-lg">
     <div className="absolute inset-0">
       <img src={image} alt={`Público ${title} - Anhangá Viagens`} width="600" height="800" loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
