@@ -1,21 +1,21 @@
 import { GoogleGenAI } from "@google/genai";
-import { checkRateLimit as checkRateLimitInternal } from '../lib/rate-limit.ts';
-import { buildCorsHeaders, getClientIP } from '../lib/network.ts';
-import { budgetTool } from '../lib/ai/tools.ts';
-import { SYSTEM_INSTRUCTION } from '../lib/ai/prompt.ts';
-import { DEFAULT_GEMINI_MODEL } from '../lib/ai/constants.ts';
+import { checkRateLimit as checkRateLimitInternal } from '../lib/rate-limit.js';
+import { buildCorsHeaders, getClientIP } from '../lib/network.js';
+import { budgetTool } from '../lib/ai/tools.js';
+import { SYSTEM_INSTRUCTION } from '../lib/ai/prompt.js';
+import { DEFAULT_GEMINI_MODEL } from '../lib/ai/constants.js';
 import {
     resolveMaxMessageLength,
     hasOversizedMessage,
     extractBudgetToolCallFromText,
     stripToolCallJsonBlock,
     extractChipsFromText
-} from '../lib/ai/utils.ts';
+} from '../lib/ai/utils.js';
 import {
     validateBudgetToolArgs,
     buildSafetyMessage,
     buildRefinementMessage
-} from '../lib/ai/validation.ts';
+} from '../lib/ai/validation.js';
 
 // Configuration
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
