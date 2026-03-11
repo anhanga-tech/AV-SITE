@@ -114,14 +114,14 @@ async function buildSsrBundle() {
       rollupOptions: {
         output: {
           manualChunks: undefined,
-          entryFileNames: 'entry-server.js',
+          entryFileNames: 'entry-server.mjs',
           format: 'es'
         }
       }
     }
   });
 
-  const serverEntryUrl = pathToFileURL(path.join(SSR_OUT_DIR, 'entry-server.js')).href;
+  const serverEntryUrl = pathToFileURL(path.join(SSR_OUT_DIR, 'entry-server.mjs')).href;
   return import(serverEntryUrl);
 }
 
