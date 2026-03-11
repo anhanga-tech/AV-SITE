@@ -1,21 +1,49 @@
-import { GoogleGenAI } from "@google/genai";
-import { checkRateLimit as checkRateLimitInternal } from '../lib/rate-limit';
-import { buildCorsHeaders, getClientIP } from '../lib/network';
-import { budgetTool } from '../lib/ai/tools';
-import { SYSTEM_INSTRUCTION } from '../lib/ai/prompt';
-import { DEFAULT_GEMINI_MODEL } from '../lib/ai/constants';
-import {
-    resolveMaxMessageLength,
-    hasOversizedMessage,
-    extractBudgetToolCallFromText,
-    stripToolCallJsonBlock,
-    extractChipsFromText
-} from '../lib/ai/utils';
-import {
-    validateBudgetToolArgs,
-    buildSafetyMessage,
-    buildRefinementMessage
-} from '../lib/ai/validation';
+// Diagnostic: lazy-load all dependencies to surface the exact failing module
+let _deps: Awaited<ReturnType<typeof loadDeps>> | null = null;
+
+async function loadDeps() {
+    const [
+        genaiMod,
+        rateLimitMod,
+        networkMod,
+        toolsMod,
+        promptMod,
+        constantsMod,
+        utilsMod,
+        validationMod
+    ] = await Promise.all([
+        import("@google/genai"),
+        import('../lib/rate-limit'),
+        import('../lib/network'),
+        import('../lib/ai/tools'),
+        import('../lib/ai/prompt'),
+        import('../lib/ai/constants'),
+        import('../lib/ai/utils'),
+        import('../lib/ai/validation'),
+    ]);
+    return {
+        GoogleGenAI: genaiMod.GoogleGenAI,
+        checkRateLimitInternal: rateLimitMod.checkRateLimit,
+        buildCorsHeaders: networkMod.buildCorsHeaders,
+        getClientIP: networkMod.getClientIP,
+        budgetTool: toolsMod.budgetTool,
+        SYSTEM_INSTRUCTION: promptMod.SYSTEM_INSTRUCTION,
+        DEFAULT_GEMINI_MODEL: constantsMod.DEFAULT_GEMINI_MODEL,
+        resolveMaxMessageLength: utilsMod.resolveMaxMessageLength,
+        hasOversizedMessage: utilsMod.hasOversizedMessage,
+        extractBudgetToolCallFromText: utilsMod.extractBudgetToolCallFromText,
+        stripToolCallJsonBlock: utilsMod.stripToolCallJsonBlock,
+        extractChipsFromText: utilsMod.extractChipsFromText,
+        validateBudgetToolArgs: validationMod.validateBudgetToolArgs,
+        buildSafetyMessage: validationMod.buildSafetyMessage,
+        buildRefinementMessage: validationMod.buildRefinementMessage,
+    };
+}
+
+async function getDeps() {
+    if (!_deps) _deps = await loadDeps();
+    return _deps;
+}
 
 // Configuration
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
@@ -84,6 +112,32 @@ function normalizeError(error: unknown): { status?: number; message: string } {
 }
 
 export default async function handler(request: Request) {
+    // Load deps with diagnostic error reporting
+    let deps: Awaited<ReturnType<typeof getDeps>>;
+    try {
+        deps = await getDeps();
+    } catch (loadError: unknown) {
+        const msg = loadError instanceof Error ? loadError.message : String(loadError);
+        const stack = loadError instanceof Error ? loadError.stack : undefined;
+        console.error('FATAL: Failed to load dependencies:', msg, stack);
+        return new Response(JSON.stringify({
+            code: 'MODULE_LOAD_ERROR',
+            error: 'Erro ao carregar dependências do servidor',
+            _debug: msg,
+        }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+        });
+    }
+
+    const {
+        GoogleGenAI, checkRateLimitInternal, buildCorsHeaders, getClientIP,
+        budgetTool, SYSTEM_INSTRUCTION, DEFAULT_GEMINI_MODEL,
+        resolveMaxMessageLength, hasOversizedMessage, extractBudgetToolCallFromText,
+        stripToolCallJsonBlock, extractChipsFromText,
+        validateBudgetToolArgs, buildSafetyMessage, buildRefinementMessage,
+    } = deps;
+
     // CORS headers for all responses
     const corsHeaders = buildCorsHeaders();
 
