@@ -15,6 +15,10 @@ import {
 import { sendGoogleConversion } from '../lib/conversions/google.js';
 import { sendMetaConversion } from '../lib/conversions/meta.js';
 
+export const config = {
+    runtime: 'edge',
+};
+
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
 const SUBMIT_LEAD_RATE_LIMIT_MAX_ENTRIES = 1000;
