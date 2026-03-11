@@ -7,12 +7,15 @@ import { buildCorsHeaders, getClientIP } from '../lib/network';
 import { budgetTool } from '../lib/ai/tools';
 import { SYSTEM_INSTRUCTION } from '../lib/ai/prompt';
 import { DEFAULT_GEMINI_MODEL } from '../lib/ai/constants';
+import { buildGenerateHandoff, type GenerateHandoff } from '../lib/ai/handoff';
+import type { BudgetToolArgs } from '../lib/ai/types';
 import {
     resolveMaxMessageLength,
     hasOversizedMessage,
     extractBudgetToolCallFromText,
     stripToolCallJsonBlock,
     extractChipsFromText,
+    normalizeText,
 } from '../lib/ai/utils';
 import {
     validateBudgetToolArgs,
@@ -25,6 +28,16 @@ const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
 const RATE_LIMIT_MAX_REQUESTS = 10; // Max 10 requests per minute per IP
 const GEMINI_3_DEFAULT_TEMPERATURE = 1.0;
 const LEGACY_DEFAULT_TEMPERATURE = 0.7;
+const HANDOFF_REPAIR_TEMPERATURE = 0.1;
+const HANDOFF_READY_MESSAGE = 'Perfeito. Seu pré-atendimento está pronto. Preencha seus dados abaixo para continuar com nossa equipe.';
+const HANDOFF_REPAIR_SYSTEM_INSTRUCTION = `${SYSTEM_INSTRUCTION}
+
+HANDOFF_REPAIR_POLICY
+- Sua tarefa agora é APENAS revisar o histórico e concluir o handoff corretamente.
+- Se os dados mínimos já estiverem disponíveis, use SOMENTE a ferramenta generate_budget_link.
+- Se ainda faltar dado obrigatório, responda com uma única mensagem curta pedindo apenas o dado faltante.
+- É proibido encerrar com link manual, markdown de CTA, URL, ou instrução para clicar no WhatsApp.
+- Não escreva JSON manual de ferramenta. Use a ferramenta real quando o handoff estiver pronto.`;
 
 interface ApiErrorShape {
     status?: number;
@@ -56,7 +69,7 @@ interface ResponseCandidateShape {
     finishReason?: string | null;
 }
 
-interface ModelResponseShape {
+export interface ModelResponseShape {
     candidates?: ResponseCandidateShape[];
     promptFeedback?: {
         blockReason?: string | null;
@@ -66,8 +79,27 @@ interface ModelResponseShape {
     text?: string | null;
 }
 
+interface GenerateSuccessBody {
+    text: string;
+    chips?: string[];
+    functionCall?: ResponseFunctionCall;
+    handoff?: GenerateHandoff;
+}
+
+interface RequestModelResponseOptions {
+    systemInstruction?: string;
+    temperature?: number;
+}
+
+interface BuildGenerateSuccessOptions {
+    apiKey: string;
+    modelName: string;
+    contents: unknown[];
+    repairModelResponse?: (repairContents: unknown[]) => Promise<ModelResponseShape>;
+}
+
 function buildJsonResponse(
-    body: Record<string, unknown>,
+    body: unknown,
     status: number,
     corsHeaders: Record<string, string>,
 ): Response {
@@ -205,6 +237,7 @@ async function requestModelResponse(
     apiKey: string,
     modelName: string,
     contents: unknown[],
+    options: RequestModelResponseOptions = {},
 ): Promise<ModelResponseShape> {
     const { GoogleGenAI } = await import("@google/genai");
     const ai = new GoogleGenAI({ apiKey });
@@ -214,10 +247,52 @@ async function requestModelResponse(
         contents,
         config: {
             tools: [{ functionDeclarations: [budgetTool] }],
-            systemInstruction: SYSTEM_INSTRUCTION,
-            temperature: resolveTemperature(modelName),
+            systemInstruction: options.systemInstruction || SYSTEM_INSTRUCTION,
+            temperature: options.temperature ?? resolveTemperature(modelName),
         }
     }) as ModelResponseShape;
+}
+
+function containsWhatsAppUrl(text?: string): boolean {
+    if (!text) return false;
+    return /wa\.me|api\.whatsapp\.com/i.test(text);
+}
+
+export function containsInvalidTextualHandoff(text?: string): boolean {
+    if (!text) return false;
+    if (containsWhatsAppUrl(text)) return true;
+
+    const normalized = normalizeText(text);
+    const invalidSignals = [
+        'clique aqui para receber seu orcamento',
+        'clique no link abaixo',
+        'finalizar seu atendimento',
+        'falar com nossos especialistas',
+        'preparei seu link direto',
+        'preparei tudo por aqui',
+        'orcamento personalizado',
+    ];
+
+    return invalidSignals.some((signal) => normalized.includes(signal));
+}
+
+function stripUnsafeWhatsAppLinks(text: string): string {
+    return text
+        .replace(/\[([^\]]+)\]\((https?:\/\/(?:wa\.me|api\.whatsapp\.com)[^)]+)\)/gi, '$1')
+        .replace(/https?:\/\/(?:wa\.me|api\.whatsapp\.com)\S*/gi, '')
+        .trim();
+}
+
+function buildHandoffRepairPrompt(originalText: string): string {
+    return [
+        'A resposta anterior tentou encerrar o atendimento com CTA textual/manual, o que é inválido.',
+        'Reavalie apenas o histórico e a resposta anterior.',
+        'Se já houver dados suficientes, use SOMENTE a ferramenta generate_budget_link.',
+        'Se faltar dado obrigatório, responda com uma única pergunta curta, sem links, sem markdown e sem CTA externo.',
+        '',
+        'Resposta inválida anterior:',
+        originalText,
+    ].join('\n');
 }
 
 function extractModelOutput(
@@ -309,17 +384,104 @@ function normalizeBudgetToolResponse(
     };
 }
 
-function buildGenerateSuccessBody(
+function buildStructuredHandoff(
+    responseFunctionCall: ResponseFunctionCall | undefined,
+    source: GenerateHandoff['source'],
+): GenerateHandoff | undefined {
+    if (responseFunctionCall?.name !== 'generate_budget_link') {
+        return undefined;
+    }
+
+    const args = responseFunctionCall.args;
+    if (!args || typeof args !== 'object') {
+        return undefined;
+    }
+
+    return buildGenerateHandoff(args as BudgetToolArgs, source);
+}
+
+async function repairTextualHandoff(
     response: ModelResponseShape,
-): Record<string, unknown> {
-    const rawOutput = extractModelOutput(response);
-    const normalizedOutput = normalizeBudgetToolResponse(ensureResponseText(response, rawOutput));
-    const { text, chips } = extractChipsFromText(normalizedOutput.responseText);
+    responseText: string,
+    options: BuildGenerateSuccessOptions,
+): Promise<GenerateSuccessBody | null> {
+    console.warn('SERVER: invalid textual handoff detected', {
+        responseId: response.responseId,
+        modelVersion: response.modelVersion,
+        preview: responseText.slice(0, 160),
+    });
+
+    const repairContents = [
+        ...options.contents,
+        { role: 'model', parts: [{ text: responseText }] },
+        { role: 'user', parts: [{ text: buildHandoffRepairPrompt(responseText) }] },
+    ];
+
+    const repairResponse = options.repairModelResponse
+        ? await options.repairModelResponse(repairContents)
+        : await requestModelResponse(options.apiKey, options.modelName, repairContents, {
+            systemInstruction: HANDOFF_REPAIR_SYSTEM_INSTRUCTION,
+            temperature: HANDOFF_REPAIR_TEMPERATURE,
+        });
+
+    const repairRawOutput = extractModelOutput(repairResponse);
+    const repairValidation = repairRawOutput.responseFunctionCall?.name === 'generate_budget_link'
+        ? validateBudgetToolArgs(repairRawOutput.responseFunctionCall.args)
+        : undefined;
+    const repairNormalizedOutput = normalizeBudgetToolResponse(ensureResponseText(repairResponse, repairRawOutput));
+    const repairedHandoff = buildStructuredHandoff(repairNormalizedOutput.responseFunctionCall, 'repair');
+
+    if (repairedHandoff) {
+        console.log('SERVER: handoff repaired', {
+            responseId: response.responseId,
+            repairResponseId: repairResponse.responseId,
+            source: repairedHandoff.source,
+        });
+
+        return {
+            text: HANDOFF_READY_MESSAGE,
+            functionCall: repairNormalizedOutput.responseFunctionCall,
+            handoff: repairedHandoff,
+        };
+    }
+
+    console.warn('SERVER: handoff repair failed', {
+        responseId: response.responseId,
+        repairResponseId: repairResponse.responseId,
+        missing: repairValidation?.missing || [],
+    });
+
+    const { text, chips } = extractChipsFromText(stripUnsafeWhatsAppLinks(repairNormalizedOutput.responseText));
 
     return {
         text,
         chips,
-        functionCall: normalizedOutput.responseFunctionCall
+    };
+}
+
+export async function buildGenerateSuccessBody(
+    response: ModelResponseShape,
+    options: BuildGenerateSuccessOptions,
+): Promise<GenerateSuccessBody> {
+    const rawOutput = extractModelOutput(response);
+    const normalizedOutput = normalizeBudgetToolResponse(ensureResponseText(response, rawOutput));
+    const handoff = buildStructuredHandoff(normalizedOutput.responseFunctionCall, 'tool');
+
+    if (!handoff && containsInvalidTextualHandoff(normalizedOutput.responseText)) {
+        const repaired = await repairTextualHandoff(response, normalizedOutput.responseText, options);
+        if (repaired) {
+            return repaired;
+        }
+    }
+
+    const sanitizedText = stripUnsafeWhatsAppLinks(normalizedOutput.responseText);
+    const { text, chips } = extractChipsFromText(sanitizedText);
+
+    return {
+        text,
+        chips,
+        functionCall: normalizedOutput.responseFunctionCall,
+        handoff,
     };
 }
 
@@ -384,9 +546,14 @@ export default async function handler(request: Request) {
 
         const modelName = process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
         const response = await requestModelResponse(apiKey, modelName, contents);
+        const successBody = await buildGenerateSuccessBody(response, {
+            apiKey,
+            modelName,
+            contents,
+        });
 
         return buildJsonResponse(
-            buildGenerateSuccessBody(response),
+            successBody,
             200,
             {
                 ...buildRateLimitHeaders(rateLimitState.rateLimit),

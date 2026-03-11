@@ -11,7 +11,10 @@ export interface LeadFinalizePayload {
 }
 
 export interface LeadFinalizeResult {
+  ok: boolean;
   notice?: string;
+  error?: string;
+  requestId?: string;
 }
 
 interface ChatLeadFormProps {
@@ -89,17 +92,22 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
 
     void triggerHaptic('medium');
 
-    const whatsappUrl = getWhatsAppUrl(payload);
-    const popup = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-    const finalizePromise = onFinalizeLead(payload);
-
-    if (!popup) {
-      window.location.assign(whatsappUrl);
+    const result = await onFinalizeLead(payload);
+    if (!result.ok) {
+      setLocalError(result.requestId
+        ? `${result.error || 'Não foi possível salvar seus dados agora.'} Ref: ${result.requestId}`
+        : (result.error || 'Não foi possível salvar seus dados agora.'));
+      return;
     }
 
-    const result = await finalizePromise;
     if (result.notice) {
       setNotice(result.notice);
+    }
+
+    const whatsappUrl = getWhatsAppUrl(payload);
+    const popup = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    if (!popup) {
+      window.location.assign(whatsappUrl);
     }
   };
 
@@ -199,7 +207,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
             </>
           ) : (
             <>
-              <span>Abrir WhatsApp</span>
+              <span>Salvar e abrir WhatsApp</span>
               <ExternalLink className="w-4 h-4 group-hover:scale-110 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
             </>
           )}

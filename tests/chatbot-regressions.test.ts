@@ -95,3 +95,14 @@ test('system prompt should mention baggage preference for likely air routes', ()
         /baggage_preference/,
     );
 });
+
+test('system prompt should forbid manual WhatsApp CTA in the final handoff', () => {
+    assert.match(
+        SYSTEM_INSTRUCTION,
+        /É proibido encerrar o handoff com link manual/,
+    );
+    assert.match(
+        SYSTEM_INSTRUCTION,
+        /generate_budget_link/,
+    );
+});

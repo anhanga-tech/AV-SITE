@@ -2,7 +2,7 @@ import { Type, type FunctionDeclaration } from "@google/genai";
 
 export const budgetTool: FunctionDeclaration = {
     name: "generate_budget_link",
-    description: "Gera um link para o WhatsApp quando o usuário concorda em solicitar um orçamento e já forneceu as informações básicas.",
+    description: "Conclui o handoff estruturado do orçamento quando o usuário concorda em solicitar atendimento e já forneceu as informações básicas. Nunca substitua esta ferramenta por link manual, markdown de CTA ou URL de WhatsApp em texto livre.",
     parameters: {
         type: Type.OBJECT,
         properties: {

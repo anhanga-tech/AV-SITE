@@ -7,8 +7,17 @@ declare global {
   }
 }
 
+async function acceptLgpd(page: import('@playwright/test').Page) {
+  await page.locator('input[type="checkbox"]').first().evaluate((element) => {
+    const input = element as HTMLInputElement;
+    if (!input.checked) {
+      input.click();
+    }
+  });
+}
+
 test.describe('Chatbot lead handoff', () => {
-  test('should open WhatsApp before the HubSpot submit completes', async ({ page }) => {
+  test('should render the lead form from structured handoff and open WhatsApp only after HubSpot success', async ({ page }) => {
     let submitRequestCount = 0;
     let submitPayload: Record<string, unknown> | null = null;
 
@@ -29,23 +38,15 @@ test.describe('Chatbot lead handoff', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          text: 'Prontinho! Preparei seu link direto para o WhatsApp.',
-          functionCall: {
-            name: 'generate_budget_link',
-            args: {
-              destination: 'Orlando',
-              destination_city: 'Orlando',
-              destination_region: 'Flórida',
-              origin_city: 'São Paulo',
-              origin_region: 'SP',
-              dates: 'Julho de 2026',
-              need_summary: 'Roteiro personalizado',
-              decision_role: 'Casal',
-              timeline_window: '30 dias',
-              budget_range: 'R$ 15.000',
-              baggage_preference: '1 mala despachada',
-              iata_code: 'MCO',
-            },
+          text: 'Perfeito. Seu pré-atendimento está pronto. Preencha seus dados abaixo para continuar com nossa equipe.',
+          handoff: {
+            origin: 'São Paulo, SP',
+            destination: 'Orlando, Flórida',
+            dates: 'Julho de 2026',
+            baggagePreference: '1 mala despachada',
+            bantSummary: 'Need: Roteiro personalizado | Authority: Casal | Budget: R$ 15.000 | Timeline: 30 dias',
+            iataCode: 'MCO',
+            source: 'repair',
           },
         }),
       }),
@@ -80,13 +81,13 @@ test.describe('Chatbot lead handoff', () => {
     await page.getByLabel('Nome', { exact: true }).fill('Felipe');
     await page.getByLabel('Sobrenome', { exact: true }).fill('William');
     await page.getByLabel('E-mail', { exact: true }).fill('felipe@example.com');
-    await page.getByRole('checkbox', { name: /Aceito receber comunicações/i }).check({ force: true });
+    await acceptLgpd(page);
 
-    await page.getByRole('button', { name: 'Abrir WhatsApp' }).click();
+    await page.getByRole('button', { name: 'Salvar e abrir WhatsApp' }).click();
 
     await expect(page.getByText('Salvando...')).toBeVisible();
-    await expect.poll(() => page.evaluate(() => window.__openedUrls?.length ?? 0)).toBe(1);
     await expect.poll(() => submitRequestCount).toBe(1);
+    await expect.poll(() => page.evaluate(() => window.__openedUrls?.length ?? 0)).toBe(1);
 
     const openedUrl = await page.evaluate(() => window.__openedUrls?.[0] ?? '');
     expect(decodeURIComponent(openedUrl)).toContain('wa.me/551152833309');
@@ -106,5 +107,69 @@ test.describe('Chatbot lead handoff', () => {
     expect(submitPayload?.tracking).toMatchObject({
       gclid: 'test-gclid',
     });
+  });
+
+  test('should keep the user on the lead form when HubSpot submit fails', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.__openedUrls = [];
+
+      Object.defineProperty(window, 'open', {
+        configurable: true,
+        value: (url?: string | URL) => {
+          window.__openedUrls?.push(String(url || ''));
+          return {} as Window;
+        },
+      });
+    });
+
+    await page.route('**/api/generate', route =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          text: 'Perfeito. Seu pré-atendimento está pronto. Preencha seus dados abaixo para continuar com nossa equipe.',
+          handoff: {
+            origin: 'São Paulo, SP',
+            destination: 'Orlando, Flórida',
+            dates: 'Julho de 2026',
+            baggagePreference: '1 mala despachada',
+            bantSummary: 'Need: Roteiro personalizado | Authority: Casal | Budget: R$ 15.000 | Timeline: 30 dias',
+            iataCode: 'MCO',
+            source: 'repair',
+          },
+        }),
+      }),
+    );
+
+    await page.route('**/api/submit-lead', route =>
+      route.fulfill({
+        status: 422,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          ok: false,
+          requestId: 'req-e2e-fail',
+          code: 'HUBSPOT_PROPERTY_ERROR',
+          error: 'Propriedade inválida no HubSpot.',
+        }),
+      }),
+    );
+
+    const aiChat = new AIChat(page);
+
+    await page.goto('/');
+    await aiChat.open();
+    await aiChat.sendMessage('Quero uma viagem para Orlando');
+
+    await expect(page.getByText('Link Gerado')).toBeVisible();
+    await page.getByLabel('Nome', { exact: true }).fill('Felipe');
+    await page.getByLabel('Sobrenome', { exact: true }).fill('William');
+    await page.getByLabel('E-mail', { exact: true }).fill('felipe@example.com');
+    await acceptLgpd(page);
+
+    await page.getByRole('button', { name: 'Salvar e abrir WhatsApp' }).click();
+
+    await expect(page.getByRole('alert')).toContainText('Propriedade inválida no HubSpot. Ref: req-e2e-fail');
+    await expect.poll(() => page.evaluate(() => window.__openedUrls?.length ?? 0)).toBe(0);
+    await expect(page.getByText('Link Gerado')).toBeVisible();
   });
 });

@@ -240,7 +240,6 @@ export function useLeadCapture() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                keepalive: true,
                 body: JSON.stringify(payload),
             });
 

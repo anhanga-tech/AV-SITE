@@ -108,6 +108,22 @@ const AIChat: React.FC = () => {
     setLeadDraft({ ...payload });
     const result = await submitLead({ ...payload });
 
+    if (!result.ok) {
+      const errorResult = result as Extract<SubmitLeadHookResult, { ok: false }>;
+
+      console.warn('AI_CHAT: lead submit failed before WhatsApp handoff', {
+        code: errorResult.code,
+        requestId: errorResult.requestId,
+        status: errorResult.status,
+      });
+
+      return {
+        ok: false,
+        error: errorResult.error,
+        requestId: errorResult.requestId,
+      };
+    }
+
     if (typeof window !== 'undefined' && window.dataLayer) {
       window.dataLayer.push({
         event: 'form_submission',
@@ -117,19 +133,10 @@ const AIChat: React.FC = () => {
       });
     }
 
-    if (!result.ok) {
-      const errorResult = result as Extract<SubmitLeadHookResult, { ok: false }>;
-
-      console.warn('AI_CHAT: lead submit failed after WhatsApp handoff', {
-        code: errorResult.code,
-        requestId: errorResult.requestId,
-        status: errorResult.status,
-      });
-
-      return {};
-    }
-
-    return { notice: result.warning };
+    return {
+      ok: true,
+      notice: result.warning,
+    };
   };
 
   const submitMessage = async (text: string, enableHaptics: boolean = true) => {

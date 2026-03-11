@@ -1,23 +1,6 @@
 import { getWhatsAppLink } from "../utils/whatsapp.ts";
-
-interface BudgetFunctionArgs {
-  destination?: string;
-  dates?: string;
-  adults?: number;
-  child_ages?: number[];
-  interests?: string;
-  origin_city?: string;
-  origin_region?: string;
-  destination_city?: string;
-  destination_region?: string;
-  trip_scope?: 'national' | 'south_america' | 'international' | string;
-  budget_range?: string;
-  decision_role?: string;
-  need_summary?: string;
-  timeline_window?: string;
-  baggage_preference?: string;
-  iata_code?: string;
-}
+import { buildGenerateHandoff, type GenerateHandoff } from "../lib/ai/handoff.ts";
+import type { BudgetToolArgs } from "../lib/ai/types.ts";
 
 interface ChatResponse {
   text?: string;
@@ -35,17 +18,20 @@ interface ChatResponse {
 
 interface GenerateFunctionCall {
   name?: string;
-  args?: BudgetFunctionArgs;
+  args?: BudgetToolArgs;
 }
 
 interface GenerateApiResponse {
   text?: string;
   chips?: string[];
   functionCall?: GenerateFunctionCall;
+  handoff?: GenerateHandoff;
   error?: string;
   code?: string;
   retryAfter?: number;
 }
+
+const INVALID_HANDOFF_MESSAGE = 'Tive um problema ao concluir seu orçamento agora. Por favor, tente novamente em alguns instantes para gerar seu atendimento corretamente.';
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -66,32 +52,11 @@ function getErrorName(error: unknown): string {
 }
 
 const buildFallbackContactMarkdown = (): string => {
-  const whatsappUrl = getWhatsAppLink(
-    'Olá! Tive um problema no chat do site e gostaria de continuar meu atendimento pelo WhatsApp.',
-    { appendTrackingRef: false },
-  );
-
-  return `Se preferir, [fale conosco no WhatsApp](${whatsappUrl}).`;
+  return 'Se preferir, fale conosco no WhatsApp com a equipe da Anhangá.';
 };
 
 const withContactFallback = (message: string): string => {
   return `${message}\n\n${buildFallbackContactMarkdown()}`;
-};
-
-const formatLocation = (city?: string, region?: string, fallback = 'A definir'): string => {
-  const cityText = typeof city === 'string' ? city.trim() : '';
-  const regionText = typeof region === 'string' ? region.trim() : '';
-
-  if (!cityText && !regionText) return fallback;
-  if (!regionText) return cityText || fallback;
-  if (!cityText) return regionText;
-
-  return `${cityText}, ${regionText}`;
-};
-
-const cleanOptional = (value?: string): string => {
-  if (typeof value !== 'string') return '';
-  return value.trim();
 };
 
 const buildContactFallbackResponse = (message: string): ChatResponse => ({
@@ -131,49 +96,47 @@ const buildServerErrorResponse = (status: number, errorData: GenerateApiResponse
   );
 };
 
-function buildBantSummary(args: BudgetFunctionArgs): string {
-  const budgetText = args.budget_range?.trim() || 'A definir';
-  const needText = args.need_summary?.trim() || 'Não informado';
-  const decisionRoleText = args.decision_role?.trim() || 'Não informado';
-  const timelineText = args.timeline_window?.trim() || 'Não informado';
-
-  return `Need: ${needText} | Authority: ${decisionRoleText} | Budget: ${budgetText} | Timeline: ${timelineText}`;
-}
-
-function buildBudgetMessage(args: BudgetFunctionArgs, originText: string, destinationText: string, baggagePreference: string): string {
+function buildBudgetMessage(handoff: GenerateHandoff): string {
   const messageLines = [
     'Olá! Vim pelo Chatbot da Anhangá. Gostaria de continuar meu atendimento:',
     '',
-    `🛫 Origem: ${originText}`,
-    `📍 Destino: ${destinationText}`,
-    `📅 Datas: ${args.dates || 'A definir'}`,
+    `🛫 Origem: ${handoff.origin}`,
+    `📍 Destino: ${handoff.destination}`,
+    `📅 Datas: ${handoff.dates}`,
   ];
 
-  if (baggagePreference) {
-    messageLines.push(`🧳 Bagagem: ${baggagePreference}`);
+  if (handoff.baggagePreference) {
+    messageLines.push(`🧳 Bagagem: ${handoff.baggagePreference}`);
   }
 
   return messageLines.join('\n');
 }
 
-function buildBudgetLink(args: BudgetFunctionArgs): ChatResponse['budgetLink'] {
-  const originText = formatLocation(args.origin_city, args.origin_region, 'Origem a definir');
-  const destinationText = formatLocation(
-    args.destination_city,
-    args.destination_region,
-    args.destination || 'Destino a definir'
-  );
-  const baggagePreference = cleanOptional(args.baggage_preference);
+function buildBudgetLink(handoff: GenerateHandoff): ChatResponse['budgetLink'] {
+  if (!handoff) return undefined;
 
   return {
-    origin: originText,
-    destination: destinationText,
-    dates: args.dates || 'A definir',
-    baggagePreference: baggagePreference || undefined,
-    url: getWhatsAppLink(buildBudgetMessage(args, originText, destinationText, baggagePreference), { appendTrackingRef: false }),
-    bantSummary: buildBantSummary(args),
-    iataCode: args.iata_code || undefined,
+    origin: handoff.origin,
+    destination: handoff.destination,
+    dates: handoff.dates,
+    baggagePreference: handoff.baggagePreference,
+    url: getWhatsAppLink(buildBudgetMessage(handoff), { appendTrackingRef: false }),
+    bantSummary: handoff.bantSummary,
+    iataCode: handoff.iataCode,
   };
+}
+
+function containsUnsafeHandoffText(text?: string): boolean {
+  if (!text) return false;
+
+  return /wa\.me|api\.whatsapp\.com/i.test(text) || /clique aqui para receber seu or[cç]amento|clique no link abaixo|finalizar seu atendimento|falar com nossos especialistas/i.test(text);
+}
+
+function stripWhatsAppLinks(text: string): string {
+  return text
+    .replace(/\[([^\]]+)\]\((https?:\/\/(?:wa\.me|api\.whatsapp\.com)[^)]+)\)/gi, '$1')
+    .replace(/https?:\/\/(?:wa\.me|api\.whatsapp\.com)\S*/gi, '')
+    .trim();
 }
 
 function applyGenerateApiData(result: ChatResponse, data: GenerateApiResponse): void {
@@ -185,15 +148,28 @@ function applyGenerateApiData(result: ChatResponse, data: GenerateApiResponse): 
     result.chips = data.chips;
   }
 
-  if (data.functionCall?.name !== 'generate_budget_link') {
-    return;
+  if (data.handoff) {
+    result.budgetLink = buildBudgetLink(data.handoff);
+  } else if (data.functionCall?.name === 'generate_budget_link') {
+    result.budgetLink = buildBudgetLink(buildGenerateHandoff(data.functionCall.args || {}, 'tool'));
   }
 
-  const args = data.functionCall.args || {};
-  result.budgetLink = buildBudgetLink(args);
-
-  if (!result.text) {
+  if (!result.text && result.budgetLink) {
     result.text = "Prontinho! ✨ Preparei seu link direto para falar com nossos especialistas. É só clicar abaixo 👇";
+  }
+
+  if (result.budgetLink && result.text) {
+    result.text = stripWhatsAppLinks(result.text);
+  }
+
+  if (!result.budgetLink && result.text) {
+    if (containsUnsafeHandoffText(result.text)) {
+      result.text = INVALID_HANDOFF_MESSAGE;
+      result.chips = undefined;
+      return;
+    }
+
+    result.text = stripWhatsAppLinks(result.text);
   }
 }
 
