@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { getTrackingDataObject, getWhatsAppLink } from '../utils/whatsapp';
 import type { LeadTracking, LeadUtms, SubmitLeadRequest } from '../types/leadCapture';
 
-interface LeadDraft {
+export interface LeadDraft {
     firstName: string;
     lastName: string;
     email: string;
@@ -13,38 +13,32 @@ interface LeadDraft {
     baggagePreference: string;
 }
 
-type LeadDraftPartial = Partial<LeadDraft>;
+export type LeadDraftPartial = Partial<LeadDraft>;
 
 type SubmitLeadResponseData = {
     error?: string;
     code?: string;
     contactId?: string;
     dealId?: string;
+    requestId?: string;
     warning?: string;
 };
 
-type SubmitLeadHookResult =
+export type SubmitLeadHookResult =
     | {
         ok: true;
-        whatsappUrl: string;
+        requestId: string;
         contactId: string;
         dealId?: string;
         warning?: string;
     }
     | {
         ok: false;
+        requestId?: string;
         error: string;
         code: string;
         status?: number;
     };
-
-const EMPTY_UTMS: LeadUtms = {
-    utm_source: null,
-    utm_medium: null,
-    utm_campaign: null,
-    utm_term: null,
-    utm_content: null,
-};
 
 const EMPTY_LEAD_DRAFT: LeadDraft = {
     firstName: '',
@@ -59,6 +53,13 @@ const EMPTY_LEAD_DRAFT: LeadDraft = {
 
 function cleanValue(value: string): string {
     return value.trim();
+}
+
+function mergeLeadDraft(base: LeadDraft, overrides: LeadDraftPartial): LeadDraft {
+    return {
+        ...base,
+        ...overrides,
+    };
 }
 
 function asResponseData(value: unknown): SubmitLeadResponseData {
@@ -136,7 +137,7 @@ function captureInitialTracking(): LeadTracking {
     };
 }
 
-function buildWhatsAppMessage(lead: LeadDraft): string {
+export function buildLeadWhatsAppMessage(lead: LeadDraft): string {
     const origin = cleanValue(lead.origin) || 'A definir';
     const destination = cleanValue(lead.destination) || 'A definir';
     const dates = cleanValue(lead.dates) || 'A definir';
@@ -157,6 +158,10 @@ function buildWhatsAppMessage(lead: LeadDraft): string {
     return lines.join('\n');
 }
 
+export function buildLeadWhatsAppUrl(lead: LeadDraft): string {
+    return getWhatsAppLink(buildLeadWhatsAppMessage(lead), { appendTrackingRef: true });
+}
+
 function resolveSubmitLeadEndpoint(): string {
     return '/api/submit-lead';
 }
@@ -174,11 +179,17 @@ export function useLeadCapture() {
         setUtms(extractUtms(captured));
     }, []);
 
+    const refreshTrackingState = (): { tracking: LeadTracking; utms: LeadUtms } => {
+        const latestTracking = captureInitialTracking();
+        const latestUtms = extractUtms(latestTracking);
+        setTracking(latestTracking);
+        setUtms(latestUtms);
+
+        return { tracking: latestTracking, utms: latestUtms };
+    };
+
     const setLeadDraft = (partial: LeadDraftPartial): void => {
-        setLeadDraftState((prev) => ({
-            ...prev,
-            ...partial,
-        }));
+        setLeadDraftState((prev) => mergeLeadDraft(prev, partial));
     };
 
     const resetLeadDraft = (): void => {
@@ -186,19 +197,17 @@ export function useLeadCapture() {
         setError(null);
     };
 
+    const getLeadWhatsAppUrl = (overrides: LeadDraftPartial = {}): string => {
+        refreshTrackingState();
+        return buildLeadWhatsAppUrl(mergeLeadDraft(leadDraft, overrides));
+    };
+
     const submitLead = async (overrides: LeadDraftPartial = {}): Promise<SubmitLeadHookResult> => {
         setError(null);
         setIsSubmitting(true);
 
-        const latestTracking = captureInitialTracking();
-        const latestUtms = extractUtms(latestTracking);
-        setTracking(latestTracking);
-        setUtms(latestUtms);
-
-        const merged: LeadDraft = {
-            ...leadDraft,
-            ...overrides,
-        };
+        const { tracking: latestTracking, utms: latestUtms } = refreshTrackingState();
+        const merged = mergeLeadDraft(leadDraft, overrides);
 
         const payload: SubmitLeadRequest = {
             firstName: cleanValue(merged.firstName),
@@ -231,6 +240,7 @@ export function useLeadCapture() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                keepalive: true,
                 body: JSON.stringify(payload),
             });
 
@@ -249,25 +259,26 @@ export function useLeadCapture() {
 
                 return {
                     ok: false,
+                    requestId: rawData.requestId,
                     error: apiError,
                     code: apiCode,
                     status: response.status,
                 };
             }
 
+            const requestId = typeof rawData.requestId === 'string' ? rawData.requestId : 'unknown';
             const contactId = typeof rawData.contactId === 'string' ? rawData.contactId : 'unknown';
             const dealId = typeof rawData.dealId === 'string' ? rawData.dealId : undefined;
             const warning = typeof rawData.warning === 'string' ? rawData.warning : undefined;
-            const whatsappUrl = getWhatsAppLink(buildWhatsAppMessage(merged), { appendTrackingRef: true });
 
             setIsSubmitting(false);
 
             return {
                 ok: true,
+                requestId,
                 contactId,
                 dealId,
                 warning,
-                whatsappUrl,
             };
         } catch (requestError: unknown) {
             const message = requestError instanceof Error
@@ -291,10 +302,9 @@ export function useLeadCapture() {
         leadDraft,
         isSubmitting,
         error,
+        getLeadWhatsAppUrl,
         setLeadDraft,
         resetLeadDraft,
         submitLead,
     };
 }
-
-export type { LeadDraft, LeadDraftPartial, SubmitLeadHookResult };

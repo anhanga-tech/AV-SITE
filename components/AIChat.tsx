@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { MessageCircle, X, Send, Sparkles, Loader2, Bot, User } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { getTravelAdvice } from '../services/geminiService';
-import { useLeadCapture } from '../hooks/useLeadCapture';
+import { useLeadCapture, type SubmitLeadHookResult } from '../hooks/useLeadCapture';
 import { PassportStamp } from './ui/PassportStamp';
 import { ChatLeadForm, type LeadFinalizePayload, type LeadFinalizeResult } from './ChatLeadForm';
 import { triggerHaptic } from '../utils/haptics';
@@ -14,7 +14,6 @@ interface Message {
   chips?: string[];
   isAction?: boolean;
   actionData?: {
-    url: string;
     destination: string;
     bantSummary: string;
     iataCode?: string;
@@ -65,7 +64,12 @@ const AIChat: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const messagesRef = useRef<Message[]>(messages);
-  const { setLeadDraft, submitLead, isSubmitting: isSubmittingLead } = useLeadCapture();
+  const {
+    getLeadWhatsAppUrl,
+    setLeadDraft,
+    submitLead,
+    isSubmitting: isSubmittingLead,
+  } = useLeadCapture();
   const location = useLocation();
   const navigate = useNavigate();
   useEffect(() => {
@@ -104,54 +108,28 @@ const AIChat: React.FC = () => {
     setLeadDraft({ ...payload });
     const result = await submitLead({ ...payload });
 
-    if (result.ok) {
-      if (typeof window !== 'undefined' && window.dataLayer) {
-        window.dataLayer.push({
-          event: 'form_submission',
-          form_type: 'ai_chatbot_lead',
-          destination: payload.fallbackUrl.includes('whatsapp') ? 'whatsapp' : 'lead_captured',
-          page_location: window.location.href
-        });
-      }
-      return { ok: true, url: result.whatsappUrl, notice: result.warning };
+    if (typeof window !== 'undefined' && window.dataLayer) {
+      window.dataLayer.push({
+        event: 'form_submission',
+        form_type: 'ai_chatbot_lead',
+        destination: 'whatsapp',
+        page_location: window.location.href,
+      });
     }
 
-    if (!('code' in result)) {
-      return {
-        ok: false,
-        error: 'Ocorreu um imprevisto ao processar sua solicitação. Tente novamente.'
-      };
+    if (!result.ok) {
+      const errorResult = result as Extract<SubmitLeadHookResult, { ok: false }>;
+
+      console.warn('AI_CHAT: lead submit failed after WhatsApp handoff', {
+        code: errorResult.code,
+        requestId: errorResult.requestId,
+        status: errorResult.status,
+      });
+
+      return {};
     }
 
-    const errorResult = result;
-
-    // Classify error (Option A)
-    if (errorResult.code === 'HUBSPOT_DUPLICATE_CONTACT') {
-      return {
-        ok: true,
-        url: payload.fallbackUrl,
-        notice: 'Seu contato já estava cadastrado. Vamos continuar.',
-      };
-    }
-
-    if (errorResult.code === 'NETWORK_ERROR' || (errorResult.status && errorResult.status >= 500)) {
-      return {
-        ok: false,
-        error: 'Não conseguimos enviar seus dados agora. Tente novamente em instantes.'
-      };
-    }
-
-    if (errorResult.code === 'VALIDATION_ERROR') {
-      return {
-        ok: false,
-        error: errorResult.error || 'Por favor, verifique os campos do formulário.'
-      };
-    }
-
-    return {
-      ok: false,
-      error: 'Ocorreu um imprevisto ao processar sua solicitação. Tente novamente.'
-    };
+    return { notice: result.warning };
   };
 
   const submitMessage = async (text: string, enableHaptics: boolean = true) => {
@@ -200,7 +178,6 @@ const AIChat: React.FC = () => {
         text: 'Orçamento Pronto',
         isAction: true,
         actionData: {
-          url: response.budgetLink!.url,
           destination: response.budgetLink!.destination,
           bantSummary: response.budgetLink!.bantSummary,
           iataCode: response.budgetLink!.iataCode
@@ -406,9 +383,9 @@ const AIChat: React.FC = () => {
                         className="absolute top-[-25px] right-[-10px] sm:right-[5px] pointer-events-none"
                       />
                       <ChatLeadForm
-                        fallbackUrl={msg.actionData?.url || '#'}
                         destination={msg.actionData?.destination}
                         defaultBantSummary={msg.actionData?.bantSummary}
+                        getWhatsAppUrl={getLeadWhatsAppUrl}
                         onFinalizeLead={handleFinalizeLead}
                         isSubmittingLead={isSubmittingLead}
                       />

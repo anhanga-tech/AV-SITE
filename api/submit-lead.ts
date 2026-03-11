@@ -10,7 +10,7 @@ import {
     getContactIdByEmail,
     hubspotRequest,
     updateContactProperties,
-    type HubSpotObjectResponse
+    type HubSpotObjectResponse,
 } from '../services/hubspot';
 import { sendGoogleConversion } from '../lib/conversions/google';
 import { sendMetaConversion } from '../lib/conversions/meta';
@@ -30,9 +30,56 @@ interface DealCreationResult {
     warning?: string;
 }
 
-/**
- * Builds a standard error response for the API.
- */
+interface ParsedHubSpotError {
+    status?: number;
+    detail?: string;
+    isUnauthorized: boolean;
+    isPropertyError: boolean;
+}
+
+type LeadLogLevel = 'info' | 'warn' | 'error';
+
+function createRequestId(): string {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID();
+    }
+
+    return `lead_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function truncateDetail(detail: string): string | undefined {
+    const normalized = detail.trim();
+    return normalized ? normalized.substring(0, 600) : undefined;
+}
+
+function maskEmail(email: string): string {
+    const [localPart, domainPart] = email.split('@');
+    if (!domainPart) return 'hidden';
+
+    const firstChar = localPart?.trim().charAt(0) || '*';
+    return `${firstChar}***@${domainPart}`;
+}
+
+function emitLeadLog(level: LeadLogLevel, requestId: string, stage: string, details: Record<string, unknown> = {}): void {
+    const payload = {
+        requestId,
+        stage,
+        ...details,
+    };
+
+    if (level === 'warn') {
+        console.warn('SUBMIT_LEAD', payload);
+        return;
+    }
+
+    if (level === 'error') {
+        console.error('SUBMIT_LEAD', payload);
+        return;
+    }
+
+    console.log('SUBMIT_LEAD', payload);
+}
+
 function buildErrorResponse(
     body: SubmitLeadResponse,
     status: number,
@@ -55,9 +102,42 @@ function buildSuccessResponse(
     });
 }
 
+function isHubSpotPropertyStatus(status: number): boolean {
+    return status === 400 || status === 422;
+}
+
+function parseHubSpotErrorMessage(message: string): ParsedHubSpotError {
+    if (message.includes('UNAUTHORIZED')) {
+        return {
+            isUnauthorized: true,
+            isPropertyError: false,
+        };
+    }
+
+    const match = message.match(/^[A-Z_]+:(\d+):(.*)$/s);
+    if (!match) {
+        return {
+            detail: truncateDetail(message),
+            isUnauthorized: false,
+            isPropertyError: false,
+        };
+    }
+
+    const status = Number(match[1]);
+    const detail = truncateDetail(match[2] || '');
+
+    return {
+        status: Number.isFinite(status) ? status : undefined,
+        detail,
+        isUnauthorized: false,
+        isPropertyError: Number.isFinite(status) ? isHubSpotPropertyStatus(status) : false,
+    };
+}
+
 async function getRateLimitResponse(
     request: Request,
     corsHeaders: Record<string, string>,
+    requestId: string,
 ): Promise<Response | null> {
     const clientIP = getClientIP(request);
     const rateLimit = await checkRateLimitInternal(clientIP, {
@@ -68,8 +148,18 @@ async function getRateLimitResponse(
 
     if (rateLimit.allowed) return null;
 
+    emitLeadLog('warn', requestId, 'rate_limited', {
+        clientIP,
+        retryAfterSeconds: Math.ceil(rateLimit.resetIn / 1000),
+    });
+
     return buildErrorResponse(
-        { ok: false, code: 'RATE_LIMIT_EXCEEDED', error: 'Muitas tentativas. Tente novamente em breve.' },
+        {
+            ok: false,
+            requestId,
+            code: 'RATE_LIMIT_EXCEEDED',
+            error: 'Muitas tentativas. Tente novamente em breve.',
+        },
         429,
         { ...corsHeaders, 'Retry-After': String(Math.ceil(rateLimit.resetIn / 1000)) },
     );
@@ -95,12 +185,18 @@ function getSubmitLeadConfig(): SubmitLeadConfig | null {
 async function parseRequestBody(
     request: Request,
     corsHeaders: Record<string, string>,
+    requestId: string,
 ): Promise<unknown | Response> {
     try {
         return await request.json();
     } catch {
         return buildErrorResponse(
-            { ok: false, code: 'VALIDATION_ERROR', error: 'JSON inválido no corpo da requisição.' },
+            {
+                ok: false,
+                requestId,
+                code: 'VALIDATION_ERROR',
+                error: 'JSON inválido no corpo da requisição.',
+            },
             400,
             corsHeaders,
         );
@@ -110,21 +206,23 @@ async function parseRequestBody(
 function validateRequestPayload(
     rawBody: unknown,
     corsHeaders: Record<string, string>,
+    requestId: string,
 ): SubmitLeadRequest | Response {
     const validation = validatePayload(rawBody);
     if (validation.valid === false) {
         return buildErrorResponse(
-            { ok: false, code: 'VALIDATION_ERROR', error: validation.error },
+            {
+                ok: false,
+                requestId,
+                code: 'VALIDATION_ERROR',
+                error: validation.error,
+            },
             400,
             corsHeaders,
         );
     }
 
     return validation.data;
-}
-
-function isUnauthorizedHubSpotError(message: string): boolean {
-    return message.includes('UNAUTHORIZED');
 }
 
 async function recoverDuplicateContact(
@@ -134,7 +232,7 @@ async function recoverDuplicateContact(
 ): Promise<string> {
     const existingContactId = await getContactIdByEmail(hubspotToken, email);
     if (!existingContactId) {
-        throw new Error('Contact ID not found for existing email');
+        throw new Error('CONTACT_SEARCH_FAILED:404:Contact ID not found for existing email');
     }
 
     await updateContactProperties(hubspotToken, existingContactId, contactProperties);
@@ -146,37 +244,99 @@ async function createOrUpdateContact(
     payload: { email: string },
     contactProperties: Record<string, string>,
     corsHeaders: Record<string, string>,
+    requestId: string,
 ): Promise<string | Response> {
+    emitLeadLog('info', requestId, 'contact_create_or_update', {
+        email: maskEmail(payload.email),
+        propertyCount: Object.keys(contactProperties).length,
+    });
+
     const createContactResponse = await hubspotRequest(hubspotToken, '/crm/v3/objects/contacts', {
         method: 'POST',
         body: JSON.stringify({ properties: contactProperties }),
     });
 
-    if (createContactResponse.status === 401) {
+    if (createContactResponse.status === 401 || createContactResponse.status === 403) {
+        emitLeadLog('error', requestId, 'contact_create_or_update_failed', {
+            code: 'HUBSPOT_UNAUTHORIZED',
+            status: createContactResponse.status,
+        });
+
         return buildErrorResponse(
-            { ok: false, code: 'HUBSPOT_UNAUTHORIZED', error: 'Erro de integração com o CRM' },
-            401,
+            {
+                ok: false,
+                requestId,
+                code: 'HUBSPOT_UNAUTHORIZED',
+                error: 'Erro de integração com o CRM',
+            },
+            createContactResponse.status,
             corsHeaders,
         );
     }
 
     if (createContactResponse.status === 409) {
+        emitLeadLog('warn', requestId, 'contact_duplicate_detected', {
+            email: maskEmail(payload.email),
+        });
+
         try {
-            return await recoverDuplicateContact(hubspotToken, payload.email, contactProperties);
+            const existingContactId = await recoverDuplicateContact(hubspotToken, payload.email, contactProperties);
+
+            emitLeadLog('info', requestId, 'contact_create_or_update_success', {
+                mode: 'updated_existing',
+                contactId: existingContactId,
+            });
+
+            return existingContactId;
         } catch (error: unknown) {
             const message = error instanceof Error ? error.message : 'Unknown recovery error';
-            console.error('HUBSPOT: Duplicate contact recovery failed', message);
+            const parsedError = parseHubSpotErrorMessage(message);
+            const errorCode = parsedError.isUnauthorized
+                ? 'HUBSPOT_UNAUTHORIZED'
+                : parsedError.isPropertyError
+                    ? 'HUBSPOT_PROPERTY_ERROR'
+                    : 'HUBSPOT_API_ERROR';
 
-            if (isUnauthorizedHubSpotError(message)) {
+            emitLeadLog('error', requestId, 'contact_create_or_update_failed', {
+                phase: 'duplicate_recovery',
+                code: errorCode,
+                status: parsedError.status,
+                detail: parsedError.detail,
+            });
+
+            if (parsedError.isUnauthorized) {
                 return buildErrorResponse(
-                    { ok: false, code: 'HUBSPOT_UNAUTHORIZED', error: 'Erro de integração com o CRM' },
+                    {
+                        ok: false,
+                        requestId,
+                        code: 'HUBSPOT_UNAUTHORIZED',
+                        error: 'Erro de integração com o CRM',
+                    },
                     401,
                     corsHeaders,
                 );
             }
 
+            if (parsedError.isPropertyError) {
+                return buildErrorResponse(
+                    {
+                        ok: false,
+                        requestId,
+                        code: 'HUBSPOT_PROPERTY_ERROR',
+                        error: 'Erro de integração com o CRM: propriedades do contato inválidas ou não configuradas.',
+                    },
+                    502,
+                    corsHeaders,
+                );
+            }
+
             return buildErrorResponse(
-                { ok: false, code: 'HUBSPOT_API_ERROR', error: 'Erro ao processar contato' },
+                {
+                    ok: false,
+                    requestId,
+                    code: 'HUBSPOT_API_ERROR',
+                    error: 'Erro ao processar contato',
+                },
                 502,
                 corsHeaders,
             );
@@ -185,10 +345,25 @@ async function createOrUpdateContact(
 
     if (!createContactResponse.ok) {
         const hubspotErrorText = await createContactResponse.text().catch(() => '');
-        console.error('HUBSPOT: Error creating contact', createContactResponse.status, hubspotErrorText);
+        const errorCode = isHubSpotPropertyStatus(createContactResponse.status)
+            ? 'HUBSPOT_PROPERTY_ERROR'
+            : 'HUBSPOT_API_ERROR';
+
+        emitLeadLog('error', requestId, 'contact_create_or_update_failed', {
+            code: errorCode,
+            status: createContactResponse.status,
+            detail: truncateDetail(hubspotErrorText),
+        });
 
         return buildErrorResponse(
-            { ok: false, code: 'HUBSPOT_API_ERROR', error: 'Erro de integração com o CRM' },
+            {
+                ok: false,
+                requestId,
+                code: errorCode,
+                error: errorCode === 'HUBSPOT_PROPERTY_ERROR'
+                    ? 'Erro de integração com o CRM: propriedades do contato inválidas ou não configuradas.'
+                    : 'Erro de integração com o CRM',
+            },
             502,
             corsHeaders,
         );
@@ -197,12 +372,27 @@ async function createOrUpdateContact(
     const hubspotData = (await createContactResponse.json().catch(() => ({}))) as HubSpotObjectResponse;
     const contactId = cleanString(hubspotData.id);
     if (!contactId) {
+        emitLeadLog('error', requestId, 'contact_create_or_update_failed', {
+            code: 'HUBSPOT_API_ERROR',
+            detail: 'missing_contact_id',
+        });
+
         return buildErrorResponse(
-            { ok: false, code: 'HUBSPOT_API_ERROR', error: 'Erro de integração com o CRM' },
+            {
+                ok: false,
+                requestId,
+                code: 'HUBSPOT_API_ERROR',
+                error: 'Erro de integração com o CRM',
+            },
             502,
             corsHeaders,
         );
     }
+
+    emitLeadLog('info', requestId, 'contact_create_or_update_success', {
+        mode: 'created',
+        contactId,
+    });
 
     return contactId;
 }
@@ -236,6 +426,7 @@ async function createFallbackNoteForLead(
         bantSummary: string;
     },
     baseWarning: string,
+    requestId: string,
 ): Promise<string> {
     try {
         const noteBody = [
@@ -248,7 +439,11 @@ async function createFallbackNoteForLead(
         await createFallbackNote(hubspotToken, contactId, noteBody);
         return `${baseWarning} Uma nota foi registrada no contato para acompanhamento manual.`;
     } catch (noteError: unknown) {
-        console.error('HUBSPOT: Note fallback failed', noteError);
+        emitLeadLog('error', requestId, 'fallback_note_failed', {
+            contactId,
+            detail: truncateDetail(noteError instanceof Error ? noteError.message : String(noteError)),
+        });
+
         return baseWarning;
     }
 }
@@ -265,18 +460,46 @@ async function createDealForLead(
     },
     config: SubmitLeadConfig,
     corsHeaders: Record<string, string>,
+    requestId: string,
 ): Promise<DealCreationResult | Response> {
+    emitLeadLog('info', requestId, 'deal_create', {
+        contactId,
+        destination: payload.destination,
+    });
+
     try {
         const dealId = await createDeal(hubspotToken, buildDealProperties(payload, config));
         await associateDealToContact(hubspotToken, dealId, contactId);
+
+        emitLeadLog('info', requestId, 'deal_associate', {
+            contactId,
+            dealId,
+        });
+
         return { dealId };
     } catch (dealError: unknown) {
         const message = dealError instanceof Error ? dealError.message : 'Unknown deal error';
-        console.error('HUBSPOT: Deal creation/association failed', message);
+        const parsedError = parseHubSpotErrorMessage(message);
 
-        if (isUnauthorizedHubSpotError(message)) {
+        emitLeadLog(parsedError.isPropertyError ? 'warn' : 'error', requestId, 'deal_create_failed', {
+            contactId,
+            code: parsedError.isUnauthorized
+                ? 'HUBSPOT_UNAUTHORIZED'
+                : parsedError.isPropertyError
+                    ? 'HUBSPOT_PROPERTY_ERROR'
+                    : 'HUBSPOT_API_ERROR',
+            status: parsedError.status,
+            detail: parsedError.detail,
+        });
+
+        if (parsedError.isUnauthorized) {
             return buildErrorResponse(
-                { ok: false, code: 'HUBSPOT_UNAUTHORIZED', error: 'Erro de integração com o CRM' },
+                {
+                    ok: false,
+                    requestId,
+                    code: 'HUBSPOT_UNAUTHORIZED',
+                    error: 'Erro de integração com o CRM',
+                },
                 401,
                 corsHeaders,
             );
@@ -286,14 +509,17 @@ async function createDealForLead(
             hubspotToken,
             contactId,
             payload,
-            'Contato salvo, mas não foi possível criar ou associar o deal automaticamente.',
+            parsedError.isPropertyError
+                ? 'Contato salvo, mas o deal não foi criado automaticamente por erro de propriedade no HubSpot.'
+                : 'Contato salvo, mas não foi possível criar ou associar o deal automaticamente.',
+            requestId,
         );
 
         return { warning };
     }
 }
 
-async function trackLeadConversions(payload: SubmitLeadRequest): Promise<void> {
+async function trackLeadConversions(payload: SubmitLeadRequest, requestId: string): Promise<void> {
     const [googleResult, metaResult] = await Promise.all([
         sendGoogleConversion('lead_qualificado', {
             gclid: payload.tracking?.gclid,
@@ -310,29 +536,37 @@ async function trackLeadConversions(payload: SubmitLeadRequest): Promise<void> {
             fbc: payload.tracking?.fbc,
             contentName: payload.destination,
             contentType: 'destination_interest',
-        })
+        }),
     ]);
+
+    emitLeadLog('info', requestId, 'conversions', {
+        googleAds: googleResult.success ? 'ok' : googleResult.error || 'failed',
+        metaAds: metaResult.success ? 'ok' : metaResult.error || 'failed',
+    });
 
     if (!googleResult.success) console.warn('GOOGLE_ADS: Lead conversion failed', googleResult.error);
     if (!metaResult.success) console.warn('META: Lead conversion failed', metaResult.error);
 }
 
-/**
- * Main handler for the submit-lead Edge Function.
- */
 export default async function handler(request: Request): Promise<Response> {
+    const requestId = createRequestId();
     const corsHeaders = buildCorsHeaders();
 
     if (request.method === 'OPTIONS') {
         return new Response(null, { status: 204, headers: corsHeaders });
     }
 
-    const rateLimitResponse = await getRateLimitResponse(request, corsHeaders);
+    const rateLimitResponse = await getRateLimitResponse(request, corsHeaders, requestId);
     if (rateLimitResponse) return rateLimitResponse;
 
     if (request.method !== 'POST') {
         return buildErrorResponse(
-            { ok: false, code: 'METHOD_NOT_ALLOWED', error: 'Method not allowed' },
+            {
+                ok: false,
+                requestId,
+                code: 'METHOD_NOT_ALLOWED',
+                error: 'Method not allowed',
+            },
             405,
             corsHeaders,
         );
@@ -340,32 +574,73 @@ export default async function handler(request: Request): Promise<Response> {
 
     const config = getSubmitLeadConfig();
     if (!config) {
-        console.error('SERVER_CONFIG_ERROR: Missing required HubSpot environment variables.');
+        emitLeadLog('error', requestId, 'config', {
+            code: 'SERVER_CONFIG_ERROR',
+            hasHubSpotToken: Boolean(process.env.HUBSPOT_TOKEN),
+            hasPipelineId: Boolean(cleanString(process.env.HUBSPOT_DEAL_PIPELINE_ID)),
+            hasDealStageId: Boolean(cleanString(process.env.HUBSPOT_DEAL_STAGE_ID)),
+        });
+
         return buildErrorResponse(
-            { ok: false, code: 'SERVER_CONFIG_ERROR', error: 'Erro de configuração do servidor' },
+            {
+                ok: false,
+                requestId,
+                code: 'SERVER_CONFIG_ERROR',
+                error: 'Erro de configuração do servidor',
+            },
             500,
             corsHeaders,
         );
     }
 
     try {
-        const rawBody = await parseRequestBody(request, corsHeaders);
+        const rawBody = await parseRequestBody(request, corsHeaders, requestId);
         if (rawBody instanceof Response) return rawBody;
 
-        const payload = validateRequestPayload(rawBody, corsHeaders);
+        const payload = validateRequestPayload(rawBody, corsHeaders, requestId);
         if (payload instanceof Response) return payload;
+
+        emitLeadLog('info', requestId, 'payload_validated', {
+            email: maskEmail(payload.email),
+            destination: payload.destination,
+            utmSource: payload.utms.utm_source,
+            extraTrackingKeys: Object.keys(payload.tracking?.extras ?? {}).length,
+            hasClickIds: Boolean(
+                payload.tracking?.gclid
+                || payload.tracking?.fbclid
+                || payload.tracking?.msclkid
+                || payload.tracking?.ttclid
+                || payload.tracking?.wbraid
+                || payload.tracking?.gbraid,
+            ),
+        });
+
         const contactProperties = buildContactProperties(payload);
-        const contactId = await createOrUpdateContact(config.hubspotToken, payload, contactProperties, corsHeaders);
+        const contactId = await createOrUpdateContact(
+            config.hubspotToken,
+            payload,
+            contactProperties,
+            corsHeaders,
+            requestId,
+        );
         if (contactId instanceof Response) return contactId;
 
-        const dealResult = await createDealForLead(config.hubspotToken, contactId, payload, config, corsHeaders);
+        const dealResult = await createDealForLead(
+            config.hubspotToken,
+            contactId,
+            payload,
+            config,
+            corsHeaders,
+            requestId,
+        );
         if (dealResult instanceof Response) return dealResult;
 
-        await trackLeadConversions(payload);
+        await trackLeadConversions(payload, requestId);
 
         return buildSuccessResponse(
             {
                 ok: true,
+                requestId,
                 contactId,
                 dealId: dealResult.dealId,
                 warning: dealResult.warning,
@@ -378,10 +653,19 @@ export default async function handler(request: Request): Promise<Response> {
         );
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : 'Unknown error';
-        console.error('SERVER: submit-lead unexpected error:', message);
+
+        emitLeadLog('error', requestId, 'unexpected', {
+            code: 'HUBSPOT_API_ERROR',
+            detail: truncateDetail(message),
+        });
 
         return buildErrorResponse(
-            { ok: false, code: 'HUBSPOT_API_ERROR', error: 'Erro interno ao processar envio do lead.' },
+            {
+                ok: false,
+                requestId,
+                code: 'HUBSPOT_API_ERROR',
+                error: 'Erro interno ao processar envio do lead.',
+            },
             500,
             corsHeaders,
         );

@@ -44,7 +44,7 @@ interface MockHubSpotRequest {
     body?: MockHubSpotRequestBody;
 }
 
-test('mapTrackingToContactProperties should map msclkid to hs_microsoft_click_id', () => {
+test('mapTrackingToContactProperties should map msclkid to hs_linkedin_click_id', () => {
     const mapped = mapTrackingToContactProperties({
         utm_source: null,
         utm_medium: null,
@@ -58,7 +58,7 @@ test('mapTrackingToContactProperties should map msclkid to hs_microsoft_click_id
     });
 
     assert.equal(mapped.properties.ga_client_id, 'ga.123');
-    assert.equal(mapped.properties.hs_microsoft_click_id, 'ms-abc');
+    assert.equal(mapped.properties.hs_linkedin_click_id, 'ms-abc');
     assert.equal(mapped.properties.hs_google_click_id, 'g-xyz');
     assert.equal(mapped.properties.wbraid, 'w-123');
 });
@@ -125,6 +125,8 @@ test('submit-lead should create contact and deal on first attempt', async (t) =>
     const payload = await response.json();
 
     assert.equal(payload.ok, true);
+    assert.equal(typeof payload.requestId, 'string');
+    assert.ok(payload.requestId.length > 0);
     assert.equal(payload.contactId, 'contact-1');
     assert.equal(payload.dealId, 'deal-1');
 
@@ -136,7 +138,7 @@ test('submit-lead should create contact and deal on first attempt', async (t) =>
     assert.equal(contactProps.ga_session_id, 'sid-1');
     assert.equal(contactProps.hs_google_click_id, 'gclid-1');
     assert.equal(contactProps.hs_facebook_click_id, 'fbclid-1');
-    assert.equal(contactProps.hs_microsoft_click_id, 'msclkid-1');
+    assert.equal(contactProps.hs_linkedin_click_id, 'msclkid-1');
 
     const dealRequest = calls.find((call) => call.url.endsWith('/crm/v3/objects/deals'));
     assert.ok(dealRequest, 'deal creation request should exist');
@@ -275,6 +277,8 @@ test('submit-lead should recover on duplicate contact and still create deal', as
     const payload = await response.json();
 
     assert.equal(payload.ok, true);
+    assert.equal(typeof payload.requestId, 'string');
+    assert.ok(payload.requestId.length > 0);
     assert.equal(payload.contactId, 'contact-existing');
     assert.equal(payload.dealId, 'deal-2');
 });
@@ -332,7 +336,58 @@ test('submit-lead should create fallback note and return warning when deal fails
     const payload = await response.json();
 
     assert.equal(payload.ok, true);
+    assert.equal(typeof payload.requestId, 'string');
+    assert.ok(payload.requestId.length > 0);
     assert.equal(payload.contactId, 'contact-3');
     assert.equal(payload.dealId, undefined);
     assert.match(payload.warning, /nota foi registrada/i);
+});
+
+test('submit-lead should return requestId and property-specific code when HubSpot rejects contact properties', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+        restoreEnv();
+    });
+
+    process.env.HUBSPOT_TOKEN = 'test-token';
+    process.env.HUBSPOT_DEAL_PIPELINE_ID = 'pipeline-1';
+    process.env.HUBSPOT_DEAL_STAGE_ID = 'stage-1';
+
+    global.fetch = (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+        const url = getUrl(input);
+        const method = init?.method || 'GET';
+
+        if (url.endsWith('/crm/v3/objects/contacts') && method === 'POST') {
+            return new Response(JSON.stringify({
+                status: 'error',
+                message: 'Property values were not valid',
+            }), { status: 400 });
+        }
+
+        throw new Error(`Unexpected request: ${method} ${url}`);
+    }) as typeof fetch;
+
+    const response = await handler(buildRequest({
+        firstName: 'Felipe',
+        lastName: 'William',
+        email: 'felipe@example.com',
+        bantSummary: 'Need: Praia | Authority: casal | Budget: 20k | Timeline: setembro',
+        destination: 'Lisboa',
+        utms: {},
+        tracking: {
+            utm_source: null,
+            utm_medium: null,
+            utm_campaign: null,
+            utm_term: null,
+            utm_content: null,
+        },
+    }));
+
+    assert.equal(response.status, 502);
+    const payload = await response.json();
+
+    assert.equal(payload.ok, false);
+    assert.equal(payload.code, 'HUBSPOT_PROPERTY_ERROR');
+    assert.equal(typeof payload.requestId, 'string');
+    assert.ok(payload.requestId.length > 0);
 });

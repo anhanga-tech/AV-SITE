@@ -6,7 +6,7 @@ const TRACKING_PROPERTY_MAP: Record<string, string> = {
     sid: 'ga_session_id',
     gclid: 'hs_google_click_id',
     fbclid: 'hs_facebook_click_id',
-    msclkid: 'hs_microsoft_click_id',
+    msclkid: 'hs_linkedin_click_id',
     ttclid: 'tiktok_id',
     gbraid: 'gbraid',
     wbraid: 'wbraid',
@@ -30,7 +30,7 @@ export interface HubSpotObjectWithProperties {
 }
 
 async function assertHubSpotResponseOk(response: Response, errorCode: string): Promise<void> {
-    if (response.status === 401) {
+    if (response.status === 401 || response.status === 403) {
         throw new Error('UNAUTHORIZED');
     }
 
