@@ -1,12 +1,14 @@
 
 import React, { useState, memo } from 'react';
-import ChevronDown from 'lucide-react/dist/esm/icons/chevron-down';
-import ChevronUp from 'lucide-react/dist/esm/icons/chevron-up';
-import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
-import Plane from 'lucide-react/dist/esm/icons/plane';
-import Hotel from 'lucide-react/dist/esm/icons/hotel';
-import Ticket from 'lucide-react/dist/esm/icons/ticket';
-import MapPin from 'lucide-react/dist/esm/icons/map-pin';
+import {
+    CaretDown,
+    CaretUp,
+    Sparkle,
+    AirplaneTilt,
+    Buildings,
+    Ticket,
+    MapPin,
+} from '@phosphor-icons/react';
 
 interface FAQItemProps {
     question: string;
@@ -46,7 +48,7 @@ const FAQItem = memo(({ question, answer, idx }: FAQItemProps) => {
                     ? 'bg-brand-cyan text-white rotate-180'
                     : 'bg-white text-gray-400 group-hover:text-brand-cyan'
                     }`}>
-                    {isOpen ? <ChevronUp className="w-6 h-6" /> : <ChevronDown className="w-6 h-6" />}
+                    {isOpen ? <CaretUp className="w-6 h-6" weight="bold" /> : <CaretDown className="w-6 h-6" weight="bold" />}
                 </div>
             </button>
             <div
@@ -99,11 +101,11 @@ const FAQS = [
                     Você recebe uma proposta com todos os custos listados:
                 </p>
                 <ul className="space-y-2 mb-4">
-                    <li className="flex items-center gap-2"><Plane className="w-4 h-4 text-brand-cyan" /> Passagens aéreas (consultamos o melhor preço do dia)</li>
-                    <li className="flex items-center gap-2"><Hotel className="w-4 h-4 text-brand-cyan" /> Hospedagem (você escolhe o nível de conforto)</li>
-                    <li className="flex items-center gap-2"><Ticket className="w-4 h-4 text-brand-cyan" /> Entradas em atrações</li>
-                    <li className="flex items-center gap-2"><MapPin className="w-4 h-4 text-brand-cyan" /> Transporte terrestre</li>
-                    <li className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-brand-cyan" /> Refeições recomendadas (opcionais)</li>
+                    <li className="flex items-center gap-2"><AirplaneTilt className="w-4 h-4 text-brand-cyan" weight="fill" /> Passagens aéreas (consultamos o melhor preço do dia)</li>
+                    <li className="flex items-center gap-2"><Buildings className="w-4 h-4 text-brand-cyan" weight="fill" /> Hospedagem (você escolhe o nível de conforto)</li>
+                    <li className="flex items-center gap-2"><Ticket className="w-4 h-4 text-brand-cyan" weight="fill" /> Entradas em atrações</li>
+                    <li className="flex items-center gap-2"><MapPin className="w-4 h-4 text-brand-cyan" weight="fill" /> Transporte terrestre</li>
+                    <li className="flex items-center gap-2"><Sparkle className="w-4 h-4 text-brand-cyan" weight="fill" /> Refeições recomendadas (opcionais)</li>
                 </ul>
                 <p className="font-bold text-brand-dark">Só avançamos após sua aprovação. Sem surpresas!</p>
             </div>
@@ -227,7 +229,7 @@ const FAQ: React.FC = () => {
                 <div className="mt-16 flex justify-center">
                     <div className="bg-white/80 backdrop-blur-sm border border-brand-cyan/20 rounded-3xl p-6 flex flex-col md:flex-row items-center gap-5 max-w-lg shadow-[0_8px_30px_rgba(14,165,233,0.1)] hover:shadow-[0_8px_30px_rgba(14,165,233,0.2)] transition-shadow cursor-default">
                         <div className="bg-brand-light p-4 rounded-full">
-                            <Sparkles className="w-8 h-8 text-brand-cyan animate-pulse" />
+                            <Sparkle className="w-8 h-8 text-brand-cyan animate-pulse" weight="fill" />
                         </div>
                         <div className="text-center md:text-left">
                             <h4 className="font-bold text-brand-dark text-xl mb-1">Ainda tem dúvidas?</h4>

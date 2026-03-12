@@ -1,7 +1,9 @@
 import React from 'react';
-import MessageSquare from 'lucide-react/dist/esm/icons/message-square';
-import Plane from 'lucide-react/dist/esm/icons/plane';
-import Smartphone from 'lucide-react/dist/esm/icons/smartphone';
+import {
+    ChatCentered,
+    AirplaneTilt,
+    DeviceMobile,
+} from '@phosphor-icons/react';
 import { openAiChat } from '../utils/aiChat';
 
 const CallToAction: React.FC = () => {
@@ -33,7 +35,7 @@ const CallToAction: React.FC = () => {
                         {/* Header Strip */}
                         <div className="flex justify-between items-center mb-8 border-b-2 border-dashed border-gray-100 pb-4">
                             <div className="flex items-center gap-2 text-brand-cyan font-black tracking-widest text-sm uppercase">
-                                <Plane className="w-5 h-5" /> Anhangá Airlines
+                                <AirplaneTilt className="w-5 h-5" weight="fill" /> Anhangá Airlines
                             </div>
                             <div className="text-gray-400 font-bold text-xs uppercase">First Class Experience</div>
                         </div>
@@ -57,7 +59,7 @@ const CallToAction: React.FC = () => {
                                 data-tracking="cta-home-footer"
                             >
                                 <span>Solicitar Orçamento Personalizado</span>
-                                <MessageSquare className="w-5 h-5" />
+                                <ChatCentered className="w-5 h-5" weight="fill" />
                             </button>
                         </div>
 
@@ -83,7 +85,7 @@ const CallToAction: React.FC = () => {
                         {/* Stub Header */}
                         <div className="flex justify-between items-center mb-5 opacity-60">
                             <span className="text-[10px] font-bold tracking-widest uppercase">Anhangá Air</span>
-                            <Plane className="w-3 h-3" />
+                            <AirplaneTilt className="w-3 h-3" weight="fill" />
                         </div>
 
                         {/* Passenger Name */}
@@ -175,14 +177,14 @@ const CallToAction: React.FC = () => {
                                     <span className="font-mono text-[9px] font-bold tracking-[0.3em] text-gray-400 uppercase">
                                         ETKT 29384910239
                                     </span>
-                                    <Smartphone className="w-3 h-3 text-gray-300" />
+                                    <DeviceMobile className="w-3 h-3 text-gray-300" weight="fill" />
                                 </div>
                             </div>
                         </div>
 
                         {/* Decorative Stamp Watermark */}
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] rotate-[-30deg] pointer-events-none">
-                            <Plane className="w-32 h-32 text-brand-dark" />
+                            <AirplaneTilt className="w-32 h-32 text-brand-dark" weight="fill" />
                         </div>
                     </div>
 

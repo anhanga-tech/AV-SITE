@@ -1,13 +1,14 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Instagram from 'lucide-react/dist/esm/icons/instagram';
-import Facebook from 'lucide-react/dist/esm/icons/facebook';
-import Phone from 'lucide-react/dist/esm/icons/phone';
-import Mail from 'lucide-react/dist/esm/icons/mail';
-import MapPin from 'lucide-react/dist/esm/icons/map-pin';
-import Globe2 from 'lucide-react/dist/esm/icons/globe-2';
-import Heart from 'lucide-react/dist/esm/icons/heart';
+import {
+    InstagramLogo,
+    FacebookLogo,
+    Phone,
+    Envelope,
+    MapPin,
+    Heart,
+} from '@phosphor-icons/react';
 import { getBlogHomeUrl } from '../utils/blog';
 
 const SITE_URL = 'https://www.anhanga.tur.br';
@@ -67,15 +68,15 @@ const Footer: React.FC = () => {
                         <h4 className="font-bold text-white mb-6 uppercase tracking-wider text-xs">Fale Conosco</h4>
                         <ul className="space-y-4 font-medium text-sm">
                             <li className="flex items-center gap-3">
-                                <Phone className="w-5 h-5 text-brand-cyan" />
+                                <Phone className="w-5 h-5 text-brand-cyan" weight="fill" />
                                 <a href="tel:+551152833309" className="hover:text-brand-yellow transition-colors">(11) 5283-3309</a>
                             </li>
                             <li className="flex items-center gap-3">
-                                <Mail className="w-5 h-5 text-brand-cyan" />
+                                <Envelope className="w-5 h-5 text-brand-cyan" weight="fill" />
                                 <a href="mailto:contato@anhanga.tur.br" className="hover:text-brand-yellow transition-colors">contato@anhanga.tur.br</a>
                             </li>
                             <li className="flex items-start gap-3">
-                                <MapPin className="w-5 h-5 text-brand-cyan shrink-0 mt-1" />
+                                <MapPin className="w-5 h-5 text-brand-cyan shrink-0 mt-1" weight="fill" />
                                 <span className="leading-snug">Av. Dom Pedro I, 773<br />Vila Monumento, São Paulo-SP</span>
                             </li>
                         </ul>
@@ -92,7 +93,7 @@ const Footer: React.FC = () => {
                             className="p-2 bg-white/5 rounded-full hover:bg-brand-vibrant hover:text-white transition-colors"
                             aria-label="Siga a Anhangá Viagens no Instagram"
                         >
-                            <Instagram className="w-5 h-5" />
+                            <InstagramLogo className="w-5 h-5" weight="fill" />
                         </a>
                         <a
                             href="https://facebook.com/profile.php?id=61585422494271"
@@ -101,13 +102,13 @@ const Footer: React.FC = () => {
                             className="p-2 bg-white/5 rounded-full hover:bg-brand-vibrant hover:text-white transition-colors"
                             aria-label="Siga a Anhangá Viagens no Facebook"
                         >
-                            <Facebook className="w-5 h-5" />
+                            <FacebookLogo className="w-5 h-5" weight="fill" />
                         </a>
                     </div>
 
                     <div className="flex flex-col md:items-end gap-2 text-center md:text-right order-1 md:order-2">
                         <div className="text-xs text-gray-500 font-medium flex items-center justify-center md:justify-end gap-1">
-                            Feito com <Heart className="w-3 h-3 text-red-500 fill-current" aria-hidden="true" /> pela <img src={`${baseUrl}assets/LOGO ANHANGA TECH.svg`} alt="Anhangá.tech" width="80" height="16" className="h-4 w-auto inline-block mx-1 align-sub" /> • {currentYear}
+                            Feito com <Heart className="w-3 h-3 text-red-500" weight="fill" aria-hidden="true" /> pela <img src={`${baseUrl}assets/LOGO ANHANGA TECH.svg`} alt="Anhangá.tech" width="80" height="16" className="h-4 w-auto inline-block mx-1 align-sub" /> • {currentYear}
                         </div>
                         <div className="text-[10px] text-gray-600 font-medium flex flex-wrap justify-center md:justify-end gap-x-2">
                             <span>ANHANGA TURISMO LTDA • CNPJ/Cadastur: <a href="https://cadastur.turismo.gov.br/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline decoration-gray-600 underline-offset-2">37.036.732/0001-41</a></span>
