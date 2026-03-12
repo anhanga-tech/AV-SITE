@@ -3,6 +3,7 @@
 
 interface MetaConversionPayload {
   eventName: 'Lead' | 'Purchase';
+  eventId?: string;
   email?: string;
   phone?: string;
   firstName?: string;

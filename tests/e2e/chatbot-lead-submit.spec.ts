@@ -107,6 +107,47 @@ test.describe('Chatbot lead handoff', () => {
     expect(submitPayload?.tracking).toMatchObject({
       gclid: 'test-gclid',
     });
+    expect(typeof submitPayload?.event_id).toBe('string');
+    expect(String(submitPayload?.event_id)).toMatch(/^lead_(?:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+_[a-z0-9]{6})$/);
+
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          (window.dataLayer || []).find((entry) =>
+            entry && typeof entry === 'object' && 'event' in entry && entry.event === 'generate_lead'
+          ) || null
+        )
+      )
+      .not.toBeNull();
+
+    const generateLeadEvent = await page.evaluate(() =>
+      (window.dataLayer || []).find((entry) =>
+        entry && typeof entry === 'object' && 'event' in entry && entry.event === 'generate_lead'
+      ) || null
+    );
+    expect(generateLeadEvent).toMatchObject({
+      event: 'generate_lead',
+      event_id: submitPayload?.event_id,
+      destination: 'Orlando, Flórida',
+      utm_source: 'google',
+      utm_medium: 'cpc',
+    });
+    expect(generateLeadEvent).toHaveProperty('ga_client_id');
+    expect(generateLeadEvent).toHaveProperty('ga_session_id');
+
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          (window.dataLayer || []).find((entry) =>
+            entry && typeof entry === 'object' && 'event' in entry && entry.event === 'form_submission'
+          ) || null
+        )
+      )
+      .toMatchObject({
+      event: 'form_submission',
+      form_type: 'ai_chatbot_lead',
+      destination: 'whatsapp',
+    });
   });
 
   test('should open WhatsApp immediately even when HubSpot submit fails in the background', async ({ page }) => {
@@ -186,5 +227,15 @@ test.describe('Chatbot lead handoff', () => {
     // The lead form ("Link Gerado") is still rendered (popup opened in a new tab,
     // window.open mock returns a truthy object so location.assign is not triggered)
     await expect(page.getByText('Link Gerado')).toBeVisible();
+
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          (window.dataLayer || []).some((entry) =>
+            entry && typeof entry === 'object' && 'event' in entry && entry.event === 'generate_lead'
+          )
+        )
+      )
+      .toBe(false);
   });
 });

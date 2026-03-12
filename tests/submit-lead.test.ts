@@ -139,6 +139,24 @@ test('validatePayload should preserve fbp as a top-level tracking field', () => 
     });
 });
 
+test('validatePayload should preserve sanitized event_id when provided', () => {
+    const result = validatePayload({
+        firstName: 'Felipe',
+        lastName: 'William',
+        email: 'felipe@example.com',
+        event_id: ' lead_<meta>&capi ',
+        bantSummary: 'Need: Praia | Authority: casal | Budget: 20k | Timeline: setembro',
+        destination: 'Rio de Janeiro',
+        utms: {},
+        tracking: {},
+    });
+
+    assert.equal(result.valid, true);
+    if (!result.valid) return;
+
+    assert.equal(result.data.event_id, 'lead_&lt;meta&gt;&capi');
+});
+
 test('submit-lead should create contact and deal on first attempt', async (t) => {
     t.after(() => {
         global.fetch = originalFetch;
@@ -200,6 +218,7 @@ test('submit-lead should create contact and deal on first attempt', async (t) =>
         firstName: 'Felipe',
         lastName: 'William',
         email: 'felipe@example.com',
+        event_id: 'lead_test_123abc',
         bantSummary: 'Need: Praia | Authority: casal | Budget: 20k | Timeline: setembro',
         destination: 'Rio de Janeiro',
         utms: {
@@ -249,6 +268,7 @@ test('submit-lead should create contact and deal on first attempt', async (t) =>
         1,
     );
     assert.equal(metaCalls.length, 1);
+    assert.equal(metaCalls[0]?.eventId, 'lead_test_123abc');
     assert.equal(metaCalls[0]?.fbp, 'fb.1.1736366050.1234567890');
 
     const dealRequest = calls.find((call) => call.url.endsWith('/crm/v3/objects/deals'));

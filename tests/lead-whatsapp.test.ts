@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { buildLeadWhatsAppUrl, type LeadDraft } from '../hooks/useLeadCapture.ts';
+import {
+    buildLeadWhatsAppUrl,
+    createLeadEventId,
+    pushGenerateLeadDataLayerEvent,
+    type LeadDraft,
+} from '../hooks/useLeadCapture.ts';
 
 type MockWindow = {
     location: {
@@ -21,6 +26,35 @@ type MockSessionStorage = {
 const originalWindow = globalThis.window;
 const originalDocument = globalThis.document;
 const originalSessionStorage = globalThis.sessionStorage;
+
+function restoreBrowserGlobals() {
+    if (originalWindow === undefined) {
+        delete (globalThis as typeof globalThis & { window?: typeof globalThis.window }).window;
+    } else {
+        Object.defineProperty(globalThis, 'window', {
+            configurable: true,
+            value: originalWindow,
+        });
+    }
+
+    if (originalDocument === undefined) {
+        delete (globalThis as typeof globalThis & { document?: typeof globalThis.document }).document;
+    } else {
+        Object.defineProperty(globalThis, 'document', {
+            configurable: true,
+            value: originalDocument,
+        });
+    }
+
+    if (originalSessionStorage === undefined) {
+        delete (globalThis as typeof globalThis & { sessionStorage?: typeof globalThis.sessionStorage }).sessionStorage;
+    } else {
+        Object.defineProperty(globalThis, 'sessionStorage', {
+            configurable: true,
+            value: originalSessionStorage,
+        });
+    }
+}
 
 function createSessionStorage(): MockSessionStorage {
     const store = new Map<string, string>();
@@ -88,30 +122,67 @@ test('buildLeadWhatsAppUrl should include origin, destination, dates, baggage an
     assert.match(message, /Dados: .*utm_medium=cpc/);
     assert.match(message, /Dados: .*gclid=test-gclid/);
 
-    if (originalWindow === undefined) {
-        delete (globalThis as typeof globalThis & { window?: typeof globalThis.window }).window;
-    } else {
-        Object.defineProperty(globalThis, 'window', {
-            configurable: true,
-            value: originalWindow,
-        });
-    }
+    restoreBrowserGlobals();
+});
 
-    if (originalDocument === undefined) {
-        delete (globalThis as typeof globalThis & { document?: typeof globalThis.document }).document;
-    } else {
-        Object.defineProperty(globalThis, 'document', {
-            configurable: true,
-            value: originalDocument,
-        });
-    }
+test('createLeadEventId should generate a lead-prefixed event id', () => {
+    const eventId = createLeadEventId();
 
-    if (originalSessionStorage === undefined) {
-        delete (globalThis as typeof globalThis & { sessionStorage?: typeof globalThis.sessionStorage }).sessionStorage;
-    } else {
-        Object.defineProperty(globalThis, 'sessionStorage', {
-            configurable: true,
-            value: originalSessionStorage,
-        });
-    }
+    assert.match(eventId, /^lead_(?:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+_[a-z0-9]{6})$/);
+});
+
+test('pushGenerateLeadDataLayerEvent should push generate_lead with tracking fields', () => {
+    const mockWindow: MockWindow = {
+        location: {
+            search: '',
+            hash: '',
+            href: 'https://www.anhanga.tur.br/',
+        },
+        dataLayer: [],
+    };
+
+    Object.defineProperty(globalThis, 'window', {
+        configurable: true,
+        value: mockWindow,
+    });
+
+    pushGenerateLeadDataLayerEvent(
+        {
+            firstName: 'Felipe',
+            lastName: 'William',
+            email: 'felipe@example.com',
+            event_id: 'lead_123456_test01',
+            bantSummary: 'Need: Praia',
+            destination: 'Rio de Janeiro',
+            utms: {
+                utm_source: 'google',
+                utm_medium: 'cpc',
+                utm_campaign: 'rio',
+                utm_term: null,
+                utm_content: null,
+            },
+            tracking: {
+                utm_source: 'google',
+                utm_medium: 'cpc',
+                utm_campaign: 'rio',
+                utm_term: null,
+                utm_content: null,
+                cid: 'cid-123',
+                sid: 'sid-456',
+            },
+        },
+    );
+
+    assert.deepEqual(mockWindow.dataLayer[0], {
+        event: 'generate_lead',
+        event_id: 'lead_123456_test01',
+        destination: 'Rio de Janeiro',
+        utm_source: 'google',
+        utm_medium: 'cpc',
+        utm_campaign: 'rio',
+        ga_client_id: 'cid-123',
+        ga_session_id: 'sid-456',
+    });
+
+    restoreBrowserGlobals();
 });
