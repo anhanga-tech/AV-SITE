@@ -10,6 +10,8 @@ const originalEnv = {
     HUBSPOT_DEAL_STAGE_ID: process.env.HUBSPOT_DEAL_STAGE_ID,
     HUBSPOT_DEAL_BANT_PROPERTY: process.env.HUBSPOT_DEAL_BANT_PROPERTY,
     HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY: process.env.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY,
+    HUBSPOT_REQUEST_TIMEOUT_MS: process.env.HUBSPOT_REQUEST_TIMEOUT_MS,
+    SUBMIT_LEAD_RATE_LIMIT_TIMEOUT_MS: process.env.SUBMIT_LEAD_RATE_LIMIT_TIMEOUT_MS,
 };
 
 function restoreEnv() {
@@ -18,12 +20,19 @@ function restoreEnv() {
     process.env.HUBSPOT_DEAL_STAGE_ID = originalEnv.HUBSPOT_DEAL_STAGE_ID;
     process.env.HUBSPOT_DEAL_BANT_PROPERTY = originalEnv.HUBSPOT_DEAL_BANT_PROPERTY;
     process.env.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY = originalEnv.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY;
+    process.env.HUBSPOT_REQUEST_TIMEOUT_MS = originalEnv.HUBSPOT_REQUEST_TIMEOUT_MS;
+    process.env.SUBMIT_LEAD_RATE_LIMIT_TIMEOUT_MS = originalEnv.SUBMIT_LEAD_RATE_LIMIT_TIMEOUT_MS;
 }
 
 function buildRequest(body: Record<string, unknown>): Request {
+    const ipSuffix = Math.floor(Math.random() * 200) + 1;
+
     return new Request('http://localhost/api/submit-lead', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            'x-real-ip': `127.0.0.${ipSuffix}`,
+        },
         body: JSON.stringify(body),
     });
 }
@@ -44,7 +53,40 @@ interface MockHubSpotRequest {
     body?: MockHubSpotRequestBody;
 }
 
-test('mapTrackingToContactProperties should map msclkid to hs_microsoft_click_id', () => {
+interface MockHubSpotRoute {
+    matches: (request: MockHubSpotRequest) => boolean;
+    respond: (request: MockHubSpotRequest) => Response | Promise<Response>;
+}
+
+function buildMockHubSpotRequest(input: RequestInfo | URL, init?: RequestInit): MockHubSpotRequest {
+    return {
+        url: getUrl(input),
+        method: init?.method || 'GET',
+        body: init?.body ? JSON.parse(String(init.body)) as MockHubSpotRequestBody : undefined,
+    };
+}
+
+function createMockHubSpotFetch(calls: MockHubSpotRequest[], routes: MockHubSpotRoute[]): typeof fetch {
+    return (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+        const request = buildMockHubSpotRequest(input, init);
+        calls.push(request);
+
+        for (const route of routes) {
+            if (route.matches(request)) {
+                return await route.respond(request);
+            }
+        }
+
+        throw new Error(`Unexpected request: ${request.method} ${request.url}`);
+    }) as typeof fetch;
+}
+
+function collectContactPatchProperties(calls: MockHubSpotRequest[], contactId: string): Record<string, unknown> {
+    const patches = calls.filter((call) => call.url.endsWith(`/crm/v3/objects/contacts/${contactId}`) && call.method === 'PATCH');
+    return Object.assign({}, ...patches.map((call) => call.body?.properties || {}));
+}
+
+test('mapTrackingToContactProperties should map msclkid to hs_linkedin_click_id', () => {
     const mapped = mapTrackingToContactProperties({
         utm_source: null,
         utm_medium: null,
@@ -58,7 +100,7 @@ test('mapTrackingToContactProperties should map msclkid to hs_microsoft_click_id
     });
 
     assert.equal(mapped.properties.ga_client_id, 'ga.123');
-    assert.equal(mapped.properties.hs_microsoft_click_id, 'ms-abc');
+    assert.equal(mapped.properties.hs_linkedin_click_id, 'ms-abc');
     assert.equal(mapped.properties.hs_google_click_id, 'g-xyz');
     assert.equal(mapped.properties.wbraid, 'w-123');
 });
@@ -84,6 +126,10 @@ test('submit-lead should create contact and deal on first attempt', async (t) =>
 
         if (url.endsWith('/crm/v3/objects/contacts') && method === 'POST') {
             return new Response(JSON.stringify({ id: 'contact-1' }), { status: 201 });
+        }
+
+        if (url.endsWith('/crm/v3/objects/contacts/contact-1') && method === 'PATCH') {
+            return new Response(JSON.stringify({ id: 'contact-1' }), { status: 200 });
         }
 
         if (url.endsWith('/crm/v3/objects/deals') && method === 'POST') {
@@ -125,6 +171,8 @@ test('submit-lead should create contact and deal on first attempt', async (t) =>
     const payload = await response.json();
 
     assert.equal(payload.ok, true);
+    assert.equal(typeof payload.requestId, 'string');
+    assert.ok(payload.requestId.length > 0);
     assert.equal(payload.contactId, 'contact-1');
     assert.equal(payload.dealId, 'deal-1');
 
@@ -132,11 +180,20 @@ test('submit-lead should create contact and deal on first attempt', async (t) =>
     assert.ok(contactRequest, 'contact creation request should exist');
 
     const contactProps = contactRequest!.body?.properties || {};
-    assert.equal(contactProps.ga_client_id, 'cid-1');
-    assert.equal(contactProps.ga_session_id, 'sid-1');
-    assert.equal(contactProps.hs_google_click_id, 'gclid-1');
-    assert.equal(contactProps.hs_facebook_click_id, 'fbclid-1');
-    assert.equal(contactProps.hs_microsoft_click_id, 'msclkid-1');
+    assert.equal(contactProps.firstname, 'Felipe');
+    assert.equal(contactProps.lastname, 'William');
+    assert.equal(contactProps.email, 'felipe@example.com');
+
+    const enrichedContactProps = collectContactPatchProperties(calls, 'contact-1');
+    assert.equal(enrichedContactProps.ga_client_id, 'cid-1');
+    assert.equal(enrichedContactProps.ga_session_id, 'sid-1');
+    assert.equal(enrichedContactProps.hs_google_click_id, 'gclid-1');
+    assert.equal(enrichedContactProps.hs_facebook_click_id, 'fbclid-1');
+    assert.equal(enrichedContactProps.hs_linkedin_click_id, 'msclkid-1');
+    assert.equal(
+        calls.filter((call) => call.url.endsWith('/crm/v3/objects/contacts/contact-1') && call.method === 'PATCH').length,
+        1,
+    );
 
     const dealRequest = calls.find((call) => call.url.endsWith('/crm/v3/objects/deals'));
     assert.ok(dealRequest, 'deal creation request should exist');
@@ -164,6 +221,9 @@ test('submit-lead should sanitize XSS payloads in inputs', async (t) => {
 
         if (url.endsWith('/crm/v3/objects/contacts') && method === 'POST') {
             return new Response(JSON.stringify({ id: 'contact-1' }), { status: 201 });
+        }
+        if (url.endsWith('/crm/v3/objects/contacts/contact-1') && method === 'PATCH') {
+            return new Response(JSON.stringify({ id: 'contact-1' }), { status: 200 });
         }
         if (url.endsWith('/crm/v3/objects/deals') && method === 'POST') {
             return new Response(JSON.stringify({ id: 'deal-1' }), { status: 201 });
@@ -198,7 +258,9 @@ test('submit-lead should sanitize XSS payloads in inputs', async (t) => {
 
     assert.equal(contactProps.firstname, "&lt;script&gt;alert('xss')&lt;/script&gt;John");
     assert.equal(contactProps.lastname, "Doe &gt;");
-    assert.equal(contactProps.ultimo_utm_source, "&lt;svg onload=alert(1)&gt;");
+
+    const enrichedContactProps = collectContactPatchProperties(calls, 'contact-1');
+    assert.equal(enrichedContactProps.ultimo_utm_source, "&lt;svg onload=alert(1)&gt;");
 
     const dealRequest = calls.find((call) => call.url.endsWith('/crm/v3/objects/deals'));
     const dealProps = dealRequest!.body.properties;
@@ -208,8 +270,8 @@ test('submit-lead should sanitize XSS payloads in inputs', async (t) => {
     assert.equal(dealProps[bantProperty], "Need: &lt;img src=x onerror=alert(1)&gt;");
 
     // Check extras sanitization
-    const trackingFallback = typeof contactProps.contact_tracking_fallback === 'string'
-        ? contactProps.contact_tracking_fallback
+    const trackingFallback = typeof enrichedContactProps.contact_tracking_fallback === 'string'
+        ? enrichedContactProps.contact_tracking_fallback
         : '{}';
     const extras = JSON.parse(trackingFallback) as Record<string, string>;
     assert.ok(extras["&lt;p&gt;custom&lt;/p&gt;"], "Key should be sanitized");
@@ -275,6 +337,8 @@ test('submit-lead should recover on duplicate contact and still create deal', as
     const payload = await response.json();
 
     assert.equal(payload.ok, true);
+    assert.equal(typeof payload.requestId, 'string');
+    assert.ok(payload.requestId.length > 0);
     assert.equal(payload.contactId, 'contact-existing');
     assert.equal(payload.dealId, 'deal-2');
 });
@@ -295,6 +359,10 @@ test('submit-lead should create fallback note and return warning when deal fails
 
         if (url.endsWith('/crm/v3/objects/contacts') && method === 'POST') {
             return new Response(JSON.stringify({ id: 'contact-3' }), { status: 201 });
+        }
+
+        if (url.endsWith('/crm/v3/objects/contacts/contact-3') && method === 'PATCH') {
+            return new Response(JSON.stringify({ id: 'contact-3' }), { status: 200 });
         }
 
         if (url.endsWith('/crm/v3/objects/deals') && method === 'POST') {
@@ -332,7 +400,225 @@ test('submit-lead should create fallback note and return warning when deal fails
     const payload = await response.json();
 
     assert.equal(payload.ok, true);
+    assert.equal(typeof payload.requestId, 'string');
+    assert.ok(payload.requestId.length > 0);
     assert.equal(payload.contactId, 'contact-3');
     assert.equal(payload.dealId, undefined);
     assert.match(payload.warning, /nota foi registrada/i);
+});
+
+test('submit-lead should keep the contact when optional HubSpot properties fail', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+        restoreEnv();
+    });
+
+    process.env.HUBSPOT_TOKEN = 'test-token';
+    process.env.HUBSPOT_DEAL_PIPELINE_ID = 'pipeline-1';
+    process.env.HUBSPOT_DEAL_STAGE_ID = 'stage-1';
+
+    const calls: MockHubSpotRequest[] = [];
+
+    global.fetch = createMockHubSpotFetch(calls, [
+        {
+            matches: ({ url, method }) => url.endsWith('/crm/v3/objects/contacts') && method === 'POST',
+            respond: () => new Response(JSON.stringify({ id: 'contact-4' }), { status: 201 }),
+        },
+        {
+            matches: ({ url, method }) => url.endsWith('/crm/v3/objects/contacts/contact-4') && method === 'PATCH',
+            respond: ({ body }) => {
+                const propertyName = Object.keys(body?.properties || {})[0];
+                if (propertyName === 'ultimo_utm_source') {
+                    return new Response(JSON.stringify({
+                        status: 'error',
+                        message: 'Property values were not valid',
+                    }), { status: 400 });
+                }
+
+                return new Response(JSON.stringify({ id: 'contact-4' }), { status: 200 });
+            },
+        },
+        {
+            matches: ({ url, method }) => url.endsWith('/crm/v3/objects/deals') && method === 'POST',
+            respond: () => new Response(JSON.stringify({ id: 'deal-4' }), { status: 201 }),
+        },
+        {
+            matches: ({ url, method }) => url.endsWith('/crm/v4/objects/deals/deal-4/associations/default/contacts/contact-4') && method === 'PUT',
+            respond: () => new Response(null, { status: 204 }),
+        },
+        {
+            matches: ({ url, method }) => url.endsWith('/crm/v3/objects/notes') && method === 'POST',
+            respond: () => new Response(JSON.stringify({ id: 'note-contact-warning' }), { status: 201 }),
+        },
+        {
+            matches: ({ url, method }) => url.endsWith('/crm/v4/objects/notes/note-contact-warning/associations/default/contacts/contact-4') && method === 'PUT',
+            respond: () => new Response(null, { status: 204 }),
+        },
+    ]);
+
+    const response = await handler(buildRequest({
+        firstName: 'Felipe',
+        lastName: 'William',
+        email: 'felipe@example.com',
+        bantSummary: 'Need: Disney | Authority: casal | Budget: 20k | Timeline: junho',
+        destination: 'Orlando',
+        utms: {
+            utm_source: 'google',
+            utm_medium: null,
+            utm_campaign: null,
+            utm_term: null,
+            utm_content: null,
+        },
+        tracking: {
+            utm_source: 'google',
+            utm_medium: null,
+            utm_campaign: null,
+            utm_term: null,
+            utm_content: null,
+            cid: 'cid-4',
+        },
+    }));
+
+    assert.equal(response.status, 201);
+    const payload = await response.json();
+
+    assert.equal(payload.ok, true);
+    assert.equal(payload.contactId, 'contact-4');
+    assert.equal(payload.dealId, 'deal-4');
+    assert.match(payload.warning, /dados de rastreamento\/UTM/i);
+    assert.match(payload.warning, /nota foi registrada/i);
+
+    const contactCreateRequest = calls.find((call) => call.url.endsWith('/crm/v3/objects/contacts') && call.method === 'POST');
+    assert.deepEqual(contactCreateRequest?.body?.properties, {
+        firstname: 'Felipe',
+        lastname: 'William',
+        email: 'felipe@example.com',
+    });
+
+    const enrichedContactProps = collectContactPatchProperties(calls, 'contact-4');
+    assert.equal(enrichedContactProps.ga_client_id, 'cid-4');
+    assert.equal(enrichedContactProps.ultimo_utm_source, 'google');
+    assert.equal(
+        calls.filter((call) => call.url.endsWith('/crm/v3/objects/contacts/contact-4') && call.method === 'PATCH').length,
+        1,
+    );
+
+    const noteRequest = calls.find((call) => call.url.endsWith('/crm/v3/objects/notes') && call.method === 'POST');
+    assert.ok(noteRequest, 'fallback note should be created for rejected optional properties');
+    assert.match(String(noteRequest?.body?.properties?.hs_note_body || ''), /ultimo_utm_source/);
+});
+
+test('submit-lead should return requestId and property-specific code when HubSpot rejects contact properties', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+        restoreEnv();
+    });
+
+    process.env.HUBSPOT_TOKEN = 'test-token';
+    process.env.HUBSPOT_DEAL_PIPELINE_ID = 'pipeline-1';
+    process.env.HUBSPOT_DEAL_STAGE_ID = 'stage-1';
+
+    global.fetch = (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+        const url = getUrl(input);
+        const method = init?.method || 'GET';
+
+        if (url.endsWith('/crm/v3/objects/contacts') && method === 'POST') {
+            return new Response(JSON.stringify({
+                status: 'error',
+                message: 'Property values were not valid',
+            }), { status: 400 });
+        }
+
+        throw new Error(`Unexpected request: ${method} ${url}`);
+    }) as typeof fetch;
+
+    const response = await handler(buildRequest({
+        firstName: 'Felipe',
+        lastName: 'William',
+        email: 'felipe@example.com',
+        bantSummary: 'Need: Praia | Authority: casal | Budget: 20k | Timeline: setembro',
+        destination: 'Lisboa',
+        utms: {},
+        tracking: {
+            utm_source: null,
+            utm_medium: null,
+            utm_campaign: null,
+            utm_term: null,
+            utm_content: null,
+        },
+    }));
+
+    assert.equal(response.status, 502);
+    const payload = await response.json();
+
+    assert.equal(payload.ok, false);
+    assert.equal(payload.code, 'HUBSPOT_PROPERTY_ERROR');
+    assert.equal(typeof payload.requestId, 'string');
+    assert.ok(payload.requestId.length > 0);
+});
+
+test('submit-lead should not hang when HubSpot enrichment times out', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+        restoreEnv();
+    });
+
+    process.env.HUBSPOT_TOKEN = 'test-token';
+    process.env.HUBSPOT_DEAL_PIPELINE_ID = 'pipeline-1';
+    process.env.HUBSPOT_DEAL_STAGE_ID = 'stage-1';
+    process.env.HUBSPOT_REQUEST_TIMEOUT_MS = '100';
+
+    const calls: MockHubSpotRequest[] = [];
+
+    global.fetch = createMockHubSpotFetch(calls, [
+        {
+            matches: ({ url, method }) => url.endsWith('/crm/v3/objects/contacts') && method === 'POST',
+            respond: () => new Response(JSON.stringify({ id: 'contact-timeout' }), { status: 201 }),
+        },
+        {
+            matches: ({ url, method }) => url.endsWith('/crm/v3/objects/contacts/contact-timeout') && method === 'PATCH',
+            respond: () => new Promise<Response>(() => {}),
+        },
+        {
+            matches: ({ url, method }) => url.endsWith('/crm/v3/objects/deals') && method === 'POST',
+            respond: () => new Response(JSON.stringify({ id: 'deal-timeout' }), { status: 201 }),
+        },
+        {
+            matches: ({ url, method }) => url.endsWith('/crm/v4/objects/deals/deal-timeout/associations/default/contacts/contact-timeout') && method === 'PUT',
+            respond: () => new Response(null, { status: 204 }),
+        },
+    ]);
+
+    const response = await handler(buildRequest({
+        firstName: 'Felipe',
+        lastName: 'William',
+        email: 'felipe@example.com',
+        bantSummary: 'Need: Disney | Authority: casal | Budget: 20k | Timeline: junho',
+        destination: 'Orlando',
+        utms: {
+            utm_source: 'google',
+            utm_medium: null,
+            utm_campaign: null,
+            utm_term: null,
+            utm_content: null,
+        },
+        tracking: {
+            cid: 'cid-timeout',
+            utm_source: 'google',
+            utm_medium: null,
+            utm_campaign: null,
+            utm_term: null,
+            utm_content: null,
+        },
+    }));
+
+    assert.equal(response.status, 201);
+    const payload = await response.json();
+
+    assert.equal(payload.ok, true);
+    assert.equal(payload.contactId, 'contact-timeout');
+    assert.equal(payload.dealId, 'deal-timeout');
+    assert.match(payload.warning, /dados de rastreamento\/UTM/i);
+    assert.doesNotMatch(payload.warning, /nota foi registrada/i);
+    assert.equal(calls.some((call) => call.url.endsWith('/crm/v3/objects/notes')), false);
 });

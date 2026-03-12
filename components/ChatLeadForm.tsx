@@ -1,5 +1,5 @@
-import React, { useState, memo } from 'react';
-import { Loader2, ExternalLink, CheckCircle2 } from 'lucide-react';
+import React, { memo, useState } from 'react';
+import { CheckCircle2, ExternalLink, Loader2 } from 'lucide-react';
 import { triggerHaptic } from '../utils/haptics';
 
 export interface LeadFinalizePayload {
@@ -8,29 +8,29 @@ export interface LeadFinalizePayload {
   email: string;
   bantSummary: string;
   destination: string;
-  fallbackUrl: string;
 }
 
-export type LeadFinalizeResult =
-  | { ok: true; url: string; notice?: string }
-  | { ok: false; error: string };
+export interface LeadFinalizeResult {
+  ok: boolean;
+  notice?: string;
+  error?: string;
+  requestId?: string;
+}
 
 interface ChatLeadFormProps {
-  fallbackUrl: string;
   destination?: string;
   defaultBantSummary?: string;
+  getWhatsAppUrl: (payload: LeadFinalizePayload) => string;
   isSubmittingLead: boolean;
   onFinalizeLead: (payload: LeadFinalizePayload) => Promise<LeadFinalizeResult>;
-  externalError?: string | null;
 }
 
 const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
-  fallbackUrl,
   destination,
   defaultBantSummary,
+  getWhatsAppUrl,
   isSubmittingLead,
   onFinalizeLead,
-  externalError
 }) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -56,6 +56,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
     const normalizedFirstName = firstName.trim();
     const normalizedLastName = lastName.trim();
     const normalizedEmail = email.trim().toLowerCase();
+    const normalizedDestination = destination?.trim() || '';
 
     const errors: typeof fieldErrors = {};
     if (!normalizedFirstName) errors.firstName = 'Campo obrigatório';
@@ -76,30 +77,36 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
       return;
     }
 
-    void triggerHaptic('medium');
+    if (!normalizedDestination) {
+      setLocalError('Não conseguimos identificar o destino da sua viagem. Gere o link novamente pelo chat.');
+      return;
+    }
 
-    const result = await onFinalizeLead({
+    const payload: LeadFinalizePayload = {
       firstName: normalizedFirstName,
       lastName: normalizedLastName,
       email: normalizedEmail,
       bantSummary: defaultBantSummary || 'Não informado',
-      destination: destination || '',
-      fallbackUrl,
-    });
+      destination: normalizedDestination,
+    };
 
-    if (!result.ok) {
-      setLocalError((result as { ok: false; error: string }).error);
-      return;
+    void triggerHaptic('medium');
+
+    // Open WhatsApp synchronously in the click handler to prevent popup blockers on mobile/Safari
+    const whatsappUrl = getWhatsAppUrl(payload);
+    const popup = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    if (!popup) {
+      window.location.assign(whatsappUrl);
     }
 
-    if (result.notice) {
+    // Submit lead data in the background — user is already heading to WhatsApp
+    const result = await onFinalizeLead(payload);
+    if (!result.ok) {
+      console.warn('Background lead submission failed:', { error: result.error, requestId: result.requestId });
+    } else if (result.notice) {
       setNotice(result.notice);
     }
-
-    window.open(result.url, '_blank', 'noopener,noreferrer');
   };
-
-  const displayError = externalError || localError;
 
   return (
     <div className="bg-white rounded-2xl border border-brand-blue/10 shadow-[0_8px_30px_rgb(0,0,0,0.08)] w-full overflow-hidden transform transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-1">
@@ -166,16 +173,16 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
                 <CheckCircle2 className="absolute h-3 w-3 text-white opacity-0 peer-checked:opacity-100 left-0.5 pointer-events-none transition-opacity" />
               </div>
               <span className="text-[11px] text-gray-500 leading-tight">
-                Aceito receber comunicações e autorizo o tratamento dos meus dados conforme a <a href="https://www.anhanga.tur.br/politica-privacidade/" target="_blank" className="underline hover:text-brand-vibrant">Política de Privacidade</a>.
+                Aceito receber comunicações e autorizo o tratamento dos meus dados conforme a <a href="https://www.anhanga.tur.br/politica-privacidade/" target="_blank" rel="noopener noreferrer" className="underline hover:text-brand-vibrant">Política de Privacidade</a>.
               </span>
             </label>
             {fieldErrors.lgpd && <span className="text-[10px] text-red-500 font-bold ml-7 uppercase">{fieldErrors.lgpd}</span>}
           </div>
         </div>
 
-        {displayError && (
+        {localError && (
           <div role="alert" className="bg-red-50/80 text-red-600 px-4 py-3 text-xs font-medium rounded-xl mb-4 border border-red-100 animate-in fade-in slide-in-from-top-1">
-            {displayError}
+            {localError}
           </div>
         )}
         {notice && (
@@ -197,7 +204,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
             </>
           ) : (
             <>
-              <span>Abrir WhatsApp</span>
+              <span>Salvar e abrir WhatsApp</span>
               <ExternalLink className="w-4 h-4 group-hover:scale-110 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
             </>
           )}

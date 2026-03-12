@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { getTrackingDataObject, getWhatsAppLink } from '../utils/whatsapp';
 import type { LeadTracking, LeadUtms, SubmitLeadRequest } from '../types/leadCapture';
 
-interface LeadDraft {
+export interface LeadDraft {
     firstName: string;
     lastName: string;
     email: string;
@@ -13,38 +13,35 @@ interface LeadDraft {
     baggagePreference: string;
 }
 
-type LeadDraftPartial = Partial<LeadDraft>;
+export type LeadDraftPartial = Partial<LeadDraft>;
 
 type SubmitLeadResponseData = {
     error?: string;
     code?: string;
     contactId?: string;
     dealId?: string;
+    requestId?: string;
     warning?: string;
 };
 
-type SubmitLeadHookResult =
+export type SubmitLeadHookResult =
     | {
         ok: true;
-        whatsappUrl: string;
+        requestId: string;
         contactId: string;
         dealId?: string;
         warning?: string;
     }
     | {
         ok: false;
+        requestId?: string;
         error: string;
         code: string;
         status?: number;
     };
 
-const EMPTY_UTMS: LeadUtms = {
-    utm_source: null,
-    utm_medium: null,
-    utm_campaign: null,
-    utm_term: null,
-    utm_content: null,
-};
+type SubmitLeadSuccessResult = Extract<SubmitLeadHookResult, { ok: true }>;
+type SubmitLeadFailureResult = Extract<SubmitLeadHookResult, { ok: false }>;
 
 const EMPTY_LEAD_DRAFT: LeadDraft = {
     firstName: '',
@@ -61,12 +58,29 @@ function cleanValue(value: string): string {
     return value.trim();
 }
 
+function mergeLeadDraft(base: LeadDraft, overrides: LeadDraftPartial): LeadDraft {
+    return {
+        ...base,
+        ...overrides,
+    };
+}
+
 function asResponseData(value: unknown): SubmitLeadResponseData {
     if (!value || typeof value !== 'object') {
         return {};
     }
 
     return value as SubmitLeadResponseData;
+}
+
+function parseResponseData(value: string): SubmitLeadResponseData {
+    if (!value) return {};
+
+    try {
+        return asResponseData(JSON.parse(value));
+    } catch {
+        return {};
+    }
 }
 
 function toNullable(value: unknown): string | null {
@@ -136,7 +150,7 @@ function captureInitialTracking(): LeadTracking {
     };
 }
 
-function buildWhatsAppMessage(lead: LeadDraft): string {
+export function buildLeadWhatsAppMessage(lead: LeadDraft): string {
     const origin = cleanValue(lead.origin) || 'A definir';
     const destination = cleanValue(lead.destination) || 'A definir';
     const dates = cleanValue(lead.dates) || 'A definir';
@@ -157,8 +171,114 @@ function buildWhatsAppMessage(lead: LeadDraft): string {
     return lines.join('\n');
 }
 
+export function buildLeadWhatsAppUrl(lead: LeadDraft): string {
+    return getWhatsAppLink(buildLeadWhatsAppMessage(lead), { appendTrackingRef: true });
+}
+
 function resolveSubmitLeadEndpoint(): string {
     return '/api/submit-lead';
+}
+
+function isHtmlPayload(value: string): boolean {
+    const normalized = value.trim().toLowerCase();
+    return normalized.startsWith('<!doctype html') || normalized.startsWith('<html');
+}
+
+function truncateResponseText(value: string): string {
+    const normalized = value.trim().replace(/\s+/g, ' ');
+    return normalized.length > 180 ? `${normalized.slice(0, 177)}...` : normalized;
+}
+
+function buildSubmitLeadPayload(
+    leadDraft: LeadDraft,
+    overrides: LeadDraftPartial,
+    latestTracking: LeadTracking,
+    latestUtms: LeadUtms,
+): SubmitLeadRequest {
+    const merged = mergeLeadDraft(leadDraft, overrides);
+
+    return {
+        firstName: cleanValue(merged.firstName),
+        lastName: cleanValue(merged.lastName),
+        email: cleanValue(merged.email).toLowerCase(),
+        bantSummary: cleanValue(merged.bantSummary),
+        destination: cleanValue(merged.destination),
+        utms: latestUtms,
+        tracking: {
+            ...latestTracking,
+            ...latestUtms,
+        },
+    };
+}
+
+function getSubmitLeadValidationError(payload: SubmitLeadRequest): string | null {
+    if (!payload.firstName || !payload.lastName || !payload.email || !payload.bantSummary || !payload.destination) {
+        return 'Preencha todos os campos obrigatórios (incluindo destino) antes de enviar.';
+    }
+
+    return null;
+}
+
+type ParsedSubmitLeadResponse = {
+    responseRequestId?: string;
+    responseText: string;
+    rawData: SubmitLeadResponseData;
+};
+
+async function parseSubmitLeadResponse(response: Response): Promise<ParsedSubmitLeadResponse> {
+    const responseText = await response.text();
+
+    return {
+        responseText,
+        rawData: parseResponseData(responseText),
+        responseRequestId: response.headers.get('x-request-id') || undefined,
+    };
+}
+
+function buildSubmitLeadErrorResult(
+    status: number,
+    parsed: ParsedSubmitLeadResponse,
+): SubmitLeadFailureResult {
+    const apiError = typeof parsed.rawData.error === 'string'
+        ? parsed.rawData.error
+        : parsed.responseText && !isHtmlPayload(parsed.responseText)
+            ? truncateResponseText(parsed.responseText)
+            : `Falha ao enviar lead para o HubSpot (status ${status}).`;
+    const apiCode = typeof parsed.rawData.code === 'string'
+        ? parsed.rawData.code
+        : 'HUBSPOT_API_ERROR';
+
+    return {
+        ok: false,
+        requestId: parsed.rawData.requestId || parsed.responseRequestId,
+        error: apiError,
+        code: apiCode,
+        status,
+    };
+}
+
+function buildSubmitLeadSuccessResult(parsed: ParsedSubmitLeadResponse): SubmitLeadSuccessResult {
+    return {
+        ok: true,
+        requestId: typeof parsed.rawData.requestId === 'string'
+            ? parsed.rawData.requestId
+            : (parsed.responseRequestId || 'unknown'),
+        contactId: typeof parsed.rawData.contactId === 'string' ? parsed.rawData.contactId : 'unknown',
+        dealId: typeof parsed.rawData.dealId === 'string' ? parsed.rawData.dealId : undefined,
+        warning: typeof parsed.rawData.warning === 'string' ? parsed.rawData.warning : undefined,
+    };
+}
+
+function buildNetworkErrorResult(requestError: unknown): SubmitLeadFailureResult {
+    const message = requestError instanceof Error
+        ? requestError.message
+        : 'Falha de rede ao enviar lead.';
+
+    return {
+        ok: false,
+        error: message,
+        code: 'NETWORK_ERROR',
+    };
 }
 
 export function useLeadCapture() {
@@ -174,11 +294,17 @@ export function useLeadCapture() {
         setUtms(extractUtms(captured));
     }, []);
 
+    const refreshTrackingState = (): { tracking: LeadTracking; utms: LeadUtms } => {
+        const latestTracking = captureInitialTracking();
+        const latestUtms = extractUtms(latestTracking);
+        setTracking(latestTracking);
+        setUtms(latestUtms);
+
+        return { tracking: latestTracking, utms: latestUtms };
+    };
+
     const setLeadDraft = (partial: LeadDraftPartial): void => {
-        setLeadDraftState((prev) => ({
-            ...prev,
-            ...partial,
-        }));
+        setLeadDraftState((prev) => mergeLeadDraft(prev, partial));
     };
 
     const resetLeadDraft = (): void => {
@@ -186,36 +312,21 @@ export function useLeadCapture() {
         setError(null);
     };
 
+    const getLeadWhatsAppUrl = (overrides: LeadDraftPartial = {}): string => {
+        refreshTrackingState();
+        return buildLeadWhatsAppUrl(mergeLeadDraft(leadDraft, overrides));
+    };
+
     const submitLead = async (overrides: LeadDraftPartial = {}): Promise<SubmitLeadHookResult> => {
         setError(null);
         setIsSubmitting(true);
 
-        const latestTracking = captureInitialTracking();
-        const latestUtms = extractUtms(latestTracking);
-        setTracking(latestTracking);
-        setUtms(latestUtms);
+        const { tracking: latestTracking, utms: latestUtms } = refreshTrackingState();
+        const payload = buildSubmitLeadPayload(leadDraft, overrides, latestTracking, latestUtms);
+        const validationError = getSubmitLeadValidationError(payload);
 
-        const merged: LeadDraft = {
-            ...leadDraft,
-            ...overrides,
-        };
-
-        const payload: SubmitLeadRequest = {
-            firstName: cleanValue(merged.firstName),
-            lastName: cleanValue(merged.lastName),
-            email: cleanValue(merged.email).toLowerCase(),
-            bantSummary: cleanValue(merged.bantSummary),
-            destination: cleanValue(merged.destination),
-            utms: latestUtms,
-            tracking: {
-                ...latestTracking,
-                ...latestUtms,
-            },
-        };
-
-        if (!payload.firstName || !payload.lastName || !payload.email || !payload.bantSummary || !payload.destination) {
+        if (validationError) {
             setIsSubmitting(false);
-            const validationError = 'Preencha todos os campos obrigatórios (incluindo destino) antes de enviar.';
             setError(validationError);
 
             return {
@@ -234,54 +345,22 @@ export function useLeadCapture() {
                 body: JSON.stringify(payload),
             });
 
-            const rawData = asResponseData(await response.json().catch(() => ({})));
+            const parsed = await parseSubmitLeadResponse(response);
 
             if (!response.ok) {
-                const apiError = typeof rawData.error === 'string'
-                    ? rawData.error
-                    : 'Falha ao enviar lead para o HubSpot.';
-                const apiCode = typeof rawData.code === 'string'
-                    ? rawData.code
-                    : 'HUBSPOT_API_ERROR';
-
-                setError(apiError);
+                const failure = buildSubmitLeadErrorResult(response.status, parsed);
+                setError(failure.error);
                 setIsSubmitting(false);
-
-                return {
-                    ok: false,
-                    error: apiError,
-                    code: apiCode,
-                    status: response.status,
-                };
+                return failure;
             }
 
-            const contactId = typeof rawData.contactId === 'string' ? rawData.contactId : 'unknown';
-            const dealId = typeof rawData.dealId === 'string' ? rawData.dealId : undefined;
-            const warning = typeof rawData.warning === 'string' ? rawData.warning : undefined;
-            const whatsappUrl = getWhatsAppLink(buildWhatsAppMessage(merged), { appendTrackingRef: true });
-
             setIsSubmitting(false);
-
-            return {
-                ok: true,
-                contactId,
-                dealId,
-                warning,
-                whatsappUrl,
-            };
+            return buildSubmitLeadSuccessResult(parsed);
         } catch (requestError: unknown) {
-            const message = requestError instanceof Error
-                ? requestError.message
-                : 'Falha de rede ao enviar lead.';
-
-            setError(message);
+            const failure = buildNetworkErrorResult(requestError);
+            setError(failure.error);
             setIsSubmitting(false);
-
-            return {
-                ok: false,
-                error: message,
-                code: 'NETWORK_ERROR',
-            };
+            return failure;
         }
     };
 
@@ -291,10 +370,9 @@ export function useLeadCapture() {
         leadDraft,
         isSubmitting,
         error,
+        getLeadWhatsAppUrl,
         setLeadDraft,
         resetLeadDraft,
         submitLead,
     };
 }
-
-export type { LeadDraft, LeadDraftPartial, SubmitLeadHookResult };

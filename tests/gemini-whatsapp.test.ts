@@ -85,7 +85,65 @@ test('chatbot whatsapp message should omit baggage line when unavailable', async
     assert.doesNotMatch(text, /\|\| Dados:/);
 });
 
-test('chatbot should show WhatsApp fallback when server returns 500', async (t) => {
+test('chatbot should prioritize structured handoff over legacy functionCall', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+    });
+
+    global.fetch = async () => new Response(
+        JSON.stringify({
+            text: 'Perfeito. Seu pré-atendimento está pronto.',
+            handoff: {
+                origin: 'Campinas, SP',
+                destination: 'Orlando, Flórida',
+                dates: 'junho de 2026',
+                baggagePreference: 'Bagagem despachada',
+                bantSummary: 'Need: Família | Authority: casal | Budget: R$ 20 mil+ | Timeline: junho',
+                iataCode: 'MCO',
+                source: 'repair',
+            },
+            functionCall: {
+                name: 'generate_budget_link',
+                args: {
+                    origin_city: 'São Paulo',
+                    origin_region: 'SP',
+                    destination_city: 'Salvador',
+                    destination_region: 'BA',
+                    dates: 'setembro',
+                },
+            },
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+    );
+
+    const response = await getTravelAdvice([{ role: 'user', text: 'teste' }]);
+
+    assert.equal(response.budgetLink?.origin, 'Campinas, SP');
+    assert.equal(response.budgetLink?.destination, 'Orlando, Flórida');
+    assert.equal(response.budgetLink?.bantSummary, 'Need: Família | Authority: casal | Budget: R$ 20 mil+ | Timeline: junho');
+    assert.equal(response.budgetLink?.iataCode, 'MCO');
+});
+
+test('chatbot should block unsafe textual handoff without structured payload', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+    });
+
+    global.fetch = async () => new Response(
+        JSON.stringify({
+            text: 'Clique aqui para receber seu orçamento personalizado: [WhatsApp](https://wa.me/5511999999999)',
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+    );
+
+    const response = await getTravelAdvice([{ role: 'user', text: 'teste' }]);
+
+    assert.equal(response.budgetLink, undefined);
+    assert.match(response.text || '', /problema ao concluir seu orçamento agora/i);
+    assert.doesNotMatch(response.text || '', /wa\.me/i);
+});
+
+test('chatbot should show non-clickable fallback when server returns 500', async (t) => {
     t.after(() => {
         global.fetch = originalFetch;
     });
@@ -101,10 +159,11 @@ test('chatbot should show WhatsApp fallback when server returns 500', async (t) 
     const response = await getTravelAdvice([{ role: 'user', text: 'teste' }]);
 
     assert.match(response.text || '', /Tivemos um problema técnico interno/);
-    assert.match(response.text || '', /\[fale conosco no WhatsApp\]\(https:\/\/wa\.me\//);
+    assert.match(response.text || '', /fale conosco no WhatsApp/i);
+    assert.doesNotMatch(response.text || '', /wa\.me/i);
 });
 
-test('chatbot should explain config error and show WhatsApp fallback when server config is broken', async (t) => {
+test('chatbot should explain config error without clickable WhatsApp CTA when server config is broken', async (t) => {
     t.after(() => {
         global.fetch = originalFetch;
     });
@@ -120,7 +179,8 @@ test('chatbot should explain config error and show WhatsApp fallback when server
     const response = await getTravelAdvice([{ role: 'user', text: 'teste' }]);
 
     assert.match(response.text || '', /problema de configuração no servidor/);
-    assert.match(response.text || '', /\[fale conosco no WhatsApp\]\(https:\/\/wa\.me\//);
+    assert.match(response.text || '', /fale conosco no WhatsApp/i);
+    assert.doesNotMatch(response.text || '', /wa\.me/i);
 });
 
 test('chatbot should return fallback text when API succeeds without usable content', async (t) => {
@@ -136,6 +196,7 @@ test('chatbot should return fallback text when API succeeds without usable conte
     const response = await getTravelAdvice([{ role: 'user', text: 'teste' }]);
 
     assert.match(response.text || '', /Não consegui gerar uma resposta agora/);
-    assert.match(response.text || '', /\[fale conosco no WhatsApp\]\(https:\/\/wa\.me\//);
+    assert.match(response.text || '', /fale conosco no WhatsApp/i);
+    assert.doesNotMatch(response.text || '', /wa\.me/i);
     assert.equal(response.budgetLink, undefined);
 });

@@ -1,12 +1,14 @@
 import type { LeadTracking, SubmitLeadRequest } from '../types/leadCapture';
-import { cleanString } from '../lib/lead-logic.ts';
+import { cleanString } from '../lib/lead-logic.js';
+
+const DEFAULT_HUBSPOT_REQUEST_TIMEOUT_MS = 1500;
 
 const TRACKING_PROPERTY_MAP: Record<string, string> = {
     cid: 'ga_client_id',
     sid: 'ga_session_id',
     gclid: 'hs_google_click_id',
     fbclid: 'hs_facebook_click_id',
-    msclkid: 'hs_microsoft_click_id',
+    msclkid: 'hs_linkedin_click_id',
     ttclid: 'tiktok_id',
     gbraid: 'gbraid',
     wbraid: 'wbraid',
@@ -29,8 +31,21 @@ export interface HubSpotObjectWithProperties {
     properties: Record<string, string | null>;
 }
 
+function getHubSpotRequestTimeoutMs(): number {
+    const configured = Number.parseInt(String(process.env.HUBSPOT_REQUEST_TIMEOUT_MS ?? ''), 10);
+    if (!Number.isFinite(configured) || configured < 50) {
+        return DEFAULT_HUBSPOT_REQUEST_TIMEOUT_MS;
+    }
+
+    return configured;
+}
+
+function createHubSpotTimeoutError(path: string, timeoutMs: number): Error {
+    return new Error(`HUBSPOT_TIMEOUT:504:HubSpot request timed out after ${timeoutMs}ms for ${path}`);
+}
+
 async function assertHubSpotResponseOk(response: Response, errorCode: string): Promise<void> {
-    if (response.status === 401) {
+    if (response.status === 401 || response.status === 403) {
         throw new Error('UNAUTHORIZED');
     }
 
@@ -62,10 +77,36 @@ export async function hubspotRequest(
     headers.set('Authorization', `Bearer ${token}`);
     headers.set('Content-Type', 'application/json');
 
-    return fetch(`https://api.hubapi.com${path}`, {
-        ...init,
-        headers,
-    });
+    const timeoutMs = getHubSpotRequestTimeoutMs();
+    const controller = new AbortController();
+    const timeoutError = createHubSpotTimeoutError(path, timeoutMs);
+    let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
+
+    try {
+        return await Promise.race([
+            fetch(`https://api.hubapi.com${path}`, {
+                ...init,
+                headers,
+                signal: controller.signal,
+            }),
+            new Promise<Response>((_, reject) => {
+                timeoutHandle = setTimeout(() => {
+                    controller.abort();
+                    reject(timeoutError);
+                }, timeoutMs);
+            }),
+        ]);
+    } catch (error: unknown) {
+        if (error instanceof Error && error.name === 'AbortError') {
+            throw timeoutError;
+        }
+
+        throw error;
+    } finally {
+        if (timeoutHandle) {
+            clearTimeout(timeoutHandle);
+        }
+    }
 }
 
 /**
@@ -133,10 +174,22 @@ export function mapTrackingToContactProperties(tracking?: LeadTracking): {
  * Builds the full set of contact properties for HubSpot.
  */
 export function buildContactProperties(payload: SubmitLeadRequest): Record<string, string> {
-    const properties: Record<string, string> = {
+    return {
+        ...buildCoreContactProperties(payload),
+        ...buildAdditionalContactProperties(payload),
+    };
+}
+
+export function buildCoreContactProperties(payload: SubmitLeadRequest): Record<string, string> {
+    return {
         firstname: payload.firstName,
         lastname: payload.lastName,
         email: payload.email,
+    };
+}
+
+export function buildAdditionalContactProperties(payload: SubmitLeadRequest): Record<string, string> {
+    const properties: Record<string, string> = {
     };
 
     if (payload.utms.utm_source) properties.ultimo_utm_source = payload.utms.utm_source;

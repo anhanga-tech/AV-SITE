@@ -125,7 +125,8 @@ export function buildRefinementMessage(missing: string[]): string {
         destination_city: 'cidade de destino (ex: Paris, França)',
         dates: 'período da viagem (ou "a definir")',
         adults: 'quantidade de adultos',
-        trip_scope: 'escopo da viagem (nacional, América do Sul ou internacional)'
+        trip_scope: 'escopo da viagem (nacional, América do Sul ou internacional)',
+        baggage_preference: 'preferência de bagagem (mala de mão ou bagagem despachada)',
     };
 
     const uniqueMissing = Array.from(new Set(missing));
@@ -181,6 +182,7 @@ function collectMissingBudgetFields(fields: {
     dates: string;
     adults?: number;
     tripScope?: TripScope;
+    baggagePreference: string;
 }): string[] {
     const missing: string[] = [];
 
@@ -190,6 +192,9 @@ function collectMissingBudgetFields(fields: {
     if (!fields.dates) missing.push('dates');
     if (!fields.adults) missing.push('adults');
     if (!fields.tripScope || !TRIP_SCOPES.has(fields.tripScope)) missing.push('trip_scope');
+    if ((fields.tripScope === 'international' || fields.tripScope === 'south_america') && !fields.baggagePreference) {
+        missing.push('baggage_preference');
+    }
 
     return missing;
 }
@@ -247,6 +252,7 @@ export function validateBudgetToolArgs(rawArgs: unknown): BudgetValidationResult
         dates: fields.dates,
         adults: fields.adults,
         tripScope,
+        baggagePreference: fields.baggagePreference,
     });
     if (missing.length > 0) {
         return buildInvalidBudgetResult(missing);

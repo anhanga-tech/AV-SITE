@@ -1,0 +1,190 @@
+import { expect, test } from '@playwright/test';
+import { AIChat } from './pages/AIChat';
+
+declare global {
+  interface Window {
+    __openedUrls?: string[];
+  }
+}
+
+async function acceptLgpd(page: import('@playwright/test').Page) {
+  await page.locator('input[type="checkbox"]').first().evaluate((element) => {
+    const input = element as HTMLInputElement;
+    if (!input.checked) {
+      input.click();
+    }
+  });
+}
+
+test.describe('Chatbot lead handoff', () => {
+  test('should render the lead form from structured handoff and open WhatsApp only after HubSpot success', async ({ page }) => {
+    let submitRequestCount = 0;
+    let submitPayload: Record<string, unknown> | null = null;
+
+    await page.addInitScript(() => {
+      window.__openedUrls = [];
+
+      Object.defineProperty(window, 'open', {
+        configurable: true,
+        value: (url?: string | URL) => {
+          window.__openedUrls?.push(String(url || ''));
+          return {} as Window;
+        },
+      });
+    });
+
+    await page.route('**/api/generate', route =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          text: 'Perfeito. Seu pré-atendimento está pronto. Preencha seus dados abaixo para continuar com nossa equipe.',
+          handoff: {
+            origin: 'São Paulo, SP',
+            destination: 'Orlando, Flórida',
+            dates: 'Julho de 2026',
+            baggagePreference: '1 mala despachada',
+            bantSummary: 'Need: Roteiro personalizado | Authority: Casal | Budget: R$ 15.000 | Timeline: 30 dias',
+            iataCode: 'MCO',
+            source: 'repair',
+          },
+        }),
+      }),
+    );
+
+    await page.route('**/api/submit-lead', async route => {
+      submitRequestCount += 1;
+      submitPayload = JSON.parse(route.request().postData() || '{}') as Record<string, unknown>;
+
+      await new Promise((resolve) => setTimeout(resolve, 700));
+
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          ok: true,
+          requestId: 'req-e2e-1',
+          contactId: 'contact-e2e-1',
+          dealId: 'deal-e2e-1',
+          message: 'Contato e deal criados com sucesso no HubSpot.',
+        }),
+      });
+    });
+
+    const aiChat = new AIChat(page);
+
+    await page.goto('/?utm_source=google&utm_medium=cpc&gclid=test-gclid');
+    await aiChat.open();
+    await aiChat.sendMessage('Quero uma viagem para Orlando');
+
+    await expect(page.getByText('Link Gerado')).toBeVisible();
+    await page.getByLabel('Nome', { exact: true }).fill('Felipe');
+    await page.getByLabel('Sobrenome', { exact: true }).fill('William');
+    await page.getByLabel('E-mail', { exact: true }).fill('felipe@example.com');
+    await acceptLgpd(page);
+
+    await page.getByRole('button', { name: 'Salvar e abrir WhatsApp' }).click();
+
+    await expect(page.getByText('Salvando...')).toBeVisible();
+    await expect.poll(() => submitRequestCount).toBe(1);
+    await expect.poll(() => page.evaluate(() => window.__openedUrls?.length ?? 0)).toBe(1);
+
+    const openedUrl = await page.evaluate(() => window.__openedUrls?.[0] ?? '');
+    expect(decodeURIComponent(openedUrl)).toContain('wa.me/551152833309');
+    expect(decodeURIComponent(openedUrl)).toContain('Origem: São Paulo, SP');
+    expect(decodeURIComponent(openedUrl)).toContain('Dados: utm_source=google');
+    expect(decodeURIComponent(openedUrl)).toContain('gclid=test-gclid');
+
+    expect(submitPayload).not.toBeNull();
+    expect(submitPayload?.firstName).toBe('Felipe');
+    expect(submitPayload?.lastName).toBe('William');
+    expect(submitPayload?.email).toBe('felipe@example.com');
+    expect(submitPayload?.destination).toBe('Orlando, Flórida');
+    expect(submitPayload?.utms).toMatchObject({
+      utm_source: 'google',
+      utm_medium: 'cpc',
+    });
+    expect(submitPayload?.tracking).toMatchObject({
+      gclid: 'test-gclid',
+    });
+  });
+
+  test('should open WhatsApp immediately even when HubSpot submit fails in the background', async ({ page }) => {
+    let submitRequestCount = 0;
+
+    await page.addInitScript(() => {
+      window.__openedUrls = [];
+
+      Object.defineProperty(window, 'open', {
+        configurable: true,
+        value: (url?: string | URL) => {
+          window.__openedUrls?.push(String(url || ''));
+          return {} as Window;
+        },
+      });
+    });
+
+    await page.route('**/api/generate', route =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          text: 'Perfeito. Seu pré-atendimento está pronto. Preencha seus dados abaixo para continuar com nossa equipe.',
+          handoff: {
+            origin: 'São Paulo, SP',
+            destination: 'Orlando, Flórida',
+            dates: 'Julho de 2026',
+            baggagePreference: '1 mala despachada',
+            bantSummary: 'Need: Roteiro personalizado | Authority: Casal | Budget: R$ 15.000 | Timeline: 30 dias',
+            iataCode: 'MCO',
+            source: 'repair',
+          },
+        }),
+      }),
+    );
+
+    await page.route('**/api/submit-lead', async route => {
+      submitRequestCount += 1;
+      await route.fulfill({
+        status: 422,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          ok: false,
+          requestId: 'req-e2e-fail',
+          code: 'HUBSPOT_PROPERTY_ERROR',
+          error: 'Propriedade inválida no HubSpot.',
+        }),
+      });
+    });
+
+    const aiChat = new AIChat(page);
+
+    await page.goto('/');
+    await aiChat.open();
+    await aiChat.sendMessage('Quero uma viagem para Orlando');
+
+    await expect(page.getByText('Link Gerado')).toBeVisible();
+    await page.getByLabel('Nome', { exact: true }).fill('Felipe');
+    await page.getByLabel('Sobrenome', { exact: true }).fill('William');
+    await page.getByLabel('E-mail', { exact: true }).fill('felipe@example.com');
+    await acceptLgpd(page);
+
+    await page.getByRole('button', { name: 'Salvar e abrir WhatsApp' }).click();
+
+    // WhatsApp must open immediately (before HubSpot submission completes) —
+    // this is the core guarantee of the fire-and-forget design.
+    await expect.poll(() => page.evaluate(() => window.__openedUrls?.length ?? 0)).toBe(1);
+    const openedUrl = await page.evaluate(() => window.__openedUrls?.[0] ?? '');
+    expect(decodeURIComponent(openedUrl)).toContain('wa.me/');
+
+    // HubSpot submission happened in the background
+    await expect.poll(() => submitRequestCount).toBe(1);
+
+    // No UI error alert — HubSpot errors are silently logged to console
+    await expect(page.getByRole('alert')).not.toBeVisible();
+
+    // The lead form ("Link Gerado") is still rendered (popup opened in a new tab,
+    // window.open mock returns a truthy object so location.assign is not triggered)
+    await expect(page.getByText('Link Gerado')).toBeVisible();
+  });
+});
