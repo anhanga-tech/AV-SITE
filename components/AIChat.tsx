@@ -14,6 +14,7 @@ import { getTravelAdvice } from '../services/geminiService';
 import { useLeadCapture, type SubmitLeadHookResult } from '../hooks/useLeadCapture';
 import { PassportStamp } from './ui/PassportStamp';
 import { ChatLeadForm, type LeadFinalizePayload, type LeadFinalizeResult } from './ChatLeadForm';
+import type { SubmitLeadRequest } from '../types/leadCapture';
 import { triggerHaptic } from '../utils/haptics';
 
 interface Message {
@@ -74,6 +75,7 @@ const AIChat: React.FC = () => {
   const messagesRef = useRef<Message[]>(messages);
   const {
     getLeadWhatsAppUrl,
+    prepareLeadSubmitPayload,
     setLeadDraft,
     submitLead,
     isSubmitting: isSubmittingLead,
@@ -112,9 +114,20 @@ const AIChat: React.FC = () => {
     setIsOpen(false);
   };
 
-  const handleFinalizeLead = async (payload: LeadFinalizePayload): Promise<LeadFinalizeResult> => {
+  const handlePrepareLeadSubmitPayload = (payload: LeadFinalizePayload, eventId: string): SubmitLeadRequest => {
     setLeadDraft({ ...payload });
-    const result = await submitLead({ ...payload });
+    return prepareLeadSubmitPayload({ ...payload }, eventId);
+  };
+
+  const handleFinalizeLead = async (payload: SubmitLeadRequest): Promise<LeadFinalizeResult> => {
+    setLeadDraft({
+      firstName: payload.firstName,
+      lastName: payload.lastName,
+      email: payload.email,
+      bantSummary: payload.bantSummary,
+      destination: payload.destination,
+    });
+    const result = await submitLead(payload, { pushDataLayerEvent: false });
 
     if (!result.ok) {
       const errorResult = result as Extract<SubmitLeadHookResult, { ok: false }>;
@@ -401,6 +414,7 @@ const AIChat: React.FC = () => {
                         destination={msg.actionData?.destination}
                         defaultBantSummary={msg.actionData?.bantSummary}
                         getWhatsAppUrl={getLeadWhatsAppUrl}
+                        prepareLeadSubmitPayload={handlePrepareLeadSubmitPayload}
                         onFinalizeLead={handleFinalizeLead}
                         isSubmittingLead={isSubmittingLead}
                       />
