@@ -79,8 +79,7 @@ const getGA4SessionId = (): string | null => {
 
 const getFbp = (): string | null => {
     if (typeof document === 'undefined') return null;
-    const match = document.cookie.match(/_fbp=(fb\.\d+\.\d+\.\d+)/);
-    return match ? match[1] : null;
+    return getCookie('_fbp');
 };
 
 function parseTrackingDataString(dataString: string): TrackingData {
