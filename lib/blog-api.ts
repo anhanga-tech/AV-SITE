@@ -1,6 +1,9 @@
 import { BlogPost } from '../data/blogData';
 
-const RSS_URL = 'https://blog.anhanga.tur.br/rss/';
+export const BLOG_RSS_URL = 'https://blog.anhanga.tur.br/rss/';
+export const BLOG_POSTS_API_PATH = '/api/blog-posts';
+export const DEFAULT_BLOG_POST_LIMIT = 4;
+export const MAX_BLOG_POST_LIMIT = 10;
 
 const COLORS = [
     'text-blue-600 bg-blue-50 border-blue-200',
@@ -75,66 +78,125 @@ function safeImageUrl(url: string): string {
     return escapeHTML(trimmed);
 }
 
-export async function fetchRecentPosts(limit: number = 4): Promise<BlogPost[]> {
-    try {
-        const response = await fetch(RSS_URL);
-        if (!response.ok) throw new Error('Failed to fetch RSS feed');
+function stripHtmlTags(text: string): string {
+    return text.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+}
 
-        const xmlText = await response.text();
+function decodeHtmlEntities(text: string): string {
+    return text
+        .replace(/&#x([0-9a-f]+);/gi, (_, hex: string) => String.fromCodePoint(Number.parseInt(hex, 16)))
+        .replace(/&#(\d+);/g, (_, decimal: string) => String.fromCodePoint(Number.parseInt(decimal, 10)))
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&quot;/g, '"')
+        .replace(/&apos;/g, "'")
+        .replace(/&#39;/g, "'")
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&');
+}
 
-        // Portable parsing using regex for RSS items
-        const itemMatches = xmlText.match(/<item>([\s\S]*?)<\/item>/g) || [];
-        const items = itemMatches.slice(0, limit);
+function buildExcerpt(rawDescription: string): string {
+    const normalized = decodeHtmlEntities(stripHtmlTags(rawDescription));
+    if (normalized.length <= 150) return normalized;
+    return `${normalized.substring(0, 150).trim()}...`;
+}
 
-        if (items.length === 0) return [];
+function isBlogPost(value: unknown): value is BlogPost {
+    if (!value || typeof value !== 'object') return false;
 
-        return items.map((itemXml, index) => {
-            const rawTitle = extractTag(itemXml, 'title');
-            const rawLink = extractTag(itemXml, 'link');
-            const rawDescription = extractTag(itemXml, 'description');
-            const rawAuthor = extractTag(itemXml, 'dc:creator') || extractTag(itemXml, 'creator') || 'Equipe Anhangá';
-            const rawCategory = extractTag(itemXml, 'category');
+    const candidate = value as Partial<BlogPost>;
+    return typeof candidate.id === 'number'
+        && typeof candidate.slug === 'string'
+        && typeof candidate.title === 'string'
+        && typeof candidate.excerpt === 'string'
+        && typeof candidate.content === 'string'
+        && typeof candidate.image === 'string'
+        && typeof candidate.category === 'string'
+        && typeof candidate.date === 'string'
+        && typeof candidate.author === 'string'
+        && typeof candidate.color === 'string'
+        && typeof candidate.rotate === 'string';
+}
 
-            // Try different ways to get the image
-            let rawImageUrl = extractAttribute(itemXml, 'media:content', 'url');
-            if (!rawImageUrl) {
-                rawImageUrl = extractAttribute(itemXml, 'enclosure', 'url');
-            }
-            if (!rawImageUrl) {
-                // Try to find an img tag in content:encoded
-                const rawContent = extractTag(itemXml, 'content:encoded') || extractTag(itemXml, 'encoded');
-                const imgMatch = rawContent.match(/<img[^>]*src="([^"]*)"/i);
-                if (imgMatch) rawImageUrl = imgMatch[1];
-            }
-
-            // Sanitize all values immediately after extraction
-            const title = safeSanitize(rawTitle);
-            const author = safeSanitize(rawAuthor);
-            const category = safeSanitize(rawCategory);
-            const imageUrl = safeImageUrl(rawImageUrl);
-            const slug = safeSanitize(rawLink.replace(/\/$/, '').split('/').pop() || '');
-
-            // Create a safe excerpt
-            const excerpt = safeSanitize(rawDescription).substring(0, 150).trim() +
-                           (rawDescription.length > 150 ? '...' : '');
-
-            return {
-                id: index + 1000,
-                slug,
-                title,
-                excerpt,
-                content: '', // Not used in homepage grid
-                image: imageUrl,
-                category: category || 'Dicas',
-                date: formatDate(extractTag(itemXml, 'pubDate')),
-                author,
-                isFeatured: index === 0,
-                color: COLORS[index % COLORS.length],
-                rotate: ROTATIONS[index % ROTATIONS.length]
-            };
-        });
-    } catch (error) {
-        console.error('Error fetching blog posts:', error);
-        throw error;
+export function sanitizePostsLimit(limit: string | number | null | undefined): number {
+    if (typeof limit === 'number' && Number.isFinite(limit)) {
+        return Math.min(Math.max(Math.floor(limit), 1), MAX_BLOG_POST_LIMIT);
     }
+
+    if (typeof limit === 'string') {
+        const parsed = Number.parseInt(limit, 10);
+        if (Number.isFinite(parsed)) {
+            return Math.min(Math.max(parsed, 1), MAX_BLOG_POST_LIMIT);
+        }
+    }
+
+    return DEFAULT_BLOG_POST_LIMIT;
+}
+
+export function parseRecentPostsFromRss(xmlText: string, limit: number = DEFAULT_BLOG_POST_LIMIT): BlogPost[] {
+    const normalizedLimit = sanitizePostsLimit(limit);
+    const itemMatches = xmlText.match(/<item>([\s\S]*?)<\/item>/g) || [];
+    const items = itemMatches.slice(0, normalizedLimit);
+
+    if (items.length === 0) return [];
+
+    return items.map((itemXml, index) => {
+        const rawTitle = extractTag(itemXml, 'title');
+        const rawLink = extractTag(itemXml, 'link');
+        const rawDescription = extractTag(itemXml, 'description');
+        const rawAuthor = extractTag(itemXml, 'dc:creator') || extractTag(itemXml, 'creator') || 'Equipe Anhangá';
+        const rawCategory = extractTag(itemXml, 'category');
+
+        let rawImageUrl = extractAttribute(itemXml, 'media:content', 'url');
+        if (!rawImageUrl) {
+            rawImageUrl = extractAttribute(itemXml, 'enclosure', 'url');
+        }
+        if (!rawImageUrl) {
+            const rawContent = extractTag(itemXml, 'content:encoded') || extractTag(itemXml, 'encoded');
+            const imgMatch = rawContent.match(/<img[^>]*src="([^"]*)"/i);
+            if (imgMatch) rawImageUrl = imgMatch[1];
+        }
+
+        const title = safeSanitize(rawTitle);
+        const author = safeSanitize(rawAuthor);
+        const category = safeSanitize(rawCategory);
+        const imageUrl = safeImageUrl(rawImageUrl);
+        const slug = safeSanitize(rawLink.replace(/\/$/, '').split('/').pop() || '');
+        const excerpt = buildExcerpt(rawDescription);
+
+        return {
+            id: index + 1000,
+            slug,
+            title,
+            excerpt,
+            content: '',
+            image: imageUrl,
+            category: category || 'Dicas',
+            date: formatDate(extractTag(itemXml, 'pubDate')),
+            author,
+            isFeatured: index === 0,
+            color: COLORS[index % COLORS.length],
+            rotate: ROTATIONS[index % ROTATIONS.length]
+        };
+    });
+}
+
+export async function fetchRecentPosts(limit: number = DEFAULT_BLOG_POST_LIMIT): Promise<BlogPost[]> {
+    const normalizedLimit = sanitizePostsLimit(limit);
+    const response = await fetch(`${BLOG_POSTS_API_PATH}?limit=${normalizedLimit}`, {
+        headers: {
+            Accept: 'application/json',
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch recent blog posts: ${response.status}`);
+    }
+
+    const posts = await response.json();
+    if (!Array.isArray(posts) || !posts.every(isBlogPost)) {
+        throw new Error('Invalid blog posts response');
+    }
+
+    return posts;
 }

@@ -24,42 +24,28 @@ const Blog: React.FC = memo(() => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        let isMounted = true;
+
         async function loadPosts() {
             try {
-                // Try to load from cache first (browser only)
-                if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-                    const cached = localStorage.getItem('dynamic_blog_posts');
-                    const cachedTime = localStorage.getItem('dynamic_blog_posts_time');
-
-                    if (cached && cachedTime) {
-                        const now = Date.now();
-                        const age = now - parseInt(cachedTime, 10);
-                        const ONE_HOUR = 60 * 60 * 1000;
-
-                        if (age < ONE_HOUR) {
-                            setPosts(JSON.parse(cached));
-                            setIsLoading(false);
-                            return;
-                        }
-                    }
-                }
-
                 const fetchedPosts = await fetchRecentPosts(4);
-                if (fetchedPosts && fetchedPosts.length > 0) {
+                if (isMounted && fetchedPosts && fetchedPosts.length > 0) {
                     setPosts(fetchedPosts);
-                    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-                        localStorage.setItem('dynamic_blog_posts', JSON.stringify(fetchedPosts));
-                        localStorage.setItem('dynamic_blog_posts_time', Date.now().toString());
-                    }
                 }
             } catch (error) {
                 console.error('Failed to load dynamic posts, using fallback', error);
             } finally {
-                setIsLoading(false);
+                if (isMounted) {
+                    setIsLoading(false);
+                }
             }
         }
 
         loadPosts();
+
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
     const displayPosts = posts;
