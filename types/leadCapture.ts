@@ -29,6 +29,7 @@ export interface SubmitLeadRequest {
     firstName: string;
     lastName: string;
     email: string;
+    event_id?: string;
     utms: LeadUtms;
     tracking?: LeadTracking;
     bantSummary: string;

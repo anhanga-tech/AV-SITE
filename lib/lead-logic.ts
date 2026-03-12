@@ -125,6 +125,7 @@ export function validatePayload(payload: unknown): { valid: true; data: SubmitLe
     const firstName = cleanString(raw.firstName);
     const lastName = cleanString(raw.lastName);
     const email = cleanString(raw.email).toLowerCase();
+    const eventId = normalizeNullable(raw.event_id, 128) ?? undefined;
     const bantSummary = cleanString(raw.bantSummary);
     const destination = cleanString(raw.destination);
 
@@ -149,6 +150,7 @@ export function validatePayload(payload: unknown): { valid: true; data: SubmitLe
             firstName,
             lastName,
             email,
+            event_id: eventId,
             bantSummary,
             destination,
             utms,

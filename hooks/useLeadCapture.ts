@@ -191,11 +191,16 @@ function truncateResponseText(value: string): string {
     return normalized.length > 180 ? `${normalized.slice(0, 177)}...` : normalized;
 }
 
+export function createLeadEventId(): string {
+    return `lead_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
 function buildSubmitLeadPayload(
     leadDraft: LeadDraft,
     overrides: LeadDraftPartial,
     latestTracking: LeadTracking,
     latestUtms: LeadUtms,
+    eventId?: string,
 ): SubmitLeadRequest {
     const merged = mergeLeadDraft(leadDraft, overrides);
 
@@ -203,6 +208,7 @@ function buildSubmitLeadPayload(
         firstName: cleanValue(merged.firstName),
         lastName: cleanValue(merged.lastName),
         email: cleanValue(merged.email).toLowerCase(),
+        event_id: eventId,
         bantSummary: cleanValue(merged.bantSummary),
         destination: cleanValue(merged.destination),
         utms: latestUtms,
@@ -211,6 +217,27 @@ function buildSubmitLeadPayload(
             ...latestUtms,
         },
     };
+}
+
+export function pushGenerateLeadDataLayerEvent(
+    payload: SubmitLeadRequest,
+    latestTracking: LeadTracking,
+    latestUtms: LeadUtms,
+): void {
+    if (typeof window === 'undefined' || !window.dataLayer || !payload.event_id) {
+        return;
+    }
+
+    window.dataLayer.push({
+        event: 'generate_lead',
+        event_id: payload.event_id,
+        destination: payload.destination,
+        utm_source: latestUtms.utm_source,
+        utm_medium: latestUtms.utm_medium,
+        utm_campaign: latestUtms.utm_campaign,
+        ga_client_id: latestTracking.cid,
+        ga_session_id: latestTracking.sid,
+    });
 }
 
 function getSubmitLeadValidationError(payload: SubmitLeadRequest): string | null {
@@ -324,7 +351,8 @@ export function useLeadCapture() {
         setIsSubmitting(true);
 
         const { tracking: latestTracking, utms: latestUtms } = refreshTrackingState();
-        const payload = buildSubmitLeadPayload(leadDraft, overrides, latestTracking, latestUtms);
+        const eventId = createLeadEventId();
+        const payload = buildSubmitLeadPayload(leadDraft, overrides, latestTracking, latestUtms, eventId);
         const validationError = getSubmitLeadValidationError(payload);
 
         if (validationError) {
@@ -356,6 +384,7 @@ export function useLeadCapture() {
                 return failure;
             }
 
+            pushGenerateLeadDataLayerEvent(payload, latestTracking, latestUtms);
             setIsSubmitting(false);
             return buildSubmitLeadSuccessResult(parsed);
         } catch (requestError: unknown) {

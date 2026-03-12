@@ -688,6 +688,7 @@ async function trackLeadConversions(payload: SubmitLeadRequest, requestId: strin
         }),
         sendMetaConversion({
             eventName: 'Lead',
+            eventId: payload.event_id,
             email: payload.email,
             phone: payload.tracking?.extras?.phone,
             firstName: payload.firstName,
