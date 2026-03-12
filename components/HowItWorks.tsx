@@ -1,41 +1,43 @@
 import React from 'react';
-import MessageCircle from 'lucide-react/dist/esm/icons/message-circle';
-import PenTool from 'lucide-react/dist/esm/icons/pen-tool';
-import CreditCard from 'lucide-react/dist/esm/icons/credit-card';
-import Plane from 'lucide-react/dist/esm/icons/plane';
-import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
-import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
-import Star from 'lucide-react/dist/esm/icons/star';
-import Heart from 'lucide-react/dist/esm/icons/heart';
+import {
+  ChatCircleDots,
+  PaintBrushBroad,
+  CreditCard,
+  AirplaneTilt,
+  Sparkle,
+  ArrowRight,
+  Star,
+  Heart,
+} from '@phosphor-icons/react';
 import { openAiChat } from '../utils/aiChat';
 
 // Moved outside component to prevent re-allocation on every render
 const STEPS = [
   {
     id: 1,
-    icon: <MessageCircle className="w-8 h-8 text-white" />,
+    icon: <ChatCircleDots className="w-8 h-8 text-white" weight="fill" />,
     title: "Oie! Vamos conversar?",
     desc: "Nada de formulários chatos. A gente bate um papo no WhatsApp para entender seus sonhos e quanto você quer investir.",
     color: "bg-brand-yellow",
     lightColor: "bg-yellow-50",
     borderColor: "border-yellow-200",
     rotate: "-rotate-2",
-    sticker: <Heart className="w-20 h-20 text-yellow-400 fill-yellow-400 drop-shadow-md" />
+    sticker: <Heart className="w-20 h-20 text-yellow-400 drop-shadow-md" weight="fill" />
   },
   {
     id: 2,
-    icon: <PenTool className="w-8 h-8 text-white" />,
+    icon: <PaintBrushBroad className="w-8 h-8 text-white" weight="fill" />,
     title: "Desenhando o Sonho",
     desc: "Nossos especialistas criam um roteiro dia-a-dia só seu. Ajustamos cada detalhe até você dizer: 'É isso!'",
     color: "bg-brand-cyan",
     lightColor: "bg-sky-50",
     borderColor: "border-sky-200",
     rotate: "rotate-3",
-    sticker: <Star className="w-24 h-24 text-sky-400 fill-sky-200 drop-shadow-md" />
+    sticker: <Star className="w-24 h-24 text-sky-400 drop-shadow-md" weight="fill" />
   },
   {
     id: 3,
-    icon: <CreditCard className="w-8 h-8 text-white" />,
+    icon: <CreditCard className="w-8 h-8 text-white" weight="fill" />,
     title: "Burocracia? Deixa com a gente",
     desc: "Aprovado? Ótimo! Nós emitimos voos, hotéis e passeios. Parcelamos tudo e você recebe os vouchers organizadinhos.",
     color: "bg-emerald-500",
@@ -46,7 +48,7 @@ const STEPS = [
   },
   {
     id: 4,
-    icon: <Plane className="w-8 h-8 text-white" />,
+    icon: <AirplaneTilt className="w-8 h-8 text-white" weight="fill" />,
     title: "Fui! Partiu Viajar",
     desc: "Agora é só fazer as malas! E se precisar de algo lá longe? Nosso time fica de plantão 24h por você.",
     color: "bg-green-500",
@@ -168,10 +170,10 @@ const HowItWorks: React.FC = () => {
                     }}
                     className="relative z-10 flex items-center gap-4 bg-white text-brand-dark px-10 py-6 rounded-full font-black text-xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.15)] hover:shadow-[0_20px_50px_rgba(8,_112,_184,_0.25)] transform transition-all hover:scale-105 active:scale-95 border-4 border-transparent hover:border-brand-yellow text-left"
                 >
-                    <Sparkles className="w-6 h-6 text-brand-yellow fill-brand-yellow" />
+                    <Sparkle className="w-6 h-6 text-brand-yellow" weight="fill" />
                     <span>Quero meu roteiro agora!</span>
                     <div className="w-10 h-10 bg-brand-dark rounded-full flex items-center justify-center text-white">
-                        <ArrowRight className="w-5 h-5" />
+                        <ArrowRight className="w-5 h-5" weight="bold" />
                     </div>
                 </button>
             </div>

@@ -1,12 +1,14 @@
 import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import { LazyImage } from './ui/LazyImage';
-import UserCheck from 'lucide-react/dist/esm/icons/user-check';
-import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
-import FileCheck from 'lucide-react/dist/esm/icons/file-check';
-import Compass from 'lucide-react/dist/esm/icons/compass';
-import ShieldCheck from 'lucide-react/dist/esm/icons/shield-check';
-import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
+import {
+  UserCircleCheck,
+  Sparkle,
+  ClipboardText,
+  Compass,
+  ShieldCheck,
+  ArrowRight,
+} from '@phosphor-icons/react';
 import { openAiChat } from '../utils/aiChat';
 
 const fadeUp = {
@@ -40,7 +42,7 @@ interface HighlightItem {
 // Moved outside component to prevent re-allocation on every render
 const HIGHLIGHTS: HighlightItem[] = [
     {
-        icon: UserCheck,
+        icon: UserCircleCheck,
         title: "Concierge Humano",
         description: "Esqueça os robôs. Fale com gente que entende de gente.",
         bg: "bg-orange-100",
@@ -49,7 +51,7 @@ const HIGHLIGHTS: HighlightItem[] = [
         rotate: "-rotate-1"
     },
     {
-        icon: Sparkles,
+        icon: Sparkle,
         title: "Roteiros à Mão",
         description: "Desenhamos cada dia da viagem do zero, só pra você.",
         bg: "bg-emerald-100",
@@ -58,7 +60,7 @@ const HIGHLIGHTS: HighlightItem[] = [
         rotate: "rotate-2"
     },
     {
-        icon: FileCheck,
+        icon: ClipboardText,
         title: "Zero Burocracia",
         description: "Vistos, formulários e chatices? Deixa com a gente.",
         bg: "bg-blue-100",
@@ -135,7 +137,7 @@ const Highlights = memo(() => {
                                 }}
                                 className="flex items-center justify-center gap-3 w-full bg-brand-dark text-white px-6 py-4 rounded-xl font-bold transition-all duration-300 ease-spring shadow-[4px_4px_0px_#94a3b8] hover:shadow-[2px_2px_0px_#94a3b8] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
                             >
-                                <ShieldCheck className="w-5 h-5" />
+                                <ShieldCheck className="w-5 h-5" weight="fill" />
                                 <span>Falar com Especialista</span>
                             </button>
                         </div>
@@ -154,7 +156,7 @@ const Highlights = memo(() => {
                             <div className="inline-block relative mb-4">
                                 <span className="absolute inset-0 bg-blue-100 transform -skew-x-12 rounded-lg"></span>
                                 <span className="relative px-3 py-1 text-blue-600 font-black uppercase tracking-widest text-sm flex items-center gap-2">
-                                    <Sparkles className="w-4 h-4" /> O Jeito Anhangá
+                                    <Sparkle className="w-4 h-4" weight="fill" /> O Jeito Anhangá
                                 </span>
                             </div>
                             <h2 className="text-4xl md:text-5xl font-black text-brand-dark leading-tight mb-6">
@@ -199,7 +201,7 @@ const Highlights = memo(() => {
                                             className={`w-16 h-16 rounded-2xl ${item.bg} border-2 ${item.accent} flex items-center justify-center mb-6 shadow-sm`}
                                             whileHover={{ scale: 1.1, rotate: 6, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
                                         >
-                                            <Icon className={`w-8 h-8 ${item.iconColor}`} strokeWidth={2.5} />
+                                            <Icon className={`w-8 h-8 ${item.iconColor}`} weight="fill" />
                                         </motion.div>
 
                                         {/* Content */}

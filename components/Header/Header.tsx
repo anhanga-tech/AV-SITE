@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import Menu from 'lucide-react/dist/esm/icons/menu';
-import X from 'lucide-react/dist/esm/icons/x';
-import Phone from 'lucide-react/dist/esm/icons/phone';
-import ChevronDown from 'lucide-react/dist/esm/icons/chevron-down';
+import { List, X, Phone, CaretDown } from '@phosphor-icons/react';
 import { getBlogHomeUrl } from '@/utils/blog';
 import { openAiChat } from '../../utils/aiChat';
 
@@ -124,7 +121,7 @@ const Header: React.FC = () => {
                 {link.subLinks ? (
                   <button className={`flex items-center gap-1 font-medium text-sm transition-colors duration-500 hover:opacity-80 focus:outline-none focus:underline decoration-2 underline-offset-4 cursor-pointer ${navTextClass}`}>
                     {link.name}
-                    <ChevronDown className="w-4 h-4" />
+                    <CaretDown className="w-4 h-4" weight="bold" />
                   </button>
                 ) : (
                   isHome ? (
@@ -189,7 +186,7 @@ const Header: React.FC = () => {
               onClick={handleContactClick}
               className={`btn-whatsapp btn-specialist px-5 py-2.5 rounded-full font-medium text-sm transition-all duration-500 flex items-center gap-2 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-vibrant ${buttonClass}`}
             >
-              <Phone className="w-4 h-4" />
+              <Phone className="w-4 h-4" weight="fill" />
               Fale Conosco
             </a>
           </div>
@@ -201,7 +198,7 @@ const Header: React.FC = () => {
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-menu"
           >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMobileMenuOpen ? <X className="w-6 h-6" weight="bold" /> : <List className="w-6 h-6" weight="bold" />}
           </button>
         </div>
       </div>

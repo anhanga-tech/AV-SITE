@@ -1,6 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { MessageCircle, X, Send, Sparkles, Loader2, Bot, User } from 'lucide-react';
+import {
+  ChatCircleDots,
+  X,
+  PaperPlaneTilt,
+  Sparkle,
+  CircleNotch,
+  Robot,
+  User,
+} from '@phosphor-icons/react';
 import ReactMarkdown from 'react-markdown';
 import { getTravelAdvice } from '../services/geminiService';
 import { useLeadCapture, type SubmitLeadHookResult } from '../hooks/useLeadCapture';
@@ -307,7 +315,7 @@ const AIChat: React.FC = () => {
         aria-label="Abrir assistente virtual"
       >
         <div className="relative flex items-center justify-center">
-          <MessageCircle className="w-7 h-7" />
+          <ChatCircleDots className="w-7 h-7" weight="fill" />
           <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse border-2 border-brand-vibrant"></span>
         </div>
 
@@ -335,7 +343,7 @@ const AIChat: React.FC = () => {
         <div className="bg-white/80 backdrop-blur-md px-6 py-5 border-b border-gray-100 flex justify-between items-center shrink-0 z-10">
           <div className="flex gap-4 items-center">
             <div className="w-12 h-12 bg-gray-50 rounded-[1.25rem] flex items-center justify-center shadow-sm transform -rotate-3 hover:rotate-0 transition-transform">
-              <Sparkles className="w-6 h-6 text-brand-vibrant" />
+              <Sparkle className="w-6 h-6 text-brand-vibrant" weight="fill" />
             </div>
             <div>
               <h2 className="font-extrabold text-lg text-brand-dark tracking-tight leading-none">
@@ -357,7 +365,7 @@ const AIChat: React.FC = () => {
             className="text-gray-400 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-full p-2.5 transition-colors focus:outline-none"
             aria-label="Fechar gaveta"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5" weight="bold" />
           </button>
         </div>
 
@@ -377,7 +385,7 @@ const AIChat: React.FC = () => {
                     ? 'bg-brand-dark text-white'
                     : 'bg-white text-brand-vibrant border border-gray-100'
                     }`}>
-                    {msg.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-5 h-5" />}
+                    {msg.role === 'user' ? <User className="w-4 h-4" weight="fill" /> : <Robot className="w-5 h-5" weight="fill" />}
                   </div>
 
                   {/* Bubble */}
@@ -438,10 +446,10 @@ const AIChat: React.FC = () => {
           {isLoading && (
             <div data-testid="chat-typing-indicator" className="flex items-end gap-3 z-10 relative">
               <div className="w-9 h-9 bg-white rounded-full border border-gray-100 text-brand-vibrant flex items-center justify-center shadow-sm">
-                <Bot className="w-5 h-5" />
+                <Robot className="w-5 h-5" weight="fill" />
               </div>
               <div className="bg-white px-4 py-3 border border-gray-100 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-2.5">
-                <Loader2 className="w-4 h-4 animate-spin text-brand-vibrant" />
+                <CircleNotch className="w-4 h-4 animate-spin text-brand-vibrant" weight="bold" />
                 <span className="text-xs font-medium text-gray-400">Anhangá digitando...</span>
               </div>
             </div>
@@ -469,7 +477,7 @@ const AIChat: React.FC = () => {
               className="absolute right-2 bottom-2 p-2.5 bg-brand-vibrant text-white rounded-[10px] shadow-sm hover:bg-brand-blue hover:shadow-md transition-all disabled:opacity-0 disabled:scale-75 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-vibrant/50"
               aria-label="Enviar mensagem"
             >
-              <Send className="w-4 h-4 ml-0.5" />
+              <PaperPlaneTilt className="w-4 h-4 ml-0.5" weight="fill" />
             </button>
           </div>
           <p className="text-center text-[10px] text-gray-400 mt-2">
