@@ -108,7 +108,7 @@ test.describe('Chatbot lead handoff', () => {
       gclid: 'test-gclid',
     });
     expect(typeof submitPayload?.event_id).toBe('string');
-    expect(String(submitPayload?.event_id)).toMatch(/^lead_\d+_[a-z0-9]{6}$/);
+    expect(String(submitPayload?.event_id)).toMatch(/^lead_(?:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+_[a-z0-9]{6})$/);
 
     await expect
       .poll(() =>
