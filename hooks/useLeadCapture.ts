@@ -117,6 +117,7 @@ function captureInitialTracking(): LeadTracking {
         'wbraid',
         'gbraid',
         'fbc',
+        'fbp',
     ]);
 
     const extras: Record<string, string> = {};
@@ -146,6 +147,7 @@ function captureInitialTracking(): LeadTracking {
         wbraid: toNullable(source.wbraid),
         gbraid: toNullable(source.gbraid),
         fbc: toNullable(source.fbc),
+        fbp: toNullable(source.fbp),
         extras: Object.keys(extras).length > 0 ? extras : undefined,
     };
 }

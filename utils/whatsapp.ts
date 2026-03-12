@@ -77,6 +77,12 @@ const getGA4SessionId = (): string | null => {
     return null;
 };
 
+const getFbp = (): string | null => {
+    if (typeof document === 'undefined') return null;
+    const match = document.cookie.match(/_fbp=(fb\.\d+\.\d+\.\d+)/);
+    return match ? match[1] : null;
+};
+
 function parseTrackingDataString(dataString: string): TrackingData {
     const parsed: TrackingData = {};
 
@@ -179,6 +185,9 @@ const captureTrackingDataObject = (): TrackingData | null => {
     if (trackingData.fbclid && !trackingData.fbc) {
         trackingData.fbc = `fb.1.${Date.now()}.${trackingData.fbclid}`;
     }
+
+    const fbp = getFbp();
+    if (fbp) trackingData.fbp = fbp;
 
     if (foundInUrl || cid || sid || Object.keys(trackingData).length > 0) {
         try {

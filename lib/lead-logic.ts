@@ -17,6 +17,7 @@ const KNOWN_TRACKING_KEYS = new Set([
     'wbraid',
     'gbraid',
     'fbc',
+    'fbp',
 ]);
 
 /**
@@ -107,6 +108,7 @@ export function normalizeTracking(value: unknown, utms: LeadUtms): LeadTracking 
         wbraid: normalizeNullable(source.wbraid),
         gbraid: normalizeNullable(source.gbraid),
         fbc: normalizeNullable(source.fbc),
+        fbp: normalizeNullable(source.fbp),
         extras: normalizeTrackingExtras(source),
     };
 }

@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import handler from '../api/submit-lead.ts';
 import { mapTrackingToContactProperties } from '../services/hubspot.ts';
+import { validatePayload } from '../lib/lead-logic.ts';
 
 const originalFetch = global.fetch;
 const originalEnv = {
@@ -12,6 +13,8 @@ const originalEnv = {
     HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY: process.env.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY,
     HUBSPOT_REQUEST_TIMEOUT_MS: process.env.HUBSPOT_REQUEST_TIMEOUT_MS,
     SUBMIT_LEAD_RATE_LIMIT_TIMEOUT_MS: process.env.SUBMIT_LEAD_RATE_LIMIT_TIMEOUT_MS,
+    META_PIXEL_ID: process.env.META_PIXEL_ID,
+    META_ACCESS_TOKEN: process.env.META_ACCESS_TOKEN,
 };
 
 function restoreEnv() {
@@ -22,6 +25,8 @@ function restoreEnv() {
     process.env.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY = originalEnv.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY;
     process.env.HUBSPOT_REQUEST_TIMEOUT_MS = originalEnv.HUBSPOT_REQUEST_TIMEOUT_MS;
     process.env.SUBMIT_LEAD_RATE_LIMIT_TIMEOUT_MS = originalEnv.SUBMIT_LEAD_RATE_LIMIT_TIMEOUT_MS;
+    process.env.META_PIXEL_ID = originalEnv.META_PIXEL_ID;
+    process.env.META_ACCESS_TOKEN = originalEnv.META_ACCESS_TOKEN;
 }
 
 function buildRequest(body: Record<string, unknown>): Request {
@@ -105,6 +110,35 @@ test('mapTrackingToContactProperties should map msclkid to hs_linkedin_click_id'
     assert.equal(mapped.properties.wbraid, 'w-123');
 });
 
+test('validatePayload should preserve fbp as a top-level tracking field', () => {
+    const result = validatePayload({
+        firstName: 'Felipe',
+        lastName: 'William',
+        email: 'felipe@example.com',
+        bantSummary: 'Need: Praia | Authority: casal | Budget: 20k | Timeline: setembro',
+        destination: 'Rio de Janeiro',
+        utms: {
+            utm_source: 'google',
+            utm_medium: 'cpc',
+            utm_campaign: 'rio',
+            utm_term: 'rio viagem',
+            utm_content: 'ad-1',
+        },
+        tracking: {
+            fbp: 'fb.1.1736366050.1234567890',
+            custom_source: 'chatbot',
+        },
+    });
+
+    assert.equal(result.valid, true);
+    if (!result.valid) return;
+
+    assert.equal(result.data.tracking?.fbp, 'fb.1.1736366050.1234567890');
+    assert.deepEqual(result.data.tracking?.extras, {
+        custom_source: 'chatbot',
+    });
+});
+
 test('submit-lead should create contact and deal on first attempt', async (t) => {
     t.after(() => {
         global.fetch = originalFetch;
@@ -115,8 +149,27 @@ test('submit-lead should create contact and deal on first attempt', async (t) =>
     process.env.HUBSPOT_DEAL_PIPELINE_ID = 'pipeline-1';
     process.env.HUBSPOT_DEAL_STAGE_ID = 'stage-1';
     process.env.HUBSPOT_DEAL_BANT_PROPERTY = 'bant_summary';
+    process.env.META_PIXEL_ID = 'pixel-1';
+    process.env.META_ACCESS_TOKEN = 'token-1';
 
     const calls: MockHubSpotRequest[] = [];
+    const originalConsoleLog = console.log;
+    const metaCalls: Array<Record<string, unknown>> = [];
+
+    console.log = (...args: unknown[]) => {
+        if (
+            args[0] === 'META: Would send conversion'
+            && args[1]
+            && typeof args[1] === 'object'
+            && !Array.isArray(args[1])
+        ) {
+            metaCalls.push(args[1] as Record<string, unknown>);
+        }
+    };
+
+    t.after(() => {
+        console.log = originalConsoleLog;
+    });
 
     global.fetch = (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
         const url = getUrl(input);
@@ -164,6 +217,7 @@ test('submit-lead should create contact and deal on first attempt', async (t) =>
             msclkid: 'msclkid-1',
             ttclid: 'ttclid-1',
             gbraid: 'gbraid-1',
+            fbp: 'fb.1.1736366050.1234567890',
         },
     }));
 
@@ -194,6 +248,8 @@ test('submit-lead should create contact and deal on first attempt', async (t) =>
         calls.filter((call) => call.url.endsWith('/crm/v3/objects/contacts/contact-1') && call.method === 'PATCH').length,
         1,
     );
+    assert.equal(metaCalls.length, 1);
+    assert.equal(metaCalls[0]?.fbp, 'fb.1.1736366050.1234567890');
 
     const dealRequest = calls.find((call) => call.url.endsWith('/crm/v3/objects/deals'));
     assert.ok(dealRequest, 'deal creation request should exist');
