@@ -6,8 +6,6 @@ import {
     parseRecentPostsFromRss,
 } from '../lib/blog-api.ts';
 
-const originalFetch = global.fetch;
-
 const RSS_FIXTURE = `<?xml version="1.0" encoding="UTF-8"?>
 <rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:media="http://search.yahoo.com/mrss/" version="2.0">
   <channel>
@@ -74,7 +72,7 @@ test('parseRecentPostsFromRss should keep the first four items and normalize fie
 });
 
 test('blog-posts API should return four posts with cache headers', async (t) => {
-    global.fetch = (async (input: RequestInfo | URL): Promise<Response> => {
+    t.mock.method(global, 'fetch', async (input: RequestInfo | URL): Promise<Response> => {
         const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
         assert.equal(url, BLOG_RSS_URL);
         return new Response(RSS_FIXTURE, {
@@ -83,10 +81,6 @@ test('blog-posts API should return four posts with cache headers', async (t) => 
                 'Content-Type': 'application/rss+xml',
             },
         });
-    }) as typeof fetch;
-
-    t.after(() => {
-        global.fetch = originalFetch;
     });
 
     const response = await handler(new Request('http://localhost/api/blog-posts?limit=invalid'));
@@ -99,11 +93,7 @@ test('blog-posts API should return four posts with cache headers', async (t) => 
 });
 
 test('blog-posts API should return controlled error when RSS fetch fails', async (t) => {
-    global.fetch = (async () => new Response('upstream error', { status: 503 })) as typeof fetch;
-
-    t.after(() => {
-        global.fetch = originalFetch;
-    });
+    t.mock.method(global, 'fetch', async () => new Response('upstream error', { status: 503 }));
 
     const response = await handler(new Request('http://localhost/api/blog-posts?limit=4'));
     assert.equal(response.status, 500);

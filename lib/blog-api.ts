@@ -87,18 +87,35 @@ function decodeHtmlEntities(text: string): string {
         .replace(/&#x([0-9a-f]+);/gi, (_, hex: string) => String.fromCodePoint(Number.parseInt(hex, 16)))
         .replace(/&#(\d+);/g, (_, decimal: string) => String.fromCodePoint(Number.parseInt(decimal, 10)))
         .replace(/&nbsp;/g, ' ')
-        .replace(/&amp;/g, '&')
         .replace(/&quot;/g, '"')
         .replace(/&apos;/g, "'")
         .replace(/&#39;/g, "'")
         .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>');
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&');
 }
 
 function buildExcerpt(rawDescription: string): string {
-    const sanitized = safeSanitize(decodeHtmlEntities(stripHtmlTags(rawDescription)));
-    if (sanitized.length <= 150) return sanitized;
-    return `${sanitized.substring(0, 150).trim()}...`;
+    const normalized = decodeHtmlEntities(stripHtmlTags(rawDescription));
+    if (normalized.length <= 150) return normalized;
+    return `${normalized.substring(0, 150).trim()}...`;
+}
+
+function isBlogPost(value: unknown): value is BlogPost {
+    if (!value || typeof value !== 'object') return false;
+
+    const candidate = value as Partial<BlogPost>;
+    return typeof candidate.id === 'number'
+        && typeof candidate.slug === 'string'
+        && typeof candidate.title === 'string'
+        && typeof candidate.excerpt === 'string'
+        && typeof candidate.content === 'string'
+        && typeof candidate.image === 'string'
+        && typeof candidate.category === 'string'
+        && typeof candidate.date === 'string'
+        && typeof candidate.author === 'string'
+        && typeof candidate.color === 'string'
+        && typeof candidate.rotate === 'string';
 }
 
 export function sanitizePostsLimit(limit: string | number | null | undefined): number {
@@ -177,9 +194,9 @@ export async function fetchRecentPosts(limit: number = DEFAULT_BLOG_POST_LIMIT):
     }
 
     const posts = await response.json();
-    if (!Array.isArray(posts)) {
+    if (!Array.isArray(posts) || !posts.every(isBlogPost)) {
         throw new Error('Invalid blog posts response');
     }
 
-    return posts as BlogPost[];
+    return posts;
 }

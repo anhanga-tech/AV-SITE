@@ -19,9 +19,9 @@ test.describe('SEO Smoke Check', () => {
     test(`Checking SEO for ${route}`, async ({ page }) => {
       await page.goto(route);
 
-      // Wait for metadata (React 19 might take a moment to update document.title)
+      // Waiting for network idle is flaky on the Home route because analytics
+      // and lazy client-side requests may keep the page busy even when SEO tags are ready.
       await page.waitForFunction(() => document.title.length > 0);
-      await page.waitForLoadState('networkidle');
 
       // 1. Check Title
       const title = await page.title();
