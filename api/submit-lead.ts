@@ -694,6 +694,7 @@ async function trackLeadConversions(payload: SubmitLeadRequest, requestId: strin
             lastName: payload.lastName,
             fbclid: payload.tracking?.fbclid,
             fbc: payload.tracking?.fbc,
+            fbp: payload.tracking?.fbp,
             contentName: payload.destination,
             contentType: 'destination_interest',
         }),

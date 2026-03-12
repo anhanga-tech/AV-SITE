@@ -21,6 +21,7 @@ export interface LeadTracking {
     wbraid?: string | null;
     gbraid?: string | null;
     fbc?: string | null;
+    fbp?: string | null;
     extras?: Record<string, string>;
 }
 

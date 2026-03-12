@@ -77,6 +77,11 @@ const getGA4SessionId = (): string | null => {
     return null;
 };
 
+const getFbp = (): string | null => {
+    if (typeof document === 'undefined') return null;
+    return getCookie('_fbp');
+};
+
 function parseTrackingDataString(dataString: string): TrackingData {
     const parsed: TrackingData = {};
 
@@ -128,48 +133,48 @@ function getSearchStringFromLocation(): string {
     return searchString;
 }
 
-const captureTrackingDataObject = (): TrackingData | null => {
-    if (typeof window === 'undefined') return null;
+function appendDecodedTrackingValue(trackingData: TrackingData, key: string, value: string): void {
+    try {
+        trackingData[key] = decodeURIComponent(value);
+    } catch {
+        trackingData[key] = value;
+    }
+}
 
-    const trackingData: TrackingData = {};
-    let foundInUrl = false;
-
-    const searchString = getSearchStringFromLocation();
-    const urlParams = new URLSearchParams(searchString);
-
+function mergeStoredTrackingData(trackingData: TrackingData): void {
     try {
         const stored = sessionStorage.getItem(STORAGE_KEY);
-        if (stored) {
-            const parsed = JSON.parse(stored) as TrackingData;
-            Object.assign(trackingData, parsed);
-        }
+        if (!stored) return;
+
+        const parsed = JSON.parse(stored) as TrackingData;
+        Object.assign(trackingData, parsed);
     } catch {
         // Ignore storage failures
     }
+}
+
+function mergeUrlTrackingData(trackingData: TrackingData, urlParams: URLSearchParams): boolean {
+    let foundInUrl = false;
 
     TRACKING_PARAMS.forEach((param) => {
         const value = urlParams.get(param);
         if (!value) return;
 
-        try {
-            trackingData[param] = decodeURIComponent(value);
-        } catch {
-            trackingData[param] = value;
-        }
+        appendDecodedTrackingValue(trackingData, param, value);
         foundInUrl = true;
     });
 
     urlParams.forEach((value, key) => {
         if (!key.startsWith(HSA_PREFIX)) return;
 
-        try {
-            trackingData[key] = decodeURIComponent(value);
-        } catch {
-            trackingData[key] = value;
-        }
+        appendDecodedTrackingValue(trackingData, key, value);
         foundInUrl = true;
     });
 
+    return foundInUrl;
+}
+
+function mergeAnalyticsTrackingData(trackingData: TrackingData): { cid: string | null; sid: string | null } {
     const cid = getGA4ClientId();
     if (cid) trackingData.cid = cid;
 
@@ -180,38 +185,62 @@ const captureTrackingDataObject = (): TrackingData | null => {
         trackingData.fbc = `fb.1.${Date.now()}.${trackingData.fbclid}`;
     }
 
-    if (foundInUrl || cid || sid || Object.keys(trackingData).length > 0) {
-        try {
-            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(trackingData));
-        } catch {
-            // Ignore storage failures
-        }
+    const fbp = getFbp();
+    if (fbp) trackingData.fbp = fbp;
 
-        const dataString = serializeTrackingData(trackingData);
-        if (dataString) {
-            setCookie(COOKIE_NAME, dataString, 30);
-            cachedTrackingData = dataString;
-            cachedTrackingObject = { ...trackingData };
+    return { cid, sid };
+}
 
-            if (typeof window !== 'undefined' && window.dataLayer) {
-                window.dataLayer.push({
-                    event: 'tracking_data_captured',
-                    ...trackingData,
-                });
-            }
-        }
+function persistTrackingData(trackingData: TrackingData): TrackingData | null {
+    try {
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(trackingData));
+    } catch {
+        // Ignore storage failures
+    }
 
+    const dataString = serializeTrackingData(trackingData);
+    if (!dataString) {
         return Object.keys(trackingData).length > 0 ? { ...trackingData } : null;
     }
 
-    const cookieData = getCookie(COOKIE_NAME);
-    if (cookieData) {
-        cachedTrackingData = cookieData;
-        cachedTrackingObject = parseTrackingDataString(cookieData);
-        return { ...cachedTrackingObject };
+    setCookie(COOKIE_NAME, dataString, 30);
+    cachedTrackingData = dataString;
+    cachedTrackingObject = { ...trackingData };
+
+    if (typeof window !== 'undefined' && window.dataLayer) {
+        window.dataLayer.push({
+            event: 'tracking_data_captured',
+            ...trackingData,
+        });
     }
 
-    return null;
+    return Object.keys(trackingData).length > 0 ? { ...trackingData } : null;
+}
+
+function getCookieTrackingData(): TrackingData | null {
+    const cookieData = getCookie(COOKIE_NAME);
+    if (!cookieData) return null;
+
+    cachedTrackingData = cookieData;
+    cachedTrackingObject = parseTrackingDataString(cookieData);
+    return { ...cachedTrackingObject };
+}
+
+const captureTrackingDataObject = (): TrackingData | null => {
+    if (typeof window === 'undefined') return null;
+
+    const trackingData: TrackingData = {};
+    const urlParams = new URLSearchParams(getSearchStringFromLocation());
+
+    mergeStoredTrackingData(trackingData);
+    const foundInUrl = mergeUrlTrackingData(trackingData, urlParams);
+    const { cid, sid } = mergeAnalyticsTrackingData(trackingData);
+
+    if (foundInUrl || cid || sid || Object.keys(trackingData).length > 0) {
+        return persistTrackingData(trackingData);
+    }
+
+    return getCookieTrackingData();
 };
 
 const captureTrackingData = (): string | null => {
