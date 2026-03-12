@@ -33,7 +33,12 @@ const STEPS = [
     lightColor: "bg-sky-50",
     borderColor: "border-sky-200",
     rotate: "rotate-3",
-    sticker: <Star className="w-24 h-24 text-sky-400 drop-shadow-md" weight="fill" />
+    sticker: (
+      <div className="relative w-24 h-24 drop-shadow-md" aria-hidden="true">
+        <Star className="absolute inset-0 w-24 h-24 text-sky-200" weight="fill" />
+        <Star className="absolute inset-0 w-24 h-24 text-sky-400" weight="regular" />
+      </div>
+    )
   },
   {
     id: 3,
