@@ -67,7 +67,7 @@ const MelhorIdadeLanding: React.FC = () => {
           </Link>
           <button 
             onClick={() => openAiChat({ message: 'Olá! Gostaria de saber mais sobre roteiros para a melhor idade.' })}
-            className="text-xs font-black uppercase tracking-widest bg-brand-dark text-white px-4 py-2 rounded-full hover:bg-brand-cyan transition-colors"
+            className="text-xs font-black uppercase tracking-widest bg-brand-dark text-white px-4 py-2 rounded-full hover:bg-brand-cyan transition-colors focus:outline-dashed focus:outline-2 focus:outline-offset-2 focus:outline-brand-cyan"
           >
             Falar com Especialista
           </button>
