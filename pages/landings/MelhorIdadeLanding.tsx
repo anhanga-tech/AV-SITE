@@ -205,7 +205,7 @@ const MelhorIdadeLanding: React.FC = () => {
           </p>
           <button
             onClick={() => openAiChat({ message: 'Olá! Sou do público 50+ e gostaria de um orçamento para minha próxima viagem.' })}
-            className="bg-brand-cyan text-white px-10 py-5 rounded-2xl font-black text-xl shadow-2xl shadow-brand-cyan/20 hover:scale-105 transition-transform relative z-10"
+            className="bg-brand-cyan text-white px-10 py-5 rounded-2xl font-black text-xl shadow-2xl shadow-brand-cyan/20 hover:scale-105 transition-transform relative z-10 focus:outline-dashed focus:outline-2 focus:outline-offset-2 focus:outline-white"
           >
             Falar com um Consultor
           </button>
