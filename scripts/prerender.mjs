@@ -13,6 +13,7 @@ const ROUTES = [
   '/beto-carrero',
   '/lollapalooza-2026',
   '/sobre',
+  '/melhor-idade',
   '/mapa-do-site',
   '/termos-de-uso',
   '/politica-privacidade'

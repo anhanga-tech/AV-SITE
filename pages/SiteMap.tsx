@@ -14,6 +14,7 @@ const SiteMap: React.FC = () => {
     { to: getBlogHomeUrl(), label: 'Blog de Viagens e Roteiros', external: true },
     { to: `${SITE_URL}/orlando/`, label: 'Pacotes para Orlando' },
     { to: `${SITE_URL}/beto-carrero/`, label: 'Pacote Beto Carrero' },
+    { to: `${SITE_URL}/melhor-idade/`, label: 'Viagens para Melhor Idade' },
     { to: `${SITE_URL}/lollapalooza-2026/`, label: 'Pacotes para Lollapalooza 2026' },
     { to: `${SITE_URL}/termos-de-uso/`, label: 'Termos de Uso' },
     { to: `${SITE_URL}/politica-privacidade/`, label: 'Política de Privacidade' }
