@@ -128,7 +128,7 @@ test('buildLeadWhatsAppUrl should include origin, destination, dates, baggage an
 test('createLeadEventId should generate a lead-prefixed event id', () => {
     const eventId = createLeadEventId();
 
-    assert.match(eventId, /^lead_\d+_[a-z0-9]{6}$/);
+    assert.match(eventId, /^lead_(?:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+_[a-z0-9]{6})$/);
 });
 
 test('pushGenerateLeadDataLayerEvent should push generate_lead with tracking fields', () => {
@@ -170,22 +170,6 @@ test('pushGenerateLeadDataLayerEvent should push generate_lead with tracking fie
                 cid: 'cid-123',
                 sid: 'sid-456',
             },
-        },
-        {
-            utm_source: 'google',
-            utm_medium: 'cpc',
-            utm_campaign: 'rio',
-            utm_term: null,
-            utm_content: null,
-            cid: 'cid-123',
-            sid: 'sid-456',
-        },
-        {
-            utm_source: 'google',
-            utm_medium: 'cpc',
-            utm_campaign: 'rio',
-            utm_term: null,
-            utm_content: null,
         },
     );
 

@@ -192,6 +192,10 @@ function truncateResponseText(value: string): string {
 }
 
 export function createLeadEventId(): string {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+        return `lead_${crypto.randomUUID()}`;
+    }
+
     return `lead_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
@@ -221,8 +225,6 @@ function buildSubmitLeadPayload(
 
 export function pushGenerateLeadDataLayerEvent(
     payload: SubmitLeadRequest,
-    latestTracking: LeadTracking,
-    latestUtms: LeadUtms,
 ): void {
     if (typeof window === 'undefined' || !window.dataLayer || !payload.event_id) {
         return;
@@ -232,11 +234,11 @@ export function pushGenerateLeadDataLayerEvent(
         event: 'generate_lead',
         event_id: payload.event_id,
         destination: payload.destination,
-        utm_source: latestUtms.utm_source,
-        utm_medium: latestUtms.utm_medium,
-        utm_campaign: latestUtms.utm_campaign,
-        ga_client_id: latestTracking.cid,
-        ga_session_id: latestTracking.sid,
+        utm_source: payload.utms.utm_source,
+        utm_medium: payload.utms.utm_medium,
+        utm_campaign: payload.utms.utm_campaign,
+        ga_client_id: payload.tracking?.cid,
+        ga_session_id: payload.tracking?.sid,
     });
 }
 
@@ -384,7 +386,7 @@ export function useLeadCapture() {
                 return failure;
             }
 
-            pushGenerateLeadDataLayerEvent(payload, latestTracking, latestUtms);
+            pushGenerateLeadDataLayerEvent(payload);
             setIsSubmitting(false);
             return buildSubmitLeadSuccessResult(parsed);
         } catch (requestError: unknown) {
