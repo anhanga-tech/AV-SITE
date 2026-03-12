@@ -137,7 +137,7 @@ const Hero: React.FC = () => {
             </span>
             Sua Próxima <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500 relative inline-block pb-2">
-              {validCityForTitle ? `Aventura em ${validCityForTitle}` : 'Aventura Personalizada'}
+              {validCityForTitle ? `Aventura em ${validCityForTitle}` : 'Aventura'}
 
               {/* Underline Scribble - orgânico via Framer Motion pathLength */}
               <svg className="absolute w-full h-4 -bottom-0 left-0 text-yellow-400 overflow-visible" viewBox="0 0 100 10" preserveAspectRatio="none">

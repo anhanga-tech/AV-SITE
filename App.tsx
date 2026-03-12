@@ -21,6 +21,7 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 const BetoCarreroLanding = lazy(() => import('./pages/landings/BetoCarreroLanding'));
 const LollapaloozaLanding = lazy(() => import('./pages/landings/LollapaloozaLanding'));
 const OrlandoLanding = lazy(() => import('./pages/landings/OrlandoLanding'));
+const MelhorIdadeLanding = lazy(() => import('./pages/landings/MelhorIdadeLanding'));
 
 const MainRouteFallback: React.FC = () => <section className="min-h-[40vh] bg-white" aria-hidden="true" />;
 const LandingRouteFallback: React.FC = () => <div className="min-h-screen bg-white" aria-hidden="true" />;
@@ -60,6 +61,7 @@ const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClient
           <Route path="/lollapalooza-2026" element={<LollapaloozaLanding />} />
           <Route path="/lollapalooza" element={<Navigate to="/lollapalooza-2026" replace />} />
           <Route path="/orlando" element={<OrlandoLanding />} />
+          <Route path="/melhor-idade" element={<MelhorIdadeLanding />} />
           <Route path="/*" element={<MainSiteShell />} />
         </Routes>
       </Suspense>
