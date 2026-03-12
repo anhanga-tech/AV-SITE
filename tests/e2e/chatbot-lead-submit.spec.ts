@@ -109,7 +109,9 @@ test.describe('Chatbot lead handoff', () => {
     });
   });
 
-  test('should keep the user on the lead form when HubSpot submit fails', async ({ page }) => {
+  test('should open WhatsApp immediately even when HubSpot submit fails in the background', async ({ page }) => {
+    let submitRequestCount = 0;
+
     await page.addInitScript(() => {
       window.__openedUrls = [];
 
@@ -141,8 +143,9 @@ test.describe('Chatbot lead handoff', () => {
       }),
     );
 
-    await page.route('**/api/submit-lead', route =>
-      route.fulfill({
+    await page.route('**/api/submit-lead', async route => {
+      submitRequestCount += 1;
+      await route.fulfill({
         status: 422,
         contentType: 'application/json',
         body: JSON.stringify({
@@ -151,8 +154,8 @@ test.describe('Chatbot lead handoff', () => {
           code: 'HUBSPOT_PROPERTY_ERROR',
           error: 'Propriedade inválida no HubSpot.',
         }),
-      }),
-    );
+      });
+    });
 
     const aiChat = new AIChat(page);
 
@@ -168,8 +171,20 @@ test.describe('Chatbot lead handoff', () => {
 
     await page.getByRole('button', { name: 'Salvar e abrir WhatsApp' }).click();
 
-    await expect(page.getByRole('alert')).toContainText('Propriedade inválida no HubSpot. Ref: req-e2e-fail');
-    await expect.poll(() => page.evaluate(() => window.__openedUrls?.length ?? 0)).toBe(0);
+    // WhatsApp must open immediately (before HubSpot submission completes) —
+    // this is the core guarantee of the fire-and-forget design.
+    await expect.poll(() => page.evaluate(() => window.__openedUrls?.length ?? 0)).toBe(1);
+    const openedUrl = await page.evaluate(() => window.__openedUrls?.[0] ?? '');
+    expect(decodeURIComponent(openedUrl)).toContain('wa.me/');
+
+    // HubSpot submission happened in the background
+    await expect.poll(() => submitRequestCount).toBe(1);
+
+    // No UI error alert — HubSpot errors are silently logged to console
+    await expect(page.getByRole('alert')).not.toBeVisible();
+
+    // The lead form ("Link Gerado") is still rendered (popup opened in a new tab,
+    // window.open mock returns a truthy object so location.assign is not triggered)
     await expect(page.getByText('Link Gerado')).toBeVisible();
   });
 });
