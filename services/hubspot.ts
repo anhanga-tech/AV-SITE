@@ -7,7 +7,8 @@ const TRACKING_PROPERTY_MAP: Record<string, string> = {
     cid: 'ga_client_id',
     sid: 'ga_session_id',
     gclid: 'hs_google_click_id',
-    fbclid: 'hs_facebook_click_id',
+    fbc: 'hs_facebook_click_id',
+    fbp: 'av_fbp',
     msclkid: 'hs_linkedin_click_id',
     ttclid: 'tiktok_id',
     gbraid: 'gbraid',
@@ -119,12 +120,12 @@ function getTrackingEntries(tracking?: LeadTracking): Record<string, string> {
         cid: tracking.cid,
         sid: tracking.sid,
         gclid: tracking.gclid,
-        fbclid: tracking.fbclid,
         msclkid: tracking.msclkid,
         ttclid: tracking.ttclid,
         gbraid: tracking.gbraid,
         wbraid: tracking.wbraid,
         fbc: tracking.fbc,
+        fbp: tracking.fbp,
     };
 
     const normalized: Record<string, string> = {};
@@ -197,6 +198,7 @@ export function buildAdditionalContactProperties(payload: SubmitLeadRequest): Re
     if (payload.utms.utm_campaign) properties.ultimo_utm_campaign = payload.utms.utm_campaign;
     if (payload.utms.utm_term) properties.utm_term = payload.utms.utm_term;
     if (payload.utms.utm_content) properties.ultimo_utm_content = payload.utms.utm_content;
+    if (payload.event_id) properties.av_event_id = payload.event_id;
 
     const trackingMapping = mapTrackingToContactProperties(payload.tracking);
     Object.assign(properties, trackingMapping.properties);
