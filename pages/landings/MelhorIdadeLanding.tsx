@@ -112,7 +112,7 @@ const MelhorIdadeLanding: React.FC = () => {
             >
               <button
                 onClick={() => openAiChat({ message: 'Olá! Quero planejar uma viagem personalizada para o público 50+.' })}
-                className="bg-brand-vibrant text-white px-8 py-4 rounded-2xl font-black text-lg shadow-xl shadow-brand-vibrant/20 hover:scale-105 transition-transform flex items-center gap-3"
+                className="bg-brand-vibrant text-white px-8 py-4 rounded-2xl font-black text-lg shadow-xl shadow-brand-vibrant/20 hover:scale-105 transition-transform flex items-center gap-3 focus:outline-dashed focus:outline-2 focus:outline-offset-2 focus:outline-brand-vibrant"
               >
                 Solicitar Orçamento
                 <Sparkles className="w-5 h-5" />
