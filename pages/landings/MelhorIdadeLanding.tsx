@@ -59,12 +59,12 @@ const MelhorIdadeLanding: React.FC = () => {
       {/* MINI HEADER */}
       <div className="bg-white/80 backdrop-blur-md py-4 border-b border-gray-100 sticky top-0 z-[60]">
         <div className="container mx-auto px-6 flex justify-between items-center">
-          <a href="https://www.anhanga.tur.br/" className="text-sm font-bold text-brand-dark hover:text-brand-cyan transition-colors flex items-center gap-2">
+          <Link to="/" className="text-sm font-bold text-brand-dark hover:text-brand-cyan transition-colors flex items-center gap-2">
             <span className="w-8 h-8 bg-brand-cyan/10 rounded-lg flex items-center justify-center">
               <img src="/favicon.svg" alt="Anhangá" className="w-5 h-5" />
             </span>
             Anhangá Viagens
-          </a>
+          </Link>
           <button 
             onClick={() => openAiChat({ message: 'Olá! Gostaria de saber mais sobre roteiros para a melhor idade.' })}
             className="text-xs font-black uppercase tracking-widest bg-brand-dark text-white px-4 py-2 rounded-full hover:bg-brand-cyan transition-colors"
