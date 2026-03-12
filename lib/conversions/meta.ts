@@ -17,6 +17,11 @@ interface MetaConversionPayload {
   timestamp?: string;
 }
 
+type MetaConversionResult = { success: boolean; error?: string };
+
+const DEFAULT_CURRENCY = 'BRL';
+const META_GRAPH_VERSION = 'v19.0';
+
 function sha256(value: string): string {
   return createHash('sha256').update(value.trim().toLowerCase()).digest('hex');
 }
@@ -33,8 +38,8 @@ function normalizePhone(value?: string): string | undefined {
   return digits ? digits : undefined;
 }
 
-function toUnixSeconds(timestamp?: string): number {
-  const fallback = Math.floor(Date.now() / 1000);
+function toUnixSeconds(timestamp: string | undefined, nowMs: number): number {
+  const fallback = Math.floor(nowMs / 1000);
   const normalized = normalizeString(timestamp);
   if (!normalized) return fallback;
 
@@ -47,19 +52,109 @@ function toUnixSeconds(timestamp?: string): number {
   return Number.isFinite(parsed) ? Math.floor(parsed / 1000) : fallback;
 }
 
-function deriveFbc(payload: MetaConversionPayload): string | undefined {
+function deriveFbc(payload: MetaConversionPayload, nowMs: number): string | undefined {
   const fbc = normalizeString(payload.fbc);
   if (fbc) return fbc;
 
   const fbclid = normalizeString(payload.fbclid);
   if (!fbclid) return undefined;
 
-  return `fb.1.${Date.now()}.${fbclid}`;
+  return `fb.1.${nowMs}.${fbclid}`;
+}
+
+function buildMetaUserData(payload: MetaConversionPayload, nowMs: number): Record<string, unknown> {
+  const userData: Record<string, unknown> = {};
+  const email = normalizeString(payload.email);
+  const firstName = normalizeString(payload.firstName);
+  const lastName = normalizeString(payload.lastName);
+  const phone = normalizePhone(payload.phone);
+  const fbp = normalizeString(payload.fbp);
+  const fbc = deriveFbc(payload, nowMs);
+
+  if (email) userData.em = [sha256(email)];
+  if (firstName) userData.fn = [sha256(firstName)];
+  if (lastName) userData.ln = [sha256(lastName)];
+  if (phone) userData.ph = [sha256(phone)];
+  if (fbp) userData.fbp = fbp;
+  if (fbc) userData.fbc = fbc;
+
+  return userData;
+}
+
+function buildMetaCustomData(payload: MetaConversionPayload): Record<string, unknown> {
+  const customData: Record<string, unknown> = {
+    currency: normalizeString(payload.currency) ?? DEFAULT_CURRENCY,
+    value: Number.isFinite(payload.value) ? payload.value : 0,
+  };
+
+  const contentName = normalizeString(payload.contentName);
+  const contentType = normalizeString(payload.contentType);
+  if (contentName) customData.content_name = contentName;
+  if (contentType) customData.content_type = contentType;
+
+  return customData;
+}
+
+function buildMetaRequestBody(
+  payload: MetaConversionPayload,
+  testEventCode: string | undefined,
+  nowMs: number
+): Record<string, unknown> {
+  const eventId = normalizeString(payload.eventId);
+  const body: Record<string, unknown> = {
+    data: [
+      {
+        event_name: payload.eventName,
+        event_time: toUnixSeconds(payload.timestamp, nowMs),
+        action_source: 'website',
+        user_data: buildMetaUserData(payload, nowMs),
+        custom_data: buildMetaCustomData(payload),
+        ...(eventId ? { event_id: eventId } : {}),
+      },
+    ],
+  };
+
+  if (testEventCode) {
+    body.test_event_code = testEventCode;
+  }
+
+  return body;
+}
+
+function buildMetaUrl(pixelId: string, accessToken: string): string {
+  return `https://graph.facebook.com/${META_GRAPH_VERSION}/${pixelId}/events?access_token=${accessToken}`;
+}
+
+async function postMetaConversion(url: string, body: Record<string, unknown>): Promise<Response> {
+  return await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+}
+
+async function handleMetaResponse(
+  payload: MetaConversionPayload,
+  response: Response
+): Promise<MetaConversionResult> {
+  if (!response.ok) {
+    const detail = await response.text().catch(() => '');
+    console.error(`META: Conversion failed with status ${response.status}`, detail);
+    return {
+      success: false,
+      error: `HTTP ${response.status}${detail ? `: ${detail}` : ''}`,
+    };
+  }
+
+  console.log(`META: ${payload.eventName} conversion sent successfully`);
+  return { success: true };
 }
 
 export async function sendMetaConversion(
   payload: MetaConversionPayload
-): Promise<{ success: boolean; error?: string }> {
+): Promise<MetaConversionResult> {
   const pixelId = process.env.META_PIXEL_ID;
   const accessToken = process.env.META_ACCESS_TOKEN;
 
@@ -69,70 +164,12 @@ export async function sendMetaConversion(
   }
 
   try {
-    const userData: Record<string, unknown> = {};
-    const email = normalizeString(payload.email);
-    const firstName = normalizeString(payload.firstName);
-    const lastName = normalizeString(payload.lastName);
-    const phone = normalizePhone(payload.phone);
-    const fbp = normalizeString(payload.fbp);
-    const fbc = deriveFbc(payload);
-
-    if (email) userData.em = [sha256(email)];
-    if (firstName) userData.fn = [sha256(firstName)];
-    if (lastName) userData.ln = [sha256(lastName)];
-    if (phone) userData.ph = [sha256(phone)];
-    if (fbp) userData.fbp = fbp;
-    if (fbc) userData.fbc = fbc;
-
-    const customData: Record<string, unknown> = {
-      currency: normalizeString(payload.currency) ?? 'BRL',
-      value: Number.isFinite(payload.value) ? payload.value : 0,
-    };
-
-    const contentName = normalizeString(payload.contentName);
-    const contentType = normalizeString(payload.contentType);
-    const eventId = normalizeString(payload.eventId);
-    if (contentName) customData.content_name = contentName;
-    if (contentType) customData.content_type = contentType;
-
-    const body: Record<string, unknown> = {
-      data: [
-        {
-          event_name: payload.eventName,
-          event_time: toUnixSeconds(payload.timestamp),
-          action_source: 'website',
-          user_data: userData,
-          custom_data: customData,
-          ...(eventId ? { event_id: eventId } : {}),
-        },
-      ],
-    };
-
+    const nowMs = Date.now();
     const testEventCode = normalizeString(process.env.META_TEST_EVENT_CODE);
-    if (testEventCode) {
-      body.test_event_code = testEventCode;
-    }
-
-    const url = `https://graph.facebook.com/v19.0/${pixelId}/events?access_token=${accessToken}`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      const detail = await response.text().catch(() => '');
-      console.error(`META: Conversion failed with status ${response.status}`, detail);
-      return {
-        success: false,
-        error: `HTTP ${response.status}${detail ? `: ${detail}` : ''}`,
-      };
-    }
-
-    console.log(`META: ${payload.eventName} conversion sent successfully`);
-    return { success: true };
+    const body = buildMetaRequestBody(payload, testEventCode, nowMs);
+    const url = buildMetaUrl(pixelId, accessToken);
+    const response = await postMetaConversion(url, body);
+    return await handleMetaResponse(payload, response);
   } catch (error) {
     console.error('META: Conversion failed', error);
     return {

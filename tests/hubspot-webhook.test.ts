@@ -187,6 +187,7 @@ test('hubspot-webhook should send purchase conversion to Meta and derive fbc fro
     console.log = originalConsoleLog;
     console.warn = originalConsoleWarn;
     console.error = originalConsoleError;
+    Date.now = originalDateNow;
     restoreEnv();
   });
 
