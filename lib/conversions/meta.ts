@@ -1,5 +1,3 @@
-import { createHash } from 'node:crypto';
-
 interface MetaConversionPayload {
   eventName: 'Lead' | 'Purchase';
   eventId?: string;
@@ -22,8 +20,16 @@ type MetaConversionResult = { success: boolean; error?: string };
 const DEFAULT_CURRENCY = 'BRL';
 const META_GRAPH_VERSION = 'v19.0';
 
-function sha256(value: string): string {
-  return createHash('sha256').update(value.trim().toLowerCase()).digest('hex');
+function toHex(buffer: ArrayBuffer): string {
+  return Array.from(new Uint8Array(buffer))
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+async function sha256(value: string): Promise<string> {
+  const normalized = value.trim().toLowerCase();
+  const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(normalized));
+  return toHex(buffer);
 }
 
 function normalizeString(value?: string): string | undefined {
@@ -62,7 +68,7 @@ function deriveFbc(payload: MetaConversionPayload, nowMs: number): string | unde
   return `fb.1.${nowMs}.${fbclid}`;
 }
 
-function buildMetaUserData(payload: MetaConversionPayload, nowMs: number): Record<string, unknown> {
+async function buildMetaUserData(payload: MetaConversionPayload, nowMs: number): Promise<Record<string, unknown>> {
   const userData: Record<string, unknown> = {};
   const email = normalizeString(payload.email);
   const firstName = normalizeString(payload.firstName);
@@ -71,10 +77,10 @@ function buildMetaUserData(payload: MetaConversionPayload, nowMs: number): Recor
   const fbp = normalizeString(payload.fbp);
   const fbc = deriveFbc(payload, nowMs);
 
-  if (email) userData.em = [sha256(email)];
-  if (firstName) userData.fn = [sha256(firstName)];
-  if (lastName) userData.ln = [sha256(lastName)];
-  if (phone) userData.ph = [sha256(phone)];
+  if (email) userData.em = [await sha256(email)];
+  if (firstName) userData.fn = [await sha256(firstName)];
+  if (lastName) userData.ln = [await sha256(lastName)];
+  if (phone) userData.ph = [await sha256(phone)];
   if (fbp) userData.fbp = fbp;
   if (fbc) userData.fbc = fbc;
 
@@ -95,11 +101,11 @@ function buildMetaCustomData(payload: MetaConversionPayload): Record<string, unk
   return customData;
 }
 
-function buildMetaRequestBody(
+async function buildMetaRequestBody(
   payload: MetaConversionPayload,
   testEventCode: string | undefined,
   nowMs: number
-): Record<string, unknown> {
+): Promise<Record<string, unknown>> {
   const eventId = normalizeString(payload.eventId);
   const body: Record<string, unknown> = {
     data: [
@@ -107,7 +113,7 @@ function buildMetaRequestBody(
         event_name: payload.eventName,
         event_time: toUnixSeconds(payload.timestamp, nowMs),
         action_source: 'website',
-        user_data: buildMetaUserData(payload, nowMs),
+        user_data: await buildMetaUserData(payload, nowMs),
         custom_data: buildMetaCustomData(payload),
         ...(eventId ? { event_id: eventId } : {}),
       },
@@ -166,7 +172,7 @@ export async function sendMetaConversion(
   try {
     const nowMs = Date.now();
     const testEventCode = normalizeString(process.env.META_TEST_EVENT_CODE);
-    const body = buildMetaRequestBody(payload, testEventCode, nowMs);
+    const body = await buildMetaRequestBody(payload, testEventCode, nowMs);
     const url = buildMetaUrl(pixelId, accessToken);
     const response = await postMetaConversion(url, body);
     return await handleMetaResponse(payload, response);

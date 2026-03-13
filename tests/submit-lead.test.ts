@@ -107,6 +107,22 @@ function hashNormalized(value: string): string {
     return createHash('sha256').update(value.trim().toLowerCase()).digest('hex');
 }
 
+async function waitForCall(
+    predicate: (call: MockHubSpotRequest) => boolean,
+    calls: MockHubSpotRequest[],
+    timeoutMs = 50,
+): Promise<MockHubSpotRequest | undefined> {
+    const start = Date.now();
+
+    while (Date.now() - start < timeoutMs) {
+        const match = calls.find(predicate);
+        if (match) return match;
+        await new Promise((resolve) => setTimeout(resolve, 1));
+    }
+
+    return calls.find(predicate);
+}
+
 test('mapTrackingToContactProperties should map msclkid to hs_linkedin_click_id', () => {
     const mapped = mapTrackingToContactProperties({
         utm_source: null,
@@ -271,7 +287,10 @@ test('submit-lead should create contact and deal on first attempt', async (t) =>
         1,
     );
 
-    const metaRequest = calls.find((call) => call.url.startsWith('https://graph.facebook.com/v19.0/pixel-1/events'));
+    const metaRequest = await waitForCall(
+        (call) => call.url.startsWith('https://graph.facebook.com/v19.0/pixel-1/events'),
+        calls,
+    );
     assert.ok(metaRequest, 'meta request should exist');
     assert.match(metaRequest!.url, /access_token=token-1$/);
 
