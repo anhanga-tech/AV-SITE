@@ -12,7 +12,7 @@ interface GA4ConversionPayload {
 type GA4ConversionResult = { success: boolean; error?: string };
 
 const DEFAULT_CURRENCY = 'BRL';
-const GA4_COLLECT_URL = 'https://www.google-analytics.com/mp/collect';
+const GA4_COLLECT_URL = process.env.GA4_DEBUG_MODE === 'true' ? 'https://www.google-analytics.com/debug/mp/collect' : 'https://www.google-analytics.com/mp/collect';
 
 function buildGA4EventParams(payload: GA4ConversionPayload): Record<string, unknown> {
   const params: Record<string, unknown> = {
