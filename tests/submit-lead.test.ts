@@ -142,6 +142,29 @@ test('mapTrackingToContactProperties should map msclkid to hs_linkedin_click_id'
     assert.equal(mapped.properties.wbraid, 'w-123');
 });
 
+test('mapTrackingToContactProperties should map HubSpot tracking fields used by FEL-45', () => {
+    const mapped = mapTrackingToContactProperties({
+        utm_source: null,
+        utm_medium: null,
+        utm_campaign: null,
+        utm_term: null,
+        utm_content: null,
+        cid: 'ga.321',
+        sid: 'sid-456',
+        fbclid: 'fbclid-123',
+        fbc: 'fb.1.1736366050123.fbclid-123',
+    });
+
+    assert.deepEqual(mapped.properties, {
+        ga_client_id: 'ga.321',
+        ga_session_id: 'sid-456',
+        hs_facebook_click_id: 'fbclid-123',
+    });
+    assert.deepEqual(mapped.unmapped, {
+        fbc: 'fb.1.1736366050123.fbclid-123',
+    });
+});
+
 test('validatePayload should preserve fbp as a top-level tracking field', () => {
     const result = validatePayload({
         firstName: 'Felipe',
