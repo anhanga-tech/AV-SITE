@@ -157,16 +157,16 @@ test('mapTrackingToContactProperties should map HubSpot tracking fields used by 
         sid: 'sid-456',
         fbclid: 'fbclid-123',
         fbc: 'fb.1.1736366050123.fbclid-123',
+        fbp: 'fb.1.1736366050.1234567890',
     });
 
     assert.deepEqual(mapped.properties, {
         ga_client_id: 'ga.321',
         ga_session_id: 'sid-456',
-        hs_facebook_click_id: 'fbclid-123',
+        hs_facebook_click_id: 'fb.1.1736366050123.fbclid-123',
+        av_fbp: 'fb.1.1736366050.1234567890',
     });
-    assert.deepEqual(mapped.unmapped, {
-        fbc: 'fb.1.1736366050123.fbclid-123',
-    });
+    assert.deepEqual(mapped.unmapped, {});
 });
 
 test('validatePayload should preserve fbp as a top-level tracking field', () => {
