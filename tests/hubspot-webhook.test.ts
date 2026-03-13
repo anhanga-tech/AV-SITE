@@ -10,8 +10,8 @@ const originalDateNow = Date.now;
 const originalEnv = {
   HUBSPOT_WEBHOOK_SECRET: process.env.HUBSPOT_WEBHOOK_SECRET,
   HUBSPOT_TOKEN: process.env.HUBSPOT_TOKEN,
-  GOOGLE_ADS_CONVERSION_ID: process.env.GOOGLE_ADS_CONVERSION_ID,
-  GOOGLE_ADS_CONVERSION_LABEL_PURCHASE: process.env.GOOGLE_ADS_CONVERSION_LABEL_PURCHASE,
+  GA4_MEASUREMENT_ID: process.env.GA4_MEASUREMENT_ID,
+  GA4_API_SECRET: process.env.GA4_API_SECRET,
   META_PIXEL_ID: process.env.META_PIXEL_ID,
   META_ACCESS_TOKEN: process.env.META_ACCESS_TOKEN,
   META_TEST_EVENT_CODE: process.env.META_TEST_EVENT_CODE,
@@ -29,8 +29,8 @@ function restoreEnvValue(key: string, value: string | undefined) {
 function restoreEnv() {
   restoreEnvValue('HUBSPOT_WEBHOOK_SECRET', originalEnv.HUBSPOT_WEBHOOK_SECRET);
   restoreEnvValue('HUBSPOT_TOKEN', originalEnv.HUBSPOT_TOKEN);
-  restoreEnvValue('GOOGLE_ADS_CONVERSION_ID', originalEnv.GOOGLE_ADS_CONVERSION_ID);
-  restoreEnvValue('GOOGLE_ADS_CONVERSION_LABEL_PURCHASE', originalEnv.GOOGLE_ADS_CONVERSION_LABEL_PURCHASE);
+  restoreEnvValue('GA4_MEASUREMENT_ID', originalEnv.GA4_MEASUREMENT_ID);
+  restoreEnvValue('GA4_API_SECRET', originalEnv.GA4_API_SECRET);
   restoreEnvValue('META_PIXEL_ID', originalEnv.META_PIXEL_ID);
   restoreEnvValue('META_ACCESS_TOKEN', originalEnv.META_ACCESS_TOKEN);
   restoreEnvValue('META_TEST_EVENT_CODE', originalEnv.META_TEST_EVENT_CODE);
@@ -96,8 +96,8 @@ test('hubspot-webhook should process closed won deal event', async (t) => {
   Date.now = () => 1736366050123;
   process.env.HUBSPOT_WEBHOOK_SECRET = secret;
   process.env.HUBSPOT_TOKEN = 'test-token';
-  delete process.env.GOOGLE_ADS_CONVERSION_ID;
-  delete process.env.GOOGLE_ADS_CONVERSION_LABEL_PURCHASE;
+  delete process.env.GA4_MEASUREMENT_ID;
+  delete process.env.GA4_API_SECRET;
   delete process.env.META_PIXEL_ID;
   delete process.env.META_ACCESS_TOKEN;
 
@@ -194,8 +194,8 @@ test('hubspot-webhook should send purchase conversion to Meta and derive fbc fro
   const secret = 'test-secret';
   process.env.HUBSPOT_WEBHOOK_SECRET = secret;
   process.env.HUBSPOT_TOKEN = 'test-token';
-  process.env.GOOGLE_ADS_CONVERSION_ID = 'google-1';
-  process.env.GOOGLE_ADS_CONVERSION_LABEL_PURCHASE = 'purchase-1';
+  process.env.GA4_MEASUREMENT_ID = 'G-TEST12345';
+  process.env.GA4_API_SECRET = 'test-api-secret';
   process.env.META_PIXEL_ID = 'pixel-1';
   process.env.META_ACCESS_TOKEN = 'token-1';
 
@@ -250,9 +250,14 @@ test('hubspot-webhook should send purchase conversion to Meta and derive fbc fro
           lastname: 'Doe',
           phone: '+55 (11) 99999-8888',
           hs_google_click_id: 'gclid-123',
-          hs_facebook_click_id: 'fbclid-123'
+          hs_facebook_click_id: 'fbclid-123',
+          ga_client_id: '123456789.1234567890'
         }
       }), { status: 200 });
+    }
+
+    if (url.startsWith('https://www.google-analytics.com/mp/collect')) {
+      return new Response(null, { status: 204 });
     }
 
     if (url.startsWith('https://graph.facebook.com/v19.0/pixel-1/events')) {
