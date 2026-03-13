@@ -153,10 +153,16 @@
 }
 
 .landing-orlando h1 {
-    /* Kept for SEO consistency if needed, but the visual text is the paragraph above */
-    font-size: 1px;
+    /* Kept for SEO — visually hidden using sr-only pattern */
+    position: absolute;
+    width: 1px;
     height: 1px;
+    padding: 0;
+    margin: -1px;
     overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
 }
 
 .landing-orlando .highlight-blue { 
@@ -1080,17 +1086,13 @@
 }
 
 /* AI Chat Glow-up - Special for Orlando */
-.landing-orlando ~ #root .fixed.bottom-4.right-4, 
-.landing-orlando ~ #root .fixed.bottom-6.right-6,
-.landing-orlando .fixed.bottom-4.right-4,
-.landing-orlando .fixed.bottom-6.right-6 {
+.orlando-chat-glow {
     border: 3px solid var(--text-dark);
-    box-shadow: 6px 6px 0px var(--text-dark) !important;
+    box-shadow: 6px 6px 0px var(--text-dark);
     animation: orlando-chat-pulse 3s infinite ease-in-out;
 }
 
-.landing-orlando ~ #root .fixed.bottom-4.right-4::after,
-.landing-orlando .fixed.bottom-4.right-4::after {
+.orlando-chat-glow::after {
     content: 'Dúvidas? Visto?';
     position: absolute;
     top: -25px;
