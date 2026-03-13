@@ -131,12 +131,16 @@ test('mapTrackingToContactProperties should map msclkid to hs_linkedin_click_id'
         utm_term: null,
         utm_content: null,
         cid: 'ga.123',
+        fbc: 'fb.1.1736366050.fbclid-123',
+        fbp: 'fb.1.1736366050.1234567890',
         msclkid: 'ms-abc',
         gclid: 'g-xyz',
         wbraid: 'w-123',
     });
 
     assert.equal(mapped.properties.ga_client_id, 'ga.123');
+    assert.equal(mapped.properties.hs_facebook_click_id, 'fb.1.1736366050.fbclid-123');
+    assert.equal(mapped.properties.av_fbp, 'fb.1.1736366050.1234567890');
     assert.equal(mapped.properties.hs_linkedin_click_id, 'ms-abc');
     assert.equal(mapped.properties.hs_google_click_id, 'g-xyz');
     assert.equal(mapped.properties.wbraid, 'w-123');
@@ -275,6 +279,7 @@ test('submit-lead should create contact and deal on first attempt', async (t) =>
             sid: 'sid-1',
             gclid: 'gclid-1',
             fbclid: 'fbclid-1',
+            fbc: 'fb.1.1736366050.fbclid-1',
             msclkid: 'msclkid-1',
             ttclid: 'ttclid-1',
             gbraid: 'gbraid-1',
@@ -300,10 +305,12 @@ test('submit-lead should create contact and deal on first attempt', async (t) =>
     assert.equal(contactProps.email, 'felipe@example.com');
 
     const enrichedContactProps = collectContactPatchProperties(calls, 'contact-1');
+    assert.equal(enrichedContactProps.av_event_id, 'lead_test_123abc');
     assert.equal(enrichedContactProps.ga_client_id, 'cid-1');
     assert.equal(enrichedContactProps.ga_session_id, 'sid-1');
     assert.equal(enrichedContactProps.hs_google_click_id, 'gclid-1');
-    assert.equal(enrichedContactProps.hs_facebook_click_id, 'fbclid-1');
+    assert.equal(enrichedContactProps.hs_facebook_click_id, 'fb.1.1736366050.fbclid-1');
+    assert.equal(enrichedContactProps.av_fbp, 'fb.1.1736366050.1234567890');
     assert.equal(enrichedContactProps.hs_linkedin_click_id, 'msclkid-1');
     assert.equal(
         calls.filter((call) => call.url.endsWith('/crm/v3/objects/contacts/contact-1') && call.method === 'PATCH').length,

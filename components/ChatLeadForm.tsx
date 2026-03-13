@@ -1,5 +1,7 @@
 import React, { memo, useState } from 'react';
 import { CheckCircle2, ExternalLink, Loader2 } from 'lucide-react';
+import { createLeadEventId, pushGenerateLeadDataLayerEvent } from '../hooks/useLeadCapture';
+import type { SubmitLeadRequest } from '../types/leadCapture';
 import { triggerHaptic } from '../utils/haptics';
 
 export interface LeadFinalizePayload {
@@ -21,14 +23,16 @@ interface ChatLeadFormProps {
   destination?: string;
   defaultBantSummary?: string;
   getWhatsAppUrl: (payload: LeadFinalizePayload) => string;
+  prepareLeadSubmitPayload: (payload: LeadFinalizePayload, eventId: string) => SubmitLeadRequest;
   isSubmittingLead: boolean;
-  onFinalizeLead: (payload: LeadFinalizePayload) => Promise<LeadFinalizeResult>;
+  onFinalizeLead: (payload: SubmitLeadRequest) => Promise<LeadFinalizeResult>;
 }
 
 const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
   destination,
   defaultBantSummary,
   getWhatsAppUrl,
+  prepareLeadSubmitPayload,
   isSubmittingLead,
   onFinalizeLead,
 }) => {
@@ -92,6 +96,10 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
 
     void triggerHaptic('medium');
 
+    const eventId = createLeadEventId();
+    const submitPayload = prepareLeadSubmitPayload(payload, eventId);
+    pushGenerateLeadDataLayerEvent(submitPayload);
+
     // Open WhatsApp synchronously in the click handler to prevent popup blockers on mobile/Safari
     const whatsappUrl = getWhatsAppUrl(payload);
     const popup = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
@@ -100,7 +108,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
     }
 
     // Submit lead data in the background — user is already heading to WhatsApp
-    const result = await onFinalizeLead(payload);
+    const result = await onFinalizeLead(submitPayload);
     if (!result.ok) {
       console.warn('Background lead submission failed:', { error: result.error, requestId: result.requestId });
     } else if (result.notice) {

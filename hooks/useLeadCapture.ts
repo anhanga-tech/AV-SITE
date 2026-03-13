@@ -223,6 +223,21 @@ function buildSubmitLeadPayload(
     };
 }
 
+function isPreparedSubmitLeadRequest(value: LeadDraftPartial | SubmitLeadRequest): value is SubmitLeadRequest {
+    const candidate = value as Partial<SubmitLeadRequest>;
+
+    return Boolean(
+        candidate
+        && typeof candidate.firstName === 'string'
+        && typeof candidate.lastName === 'string'
+        && typeof candidate.email === 'string'
+        && typeof candidate.bantSummary === 'string'
+        && typeof candidate.destination === 'string'
+        && candidate.utms
+        && typeof candidate.utms === 'object',
+    );
+}
+
 export function pushGenerateLeadDataLayerEvent(
     payload: SubmitLeadRequest,
 ): void {
@@ -348,13 +363,27 @@ export function useLeadCapture() {
         return buildLeadWhatsAppUrl(mergeLeadDraft(leadDraft, overrides));
     };
 
-    const submitLead = async (overrides: LeadDraftPartial = {}): Promise<SubmitLeadHookResult> => {
+    const prepareLeadSubmitPayload = (
+        overrides: LeadDraftPartial = {},
+        eventId: string = createLeadEventId(),
+    ): SubmitLeadRequest => {
+        const { tracking: latestTracking, utms: latestUtms } = refreshTrackingState();
+        return buildSubmitLeadPayload(leadDraft, overrides, latestTracking, latestUtms, eventId);
+    };
+
+    const submitLead = async (
+        input: LeadDraftPartial | SubmitLeadRequest = {},
+        options: {
+            eventId?: string;
+            pushDataLayerEvent?: boolean;
+        } = {},
+    ): Promise<SubmitLeadHookResult> => {
         setError(null);
         setIsSubmitting(true);
 
-        const { tracking: latestTracking, utms: latestUtms } = refreshTrackingState();
-        const eventId = createLeadEventId();
-        const payload = buildSubmitLeadPayload(leadDraft, overrides, latestTracking, latestUtms, eventId);
+        const payload = isPreparedSubmitLeadRequest(input)
+            ? input
+            : prepareLeadSubmitPayload(input, options.eventId ?? createLeadEventId());
         const validationError = getSubmitLeadValidationError(payload);
 
         if (validationError) {
@@ -386,7 +415,9 @@ export function useLeadCapture() {
                 return failure;
             }
 
-            pushGenerateLeadDataLayerEvent(payload);
+            if (options.pushDataLayerEvent !== false) {
+                pushGenerateLeadDataLayerEvent(payload);
+            }
             setIsSubmitting(false);
             return buildSubmitLeadSuccessResult(parsed);
         } catch (requestError: unknown) {
@@ -404,6 +435,7 @@ export function useLeadCapture() {
         isSubmitting,
         error,
         getLeadWhatsAppUrl,
+        prepareLeadSubmitPayload,
         setLeadDraft,
         resetLeadDraft,
         submitLead,

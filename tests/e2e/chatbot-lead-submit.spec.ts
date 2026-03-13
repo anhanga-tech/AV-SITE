@@ -17,7 +17,7 @@ async function acceptLgpd(page: import('@playwright/test').Page) {
 }
 
 test.describe('Chatbot lead handoff', () => {
-  test('should render the lead form from structured handoff and open WhatsApp only after HubSpot success', async ({ page }) => {
+  test('should reuse the same event_id for dataLayer and submit payload', async ({ page }) => {
     let submitRequestCount = 0;
     let submitPayload: Record<string, unknown> | null = null;
 
@@ -88,6 +88,15 @@ test.describe('Chatbot lead handoff', () => {
     await expect(page.getByText('Salvando...')).toBeVisible();
     await expect.poll(() => submitRequestCount).toBe(1);
     await expect.poll(() => page.evaluate(() => window.__openedUrls?.length ?? 0)).toBe(1);
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          (window.dataLayer || []).find((entry) =>
+            entry && typeof entry === 'object' && 'event' in entry && entry.event === 'generate_lead'
+          ) || null
+        )
+      )
+      .not.toBeNull();
 
     const openedUrl = await page.evaluate(() => window.__openedUrls?.[0] ?? '');
     expect(decodeURIComponent(openedUrl)).toContain('wa.me/551152833309');
@@ -109,16 +118,6 @@ test.describe('Chatbot lead handoff', () => {
     });
     expect(typeof submitPayload?.event_id).toBe('string');
     expect(String(submitPayload?.event_id)).toMatch(/^lead_(?:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+_[a-z0-9]{6})$/);
-
-    await expect
-      .poll(() =>
-        page.evaluate(() =>
-          (window.dataLayer || []).find((entry) =>
-            entry && typeof entry === 'object' && 'event' in entry && entry.event === 'generate_lead'
-          ) || null
-        )
-      )
-      .not.toBeNull();
 
     const generateLeadEvent = await page.evaluate(() =>
       (window.dataLayer || []).find((entry) =>
@@ -152,6 +151,7 @@ test.describe('Chatbot lead handoff', () => {
 
   test('should open WhatsApp immediately even when HubSpot submit fails in the background', async ({ page }) => {
     let submitRequestCount = 0;
+    let submitPayload: Record<string, unknown> | null = null;
 
     await page.addInitScript(() => {
       window.__openedUrls = [];
@@ -186,6 +186,7 @@ test.describe('Chatbot lead handoff', () => {
 
     await page.route('**/api/submit-lead', async route => {
       submitRequestCount += 1;
+      submitPayload = JSON.parse(route.request().postData() || '{}') as Record<string, unknown>;
       await route.fulfill({
         status: 422,
         contentType: 'application/json',
@@ -231,11 +232,23 @@ test.describe('Chatbot lead handoff', () => {
     await expect
       .poll(() =>
         page.evaluate(() =>
-          (window.dataLayer || []).some((entry) =>
+          (window.dataLayer || []).find((entry) =>
             entry && typeof entry === 'object' && 'event' in entry && entry.event === 'generate_lead'
-          )
+          ) || null
         )
       )
-      .toBe(false);
+      .not.toBeNull();
+
+    const generateLeadEvent = await page.evaluate(() =>
+      (window.dataLayer || []).find((entry) =>
+        entry && typeof entry === 'object' && 'event' in entry && entry.event === 'generate_lead'
+      ) || null
+    );
+    expect(typeof submitPayload?.event_id).toBe('string');
+    expect(generateLeadEvent).toMatchObject({
+      event: 'generate_lead',
+      event_id: submitPayload?.event_id,
+      destination: 'Orlando, Flórida',
+    });
   });
 });
