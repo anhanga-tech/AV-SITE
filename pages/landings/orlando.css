@@ -1057,10 +1057,6 @@
 }
 
 @media (max-width: 480px) {
-    .landing-orlando h1 {
-        font-size: 3.5rem;
-    }
-
     .landing-orlando .hero-description {
         font-size: 1rem;
         padding: 0 10px;
