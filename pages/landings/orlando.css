@@ -144,12 +144,19 @@
     animation: slideIn 0.8s ease-out forwards;
 }
 
-.landing-orlando h1 {
-    font-size: clamp(3.5rem, 7vw, 6.5rem);
+.landing-orlando .title-collage p {
+    font-size: clamp(4rem, 9vw, 8rem);
     font-weight: 900;
-    line-height: 0.95;
+    line-height: 0.9;
     text-transform: uppercase;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.04em;
+}
+
+.landing-orlando h1 {
+    /* Kept for SEO consistency if needed, but the visual text is the paragraph above */
+    font-size: 1px;
+    height: 1px;
+    overflow: hidden;
 }
 
 .landing-orlando .highlight-blue { 
