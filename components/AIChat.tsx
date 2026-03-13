@@ -82,6 +82,7 @@ const AIChat: React.FC = () => {
   } = useLeadCapture();
   const location = useLocation();
   const navigate = useNavigate();
+  const isOrlandoPage = location.pathname.startsWith('/orlando');
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
@@ -317,14 +318,15 @@ const AIChat: React.FC = () => {
       {/* Floating Toggle Button */}
       <button
         onClick={() => openChatDrawer()}
-        className={`fixed ${isOpen ? 'translate-y-32 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'} 
+        className={`fixed ${isOpen ? 'translate-y-32 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
                     bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9990]
-                    flex items-center justify-center gap-3 
-                    bg-brand-vibrant text-white 
+                    flex items-center justify-center gap-3
+                    bg-brand-vibrant text-white
                     shadow-[0_8px_30px_rgba(255,107,53,0.3)] hover:shadow-[0_8px_30px_rgba(255,107,53,0.5)] hover:-translate-y-1
                     transition-all duration-300
                     w-16 h-16 rounded-2xl sm:w-auto sm:h-auto sm:px-6 sm:py-3.5 sm:rounded-full
-                    focus:outline-none focus:ring-4 focus:ring-brand-vibrant/30`}
+                    focus:outline-none focus:ring-4 focus:ring-brand-vibrant/30
+                    ${isOrlandoPage ? 'orlando-chat-glow' : ''}`}
         aria-label="Abrir assistente virtual"
       >
         <div className="relative flex items-center justify-center">
