@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import handler from '../api/submit-lead.ts';
 import { mapTrackingToContactProperties } from '../services/hubspot.ts';
 import { validatePayload } from '../lib/lead-logic.ts';
@@ -17,16 +18,25 @@ const originalEnv = {
     META_ACCESS_TOKEN: process.env.META_ACCESS_TOKEN,
 };
 
+function restoreEnvValue(key: string, value: string | undefined) {
+    if (value === undefined) {
+        delete process.env[key];
+        return;
+    }
+
+    process.env[key] = value;
+}
+
 function restoreEnv() {
-    process.env.HUBSPOT_TOKEN = originalEnv.HUBSPOT_TOKEN;
-    process.env.HUBSPOT_DEAL_PIPELINE_ID = originalEnv.HUBSPOT_DEAL_PIPELINE_ID;
-    process.env.HUBSPOT_DEAL_STAGE_ID = originalEnv.HUBSPOT_DEAL_STAGE_ID;
-    process.env.HUBSPOT_DEAL_BANT_PROPERTY = originalEnv.HUBSPOT_DEAL_BANT_PROPERTY;
-    process.env.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY = originalEnv.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY;
-    process.env.HUBSPOT_REQUEST_TIMEOUT_MS = originalEnv.HUBSPOT_REQUEST_TIMEOUT_MS;
-    process.env.SUBMIT_LEAD_RATE_LIMIT_TIMEOUT_MS = originalEnv.SUBMIT_LEAD_RATE_LIMIT_TIMEOUT_MS;
-    process.env.META_PIXEL_ID = originalEnv.META_PIXEL_ID;
-    process.env.META_ACCESS_TOKEN = originalEnv.META_ACCESS_TOKEN;
+    restoreEnvValue('HUBSPOT_TOKEN', originalEnv.HUBSPOT_TOKEN);
+    restoreEnvValue('HUBSPOT_DEAL_PIPELINE_ID', originalEnv.HUBSPOT_DEAL_PIPELINE_ID);
+    restoreEnvValue('HUBSPOT_DEAL_STAGE_ID', originalEnv.HUBSPOT_DEAL_STAGE_ID);
+    restoreEnvValue('HUBSPOT_DEAL_BANT_PROPERTY', originalEnv.HUBSPOT_DEAL_BANT_PROPERTY);
+    restoreEnvValue('HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY', originalEnv.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY);
+    restoreEnvValue('HUBSPOT_REQUEST_TIMEOUT_MS', originalEnv.HUBSPOT_REQUEST_TIMEOUT_MS);
+    restoreEnvValue('SUBMIT_LEAD_RATE_LIMIT_TIMEOUT_MS', originalEnv.SUBMIT_LEAD_RATE_LIMIT_TIMEOUT_MS);
+    restoreEnvValue('META_PIXEL_ID', originalEnv.META_PIXEL_ID);
+    restoreEnvValue('META_ACCESS_TOKEN', originalEnv.META_ACCESS_TOKEN);
 }
 
 function buildRequest(body: Record<string, unknown>): Request {
@@ -49,7 +59,9 @@ function getUrl(input: RequestInfo | URL): string {
 }
 
 interface MockHubSpotRequestBody {
+    data?: Array<Record<string, unknown>>;
     properties?: Record<string, unknown>;
+    test_event_code?: string;
 }
 
 interface MockHubSpotRequest {
@@ -91,7 +103,27 @@ function collectContactPatchProperties(calls: MockHubSpotRequest[], contactId: s
     return Object.assign({}, ...patches.map((call) => call.body?.properties || {}));
 }
 
-test('mapTrackingToContactProperties should map HubSpot tracking fields used by FEL-45', () => {
+function hashNormalized(value: string): string {
+    return createHash('sha256').update(value.trim().toLowerCase()).digest('hex');
+}
+
+async function waitForCall(
+    predicate: (call: MockHubSpotRequest) => boolean,
+    calls: MockHubSpotRequest[],
+    timeoutMs = 50,
+): Promise<MockHubSpotRequest | undefined> {
+    const start = Date.now();
+
+    while (Date.now() - start < timeoutMs) {
+        const match = calls.find(predicate);
+        if (match) return match;
+        await new Promise((resolve) => setTimeout(resolve, 1));
+    }
+
+    return calls.find(predicate);
+}
+
+test('mapTrackingToContactProperties should map msclkid to hs_linkedin_click_id', () => {
     const mapped = mapTrackingToContactProperties({
         utm_source: null,
         utm_medium: null,
@@ -112,6 +144,29 @@ test('mapTrackingToContactProperties should map HubSpot tracking fields used by 
     assert.equal(mapped.properties.hs_linkedin_click_id, 'ms-abc');
     assert.equal(mapped.properties.hs_google_click_id, 'g-xyz');
     assert.equal(mapped.properties.wbraid, 'w-123');
+});
+
+test('mapTrackingToContactProperties should map HubSpot tracking fields used by FEL-45', () => {
+    const mapped = mapTrackingToContactProperties({
+        utm_source: null,
+        utm_medium: null,
+        utm_campaign: null,
+        utm_term: null,
+        utm_content: null,
+        cid: 'ga.321',
+        sid: 'sid-456',
+        fbclid: 'fbclid-123',
+        fbc: 'fb.1.1736366050123.fbclid-123',
+        fbp: 'fb.1.1736366050.1234567890',
+    });
+
+    assert.deepEqual(mapped.properties, {
+        ga_client_id: 'ga.321',
+        ga_session_id: 'sid-456',
+        hs_facebook_click_id: 'fb.1.1736366050123.fbclid-123',
+        av_fbp: 'fb.1.1736366050.1234567890',
+    });
+    assert.deepEqual(mapped.unmapped, {});
 });
 
 test('validatePayload should preserve fbp as a top-level tracking field', () => {
@@ -175,23 +230,6 @@ test('submit-lead should create contact and deal on first attempt', async (t) =>
     process.env.META_ACCESS_TOKEN = 'token-1';
 
     const calls: MockHubSpotRequest[] = [];
-    const originalConsoleLog = console.log;
-    const metaCalls: Array<Record<string, unknown>> = [];
-
-    console.log = (...args: unknown[]) => {
-        if (
-            args[0] === 'META: Would send conversion'
-            && args[1]
-            && typeof args[1] === 'object'
-            && !Array.isArray(args[1])
-        ) {
-            metaCalls.push(args[1] as Record<string, unknown>);
-        }
-    };
-
-    t.after(() => {
-        console.log = originalConsoleLog;
-    });
 
     global.fetch = (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
         const url = getUrl(input);
@@ -213,6 +251,10 @@ test('submit-lead should create contact and deal on first attempt', async (t) =>
 
         if (url.endsWith('/crm/v4/objects/deals/deal-1/associations/default/contacts/contact-1') && method === 'PUT') {
             return new Response(null, { status: 204 });
+        }
+
+        if (url.startsWith('https://graph.facebook.com/v19.0/pixel-1/events') && method === 'POST') {
+            return new Response(JSON.stringify({ events_received: 1 }), { status: 200 });
         }
 
         throw new Error(`Unexpected request: ${method} ${url}`);
@@ -274,9 +316,30 @@ test('submit-lead should create contact and deal on first attempt', async (t) =>
         calls.filter((call) => call.url.endsWith('/crm/v3/objects/contacts/contact-1') && call.method === 'PATCH').length,
         1,
     );
-    assert.equal(metaCalls.length, 1);
-    assert.equal(metaCalls[0]?.eventId, 'lead_test_123abc');
-    assert.equal(metaCalls[0]?.fbp, 'fb.1.1736366050.1234567890');
+
+    const metaRequest = await waitForCall(
+        (call) => call.url.startsWith('https://graph.facebook.com/v19.0/pixel-1/events'),
+        calls,
+    );
+    assert.ok(metaRequest, 'meta request should exist');
+    assert.match(metaRequest!.url, /access_token=token-1$/);
+
+    const metaEvent = metaRequest!.body?.data?.[0];
+    assert.ok(metaEvent, 'meta event payload should exist');
+    assert.equal(metaEvent?.event_id, 'lead_test_123abc');
+    assert.equal(metaEvent?.event_name, 'Lead');
+    assert.equal(
+        (metaEvent?.custom_data as Record<string, unknown>)?.content_name,
+        'Rio de Janeiro',
+    );
+    assert.equal(
+        (metaEvent?.user_data as Record<string, unknown>)?.fbp,
+        'fb.1.1736366050.1234567890',
+    );
+    assert.deepEqual(
+        (metaEvent?.user_data as Record<string, unknown>)?.em,
+        [hashNormalized('felipe@example.com')],
+    );
 
     const dealRequest = calls.find((call) => call.url.endsWith('/crm/v3/objects/deals'));
     assert.ok(dealRequest, 'deal creation request should exist');
