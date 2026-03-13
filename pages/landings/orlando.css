@@ -153,16 +153,10 @@
 }
 
 .landing-orlando h1 {
-    /* Kept for SEO — visually hidden using sr-only pattern */
-    position: absolute;
-    width: 1px;
+    /* Kept for SEO consistency if needed, but the visual text is the paragraph above */
+    font-size: 1px;
     height: 1px;
-    padding: 0;
-    margin: -1px;
     overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
 }
 
 .landing-orlando .highlight-blue { 
@@ -1063,10 +1057,6 @@
 }
 
 @media (max-width: 480px) {
-    .landing-orlando h1 {
-        font-size: 3.5rem;
-    }
-
     .landing-orlando .hero-description {
         font-size: 1rem;
         padding: 0 10px;
