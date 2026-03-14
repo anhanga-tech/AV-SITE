@@ -40,7 +40,7 @@ export class HomePage {
 
   async selectBudget(tier: string) {
     await this.budgetBtn.click();
-    await this.page.locator(`button:has-text("${tier}")`).click();
+    await this.page.getByRole('button', { name: tier }).click();
   }
 
   async submitSearch() {
