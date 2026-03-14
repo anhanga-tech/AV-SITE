@@ -40,11 +40,8 @@ test.describe('404 Page', () => {
 
   test('should navigate back to home from 404 page', async ({ page }) => {
     await page.goto('/404-test');
-    // We use getByRole('link') instead of standard locator because we replaced Link with <a>
-    await page.getByTestId('not-found-section').getByRole('link', { name: 'Página Inicial' }).click();
-    // In local dev/test it stays on localhost, but the href is absolute to production.
-    // However, clicking an absolute link to another domain in Playwright tests might trigger navigation
-    // to that domain. Since we want to ensure it points to the right place:
-    await expect(page).toHaveURL(/.*anhanga\.tur\.br\/$/);
+    // Verify the home link points to the correct absolute URL without navigating away from the test server
+    const homeLink = page.getByTestId('not-found-section').getByRole('link', { name: 'Página Inicial' });
+    await expect(homeLink).toHaveAttribute('href', 'https://www.anhanga.tur.br/');
   });
 });
