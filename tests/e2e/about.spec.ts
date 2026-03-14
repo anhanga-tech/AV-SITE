@@ -17,7 +17,7 @@ test.describe('Sobre Page E-E-A-T Verification', () => {
 
     // Check for History section
     await expect(page.locator('#nossa-historia')).toBeVisible();
-    await expect(page.locator('h2').filter({ hasText: 'Nossa História' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Nossa História' })).toBeVisible();
 
     // Check for Expertise/Differentiators
     await expect(page.locator('text=Atendimento Humano')).toBeVisible();
