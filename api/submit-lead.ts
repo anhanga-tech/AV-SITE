@@ -682,9 +682,10 @@ async function createDealForLead(
 async function trackLeadConversions(payload: SubmitLeadRequest, requestId: string): Promise<void> {
     const [googleResult, metaResult] = await Promise.all([
         sendGoogleConversion('lead_qualificado', {
+            clientId: payload.tracking?.cid,
+            sessionId: payload.tracking?.sid,
             gclid: payload.tracking?.gclid,
-            email: payload.email,
-            phone: payload.tracking?.extras?.phone,
+            destination: payload.destination,
         }),
         sendMetaConversion({
             eventName: 'Lead',
@@ -702,11 +703,11 @@ async function trackLeadConversions(payload: SubmitLeadRequest, requestId: strin
     ]);
 
     emitLeadLog('info', requestId, 'conversions', {
-        googleAds: googleResult.success ? 'ok' : googleResult.error || 'failed',
+        ga4: googleResult.success ? 'ok' : googleResult.error || 'failed',
         metaAds: metaResult.success ? 'ok' : metaResult.error || 'failed',
     });
 
-    if (!googleResult.success) console.warn('GOOGLE_ADS: Lead conversion failed', googleResult.error);
+    if (!googleResult.success) console.warn('[GA4 MP] Lead conversion failed', googleResult.error);
     if (!metaResult.success) console.warn('META: Lead conversion failed', metaResult.error);
 }
 

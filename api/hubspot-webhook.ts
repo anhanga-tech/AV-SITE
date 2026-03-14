@@ -109,13 +109,13 @@ async function processClosedWonEvent(event: HubSpotWebhookEvent, hubspotToken: s
   const phone = contact.properties.phone || undefined;
   const gclid = contact.properties.hs_google_click_id || undefined;
   const fbclid = contact.properties.hs_facebook_click_id || undefined;
+  const gaClientId = contact.properties.ga_client_id || undefined;
 
   const [googleResult, metaResult] = await Promise.allSettled([
     sendGoogleConversion('purchase', {
+      clientId: gaClientId,
+      gclid,
       value: amount,
-      email,
-      phone,
-      gclid
     }),
     sendMetaConversion({
       eventName: 'Purchase',
