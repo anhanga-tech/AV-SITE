@@ -4,6 +4,20 @@ import { revalidatePath } from 'next/cache'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 
+const MAX_AVATAR_SIZE_BYTES = 2 * 1024 * 1024
+
+function normalizeName(value: FormDataEntryValue | null): string {
+  return typeof value === 'string' ? value.trim() : ''
+}
+
+function isImageFile(file: File) {
+  return typeof file.type === 'string' && file.type.startsWith('image/')
+}
+
+function getBoolean(formData: FormData, field: string) {
+  return formData.get(field) === 'true'
+}
+
 export async function updateProfile(formData: FormData) {
     const supabase = await createServerSupabaseClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -12,11 +26,15 @@ export async function updateProfile(formData: FormData) {
         throw new Error('Not authenticated')
     }
 
-    const name = formData.get('name') as string
-    const emailReminders = formData.get('email_reminders') === 'true'
-    const pushNotifications = formData.get('push_notifications') === 'true'
-    const whatsapp = formData.get('whatsapp') === 'true'
-    const telegram = formData.get('telegram') === 'true'
+    const name = normalizeName(formData.get('name'))
+    const emailReminders = getBoolean(formData, 'email_reminders')
+    const pushNotifications = getBoolean(formData, 'push_notifications')
+    const whatsapp = getBoolean(formData, 'whatsapp')
+    const telegram = getBoolean(formData, 'telegram')
+
+    if (name.length < 2) {
+        return { error: 'Nome deve ter pelo menos 2 caracteres.' }
+    }
 
     const { error } = await supabase
         .from('profiles')
@@ -28,7 +46,6 @@ export async function updateProfile(formData: FormData) {
                 whatsapp,
                 telegram,
             },
-            updated_at: new Date().toISOString(),
         })
         .eq('id', user.id)
 
@@ -48,18 +65,27 @@ export async function uploadAvatar(formData: FormData) {
         throw new Error('Not authenticated')
     }
 
-    const file = formData.get('file') as File
-    if (!file) {
+    const file = formData.get('file')
+    if (!(file instanceof File)) {
         return { error: 'No file provided' }
     }
 
-    const fileExt = file.name.split('.').pop()
-    const fileName = `${user.id}-${Math.random()}.${fileExt}`
-    const filePath = `${user.id}/${fileName}`
+    if (!isImageFile(file)) {
+        return { error: 'O arquivo deve ser uma imagem.' }
+    }
+
+    if (file.size > MAX_AVATAR_SIZE_BYTES) {
+        return { error: 'O arquivo deve ter no máximo 2MB.' }
+    }
+
+    const filePath = `${user.id}/avatar`
 
     const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(filePath, file)
+        .upload(filePath, file, {
+            upsert: true,
+            contentType: file.type,
+        })
 
     if (uploadError) {
         return { error: uploadError.message }

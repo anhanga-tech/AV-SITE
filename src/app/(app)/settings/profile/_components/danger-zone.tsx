@@ -10,6 +10,7 @@ import {
   DialogFooter, 
   DialogHeader, 
   DialogTitle, 
+  DialogClose,
   DialogTrigger 
 } from '@/components/ui/dialog'
 import { LogOut, Key, AlertTriangle } from 'lucide-react'
@@ -19,9 +20,11 @@ import { supabase } from '@/lib/supabase/client'
 export function DangerZone() {
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [isResettingPassword, setIsResettingPassword] = useState(false)
+  const [feedbackMessage, setFeedbackMessage] = useState('')
 
   async function handleResetPassword() {
     setIsResettingPassword(true)
+    setFeedbackMessage('')
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (user?.email) {
@@ -29,14 +32,16 @@ export function DangerZone() {
           redirectTo: `${window.location.origin}/auth/callback?next=/settings/profile`,
         })
         if (error) {
-          alert('Erro ao enviar email de recuperação: ' + error.message)
+          setFeedbackMessage('Erro ao enviar email de recuperação: ' + error.message)
         } else {
-          alert('Email de recuperação enviado com sucesso!')
+          setFeedbackMessage('Email de recuperação enviado com sucesso!')
         }
+      } else {
+        setFeedbackMessage('Não foi possível identificar um e-mail para esta conta.')
       }
     } catch (error) {
       console.error('Reset password error:', error)
-      alert('Erro ao processar solicitação.')
+      setFeedbackMessage('Erro ao processar solicitação.')
     } finally {
       setIsResettingPassword(false)
     }
@@ -49,7 +54,7 @@ export function DangerZone() {
     } catch (error) {
       console.error('Sign out error:', error)
       setIsLoggingOut(false)
-      alert('Erro ao sair.')
+      setFeedbackMessage('Erro ao sair.')
     }
   }
 
@@ -106,7 +111,9 @@ export function DangerZone() {
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <Button variant="ghost" disabled={isLoggingOut}>Cancelar</Button>
+              <DialogClose asChild>
+                <Button variant="ghost" disabled={isLoggingOut}>Cancelar</Button>
+              </DialogClose>
               <Button 
                 variant="destructive" 
                 onClick={handleLogout}
@@ -117,6 +124,16 @@ export function DangerZone() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {feedbackMessage && (
+          <p
+            className={`text-sm ${feedbackMessage.includes('sucesso') ? 'text-emerald-600' : 'text-destructive'}`}
+            role="status"
+            aria-live="polite"
+          >
+            {feedbackMessage}
+          </p>
+        )}
       </CardContent>
     </Card>
   )

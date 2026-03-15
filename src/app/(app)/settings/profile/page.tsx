@@ -27,7 +27,7 @@ export default async function ProfilePage() {
                 </p>
             </div>
             
-            <ProfileForm profile={profile} userEmail={user.email!} />
+            <ProfileForm profile={profile} userEmail={user.email ?? 'E-mail não disponível'} />
         </div>
     )
 }

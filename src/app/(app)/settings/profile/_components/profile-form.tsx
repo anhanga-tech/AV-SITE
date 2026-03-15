@@ -40,6 +40,7 @@ interface ProfileFormProps {
 
 export function ProfileForm({ profile, userEmail }: ProfileFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [feedbackMessage, setFeedbackMessage] = useState('')
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url)
 
   const form = useForm<ProfileFormValues>({
@@ -55,6 +56,7 @@ export function ProfileForm({ profile, userEmail }: ProfileFormProps) {
 
   async function onSubmit(data: ProfileFormValues) {
     setIsSubmitting(true)
+    setFeedbackMessage('')
     const formData = new FormData()
     formData.append('name', data.name)
     formData.append('email_reminders', data.email_reminders.toString())
@@ -65,10 +67,12 @@ export function ProfileForm({ profile, userEmail }: ProfileFormProps) {
     try {
       const result = await updateProfile(formData)
       if (result?.error) {
-        alert('Erro ao atualizar perfil: ' + result.error)
+        setFeedbackMessage('Erro ao atualizar perfil: ' + result.error)
+      } else {
+        setFeedbackMessage('Perfil atualizado com sucesso!')
       }
     } catch (error) {
-      alert('Erro inesperado: ' + (error instanceof Error ? error.message : 'Desconhecido'))
+      setFeedbackMessage('Erro inesperado: ' + (error instanceof Error ? error.message : 'Desconhecido'))
     } finally {
       setIsSubmitting(false)
     }
@@ -119,6 +123,16 @@ export function ProfileForm({ profile, userEmail }: ProfileFormProps) {
                 {isSubmitting ? 'Salvando...' : 'Salvar alterações'}
               </Button>
             </div>
+
+            {feedbackMessage && (
+              <p
+                className={`text-sm ${feedbackMessage.includes('sucesso') ? 'text-emerald-600' : 'text-destructive'}`}
+                role="status"
+                aria-live="polite"
+              >
+                {feedbackMessage}
+              </p>
+            )}
           </form>
         </CardContent>
       </Card>

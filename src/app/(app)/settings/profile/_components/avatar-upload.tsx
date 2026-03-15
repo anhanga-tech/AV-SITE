@@ -6,6 +6,10 @@ import { Button } from '@/components/ui/button'
 import { Camera, Loader2 } from 'lucide-react'
 import { uploadAvatar } from '@/features/profile/actions'
 
+const MAX_AVATAR_SIZE_BYTES = 2 * 1024 * 1024
+
+const MAX_AVATAR_SIZE_LABEL = '2MB'
+
 interface AvatarUploadProps {
   currentAvatarUrl: string | null
   userName: string
@@ -14,6 +18,7 @@ interface AvatarUploadProps {
 
 export function AvatarUpload({ currentAvatarUrl, userName, onUploadSuccess }: AvatarUploadProps) {
   const [isUploading, setIsUploading] = useState(false)
+  const [feedback, setFeedback] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const initials = userName
@@ -31,28 +36,30 @@ export function AvatarUpload({ currentAvatarUrl, userName, onUploadSuccess }: Av
 
     // Simple client side validation
     if (!file.type.startsWith('image/')) {
-      alert('Por favor, selecione uma imagem.')
+      setFeedback('Por favor, selecione uma imagem.')
       return
     }
 
-    if (file.size > 2 * 1024 * 1024) {
-      alert('Imagem muito grande. O limite é 2MB.')
+    if (file.size > MAX_AVATAR_SIZE_BYTES) {
+      setFeedback(`Imagem muito grande. O limite é ${MAX_AVATAR_SIZE_LABEL}.`)
       return
     }
 
     setIsUploading(true)
+    setFeedback('')
     const formData = new FormData()
     formData.append('file', file)
 
     try {
       const result = await uploadAvatar(formData)
       if (result.success && result.avatarUrl) {
+        setFeedback('Foto atualizada com sucesso!')
         onUploadSuccess(result.avatarUrl)
       } else if (result.error) {
-        alert('Erro no upload: ' + result.error)
+        setFeedback('Erro no upload: ' + result.error)
       }
     } catch (error) {
-      alert('Erro inesperado: ' + (error instanceof Error ? error.message : 'Desconhecido'))
+      setFeedback('Erro inesperado: ' + (error instanceof Error ? error.message : 'Desconhecido'))
     } finally {
       setIsUploading(false)
       if (fileInputRef.current) fileInputRef.current.value = ''
@@ -97,7 +104,7 @@ export function AvatarUpload({ currentAvatarUrl, userName, onUploadSuccess }: Av
               className="text-destructive hover:text-destructive hover:bg-destructive/10"
               onClick={() => {
                 // Future: add delete avatar action
-                alert('Funcionalidade de remover foto em breve.')
+                setFeedback('Funcionalidade de remover foto em breve.')
               }}
             >
               Remover
@@ -105,8 +112,13 @@ export function AvatarUpload({ currentAvatarUrl, userName, onUploadSuccess }: Av
           )}
         </div>
         <p className="text-xs text-muted-foreground">
-          JPG, PNG ou WebP. Máximo de 2MB.
+          JPG, PNG ou WebP. Máximo de {MAX_AVATAR_SIZE_LABEL}.
         </p>
+        {feedback && (
+          <p className={`text-xs ${feedback.includes('sucesso') ? 'text-emerald-600' : 'text-destructive'}`} role="status" aria-live="polite">
+            {feedback}
+          </p>
+        )}
         <input 
           type="file" 
           ref={fileInputRef} 

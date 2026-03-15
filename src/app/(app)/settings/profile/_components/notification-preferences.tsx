@@ -2,7 +2,7 @@
 
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
-import { UseFormReturn } from 'react-hook-form'
+import { Controller, UseFormReturn } from 'react-hook-form'
 import { Bell, Mail, MessageSquare, Send } from 'lucide-react'
 import { ProfileFormValues } from '../_types'
 
@@ -31,9 +31,15 @@ export function NotificationPreferences({ form }: NotificationPreferencesProps) 
               </p>
             </div>
           </div>
-          <Switch 
-            checked={form.watch('email_reminders')}
-            onCheckedChange={(checked) => form.setValue('email_reminders', checked)}
+          <Controller
+            control={form.control}
+            name="email_reminders"
+            render={({ field }) => (
+              <Switch
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+            )}
           />
         </div>
 
@@ -49,9 +55,15 @@ export function NotificationPreferences({ form }: NotificationPreferencesProps) 
               </p>
             </div>
           </div>
-          <Switch 
-            checked={form.watch('push_notifications')}
-            onCheckedChange={(checked) => form.setValue('push_notifications', checked)}
+          <Controller
+            control={form.control}
+            name="push_notifications"
+            render={({ field }) => (
+              <Switch
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+            )}
           />
         </div>
 
