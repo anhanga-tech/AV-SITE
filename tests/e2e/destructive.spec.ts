@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import type { SubmitLeadRequest } from '../../types/leadCapture';
 import { AIChat } from './pages/AIChat';
 
 async function acceptLgpd(page: import('@playwright/test').Page) {
@@ -45,10 +46,10 @@ test.describe('Destructive & Security Suite', () => {
   test('should sanitize XSS payload in Lead Form fields for API submission', async ({ page }) => {
     const aiChat = new AIChat(page);
     const xssPayload = '<script>console.log("pwned")</script>';
-    let submitPayload: any = null;
+    let submitPayload: SubmitLeadRequest | null = null;
 
     await page.route('**/api/submit-lead', async route => {
-      submitPayload = route.request().postDataJSON();
+      submitPayload = route.request().postDataJSON() as SubmitLeadRequest;
       await route.fulfill({
         status: 201,
         contentType: 'application/json',
@@ -58,7 +59,7 @@ test.describe('Destructive & Security Suite', () => {
 
     await page.goto('/');
     await page.evaluate(() => {
-      window.open = () => ({}) as any;
+      window.open = () => ({}) as unknown as Window;
     });
 
     await aiChat.open();
@@ -94,7 +95,7 @@ test.describe('Destructive & Security Suite', () => {
 
     await page.goto('/');
     await page.evaluate(() => {
-      window.open = () => ({}) as any;
+      window.open = () => ({}) as unknown as Window;
     });
 
     await aiChat.open();
@@ -126,7 +127,7 @@ test.describe('Destructive & Security Suite', () => {
 
     await page.goto('/');
     await page.evaluate(() => {
-      window.open = () => ({}) as any;
+      window.open = () => ({}) as unknown as Window;
     });
 
     await aiChat.open();
