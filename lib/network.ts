@@ -18,22 +18,24 @@ export function buildCorsHeaders(allowedOrigin?: string): Record<string, string>
  * Specialized for Vercel's environment.
  */
 export function getClientIP(request: Request): string {
-    // Try various headers that might contain the real IP
-    const forwardedFor = request.headers.get('x-forwarded-for');
-    if (forwardedFor) {
-        const ips = forwardedFor.split(',').map(ip => ip.trim());
-        return ips[ips.length - 1]; // Use the last one for Vercel
-    }
-
+    // Prioritize X-Real-IP as it is more reliable on Vercel
     const realIP = request.headers.get('x-real-ip');
     if (realIP) {
-        return realIP;
+        return realIP.trim();
     }
 
     // Vercel-specific header
     const vercelForwardedFor = request.headers.get('x-vercel-forwarded-for');
     if (vercelForwardedFor) {
         return vercelForwardedFor.split(',')[0].trim();
+    }
+
+    // Fallback to X-Forwarded-For
+    const forwardedFor = request.headers.get('x-forwarded-for');
+    if (forwardedFor) {
+        const ips = forwardedFor.split(',').map(ip => ip.trim());
+        // Standard practice: use the first one (original client)
+        return ips[0];
     }
 
     return 'unknown';

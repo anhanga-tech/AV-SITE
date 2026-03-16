@@ -1,6 +1,7 @@
 import type { SubmitLeadRequest, SubmitLeadResponse } from '../types/leadCapture';
-import { buildCorsHeaders, getClientIP } from '../lib/network.js';
-import { cleanString, validatePayload } from '../lib/lead-logic.js';
+import { buildCorsHeaders, getClientIP } from '../lib/network';
+import { checkRateLimit } from '../lib/rate-limit';
+import { cleanString, validatePayload } from '../lib/lead-logic';
 import {
     associateDealToContact,
     buildAdditionalContactProperties,
@@ -11,9 +12,9 @@ import {
     hubspotRequest,
     updateContactProperties,
     type HubSpotObjectResponse,
-} from '../services/hubspot.js';
-import { sendGoogleConversion } from '../lib/conversions/google.js';
-import { sendMetaConversion } from '../lib/conversions/meta.js';
+} from '../services/hubspot';
+import { sendGoogleConversion } from '../lib/conversions/google';
+import { sendMetaConversion } from '../lib/conversions/meta';
 
 export const config = {
     runtime: 'edge',
@@ -21,12 +22,6 @@ export const config = {
 
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
-const SUBMIT_LEAD_RATE_LIMIT_MAX_ENTRIES = 1000;
-
-interface SubmitLeadRateLimitEntry {
-    count: number;
-    resetTime: number;
-}
 
 interface SubmitLeadConfig {
     hubspotToken: string;
@@ -55,8 +50,6 @@ interface FailedContactPropertyBatch {
 }
 
 type LeadLogLevel = 'info' | 'warn' | 'error';
-
-const submitLeadRateLimitStore = new Map<string, SubmitLeadRateLimitEntry>();
 
 function createRequestId(): string {
     if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -167,41 +160,6 @@ function appendWarning(existing: string | undefined, next: string | undefined): 
     return `${existing} ${next}`;
 }
 
-function checkSubmitLeadRateLimit(clientIP: string): { allowed: boolean; resetIn: number } {
-    const now = Date.now();
-    const entry = submitLeadRateLimitStore.get(clientIP);
-
-    if (submitLeadRateLimitStore.size >= SUBMIT_LEAD_RATE_LIMIT_MAX_ENTRIES && !entry) {
-        for (const [key, value] of submitLeadRateLimitStore.entries()) {
-            if (now > value.resetTime) {
-                submitLeadRateLimitStore.delete(key);
-            }
-
-            if (submitLeadRateLimitStore.size < SUBMIT_LEAD_RATE_LIMIT_MAX_ENTRIES) {
-                break;
-            }
-        }
-    }
-
-    if (!entry || now > entry.resetTime) {
-        submitLeadRateLimitStore.set(clientIP, {
-            count: 1,
-            resetTime: now + RATE_LIMIT_WINDOW_MS,
-        });
-
-        return {
-            allowed: true,
-            resetIn: RATE_LIMIT_WINDOW_MS,
-        };
-    }
-
-    entry.count += 1;
-    return {
-        allowed: entry.count <= RATE_LIMIT_MAX_REQUESTS,
-        resetIn: entry.resetTime - now,
-    };
-}
-
 function shouldAttemptFallbackNote(parsedError: ParsedHubSpotError): boolean {
     return !parsedError.isUnauthorized && parsedError.status !== 504;
 }
@@ -212,12 +170,17 @@ async function getRateLimitResponse(
     requestId: string,
 ): Promise<Response | null> {
     const clientIP = getClientIP(request);
-    const rateLimit = checkSubmitLeadRateLimit(clientIP);
+    const rateLimit = await checkRateLimit(clientIP, {
+        limit: RATE_LIMIT_MAX_REQUESTS,
+        windowMs: RATE_LIMIT_WINDOW_MS,
+        prefix: 'ratelimit:submit-lead',
+    });
 
     if (rateLimit.allowed) return null;
 
     emitLeadLog('warn', requestId, 'rate_limited', {
         clientIP,
+        remaining: rateLimit.remaining,
         retryAfterSeconds: Math.ceil(rateLimit.resetIn / 1000),
     });
 
@@ -229,7 +192,12 @@ async function getRateLimitResponse(
             error: 'Muitas tentativas. Tente novamente em breve.',
         },
         429,
-        { ...corsHeaders, 'Retry-After': String(Math.ceil(rateLimit.resetIn / 1000)) },
+        {
+            ...corsHeaders,
+            'Retry-After': String(Math.ceil(rateLimit.resetIn / 1000)),
+            'X-RateLimit-Remaining': String(rateLimit.remaining),
+            'X-RateLimit-Reset': String(Math.ceil((Date.now() + rateLimit.resetIn) / 1000)),
+        },
     );
 }
 
