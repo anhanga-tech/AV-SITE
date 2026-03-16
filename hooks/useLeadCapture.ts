@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getTrackingDataObject, getWhatsAppLink } from '../utils/whatsapp';
 import type { LeadTracking, LeadUtms, SubmitLeadRequest } from '../types/leadCapture';
+import { cleanString } from '../lib/lead-logic';
 
 export interface LeadDraft {
     firstName: string;
@@ -55,7 +56,7 @@ const EMPTY_LEAD_DRAFT: LeadDraft = {
 };
 
 function cleanValue(value: string): string {
-    return value.trim();
+    return cleanString(value);
 }
 
 function mergeLeadDraft(base: LeadDraft, overrides: LeadDraftPartial): LeadDraft {
