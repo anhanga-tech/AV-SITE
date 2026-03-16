@@ -43,6 +43,14 @@ function getUrl(input: RequestInfo | URL): string {
     return input.url;
 }
 
+function requestTargetsHost(rawUrl: string, host: string): boolean {
+    try {
+        return new URL(rawUrl).hostname === host;
+    } catch {
+        return false;
+    }
+}
+
 interface MockHubSpotRequestBody {
     properties?: Record<string, unknown>;
     filterGroups?: Array<Record<string, unknown>>;
@@ -185,8 +193,8 @@ test('submit-waitlist should create contact, sync tracking, create note, and avo
     assert.match(String(noteCall?.body?.properties?.hs_note_body || ''), /\/lollapalooza/);
 
     assert.equal(calls.some((call) => call.url.includes('/crm/v3/objects/deals')), false);
-    assert.equal(calls.some((call) => call.url.includes('google-analytics.com')), false);
-    assert.equal(calls.some((call) => call.url.includes('graph.facebook.com')), false);
+    assert.equal(calls.some((call) => requestTargetsHost(call.url, 'www.google-analytics.com')), false);
+    assert.equal(calls.some((call) => requestTargetsHost(call.url, 'graph.facebook.com')), false);
 });
 
 test('submit-waitlist should update an existing contact when HubSpot returns duplicate email', async (t) => {

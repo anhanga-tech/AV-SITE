@@ -179,14 +179,16 @@ export default async function handler(request: Request): Promise<Response> {
         if (Object.keys(additionalContactProperties).length > 0) {
             try {
                 await updateContactProperties(process.env.HUBSPOT_TOKEN, contactId, additionalContactProperties);
-            } catch {
+            } catch (trackingError: unknown) {
+                console.error('submit-waitlist: failed to update additional contact properties', trackingError);
                 warning = 'Contato salvo, mas alguns dados de rastreamento não puderam ser gravados.';
             }
         }
 
         try {
             await createContactNote(process.env.HUBSPOT_TOKEN, contactId, buildWaitlistNoteBody(payload));
-        } catch {
+        } catch (noteError: unknown) {
+            console.error('submit-waitlist: failed to create waitlist note', noteError);
             warning = warning || 'Contato salvo, mas a anotação de waitlist não pôde ser registrada automaticamente.';
         }
 

@@ -156,13 +156,13 @@ const WaitlistSection: React.FC = () => {
               )}
 
               {successMessage && (
-                <div className="rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
+                <div role="status" className="rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
                   {successMessage}
                 </div>
               )}
 
               {warningMessage && (
-                <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-700">
+                <div role="status" className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-700">
                   {warningMessage}
                 </div>
               )}
