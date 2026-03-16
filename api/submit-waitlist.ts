@@ -1,8 +1,10 @@
 import type { SubmitLeadRequest } from '../types/leadCapture';
 import type { SubmitWaitlistResponse } from '../types/waitlist';
 import { buildCorsHeaders } from '../lib/network.js';
+import { cleanString } from '../lib/lead-logic.js';
 import { buildWaitlistNoteBody, splitWaitlistName, validateWaitlistPayload } from '../lib/waitlist-logic.js';
 import {
+    addContactToList,
     buildAdditionalContactProperties,
     buildCoreContactProperties,
     createContactNote,
@@ -175,6 +177,7 @@ export default async function handler(request: Request): Promise<Response> {
     try {
         const contactId = await createOrUpdateContact(process.env.HUBSPOT_TOKEN, coreContactProperties, payload.email);
         let warning: string | undefined;
+        const lollapaloozaListId = cleanString(process.env.HUBSPOT_LOLLAPALOOZA_LIST_ID);
 
         if (Object.keys(additionalContactProperties).length > 0) {
             try {
@@ -182,6 +185,16 @@ export default async function handler(request: Request): Promise<Response> {
             } catch (trackingError: unknown) {
                 console.error('submit-waitlist: failed to update additional contact properties', trackingError);
                 warning = 'Contato salvo, mas alguns dados de rastreamento não puderam ser gravados.';
+            }
+        }
+
+        if (!lollapaloozaListId) {
+            console.info('submit-waitlist: lollapalooza waitlist list id is not configured');
+        } else {
+            try {
+                await addContactToList(process.env.HUBSPOT_TOKEN, lollapaloozaListId, contactId);
+            } catch (listError: unknown) {
+                console.error('submit-waitlist: failed to add contact to lollapalooza list', listError);
             }
         }
 

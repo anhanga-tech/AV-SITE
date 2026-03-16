@@ -5,6 +5,7 @@ import handler from '../api/submit-waitlist.ts';
 const originalFetch = global.fetch;
 const originalEnv = {
     HUBSPOT_TOKEN: process.env.HUBSPOT_TOKEN,
+    HUBSPOT_LOLLAPALOOZA_LIST_ID: process.env.HUBSPOT_LOLLAPALOOZA_LIST_ID,
     HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY: process.env.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY,
     HUBSPOT_REQUEST_TIMEOUT_MS: process.env.HUBSPOT_REQUEST_TIMEOUT_MS,
 };
@@ -20,6 +21,7 @@ function restoreEnvValue(key: string, value: string | undefined) {
 
 function restoreEnv() {
     restoreEnvValue('HUBSPOT_TOKEN', originalEnv.HUBSPOT_TOKEN);
+    restoreEnvValue('HUBSPOT_LOLLAPALOOZA_LIST_ID', originalEnv.HUBSPOT_LOLLAPALOOZA_LIST_ID);
     restoreEnvValue('HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY', originalEnv.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY);
     restoreEnvValue('HUBSPOT_REQUEST_TIMEOUT_MS', originalEnv.HUBSPOT_REQUEST_TIMEOUT_MS);
 }
@@ -95,6 +97,12 @@ function collectContactPatchProperties(calls: MockHubSpotRequest[], contactId: s
     return Object.assign({}, ...patches.map((call) => call.body?.properties || {}));
 }
 
+function collectListMembershipBodies(calls: MockHubSpotRequest[], listId: string): unknown[] {
+    return calls
+        .filter((call) => call.method === 'PUT' && call.url.endsWith(`/crm/v3/lists/${listId}/memberships/add`))
+        .map((call) => call.body);
+}
+
 test('submit-waitlist should reject invalid payloads', async () => {
     restoreEnv();
     delete process.env.HUBSPOT_TOKEN;
@@ -121,6 +129,7 @@ test('submit-waitlist should create contact, sync tracking, create note, and avo
     });
 
     process.env.HUBSPOT_TOKEN = 'hubspot-token';
+    process.env.HUBSPOT_LOLLAPALOOZA_LIST_ID = 'list_lolla_2027';
     process.env.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY = 'tracking_payload';
 
     const calls: MockHubSpotRequest[] = [];
@@ -140,6 +149,10 @@ test('submit-waitlist should create contact, sync tracking, create note, and avo
         {
             matches: (request) => request.method === 'PUT' && request.url.endsWith('/crm/v4/objects/notes/note_waitlist_123/associations/default/contacts/contact_waitlist_123'),
             respond: async () => new Response(JSON.stringify({ ok: true }), { status: 200 }),
+        },
+        {
+            matches: (request) => request.method === 'PUT' && request.url.endsWith('/crm/v3/lists/list_lolla_2027/memberships/add'),
+            respond: async () => new Response(JSON.stringify({ recordsAdded: 1 }), { status: 200 }),
         },
     ]);
 
@@ -191,6 +204,7 @@ test('submit-waitlist should create contact, sync tracking, create note, and avo
     const noteCall = calls.find((call) => call.url.endsWith('/crm/v3/objects/notes') && call.method === 'POST');
     assert.match(String(noteCall?.body?.properties?.hs_note_body || ''), /Lista de Espera Lollapalooza 2027/);
     assert.match(String(noteCall?.body?.properties?.hs_note_body || ''), /\/lollapalooza/);
+    assert.deepEqual(collectListMembershipBodies(calls, 'list_lolla_2027'), [['contact_waitlist_123']]);
 
     assert.equal(calls.some((call) => call.url.includes('/crm/v3/objects/deals')), false);
     assert.equal(calls.some((call) => requestTargetsHost(call.url, 'www.google-analytics.com')), false);
@@ -204,6 +218,7 @@ test('submit-waitlist should update an existing contact when HubSpot returns dup
     });
 
     process.env.HUBSPOT_TOKEN = 'hubspot-token';
+    process.env.HUBSPOT_LOLLAPALOOZA_LIST_ID = 'list_lolla_2027';
 
     const calls: MockHubSpotRequest[] = [];
     global.fetch = createMockHubSpotFetch(calls, [
@@ -227,6 +242,10 @@ test('submit-waitlist should update an existing contact when HubSpot returns dup
             matches: (request) => request.method === 'PUT' && request.url.endsWith('/crm/v4/objects/notes/note_waitlist_456/associations/default/contacts/contact_existing_456'),
             respond: async () => new Response(JSON.stringify({ ok: true }), { status: 200 }),
         },
+        {
+            matches: (request) => request.method === 'PUT' && request.url.endsWith('/crm/v3/lists/list_lolla_2027/memberships/add'),
+            respond: async () => new Response(JSON.stringify({ recordsAdded: 1 }), { status: 200 }),
+        },
     ]);
 
     const response = await handler(buildRequest({
@@ -246,4 +265,113 @@ test('submit-waitlist should update an existing contact when HubSpot returns dup
     const patchCalls = calls.filter((call) => call.url.endsWith('/crm/v3/objects/contacts/contact_existing_456') && call.method === 'PATCH');
     assert.equal(patchCalls.length >= 1, true);
     assert.equal(calls.some((call) => call.url.endsWith('/crm/v3/objects/contacts/search')), true);
+    assert.deepEqual(collectListMembershipBodies(calls, 'list_lolla_2027'), [['contact_existing_456']]);
+});
+
+test('submit-waitlist should still succeed without a configured HubSpot list id', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+        restoreEnv();
+    });
+
+    const originalConsoleInfo = console.info;
+    const infoCalls: unknown[][] = [];
+    console.info = (...args: unknown[]) => {
+        infoCalls.push(args);
+    };
+    t.after(() => {
+        console.info = originalConsoleInfo;
+    });
+
+    process.env.HUBSPOT_TOKEN = 'hubspot-token';
+    delete process.env.HUBSPOT_LOLLAPALOOZA_LIST_ID;
+
+    const calls: MockHubSpotRequest[] = [];
+    global.fetch = createMockHubSpotFetch(calls, [
+        {
+            matches: (request) => request.method === 'POST' && request.url.endsWith('/crm/v3/objects/contacts'),
+            respond: async () => new Response(JSON.stringify({ id: 'contact_waitlist_789' }), { status: 201 }),
+        },
+        {
+            matches: (request) => request.method === 'POST' && request.url.endsWith('/crm/v3/objects/notes'),
+            respond: async () => new Response(JSON.stringify({ id: 'note_waitlist_789' }), { status: 201 }),
+        },
+        {
+            matches: (request) => request.method === 'PUT' && request.url.endsWith('/crm/v4/objects/notes/note_waitlist_789/associations/default/contacts/contact_waitlist_789'),
+            respond: async () => new Response(JSON.stringify({ ok: true }), { status: 200 }),
+        },
+    ]);
+
+    const response = await handler(buildRequest({
+        name: 'Felipe William',
+        email: 'felipe@example.com',
+        sourcePage: '/lollapalooza',
+        utms: {},
+        tracking: {},
+    }));
+
+    assert.equal(response.status, 201);
+
+    const payload = await response.json() as { ok: boolean; contactId?: string; warning?: string };
+    assert.equal(payload.ok, true);
+    assert.equal(payload.contactId, 'contact_waitlist_789');
+    assert.equal(payload.warning, undefined);
+    assert.equal(calls.some((call) => call.url.includes('/crm/v3/lists/')), false);
+    assert.equal(infoCalls.some((args) => args.some((value) => String(value).includes('waitlist list id is not configured'))), true);
+});
+
+test('submit-waitlist should keep success response when list membership fails', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+        restoreEnv();
+    });
+
+    const originalConsoleError = console.error;
+    const errorCalls: unknown[][] = [];
+    console.error = (...args: unknown[]) => {
+        errorCalls.push(args);
+    };
+    t.after(() => {
+        console.error = originalConsoleError;
+    });
+
+    process.env.HUBSPOT_TOKEN = 'hubspot-token';
+    process.env.HUBSPOT_LOLLAPALOOZA_LIST_ID = 'list_lolla_2027';
+
+    const calls: MockHubSpotRequest[] = [];
+    global.fetch = createMockHubSpotFetch(calls, [
+        {
+            matches: (request) => request.method === 'POST' && request.url.endsWith('/crm/v3/objects/contacts'),
+            respond: async () => new Response(JSON.stringify({ id: 'contact_waitlist_999' }), { status: 201 }),
+        },
+        {
+            matches: (request) => request.method === 'POST' && request.url.endsWith('/crm/v3/objects/notes'),
+            respond: async () => new Response(JSON.stringify({ id: 'note_waitlist_999' }), { status: 201 }),
+        },
+        {
+            matches: (request) => request.method === 'PUT' && request.url.endsWith('/crm/v4/objects/notes/note_waitlist_999/associations/default/contacts/contact_waitlist_999'),
+            respond: async () => new Response(JSON.stringify({ ok: true }), { status: 200 }),
+        },
+        {
+            matches: (request) => request.method === 'PUT' && request.url.endsWith('/crm/v3/lists/list_lolla_2027/memberships/add'),
+            respond: async () => new Response(JSON.stringify({ message: 'list unavailable' }), { status: 500 }),
+        },
+    ]);
+
+    const response = await handler(buildRequest({
+        name: 'Felipe William',
+        email: 'felipe@example.com',
+        sourcePage: '/lollapalooza',
+        utms: {},
+        tracking: {},
+    }));
+
+    assert.equal(response.status, 201);
+
+    const payload = await response.json() as { ok: boolean; contactId?: string; warning?: string };
+    assert.equal(payload.ok, true);
+    assert.equal(payload.contactId, 'contact_waitlist_999');
+    assert.equal(payload.warning, undefined);
+    assert.deepEqual(collectListMembershipBodies(calls, 'list_lolla_2027'), [['contact_waitlist_999']]);
+    assert.equal(errorCalls.some((args) => args.some((value) => String(value).includes('failed to add contact to lollapalooza list'))), true);
 });

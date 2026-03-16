@@ -24,6 +24,7 @@ pnpm test:regression  # Run regression tests (Node built-in test runner, strip-t
 GEMINI_API_KEY=       # Google Gemini API key (required for chatbot)
 GEMINI_MODEL=         # Model version (default: gemini-2.5-flash-lite)
 HUBSPOT_TOKEN=        # HubSpot private app token (required for lead capture)
+HUBSPOT_LOLLAPALOOZA_LIST_ID=  # Optional static list ID for Lollapalooza waitlist contacts
 VITE_BASE_PATH=       # Base path for deployment (default: /)
 VITE_MEDIA_CDN_URL=   # Optional CDN base URL for media assets
 ALLOWED_ORIGIN=       # CORS allowed origin for API (default: *)
