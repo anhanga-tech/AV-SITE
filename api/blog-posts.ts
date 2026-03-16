@@ -3,6 +3,8 @@ import {
     parseRecentPostsFromRss,
     sanitizePostsLimit,
 } from '../lib/blog-api';
+import { checkRateLimit } from '../lib/rate-limit';
+import { getClientIP } from '../lib/network';
 
 export const config = {
     runtime: 'edge',
@@ -27,6 +29,29 @@ export default async function handler(request: Request): Promise<Response> {
     }
 
     try {
+        const clientIP = getClientIP(request);
+        const rateLimit = await checkRateLimit(clientIP, {
+            limit: 30, // 30 requests per minute
+            windowMs: 60 * 1000,
+            prefix: 'ratelimit:blog-posts',
+        });
+
+        if (!rateLimit.allowed) {
+            return new Response(
+                JSON.stringify({ error: 'Muitas requisições. Por favor, aguarde um momento.' }),
+                {
+                    status: 429,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': ERROR_CACHE_CONTROL,
+                        'Retry-After': String(Math.ceil(rateLimit.resetIn / 1000)),
+                        'X-RateLimit-Remaining': String(rateLimit.remaining),
+                        'X-RateLimit-Reset': String(Math.ceil((Date.now() + rateLimit.resetIn) / 1000)),
+                    },
+                }
+            );
+        }
+
         const url = new URL(request.url);
         const limit = sanitizePostsLimit(url.searchParams.get('limit'));
 
