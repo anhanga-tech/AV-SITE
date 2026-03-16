@@ -56,7 +56,7 @@ const Footer: React.FC = () => {
                             <li><a href={getBlogHomeUrl()} className="hover:text-brand-yellow transition-colors">Blog de Viagens e Roteiros</a></li>
                             <li><a href={`${SITE_URL}/orlando/`} className="hover:text-brand-yellow transition-colors">Pacotes para Orlando</a></li>
                             <li><a href={`${SITE_URL}/beto-carrero/`} className="hover:text-brand-yellow transition-colors">Pacote Beto Carrero</a></li>
-                            <li><a href={`${SITE_URL}/lollapalooza-2026/`} className="hover:text-brand-yellow transition-colors">Pacotes para Lollapalooza 2026</a></li>
+                            <li><a href={`${SITE_URL}/lollapalooza/`} className="hover:text-brand-yellow transition-colors">Lollapalooza Brasil</a></li>
                             <li><a href={`${SITE_URL}/mapa-do-site/`} className="hover:text-brand-yellow transition-colors">Mapa do Site</a></li>
                             <li><a href={`${SITE_URL}/termos-de-uso/`} className="hover:text-brand-yellow transition-colors">Termos de Uso</a></li>
                             <li><a href={`${SITE_URL}/politica-privacidade/`} className="hover:text-brand-yellow transition-colors">Política de Privacidade</a></li>

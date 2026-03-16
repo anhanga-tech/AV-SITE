@@ -11,7 +11,7 @@ export const OrganizationSchema = () => (
       "alternateName": "Anhangá Turismo",
       "url": "https://www.anhanga.tur.br/",
       "logo": "https://www.anhanga.tur.br/assets/LOGO%20ANHANGA%20VIAGENS%20-%20AZUL.svg",
-      "description": "Agência de viagens boutique em São Paulo especializada em roteiros personalizados, turismo de transformação e pacotes exclusivos para grandes festivais (Lollapalooza 2026) e público 50+.",
+      "description": "Agência de viagens boutique em São Paulo especializada em roteiros personalizados, turismo de transformação e pacotes exclusivos para grandes festivais, incluindo o Lollapalooza Brasil, e público 50+.",
       "telephone": "+55-11-52833309",
       "email": "contato@anhanga.tur.br",
       "taxID": "37.036.732/0001-41",
@@ -64,7 +64,7 @@ export const OrganizationSchema = () => (
       },
       "knowsAbout": [
         "Roteiros Personalizados",
-        "Lollapalooza 2026",
+        "Lollapalooza Brasil",
         "Rock in Rio",
         "The Town",
         "Viagens para 50 Mais",

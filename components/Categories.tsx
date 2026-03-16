@@ -31,7 +31,7 @@ const POPULAR_DESTINATIONS = [
     tag: "Festival",
     rotate: "-rotate-1",
     color: "bg-emerald-100 text-emerald-600",
-    link: "/lollapalooza-2026"
+    link: "/lollapalooza"
   }
 ];
 

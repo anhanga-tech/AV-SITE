@@ -2,6 +2,7 @@ import React from 'react';
 import { BedDouble, BusFront, Headset, Map, Wand2, type LucideIcon } from 'lucide-react';
 import useIntersectionObserver from './hooks/useIntersectionObserver';
 import Button from './Button';
+import { WAITLIST_CTA_LABEL, WAITLIST_SECTION_ID } from './constants';
 
 // Tipos para os dados
 interface FeatureItem {
@@ -20,40 +21,40 @@ const PackageFeatures: React.FC = () => {
   const features: FeatureItem[] = [
     {
       id: 'experience',
-      title: 'VIVA O LOLLA. A GENTE CUIDA DO RESTO.',
-      subtitle: 'Ingresso na mão? Esqueça filas de Uber e perrengue de hotel. Sua única preocupação é não perder o show.',
+      title: 'O QUE FEZ 2026 ESGOTAR',
+      subtitle: 'A campanha combinou hotel estratégico, mobilidade planejada e suporte humano para quem queria viver o festival sem caos.',
       icon: Wand2,
       image: 'https://mobilidade.estadao.com.br/wp-content/uploads/2025/03/lollapalooza_reproducao-.jpg.webp',
       className: 'col-span-1 md:col-span-2 md:row-span-2 min-h-[400px] sm:min-h-[500px]'
     },
     {
       id: 'hotel',
-      title: 'RECARREGUE A BATERIA',
-      subtitle: 'Hotéis 4★ estratégicos. Cama macia e café da manhã reforçado pra aguentar o dia seguinte.',
+      title: 'HOTEL NA MEDIDA',
+      subtitle: 'Hospedagem bem localizada e pensada para descansar de verdade entre um dia de show e outro.',
       icon: BedDouble,
       image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&q=80&w=800&fm=webp',
       className: 'col-span-1 md:col-span-1 md:row-span-2 min-h-[300px] sm:min-h-[400px] md:min-h-full'
     },
     {
       id: 'city',
-      title: 'SP ALÉM DO SHOW',
-      subtitle: 'Roteiros gastronômicos e after-parties pra quem tem energia sobrando.',
+      title: 'SP ALÉM DO PALCO',
+      subtitle: 'Curadoria da cidade para aproveitar São Paulo antes, durante e depois do festival.',
       icon: Map,
       image: 'https://guiaviajarmelhor.com.br/wp-content/uploads/2018/10/O-que-fazer-em-sao-paulo-a-noite.jpg', // SP Night
       className: 'col-span-1 md:col-span-1 md:row-span-1 min-h-[250px] sm:min-h-[300px]'
     },
     {
       id: 'transport',
-      title: 'TELETRANSPORTE VIP',
-      subtitle: 'Transporte executivo exclusivo. Ar-condicionado, água e zero stress no trânsito.',
+      title: 'LOGÍSTICA INTELIGENTE',
+      subtitle: 'Rotas e deslocamentos desenhados para evitar perrengue no entorno de Interlagos.',
       icon: BusFront,
       bgColor: 'bg-anhanga-yellow',
       className: 'col-span-1 md:col-span-1 md:row-span-1 min-h-[250px] sm:min-h-[300px]'
     },
     {
       id: 'support',
-      title: 'SUPORTE 24H REAL',
-      subtitle: 'Time Anhangá no hotel e no WhatsApp. Deu ruim? A gente resolve.',
+      title: 'SUPORTE HUMANO',
+      subtitle: 'Time disponível para ajustes e imprevistos, do embarque ao retorno.',
       icon: Headset,
       bgColor: 'bg-anhanga-blue',
       className: 'col-span-1 md:col-span-1 md:row-span-1 min-h-[250px] sm:min-h-[300px]'
@@ -71,11 +72,11 @@ const PackageFeatures: React.FC = () => {
       <div className="container mx-auto px-4 relative z-10">
         <div className={`mb-12 md:mb-16 animate-on-scroll ${isVisible ? 'is-visible' : ''}`}>
           <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full border border-anhanga-yellow/30 bg-anhanga-yellow/10 text-anhanga-yellow font-bold uppercase text-xs tracking-widest mb-4">
-            <Wand2 size={14} /> Pacote Completo
+            <Wand2 size={14} /> Destaques da Operação 2026
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-6xl font-black text-white leading-[0.9] tracking-tighter max-w-3xl">
-            TUDO INCLUSO. <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-anhanga-yellow to-white">SÓ FALTA VOCÊ.</span>
+            A EXPERIÊNCIA QUE LOTOU <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-anhanga-yellow to-white">E JÁ PREPARA 2027.</span>
           </h2>
         </div>
 
@@ -133,9 +134,11 @@ const PackageFeatures: React.FC = () => {
 
         <div className="mt-16 text-center">
           <Button
-            text="Quero viver essa experiência"
+            text={WAITLIST_CTA_LABEL}
+            href={`#${WAITLIST_SECTION_ID}`}
             className="md:text-xl md:px-12 md:py-5"
-            dataTracking="mid-lolla"
+            dataTracking="mid-lolla-waitlist"
+            id="btn-lolla-waitlist-mid"
           />
         </div>
       </div>

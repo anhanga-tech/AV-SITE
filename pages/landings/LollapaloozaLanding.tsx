@@ -1,32 +1,30 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { getWhatsAppLink } from '../../utils/whatsapp';
 import { SEO } from '../../components/SEO';
 import { LandingFAQ } from '../../components/LandingFAQ';
 import LollapaloozaApp from '../../components/landings/lollapalooza/LollapaloozaApp';
+import { WAITLIST_SECTION_ID } from '../../components/landings/lollapalooza/constants';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../../components/schemas/FAQPageSchema';
 import { ServiceSchema } from '../../components/schemas/ServiceSchema';
-import { openAiChat } from '../../utils/aiChat';
 import 'leaflet/dist/leaflet.css';
 import './lollapalooza.css';
 
 const LOLLAPALOOZA_FAQ_ITEMS = [
   {
-    question: 'Como garantir ingressos para o Lollapalooza 2026?',
-    answer: 'Os ingressos são vendidos em lotes e costumam esgotar rápido. Nossa equipe monitora as aberturas oficiais e pode te auxiliar na logística de compra para garantir que você não perca o festival.'
+    question: 'Os pacotes para o Lollapalooza 2026 estão esgotados?',
+    answer: 'Sim. A campanha de pacotes 2026 foi encerrada com disponibilidade esgotada. Mantivemos esta página ativa para orientar quem pesquisou pela edição atual e abrir a lista de espera da edição 2027.'
+  },
+  {
+    question: 'Como funciona a Lista de Espera Lolla 2027?',
+    answer: 'Você deixa nome e e-mail nesta página e a Anhangá entra em contato quando a próxima campanha abrir. Isso ajuda a priorizar quem já demonstrou interesse na experiência do festival.'
   },
   {
     question: 'Qual a melhor região para se hospedar durante o festival?',
-    answer: 'Recomendamos hotéis próximos à linha de trem que atende o Autódromo de Interlagos ou nas regiões de Pinheiros e Vila Olímpia, que oferecem fácil acesso e boa estrutura. Nossos pacotes já incluem as melhores opções de curadoria.'
+    answer: 'As regiões com acesso facilitado à Linha 9 - Esmeralda, além de bairros como Pinheiros e Vila Olímpia, seguem sendo as mais estratégicas para quem quer logística inteligente nos dias de evento.'
   },
   {
-    question: 'Como funciona o transporte para o Autódromo de Interlagos?',
-    answer: 'A forma mais eficiente é utilizar o trem (Linha 9 - Esmeralda) ou o Lolla Express. Em nossos pacotes, orientamos sobre o melhor trajeto e podemos incluir transfers exclusivos para maior conforto do seu grupo.'
-  },
-  {
-    question: 'Posso personalizar o pacote para Lollapalooza com meu grupo?',
-    answer: 'Pode. Ajustamos orçamento, tipo de hospedagem e dinâmica de viagem para grupos, casais e viajantes solo.'
+    question: 'Posso montar um pacote personalizado para 2027?',
+    answer: 'Sim. A lista de espera serve justamente para identificar quem quer prioridade quando retomarmos orçamento, hospedagem e operação para a próxima edição do Lollapalooza.'
   }
 ];
 
@@ -34,24 +32,24 @@ const LollapaloozaLanding: React.FC = () => {
   return (
     <>
       <SEO
-        title="Pacotes Lollapalooza 2026: Viagem e Hotel em São Paulo"
-        description="Garanta seu pacote para o Lollapalooza Brasil 2026 com hotel, transporte e suporte exclusivo em São Paulo. Experiência completa com a Anhangá Viagens."
-        canonical="https://www.anhanga.tur.br/lollapalooza-2026/"
-        keywords="pacotes Lollapalooza 2026, viagem Lollapalooza São Paulo, hotel para Lollapalooza, pacote festival em São Paulo"
+        title="Lollapalooza Brasil: 2026 Esgotado, Lista de Espera 2027"
+        description="A campanha do Lollapalooza 2026 foi encerrada com sucesso. Entre na lista de espera 2027 para receber prioridade quando os próximos pacotes abrirem."
+        canonical="https://www.anhanga.tur.br/lollapalooza/"
+        keywords="Lollapalooza Brasil, lista de espera Lollapalooza 2027, viagem Lollapalooza São Paulo, hotel para Lollapalooza, pacote festival em São Paulo"
       />
       <ServiceSchema
-        name="Pacotes para o Lollapalooza Brasil 2026"
-        description="Pacotes de viagem completos para o Lollapalooza 2026 com hotel, transporte exclusivo e suporte especializado em São Paulo."
-        serviceUrl="https://www.anhanga.tur.br/lollapalooza-2026/"
-        serviceType="Pacote de viagem para festival"
+        name="Lista de Espera Lollapalooza Brasil 2027"
+        description="Página oficial da Anhangá para acompanhar a campanha esgotada do Lollapalooza 2026 e captar interessados na próxima edição."
+        serviceUrl="https://www.anhanga.tur.br/lollapalooza/"
+        serviceType="Lista de espera para pacote de viagem de festival"
         areaServed="São Paulo e Brasil"
-        keywords={['pacote Lollapalooza 2026', 'viagem para festival', 'hotel em São Paulo para evento']}
+        keywords={['lista de espera Lollapalooza 2027', 'viagem para festival', 'hotel em São Paulo para evento']}
         aggregateRating={{ ratingValue: 4.94, reviewCount: 8 }}
       />
       <BreadcrumbSchema
         items={[
           { name: 'Home', item: 'https://www.anhanga.tur.br/' },
-          { name: 'Pacotes para Lollapalooza 2026', item: 'https://www.anhanga.tur.br/lollapalooza-2026/' }
+          { name: 'Lollapalooza Brasil', item: 'https://www.anhanga.tur.br/lollapalooza/' }
         ]}
       />
       <FAQPageSchema items={LOLLAPALOOZA_FAQ_ITEMS} />
@@ -75,18 +73,18 @@ const LollapaloozaLanding: React.FC = () => {
       <LandingFAQ items={LOLLAPALOOZA_FAQ_ITEMS} />
       <section className="bg-[#fffdf5] border-t border-brand-cyan/10 py-14">
         <div className="container mx-auto px-6 max-w-5xl">
-          <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Pacotes para Lollapalooza 2026 com suporte real</h2>
+          <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">2026 encerrou forte. 2027 já está no radar.</h2>
           <p className="text-gray-700 text-lg leading-relaxed mb-5">
-            Para quem quer curtir o festival sem caos, nossos <strong>pacotes para Lollapalooza 2026</strong> unem hospedagem estratégica, deslocamento inteligente e suporte para os dias de evento. São <strong>pacotes de viagem</strong> montados por especialistas que conhecem São Paulo e entendem o ritmo dos grandes festivais de música.
+            A página do <strong>Lollapalooza Brasil</strong> continua no ar porque a campanha 2026 foi um sucesso e segue relevante para quem pesquisa logística, hotel e planejamento de festival em São Paulo. Agora, o foco é transformar essa procura em prioridade para a próxima edição.
           </p>
           <p className="text-gray-700 text-lg leading-relaxed mb-5">
-            Você viaja com roteiro claro, evita decisões de última hora e ganha mais tempo para aproveitar shows, ativações e experiências em São Paulo. A <strong>Anhangá Viagens</strong> é uma{' '}
+            Se você quer chegar antes da próxima abertura, entre na <strong>Lista de Espera Lolla 2027</strong>. A <strong>Anhangá Viagens</strong> é uma{' '}
             <a href="https://www.anhanga.tur.br/" className="text-brand-cyan font-semibold hover:underline">
               agência de viagens boutique em São Paulo
             </a>{' '}
             com foco em atendimento consultivo e <strong>viagens personalizadas</strong> — do planejamento inicial ao suporte no destino.
           </p>
-          <h3 className="text-xl md:text-2xl font-extrabold text-brand-dark mb-3">O que pode estar no pacote</h3>
+          <h3 className="text-xl md:text-2xl font-extrabold text-brand-dark mb-3">O que segue valendo para quem quer ir ao festival</h3>
           <ul className="list-disc list-inside text-gray-700 space-y-1 mb-6">
             <li>Hospedagem próxima a rotas de acesso ao festival</li>
             <li>Transporte com melhor custo-benefício (Linha 9 – Esmeralda ou Lolla Express)</li>
@@ -95,22 +93,16 @@ const LollapaloozaLanding: React.FC = () => {
             <li>Curadoria de restaurantes e experiências em São Paulo ao redor do festival</li>
           </ul>
           <p className="text-gray-700 text-lg leading-relaxed mb-6">
-            Além do <strong>Lollapalooza</strong>, a Anhangá também organiza <strong>viagens para festivais</strong> como Rock in Rio e The Town, além de <strong>pacotes para Orlando</strong> e outros destinos. Se você está planejando uma viagem completa, explore nossas outras opções abaixo.
+            Enquanto a próxima edição não abre, você também pode explorar outros roteiros da Anhangá e continuar pesquisando o festival com a referência desta landing evergreen.
           </p>
           <div className="flex flex-wrap gap-3">
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                openAiChat({
-                  message: 'Olá! Gostaria de um orçamento personalizado para o Lollapalooza 2026.'
-                });
-              }}
+            <a
+              href={`#${WAITLIST_SECTION_ID}`}
               className="btn-whatsapp btn-specialist px-5 py-3 rounded-full bg-brand-cyan text-white font-bold hover:bg-brand-cyan/90 transition-colors"
-              data-tracking="footer-lollapalooza"
-              data-testid="cta-lollapalooza-specialist"
+              data-tracking="footer-lollapalooza-waitlist"
             >
-              Falar com especialista
-            </button>
+              Entrar na lista de espera 2027
+            </a>
             <a href="https://www.anhanga.tur.br/orlando/" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ver pacotes para Orlando
             </a>

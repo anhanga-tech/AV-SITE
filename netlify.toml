@@ -3,6 +3,16 @@
   publish = "dist"
 
 [[redirects]]
+  from = "/lollapalooza-2026"
+  to = "/lollapalooza"
+  status = 301
+
+[[redirects]]
+  from = "/lollapalooza-2026/"
+  to = "/lollapalooza"
+  status = 301
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200

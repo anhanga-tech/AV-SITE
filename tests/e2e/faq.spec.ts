@@ -4,7 +4,7 @@ test.describe('Landing Page FAQ Suite', () => {
   const landingPages = [
     { path: '/orlando', firstQuestion: 'Qual a melhor época para viajar para Orlando?' },
     { path: '/beto-carrero', firstQuestion: 'Quanto custa em média um pacote para o Beto Carrero?' },
-    { path: '/lollapalooza-2026', firstQuestion: 'Como garantir ingressos para o Lollapalooza 2026?' },
+    { path: '/lollapalooza', firstQuestion: 'Os pacotes para o Lollapalooza 2026 estão esgotados?' },
   ];
 
   for (const landing of landingPages) {

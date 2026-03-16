@@ -11,7 +11,7 @@ const ROUTES = [
   '/',
   '/orlando',
   '/beto-carrero',
-  '/lollapalooza-2026',
+  '/lollapalooza',
   '/sobre',
   '/melhor-idade',
   '/mapa-do-site',

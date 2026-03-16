@@ -295,9 +295,9 @@ export async function associateDealToContact(token: string, dealId: string, cont
 }
 
 /**
- * Creates a note and associates it to a contact as a fallback when deal creation fails.
+ * Creates a note and associates it to a contact.
  */
-export async function createFallbackNote(token: string, contactId: string, body: string): Promise<void> {
+export async function createContactNote(token: string, contactId: string, body: string): Promise<void> {
     const noteResponse = await hubspotRequest(token, '/crm/v3/objects/notes', {
         method: 'POST',
         body: JSON.stringify({
@@ -328,6 +328,13 @@ export async function createFallbackNote(token: string, contactId: string, body:
     );
 
     await assertHubSpotResponseOk(associationResponse, 'NOTE_ASSOCIATION_FAILED');
+}
+
+/**
+ * Creates a note and associates it to a contact as a fallback when deal creation fails.
+ */
+export async function createFallbackNote(token: string, contactId: string, body: string): Promise<void> {
+    return createContactNote(token, contactId, body);
 }
 
 /**

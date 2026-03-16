@@ -102,7 +102,7 @@ const NotFound: React.FC = () => {
               </a>
 
               <a
-                href={`${SITE_URL}/lollapalooza-2026/`}
+                href={`${SITE_URL}/lollapalooza/`}
                 className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition-all duration-300 group"
               >
                 <div className="w-12 h-12 rounded-2xl bg-brand-light flex items-center justify-center text-brand-cyan group-hover:bg-brand-cyan group-hover:text-white transition-colors">
