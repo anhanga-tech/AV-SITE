@@ -26,6 +26,16 @@
       "permanent": true
     },
     {
+      "source": "/lollapalooza-2026",
+      "destination": "/lollapalooza",
+      "permanent": true
+    },
+    {
+      "source": "/lollapalooza-2026/",
+      "destination": "/lollapalooza",
+      "permanent": true
+    },
+    {
       "source": "/blog/tag/dicas",
       "destination": "https://blog.anhanga.tur.br/tag/dicas-de-expert/",
       "permanent": true

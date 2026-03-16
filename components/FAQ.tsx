@@ -158,13 +158,13 @@ const FAQS = [
         )
     },
     {
-        question: "Como funcionam os pacotes para o Lollapalooza 2026?",
+        question: "Como funciona a página do Lollapalooza Brasil na Anhangá?",
         answer: (
             <div itemProp="text">
                 <p className="mb-4">
-                    Somos especialistas em grandes festivais. Nossos pacotes para o <strong>Lollapalooza 2026</strong> incluem translados exclusivos, hospedagem estratégica próxima ao Interlagos e suporte completo para que você foque apenas na música.
+                    Somos especialistas em grandes festivais. A landing do <strong>Lollapalooza Brasil</strong> concentra as atualizações da campanha vigente, histórico da operação e a lista de espera para a próxima abertura quando a edição atual já estiver encerrada.
                 </p>
-                <p className="font-bold text-brand-dark italic">Garanta seu lugar com antecedência, pois a procura é altíssima!</p>
+                <p className="font-bold text-brand-dark italic">Quem se cadastra primeiro recebe aviso prioritário quando a próxima edição abre.</p>
             </div>
         )
     },

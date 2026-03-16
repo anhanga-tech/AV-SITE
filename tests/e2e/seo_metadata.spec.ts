@@ -10,7 +10,7 @@ test.describe('SEO Metadata Verification', () => {
     { path: '/', expectedCanonical: 'https://www.anhanga.tur.br/' },
     { path: '/orlando', expectedCanonical: 'https://www.anhanga.tur.br/orlando/' },
     { path: '/beto-carrero', expectedCanonical: 'https://www.anhanga.tur.br/beto-carrero/' },
-    { path: '/lollapalooza-2026', expectedCanonical: 'https://www.anhanga.tur.br/lollapalooza-2026/' },
+    { path: '/lollapalooza', expectedCanonical: 'https://www.anhanga.tur.br/lollapalooza/' },
     { path: '/termos-de-uso', expectedCanonical: 'https://www.anhanga.tur.br/termos-de-uso/' },
   ];
 

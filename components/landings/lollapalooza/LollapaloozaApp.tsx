@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import Navbar from './Navbar';
 import Hero from './Hero';
+import WaitlistSection from './WaitlistSection';
 import LineupSection from './LineupSection';
 import PackageFeatures from './PackageFeatures';
 import WhyUs from './WhyUs';
@@ -45,6 +46,7 @@ function LollapaloozaApp() {
     <div className="landing-lollapalooza font-sans antialiased text-gray-800 bg-white selection:bg-anhanga-yellow selection:text-anhanga-darkBlue">
       <Navbar />
       <Hero />
+      <WaitlistSection />
       {shouldRenderInteractiveMap ? (
         <Suspense fallback={<VenueMapFallback />}>
           <VenueMap />

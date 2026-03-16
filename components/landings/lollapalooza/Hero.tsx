@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Button from './Button';
 import { Calendar, MapPin, Music2, Share2, Check } from 'lucide-react';
+import { WAITLIST_CTA_LABEL, WAITLIST_SECTION_ID } from './constants';
 
 const Hero: React.FC = () => {
   const headliners = [
@@ -30,10 +31,10 @@ const Hero: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleShare = async () => {
+    const handleShare = async () => {
     const shareData = {
-      title: 'Anhangá Viagens | Lollapalooza 2026',
-      text: 'Bora pro Lolla 2026? Olha esses pacotes da Anhangá! 🎸',
+      title: 'Anhangá Viagens | Lollapalooza Brasil',
+      text: 'Lolla 2026 esgotado, mas a lista de espera 2027 da Anhangá já está aberta. 🎸',
       url: window.location.href
     };
 
@@ -56,7 +57,7 @@ const Hero: React.FC = () => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-anhanga-darkBlue" aria-label="Introdução - Lollapalooza 2026">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-anhanga-darkBlue" aria-label="Introdução - Lollapalooza Brasil">
       {/* Background Video with Overlay */}
       <div className="absolute inset-0 z-0" aria-hidden="true">
         <video 
@@ -104,7 +105,7 @@ const Hero: React.FC = () => {
         </div>
 
         {/* Main Value Proposition */}
-        <h1 className="sr-only">Pacotes para Lollapalooza 2026: Hospedagem e Transporte em São Paulo</h1>
+        <h1 className="sr-only">Lollapalooza Brasil: campanha 2026 esgotada e lista de espera 2027</h1>
         <div aria-hidden="true" className="flex flex-col items-center justify-center mb-6 md:mb-8 text-white max-w-5xl mx-auto">
             <div className="flex flex-wrap items-center justify-center gap-x-2 sm:gap-x-4 gap-y-2 mb-2 sm:mb-4">
                 <span className="text-xl sm:text-3xl md:text-5xl font-bold drop-shadow-2xl">no</span>
@@ -128,7 +129,13 @@ const Hero: React.FC = () => {
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Button text="Quero meu pacote para o Lolla 2026" className="animate-pulse hover:animate-none w-full sm:w-auto text-sm sm:text-lg px-6 py-3 sm:px-8 sm:py-4" dataTracking="hero-lolla" />
+          <Button
+            text={WAITLIST_CTA_LABEL}
+            href={`#${WAITLIST_SECTION_ID}`}
+            className="animate-pulse hover:animate-none w-full sm:w-auto text-sm sm:text-lg px-6 py-3 sm:px-8 sm:py-4"
+            dataTracking="hero-lolla-waitlist"
+            id="btn-lolla-waitlist-hero"
+          />
           
           <button 
             onClick={handleShare}
@@ -157,7 +164,7 @@ const Hero: React.FC = () => {
         
         <div className="mt-6 md:mt-8 flex items-center justify-center gap-2 text-[10px] sm:text-xs md:text-sm text-gray-400 font-medium">
             <Music2 size={14} className="text-anhanga-yellow" aria-hidden="true" />
-            <span>Experiência oficial de turismo. Ingressos não inclusos.</span>
+            <span>Campanha 2026 encerrada. Cadastre-se para ser avisado sobre 2027.</span>
         </div>
       </div>
     </section>

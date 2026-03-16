@@ -36,7 +36,7 @@ test.describe('Smoke Suite', () => {
     const landingPages = [
       { path: '/orlando', title: /Orlando/i },
       { path: '/beto-carrero', title: /Beto Carrero/i },
-      { path: '/lollapalooza-2026', title: /Lollapalooza/i },
+      { path: '/lollapalooza', title: /Lollapalooza/i },
     ];
 
     for (const landing of landingPages) {
@@ -81,10 +81,5 @@ test.describe('Smoke Suite', () => {
     await aiChat.expectMessageContaining('Beto Carrero');
     await aiChat.close();
 
-    // Lollapalooza
-    await page.goto('/lollapalooza-2026');
-    await page.getByTestId('cta-lollapalooza-specialist').click();
-    await aiChat.expectVisible();
-    await aiChat.expectMessageContaining('Lollapalooza');
   });
 });

@@ -58,8 +58,8 @@ const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClient
       <Suspense fallback={<LandingRouteFallback />}>
         <Routes>
           <Route path="/beto-carrero" element={<BetoCarreroLanding />} />
-          <Route path="/lollapalooza-2026" element={<LollapaloozaLanding />} />
-          <Route path="/lollapalooza" element={<Navigate to="/lollapalooza-2026" replace />} />
+          <Route path="/lollapalooza" element={<LollapaloozaLanding />} />
+          <Route path="/lollapalooza-2026" element={<Navigate to="/lollapalooza" replace />} />
           <Route path="/orlando" element={<OrlandoLanding />} />
           <Route path="/melhor-idade" element={<MelhorIdadeLanding />} />
           <Route path="/*" element={<MainSiteShell />} />

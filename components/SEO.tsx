@@ -17,7 +17,7 @@ export const SEO: React.FC<SEOProps> = ({
   canonical,
   image = 'https://www.anhanga.tur.br/og-image-1200x630.jpg',
   type = 'website',
-  keywords = 'agência de viagens em São Paulo, viagens personalizadas, pacotes para Orlando, pacote Beto Carrero, viagem Lollapalooza 2026, viagens melhor idade 50+, roteiros exclusivos',
+  keywords = 'agência de viagens em São Paulo, viagens personalizadas, pacotes para Orlando, pacote Beto Carrero, Lollapalooza Brasil, viagens melhor idade 50+, roteiros exclusivos',
   robots = 'index, follow'
 }) => {
   const siteName = "Anhangá Viagens";

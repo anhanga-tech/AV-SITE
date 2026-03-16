@@ -96,7 +96,7 @@ const Home: React.FC = () => {
         title="Agência de Viagens em São Paulo: Roteiros Exclusivos 2026"
         description="Agência boutique em São Paulo especializada em roteiros sob medida, pacotes para Orlando, Beto Carrero e experiências exclusivas para o público 50+."
         canonical="https://www.anhanga.tur.br/"
-        keywords="agência de viagens em São Paulo, roteiros exclusivos, pacotes para Orlando, pacote Beto Carrero, viagem Lollapalooza 2026, viagens melhor idade 50+, planejamento de viagens"
+        keywords="agência de viagens em São Paulo, roteiros exclusivos, pacotes para Orlando, pacote Beto Carrero, Lollapalooza Brasil, viagens melhor idade 50+, planejamento de viagens"
       />
       <OrganizationSchema />
       <BreadcrumbSchema items={[{ name: 'Home', item: 'https://www.anhanga.tur.br/' }]} />

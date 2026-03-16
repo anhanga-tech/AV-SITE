@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { Menu, X, MessageCircle } from 'lucide-react';
 import { NAVIGATION_LINKS } from './constants';
-import { getWhatsAppLink } from '../../../utils/whatsapp';
-import { WHATSAPP_MESSAGE } from './constants';
-import { openAiChat } from '../../../utils/aiChat';
+import { WAITLIST_SECTION_ID } from './constants';
 
 const SITE_URL = 'https://www.anhanga.tur.br';
 
@@ -24,8 +21,6 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // URL gerada com todos os parâmetros de tracking
-  const whatsappUrl = getWhatsAppLink(WHATSAPP_MESSAGE);
   const logoUrl = `${import.meta.env.BASE_URL}assets/LOGO ANHANGA VIAGENS - AZUL.svg`;
 
   return (
@@ -53,20 +48,16 @@ const Navbar: React.FC = () => {
               {link.name}
             </a>
           ))}
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              openAiChat({ message: WHATSAPP_MESSAGE });
-            }}
+          <a
+            href={`#${WAITLIST_SECTION_ID}`}
             className="btn-whatsapp btn-specialist bg-anhanga-yellow text-anhanga-darkBlue px-5 py-2 rounded-full font-bold text-sm flex items-center gap-2 hover:bg-anhanga-yellowHover transition-colors shadow-md focus:outline-none focus:ring-4 focus:ring-anhanga-yellow/50"
-            aria-label="Fale conosco"
-            id="btn-whatsapp-header"
-            data-whatsapp-location="navbar_desktop_contact_button"
-            data-tracking="navbar-desktop-lolla"
+            aria-label="Ir para a lista de espera"
+            id="btn-lolla-waitlist-header"
+            data-tracking="navbar-desktop-lolla-waitlist"
           >
             <MessageCircle size={16} aria-hidden="true" />
-            Fale Conosco
-          </button>
+            Lista de Espera
+          </a>
         </div>
 
         {/* Mobile Menu Button */}
@@ -93,19 +84,15 @@ const Navbar: React.FC = () => {
               {link.name}
             </a>
           ))}
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              openAiChat({ message: WHATSAPP_MESSAGE });
-              setIsOpen(false);
-            }}
+          <a
+            href={`#${WAITLIST_SECTION_ID}`}
+            onClick={() => setIsOpen(false)}
             className="btn-whatsapp btn-specialist bg-anhanga-yellow text-anhanga-darkBlue px-8 py-3 rounded-full font-bold focus:outline-none focus:ring-4 focus:ring-anhanga-yellow/50"
-            id="btn-whatsapp-mobile"
-            data-whatsapp-location="navbar_mobile_package_button"
-            data-tracking="navbar-mobile-lolla"
+            id="btn-lolla-waitlist-mobile"
+            data-tracking="navbar-mobile-lolla-waitlist"
           >
-            Quero meu pacote
-          </button>
+            Entrar na Lista
+          </a>
         </div>
       )}
     </nav>
