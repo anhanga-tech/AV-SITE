@@ -69,6 +69,8 @@ O site institucional da **Anhangá Viagens** é uma plataforma moderna e interat
    HUBSPOT_DEAL_BANT_PROPERTY=bant_summary
    # Opcional (fallback para tracking não mapeado)
    HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY=tracking_payload_json
+   # Opcional (lista estática para contatos da waitlist do Lollapalooza)
+   HUBSPOT_LOLLAPALOOZA_LIST_ID=123
    ```
 
 
@@ -95,7 +97,7 @@ O projeto está pré-configurado para deploy simplificado em plataformas como Ve
 
 1. Faça o fork do repositório.
 2. Conecte sua conta do GitHub ao Vercel.
-3. Importe o repositório e configure as variáveis de ambiente `GEMINI_API_KEY`, `HUBSPOT_TOKEN`, `HUBSPOT_DEAL_PIPELINE_ID` e `HUBSPOT_DEAL_STAGE_ID` no painel do projeto.
+3. Importe o repositório e configure as variáveis de ambiente `GEMINI_API_KEY`, `HUBSPOT_TOKEN`, `HUBSPOT_DEAL_PIPELINE_ID`, `HUBSPOT_DEAL_STAGE_ID` e, se quiser classificar a waitlist do festival em uma lista estática, `HUBSPOT_LOLLAPALOOZA_LIST_ID` no painel do projeto.
 4. O deploy será feito automaticamente a cada push para a branch principal.
 
 ### Netlify

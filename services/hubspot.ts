@@ -257,6 +257,18 @@ export async function updateContactProperties(token: string, contactId: string, 
 }
 
 /**
+ * Adds a contact to a static HubSpot list.
+ */
+export async function addContactToList(token: string, listId: string, contactId: string): Promise<void> {
+    const response = await hubspotRequest(token, `/crm/v3/lists/${encodeURIComponent(listId)}/memberships/add`, {
+        method: 'PUT',
+        body: JSON.stringify([contactId]),
+    });
+
+    await assertHubSpotResponseOk(response, 'LIST_MEMBERSHIP_ADD_FAILED');
+}
+
+/**
  * Creates a new deal in HubSpot.
  */
 export async function createDeal(token: string, properties: Record<string, string>): Promise<string> {
