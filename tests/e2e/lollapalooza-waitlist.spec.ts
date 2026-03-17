@@ -38,7 +38,7 @@ test.describe('Lollapalooza evergreen landing waitlist', () => {
     await page.getByRole('link', { name: /entrar na lista de espera/i }).first().click();
 
     await expect(page).toHaveURL(/\/lollapalooza(?:\?[^#]+)?#lista-de-espera$/);
-    await expect(page.getByRole('heading', { name: /pacotes 2026 esgotados/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /não fique de fora do lolla 2027/i })).toBeVisible();
 
     await page.getByLabel('Nome completo', { exact: true }).fill('Felipe William');
     await page.getByLabel('E-mail', { exact: true }).fill('felipe@example.com');
