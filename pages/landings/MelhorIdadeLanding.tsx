@@ -52,7 +52,7 @@ const MelhorIdadeLanding: React.FC = () => {
       <BreadcrumbSchema
         items={[
           { name: 'Home', item: 'https://www.anhanga.tur.br/' },
-          { name: 'Melhor Idade', item: 'https://www.anhanga.tur.br/melhor-idade/' }
+          { name: 'Viagens Melhor Idade 50+', item: 'https://www.anhanga.tur.br/melhor-idade/' }
         ]}
       />
       <FAQPageSchema items={MELHOR_IDADE_FAQ_ITEMS} />
