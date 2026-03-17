@@ -121,6 +121,10 @@ const AIChat: React.FC = () => {
   };
 
   const handleFinalizeLead = async (payload: SubmitLeadRequest): Promise<LeadFinalizeResult> => {
+    if (isSubmittingLead) {
+      return { ok: true }; // Already processing
+    }
+
     setLeadDraft({
       firstName: payload.firstName,
       lastName: payload.lastName,

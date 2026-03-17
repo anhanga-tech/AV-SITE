@@ -50,9 +50,14 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
 
   const [localError, setLocalError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [isLocallySubmitting, setIsLocallySubmitting] = useState(false);
+  const isProcessingRef = React.useRef(false);
 
   const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (isSubmittingLead || isLocallySubmitting || isProcessingRef.current) return;
     e.preventDefault();
+    isProcessingRef.current = true;
+    setIsLocallySubmitting(true);
     setLocalError(null);
     setNotice(null);
     setFieldErrors({});
@@ -78,11 +83,15 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
       setLocalError('Por favor, corrija os erros no formulário.');
+      setIsLocallySubmitting(false);
+      isProcessingRef.current = false;
       return;
     }
 
     if (!normalizedDestination) {
       setLocalError('Não conseguimos identificar o destino da sua viagem. Gere o link novamente pelo chat.');
+      setIsLocallySubmitting(false);
+      isProcessingRef.current = false;
       return;
     }
 
@@ -108,11 +117,16 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
     }
 
     // Submit lead data in the background — user is already heading to WhatsApp
-    const result = await onFinalizeLead(submitPayload);
-    if (!result.ok) {
-      console.warn('Background lead submission failed:', { error: result.error, requestId: result.requestId });
-    } else if (result.notice) {
-      setNotice(result.notice);
+    try {
+      const result = await onFinalizeLead(submitPayload);
+      if (!result.ok) {
+        console.warn('Background lead submission failed:', { error: result.error, requestId: result.requestId });
+      } else if (result.notice) {
+        setNotice(result.notice);
+      }
+    } finally {
+      setIsLocallySubmitting(false);
+      isProcessingRef.current = false;
     }
   };
 
@@ -202,10 +216,10 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
         <button
           type="button"
           onClick={handleClick}
-          disabled={isSubmittingLead}
-          className={`group flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3.5 px-4 rounded-xl shadow-md hover:shadow-lg transition-all ${isSubmittingLead ? 'opacity-90 cursor-wait' : ''}`}
+          disabled={isSubmittingLead || isLocallySubmitting}
+          className={`group flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3.5 px-4 rounded-xl shadow-md hover:shadow-lg transition-all ${isSubmittingLead || isLocallySubmitting ? 'opacity-90 cursor-wait' : ''}`}
         >
-          {isSubmittingLead ? (
+          {isSubmittingLead || isLocallySubmitting ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
               <span>Salvando...</span>
