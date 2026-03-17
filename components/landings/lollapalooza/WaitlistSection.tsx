@@ -154,7 +154,7 @@ const WaitlistSection: React.FC = () => {
                       type="text"
                       value={name}
                       onChange={(event) => setName(event.target.value)}
-                      className="peer w-full bg-black/60 border-l-2 border-white/10 px-6 py-4 text-white placeholder-white/30 outline-none transition-all duration-300 focus:border-anhanga-yellow focus:bg-anhanga-yellow/5"
+                      className="peer w-full bg-black/60 border-l-2 border-white/10 px-6 py-4 text-white placeholder-white/30 outline-none transition-all duration-300 focus:border-anhanga-yellow focus:bg-anhanga-yellow/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-anhanga-yellow focus-visible:outline-offset-2"
                       placeholder="EX: SABRINA CARPENTER"
                       autoComplete="name"
                     />
@@ -174,7 +174,7 @@ const WaitlistSection: React.FC = () => {
                       type="email"
                       value={email}
                       onChange={(event) => setEmail(event.target.value)}
-                      className="peer w-full bg-black/60 border-l-2 border-white/10 px-6 py-4 text-white placeholder-white/30 outline-none transition-all duration-300 focus:border-anhanga-blue focus:bg-anhanga-blue/5"
+                      className="peer w-full bg-black/60 border-l-2 border-white/10 px-6 py-4 text-white placeholder-white/30 outline-none transition-all duration-300 focus:border-anhanga-blue focus:bg-anhanga-blue/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-anhanga-blue focus-visible:outline-offset-2"
                       placeholder="VOICE@EXEMPLO.COM"
                       autoComplete="email"
                     />
@@ -192,7 +192,7 @@ const WaitlistSection: React.FC = () => {
                       onChange={(event) => setAcceptedLgpd(event.target.checked)}
                       className="peer sr-only"
                     />
-                    <div className="h-5 w-5 border-2 border-white/20 peer-checked:border-anhanga-yellow peer-checked:bg-anhanga-yellow transition-all duration-200" />
+                    <div className="h-5 w-5 border-2 border-white/20 peer-checked:border-anhanga-yellow peer-checked:bg-anhanga-yellow transition-all duration-200 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-anhanga-yellow peer-focus-visible:outline-offset-2" />
                     <CheckCircle2 size={12} className="absolute text-black opacity-0 peer-checked:opacity-100 transition-opacity" />
                   </div>
                   <span className="text-xs text-gray-400 leading-snug group-hover:text-gray-300 transition-colors">
@@ -222,14 +222,26 @@ const WaitlistSection: React.FC = () => {
                   )}
 
                   {successMessage && (
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
-                      role="status" 
+                      role="status"
                       className="border-l-4 border-anhanga-yellow bg-anhanga-yellow/10 px-4 py-3 text-xs font-bold text-anhanga-yellow"
                     >
                       {successMessage}
+                    </motion.div>
+                  )}
+
+                  {warningMessage && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      role="status"
+                      className="border-l-4 border-amber-500 bg-amber-500/10 px-4 py-3 text-xs font-bold text-amber-400"
+                    >
+                      {warningMessage}
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -237,8 +249,7 @@ const WaitlistSection: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="group relative flex w-full items-center justify-center gap-3 bg-anhanga-yellow px-8 py-5 text-sm font-black text-black transition-all duration-300 hover:tracking-[0.1em] disabled:cursor-wait disabled:opacity-50"
-                  style={{ borderRadius: '1px' }}
+                  className="group relative flex w-full items-center justify-center gap-3 rounded-[1px] bg-anhanga-yellow px-8 py-5 text-sm font-black text-black transition-all duration-300 hover:tracking-[0.1em] disabled:cursor-wait disabled:opacity-50"
                 >
                   <span className="relative z-10 flex items-center gap-2">
                     {isSubmitting ? (
