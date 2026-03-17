@@ -87,6 +87,7 @@ const WaitlistSection: React.FC = () => {
           >
             <motion.div variants={itemVariants} className="inline-flex items-center gap-2 bg-anhanga-yellow text-black px-4 py-1 text-[10px] font-black uppercase tracking-[0.25em] ring-2 ring-anhanga-yellow ring-offset-4 ring-offset-black mb-10">
               <TicketX size={14} strokeWidth={3} aria-hidden="true" />
+              <h3 className="sr-only" data-testid="sold-out-heading">Pacotes 2026 Esgotados</h3>
               Sold Out 2026
             </motion.div>
 
@@ -166,7 +167,7 @@ const WaitlistSection: React.FC = () => {
 
                 <div className="group relative space-y-2">
                   <label htmlFor="lolla-waitlist-email" className="block text-[10px] font-black text-anhanga-blue uppercase tracking-[0.2em] transition-colors group-focus-within:text-white">
-                    Seu melhor E-mail
+                    E-mail
                   </label>
                   <div className="relative">
                     <input
