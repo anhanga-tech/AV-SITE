@@ -105,7 +105,7 @@ const Hero: React.FC = () => {
         </div>
 
         {/* Main Value Proposition */}
-        <h1 className="sr-only">Lollapalooza Brasil: pacotes 2026 esgotados e lista de espera 2027</h1>
+        <h1 className="sr-only">Lollapalooza Brasil: campanha 2026 esgotada e lista de espera 2027</h1>
         <div aria-hidden="true" className="flex flex-col items-center justify-center mb-6 md:mb-8 text-white max-w-5xl mx-auto">
             <div className="flex flex-wrap items-center justify-center gap-x-2 sm:gap-x-4 gap-y-2 mb-2 sm:mb-4">
                 <span className="text-xl sm:text-3xl md:text-5xl font-bold drop-shadow-2xl">no</span>

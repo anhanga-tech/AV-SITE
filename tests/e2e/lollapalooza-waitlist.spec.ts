@@ -38,10 +38,10 @@ test.describe('Lollapalooza evergreen landing waitlist', () => {
     await page.getByRole('link', { name: /entrar na lista de espera/i }).first().click();
 
     await expect(page).toHaveURL(/\/lollapalooza(?:\?[^#]+)?#lista-de-espera$/);
-    await expect(page.getByTestId('sold-out-heading')).toBeVisible();
+    await expect(page.locator('h2', { hasText: /lolla 2027/i })).toBeVisible();
 
-    await page.getByLabel('Nome completo', { exact: true }).fill('Felipe William');
-    await page.getByLabel('E-mail', { exact: true }).fill('felipe@example.com');
+    await page.locator('#lolla-waitlist-name').fill('Felipe William');
+    await page.locator('#lolla-waitlist-email').fill('felipe@example.com');
     await acceptLgpd(page);
 
     await page.getByRole('button', { name: /entrar na lista/i }).click();
