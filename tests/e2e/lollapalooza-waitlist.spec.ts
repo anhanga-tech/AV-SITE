@@ -41,7 +41,7 @@ test.describe('Lollapalooza evergreen landing waitlist', () => {
     await expect(page.getByRole('heading', { name: /não fique de fora do lolla 2027/i })).toBeVisible();
 
     await page.getByLabel('Nome completo', { exact: true }).fill('Felipe William');
-    await page.getByLabel('E-mail', { exact: true }).fill('felipe@example.com');
+    await page.getByLabel('Seu melhor E-mail', { exact: true }).fill('felipe@example.com');
     await acceptLgpd(page);
 
     await page.getByRole('button', { name: /entrar na lista/i }).click();
