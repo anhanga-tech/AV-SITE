@@ -1,166 +1,135 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import ChevronLeft from 'lucide-react/dist/esm/icons/chevron-left';
-import ChevronRight from 'lucide-react/dist/esm/icons/chevron-right';
+import React from 'react';
 import Quote from 'lucide-react/dist/esm/icons/quote';
 import MessageSquareHeart from 'lucide-react/dist/esm/icons/message-square-heart';
+import type { HomeTestimonialsViewModel } from '../types/googleReviews';
 
-const TESTIMONIALS = [
-    {
-        name: "Daryw M.",
-        destination: "Finlândia",
-        text: "Desde o primeiro contato, senti um acolhimento e atendimento diferente e especial.",
-        image: "https://api.dicebear.com/9.x/adventurer/svg?seed=Daryw&backgroundColor=b6e3f4",
-        bg: "bg-yellow-50",
-        rotate: "-rotate-2",
-        date: "2025-12-15"
-    },
-    {
-        name: "Rafa & Gabi",
-        destination: "Paraty",
-        text: "Chegamos no hotel e havia uma surpresa. Atendimento impecável do início ao fim.",
-        image: "https://api.dicebear.com/9.x/adventurer/svg?seed=CarlosFer&backgroundColor=ffdfbf",
-        bg: "bg-blue-50",
-        rotate: "rotate-1",
-        date: "2025-11-20"
-    },
-    {
-        name: "William S.",
-        destination: "Alemanha",
-        text: "Viagem mais tranquila da vida. Trens, hotéis, tudo organizado perfeitamente.",
-        image: "https://api.dicebear.com/9.x/adventurer/svg?seed=Roberto&backgroundColor=c0aede",
-        bg: "bg-emerald-50",
-        rotate: "-rotate-1",
-        date: "2025-10-10"
-    }
-];
+interface TestimonialsProps {
+    model: HomeTestimonialsViewModel;
+}
 
-const Testimonials: React.FC = () => {
-    const [currentIndex, setCurrentIndex] = useState(0);
+const formatDate = (value: string): string =>
+    new Intl.DateTimeFormat('pt-BR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+    }).format(new Date(value));
 
-    const nextSlide = useCallback(() => {
-        setCurrentIndex((prev) => (prev === TESTIMONIALS.length - 1 ? 0 : prev + 1));
-    }, []);
+const renderStars = (rating: number) => '★'.repeat(Math.round(rating)).padEnd(5, '☆');
 
-    const prevSlide = () => {
-        setCurrentIndex((prev) => (prev === 0 ? TESTIMONIALS.length - 1 : prev - 1));
-    };
-
-    useEffect(() => {
-        const interval = setInterval(nextSlide, 6000); // Aumentei um pouco o tempo para leitura
-        return () => clearInterval(interval);
-    }, [nextSlide]);
-
+const Testimonials: React.FC<TestimonialsProps> = ({ model }) => {
     return (
-        <section id="depoimentos" className="py-24 bg-brand-light overflow-hidden relative">
-
-            {/* Background Decor */}
-
+        <section
+            id="depoimentos"
+            data-review-mode={model.mode}
+            data-review-source={model.mode === 'real' ? model.source : model.source}
+            className="py-24 bg-brand-light overflow-hidden relative"
+        >
             <div className="container mx-auto px-6 relative z-10">
                 <div className="text-center mb-16">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-brand-light text-brand-dark font-black text-xs uppercase tracking-widest shadow-sm mb-4">
-                        <MessageSquareHeart className="w-4 h-4 text-red-500 fill-red-500" /> Love Notes
+                        <MessageSquareHeart className="w-4 h-4 text-red-500 fill-red-500" />
+                        {model.mode === 'real' ? 'Avaliações no Google' : 'Histórias selecionadas'}
                     </div>
-                    <h2 className="text-4xl font-black text-brand-dark">Mural do Amor ❤️</h2>
-                    <p className="mt-3 text-gray-500 text-base">Depoimentos reais de quem viajou com a gente</p>
+                    <h2 className="text-4xl font-black text-brand-dark">
+                        {model.mode === 'real' ? 'Quem viajou com a Anhangá recomenda' : 'Histórias de quem viajou com a gente'}
+                    </h2>
+                    {model.mode === 'real' ? (
+                        <div className="mt-4 flex flex-col items-center gap-3">
+                            <p className="text-gray-600 text-base max-w-2xl">
+                                Reviews reais e visíveis no HTML inicial da Home, alinhadas com o schema da página.
+                            </p>
+                            <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
+                                <span className="rounded-full bg-white px-4 py-2 font-black text-brand-dark shadow-sm">
+                                    {model.aggregateRating.ratingValue.toFixed(1)} / {model.aggregateRating.bestRating}
+                                </span>
+                                <span className="rounded-full bg-white px-4 py-2 font-semibold text-gray-600 shadow-sm">
+                                    {model.aggregateRating.reviewCount} avaliações
+                                </span>
+                                <span className="rounded-full bg-white px-4 py-2 font-semibold text-gray-600 shadow-sm">
+                                    Snapshot em {formatDate(model.fetchedAt)}
+                                </span>
+                            </div>
+                        </div>
+                    ) : (
+                        <p className="mt-3 text-gray-500 text-base">
+                            Uma seleção editorial da equipe enquanto o snapshot de reviews reais não está disponível.
+                        </p>
+                    )}
                 </div>
 
-                {/* Carousel Container */}
-                <div className="max-w-4xl mx-auto relative">
-
-                    {/* Viewport for Slides */}
-                    <div className="overflow-hidden py-4 px-2"> {/* Padding prevent shadow clip */}
-                        <div
-                            className="flex transition-transform duration-700 ease-in-out will-change-transform"
-                            style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-                        >
-                            {TESTIMONIALS.map((testimonial, index) => (
-                                <div key={index} className="w-full flex-shrink-0 px-2 md:px-12">
-                                    <div
-                                        className="relative"
-                                        itemScope
-                                        itemType="https://schema.org/Review"
-                                    >
-                                        {/* Schema Hidden Data */}
-                                        <div itemProp="itemReviewed" itemScope itemType="https://schema.org/LocalBusiness">
-                                            <meta itemProp="name" content="Anhangá Viagens" />
-                                            <meta itemProp="image" content="https://www.anhanga.tur.br/logo.png" />
-                                            <meta itemProp="telephone" content="+551152833309" />
-                                            <meta itemProp="address" content="Av. Dom Pedro I, 773, São Paulo, SP" />
+                <div className="max-w-6xl mx-auto relative">
+                    {model.mode === 'real' ? (
+                        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                            {model.displayedReviews.map((review) => (
+                                <article
+                                    key={review.id}
+                                    data-review-card-id={review.id}
+                                    className="bg-white rounded-[2.25rem] p-8 border-4 border-white shadow-[10px_10px_0px_rgba(0,0,0,0.05)] flex flex-col gap-6"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-16 h-16 rounded-full bg-brand-cyan/10 text-brand-cyan font-black text-lg flex items-center justify-center shrink-0">
+                                            {review.initials}
                                         </div>
-                                        <div itemProp="reviewRating" itemScope itemType="https://schema.org/Rating">
-                                            <meta itemProp="ratingValue" content="5" />
-                                            <meta itemProp="bestRating" content="5" />
+                                        <div className="min-w-0">
+                                            <h3 className="font-black text-lg text-brand-dark truncate">{review.authorName}</h3>
+                                            <p className="text-sm font-semibold text-gray-500">
+                                                {formatDate(review.publishedAt)}
+                                            </p>
                                         </div>
-                                        <meta itemProp="datePublished" content={testimonial.date} />
-
-                                        {/* The Card - Looks like a pinned note */}
-                                        <div className={`
-                                    bg-white rounded-[3rem] p-8 md:p-12 shadow-[10px_10px_0px_rgba(0,0,0,0.05)] border-4 border-white
-                                    flex flex-col md:flex-row items-center gap-8 relative z-10 transform ${testimonial.rotate}
-                                    transition-transform duration-500 hover:rotate-0 hover:scale-[1.01]
-                                `}>
-                                            {/* Pin Graphic */}
-                                            <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-red-400 shadow-sm z-20 border border-red-600"></div>
-
-                                            {/* Animated Avatar Sticker */}
-                                            <div className="relative shrink-0">
-                                                <div className="w-32 h-32 rounded-full border-4 border-white shadow-lg overflow-hidden bg-white animate-float">
-                                                    <img
-                                                        src={testimonial.image}
-                                                        alt={testimonial.name}
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                </div>
-                                                <div className="absolute -bottom-2 -right-2 bg-yellow-300 text-yellow-900 text-xs font-black px-3 py-1 rounded-full shadow-sm -rotate-6 z-20" title="Depoimento verificado pela equipe Anhangá Viagens">
-                                                    ✓ Cliente Real
-                                                </div>
-                                            </div>
-
-                                            {/* Text */}
-                                            <div className="text-center md:text-left">
-                                                <Quote className="w-10 h-10 text-brand-cyan/20 mx-auto md:mx-0 mb-4 fill-current" />
-                                                <p itemProp="reviewBody" className="text-xl md:text-2xl font-bold text-gray-700 leading-snug mb-6 font-serif italic">
-                                                    "{testimonial.text}"
-                                                </p>
-                                                <div>
-                                                    <h4 itemProp="author" itemScope itemType="https://schema.org/Person" className="font-black text-lg text-brand-dark uppercase tracking-wide">
-                                                        <span itemProp="name">{testimonial.name}</span>
-                                                    </h4>
-                                                    <span className="text-brand-cyan font-bold text-sm">
-                                                        Viajou para <span itemProp="keywords">{testimonial.destination}</span>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Background Shadow Card for Depth (Moves with the slide now) */}
-                                        <div className="absolute inset-0 bg-brand-cyan/10 rounded-[3rem] transform rotate-2 z-0 scale-95 translate-y-4"></div>
                                     </div>
-                                </div>
+
+                                    <div className="flex items-center gap-3 text-sm">
+                                        <span className="text-brand-yellow tracking-[0.25em]" aria-label={`${review.rating} de 5 estrelas`}>
+                                            {renderStars(review.rating)}
+                                        </span>
+                                        <span className="font-semibold text-gray-500">{review.rating.toFixed(0)}/5</span>
+                                    </div>
+
+                                    <div className="relative flex-1">
+                                        <Quote className="w-10 h-10 text-brand-cyan/20 mb-4 fill-current" />
+                                        <p className="text-lg font-bold text-gray-700 leading-relaxed font-serif italic">
+                                            "{review.text}"
+                                        </p>
+                                    </div>
+
+                                    {review.reviewUrl ? (
+                                        <a
+                                            href={review.reviewUrl}
+                                            target="_blank"
+                                            rel="noreferrer noopener"
+                                            className="inline-flex items-center gap-2 text-sm font-black text-brand-cyan hover:text-brand-dark transition-colors"
+                                        >
+                                            Ver origem da avaliação
+                                        </a>
+                                    ) : null}
+                                </article>
                             ))}
                         </div>
-                    </div>
+                    ) : (
+                        <div className="grid gap-6 md:grid-cols-3">
+                            {model.stories.map((story) => (
+                                <article
+                                    key={story.id}
+                                    className="bg-white rounded-[2.25rem] p-8 border-4 border-white shadow-[10px_10px_0px_rgba(0,0,0,0.05)] flex flex-col gap-5"
+                                >
+                                    <div>
+                                        <p className="text-xs font-black uppercase tracking-[0.3em] text-brand-cyan">
+                                            Historia editorial
+                                        </p>
+                                        <h3 className="mt-3 font-black text-xl text-brand-dark">{story.name}</h3>
+                                        <p className="text-sm font-semibold text-gray-500">Roteiro para {story.destination}</p>
+                                    </div>
 
-                    {/* Controls */}
-                    <div className="flex justify-center gap-4 mt-8">
-                        <button onClick={prevSlide} className="w-12 h-12 bg-white border-2 border-white/50 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform text-brand-cyan hover:bg-brand-cyan hover:text-white z-20">
-                            <ChevronLeft className="w-6 h-6" />
-                        </button>
-                        <div className="flex gap-2 items-center z-20">
-                            {TESTIMONIALS.map((_, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => setCurrentIndex(i)}
-                                    className={`h-2 rounded-full transition-all duration-300 ${i === currentIndex ? 'bg-brand-cyan w-8' : 'bg-brand-cyan/20 w-2 hover:bg-brand-cyan/40'}`}
-                                    aria-label={`Ir para depoimento ${i + 1}`}
-                                />
+                                    <div className="relative flex-1">
+                                        <Quote className="w-10 h-10 text-brand-cyan/20 mb-4 fill-current" />
+                                        <p className="text-lg font-bold text-gray-700 leading-relaxed font-serif italic">
+                                            "{story.text}"
+                                        </p>
+                                    </div>
+                                </article>
                             ))}
                         </div>
-                        <button onClick={nextSlide} className="w-12 h-12 bg-white border-2 border-white/50 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform text-brand-cyan hover:bg-brand-cyan hover:text-white z-20">
-                            <ChevronRight className="w-6 h-6" />
-                        </button>
-                    </div>
-
+                    )}
                 </div>
             </div>
         </section>

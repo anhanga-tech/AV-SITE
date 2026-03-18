@@ -29,6 +29,7 @@ test.describe('Sobre Page E-E-A-T Verification', () => {
     const schemaData = JSON.parse(schema.replace(/\\u003c/g, '<'));
     expect(schemaData['@type']).toContain('TravelAgency');
     expect(schemaData['taxID']).toBe('37.036.732/0001-41');
+    expect(schemaData['aggregateRating']).toBeUndefined();
   });
 
   test('should navigate to about page from header', async ({ page, isMobile }) => {

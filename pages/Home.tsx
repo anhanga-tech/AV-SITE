@@ -1,17 +1,22 @@
 import React, { useEffect, Suspense, lazy } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import Hero from '../components/Hero';
 
 import { OrganizationSchema } from '../components/schemas/OrganizationSchema';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 
 import { SEO } from '../components/SEO';
+import Testimonials from '../components/Testimonials';
+import {
+  getHomeTestimonialsViewModel,
+  getParsedHomeReviewsSnapshot,
+  shouldEmitHomeAggregateRating,
+} from '../lib/googleReviewsSnapshot';
 
 const Highlights = lazy(() => import('../components/Highlights'));
 const Categories = lazy(() => import('../components/Categories'));
 const Destinations = lazy(() => import('../components/Destinations'));
 const HowItWorks = lazy(() => import('../components/HowItWorks'));
-const Testimonials = lazy(() => import('../components/Testimonials'));
 const Blog = lazy(() => import('../components/Blog'));
 const FAQ = lazy(() => import('../components/FAQ'));
 const CallToAction = lazy(() => import('../components/CallToAction'));
@@ -21,6 +26,18 @@ const Home: React.FC = () => {
   const [shouldRenderBelowFold, setShouldRenderBelowFold] = React.useState(false);
   const [shouldLoadDestinations, setShouldLoadDestinations] = React.useState(false);
   const destinationsSentinelRef = React.useRef<HTMLDivElement>(null);
+  const testimonialsModel = getHomeTestimonialsViewModel();
+  const parsedSnapshot = getParsedHomeReviewsSnapshot();
+  const renderedReviewIds = testimonialsModel.mode === 'real'
+    ? testimonialsModel.displayedReviews.map((review) => review.id)
+    : [];
+  const organizationAggregateRating = shouldEmitHomeAggregateRating({
+    pathname: location.pathname,
+    parsedSnapshot,
+    renderedReviewIds,
+  }) && testimonialsModel.mode === 'real'
+    ? testimonialsModel.aggregateRating
+    : undefined;
 
   // Efeito para lidar com navegação vinda de outras páginas (ex: Blog -> Seção Home)
   useEffect(() => {
@@ -98,7 +115,7 @@ const Home: React.FC = () => {
         canonical="https://www.anhanga.tur.br/"
         keywords="agência de viagens em São Paulo, roteiros exclusivos, pacotes para Orlando, pacote Beto Carrero, Lollapalooza Brasil, viagens melhor idade 50+, planejamento de viagens"
       />
-      <OrganizationSchema />
+      <OrganizationSchema aggregateRating={organizationAggregateRating} />
       <BreadcrumbSchema items={[{ name: 'Home', item: 'https://www.anhanga.tur.br/' }]} />
       <Hero />
 
@@ -133,9 +150,16 @@ const Home: React.FC = () => {
           <Suspense fallback={<section id="faq" className="min-h-[600px] bg-[#fffdf5]" aria-hidden="true" />}>
             <FAQ />
           </Suspense>
-          <Suspense fallback={<section id="depoimentos" className="min-h-[500px] bg-[#fffdf5]" aria-hidden="true" />}>
-            <Testimonials />
-          </Suspense>
+        </>
+      ) : (
+        <>
+          <section id="como-funciona" className="min-h-[800px] bg-[#fffdf5]" aria-hidden="true" />
+          <section id="faq" className="min-h-[600px] bg-[#fffdf5]" aria-hidden="true" />
+        </>
+      )}
+      <Testimonials model={testimonialsModel} />
+      {shouldRenderBelowFold ? (
+        <>
           <Suspense fallback={<section id="blog" className="min-h-[500px] bg-[#fffdf5]" aria-hidden="true" />}>
             <Blog />
           </Suspense>
@@ -145,9 +169,6 @@ const Home: React.FC = () => {
         </>
       ) : (
         <>
-          <section id="como-funciona" className="min-h-[800px] bg-[#fffdf5]" aria-hidden="true" />
-          <section id="faq" className="min-h-[600px] bg-[#fffdf5]" aria-hidden="true" />
-          <section id="depoimentos" className="min-h-[500px] bg-[#fffdf5]" aria-hidden="true" />
           <section id="blog" className="min-h-[500px] bg-[#fffdf5]" aria-hidden="true" />
           <section id="contato" className="min-h-[400px] bg-[#fffdf5]" aria-hidden="true" />
         </>

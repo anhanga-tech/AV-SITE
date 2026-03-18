@@ -51,6 +51,12 @@ const UNIQUE_TAG_PATTERNS = [
   { label: 'twitter:description', pattern: /<meta\b[^>]*name="twitter:description"[^>]*>/gi },
   { label: 'twitter:image', pattern: /<meta\b[^>]*name="twitter:image"[^>]*>/gi }
 ];
+const HOME_REVIEWS_SECTION_PATTERN = /id="depoimentos"/i;
+const HOME_REVIEWS_PLACEHOLDER_PATTERN = /<section id="depoimentos"[^>]*aria-hidden="true"[^>]*><\/section>/i;
+const HOME_REVIEWS_REAL_MODE_PATTERN = /data-review-mode="real"/i;
+const HOME_REVIEWS_FALLBACK_MODE_PATTERN = /data-review-mode="fallback"/i;
+const HOME_REVIEW_CARD_PATTERN = /data-review-card-id="/gi;
+const ORGANIZATION_SCHEMA_PATTERN = /<script\b[^>]*data-av-head="script:ld-json:organization"[^>]*>([\s\S]*?)<\/script>/i;
 
 const routeToOutputPath = (route) =>
   route === '/' ? path.join(DIST_DIR, 'index.html') : path.join(DIST_DIR, route.slice(1), 'index.html');
@@ -79,6 +85,67 @@ const injectRenderedHtml = (template, appHtml, headHtml) => {
 
 const countMatches = (html, pattern) => Array.from(html.matchAll(pattern)).length;
 
+const extractOrganizationSchema = (html) => {
+  const match = html.match(ORGANIZATION_SCHEMA_PATTERN);
+  if (!match) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(match[1].replace(/\\u003c/g, '<'));
+  } catch (error) {
+    throw new Error(`Failed to parse organization schema from prerendered HTML: ${String(error)}`);
+  }
+};
+
+const validateReviewMarkup = (route, html) => {
+  if (route === '/') {
+    if (!HOME_REVIEWS_SECTION_PATTERN.test(html)) {
+      throw new Error('Missing visible reviews section in prerendered Home HTML');
+    }
+
+    if (HOME_REVIEWS_PLACEHOLDER_PATTERN.test(html)) {
+      throw new Error('Home prerender still contains the empty depoimentos placeholder');
+    }
+
+    const hasRealMode = HOME_REVIEWS_REAL_MODE_PATTERN.test(html);
+    const hasFallbackMode = HOME_REVIEWS_FALLBACK_MODE_PATTERN.test(html);
+
+    if (hasRealMode === hasFallbackMode) {
+      throw new Error('Home prerender must declare exactly one review mode');
+    }
+
+    const organizationSchema = extractOrganizationSchema(html);
+    const hasAggregateRating = Boolean(organizationSchema?.aggregateRating);
+
+    if (hasRealMode) {
+      if (countMatches(html, HOME_REVIEW_CARD_PATTERN) < 3) {
+        throw new Error('Home prerender must expose at least 3 visible real review cards');
+      }
+
+      if (!hasAggregateRating) {
+        throw new Error('Home prerender is in real review mode without aggregateRating');
+      }
+    }
+
+    if (hasFallbackMode && hasAggregateRating) {
+      throw new Error('Home fallback mode must not emit aggregateRating');
+    }
+  }
+
+  if (route === '/sobre') {
+    const organizationSchema = extractOrganizationSchema(html);
+
+    if (!organizationSchema) {
+      throw new Error('Missing organization schema in /sobre prerender');
+    }
+
+    if (organizationSchema.aggregateRating) {
+      throw new Error('/sobre prerender must not emit aggregateRating without visible reviews');
+    }
+  }
+};
+
 const validateHtml = (route, html) => {
   for (const requirement of REQUIRED_PATTERNS) {
     if (!requirement.pattern.test(html)) {
@@ -92,6 +159,8 @@ const validateHtml = (route, html) => {
       throw new Error(`Expected exactly 1 ${tag.label} tag in prerendered output for route "${route}", found ${matchCount}`);
     }
   }
+
+  validateReviewMarkup(route, html);
 };
 
 const removeDirectory = (directoryPath) => {
