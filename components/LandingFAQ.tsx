@@ -1,5 +1,4 @@
 import React, { useState, memo, useCallback } from 'react';
-import { triggerHaptic } from '../utils/haptics';
 import ChevronDown from 'lucide-react/dist/esm/icons/chevron-down';
 import ChevronUp from 'lucide-react/dist/esm/icons/chevron-up';
 
@@ -66,7 +65,6 @@ export const LandingFAQ: React.FC<LandingFAQProps> = ({
 
     const handleToggle = useCallback((idx: number) => {
         setOpenIndex(prev => prev === idx ? null : idx);
-        void triggerHaptic('light');
     }, []);
 
     return (

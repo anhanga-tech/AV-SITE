@@ -3,7 +3,6 @@ import SectionTitle from './SectionTitle';
 import Button from './Button';
 import { FAQItem } from './types';
 import { ChevronDown, HelpCircle, Sparkles, ArrowRight } from 'lucide-react';
-import { triggerHaptic } from '../../../utils/haptics';
 
 const items: FAQItem[] = [
   { question: "Os pacotes incluem ingresso do Beto Carrero?", answer: "Sim! Trabalhamos com ingressos oficiais. Você recebe o QR Code direto no seu WhatsApp e entra no parque sem pegar fila na bilheteria." },
@@ -17,7 +16,6 @@ const FAQ: React.FC = () => {
 
   const toggleAccordion = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
-    void triggerHaptic('light');
   };
 
   return (

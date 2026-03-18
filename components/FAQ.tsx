@@ -1,6 +1,5 @@
 
 import React, { useState, memo, useCallback } from 'react';
-import { triggerHaptic } from '../utils/haptics';
 import {
     CaretDown,
     CaretUp,
@@ -22,7 +21,6 @@ const FAQItem = memo(({ question, answer, idx }: FAQItemProps) => {
 
     const handleToggle = useCallback(() => {
         setIsOpen(prev => !prev);
-        void triggerHaptic('light');
     }, []);
 
     return (
