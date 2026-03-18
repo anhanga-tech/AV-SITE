@@ -54,6 +54,9 @@ const isValidIsoDate = (value: unknown): value is string => {
 const isFiniteNumber = (value: unknown): value is number =>
   typeof value === 'number' && Number.isFinite(value);
 
+const isNonEmptyString = (value: unknown): value is string =>
+  typeof value === 'string' && value.trim().length > 0;
+
 const buildInitials = (authorName: string): string =>
   authorName
     .split(/\s+/)
@@ -74,6 +77,132 @@ const normalizeReview = (review: GoogleBusinessReview, index: number): HomeRealR
   destinationLabel: review.destination ?? DEFAULT_DESTINATION_LABEL,
   avatarUrl: review.profilePhotoUrl ?? buildAvatarUrl(review.authorName, index),
 });
+
+const parseRequiredTrimmedStringField = (
+  value: unknown,
+  fieldPath: string,
+  errors: string[],
+): string | null => {
+  if (!isNonEmptyString(value)) {
+    errors.push(`${fieldPath} must be a non-empty string`);
+    return null;
+  }
+
+  return value.trim();
+};
+
+const parseIsoDateField = (
+  value: unknown,
+  fieldPath: string,
+  errors: string[],
+): string | null => {
+  if (!isValidIsoDate(value)) {
+    errors.push(`${fieldPath} must be a valid date`);
+    return null;
+  }
+
+  return value;
+};
+
+const parseOptionalDestination = (
+  value: unknown,
+  fieldPath: string,
+  errors: string[],
+): string | undefined => {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (!isNonEmptyString(value)) {
+    errors.push(`${fieldPath} must be a non-empty string when provided`);
+    return undefined;
+  }
+
+  return value.trim();
+};
+
+const parseOptionalStringField = (
+  value: unknown,
+  fieldPath: string,
+  errors: string[],
+): string | undefined => {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (typeof value !== 'string') {
+    errors.push(`${fieldPath} must be a string when provided`);
+    return undefined;
+  }
+
+  return value;
+};
+
+const parseReviewRatingField = (
+  value: unknown,
+  fieldPath: string,
+  errors: string[],
+  aggregateRating: GoogleAggregateRating | null,
+): number | null => {
+  if (!isFiniteNumber(value)) {
+    errors.push(`${fieldPath} must be a finite number`);
+    return null;
+  }
+
+  if (
+    aggregateRating &&
+    (value < aggregateRating.worstRating || value > aggregateRating.bestRating)
+  ) {
+    errors.push(`${fieldPath} must stay between worstRating and bestRating`);
+  }
+
+  return value;
+};
+
+function parseSnapshotMetadata(
+  rawSnapshot: Record<string, unknown>,
+  errors: string[],
+): {
+  schemaVersion: 1 | null;
+  source: string;
+  fetchedAt: string;
+} {
+  const schemaVersion = rawSnapshot.schemaVersion === 1 ? 1 : null;
+
+  if (!schemaVersion) {
+    errors.push('schemaVersion must be 1');
+  }
+
+  return {
+    schemaVersion,
+    source: parseRequiredTrimmedStringField(rawSnapshot.source, 'source', errors) ?? '',
+    fetchedAt: parseIsoDateField(rawSnapshot.fetchedAt, 'fetchedAt', errors) ?? '',
+  };
+}
+
+function parseReviewsCollection(
+  value: unknown,
+  errors: string[],
+  aggregateRating: GoogleAggregateRating | null,
+): {
+  reviews: GoogleBusinessReview[];
+  hasExplicitEmptyArray: boolean;
+} {
+  if (!Array.isArray(value)) {
+    errors.push('reviews must be an array');
+    return {
+      reviews: [],
+      hasExplicitEmptyArray: false,
+    };
+  }
+
+  return {
+    reviews: value
+      .map((review, index) => parseReview(review, index, errors, aggregateRating))
+      .filter((review): review is GoogleBusinessReview => review !== null),
+    hasExplicitEmptyArray: value.length === 0,
+  };
+}
 
 function parseAggregateRating(
   value: unknown,
@@ -141,79 +270,29 @@ function parseReview(
     return null;
   }
 
-  const id = value.id;
-  const authorName = value.authorName;
-  const text = value.text;
-  const rating = value.rating;
-  const publishedAt = value.publishedAt;
-  const destination = value.destination;
-  const profilePhotoUrl = value.profilePhotoUrl;
-  const reviewUrl = value.reviewUrl;
-  const normalizedDestination = typeof destination === 'string' ? destination.trim() : undefined;
-  const normalizedProfilePhotoUrl = typeof profilePhotoUrl === 'string' ? profilePhotoUrl : undefined;
-  const normalizedReviewUrl = typeof reviewUrl === 'string' ? reviewUrl : undefined;
+  const fieldPath = (fieldName: string) => `reviews[${index}].${fieldName}`;
+  const id = parseRequiredTrimmedStringField(value.id, fieldPath('id'), errors);
+  const authorName = parseRequiredTrimmedStringField(value.authorName, fieldPath('authorName'), errors);
+  const text = parseRequiredTrimmedStringField(value.text, fieldPath('text'), errors);
+  const rating = parseReviewRatingField(value.rating, fieldPath('rating'), errors, aggregateRating);
+  const publishedAt = parseIsoDateField(value.publishedAt, fieldPath('publishedAt'), errors);
+  const destination = parseOptionalDestination(value.destination, fieldPath('destination'), errors);
+  const profilePhotoUrl = parseOptionalStringField(value.profilePhotoUrl, fieldPath('profilePhotoUrl'), errors);
+  const reviewUrl = parseOptionalStringField(value.reviewUrl, fieldPath('reviewUrl'), errors);
 
-  if (typeof id !== 'string' || id.trim().length === 0) {
-    errors.push(`reviews[${index}].id must be a non-empty string`);
-  }
-
-  if (typeof authorName !== 'string' || authorName.trim().length === 0) {
-    errors.push(`reviews[${index}].authorName must be a non-empty string`);
-  }
-
-  if (typeof text !== 'string' || text.trim().length === 0) {
-    errors.push(`reviews[${index}].text must be a non-empty string`);
-  }
-
-  if (!isFiniteNumber(rating)) {
-    errors.push(`reviews[${index}].rating must be a finite number`);
-  }
-
-  if (!isValidIsoDate(publishedAt)) {
-    errors.push(`reviews[${index}].publishedAt must be a valid date`);
-  }
-
-  if (
-    destination !== undefined &&
-    (typeof destination !== 'string' || normalizedDestination?.length === 0)
-  ) {
-    errors.push(`reviews[${index}].destination must be a non-empty string when provided`);
-  }
-
-  if (
-    aggregateRating &&
-    isFiniteNumber(rating) &&
-    (rating < aggregateRating.worstRating || rating > aggregateRating.bestRating)
-  ) {
-    errors.push(`reviews[${index}].rating must stay between worstRating and bestRating`);
-  }
-
-  if (
-    (profilePhotoUrl !== undefined && typeof profilePhotoUrl !== 'string') ||
-    (reviewUrl !== undefined && typeof reviewUrl !== 'string')
-  ) {
-    errors.push(`reviews[${index}] optional URLs must be strings when provided`);
-  }
-
-  if (
-    typeof id !== 'string' ||
-    typeof authorName !== 'string' ||
-    typeof text !== 'string' ||
-    !isFiniteNumber(rating) ||
-    !isValidIsoDate(publishedAt)
-  ) {
+  if (!id || !authorName || !text || rating === null || !publishedAt) {
     return null;
   }
 
   return {
-    id: id.trim(),
-    authorName: authorName.trim(),
-    text: text.trim(),
+    id,
+    authorName,
+    text,
     rating,
     publishedAt,
-    destination: normalizedDestination,
-    profilePhotoUrl: normalizedProfilePhotoUrl,
-    reviewUrl: normalizedReviewUrl,
+    destination,
+    profilePhotoUrl,
+    reviewUrl,
   };
 }
 
@@ -231,45 +310,20 @@ export function parseGoogleReviewsSnapshot(
     };
   }
 
-  if (rawSnapshot.schemaVersion !== 1) {
-    errors.push('schemaVersion must be 1');
-  }
-
-  const rawSource = rawSnapshot.source;
-  const rawFetchedAt = rawSnapshot.fetchedAt;
-  const normalizedSource = typeof rawSource === 'string' ? rawSource.trim() : '';
-  const normalizedFetchedAt = isValidIsoDate(rawFetchedAt) ? rawFetchedAt : '';
-
-  if (normalizedSource.length === 0) {
-    errors.push('source must be a non-empty string');
-  }
-
-  if (!normalizedFetchedAt) {
-    errors.push('fetchedAt must be a valid date');
-  }
-
+  const metadata = parseSnapshotMetadata(rawSnapshot, errors);
   const aggregateRating = parseAggregateRating(rawSnapshot.aggregateRating, errors);
+  const parsedReviews = parseReviewsCollection(rawSnapshot.reviews, errors, aggregateRating);
 
-  if (!Array.isArray(rawSnapshot.reviews)) {
-    errors.push('reviews must be an array');
-  }
-
-  const parsedReviews = Array.isArray(rawSnapshot.reviews)
-    ? rawSnapshot.reviews
-        .map((review, index) => parseReview(review, index, errors, aggregateRating))
-        .filter((review): review is GoogleBusinessReview => review !== null)
-    : [];
-
-  if (Array.isArray(rawSnapshot.reviews) && rawSnapshot.reviews.length === 0) {
+  if (parsedReviews.hasExplicitEmptyArray) {
     return {
       kind: 'empty-snapshot',
       errors: ['reviews array is empty'],
     };
   }
 
-  const displayedReviews = parsedReviews.slice(0, visibleReviewCount).map(normalizeReview);
+  const displayedReviews = parsedReviews.reviews.slice(0, visibleReviewCount).map(normalizeReview);
 
-  if (displayedReviews.length === 0 && parsedReviews.length === 0 && errors.length === 0) {
+  if (displayedReviews.length === 0 && parsedReviews.reviews.length === 0 && errors.length === 0) {
     return {
       kind: 'empty-snapshot',
       errors: ['no reviews available for Home'],
@@ -280,7 +334,7 @@ export function parseGoogleReviewsSnapshot(
     errors.push('aggregateRating.reviewCount must be greater than or equal to displayed reviews');
   }
 
-  if (errors.length > 0 || !aggregateRating || rawSnapshot.schemaVersion !== 1) {
+  if (errors.length > 0 || !aggregateRating || metadata.schemaVersion !== 1) {
     return {
       kind: 'invalid-snapshot',
       errors,
@@ -291,10 +345,10 @@ export function parseGoogleReviewsSnapshot(
     kind: 'valid-real-snapshot',
     snapshot: {
       schemaVersion: 1,
-      source: normalizedSource,
-      fetchedAt: normalizedFetchedAt,
+      source: metadata.source,
+      fetchedAt: metadata.fetchedAt,
       aggregateRating,
-      reviews: parsedReviews,
+      reviews: parsedReviews.reviews,
     } satisfies GoogleBusinessReviewsSnapshotV1,
     aggregateRating,
     displayedReviews,
