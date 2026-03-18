@@ -13,10 +13,10 @@ const items: FAQItem[] = [
 
 const FAQ: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
-  const toggleAccordion = useCallback((index: number) => {
-    setOpenIndex(prev => prev === index ? null : index);
-    void triggerHaptic('light');
-  }, []);
+
+  const toggleAccordion = (index: number) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
 
   return (
     <section className="py-24 bg-fun-yellow relative overflow-hidden">
