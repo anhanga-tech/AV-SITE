@@ -3,6 +3,7 @@ import SectionTitle from './SectionTitle';
 import Button from './Button';
 import { FAQItem } from './types';
 import { ChevronDown, HelpCircle, Sparkles, ArrowRight } from 'lucide-react';
+import { triggerHaptic } from '../../../utils/haptics';
 
 const items: FAQItem[] = [
   { question: "Os pacotes incluem ingresso do Beto Carrero?", answer: "Sim! Trabalhamos com ingressos oficiais. Você recebe o QR Code direto no seu WhatsApp e entra no parque sem pegar fila na bilheteria." },
@@ -16,6 +17,7 @@ const FAQ: React.FC = () => {
 
   const toggleAccordion = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
+    void triggerHaptic('light');
   };
 
   return (
@@ -48,7 +50,7 @@ const FAQ: React.FC = () => {
                   >
                     <button 
                       onClick={() => toggleAccordion(idx)}
-                      className="w-full flex items-center justify-between p-5 md:p-6 text-left focus:outline-none"
+                      className="w-full flex items-center justify-between p-5 md:p-6 text-left focus:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-fun-blue/50"
                       aria-expanded={isOpen}
                     >
                       <span className={`font-heading font-bold text-lg md:text-xl pr-4 leading-tight ${isOpen ? 'text-fun-blue' : 'text-fun-dark'}`}>
