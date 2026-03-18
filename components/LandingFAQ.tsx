@@ -1,4 +1,4 @@
-import React, { useState, memo } from 'react';
+import React, { useState, memo, useCallback } from 'react';
 import ChevronDown from 'lucide-react/dist/esm/icons/chevron-down';
 import ChevronUp from 'lucide-react/dist/esm/icons/chevron-up';
 
@@ -19,7 +19,7 @@ const FAQItemComponent = memo(({ question, answer, isOpen, onClick }: FAQItem & 
             className={`border-b border-brand-cyan/10 last:border-0 transition-all duration-300 ${isOpen ? 'bg-white/40' : ''}`}
         >
             <button
-                className="w-full py-6 flex justify-between items-center text-left focus:outline-none group"
+                className="w-full py-6 flex justify-between items-center text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan group"
                 onClick={onClick}
                 aria-expanded={isOpen}
             >
@@ -63,6 +63,10 @@ export const LandingFAQ: React.FC<LandingFAQProps> = ({
 }) => {
     const [openIndex, setOpenIndex] = useState<number | null>(0);
 
+    const handleToggle = useCallback((idx: number) => {
+        setOpenIndex(prev => prev === idx ? null : idx);
+    }, []);
+
     return (
         <section className="py-20 bg-white">
             <div className="container mx-auto px-6 max-w-4xl" itemScope itemType="https://schema.org/FAQPage">
@@ -81,7 +85,7 @@ export const LandingFAQ: React.FC<LandingFAQProps> = ({
                             key={item.question}
                             {...item}
                             isOpen={openIndex === idx}
-                            onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
+                            onClick={() => handleToggle(idx)}
                         />
                     ))}
                 </div>

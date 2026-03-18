@@ -48,7 +48,7 @@ const FAQ: React.FC = () => {
                   >
                     <button 
                       onClick={() => toggleAccordion(idx)}
-                      className="w-full flex items-center justify-between p-5 md:p-6 text-left focus:outline-none"
+                      className="w-full flex items-center justify-between p-5 md:p-6 text-left focus:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-fun-blue/50"
                       aria-expanded={isOpen}
                     >
                       <span className={`font-heading font-bold text-lg md:text-xl pr-4 leading-tight ${isOpen ? 'text-fun-blue' : 'text-fun-dark'}`}>
