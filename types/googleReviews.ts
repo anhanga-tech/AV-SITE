@@ -11,6 +11,7 @@ export interface GoogleBusinessReview {
   text: string;
   rating: number;
   publishedAt: string;
+  destination?: string;
   profilePhotoUrl?: string;
   reviewUrl?: string;
 }
@@ -25,6 +26,8 @@ export interface GoogleBusinessReviewsSnapshotV1 {
 
 export interface HomeRealReview extends GoogleBusinessReview {
   initials: string;
+  destinationLabel: string;
+  avatarUrl: string;
 }
 
 export interface HomeFallbackStory {
@@ -32,6 +35,8 @@ export interface HomeFallbackStory {
   name: string;
   destination: string;
   text: string;
+  avatarUrl: string;
+  publishedAt: string;
 }
 
 export interface ValidRealSnapshotResult {

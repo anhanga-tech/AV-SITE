@@ -15,6 +15,7 @@
       "text": "Desde o primeiro contato, senti um acolhimento e atendimento diferente e especial.",
       "rating": 5,
       "publishedAt": "2025-12-15",
+      "destination": "Finlandia",
       "reviewUrl": "https://google.com/maps"
     },
     {
@@ -22,21 +23,24 @@
       "authorName": "Rafa & Gabi",
       "text": "Chegamos no hotel e havia uma surpresa. Atendimento impecável do início ao fim.",
       "rating": 5,
-      "publishedAt": "2025-11-20"
+      "publishedAt": "2025-11-20",
+      "destination": "Paraty"
     },
     {
       "id": "review-3",
       "authorName": "William S.",
       "text": "Viagem mais tranquila da vida. Trens, hotéis, tudo organizado perfeitamente.",
       "rating": 5,
-      "publishedAt": "2025-10-10"
+      "publishedAt": "2025-10-10",
+      "destination": "Alemanha"
     },
     {
       "id": "review-4",
       "authorName": "Camila R.",
       "text": "A curadoria foi muito certeira e a viagem fluiu sem estresse.",
       "rating": 4,
-      "publishedAt": "2025-09-03"
+      "publishedAt": "2025-09-03",
+      "destination": "Maragogi"
     }
   ]
 }

@@ -25,6 +25,7 @@ const validSnapshot = {
       text: 'Desde o primeiro contato, senti um acolhimento e atendimento diferente e especial.',
       rating: 5,
       publishedAt: '2025-12-15',
+      destination: 'Finlandia',
       reviewUrl: 'https://example.com/review-1',
     },
     {
@@ -33,6 +34,7 @@ const validSnapshot = {
       text: 'Chegamos no hotel e havia uma surpresa. Atendimento impecável do início ao fim.',
       rating: 5,
       publishedAt: '2025-11-20',
+      destination: 'Paraty',
     },
     {
       id: 'review-3',
@@ -40,6 +42,7 @@ const validSnapshot = {
       text: 'Viagem mais tranquila da vida. Trens, hotéis, tudo organizado perfeitamente.',
       rating: 5,
       publishedAt: '2025-10-10',
+      destination: 'Alemanha',
     },
     {
       id: 'review-4',
@@ -47,6 +50,7 @@ const validSnapshot = {
       text: 'A curadoria foi muito certeira e a viagem fluiu sem estresse.',
       rating: 4,
       publishedAt: '2025-09-03',
+      destination: 'Maragogi',
     },
   ],
 };
@@ -126,6 +130,44 @@ test('getHomeTestimonialsViewModelFromSnapshot should fall back to editorial mod
 
   assert.equal(model.mode, 'fallback');
   assert.equal(model.source, 'editorial-fallback');
+});
+
+test('getHomeTestimonialsViewModelFromSnapshot should map real Google reviews into the legacy mural presentation fields', () => {
+  const model = getHomeTestimonialsViewModelFromSnapshot(validSnapshot);
+
+  assert.equal(model.mode, 'real');
+  assert.deepEqual(
+    model.displayedReviews.map((review) => ({
+      id: review.id,
+      name: review.authorName,
+      destinationLabel: (review as { destinationLabel?: string }).destinationLabel,
+      avatarUrl: (review as { avatarUrl?: string }).avatarUrl,
+      publishedAt: review.publishedAt,
+    })),
+    [
+      {
+        id: 'review-1',
+        name: 'Daryw M.',
+        destinationLabel: 'Finlandia',
+        avatarUrl: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Daryw%20M.&backgroundColor=b6e3f4',
+        publishedAt: '2025-12-15',
+      },
+      {
+        id: 'review-2',
+        name: 'Rafa & Gabi',
+        destinationLabel: 'Paraty',
+        avatarUrl: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Rafa%20%26%20Gabi&backgroundColor=ffdfbf',
+        publishedAt: '2025-11-20',
+      },
+      {
+        id: 'review-3',
+        name: 'William S.',
+        destinationLabel: 'Alemanha',
+        avatarUrl: 'https://api.dicebear.com/9.x/adventurer/svg?seed=William%20S.&backgroundColor=c0aede',
+        publishedAt: '2025-10-10',
+      },
+    ],
+  );
 });
 
 test('shouldEmitHomeAggregateRating should emit only for valid Home reviews that match the rendered DOM', () => {

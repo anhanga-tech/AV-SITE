@@ -35,9 +35,17 @@ test('Home prerender should include real reviews, coherent aggregate rating, and
 
   assert.match(html, /id="depoimentos"/);
   assert.match(html, /data-review-mode="real"/);
+  assert.match(html, /Love Notes/);
+  assert.match(html, /Mural do Amor/);
+  assert.match(html, /Depoimentos reais de quem viajou com a gente/);
   assert.match(html, /Daryw M\./);
   assert.match(html, /Rafa &amp; Gabi|Rafa & Gabi/);
   assert.match(html, /William S\./);
+  assert.match(html, /Cliente Real/);
+  assert.match(html, /Ir para depoimento 1/);
+  assert.match(html, /Ir para depoimento 2/);
+  assert.match(html, /Ir para depoimento 3/);
+  assert.match(html, /Viajou para/);
   assert.doesNotMatch(html, /<section id="depoimentos"[^>]*aria-hidden="true"[^>]*><\/section>/);
   assert.match(html, /"aggregateRating":\{"@type":"AggregateRating","ratingValue":"?4\.9"?,"reviewCount":"?27"?/);
 });

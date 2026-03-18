@@ -10,6 +10,8 @@ import type {
 } from '../types/googleReviews';
 
 export const HOME_REAL_REVIEW_LIMIT = 3;
+const AVATAR_BACKGROUND_COLORS = ['b6e3f4', 'ffdfbf', 'c0aede'];
+const DEFAULT_DESTINATION_LABEL = 'Google';
 
 const FALLBACK_HOME_STORIES: HomeFallbackStory[] = [
   {
@@ -17,18 +19,24 @@ const FALLBACK_HOME_STORIES: HomeFallbackStory[] = [
     name: 'Daryw M.',
     destination: 'Finlandia',
     text: 'Desde o primeiro contato, senti um acolhimento e atendimento diferente e especial.',
+    avatarUrl: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Daryw&backgroundColor=b6e3f4',
+    publishedAt: '2025-12-15',
   },
   {
     id: 'fallback-2',
     name: 'Rafa & Gabi',
     destination: 'Paraty',
     text: 'Chegamos no hotel e havia uma surpresa. Atendimento impecavel do inicio ao fim.',
+    avatarUrl: 'https://api.dicebear.com/9.x/adventurer/svg?seed=CarlosFer&backgroundColor=ffdfbf',
+    publishedAt: '2025-11-20',
   },
   {
     id: 'fallback-3',
     name: 'William S.',
     destination: 'Alemanha',
     text: 'Viagem mais tranquila da vida. Trens, hoteis, tudo organizado perfeitamente.',
+    avatarUrl: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Roberto&backgroundColor=c0aede',
+    publishedAt: '2025-10-10',
   },
 ];
 
@@ -54,9 +62,17 @@ const buildInitials = (authorName: string): string =>
     .map((part) => part[0]?.toUpperCase() ?? '')
     .join('');
 
-const normalizeReview = (review: GoogleBusinessReview): HomeRealReview => ({
+const getAvatarBackgroundColor = (index: number): string =>
+  AVATAR_BACKGROUND_COLORS[index % AVATAR_BACKGROUND_COLORS.length];
+
+const buildAvatarUrl = (authorName: string, index: number): string =>
+  `https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(authorName)}&backgroundColor=${getAvatarBackgroundColor(index)}`;
+
+const normalizeReview = (review: GoogleBusinessReview, index: number): HomeRealReview => ({
   ...review,
   initials: buildInitials(review.authorName),
+  destinationLabel: review.destination ?? DEFAULT_DESTINATION_LABEL,
+  avatarUrl: review.profilePhotoUrl ?? buildAvatarUrl(review.authorName, index),
 });
 
 function parseAggregateRating(
@@ -130,8 +146,10 @@ function parseReview(
   const text = value.text;
   const rating = value.rating;
   const publishedAt = value.publishedAt;
+  const destination = value.destination;
   const profilePhotoUrl = value.profilePhotoUrl;
   const reviewUrl = value.reviewUrl;
+  const normalizedDestination = typeof destination === 'string' ? destination.trim() : undefined;
   const normalizedProfilePhotoUrl = typeof profilePhotoUrl === 'string' ? profilePhotoUrl : undefined;
   const normalizedReviewUrl = typeof reviewUrl === 'string' ? reviewUrl : undefined;
 
@@ -153,6 +171,13 @@ function parseReview(
 
   if (!isValidIsoDate(publishedAt)) {
     errors.push(`reviews[${index}].publishedAt must be a valid date`);
+  }
+
+  if (
+    destination !== undefined &&
+    (typeof destination !== 'string' || normalizedDestination?.length === 0)
+  ) {
+    errors.push(`reviews[${index}].destination must be a non-empty string when provided`);
   }
 
   if (
@@ -186,6 +211,7 @@ function parseReview(
     text: text.trim(),
     rating,
     publishedAt,
+    destination: normalizedDestination,
     profilePhotoUrl: normalizedProfilePhotoUrl,
     reviewUrl: normalizedReviewUrl,
   };
