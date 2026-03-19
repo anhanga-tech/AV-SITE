@@ -200,7 +200,6 @@ const BlogPost: React.FC = () => {
                                         prose-strong:text-brand-dark prose-strong:font-black
                                         prose-ul:list-disc prose-ul:pl-6 prose-ul:marker:text-brand-yellow
                                         prose-li:font-serif prose-li:text-gray-600
-                                        prose-img:rounded-3xl prose-img:shadow-lg prose-img:my-10 prose-img:w-full
                                         prose-blockquote:border-l-4 prose-blockquote:border-brand-yellow prose-blockquote:bg-yellow-50 prose-blockquote:py-4 prose-blockquote:px-8 prose-blockquote:rounded-r-2xl prose-blockquote:not-italic prose-blockquote:font-serif prose-blockquote:text-gray-700
                                         first-letter:text-5xl first-letter:font-black first-letter:text-brand-dark first-letter:mr-3 first-letter:float-left first-letter:leading-[0.8]
                                     ">
