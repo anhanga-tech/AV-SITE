@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { MDXProvider } from '@mdx-js/react';
 import { BLOG_POSTS, AUTHORS } from '../data/blogData';
 import Calendar from 'lucide-react/dist/esm/icons/calendar';
 import User from 'lucide-react/dist/esm/icons/user';
@@ -14,15 +15,37 @@ import { ArticleSchema } from '../components/schemas/ArticleSchema';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { PersonSchema } from '../components/schemas/PersonSchema';
 import { SocialShare } from '../components/SocialShare';
-import DOMPurify from 'dompurify';
 import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 import { openAiChat } from '../utils/aiChat';
+import { mdxComponents } from '../components/blog/mdxComponents';
+
+// import.meta.glob deve ficar no nível do módulo para o Vite processar em build time
+const mdxModuleMap = import.meta.glob<{ default: React.ComponentType }>(
+    '/content/blog/*.mdx'
+);
+
+// Cache de lazy components por slug para evitar re-criação a cada render
+const lazyComponentCache: Record<
+    string,
+    React.LazyExoticComponent<React.ComponentType>
+> = {};
+
+function getMdxComponent(
+    slug: string
+): React.LazyExoticComponent<React.ComponentType> | null {
+    const key = `/content/blog/${slug}.mdx`;
+    const importFn = mdxModuleMap[key];
+    if (!importFn) return null;
+    if (!lazyComponentCache[slug]) {
+        lazyComponentCache[slug] = React.lazy(importFn);
+    }
+    return lazyComponentCache[slug];
+}
 
 const BlogPost: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
     const post = BLOG_POSTS.find(p => p.slug === slug);
     const author = post?.authorId ? AUTHORS[post.authorId] : null;
-    const contentRef = React.useRef<HTMLDivElement>(null);
 
     // Validate slug to avoid propagating arbitrary user input into structured data
     const isValidSlug = (value: unknown): value is string => {
@@ -32,38 +55,6 @@ const BlogPost: React.FC = () => {
     };
 
     const canonicalUrl = isValidSlug(slug) ? getBlogPostUrl(slug) : getBlogHomeUrl();
-
-    // Update WhatsApp links with tracking
-    useEffect(() => {
-        if (contentRef.current && post) {
-            const links = contentRef.current.querySelectorAll('a[href^="https://wa.me"]');
-            const cleanupFns: Array<() => void> = [];
-
-            links.forEach(link => {
-                const anchor = link as HTMLAnchorElement;
-                const url = new URL(anchor.href);
-                const currentText = url.searchParams.get('text');
-
-                // Construct message: use existing text or default to post title context
-                const message = currentText || `Olá! Li o post "${post.title}" e gostaria de planejar minha viagem.`;
-
-                // Update to trigger chatbot
-                const handleAnchorClick = (e: Event) => {
-                    e.preventDefault();
-                    openAiChat({ message });
-                };
-
-                anchor.addEventListener('click', handleAnchorClick);
-                anchor.href = "#";
-                anchor.classList.add('btn-whatsapp');
-                cleanupFns.push(() => anchor.removeEventListener('click', handleAnchorClick));
-            });
-
-            return () => {
-                cleanupFns.forEach((cleanup) => cleanup());
-            };
-        }
-    }, [post]);
 
     // Scroll to top on load
     useEffect(() => {
@@ -85,6 +76,8 @@ const BlogPost: React.FC = () => {
     const relatedPosts = BLOG_POSTS.filter(p => p.id !== post.id).slice(0, 2);
 
     const sameAs = author?.social ? (Object.values(author.social).filter(Boolean) as string[]) : [];
+
+    const MdxContent = getMdxComponent(slug!);
 
     return (
         <article className="min-h-screen bg-[#fffdf5]">
@@ -197,22 +190,36 @@ const BlogPost: React.FC = () => {
                                 />
                             </div>
 
-                            <div
-                                ref={contentRef}
-                                className="
-                                prose prose-lg md:prose-xl max-w-none 
-                                prose-headings:font-sans prose-headings:font-black prose-headings:tracking-tight prose-headings:text-brand-dark
-                                prose-p:font-serif prose-p:text-gray-600 prose-p:leading-8 prose-p:mb-6
-                                prose-a:text-brand-cyan prose-a:font-bold prose-a:no-underline prose-a:border-b-2 prose-a:border-brand-cyan/30 hover:prose-a:border-brand-cyan hover:prose-a:text-brand-cyanDark hover:prose-a:bg-brand-cyan/5 prose-a:transition-all
-                                prose-strong:text-brand-dark prose-strong:font-black
-                                prose-ul:list-disc prose-ul:pl-6 prose-ul:marker:text-brand-yellow
-                                prose-li:font-serif prose-li:text-gray-600
-                                prose-img:rounded-3xl prose-img:shadow-lg prose-img:my-10 prose-img:w-full
-                                prose-blockquote:border-l-4 prose-blockquote:border-brand-yellow prose-blockquote:bg-yellow-50 prose-blockquote:py-4 prose-blockquote:px-8 prose-blockquote:rounded-r-2xl prose-blockquote:not-italic prose-blockquote:font-serif prose-blockquote:text-gray-700
-                                first-letter:text-5xl first-letter:font-black first-letter:text-brand-dark first-letter:mr-3 first-letter:float-left first-letter:leading-[0.8]
-                            "
-                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content || `<p>${post.excerpt}</p><p>Conteúdo completo em breve...</p>`) }}
-                            />
+                            {MdxContent ? (
+                                <MDXProvider components={mdxComponents}>
+                                    <div className="
+                                        prose prose-lg md:prose-xl max-w-none
+                                        prose-headings:font-sans prose-headings:font-black prose-headings:tracking-tight prose-headings:text-brand-dark
+                                        prose-p:font-serif prose-p:text-gray-600 prose-p:leading-8 prose-p:mb-6
+                                        prose-a:text-brand-cyan prose-a:font-bold prose-a:no-underline prose-a:border-b-2 prose-a:border-brand-cyan/30 hover:prose-a:border-brand-cyan hover:prose-a:text-brand-cyanDark hover:prose-a:bg-brand-cyan/5 prose-a:transition-all
+                                        prose-strong:text-brand-dark prose-strong:font-black
+                                        prose-ul:list-disc prose-ul:pl-6 prose-ul:marker:text-brand-yellow
+                                        prose-li:font-serif prose-li:text-gray-600
+                                        prose-blockquote:border-l-4 prose-blockquote:border-brand-yellow prose-blockquote:bg-yellow-50 prose-blockquote:py-4 prose-blockquote:px-8 prose-blockquote:rounded-r-2xl prose-blockquote:not-italic prose-blockquote:font-serif prose-blockquote:text-gray-700
+                                        first-letter:text-5xl first-letter:font-black first-letter:text-brand-dark first-letter:mr-3 first-letter:float-left first-letter:leading-[0.8]
+                                    ">
+                                        <Suspense fallback={
+                                            <div className="animate-pulse space-y-4">
+                                                <div className="h-4 bg-gray-200 rounded w-3/4" />
+                                                <div className="h-4 bg-gray-200 rounded w-full" />
+                                                <div className="h-4 bg-gray-200 rounded w-5/6" />
+                                            </div>
+                                        }>
+                                            <MdxContent />
+                                        </Suspense>
+                                    </div>
+                                </MDXProvider>
+                            ) : (
+                                <div className="prose prose-lg md:prose-xl max-w-none prose-p:font-serif prose-p:text-gray-600 prose-p:leading-8">
+                                    <p>{post.excerpt}</p>
+                                    <p className="text-gray-400 italic">Conteúdo completo em breve…</p>
+                                </div>
+                            )}
 
                             <div className="mt-16 pt-10 border-t-2 border-dashed border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-6">
                                 <div className="flex items-center gap-2">
