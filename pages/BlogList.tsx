@@ -63,9 +63,25 @@ const BlogList: React.FC = () => {
                     <h1 className="text-4xl md:text-6xl font-black text-brand-dark mb-6">
                         Diário de <span className="text-brand-cyan">Bordo</span>
                     </h1>
-                    <p className="text-xl text-gray-500 font-medium">
+                    <p className="text-xl text-gray-500 font-medium mb-8">
                         Explore nosso acervo completo de dicas, roteiros e segredos de viagem.
                     </p>
+
+                    <div className="flex justify-center mb-10">
+                        <button
+                            onClick={(e) => {
+                                e.preventDefault();
+                                openAiChat({
+                                    message: 'Olá! Gostaria de solicitar um orçamento para minha próxima viagem.'
+                                });
+                            }}
+                            className="btn-whatsapp btn-specialist bg-brand-vibrant text-white px-8 py-4 rounded-2xl font-black text-lg shadow-xl shadow-brand-vibrant/20 hover:scale-105 transition-transform active:scale-95 flex items-center gap-3"
+                            data-tracking="hero-blog-list"
+                        >
+                            Planejar minha Viagem
+                            <ArrowRight className="w-5 h-5" />
+                        </button>
+                    </div>
 
                     {/* Search Bar */}
                     <div className="mt-8 relative max-w-lg mx-auto">
@@ -166,7 +182,8 @@ const BlogList: React.FC = () => {
                                 message: 'Olá! Vi o blog da Anhangá e gostaria de solicitar um orçamento personalizado.'
                             });
                         }}
-                        className="btn-whatsapp inline-flex items-center gap-3 bg-brand-dark text-white text-lg font-bold px-10 py-5 rounded-2xl shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
+                        className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-brand-dark text-white text-lg font-bold px-10 py-5 rounded-2xl shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
+                        data-tracking="footer-blog-list"
                     >
                         Solicitar Orçamento
                     </button>

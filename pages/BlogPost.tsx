@@ -254,6 +254,7 @@ const BlogPost: React.FC = () => {
                                         });
                                     }}
                                     className="btn-whatsapp btn-specialist block w-full py-4 bg-white border-2 border-brand-dark text-brand-dark font-black tracking-wide text-sm uppercase rounded-xl hover:bg-brand-dark hover:text-white transition-colors shadow-[4px_4px_0px_#0f172a] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] text-center"
+                                    data-tracking="sidebar-blog-post"
                                 >
                                     Falar com Especialista
                                 </button>
@@ -302,10 +303,11 @@ const BlogPost: React.FC = () => {
                         Transformamos essas inspirações em um roteiro real e exclusivo para você.
                     </p>
                     <a
-                        href={getWhatsAppLink(`Olá! Li o post "${post.title}" e gostaria de planejar minha viagem.`)}
+                        href={getWhatsAppLink(`Olá! Li o post "${post.title}" e gostaria de planejar minha viagem.`, { appendTrackingRef: true })}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-brand-cyan text-white text-lg font-bold px-10 py-5 rounded-2xl shadow-[4px_4px_0px_#ffffff20] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all relative z-10"
+                        data-tracking="footer-blog-post"
                     >
                         Conversar com um Especialista
                     </a>
