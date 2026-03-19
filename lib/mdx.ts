@@ -11,24 +11,24 @@ const postFiles = import.meta.glob('/content/blog/*.mdx', {
 }) as Record<string, string>;
 
 export type PostMeta = BlogPostFrontmatter & {
-  rawSlug: string;     // derivado do filename, ex: "dicas-disney-2026"
+  slug: string;        // derivado do filename, ex: "dicas-disney-2026"
   readingTime: string; // ex: "4 min de leitura"
 };
 
 export function getAllPosts(): PostMeta[] {
   return Object.entries(postFiles)
+    .filter(([filepath]) => !filepath.split('/').pop()?.startsWith('_')) // ignora _template e _rascunhos
     .map(([filepath, rawContent]) => {
       const { data, content } = matter(rawContent);
-      const rawSlug = filepath.split('/').pop()?.replace('.mdx', '') ?? '';
+      const slug = filepath.split('/').pop()?.replace('.mdx', '') ?? '';
       const rt = readingTime(content);
       return {
         ...(data as BlogPostFrontmatter),
-        rawSlug,
-        readingTime: rt.text.replace('read', 'de leitura'),
+        slug,
+        readingTime: `${Math.ceil(rt.minutes)} min de leitura`,
       };
     })
-    .filter(post => !post.rawSlug.startsWith('_')) // ignora _template e _rascunhos
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    .sort((a, b) => (a.date < b.date ? 1 : -1)); // ISO 8601 ordena corretamente como string
 }
 
 export function getPostBySlug(slug: string): string | null {
