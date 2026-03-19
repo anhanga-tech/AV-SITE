@@ -68,7 +68,8 @@ const MelhorIdadeLanding: React.FC = () => {
           </Link>
           <button 
             onClick={() => openAiChat({ message: 'Olá! Gostaria de saber mais sobre roteiros para a melhor idade.' })}
-            className="text-xs font-black uppercase tracking-widest bg-brand-dark text-white px-4 py-2 rounded-full hover:bg-brand-cyan transition-colors focus:outline-dashed focus:outline-2 focus:outline-offset-2 focus:outline-brand-cyan"
+            className="btn-whatsapp btn-specialist text-xs font-black uppercase tracking-widest bg-brand-dark text-white px-4 py-2 rounded-full hover:bg-brand-cyan transition-colors focus:outline-dashed focus:outline-2 focus:outline-offset-2 focus:outline-brand-cyan"
+            data-tracking="header-melhor-idade"
           >
             Falar com Especialista
           </button>
@@ -113,7 +114,8 @@ const MelhorIdadeLanding: React.FC = () => {
             >
               <button
                 onClick={() => openAiChat({ message: 'Olá! Quero planejar uma viagem personalizada para o público 50+.' })}
-                className="bg-brand-vibrant text-white px-8 py-4 rounded-2xl font-black text-lg shadow-xl shadow-brand-vibrant/20 hover:scale-105 transition-transform flex items-center gap-3 focus:outline-dashed focus:outline-2 focus:outline-offset-2 focus:outline-brand-vibrant"
+                className="btn-whatsapp btn-specialist bg-brand-vibrant text-white px-8 py-4 rounded-2xl font-black text-lg shadow-xl shadow-brand-vibrant/20 hover:scale-105 transition-transform flex items-center gap-3 focus:outline-dashed focus:outline-2 focus:outline-offset-2 focus:outline-brand-vibrant"
+                data-tracking="hero-melhor-idade"
               >
                 Solicitar Orçamento
                 <Sparkles className="w-5 h-5" />
@@ -206,7 +208,8 @@ const MelhorIdadeLanding: React.FC = () => {
           </p>
           <button
             onClick={() => openAiChat({ message: 'Olá! Sou do público 50+ e gostaria de um orçamento para minha próxima viagem.' })}
-            className="bg-brand-cyan text-white px-10 py-5 rounded-2xl font-black text-xl shadow-2xl shadow-brand-cyan/20 hover:scale-105 transition-transform relative z-10 focus:outline-dashed focus:outline-2 focus:outline-offset-2 focus:outline-white"
+            className="btn-whatsapp btn-specialist bg-brand-cyan text-white px-10 py-5 rounded-2xl font-black text-xl shadow-2xl shadow-brand-cyan/20 hover:scale-105 transition-transform relative z-10 focus:outline-dashed focus:outline-2 focus:outline-offset-2 focus:outline-white"
+            data-tracking="footer-melhor-idade"
           >
             Falar com um Consultor
           </button>

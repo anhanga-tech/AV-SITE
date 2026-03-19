@@ -5,6 +5,7 @@ import { SEO } from '../components/SEO';
 import { OrganizationSchema } from '../components/schemas/OrganizationSchema';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { LazyImage } from '../components/ui/LazyImage';
+import { openAiChat } from '../utils/aiChat';
 import ShieldCheck from 'lucide-react/dist/esm/icons/shield-check';
 import Award from 'lucide-react/dist/esm/icons/award';
 import Users from 'lucide-react/dist/esm/icons/users';
@@ -78,9 +79,19 @@ const About: React.FC = () => {
               design e zero estresse.
             </span>
           </h1>
-          <p className="max-w-2xl mx-auto text-gray-600 text-lg md:text-xl font-medium leading-relaxed">
+          <p className="max-w-2xl mx-auto text-gray-600 text-lg md:text-xl font-medium leading-relaxed mb-8">
             Na Anhangá Viagens, acreditamos que viajar é mais do que carimbar um passaporte — é sobre colecionar histórias que valem a pena ser contadas.
           </p>
+          <div className="flex justify-center">
+            <button
+              onClick={() => openAiChat({ message: "Olá! Gostaria de conversar sobre um roteiro personalizado." })}
+              className="btn-whatsapp btn-specialist bg-brand-vibrant text-white px-8 py-4 rounded-2xl font-black text-lg shadow-xl shadow-brand-vibrant/20 hover:scale-105 transition-transform active:scale-95 flex items-center gap-3"
+              data-tracking="hero-about"
+            >
+              Solicitar Orçamento
+              <Sparkles className="w-5 h-5" />
+            </button>
+          </div>
         </motion.section>
 
         {/* HISTORIA SECTION */}
@@ -274,12 +285,9 @@ const About: React.FC = () => {
               Seja para um festival épico ou um refúgio relaxante, nós desenhamos a viagem perfeita para você.
             </p>
             <button
-              onClick={() => {
-                window.dispatchEvent(new CustomEvent('toggle-ai-chat', {
-                  detail: { message: "Olá! Gostaria de conversar sobre um roteiro personalizado." }
-                }));
-              }}
-              className="bg-brand-vibrant text-white px-10 py-5 rounded-2xl font-black text-lg shadow-xl shadow-brand-vibrant/20 hover:scale-105 transition-transform active:scale-95 flex items-center gap-3 mx-auto"
+              onClick={() => openAiChat({ message: "Olá! Gostaria de conversar sobre um roteiro personalizado." })}
+              className="btn-whatsapp btn-specialist bg-brand-vibrant text-white px-10 py-5 rounded-2xl font-black text-lg shadow-xl shadow-brand-vibrant/20 hover:scale-105 transition-transform active:scale-95 flex items-center gap-3 mx-auto"
+              data-tracking="footer-about"
             >
               Começar Planejamento
               <Sparkles className="w-5 h-5" />

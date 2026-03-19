@@ -25,7 +25,7 @@ export function WhatsAppCTALinkMobile() {
 
     // O link é calculado em cada renderização
     // Como getWhatsAppLink é síncrona, o link sempre estará pronto antes do clique
-    const whatsappUrl = getWhatsAppLink(WHATSAPP_MESSAGE);
+    const whatsappUrl = getWhatsAppLink(WHATSAPP_MESSAGE, { appendTrackingRef: true });
 
     return (
         <a
@@ -57,7 +57,7 @@ export function WhatsAppCTALinkMobile() {
  */
 export function WhatsAppCTAById() {
     const gaClientId = useGAClientId();
-    const whatsappUrl = getWhatsAppLink(WHATSAPP_MESSAGE);
+    const whatsappUrl = getWhatsAppLink(WHATSAPP_MESSAGE, { appendTrackingRef: true });
 
     return (
         <a
@@ -90,7 +90,7 @@ export function WhatsAppCTAById() {
 export function WhatsAppCTAVisualLoading() {
     const [isLoading, setIsLoading] = React.useState(false);
     const gaClientId = useGAClientId();
-    const whatsappUrl = getWhatsAppLink(WHATSAPP_MESSAGE);
+    const whatsappUrl = getWhatsAppLink(WHATSAPP_MESSAGE, { appendTrackingRef: true });
 
     const handleClick = () => {
         // Ativamos o loading apenas como feedback visual instantâneo
