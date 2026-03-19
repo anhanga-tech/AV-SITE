@@ -3,6 +3,8 @@ import path from 'path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
+import mdx from '@mdx-js/rollup';
+import remarkGfm from 'remark-gfm';
 import { DEFAULT_GEMINI_MODEL } from './lib/ai/constants.ts';
 
 type ApiHandler = (request: Request) => Promise<Response> | Response;
@@ -147,7 +149,17 @@ export default defineConfig(({ mode, isSsrBuild }) => {
       port: 3000,
       host: '0.0.0.0',
     },
-    plugins: [react(), apiDevPlugin()],
+    plugins: [
+      {
+        enforce: 'pre',
+        ...mdx({
+          providerImportSource: '@mdx-js/react',
+          remarkPlugins: [remarkGfm],
+        }),
+      },
+      react({ include: /\.(jsx|tsx|mdx)$/ }),
+      apiDevPlugin(),
+    ],
     define: {
       'process.env.GEMINI_MODEL': JSON.stringify(geminiModel)
     },
