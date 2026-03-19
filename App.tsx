@@ -22,6 +22,7 @@ const BetoCarreroLanding = lazy(() => import('./pages/landings/BetoCarreroLandin
 const LollapaloozaLanding = lazy(() => import('./pages/landings/LollapaloozaLanding'));
 const OrlandoLanding = lazy(() => import('./pages/landings/OrlandoLanding'));
 const MelhorIdadeLanding = lazy(() => import('./pages/landings/MelhorIdadeLanding'));
+const KeystaticPage = lazy(() => import('./pages/KeystaticPage'));
 
 const MainRouteFallback: React.FC = () => <section className="min-h-[40vh] bg-white" aria-hidden="true" />;
 const LandingRouteFallback: React.FC = () => <div className="min-h-screen bg-white" aria-hidden="true" />;
@@ -57,6 +58,8 @@ const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClient
       <ScrollToTop />
       <Suspense fallback={<LandingRouteFallback />}>
         <Routes>
+          {/* Admin Keystatic — fora do layout principal, antes de todas as outras rotas */}
+          <Route path="/keystatic/*" element={<KeystaticPage />} />
           <Route path="/beto-carrero" element={<BetoCarreroLanding />} />
           <Route path="/lollapalooza" element={<LollapaloozaLanding />} />
           <Route path="/lollapalooza-2026" element={<Navigate to="/lollapalooza" replace />} />

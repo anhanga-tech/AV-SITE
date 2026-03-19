@@ -5,8 +5,8 @@ export default config({
   storage: {
     kind: 'github',
     repo: {
-      owner: 'SEU_GITHUB_OWNER', // TODO: substituir antes do deploy (FEL-99)
-      name: 'SEU_REPO_NAME',     // TODO: substituir antes do deploy (FEL-99)
+      owner: 'felipewilliam2',
+      name: 'AV-SITE',
     },
   },
 
