@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, memo, useCallback } from 'react';
 import Search from 'lucide-react/dist/esm/icons/search';
 import MapPin from 'lucide-react/dist/esm/icons/map-pin';
 import ChevronDown from 'lucide-react/dist/esm/icons/chevron-down';
@@ -150,7 +150,7 @@ interface DestinationFieldProps {
   onSelect: (destination: DestinationOption) => void;
 }
 
-const DestinationField: React.FC<DestinationFieldProps> = ({
+const DestinationField = memo(({
   destRef,
   inputValue,
   showDestSuggestions,
@@ -158,7 +158,7 @@ const DestinationField: React.FC<DestinationFieldProps> = ({
   onChange,
   onFocus,
   onSelect,
-}) => {
+}: DestinationFieldProps) => {
   const hasSuggestions = filteredDestinations.length > 0;
   const shouldShowEmptyState = showDestSuggestions && inputValue.length > 1 && !hasSuggestions;
 
@@ -211,7 +211,8 @@ const DestinationField: React.FC<DestinationFieldProps> = ({
       )}
     </div>
   );
-};
+});
+DestinationField.displayName = 'DestinationField';
 
 interface DateFieldProps {
   calendarRef: React.RefObject<HTMLDivElement | null>;
@@ -228,7 +229,7 @@ interface DateFieldProps {
   isDateInRange: (date: Date) => boolean;
 }
 
-const DateField: React.FC<DateFieldProps> = ({
+const DateField = memo(({
   calendarRef,
   showCalendar,
   startDate,
@@ -241,7 +242,7 @@ const DateField: React.FC<DateFieldProps> = ({
   onDateClick,
   isDateSelected,
   isDateInRange,
-}) => (
+}: DateFieldProps) => (
   <div className="w-full md:flex-1 relative group" ref={calendarRef}>
     <button
       type="button"
@@ -308,7 +309,8 @@ const DateField: React.FC<DateFieldProps> = ({
       </div>
     )}
   </div>
-);
+));
+DateField.displayName = 'DateField';
 
 interface GuestsFieldProps {
   guestDropdownRef: React.RefObject<HTMLDivElement | null>;
@@ -324,7 +326,7 @@ interface GuestsFieldProps {
   onClose: () => void;
 }
 
-const GuestsField: React.FC<GuestsFieldProps> = ({
+const GuestsField = memo(({
   guestDropdownRef,
   showGuestDropdown,
   guestSummary,
@@ -336,7 +338,7 @@ const GuestsField: React.FC<GuestsFieldProps> = ({
   onChildCountChange,
   onChildAgeChange,
   onClose,
-}) => (
+}: GuestsFieldProps) => (
   <div className="w-full md:flex-1 relative group" ref={guestDropdownRef}>
     <button
       type="button"
@@ -427,7 +429,8 @@ const GuestsField: React.FC<GuestsFieldProps> = ({
       </div>
     )}
   </div>
-);
+));
+GuestsField.displayName = 'GuestsField';
 
 interface TripTypeFieldProps {
   tripTypeRef: React.RefObject<HTMLDivElement | null>;
@@ -438,14 +441,14 @@ interface TripTypeFieldProps {
   onSelect: (label: string) => void;
 }
 
-const TripTypeField: React.FC<TripTypeFieldProps> = ({
+const TripTypeField = memo(({
   tripTypeRef,
   showTripTypeDropdown,
   tripType,
   selectedTripObj,
   onToggle,
   onSelect,
-}) => (
+}: TripTypeFieldProps) => (
   <div className="w-full md:flex-1 relative group" ref={tripTypeRef}>
     <button
       type="button"
@@ -494,7 +497,8 @@ const TripTypeField: React.FC<TripTypeFieldProps> = ({
       </div>
     )}
   </div>
-);
+));
+TripTypeField.displayName = 'TripTypeField';
 
 interface BudgetFieldProps {
   budgetRef: React.RefObject<HTMLDivElement | null>;
@@ -505,14 +509,14 @@ interface BudgetFieldProps {
   onSelect: (label: string) => void;
 }
 
-const BudgetField: React.FC<BudgetFieldProps> = ({
+const BudgetField = memo(({
   budgetRef,
   showBudgetDropdown,
   budget,
   selectedBudgetObj,
   onToggle,
   onSelect,
-}) => (
+}: BudgetFieldProps) => (
   <div className="w-full md:flex-1 relative group" ref={budgetRef}>
     <button
       type="button"
@@ -573,13 +577,14 @@ const BudgetField: React.FC<BudgetFieldProps> = ({
       </div>
     )}
   </div>
-);
+));
+BudgetField.displayName = 'BudgetField';
 
 interface SearchButtonProps {
   isSearchLoading: boolean;
 }
 
-const SearchButton: React.FC<SearchButtonProps> = ({ isSearchLoading }) => (
+const SearchButton = memo(({ isSearchLoading }: SearchButtonProps) => (
   <div className="p-2 w-full md:w-auto flex-shrink-0">
     <button
       type="submit"
@@ -598,9 +603,10 @@ const SearchButton: React.FC<SearchButtonProps> = ({ isSearchLoading }) => (
       )}
     </button>
   </div>
-);
+));
+SearchButton.displayName = 'SearchButton';
 
-const SearchForm: React.FC<SearchFormProps> = ({ onDestinationMatch }) => {
+const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
   const [inputValue, setInputValue] = useState('');
   const [showDestSuggestions, setShowDestSuggestions] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -653,7 +659,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ onDestinationMatch }) => {
   const selectedTripObj = useMemo(() => TRIP_OPTIONS.find((option) => option.label === tripType), [tripType]);
   const selectedBudgetObj = useMemo(() => BUDGET_TIERS.find((tier) => tier.label === budget), [budget]);
 
-  const handleDestinationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDestinationChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setInputValue(value);
     setShowDestSuggestions(true);
@@ -664,15 +670,15 @@ const SearchForm: React.FC<SearchFormProps> = ({ onDestinationMatch }) => {
     ));
 
     onDestinationMatch(exactMatch ? exactMatch.city : null);
-  };
+  }, [onDestinationMatch]);
 
-  const handleDestinationSelect = (destination: DestinationOption) => {
+  const handleDestinationSelect = useCallback((destination: DestinationOption) => {
     setInputValue(destination.label);
     onDestinationMatch(destination.city);
     setShowDestSuggestions(false);
-  };
+  }, [onDestinationMatch]);
 
-  const handleChildCountChange = (operation: 'add' | 'remove') => {
+  const handleChildCountChange = useCallback((operation: 'add' | 'remove') => {
     if (operation === 'add') {
       setChildren((previous) => previous + 1);
       setChildAges((previous) => [...previous, '']);
@@ -681,17 +687,17 @@ const SearchForm: React.FC<SearchFormProps> = ({ onDestinationMatch }) => {
 
     setChildren((previous) => (previous > 0 ? previous - 1 : 0));
     setChildAges((previous) => (previous.length > 0 ? previous.slice(0, -1) : []));
-  };
+  }, []);
 
-  const handleChildAgeChange = (index: number, value: string) => {
+  const handleChildAgeChange = useCallback((index: number, value: string) => {
     setChildAges((previous) => {
       const nextAges = [...previous];
       nextAges[index] = value;
       return nextAges;
     });
-  };
+  }, []);
 
-  const handleDateClick = (date: Date) => {
+  const handleDateClick = useCallback((date: Date) => {
     if (isDateInPast(date)) return;
 
     if (!startDate || endDate) {
@@ -708,35 +714,37 @@ const SearchForm: React.FC<SearchFormProps> = ({ onDestinationMatch }) => {
 
     setEndDate(date);
     setShowCalendar(false);
-  };
+  }, [startDate, endDate]);
 
-  const isDateSelected = (date: Date) => {
+  const isDateSelected = useCallback((date: Date) => {
     if (!startDate) return false;
     if (startDate.toDateString() === date.toDateString()) return true;
     return !!endDate && endDate.toDateString() === date.toDateString();
-  };
+  }, [startDate, endDate]);
 
-  const isDateInRange = (date: Date) => {
+  const isDateInRange = useCallback((date: Date) => {
     if (!startDate || !endDate) return false;
     return date > startDate && date < endDate;
-  };
+  }, [startDate, endDate]);
 
-  const handleMonthChange = (offset: number) => {
-    const nextMonth = new Date(currentMonth);
-    nextMonth.setMonth(nextMonth.getMonth() + offset);
+  const handleMonthChange = useCallback((offset: number) => {
+    setCurrentMonth((prevMonth) => {
+        const nextMonth = new Date(prevMonth);
+        nextMonth.setMonth(nextMonth.getMonth() + offset);
 
-    const today = new Date();
-    const nextYear = nextMonth.getFullYear();
-    const nextMonthIndex = nextMonth.getMonth();
-    const currentYear = today.getFullYear();
-    const currentMonthIndex = today.getMonth();
+        const today = new Date();
+        const nextYear = nextMonth.getFullYear();
+        const nextMonthIndex = nextMonth.getMonth();
+        const currentYear = today.getFullYear();
+        const currentMonthIndex = today.getMonth();
 
-    if (nextYear < currentYear || (nextYear === currentYear && nextMonthIndex < currentMonthIndex)) {
-      return;
-    }
+        if (nextYear < currentYear || (nextYear === currentYear && nextMonthIndex < currentMonthIndex)) {
+            return prevMonth;
+        }
 
-    setCurrentMonth(nextMonth);
-  };
+        return nextMonth;
+    });
+  }, []);
 
   const canGoToPreviousMonth = useMemo(() => {
     const today = new Date();
@@ -744,17 +752,17 @@ const SearchForm: React.FC<SearchFormProps> = ({ onDestinationMatch }) => {
       || (currentMonth.getFullYear() === today.getFullYear() && currentMonth.getMonth() > today.getMonth());
   }, [currentMonth]);
 
-  const handleTripTypeSelect = (label: string) => {
+  const handleTripTypeSelect = useCallback((label: string) => {
     setTripType(label);
     setShowTripTypeDropdown(false);
-  };
+  }, []);
 
-  const handleBudgetSelect = (label: string) => {
+  const handleBudgetSelect = useCallback((label: string) => {
     setBudget(label);
     setShowBudgetDropdown(false);
-  };
+  }, []);
 
-  const handleSearch = () => {
+  const handleSearch = useCallback(() => {
     if (!inputValue.trim()) {
       alert("Por favor, informe o destino.");
       return;
@@ -783,12 +791,19 @@ const SearchForm: React.FC<SearchFormProps> = ({ onDestinationMatch }) => {
     setTimeout(() => {
       setIsSearchLoading(false);
     }, 1000);
-  };
+  }, [inputValue, startDate, endDate, adults, children, childAges, tripType, budget]);
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = useCallback((event: React.FormEvent) => {
     event.preventDefault();
     handleSearch();
-  };
+  }, [handleSearch]);
+
+  const toggleCalendar = useCallback(() => setShowCalendar((prev) => !prev), []);
+  const toggleGuestDropdown = useCallback(() => setShowGuestDropdown((prev) => !prev), []);
+  const closeGuestDropdown = useCallback(() => setShowGuestDropdown(false), []);
+  const toggleTripTypeDropdown = useCallback(() => setShowTripTypeDropdown((prev) => !prev), []);
+  const toggleBudgetDropdown = useCallback(() => setShowBudgetDropdown((prev) => !prev), []);
+  const onDestinationFocus = useCallback(() => setShowDestSuggestions(true), []);
 
   return (
     <form
@@ -802,7 +817,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ onDestinationMatch }) => {
           showDestSuggestions={showDestSuggestions}
           filteredDestinations={filteredDestinations}
           onChange={handleDestinationChange}
-          onFocus={() => setShowDestSuggestions(true)}
+          onFocus={onDestinationFocus}
           onSelect={handleDestinationSelect}
         />
         <DateField
@@ -813,7 +828,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ onDestinationMatch }) => {
           currentMonth={currentMonth}
           calendarDays={calendarDays}
           canGoToPreviousMonth={canGoToPreviousMonth}
-          onToggle={() => setShowCalendar((previous) => !previous)}
+          onToggle={toggleCalendar}
           onChangeMonth={handleMonthChange}
           onDateClick={handleDateClick}
           isDateSelected={isDateSelected}
@@ -826,11 +841,11 @@ const SearchForm: React.FC<SearchFormProps> = ({ onDestinationMatch }) => {
           adults={adults}
           children={children}
           childAges={childAges}
-          onToggle={() => setShowGuestDropdown((previous) => !previous)}
+          onToggle={toggleGuestDropdown}
           onAdultsChange={setAdults}
           onChildCountChange={handleChildCountChange}
           onChildAgeChange={handleChildAgeChange}
-          onClose={() => setShowGuestDropdown(false)}
+          onClose={closeGuestDropdown}
         />
       </div>
 
@@ -845,7 +860,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ onDestinationMatch }) => {
           showTripTypeDropdown={showTripTypeDropdown}
           tripType={tripType}
           selectedTripObj={selectedTripObj}
-          onToggle={() => setShowTripTypeDropdown((previous) => !previous)}
+          onToggle={toggleTripTypeDropdown}
           onSelect={handleTripTypeSelect}
         />
         <BudgetField
@@ -853,13 +868,15 @@ const SearchForm: React.FC<SearchFormProps> = ({ onDestinationMatch }) => {
           showBudgetDropdown={showBudgetDropdown}
           budget={budget}
           selectedBudgetObj={selectedBudgetObj}
-          onToggle={() => setShowBudgetDropdown((previous) => !previous)}
+          onToggle={toggleBudgetDropdown}
           onSelect={handleBudgetSelect}
         />
         <SearchButton isSearchLoading={isSearchLoading} />
       </div>
     </form>
   );
-};
+});
+
+SearchForm.displayName = 'SearchForm';
 
 export default SearchForm;
