@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BLOG_POSTS } from '../data/blogData';
+import { getAllPosts } from '../lib/mdx';
+import { AUTHORS } from '../data/blogData';
 import User from 'lucide-react/dist/esm/icons/user';
 import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import Search from 'lucide-react/dist/esm/icons/search';
 import BookOpen from 'lucide-react/dist/esm/icons/book-open';
 import { SocialShare } from '../components/SocialShare';
-import { getBlogPostUrl } from '../utils/blog';
+import { getBlogPostUrl, getBlogHomeUrl } from '../utils/blog';
 import { optimizeRemoteImageUrl } from '../data/mediaConfig';
 import { SEO } from '../components/SEO';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
@@ -19,12 +20,25 @@ import { openAiChat } from '../utils/aiChat';
  * 1. Removed 'hoveredId' state which caused page re-renders on mouse over.
  * 2. Replaced with Tailwind 'group-hover' for CSS-native reactive styling.
  */
+const COLORS = [
+    'text-blue-700 bg-blue-50 border-blue-200',
+    'text-cyan-700 bg-cyan-50 border-cyan-200',
+    'text-yellow-700 bg-yellow-50 border-yellow-200',
+    'text-green-700 bg-green-50 border-green-200',
+    'text-purple-700 bg-purple-50 border-purple-200',
+    'text-rose-700 bg-rose-50 border-rose-200',
+];
+
+const allPosts = getAllPosts();
+
 const BlogList: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
 
-    const filteredPosts = BLOG_POSTS.filter(post =>
-        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.category.toLowerCase().includes(searchTerm.toLowerCase())
+    const term = searchTerm.toLowerCase();
+    const filteredPosts = allPosts.filter(post =>
+        post.title.toLowerCase().includes(term) ||
+        post.category.toLowerCase().includes(term) ||
+        post.tags.some(tag => tag.toLowerCase().includes(term))
     );
 
     return (
@@ -32,11 +46,11 @@ const BlogList: React.FC = () => {
             <SEO
                 title="Blog de Viagens e Dicas Práticas"
                 description="Dicas, roteiros e conteúdos para planejar viagens personalizadas com mais segurança, economia e experiência."
-                canonical="https://blog.anhanga.tur.br/"
+                canonical={getBlogHomeUrl()}
             />
             <BreadcrumbSchema items={[
                 { name: 'Home', item: 'https://www.anhanga.tur.br/' },
-                { name: 'Blog', item: 'https://blog.anhanga.tur.br/' }
+                { name: 'Blog', item: getBlogHomeUrl() }
             ]} />
             <div className="min-h-screen bg-[#fffdf5] pt-32 pb-24">
                 <div className="container mx-auto px-6">
@@ -71,10 +85,10 @@ const BlogList: React.FC = () => {
                 {/* Grid */}
                 {filteredPosts.length > 0 ? (
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filteredPosts.map((post) => (
+                        {filteredPosts.map((post, index) => (
                             <Link
                                 to={`/blog/${post.slug}`}
-                                key={post.id}
+                                key={post.slug}
                                 className={`
                                 group bg-white rounded-3xl p-5 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.05)] border border-gray-100
                                 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl
@@ -108,7 +122,7 @@ const BlogList: React.FC = () => {
                                 {/* Content */}
                                 <div className="flex-1 flex flex-col">
                                     <div className="mb-3">
-                                        <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md border ${post.color}`}>
+                                        <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md border ${COLORS[index % COLORS.length]}`}>
                                             {post.category}
                                         </span>
                                     </div>
@@ -121,7 +135,7 @@ const BlogList: React.FC = () => {
 
                                     <div className="pt-4 border-t border-dashed border-gray-100 flex items-center justify-between">
                                         <span className="text-xs font-bold text-gray-400 flex items-center gap-1">
-                                            <User className="w-3 h-3" /> {post.author}
+                                            <User className="w-3 h-3" /> {AUTHORS[post.author]?.name ?? post.author}
                                         </span>
                                         <span className="w-10 h-10 rounded-full flex items-center justify-center transition-colors bg-gray-100 text-gray-400 group-hover:bg-brand-cyan group-hover:text-white">
                                             <ArrowRight className="w-5 h-5" />

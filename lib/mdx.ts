@@ -10,7 +10,8 @@ const postFiles = import.meta.glob('/content/blog/*.mdx', {
   import: 'default',
 }) as Record<string, string>;
 
-export type PostMeta = BlogPostFrontmatter & {
+export type PostMeta = Omit<BlogPostFrontmatter, 'tags'> & {
+  tags: string[];      // normalizado: nunca undefined
   slug: string;        // derivado do filename, ex: "dicas-disney-2026"
   readingTime: string; // ex: "4 min de leitura"
 };
@@ -22,8 +23,10 @@ export function getAllPosts(): PostMeta[] {
       const { data, content } = matter(rawContent);
       const slug = filepath.split('/').pop()?.replace('.mdx', '') ?? '';
       const rt = readingTime(content);
+      const fm = data as BlogPostFrontmatter;
       return {
-        ...(data as BlogPostFrontmatter),
+        ...fm,
+        tags: fm.tags ?? [],
         slug,
         readingTime: `${Math.ceil(rt.minutes)} min de leitura`,
       };
