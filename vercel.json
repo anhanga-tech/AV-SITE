@@ -58,6 +58,10 @@
   ],
   "rewrites": [
     {
+      "source": "/api/keystatic/:path*",
+      "destination": "/api/keystatic/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
