@@ -40,10 +40,12 @@ for (const post of BLOG_POSTS) {
   // Limpa indentação de template literal
   const content = (post.content ?? '').trim().replace(/^ {4,12}/gm, '');
 
+  const escYaml = (s: string) => s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+
   const frontmatter = [
     '---',
-    `title: "${post.title.replace(/"/g, '\\"')}"`,
-    `excerpt: "${post.excerpt.replace(/"/g, '\\"')}"`,
+    `title: "${escYaml(post.title)}"`,
+    `excerpt: "${escYaml(post.excerpt)}"`,
     `date: "${date}"`,
     `author: "${author}"`,
     `category: "${post.category}"`,
