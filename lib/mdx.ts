@@ -1,6 +1,9 @@
 import matter from 'gray-matter';
-import readingTime from 'reading-time';
 import type { BlogPostFrontmatter } from '../types/blog';
+
+function calcReadingTime(text: string): number {
+  return Math.ceil(text.trim().split(/\s+/).length / 200);
+}
 
 // Vite glob — importa todos os MDX como string raw para extrair frontmatter
 // eager: true = processado em build time, não lazy
@@ -22,13 +25,12 @@ export function getAllPosts(): PostMeta[] {
     .map(([filepath, rawContent]) => {
       const { data, content } = matter(rawContent);
       const slug = filepath.split('/').pop()?.replace('.mdx', '') ?? '';
-      const rt = readingTime(content);
       const fm = data as BlogPostFrontmatter;
       return {
         ...fm,
         tags: fm.tags ?? [],
         slug,
-        readingTime: `${Math.ceil(rt.minutes)} min de leitura`,
+        readingTime: `${calcReadingTime(content)} min de leitura`,
       };
     })
     .sort((a, b) => (a.date < b.date ? 1 : -1)); // ISO 8601 ordena corretamente como string
