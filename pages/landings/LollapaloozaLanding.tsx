@@ -109,7 +109,7 @@ const LollapaloozaLanding: React.FC = () => {
             <a href="https://www.anhanga.tur.br/" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Conhecer a Anhangá Viagens
             </a>
-            <a href="https://blog.anhanga.tur.br" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+            <a href="/blog" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ler guia de festivais
             </a>
           </div>

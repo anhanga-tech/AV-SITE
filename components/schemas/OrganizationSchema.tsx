@@ -73,7 +73,7 @@ export const OrganizationSchema = () => (
         "Orlando & Disney",
         "Beto Carrero World"
       ],
-      "blog": "https://blog.anhanga.tur.br/"
+      "blog": "https://www.anhanga.tur.br/blog/"
     }}
   />
 );

@@ -35,9 +35,7 @@ export const SEO: React.FC<SEOProps> = ({
 
       // Force production hostname and protocol
       url.protocol = 'https:';
-      if (url.hostname !== 'blog.anhanga.tur.br') {
-        url.hostname = 'www.anhanga.tur.br';
-      }
+      url.hostname = 'www.anhanga.tur.br';
       url.port = ''; // Remove port (dev/preview servers)
 
       // Strip query parameters and hash to prevent duplicate content

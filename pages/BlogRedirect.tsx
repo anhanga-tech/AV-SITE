@@ -31,7 +31,7 @@ const BlogRedirect: React.FC = () => {
             href={destination}
             className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-brand-cyan text-white font-bold"
           >
-            Ir para blog.anhanga.tur.br
+            Ir para o Blog da Anhangá
           </a>
         </div>
       </main>
