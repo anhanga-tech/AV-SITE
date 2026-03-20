@@ -23,7 +23,10 @@ function parseDate(dateStr: string): string {
   const m = dateStr.match(/(\d+)\s+(\w+),?\s+(\d{4})/);
   if (!m) return dateStr;
   const [, day, mes, year] = m;
-  const month = MESES[mes] ?? '01';
+  const month = MESES[mes];
+  if (!month) {
+    throw new Error(`Mês desconhecido "${mes}" na data "${dateStr}". Verifique os dados de origem.`);
+  }
   return `${year}-${month}-${day.padStart(2, '0')}`;
 }
 

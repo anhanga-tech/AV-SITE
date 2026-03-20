@@ -43,7 +43,13 @@ td.addRule('remove-cta-div', {
 
 for (const [slug, destino] of Object.entries(DESTINOS)) {
   const filePath = join(BLOG_DIR, `${slug}.mdx`);
-  const raw = readFileSync(filePath, 'utf-8');
+  let raw: string;
+  try {
+    raw = readFileSync(filePath, 'utf-8');
+  } catch (err) {
+    console.warn(`⚠️  Arquivo não encontrado: ${slug}.mdx — pulando`);
+    continue;
+  }
 
   // Separa frontmatter do corpo
   const fmMatch = raw.match(/^(---[\s\S]+?---)\n([\s\S]*)$/);
