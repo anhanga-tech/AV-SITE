@@ -34,32 +34,12 @@
       "source": "/lollapalooza-2026/",
       "destination": "/lollapalooza",
       "permanent": true
-    },
-    {
-      "source": "/blog/tag/dicas",
-      "destination": "https://blog.anhanga.tur.br/tag/dicas-de-expert/",
-      "permanent": true
-    },
-    {
-      "source": "/blog/tag/dicas/",
-      "destination": "https://blog.anhanga.tur.br/tag/dicas-de-expert/",
-      "permanent": true
-    },
-    {
-      "source": "/blog",
-      "destination": "https://blog.anhanga.tur.br/",
-      "permanent": true
-    },
-    {
-      "source": "/blog/:slug*",
-      "destination": "https://blog.anhanga.tur.br/:slug*/",
-      "permanent": true
     }
   ],
   "rewrites": [
     {
       "source": "/api/keystatic/:path*",
-      "destination": "/api/keystatic/:path*"
+      "destination": "/api/keystatic/[...params]"
     },
     {
       "source": "/keystatic/:path*",
