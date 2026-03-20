@@ -1,7 +1,8 @@
 import React, { Suspense, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { MDXProvider } from '@mdx-js/react';
-import { BLOG_POSTS, AUTHORS } from '../data/blogData';
+import { AUTHORS } from '../data/blogData';
+import { getAllPosts, type PostMeta } from '../lib/mdx';
 import Calendar from 'lucide-react/dist/esm/icons/calendar';
 import User from 'lucide-react/dist/esm/icons/user';
 import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left';
@@ -18,6 +19,24 @@ import { SocialShare } from '../components/SocialShare';
 import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 import { openAiChat } from '../utils/aiChat';
 import { mdxComponents } from '../components/blog/mdxComponents';
+
+// Carregado no nível do módulo para o Vite processar em build time
+const allMdxPosts = getAllPosts();
+
+const CATEGORY_COLORS: Record<string, string> = {
+    'Disney': 'text-blue-700 bg-blue-50 border-blue-200',
+    'Viagem': 'text-cyan-700 bg-cyan-50 border-cyan-200',
+    'Gastronomia': 'text-yellow-700 bg-yellow-50 border-yellow-200',
+    'Lua de Mel': 'text-pink-700 bg-pink-50 border-pink-200',
+    'Nova York': 'text-blue-700 bg-blue-50 border-blue-200',
+    'Festivais': 'text-purple-700 bg-purple-50 border-purple-200',
+    'Carnaval': 'text-yellow-700 bg-yellow-50 border-yellow-200',
+    'Cruzeiros': 'text-cyan-700 bg-cyan-50 border-cyan-200',
+};
+const DEFAULT_COLOR = 'text-brand-dark bg-brand-yellow/10 border-brand-yellow';
+function getCategoryColor(category: string): string {
+    return CATEGORY_COLORS[category] ?? DEFAULT_COLOR;
+}
 
 // import.meta.glob deve ficar no nível do módulo para o Vite processar em build time
 const mdxModuleMap = import.meta.glob<{ default: React.ComponentType }>(
@@ -44,8 +63,8 @@ function getMdxComponent(
 
 const BlogPost: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
-    const post = BLOG_POSTS.find(p => p.slug === slug);
-    const author = post?.authorId ? AUTHORS[post.authorId] : null;
+    const post: PostMeta | undefined = allMdxPosts.find(p => p.slug === slug);
+    const author = post ? AUTHORS[post.author] ?? null : null;
 
     // Validate slug to avoid propagating arbitrary user input into structured data
     const isValidSlug = (value: unknown): value is string => {
@@ -73,7 +92,7 @@ const BlogPost: React.FC = () => {
     }
 
     // Related posts (excluding current)
-    const relatedPosts = BLOG_POSTS.filter(p => p.id !== post.id).slice(0, 2);
+    const relatedPosts = allMdxPosts.filter(p => p.slug !== slug).slice(0, 2);
 
     const sameAs = author?.social ? (Object.values(author.social).filter(Boolean) as string[]) : [];
 
@@ -132,7 +151,7 @@ const BlogPost: React.FC = () => {
                         </a>
                         <div className="max-w-4xl">
                             <div className="flex items-center gap-3 mb-6">
-                                <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 ${post.color} shadow-[4px_4px_0px_rgba(0,0,0,0.3)] font-black text-xs uppercase tracking-widest transform -rotate-1`}>
+                                <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 ${getCategoryColor(post.category)} shadow-[4px_4px_0px_rgba(0,0,0,0.3)] font-black text-xs uppercase tracking-widest transform -rotate-1`}>
                                     <Tag className="w-3 h-3 fill-current opacity-50" />
                                     {post.category}
                                 </span>
@@ -177,7 +196,7 @@ const BlogPost: React.FC = () => {
 
                             <div className="mb-10 pb-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div className="flex items-center gap-3">
-                                    <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest ${post.color} bg-opacity-20 border`}>
+                                    <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest ${getCategoryColor(post.category)} bg-opacity-20 border`}>
                                         {post.category}
                                     </span>
                                     <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{post.date}</span>
@@ -274,13 +293,13 @@ const BlogPost: React.FC = () => {
                                 </h3>
                                 <div className="space-y-4">
                                     {relatedPosts.map(related => (
-                                        <a href={getBlogPostUrl(related.slug)} key={related.id} className="group flex gap-5 items-center bg-white p-4 rounded-2xl hover:bg-white hover:shadow-xl transition-all border border-transparent hover:border-gray-100 duration-300">
+                                        <a href={getBlogPostUrl(related.slug)} key={related.slug} className="group flex gap-5 items-center bg-white p-4 rounded-2xl hover:bg-white hover:shadow-xl transition-all border border-transparent hover:border-gray-100 duration-300">
                                             <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0 border border-gray-100 shadow-sm relative">
                                                 <img src={optimizeRemoteImageUrl(related.image, 200, 200)} alt={related.title} width="200" height="200" loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                             </div>
                                             <div className="flex flex-col h-full justify-center">
                                                 <div className="mb-2">
-                                                    <span className={`inline-block text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border ${related.color} bg-opacity-50`}>
+                                                    <span className={`inline-block text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border ${getCategoryColor(related.category)} bg-opacity-50`}>
                                                         {related.category}
                                                     </span>
                                                 </div>
