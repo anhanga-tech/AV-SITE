@@ -10,3 +10,9 @@ export interface BlogPostFrontmatter {
   seoTitle?: string;       // opcional: título diferente para <title> tag SEO
   seoDescription?: string; // opcional: meta description diferente do excerpt
 }
+
+export type PostMeta = Omit<BlogPostFrontmatter, 'tags'> & {
+  tags: string[];      // normalizado: nunca undefined
+  slug: string;        // derivado do filename, ex: "dicas-disney-2026"
+  readingTime: string; // ex: "4 min de leitura"
+};
