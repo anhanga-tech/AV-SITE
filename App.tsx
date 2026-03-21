@@ -5,6 +5,7 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import AIChat from './components/AIChat';
+import { ClientOnly } from './components/ClientOnly';
 import ScrollToTop from './components/ScrollToTop';
 import { HeadContext, type HeadManager } from './lib/head';
 
@@ -26,6 +27,14 @@ const KeystaticPage = lazy(() => import('./pages/KeystaticPage'));
 
 const MainRouteFallback: React.FC = () => <section className="min-h-[40vh] bg-white" aria-hidden="true" />;
 const LandingRouteFallback: React.FC = () => <div className="min-h-screen bg-white" aria-hidden="true" />;
+
+const ClientFeatures: React.FC = () => (
+  <ClientOnly>
+    <AIChat />
+    <Analytics />
+    <SpeedInsights />
+  </ClientOnly>
+);
 
 const MainSiteShell: React.FC = () => {
   return (
@@ -69,11 +78,7 @@ const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClient
         </Routes>
       </Suspense>
       {includeClientFeatures ? (
-        <>
-          <AIChat />
-          <Analytics />
-          <SpeedInsights />
-        </>
+        <ClientFeatures />
       ) : null}
     </>
   );
