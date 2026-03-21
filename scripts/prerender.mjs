@@ -3,26 +3,16 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { build } from 'vite';
 import { fileURLToPath } from 'node:url';
+import { buildPrerenderRoutes } from '../lib/prerender-routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-const ROUTES = [
-  '/',
-  '/orlando',
-  '/beto-carrero',
-  '/lollapalooza',
-  '/sobre',
-  '/melhor-idade',
-  '/mapa-do-site',
-  '/termos-de-uso',
-  '/politica-privacidade'
-];
 
 const DIST_DIR = path.resolve(__dirname, '../dist');
 const SSR_OUT_DIR = path.resolve(__dirname, '../.prerender-ssr');
 const SSR_ENTRY = path.resolve(__dirname, '../ssr.tsx');
 const INDEX_FILE = path.join(DIST_DIR, 'index.html');
+const BLOG_DIR = path.resolve(__dirname, '../content/blog');
 
 const REQUIRED_PATTERNS = [
   { label: 'title', pattern: /<title\b[^>]*>[\s\S]*?<\/title>/i },
@@ -55,10 +45,30 @@ const UNIQUE_TAG_PATTERNS = [
 const routeToOutputPath = (route) =>
   route === '/' ? path.join(DIST_DIR, 'index.html') : path.join(DIST_DIR, route.slice(1), 'index.html');
 
-const ensurePrerenderMarker = (html) =>
-  html.replace(/<html([^>]*)>/i, (match, attrs) =>
-    attrs.includes('data-prerendered=') ? match : `<html${attrs} data-prerendered="true">`
-  );
+const normalizeRoute = (route) => (route === '/' ? '/' : route.replace(/\/+$/, ''));
+const escapeHtmlAttribute = (value) =>
+  value.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+
+const ensurePrerenderMarker = (html, route) =>
+  html.replace(/<html([^>]*)>/i, (_, attrs) => {
+    const normalizedRoute = normalizeRoute(route);
+    const escapedRoute = escapeHtmlAttribute(normalizedRoute);
+    let nextAttrs = attrs;
+
+    if (nextAttrs.includes('data-prerendered=')) {
+      nextAttrs = nextAttrs.replace(/data-prerendered="[^"]*"/i, 'data-prerendered="true"');
+    } else {
+      nextAttrs += ' data-prerendered="true"';
+    }
+
+    if (nextAttrs.includes('data-prerender-route=')) {
+      nextAttrs = nextAttrs.replace(/data-prerender-route="[^"]*"/i, `data-prerender-route="${escapedRoute}"`);
+    } else {
+      nextAttrs += ` data-prerender-route="${escapedRoute}"`;
+    }
+
+    return `<html${nextAttrs}>`;
+  });
 
 const stripManagedHeadTags = (template) => {
   let strippedTemplate = template;
@@ -70,11 +80,11 @@ const stripManagedHeadTags = (template) => {
   return strippedTemplate;
 };
 
-const injectRenderedHtml = (template, appHtml, headHtml) => {
+const injectRenderedHtml = (template, appHtml, headHtml, route) => {
   const withManagedHeadRemoved = stripManagedHeadTags(template);
   const withRoot = withManagedHeadRemoved.replace('<div id="root"></div>', `<div id="root">${appHtml}</div>`);
   const withHead = withRoot.replace('</head>', `${headHtml}\n</head>`);
-  return ensurePrerenderMarker(withHead);
+  return ensurePrerenderMarker(withHead, route);
 };
 
 const countMatches = (html, pattern) => Array.from(html.matchAll(pattern)).length;
@@ -135,15 +145,16 @@ async function prerender() {
 
   const template = fs.readFileSync(INDEX_FILE, 'utf8');
   const serverModule = await buildSsrBundle();
+  const routes = await buildPrerenderRoutes(BLOG_DIR);
 
   if (typeof serverModule.render !== 'function') {
     throw new Error('SSR bundle does not export a render(url) function.');
   }
 
-  for (const route of ROUTES) {
+  for (const route of routes) {
     console.log(`Rendering ${route}`);
     const { appHtml, headHtml } = await serverModule.render(route);
-    const html = injectRenderedHtml(template, appHtml, headHtml);
+    const html = injectRenderedHtml(template, appHtml, headHtml, route);
 
     validateHtml(route, html);
 

@@ -6,6 +6,7 @@ import react from '@vitejs/plugin-react';
 import mdx from '@mdx-js/rollup';
 import remarkGfm from 'remark-gfm';
 import { DEFAULT_GEMINI_MODEL } from './lib/ai/constants.ts';
+import { stripYamlFrontmatter } from './lib/mdx-frontmatter.ts';
 
 type ApiHandler = (request: Request) => Promise<Response> | Response;
 
@@ -123,6 +124,23 @@ function apiDevPlugin() {
   };
 }
 
+function stripMdxFrontmatterPlugin() {
+  return {
+    name: 'strip-mdx-frontmatter',
+    enforce: 'pre' as const,
+    transform(code: string, id: string) {
+      const [filepath] = id.split('?');
+
+      if (!filepath.endsWith('.mdx')) {
+        return null;
+      }
+
+      const strippedCode = stripYamlFrontmatter(code);
+      return strippedCode === code ? null : { code: strippedCode, map: null };
+    },
+  };
+}
+
 export default defineConfig(({ mode, isSsrBuild }) => {
   // Carregar variáveis de ambiente do arquivo .env e do sistema
   // O segundo parâmetro '.' significa o diretório atual (raiz do projeto)
@@ -150,6 +168,7 @@ export default defineConfig(({ mode, isSsrBuild }) => {
       host: '0.0.0.0',
     },
     plugins: [
+      stripMdxFrontmatterPlugin(),
       {
         enforce: 'pre',
         ...mdx({
