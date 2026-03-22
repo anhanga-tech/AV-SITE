@@ -65,7 +65,7 @@ BANT_POLICY
   Use "não informado" para eixos ausentes. Este campo alimenta o CRM diretamente.
 
 BANT_EXAMPLES
-- (Trechos abaixo são modelos internos; não copie rótulos como "Exemplo A" para o cliente.)
+(Trechos abaixo são modelos internos; não copie rótulos como "Exemplo A" para o cliente.)
 - Exemplo A — internacional, casal, lua de mel:
   "Viagem romântica com experiências gastronômicas e hospedagem premium.
    Decisão compartilhada com cônjuge. Orçamento R$ 35-60 mil. Embarque junho/2025."
