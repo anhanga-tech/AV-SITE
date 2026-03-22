@@ -106,3 +106,17 @@ test('system prompt should forbid manual WhatsApp CTA in the final handoff', () 
         /generate_budget_link/,
     );
 });
+
+test('system prompt should document IATA code rules for the budget tool', () => {
+    assert.match(SYSTEM_INSTRUCTION, /IATA_CODE_POLICY/);
+    assert.match(SYSTEM_INSTRUCTION, /iata_code é obrigatório/);
+});
+
+test('system prompt should prefer structured JSON line for chips', () => {
+    assert.match(SYSTEM_INSTRUCTION, /\{\"chips\":\[\"Opção 1\",\"Opção 2\",\"Opção 3\"\]\}/);
+});
+
+test('system prompt should define out-of-scope handling', () => {
+    assert.match(SYSTEM_INSTRUCTION, /OUT_OF_SCOPE/);
+    assert.match(SYSTEM_INSTRUCTION, /Não é jurídico, médico, financeiro/);
+});
