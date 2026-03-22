@@ -107,10 +107,10 @@ const Attractions: React.FC = () => {
 
               {/* Content */}
               <div className="text-center px-1">
-                <h3 className="font-heading font-black text-3xl text-fun-dark mb-3 leading-[0.9]">
+                <h3 className="font-sans font-black text-3xl text-fun-dark mb-3 leading-[0.9]">
                   {item.name}
                 </h3>
-                <p className="font-body text-slate-700 font-bold text-base leading-snug">
+                <p className="font-sans text-slate-700 font-bold text-base leading-snug">
                   {item.description}
                 </p>
               </div>
@@ -125,7 +125,7 @@ const Attractions: React.FC = () => {
 
         {/* Bottom Callout */}
         <div className="mt-20 text-center">
-          <p className="font-heading font-bold text-xl md:text-2xl text-fun-dark inline-block bg-fun-yellow px-8 py-3 rounded-full border-2 border-fun-dark shadow-hard transform rotate-1 hover:scale-105 transition-transform cursor-default">
+          <p className="font-sans font-bold text-xl md:text-2xl text-fun-dark inline-block bg-fun-yellow px-8 py-3 rounded-full border-2 border-fun-dark shadow-hard transform rotate-1 hover:scale-105 transition-transform cursor-default">
             🎢 E muito, muito mais!
           </p>
         </div>

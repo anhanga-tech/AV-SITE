@@ -50,7 +50,7 @@ const Solution: React.FC = () => {
                         <span className="font-bold text-fun-dark uppercase tracking-wide text-sm">Zero Stress</span>
                      </div>
 
-                     <h2 className="text-4xl md:text-6xl font-heading font-bold mb-6 text-white drop-shadow-md leading-tight">
+                     <h2 className="text-4xl md:text-6xl font-sans font-bold mb-6 text-white drop-shadow-md leading-tight">
                         A Solução é <br className="md:hidden" />
                         <span className="relative inline-block ml-2 md:ml-0">
                            <span className="relative z-10 text-fun-yellow">Simples</span>
@@ -60,7 +60,7 @@ const Solution: React.FC = () => {
                            </svg>
                         </span>
                      </h2>
-                     <p className="text-xl md:text-2xl font-body mb-10 text-blue-100 leading-relaxed max-w-lg">
+                     <p className="text-xl md:text-2xl font-sans mb-10 text-blue-100 leading-relaxed max-w-lg">
                         Enquanto você sonha, a Anhangá organiza. Seu pacote completo chega pronto no seu WhatsApp.
                      </p>
                   </div>
@@ -76,7 +76,7 @@ const Solution: React.FC = () => {
                               <Plane className="w-6 h-6 lg:w-9 lg:h-9" strokeWidth={2.5} />
                            </div>
                            <div>
-                              <h4 className="font-heading font-bold text-lg lg:text-2xl text-fun-dark">Passagem Aérea</h4>
+                              <h4 className="font-sans font-bold text-lg lg:text-2xl text-fun-dark">Passagem Aérea</h4>
                               <p className="text-slate-600 text-xs lg:text-sm font-bold">Horários que funcionam.</p>
                            </div>
                         </div>
@@ -101,7 +101,7 @@ const Solution: React.FC = () => {
                               <BedDouble className="w-6 h-6 lg:w-9 lg:h-9" strokeWidth={2.5} />
                            </div>
                            <div>
-                              <h4 className="font-heading font-bold text-lg lg:text-2xl text-fun-dark">Hotel Top</h4>
+                              <h4 className="font-sans font-bold text-lg lg:text-2xl text-fun-dark">Hotel Top</h4>
                               <p className="text-slate-600 text-xs lg:text-sm font-bold">Perto da diversão.</p>
                            </div>
                         </div>
@@ -130,7 +130,7 @@ const Solution: React.FC = () => {
                               <Ticket className="w-6 h-6 lg:w-9 lg:h-9" strokeWidth={2.5} />
                            </div>
                            <div>
-                              <h4 className="font-heading font-bold text-lg lg:text-2xl text-fun-dark">Ingresso Oficial</h4>
+                              <h4 className="font-sans font-bold text-lg lg:text-2xl text-fun-dark">Ingresso Oficial</h4>
                               <p className="text-slate-600 text-xs lg:text-sm font-bold">Direto na catraca.</p>
                            </div>
                         </div>
@@ -164,7 +164,7 @@ const Solution: React.FC = () => {
                            <div className="bg-fun-dark text-white p-2 rounded-lg">
                               <MapPin size={24} strokeWidth={2.5} />
                            </div>
-                           <span className="font-heading font-bold text-2xl leading-none text-fun-dark">Estique a viagem</span>
+                           <span className="font-sans font-bold text-2xl leading-none text-fun-dark">Estique a viagem</span>
                         </div>
 
                         {/* Description */}
@@ -263,7 +263,7 @@ const Solution: React.FC = () => {
                      <div className="absolute -bottom-6 -right-6 bg-white p-3 rounded-xl border-2 border-fun-dark shadow-hard transform -rotate-6 z-20">
                         <div className="flex items-center gap-2">
                            <MessageCircle className="text-green-500 fill-current" />
-                           <span className="font-heading font-bold text-fun-dark text-sm">Tudo no Zap!</span>
+                           <span className="font-sans font-bold text-fun-dark text-sm">Tudo no Zap!</span>
                         </div>
                      </div>
                   </div>
@@ -300,7 +300,7 @@ const Solution: React.FC = () => {
 
                   {/* Header */}
                   <div className="text-center mb-8">
-                     <h3 className="font-heading font-bold text-3xl md:text-4xl text-fun-dark mb-2">Destinos Extras</h3>
+                     <h3 className="font-sans font-bold text-3xl md:text-4xl text-fun-dark mb-2">Destinos Extras</h3>
                      <p className="text-slate-600 font-bold">Escolha um (ou todos) e peça no Zap!</p>
                   </div>
 
@@ -315,7 +315,7 @@ const Solution: React.FC = () => {
                            <Sun size={32} className="text-fun-dark" strokeWidth={2.5} />
                         </div>
                         <div className="z-10">
-                           <h4 className="font-heading font-bold text-2xl text-fun-dark mb-1">Florianópolis</h4>
+                           <h4 className="font-sans font-bold text-2xl text-fun-dark mb-1">Florianópolis</h4>
                            <p className="text-sm font-bold text-slate-500 leading-tight">42 praias, dunas de areia e gastronomia.</p>
                         </div>
                      </div>
@@ -328,7 +328,7 @@ const Solution: React.FC = () => {
                            <Fish size={32} className="text-white" strokeWidth={2.5} />
                         </div>
                         <div className="z-10">
-                           <h4 className="font-heading font-bold text-2xl text-fun-dark mb-1">Bombinhas</h4>
+                           <h4 className="font-sans font-bold text-2xl text-fun-dark mb-1">Bombinhas</h4>
                            <p className="text-sm font-bold text-slate-500 leading-tight">Mergulho ecológico e águas cristalinas.</p>
                         </div>
                      </div>
@@ -341,7 +341,7 @@ const Solution: React.FC = () => {
                            <Building2 size={32} className="text-white" strokeWidth={2.5} />
                         </div>
                         <div className="z-10">
-                           <h4 className="font-heading font-bold text-2xl text-fun-dark mb-1">Balneário Camboriú</h4>
+                           <h4 className="font-sans font-bold text-2xl text-fun-dark mb-1">Balneário Camboriú</h4>
                            <p className="text-sm font-bold text-slate-500 leading-tight">Roda gigante, aquário e vida noturna.</p>
                         </div>
                      </div>

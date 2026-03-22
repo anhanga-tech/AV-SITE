@@ -51,7 +51,7 @@ const FAQ: React.FC = () => {
                       className="w-full flex items-center justify-between p-5 md:p-6 text-left focus:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-fun-blue/50"
                       aria-expanded={isOpen}
                     >
-                      <span className={`font-heading font-bold text-lg md:text-xl pr-4 leading-tight ${isOpen ? 'text-fun-blue' : 'text-fun-dark'}`}>
+                      <span className={`font-sans font-bold text-lg md:text-xl pr-4 leading-tight ${isOpen ? 'text-fun-blue' : 'text-fun-dark'}`}>
                         {item.question}
                       </span>
                       <div className={`flex-shrink-0 w-8 h-8 rounded-full border-2 border-fun-dark flex items-center justify-center transition-all duration-300 ${isOpen ? 'bg-fun-blue text-white rotate-180' : 'bg-white text-fun-dark'}`}>
@@ -89,7 +89,7 @@ const FAQ: React.FC = () => {
                     <Sparkles size={14} /> Último Passo
                  </div>
                  
-                 <h3 className="font-heading font-bold text-3xl md:text-4xl mb-4 leading-tight">
+                 <h3 className="font-sans font-bold text-3xl md:text-4xl mb-4 leading-tight">
                     Sua viagem começa no <span className="text-[#25D366]">WhatsApp</span>
                  </h3>
                  

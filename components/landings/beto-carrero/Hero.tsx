@@ -30,7 +30,7 @@ const Hero: React.FC = () => {
 
           {/* Headline */}
           <h1 className="sr-only">Pacote Beto Carrero: Diversão e Viagem em Família com Roteiro Personalizado</h1>
-          <p aria-hidden="true" className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-heading font-black text-fun-dark leading-[1.1] md:leading-[1] lg:leading-[0.9] mb-6 md:mb-8 drop-shadow-sm max-w-2xl lg:max-w-none">
+          <p aria-hidden="true" className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-sans font-black text-fun-dark leading-[1.1] md:leading-[1] lg:leading-[0.9] mb-6 md:mb-8 drop-shadow-sm max-w-2xl lg:max-w-none">
             Memórias Que Começam no <br className="hidden md:block" />
             <span className="relative inline-block mt-1 md:mt-2 lg:mt-4">
               <span className="relative z-10">Beto Carrero</span>
@@ -42,7 +42,7 @@ const Hero: React.FC = () => {
           </p>
 
           {/* Subheadline */}
-          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-body text-fun-dark mb-8 md:mb-12 leading-relaxed font-semibold max-w-lg lg:max-w-2xl mx-auto lg:mx-0">
+          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-sans text-fun-dark mb-8 md:mb-12 leading-relaxed font-semibold max-w-lg lg:max-w-2xl mx-auto lg:mx-0">
             Aéreo + Hotel + Ingresso em um só pacote. <br className="hidden lg:block" />
             Você só se preocupa em <span className="bg-fun-pink text-white px-2 py-0.5 transform -rotate-1 inline-block rounded-sm shadow-sm">gritar na montanha-russa.</span>
           </p>
@@ -84,7 +84,7 @@ const Hero: React.FC = () => {
                   className="object-cover w-full h-full transform group-hover:scale-110 transition-transform duration-700"
                 />
               </div>
-              <div className="absolute bottom-3 lg:bottom-4 left-0 w-full text-center font-heading font-bold text-fun-dark text-xl lg:text-3xl rotate-1 z-0">
+              <div className="absolute bottom-3 lg:bottom-4 left-0 w-full text-center font-sans font-bold text-fun-dark text-xl lg:text-3xl rotate-1 z-0">
                 Férias ❤️
               </div>
             </div>
@@ -97,7 +97,7 @@ const Hero: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-[10px] sm:text-xs lg:text-sm font-bold text-gray-400 leading-none mb-1">Voo Confirmado</div>
-                  <div className="font-heading font-bold text-fun-dark text-sm sm:text-base lg:text-xl leading-none">GRU ➔ NVT</div>
+                  <div className="font-sans font-bold text-fun-dark text-sm sm:text-base lg:text-xl leading-none">GRU ➔ NVT</div>
                 </div>
               </div>
             </div>
@@ -106,7 +106,7 @@ const Hero: React.FC = () => {
             <div className="absolute bottom-16 -left-4 sm:bottom-20 sm:-left-12 md:-left-4 md:bottom-24 lg:bottom-8 lg:-left-16 xl:bottom-24 xl:-left-20 bg-fun-pink text-white p-3 sm:p-4 lg:p-4 xl:p-6 px-4 sm:px-6 lg:px-6 xl:px-8 rounded-xl border-2 border-fun-dark shadow-hard transform -rotate-12 z-30 animate-[float_5s_ease-in-out_infinite_1s] scale-90 sm:scale-100 md:scale-85 lg:scale-75 xl:scale-110">
               <div className="flex items-center gap-2 lg:gap-3">
                 <Ticket size={20} className="sm:w-6 sm:h-6 lg:w-8 lg:h-8" />
-                <span className="font-heading font-bold text-sm sm:text-lg lg:text-2xl">Ingresso VIP</span>
+                <span className="font-sans font-bold text-sm sm:text-lg lg:text-2xl">Ingresso VIP</span>
               </div>
               {/* Perforation line */}
               <div className="absolute -right-1 top-1/2 -translate-y-1/2 w-3 h-3 lg:w-4 lg:h-4 bg-fun-yellow rounded-full border-2 border-fun-dark"></div>
@@ -149,7 +149,7 @@ const Hero: React.FC = () => {
       {/* --- Floating Scroll Connector (Overlapping the ZigZag) --- */}
       <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 z-40 w-full flex justify-center pointer-events-none">
         <div className="bg-white px-6 py-3 rounded-full border-4 border-fun-dark shadow-hard flex items-center gap-3 animate-bounce pointer-events-auto cursor-pointer group hover:scale-105 transition-transform">
-          <span className="font-heading font-bold text-fun-dark text-sm md:text-lg whitespace-nowrap">
+          <span className="font-sans font-bold text-fun-dark text-sm md:text-lg whitespace-nowrap">
             O pesadelo de planejar
           </span>
           <div className="bg-fun-pink text-white rounded-full w-8 h-8 flex items-center justify-center border-2 border-fun-dark group-hover:bg-fun-dark transition-colors">

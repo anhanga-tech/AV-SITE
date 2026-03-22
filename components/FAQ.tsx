@@ -136,7 +136,7 @@ const FAQS = [
         )
     },
     {
-        question: "O que diferencia a Anhangá de outras agências?",
+        question: "Por que a Anhangá em vez de outra agência?",
         answer: (
             <div itemProp="text">
                 <p className="mb-2"><strong>1. Roteiros 100% personalizados:</strong> Não vendemos pacotes prontos.</p>
@@ -148,7 +148,7 @@ const FAQS = [
         )
     },
     {
-        question: "Qual é o processo de planejamento?",
+        question: "Como funciona o processo? É complicado?",
         answer: (
             <div itemProp="text">
                 <strong className="block mb-3">4 passos simples:</strong>
@@ -173,7 +173,7 @@ const FAQS = [
         )
     },
     {
-        question: "A Anhangá possui roteiros para o público 50+ (Melhor Idade)?",
+        question: "Vocês têm viagens para quem tem 50+ (Melhor Idade)?",
         answer: (
             <div itemProp="text">
                 <p className="mb-4">
@@ -213,13 +213,13 @@ const FAQ: React.FC = () => {
                         Tire suas dúvidas
                     </div>
                     <h2 className="text-4xl md:text-5xl font-black text-brand-dark tracking-tight mb-4">
-                        Dúvidas Frequentes<br />
+                        Tá na cabeça?<br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan to-blue-600">
-                            Planejamento de Viagens
+                            A gente responde.
                         </span>
                     </h2>
                     <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-                        Tudo o que você precisa saber para viajar sem preocupações.
+                        As perguntas que chegam mais no nosso WhatsApp, com resposta de verdade.
                     </p>
                 </div>
 

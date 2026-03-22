@@ -160,13 +160,13 @@ const Highlights = memo(() => {
                                 </span>
                             </div>
                             <h2 className="text-4xl md:text-5xl font-black text-brand-dark leading-tight mb-6">
-                                Agência de viagens em São Paulo com <br />
+                                Não existe roteiro certo <br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan to-blue-500">
-                                    atendimento personalizado
+                                    para o viajante errado.
                                 </span>
                             </h2>
                             <p className="text-gray-600 text-lg md:text-xl font-medium leading-relaxed mb-8">
-                                A <strong>Anhangá Viagens</strong> é uma agência de viagens boutique em São Paulo especializada em roteiros personalizados e experiências únicas. Montamos pacotes de viagem sob medida para quem quer viajar com planejamento, conforto e suporte real — antes, durante e depois da viagem.
+                                A <strong>Anhangá</strong> é uma agência boutique em São Paulo. Não trabalhamos com pacote pronto. Ouvimos o que você quer, pesquisamos o que faz sentido pra você e montamos cada detalhe do roteiro. Do primeiro voo ao último café da manhã, você não está sozinho.
                             </p>
                         </motion.div>
 

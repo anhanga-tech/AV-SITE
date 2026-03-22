@@ -38,7 +38,7 @@ const Button: React.FC<ButtonProps> = ({
     };
   }, []);
 
-  const baseStyles = "inline-flex items-center justify-center font-heading font-bold text-lg md:text-xl px-8 py-4 rounded-full transition-all duration-200 transform hover:-translate-y-1 border-2 border-fun-dark relative z-10 focus:outline-none focus:ring-4 focus:ring-fun-blue focus:ring-offset-2 focus:ring-offset-white";
+  const baseStyles = "inline-flex items-center justify-center font-sans font-bold text-lg md:text-xl px-8 py-4 rounded-full transition-all duration-200 transform hover:-translate-y-1 border-2 border-fun-dark relative z-10 focus:outline-none focus:ring-4 focus:ring-fun-blue focus:ring-offset-2 focus:ring-offset-white";
 
   const variants = {
     primary: "bg-fun-green text-white shadow-hard hover:shadow-hard-hover",
