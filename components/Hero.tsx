@@ -133,7 +133,7 @@ const Hero: React.FC = () => {
                 `}
           >
             <span className="block text-sm sm:text-base font-semibold text-white/80 tracking-widest uppercase mb-3 leading-normal">
-              Agência de Viagens em São Paulo
+              Para quem não consegue mais ficar parado.
             </span>
             Sua Próxima <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500 relative inline-block pb-2">
@@ -155,8 +155,7 @@ const Hero: React.FC = () => {
           </h1>
 
           <p className="text-white/90 text-xl md:text-2xl max-w-2xl mx-auto mb-12 font-medium leading-relaxed drop-shadow-md">
-            Roteiros que parecem feitos à mão. <br />
-            Porque sua viagem merece ser única.
+            Cada roteiro nasce de uma conversa.
           </p>
 
           <SearchForm onDestinationMatch={setValidCityForTitle} />

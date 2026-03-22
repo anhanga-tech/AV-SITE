@@ -43,11 +43,11 @@ const CallToAction: React.FC = () => {
                         {/* Main Content */}
                         <div className="mb-8">
                             <h2 className="text-4xl md:text-5xl font-black text-brand-dark mb-4 leading-tight">
-                                Sua próxima parada: <br />
-                                <span className="text-brand-vibrant">O Inesquecível.</span>
+                                Próxima parada: <br />
+                                <span className="text-brand-vibrant">aquele lugar que você sempre adiou.</span>
                             </h2>
                             <p className="text-gray-500 font-medium text-lg max-w-md">
-                                O orçamento é gratuito, o roteiro é exclusivo e as memórias são para sempre.
+                                Orçamento gratuito. Roteiro feito do zero, só pra você. A viagem que você vai contar por anos.
                             </p>
                         </div>
 
@@ -58,7 +58,7 @@ const CallToAction: React.FC = () => {
                                 className="btn-whatsapp btn-specialist flex items-center gap-3 bg-brand-dark text-white text-lg font-bold px-8 py-4 rounded-xl shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
                                 data-tracking="cta-home-footer"
                             >
-                                <span>Solicitar Orçamento Personalizado</span>
+                                <span>Começar minha Viagem</span>
                                 <ChatCentered className="w-5 h-5" weight="fill" />
                             </button>
                         </div>

@@ -41,7 +41,7 @@ const Problem: React.FC = () => {
                      {/* Browser Body */}
                      <div className="p-6 md:p-8 lg:p-10 flex flex-col items-center text-center">
                         <Search className="text-fun-blue w-10 h-10 lg:w-16 lg:h-16 mb-2 animate-pulse" />
-                        <h3 className="font-heading font-bold text-xl md:text-2xl lg:text-3xl text-fun-dark">157 abas abertas</h3>
+                        <h3 className="font-sans font-bold text-xl md:text-2xl lg:text-3xl text-fun-dark">157 abas abertas</h3>
                         <p className="text-sm md:text-base lg:text-lg text-slate-500 mt-2 leading-tight">
                            Comparando preços, lendo reviews antigos e ficando cada vez mais confuso.
                         </p>
@@ -86,7 +86,7 @@ const Problem: React.FC = () => {
                            <HelpCircle size={28} className="lg:w-10 lg:h-10" strokeWidth={2.5} />
                         </div>
                         <div>
-                           <h3 className="font-heading font-extrabold text-xl md:text-2xl lg:text-3xl mb-2 text-fun-dark">Insegurança na escolha</h3>
+                           <h3 className="font-sans font-extrabold text-xl md:text-2xl lg:text-3xl mb-2 text-fun-dark">Insegurança na escolha</h3>
                            <p className="text-slate-600 font-medium leading-relaxed text-sm md:text-base lg:text-lg">
                               "Será que esse hotel é limpo? Fica longe do parque? O transfer busca a gente?"
                            </p>
@@ -104,7 +104,7 @@ const Problem: React.FC = () => {
                            <X size={28} className="lg:w-10 lg:h-10" strokeWidth={2.5} />
                         </div>
                         <div>
-                           <h3 className="font-heading font-extrabold text-xl md:text-2xl lg:text-3xl mb-2 text-fun-dark">Logística Complicada</h3>
+                           <h3 className="font-sans font-extrabold text-xl md:text-2xl lg:text-3xl mb-2 text-fun-dark">Logística Complicada</h3>
                            <p className="text-slate-600 font-medium leading-relaxed text-sm md:text-base lg:text-lg">
                               Conciliar horário de voo, check-in do hotel e dias de parque sem perder tempo é um quebra-cabeça chato.
                            </p>
@@ -119,7 +119,7 @@ const Problem: React.FC = () => {
                            <AlertTriangle size={28} className="lg:w-10 lg:h-10" strokeWidth={2.5} />
                         </div>
                         <div>
-                           <h3 className="font-heading font-extrabold text-xl md:text-2xl lg:text-3xl mb-2 text-fun-dark">Surpresas no Pagamento</h3>
+                           <h3 className="font-sans font-extrabold text-xl md:text-2xl lg:text-3xl mb-2 text-fun-dark">Surpresas no Pagamento</h3>
                            <p className="text-slate-600 font-medium leading-relaxed text-sm md:text-base lg:text-lg">
                               Taxas escondidas, sites que travam na hora de pagar e parcelamentos com juros abusivos.
                            </p>

@@ -2,28 +2,13 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
-    "title": "Post de Teste",
-    "excerpt": "Este é um post de teste para validar a infraestrutura MDX do blog da Anhangá Viagens.",
-    "date": "2026-04-01",
-    "author": "equipe-anhanga",
-    "category": "Dicas de Viagem",
-    "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&auto=format",
-    "featured": false,
-    "tags": [
-      "teste",
-      "infraestrutura"
-    ],
-    "slug": "teste",
-    "readingTime": "1 min de leitura"
-  },
-  {
     "title": "Viagem solo feminina ganha espaço nos cruzeiros da Norwegian Cruise Line",
     "excerpt": "Cada vez mais mulheres estão escolhendo viajar sozinhas, e o turismo tem respondido a isso de formas bem concretas. Se você já pensou em embarcar sem ...",
     "date": "2026-03-09",
     "author": "equipe-anhanga",
     "category": "Cruzeiros",
-    "image": "https://blog.anhanga.tur.br/content/images/2026/03/1-3.png",
-    "featured": false,
+    "image": "https://krooze.com.br/wp-content/uploads/2026/03/1-3.png",
+    "featured": true,
     "tags": [
       "cruzeiros"
     ],
@@ -64,7 +49,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "author": "ana-souza",
     "category": "Dicas de Expert",
     "image": "https://cdn1.parksmedia.wdprapps.disney.com/resize/mwImage/1/1300/544/75/vision-dam/digital/parks-platform/parks-global-assets/disney-world/events/holiday/entertainment/MKDecor2_0109ZL_0316SD_R3_xak-16x9.jpg?2025-06-09T20:18:33+00:00",
-    "featured": true,
+    "featured": false,
     "tags": [],
     "slug": "5-segredos-da-disney-que-ninguem-conta",
     "readingTime": "4 min de leitura"

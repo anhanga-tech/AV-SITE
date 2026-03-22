@@ -89,7 +89,7 @@ const HowItWorks: React.FC = () => {
             </h2>
             <p className="text-xl text-gray-600 font-medium font-sans">
                 Planejar viagem não precisa ser chato. <br className="hidden md:block"/>
-                Veja como transformamos seu sonho em realidade em 4 passos simples.
+                Aqui vai funcionar assim: você fala, a gente afia o lápis e monta tudo.
             </p>
         </div>
 

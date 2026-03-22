@@ -89,7 +89,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col font-body selection:bg-fun-pink selection:text-white pt-[84px] md:pt-[132px]">
+    <div className="min-h-screen flex flex-col font-sans selection:bg-fun-pink selection:text-white pt-[84px] md:pt-[132px]">
 
       {/* 
          Header Changes:
@@ -129,7 +129,7 @@ const App: React.FC = () => {
               <a
                 key={link.name}
                 href={link.href}
-                className="relative group font-heading font-bold text-fun-dark text-lg hover:text-fun-pink transition-colors py-2"
+                className="relative group font-sans font-bold text-fun-dark text-lg hover:text-fun-pink transition-colors py-2"
               >
                 {link.name}
                 {/* Scribble Underline Effect */}
@@ -177,7 +177,7 @@ const App: React.FC = () => {
                 key={link.name}
                 href={link.href}
                 onClick={handleLinkClick}
-                className="font-heading font-bold text-2xl text-fun-dark text-center py-2 border-b-2 border-dashed border-gray-200 active:text-fun-pink"
+                className="font-sans font-bold text-2xl text-fun-dark text-center py-2 border-b-2 border-dashed border-gray-200 active:text-fun-pink"
               >
                 {link.name}
               </a>

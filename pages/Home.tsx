@@ -93,8 +93,8 @@ const Home: React.FC = () => {
   return (
     <>
       <SEO
-        title="Agência de Viagens em São Paulo: Roteiros Exclusivos 2026"
-        description="Agência boutique em São Paulo especializada em roteiros sob medida, pacotes para Orlando, Beto Carrero e experiências exclusivas para o público 50+."
+        title="Agência de Viagens em São Paulo | Roteiros Feitos do Zero"
+        description="Agência boutique em São Paulo. Não trabalhamos com pacote pronto — cada roteiro começa do zero, pensado pro seu jeito de viajar. Orlando, Beto Carrero, Europa e muito mais. Orçamento gratuito."
         canonical="https://www.anhanga.tur.br/"
         keywords="agência de viagens em São Paulo, roteiros exclusivos, pacotes para Orlando, pacote Beto Carrero, Lollapalooza Brasil, viagens melhor idade 50+, planejamento de viagens"
       />

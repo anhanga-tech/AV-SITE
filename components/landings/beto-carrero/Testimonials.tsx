@@ -69,7 +69,7 @@ const Testimonials: React.FC = () => {
                  </div>
 
                  {/* Quote Content */}
-                 <p className="text-xl md:text-2xl font-heading font-bold leading-snug mb-8 relative z-10 flex-grow">
+                 <p className="text-xl md:text-2xl font-sans font-bold leading-snug mb-8 relative z-10 flex-grow">
                    "{t.quote}"
                  </p>
 
@@ -83,7 +83,7 @@ const Testimonials: React.FC = () => {
                    </div>
                    
                    <div>
-                     <span className="font-heading font-bold text-lg block leading-none mb-1">{t.name}</span>
+                     <span className="font-sans font-bold text-lg block leading-none mb-1">{t.name}</span>
                      <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-full inline-block border border-green-200 uppercase tracking-wide">
                         Viagem Verificada
                      </span>
