@@ -22,7 +22,7 @@ const Footer: React.FC = () => {
           />
         </div>
 
-        <p className="opacity-80 font-body font-semibold text-lg mb-8 max-w-md mx-auto">
+        <p className="opacity-80 font-sans font-semibold text-lg mb-8 max-w-md mx-auto">
           Levando alegria sem burocracia para suas férias.
         </p>
         

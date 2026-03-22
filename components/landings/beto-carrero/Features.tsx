@@ -49,7 +49,7 @@ const Features: React.FC = () => {
               className="relative group perspective-1000"
             >
               {/* The Large Number Floating Behind */}
-              <div className="absolute -top-10 -left-2 text-[120px] font-heading font-black text-gray-100 select-none z-0 transition-all duration-300 group-hover:text-gray-200 group-hover:-translate-y-4 group-hover:scale-105">
+              <div className="absolute -top-10 -left-2 text-[120px] font-sans font-black text-gray-100 select-none z-0 transition-all duration-300 group-hover:text-gray-200 group-hover:-translate-y-4 group-hover:scale-105">
                 0{idx + 1}
               </div>
 
@@ -83,11 +83,11 @@ const Features: React.FC = () => {
                     {feature.icon}
                   </div>
 
-                  <h3 className="text-3xl font-heading font-bold mb-6 text-fun-dark leading-tight">
+                  <h3 className="text-3xl font-sans font-bold mb-6 text-fun-dark leading-tight">
                     {feature.title}
                   </h3>
                   
-                  <p className="font-body text-xl text-slate-600 leading-relaxed">
+                  <p className="font-sans text-xl text-slate-600 leading-relaxed">
                     {feature.description}
                   </p>
                 </div>

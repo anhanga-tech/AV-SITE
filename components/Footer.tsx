@@ -42,8 +42,8 @@ const Footer: React.FC = () => {
                             />
                         </div>
                         <p className="text-gray-400 leading-relaxed max-w-sm font-medium">
-                            Planejamento de viagens com alma, design e zero estresse. <br />
-                            Vamos criar memórias?
+                            Roteiros feitos do zero. Sem pacote pronto, sem estresse. <br />
+                            Só a sua viagem.
                         </p>
                     </div>
 

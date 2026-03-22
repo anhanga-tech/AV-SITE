@@ -1,20 +1,22 @@
-name: Playwright Tests
+name: Update Playwright Snapshots
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to update snapshots on'
+        required: true
+        default: 'feat/copy-typography-cleanup'
 permissions:
   contents: write
 jobs:
-  test:
+  update-snapshots:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4.2.2
       with:
+        ref: ${{ github.event.inputs.branch }}
         token: ${{ secrets.GITHUB_TOKEN }}
-        fetch-depth: 0
     - uses: pnpm/action-setup@v4.1.0
     - uses: actions/setup-node@v4.2.0
       with:
@@ -23,14 +25,10 @@ jobs:
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
     - name: Install Playwright Browsers
-      # In CI only install Chromium to match the CI-only project set in playwright.config.ts
       run: pnpm exec playwright install --with-deps chromium
-
     - name: Update visual snapshots
       run: pnpm exec playwright test tests/e2e/visual.spec.ts --update-snapshots
     - name: Commit updated snapshots
-      env:
-        HEAD_REF: ${{ github.head_ref }}
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -39,18 +37,5 @@ jobs:
           echo "No snapshot changes to commit."
         else
           git commit -m "test: update visual regression baselines [skip ci]"
-          # Push to the PR head branch (HEAD_REF is set only on pull_request events)
-          if [ -n "$HEAD_REF" ]; then
-            git push origin "HEAD:$HEAD_REF"
-          else
-            git push
-          fi
+          git push
         fi
-    - name: Run Playwright tests
-      run: pnpm exec playwright test
-    - uses: actions/upload-artifact@v4.6.2
-      if: always()
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30

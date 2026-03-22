@@ -39,14 +39,14 @@ const WhyUs: React.FC = () => {
           
           <div className={`w-full lg:w-1/2 animate-on-scroll ${isVisible ? 'is-visible' : ''}`} style={{ transitionDelay: '200ms' }}>
             <h2 id="why-us-heading" className="text-3xl md:text-5xl font-black text-gray-900 mb-8 leading-tight">
-              Por que viajar com a <span className="text-anhanga-blue">Anhangá Viagens</span>?
+              Você cuida da setlist.<br /><span className="text-anhanga-blue">A gente cuida do resto.</span>
             </h2>
 
             <div className="space-y-8">
               {[
-                { Icon: UserCheck, title: "Atendimento Personalizado", text: "Não somos robôs. Você fala com especialistas reais que entendem suas necessidades e montam o pacote ideal.", color: "yellow" },
-                { Icon: ShieldCheck, title: "Experiência e Segurança", text: "Curadoria profissional de hotéis e transportes. Monitoramos tudo para garantir sua segurança em São Paulo.", color: "blue" },
-                { Icon: HeartHandshake, title: "Acompanhamento Completo", text: "Desde o planejamento até o retorno para casa, estamos ao seu lado garantindo que tudo saia perfeito.", color: "green" }
+                { Icon: UserCheck, title: "Gente de verdade, não robô", text: "Você fala com quem já organizou centenas de pacotes para o Lolla. Especialistas que sabem o que faz diferença no evento.", color: "yellow" },
+                { Icon: ShieldCheck, title: "Cada detalhe no lugar", text: "Hotel a distância do autódromo, transfer no horário certo, ingresso em mãos. Sem táxi às 23h. Sem susto na chegada.", color: "blue" },
+                { Icon: HeartHandshake, title: "WhatsApp aberto durante o festival", text: "Se surgir qualquer problema durante os três dias, estamos disponíveis. Você curte os shows, a gente resolve o resto.", color: "green" }
               ].map((item, index) => (
                 <div key={index} className="flex gap-4 group">
                   <div className="flex-shrink-0 mt-1">

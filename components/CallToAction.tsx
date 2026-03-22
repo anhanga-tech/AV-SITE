@@ -1,12 +1,23 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import {
     ChatCentered,
     AirplaneTilt,
     DeviceMobile,
+    WhatsappLogo,
+    CheckCircle,
+    SpinnerGap,
 } from '@phosphor-icons/react';
 import { openAiChat } from '../utils/aiChat';
+import { useLeadCapture, createLeadEventId } from '../hooks/useLeadCapture';
+import { getWhatsAppLink } from '../utils/whatsapp';
+
+type FormState = 'closed' | 'open' | 'submitted';
 
 const CallToAction: React.FC = () => {
+    const { submitLead, isSubmitting, error } = useLeadCapture();
+    const [formState, setFormState] = useState<FormState>('closed');
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
 
     const handleCTAClick = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -14,6 +25,37 @@ const CallToAction: React.FC = () => {
             message: 'Olá! Gostaria de fazer meu check-in e solicitar um orçamento personalizado.'
         });
     };
+
+    const handleSecondarySubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const parts = name.trim().split(/\s+/);
+        const firstName = parts[0] ?? '';
+        const lastName = parts.slice(1).join(' ') || firstName;
+
+        const result = await submitLead(
+            {
+                firstName,
+                lastName,
+                email: email.trim(),
+                bantSummary: 'Interesse inicial capturado via CTA homepage.',
+                destination: 'A definir',
+            },
+            { eventId: createLeadEventId(), pushDataLayerEvent: true },
+        );
+
+        if (result.ok) {
+            setFormState('submitted');
+        }
+    };
+
+    // Computed only after submission — reads sessionStorage via getWhatsAppLink.
+    const whatsappSuccessUrl = useMemo(
+        () => getWhatsAppLink(
+            `Olá! Me chamo ${name.trim() || 'você'} e acabei de deixar meu contato no site. Gostaria de saber mais sobre como planejar minha viagem.`,
+            { appendTrackingRef: true },
+        ),
+        [name],
+    );
 
     return (
         <section id="contato" className="py-24 bg-brand-light relative overflow-hidden">
@@ -43,24 +85,99 @@ const CallToAction: React.FC = () => {
                         {/* Main Content */}
                         <div className="mb-8">
                             <h2 className="text-4xl md:text-5xl font-black text-brand-dark mb-4 leading-tight">
-                                Sua próxima parada: <br />
-                                <span className="text-brand-vibrant">O Inesquecível.</span>
+                                Próxima parada: <br />
+                                <span className="text-brand-vibrant">aquele lugar que você sempre adiou.</span>
                             </h2>
                             <p className="text-gray-500 font-medium text-lg max-w-md">
-                                O orçamento é gratuito, o roteiro é exclusivo e as memórias são para sempre.
+                                Orçamento gratuito. Roteiro feito do zero, só pra você. A viagem que você vai contar por anos.
                             </p>
                         </div>
 
                         {/* Footer / CTA */}
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                        <div className="flex flex-col gap-4">
                             <button
                                 onClick={handleCTAClick}
-                                className="btn-whatsapp btn-specialist flex items-center gap-3 bg-brand-dark text-white text-lg font-bold px-8 py-4 rounded-xl shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
+                                className="btn-whatsapp btn-specialist flex items-center gap-3 bg-brand-dark text-white text-lg font-bold px-8 py-4 rounded-xl shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all self-start"
                                 data-tracking="cta-home-footer"
                             >
-                                <span>Solicitar Orçamento Personalizado</span>
+                                <span>Começar minha Viagem</span>
                                 <ChatCentered className="w-5 h-5" weight="fill" />
                             </button>
+
+                            {/* Botão secundário — captura nome + email → HubSpot */}
+                            {formState === 'closed' && (
+                                <button
+                                    onClick={() => setFormState('open')}
+                                    className="flex items-center gap-2 text-gray-500 hover:text-green-600 text-sm font-semibold transition-colors self-start"
+                                    data-tracking="cta-home-footer-whatsapp"
+                                >
+                                    <WhatsappLogo className="w-4 h-4" weight="fill" />
+                                    Prefere o WhatsApp? Deixe seu contato →
+                                </button>
+                            )}
+
+                            {formState === 'open' && (
+                                <form
+                                    onSubmit={handleSecondarySubmit}
+                                    className="flex flex-col gap-3 w-full max-w-xs"
+                                    noValidate
+                                >
+                                    <input
+                                        type="text"
+                                        placeholder="Seu nome"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        required
+                                        className="px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-brand-cyan transition-colors placeholder-gray-400"
+                                    />
+                                    <input
+                                        type="email"
+                                        placeholder="Seu melhor e-mail"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                        className="px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-brand-cyan transition-colors placeholder-gray-400"
+                                    />
+                                    {error && (
+                                        <p className="text-red-500 text-xs font-medium">{error}</p>
+                                    )}
+                                    <button
+                                        type="submit"
+                                        disabled={isSubmitting || !name.trim() || !email.trim()}
+                                        className="flex items-center justify-center gap-2 bg-green-500 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                    >
+                                        {isSubmitting ? (
+                                            <>
+                                                <SpinnerGap className="w-4 h-4 animate-spin" weight="bold" />
+                                                Enviando…
+                                            </>
+                                        ) : (
+                                            <>
+                                                <WhatsappLogo className="w-4 h-4" weight="fill" />
+                                                Enviar contato
+                                            </>
+                                        )}
+                                    </button>
+                                </form>
+                            )}
+
+                            {formState === 'submitted' && (
+                                <div className="flex flex-col gap-2">
+                                    <p className="flex items-center gap-2 text-green-600 text-sm font-bold">
+                                        <CheckCircle className="w-5 h-5" weight="fill" />
+                                        Recebemos! Nossa equipe entra em contato em breve.
+                                    </p>
+                                    <a
+                                        href={whatsappSuccessUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-2 text-green-600 hover:text-green-700 text-sm font-semibold transition-colors"
+                                    >
+                                        <WhatsappLogo className="w-4 h-4" weight="fill" />
+                                        Ou fale agora no WhatsApp →
+                                    </a>
+                                </div>
+                            )}
                         </div>
 
                         {/* Top "Hole" for perforation illusion */}

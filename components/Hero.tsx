@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { HERO_VIDEOS, optimizeRemoteImageUrl } from '../data/mediaConfig';
 import { QUICK_FEATURES } from '../data/destinations';
 import SearchForm from './SearchForm';
+import { openAiChat } from '../utils/aiChat';
 
 const Hero: React.FC = () => {
   // PERFORMANCE: Use the first video by default to match the LCP preload in index.html.
@@ -16,6 +17,7 @@ const Hero: React.FC = () => {
   );
 
   const [validCityForTitle, setValidCityForTitle] = useState<string | null>(null);
+  const [mobileDestination, setMobileDestination] = useState('');
 
   // Defer video loading on mobile / save-data and wait for user intent.
   useEffect(() => {
@@ -133,7 +135,7 @@ const Hero: React.FC = () => {
                 `}
           >
             <span className="block text-sm sm:text-base font-semibold text-white/80 tracking-widest uppercase mb-3 leading-normal">
-              Agência de Viagens em São Paulo
+              Para quem não consegue mais ficar parado.
             </span>
             Sua Próxima <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500 relative inline-block pb-2">
@@ -155,11 +157,46 @@ const Hero: React.FC = () => {
           </h1>
 
           <p className="text-white/90 text-xl md:text-2xl max-w-2xl mx-auto mb-12 font-medium leading-relaxed drop-shadow-md">
-            Roteiros que parecem feitos à mão. <br />
-            Porque sua viagem merece ser única.
+            Cada roteiro nasce de uma conversa.
           </p>
 
-          <SearchForm onDestinationMatch={setValidCityForTitle} />
+          {/* Formulário completo — apenas desktop */}
+          <div className="hidden md:block w-full">
+            <SearchForm onDestinationMatch={setValidCityForTitle} />
+          </div>
+
+          {/* CTA simplificado — apenas mobile */}
+          <div className="md:hidden w-full max-w-sm mx-auto">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                openAiChat({
+                  message: mobileDestination.trim()
+                    ? `Olá! Tenho interesse em viajar para ${mobileDestination.trim()}. Podem me ajudar com um orçamento?`
+                    : 'Olá! Gostaria de montar um roteiro personalizado. Podem me ajudar?',
+                });
+              }}
+              className="flex flex-col gap-3"
+            >
+              <div className="flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-2xl px-4 py-3 shadow-lg border border-white/30">
+                <span className="text-brand-cyan text-lg">📍</span>
+                <input
+                  type="text"
+                  value={mobileDestination}
+                  onChange={(e) => setMobileDestination(e.target.value)}
+                  placeholder="Para onde você quer ir?"
+                  className="flex-1 outline-none text-gray-800 font-semibold placeholder-gray-400 bg-transparent text-base"
+                  autoComplete="off"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-brand-yellow text-brand-dark font-black text-base py-4 rounded-2xl shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
+              >
+                Quero meu orçamento →
+              </button>
+            </form>
+          </div>
 
           {/* Micro-texto abaixo da barra de busca */}
           <p className="text-sm text-white/70 text-center mt-3">

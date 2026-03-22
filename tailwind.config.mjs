@@ -38,10 +38,8 @@ export default {
                 },
             },
             fontFamily: {
-                sans: ['Poppins', 'Inter', 'sans-serif'],
+                sans: ['Poppins', 'sans-serif'],
                 serif: ['Merriweather', 'serif'], // Fonte editorial para o blog
-                heading: ['Fredoka', 'Outfit', 'sans-serif'],
-                body: ['Nunito', 'Outfit', 'sans-serif'],
             },
             boxShadow: {
                 'glow': '0 0 20px rgba(14, 165, 233, 0.5)',
