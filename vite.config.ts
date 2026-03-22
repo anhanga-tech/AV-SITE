@@ -11,7 +11,6 @@ import { stripYamlFrontmatter } from './lib/mdx-frontmatter.ts';
 type ApiHandler = (request: Request) => Promise<Response> | Response;
 
 const DEV_API_ROUTES: Record<string, () => Promise<{ default: ApiHandler }>> = {
-  '/api/blog-posts': () => import('./api/blog-posts.ts'),
   '/api/generate': () => import('./api/generate.ts'),
   '/api/submit-lead': () => import('./api/submit-lead.ts'),
   '/api/submit-waitlist': () => import('./api/submit-waitlist.ts'),

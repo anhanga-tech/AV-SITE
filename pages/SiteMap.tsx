@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { SEO } from '../components/SEO';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
-import { BLOG_POSTS } from '../data/blogData';
+import { getAllPosts } from '../lib/mdx';
 import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 
 const SITE_URL = 'https://www.anhanga.tur.br';
@@ -51,8 +51,8 @@ const SiteMap: React.FC = () => {
 
           <h2 className="text-2xl font-extrabold text-brand-dark mb-4">Blog</h2>
           <ul className="space-y-3">
-            {BLOG_POSTS.map((post) => (
-              <li key={post.id}>
+            {getAllPosts().map((post) => (
+              <li key={post.slug}>
                 <a href={getBlogPostUrl(post.slug)} className="text-brand-cyan hover:underline font-semibold">
                   {post.title}
                 </a>
