@@ -1,57 +1,23 @@
-import React, { useState, useEffect, memo } from 'react';
+import React from 'react';
 import Calendar from 'lucide-react/dist/esm/icons/calendar';
 import User from 'lucide-react/dist/esm/icons/user';
 import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import BookOpen from 'lucide-react/dist/esm/icons/book-open';
 import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
-import Loader2 from 'lucide-react/dist/esm/icons/loader-2';
-import { BLOG_POSTS, BlogPost as BlogPostType } from '../data/blogData';
+import { getAllPosts } from '../lib/mdx';
 import { SocialShare } from './SocialShare';
 import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 import { optimizeRemoteImageUrl } from '../data/mediaConfig';
-import { fetchRecentPosts } from '../lib/blog-api';
+import { getCategoryColor } from '../utils/categoryColors';
 
-/**
- * Blog Component - Optimized with memoization and CSS hover
- *
- * PERFORMANCE WIN:
- * 1. Removed 'hoveredId' state which caused full list re-renders on mouse over.
- * 2. Replaced with Tailwind 'group-hover' for CSS-native reactive styling.
- * 3. Wrapped in React.memo to prevent unnecessary re-renders when Home parent updates.
- */
-const Blog: React.FC = memo(() => {
-    const [posts, setPosts] = useState<BlogPostType[]>(BLOG_POSTS.slice(0, 4));
-    const [isLoading, setIsLoading] = useState(true);
+const allPosts = getAllPosts();
+const displayPosts = allPosts.slice(0, 4);
+const featuredPost = displayPosts.find(p => p.featured) ?? displayPosts[0];
+const gridPosts = featuredPost
+    ? displayPosts.filter(p => p.slug !== featuredPost.slug).slice(0, 3)
+    : [];
 
-    useEffect(() => {
-        let isMounted = true;
-
-        async function loadPosts() {
-            try {
-                const fetchedPosts = await fetchRecentPosts(4);
-                if (isMounted && fetchedPosts && fetchedPosts.length > 0) {
-                    setPosts(fetchedPosts);
-                }
-            } catch (error) {
-                console.error('Failed to load dynamic posts, using fallback', error);
-            } finally {
-                if (isMounted) {
-                    setIsLoading(false);
-                }
-            }
-        }
-
-        loadPosts();
-
-        return () => {
-            isMounted = false;
-        };
-    }, []);
-
-    const displayPosts = posts;
-    const featuredPost = displayPosts.find(p => p.isFeatured) || displayPosts[0];
-    const gridPosts = displayPosts.filter(p => p.id !== featuredPost.id).slice(0, 3);
-
+const Blog: React.FC = () => {
     return (
         <section id="blog" className="py-24 bg-white relative overflow-hidden">
             {/* Background Decorations */}
@@ -72,16 +38,8 @@ const Blog: React.FC = memo(() => {
                     </p>
                 </div>
 
-                {/* Loading State */}
-                {isLoading && (
-                    <div className="flex flex-col items-center justify-center py-12 text-gray-400">
-                        <Loader2 className="w-8 h-8 animate-spin mb-4" />
-                        <p className="font-medium">Carregando novidades...</p>
-                    </div>
-                )}
-
                 {/* Featured Post Layout */}
-                {!isLoading && featuredPost && (
+                {featuredPost && (
                     <div className="mb-16 cursor-pointer relative">
                         <a href={getBlogPostUrl(featuredPost.slug)} className="group">
                             <div className="bg-[#fffdf5] rounded-[2.5rem] p-6 md:p-8 border-4 border-gray-100 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] flex flex-col md:flex-row gap-8 items-center transition-transform duration-300 hover:scale-[1.01]">
@@ -114,7 +72,7 @@ const Blog: React.FC = memo(() => {
                                 {/* Featured Content */}
                                 <div className="w-full md:w-1/2 md:pr-8">
                                     <div className="flex items-center gap-3 mb-4 text-sm font-bold text-gray-400">
-                                        <span className={`px-3 py-1 rounded-full ${featuredPost.color} bg-opacity-20 border`}>
+                                        <span className={`px-3 py-1 rounded-full border ${getCategoryColor(featuredPost.category)}`}>
                                             {featuredPost.category}
                                         </span>
                                         <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {featuredPost.date}</span>
@@ -146,17 +104,12 @@ const Blog: React.FC = memo(() => {
                 )}
 
                 {/* Grid Posts */}
-                {!isLoading && (
-                    <div className="grid md:grid-cols-3 gap-8">
+                <div className="grid md:grid-cols-3 gap-8">
                     {gridPosts.map((post) => (
                         <a
                             href={getBlogPostUrl(post.slug)}
-                            key={post.id}
-                            className={`
-                                group bg-white rounded-3xl p-4 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.05)] border border-gray-100
-                                transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl
-                                ${post.rotate} hover:rotate-0 flex flex-col h-full
-                            `}
+                            key={post.slug}
+                            className="group bg-white rounded-3xl p-4 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.05)] border border-gray-100 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl flex flex-col h-full"
                         >
                             {/* Image Area */}
                             <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-5 bg-gray-100">
@@ -183,7 +136,7 @@ const Blog: React.FC = memo(() => {
                             {/* Content */}
                             <div className="flex-1 flex flex-col">
                                 <div className="mb-3">
-                                    <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md border ${post.color}`}>
+                                    <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md border ${getCategoryColor(post.category)}`}>
                                         {post.category}
                                     </span>
                                 </div>
@@ -205,8 +158,7 @@ const Blog: React.FC = memo(() => {
                             </div>
                         </a>
                     ))}
-                    </div>
-                )}
+                </div>
 
                 {/* View More Button */}
                 <div className="mt-16 text-center">
@@ -219,8 +171,6 @@ const Blog: React.FC = memo(() => {
             </div>
         </section>
     );
-});
-
-Blog.displayName = 'Blog';
+};
 
 export default Blog;
