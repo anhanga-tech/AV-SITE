@@ -113,7 +113,7 @@ test('system prompt should document IATA code rules for the budget tool', () => 
 });
 
 test('system prompt should prefer structured JSON line for chips', () => {
-    assert.match(SYSTEM_INSTRUCTION, /\{"chips":\[/);
+    assert.match(SYSTEM_INSTRUCTION, /\{\"chips\":\[\"Opção 1\",\"Opção 2\",\"Opção 3\"\]\}/);
 });
 
 test('system prompt should define out-of-scope handling', () => {
