@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comparação de IDEs: VS Code vs Cursor vs Google Antigravity</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #60a5fa, #a78bfa, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      color: #94a3b8;
+      font-size: 0.95rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      max-width: 1100px;
+      margin: 0 auto 48px;
+    }
+
+    .card {
+      background: #1e2130;
+      border-radius: 16px;
+      border: 1px solid #2d3348;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+
+    .card-header {
+      padding: 24px 24px 16px;
+      border-bottom: 1px solid #2d3348;
+    }
+
+    .card-header .logo {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    .card-header h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .card-header .tagline {
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+
+    .badge-free { background: #14532d; color: #86efac; }
+    .badge-freemium { background: #1e3a5f; color: #93c5fd; }
+    .badge-preview { background: #3b1f6e; color: #c4b5fd; }
+
+    /* VS Code blue */
+    .vscode .card-header { border-top: 3px solid #0078d4; }
+    .vscode h2 { color: #60a5fa; }
+
+    /* Cursor purple */
+    .cursor .card-header { border-top: 3px solid #8b5cf6; }
+    .cursor h2 { color: #a78bfa; }
+
+    /* Antigravity green */
+    .antigravity .card-header { border-top: 3px solid #10b981; }
+    .antigravity h2 { color: #34d399; }
+
+    .card-body { padding: 20px 24px 24px; }
+
+    .section-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pros .section-title { color: #34d399; }
+    .cons .section-title { color: #f87171; }
+
+    .pros { margin-bottom: 16px; }
+
+    ul.items {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    ul.items li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.875rem;
+      line-height: 1.4;
+      color: #cbd5e1;
+    }
+
+    ul.items li .icon {
+      flex-shrink: 0;
+      margin-top: 2px;
+      font-size: 0.75rem;
+    }
+
+    .pros .icon { color: #34d399; }
+    .cons .icon { color: #f87171; }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #2d3348;
+      margin: 16px 0;
+    }
+
+    .score-row {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .score-item label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin-bottom: 4px;
+    }
+
+    .bar-bg {
+      background: #2d3348;
+      border-radius: 999px;
+      height: 6px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 1s ease;
+    }
+
+    .vscode .bar-fill { background: linear-gradient(90deg, #0078d4, #60a5fa); }
+    .cursor .bar-fill { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+    .antigravity .bar-fill { background: linear-gradient(90deg, #059669, #34d399); }
+
+    /* Summary table */
+    .summary {
+      max-width: 1100px;
+      margin: 0 auto 40px;
+      background: #1e2130;
+      border-radius: 16px;
+      border: 1px solid #2d3348;
+      overflow: hidden;
+    }
+
+    .summary h3 {
+      padding: 20px 24px 16px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #94a3b8;
+      border-bottom: 1px solid #2d3348;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 0.75rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      padding: 12px 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-align: left;
+      background: #161825;
+      color: #94a3b8;
+      border-bottom: 1px solid #2d3348;
+    }
+
+    td {
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      border-bottom: 1px solid #1a1e2e;
+      color: #cbd5e1;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    tr:hover td { background: #23293d; }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    .tag-yes { background: #14532d; color: #86efac; }
+    .tag-no { background: #450a0a; color: #fca5a5; }
+    .tag-partial { background: #431407; color: #fdba74; }
+
+    .verdict {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .verdict-card {
+      background: #1e2130;
+      border: 1px solid #2d3348;
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .verdict-card h4 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+      margin-bottom: 8px;
+    }
+
+    .verdict-card .who {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .verdict-card p {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    .vscode-verdict .who { color: #60a5fa; }
+    .cursor-verdict .who { color: #a78bfa; }
+    .antigravity-verdict .who { color: #34d399; }
+
+    footer {
+      text-align: center;
+      margin-top: 48px;
+      color: #475569;
+      font-size: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>⚡ Comparação de IDEs</h1>
+    <p>VS Code &nbsp;·&nbsp; Cursor &nbsp;·&nbsp; Google Antigravity &nbsp;—&nbsp; Março 2026</p>
+  </header>
+
+  <!-- Cards -->
+  <div class="grid">
+
+    <!-- VS Code -->
+    <div class="card vscode">
+      <div class="card-header">
+        <div class="logo">🔵</div>
+        <h2>Visual Studio Code</h2>
+        <div class="tagline">Microsoft · Open Source · Desde 2015</div>
+        <span class="badge badge-free">Gratuito & Open Source</span>
+      </div>
+      <div class="card-body">
+        <div class="pros">
+          <div class="section-title">✅ Prós</div>
+          <ul class="items">
+            <li><span class="icon">✔</span>Ecossistema de extensões mais rico do mundo (+50k extensões)</li>
+            <li><span class="icon">✔</span>Suporte TypeScript nativo e excepcional (ambos feitos pela Microsoft)</li>
+            <li><span class="icon">✔</span>Extensão oficial do Claude Code integrada</li>
+            <li><span class="icon">✔</span>Comunidade enorme — solução para qualquer problema está no Google</li>
+            <li><span class="icon">✔</span>Leve, estável e confiável em produção</li>
+            <li><span class="icon">✔</span>Suporte a Tailwind IntelliSense, ESLint, Prettier nativamente</li>
+            <li><span class="icon">✔</span>Funciona com Claude Code, Gemini CLI e Opencode via terminal</li>
+          </ul>
+        </div>
+        <hr class="divider" />
+        <div class="cons">
+          <div class="section-title">❌ Contras</div>
+          <ul class="items">
+            <li><span class="icon">✖</span>IA não é nativa — depende de extensões (Copilot, Gemini Assist)</li>
+            <li><span class="icon">✖</span>Configuração inicial pode ser demorada para iniciantes</li>
+            <li><span class="icon">✖</span>Sem orquestração de agentes de IA por padrão</li>
+            <li><span class="icon">✖</span>Copilot (melhor IA integrada) tem custo adicional</li>
+          </ul>
+        </div>
+        <hr class="divider" />
+        <div class="score-row">
+          <div class="score-item">
+            <label><span>Suporte TypeScript/React</span><span>95%</span></label>
+            <div class="bar-bg"><div class="bar-fill" style="width:95%"></div></div>
+          </div>
+          <div class="score-item">
+            <label><span>IA integrada</span><span>60%</span></label>
+            <div class="bar-bg"><div class="bar-fill" style="width:60%"></div></div>
+          </div>
+          <div class="score-item">
+            <label><span>Facilidade para iniciantes</span><span>70%</span></label>
+            <div class="bar-bg"><div class="bar-fill" style="width:70%"></div></div>
+          </div>
+          <div class="score-item">
+            <label><span>Ecossistema & extensões</span><span>99%</span></label>
+            <div class="bar-bg"><div class="bar-fill" style="width:99%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cursor -->
+    <div class="card cursor">
+      <div class="card-header">
+        <div class="logo">🟣</div>
+        <h2>Cursor</h2>
+        <div class="tagline">Anysphere · Fork do VS Code · Desde 2023</div>
+        <span class="badge badge-freemium">Freemium (US$20/mês Pro)</span>
+      </div>
+      <div class="card-body">
+        <div class="pros">
+          <div class="section-title">✅ Prós</div>
+          <ul class="items">
+            <li><span class="icon">✔</span>IA com contexto de codebase completo — entende o projeto inteiro</li>
+            <li><span class="icon">✔</span>Compatível com todas as extensões do VS Code</li>
+            <li><span class="icon">✔</span>Suporta Claude, GPT-4o e Gemini como modelos</li>
+            <li><span class="icon">✔</span>Edição por linguagem natural diretamente no arquivo</li>
+            <li><span class="icon">✔</span>Complementa bem Claude Code e Gemini CLI (ferramentas distintas)</li>
+            <li><span class="icon">✔</span>Curva de aprendizado suave para quem já usa VS Code</li>
+          </ul>
+        </div>
+        <hr class="divider" />
+        <div class="cons">
+          <div class="section-title">❌ Contras</div>
+          <ul class="items">
+            <li><span class="icon">✖</span>Versão gratuita tem limite de uso mensal de IA</li>
+            <li><span class="icon">✖</span>Empresa menor, menos garantia de suporte a longo prazo</li>
+            <li><span class="icon">✖</span>Consome mais memória que o VS Code puro</li>
+            <li><span class="icon">✖</span>Sem orquestração multi-agente nativa</li>
+          </ul>
+        </div>
+        <hr class="divider" />
+        <div class="score-row">
+          <div class="score-item">
+            <label><span>Suporte TypeScript/React</span><span>93%</span></label>
+            <div class="bar-bg"><div class="bar-fill" style="width:93%"></div></div>
+          </div>
+          <div class="score-item">
+            <label><span>IA integrada</span><span>90%</span></label>
+            <div class="bar-bg"><div class="bar-fill" style="width:90%"></div></div>
+          </div>
+          <div class="score-item">
+            <label><span>Facilidade para iniciantes</span><span>82%</span></label>
+            <div class="bar-bg"><div class="bar-fill" style="width:82%"></div></div>
+          </div>
+          <div class="score-item">
+            <label><span>Ecossistema & extensões</span><span>92%</span></label>
+            <div class="bar-bg"><div class="bar-fill" style="width:92%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Google Antigravity -->
+    <div class="card antigravity">
+      <div class="card-header">
+        <div class="logo">🟢</div>
+        <h2>Google Antigravity</h2>
+        <div class="tagline">Google · Fork do VS Code · Lançado Nov 2025</div>
+        <span class="badge badge-preview">Public Preview · Gratuito</span>
+      </div>
+      <div class="card-body">
+        <div class="pros">
+          <div class="section-title">✅ Prós</div>
+          <ul class="items">
+            <li><span class="icon">✔</span>Orquestração de múltiplos agentes de IA trabalhando em paralelo</li>
+            <li><span class="icon">✔</span>Agentes geram Artifacts (planos, screenshots, gravações de browser)</li>
+            <li><span class="icon">✔</span>Suporta Gemini 3 Pro, Claude Sonnet/Opus e GPT-OSS 120B</li>
+            <li><span class="icon">✔</span>Contexto persistente entre sessões (Knowledge Items)</li>
+            <li><span class="icon">✔</span>Completamente gratuito para uso individual</li>
+            <li><span class="icon">✔</span>Integração nativa com ecossistema Google (Cloud, Firebase, etc.)</li>
+          </ul>
+        </div>
+        <hr class="divider" />
+        <div class="cons">
+          <div class="section-title">❌ Contras</div>
+          <ul class="items">
+            <li><span class="icon">✖</span>Ainda em Preview público — pode ter bugs e instabilidades</li>
+            <li><span class="icon">✖</span>Vulnerabilidade de segurança identificada em nov/2025 (em correção)</li>
+            <li><span class="icon">✖</span>Comportamento dos agentes pode ser imprevisível</li>
+            <li><span class="icon">✖</span>Sem suporte a modelos locais (sempre depende de cloud)</li>
+            <li><span class="icon">✖</span>Mover pastas do projeto pode quebrar silenciosamente</li>
+            <li><span class="icon">✖</span>Sem workflow hooks para triggers automáticos de agentes</li>
+          </ul>
+        </div>
+        <hr class="divider" />
+        <div class="score-row">
+          <div class="score-item">
+            <label><span>Suporte TypeScript/React</span><span>80%</span></label>
+            <div class="bar-bg"><div class="bar-fill" style="width:80%"></div></div>
+          </div>
+          <div class="score-item">
+            <label><span>IA integrada</span><span>95%</span></label>
+            <div class="bar-bg"><div class="bar-fill" style="width:95%"></div></div>
+          </div>
+          <div class="score-item">
+            <label><span>Facilidade para iniciantes</span><span>75%</span></label>
+            <div class="bar-bg"><div class="bar-fill" style="width:75%"></div></div>
+          </div>
+          <div class="score-item">
+            <label><span>Ecossistema & extensões</span><span>85%</span></label>
+            <div class="bar-bg"><div class="bar-fill" style="width:85%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tabela comparativa -->
+  <div class="summary">
+    <h3>📊 Tabela Comparativa Rápida</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Critério</th>
+          <th>🔵 VS Code</th>
+          <th>🟣 Cursor</th>
+          <th>🟢 Google Antigravity</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Preço</td>
+          <td>Gratuito</td>
+          <td>Gratuito / US$20/mês</td>
+          <td>Gratuito (preview)</td>
+        </tr>
+        <tr>
+          <td>Extensões VS Code</td>
+          <td><span class="tag tag-yes">✔ Sim</span></td>
+          <td><span class="tag tag-yes">✔ Sim</span></td>
+          <td><span class="tag tag-yes">✔ Sim</span></td>
+        </tr>
+        <tr>
+          <td>IA com contexto de codebase</td>
+          <td><span class="tag tag-partial">⚡ Via extensão</span></td>
+          <td><span class="tag tag-yes">✔ Nativa</span></td>
+          <td><span class="tag tag-yes">✔ Nativa</span></td>
+        </tr>
+        <tr>
+          <td>Multi-agente / Agentic</td>
+          <td><span class="tag tag-no">✖ Não</span></td>
+          <td><span class="tag tag-partial">⚡ Limitado</span></td>
+          <td><span class="tag tag-yes">✔ Principal diferencial</span></td>
+        </tr>
+        <tr>
+          <td>Suporte a Claude</td>
+          <td><span class="tag tag-partial">⚡ Via extensão</span></td>
+          <td><span class="tag tag-yes">✔ Nativo</span></td>
+          <td><span class="tag tag-yes">✔ Nativo</span></td>
+        </tr>
+        <tr>
+          <td>Suporte a Gemini</td>
+          <td><span class="tag tag-partial">⚡ Via extensão</span></td>
+          <td><span class="tag tag-yes">✔ Sim</span></td>
+          <td><span class="tag tag-yes">✔ Principal modelo</span></td>
+        </tr>
+        <tr>
+          <td>Modelos locais</td>
+          <td><span class="tag tag-yes">✔ Via Ollama</span></td>
+          <td><span class="tag tag-yes">✔ Via Ollama</span></td>
+          <td><span class="tag tag-no">✖ Não</span></td>
+        </tr>
+        <tr>
+          <td>Estabilidade / Maturidade</td>
+          <td><span class="tag tag-yes">✔ 10 anos</span></td>
+          <td><span class="tag tag-partial">⚡ 2 anos</span></td>
+          <td><span class="tag tag-no">⚡ Preview (nov/2025)</span></td>
+        </tr>
+        <tr>
+          <td>Integração Google Cloud</td>
+          <td><span class="tag tag-partial">⚡ Via extensão</span></td>
+          <td><span class="tag tag-partial">⚡ Via extensão</span></td>
+          <td><span class="tag tag-yes">✔ Nativa</span></td>
+        </tr>
+        <tr>
+          <td>Ideal para aprender programação</td>
+          <td><span class="tag tag-yes">✔ Muito bom</span></td>
+          <td><span class="tag tag-yes">✔ Muito bom</span></td>
+          <td><span class="tag tag-partial">⚡ Razoável</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Veredito -->
+  <div class="verdict">
+    <div class="verdict-card vscode-verdict">
+      <h4>🔵 Escolha VS Code se...</h4>
+      <div class="who">Você quer estabilidade e o melhor ecossistema</div>
+      <p>Ideal para quem está aprendendo programação, quer a maior comunidade possível e usa Claude Code + Gemini CLI via terminal. A base mais sólida para qualquer stack.</p>
+    </div>
+    <div class="verdict-card cursor-verdict">
+      <h4>🟣 Escolha Cursor se...</h4>
+      <div class="who">Você quer IA poderosa no dia a dia</div>
+      <p>Perfeito para quem já tem algum conforto com código e quer acelerar com IA dentro do editor. O melhor custo-benefício para desenvolvimento React/TypeScript com IA.</p>
+    </div>
+    <div class="verdict-card antigravity-verdict">
+      <h4>🟢 Experimente Antigravity se...</h4>
+      <div class="who">Você quer explorar o futuro dos IDEs</div>
+      <p>Para quem quer orquestrar agentes de IA em tarefas complexas e se integrar ao ecossistema Google. Ainda em preview, mas vale experimentar como segundo IDE.</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>Comparação gerada em março de 2026 · Dados baseados em documentação oficial e reviews públicos</p>
+  </footer>
+
+</body>
+</html>

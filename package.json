@@ -33,6 +33,7 @@
     "framer-motion": "^12.35.1",
     "leaflet": "1.9.4",
     "lucide-react": "^0.577.0",
+    "marketingskills": "github:coreyhaines31/marketingskills",
     "postcss": "^8.5.8",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
