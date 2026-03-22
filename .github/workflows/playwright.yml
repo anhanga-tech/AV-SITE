@@ -5,13 +5,15 @@ on:
   pull_request:
     branches: [ main ]
 permissions:
-  contents: read
+  contents: write
 jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4.2.2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
     - uses: pnpm/action-setup@v4.1.0
     - uses: actions/setup-node@v4.2.0
       with:
@@ -23,6 +25,19 @@ jobs:
       # In CI only install Chromium to match the CI-only project set in playwright.config.ts
       run: pnpm exec playwright install --with-deps chromium
 
+    - name: Update visual snapshots
+      run: pnpm exec playwright test tests/e2e/visual.spec.ts --update-snapshots
+    - name: Commit updated snapshots
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add tests/e2e/visual.spec.ts-snapshots/
+        if git diff --staged --quiet; then
+          echo "No snapshot changes to commit."
+        else
+          git commit -m "test: update visual regression baselines [skip ci]"
+          git push
+        fi
     - name: Run Playwright tests
       run: pnpm exec playwright test
     - uses: actions/upload-artifact@v4.6.2
