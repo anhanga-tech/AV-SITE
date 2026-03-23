@@ -38,7 +38,7 @@ const BetoCarreroLanding: React.FC = () => {
         keywords="pacote Beto Carrero, viagem Beto Carrero, ingresso Beto Carrero, pacote família Beto Carrero, agência de viagens Beto Carrero"
       />
       <ServiceSchema
-        name="Pacote Beto Carrero 2025/2026"
+        name="Pacote Beto Carrero 2026"
         description="Planejamento de pacote para o Beto Carrero World com hotel, ingressos, transporte e suporte especializado."
         serviceUrl="https://www.anhanga.tur.br/beto-carrero/"
         serviceType="Pacote de viagem para parque temático"
