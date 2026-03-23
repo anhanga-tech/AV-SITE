@@ -63,11 +63,11 @@ const BlogList: React.FC = () => {
                     <h1 className="text-4xl md:text-6xl font-black text-brand-dark mb-6">
                         Diário de <span className="text-brand-cyan">Bordo</span>
                     </h1>
-                    <p className="text-xl text-gray-500 font-medium mb-8">
+                    <p className="text-xl text-gray-500 font-medium mb-6">
                         Explore nosso acervo completo de dicas, roteiros e segredos de viagem.
                     </p>
 
-                    <div className="flex justify-center mb-10">
+                    <div className="flex justify-center mb-5">
                         <button
                             onClick={(e) => {
                                 e.preventDefault();
@@ -84,7 +84,7 @@ const BlogList: React.FC = () => {
                     </div>
 
                     {/* Search Bar */}
-                    <div className="mt-8 relative max-w-lg mx-auto">
+                    <div className="relative max-w-lg mx-auto">
                         <label htmlFor="blog-search-input" className="sr-only">Buscar artigos</label>
                         <input
                             id="blog-search-input"

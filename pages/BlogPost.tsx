@@ -182,7 +182,7 @@ const BlogPost: React.FC = () => {
                     <div className="w-full lg:w-2/3">
                         <div className="bg-white rounded-[2.5rem] p-8 md:p-14 shadow-xl border border-gray-100">
 
-                            <div className="mb-10 pb-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="mb-6 pb-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div className="flex items-center gap-3">
                                     <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest ${getCategoryColor(post.category)} bg-opacity-20 border`}>
                                         {post.category}
@@ -208,7 +208,7 @@ const BlogPost: React.FC = () => {
                                         prose-ul:list-disc prose-ul:pl-6 prose-ul:marker:text-brand-yellow
                                         prose-li:font-serif prose-li:text-gray-600
                                         prose-blockquote:border-l-4 prose-blockquote:border-brand-yellow prose-blockquote:bg-yellow-50 prose-blockquote:py-4 prose-blockquote:px-8 prose-blockquote:rounded-r-2xl prose-blockquote:not-italic prose-blockquote:font-serif prose-blockquote:text-gray-700
-                                        first-letter:text-5xl first-letter:font-black first-letter:text-brand-dark first-letter:mr-3 first-letter:float-left first-letter:leading-[0.8]
+                                        first-letter:text-[4.5rem] first-letter:font-black first-letter:text-brand-dark first-letter:float-left first-letter:leading-none first-letter:mr-2 first-letter:mt-1
                                     ">
                                         <Suspense fallback={
                                             <div className="animate-pulse space-y-4">
@@ -228,7 +228,7 @@ const BlogPost: React.FC = () => {
                                 </div>
                             )}
 
-                            <div className="mt-16 pt-10 border-t-2 border-dashed border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-6">
+                            <div className="mt-12 pt-8 border-t-2 border-dashed border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-6">
                                 <div className="flex items-center gap-2">
                                     <span className="font-bold text-brand-dark text-lg">Gostou? Espalhe a palavra:</span>
                                 </div>
