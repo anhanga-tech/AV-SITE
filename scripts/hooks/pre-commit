@@ -1,0 +1,3 @@
+#!/bin/sh
+# Atualiza dateModified nos posts MDX staged e regenera o manifest.
+node scripts/update-post-dates.mjs

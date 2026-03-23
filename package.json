@@ -14,7 +14,9 @@
     "test:regression": "pnpm generate:blog-manifest && tsx --test tests/*.test.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:update-snapshots": "playwright test tests/e2e/visual.spec.ts --update-snapshots"
+    "test:update-snapshots": "playwright test tests/e2e/visual.spec.ts --update-snapshots",
+    "prepare": "node scripts/install-hooks.mjs",
+    "update:dates": "node scripts/update-post-dates.mjs --all"
   },
   "dependencies": {
     "@google/genai": "^1.44.0",

@@ -6,6 +6,7 @@ interface ArticleSchemaProps {
     description: string;
     image: string;
     datePublished: string;
+    dateModified?: string;
     authorName: string;
     authorImage?: string;
     url: string;
@@ -16,6 +17,7 @@ export const ArticleSchema: React.FC<ArticleSchemaProps> = ({
     description,
     image,
     datePublished,
+    dateModified,
     authorName,
     authorImage,
     url
@@ -41,6 +43,7 @@ export const ArticleSchema: React.FC<ArticleSchemaProps> = ({
         }
       },
       "datePublished": datePublished,
+      "dateModified": dateModified ?? datePublished,
       "description": description,
       "mainEntityOfPage": {
         "@type": "WebPage",

@@ -12,9 +12,13 @@ Disallow: /_next/
 # AI Crawlers - Explicitly Allowed for GEO
 User-agent: GPTBot
 User-agent: ChatGPT-User
+User-agent: OAI-SearchBot
 User-agent: PerplexityBot
+User-agent: ClaudeBot
+User-agent: anthropic-ai
 User-agent: Claude-Web
 User-agent: Google-Extended
+User-agent: Bingbot
 Allow: /
 
 # Aggressive SEO Bots - Throttled

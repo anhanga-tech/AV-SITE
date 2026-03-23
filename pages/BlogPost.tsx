@@ -99,6 +99,7 @@ const BlogPost: React.FC = () => {
                 description={post.excerpt}
                 image={post.image}
                 datePublished={post.date}
+                dateModified={post.dateModified}
                 authorName={author?.name || post.author}
                 authorImage={author?.image}
                 url={canonicalUrl}

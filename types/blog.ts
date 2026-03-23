@@ -1,7 +1,8 @@
 export interface BlogPostFrontmatter {
   title: string;
   excerpt: string;         // max 160 chars — usado no <meta description> e nos cards
-  date: string;            // ISO 8601: "2026-04-01"
+  date: string;            // ISO 8601: "2026-04-01" — data de publicação original
+  dateModified?: string;   // ISO 8601: "2026-04-15" — data da última revisão significativa
   author: string;          // chave do objeto AUTHORS em blogData.ts
   category: string;
   image: string;           // URL absoluta da imagem de capa
