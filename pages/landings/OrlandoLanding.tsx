@@ -43,7 +43,7 @@ const OrlandoLanding: React.FC = () => {
         keywords="pacotes para Orlando, viagem para Orlando, roteiro Disney Orlando, pacote Universal Orlando, agência de viagens Orlando São Paulo"
       />
       <ServiceSchema
-        name="Pacotes para Orlando 2025/2026"
+        name="Pacotes para Orlando 2026"
         description="Planejamento de viagem para Orlando com suporte especializado, incluindo aéreo, hotel, ingressos e roteiro personalizado."
         serviceUrl="https://www.anhanga.tur.br/orlando/"
         serviceType="Planejamento de viagem para Orlando"
