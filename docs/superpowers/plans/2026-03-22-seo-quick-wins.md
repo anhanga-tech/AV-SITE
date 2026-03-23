@@ -63,7 +63,7 @@ Antes de codificar, foram verificados os arquivos reais. Registros importantes:
 
   Verificar que o arquivo abre sem erros: número de `<url>` deve subir de 17 para 18.
   ```bash
-  grep -c "<url>" /Users/felipewilliams/Projetos/Anhangá\ Viagens/AV-SITE/public/sitemap.xml
+  grep -c "<url>" public/sitemap.xml
   # Esperado: 18
   ```
 
