@@ -49,6 +49,17 @@
     </image:image>
   </url>
 
+  <url>
+    <loc>https://www.anhanga.tur.br/melhor-idade/</loc>
+    <lastmod>2026-03-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://www.anhanga.tur.br/og-image-1200x630.jpg</image:loc>
+      <image:caption>Pacotes de Viagem para Melhor Idade 50+ - Anhangá Viagens</image:caption>
+    </image:image>
+  </url>
+
   <!-- Institutional -->
   <url>
     <loc>https://www.anhanga.tur.br/sobre/</loc>
