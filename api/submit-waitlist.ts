@@ -1,5 +1,5 @@
 import type { SubmitLeadRequest } from '../types/leadCapture';
-import type { SubmitWaitlistResponse } from '../types/waitlist';
+import type { SubmitWaitlistRequest, SubmitWaitlistResponse } from '../types/waitlist';
 import { buildCorsHeaders, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
 import { cleanString } from '../lib/lead-logic';
@@ -97,7 +97,7 @@ async function createOrUpdateContact(
 
 async function processWaitlistSync(
     hubspotToken: string,
-    payload: any,
+    payload: SubmitWaitlistRequest,
     enrichmentPayload: SubmitLeadRequest
 ): Promise<{ contactId: string; warning?: string }> {
     const coreContactProperties = buildCoreContactProperties(enrichmentPayload);
