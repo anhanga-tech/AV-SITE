@@ -112,7 +112,7 @@ function OrlandoApp() {
       <main className="hero">
           <div className="hero-content">
               <div className="title-collage">
-                  <h1 className="sr-only">Pacote para Orlando 2025/2026: Roteiro Personalizado Disney e Universal</h1>
+                  <h1 className="sr-only">Pacote para Orlando 2026: Roteiro Personalizado Disney e Universal</h1>
                   <p aria-hidden="true">
                       <span className="highlight-blue">Orlando</span>
                       <span className="highlight-pink">É SURREAL.</span>

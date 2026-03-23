@@ -13,6 +13,8 @@ const requiredFallbackPatterns = [
   { label: 'og:title', pattern: /<meta\b[^>]*data-av-head="meta:og:title"[^>]*property="og:title"[^>]*content="[^"]+"/i },
   { label: 'og:description', pattern: /<meta\b[^>]*data-av-head="meta:og:description"[^>]*property="og:description"[^>]*content="[^"]+"/i },
   { label: 'og:image', pattern: /<meta\b[^>]*data-av-head="meta:og:image"[^>]*property="og:image"[^>]*content="https:\/\/www\.anhanga\.tur\.br\/og-image-1200x630\.jpg"/i },
+  { label: 'og:image:width', pattern: /<meta\b[^>]*data-av-head="meta:og:image:width"[^>]*property="og:image:width"[^>]*content="1200"/i },
+  { label: 'og:image:height', pattern: /<meta\b[^>]*data-av-head="meta:og:image:height"[^>]*property="og:image:height"[^>]*content="630"/i },
   { label: 'og:type', pattern: /<meta\b[^>]*data-av-head="meta:og:type"[^>]*property="og:type"[^>]*content="website"/i },
   { label: 'og:url', pattern: /<meta\b[^>]*data-av-head="meta:og:url"[^>]*property="og:url"[^>]*content="https:\/\/www\.anhanga\.tur\.br\/"/i },
   { label: 'twitter:card', pattern: /<meta\b[^>]*data-av-head="meta:twitter:card"[^>]*name="twitter:card"[^>]*content="summary_large_image"/i },
