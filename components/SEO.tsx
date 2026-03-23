@@ -2,6 +2,8 @@ import React from 'react';
 import { useHeadTags } from '../lib/head';
 
 const DEFAULT_OG_IMAGE = 'https://www.anhanga.tur.br/og-image-1200x630.jpg';
+const DEFAULT_OG_IMAGE_WIDTH = '1200';
+const DEFAULT_OG_IMAGE_HEIGHT = '630';
 
 interface SEOProps {
   title?: string;
@@ -28,8 +30,8 @@ export const SEO: React.FC<SEOProps> = ({
 }) => {
   // Only emit og:image dimensions when accurate: explicit props or the known-sized default image.
   // Blog posts and other pages with third-party images of unknown sizes omit these tags.
-  const resolvedImageWidth = imageWidth ?? (image === DEFAULT_OG_IMAGE ? '1200' : undefined);
-  const resolvedImageHeight = imageHeight ?? (image === DEFAULT_OG_IMAGE ? '630' : undefined);
+  const resolvedImageWidth = imageWidth ?? (image === DEFAULT_OG_IMAGE ? DEFAULT_OG_IMAGE_WIDTH : undefined);
+  const resolvedImageHeight = imageHeight ?? (image === DEFAULT_OG_IMAGE ? DEFAULT_OG_IMAGE_HEIGHT : undefined);
   const siteName = "Anhangá Viagens";
   const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
