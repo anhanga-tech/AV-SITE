@@ -49,13 +49,19 @@ test.describe('Chaos & Unhappy Path Suite', () => {
     await aiChat.expectMessageContaining('Respondendo após delay');
   });
 
-  test('should handle invalid destination input in search bar', async ({ page }) => {
+  test('should handle invalid destination input in search bar', async ({ page, isMobile }) => {
     const homePage = new HomePage(page);
     await homePage.goto();
 
-    // Fill with empty or nonsense
-    await homePage.fillDestination('    ');
-    await homePage.submitSearch();
+    if (isMobile) {
+      // Use mobile specific elements
+      await homePage.mobileDestinationInput.fill('    ');
+      await homePage.mobileSubmitSearchBtn.click();
+    } else {
+      // Fill with empty or nonsense
+      await homePage.fillDestination('    ');
+      await homePage.submitSearch();
+    }
 
     // Should stay on home or show validation (depends on implementation)
     await expect(page).toHaveURL(/\/$/);

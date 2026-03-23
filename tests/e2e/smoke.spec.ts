@@ -15,8 +15,13 @@ test.describe('Smoke Suite', () => {
       await expect(homePage.faleConoscoBtn).toBeVisible();
     }
 
-    await expect(homePage.destinationInput).toBeVisible();
-    await expect(homePage.submitSearchBtn).toBeVisible();
+    if (isMobile) {
+      await expect(homePage.mobileDestinationInput).toBeVisible();
+      await expect(homePage.mobileSubmitSearchBtn).toBeVisible();
+    } else {
+      await expect(homePage.destinationInput).toBeVisible();
+      await expect(homePage.submitSearchBtn).toBeVisible();
+    }
   });
 
   test('should open AI Chatbot via "Fale Conosco" button', async ({ page, isMobile }) => {
