@@ -1,8 +1,9 @@
 import type { SubmitLeadRequest } from '../types/leadCapture';
 import type { SubmitWaitlistResponse } from '../types/waitlist';
-import { buildCorsHeaders } from '../lib/network.js';
-import { cleanString } from '../lib/lead-logic.js';
-import { buildWaitlistNoteBody, splitWaitlistName, validateWaitlistPayload } from '../lib/waitlist-logic.js';
+import { buildCorsHeaders, getClientIP } from '../lib/network';
+import { checkRateLimit } from '../lib/rate-limit';
+import { cleanString } from '../lib/lead-logic';
+import { buildWaitlistNoteBody, splitWaitlistName, validateWaitlistPayload } from '../lib/waitlist-logic';
 import {
     addContactToList,
     buildAdditionalContactProperties,
@@ -12,11 +13,14 @@ import {
     hubspotRequest,
     type HubSpotObjectResponse,
     updateContactProperties,
-} from '../services/hubspot.js';
+} from '../services/hubspot';
 
 export const config = {
     runtime: 'edge',
 };
+
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const RATE_LIMIT_MAX_REQUESTS = 5;
 
 function createRequestId(): string {
     if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -102,6 +106,30 @@ export default async function handler(request: Request): Promise<Response> {
         });
     }
 
+    const clientIP = getClientIP(request);
+    const rateLimit = await checkRateLimit(clientIP, {
+        limit: RATE_LIMIT_MAX_REQUESTS,
+        windowMs: RATE_LIMIT_WINDOW_MS,
+        prefix: 'ratelimit:submit-waitlist',
+    });
+
+    if (!rateLimit.allowed) {
+        return buildJsonResponse(
+            {
+                ok: false,
+                requestId,
+                code: 'RATE_LIMIT_EXCEEDED',
+                error: 'Muitas tentativas. Tente novamente em breve.',
+            },
+            429,
+            {
+                ...corsHeaders,
+                'Retry-After': String(Math.ceil(rateLimit.resetIn / 1000)),
+                'X-RateLimit-Remaining': String(rateLimit.remaining),
+                'X-RateLimit-Reset': String(Math.ceil((Date.now() + rateLimit.resetIn) / 1000)),
+            },
+        );
+    }
     if (request.method !== 'POST') {
         return buildJsonResponse(
             {
