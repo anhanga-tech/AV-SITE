@@ -95,15 +95,53 @@ async function createOrUpdateContact(
     return data.id;
 }
 
+async function processWaitlistSync(
+    hubspotToken: string,
+    payload: any,
+    enrichmentPayload: SubmitLeadRequest
+): Promise<{ contactId: string; warning?: string }> {
+    const coreContactProperties = buildCoreContactProperties(enrichmentPayload);
+    const additionalContactProperties = buildAdditionalContactProperties(enrichmentPayload);
+
+    const contactId = await createOrUpdateContact(hubspotToken, coreContactProperties, payload.email);
+    let warning: string | undefined;
+
+    if (Object.keys(additionalContactProperties).length > 0) {
+        try {
+            await updateContactProperties(hubspotToken, contactId, additionalContactProperties);
+        } catch (trackingError: unknown) {
+            console.error('submit-waitlist: failed to update additional contact properties', trackingError);
+            warning = 'Contato salvo, mas alguns dados de rastreamento não puderam ser gravados.';
+        }
+    }
+
+    const lollapaloozaListId = cleanString(process.env.HUBSPOT_LOLLAPALOOZA_LIST_ID);
+    if (lollapaloozaListId) {
+        try {
+            await addContactToList(hubspotToken, lollapaloozaListId, contactId);
+        } catch (listError: unknown) {
+            console.error('submit-waitlist: failed to add contact to lollapalooza list', listError);
+        }
+    } else {
+        console.info('submit-waitlist: lollapalooza waitlist list id is not configured');
+    }
+
+    try {
+        await createContactNote(hubspotToken, contactId, buildWaitlistNoteBody(payload));
+    } catch (noteError: unknown) {
+        console.error('submit-waitlist: failed to create waitlist note', noteError);
+        warning = warning || 'Contato salvo, mas a anotação de waitlist não pôde ser registrada automaticamente.';
+    }
+
+    return { contactId, warning };
+}
+
 export default async function handler(request: Request): Promise<Response> {
     const corsHeaders = buildCorsHeaders(request.headers.get('origin') || undefined);
     const requestId = createRequestId();
 
     if (request.method === 'OPTIONS') {
-        return new Response(null, {
-            status: 204,
-            headers: corsHeaders,
-        });
+        return new Response(null, { status: 204, headers: corsHeaders });
     }
 
     const clientIP = getClientIP(request);
@@ -115,12 +153,7 @@ export default async function handler(request: Request): Promise<Response> {
 
     if (!rateLimit.allowed) {
         return buildJsonResponse(
-            {
-                ok: false,
-                requestId,
-                code: 'RATE_LIMIT_EXCEEDED',
-                error: 'Muitas tentativas. Tente novamente em breve.',
-            },
+            { ok: false, requestId, code: 'RATE_LIMIT_EXCEEDED', error: 'Muitas tentativas. Tente novamente em breve.' },
             429,
             {
                 ...corsHeaders,
@@ -130,64 +163,28 @@ export default async function handler(request: Request): Promise<Response> {
             },
         );
     }
+
     if (request.method !== 'POST') {
-        return buildJsonResponse(
-            {
-                ok: false,
-                requestId,
-                code: 'METHOD_NOT_ALLOWED',
-                error: 'Método não permitido.',
-            },
-            405,
-            corsHeaders,
-        );
+        return buildJsonResponse({ ok: false, requestId, code: 'METHOD_NOT_ALLOWED', error: 'Método não permitido.' }, 405, corsHeaders);
     }
 
     let rawPayload: unknown;
-
     try {
         rawPayload = await request.json();
     } catch {
-        return buildJsonResponse(
-            {
-                ok: false,
-                requestId,
-                code: 'VALIDATION_ERROR',
-                error: 'Payload inválido.',
-            },
-            400,
-            corsHeaders,
-        );
+        return buildJsonResponse({ ok: false, requestId, code: 'VALIDATION_ERROR', error: 'Payload inválido.' }, 400, corsHeaders);
     }
 
     const validation = validateWaitlistPayload(rawPayload);
     if (validation.valid === false) {
-        return buildJsonResponse(
-            {
-                ok: false,
-                requestId,
-                code: 'VALIDATION_ERROR',
-                error: validation.error,
-            },
-            400,
-            corsHeaders,
-        );
-    }
-
-    if (!process.env.HUBSPOT_TOKEN) {
-        return buildJsonResponse(
-            {
-                ok: false,
-                requestId,
-                code: 'SERVER_CONFIG_ERROR',
-                error: 'Integração de waitlist indisponível no momento.',
-            },
-            500,
-            corsHeaders,
-        );
+        return buildJsonResponse({ ok: false, requestId, code: 'VALIDATION_ERROR', error: validation.error }, 400, corsHeaders);
     }
 
     const hubspotToken = process.env.HUBSPOT_TOKEN;
+    if (!hubspotToken) {
+        return buildJsonResponse({ ok: false, requestId, code: 'SERVER_CONFIG_ERROR', error: 'Integração de waitlist indisponível no momento.' }, 500, corsHeaders);
+    }
+
     const payload = validation.data;
     const { firstName, lastName } = splitWaitlistName(payload.name);
     const enrichmentPayload: SubmitLeadRequest = {
@@ -200,62 +197,22 @@ export default async function handler(request: Request): Promise<Response> {
         tracking: payload.tracking,
     };
 
-    const coreContactProperties = buildCoreContactProperties(enrichmentPayload);
-    const additionalContactProperties = buildAdditionalContactProperties(enrichmentPayload);
-
     try {
-        const contactId = await createOrUpdateContact(hubspotToken, coreContactProperties, payload.email);
-        let warning: string | undefined;
-        const lollapaloozaListId = cleanString(process.env.HUBSPOT_LOLLAPALOOZA_LIST_ID);
-
-        if (Object.keys(additionalContactProperties).length > 0) {
-            try {
-                await updateContactProperties(hubspotToken, contactId, additionalContactProperties);
-            } catch (trackingError: unknown) {
-                console.error('submit-waitlist: failed to update additional contact properties', trackingError);
-                warning = 'Contato salvo, mas alguns dados de rastreamento não puderam ser gravados.';
-            }
-        }
-
-        if (!lollapaloozaListId) {
-            console.info('submit-waitlist: lollapalooza waitlist list id is not configured');
-        } else {
-            try {
-                await addContactToList(hubspotToken, lollapaloozaListId, contactId);
-            } catch (listError: unknown) {
-                console.error('submit-waitlist: failed to add contact to lollapalooza list', listError);
-            }
-        }
-
-        try {
-            await createContactNote(hubspotToken, contactId, buildWaitlistNoteBody(payload));
-        } catch (noteError: unknown) {
-            console.error('submit-waitlist: failed to create waitlist note', noteError);
-            warning = warning || 'Contato salvo, mas a anotação de waitlist não pôde ser registrada automaticamente.';
-        }
+        const { contactId, warning } = await processWaitlistSync(hubspotToken, payload, enrichmentPayload);
 
         return buildJsonResponse(
-            {
-                ok: true,
-                requestId,
-                contactId,
-                warning,
-                message: 'Cadastro realizado com sucesso na lista de espera.',
-            },
+            { ok: true, requestId, contactId, warning, message: 'Cadastro realizado com sucesso na lista de espera.' },
             201,
             corsHeaders,
         );
     } catch (error: unknown) {
         const parsed = parseHubSpotError(error);
-
         return buildJsonResponse(
             {
                 ok: false,
                 requestId,
                 code: parsed.code,
-                error: parsed.code === 'HUBSPOT_UNAUTHORIZED'
-                    ? 'Erro de integração com o CRM.'
-                    : 'Erro ao salvar sua inscrição na lista de espera.',
+                error: parsed.code === 'HUBSPOT_UNAUTHORIZED' ? 'Erro de integração com o CRM.' : 'Erro ao salvar sua inscrição na lista de espera.',
             },
             parsed.status,
             corsHeaders,
