@@ -1,11 +1,15 @@
 import React from 'react';
 import { useHeadTags } from '../lib/head';
 
+const DEFAULT_OG_IMAGE = 'https://www.anhanga.tur.br/og-image-1200x630.jpg';
+
 interface SEOProps {
   title?: string;
   description?: string;
   canonical?: string;
   image?: string;
+  imageWidth?: string;
+  imageHeight?: string;
   type?: 'website' | 'article';
   keywords?: string;
   robots?: string;
@@ -15,11 +19,17 @@ export const SEO: React.FC<SEOProps> = ({
   title = 'Anhangá Viagens | Agência de Viagens Personalizadas',
   description = 'Agência de viagens boutique em São Paulo com roteiros personalizados, experiências no Brasil e no mundo e suporte especializado.',
   canonical,
-  image = 'https://www.anhanga.tur.br/og-image-1200x630.jpg',
+  image = DEFAULT_OG_IMAGE,
+  imageWidth,
+  imageHeight,
   type = 'website',
   keywords = 'agência de viagens em São Paulo, viagens personalizadas, pacotes para Orlando, pacote Beto Carrero, Lollapalooza Brasil, viagens melhor idade 50+, roteiros exclusivos',
   robots = 'index, follow'
 }) => {
+  // Only emit og:image dimensions when accurate: explicit props or the known-sized default image.
+  // Blog posts and other pages with third-party images of unknown sizes omit these tags.
+  const resolvedImageWidth = imageWidth ?? (image === DEFAULT_OG_IMAGE ? '1200' : undefined);
+  const resolvedImageHeight = imageHeight ?? (image === DEFAULT_OG_IMAGE ? '630' : undefined);
   const siteName = "Anhangá Viagens";
   const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
@@ -103,16 +113,8 @@ export const SEO: React.FC<SEOProps> = ({
       key: 'meta:og:image',
       attrs: { property: 'og:image', content: image }
     },
-    {
-      tagName: 'meta',
-      key: 'meta:og:image:width',
-      attrs: { property: 'og:image:width', content: '1200' }
-    },
-    {
-      tagName: 'meta',
-      key: 'meta:og:image:height',
-      attrs: { property: 'og:image:height', content: '630' }
-    },
+    ...(resolvedImageWidth ? [{ tagName: 'meta' as const, key: 'meta:og:image:width', attrs: { property: 'og:image:width', content: resolvedImageWidth } }] : []),
+    ...(resolvedImageHeight ? [{ tagName: 'meta' as const, key: 'meta:og:image:height', attrs: { property: 'og:image:height', content: resolvedImageHeight } }] : []),
     {
       tagName: 'meta',
       key: 'meta:og:site_name',
