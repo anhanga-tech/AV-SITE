@@ -105,6 +105,16 @@ export const SEO: React.FC<SEOProps> = ({
     },
     {
       tagName: 'meta',
+      key: 'meta:og:image:width',
+      attrs: { property: 'og:image:width', content: '1200' }
+    },
+    {
+      tagName: 'meta',
+      key: 'meta:og:image:height',
+      attrs: { property: 'og:image:height', content: '630' }
+    },
+    {
+      tagName: 'meta',
       key: 'meta:og:site_name',
       attrs: { property: 'og:site_name', content: siteName }
     },
