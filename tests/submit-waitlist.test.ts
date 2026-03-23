@@ -375,3 +375,41 @@ test('submit-waitlist should keep success response when list membership fails', 
     assert.deepEqual(collectListMembershipBodies(calls, 'list_lolla_2027'), [['contact_waitlist_999']]);
     assert.equal(errorCalls.some((args) => args.some((value) => String(value).includes('failed to add contact to lollapalooza list'))), true);
 });
+
+test('submit-waitlist should enforce rate limiting', async () => {
+    restoreEnv();
+
+    const sharedIP = '1.2.3.4';
+    const buildRateLimitedRequest = () => new Request('http://localhost/api/submit-waitlist', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-real-ip': sharedIP,
+        },
+        body: JSON.stringify({
+            name: 'Felipe William',
+            email: 'felipe@example.com',
+            sourcePage: '/lollapalooza',
+            utms: {},
+            tracking: {},
+        }),
+    });
+
+    // Make 5 successful requests
+    for (let i = 0; i < 5; i++) {
+        const response = await handler(buildRateLimitedRequest());
+        // Since HUBSPOT_TOKEN is not set, it will return 500 SERVER_CONFIG_ERROR,
+        // but it still consumes rate limit.
+        assert.equal(response.status, 500);
+    }
+
+    // The 6th request should be rate limited
+    const response = await handler(buildRateLimitedRequest());
+    assert.equal(response.status, 429);
+
+    const payload = await response.json() as { ok: boolean; code?: string };
+    assert.equal(payload.ok, false);
+    assert.equal(payload.code, 'RATE_LIMIT_EXCEEDED');
+    assert.ok(response.headers.get('Retry-After'));
+    assert.ok(response.headers.get('X-RateLimit-Reset'));
+});
