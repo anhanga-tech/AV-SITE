@@ -23,7 +23,6 @@ const SITE_URL = 'https://www.anhanga.tur.br';
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   const location = useLocation();
   const isHome = location.pathname === '/';
@@ -112,16 +111,16 @@ const Header: React.FC = () => {
         <div className="flex items-center gap-8">
           <nav className="hidden md:flex items-center gap-8" aria-label="Menu Principal">
             {NAV_LINKS.map((link) => (
+              /* Performance optimization: Using CSS 'group-hover' for dropdowns instead of React state
+                 to eliminate unnecessary re-renders on every hover interaction. */
               <div
                 key={link.name}
-                className="relative"
-                onMouseEnter={() => link.subLinks && setActiveDropdown(link.name)}
-                onMouseLeave={() => link.subLinks && setActiveDropdown(null)}
+                className="relative group"
               >
                 {link.subLinks ? (
                   <button className={`flex items-center gap-1 font-medium text-sm transition-colors duration-500 hover:opacity-80 focus:outline-none focus:underline decoration-2 underline-offset-4 cursor-pointer ${navTextClass}`}>
                     {link.name}
-                    <CaretDown className="w-4 h-4" weight="bold" />
+                    <CaretDown className="w-4 h-4 transition-transform duration-300 group-hover:rotate-180" weight="bold" />
                   </button>
                 ) : (
                   isHome ? (
@@ -142,9 +141,9 @@ const Header: React.FC = () => {
                   )
                 )}
 
-                {link.subLinks && activeDropdown === link.name && (
-                  <div className="absolute top-full pt-4 w-48 z-10">
-                    <div className="bg-white rounded-md shadow-lg py-2 animate-fade-in-down">
+                {link.subLinks && (
+                  <div className="absolute top-full pt-4 w-48 z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible focus-within:opacity-100 focus-within:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                    <div className="bg-white rounded-md shadow-lg py-2 border border-gray-100">
                       {link.subLinks.map((subLink) => {
                         const isPage = subLink.href.startsWith('/');
                         const href = isPage ? `${SITE_URL}${subLink.href}` : (isHome ? `#${subLink.href}` : `${SITE_URL}/#${subLink.href}`);
@@ -156,9 +155,8 @@ const Header: React.FC = () => {
                               if (!isPage && isHome) {
                                 handleNavClick(e, subLink.href);
                               }
-                              setActiveDropdown(null);
                             }}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                           >
                             {subLink.name}
                           </a>
