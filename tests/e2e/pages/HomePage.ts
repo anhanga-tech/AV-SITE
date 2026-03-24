@@ -10,6 +10,8 @@ export class HomePage {
   readonly tripTypeBtn: Locator;
   readonly budgetBtn: Locator;
   readonly submitSearchBtn: Locator;
+  readonly mobileDestinationInput: Locator;
+  readonly mobileSubmitSearchBtn: Locator;
   readonly mobileMenuBtn: Locator;
   readonly mobileFaleConoscoBtn: Locator;
 
@@ -27,6 +29,8 @@ export class HomePage {
     this.tripTypeBtn = page.getByTestId('trip-type-filter-btn');
     this.budgetBtn = page.getByTestId('budget-filter-btn');
     this.submitSearchBtn = page.getByTestId('submit-search-btn');
+    this.mobileDestinationInput = page.getByTestId('destination-input-mobile');
+    this.mobileSubmitSearchBtn = page.getByTestId('submit-search-btn-mobile');
     this.mobileMenuBtn = page.locator('button[aria-label="Abrir menu"]');
   }
 

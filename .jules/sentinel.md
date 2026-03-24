@@ -36,3 +36,16 @@ Implemented regex-based HTML entity escaping for all user-controlled strings in 
 
 ### Pattern Discovery
 Adopted a "Sanitize at the Edge" pattern for serverless functions. Since DOM-based sanitizers like DOMPurify aren't natively efficient in certain edge environments without a JSDOM-like overhead, simple character escaping provides a robust, low-latency defense-in-depth mechanism for structured data APIs.
+
+# 🛡️ Sentinel Journal - 2026-03-05
+
+## Security: Inconsistent Rate Limiting on Public Endpoints
+
+### Finding
+Discovered that the `api/submit-waitlist.ts` endpoint was missing rate limiting, unlike `api/submit-lead.ts` and `api/generate.ts`. This created a vulnerability where automated bots could spam the HubSpot waitlist, potentially exhausting CRM quotas or polluting lead data.
+
+### Resolution
+Implemented the standard `checkRateLimit` helper in the waitlist handler. Crucially, the check was placed *after* the CORS `OPTIONS` preflight handling to ensure that browser preflight requests do not consume the rate limit quota, which would otherwise lead to false positives for legitimate users.
+
+### Pattern Discovery
+Established the "Post-Preflight Rate Limiting" pattern. Rate limit checks in Edge Functions must always follow the `OPTIONS` method check to prevent blocking legitimate cross-origin requests due to preflight overhead.

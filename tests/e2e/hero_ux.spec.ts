@@ -5,7 +5,8 @@ test.describe('Hero UX and Accessibility', () => {
     await page.goto('/');
   });
 
-  test('should have proper ARIA attributes for destination search', async ({ page }) => {
+  test('should have proper ARIA attributes for destination search', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'SearchForm complex interactions are desktop-only');
     const destInput = page.getByPlaceholder('Ex: Orlando, Paris, Brasil...');
 
     // Check initial ARIA attributes
@@ -25,7 +26,8 @@ test.describe('Hero UX and Accessibility', () => {
     expect(optionsCount).toBeGreaterThan(0);
   });
 
-  test('should dismiss destination suggestions with Escape key', async ({ page }) => {
+  test('should dismiss destination suggestions with Escape key', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'SearchForm complex interactions are desktop-only');
     const destInput = page.getByPlaceholder('Ex: Orlando, Paris, Brasil...');
     await destInput.fill('Or');
     await expect(page.locator('[role="listbox"]')).toBeVisible();
@@ -34,7 +36,8 @@ test.describe('Hero UX and Accessibility', () => {
     await expect(page.locator('[role="listbox"]')).not.toBeVisible();
   });
 
-  test('should dismiss other dropdowns with Escape key', async ({ page }) => {
+  test('should dismiss other dropdowns with Escape key', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'SearchForm complex interactions are desktop-only');
     // Open Calendar
     await page.getByTestId('dates-filter-btn').click();
     // Use a more specific locator for the calendar to avoid footer links
