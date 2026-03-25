@@ -4,6 +4,7 @@ import MapPin from 'lucide-react/dist/esm/icons/map-pin';
 import ChevronDown from 'lucide-react/dist/esm/icons/chevron-down';
 import Plus from 'lucide-react/dist/esm/icons/plus';
 import Minus from 'lucide-react/dist/esm/icons/minus';
+import X from 'lucide-react/dist/esm/icons/x';
 import ChevronLeft from 'lucide-react/dist/esm/icons/chevron-left';
 import ChevronRight from 'lucide-react/dist/esm/icons/chevron-right';
 import Loader2 from 'lucide-react/dist/esm/icons/loader-2';
@@ -148,6 +149,7 @@ interface DestinationFieldProps {
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onFocus: () => void;
   onSelect: (destination: DestinationOption) => void;
+  onClear: () => void;
 }
 
 const DestinationField = memo(({
@@ -158,6 +160,7 @@ const DestinationField = memo(({
   onChange,
   onFocus,
   onSelect,
+  onClear,
 }: DestinationFieldProps) => {
   const hasSuggestions = filteredDestinations.length > 0;
   const shouldShowEmptyState = showDestSuggestions && inputValue.length > 1 && !hasSuggestions;
@@ -170,22 +173,38 @@ const DestinationField = memo(({
       <label htmlFor="destination-input" className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-focus-within:text-brand-cyan transition-colors">
         <MapPin className="w-3 h-3" /> Para onde?
       </label>
-      <input
-        id="destination-input"
-        type="text"
-        data-testid="destination-input"
-        value={inputValue}
-        onChange={onChange}
-        onFocus={onFocus}
-        placeholder="Ex: Orlando, Paris, Brasil..."
-        className="w-full outline-none text-gray-800 font-bold placeholder-gray-300 bg-transparent text-lg md:text-xl truncate transition-colors"
-        autoComplete="off"
-        role="combobox"
-        aria-autocomplete="list"
-        aria-expanded={showDestSuggestions && hasSuggestions}
-        aria-haspopup="listbox"
-        aria-controls="destination-results"
-      />
+      <div className="relative flex items-center">
+        <input
+          id="destination-input"
+          type="text"
+          data-testid="destination-input"
+          value={inputValue}
+          onChange={onChange}
+          onFocus={onFocus}
+          placeholder="Ex: Orlando, Paris, Brasil..."
+          className="w-full outline-none text-gray-800 font-bold placeholder-gray-300 bg-transparent text-lg md:text-xl truncate transition-colors pr-8"
+          autoComplete="off"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded={showDestSuggestions && hasSuggestions}
+          aria-haspopup="listbox"
+          aria-controls="destination-results"
+        />
+        {inputValue && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onClear();
+            }}
+            className="absolute right-0 p-1 text-gray-400 hover:text-brand-vibrant transition-colors focus:outline-none focus:ring-2 focus:ring-brand-vibrant/20 rounded-full"
+            aria-label="Limpar destino"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
       {showDestSuggestions && hasSuggestions && (
         <div className="absolute top-full left-0 w-full bg-white rounded-2xl shadow-xl border-2 border-gray-100 mt-4 overflow-hidden z-[60] animate-pop-in origin-top">
           <ul id="destination-results" role="listbox" className="max-h-60 overflow-y-auto custom-scrollbar">
@@ -365,7 +384,8 @@ const GuestsField = memo(({
             <button
               type="button"
               onClick={(event) => { event.preventDefault(); event.stopPropagation(); onAdultsChange(Math.max(1, adults - 1)); }}
-              className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-brand-cyan hover:text-brand-cyan transition-all"
+              disabled={adults <= 1}
+              className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-brand-cyan hover:text-brand-cyan transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               aria-label="Remover um adulto"
             >
               <Minus className="w-4 h-4" />
@@ -387,7 +407,8 @@ const GuestsField = memo(({
             <button
               type="button"
               onClick={(event) => { event.preventDefault(); event.stopPropagation(); onChildCountChange('remove'); }}
-              className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-brand-cyan hover:text-brand-cyan transition-all"
+              disabled={children <= 0}
+              className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-brand-cyan hover:text-brand-cyan transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               aria-label="Remover uma criança"
             >
               <Minus className="w-4 h-4" />
@@ -594,7 +615,10 @@ const SearchButton = memo(({ isSearchLoading }: SearchButtonProps) => (
       data-tracking="hero-home"
     >
       {isSearchLoading ? (
-        <Loader2 className="w-6 h-6 animate-spin" />
+        <>
+          <Loader2 className="w-6 h-6 animate-spin" />
+          <span className="font-black text-lg">Planejando...</span>
+        </>
       ) : (
         <>
           <Search className="w-6 h-6 group-hover:rotate-12 transition-transform duration-300 ease-spring" strokeWidth={2.5} />
@@ -675,6 +699,12 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
   const handleDestinationSelect = useCallback((destination: DestinationOption) => {
     setInputValue(destination.label);
     onDestinationMatch(destination.city);
+    setShowDestSuggestions(false);
+  }, [onDestinationMatch]);
+
+  const handleClearDestination = useCallback(() => {
+    setInputValue('');
+    onDestinationMatch(null);
     setShowDestSuggestions(false);
   }, [onDestinationMatch]);
 
@@ -819,6 +849,7 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
           onChange={handleDestinationChange}
           onFocus={onDestinationFocus}
           onSelect={handleDestinationSelect}
+          onClear={handleClearDestination}
         />
         <DateField
           calendarRef={calendarRef}
