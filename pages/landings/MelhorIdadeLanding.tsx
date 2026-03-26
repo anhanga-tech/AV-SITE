@@ -38,7 +38,6 @@ const MelhorIdadeLanding: React.FC = () => {
         title="Viagens Melhor Idade 50+: Roteiros Seguros e Personalizados"
         description="Experiências de viagem exclusivas para o público 50+. Roteiros com conforto, segurança e atendimento boutique. Planeje sua próxima aventura com a Anhangá."
         canonical="https://www.anhanga.tur.br/melhor-idade/"
-        keywords="viagens melhor idade, turismo 50+, roteiros personalizados idosos, viagem segura para terceira idade, viagens de luxo 50+"
       />
       <ServiceSchema
         name="Viagens Personalizadas Melhor Idade"

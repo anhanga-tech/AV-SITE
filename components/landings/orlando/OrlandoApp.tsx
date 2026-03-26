@@ -273,7 +273,7 @@ function OrlandoApp() {
             <div className="parks-grid">
                 <div className="park-card">
                     <div className="park-image-frame">
-                        <img src="https://www.visiteosusa.com.br/sites/default/files/styles/hero_l/public/images/hero_media_image/2020-02/4bdb3f38-9657-475b-825a-dccf6dcbc4c3.jpeg?h=3a1b08a4&itok=J2NP-HWG" alt="Universal Studios" width="600" height="400" loading="lazy" />
+                        <img src="https://res.cloudinary.com/dzehqrcmm/image/upload/f_auto,q_auto,w_600,h_400,c_fill/orlando/universal-studios-orlando.jpg" alt="Universal Studios Orlando" width="600" height="400" loading="lazy" />
                     </div>
                     <img className="park-logo-title" style={{ maxHeight: '77px', maxWidth: '280px' }} src="https://frontdoormagicbreaks-huaycyfnhbh0e8h4.z03.azurefd.net/umbr-upgrade-media/media/1acfwlwm/universal-universal-studios-florida-blue-logo.png" alt="Universal Studios Logo" width="280" height="77" loading="lazy" />
                     <p>Entre no filme. Fuja do banco de Gringotts, brinque com os Minions e viva o cinema.</p>

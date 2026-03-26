@@ -3,7 +3,6 @@ import { useLocation, Link } from 'react-router-dom';
 import Hero from '../components/Hero';
 
 import { OrganizationSchema } from '../components/schemas/OrganizationSchema';
-import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 
 import { SEO } from '../components/SEO';
 
@@ -96,60 +95,58 @@ const Home: React.FC = () => {
         title="Agência de Viagens em São Paulo | Roteiros Feitos do Zero"
         description="Agência boutique em São Paulo. Não trabalhamos com pacote pronto — cada roteiro começa do zero, pensado pro seu jeito de viajar. Orlando, Beto Carrero, Europa e muito mais. Orçamento gratuito."
         canonical="https://www.anhanga.tur.br/"
-        keywords="agência de viagens em São Paulo, roteiros exclusivos, pacotes para Orlando, pacote Beto Carrero, Lollapalooza Brasil, viagens melhor idade 50+, planejamento de viagens"
       />
       <OrganizationSchema />
-      <BreadcrumbSchema items={[{ name: 'Home', item: 'https://www.anhanga.tur.br/' }]} />
       <Hero />
 
       {shouldRenderBelowFold ? (
         <>
-          <Suspense fallback={<section id="experiencia" className="min-h-[700px] bg-[#fffdf5]" aria-hidden="true" />}>
+          <Suspense fallback={<section id="experiencia" className="min-h-[700px] bg-[#fffdf5]" />}>
             <Highlights />
           </Suspense>
-          <Suspense fallback={<section className="min-h-[300px] bg-[#fffdf5]" aria-hidden="true" />}>
+          <Suspense fallback={<section className="min-h-[300px] bg-[#fffdf5]" />}>
             <Categories />
           </Suspense>
         </>
       ) : (
         <>
-          <section id="experiencia" className="min-h-[700px] bg-[#fffdf5]" aria-hidden="true" />
-          <section className="min-h-[300px] bg-[#fffdf5]" aria-hidden="true" />
+          <section id="experiencia" className="min-h-[700px] bg-[#fffdf5]" />
+          <section className="min-h-[300px] bg-[#fffdf5]" />
         </>
       )}
       <div id="destinos" ref={destinationsSentinelRef} />
       {shouldRenderBelowFold && shouldLoadDestinations ? (
-        <Suspense fallback={<section className="min-h-[900px] bg-[#fffdf5]" aria-hidden="true" />}>
+        <Suspense fallback={<section className="min-h-[900px] bg-[#fffdf5]" />}>
           <Destinations />
         </Suspense>
       ) : (
-        <section className="min-h-[900px] bg-[#fffdf5]" aria-hidden="true" />
+        <section className="min-h-[900px] bg-[#fffdf5]" />
       )}
       {shouldRenderBelowFold ? (
         <>
-          <Suspense fallback={<section id="como-funciona" className="min-h-[800px] bg-[#fffdf5]" aria-hidden="true" />}>
+          <Suspense fallback={<section id="como-funciona" className="min-h-[800px] bg-[#fffdf5]" />}>
             <HowItWorks />
           </Suspense>
-          <Suspense fallback={<section id="faq" className="min-h-[600px] bg-[#fffdf5]" aria-hidden="true" />}>
+          <Suspense fallback={<section id="faq" className="min-h-[600px] bg-[#fffdf5]" />}>
             <FAQ />
           </Suspense>
-          <Suspense fallback={<section id="depoimentos" className="min-h-[500px] bg-[#fffdf5]" aria-hidden="true" />}>
+          <Suspense fallback={<section id="depoimentos" className="min-h-[500px] bg-[#fffdf5]" />}>
             <Testimonials />
           </Suspense>
-          <Suspense fallback={<section id="blog" className="min-h-[500px] bg-[#fffdf5]" aria-hidden="true" />}>
+          <Suspense fallback={<section id="blog" className="min-h-[500px] bg-[#fffdf5]" />}>
             <Blog />
           </Suspense>
-          <Suspense fallback={<section id="contato" className="min-h-[400px] bg-[#fffdf5]" aria-hidden="true" />}>
+          <Suspense fallback={<section id="contato" className="min-h-[400px] bg-[#fffdf5]" />}>
             <CallToAction />
           </Suspense>
         </>
       ) : (
         <>
-          <section id="como-funciona" className="min-h-[800px] bg-[#fffdf5]" aria-hidden="true" />
-          <section id="faq" className="min-h-[600px] bg-[#fffdf5]" aria-hidden="true" />
-          <section id="depoimentos" className="min-h-[500px] bg-[#fffdf5]" aria-hidden="true" />
-          <section id="blog" className="min-h-[500px] bg-[#fffdf5]" aria-hidden="true" />
-          <section id="contato" className="min-h-[400px] bg-[#fffdf5]" aria-hidden="true" />
+          <section id="como-funciona" className="min-h-[800px] bg-[#fffdf5]" />
+          <section id="faq" className="min-h-[600px] bg-[#fffdf5]" />
+          <section id="depoimentos" className="min-h-[500px] bg-[#fffdf5]" />
+          <section id="blog" className="min-h-[500px] bg-[#fffdf5]" />
+          <section id="contato" className="min-h-[400px] bg-[#fffdf5]" />
         </>
       )}
     </>
