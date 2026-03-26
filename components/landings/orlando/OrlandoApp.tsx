@@ -273,8 +273,7 @@ function OrlandoApp() {
             <div className="parks-grid">
                 <div className="park-card">
                     <div className="park-image-frame">
-                        {/* TODO: hospedar imagem própria no Cloudinary — URL anterior (visiteosusa.com.br) retornava 403 por bloqueio de hotlinking */}
-                        <img src="https://images.unsplash.com/photo-1568515387631-8b650bbcdb90?auto=format&fit=crop&w=600&q=80" alt="Universal Studios Orlando" width="600" height="400" loading="lazy" />
+                        <img src="https://res.cloudinary.com/dzehqrcmm/image/upload/f_auto,q_auto,w_600,h_400,c_fill/orlando/universal-studios-orlando.jpg" alt="Universal Studios Orlando" width="600" height="400" loading="lazy" />
                     </div>
                     <img className="park-logo-title" style={{ maxHeight: '77px', maxWidth: '280px' }} src="https://frontdoormagicbreaks-huaycyfnhbh0e8h4.z03.azurefd.net/umbr-upgrade-media/media/1acfwlwm/universal-universal-studios-florida-blue-logo.png" alt="Universal Studios Logo" width="280" height="77" loading="lazy" />
                     <p>Entre no filme. Fuja do banco de Gringotts, brinque com os Minions e viva o cinema.</p>
