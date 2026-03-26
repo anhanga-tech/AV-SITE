@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+    buildLeadWhatsAppMessage,
     buildLeadWhatsAppUrl,
     createLeadEventId,
     pushGenerateLeadDataLayerEvent,
@@ -185,4 +186,38 @@ test('pushGenerateLeadDataLayerEvent should push generate_lead with tracking fie
     });
 
     restoreBrowserGlobals();
+});
+
+test('buildLeadWhatsAppMessage includes email line when email is present', () => {
+    const draft: LeadDraft = {
+        firstName: 'Felipe',
+        lastName: 'William',
+        email: 'felipe@example.com',
+        bantSummary: 'Need: Praia',
+        origin: 'São Paulo, SP',
+        destination: 'Orlando, Flórida',
+        dates: 'Julho de 2026',
+        baggagePreference: '',
+    };
+
+    const message = buildLeadWhatsAppMessage(draft);
+
+    assert.match(message, /📧 E-mail: felipe@example\.com/);
+});
+
+test('buildLeadWhatsAppMessage omits email line when email is empty', () => {
+    const draft: LeadDraft = {
+        firstName: 'Felipe',
+        lastName: 'William',
+        email: '',
+        bantSummary: 'Need: Praia',
+        origin: 'São Paulo, SP',
+        destination: 'Orlando, Flórida',
+        dates: 'Julho de 2026',
+        baggagePreference: '',
+    };
+
+    const message = buildLeadWhatsAppMessage(draft);
+
+    assert.doesNotMatch(message, /E-mail:/);
 });
