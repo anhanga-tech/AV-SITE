@@ -55,13 +55,6 @@ export const OrganizationSchema = () => (
         { "@type": "Place", "name": "Europa" },
         { "@type": "Place", "name": "Ásia" }
       ],
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.94",
-        "reviewCount": "3",
-        "bestRating": "5",
-        "worstRating": "1"
-      },
       "knowsAbout": [
         "Roteiros Personalizados",
         "Lollapalooza Brasil",
