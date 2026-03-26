@@ -13,7 +13,6 @@ interface SEOProps {
   imageWidth?: string;
   imageHeight?: string;
   type?: 'website' | 'article';
-  keywords?: string;
   robots?: string;
 }
 
@@ -25,7 +24,6 @@ export const SEO: React.FC<SEOProps> = ({
   imageWidth,
   imageHeight,
   type = 'website',
-  keywords = 'agência de viagens em São Paulo, viagens personalizadas, pacotes para Orlando, pacote Beto Carrero, Lollapalooza Brasil, viagens melhor idade 50+, roteiros exclusivos',
   robots = 'index, follow'
 }) => {
   // Only emit og:image dimensions when accurate: explicit props or the known-sized default image.
@@ -87,11 +85,6 @@ export const SEO: React.FC<SEOProps> = ({
     },
     {
       tagName: 'meta',
-      key: 'meta:keywords',
-      attrs: { name: 'keywords', content: keywords }
-    },
-    {
-      tagName: 'meta',
       key: 'meta:robots',
       attrs: { name: 'robots', content: robots }
     },
@@ -148,16 +141,6 @@ export const SEO: React.FC<SEOProps> = ({
             tagName: 'link' as const,
             key: 'link:canonical',
             attrs: { rel: 'canonical', href: canonicalUrl }
-          },
-          {
-            tagName: 'link' as const,
-            key: 'link:alternate:pt-BR',
-            attrs: { rel: 'alternate', hreflang: 'pt-BR', href: canonicalUrl }
-          },
-          {
-            tagName: 'link' as const,
-            key: 'link:alternate:x-default',
-            attrs: { rel: 'alternate', hreflang: 'x-default', href: canonicalUrl }
           },
           {
             tagName: 'meta' as const,

@@ -34,7 +34,7 @@ export const AUTHORS: Record<string, Author> = {
         name: "Chef Luigi",
         role: "Crítico Gastronômico",
         bio: "Viajante incansável em busca dos melhores sabores do mundo, da alta gastronomia à comida de rua.",
-        image: "https://images.unsplash.com/photo-1583394238182-6f71f3ef0864?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80"
+        image: "https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=256&q=80"
     },
     "mariana": {
         id: "mariana",

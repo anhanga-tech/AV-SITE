@@ -35,7 +35,6 @@ const LollapaloozaLanding: React.FC = () => {
         title="Lollapalooza Brasil: 2026 Esgotado, Lista de Espera 2027"
         description="A campanha do Lollapalooza 2026 foi encerrada com sucesso. Entre na lista de espera 2027 para receber prioridade quando os próximos pacotes abrirem."
         canonical="https://www.anhanga.tur.br/lollapalooza/"
-        keywords="Lollapalooza Brasil, lista de espera Lollapalooza 2027, viagem Lollapalooza São Paulo, hotel para Lollapalooza, pacote festival em São Paulo"
       />
       <ServiceSchema
         name="Lista de Espera Lollapalooza Brasil 2027"

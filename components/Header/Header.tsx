@@ -178,8 +178,8 @@ const Header: React.FC = () => {
           </nav>
 
           <div className="hidden md:block">
-            <a
-              href="#"
+            <button
+              type="button"
               aria-label="Fale Conosco"
               data-testid="desktop-fale-conosco-btn"
               data-tracking="navbar-desktop"
@@ -188,7 +188,7 @@ const Header: React.FC = () => {
             >
               <Phone className="w-4 h-4" weight="fill" />
               Fale Conosco
-            </a>
+            </button>
           </div>
 
           <button
@@ -256,15 +256,15 @@ const Header: React.FC = () => {
           >
             Blog de Viagens
           </a>
-          <a
-            href="#"
+          <button
+            type="button"
             data-testid="mobile-fale-conosco-btn"
             data-tracking="navbar-mobile"
             className="btn-whatsapp btn-specialist bg-brand-vibrant text-center text-white px-5 py-3 rounded-lg font-bold mt-2 focus:ring-2 focus:ring-offset-2 focus:ring-brand-dark focus:outline-none flex justify-center items-center gap-2"
             onClick={handleContactClick}
           >
             Fale Conosco
-          </a>
+          </button>
         </div>
       )}
     </header>

@@ -40,7 +40,6 @@ const OrlandoLanding: React.FC = () => {
         title="Pacotes para Orlando 2026: Roteiro Disney e Universal"
         description="Planeje sua viagem para Orlando 2026 com roteiro personalizado, ingressos e hospedagem. Atendimento especializado por agência boutique em São Paulo."
         canonical="https://www.anhanga.tur.br/orlando/"
-        keywords="pacotes para Orlando, viagem para Orlando, roteiro Disney Orlando, pacote Universal Orlando, agência de viagens Orlando São Paulo"
       />
       <ServiceSchema
         name="Pacotes para Orlando 2026"
