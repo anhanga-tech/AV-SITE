@@ -101,7 +101,7 @@ const Home: React.FC = () => {
 
       {shouldRenderBelowFold ? (
         <>
-          <Suspense fallback={<section id="experiencia" className="min-h-[700px] bg-[#fffdf5]" />}>
+          <Suspense fallback={<section id="experiencia" className="min-h-[700px] bg-[#fffdf5]" aria-hidden="true" />}>
             <Highlights />
           </Suspense>
           <Suspense fallback={<section className="min-h-[300px] bg-[#fffdf5]" />}>
