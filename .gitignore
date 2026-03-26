@@ -40,3 +40,4 @@ blob-report/
 playwright/.cache/
 .worktrees/
 .codex/
+.claude/github-token
