@@ -143,6 +143,16 @@ export const SEO: React.FC<SEOProps> = ({
             attrs: { rel: 'canonical', href: canonicalUrl }
           },
           {
+            tagName: 'link' as const,
+            key: 'link:hreflang:pt-BR',
+            attrs: { rel: 'alternate', hreflang: 'pt-BR', href: canonicalUrl }
+          },
+          {
+            tagName: 'link' as const,
+            key: 'link:hreflang:x-default',
+            attrs: { rel: 'alternate', hreflang: 'x-default', href: canonicalUrl }
+          },
+          {
             tagName: 'meta' as const,
             key: 'meta:og:url',
             attrs: { property: 'og:url', content: canonicalUrl }
