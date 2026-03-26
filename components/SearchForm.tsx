@@ -198,7 +198,7 @@ const DestinationField = memo(({
               e.stopPropagation();
               onClear();
             }}
-            className="absolute right-0 p-1 text-gray-400 hover:text-brand-vibrant transition-colors focus:outline-none focus:ring-2 focus:ring-brand-vibrant/20 rounded-full"
+            className="absolute right-0 p-1 text-gray-400 hover:text-brand-vibrant transition-colors rounded-full focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-vibrant"
             aria-label="Limpar destino"
           >
             <X className="w-4 h-4" />
