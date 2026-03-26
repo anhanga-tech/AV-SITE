@@ -188,36 +188,24 @@ test('pushGenerateLeadDataLayerEvent should push generate_lead with tracking fie
     restoreBrowserGlobals();
 });
 
-test('buildLeadWhatsAppMessage includes email line when email is present', () => {
-    const draft: LeadDraft = {
-        firstName: 'Felipe',
-        lastName: 'William',
-        email: 'felipe@example.com',
-        bantSummary: 'Need: Praia',
-        origin: 'São Paulo, SP',
-        destination: 'Orlando, Flórida',
-        dates: 'Julho de 2026',
-        baggagePreference: '',
-    };
+const baseDraft: Omit<LeadDraft, 'email'> = {
+    firstName: 'Felipe',
+    lastName: 'William',
+    bantSummary: 'Need: Praia',
+    origin: 'São Paulo, SP',
+    destination: 'Orlando, Flórida',
+    dates: 'Julho de 2026',
+    baggagePreference: '',
+};
 
-    const message = buildLeadWhatsAppMessage(draft);
+test('buildLeadWhatsAppMessage includes email line when email is present', () => {
+    const message = buildLeadWhatsAppMessage({ ...baseDraft, email: 'felipe@example.com' });
 
     assert.match(message, /📧 E-mail: felipe@example\.com/);
 });
 
 test('buildLeadWhatsAppMessage omits email line when email is empty', () => {
-    const draft: LeadDraft = {
-        firstName: 'Felipe',
-        lastName: 'William',
-        email: '',
-        bantSummary: 'Need: Praia',
-        origin: 'São Paulo, SP',
-        destination: 'Orlando, Flórida',
-        dates: 'Julho de 2026',
-        baggagePreference: '',
-    };
-
-    const message = buildLeadWhatsAppMessage(draft);
+    const message = buildLeadWhatsAppMessage({ ...baseDraft, email: '' });
 
     assert.doesNotMatch(message, /E-mail:/);
 });
