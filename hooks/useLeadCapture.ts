@@ -158,6 +158,7 @@ export function buildLeadWhatsAppMessage(lead: LeadDraft): string {
     const destination = cleanValue(lead.destination) || 'A definir';
     const dates = cleanValue(lead.dates) || 'A definir';
     const baggagePreference = cleanValue(lead.baggagePreference);
+    const email = cleanValue(lead.email);
 
     const lines = [
         'Olá! Vim pelo chatbot da Anhangá e gostaria de continuar meu atendimento.',
@@ -169,6 +170,10 @@ export function buildLeadWhatsAppMessage(lead: LeadDraft): string {
 
     if (baggagePreference) {
         lines.push(`🧳 Bagagem: ${baggagePreference}`);
+    }
+
+    if (email) {
+        lines.push(`📧 E-mail: ${email}`);
     }
 
     return lines.join('\n');
