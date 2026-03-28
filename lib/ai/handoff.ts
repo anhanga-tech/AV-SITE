@@ -26,13 +26,14 @@ function formatLocation(city?: string, region?: string, fallback = 'A definir'):
     return `${cityText}, ${regionText}`;
 }
 
-export function buildBantSummary(args: Pick<BudgetToolArgs, 'budget_range' | 'need_summary' | 'decision_role' | 'timeline_window'>): string {
+export function buildBantSummary(args: Pick<BudgetToolArgs, 'budget_range' | 'need_summary' | 'decision_role' | 'timeline_window' | 'visa_status'>): string {
     const budgetText = cleanOptional(args.budget_range) || 'A definir';
     const needText = cleanOptional(args.need_summary) || 'Não informado';
     const decisionRoleText = cleanOptional(args.decision_role) || 'Não informado';
     const timelineText = cleanOptional(args.timeline_window) || 'Não informado';
+    const visaNote = args.visa_status === 'pendente' ? ' | Visto EUA: Pendente' : '';
 
-    return `Need: ${needText} | Authority: ${decisionRoleText} | Budget: ${budgetText} | Timeline: ${timelineText}`;
+    return `Need: ${needText} | Authority: ${decisionRoleText} | Budget: ${budgetText} | Timeline: ${timelineText}${visaNote}`;
 }
 
 export function buildGenerateHandoff(args: BudgetToolArgs, source: GenerateHandoff['source']): GenerateHandoff {

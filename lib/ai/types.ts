@@ -25,6 +25,7 @@ export interface BudgetToolArgs {
     baggage_preference?: string;
     assumed_origin_br?: boolean;
     iata_code?: string;
+    visa_status?: string;
 }
 
 export interface BudgetValidationResult {
