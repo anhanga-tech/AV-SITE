@@ -172,6 +172,7 @@ function sanitizeBudgetFields(raw: BudgetToolArgs) {
         timelineWindow: cleanString(raw.timeline_window) || 'não informado',
         baggagePreference: cleanString(raw.baggage_preference) || '',
         iataCode: cleanString(raw.iata_code)?.substring(0, 3).toUpperCase() || '',
+        visaStatus: cleanString(raw.visa_status) || '',
     };
 }
 
@@ -228,6 +229,7 @@ function buildNormalizedBudgetArgs(
         baggage_preference: fields.baggagePreference,
         assumed_origin_br: fields.assumedOriginBr,
         iata_code: fields.iataCode,
+        visa_status: fields.visaStatus || undefined,
     };
 }
 
