@@ -49,3 +49,16 @@ Implemented the standard `checkRateLimit` helper in the waitlist handler. Crucia
 
 ### Pattern Discovery
 Established the "Post-Preflight Rate Limiting" pattern. Rate limit checks in Edge Functions must always follow the `OPTIONS` method check to prevent blocking legitimate cross-origin requests due to preflight overhead.
+
+# 🛡️ Sentinel Journal - 2026-03-06
+
+## Security: Over-permissive CORS Origin Reflection
+
+### Finding
+The `api/submit-waitlist.ts` endpoint was reflecting the `Origin` header from incoming requests directly into the `Access-Control-Allow-Origin` header. This bypasses the security provided by the `ALLOWED_ORIGIN` environment variable and allows any website to make cross-origin requests to the endpoint, which is a significant security risk for data ingestion endpoints.
+
+### Resolution
+Removed the explicit origin reflection from the `buildCorsHeaders` call. The endpoint now correctly falls back to the standardized `ALLOWED_ORIGIN` configuration (or the safe default) defined in `lib/network.ts`.
+
+### Pattern Discovery
+Standardized the "Zero-Trust CORS" pattern for internal APIs. Public-facing endpoints must never reflect the `Origin` header without strict validation against an allowlist. Using a centralized, parameterless `buildCorsHeaders()` call ensures consistency across all serverless functions.
