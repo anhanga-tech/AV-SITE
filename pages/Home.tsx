@@ -7,6 +7,7 @@ import { FAQPageSchema } from '../components/schemas/FAQPageSchema';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { ServiceSchema } from '../components/schemas/ServiceSchema';
 import { FAQ_SCHEMA_ITEMS } from '../data/faqData';
+import { TESTIMONIALS, TESTIMONIAL_MAX_RATING } from '../data/testimonialsData';
 
 import { SEO } from '../components/SEO';
 
@@ -120,7 +121,7 @@ const Home: React.FC = () => {
           'turismo melhor idade',
           'pacotes de viagem SP',
         ]}
-        aggregateRating={{ ratingValue: 5, reviewCount: 3 }}
+        aggregateRating={{ ratingValue: TESTIMONIAL_MAX_RATING, reviewCount: TESTIMONIALS.length }}
       />
       <Hero />
 
