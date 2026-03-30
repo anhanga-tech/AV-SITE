@@ -3,36 +3,7 @@ import ChevronLeft from 'lucide-react/dist/esm/icons/chevron-left';
 import ChevronRight from 'lucide-react/dist/esm/icons/chevron-right';
 import Quote from 'lucide-react/dist/esm/icons/quote';
 import MessageSquareHeart from 'lucide-react/dist/esm/icons/message-square-heart';
-
-const TESTIMONIALS = [
-    {
-        name: "Daryw M.",
-        destination: "Finlândia",
-        text: "Desde o primeiro contato, senti um acolhimento e atendimento diferente e especial.",
-        image: "https://api.dicebear.com/9.x/adventurer/svg?seed=Daryw&backgroundColor=b6e3f4",
-        bg: "bg-yellow-50",
-        rotate: "-rotate-2",
-        date: "2025-12-15"
-    },
-    {
-        name: "Rafa & Gabi",
-        destination: "Paraty",
-        text: "Chegamos no hotel e havia uma surpresa. Atendimento impecável do início ao fim.",
-        image: "https://api.dicebear.com/9.x/adventurer/svg?seed=CarlosFer&backgroundColor=ffdfbf",
-        bg: "bg-blue-50",
-        rotate: "rotate-1",
-        date: "2025-11-20"
-    },
-    {
-        name: "William S.",
-        destination: "Alemanha",
-        text: "Viagem mais tranquila da vida. Trens, hotéis, tudo organizado perfeitamente.",
-        image: "https://api.dicebear.com/9.x/adventurer/svg?seed=Roberto&backgroundColor=c0aede",
-        bg: "bg-emerald-50",
-        rotate: "-rotate-1",
-        date: "2025-10-10"
-    }
-];
+import { TESTIMONIALS } from '../data/testimonialsData';
 
 const Testimonials: React.FC = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
