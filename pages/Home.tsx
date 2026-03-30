@@ -3,6 +3,10 @@ import { useLocation, Link } from 'react-router-dom';
 import Hero from '../components/Hero';
 
 import { OrganizationSchema } from '../components/schemas/OrganizationSchema';
+import { FAQPageSchema } from '../components/schemas/FAQPageSchema';
+import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
+import { ServiceSchema } from '../components/schemas/ServiceSchema';
+import { FAQ_SCHEMA_ITEMS } from '../data/faqData';
 
 import { SEO } from '../components/SEO';
 
@@ -92,11 +96,32 @@ const Home: React.FC = () => {
   return (
     <>
       <SEO
-        title="Anhangá Viagens: Roteiros Personalizados em São Paulo"
+        title="Agência de Viagens em SP | Anhangá Viagens"
         description="Agência boutique em São Paulo. Cada roteiro começa do zero — sem pacote pronto. Orlando, Beto Carrero, Europa e muito mais. Orçamento gratuito."
         canonical="https://www.anhanga.tur.br/"
       />
       <OrganizationSchema />
+      <FAQPageSchema items={FAQ_SCHEMA_ITEMS} />
+      <BreadcrumbSchema
+        items={[{ name: 'Home', item: 'https://www.anhanga.tur.br/' }]}
+      />
+      <ServiceSchema
+        name="Agência de Viagens Personalizadas"
+        description="Roteiros de viagem 100% personalizados para casais, famílias e grupos. Especialistas em Orlando, Beto Carrero, Europa, Lollapalooza e turismo 50+. Atendimento boutique em São Paulo."
+        serviceUrl="https://www.anhanga.tur.br/"
+        serviceType="Agência de Viagens"
+        areaServed="São Paulo, Brasil"
+        keywords={[
+          'agência de viagens São Paulo',
+          'roteiro personalizado',
+          'viagem Orlando',
+          'Beto Carrero World',
+          'Lollapalooza Brasil',
+          'turismo melhor idade',
+          'pacotes de viagem SP',
+        ]}
+        aggregateRating={{ ratingValue: 5, reviewCount: 3 }}
+      />
       <Hero />
 
       {shouldRenderBelowFold ? (
