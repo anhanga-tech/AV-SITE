@@ -26,9 +26,6 @@ const FAQItem = memo(({ question, answer, idx }: FAQItemProps) => {
     return (
         <div
             className={`mb-4 rounded-2xl overflow-hidden transition-all duration-300 border border-white/40 shadow-sm custom-backdrop ${isOpen ? 'shadow-md scale-[1.01]' : ''}`}
-            itemScope
-            itemProp="mainEntity"
-            itemType="https://schema.org/Question"
         >
             <button
                 className="w-full px-6 py-5 flex justify-between items-center text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan group bg-white/60 hover:bg-white/80 transition-colors"
@@ -41,7 +38,6 @@ const FAQItem = memo(({ question, answer, idx }: FAQItemProps) => {
                         {idx + 1}
                     </span>
                     <h3
-                        itemProp="name"
                         className="font-bold text-lg md:text-xl text-brand-dark group-hover:text-brand-cyan transition-colors"
                     >
                         {question}
@@ -57,9 +53,6 @@ const FAQItem = memo(({ question, answer, idx }: FAQItemProps) => {
             </button>
             <div
                 className={`overflow-hidden transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}
-                itemScope
-                itemProp="acceptedAnswer"
-                itemType="https://schema.org/Answer"
             >
                 <div className="px-6 pb-8 pt-4 text-gray-700 font-medium leading-relaxed text-lg bg-white/40">
                     {/* The answer content is injected here */}
@@ -76,7 +69,7 @@ const FAQS = [
     {
         question: "Quanto custa um roteiro personalizado?",
         answer: (
-            <div itemProp="text">
+            <div>
                 <p className="mb-4">
                     O preço varia conforme a complexidade, duração e destino. Nossos roteiros começam
                     em <strong>R$ 3.800</strong> e podem chegar a <strong>R$ 50.000+</strong> para experiências premium.
@@ -99,7 +92,7 @@ const FAQS = [
     {
         question: "Como funciona a estrutura de preço da Anhangá?",
         answer: (
-            <div itemProp="text">
+            <div>
                 <p className="mb-4">
                     Nós montamos seu roteiro dia-a-dia conforme seu estilo e orçamento.
                     Você recebe uma proposta com todos os custos listados:
@@ -118,7 +111,7 @@ const FAQS = [
     {
         question: "Quanto tempo antes devo planejar minha viagem?",
         answer: (
-            <div itemProp="text">
+            <div>
                 <p className="mb-4">
                     Recomendamos começar com <strong>3-6 meses de antecedência</strong> para viagens internacionais.
                     Isso nos permite:
@@ -138,7 +131,7 @@ const FAQS = [
     {
         question: "Por que a Anhangá em vez de outra agência?",
         answer: (
-            <div itemProp="text">
+            <div>
                 <p className="mb-2"><strong>1. Roteiros 100% personalizados:</strong> Não vendemos pacotes prontos.</p>
                 <p className="mb-2"><strong>2. Sem burocracia:</strong> Cuidamos de vistos, formulários, tudo.</p>
                 <p className="mb-2"><strong>3. Concierge humano:</strong> Fale com especialistas, não robôs.</p>
@@ -150,7 +143,7 @@ const FAQS = [
     {
         question: "Como funciona o processo? É complicado?",
         answer: (
-            <div itemProp="text">
+            <div>
                 <strong className="block mb-3">4 passos simples:</strong>
                 <ol className="list-decimal pl-5 space-y-3">
                     <li className="pl-1"><strong className="text-brand-dark">Oie! Vamos conversar?</strong> <br /> Você nos conta seus sonhos e orçamento via Chatbot</li>
@@ -164,7 +157,7 @@ const FAQS = [
     {
         question: "Como funciona a página do Lollapalooza Brasil na Anhangá?",
         answer: (
-            <div itemProp="text">
+            <div>
                 <p className="mb-4">
                     Somos especialistas em grandes festivais. A landing do <strong>Lollapalooza Brasil</strong> concentra as atualizações da campanha vigente, histórico da operação e a lista de espera para a próxima abertura quando a edição atual já estiver encerrada.
                 </p>
@@ -175,7 +168,7 @@ const FAQS = [
     {
         question: "Vocês têm viagens para quem tem 50+ (Melhor Idade)?",
         answer: (
-            <div itemProp="text">
+            <div>
                 <p className="mb-4">
                     Sim! O <strong>Turismo 50+</strong> é um de nossos pilares. Criamos roteiros com ritmo desacelerado, foco em conforto, acessibilidade e experiências culturais enriquecedoras, tanto no Brasil quanto no exterior.
                 </p>
@@ -186,7 +179,7 @@ const FAQS = [
     {
         question: "A Anhangá Viagens é uma agência credenciada?",
         answer: (
-            <div itemProp="text">
+            <div>
                 <p className="mb-2">
                     Com certeza. Somos uma agência de turismo com <strong>Certificado Cadastur (37.036.732/0001-41)</strong> e parceiros credenciados dos maiores parques do Brasil, como <strong>Beto Carrero World</strong> e <strong>Hopi Hari</strong>.
                 </p>
@@ -207,7 +200,7 @@ const FAQ: React.FC = () => {
             {/* Decorative blob for background interest */}
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-yellow-100/40 rounded-full blur-3xl pointer-events-none -z-10 translate-x-1/3 -translate-y-1/3"></div>
 
-            <div className="container mx-auto px-6 max-w-4xl" itemScope itemType="https://schema.org/FAQPage">
+            <div className="container mx-auto px-6 max-w-4xl">
                 <div className="text-center mb-16">
                     <div className="inline-block bg-brand-vibrant text-white px-4 py-1.5 rounded-full font-black text-xs uppercase tracking-widest mb-4 shadow-sm transform -rotate-1">
                         Tire suas dúvidas
