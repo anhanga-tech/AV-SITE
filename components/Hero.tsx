@@ -92,7 +92,7 @@ const Hero: React.FC = () => {
         {!shouldRenderVideo && (
           <img
             src={optimizedPoster}
-            alt="Destinos exclusivos planejados pela Anhangá Viagens, agência boutique em São Paulo"
+            alt="Paisagem de um destino de viagem paradisíaco, um dos roteiros exclusivos da Anhangá Viagens"
             width="1280"
             height="720"
             fetchPriority="high"
