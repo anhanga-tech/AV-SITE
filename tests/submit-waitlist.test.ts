@@ -4,6 +4,7 @@ import handler from '../api/submit-waitlist.ts';
 
 const originalFetch = global.fetch;
 const originalEnv = {
+    ALLOWED_ORIGIN: process.env.ALLOWED_ORIGIN,
     HUBSPOT_TOKEN: process.env.HUBSPOT_TOKEN,
     HUBSPOT_LOLLAPALOOZA_LIST_ID: process.env.HUBSPOT_LOLLAPALOOZA_LIST_ID,
     HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY: process.env.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY,
@@ -20,22 +21,25 @@ function restoreEnvValue(key: string, value: string | undefined) {
 }
 
 function restoreEnv() {
+    restoreEnvValue('ALLOWED_ORIGIN', originalEnv.ALLOWED_ORIGIN);
     restoreEnvValue('HUBSPOT_TOKEN', originalEnv.HUBSPOT_TOKEN);
     restoreEnvValue('HUBSPOT_LOLLAPALOOZA_LIST_ID', originalEnv.HUBSPOT_LOLLAPALOOZA_LIST_ID);
     restoreEnvValue('HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY', originalEnv.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY);
     restoreEnvValue('HUBSPOT_REQUEST_TIMEOUT_MS', originalEnv.HUBSPOT_REQUEST_TIMEOUT_MS);
 }
 
-function buildRequest(body: Record<string, unknown>): Request {
+function buildRequest(body: Record<string, unknown>, init?: { headers?: Record<string, string>; method?: string }): Request {
     const ipSuffix = Math.floor(Math.random() * 200) + 1;
+    const method = init?.method || 'POST';
 
     return new Request('http://localhost/api/submit-waitlist', {
-        method: 'POST',
+        method,
         headers: {
             'Content-Type': 'application/json',
             'x-real-ip': `127.0.0.${ipSuffix}`,
+            ...init?.headers,
         },
-        body: JSON.stringify(body),
+        body: method === 'OPTIONS' ? undefined : JSON.stringify(body),
     });
 }
 
@@ -120,6 +124,43 @@ test('submit-waitlist should reject invalid payloads', async () => {
     const payload = await response.json() as { ok: boolean; code?: string };
     assert.equal(payload.ok, false);
     assert.equal(payload.code, 'VALIDATION_ERROR');
+});
+
+test('submit-waitlist should use configured allowed origin for POST responses', async () => {
+    restoreEnv();
+    process.env.ALLOWED_ORIGIN = 'https://preview.anhanga.tur.br';
+    delete process.env.HUBSPOT_TOKEN;
+
+    const response = await handler(buildRequest({
+        name: '',
+        email: 'felipe@example.com',
+        sourcePage: '/lollapalooza',
+        utms: {},
+        tracking: {},
+    }, {
+        headers: {
+            origin: 'https://evil.example',
+        },
+    }));
+
+    assert.equal(response.status, 400);
+    assert.equal(response.headers.get('Access-Control-Allow-Origin'), 'https://preview.anhanga.tur.br');
+});
+
+test('submit-waitlist should use configured allowed origin for OPTIONS preflight', async () => {
+    restoreEnv();
+    process.env.ALLOWED_ORIGIN = 'https://preview.anhanga.tur.br';
+
+    const response = await handler(buildRequest({}, {
+        method: 'OPTIONS',
+        headers: {
+            origin: 'https://evil.example',
+        },
+    }));
+
+    assert.equal(response.status, 204);
+    assert.equal(response.headers.get('Access-Control-Allow-Origin'), 'https://preview.anhanga.tur.br');
+    assert.equal(response.headers.get('Access-Control-Allow-Methods'), 'POST, OPTIONS');
 });
 
 test('submit-waitlist should create contact, sync tracking, create note, and avoid deals', async (t) => {
