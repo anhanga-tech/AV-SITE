@@ -92,7 +92,7 @@ const Hero: React.FC = () => {
         {!shouldRenderVideo && (
           <img
             src={optimizedPoster}
-            alt="Fundo de destino de viagem Anhangá Viagens"
+            alt="Paisagem de um destino de viagem paradisíaco, um dos roteiros exclusivos da Anhangá Viagens"
             width="1280"
             height="720"
             fetchPriority="high"
