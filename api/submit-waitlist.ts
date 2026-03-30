@@ -137,7 +137,7 @@ async function processWaitlistSync(
 }
 
 export default async function handler(request: Request): Promise<Response> {
-    const corsHeaders = buildCorsHeaders(request.headers.get('origin') || undefined);
+    const corsHeaders = buildCorsHeaders();
     const requestId = createRequestId();
 
     if (request.method === 'OPTIONS') {
