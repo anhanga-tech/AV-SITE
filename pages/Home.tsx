@@ -92,7 +92,7 @@ const Home: React.FC = () => {
   return (
     <>
       <SEO
-        title="Agência de Viagens em São Paulo | Roteiros Feitos do Zero"
+        title="Anhangá Viagens: Roteiros Personalizados em São Paulo"
         description="Agência boutique em São Paulo. Cada roteiro começa do zero — sem pacote pronto. Orlando, Beto Carrero, Europa e muito mais. Orçamento gratuito."
         canonical="https://www.anhanga.tur.br/"
       />
