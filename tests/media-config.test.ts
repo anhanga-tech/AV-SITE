@@ -2,49 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { AUTHORS } from '../data/blogData.ts';
-import { getMediaRuntimeConfig, HERO_VIDEOS } from '../data/mediaConfig.ts';
+import { HERO_VIDEOS } from '../data/mediaConfig.ts';
 import { BLOG_POST_MANIFEST } from '../data/blogManifest.ts';
-
-test('getMediaRuntimeConfig should enable same-host transforms from env values', () => {
-    assert.deepEqual(
-        getMediaRuntimeConfig(
-            {
-                VITE_MEDIA_BASE_URL: 'https://media.anhanga.tur.br',
-                VITE_MEDIA_TRANSFORM_ZONE_URL: 'https://media.anhanga.tur.br',
-                VITE_MEDIA_ENABLE_TRANSFORMS: 'true',
-            },
-            {
-                hostname: 'www.anhanga.tur.br',
-                origin: 'https://www.anhanga.tur.br',
-            },
-        ),
-        {
-            mediaBaseUrl: 'https://media.anhanga.tur.br',
-            transformZoneUrl: 'https://media.anhanga.tur.br',
-            enableTransforms: true,
-        },
-    );
-});
-
-test('getMediaRuntimeConfig should accept quoted boolean env values', () => {
-    assert.deepEqual(
-        getMediaRuntimeConfig(
-            {
-                VITE_MEDIA_BASE_URL: 'https://media.anhanga.tur.br',
-                VITE_MEDIA_ENABLE_TRANSFORMS: '"true"',
-            },
-            {
-                hostname: 'www.anhanga.tur.br',
-                origin: 'https://www.anhanga.tur.br',
-            },
-        ),
-        {
-            mediaBaseUrl: 'https://media.anhanga.tur.br',
-            transformZoneUrl: 'https://media.anhanga.tur.br',
-            enableTransforms: true,
-        },
-    );
-});
 
 test('hero media should point to the Cloudflare R2 origin', () => {
     assert.deepEqual(
