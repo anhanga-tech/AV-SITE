@@ -1,20 +1,21 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import ChevronLeft from 'lucide-react/dist/esm/icons/chevron-left';
 import ChevronRight from 'lucide-react/dist/esm/icons/chevron-right';
 import Quote from 'lucide-react/dist/esm/icons/quote';
 import MessageSquareHeart from 'lucide-react/dist/esm/icons/message-square-heart';
 import { TESTIMONIALS } from '../data/testimonialsData';
+import { LazyImage } from './ui/LazyImage';
 
-const Testimonials: React.FC = () => {
+const Testimonials = memo(function Testimonials() {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const nextSlide = useCallback(() => {
         setCurrentIndex((prev) => (prev === TESTIMONIALS.length - 1 ? 0 : prev + 1));
     }, []);
 
-    const prevSlide = () => {
+    const prevSlide = useCallback(() => {
         setCurrentIndex((prev) => (prev === 0 ? TESTIMONIALS.length - 1 : prev - 1));
-    };
+    }, []);
 
     useEffect(() => {
         const interval = setInterval(nextSlide, 6000); // Aumentei um pouco o tempo para leitura
@@ -76,9 +77,11 @@ const Testimonials: React.FC = () => {
                                             {/* Animated Avatar Sticker */}
                                             <div className="relative shrink-0">
                                                 <div className="w-32 h-32 rounded-full border-4 border-white shadow-lg overflow-hidden bg-white animate-float">
-                                                    <img
+                                                    <LazyImage
                                                         src={testimonial.image}
                                                         alt={testimonial.name}
+                                                        width={128}
+                                                        height={128}
                                                         className="w-full h-full object-cover"
                                                     />
                                                 </div>
@@ -136,6 +139,8 @@ const Testimonials: React.FC = () => {
             </div>
         </section>
     );
-};
+});
+
+Testimonials.displayName = 'Testimonials';
 
 export default Testimonials;

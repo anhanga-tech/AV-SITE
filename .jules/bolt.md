@@ -11,3 +11,7 @@
 ## 2026-03-05 - ⚡ Bolt: CSS-based Hover States
 **Learning:** React state-driven hover effects (`onMouseEnter/Leave`) can cause excessive re-renders in large lists or grids. Replacing them with CSS `group-hover` eliminates JavaScript execution and Virtual DOM diffing during high-frequency interactions.
 **Action:** Always check if a hover effect can be achieved via CSS before reaching for `useState`.
+
+## 2026-03-31 - ⚡ Bolt: Testimonial Carousel Interaction Optimization
+**Learning:** Carousel components with automatic transitions and heavy assets (avatars) can suffer from stutter and layout shifts if not properly memoized. Using `React.memo` with stabilized `useCallback` transitions prevents Virtual DOM thrashing, while `LazyImage` with fixed dimensions ensures that images are loaded efficiently and don't cause CLS during slides.
+**Action:** For interactive carousels, always combine `React.memo` for the main container with `LazyImage` and explicit `width`/`height` props to maintain 60fps transitions and zero layout shift.
