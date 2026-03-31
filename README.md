@@ -73,10 +73,10 @@ O site institucional da **Anhangá Viagens** é uma plataforma moderna e interat
    HUBSPOT_LOLLAPALOOZA_LIST_ID=123
    # Opcional (o projeto já usa este domínio por padrão; defina só se quiser explicitar)
    VITE_MEDIA_BASE_URL=https://media.anhanga.tur.br
-   # Opcional (zona Cloudflare que vai servir /cdn-cgi/image)
-   VITE_MEDIA_TRANSFORM_ZONE_URL=https://www.anhanga.tur.br
-   # Opcional (ative só depois de validar que /cdn-cgi/image responde imagem)
-   VITE_MEDIA_ENABLE_TRANSFORMS=false
+   # Opcional (para assets do R2, prefira o host de mídia como zona de resize)
+   VITE_MEDIA_TRANSFORM_ZONE_URL=https://media.anhanga.tur.br
+   # Opcional (ative depois de validar o /cdn-cgi/image no host de mídia)
+   VITE_MEDIA_ENABLE_TRANSFORMS=true
    ```
 
    O projeto já aponta por padrão para `https://media.anhanga.tur.br`. Use
@@ -84,7 +84,8 @@ O site institucional da **Anhangá Viagens** é uma plataforma moderna e interat
    `VITE_MEDIA_TRANSFORM_ZONE_URL` só entra em uso quando
    `VITE_MEDIA_ENABLE_TRANSFORMS=true`. O padrão atual mantém as imagens servidas
    diretamente do bucket do R2, o que evita quebra quando `/cdn-cgi/image/...`
-   ainda não está ativo na zona.
+   ainda não está ativo. Quando ativado, o helper só transforma imagens do
+   próprio host de mídia; URLs externas seguem diretas.
 
 
 4. **Execute o projeto:**

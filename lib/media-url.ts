@@ -22,6 +22,14 @@ function isAbsoluteHttpUrl(value: string): boolean {
     return /^https?:\/\//i.test(value);
 }
 
+function safelyParseUrl(value: string): URL | null {
+    try {
+        return new URL(value);
+    } catch {
+        return null;
+    }
+}
+
 function stripTrailingSlash(value: string): string {
     return value.replace(/\/+$/, '');
 }
@@ -84,7 +92,7 @@ export function selectImagePreset(width: number = 1200, height?: number): ImageP
 }
 
 export function buildCloudflareImageUrl(
-    sourceUrl: string,
+    sourcePathOrUrl: string,
     transformZoneUrl: string,
     preset: ImagePreset,
 ): string {
@@ -101,11 +109,42 @@ export function buildCloudflareImageUrl(
         params.push(`height=${preset.height}`);
     }
 
-    return `${normalizedZone}/cdn-cgi/image/${params.join(',')}/${sourceUrl}`;
+    const normalizedSource = sourcePathOrUrl.startsWith('/')
+        ? sourcePathOrUrl
+        : `/${sourcePathOrUrl.replace(/^\/+/, '')}`;
+
+    return `${normalizedZone}/cdn-cgi/image/${params.join(',')}${normalizedSource}`;
 }
 
 function isExistingCloudflareTransformUrl(url: string): boolean {
     return url.includes('/cdn-cgi/image/');
+}
+
+function getTransformSourcePath(
+    rawUrl: string,
+    resolvedSource: string,
+    transformZoneUrl: string,
+): string | null {
+    if (!isAbsoluteHttpUrl(transformZoneUrl)) {
+        return null;
+    }
+
+    if (!isAbsoluteHttpUrl(rawUrl)) {
+        return `/${rawUrl.replace(/^\/+/, '')}`;
+    }
+
+    const sourceUrl = safelyParseUrl(resolvedSource);
+    const transformZone = safelyParseUrl(transformZoneUrl);
+
+    if (!sourceUrl || !transformZone) {
+        return null;
+    }
+
+    if (sourceUrl.origin !== transformZone.origin) {
+        return null;
+    }
+
+    return `${sourceUrl.pathname}${sourceUrl.search}`;
 }
 
 export function optimizeImageUrl(rawUrl: string, options: OptimizeImageUrlOptions = {}): string {
@@ -122,6 +161,11 @@ export function optimizeImageUrl(rawUrl: string, options: OptimizeImageUrlOption
         return resolvedSource;
     }
 
+    const sourcePath = getTransformSourcePath(rawUrl, resolvedSource, options.transformZoneUrl);
+    if (!sourcePath) {
+        return resolvedSource;
+    }
+
     const preset = selectImagePreset(options.width, options.height);
-    return buildCloudflareImageUrl(resolvedSource, options.transformZoneUrl, preset);
+    return buildCloudflareImageUrl(sourcePath, options.transformZoneUrl, preset);
 }

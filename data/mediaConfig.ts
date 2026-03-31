@@ -4,7 +4,7 @@ import { optimizeImageUrl, resolveMediaUrl } from '../lib/media-url.ts';
  * Media Configuration - Centralized media assets management.
  *
  * The current migration target is Cloudflare R2 for origin storage and
- * Cloudflare image transformations via `/cdn-cgi/image/...` on the site zone.
+ * Cloudflare image transformations via `/cdn-cgi/image/...` on the media zone.
  */
 
 interface MediaEnv {
@@ -48,10 +48,13 @@ function getDefaultTransformZoneUrl(): string {
 
 function getMediaRuntimeConfig() {
     const env = getImportMetaEnv();
+    const mediaBaseUrl = env.VITE_MEDIA_BASE_URL || env.VITE_MEDIA_CDN_URL || DEFAULT_MEDIA_BASE_URL;
+    const enableTransforms = parseBooleanEnv(env.VITE_MEDIA_ENABLE_TRANSFORMS);
+
     return {
-        mediaBaseUrl: env.VITE_MEDIA_BASE_URL || env.VITE_MEDIA_CDN_URL || DEFAULT_MEDIA_BASE_URL,
-        transformZoneUrl: env.VITE_MEDIA_TRANSFORM_ZONE_URL || getDefaultTransformZoneUrl(),
-        enableTransforms: parseBooleanEnv(env.VITE_MEDIA_ENABLE_TRANSFORMS),
+        mediaBaseUrl,
+        transformZoneUrl: env.VITE_MEDIA_TRANSFORM_ZONE_URL || (enableTransforms ? mediaBaseUrl : getDefaultTransformZoneUrl()),
+        enableTransforms,
     };
 }
 

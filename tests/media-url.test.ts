@@ -77,14 +77,14 @@ test('selectImagePreset should use scale-down presets when height is not provide
 
 test('buildCloudflareImageUrl should build a /cdn-cgi/image URL with fixed options', () => {
     const url = buildCloudflareImageUrl(
-        'https://media.anhanga.tur.br/images/home/hero.jpg',
-        'https://www.anhanga.tur.br',
+        '/images/home/hero.jpg',
+        'https://media.anhanga.tur.br',
         selectImagePreset(1280, 720),
     );
 
     assert.equal(
         url,
-        'https://www.anhanga.tur.br/cdn-cgi/image/format=auto,quality=85,metadata=none,fit=cover,width=1280,height=720/https://media.anhanga.tur.br/images/home/hero.jpg',
+        'https://media.anhanga.tur.br/cdn-cgi/image/format=auto,quality=85,metadata=none,fit=cover,width=1280,height=720/images/home/hero.jpg',
     );
 });
 
@@ -113,31 +113,45 @@ test('optimizeImageUrl should build transformed URLs only when transforms are ex
     assert.equal(
         optimizeImageUrl('images/home/hero.jpg', {
             mediaBaseUrl: 'https://media.anhanga.tur.br',
-            transformZoneUrl: 'https://www.anhanga.tur.br',
+            transformZoneUrl: 'https://media.anhanga.tur.br',
             enableTransforms: true,
             width: 1200,
             height: 675,
         }),
-        'https://www.anhanga.tur.br/cdn-cgi/image/format=auto,quality=85,metadata=none,fit=cover,width=1200,height=675/https://media.anhanga.tur.br/images/home/hero.jpg',
+        'https://media.anhanga.tur.br/cdn-cgi/image/format=auto,quality=85,metadata=none,fit=cover,width=1200,height=675/images/home/hero.jpg',
     );
+});
 
+test('optimizeImageUrl should transform absolute media URLs that already point to the transform zone', () => {
+    assert.equal(
+        optimizeImageUrl('https://media.anhanga.tur.br/images/home/hero.jpg?version=2', {
+            transformZoneUrl: 'https://media.anhanga.tur.br',
+            enableTransforms: true,
+            width: 1200,
+            height: 675,
+        }),
+        'https://media.anhanga.tur.br/cdn-cgi/image/format=auto,quality=85,metadata=none,fit=cover,width=1200,height=675/images/home/hero.jpg?version=2',
+    );
+});
+
+test('optimizeImageUrl should leave external absolute URLs untouched when using same-zone transforms', () => {
     assert.equal(
         optimizeImageUrl('https://images.pexels.com/photos/2868242/pexels-photo-2868242.jpeg', {
-            transformZoneUrl: 'https://www.anhanga.tur.br',
+            transformZoneUrl: 'https://media.anhanga.tur.br',
             enableTransforms: true,
             width: 640,
             height: 400,
         }),
-        'https://www.anhanga.tur.br/cdn-cgi/image/format=auto,quality=85,metadata=none,fit=cover,width=640,height=400/https://images.pexels.com/photos/2868242/pexels-photo-2868242.jpeg',
+        'https://images.pexels.com/photos/2868242/pexels-photo-2868242.jpeg',
     );
 });
 
 test('optimizeImageUrl should not double-wrap existing Cloudflare transformation URLs', () => {
-    const transformed = 'https://www.anhanga.tur.br/cdn-cgi/image/format=auto,quality=85,width=640/https://media.anhanga.tur.br/images/home/hero.jpg';
+    const transformed = 'https://media.anhanga.tur.br/cdn-cgi/image/format=auto,quality=85,width=640/images/home/hero.jpg';
 
     assert.equal(
         optimizeImageUrl(transformed, {
-            transformZoneUrl: 'https://www.anhanga.tur.br',
+            transformZoneUrl: 'https://media.anhanga.tur.br',
             enableTransforms: true,
             width: 640,
         }),
