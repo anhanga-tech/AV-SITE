@@ -1,3 +1,4 @@
+import { optimizeRemoteImageUrl } from './mediaConfig';
 
 export interface Author {
     id: string;
@@ -34,7 +35,7 @@ export const AUTHORS: Record<string, Author> = {
         name: "Chef Luigi",
         role: "Crítico Gastronômico",
         bio: "Viajante incansável em busca dos melhores sabores do mundo, da alta gastronomia à comida de rua.",
-        image: "https://res.cloudinary.com/dzehqrcmm/image/upload/f_auto,q_auto,w_256,h_256,c_fill/blog/authors/chef-luigi.jpg"
+        image: optimizeRemoteImageUrl('images/authors/chef-luigi.jpg', 256, 256)
     },
     "mariana": {
         id: "mariana",
@@ -58,4 +59,3 @@ export const AUTHORS: Record<string, Author> = {
         image: "https://www.anhanga.tur.br/logo.png"
     }
 };
-
