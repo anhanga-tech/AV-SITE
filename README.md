@@ -75,12 +75,16 @@ O site institucional da **Anhangá Viagens** é uma plataforma moderna e interat
    VITE_MEDIA_BASE_URL=https://media.anhanga.tur.br
    # Opcional (zona Cloudflare que vai servir /cdn-cgi/image)
    VITE_MEDIA_TRANSFORM_ZONE_URL=https://www.anhanga.tur.br
+   # Opcional (ative só depois de validar que /cdn-cgi/image responde imagem)
+   VITE_MEDIA_ENABLE_TRANSFORMS=false
    ```
 
    O projeto já aponta por padrão para `https://media.anhanga.tur.br`. Use
    `VITE_MEDIA_BASE_URL` apenas se precisar sobrescrever a origem em outro ambiente.
-   `VITE_MEDIA_TRANSFORM_ZONE_URL` deve apontar para a zona do site que vai aplicar as
-   transformações de imagem via `/cdn-cgi/image/...`.
+   `VITE_MEDIA_TRANSFORM_ZONE_URL` só entra em uso quando
+   `VITE_MEDIA_ENABLE_TRANSFORMS=true`. O padrão atual mantém as imagens servidas
+   diretamente do bucket do R2, o que evita quebra quando `/cdn-cgi/image/...`
+   ainda não está ativo na zona.
 
 
 4. **Execute o projeto:**

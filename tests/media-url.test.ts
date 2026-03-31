@@ -97,11 +97,24 @@ test('optimizeImageUrl should fall back to the resolved source URL when no trans
     );
 });
 
-test('optimizeImageUrl should build transformed URLs for relative or remote images', () => {
+test('optimizeImageUrl should fall back to the resolved source URL when transforms are disabled', () => {
     assert.equal(
         optimizeImageUrl('images/home/hero.jpg', {
             mediaBaseUrl: 'https://media.anhanga.tur.br',
             transformZoneUrl: 'https://www.anhanga.tur.br',
+            width: 1200,
+            height: 675,
+        }),
+        'https://media.anhanga.tur.br/images/home/hero.jpg',
+    );
+});
+
+test('optimizeImageUrl should build transformed URLs only when transforms are explicitly enabled', () => {
+    assert.equal(
+        optimizeImageUrl('images/home/hero.jpg', {
+            mediaBaseUrl: 'https://media.anhanga.tur.br',
+            transformZoneUrl: 'https://www.anhanga.tur.br',
+            enableTransforms: true,
             width: 1200,
             height: 675,
         }),
@@ -111,6 +124,7 @@ test('optimizeImageUrl should build transformed URLs for relative or remote imag
     assert.equal(
         optimizeImageUrl('https://images.pexels.com/photos/2868242/pexels-photo-2868242.jpeg', {
             transformZoneUrl: 'https://www.anhanga.tur.br',
+            enableTransforms: true,
             width: 640,
             height: 400,
         }),
@@ -124,6 +138,7 @@ test('optimizeImageUrl should not double-wrap existing Cloudflare transformation
     assert.equal(
         optimizeImageUrl(transformed, {
             transformZoneUrl: 'https://www.anhanga.tur.br',
+            enableTransforms: true,
             width: 640,
         }),
         transformed,

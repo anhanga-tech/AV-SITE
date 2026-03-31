@@ -3,13 +3,14 @@ import { Link } from 'react-router-dom';
 import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import TrendingUp from 'lucide-react/dist/esm/icons/trending-up';
 import { LazyImage } from './ui/LazyImage';
+import { optimizeRemoteImageUrl } from '../data/mediaConfig';
 
 // Moved outside component to prevent re-allocation on every render
 const POPULAR_DESTINATIONS = [
   {
     title: "Orlando",
     subtitle: "Magia & Parques",
-    image: "images/categories/orlando-home.jpg",
+    image: optimizeRemoteImageUrl('images/categories/orlando-home.jpg', 600, 600),
     tag: "Destino dos Sonhos",
     rotate: "-rotate-2",
     color: "bg-blue-100 text-blue-600",
@@ -18,7 +19,7 @@ const POPULAR_DESTINATIONS = [
   {
     title: "Beto Carrero",
     subtitle: "Diversão BR",
-    image: "images/categories/beto-carrero-world.jpg",
+    image: optimizeRemoteImageUrl('images/categories/beto-carrero-world.jpg', 600, 600),
     tag: "Radical",
     rotate: "rotate-3",
     color: "bg-yellow-100 text-yellow-700",
@@ -27,7 +28,7 @@ const POPULAR_DESTINATIONS = [
   {
     title: "Lollapalooza",
     subtitle: "Festivais",
-    image: "images/categories/lollapalooza-2026.webp",
+    image: optimizeRemoteImageUrl('images/categories/lollapalooza-2026.webp', 600, 600),
     tag: "Festival",
     rotate: "-rotate-1",
     color: "bg-emerald-100 text-emerald-600",

@@ -11,9 +11,18 @@ interface MediaEnv {
     VITE_MEDIA_BASE_URL?: string;
     VITE_MEDIA_CDN_URL?: string;
     VITE_MEDIA_TRANSFORM_ZONE_URL?: string;
+    VITE_MEDIA_ENABLE_TRANSFORMS?: string;
 }
 
 const DEFAULT_MEDIA_BASE_URL = 'https://media.anhanga.tur.br';
+
+function parseBooleanEnv(value?: string): boolean {
+    if (!value) {
+        return false;
+    }
+
+    return ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase());
+}
 
 function getImportMetaEnv(): MediaEnv {
     if (typeof import.meta === 'undefined') {
@@ -42,6 +51,7 @@ function getMediaRuntimeConfig() {
     return {
         mediaBaseUrl: env.VITE_MEDIA_BASE_URL || env.VITE_MEDIA_CDN_URL || DEFAULT_MEDIA_BASE_URL,
         transformZoneUrl: env.VITE_MEDIA_TRANSFORM_ZONE_URL || getDefaultTransformZoneUrl(),
+        enableTransforms: parseBooleanEnv(env.VITE_MEDIA_ENABLE_TRANSFORMS),
     };
 }
 
@@ -55,10 +65,11 @@ export const optimizeRemoteImageUrl = (
     width: number = 1200,
     height?: number
 ): string => {
-    const { mediaBaseUrl, transformZoneUrl } = getMediaRuntimeConfig();
+    const { mediaBaseUrl, transformZoneUrl, enableTransforms } = getMediaRuntimeConfig();
     return optimizeImageUrl(rawUrl, {
         mediaBaseUrl,
         transformZoneUrl,
+        enableTransforms,
         width,
         height,
     });

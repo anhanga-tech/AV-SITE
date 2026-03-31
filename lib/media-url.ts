@@ -10,6 +10,7 @@ export interface ImagePreset {
 export interface OptimizeImageUrlOptions {
     mediaBaseUrl?: string;
     transformZoneUrl?: string;
+    enableTransforms?: boolean;
     width?: number;
     height?: number;
 }
@@ -117,7 +118,7 @@ export function optimizeImageUrl(rawUrl: string, options: OptimizeImageUrlOption
         return resolvedSource;
     }
 
-    if (!options.transformZoneUrl) {
+    if (!options.enableTransforms || !options.transformZoneUrl) {
         return resolvedSource;
     }
 
