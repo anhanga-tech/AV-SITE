@@ -9,7 +9,7 @@ const POPULAR_DESTINATIONS = [
   {
     title: "Orlando",
     subtitle: "Magia & Parques",
-    image: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293380/avkqwz1ar2964muauoml_xivjtk.jpg",
+    image: "images/categories/orlando-home.jpg",
     tag: "Destino dos Sonhos",
     rotate: "-rotate-2",
     color: "bg-blue-100 text-blue-600",
@@ -18,7 +18,7 @@ const POPULAR_DESTINATIONS = [
   {
     title: "Beto Carrero",
     subtitle: "Diversão BR",
-    image: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293401/Star-Mountain-Beto-Carrero-World-2_r6n9ij.jpg",
+    image: "images/categories/beto-carrero-world.jpg",
     tag: "Radical",
     rotate: "rotate-3",
     color: "bg-yellow-100 text-yellow-700",
@@ -27,7 +27,7 @@ const POPULAR_DESTINATIONS = [
   {
     title: "Lollapalooza",
     subtitle: "Festivais",
-    image: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293421/lollapalooza-brasil-2026-2_pwrkqg.webp",
+    image: "images/categories/lollapalooza-2026.webp",
     tag: "Festival",
     rotate: "-rotate-1",
     color: "bg-emerald-100 text-emerald-600",
