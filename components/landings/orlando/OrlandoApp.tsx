@@ -5,6 +5,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { optimizeRemoteImageUrl } from '../../../data/mediaConfig';
 import { getWhatsAppLink } from '../../../utils/whatsapp';
 import { openAiChat } from '../../../utils/aiChat';
 
@@ -273,7 +274,7 @@ function OrlandoApp() {
             <div className="parks-grid">
                 <div className="park-card">
                     <div className="park-image-frame">
-                        <img src="https://res.cloudinary.com/dzehqrcmm/image/upload/f_auto,q_auto,w_600,h_400,c_fill/orlando/universal-studios-orlando.jpg" alt="Universal Studios Orlando" width="600" height="400" loading="lazy" />
+                        <img src={optimizeRemoteImageUrl('images/orlando/universal-studios-orlando.jpg', 600, 400)} alt="Universal Studios Orlando" width="600" height="400" loading="lazy" />
                     </div>
                     <img className="park-logo-title" style={{ maxHeight: '77px', maxWidth: '280px' }} src="https://frontdoormagicbreaks-huaycyfnhbh0e8h4.z03.azurefd.net/umbr-upgrade-media/media/1acfwlwm/universal-universal-studios-florida-blue-logo.png" alt="Universal Studios Logo" width="280" height="77" loading="lazy" />
                     <p>Entre no filme. Fuja do banco de Gringotts, brinque com os Minions e viva o cinema.</p>
