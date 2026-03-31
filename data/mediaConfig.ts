@@ -41,11 +41,13 @@ function getImportMetaEnv(): MediaEnv {
         return {};
     }
 
+    const viteEnv = (import.meta as ImportMeta & { env?: MediaEnv }).env;
+
     return {
-        VITE_MEDIA_BASE_URL: import.meta.env?.VITE_MEDIA_BASE_URL,
-        VITE_MEDIA_CDN_URL: import.meta.env?.VITE_MEDIA_CDN_URL,
-        VITE_MEDIA_TRANSFORM_ZONE_URL: import.meta.env?.VITE_MEDIA_TRANSFORM_ZONE_URL,
-        VITE_MEDIA_ENABLE_TRANSFORMS: import.meta.env?.VITE_MEDIA_ENABLE_TRANSFORMS,
+        VITE_MEDIA_BASE_URL: viteEnv && import.meta.env.VITE_MEDIA_BASE_URL,
+        VITE_MEDIA_CDN_URL: viteEnv && import.meta.env.VITE_MEDIA_CDN_URL,
+        VITE_MEDIA_TRANSFORM_ZONE_URL: viteEnv && import.meta.env.VITE_MEDIA_TRANSFORM_ZONE_URL,
+        VITE_MEDIA_ENABLE_TRANSFORMS: viteEnv && import.meta.env.VITE_MEDIA_ENABLE_TRANSFORMS,
     };
 }
 
