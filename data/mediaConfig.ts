@@ -1,117 +1,67 @@
+import { optimizeImageUrl, resolveMediaUrl } from '../lib/media-url.ts';
+
 /**
- * Media Configuration - Centralized media assets management
+ * Media Configuration - Centralized media assets management.
  *
- * MIGRATION TO CDN:
- * 1. Upload all videos/images to your CDN (Cloudinary, Vercel Blob, AWS S3, etc.)
- * 2. Update the URLs below to point to your CDN
- * 3. For Cloudinary, you can use transformations for automatic optimization:
- *    - Videos: Add '/q_auto,f_auto/' to the URL
- *    - Images: Add '/w_800,q_auto,f_auto/' for responsive optimization
- *
- * RECOMMENDED CDN SERVICES:
- * - Cloudinary (https://cloudinary.com) - Best for image/video transformations
- * - Vercel Blob (https://vercel.com/docs/storage/vercel-blob) - Simple, integrated with Vercel
- * - Bunny CDN (https://bunny.net) - Cost-effective
- * - AWS CloudFront + S3 - Enterprise-grade
+ * The current migration target is Cloudflare R2 for origin storage and
+ * Cloudflare image transformations via `/cdn-cgi/image/...` on the site zone.
  */
 
-// Base URL for media assets - change this when migrating to CDN
-const MEDIA_BASE_URL = import.meta.env.VITE_MEDIA_CDN_URL || '';
+interface MediaEnv {
+    VITE_MEDIA_BASE_URL?: string;
+    VITE_MEDIA_CDN_URL?: string;
+    VITE_MEDIA_TRANSFORM_ZONE_URL?: string;
+}
 
-// Helper function to construct media URLs
-export const getMediaUrl = (path: string): string => {
-    if (path.startsWith('http')) {
-        // Already an absolute URL (e.g., from Pexels)
-        return path;
+const DEFAULT_MEDIA_BASE_URL = 'https://media.anhanga.tur.br';
+
+function getImportMetaEnv(): MediaEnv {
+    if (typeof import.meta === 'undefined') {
+        return {};
     }
-    return `${MEDIA_BASE_URL}${path}`;
+
+    const candidate = import.meta as ImportMeta & { env?: MediaEnv };
+    return candidate.env ?? {};
+}
+
+function getDefaultTransformZoneUrl(): string {
+    if (typeof window === 'undefined') {
+        return '';
+    }
+
+    const { hostname, origin } = window.location;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return '';
+    }
+
+    return origin;
+}
+
+function getMediaRuntimeConfig() {
+    const env = getImportMetaEnv();
+    return {
+        mediaBaseUrl: env.VITE_MEDIA_BASE_URL || env.VITE_MEDIA_CDN_URL || DEFAULT_MEDIA_BASE_URL,
+        transformZoneUrl: env.VITE_MEDIA_TRANSFORM_ZONE_URL || getDefaultTransformZoneUrl(),
+    };
+}
+
+export const getMediaUrl = (path: string): string => {
+    const { mediaBaseUrl } = getMediaRuntimeConfig();
+    return resolveMediaUrl(path, mediaBaseUrl);
 };
 
-function parseRemoteUrl(rawUrl: string): URL | null {
-    try {
-        return new URL(rawUrl);
-    } catch {
-        return null;
-    }
-}
-
-function optimizePexelsUrl(parsedUrl: URL, width: number, height?: number): string {
-    if (!parsedUrl.searchParams.has('auto')) {
-        parsedUrl.searchParams.set('auto', 'compress');
-    }
-    if (!parsedUrl.searchParams.has('cs')) {
-        parsedUrl.searchParams.set('cs', 'tinysrgb');
-    }
-    if (!parsedUrl.searchParams.has('w')) {
-        parsedUrl.searchParams.set('w', String(width));
-    }
-    if (height && !parsedUrl.searchParams.has('h')) {
-        parsedUrl.searchParams.set('h', String(height));
-    }
-    if (!parsedUrl.searchParams.has('dpr')) {
-        parsedUrl.searchParams.set('dpr', '1');
-    }
-
-    return parsedUrl.toString();
-}
-
-function optimizeCloudinaryDeliveryUrl(rawUrl: string, parsedUrl: URL, width: number, height?: number): string | null {
-    if (parsedUrl.hostname !== 'res.cloudinary.com' || !rawUrl.includes('/image/upload/')) {
-        return null;
-    }
-
-    const afterUpload = rawUrl.split('/image/upload/')[1] || '';
-    const firstSegment = afterUpload.split('/')[0];
-    if (/[a-z]_/.test(firstSegment)) {
-        return rawUrl;
-    }
-
-    const transforms = height
-        ? `f_auto,q_auto,w_${width},h_${height},c_fill`
-        : `f_auto,q_auto,w_${width}`;
-
-    return rawUrl.replace('/image/upload/', `/image/upload/${transforms}/`);
-}
-
-function buildWsrvProxyUrl(rawUrl: string, width: number): string {
-    const withoutProtocol = rawUrl.replace(/^https?:\/\//, '');
-    const encodedUrl = encodeURIComponent(withoutProtocol);
-    return `https://wsrv.nl/?url=${encodedUrl}&w=${width}&output=webp&q=80`;
-}
-
-/**
- * Optimize remote image URLs to reduce transfer size.
- * - Pexels: use built-in compression and constrained dimensions
- * - Other remote hosts: use wsrv.nl proxy to convert/compress as WebP
- */
 export const optimizeRemoteImageUrl = (
     rawUrl: string,
     width: number = 1200,
     height?: number
 ): string => {
-    if (!rawUrl || !rawUrl.startsWith('http')) {
-        return rawUrl;
-    }
-
-    const parsedUrl = parseRemoteUrl(rawUrl);
-    if (!parsedUrl) {
-        return rawUrl;
-    }
-
-    if (parsedUrl.hostname === 'images.pexels.com') {
-        return optimizePexelsUrl(parsedUrl, width, height);
-    }
-
-    if (parsedUrl.hostname === 'wsrv.nl') {
-        return rawUrl;
-    }
-
-    const optimizedCloudinaryUrl = optimizeCloudinaryDeliveryUrl(rawUrl, parsedUrl, width, height);
-    if (optimizedCloudinaryUrl) {
-        return optimizedCloudinaryUrl;
-    }
-
-    return buildWsrvProxyUrl(rawUrl, width);
+    const { mediaBaseUrl, transformZoneUrl } = getMediaRuntimeConfig();
+    return optimizeImageUrl(rawUrl, {
+        mediaBaseUrl,
+        transformZoneUrl,
+        width,
+        height,
+    });
 };
 
 // =============================================================================
@@ -127,32 +77,32 @@ export interface HeroVideo {
 export const HERO_VIDEOS: HeroVideo[] = [
     {
         id: 1,
-        url: "https://res.cloudinary.com/dzehqrcmm/video/upload/f_auto,q_auto,vc_auto/v1771293570/16863167_kbozxi.mp4",
-        poster: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293589/pexels-photo-2868242_hugrsz.jpg",
+        url: getMediaUrl('videos/hero/rio.mp4'),
+        poster: getMediaUrl('images/hero/rio-poster.jpg'),
         description: "Rio de Janeiro / Tropical Brazil"
     },
     {
         id: 2,
-        url: "https://res.cloudinary.com/dzehqrcmm/video/upload/f_auto,q_auto,vc_auto/v1771293602/7197880_r8nk2w.mp4",
-        poster: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293621/pexels-photo-1530259_iea81k.jpg",
+        url: getMediaUrl('videos/hero/paris.mp4'),
+        poster: getMediaUrl('images/hero/paris-poster.jpg'),
         description: "Paris / Europa"
     },
     {
         id: 3,
-        url: "https://res.cloudinary.com/dzehqrcmm/video/upload/f_auto,q_auto,vc_auto/v1771293785/4069480-uhd_3840_2160_25fps_mqkuxl.mov",
-        poster: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293814/pexels-photo-1483053_azoiz9.jpg",
+        url: getMediaUrl('videos/hero/maldivas.mp4'),
+        poster: getMediaUrl('images/hero/maldivas-poster.jpg'),
         description: "Maldivas / Praia Paradisíaca"
     },
     {
         id: 4,
-        url: "https://res.cloudinary.com/dzehqrcmm/video/upload/f_auto,q_auto,vc_auto/v1771293836/31312984_af8j6l.mp4",
-        poster: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293870/pexels-photo-12110576_qaeilk.jpg",
+        url: getMediaUrl('videos/hero/new-york.mp4'),
+        poster: getMediaUrl('images/hero/new-york-poster.jpg'),
         description: "New York / Urbano"
     },
     {
         id: 5,
-        url: "https://res.cloudinary.com/dzehqrcmm/video/upload/f_auto,q_auto,vc_auto/v1771293881/3120431_c16dlk.mp4",
-        poster: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293923/pexels-photo-4027087_zipkrv.jpg",
+        url: getMediaUrl('videos/hero/natureza.mp4'),
+        poster: getMediaUrl('images/hero/natureza-poster.jpg'),
         description: "Natureza / Montanhas"
     }
 ];
@@ -253,51 +203,26 @@ export const getDestinationImage = (city: string): string => {
 };
 
 // =============================================================================
-// IMAGE OPTIMIZATION HELPERS (for when using Cloudinary)
+// IMAGE OPTIMIZATION HELPERS
 // =============================================================================
 
-// Allowed Cloudinary hosts for URL optimization
-const isCloudinaryUrl = (url: string): boolean => {
-    try {
-        const parsed = new URL(url);
-        const host = parsed.hostname.toLowerCase();
-        return host === 'cloudinary.com' || host.endsWith('.cloudinary.com');
-    } catch {
-        return false;
-    }
-};
-
 /**
- * Generate optimized Cloudinary URL
- * @param url Original Cloudinary URL
- * @param width Desired width
- * @param format Output format (auto recommended)
+ * Backwards-compatible alias preserved for legacy call sites.
  */
 export const optimizeCloudinaryUrl = (
     url: string,
     width: number = 800,
     format: 'auto' | 'webp' | 'avif' = 'auto'
 ): string => {
-    // Only works with Cloudinary URLs
-    if (!isCloudinaryUrl(url)) {
-        return url;
-    }
-
-    // Insert transformation parameters
-    const transformations = `w_${width},q_auto,f_${format}`;
-    return url.replace('/upload/', `/upload/${transformations}/`);
+    void format;
+    return optimizeRemoteImageUrl(url, width);
 };
 
 /**
- * Generate srcset for responsive images
- * Only works with Cloudinary URLs
+ * Generate srcset for responsive images using the active media provider.
  */
 export const generateSrcSet = (url: string, sizes: number[] = [400, 800, 1200]): string => {
-    if (!isCloudinaryUrl(url)) {
-        return '';
-    }
-
     return sizes
-        .map(size => `${optimizeCloudinaryUrl(url, size)} ${size}w`)
+        .map(size => `${optimizeRemoteImageUrl(url, size)} ${size}w`)
         .join(', ');
 };
