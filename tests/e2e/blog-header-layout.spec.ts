@@ -9,6 +9,8 @@ const ARTICLE_MIN_GAP_MOBILE = 16;
 const ARTICLE_MIN_GAP_DESKTOP = 24;
 const LIST_MIN_GAP_MOBILE = 12;
 const LIST_MIN_GAP_DESKTOP = 20;
+const HOME_HEADER_MIN_HEIGHT = 120;
+const HOME_DESKTOP_CTA_MIN_HEIGHT = 40;
 
 async function getElementHeight(locator: Locator) {
   const box = await locator.boundingBox();
@@ -54,7 +56,17 @@ async function expectExpandedTransparentHomeHeader(page: Page) {
     boxShadow: 'none',
   });
 
+  await expect.poll(() => getElementHeight(page.getByTestId('site-header'))).toBeGreaterThanOrEqual(HOME_HEADER_MIN_HEIGHT);
   await expect.poll(() => getElementHeight(page.getByTestId('header-logo'))).toBeGreaterThanOrEqual(90);
+
+  const viewportWidth = page.viewportSize()?.width ?? 0;
+
+  if (viewportWidth >= MOBILE_VIEWPORT_BREAKPOINT) {
+    const desktopCta = page.getByTestId('desktop-fale-conosco-btn');
+
+    await expect(desktopCta).toBeVisible();
+    await expect.poll(() => getElementHeight(desktopCta)).toBeGreaterThanOrEqual(HOME_DESKTOP_CTA_MIN_HEIGHT);
+  }
 }
 
 async function getHeadingGap(page: Page) {
