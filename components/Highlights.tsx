@@ -111,7 +111,7 @@ const Highlights = memo(() => {
                                 transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                             >
                                 <LazyImage
-                                    src="https://images.pexels.com/photos/1450372/pexels-photo-1450372.jpeg"
+                                    src="images/highlights/experiencia-caribe.jpg"
                                     alt="Família em praia paradisíaca com areia branca e água turquesa — pacote de viagem personalizado da Anhangá Viagens, agência em São Paulo"
                                     width={800}
                                     height={600}

@@ -2,25 +2,26 @@ import React from 'react';
 import SectionTitle from './SectionTitle';
 import { Star, Quote, CheckCircle2 } from 'lucide-react';
 import { Testimonial } from './types';
+import { optimizeRemoteImageUrl } from '../../../data/mediaConfig';
 
 const testimonials: Testimonial[] = [
   {
     id: 1,
     name: "Família Souza",
     quote: "Foi a melhor viagem da nossa família. Não tivemos dor de cabeça com nada, o hotel era do lado do parque!",
-    avatar: "https://picsum.photos/100/100?random=10"
+    avatar: optimizeRemoteImageUrl('images/beto-carrero/testimonials/familia-souza.jpg', 100, 100)
   },
   {
     id: 2,
     name: "Roberto & Ana",
     quote: "Tudo chegou certinho no WhatsApp, só tivemos o trabalho de ir pro aeroporto. Recomendo demais.",
-    avatar: "https://picsum.photos/100/100?random=11"
+    avatar: optimizeRemoteImageUrl('images/beto-carrero/testimonials/roberto-ana.jpg', 100, 100)
   },
   {
     id: 3,
     name: "Carla Dias",
     quote: "Eu estava perdida com tanta informação na internet. A Anhangá resolveu em 10 minutos de conversa.",
-    avatar: "https://picsum.photos/100/100?random=12"
+    avatar: optimizeRemoteImageUrl('images/beto-carrero/testimonials/carla-dias.jpg', 100, 100)
   }
 ];
 

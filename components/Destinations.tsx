@@ -18,6 +18,7 @@ import Share from 'lucide-react/dist/esm/icons/share';
 import { SocialShare } from './SocialShare';
 import { LazyImage } from './ui/LazyImage';
 import { openAiChat } from '../utils/aiChat';
+import { getDestinationImage } from '../data/mediaConfig';
 
 import { Link } from "react-router-dom";
 
@@ -40,7 +41,7 @@ const DESTINATIONS: Destination[] = [
     // --- AMÉRICAS ---
     {
         coords: [28.5383, -81.3792],
-        image: "https://images.pexels.com/photos/3411139/pexels-photo-3411139.jpeg",
+        image: getDestinationImage("Orlando"),
         city: "Orlando",
         landingPage: "/orlando",
         country: "EUA",
@@ -53,7 +54,7 @@ const DESTINATIONS: Destination[] = [
     },
     {
         coords: [18.5601, -68.3725],
-        image: "https://images.pexels.com/photos/3675435/pexels-photo-3675435.jpeg",
+        image: getDestinationImage("Punta Cana"),
         city: "Punta Cana",
         country: "Rep. Dominicana",
         rating: "4.95",
@@ -65,7 +66,7 @@ const DESTINATIONS: Destination[] = [
     },
     {
         coords: [21.1619, -86.8515],
-        image: "https://images.pexels.com/photos/20210505/pexels-photo-20210505.jpeg",
+        image: getDestinationImage("Cancún"),
         city: "Cancún",
         country: "México",
         rating: "4.89",
@@ -78,7 +79,7 @@ const DESTINATIONS: Destination[] = [
     // --- AMÉRICA DO SUL ---
     {
         coords: [-26.8041, -48.6521],
-        image: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293401/Star-Mountain-Beto-Carrero-World-2_r6n9ij.jpg",
+        image: getDestinationImage("Beto Carrero"),
         city: "Beto Carrero",
         landingPage: "/beto-carrero",
         country: "Brasil",
@@ -91,7 +92,7 @@ const DESTINATIONS: Destination[] = [
     },
     {
         coords: [-29.3738, -50.8764],
-        image: "https://images.pexels.com/photos/3101546/pexels-photo-3101546.jpeg",
+        image: getDestinationImage("Gramado"),
         city: "Gramado",
         country: "Brasil",
         rating: "4.91",
@@ -103,7 +104,7 @@ const DESTINATIONS: Destination[] = [
     },
     {
         coords: [-22.9068, -43.1729],
-        image: "https://images.pexels.com/photos/2868242/pexels-photo-2868242.jpeg",
+        image: getDestinationImage("Rio de Janeiro"),
         city: "Rio de Janeiro",
         country: "Brasil",
         rating: "4.93",
@@ -115,7 +116,7 @@ const DESTINATIONS: Destination[] = [
     },
     {
         coords: [-5.7945, -35.2110],
-        image: "https://images.pexels.com/photos/4265480/pexels-photo-4265480.jpeg",
+        image: getDestinationImage("Natal"),
         city: "Natal",
         country: "Brasil",
         rating: "4.92",
@@ -127,7 +128,7 @@ const DESTINATIONS: Destination[] = [
     },
     {
         coords: [-13.1631, -72.5450],
-        image: "https://images.pexels.com/photos/35570962/pexels-photo-35570962.jpeg",
+        image: getDestinationImage("Cusco"),
         city: "Cusco",
         country: "Peru",
         rating: "4.98",
@@ -139,7 +140,7 @@ const DESTINATIONS: Destination[] = [
     },
     {
         coords: [-33.4489, -70.6693],
-        image: "https://images.pexels.com/photos/7410250/pexels-photo-7410250.jpeg",
+        image: getDestinationImage("Santiago"),
         city: "Santiago",
         country: "Chile",
         rating: "4.88",
@@ -151,7 +152,7 @@ const DESTINATIONS: Destination[] = [
     },
     {
         coords: [10.3910, -75.4795],
-        image: "https://images.pexels.com/photos/13804522/pexels-photo-13804522.jpeg",
+        image: getDestinationImage("Cartagena"),
         city: "Cartagena",
         country: "Colômbia",
         rating: "4.90",
@@ -165,7 +166,7 @@ const DESTINATIONS: Destination[] = [
     // --- EUROPA ---
     {
         coords: [48.8566, 2.3522],
-        image: "https://images.pexels.com/photos/1850619/pexels-photo-1850619.jpeg",
+        image: getDestinationImage("Paris"),
         city: "Paris",
         country: "França",
         rating: "4.92",
@@ -177,7 +178,7 @@ const DESTINATIONS: Destination[] = [
     },
     {
         coords: [38.7223, -9.1393],
-        image: "https://images.pexels.com/photos/3763903/pexels-photo-3763903.jpeg",
+        image: getDestinationImage("Lisboa"),
         city: "Lisboa",
         country: "Portugal",
         rating: "4.96",
@@ -189,7 +190,7 @@ const DESTINATIONS: Destination[] = [
     },
     {
         coords: [36.3932, 25.4615],
-        image: "https://images.pexels.com/photos/1010657/pexels-photo-1010657.jpeg",
+        image: getDestinationImage("Santorini"),
         city: "Santorini",
         country: "Grécia",
         rating: "4.97",
@@ -203,7 +204,7 @@ const DESTINATIONS: Destination[] = [
     // --- ÁSIA ---
     {
         coords: [35.6762, 139.6503],
-        image: "https://images.pexels.com/photos/2506923/pexels-photo-2506923.jpeg",
+        image: getDestinationImage("Tóquio"),
         city: "Tóquio",
         country: "Japão",
         rating: "4.99",
@@ -215,7 +216,7 @@ const DESTINATIONS: Destination[] = [
     },
     {
         coords: [-8.4095, 115.1889],
-        image: "https://images.pexels.com/photos/2474690/pexels-photo-2474690.jpeg",
+        image: getDestinationImage("Bali"),
         city: "Bali",
         country: "Indonésia",
         rating: "4.94",
@@ -227,7 +228,7 @@ const DESTINATIONS: Destination[] = [
     },
     {
         coords: [25.2048, 55.2708],
-        image: "https://images.pexels.com/photos/3769312/pexels-photo-3769312.jpeg",
+        image: getDestinationImage("Dubai"),
         city: "Dubai",
         country: "Emirados Árabes",
         rating: "4.90",
@@ -239,7 +240,7 @@ const DESTINATIONS: Destination[] = [
     },
     {
         coords: [13.7563, 100.5018],
-        image: "https://images.pexels.com/photos/1031659/pexels-photo-1031659.jpeg",
+        image: getDestinationImage("Bangkok"),
         city: "Bangkok",
         country: "Tailândia",
         rating: "4.87",
@@ -253,7 +254,7 @@ const DESTINATIONS: Destination[] = [
     // --- ÁFRICA ---
     {
         coords: [-33.9249, 18.4241],
-        image: "https://images.pexels.com/photos/259447/pexels-photo-259447.jpeg",
+        image: getDestinationImage("Cidade do Cabo"),
         city: "Cidade do Cabo",
         country: "África do Sul",
         rating: "4.88",
@@ -265,7 +266,7 @@ const DESTINATIONS: Destination[] = [
     },
     {
         coords: [30.0444, 31.2357],
-        image: "https://images.pexels.com/photos/3522880/pexels-photo-3522880.jpeg",
+        image: getDestinationImage("Cairo"),
         city: "Cairo",
         country: "Egito",
         rating: "4.85",
@@ -277,7 +278,7 @@ const DESTINATIONS: Destination[] = [
     },
     {
         coords: [31.6295, -7.9811],
-        image: "https://images.pexels.com/photos/6752812/pexels-photo-6752812.jpeg",
+        image: getDestinationImage("Marrakech"),
         city: "Marrakech",
         country: "Marrocos",
         rating: "4.89",
@@ -291,7 +292,7 @@ const DESTINATIONS: Destination[] = [
     // --- OCEANIA ---
     {
         coords: [-33.8688, 151.2093],
-        image: "https://images.pexels.com/photos/2845013/pexels-photo-2845013.jpeg",
+        image: getDestinationImage("Sydney"),
         city: "Sydney",
         country: "Austrália",
         rating: "4.92",
@@ -303,7 +304,7 @@ const DESTINATIONS: Destination[] = [
     },
     {
         coords: [-16.5004, -151.7415],
-        image: "https://images.pexels.com/photos/753626/pexels-photo-753626.jpeg",
+        image: getDestinationImage("Bora Bora"),
         city: "Bora Bora",
         country: "Polinésia Francesa",
         rating: "4.99",

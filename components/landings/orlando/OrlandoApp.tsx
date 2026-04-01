@@ -5,7 +5,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { optimizeRemoteImageUrl } from '../../../data/mediaConfig';
+import { getMediaUrl, optimizeRemoteImageUrl } from '../../../data/mediaConfig';
 import { getWhatsAppLink } from '../../../utils/whatsapp';
 import { openAiChat } from '../../../utils/aiChat';
 
@@ -145,7 +145,7 @@ function OrlandoApp() {
               <Card 
                 ref={el => { if(el) cardsRef.current[0] = el }}
                 className="c1"
-                imgSrc="https://seaworld.com/orlando/-/media/migrated-media/seaworld-orlando/images/rides/pipeline/660x410-swo-2023-coasters-pipeline.jpg?h=410&w=660&la=en&hash=1757D7A701BD2779B5E5D1B75721E8D4"
+                imgSrc={optimizeRemoteImageUrl('images/orlando/cards/seaworld-pipeline.jpg', 300, 300)}
                 imgAlt="Rollercoaster"
                 label="ADRENALINA 100%"
                 tape={{ style: { top: '-15px', left: '50px', width: '80px', background: 'rgba(76, 201, 240, 0.6)', transform: 'rotate(-5deg)' } }}
@@ -154,7 +154,7 @@ function OrlandoApp() {
               <Card 
                 ref={el => { if(el) cardsRef.current[1] = el }}
                 className="c2"
-                imgSrc="https://images.unsplash.com/photo-1597466599360-3b9775841aec?auto=format&fit=crop&q=80&w=600"
+                imgSrc={optimizeRemoteImageUrl('images/orlando/cards/magic-castle.jpg', 300, 300)}
                 imgAlt="Magic Kingdom style"
                 label="O CASTELO É NOSSO"
                 tape={{ style: { top: '-10px', right: '40px', width: '100px', background: 'rgba(255, 107, 157, 0.6)', transform: 'rotate(10deg)' } }}
@@ -163,7 +163,7 @@ function OrlandoApp() {
               <Card 
                 ref={el => { if(el) cardsRef.current[2] = el }}
                 className="c3"
-                imgSrc="https://www.visittheusa.com/sites/default/files/styles/16_9_1280x720/public/images/hero_media_image/2023-08/fc166dfa-a5b7-45c4-9abe-9482f55baba3.jpeg?h=2992ba0a&itok=avnYaKQ1"
+                imgSrc={optimizeRemoteImageUrl('images/orlando/cards/summer-vibes.jpg', 300, 300)}
                 imgAlt="Palm Trees"
                 label="SUMMER VIBES ONLY"
               />
@@ -226,41 +226,41 @@ function OrlandoApp() {
             <div className="parks-grid">
                 <div className="park-card">
                     <div className="park-image-frame">
-                        <img src="https://images.unsplash.com/photo-1575089776834-8be34696ffb9?auto=format&fit=crop&q=80&w=600" alt="Magic Kingdom" width="600" height="400" loading="lazy" />
+                        <img src={optimizeRemoteImageUrl('images/orlando/parks/magic-kingdom.jpg', 600, 400)} alt="Magic Kingdom" width="600" height="400" loading="lazy" />
                     </div>
-                    <img className="park-logo-title" src="https://frontdoormagicbreaks-huaycyfnhbh0e8h4.z03.azurefd.net/umbr-upgrade-media/media/24clyz0k/wdw-magic-kingdom-blue-logo.png" alt="Magic Kingdom Logo" width="120" height="40" loading="lazy" />
+                    <img className="park-logo-title" src={getMediaUrl('images/orlando/logos/magic-kingdom.png')} alt="Magic Kingdom Logo" width="120" height="40" loading="lazy" />
                     <p>Onde a fantasia é lei. O castelo icônico, fogos inesquecíveis e a magia que define Orlando.</p>
                 </div>
                 
                 <div className="park-card">
                     <div className="park-image-frame">
-                        <img src="https://campinas.com.br/wp-content/uploads/2024/02/epcot-flower-and-garden-festival-walt-disney-world-florida.jpg" alt="Epcot" width="600" height="400" loading="lazy" />
+                        <img src={optimizeRemoteImageUrl('images/orlando/parks/epcot.jpg', 600, 400)} alt="Epcot" width="600" height="400" loading="lazy" />
                     </div>
-                    <img className="park-logo-title" style={{ maxWidth: '120px', maxHeight: '33px' }} src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAILutNiHpS1bUoL9HV7i86jpQeYvOugG1GA&s" alt="Epcot Logo" width="120" height="33" loading="lazy" />
+                    <img className="park-logo-title" style={{ maxWidth: '120px', maxHeight: '33px' }} src={getMediaUrl('images/orlando/logos/epcot.png')} alt="Epcot Logo" width="120" height="33" loading="lazy" />
                     <p>Volta ao mundo em um dia. Coma em Paris, beba no Japão e voe para o futuro.</p>
                 </div>
 
                 <div className="park-card">
                     <div className="park-image-frame">
-                        <img src="https://cdn-imgix.headout.com/media/images/7b86b768-3512-410a-8eb9-9550e62bf321-1753677493506-294541.jpg?auto=format&w=900&h=562.5&q=90&ar=16%3A10&crop=faces%2Ccenter&fit=crop" alt="Hollywood Studios" width="600" height="400" loading="lazy" />
+                        <img src={optimizeRemoteImageUrl('images/orlando/parks/hollywood-studios.jpg', 600, 400)} alt="Hollywood Studios" width="600" height="400" loading="lazy" />
                     </div>
-                    <img className="park-logo-title" src="https://upload.wikimedia.org/wikipedia/commons/3/36/Disney%27s_Hollywood_Studios_logo_2019.svg" alt="Hollywood Studios Logo" width="120" height="40" loading="lazy" />
+                    <img className="park-logo-title" src={getMediaUrl('images/orlando/logos/hollywood-studios.svg')} alt="Hollywood Studios Logo" width="120" height="40" loading="lazy" />
                     <p>Luz, câmera, ação! Da saga Star Wars ao quintal de Toy Story: você é o protagonista.</p>
                 </div>
 
                 <div className="park-card">
                     <div className="park-image-frame">
-                        <img src="https://cdn1.parksmedia.wdprapps.disney.com/resize/mwImage/1/1200/675/75/vision-dam/digital/parks-platform/parks-global-assets/disney-world/destination/animal-kingdom/tree-of-life-gallery01-16x9.jpg?2024-09-23T16:09:31+00:00" alt="Animal Kingdom" width="600" height="400" loading="lazy" />
+                        <img src={optimizeRemoteImageUrl('images/orlando/parks/animal-kingdom.jpg', 600, 400)} alt="Animal Kingdom" width="600" height="400" loading="lazy" />
                     </div>
-                    <img className="park-logo-title" src="https://upload.wikimedia.org/wikipedia/commons/3/39/Disney%27s_Animal_Kingdom_wordmark_-_Dark_Green.svg" alt="Animal Kingdom Logo" width="120" height="40" loading="lazy" />
+                    <img className="park-logo-title" src={getMediaUrl('images/orlando/logos/animal-kingdom.svg')} alt="Animal Kingdom Logo" width="120" height="40" loading="lazy" />
                     <p>A natureza ruge. Safáris reais, montanhas flutuantes em Pandora e expedições selvagens.</p>
                 </div>
 
                 <div className="park-card">
                     <div className="park-image-frame">
-                        <img src="https://familytripmagazine.com.br/wp-content/uploads/2023/03/TL1.jpg" alt="Typhoon Lagoon" width="600" height="400" loading="lazy" />
+                        <img src={optimizeRemoteImageUrl('images/orlando/parks/typhoon-lagoon.jpg', 600, 400)} alt="Typhoon Lagoon" width="600" height="400" loading="lazy" />
                     </div>
-                    <img className="park-logo-title" src="https://vectorseek.com/wp-content/uploads/2023/11/Typhoon-Lagoon-Logo-Vector.svg-.png" alt="Typhoon Lagoon Logo" width="120" height="40" loading="lazy" />
+                    <img className="park-logo-title" src={getMediaUrl('images/orlando/logos/typhoon-lagoon.png')} alt="Typhoon Lagoon Logo" width="120" height="40" loading="lazy" />
                     <p>Tsunamis de diversão. Encare ondas gigantes ou relaxe no rio lento deste paraíso tropical.</p>
                 </div>
             </div>
@@ -276,31 +276,31 @@ function OrlandoApp() {
                     <div className="park-image-frame">
                         <img src={optimizeRemoteImageUrl('images/orlando/universal-studios-orlando.jpg', 600, 400)} alt="Universal Studios Orlando" width="600" height="400" loading="lazy" />
                     </div>
-                    <img className="park-logo-title" style={{ maxHeight: '77px', maxWidth: '280px' }} src="https://frontdoormagicbreaks-huaycyfnhbh0e8h4.z03.azurefd.net/umbr-upgrade-media/media/1acfwlwm/universal-universal-studios-florida-blue-logo.png" alt="Universal Studios Logo" width="280" height="77" loading="lazy" />
+                    <img className="park-logo-title" style={{ maxHeight: '77px', maxWidth: '280px' }} src={getMediaUrl('images/orlando/logos/universal-studios.png')} alt="Universal Studios Logo" width="280" height="77" loading="lazy" />
                     <p>Entre no filme. Fuja do banco de Gringotts, brinque com os Minions e viva o cinema.</p>
                 </div>
 
                 <div className="park-card">
                     <div className="park-image-frame">
-                        <img src="https://www.universalorlando.com/webdata/k2/en/us/files/Images/gds/ioa-incredible-hulk-coaster-universal-tunnel-b.jpg" alt="Islands of Adventure" width="600" height="400" loading="lazy" />
+                        <img src={optimizeRemoteImageUrl('images/orlando/parks/islands-of-adventure.jpg', 600, 400)} alt="Islands of Adventure" width="600" height="400" loading="lazy" />
                     </div>
-                    <img className="park-logo-title" style={{ maxHeight: '77px', maxWidth: '280px' }} src="https://www.universalorlando.com/webdata/k2/en/us/files/Images/gds/ioa-islands-of-adventure-logo-map-b-00.png" alt="Islands of Adventure Logo" width="280" height="77" loading="lazy" />
+                    <img className="park-logo-title" style={{ maxHeight: '77px', maxWidth: '280px' }} src={getMediaUrl('images/orlando/logos/islands-of-adventure.png')} alt="Islands of Adventure Logo" width="280" height="77" loading="lazy" />
                     <p>Aventura nível hard. Voe de moto com Hagrid, escape de dinossauros e sinta a fúria do Hulk.</p>
                 </div>
 
                 <div className="park-card">
                     <div className="park-image-frame">
-                        <img src="https://brasilturis.com.br/storage/2025/05/0_Universal-Epic-Universe-is-Now-Open-scaled.jpg" alt="Epic Universe" width="600" height="400" loading="lazy" />
+                        <img src={optimizeRemoteImageUrl('images/orlando/parks/epic-universe.jpg', 600, 400)} alt="Epic Universe" width="600" height="400" loading="lazy" />
                     </div>
-                    <img className="park-logo-title" style={{ maxHeight: '77px', maxWidth: '280px' }} src="https://static.wikia.nocookie.net/logopedia/images/4/4e/Universal_Epic_Universe_logo.png/revision/latest/scale-to-width-down/1000?cb=20240203054900" alt="Epic Universe Logo" width="280" height="77" loading="lazy" />
+                    <img className="park-logo-title" style={{ maxHeight: '77px', maxWidth: '280px' }} src={getMediaUrl('images/orlando/logos/epic-universe.png')} alt="Epic Universe Logo" width="280" height="77" loading="lazy" />
                     <p>5 mundos, 1 destino. De Super Nintendo World a Monstros Clássicos: o portal se abriu.</p>
                 </div>
 
                 <div className="park-card">
                     <div className="park-image-frame">
-                        <img src="https://www.universalorlando.com/webdata/k2/pt/br/files/Images/gds/vb-the-volcano-ride-and-pool-b.jpg" alt="Volcano Bay" width="600" height="400" loading="lazy" />
+                        <img src={optimizeRemoteImageUrl('images/orlando/parks/volcano-bay.jpg', 600, 400)} alt="Volcano Bay" width="600" height="400" loading="lazy" />
                     </div>
-                    <img className="park-logo-title" style={{ maxHeight: '77px', maxWidth: '280px' }} src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/4b1ceee5-9458-4434-80bc-fc5d83a2ea88/ddzunkm-730b02ef-6b55-4279-b8ce-5d5ff2edfccf.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi80YjFjZWVlNS05NDU4LTQ0MzQtODBiYy1mYzVkODNhMmVhODgvZGR6dW5rbS03MzBiMDJlZi02YjU1LTQyNzktYjhjZS01ZDVmZjJlZGZjY2YucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.HfuEdPi8oCXqnzZQRZ5Ycbiv9GbM8QSTn2-F713HH7I" alt="Volcano Bay Logo" width="280" height="77" loading="lazy" />
+                    <img className="park-logo-title" style={{ maxHeight: '77px', maxWidth: '280px' }} src={getMediaUrl('images/orlando/logos/volcano-bay.png')} alt="Volcano Bay Logo" width="280" height="77" loading="lazy" />
                     <p>Praia e adrenalina. Despenque do vulcão Krakatau ou apenas relaxe na areia. O TapuTapu cuida da fila.</p>
                 </div>
             </div>
@@ -314,25 +314,25 @@ function OrlandoApp() {
             <div className="parks-grid">
                  <div className="park-card">
                     <div className="park-image-frame">
-                        <img src="https://s2-oglobo.glbimg.com/yESS2VMkcdHm3EBfKb8UaGJ0W1Q=/0x0:2560x1656/888x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_da025474c0c44edd99332dddb09cabe8/internal_photos/bs/2022/g/v/kHlRRRTn6wDYntwnRRiA/seaworldorlandopipeline.jpg" alt="SeaWorld" width="600" height="400" loading="lazy" />
+                        <img src={optimizeRemoteImageUrl('images/orlando/parks/seaworld.jpg', 600, 400)} alt="SeaWorld" width="600" height="400" loading="lazy" />
                     </div>
-                    <img className="park-logo-title" src="https://upload.wikimedia.org/wikipedia/en/thumb/5/59/Seaworld_logo.svg/1200px-Seaworld_logo.svg.png" alt="SeaWorld Logo" width="120" height="40" loading="lazy" />
+                    <img className="park-logo-title" src={getMediaUrl('images/orlando/logos/seaworld.png')} alt="SeaWorld Logo" width="120" height="40" loading="lazy" />
                     <p>Coasters insanas. Acelere na Pipeline e na Mako, depois recupere o fôlego admirando a vida marinha.</p>
                 </div>
 
                  <div className="park-card">
                     <div className="park-image-frame">
-                        <img src="https://bearsdenorlando.com/wp-content/uploads/2024/01/discovery-cove-freshwater-oasis.jpg" alt="Discovery Cove" width="600" height="400" loading="lazy" />
+                        <img src={optimizeRemoteImageUrl('images/orlando/parks/discovery-cove.jpg', 600, 400)} alt="Discovery Cove" width="600" height="400" loading="lazy" />
                     </div>
-                    <img className="park-logo-title" src="https://upload.wikimedia.org/wikipedia/en/thumb/2/25/Discovery_Cove_Logo.svg/1200px-Discovery_Cove_Logo.svg.png" alt="Discovery Cove Logo" width="120" height="40" loading="lazy" />
+                    <img className="park-logo-title" src={getMediaUrl('images/orlando/logos/discovery-cove.png')} alt="Discovery Cove Logo" width="120" height="40" loading="lazy" />
                     <p>Seu dia de VIP. All-inclusive de luxo: nade com golfinhos e esqueça do mundo lá fora.</p>
                 </div>
 
                 <div className="park-card">
                     <div className="park-image-frame">
-                        <img src="https://cdn-imgix.headout.com/microbrands-content-image/image/d064b834bebab22aeda3a22b9f631f20-Kennedy%20Space%20Center.jpg" alt="Kennedy Space Center" width="600" height="400" loading="lazy" />
+                        <img src={optimizeRemoteImageUrl('images/orlando/parks/kennedy-space-center.jpg', 600, 400)} alt="Kennedy Space Center" width="600" height="400" loading="lazy" />
                     </div>
-                    <img className="park-logo-title" src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Kennedy-Space-Center-Logo.svg" alt="Kennedy Space Center Logo" width="120" height="40" loading="lazy" />
+                    <img className="park-logo-title" src={getMediaUrl('images/orlando/logos/kennedy-space-center.svg')} alt="Kennedy Space Center Logo" width="120" height="40" loading="lazy" />
                     <p>3... 2... 1... Decolar! Foguetes reais da NASA, pedras lunares e a história do universo.</p>
                 </div>
             </div>

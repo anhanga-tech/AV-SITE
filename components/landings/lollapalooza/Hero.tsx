@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Button from './Button';
 import { Calendar, MapPin, Music2, Share2, Check } from 'lucide-react';
 import { WAITLIST_CTA_LABEL, WAITLIST_SECTION_ID } from './constants';
+import { getMediaUrl } from '../../../data/mediaConfig';
 
 const Hero: React.FC = () => {
   const headliners = [
@@ -66,7 +67,7 @@ const Hero: React.FC = () => {
           muted 
           playsInline
           className="w-full h-full object-cover object-center"
-          poster="https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+          poster={getMediaUrl('images/lollapalooza/hero/crowd-poster.jpg')}
         >
           {/* Video: Concert Crowd with Confetti - Matches Lolla Vibe */}
           <source src="https://videos.pexels.com/video-files/2022395/2022395-hd_1920_1080_30fps.mp4" type="video/mp4" />
@@ -110,7 +111,7 @@ const Hero: React.FC = () => {
             <div className="flex flex-wrap items-center justify-center gap-x-2 sm:gap-x-4 gap-y-2 mb-2 sm:mb-4">
                 <span className="text-xl sm:text-3xl md:text-5xl font-bold drop-shadow-2xl">no</span>
                 <img 
-                    src="https://logodownload.org/wp-content/uploads/2022/01/lollapalooza-brasil-logo.png" 
+                    src={getMediaUrl('images/lollapalooza/logos/lollapalooza-brasil.png')} 
                     alt="Lollapalooza Brasil" 
                     width="400"
                     height="112"

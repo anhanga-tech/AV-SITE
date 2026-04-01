@@ -3,6 +3,7 @@ import { BedDouble, BusFront, Headset, Map, Wand2, type LucideIcon } from 'lucid
 import useIntersectionObserver from './hooks/useIntersectionObserver';
 import Button from './Button';
 import { WAITLIST_CTA_LABEL, WAITLIST_SECTION_ID } from './constants';
+import { optimizeRemoteImageUrl } from '../../../data/mediaConfig';
 
 // Tipos para os dados
 interface FeatureItem {
@@ -24,7 +25,7 @@ const PackageFeatures: React.FC = () => {
       title: 'O QUE FEZ 2026 ESGOTAR',
       subtitle: 'A campanha combinou hotel estratégico, mobilidade planejada e suporte humano para quem queria viver o festival sem caos.',
       icon: Wand2,
-      image: 'https://mobilidade.estadao.com.br/wp-content/uploads/2025/03/lollapalooza_reproducao-.jpg.webp',
+      image: 'images/lollapalooza/package/esgotou-2026.webp',
       className: 'col-span-1 md:col-span-2 md:row-span-2 min-h-[400px] sm:min-h-[500px]'
     },
     {
@@ -32,7 +33,7 @@ const PackageFeatures: React.FC = () => {
       title: 'HOTEL NA MEDIDA',
       subtitle: 'Hospedagem bem localizada e pensada para descansar de verdade entre um dia de show e outro.',
       icon: BedDouble,
-      image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&q=80&w=800&fm=webp',
+      image: 'images/lollapalooza/package/hotel-medida.jpg',
       className: 'col-span-1 md:col-span-1 md:row-span-2 min-h-[300px] sm:min-h-[400px] md:min-h-full'
     },
     {
@@ -40,7 +41,7 @@ const PackageFeatures: React.FC = () => {
       title: 'SP ALÉM DO PALCO',
       subtitle: 'Curadoria da cidade para aproveitar São Paulo antes, durante e depois do festival.',
       icon: Map,
-      image: 'https://guiaviajarmelhor.com.br/wp-content/uploads/2018/10/O-que-fazer-em-sao-paulo-a-noite.jpg', // SP Night
+      image: 'images/lollapalooza/package/sp-noite.jpg',
       className: 'col-span-1 md:col-span-1 md:row-span-1 min-h-[250px] sm:min-h-[300px]'
     },
     {
@@ -96,7 +97,7 @@ const PackageFeatures: React.FC = () => {
               {feature.image ? (
                 <>
                   <img
-                    src={feature.image}
+                    src={optimizeRemoteImageUrl(feature.image, 800, 600)}
                     alt={feature.title}
                     width="800"
                     height="600"
