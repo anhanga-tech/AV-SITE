@@ -14,6 +14,17 @@ interface MediaEnv {
     VITE_MEDIA_ENABLE_TRANSFORMS?: string;
 }
 
+interface RuntimeLocation {
+    hostname: string;
+    origin: string;
+}
+
+interface MediaRuntimeConfig {
+    mediaBaseUrl: string;
+    transformZoneUrl: string;
+    enableTransforms: boolean;
+}
+
 const DEFAULT_MEDIA_BASE_URL = 'https://media.anhanga.tur.br';
 
 function parseBooleanEnv(value?: string): boolean {
@@ -21,7 +32,8 @@ function parseBooleanEnv(value?: string): boolean {
         return false;
     }
 
-    return ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase());
+    const normalized = value.trim().replace(/^['"]|['"]$/g, '').toLowerCase();
+    return ['1', 'true', 'yes', 'on'].includes(normalized);
 }
 
 function getImportMetaEnv(): MediaEnv {
@@ -29,16 +41,22 @@ function getImportMetaEnv(): MediaEnv {
         return {};
     }
 
-    const candidate = import.meta as ImportMeta & { env?: MediaEnv };
-    return candidate.env ?? {};
+    const viteEnv = (import.meta as ImportMeta & { env?: MediaEnv }).env;
+
+    return {
+        VITE_MEDIA_BASE_URL: viteEnv && import.meta.env.VITE_MEDIA_BASE_URL,
+        VITE_MEDIA_CDN_URL: viteEnv && import.meta.env.VITE_MEDIA_CDN_URL,
+        VITE_MEDIA_TRANSFORM_ZONE_URL: viteEnv && import.meta.env.VITE_MEDIA_TRANSFORM_ZONE_URL,
+        VITE_MEDIA_ENABLE_TRANSFORMS: viteEnv && import.meta.env.VITE_MEDIA_ENABLE_TRANSFORMS,
+    };
 }
 
-function getDefaultTransformZoneUrl(): string {
-    if (typeof window === 'undefined') {
+function getDefaultTransformZoneUrl(location?: RuntimeLocation): string {
+    if (!location) {
         return '';
     }
 
-    const { hostname, origin } = window.location;
+    const { hostname, origin } = location;
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
         return '';
     }
@@ -46,14 +64,27 @@ function getDefaultTransformZoneUrl(): string {
     return origin;
 }
 
-function getMediaRuntimeConfig() {
-    const env = getImportMetaEnv();
+function getRuntimeLocation(): RuntimeLocation | undefined {
+    if (typeof window === 'undefined') {
+        return undefined;
+    }
+
+    return {
+        hostname: window.location.hostname,
+        origin: window.location.origin,
+    };
+}
+
+export function getMediaRuntimeConfig(
+    env: MediaEnv = getImportMetaEnv(),
+    location: RuntimeLocation | undefined = getRuntimeLocation(),
+): MediaRuntimeConfig {
     const mediaBaseUrl = env.VITE_MEDIA_BASE_URL || env.VITE_MEDIA_CDN_URL || DEFAULT_MEDIA_BASE_URL;
     const enableTransforms = parseBooleanEnv(env.VITE_MEDIA_ENABLE_TRANSFORMS);
 
     return {
         mediaBaseUrl,
-        transformZoneUrl: env.VITE_MEDIA_TRANSFORM_ZONE_URL || (enableTransforms ? mediaBaseUrl : getDefaultTransformZoneUrl()),
+        transformZoneUrl: env.VITE_MEDIA_TRANSFORM_ZONE_URL || (enableTransforms ? mediaBaseUrl : getDefaultTransformZoneUrl(location)),
         enableTransforms,
     };
 }
