@@ -6,6 +6,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { getMediaUrl, optimizeRemoteImageUrl } from '../../../data/mediaConfig';
+import { useFooterRuntimeMetadata } from '../../../lib/footer-runtime';
 import { getWhatsAppLink } from '../../../utils/whatsapp';
 import { openAiChat } from '../../../utils/aiChat';
 
@@ -58,6 +59,8 @@ const Badge = ({ className, text, rotation }: BadgeProps) => (
 // --- Main Application ---
 
 function OrlandoApp() {
+  const runtimeMetadata = useFooterRuntimeMetadata();
+
   // SEO Hint: <title> name="description" og:
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -438,7 +441,7 @@ function OrlandoApp() {
           </div>
           
           <div className="footer-bottom">
-              <p>&copy; {new Date().getFullYear()} ANHANGÁ TURISMO - TODOS OS DIREITOS RESERVADOS.</p>
+              <p>&copy; {runtimeMetadata ? `${runtimeMetadata.currentYear} ` : ''}ANHANGÁ TURISMO - TODOS OS DIREITOS RESERVADOS.</p>
               <p>Feito com ❤️ pela anhangá.tech • 2026</p>
           </div>
       </footer>

@@ -2,8 +2,13 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { HERO_VIDEOS, optimizeRemoteImageUrl } from '../data/mediaConfig';
 import { QUICK_FEATURES } from '../data/destinations';
+import { NOISE_TEXTURE_URL } from '../lib/static-assets';
 import SearchForm from './SearchForm';
 import { openAiChat } from '../utils/aiChat';
+
+const noiseTextureStyle = {
+  backgroundImage: `url("${NOISE_TEXTURE_URL}")`,
+};
 
 const Hero: React.FC = () => {
   // PERFORMANCE: Use the first video by default to match the LCP preload in index.html.
@@ -122,7 +127,7 @@ const Hero: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-brand-cyan/80 to-blue-900/70 md:mix-blend-multiply"></div>
 
         {/* Decorative texture hidden on mobile to reduce render overhead */}
-        <div className="hidden md:block absolute inset-0 opacity-20 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+        <div className="hidden md:block absolute inset-0 opacity-20" style={noiseTextureStyle}></div>
       </div>
 
       <div className="container mx-auto px-6 relative z-10 pt-40 pb-12">
