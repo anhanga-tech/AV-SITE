@@ -19,6 +19,7 @@ import { SocialShare } from './SocialShare';
 import { LazyImage } from './ui/LazyImage';
 import { openAiChat } from '../utils/aiChat';
 import { getDestinationImage } from '../data/mediaConfig';
+import { NOISE_TEXTURE_URL } from '../lib/static-assets';
 
 import { Link } from "react-router-dom";
 
@@ -35,6 +36,10 @@ interface Destination {
     activities: string[];
     landingPage?: string;
 }
+
+const noiseTextureStyle = {
+    backgroundImage: `url("${NOISE_TEXTURE_URL}")`,
+};
 
 // Static configuration moved outside component to prevent recreation on every render
 const DESTINATIONS: Destination[] = [
@@ -559,7 +564,7 @@ const Destinations: React.FC = () => {
                         {/* Map Inner Border & Content */}
                         <div className="w-full h-full border-2 border-gray-100 overflow-hidden relative bg-[#FAFAFA]">
                             {/* Paper Texture Overlay */}
-                            <div className="absolute inset-0 z-[5] pointer-events-none opacity-[0.15] mix-blend-multiply bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+                            <div className="absolute inset-0 z-[5] pointer-events-none opacity-[0.15] mix-blend-multiply" style={noiseTextureStyle}></div>
 
                             {/* Inner Shadow for Depth */}
                             <div className="absolute inset-0 z-[5] pointer-events-none shadow-[inset_0_0_40px_rgba(0,0,0,0.1)]"></div>
@@ -675,7 +680,7 @@ const Destinations: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="w-full md:w-1/2 p-8 md:p-10 overflow-y-auto bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-opacity-50">
+                        <div className="w-full md:w-1/2 p-8 md:p-10 overflow-y-auto" style={noiseTextureStyle}>
                             <p className="text-gray-600 mb-8 text-lg leading-relaxed font-medium font-serif italic">"{selectedDestination.details}"</p>
 
                             <h4 className="font-black text-gray-900 mb-4 flex items-center gap-2">

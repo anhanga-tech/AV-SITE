@@ -1,6 +1,4 @@
-
 import React from 'react';
-import { Link } from 'react-router-dom';
 import {
     InstagramLogo,
     FacebookLogo,
@@ -10,12 +8,13 @@ import {
     Heart,
 } from '@phosphor-icons/react';
 import { getBlogHomeUrl } from '../utils/blog';
+import { useFooterRuntimeMetadata } from '../lib/footer-runtime';
+import { getStaticAssetUrl } from '../lib/static-assets';
 
 const SITE_URL = 'https://www.anhanga.tur.br';
 
 const Footer: React.FC = () => {
-    const currentYear = new Date().getFullYear();
-    const baseUrl = import.meta.env.BASE_URL;
+    const runtimeMetadata = useFooterRuntimeMetadata();
 
     return (
         <footer className="relative bg-brand-dark text-gray-300 pt-32 pb-32 md:pb-24 font-sans overflow-hidden">
@@ -34,7 +33,7 @@ const Footer: React.FC = () => {
                     <div className="md:col-span-2">
                         <div className="mb-6">
                             <img
-                                src={`${baseUrl}assets/LOGO ANHANGA VIAGENS - BRANCO.svg`}
+                                src={getStaticAssetUrl('LOGO ANHANGA VIAGENS - BRANCO.svg')}
                                 alt="Anhangá Viagens"
                                 width="247"
                                 height="128"
@@ -108,7 +107,8 @@ const Footer: React.FC = () => {
 
                     <div className="flex flex-col md:items-end gap-2 text-center md:text-right order-1 md:order-2">
                         <div className="text-xs text-gray-500 font-medium flex items-center justify-center md:justify-end gap-1">
-                            Feito com <Heart className="w-3 h-3 text-red-500" weight="fill" aria-hidden="true" /> pela <img src={baseUrl + "assets/LOGO%20ANHANGA%20TECH.svg"} alt="Anhangá.tech" width="80" height="16" loading="lazy" className="h-4 w-auto inline-block mx-1 align-sub" /> • {currentYear}
+                            Feito com <Heart className="w-3 h-3 text-red-500" weight="fill" aria-hidden="true" /> pela <img src={getStaticAssetUrl('LOGO ANHANGA TECH.svg')} alt="Anhangá.tech" width="80" height="16" loading="lazy" className="h-4 w-auto inline-block mx-1 align-sub" />
+                            {runtimeMetadata ? ` • ${runtimeMetadata.currentYear}` : null}
                         </div>
                         <div className="text-[10px] text-gray-600 font-medium flex flex-wrap justify-center md:justify-end gap-x-2">
                             <span>ANHANGA TURISMO LTDA • CNPJ/Cadastur: <a href="https://cadastur.turismo.gov.br/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline decoration-gray-600 underline-offset-2">37.036.732/0001-41</a></span>
@@ -118,7 +118,8 @@ const Footer: React.FC = () => {
                             <a href="https://www.gov.br/turismo/pt-br" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline decoration-gray-600 underline-offset-2">Ministério do Turismo</a>
                         </div>
                         <div className="text-[10px] text-gray-700 font-bold uppercase tracking-widest mt-2">
-                            Conteúdo da equipe Anhangá Viagens • Última atualização: {new Date().toLocaleDateString('pt-BR')}
+                            Conteúdo da equipe Anhangá Viagens
+                            {runtimeMetadata ? ` • Última atualização: ${runtimeMetadata.lastUpdatedLabel}` : null}
                         </div>
                     </div>
                 </div>
