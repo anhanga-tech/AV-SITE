@@ -121,13 +121,13 @@ const BlogPost: React.FC = () => {
             ]} />
 
             {/* Hero Header */}
-            <div className="relative min-h-[560px] md:min-h-[620px] lg:min-h-[680px] w-full overflow-hidden">
+            <div className="relative min-h-[560px] w-full overflow-hidden md:min-h-[620px] lg:min-h-[680px]">
                 <img
                     src={optimizeRemoteImageUrl(post.image, 1200, 675)}
                     alt={post.title}
                     width="1200"
                     height="675"
-                    className="w-full h-full object-cover"
+                    className="absolute inset-0 h-full w-full object-cover"
                     fetchPriority="high"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/40 to-transparent opacity-90"></div>

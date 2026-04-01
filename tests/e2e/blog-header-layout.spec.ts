@@ -85,6 +85,22 @@ async function getHeadingGap(page: Page) {
   return headingBox.y - (headerBox.y + headerBox.height);
 }
 
+async function getHeroMediaCoverage(page: Page) {
+  const hero = page.locator('article > div.relative').first();
+  const heroImage = hero.locator('img').first();
+
+  const [heroBox, heroImageBox] = await Promise.all([
+    hero.boundingBox(),
+    heroImage.boundingBox(),
+  ]);
+
+  if (!heroBox || !heroImageBox) {
+    throw new Error('Expected article hero and cover image to be measurable.');
+  }
+
+  return heroImageBox.height / heroBox.height;
+}
+
 async function expectHeadingBelowHeader(page: Page, minGap: number) {
   await expectSingleVisibleHeadingInMain(page);
   await expect.poll(() => getHeadingGap(page)).toBeGreaterThanOrEqual(minGap);
@@ -108,6 +124,7 @@ test('blog article hero keeps the title below the fixed header', async ({ page }
     : ARTICLE_MIN_GAP_DESKTOP;
 
   await expectHeadingBelowHeader(page, minGap);
+  await expect.poll(() => getHeroMediaCoverage(page)).toBeGreaterThanOrEqual(0.98);
 });
 
 test('internal desktop header keeps the compact desktop treatment active', async ({ page }) => {
