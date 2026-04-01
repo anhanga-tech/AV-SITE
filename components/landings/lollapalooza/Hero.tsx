@@ -70,7 +70,7 @@ const Hero: React.FC = () => {
           poster={getMediaUrl('images/lollapalooza/hero/crowd-poster.jpg')}
         >
           {/* Video: Concert Crowd with Confetti - Matches Lolla Vibe */}
-          <source src="https://videos.pexels.com/video-files/2022395/2022395-hd_1920_1080_30fps.mp4" type="video/mp4" />
+          <source src={getMediaUrl('videos/lollapalooza/hero/crowd-background.mp4')} type="video/mp4" />
           Seu navegador não suporta a tag de vídeo.
         </video>
         

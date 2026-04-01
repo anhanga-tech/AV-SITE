@@ -1,5 +1,6 @@
 import React from 'react';
 import { StructuredData } from './StructuredData';
+import { BRAND_LOGO_BLUE_URL } from '../../lib/media-assets';
 
 export const OrganizationSchema = () => (
   <StructuredData
@@ -10,7 +11,7 @@ export const OrganizationSchema = () => (
       "name": "Anhangá Viagens",
       "alternateName": "Anhangá Turismo",
       "url": "https://www.anhanga.tur.br/",
-      "logo": "https://www.anhanga.tur.br/assets/LOGO%20ANHANGA%20VIAGENS%20-%20AZUL.svg",
+      "logo": BRAND_LOGO_BLUE_URL,
       "description": "Agência de viagens boutique em São Paulo especializada em roteiros personalizados, turismo de transformação e pacotes exclusivos para grandes festivais, incluindo o Lollapalooza Brasil, e público 50+.",
       "telephone": "+55-11-52833309",
       "email": "contato@anhanga.tur.br",

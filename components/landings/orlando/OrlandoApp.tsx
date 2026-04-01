@@ -7,13 +7,14 @@ import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { getMediaUrl, optimizeRemoteImageUrl } from '../../../data/mediaConfig';
 import { useFooterRuntimeMetadata } from '../../../lib/footer-runtime';
+import { BRAND_LOGO_BLUE_URL } from '../../../lib/media-assets';
 import { getWhatsAppLink } from '../../../utils/whatsapp';
 import { openAiChat } from '../../../utils/aiChat';
 
 // --- Constants ---
 const SITE_URL = 'https://www.anhanga.tur.br';
 const WHATSAPP_MESSAGE = "Olá! Gostaria de saber mais sobre os pacotes para Orlando.";
-const LOGO_URL = `${import.meta.env.BASE_URL}assets/LOGO ANHANGA VIAGENS - AZUL.svg`;
+const LOGO_URL = BRAND_LOGO_BLUE_URL;
 
 // --- Components ---
 

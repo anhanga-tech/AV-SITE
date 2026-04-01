@@ -1,4 +1,5 @@
 import { optimizeRemoteImageUrl } from './mediaConfig';
+import { BRAND_LOGO_PNG_URL } from '../lib/media-assets';
 
 export interface Author {
     id: string;
@@ -56,6 +57,6 @@ export const AUTHORS: Record<string, Author> = {
         name: "Equipe Anhangá",
         role: "Especialistas em Viagens",
         bio: "Nossa equipe de especialistas compartilha as melhores dicas coletivas para sua próxima aventura.",
-        image: "https://www.anhanga.tur.br/logo.png"
+        image: optimizeRemoteImageUrl(BRAND_LOGO_PNG_URL, 256, 256)
     }
 };

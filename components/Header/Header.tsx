@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { List, X, Phone, CaretDown } from '@phosphor-icons/react';
 import { getBlogHomeUrl } from '@/utils/blog';
 import { openAiChat } from '../../utils/aiChat';
+import { BRAND_LOGO_BLUE_URL, BRAND_LOGO_WHITE_URL } from '../../lib/media-assets';
 
 const NAV_LINKS = [
   { name: 'Destinos', href: 'destinos' },
@@ -68,10 +69,9 @@ const Header: React.FC = () => {
     ? 'bg-white/90 backdrop-blur-md shadow-lg py-3 text-brand-dark'
     : 'bg-transparent py-6 text-white';
 
-  const baseUrl = import.meta.env.BASE_URL;
   const logoSrc = isScrolled || forceWhiteHeader
-    ? `${baseUrl}assets/LOGO ANHANGA VIAGENS - AZUL.svg`
-    : `${baseUrl}assets/LOGO ANHANGA VIAGENS - BRANCO.svg`;
+    ? BRAND_LOGO_BLUE_URL
+    : BRAND_LOGO_WHITE_URL;
 
   const navTextClass = isScrolled || forceWhiteHeader ? 'text-gray-600 hover:text-brand-vibrant' : 'text-white/90 hover:text-white';
   const buttonClass = isScrolled || forceWhiteHeader
