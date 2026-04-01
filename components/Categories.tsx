@@ -3,14 +3,13 @@ import { Link } from 'react-router-dom';
 import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import TrendingUp from 'lucide-react/dist/esm/icons/trending-up';
 import { LazyImage } from './ui/LazyImage';
-import { optimizeRemoteImageUrl } from '../data/mediaConfig';
 
 // Moved outside component to prevent re-allocation on every render
 const POPULAR_DESTINATIONS = [
   {
     title: "Orlando",
     subtitle: "Magia & Parques",
-    image: optimizeRemoteImageUrl('images/categories/orlando-home.jpg', 600, 600),
+    image: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293380/avkqwz1ar2964muauoml_xivjtk.jpg",
     tag: "Destino dos Sonhos",
     rotate: "-rotate-2",
     color: "bg-blue-100 text-blue-600",
@@ -19,7 +18,7 @@ const POPULAR_DESTINATIONS = [
   {
     title: "Beto Carrero",
     subtitle: "Diversão BR",
-    image: optimizeRemoteImageUrl('images/categories/beto-carrero-world.jpg', 600, 600),
+    image: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293401/Star-Mountain-Beto-Carrero-World-2_r6n9ij.jpg",
     tag: "Radical",
     rotate: "rotate-3",
     color: "bg-yellow-100 text-yellow-700",
@@ -28,7 +27,7 @@ const POPULAR_DESTINATIONS = [
   {
     title: "Lollapalooza",
     subtitle: "Festivais",
-    image: optimizeRemoteImageUrl('images/categories/lollapalooza-2026.webp', 600, 600),
+    image: "https://res.cloudinary.com/dzehqrcmm/image/upload/v1771293421/lollapalooza-brasil-2026-2_pwrkqg.webp",
     tag: "Festival",
     rotate: "-rotate-1",
     color: "bg-emerald-100 text-emerald-600",

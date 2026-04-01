@@ -6,7 +6,7 @@ import MessageSquareHeart from 'lucide-react/dist/esm/icons/message-square-heart
 import { TESTIMONIALS } from '../data/testimonialsData';
 import { LazyImage } from './ui/LazyImage';
 
-const Testimonials = memo(function Testimonials() {
+const Testimonials = memo(() => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const nextSlide = useCallback(() => {

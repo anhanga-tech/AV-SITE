@@ -71,21 +71,7 @@ O site institucional da **Anhangá Viagens** é uma plataforma moderna e interat
    HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY=tracking_payload_json
    # Opcional (lista estática para contatos da waitlist do Lollapalooza)
    HUBSPOT_LOLLAPALOOZA_LIST_ID=123
-   # Opcional (o projeto já usa este domínio por padrão; defina só se quiser explicitar)
-   VITE_MEDIA_BASE_URL=https://media.anhanga.tur.br
-   # Opcional (para assets do R2, prefira o host de mídia como zona de resize)
-   VITE_MEDIA_TRANSFORM_ZONE_URL=https://media.anhanga.tur.br
-   # Opcional (ative depois de validar o /cdn-cgi/image no host de mídia)
-   VITE_MEDIA_ENABLE_TRANSFORMS=true
    ```
-
-   O projeto já aponta por padrão para `https://media.anhanga.tur.br`. Use
-   `VITE_MEDIA_BASE_URL` apenas se precisar sobrescrever a origem em outro ambiente.
-   `VITE_MEDIA_TRANSFORM_ZONE_URL` só entra em uso quando
-   `VITE_MEDIA_ENABLE_TRANSFORMS=true`. O padrão atual mantém as imagens servidas
-   diretamente do bucket do R2, o que evita quebra quando `/cdn-cgi/image/...`
-   ainda não está ativo. Quando ativado, o helper só transforma imagens do
-   próprio host de mídia; URLs externas seguem diretas.
 
 
 4. **Execute o projeto:**
