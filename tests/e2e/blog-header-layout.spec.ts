@@ -18,6 +18,10 @@ async function expectSingleVisibleHeadingInMain(page: Page) {
   await expect(heading).toBeVisible();
 }
 
+async function expectInternalHeaderVariant(page: Page) {
+  await expect(page.getByTestId('site-header')).toHaveAttribute('data-header-variant', 'internal');
+}
+
 async function getHeadingGap(page: Page) {
   const header = page.getByTestId('site-header');
   const heading = page.locator(MAIN_CONTENT_SELECTOR).getByRole('heading', { level: 1 }).first();
@@ -42,6 +46,8 @@ async function expectHeadingBelowHeader(page: Page, minGap: number) {
 test('blog article hero keeps the title below the fixed header', async ({ page }) => {
   await page.goto(BLOG_POST_PATH);
 
+  await expectInternalHeaderVariant(page);
+
   const viewportWidth = page.viewportSize()?.width ?? 0;
   const minGap = viewportWidth < MOBILE_VIEWPORT_BREAKPOINT
     ? ARTICLE_MIN_GAP_MOBILE
@@ -52,6 +58,8 @@ test('blog article hero keeps the title below the fixed header', async ({ page }
 
 test('blog list keeps the title below the fixed header', async ({ page }) => {
   await page.goto(BLOG_LIST_PATH);
+
+  await expectInternalHeaderVariant(page);
 
   const viewportWidth = page.viewportSize()?.width ?? 0;
   const minGap = viewportWidth < MOBILE_VIEWPORT_BREAKPOINT

@@ -26,6 +26,22 @@ const Header: React.FC = () => {
 
   const location = useLocation();
   const isHome = location.pathname === '/';
+  const isInternalPage = !isHome;
+  const useSolidHeader = isScrolled || isInternalPage;
+
+  const headerToneClass = useSolidHeader
+    ? 'bg-white/90 text-brand-dark backdrop-blur-md shadow-lg'
+    : 'bg-transparent text-white';
+
+  const headerSizeClass = isInternalPage
+    ? 'py-2.5 md:py-3'
+    : isScrolled
+      ? 'py-3'
+      : 'py-6';
+
+  const logoHeightClass = isInternalPage ? 'h-16 md:h-20' : 'h-24';
+  const navGapClass = isInternalPage ? 'gap-6' : 'gap-8';
+  const actionGapClass = isInternalPage ? 'gap-5' : 'gap-8';
 
   useEffect(() => {
     let ticking = false;
@@ -63,26 +79,22 @@ const Header: React.FC = () => {
     }
   };
 
-  const forceWhiteHeader = !isHome;
-  const headerClass = isScrolled || forceWhiteHeader
-    ? 'bg-white/90 backdrop-blur-md shadow-lg py-3 text-brand-dark'
-    : 'bg-transparent py-6 text-white';
-
   const baseUrl = import.meta.env.BASE_URL;
-  const logoSrc = isScrolled || forceWhiteHeader
+  const logoSrc = useSolidHeader
     ? `${baseUrl}assets/LOGO ANHANGA VIAGENS - AZUL.svg`
     : `${baseUrl}assets/LOGO ANHANGA VIAGENS - BRANCO.svg`;
 
-  const navTextClass = isScrolled || forceWhiteHeader ? 'text-gray-600 hover:text-brand-vibrant' : 'text-white/90 hover:text-white';
-  const buttonClass = isScrolled || forceWhiteHeader
+  const navTextClass = useSolidHeader ? 'text-gray-600 hover:text-brand-vibrant' : 'text-white/90 hover:text-white';
+  const buttonClass = useSolidHeader
     ? 'bg-brand-vibrant hover:bg-brand-blue text-white'
     : 'bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white border border-white/30';
-  const mobileToggleClass = isScrolled || forceWhiteHeader ? 'text-gray-700' : 'text-white';
+  const mobileToggleClass = useSolidHeader ? 'text-gray-700' : 'text-white';
 
   return (
     <header
       data-testid="site-header"
-      className={`fixed top-0 w-full z-50 transition-all duration-500 ease-in-out ${headerClass}`}
+      data-header-variant={isInternalPage ? 'internal' : 'home'}
+      className={`fixed top-0 w-full z-50 transition-all duration-500 ease-in-out ${headerToneClass} ${headerSizeClass}`}
     >
       <a
         href="#main-content"
@@ -104,12 +116,12 @@ const Header: React.FC = () => {
             fetchPriority="high"
             width="185"
             height="96"
-            className="h-24 w-auto transition-all duration-300 object-contain"
+            className={`w-auto transition-all duration-300 object-contain ${logoHeightClass}`}
           />
         </a>
 
-        <div className="flex items-center gap-8">
-          <nav className="hidden md:flex items-center gap-8" aria-label="Menu Principal">
+        <div className={`flex items-center ${actionGapClass}`}>
+          <nav className={`hidden md:flex items-center ${navGapClass}`} aria-label="Menu Principal">
             {NAV_LINKS.map((link) => (
               /* Performance optimization: Using CSS 'group-hover' for dropdowns instead of React state
                  to eliminate unnecessary re-renders on every hover interaction. */
@@ -182,7 +194,7 @@ const Header: React.FC = () => {
               data-testid="desktop-fale-conosco-btn"
               data-tracking="navbar-desktop"
               onClick={handleContactClick}
-              className={`btn-whatsapp btn-specialist px-5 py-2.5 rounded-full font-medium text-sm transition-all duration-500 flex items-center gap-2 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-vibrant ${buttonClass}`}
+              className={`btn-whatsapp btn-specialist rounded-full font-medium text-sm transition-all duration-500 flex items-center gap-2 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-vibrant ${isInternalPage ? 'px-4 py-2' : 'px-5 py-2.5'} ${buttonClass}`}
             >
               <Phone className="w-4 h-4" weight="fill" />
               Fale Conosco
