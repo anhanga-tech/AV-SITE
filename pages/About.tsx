@@ -111,7 +111,7 @@ const About: React.FC = () => {
                 <div className="absolute -top-4 -left-4 w-24 h-24 bg-brand-yellow/30 rounded-full blur-2xl z-0"></div>
                 <div className="relative rounded-3xl overflow-hidden border-8 border-white shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500">
                   <LazyImage
-                    src="https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg"
+                    src="images/about/equipe-anhanga.jpg"
                     alt="Equipe da Anhangá Viagens planejando um roteiro personalizado"
                     className="w-full h-auto object-cover aspect-[4/3]"
                   />

@@ -18,6 +18,10 @@ function normalizeTags(tags: BlogPostFrontmatter['tags']): string[] {
   return Array.isArray(tags) ? tags : [];
 }
 
+// The generated manifest is consumed as static data during build/prerender.
+// It intentionally materializes absolute image URLs here instead of relying on
+// runtime media helpers that component-facing modules such as blogData/LazyImage
+// apply in the browser.
 function normalizePostImageUrl(image: string): string {
   if (/^https?:\/\//i.test(image)) {
     return image;

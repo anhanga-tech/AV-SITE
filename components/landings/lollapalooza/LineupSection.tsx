@@ -2,25 +2,22 @@ import React from 'react';
 import { Music, Star, Zap, Calendar, ExternalLink } from 'lucide-react';
 import useIntersectionObserver from './hooks/useIntersectionObserver';
 import sabrinaImage from './assets/sabrina-carpenter-devushka-vzgliad-volosy-litso-guby-blondin.webp';
+import { getMediaUrl, optimizeRemoteImageUrl } from '../../../data/mediaConfig';
 
 const LineupSection: React.FC = () => {
   const { elementRef, isVisible } = useIntersectionObserver(0.05);
 
-  const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1493225255756-d9584f8606e9?auto=format&fit=crop&q=80&w=800&fm=webp";
+  const FALLBACK_IMAGE = getMediaUrl('images/lollapalooza/lineup/fallback-crowd.jpg');
 
-  /**
-   * Otimiza URLs de imagem usando o serviço wsrv.nl para:
-   * 1. Converter para WebP (formato moderno e leve)
-   * 2. Redimensionar para o tamanho necessário (evita carregar imagens 4k em espaços pequenos)
-   * 3. Comprimir com qualidade 80%
-   */
-  const getOptimizedUrl = (url: string, width: number) => {
+  const getArtistImageUrl = (url: string, width: number, height?: number) => {
     if (!url) return FALLBACK_IMAGE;
-    // Se não começar com http (é local), retorna direto
-    if (!url.startsWith('http')) return url;
-    // Remove query params existentes para evitar conflitos na URL codificada
-    const cleanUrl = url.split('?')[0];
-    return `https://wsrv.nl/?url=${encodeURIComponent(cleanUrl)}&w=${width}&output=webp&q=80`;
+    if (url.startsWith('images/')) {
+      return height
+        ? optimizeRemoteImageUrl(url, width, height)
+        : optimizeRemoteImageUrl(url, width);
+    }
+
+    return url;
   };
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
@@ -36,42 +33,42 @@ const LineupSection: React.FC = () => {
     {
       name: "CHAPPELL ROAN",
       genre: "Pop / Camp",
-      image: "https://upload.wikimedia.org/wikipedia/pt/e/eb/The_Rise_and_Fall_of_a_Midwest_Princess.png"
+      image: "images/lollapalooza/lineup/chappell-roan.png"
     },
     {
       name: "TYLER, THE CREATOR",
       genre: "Hip Hop",
-      image: "https://www.rbsdirect.com.br/filestore/2/6/6/5/9/3/5_5d94280c80cd21d/5395662_d007428e7b56a0b.jpg"
+      image: "images/lollapalooza/lineup/tyler-the-creator.jpg"
     },
     {
       name: "LORDE",
       genre: "Alt Pop",
-      image: "https://jpimg.com.br/uploads/2017/11/archives/2014/06/02/3865408394-lorde-elogia-bieber.jpg"
+      image: "images/lollapalooza/lineup/lorde.jpg"
     },
     {
       name: "SKRILLEX",
       genre: "Electronic",
-      image: "https://monkeybuzz.com.br/wp-content/uploads/2012/11/skrillex-jogo-online-video-boys-noize-next-order.jpg"
+      image: "images/lollapalooza/lineup/skrillex.jpg"
     },
     {
       name: "DEFTONES",
       genre: "Alt Metal",
-      image: "https://uploads.tenhomaisdiscosqueamigos.com/2023/08/deftones.jpg"
+      image: "images/lollapalooza/lineup/deftones.jpg"
     },
     {
       name: "DOECHII",
       genre: "Hip Hop",
-      image: "https://conectageek.com.br/wp-content/uploads/2025/03/doechii-john-jay.jpeg"
+      image: "images/lollapalooza/lineup/doechii.jpg"
     },
     {
       name: "LEWIS CAPALDI",
       genre: "Pop / Soul",
-      image: "https://akamai.sscdn.co/uploadfile/letras/fotos/7/4/d/4/74d4a5e24f77699fcdc165e926373f25.jpg"
+      image: "images/lollapalooza/lineup/lewis-capaldi.jpg"
     },
     {
       name: "TURNSTILE",
       genre: "Hardcore Punk",
-      image: "https://gerenciador.popload.com.br/wp-content/uploads/2025/05/200525_turnstile.jpg"
+      image: "images/lollapalooza/lineup/turnstile.jpg"
     }
   ];
 
@@ -123,7 +120,7 @@ const LineupSection: React.FC = () => {
               <div key={idx} className="relative z-0 hover:z-10 transition-all duration-300 transform hover:scale-110 hover:-translate-y-2 group">
                 <div className="w-16 h-16 md:w-24 md:h-24 rounded-full border-4 border-black group-hover:border-anhanga-yellow overflow-hidden relative shadow-lg">
                   <img
-                    src={getOptimizedUrl(artist.image, 200)}
+                    src={getArtistImageUrl(artist.image, 96, 96)}
                     alt={`Foto de ${artist.name}`}
                     onError={handleImageError}
                     loading="lazy"
@@ -162,7 +159,7 @@ const LineupSection: React.FC = () => {
               {/* Background Image - Optimized to 600px width */}
               <div className="absolute inset-0 bg-gray-900">
                 <img
-                  src={getOptimizedUrl(artist.image, 600)}
+                  src={getArtistImageUrl(artist.image, 600)}
                   alt={artist.name}
                   onError={handleImageError}
                   loading="lazy"
@@ -211,7 +208,7 @@ const LineupSection: React.FC = () => {
                     <div key={i} className="flex items-center gap-4 group/artist">
                       <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-700 group-hover/artist:border-anhanga-yellow transition-colors shrink-0 bg-gray-800">
                         <img
-                          src={getOptimizedUrl(act.image, 100)}
+                          src={getArtistImageUrl(act.image, 100, 100)}
                           alt={act.name}
                           onError={handleImageError}
                           loading="lazy"

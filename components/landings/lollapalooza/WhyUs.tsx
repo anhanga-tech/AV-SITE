@@ -1,6 +1,7 @@
 import React from 'react';
 import { UserCheck, ShieldCheck, HeartHandshake } from 'lucide-react';
 import useIntersectionObserver from './hooks/useIntersectionObserver';
+import { getMediaUrl } from '../../../data/mediaConfig';
 
 const WhyUs: React.FC = () => {
   const { elementRef, isVisible } = useIntersectionObserver(0.2);
@@ -16,7 +17,7 @@ const WhyUs: React.FC = () => {
               {/* Image Display */}
               <div className="relative overflow-hidden rounded-3xl shadow-2xl rotate-2 group-hover:rotate-0 transition-all duration-500 w-full aspect-[4/3] bg-gray-100">
                  <img 
-                    src="https://eletrovibez.com/wp-content/uploads/2025/01/Lollapalooza-Brasil-2025-anuncia-line-up-dividido-por-dia-e-e-inicia-vendas-do-Lolla-Double-e-Lolla-Day-1155x770.jpg" 
+                    src={getMediaUrl('images/lollapalooza/why-us/multidao-festival.jpg')} 
                     alt="Multidão feliz em um festival de música com confetes e luzes" 
                     width="1155"
                     height="770"

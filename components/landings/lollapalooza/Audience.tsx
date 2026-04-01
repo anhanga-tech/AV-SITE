@@ -1,6 +1,7 @@
 import React from 'react';
 import { Users, Heart, Baby, type LucideIcon } from 'lucide-react';
 import useIntersectionObserver from './hooks/useIntersectionObserver';
+import { getMediaUrl } from '../../../data/mediaConfig';
 
 interface AudienceCardProps {
   icon: LucideIcon;
@@ -47,7 +48,7 @@ const Audience: React.FC = () => {
               icon={Baby}
               title="Famílias"
               description="Segurança e conforto para quem quer levar os filhos ou curtir em família sem perrengues."
-              image="https://picsum.photos/seed/familyconcert/600/800"
+              image={getMediaUrl('images/lollapalooza/audience/familias.jpg')}
             />
           </div>
           <div className={`animate-on-scroll ${isVisible ? 'is-visible' : ''}`} style={{ transitionDelay: '200ms' }}>
@@ -55,7 +56,7 @@ const Audience: React.FC = () => {
               icon={Heart}
               title="Casais"
               description="Uma experiência prática e memorável para curtir os shows a dois com tranquilidade."
-              image="https://picsum.photos/seed/couplefestival/600/800"
+              image={getMediaUrl('images/lollapalooza/audience/casais.jpg')}
             />
           </div>
           <div className={`animate-on-scroll ${isVisible ? 'is-visible' : ''}`} style={{ transitionDelay: '300ms' }}>
@@ -63,7 +64,7 @@ const Audience: React.FC = () => {
               icon={Users}
               title="Grupos de Amigos"
               description="Logística resolvida para vocês só se preocuparem em se divertir juntos."
-              image="https://picsum.photos/seed/friendsfun/600/800"
+              image={getMediaUrl('images/lollapalooza/audience/grupos-amigos.jpg')}
             />
           </div>
         </div>
