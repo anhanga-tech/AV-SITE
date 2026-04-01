@@ -680,7 +680,7 @@ const Destinations: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="w-full md:w-1/2 p-8 md:p-10 overflow-y-auto bg-opacity-50" style={noiseTextureStyle}>
+                        <div className="w-full md:w-1/2 p-8 md:p-10 overflow-y-auto" style={noiseTextureStyle}>
                             <p className="text-gray-600 mb-8 text-lg leading-relaxed font-medium font-serif italic">"{selectedDestination.details}"</p>
 
                             <h4 className="font-black text-gray-900 mb-4 flex items-center gap-2">
