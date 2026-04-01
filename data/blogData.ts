@@ -18,7 +18,7 @@ export const AUTHORS: Record<string, Author> = {
         name: "Ana Souza",
         role: "Dicas de Expert",
         bio: "Especialista em roteiros para a Disney e apaixonada por transformar viagens em família em momentos mágicos.",
-        image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
+        image: optimizeRemoteImageUrl('images/authors/ana-souza.jpg', 256, 256),
         social: {
             instagram: "https://www.instagram.com/anhangaviagens"
         }
@@ -28,7 +28,7 @@ export const AUTHORS: Record<string, Author> = {
         name: "Rafa Tech",
         role: "Especialista em Planejamento",
         bio: "Entusiasta de tecnologia e organização, focado em tornar cada etapa da viagem mais eficiente e tranquila.",
-        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80"
+        image: optimizeRemoteImageUrl('images/authors/rafa-tech.jpg', 256, 256)
     },
     "luigi": {
         id: "luigi",
@@ -42,14 +42,14 @@ export const AUTHORS: Record<string, Author> = {
         name: "Mariana S.",
         role: "Consultora de Viagens Românticas",
         bio: "Especialista em destinos de luxo e roteiros personalizados para casais em busca de momentos únicos.",
-        image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80"
+        image: optimizeRemoteImageUrl('images/authors/mariana-s.jpg', 256, 256)
     },
     "carlos": {
         id: "carlos",
         name: "Carlos Viajante",
         role: "Explorador Cultural",
         bio: "Curioso por natureza, adora descobrir as histórias e tradições por trás de cada destino icônico.",
-        image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80"
+        image: optimizeRemoteImageUrl('images/authors/carlos-viajante.jpg', 256, 256)
     },
     "equipe-anhanga": {
         id: "equipe-anhanga",

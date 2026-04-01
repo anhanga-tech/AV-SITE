@@ -1,7 +1,10 @@
 import React from 'react';
+import { useFooterRuntimeMetadata } from '../../../lib/footer-runtime';
+import { getStaticAssetUrl } from '../../../lib/static-assets';
 
 const Footer: React.FC = () => {
-  const logoUrl = `${import.meta.env.BASE_URL}assets/LOGO ANHANGA VIAGENS - BRANCO.svg`;
+  const logoUrl = getStaticAssetUrl('LOGO ANHANGA VIAGENS - BRANCO.svg');
+  const runtimeMetadata = useFooterRuntimeMetadata();
 
   return (
     <footer className="bg-gray-900 text-gray-400 py-12 border-t border-gray-800" role="contentinfo">
@@ -19,7 +22,7 @@ const Footer: React.FC = () => {
         </div>
 
         <div className="border-t border-gray-800 pt-8 text-center md:text-left text-sm">
-          <p className="mb-2">© {new Date().getFullYear()} Anhangá Viagens. Todos os direitos reservados.</p>
+          <p className="mb-2">© {runtimeMetadata ? `${runtimeMetadata.currentYear} ` : ''}Anhangá Viagens. Todos os direitos reservados.</p>
           <p>
             Anhangá Viagens - Especialistas em experiências.
             <br className="md:hidden" />
