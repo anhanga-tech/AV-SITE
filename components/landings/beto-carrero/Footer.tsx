@@ -1,7 +1,10 @@
 import React from 'react';
 import { getBetoAssetUrl } from './assetPath';
+import { useFooterRuntimeMetadata } from '../../../lib/footer-runtime';
 
 const Footer: React.FC = () => {
+  const runtimeMetadata = useFooterRuntimeMetadata();
+
   return (
     <footer className="bg-fun-dark py-16 text-white text-center relative overflow-hidden">
       {/* Background Pattern to match other sections */}
@@ -27,7 +30,7 @@ const Footer: React.FC = () => {
         </p>
         
         <p className="text-sm opacity-40">
-          &copy; {new Date().getFullYear()} Anhangá Viagens. Todos os direitos reservados.
+          &copy; {runtimeMetadata ? `${runtimeMetadata.currentYear} ` : ''}Anhangá Viagens. Todos os direitos reservados.
         </p>
       </div>
     </footer>

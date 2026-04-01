@@ -208,3 +208,31 @@ test('festival landings should use managed static imagery', async () => {
   );
   assert.match(betoTestimonials, /images\/beto-carrero\/testimonials\/.+\.(jpg|jpeg|webp)/);
 });
+
+test('home decorative textures should not hotlink grain overlays from third-party hosts', async () => {
+  const [hero, destinations, indexHtml] = await Promise.all([
+    readRepoFile('components/Hero.tsx'),
+    readRepoFile('components/Destinations.tsx'),
+    readRepoFile('index.html'),
+  ]);
+
+  assertMissingHosts(
+    hero,
+    ['grainy-gradients.vercel.app'],
+    'components/Hero.tsx',
+  );
+  assert.match(hero, /assets\/noise\.svg|NOISE_TEXTURE_URL/);
+
+  assertMissingHosts(
+    destinations,
+    ['grainy-gradients.vercel.app'],
+    'components/Destinations.tsx',
+  );
+  assert.match(destinations, /assets\/noise\.svg|NOISE_TEXTURE_URL/);
+
+  assertMissingHosts(
+    indexHtml,
+    ['grainy-gradients.vercel.app'],
+    'index.html',
+  );
+});
