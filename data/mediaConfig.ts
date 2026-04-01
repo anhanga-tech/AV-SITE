@@ -165,75 +165,78 @@ export interface DestinationMedia {
 export const DESTINATION_IMAGES: Record<string, DestinationMedia> = {
     // Americas
     "Orlando": {
-        image: "https://images.pexels.com/photos/3411139/pexels-photo-3411139.jpeg",
+        image: "images/destinations/orlando.jpg",
     },
     "Punta Cana": {
-        image: "https://images.pexels.com/photos/3675435/pexels-photo-3675435.jpeg",
+        image: "images/destinations/punta-cana.jpg",
     },
     "Cancún": {
-        image: "https://images.pexels.com/photos/20210505/pexels-photo-20210505.jpeg",
+        image: "images/destinations/cancun.jpg",
+    },
+    "Beto Carrero": {
+        image: "images/destinations/beto-carrero.jpg",
     },
     "Gramado": {
-        image: "https://images.pexels.com/photos/3101546/pexels-photo-3101546.jpeg",
+        image: "images/destinations/gramado.jpg",
     },
     "Rio de Janeiro": {
-        image: "https://images.pexels.com/photos/2868242/pexels-photo-2868242.jpeg",
+        image: "images/destinations/rio-de-janeiro.jpg",
     },
     "Natal": {
-        image: "https://images.pexels.com/photos/4265480/pexels-photo-4265480.jpeg",
+        image: "images/destinations/natal.jpg",
     },
     "Cusco": {
-        image: "https://images.pexels.com/photos/35570962/pexels-photo-35570962.jpeg",
+        image: "images/destinations/cusco.jpg",
     },
     "Santiago": {
-        image: "https://images.pexels.com/photos/7410250/pexels-photo-7410250.jpeg",
+        image: "images/destinations/santiago.jpg",
     },
     "Cartagena": {
-        image: "https://images.pexels.com/photos/13804522/pexels-photo-13804522.jpeg",
+        image: "images/destinations/cartagena.jpg",
     },
 
     // Europe
     "Paris": {
-        image: "https://images.pexels.com/photos/1850619/pexels-photo-1850619.jpeg",
+        image: "images/destinations/paris.jpg",
     },
     "Lisboa": {
-        image: "https://images.pexels.com/photos/3763903/pexels-photo-3763903.jpeg",
+        image: "images/destinations/lisboa.jpg",
     },
     "Santorini": {
-        image: "https://images.pexels.com/photos/1010657/pexels-photo-1010657.jpeg",
+        image: "images/destinations/santorini.jpg",
     },
 
     // Asia
     "Tóquio": {
-        image: "https://images.pexels.com/photos/2506923/pexels-photo-2506923.jpeg",
+        image: "images/destinations/toquio.jpg",
     },
     "Bali": {
-        image: "https://images.pexels.com/photos/2474690/pexels-photo-2474690.jpeg",
+        image: "images/destinations/bali.jpg",
     },
     "Dubai": {
-        image: "https://images.pexels.com/photos/3769312/pexels-photo-3769312.jpeg",
+        image: "images/destinations/dubai.jpg",
     },
     "Bangkok": {
-        image: "https://images.pexels.com/photos/1031659/pexels-photo-1031659.jpeg",
+        image: "images/destinations/bangkok.jpg",
     },
 
     // Africa
     "Cidade do Cabo": {
-        image: "https://images.pexels.com/photos/259447/pexels-photo-259447.jpeg",
+        image: "images/destinations/cidade-do-cabo.jpg",
     },
     "Cairo": {
-        image: "https://images.pexels.com/photos/3522880/pexels-photo-3522880.jpeg",
+        image: "images/destinations/cairo.jpg",
     },
     "Marrakech": {
-        image: "https://images.pexels.com/photos/6752812/pexels-photo-6752812.jpeg",
+        image: "images/destinations/marrakech.jpg",
     },
 
     // Oceania
     "Sydney": {
-        image: "https://images.pexels.com/photos/2845013/pexels-photo-2845013.jpeg",
+        image: "images/destinations/sydney.jpg",
     },
     "Bora Bora": {
-        image: "https://images.pexels.com/photos/753626/pexels-photo-753626.jpeg",
+        image: "images/destinations/bora-bora.jpg",
     },
 };
 
@@ -244,7 +247,7 @@ export const getDestinationImage = (city: string): string => {
         return getMediaUrl(media.image);
     }
     // Fallback image
-    return "https://images.pexels.com/photos/1010657/pexels-photo-1010657.jpeg";
+    return getMediaUrl('images/destinations/santorini.jpg');
 };
 
 // =============================================================================

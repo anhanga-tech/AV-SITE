@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import L from 'leaflet';
 import { MapPin, Navigation, Plane, Building2, Trees, CarFront, Info, ChevronRight, Utensils, TrainFront } from 'lucide-react';
+import { optimizeRemoteImageUrl } from '../../../data/mediaConfig';
 
 const VenueMap: React.FC = () => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -14,16 +15,6 @@ const VenueMap: React.FC = () => {
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
-  /**
-   * Helper para otimização de imagens
-   * Utiliza wsrv.nl para converter para WebP, redimensionar e comprimir
-   */
-  const getOptimizedUrl = (url: string, width: number) => {
-    // Remove query params para evitar conflitos e adiciona os parametros do wsrv.nl
-    const cleanUrl = url.split('?')[0];
-    return `https://wsrv.nl/?url=${encodeURIComponent(cleanUrl)}&w=${width}&output=webp&q=80&fit=cover`;
-  };
-
   // Dados dos Pontos de Interesse
   const pois = [
     {
@@ -34,7 +25,7 @@ const VenueMap: React.FC = () => {
       time: '1h 30min',
       description: "Principal porta de entrada internacional. Recomendamos nosso transfer exclusivo que busca grupos acima de 10 pessoas mediante agendamento.",
       transitInfo: "Expresso Aeroporto até Luz ➔ Linha 4-Amarela até Pinheiros ➔ Linha 9-Esmeralda até Estação Autódromo. (~2h)",
-      image: "https://images.unsplash.com/photo-1569154941061-e231b4725ef1"
+      image: "images/lollapalooza/venue/gru.jpg"
     },
     {
       name: "Aeroporto de Congonhas (CGH)",
@@ -44,7 +35,7 @@ const VenueMap: React.FC = () => {
       time: '40 min',
       description: "Aeroporto central para voos domésticos. Localização estratégica, a apenas 15 minutos dos hotéis parceiros na região da Berrini.",
       transitInfo: "Uber até Estação Campo Belo (Linha 5-Lilás) ➔ Santo Amaro ➔ Linha 9-Esmeralda até Estação Autódromo. (~55min)",
-      image: "https://images.unsplash.com/photo-1559406041-c7d2b2e986a3"
+      image: "images/lollapalooza/venue/cgh.jpg"
     },
     {
       name: "Parque Ibirapuera",
@@ -54,7 +45,7 @@ const VenueMap: React.FC = () => {
       time: '45 min',
       description: "O pulmão verde de SP. Ótimo para um passeio relaxante na manhã pré-festival. A região conta com hotéis boutique de alto padrão.",
       transitInfo: "Estação Moema (Linha 5-Lilás) ➔ Santo Amaro ➔ Linha 9-Esmeralda até Estação Autódromo. (~50min)",
-      image: "https://images.unsplash.com/photo-1596484552993-9c59508927eb"
+      image: "images/lollapalooza/venue/ibirapuera.jpg"
     },
     {
       name: "Av. Paulista",
@@ -64,7 +55,7 @@ const VenueMap: React.FC = () => {
       time: '50 min',
       description: "O coração financeiro e cultural. Oferecemos pacotes com hospedagem nesta região para quem quer curtir a cidade além dos shows.",
       transitInfo: "Estação Consolação (Linha 2-Verde) ➔ Pinheiros (Linha 4) ➔ Linha 9-Esmeralda até Estação Autódromo. (~1h)",
-      image: "https://images.unsplash.com/photo-1554862426-3d2f267793d5"
+      image: "images/lollapalooza/venue/avenida-paulista.jpg"
     },
     {
       name: "Pinheiros (Bares e Restaurantes)",
@@ -74,7 +65,7 @@ const VenueMap: React.FC = () => {
       time: '45 min',
       description: "Bairro boêmio com a melhor gastronomia e vida noturna. Perfeito para o 'esquenta' ou para jantar após o festival.",
       transitInfo: "Estação Pinheiros (Linha 9-Esmeralda) ➔ Direto até Estação Autódromo. Rota mais rápida de trem. (~35min)",
-      image: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b"
+      image: "images/lollapalooza/venue/pinheiros.jpg"
     }
   ];
 
@@ -286,7 +277,7 @@ const VenueMap: React.FC = () => {
                     {/* Imagem de Fundo Otimizada */}
                     <div className="absolute inset-0 z-0">
                       <img
-                        src={getOptimizedUrl(poi.image, 400)}
+                        src={optimizeRemoteImageUrl(poi.image, 400, 300)}
                         alt={`Local: ${poi.name}`}
                         width="400"
                         height="300"
