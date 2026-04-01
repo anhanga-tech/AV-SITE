@@ -1,9 +1,9 @@
 import React from 'react';
 import { useFooterRuntimeMetadata } from '../../../lib/footer-runtime';
-import { getStaticAssetUrl } from '../../../lib/static-assets';
+import { BRAND_LOGO_WHITE_URL } from '../../../lib/media-assets';
 
 const Footer: React.FC = () => {
-  const logoUrl = getStaticAssetUrl('LOGO ANHANGA VIAGENS - BRANCO.svg');
+  const logoUrl = BRAND_LOGO_WHITE_URL;
   const runtimeMetadata = useFooterRuntimeMetadata();
 
   return (

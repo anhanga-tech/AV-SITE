@@ -1,5 +1,6 @@
 import React from 'react';
 import { StructuredData } from './StructuredData';
+import { BRAND_LOGO_BLUE_URL } from '../../lib/media-assets';
 
 interface ArticleSchemaProps {
     title: string;
@@ -39,7 +40,7 @@ export const ArticleSchema: React.FC<ArticleSchemaProps> = ({
         "name": "Anhangá Viagens",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://www.anhanga.tur.br/assets/LOGO%20ANHANGA%20VIAGENS%20-%20AZUL.svg"
+          "url": BRAND_LOGO_BLUE_URL
         }
       },
       "datePublished": datePublished,
