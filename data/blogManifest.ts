@@ -2,14 +2,29 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
+    "title": "Quais São as Melhores Agências de Viagem Boutique em São Paulo?",
+    "excerpt": "As melhores agências de viagem boutique em São Paulo combinam tecnologia e cuidado humano. Veja como funciona o atendimento da Anhangá.",
+    "date": "2026-04-03",
+    "author": "Queila de Oliveira",
+    "category": "Dicas de Viagem",
+    "image": "https://images.unsplash.com/photo-XXXXX?w=1200&auto=format",
+    "featured": true,
+    "tags": [
+      "viagem",
+      "dicas"
+    ],
+    "slug": "agencias-boutique-sao-paulo",
+    "readingTime": "7 min de leitura"
+  },
+  {
     "title": "Viagem solo feminina ganha espaço nos cruzeiros da Norwegian Cruise Line",
     "excerpt": "Cada vez mais mulheres estão escolhendo viajar sozinhas, e o turismo tem respondido a isso de formas bem concretas. Se você já pensou em embarcar sem ...",
     "date": "2026-03-09",
-    "dateModified": "2026-03-23",
+    "dateModified": "2026-04-02",
     "author": "equipe-anhanga",
     "category": "Cruzeiros",
     "image": "https://www.anhanga.tur.br/blog-viagem-solo-feminina.png",
-    "featured": true,
+    "featured": false,
     "tags": [
       "cruzeiros"
     ],
