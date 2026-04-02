@@ -5,10 +5,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Viagem solo feminina ganha espaço nos cruzeiros da Norwegian Cruise Line",
     "excerpt": "Cada vez mais mulheres estão escolhendo viajar sozinhas, e o turismo tem respondido a isso de formas bem concretas. Se você já pensou em embarcar sem ...",
     "date": "2026-03-09",
-    "dateModified": "2026-03-23",
+    "dateModified": "2026-04-01",
     "author": "equipe-anhanga",
     "category": "Cruzeiros",
-    "image": "https://www.anhanga.tur.br/blog-viagem-solo-feminina.png",
+    "image": "https://media.anhanga.tur.br/images/blog/blog-viagem-solo-feminina.png",
     "featured": true,
     "tags": [
       "cruzeiros"

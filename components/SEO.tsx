@@ -1,7 +1,8 @@
 import React from 'react';
 import { useHeadTags } from '../lib/head';
+import { DEFAULT_OG_IMAGE_URL } from '../lib/media-assets';
 
-const DEFAULT_OG_IMAGE = 'https://www.anhanga.tur.br/og-image-1200x630.jpg';
+const DEFAULT_OG_IMAGE = DEFAULT_OG_IMAGE_URL;
 const DEFAULT_OG_IMAGE_WIDTH = '1200';
 const DEFAULT_OG_IMAGE_HEIGHT = '630';
 
