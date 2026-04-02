@@ -148,7 +148,7 @@ const BlogPost: React.FC = () => {
                                 </span>
                             </div>
 
-                            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 leading-[1.05] tracking-tight drop-shadow-lg md:mb-8">
+                            <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-white mb-6 leading-[1.05] tracking-tight drop-shadow-lg md:mb-8">
                                 {post.title}
                             </h1>
 
@@ -203,7 +203,7 @@ const BlogPost: React.FC = () => {
                             {MdxContent ? (
                                 <MDXProvider components={mdxComponents}>
                                     <div className="
-                                        prose prose-lg md:prose-xl max-w-none
+                                        prose md:prose-lg xl:prose-xl max-w-none
                                         prose-headings:font-sans prose-headings:font-black prose-headings:tracking-tight prose-headings:text-brand-dark
                                         prose-p:font-serif prose-p:text-gray-600 prose-p:leading-8 prose-p:mb-6
                                         prose-a:text-brand-cyan prose-a:font-bold prose-a:no-underline prose-a:border-b-2 prose-a:border-brand-cyan/30 hover:prose-a:border-brand-cyan hover:prose-a:text-brand-cyanDark hover:prose-a:bg-brand-cyan/5 prose-a:transition-all
@@ -225,7 +225,7 @@ const BlogPost: React.FC = () => {
                                     </div>
                                 </MDXProvider>
                             ) : (
-                                <div className="prose prose-lg md:prose-xl max-w-none prose-p:font-serif prose-p:text-gray-600 prose-p:leading-8">
+                                <div className="prose md:prose-lg xl:prose-xl max-w-none prose-p:font-serif prose-p:text-gray-600 prose-p:leading-8">
                                     <p>{post.excerpt}</p>
                                     <p className="text-gray-400 italic">Conteúdo completo em breve…</p>
                                 </div>

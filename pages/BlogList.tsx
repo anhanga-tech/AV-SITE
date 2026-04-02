@@ -52,7 +52,7 @@ const BlogList: React.FC = () => {
                 { name: 'Home', item: 'https://www.anhanga.tur.br/' },
                 { name: 'Blog', item: getBlogHomeUrl() }
             ]} />
-            <div className="min-h-screen bg-[#fffdf5] pt-28 md:pt-32 lg:pt-36 pb-24">
+            <div className="min-h-screen bg-[#fffdf5] pt-32 md:pt-36 lg:pt-40 pb-24">
                 <div className="container mx-auto px-6">
 
                 {/* Header */}
@@ -60,7 +60,7 @@ const BlogList: React.FC = () => {
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border-2 border-brand-dark bg-brand-yellow text-brand-dark font-black text-xs uppercase tracking-widest shadow-[4px_4px_0px_#0f172a] transform -rotate-1 mb-4">
                         <BookOpen className="w-4 h-4" /> Todos os Artigos
                     </div>
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-brand-dark mb-6">
+                    <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-brand-dark mb-6">
                         Diário de <span className="text-brand-cyan">Bordo</span>
                     </h1>
                     <p className="text-lg md:text-xl text-gray-500 font-medium mb-6">
