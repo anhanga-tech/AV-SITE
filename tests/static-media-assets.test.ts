@@ -236,3 +236,74 @@ test('home decorative textures should not hotlink grain overlays from third-part
     'index.html',
   );
 });
+
+test('remaining runtime media dependencies should use managed Cloudflare assets', async () => {
+  const [testimonials, orlandoCss, lollapaloozaHero, seo, blogData, header, footer, lollaFooter, lollaNavbar, organizationSchema, articleSchema, sitemap, blogPost] = await Promise.all([
+    readRepoFile('data/testimonialsData.ts'),
+    readRepoFile('pages/landings/orlando.css'),
+    readRepoFile('components/landings/lollapalooza/Hero.tsx'),
+    readRepoFile('components/SEO.tsx'),
+    readRepoFile('data/blogData.ts'),
+    readRepoFile('components/Header/Header.tsx'),
+    readRepoFile('components/Footer.tsx'),
+    readRepoFile('components/landings/lollapalooza/Footer.tsx'),
+    readRepoFile('components/landings/lollapalooza/Navbar.tsx'),
+    readRepoFile('components/schemas/OrganizationSchema.tsx'),
+    readRepoFile('components/schemas/ArticleSchema.tsx'),
+    readRepoFile('public/sitemap.xml'),
+    readRepoFile('content/blog/viagem-solo-feminina-ganha-espaco-nos-cruzeiros-da-norwegian-cruise-line.mdx'),
+  ]);
+
+  assertMissingHosts(
+    testimonials,
+    ['api.dicebear.com'],
+    'data/testimonialsData.ts',
+  );
+  assert.match(testimonials, /getMediaUrl\('images\/testimonials\/daryw-m\.(svg|png|webp)'\)/);
+  assert.match(testimonials, /getMediaUrl\('images\/testimonials\/rafa-gabi\.(svg|png|webp)'\)/);
+  assert.match(testimonials, /getMediaUrl\('images\/testimonials\/william-s\.(svg|png|webp)'\)/);
+
+  assertMissingHosts(
+    orlandoCss,
+    ['transparenttextures.com'],
+    'pages/landings/orlando.css',
+  );
+  assert.match(orlandoCss, /https:\/\/media\.anhanga\.tur\.br\/images\/textures\/felt\.(png|webp)/);
+
+  assertMissingHosts(
+    lollapaloozaHero,
+    ['videos.pexels.com'],
+    'components/landings/lollapalooza/Hero.tsx',
+  );
+  assert.match(lollapaloozaHero, /videos\/lollapalooza\/hero\/crowd-background\.mp4/);
+
+  for (const [label, content] of [
+    ['components/SEO.tsx', seo],
+    ['data/blogData.ts', blogData],
+    ['components/Header/Header.tsx', header],
+    ['components/Footer.tsx', footer],
+    ['components/landings/lollapalooza/Footer.tsx', lollaFooter],
+    ['components/landings/lollapalooza/Navbar.tsx', lollaNavbar],
+    ['components/schemas/OrganizationSchema.tsx', organizationSchema],
+    ['components/schemas/ArticleSchema.tsx', articleSchema],
+    ['public/sitemap.xml', sitemap],
+  ] as const) {
+    assertMissingHosts(
+      content,
+      ['https://www.anhanga.tur.br/og-image-1200x630.jpg', 'https://www.anhanga.tur.br/logo.png', 'assets/LOGO ANHANGA VIAGENS', 'landing/beto-carrero/hero.jpg'],
+      label,
+    );
+  }
+
+  assert.match(seo, /DEFAULT_OG_IMAGE_URL/);
+  assert.match(blogData, /BRAND_LOGO_PNG_URL/);
+  assert.match(header, /BRAND_LOGO_(BLUE|WHITE)_URL/);
+  assert.match(footer, /BRAND_LOGO_WHITE_URL/);
+  assert.match(lollaFooter, /BRAND_LOGO_WHITE_URL/);
+  assert.match(lollaNavbar, /BRAND_LOGO_BLUE_URL/);
+  assert.match(organizationSchema, /BRAND_LOGO_BLUE_URL/);
+  assert.match(articleSchema, /BRAND_LOGO_BLUE_URL/);
+  assert.match(sitemap, /https:\/\/media\.anhanga\.tur\.br\/images\/og\/og-image-1200x630\.jpg/);
+  assert.match(sitemap, /https:\/\/media\.anhanga\.tur\.br\/images\/beto-carrero\/landing\/firewhip\.jpg/);
+  assert.match(blogPost, /image: "images\/blog\/blog-viagem-solo-feminina\.png"/);
+});

@@ -4,6 +4,7 @@ import { List, X, Phone } from '@phosphor-icons/react';
 import { openAiChat } from '../../utils/aiChat';
 import { DesktopNavigation, MobileNavigationMenu } from './HeaderNavigation';
 import { SITE_URL } from './headerConfig';
+import { BRAND_LOGO_BLUE_URL, BRAND_LOGO_WHITE_URL } from '../../lib/media-assets';
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -65,10 +66,9 @@ const Header: React.FC = () => {
     }
   };
 
-  const baseUrl = import.meta.env.BASE_URL;
   const logoSrc = useSolidHeader
-    ? `${baseUrl}assets/LOGO ANHANGA VIAGENS - AZUL.svg`
-    : `${baseUrl}assets/LOGO ANHANGA VIAGENS - BRANCO.svg`;
+    ? BRAND_LOGO_BLUE_URL
+    : BRAND_LOGO_WHITE_URL;
 
   const navTextClass = useSolidHeader ? 'text-gray-600 hover:text-brand-vibrant' : 'text-white/90 hover:text-white';
   const buttonClass = useSolidHeader

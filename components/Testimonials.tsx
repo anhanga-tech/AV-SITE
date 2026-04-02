@@ -4,6 +4,7 @@ import ChevronRight from 'lucide-react/dist/esm/icons/chevron-right';
 import Quote from 'lucide-react/dist/esm/icons/quote';
 import MessageSquareHeart from 'lucide-react/dist/esm/icons/message-square-heart';
 import { TESTIMONIALS } from '../data/testimonialsData';
+import { BRAND_LOGO_PNG_URL } from '../lib/media-assets';
 
 const Testimonials: React.FC = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -54,7 +55,7 @@ const Testimonials: React.FC = () => {
                                         {/* Schema Hidden Data */}
                                         <div itemProp="itemReviewed" itemScope itemType="https://schema.org/LocalBusiness">
                                             <meta itemProp="name" content="Anhangá Viagens" />
-                                            <meta itemProp="image" content="https://www.anhanga.tur.br/logo.png" />
+                                            <meta itemProp="image" content={BRAND_LOGO_PNG_URL} />
                                             <meta itemProp="telephone" content="+551152833309" />
                                             <meta itemProp="address" content="Av. Dom Pedro I, 773, São Paulo, SP" />
                                         </div>
