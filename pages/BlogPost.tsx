@@ -121,7 +121,10 @@ const BlogPost: React.FC = () => {
             ]} />
 
             {/* Hero Header */}
-            <div className="relative min-h-[560px] w-full overflow-hidden md:min-h-[620px] lg:min-h-[680px]">
+            <div
+                data-testid="blog-post-hero"
+                className="relative min-h-[560px] w-full overflow-hidden md:min-h-[620px] lg:min-h-[680px]"
+            >
                 <img
                     src={optimizeRemoteImageUrl(post.image, 1200, 675)}
                     alt={post.title}

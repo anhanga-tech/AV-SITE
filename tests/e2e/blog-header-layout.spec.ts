@@ -86,7 +86,7 @@ async function getHeadingGap(page: Page) {
 }
 
 async function getHeroMediaCoverage(page: Page) {
-  const hero = page.locator('article > div.relative').first();
+  const hero = page.getByTestId('blog-post-hero');
   const heroImage = hero.locator('img').first();
 
   const [heroBox, heroImageBox] = await Promise.all([
