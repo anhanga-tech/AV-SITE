@@ -48,10 +48,12 @@ export const tokens = {
     muted:       'gray-500',
   },
   shadow: {
-    hard:   'shadow-hard',
-    hardLg: 'shadow-hard-lg',
-    float:  'shadow-float',
-    glow:   'shadow-glow',
+    hard:        'shadow-hard',          // 4px 4px 0 #0f172a
+    hardYellow:  'shadow-hard-yellow',   // 4px 4px 0 #FFD600 (novo token)
+    hardLg:      'shadow-hard-lg',
+    float:       'shadow-float',
+    floatLg:     'shadow-float-lg',      // novo token para Card variant="float"
+    glow:        'shadow-glow',
   },
   radius: {
     sm:   'rounded-lg',
@@ -64,28 +66,32 @@ export const tokens = {
 
 ---
 
-## `tailwind.config.mjs` — mudanças de cor
+## `tailwind.config.mjs` — mudanças
 
-### Adicionar dentro de `anhanga`
+### Patch aditivo ao bloco `anhanga` existente
+
+Adicionar apenas as **duas chaves novas** ao bloco `anhanga` já existente no config. Não substituir o bloco inteiro:
 
 ```js
-anhanga: {
-  // Ação/interativo (antigo brand-cyan / brand-vibrant)
-  action:       '#0ea5e9',
-  actionDark:   '#0284c7',
-  // Identidade de marca
-  blue:         '#0056D2',
-  darkBlue:     '#003B8E',
-  // Acento
-  yellow:       '#FFD600',
-  yellowHover:  '#E5C000',
-  // Superfícies
-  dark:         '#0f172a',
-  light:        '#F4F8FF',
-}
+// Dentro de theme.extend.colors.anhanga — ADICIONAR estas duas chaves:
+action:      '#0ea5e9',   // cor de ação interativa (antigo brand-cyan / brand-vibrant)
+actionDark:  '#0284c7',   // hover de ação (antigo brand-cyanDark)
+// Nota: dark: '#0f172a' e as demais já existem no bloco anhanga atual
 ```
 
-### Aliases de migração (mantidos temporariamente)
+### Patch aditivo ao bloco `boxShadow` existente
+
+Adicionar dois novos tokens de sombra ao bloco `boxShadow` já existente:
+
+```js
+// Dentro de theme.extend.boxShadow — ADICIONAR:
+'hard-yellow': '4px 4px 0px 0px #FFD600',   // hard-shadow amarelo para Button primary
+'float-lg':    '0 20px 60px -15px rgba(0,0,0,0.2)', // sombra pronunciada para Card float
+```
+
+### Aliases de migração `brand.*` (mantidos temporariamente)
+
+Estes já existem e são mantidos sem alteração durante a migração:
 
 ```js
 brand: {
@@ -93,17 +99,21 @@ brand: {
   cyanDark:  '#0284c7',   // → anhanga-actionDark
   vibrant:   '#0ea5e9',   // → anhanga-action
   blue:      '#1e40af',   // → blue-800 (nativo Tailwind)
-  yellow:    '#fbbf24',   // → anhanga-yellow (valor diferente — verificar)
+  yellow:    '#fbbf24',   // ⚠ DIFERENTE de anhanga-yellow — ver aviso abaixo
   dark:      '#0f172a',   // → anhanga-dark
-  light:     '#f0f9ff',   // → anhanga-light (valor levemente diferente — verificar)
+  light:     '#f0f9ff',   // ⚠ DIFERENTE de anhanga-light — ver aviso abaixo
 }
 ```
 
-> **Atenção:** `brand.yellow` (#fbbf24 / Amber 400) e `anhanga.yellow` (#FFD600) são valores diferentes. Verificar visualmente antes de migrar usos de `brand-yellow`.
+> **⚠ Atenção — brand.yellow:** `brand.yellow` é `#fbbf24` (Amber 400) e `anhanga.yellow` é `#FFD600`. São cores visualmente diferentes. Fazer passe de verificação visual antes de migrar qualquer uso de `brand-yellow`.
+
+> **⚠ Atenção — brand.light:** `brand.light` é `#f0f9ff` (Sky 50) e `anhanga.light` é `#F4F8FF`. São tons de fundo levemente diferentes. Fazer passe de verificação visual antes de migrar usos de `brand-light`, especialmente em fundos de seção.
 
 ---
 
 ## Componentes — `components/ui/`
+
+Todos os componentes aceitam `className?: string` como prop passthrough para spacing e posicionamento no callsite, além dos props documentados abaixo.
 
 ### Estrutura de arquivos
 
@@ -124,29 +134,33 @@ components/ui/
 
 | Prop | Tipo | Default | Descrição |
 |---|---|---|---|
+| `children` | `React.ReactNode` | — | **Obrigatório.** Conteúdo do botão |
 | `variant` | `'primary' \| 'action' \| 'cta' \| 'ghost'` | `'primary'` | Estilo visual |
 | `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Tamanho |
 | `leftIcon` | `React.ReactNode` | — | Ícone à esquerda |
 | `rightIcon` | `React.ReactNode` | — | Ícone à direita |
-| `isLoading` | `boolean` | `false` | Exibe spinner, desabilita |
+| `isLoading` | `boolean` | `false` | Exibe spinner, desabilita interação |
 | `asChild` | `boolean` | `false` | Renderiza como elemento filho (ex: `<a>`) |
+| `className` | `string` | — | Classes adicionais |
 
 **Variantes:**
 
-- `primary` — `bg-anhanga-dark text-white rounded-xl shadow-hard` (hard-shadow amarelo)
+- `primary` — `bg-anhanga-dark text-white rounded-xl shadow-hard-yellow` (hard-shadow **amarelo**, token `shadow-hard-yellow`)
 - `action` — `bg-anhanga-action text-white rounded-full`
-- `cta` — `bg-anhanga-yellow text-anhanga-dark rounded-2xl` (hard-shadow dark)
+- `cta` — `bg-anhanga-yellow text-anhanga-dark rounded-2xl shadow-hard` (hard-shadow **dark**, token `shadow-hard`)
 - `ghost` — `text-gray-500 hover:text-anhanga-action`
+
+> **Nota:** `primary` usa `shadow-hard-yellow` (novo token — 4px 4px 0 #FFD600). `cta` usa `shadow-hard` existente (4px 4px 0 #0f172a). São sombras distintas.
 
 ### `Input`
 
 **Props:**
 
-| Prop | Tipo | Descrição |
-|---|---|---|
-| `label` | `string` | Label visível acima do campo |
-| `error` | `string` | Mensagem de erro (borda vermelha + texto) |
-| `placeholder` | `string` | Placeholder |
+| Prop | Tipo | Default | Descrição |
+|---|---|---|---|
+| `label` | `string` | — | Label visível acima do campo |
+| `error` | `string` | — | Mensagem de erro (borda vermelha + texto abaixo) |
+| `className` | `string` | — | Classes adicionais no wrapper |
 
 Herda todos os props nativos de `<input>`.
 
@@ -158,8 +172,12 @@ Herda todos os props nativos de `<input>`.
 
 | Prop | Tipo | Default | Descrição |
 |---|---|---|---|
+| `children` | `React.ReactNode` | — | **Obrigatório.** Conteúdo do badge |
 | `color` | `'default' \| 'blue' \| 'yellow'` | `'default'` | Esquema de cor |
 | `icon` | `React.ReactNode` | — | Ícone opcional à esquerda |
+| `className` | `string` | — | Classes adicionais |
+
+`BadgeColor = 'default' | 'blue' | 'yellow'` — tipo exportado de `Badge.tsx` para reuso em outros componentes (ex: `SectionHeader`).
 
 **Estilo base:** pill, uppercase, tracking-widest, font-black, text-xs
 
@@ -169,25 +187,27 @@ Herda todos os props nativos de `<input>`.
 
 | Prop | Tipo | Default | Descrição |
 |---|---|---|---|
+| `children` | `React.ReactNode` | — | **Obrigatório.** Conteúdo do card |
 | `variant` | `'default' \| 'hard' \| 'float'` | `'default'` | Intensidade da sombra |
 | `className` | `string` | — | Classes adicionais |
 
 - `default` — `shadow-float`
 - `hard` — `shadow-hard`
-- `float` — `shadow-[0_20px_60px_-15px_rgba(0,0,0,0.2)]`
+- `float` — `shadow-float-lg` (novo token definido em boxShadow)
 
 ### `SectionHeader`
 
 **Props:**
 
-| Prop | Tipo | Descrição |
-|---|---|---|
-| `badge` | `string` | Texto do badge acima do título |
-| `badgeIcon` | `React.ReactNode` | Ícone do badge |
-| `badgeColor` | `BadgeColor` | Cor do badge (default: `'default'`) |
-| `title` | `string` | Título principal (h2) |
-| `subtitle` | `string` | Subtítulo opcional |
-| `align` | `'center' \| 'left'` | Alinhamento (default: `'center'`) |
+| Prop | Tipo | Default | Descrição |
+|---|---|---|---|
+| `title` | `string` | — | **Obrigatório.** Título principal (h2) |
+| `badge` | `string` | — | Texto do badge. Se omitido, badge não é renderizado |
+| `badgeIcon` | `React.ReactNode` | — | Ícone do badge |
+| `badgeColor` | `BadgeColor` | `'default'` | Cor do badge (importado de `Badge.tsx`) |
+| `subtitle` | `string` | — | Subtítulo opcional |
+| `align` | `'center' \| 'left'` | `'center'` | Alinhamento |
+| `className` | `string` | — | Classes adicionais |
 
 ### `WaveDivider`
 
@@ -198,6 +218,7 @@ Herda todos os props nativos de `<input>`.
 | `fill` | `string` | `'#ffffff'` | Cor de preenchimento da onda (cor da seção abaixo) |
 | `direction` | `'down' \| 'up'` | `'down'` | Orientação da onda |
 | `height` | `number` | `60` | Altura em px |
+| `className` | `string` | — | Classes adicionais |
 
 Encapsula o SVG de onda que hoje está duplicado no `Hero.tsx` e no `Footer.tsx`.
 
@@ -208,27 +229,39 @@ Encapsula o SVG de onda que hoje está duplicado no `Hero.tsx` e no `Footer.tsx`
 ### Fase 1 — Tokens (sem mudança visual)
 
 1. Criar `lib/design-tokens.ts`
-2. Atualizar `tailwind.config.mjs`: adicionar tokens `anhanga.action/actionDark`, manter aliases `brand.*`
-3. Resultado: zero mudança visual
+2. Aplicar o patch aditivo em `tailwind.config.mjs`: adicionar `anhanga.action`, `anhanga.actionDark`, `shadow-hard-yellow`, `shadow-float-lg`
+3. Resultado: zero mudança visual; aliases `brand.*` intocados
 
 ### Fase 2 — Componentes UI
 
-1. Criar os 6 componentes em `components/ui/` usando apenas classes `anhanga.*`
+1. Criar os 6 componentes em `components/ui/` usando apenas classes `anhanga.*` e os novos tokens de sombra
 2. Criar `components/ui/index.ts` com re-exports
 
 ### Fase 3 — Migração de consumidores (incremental)
 
 1. Ao tocar um componente existente, substituir padrões inline pelos novos componentes
-2. Rastrear contagem de usos de `brand-*` no codebase
-3. Quando zero usos restarem, remover aliases do Tailwind
+2. Rastrear contagem de usos de `brand-*` com `grep -r "brand-" --include="*.tsx"`
+3. Antes de migrar `brand-yellow` ou `brand-light`, fazer passe visual (ver avisos acima)
+4. Quando zero usos restarem, remover os aliases do Tailwind
 
 ---
 
 ## Testes
 
-- **Sem testes unitários** para os componentes UI (puramente visuais, sem lógica)
-- **`pnpm typecheck`** obrigatório após a implementação
-- **Playwright smoke** — verificar que os novos componentes renderizam corretamente em pelo menos uma página real (ex: Home)
+### `node:test`
+
+- Verificar que `lib/design-tokens.ts` exporta todas as chaves esperadas (`color`, `shadow`, `radius`) sem erros de importação
+- Verificar que `Button` com `isLoading=true` tem `disabled=true` no elemento renderizado
+
+### Playwright
+
+- **Home page (`/`)**: `Button variant="primary"` renderiza com texto visível e `aria-disabled=false`
+- **Home page (`/`)**: `Button variant="primary" isLoading=true` renderiza com spinner e `aria-disabled=true`
+- **Home page (`/`)**: `SectionHeader` renderiza com `role="heading" level=2`
+
+### Typecheck
+
+- `pnpm typecheck` deve passar sem erros após a implementação
 
 ---
 
