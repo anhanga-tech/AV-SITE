@@ -108,7 +108,7 @@ const CallToAction: React.FC = () => {
                             {formState === 'closed' && (
                                 <button
                                     onClick={() => setFormState('open')}
-                                    className="flex items-center gap-2 text-gray-500 hover:text-green-600 text-sm font-semibold transition-colors self-start focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-cyan focus-visible:outline-offset-2 rounded-lg p-1"
+                                    className="flex items-center gap-2 text-gray-500 hover:text-green-600 text-sm font-semibold transition-colors self-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded-lg p-1"
                                     data-tracking="cta-home-footer-whatsapp"
                                     title="Deixar contato para WhatsApp"
                                 >
@@ -132,7 +132,7 @@ const CallToAction: React.FC = () => {
                                             value={name}
                                             onChange={(e) => setName(e.target.value)}
                                             required
-                                            className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-brand-cyan focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-cyan focus-visible:outline-offset-2 transition-colors placeholder-gray-400"
+                                            className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-gray-400"
                                         />
                                     </div>
                                     <div>
@@ -144,7 +144,7 @@ const CallToAction: React.FC = () => {
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                             required
-                                            className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-brand-cyan focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-cyan focus-visible:outline-offset-2 transition-colors placeholder-gray-400"
+                                            className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-gray-400"
                                         />
                                     </div>
                                     {error && (
@@ -153,7 +153,7 @@ const CallToAction: React.FC = () => {
                                     <button
                                         type="submit"
                                         disabled={isSubmitting || !name.trim() || !email.trim()}
-                                        className="flex items-center justify-center gap-2 bg-green-500 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-green-500 focus-visible:outline-offset-2"
+                                        className="flex items-center justify-center gap-2 bg-green-500 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
                                     >
                                         {isSubmitting ? (
                                             <>

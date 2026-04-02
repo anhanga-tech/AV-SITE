@@ -238,10 +238,42 @@ const BlogPost: React.FC = () => {
                                     excerpt={post.excerpt}
                                 />
                             </div>
+
+                            {/* Mobile-First Related Posts (Below Content) */}
+                            <div className="mt-12 lg:hidden border-t border-gray-100 pt-10">
+                                <h3 className="font-black text-2xl text-brand-dark mb-6 flex items-center gap-2">
+                                    <span className="w-1.5 h-6 bg-brand-vibrant rounded-full"></span>
+                                    Leia Também
+                                </h3>
+                                <div className="grid sm:grid-cols-2 gap-6">
+                                    {relatedPosts.map(related => (
+                                        <a href={getBlogPostUrl(related.slug)} key={`mobile-${related.slug}`} className="group flex flex-col bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                                            <div className="aspect-video w-full overflow-hidden relative">
+                                                <img src={optimizeRemoteImageUrl(related.image, 400, 225)} alt={related.title} width="400" height="225" loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                                <div className="absolute top-3 left-3">
+                                                    <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border ${getCategoryColor(related.category)} bg-opacity-90 backdrop-blur-sm bg-white shadow-sm`}>
+                                                        {related.category}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div className="p-4">
+                                                <h5 className="font-bold text-gray-800 leading-tight group-hover:text-brand-cyan transition-colors text-base mb-2">
+                                                    {related.title}
+                                                </h5>
+                                                <div className="flex items-center gap-3 text-xs text-gray-400 font-bold">
+                                                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> 5 min</span>
+                                                    <span>•</span>
+                                                    <span>{related.date}</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Sidebar */}
+                    {/* Sidebar (Desktop only for Related Posts) */}
                     <div className="w-full lg:w-1/3">
                         <div className="sticky top-32 space-y-8">
                             <div className="bg-white rounded-3xl p-8 border-2 border-gray-100 text-center relative overflow-hidden shadow-lg group hover:border-brand-yellow/30 transition-colors">
@@ -274,7 +306,7 @@ const BlogPost: React.FC = () => {
                                 </button>
                             </div>
 
-                            <div className="bg-white/50 backdrop-blur-sm p-2 rounded-3xl">
+                            <div className="bg-white/50 backdrop-blur-sm p-2 rounded-3xl hidden lg:block">
                                 <h3 className="font-black text-xl text-gray-800 mb-6 pl-2 flex items-center gap-2">
                                     <span className="w-1.5 h-6 bg-brand-vibrant rounded-full"></span>
                                     Leia Também

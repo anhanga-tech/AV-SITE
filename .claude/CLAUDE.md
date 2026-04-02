@@ -50,7 +50,7 @@ Copy `.env.example` to `.env` for local development.
 **Import Alias:** Use `@/` for root-relative imports (e.g., `@/components/Header`).
 
 **Routing:** BrowserRouter with two layout branches in `App.tsx`:
-- `/beto-carrero`, `/lollapalooza-2026`, `/orlando` → Dedicated landing pages (no Header/Footer/AIChat)
+- `/beto-carrero`, `/lollapalooza`, `/orlando`, `/melhor-idade` → Dedicated landing pages (no Header/Footer in MainSiteShell)
 - All other routes → MainSiteShell (Header + AIChat + Footer)
 - `/blog` and `/blog/:slug` redirect to an external blog domain via `BlogRedirect.tsx`
 - `*` → redirect to `/`
