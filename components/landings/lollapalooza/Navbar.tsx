@@ -51,7 +51,7 @@ const Navbar: React.FC = () => {
           ))}
           <a
             href={`#${WAITLIST_SECTION_ID}`}
-            className="btn-whatsapp btn-specialist bg-anhanga-yellow text-anhanga-darkBlue px-5 py-2 rounded-full font-bold text-sm flex items-center gap-2 hover:bg-anhanga-yellowHover transition-colors shadow-md focus:outline-none focus:ring-4 focus:ring-anhanga-yellow/50"
+            className="bg-anhanga-yellow text-anhanga-darkBlue px-5 py-2 rounded-full font-bold text-sm flex items-center gap-2 hover:bg-anhanga-yellowHover transition-colors shadow-md focus:outline-none focus:ring-4 focus:ring-anhanga-yellow/50"
             aria-label="Ir para a lista de espera"
             id="btn-lolla-waitlist-header"
             data-tracking="navbar-desktop-lolla-waitlist"
@@ -88,7 +88,7 @@ const Navbar: React.FC = () => {
           <a
             href={`#${WAITLIST_SECTION_ID}`}
             onClick={() => setIsOpen(false)}
-            className="btn-whatsapp btn-specialist bg-anhanga-yellow text-anhanga-darkBlue px-8 py-3 rounded-full font-bold focus:outline-none focus:ring-4 focus:ring-anhanga-yellow/50"
+            className="bg-anhanga-yellow text-anhanga-darkBlue px-8 py-3 rounded-full font-bold focus:outline-none focus:ring-4 focus:ring-anhanga-yellow/50"
             id="btn-lolla-waitlist-mobile"
             data-tracking="navbar-mobile-lolla-waitlist"
           >
