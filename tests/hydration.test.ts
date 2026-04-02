@@ -66,5 +66,5 @@ test('Footer prerender should be deterministic across different runtime dates', 
   const januaryMarkup = renderFooter('2027-01-01T01:00:00.000Z');
 
   assert.equal(marchMarkup, januaryMarkup);
-  assert.match(marchMarkup, /assets\/LOGO(?:%20| )ANHANGA(?:%20| )VIAGENS(?:%20| )-(?:%20| )BRANCO\.svg/);
+  assert.match(marchMarkup, /https:\/\/media\.anhanga\.tur\.br\/images\/brand\/LOGO%20ANHANGA%20VIAGENS%20-%20BRANCO\.svg/);
 });
