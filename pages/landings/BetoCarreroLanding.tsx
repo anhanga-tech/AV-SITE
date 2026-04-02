@@ -32,8 +32,8 @@ const BetoCarreroLanding: React.FC = () => {
   return (
     <>
       <SEO
-        title="Pacote Beto Carrero 2026 | Diversão para toda a Família"
-        description="Planeje sua viagem para o Beto Carrero World 2026 com hotel, ingressos e transporte inclusos. Suporte especializado da Anhangá Viagens para uma experiência em família inesquecível."
+        title="Pacote Beto Carrero 2026 | Diversão em Família"
+        description="Planeje sua viagem para o Beto Carrero 2026 com hotel, ingressos e transporte inclusos. Suporte especializado da Anhangá Viagens para uma experiência inesquecível."
         canonical="https://www.anhanga.tur.br/beto-carrero/"
         keywords="pacote Beto Carrero, viagem Beto Carrero, ingresso Beto Carrero, pacote família Beto Carrero, agência de viagens Beto Carrero"
       />
