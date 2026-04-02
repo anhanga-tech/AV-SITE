@@ -17,7 +17,8 @@ test.describe('SEO Smoke Check', () => {
       await page.goto(route.path);
 
       const siteName = "Anhangá Viagens";
-      const expectedTitle = route.title.includes(siteName) ? route.title : `${route.title} | ${siteName}`;
+      const normalize = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const expectedTitle = normalize(route.title).includes(normalize(siteName)) ? route.title : route.title + " | " + siteName;
 
       // Title
       await expect(page).toHaveTitle(expectedTitle);
