@@ -20,12 +20,12 @@ const Header: React.FC = () => {
     : 'bg-transparent text-white';
 
   const headerSizeClass = isInternalPage
-    ? 'py-2.5 md:py-3'
+    ? 'py-2 md:py-2.5'
     : isScrolled
       ? 'py-3'
       : 'py-6';
 
-  const logoHeightClass = isInternalPage ? 'h-16 md:h-20' : 'h-24';
+  const logoHeightClass = isInternalPage ? 'h-12 md:h-16' : 'h-24';
   const navGapClass = isInternalPage ? 'gap-6' : 'gap-8';
   const actionGapClass = isInternalPage ? 'gap-5' : 'gap-8';
   const ctaPaddingClass = isInternalPage ? 'px-4 py-2' : 'px-5 py-2.5';

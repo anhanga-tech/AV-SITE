@@ -20,7 +20,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Melhores destinos para o Carnaval 2026 no Brasil (com dicas para economizar)",
     "excerpt": "Quer curtir o Carnaval 2026 sem estourar o orçamento? Neste guia, você vai encontrar destinos no Brasil para diferentes estilos (bloco de rua, trio el...",
     "date": "2026-02-11",
-    "dateModified": "2026-04-01",
+    "dateModified": "2026-04-02",
     "author": "equipe-anhanga",
     "category": "Carnaval",
     "image": "https://media.anhanga.tur.br/images/blog/destinos-carnaval-2026.jpg",
