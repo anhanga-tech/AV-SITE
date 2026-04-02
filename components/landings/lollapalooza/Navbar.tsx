@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Menu, X, MessageCircle } from 'lucide-react';
 import { NAVIGATION_LINKS } from './constants';
 import { WAITLIST_SECTION_ID } from './constants';
+import { BRAND_LOGO_BLUE_URL } from '../../../lib/media-assets';
 
 const SITE_URL = 'https://www.anhanga.tur.br';
 
@@ -21,7 +22,7 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const logoUrl = `${import.meta.env.BASE_URL}assets/LOGO ANHANGA VIAGENS - AZUL.svg`;
+  const logoUrl = BRAND_LOGO_BLUE_URL;
 
   return (
     <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'}`} role="navigation" aria-label="Menu principal">

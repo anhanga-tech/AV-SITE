@@ -133,15 +133,14 @@ const Hero: React.FC = () => {
       <div className="container mx-auto px-6 relative z-10 pt-40 pb-12">
         <div className="flex flex-col items-center justify-center text-center">
 
-          {/* SEO H1 - sr-only prefixes keyword for crawlers; visible copy preserved for design */}
+          {/* SEO H1 - Optimized with visible keywords for search engines */}
           <h1
             className={`font-sans font-extrabold text-white mb-6 leading-[0.9] tracking-tight drop-shadow-lg transition-all duration-500
                 ${validCityForTitle ? 'text-4xl sm:text-5xl md:text-7xl' : 'text-5xl sm:text-6xl md:text-8xl'}
                 `}
           >
-            <span className="sr-only">Agência de Viagens Boutique em São Paulo — </span>
             <span className="block text-sm sm:text-base font-semibold text-white/80 tracking-widest uppercase mb-3 leading-normal">
-              Para quem não consegue mais ficar parado.
+              Agência de Viagens Boutique em São Paulo
             </span>
             Sua Próxima <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500 relative inline-block pb-2">

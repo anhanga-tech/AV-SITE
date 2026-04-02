@@ -154,6 +154,9 @@ export default defineConfig(({ mode, isSsrBuild }) => {
   // Base path: '/' para Netlify/Vercel, ou '/repo-name/' para GitHub Pages
   // Para GitHub Pages, defina a variável de ambiente VITE_BASE_PATH
   const base = env.VITE_BASE_PATH || process.env.VITE_BASE_PATH || '/';
+  const devHost = env.VITE_DEV_HOST || process.env.VITE_DEV_HOST || '0.0.0.0';
+  const devPort = Number(env.VITE_DEV_PORT || process.env.VITE_DEV_PORT || '3000');
+  const devStrictPort = (env.VITE_DEV_STRICT_PORT || process.env.VITE_DEV_STRICT_PORT || 'false') === 'true';
 
   // Logs de debug (útil para verificar se a variável está sendo carregada)
   console.log(`🔧 Building with base path: ${base}`);
@@ -163,8 +166,9 @@ export default defineConfig(({ mode, isSsrBuild }) => {
   return {
     base,
     server: {
-      port: 3000,
-      host: '0.0.0.0',
+      port: devPort,
+      host: devHost,
+      strictPort: devStrictPort,
     },
     plugins: [
       stripMdxFrontmatterPlugin(),

@@ -9,7 +9,7 @@ import {
 } from '@phosphor-icons/react';
 import { getBlogHomeUrl } from '../utils/blog';
 import { useFooterRuntimeMetadata } from '../lib/footer-runtime';
-import { getStaticAssetUrl } from '../lib/static-assets';
+import { ANHANGA_TECH_LOGO_URL, BRAND_LOGO_WHITE_URL } from '../lib/media-assets';
 
 const SITE_URL = 'https://www.anhanga.tur.br';
 
@@ -33,7 +33,7 @@ const Footer: React.FC = () => {
                     <div className="md:col-span-2">
                         <div className="mb-6">
                             <img
-                                src={getStaticAssetUrl('LOGO ANHANGA VIAGENS - BRANCO.svg')}
+                                src={BRAND_LOGO_WHITE_URL}
                                 alt="Anhangá Viagens"
                                 width="247"
                                 height="128"
@@ -107,7 +107,7 @@ const Footer: React.FC = () => {
 
                     <div className="flex flex-col md:items-end gap-2 text-center md:text-right order-1 md:order-2">
                         <div className="text-xs text-gray-500 font-medium flex items-center justify-center md:justify-end gap-1">
-                            Feito com <Heart className="w-3 h-3 text-red-500" weight="fill" aria-hidden="true" /> pela <img src={getStaticAssetUrl('LOGO ANHANGA TECH.svg')} alt="Anhangá.tech" width="80" height="16" loading="lazy" className="h-4 w-auto inline-block mx-1 align-sub" />
+                            Feito com <Heart className="w-3 h-3 text-red-500" weight="fill" aria-hidden="true" /> pela <img src={ANHANGA_TECH_LOGO_URL} alt="Anhangá.tech" width="80" height="16" loading="lazy" className="h-4 w-auto inline-block mx-1 align-sub" />
                             {runtimeMetadata ? ` • ${runtimeMetadata.currentYear}` : null}
                         </div>
                         <div className="text-[10px] text-gray-600 font-medium flex flex-wrap justify-center md:justify-end gap-x-2">
