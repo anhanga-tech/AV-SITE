@@ -1,24 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { List, X, Phone, CaretDown } from '@phosphor-icons/react';
-import { getBlogHomeUrl } from '@/utils/blog';
+import { useLocation } from 'react-router-dom';
+import { List, X, Phone } from '@phosphor-icons/react';
 import { openAiChat } from '../../utils/aiChat';
-
-const NAV_LINKS = [
-  { name: 'Destinos', href: 'destinos' },
-  {
-    name: 'Sobre Nós',
-    subLinks: [
-      { name: 'A Anhangá', href: '/sobre/' },
-      { name: 'Nossa História', href: '/sobre/#nossa-historia' },
-      { name: 'Como Funciona', href: 'como-funciona' },
-      { name: 'Depoimentos', href: 'depoimentos' },
-    ],
-  },
-  { name: 'Contato', href: 'contato' },
-];
-
-const SITE_URL = 'https://www.anhanga.tur.br';
+import { DesktopNavigation, MobileNavigationMenu } from './HeaderNavigation';
+import { SITE_URL } from './headerConfig';
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -42,6 +27,7 @@ const Header: React.FC = () => {
   const logoHeightClass = isInternalPage ? 'h-16 md:h-20' : 'h-24';
   const navGapClass = isInternalPage ? 'gap-6' : 'gap-8';
   const actionGapClass = isInternalPage ? 'gap-5' : 'gap-8';
+  const ctaPaddingClass = isInternalPage ? 'px-4 py-2' : 'px-5 py-2.5';
 
   useEffect(() => {
     let ticking = false;
@@ -66,7 +52,7 @@ const Header: React.FC = () => {
     setIsMobileMenuOpen(false);
   };
 
-  const handleNavClick = (e: React.MouseEvent, targetId: string) => {
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
     if (isHome) {
       e.preventDefault();
       const element = document.getElementById(targetId);
@@ -121,71 +107,12 @@ const Header: React.FC = () => {
         </a>
 
         <div className={`flex items-center ${actionGapClass}`}>
-          <nav className={`hidden md:flex items-center ${navGapClass}`} aria-label="Menu Principal">
-            {NAV_LINKS.map((link) => (
-              /* Performance optimization: Using CSS 'group-hover' for dropdowns instead of React state
-                 to eliminate unnecessary re-renders on every hover interaction. */
-              <div
-                key={link.name}
-                className="relative group"
-              >
-                {link.subLinks ? (
-                  <button className={`flex items-center gap-1 font-medium text-sm transition-colors duration-500 hover:opacity-80 focus:outline-none focus:underline decoration-2 underline-offset-4 cursor-pointer ${navTextClass}`}>
-                    {link.name}
-                    <CaretDown className="w-4 h-4 transition-transform duration-300 group-hover:rotate-180" weight="bold" />
-                  </button>
-                ) : (
-                  isHome ? (
-                    <a
-                      href={`#${link.href}`}
-                      onClick={(e) => handleNavClick(e, link.href!)}
-                      className={`font-medium text-sm transition-colors duration-500 hover:opacity-80 focus:outline-none focus:underline decoration-2 underline-offset-4 cursor-pointer ${navTextClass}`}
-                    >
-                      {link.name}
-                    </a>
-                  ) : (
-                    <a
-                      href={`${SITE_URL}/#${link.href}`}
-                      className={`font-medium text-sm transition-colors duration-500 hover:opacity-80 focus:outline-none focus:underline decoration-2 underline-offset-4 cursor-pointer ${navTextClass}`}
-                    >
-                      {link.name}
-                    </a>
-                  )
-                )}
-
-                {link.subLinks && (
-                  <div className="absolute top-full pt-4 w-48 z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible focus-within:opacity-100 focus-within:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-                    <div className="bg-white rounded-md shadow-lg py-2 border border-gray-100">
-                      {link.subLinks.map((subLink) => {
-                        const isPage = subLink.href.startsWith('/');
-                        const href = isPage ? `${SITE_URL}${subLink.href}` : (isHome ? `#${subLink.href}` : `${SITE_URL}/#${subLink.href}`);
-                        return (
-                          <a
-                            key={subLink.name}
-                            href={href}
-                            onClick={(e) => {
-                              if (!isPage && isHome) {
-                                handleNavClick(e, subLink.href);
-                              }
-                            }}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                          >
-                            {subLink.name}
-                          </a>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-            <a
-              href={getBlogHomeUrl()}
-              className={`font-medium text-sm transition-colors duration-500 hover:opacity-80 focus:outline-none focus:underline decoration-2 underline-offset-4 ${navTextClass}`}
-            >
-              Blog de Viagens
-            </a>
-          </nav>
+          <DesktopNavigation
+            isHome={isHome}
+            navGapClass={navGapClass}
+            navTextClass={navTextClass}
+            onNavClick={handleNavClick}
+          />
 
           <div className="hidden md:block">
             <button
@@ -194,7 +121,7 @@ const Header: React.FC = () => {
               data-testid="desktop-fale-conosco-btn"
               data-tracking="navbar-desktop"
               onClick={handleContactClick}
-              className={`btn-whatsapp btn-specialist rounded-full font-medium text-sm transition-all duration-500 flex items-center gap-2 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-vibrant ${isInternalPage ? 'px-4 py-2' : 'px-5 py-2.5'} ${buttonClass}`}
+              className={`btn-whatsapp btn-specialist rounded-full font-medium text-sm transition-all duration-500 flex items-center gap-2 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-vibrant ${ctaPaddingClass} ${buttonClass}`}
             >
               <Phone className="w-4 h-4" weight="fill" />
               Fale Conosco
@@ -213,59 +140,13 @@ const Header: React.FC = () => {
         </div>
       </div>
 
-      {isMobileMenuOpen && (
-        <div id="mobile-menu" className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg py-4 px-6 flex flex-col gap-4 border-t border-gray-100 text-gray-800 animate-fade-in-down">
-          {NAV_LINKS.map((link) => {
-            if (link.subLinks) {
-              return link.subLinks.map((subLink) => {
-                const isPage = subLink.href.startsWith('/');
-                const href = isPage ? `${SITE_URL}${subLink.href}` : (isHome ? `#${subLink.href}` : `${SITE_URL}/#${subLink.href}`);
-                return (
-                  <a
-                    key={subLink.name}
-                    href={href}
-                    className="text-gray-700 font-medium py-2 border-b border-gray-50 focus:text-brand-vibrant focus:outline-none"
-                    onClick={(e) => {
-                      if (!isPage && isHome) {
-                        handleNavClick(e, subLink.href);
-                      } else {
-                        setIsMobileMenuOpen(false);
-                      }
-                    }}
-                  >
-                    {subLink.name}
-                  </a>
-                );
-              });
-            }
-
-            return isHome ? (
-              <a
-                key={link.name}
-                href={`#${link.href}`}
-                className="text-gray-700 font-medium py-2 border-b border-gray-50 focus:text-brand-vibrant focus:outline-none"
-                onClick={(e) => handleNavClick(e, link.href!)}
-              >
-                {link.name}
-              </a>
-            ) : (
-              <a
-                key={link.name}
-                href={`${SITE_URL}/#${link.href}`}
-                className="text-gray-700 font-medium py-2 border-b border-gray-50 focus:text-brand-vibrant focus:outline-none"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {link.name}
-              </a>
-            );
-          })}
-          <a
-            href={getBlogHomeUrl()}
-            className="text-gray-700 font-medium py-2 border-b border-gray-50 focus:text-brand-vibrant focus:outline-none"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Blog de Viagens
-          </a>
+      <MobileNavigationMenu
+        isHome={isHome}
+        isOpen={isMobileMenuOpen}
+        navTextClass={navTextClass}
+        onCloseMenu={() => setIsMobileMenuOpen(false)}
+        onNavClick={handleNavClick}
+        contactButton={(
           <button
             type="button"
             data-testid="mobile-fale-conosco-btn"
@@ -275,8 +156,8 @@ const Header: React.FC = () => {
           >
             Fale Conosco
           </button>
-        </div>
-      )}
+        )}
+      />
     </header>
   );
 };
