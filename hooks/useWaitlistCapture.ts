@@ -100,6 +100,7 @@ export function pushWaitlistSignupDataLayerEvent(payload: SubmitWaitlistRequest)
         return;
     }
 
+    // 1. Internal waitlist event
     window.dataLayer.push({
         event: 'waitlist_signup',
         destination: 'Lollapalooza Brasil',
@@ -110,7 +111,15 @@ export function pushWaitlistSignupDataLayerEvent(payload: SubmitWaitlistRequest)
         utm_campaign: payload.utms.utm_campaign,
         ga_client_id: payload.tracking?.cid,
         ga_session_id: payload.tracking?.sid,
-        page_location: typeof window !== 'undefined' ? window.location.href : undefined,
+        page_location: window.location.href,
+    });
+
+    // 2. Unified form submission event
+    window.dataLayer.push({
+        event: 'form_submission',
+        form_type: 'waitlist',
+        form_id: 'lolla_waitlist_2027',
+        page_location: window.location.href,
     });
 }
 

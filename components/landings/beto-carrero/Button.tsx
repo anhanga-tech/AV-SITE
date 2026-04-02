@@ -70,7 +70,9 @@ const Button: React.FC<ButtonProps> = ({
       <button
         onClick={(e) => {
           e.preventDefault();
-          openAiChat({ message: WHATSAPP_MESSAGE });
+          openAiChat({
+            message: WHATSAPP_MESSAGE
+          });
           handleClick();
         }}
         className={`btn-whatsapp btn-specialist ${baseStyles} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className}`}

@@ -251,6 +251,7 @@ export function pushGenerateLeadDataLayerEvent(
         return;
     }
 
+    // 1. Internal generation event
     window.dataLayer.push({
         event: 'generate_lead',
         event_id: payload.event_id,
@@ -260,6 +261,15 @@ export function pushGenerateLeadDataLayerEvent(
         utm_campaign: payload.utms.utm_campaign,
         ga_client_id: payload.tracking?.cid,
         ga_session_id: payload.tracking?.sid,
+    });
+
+    // 2. Unified form submission event for GA4/Ads
+    window.dataLayer.push({
+        event: 'form_submission',
+        form_type: 'ai_chatbot_lead',
+        form_id: payload.event_id,
+        destination: 'whatsapp',
+        page_location: window.location.href,
     });
 }
 

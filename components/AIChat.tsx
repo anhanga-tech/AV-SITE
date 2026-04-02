@@ -150,14 +150,6 @@ const AIChat: React.FC = () => {
       };
     }
 
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: 'form_submission',
-        form_type: 'ai_chatbot_lead',
-        destination: 'whatsapp',
-        page_location: window.location.href,
-      });
-    }
 
     return {
       ok: true,

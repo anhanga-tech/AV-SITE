@@ -33,7 +33,7 @@ const Button: React.FC<ButtonProps> = ({ text, className = '', variant = 'primar
   const widthClass = fullWidth ? "w-full" : "";
 
   const sharedProps = {
-    className: `btn-whatsapp btn-specialist ${baseStyles} ${variants[variant]} ${widthClass} ${className}`,
+    className: `${baseStyles} ${variants[variant]} ${widthClass} ${className}`,
     id,
     'data-testid': dataTestId,
     'data-whatsapp-location': dataWhatsappLocation,
