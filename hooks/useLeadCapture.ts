@@ -19,8 +19,6 @@ export type LeadDraftPartial = Partial<LeadDraft>;
 type SubmitLeadResponseData = {
     error?: string;
     code?: string;
-    contactId?: string;
-    dealId?: string;
     requestId?: string;
     warning?: string;
 };
@@ -29,8 +27,6 @@ export type SubmitLeadHookResult =
     | {
         ok: true;
         requestId: string;
-        contactId: string;
-        dealId?: string;
         warning?: string;
     }
     | {
@@ -305,10 +301,10 @@ function buildSubmitLeadErrorResult(
         ? parsed.rawData.error
         : parsed.responseText && !isHtmlPayload(parsed.responseText)
             ? truncateResponseText(parsed.responseText)
-            : `Falha ao enviar lead para o HubSpot (status ${status}).`;
+            : `Falha ao enviar lead (status ${status}).`;
     const apiCode = typeof parsed.rawData.code === 'string'
         ? parsed.rawData.code
-        : 'HUBSPOT_API_ERROR';
+        : 'API_ERROR';
 
     return {
         ok: false,
@@ -325,8 +321,6 @@ function buildSubmitLeadSuccessResult(parsed: ParsedSubmitLeadResponse): SubmitL
         requestId: typeof parsed.rawData.requestId === 'string'
             ? parsed.rawData.requestId
             : (parsed.responseRequestId || 'unknown'),
-        contactId: typeof parsed.rawData.contactId === 'string' ? parsed.rawData.contactId : 'unknown',
-        dealId: typeof parsed.rawData.dealId === 'string' ? parsed.rawData.dealId : undefined,
         warning: typeof parsed.rawData.warning === 'string' ? parsed.rawData.warning : undefined,
     };
 }

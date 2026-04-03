@@ -104,7 +104,7 @@ const CallToAction: React.FC = () => {
                                 <ChatCentered className="w-5 h-5" weight="fill" />
                             </button>
 
-                            {/* Botão secundário — captura nome + email → HubSpot */}
+                            {/* Botão secundário — captura nome + email para o fluxo de lead */}
                             {formState === 'closed' && (
                                 <button
                                     onClick={() => setFormState('open')}

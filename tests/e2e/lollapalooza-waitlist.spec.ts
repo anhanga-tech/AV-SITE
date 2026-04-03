@@ -27,8 +27,7 @@ test.describe('Lollapalooza evergreen landing waitlist', () => {
         body: JSON.stringify({
           ok: true,
           requestId: 'req-waitlist-e2e',
-          contactId: 'contact-waitlist-e2e',
-          message: 'Cadastro realizado com sucesso na lista de espera.',
+          message: 'Cadastro recebido com sucesso.',
         }),
       });
     });

@@ -1,19 +1,10 @@
-import type { SubmitLeadRequest } from '../types/leadCapture';
 import type { SubmitWaitlistRequest, SubmitWaitlistResponse } from '../types/waitlist';
 import { buildCorsHeaders, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
 import { cleanString } from '../lib/lead-logic';
-import { buildWaitlistNoteBody, splitWaitlistName, validateWaitlistPayload } from '../lib/waitlist-logic';
-import {
-    addContactToList,
-    buildAdditionalContactProperties,
-    buildCoreContactProperties,
-    createContactNote,
-    getContactIdByEmail,
-    hubspotRequest,
-    type HubSpotObjectResponse,
-    updateContactProperties,
-} from '../services/hubspot';
+import { buildN8nWaitlistPayload } from '../lib/n8n-payloads';
+import { validateWaitlistPayload } from '../lib/waitlist-logic';
+import { sendWaitlistToN8n } from '../services/n8n';
 
 export const config = {
     runtime: 'edge',
@@ -21,6 +12,11 @@ export const config = {
 
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
+
+interface SubmitWaitlistConfig {
+    webhookUrl: string;
+    webhookSecret: string;
+}
 
 function createRequestId(): string {
     if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -41,109 +37,90 @@ function buildJsonResponse(body: SubmitWaitlistResponse, status: number, corsHea
     });
 }
 
-function parseHubSpotError(error: unknown): { code: 'HUBSPOT_UNAUTHORIZED' | 'HUBSPOT_PROPERTY_ERROR' | 'HUBSPOT_API_ERROR'; status: number } {
+function getSubmitWaitlistConfig(): SubmitWaitlistConfig | null {
+    const webhookUrl = cleanString(process.env.N8N_SUBMIT_WAITLIST_WEBHOOK_URL);
+    const webhookSecret = cleanString(process.env.N8N_WEBHOOK_SECRET);
+
+    if (!webhookUrl || !webhookSecret) {
+        return null;
+    }
+
+    return {
+        webhookUrl,
+        webhookSecret,
+    };
+}
+
+export function classifySubmitWaitlistError(error: unknown): {
+    code: 'N8N_WEBHOOK_ERROR' | 'INTERNAL_ERROR';
+    status: number;
+    error: string;
+} {
     const message = error instanceof Error ? error.message : String(error);
-
-    if (message.includes('UNAUTHORIZED')) {
-        return { code: 'HUBSPOT_UNAUTHORIZED', status: 401 };
+    const match = message.match(/^N8N_WEBHOOK_ERROR:(\d+):(.*)$/s);
+    if (!match) {
+        return {
+            code: 'INTERNAL_ERROR',
+            status: 500,
+            error: 'Erro interno ao processar envio da lista de espera.',
+        };
     }
 
-    const match = message.match(/^[A-Z_]+:(\d+):(.*)$/s);
-    const status = match ? Number(match[1]) : 502;
-
-    if (status === 400 || status === 422) {
-        return { code: 'HUBSPOT_PROPERTY_ERROR', status: 502 };
-    }
-
-    return { code: 'HUBSPOT_API_ERROR', status: 502 };
+    return {
+        code: 'N8N_WEBHOOK_ERROR',
+        status: 502,
+        error: 'Erro ao enviar inscrição na lista de espera.',
+    };
 }
 
-async function createOrUpdateContact(
-    token: string,
-    coreProperties: Record<string, string>,
-    email: string,
-): Promise<string> {
-    const createContactResponse = await hubspotRequest(token, '/crm/v3/objects/contacts', {
-        method: 'POST',
-        body: JSON.stringify({ properties: coreProperties }),
-    });
-
-    if (createContactResponse.status === 401 || createContactResponse.status === 403) {
-        throw new Error('UNAUTHORIZED');
-    }
-
-    if (createContactResponse.status === 409) {
-        const existingContactId = await getContactIdByEmail(token, email);
-        if (!existingContactId) {
-            throw new Error('CONTACT_SEARCH_FAILED:404:Contact ID not found for existing email');
-        }
-
-        await updateContactProperties(token, existingContactId, coreProperties);
-        return existingContactId;
-    }
-
-    if (!createContactResponse.ok) {
-        const detail = await createContactResponse.text().catch(() => '');
-        throw new Error(`CONTACT_CREATE_FAILED:${createContactResponse.status}:${detail}`);
-    }
-
-    const data = (await createContactResponse.json().catch(() => ({}))) as HubSpotObjectResponse;
-    if (!data.id) {
-        throw new Error('CONTACT_CREATE_FAILED:502:missing_contact_id');
-    }
-
-    return data.id;
-}
-
-async function processWaitlistSync(
-    hubspotToken: string,
-    payload: SubmitWaitlistRequest,
-    enrichmentPayload: SubmitLeadRequest
-): Promise<{ contactId: string; warning?: string }> {
-    const coreContactProperties = buildCoreContactProperties(enrichmentPayload);
-    const additionalContactProperties = buildAdditionalContactProperties(enrichmentPayload);
-
-    const contactId = await createOrUpdateContact(hubspotToken, coreContactProperties, payload.email);
-    let warning: string | undefined;
-
-    if (Object.keys(additionalContactProperties).length > 0) {
-        try {
-            await updateContactProperties(hubspotToken, contactId, additionalContactProperties);
-        } catch (trackingError: unknown) {
-            console.error('submit-waitlist: failed to update additional contact properties', trackingError);
-            warning = 'Contato salvo, mas alguns dados de rastreamento não puderam ser gravados.';
-        }
-    }
-
-    const lollapaloozaListId = cleanString(process.env.HUBSPOT_LOLLAPALOOZA_LIST_ID);
-    if (lollapaloozaListId) {
-        try {
-            await addContactToList(hubspotToken, lollapaloozaListId, contactId);
-        } catch (listError: unknown) {
-            console.error('submit-waitlist: failed to add contact to lollapalooza list', listError);
-        }
-    } else {
-        console.info('submit-waitlist: lollapalooza waitlist list id is not configured');
-    }
-
+async function parseRequestBody(
+    request: Request,
+    corsHeaders: Record<string, string>,
+    requestId: string,
+): Promise<unknown | Response> {
     try {
-        await createContactNote(hubspotToken, contactId, buildWaitlistNoteBody(payload));
-    } catch (noteError: unknown) {
-        console.error('submit-waitlist: failed to create waitlist note', noteError);
-        warning = warning || 'Contato salvo, mas a anotação de waitlist não pôde ser registrada automaticamente.';
+        return await request.json();
+    } catch {
+        return buildJsonResponse(
+            {
+                ok: false,
+                requestId,
+                code: 'VALIDATION_ERROR',
+                error: 'JSON inválido no corpo da requisição.',
+            },
+            400,
+            corsHeaders,
+        );
     }
-
-    return { contactId, warning };
 }
 
-export default async function handler(request: Request): Promise<Response> {
-    const corsHeaders = buildCorsHeaders();
-    const requestId = createRequestId();
-
-    if (request.method === 'OPTIONS') {
-        return new Response(null, { status: 204, headers: corsHeaders });
+function validateRequestPayload(
+    rawBody: unknown,
+    corsHeaders: Record<string, string>,
+    requestId: string,
+): SubmitWaitlistRequest | Response {
+    const validation = validateWaitlistPayload(rawBody);
+    if (validation.valid === false) {
+        return buildJsonResponse(
+            {
+                ok: false,
+                requestId,
+                code: 'VALIDATION_ERROR',
+                error: validation.error,
+            },
+            400,
+            corsHeaders,
+        );
     }
 
+    return validation.data;
+}
+
+async function getRateLimitResponse(
+    request: Request,
+    corsHeaders: Record<string, string>,
+    requestId: string,
+): Promise<Response | null> {
     const clientIP = getClientIP(request);
     const rateLimit = await checkRateLimit(clientIP, {
         limit: RATE_LIMIT_MAX_REQUESTS,
@@ -151,70 +128,96 @@ export default async function handler(request: Request): Promise<Response> {
         prefix: 'ratelimit:submit-waitlist',
     });
 
-    if (!rateLimit.allowed) {
-        return buildJsonResponse(
-            { ok: false, requestId, code: 'RATE_LIMIT_EXCEEDED', error: 'Muitas tentativas. Tente novamente em breve.' },
-            429,
-            {
-                ...corsHeaders,
-                'Retry-After': String(Math.ceil(rateLimit.resetIn / 1000)),
-                'X-RateLimit-Remaining': String(rateLimit.remaining),
-                'X-RateLimit-Reset': String(Math.ceil((Date.now() + rateLimit.resetIn) / 1000)),
-            },
+    if (rateLimit.allowed) return null;
+
+    return buildJsonResponse(
+        {
+            ok: false,
+            requestId,
+            code: 'RATE_LIMIT_EXCEEDED',
+            error: 'Muitas tentativas. Tente novamente em breve.',
+        },
+        429,
+        {
+            ...corsHeaders,
+            'Retry-After': String(Math.ceil(rateLimit.resetIn / 1000)),
+            'X-RateLimit-Remaining': String(rateLimit.remaining),
+            'X-RateLimit-Reset': String(Math.ceil((Date.now() + rateLimit.resetIn) / 1000)),
+        },
+    );
+}
+
+export default async function handler(request: Request): Promise<Response> {
+    const corsHeaders = buildCorsHeaders();
+    const requestId = createRequestId();
+
+    try {
+        if (request.method === 'OPTIONS') {
+            return new Response(null, { status: 204, headers: corsHeaders });
+        }
+
+        if (request.method !== 'POST') {
+            return buildJsonResponse(
+                {
+                    ok: false,
+                    requestId,
+                    code: 'METHOD_NOT_ALLOWED',
+                    error: 'Método não permitido.',
+                },
+                405,
+                corsHeaders,
+            );
+        }
+
+        const config = getSubmitWaitlistConfig();
+        if (!config) {
+            return buildJsonResponse(
+                {
+                    ok: false,
+                    requestId,
+                    code: 'SERVER_CONFIG_ERROR',
+                    error: 'Integração de waitlist indisponível no momento.',
+                },
+                500,
+                corsHeaders,
+            );
+        }
+
+        const rawBody = await parseRequestBody(request, corsHeaders, requestId);
+        if (rawBody instanceof Response) return rawBody;
+
+        const payload = validateRequestPayload(rawBody, corsHeaders, requestId);
+        if (payload instanceof Response) return payload;
+
+        const rateLimitResponse = await getRateLimitResponse(request, corsHeaders, requestId);
+        if (rateLimitResponse) return rateLimitResponse;
+
+        await sendWaitlistToN8n(
+            config.webhookUrl,
+            config.webhookSecret,
+            requestId,
+            buildN8nWaitlistPayload(payload, requestId),
         );
-    }
-
-    if (request.method !== 'POST') {
-        return buildJsonResponse({ ok: false, requestId, code: 'METHOD_NOT_ALLOWED', error: 'Método não permitido.' }, 405, corsHeaders);
-    }
-
-    let rawPayload: unknown;
-    try {
-        rawPayload = await request.json();
-    } catch {
-        return buildJsonResponse({ ok: false, requestId, code: 'VALIDATION_ERROR', error: 'Payload inválido.' }, 400, corsHeaders);
-    }
-
-    const validation = validateWaitlistPayload(rawPayload);
-    if (validation.valid === false) {
-        return buildJsonResponse({ ok: false, requestId, code: 'VALIDATION_ERROR', error: validation.error }, 400, corsHeaders);
-    }
-
-    const hubspotToken = process.env.HUBSPOT_TOKEN;
-    if (!hubspotToken) {
-        return buildJsonResponse({ ok: false, requestId, code: 'SERVER_CONFIG_ERROR', error: 'Integração de waitlist indisponível no momento.' }, 500, corsHeaders);
-    }
-
-    const payload = validation.data;
-    const { firstName, lastName } = splitWaitlistName(payload.name);
-    const enrichmentPayload: SubmitLeadRequest = {
-        firstName,
-        lastName,
-        email: payload.email,
-        bantSummary: 'Lista de Espera Lollapalooza 2027',
-        destination: 'Lollapalooza Brasil',
-        utms: payload.utms,
-        tracking: payload.tracking,
-    };
-
-    try {
-        const { contactId, warning } = await processWaitlistSync(hubspotToken, payload, enrichmentPayload);
 
         return buildJsonResponse(
-            { ok: true, requestId, contactId, warning, message: 'Cadastro realizado com sucesso na lista de espera.' },
+            {
+                ok: true,
+                requestId,
+                message: 'Enviado com sucesso',
+            },
             201,
             corsHeaders,
         );
     } catch (error: unknown) {
-        const parsed = parseHubSpotError(error);
+        const classified = classifySubmitWaitlistError(error);
         return buildJsonResponse(
             {
                 ok: false,
                 requestId,
-                code: parsed.code,
-                error: parsed.code === 'HUBSPOT_UNAUTHORIZED' ? 'Erro de integração com o CRM.' : 'Erro ao salvar sua inscrição na lista de espera.',
+                code: classified.code,
+                error: classified.error,
             },
-            parsed.status,
+            classified.status,
             corsHeaders,
         );
     }
