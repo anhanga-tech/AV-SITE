@@ -2,6 +2,7 @@ import React from 'react';
 import { SEO } from '../../components/SEO';
 import { LandingFAQ } from '../../components/LandingFAQ';
 import LollapaloozaApp from '../../components/landings/lollapalooza/LollapaloozaApp';
+import { openAiChat } from '../../utils/aiChat';
 import { WAITLIST_SECTION_ID } from '../../components/landings/lollapalooza/constants';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../../components/schemas/FAQPageSchema';
@@ -97,11 +98,23 @@ const LollapaloozaLanding: React.FC = () => {
           <div className="flex flex-wrap gap-3">
             <a
               href={`#${WAITLIST_SECTION_ID}`}
-              className="btn-whatsapp btn-specialist px-5 py-3 rounded-full bg-brand-cyan text-white font-bold hover:bg-brand-cyan/90 transition-colors"
+              className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors"
               data-tracking="footer-lollapalooza-waitlist"
             >
               Entrar na lista de espera 2027
             </a>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                openAiChat({
+                  message: 'Olá! Tenho dúvidas sobre os pacotes do Lollapalooza. Podem me ajudar?'
+                });
+              }}
+              className="btn-whatsapp btn-specialist px-5 py-3 rounded-full bg-brand-cyan text-white font-bold hover:bg-brand-cyan/90 transition-colors"
+              data-tracking="footer-lollapalooza-whatsapp"
+            >
+              Falar com especialista
+            </button>
             <a href="https://www.anhanga.tur.br/orlando/" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ver pacotes para Orlando
             </a>

@@ -137,6 +137,14 @@ const Hero: React.FC = () => {
             dataTracking="hero-lolla-waitlist"
             id="btn-lolla-waitlist-hero"
           />
+
+          <Button
+            text="Falar com especialista"
+            variant="outline"
+            className="btn-whatsapp btn-specialist w-full sm:w-auto text-sm sm:text-lg px-6 py-3 sm:px-8 sm:py-4"
+            dataTracking="hero-lolla-whatsapp"
+            id="btn-lolla-specialist-hero"
+          />
           
           <button 
             onClick={handleShare}
