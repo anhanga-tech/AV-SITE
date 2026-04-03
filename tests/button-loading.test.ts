@@ -17,5 +17,5 @@ test('Button isLoading=false não tem disabled', () => {
         React.createElement(Button, { children: 'Enviar', isLoading: false })
     );
     assert.ok(!html.includes('disabled=""'), 'não deve ter o atributo disabled=""');
-    assert.ok(html.includes('aria-disabled="false"'), 'deve conter aria-disabled="false"');
+    assert.ok(!html.includes('aria-disabled'), 'não deve ter aria-disabled em botão habilitado');
 });

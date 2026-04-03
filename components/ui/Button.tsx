@@ -55,6 +55,8 @@ export const Button: React.FC<ButtonProps> = ({
     const classes = `${base} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`;
     const isDisabled = disabled || isLoading;
 
+    // When asChild=true, only style classes are merged onto the child element.
+    // isLoading, disabled, leftIcon, and rightIcon are not forwarded.
     if (asChild && React.isValidElement(children)) {
         return React.cloneElement(children as React.ReactElement<React.HTMLAttributes<HTMLElement>>, {
             className: `${classes} ${(children as React.ReactElement<React.HTMLAttributes<HTMLElement>>).props.className ?? ''}`.trim(),
@@ -65,7 +67,7 @@ export const Button: React.FC<ButtonProps> = ({
         <button
             className={classes}
             disabled={isDisabled}
-            aria-disabled={isDisabled}
+            aria-disabled={isDisabled || undefined}
             {...rest}
         >
             {isLoading ? (
