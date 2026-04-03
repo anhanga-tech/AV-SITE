@@ -1,4 +1,5 @@
 import React from 'react';
+import { CircleNotch } from '@phosphor-icons/react';
 
 export type ButtonVariant = 'primary' | 'action' | 'cta' | 'ghost';
 export type ButtonSize = 'sm' | 'md' | 'lg';
@@ -27,17 +28,7 @@ const sizeClasses: Record<ButtonSize, string> = {
     lg: 'text-base px-7 py-3.5',
 };
 
-const Spinner: React.FC = () => (
-    <svg
-        className="w-4 h-4 animate-spin"
-        viewBox="0 0 24 24"
-        fill="none"
-        aria-hidden="true"
-    >
-        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-    </svg>
-);
+const baseClasses = 'inline-flex items-center justify-center gap-2 font-bold transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-anhanga-action disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none';
 
 export const Button: React.FC<ButtonProps> = ({
     children,
@@ -51,8 +42,7 @@ export const Button: React.FC<ButtonProps> = ({
     disabled,
     ...rest
 }) => {
-    const base = 'inline-flex items-center justify-center gap-2 font-bold transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-anhanga-action disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none';
-    const classes = `${base} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`;
+    const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`;
     const isDisabled = disabled || isLoading;
 
     // When asChild=true, only style classes are merged onto the child element.
@@ -72,7 +62,7 @@ export const Button: React.FC<ButtonProps> = ({
         >
             {isLoading ? (
                 <>
-                    <Spinner />
+                    <CircleNotch className="w-4 h-4 animate-spin" weight="bold" aria-hidden="true" />
                     {children}
                 </>
             ) : (
