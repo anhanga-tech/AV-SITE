@@ -12,9 +12,12 @@ export const WaveDivider: React.FC<WaveDividerProps> = ({
     direction = 'down',
     height = 60,
     className = '',
-}) => (
+}) => {
+    // SVG path faces up by default; rotate-180 makes it face down
+    const rotateClass = direction === 'up' ? '' : 'rotate-180';
+    return (
     <div
-        className={`w-full overflow-hidden leading-none ${direction === 'up' ? '' : 'rotate-180'} ${className}`}
+        className={`w-full overflow-hidden leading-none ${rotateClass} ${className}`}
         aria-hidden="true"
     >
         <svg
@@ -30,4 +33,5 @@ export const WaveDivider: React.FC<WaveDividerProps> = ({
             />
         </svg>
     </div>
-);
+    );
+};
