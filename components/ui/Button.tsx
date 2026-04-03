@@ -28,7 +28,7 @@ const sizeClasses: Record<ButtonSize, string> = {
     lg: 'text-base px-7 py-3.5',
 };
 
-const baseClasses = 'inline-flex items-center justify-center gap-2 font-bold transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-anhanga-action disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none';
+const baseClasses = 'inline-flex items-center justify-center gap-2 font-bold transition-all duration-150 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none';
 
 export const Button: React.FC<ButtonProps> = ({
     children,
