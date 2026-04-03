@@ -5,6 +5,7 @@ import Quote from 'lucide-react/dist/esm/icons/quote';
 import MessageSquareHeart from 'lucide-react/dist/esm/icons/message-square-heart';
 import { TESTIMONIALS } from '../data/testimonialsData';
 import { BRAND_LOGO_PNG_URL } from '../lib/media-assets';
+import { SectionHeader } from './ui';
 
 const Testimonials: React.FC = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -28,13 +29,13 @@ const Testimonials: React.FC = () => {
             {/* Background Decor */}
 
             <div className="container mx-auto px-6 relative z-10">
-                <div className="text-center mb-16">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-brand-light text-brand-dark font-black text-xs uppercase tracking-widest shadow-sm mb-4">
-                        <MessageSquareHeart className="w-4 h-4 text-red-500 fill-red-500" /> Love Notes
-                    </div>
-                    <h2 className="text-4xl font-black text-brand-dark">Mural do Amor ❤️</h2>
-                    <p className="mt-3 text-gray-500 text-base">Depoimentos reais de quem viajou com a gente</p>
-                </div>
+                <SectionHeader
+                    badge="Love Notes"
+                    badgeIcon={<MessageSquareHeart className="w-4 h-4 text-red-500 fill-red-500" />}
+                    title="Mural do Amor ❤️"
+                    subtitle="Depoimentos reais de quem viajou com a gente"
+                    className="mb-16"
+                />
 
                 {/* Carousel Container */}
                 <div className="max-w-4xl mx-auto relative">

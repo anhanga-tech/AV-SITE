@@ -30,6 +30,9 @@ export default {
                 'fun-dark': '#0F172A',
                 'fun-white': '#F8FAFC',
                 anhanga: {
+                    action:     '#0ea5e9',   // cor de ação (antigo brand-cyan / brand-vibrant)
+                    actionDark: '#0284c7',   // hover de ação (antigo brand-cyanDark)
+                    dark:       '#0f172a',   // necessário para text-anhanga-dark / bg-anhanga-dark
                     blue: '#0056D2',
                     darkBlue: '#003B8E',
                     yellow: '#FFD600',
@@ -44,7 +47,9 @@ export default {
             boxShadow: {
                 'glow': '0 0 20px rgba(14, 165, 233, 0.5)',
                 'float': '0 10px 40px -10px rgba(0,0,0,0.15)',
+                'float-lg': '0 20px 60px -15px rgba(0,0,0,0.2)',
                 'hard': '4px 4px 0px 0px rgba(15, 23, 42, 1)',
+                'hard-yellow': '4px 4px 0px 0px #FFD600',
                 'hard-lg': '8px 8px 0px 0px rgba(15, 23, 42, 1)',
                 'hard-hover': '6px 6px 0px 0px rgba(15, 23, 42, 1)',
             },
