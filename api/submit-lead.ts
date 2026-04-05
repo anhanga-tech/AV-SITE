@@ -113,6 +113,7 @@ export function classifySubmitLeadError(error: unknown): {
         };
     }
 
+    const status = Number(match[1]);
     const detail = truncateDetail(match[2] || '');
 
     return {
