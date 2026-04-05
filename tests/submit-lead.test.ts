@@ -68,6 +68,7 @@ function buildLeadPayloadFixture() {
         firstName: 'Felipe',
         lastName: 'William',
         email: 'felipe@example.com',
+        whatsapp: '+5511988314487',
         event_id: 'lead_test_123abc',
         bantSummary: 'Need: Praia | Authority: casal | Budget: 20k | Timeline: setembro',
         destination: 'Rio de Janeiro',
@@ -137,6 +138,7 @@ test('validatePayload should preserve fbp as a top-level tracking field', () => 
         firstName: 'Felipe',
         lastName: 'William',
         email: 'felipe@example.com',
+        whatsapp: '+5511988314487',
         bantSummary: 'Need: Praia | Authority: casal | Budget: 20k | Timeline: setembro',
         destination: 'Rio de Janeiro',
         utms: {
@@ -166,6 +168,7 @@ test('validatePayload should preserve sanitized event_id when provided', () => {
         firstName: 'Felipe',
         lastName: 'William',
         email: 'felipe@example.com',
+        whatsapp: '+5511988314487',
         event_id: ' lead_<meta>&capi ',
         bantSummary: 'Need: Praia | Authority: casal | Budget: 20k | Timeline: setembro',
         destination: 'Rio de Janeiro',
@@ -179,11 +182,47 @@ test('validatePayload should preserve sanitized event_id when provided', () => {
     assert.equal(result.data.event_id, 'lead_&lt;meta&gt;&capi');
 });
 
+test('validatePayload should require whatsapp and normalize it to E.164 digits', () => {
+    const result = validatePayload({
+        firstName: 'Felipe',
+        lastName: 'William',
+        email: 'felipe@example.com',
+        whatsapp: ' (11) 98831-4487 ',
+        bantSummary: 'Need: Praia | Authority: casal | Budget: 20k | Timeline: setembro',
+        destination: 'Rio de Janeiro',
+        utms: {},
+        tracking: {},
+    });
+
+    assert.equal(result.valid, true);
+    if (!result.valid) return;
+
+    assert.equal(result.data.whatsapp, '+5511988314487');
+});
+
+test('validatePayload should reject payloads without whatsapp', () => {
+    const result = validatePayload({
+        firstName: 'Felipe',
+        lastName: 'William',
+        email: 'felipe@example.com',
+        bantSummary: 'Need: Praia | Authority: casal | Budget: 20k | Timeline: setembro',
+        destination: 'Rio de Janeiro',
+        utms: {},
+        tracking: {},
+    });
+
+    assert.equal(result.valid, false);
+    if (result.valid) return;
+
+    assert.equal(result.error, 'Campos obrigatórios ausentes.');
+});
+
 test('buildN8nLeadPayload should build the outbound webhook contract', () => {
     const payload = buildN8nLeadPayload({
         firstName: 'Felipe',
         lastName: 'William',
         email: 'felipe@example.com',
+        whatsapp: '+5511988314487',
         bantSummary: 'Need: Praia | Authority: casal | Budget: 20k | Timeline: setembro',
         destination: 'Rio de Janeiro',
         utms: {
@@ -219,6 +258,7 @@ test('buildN8nLeadPayload should build the outbound webhook contract', () => {
             firstName: 'Felipe',
             lastName: 'William',
             email: 'felipe@example.com',
+            whatsapp: '+5511988314487',
             eventId: null,
             bantSummary: 'Need: Praia | Authority: casal | Budget: 20k | Timeline: setembro',
             destination: 'Rio de Janeiro',
@@ -295,6 +335,7 @@ test('sendLeadToN8n should send request metadata and webhook auth headers', asyn
         firstName: body.firstName,
         lastName: body.lastName,
         email: body.email,
+        whatsapp: body.whatsapp,
         eventId: body.event_id,
         bantSummary: body.bantSummary,
         destination: body.destination,
@@ -342,6 +383,7 @@ test('submit-lead should send sanitized validated values to n8n', async (t) => {
         firstName: "<script>alert('xss')</script>John",
         lastName: "Doe >",
         email: 'john@example.com',
+        whatsapp: ' (11) 98831-4487 ',
         event_id: ' lead_<meta>&capi ',
         bantSummary: 'Need: <img src=x onerror=alert(1)>',
         destination: 'Mars <script>',
@@ -371,6 +413,7 @@ test('submit-lead should send sanitized validated values to n8n', async (t) => {
         firstName: '&lt;script&gt;alert(\'xss\')&lt;/script&gt;John',
         lastName: 'Doe &gt;',
         email: 'john@example.com',
+        whatsapp: '+5511988314487',
         eventId: 'lead_&lt;meta&gt;&capi',
         bantSummary: 'Need: &lt;img src=x onerror=alert(1)&gt;',
         destination: 'Mars &lt;script&gt;',
@@ -532,6 +575,7 @@ test('submit-lead should deliver the validated payload to n8n and return a neutr
         firstName: requestBody.firstName,
         lastName: requestBody.lastName,
         email: requestBody.email,
+        whatsapp: requestBody.whatsapp,
         eventId: requestBody.event_id,
         bantSummary: requestBody.bantSummary,
         destination: requestBody.destination,
@@ -558,7 +602,7 @@ test('submit-lead should return N8N_WEBHOOK_ERROR when the webhook responds with
     const response = await handler(buildRequest(buildLeadPayloadFixture()));
     const payload = await response.json() as { ok: boolean; code?: string; error?: string };
 
-    assert.equal(response.status, 502);
+    assert.equal(response.status, 503);
     assert.equal(payload.ok, false);
     assert.equal(payload.code, 'N8N_WEBHOOK_ERROR');
     assert.equal(payload.error, 'Erro ao enviar lead.');
@@ -634,7 +678,7 @@ test('classifySubmitLeadError should preserve sanitized webhook detail for inter
     const classified = classifySubmitLeadError(new Error('N8N_WEBHOOK_ERROR:503: upstream failed\nwith extra detail '));
 
     assert.equal(classified.code, 'N8N_WEBHOOK_ERROR');
-    assert.equal(classified.status, 502);
+    assert.equal(classified.status, 503);
     assert.equal(classified.error, 'Erro ao enviar lead.');
     assert.equal(classified.detail, 'upstream failed with extra detail');
 });

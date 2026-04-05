@@ -27,6 +27,7 @@ export interface N8nLeadPayload {
         firstName: string;
         lastName: string;
         email: string;
+        whatsapp: string;
         eventId: string | null;
         bantSummary: string;
         destination: string;
@@ -102,6 +103,7 @@ export function buildN8nLeadPayload(payload: SubmitLeadRequest, requestId: strin
             firstName: payload.firstName,
             lastName: payload.lastName,
             email: payload.email,
+            whatsapp: payload.whatsapp,
             eventId: payload.event_id ?? null,
             bantSummary: payload.bantSummary,
             destination: payload.destination,

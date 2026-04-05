@@ -286,7 +286,7 @@ test('submit-waitlist should map webhook failures to N8N_WEBHOOK_ERROR', async (
     }));
     const payload = await response.json() as { ok: boolean; code?: string; error?: string };
 
-    assert.equal(response.status, 502);
+    assert.equal(response.status, 503);
     assert.equal(payload.ok, false);
     assert.equal(payload.code, 'N8N_WEBHOOK_ERROR');
     assert.equal(payload.error, 'Erro ao enviar inscrição na lista de espera.');
@@ -304,7 +304,7 @@ test('classifySubmitWaitlistError should preserve sanitized webhook detail for i
     const classified = classifySubmitWaitlistError(new Error('N8N_WEBHOOK_ERROR:503: upstream failed\nwith extra detail '));
 
     assert.equal(classified.code, 'N8N_WEBHOOK_ERROR');
-    assert.equal(classified.status, 502);
+    assert.equal(classified.status, 503);
     assert.equal(classified.error, 'Erro ao enviar inscrição na lista de espera.');
     assert.equal(classified.detail, 'upstream failed with extra detail');
 });

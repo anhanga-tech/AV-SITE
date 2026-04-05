@@ -79,6 +79,7 @@ test.describe('Chatbot lead handoff', () => {
     await page.getByLabel('Nome', { exact: true }).fill('Felipe');
     await page.getByLabel('Sobrenome', { exact: true }).fill('William');
     await page.getByLabel('E-mail', { exact: true }).fill('felipe@example.com');
+    await page.getByLabel('WhatsApp', { exact: true }).fill('11 98831-4487');
     await acceptLgpd(page);
 
     await page.getByRole('button', { name: 'Salvar e abrir WhatsApp' }).click();
@@ -101,11 +102,13 @@ test.describe('Chatbot lead handoff', () => {
     expect(decodeURIComponent(openedUrl)).toContain('Origem: São Paulo, SP');
     expect(decodeURIComponent(openedUrl)).toContain('Dados: utm_source=google');
     expect(decodeURIComponent(openedUrl)).toContain('gclid=test-gclid');
+    expect(decodeURIComponent(openedUrl)).not.toContain('+5511988314487');
 
     expect(submitPayload).not.toBeNull();
     expect(submitPayload?.firstName).toBe('Felipe');
     expect(submitPayload?.lastName).toBe('William');
     expect(submitPayload?.email).toBe('felipe@example.com');
+    expect(submitPayload?.whatsapp).toBe('+5511988314487');
     expect(submitPayload?.destination).toBe('Orlando, Flórida');
     expect(submitPayload?.utms).toMatchObject({
       utm_source: 'google',
@@ -207,6 +210,7 @@ test.describe('Chatbot lead handoff', () => {
     await page.getByLabel('Nome', { exact: true }).fill('Felipe');
     await page.getByLabel('Sobrenome', { exact: true }).fill('William');
     await page.getByLabel('E-mail', { exact: true }).fill('felipe@example.com');
+    await page.getByLabel('WhatsApp', { exact: true }).fill('11 98831-4487');
     await acceptLgpd(page);
 
     await page.getByRole('button', { name: 'Salvar e abrir WhatsApp' }).click();
@@ -216,6 +220,7 @@ test.describe('Chatbot lead handoff', () => {
     await expect.poll(() => page.evaluate(() => window.__openedUrls?.length ?? 0)).toBe(1);
     const openedUrl = await page.evaluate(() => window.__openedUrls?.[0] ?? '');
     expect(decodeURIComponent(openedUrl)).toContain('wa.me/');
+    expect(decodeURIComponent(openedUrl)).not.toContain('+5511988314487');
 
     // Lead submission happened in the background
     await expect.poll(() => submitRequestCount).toBe(1);

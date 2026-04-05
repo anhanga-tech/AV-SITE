@@ -129,6 +129,7 @@ const AIChat: React.FC = () => {
       firstName: payload.firstName,
       lastName: payload.lastName,
       email: payload.email,
+      whatsapp: payload.whatsapp,
       bantSummary: payload.bantSummary,
       destination: payload.destination,
     });

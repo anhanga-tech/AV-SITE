@@ -113,11 +113,12 @@ export function classifySubmitLeadError(error: unknown): {
         };
     }
 
+    const status = Number(match[1]);
     const detail = truncateDetail(match[2] || '');
 
     return {
         code: 'N8N_WEBHOOK_ERROR',
-        status: 502,
+        status: Number.isFinite(status) && status >= 400 ? status : 502,
         error: 'Erro ao enviar lead.',
         detail,
     };
@@ -215,7 +216,7 @@ async function trackLeadConversions(payload: SubmitLeadRequest, requestId: strin
             eventName: 'Lead',
             eventId: payload.event_id,
             email: payload.email,
-            phone: payload.tracking?.extras?.phone,
+            phone: payload.whatsapp,
             firstName: payload.firstName,
             lastName: payload.lastName,
             fbclid: payload.tracking?.fbclid,

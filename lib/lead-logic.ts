@@ -1,6 +1,8 @@
 import type { LeadTracking, LeadUtms, SubmitLeadRequest } from '../types/leadCapture';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MIN_PHONE_DIGITS = 10;
+const MAX_PHONE_DIGITS = 15;
 
 const KNOWN_TRACKING_KEYS = new Set([
     'utm_source',
@@ -37,6 +39,32 @@ export function normalizeNullable(value: unknown, maxLength = 255): string | nul
     if (trimmed.length === 0) return null;
     const sanitized = trimmed.replace(/</g, '&lt;').replace(/>/g, '&gt;');
     return sanitized.length > maxLength ? sanitized.substring(0, maxLength) : sanitized;
+}
+
+export function normalizeWhatsappNumber(value: unknown, defaultCountryCode = '+55'): string | null {
+    if (typeof value !== 'string') return null;
+
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+
+    const countryDigits = defaultCountryCode.replace(/\D/g, '');
+    if (!countryDigits) return null;
+
+    const sanitized = trimmed.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const digits = sanitized.replace(/\D/g, '');
+    if (!digits) return null;
+
+    const normalizedDigits = sanitized.startsWith('+')
+        ? digits
+        : digits.startsWith(countryDigits)
+            ? digits
+            : `${countryDigits}${digits}`;
+
+    if (normalizedDigits.length < MIN_PHONE_DIGITS || normalizedDigits.length > MAX_PHONE_DIGITS) {
+        return null;
+    }
+
+    return `+${normalizedDigits}`;
 }
 
 /**
@@ -125,15 +153,16 @@ export function validatePayload(payload: unknown): { valid: true; data: SubmitLe
     const firstName = cleanString(raw.firstName);
     const lastName = cleanString(raw.lastName);
     const email = cleanString(raw.email).toLowerCase();
+    const whatsapp = normalizeWhatsappNumber(raw.whatsapp);
     const eventId = normalizeNullable(raw.event_id, 128) ?? undefined;
     const bantSummary = cleanString(raw.bantSummary);
     const destination = cleanString(raw.destination);
 
-    if (!firstName || !lastName || !email || !bantSummary || !destination) {
+    if (!firstName || !lastName || !email || !whatsapp || !bantSummary || !destination) {
         return { valid: false, error: 'Campos obrigatórios ausentes.' };
     }
 
-    if (firstName.length > 100 || lastName.length > 100 || email.length > 255 || bantSummary.length > 5000 || destination.length > 255) {
+    if (firstName.length > 100 || lastName.length > 100 || email.length > 255 || whatsapp.length > 16 || bantSummary.length > 5000 || destination.length > 255) {
         return { valid: false, error: 'Entrada muito longa.' };
     }
 
@@ -150,6 +179,7 @@ export function validatePayload(payload: unknown): { valid: true; data: SubmitLe
             firstName,
             lastName,
             email,
+            whatsapp,
             event_id: eventId,
             bantSummary,
             destination,

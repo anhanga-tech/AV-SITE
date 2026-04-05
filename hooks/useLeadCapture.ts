@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { getTrackingDataObject, getWhatsAppLink } from '../utils/whatsapp';
 import type { LeadTracking, LeadUtms, SubmitLeadRequest } from '../types/leadCapture';
-import { cleanString } from '../lib/lead-logic';
+import { cleanString, normalizeWhatsappNumber } from '../lib/lead-logic';
 
 export interface LeadDraft {
     firstName: string;
     lastName: string;
     email: string;
+    whatsapp: string;
     bantSummary: string;
     origin: string;
     destination: string;
@@ -44,6 +45,7 @@ const EMPTY_LEAD_DRAFT: LeadDraft = {
     firstName: '',
     lastName: '',
     email: '',
+    whatsapp: '',
     bantSummary: '',
     origin: '',
     destination: '',
@@ -214,6 +216,7 @@ function buildSubmitLeadPayload(
         firstName: cleanValue(merged.firstName),
         lastName: cleanValue(merged.lastName),
         email: cleanValue(merged.email).toLowerCase(),
+        whatsapp: normalizeWhatsappNumber(merged.whatsapp) ?? '',
         event_id: eventId,
         bantSummary: cleanValue(merged.bantSummary),
         destination: cleanValue(merged.destination),
@@ -233,6 +236,7 @@ function isPreparedSubmitLeadRequest(value: LeadDraftPartial | SubmitLeadRequest
         && typeof candidate.firstName === 'string'
         && typeof candidate.lastName === 'string'
         && typeof candidate.email === 'string'
+        && typeof candidate.whatsapp === 'string'
         && typeof candidate.bantSummary === 'string'
         && typeof candidate.destination === 'string'
         && candidate.utms
@@ -270,7 +274,7 @@ export function pushGenerateLeadDataLayerEvent(
 }
 
 function getSubmitLeadValidationError(payload: SubmitLeadRequest): string | null {
-    if (!payload.firstName || !payload.lastName || !payload.email || !payload.bantSummary || !payload.destination) {
+    if (!payload.firstName || !payload.lastName || !payload.email || !payload.whatsapp || !payload.bantSummary || !payload.destination) {
         return 'Preencha todos os campos obrigatórios (incluindo destino) antes de enviar.';
     }
 

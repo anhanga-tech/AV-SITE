@@ -105,6 +105,7 @@ test('buildLeadWhatsAppUrl should include origin, destination, dates, baggage an
         firstName: 'Felipe',
         lastName: 'William',
         email: 'felipe@example.com',
+        whatsapp: '+5511988314487',
         bantSummary: 'Need: Praia',
         origin: 'São Paulo, SP',
         destination: 'Orlando, Flórida',
@@ -152,6 +153,7 @@ test('pushGenerateLeadDataLayerEvent should push generate_lead with tracking fie
             firstName: 'Felipe',
             lastName: 'William',
             email: 'felipe@example.com',
+            whatsapp: '+5511988314487',
             event_id: 'lead_123456_test01',
             bantSummary: 'Need: Praia',
             destination: 'Rio de Janeiro',
@@ -191,6 +193,7 @@ test('pushGenerateLeadDataLayerEvent should push generate_lead with tracking fie
 const baseDraft: Omit<LeadDraft, 'email'> = {
     firstName: 'Felipe',
     lastName: 'William',
+    whatsapp: '+5511988314487',
     bantSummary: 'Need: Praia',
     origin: 'São Paulo, SP',
     destination: 'Orlando, Flórida',
@@ -208,4 +211,15 @@ test('buildLeadWhatsAppMessage omits email line when email is empty', () => {
     const message = buildLeadWhatsAppMessage({ ...baseDraft, email: '' });
 
     assert.doesNotMatch(message, /E-mail:/);
+});
+
+test('buildLeadWhatsAppMessage never includes the lead whatsapp number', () => {
+    const message = buildLeadWhatsAppMessage({
+        ...baseDraft,
+        email: 'felipe@example.com',
+        whatsapp: '+5511988314487',
+    });
+
+    assert.doesNotMatch(message, /\+5511988314487/);
+    assert.doesNotMatch(message, /WhatsApp:/i);
 });
