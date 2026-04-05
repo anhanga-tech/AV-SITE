@@ -2,12 +2,14 @@ import React, { memo, useState } from 'react';
 import { CheckCircle2, ExternalLink, Loader2 } from 'lucide-react';
 import { createLeadEventId, pushGenerateLeadDataLayerEvent } from '../hooks/useLeadCapture';
 import type { SubmitLeadRequest } from '../types/leadCapture';
+import { normalizeWhatsappNumber } from '../lib/lead-logic';
 import { triggerHaptic } from '../utils/haptics';
 
 export interface LeadFinalizePayload {
   firstName: string;
   lastName: string;
   email: string;
+  whatsapp: string;
   bantSummary: string;
   destination: string;
 }
@@ -39,12 +41,15 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [countryCode, setCountryCode] = useState('+55');
+  const [whatsapp, setWhatsapp] = useState('');
   const [acceptedLGPD, setAcceptedLGPD] = useState(false);
 
   const [fieldErrors, setFieldErrors] = useState<{
     firstName?: string;
     lastName?: string;
     email?: string;
+    whatsapp?: string;
     lgpd?: string;
   }>({});
 
@@ -65,6 +70,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
     const normalizedFirstName = firstName.trim();
     const normalizedLastName = lastName.trim();
     const normalizedEmail = email.trim().toLowerCase();
+    const normalizedWhatsapp = normalizeWhatsappNumber(whatsapp, countryCode);
     const normalizedDestination = destination?.trim() || '';
 
     const errors: typeof fieldErrors = {};
@@ -74,6 +80,11 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
       errors.email = 'Campo obrigatório';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
       errors.email = 'E-mail inválido';
+    }
+    if (!whatsapp.trim()) {
+      errors.whatsapp = 'Campo obrigatório';
+    } else if (!normalizedWhatsapp) {
+      errors.whatsapp = 'WhatsApp inválido';
     }
 
     if (!acceptedLGPD) {
@@ -99,6 +110,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
       firstName: normalizedFirstName,
       lastName: normalizedLastName,
       email: normalizedEmail,
+      whatsapp: normalizedWhatsapp!,
       bantSummary: defaultBantSummary || 'Não informado',
       destination: normalizedDestination,
     };
@@ -181,6 +193,33 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
               className={`w-full bg-white border ${fieldErrors.email ? 'border-red-500' : 'border-gray-200'} rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm`}
             />
             {fieldErrors.email && <span className="text-[10px] text-red-500 font-bold ml-1 uppercase">{fieldErrors.email}</span>}
+          </div>
+
+          <div className="space-y-1">
+            <label htmlFor="lead-whatsapp" className="sr-only">WhatsApp</label>
+            <div className="flex gap-2">
+              <label htmlFor="lead-country-code" className="sr-only">Código do país</label>
+              <select
+                id="lead-country-code"
+                value={countryCode}
+                onChange={(e) => setCountryCode(e.target.value)}
+                className="w-[112px] shrink-0 bg-white border border-gray-200 rounded-xl px-3 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm"
+              >
+                <option value="+55">+55 BR</option>
+                <option value="+1">+1 US/CA</option>
+                <option value="+351">+351 PT</option>
+              </select>
+              <input
+                id="lead-whatsapp"
+                type="tel"
+                inputMode="tel"
+                value={whatsapp}
+                onChange={(e) => setWhatsapp(e.target.value)}
+                placeholder="WhatsApp"
+                className={`w-full bg-white border ${fieldErrors.whatsapp ? 'border-red-500' : 'border-gray-200'} rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm`}
+              />
+            </div>
+            {fieldErrors.whatsapp && <span className="text-[10px] text-red-500 font-bold ml-1 uppercase">{fieldErrors.whatsapp}</span>}
           </div>
 
           <div className="flex flex-col gap-1 mt-2">

@@ -215,7 +215,7 @@ async function trackLeadConversions(payload: SubmitLeadRequest, requestId: strin
             eventName: 'Lead',
             eventId: payload.event_id,
             email: payload.email,
-            phone: payload.tracking?.extras?.phone,
+            phone: payload.whatsapp,
             firstName: payload.firstName,
             lastName: payload.lastName,
             fbclid: payload.tracking?.fbclid,

@@ -70,6 +70,7 @@ test.describe('Destructive & Security Suite', () => {
     await page.locator('input[placeholder="Nome"]').fill(xssPayload);
     await page.locator('input[placeholder="Sobrenome"]').fill('Test');
     await page.locator('input[placeholder="E-mail"]').fill('test@example.com');
+    await page.locator('input[placeholder=\"WhatsApp\"]').fill('(11) 98831-4487');
     await acceptLgpd(page);
 
     await page.getByRole('button', { name: 'Salvar e abrir WhatsApp' }).click();
@@ -105,6 +106,7 @@ test.describe('Destructive & Security Suite', () => {
     await page.locator('input[placeholder="Nome"]').fill('Rage');
     await page.locator('input[placeholder="Sobrenome"]').fill('Tester');
     await page.locator('input[placeholder="E-mail"]').fill('rage@test.com');
+    await page.locator('input[placeholder=\"WhatsApp\"]').fill('(11) 98831-4487');
     await acceptLgpd(page);
 
     const submitBtn = page.getByRole('button', { name: 'Salvar e abrir WhatsApp' });
@@ -145,10 +147,18 @@ test.describe('Destructive & Security Suite', () => {
     await submitBtn.click();
     await expect(page.getByText('E-mail inválido')).toBeVisible();
 
+    // Missing WhatsApp
+    await page.locator('input[placeholder="Nome"]').fill('Valid');
+    await page.locator('input[placeholder="Sobrenome"]').fill('Name');
+    await page.locator('input[placeholder="E-mail"]').fill('test@test.com');
+    await submitBtn.click();
+    await expect(page.getByText('Campo obrigatório').first()).toBeVisible();
+
     // No LGPD
     await page.locator('input[placeholder="Nome"]').fill('Valid');
     await page.locator('input[placeholder="Sobrenome"]').fill('Name');
     await page.locator('input[placeholder="E-mail"]').fill('test@test.com');
+    await page.locator('input[placeholder=\"WhatsApp\"]').fill('(11) 98831-4487');
     await submitBtn.click();
     await expect(page.getByText('Você deve aceitar os termos')).toBeVisible();
   });
