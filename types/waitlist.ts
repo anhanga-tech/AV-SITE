@@ -11,17 +11,15 @@ export interface SubmitWaitlistRequest {
 export interface SubmitWaitlistSuccess {
     ok: true;
     requestId: string;
-    contactId: string;
     warning?: string;
     message: string;
 }
 
 export type SubmitWaitlistErrorCode =
     | 'VALIDATION_ERROR'
-    | 'HUBSPOT_UNAUTHORIZED'
-    | 'HUBSPOT_PROPERTY_ERROR'
-    | 'HUBSPOT_API_ERROR'
     | 'SERVER_CONFIG_ERROR'
+    | 'N8N_WEBHOOK_ERROR'
+    | 'INTERNAL_ERROR'
     | 'METHOD_NOT_ALLOWED'
     | 'RATE_LIMIT_EXCEEDED';
 

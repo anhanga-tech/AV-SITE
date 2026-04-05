@@ -2,19 +2,10 @@ import type { SubmitLeadRequest, SubmitLeadResponse } from '../types/leadCapture
 import { buildCorsHeaders, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
 import { cleanString, validatePayload } from '../lib/lead-logic';
-import {
-    associateDealToContact,
-    buildAdditionalContactProperties,
-    buildCoreContactProperties,
-    createDeal,
-    createFallbackNote,
-    getContactIdByEmail,
-    hubspotRequest,
-    updateContactProperties,
-    type HubSpotObjectResponse,
-} from '../services/hubspot';
+import { buildN8nLeadPayload } from '../lib/n8n-payloads';
 import { sendGoogleConversion } from '../lib/conversions/google';
 import { sendMetaConversion } from '../lib/conversions/meta';
+import { sendLeadToN8n } from '../services/n8n';
 
 export const config = {
     runtime: 'edge',
@@ -24,30 +15,11 @@ const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
 
 interface SubmitLeadConfig {
-    hubspotToken: string;
-    dealPipelineId: string;
-    dealStageId: string;
-    dealBantProperty: string;
+    webhookUrl: string;
+    webhookSecret: string;
 }
 
-interface DealCreationResult {
-    dealId?: string;
-    warning?: string;
-}
-
-interface ParsedHubSpotError {
-    status?: number;
-    detail?: string;
-    isUnauthorized: boolean;
-    isPropertyError: boolean;
-}
-
-interface FailedContactPropertyBatch {
-    properties: Record<string, string>;
-    status?: number;
-    code: 'HUBSPOT_UNAUTHORIZED' | 'HUBSPOT_PROPERTY_ERROR' | 'HUBSPOT_API_ERROR';
-    detail?: string;
-}
+type SubmitLeadInternalErrorCode = 'N8N_WEBHOOK_ERROR' | 'INTERNAL_ERROR';
 
 type LeadLogLevel = 'info' | 'warn' | 'error';
 
@@ -60,7 +32,7 @@ function createRequestId(): string {
 }
 
 function truncateDetail(detail: string): string | undefined {
-    const normalized = detail.trim();
+    const normalized = detail.replace(/[\r\n]+/g, ' ').trim();
     return normalized ? normalized.substring(0, 600) : undefined;
 }
 
@@ -92,7 +64,7 @@ function emitLeadLog(level: LeadLogLevel, requestId: string, stage: string, deta
     console.log('SUBMIT_LEAD', payload);
 }
 
-function buildErrorResponse(
+function buildJsonResponse(
     body: SubmitLeadResponse,
     status: number,
     corsHeaders: Record<string, string>,
@@ -103,65 +75,52 @@ function buildErrorResponse(
 
     return new Response(JSON.stringify(body), {
         status,
-        headers: { 'Content-Type': 'application/json', ...(requestId ? { 'X-Request-Id': requestId } : {}), ...corsHeaders },
+        headers: {
+            'Content-Type': 'application/json',
+            ...(requestId ? { 'X-Request-Id': requestId } : {}),
+            ...corsHeaders,
+        },
     });
 }
 
-function buildSuccessResponse(
-    body: SubmitLeadResponse,
-    status: number,
-    corsHeaders: Record<string, string>,
-): Response {
-    const requestId = typeof body === 'object' && body && 'requestId' in body && typeof body.requestId === 'string'
-        ? body.requestId
-        : undefined;
+function getSubmitLeadConfig(): SubmitLeadConfig | null {
+    const webhookUrl = cleanString(process.env.N8N_SUBMIT_LEAD_WEBHOOK_URL);
+    const webhookSecret = cleanString(process.env.N8N_WEBHOOK_SECRET);
 
-    return new Response(JSON.stringify(body), {
-        status,
-        headers: { 'Content-Type': 'application/json', ...(requestId ? { 'X-Request-Id': requestId } : {}), ...corsHeaders },
-    });
-}
-
-function isHubSpotPropertyStatus(status: number): boolean {
-    return status === 400 || status === 422;
-}
-
-function parseHubSpotErrorMessage(message: string): ParsedHubSpotError {
-    if (message.includes('UNAUTHORIZED')) {
-        return {
-            isUnauthorized: true,
-            isPropertyError: false,
-        };
+    if (!webhookUrl || !webhookSecret) {
+        return null;
     }
-
-    const match = message.match(/^[A-Z_]+:(\d+):(.*)$/s);
-    if (!match) {
-        return {
-            detail: truncateDetail(message),
-            isUnauthorized: false,
-            isPropertyError: false,
-        };
-    }
-
-    const status = Number(match[1]);
-    const detail = truncateDetail(match[2] || '');
 
     return {
-        status: Number.isFinite(status) ? status : undefined,
-        detail,
-        isUnauthorized: false,
-        isPropertyError: Number.isFinite(status) ? isHubSpotPropertyStatus(status) : false,
+        webhookUrl,
+        webhookSecret,
     };
 }
 
-function appendWarning(existing: string | undefined, next: string | undefined): string | undefined {
-    if (!existing) return next;
-    if (!next) return existing;
-    return `${existing} ${next}`;
-}
+export function classifySubmitLeadError(error: unknown): {
+    code: SubmitLeadInternalErrorCode;
+    status: number;
+    error: string;
+    detail?: string;
+} {
+    const message = error instanceof Error ? error.message : String(error);
+    const match = message.match(/^N8N_WEBHOOK_ERROR:(\d+):(.*)$/s);
+    if (!match) {
+        return {
+            code: 'INTERNAL_ERROR',
+            status: 500,
+            error: 'Erro interno ao processar envio do lead.',
+        };
+    }
 
-function shouldAttemptFallbackNote(parsedError: ParsedHubSpotError): boolean {
-    return !parsedError.isUnauthorized && parsedError.status !== 504;
+    const detail = truncateDetail(match[2] || '');
+
+    return {
+        code: 'N8N_WEBHOOK_ERROR',
+        status: 502,
+        error: 'Erro ao enviar lead.',
+        detail,
+    };
 }
 
 async function getRateLimitResponse(
@@ -184,7 +143,7 @@ async function getRateLimitResponse(
         retryAfterSeconds: Math.ceil(rateLimit.resetIn / 1000),
     });
 
-    return buildErrorResponse(
+    return buildJsonResponse(
         {
             ok: false,
             requestId,
@@ -201,23 +160,6 @@ async function getRateLimitResponse(
     );
 }
 
-function getSubmitLeadConfig(): SubmitLeadConfig | null {
-    const hubspotToken = process.env.HUBSPOT_TOKEN;
-    const dealPipelineId = cleanString(process.env.HUBSPOT_DEAL_PIPELINE_ID);
-    const dealStageId = cleanString(process.env.HUBSPOT_DEAL_STAGE_ID);
-
-    if (!hubspotToken || !dealPipelineId || !dealStageId) {
-        return null;
-    }
-
-    return {
-        hubspotToken,
-        dealPipelineId,
-        dealStageId,
-        dealBantProperty: cleanString(process.env.HUBSPOT_DEAL_BANT_PROPERTY) || 'bant_summary',
-    };
-}
-
 async function parseRequestBody(
     request: Request,
     corsHeaders: Record<string, string>,
@@ -226,7 +168,7 @@ async function parseRequestBody(
     try {
         return await request.json();
     } catch {
-        return buildErrorResponse(
+        return buildJsonResponse(
             {
                 ok: false,
                 requestId,
@@ -246,7 +188,7 @@ function validateRequestPayload(
 ): SubmitLeadRequest | Response {
     const validation = validatePayload(rawBody);
     if (validation.valid === false) {
-        return buildErrorResponse(
+        return buildJsonResponse(
             {
                 ok: false,
                 requestId,
@@ -259,392 +201,6 @@ function validateRequestPayload(
     }
 
     return validation.data;
-}
-
-async function recoverDuplicateContact(
-    hubspotToken: string,
-    email: string,
-    coreContactProperties: Record<string, string>,
-): Promise<string> {
-    const existingContactId = await getContactIdByEmail(hubspotToken, email);
-    if (!existingContactId) {
-        throw new Error('CONTACT_SEARCH_FAILED:404:Contact ID not found for existing email');
-    }
-
-    await updateContactProperties(hubspotToken, existingContactId, coreContactProperties);
-    return existingContactId;
-}
-
-async function createOrUpdateContact(
-    hubspotToken: string,
-    payload: { email: string },
-    coreContactProperties: Record<string, string>,
-    corsHeaders: Record<string, string>,
-    requestId: string,
-): Promise<string | Response> {
-    emitLeadLog('info', requestId, 'contact_create_or_update', {
-        email: maskEmail(payload.email),
-        propertyCount: Object.keys(coreContactProperties).length,
-    });
-
-    const createContactResponse = await hubspotRequest(hubspotToken, '/crm/v3/objects/contacts', {
-        method: 'POST',
-        body: JSON.stringify({ properties: coreContactProperties }),
-    });
-
-    if (createContactResponse.status === 401 || createContactResponse.status === 403) {
-        emitLeadLog('error', requestId, 'contact_create_or_update_failed', {
-            code: 'HUBSPOT_UNAUTHORIZED',
-            status: createContactResponse.status,
-        });
-
-        return buildErrorResponse(
-            {
-                ok: false,
-                requestId,
-                code: 'HUBSPOT_UNAUTHORIZED',
-                error: 'Erro de integração com o CRM',
-            },
-            createContactResponse.status,
-            corsHeaders,
-        );
-    }
-
-    if (createContactResponse.status === 409) {
-        emitLeadLog('warn', requestId, 'contact_duplicate_detected', {
-            email: maskEmail(payload.email),
-        });
-
-        try {
-            const existingContactId = await recoverDuplicateContact(hubspotToken, payload.email, coreContactProperties);
-
-            emitLeadLog('info', requestId, 'contact_create_or_update_success', {
-                mode: 'updated_existing',
-                contactId: existingContactId,
-            });
-
-            return existingContactId;
-        } catch (error: unknown) {
-            const message = error instanceof Error ? error.message : 'Unknown recovery error';
-            const parsedError = parseHubSpotErrorMessage(message);
-            const errorCode = parsedError.isUnauthorized
-                ? 'HUBSPOT_UNAUTHORIZED'
-                : parsedError.isPropertyError
-                    ? 'HUBSPOT_PROPERTY_ERROR'
-                    : 'HUBSPOT_API_ERROR';
-
-            emitLeadLog('error', requestId, 'contact_create_or_update_failed', {
-                phase: 'duplicate_recovery',
-                code: errorCode,
-                status: parsedError.status,
-                detail: parsedError.detail,
-            });
-
-            if (parsedError.isUnauthorized) {
-                return buildErrorResponse(
-                    {
-                        ok: false,
-                        requestId,
-                        code: 'HUBSPOT_UNAUTHORIZED',
-                        error: 'Erro de integração com o CRM',
-                    },
-                    401,
-                    corsHeaders,
-                );
-            }
-
-            if (parsedError.isPropertyError) {
-                return buildErrorResponse(
-                    {
-                        ok: false,
-                        requestId,
-                        code: 'HUBSPOT_PROPERTY_ERROR',
-                        error: 'Erro de integração com o CRM: propriedades do contato inválidas ou não configuradas.',
-                    },
-                    502,
-                    corsHeaders,
-                );
-            }
-
-            return buildErrorResponse(
-                {
-                    ok: false,
-                    requestId,
-                    code: 'HUBSPOT_API_ERROR',
-                    error: 'Erro ao processar contato',
-                },
-                502,
-                corsHeaders,
-            );
-        }
-    }
-
-    if (!createContactResponse.ok) {
-        const hubspotErrorText = await createContactResponse.text().catch(() => '');
-        const errorCode = isHubSpotPropertyStatus(createContactResponse.status)
-            ? 'HUBSPOT_PROPERTY_ERROR'
-            : 'HUBSPOT_API_ERROR';
-
-        emitLeadLog('error', requestId, 'contact_create_or_update_failed', {
-            code: errorCode,
-            status: createContactResponse.status,
-            detail: truncateDetail(hubspotErrorText),
-        });
-
-        return buildErrorResponse(
-            {
-                ok: false,
-                requestId,
-                code: errorCode,
-                error: errorCode === 'HUBSPOT_PROPERTY_ERROR'
-                    ? 'Erro de integração com o CRM: propriedades do contato inválidas ou não configuradas.'
-                    : 'Erro de integração com o CRM',
-            },
-            502,
-            corsHeaders,
-        );
-    }
-
-    const hubspotData = (await createContactResponse.json().catch(() => ({}))) as HubSpotObjectResponse;
-    const contactId = cleanString(hubspotData.id);
-    if (!contactId) {
-        emitLeadLog('error', requestId, 'contact_create_or_update_failed', {
-            code: 'HUBSPOT_API_ERROR',
-            detail: 'missing_contact_id',
-        });
-
-        return buildErrorResponse(
-            {
-                ok: false,
-                requestId,
-                code: 'HUBSPOT_API_ERROR',
-                error: 'Erro de integração com o CRM',
-            },
-            502,
-            corsHeaders,
-        );
-    }
-
-    emitLeadLog('info', requestId, 'contact_create_or_update_success', {
-        mode: 'created',
-        contactId,
-    });
-
-    return contactId;
-}
-
-async function syncAdditionalContactProperties(
-    hubspotToken: string,
-    contactId: string,
-    additionalProperties: Record<string, string>,
-    payload: {
-        firstName: string;
-        lastName: string;
-        email: string;
-        bantSummary: string;
-    },
-    requestId: string,
-): Promise<string | undefined> {
-    const propertyEntries = Object.entries(additionalProperties);
-    if (propertyEntries.length === 0) {
-        return undefined;
-    }
-
-    emitLeadLog('info', requestId, 'contact_enrichment_start', {
-        contactId,
-        propertyCount: propertyEntries.length,
-    });
-
-    try {
-        await updateContactProperties(hubspotToken, contactId, additionalProperties);
-        emitLeadLog('info', requestId, 'contact_enrichment_success', {
-            contactId,
-            propertyCount: propertyEntries.length,
-        });
-        return undefined;
-    } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : 'Unknown property sync error';
-        const parsedError = parseHubSpotErrorMessage(message);
-        const failedBatch: FailedContactPropertyBatch = {
-            properties: additionalProperties,
-            status: parsedError.status,
-            code: parsedError.isUnauthorized
-                ? 'HUBSPOT_UNAUTHORIZED'
-                : parsedError.isPropertyError
-                    ? 'HUBSPOT_PROPERTY_ERROR'
-                    : 'HUBSPOT_API_ERROR',
-            detail: parsedError.detail,
-        };
-
-        emitLeadLog(parsedError.isPropertyError ? 'warn' : 'error', requestId, 'contact_enrichment_failed', {
-            contactId,
-            propertyCount: propertyEntries.length,
-            code: failedBatch.code,
-            status: parsedError.status,
-            detail: parsedError.detail,
-        });
-
-        const warningBase = 'Contato salvo, mas alguns dados de rastreamento/UTM não puderam ser gravados automaticamente no HubSpot.';
-        const warningContext = [
-            `Contato HubSpot: ${contactId}`,
-            `Falha do enrichment: batch [${failedBatch.code}${failedBatch.status ? ` ${failedBatch.status}` : ''}]`,
-            `Payload não persistido: ${JSON.stringify(failedBatch.properties)}`,
-        ];
-
-        if (!shouldAttemptFallbackNote(parsedError)) {
-            emitLeadLog('warn', requestId, 'fallback_note_skipped', {
-                contactId,
-                phase: 'contact_enrichment',
-                code: failedBatch.code,
-                status: failedBatch.status,
-            });
-            return warningBase;
-        }
-
-        return await createFallbackNoteForLead(
-            hubspotToken,
-            contactId,
-            payload,
-            warningBase,
-            requestId,
-            warningContext,
-        );
-    }
-}
-
-function buildDealProperties(
-    payload: {
-        firstName: string;
-        lastName: string;
-        destination: string;
-        bantSummary: string;
-    },
-    config: SubmitLeadConfig,
-): Record<string, string> {
-    const rawDealName = `Lead chatbot - ${payload.firstName} ${payload.lastName} - ${payload.destination}`;
-
-    return {
-        dealname: rawDealName.length > 255 ? `${rawDealName.substring(0, 252)}...` : rawDealName,
-        pipeline: config.dealPipelineId,
-        dealstage: config.dealStageId,
-        [config.dealBantProperty]: payload.bantSummary,
-    };
-}
-
-async function createFallbackNoteForLead(
-    hubspotToken: string,
-    contactId: string,
-    payload: {
-        firstName: string;
-        lastName: string;
-        email: string;
-        bantSummary: string;
-    },
-    baseWarning: string,
-    requestId: string,
-    extraContext: string[] = [],
-): Promise<string> {
-    try {
-        const noteBody = [
-            'Fallback automático do chatbot:',
-            baseWarning,
-            `Lead: ${payload.firstName} ${payload.lastName} <${payload.email}>`,
-            `BANT: ${payload.bantSummary}`,
-            ...extraContext,
-        ].join('\n');
-
-        await createFallbackNote(hubspotToken, contactId, noteBody);
-        return `${baseWarning} Uma nota foi registrada no contato para acompanhamento manual.`;
-    } catch (noteError: unknown) {
-        emitLeadLog('error', requestId, 'fallback_note_failed', {
-            contactId,
-            detail: truncateDetail(noteError instanceof Error ? noteError.message : String(noteError)),
-        });
-
-        return baseWarning;
-    }
-}
-
-async function createDealForLead(
-    hubspotToken: string,
-    contactId: string,
-    payload: {
-        firstName: string;
-        lastName: string;
-        email: string;
-        destination: string;
-        bantSummary: string;
-    },
-    config: SubmitLeadConfig,
-    corsHeaders: Record<string, string>,
-    requestId: string,
-): Promise<DealCreationResult | Response> {
-    emitLeadLog('info', requestId, 'deal_create', {
-        contactId,
-        destination: payload.destination,
-    });
-
-    try {
-        const dealId = await createDeal(hubspotToken, buildDealProperties(payload, config));
-        await associateDealToContact(hubspotToken, dealId, contactId);
-
-        emitLeadLog('info', requestId, 'deal_associate', {
-            contactId,
-            dealId,
-        });
-
-        return { dealId };
-    } catch (dealError: unknown) {
-        const message = dealError instanceof Error ? dealError.message : 'Unknown deal error';
-        const parsedError = parseHubSpotErrorMessage(message);
-
-        emitLeadLog(parsedError.isPropertyError ? 'warn' : 'error', requestId, 'deal_create_failed', {
-            contactId,
-            code: parsedError.isUnauthorized
-                ? 'HUBSPOT_UNAUTHORIZED'
-                : parsedError.isPropertyError
-                    ? 'HUBSPOT_PROPERTY_ERROR'
-                    : 'HUBSPOT_API_ERROR',
-            status: parsedError.status,
-            detail: parsedError.detail,
-        });
-
-        if (parsedError.isUnauthorized) {
-            return buildErrorResponse(
-                {
-                    ok: false,
-                    requestId,
-                    code: 'HUBSPOT_UNAUTHORIZED',
-                    error: 'Erro de integração com o CRM',
-                },
-                401,
-                corsHeaders,
-            );
-        }
-
-        const warningBase = parsedError.isPropertyError
-            ? 'Contato salvo, mas o deal não foi criado automaticamente por erro de propriedade no HubSpot.'
-            : 'Contato salvo, mas não foi possível criar ou associar o deal automaticamente.';
-        if (!shouldAttemptFallbackNote(parsedError)) {
-            emitLeadLog('warn', requestId, 'fallback_note_skipped', {
-                contactId,
-                phase: 'deal_create',
-                status: parsedError.status,
-                detail: parsedError.detail,
-            });
-            return { warning: warningBase };
-        }
-
-        const warning = await createFallbackNoteForLead(
-            hubspotToken,
-            contactId,
-            payload,
-            warningBase,
-            requestId,
-        );
-
-        return { warning };
-    }
 }
 
 async function trackLeadConversions(payload: SubmitLeadRequest, requestId: string): Promise<void> {
@@ -688,11 +244,8 @@ export default async function handler(request: Request): Promise<Response> {
             return new Response(null, { status: 204, headers: corsHeaders });
         }
 
-        const rateLimitResponse = await getRateLimitResponse(request, corsHeaders, requestId);
-        if (rateLimitResponse) return rateLimitResponse;
-
         if (request.method !== 'POST') {
-            return buildErrorResponse(
+            return buildJsonResponse(
                 {
                     ok: false,
                     requestId,
@@ -708,17 +261,16 @@ export default async function handler(request: Request): Promise<Response> {
         if (!config) {
             emitLeadLog('error', requestId, 'config', {
                 code: 'SERVER_CONFIG_ERROR',
-                hasHubSpotToken: Boolean(process.env.HUBSPOT_TOKEN),
-                hasPipelineId: Boolean(cleanString(process.env.HUBSPOT_DEAL_PIPELINE_ID)),
-                hasDealStageId: Boolean(cleanString(process.env.HUBSPOT_DEAL_STAGE_ID)),
+                hasWebhookUrl: Boolean(cleanString(process.env.N8N_SUBMIT_LEAD_WEBHOOK_URL)),
+                hasWebhookSecret: Boolean(cleanString(process.env.N8N_WEBHOOK_SECRET)),
             });
 
-            return buildErrorResponse(
+            return buildJsonResponse(
                 {
                     ok: false,
                     requestId,
                     code: 'SERVER_CONFIG_ERROR',
-                    error: 'Erro de configuração do servidor',
+                    error: 'Integração de lead indisponível no momento.',
                 },
                 500,
                 corsHeaders,
@@ -746,47 +298,22 @@ export default async function handler(request: Request): Promise<Response> {
             ),
         });
 
-        const coreContactProperties = buildCoreContactProperties(payload);
-        const contactId = await createOrUpdateContact(
-            config.hubspotToken,
-            payload,
-            coreContactProperties,
-            corsHeaders,
+        const rateLimitResponse = await getRateLimitResponse(request, corsHeaders, requestId);
+        if (rateLimitResponse) return rateLimitResponse;
+
+        await sendLeadToN8n(
+            config.webhookUrl,
+            config.webhookSecret,
             requestId,
+            buildN8nLeadPayload(payload, requestId),
         );
-        if (contactId instanceof Response) return contactId;
 
-        const additionalContactProperties = buildAdditionalContactProperties(payload);
-        const [contactWarning, dealResult] = await Promise.all([
-            syncAdditionalContactProperties(
-                config.hubspotToken,
-                contactId,
-                additionalContactProperties,
-                payload,
-                requestId,
-            ),
-            createDealForLead(
-                config.hubspotToken,
-                contactId,
-                payload,
-                config,
-                corsHeaders,
-                requestId,
-            ),
-        ]);
-        if (dealResult instanceof Response) return dealResult;
-
-        const response = buildSuccessResponse(
+        const response = buildJsonResponse(
             {
                 ok: true,
                 requestId,
-                contactId,
-                dealId: dealResult.dealId,
-                warning: appendWarning(contactWarning, dealResult.warning),
-                message: dealResult.dealId
-                    ? 'Contato e deal criados com sucesso no HubSpot.'
-                    : 'Contato criado com sucesso no HubSpot.',
-            } satisfies SubmitLeadResponse,
+                message: 'Enviado com sucesso',
+            },
             201,
             corsHeaders,
         );
@@ -799,21 +326,23 @@ export default async function handler(request: Request): Promise<Response> {
 
         return response;
     } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : 'Unknown error';
+        const classified = classifySubmitLeadError(error);
 
-        emitLeadLog('error', requestId, 'unexpected', {
-            code: 'HUBSPOT_API_ERROR',
-            detail: truncateDetail(message),
+        emitLeadLog('error', requestId, classified.code === 'N8N_WEBHOOK_ERROR' ? 'n8n_webhook_failed' : 'unexpected', {
+            code: classified.code,
+            status: classified.status,
+            errorType: error instanceof Error ? error.name : typeof error,
+            detail: classified.detail,
         });
 
-        return buildErrorResponse(
+        return buildJsonResponse(
             {
                 ok: false,
                 requestId,
-                code: 'HUBSPOT_API_ERROR',
-                error: 'Erro interno ao processar envio do lead.',
+                code: classified.code,
+                error: classified.error,
             },
-            500,
+            classified.status,
             corsHeaders,
         );
     }

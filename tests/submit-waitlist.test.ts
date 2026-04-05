@@ -1,14 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import handler from '../api/submit-waitlist.ts';
+import handler, { classifySubmitWaitlistError } from '../api/submit-waitlist.ts';
 
 const originalFetch = global.fetch;
 const originalEnv = {
     ALLOWED_ORIGIN: process.env.ALLOWED_ORIGIN,
-    HUBSPOT_TOKEN: process.env.HUBSPOT_TOKEN,
-    HUBSPOT_LOLLAPALOOZA_LIST_ID: process.env.HUBSPOT_LOLLAPALOOZA_LIST_ID,
-    HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY: process.env.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY,
-    HUBSPOT_REQUEST_TIMEOUT_MS: process.env.HUBSPOT_REQUEST_TIMEOUT_MS,
+    UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
+    UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
+    N8N_SUBMIT_WAITLIST_WEBHOOK_URL: process.env.N8N_SUBMIT_WAITLIST_WEBHOOK_URL,
+    N8N_WEBHOOK_SECRET: process.env.N8N_WEBHOOK_SECRET,
+    N8N_WEBHOOK_TIMEOUT_MS: process.env.N8N_WEBHOOK_TIMEOUT_MS,
 };
 
 function restoreEnvValue(key: string, value: string | undefined) {
@@ -22,13 +23,17 @@ function restoreEnvValue(key: string, value: string | undefined) {
 
 function restoreEnv() {
     restoreEnvValue('ALLOWED_ORIGIN', originalEnv.ALLOWED_ORIGIN);
-    restoreEnvValue('HUBSPOT_TOKEN', originalEnv.HUBSPOT_TOKEN);
-    restoreEnvValue('HUBSPOT_LOLLAPALOOZA_LIST_ID', originalEnv.HUBSPOT_LOLLAPALOOZA_LIST_ID);
-    restoreEnvValue('HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY', originalEnv.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY);
-    restoreEnvValue('HUBSPOT_REQUEST_TIMEOUT_MS', originalEnv.HUBSPOT_REQUEST_TIMEOUT_MS);
+    restoreEnvValue('UPSTASH_REDIS_REST_URL', originalEnv.UPSTASH_REDIS_REST_URL);
+    restoreEnvValue('UPSTASH_REDIS_REST_TOKEN', originalEnv.UPSTASH_REDIS_REST_TOKEN);
+    restoreEnvValue('N8N_SUBMIT_WAITLIST_WEBHOOK_URL', originalEnv.N8N_SUBMIT_WAITLIST_WEBHOOK_URL);
+    restoreEnvValue('N8N_WEBHOOK_SECRET', originalEnv.N8N_WEBHOOK_SECRET);
+    restoreEnvValue('N8N_WEBHOOK_TIMEOUT_MS', originalEnv.N8N_WEBHOOK_TIMEOUT_MS);
 }
 
-function buildRequest(body: Record<string, unknown>, init?: { headers?: Record<string, string>; method?: string }): Request {
+function buildRequest(
+    body: Record<string, unknown> | string,
+    init?: { headers?: Record<string, string>; method?: string },
+): Request {
     const ipSuffix = Math.floor(Math.random() * 200) + 1;
     const method = init?.method || 'POST';
 
@@ -39,7 +44,11 @@ function buildRequest(body: Record<string, unknown>, init?: { headers?: Record<s
             'x-real-ip': `127.0.0.${ipSuffix}`,
             ...init?.headers,
         },
-        body: method === 'OPTIONS' ? undefined : JSON.stringify(body),
+        body: method === 'OPTIONS'
+            ? undefined
+            : typeof body === 'string'
+                ? body
+                : JSON.stringify(body),
     });
 }
 
@@ -49,408 +58,253 @@ function getUrl(input: RequestInfo | URL): string {
     return input.url;
 }
 
-function requestTargetsHost(rawUrl: string, host: string): boolean {
-    try {
-        return new URL(rawUrl).hostname === host;
-    } catch {
-        return false;
-    }
-}
-
-interface MockHubSpotRequestBody {
-    properties?: Record<string, unknown>;
-    filterGroups?: Array<Record<string, unknown>>;
-}
-
-interface MockHubSpotRequest {
+interface MockN8nRequest {
     url: string;
     method: string;
-    body?: MockHubSpotRequestBody;
+    headers: Record<string, string>;
+    body?: Record<string, unknown>;
 }
 
-interface MockHubSpotRoute {
-    matches: (request: MockHubSpotRequest) => boolean;
-    respond: (request: MockHubSpotRequest) => Response | Promise<Response>;
-}
+function buildMockN8nRequest(input: RequestInfo | URL, init?: RequestInit): MockN8nRequest {
+    const headers = new Headers(init?.headers);
 
-function buildMockHubSpotRequest(input: RequestInfo | URL, init?: RequestInit): MockHubSpotRequest {
     return {
         url: getUrl(input),
         method: init?.method || 'GET',
-        body: init?.body ? JSON.parse(String(init.body)) as MockHubSpotRequestBody : undefined,
+        headers: Object.fromEntries(headers.entries()),
+        body: init?.body ? JSON.parse(String(init.body)) as Record<string, unknown> : undefined,
     };
 }
 
-function createMockHubSpotFetch(calls: MockHubSpotRequest[], routes: MockHubSpotRoute[]): typeof fetch {
+function createMockN8nFetch(
+    calls: MockN8nRequest[],
+    response: Response | ((request: MockN8nRequest) => Response | Promise<Response>),
+): typeof fetch {
     return (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-        const request = buildMockHubSpotRequest(input, init);
+        const request = buildMockN8nRequest(input, init);
         calls.push(request);
 
-        for (const route of routes) {
-            if (route.matches(request)) {
-                return await route.respond(request);
-            }
+        if (typeof response === 'function') {
+            return await response(request);
         }
 
-        throw new Error(`Unexpected request: ${request.method} ${request.url}`);
+        return response;
     }) as typeof fetch;
 }
 
-function collectContactPatchProperties(calls: MockHubSpotRequest[], contactId: string): Record<string, unknown> {
-    const patches = calls.filter((call) => call.url.endsWith(`/crm/v3/objects/contacts/${contactId}`) && call.method === 'PATCH');
-    return Object.assign({}, ...patches.map((call) => call.body?.properties || {}));
-}
-
-function collectListMembershipBodies(calls: MockHubSpotRequest[], listId: string): unknown[] {
-    return calls
-        .filter((call) => call.method === 'PUT' && call.url.endsWith(`/crm/v3/lists/${listId}/memberships/add`))
-        .map((call) => call.body);
-}
-
-test('submit-waitlist should reject invalid payloads', async () => {
-    restoreEnv();
-    delete process.env.HUBSPOT_TOKEN;
-
-    const response = await handler(buildRequest({
-        name: '',
-        email: 'felipe@example.com',
-        sourcePage: '/lollapalooza',
-        utms: {},
-        tracking: {},
-    }));
-
-    assert.equal(response.status, 400);
-
-    const payload = await response.json() as { ok: boolean; code?: string };
-    assert.equal(payload.ok, false);
-    assert.equal(payload.code, 'VALIDATION_ERROR');
-});
-
-test('submit-waitlist should use configured allowed origin for POST responses', async () => {
-    restoreEnv();
-    process.env.ALLOWED_ORIGIN = 'https://preview.anhanga.tur.br';
-    delete process.env.HUBSPOT_TOKEN;
-
-    const response = await handler(buildRequest({
-        name: '',
-        email: 'felipe@example.com',
-        sourcePage: '/lollapalooza',
-        utms: {},
-        tracking: {},
-    }, {
-        headers: {
-            origin: 'https://evil.example',
-        },
-    }));
-
-    assert.equal(response.status, 400);
-    assert.equal(response.headers.get('Access-Control-Allow-Origin'), 'https://preview.anhanga.tur.br');
-});
-
-test('submit-waitlist should use configured allowed origin for OPTIONS preflight', async () => {
-    restoreEnv();
-    process.env.ALLOWED_ORIGIN = 'https://preview.anhanga.tur.br';
-
-    const response = await handler(buildRequest({}, {
-        method: 'OPTIONS',
-        headers: {
-            origin: 'https://evil.example',
-        },
-    }));
-
-    assert.equal(response.status, 204);
-    assert.equal(response.headers.get('Access-Control-Allow-Origin'), 'https://preview.anhanga.tur.br');
-    assert.equal(response.headers.get('Access-Control-Allow-Methods'), 'POST, OPTIONS');
-});
-
-test('submit-waitlist should create contact, sync tracking, create note, and avoid deals', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
-
-    process.env.HUBSPOT_TOKEN = 'hubspot-token';
-    process.env.HUBSPOT_LOLLAPALOOZA_LIST_ID = 'list_lolla_2027';
-    process.env.HUBSPOT_CONTACT_TRACKING_FALLBACK_PROPERTY = 'tracking_payload';
-
-    const calls: MockHubSpotRequest[] = [];
-    global.fetch = createMockHubSpotFetch(calls, [
-        {
-            matches: (request) => request.method === 'POST' && request.url.endsWith('/crm/v3/objects/contacts'),
-            respond: async () => new Response(JSON.stringify({ id: 'contact_waitlist_123' }), { status: 201 }),
-        },
-        {
-            matches: (request) => request.method === 'PATCH' && request.url.endsWith('/crm/v3/objects/contacts/contact_waitlist_123'),
-            respond: async () => new Response(JSON.stringify({ id: 'contact_waitlist_123' }), { status: 200 }),
-        },
-        {
-            matches: (request) => request.method === 'POST' && request.url.endsWith('/crm/v3/objects/notes'),
-            respond: async () => new Response(JSON.stringify({ id: 'note_waitlist_123' }), { status: 201 }),
-        },
-        {
-            matches: (request) => request.method === 'PUT' && request.url.endsWith('/crm/v4/objects/notes/note_waitlist_123/associations/default/contacts/contact_waitlist_123'),
-            respond: async () => new Response(JSON.stringify({ ok: true }), { status: 200 }),
-        },
-        {
-            matches: (request) => request.method === 'PUT' && request.url.endsWith('/crm/v3/lists/list_lolla_2027/memberships/add'),
-            respond: async () => new Response(JSON.stringify({ recordsAdded: 1 }), { status: 200 }),
-        },
-    ]);
-
-    const response = await handler(buildRequest({
-        name: 'Felipe William',
-        email: 'felipe@example.com',
-        sourcePage: '/lollapalooza',
+function buildDirtyWaitlistPayload() {
+    return {
+        name: '  Ana <Maria>  ',
+        email: '  ANA@example.com  ',
+        sourcePage: ' /lollapalooza?slot=<hero> ',
         utms: {
-            utm_source: 'google',
-            utm_medium: 'cpc',
-            utm_campaign: 'lolla_waitlist',
-            utm_term: null,
-            utm_content: null,
+            utm_source: ' google ',
+            utm_medium: ' cpc ',
+            utm_campaign: ' lolla <2027> ',
+            utm_term: '   ',
+            utm_content: ' hero ad ',
         },
         tracking: {
-            utm_source: 'google',
-            utm_medium: 'cpc',
-            utm_campaign: 'lolla_waitlist',
-            utm_term: null,
-            utm_content: null,
-            gclid: 'test-gclid',
+            fbclid: ' fbclid-123 ',
             extras: {
-                ref: 'hero_cta',
+                ref: ' hero <cta> ',
+                campaign_note: ' hurry > now ',
             },
+            custom_source: ' direct ',
         },
-    }));
-
-    assert.equal(response.status, 201);
-
-    const payload = await response.json() as { ok: boolean; contactId?: string; message?: string };
-    assert.equal(payload.ok, true);
-    assert.equal(payload.contactId, 'contact_waitlist_123');
-    assert.match(payload.message || '', /lista de espera/i);
-
-    const createContactCall = calls.find((call) => call.url.endsWith('/crm/v3/objects/contacts') && call.method === 'POST');
-    assert.deepEqual(createContactCall?.body?.properties, {
-        firstname: 'Felipe',
-        lastname: 'William',
-        email: 'felipe@example.com',
-    });
-
-    const contactProperties = collectContactPatchProperties(calls, 'contact_waitlist_123');
-    assert.equal(contactProperties.ultimo_utm_source, 'google');
-    assert.equal(contactProperties.ultimo_utm_medium, 'cpc');
-    assert.equal(contactProperties.ultimo_utm_campaign, 'lolla_waitlist');
-    assert.equal(contactProperties.hs_google_click_id, 'test-gclid');
-    assert.equal(contactProperties.tracking_payload, JSON.stringify({ ref: 'hero_cta' }));
-
-    const noteCall = calls.find((call) => call.url.endsWith('/crm/v3/objects/notes') && call.method === 'POST');
-    assert.match(String(noteCall?.body?.properties?.hs_note_body || ''), /Lista de Espera Lollapalooza 2027/);
-    assert.match(String(noteCall?.body?.properties?.hs_note_body || ''), /\/lollapalooza/);
-    assert.deepEqual(collectListMembershipBodies(calls, 'list_lolla_2027'), [['contact_waitlist_123']]);
-
-    assert.equal(calls.some((call) => call.url.includes('/crm/v3/objects/deals')), false);
-    assert.equal(calls.some((call) => requestTargetsHost(call.url, 'www.google-analytics.com')), false);
-    assert.equal(calls.some((call) => requestTargetsHost(call.url, 'graph.facebook.com')), false);
-});
-
-test('submit-waitlist should update an existing contact when HubSpot returns duplicate email', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
-
-    process.env.HUBSPOT_TOKEN = 'hubspot-token';
-    process.env.HUBSPOT_LOLLAPALOOZA_LIST_ID = 'list_lolla_2027';
-
-    const calls: MockHubSpotRequest[] = [];
-    global.fetch = createMockHubSpotFetch(calls, [
-        {
-            matches: (request) => request.method === 'POST' && request.url.endsWith('/crm/v3/objects/contacts'),
-            respond: async () => new Response(JSON.stringify({ message: 'duplicate' }), { status: 409 }),
-        },
-        {
-            matches: (request) => request.method === 'POST' && request.url.endsWith('/crm/v3/objects/contacts/search'),
-            respond: async () => new Response(JSON.stringify({ results: [{ id: 'contact_existing_456' }] }), { status: 200 }),
-        },
-        {
-            matches: (request) => request.method === 'PATCH' && request.url.endsWith('/crm/v3/objects/contacts/contact_existing_456'),
-            respond: async () => new Response(JSON.stringify({ id: 'contact_existing_456' }), { status: 200 }),
-        },
-        {
-            matches: (request) => request.method === 'POST' && request.url.endsWith('/crm/v3/objects/notes'),
-            respond: async () => new Response(JSON.stringify({ id: 'note_waitlist_456' }), { status: 201 }),
-        },
-        {
-            matches: (request) => request.method === 'PUT' && request.url.endsWith('/crm/v4/objects/notes/note_waitlist_456/associations/default/contacts/contact_existing_456'),
-            respond: async () => new Response(JSON.stringify({ ok: true }), { status: 200 }),
-        },
-        {
-            matches: (request) => request.method === 'PUT' && request.url.endsWith('/crm/v3/lists/list_lolla_2027/memberships/add'),
-            respond: async () => new Response(JSON.stringify({ recordsAdded: 1 }), { status: 200 }),
-        },
-    ]);
-
-    const response = await handler(buildRequest({
-        name: 'Felipe',
-        email: 'felipe@example.com',
-        sourcePage: '/lollapalooza',
-        utms: {},
-        tracking: {},
-    }));
-
-    assert.equal(response.status, 201);
-
-    const payload = await response.json() as { ok: boolean; contactId?: string };
-    assert.equal(payload.ok, true);
-    assert.equal(payload.contactId, 'contact_existing_456');
-
-    const patchCalls = calls.filter((call) => call.url.endsWith('/crm/v3/objects/contacts/contact_existing_456') && call.method === 'PATCH');
-    assert.equal(patchCalls.length >= 1, true);
-    assert.equal(calls.some((call) => call.url.endsWith('/crm/v3/objects/contacts/search')), true);
-    assert.deepEqual(collectListMembershipBodies(calls, 'list_lolla_2027'), [['contact_existing_456']]);
-});
-
-test('submit-waitlist should still succeed without a configured HubSpot list id', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
-
-    const originalConsoleInfo = console.info;
-    const infoCalls: unknown[][] = [];
-    console.info = (...args: unknown[]) => {
-        infoCalls.push(args);
     };
-    t.after(() => {
-        console.info = originalConsoleInfo;
-    });
+}
 
-    process.env.HUBSPOT_TOKEN = 'hubspot-token';
-    delete process.env.HUBSPOT_LOLLAPALOOZA_LIST_ID;
-
-    const calls: MockHubSpotRequest[] = [];
-    global.fetch = createMockHubSpotFetch(calls, [
-        {
-            matches: (request) => request.method === 'POST' && request.url.endsWith('/crm/v3/objects/contacts'),
-            respond: async () => new Response(JSON.stringify({ id: 'contact_waitlist_789' }), { status: 201 }),
-        },
-        {
-            matches: (request) => request.method === 'POST' && request.url.endsWith('/crm/v3/objects/notes'),
-            respond: async () => new Response(JSON.stringify({ id: 'note_waitlist_789' }), { status: 201 }),
-        },
-        {
-            matches: (request) => request.method === 'PUT' && request.url.endsWith('/crm/v4/objects/notes/note_waitlist_789/associations/default/contacts/contact_waitlist_789'),
-            respond: async () => new Response(JSON.stringify({ ok: true }), { status: 200 }),
-        },
-    ]);
-
-    const response = await handler(buildRequest({
-        name: 'Felipe William',
-        email: 'felipe@example.com',
-        sourcePage: '/lollapalooza',
-        utms: {},
-        tracking: {},
-    }));
-
-    assert.equal(response.status, 201);
-
-    const payload = await response.json() as { ok: boolean; contactId?: string; warning?: string };
-    assert.equal(payload.ok, true);
-    assert.equal(payload.contactId, 'contact_waitlist_789');
-    assert.equal(payload.warning, undefined);
-    assert.equal(calls.some((call) => call.url.includes('/crm/v3/lists/')), false);
-    assert.equal(infoCalls.some((args) => args.some((value) => String(value).includes('waitlist list id is not configured'))), true);
-});
-
-test('submit-waitlist should keep success response when list membership fails', async (t) => {
+test('submit-waitlist should return SERVER_CONFIG_ERROR before parsing malformed JSON when config is missing', async (t) => {
     t.after(() => {
         global.fetch = originalFetch;
         restoreEnv();
     });
 
-    const originalConsoleError = console.error;
-    const errorCalls: unknown[][] = [];
-    console.error = (...args: unknown[]) => {
-        errorCalls.push(args);
-    };
-    t.after(() => {
-        console.error = originalConsoleError;
-    });
+    delete process.env.N8N_SUBMIT_WAITLIST_WEBHOOK_URL;
+    delete process.env.N8N_WEBHOOK_SECRET;
 
-    process.env.HUBSPOT_TOKEN = 'hubspot-token';
-    process.env.HUBSPOT_LOLLAPALOOZA_LIST_ID = 'list_lolla_2027';
+    let fetchCalled = false;
+    global.fetch = (async () => {
+        fetchCalled = true;
+        throw new Error('fetch should not run when config is missing');
+    }) as typeof fetch;
 
-    const calls: MockHubSpotRequest[] = [];
-    global.fetch = createMockHubSpotFetch(calls, [
-        {
-            matches: (request) => request.method === 'POST' && request.url.endsWith('/crm/v3/objects/contacts'),
-            respond: async () => new Response(JSON.stringify({ id: 'contact_waitlist_999' }), { status: 201 }),
-        },
-        {
-            matches: (request) => request.method === 'POST' && request.url.endsWith('/crm/v3/objects/notes'),
-            respond: async () => new Response(JSON.stringify({ id: 'note_waitlist_999' }), { status: 201 }),
-        },
-        {
-            matches: (request) => request.method === 'PUT' && request.url.endsWith('/crm/v4/objects/notes/note_waitlist_999/associations/default/contacts/contact_waitlist_999'),
-            respond: async () => new Response(JSON.stringify({ ok: true }), { status: 200 }),
-        },
-        {
-            matches: (request) => request.method === 'PUT' && request.url.endsWith('/crm/v3/lists/list_lolla_2027/memberships/add'),
-            respond: async () => new Response(JSON.stringify({ message: 'list unavailable' }), { status: 500 }),
-        },
-    ]);
+    const response = await handler(buildRequest('{"name":"broken"', { method: 'POST' }));
+    const payload = await response.json() as { ok: boolean; code?: string; error?: string };
 
-    const response = await handler(buildRequest({
-        name: 'Felipe William',
-        email: 'felipe@example.com',
-        sourcePage: '/lollapalooza',
-        utms: {},
-        tracking: {},
-    }));
-
-    assert.equal(response.status, 201);
-
-    const payload = await response.json() as { ok: boolean; contactId?: string; warning?: string };
-    assert.equal(payload.ok, true);
-    assert.equal(payload.contactId, 'contact_waitlist_999');
-    assert.equal(payload.warning, undefined);
-    assert.deepEqual(collectListMembershipBodies(calls, 'list_lolla_2027'), [['contact_waitlist_999']]);
-    assert.equal(errorCalls.some((args) => args.some((value) => String(value).includes('failed to add contact to lollapalooza list'))), true);
+    assert.equal(fetchCalled, false);
+    assert.equal(response.status, 500);
+    assert.equal(payload.ok, false);
+    assert.equal(payload.code, 'SERVER_CONFIG_ERROR');
+    assert.equal(payload.error, 'Integração de waitlist indisponível no momento.');
 });
 
-test('submit-waitlist should enforce rate limiting', async () => {
-    restoreEnv();
+test('submit-waitlist should deliver a sanitized payload to n8n and return a neutral success response', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+        restoreEnv();
+    });
 
-    const sharedIP = '1.2.3.4';
-    const buildRateLimitedRequest = () => new Request('http://localhost/api/submit-waitlist', {
-        method: 'POST',
+    process.env.N8N_SUBMIT_WAITLIST_WEBHOOK_URL = 'https://n8n.example/webhook/waitlist';
+    process.env.N8N_WEBHOOK_SECRET = 'secret-456';
+    process.env.N8N_WEBHOOK_TIMEOUT_MS = '200';
+
+    const calls: MockN8nRequest[] = [];
+    global.fetch = createMockN8nFetch(calls, new Response(JSON.stringify({ ok: true }), { status: 200 }));
+
+    const response = await handler(buildRequest(buildDirtyWaitlistPayload(), {
         headers: {
-            'Content-Type': 'application/json',
+            'x-real-ip': '127.0.0.41',
+        },
+    }));
+
+    assert.equal(response.status, 201);
+
+    const payload = await response.json() as { ok: boolean; requestId?: string; message?: string; contactId?: string };
+    assert.equal(payload.ok, true);
+    assert.equal(payload.message, 'Enviado com sucesso');
+    assert.equal(payload.contactId, undefined);
+    assert.ok(payload.requestId);
+
+    assert.equal(calls.length, 1);
+    const request = calls[0]!;
+    assert.equal(request.url, 'https://n8n.example/webhook/waitlist');
+    assert.equal(request.method, 'POST');
+
+    const headers = new Headers(request.headers);
+    assert.equal(headers.get('Content-Type'), 'application/json');
+    assert.equal(headers.get('X-Webhook-Secret'), 'secret-456');
+    assert.equal(headers.get('X-Request-Id'), payload.requestId);
+
+    const body = request.body as {
+        requestId: string;
+        source: string;
+        waitlist: { name: string; email: string; sourcePage: string };
+        utms: Record<string, unknown>;
+        tracking: Record<string, unknown>;
+        meta: { receivedAt: string };
+    };
+
+    assert.equal(body.requestId, payload.requestId);
+    assert.equal(body.source, 'submit-waitlist');
+    assert.deepEqual(body.waitlist, {
+        name: 'Ana &lt;Maria&gt;',
+        email: 'ana@example.com',
+        sourcePage: '/lollapalooza?slot=&lt;hero&gt;',
+    });
+    assert.deepEqual(body.utms, {
+        utm_source: 'google',
+        utm_medium: 'cpc',
+        utm_campaign: 'lolla &lt;2027&gt;',
+        utm_term: null,
+        utm_content: 'hero ad',
+    });
+    assert.deepEqual(body.tracking, {
+        utm_source: 'google',
+        utm_medium: 'cpc',
+        utm_campaign: 'lolla &lt;2027&gt;',
+        utm_term: null,
+        utm_content: 'hero ad',
+        cid: null,
+        sid: null,
+        gclid: null,
+        fbclid: 'fbclid-123',
+        msclkid: null,
+        ttclid: null,
+        wbraid: null,
+        gbraid: null,
+        fbc: null,
+        fbp: null,
+        extras: {
+            ref: 'hero &lt;cta&gt;',
+            campaign_note: 'hurry &gt; now',
+            custom_source: 'direct',
+        },
+    });
+    assert.match(body.meta.receivedAt, /^\d{4}-\d{2}-\d{2}T/);
+});
+
+test('submit-waitlist should return VALIDATION_ERROR without consuming rate-limit quota', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+        restoreEnv();
+    });
+
+    process.env.N8N_SUBMIT_WAITLIST_WEBHOOK_URL = 'https://n8n.example/webhook/waitlist';
+    process.env.N8N_WEBHOOK_SECRET = 'secret-456';
+
+    const calls: MockN8nRequest[] = [];
+    global.fetch = createMockN8nFetch(calls, new Response(JSON.stringify({ ok: true }), { status: 200 }));
+
+    const sharedIP = '127.0.0.142';
+    const buildSharedRequest = (body: Record<string, unknown>) => buildRequest(body, {
+        headers: {
             'x-real-ip': sharedIP,
         },
-        body: JSON.stringify({
-            name: 'Felipe William',
-            email: 'felipe@example.com',
-            sourcePage: '/lollapalooza',
-            utms: {},
-            tracking: {},
-        }),
     });
 
-    // Make 5 successful requests
+    const invalidResponse = await handler(buildSharedRequest({
+        name: 'Ana Maria',
+        email: 'not-an-email',
+        sourcePage: '/lollapalooza',
+        utms: {},
+        tracking: {},
+    }));
+    const invalidPayload = await invalidResponse.json() as { ok: boolean; code?: string };
+
+    assert.equal(invalidResponse.status, 400);
+    assert.equal(invalidPayload.ok, false);
+    assert.equal(invalidPayload.code, 'VALIDATION_ERROR');
+    assert.equal(calls.length, 0);
+
+    const validBody = buildDirtyWaitlistPayload();
     for (let i = 0; i < 5; i++) {
-        const response = await handler(buildRateLimitedRequest());
-        // Since HUBSPOT_TOKEN is not set, it will return 500 SERVER_CONFIG_ERROR,
-        // but it still consumes rate limit.
-        assert.equal(response.status, 500);
+        const response = await handler(buildSharedRequest(validBody));
+        assert.equal(response.status, 201);
     }
 
-    // The 6th request should be rate limited
-    const response = await handler(buildRateLimitedRequest());
-    assert.equal(response.status, 429);
+    assert.equal(calls.length, 5);
+});
 
-    const payload = await response.json() as { ok: boolean; code?: string };
+test('submit-waitlist should map webhook failures to N8N_WEBHOOK_ERROR', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+        restoreEnv();
+    });
+
+    process.env.N8N_SUBMIT_WAITLIST_WEBHOOK_URL = 'https://n8n.example/webhook/waitlist';
+    process.env.N8N_WEBHOOK_SECRET = 'secret-456';
+    process.env.N8N_WEBHOOK_TIMEOUT_MS = '200';
+
+    global.fetch = (async () => new Response(JSON.stringify({ error: 'upstream failed' }), { status: 503 })) as typeof fetch;
+
+    const response = await handler(buildRequest(buildDirtyWaitlistPayload(), {
+        headers: {
+            'x-real-ip': '127.0.0.43',
+        },
+    }));
+    const payload = await response.json() as { ok: boolean; code?: string; error?: string };
+
+    assert.equal(response.status, 502);
     assert.equal(payload.ok, false);
-    assert.equal(payload.code, 'RATE_LIMIT_EXCEEDED');
-    assert.ok(response.headers.get('Retry-After'));
-    assert.ok(response.headers.get('X-RateLimit-Reset'));
+    assert.equal(payload.code, 'N8N_WEBHOOK_ERROR');
+    assert.equal(payload.error, 'Erro ao enviar inscrição na lista de espera.');
+});
+
+test('classifySubmitWaitlistError should preserve unexpected internal failures', () => {
+    const classified = classifySubmitWaitlistError(new Error('unexpected database failure'));
+
+    assert.equal(classified.code, 'INTERNAL_ERROR');
+    assert.equal(classified.status, 500);
+    assert.equal(classified.error, 'Erro interno ao processar envio da lista de espera.');
+});
+
+test('classifySubmitWaitlistError should preserve sanitized webhook detail for internal handling', () => {
+    const classified = classifySubmitWaitlistError(new Error('N8N_WEBHOOK_ERROR:503: upstream failed\nwith extra detail '));
+
+    assert.equal(classified.code, 'N8N_WEBHOOK_ERROR');
+    assert.equal(classified.status, 502);
+    assert.equal(classified.error, 'Erro ao enviar inscrição na lista de espera.');
+    assert.equal(classified.detail, 'upstream failed with extra detail');
 });

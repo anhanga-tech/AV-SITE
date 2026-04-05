@@ -7,7 +7,6 @@ type SubmitWaitlistResult =
     | {
         ok: true;
         requestId: string;
-        contactId: string;
         warning?: string;
         message: string;
     }
@@ -89,8 +88,8 @@ function buildSubmitWaitlistError(
     return {
         ok: false,
         requestId: typeof payload.requestId === 'string' ? payload.requestId : response.headers.get('X-Request-Id') || undefined,
-        error: typeof payload.error === 'string' ? payload.error : `Falha ao enviar waitlist (status ${response.status}).`,
-        code: typeof payload.code === 'string' ? payload.code : 'HUBSPOT_API_ERROR',
+        error: typeof payload.error === 'string' ? payload.error : `Falha ao enviar cadastro (status ${response.status}).`,
+        code: typeof payload.code === 'string' ? payload.code : 'API_ERROR',
         status: response.status,
     };
 }
@@ -177,14 +176,13 @@ export function useWaitlistCapture() {
             return {
                 ok: true,
                 requestId: String(responsePayload.requestId || response.headers.get('X-Request-Id') || 'unknown'),
-                contactId: typeof responsePayload.contactId === 'string' ? responsePayload.contactId : 'unknown',
                 warning: typeof responsePayload.warning === 'string' ? responsePayload.warning : undefined,
                 message: typeof responsePayload.message === 'string'
                     ? responsePayload.message
-                    : 'Cadastro realizado com sucesso na lista de espera.',
+                    : 'Cadastro recebido com sucesso.',
             };
         } catch (requestError: unknown) {
-            const message = requestError instanceof Error ? requestError.message : 'Falha de rede ao enviar waitlist.';
+            const message = requestError instanceof Error ? requestError.message : 'Falha de rede ao enviar cadastro.';
             setError(message);
             setIsSubmitting(false);
 

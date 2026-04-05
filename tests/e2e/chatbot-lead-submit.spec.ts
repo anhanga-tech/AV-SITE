@@ -64,9 +64,7 @@ test.describe('Chatbot lead handoff', () => {
         body: JSON.stringify({
           ok: true,
           requestId: 'req-e2e-1',
-          contactId: 'contact-e2e-1',
-          dealId: 'deal-e2e-1',
-          message: 'Contato e deal criados com sucesso no HubSpot.',
+          warning: 'Acompanhamento será realizado por um canal alternativo.',
         }),
       });
     });
@@ -149,7 +147,7 @@ test.describe('Chatbot lead handoff', () => {
     });
   });
 
-  test('should open WhatsApp immediately even when HubSpot submit fails in the background', async ({ page }) => {
+  test('should open WhatsApp immediately even when lead submit fails in the background', async ({ page }) => {
     let submitRequestCount = 0;
     let submitPayload: Record<string, unknown> | null = null;
 
@@ -193,8 +191,8 @@ test.describe('Chatbot lead handoff', () => {
         body: JSON.stringify({
           ok: false,
           requestId: 'req-e2e-fail',
-          code: 'HUBSPOT_PROPERTY_ERROR',
-          error: 'Propriedade inválida no HubSpot.',
+          code: 'UPSTREAM_VALIDATION_ERROR',
+          error: 'Falha ao processar o envio.',
         }),
       });
     });
@@ -213,16 +211,16 @@ test.describe('Chatbot lead handoff', () => {
 
     await page.getByRole('button', { name: 'Salvar e abrir WhatsApp' }).click();
 
-    // WhatsApp must open immediately (before HubSpot submission completes) —
+    // WhatsApp must open immediately (before lead submission completes) —
     // this is the core guarantee of the fire-and-forget design.
     await expect.poll(() => page.evaluate(() => window.__openedUrls?.length ?? 0)).toBe(1);
     const openedUrl = await page.evaluate(() => window.__openedUrls?.[0] ?? '');
     expect(decodeURIComponent(openedUrl)).toContain('wa.me/');
 
-    // HubSpot submission happened in the background
+    // Lead submission happened in the background
     await expect.poll(() => submitRequestCount).toBe(1);
 
-    // No UI error alert — HubSpot errors are silently logged to console
+    // No UI error alert — upstream errors are silently logged to console
     await expect(page.getByRole('alert')).not.toBeVisible();
 
     // The lead form ("Link Gerado") is still rendered (popup opened in a new tab,

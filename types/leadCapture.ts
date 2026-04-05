@@ -39,19 +39,15 @@ export interface SubmitLeadRequest {
 export interface SubmitLeadSuccess {
     ok: true;
     requestId: string;
-    contactId: string;
-    dealId?: string;
     warning?: string;
     message: string;
 }
 
 export type SubmitLeadErrorCode =
     | 'VALIDATION_ERROR'
-    | 'HUBSPOT_UNAUTHORIZED'
-    | 'HUBSPOT_DUPLICATE_CONTACT'
-    | 'HUBSPOT_PROPERTY_ERROR'
-    | 'HUBSPOT_API_ERROR'
+    | 'INTERNAL_ERROR'
     | 'SERVER_CONFIG_ERROR'
+    | 'N8N_WEBHOOK_ERROR'
     | 'METHOD_NOT_ALLOWED'
     | 'RATE_LIMIT_EXCEEDED';
 
