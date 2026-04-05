@@ -216,7 +216,7 @@ function buildSubmitLeadPayload(
         firstName: cleanValue(merged.firstName),
         lastName: cleanValue(merged.lastName),
         email: cleanValue(merged.email).toLowerCase(),
-        whatsapp: normalizeWhatsappNumber(merged.whatsapp) ?? cleanValue(merged.whatsapp),
+        whatsapp: normalizeWhatsappNumber(merged.whatsapp) ?? '',
         event_id: eventId,
         bantSummary: cleanValue(merged.bantSummary),
         destination: cleanValue(merged.destination),
