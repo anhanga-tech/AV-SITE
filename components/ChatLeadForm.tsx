@@ -30,6 +30,135 @@ interface ChatLeadFormProps {
   onFinalizeLead: (payload: SubmitLeadRequest) => Promise<LeadFinalizeResult>;
 }
 
+type FieldErrors = {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  whatsapp?: string;
+  lgpd?: string;
+};
+
+type LeadFormValues = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  whatsapp: string;
+  countryCode: string;
+  acceptedLGPD: boolean;
+  destination?: string;
+  defaultBantSummary?: string;
+};
+
+type ValidationResult =
+  | {
+      ok: true;
+      payload: LeadFinalizePayload;
+    }
+  | {
+      ok: false;
+      fieldErrors?: FieldErrors;
+      localError: string;
+    };
+
+type TextFieldProps = {
+  id: string;
+  label: string;
+  type: 'text' | 'email' | 'tel';
+  value: string;
+  placeholder: string;
+  error?: string;
+  onChange: (value: string) => void;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];
+};
+
+function validateLeadForm(values: LeadFormValues): ValidationResult {
+  const normalizedFirstName = values.firstName.trim();
+  const normalizedLastName = values.lastName.trim();
+  const normalizedEmail = values.email.trim().toLowerCase();
+  const normalizedWhatsapp = normalizeWhatsappNumber(values.whatsapp, values.countryCode);
+  const normalizedDestination = values.destination?.trim() || '';
+
+  const errors: FieldErrors = {};
+  if (!normalizedFirstName) errors.firstName = 'Campo obrigatório';
+  if (!normalizedLastName) errors.lastName = 'Campo obrigatório';
+  if (!normalizedEmail) {
+    errors.email = 'Campo obrigatório';
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+    errors.email = 'E-mail inválido';
+  }
+
+  if (!values.whatsapp.trim()) {
+    errors.whatsapp = 'Campo obrigatório';
+  } else if (!normalizedWhatsapp) {
+    errors.whatsapp = 'WhatsApp inválido';
+  }
+
+  if (!values.acceptedLGPD) {
+    errors.lgpd = 'Você deve aceitar os termos';
+  }
+
+  if (Object.keys(errors).length > 0) {
+    return {
+      ok: false,
+      fieldErrors: errors,
+      localError: 'Por favor, corrija os erros no formulário.',
+    };
+  }
+
+  if (!normalizedDestination) {
+    return {
+      ok: false,
+      localError: 'Não conseguimos identificar o destino da sua viagem. Gere o link novamente pelo chat.',
+    };
+  }
+
+  return {
+    ok: true,
+    payload: {
+      firstName: normalizedFirstName,
+      lastName: normalizedLastName,
+      email: normalizedEmail,
+      whatsapp: normalizedWhatsapp!,
+      bantSummary: values.defaultBantSummary || 'Não informado',
+      destination: normalizedDestination,
+    },
+  };
+}
+
+function openWhatsAppWindow(url: string): void {
+  const popup = window.open(url, '_blank', 'noopener,noreferrer');
+  if (!popup) {
+    window.location.assign(url);
+  }
+}
+
+function TextField({
+  id,
+  label,
+  type,
+  value,
+  placeholder,
+  error,
+  onChange,
+  inputMode,
+}: TextFieldProps) {
+  return (
+    <div className="space-y-1">
+      <label htmlFor={id} className="sr-only">{label}</label>
+      <input
+        id={id}
+        type={type}
+        inputMode={inputMode}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className={`w-full bg-white border ${error ? 'border-red-500' : 'border-gray-200'} rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm`}
+      />
+      {error && <span className="text-[10px] text-red-500 font-bold ml-1 uppercase">{error}</span>}
+    </div>
+  );
+}
+
 const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
   destination,
   defaultBantSummary,
@@ -45,13 +174,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
   const [whatsapp, setWhatsapp] = useState('');
   const [acceptedLGPD, setAcceptedLGPD] = useState(false);
 
-  const [fieldErrors, setFieldErrors] = useState<{
-    firstName?: string;
-    lastName?: string;
-    email?: string;
-    whatsapp?: string;
-    lgpd?: string;
-  }>({});
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
   const [localError, setLocalError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -67,53 +190,25 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
     setNotice(null);
     setFieldErrors({});
 
-    const normalizedFirstName = firstName.trim();
-    const normalizedLastName = lastName.trim();
-    const normalizedEmail = email.trim().toLowerCase();
-    const normalizedWhatsapp = normalizeWhatsappNumber(whatsapp, countryCode);
-    const normalizedDestination = destination?.trim() || '';
+    const validation = validateLeadForm({
+      firstName,
+      lastName,
+      email,
+      whatsapp,
+      countryCode,
+      acceptedLGPD,
+      destination,
+      defaultBantSummary,
+    });
 
-    const errors: typeof fieldErrors = {};
-    if (!normalizedFirstName) errors.firstName = 'Campo obrigatório';
-    if (!normalizedLastName) errors.lastName = 'Campo obrigatório';
-    if (!normalizedEmail) {
-      errors.email = 'Campo obrigatório';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
-      errors.email = 'E-mail inválido';
-    }
-    if (!whatsapp.trim()) {
-      errors.whatsapp = 'Campo obrigatório';
-    } else if (!normalizedWhatsapp) {
-      errors.whatsapp = 'WhatsApp inválido';
-    }
-
-    if (!acceptedLGPD) {
-      errors.lgpd = 'Você deve aceitar os termos';
-    }
-
-    if (Object.keys(errors).length > 0) {
-      setFieldErrors(errors);
-      setLocalError('Por favor, corrija os erros no formulário.');
+    if (validation.ok === false) {
+      setFieldErrors(validation.fieldErrors || {});
+      setLocalError(validation.localError);
       setIsLocallySubmitting(false);
       isProcessingRef.current = false;
       return;
     }
-
-    if (!normalizedDestination) {
-      setLocalError('Não conseguimos identificar o destino da sua viagem. Gere o link novamente pelo chat.');
-      setIsLocallySubmitting(false);
-      isProcessingRef.current = false;
-      return;
-    }
-
-    const payload: LeadFinalizePayload = {
-      firstName: normalizedFirstName,
-      lastName: normalizedLastName,
-      email: normalizedEmail,
-      whatsapp: normalizedWhatsapp!,
-      bantSummary: defaultBantSummary || 'Não informado',
-      destination: normalizedDestination,
-    };
+    const { payload } = validation;
 
     void triggerHaptic('medium');
 
@@ -122,11 +217,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
     pushGenerateLeadDataLayerEvent(submitPayload);
 
     // Open WhatsApp synchronously in the click handler to prevent popup blockers on mobile/Safari
-    const whatsappUrl = getWhatsAppUrl(payload);
-    const popup = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-    if (!popup) {
-      window.location.assign(whatsappUrl);
-    }
+    openWhatsAppWindow(getWhatsAppUrl(payload));
 
     // Submit lead data in the background — user is already heading to WhatsApp
     try {
@@ -156,44 +247,35 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
         </p>
 
         <div className="space-y-3 mb-5">
-          <div className="space-y-1">
-            <label htmlFor="lead-first-name" className="sr-only">Nome</label>
-            <input
-              id="lead-first-name"
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              placeholder="Nome"
-              className={`w-full bg-white border ${fieldErrors.firstName ? 'border-red-500' : 'border-gray-200'} rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm`}
-            />
-            {fieldErrors.firstName && <span className="text-[10px] text-red-500 font-bold ml-1 uppercase">{fieldErrors.firstName}</span>}
-          </div>
+          <TextField
+            id="lead-first-name"
+            label="Nome"
+            type="text"
+            value={firstName}
+            placeholder="Nome"
+            error={fieldErrors.firstName}
+            onChange={setFirstName}
+          />
 
-          <div className="space-y-1">
-            <label htmlFor="lead-last-name" className="sr-only">Sobrenome</label>
-            <input
-              id="lead-last-name"
-              type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              placeholder="Sobrenome"
-              className={`w-full bg-white border ${fieldErrors.lastName ? 'border-red-500' : 'border-gray-200'} rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm`}
-            />
-            {fieldErrors.lastName && <span className="text-[10px] text-red-500 font-bold ml-1 uppercase">{fieldErrors.lastName}</span>}
-          </div>
+          <TextField
+            id="lead-last-name"
+            label="Sobrenome"
+            type="text"
+            value={lastName}
+            placeholder="Sobrenome"
+            error={fieldErrors.lastName}
+            onChange={setLastName}
+          />
 
-          <div className="space-y-1">
-            <label htmlFor="lead-email" className="sr-only">E-mail</label>
-            <input
-              id="lead-email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="E-mail"
-              className={`w-full bg-white border ${fieldErrors.email ? 'border-red-500' : 'border-gray-200'} rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm`}
-            />
-            {fieldErrors.email && <span className="text-[10px] text-red-500 font-bold ml-1 uppercase">{fieldErrors.email}</span>}
-          </div>
+          <TextField
+            id="lead-email"
+            label="E-mail"
+            type="email"
+            value={email}
+            placeholder="E-mail"
+            error={fieldErrors.email}
+            onChange={setEmail}
+          />
 
           <div className="space-y-1">
             <label htmlFor="lead-whatsapp" className="sr-only">WhatsApp</label>
@@ -209,17 +291,17 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
                 <option value="+1">+1 US/CA</option>
                 <option value="+351">+351 PT</option>
               </select>
-              <input
+              <TextField
                 id="lead-whatsapp"
+                label="WhatsApp"
                 type="tel"
                 inputMode="tel"
                 value={whatsapp}
-                onChange={(e) => setWhatsapp(e.target.value)}
                 placeholder="WhatsApp"
-                className={`w-full bg-white border ${fieldErrors.whatsapp ? 'border-red-500' : 'border-gray-200'} rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm`}
+                error={fieldErrors.whatsapp}
+                onChange={setWhatsapp}
               />
             </div>
-            {fieldErrors.whatsapp && <span className="text-[10px] text-red-500 font-bold ml-1 uppercase">{fieldErrors.whatsapp}</span>}
           </div>
 
           <div className="flex flex-col gap-1 mt-2">
