@@ -452,6 +452,33 @@ test('sendLeadToN8n should normalize raw network failures into N8N_WEBHOOK_ERROR
     );
 });
 
+test('sendLeadToN8n should include a sanitized webhook response detail in provider errors', async (t) => {
+    const originalTimeout = process.env.N8N_WEBHOOK_TIMEOUT_MS;
+
+    t.after(() => {
+        global.fetch = originalFetch;
+        if (originalTimeout === undefined) {
+            delete process.env.N8N_WEBHOOK_TIMEOUT_MS;
+        } else {
+            process.env.N8N_WEBHOOK_TIMEOUT_MS = originalTimeout;
+        }
+    });
+
+    process.env.N8N_WEBHOOK_TIMEOUT_MS = '200';
+    global.fetch = (async () => new Response(' upstream failed\nwith extra detail ', { status: 503 })) as typeof fetch;
+
+    await assert.rejects(
+        () => sendLeadToN8n(
+            'https://n8n.example/webhook/submit-lead',
+            'secret-123',
+            'req-upstream-error',
+            buildN8nLeadPayload(buildLeadPayloadFixture(), 'req-upstream-error'),
+        ),
+        (error: unknown) => error instanceof Error
+            && error.message === 'N8N_WEBHOOK_ERROR:503:upstream failed with extra detail',
+    );
+});
+
 test('submit-lead should deliver the validated payload to n8n and return a neutral success response', async (t) => {
     t.after(() => {
         global.fetch = originalFetch;
@@ -601,6 +628,15 @@ test('classifySubmitLeadError should preserve unexpected internal failures', () 
     assert.equal(classified.code, 'INTERNAL_ERROR');
     assert.equal(classified.status, 500);
     assert.equal(classified.error, 'Erro interno ao processar envio do lead.');
+});
+
+test('classifySubmitLeadError should preserve sanitized webhook detail for internal logging', () => {
+    const classified = classifySubmitLeadError(new Error('N8N_WEBHOOK_ERROR:503: upstream failed\nwith extra detail '));
+
+    assert.equal(classified.code, 'N8N_WEBHOOK_ERROR');
+    assert.equal(classified.status, 502);
+    assert.equal(classified.error, 'Erro ao enviar lead.');
+    assert.equal(classified.detail, 'upstream failed with extra detail');
 });
 
 test('submit-lead should enforce rate limiting', async (t) => {

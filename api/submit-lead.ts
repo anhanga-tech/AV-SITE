@@ -32,7 +32,7 @@ function createRequestId(): string {
 }
 
 function truncateDetail(detail: string): string | undefined {
-    const normalized = detail.trim();
+    const normalized = detail.replace(/[\r\n]+/g, ' ').trim();
     return normalized ? normalized.substring(0, 600) : undefined;
 }
 
@@ -101,6 +101,7 @@ export function classifySubmitLeadError(error: unknown): {
     code: SubmitLeadInternalErrorCode;
     status: number;
     error: string;
+    detail?: string;
 } {
     const message = error instanceof Error ? error.message : String(error);
     const match = message.match(/^N8N_WEBHOOK_ERROR:(\d+):(.*)$/s);
@@ -112,10 +113,13 @@ export function classifySubmitLeadError(error: unknown): {
         };
     }
 
+    const detail = truncateDetail(match[2] || '');
+
     return {
         code: 'N8N_WEBHOOK_ERROR',
         status: 502,
         error: 'Erro ao enviar lead.',
+        detail,
     };
 }
 
@@ -328,6 +332,7 @@ export default async function handler(request: Request): Promise<Response> {
             code: classified.code,
             status: classified.status,
             errorType: error instanceof Error ? error.name : typeof error,
+            detail: classified.detail,
         });
 
         return buildJsonResponse(

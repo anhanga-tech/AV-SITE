@@ -25,8 +25,9 @@ function createTimeoutError(timeoutMs: number): Error {
 async function assertN8nResponseOk(response: Response): Promise<void> {
     if (response.ok) return;
 
-    await response.text().catch(() => '');
-    throw new Error(`N8N_WEBHOOK_ERROR:${response.status}:Webhook request failed`);
+    const detail = sanitizeErrorDetail(await response.text().catch(() => ''));
+    const message = detail || 'Webhook request failed';
+    throw new Error(`N8N_WEBHOOK_ERROR:${response.status}:${message}`);
 }
 
 function normalizeNetworkError(): Error {

@@ -53,28 +53,45 @@ export interface N8nWaitlistPayload {
     };
 }
 
-function buildLeadTracking(payload: SubmitLeadRequest): N8nLeadTracking {
+function toNullableTrackingValue(value: string | null | undefined): string | null {
+    return value ?? null;
+}
+
+function buildLeadTrackingUtms(payload: SubmitLeadRequest) {
     const tracking = payload.tracking;
-    const leadTracking: N8nLeadTracking = {
+
+    return {
         utm_source: tracking?.utm_source ?? payload.utms.utm_source,
         utm_medium: tracking?.utm_medium ?? payload.utms.utm_medium,
         utm_campaign: tracking?.utm_campaign ?? payload.utms.utm_campaign,
         utm_term: tracking?.utm_term ?? payload.utms.utm_term,
         utm_content: tracking?.utm_content ?? payload.utms.utm_content,
-        cid: tracking?.cid ?? null,
-        sid: tracking?.sid ?? null,
-        gclid: tracking?.gclid ?? null,
-        fbclid: tracking?.fbclid ?? null,
-        msclkid: tracking?.msclkid ?? null,
-        ttclid: tracking?.ttclid ?? null,
-        wbraid: tracking?.wbraid ?? null,
-        gbraid: tracking?.gbraid ?? null,
-        fbc: tracking?.fbc ?? null,
-        fbp: tracking?.fbp ?? null,
-        extras: tracking?.extras ?? {},
     };
+}
 
-    return leadTracking;
+function buildLeadTrackingIds(payload: SubmitLeadRequest) {
+    const tracking = payload.tracking;
+
+    return {
+        cid: toNullableTrackingValue(tracking?.cid),
+        sid: toNullableTrackingValue(tracking?.sid),
+        gclid: toNullableTrackingValue(tracking?.gclid),
+        fbclid: toNullableTrackingValue(tracking?.fbclid),
+        msclkid: toNullableTrackingValue(tracking?.msclkid),
+        ttclid: toNullableTrackingValue(tracking?.ttclid),
+        wbraid: toNullableTrackingValue(tracking?.wbraid),
+        gbraid: toNullableTrackingValue(tracking?.gbraid),
+        fbc: toNullableTrackingValue(tracking?.fbc),
+        fbp: toNullableTrackingValue(tracking?.fbp),
+    };
+}
+
+function buildLeadTracking(payload: SubmitLeadRequest): N8nLeadTracking {
+    return {
+        ...buildLeadTrackingUtms(payload),
+        ...buildLeadTrackingIds(payload),
+        extras: payload.tracking?.extras ?? {},
+    };
 }
 
 export function buildN8nLeadPayload(payload: SubmitLeadRequest, requestId: string): N8nLeadPayload {

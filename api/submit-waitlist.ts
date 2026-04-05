@@ -18,6 +18,13 @@ interface SubmitWaitlistConfig {
     webhookSecret: string;
 }
 
+function truncateDetail(detail: string): string | undefined {
+    const trimmed = detail.replace(/[\r\n]+/g, ' ').trim();
+    if (!trimmed) return undefined;
+
+    return trimmed.slice(0, 200);
+}
+
 function createRequestId(): string {
     if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
         return crypto.randomUUID();
@@ -55,6 +62,7 @@ export function classifySubmitWaitlistError(error: unknown): {
     code: 'N8N_WEBHOOK_ERROR' | 'INTERNAL_ERROR';
     status: number;
     error: string;
+    detail?: string;
 } {
     const message = error instanceof Error ? error.message : String(error);
     const match = message.match(/^N8N_WEBHOOK_ERROR:(\d+):(.*)$/s);
@@ -66,10 +74,13 @@ export function classifySubmitWaitlistError(error: unknown): {
         };
     }
 
+    const detail = truncateDetail(match[2] || '');
+
     return {
         code: 'N8N_WEBHOOK_ERROR',
         status: 502,
         error: 'Erro ao enviar inscrição na lista de espera.',
+        detail,
     };
 }
 

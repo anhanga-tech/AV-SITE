@@ -299,3 +299,12 @@ test('classifySubmitWaitlistError should preserve unexpected internal failures',
     assert.equal(classified.status, 500);
     assert.equal(classified.error, 'Erro interno ao processar envio da lista de espera.');
 });
+
+test('classifySubmitWaitlistError should preserve sanitized webhook detail for internal handling', () => {
+    const classified = classifySubmitWaitlistError(new Error('N8N_WEBHOOK_ERROR:503: upstream failed\nwith extra detail '));
+
+    assert.equal(classified.code, 'N8N_WEBHOOK_ERROR');
+    assert.equal(classified.status, 502);
+    assert.equal(classified.error, 'Erro ao enviar inscrição na lista de espera.');
+    assert.equal(classified.detail, 'upstream failed with extra detail');
+});
