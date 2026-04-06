@@ -48,7 +48,6 @@ const OrlandoLanding: React.FC = () => {
         serviceType="Planejamento de viagem para Orlando"
         areaServed="São Paulo e Brasil"
         keywords={['pacotes para Orlando', 'roteiro Disney', 'viagem Universal']}
-        aggregateRating={{ ratingValue: 4.98, reviewCount: 24 }}
       />
       <BreadcrumbSchema
         items={[

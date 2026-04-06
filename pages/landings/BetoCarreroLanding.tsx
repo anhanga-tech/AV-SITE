@@ -43,7 +43,7 @@ const BetoCarreroLanding: React.FC = () => {
         serviceType="Pacote de viagem para parque temático"
         areaServed="São Paulo e Brasil"
         keywords={['pacote Beto Carrero', 'ingresso Beto Carrero', 'viagem em família']}
-        aggregateRating={{ ratingValue: 4.9, reviewCount: 12 }}
+        aggregateRating={{ ratingValue: 5, reviewCount: 3 }}
       />
       <BreadcrumbSchema
         items={[
