@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import ChevronLeft from 'lucide-react/dist/esm/icons/chevron-left';
 import ChevronRight from 'lucide-react/dist/esm/icons/chevron-right';
 import Quote from 'lucide-react/dist/esm/icons/quote';
@@ -6,17 +6,29 @@ import MessageSquareHeart from 'lucide-react/dist/esm/icons/message-square-heart
 import { TESTIMONIALS } from '../data/testimonialsData';
 import { BRAND_LOGO_PNG_URL } from '../lib/media-assets';
 import { SectionHeader } from './ui';
+import { LazyImage } from './ui/LazyImage';
 
-const Testimonials: React.FC = () => {
+/**
+ * Optimized Testimonials component.
+ *
+ * PERFORMANCE WIN:
+ * 1. Wrapped in React.memo to prevent unnecessary re-renders when parent (Home.tsx)
+ *    updates its internal state (like shouldRenderBelowFold).
+ * 2. Memoized slide transition functions using useCallback to maintain stable
+ *    references and prevent child component re-renders if passed as props.
+ * 3. Utilizes LazyImage for avatars with fixed dimensions (128x128) to
+ *    eliminate Layout Shifts (CLS) and leverage CDN image optimization.
+ */
+const Testimonials: React.FC = memo(() => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const nextSlide = useCallback(() => {
         setCurrentIndex((prev) => (prev === TESTIMONIALS.length - 1 ? 0 : prev + 1));
     }, []);
 
-    const prevSlide = () => {
+    const prevSlide = useCallback(() => {
         setCurrentIndex((prev) => (prev === 0 ? TESTIMONIALS.length - 1 : prev - 1));
-    };
+    }, []);
 
     useEffect(() => {
         const interval = setInterval(nextSlide, 6000); // Aumentei um pouco o tempo para leitura
@@ -78,9 +90,11 @@ const Testimonials: React.FC = () => {
                                             {/* Animated Avatar Sticker */}
                                             <div className="relative shrink-0">
                                                 <div className="w-32 h-32 rounded-full border-4 border-white shadow-lg overflow-hidden bg-white animate-float">
-                                                    <img
+                                                    <LazyImage
                                                         src={testimonial.image}
                                                         alt={testimonial.name}
+                                                        width={128}
+                                                        height={128}
                                                         className="w-full h-full object-cover"
                                                     />
                                                 </div>
@@ -138,6 +152,8 @@ const Testimonials: React.FC = () => {
             </div>
         </section>
     );
-};
+});
+
+Testimonials.displayName = 'Testimonials';
 
 export default Testimonials;

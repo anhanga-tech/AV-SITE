@@ -11,3 +11,7 @@
 ## 2026-03-05 - ⚡ Bolt: CSS-based Hover States
 **Learning:** React state-driven hover effects (`onMouseEnter/Leave`) can cause excessive re-renders in large lists or grids. Replacing them with CSS `group-hover` eliminates JavaScript execution and Virtual DOM diffing during high-frequency interactions.
 **Action:** Always check if a hover effect can be achieved via CSS before reaching for `useState`.
+
+## 2026-05-20 - ⚡ Bolt: Carousel Layout Stability
+**Learning:** Using standard <img> tags in dynamic carousels like Testimonials without explicit width/height leads to Cumulative Layout Shift (CLS) as images load after the container renders. Wrapping in LazyImage with numeric dimensions ensures the aspect ratio is reserved.
+**Action:** Always use LazyImage with explicit width and height for repeatable list/carousel items to ensure visual stability and CDN optimization.
