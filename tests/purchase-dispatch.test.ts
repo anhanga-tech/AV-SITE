@@ -31,7 +31,7 @@ function restoreEnv() {
 }
 
 function buildRequest(
-  body: Record<string, unknown>,
+  body: unknown,
   secret: string,
 ): Request {
   return new Request('http://localhost/api/purchase-dispatch', {
@@ -54,6 +54,36 @@ test('purchase-dispatch should reject invalid webhook secret', async (t) => {
   const response = await handler(buildRequest({ dealId: 'deal-1' }, 'wrong-secret'));
 
   assert.equal(response.status, 401);
+});
+
+test('purchase-dispatch should hide missing webhook secret configuration', async (t) => {
+  t.after(() => {
+    restoreEnv();
+  });
+
+  delete process.env.N8N_WEBHOOK_SECRET;
+
+  const response = await handler(buildRequest({ dealId: 'deal-1' }, 'wrong-secret'));
+
+  assert.equal(response.status, 500);
+
+  const data = await response.json() as Record<string, unknown>;
+  assert.equal(data.error, 'Internal server error');
+});
+
+test('purchase-dispatch should reject non-object JSON bodies', async (t) => {
+  t.after(() => {
+    restoreEnv();
+  });
+
+  process.env.N8N_WEBHOOK_SECRET = 'expected-secret';
+
+  const response = await handler(buildRequest([], 'expected-secret'));
+
+  assert.equal(response.status, 400);
+
+  const data = await response.json() as Record<string, unknown>;
+  assert.equal(data.error, 'Missing dealId');
 });
 
 test('purchase-dispatch should send GA4 and Meta purchase payloads', async (t) => {
@@ -87,7 +117,7 @@ test('purchase-dispatch should send GA4 and Meta purchase payloads', async (t) =
   }) as typeof fetch;
 
   const response = await handler(buildRequest({
-    dealId: 'deal-1',
+    dealId: '  <deal-1>  ',
     value: 4200,
     currency: 'BRL',
     destination: 'Japao',
@@ -116,7 +146,7 @@ test('purchase-dispatch should send GA4 and Meta purchase payloads', async (t) =
   assert.ok(gaEvent, 'GA4 event should exist');
   assert.equal(gaRequest!.body?.client_id, '123456789.1234567890');
   assert.equal(gaEvent?.name, 'purchase');
-  assert.equal((gaEvent?.params as Record<string, unknown>)?.transaction_id, 'deal-1');
+  assert.equal((gaEvent?.params as Record<string, unknown>)?.transaction_id, '<deal-1>');
   assert.equal((gaEvent?.params as Record<string, unknown>)?.session_id, '174');
   assert.equal((gaEvent?.params as Record<string, unknown>)?.value, 4200);
 
@@ -126,7 +156,7 @@ test('purchase-dispatch should send GA4 and Meta purchase payloads', async (t) =
   const metaEvent = (metaRequest!.body?.data as Array<Record<string, unknown>> | undefined)?.[0];
   assert.ok(metaEvent, 'Meta event should exist');
   assert.equal(metaEvent?.event_name, 'Purchase');
-  assert.equal(metaEvent?.event_id, 'deal-1');
+  assert.equal(metaEvent?.event_id, '<deal-1>');
   assert.equal((metaEvent?.custom_data as Record<string, unknown>)?.value, 4200);
 });
 

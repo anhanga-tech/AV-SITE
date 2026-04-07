@@ -1,6 +1,5 @@
 import { sendGoogleConversion } from '../lib/conversions/google';
 import { sendMetaConversion } from '../lib/conversions/meta';
-import { cleanString } from '../lib/lead-logic';
 import { buildCorsHeaders } from '../lib/network';
 
 export const config = {
@@ -36,17 +35,28 @@ function buildJsonResponse(body: Record<string, unknown>, status: number): Respo
 }
 
 function getExpectedSecret(): string | null {
-  const secret = cleanString(process.env.N8N_WEBHOOK_SECRET);
+  const secret = typeof process.env.N8N_WEBHOOK_SECRET === 'string'
+    ? process.env.N8N_WEBHOOK_SECRET.trim()
+    : '';
   return secret || null;
 }
 
 function isAuthorized(request: Request, expectedSecret: string): boolean {
   const providedSecret = request.headers.get('X-Webhook-Secret');
-  return cleanString(providedSecret) === expectedSecret;
+  const normalizedSecret = providedSecret?.trim();
+  return normalizedSecret === expectedSecret;
 }
 
 function toStringOrUndefined(value: unknown): string | undefined {
-  const normalized = cleanString(value);
+  if (value === null || value === undefined) {
+    return undefined;
+  }
+
+  if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'bigint') {
+    return undefined;
+  }
+
+  const normalized = String(value).trim();
   return normalized || undefined;
 }
 
@@ -59,28 +69,33 @@ function toNumberOrZero(value: unknown): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function normalizePayload(raw: PurchaseDispatchPayload) {
-  const dealId = toStringOrUndefined(raw.dealId);
+function normalizePayload(raw: unknown) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    return null;
+  }
+
+  const payload = raw as PurchaseDispatchPayload;
+  const dealId = toStringOrUndefined(payload.dealId);
   if (!dealId) {
     return null;
   }
 
   return {
     dealId,
-    value: toNumberOrZero(raw.value),
-    currency: toStringOrUndefined(raw.currency) ?? 'BRL',
-    destination: toStringOrUndefined(raw.destination),
-    email: toStringOrUndefined(raw.email),
-    phone: toStringOrUndefined(raw.phone),
-    firstName: toStringOrUndefined(raw.firstName),
-    lastName: toStringOrUndefined(raw.lastName),
-    gaClientId: toStringOrUndefined(raw.gaClientId),
-    gaSessionId: toStringOrUndefined(raw.gaSessionId),
-    gclid: toStringOrUndefined(raw.gclid),
-    fbclid: toStringOrUndefined(raw.fbclid),
-    fbc: toStringOrUndefined(raw.fbc),
-    fbp: toStringOrUndefined(raw.fbp),
-    timestamp: toStringOrUndefined(raw.timestamp),
+    value: toNumberOrZero(payload.value),
+    currency: toStringOrUndefined(payload.currency) ?? 'BRL',
+    destination: toStringOrUndefined(payload.destination),
+    email: toStringOrUndefined(payload.email),
+    phone: toStringOrUndefined(payload.phone),
+    firstName: toStringOrUndefined(payload.firstName),
+    lastName: toStringOrUndefined(payload.lastName),
+    gaClientId: toStringOrUndefined(payload.gaClientId),
+    gaSessionId: toStringOrUndefined(payload.gaSessionId),
+    gclid: toStringOrUndefined(payload.gclid),
+    fbclid: toStringOrUndefined(payload.fbclid),
+    fbc: toStringOrUndefined(payload.fbc),
+    fbp: toStringOrUndefined(payload.fbp),
+    timestamp: toStringOrUndefined(payload.timestamp),
   };
 }
 
@@ -95,17 +110,17 @@ export default async function handler(request: Request): Promise<Response> {
 
   const expectedSecret = getExpectedSecret();
   if (!expectedSecret) {
-    return buildJsonResponse({ ok: false, error: 'Missing N8N webhook secret' }, 500);
+    return buildJsonResponse({ ok: false, error: 'Internal server error' }, 500);
   }
 
   if (!isAuthorized(request, expectedSecret)) {
     return buildJsonResponse({ ok: false, error: 'Unauthorized' }, 401);
   }
 
-  let body: PurchaseDispatchPayload;
+  let body: unknown;
 
   try {
-    body = await request.json() as PurchaseDispatchPayload;
+    body = await request.json();
   } catch {
     return buildJsonResponse({ ok: false, error: 'Invalid JSON body' }, 400);
   }
