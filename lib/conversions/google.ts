@@ -7,6 +7,7 @@ interface GA4ConversionPayload {
   destination?: string;
   value?: number;
   currency?: string;
+  transactionId?: string | null;
 }
 
 type GA4ConversionResult = { success: boolean; error?: string };
@@ -23,6 +24,7 @@ function buildGA4EventParams(payload: GA4ConversionPayload): Record<string, unkn
   if (payload.sessionId) params.session_id = payload.sessionId;
   if (payload.destination) params.destination = payload.destination;
   if (payload.gclid) params.gclid = payload.gclid;
+  if (payload.transactionId) params.transaction_id = payload.transactionId;
 
   return params;
 }
