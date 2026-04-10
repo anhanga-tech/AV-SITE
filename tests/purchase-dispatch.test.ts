@@ -207,6 +207,212 @@ test('purchase-dispatch should send GA4 and Meta purchase payloads', async (t) =
   assert.equal((metaEvent?.custom_data as Record<string, unknown>)?.value, 4200);
 });
 
+test('purchase-dispatch should dispatch lead_qualificado with attributionKey', async (t) => {
+  const calls: Array<{ url: string; body?: Record<string, unknown> }> = [];
+
+  t.after(() => {
+    global.fetch = originalFetch;
+    restoreEnv();
+  });
+
+  process.env.N8N_WEBHOOK_SECRET = 'expected-secret';
+  process.env.GA4_MEASUREMENT_ID = 'G-TEST12345';
+  process.env.GA4_API_SECRET = 'test-api-secret';
+  process.env.META_PIXEL_ID = 'pixel-1';
+  process.env.META_ACCESS_TOKEN = 'token-1';
+
+  global.fetch = (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+    const body = init?.body ? JSON.parse(String(init.body)) as Record<string, unknown> : undefined;
+    calls.push({ url, body });
+
+    if (url.startsWith('https://www.google-analytics.com/mp/collect')) {
+      return new Response(null, { status: 204 });
+    }
+
+    if (url.startsWith('https://graph.facebook.com/v19.0/pixel-1/events')) {
+      return new Response(JSON.stringify({ events_received: 1 }), { status: 200 });
+    }
+
+    return new Response(JSON.stringify({ error: 'unexpected request' }), { status: 500 });
+  }) as typeof fetch;
+
+  const response = await handler(buildRequest({
+    eventType: 'lead_qualificado',
+    attributionKey: 'attr-test-123',
+    email: 'lead@example.com',
+    phone: '+5511988887777',
+    gaClientId: '123456789.1234567890',
+    gaSessionId: '174',
+    fbc: 'fb.1.1736366050.fbclid-123',
+    fbp: 'fb.1.1736366050.1234567890',
+    value: 9999,
+    destination: 'Japao',
+  }, 'expected-secret'));
+
+  assert.equal(response.status, 200);
+
+  const data = await response.json() as Record<string, unknown>;
+  assert.equal(data.ok, true);
+  assert.equal(data.mode, 'full');
+
+  const gaRequest = calls.find(call => call.url.startsWith('https://www.google-analytics.com/mp/collect'));
+  assert.ok(gaRequest, 'GA4 request should exist');
+  const gaEvent = (gaRequest!.body?.events as Array<Record<string, unknown>>)?.[0];
+  assert.equal(gaEvent?.name, 'lead_qualificado');
+  assert.equal((gaEvent?.params as Record<string, unknown>)?.transaction_id, 'attr-test-123');
+  assert.equal((gaEvent?.params as Record<string, unknown>)?.value, 0, 'value should be forced to 0 for lead_qualificado');
+
+  const metaRequest = calls.find(call => call.url.startsWith('https://graph.facebook.com/v19.0/pixel-1/events'));
+  assert.ok(metaRequest, 'Meta request should exist');
+  const metaEvent = (metaRequest!.body?.data as Array<Record<string, unknown>>)?.[0];
+  assert.equal(metaEvent?.event_name, 'Lead');
+  assert.equal(metaEvent?.event_id, 'attr-test-123');
+  assert.equal((metaEvent?.custom_data as Record<string, unknown>)?.value, 0, 'Meta value should also be 0');
+});
+
+test('purchase-dispatch should dispatch close_convert_lead with dealId', async (t) => {
+  const calls: Array<{ url: string; body?: Record<string, unknown> }> = [];
+
+  t.after(() => {
+    global.fetch = originalFetch;
+    restoreEnv();
+  });
+
+  process.env.N8N_WEBHOOK_SECRET = 'expected-secret';
+  process.env.GA4_MEASUREMENT_ID = 'G-TEST12345';
+  process.env.GA4_API_SECRET = 'test-api-secret';
+  process.env.META_PIXEL_ID = 'pixel-1';
+  process.env.META_ACCESS_TOKEN = 'token-1';
+
+  global.fetch = (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+    const body = init?.body ? JSON.parse(String(init.body)) as Record<string, unknown> : undefined;
+    calls.push({ url, body });
+
+    if (url.startsWith('https://www.google-analytics.com/mp/collect')) {
+      return new Response(null, { status: 204 });
+    }
+
+    if (url.startsWith('https://graph.facebook.com/v19.0/pixel-1/events')) {
+      return new Response(JSON.stringify({ events_received: 1 }), { status: 200 });
+    }
+
+    return new Response(JSON.stringify({ error: 'unexpected request' }), { status: 500 });
+  }) as typeof fetch;
+
+  const response = await handler(buildRequest({
+    eventType: 'close_convert_lead',
+    dealId: 'deal-quote-1',
+    value: 8500,
+    currency: 'BRL',
+    email: 'cliente@example.com',
+    gaClientId: '123456789.1234567890',
+    fbc: 'fb.1.1736366050.fbclid-456',
+    destination: 'Europa 15 dias',
+  }, 'expected-secret'));
+
+  assert.equal(response.status, 200);
+
+  const data = await response.json() as Record<string, unknown>;
+  assert.equal(data.ok, true);
+
+  const gaRequest = calls.find(call => call.url.startsWith('https://www.google-analytics.com/mp/collect'));
+  const gaEvent = (gaRequest!.body?.events as Array<Record<string, unknown>>)?.[0];
+  assert.equal(gaEvent?.name, 'close_convert_lead');
+  assert.equal((gaEvent?.params as Record<string, unknown>)?.transaction_id, 'deal-quote-1');
+  assert.equal((gaEvent?.params as Record<string, unknown>)?.value, 8500);
+
+  const metaRequest = calls.find(call => call.url.startsWith('https://graph.facebook.com/v19.0/pixel-1/events'));
+  const metaEvent = (metaRequest!.body?.data as Array<Record<string, unknown>>)?.[0];
+  assert.equal(metaEvent?.event_name, 'Lead');
+  assert.equal(metaEvent?.event_id, 'deal-quote-1');
+  assert.equal((metaEvent?.custom_data as Record<string, unknown>)?.value, 8500);
+});
+
+test('purchase-dispatch should default to purchase when eventType is omitted', async (t) => {
+  const calls: Array<{ url: string; body?: Record<string, unknown> }> = [];
+
+  t.after(() => {
+    global.fetch = originalFetch;
+    restoreEnv();
+  });
+
+  process.env.N8N_WEBHOOK_SECRET = 'expected-secret';
+  process.env.GA4_MEASUREMENT_ID = 'G-TEST12345';
+  process.env.GA4_API_SECRET = 'test-api-secret';
+  process.env.META_PIXEL_ID = 'pixel-1';
+  process.env.META_ACCESS_TOKEN = 'token-1';
+
+  global.fetch = (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+    const body = init?.body ? JSON.parse(String(init.body)) as Record<string, unknown> : undefined;
+    calls.push({ url, body });
+
+    if (url.startsWith('https://www.google-analytics.com/mp/collect')) {
+      return new Response(null, { status: 204 });
+    }
+
+    if (url.startsWith('https://graph.facebook.com/v19.0/pixel-1/events')) {
+      return new Response(JSON.stringify({ events_received: 1 }), { status: 200 });
+    }
+
+    return new Response(JSON.stringify({ error: 'unexpected request' }), { status: 500 });
+  }) as typeof fetch;
+
+  const response = await handler(buildRequest({
+    dealId: 'deal-compat',
+    value: 3000,
+    gaClientId: '123456789.1234567890',
+    fbclid: 'fbclid-compat',
+  }, 'expected-secret'));
+
+  assert.equal(response.status, 200);
+
+  const data = await response.json() as Record<string, unknown>;
+  assert.equal(data.ok, true);
+
+  const gaEvent = (calls.find(c => c.url.includes('google-analytics'))!.body?.events as Array<Record<string, unknown>>)?.[0];
+  assert.equal(gaEvent?.name, 'purchase', 'should default to purchase');
+
+  const metaEvent = (calls.find(c => c.url.includes('graph.facebook'))!.body?.data as Array<Record<string, unknown>>)?.[0];
+  assert.equal(metaEvent?.event_name, 'Purchase', 'Meta should default to Purchase');
+});
+
+test('purchase-dispatch should reject lead_qualificado without attributionKey', async (t) => {
+  t.after(() => {
+    restoreEnv();
+  });
+
+  process.env.N8N_WEBHOOK_SECRET = 'expected-secret';
+
+  const response = await handler(buildRequest({
+    eventType: 'lead_qualificado',
+    email: 'lead@example.com',
+  }, 'expected-secret'));
+
+  assert.equal(response.status, 400);
+  const data = await response.json() as Record<string, unknown>;
+  assert.equal(data.error, 'Missing attributionKey');
+});
+
+test('purchase-dispatch should reject close_convert_lead without dealId', async (t) => {
+  t.after(() => {
+    restoreEnv();
+  });
+
+  process.env.N8N_WEBHOOK_SECRET = 'expected-secret';
+
+  const response = await handler(buildRequest({
+    eventType: 'close_convert_lead',
+    value: 5000,
+  }, 'expected-secret'));
+
+  assert.equal(response.status, 400);
+  const data = await response.json() as Record<string, unknown>;
+  assert.equal(data.error, 'Missing dealId');
+});
+
 test('purchase-dispatch should reject negative purchase values', async (t) => {
   t.after(() => {
     restoreEnv();
