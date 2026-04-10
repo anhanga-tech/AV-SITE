@@ -67,6 +67,20 @@ type NormalizePayloadResult =
   | { error: 'Missing attributionKey' | 'Missing dealId' }
   | null;
 
+type HandlerStepResult<T> =
+  | { ok: true; value: T }
+  | { ok: false; response: Response };
+
+type ConversionDispatchMode = 'full' | 'partial' | 'failed';
+
+type ProviderDispatchResult = Awaited<ReturnType<typeof sendGoogleConversion>>;
+
+interface ConversionDispatchOutcome {
+  ga4Result: ProviderDispatchResult;
+  metaResult: Awaited<ReturnType<typeof sendMetaConversion>>;
+  mode: ConversionDispatchMode;
+}
+
 function buildJsonResponse(
   body: Record<string, unknown>,
   status: number,
@@ -225,9 +239,7 @@ function sanitizeProviderResult(
   };
 }
 
-export default async function handler(request: Request): Promise<Response> {
-  const requestId = createRequestId();
-
+function validateRequestMethod(request: Request, requestId: string): Response | null {
   if (request.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: buildCorsHeaders() });
   }
@@ -236,6 +248,10 @@ export default async function handler(request: Request): Promise<Response> {
     return buildJsonResponse({ ok: false, requestId, error: 'Method not allowed' }, 405);
   }
 
+  return null;
+}
+
+function validateAuthorization(request: Request, requestId: string): Response | null {
   const expectedSecret = getExpectedSecret();
   if (!expectedSecret) {
     emitConversionLog('error', requestId, 'config_missing_secret');
@@ -247,27 +263,50 @@ export default async function handler(request: Request): Promise<Response> {
     return buildJsonResponse({ ok: false, requestId, error: 'Unauthorized' }, 401);
   }
 
+  return null;
+}
+
+async function parseValidatedPayload(
+  request: Request,
+  requestId: string,
+): Promise<HandlerStepResult<ConversionDispatchPayload>> {
   let body: unknown;
 
   try {
     body = await request.json();
   } catch {
-    return buildJsonResponse({ ok: false, requestId, error: 'Invalid JSON body' }, 400);
+    return {
+      ok: false,
+      response: buildJsonResponse({ ok: false, requestId, error: 'Invalid JSON body' }, 400),
+    };
   }
 
   const payload = normalizePayload(body);
   if (!payload) {
-    return buildJsonResponse({ ok: false, requestId, error: 'Invalid payload' }, 400);
+    return {
+      ok: false,
+      response: buildJsonResponse({ ok: false, requestId, error: 'Invalid payload' }, 400),
+    };
   }
 
   if ('error' in payload) {
-    return buildJsonResponse({ ok: false, requestId, error: payload.error }, 400);
+    return {
+      ok: false,
+      response: buildJsonResponse({ ok: false, requestId, error: payload.error }, 400),
+    };
   }
 
   if (payload.value < 0) {
-    return buildJsonResponse({ ok: false, requestId, error: 'Invalid value' }, 400);
+    return {
+      ok: false,
+      response: buildJsonResponse({ ok: false, requestId, error: 'Invalid value' }, 400),
+    };
   }
 
+  return { ok: true, value: payload };
+}
+
+async function enforceRateLimit(request: Request, requestId: string): Promise<Response | null> {
   const clientIP = getClientIP(request);
   const rateLimit = await checkRateLimit(clientIP, {
     limit: RATE_LIMIT_MAX_REQUESTS,
@@ -275,28 +314,47 @@ export default async function handler(request: Request): Promise<Response> {
     prefix: 'ratelimit:purchase-dispatch',
   });
 
-  if (!rateLimit.allowed) {
-    emitConversionLog('warn', requestId, 'rate_limited', {
-      clientIP,
-      remaining: rateLimit.remaining,
-      retryAfterSeconds: Math.ceil(rateLimit.resetIn / 1000),
-    });
-
-    return buildJsonResponse(
-      {
-        ok: false,
-        requestId,
-        error: 'Too many requests',
-      },
-      429,
-      {
-        'Retry-After': String(Math.ceil(rateLimit.resetIn / 1000)),
-        'X-RateLimit-Remaining': String(rateLimit.remaining),
-        'X-RateLimit-Reset': String(Math.ceil((Date.now() + rateLimit.resetIn) / 1000)),
-      },
-    );
+  if (rateLimit.allowed) {
+    return null;
   }
 
+  emitConversionLog('warn', requestId, 'rate_limited', {
+    clientIP,
+    remaining: rateLimit.remaining,
+    retryAfterSeconds: Math.ceil(rateLimit.resetIn / 1000),
+  });
+
+  return buildJsonResponse(
+    {
+      ok: false,
+      requestId,
+      error: 'Too many requests',
+    },
+    429,
+    {
+      'Retry-After': String(Math.ceil(rateLimit.resetIn / 1000)),
+      'X-RateLimit-Remaining': String(rateLimit.remaining),
+      'X-RateLimit-Reset': String(Math.ceil((Date.now() + rateLimit.resetIn) / 1000)),
+    },
+  );
+}
+
+function getDispatchMode(ga4Succeeded: boolean, metaSucceeded: boolean): ConversionDispatchMode {
+  if (ga4Succeeded && metaSucceeded) {
+    return 'full';
+  }
+
+  if (ga4Succeeded || metaSucceeded) {
+    return 'partial';
+  }
+
+  return 'failed';
+}
+
+async function dispatchConversion(
+  payload: ConversionDispatchPayload,
+  requestId: string,
+): Promise<ConversionDispatchOutcome> {
   const [ga4Result, metaResult] = await Promise.all([
     sendGoogleConversion(payload.eventType, {
       clientId: payload.gaClientId,
@@ -325,11 +383,7 @@ export default async function handler(request: Request): Promise<Response> {
     }),
   ]);
 
-  const mode = ga4Result.success && metaResult.success
-    ? 'full'
-    : ga4Result.success || metaResult.success
-      ? 'partial'
-      : 'failed';
+  const mode = getDispatchMode(ga4Result.success, metaResult.success);
 
   emitConversionLog('info', requestId, 'dispatch_complete', {
     eventType: payload.eventType,
@@ -339,6 +393,32 @@ export default async function handler(request: Request): Promise<Response> {
     meta: metaResult.success ? 'ok' : 'failed',
   });
 
+  return { ga4Result, metaResult, mode };
+}
+
+export default async function handler(request: Request): Promise<Response> {
+  const requestId = createRequestId();
+  const methodError = validateRequestMethod(request, requestId);
+  if (methodError) {
+    return methodError;
+  }
+
+  const authError = validateAuthorization(request, requestId);
+  if (authError) {
+    return authError;
+  }
+
+  const parsedPayload = await parseValidatedPayload(request, requestId);
+  if (parsedPayload.ok === false) {
+    return parsedPayload.response;
+  }
+
+  const rateLimitError = await enforceRateLimit(request, requestId);
+  if (rateLimitError) {
+    return rateLimitError;
+  }
+
+  const { ga4Result, metaResult, mode } = await dispatchConversion(parsedPayload.value, requestId);
   const ga4 = sanitizeProviderResult(requestId, 'ga4', ga4Result);
   const meta = sanitizeProviderResult(requestId, 'meta', metaResult);
 
