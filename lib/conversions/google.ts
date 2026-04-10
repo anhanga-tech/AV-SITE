@@ -1,4 +1,4 @@
-type GA4EventName = 'lead_qualificado' | 'purchase';
+type GA4EventName = 'lead_qualificado' | 'close_convert_lead' | 'purchase';
 
 interface GA4ConversionPayload {
   clientId?: string | null;
