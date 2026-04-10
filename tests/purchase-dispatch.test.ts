@@ -89,7 +89,7 @@ test('purchase-dispatch should reject non-object JSON bodies', async (t) => {
   assert.equal(response.status, 400);
 
   const data = await response.json() as Record<string, unknown>;
-  assert.equal(data.error, 'Missing dealId');
+  assert.equal(data.error, 'Invalid payload');
 });
 
 test('purchase-dispatch should include a request id in successful responses', async (t) => {

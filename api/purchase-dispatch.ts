@@ -11,7 +11,9 @@ const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 30;
 const SANITIZED_DISPATCH_ERROR = 'Conversion dispatch failed';
 
-interface PurchaseDispatchPayload {
+interface ConversionDispatchPayloadInput {
+  eventType?: unknown;
+  attributionKey?: unknown;
   dealId?: unknown;
   value?: unknown;
   currency?: unknown;
@@ -28,6 +30,42 @@ interface PurchaseDispatchPayload {
   fbp?: unknown;
   timestamp?: unknown;
 }
+
+type ConversionEventType = 'lead_qualificado' | 'close_convert_lead' | 'purchase';
+
+const VALID_EVENT_TYPES: ReadonlySet<string> = new Set(['lead_qualificado', 'close_convert_lead', 'purchase']);
+
+const META_EVENT_MAP: Record<ConversionEventType, 'Lead' | 'Purchase'> = {
+  lead_qualificado: 'Lead',
+  close_convert_lead: 'Lead',
+  purchase: 'Purchase',
+};
+
+interface ConversionDispatchPayload {
+  eventType: ConversionEventType;
+  deduplicationId: string;
+  dealId?: string;
+  attributionKey?: string;
+  value: number;
+  currency: string;
+  destination?: string;
+  email?: string;
+  phone?: string;
+  firstName?: string;
+  lastName?: string;
+  gaClientId?: string;
+  gaSessionId?: string;
+  gclid?: string;
+  fbclid?: string;
+  fbc?: string;
+  fbp?: string;
+  timestamp?: string;
+}
+
+type NormalizePayloadResult =
+  | ConversionDispatchPayload
+  | { error: 'Missing attributionKey' | 'Missing dealId' }
+  | null;
 
 function buildJsonResponse(
   body: Record<string, unknown>,
@@ -52,7 +90,7 @@ function createRequestId(): string {
     return crypto.randomUUID();
   }
 
-  return `purchase_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+  return `conv_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
 function truncateDetail(detail: string): string | undefined {
@@ -60,7 +98,7 @@ function truncateDetail(detail: string): string | undefined {
   return normalized ? normalized.substring(0, 600) : undefined;
 }
 
-function emitPurchaseDispatchLog(
+function emitConversionLog(
   level: 'info' | 'warn' | 'error',
   requestId: string,
   stage: string,
@@ -73,16 +111,16 @@ function emitPurchaseDispatchLog(
   };
 
   if (level === 'warn') {
-    console.warn('PURCHASE_DISPATCH', payload);
+    console.warn('CONVERSION_DISPATCH', payload);
     return;
   }
 
   if (level === 'error') {
-    console.error('PURCHASE_DISPATCH', payload);
+    console.error('CONVERSION_DISPATCH', payload);
     return;
   }
 
-  console.log('PURCHASE_DISPATCH', payload);
+  console.log('CONVERSION_DISPATCH', payload);
 }
 
 function getExpectedSecret(): string | null {
@@ -120,20 +158,38 @@ function toNumberOrZero(value: unknown): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function normalizePayload(raw: unknown) {
+function normalizePayload(raw: unknown): NormalizePayloadResult {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
     return null;
   }
 
-  const payload = raw as PurchaseDispatchPayload;
-  const dealId = toStringOrUndefined(payload.dealId);
-  if (!dealId) {
+  const payload = raw as ConversionDispatchPayloadInput;
+  const rawEventType = toStringOrUndefined(payload.eventType) ?? 'purchase';
+  if (!VALID_EVENT_TYPES.has(rawEventType)) {
     return null;
   }
 
+  const eventType = rawEventType as ConversionEventType;
+  const dealId = toStringOrUndefined(payload.dealId);
+  const attributionKey = toStringOrUndefined(payload.attributionKey);
+
+  if (eventType === 'lead_qualificado') {
+    if (!attributionKey) {
+      return { error: 'Missing attributionKey' };
+    }
+  } else if (!dealId) {
+    return { error: 'Missing dealId' };
+  }
+
+  const deduplicationId = eventType === 'lead_qualificado' ? attributionKey! : dealId!;
+  const value = eventType === 'lead_qualificado' ? 0 : toNumberOrZero(payload.value);
+
   return {
+    eventType,
+    deduplicationId,
     dealId,
-    value: toNumberOrZero(payload.value),
+    attributionKey,
+    value,
     currency: toStringOrUndefined(payload.currency) ?? 'BRL',
     destination: toStringOrUndefined(payload.destination),
     email: toStringOrUndefined(payload.email),
@@ -159,7 +215,7 @@ function sanitizeProviderResult(
     return { success: true };
   }
 
-  emitPurchaseDispatchLog('warn', requestId, `${provider}_dispatch_failed`, {
+  emitConversionLog('warn', requestId, `${provider}_dispatch_failed`, {
     detail: truncateDetail(result.error ?? ''),
   });
 
@@ -182,12 +238,12 @@ export default async function handler(request: Request): Promise<Response> {
 
   const expectedSecret = getExpectedSecret();
   if (!expectedSecret) {
-    emitPurchaseDispatchLog('error', requestId, 'config_missing_secret');
+    emitConversionLog('error', requestId, 'config_missing_secret');
     return buildJsonResponse({ ok: false, requestId, error: 'Internal server error' }, 500);
   }
 
   if (!isAuthorized(request, expectedSecret)) {
-    emitPurchaseDispatchLog('warn', requestId, 'unauthorized');
+    emitConversionLog('warn', requestId, 'unauthorized');
     return buildJsonResponse({ ok: false, requestId, error: 'Unauthorized' }, 401);
   }
 
@@ -201,7 +257,11 @@ export default async function handler(request: Request): Promise<Response> {
 
   const payload = normalizePayload(body);
   if (!payload) {
-    return buildJsonResponse({ ok: false, requestId, error: 'Missing dealId' }, 400);
+    return buildJsonResponse({ ok: false, requestId, error: 'Invalid payload' }, 400);
+  }
+
+  if ('error' in payload) {
+    return buildJsonResponse({ ok: false, requestId, error: payload.error }, 400);
   }
 
   if (payload.value < 0) {
@@ -216,7 +276,7 @@ export default async function handler(request: Request): Promise<Response> {
   });
 
   if (!rateLimit.allowed) {
-    emitPurchaseDispatchLog('warn', requestId, 'rate_limited', {
+    emitConversionLog('warn', requestId, 'rate_limited', {
       clientIP,
       remaining: rateLimit.remaining,
       retryAfterSeconds: Math.ceil(rateLimit.resetIn / 1000),
@@ -238,18 +298,18 @@ export default async function handler(request: Request): Promise<Response> {
   }
 
   const [ga4Result, metaResult] = await Promise.all([
-    sendGoogleConversion('purchase', {
+    sendGoogleConversion(payload.eventType, {
       clientId: payload.gaClientId,
       sessionId: payload.gaSessionId,
       gclid: payload.gclid,
       destination: payload.destination,
       value: payload.value,
       currency: payload.currency,
-      transactionId: payload.dealId,
+      transactionId: payload.deduplicationId,
     }),
     sendMetaConversion({
-      eventName: 'Purchase',
-      eventId: payload.dealId,
+      eventName: META_EVENT_MAP[payload.eventType],
+      eventId: payload.deduplicationId,
       email: payload.email,
       phone: payload.phone,
       firstName: payload.firstName,
@@ -260,7 +320,7 @@ export default async function handler(request: Request): Promise<Response> {
       value: payload.value,
       currency: payload.currency,
       contentName: payload.destination,
-      contentType: 'travel_package',
+      contentType: payload.eventType === 'purchase' ? 'travel_package' : 'destination_interest',
       timestamp: payload.timestamp,
     }),
   ]);
@@ -271,8 +331,9 @@ export default async function handler(request: Request): Promise<Response> {
       ? 'partial'
       : 'failed';
 
-  emitPurchaseDispatchLog('info', requestId, 'dispatch_complete', {
-    dealId: payload.dealId,
+  emitConversionLog('info', requestId, 'dispatch_complete', {
+    eventType: payload.eventType,
+    deduplicationId: payload.deduplicationId,
     mode,
     ga4: ga4Result.success ? 'ok' : 'failed',
     meta: metaResult.success ? 'ok' : 'failed',
