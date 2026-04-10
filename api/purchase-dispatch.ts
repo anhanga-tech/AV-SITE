@@ -186,16 +186,18 @@ function normalizePayload(raw: unknown): NormalizePayloadResult {
   const eventType = rawEventType as ConversionEventType;
   const dealId = toStringOrUndefined(payload.dealId);
   const attributionKey = toStringOrUndefined(payload.attributionKey);
+  let deduplicationId: string;
 
   if (eventType === 'lead_qualificado') {
     if (!attributionKey) {
       return { error: 'Missing attributionKey' };
     }
+    deduplicationId = attributionKey;
   } else if (!dealId) {
     return { error: 'Missing dealId' };
+  } else {
+    deduplicationId = dealId;
   }
-
-  const deduplicationId = eventType === 'lead_qualificado' ? attributionKey! : dealId!;
   const value = eventType === 'lead_qualificado' ? 0 : toNumberOrZero(payload.value);
 
   return {
