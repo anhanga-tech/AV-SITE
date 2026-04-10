@@ -3,8 +3,6 @@ import { buildCorsHeaders, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
 import { cleanString, validatePayload } from '../lib/lead-logic';
 import { buildN8nLeadPayload } from '../lib/n8n-payloads';
-import { sendGoogleConversion } from '../lib/conversions/google';
-import { sendMetaConversion } from '../lib/conversions/meta';
 import { sendLeadToN8n } from '../services/n8n';
 
 export const config = {
@@ -204,38 +202,6 @@ function validateRequestPayload(
     return validation.data;
 }
 
-async function trackLeadConversions(payload: SubmitLeadRequest, requestId: string): Promise<void> {
-    const [googleResult, metaResult] = await Promise.all([
-        sendGoogleConversion('lead_qualificado', {
-            clientId: payload.tracking?.cid,
-            sessionId: payload.tracking?.sid,
-            gclid: payload.tracking?.gclid,
-            destination: payload.destination,
-        }),
-        sendMetaConversion({
-            eventName: 'Lead',
-            eventId: payload.event_id,
-            email: payload.email,
-            phone: payload.whatsapp,
-            firstName: payload.firstName,
-            lastName: payload.lastName,
-            fbclid: payload.tracking?.fbclid,
-            fbc: payload.tracking?.fbc,
-            fbp: payload.tracking?.fbp,
-            contentName: payload.destination,
-            contentType: 'destination_interest',
-        }),
-    ]);
-
-    emitLeadLog('info', requestId, 'conversions', {
-        ga4: googleResult.success ? 'ok' : googleResult.error || 'failed',
-        metaAds: metaResult.success ? 'ok' : metaResult.error || 'failed',
-    });
-
-    if (!googleResult.success) console.warn('[GA4 MP] Lead conversion failed', googleResult.error);
-    if (!metaResult.success) console.warn('META: Lead conversion failed', metaResult.error);
-}
-
 export default async function handler(request: Request): Promise<Response> {
     const requestId = createRequestId();
     const corsHeaders = buildCorsHeaders();
@@ -318,12 +284,6 @@ export default async function handler(request: Request): Promise<Response> {
             201,
             corsHeaders,
         );
-
-        void trackLeadConversions(payload, requestId).catch((conversionError: unknown) => {
-            emitLeadLog('warn', requestId, 'conversions_failed', {
-                detail: truncateDetail(conversionError instanceof Error ? conversionError.message : String(conversionError)),
-            });
-        });
 
         return response;
     } catch (error: unknown) {
