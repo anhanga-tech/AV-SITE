@@ -44,6 +44,11 @@ function maskEmail(email: string): string {
     return `${firstChar}***@${domainPart}`;
 }
 
+function maskPhone(phone: string): string {
+    if (phone.length <= 6) return '***';
+    return `${phone.slice(0, 3)}***${phone.slice(-3)}`;
+}
+
 function emitLeadLog(level: LeadLogLevel, requestId: string, stage: string, details: Record<string, unknown> = {}): void {
     const payload = {
         requestId,
@@ -239,6 +244,8 @@ async function trackLeadConversions(payload: SubmitLeadRequest, requestId: strin
 export default async function handler(request: Request): Promise<Response> {
     const requestId = createRequestId();
     const corsHeaders = buildCorsHeaders();
+    // Hoisted so the catch block can log recovery data if the N8n call fails after validation.
+    let recoveryPayload: SubmitLeadRequest | null = null;
 
     try {
         if (request.method === 'OPTIONS') {
@@ -283,6 +290,8 @@ export default async function handler(request: Request): Promise<Response> {
 
         const payload = validateRequestPayload(rawBody, corsHeaders, requestId);
         if (payload instanceof Response) return payload;
+
+        recoveryPayload = payload;
 
         emitLeadLog('info', requestId, 'payload_validated', {
             email: maskEmail(payload.email),
@@ -329,11 +338,27 @@ export default async function handler(request: Request): Promise<Response> {
     } catch (error: unknown) {
         const classified = classifySubmitLeadError(error);
 
+        const recoveryData = classified.code === 'N8N_WEBHOOK_ERROR' && recoveryPayload !== null
+            ? {
+                // Masked lead data so the submission can be recovered manually from logs if needed.
+                recoveredLead: {
+                    maskedEmail: maskEmail(recoveryPayload.email),
+                    maskedPhone: maskPhone(recoveryPayload.whatsapp),
+                    firstName: recoveryPayload.firstName,
+                    lastName: recoveryPayload.lastName,
+                    destination: recoveryPayload.destination,
+                    bantSummary: recoveryPayload.bantSummary,
+                    utms: recoveryPayload.utms,
+                },
+            }
+            : {};
+
         emitLeadLog('error', requestId, classified.code === 'N8N_WEBHOOK_ERROR' ? 'n8n_webhook_failed' : 'unexpected', {
             code: classified.code,
             status: classified.status,
             errorType: error instanceof Error ? error.name : typeof error,
             detail: classified.detail,
+            ...recoveryData,
         });
 
         return buildJsonResponse(
