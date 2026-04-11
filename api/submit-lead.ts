@@ -298,7 +298,7 @@ export default async function handler(request: Request): Promise<Response> {
     } catch (error: unknown) {
         const classified = classifySubmitLeadError(error);
 
-        const recoveryData = classified.code === 'N8N_WEBHOOK_ERROR' && recoveryPayload !== null
+        const recoveryData = recoveryPayload !== null
             ? {
                 // Masked lead data so the submission can be recovered manually from logs if needed.
                 recoveredLead: {
