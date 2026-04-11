@@ -33,7 +33,7 @@ interface ConversionDispatchPayloadInput {
 
 type ConversionEventType = 'lead_qualificado' | 'close_convert_lead' | 'purchase';
 
-const VALID_EVENT_TYPES: ReadonlySet<string> = new Set(['lead_qualificado', 'close_convert_lead', 'purchase']);
+const VALID_EVENT_TYPES: ReadonlySet<ConversionEventType> = new Set<ConversionEventType>(['lead_qualificado', 'close_convert_lead', 'purchase']);
 
 const META_EVENT_MAP: Record<ConversionEventType, 'Lead' | 'Purchase'> = {
   lead_qualificado: 'Lead',
@@ -179,7 +179,7 @@ function normalizePayload(raw: unknown): NormalizePayloadResult {
 
   const payload = raw as ConversionDispatchPayloadInput;
   const rawEventType = toStringOrUndefined(payload.eventType) ?? 'purchase';
-  if (!VALID_EVENT_TYPES.has(rawEventType)) {
+  if (!VALID_EVENT_TYPES.has(rawEventType as ConversionEventType)) {
     return null;
   }
 

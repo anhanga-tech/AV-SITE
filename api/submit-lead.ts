@@ -300,7 +300,6 @@ export default async function handler(request: Request): Promise<Response> {
 
         const recoveryData = recoveryPayload !== null
             ? {
-                // Masked lead data so the submission can be recovered manually from logs if needed.
                 recoveredLead: {
                     maskedEmail: maskEmail(recoveryPayload.email),
                     maskedPhone: maskPhone(recoveryPayload.whatsapp),
