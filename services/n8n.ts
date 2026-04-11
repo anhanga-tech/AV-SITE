@@ -1,6 +1,8 @@
 import type { N8nLeadPayload, N8nWaitlistPayload } from '../lib/n8n-payloads';
 
-const DEFAULT_N8N_REQUEST_TIMEOUT_MS = 1500;
+// 5 seconds gives self-hosted n8n enough headroom for cold-start workflows
+// without hanging the edge function indefinitely. Override with N8N_WEBHOOK_TIMEOUT_MS.
+const DEFAULT_N8N_REQUEST_TIMEOUT_MS = 5000;
 
 export function getN8nTimeoutMs(): number {
     const configured = Number.parseInt(String(process.env.N8N_WEBHOOK_TIMEOUT_MS ?? ''), 10);
