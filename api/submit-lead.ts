@@ -305,9 +305,10 @@ export default async function handler(request: Request): Promise<Response> {
                     maskedEmail: maskEmail(recoveryPayload.email),
                     maskedPhone: maskPhone(recoveryPayload.whatsapp),
                     firstName: recoveryPayload.firstName,
-                    lastName: recoveryPayload.lastName,
                     destination: recoveryPayload.destination,
-                    bantSummary: recoveryPayload.bantSummary,
+                    // bantSummary omitted — may contain sensitive PII (budget, health, family details).
+                    // hasBantSummary preserves qualification signal without exposing content to log infra.
+                    hasBantSummary: Boolean(recoveryPayload.bantSummary),
                     utms: recoveryPayload.utms,
                 },
             }
