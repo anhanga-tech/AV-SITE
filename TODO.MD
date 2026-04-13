@@ -3,6 +3,7 @@
 Este documento lista as melhorias identificadas na auditoria de Março de 2026 que não foram priorizadas para implementação imediata.
 
 ## Técnico & Performance
+- [ ] **Padronizar navegação interna nas landing pages**: Substituir `<a href="https://www.anhanga.tur.br/">` por `<Link to="/">` do `react-router-dom` em todas as landings (`BetoCarreroLanding`, `LollapaloozaLanding`, `OrlandoLanding`, `MelhorIdadeLanding`, `BrazilPromotionDayLanding`). Melhora navegação SPA e compatibilidade com ambientes de preview (Vercel). Fazer de uma vez em todas para manter consistência.
 - [ ] **Padronização Cloudinary**: Migrar todas as imagens remotas (como as do Pexels/Unsplash no blog) para o Cloudinary utilizando o helper `optimizeRemoteImageUrl` com parâmetros `f_auto,q_auto` para maximizar o Core Web Vitals (LCP).
 - [ ] **Auditoria de CLS**: Adicionar `width` e `height` explícitos em componentes de imagem para evitar saltos de layout.
 
