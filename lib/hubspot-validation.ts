@@ -19,7 +19,7 @@ const HUBSPOT_URI_DECODE_RULES: Array<[RegExp, string]> = [
   [/%3B/gi, ';']
 ];
 
-function timingSafeEqual(left: string, right: string): boolean {
+export function timingSafeEqual(left: string, right: string): boolean {
   if (left.length !== right.length) {
     return false;
   }
