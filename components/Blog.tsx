@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import Calendar from 'lucide-react/dist/esm/icons/calendar';
 import User from 'lucide-react/dist/esm/icons/user';
 import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
@@ -7,8 +7,8 @@ import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
 import { getAllPosts } from '../lib/mdx';
 import { SocialShare } from './SocialShare';
 import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
-import { optimizeRemoteImageUrl } from '../data/mediaConfig';
 import { getCategoryColor } from '../utils/categoryColors';
+import { LazyImage } from './ui/LazyImage';
 
 const allPosts = getAllPosts();
 const displayPosts = allPosts.slice(0, 4);
@@ -17,7 +17,16 @@ const gridPosts = featuredPost
     ? displayPosts.filter(p => p.slug !== featuredPost.slug).slice(0, 3)
     : [];
 
-const Blog: React.FC = () => {
+/**
+ * Optimized Blog component.
+ *
+ * PERFORMANCE WIN:
+ * 1. Wrapped in React.memo to prevent unnecessary re-renders when parent (Home.tsx)
+ *    updates its internal state.
+ * 2. Replaced standard <img> with LazyImage to eliminate Layout Shifts (CLS)
+ *    and ensure efficient asset loading with CDN optimization.
+ */
+const Blog: React.FC = memo(() => {
     return (
         <section id="blog" className="py-24 bg-white relative overflow-hidden">
             {/* Background Decorations */}
@@ -48,11 +57,11 @@ const Blog: React.FC = () => {
                                 <div className="w-full md:w-1/2 relative">
                                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-brand-cyan/20 backdrop-blur-sm border-l border-r border-white/60 -rotate-2 shadow-sm z-20"></div>
                                     <div className="rounded-2xl overflow-hidden aspect-video border-2 border-white shadow-md">
-                                        <img
-                                            src={optimizeRemoteImageUrl(featuredPost.image, 960, 540)}
+                                        <LazyImage
+                                            src={featuredPost.image}
                                             alt={featuredPost.title}
-                                            loading="lazy"
-                                            decoding="async"
+                                            width={960}
+                                            height={540}
                                             className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
                                         />
                                     </div>
@@ -113,11 +122,11 @@ const Blog: React.FC = () => {
                         >
                             {/* Image Area */}
                             <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-5 bg-gray-100">
-                                <img
-                                    src={optimizeRemoteImageUrl(post.image, 640, 480)}
+                                <LazyImage
+                                    src={post.image}
                                     alt={post.title}
-                                    loading="lazy"
-                                    decoding="async"
+                                    width={640}
+                                    height={480}
                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                 />
                                 <div className="absolute top-3 right-3 bg-white/90 backdrop-blur rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-800 shadow-sm">
@@ -171,6 +180,8 @@ const Blog: React.FC = () => {
             </div>
         </section>
     );
-};
+});
+
+Blog.displayName = 'Blog';
 
 export default Blog;

@@ -15,3 +15,7 @@
 ## 2026-04-06 - ⚡ Bolt: Carousel Layout Stability
 **Learning:** Using standard <img> tags in dynamic carousels like Testimonials without explicit width/height leads to Cumulative Layout Shift (CLS) as images load after the container renders. Wrapping in LazyImage with numeric dimensions ensures the aspect ratio is reserved.
 **Action:** Always use LazyImage with explicit width and height for repeatable list/carousel items to ensure visual stability and CDN optimization.
+
+## 2026-05-20 - ⚡ Bolt: Blog Component Optimization
+**Learning:** The Blog component on the home page was using standard `<img>` tags and lacked memoization, causing Cumulative Layout Shift (CLS) and redundant re-renders when the parent home page state changed. Utilizing the internal `LazyImage` component with explicit dimensions (960x540 for featured, 640x480 for grid) not only stabilizes the layout but also leverages the built-in `optimizeRemoteImageUrl` for bandwidth efficiency.
+**Action:** Ensure large content sections like Blog are wrapped in `React.memo` and use the project's `LazyImage` standard for all remote assets to maintain Core Web Vitals.
