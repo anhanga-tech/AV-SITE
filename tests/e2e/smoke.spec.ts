@@ -87,4 +87,22 @@ test.describe('Smoke Suite', () => {
     await aiChat.close();
 
   });
+
+  test('should ensure header anchor links work from non-home pages', async ({ page }) => {
+    // Navigate to a non-home page
+    await page.goto('/sobre/');
+
+    const contactLink = page.locator('header a[href*="#contato"]');
+    const href = await contactLink.getAttribute('href');
+
+    // Memory 27 says: Header component uses a conditional href that prepends
+    // the absolute SITE_URL when isHome is false.
+    // So we expect it to be an absolute URL or at least start with /
+    expect(href).toMatch(/^https?:\/\/.*\/#contato$/);
+
+    await contactLink.click();
+
+    // Should navigate back to home with the anchor
+    await expect(page).toHaveURL(/\/.*#contato$/);
+  });
 });

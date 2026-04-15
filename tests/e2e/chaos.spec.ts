@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { HomePage } from './pages/HomePage';
 import { AIChat } from './pages/AIChat';
+import { BrazilPromotionDayPage } from './pages/BrazilPromotionDayPage';
 
 test.describe('Chaos & Unhappy Path Suite', () => {
   test('should handle Gemini API 500 error gracefully', async ({ page }) => {
@@ -65,5 +66,54 @@ test.describe('Chaos & Unhappy Path Suite', () => {
 
     // Should stay on home or show validation (depends on implementation)
     await expect(page).toHaveURL(/\/$/);
+  });
+
+  test('should handle API 500 error in Brazil Promotion Day form', async ({ page }) => {
+    const landing = new BrazilPromotionDayPage(page);
+    await page.route('**/api/submit-lead', route => {
+      route.fulfill({
+        status: 500,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'Internal Server Error', code: 'SERVER_ERROR' }),
+      });
+    });
+
+    await landing.goto();
+
+    await landing.fillForm({
+      firstName: 'Chaos',
+      lastName: 'Tester',
+      email: 'chaos@test.com',
+      whatsapp: '(11) 98831-4487',
+      destination: 'Paris',
+    });
+
+    await landing.submit();
+
+    await landing.expectError('Internal Server Error');
+  });
+
+  test('should handle network timeout in Brazil Promotion Day form', async ({ page }) => {
+    const landing = new BrazilPromotionDayPage(page);
+    await page.route('**/api/submit-lead', async route => {
+      // Small delay to ensure it's not instantaneous but enough to trigger fetch failure
+      await new Promise(resolve => setTimeout(resolve, 100));
+      await route.abort('timedout');
+    });
+
+    await landing.goto();
+
+    await landing.fillForm({
+      firstName: 'Timeout',
+      lastName: 'Tester',
+      email: 'timeout@test.com',
+      whatsapp: '(11) 98831-4487',
+      destination: 'Paris',
+    });
+
+    await landing.submit();
+
+    // Since the request was aborted/timed out, useLeadCapture should catch the network error
+    await landing.expectError();
   });
 });
