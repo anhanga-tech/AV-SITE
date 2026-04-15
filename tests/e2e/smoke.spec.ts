@@ -88,11 +88,20 @@ test.describe('Smoke Suite', () => {
 
   });
 
-  test('should ensure header anchor links work from non-home pages', async ({ page }) => {
+  test('should ensure header anchor links work from non-home pages', async ({ page, isMobile }) => {
     // Navigate to a non-home page
     await page.goto('/sobre/');
 
-    const contactLink = page.locator('header a[href*="#contato"]');
+    const homePage = new HomePage(page);
+    let contactLink;
+
+    if (isMobile) {
+      await homePage.openMobileMenu();
+      contactLink = page.locator('#mobile-menu a[href*="#contato"]');
+    } else {
+      contactLink = page.locator('header a[href*="#contato"]');
+    }
+
     const href = await contactLink.getAttribute('href');
 
     // Memory 27 says: Header component uses a conditional href that prepends

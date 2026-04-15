@@ -167,7 +167,7 @@ test.describe('Destructive & Security Suite', () => {
   test('should sanitize XSS payload in Brazil Promotion Day form', async ({ page }) => {
     const landing = new BrazilPromotionDayPage(page);
     const xssPayload = '<img src=x onerror=alert(1)>';
-    let submitPayload: any = null;
+    let submitPayload: SubmitLeadRequest | null = null;
 
     await page.route('**/api/submit-lead', async route => {
       submitPayload = route.request().postDataJSON();
@@ -192,7 +192,7 @@ test.describe('Destructive & Security Suite', () => {
 
     await expect.poll(() => submitPayload, { timeout: 15000 }).not.toBeNull();
     // Verify frontend sanitization
-    expect(submitPayload.firstName).toBe('&lt;img src=x onerror=alert(1)&gt;');
+    expect(submitPayload?.firstName).toBe('&lt;img src=x onerror=alert(1)&gt;');
   });
 
   test('should prevent multiple submissions on Brazil Promotion Day form via rage clicking', async ({ page }) => {
