@@ -706,9 +706,16 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
     setInputValue('');
     onDestinationMatch(null);
     setShowDestSuggestions(false);
+    import('../utils/haptics').then(m => m.triggerHaptic('light'));
   }, [onDestinationMatch]);
 
+  const handleAdultsChange = useCallback((nextValue: number) => {
+    setAdults(nextValue);
+    import('../utils/haptics').then(m => m.triggerHaptic('light'));
+  }, []);
+
   const handleChildCountChange = useCallback((operation: 'add' | 'remove') => {
+    import('../utils/haptics').then(m => m.triggerHaptic('light'));
     if (operation === 'add') {
       setChildren((previous) => previous + 1);
       setChildAges((previous) => [...previous, '']);
@@ -725,6 +732,7 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
       nextAges[index] = value;
       return nextAges;
     });
+    import('../utils/haptics').then(m => m.triggerHaptic('light'));
   }, []);
 
   const handleDateClick = useCallback((date: Date) => {
@@ -828,11 +836,23 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
     handleSearch();
   }, [handleSearch]);
 
-  const toggleCalendar = useCallback(() => setShowCalendar((prev) => !prev), []);
-  const toggleGuestDropdown = useCallback(() => setShowGuestDropdown((prev) => !prev), []);
+  const toggleCalendar = useCallback(() => {
+    setShowCalendar((prev) => !prev);
+    import('../utils/haptics').then(m => m.triggerHaptic('light'));
+  }, []);
+  const toggleGuestDropdown = useCallback(() => {
+    setShowGuestDropdown((prev) => !prev);
+    import('../utils/haptics').then(m => m.triggerHaptic('light'));
+  }, []);
   const closeGuestDropdown = useCallback(() => setShowGuestDropdown(false), []);
-  const toggleTripTypeDropdown = useCallback(() => setShowTripTypeDropdown((prev) => !prev), []);
-  const toggleBudgetDropdown = useCallback(() => setShowBudgetDropdown((prev) => !prev), []);
+  const toggleTripTypeDropdown = useCallback(() => {
+    setShowTripTypeDropdown((prev) => !prev);
+    import('../utils/haptics').then(m => m.triggerHaptic('light'));
+  }, []);
+  const toggleBudgetDropdown = useCallback(() => {
+    setShowBudgetDropdown((prev) => !prev);
+    import('../utils/haptics').then(m => m.triggerHaptic('light'));
+  }, []);
   const onDestinationFocus = useCallback(() => setShowDestSuggestions(true), []);
 
   return (
@@ -873,7 +893,7 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
           children={children}
           childAges={childAges}
           onToggle={toggleGuestDropdown}
-          onAdultsChange={setAdults}
+          onAdultsChange={handleAdultsChange}
           onChildCountChange={handleChildCountChange}
           onChildAgeChange={handleChildAgeChange}
           onClose={closeGuestDropdown}

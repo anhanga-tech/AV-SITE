@@ -9,3 +9,7 @@
 ## 2025-05-15 - Enhancing Form Control Interactions and State Feedback
 **Learning:** Interactive form elements like guest counters and destination inputs benefit significantly from explicit state constraints and quick-reset actions. Disabling invalid decrement actions (e.g., <1 adult) prevents user error before it occurs, while a dedicated "Clear" button for text inputs reduces the interaction cost for corrections. Furthermore, a transient "loading" state on the primary CTA provides immediate feedback for background processes, preventing duplicate submissions and confirming user intent.
 **Action:** Always implement boundary constraints for numeric inputs, provide clear reset options for searchable fields, and ensure CTAs reflect their processing state during asynchronous operations.
+
+## 2025-05-15 - Synchronized Haptics and Accessible Destination Cards
+**Learning:** Micro-interactions like haptic feedback ('light' for toggles/counters, 'medium' for copy actions) significantly increase the "physical" feel of the interface on mobile. For card-based layouts that trigger modals, adding semantic role="button" and keyboard listeners (Enter/Space) ensures that keyboard and screen-reader users can access the same rich content as mouse users. Using dynamic imports for the haptics utility keeps the bundle lean for non-mobile or low-interaction sessions.
+**Action:** Use haptic feedback to confirm discrete UI actions and always ensure custom interactive elements (like cards) are reachable and activatable via keyboard.

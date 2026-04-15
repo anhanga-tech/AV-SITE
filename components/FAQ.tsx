@@ -21,6 +21,7 @@ const FAQItem = memo(({ question, answer, idx }: FAQItemProps) => {
 
     const handleToggle = useCallback(() => {
         setIsOpen(prev => !prev);
+        import('../utils/haptics').then(m => m.triggerHaptic('light'));
     }, []);
 
     return (
