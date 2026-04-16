@@ -5,6 +5,7 @@ import { QUICK_FEATURES } from '../data/destinations';
 import { NOISE_TEXTURE_URL } from '../lib/static-assets';
 import SearchForm from './SearchForm';
 import { openAiChat } from '../utils/aiChat';
+import { triggerHaptic } from '../utils/haptics';
 
 const noiseTextureStyle = {
   backgroundImage: `url("${NOISE_TEXTURE_URL}")`,
@@ -175,7 +176,9 @@ const Hero: React.FC = () => {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
+                void triggerHaptic('light');
                 openAiChat({
+                  haptic: 'none',
                   message: mobileDestination.trim()
                     ? `Olá! Tenho interesse em viajar para ${mobileDestination.trim()}. Podem me ajudar com um orçamento?`
                     : 'Olá! Gostaria de montar um roteiro personalizado. Podem me ajudar?',

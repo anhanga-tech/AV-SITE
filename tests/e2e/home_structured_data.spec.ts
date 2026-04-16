@@ -5,7 +5,7 @@ function parseStructuredData(rawJson: string): Record<string, unknown> {
 }
 
 test.describe('Home structured data', () => {
-  test('publishes FAQ, breadcrumb and service schemas with aggregate rating', async ({ page }) => {
+  test('publishes FAQ, breadcrumb and service schemas', async ({ page }) => {
     await page.goto('/');
 
     await expect(page).toHaveTitle(/Anhangá Viagens/);
@@ -47,12 +47,8 @@ test.describe('Home structured data', () => {
     const serviceSchema = parseStructuredData(await serviceScript.first().innerHTML());
     expect(serviceSchema['@type']).toBe('Service');
     expect(serviceSchema.name).toBe('Agência de Viagens Personalizadas');
-    expect(serviceSchema.aggregateRating).toEqual({
-      '@type': 'AggregateRating',
-      ratingValue: 5,
-      reviewCount: expect.any(Number),
-      bestRating: 5,
-      worstRating: 1,
-    });
+    // aggregateRating was intentionally removed from the home ServiceSchema to comply with
+    // Google's structured data visibility guidelines (reviews must be user-visible on the page).
+    expect(serviceSchema.aggregateRating).toBeUndefined();
   });
 });
