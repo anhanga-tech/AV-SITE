@@ -7,10 +7,7 @@ import { FAQPageSchema } from '../components/schemas/FAQPageSchema';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { ServiceSchema } from '../components/schemas/ServiceSchema';
 import { FAQ_SCHEMA_ITEMS } from '../data/faqData';
-// TESTIMONIALS and TESTIMONIAL_MAX_RATING removed from import: aggregateRating was dropped from
-// ServiceSchema on 2026-04-06 to fix a Google structured-data guideline violation (ratings must
-// be statically user-visible; they were only in JS-rendered hidden <meta> elements).
-// Individual Review microdata still renders via Testimonials.tsx (itemScope/itemProp).
+// aggregateRating was removed from ServiceSchema to comply with Google's visibility guidelines; individual reviews now use microdata.
 
 import { SEO } from '../components/SEO';
 
