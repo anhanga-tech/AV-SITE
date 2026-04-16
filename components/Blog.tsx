@@ -7,8 +7,8 @@ import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
 import { getAllPosts } from '../lib/mdx';
 import { SocialShare } from './SocialShare';
 import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
-import { LazyImage } from './ui/LazyImage';
 import { getCategoryColor } from '../utils/categoryColors';
+import { LazyImage } from './ui/LazyImage';
 
 const allPosts = getAllPosts();
 const displayPosts = allPosts.slice(0, 4);
@@ -18,16 +18,15 @@ const gridPosts = featuredPost
     : [];
 
 /**
- * Blog Component - Optimized with React.memo and LazyImage.
+ * Optimized Blog component.
  *
- * PERFORMANCE WINS:
- * 1. React.memo: Prevents the entire blog section from re-rendering when parent
- *    state changes (e.g., header scrolls, chat opens).
- * 2. LazyImage: Implements intersection-based lazy loading and stabilizes
- *    layout with explicit aspect ratios to prevent Cumulative Layout Shift (CLS).
- * 3. URL Optimization: Automatically requests appropriately sized images from the CDN.
+ * PERFORMANCE WIN:
+ * 1. Wrapped in React.memo to prevent unnecessary re-renders when parent (Home.tsx)
+ *    updates its internal state.
+ * 2. Replaced standard <img> with LazyImage to eliminate Layout Shifts (CLS)
+ *    and ensure efficient asset loading with CDN optimization.
  */
-const Blog = memo(() => {
+const Blog: React.FC = memo(() => {
     return (
         <section id="blog" className="py-24 bg-white relative overflow-hidden">
             {/* Background Decorations */}
@@ -57,14 +56,12 @@ const Blog = memo(() => {
                                 {/* Featured Image */}
                                 <div className="w-full md:w-1/2 relative">
                                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-brand-cyan/20 backdrop-blur-sm border-l border-r border-white/60 -rotate-2 shadow-sm z-20"></div>
-                                    <div className="rounded-2xl overflow-hidden border-2 border-white shadow-md aspect-video">
+                                    <div className="rounded-2xl overflow-hidden aspect-video border-2 border-white shadow-md">
                                         <LazyImage
                                             src={featuredPost.image}
                                             alt={featuredPost.title}
                                             width={960}
                                             height={540}
-                                            loading="lazy"
-                                            fetchPriority="low"
                                             className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
                                         />
                                     </div>
@@ -124,14 +121,12 @@ const Blog = memo(() => {
                             className="group bg-white rounded-3xl p-4 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.05)] border border-gray-100 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl flex flex-col h-full"
                         >
                             {/* Image Area */}
-                            <div className="relative rounded-2xl overflow-hidden mb-5 bg-gray-100 aspect-[4/3]">
+                            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-5 bg-gray-100">
                                 <LazyImage
                                     src={post.image}
                                     alt={post.title}
                                     width={640}
                                     height={480}
-                                    loading="lazy"
-                                    fetchPriority="low"
                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                 />
                                 <div className="absolute top-3 right-3 bg-white/90 backdrop-blur rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-800 shadow-sm">
