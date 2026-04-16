@@ -4,7 +4,7 @@ import { Star, Quote, CheckCircle2 } from 'lucide-react';
 import { Testimonial } from './types';
 import { optimizeRemoteImageUrl } from '../../../data/mediaConfig';
 
-const testimonials: Testimonial[] = [
+export const BETO_TESTIMONIALS: Testimonial[] = [
   {
     id: 1,
     name: "Família Souza",
@@ -42,7 +42,7 @@ const Testimonials: React.FC = () => {
         />
 
         <div className="grid md:grid-cols-3 gap-12 lg:gap-8 mt-20 px-4">
-          {testimonials.map((t, idx) => {
+          {BETO_TESTIMONIALS.map((t, idx) => {
              // Rotation logic to make it look organic
              const rotationClasses = [
                 'rotate-2 lg:rotate-2 hover:rotate-0 translate-y-4', // Card 1

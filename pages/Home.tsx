@@ -7,7 +7,7 @@ import { FAQPageSchema } from '../components/schemas/FAQPageSchema';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { ServiceSchema } from '../components/schemas/ServiceSchema';
 import { FAQ_SCHEMA_ITEMS } from '../data/faqData';
-import { TESTIMONIALS, TESTIMONIAL_MAX_RATING } from '../data/testimonialsData';
+// aggregateRating was removed from ServiceSchema to comply with Google's visibility guidelines; individual reviews now use microdata.
 
 import { SEO } from '../components/SEO';
 
@@ -121,7 +121,6 @@ const Home: React.FC = () => {
           'turismo melhor idade',
           'pacotes de viagem SP',
         ]}
-        aggregateRating={{ ratingValue: TESTIMONIAL_MAX_RATING, reviewCount: TESTIMONIALS.length }}
       />
       <Hero />
 
