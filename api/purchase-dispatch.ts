@@ -2,6 +2,7 @@ import { sendGoogleConversion } from '../lib/conversions/google';
 import { sendMetaConversion } from '../lib/conversions/meta';
 import { buildCorsHeaders, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
+import { timingSafeEqual } from '../lib/hubspot-validation';
 
 export const config = {
   runtime: 'edge',
@@ -146,8 +147,8 @@ function getExpectedSecret(): string | null {
 
 function isAuthorized(request: Request, expectedSecret: string): boolean {
   const providedSecret = request.headers.get('X-Webhook-Secret');
-  const normalizedSecret = providedSecret?.trim();
-  return normalizedSecret === expectedSecret;
+  const normalizedSecret = providedSecret?.trim() ?? '';
+  return timingSafeEqual(normalizedSecret, expectedSecret);
 }
 
 function toStringOrUndefined(value: unknown): string | undefined {
