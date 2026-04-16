@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
     InstagramLogo,
@@ -85,6 +85,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
     });
     const [submitState, setSubmitState] = useState<'idle' | 'success' | 'error'>('idle');
     const [errorMessage, setErrorMessage] = useState('');
+    const isLocallySubmitting = useRef(false);
 
     // Push campaign data to GTM dataLayer on mount
     useEffect(() => {
@@ -105,28 +106,37 @@ const BrazilPromotionDayLanding: React.FC = () => {
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
+        if (isLocallySubmitting.current) return;
+        isLocallySubmitting.current = true;
         setErrorMessage('');
 
-        const eventId = createLeadEventId();
-        const destination = form.destination.trim() || 'A definir';
+        try {
+            const eventId = createLeadEventId();
+            const destination = form.destination.trim() || 'A definir';
 
-        const result = await submitLead(
-            {
-                firstName: form.firstName,
-                lastName: form.lastName,
-                email: form.email,
-                whatsapp: form.whatsapp,
-                destination,
-                bantSummary: `Lead captado via QR Code — Brazil Promotion Day 2026. Destino de interesse: ${destination}.`,
-            },
-            { eventId, pushDataLayerEvent: true },
-        );
+            const result = await submitLead(
+                {
+                    firstName: form.firstName,
+                    lastName: form.lastName,
+                    email: form.email,
+                    whatsapp: form.whatsapp,
+                    destination,
+                    bantSummary: `Lead captado via QR Code — Brazil Promotion Day 2026. Destino de interesse: ${destination}.`,
+                },
+                { eventId, pushDataLayerEvent: true },
+            );
 
-        if (result.ok) {
-            setSubmitState('success');
-        } else {
+            if (result.ok) {
+                setSubmitState('success');
+            } else {
+                setSubmitState('error');
+                setErrorMessage('error' in result ? result.error : 'Ocorreu um erro ao enviar. Tente novamente.');
+                isLocallySubmitting.current = false;
+            }
+        } catch (err) {
             setSubmitState('error');
-            setErrorMessage('error' in result ? result.error : 'Ocorreu um erro ao enviar. Tente novamente.');
+            setErrorMessage('Ocorreu um erro inesperado. Tente novamente.');
+            isLocallySubmitting.current = false;
         }
     }
 

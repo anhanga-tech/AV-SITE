@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import type { SubmitLeadRequest } from '../../types/leadCapture';
 import { AIChat } from './pages/AIChat';
+import { BrazilPromotionDayPage } from './pages/BrazilPromotionDayPage';
 
 async function acceptLgpd(page: import('@playwright/test').Page) {
   await page.locator('input[type="checkbox"]').first().evaluate((element) => {
@@ -161,5 +162,72 @@ test.describe('Destructive & Security Suite', () => {
     await page.locator('input[placeholder=\"WhatsApp\"]').fill('(11) 98831-4487');
     await submitBtn.click();
     await expect(page.getByText('Você deve aceitar os termos')).toBeVisible();
+  });
+
+  test('should sanitize XSS payload in Brazil Promotion Day form', async ({ page }) => {
+    const landing = new BrazilPromotionDayPage(page);
+    const xssPayload = '<img src=x onerror=alert(1)>';
+    let submitPayload: SubmitLeadRequest | null = null;
+
+    await page.route('**/api/submit-lead', async route => {
+      submitPayload = route.request().postDataJSON();
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true }),
+      });
+    });
+
+    await landing.goto();
+
+    await landing.fillForm({
+      firstName: xssPayload,
+      lastName: 'XSS Test',
+      email: 'xss@test.com',
+      whatsapp: '(11) 98831-4487',
+      destination: 'Paris',
+    });
+
+    await landing.submit();
+
+    await expect.poll(() => submitPayload, { timeout: 15000 }).not.toBeNull();
+    // Verify frontend sanitization
+    expect(submitPayload?.firstName).toBe('&lt;img src=x onerror=alert(1)&gt;');
+  });
+
+  test('should prevent multiple submissions on Brazil Promotion Day form via rage clicking', async ({ page }) => {
+    const landing = new BrazilPromotionDayPage(page);
+    let submissionCount = 0;
+
+    await page.route('**/api/submit-lead', async route => {
+      submissionCount++;
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true }),
+      });
+    });
+
+    await landing.goto();
+
+    await landing.fillForm({
+      firstName: 'Rage',
+      lastName: 'Tester',
+      email: 'rage@test.com',
+      whatsapp: '(11) 98831-4487',
+      destination: 'Paris',
+    });
+
+    // Multiple rapid clicks via evaluate to ensure we hit the DOM directly
+    await landing.submitBtn.evaluate(node => {
+      (node as HTMLButtonElement).click();
+      (node as HTMLButtonElement).click();
+      (node as HTMLButtonElement).click();
+    });
+
+    await page.waitForResponse('**/api/submit-lead');
+
+    expect(submissionCount).toBe(1);
   });
 });
