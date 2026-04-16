@@ -124,7 +124,8 @@ const Highlights = memo(() => {
                         </div>
 
                         <div className="bg-white p-8 rounded-[2rem] border-2 border-gray-100 shadow-[8px_8px_0px_rgba(0,0,0,0.05)] text-center lg:text-left">
-                            <h4 className="font-black text-2xl text-gray-900 mb-2">Viaje Leve! 🎈</h4>
+                            {/* Changed h4 to p to maintain correct heading hierarchy and avoid SEO audit findings. */}
+                            <p className="font-black text-2xl text-gray-900 mb-2">Viaje Leve! 🎈</p>
                             <p className="text-gray-500 text-lg mb-6 leading-relaxed">
                                 Comece a planejar agora e receba um roteiro prévio sem compromisso.
                             </p>

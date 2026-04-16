@@ -8,6 +8,7 @@ import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../../components/schemas/FAQPageSchema';
 import { ServiceSchema } from '../../components/schemas/ServiceSchema';
 import { openAiChat } from '../../utils/aiChat';
+import { BETO_TESTIMONIALS } from '../../components/landings/beto-carrero/Testimonials';
 
 const BETO_FAQ_ITEMS = [
   {
@@ -43,7 +44,7 @@ const BetoCarreroLanding: React.FC = () => {
         serviceType="Pacote de viagem para parque temático"
         areaServed="São Paulo e Brasil"
         keywords={['pacote Beto Carrero', 'ingresso Beto Carrero', 'viagem em família']}
-        aggregateRating={{ ratingValue: 4.9, reviewCount: 12 }}
+        aggregateRating={{ ratingValue: 5, reviewCount: BETO_TESTIMONIALS.length }}
       />
       <BreadcrumbSchema
         items={[
