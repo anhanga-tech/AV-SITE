@@ -15,3 +15,7 @@
 ## 2026-04-06 - ⚡ Bolt: Carousel Layout Stability
 **Learning:** Using standard <img> tags in dynamic carousels like Testimonials without explicit width/height leads to Cumulative Layout Shift (CLS) as images load after the container renders. Wrapping in LazyImage with numeric dimensions ensures the aspect ratio is reserved.
 **Action:** Always use LazyImage with explicit width and height for repeatable list/carousel items to ensure visual stability and CDN optimization.
+
+## 2026-05-20 - ⚡ Bolt: Blog Component Optimization
+**Learning:** When replacing standard images with `LazyImage` in complex layouts, removing parent aspect-ratio utility classes (like `aspect-video`) can cause layout shifts during hydration or before the intersection observer triggers.
+**Action:** Always retain CSS aspect-ratio classes on parent containers when implementing `LazyImage` to provide a "double-lock" against Cumulative Layout Shift (CLS).
