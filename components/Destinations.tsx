@@ -611,8 +611,17 @@ const Destinations: React.FC = () => {
                     {filteredDestinations.slice(0, 3).map((dest, idx) => (
                         <div
                             key={idx}
-                            className="group bg-white rounded-[2rem] border-2 border-gray-100 p-4 pb-0 shadow-[6px_6px_0px_rgba(0,0,0,0.05)] hover:shadow-[10px_10px_0px_rgba(0,0,0,0.08)] hover:-translate-y-2 transition-all cursor-pointer flex flex-col"
+                            tabIndex={0}
+                            role="button"
+                            aria-label={`Ver detalhes de ${dest.city}, ${dest.country}`}
+                            className="group bg-white rounded-[2rem] border-2 border-gray-100 p-4 pb-0 shadow-[6px_6px_0px_rgba(0,0,0,0.05)] hover:shadow-[10px_10px_0px_rgba(0,0,0,0.08)] hover:-translate-y-2 transition-all cursor-pointer flex flex-col focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-cyan"
                             onClick={() => setSelectedDestination(dest)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    setSelectedDestination(dest);
+                                }
+                            }}
                         >
                             <div className="relative h-56 rounded-[1.5rem] overflow-hidden mb-4 border border-gray-100">
                                 <LazyImage

@@ -65,6 +65,7 @@ export const LandingFAQ: React.FC<LandingFAQProps> = ({
 
     const handleToggle = useCallback((idx: number) => {
         setOpenIndex(prev => prev === idx ? null : idx);
+        import('../utils/haptics').then(m => m.triggerHaptic('light'));
     }, []);
 
     return (
