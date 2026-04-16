@@ -32,6 +32,6 @@ for (const fallbackTag of requiredFallbackPatterns) {
 test('index.html preloads the transformed default hero poster used for the initial LCP image', () => {
   assert.match(
     indexHtml,
-    /<link\b[^>]*rel="preload"[^>]*as="image"[^>]*href="https:\/\/media\.anhanga\.tur\.br\/cdn-cgi\/image\/format=auto,quality=85,metadata=none,fit=cover,width=1280,height=720\/images\/hero\/rio-poster\.jpg"/i,
+    /<link\b[^>]*rel="preload"[^>]*as="image"[^>]*href="https:\/\/media\.anhanga\.tur\.br\/cdn-cgi\/image\/format=webp,quality=85,metadata=none,fit=cover,width=1280,height=720\/images\/hero\/rio-poster\.jpg"/i,
   );
 });

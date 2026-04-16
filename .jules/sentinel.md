@@ -62,3 +62,8 @@ Removed the explicit origin reflection from the `buildCorsHeaders` call. The end
 
 ### Pattern Discovery
 Standardized the "Zero-Trust CORS" pattern for internal APIs. Public-facing endpoints must never reflect the `Origin` header without strict validation against an allowlist. Using a centralized, parameterless `buildCorsHeaders()` call ensures consistency across all serverless functions.
+
+## 2026-03-20 - [Timing-Safe Authorization for Edge Webhooks]
+**Vulnerability:** Authorization logic in Edge Functions (e.g., `api/purchase-dispatch.ts`) was using standard string comparison (`===`) for webhook secrets. This is vulnerable to timing attacks, where an attacker can brute-force a secret by measuring slight variations in response time for each character.
+**Learning:** Even simple API secrets need constant-time comparison. While Node.js has `crypto.timingSafeEqual`, Edge Runtimes often require a manual implementation using bitwise operations to ensure consistency across environments.
+**Prevention:** Always use a `timingSafeEqual` utility for comparing secrets, tokens, or signatures. Ensure the utility is shared across the codebase to maintain a unified security posture.
