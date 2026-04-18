@@ -22,8 +22,8 @@ Criar os arquivos estáticos que compõem o painel do Decap CMS, servidos como a
 **Tarefas:**
 - [ ] Criar `/public/admin/index.html` com script do Decap CMS via CDN
 - [ ] Criar `/public/admin/config.yml` com backend GitHub e coleção `blog`
-- [ ] Mapear todos os campos do frontmatter existente (`types/blog.ts`) no `config.yml`
-- [ ] Configurar `media_folder` apontando para `public/uploads`
+- [ ] Mapear campos do frontmatter (`types/blog.ts`), usando widget `select` para `author` com as chaves de `data/blogData.ts` (garante integridade referencial e evita typos que quebram o `BlogPost.tsx`)
+- [ ] Configurar `media_folder: public/uploads` e `public_folder: /uploads` no `config.yml` (Vite serve `public/` a partir da raiz; sem `public_folder` os caminhos salvos não resolvem corretamente)
 - [ ] Verificar que `/admin` é acessível localmente em `http://localhost:3000/admin`
 
 **Critérios de aceite:**
@@ -47,6 +47,7 @@ Registrar o OAuth App no GitHub que será usado pelo Decap CMS para autenticaç�
   - Application name: `Anhangá Viagens CMS`
   - Homepage URL: `https://www.anhanga.tur.br`
   - Authorization callback URL: `https://www.anhanga.tur.br/api/auth/callback`
+- [ ] Criar um **segundo OAuth App** para desenvolvimento local com callback `http://localhost:3000/api/auth/callback` — o GitHub OAuth não permite múltiplos domínios em um único App (alternativa: usar ngrok com o App de produção)
 - [ ] Salvar `Client ID` e gerar `Client Secret`
 - [ ] Adicionar `GITHUB_CLIENT_ID` e `GITHUB_CLIENT_SECRET` nas env vars da Vercel
 - [ ] Adicionar as mesmas vars ao `.env.example` (sem valores reais)
@@ -68,9 +69,9 @@ O Decap CMS com backend `github` exige um servidor que faça o handshake OAuth �
 
 **Tarefas:**
 - [ ] Criar `/api/auth.ts` — inicia o fluxo OAuth redirecionando para o GitHub
-- [ ] Criar `/api/auth/callback.ts` — recebe o `code` do GitHub, troca por token, devolve ao CMS via `postMessage`
+- [ ] Criar `/api/auth/callback.ts` — recebe o `code` do GitHub, troca por token, devolve ao CMS via `postMessage` validando o `origin` da janela opener (nunca usar `*`; interceptar o origin no início do fluxo e usá-lo no `postMessage` para evitar interceptação por sites maliciosos)
 - [ ] Seguir os padrões de `api-conventions.md`:
-  - Validar presença das env vars na inicialização
+  - Validar presença das env vars na inicialização; atribuir a constantes locais após a verificação para garantir type narrowing (`string | undefined` → `string`) no TypeScript
   - Retornar erros estruturados em JSON
   - Não logar o `client_secret` nem o token
 - [ ] Atualizar `vercel.json` se necessário para rotear `/api/auth`
@@ -99,7 +100,7 @@ O Decap CMS commita novos/editados arquivos `.mdx` diretamente no repositório. 
   1. Checkout do repositório
   2. Instalar dependências com `pnpm`
   3. Rodar `pnpm run generate:blog-manifest`
-  4. Commitar e fazer push do `data/blogManifest.ts` atualizado se houver diff
+  4. Commitar e fazer push do `data/blogManifest.ts` atualizado se houver diff (verificar se o `GITHUB_TOKEN` tem permissão de escrita na branch protegida; caso contrário, usar um PAT com escopo `repo`)
 - [ ] Garantir que o bot de CI não dispara loop infinito (commitar com `[skip ci]` ou filtro de autor)
 
 **Critérios de aceite:**
