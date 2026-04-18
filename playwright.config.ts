@@ -18,6 +18,10 @@ export default defineConfig({
     baseURL: BASE_URL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
+    // Block Mautic tracking during tests — prevents anonymous contacts from being created in production Mautic
+    launchOptions: {
+      args: ['--host-resolver-rules=MAP mkt.anhanga.tur.br ~NOTFOUND'],
+    },
   },
 
   // In CI run only Chromium + Mobile Chrome to keep the pipeline fast.
