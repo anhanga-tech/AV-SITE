@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=700">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin:0; padding:0; background: var(--av-cream); }
+  body { padding: 24px; font-family: var(--av-font-body); }
+  .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 14px; }
+  .lbl { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .14em; color: var(--av-fg-3); margin-bottom: 6px; }
+  .chip { height: 72px; border-radius: 12px; display:flex; align-items:flex-end; padding: 8px 10px; font-family: var(--av-font-mono); font-size: 10px; color: rgba(0,0,0,.55); box-shadow: inset 0 0 0 1px rgba(15,23,42,0.05); }
+  .chip.white { color: rgba(255,255,255,.8); }
+</style></head>
+<body>
+<div class="lbl">Neutrals · gray scale (Tailwind default, used for borders, muted text, dividers)</div>
+<div class="row">
+  <div class="chip" style="background:#f9fafb">50</div>
+  <div class="chip" style="background:#f3f4f6">100</div>
+  <div class="chip" style="background:#e5e7eb">200</div>
+  <div class="chip" style="background:#d1d5db">300</div>
+  <div class="chip" style="background:#9ca3af">400</div>
+</div>
+<div class="row">
+  <div class="chip white" style="background:#6b7280">500</div>
+  <div class="chip white" style="background:#4b5563">600</div>
+  <div class="chip white" style="background:#374151">700</div>
+  <div class="chip white" style="background:#1f2937">800</div>
+  <div class="chip white" style="background:#111827">900</div>
+</div>
+</body></html>

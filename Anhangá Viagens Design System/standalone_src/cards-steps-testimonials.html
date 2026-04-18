@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=760">
+<link rel="stylesheet" href="../colors_and_type.css">
+<template id="__bundler_thumbnail" data-bg-color="#fffdf5">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect x="120" y="140" width="960" height="260" rx="56" fill="#ffffff" stroke="#0f172a" stroke-width="14"/>
+    <rect x="160" y="100" width="96" height="96" rx="28" fill="#FFD600" stroke="#0f172a" stroke-width="12" transform="rotate(-4 208 148)"/>
+    <rect x="180" y="500" width="640" height="220" rx="80" fill="#ffffff" stroke="#0f172a" stroke-width="14"/>
+    <text x="220" y="625" font-family="Georgia, serif" font-size="64" font-style="italic" fill="#0f172a">“…”</text>
+    <text x="540" y="625" font-size="52" fill="#f59e0b">★★★★★</text>
+  </svg>
+</template>
+<style>
+  html, body { margin:0; padding:0; background: var(--av-cream); }
+  body { padding: 28px; font-family: var(--av-font-body); display:flex; flex-direction:column; gap: 20px;}
+  .label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .16em; color: var(--av-fg-3); }
+
+  /* How-it-works step */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .step {
+    background: white;
+    border: 2px solid var(--av-dark);
+    border-radius: 28px;
+    padding: 22px;
+    position: relative;
+    box-shadow: 6px 6px 0 rgba(0,0,0,0.06);
+  }
+  .step .num {
+    position: absolute; top: -18px; left: 20px;
+    width: 44px; height: 44px; border-radius: 14px;
+    background: var(--av-yellow);
+    border: 2px solid var(--av-dark);
+    display:flex; align-items:center; justify-content:center;
+    font-family: var(--av-font-display);
+    font-weight: 800; font-size: 20px; color: var(--av-dark);
+    transform: rotate(-4deg);
+  }
+  .step h4 { margin-top: 16px; font-size: 17px; font-weight: 800; color: var(--av-dark);}
+  .step p { margin-top: 6px; font-size: 13.5px; color: var(--av-fg-2); line-height: 1.55;}
+
+  /* Testimonial */
+  .testi {
+    background: white;
+    border: 2px solid var(--av-dark);
+    border-radius: 40px;
+    padding: 30px 34px 28px;
+    box-shadow: 10px 10px 0 rgba(0,0,0,0.05);
+    position: relative;
+    max-width: 560px;
+  }
+  .testi .q { font-family: 'Merriweather', serif; font-style: italic; font-size: 22px; color: var(--av-dark); line-height: 1.4;}
+  .testi .q::before { content:"\201C"; color: var(--av-yellow); font-size: 60px; line-height: 0; vertical-align: -.3em; margin-right: 4px;}
+  .testi .who { display:flex; align-items:center; gap:12px; margin-top: 22px; padding-top: 18px; border-top: 1px dashed var(--av-border);}
+  .testi .avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: linear-gradient(135deg, #fde047, #FFD600);
+    border: 2px solid var(--av-dark);
+    display:flex; align-items:center; justify-content:center;
+    font-family: var(--av-font-display); font-weight: 800; color: var(--av-dark);
+    flex-shrink: 0;
+  }
+  .testi .meta { flex: 1; }
+  .testi .meta b { font-weight: 800; color: var(--av-dark); font-size: 14px;}
+  .testi .meta span { display:block; font-size: 12px; color: var(--av-fg-3); margin-top: 1px;}
+  .testi .stars {
+    color: #f59e0b;
+    font-size: 14px;
+    letter-spacing: 2px;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  /* FAQ item */
+  .faq {
+    background: white;
+    border: 2px solid var(--av-dark);
+    border-radius: 20px;
+    padding: 18px 22px;
+    display:flex; justify-content: space-between; align-items: center;
+    box-shadow: 4px 4px 0 var(--av-dark);
+    max-width: 560px;
+  }
+  .faq .q { font-weight: 700; font-size: 15px; color: var(--av-dark);}
+  .faq .plus {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--av-yellow);
+    border: 2px solid var(--av-dark);
+    display:flex; align-items:center; justify-content:center;
+    font-weight: 800; color: var(--av-dark);
+  }
+</style></head>
+<body>
+  <div>
+    <div class="label" style="margin-bottom: 22px;">Step cards · How it works</div>
+    <div class="steps">
+      <div class="step">
+        <div class="num">01</div>
+        <h4>Conta a ideia</h4>
+        <p>Um formulário curto pra entender vibe, datas e quem vai.</p>
+      </div>
+      <div class="step">
+        <div class="num">02</div>
+        <h4>A gente roteiriza</h4>
+        <p>Recebe a proposta em até 72h, ajustada no seu tempo.</p>
+      </div>
+      <div class="step">
+        <div class="num">03</div>
+        <h4>Vai viajar</h4>
+        <p>A gente acompanha do embarque ao último pôr-do-sol.</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:22px; align-items:start;">
+    <div class="testi">
+      <p class="q">Montaram a nossa lua-de-mel como se fosse deles mesmos. Cada detalhe pensado.</p>
+      <div class="who">
+        <div class="avatar">C</div>
+        <div class="meta"><b>Carolina &amp; Pedro</b><span>Patagônia · 2024</span></div>
+        <div class="stars">★★★★★</div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div class="faq"><span class="q">Como funciona o pagamento?</span><span class="plus">+</span></div>
+      <div class="faq"><span class="q">Posso parcelar?</span><span class="plus">+</span></div>
+      <div class="faq"><span class="q">E se eu quiser mudar datas?</span><span class="plus">+</span></div>
+    </div>
+  </div>
+</body></html>

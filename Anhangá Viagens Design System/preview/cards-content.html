@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=760">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin:0; padding:0; background: var(--av-cream); }
+  body { padding: 28px; font-family: var(--av-font-body); display:grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start;}
+
+  /* Highlight card (Porque a Anhangá) */
+  .hl {
+    background: white;
+    border: 2px solid var(--av-dark);
+    border-radius: 32px;
+    padding: 28px 26px 26px;
+    box-shadow: 8px 8px 0 rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
+  }
+  .hl .icon-badge {
+    width: 56px; height: 56px; border-radius: 18px;
+    background: var(--av-orange-100);
+    border: 2px solid var(--av-dark);
+    display:flex; align-items:center; justify-content:center;
+    font-size: 26px; color: var(--av-orange-600);
+    margin-bottom: 18px; transform: rotate(-4deg);
+  }
+  .hl h3 { font-size: 22px; font-weight: 800; color: var(--av-dark); letter-spacing: -.01em;}
+  .hl p { margin-top: 8px; font-size: 14.5px; line-height: 1.55; color: var(--av-fg-2); font-weight: 400;}
+  .hl .corner {
+    position:absolute; top:14px; right:14px;
+    font-family: var(--av-font-mono); font-size: 11px; color: var(--av-fg-3);
+  }
+
+  /* Polaroid destination card */
+  .pol {
+    background: white;
+    border: 2px solid var(--av-dark);
+    border-radius: 14px;
+    padding: 10px 10px 18px;
+    transform: rotate(-2deg);
+    box-shadow: 8px 8px 0 rgba(0,0,0,0.1);
+    position: relative;
+    width: 100%;
+  }
+  .pol .img {
+    aspect-ratio: 4/3;
+    border-radius: 8px;
+    background:
+      linear-gradient(135deg, rgba(14,165,233,0.35), rgba(255,214,0,0.35)),
+      repeating-linear-gradient(45deg, #cbe7f7 0 10px, #bfe0f3 10px 20px);
+    position: relative;
+    overflow: hidden;
+    z-index: 0;
+  }
+  .pol .img::after {
+    content: "PATAGÔNIA · BR→AR";
+    position: absolute; bottom: 10px; left: 12px;
+    font-family: var(--av-font-mono); font-size: 10px; color: rgba(15,23,42,0.55);
+    background: rgba(255,255,255,0.9); padding: 3px 8px; border-radius: 4px;
+  }
+  .pol .cap {
+    font-family: 'Merriweather', serif;
+    font-style: italic;
+    text-align: center;
+    font-size: 15px;
+    color: var(--av-dark);
+    margin-top: 12px;
+  }
+  .pol .tape {
+    position:absolute; top: -12px; left: 50%;
+    transform: translateX(-50%) rotate(-3deg);
+    width: 96px; height: 26px;
+    background: rgba(254,249,195,0.92);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    z-index: 3;
+  }
+  .pol .stamp {
+    position: absolute; top: 14px; right: -14px;
+    transform: rotate(14deg);
+    background: var(--av-yellow);
+    border: 2px solid var(--av-dark);
+    border-radius: 9999px;
+    padding: 6px 12px;
+    font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.12);
+    z-index: 3;
+  }
+</style></head>
+<body>
+  <div class="hl">
+    <div class="corner">01 / 06</div>
+    <div class="icon-badge">♥</div>
+    <h3>Concierge humano</h3>
+    <p>Você conversa com gente de verdade — viajantes que já pisaram nos destinos. Sem bot, sem script, sem pacote pronto.</p>
+  </div>
+
+  <div class="pol">
+    <div class="tape"></div>
+    <div class="stamp">★ Achado</div>
+    <div class="img"></div>
+    <div class="cap">"El Chaltén ao amanhecer"</div>
+  </div>
+</body></html>

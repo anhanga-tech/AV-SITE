@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=700">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin:0; padding:0; background: var(--av-cream); }
+  body { padding: 28px; font-family: var(--av-font-body); display:flex; flex-direction:column; gap: 16px;}
+  .label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .16em; color: var(--av-fg-3); }
+
+  .field { display:flex; flex-direction:column; gap:6px; max-width: 420px;}
+  .field label { font-size: 13px; font-weight: 700; color: var(--av-dark);}
+  .field input, .field select, .field textarea {
+    font-family: var(--av-font-body);
+    font-size: 15px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 2px solid var(--av-border);
+    background: white;
+    color: var(--av-dark);
+    transition: border-color .2s, box-shadow .2s;
+    width: 100%;
+  }
+  .field input::placeholder { color: var(--av-gray-400);}
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none;
+    border-color: var(--av-action);
+    box-shadow: 0 0 0 4px rgba(14,165,233,0.15);
+  }
+
+  .search-bar {
+    display:flex;
+    border: 2px solid var(--av-dark);
+    border-radius: 9999px;
+    background: white;
+    padding: 6px 6px 6px 20px;
+    box-shadow: 4px 4px 0 var(--av-dark);
+    max-width: 520px;
+    align-items: center;
+    gap: 10px;
+  }
+  .search-bar input { flex:1; border: none; outline: none; font-size: 15px; font-family: var(--av-font-body); background: transparent; padding: 10px 0;}
+  .search-bar button {
+    background: var(--av-yellow);
+    border: 2px solid var(--av-dark);
+    color: var(--av-dark);
+    font-weight: 800;
+    border-radius: 9999px;
+    padding: 10px 20px;
+    font-family: var(--av-font-display);
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .chips { display:flex; gap:8px; flex-wrap: wrap;}
+  .chip {
+    padding: 8px 14px;
+    border-radius: 9999px;
+    background: white;
+    border: 1.5px solid var(--av-border);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--av-fg-1);
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .chip.active { background: var(--av-dark); color: white; border-color: var(--av-dark);}
+  .chip:hover:not(.active) { border-color: var(--av-dark); }
+</style></head>
+<body>
+  <div>
+    <div class="label" style="margin-bottom:8px">Hero search bar</div>
+    <div class="search-bar">
+      <span style="color: var(--av-fg-3); font-size: 16px;">✦</span>
+      <input placeholder="Pra onde você quer ir? Ex.: Patagônia, Marrocos…">
+      <button>Buscar</button>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div class="field">
+      <label>Nome</label>
+      <input placeholder="Como podemos te chamar?">
+    </div>
+    <div class="field">
+      <label>E-mail</label>
+      <input placeholder="voce@email.com">
+    </div>
+  </div>
+
+  <div>
+    <div class="label" style="margin-bottom:8px">Filter chips (destinos)</div>
+    <div class="chips">
+      <button class="chip active">Todos</button>
+      <button class="chip">América do Sul</button>
+      <button class="chip">Europa</button>
+      <button class="chip">Ásia &amp; Oriente</button>
+      <button class="chip">Lua-de-mel</button>
+      <button class="chip">Roadtrips</button>
+    </div>
+  </div>
+</body></html>

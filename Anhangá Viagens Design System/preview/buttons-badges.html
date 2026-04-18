@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=700">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html, body { margin:0; padding:0; background: var(--av-cream); }
+  body { padding: 28px; font-family: var(--av-font-body); display:flex; flex-direction:column; gap: 20px;}
+  .row { display:flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  .label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .16em; color: var(--av-fg-3); width: 100%; }
+
+  /* --- Primary (yellow w/ hard shadow) --- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px;
+    border: 2px solid var(--av-dark);
+    border-radius: 9999px;
+    padding: 14px 28px;
+    font-family: var(--av-font-display);
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: .01em;
+    cursor: pointer;
+    transition: transform .2s var(--av-ease-spring), box-shadow .2s ease, background .2s;
+  }
+  .btn-primary { background: var(--av-yellow); color: var(--av-dark); box-shadow: 4px 4px 0 var(--av-dark);}
+  .btn-primary:hover { background: var(--av-yellow-hover); transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--av-dark);}
+  .btn-dark { background: var(--av-dark); color: white; box-shadow: 4px 4px 0 var(--av-yellow); border-color: var(--av-dark);}
+  .btn-ghost { background: white; color: var(--av-dark); box-shadow: 4px 4px 0 var(--av-dark);}
+  .btn-link { background: transparent; color: var(--av-action); border: none; padding: 8px 0; box-shadow: none; font-weight: 700; text-decoration: underline 2px; text-underline-offset: 4px;}
+  .btn-sm { padding: 10px 18px; font-size: 13px; }
+  .arrow { display: inline-block; transition: transform .2s var(--av-ease-spring); }
+  .btn:hover .arrow { transform: translateX(3px); }
+
+  /* --- Badges (scribble / eyebrow) --- */
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    border-radius: 9999px;
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    border: 2px solid var(--av-dark);
+  }
+  .pill.yellow { background: var(--av-yellow); color: var(--av-dark);}
+  .pill.blue { background: #eff6ff; color: var(--av-blue); border-color: var(--av-blue);}
+  .pill.dark { background: var(--av-dark); color: white;}
+  .pill.soft { background: white; color: var(--av-fg-1); border: 1px solid var(--av-border); letter-spacing: .14em;}
+  .pill.achado { background: var(--av-emerald-100); color: var(--av-emerald-600); border: 1px dashed var(--av-emerald-500); letter-spacing: .12em;}
+
+  .dot { width: 6px; height: 6px; border-radius:50%; background: currentColor;}
+</style></head>
+<body>
+  <div class="row">
+    <div class="label">Buttons</div>
+    <button class="btn btn-primary">Planejar minha viagem <span class="arrow">→</span></button>
+    <button class="btn btn-dark">Falar com concierge</button>
+    <button class="btn btn-ghost">Ver destinos</button>
+    <button class="btn btn-primary btn-sm">Começar <span class="arrow">→</span></button>
+    <button class="btn btn-link">Saber mais →</button>
+  </div>
+  <div class="row">
+    <div class="label">Badges · pills · eyebrows</div>
+    <span class="pill yellow"><span class="dot"></span>Novo</span>
+    <span class="pill blue">Nossa Missão</span>
+    <span class="pill dark">Anhangá Premium</span>
+    <span class="pill soft">Como funciona</span>
+    <span class="pill achado">★ Achado Anhangá</span>
+  </div>
+</body></html>

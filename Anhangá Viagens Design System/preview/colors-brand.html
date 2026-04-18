@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=700">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--av-cream); }
+  body { padding: 24px; font-family: var(--av-font-body); }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .sw { position: relative; }
+  .chip {
+    aspect-ratio: 1.6 / 1;
+    border-radius: var(--av-radius-lg);
+    box-shadow: inset 0 0 0 1px rgba(15,23,42,0.06);
+  }
+  .meta { margin-top: 8px; }
+  .name { font-size: 13px; font-weight: 700; color: var(--av-fg-1); }
+  .hex { font-family: var(--av-font-mono); font-size: 11px; color: var(--av-fg-3); margin-top: 2px; }
+</style></head>
+<body>
+<div class="grid">
+  <div class="sw"><div class="chip" style="background:#0056D2"></div><div class="meta"><div class="name">Brand Blue</div><div class="hex">#0056D2 · anhanga.blue</div></div></div>
+  <div class="sw"><div class="chip" style="background:#0ea5e9"></div><div class="meta"><div class="name">Action</div><div class="hex">#0EA5E9 · anhanga.action</div></div></div>
+  <div class="sw"><div class="chip" style="background:#0284c7"></div><div class="meta"><div class="name">Action Dark</div><div class="hex">#0284C7 · action-dark</div></div></div>
+  <div class="sw"><div class="chip" style="background:#FFD600"></div><div class="meta"><div class="name">Yellow</div><div class="hex">#FFD600 · anhanga.yellow</div></div></div>
+  <div class="sw"><div class="chip" style="background:#E5C000"></div><div class="meta"><div class="name">Yellow Hover</div><div class="hex">#E5C000</div></div></div>
+  <div class="sw"><div class="chip" style="background:#0f172a"></div><div class="meta"><div class="name" style="color:#0f172a">Dark</div><div class="hex">#0F172A · anhanga.dark</div></div></div>
+  <div class="sw"><div class="chip" style="background:#F4F8FF; box-shadow: inset 0 0 0 1px rgba(15,23,42,0.12)"></div><div class="meta"><div class="name">Surface Alt</div><div class="hex">#F4F8FF · anhanga.light</div></div></div>
+  <div class="sw"><div class="chip" style="background:#fffdf5; box-shadow: inset 0 0 0 1px rgba(15,23,42,0.12)"></div><div class="meta"><div class="name">Cream</div><div class="hex">#FFFDF5 · homepage bg</div></div></div>
+</div>
+</body></html>

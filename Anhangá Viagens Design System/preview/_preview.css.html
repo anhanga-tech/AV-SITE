@@ -1,0 +1,32 @@
+<!-- Anhangá Viagens — shared preview card bootstrap.
+     Each preview HTML @imports colors_and_type.css and uses these helpers. -->
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--av-cream);
+    color: var(--av-fg-1);
+  }
+  body {
+    padding: 20px 24px;
+    font-family: var(--av-font-body);
+  }
+  .av-card-root {
+    width: 100%;
+  }
+  .av-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .av-stack { display: flex; flex-direction: column; gap: 12px; }
+  .av-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--av-fg-3);
+  }
+  .av-mono {
+    font-family: var(--av-font-mono);
+    font-size: 11px;
+    color: var(--av-fg-3);
+  }
+</style>

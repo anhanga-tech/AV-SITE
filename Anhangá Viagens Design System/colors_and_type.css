@@ -1,0 +1,295 @@
+/* ==========================================================================
+   Anhangá Viagens — Foundational tokens
+   Source of truth: tailwind.config.mjs + lib/design-tokens.ts + src/index.css
+   ========================================================================== */
+
+/* Fonts — loaded from Google Fonts (matches index.html <head>) */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Merriweather:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+:root {
+  /* ----- Brand palette (anhanga.*) ------------------------------------- */
+  --av-blue:          #0056D2;   /* identidade (logo, footer accents) */
+  --av-action:        #0ea5e9;   /* sky-500 — botões, links, foco       */
+  --av-action-dark:   #0284c7;   /* sky-600 — hover de ação             */
+  --av-yellow:        #FFD600;   /* CTAs principais, tape                */
+  --av-yellow-hover:  #E5C000;
+  --av-dark:          #0f172a;   /* slate-900 — textos, footer          */
+  --av-light:         #F4F8FF;   /* sky-tinted section bg                */
+
+  /* Homepage canvas — slightly cream vs sky tint (brand.light) */
+  --av-cream:         #fffdf5;   /* home sections (Highlights, HowItWorks, FAQ) */
+  --av-sky-50:        #f0f9ff;   /* alt section bg (brand.light alias)  */
+
+  /* Accent / sticker palette (used by Highlights + HowItWorks cards) */
+  --av-orange-100:    #ffedd5;
+  --av-orange-200:    #fed7aa;
+  --av-orange-600:    #ea580c;
+  --av-emerald-100:   #d1fae5;
+  --av-emerald-200:   #a7f3d0;
+  --av-emerald-500:   #10b981;
+  --av-emerald-600:   #059669;
+  --av-blue-100:      #dbeafe;
+  --av-blue-200:      #bfdbfe;
+  --av-blue-600:      #2563eb;
+  --av-sky-50-card:   #f0f9ff;
+  --av-sky-200:       #bae6fd;
+  --av-sky-400:       #38bdf8;
+  --av-yellow-50:     #fefce8;
+  --av-yellow-200:    #fef08a;
+  --av-yellow-300:    #fde047;
+  --av-red-400:       #f87171;
+  --av-red-500:       #ef4444;
+  --av-green-500:     #22c55e;
+
+  /* Neutrals */
+  --av-white:         #ffffff;
+  --av-gray-50:       #f9fafb;
+  --av-gray-100:      #f3f4f6;
+  --av-gray-200:      #e5e7eb;
+  --av-gray-300:      #d1d5db;
+  --av-gray-400:      #9ca3af;
+  --av-gray-500:      #6b7280;
+  --av-gray-600:      #4b5563;
+  --av-gray-700:      #374151;
+  --av-gray-800:      #1f2937;
+  --av-gray-900:      #111827;
+
+  /* Semantic — fg / bg / borders ---------------------------------------- */
+  --av-fg-1:          var(--av-dark);      /* body primary, headings */
+  --av-fg-2:          var(--av-gray-600);  /* body muted, descriptions */
+  --av-fg-3:          var(--av-gray-500);  /* helper, meta            */
+  --av-fg-4:          var(--av-gray-400);  /* disabled, placeholders  */
+  --av-fg-inverse:    var(--av-white);
+
+  --av-bg-page:       var(--av-cream);     /* homepage default bg      */
+  --av-bg-surface:    var(--av-white);     /* cards                    */
+  --av-bg-surface-alt:var(--av-light);     /* pale blue section bg     */
+  --av-bg-dark:       var(--av-dark);      /* footer, CTA buttons      */
+
+  --av-border-soft:   var(--av-gray-100);
+  --av-border:        var(--av-gray-200);
+  --av-border-strong: var(--av-dark);
+
+  --av-link:          var(--av-action);
+  --av-link-hover:    var(--av-action-dark);
+
+  /* ----- Typography ---------------------------------------------------- */
+  --av-font-display:  'Poppins', ui-sans-serif, system-ui, sans-serif;
+  --av-font-body:     'Poppins', ui-sans-serif, system-ui, sans-serif;
+  /* Merriweather is used for serif italic pull-quotes (Testimonials) */
+  --av-font-serif:    'Merriweather', Georgia, serif;
+  --av-font-mono:     ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, monospace;
+
+  /* Type scale (matches hero/section usage on home) */
+  --av-text-xs:       0.75rem;   /* 12 — eyebrow badges, legal         */
+  --av-text-sm:       0.875rem;  /* 14 — body small, meta              */
+  --av-text-base:     1rem;      /* 16 — body                          */
+  --av-text-lg:       1.125rem;  /* 18 — subtitle / lead                */
+  --av-text-xl:       1.25rem;   /* 20 — hero subcopy, card title       */
+  --av-text-2xl:      1.5rem;    /* 24 — card H3                        */
+  --av-text-3xl:      1.875rem;
+  --av-text-4xl:      2.25rem;   /* 36 — section H2 (sm)                */
+  --av-text-5xl:      3rem;      /* 48 — section H2 (md+)               */
+  --av-text-6xl:      3.75rem;   /* 60 — HowItWorks H2                  */
+  --av-text-7xl:      4.5rem;    /* 72 — Hero H1 (with city)            */
+  --av-text-8xl:      6rem;      /* 96 — Hero H1 (default)              */
+
+  --av-weight-regular: 400;
+  --av-weight-semi:    600;
+  --av-weight-bold:    700;
+  --av-weight-xbold:   800;
+  /* Note: Poppins is loaded with 400/600/700/800 only.
+     Avoid 500 (medium) and 900 (black) — they'll fall back to the nearest weight. */
+
+  --av-leading-tight:   1.1;
+  --av-leading-snug:    1.25;
+  --av-leading-normal:  1.5;
+  --av-leading-relaxed: 1.625;
+
+  --av-tracking-tight:    -0.02em;
+  --av-tracking-normal:   0;
+  --av-tracking-wide:     0.025em;
+  --av-tracking-widest:   0.2em;
+
+  /* ----- Radius -------------------------------------------------------- */
+  --av-radius-sm:    0.5rem;     /*  8 — small pills / inputs */
+  --av-radius-md:    0.75rem;    /* 12 — inputs, small buttons */
+  --av-radius-lg:    1rem;       /* 16 — standard cards */
+  --av-radius-xl:    1.5rem;     /* 24 — large cards */
+  --av-radius-2xl:   2rem;       /* 32 — Highlights cards, cream cards */
+  --av-radius-3xl:   2.5rem;     /* 40 — Highlights "superellipse" cards */
+  --av-radius-4xl:   3rem;       /* 48 — Testimonials hero cards */
+  --av-radius-full:  9999px;
+
+  /* ----- Signature shadows (neobrutalist "hard" + ambient float) ------ */
+  --av-shadow-hard:        4px 4px 0 0 var(--av-dark);         /* CTA buttons */
+  --av-shadow-hard-yellow: 4px 4px 0 0 var(--av-yellow);       /* Primary buttons */
+  --av-shadow-hard-lg:     8px 8px 0 0 rgba(0,0,0,0.05);       /* Cards, polaroids */
+  --av-shadow-hard-xl:    10px 10px 0 0 rgba(0,0,0,0.05);      /* Testimonial */
+  --av-shadow-float:       0 10px 30px rgba(0,0,0,0.1);
+  --av-shadow-float-lg:    0 20px 60px -15px rgba(0,0,0,0.2);
+  --av-shadow-float-card:  0 15px 30px -10px rgba(0,0,0,0.15); /* Polaroids */
+  --av-shadow-glow:        0 20px 50px rgba(8,112,184,0.15);   /* Sparkle CTA */
+
+  /* ----- Spacing (8px base, matches Tailwind scale used in repo) ------- */
+  --av-space-1:   0.25rem;  /*  4 */
+  --av-space-2:   0.5rem;   /*  8 */
+  --av-space-3:   0.75rem;  /* 12 */
+  --av-space-4:   1rem;     /* 16 */
+  --av-space-5:   1.25rem;  /* 20 */
+  --av-space-6:   1.5rem;   /* 24 — base container padding */
+  --av-space-8:   2rem;     /* 32 */
+  --av-space-10:  2.5rem;   /* 40 */
+  --av-space-12:  3rem;     /* 48 */
+  --av-space-16:  4rem;     /* 64 */
+  --av-space-20:  5rem;     /* 80 */
+  --av-space-24:  6rem;     /* 96 — section vertical padding */
+  --av-space-32:  8rem;
+
+  /* ----- Motion -------------------------------------------------------- */
+  --av-ease-spring:     cubic-bezier(0.34, 1.56, 0.64, 1);
+  --av-ease-out:        cubic-bezier(0.22, 1, 0.36, 1);
+  --av-duration-fast:   150ms;
+  --av-duration-base:   300ms;
+  --av-duration-slow:   500ms;
+  --av-duration-slower: 700ms;
+}
+
+/* ==========================================================================
+   Base body & heading styles — Poppins for headings and body
+   (the repo's src/index.css sets body=Inter,h*=Poppins; this design system
+    standardises on Poppins everywhere for clearer hierarchy, matching the
+    production index.html which actually loads Poppins+Merriweather only.)
+   ========================================================================== */
+
+body {
+  font-family: var(--av-font-body);
+  font-size: var(--av-text-base);
+  line-height: var(--av-leading-normal);
+  color: var(--av-fg-1);
+  background: var(--av-bg-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--av-font-display);
+  color: var(--av-fg-1);
+  line-height: var(--av-leading-tight);
+  letter-spacing: var(--av-tracking-tight);
+  margin: 0;
+}
+
+h1 {
+  font-size: clamp(3rem, 7vw, var(--av-text-8xl));
+  font-weight: var(--av-weight-xbold);   /* 800 */
+  letter-spacing: -0.035em;
+}
+
+h2 {
+  font-size: clamp(var(--av-text-4xl), 5vw, var(--av-text-5xl));
+  font-weight: var(--av-weight-xbold);   /* 800 — loaded heaviest */
+  letter-spacing: -0.025em;
+}
+
+h3 {
+  font-size: var(--av-text-2xl);
+  font-weight: var(--av-weight-xbold);
+  line-height: var(--av-leading-snug);
+}
+
+h4 {
+  font-size: var(--av-text-xl);
+  font-weight: var(--av-weight-bold);
+}
+
+h5 {
+  font-size: var(--av-text-lg);
+  font-weight: var(--av-weight-bold);
+}
+
+h6 {
+  font-size: var(--av-text-base);
+  font-weight: var(--av-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--av-tracking-widest);
+}
+
+p {
+  font-size: var(--av-text-base);
+  line-height: var(--av-leading-relaxed);
+  color: var(--av-fg-2);
+  font-weight: var(--av-weight-regular);
+  margin: 0;
+}
+
+a {
+  color: var(--av-link);
+  text-decoration: none;
+  transition: color var(--av-duration-base) var(--av-ease-out);
+}
+a:hover { color: var(--av-link-hover); }
+
+strong { font-weight: var(--av-weight-bold); color: var(--av-fg-1); }
+
+code, pre {
+  font-family: var(--av-font-mono);
+  font-size: 0.9em;
+}
+
+/* ----- Signature utility classes ---------------------------------------- */
+
+/* "Eyebrow" badge above H2 — skewed yellow highlight behind text */
+.av-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--av-radius-full);
+  background: var(--av-white);
+  border: 1px solid var(--av-border);
+  color: var(--av-fg-1);
+  font-size: var(--av-text-xs);
+  font-weight: var(--av-weight-xbold);
+  text-transform: uppercase;
+  letter-spacing: var(--av-tracking-widest);
+}
+.av-badge--yellow {
+  background: var(--av-yellow-50);
+  border-color: var(--av-yellow-200);
+  color: #713f12;
+}
+.av-badge--blue {
+  background: #eff6ff;
+  border-color: var(--av-blue-200);
+  color: var(--av-blue);
+}
+.av-badge--hard {
+  border: 2px solid var(--av-dark);
+  box-shadow: var(--av-shadow-hard);
+}
+
+/* Scribble underline for hero keywords (SVG-driven in production) */
+.av-scribble {
+  position: relative;
+  display: inline-block;
+  background-image: linear-gradient(90deg, var(--av-yellow-300), var(--av-yellow));
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+}
+
+/* Washi-tape decoration — drop onto .relative parents */
+.av-tape {
+  position: absolute;
+  top: -0.75rem;
+  left: 50%;
+  transform: translateX(-50%) rotate(1deg);
+  width: 6rem;
+  height: 1.75rem;
+  background: rgba(254, 249, 195, 0.9);
+  border-left: 2px solid rgba(255,255,255,0.6);
+  border-right: 2px solid rgba(255,255,255,0.6);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  backdrop-filter: blur(4px);
+}
