@@ -15,6 +15,12 @@ interface SEOProps {
   imageHeight?: string;
   type?: 'website' | 'article';
   robots?: string;
+  /**
+   * When true, suppresses hreflang link tags.
+   * Use on dedicated landing pages that serve a single locale
+   * to avoid redundant pt-BR + x-default signals on the same URL.
+   */
+  noHreflang?: boolean;
 }
 
 export const SEO: React.FC<SEOProps> = ({
@@ -25,7 +31,8 @@ export const SEO: React.FC<SEOProps> = ({
   imageWidth,
   imageHeight,
   type = 'website',
-  robots = 'index, follow'
+  robots = 'index, follow',
+  noHreflang = false
 }) => {
   // Only emit og:image dimensions when accurate: explicit props or the known-sized default image.
   // Blog posts and other pages with third-party images of unknown sizes omit these tags.
@@ -143,16 +150,20 @@ export const SEO: React.FC<SEOProps> = ({
             key: 'link:canonical',
             attrs: { rel: 'canonical', href: canonicalUrl }
           },
-          {
-            tagName: 'link' as const,
-            key: 'link:hreflang:pt-BR',
-            attrs: { rel: 'alternate', hreflang: 'pt-BR', href: canonicalUrl }
-          },
-          {
-            tagName: 'link' as const,
-            key: 'link:hreflang:x-default',
-            attrs: { rel: 'alternate', hreflang: 'x-default', href: canonicalUrl }
-          },
+          ...(!noHreflang
+            ? [
+                {
+                  tagName: 'link' as const,
+                  key: 'link:hreflang:pt-BR',
+                  attrs: { rel: 'alternate', hreflang: 'pt-BR', href: canonicalUrl }
+                },
+                {
+                  tagName: 'link' as const,
+                  key: 'link:hreflang:x-default',
+                  attrs: { rel: 'alternate', hreflang: 'x-default', href: canonicalUrl }
+                }
+              ]
+            : []),
           {
             tagName: 'meta' as const,
             key: 'meta:og:url',

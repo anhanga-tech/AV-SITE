@@ -76,7 +76,7 @@ const Solution: React.FC = () => {
                               <Plane className="w-6 h-6 lg:w-9 lg:h-9" strokeWidth={2.5} />
                            </div>
                            <div>
-                              <h4 className="font-sans font-bold text-lg lg:text-2xl text-fun-dark">Passagem Aérea</h4>
+                              <h3 className="font-sans font-bold text-lg lg:text-2xl text-fun-dark">Passagem Aérea</h3>
                               <p className="text-slate-600 text-xs lg:text-sm font-bold">Horários que funcionam.</p>
                            </div>
                         </div>
@@ -101,7 +101,7 @@ const Solution: React.FC = () => {
                               <BedDouble className="w-6 h-6 lg:w-9 lg:h-9" strokeWidth={2.5} />
                            </div>
                            <div>
-                              <h4 className="font-sans font-bold text-lg lg:text-2xl text-fun-dark">Hotel Top</h4>
+                              <h3 className="font-sans font-bold text-lg lg:text-2xl text-fun-dark">Hotel Top</h3>
                               <p className="text-slate-600 text-xs lg:text-sm font-bold">Perto da diversão.</p>
                            </div>
                         </div>
@@ -130,7 +130,7 @@ const Solution: React.FC = () => {
                               <Ticket className="w-6 h-6 lg:w-9 lg:h-9" strokeWidth={2.5} />
                            </div>
                            <div>
-                              <h4 className="font-sans font-bold text-lg lg:text-2xl text-fun-dark">Ingresso Oficial</h4>
+                              <h3 className="font-sans font-bold text-lg lg:text-2xl text-fun-dark">Ingresso Oficial</h3>
                               <p className="text-slate-600 text-xs lg:text-sm font-bold">Direto na catraca.</p>
                            </div>
                         </div>
