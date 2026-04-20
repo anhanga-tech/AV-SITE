@@ -14,11 +14,14 @@ function markdownResponse(body: string, status = 200): Response {
         headers: {
             'Content-Type': 'text/markdown; charset=utf-8',
             'x-markdown-tokens': String(tokenCount(body)),
-            'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
+            'Cache-Control': status === 200
+                ? 'public, max-age=3600, stale-while-revalidate=86400'
+                : 'no-cache, no-store, must-revalidate',
         },
     });
 }
 
+// Content duplicated from JSX components intentionally — separate Markdown source for LLM/agent consumption
 function homePage(): string {
     const faqSection = FAQ_SCHEMA_ITEMS.map(
         ({ question, answer }) => `### ${question}\n\n${answer}`
@@ -254,8 +257,8 @@ export default async function handler(req: Request): Promise<Response> {
     const url = new URL(req.url);
     const rawPath = url.searchParams.get('path') ?? '/';
 
-    // Normalize: ensure single leading slash, no trailing slash
-    const path = '/' + rawPath.replace(/^\/+/, '').replace(/\/+$/, '');
+    // Normalize: single leading slash, no trailing slash, lowercase for case-insensitive matching
+    const path = ('/' + rawPath.replace(/^\/+/, '').replace(/\/+$/, '')).toLowerCase();
 
     switch (path) {
         case '/':

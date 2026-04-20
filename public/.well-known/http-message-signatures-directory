@@ -1,0 +1,11 @@
+{
+  "keys": [
+    {
+      "kty": "OKP",
+      "crv": "Ed25519",
+      "x": "plPpivVXyWiqH9xxF03hmjB5IqAr7wvo-0TindAlbG4",
+      "kid": "anhanga-bot-2026-04",
+      "use": "sig"
+    }
+  ]
+}
