@@ -215,7 +215,8 @@ async function parseGenerateContents(
     request: Request,
     corsHeaders: Record<string, string>,
 ): Promise<unknown[] | Response> {
-    const { contents } = await request.json() as GenerateRequestBody;
+    const body = await request.json() as GenerateRequestBody;
+    const { contents } = body;
 
     if (!contents || !Array.isArray(contents) || contents.length === 0) {
         return buildJsonResponse({ error: 'Contents must be a non-empty array' }, 400, corsHeaders);
@@ -223,6 +224,12 @@ async function parseGenerateContents(
 
     if (contents.length > 50) {
         return buildJsonResponse({ error: 'Too many messages in history' }, 400, corsHeaders);
+    }
+
+    // Defense-in-depth: total payload string length check
+    const totalLength = JSON.stringify(contents).length;
+    if (totalLength > 200000) {
+        return buildJsonResponse({ error: 'Payload too large' }, 400, corsHeaders);
     }
 
     const maxMessageLength = resolveMaxMessageLength(process.env.MAX_MESSAGE_LENGTH);
@@ -299,8 +306,11 @@ function extractModelOutput(
     response: ModelResponseShape,
 ): { responseText?: string; responseFunctionCall?: ResponseFunctionCall } {
     const candidate = response.candidates?.[0];
-    const textPart = collectTextParts(candidate?.content?.parts);
-    const functionCallPart = candidate?.content?.parts?.find((part) => part.functionCall);
+    const parts = candidate?.content?.parts;
+
+    // Defensive check: ensure parts is an array before using .find()
+    const textPart = Array.isArray(parts) ? collectTextParts(parts) : undefined;
+    const functionCallPart = Array.isArray(parts) ? parts.find((part) => part.functionCall) : undefined;
 
     let responseText = response.text?.trim() || textPart;
     let responseFunctionCall = functionCallPart?.functionCall;
