@@ -14,6 +14,7 @@ function markdownResponse(body: string, status = 200): Response {
         headers: {
             'Content-Type': 'text/markdown; charset=utf-8',
             'x-markdown-tokens': String(tokenCount(body)),
+            'Vary': 'Accept',
             'Cache-Control': status === 200
                 ? 'public, max-age=3600, stale-while-revalidate=86400'
                 : 'no-cache, no-store, must-revalidate',
