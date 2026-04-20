@@ -12,6 +12,7 @@ import type { BudgetToolArgs } from '../lib/ai/types';
 import {
     resolveMaxMessageLength,
     hasOversizedMessage,
+    hasOversizedPayload,
     extractBudgetToolCallFromText,
     stripToolCallJsonBlock,
     extractChipsFromText,
@@ -226,9 +227,7 @@ async function parseGenerateContents(
         return buildJsonResponse({ error: 'Too many messages in history' }, 400, corsHeaders);
     }
 
-    // Defense-in-depth: total payload string length check
-    const totalLength = JSON.stringify(contents).length;
-    if (totalLength > 200000) {
+    if (hasOversizedPayload(contents)) {
         return buildJsonResponse({ error: 'Payload too large' }, 400, corsHeaders);
     }
 
@@ -308,7 +307,7 @@ function extractModelOutput(
     const candidate = response.candidates?.[0];
     const parts = candidate?.content?.parts;
 
-    // Defensive check: ensure parts is an array before using .find()
+    // Gemini can return a non-array `parts` on certain safety stops or malformed upstream responses
     const textPart = Array.isArray(parts) ? collectTextParts(parts) : undefined;
     const functionCallPart = Array.isArray(parts) ? parts.find((part) => part.functionCall) : undefined;
 

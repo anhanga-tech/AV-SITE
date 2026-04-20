@@ -41,8 +41,8 @@ export function normalizeNullable(value: unknown, maxLength = 255): string | nul
     if (typeof value !== 'string') return null;
     const trimmed = value.trim();
     if (trimmed.length === 0) return null;
-    const limit = Math.min(10000, trimmed.length);
-    const sanitized = trimmed.substring(0, limit).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const truncated = trimmed.length > 10000 ? trimmed.substring(0, 10000) : trimmed;
+    const sanitized = truncated.replace(/</g, '&lt;').replace(/>/g, '&gt;');
     return sanitized.length > maxLength ? sanitized.substring(0, maxLength) : sanitized;
 }
 

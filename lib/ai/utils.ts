@@ -29,6 +29,12 @@ export function resolveMaxMessageLength(rawValue: string | undefined): number {
     return Number.isFinite(parsed) && parsed > 0 ? parsed : 4000;
 }
 
+export const MAX_CONTENTS_TOTAL_LENGTH = 200_000;
+
+export function hasOversizedPayload(contents: unknown[]): boolean {
+    return JSON.stringify(contents).length > MAX_CONTENTS_TOTAL_LENGTH;
+}
+
 export function hasOversizedMessage(contents: unknown, maxMessageLength: number): boolean {
     if (!Array.isArray(contents)) return false;
 
