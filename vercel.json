@@ -39,6 +39,18 @@
       "source": "/admin",
       "destination": "/admin/",
       "permanent": false
+    },
+    {
+      "source": "/((?!api/).*)",
+      "has": [
+        {
+          "type": "header",
+          "key": "accept",
+          "value": "text/markdown"
+        }
+      ],
+      "destination": "/api/markdown?path=/$1",
+      "permanent": false
     }
   ],
   "rewrites": [
@@ -49,17 +61,6 @@
     {
       "source": "/keystatic/:path*",
       "destination": "/index.html"
-    },
-    {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "header",
-          "key": "accept",
-          "value": "text/markdown"
-        }
-      ],
-      "destination": "/api/markdown?path=/$1"
     },
     {
       "source": "/(.*)",
