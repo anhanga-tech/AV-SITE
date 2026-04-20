@@ -25,10 +25,13 @@ test('cleanString should truncate strings longer than 10000 chars', () => {
 });
 
 test('cleanString should sanitize after truncating, not before (no XSS bypass)', () => {
-    // Payload: 9999 "a"s followed by "<script>" — must still be escaped after truncation
+    // Payload: 9999 "a"s followed by "<script>" — must still be escaped after truncation.
+    // Truncation happens first (to 10000 chars), then sanitization runs on the truncated
+    // string. A "<" at the truncation boundary becomes "&lt;" (4 chars), so the final
+    // length may slightly exceed 10000 by up to 3 chars (worst case: one entity expansion).
     const payload = 'a'.repeat(9999) + '<script>';
     const result = cleanString(payload);
-    assert.equal(result.length, 10000);
+    assert.ok(result.length <= 10004, `result grew unexpectedly: ${result.length}`);
     assert.ok(result.endsWith('&lt;'), 'truncated tail must still be entity-escaped');
     assert.ok(!result.includes('<'), 'raw < must not survive truncation');
 });

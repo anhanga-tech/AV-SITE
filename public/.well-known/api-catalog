@@ -1,0 +1,20 @@
+{
+  "apis": [
+    {
+      "title": "Anhangá Viagens – AI Chat",
+      "description": "BANT-qualified travel consultation chatbot powered by Google Gemini.",
+      "contact": "contato@anhanga.tur.br",
+      "license": {
+        "name": "Proprietary"
+      },
+      "tags": ["travel", "ai", "chat"],
+      "links": [
+        {
+          "rel": "service-desc",
+          "type": "application/json",
+          "href": "/api/generate"
+        }
+      ]
+    }
+  ]
+}
