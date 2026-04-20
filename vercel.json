@@ -34,6 +34,11 @@
       "source": "/lollapalooza-2026/",
       "destination": "/lollapalooza",
       "permanent": true
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin/",
+      "permanent": false
     }
   ],
   "rewrites": [
