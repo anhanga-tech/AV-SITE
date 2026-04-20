@@ -49,7 +49,7 @@ Agência boutique especializada em roteiros 100% personalizados para destinos na
 | Orlando | EUA | ⭐ 4.98 | R$ 15.000 |
 | Punta Cana | Rep. Dominicana | ⭐ 4.95 | R$ 3.800 |
 | Cancún | México | ⭐ 4.89 | R$ 4.100 |
-| Beto Carrero World | Brasil | ⭐ 4.92 | R$ 1.500 |
+| Beto Carrero World | Brasil | ⭐ 4.92 | R$ 1.200 |
 | Gramado | Brasil | ⭐ 4.91 | R$ 2.200 |
 | Rio de Janeiro | Brasil | ⭐ 4.93 | R$ 1.900 |
 | Natal | Brasil | ⭐ 4.92 | R$ 2.300 |
