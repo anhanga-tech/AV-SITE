@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useHeadTags } from '../lib/head';
 import { DEFAULT_OG_IMAGE_URL } from '../lib/media-assets';
 
@@ -172,6 +172,15 @@ export const SEO: React.FC<SEOProps> = ({
         ]
       : [])
   ]);
+
+  // When noHreflang=true, remove static hreflang tags baked into index.html
+  // that useHeadTags won't claim (since they're absent from the tags array).
+  useEffect(() => {
+    if (typeof document === 'undefined' || !noHreflang) return;
+    for (const key of ['link:hreflang:pt-BR', 'link:hreflang:x-default']) {
+      document.head.querySelector(`[data-av-head="${key}"]`)?.remove();
+    }
+  }, [noHreflang]);
 
   return null;
 };
