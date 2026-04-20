@@ -1,4 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import { readFile } from 'node:fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, loadEnv } from 'vite';
@@ -123,6 +124,34 @@ function apiDevPlugin() {
   };
 }
 
+function adminHtmlDevPlugin() {
+  const adminHtmlPath = path.resolve(__dirname, 'public/admin/index.html');
+
+  return {
+    name: 'admin-html-dev-plugin',
+    apply: 'serve' as const,
+    configureServer(server: { middlewares: { use: (handler: (req: IncomingMessage, res: ServerResponse, next: (error?: Error) => void) => void | Promise<void>) => void } }) {
+      server.middlewares.use(async (req, res, next) => {
+        const pathname = new URL(req.url || '/', 'http://vite.local').pathname;
+
+        if (pathname !== '/admin' && pathname !== '/admin/') {
+          next();
+          return;
+        }
+
+        try {
+          const html = await readFile(adminHtmlPath, 'utf8');
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          res.end(html);
+        } catch (error) {
+          next(error instanceof Error ? error : new Error('Failed to serve /admin in Vite dev'));
+        }
+      });
+    },
+  };
+}
+
 function stripMdxFrontmatterPlugin() {
   return {
     name: 'strip-mdx-frontmatter',
@@ -180,6 +209,7 @@ export default defineConfig(({ mode, isSsrBuild }) => {
         }),
       },
       react({ include: /\.(jsx|tsx|mdx)$/ }),
+      adminHtmlDevPlugin(),
       apiDevPlugin(),
     ],
     define: {
@@ -188,6 +218,7 @@ export default defineConfig(({ mode, isSsrBuild }) => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
+        'compute-scroll-into-view': path.resolve(__dirname, 'src/vendor/compute-scroll-into-view.ts'),
       }
     },
     build: {

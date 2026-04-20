@@ -67,3 +67,8 @@ Standardized the "Zero-Trust CORS" pattern for internal APIs. Public-facing endp
 **Vulnerability:** Authorization logic in Edge Functions (e.g., `api/purchase-dispatch.ts`) was using standard string comparison (`===`) for webhook secrets. This is vulnerable to timing attacks, where an attacker can brute-force a secret by measuring slight variations in response time for each character.
 **Learning:** Even simple API secrets need constant-time comparison. While Node.js has `crypto.timingSafeEqual`, Edge Runtimes often require a manual implementation using bitwise operations to ensure consistency across environments.
 **Prevention:** Always use a `timingSafeEqual` utility for comparing secrets, tokens, or signatures. Ensure the utility is shared across the codebase to maintain a unified security posture.
+
+## 2026-03-22 - [Truncation-based Sanitization Bypass]
+**Vulnerability:** In `lib/lead-logic.ts`, a length limit was implemented that returned the truncated string *before* applying HTML entity escaping for XSS prevention. This allowed malicious payloads exceeding the length limit to bypass sanitization entirely.
+**Learning:** Defensive measures like length limits must be ordered such that they don't bypass security filters. Truncation should happen first, but the resulting shorter string must still be processed by all security filters.
+**Prevention:** Always truncate first, then sanitize. Ensure security-critical functions don't have early return paths that skip mandatory sanitization logic.
