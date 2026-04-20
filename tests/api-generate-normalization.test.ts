@@ -127,6 +127,30 @@ test('buildGenerateSuccessBody should repair textual handoff into structured pay
     assert.doesNotMatch(body.text, /wa\.me/i);
 });
 
+test('buildGenerateSuccessBody should handle non-array parts from Gemini response gracefully', async () => {
+    // Gemini can return non-array `parts` on certain safety stops
+    const malformedResponse: ModelResponseShape = {
+        responseId: 'resp-malformed',
+        text: 'Posso te ajudar com a viagem.',
+        candidates: [
+            {
+                content: {
+                    parts: null as unknown as [],
+                },
+            },
+        ],
+    };
+
+    const body = await buildGenerateSuccessBody(malformedResponse, {
+        apiKey: 'test-key',
+        modelName: 'test-model',
+        contents: [],
+    });
+
+    assert.equal(typeof body.text, 'string');
+    assert.ok(body.text.length > 0, 'should fall back to response.text when parts is non-array');
+});
+
 test('buildGenerateSuccessBody should fall back to refinement when textual handoff repair is invalid', async () => {
     const body = await buildGenerateSuccessBody(
         {
