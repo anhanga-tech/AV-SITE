@@ -34,14 +34,14 @@
       "source": "/lollapalooza-2026/",
       "destination": "/lollapalooza",
       "permanent": true
-    }
-  ],
-  "rewrites": [
+    },
     {
       "source": "/admin",
       "destination": "/admin/",
       "permanent": false
-    },
+    }
+  ],
+  "rewrites": [
     {
       "source": "/api/keystatic/:path*",
       "destination": "/api/keystatic/[...params]"

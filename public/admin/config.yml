@@ -4,8 +4,8 @@ backend:
   branch: main
 
 local_backend: true
-site_url: http://localhost:3000
-display_url: http://localhost:3000
+site_url: https://www.anhanga.tur.br
+display_url: https://www.anhanga.tur.br
 logo_url: /assets/Anhangá Viagens - logo.png
 publish_mode: editorial_workflow
 media_folder: public/uploads
