@@ -38,6 +38,11 @@
   ],
   "rewrites": [
     {
+      "source": "/admin",
+      "destination": "/admin/",
+      "permanent": false
+    },
+    {
       "source": "/api/keystatic/:path*",
       "destination": "/api/keystatic/[...params]"
     },
