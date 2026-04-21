@@ -88,7 +88,10 @@ function apiDevPlugin() {
     apply: 'serve' as const,
     configureServer(server: { middlewares: { use: (handler: (req: IncomingMessage, res: ServerResponse, next: () => void) => void | Promise<void>) => void }, ssrFixStacktrace?: (error: Error) => void }) {
       server.middlewares.use(async (req, res, next) => {
-        const pathname = new URL(req.url, 'http://vite.local').pathname;
+        let pathname = '/';
+        if (req.url) {
+          pathname = new URL(req.url, 'http://vite.local').pathname;
+        }
         const loadHandler = DEV_API_ROUTES[pathname];
 
         if (!loadHandler) {

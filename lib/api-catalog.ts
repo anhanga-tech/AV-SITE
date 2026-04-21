@@ -5,7 +5,102 @@ const OPENAPI_PATH = '/.well-known/openapi.json';
 const HEALTH_PATH = '/api/health';
 const RFC_9727_PROFILE = 'https://www.rfc-editor.org/info/rfc9727';
 
-const API_ENDPOINTS = [
+type JsonSchema = Record<string, unknown>;
+type OpenApiJsonContent = {
+    'application/json': {
+        schema: JsonSchema;
+    };
+};
+
+interface OpenApiRequestBody {
+    required?: boolean;
+    content: {
+        'application/json': {
+            schema: JsonSchema;
+        };
+    };
+}
+
+interface OpenApiResponseDefinition {
+    description: string;
+    content?: OpenApiJsonContent;
+}
+
+export interface ApiEndpointDefinition {
+    anchor: string;
+    method: string;
+    summary: string;
+    description: string;
+    requestBody?: OpenApiRequestBody;
+    responses: Record<string, OpenApiResponseDefinition>;
+}
+
+const GENERIC_JSON_OBJECT_SCHEMA: JsonSchema = {
+    type: 'object',
+    additionalProperties: true,
+};
+
+const GENERATE_SUCCESS_SCHEMA: JsonSchema = {
+    type: 'object',
+    required: ['text'],
+    properties: {
+        text: { type: 'string' },
+        chips: {
+            type: 'array',
+            items: { type: 'string' },
+        },
+        functionCall: {
+            type: 'object',
+            additionalProperties: true,
+        },
+        handoff: {
+            type: 'object',
+            additionalProperties: true,
+        },
+    },
+    additionalProperties: false,
+};
+
+const SUBMIT_SUCCESS_SCHEMA: JsonSchema = {
+    type: 'object',
+    required: ['ok', 'requestId', 'message'],
+    properties: {
+        ok: { type: 'boolean' },
+        requestId: { type: 'string' },
+        message: { type: 'string' },
+    },
+    additionalProperties: true,
+};
+
+const ERROR_RESPONSE_SCHEMA: JsonSchema = {
+    type: 'object',
+    required: ['error'],
+    properties: {
+        ok: { type: 'boolean' },
+        requestId: { type: 'string' },
+        code: { type: 'string' },
+        error: { type: 'string' },
+        retryAfter: { type: 'number' },
+    },
+    additionalProperties: true,
+};
+
+function buildJsonContent(schema: JsonSchema = GENERIC_JSON_OBJECT_SCHEMA): OpenApiJsonContent {
+    return {
+        'application/json': {
+            schema,
+        },
+    };
+}
+
+function buildJsonResponse(description: string, schema: JsonSchema = GENERIC_JSON_OBJECT_SCHEMA): OpenApiResponseDefinition {
+    return {
+        description,
+        content: buildJsonContent(schema),
+    };
+}
+
+const API_ENDPOINTS: readonly ApiEndpointDefinition[] = [
     {
         anchor: `${SITE_ORIGIN}/api/generate`,
         method: 'post',
@@ -35,18 +130,10 @@ const API_ENDPOINTS = [
             },
         },
         responses: {
-            '200': {
-                description: 'Generated assistant response payload.',
-            },
-            '400': {
-                description: 'Invalid request body.',
-            },
-            '429': {
-                description: 'Rate limit exceeded.',
-            },
-            '500': {
-                description: 'Server or upstream model failure.',
-            },
+            '200': buildJsonResponse('Generated assistant response payload.', GENERATE_SUCCESS_SCHEMA),
+            '400': buildJsonResponse('Invalid request body.', ERROR_RESPONSE_SCHEMA),
+            '429': buildJsonResponse('Rate limit exceeded.', ERROR_RESPONSE_SCHEMA),
+            '500': buildJsonResponse('Server or upstream model failure.', ERROR_RESPONSE_SCHEMA),
         },
     },
     {
@@ -83,18 +170,10 @@ const API_ENDPOINTS = [
             },
         },
         responses: {
-            '201': {
-                description: 'Lead accepted.',
-            },
-            '400': {
-                description: 'Invalid lead payload.',
-            },
-            '429': {
-                description: 'Rate limit exceeded.',
-            },
-            '500': {
-                description: 'Server or upstream integration failure.',
-            },
+            '201': buildJsonResponse('Lead accepted.', SUBMIT_SUCCESS_SCHEMA),
+            '400': buildJsonResponse('Invalid lead payload.', ERROR_RESPONSE_SCHEMA),
+            '429': buildJsonResponse('Rate limit exceeded.', ERROR_RESPONSE_SCHEMA),
+            '500': buildJsonResponse('Server or upstream integration failure.', ERROR_RESPONSE_SCHEMA),
         },
     },
     {
@@ -128,21 +207,13 @@ const API_ENDPOINTS = [
             },
         },
         responses: {
-            '201': {
-                description: 'Waitlist registration accepted.',
-            },
-            '400': {
-                description: 'Invalid waitlist payload.',
-            },
-            '429': {
-                description: 'Rate limit exceeded.',
-            },
-            '500': {
-                description: 'Server or upstream integration failure.',
-            },
+            '201': buildJsonResponse('Waitlist registration accepted.', SUBMIT_SUCCESS_SCHEMA),
+            '400': buildJsonResponse('Invalid waitlist payload.', ERROR_RESPONSE_SCHEMA),
+            '429': buildJsonResponse('Rate limit exceeded.', ERROR_RESPONSE_SCHEMA),
+            '500': buildJsonResponse('Server or upstream integration failure.', ERROR_RESPONSE_SCHEMA),
         },
     },
-] as const;
+];
 
 function buildLinkHeader(): string {
     return `</.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"; profile="${RFC_9727_PROFILE}"`;
@@ -214,24 +285,27 @@ export function buildApiCatalogDocument(): {
     };
 }
 
-export function buildOpenApiDocument(): Record<string, unknown> {
-    const paths: Record<string, Record<string, unknown>> = Object.fromEntries(
-        API_ENDPOINTS.map((endpoint) => {
-            const path = new URL(endpoint.anchor).pathname;
+export function buildOpenApiPaths(endpoints: readonly ApiEndpointDefinition[]): Record<string, Record<string, unknown>> {
+    const paths: Record<string, Record<string, unknown>> = {};
 
-            return [
-                path,
-                {
-                    [endpoint.method]: {
-                        summary: endpoint.summary,
-                        description: endpoint.description,
-                        requestBody: endpoint.requestBody,
-                        responses: endpoint.responses,
-                    },
-                },
-            ];
-        }),
-    );
+    for (const endpoint of endpoints) {
+        const path = new URL(endpoint.anchor).pathname;
+        paths[path] = {
+            ...paths[path],
+            [endpoint.method]: {
+                summary: endpoint.summary,
+                description: endpoint.description,
+                requestBody: endpoint.requestBody,
+                responses: endpoint.responses,
+            },
+        };
+    }
+
+    return paths;
+}
+
+export function buildOpenApiDocument(): Record<string, unknown> {
+    const paths = buildOpenApiPaths(API_ENDPOINTS);
 
     paths[HEALTH_PATH] = {
         get: {

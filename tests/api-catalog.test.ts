@@ -6,6 +6,7 @@ import apiCatalogHandler from '../api/api-catalog.ts';
 import apiDocsHandler from '../api/api-docs.ts';
 import healthHandler from '../api/health.ts';
 import openapiHandler from '../api/openapi.ts';
+import { buildOpenApiPaths, type ApiEndpointDefinition } from '../lib/api-catalog.ts';
 
 interface LinkTarget {
     href?: string;
@@ -97,6 +98,82 @@ test('openapi handler should publish the machine-readable API description used b
     assert.ok(payload.paths?.['/api/submit-lead']);
     assert.ok(payload.paths?.['/api/submit-waitlist']);
     assert.ok(payload.paths?.['/api/health']);
+
+    const generatePath = payload.paths?.['/api/generate'] as {
+        post?: {
+            responses?: Record<string, { content?: Record<string, { schema?: unknown }> }>;
+        };
+    };
+    const submitLeadPath = payload.paths?.['/api/submit-lead'] as {
+        post?: {
+            responses?: Record<string, { content?: Record<string, { schema?: unknown }> }>;
+        };
+    };
+
+    assert.ok(generatePath.post?.responses?.['200']?.content?.['application/json']?.schema);
+    assert.ok(generatePath.post?.responses?.['400']?.content?.['application/json']?.schema);
+    assert.ok(submitLeadPath.post?.responses?.['201']?.content?.['application/json']?.schema);
+    assert.ok(submitLeadPath.post?.responses?.['500']?.content?.['application/json']?.schema);
+});
+
+test('buildOpenApiPaths should preserve multiple HTTP methods for the same path', () => {
+    const endpoints: ApiEndpointDefinition[] = [
+        {
+            anchor: 'https://www.anhanga.tur.br/api/example',
+            method: 'get',
+            summary: 'Read example',
+            description: 'Reads an example resource.',
+            responses: {
+                '200': {
+                    description: 'Read response.',
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                additionalProperties: true,
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        {
+            anchor: 'https://www.anhanga.tur.br/api/example',
+            method: 'post',
+            summary: 'Create example',
+            description: 'Creates an example resource.',
+            requestBody: {
+                required: true,
+                content: {
+                    'application/json': {
+                        schema: {
+                            type: 'object',
+                            additionalProperties: true,
+                        },
+                    },
+                },
+            },
+            responses: {
+                '201': {
+                    description: 'Created response.',
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                additionalProperties: true,
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    ];
+
+    const paths = buildOpenApiPaths(endpoints);
+    const examplePath = paths['/api/example'] as Record<string, unknown>;
+
+    assert.ok(examplePath.get);
+    assert.ok(examplePath.post);
 });
 
 test('api-docs handler should publish human-readable documentation for the cataloged APIs', async () => {
@@ -155,4 +232,6 @@ test('vite dev routing should expose the same discovery endpoints locally', asyn
     assert.match(viteConfig, /'\/\.well-known\/api-catalog'/);
     assert.match(viteConfig, /'\/\.well-known\/openapi\.json'/);
     assert.match(viteConfig, /'\/\.well-known\/api-docs'/);
+    assert.match(viteConfig, /let pathname = '\/';/);
+    assert.match(viteConfig, /if \(req\.url\) \{/);
 });
