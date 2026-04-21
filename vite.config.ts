@@ -21,6 +21,7 @@ const DEV_API_ROUTES: Record<string, () => Promise<{ default: ApiHandler }>> = {
   '/api/submit-lead': () => import('./api/submit-lead.ts'),
   '/api/submit-waitlist': () => import('./api/submit-waitlist.ts'),
   '/api/hubspot-webhook': () => import('./api/hubspot-webhook.ts'),
+  '/api/submit-nps': () => import('./api/submit-nps.ts'),
 };
 
 const METHODS_WITH_BODY = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);

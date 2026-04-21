@@ -26,6 +26,13 @@ const KNOWN_TRACKING_KEYS = new Set([
  * Sanitize strings to prevent XSS and remove leading/trailing whitespace.
  * Includes a maximum length check to prevent DoS via excessive regex execution.
  */
+export function maskEmail(email: string): string {
+    const [localPart, domainPart] = email.split('@');
+    if (!domainPart) return 'hidden';
+    const firstChar = localPart?.trim().charAt(0) || '*';
+    return `${firstChar}***@${domainPart}`;
+}
+
 export function cleanString(value: unknown): string {
     if (typeof value !== 'string') return '';
     const trimmed = value.trim();
