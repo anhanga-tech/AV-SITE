@@ -165,7 +165,7 @@ export default function NPS() {
                     De 0 a 10, o quanto você recomendaria a Anhangá Viagens para um amigo ou familiar?
                   </legend>
 
-                  <div className="flex flex-wrap gap-2">
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(11, 1fr)', gap: '6px' }}>
                     {Array.from({ length: 11 }, (_, i) => {
                       const selected = score === i;
                       const hovered = hoveredScore === i && !selected;
@@ -180,8 +180,8 @@ export default function NPS() {
                           aria-label={`Nota ${i}${SCORE_LABELS[i] ? ` — ${SCORE_LABELS[i]}` : ''}`}
                           className="nps-score-btn"
                           style={{
-                            width: '2.75rem',
-                            height: '2.75rem',
+                            width: '100%',
+                            aspectRatio: '1',
                             borderRadius: '0.375rem',
                             fontWeight: 800,
                             fontSize: '0.875rem',
