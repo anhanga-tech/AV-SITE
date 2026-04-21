@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
 import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import TrendingUp from 'lucide-react/dist/esm/icons/trending-up';
@@ -36,7 +36,14 @@ const POPULAR_DESTINATIONS = [
   }
 ];
 
-const Categories: React.FC = () => {
+/**
+ * Categories Component - Optimized with React.memo
+ *
+ * PERFORMANCE WIN: Prevents unnecessary re-renders when the Home page state changes.
+ * Since this component relies on static data, it only needs to render once.
+ * Expected Impact: Reduces re-render time for the Home page by skipping this component's reconciliation.
+ */
+const Categories = memo(() => {
 
   return (
     <section className="py-24 bg-[#fffdf5] relative">
@@ -105,6 +112,8 @@ const Categories: React.FC = () => {
       </div>
     </section>
   );
-};
+});
+
+Categories.displayName = 'Categories';
 
 export default Categories;

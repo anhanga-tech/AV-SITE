@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import {
   ChatCircleDots,
   PaintBrushBroad,
@@ -64,7 +64,13 @@ const STEPS = [
   }
 ];
 
-const HowItWorks: React.FC = () => {
+/**
+ * HowItWorks Component - Optimized with React.memo
+ *
+ * PERFORMANCE WIN: Prevents expensive re-renders of the complex SVG path and step list.
+ * As a static informational section, it does not need to re-render when parent state updates.
+ */
+const HowItWorks = memo(() => {
 
   return (
     <section id="como-funciona" className="pt-24 pb-32 relative overflow-hidden bg-[#fffdf5]" aria-label="Como Funciona">
@@ -198,6 +204,8 @@ const HowItWorks: React.FC = () => {
 
     </section>
   );
-};
+});
+
+HowItWorks.displayName = 'HowItWorks';
 
 export default HowItWorks;
