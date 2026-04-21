@@ -12,8 +12,12 @@ import { stripYamlFrontmatter } from './lib/mdx-frontmatter.ts';
 type ApiHandler = (request: Request) => Promise<Response> | Response;
 
 const DEV_API_ROUTES: Record<string, () => Promise<{ default: ApiHandler }>> = {
+  '/.well-known/api-catalog': () => import('./api/api-catalog.ts'),
+  '/.well-known/api-docs': () => import('./api/api-docs.ts'),
+  '/.well-known/openapi.json': () => import('./api/openapi.ts'),
   '/api/markdown': () => import('./api/markdown.ts'),
   '/api/generate': () => import('./api/generate.ts'),
+  '/api/health': () => import('./api/health.ts'),
   '/api/submit-lead': () => import('./api/submit-lead.ts'),
   '/api/submit-waitlist': () => import('./api/submit-waitlist.ts'),
   '/api/hubspot-webhook': () => import('./api/hubspot-webhook.ts'),
@@ -84,12 +88,10 @@ function apiDevPlugin() {
     apply: 'serve' as const,
     configureServer(server: { middlewares: { use: (handler: (req: IncomingMessage, res: ServerResponse, next: () => void) => void | Promise<void>) => void }, ssrFixStacktrace?: (error: Error) => void }) {
       server.middlewares.use(async (req, res, next) => {
-        if (!req.url?.startsWith('/api/')) {
-          next();
-          return;
+        let pathname = '/';
+        if (req.url) {
+          pathname = new URL(req.url, 'http://vite.local').pathname;
         }
-
-        const pathname = new URL(req.url, 'http://vite.local').pathname;
         const loadHandler = DEV_API_ROUTES[pathname];
 
         if (!loadHandler) {

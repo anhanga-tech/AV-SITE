@@ -55,6 +55,18 @@
   ],
   "rewrites": [
     {
+      "source": "/.well-known/api-catalog",
+      "destination": "/api/api-catalog"
+    },
+    {
+      "source": "/.well-known/api-docs",
+      "destination": "/api/api-docs"
+    },
+    {
+      "source": "/.well-known/openapi.json",
+      "destination": "/api/openapi"
+    },
+    {
       "source": "/api/keystatic/:path*",
       "destination": "/api/keystatic/[...params]"
     },
@@ -89,20 +101,11 @@
         },
         {
           "key": "Link",
-          "value": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/json\""
+          "value": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\"; profile=\"https://www.rfc-editor.org/info/rfc9727\""
         },
         {
           "key": "Vary",
           "value": "Accept"
-        }
-      ]
-    },
-    {
-      "source": "/.well-known/api-catalog",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/json"
         }
       ]
     },
