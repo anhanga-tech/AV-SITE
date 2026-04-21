@@ -15,7 +15,6 @@ interface NpsPayload {
   score: number;
   reason: string;
   highlight: string;
-  submittedAt: string;
 }
 
 function buildJsonResponse(
@@ -48,10 +47,6 @@ function validateNpsPayload(
   const score = obj.score;
   const reason = cleanString(typeof obj.reason === 'string' ? obj.reason : '');
   const highlight = cleanString(typeof obj.highlight === 'string' ? obj.highlight : '');
-  const submittedAt =
-    typeof obj.submittedAt === 'string' && obj.submittedAt
-      ? obj.submittedAt
-      : new Date().toISOString();
 
   if (!firstname || firstname.length > 100) {
     return { valid: false, error: 'Nome inválido.' };
@@ -83,7 +78,7 @@ function validateNpsPayload(
 
   return {
     valid: true,
-    data: { firstname, email, score, reason, highlight, submittedAt },
+    data: { firstname, email, score, reason, highlight },
   };
 }
 
@@ -104,7 +99,7 @@ export default async function handler(request: Request): Promise<Response> {
     );
   }
 
-  const webhookUrl = cleanString(process.env.NPS_WEBHOOK_URL);
+  const webhookUrl = process.env.NPS_WEBHOOK_URL?.trim();
   if (!webhookUrl) {
     console.error('SUBMIT_NPS', { requestId, stage: 'config', code: 'SERVER_CONFIG_ERROR' });
     return buildJsonResponse(
@@ -182,7 +177,7 @@ export default async function handler(request: Request): Promise<Response> {
     const webhookRes = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...payload, requestId }),
+      body: JSON.stringify({ ...payload, submittedAt: new Date().toISOString(), requestId }),
     });
 
     if (!webhookRes.ok) {

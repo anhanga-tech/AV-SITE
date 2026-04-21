@@ -59,7 +59,6 @@ function validBody(overrides?: Record<string, unknown>) {
         score: 9,
         reason: 'Atendimento excelente e viagem perfeita.',
         highlight: 'A visita às Cataratas do Iguaçu.',
-        submittedAt: '2026-04-21T10:00:00.000Z',
         ...overrides,
     };
 }
@@ -336,6 +335,8 @@ test('submit-nps returns 201 and forwards payload to webhook on success', async 
     assert.equal(webhookCall.body?.reason, 'Atendimento excelente e viagem perfeita.');
     assert.equal(webhookCall.body?.highlight, 'A visita às Cataratas do Iguaçu.');
     assert.ok(typeof webhookCall.body?.requestId === 'string');
+    assert.match(String(webhookCall.body?.submittedAt), /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/,
+        'submittedAt deve ser gerado server-side em formato ISO 8601');
 });
 
 test('submit-nps accepts score 0 (boundary)', async (t) => {

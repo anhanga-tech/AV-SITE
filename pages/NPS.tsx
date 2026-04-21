@@ -103,7 +103,6 @@ export default function NPS() {
           score,
           reason: reason.trim(),
           highlight: highlight.trim(),
-          submittedAt: new Date().toISOString(),
         }),
       });
 
