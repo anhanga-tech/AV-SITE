@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { BRAND_LOGO_WHITE_URL } from '../lib/media-assets';
 
 const GOOGLE_REVIEW_URL = 'https://g.page/r/Ca7sLORX6EQ7EBM/review';
 const WHATSAPP_URL = 'https://wa.me/551152833309';
-const LOGO_URL = 'https://media.anhanga.tur.br/images/brand/logo_azul.png';
 
 type PageState = 'form' | 'thank-promoter' | 'thank-other';
 
@@ -133,9 +133,9 @@ export default function NPS() {
       >
         <header className="py-6 px-6 flex justify-center">
           <img
-            src={LOGO_URL}
+            src={BRAND_LOGO_WHITE_URL}
             alt="Anhangá Viagens"
-            className="h-10 w-auto"
+            className="h-20 w-auto"
             loading="eager"
           />
         </header>
