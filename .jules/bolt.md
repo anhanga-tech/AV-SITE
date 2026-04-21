@@ -19,3 +19,7 @@
 ## 2026-05-20 - ⚡ Bolt: Blog Component Optimization
 **Learning:** The Blog component on the home page was using standard `<img>` tags and lacked memoization, causing Cumulative Layout Shift (CLS) and redundant re-renders when the parent home page state changed. Utilizing the internal `LazyImage` component with explicit dimensions (960x540 for featured, 640x480 for grid) not only stabilizes the layout but also leverages the built-in `optimizeRemoteImageUrl` for bandwidth efficiency.
 **Action:** Ensure large content sections like Blog are wrapped in `React.memo` and use the project's `LazyImage` standard for all remote assets to maintain Core Web Vitals.
+
+## 2026-06-12 - ⚡ Bolt: Home Page Section Memoization
+**Learning:** Static-data sections like FAQ, Categories, and HowItWorks can still be forced to re-render when the parent page component (Home.tsx) updates its lifecycle states (e.g., intersection observer flags or interaction timeouts). Wrapping these in React.memo prevents unnecessary reconciliation and CPU cycles during the "below-the-fold" rendering phase.
+**Action:** Always memoize large, data-driven Home page sections that don't depend on parent state to ensure smooth performance during deferred loading sequences.

@@ -190,7 +190,13 @@ const FAQS = [
     }
 ];
 
-const FAQ: React.FC = () => {
+/**
+ * FAQ Component - Optimized with React.memo
+ *
+ * PERFORMANCE WIN: Prevents the entire FAQ section from re-rendering when parent state changes.
+ * Individual FAQ items are already memoized, but memoizing the container avoids the outer render logic.
+ */
+const FAQ = memo(() => {
     return (
         <section
             id="faq-section"
@@ -247,8 +253,9 @@ const FAQ: React.FC = () => {
             `}</style>
         </section>
     );
-};
+});
 
 FAQItem.displayName = 'FAQItem';
+FAQ.displayName = 'FAQ';
 
 export default FAQ;
