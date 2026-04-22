@@ -7,6 +7,7 @@ import Footer from './components/Footer';
 import AIChat from './components/AIChat';
 import { ClientOnly } from './components/ClientOnly';
 import ScrollToTop from './components/ScrollToTop';
+import BackToTop from './components/ui/BackToTop';
 import { HeadContext, type HeadManager } from './lib/head';
 
 // Pages
@@ -33,6 +34,7 @@ const LandingRouteFallback: React.FC = () => <div className="min-h-screen bg-whi
 const ClientFeatures: React.FC = () => (
   <ClientOnly>
     <AIChat />
+    <BackToTop />
     <Analytics />
     <SpeedInsights />
   </ClientOnly>
