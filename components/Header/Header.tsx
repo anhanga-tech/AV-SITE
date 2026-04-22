@@ -91,7 +91,7 @@ const Header: React.FC = () => {
       <div className="container mx-auto px-6 flex justify-between items-center">
         <a
           href={`${SITE_URL}/`}
-          className="flex items-center gap-2 group focus:outline-none rounded-lg p-1"
+          className="flex items-center gap-2 group rounded-lg p-1 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2"
           aria-label="Anhangá Viagens - Ir para o topo"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >

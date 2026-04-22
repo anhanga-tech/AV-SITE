@@ -13,3 +13,7 @@
 ## 2025-05-15 - Synchronized Haptics and Accessible Destination Cards
 **Learning:** Micro-interactions like haptic feedback ('light' for toggles/counters, 'medium' for copy actions) significantly increase the "physical" feel of the interface on mobile. For card-based layouts that trigger modals, adding semantic role="button" and keyboard listeners (Enter/Space) ensures that keyboard and screen-reader users can access the same rich content as mouse users. Using dynamic imports for the haptics utility keeps the bundle lean for non-mobile or low-interaction sessions.
 **Action:** Use haptic feedback to confirm discrete UI actions and always ensure custom interactive elements (like cards) are reachable and activatable via keyboard.
+
+## 2026-04-22 - Managing Floating UI Component Collisions
+**Learning:** In applications with multiple persistent floating widgets (like AI Chat drawers and Back-to-Top buttons), simple absolute positioning can lead to "UI Stacking" where elements overlap, rendering one or both inaccessible. Coordinating responsive offsets (e.g., using `bottom-32` on one element when another is present at `bottom-8`) is necessary to maintain a clear visual hierarchy and usability across screen sizes.
+**Action:** When adding new floating elements, audit existing sticky/fixed components and implement conditional or responsive spacing to prevent overlap, especially on mobile where screen real estate is limited.
