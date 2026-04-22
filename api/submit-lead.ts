@@ -1,7 +1,7 @@
 import type { SubmitLeadRequest, SubmitLeadResponse } from '../types/leadCapture';
-import { buildCorsHeaders, getClientIP } from '../lib/network';
+import { buildCorsHeaders, createRequestId, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
-import { cleanString, validatePayload } from '../lib/lead-logic';
+import { cleanString, maskEmail, validatePayload } from '../lib/lead-logic';
 import { buildN8nLeadPayload } from '../lib/n8n-payloads';
 import { sendLeadToN8n } from '../services/n8n';
 
@@ -21,25 +21,9 @@ type SubmitLeadInternalErrorCode = 'N8N_WEBHOOK_ERROR' | 'INTERNAL_ERROR';
 
 type LeadLogLevel = 'info' | 'warn' | 'error';
 
-function createRequestId(): string {
-    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-        return crypto.randomUUID();
-    }
-
-    return `lead_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
-}
-
 function truncateDetail(detail: string): string | undefined {
     const normalized = detail.replace(/[\r\n]+/g, ' ').trim();
     return normalized ? normalized.substring(0, 600) : undefined;
-}
-
-function maskEmail(email: string): string {
-    const [localPart, domainPart] = email.split('@');
-    if (!domainPart) return 'hidden';
-
-    const firstChar = localPart?.trim().charAt(0) || '*';
-    return `${firstChar}***@${domainPart}`;
 }
 
 function maskPhone(phone: string): string {
