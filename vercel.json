@@ -34,9 +34,38 @@
       "source": "/lollapalooza-2026/",
       "destination": "/lollapalooza",
       "permanent": true
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin/",
+      "permanent": false
+    },
+    {
+      "source": "/((?!api/).*)",
+      "has": [
+        {
+          "type": "header",
+          "key": "accept",
+          "value": "text/markdown"
+        }
+      ],
+      "destination": "/api/markdown?path=/$1",
+      "permanent": false
     }
   ],
   "rewrites": [
+    {
+      "source": "/.well-known/api-catalog",
+      "destination": "/api/api-catalog"
+    },
+    {
+      "source": "/.well-known/api-docs",
+      "destination": "/api/api-docs"
+    },
+    {
+      "source": "/.well-known/openapi.json",
+      "destination": "/api/openapi"
+    },
     {
       "source": "/api/keystatic/:path*",
       "destination": "/api/keystatic/[...params]"
@@ -69,6 +98,23 @@
         {
           "key": "Permissions-Policy",
           "value": "camera=(), microphone=(), geolocation=(), payment=()"
+        },
+        {
+          "key": "Link",
+          "value": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\"; profile=\"https://www.rfc-editor.org/info/rfc9727\""
+        },
+        {
+          "key": "Vary",
+          "value": "Accept"
+        }
+      ]
+    },
+    {
+      "source": "/.well-known/http-message-signatures-directory",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json"
         }
       ]
     }

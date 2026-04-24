@@ -24,20 +24,32 @@ const KNOWN_TRACKING_KEYS = new Set([
 
 /**
  * Sanitize strings to prevent XSS and remove leading/trailing whitespace.
+ * Includes a maximum length check to prevent DoS via excessive regex execution.
  */
+export function maskEmail(email: string): string {
+    const [localPart, domainPart] = email.split('@');
+    if (!domainPart) return 'hidden';
+    const firstChar = localPart?.trim().charAt(0) || '*';
+    return `${firstChar}***@${domainPart}`;
+}
+
 export function cleanString(value: unknown): string {
     if (typeof value !== 'string') return '';
-    return value.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const trimmed = value.trim();
+    const truncated = trimmed.length > 10000 ? trimmed.substring(0, 10000) : trimmed;
+    return truncated.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 /**
  * Normalizes a string or returns null if empty.
+ * Includes a maximum length check to prevent DoS via excessive regex execution.
  */
 export function normalizeNullable(value: unknown, maxLength = 255): string | null {
     if (typeof value !== 'string') return null;
     const trimmed = value.trim();
     if (trimmed.length === 0) return null;
-    const sanitized = trimmed.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const truncated = trimmed.length > 10000 ? trimmed.substring(0, 10000) : trimmed;
+    const sanitized = truncated.replace(/</g, '&lt;').replace(/>/g, '&gt;');
     return sanitized.length > maxLength ? sanitized.substring(0, maxLength) : sanitized;
 }
 

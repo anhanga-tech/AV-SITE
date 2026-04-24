@@ -8,13 +8,14 @@ import { test, expect } from '@playwright/test';
 test.describe('SEO Metadata Verification', () => {
   const routes = [
     { path: '/', expectedCanonical: 'https://www.anhanga.tur.br/' },
-    { path: '/orlando', expectedCanonical: 'https://www.anhanga.tur.br/orlando/' },
-    { path: '/beto-carrero', expectedCanonical: 'https://www.anhanga.tur.br/beto-carrero/' },
-    { path: '/lollapalooza', expectedCanonical: 'https://www.anhanga.tur.br/lollapalooza/' },
+    // Landing pages use noHreflang — hreflang tags are intentionally suppressed
+    { path: '/orlando', expectedCanonical: 'https://www.anhanga.tur.br/orlando/', noHreflang: true },
+    { path: '/beto-carrero', expectedCanonical: 'https://www.anhanga.tur.br/beto-carrero/', noHreflang: true },
+    { path: '/lollapalooza', expectedCanonical: 'https://www.anhanga.tur.br/lollapalooza/', noHreflang: true },
     { path: '/termos-de-uso', expectedCanonical: 'https://www.anhanga.tur.br/termos-de-uso/' },
   ];
 
-  for (const route of routes) {
+  for (const route of routes as Array<{ path: string; expectedCanonical: string; noHreflang?: boolean }>) {
     test(`Checking metadata for ${route.path}`, async ({ page }) => {
       // Use longer timeout for slow CI environments
       test.setTimeout(60000);
@@ -42,13 +43,19 @@ test.describe('SEO Metadata Verification', () => {
       await expect(canonical).toHaveAttribute('href', route.expectedCanonical, { timeout: 10000 });
       await expect(canonical).toHaveCount(1);
 
-      // 4. Verify Hreflang Tags (pt-BR and x-default)
-      const hreflangs = ['pt-BR', 'x-default'];
-      for (const lang of hreflangs) {
-        await test.step(`Verify hreflang="${lang}"`, async () => {
-          const link = page.locator(`link[hreflang="${lang}"]`);
-          await expect(link).toHaveAttribute('href', route.expectedCanonical, { timeout: 10000 });
-          await expect(link).toHaveCount(1);
+      // 4. Verify Hreflang Tags (pt-BR and x-default) — skipped for noHreflang pages
+      if (!route.noHreflang) {
+        const hreflangs = ['pt-BR', 'x-default'];
+        for (const lang of hreflangs) {
+          await test.step(`Verify hreflang="${lang}"`, async () => {
+            const link = page.locator(`link[hreflang="${lang}"]`);
+            await expect(link).toHaveAttribute('href', route.expectedCanonical, { timeout: 10000 });
+            await expect(link).toHaveCount(1);
+          });
+        }
+      } else {
+        await test.step('Verify no hreflang tags (noHreflang page)', async () => {
+          await expect(page.locator('link[hreflang]')).toHaveCount(0);
         });
       }
 

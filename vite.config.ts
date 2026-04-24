@@ -1,4 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import { readFile } from 'node:fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, loadEnv } from 'vite';
@@ -11,10 +12,16 @@ import { stripYamlFrontmatter } from './lib/mdx-frontmatter.ts';
 type ApiHandler = (request: Request) => Promise<Response> | Response;
 
 const DEV_API_ROUTES: Record<string, () => Promise<{ default: ApiHandler }>> = {
+  '/.well-known/api-catalog': () => import('./api/api-catalog.ts'),
+  '/.well-known/api-docs': () => import('./api/api-docs.ts'),
+  '/.well-known/openapi.json': () => import('./api/openapi.ts'),
+  '/api/markdown': () => import('./api/markdown.ts'),
   '/api/generate': () => import('./api/generate.ts'),
+  '/api/health': () => import('./api/health.ts'),
   '/api/submit-lead': () => import('./api/submit-lead.ts'),
   '/api/submit-waitlist': () => import('./api/submit-waitlist.ts'),
   '/api/hubspot-webhook': () => import('./api/hubspot-webhook.ts'),
+  '/api/submit-nps': () => import('./api/submit-nps.ts'),
 };
 
 const METHODS_WITH_BODY = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
@@ -82,12 +89,10 @@ function apiDevPlugin() {
     apply: 'serve' as const,
     configureServer(server: { middlewares: { use: (handler: (req: IncomingMessage, res: ServerResponse, next: () => void) => void | Promise<void>) => void }, ssrFixStacktrace?: (error: Error) => void }) {
       server.middlewares.use(async (req, res, next) => {
-        if (!req.url?.startsWith('/api/')) {
-          next();
-          return;
+        let pathname = '/';
+        if (req.url) {
+          pathname = new URL(req.url, 'http://vite.local').pathname;
         }
-
-        const pathname = new URL(req.url, 'http://vite.local').pathname;
         const loadHandler = DEV_API_ROUTES[pathname];
 
         if (!loadHandler) {
@@ -117,6 +122,34 @@ function apiDevPlugin() {
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify({ error: 'Internal dev server error' }));
           }
+        }
+      });
+    },
+  };
+}
+
+function adminHtmlDevPlugin() {
+  const adminHtmlPath = path.resolve(__dirname, 'public/admin/index.html');
+
+  return {
+    name: 'admin-html-dev-plugin',
+    apply: 'serve' as const,
+    configureServer(server: { middlewares: { use: (handler: (req: IncomingMessage, res: ServerResponse, next: (error?: Error) => void) => void | Promise<void>) => void } }) {
+      server.middlewares.use(async (req, res, next) => {
+        const pathname = new URL(req.url || '/', 'http://vite.local').pathname;
+
+        if (pathname !== '/admin' && pathname !== '/admin/') {
+          next();
+          return;
+        }
+
+        try {
+          const html = await readFile(adminHtmlPath, 'utf8');
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          res.end(html);
+        } catch (error) {
+          next(error instanceof Error ? error : new Error('Failed to serve /admin in Vite dev'));
         }
       });
     },
@@ -180,6 +213,7 @@ export default defineConfig(({ mode, isSsrBuild }) => {
         }),
       },
       react({ include: /\.(jsx|tsx|mdx)$/ }),
+      adminHtmlDevPlugin(),
       apiDevPlugin(),
     ],
     define: {
@@ -188,6 +222,7 @@ export default defineConfig(({ mode, isSsrBuild }) => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
+        'compute-scroll-into-view': path.resolve(__dirname, 'src/vendor/compute-scroll-into-view.ts'),
       }
     },
     build: {

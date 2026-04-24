@@ -1,5 +1,5 @@
 import type { SubmitWaitlistRequest, SubmitWaitlistResponse } from '../types/waitlist';
-import { buildCorsHeaders, getClientIP } from '../lib/network';
+import { buildCorsHeaders, createRequestId, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
 import { cleanString } from '../lib/lead-logic';
 import { buildN8nWaitlistPayload } from '../lib/n8n-payloads';
@@ -23,14 +23,6 @@ function truncateDetail(detail: string): string | undefined {
     if (!trimmed) return undefined;
 
     return trimmed.slice(0, 200);
-}
-
-function createRequestId(): string {
-    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-        return crypto.randomUUID();
-    }
-
-    return `waitlist_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
 function buildJsonResponse(body: SubmitWaitlistResponse, status: number, corsHeaders: Record<string, string>): Response {

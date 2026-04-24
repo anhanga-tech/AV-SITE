@@ -33,9 +33,10 @@ const LollapaloozaLanding: React.FC = () => {
   return (
     <>
       <SEO
-        title="Lollapalooza Brasil: 2026 Esgotado, Lista de Espera 2027"
+        title="Lollapalooza 2026 Esgotado | Lista de Espera 2027"
         description="A campanha do Lollapalooza 2026 foi encerrada com sucesso. Entre na lista de espera 2027 para receber prioridade quando os próximos pacotes abrirem."
         canonical="https://www.anhanga.tur.br/lollapalooza/"
+        noHreflang
       />
       <ServiceSchema
         name="Lista de Espera Lollapalooza Brasil 2027"

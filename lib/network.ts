@@ -2,6 +2,14 @@
  * Common network utilities for Edge Functions.
  */
 
+export function createRequestId(): string {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID();
+    }
+
+    return `req_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+}
+
 /**
  * Normalizes and builds CORS headers for the response.
  */
@@ -10,6 +18,7 @@ export function buildCorsHeaders(allowedOrigin?: string): Record<string, string>
         'Access-Control-Allow-Origin': allowedOrigin || process.env.ALLOWED_ORIGIN || 'https://www.anhanga.tur.br',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Expose-Headers': 'X-RateLimit-Remaining, X-RateLimit-Reset, X-Request-Id',
     };
 }
 

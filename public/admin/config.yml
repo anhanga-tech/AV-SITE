@@ -1,0 +1,58 @@
+backend:
+  name: github
+  repo: felipewilliam2/AV-SITE
+  branch: main
+
+local_backend: true
+site_url: https://www.anhanga.tur.br
+display_url: https://www.anhanga.tur.br
+logo_url: /assets/Anhangá Viagens - logo.png
+publish_mode: editorial_workflow
+media_folder: public/uploads
+public_folder: /uploads
+
+collections:
+  - name: blog
+    label: Blog
+    label_singular: Post
+    folder: content/blog
+    create: true
+    extension: mdx
+    format: frontmatter
+    slug: '{{slug}}'
+    preview_path: blog/{{slug}}
+    editor:
+      preview: false
+    fields:
+      - { label: Título, name: title, widget: string }
+      - { label: Resumo, name: excerpt, widget: text }
+      - { label: Data de publicação, name: date, widget: datetime, date_format: YYYY-MM-DD, time_format: false }
+      - { label: Data de atualização, name: dateModified, widget: datetime, required: false, date_format: YYYY-MM-DD, time_format: false }
+      - label: Autor
+        name: author
+        widget: select
+        options:
+          - { label: Equipe Anhangá, value: equipe-anhanga }
+          - { label: Ana Souza, value: ana-souza }
+          - { label: Rafa Tech, value: rafa-tech }
+          - { label: Chef Luigi, value: luigi }
+          - { label: Mariana S., value: mariana }
+          - { label: Carlos Viajante, value: carlos }
+      - label: Categoria
+        name: category
+        widget: select
+        options:
+          - { label: Cruzeiros, value: Cruzeiros }
+          - { label: Carnaval, value: Carnaval }
+          - { label: Festivais, value: Festivais }
+          - { label: Dicas de Expert, value: Dicas de Expert }
+          - { label: Planejamento, value: Planejamento }
+          - { label: Gastronomia, value: Gastronomia }
+          - { label: Romance, value: Romance }
+          - { label: Sazonal, value: Sazonal }
+      - { label: Imagem de capa, name: image, widget: image, required: true }
+      - { label: Destaque, name: featured, widget: boolean, required: false, default: false }
+      - { label: Tags, name: tags, widget: list, required: false }
+      - { label: Título SEO, name: seoTitle, widget: string, required: false }
+      - { label: Descrição SEO, name: seoDescription, widget: text, required: false }
+      - { label: Conteúdo, name: body, widget: markdown }

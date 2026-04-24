@@ -54,7 +54,7 @@ const Problem: React.FC = () => {
                      <div className="flex items-start gap-3 lg:gap-4">
                         <AlertTriangle className="text-fun-dark w-6 h-6 md:w-8 md:h-8 lg:w-10 lg:h-10 flex-shrink-0" />
                         <div>
-                           <h4 className="font-bold text-sm md:text-lg lg:text-xl leading-tight mb-1">Preço mudou!</h4>
+                           <h3 className="font-bold text-sm md:text-lg lg:text-xl leading-tight mb-1">Preço mudou!</h3>
                            <p className="text-xs md:text-sm lg:text-base text-fun-dark/80">A passagem aumentou enquanto você pensava.</p>
                         </div>
                      </div>
