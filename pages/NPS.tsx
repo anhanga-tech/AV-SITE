@@ -165,7 +165,7 @@ export default function NPS() {
                     De 0 a 10, o quanto você recomendaria a Anhangá Viagens para um amigo ou familiar?
                   </legend>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(11, 1fr)', gap: '6px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(2.75rem, 1fr))', gap: '6px' }}>
                     {Array.from({ length: 11 }, (_, i) => {
                       const selected = score === i;
                       const hovered = hoveredScore === i && !selected;

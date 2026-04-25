@@ -173,12 +173,17 @@ export default async function handler(request: Request): Promise<Response> {
     score: payload.score,
   });
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
+
   try {
     const webhookRes = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...payload, submittedAt: new Date().toISOString(), requestId }),
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
 
     if (!webhookRes.ok) {
       const text = await webhookRes.text().catch(() => '');
@@ -204,9 +209,10 @@ export default async function handler(request: Request): Promise<Response> {
       requestId,
     );
   } catch (err) {
+    clearTimeout(timeoutId);
     console.error('SUBMIT_NPS', {
       requestId,
-      stage: 'unexpected',
+      stage: err instanceof Error && err.name === 'AbortError' ? 'webhook_timeout' : 'unexpected',
       errorType: err instanceof Error ? err.name : typeof err,
     });
     return buildJsonResponse(
