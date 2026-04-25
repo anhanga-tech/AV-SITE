@@ -50,7 +50,13 @@ export function normalizeNullable(value: unknown, maxLength = 255): string | nul
     if (trimmed.length === 0) return null;
     const truncated = trimmed.length > 10000 ? trimmed.substring(0, 10000) : trimmed;
     const sanitized = truncated.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return sanitized.length > maxLength ? sanitized.substring(0, maxLength) : sanitized;
+    if (sanitized.length <= maxLength) return sanitized;
+    let cut = sanitized.substring(0, maxLength);
+    const lastAmp = cut.lastIndexOf('&');
+    if (lastAmp !== -1 && !cut.includes(';', lastAmp)) {
+        cut = cut.substring(0, lastAmp);
+    }
+    return cut;
 }
 
 export function normalizeWhatsappNumber(value: unknown, defaultCountryCode = '+55'): string | null {
