@@ -2,6 +2,7 @@ backend:
   name: github
   repo: felipewilliam2/AV-SITE
   branch: main
+  base_url: https://www.anhanga.tur.br
   auth_endpoint: api/auth
   auth_scope: repo
 
