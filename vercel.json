@@ -110,6 +110,15 @@
       ]
     },
     {
+      "source": "/admin/:path*",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
       "source": "/.well-known/http-message-signatures-directory",
       "headers": [
         {

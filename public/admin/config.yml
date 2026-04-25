@@ -3,6 +3,7 @@ backend:
   repo: felipewilliam2/AV-SITE
   branch: main
   auth_endpoint: api/auth
+  auth_scope: repo
 
 local_backend: true
 site_url: https://www.anhanga.tur.br
