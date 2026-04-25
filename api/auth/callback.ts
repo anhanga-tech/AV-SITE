@@ -92,6 +92,42 @@ function buildPostMessageHtml(status: 'success' | 'error', content: string, http
     });
 }
 
+/** Returns the access token string on success, or an error Response on failure. */
+async function exchangeCodeForToken(clientId: string, clientSecret: string, code: string): Promise<Response | string> {
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), GITHUB_TOKEN_TIMEOUT_MS);
+
+    let tokenData: Record<string, unknown>;
+    try {
+        const tokenRes = await fetch(GITHUB_TOKEN_URL, {
+            method: 'POST',
+            headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+            body: JSON.stringify({ client_id: clientId, client_secret: clientSecret, code }),
+            signal: ac.signal,
+        });
+        clearTimeout(timer);
+
+        if (!tokenRes.ok) {
+            console.error('AUTH_CALLBACK', { stage: 'token_exchange', httpStatus: tokenRes.status });
+            return buildPostMessageHtml('error', 'Token exchange failed', 502);
+        }
+
+        tokenData = (await tokenRes.json()) as Record<string, unknown>;
+    } catch (err) {
+        clearTimeout(timer);
+        const isTimeout = err instanceof Error && err.name === 'AbortError';
+        console.error('AUTH_CALLBACK', { stage: 'token_fetch', error: isTimeout ? 'timeout' : err instanceof Error ? err.message : 'unknown' });
+        return buildPostMessageHtml('error', isTimeout ? 'Token exchange timed out' : 'Token exchange request failed', 502);
+    }
+
+    if (tokenData['error'] || typeof tokenData['access_token'] !== 'string') {
+        console.error('AUTH_CALLBACK', { stage: 'token_parse', error: tokenData['error'] ?? 'missing_token' });
+        return buildPostMessageHtml('error', String(tokenData['error_description'] ?? 'Token exchange failed'), 400);
+    }
+
+    return tokenData['access_token'];
+}
+
 export default async function handler(req: Request): Promise<Response> {
     if (req.method !== 'GET') {
         return buildJsonError(405, 'METHOD_NOT_ALLOWED', 'Method not allowed');
@@ -125,44 +161,9 @@ export default async function handler(req: Request): Promise<Response> {
         return buildPostMessageHtml('error', 'Missing authorization code', 400);
     }
 
-    let tokenData: Record<string, unknown>;
-    const ac = new AbortController();
-    const timer = setTimeout(() => ac.abort(), GITHUB_TOKEN_TIMEOUT_MS);
+    const result = await exchangeCodeForToken(clientId, clientSecret, code);
+    if (result instanceof Response) return result;
 
-    try {
-        const tokenRes = await fetch(GITHUB_TOKEN_URL, {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ client_id: clientId, client_secret: clientSecret, code }),
-            signal: ac.signal,
-        });
-        clearTimeout(timer);
-
-        if (!tokenRes.ok) {
-            console.error('AUTH_CALLBACK', { stage: 'token_exchange', httpStatus: tokenRes.status });
-            return buildPostMessageHtml('error', 'Token exchange failed', 502);
-        }
-
-        tokenData = (await tokenRes.json()) as Record<string, unknown>;
-    } catch (err) {
-        clearTimeout(timer);
-        const isTimeout = err instanceof Error && err.name === 'AbortError';
-        console.error('AUTH_CALLBACK', { stage: 'token_fetch', error: isTimeout ? 'timeout' : err instanceof Error ? err.message : 'unknown' });
-        return buildPostMessageHtml('error', isTimeout ? 'Token exchange timed out' : 'Token exchange request failed', 502);
-    }
-
-    if (tokenData['error'] || typeof tokenData['access_token'] !== 'string') {
-        console.error('AUTH_CALLBACK', { stage: 'token_parse', error: tokenData['error'] ?? 'missing_token' });
-        return buildPostMessageHtml(
-            'error',
-            String(tokenData['error_description'] ?? 'Token exchange failed'),
-            400,
-        );
-    }
-
-    const successContent = JSON.stringify({ token: tokenData['access_token'], provider: PROVIDER });
+    const successContent = JSON.stringify({ token: result, provider: PROVIDER });
     return buildPostMessageHtml('success', successContent, 200);
 }
