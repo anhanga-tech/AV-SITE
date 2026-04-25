@@ -53,6 +53,7 @@ collections:
           - { label: Sazonal, value: Sazonal }
       - { label: Imagem de capa, name: image, widget: image, required: true }
       - { label: Destaque, name: featured, widget: boolean, required: false, default: false }
+      - { label: Mostrar CTA do Chat, name: showChatCTA, widget: boolean, required: false, default: true }
       - { label: Tags, name: tags, widget: list, required: false }
       - { label: Título SEO, name: seoTitle, widget: string, required: false }
       - { label: Descrição SEO, name: seoDescription, widget: text, required: false }

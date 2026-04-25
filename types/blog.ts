@@ -7,6 +7,7 @@ export interface BlogPostFrontmatter {
   category: string;
   image: string;           // URL absoluta da imagem de capa
   featured?: boolean;      // se true, aparece em destaque no BlogList
+  showChatCTA?: boolean;   // se true, renderiza <ChatCTA /> ao final do post via BlogPost.tsx
   tags?: string[];
   seoTitle?: string;       // opcional: título diferente para <title> tag SEO
   seoDescription?: string; // opcional: meta description diferente do excerpt
