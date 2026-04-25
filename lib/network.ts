@@ -23,6 +23,16 @@ export function buildCorsHeaders(allowedOrigin?: string): Record<string, string>
 }
 
 /**
+ * Builds a structured JSON error response.
+ */
+export function buildJsonError(status: number, code: string, message: string): Response {
+    return new Response(JSON.stringify({ error: code, message }), {
+        status,
+        headers: { 'Content-Type': 'application/json' },
+    });
+}
+
+/**
  * Extracts the client IP from the request headers.
  * Specialized for Vercel's environment.
  */
