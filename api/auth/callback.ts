@@ -88,7 +88,10 @@ function buildPostMessageHtml(status: 'success' | 'error', content: string, http
 
     return new Response(html, {
         status: httpStatus,
-        headers: { 'Content-Type': 'text/html; charset=utf-8' },
+        headers: {
+            'Content-Type': 'text/html; charset=utf-8',
+            'Set-Cookie': 'oauth_state=; Path=/api/auth; Max-Age=0; HttpOnly; SameSite=Lax; Secure',
+        },
     });
 }
 
