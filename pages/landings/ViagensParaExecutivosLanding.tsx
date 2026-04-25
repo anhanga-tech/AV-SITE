@@ -6,6 +6,7 @@ import { BreadcrumbSchema } from '@/components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '@/components/schemas/FAQPageSchema';
 import { ServiceSchema } from '@/components/schemas/ServiceSchema';
 import { useWhatsAppLink } from '@/utils/whatsapp';
+import { pushWhatsAppCta } from '@/utils/analytics';
 import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left';
 import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import Search from 'lucide-react/dist/esm/icons/search';
@@ -87,11 +88,6 @@ const HOW_IT_WORKS = [
 const ViagensParaExecutivosLanding: React.FC = () => {
   const whatsappUrl = useWhatsAppLink(WHATSAPP_MESSAGE, { appendTrackingRef: true });
 
-  const handleCtaClick = () => {
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({ event: 'whatsapp_cta_click', page: PAGE_NAME });
-  };
-
   return (
     <div className="bg-white min-h-screen font-sans">
       <SEO
@@ -117,10 +113,10 @@ const ViagensParaExecutivosLanding: React.FC = () => {
       <FAQPageSchema items={FAQ_ITEMS} />
 
       {/* Mini Header */}
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-50 py-3">
+      <header className="bg-white/90 backdrop-blur-sm border-b border-gray-100 sticky top-0 z-50 py-3">
         <div className="max-w-5xl mx-auto px-6 flex items-center justify-between">
-          <a
-            href="https://www.anhanga.tur.br/"
+          <Link
+            to="/"
             className="inline-flex items-center gap-2 group"
             aria-label="Voltar para o site principal da Anhangá Viagens"
           >
@@ -131,12 +127,12 @@ const ViagensParaExecutivosLanding: React.FC = () => {
             <span className="text-sm font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
               Anhangá Viagens
             </span>
-          </a>
+          </Link>
           <a
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={handleCtaClick}
+            onClick={() => pushWhatsAppCta(PAGE_NAME)}
             className="text-xs font-bold bg-anhanga-blue text-white px-4 py-2 rounded-xl hover:bg-anhanga-darkBlue transition-colors whitespace-nowrap"
           >
             Falar com consultor
@@ -160,14 +156,14 @@ const ViagensParaExecutivosLanding: React.FC = () => {
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={handleCtaClick}
+            onClick={() => pushWhatsAppCta(PAGE_NAME)}
             className="inline-flex items-center gap-3 bg-anhanga-yellow text-anhanga-dark font-bold px-8 py-4 rounded-2xl hover:bg-anhanga-yellowHover transition-colors text-lg shadow-lg"
             aria-label="Falar com um consultor de viagens via WhatsApp"
           >
             Falar com um consultor
             <ArrowRight className="w-5 h-5" />
           </a>
-          <p className="mt-4 text-sm text-gray-500">Consultor fixo do início ao fim.</p>
+          <p className="mt-4 text-sm text-gray-400">Consultor fixo do início ao fim.</p>
         </div>
       </section>
 
@@ -177,7 +173,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
           <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-4 font-serif">
             Para quem é
           </h2>
-          <p className="text-gray-500 text-lg mb-10">
+          <p className="text-gray-600 text-lg mb-10">
             Profissionais e famílias que valorizam tempo e têm aversão a erro.
           </p>
           <div className="flex flex-wrap gap-3">
@@ -271,7 +267,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
             ].map(({ label, value }) => (
               <div key={label}>
                 <div className="text-3xl font-black text-anhanga-dark">{value}</div>
-                <div className="text-sm text-gray-500 mt-1">{label}</div>
+                <div className="text-sm text-gray-600 mt-1">{label}</div>
               </div>
             ))}
           </div>
@@ -291,7 +287,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={handleCtaClick}
+            onClick={() => pushWhatsAppCta(PAGE_NAME)}
             className="inline-flex items-center gap-3 bg-white text-anhanga-blue font-black px-10 py-5 rounded-2xl hover:bg-anhanga-light transition-colors text-xl shadow-lg"
             aria-label="Falar com um consultor de viagens via WhatsApp"
           >
@@ -313,7 +309,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
               <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                 Consultoria de Viagem
               </div>
-              <div className="text-sm text-gray-500 mt-1">
+              <div className="text-sm text-gray-600 mt-1">
                 Roteiro sob medida com consultor humano
               </div>
             </Link>
@@ -324,7 +320,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
               <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                 Curadoria de Cruzeiros
               </div>
-              <div className="text-sm text-gray-500 mt-1">
+              <div className="text-sm text-gray-600 mt-1">
                 Escolha o navio e a cabine certos para você
               </div>
             </Link>
@@ -335,7 +331,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
               <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                 Site principal
               </div>
-              <div className="text-sm text-gray-500 mt-1">
+              <div className="text-sm text-gray-600 mt-1">
                 Conheça todos os serviços da Anhangá
               </div>
             </a>

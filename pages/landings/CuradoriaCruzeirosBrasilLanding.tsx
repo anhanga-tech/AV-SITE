@@ -6,6 +6,7 @@ import { BreadcrumbSchema } from '@/components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '@/components/schemas/FAQPageSchema';
 import { ServiceSchema } from '@/components/schemas/ServiceSchema';
 import { useWhatsAppLink } from '@/utils/whatsapp';
+import { pushWhatsAppCta } from '@/utils/analytics';
 import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left';
 import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import Compass from 'lucide-react/dist/esm/icons/compass';
@@ -97,11 +98,6 @@ const HOW_IT_WORKS = [
 const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
   const whatsappUrl = useWhatsAppLink(WHATSAPP_MESSAGE, { appendTrackingRef: true });
 
-  const handleCtaClick = () => {
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({ event: 'whatsapp_cta_click', page: PAGE_NAME });
-  };
-
   return (
     <div className="bg-anhanga-light min-h-screen font-sans">
       <SEO
@@ -129,8 +125,8 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
       {/* Mini Header */}
       <header className="bg-white/90 backdrop-blur-sm border-b border-anhanga-blue/10 sticky top-0 z-50 py-3">
         <div className="max-w-5xl mx-auto px-6 flex items-center justify-between">
-          <a
-            href="https://www.anhanga.tur.br/"
+          <Link
+            to="/"
             className="inline-flex items-center gap-2 group"
             aria-label="Voltar para o site principal da Anhangá Viagens"
           >
@@ -141,12 +137,12 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
             <span className="text-sm font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
               Anhangá Viagens
             </span>
-          </a>
+          </Link>
           <a
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={handleCtaClick}
+            onClick={() => pushWhatsAppCta(PAGE_NAME)}
             className="text-xs font-bold bg-anhanga-blue text-white px-4 py-2 rounded-xl hover:bg-anhanga-darkBlue transition-colors whitespace-nowrap"
           >
             Falar com especialista
@@ -170,7 +166,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={handleCtaClick}
+            onClick={() => pushWhatsAppCta(PAGE_NAME)}
             className="inline-flex items-center gap-3 bg-anhanga-blue text-white font-bold px-8 py-4 rounded-2xl hover:bg-anhanga-darkBlue transition-colors text-lg shadow-lg"
             aria-label="Falar com um especialista em cruzeiros via WhatsApp"
           >
@@ -187,7 +183,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
           <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-4 font-serif">
             O que analisamos juntos
           </h2>
-          <p className="text-gray-500 text-lg mb-10">
+          <p className="text-gray-600 text-lg mb-10">
             Na curadoria, passamos por todos esses pontos antes de você decidir.
           </p>
           <div className="grid sm:grid-cols-2 gap-4">
@@ -207,7 +203,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
           <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-3 font-serif">
             Por que curadoria?
           </h2>
-          <p className="text-gray-500 text-lg mb-12">
+          <p className="text-gray-600 text-lg mb-12">
             Porque escolher um cruzeiro envolve mais variáveis do que parece.
           </p>
           <div className="grid md:grid-cols-3 gap-6">
@@ -300,7 +296,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
             ].map(({ label, value }) => (
               <div key={label}>
                 <div className="text-4xl font-black text-anhanga-blue">{value}</div>
-                <div className="text-sm text-gray-500 mt-1">{label}</div>
+                <div className="text-sm text-gray-600 mt-1">{label}</div>
               </div>
             ))}
           </div>
@@ -320,7 +316,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={handleCtaClick}
+            onClick={() => pushWhatsAppCta(PAGE_NAME)}
             className="inline-flex items-center gap-3 bg-anhanga-yellow text-anhanga-dark font-black px-10 py-5 rounded-2xl hover:bg-anhanga-yellowHover transition-colors text-xl shadow-lg"
             aria-label="Falar com um especialista em cruzeiros via WhatsApp"
           >
@@ -342,7 +338,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
               <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                 Consultoria de Viagem
               </div>
-              <div className="text-sm text-gray-500 mt-1">
+              <div className="text-sm text-gray-600 mt-1">
                 Roteiro sob medida com consultor humano
               </div>
             </Link>
@@ -353,7 +349,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
               <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                 Viagens para Executivos
               </div>
-              <div className="text-sm text-gray-500 mt-1">
+              <div className="text-sm text-gray-600 mt-1">
                 Planejamento com precisão para profissionais
               </div>
             </Link>
@@ -364,7 +360,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
               <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                 Site principal
               </div>
-              <div className="text-sm text-gray-500 mt-1">
+              <div className="text-sm text-gray-600 mt-1">
                 Conheça todos os serviços da Anhangá
               </div>
             </a>
