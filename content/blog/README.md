@@ -14,7 +14,8 @@ Use o campo booleano `showChatCTA` no frontmatter em vez de colocar `<ChatCTA />
 ---
 title: "Título do Post"
 ...
-showChatCTA: true   # exibe o botão de CTA ao final do post
+showChatCTA: true             # exibe o botão de CTA ao final do post
+chatCTADestination: "Orlando" # opcional: personaliza a mensagem do botão
 ---
 ```
 
@@ -37,6 +38,7 @@ Use `_template.mdx` como ponto de partida para novos posts. Ele já inclui `show
 | `image`         | string    | sim         | URL da imagem de capa                              |
 | `featured`      | boolean   | não         | Se `true`, aparece em destaque no BlogList         |
 | `showChatCTA`   | boolean   | não         | Se `true`, exibe `<ChatCTA />` ao final do post    |
+| `chatCTADestination` | string | não    | Destino para personalizar a mensagem do chat (ex: "Orlando", "Maldivas") |
 | `tags`          | string[]  | não         | Lista de tags                                      |
 | `seoTitle`      | string    | não         | Título alternativo para a tag `<title>` de SEO     |
 | `seoDescription`| string    | não         | Meta description alternativa ao excerpt            |

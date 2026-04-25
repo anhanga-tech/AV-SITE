@@ -11,6 +11,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "image": "https://media.anhanga.tur.br/images/blog/blog-viagem-solo-feminina.png",
     "featured": true,
     "showChatCTA": true,
+    "chatCTADestination": "Cruzeiros",
     "tags": [
       "cruzeiros"
     ],
@@ -27,6 +28,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "image": "https://media.anhanga.tur.br/images/blog/destinos-carnaval-2026.jpg",
     "featured": false,
     "showChatCTA": true,
+    "chatCTADestination": "Carnaval",
     "tags": [
       "malas",
       "carnaval"
@@ -44,6 +46,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "image": "https://media.anhanga.tur.br/images/blog/guia-festivais.jpg",
     "featured": false,
     "showChatCTA": true,
+    "chatCTADestination": "Festivais",
     "tags": [],
     "slug": "guia-definitivo-sobrevivencia-festivais",
     "readingTime": "3 min de leitura"
@@ -58,6 +61,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "image": "https://media.anhanga.tur.br/images/blog/5-segredos-disney.jpg",
     "featured": false,
     "showChatCTA": true,
+    "chatCTADestination": "Orlando",
     "tags": [],
     "slug": "5-segredos-da-disney-que-ninguem-conta",
     "readingTime": "4 min de leitura"
@@ -72,6 +76,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "image": "https://media.anhanga.tur.br/images/blog/malas-de-mao.jpg",
     "featured": false,
     "showChatCTA": true,
+    "chatCTADestination": "Viagem",
     "tags": [],
     "slug": "malas-de-mao-o-guia-definitivo",
     "readingTime": "4 min de leitura"
@@ -86,6 +91,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "image": "https://media.anhanga.tur.br/images/blog/europa-gastronomica-italia.jpg",
     "featured": false,
     "showChatCTA": true,
+    "chatCTADestination": "Itália",
     "tags": [],
     "slug": "europa-gastronomica-roteiro-italia",
     "readingTime": "6 min de leitura"
@@ -100,6 +106,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "image": "https://media.anhanga.tur.br/images/blog/lua-de-mel-maldivas.jpg",
     "featured": false,
     "showChatCTA": true,
+    "chatCTADestination": "Maldivas",
     "tags": [],
     "slug": "lua-de-mel-nas-maldivas",
     "readingTime": "7 min de leitura"
@@ -114,6 +121,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "image": "https://media.anhanga.tur.br/images/blog/nova-york-natal.jpg",
     "featured": false,
     "showChatCTA": true,
+    "chatCTADestination": "Nova York",
     "tags": [],
     "slug": "nova-york-no-natal",
     "readingTime": "6 min de leitura"
