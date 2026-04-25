@@ -13,7 +13,7 @@ export default function handler(req: Request): Response {
         return buildJsonError(405, 'METHOD_NOT_ALLOWED', 'Method not allowed');
     }
 
-    const clientId = process.env.GITHUB_OAUTH_CLIENT_ID;
+    const clientId = process.env.GITHUB_CLIENT_ID;
     if (!clientId) {
         return buildJsonError(500, 'CONFIGURATION_ERROR', 'OAuth provider not configured');
     }

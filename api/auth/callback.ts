@@ -97,8 +97,8 @@ export default async function handler(req: Request): Promise<Response> {
         return buildJsonError(405, 'METHOD_NOT_ALLOWED', 'Method not allowed');
     }
 
-    const clientId = process.env.GITHUB_OAUTH_CLIENT_ID;
-    const clientSecret = process.env.GITHUB_OAUTH_CLIENT_SECRET;
+    const clientId = process.env.GITHUB_CLIENT_ID;
+    const clientSecret = process.env.GITHUB_CLIENT_SECRET;
 
     if (!clientId || !clientSecret) {
         return buildJsonError(500, 'CONFIGURATION_ERROR', 'OAuth provider not configured');
