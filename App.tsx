@@ -25,6 +25,9 @@ const LollapaloozaLanding = lazy(() => import('./pages/landings/LollapaloozaLand
 const OrlandoLanding = lazy(() => import('./pages/landings/OrlandoLanding'));
 const MelhorIdadeLanding = lazy(() => import('./pages/landings/MelhorIdadeLanding'));
 const BrazilPromotionDayLanding = lazy(() => import('./pages/landings/BrazilPromotionDayLanding'));
+const ConsultoriaDeViagemLanding = lazy(() => import('./pages/landings/ConsultoriaDeViagemLanding'));
+const ViagensParaExecutivosLanding = lazy(() => import('./pages/landings/ViagensParaExecutivosLanding'));
+const CuradoriaCruzeirosBrasilLanding = lazy(() => import('./pages/landings/CuradoriaCruzeirosBrasilLanding'));
 const KeystaticPage = lazy(() => import('./pages/KeystaticPage'));
 const NPS = lazy(() => import('./pages/NPS'));
 
@@ -79,6 +82,9 @@ const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClient
           <Route path="/orlando" element={<OrlandoLanding />} />
           <Route path="/melhor-idade" element={<MelhorIdadeLanding />} />
           <Route path="/brazil-promotion-day" element={<BrazilPromotionDayLanding />} />
+          <Route path="/consultoria-de-viagem" element={<ConsultoriaDeViagemLanding />} />
+          <Route path="/viagens-para-executivos" element={<ViagensParaExecutivosLanding />} />
+          <Route path="/curadoria-cruzeiros-brasil" element={<CuradoriaCruzeirosBrasilLanding />} />
           <Route path="/nps" element={<NPS />} />
           <Route path="/*" element={<MainSiteShell />} />
         </Routes>
