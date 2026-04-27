@@ -1,0 +1,2059 @@
+
+> anhanga-viagens@0.0.0 test:regression /app
+> pnpm generate:blog-manifest && tsx --test tests/*.test.ts
+
+
+> anhanga-viagens@0.0.0 generate:blog-manifest /app
+> tsx scripts/generate-blog-manifest.ts
+
+✓ Generated blog manifest with 8 posts at data/blogManifest.ts
+TAP version 13
+# Subtest: api-catalog should return application/linkset+json with required RFC 9727 relations
+ok 1 - api-catalog should return application/linkset+json with required RFC 9727 relations
+  ---
+  duration_ms: 33.975712
+  type: 'test'
+  ...
+# Subtest: api-catalog should answer HEAD with api-catalog discovery headers
+ok 2 - api-catalog should answer HEAD with api-catalog discovery headers
+  ---
+  duration_ms: 0.708272
+  type: 'test'
+  ...
+# Subtest: openapi handler should publish the machine-readable API description used by the catalog
+ok 3 - openapi handler should publish the machine-readable API description used by the catalog
+  ---
+  duration_ms: 1.700257
+  type: 'test'
+  ...
+# Subtest: buildOpenApiPaths should preserve multiple HTTP methods for the same path
+ok 4 - buildOpenApiPaths should preserve multiple HTTP methods for the same path
+  ---
+  duration_ms: 0.304441
+  type: 'test'
+  ...
+# Subtest: api-docs handler should publish human-readable documentation for the cataloged APIs
+ok 5 - api-docs handler should publish human-readable documentation for the cataloged APIs
+  ---
+  duration_ms: 1.236521
+  type: 'test'
+  ...
+# Subtest: health handler should return a simple JSON status document for the catalog status relation
+ok 6 - health handler should return a simple JSON status document for the catalog status relation
+  ---
+  duration_ms: 0.962119
+  type: 'test'
+  ...
+# Subtest: deployment config should route well-known discovery URLs to the new handlers
+ok 7 - deployment config should route well-known discovery URLs to the new handlers
+  ---
+  duration_ms: 13.627635
+  type: 'test'
+  ...
+# Subtest: vite dev routing should expose the same discovery endpoints locally
+ok 8 - vite dev routing should expose the same discovery endpoints locally
+  ---
+  duration_ms: 1.481774
+  type: 'test'
+  ...
+# SERVER: invalid textual handoff detected {
+#   responseId: 'resp-text',
+#   modelVersion: undefined,
+#   preview: 'Clique aqui para receber seu orçamento personalizado: [WhatsApp](https://wa.me/5511999999999)'
+# }
+# SERVER: handoff repaired {
+#   responseId: 'resp-text',
+#   repairResponseId: 'resp-tool',
+#   source: 'repair'
+# }
+# SERVER: invalid textual handoff detected {
+#   responseId: 'resp-invalid-text',
+#   modelVersion: undefined,
+#   preview: 'Clique aqui para receber seu orçamento personalizado: https://wa.me/5511999999999'
+# }
+# SERVER: handoff repair failed {
+#   responseId: 'resp-invalid-text',
+#   repairResponseId: 'resp-tool',
+#   missing: [ 'origin_city', 'baggage_preference' ]
+# }
+# Subtest: containsInvalidTextualHandoff should detect raw handoff CTA text
+ok 9 - containsInvalidTextualHandoff should detect raw handoff CTA text
+  ---
+  duration_ms: 1.543815
+  type: 'test'
+  ...
+# Subtest: buildGenerateSuccessBody should expose structured handoff from tool response
+ok 10 - buildGenerateSuccessBody should expose structured handoff from tool response
+  ---
+  duration_ms: 7.833697
+  type: 'test'
+  ...
+# Subtest: buildGenerateSuccessBody should refuse international handoff without baggage preference
+ok 11 - buildGenerateSuccessBody should refuse international handoff without baggage preference
+  ---
+  duration_ms: 4.731533
+  type: 'test'
+  ...
+# Subtest: buildGenerateSuccessBody should repair textual handoff into structured payload
+ok 12 - buildGenerateSuccessBody should repair textual handoff into structured payload
+  ---
+  duration_ms: 4.537625
+  type: 'test'
+  ...
+# Subtest: buildGenerateSuccessBody should handle non-array parts from Gemini response gracefully
+ok 13 - buildGenerateSuccessBody should handle non-array parts from Gemini response gracefully
+  ---
+  duration_ms: 0.460034
+  type: 'test'
+  ...
+# Subtest: buildGenerateSuccessBody should fall back to refinement when textual handoff repair is invalid
+ok 14 - buildGenerateSuccessBody should fall back to refinement when textual handoff repair is invalid
+  ---
+  duration_ms: 1.56984
+  type: 'test'
+  ...
+# Subtest: buildPostMessageHtml includes origin validation logic
+not ok 15 - buildPostMessageHtml includes origin validation logic
+  ---
+  duration_ms: 34.382066
+  type: 'test'
+  location: '/app/tests/auth-callback-security.test.ts:1:126'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /\/\^http:\\\/\\\/localhost:\\\d\+\$\//. Input:
+
+    '<!doctype html>\n' +
+      '<html lang="pt-BR">\n' +
+      '<head>\n' +
+      '  <meta charset="UTF-8">\n' +
+      '  <meta name="robots" content="noindex,nofollow">\n' +
+      '  <title>Autenticação</title>\n' +
+      '</head>\n' +
+      '<body>\n' +
+      '<script>\n' +
+      '(function () {\n' +
+      '  var provider = "github";\n' +
+      '  var status = "success";\n' +
+      '  var content = "{\\"token\\":\\"test\\"}";\n' +
+      '  var allowedOrigin = "https://www.anhanga.tur.br";\n' +
+      "  var handshake = 'authorizing:' + provider;\n" +
+      "  var message = 'authorization:' + provider + ':' + status + ':' + content;\n" +
+      '\n' +
+      '  if (!window.opener) {\n' +
+      "    document.body.textContent = status === 'error'\n" +
+      "      ? 'Erro de autenticação: ' + content\n" +
+      "      : 'Autenticação concluída. Feche esta janela.';\n" +
+      '    return;\n' +
+      '  }\n' +
+      '\n' +
+      '  function onMessage(e) {\n' +
+      '    if (e.data !== handshake) return;\n' +
+      '\n' +
+      "    // Hardened origin check: only respond to the site's own origin or localhost (for dev).\n" +
+      '    // The CMS must be hosted on the same domain or a trusted subdomain.\n' +
+      "    var origin = e.origin || '';\n" +
+      '    var isTrusted = origin === allowedOrigin || \n' +
+      '                    origin === window.location.origin ||\n' +
+      '                    /^https:\\/\\/.*\\.anhanga\\.tur\\.br$/.test(origin) ||\n' +
+      '                    /^http:\\/\\/localhost:\\d+$/.test(origin);\n' +
+      '\n' +
+      '    if (!isTrusted) {\n' +
+      "      console.error('AUTH_CALLBACK: Blocked unauthorized origin:', origin);\n" +
+      '      return;\n' +
+      '    }\n' +
+      '\n' +
+      '    clearTimeout(handshakeTimeout);\n' +
+      "    window.removeEventListener('message', onMessage, false);\n" +
+      '    e.source.postMessage(message, e.origin);\n' +
+      '    window.close();\n' +
+      '  }\n' +
+      '\n' +
+      '  // Guard against opener never responding — clean up listener and surface error.\n' +
+      '  var handshakeTimeout = setTimeout(function () {\n' +
+      "    window.removeEventListener('message', onMessage, false);\n" +
+      "    document.body.textContent = 'Erro: o CMS não respondeu ao handshake. Feche esta janela e tente novamente.';\n" +
+      '  }, 10000);\n' +
+      '\n' +
+      "  window.addEventListener('message', onMessage, false);\n" +
+      "  window.opener.postMessage(handshake, '*');\n" +
+      '}());\n' +
+      '</script>\n' +
+      '</body>\n' +
+      '</html>'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    <!doctype html>
+    <html lang="pt-BR">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="robots" content="noindex,nofollow">
+      <title>Autenticação</title>
+    </head>
+    <body>
+    <script>
+    (function () {
+      var provider = "github";
+      var status = "success";
+      var content = "{\"token\":\"test\"}";
+      var allowedOrigin = "https://www.anhanga.tur.br";
+      var handshake = 'authorizing:' + provider;
+      var message = 'authorization:' + provider + ':' + status + ':' + content;
+
+      if (!window.opener) {
+        document.body.textContent = status === 'error'
+          ? 'Erro de autenticação: ' + content
+          : 'Autenticação concluída. Feche esta janela.';
+        return;
+      }
+
+      function onMessage(e) {
+        if (e.data !== handshake) return;
+
+        // Hardened origin check: only respond to the site's own origin or localhost (for dev).
+        // The CMS must be hosted on the same domain or a trusted subdomain.
+        var origin = e.origin || '';
+        var isTrusted = origin === allowedOrigin ||
+                        origin === window.location.origin ||
+                        /^https:\/\/.*\.anhanga\.tur\.br$/.test(origin) ||
+                        /^http:\/\/localhost:\d+$/.test(origin);
+
+        if (!isTrusted) {
+          console.error('AUTH_CALLBACK: Blocked unauthorized origin:', origin);
+          return;
+        }
+
+        clearTimeout(handshakeTimeout);
+        window.removeEventListener('message', onMessage, false);
+        e.source.postMessage(message, e.origin);
+        window.close();
+      }
+
+      // Guard against opener never responding — clean up listener and surface error.
+      var handshakeTimeout = setTimeout(function () {
+        window.removeEventListener('message', onMessage, false);
+        document.body.textContent = 'Erro: o CMS não respondeu ao handshake. Feche esta janela e tente novamente.';
+      }, 10000);
+
+      window.addEventListener('message', onMessage, false);
+      window.opener.postMessage(handshake, '*');
+    }());
+    </script>
+    </body>
+    </html>
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (/app/tests/auth-callback-security.test.ts:17:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: getBetoAssetUrl should resolve the managed Beto Carrero asset keys
+ok 16 - getBetoAssetUrl should resolve the managed Beto Carrero asset keys
+  ---
+  duration_ms: 1.031894
+  type: 'test'
+  ...
+# Subtest: collectBlogPostMeta reads MDX frontmatter and ignores template files
+ok 17 - collectBlogPostMeta reads MDX frontmatter and ignores template files
+  ---
+  duration_ms: 42.564426
+  type: 'test'
+  ...
+# Subtest: collectBlogPostMeta keeps same-day posts in slug order
+ok 18 - collectBlogPostMeta keeps same-day posts in slug order
+  ---
+  duration_ms: 10.939161
+  type: 'test'
+  ...
+# Subtest: Button isLoading=true renderiza com disabled e aria-disabled="true"
+ok 19 - Button isLoading=true renderiza com disabled e aria-disabled="true"
+  ---
+  duration_ms: 11.317526
+  type: 'test'
+  ...
+# Subtest: Button isLoading=false não tem disabled
+ok 20 - Button isLoading=false não tem disabled
+  ---
+  duration_ms: 1.244084
+  type: 'test'
+  ...
+# Subtest: safety check should block "Emirados" (Policy \#186)
+ok 21 - safety check should block "Emirados" (Policy \#186)
+  ---
+  duration_ms: 3.41301
+  type: 'test'
+  ...
+# Subtest: safety check should still block explicit Iran destinations
+ok 22 - safety check should still block explicit Iran destinations
+  ---
+  duration_ms: 1.740968
+  type: 'test'
+  ...
+# Subtest: safety check should block all Middle Eastern countries (Policy \#186)
+ok 23 - safety check should block all Middle Eastern countries (Policy \#186)
+  ---
+  duration_ms: 3.978084
+  type: 'test'
+  ...
+# Subtest: safety check should still allow safe destinations
+ok 24 - safety check should still allow safe destinations
+  ---
+  duration_ms: 5.795746
+  type: 'test'
+  ...
+# Subtest: system prompt should avoid budget pressure before handoff
+ok 25 - system prompt should avoid budget pressure before handoff
+  ---
+  duration_ms: 0.352163
+  type: 'test'
+  ...
+# Subtest: system prompt should include prompt injection hardening rules
+ok 26 - system prompt should include prompt injection hardening rules
+  ---
+  duration_ms: 0.165705
+  type: 'test'
+  ...
+# Subtest: system prompt should enforce one-question-at-a-time behavior
+ok 27 - system prompt should enforce one-question-at-a-time behavior
+  ---
+  duration_ms: 0.379104
+  type: 'test'
+  ...
+# Subtest: system prompt should include friendly under-30-days handoff message
+ok 28 - system prompt should include friendly under-30-days handoff message
+  ---
+  duration_ms: 0.156789
+  type: 'test'
+  ...
+# Subtest: system prompt should mention baggage preference for likely air routes
+ok 29 - system prompt should mention baggage preference for likely air routes
+  ---
+  duration_ms: 0.39843
+  type: 'test'
+  ...
+# Subtest: system prompt should forbid manual WhatsApp CTA in the final handoff
+ok 30 - system prompt should forbid manual WhatsApp CTA in the final handoff
+  ---
+  duration_ms: 0.555333
+  type: 'test'
+  ...
+# Subtest: system prompt should document IATA code rules for the budget tool
+ok 31 - system prompt should document IATA code rules for the budget tool
+  ---
+  duration_ms: 0.209558
+  type: 'test'
+  ...
+# Subtest: system prompt should prefer structured JSON line for chips
+ok 32 - system prompt should prefer structured JSON line for chips
+  ---
+  duration_ms: 0.115865
+  type: 'test'
+  ...
+# Subtest: system prompt should define out-of-scope handling
+ok 33 - system prompt should define out-of-scope handling
+  ---
+  duration_ms: 0.098084
+  type: 'test'
+  ...
+# Subtest: Decap CMS config points GitHub OAuth to the production auth proxy
+ok 34 - Decap CMS config points GitHub OAuth to the production auth proxy
+  ---
+  duration_ms: 1.329884
+  type: 'test'
+  ...
+# Subtest: Decap CMS admin HTML sets an explicit base path for config resolution
+ok 35 - Decap CMS admin HTML sets an explicit base path for config resolution
+  ---
+  duration_ms: 0.287987
+  type: 'test'
+  ...
+# Subtest: tokens exporta as categorias esperadas
+ok 36 - tokens exporta as categorias esperadas
+  ---
+  duration_ms: 1.218276
+  type: 'test'
+  ...
+# Subtest: tokens.color contém todos os papéis semânticos
+ok 37 - tokens.color contém todos os papéis semânticos
+  ---
+  duration_ms: 0.278625
+  type: 'test'
+  ...
+# Subtest: tokens.shadow contém os tokens de sombra
+ok 38 - tokens.shadow contém os tokens de sombra
+  ---
+  duration_ms: 0.181628
+  type: 'test'
+  ...
+# Subtest: tokens.color.action aponta para a classe Tailwind correta
+ok 39 - tokens.color.action aponta para a classe Tailwind correta
+  ---
+  duration_ms: 0.188708
+  type: 'test'
+  ...
+# Subtest: tokens.color.dark aponta para a classe Tailwind correta
+ok 40 - tokens.color.dark aponta para a classe Tailwind correta
+  ---
+  duration_ms: 0.199565
+  type: 'test'
+  ...
+# [GeminiService] Using endpoint: /api/generate
+# [GeminiService] Using endpoint: /api/generate
+# [GeminiService] Using endpoint: /api/generate
+# [GeminiService] Using endpoint: /api/generate
+# [GeminiService] Using endpoint: /api/generate
+# [GeminiService] Server error: { code: 'GEMINI_INTERNAL_ERROR', error: 'Error processing request' }
+# [GeminiService] Using endpoint: /api/generate
+# [GeminiService] Server error: { code: 'SERVER_CONFIG_ERROR', error: 'Erro interno de configuração' }
+# [GeminiService] Using endpoint: /api/generate
+# Subtest: chatbot whatsapp message should omit BANT and tracking suffix
+ok 41 - chatbot whatsapp message should omit BANT and tracking suffix
+  ---
+  duration_ms: 46.149771
+  type: 'test'
+  ...
+# Subtest: chatbot whatsapp message should omit baggage line when unavailable
+ok 42 - chatbot whatsapp message should omit baggage line when unavailable
+  ---
+  duration_ms: 1.82878
+  type: 'test'
+  ...
+# Subtest: chatbot should prioritize structured handoff over legacy functionCall
+ok 43 - chatbot should prioritize structured handoff over legacy functionCall
+  ---
+  duration_ms: 1.804021
+  type: 'test'
+  ...
+# Subtest: chatbot should block unsafe textual handoff without structured payload
+ok 44 - chatbot should block unsafe textual handoff without structured payload
+  ---
+  duration_ms: 1.526707
+  type: 'test'
+  ...
+# Subtest: chatbot should show non-clickable fallback when server returns 500
+ok 45 - chatbot should show non-clickable fallback when server returns 500
+  ---
+  duration_ms: 6.377966
+  type: 'test'
+  ...
+# Subtest: chatbot should explain config error without clickable WhatsApp CTA when server config is broken
+ok 46 - chatbot should explain config error without clickable WhatsApp CTA when server config is broken
+  ---
+  duration_ms: 1.839832
+  type: 'test'
+  ...
+# Subtest: chatbot should return fallback text when API succeeds without usable content
+ok 47 - chatbot should return fallback text when API succeeds without usable content
+  ---
+  duration_ms: 2.286009
+  type: 'test'
+  ...
+# Subtest: resolveMaxMessageLength should default to 4000
+ok 48 - resolveMaxMessageLength should default to 4000
+  ---
+  duration_ms: 1.41126
+  type: 'test'
+  ...
+# Subtest: resolveMaxMessageLength should use provided env value
+ok 49 - resolveMaxMessageLength should use provided env value
+  ---
+  duration_ms: 0.193219
+  type: 'test'
+  ...
+# Subtest: resolveMaxMessageLength should fallback to 4000 for invalid env values
+ok 50 - resolveMaxMessageLength should fallback to 4000 for invalid env values
+  ---
+  duration_ms: 0.152466
+  type: 'test'
+  ...
+# Subtest: hasOversizedMessage should allow messages up to 4000 chars
+ok 51 - hasOversizedMessage should allow messages up to 4000 chars
+  ---
+  duration_ms: 0.339721
+  type: 'test'
+  ...
+# Subtest: hasOversizedMessage should block messages over 4000 chars
+ok 52 - hasOversizedMessage should block messages over 4000 chars
+  ---
+  duration_ms: 0.256633
+  type: 'test'
+  ...
+# Subtest: hasOversizedPayload should allow payload under the limit
+ok 53 - hasOversizedPayload should allow payload under the limit
+  ---
+  duration_ms: 0.188566
+  type: 'test'
+  ...
+# Subtest: hasOversizedPayload should block payload exceeding MAX_CONTENTS_TOTAL_LENGTH
+ok 54 - hasOversizedPayload should block payload exceeding MAX_CONTENTS_TOTAL_LENGTH
+  ---
+  duration_ms: 1.355306
+  type: 'test'
+  ...
+# Subtest: hasOversizedPayload should accept payload exactly at the limit
+ok 55 - hasOversizedPayload should accept payload exactly at the limit
+  ---
+  duration_ms: 2.048789
+  type: 'test'
+  ...
+# Subtest: triggerHaptic lazily creates and reuses the singleton instance
+ok 56 - triggerHaptic lazily creates and reuses the singleton instance
+  ---
+  duration_ms: 2.606818
+  type: 'test'
+  ...
+# Subtest: triggerHaptic is a no-op outside the client environment
+ok 57 - triggerHaptic is a no-op outside the client environment
+  ---
+  duration_ms: 0.502392
+  type: 'test'
+  ...
+# Subtest: triggerHaptic swallows loader and runtime failures
+ok 58 - triggerHaptic swallows loader and runtime failures
+  ---
+  duration_ms: 0.617696
+  type: 'test'
+  ...
+# Subtest: validateHubSpotSignature should normalize supported encoded URL characters
+ok 59 - validateHubSpotSignature should normalize supported encoded URL characters
+  ---
+  duration_ms: 7.746174
+  type: 'test'
+  ...
+# Subtest: hubspot-webhook should reject invalid signature
+ok 60 - hubspot-webhook should reject invalid signature
+  ---
+  duration_ms: 54.051406
+  type: 'test'
+  ...
+# Subtest: hubspot-webhook should process closed won deal event
+ok 61 - hubspot-webhook should process closed won deal event
+  ---
+  duration_ms: 11.395369
+  type: 'test'
+  ...
+# Subtest: hubspot-webhook should send purchase conversion to Meta and derive fbc from fbclid
+ok 62 - hubspot-webhook should send purchase conversion to Meta and derive fbc from fbclid
+  ---
+  duration_ms: 9.827578
+  type: 'test'
+  ...
+# Subtest: shouldHydratePrerenderedRoute only hydrates when the prerendered route matches the current path
+ok 63 - shouldHydratePrerenderedRoute only hydrates when the prerendered route matches the current path
+  ---
+  duration_ms: 1.503221
+  type: 'test'
+  ...
+# Subtest: ClientOnly omits children during the initial render
+ok 64 - ClientOnly omits children during the initial render
+  ---
+  duration_ms: 5.33699
+  type: 'test'
+  ...
+# Subtest: Footer prerender should be deterministic across different runtime dates
+ok 65 - Footer prerender should be deterministic across different runtime dates
+  ---
+  duration_ms: 15.3399
+  type: 'test'
+  ...
+# Subtest: index.html includes title fallback metadata
+ok 66 - index.html includes title fallback metadata
+  ---
+  duration_ms: 1.686676
+  type: 'test'
+  ...
+# Subtest: index.html includes meta description fallback metadata
+ok 67 - index.html includes meta description fallback metadata
+  ---
+  duration_ms: 0.419681
+  type: 'test'
+  ...
+# Subtest: index.html includes canonical fallback metadata
+ok 68 - index.html includes canonical fallback metadata
+  ---
+  duration_ms: 0.22669
+  type: 'test'
+  ...
+# Subtest: index.html includes og:title fallback metadata
+ok 69 - index.html includes og:title fallback metadata
+  ---
+  duration_ms: 0.19316
+  type: 'test'
+  ...
+# Subtest: index.html includes og:description fallback metadata
+ok 70 - index.html includes og:description fallback metadata
+  ---
+  duration_ms: 0.275523
+  type: 'test'
+  ...
+# Subtest: index.html includes og:image fallback metadata
+ok 71 - index.html includes og:image fallback metadata
+  ---
+  duration_ms: 0.235488
+  type: 'test'
+  ...
+# Subtest: index.html includes og:image:width fallback metadata
+ok 72 - index.html includes og:image:width fallback metadata
+  ---
+  duration_ms: 0.286644
+  type: 'test'
+  ...
+# Subtest: index.html includes og:image:height fallback metadata
+ok 73 - index.html includes og:image:height fallback metadata
+  ---
+  duration_ms: 0.267778
+  type: 'test'
+  ...
+# Subtest: index.html includes og:type fallback metadata
+ok 74 - index.html includes og:type fallback metadata
+  ---
+  duration_ms: 0.590945
+  type: 'test'
+  ...
+# Subtest: index.html includes og:url fallback metadata
+ok 75 - index.html includes og:url fallback metadata
+  ---
+  duration_ms: 0.664366
+  type: 'test'
+  ...
+# Subtest: index.html includes twitter:card fallback metadata
+ok 76 - index.html includes twitter:card fallback metadata
+  ---
+  duration_ms: 0.265811
+  type: 'test'
+  ...
+# Subtest: index.html includes twitter:title fallback metadata
+ok 77 - index.html includes twitter:title fallback metadata
+  ---
+  duration_ms: 0.307162
+  type: 'test'
+  ...
+# Subtest: index.html includes twitter:description fallback metadata
+ok 78 - index.html includes twitter:description fallback metadata
+  ---
+  duration_ms: 0.19254
+  type: 'test'
+  ...
+# Subtest: index.html includes twitter:image fallback metadata
+ok 79 - index.html includes twitter:image fallback metadata
+  ---
+  duration_ms: 0.187392
+  type: 'test'
+  ...
+# Subtest: index.html preloads the transformed default hero poster used for the initial LCP image
+ok 80 - index.html preloads the transformed default hero poster used for the initial LCP image
+  ---
+  duration_ms: 0.339536
+  type: 'test'
+  ...
+# Subtest: cleanString should return empty string for non-string input
+ok 81 - cleanString should return empty string for non-string input
+  ---
+  duration_ms: 1.359109
+  type: 'test'
+  ...
+# Subtest: cleanString should escape HTML entities
+ok 82 - cleanString should escape HTML entities
+  ---
+  duration_ms: 0.284652
+  type: 'test'
+  ...
+# Subtest: cleanString should trim whitespace
+ok 83 - cleanString should trim whitespace
+  ---
+  duration_ms: 0.173918
+  type: 'test'
+  ...
+# Subtest: cleanString should truncate strings longer than 10000 chars
+ok 84 - cleanString should truncate strings longer than 10000 chars
+  ---
+  duration_ms: 0.165417
+  type: 'test'
+  ...
+# Subtest: cleanString should sanitize after truncating, not before (no XSS bypass)
+ok 85 - cleanString should sanitize after truncating, not before (no XSS bypass)
+  ---
+  duration_ms: 0.340756
+  type: 'test'
+  ...
+# Subtest: normalizeNullable should return null for non-string input
+ok 86 - normalizeNullable should return null for non-string input
+  ---
+  duration_ms: 0.279246
+  type: 'test'
+  ...
+# Subtest: normalizeNullable should return null for empty/whitespace-only string
+ok 87 - normalizeNullable should return null for empty/whitespace-only string
+  ---
+  duration_ms: 0.232899
+  type: 'test'
+  ...
+# Subtest: normalizeNullable should escape HTML entities
+ok 88 - normalizeNullable should escape HTML entities
+  ---
+  duration_ms: 0.3105
+  type: 'test'
+  ...
+# Subtest: normalizeNullable should respect maxLength after truncation
+ok 89 - normalizeNullable should respect maxLength after truncation
+  ---
+  duration_ms: 0.43787
+  type: 'test'
+  ...
+# Subtest: normalizeNullable should truncate strings longer than 10000 chars before sanitization
+ok 90 - normalizeNullable should truncate strings longer than 10000 chars before sanitization
+  ---
+  duration_ms: 0.560162
+  type: 'test'
+  ...
+# Subtest: normalizeNullable should sanitize after truncating (no XSS bypass)
+ok 91 - normalizeNullable should sanitize after truncating (no XSS bypass)
+  ---
+  duration_ms: 0.219722
+  type: 'test'
+  ...
+# Subtest: buildLeadWhatsAppUrl should include origin, destination, dates, baggage and tracking ref
+ok 92 - buildLeadWhatsAppUrl should include origin, destination, dates, baggage and tracking ref
+  ---
+  duration_ms: 3.241259
+  type: 'test'
+  ...
+# Subtest: createLeadEventId should generate a lead-prefixed event id
+ok 93 - createLeadEventId should generate a lead-prefixed event id
+  ---
+  duration_ms: 0.777898
+  type: 'test'
+  ...
+# Subtest: pushGenerateLeadDataLayerEvent should push generate_lead with tracking fields
+ok 94 - pushGenerateLeadDataLayerEvent should push generate_lead with tracking fields
+  ---
+  duration_ms: 1.132054
+  type: 'test'
+  ...
+# Subtest: buildLeadWhatsAppMessage includes email line when email is present
+ok 95 - buildLeadWhatsAppMessage includes email line when email is present
+  ---
+  duration_ms: 0.305179
+  type: 'test'
+  ...
+# Subtest: buildLeadWhatsAppMessage omits email line when email is empty
+ok 96 - buildLeadWhatsAppMessage omits email line when email is empty
+  ---
+  duration_ms: 0.226584
+  type: 'test'
+  ...
+# Subtest: buildLeadWhatsAppMessage never includes the lead whatsapp number
+ok 97 - buildLeadWhatsAppMessage never includes the lead whatsapp number
+  ---
+  duration_ms: 0.256585
+  type: 'test'
+  ...
+# Subtest: stripYamlFrontmatter removes only the leading YAML block from MDX content
+ok 98 - stripYamlFrontmatter removes only the leading YAML block from MDX content
+  ---
+  duration_ms: 1.27976
+  type: 'test'
+  ...
+# Subtest: getMediaRuntimeConfig should enable same-host transforms from env values
+ok 99 - getMediaRuntimeConfig should enable same-host transforms from env values
+  ---
+  duration_ms: 2.062255
+  type: 'test'
+  ...
+# Subtest: getMediaRuntimeConfig should accept quoted boolean env values
+ok 100 - getMediaRuntimeConfig should accept quoted boolean env values
+  ---
+  duration_ms: 0.319011
+  type: 'test'
+  ...
+# Subtest: hero media should point to the Cloudflare R2 origin
+ok 101 - hero media should point to the Cloudflare R2 origin
+  ---
+  duration_ms: 0.293165
+  type: 'test'
+  ...
+# Subtest: migrated author avatars should use the Cloudflare R2 origin
+ok 102 - migrated author avatars should use the Cloudflare R2 origin
+  ---
+  duration_ms: 0.243286
+  type: 'test'
+  ...
+# Subtest: migrated blog cover images should be serialized as absolute URLs
+ok 103 - migrated blog cover images should be serialized as absolute URLs
+  ---
+  duration_ms: 0.342696
+  type: 'test'
+  ...
+# Subtest: resolveMediaUrl should keep absolute URLs untouched
+ok 104 - resolveMediaUrl should keep absolute URLs untouched
+  ---
+  duration_ms: 1.606378
+  type: 'test'
+  ...
+# Subtest: resolveMediaUrl should join relative paths with the configured media base URL
+ok 105 - resolveMediaUrl should join relative paths with the configured media base URL
+  ---
+  duration_ms: 0.472076
+  type: 'test'
+  ...
+# Subtest: selectImagePreset should snap square requests to fixed square presets
+ok 106 - selectImagePreset should snap square requests to fixed square presets
+  ---
+  duration_ms: 1.127116
+  type: 'test'
+  ...
+# Subtest: selectImagePreset should snap landscape requests to fixed cover presets
+ok 107 - selectImagePreset should snap landscape requests to fixed cover presets
+  ---
+  duration_ms: 0.29208
+  type: 'test'
+  ...
+# Subtest: selectImagePreset should use scale-down presets when height is not provided
+ok 108 - selectImagePreset should use scale-down presets when height is not provided
+  ---
+  duration_ms: 0.229816
+  type: 'test'
+  ...
+# Subtest: buildCloudflareImageUrl should build a /cdn-cgi/image URL with fixed options
+ok 109 - buildCloudflareImageUrl should build a /cdn-cgi/image URL with fixed options
+  ---
+  duration_ms: 0.286254
+  type: 'test'
+  ...
+# Subtest: optimizeImageUrl should fall back to the resolved source URL when no transform zone is configured
+ok 110 - optimizeImageUrl should fall back to the resolved source URL when no transform zone is configured
+  ---
+  duration_ms: 0.458837
+  type: 'test'
+  ...
+# Subtest: optimizeImageUrl should fall back to the resolved source URL when transforms are disabled
+ok 111 - optimizeImageUrl should fall back to the resolved source URL when transforms are disabled
+  ---
+  duration_ms: 0.250733
+  type: 'test'
+  ...
+# Subtest: optimizeImageUrl should build transformed URLs only when transforms are explicitly enabled
+ok 112 - optimizeImageUrl should build transformed URLs only when transforms are explicitly enabled
+  ---
+  duration_ms: 0.477942
+  type: 'test'
+  ...
+# Subtest: optimizeImageUrl should transform absolute media URLs that already point to the transform zone
+ok 113 - optimizeImageUrl should transform absolute media URLs that already point to the transform zone
+  ---
+  duration_ms: 0.653365
+  type: 'test'
+  ...
+# Subtest: optimizeImageUrl should leave external absolute URLs untouched when using same-zone transforms
+ok 114 - optimizeImageUrl should leave external absolute URLs untouched when using same-zone transforms
+  ---
+  duration_ms: 0.192136
+  type: 'test'
+  ...
+# Subtest: optimizeImageUrl should not double-wrap existing Cloudflare transformation URLs
+ok 115 - optimizeImageUrl should not double-wrap existing Cloudflare transformation URLs
+  ---
+  duration_ms: 0.285012
+  type: 'test'
+  ...
+# Subtest: sendMetaConversion should build the expected Meta CAPI payload
+ok 116 - sendMetaConversion should build the expected Meta CAPI payload
+  ---
+  duration_ms: 48.314145
+  type: 'test'
+  ...
+# Subtest: sendMetaConversion should omit empty optional fields and use defaults
+ok 117 - sendMetaConversion should omit empty optional fields and use defaults
+  ---
+  duration_ms: 1.213898
+  type: 'test'
+  ...
+# Subtest: sendMetaConversion should return failure when Meta responds with an HTTP error
+ok 118 - sendMetaConversion should return failure when Meta responds with an HTTP error
+  ---
+  duration_ms: 6.054873
+  type: 'test'
+  ...
+# Subtest: validation scripts regenerate the blog manifest before running checks
+ok 119 - validation scripts regenerate the blog manifest before running checks
+  ---
+  duration_ms: 5.098266
+  type: 'test'
+  ...
+# Subtest: buildPrerenderRoutes includes blog index and blog post routes from MDX files
+ok 120 - buildPrerenderRoutes includes blog index and blog post routes from MDX files
+  ---
+  duration_ms: 10.480985
+  type: 'test'
+  ...
+# CONVERSION_DISPATCH {
+#   requestId: '2a48dd3d-7830-4406-8cab-af96f28c311e',
+#   stage: 'unauthorized'
+# }
+# CONVERSION_DISPATCH {
+#   requestId: '8b563e9b-37d6-421e-b08b-449330509360',
+#   stage: 'config_missing_secret'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: '01eb8a28-5bed-4288-85df-ab9ecb8972c6',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-request-id',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# Subtest: purchase-dispatch should reject invalid webhook secret
+ok 121 - purchase-dispatch should reject invalid webhook secret
+  ---
+  duration_ms: 36.006595
+  type: 'test'
+  ...
+# Subtest: purchase-dispatch should hide missing webhook secret configuration
+ok 122 - purchase-dispatch should hide missing webhook secret configuration
+  ---
+  duration_ms: 2.917705
+  type: 'test'
+  ...
+# Subtest: purchase-dispatch should reject non-object JSON bodies
+ok 123 - purchase-dispatch should reject non-object JSON bodies
+  ---
+  duration_ms: 7.059156
+  type: 'test'
+  ...
+# Subtest: purchase-dispatch should include a request id in successful responses
+ok 124 - purchase-dispatch should include a request id in successful responses
+  ---
+  duration_ms: 4.746812
+  type: 'test'
+  ...
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: '607e46f3-97a5-49ba-aa99-f6c3627e6a1c',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: '<deal-1>',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] lead_qualificado enviado com sucesso
+# Subtest: purchase-dispatch should send GA4 and Meta purchase payloads
+ok 125 - purchase-dispatch should send GA4 and Meta purchase payloads
+  ---
+  duration_ms: 16.853261
+  type: 'test'
+  ...
+# META: Lead conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: 'd1ccb021-9fba-4de9-b432-c3401cd8c389',
+#   stage: 'dispatch_complete',
+#   eventType: 'lead_qualificado',
+#   deduplicationId: 'attr-test-123',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] close_convert_lead enviado com sucesso
+# Subtest: purchase-dispatch should dispatch lead_qualificado with attributionKey
+ok 126 - purchase-dispatch should dispatch lead_qualificado with attributionKey
+  ---
+  duration_ms: 9.995594
+  type: 'test'
+  ...
+# [GA4 MP] clientId ausente — pulando
+# META: Lead conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: 'fb858766-7cec-4978-9457-8e951b77ed25',
+#   stage: 'dispatch_complete',
+#   eventType: 'close_convert_lead',
+#   deduplicationId: 'deal-quote-1',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: 'eb4815c2-a8c5-406d-94b8-9251f2940f47',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-compat',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# Subtest: purchase-dispatch should dispatch close_convert_lead with dealId
+ok 127 - purchase-dispatch should dispatch close_convert_lead with dealId
+  ---
+  duration_ms: 5.939628
+  type: 'test'
+  ...
+# Subtest: purchase-dispatch should default to purchase when eventType is omitted
+ok 128 - purchase-dispatch should default to purchase when eventType is omitted
+  ---
+  duration_ms: 1.923767
+  type: 'test'
+  ...
+# Subtest: purchase-dispatch should reject lead_qualificado without attributionKey
+ok 129 - purchase-dispatch should reject lead_qualificado without attributionKey
+  ---
+  duration_ms: 1.845048
+  type: 'test'
+  ...
+# Subtest: purchase-dispatch should reject close_convert_lead without dealId
+ok 130 - purchase-dispatch should reject close_convert_lead without dealId
+  ---
+  duration_ms: 1.364925
+  type: 'test'
+  ...
+# Subtest: purchase-dispatch should reject negative purchase values
+ok 131 - purchase-dispatch should reject negative purchase values
+  ---
+  duration_ms: 0.856505
+  type: 'test'
+  ...
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: 'de383932-39c9-45b2-8d7b-fcd7d14537e1',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-2',
+#   mode: 'partial',
+#   ga4: 'failed',
+#   meta: 'ok'
+# }
+# CONVERSION_DISPATCH {
+#   requestId: 'de383932-39c9-45b2-8d7b-fcd7d14537e1',
+#   stage: 'ga4_dispatch_failed',
+#   detail: 'Missing clientId'
+# }
+# [GA4 MP] Status inesperado: 400 ga4 upstream detail
+# META: Conversion failed with status 400 meta upstream detail
+# CONVERSION_DISPATCH {
+#   requestId: 'de269121-e34f-4bbf-8abb-dfde928acb06',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-failed',
+#   mode: 'failed',
+#   ga4: 'failed',
+#   meta: 'failed'
+# }
+# CONVERSION_DISPATCH {
+#   requestId: 'de269121-e34f-4bbf-8abb-dfde928acb06',
+#   stage: 'ga4_dispatch_failed',
+#   detail: 'HTTP 400: ga4 upstream detail'
+# }
+# CONVERSION_DISPATCH {
+#   requestId: 'de269121-e34f-4bbf-8abb-dfde928acb06',
+#   stage: 'meta_dispatch_failed',
+#   detail: 'HTTP 400: meta upstream detail'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Conversion failed with status 400 meta upstream detail
+# CONVERSION_DISPATCH {
+#   requestId: 'f8c4089a-47f0-43cf-b925-0fe0686204ae',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-meta-failure',
+#   mode: 'partial',
+#   ga4: 'ok',
+#   meta: 'failed'
+# }
+# CONVERSION_DISPATCH {
+#   requestId: 'f8c4089a-47f0-43cf-b925-0fe0686204ae',
+#   stage: 'meta_dispatch_failed',
+#   detail: 'HTTP 400: meta upstream detail'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: 'cd063df1-9f1b-450a-a8e0-5c0acfa0c98b',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-0',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: '2bb3f217-7a7e-44af-b7c6-667d61938a1e',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-1',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: 'e8ca29ba-c7ea-4c36-8aef-f91fe9f614b9',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-2',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: '4cf5e2b2-438a-4f53-89eb-bd9ca6ae44d7',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-3',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: 'fdc1ec07-cef6-43c1-8f33-3e2dc8367148',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-4',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: 'e1b4323a-d92d-4390-ad9c-8c385e04251a',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-5',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: '0e6327fc-efc7-48da-9aec-5f73a1485a43',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-6',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: '653af482-9430-42b1-a436-7eeae03fbd28',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-7',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: '07437148-bc5f-40c8-8d96-0d13986af4f6',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-8',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: 'c07102f9-32a0-4e45-8d57-84e6d8905434',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-9',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: '83f0a96c-9c13-4d22-b0e6-d865c5b9df28',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-10',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: '8e4847c0-7a84-453c-9090-b80387ba588a',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-11',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: 'bdc8906f-4f8f-4aa8-b3fd-4eca99e97634',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-12',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: '004702f5-928e-48c3-9eeb-f9c2db303883',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-13',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: 'bd34b797-f65f-440a-a73a-7bfeecf2e82b',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-14',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: 'becf5b42-7031-4f57-80c7-7eb22f39528f',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-15',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: '0b68e140-37a7-4631-b56f-63eaa380aa44',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-16',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: 'dc3539e8-a3f8-4589-b29d-92c0520a6823',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-17',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: '786baf02-f7f4-4cdb-80b3-7cf7bd10df54',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-18',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: '5ca210ca-0c2b-4400-ab89-7ca330a1f4df',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-19',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: '579c8d1b-8adf-4834-9427-5deee559d39c',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-20',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: 'aa8799ee-3d94-458f-92d6-ad9a9ab1533b',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-21',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: '27e98b49-00c8-4549-8fed-d1f5ec127e35',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-22',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: 'feb593e8-2553-4177-93f3-6d857dd2fcb3',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-23',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: '2a0b2ea5-bc83-4b69-b9f2-32dbcae74f7d',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-24',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: '8033483c-9445-45ae-87ea-78c02a789aeb',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-25',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: '91111134-f38c-498f-9070-e9eacb58d8a8',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-26',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: '604288c1-563c-4ec4-8283-c89495870ae9',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-27',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: '79b2d908-7cd6-4727-ac7a-4aa5f3683483',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-28',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# [GA4 MP] purchase enviado com sucesso
+# META: Purchase conversion sent successfully
+# CONVERSION_DISPATCH {
+#   requestId: '18efd7ea-1a6e-4db4-837a-39da1b8d7c68',
+#   stage: 'dispatch_complete',
+#   eventType: 'purchase',
+#   deduplicationId: 'deal-rate-29',
+#   mode: 'full',
+#   ga4: 'ok',
+#   meta: 'ok'
+# }
+# CONVERSION_DISPATCH {
+#   requestId: '659025ef-40ec-4586-b5c9-c62c52e50a55',
+#   stage: 'rate_limited',
+#   clientIP: '203.0.113.150',
+#   remaining: 0,
+#   retryAfterSeconds: 60
+# }
+# Subtest: purchase-dispatch should return partial mode when GA4 lacks client id but Meta succeeds
+ok 132 - purchase-dispatch should return partial mode when GA4 lacks client id but Meta succeeds
+  ---
+  duration_ms: 13.55189
+  type: 'test'
+  ...
+# Subtest: purchase-dispatch should sanitize provider errors in failed responses
+ok 133 - purchase-dispatch should sanitize provider errors in failed responses
+  ---
+  duration_ms: 2.632103
+  type: 'test'
+  ...
+# Subtest: purchase-dispatch should return partial mode when GA4 succeeds and Meta fails
+ok 134 - purchase-dispatch should return partial mode when GA4 succeeds and Meta fails
+  ---
+  duration_ms: 2.391531
+  type: 'test'
+  ...
+# Subtest: purchase-dispatch should rate limit repeated requests from the same client
+ok 135 - purchase-dispatch should rate limit repeated requests from the same client
+  ---
+  duration_ms: 41.983676
+  type: 'test'
+  ...
+# Subtest: build pipeline keeps prerender enabled for Vercel deploys
+ok 136 - build pipeline keeps prerender enabled for Vercel deploys
+  ---
+  duration_ms: 12.297069
+  type: 'test'
+  ...
+# Subtest: index template does not hide crawlable navigation links
+ok 137 - index template does not hide crawlable navigation links
+  ---
+  duration_ms: 1.980205
+  type: 'test'
+  ...
+# Subtest: core static image sources should not rely on external image CDNs
+ok 138 - core static image sources should not rely on external image CDNs
+  ---
+  duration_ms: 8.671376
+  type: 'test'
+  ...
+# Subtest: blog imagery should use the managed media origin
+ok 139 - blog imagery should use the managed media origin
+  ---
+  duration_ms: 14.979234
+  type: 'test'
+  ...
+# Subtest: orlando landing should not hotlink static images from partner websites
+ok 140 - orlando landing should not hotlink static images from partner websites
+  ---
+  duration_ms: 3.753972
+  type: 'test'
+  ...
+# Subtest: festival landings should use managed static imagery
+ok 141 - festival landings should use managed static imagery
+  ---
+  duration_ms: 3.956732
+  type: 'test'
+  ...
+# Subtest: home decorative textures should not hotlink grain overlays from third-party hosts
+ok 142 - home decorative textures should not hotlink grain overlays from third-party hosts
+  ---
+  duration_ms: 2.475595
+  type: 'test'
+  ...
+# Subtest: remaining runtime media dependencies should use managed Cloudflare assets
+ok 143 - remaining runtime media dependencies should use managed Cloudflare assets
+  ---
+  duration_ms: 8.215865
+  type: 'test'
+  ...
+# SUBMIT_LEAD {
+#   requestId: '81229758-9f27-4944-ba08-23fd41cf61a9',
+#   stage: 'payload_validated',
+#   email: 'j***@example.com',
+#   destination: 'Mars &lt;script&gt;',
+#   utmSource: '&lt;svg onload=alert(1)&gt;',
+#   extraTrackingKeys: 1,
+#   hasClickIds: false
+# }
+# Subtest: validatePayload should preserve fbp as a top-level tracking field
+ok 144 - validatePayload should preserve fbp as a top-level tracking field
+  ---
+  duration_ms: 3.019608
+  type: 'test'
+  ...
+# Subtest: validatePayload should preserve sanitized event_id when provided
+ok 145 - validatePayload should preserve sanitized event_id when provided
+  ---
+  duration_ms: 0.431802
+  type: 'test'
+  ...
+# Subtest: validatePayload should require whatsapp and normalize it to E.164 digits
+ok 146 - validatePayload should require whatsapp and normalize it to E.164 digits
+  ---
+  duration_ms: 0.269135
+  type: 'test'
+  ...
+# Subtest: validatePayload should reject payloads without whatsapp
+ok 147 - validatePayload should reject payloads without whatsapp
+  ---
+  duration_ms: 0.191146
+  type: 'test'
+  ...
+# Subtest: buildN8nLeadPayload should build the outbound webhook contract
+ok 148 - buildN8nLeadPayload should build the outbound webhook contract
+  ---
+  duration_ms: 1.0503
+  type: 'test'
+  ...
+# Subtest: sendLeadToN8n should send request metadata and webhook auth headers
+ok 149 - sendLeadToN8n should send request metadata and webhook auth headers
+  ---
+  duration_ms: 46.161734
+  type: 'test'
+  ...
+# Subtest: submit-lead should send sanitized validated values to n8n
+ok 150 - submit-lead should send sanitized validated values to n8n
+  ---
+  duration_ms: 11.452246
+  type: 'test'
+  ...
+# SUBMIT_LEAD {
+#   requestId: '3a21966c-9388-4703-b97d-5e2d7477a56a',
+#   stage: 'payload_validated',
+#   email: 'f***@example.com',
+#   destination: 'Rio de Janeiro',
+#   utmSource: 'google',
+#   extraTrackingKeys: 0,
+#   hasClickIds: true
+# }
+# SUBMIT_LEAD {
+#   requestId: '80a7792c-e6ad-49af-b45b-4224155c76db',
+#   stage: 'payload_validated',
+#   email: 'f***@example.com',
+#   destination: 'Rio de Janeiro',
+#   utmSource: 'google',
+#   extraTrackingKeys: 0,
+#   hasClickIds: true
+# }
+# SUBMIT_LEAD {
+#   requestId: '80a7792c-e6ad-49af-b45b-4224155c76db',
+#   stage: 'n8n_webhook_failed',
+#   code: 'N8N_WEBHOOK_ERROR',
+#   status: 503,
+#   errorType: 'Error',
+#   detail: '{"error":"upstream failed"}',
+#   recoveredLead: {
+#     maskedEmail: 'f***@example.com',
+#     maskedPhone: '+55***487',
+#     firstName: 'Felipe',
+#     destination: 'Rio de Janeiro',
+#     hasBantSummary: true,
+#     utms: {
+#       utm_source: 'google',
+#       utm_medium: 'cpc',
+#       utm_campaign: 'rio',
+#       utm_term: 'rio viagem',
+#       utm_content: 'ad-1'
+#     }
+#   }
+# }
+# SUBMIT_LEAD {
+#   requestId: '047db864-3e3d-4b4c-88dd-1e5ec9925d32',
+#   stage: 'config',
+#   code: 'SERVER_CONFIG_ERROR',
+#   hasWebhookUrl: false,
+#   hasWebhookSecret: false
+# }
+# SUBMIT_LEAD {
+#   requestId: '708cc318-2f54-4275-a63d-e43a184c5706',
+#   stage: 'config',
+#   code: 'SERVER_CONFIG_ERROR',
+#   hasWebhookUrl: false,
+#   hasWebhookSecret: false
+# }
+# SUBMIT_LEAD {
+#   requestId: 'f9c67c90-ba7c-4c54-910e-d293ad951235',
+#   stage: 'payload_validated',
+#   email: 'f***@example.com',
+#   destination: 'Rio de Janeiro',
+#   utmSource: 'google',
+#   extraTrackingKeys: 0,
+#   hasClickIds: true
+# }
+# SUBMIT_LEAD {
+#   requestId: '5bcffc32-3a22-4f08-b5de-55977f6ed57d',
+#   stage: 'payload_validated',
+#   email: 'f***@example.com',
+#   destination: 'Rio de Janeiro',
+#   utmSource: 'google',
+#   extraTrackingKeys: 0,
+#   hasClickIds: true
+# }
+# SUBMIT_LEAD {
+#   requestId: 'd0ef200d-21a1-4d14-9416-aa0381284ea7',
+#   stage: 'payload_validated',
+#   email: 'f***@example.com',
+#   destination: 'Rio de Janeiro',
+#   utmSource: 'google',
+#   extraTrackingKeys: 0,
+#   hasClickIds: true
+# }
+# SUBMIT_LEAD {
+#   requestId: 'dc84e0e9-44a3-47fb-b80e-93012a63e178',
+#   stage: 'payload_validated',
+#   email: 'f***@example.com',
+#   destination: 'Rio de Janeiro',
+#   utmSource: 'google',
+#   extraTrackingKeys: 0,
+#   hasClickIds: true
+# }
+# SUBMIT_LEAD {
+#   requestId: '83b3e0be-444f-4956-9a82-4a987ddf7b19',
+#   stage: 'payload_validated',
+#   email: 'f***@example.com',
+#   destination: 'Rio de Janeiro',
+#   utmSource: 'google',
+#   extraTrackingKeys: 0,
+#   hasClickIds: true
+# }
+# SUBMIT_LEAD {
+#   requestId: 'deced211-701f-4bca-ba0f-eb5df64a6228',
+#   stage: 'payload_validated',
+#   email: 'f***@example.com',
+#   destination: 'Rio de Janeiro',
+#   utmSource: 'google',
+#   extraTrackingKeys: 0,
+#   hasClickIds: true
+# }
+# SUBMIT_LEAD {
+#   requestId: 'deced211-701f-4bca-ba0f-eb5df64a6228',
+#   stage: 'rate_limited',
+#   clientIP: '9.8.7.6',
+#   remaining: 0,
+#   retryAfterSeconds: 60
+# }
+# SUBMIT_LEAD {
+#   requestId: '9513bc76-1a07-45b5-9425-3d5d2befdd5b',
+#   stage: 'payload_validated',
+#   email: 'f***@example.com',
+#   destination: 'Rio de Janeiro',
+#   utmSource: 'google',
+#   extraTrackingKeys: 0,
+#   hasClickIds: true
+# }
+# SUBMIT_LEAD {
+#   requestId: '1904bb1c-7c4d-42c0-94b5-9993fc04b0f2',
+#   stage: 'payload_validated',
+#   email: 'f***@example.com',
+#   destination: 'Rio de Janeiro',
+#   utmSource: 'google',
+#   extraTrackingKeys: 0,
+#   hasClickIds: true
+# }
+# SUBMIT_LEAD {
+#   requestId: 'b37b945e-b44c-4164-b9ae-a23a8ec06bea',
+#   stage: 'payload_validated',
+#   email: 'f***@example.com',
+#   destination: 'Rio de Janeiro',
+#   utmSource: 'google',
+#   extraTrackingKeys: 0,
+#   hasClickIds: true
+# }
+# SUBMIT_LEAD {
+#   requestId: 'c86a73eb-1df8-4b14-93d1-371a5aefeb18',
+#   stage: 'payload_validated',
+#   email: 'f***@example.com',
+#   destination: 'Rio de Janeiro',
+#   utmSource: 'google',
+#   extraTrackingKeys: 0,
+#   hasClickIds: true
+# }
+# SUBMIT_LEAD {
+#   requestId: '58094f5f-cd98-44ab-af88-931cf2f3a15a',
+#   stage: 'payload_validated',
+#   email: 'f***@example.com',
+#   destination: 'Rio de Janeiro',
+#   utmSource: 'google',
+#   extraTrackingKeys: 0,
+#   hasClickIds: true
+# }
+# Subtest: sendLeadToN8n should reject timed out webhook deliveries with a sanitized error
+ok 151 - sendLeadToN8n should reject timed out webhook deliveries with a sanitized error
+  ---
+  duration_ms: 5007.051861
+  type: 'test'
+  ...
+# Subtest: sendLeadToN8n should normalize raw network failures into N8N_WEBHOOK_ERROR
+ok 152 - sendLeadToN8n should normalize raw network failures into N8N_WEBHOOK_ERROR
+  ---
+  duration_ms: 1.238321
+  type: 'test'
+  ...
+# Subtest: sendLeadToN8n should include a sanitized webhook response detail in provider errors
+ok 153 - sendLeadToN8n should include a sanitized webhook response detail in provider errors
+  ---
+  duration_ms: 1.468126
+  type: 'test'
+  ...
+# Subtest: submit-lead should deliver the validated payload to n8n and return a neutral success response
+ok 154 - submit-lead should deliver the validated payload to n8n and return a neutral success response
+  ---
+  duration_ms: 2.899301
+  type: 'test'
+  ...
+# Subtest: submit-lead should return N8N_WEBHOOK_ERROR when the webhook responds with a failure
+ok 155 - submit-lead should return N8N_WEBHOOK_ERROR when the webhook responds with a failure
+  ---
+  duration_ms: 3.323508
+  type: 'test'
+  ...
+# Subtest: submit-lead should return SERVER_CONFIG_ERROR when n8n config is missing
+ok 156 - submit-lead should return SERVER_CONFIG_ERROR when n8n config is missing
+  ---
+  duration_ms: 1.509844
+  type: 'test'
+  ...
+# Subtest: submit-lead should return SERVER_CONFIG_ERROR before parsing malformed JSON when n8n config is missing
+ok 157 - submit-lead should return SERVER_CONFIG_ERROR before parsing malformed JSON when n8n config is missing
+  ---
+  duration_ms: 1.983016
+  type: 'test'
+  ...
+# Subtest: classifySubmitLeadError should preserve unexpected internal failures
+ok 158 - classifySubmitLeadError should preserve unexpected internal failures
+  ---
+  duration_ms: 0.224039
+  type: 'test'
+  ...
+# Subtest: classifySubmitLeadError should preserve sanitized webhook detail for internal logging
+ok 159 - classifySubmitLeadError should preserve sanitized webhook detail for internal logging
+  ---
+  duration_ms: 0.169914
+  type: 'test'
+  ...
+# Subtest: submit-lead should enforce rate limiting
+ok 160 - submit-lead should enforce rate limiting
+  ---
+  duration_ms: 9.622766
+  type: 'test'
+  ...
+# Subtest: submit-lead should not consume rate-limit quota for invalid payloads
+ok 161 - submit-lead should not consume rate-limit quota for invalid payloads
+  ---
+  duration_ms: 5.230386
+  type: 'test'
+  ...
+# SUBMIT_NPS {
+#   requestId: '953d0f29-3b3b-49f6-aad1-a7fa72e9665a',
+#   stage: 'config',
+#   code: 'SERVER_CONFIG_ERROR'
+# }
+# SUBMIT_NPS {
+#   requestId: 'daeda557-7ea1-4ea7-bc46-94f231a16489',
+#   stage: 'sending',
+#   email: 'm***@example.com',
+#   score: 9
+# }
+# SUBMIT_NPS {
+#   requestId: 'daeda557-7ea1-4ea7-bc46-94f231a16489',
+#   stage: 'done',
+#   score: 9
+# }
+# SUBMIT_NPS {
+#   requestId: 'a2ab0eb3-d595-45c1-8a3f-6d8900b3b42e',
+#   stage: 'sending',
+#   email: 'm***@example.com',
+#   score: 0
+# }
+# SUBMIT_NPS {
+#   requestId: 'a2ab0eb3-d595-45c1-8a3f-6d8900b3b42e',
+#   stage: 'done',
+#   score: 0
+# }
+# SUBMIT_NPS {
+#   requestId: 'b6b81c87-263c-4681-acb3-8c0c797deeda',
+#   stage: 'sending',
+#   email: 'm***@example.com',
+#   score: 10
+# }
+# SUBMIT_NPS {
+#   requestId: 'b6b81c87-263c-4681-acb3-8c0c797deeda',
+#   stage: 'done',
+#   score: 10
+# }
+# SUBMIT_NPS {
+#   requestId: '59c4177f-73b1-40c0-9886-131fd7e2fe95',
+#   stage: 'sending',
+#   email: 'm***@example.com',
+#   score: 9
+# }
+# SUBMIT_NPS {
+#   requestId: '59c4177f-73b1-40c0-9886-131fd7e2fe95',
+#   stage: 'done',
+#   score: 9
+# }
+# SUBMIT_NPS {
+#   requestId: 'b3933778-fcf0-43c1-80da-bf6882aa9e03',
+#   stage: 'sending',
+#   email: 'm***@example.com',
+#   score: 9
+# }
+# SUBMIT_NPS {
+#   requestId: 'b3933778-fcf0-43c1-80da-bf6882aa9e03',
+#   stage: 'webhook_failed',
+#   status: 502,
+#   detail: 'Bad Gateway'
+# }
+# SUBMIT_NPS {
+#   requestId: 'c27b2be3-a3d6-4901-bc9d-e453e4be3ae8',
+#   stage: 'sending',
+#   email: 'm***@example.com',
+#   score: 9
+# }
+# SUBMIT_NPS {
+#   requestId: 'c27b2be3-a3d6-4901-bc9d-e453e4be3ae8',
+#   stage: 'done',
+#   score: 9
+# }
+# SUBMIT_NPS {
+#   requestId: '52ea7664-d36a-45f2-9e46-b0b14e34287e',
+#   stage: 'sending',
+#   email: 'm***@example.com',
+#   score: 9
+# }
+# SUBMIT_NPS {
+#   requestId: '52ea7664-d36a-45f2-9e46-b0b14e34287e',
+#   stage: 'done',
+#   score: 9
+# }
+# SUBMIT_NPS {
+#   requestId: '62716091-d784-4d77-9827-7544454d3f30',
+#   stage: 'sending',
+#   email: 'm***@example.com',
+#   score: 9
+# }
+# SUBMIT_NPS {
+#   requestId: '62716091-d784-4d77-9827-7544454d3f30',
+#   stage: 'done',
+#   score: 9
+# }
+# SUBMIT_NPS {
+#   requestId: '09adb1b6-1e80-47f1-af29-e211e763d866',
+#   stage: 'rate_limited',
+#   clientIP: '10.19.177.1',
+#   remaining: 0
+# }
+# SUBMIT_NPS {
+#   requestId: '8c846b54-57c8-4f95-ba6b-17fa47160b2a',
+#   stage: 'sending',
+#   email: 'm***@example.com',
+#   score: 9
+# }
+# SUBMIT_NPS {
+#   requestId: '8c846b54-57c8-4f95-ba6b-17fa47160b2a',
+#   stage: 'done',
+#   score: 9
+# }
+# Subtest: submit-nps returns 500 SERVER_CONFIG_ERROR when NPS_WEBHOOK_URL is absent
+ok 162 - submit-nps returns 500 SERVER_CONFIG_ERROR when NPS_WEBHOOK_URL is absent
+  ---
+  duration_ms: 35.69019
+  type: 'test'
+  ...
+# Subtest: submit-nps returns 405 METHOD_NOT_ALLOWED for GET requests
+ok 163 - submit-nps returns 405 METHOD_NOT_ALLOWED for GET requests
+  ---
+  duration_ms: 1.486327
+  type: 'test'
+  ...
+# Subtest: submit-nps returns 204 for OPTIONS preflight
+ok 164 - submit-nps returns 204 for OPTIONS preflight
+  ---
+  duration_ms: 0.966225
+  type: 'test'
+  ...
+# Subtest: submit-nps returns 400 VALIDATION_ERROR for malformed JSON body
+ok 165 - submit-nps returns 400 VALIDATION_ERROR for malformed JSON body
+  ---
+  duration_ms: 1.592788
+  type: 'test'
+  ...
+# Subtest: submit-nps returns 400 for missing firstname
+ok 166 - submit-nps returns 400 for missing firstname
+  ---
+  duration_ms: 2.49918
+  type: 'test'
+  ...
+# Subtest: submit-nps returns 400 for firstname over 100 characters
+ok 167 - submit-nps returns 400 for firstname over 100 characters
+  ---
+  duration_ms: 3.735726
+  type: 'test'
+  ...
+# Subtest: submit-nps returns 400 for invalid email
+ok 168 - submit-nps returns 400 for invalid email
+  ---
+  duration_ms: 1.65762
+  type: 'test'
+  ...
+# Subtest: submit-nps returns 400 for score below 0
+ok 169 - submit-nps returns 400 for score below 0
+  ---
+  duration_ms: 1.355261
+  type: 'test'
+  ...
+# Subtest: submit-nps returns 400 for score above 10
+ok 170 - submit-nps returns 400 for score above 10
+  ---
+  duration_ms: 1.627585
+  type: 'test'
+  ...
+# Subtest: submit-nps returns 400 for non-integer score
+ok 171 - submit-nps returns 400 for non-integer score
+  ---
+  duration_ms: 1.236839
+  type: 'test'
+  ...
+# Subtest: submit-nps returns 400 for non-numeric score
+ok 172 - submit-nps returns 400 for non-numeric score
+  ---
+  duration_ms: 1.043334
+  type: 'test'
+  ...
+# Subtest: submit-nps returns 400 for empty reason
+ok 173 - submit-nps returns 400 for empty reason
+  ---
+  duration_ms: 2.567735
+  type: 'test'
+  ...
+# Subtest: submit-nps returns 400 for reason over 2000 characters
+ok 174 - submit-nps returns 400 for reason over 2000 characters
+  ---
+  duration_ms: 1.038299
+  type: 'test'
+  ...
+# Subtest: submit-nps returns 400 for highlight over 2000 characters
+ok 175 - submit-nps returns 400 for highlight over 2000 characters
+  ---
+  duration_ms: 0.891794
+  type: 'test'
+  ...
+# Subtest: submit-nps returns 201 and forwards payload to webhook on success
+ok 176 - submit-nps returns 201 and forwards payload to webhook on success
+  ---
+  duration_ms: 3.316152
+  type: 'test'
+  ...
+# Subtest: submit-nps accepts score 0 (boundary)
+ok 177 - submit-nps accepts score 0 (boundary)
+  ---
+  duration_ms: 1.566623
+  type: 'test'
+  ...
+# Subtest: submit-nps accepts score 10 (boundary)
+ok 178 - submit-nps accepts score 10 (boundary)
+  ---
+  duration_ms: 1.513038
+  type: 'test'
+  ...
+# Subtest: submit-nps accepts empty highlight (optional field)
+ok 179 - submit-nps accepts empty highlight (optional field)
+  ---
+  duration_ms: 2.038117
+  type: 'test'
+  ...
+# Subtest: submit-nps returns 502 WEBHOOK_ERROR when upstream returns non-2xx
+ok 180 - submit-nps returns 502 WEBHOOK_ERROR when upstream returns non-2xx
+  ---
+  duration_ms: 1.737376
+  type: 'test'
+  ...
+# Subtest: submit-nps enforces rate limit after 3 requests from the same IP
+ok 181 - submit-nps enforces rate limit after 3 requests from the same IP
+  ---
+  duration_ms: 6.891984
+  type: 'test'
+  ...
+# Subtest: submit-nps does not consume rate limit quota for invalid payloads
+ok 182 - submit-nps does not consume rate limit quota for invalid payloads
+  ---
+  duration_ms: 2.64508
+  type: 'test'
+  ...
+# Subtest: submit-waitlist should return SERVER_CONFIG_ERROR before parsing malformed JSON when config is missing
+ok 183 - submit-waitlist should return SERVER_CONFIG_ERROR before parsing malformed JSON when config is missing
+  ---
+  duration_ms: 34.581018
+  type: 'test'
+  ...
+# Subtest: submit-waitlist should deliver a sanitized payload to n8n and return a neutral success response
+ok 184 - submit-waitlist should deliver a sanitized payload to n8n and return a neutral success response
+  ---
+  duration_ms: 6.314814
+  type: 'test'
+  ...
+# Subtest: submit-waitlist should return VALIDATION_ERROR without consuming rate-limit quota
+ok 185 - submit-waitlist should return VALIDATION_ERROR without consuming rate-limit quota
+  ---
+  duration_ms: 10.543603
+  type: 'test'
+  ...
+# Subtest: submit-waitlist should map webhook failures to N8N_WEBHOOK_ERROR
+ok 186 - submit-waitlist should map webhook failures to N8N_WEBHOOK_ERROR
+  ---
+  duration_ms: 2.504422
+  type: 'test'
+  ...
+# Subtest: classifySubmitWaitlistError should preserve unexpected internal failures
+ok 187 - classifySubmitWaitlistError should preserve unexpected internal failures
+  ---
+  duration_ms: 0.373185
+  type: 'test'
+  ...
+# Subtest: classifySubmitWaitlistError should preserve sanitized webhook detail for internal handling
+ok 188 - classifySubmitWaitlistError should preserve sanitized webhook detail for internal handling
+  ---
+  duration_ms: 0.541479
+  type: 'test'
+  ...
+# Subtest: extractBudgetToolCallFromText should parse JSON tool_call payload from plain text
+ok 189 - extractBudgetToolCallFromText should parse JSON tool_call payload from plain text
+  ---
+  duration_ms: 1.769346
+  type: 'test'
+  ...
+# Subtest: extractBudgetToolCallFromText should parse fenced JSON payload
+ok 190 - extractBudgetToolCallFromText should parse fenced JSON payload
+  ---
+  duration_ms: 0.463369
+  type: 'test'
+  ...
+# Subtest: extractBudgetToolCallFromText should return undefined for unrelated text
+ok 191 - extractBudgetToolCallFromText should return undefined for unrelated text
+  ---
+  duration_ms: 0.290575
+  type: 'test'
+  ...
+1..191
+# tests 191
+# suites 0
+# pass 190
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 12823.62212
+ ELIFECYCLE  Command failed with exit code 1.
