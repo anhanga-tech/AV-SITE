@@ -23,3 +23,7 @@
 ## 2026-06-12 - ⚡ Bolt: Home Page Section Memoization
 **Learning:** Static-data sections like FAQ, Categories, and HowItWorks can still be forced to re-render when the parent page component (Home.tsx) updates its lifecycle states (e.g., intersection observer flags or interaction timeouts). Wrapping these in React.memo prevents unnecessary reconciliation and CPU cycles during the "below-the-fold" rendering phase.
 **Action:** Always memoize large, data-driven Home page sections that don't depend on parent state to ensure smooth performance during deferred loading sequences.
+
+## 2026-07-15 - ⚡ Bolt: Heavy Map Component Memoization
+**Learning:** Components wrapping third-party libraries like Leaflet (e.g., `Destinations.tsx`) are particularly expensive to re-render because they often trigger full DOM reconciliation or re-initialization of the library's internal state. Even if the component appears "dynamic," if the underlying data (destinations list) is stable, `React.memo` provides a massive win by bypassing the entire JS execution for that branch.
+**Action:** Prioritize memoization for components that bridge React with heavy non-React DOM libraries to prevent main-thread jank during parent state updates.
