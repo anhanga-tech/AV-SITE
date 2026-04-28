@@ -105,12 +105,15 @@ export function MobileNavigationMenu({
   onNavClick,
   contactButton,
 }: MobileNavigationMenuProps) {
-  if (!isOpen) {
-    return null;
-  }
-
+  // The element must always be present in the DOM so that the mobile toggle button's
+  // aria-controls="mobile-menu" attribute always references a valid element.
+  // Visibility is controlled via the hidden attribute instead of conditional rendering.
   return (
-    <div id="mobile-menu" className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg py-4 px-6 flex flex-col gap-4 border-t border-gray-100 text-gray-800 animate-fade-in-down">
+    <div
+      id="mobile-menu"
+      hidden={!isOpen}
+      className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg py-4 px-6 flex flex-col gap-4 border-t border-gray-100 text-gray-800 animate-fade-in-down"
+    >
       {NAV_LINKS.map((link) => {
         if (link.subLinks) {
           return link.subLinks.map((subLink) => {
