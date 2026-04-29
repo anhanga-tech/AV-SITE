@@ -13,12 +13,13 @@ jobs:
       issues: write
       repository-projects: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       # Work around upstream claude-code-action SDK crashes on issues:opened.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "24"
+          package-manager-cache: false
 
       - name: Install Claude Code CLI
         run: npm install -g @anthropic-ai/claude-code
@@ -76,6 +77,6 @@ jobs:
 
           claude -p \
             --model claude-sonnet-4-6 \
-            --max-turns 5 \
+            --max-turns 10 \
             --allowedTools "Bash(gh issue:*),Bash(gh search:*),Bash(gh label:*),Bash(gh project:*),Bash(gh api:*)" \
             < "$PROMPT_FILE"
