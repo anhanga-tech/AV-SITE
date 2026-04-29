@@ -31,16 +31,18 @@ function safeJsonString(value: string): string {
 /**
  * Returns an HTML page that completes the Decap CMS OAuth handshake via postMessage.
  *
- * Protocol (canonical Decap CMS flow):
- *  1. This page fires `window.opener.postMessage('authorizing:github', '*')` — no sensitive payload.
- *  2. The CMS parent window echoes the same message back.
- *  3. `e.origin` from that echo is the verified opener origin (set by the browser, not forgeable).
- *  4. This page replies to `e.source` at `e.origin` with the auth result — never '*'.
+ * Protocol (canonical Decap CMS flow with security hardening):
+ *  1. This page determines allowed origins for communication (the site itself).
+ *  2. This page fires `window.opener.postMessage('authorizing:github', '*')` — no sensitive payload.
+ *  3. The CMS parent window echoes the same message back.
+ *  4. This page verifies the echo's `e.origin` against the allowlist.
+ *  5. This page replies to `e.source` at the VERIFIED `e.origin` with the auth result.
  */
-function buildPostMessageHtml(status: 'success' | 'error', content: string, httpStatus: number): Response {
+export function buildPostMessageHtml(status: 'success' | 'error', content: string, httpStatus: number): Response {
     const safeProvider = safeJsonString(PROVIDER);
     const safeStatus = safeJsonString(status);
     const safeContent = safeJsonString(content);
+    const allowedOrigin = process.env.ALLOWED_ORIGIN || 'https://www.anhanga.tur.br';
 
     const html = `<!doctype html>
 <html lang="pt-BR">
@@ -55,6 +57,7 @@ function buildPostMessageHtml(status: 'success' | 'error', content: string, http
   var provider = ${safeProvider};
   var status = ${safeStatus};
   var content = ${safeContent};
+  var allowedOrigin = ${safeJsonString(allowedOrigin)};
   var handshake = 'authorizing:' + provider;
   var message = 'authorization:' + provider + ':' + status + ':' + content;
 
@@ -67,6 +70,20 @@ function buildPostMessageHtml(status: 'success' | 'error', content: string, http
 
   function onMessage(e) {
     if (e.data !== handshake) return;
+
+    // Hardened origin check: only respond to the site's own origin or localhost (for dev).
+    // The CMS must be hosted on the same domain or a trusted subdomain.
+    var origin = e.origin || '';
+    var isTrusted = origin === allowedOrigin ||
+                    origin === window.location.origin ||
+                    /^https:\\/\\/.*\\.anhanga\\.tur\\.br$/.test(origin) ||
+                    /^http:\\/\\/localhost:\\d+$/.test(origin);
+
+    if (!isTrusted) {
+      console.error('AUTH_CALLBACK: Blocked unauthorized origin:', origin);
+      return;
+    }
+
     clearTimeout(handshakeTimeout);
     window.removeEventListener('message', onMessage, false);
     e.source.postMessage(message, e.origin);
