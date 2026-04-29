@@ -99,7 +99,7 @@ test.describe('Smoke Suite', () => {
       await homePage.openMobileMenu();
       contactLink = page.locator('#mobile-menu a[href*="#contato"]');
     } else {
-      contactLink = page.locator('header a[href*="#contato"]');
+      contactLink = page.getByTestId('site-header').getByRole('link', { name: 'Contato' });
     }
 
     const href = await contactLink.getAttribute('href');

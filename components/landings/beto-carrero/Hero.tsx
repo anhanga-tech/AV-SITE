@@ -28,9 +28,8 @@ const Hero: React.FC = () => {
             <span className="uppercase tracking-wide text-fun-dark">Diversão sem Burocracia</span>
           </div>
 
-          {/* Headline */}
-          <h1 className="sr-only">Pacote Beto Carrero: Diversão e Viagem em Família com Roteiro Personalizado</h1>
-          <p aria-hidden="true" className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-sans font-black text-fun-dark leading-[1.1] md:leading-[1] lg:leading-[0.9] mb-6 md:mb-8 drop-shadow-sm max-w-2xl lg:max-w-none">
+          {/* Headline — h1 is the visible heading to avoid sr-only cloaking risk */}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-sans font-black text-fun-dark leading-[1.1] md:leading-[1] lg:leading-[0.9] mb-6 md:mb-8 drop-shadow-sm max-w-2xl lg:max-w-none">
             Memórias Que Começam no <br className="hidden md:block" />
             <span className="relative inline-block mt-1 md:mt-2 lg:mt-4">
               <span className="relative z-10">Beto Carrero</span>
@@ -39,7 +38,7 @@ const Hero: React.FC = () => {
                 <path d="M0 16 C18 6, 36 20, 54 12 C72 4, 90 18, 100 14 L100 24 L0 24 Z" fill="currentColor" />
               </svg>
             </span>
-          </p>
+          </h1>
 
           {/* Subheadline */}
           <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-sans text-fun-dark mb-8 md:mb-12 leading-relaxed font-semibold max-w-lg lg:max-w-2xl mx-auto lg:mx-0">

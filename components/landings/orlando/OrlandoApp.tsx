@@ -116,8 +116,9 @@ function OrlandoApp() {
 
       <main className="hero">
           <div className="hero-content">
+              {/* h1 is rendered visibly above the decorative title to eliminate sr-only cloaking risk */}
+              <h1 style={{fontSize:'0.9rem',fontWeight:600,letterSpacing:'0.05em',textTransform:'uppercase',opacity:0.7,marginBottom:'0.5rem'}}>Pacote para Orlando 2026: Roteiro Personalizado Disney e Universal</h1>
               <div className="title-collage">
-                  <h1 className="sr-only">Pacote para Orlando 2026: Roteiro Personalizado Disney e Universal</h1>
                   <p aria-hidden="true">
                       <span className="highlight-blue">Orlando</span>
                       <span className="highlight-pink">É SURREAL.</span>
