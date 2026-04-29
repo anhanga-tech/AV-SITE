@@ -18,7 +18,7 @@ jobs:
       # Work around upstream claude-code-action SDK crashes on issues:opened.
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
 
       - name: Install Claude Code CLI
         run: npm install -g @anthropic-ai/claude-code
