@@ -88,13 +88,23 @@ jobs:
 
           if [[ "$title" =~ [Ss][Ee][Oo]|[Gg][Ee][Oo] ]]; then
             project_number="5"
+            project_id="PVT_kwHODSPH6s4BP_lK"
             project_name="SEO & GEO Optimization 2026"
           else
             project_number="4"
+            project_id="PVT_kwHODSPH6s4BPrTl"
             project_name="AV-SITE Project"
           fi
 
-          gh project item-add "$project_number" --owner felipewilliam2 --url "$ISSUE_URL" >/dev/null
+          issue_node_id="$(gh issue view "$ISSUE_NUMBER" --repo "$REPO" --json id --jq '.id')"
+          if gh api graphql \
+            -f query='mutation($projectId: ID!, $contentId: ID!) { addProjectV2ItemById(input: { projectId: $projectId, contentId: $contentId }) { item { id } } }' \
+            -f projectId="$project_id" \
+            -f contentId="$issue_node_id" >/dev/null; then
+            project_status="adicionada"
+          else
+            project_status="falha ao adicionar; verifique permissoes do GITHUB_TOKEN para Projects v2"
+          fi
 
           search_query="$(printf '%s' "$title" | sed -E 's/^\[[^]]+\][[:space:]]*//; s/Recriada:[[:space:]]*//I; s/"/\\"/g')"
           duplicates="$(gh search issues "$search_query" --repo "$REPO" --state open --json number,title,url --limit 5 \
@@ -112,7 +122,7 @@ jobs:
 
           - Tipo: ${issue_type}
           - Labels aplicadas: ${label_csv}
-          - Projeto: #${project_number} (${project_name})
+          - Projeto: #${project_number} (${project_name}) - ${project_status}
 
           Possiveis duplicatas:
           ${duplicate_summary}
