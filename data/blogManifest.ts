@@ -2,46 +2,46 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
-    "title": "Ásia para brasileiros em 2026: Japão, Tailândia, Bali e os destinos que mais valem a viagem",
-    "excerpt": "A Ásia está no topo das buscas dos brasileiros em 2026. Veja os melhores destinos, custos reais, vistos e como planejar uma viagem que realmente entrega.",
-    "date": "2026-04-29",
-    "author": "equipe-anhanga",
-    "category": "Destinos",
-    "image": "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1200&auto=format",
-    "featured": false,
-    "showChatCTA": true,
-    "chatCTADestination": "Ásia",
-    "tags": ["asia", "japao", "tailandia", "bali"],
-    "slug": "asia-destinos-para-brasileiros-2026",
-    "readingTime": "7 min de leitura"
-  },
-  {
     "title": "América do Norte: destinos além de Nova York para brasileiros em 2026",
     "excerpt": "EUA, Canadá e México têm muito mais que Nova York e Disney. Veja os destinos em alta para brasileiros em 2026, com visto, custos e o que cada um tem de melhor.",
     "date": "2026-04-29",
     "author": "equipe-anhanga",
     "category": "Destinos",
-    "image": "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1200&auto=format",
+    "image": "https://media.anhanga.tur.br/images/blog/america-do-norte-destinos-alem-de-nova-york.jpg",
     "featured": false,
     "showChatCTA": true,
     "chatCTADestination": "América do Norte",
-    "tags": ["eua", "canada", "mexico", "america-do-norte"],
+    "tags": [
+      "eua",
+      "canada",
+      "mexico",
+      "nova-york",
+      "orlando",
+      "america-do-norte"
+    ],
     "slug": "america-do-norte-destinos-alem-de-nova-york",
-    "readingTime": "7 min de leitura"
+    "readingTime": "6 min de leitura"
   },
   {
-    "title": "Roteiro Europa para brasileiros em 2026: o guia completo com ETIAS, câmbio e destinos",
-    "excerpt": "O que mudou para viajar à Europa em 2026, quanto custa, quais países combinar e como montar um roteiro que realmente funciona saindo do Brasil.",
+    "title": "Ásia para brasileiros em 2026: Japão, Tailândia, Bali e os destinos que mais valem a viagem",
+    "excerpt": "A Ásia está no topo das buscas dos brasileiros em 2026. Veja os melhores destinos, custos reais, vistos e como planejar uma viagem que realmente entrega.",
     "date": "2026-04-29",
     "author": "equipe-anhanga",
     "category": "Destinos",
-    "image": "https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=1200&auto=format",
+    "image": "https://media.anhanga.tur.br/images/blog/asia-destinos-para-brasileiros-2026.jpg",
     "featured": false,
     "showChatCTA": true,
-    "chatCTADestination": "Europa",
-    "tags": ["europa", "roteiro", "etias", "schengen"],
-    "slug": "roteiro-europa-brasileiros-2026",
-    "readingTime": "8 min de leitura"
+    "chatCTADestination": "Ásia",
+    "tags": [
+      "asia",
+      "japao",
+      "tailandia",
+      "bali",
+      "china",
+      "sudeste-asiatico"
+    ],
+    "slug": "asia-destinos-para-brasileiros-2026",
+    "readingTime": "6 min de leitura"
   },
   {
     "title": "Caribe para brasileiros: Punta Cana, Cancún ou Aruba? Entenda as diferenças",
@@ -49,27 +49,19 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "date": "2026-04-29",
     "author": "equipe-anhanga",
     "category": "Destinos",
-    "image": "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=1200&auto=format",
+    "image": "https://media.anhanga.tur.br/images/blog/caribe-destinos-para-brasileiros.jpg",
     "featured": false,
     "showChatCTA": true,
     "chatCTADestination": "Caribe",
-    "tags": ["caribe", "punta-cana", "cancun", "aruba"],
+    "tags": [
+      "caribe",
+      "punta-cana",
+      "cancun",
+      "aruba",
+      "all-inclusive"
+    ],
     "slug": "caribe-destinos-para-brasileiros",
-    "readingTime": "6 min de leitura"
-  },
-  {
-    "title": "Os melhores destinos do Brasil para viajar em 2026",
-    "excerpt": "Nordeste, Sul, Centro-Oeste e mais: um guia honesto dos destinos brasileiros que mais valem o tempo e o dinheiro em 2026.",
-    "date": "2026-04-29",
-    "author": "equipe-anhanga",
-    "category": "Destinos",
-    "image": "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=1200&auto=format",
-    "featured": false,
-    "showChatCTA": true,
-    "chatCTADestination": "Brasil",
-    "tags": ["brasil", "nordeste", "sul", "melhores-destinos"],
-    "slug": "melhores-destinos-brasil-2026",
-    "readingTime": "7 min de leitura"
+    "readingTime": "5 min de leitura"
   },
   {
     "title": "América do Sul: os destinos que mais valem a viagem saindo do Brasil",
@@ -77,18 +69,65 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "date": "2026-04-29",
     "author": "equipe-anhanga",
     "category": "Destinos",
-    "image": "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?w=1200&auto=format",
+    "image": "https://media.anhanga.tur.br/images/blog/destinos-america-do-sul-latam.jpg",
     "featured": false,
     "showChatCTA": true,
     "chatCTADestination": "América do Sul",
-    "tags": ["latam", "argentina", "chile", "peru"],
+    "tags": [
+      "latam",
+      "argentina",
+      "chile",
+      "peru",
+      "america-do-sul"
+    ],
     "slug": "destinos-america-do-sul-latam",
-    "readingTime": "8 min de leitura"
+    "readingTime": "5 min de leitura"
+  },
+  {
+    "title": "Os melhores destinos do Brasil para viajar em 2026",
+    "excerpt": "Nordeste, Sul, Centro-Oeste e mais: um guia honesto dos destinos brasileiros que mais valem o tempo e o dinheiro em 2026.",
+    "date": "2026-04-29",
+    "author": "equipe-anhanga",
+    "category": "Destinos",
+    "image": "https://media.anhanga.tur.br/images/blog/melhores-destinos-brasil-2026.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Brasil",
+    "tags": [
+      "brasil",
+      "nordeste",
+      "sul",
+      "melhores-destinos",
+      "viagem-nacional"
+    ],
+    "slug": "melhores-destinos-brasil-2026",
+    "readingTime": "5 min de leitura"
+  },
+  {
+    "title": "Roteiro Europa para brasileiros em 2026: o guia completo com ETIAS, câmbio e destinos",
+    "excerpt": "O que mudou para viajar à Europa em 2026, quanto custa, quais países combinar e como montar um roteiro que realmente funciona saindo do Brasil.",
+    "date": "2026-04-29",
+    "author": "equipe-anhanga",
+    "category": "Destinos",
+    "image": "https://media.anhanga.tur.br/images/blog/roteiro-europa-brasileiros-2026.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Europa",
+    "tags": [
+      "europa",
+      "roteiro",
+      "etias",
+      "visto",
+      "schengen"
+    ],
+    "slug": "roteiro-europa-brasileiros-2026",
+    "readingTime": "6 min de leitura"
   },
   {
     "title": "Quais São as Melhores Agências de Viagem Boutique em São Paulo?",
     "excerpt": "As melhores agências de viagem boutique em São Paulo combinam tecnologia e cuidado humano. Veja como funciona o atendimento da Anhangá.",
     "date": "2026-04-25",
+    "dateModified": "2026-04-29",
     "author": "equipe-anhanga",
     "category": "Dicas de Expert",
     "image": "https://media.anhanga.tur.br/images/about/equipe-anhanga.jpg",
