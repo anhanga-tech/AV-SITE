@@ -99,18 +99,6 @@ const QUIZ_QUESTIONS: QuizQuestion[] = [
         title: 'Como você organiza uma viagem antes de sair?',
         multi: false,
         options: [
-            { id: 'logo',     label: 'Nos próximos 3 meses', hint: 'A mala já tá quase pronta' },
-            { id: 'semestre', label: 'Daqui 3 a 6 meses',    hint: 'Tem tempo de planejar bem' },
-            { id: 'ano',      label: 'Esse ano ainda',        hint: 'Sem pressa, sem preguiça' },
-            { id: 'sonhando', label: 'Só sonhando ainda',     hint: 'Plantando a sementinha' },
-        ],
-    },
-    {
-        id: 'ritmo',
-        eyebrow: 'Pergunta 06',
-        title: 'Qual o ritmo ideal da sua viagem?',
-        multi: false,
-        options: [
             { id: 'planejado',       label: 'Tudo planejado',    hint: 'Roteiro fechado, sem improviso' },
             { id: 'semi-planejado',  label: 'Semi-planejado',    hint: 'Base definida, liberdade no meio' },
             { id: 'quase-livre',     label: 'Quase livre',       hint: 'Só hotel reservado, o resto vejo lá' },
@@ -204,6 +192,7 @@ const TRAVELER_PROFILES: Record<ProfileKey, TravelerProfile> = {
 type QuizAnswers = Record<string, string[]>;
 
 // Score table: Plog psicocentricity model — P1+P2+P3+P4+P6 (P5/quando is BANT, excluded)
+// Keys here must match question IDs in QUIZ_QUESTIONS; missing IDs fall back to NEUTRAL_SCORE.
 const SCORES: Record<string, Record<string, number>> = {
     destino: {
         'europa': 3, 'america-norte': 3, 'latam': 4,
@@ -221,19 +210,40 @@ const SCORES: Record<string, Record<string, number>> = {
     ritmo: { 'planejado': 1, 'semi-planejado': 3, 'quase-livre': 4, 'livre': 5 },
 };
 
+const NEUTRAL_SCORE = 3;
+
+const SUMMARY_LABELS: Record<string, Record<string, string>> = {
+    destino: {
+        'europa': 'Europa', 'america-norte': 'América do Norte', 'latam': 'América Latina',
+        'caribe': 'Caribe', 'asia': 'Ásia', 'africa-oriente': 'África & Oriente', 'surpresa': 'Surpresa',
+    },
+    cena: {
+        'aventura': 'Aventura', 'familia': 'Família', 'luxo': 'Luxo',
+        'microescapada': 'Microescapada', 'natureza': 'Natureza', 'wellness': 'Wellness',
+    },
+    companhia: { 'solo': 'Solo', 'parceiro': 'Casal', 'familia': 'Família', 'variado': 'Grupo' },
+    frustracao: {
+        'sem-liberdade': 'Roteiro engessado', 'multidao': 'Multidão',
+        'hotel-ruim': 'Hospedagem ruim', 'genericas': 'Atrações genéricas', 'caro-demais': 'Custo alto',
+    },
+    horizonte: { 'budget': 'Dinheiro', 'tempo': 'Tempo', 'companhia': 'Companhia', 'destino': 'Destino indefinido' },
+    ritmo: {
+        'planejado': 'Planejado', 'semi-planejado': 'Semi-planejado',
+        'quase-livre': 'Quase livre', 'livre': 'Livre',
+    },
+};
+
 function scoreField(fieldScores: Record<string, number>, selected: string[]): number {
     if (!selected.length) return 0;
-    const total = selected.reduce((sum, id) => sum + (fieldScores[id] ?? 3), 0);
+    const total = selected.reduce((sum, id) => sum + (fieldScores[id] ?? NEUTRAL_SCORE), 0);
     return Math.round(total / selected.length);
 }
 
 function matchProfile(answers: QuizAnswers): ProfileKey {
-    const score =
-        scoreField(SCORES.destino,    answers.destino    ?? []) +
-        scoreField(SCORES.cena,       answers.cena       ?? []) +
-        scoreField(SCORES.companhia,  answers.companhia  ?? []) +
-        scoreField(SCORES.frustracao, answers.frustracao ?? []) +
-        scoreField(SCORES.ritmo,      answers.ritmo      ?? []);
+    const score = Object.keys(SCORES).reduce(
+        (sum, field) => sum + scoreField(SCORES[field], answers[field] ?? []),
+        0,
+    );
 
     if (score <= 9)  return 'escapista';
     if (score <= 13) return 'bon-vivant';
@@ -243,30 +253,10 @@ function matchProfile(answers: QuizAnswers): ProfileKey {
 }
 
 function buildAnswersSummary(answers: QuizAnswers): string {
-    const labels: Record<string, Record<string, string>> = {
-        destino: {
-            'europa': 'Europa', 'america-norte': 'América do Norte', 'latam': 'América Latina',
-            'caribe': 'Caribe', 'asia': 'Ásia', 'africa-oriente': 'África & Oriente', 'surpresa': 'Surpresa',
-        },
-        cena: {
-            'aventura': 'Aventura', 'familia': 'Família', 'luxo': 'Luxo',
-            'microescapada': 'Microescapada', 'natureza': 'Natureza', 'wellness': 'Wellness',
-        },
-        companhia: { 'solo': 'Solo', 'parceiro': 'Casal', 'familia': 'Família', 'variado': 'Grupo' },
-        frustracao: {
-            'sem-liberdade': 'Roteiro engessado', 'multidao': 'Multidão',
-            'hotel-ruim': 'Hospedagem ruim', 'genericas': 'Atrações genéricas', 'caro-demais': 'Custo alto',
-        },
-        quando: { 'logo': 'Até 3 meses', 'semestre': '3-6 meses', 'ano': 'Esse ano', 'sonhando': 'Sonhando' },
-        ritmo: {
-            'planejado': 'Planejado', 'semi-planejado': 'Semi-planejado',
-            'quase-livre': 'Quase livre', 'livre': 'Livre',
-        },
-    };
     return Object.entries(answers)
         .filter(([, sel]) => sel?.length)
         .map(([qId, sel]) => {
-            const map = labels[qId];
+            const map = SUMMARY_LABELS[qId];
             if (!map) return null;
             return sel.map((id) => map[id] ?? id).join(', ');
         })
