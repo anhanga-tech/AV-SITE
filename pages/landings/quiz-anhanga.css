@@ -398,7 +398,6 @@
 .quiz-opt--pills {
   border-radius: 9999px;
   padding: 16px 28px 16px 30px;
-  min-height: 48px;
   display: inline-flex;
   flex-direction: row;
   align-items: center;
