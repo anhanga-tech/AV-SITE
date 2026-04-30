@@ -876,7 +876,7 @@ export default function QuizAnhangaLanding() {
         const profile = TRAVELER_PROFILES[pKey];
         const mainDest = selectMainDestination(pKey, answers.destino ?? []);
 
-        const firstName = form.nome.trim();
+        const firstName = form.nome.trim().split(/\s+/)[0] || 'Viajante';
         const lastName = form.sobrenome.trim();
         const bantSummary = `Quiz Anhangá · Perfil: ${profile.name} · Destino: ${mainDest.name} · ${buildAnswersSummary(answers)}`;
 
