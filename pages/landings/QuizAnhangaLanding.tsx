@@ -32,27 +32,28 @@ const QUIZ_QUESTIONS: QuizQuestion[] = [
         subtitle: 'Pode escolher mais de um.',
         multi: true,
         options: [
-            { id: 'europa',         label: 'Cafés de esquina, mercado de pulgas, museu que você descobriu por acidente' },
-            { id: 'america-norte',  label: 'Parques nacionais, cidades que não param, estrada aberta' },
-            { id: 'latam',          label: 'Sabores que não existem em outro lugar, festas que começam de madrugada, natureza que ainda assusta' },
-            { id: 'caribe',         label: 'Areia branca, água transparente, nenhum compromisso no dia' },
-            { id: 'asia',           label: 'Templos, mercados barulhentos, a sensação de que você não entende nada e está tudo bem' },
-            { id: 'africa-oriente', label: 'Savana, deserto, civilizações com mais camadas do que qualquer guia consegue explicar' },
-            { id: 'surpresa',       label: 'Ainda não sei, pode ser qualquer um desses' },
+            { id: 'europa',         label: 'Europa',           hint: 'Cidades, vinho, história',      emoji: 'EU' },
+            { id: 'america-norte',  label: 'América do Norte', hint: 'Parques, road trips, NY',       emoji: 'NA' },
+            { id: 'latam',          label: 'América Latina',   hint: 'Cultura viva, vizinho querido', emoji: 'LA' },
+            { id: 'caribe',         label: 'Caribe',           hint: 'Águas turquesa, ilha em ilha',  emoji: 'CA' },
+            { id: 'asia',           label: 'Ásia',             hint: 'Templos, mercado, sushi',       emoji: 'AS' },
+            { id: 'africa-oriente', label: 'África & Oriente', hint: 'Deserto, safari, culturas',     emoji: 'AF' },
+            { id: 'surpresa',       label: 'Me surpreenda!',   hint: 'Pode ser qualquer coisa',       emoji: '?' },
         ],
     },
     {
         id: 'cena',
         eyebrow: 'Pergunta 02',
-        title: 'Em qual dessas cenas você se enxerga?',
+        title: 'Qual cena de viagem mais combina com você?',
+        subtitle: 'Escolha a que mais te representa.',
         multi: false,
         options: [
-            { id: 'aventura',      label: 'Você chegou sem plano fixo. Acabou dormindo numa pousada que não estava no roteiro e foi o melhor da viagem.' },
-            { id: 'familia',       label: 'Toda a família na mesma mesa, num lugar em que ninguém fala português, rindo à toa.' },
-            { id: 'luxo',          label: 'Você se arrumou, desceu pro jantar, e o restaurante tinha uma vista ridícula de boa.' },
-            { id: 'microescapada', label: 'Fim de semana que pareceu uma semana inteira. Você voltou diferente.' },
-            { id: 'natureza',      label: 'A trilha era longa, o pico era alto, e lá em cima você ficou um tempo em silêncio.' },
-            { id: 'wellness',      label: 'Spa, mar calmo, nenhuma notificação. A cabeça desligou de vez.' },
+            { id: 'aventura',      label: 'Aventura & autenticidade', hint: 'Trilhas, locais, fora do mapa' },
+            { id: 'familia',       label: 'Família em movimento',     hint: 'Roteiro pra todas as idades' },
+            { id: 'luxo',          label: 'Luxo & conforto',          hint: 'Hotel incrível, jantar premiado' },
+            { id: 'microescapada', label: 'Microescapada',            hint: '3-4 dias e bora' },
+            { id: 'natureza',      label: 'Natureza & ecoturismo',    hint: 'Florestas, parques, silêncio' },
+            { id: 'wellness',      label: 'Descanso & wellness',      hint: 'Spa, praia, nada na agenda' },
         ],
     },
     {
@@ -61,23 +62,23 @@ const QUIZ_QUESTIONS: QuizQuestion[] = [
         title: 'Com quem você viaja, na maior parte das vezes?',
         multi: false,
         options: [
-            { id: 'solo',      label: 'Sozinho(a). É quando eu realmente descanso.' },
-            { id: 'familia',   label: 'Com a família, filhos incluídos.' },
-            { id: 'parceiro',  label: 'Com parceiro(a) ou alguém próximo.' },
-            { id: 'variado',   label: 'Depende da viagem. Às vezes em grupo, às vezes só.' },
+            { id: 'solo',    label: 'Só eu',         hint: 'Modo livre total' },
+            { id: 'parceiro',label: 'Eu e meu par',  hint: 'A dois' },
+            { id: 'familia', label: 'Família',        hint: 'Crianças e/ou pais' },
+            { id: 'variado', label: 'Turma variada', hint: 'Amigos, grupos, quanto mais melhor' },
         ],
     },
     {
         id: 'frustracao',
         eyebrow: 'Pergunta 04',
-        title: 'O que faz você chegar em casa pensando "não valeu"?',
+        title: 'O que mais te frustra em uma viagem?',
         multi: false,
         options: [
-            { id: 'sem-liberdade', label: 'Roteiro lotado, horário pra tudo, nenhuma hora sobrando.' },
-            { id: 'multidao',      label: 'Lugar bonito, mas cheio de gente demais. Perdeu o ponto.' },
-            { id: 'hotel-ruim',    label: 'Hotel que não entregou o que prometia.' },
-            { id: 'genericas',     label: 'Comida sem graça e experiências genéricas de turista.' },
-            { id: 'caro-demais',   label: 'Gastar mais do que o planejado e voltar com a sensação de que não era pra tanto.' },
+            { id: 'sem-liberdade', label: 'Roteiro engessado',  hint: 'Sem espaço pra improvisar' },
+            { id: 'multidao',      label: 'Multidão',           hint: 'Turistada, filas, selfie stick' },
+            { id: 'hotel-ruim',    label: 'Hospedagem ruim',    hint: 'Conforto abaixo do esperado' },
+            { id: 'genericas',     label: 'Atrações genéricas', hint: 'Mesmo de sempre, sem surpresa' },
+            { id: 'caro-demais',   label: 'Custo alto demais',  hint: 'Não cabe no bolso' },
         ],
     },
     {
@@ -98,10 +99,10 @@ const QUIZ_QUESTIONS: QuizQuestion[] = [
         title: 'Como você organiza uma viagem antes de sair?',
         multi: false,
         options: [
-            { id: 'planejado',      label: 'Roteiro fechado. Sei o que faço em cada dia, cada horário.' },
-            { id: 'semi-planejado', label: 'Tenho os pontos principais reservados. O resto decido lá.' },
-            { id: 'quase-livre',    label: 'Chego com hotel da primeira noite. O resto é improviso.' },
-            { id: 'livre',          label: 'Quanto menos planejado, melhor. A viagem acontece sozinha.' },
+            { id: 'planejado',       label: 'Tudo planejado',    hint: 'Roteiro fechado, sem improviso' },
+            { id: 'semi-planejado',  label: 'Semi-planejado',    hint: 'Base definida, liberdade no meio' },
+            { id: 'quase-livre',     label: 'Quase livre',       hint: 'Só hotel reservado, o resto vejo lá' },
+            { id: 'livre',           label: 'Totalmente livre',  hint: 'Decido tudo na hora' },
         ],
     },
 ];
@@ -122,151 +123,140 @@ interface TravelerProfile {
     destinations: TravelerDestination[];
 }
 
-type ProfileKey = 'aventureiro' | 'contemplativo' | 'cultural' | 'praiano' | 'familia' | 'sibarita';
+type ProfileKey = 'escapista' | 'bon-vivant' | 'viajante-de-verdade' | 'desbravador' | 'nomade-de-alma';
 
 // imageKey maps to: https://media.anhanga.tur.br/{imageKey}.webp
 const TRAVELER_PROFILES: Record<ProfileKey, TravelerProfile> = {
-    aventureiro: {
-        name: 'Aventureiro',
-        tagline: 'Você troca lobby por trilha sem pensar duas vezes.',
-        description: 'Seu mapa tem mais picos que praias. Procura o local, a comida que ninguém indicou, a história que só quem foi sabe contar. A Anhangá tem gente que viveu esses lugares — e sabe quando te empurrar pro próximo desafio.',
+    'escapista': {
+        name: 'Escapista',
+        tagline: 'Você quer sair da rotina — sem sair da zona de conforto.',
+        description: 'Praia, resort, tudo incluído e nem uma preocupação para gerenciar. Sua viagem ideal é aquela em que você desembarca e só precisa decidir se quer sol ou sombra. A Anhangá conhece os destinos certos para quem quer descansar de verdade.',
+        color: 'sky',
+        icon: '☀',
+        destinations: [
+            { name: 'Maragogi',        region: 'Alagoas · Brasil',  tag: 'Piscinas naturais',     imageKey: 'maragogi' },
+            { name: 'Riviera Maya',    region: 'México',            tag: 'Resort + praia',        imageKey: 'riviera-maya' },
+            { name: 'Costa do Sauípe', region: 'Bahia · Brasil',    tag: 'All-inclusive + praia', imageKey: 'sauipe' },
+        ],
+    },
+    'bon-vivant': {
+        name: 'Bon Vivant',
+        tagline: 'Você viaja pra curtir a boa vida — com estilo.',
+        description: 'Hotel com vista, jantar em restaurante premiado, um roteiro que combina o melhor da gastronomia, cultura e conforto. Você não abre mão de qualidade, mas também curte explorar. A Anhangá monta o itinerário perfeito para quem sabe viver bem.',
+        color: 'yellow',
+        icon: '◆',
+        destinations: [
+            { name: 'Buenos Aires', region: 'Argentina',   tag: 'Gastronomia + cultura', imageKey: 'buenos-aires' },
+            { name: 'Lisboa',       region: 'Portugal',    tag: 'Bairro + fado',         imageKey: 'lisboa' },
+            { name: 'Gramado',      region: 'RS · Brasil', tag: 'Charme + gastronomia',  imageKey: 'gramado' },
+        ],
+    },
+    'viajante-de-verdade': {
+        name: 'Viajante de Verdade',
+        tagline: 'Você equilibra conforto e descoberta com maestria.',
+        description: 'Nem tudo planejado, nem totalmente improvisado. Você curte um bom hotel, mas também embica pela rua sem destino e acha o melhor restaurante da cidade assim. A Anhangá adora montar roteiros para quem quer o melhor dos dois mundos.',
+        color: 'emerald',
+        icon: '✦',
+        destinations: [
+            { name: 'Cartagena', region: 'Colômbia',        tag: 'Histórico + praias',   imageKey: 'cartagena' },
+            { name: 'Chapada',   region: 'Bahia · Brasil',  tag: 'Cachoeiras + trilhas', imageKey: 'chapada' },
+            { name: 'Santiago',  region: 'Chile',           tag: 'Cidade + vinhedo',     imageKey: 'santiago' },
+        ],
+    },
+    'desbravador': {
+        name: 'Desbravador',
+        tagline: 'Você vai além do roteiro e volta com história pra contar.',
+        description: 'Trilhas, cidades pouco visitadas, contato com a cultura local de verdade. Você não tem medo de sair do mapa — e é aí que estão as melhores memórias. A Anhangá tem especialistas que conhecem os destinos que você ainda não descobriu.',
         color: 'orange',
         icon: '⛰',
         destinations: [
-            { name: 'Patagônia',  region: 'Argentina · Chile', tag: 'Trilha + glaciar',    imageKey: 'patagonia' },
-            { name: 'Marrocos',   region: 'África do Norte',   tag: 'Deserto + medina',    imageKey: 'marrocos' },
-            { name: 'Chapada',    region: 'Bahia · Brasil',    tag: 'Cachoeira + cerrado', imageKey: 'chapada' },
+            { name: 'Patagônia',           region: 'Argentina · Chile', tag: 'Trilha + glaciar',  imageKey: 'patagonia' },
+            { name: 'Lençóis Maranhenses', region: 'MA · Brasil',       tag: 'Dunas + lagoas',    imageKey: 'lencois' },
+            { name: 'Peru & Machu Picchu', region: 'Peru',              tag: 'Ruínas + aventura', imageKey: 'machu-picchu' },
         ],
     },
-    contemplativo: {
-        name: 'Contemplativo',
-        tagline: 'Você viaja pra desacelerar, não pra colecionar carimbo.',
-        description: 'Prefere uma manhã longa de café numa varanda do que três cidades em três dias. Busca silêncio, vista e gente sem pressa. A Anhangá curadora pousadas onde o wi-fi é fraquinho de propósito.',
-        color: 'emerald',
+    'nomade-de-alma': {
+        name: 'Nômade de Alma',
+        tagline: 'O mundo é o seu quintal — e você ainda não viu tudo.',
+        description: 'Você quer o que poucos ousam: destinos diferentes, experiências únicas, total liberdade. O roteiro é um ponto de partida, não um manual. A Anhangá tem consultores que já viajaram para os lugares mais improváveis — e sabem como te mandar pra lá.',
+        color: 'blue',
         icon: '◐',
         destinations: [
-            { name: 'Toscana',  region: 'Itália',          tag: 'Vinho + colina', imageKey: 'toscana' },
-            { name: 'Bali',     region: 'Indonésia',       tag: 'Arrozal + spa',  imageKey: 'bali' },
-            { name: 'Trancoso', region: 'Bahia · Brasil',  tag: 'Quadrado + mar', imageKey: 'trancoso' },
-        ],
-    },
-    cultural: {
-        name: 'Curioso Cultural',
-        tagline: 'Você lê o cardápio inteiro antes de pedir — e faz o mesmo com a cidade.',
-        description: 'Museu de manhã, mercado à tarde, restaurante de bairro à noite. Quer entender o lugar, não só ver. A Anhangá monta dia-a-dia com guia que conversa, não que recita.',
-        color: 'blue',
-        icon: '✦',
-        destinations: [
-            { name: 'Lisboa',           region: 'Portugal', tag: 'Bairro + fado', imageKey: 'lisboa' },
-            { name: 'Cidade do México', region: 'México',   tag: 'Arte + tacos',  imageKey: 'cdmx' },
-            { name: 'Quioto',           region: 'Japão',    tag: 'Templo + chá',  imageKey: 'quioto' },
-        ],
-    },
-    praiano: {
-        name: 'Praiano de Alma',
-        tagline: 'Pé na areia é onde sua mente desliga.',
-        description: 'A viagem ideal tem som de onda no fundo. Quer um lugar bonito, água que valha a pena entrar, e jantar com vista pro pôr-do-sol. A Anhangá conhece a praia certa pro seu ritmo — sem turistada.',
-        color: 'sky',
-        icon: '~',
-        destinations: [
-            { name: 'Maragogi', region: 'Alagoas · Brasil',  tag: 'Piscina natural',    imageKey: 'maragogi' },
-            { name: 'Aruba',    region: 'Caribe',            tag: 'Vento + areia branca', imageKey: 'aruba' },
-            { name: 'Maldivas', region: 'Oceano Índico',     tag: 'Bangalô + recife',   imageKey: 'maldivas' },
-        ],
-    },
-    familia: {
-        name: 'Família em Movimento',
-        tagline: 'Viajar com os seus é diversão pra todo mundo, inclusive você.',
-        description: 'Quer um roteiro que funciona pra criança, pra avó e pra você também. Atividade pra todo mundo, hora de descanso, e nada de "espera aí, mais 30 minutinhos". A Anhangá calibra cada dia pra família inteira voltar feliz.',
-        color: 'yellow',
-        icon: '♥',
-        destinations: [
-            { name: 'Orlando',         region: 'EUA',            tag: 'Parque + temático', imageKey: 'orlando' },
-            { name: 'Bariloche',       region: 'Argentina',      tag: 'Neve + lago',       imageKey: 'bariloche' },
-            { name: 'Costa do Sauípe', region: 'Bahia · Brasil', tag: 'Resort + criança',  imageKey: 'sauipe' },
-        ],
-    },
-    sibarita: {
-        name: 'Sibarita',
-        tagline: 'A viagem é um spa contínuo — e você merece.',
-        description: 'Quer suíte com vista, jantar premiado, hora de spa, transfer privativo. Não é luxo gratuito — é tempo bem cuidado. A Anhangá tem a hotelaria que a gente já dormiu, e sabe o quarto certo pra pedir.',
-        color: 'emerald',
-        icon: '◆',
-        destinations: [
-            { name: 'Provence', region: 'França',        tag: 'Château + lavanda', imageKey: 'provence' },
-            { name: 'Mendoza',  region: 'Argentina',     tag: 'Vinho + vinhedo',   imageKey: 'mendoza' },
-            { name: 'Maldivas', region: 'Oceano Índico', tag: 'Bangalô + spa',     imageKey: 'maldivas' },
+            { name: 'Japão',    region: 'Ásia',            tag: 'Templo + trem-bala',  imageKey: 'quioto' },
+            { name: 'Marrocos', region: 'África do Norte', tag: 'Deserto + medina',    imageKey: 'marrocos' },
+            { name: 'Pantanal', region: 'MT/MS · Brasil',  tag: 'Onças + natureza',    imageKey: 'pantanal' },
         ],
     },
 };
 
 type QuizAnswers = Record<string, string[]>;
 
-function matchProfile(answers: QuizAnswers): ProfileKey {
-    const cena = answers.cena?.[0];
-    const ritmo = answers.ritmo?.[0];
-    const comp = answers.companhia?.[0];
-    const frustracao = answers.frustracao?.[0];
-    const destinos = answers.destino ?? [];
+// Score table: Plog psicocentricity model — P1+P2+P3+P4+P6 (P5/quando is BANT, excluded)
+// Keys here must match question IDs in QUIZ_QUESTIONS; missing IDs fall back to NEUTRAL_SCORE.
+const SCORES: Record<string, Record<string, number>> = {
+    destino: {
+        'europa': 3, 'america-norte': 3, 'latam': 4,
+        'caribe': 1, 'asia': 5, 'africa-oriente': 5, 'surpresa': 3,
+    },
+    cena: {
+        'aventura': 5, 'familia': 2, 'luxo': 2,
+        'microescapada': 3, 'natureza': 4, 'wellness': 1,
+    },
+    companhia: { 'solo': 5, 'familia': 1, 'parceiro': 3, 'variado': 3 },
+    frustracao: {
+        'sem-liberdade': 5, 'multidao': 4, 'hotel-ruim': 2,
+        'genericas': 3, 'caro-demais': 2,
+    },
+    ritmo: { 'planejado': 1, 'semi-planejado': 3, 'quase-livre': 4, 'livre': 5 },
+};
 
-    if (cena === 'familia' || comp === 'familia') return 'familia';
-    if (cena === 'luxo' || cena === 'wellness' || frustracao === 'hotel-ruim') return 'sibarita';
-    if (destinos.includes('caribe')) return 'praiano';
-    if (cena === 'aventura' || cena === 'natureza' || ritmo === 'livre' || ritmo === 'quase-livre' || frustracao === 'sem-liberdade') return 'aventureiro';
-    if (cena === 'microescapada' || frustracao === 'genericas') return 'cultural';
-    if (ritmo === 'planejado' || frustracao === 'multidao' || frustracao === 'caro-demais') return 'contemplativo';
-    return 'cultural';
+const NEUTRAL_SCORE = 3;
+
+const SUMMARY_LABELS: Record<string, Record<string, string>> = {
+    destino: {
+        'europa': 'Europa', 'america-norte': 'América do Norte', 'latam': 'América Latina',
+        'caribe': 'Caribe', 'asia': 'Ásia', 'africa-oriente': 'África & Oriente', 'surpresa': 'Surpresa',
+    },
+    cena: {
+        'aventura': 'Aventura', 'familia': 'Família', 'luxo': 'Luxo',
+        'microescapada': 'Microescapada', 'natureza': 'Natureza', 'wellness': 'Wellness',
+    },
+    companhia: { 'solo': 'Solo', 'parceiro': 'Casal', 'familia': 'Família', 'variado': 'Grupo' },
+    frustracao: {
+        'sem-liberdade': 'Roteiro engessado', 'multidao': 'Multidão',
+        'hotel-ruim': 'Hospedagem ruim', 'genericas': 'Atrações genéricas', 'caro-demais': 'Custo alto',
+    },
+    horizonte: { 'budget': 'Dinheiro', 'tempo': 'Tempo', 'companhia': 'Companhia', 'destino': 'Destino indefinido' },
+    ritmo: {
+        'planejado': 'Planejado', 'semi-planejado': 'Semi-planejado',
+        'quase-livre': 'Quase livre', 'livre': 'Livre',
+    },
+};
+
+function scoreField(fieldScores: Record<string, number>, selected: string[]): number {
+    if (!selected.length) return 0;
+    const total = selected.reduce((sum, id) => sum + (fieldScores[id] ?? NEUTRAL_SCORE), 0);
+    return Math.round(total / selected.length);
+}
+
+function matchProfile(answers: QuizAnswers): ProfileKey {
+    const score = Object.keys(SCORES).reduce(
+        (sum, field) => sum + scoreField(SCORES[field], answers[field] ?? []),
+        0,
+    );
+
+    if (score <= 9)  return 'escapista';
+    if (score <= 13) return 'bon-vivant';
+    if (score <= 17) return 'viajante-de-verdade';
+    if (score <= 21) return 'desbravador';
+    return 'nomade-de-alma';
 }
 
 function buildAnswersSummary(answers: QuizAnswers): string {
-    const labels: Record<string, Record<string, string>> = {
-        destino: {
-            europa: 'Europa',
-            'america-norte': 'América do Norte',
-            latam: 'América Latina',
-            caribe: 'Caribe',
-            asia: 'Ásia',
-            'africa-oriente': 'África e Oriente',
-            surpresa: 'Surpresa',
-        },
-        cena: {
-            aventura: 'Aventura sem plano fixo',
-            familia: 'Família reunida',
-            luxo: 'Jantar com vista',
-            microescapada: 'Microescapada',
-            natureza: 'Trilha e natureza',
-            wellness: 'Wellness',
-        },
-        companhia: {
-            solo: 'Solo',
-            familia: 'Família',
-            parceiro: 'Parceiro(a)',
-            variado: 'Variado',
-        },
-        frustracao: {
-            'sem-liberdade': 'Sem liberdade',
-            multidao: 'Multidão',
-            'hotel-ruim': 'Hotel ruim',
-            genericas: 'Experiências genéricas',
-            'caro-demais': 'Caro demais',
-        },
-        horizonte: {
-            budget: 'Budget',
-            tempo: 'Tempo',
-            companhia: 'Companhia',
-            destino: 'Destino indefinido',
-        },
-        ritmo: {
-            planejado: 'Planejado',
-            'semi-planejado': 'Semi-planejado',
-            'quase-livre': 'Quase livre',
-            livre: 'Livre',
-        },
-    };
     return Object.entries(answers)
         .filter(([, sel]) => sel?.length)
         .map(([qId, sel]) => {
-            const map = labels[qId];
+            const map = SUMMARY_LABELS[qId];
             if (!map) return null;
             return sel.map((id) => map[id] ?? id).join(', ');
         })
