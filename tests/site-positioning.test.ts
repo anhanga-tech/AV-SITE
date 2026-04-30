@@ -6,7 +6,6 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const POSITIONING_CONTENT_PATHS = [
-  'Anhangá Viagens Design System/README.md',
   'PLANO-SEO-2026.md',
   'QWEN.md',
   'TODO.MD',
@@ -53,8 +52,19 @@ async function collectTextFiles(targetPath: string): Promise<string[]> {
   return nestedFiles.flat();
 }
 
+async function collectDesignSystemReadmes(): Promise<string[]> {
+  const entries = await readdir(ROOT_DIR, { withFileTypes: true });
+
+  return entries
+    .filter((entry) => entry.isDirectory() && entry.name.endsWith('Design System'))
+    .map((entry) => path.join(ROOT_DIR, entry.name, 'README.md'));
+}
+
 test('site positioning content does not use boutique agency positioning', async () => {
-  const files = (await Promise.all(POSITIONING_CONTENT_PATHS.map(collectTextFiles))).flat();
+  const files = [
+    ...(await Promise.all(POSITIONING_CONTENT_PATHS.map(collectTextFiles))).flat(),
+    ...(await collectDesignSystemReadmes()),
+  ];
   const matches = (
     await Promise.all(
       files.map(async (file) => {
