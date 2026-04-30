@@ -17,3 +17,7 @@
 ## 2026-04-22 - Managing Floating UI Component Collisions
 **Learning:** In applications with multiple persistent floating widgets (like AI Chat drawers and Back-to-Top buttons), simple absolute positioning can lead to "UI Stacking" where elements overlap, rendering one or both inaccessible. Coordinating responsive offsets (e.g., using `bottom-32` on one element when another is present at `bottom-8`) is necessary to maintain a clear visual hierarchy and usability across screen sizes.
 **Action:** When adding new floating elements, audit existing sticky/fixed components and implement conditional or responsive spacing to prevent overlap, especially on mobile where screen real estate is limited.
+
+## 2026-04-29 - Transitioning from Blocking Alerts to State-Driven Feedback
+**Learning:** Browser native `alert()` calls are disruptive and break the user's immersion. Replacing them with state-driven inline error messages, combined with 'medium' haptic feedback, provides a more modern and integrated experience. Using `role="alert"` ensures accessibility, while tactile feedback on both failure and success paths reinforces the user's actions.
+**Action:** Avoid native `alert()` for validation; use integrated UI components with animations for error feedback and leverage haptics to provide a "physical" feel to interactions.
