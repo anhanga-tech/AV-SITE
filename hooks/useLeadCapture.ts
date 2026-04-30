@@ -244,9 +244,11 @@ function isPreparedSubmitLeadRequest(value: LeadDraftPartial | SubmitLeadRequest
     );
 }
 
+export type LeadFormType = 'ai_chatbot_lead' | 'event_lead';
+
 export function pushGenerateLeadDataLayerEvent(
     payload: SubmitLeadRequest,
-    formType: string = 'ai_chatbot_lead',
+    formType: LeadFormType = 'ai_chatbot_lead',
 ): void {
     if (typeof window === 'undefined' || !window.dataLayer || !payload.event_id) {
         return;
@@ -391,7 +393,7 @@ export function useLeadCapture() {
         options: {
             eventId?: string;
             pushDataLayerEvent?: boolean;
-            formType?: string;
+            formType?: LeadFormType;
         } = {},
     ): Promise<SubmitLeadHookResult> => {
         setError(null);
