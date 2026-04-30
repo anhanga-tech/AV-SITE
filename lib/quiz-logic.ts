@@ -28,6 +28,10 @@ export function validateQuizPayload(
 
     const whatsapp = normalizeWhatsappNumber(raw.whatsapp) ?? undefined;
 
+    const destinos = Array.isArray(raw.destinos)
+        ? raw.destinos.filter((d): d is string => typeof d === 'string').slice(0, 10)
+        : [];
+
     const utms = normalizeUtms(raw.utms);
     const tracking = normalizeTracking(raw.tracking, utms);
 
@@ -41,6 +45,7 @@ export function validateQuizPayload(
             profileName,
             bantSummary,
             sourcePage,
+            destinos,
             utms,
             tracking,
         },

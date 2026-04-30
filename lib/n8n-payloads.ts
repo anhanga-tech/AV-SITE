@@ -145,6 +145,7 @@ export interface N8nQuizPayload {
         profileName: string;
         bantSummary: string;
         sourcePage: string;
+        destinos: string[];
     };
     utms: SubmitQuizRequest['utms'];
     tracking: SubmitQuizRequest['tracking'];
@@ -165,6 +166,7 @@ export function buildN8nQuizPayload(payload: SubmitQuizRequest, requestId: strin
             profileName: payload.profileName,
             bantSummary: payload.bantSummary,
             sourcePage: payload.sourcePage,
+            destinos: payload.destinos ?? [],
         },
         utms: payload.utms,
         tracking: payload.tracking,
