@@ -3,6 +3,12 @@ import { SEO } from '../../components/SEO';
 import { useQuizCapture } from '../../hooks/useQuizCapture';
 import { getWhatsAppLink } from '../../utils/whatsapp';
 import { matchProfile, type ProfileKey } from '../../lib/quiz-scoring';
+import {
+    selectMainDestination,
+    selectInspirationDestinations,
+    type MainDestination,
+    type InspirationDestination,
+} from '../../lib/quiz-destinations';
 import './quiz-anhanga.css';
 
 /* ==========================================================================
@@ -108,23 +114,14 @@ const QUIZ_QUESTIONS: QuizQuestion[] = [
     },
 ];
 
-interface TravelerDestination {
-    name: string;
-    region: string;
-    tag: string;
-    imageKey: string;
-}
-
 interface TravelerProfile {
     name: string;
     tagline: string;
     description: string;
     color: 'orange' | 'emerald' | 'blue' | 'sky' | 'yellow';
     icon: string;
-    destinations: TravelerDestination[];
 }
 
-// imageKey maps to: https://media.anhanga.tur.br/{imageKey}.webp
 const TRAVELER_PROFILES: Record<ProfileKey, TravelerProfile> = {
     'escapista': {
         name: 'Escapista',
@@ -132,11 +129,6 @@ const TRAVELER_PROFILES: Record<ProfileKey, TravelerProfile> = {
         description: 'Praia, resort, tudo incluído e nem uma preocupação para gerenciar. Sua viagem ideal é aquela em que você desembarca e só precisa decidir se quer sol ou sombra. A Anhangá conhece os destinos certos para quem quer descansar de verdade.',
         color: 'sky',
         icon: '☀',
-        destinations: [
-            { name: 'Maragogi',        region: 'Alagoas · Brasil',  tag: 'Piscinas naturais',     imageKey: 'maragogi' },
-            { name: 'Riviera Maya',    region: 'México',            tag: 'Resort + praia',        imageKey: 'riviera-maya' },
-            { name: 'Costa do Sauípe', region: 'Bahia · Brasil',    tag: 'All-inclusive + praia', imageKey: 'sauipe' },
-        ],
     },
     'bon-vivant': {
         name: 'Bon Vivant',
@@ -144,11 +136,6 @@ const TRAVELER_PROFILES: Record<ProfileKey, TravelerProfile> = {
         description: 'Hotel com vista, jantar em restaurante premiado, um roteiro que combina o melhor da gastronomia, cultura e conforto. Você não abre mão de qualidade, mas também curte explorar. A Anhangá monta o itinerário perfeito para quem sabe viver bem.',
         color: 'yellow',
         icon: '◆',
-        destinations: [
-            { name: 'Buenos Aires', region: 'Argentina',   tag: 'Gastronomia + cultura', imageKey: 'buenos-aires' },
-            { name: 'Lisboa',       region: 'Portugal',    tag: 'Bairro + fado',         imageKey: 'lisboa' },
-            { name: 'Gramado',      region: 'RS · Brasil', tag: 'Charme + gastronomia',  imageKey: 'gramado' },
-        ],
     },
     'viajante-de-verdade': {
         name: 'Viajante de Verdade',
@@ -156,11 +143,6 @@ const TRAVELER_PROFILES: Record<ProfileKey, TravelerProfile> = {
         description: 'Nem tudo planejado, nem totalmente improvisado. Você curte um bom hotel, mas também embica pela rua sem destino e acha o melhor restaurante da cidade assim. A Anhangá adora montar roteiros para quem quer o melhor dos dois mundos.',
         color: 'emerald',
         icon: '✦',
-        destinations: [
-            { name: 'Cartagena', region: 'Colômbia',        tag: 'Histórico + praias',   imageKey: 'cartagena' },
-            { name: 'Chapada',   region: 'Bahia · Brasil',  tag: 'Cachoeiras + trilhas', imageKey: 'chapada' },
-            { name: 'Santiago',  region: 'Chile',           tag: 'Cidade + vinhedo',     imageKey: 'santiago' },
-        ],
     },
     'desbravador': {
         name: 'Desbravador',
@@ -168,11 +150,6 @@ const TRAVELER_PROFILES: Record<ProfileKey, TravelerProfile> = {
         description: 'Trilhas, cidades pouco visitadas, contato com a cultura local de verdade. Você não tem medo de sair do mapa — e é aí que estão as melhores memórias. A Anhangá tem especialistas que conhecem os destinos que você ainda não descobriu.',
         color: 'orange',
         icon: '⛰',
-        destinations: [
-            { name: 'Patagônia',           region: 'Argentina · Chile', tag: 'Trilha + glaciar',  imageKey: 'patagonia' },
-            { name: 'Lençóis Maranhenses', region: 'MA · Brasil',       tag: 'Dunas + lagoas',    imageKey: 'lencois' },
-            { name: 'Peru & Machu Picchu', region: 'Peru',              tag: 'Ruínas + aventura', imageKey: 'machu-picchu' },
-        ],
     },
     'nomade-de-alma': {
         name: 'Nômade de Alma',
@@ -180,11 +157,6 @@ const TRAVELER_PROFILES: Record<ProfileKey, TravelerProfile> = {
         description: 'Você quer o que poucos ousam: destinos diferentes, experiências únicas, total liberdade. O roteiro é um ponto de partida, não um manual. A Anhangá tem consultores que já viajaram para os lugares mais improváveis — e sabem como te mandar pra lá.',
         color: 'blue',
         icon: '◐',
-        destinations: [
-            { name: 'Japão',    region: 'Ásia',            tag: 'Templo + trem-bala',  imageKey: 'quioto' },
-            { name: 'Marrocos', region: 'África do Norte', tag: 'Deserto + medina',    imageKey: 'marrocos' },
-            { name: 'Pantanal', region: 'MT/MS · Brasil',  tag: 'Onças + natureza',    imageKey: 'pantanal' },
-        ],
     },
 };
 
@@ -610,14 +582,10 @@ function Confetti({ active }: { active: boolean }) {
 
 const QUIZ_IMG_BASE = 'https://media.anhanga.tur.br';
 
-function getPolaroidImage(imageKey: string): string {
-    return `${QUIZ_IMG_BASE}/${imageKey}.webp`;
-}
-
-function Polaroid({ dest, index }: { dest: TravelerDestination; index: number }) {
+function Polaroid({ dest, index }: { dest: InspirationDestination; index: number }) {
     const tilts = [-2.4, 1.6, -1.2, 2, -1.8];
     const tilt = tilts[index % tilts.length];
-    const imgSrc = getPolaroidImage(dest.imageKey);
+    const imgSrc = `${QUIZ_IMG_BASE}/${dest.imageKey}.webp`;
 
     return (
         <div
@@ -645,16 +613,32 @@ function Polaroid({ dest, index }: { dest: TravelerDestination; index: number })
 }
 
 /* ==========================================================================
+   Componente: MainDestCard — destino principal contextualizado
+   ========================================================================== */
+
+function MainDestCard({ dest }: { dest: MainDestination }) {
+    return (
+        <div className="quiz-main-dest-card">
+            <span className="quiz-main-dest-region">{dest.region.toUpperCase()}</span>
+            <strong className="quiz-main-dest-name">{dest.name}</strong>
+            <span className="quiz-main-dest-sub">{dest.subtitle}</span>
+            <span className="quiz-main-dest-tag">{dest.tag}</span>
+        </div>
+    );
+}
+
+/* ==========================================================================
    Componente: WhatsAppUpgrade — passo 2: WhatsApp opcional no resultado
    ========================================================================== */
 
 interface WhatsAppUpgradeProps {
     profileName: string;
+    mainDestName: string;
     firstName: string;
     baseWaUrl: string;
 }
 
-function WhatsAppUpgrade({ profileName, firstName, baseWaUrl }: WhatsAppUpgradeProps) {
+function WhatsAppUpgrade({ profileName, mainDestName, firstName, baseWaUrl }: WhatsAppUpgradeProps) {
     const [phone, setPhone] = useState('');
     const [submitted, setSubmitted] = useState(false);
 
@@ -671,7 +655,7 @@ function WhatsAppUpgrade({ profileName, firstName, baseWaUrl }: WhatsAppUpgradeP
 
     const waUrl = isValid && submitted
         ? getWhatsAppLink(
-            `Oi! Sou ${firstName} e meu perfil é ${profileName}. Bora montar minha viagem?`,
+            `Oi! Sou ${firstName}. Meu perfil é ${profileName} e meu próximo destino pode ser ${mainDestName}. Bora planejar essa viagem?`,
             { appendTrackingRef: true },
           )
         : baseWaUrl;
@@ -736,13 +720,15 @@ function WhatsAppUpgrade({ profileName, firstName, baseWaUrl }: WhatsAppUpgradeP
 
 interface ResultScreenProps {
     profile: TravelerProfile;
+    mainDest: MainDestination;
+    inspirations: InspirationDestination[];
     lead: LeadForm;
     onRestart: () => void;
     baseWaUrl: string;
     submitFailed: boolean;
 }
 
-function ResultScreen({ profile, lead, onRestart, baseWaUrl, submitFailed }: ResultScreenProps) {
+function ResultScreen({ profile, mainDest, inspirations, lead, onRestart, baseWaUrl, submitFailed }: ResultScreenProps) {
     const [reveal, setReveal] = useState(false);
     const firstName = lead.nome.trim().split(/\s+/)[0] || 'Viajante';
 
@@ -779,22 +765,31 @@ function ResultScreen({ profile, lead, onRestart, baseWaUrl, submitFailed }: Res
                     <p className="quiz-result-desc">{profile.description}</p>
                 </div>
 
-                {/* Bloco 3 — destinos */}
-                <div className="quiz-reveal-block" style={{ ['--reveal-delay' as string]: '680ms' }}>
+                {/* Bloco 3 — destino principal */}
+                <div className="quiz-reveal-block" style={{ ['--reveal-delay' as string]: '640ms' }}>
                     <div className="quiz-result-eyebrow quiz-result-eyebrow--mid">
-                        <span className="quiz-pill-soft">DESTINOS QUE COMBINAM</span>
+                        <span className="quiz-pill-soft">SEU PRÓXIMO DESTINO</span>
+                    </div>
+                    <MainDestCard dest={mainDest} />
+                </div>
+
+                {/* Bloco 4 — 3 destinos de inspiração */}
+                <div className="quiz-reveal-block" style={{ ['--reveal-delay' as string]: '800ms' }}>
+                    <div className="quiz-result-eyebrow quiz-result-eyebrow--mid">
+                        <span className="quiz-pill-soft">3 DESTINOS PARA SONHAR</span>
                     </div>
                     <div className="quiz-dest-grid">
-                        {profile.destinations.map((d, i) => (
+                        {inspirations.map((d, i) => (
                             <Polaroid key={d.name} dest={d} index={i} />
                         ))}
                     </div>
                 </div>
 
-                {/* Bloco 4 — upgrade WhatsApp + CTA */}
-                <div className="quiz-reveal-block" style={{ ['--reveal-delay' as string]: '900ms' }}>
+                {/* Bloco 5 — upgrade WhatsApp + CTA */}
+                <div className="quiz-reveal-block" style={{ ['--reveal-delay' as string]: '1000ms' }}>
                     <WhatsAppUpgrade
                         profileName={profile.name}
+                        mainDestName={mainDest.name}
                         firstName={firstName}
                         baseWaUrl={baseWaUrl}
                     />
@@ -803,8 +798,8 @@ function ResultScreen({ profile, lead, onRestart, baseWaUrl, submitFailed }: Res
                     </button>
                 </div>
 
-                {/* Bloco 5 — fineprint + erro de API */}
-                <div className="quiz-reveal-block" style={{ ['--reveal-delay' as string]: '1000ms' }}>
+                {/* Bloco 6 — fineprint + erro de API */}
+                <div className="quiz-reveal-block" style={{ ['--reveal-delay' as string]: '1100ms' }}>
                     {submitFailed ? (
                         <p className="quiz-result-fineprint quiz-result-fineprint--warn">
                             Algo deu errado ao salvar seus dados. Use o WhatsApp acima para garantir o contato.
@@ -862,12 +857,13 @@ export default function QuizAnhangaLanding() {
     async function handleLeadSubmit(form: LeadForm) {
         const pKey = matchProfile(answers);
         const profile = TRAVELER_PROFILES[pKey];
+        const mainDest = selectMainDestination(pKey, answers.destino ?? []);
 
         const names = form.nome.trim().split(/\s+/);
         const firstName = names[0] || form.nome.trim();
-        const bantSummary = `Quiz Anhangá · Perfil: ${profile.name} · ${buildAnswersSummary(answers)}`;
+        const bantSummary = `Quiz Anhangá · Perfil: ${profile.name} · Destino: ${mainDest.name} · ${buildAnswersSummary(answers)}`;
 
-        const waMsg = `Oi! Sou ${form.nome} e descobri no Quiz da Anhangá que sou um(a) ${profile.name}. Bora montar minha viagem?`;
+        const waMsg = `Oi! Sou ${form.nome}. Descobri no Quiz da Anhangá que sou um(a) ${profile.name} e meu próximo destino pode ser ${mainDest.name}. Bora planejar essa viagem?`;
         const waUrl = getWhatsAppLink(waMsg, { appendTrackingRef: true });
 
         // Avança para o resultado imediatamente — API roda em paralelo
@@ -928,9 +924,13 @@ export default function QuizAnhangaLanding() {
             );
         }
         if (stage.kind === 'result' && profileKey && leadForm) {
+            const mainDest = selectMainDestination(profileKey, answers.destino ?? []);
+            const inspirations = selectInspirationDestinations(profileKey);
             return (
                 <ResultScreen
                     profile={TRAVELER_PROFILES[profileKey]}
+                    mainDest={mainDest}
+                    inspirations={inspirations}
                     lead={leadForm}
                     onRestart={restart}
                     baseWaUrl={baseWaUrl}
