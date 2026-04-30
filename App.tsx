@@ -30,6 +30,7 @@ const ViagensParaExecutivosLanding = lazy(() => import('./pages/landings/Viagens
 const CuradoriaCruzeirosBrasilLanding = lazy(() => import('./pages/landings/CuradoriaCruzeirosBrasilLanding'));
 const KeystaticPage = lazy(() => import('./pages/KeystaticPage'));
 const NPS = lazy(() => import('./pages/NPS'));
+const QuizAnhangaLanding = lazy(() => import('./pages/landings/QuizAnhangaLanding'));
 
 const MainRouteFallback: React.FC = () => <section className="min-h-[40vh] bg-white" aria-hidden="true" />;
 const LandingRouteFallback: React.FC = () => <div className="min-h-screen bg-white" aria-hidden="true" />;
@@ -86,6 +87,7 @@ const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClient
           <Route path="/viagens-para-executivos" element={<ViagensParaExecutivosLanding />} />
           <Route path="/curadoria-cruzeiros-brasil" element={<CuradoriaCruzeirosBrasilLanding />} />
           <Route path="/nps" element={<NPS />} />
+          <Route path="/quiz" element={<QuizAnhangaLanding />} />
           <Route path="/*" element={<MainSiteShell />} />
         </Routes>
       </Suspense>
