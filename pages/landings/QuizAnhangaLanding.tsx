@@ -605,7 +605,7 @@ function getPolaroidImage(imageKey: string): string {
     return `${QUIZ_IMG_BASE}/${imageKey}.webp`;
 }
 
-function Polaroid({ dest, index, accent }: { dest: TravelerDestination; index: number; accent: string }) {
+function Polaroid({ dest, index }: { dest: TravelerDestination; index: number }) {
     const tilts = [-2.4, 1.6, -1.2, 2, -1.8];
     const tilt = tilts[index % tilts.length];
     const imgSrc = getPolaroidImage(dest.imageKey);
@@ -777,7 +777,7 @@ function ResultScreen({ profile, lead, onRestart, baseWaUrl, submitFailed }: Res
                     </div>
                     <div className="quiz-dest-grid">
                         {profile.destinations.map((d, i) => (
-                            <Polaroid key={d.name} dest={d} index={i} accent={profile.color} />
+                            <Polaroid key={d.name} dest={d} index={i} />
                         ))}
                     </div>
                 </div>

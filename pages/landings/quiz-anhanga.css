@@ -245,14 +245,12 @@
   font-style: italic;
   transform: scale(var(--cq-scale));
 }
-.quiz-chunky .quiz-ch-letter { display: inline-block; }
+.quiz-chunky .quiz-ch-letter { display: inline-block; animation: qLetterPop 600ms var(--av-ease-spring) both; }
 .quiz-chunky-layered { filter: drop-shadow(2px 2px 0 rgba(15,23,42,0.25)); }
 .quiz-chunky-layered .quiz-ch-front { position: relative; color: white; -webkit-text-stroke: 3px var(--av-dark); }
 .quiz-chunky-layered .quiz-ch-layer { position: absolute; top: 0; left: 0; pointer-events: none; -webkit-text-stroke: 3px var(--av-dark); }
 .quiz-chunky-outline { color: transparent; -webkit-text-stroke: 5px white; }
 .quiz-chunky-solid { color: var(--av-yellow); -webkit-text-stroke: 4px var(--av-dark); text-shadow: 8px 8px 0 var(--av-dark); }
-
-.quiz-chunky .quiz-ch-letter { animation: qLetterPop 600ms var(--av-ease-spring) both; }
 .quiz-chunky .quiz-ch-letter:nth-child(1){ animation-delay: 60ms; }
 .quiz-chunky .quiz-ch-letter:nth-child(2){ animation-delay: 140ms; }
 .quiz-chunky .quiz-ch-letter:nth-child(3){ animation-delay: 220ms; }
@@ -266,6 +264,7 @@
   border: 2px solid var(--av-dark);
   border-radius: 9999px;
   padding: 14px 28px;
+  min-height: 48px;
   font-family: var(--av-font-display);
   font-weight: 800;
   font-size: 15px;
@@ -275,7 +274,7 @@
   transition: transform .2s var(--av-ease-spring), box-shadow .2s ease, background .2s;
   background: none;
 }
-.quiz-btn-lg { padding: 18px 36px; font-size: 17px; }
+.quiz-btn-lg { padding: 18px 36px; font-size: 17px; min-height: 56px; }
 .quiz-btn-primary { background: var(--av-yellow); box-shadow: 4px 4px 0 var(--av-dark); }
 .quiz-btn-primary:hover:not(:disabled) { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--av-dark); background: var(--av-yellow-hover); }
 .quiz-btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
@@ -304,6 +303,8 @@
   border: 2px solid var(--av-dark);
   border-radius: 9999px;
   padding: 8px 18px;
+  min-height: 44px;
+  min-width: 80px;
   font-family: var(--av-font-display);
   font-weight: 700;
   font-size: 13px;
@@ -397,6 +398,7 @@
 .quiz-opt--pills {
   border-radius: 9999px;
   padding: 16px 28px 16px 30px;
+  min-height: 48px;
   display: inline-flex;
   flex-direction: row;
   align-items: center;
@@ -548,7 +550,7 @@
   opacity: 0;
   transition: all .15s var(--av-ease-spring);
 }
-.quiz-check input:checked + .quiz-check-box { background: var(--av-yellow); }
+.quiz-check input:checked + .quiz-check-box { background: var(--av-yellow); animation: qCheckPulse 350ms var(--av-ease-spring); }
 .quiz-check input:checked + .quiz-check-box::after { opacity: 1; transform: translate(-50%,-50%) scale(1); }
 .quiz-check-label { font-size: 13px; color: var(--av-fg-2); line-height: 1.45; }
 .quiz-check-label a { color: var(--av-action); text-decoration: underline; }
@@ -707,6 +709,8 @@
   padding: 12px 12px 18px;
   box-shadow: 8px 8px 0 var(--av-dark);
   transform: rotate(var(--tilt, -2deg));
+  transition: transform 0.28s var(--av-ease-spring), box-shadow 0.28s ease-out;
+  cursor: default;
   animation: qPolDrop 700ms var(--av-ease-spring) both;
   animation-delay: var(--delay, 0ms);
 }
@@ -774,7 +778,7 @@
   90%  { opacity: 1; }
   100% { transform: translate(var(--drift), 100vh) rotate(var(--rot)); opacity: 0; }
 }
-.quiz-conf--paper {}
+/* .quiz-conf--paper uses the default square shape from .quiz-conf */
 .quiz-conf--stars { background: transparent; color: var(--color); font-size: var(--size); line-height: 1; }
 .quiz-conf--balloons { background: var(--color); border-radius: 50%; box-shadow: inset -3px -4px 0 rgba(0,0,0,0.15); }
 .quiz-conf--balloons::after {
@@ -814,6 +818,7 @@
   display: flex;
   align-items: stretch;
   position: relative;
+  aspect-ratio: 4 / 3;
 }
 .quiz-pol-img--photo img {
   width: 100%;
@@ -821,6 +826,7 @@
   object-fit: cover;
   display: block;
   border-radius: 4px;
+  aspect-ratio: 4 / 3;
 }
 
 /* ============== WHATSAPP UPGRADE ============== */
@@ -935,9 +941,6 @@
 }
 
 /* --- Checkbox: pulse ao marcar --- */
-.quiz-check input:checked + .quiz-check-box {
-  animation: qCheckPulse 350ms var(--av-ease-spring);
-}
 @keyframes qCheckPulse {
   0%   { transform: scale(1); }
   45%  { transform: scale(1.22); }
@@ -945,10 +948,6 @@
 }
 
 /* --- Polaroid: lift ao hover (recompensa de descoberta) --- */
-.quiz-polaroid {
-  transition: transform 0.28s var(--av-ease-spring), box-shadow 0.28s ease-out;
-  cursor: default;
-}
 .quiz-polaroid:hover {
   transform: rotate(0deg) translateY(-10px) scale(1.04);
   box-shadow: 14px 18px 0 var(--av-dark);
@@ -991,24 +990,6 @@
   outline-offset: 3px;
 }
 .quiz-screen-hero .quiz-btn:focus-visible { outline-color: white; }
-
-/* ============== TOUCH TARGETS ============== */
-.quiz-opt--pills { min-height: 48px; }
-.quiz-q-back { min-height: 44px; min-width: 80px; }
-.quiz-btn { min-height: 48px; }
-.quiz-btn-lg { min-height: 56px; }
-
-/* ============== POLAROID IMAGE CLS PREVENTION ============== */
-.quiz-pol-img--photo {
-  aspect-ratio: 4 / 3;
-}
-.quiz-pol-img--photo img {
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-}
-
-/* ============== WA INPUT TRANSITION ============== */
-.quiz-wa-input { transition: border-color .2s, box-shadow .2s; }
 
 /* ============== PREFERS REDUCED MOTION ============== */
 @media (prefers-reduced-motion: reduce) {
