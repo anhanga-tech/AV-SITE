@@ -1,8 +1,7 @@
-import { normalizeNullable, normalizeTracking, normalizeUtms } from './lead-logic';
+import { normalizeNullable, normalizeTracking, normalizeUtms, normalizeWhatsappNumber } from './lead-logic';
 import type { SubmitQuizRequest } from '../types/quiz';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const WHATSAPP_MIN_DIGITS = 10;
 
 export function validateQuizPayload(
     payload: unknown,
@@ -27,11 +26,7 @@ export function validateQuizPayload(
         return { valid: false, error: 'Email inválido.' };
     }
 
-    const rawWhatsapp = typeof raw.whatsapp === 'string' ? raw.whatsapp : '';
-    const whatsappDigits = rawWhatsapp.replace(/\D/g, '');
-    const whatsapp = whatsappDigits.length >= WHATSAPP_MIN_DIGITS
-        ? whatsappDigits
-        : undefined;
+    const whatsapp = normalizeWhatsappNumber(raw.whatsapp) ?? undefined;
 
     const utms = normalizeUtms(raw.utms);
     const tracking = normalizeTracking(raw.tracking, utms);

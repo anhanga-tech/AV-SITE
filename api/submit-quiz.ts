@@ -98,10 +98,20 @@ export default async function handler(request: Request): Promise<Response> {
     });
 
     if (!rateLimitResult.allowed) {
-        return buildJsonResponse(
-            { ok: false, requestId, error: 'Muitas tentativas. Aguarde um momento.', code: 'RATE_LIMIT_EXCEEDED' },
-            429,
-            corsHeaders,
+        const retryAfterSec = Math.ceil(rateLimitResult.resetIn / 1000);
+        return new Response(
+            JSON.stringify({ ok: false, requestId, error: 'Muitas tentativas. Aguarde um momento.', code: 'RATE_LIMIT_EXCEEDED' }),
+            {
+                status: 429,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Request-Id': requestId,
+                    'Retry-After': String(retryAfterSec),
+                    'X-RateLimit-Remaining': '0',
+                    'X-RateLimit-Reset': String(Math.ceil((Date.now() + rateLimitResult.resetIn) / 1000)),
+                    ...corsHeaders,
+                },
+            },
         );
     }
 

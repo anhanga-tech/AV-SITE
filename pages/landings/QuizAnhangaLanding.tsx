@@ -362,9 +362,17 @@ interface QuestionScreenProps {
 function QuestionScreen({ q, qIndex, total, value, onChange, onNext, onBack }: QuestionScreenProps) {
     const selected: string[] = value ?? [];
     const [pendingId, setPendingId] = useState<string | null>(null);
+    const advanceTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    // reset pending when question changes
-    useEffect(() => { setPendingId(null); }, [q.id]);
+    // reset pending when question changes and clear any pending timer
+    useEffect(() => {
+        setPendingId(null);
+        return () => {
+            if (advanceTimerRef.current !== null) {
+                clearTimeout(advanceTimerRef.current);
+            }
+        };
+    }, [q.id]);
 
     function toggle(optId: string) {
         if (q.multi) {
@@ -376,7 +384,8 @@ function QuestionScreen({ q, qIndex, total, value, onChange, onNext, onBack }: Q
             onChange([optId]);
             setPendingId(optId);
             // 500ms gives visual confirmation + small undo window before advancing
-            setTimeout(() => {
+            advanceTimerRef.current = setTimeout(() => {
+                advanceTimerRef.current = null;
                 setPendingId(null);
                 onNext();
             }, 500);
