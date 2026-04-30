@@ -2,6 +2,7 @@ import type { LeadTracking, LeadUtms } from './leadCapture';
 
 export interface SubmitQuizRequest {
     firstName: string;
+    lastName: string;
     email: string;
     whatsapp?: string;
     profileKey: string;

@@ -207,6 +207,7 @@ type Stage =
 
 interface LeadForm {
     nome: string;
+    sobrenome: string;
     email: string;
     aceite: boolean;
 }
@@ -432,7 +433,7 @@ interface PreLeadScreenProps {
 }
 
 function PreLeadScreen({ onSubmit, onBack, isSubmitting }: PreLeadScreenProps) {
-    const [form, setForm] = useState<LeadForm>({ nome: '', email: '', aceite: false });
+    const [form, setForm] = useState<LeadForm>({ nome: '', sobrenome: '', email: '', aceite: false });
     const [errors, setErrors] = useState<Partial<Record<keyof LeadForm, string>>>({});
 
     function update<K extends keyof LeadForm>(k: K, v: LeadForm[K]) {
@@ -444,6 +445,7 @@ function PreLeadScreen({ onSubmit, onBack, isSubmitting }: PreLeadScreenProps) {
         e.preventDefault();
         const errs: typeof errors = {};
         if (!form.nome.trim()) errs.nome = 'Conta pra gente seu nome';
+        if (!form.sobrenome.trim()) errs.sobrenome = 'E o sobrenome?';
         if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email)) errs.email = 'E-mail inválido';
         if (!form.aceite) errs.aceite = 'Precisa do aceite pra continuar';
         if (Object.keys(errs).length) { setErrors(errs); return; }
@@ -479,6 +481,21 @@ function PreLeadScreen({ onSubmit, onBack, isSubmitting }: PreLeadScreenProps) {
                             autoComplete="given-name"
                         />
                         {errors.nome && <span className="quiz-err">{errors.nome}</span>}
+                    </div>
+
+                    <div className="quiz-field">
+                        <label htmlFor="quiz-sobrenome">Sobrenome</label>
+                        <input
+                            id="quiz-sobrenome"
+                            type="text"
+                            placeholder="Seu sobrenome"
+                            value={form.sobrenome}
+                            onChange={(e) => update('sobrenome', e.target.value)}
+                            className={errors.sobrenome ? 'has-error' : ''}
+                            disabled={isSubmitting}
+                            autoComplete="family-name"
+                        />
+                        {errors.sobrenome && <span className="quiz-err">{errors.sobrenome}</span>}
                     </div>
 
                     <div className="quiz-field">
@@ -859,8 +876,8 @@ export default function QuizAnhangaLanding() {
         const profile = TRAVELER_PROFILES[pKey];
         const mainDest = selectMainDestination(pKey, answers.destino ?? []);
 
-        const names = form.nome.trim().split(/\s+/);
-        const firstName = names[0] || form.nome.trim();
+        const firstName = form.nome.trim();
+        const lastName = form.sobrenome.trim();
         const bantSummary = `Quiz Anhangá · Perfil: ${profile.name} · Destino: ${mainDest.name} · ${buildAnswersSummary(answers)}`;
 
         const waMsg = `Oi! Sou ${firstName}. Descobri no Quiz da Anhangá que meu perfil é ${profile.name} e meu próximo destino pode ser ${mainDest.name}. Bora planejar essa viagem?`;
@@ -875,6 +892,7 @@ export default function QuizAnhangaLanding() {
 
         const result = await submitQuiz({
             firstName,
+            lastName,
             email: form.email,
             profileKey: pKey,
             profileName: profile.name,
