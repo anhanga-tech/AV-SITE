@@ -7,7 +7,7 @@ const readQuizLanding = (): Promise<string> =>
 
 test('quiz landing should expose the six Plog question fields from FEL-129', async () => {
   const source = await readQuizLanding();
-  const questionIds = [...source.matchAll(/^\s*id: '([^']+)',\n\s*eyebrow: 'Pergunta \d\d'/gm)]
+  const questionIds = [...source.matchAll(/^\s*id:\s*['"]([^'"]+)['"],\r?\n\s*eyebrow:\s*['"]Pergunta \d\d['"]/gm)]
     .map((match) => match[1]);
 
   assert.deepEqual(questionIds, [

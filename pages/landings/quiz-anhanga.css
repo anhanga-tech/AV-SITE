@@ -418,7 +418,7 @@
 .quiz-opt--pills.is-selected { background: var(--av-yellow); box-shadow: 6px 6px 0 var(--av-dark); }
 .quiz-opt--pills .quiz-opt-emoji { display: none; }
 .quiz-opt--pills .quiz-opt-hint { display: none; }
-.quiz-opt--pills .quiz-opt-label { font-size: 16px; font-weight: 700; letter-spacing: -0.005em; color: var(--av-dark); display: block; line-height: 1.25; overflow-wrap: anywhere; }
+.quiz-opt--pills .quiz-opt-label { font-size: 16px; font-weight: 700; letter-spacing: -0.005em; color: var(--av-dark); display: block; line-height: 1.25; overflow-wrap: break-word; }
 .quiz-opt--pills .quiz-opt-check {
   position: static;
   width: 18px; height: 18px;
