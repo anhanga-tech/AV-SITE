@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { SEO } from '../../components/SEO';
 import { useQuizCapture } from '../../hooks/useQuizCapture';
 import { getWhatsAppLink } from '../../utils/whatsapp';
+import { matchProfile, type ProfileKey } from '../../lib/quiz-scoring';
 import './quiz-anhanga.css';
 
 /* ==========================================================================
@@ -123,8 +124,6 @@ interface TravelerProfile {
     destinations: TravelerDestination[];
 }
 
-type ProfileKey = 'escapista' | 'bon-vivant' | 'viajante-de-verdade' | 'desbravador' | 'nomade-de-alma';
-
 // imageKey maps to: https://media.anhanga.tur.br/{imageKey}.webp
 const TRAVELER_PROFILES: Record<ProfileKey, TravelerProfile> = {
     'escapista': {
@@ -191,27 +190,6 @@ const TRAVELER_PROFILES: Record<ProfileKey, TravelerProfile> = {
 
 type QuizAnswers = Record<string, string[]>;
 
-// Score table: Plog psicocentricity model — P1+P2+P3+P4+P6 (P5/quando is BANT, excluded)
-// Keys here must match question IDs in QUIZ_QUESTIONS; missing IDs fall back to NEUTRAL_SCORE.
-const SCORES: Record<string, Record<string, number>> = {
-    destino: {
-        'europa': 3, 'america-norte': 3, 'latam': 4,
-        'caribe': 1, 'asia': 5, 'africa-oriente': 5, 'surpresa': 3,
-    },
-    cena: {
-        'aventura': 5, 'familia': 2, 'luxo': 2,
-        'microescapada': 3, 'natureza': 4, 'wellness': 1,
-    },
-    companhia: { 'solo': 5, 'familia': 1, 'parceiro': 3, 'variado': 3 },
-    frustracao: {
-        'sem-liberdade': 5, 'multidao': 4, 'hotel-ruim': 2,
-        'genericas': 3, 'caro-demais': 2,
-    },
-    ritmo: { 'planejado': 1, 'semi-planejado': 3, 'quase-livre': 4, 'livre': 5 },
-};
-
-const NEUTRAL_SCORE = 3;
-
 const SUMMARY_LABELS: Record<string, Record<string, string>> = {
     destino: {
         'europa': 'Europa', 'america-norte': 'América do Norte', 'latam': 'América Latina',
@@ -232,25 +210,6 @@ const SUMMARY_LABELS: Record<string, Record<string, string>> = {
         'quase-livre': 'Quase livre', 'livre': 'Livre',
     },
 };
-
-function scoreField(fieldScores: Record<string, number>, selected: string[]): number {
-    if (!selected.length) return 0;
-    const total = selected.reduce((sum, id) => sum + (fieldScores[id] ?? NEUTRAL_SCORE), 0);
-    return Math.round(total / selected.length);
-}
-
-function matchProfile(answers: QuizAnswers): ProfileKey {
-    const score = Object.keys(SCORES).reduce(
-        (sum, field) => sum + scoreField(SCORES[field], answers[field] ?? []),
-        0,
-    );
-
-    if (score <= 9)  return 'escapista';
-    if (score <= 13) return 'bon-vivant';
-    if (score <= 17) return 'viajante-de-verdade';
-    if (score <= 21) return 'desbravador';
-    return 'nomade-de-alma';
-}
 
 function buildAnswersSummary(answers: QuizAnswers): string {
     return Object.entries(answers)
