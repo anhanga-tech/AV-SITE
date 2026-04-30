@@ -5,22 +5,25 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PUBLISHED_PATHS = [
+const POSITIONING_CONTENT_PATHS = [
+  'Anhangá Viagens Design System/README.md',
+  'PLANO-SEO-2026.md',
+  'QWEN.md',
+  'TODO.MD',
   'api/markdown.ts',
   'components',
   'content/blog',
+  'competitive-brief-conteudo.md',
   'data/blogManifest.ts',
+  'docs',
   'index.html',
   'pages',
   'public/llms.txt',
   'public/sitemap.xml',
+  'seo-audit-anhanga-viagens.md',
+  'seo-audit-completo-marco-2026.md',
 ];
-const BLOCKED_POSITIONING_PATTERNS = [
-  /\bboutique\b/i,
-  /agencias-boutique-sao-paulo/i,
-  /ag[eê]ncia de viagens boutique/i,
-  /ag[eê]ncia boutique/i,
-];
+const BLOCKED_POSITIONING_PATTERN = /\bboutique\b/i;
 
 async function collectTextFiles(targetPath: string): Promise<string[]> {
   const absolutePath = path.join(ROOT_DIR, targetPath);
@@ -39,7 +42,7 @@ async function collectTextFiles(targetPath: string): Promise<string[]> {
         return collectTextFiles(entryPath);
       }
 
-      if (entry.isFile() && /\.(css|html|mdx|ts|tsx|txt|xml)$/.test(entry.name)) {
+      if (entry.isFile() && /\.(css|html|md|mdx|ts|tsx|txt|xml)$/i.test(entry.name)) {
         return [path.join(ROOT_DIR, entryPath)];
       }
 
@@ -50,20 +53,17 @@ async function collectTextFiles(targetPath: string): Promise<string[]> {
   return nestedFiles.flat();
 }
 
-test('published site content does not use boutique agency positioning', async () => {
-  const files = (await Promise.all(PUBLISHED_PATHS.map(collectTextFiles))).flat();
-  const matches: string[] = [];
+test('site positioning content does not use boutique agency positioning', async () => {
+  const files = (await Promise.all(POSITIONING_CONTENT_PATHS.map(collectTextFiles))).flat();
+  const matches = (
+    await Promise.all(
+      files.map(async (file) => {
+        const content = await readFile(file, 'utf8');
 
-  for (const file of files) {
-    const content = await readFile(file, 'utf8');
-
-    for (const pattern of BLOCKED_POSITIONING_PATTERNS) {
-      if (pattern.test(content)) {
-        matches.push(path.relative(ROOT_DIR, file));
-        break;
-      }
-    }
-  }
+        return BLOCKED_POSITIONING_PATTERN.test(content) ? path.relative(ROOT_DIR, file) : null;
+      }),
+    )
+  ).filter((match): match is string => match !== null);
 
   assert.deepEqual([...new Set(matches)].sort(), []);
 });
