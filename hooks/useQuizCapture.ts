@@ -88,7 +88,7 @@ export function useQuizCapture() {
     }, []);
 
     const submitQuiz = async (
-        input: Pick<SubmitQuizRequest, 'firstName' | 'email' | 'whatsapp' | 'profileKey' | 'profileName' | 'bantSummary'>,
+        input: Pick<SubmitQuizRequest, 'firstName' | 'email' | 'whatsapp' | 'profileKey' | 'profileName' | 'bantSummary' | 'destinos'>,
     ): Promise<SubmitQuizResult> => {
         setError(null);
         setIsSubmitting(true);

@@ -883,6 +883,7 @@ export default function QuizAnhangaLanding() {
             profileKey: pKey,
             profileName: profile.name,
             bantSummary,
+            destinos: answers.destino ?? [],
         });
 
         if (!result.ok) {

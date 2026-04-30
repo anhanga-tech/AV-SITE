@@ -8,6 +8,7 @@ export interface SubmitQuizRequest {
     profileName: string;
     bantSummary: string;
     sourcePage: string;
+    destinos?: string[];
     utms: LeadUtms;
     tracking?: LeadTracking;
 }
