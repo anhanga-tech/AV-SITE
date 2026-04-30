@@ -36,35 +36,12 @@ test('scoreField returns 0 for empty selection', () => {
 // matchProfile — boundary conditions
 // ---------------------------------------------------------------------------
 
-// Builds answers that produce exactly the requested total Plog score.
-// Uses single-choice fields only (P2–P4, P6) plus a single destino pick, for simplicity.
+// Score reference for boundary tests:
 // destino: caribe=1, surpresa=3, latam=4, asia=5
 // cena: wellness=1, familia=2, microescapada=3, natureza=4, aventura=5
 // companhia: familia=1, parceiro=3, variado=3, solo=5
 // frustracao: hotel-ruim=2, caro-demais=2, genericas=3, multidao=4, sem-liberdade=5
 // ritmo: planejado=1, semi-planejado=3, quase-livre=4, livre=5
-
-function answersForScore(target: number): Record<string, string[]> {
-    // Fixed partial: cena=1, companhia=1, frustracao=2, ritmo=1 → base = 5
-    // We vary destino to hit the target (target - 5 + 1 = destino contribution we need).
-    // Available destino: caribe=1, surpresa=3, latam=4, asia=5
-    const base = 1 + 1 + 2 + 1; // 5
-    const needed = target - base;
-    let destino: string;
-    if (needed <= 1) destino = 'caribe';
-    else if (needed <= 3) destino = 'surpresa';
-    else if (needed <= 4) destino = 'latam';
-    else destino = 'asia';
-
-    return {
-        destino: [destino],
-        cena: ['wellness'],
-        companhia: ['familia'],
-        frustracao: ['hotel-ruim'],
-        horizonte: ['budget'], // BANT field — must not affect score
-        ritmo: ['planejado'],
-    };
-}
 
 test('matchProfile returns escapista for score at upper boundary (9)', () => {
     // cena=wellness(1) + companhia=familia(1) + frustracao=hotel-ruim(2) + ritmo=planejado(1) + destino=asia(5) = 10, overshoot
