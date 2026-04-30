@@ -2,7 +2,7 @@
 
 ## Visão Geral
 
-**Anhangá Viagens** é um site institucional moderno para uma agência de viagens boutique brasileira. A plataforma oferece uma experiência completa aos clientes, desde exploração de destinos até planejamento de viagens com auxílio de inteligência artificial.
+**Anhangá Viagens** é um site institucional moderno para uma agência de viagens brasileira com roteiros personalizados. A plataforma oferece uma experiência completa aos clientes, desde exploração de destinos até planejamento de viagens com auxílio de inteligência artificial.
 
 ### Principais Funcionalidades
 

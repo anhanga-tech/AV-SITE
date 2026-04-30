@@ -286,7 +286,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
             Sobre a Anhangá Viagens
           </h2>
           <p className="text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
-            Agência boutique em São Paulo desde 2018, com especialistas em cruzeiros no Brasil e roteiros personalizados. Nota 5.0 no Google e atendimento humano do início ao fim.
+            Agência de viagens em São Paulo desde 2018, com especialistas em cruzeiros no Brasil e roteiros personalizados. Nota 5.0 no Google e atendimento humano do início ao fim.
           </p>
           <div className="mt-12 flex flex-wrap justify-center gap-12">
             {[
@@ -377,7 +377,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
 
       {/* Footer */}
       <footer className="py-8 bg-anhanga-light border-t border-anhanga-blue/10 text-center text-sm text-gray-600">
-        <p>Anhangá Viagens · Agência boutique em São Paulo</p>
+        <p>Anhangá Viagens · Agência de viagens em São Paulo</p>
         <p className="mt-1">Atualizado em abril de 2026</p>
       </footer>
     </div>

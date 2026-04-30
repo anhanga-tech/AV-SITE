@@ -8,7 +8,7 @@ The working design system for **Anhangá Viagens**, a Brazilian-Portuguese conci
 
 > **Anhangá é a agência de viagens que cuida de cada detalhe da sua próxima aventura — no seu tempo, do seu jeito.**
 
-- **Product:** boutique travel agency selling custom itineraries, not packages. There is a sister brand "Anhangá Tech" (see `assets/logo-anhanga-tech.svg`), but this system covers the traveler-facing experience.
+- **Product:** Brazilian travel agency selling custom itineraries, not packages. There is a sister brand "Anhangá Tech" (see `assets/logo-anhanga-tech.svg`), but this system covers the traveler-facing experience.
 - **Language:** 100% **Brazilian Portuguese**. Tone is warm, second-person plural ("a gente", "você"), conversational but precise. Avoid corporate/agency jargon.
 - **Voice pillars:**
   - **Humano** — there's a real person on the other side.

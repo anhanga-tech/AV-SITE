@@ -43,7 +43,7 @@ const VenueMap: React.FC = () => {
       type: 'landmark',
       distance: '18 km',
       time: '45 min',
-      description: "O pulmão verde de SP. Ótimo para um passeio relaxante na manhã pré-festival. A região conta com hotéis boutique de alto padrão.",
+      description: "O pulmão verde de SP. Ótimo para um passeio relaxante na manhã pré-festival. A região conta com hotéis de alto padrão.",
       transitInfo: "Estação Moema (Linha 5-Lilás) ➔ Santo Amaro ➔ Linha 9-Esmeralda até Estação Autódromo. (~50min)",
       image: "images/lollapalooza/venue/ibirapuera.jpg"
     },
