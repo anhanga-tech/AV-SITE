@@ -139,6 +139,7 @@ export interface N8nQuizPayload {
     source: 'submit-quiz';
     quiz: {
         firstName: string;
+        lastName: string;
         email: string;
         whatsapp: string | null;
         profileKey: string;
@@ -160,6 +161,7 @@ export function buildN8nQuizPayload(payload: SubmitQuizRequest, requestId: strin
         source: 'submit-quiz',
         quiz: {
             firstName: payload.firstName,
+            lastName: payload.lastName,
             email: payload.email,
             whatsapp: payload.whatsapp ?? null,
             profileKey: payload.profileKey,

@@ -12,6 +12,7 @@ export function validateQuizPayload(
 
     const raw = payload as Record<string, unknown>;
     const firstName = normalizeNullable(raw.firstName, 100);
+    const lastName = normalizeNullable(raw.lastName, 100) ?? '';
     const email = normalizeNullable(raw.email)?.toLowerCase() ?? null;
     const profileKey = normalizeNullable(raw.profileKey, 50);
     const profileName = normalizeNullable(raw.profileName, 100);
@@ -43,6 +44,7 @@ export function validateQuizPayload(
         valid: true,
         data: {
             firstName,
+            lastName,
             email,
             whatsapp,
             profileKey,

@@ -5,6 +5,7 @@ import { buildN8nQuizPayload } from '../lib/n8n-payloads.ts';
 
 const BASE_PAYLOAD = {
     firstName: 'Maria',
+    lastName: 'Silva',
     email: 'maria@example.com',
     profileKey: 'aventureiro',
     profileName: 'Aventureiro',
@@ -66,4 +67,23 @@ test('buildN8nQuizPayload — destinos ausente resulta em array vazio no payload
     const payload = { ...BASE_PAYLOAD, tracking: undefined };
     const n8n = buildN8nQuizPayload(payload, 'req-456');
     assert.deepEqual(n8n.quiz.destinos, []);
+});
+
+test('validateQuizPayload — lastName é incluído no resultado', () => {
+    const result = validateQuizPayload({ ...BASE_PAYLOAD });
+    assert.ok(result.valid);
+    assert.equal(result.data.lastName, 'Silva');
+});
+
+test('validateQuizPayload — lastName ausente resulta em string vazia', () => {
+    const { lastName: _omit, ...withoutLast } = BASE_PAYLOAD;
+    const result = validateQuizPayload(withoutLast);
+    assert.ok(result.valid);
+    assert.equal(result.data.lastName, '');
+});
+
+test('buildN8nQuizPayload — inclui lastName no payload do n8n', () => {
+    const payload = { ...BASE_PAYLOAD, tracking: undefined };
+    const n8n = buildN8nQuizPayload(payload, 'req-789');
+    assert.equal(n8n.quiz.lastName, 'Silva');
 });
