@@ -246,6 +246,7 @@ function isPreparedSubmitLeadRequest(value: LeadDraftPartial | SubmitLeadRequest
 
 export function pushGenerateLeadDataLayerEvent(
     payload: SubmitLeadRequest,
+    formType: string = 'ai_chatbot_lead',
 ): void {
     if (typeof window === 'undefined' || !window.dataLayer || !payload.event_id) {
         return;
@@ -266,7 +267,7 @@ export function pushGenerateLeadDataLayerEvent(
     // 2. Unified form submission event for GA4/Ads
     window.dataLayer.push({
         event: 'form_submission',
-        form_type: 'ai_chatbot_lead',
+        form_type: formType,
         form_id: payload.event_id,
         destination: 'whatsapp',
         page_location: window.location.href,
@@ -390,6 +391,7 @@ export function useLeadCapture() {
         options: {
             eventId?: string;
             pushDataLayerEvent?: boolean;
+            formType?: string;
         } = {},
     ): Promise<SubmitLeadHookResult> => {
         setError(null);
@@ -430,7 +432,7 @@ export function useLeadCapture() {
             }
 
             if (options.pushDataLayerEvent !== false) {
-                pushGenerateLeadDataLayerEvent(payload);
+                pushGenerateLeadDataLayerEvent(payload, options.formType);
             }
             setIsSubmitting(false);
             return buildSubmitLeadSuccessResult(parsed);
