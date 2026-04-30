@@ -37,6 +37,18 @@ test('validateQuizPayload — destinos com valores não-string são filtrados', 
     assert.deepEqual(result.data.destinos, ['europa', 'latam']);
 });
 
+test('validateQuizPayload — destinos com espaços são normalizados com trim', () => {
+    const result = validateQuizPayload({ ...BASE_PAYLOAD, destinos: ['  europa  ', ' latam'] });
+    assert.ok(result.valid);
+    assert.deepEqual(result.data.destinos, ['europa', 'latam']);
+});
+
+test('validateQuizPayload — destinos com strings vazias após trim são removidos', () => {
+    const result = validateQuizPayload({ ...BASE_PAYLOAD, destinos: ['europa', '   ', 'latam'] });
+    assert.ok(result.valid);
+    assert.deepEqual(result.data.destinos, ['europa', 'latam']);
+});
+
 test('validateQuizPayload — destinos limitado a 10 elementos', () => {
     const destinos = Array.from({ length: 15 }, (_, i) => `destino-${i}`);
     const result = validateQuizPayload({ ...BASE_PAYLOAD, destinos });

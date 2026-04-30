@@ -29,7 +29,11 @@ export function validateQuizPayload(
     const whatsapp = normalizeWhatsappNumber(raw.whatsapp) ?? undefined;
 
     const destinos = Array.isArray(raw.destinos)
-        ? raw.destinos.filter((d): d is string => typeof d === 'string').slice(0, 10)
+        ? raw.destinos
+            .filter((d): d is string => typeof d === 'string')
+            .map((d) => d.trim().slice(0, 50))
+            .filter(Boolean)
+            .slice(0, 10)
         : [];
 
     const utms = normalizeUtms(raw.utms);
