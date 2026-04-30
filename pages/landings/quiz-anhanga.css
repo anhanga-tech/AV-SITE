@@ -367,7 +367,7 @@
 .quiz-opt-grid { margin-top: 36px; width: 100%; display: grid; gap: 16px; }
 .quiz-opt-grid--cards.quiz-opt-grid--roomy { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 .quiz-opt-grid--cards.quiz-opt-grid--tight { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
-.quiz-opt-grid--pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; max-width: 760px; margin-left: auto; margin-right: auto; }
+.quiz-opt-grid--pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; max-width: 880px; margin-left: auto; margin-right: auto; }
 .quiz-opt-grid--chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
 
 .quiz-opt {
@@ -399,24 +399,26 @@
   border-radius: 9999px;
   padding: 16px 28px 16px 30px;
   display: inline-flex;
+  flex: 1 1 280px;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 10px;
+  max-width: 430px;
   box-shadow: 4px 4px 0 var(--av-dark);
   min-height: 56px;
   background: white;
   border: 2.5px solid var(--av-dark);
   font-family: var(--av-font-display);
   text-align: center;
-  line-height: 1;
+  line-height: 1.25;
   transition: transform .18s var(--av-ease-spring), box-shadow .18s var(--av-ease-out), background .18s;
 }
 .quiz-opt--pills:hover { box-shadow: 6px 6px 0 var(--av-dark); }
 .quiz-opt--pills.is-selected { background: var(--av-yellow); box-shadow: 6px 6px 0 var(--av-dark); }
 .quiz-opt--pills .quiz-opt-emoji { display: none; }
 .quiz-opt--pills .quiz-opt-hint { display: none; }
-.quiz-opt--pills .quiz-opt-label { font-size: 16px; font-weight: 700; letter-spacing: -0.005em; color: var(--av-dark); display: inline-flex; align-items: center; line-height: 1; }
+.quiz-opt--pills .quiz-opt-label { font-size: 16px; font-weight: 700; letter-spacing: -0.005em; color: var(--av-dark); display: block; line-height: 1.25; overflow-wrap: anywhere; }
 .quiz-opt--pills .quiz-opt-check {
   position: static;
   width: 18px; height: 18px;
@@ -1019,6 +1021,8 @@
   .quiz-chunky { font-size: clamp(72px, 22vw, 120px); }
   .quiz-deco-star { display: none; }
   .quiz-deco-star-1, .quiz-deco-star-3 { display: block; }
+  .quiz-opt-grid--pills { align-items: stretch; }
+  .quiz-opt--pills { width: 100%; max-width: none; }
   .quiz-pol-img { aspect-ratio: 1.2/1; }
   .quiz-lead-card { padding: 32px 24px 28px; }
   .quiz-stamp-lead { right: 12px; top: -16px; }

@@ -28,67 +28,80 @@ const QUIZ_QUESTIONS: QuizQuestion[] = [
     {
         id: 'destino',
         eyebrow: 'Pergunta 01',
-        title: 'Qual canto do mundo te chama?',
-        subtitle: 'Pode escolher mais de um — a gente entende.',
+        title: 'Você acabou de pousar. Onde chegou?',
+        subtitle: 'Pode escolher mais de um.',
         multi: true,
         options: [
-            { id: 'europa',    label: 'Europa',           hint: 'Cidades, vinho, história',      emoji: 'EU' },
-            { id: 'america-n', label: 'América do Norte', hint: 'Parques, road trips, NY',       emoji: 'NA' },
-            { id: 'cruzeiros', label: 'Cruzeiros',        hint: 'Vários destinos, uma cabine',   emoji: 'CR' },
-            { id: 'asia',      label: 'Ásia',             hint: 'Templos, mercado, sushi',       emoji: 'AS' },
-            { id: 'latam',     label: 'América Latina',   hint: 'Cultura viva, vizinho querido', emoji: 'LA' },
-            { id: 'brasil',    label: 'Brasil',           hint: 'O nosso quintal continental',   emoji: 'BR' },
-            { id: 'caribe',    label: 'Caribe',           hint: 'Águas turquesa, ilha em ilha',  emoji: 'CA' },
+            { id: 'europa',         label: 'Cafés de esquina, mercado de pulgas, museu que você descobriu por acidente' },
+            { id: 'america-norte',  label: 'Parques nacionais, cidades que não param, estrada aberta' },
+            { id: 'latam',          label: 'Sabores que não existem em outro lugar, festas que começam de madrugada, natureza que ainda assusta' },
+            { id: 'caribe',         label: 'Areia branca, água transparente, nenhum compromisso no dia' },
+            { id: 'asia',           label: 'Templos, mercados barulhentos, a sensação de que você não entende nada e está tudo bem' },
+            { id: 'africa-oriente', label: 'Savana, deserto, civilizações com mais camadas do que qualquer guia consegue explicar' },
+            { id: 'surpresa',       label: 'Ainda não sei, pode ser qualquer um desses' },
         ],
     },
     {
-        id: 'perfil',
+        id: 'cena',
         eyebrow: 'Pergunta 02',
-        title: 'Como você gosta de viajar?',
-        subtitle: 'Marca o que mais combina com você.',
+        title: 'Em qual dessas cenas você se enxerga?',
         multi: false,
         options: [
-            { id: 'aventura', label: 'Aventura & autenticidade', hint: 'Trilhas, locais, fora do mapa' },
-            { id: 'familia',  label: 'Família',                  hint: 'Roteiro pra todas as idades' },
-            { id: 'luxo',     label: 'Luxo & wellness',          hint: 'Spa, vista e silêncio bom' },
-            { id: 'micro',    label: 'Microescapadas',           hint: '3-4 dias e bora' },
-            { id: 'praia',    label: 'Praia',                    hint: 'Pé na areia, descanso' },
-            { id: 'cultural', label: 'Cultural',                 hint: 'Museus, ruas, conversas' },
+            { id: 'aventura',      label: 'Você chegou sem plano fixo. Acabou dormindo numa pousada que não estava no roteiro e foi o melhor da viagem.' },
+            { id: 'familia',       label: 'Toda a família na mesma mesa, num lugar em que ninguém fala português, rindo à toa.' },
+            { id: 'luxo',          label: 'Você se arrumou, desceu pro jantar, e o restaurante tinha uma vista ridícula de boa.' },
+            { id: 'microescapada', label: 'Fim de semana que pareceu uma semana inteira. Você voltou diferente.' },
+            { id: 'natureza',      label: 'A trilha era longa, o pico era alto, e lá em cima você ficou um tempo em silêncio.' },
+            { id: 'wellness',      label: 'Spa, mar calmo, nenhuma notificação. A cabeça desligou de vez.' },
         ],
     },
     {
         id: 'companhia',
         eyebrow: 'Pergunta 03',
-        title: 'Quem vai com você?',
+        title: 'Com quem você viaja, na maior parte das vezes?',
         multi: false,
         options: [
-            { id: 'sozinho', label: 'Só eu',           hint: 'Modo livre' },
-            { id: 'casal',   label: 'Eu e meu par',    hint: 'A dois' },
-            { id: 'familia', label: 'Família',          hint: 'Crianças e/ou pais' },
-            { id: 'amigos',  label: 'Turma de amigos', hint: 'Quanto mais, melhor' },
+            { id: 'solo',      label: 'Sozinho(a). É quando eu realmente descanso.' },
+            { id: 'familia',   label: 'Com a família, filhos incluídos.' },
+            { id: 'parceiro',  label: 'Com parceiro(a) ou alguém próximo.' },
+            { id: 'variado',   label: 'Depende da viagem. Às vezes em grupo, às vezes só.' },
+        ],
+    },
+    {
+        id: 'frustracao',
+        eyebrow: 'Pergunta 04',
+        title: 'O que faz você chegar em casa pensando "não valeu"?',
+        multi: false,
+        options: [
+            { id: 'sem-liberdade', label: 'Roteiro lotado, horário pra tudo, nenhuma hora sobrando.' },
+            { id: 'multidao',      label: 'Lugar bonito, mas cheio de gente demais. Perdeu o ponto.' },
+            { id: 'hotel-ruim',    label: 'Hotel que não entregou o que prometia.' },
+            { id: 'genericas',     label: 'Comida sem graça e experiências genéricas de turista.' },
+            { id: 'caro-demais',   label: 'Gastar mais do que o planejado e voltar com a sensação de que não era pra tanto.' },
+        ],
+    },
+    {
+        id: 'horizonte',
+        eyebrow: 'Pergunta 05',
+        title: 'O que trava essa viagem de sair do papel?',
+        multi: false,
+        options: [
+            { id: 'budget',     label: 'Dinheiro. Preciso guardar mais um pouco.' },
+            { id: 'tempo',      label: 'Tempo. Minha agenda não colabora agora.' },
+            { id: 'companhia',  label: 'Companhia. Ainda não achei quem tope.' },
+            { id: 'destino',    label: 'Só não me decidi para onde ir ainda.' },
         ],
     },
     {
         id: 'ritmo',
-        eyebrow: 'Pergunta 04',
-        title: 'Qual o ritmo da viagem?',
+        eyebrow: 'Pergunta 06',
+        title: 'Como você organiza uma viagem antes de sair?',
         multi: false,
         options: [
-            { id: 'corrido',       label: 'Corrido',       hint: 'Quero ver o máximo possível' },
-            { id: 'equilibrado',   label: 'Equilibrado',   hint: 'Um pouco de tudo' },
-            { id: 'contemplativo', label: 'Contemplativo', hint: 'Devagar, com calma' },
-        ],
-    },
-    {
-        id: 'quando',
-        eyebrow: 'Pergunta 05',
-        title: 'Quando você pensa em ir?',
-        multi: false,
-        options: [
-            { id: 'logo',     label: 'Nos próximos 3 meses', hint: 'A mala já tá quase pronta' },
-            { id: 'semestre', label: 'Daqui 3 a 6 meses',    hint: 'Tem tempo de planejar bem' },
-            { id: 'ano',      label: 'Esse ano ainda',       hint: 'Sem pressa, sem preguiça' },
-            { id: 'sonhando', label: 'Só sonhando ainda',    hint: 'Plantando a sementinha' },
+            { id: 'planejado',      label: 'Roteiro fechado. Sei o que faço em cada dia, cada horário.' },
+            { id: 'semi-planejado', label: 'Tenho os pontos principais reservados. O resto decido lá.' },
+            { id: 'quase-livre',    label: 'Chego com hotel da primeira noite. O resto é improviso.' },
+            { id: 'livre',          label: 'Quanto menos planejado, melhor. A viagem acontece sozinha.' },
         ],
     },
 ];
@@ -190,27 +203,65 @@ const TRAVELER_PROFILES: Record<ProfileKey, TravelerProfile> = {
 type QuizAnswers = Record<string, string[]>;
 
 function matchProfile(answers: QuizAnswers): ProfileKey {
-    const perfil = answers.perfil?.[0];
-    const ritmo  = answers.ritmo?.[0];
-    const comp   = answers.companhia?.[0];
+    const cena = answers.cena?.[0];
+    const ritmo = answers.ritmo?.[0];
+    const comp = answers.companhia?.[0];
+    const frustracao = answers.frustracao?.[0];
+    const destinos = answers.destino ?? [];
 
-    if (perfil === 'familia' || comp === 'familia') return 'familia';
-    if (perfil === 'luxo')    return 'sibarita';
-    if (perfil === 'aventura' && ritmo !== 'contemplativo') return 'aventureiro';
-    if (perfil === 'praia')   return 'praiano';
-    if (perfil === 'cultural') return 'cultural';
-    if (ritmo === 'contemplativo') return 'contemplativo';
-    if (perfil === 'micro')   return 'cultural';
-    return 'aventureiro';
+    if (cena === 'familia' || comp === 'familia') return 'familia';
+    if (cena === 'luxo' || cena === 'wellness' || frustracao === 'hotel-ruim') return 'sibarita';
+    if (destinos.includes('caribe')) return 'praiano';
+    if (cena === 'aventura' || cena === 'natureza' || ritmo === 'livre' || ritmo === 'quase-livre' || frustracao === 'sem-liberdade') return 'aventureiro';
+    if (cena === 'microescapada' || frustracao === 'genericas') return 'cultural';
+    if (ritmo === 'planejado' || frustracao === 'multidao' || frustracao === 'caro-demais') return 'contemplativo';
+    return 'cultural';
 }
 
 function buildAnswersSummary(answers: QuizAnswers): string {
     const labels: Record<string, Record<string, string>> = {
-        destino:   { 'europa': 'Europa', 'america-n': 'América do Norte', 'cruzeiros': 'Cruzeiros', 'asia': 'Ásia', 'latam': 'América Latina', 'brasil': 'Brasil', 'caribe': 'Caribe' },
-        perfil:    { aventura: 'Aventura', familia: 'Família', luxo: 'Luxo', micro: 'Microescapadas', praia: 'Praia', cultural: 'Cultural' },
-        companhia: { sozinho: 'Solo', casal: 'Casal', familia: 'Família', amigos: 'Amigos' },
-        ritmo:     { corrido: 'Corrido', equilibrado: 'Equilibrado', contemplativo: 'Contemplativo' },
-        quando:    { logo: 'Até 3 meses', semestre: '3-6 meses', ano: 'Esse ano', sonhando: 'Sonhando' },
+        destino: {
+            europa: 'Europa',
+            'america-norte': 'América do Norte',
+            latam: 'América Latina',
+            caribe: 'Caribe',
+            asia: 'Ásia',
+            'africa-oriente': 'África e Oriente',
+            surpresa: 'Surpresa',
+        },
+        cena: {
+            aventura: 'Aventura sem plano fixo',
+            familia: 'Família reunida',
+            luxo: 'Jantar com vista',
+            microescapada: 'Microescapada',
+            natureza: 'Trilha e natureza',
+            wellness: 'Wellness',
+        },
+        companhia: {
+            solo: 'Solo',
+            familia: 'Família',
+            parceiro: 'Parceiro(a)',
+            variado: 'Variado',
+        },
+        frustracao: {
+            'sem-liberdade': 'Sem liberdade',
+            multidao: 'Multidão',
+            'hotel-ruim': 'Hotel ruim',
+            genericas: 'Experiências genéricas',
+            'caro-demais': 'Caro demais',
+        },
+        horizonte: {
+            budget: 'Budget',
+            tempo: 'Tempo',
+            companhia: 'Companhia',
+            destino: 'Destino indefinido',
+        },
+        ritmo: {
+            planejado: 'Planejado',
+            'semi-planejado': 'Semi-planejado',
+            'quase-livre': 'Quase livre',
+            livre: 'Livre',
+        },
     };
     return Object.entries(answers)
         .filter(([, sel]) => sel?.length)
@@ -300,7 +351,7 @@ function HeroScreen({ onStart }: { onStart: () => void }) {
                     <ChunkyQuiz />
                 </div>
                 <p className="quiz-hero-sub">
-                    5 perguntinhas rápidas. No final, a gente revela seu{' '}
+                    6 perguntinhas rápidas. No final, a gente revela seu{' '}
                     <em>perfil de viajante</em> e os destinos que combinam com você.
                 </p>
                 <div className="quiz-hero-cta">
@@ -324,7 +375,7 @@ function HeroScreen({ onStart }: { onStart: () => void }) {
 
 const PROGRESS_MILESTONES: Record<number, string> = {
     3: 'Na metade!',
-    5: 'Última!',
+    6: 'Última!',
 };
 
 function Progress({ current, total }: { current: number; total: number }) {
@@ -944,7 +995,7 @@ export default function QuizAnhangaLanding() {
         <>
             <SEO
                 title="Quiz de Destinos | Descubra seu próximo rolê — Anhangá Viagens"
-                description="5 perguntas rápidas para descobrir seu perfil de viajante e os destinos que mais combinam com você. Gratuito e sem compromisso."
+                description="6 perguntas rápidas para descobrir seu perfil de viajante e os destinos que mais combinam com você. Gratuito e sem compromisso."
                 canonical="https://www.anhanga.tur.br/quiz/"
                 noHreflang
             />
