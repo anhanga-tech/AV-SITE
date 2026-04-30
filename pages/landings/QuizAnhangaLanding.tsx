@@ -655,7 +655,7 @@ function WhatsAppUpgrade({ profileName, mainDestName, firstName, baseWaUrl }: Wh
 
     const waUrl = isValid && submitted
         ? getWhatsAppLink(
-            `Oi! Sou ${firstName}. Meu perfil é ${profileName} e meu próximo destino pode ser ${mainDestName}. Bora planejar essa viagem?`,
+            `Oi! Sou ${firstName}. Descobri no Quiz da Anhangá que meu perfil é ${profileName} e meu próximo destino pode ser ${mainDestName}. Bora planejar essa viagem?`,
             { appendTrackingRef: true },
           )
         : baseWaUrl;
@@ -863,7 +863,7 @@ export default function QuizAnhangaLanding() {
         const firstName = names[0] || form.nome.trim();
         const bantSummary = `Quiz Anhangá · Perfil: ${profile.name} · Destino: ${mainDest.name} · ${buildAnswersSummary(answers)}`;
 
-        const waMsg = `Oi! Sou ${form.nome}. Descobri no Quiz da Anhangá que sou um(a) ${profile.name} e meu próximo destino pode ser ${mainDest.name}. Bora planejar essa viagem?`;
+        const waMsg = `Oi! Sou ${firstName}. Descobri no Quiz da Anhangá que meu perfil é ${profile.name} e meu próximo destino pode ser ${mainDest.name}. Bora planejar essa viagem?`;
         const waUrl = getWhatsAppLink(waMsg, { appendTrackingRef: true });
 
         // Avança para o resultado imediatamente — API roda em paralelo
@@ -925,7 +925,7 @@ export default function QuizAnhangaLanding() {
         }
         if (stage.kind === 'result' && profileKey && leadForm) {
             const mainDest = selectMainDestination(profileKey, answers.destino ?? []);
-            const inspirations = selectInspirationDestinations(profileKey);
+            const inspirations = selectInspirationDestinations(profileKey, mainDest);
             return (
                 <ResultScreen
                     profile={TRAVELER_PROFILES[profileKey]}
