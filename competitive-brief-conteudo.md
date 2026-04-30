@@ -6,7 +6,7 @@
 
 ## 1. Resumo Executivo
 
-O mercado de agências de viagem boutique em São Paulo é dominado por marcas que constroem autoridade via blog e redes sociais — mas poucas aproveitam tecnologia (IA, chatbot, automação) como diferencial de conteúdo e conversão. A **Adventure Club** lidera em volume de conteúdo e engajamento orgânico; a **Magari Blu** é referência em conteúdo de luxo experiencial; a **S Viagens** e a **Concierge de Viagem** apostam em reputação e curadoria, com pouca estratégia editorial.
+O mercado de agências de viagem personalizadas em São Paulo é dominado por marcas que constroem autoridade via blog e redes sociais — mas poucas aproveitam tecnologia (IA, chatbot, automação) como diferencial de conteúdo e conversão. A **Adventure Club** lidera em volume de conteúdo e engajamento orgânico; a **Magari Blu** é referência em conteúdo de luxo experiencial; a **S Viagens** e a **Concierge de Viagem** apostam em reputação e curadoria, com pouca estratégia editorial.
 
 **Maior oportunidade para a Anhangá Viagens:** ser a única agência da região a combinar conteúdo educativo de destinos com uma narrativa de "consultoria inteligente" — posicionando o chatbot com IA como diferencial editorial e de experiência do cliente, algo que nenhum concorrente local explora ainda.
 
@@ -94,7 +94,7 @@ O mercado de agências de viagem boutique em São Paulo é dominado por marcas q
 ### 2.3 S Viagens
 **Site:** [sviagens.com](https://sviagens.com/) | **Instagram:** [@s.viagens](https://www.instagram.com/s.viagens/)
 
-**O que fazem:** Agência boutique de viagens de luxo, membro do TTW Lab (rede exclusiva de agências premium do Brasil).
+**O que fazem:** Agência de viagens de luxo, membro do TTW Lab (rede exclusiva de agências premium do Brasil).
 
 **Público-alvo:** Viajantes de alto poder aquisitivo que buscam acesso a benefícios exclusivos e experiências premium.
 
@@ -152,7 +152,7 @@ Site com conteúdo carregado dinamicamente (JavaScript-heavy) — dificulta inde
 | Dimensão | **Anhangá Viagens** | Adventure Club | Magari Blu | S Viagens | Concierge de Viagem |
 |---|---|---|---|---|---|
 | **Tagline** | — | "Viagens que conectam" | "Viagens de Luxo e Experiência" | "A new way to travel" | — |
-| **Segmento** | Boutique / Digital-first | Natureza e Cultural | Luxo experiencial | Luxo premium | Luxo concierge |
+| **Segmento** | Personalizada / Digital-first | Natureza e Cultural | Luxo experiencial | Luxo premium | Luxo concierge |
 | **Blog ativo?** | Não (externo) | ✅ Robusto (121+ pgs) | ✅ Editorial forte | ❌ | ❌ |
 | **Instagram** | — | 26K seguidores | Multicanal | Presente | Pouca atividade |
 | **YouTube** | ❌ | ❌ | ✅ Canal ativo | ❌ | ❌ |
@@ -181,7 +181,7 @@ Site com conteúdo carregado dinamicamente (JavaScript-heavy) — dificulta inde
 
 ### Termos e temas com oportunidade de SEO local:
 - "agência de viagem Ipiranga" — pouquíssima concorrência de conteúdo
-- "viagem personalizada São Paulo" — Adventure Club não atua nesse nicho de personalização boutique
+- "viagem personalizada São Paulo" — Adventure Club não atua nesse nicho de personalização consultiva
 - "chatbot viagem" / "consultor de viagem IA" — nenhum concorrente local reivindica esse território
 
 ---

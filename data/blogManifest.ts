@@ -124,19 +124,6 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "6 min de leitura"
   },
   {
-    "title": "Quais São as Melhores Agências de Viagem Boutique em São Paulo?",
-    "excerpt": "As melhores agências de viagem boutique em São Paulo combinam tecnologia e cuidado humano. Veja como funciona o atendimento da Anhangá.",
-    "date": "2026-04-25",
-    "author": "equipe-anhanga",
-    "category": "Dicas de Expert",
-    "image": "https://media.anhanga.tur.br/images/about/equipe-anhanga.jpg",
-    "featured": true,
-    "showChatCTA": false,
-    "tags": [],
-    "slug": "agencias-boutique-sao-paulo",
-    "readingTime": "7 min de leitura"
-  },
-  {
     "title": "Viagem solo feminina ganha espaço nos cruzeiros da Norwegian Cruise Line",
     "excerpt": "Cada vez mais mulheres estão escolhendo viajar sozinhas, e o turismo tem respondido a isso de formas bem concretas. Se você já pensou em embarcar sem ...",
     "date": "2026-03-09",

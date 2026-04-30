@@ -257,7 +257,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
             Sobre a Anhangá Viagens
           </h2>
           <p className="text-lg text-gray-600 leading-relaxed max-w-2xl mb-10">
-            Agência boutique em São Paulo desde 2018, especializada em viagens sob medida. Consultor fixo do início ao fim, nota 5.0 no Google, atendimento sem robôs e sem formulários.
+            Agência de viagens em São Paulo desde 2018, especializada em viagens sob medida. Consultor fixo do início ao fim, nota 5.0 no Google, atendimento sem robôs e sem formulários.
           </p>
           <div className="flex flex-wrap gap-12">
             {[
@@ -348,7 +348,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
 
       {/* Footer */}
       <footer className="py-8 bg-[#fffdf5] border-t border-gray-100 text-center text-sm text-gray-600">
-        <p>Anhangá Viagens · Agência boutique em São Paulo</p>
+        <p>Anhangá Viagens · Agência de viagens em São Paulo</p>
         <p className="mt-1">Atualizado em abril de 2026</p>
       </footer>
     </div>

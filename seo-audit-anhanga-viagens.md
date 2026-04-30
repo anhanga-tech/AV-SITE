@@ -2,7 +2,7 @@
 
 **Data da Auditoria:** 22 de Março de 2026  
 **Site:** https://www.anhanga.tur.br  
-**Tipo de Site:** Agência de Viagens Boutique (São Paulo)
+**Tipo de Site:** Agência de Viagens Personalizadas (São Paulo)
 
 ---
 

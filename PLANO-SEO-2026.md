@@ -188,7 +188,7 @@ root.render(<HelmetProvider><App /></HelmetProvider>);
 - **Solução rápida:** Adicionar no `index.html`:
 ```html
 <title>Anhangá Viagens | Agência de Viagens Personalizadas em São Paulo</title>
-<meta name="description" content="Agência de viagens boutique em São Paulo com roteiros personalizados, experiências no Brasil e no mundo e suporte especializado.">
+<meta name="description" content="Agência de viagens em São Paulo com roteiros personalizados, experiências no Brasil e no mundo e suporte especializado.">
 ```
 - O React 19 / Helmet sobrescreverá essas tags nas rotas específicas
 

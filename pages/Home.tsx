@@ -98,7 +98,7 @@ const Home: React.FC = () => {
     <>
       <SEO
         title="Agência de Viagens em São Paulo | Roteiros Sob Medida"
-        description="Agência boutique em São Paulo. Cada roteiro começa do zero — sem pacote pronto. Orlando, Beto Carrero, Europa e muito mais. Orçamento gratuito."
+        description="Agência de viagens em São Paulo. Cada roteiro começa do zero — sem pacote pronto. Orlando, Beto Carrero, Europa e muito mais. Orçamento gratuito."
         canonical="https://www.anhanga.tur.br/"
       />
       <OrganizationSchema />
@@ -108,7 +108,7 @@ const Home: React.FC = () => {
       />
       <ServiceSchema
         name="Agência de Viagens Personalizadas"
-        description="Roteiros de viagem 100% personalizados para casais, famílias e grupos. Especialistas em Orlando, Beto Carrero, Europa, Lollapalooza e turismo 50+. Atendimento boutique em São Paulo."
+        description="Roteiros de viagem 100% personalizados para casais, famílias e grupos. Especialistas em Orlando, Beto Carrero, Europa, Lollapalooza e turismo 50+. Atendimento humano em São Paulo."
         serviceUrl="https://www.anhanga.tur.br/"
         serviceType="Agência de Viagens"
         areaServed="São Paulo, Brasil"

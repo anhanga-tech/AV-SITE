@@ -32,7 +32,7 @@ const FAQ_ITEMS = [
   },
   {
     question: 'Qual o diferencial da Anhangá?',
-    answer: 'Atendimento boutique com consultor fixo do início ao fim, roteiro feito do zero para o seu perfil e suporte 24h via WhatsApp durante a viagem.'
+    answer: 'Atendimento consultivo com consultor fixo do início ao fim, roteiro feito do zero para o seu perfil e suporte 24h via WhatsApp durante a viagem.'
   },
   {
     question: 'Qual o prazo para montar um roteiro?',
@@ -100,11 +100,11 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
       />
       <ServiceSchema
         name="Consultoria de Viagem Sob Medida"
-        description="Planejamento personalizado de viagens com consultor humano, sem pacote pronto. Atendimento boutique com suporte antes, durante e depois da viagem."
+        description="Planejamento personalizado de viagens com consultor humano, sem pacote pronto. Atendimento consultivo com suporte antes, durante e depois da viagem."
         serviceUrl="https://www.anhanga.tur.br/consultoria-de-viagem/"
         serviceType="Consultoria de Viagem"
         areaServed="São Paulo e Brasil"
-        keywords={['consultoria de viagem', 'viagem sob medida', 'planejamento de viagem personalizado', 'agência boutique SP']}
+        keywords={['consultoria de viagem', 'viagem sob medida', 'planejamento de viagem personalizado', 'consultoria de viagem SP']}
       />
       <BreadcrumbSchema
         items={[
@@ -146,7 +146,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
       <section className="pt-16 pb-20 px-6">
         <div className="max-w-3xl mx-auto">
           <p className="text-sm font-semibold text-anhanga-blue mb-4 tracking-wide uppercase">
-            Agência boutique · São Paulo
+            Consultoria de viagem · São Paulo
           </p>
           <h1 className="text-4xl md:text-6xl font-black text-anhanga-dark mb-6 leading-[1.1] font-serif">
             Planeje uma viagem sob medida sem depender de pacote pronto
@@ -270,7 +270,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
             Sobre a Anhangá Viagens
           </h2>
           <p className="text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
-            Agência boutique em São Paulo, especializada em viagens personalizadas desde 2018. Atendimento humano, nota 5.0 no Google e consultor fixo do início ao fim da sua viagem.
+            Agência de viagens em São Paulo, especializada em viagens personalizadas desde 2018. Atendimento humano, nota 5.0 no Google e consultor fixo do início ao fim da sua viagem.
           </p>
           <div className="mt-12 flex flex-wrap justify-center gap-12">
             {[
@@ -361,7 +361,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
 
       {/* Footer */}
       <footer className="py-8 bg-[#fffdf5] border-t border-gray-100 text-center text-sm text-gray-600">
-        <p>Anhangá Viagens · Agência boutique em São Paulo</p>
+        <p>Anhangá Viagens · Agência de viagens em São Paulo</p>
         <p className="mt-1">Atualizado em abril de 2026</p>
       </footer>
     </div>

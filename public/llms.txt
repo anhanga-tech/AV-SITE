@@ -1,10 +1,10 @@
 # Anhangá Viagens
 
-> Agência de viagens boutique em São Paulo especializada em roteiros personalizados, turismo de transformação e experiências exclusivas.
+> Agência de viagens em São Paulo especializada em roteiros personalizados, turismo de transformação e experiências exclusivas.
 
 ## Sobre a empresa
 
-A Anhangá Viagens é uma agência boutique localizada em São Paulo (SP), fundada para oferecer planejamento de viagens personalizado e atendimento humano diferenciado. Trabalhamos com roteiros sob medida para famílias, casais, grupos e viajantes da melhor idade (50+).
+A Anhangá Viagens é uma agência de viagens localizada em São Paulo (SP), fundada para oferecer planejamento de viagens personalizado e atendimento humano diferenciado. Trabalhamos com roteiros sob medida para famílias, casais, grupos e viajantes da melhor idade (50+).
 
 - **CNPJ:** 37.036.732/0001-41
 - **Cadastur:** 37.036.732/0001-41 (registro oficial no Ministério do Turismo)

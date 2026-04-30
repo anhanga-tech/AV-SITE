@@ -36,7 +36,7 @@ const MelhorIdadeLanding: React.FC = () => {
     <div className="bg-[#fffdf5] min-h-screen font-sans">
       <SEO
         title="Turismo 50+: Viagens Seguras e Personalizadas"
-        description="Experiências de viagem exclusivas para o público 50+. Roteiros com conforto, segurança e atendimento boutique. Planeje sua próxima aventura com a Anhangá."
+        description="Experiências de viagem exclusivas para o público 50+. Roteiros com conforto, segurança e atendimento humano. Planeje sua próxima aventura com a Anhangá."
         canonical="https://www.anhanga.tur.br/melhor-idade/"
         noHreflang
       />
@@ -104,7 +104,7 @@ const MelhorIdadeLanding: React.FC = () => {
               transition={{ delay: 0.2 }}
               className="text-xl text-gray-600 mb-10 leading-relaxed font-medium"
             >
-              Na Anhangá, acreditamos que a "melhor idade" é a época perfeita para novas descobertas. Criamos roteiros boutique 100% personalizados para quem não abre mão de conforto, segurança e boas histórias.
+              Na Anhangá, acreditamos que a "melhor idade" é a época perfeita para novas descobertas. Criamos roteiros 100% personalizados para quem não abre mão de conforto, segurança e boas histórias.
             </motion.p>
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
@@ -155,7 +155,7 @@ const MelhorIdadeLanding: React.FC = () => {
               <div className="w-16 h-16 bg-brand-vibrant/10 rounded-2xl flex items-center justify-center text-brand-vibrant mb-6">
                 <Sparkles className="w-8 h-8" />
               </div>
-              <h3 className="text-2xl font-black text-brand-dark">Curadoria Boutique</h3>
+              <h3 className="text-2xl font-black text-brand-dark">Curadoria Personalizada</h3>
               <p className="text-gray-500 font-medium leading-relaxed">
                 Experiências gastronômicas, culturais e de lazer selecionadas a dedo para viajantes exigentes e experientes.
               </p>
