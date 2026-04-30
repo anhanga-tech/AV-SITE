@@ -135,7 +135,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => pushWhatsAppCta(PAGE_NAME)}
-            className="text-xs font-bold bg-anhanga-blue text-white px-4 py-2 rounded-xl hover:bg-anhanga-darkBlue transition-colors whitespace-nowrap"
+            className="btn-whatsapp btn-specialist text-xs font-bold bg-anhanga-blue text-white px-4 py-2 rounded-xl hover:bg-anhanga-darkBlue transition-colors whitespace-nowrap"
           >
             Falar com consultor
           </a>
@@ -159,7 +159,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => pushWhatsAppCta(PAGE_NAME)}
-            className="inline-flex items-center gap-3 bg-anhanga-blue text-white font-bold px-8 py-4 rounded-2xl hover:bg-anhanga-darkBlue transition-colors text-lg shadow-lg"
+            className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-anhanga-blue text-white font-bold px-8 py-4 rounded-2xl hover:bg-anhanga-darkBlue transition-colors text-lg shadow-lg"
             aria-label="Falar com um consultor de viagens via WhatsApp"
           >
             Falar com um consultor
@@ -301,7 +301,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => pushWhatsAppCta(PAGE_NAME)}
-            className="inline-flex items-center gap-3 bg-anhanga-yellow text-anhanga-dark font-black px-10 py-5 rounded-2xl hover:bg-anhanga-yellowHover transition-colors text-xl shadow-lg"
+            className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-anhanga-yellow text-anhanga-dark font-black px-10 py-5 rounded-2xl hover:bg-anhanga-yellowHover transition-colors text-xl shadow-lg"
             aria-label="Falar com um consultor via WhatsApp"
           >
             Falar com um consultor
