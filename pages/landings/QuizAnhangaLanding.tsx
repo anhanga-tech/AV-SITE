@@ -28,8 +28,8 @@ const QUIZ_QUESTIONS: QuizQuestion[] = [
     {
         id: 'destino',
         eyebrow: 'Pergunta 01',
-        title: 'Qual canto do mundo te chama?',
-        subtitle: 'Pode escolher mais de um — a gente entende.',
+        title: 'Você acabou de pousar. Onde chegou?',
+        subtitle: 'Pode escolher mais de um.',
         multi: true,
         options: [
             { id: 'europa',         label: 'Europa',           hint: 'Cidades, vinho, história',      emoji: 'EU' },
@@ -59,7 +59,7 @@ const QUIZ_QUESTIONS: QuizQuestion[] = [
     {
         id: 'companhia',
         eyebrow: 'Pergunta 03',
-        title: 'Quem vai com você?',
+        title: 'Com quem você viaja, na maior parte das vezes?',
         multi: false,
         options: [
             { id: 'solo',    label: 'Só eu',         hint: 'Modo livre total' },
@@ -82,9 +82,21 @@ const QUIZ_QUESTIONS: QuizQuestion[] = [
         ],
     },
     {
-        id: 'quando',
+        id: 'horizonte',
         eyebrow: 'Pergunta 05',
-        title: 'Quando você pensa em ir?',
+        title: 'O que trava essa viagem de sair do papel?',
+        multi: false,
+        options: [
+            { id: 'budget',     label: 'Dinheiro. Preciso guardar mais um pouco.' },
+            { id: 'tempo',      label: 'Tempo. Minha agenda não colabora agora.' },
+            { id: 'companhia',  label: 'Companhia. Ainda não achei quem tope.' },
+            { id: 'destino',    label: 'Só não me decidi para onde ir ainda.' },
+        ],
+    },
+    {
+        id: 'ritmo',
+        eyebrow: 'Pergunta 06',
+        title: 'Como você organiza uma viagem antes de sair?',
         multi: false,
         options: [
             { id: 'logo',     label: 'Nos próximos 3 meses', hint: 'A mala já tá quase pronta' },
@@ -983,7 +995,7 @@ export default function QuizAnhangaLanding() {
         <>
             <SEO
                 title="Quiz de Destinos | Descubra seu próximo rolê — Anhangá Viagens"
-                description="5 perguntas rápidas para descobrir seu perfil de viajante e os destinos que mais combinam com você. Gratuito e sem compromisso."
+                description="6 perguntas rápidas para descobrir seu perfil de viajante e os destinos que mais combinam com você. Gratuito e sem compromisso."
                 canonical="https://www.anhanga.tur.br/quiz/"
                 noHreflang
             />

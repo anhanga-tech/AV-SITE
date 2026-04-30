@@ -38,7 +38,7 @@ const OrlandoLanding: React.FC = () => {
     <>
       <SEO
         title="Pacotes para Orlando: Disney e Universal 2026"
-        description="Planeje sua viagem para Orlando com roteiro personalizado, ingressos e hospedagem. Atendimento especializado por agência boutique em São Paulo."
+        description="Planeje sua viagem para Orlando com roteiro personalizado, ingressos e hospedagem. Atendimento especializado por agência de viagens em São Paulo."
         canonical="https://www.anhanga.tur.br/orlando/"
         noHreflang
       />

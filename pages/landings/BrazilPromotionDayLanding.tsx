@@ -144,7 +144,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
         <>
             <SEO
                 title="Anhangá Viagens na Brazil Promotion Day | Roteiros Personalizados"
-                description="Conheça a Anhangá Viagens na Brazil Promotion Day. Agência boutique em SP com roteiros exclusivos feitos do zero, sem pacote pronto."
+                description="Conheça a Anhangá Viagens na Brazil Promotion Day. Agência de viagens em SP com roteiros exclusivos feitos do zero, sem pacote pronto."
                 canonical="https://www.anhanga.tur.br/brazil-promotion-day/"
             />
 
