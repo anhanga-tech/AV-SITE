@@ -397,6 +397,7 @@ function QuestionScreen({ q, qIndex, total, value, onChange, onNext, onBack }: Q
                             style={{ ['--opt-i' as string]: i }}
                         >
                             <span className="quiz-opt-label">{opt.label}</span>
+                            {opt.hint && <span className="quiz-opt-hint">{opt.hint}</span>}
                             <span className="quiz-opt-check" aria-hidden="true">✓</span>
                         </button>
                     ))}
