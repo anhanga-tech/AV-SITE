@@ -607,7 +607,7 @@ function Confetti({ active }: { active: boolean }) {
    Componente: Polaroid — com imagem Cloudflare
    ========================================================================== */
 
-const QUIZ_IMG_BASE = 'https://media.anhanga.tur.br';
+const QUIZ_IMG_BASE = 'https://media.anhanga.tur.br/quiz';
 
 function Polaroid({ dest, index }: { dest: InspirationDestination; index: number }) {
     const tilts = [-2.4, 1.6, -1.2, 2, -1.8];
