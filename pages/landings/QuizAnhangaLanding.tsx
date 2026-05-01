@@ -11,6 +11,21 @@ import {
 } from '../../lib/quiz-destinations';
 import './quiz-anhanga.css';
 
+/** Lê parâmetros de URL para pré-popular o quiz com dados de leads existentes.
+ *  ?email=foo@bar.com&nome=João&sobrenome=Silva&skip=true
+ *  Quando skip=true, o stage 'lead' é omitido e o webhook inclui skipped:true.
+ */
+function useQuizUrlParams() {
+    return useMemo(() => {
+        const p = new URLSearchParams(window.location.search);
+        const email = p.get('email') ?? '';
+        const nome = p.get('nome') ?? '';
+        const sobrenome = p.get('sobrenome') ?? '';
+        const skip = p.get('skip') === 'true' && email.length > 0;
+        return { email, nome, sobrenome, skip };
+    }, []);
+}
+
 /* ==========================================================================
    Dados do quiz
    ========================================================================== */
@@ -847,6 +862,7 @@ function ResultScreen({ profile, mainDest, inspirations, lead, onRestart, baseWa
    ========================================================================== */
 
 export default function QuizAnhangaLanding() {
+    const urlParams = useQuizUrlParams();
     const [stage, setStage] = useState<Stage>({ kind: 'hero' });
     const [direction, setDirection] = useState<'forward' | 'back'>('forward');
     const [answers, setAnswers] = useState<QuizAnswers>({});
@@ -870,7 +886,15 @@ export default function QuizAnhangaLanding() {
 
     function nextQ(currentIndex: number) {
         if (currentIndex + 1 >= QUIZ_QUESTIONS.length) {
-            go({ kind: 'lead' });
+            if (urlParams.skip) {
+                // Lead já conhecido — pula formulário e dispara diretamente
+                void handleLeadSubmit(
+                    { nome: urlParams.nome, sobrenome: urlParams.sobrenome, email: urlParams.email, aceite: true },
+                    true,
+                );
+            } else {
+                go({ kind: 'lead' });
+            }
         } else {
             go({ kind: 'question', index: currentIndex + 1 });
         }
@@ -881,7 +905,7 @@ export default function QuizAnhangaLanding() {
         else go({ kind: 'question', index: currentIndex - 1 }, 'back');
     }
 
-    async function handleLeadSubmit(form: LeadForm) {
+    async function handleLeadSubmit(form: LeadForm, skipped = false) {
         const pKey = matchProfile(answers);
         const profile = TRAVELER_PROFILES[pKey];
         const mainDest = selectMainDestination(pKey, answers.destino ?? []);
@@ -908,6 +932,7 @@ export default function QuizAnhangaLanding() {
             profileName: profile.name,
             bantSummary,
             destinos: answers.destino ?? [],
+            skipped,
         });
 
         if (!result.ok) {

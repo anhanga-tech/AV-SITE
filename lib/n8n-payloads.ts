@@ -147,6 +147,7 @@ export interface N8nQuizPayload {
         bantSummary: string;
         sourcePage: string;
         destinos: string[];
+        skipped: boolean;
     };
     utms: SubmitQuizRequest['utms'];
     tracking: SubmitQuizRequest['tracking'];
@@ -169,6 +170,7 @@ export function buildN8nQuizPayload(payload: SubmitQuizRequest, requestId: strin
             bantSummary: payload.bantSummary,
             sourcePage: payload.sourcePage,
             destinos: payload.destinos ?? [],
+            skipped: payload.skipped ?? false,
         },
         utms: payload.utms,
         tracking: payload.tracking,

@@ -10,6 +10,7 @@ export interface SubmitQuizRequest {
     bantSummary: string;
     sourcePage: string;
     destinos?: string[];
+    skipped?: boolean;
     utms: LeadUtms;
     tracking?: LeadTracking;
 }
