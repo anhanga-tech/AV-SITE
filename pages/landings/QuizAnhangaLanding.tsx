@@ -28,6 +28,7 @@ interface QuizQuestion {
     title: string;
     subtitle?: string;
     multi: boolean;
+    layout?: 'cards' | 'pills';
     options: QuizOption[];
 }
 
@@ -38,6 +39,7 @@ const QUIZ_QUESTIONS: QuizQuestion[] = [
         title: 'Você acabou de pousar. Onde chegou?',
         subtitle: 'Pode escolher mais de um.',
         multi: true,
+        layout: 'cards',
         options: [
             { id: 'europa',         label: 'Europa',           hint: 'Cidades, vinho, história',      emoji: 'EU' },
             { id: 'america-norte',  label: 'América do Norte', hint: 'Parques, road trips, NY',       emoji: 'NA' },
@@ -54,6 +56,7 @@ const QUIZ_QUESTIONS: QuizQuestion[] = [
         title: 'Qual cena de viagem mais combina com você?',
         subtitle: 'Escolha a que mais te representa.',
         multi: false,
+        layout: 'cards',
         options: [
             { id: 'aventura',      label: 'Aventura & autenticidade', hint: 'Trilhas, locais, fora do mapa' },
             { id: 'familia',       label: 'Família em movimento',     hint: 'Roteiro pra todas as idades' },
@@ -367,6 +370,11 @@ function QuestionScreen({ q, qIndex, total, value, onChange, onNext, onBack }: Q
 
     const isSelected = (optId: string) => selected.includes(optId);
     const isTight = q.options.length > 4;
+    const layout = q.layout ?? 'pills';
+    const gridClass = layout === 'cards'
+        ? `quiz-opt-grid--cards quiz-opt-grid--${isTight ? 'tight' : 'roomy'}`
+        : 'quiz-opt-grid--pills';
+    const optClass = layout === 'cards' ? 'quiz-opt--cards' : 'quiz-opt--pills';
 
     return (
         <div className="quiz-screen quiz-screen-question">
@@ -383,12 +391,12 @@ function QuestionScreen({ q, qIndex, total, value, onChange, onNext, onBack }: Q
                 <h2 className="quiz-q-title">{q.title}</h2>
                 {q.subtitle && <p className="quiz-q-subtitle">{q.subtitle}</p>}
 
-                <div className={`quiz-opt-grid quiz-opt-grid--pills quiz-opt-grid--${isTight ? 'tight' : 'roomy'}`}>
+                <div className={`quiz-opt-grid ${gridClass}`}>
                     {q.options.map((opt, i) => (
                         <button
                             key={opt.id}
                             className={[
-                                'quiz-opt quiz-opt--pills',
+                                `quiz-opt ${optClass}`,
                                 isSelected(opt.id) ? 'is-selected' : '',
                                 pendingId === opt.id ? 'is-confirming' : '',
                             ].join(' ').trim()}
@@ -396,6 +404,7 @@ function QuestionScreen({ q, qIndex, total, value, onChange, onNext, onBack }: Q
                             disabled={!q.multi && pendingId !== null && pendingId !== opt.id}
                             style={{ ['--opt-i' as string]: i }}
                         >
+                            {opt.emoji && <span className="quiz-opt-emoji">{opt.emoji}</span>}
                             <span className="quiz-opt-label">{opt.label}</span>
                             {opt.hint && <span className="quiz-opt-hint">{opt.hint}</span>}
                             <span className="quiz-opt-check" aria-hidden="true">✓</span>
