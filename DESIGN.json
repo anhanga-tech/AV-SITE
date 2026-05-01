@@ -111,8 +111,8 @@
       },
       {
         "name": "hard-hover",
-        "value": "6px 6px 0px 0px #0f172a",
-        "purpose": "Estado intermediário do press-down. Parte da sequência animada: rest(4) → hover(6) → active(0)."
+        "value": "2px 2px 0px 0px #0f172a",
+        "purpose": "Estado intermediário do press-down. Parte da sequência animada: rest(4) → hover(2) → active(0)."
       },
       {
         "name": "float",

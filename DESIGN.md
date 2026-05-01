@@ -233,7 +233,7 @@ O `shadow-glow` (brilho ciano) é reservado para highlights de estado ativo em e
 - **Scrolled / internal state** (bg `white/90 backdrop-blur-md shadow-lg`): texto `gray-600 hover:text-action`, botão `bg-action hover:bg-action-dark`.
 - **Typography:** Poppins medium (500) 14px, gap 6–8 entre links de navegação.
 - **Transição:** `duration-500 ease-in-out` — a troca de estado é perceptível mas nunca brusca.
-- **Mobile:** Menu drawer com fundo branco, botão CTA `bg-brand-vibrant` de largura total, gap 16px entre itens.
+- **Mobile:** Menu drawer com fundo branco, botão CTA `bg-anhanga-action` (Céu Vivo) de largura total, gap 16px entre itens.
 
 ### SectionHeader (Signature Component)
 *O padrão de entrada visual para cada seção — badge + headline + subtítulo com ritmo consistente.*
