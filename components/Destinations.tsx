@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo, memo } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { getWhatsAppLink } from '../utils/whatsapp';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -336,14 +336,7 @@ const CONTINENT_COLORS: Record<string, string> = {
 // Componente LazyImage Otimizado - REFATORADO PARA COMPONENTE COMPARTILHADO
 // importado de ../components/ui/LazyImage
 
-/**
- * Destinations Component - Optimized with React.memo
- *
- * PERFORMANCE WIN: Prevents the entire Destinations section from re-rendering when parent state changes.
- * This is particularly important because this component initializes a Leaflet map and
- * iterates over a large set of destination markers and cards.
- */
-const Destinations: React.FC = memo(() => {
+const Destinations: React.FC = () => {
     const mapRef = useRef<HTMLDivElement>(null);
     const mapInstance = useRef<L.Map | null>(null);
     const markersLayerRef = useRef<L.FeatureGroup | null>(null);
@@ -749,8 +742,6 @@ const Destinations: React.FC = memo(() => {
             )}
         </section>
     );
-});
-
-Destinations.displayName = 'Destinations';
+};
 
 export default Destinations;

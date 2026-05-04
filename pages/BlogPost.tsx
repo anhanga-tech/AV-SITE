@@ -19,7 +19,6 @@ import { SocialShare } from '../components/SocialShare';
 import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 import { openAiChat } from '../utils/aiChat';
 import { mdxComponents } from '../components/blog/mdxComponents';
-import ChatCTA from '../components/blog/ChatCTA';
 
 // Carregado no nível do módulo para o Vite processar em build time
 const allMdxPosts = getAllPosts();
@@ -231,8 +230,6 @@ const BlogPost: React.FC = () => {
                                     <p className="text-gray-400 italic">Conteúdo completo em breve…</p>
                                 </div>
                             )}
-
-                            {post.showChatCTA && <ChatCTA destino={post.chatCTADestination} />}
 
                             <div className="mt-12 pt-8 border-t-2 border-dashed border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-6">
                                 <div className="flex items-center gap-2">

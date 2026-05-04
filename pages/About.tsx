@@ -48,7 +48,7 @@ const About: React.FC = () => {
   return (
     <div className="bg-[#fffdf5] pt-32 pb-20">
       <SEO
-        title="Sobre a Anhangá Viagens | Agência de Viagens em São Paulo"
+        title="Sobre a Anhangá Viagens | Agência Boutique em São Paulo"
         description="Conheça a história e os valores da Anhangá Viagens. Somos uma agência de turismo certificada pela Cadastur em São Paulo, especializada em roteiros personalizados."
         canonical="https://www.anhanga.tur.br/sobre/"
       />
@@ -144,7 +144,7 @@ const About: React.FC = () => {
                   A Anhangá Viagens nasceu em São Paulo com um propósito claro: resgatar o prazer de planejar uma viagem sem as dores de cabeça da burocracia digital e dos roteiros engessados.
                 </p>
                 <p>
-                  Fundada por especialistas apaixonados pelo setor, nossa agência foca no <strong>atendimento consultivo</strong>. Não somos apenas um motor de busca; somos curadores de experiências.
+                  Fundada por especialistas apaixonados pelo setor, nossa agência boutique foca no <strong>atendimento consultivo</strong>. Não somos apenas um motor de busca; somos curadores de experiências.
                 </p>
                 <p>
                   Do primeiro café (virtual ou presencial) até o seu retorno para casa, cuidamos de cada detalhe como se a viagem fosse nossa. É esse cuidado artesanal que nos define.

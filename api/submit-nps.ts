@@ -110,6 +110,30 @@ export default async function handler(request: Request): Promise<Response> {
     );
   }
 
+  let rawBody: unknown;
+  try {
+    rawBody = await request.json();
+  } catch {
+    return buildJsonResponse(
+      { ok: false, requestId, code: 'VALIDATION_ERROR', error: 'JSON inválido no corpo da requisição.' },
+      400,
+      corsHeaders,
+      requestId,
+    );
+  }
+
+  const validation = validateNpsPayload(rawBody);
+  if (validation.valid === false) {
+    return buildJsonResponse(
+      { ok: false, requestId, code: 'VALIDATION_ERROR', error: validation.error },
+      400,
+      corsHeaders,
+      requestId,
+    );
+  }
+
+  const payload = validation.data;
+
   const clientIP = getClientIP(request);
   const rateLimit = await checkRateLimit(clientIP, {
     limit: RATE_LIMIT_MAX_REQUESTS,
@@ -142,30 +166,6 @@ export default async function handler(request: Request): Promise<Response> {
     );
   }
 
-  let rawBody: unknown;
-  try {
-    rawBody = await request.json();
-  } catch {
-    return buildJsonResponse(
-      { ok: false, requestId, code: 'VALIDATION_ERROR', error: 'JSON inválido no corpo da requisição.' },
-      400,
-      corsHeaders,
-      requestId,
-    );
-  }
-
-  const validation = validateNpsPayload(rawBody);
-  if (validation.valid === false) {
-    return buildJsonResponse(
-      { ok: false, requestId, code: 'VALIDATION_ERROR', error: validation.error },
-      400,
-      corsHeaders,
-      requestId,
-    );
-  }
-
-  const payload = validation.data;
-
   console.log('SUBMIT_NPS', {
     requestId,
     stage: 'sending',
@@ -173,17 +173,12 @@ export default async function handler(request: Request): Promise<Response> {
     score: payload.score,
   });
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 8000);
-
   try {
     const webhookRes = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...payload, submittedAt: new Date().toISOString(), requestId }),
-      signal: controller.signal,
     });
-    clearTimeout(timeoutId);
 
     if (!webhookRes.ok) {
       const text = await webhookRes.text().catch(() => '');
@@ -209,10 +204,9 @@ export default async function handler(request: Request): Promise<Response> {
       requestId,
     );
   } catch (err) {
-    clearTimeout(timeoutId);
     console.error('SUBMIT_NPS', {
       requestId,
-      stage: err instanceof Error && err.name === 'AbortError' ? 'webhook_timeout' : 'unexpected',
+      stage: 'unexpected',
       errorType: err instanceof Error ? err.name : typeof err,
     });
     return buildJsonResponse(

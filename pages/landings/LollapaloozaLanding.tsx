@@ -81,7 +81,7 @@ const LollapaloozaLanding: React.FC = () => {
           <p className="text-gray-700 text-lg leading-relaxed mb-5">
             Se você quer chegar antes da próxima abertura, entre na <strong>Lista de Espera Lolla 2027</strong>. A <strong>Anhangá Viagens</strong> é uma{' '}
             <a href="https://www.anhanga.tur.br/" className="text-brand-cyan font-semibold hover:underline">
-              agência de viagens em São Paulo
+              agência de viagens boutique em São Paulo
             </a>{' '}
             com foco em atendimento consultivo e <strong>viagens personalizadas</strong> — do planejamento inicial ao suporte no destino.
           </p>

@@ -82,7 +82,7 @@ test.describe('Brazil Promotion Day Landing Page', () => {
     );
     expect(formSubmissionEvent).toMatchObject({
       event: 'form_submission',
-      form_type: 'event_lead',
+      form_type: 'ai_chatbot_lead',
     });
   });
 

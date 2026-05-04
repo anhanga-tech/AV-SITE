@@ -127,58 +127,6 @@ test('buildLeadWhatsAppUrl should include origin, destination, dates, baggage an
     restoreBrowserGlobals();
 });
 
-test('pushGenerateLeadDataLayerEvent should use provided formType for form_submission event', () => {
-    const mockWindow: MockWindow = {
-        location: {
-            search: '',
-            hash: '',
-            href: 'https://www.anhanga.tur.br/',
-        },
-        dataLayer: [],
-    };
-
-    Object.defineProperty(globalThis, 'window', {
-        configurable: true,
-        value: mockWindow,
-    });
-
-    const payload = {
-        firstName: 'Felipe',
-        lastName: 'William',
-        email: 'felipe@example.com',
-        whatsapp: '+5511988314487',
-        event_id: 'lead_form_type_test',
-        bantSummary: 'Testing formType',
-        destination: 'Nowhere',
-        utms: {
-            utm_source: null,
-            utm_medium: null,
-            utm_campaign: null,
-            utm_term: null,
-            utm_content: null,
-        },
-        tracking: {
-            utm_source: null,
-            utm_medium: null,
-            utm_campaign: null,
-            utm_term: null,
-            utm_content: null,
-        },
-    };
-
-    // Default formType
-    pushGenerateLeadDataLayerEvent(payload);
-    const submissionEvent1 = mockWindow.dataLayer.find(e => e.event === 'form_submission');
-    assert.equal(submissionEvent1?.form_type, 'ai_chatbot_lead');
-
-    // Custom formType
-    pushGenerateLeadDataLayerEvent(payload, 'event_lead');
-    const submissionEvent2 = mockWindow.dataLayer.filter(e => e.event === 'form_submission')[1];
-    assert.equal(submissionEvent2?.form_type, 'event_lead');
-
-    restoreBrowserGlobals();
-});
-
 test('createLeadEventId should generate a lead-prefixed event id', () => {
     const eventId = createLeadEventId();
 

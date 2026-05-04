@@ -7,125 +7,75 @@ on:
 jobs:
   triage:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     permissions:
       contents: read
       issues: write
       repository-projects: write
     steps:
+      - uses: actions/checkout@v4
+
+      # Work around upstream claude-code-action SDK crashes on issues:opened.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
       - name: Run Issue Triage
         env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+          DISABLE_AUTOUPDATER: "1"
           REPO: ${{ github.repository }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           ISSUE_TITLE: ${{ github.event.issue.title }}
           ISSUE_BODY: ${{ github.event.issue.body }}
-          ISSUE_URL: ${{ github.event.issue.html_url }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+          PROMPT_FILE: ${{ runner.temp }}/issue-triage-prompt.txt
         run: |
-          set -euo pipefail
+          node <<'NODE'
+          const fs = require("fs");
 
-          title="${ISSUE_TITLE:-}"
-          body="${ISSUE_BODY:-}"
-          text="$(printf '%s\n%s' "$title" "$body" | tr '[:upper:]' '[:lower:]')"
-          labels=()
+          const prompt = [
+            `REPO: ${process.env.REPO}`,
+            `ISSUE NUMBER: ${process.env.ISSUE_NUMBER}`,
+            `TITLE: "${process.env.ISSUE_TITLE || ""}"`,
+            `BODY: ${process.env.ISSUE_BODY || ""}`,
+            `AUTHOR: ${process.env.ISSUE_AUTHOR || ""}`,
+            "",
+            "Analyze this new issue and:",
+            "1. Determine if it's a bug report, feature request, or question",
+            "2. Assess priority (critical, high, medium, low)",
+            "3. Suggest appropriate labels from: bug, enhancement, seo, geo, schema, technical-debt, documentation",
+            "4. Check if it duplicates existing issues",
+            "",
+            "Routing Rules (MANDATORY):",
+            '- If TITLE contains "SEO" or "GEO" (case-insensitive): Add to Project #5 ("SEO & GEO Optimization 2026").',
+            '- If TITLE does NOT contain "SEO" or "GEO": Add to Project #4 ("AV-SITE Project").',
+            "",
+            "Use gh CLI to:",
+            "- `gh issue view [number]` to view the issue",
+            `- \`gh search issues "query" --repo ${process.env.REPO}\` to find similar issues`,
+            `- \`gh label list --repo ${process.env.REPO}\` to see available labels`,
+            '- `gh issue edit [number] --add-label "label1,label2"` to add labels',
+            "- Add to projects:",
+            "  - Project #4 ID: PVT_kwHODSPH6s4BPrTl",
+            "  - Project #5 ID: PVT_kwHODSPH6s4BP_lK",
+            `  - CMD: \`gh project item-add 4 --owner felipewilliam2 --url https://github.com/${process.env.REPO}/issues/${process.env.ISSUE_NUMBER}\``,
+            `  - OR CMD: \`gh project item-add 5 --owner felipewilliam2 --url https://github.com/${process.env.REPO}/issues/${process.env.ISSUE_NUMBER}\``,
+            "",
+            "Post a comment summarizing your analysis, apply labels, and add to the correct project.",
+            "",
+          ].join("\n");
 
-          add_label() {
-            local label="$1"
-            for existing in "${labels[@]}"; do
-              if [[ "$existing" == "$label" ]]; then
-                return
-              fi
-            done
-            labels+=("$label")
-          }
+          fs.writeFileSync(process.env.PROMPT_FILE, prompt);
+          NODE
 
-          if [[ "$text" =~ critical|critico|alta[[:space:]]+prioridade|high ]]; then
-            add_label "priority-high"
-          elif [[ "$text" =~ low|baixa ]]; then
-            add_label "priority-low"
-          else
-            add_label "priority-medium"
-          fi
-
-          if [[ "$text" =~ seo ]]; then
-            add_label "seo"
-          fi
-
-          if [[ "$text" =~ geo ]]; then
-            add_label "geo"
-          fi
-
-          if [[ "$text" =~ schema|json-ld|structured[[:space:]]+data ]]; then
-            add_label "schema"
-          fi
-
-          if [[ "$text" =~ faq|uvp|copy|content|conteudo ]]; then
-            add_label "content"
-          fi
-
-          if [[ "$text" =~ performance|lcp|fcp|web[[:space:]]+vitals|renderizacao ]]; then
-            add_label "performance"
-          fi
-
-          if [[ "$text" =~ bug|erro|falha|broken|crash|regress ]]; then
-            issue_type="bug report"
-            add_label "bug"
-          elif [[ "$text" =~ documentacao|documentation|docs ]]; then
-            issue_type="documentation"
-            add_label "documentation"
-          elif [[ "$text" =~ pergunta|question|duvida ]]; then
-            issue_type="question"
-            add_label "question"
-          else
-            issue_type="feature request / improvement"
-            add_label "enhancement"
-          fi
-
-          label_csv="$(IFS=,; echo "${labels[*]}")"
-          if [[ -n "$label_csv" ]]; then
-            gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label "$label_csv"
-          fi
-
-          if [[ "$title" =~ [Ss][Ee][Oo]|[Gg][Ee][Oo] ]]; then
-            project_number="5"
-            project_id="PVT_kwHODSPH6s4BP_lK"
-            project_name="SEO & GEO Optimization 2026"
-          else
-            project_number="4"
-            project_id="PVT_kwHODSPH6s4BPrTl"
-            project_name="AV-SITE Project"
-          fi
-
-          issue_node_id="$(gh issue view "$ISSUE_NUMBER" --repo "$REPO" --json id --jq '.id')"
-          if gh api graphql \
-            -f query='mutation($projectId: ID!, $contentId: ID!) { addProjectV2ItemById(input: { projectId: $projectId, contentId: $contentId }) { item { id } } }' \
-            -f projectId="$project_id" \
-            -f contentId="$issue_node_id" >/dev/null; then
-            project_status="adicionada"
-          else
-            project_status="falha ao adicionar; verifique permissoes do GITHUB_TOKEN para Projects v2"
-          fi
-
-          search_query="$(printf '%s' "$title" | sed -E 's/^\[[^]]+\][[:space:]]*//; s/Recriada:[[:space:]]*//I; s/"/\\"/g')"
-          duplicates="$(gh search issues "$search_query" --repo "$REPO" --state open --json number,title,url --limit 5 \
-            --jq ".[] | select(.number != (${ISSUE_NUMBER} | tonumber)) | \"- #\\(.number): \\(.title) - \\(.url)\"" || true)"
-
-          if [[ -z "$duplicates" ]]; then
-            duplicate_summary="Nenhuma duplicata aberta obvia encontrada pela busca automatizada."
-          else
-            duplicate_summary="$duplicates"
-          fi
-
-          comment_file="$(mktemp)"
-          cat > "$comment_file" <<EOF
-          Triagem automatica concluida.
-
-          - Tipo: ${issue_type}
-          - Labels aplicadas: ${label_csv}
-          - Projeto: #${project_number} (${project_name}) - ${project_status}
-
-          Possiveis duplicatas:
-          ${duplicate_summary}
-          EOF
-
-          gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body-file "$comment_file"
+          claude -p \
+            --model claude-sonnet-4-6 \
+            --max-turns 5 \
+            --allowedTools "Bash(gh issue:*),Bash(gh search:*),Bash(gh label:*),Bash(gh project:*),Bash(gh api:*)" \
+            < "$PROMPT_FILE"

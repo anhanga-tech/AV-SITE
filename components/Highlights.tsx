@@ -167,7 +167,7 @@ const Highlights = memo(() => {
                                 </span>
                             </h2>
                             <p className="text-gray-600 text-lg md:text-xl font-medium leading-relaxed mb-8">
-                                A <strong>Anhangá</strong> é uma agência de viagens em São Paulo. Não trabalhamos com pacote pronto. Ouvimos o que você quer, pesquisamos o que faz sentido pra você e montamos cada detalhe do roteiro. Do primeiro voo ao último café da manhã, você não está sozinho.
+                                A <strong>Anhangá</strong> é uma agência boutique em São Paulo. Não trabalhamos com pacote pronto. Ouvimos o que você quer, pesquisamos o que faz sentido pra você e montamos cada detalhe do roteiro. Do primeiro voo ao último café da manhã, você não está sozinho.
                             </p>
                         </motion.div>
 

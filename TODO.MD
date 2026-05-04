@@ -13,8 +13,8 @@ Este documento lista as melhorias identificadas na auditoria de Março de 2026 q
     - [ ] Criar série de posts "Europa Gastronômica: Itália profunda".
 - [ ] **Expansão de Festivais**:
     - [ ] Landing page ou blog posts para Rock in Rio 2025/2026.
-    - [ ] Conteúdo para festivais e eventos culturais de nicho.
-- [ ] **Páginas de Serviço Especializado**: Criar seções específicas para consultoria de viagem e roteiros sob medida.
+    - [ ] Conteúdo para festivais boutique e eventos culturais de nicho.
+- [ ] **Páginas de Serviço de Luxo**: Criar seções específicas para o atendimento "Boutique" e roteiros de alto padrão.
 
 ## Backlinks & Outreach
 - [ ] Iniciar campanha de guest posts em blogs de viagem parceiros.

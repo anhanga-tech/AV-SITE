@@ -25,7 +25,7 @@ interface SEOProps {
 
 export const SEO: React.FC<SEOProps> = ({
   title = 'Anhangá Viagens | Agência de Viagens Personalizadas',
-  description = 'Agência de viagens em São Paulo com roteiros personalizados, experiências no Brasil e no mundo e suporte especializado.',
+  description = 'Agência de viagens boutique em São Paulo com roteiros personalizados, experiências no Brasil e no mundo e suporte especializado.',
   canonical,
   image = DEFAULT_OG_IMAGE,
   imageWidth,

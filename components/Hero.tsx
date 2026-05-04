@@ -141,7 +141,7 @@ const Hero: React.FC = () => {
                 `}
           >
             <span className="block text-sm sm:text-base font-semibold text-white/80 tracking-widest uppercase mb-3 leading-normal">
-              Agência de Viagens em São Paulo
+              Agência de Viagens Boutique em São Paulo
             </span>
             Sua Próxima <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500 relative inline-block pb-2">

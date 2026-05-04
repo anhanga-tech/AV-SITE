@@ -18,18 +18,6 @@ function normalizeTags(tags: BlogPostFrontmatter['tags']): string[] {
   return Array.isArray(tags) ? tags : [];
 }
 
-function normalizeFrontmatterDate(value: unknown): string | undefined {
-  if (value instanceof Date) {
-    return value.toISOString().slice(0, 10);
-  }
-
-  if (typeof value === 'string') {
-    return value.trim() ? value : undefined;
-  }
-
-  return undefined;
-}
-
 // The generated manifest is consumed as static data during build/prerender.
 // It intentionally materializes absolute image URLs here instead of relying on
 // runtime media helpers that component-facing modules such as blogData/LazyImage
@@ -50,12 +38,9 @@ function toPostMeta(filepath: string, rawContent: string): PostMeta {
   const { data, content } = matter(rawContent);
   const slug = path.basename(filepath, '.mdx');
   const frontmatter = data as BlogPostFrontmatter;
-  const dateModified = normalizeFrontmatterDate(frontmatter.dateModified);
 
   return {
     ...frontmatter,
-    date: normalizeFrontmatterDate(frontmatter.date) ?? '',
-    ...(dateModified ? { dateModified } : {}),
     image: normalizePostImageUrl(frontmatter.image),
     tags: normalizeTags(frontmatter.tags),
     slug,

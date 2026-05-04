@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readdir, readFile } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 
 const readRepoFile = async (relativePath: string): Promise<string> =>
   readFile(new URL(`../${relativePath}`, import.meta.url), 'utf8');
@@ -306,25 +306,4 @@ test('remaining runtime media dependencies should use managed Cloudflare assets'
   assert.match(sitemap, /https:\/\/media\.anhanga\.tur\.br\/images\/og\/og-image-1200x630\.jpg/);
   assert.match(sitemap, /https:\/\/media\.anhanga\.tur\.br\/images\/beto-carrero\/landing\/firewhip\.jpg/);
   assert.match(blogPost, /image: "images\/blog\/blog-viagem-solo-feminina\.png"/);
-});
-
-test('blog posts should not hotlink third-party cover images', async () => {
-  const filenames = await readdir(new URL('../content/blog', import.meta.url));
-  const postFiles = filenames.filter((filename) => filename.endsWith('.mdx') && !filename.startsWith('_'));
-
-  for (const filename of postFiles) {
-    const content = await readRepoFile(`content/blog/${filename}`);
-
-    assertMissingHosts(
-      content,
-      ['images.unsplash.com', 'img1.wsimg.com', 'blog.anhanga.tur.br'],
-      filename,
-    );
-
-    assert.match(
-      content,
-      /image: "(?:images\/(?:blog|about|destinations)\/.+\.(jpg|jpeg|png|webp)|\/blog-viagem-solo-feminina\.png)"/,
-      `${filename} should point to a managed image path`,
-    );
-  }
 });

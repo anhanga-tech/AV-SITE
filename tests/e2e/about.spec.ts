@@ -5,7 +5,7 @@ test.describe('Sobre Page E-E-A-T Verification', () => {
     await page.goto('/sobre');
 
     // Check SEO Title
-    await expect(page).toHaveTitle(/Sobre a Anhangá Viagens | Agência de Viagens em São Paulo/);
+    await expect(page).toHaveTitle(/Sobre a Anhangá Viagens | Agência Boutique em São Paulo/);
 
     // Check H1
     const h1 = page.locator('h1');

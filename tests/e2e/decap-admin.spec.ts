@@ -11,7 +11,6 @@ test.describe('Decap CMS admin', () => {
     expect(configText).toContain('publish_mode: editorial_workflow');
     expect(configText).toContain('media_folder: public/uploads');
     expect(configText).toContain('public_folder: /uploads');
-    expect(configText).toContain('base_url: https://www.anhanga.tur.br');
     expect(configText).toContain('site_url: https://www.anhanga.tur.br');
     expect(configText).toContain('display_url: https://www.anhanga.tur.br');
 

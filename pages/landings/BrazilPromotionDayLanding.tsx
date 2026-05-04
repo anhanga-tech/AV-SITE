@@ -17,6 +17,8 @@ import {
     ArrowRight,
 } from '@phosphor-icons/react';
 import { SEO } from '../../components/SEO';
+import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
+import { ServiceSchema } from '../../components/schemas/ServiceSchema';
 import { useLeadCapture, createLeadEventId } from '../../hooks/useLeadCapture';
 import { useWhatsAppLink } from '../../utils/whatsapp';
 import { BRAND_LOGO_BLUE_URL } from '../../lib/media-assets';
@@ -123,7 +125,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                     destination,
                     bantSummary: `Lead captado via QR Code — Brazil Promotion Day 2026. Destino de interesse: ${destination}.`,
                 },
-                { eventId, pushDataLayerEvent: true, formType: 'event_lead' },
+                { eventId, pushDataLayerEvent: true },
             );
 
             if (result.ok) {
@@ -144,8 +146,22 @@ const BrazilPromotionDayLanding: React.FC = () => {
         <>
             <SEO
                 title="Anhangá Viagens na Brazil Promotion Day | Roteiros Personalizados"
-                description="Conheça a Anhangá Viagens na Brazil Promotion Day. Agência de viagens em SP com roteiros exclusivos feitos do zero, sem pacote pronto."
+                description="Conheça a Anhangá Viagens na Brazil Promotion Day. Agência boutique em SP com roteiros exclusivos feitos do zero, sem pacote pronto."
                 canonical="https://www.anhanga.tur.br/brazil-promotion-day/"
+            />
+            <ServiceSchema
+                name="Anhangá na Brazil Promotion Day 2026"
+                description="Planejamento de viagens personalizadas e roteiros exclusivos para empresas e executivos."
+                serviceUrl="https://www.anhanga.tur.br/brazil-promotion-day/"
+                serviceType="Consultoria de Viagem"
+                areaServed="São Paulo e Brasil"
+                keywords={['brazil promotion day', 'roteiros personalizados', 'viagens corporativas']}
+            />
+            <BreadcrumbSchema
+                items={[
+                    { name: 'Home', item: 'https://www.anhanga.tur.br/' },
+                    { name: 'Brazil Promotion Day', item: 'https://www.anhanga.tur.br/brazil-promotion-day/' }
+                ]}
             />
 
             <div className="bg-[#fffdf5] min-h-screen font-sans">
@@ -166,7 +182,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                             href={whatsappUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="btn-whatsapp btn-specialist hidden sm:flex items-center gap-2 bg-brand-dark text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
+                            className="hidden sm:flex items-center gap-2 bg-brand-dark text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
                             data-contact-intent
                         >
                             <WhatsappLogo className="w-4 h-4" weight="fill" />
@@ -252,7 +268,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                     href={whatsappUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="btn-whatsapp btn-specialist flex items-center justify-center gap-3 bg-brand-yellow text-brand-dark px-8 py-4 rounded-2xl font-bold text-lg shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
+                                    className="flex items-center justify-center gap-3 bg-brand-yellow text-brand-dark px-8 py-4 rounded-2xl font-bold text-lg shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
                                     data-contact-intent
                                 >
                                     <WhatsappLogo className="w-6 h-6" weight="fill" />
@@ -260,7 +276,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                 </a>
                                 <a
                                     href="#contato"
-                                    className="btn-specialist flex items-center justify-center gap-2 border-2 border-white/40 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:border-white hover:bg-white/10 transition-all duration-200"
+                                    className="flex items-center justify-center gap-2 border-2 border-white/40 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:border-white hover:bg-white/10 transition-all duration-200"
                                 >
                                     Prefiro ser contatado
                                     <ArrowRight className="w-5 h-5" />
@@ -427,7 +443,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                 href={whatsappUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="btn-whatsapp btn-specialist shrink-0 flex items-center gap-3 bg-brand-yellow text-brand-dark px-10 py-5 rounded-2xl font-bold text-lg shadow-[4px_4px_0px_rgba(255,255,255,0.15)] hover:shadow-[2px_2px_0px_rgba(255,255,255,0.15)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all whitespace-nowrap"
+                                className="shrink-0 flex items-center gap-3 bg-brand-yellow text-brand-dark px-10 py-5 rounded-2xl font-bold text-lg shadow-[4px_4px_0px_rgba(255,255,255,0.15)] hover:shadow-[2px_2px_0px_rgba(255,255,255,0.15)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all whitespace-nowrap"
                                 data-contact-intent
                             >
                                 <WhatsappLogo className="w-6 h-6" weight="fill" />
@@ -550,7 +566,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                             href={whatsappUrl}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="btn-whatsapp btn-specialist flex items-center gap-2 bg-brand-dark text-white px-6 py-3 rounded-xl font-bold text-sm shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
+                                            className="flex items-center gap-2 bg-brand-dark text-white px-6 py-3 rounded-xl font-bold text-sm shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
                                             data-contact-intent
                                         >
                                             <WhatsappLogo className="w-4 h-4" weight="fill" />

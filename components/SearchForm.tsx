@@ -603,19 +603,10 @@ BudgetField.displayName = 'BudgetField';
 
 interface SearchButtonProps {
   isSearchLoading: boolean;
-  validationError?: string | null;
 }
 
-const SearchButton = memo(({ isSearchLoading, validationError }: SearchButtonProps) => (
-  <div className="p-2 w-full md:w-auto flex-shrink-0 relative">
-    {validationError && (
-      <div
-        role="alert"
-        className="absolute -top-6 left-1/2 -translate-x-1/2 w-full text-center text-red-600 text-xs font-black animate-fade-in-down whitespace-nowrap bg-white/90 backdrop-blur-sm py-1 px-2 rounded-full shadow-sm border border-red-100 z-10"
-      >
-        {validationError}
-      </div>
-    )}
+const SearchButton = memo(({ isSearchLoading }: SearchButtonProps) => (
+  <div className="p-2 w-full md:w-auto flex-shrink-0">
     <button
       type="submit"
       disabled={isSearchLoading}
@@ -655,15 +646,6 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
   const [budget, setBudget] = useState('');
   const [showBudgetDropdown, setShowBudgetDropdown] = useState(false);
   const [isSearchLoading, setIsSearchLoading] = useState(false);
-  const [validationError, setValidationError] = useState<string | null>(null);
-  const errorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
-    };
-  }, []);
 
   const guestDropdownRef = useRef<HTMLDivElement>(null);
   const destRef = useRef<HTMLDivElement>(null);
@@ -820,27 +802,18 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
 
   const handleSearch = useCallback(() => {
     if (!inputValue.trim()) {
-      if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
-      setValidationError("Por favor, informe o destino.");
-      import('../utils/haptics').then(m => m.triggerHaptic('medium'));
-      errorTimeoutRef.current = setTimeout(() => setValidationError(null), 4000);
+      alert("Por favor, informe o destino.");
       return;
     }
 
     if (!startDate) {
-      if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
-      setValidationError("Por favor, selecione a data de ida.");
-      import('../utils/haptics').then(m => m.triggerHaptic('medium'));
+      alert("Por favor, selecione a data de ida.");
       setShowCalendar(true);
-      errorTimeoutRef.current = setTimeout(() => setValidationError(null), 4000);
       return;
     }
 
     setIsSearchLoading(true);
-    setValidationError(null);
-
     openAiChat({
-      haptic: 'medium',
       message: buildSearchMessage({
         inputValue,
         startDate,
@@ -885,9 +858,7 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className={`w-full max-w-5xl mx-auto bg-white rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] p-2 relative z-50 border-[6px] border-white/20 backdrop-blur-sm flex flex-col transition-all duration-300 ${
-        validationError ? 'ring-4 ring-red-500/20 border-red-500/20' : ''
-      }`}
+      className="w-full max-w-5xl mx-auto bg-white rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] p-2 relative z-50 border-[6px] border-white/20 backdrop-blur-sm flex flex-col"
     >
       <div className="flex flex-col md:flex-row items-center w-full divide-y md:divide-y-0 md:divide-x divide-gray-100">
         <DestinationField
@@ -951,10 +922,7 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
           onToggle={toggleBudgetDropdown}
           onSelect={handleBudgetSelect}
         />
-        <SearchButton
-          isSearchLoading={isSearchLoading}
-          validationError={validationError}
-        />
+        <SearchButton isSearchLoading={isSearchLoading} />
       </div>
     </form>
   );

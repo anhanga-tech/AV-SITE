@@ -32,12 +32,12 @@ Para garantir que os esforços de outreach resultem em ganhos de SEO e não em p
 ### 2. Parcerias de Conteúdo (Guest Posts)
 *   **Blogs de Viagem de Nicho:** Mochileiros.com, Vai de Viagem, Passagens Imperdíveis (focar em guias de Orlando e Beto Carrero).
 *   **Portais de Eventos e Festivais:** Parcerias com blogs que cobrem Lollapalooza e festivais de música em SP.
-*   **Influenciadores 50+:** Blogs e canais focados em "melhor idade" para promover o posicionamento consultivo da Anhangá.
+*   **Influenciadores 50+:** Blogs e canais focados em "melhor idade" para promover o posicionamento boutique da Anhangá.
 
 ### 3. Conteúdo Linkável (Link Bait)
 *   **Guia Definitivo Orlando 2026:** Infográfico ou guia PDF completo que outros blogs queiram referenciar.
 *   **Calculadora de Custos Beto Carrero:** Ferramenta interativa que gere valor para o usuário e receba links orgânicos.
-*   **Pesquisa Original:** Dados sobre tendências de viagens personalizadas em SP (E-E-A-T).
+*   **Pesquisa Original:** Dados sobre tendências de viagens boutique em SP (E-E-A-T).
 
 ---
 

@@ -28,13 +28,13 @@ function homePage(): string {
         ({ question, answer }) => `### ${question}\n\n${answer}`
     ).join('\n\n');
 
-    return `# Anhangá Viagens — Agência de Turismo Personalizada
+    return `# Anhangá Viagens — Agência de Turismo Boutique
 
 **Site:** ${SITE_BASE}
 **Cadastur:** 37.036.732/0001-41
 **Atendimento:** chatbot IA + especialistas humanos, disponível 24h
 
-Agência especializada em roteiros 100% personalizados para destinos nacionais e internacionais.
+Agência boutique especializada em roteiros 100% personalizados para destinos nacionais e internacionais.
 
 ## Serviços
 

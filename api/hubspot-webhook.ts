@@ -40,8 +40,13 @@ function getWebhookConfig(): { webhookSecret: string; hubspotToken: string } | n
 }
 
 function getMissingConfigResponse(): Response {
+  const missingEnvVars = [
+    !process.env.HUBSPOT_WEBHOOK_SECRET ? 'HUBSPOT_WEBHOOK_SECRET' : null,
+    !process.env.HUBSPOT_TOKEN ? 'HUBSPOT_TOKEN' : null,
+  ].filter(Boolean);
+
   return buildJsonResponse(
-    { error: 'Serviço temporariamente indisponível (erro de configuração).' },
+    { error: `Missing environment variables: ${missingEnvVars.join(', ')}` },
     500,
   );
 }

@@ -12,7 +12,7 @@ export const OrganizationSchema = () => (
       "alternateName": "Anhangá Turismo",
       "url": "https://www.anhanga.tur.br/",
       "logo": BRAND_LOGO_BLUE_URL,
-      "description": "Agência de viagens em São Paulo especializada em roteiros personalizados, turismo de transformação e pacotes exclusivos para grandes festivais, incluindo o Lollapalooza Brasil, e público 50+.",
+      "description": "Agência de viagens boutique em São Paulo especializada em roteiros personalizados, turismo de transformação e pacotes exclusivos para grandes festivais, incluindo o Lollapalooza Brasil, e público 50+.",
       "telephone": "+55-11-52833309",
       "email": "contato@anhanga.tur.br",
       "taxID": "37.036.732/0001-41",

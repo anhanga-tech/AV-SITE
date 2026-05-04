@@ -260,7 +260,7 @@ grep -r "pexels" /data/mediaConfig.ts /data/blogData.ts
 | roteiro Orlando 7 dias | Média | Alta | Informacional | Blog Post / Guia |
 | viagem melhor idade 50+ | Baixa | Alta | Comercial | Landing Page / Blog |
 | Lollapalooza Brasil pacotes 2026 | Baixa | Alta | Transacional | Landing Page |
-| agência de viagens personalizada SP | Baixa | Média | Comercial | Home |
+| agência de viagens boutique SP | Baixa | Média | Comercial | Home |
 | quanto custa viagem para Orlando | Baixa | Média | Informacional | Blog Post |
 | melhor época para viajar Disney | Baixa | Média | Informacional | Blog Post |
 | roteiro Europa 15 dias | Média | Média | Informacional | Blog Post / Guia |

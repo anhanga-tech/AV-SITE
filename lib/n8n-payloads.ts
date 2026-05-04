@@ -1,6 +1,5 @@
 import type { SubmitLeadRequest } from '../types/leadCapture';
 import type { SubmitWaitlistRequest } from '../types/waitlist';
-import type { SubmitQuizRequest } from '../types/quiz';
 
 export interface N8nLeadTracking {
     utm_source: string | null;
@@ -125,52 +124,6 @@ export function buildN8nWaitlistPayload(payload: SubmitWaitlistRequest, requestI
             name: payload.name,
             email: payload.email,
             sourcePage: payload.sourcePage,
-        },
-        utms: payload.utms,
-        tracking: payload.tracking,
-        meta: {
-            receivedAt: new Date().toISOString(),
-        },
-    };
-}
-
-export interface N8nQuizPayload {
-    requestId: string;
-    source: 'submit-quiz';
-    quiz: {
-        firstName: string;
-        lastName: string;
-        email: string;
-        whatsapp: string | null;
-        profileKey: string;
-        profileName: string;
-        bantSummary: string;
-        sourcePage: string;
-        destinos: string[];
-        skipped: boolean;
-    };
-    utms: SubmitQuizRequest['utms'];
-    tracking: SubmitQuizRequest['tracking'];
-    meta: {
-        receivedAt: string;
-    };
-}
-
-export function buildN8nQuizPayload(payload: SubmitQuizRequest, requestId: string): N8nQuizPayload {
-    return {
-        requestId,
-        source: 'submit-quiz',
-        quiz: {
-            firstName: payload.firstName,
-            lastName: payload.lastName,
-            email: payload.email,
-            whatsapp: payload.whatsapp ?? null,
-            profileKey: payload.profileKey,
-            profileName: payload.profileName,
-            bantSummary: payload.bantSummary,
-            sourcePage: payload.sourcePage,
-            destinos: payload.destinos ?? [],
-            skipped: payload.skipped ?? false,
         },
         utms: payload.utms,
         tracking: payload.tracking,
