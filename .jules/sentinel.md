@@ -72,3 +72,13 @@ Standardized the "Zero-Trust CORS" pattern for internal APIs. Public-facing endp
 **Vulnerability:** In `lib/lead-logic.ts`, a length limit was implemented that returned the truncated string *before* applying HTML entity escaping for XSS prevention. This allowed malicious payloads exceeding the length limit to bypass sanitization entirely.
 **Learning:** Defensive measures like length limits must be ordered such that they don't bypass security filters. Truncation should happen first, but the resulting shorter string must still be processed by all security filters.
 **Prevention:** Always truncate first, then sanitize. Ensure security-critical functions don't have early return paths that skip mandatory sanitization logic.
+
+## 2026-03-25 - [Memory-Exhaustion DoS via Early Body Parsing]
+**Vulnerability:** API endpoints were parsing the JSON request body (potentially up to MBs depending on runtime limits) *before* checking the rate limit. This allowed attackers to force the server to perform expensive serialization/parsing and memory allocation even when they were already over their quota.
+**Learning:** Rate limiting must be the very first operation after protocol/method validation. If an endpoint requires an authenticated secret, rate limit should ideally happen after the secret check (to prevent unauthenticated rate limit exhaustion) BUT before any heavy payload processing. In our case, we prioritized DoS protection by placing it even before parsing.
+**Prevention:** Always implement an "Early Rate Limiting" pattern. Ensure unit tests verify that rate limit quotas are consumed even by invalid payloads, as this confirms the check happens before validation/parsing.
+
+## 2026-03-25 - [Internal Config Leakage in Error Responses]
+**Vulnerability:** The HubSpot webhook handler leaked specific environment variable names (e.g., 'HUBSPOT_TOKEN') in public error responses when configuration was missing. This provides attackers with internal architectural details.
+**Learning:** Error responses should never disclose the name or nature of internal configuration keys.
+**Prevention:** Standardize on generic, localized error messages for infrastructure-level failures (500/502/503).
