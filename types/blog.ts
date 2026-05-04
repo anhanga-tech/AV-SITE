@@ -9,6 +9,7 @@ export interface BlogPostFrontmatter {
   featured?: boolean;      // se true, aparece em destaque no BlogList
   showChatCTA?: boolean;   // se true, renderiza <ChatCTA /> ao final do post via BlogPost.tsx
   chatCTADestination?: string; // destino opcional para personalizar o ChatCTA (ex: "Orlando", "Maldivas")
+  historicalNotice?: string;
   tags?: string[];
   seoTitle?: string;       // opcional: título diferente para <title> tag SEO
   seoDescription?: string; // opcional: meta description diferente do excerpt
