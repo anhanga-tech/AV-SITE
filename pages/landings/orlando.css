@@ -1,12 +1,12 @@
 .landing-orlando {
-    --bg-color: #fdfcf5;
-    --accent-pink: #ff6b9d;
-    --accent-blue: #4cc9f0;
-    --accent-yellow: #ffd166;
-    --accent-green: #06d6a0;
-    --text-dark: #1a1a1a;
+    --bg-color: #FDFCF5;
+    --accent-pink: #FF6B9D;
+    --accent-blue: #4CC9F0;
+    --accent-yellow: #FFD166;
+    --accent-green: #06D6A0;
+    --text-dark: #1A1A1A;
     --tape-color: rgba(255, 255, 255, 0.4);
-    --sticker-shadow: 2px 4px 12px rgba(0, 0, 0, 0.12);
+    --sticker-shadow: 2px 4px 12px rgba(0,0,0,0.12);
     --solid-shadow: 4px 4px 0px var(--text-dark);
 }
 
@@ -23,7 +23,7 @@
 
 .landing-orlando {
     background-color: var(--bg-color);
-    font-family: "Outfit", sans-serif;
+    font-family: 'Outfit', sans-serif;
     color: var(--text-dark);
     line-height: 1.5;
     overflow-x: hidden;
@@ -33,10 +33,7 @@
 /* SVG Grain Filter */
 .landing-orlando .grain-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     pointer-events: none;
     z-index: 9999;
     opacity: 0.035;
@@ -56,7 +53,7 @@
 }
 
 .landing-orlando .logo {
-    font-family: "Space Mono", monospace;
+    font-family: 'Space Mono', monospace;
     font-weight: 700;
     font-size: 1.25rem;
     letter-spacing: -0.5px;
@@ -84,7 +81,7 @@
 .landing-orlando .nav-links {
     display: flex;
     gap: 2.5rem;
-    font-family: "Space Mono", monospace;
+    font-family: 'Space Mono', monospace;
     font-weight: 700;
     text-transform: uppercase;
     font-size: 0.85rem;
@@ -99,7 +96,7 @@
 }
 
 .landing-orlando .nav-links a::after {
-    content: "";
+    content: '';
     position: absolute;
     bottom: -4px;
     left: 0;
@@ -141,11 +138,16 @@
 }
 
 .landing-orlando .title-collage {
+    display: block;
     position: relative;
     margin-bottom: 2.5rem;
     opacity: 0;
     animation: slideIn 0.8s ease-out forwards;
-    display: block; /* Works as span */
+    font-size: clamp(4rem, 9vw, 8rem);
+    font-weight: 900;
+    line-height: 0.9;
+    text-transform: uppercase;
+    letter-spacing: -0.04em;
 }
 
 .landing-orlando h1 {
@@ -165,34 +167,26 @@
     text-transform: uppercase;
     opacity: 0.7;
     margin-bottom: 0.5rem;
-    font-family: "Outfit", sans-serif;
+    font-family: 'Outfit', sans-serif;
 }
 
-.landing-orlando .title-collage {
-    font-size: clamp(4rem, 9vw, 8rem);
-    font-weight: 900;
-    line-height: 0.9;
-    text-transform: uppercase;
-    letter-spacing: -0.04em;
+.landing-orlando .highlight-blue { 
+    color: var(--accent-blue); 
+    display: block; 
+    transform: rotate(-1.5deg); 
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.05);
 }
 
-.landing-orlando .highlight-blue {
-    color: var(--accent-blue);
-    display: block;
-    transform: rotate(-1.5deg);
-    text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.05);
-}
-
-.landing-orlando .highlight-pink {
-    color: var(--accent-pink);
-    display: block;
-    margin-left: 0.2em;
+.landing-orlando .highlight-pink { 
+    color: var(--accent-pink); 
+    display: block; 
+    margin-left: 0.2em; 
 }
 
 .landing-orlando .hero-description {
     font-size: 1.2rem;
     margin-bottom: 2.5rem;
-    font-family: "Space Mono", monospace;
+    font-family: 'Space Mono', monospace;
     line-height: 1.6;
     max-width: 90%;
     color: #333;
@@ -229,7 +223,7 @@
     background: white;
     padding: 12px 12px 45px 12px;
     box-shadow: var(--sticker-shadow);
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0,0,0,0.08);
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     cursor: pointer;
     backface-visibility: hidden;
@@ -239,7 +233,7 @@
 .landing-orlando .card:hover {
     transform: scale(1.05) rotate(0deg) !important;
     z-index: 100 !important;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
 
 .landing-orlando .card img {
@@ -251,7 +245,7 @@
 }
 
 .landing-orlando .card-label {
-    font-family: "Space Mono", monospace;
+    font-family: 'Space Mono', monospace;
     margin-top: 15px;
     font-size: 0.85rem;
     text-align: center;
@@ -261,26 +255,26 @@
 }
 
 /* Precise Card Positioning (Desktop Only) */
-.landing-orlando .c1 {
-    transform: rotate(-4deg);
-    width: 280px;
-    top: 20px;
-    left: 10px;
-    z-index: 1;
+.landing-orlando .c1 { 
+    transform: rotate(-4deg); 
+    width: 280px; 
+    top: 20px; 
+    left: 10px; 
+    z-index: 1; 
 }
-.landing-orlando .c2 {
-    transform: rotate(6deg);
-    width: 300px;
-    top: 40px;
-    right: -80px;
-    z-index: 2;
+.landing-orlando .c2 { 
+    transform: rotate(6deg); 
+    width: 300px; 
+    top: 40px; 
+    right: -80px; 
+    z-index: 2; 
 }
-.landing-orlando .c3 {
-    transform: rotate(-6deg);
-    width: 260px;
-    bottom: 20px;
-    left: 220px;
-    z-index: 3;
+.landing-orlando .c3 { 
+    transform: rotate(-6deg); 
+    width: 260px; 
+    bottom: 20px; 
+    left: 220px; 
+    z-index: 3; 
 }
 
 /* Floating Badge Elements */
@@ -300,13 +294,13 @@
     box-shadow: var(--solid-shadow);
     animation: float 4s ease-in-out infinite;
     z-index: 4;
-    font-family: "Space Mono", monospace;
+    font-family: 'Space Mono', monospace;
     letter-spacing: -0.5px;
     color: var(--text-dark);
 }
 
 .landing-orlando .badge::after {
-    content: "";
+    content: '';
     position: absolute;
     top: 5px;
     left: 5px;
@@ -317,10 +311,10 @@
     opacity: 0.3;
 }
 
-.landing-orlando .badge-1 {
-    background: var(--accent-yellow);
-    top: -10%;
-    right: 12%;
+.landing-orlando .badge-1 { 
+    background: var(--accent-yellow); 
+    top: -10%; 
+    right: 12%; 
     transform: rotate(12deg);
     width: 140px;
     height: 140px;
@@ -328,12 +322,12 @@
     z-index: 6;
 }
 
-.landing-orlando .badge-2 {
-    background: var(--accent-green);
-    bottom: 5%;
-    left: 2%;
-    transform: rotate(-8deg);
-    animation-delay: 1.5s;
+.landing-orlando .badge-2 { 
+    background: var(--accent-green); 
+    bottom: 5%; 
+    left: 2%; 
+    transform: rotate(-8deg); 
+    animation-delay: 1.5s; 
     width: 180px;
     height: 180px;
     font-size: 1.5rem;
@@ -356,10 +350,10 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
-    background: #25d366;
+    background: #25D366;
     color: white;
     padding: 1.25rem 2.5rem;
-    font-family: "Space Mono", monospace;
+    font-family: 'Space Mono', monospace;
     font-weight: 700;
     text-transform: uppercase;
     text-decoration: none;
@@ -392,6 +386,7 @@
 .landing-orlando .main-btn.secondary:hover {
     background: #3db9df;
 }
+
 
 /* Features Section */
 .landing-orlando .features-section {
@@ -428,7 +423,7 @@
 }
 
 .landing-orlando .features-card h2 {
-    font-family: "Space Mono", monospace;
+    font-family: 'Space Mono', monospace;
     font-size: 2rem;
     letter-spacing: -1px;
     text-transform: uppercase;
@@ -437,7 +432,7 @@
 }
 
 .landing-orlando .handwritten-note {
-    font-family: "Space Mono", monospace;
+    font-family: 'Space Mono', monospace;
     font-style: italic;
     font-weight: 700;
     color: var(--accent-pink);
@@ -457,9 +452,7 @@
     border: 2px solid var(--text-dark);
     padding: 1.5rem;
     box-shadow: 4px 4px 0px var(--text-dark);
-    transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -488,15 +481,9 @@
     height: 28px;
 }
 
-.landing-orlando .icon-box.blue {
-    background: var(--accent-blue);
-}
-.landing-orlando .icon-box.pink {
-    background: var(--accent-pink);
-}
-.landing-orlando .icon-box.green {
-    background: var(--accent-green);
-}
+.landing-orlando .icon-box.blue { background: var(--accent-blue); }
+.landing-orlando .icon-box.pink { background: var(--accent-pink); }
+.landing-orlando .icon-box.green { background: var(--accent-green); }
 
 .landing-orlando .feature-item h3 {
     font-weight: 900;
@@ -509,7 +496,7 @@
 }
 
 .landing-orlando .feature-item p {
-    font-family: "Space Mono", monospace;
+    font-family: 'Space Mono', monospace;
     font-size: 0.9rem;
     line-height: 1.6;
     color: #444;
@@ -523,7 +510,7 @@
     scroll-snap-align: start;
     position: relative;
     background-color: #ffffff;
-    background-image:
+    background-image: 
         linear-gradient(rgba(76, 201, 240, 0.15) 1px, transparent 1px),
         linear-gradient(90deg, rgba(76, 201, 240, 0.15) 1px, transparent 1px);
     background-size: 30px 30px;
@@ -562,12 +549,12 @@
     left: 20px;
     display: inline-block;
     padding: 0.8rem 2rem;
-    font-family: "Space Mono", monospace;
+    font-family: 'Space Mono', monospace;
     font-weight: 700;
     font-size: 1.2rem;
     color: var(--text-dark);
     border: 2px solid var(--text-dark);
-    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.2);
     text-transform: uppercase;
     z-index: 10;
     margin-bottom: 0;
@@ -612,6 +599,7 @@
     border-color: var(--text-dark);
 }
 
+
 /* Parks Grid */
 .landing-orlando .parks-grid {
     display: grid;
@@ -624,9 +612,7 @@
     padding: 1rem 1rem 1.5rem 1rem;
     border: 2px solid var(--text-dark);
     box-shadow: 8px 8px 0px var(--text-dark);
-    transition:
-        transform 0.3s ease,
-        box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
 }
@@ -637,15 +623,10 @@
 }
 
 /* Hover colors based on group */
-.landing-orlando .disney-group .park-card:hover {
-    box-shadow: 12px 12px 0px var(--accent-blue);
-}
-.landing-orlando .universal-group .park-card:hover {
-    box-shadow: 12px 12px 0px var(--accent-pink);
-}
-.landing-orlando .other-group .park-card:hover {
-    box-shadow: 12px 12px 0px var(--accent-green);
-}
+.landing-orlando .disney-group .park-card:hover { box-shadow: 12px 12px 0px var(--accent-blue); }
+.landing-orlando .universal-group .park-card:hover { box-shadow: 12px 12px 0px var(--accent-pink); }
+.landing-orlando .other-group .park-card:hover { box-shadow: 12px 12px 0px var(--accent-green); }
+
 
 .landing-orlando .park-image-frame {
     height: 220px;
@@ -667,7 +648,7 @@
 }
 
 .landing-orlando .park-card h3 {
-    font-family: "Space Mono", monospace;
+    font-family: 'Space Mono', monospace;
     font-weight: 700;
     font-size: 1.25rem;
     margin-bottom: 0.75rem;
@@ -718,27 +699,17 @@
     padding: 4rem 3rem;
     position: relative;
     box-shadow: var(--sticker-shadow);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0,0,0,0.1);
     transform: rotate(-1deg);
-    background-image:
-        linear-gradient(
-            90deg,
-            transparent 39px,
-            rgba(255, 107, 157, 0.2) 39px,
-            rgba(255, 107, 157, 0.2) 41px,
-            transparent 41px
-        ),
+    background-image: 
+        linear-gradient(90deg, transparent 39px, rgba(255, 107, 157, 0.2) 39px, rgba(255, 107, 157, 0.2) 41px, transparent 41px),
         linear-gradient(#f1f1f1 1px, transparent 1px);
-    background-size:
-        100% 100%,
-        100% 2.5rem;
-    background-position:
-        0 0,
-        0 1.5rem; /* Line up lines */
+    background-size: 100% 100%, 100% 2.5rem;
+    background-position: 0 0, 0 1.5rem; /* Line up lines */
 }
 
 .landing-orlando .itinerary-wrapper::before {
-    content: "";
+    content: '';
     position: absolute;
     left: 40px;
     top: 0;
@@ -756,7 +727,7 @@
 }
 
 .landing-orlando .itinerary-header h2 {
-    font-family: "Space Mono", monospace;
+    font-family: 'Space Mono', monospace;
     font-size: 2rem;
     text-transform: uppercase;
     background: var(--text-dark);
@@ -769,7 +740,7 @@
 
 .landing-orlando .itinerary-header .subtitle {
     display: block;
-    font-family: "Outfit", sans-serif;
+    font-family: 'Outfit', sans-serif;
     font-weight: 900;
     color: var(--accent-pink);
     font-size: 1.2rem;
@@ -792,7 +763,7 @@
 
 .landing-orlando .day-marker {
     background: var(--accent-blue);
-    font-family: "Space Mono", monospace;
+    font-family: 'Space Mono', monospace;
     font-weight: 700;
     font-size: 0.9rem;
     padding: 4px 8px;
@@ -805,10 +776,10 @@
 }
 
 .landing-orlando .day-content {
-    font-family: "Outfit", sans-serif;
+    font-family: 'Outfit', sans-serif;
     font-size: 1.1rem;
     font-weight: 500;
-    background: rgba(255, 255, 255, 0.8); /* Readability over lines */
+    background: rgba(255,255,255,0.8); /* Readability over lines */
     padding: 2px 5px;
 }
 
@@ -824,7 +795,7 @@
 }
 
 .landing-orlando .itinerary-footer p {
-    font-family: "Space Mono", monospace;
+    font-family: 'Space Mono', monospace;
     color: var(--text-dark);
     font-size: 0.9rem;
     background: var(--accent-yellow);
@@ -836,10 +807,7 @@
 @media (max-width: 600px) {
     .landing-orlando .itinerary-wrapper {
         padding: 3rem 1.5rem;
-        background-image: linear-gradient(
-            #f1f1f1 1px,
-            transparent 1px
-        ); /* Remove margin line on mobile if messy */
+        background-image: linear-gradient(#f1f1f1 1px, transparent 1px); /* Remove margin line on mobile if messy */
     }
     .landing-orlando .itinerary-wrapper::before {
         display: none;
@@ -856,12 +824,13 @@
     }
 }
 
+
 /* Footer */
 .landing-orlando .main-footer {
     background: white;
     border-top: 2px solid var(--text-dark);
     padding: 4rem 5% 2rem;
-    font-family: "Space Mono", monospace;
+    font-family: 'Space Mono', monospace;
     color: var(--text-dark);
     margin-top: auto;
     scroll-snap-align: start;
@@ -922,7 +891,7 @@
 }
 
 .landing-orlando .social-links a::after {
-    content: "";
+    content: '';
     display: block;
     width: 0;
     height: 1px;
@@ -938,7 +907,7 @@
     max-width: 1200px;
     margin: 0 auto;
     padding-top: 2rem;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-top: 1px solid rgba(0,0,0,0.1);
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
@@ -954,7 +923,7 @@
         align-items: center;
         text-align: center;
     }
-
+    
     .landing-orlando .footer-brand {
         display: flex;
         flex-direction: column;
@@ -974,36 +943,25 @@
 
 /* Animations */
 @keyframes float {
-    0%,
-    100% {
-        transform: translateY(0) rotate(var(--r, 10deg));
-    }
-    50% {
-        transform: translateY(-15px) rotate(var(--r, 10deg));
-    }
+    0%, 100% { transform: translateY(0) rotate(var(--r, 10deg)); }
+    50% { transform: translateY(-15px) rotate(var(--r, 10deg)); }
 }
 
 @keyframes slideIn {
-    from {
-        transform: translateX(-30px);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+    from { transform: translateX(-30px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
 }
 
 /* Mobile Adjustments (Avoid Absolutes) */
 @media (max-width: 1100px) {
-    .landing-orlando .hero {
-        flex-direction: column;
-        text-align: center;
+    .landing-orlando .hero { 
+        flex-direction: column; 
+        text-align: center; 
         padding-top: 60px;
         gap: 60px;
         min-height: auto; /* Remove minimum height constraint */
     }
-
+    
     .landing-orlando .hero-content {
         max-width: 100%;
         margin-bottom: 0;
@@ -1011,14 +969,14 @@
         flex-direction: column;
         align-items: center;
     }
-
+    
     .landing-orlando .highlight-pink {
         margin-left: 0;
     }
 
     /* Switch gallery to Flexbox Stack instead of Absolute */
-    .landing-orlando .sticker-gallery {
-        width: 100%;
+    .landing-orlando .sticker-gallery { 
+        width: 100%; 
         max-width: 500px;
         height: auto; /* Dynamic height */
         min-width: auto;
@@ -1039,8 +997,8 @@
         max-width: 380px;
         margin: 0;
     }
-
-    .landing-orlando .cta-container {
+    
+    .landing-orlando .cta-container { 
         justify-content: center;
         flex-direction: column;
         gap: 1.5rem;
@@ -1048,16 +1006,16 @@
     }
 
     /* Use negative margins for "stacking" effect in flow */
-    .landing-orlando .c1 {
-        transform: rotate(-3deg);
+    .landing-orlando .c1 { 
+        transform: rotate(-3deg); 
         z-index: 1;
     }
-    .landing-orlando .c2 {
+    .landing-orlando .c2 { 
         margin-top: -60px; /* Overlap */
         transform: rotate(2deg);
         z-index: 2;
     }
-    .landing-orlando .c3 {
+    .landing-orlando .c3 { 
         margin-top: -60px; /* Overlap */
         transform: rotate(-3deg);
         z-index: 3;
@@ -1073,7 +1031,7 @@
         font-size: 0.75rem;
         padding: 10px;
     }
-
+    
     .landing-orlando .badge-2 {
         bottom: 20px;
         left: 5%;
@@ -1083,7 +1041,7 @@
         font-size: 1.1rem;
         padding: 10px;
     }
-
+    
     .landing-orlando header {
         flex-direction: column;
         gap: 25px;
@@ -1101,7 +1059,7 @@
     .landing-orlando .complex-group {
         padding-top: 4rem;
     }
-
+    
     .landing-orlando .complex-label {
         font-size: 1rem;
         padding: 0.6rem 1.5rem;
@@ -1114,13 +1072,12 @@
         font-size: 1rem;
         padding: 0 10px;
     }
-
+    
     .landing-orlando .card img {
         height: 200px;
     }
-
-    .landing-orlando .c2,
-    .landing-orlando .c3 {
+    
+    .landing-orlando .c2, .landing-orlando .c3 {
         margin-top: -40px;
     }
 
@@ -1137,13 +1094,13 @@
 }
 
 .orlando-chat-glow::after {
-    content: "Dúvidas? Visto?";
+    content: 'Dúvidas? Visto?';
     position: absolute;
     top: -25px;
     right: -10px;
     background: var(--accent-yellow);
     color: var(--text-dark);
-    font-family: "Space Mono", monospace;
+    font-family: 'Space Mono', monospace;
     font-weight: 700;
     font-size: 10px;
     padding: 2px 8px;
@@ -1155,11 +1112,6 @@
 }
 
 @keyframes orlando-chat-pulse {
-    0%,
-    100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
-    }
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
