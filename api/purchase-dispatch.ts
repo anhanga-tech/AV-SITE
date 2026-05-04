@@ -411,14 +411,14 @@ export default async function handler(request: Request): Promise<Response> {
     return authError;
   }
 
-  const parsedPayload = await parseValidatedPayload(request, requestId);
-  if (parsedPayload.ok === false) {
-    return parsedPayload.response;
-  }
-
   const rateLimitError = await enforceRateLimit(request, requestId);
   if (rateLimitError) {
     return rateLimitError;
+  }
+
+  const parsedPayload = await parseValidatedPayload(request, requestId);
+  if (parsedPayload.ok === false) {
+    return parsedPayload.response;
   }
 
   const { ga4Result, metaResult, mode } = await dispatchConversion(parsedPayload.value, requestId);

@@ -110,30 +110,6 @@ export default async function handler(request: Request): Promise<Response> {
     );
   }
 
-  let rawBody: unknown;
-  try {
-    rawBody = await request.json();
-  } catch {
-    return buildJsonResponse(
-      { ok: false, requestId, code: 'VALIDATION_ERROR', error: 'JSON inválido no corpo da requisição.' },
-      400,
-      corsHeaders,
-      requestId,
-    );
-  }
-
-  const validation = validateNpsPayload(rawBody);
-  if (validation.valid === false) {
-    return buildJsonResponse(
-      { ok: false, requestId, code: 'VALIDATION_ERROR', error: validation.error },
-      400,
-      corsHeaders,
-      requestId,
-    );
-  }
-
-  const payload = validation.data;
-
   const clientIP = getClientIP(request);
   const rateLimit = await checkRateLimit(clientIP, {
     limit: RATE_LIMIT_MAX_REQUESTS,
@@ -165,6 +141,30 @@ export default async function handler(request: Request): Promise<Response> {
       requestId,
     );
   }
+
+  let rawBody: unknown;
+  try {
+    rawBody = await request.json();
+  } catch {
+    return buildJsonResponse(
+      { ok: false, requestId, code: 'VALIDATION_ERROR', error: 'JSON inválido no corpo da requisição.' },
+      400,
+      corsHeaders,
+      requestId,
+    );
+  }
+
+  const validation = validateNpsPayload(rawBody);
+  if (validation.valid === false) {
+    return buildJsonResponse(
+      { ok: false, requestId, code: 'VALIDATION_ERROR', error: validation.error },
+      400,
+      corsHeaders,
+      requestId,
+    );
+  }
+
+  const payload = validation.data;
 
   console.log('SUBMIT_NPS', {
     requestId,
