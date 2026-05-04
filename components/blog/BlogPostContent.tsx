@@ -1,18 +1,22 @@
 import React, { Suspense } from 'react';
 import { MDXProvider } from '@mdx-js/react';
+import Clock from 'lucide-react/dist/esm/icons/clock';
 import { PostMeta } from '../../lib/mdx';
 import { mdxComponents } from './mdxComponents';
 import ChatCTA from './ChatCTA';
 import { SocialShare } from '../SocialShare';
 import { getCategoryColor } from '../../utils/categoryColors';
+import { getBlogPostUrl } from '../../utils/blog';
+import { optimizeRemoteImageUrl } from '../../data/mediaConfig';
 
 interface BlogPostContentProps {
     post: PostMeta;
     canonicalUrl: string;
     MdxContent: React.LazyExoticComponent<React.ComponentType> | null;
+    relatedPosts: PostMeta[];
 }
 
-export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonicalUrl, MdxContent }) => {
+export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonicalUrl, MdxContent, relatedPosts }) => {
     return (
         <div className="bg-white rounded-[2.5rem] p-8 md:p-14 shadow-xl border border-gray-100">
 
@@ -35,11 +39,11 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
                 <div className="mb-8 p-6 bg-yellow-50 border-l-4 border-brand-yellow text-gray-700 rounded-r-2xl font-serif italic text-base md:text-lg">
                     <div className="flex gap-3">
                         <div className="shrink-0 mt-1">
-                            <svg className="w-5 h-5 text-brand-yellow" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-5 h-5 text-brand-yellow" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                             </svg>
                         </div>
-                        <p>{post.historicalNotice}</p>
+                        <p className="whitespace-pre-wrap" role="status">{post.historicalNotice}</p>
                     </div>
                 </div>
             )}
@@ -86,6 +90,37 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
                     title={post.title}
                     excerpt={post.excerpt}
                 />
+            </div>
+
+            <div className="mt-12 lg:hidden border-t border-gray-100 pt-10">
+                <h3 className="font-black text-2xl text-brand-dark mb-6 flex items-center gap-2">
+                    <span className="w-1.5 h-6 bg-brand-vibrant rounded-full"></span>
+                    Leia Também
+                </h3>
+                <div className="grid sm:grid-cols-2 gap-6">
+                    {relatedPosts.map(related => (
+                        <a href={getBlogPostUrl(related.slug)} key={`mobile-${related.slug}`} className="group flex flex-col bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                            <div className="aspect-video w-full overflow-hidden relative">
+                                <img src={optimizeRemoteImageUrl(related.image, 400, 225)} alt={related.title} width="400" height="225" loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                <div className="absolute top-3 left-3">
+                                    <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border ${getCategoryColor(related.category)} bg-opacity-90 backdrop-blur-sm bg-white shadow-sm`}>
+                                        {related.category}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="p-4">
+                                <h5 className="font-bold text-gray-800 leading-tight group-hover:text-brand-cyan transition-colors text-base mb-2">
+                                    {related.title}
+                                </h5>
+                                <div className="flex items-center gap-3 text-xs text-gray-400 font-bold">
+                                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> 5 min</span>
+                                    <span>•</span>
+                                    <span>{related.date}</span>
+                                </div>
+                            </div>
+                        </a>
+                    ))}
+                </div>
             </div>
         </div>
     );
