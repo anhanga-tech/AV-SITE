@@ -2,6 +2,28 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
+    "title": "Tropical Americas: a Disney vai homenagear a América Latina no Animal Kingdom",
+    "excerpt": "A Disney anunciou uma nova área temática no Animal Kingdom dedicada à América Latina, com atrações do Encanto e Indiana Jones. Abertura prevista para 2027. Vale começar a planejar já.",
+    "date": "2026-05-02",
+    "dateModified": "2026-05-04",
+    "author": "equipe-anhanga",
+    "category": "Dicas de Expert",
+    "image": "https://media.anhanga.tur.br/images/blog/disney-tropical-americas-animal-kingdom.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Orlando",
+    "tags": [
+      "disney",
+      "orlando",
+      "animal-kingdom",
+      "encanto",
+      "eua",
+      "parques-tematicos"
+    ],
+    "slug": "disney-tropical-americas-animal-kingdom",
+    "readingTime": "3 min de leitura"
+  },
+  {
     "title": "América do Norte: destinos além de Nova York para brasileiros em 2026",
     "excerpt": "EUA, Canadá e México têm muito mais que Nova York e Disney. Veja os destinos em alta para brasileiros em 2026, com visto, custos e o que cada um tem de melhor.",
     "date": "2026-04-29",
