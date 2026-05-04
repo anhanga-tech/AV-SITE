@@ -265,7 +265,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Nova York no Natal",
     "excerpt": "O guia completo para ver as luzes de Dyker Heights e patinar no Central Park.",
     "date": "2025-01-10",
-    "dateModified": "2026-04-25",
+    "dateModified": "2026-05-04",
     "author": "carlos",
     "category": "Sazonal",
     "image": "https://media.anhanga.tur.br/images/blog/nova-york-natal.jpg",
