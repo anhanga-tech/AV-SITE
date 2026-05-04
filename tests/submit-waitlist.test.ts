@@ -225,7 +225,7 @@ test('submit-waitlist should deliver a sanitized payload to n8n and return a neu
     assert.match(body.meta.receivedAt, /^\d{4}-\d{2}-\d{2}T/);
 });
 
-test('submit-waitlist should return VALIDATION_ERROR without consuming rate-limit quota', async (t) => {
+test('submit-waitlist should enforce rate-limit even for invalid payloads (DoS protection)', async (t) => {
     t.after(() => {
         global.fetch = originalFetch;
         restoreEnv();
@@ -237,34 +237,28 @@ test('submit-waitlist should return VALIDATION_ERROR without consuming rate-limi
     const calls: MockN8nRequest[] = [];
     global.fetch = createMockN8nFetch(calls, new Response(JSON.stringify({ ok: true }), { status: 200 }));
 
-    const sharedIP = '127.0.0.142';
+    const sharedIP = '127.0.0.145';
     const buildSharedRequest = (body: Record<string, unknown>) => buildRequest(body, {
         headers: {
             'x-real-ip': sharedIP,
         },
     });
 
-    const invalidResponse = await handler(buildSharedRequest({
-        name: 'Ana Maria',
-        email: 'not-an-email',
-        sourcePage: '/lollapalooza',
-        utms: {},
-        tracking: {},
-    }));
-    const invalidPayload = await invalidResponse.json() as { ok: boolean; code?: string };
-
-    assert.equal(invalidResponse.status, 400);
-    assert.equal(invalidPayload.ok, false);
-    assert.equal(invalidPayload.code, 'VALIDATION_ERROR');
-    assert.equal(calls.length, 0);
-
-    const validBody = buildDirtyWaitlistPayload();
+    // 5 invalid requests should consume the bucket (limit is 5)
     for (let i = 0; i < 5; i++) {
-        const response = await handler(buildSharedRequest(validBody));
-        assert.equal(response.status, 201);
+        const response = await handler(buildSharedRequest({
+            name: 'Ana Maria',
+            email: 'not-an-email',
+            sourcePage: '/lollapalooza',
+            utms: {},
+            tracking: {},
+        }));
+        assert.equal(response.status, 400);
     }
 
-    assert.equal(calls.length, 5);
+    // 6th request should be rate limited, even if it would be valid
+    const limitResponse = await handler(buildSharedRequest(buildDirtyWaitlistPayload()));
+    assert.equal(limitResponse.status, 429, 'should be rate limited after 5 invalid attempts');
 });
 
 test('submit-waitlist should map webhook failures to N8N_WEBHOOK_ERROR', async (t) => {

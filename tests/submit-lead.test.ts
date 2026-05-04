@@ -719,7 +719,7 @@ test('submit-lead should enforce rate limiting', async (t) => {
     assert.ok(response.headers.get('X-RateLimit-Reset'));
 });
 
-test('submit-lead should not consume rate-limit quota for invalid payloads', async (t) => {
+test('submit-lead should enforce rate-limit even for invalid payloads (DoS protection)', async (t) => {
     t.after(() => {
         global.fetch = originalFetch;
         restoreEnv();
@@ -736,7 +736,7 @@ test('submit-lead should not consume rate-limit quota for invalid payloads', asy
     const calls: MockN8nRequest[] = [];
     global.fetch = createMockN8nFetch(calls, new Response(JSON.stringify({ ok: true }), { status: 200 }));
 
-    const sharedIP = '127.0.0.210';
+    const sharedIP = '127.0.0.212';
     const buildSharedRequest = (body: Record<string, unknown>) => new Request('http://localhost/api/submit-lead', {
         method: 'POST',
         headers: {
@@ -752,18 +752,13 @@ test('submit-lead should not consume rate-limit quota for invalid payloads', asy
         email: 'not-an-email',
     };
 
-    for (let i = 0; i < 4; i++) {
-        const response = await handler(buildSharedRequest(validBody));
-        assert.equal(response.status, 201);
+    // 5 invalid requests should consume the bucket (limit is 5)
+    for (let i = 0; i < 5; i++) {
+        const response = await handler(buildSharedRequest(invalidBody));
+        assert.equal(response.status, 400);
     }
 
-    const invalidResponse = await handler(buildSharedRequest(invalidBody));
-    const invalidPayload = await invalidResponse.json() as { ok: boolean; code?: string };
-    assert.equal(invalidResponse.status, 400);
-    assert.equal(invalidPayload.ok, false);
-    assert.equal(invalidPayload.code, 'VALIDATION_ERROR');
-
-    const postInvalidResponse = await handler(buildSharedRequest(validBody));
-    assert.equal(postInvalidResponse.status, 201);
-    assert.equal(calls.length, 5);
+    // 6th request should be rate limited, even if it would be valid
+    const limitResponse = await handler(buildSharedRequest(validBody));
+    assert.equal(limitResponse.status, 429, 'should be rate limited after 5 invalid attempts');
 });
