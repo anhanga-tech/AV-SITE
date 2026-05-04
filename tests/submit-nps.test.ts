@@ -439,7 +439,7 @@ test('submit-nps enforces rate limit after 3 requests from the same IP', async (
     assert.ok(r4.headers.get('X-RateLimit-Remaining'), 'X-RateLimit-Remaining header should be set');
 });
 
-test('submit-nps does not consume rate limit quota for invalid payloads', async (t) => {
+test('submit-nps enforces rate-limit even for invalid payloads (DoS protection)', async (t) => {
     t.after(() => {
         global.fetch = originalFetch;
         restoreEnv();
@@ -448,7 +448,7 @@ test('submit-nps does not consume rate limit quota for invalid payloads', async 
     process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
     global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
 
-    const uniqueIp = `10.${Math.floor(Math.random() * 254) + 1}.${Math.floor(Math.random() * 254) + 1}.2`;
+    const uniqueIp = `10.${Math.floor(Math.random() * 254) + 1}.${Math.floor(Math.random() * 254) + 1}.4`;
 
     function buildFixedRequest(body: unknown, valid: boolean) {
         return new Request('http://localhost/api/submit-nps', {
@@ -461,13 +461,13 @@ test('submit-nps does not consume rate limit quota for invalid payloads', async 
         });
     }
 
-    // 3 invalid requests should not fill the bucket
+    // 3 invalid requests should consume the bucket (limit is 3)
     for (let i = 0; i < 3; i++) {
         const r = await handler(buildFixedRequest({ score: 'not-a-number' }, false));
         assert.equal(r.status, 400);
     }
 
-    // Valid request should still succeed (quota not consumed by invalid calls)
-    const validResponse = await handler(buildFixedRequest(null, true));
-    assert.equal(validResponse.status, 201, 'valid request after invalid ones should succeed');
+    // 4th request should be rate limited, even if it would be valid
+    const limitResponse = await handler(buildFixedRequest(null, true));
+    assert.equal(limitResponse.status, 429, 'should be rate limited after 3 invalid attempts');
 });

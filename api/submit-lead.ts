@@ -235,6 +235,9 @@ export default async function handler(request: Request): Promise<Response> {
             );
         }
 
+        const rateLimitResponse = await getRateLimitResponse(request, corsHeaders, requestId);
+        if (rateLimitResponse) return rateLimitResponse;
+
         const rawBody = await parseRequestBody(request, corsHeaders, requestId);
         if (rawBody instanceof Response) return rawBody;
 
@@ -257,9 +260,6 @@ export default async function handler(request: Request): Promise<Response> {
                 || payload.tracking?.gbraid,
             ),
         });
-
-        const rateLimitResponse = await getRateLimitResponse(request, corsHeaders, requestId);
-        if (rateLimitResponse) return rateLimitResponse;
 
         await sendLeadToN8n(
             config.webhookUrl,
