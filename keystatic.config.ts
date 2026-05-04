@@ -76,6 +76,12 @@ export default config({
           defaultValue: false,
         }),
 
+        historicalNotice: fields.text({
+          label: 'Aviso Histórico',
+          description: 'Se preenchido, exibe um aviso no topo do post indicando que o conteúdo é histórico.',
+          multiline: true,
+        }),
+
         tags: fields.array(
           fields.text({ label: 'Tag' }),
           {
