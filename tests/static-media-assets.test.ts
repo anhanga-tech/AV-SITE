@@ -323,7 +323,7 @@ test('blog posts should not hotlink third-party cover images', async () => {
 
     assert.match(
       content,
-      /image: "(?:images\/(?:blog|about)\/.+\.(jpg|jpeg|png|webp)|\/blog-viagem-solo-feminina\.png)"/,
+      /image: "(?:images\/(?:blog|about|destinations)\/.+\.(jpg|jpeg|png|webp)|\/blog-viagem-solo-feminina\.png)"/,
       `${filename} should point to a managed image path`,
     );
   }
