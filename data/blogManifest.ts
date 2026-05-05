@@ -321,6 +321,6 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "america-do-norte"
     ],
     "slug": "nova-york-no-natal",
-    "readingTime": "6 min de leitura"
+    "readingTime": "7 min de leitura"
   }
 ];
