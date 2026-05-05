@@ -258,7 +258,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "viagem"
     ],
     "slug": "malas-de-mao-o-guia-definitivo",
-    "readingTime": "4 min de leitura"
+    "readingTime": "5 min de leitura"
   },
   {
     "title": "Europa Gastronômica: Roteiro Itália",
