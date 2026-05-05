@@ -115,17 +115,17 @@ const Header: React.FC = () => {
           />
 
           <div className="hidden md:block">
-            <button
-              type="button"
+            <a
+              href={isHome ? '#contato' : `${SITE_URL}/#contato`}
               aria-label="Fale Conosco"
               data-testid="desktop-fale-conosco-btn"
               data-tracking="navbar-desktop"
-              onClick={handleContactClick}
+              onClick={(e) => handleNavClick(e, 'contato')}
               className={`btn-whatsapp btn-specialist rounded-full font-medium text-sm transition-all duration-500 flex items-center gap-2 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-vibrant ${ctaPaddingClass} ${buttonClass}`}
             >
               <Phone className="w-4 h-4" weight="fill" />
               Fale Conosco
-            </button>
+            </a>
           </div>
 
           <button
