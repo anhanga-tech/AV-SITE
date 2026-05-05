@@ -91,7 +91,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   },
   {
     "title": "América do Sul: os destinos que mais valem a viagem saindo do Brasil",
-    "excerpt": "Argentina, Chile, Peru e mais: o que cada destino da América do Sul oferece de verdade para o viajante brasileiro em 2026.",
+    "excerpt": "Argentina, Chile, Peru, Colômbia e Bolívia: o que cada destino da América do Sul oferece ao viajante brasileiro, com vistos, custos e como chegar de verdade.",
     "date": "2026-04-29",
     "dateModified": "2026-05-05",
     "author": "felipe-william",
@@ -112,7 +112,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   },
   {
     "title": "Os melhores destinos do Brasil para viajar em 2026",
-    "excerpt": "Nordeste, Sul, Centro-Oeste e mais: um guia honesto dos destinos brasileiros que mais valem o tempo e o dinheiro em 2026.",
+    "excerpt": "Do Nordeste ao Pantanal: os destinos brasileiros que mais valem em 2026 para quem quer praia, natureza ou cidade — com custos reais e melhor época para ir.",
     "date": "2026-04-29",
     "dateModified": "2026-05-05",
     "author": "queila-oliveira",
@@ -154,7 +154,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   },
   {
     "title": "Viagem solo feminina ganha espaço nos cruzeiros da Norwegian Cruise Line",
-    "excerpt": "Cada vez mais mulheres estão escolhendo viajar sozinhas, e o turismo tem respondido a isso de formas bem concretas. Se você já pensou em embarcar sem ...",
+    "excerpt": "Cruzeiros NCL para mulheres que viajam sozinhas: o que esperar a bordo, como escolher o roteiro certo e por que o modelo freestyle funciona para viagem solo.",
     "date": "2026-03-09",
     "dateModified": "2026-05-05",
     "author": "queila-oliveira",
@@ -239,7 +239,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   },
   {
     "title": "Malas de Mão: O Guia Definitivo",
-    "excerpt": "Aprenda a viajar leve sem esquecer nada. Checklist completo para não pagar despacho.",
+    "excerpt": "Dimensões por companhia, o que vai e o que não vai na cabine, e o checklist definitivo para viajar só com mala de mão sem abrir mão de nada essencial.",
     "date": "2025-11-05",
     "dateModified": "2026-05-05",
     "author": "felipe-william",
@@ -260,7 +260,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   },
   {
     "title": "Europa Gastronômica: Roteiro Itália",
-    "excerpt": "De Roma a Florença: onde comer a verdadeira pasta carbonara e os melhores gelatos.",
+    "excerpt": "De Roma a Florença, o roteiro gastronômico pela Itália que vai além dos touristy spots: onde comer carbonara de verdade, vinhos locais e os melhores gelatos.",
     "date": "2025-10-28",
     "dateModified": "2026-05-05",
     "author": "felipe-william",
