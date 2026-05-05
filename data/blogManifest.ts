@@ -170,18 +170,22 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   },
   {
     "title": "Melhores destinos para o Carnaval 2026 no Brasil (com dicas para economizar)",
-    "excerpt": "Quer curtir o Carnaval 2026 sem estourar o orçamento? Neste guia, você vai encontrar destinos no Brasil para diferentes estilos (bloco de rua, trio el...",
+    "excerpt": "Quer curtir o Carnaval sem estourar o orçamento? Conheça os melhores destinos no Brasil para diferentes estilos de folia ou descanso nesta retrospectiva da edição 2026.",
     "date": "2026-02-11",
-    "dateModified": "2026-04-25",
+    "dateModified": "2026-05-05",
     "author": "equipe-anhanga",
     "category": "Carnaval",
     "image": "https://media.anhanga.tur.br/images/blog/destinos-carnaval-2026.jpg",
     "featured": false,
     "showChatCTA": true,
     "chatCTADestination": "Carnaval",
+    "historicalNotice": "Este artigo foi publicado para o Carnaval 2026. As informações de datas e eventos refletem aquela edição.",
     "tags": [
-      "malas",
-      "carnaval"
+      "carnaval",
+      "brasil",
+      "salvador",
+      "rio",
+      "recife"
     ],
     "slug": "destinos-carnaval-2026-brasil",
     "readingTime": "3 min de leitura"

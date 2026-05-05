@@ -141,11 +141,16 @@
 }
 
 .landing-orlando .title-collage {
+    display: block;
     position: relative;
     margin-bottom: 2.5rem;
     opacity: 0;
     animation: slideIn 0.8s ease-out forwards;
-    display: block; /* Works as span */
+    font-size: clamp(4rem, 9vw, 8rem);
+    font-weight: 900;
+    line-height: 0.9;
+    text-transform: uppercase;
+    letter-spacing: -0.04em;
 }
 
 .landing-orlando h1 {
@@ -165,15 +170,7 @@
     text-transform: uppercase;
     opacity: 0.7;
     margin-bottom: 0.5rem;
-    font-family: "Outfit", sans-serif;
-}
-
-.landing-orlando .title-collage {
-    font-size: clamp(4rem, 9vw, 8rem);
-    font-weight: 900;
-    line-height: 0.9;
-    text-transform: uppercase;
-    letter-spacing: -0.04em;
+    font-family: 'Outfit', sans-serif;
 }
 
 .landing-orlando .highlight-blue {
@@ -268,6 +265,7 @@
     left: 10px;
     z-index: 1;
 }
+
 .landing-orlando .c2 {
     transform: rotate(6deg);
     width: 300px;
@@ -275,6 +273,7 @@
     right: -80px;
     z-index: 2;
 }
+
 .landing-orlando .c3 {
     transform: rotate(-6deg);
     width: 260px;
@@ -491,9 +490,11 @@
 .landing-orlando .icon-box.blue {
     background: var(--accent-blue);
 }
+
 .landing-orlando .icon-box.pink {
     background: var(--accent-pink);
 }
+
 .landing-orlando .icon-box.green {
     background: var(--accent-green);
 }
@@ -640,9 +641,11 @@
 .landing-orlando .disney-group .park-card:hover {
     box-shadow: 12px 12px 0px var(--accent-blue);
 }
+
 .landing-orlando .universal-group .park-card:hover {
     box-shadow: 12px 12px 0px var(--accent-pink);
 }
+
 .landing-orlando .other-group .park-card:hover {
     box-shadow: 12px 12px 0px var(--accent-green);
 }
@@ -678,7 +681,8 @@
 
 .landing-orlando .park-logo-title {
     max-width: 200px;
-    max-height: 55px; /* Constraining height aligns them visually */
+    max-height: 55px;
+    /* Constraining height aligns them visually */
     width: auto;
     height: auto;
     margin-bottom: 1rem;
@@ -721,20 +725,19 @@
     border: 1px solid rgba(0, 0, 0, 0.1);
     transform: rotate(-1deg);
     background-image:
-        linear-gradient(
-            90deg,
+        linear-gradient(90deg,
             transparent 39px,
             rgba(255, 107, 157, 0.2) 39px,
             rgba(255, 107, 157, 0.2) 41px,
-            transparent 41px
-        ),
+            transparent 41px),
         linear-gradient(#f1f1f1 1px, transparent 1px);
     background-size:
         100% 100%,
         100% 2.5rem;
     background-position:
         0 0,
-        0 1.5rem; /* Line up lines */
+        0 1.5rem;
+    /* Line up lines */
 }
 
 .landing-orlando .itinerary-wrapper::before {
@@ -744,7 +747,8 @@
     top: 0;
     bottom: 0;
     width: 2px;
-    background: rgba(255, 107, 157, 0.3); /* Margin line */
+    background: rgba(255, 107, 157, 0.3);
+    /* Margin line */
     z-index: 0;
 }
 
@@ -787,7 +791,8 @@
     display: flex;
     align-items: center;
     margin-bottom: 1rem;
-    padding-left: 20px; /* Offset for margin line */
+    padding-left: 20px;
+    /* Offset for margin line */
 }
 
 .landing-orlando .day-marker {
@@ -808,7 +813,8 @@
     font-family: "Outfit", sans-serif;
     font-size: 1.1rem;
     font-weight: 500;
-    background: rgba(255, 255, 255, 0.8); /* Readability over lines */
+    background: rgba(255, 255, 255, 0.8);
+    /* Readability over lines */
     padding: 2px 5px;
 }
 
@@ -836,20 +842,22 @@
 @media (max-width: 600px) {
     .landing-orlando .itinerary-wrapper {
         padding: 3rem 1.5rem;
-        background-image: linear-gradient(
-            #f1f1f1 1px,
-            transparent 1px
-        ); /* Remove margin line on mobile if messy */
+        background-image: linear-gradient(#f1f1f1 1px,
+                transparent 1px);
+        /* Remove margin line on mobile if messy */
     }
+
     .landing-orlando .itinerary-wrapper::before {
         display: none;
     }
+
     .landing-orlando .itinerary-list li {
         padding-left: 0;
         flex-direction: column;
         align-items: flex-start;
         gap: 5px;
     }
+
     .landing-orlando .day-marker {
         transform: rotate(0deg);
         margin-bottom: 5px;
@@ -974,10 +982,12 @@
 
 /* Animations */
 @keyframes float {
+
     0%,
     100% {
         transform: translateY(0) rotate(var(--r, 10deg));
     }
+
     50% {
         transform: translateY(-15px) rotate(var(--r, 10deg));
     }
@@ -988,6 +998,7 @@
         transform: translateX(-30px);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
@@ -1001,7 +1012,8 @@
         text-align: center;
         padding-top: 60px;
         gap: 60px;
-        min-height: auto; /* Remove minimum height constraint */
+        min-height: auto;
+        /* Remove minimum height constraint */
     }
 
     .landing-orlando .hero-content {
@@ -1020,17 +1032,20 @@
     .landing-orlando .sticker-gallery {
         width: 100%;
         max-width: 500px;
-        height: auto; /* Dynamic height */
+        height: auto;
+        /* Dynamic height */
         min-width: auto;
         display: flex;
         flex-direction: column;
         align-items: center;
         margin-top: 2rem;
-        padding-bottom: 4rem; /* Space for bottom badge */
+        padding-bottom: 4rem;
+        /* Space for bottom badge */
     }
 
     .landing-orlando .card {
-        position: relative; /* Natural flow */
+        position: relative;
+        /* Natural flow */
         top: auto !important;
         left: auto !important;
         right: auto !important;
@@ -1052,13 +1067,17 @@
         transform: rotate(-3deg);
         z-index: 1;
     }
+
     .landing-orlando .c2 {
-        margin-top: -60px; /* Overlap */
+        margin-top: -60px;
+        /* Overlap */
         transform: rotate(2deg);
         z-index: 2;
     }
+
     .landing-orlando .c3 {
-        margin-top: -60px; /* Overlap */
+        margin-top: -60px;
+        /* Overlap */
         transform: rotate(-3deg);
         z-index: 3;
     }
@@ -1155,10 +1174,12 @@
 }
 
 @keyframes orlando-chat-pulse {
+
     0%,
     100% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(1.05);
     }

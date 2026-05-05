@@ -143,8 +143,7 @@ function OrlandoApp() {
           </h1>
 
           <p className="hero-description">
-            Esqueça o óbvio. Viva a adrenalina pura e a magia real no destino
-            mais vibrante do planeta.
+            Esqueça o óbvio. Viva a adrenalina pura e a magia real no destino mais vibrante do planeta.
           </p>
 
           <div className="cta-container">
