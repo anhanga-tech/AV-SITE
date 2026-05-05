@@ -72,8 +72,8 @@ test('hero media should point to the Cloudflare R2 origin', () => {
 
 test('migrated author avatars should use the Cloudflare R2 origin', () => {
     assert.equal(
-        AUTHORS.luigi.image,
-        'https://media.anhanga.tur.br/images/authors/chef-luigi.jpg',
+        AUTHORS['queila-oliveira'].image,
+        'https://media.anhanga.tur.br/images/authors/queila.jpg',
     );
 });
 

@@ -1,5 +1,4 @@
 import { optimizeRemoteImageUrl } from './mediaConfig';
-import { BRAND_LOGO_PNG_URL } from '../lib/media-assets';
 
 export interface Author {
     id: string;
@@ -14,49 +13,26 @@ export interface Author {
 }
 
 export const AUTHORS: Record<string, Author> = {
-    "ana-souza": {
-        id: "ana-souza",
-        name: "Ana Souza",
-        role: "Dicas de Expert",
-        bio: "Especialista em roteiros para a Disney e apaixonada por transformar viagens em família em momentos mágicos.",
-        image: optimizeRemoteImageUrl('images/authors/ana-souza.jpg', 256, 256),
+    "queila-oliveira": {
+        id: "queila-oliveira",
+        name: "Queila de Oliveira",
+        role: "Especialista em Viagens",
+        bio: "Apaixonada por conectar pessoas aos destinos que vão transformar suas vidas. Especialista em roteiros personalizados e viagens em família.",
+        image: optimizeRemoteImageUrl('https://media.anhanga.tur.br/images/authors/queila.jpg', 256, 256),
         social: {
-            instagram: "https://www.instagram.com/anhangaviagens"
+            instagram: "https://www.instagram.com/queiladeoliveirar/",
+            linkedin: "https://www.linkedin.com/in/queilarodrigues/"
         }
     },
-    "rafa-tech": {
-        id: "rafa-tech",
-        name: "Rafa Tech",
-        role: "Especialista em Planejamento",
-        bio: "Entusiasta de tecnologia e organização, focado em tornar cada etapa da viagem mais eficiente e tranquila.",
-        image: optimizeRemoteImageUrl('images/authors/rafa-tech.jpg', 256, 256)
-    },
-    "luigi": {
-        id: "luigi",
-        name: "Chef Luigi",
-        role: "Crítico Gastronômico",
-        bio: "Viajante incansável em busca dos melhores sabores do mundo, da alta gastronomia à comida de rua.",
-        image: optimizeRemoteImageUrl('images/authors/chef-luigi.jpg', 256, 256)
-    },
-    "mariana": {
-        id: "mariana",
-        name: "Mariana S.",
-        role: "Consultora de Viagens Românticas",
-        bio: "Especialista em destinos de luxo e roteiros personalizados para casais em busca de momentos únicos.",
-        image: optimizeRemoteImageUrl('images/authors/mariana-s.jpg', 256, 256)
-    },
-    "carlos": {
-        id: "carlos",
-        name: "Carlos Viajante",
-        role: "Explorador Cultural",
-        bio: "Curioso por natureza, adora descobrir as histórias e tradições por trás de cada destino icônico.",
-        image: optimizeRemoteImageUrl('images/authors/carlos-viajante.jpg', 256, 256)
-    },
-    "equipe-anhanga": {
-        id: "equipe-anhanga",
-        name: "Equipe Anhangá",
-        role: "Especialistas em Viagens",
-        bio: "Nossa equipe de especialistas compartilha as melhores dicas coletivas para sua próxima aventura.",
-        image: optimizeRemoteImageUrl(BRAND_LOGO_PNG_URL, 256, 256)
+    "felipe-william": {
+        id: "felipe-william",
+        name: "Felipe William",
+        role: "Consultor de Viagens",
+        bio: "Explorador incansável e especialista em planejamento de roteiros internacionais. Acredita que cada viagem bem planejada é uma história inesquecível.",
+        image: optimizeRemoteImageUrl('https://media.anhanga.tur.br/images/authors/perfil%20felipe.png', 256, 256),
+        social: {
+            instagram: "https://www.instagram.com/felipewilliam/",
+            linkedin: "https://www.linkedin.com/in/felipewilliams/"
+        }
     }
 };

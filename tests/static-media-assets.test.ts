@@ -75,10 +75,8 @@ test('blog imagery should use the managed media origin', async () => {
     ['images.unsplash.com'],
     'data/blogData.ts',
   );
-  assert.match(blogData, /images\/authors\/ana-souza\.(jpg|jpeg|webp)/);
-  assert.match(blogData, /images\/authors\/rafa-tech\.(jpg|jpeg|webp)/);
-  assert.match(blogData, /images\/authors\/mariana-s\.(jpg|jpeg|webp)/);
-  assert.match(blogData, /images\/authors\/carlos-viajante\.(jpg|jpeg|webp)/);
+  assert.match(blogData, /images\/authors\/queila\.(jpg|jpeg|webp)/);
+  assert.match(blogData, /images\/authors\/perfil%20felipe\.(png|jpg|jpeg|webp)/);
 
   assertMissingHosts(
     blogManifest,
@@ -296,7 +294,7 @@ test('remaining runtime media dependencies should use managed Cloudflare assets'
   }
 
   assert.match(seo, /DEFAULT_OG_IMAGE_URL/);
-  assert.match(blogData, /BRAND_LOGO_PNG_URL/);
+  assert.match(blogData, /optimizeRemoteImageUrl/);
   assert.match(header, /BRAND_LOGO_(BLUE|WHITE)_URL/);
   assert.match(footer, /BRAND_LOGO_WHITE_URL/);
   assert.match(lollaFooter, /BRAND_LOGO_WHITE_URL/);

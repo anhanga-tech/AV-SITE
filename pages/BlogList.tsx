@@ -9,6 +9,7 @@ import BookOpen from 'lucide-react/dist/esm/icons/book-open';
 import { SocialShare } from '../components/SocialShare';
 import { getBlogPostUrl, getBlogHomeUrl } from '../utils/blog';
 import { optimizeRemoteImageUrl } from '../data/mediaConfig';
+import { getCategoryColor } from '../utils/categoryColors';
 import { SEO } from '../components/SEO';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { openAiChat } from '../utils/aiChat';
@@ -20,14 +21,6 @@ import { openAiChat } from '../utils/aiChat';
  * 1. Removed 'hoveredId' state which caused page re-renders on mouse over.
  * 2. Replaced with Tailwind 'group-hover' for CSS-native reactive styling.
  */
-const COLORS = [
-    'text-blue-700 bg-blue-50 border-blue-200',
-    'text-cyan-700 bg-cyan-50 border-cyan-200',
-    'text-yellow-700 bg-yellow-50 border-yellow-200',
-    'text-green-700 bg-green-50 border-green-200',
-    'text-purple-700 bg-purple-50 border-purple-200',
-    'text-rose-700 bg-rose-50 border-rose-200',
-];
 
 const allPosts = getAllPosts();
 
@@ -101,7 +94,7 @@ const BlogList: React.FC = () => {
                 {/* Grid */}
                 {filteredPosts.length > 0 ? (
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filteredPosts.map((post, index) => (
+                        {filteredPosts.map((post) => (
                             <Link
                                 to={`/blog/${post.slug}`}
                                 key={post.slug}
@@ -138,7 +131,7 @@ const BlogList: React.FC = () => {
                                 {/* Content */}
                                 <div className="flex-1 flex flex-col">
                                     <div className="mb-3">
-                                        <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md border ${COLORS[index % COLORS.length]}`}>
+                                        <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md border ${getCategoryColor(post.category)}`}>
                                             {post.category}
                                         </span>
                                     </div>
