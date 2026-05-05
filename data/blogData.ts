@@ -17,8 +17,10 @@ export const AUTHORS: Record<string, Author> = {
         name: "Queila de Oliveira",
         role: "Especialista em Viagens",
         bio: "Apaixonada por conectar pessoas aos destinos que vão transformar suas vidas. Especialista em roteiros personalizados e viagens em família.",
+        image: "https://media.anhanga.tur.br/images/authors/queila.jpg",
         social: {
-            instagram: "https://www.instagram.com/anhangaviagens"
+            instagram: "https://www.instagram.com/queiladeoliveirar/",
+            linkedin: "https://www.linkedin.com/in/queilarodrigues/"
         }
     },
     "felipe-william": {
@@ -26,8 +28,10 @@ export const AUTHORS: Record<string, Author> = {
         name: "Felipe William",
         role: "Consultor de Viagens",
         bio: "Explorador incansável e especialista em planejamento de roteiros internacionais. Acredita que cada viagem bem planejada é uma história inesquecível.",
+        image: "https://media.anhanga.tur.br/images/authors/perfil%20felipe.png",
         social: {
-            instagram: "https://www.instagram.com/anhangaviagens"
+            instagram: "https://www.instagram.com/felipewilliam/",
+            linkedin: "https://www.linkedin.com/in/felipewilliams/"
         }
     }
 };
