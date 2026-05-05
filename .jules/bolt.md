@@ -27,3 +27,7 @@
 ## 2026-07-15 - ⚡ Bolt: Heavy Map Component Memoization
 **Learning:** Components wrapping third-party libraries like Leaflet (e.g., `Destinations.tsx`) are particularly expensive to re-render because they often trigger full DOM reconciliation or re-initialization of the library's internal state. Even if the component appears "dynamic," if the underlying data (destinations list) is stable, `React.memo` provides a massive win by bypassing the entire JS execution for that branch.
 **Action:** Prioritize memoization for components that bridge React with heavy non-React DOM libraries to prevent main-thread jank during parent state updates.
+
+## 2026-08-20 - ⚡ Bolt: AIChat List Optimization
+**Learning:** High-frequency components like Chat UI can suffer from quadratic complexity ((N^2)$) if logic like finding the "last" element of a specific type (e.g., `lastIndexOf`) is performed inside a `map` loop on every render.
+**Action:** Always pre-calculate derived indices (like `lastModelIndex`) using `useMemo` outside the render loop to keep complexity at (N)$ and ensure smooth typing performance as history grows.
