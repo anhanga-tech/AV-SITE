@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, memo, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   ChatCircleDots,
@@ -29,8 +29,13 @@ interface Message {
   };
 }
 
-// Formatted text for Markdown
-const FormattedText: React.FC<{ text: string }> = ({ text }) => {
+/**
+ * Optimized FormattedText component.
+ *
+ * PERFORMANCE WIN: Wrapped in React.memo to prevent redundant string processing
+ * and re-renders of static message content during chat interactions.
+ */
+const FormattedText = memo(({ text }: { text: string }) => {
   const paragraphs = text.split('\n').filter(p => p.trim() !== '');
 
   return (
@@ -61,9 +66,20 @@ const FormattedText: React.FC<{ text: string }> = ({ text }) => {
       })}
     </div>
   );
-};
+});
 
-const AIChat: React.FC = () => {
+FormattedText.displayName = 'FormattedText';
+
+/**
+ * AIChat Component - Optimized for high-frequency interactions.
+ *
+ * PERFORMANCE WIN:
+ * 1. Memoized sub-components and logic to ensure that typing in the input
+ *    field doesn't cause expensive re-calculations of the entire message history.
+ * 2. Pre-calculates the last model message index once per update (O(N))
+ *    instead of within the render loop (O(N^2)).
+ */
+const AIChat: React.FC = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     { role: 'model', text: 'Olá! Sou seu guia Anhangá 🧭.\n\nPosso te ajudar com:\n- Roteiros exclusivos\n- Dúvidas sobre o destino\n- **Orçamento personalizado**\n\nVamos começar?' }
@@ -83,6 +99,16 @@ const AIChat: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isOrlandoPage = location.pathname.startsWith('/orlando');
+
+  // PERFORMANCE: Pre-calculate the index of the last model message to avoid O(N^2)
+  // lookup inside the render loop's map function.
+  const lastModelIndex = useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].role === 'model') return i;
+    }
+    return -1;
+  }, [messages]);
+
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
@@ -387,7 +413,7 @@ const AIChat: React.FC = () => {
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, black 1px, transparent 0)', backgroundSize: '32px 32px' }}></div>
 
           {messages.map((msg, idx) => {
-            const isLastModelMsg = msg.role === 'model' && idx === messages.map(m => m.role).lastIndexOf('model');
+            const isLastModelMsg = msg.role === 'model' && idx === lastModelIndex;
 
             return (
               <div key={idx} className={`relative flex flex-col gap-2 ${msg.role === 'user' ? 'items-end' : 'items-start'} z-10`}>
@@ -500,6 +526,8 @@ const AIChat: React.FC = () => {
       </div>
     </>
   );
-};
+});
+
+AIChat.displayName = 'AIChat';
 
 export default AIChat;
