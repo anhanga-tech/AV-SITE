@@ -1,6 +1,5 @@
 import React, { memo } from 'react';
 import Calendar from 'lucide-react/dist/esm/icons/calendar';
-import User from 'lucide-react/dist/esm/icons/user';
 import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import BookOpen from 'lucide-react/dist/esm/icons/book-open';
 import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
@@ -158,8 +157,11 @@ const Blog: React.FC = memo(() => {
                                 </p>
 
                                 <div className="pt-4 border-t border-dashed border-gray-100 flex items-center justify-between">
-                                    <span className="text-xs font-bold text-gray-400 flex items-center gap-1">
-                                        <User className="w-3 h-3" /> {AUTHORS[post.author]?.name ?? post.author}
+                                    <span className="text-xs font-bold text-gray-400 flex items-center gap-2">
+                                        <div className="w-5 h-5 rounded-full bg-brand-dark flex items-center justify-center text-white text-[10px] font-black shrink-0">
+                                            {(AUTHORS[post.author]?.name ?? post.author).charAt(0).toUpperCase()}
+                                        </div>
+                                        {AUTHORS[post.author]?.name ?? post.author}
                                     </span>
                                     <span className="w-8 h-8 rounded-full flex items-center justify-center transition-colors bg-gray-100 text-gray-400 group-hover:bg-brand-cyan group-hover:text-white">
                                         <ArrowRight className="w-4 h-4" />

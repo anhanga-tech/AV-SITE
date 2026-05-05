@@ -1,49 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { List, X, Phone } from '@phosphor-icons/react';
 import { openAiChat } from '../../utils/aiChat';
 import { DesktopNavigation, MobileNavigationMenu } from './HeaderNavigation';
 import { SITE_URL } from './headerConfig';
 import { BRAND_LOGO_BLUE_URL, BRAND_LOGO_WHITE_URL } from '../../lib/media-assets';
+import { useScrolled } from './useScrolled';
+import { useHeaderStyles } from './useHeaderStyles';
 
 const Header: React.FC = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const location = useLocation();
   const isHome = location.pathname === '/';
   const isInternalPage = !isHome;
-  const useSolidHeader = isScrolled || isInternalPage;
+  const isScrolled = useScrolled();
 
-  const headerToneClass = useSolidHeader
-    ? 'bg-white/90 text-brand-dark backdrop-blur-md shadow-lg'
-    : 'bg-transparent text-white';
+  const {
+    headerToneClass,
+    headerSizeClass,
+    logoHeightClass,
+    navGapClass,
+    actionGapClass,
+    ctaPaddingClass,
+    navTextClass,
+    buttonClass,
+    mobileToggleClass,
+  } = useHeaderStyles(isScrolled, isInternalPage);
 
-  const headerSizeClass = isInternalPage
-    ? 'py-2 md:py-2.5'
-    : isScrolled
-      ? 'py-3'
-      : 'py-6';
-
-  const logoHeightClass = isInternalPage ? 'h-12 md:h-16' : 'h-24';
-  const navGapClass = isInternalPage ? 'gap-6' : 'gap-8';
-  const actionGapClass = isInternalPage ? 'gap-5' : 'gap-8';
-  const ctaPaddingClass = isInternalPage ? 'px-4 py-2' : 'px-5 py-2.5';
-
-  useEffect(() => {
-    let ticking = false;
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setIsScrolled(window.scrollY > 20);
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const logoSrc = (isScrolled || isInternalPage) ? BRAND_LOGO_BLUE_URL : BRAND_LOGO_WHITE_URL;
 
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -65,16 +50,6 @@ const Header: React.FC = () => {
       setIsMobileMenuOpen(false);
     }
   };
-
-  const logoSrc = useSolidHeader
-    ? BRAND_LOGO_BLUE_URL
-    : BRAND_LOGO_WHITE_URL;
-
-  const navTextClass = useSolidHeader ? 'text-gray-600 hover:text-brand-vibrant' : 'text-white/90 hover:text-white';
-  const buttonClass = useSolidHeader
-    ? 'bg-brand-vibrant hover:bg-brand-blue text-white'
-    : 'bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white border border-white/30';
-  const mobileToggleClass = useSolidHeader ? 'text-gray-700' : 'text-white';
 
   return (
     <header
