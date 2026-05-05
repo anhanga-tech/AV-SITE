@@ -91,7 +91,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   },
   {
     "title": "América do Sul: os destinos que mais valem a viagem saindo do Brasil",
-    "excerpt": "Argentina, Chile, Peru, Colômbia e Bolívia: o que cada destino da América do Sul oferece ao viajante brasileiro, com vistos, custos e como chegar de verdade.",
+    "excerpt": "Argentina, Chile, Peru, Colômbia e Bolívia: o que cada destino oferece ao viajante brasileiro, com documentação, custos e como chegar de verdade.",
     "date": "2026-04-29",
     "dateModified": "2026-05-05",
     "author": "felipe-william",
@@ -105,6 +105,8 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "argentina",
       "chile",
       "peru",
+      "colombia",
+      "bolivia",
       "america-do-sul"
     ],
     "slug": "destinos-america-do-sul-latam",
