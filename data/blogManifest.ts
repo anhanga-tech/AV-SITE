@@ -14,10 +14,11 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "chatCTADestination": "Orlando",
     "tags": [
       "disney",
-      "orlando",
       "animal-kingdom",
-      "encanto",
+      "orlando",
+      "america-latina",
       "eua",
+      "encanto",
       "parques-tematicos"
     ],
     "slug": "disney-tropical-americas-animal-kingdom",
@@ -163,7 +164,11 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "showChatCTA": true,
     "chatCTADestination": "Cruzeiros",
     "tags": [
-      "cruzeiros"
+      "cruzeiros",
+      "viagem-solo",
+      "feminina",
+      "norwegian-cruise-line",
+      "europa"
     ],
     "slug": "viagem-solo-feminina-ganha-espaco-nos-cruzeiros-da-norwegian-cruise-line",
     "readingTime": "4 min de leitura"
@@ -201,7 +206,13 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "featured": false,
     "showChatCTA": true,
     "chatCTADestination": "Festivais",
-    "tags": [],
+    "tags": [
+      "festivais",
+      "lollapalooza",
+      "rock-in-rio",
+      "musica",
+      "dicas"
+    ],
     "slug": "guia-definitivo-sobrevivencia-festivais",
     "readingTime": "3 min de leitura"
   },
@@ -216,7 +227,13 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "featured": false,
     "showChatCTA": true,
     "chatCTADestination": "Orlando",
-    "tags": [],
+    "tags": [
+      "disney",
+      "orlando",
+      "eua",
+      "parques-tematicos",
+      "dicas"
+    ],
     "slug": "5-segredos-da-disney-que-ninguem-conta",
     "readingTime": "5 min de leitura"
   },
@@ -231,7 +248,13 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "featured": false,
     "showChatCTA": true,
     "chatCTADestination": "Viagem",
-    "tags": [],
+    "tags": [
+      "malas-de-mao",
+      "bagagem",
+      "dicas",
+      "companhias-aereas",
+      "viagem"
+    ],
     "slug": "malas-de-mao-o-guia-definitivo",
     "readingTime": "4 min de leitura"
   },
@@ -246,7 +269,13 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "featured": false,
     "showChatCTA": true,
     "chatCTADestination": "Itália",
-    "tags": [],
+    "tags": [
+      "italia",
+      "europa",
+      "gastronomia",
+      "roteiro",
+      "roma"
+    ],
     "slug": "europa-gastronomica-roteiro-italia",
     "readingTime": "6 min de leitura"
   },
@@ -261,7 +290,13 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "featured": false,
     "showChatCTA": true,
     "chatCTADestination": "Maldivas",
-    "tags": [],
+    "tags": [
+      "maldivas",
+      "lua-de-mel",
+      "romance",
+      "luxo",
+      "asia"
+    ],
     "slug": "lua-de-mel-nas-maldivas",
     "readingTime": "7 min de leitura"
   },
@@ -276,7 +311,13 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "featured": false,
     "showChatCTA": true,
     "chatCTADestination": "Nova York",
-    "tags": [],
+    "tags": [
+      "nova-york",
+      "eua",
+      "natal",
+      "inverno",
+      "america-do-norte"
+    ],
     "slug": "nova-york-no-natal",
     "readingTime": "6 min de leitura"
   }
