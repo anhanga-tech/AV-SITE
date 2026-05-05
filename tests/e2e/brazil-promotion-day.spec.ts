@@ -7,15 +7,19 @@ test.describe('Brazil Promotion Day Landing Page', () => {
     const landing = new BrazilPromotionDayPage(page);
     await landing.goto();
 
-    const landingViewEvent = await page.evaluate(() =>
-      (window.dataLayer || []).find(e => e.event === 'landing_view')
-    );
-
-    expect(landingViewEvent).toMatchObject({
-      event: 'landing_view',
-      campaign: 'brazil-promotion-day-2026',
-      landing_type: 'event_qr',
-    });
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          (window.dataLayer || []).find(
+            e => e && typeof e === 'object' && 'event' in e && e.event === 'landing_view'
+          ) || null
+        )
+      )
+      .toMatchObject({
+        event: 'landing_view',
+        campaign: 'brazil-promotion-day-2026',
+        landing_type: 'event_qr',
+      });
   });
 
   test('should validate required fields in the lead form', async ({ page }) => {
