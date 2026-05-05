@@ -116,7 +116,7 @@ const Header: React.FC = () => {
 
           <div className="hidden md:block">
             <a
-              href="#contato"
+              href={isHome ? '#contato' : `${SITE_URL}/#contato`}
               aria-label="Fale Conosco"
               data-testid="desktop-fale-conosco-btn"
               data-tracking="navbar-desktop"
