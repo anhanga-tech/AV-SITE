@@ -5,6 +5,7 @@ import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import BookOpen from 'lucide-react/dist/esm/icons/book-open';
 import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
 import { getAllPosts } from '../lib/mdx';
+import { AUTHORS } from '../data/blogData';
 import { SocialShare } from './SocialShare';
 import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 import { getCategoryColor } from '../utils/categoryColors';
@@ -94,12 +95,12 @@ const Blog: React.FC = memo(() => {
                                     </p>
                                     <div className="flex items-center justify-between border-t border-gray-200 pt-6">
                                         <div className="flex items-center gap-2">
-                                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
-                                                <User className="w-5 h-5" />
+                                            <div className="w-10 h-10 rounded-full bg-brand-dark flex items-center justify-center text-white text-base font-black shrink-0">
+                                                {(AUTHORS[featuredPost.author]?.name ?? featuredPost.author).charAt(0).toUpperCase()}
                                             </div>
                                             <div className="flex flex-col">
                                                 <span className="text-xs font-bold text-gray-400 uppercase">Escrito por</span>
-                                                <span className="text-sm font-black text-brand-dark">{featuredPost.author}</span>
+                                                <span className="text-sm font-black text-brand-dark">{AUTHORS[featuredPost.author]?.name ?? featuredPost.author}</span>
                                             </div>
                                         </div>
                                         <span className="flex items-center gap-2 text-brand-cyan font-black uppercase tracking-wide group-hover:gap-4 transition-all">
@@ -158,7 +159,7 @@ const Blog: React.FC = memo(() => {
 
                                 <div className="pt-4 border-t border-dashed border-gray-100 flex items-center justify-between">
                                     <span className="text-xs font-bold text-gray-400 flex items-center gap-1">
-                                        <User className="w-3 h-3" /> {post.author}
+                                        <User className="w-3 h-3" /> {AUTHORS[post.author]?.name ?? post.author}
                                     </span>
                                     <span className="w-8 h-8 rounded-full flex items-center justify-center transition-colors bg-gray-100 text-gray-400 group-hover:bg-brand-cyan group-hover:text-white">
                                         <ArrowRight className="w-4 h-4" />

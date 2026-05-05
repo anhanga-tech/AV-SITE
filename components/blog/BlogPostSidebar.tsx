@@ -32,7 +32,7 @@ export const BlogPostSidebar: React.FC<BlogPostSidebarProps> = ({ author, author
                     )}
                 </div>
                 <h4 className="font-black text-2xl text-brand-dark mb-1">{author?.name || authorFallbackName}</h4>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 bg-gray-50 inline-block px-3 py-1 rounded-full">{author?.role || 'Travel Expert'}</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 bg-gray-50 inline-block px-3 py-1 rounded-full">{author?.role || 'Especialista em Viagens'}</p>
                 <p className="text-gray-600 font-serif italic text-base mb-8 leading-relaxed">
                     {author?.bio ? `"${author.bio}"` : '"Apaixonado por descobrir lugares novos e compartilhar dicas que não estão nos guias turísticos."'}
                 </p>
