@@ -2,7 +2,7 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
-    "title": "Tropical Americas: a Disney vai homenagear a América Latina no Animal Kingdom",
+    "title": "Tropical Americas: nova área da Disney no Animal Kingdom",
     "excerpt": "A Disney anunciou uma nova área temática no Animal Kingdom dedicada à América Latina, com atrações do Encanto e Indiana Jones. Abertura prevista para 2027. Vale começar a planejar já.",
     "date": "2026-05-02",
     "dateModified": "2026-05-05",
@@ -25,7 +25,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "3 min de leitura"
   },
   {
-    "title": "América do Norte: destinos além de Nova York para brasileiros em 2026",
+    "title": "América do Norte: os melhores destinos além de Nova York",
     "excerpt": "EUA, Canadá e México têm muito mais que Nova York e Disney. Veja os destinos em alta para brasileiros em 2026, com visto, custos e o que cada um tem de melhor.",
     "date": "2026-04-29",
     "dateModified": "2026-05-05",
@@ -47,7 +47,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "6 min de leitura"
   },
   {
-    "title": "Ásia para brasileiros em 2026: Japão, Tailândia, Bali e os destinos que mais valem a viagem",
+    "title": "Melhores destinos da Ásia para brasileiros em 2026",
     "excerpt": "A Ásia está no topo das buscas dos brasileiros em 2026. Veja os melhores destinos, custos reais, vistos e como planejar uma viagem que realmente entrega.",
     "date": "2026-04-29",
     "dateModified": "2026-05-05",
@@ -132,7 +132,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "6 min de leitura"
   },
   {
-    "title": "Roteiro Europa para brasileiros em 2026: o guia completo com ETIAS, câmbio e destinos",
+    "title": "Roteiro Europa 2026: ETIAS, câmbio e custos para brasileiros",
     "excerpt": "O que mudou para viajar à Europa em 2026, quanto custa, quais países combinar e como montar um roteiro que realmente funciona saindo do Brasil.",
     "date": "2026-04-29",
     "dateModified": "2026-05-05",
@@ -153,7 +153,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "6 min de leitura"
   },
   {
-    "title": "Viagem solo feminina ganha espaço nos cruzeiros da Norwegian Cruise Line",
+    "title": "Viagem solo feminina: cruzeiros NCL pelo Norte da Europa",
     "excerpt": "Cada vez mais mulheres estão escolhendo viajar sozinhas, e o turismo tem respondido a isso de formas bem concretas. Se você já pensou em embarcar sem ...",
     "date": "2026-03-09",
     "dateModified": "2026-05-05",
@@ -196,7 +196,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "3 min de leitura"
   },
   {
-    "title": "Guia Definitivo de Sobrevivência em Festivais: Como Curtir Cada Momento como um Pro",
+    "title": "Guia de Sobrevivência em Festivais de Música",
     "excerpt": "Estratégias práticas, dicas de alimentação e o kit de sobrevivência essencial para aproveitar seu festival ao máximo.",
     "date": "2026-01-24",
     "dateModified": "2026-05-05",
