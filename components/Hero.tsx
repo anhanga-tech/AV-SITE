@@ -102,7 +102,6 @@ const Hero: React.FC = () => {
             width="1280"
             height="720"
             fetchPriority="high"
-            loading="eager"
             decoding="async"
             className="w-full h-full object-cover"
           />
