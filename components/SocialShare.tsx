@@ -20,6 +20,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
     const links = getSocialShareLinks(url, title);
 
     const handleNativeShare = async () => {
+        import('../utils/haptics').then(m => m.triggerHaptic('light'));
         await shareContent({
             title,
             text: excerpt || title,
@@ -84,6 +85,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     className="p-2.5 bg-[#25D366] text-white rounded-xl hover:scale-110 transition-transform shadow-md"
                     title="Compartilhar no WhatsApp"
                     aria-label="Compartilhar no WhatsApp"
+                    onClick={() => import('../utils/haptics').then(m => m.triggerHaptic('light'))}
                 >
                     <MessageCircle className="w-5 h-5 fill-current" />
                 </a>
@@ -94,6 +96,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     className="p-2.5 bg-[#1877F2] text-white rounded-xl hover:scale-110 transition-transform shadow-md"
                     title="Compartilhar no Facebook"
                     aria-label="Compartilhar no Facebook"
+                    onClick={() => import('../utils/haptics').then(m => m.triggerHaptic('light'))}
                 >
                     <Facebook className="w-5 h-5 fill-current" />
                 </a>
@@ -104,6 +107,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     className="p-2.5 bg-[#0A66C2] text-white rounded-xl hover:scale-110 transition-transform shadow-md"
                     title="Compartilhar no LinkedIn"
                     aria-label="Compartilhar no LinkedIn"
+                    onClick={() => import('../utils/haptics').then(m => m.triggerHaptic('light'))}
                 >
                     <Linkedin className="w-5 h-5 fill-current" />
                 </a>
