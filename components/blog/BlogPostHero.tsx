@@ -7,6 +7,7 @@ import Clock from 'lucide-react/dist/esm/icons/clock';
 import { PostMeta } from '../../lib/mdx';
 import { optimizeRemoteImageUrl } from '../../data/mediaConfig';
 import { getCategoryColor } from '../../utils/categoryColors';
+import { formatDate } from '../../utils/blog';
 
 interface BlogPostHeroProps {
     post: PostMeta;
@@ -57,13 +58,13 @@ export const BlogPostHero: React.FC<BlogPostHeroProps> = ({ post, authorName }) 
                                 <div className="p-1.5 bg-white/10 rounded-lg backdrop-blur-md">
                                     <Calendar className="w-4 h-4" />
                                 </div>
-                                <span>{post.date}</span>
+                                <span>{formatDate(post.date)}</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <div className="p-1.5 bg-white/10 rounded-lg backdrop-blur-md">
                                     <Clock className="w-4 h-4" />
                                 </div>
-                                <span>5 min de leitura</span>
+                                <span>{post.readingTime}</span>
                             </div>
                         </div>
                     </div>

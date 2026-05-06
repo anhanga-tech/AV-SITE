@@ -6,7 +6,7 @@ import { mdxComponents } from './mdxComponents';
 import ChatCTA from './ChatCTA';
 import { SocialShare } from '../SocialShare';
 import { getCategoryColor } from '../../utils/categoryColors';
-import { getBlogPostUrl } from '../../utils/blog';
+import { getBlogPostUrl, formatDate } from '../../utils/blog';
 import { optimizeRemoteImageUrl } from '../../data/mediaConfig';
 
 interface BlogPostContentProps {
@@ -22,10 +22,10 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
 
             <div className="mb-6 pb-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                    <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest ${getCategoryColor(post.category)} bg-opacity-20 border`}>
+                    <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest border ${getCategoryColor(post.category)}`}>
                         {post.category}
                     </span>
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{post.date}</span>
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{formatDate(post.date)}</span>
                 </div>
                 <SocialShare
                     minimal
@@ -36,7 +36,7 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
             </div>
 
             {post.historicalNotice && (
-                <div className="mb-8 p-6 bg-yellow-50 border-2 border-brand-yellow text-gray-800 rounded-2xl font-serif italic text-base md:text-lg">
+                <div className="mb-8 p-6 bg-yellow-50 border-2 border-brand-yellow text-brand-dark rounded-2xl font-serif italic text-base md:text-lg">
                     <div className="flex gap-3">
                         <div className="shrink-0 mt-1">
                             <svg className="w-5 h-5 text-brand-yellow" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
@@ -51,15 +51,15 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
             {MdxContent ? (
                 <MDXProvider components={mdxComponents}>
                     <div className="
-                        prose md:prose-lg xl:prose-xl max-w-none
+                        prose md:prose-lg max-w-none
                         prose-headings:font-sans prose-headings:font-black prose-headings:tracking-tight prose-headings:text-brand-dark
-                        prose-p:font-serif prose-p:text-gray-600 prose-p:leading-8 prose-p:mb-6
+                        prose-p:font-serif prose-p:text-gray-600 prose-p:leading-relaxed prose-p:mb-6
                         prose-a:text-brand-cyan prose-a:font-bold prose-a:no-underline prose-a:border-b-2 prose-a:border-brand-cyan/30 hover:prose-a:border-brand-cyan hover:prose-a:text-brand-cyanDark hover:prose-a:bg-brand-cyan/5 prose-a:transition-all
                         prose-strong:text-brand-dark prose-strong:font-black
                         prose-ul:list-disc prose-ul:pl-6 prose-ul:marker:text-brand-yellow
                         prose-li:font-serif prose-li:text-gray-600
-                        prose-blockquote:border-2 prose-blockquote:border-brand-yellow/40 prose-blockquote:bg-yellow-50 prose-blockquote:py-4 prose-blockquote:px-8 prose-blockquote:rounded-2xl prose-blockquote:not-italic prose-blockquote:font-serif prose-blockquote:text-gray-700
-                        first-letter:text-[4.5rem] first-letter:font-black first-letter:text-brand-dark first-letter:float-left first-letter:leading-none first-letter:mr-2 first-letter:mt-1
+                        prose-blockquote:border-2 prose-blockquote:border-brand-yellow/40 prose-blockquote:bg-yellow-50 prose-blockquote:py-4 prose-blockquote:px-8 prose-blockquote:rounded-2xl prose-blockquote:not-italic prose-blockquote:font-serif prose-blockquote:text-brand-dark
+                        first-letter:text-[3rem] first-letter:md:text-[4.5rem] first-letter:font-black first-letter:text-brand-dark first-letter:float-left first-letter:leading-none first-letter:mr-2 first-letter:mt-1
                     ">
                         <Suspense fallback={
                             <div className="animate-pulse space-y-4">
@@ -73,7 +73,7 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
                     </div>
                 </MDXProvider>
             ) : (
-                <div className="prose md:prose-lg xl:prose-xl max-w-none prose-p:font-serif prose-p:text-gray-600 prose-p:leading-8">
+                <div className="prose md:prose-lg max-w-none prose-p:font-serif prose-p:text-gray-600 prose-p:leading-relaxed">
                     <p>{post.excerpt}</p>
                     <p className="text-gray-400 italic">Conteúdo completo em breve…</p>
                 </div>
@@ -113,9 +113,9 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
                                     {related.title}
                                 </h5>
                                 <div className="flex items-center gap-3 text-xs text-gray-400 font-bold">
-                                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> 5 min</span>
+                                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {related.readingTime}</span>
                                     <span>•</span>
-                                    <span>{related.date}</span>
+                                    <span>{formatDate(related.date)}</span>
                                 </div>
                             </div>
                         </a>

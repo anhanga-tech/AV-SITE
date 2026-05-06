@@ -50,7 +50,7 @@ export const BlogPostSidebar: React.FC<BlogPostSidebarProps> = ({ author, author
                 </button>
             </div>
 
-            <div className="bg-white/50 backdrop-blur-sm p-2 rounded-3xl hidden lg:block">
+            <div className="bg-white p-2 rounded-3xl hidden lg:block">
                 <h3 className="font-black text-xl text-gray-800 mb-6 pl-2 flex items-center gap-2">
                     <span className="w-1.5 h-6 bg-brand-vibrant rounded-full"></span>
                     Leia Também
@@ -71,7 +71,7 @@ export const BlogPostSidebar: React.FC<BlogPostSidebarProps> = ({ author, author
                                     {related.title}
                                 </h5>
                                 <span className="text-xs text-gray-400 font-bold flex items-center gap-1">
-                                    <Clock className="w-3 h-3" /> 5 min
+                                    <Clock className="w-3 h-3" /> {related.readingTime}
                                 </span>
                             </div>
                         </a>
