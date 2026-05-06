@@ -63,15 +63,26 @@ const BlogPost: React.FC = () => {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-[#fffdf5]">
                 <h2 className="text-4xl font-black text-brand-dark mb-4 text-center px-6">Ops! Artigo não encontrado.</h2>
-                <a href="https://www.anhanga.tur.br/" className="text-brand-cyan font-bold hover:underline flex items-center gap-2">
+                <a href={getBlogHomeUrl()} className="text-brand-cyan font-bold hover:underline flex items-center gap-2">
                     <ArrowLeft className="w-4 h-4" /> Voltar para o Blog
                 </a>
             </div>
         );
     }
 
-    // Related posts (excluding current)
-    const relatedPosts = allMdxPosts.filter(p => p.slug !== slug).slice(0, 2);
+    // Related posts: prioriza mesma categoria (+3 pts) e tags em comum (+1 pt cada)
+    const relatedPosts = allMdxPosts
+        .filter(p => p.slug !== slug)
+        .sort((a, b) => {
+            const score = (p: typeof allMdxPosts[0]) => {
+                let s = 0;
+                if (p.category === post?.category) s += 3;
+                s += p.tags.filter(t => post?.tags.includes(t)).length;
+                return s;
+            };
+            return score(b) - score(a);
+        })
+        .slice(0, 2);
 
     const sameAs = author?.social ? (Object.values(author.social).filter(Boolean) as string[]) : [];
 
@@ -114,7 +125,7 @@ const BlogPost: React.FC = () => {
 
             <BlogPostHero post={post} authorName={author?.name || post.author} />
 
-            <div className="container mx-auto px-6 relative z-10 -mt-20 mb-24">
+            <div className="container mx-auto px-6 relative z-10 mt-8 mb-24">
                 <div className="flex flex-col lg:flex-row gap-12">
                     <div className="w-full lg:w-2/3">
                         <BlogPostContent

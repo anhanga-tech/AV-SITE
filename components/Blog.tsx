@@ -6,7 +6,7 @@ import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
 import { getAllPosts } from '../lib/mdx';
 import { AUTHORS } from '../data/blogData';
 import { SocialShare } from './SocialShare';
-import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
+import { getBlogHomeUrl, getBlogPostUrl, formatDate } from '../utils/blog';
 import { getCategoryColor } from '../utils/categoryColors';
 import { LazyImage } from './ui/LazyImage';
 
@@ -84,7 +84,7 @@ const Blog: React.FC = memo(() => {
                                         <span className={`px-3 py-1 rounded-full border ${getCategoryColor(featuredPost.category)}`}>
                                             {featuredPost.category}
                                         </span>
-                                        <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {featuredPost.date}</span>
+                                        <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {formatDate(featuredPost.date)}</span>
                                     </div>
                                     <h3 className="text-3xl md:text-4xl font-black text-brand-dark mb-4 leading-tight group-hover:text-brand-cyan transition-colors">
                                         {featuredPost.title}
@@ -114,14 +114,14 @@ const Blog: React.FC = memo(() => {
 
                 {/* Grid Posts */}
                 <div className="grid md:grid-cols-3 gap-8">
-                    {gridPosts.map((post) => (
+                    {gridPosts.map((post, index) => (
                         <a
                             href={getBlogPostUrl(post.slug)}
                             key={post.slug}
                             className="group bg-white rounded-3xl p-4 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.05)] border border-gray-100 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl flex flex-col h-full"
                         >
-                            {/* Image Area */}
-                            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-5 bg-gray-100">
+                            {/* Image Area — aspect ratio alternado para quebrar ritmo uniforme */}
+                            <div className={`relative ${index % 2 === 0 ? 'aspect-[4/3]' : 'aspect-video'} rounded-2xl overflow-hidden mb-5 bg-gray-100`}>
                                 <LazyImage
                                     src={post.image}
                                     alt={post.title}
@@ -130,7 +130,7 @@ const Blog: React.FC = memo(() => {
                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                 />
                                 <div className="absolute top-3 right-3 bg-white/90 backdrop-blur rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-800 shadow-sm">
-                                    {post.date}
+                                    {formatDate(post.date)}
                                 </div>
                                 <div className="absolute bottom-3 right-3 z-30">
                                     <SocialShare
