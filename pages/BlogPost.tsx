@@ -70,14 +70,16 @@ const BlogPost: React.FC = () => {
         );
     }
 
-    // Related posts: prioriza mesma categoria (+3 pts) e tags em comum (+1 pt cada)
+    const CATEGORY_MATCH_SCORE = 3;
+
+    // Related posts: prioriza mesma categoria e tags em comum
     const relatedPosts = allMdxPosts
         .filter(p => p.slug !== slug)
         .sort((a, b) => {
             const score = (p: typeof allMdxPosts[0]) => {
                 let s = 0;
-                if (p.category === post?.category) s += 3;
-                s += p.tags.filter(t => post?.tags.includes(t)).length;
+                if (p.category === post.category) s += CATEGORY_MATCH_SCORE;
+                s += p.tags.filter(t => post.tags.includes(t)).length;
                 return s;
             };
             return score(b) - score(a);

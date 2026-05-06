@@ -115,7 +115,7 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
                                 <div className="flex items-center gap-3 text-xs text-gray-400 font-bold">
                                     <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {related.readingTime}</span>
                                     <span>•</span>
-                                    <span>{related.date}</span>
+                                    <span>{formatDate(related.date)}</span>
                                 </div>
                             </div>
                         </a>
