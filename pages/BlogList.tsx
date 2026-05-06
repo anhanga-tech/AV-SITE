@@ -7,7 +7,7 @@ import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import Search from 'lucide-react/dist/esm/icons/search';
 import BookOpen from 'lucide-react/dist/esm/icons/book-open';
 import { SocialShare } from '../components/SocialShare';
-import { getBlogPostUrl, getBlogHomeUrl } from '../utils/blog';
+import { getBlogPostUrl, getBlogHomeUrl, formatDate } from '../utils/blog';
 import { optimizeRemoteImageUrl } from '../data/mediaConfig';
 import { getCategoryColor } from '../utils/categoryColors';
 import { SEO } from '../components/SEO';
@@ -60,22 +60,6 @@ const BlogList: React.FC = () => {
                         Explore nosso acervo completo de dicas, roteiros e segredos de viagem.
                     </p>
 
-                    <div className="flex justify-center mb-5">
-                        <button
-                            onClick={(e) => {
-                                e.preventDefault();
-                                openAiChat({
-                                    message: 'Olá! Gostaria de solicitar um orçamento para minha próxima viagem.'
-                                });
-                            }}
-                            className="btn-whatsapp btn-specialist bg-brand-vibrant text-white px-8 py-4 rounded-2xl font-black text-lg shadow-xl shadow-brand-vibrant/20 hover:scale-105 transition-transform active:scale-95 flex items-center gap-3"
-                            data-tracking="hero-blog-list"
-                        >
-                            Planejar minha Viagem
-                            <ArrowRight className="w-5 h-5" />
-                        </button>
-                    </div>
-
                     {/* Search Bar */}
                     <div className="relative max-w-lg mx-auto">
                         <label htmlFor="blog-search-input" className="sr-only">Buscar artigos</label>
@@ -94,7 +78,7 @@ const BlogList: React.FC = () => {
                 {/* Grid */}
                 {filteredPosts.length > 0 ? (
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filteredPosts.map((post) => (
+                        {filteredPosts.map((post, index) => (
                             <Link
                                 to={`/blog/${post.slug}`}
                                 key={post.slug}
@@ -104,8 +88,8 @@ const BlogList: React.FC = () => {
                                 flex flex-col h-full relative z-10
                             `}
                             >
-                                {/* Image Area */}
-                                <div className="relative aspect-[16/10] rounded-2xl overflow-hidden mb-5 bg-gray-100">
+                                {/* Image Area — aspect ratio alternado para ritmo visual */}
+                                <div className={`relative ${index % 3 === 1 ? 'aspect-[4/3]' : index % 3 === 2 ? 'aspect-video' : 'aspect-[16/10]'} rounded-2xl overflow-hidden mb-5 bg-gray-100`}>
                                     <img
                                         src={optimizeRemoteImageUrl(post.image, 640, 400)}
                                         alt={post.title}
@@ -116,7 +100,7 @@ const BlogList: React.FC = () => {
                                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                     />
                                     <div className="absolute top-3 right-3 bg-white/90 backdrop-blur rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-800 shadow-sm">
-                                        {post.date}
+                                        {formatDate(post.date)}
                                     </div>
                                     <div className="absolute bottom-3 right-3 z-30">
                                         <SocialShare
