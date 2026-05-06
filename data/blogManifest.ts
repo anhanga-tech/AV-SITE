@@ -22,7 +22,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "parques-tematicos"
     ],
     "slug": "disney-tropical-americas-animal-kingdom",
-    "readingTime": "3 min de leitura"
+    "readingTime": "4 min de leitura"
   },
   {
     "title": "América do Norte: os melhores destinos além de Nova York",
@@ -87,7 +87,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "all-inclusive"
     ],
     "slug": "caribe-destinos-para-brasileiros",
-    "readingTime": "5 min de leitura"
+    "readingTime": "6 min de leitura"
   },
   {
     "title": "América do Sul: os destinos que mais valem a viagem saindo do Brasil",
