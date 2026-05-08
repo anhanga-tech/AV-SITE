@@ -19,8 +19,16 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
     const [copied, setCopied] = useState(false);
     const links = getSocialShareLinks(url, title);
 
+    // PERFORMANCE: Prefetch haptics on hover to minimize interaction latency
+    const prefetchHaptics = () => {
+        import('../utils/haptics').catch(() => {});
+    };
+
     const handleNativeShare = async () => {
-        import('../utils/haptics').then(m => m.triggerHaptic('light'));
+        import('../utils/haptics')
+            .then(m => m.triggerHaptic('light'))
+            .catch(() => {});
+
         await shareContent({
             title,
             text: excerpt || title,
@@ -31,7 +39,10 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
     const handleCopy = () => {
         navigator.clipboard.writeText(url);
         setCopied(true);
-        import('../utils/haptics').then(m => m.triggerHaptic('medium'));
+        import('../utils/haptics')
+            .then(m => m.triggerHaptic('medium'))
+            .catch(() => {});
+
         setTimeout(() => setCopied(false), 2000);
     };
 
@@ -44,6 +55,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                         e.stopPropagation();
                         handleNativeShare();
                     }}
+                    onMouseEnter={prefetchHaptics}
                     className="p-2 bg-white/80 hover:bg-brand-cyan hover:text-white text-gray-400 rounded-full transition-all shadow-sm border border-gray-100"
                     title="Compartilhar"
                     aria-label="Compartilhar"
@@ -56,6 +68,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                         e.stopPropagation();
                         handleCopy();
                     }}
+                    onMouseEnter={prefetchHaptics}
                     className={`p-2 rounded-full transition-all shadow-sm border ${copied ? 'bg-green-500 text-white border-green-600' : 'bg-white/80 text-gray-400 border-gray-100 hover:bg-gray-100'}`}
                     title={copied ? "Link copiado!" : "Copiar link"}
                     aria-label={copied ? "Link copiado com sucesso" : "Copiar link"}
@@ -71,6 +84,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
             {/* Native Share Button (Primary on Mobile) */}
             <button
                 onClick={handleNativeShare}
+                onMouseEnter={prefetchHaptics}
                 className="flex items-center gap-2 px-5 py-2.5 bg-brand-cyan text-white font-bold rounded-xl hover:bg-brand-cyanDark transition-all shadow-[0_4px_0px_#0369a1] active:shadow-none active:translate-y-1 lg:hidden"
             >
                 <Share2 className="w-5 h-5" /> Compartilhar
@@ -85,7 +99,12 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     className="p-2.5 bg-[#25D366] text-white rounded-xl hover:scale-110 transition-transform shadow-md"
                     title="Compartilhar no WhatsApp"
                     aria-label="Compartilhar no WhatsApp"
-                    onClick={() => import('../utils/haptics').then(m => m.triggerHaptic('light'))}
+                    onMouseEnter={prefetchHaptics}
+                    onClick={() => {
+                        import('../utils/haptics')
+                            .then(m => m.triggerHaptic('light'))
+                            .catch(() => {});
+                    }}
                 >
                     <MessageCircle className="w-5 h-5 fill-current" />
                 </a>
@@ -96,7 +115,12 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     className="p-2.5 bg-[#1877F2] text-white rounded-xl hover:scale-110 transition-transform shadow-md"
                     title="Compartilhar no Facebook"
                     aria-label="Compartilhar no Facebook"
-                    onClick={() => import('../utils/haptics').then(m => m.triggerHaptic('light'))}
+                    onMouseEnter={prefetchHaptics}
+                    onClick={() => {
+                        import('../utils/haptics')
+                            .then(m => m.triggerHaptic('light'))
+                            .catch(() => {});
+                    }}
                 >
                     <Facebook className="w-5 h-5 fill-current" />
                 </a>
@@ -107,7 +131,12 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     className="p-2.5 bg-[#0A66C2] text-white rounded-xl hover:scale-110 transition-transform shadow-md"
                     title="Compartilhar no LinkedIn"
                     aria-label="Compartilhar no LinkedIn"
-                    onClick={() => import('../utils/haptics').then(m => m.triggerHaptic('light'))}
+                    onMouseEnter={prefetchHaptics}
+                    onClick={() => {
+                        import('../utils/haptics')
+                            .then(m => m.triggerHaptic('light'))
+                            .catch(() => {});
+                    }}
                 >
                     <Linkedin className="w-5 h-5 fill-current" />
                 </a>
@@ -115,6 +144,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                 {/* Native Share (secondary on desktop) */}
                 <button
                     onClick={handleNativeShare}
+                    onMouseEnter={prefetchHaptics}
                     className="hidden lg:flex p-2.5 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transition-all shadow-sm"
                     title="Mais opções de compartilhamento"
                     aria-label="Mais opções de compartilhamento"
@@ -125,6 +155,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                 {/* Copy Link button */}
                 <button
                     onClick={handleCopy}
+                    onMouseEnter={prefetchHaptics}
                     className={`p-2.5 rounded-xl transition-all shadow-sm border ${copied ? 'bg-green-500 text-white border-green-600' : 'bg-gray-100 text-gray-600 border-transparent hover:bg-gray-200'}`}
                     title={copied ? "Link copiado!" : "Copiar link"}
                     aria-label={copied ? "Link copiado com sucesso" : "Copiar link"}
