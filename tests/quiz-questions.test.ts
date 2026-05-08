@@ -32,3 +32,13 @@ test('quiz destination options should use Mautic-aligned destination ids', async
   assert.match(source, /id: 'africa-oriente'/);
   assert.match(source, /id: 'surpresa'/);
 });
+
+test('quiz result submit failure message should announce itself as an alert', async () => {
+  const source = await readQuizLanding();
+  const submitFailedBranch = source.match(/submitFailed \? \(\s*([\s\S]*?)\s*\) : \(/)?.[1];
+  const submitFailedWarning = submitFailedBranch?.match(/<p\b[^>]*>/)?.[0];
+
+  assert.ok(submitFailedBranch, 'missing submitFailed result branch');
+  assert.ok(submitFailedWarning, 'missing submit failure warning paragraph');
+  assert.match(submitFailedWarning, /\srole="alert"/);
+});
