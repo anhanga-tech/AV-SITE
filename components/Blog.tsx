@@ -28,7 +28,7 @@ const gridPosts = featuredPost
  */
 const Blog: React.FC = memo(() => {
     return (
-        <section id="blog" className="py-24 bg-white relative overflow-hidden">
+        <section id="blog" className="py-24 bg-white relative overflow-hidden dynamic-blog-content">
             {/* Background Decorations */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-brand-cyan/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
             <div className="absolute bottom-0 left-0 w-full h-24 bg-[#fffdf5] skew-y-2 translate-y-12"></div>
