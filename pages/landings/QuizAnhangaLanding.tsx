@@ -843,7 +843,7 @@ function ResultScreen({ profile, mainDest, inspirations, lead, onRestart, baseWa
                 {/* Bloco 6 — fineprint + erro de API */}
                 <div className="quiz-reveal-block" style={{ ['--reveal-delay' as string]: '1100ms' }}>
                     {submitFailed ? (
-                        <p className="quiz-result-fineprint quiz-result-fineprint--warn">
+                        <p role="alert" className="quiz-result-fineprint quiz-result-fineprint--warn">
                             Algo deu errado ao salvar seus dados. Use o WhatsApp acima para garantir o contato.
                         </p>
                     ) : (
