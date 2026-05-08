@@ -32,3 +32,13 @@ test('quiz destination options should use Mautic-aligned destination ids', async
   assert.match(source, /id: 'africa-oriente'/);
   assert.match(source, /id: 'surpresa'/);
 });
+
+test('quiz result submit failure message should announce itself as an alert', async () => {
+  const source = await readQuizLanding();
+  const submitFailedWarning = source.match(
+    /submitFailed \? \(\s*(<p[^>]*className="quiz-result-fineprint quiz-result-fineprint--warn"[^>]*>)/,
+  )?.[1];
+
+  assert.ok(submitFailedWarning, 'missing submit failure warning paragraph');
+  assert.match(submitFailedWarning, /\srole="alert"/);
+});
