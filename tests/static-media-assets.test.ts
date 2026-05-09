@@ -134,13 +134,12 @@ test('orlando landing should not hotlink static images from partner websites', a
 });
 
 test('festival landings should use managed static imagery', async () => {
-  const [hero, packageFeatures, lineup, venueMap, audience, whyUs, betoTestimonials] =
+  const [hero, packageFeatures, lineup, venueMap, whyUs, betoTestimonials] =
     await Promise.all([
       readRepoFile('components/landings/lollapalooza/Hero.tsx'),
       readRepoFile('components/landings/lollapalooza/PackageFeatures.tsx'),
       readRepoFile('components/landings/lollapalooza/LineupSection.tsx'),
       readRepoFile('components/landings/lollapalooza/VenueMap.tsx'),
-      readRepoFile('components/landings/lollapalooza/Audience.tsx'),
       readRepoFile('components/landings/lollapalooza/WhyUs.tsx'),
       readRepoFile('components/landings/beto-carrero/Testimonials.tsx'),
     ]);
@@ -184,13 +183,6 @@ test('festival landings should use managed static imagery', async () => {
     'components/landings/lollapalooza/VenueMap.tsx',
   );
   assert.match(venueMap, /images\/lollapalooza\/venue\/.+\.(jpg|jpeg|webp)/);
-
-  assertMissingHosts(
-    audience,
-    ['picsum.photos'],
-    'components/landings/lollapalooza/Audience.tsx',
-  );
-  assert.match(audience, /images\/lollapalooza\/audience\/.+\.(jpg|jpeg|webp)/);
 
   assertMissingHosts(
     whyUs,

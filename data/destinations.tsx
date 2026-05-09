@@ -11,7 +11,7 @@ import Crown from 'lucide-react/dist/esm/icons/crown';
 import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
 
 // --- DATA: COMPREHENSIVE DESTINATION LIST (IATA & TOURIST HOTSPOTS) ---
-export const DESTINATIONS_DATABASE = [
+const DESTINATIONS_DATABASE = [
   // Brasil
   { label: "São Paulo, Brasil", city: "São Paulo" },
   { label: "Rio de Janeiro, Brasil", city: "Rio de Janeiro" },

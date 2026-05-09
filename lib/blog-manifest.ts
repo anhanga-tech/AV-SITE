@@ -79,7 +79,7 @@ export async function collectBlogPostMeta(blogDir: string): Promise<PostMeta[]> 
   return posts.sort((a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug));
 }
 
-export function serializeBlogPostMeta(posts: PostMeta[]): string {
+function serializeBlogPostMeta(posts: PostMeta[]): string {
   return `import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = ${JSON.stringify(posts, null, 2)};

@@ -1,4 +1,4 @@
-export type ImageFit = 'cover' | 'scale-down';
+type ImageFit = 'cover' | 'scale-down';
 
 export interface ImagePreset {
     id: string;
