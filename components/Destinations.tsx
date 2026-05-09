@@ -622,7 +622,7 @@ const Destinations: React.FC = memo(() => {
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {filteredDestinations.slice(0, 3).map((dest) => (
                         <div
-                            key={dest.city}
+                            key={`${dest.city}-${dest.country}`}
                             tabIndex={0}
                             role="button"
                             aria-label={`Ver detalhes de ${dest.city}, ${dest.country}`}
