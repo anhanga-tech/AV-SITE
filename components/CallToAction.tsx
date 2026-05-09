@@ -216,26 +216,26 @@ const CallToAction: React.FC = () => {
 
                         {/* Passenger Name */}
                         <div className="mb-4">
-                            <label className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider mb-0.5">Passenger Name</label>
+                            <span className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider mb-0.5">Passenger Name</span>
                             <span className="block text-lg font-black text-brand-dark truncate">VOCÊ / VIP</span>
                         </div>
 
                         {/* Flight Details Grid */}
                         <div className="grid grid-cols-2 gap-y-3 gap-x-2 mb-4 border-b-2 border-dashed border-gray-200 pb-4">
                             <div>
-                                <label className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider">Flight</label>
+                                <span className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider">Flight</span>
                                 <span className="block text-sm font-bold font-mono text-gray-800">ANH 777</span>
                             </div>
                             <div>
-                                <label className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider">Date</label>
+                                <span className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider">Date</span>
                                 <span className="block text-sm font-bold font-mono text-gray-800">HOJE</span>
                             </div>
                             <div>
-                                <label className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider">From</label>
+                                <span className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider">From</span>
                                 <span className="block text-base font-black text-gray-800">GRU</span>
                             </div>
                             <div>
-                                <label className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider">To</label>
+                                <span className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider">To</span>
                                 <span className="block text-base font-black text-brand-vibrant">MUNDO</span>
                             </div>
                         </div>
@@ -262,11 +262,11 @@ const CallToAction: React.FC = () => {
                         <div className="mt-auto">
                             <div className="flex justify-between items-end mb-2">
                                 <div>
-                                    <label className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider">Boarding</label>
+                                    <span className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider">Boarding</span>
                                     <span className="block text-sm font-black text-red-500">AGORA</span>
                                 </div>
                                 <div className="text-right">
-                                    <label className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider">SEQ</label>
+                                    <span className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider">SEQ</span>
                                     <span className="block text-sm font-mono font-bold text-gray-600">001</span>
                                 </div>
                             </div>

@@ -25,7 +25,7 @@ const Navbar: React.FC = () => {
   const logoUrl = BRAND_LOGO_BLUE_URL;
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'}`} role="navigation" aria-label="Menu principal">
+    <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'}`} aria-label="Menu principal">
       <div className="container mx-auto px-4 flex justify-between items-center">
         {/* Logo */}
         <a href={`${SITE_URL}/`} className="flex items-center" aria-label="Anhangá Viagens - Página Inicial">

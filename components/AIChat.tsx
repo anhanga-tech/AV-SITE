@@ -366,9 +366,13 @@ const AIChat: React.FC = memo(() => {
 
       {/* Backdrop Overlay */}
       <div
+        role="button"
+        tabIndex={0}
+        aria-label="Fechar chat"
         className={`fixed inset-0 z-[9998] transition-opacity duration-300 ease-in-out bg-brand-dark/20 backdrop-blur-sm ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
           }`}
         onClick={() => closeChatDrawer()}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') closeChatDrawer(); }}
       />
 
       {/* Drawer Panel - Soft Scrapbook Geometry */}

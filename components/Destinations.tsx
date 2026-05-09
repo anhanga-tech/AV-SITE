@@ -670,8 +670,8 @@ const Destinations: React.FC = memo(() => {
 
             {/* Modal - Scrapbook Page Style */}
             {selectedDestination && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedDestination(null)}>
-                    <div className="bg-[#fffdf5] w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden relative flex flex-col md:flex-row max-h-[90vh] border-8 border-white transform rotate-1" onClick={e => e.stopPropagation()}>
+                <div role="button" tabIndex={0} aria-label="Fechar destino" className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedDestination(null)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSelectedDestination(null); }}>
+                    <div role="presentation" className="bg-[#fffdf5] w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden relative flex flex-col md:flex-row max-h-[90vh] border-8 border-white transform rotate-1" onClick={e => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
 
                         {/* Washi Tape Decor */}
                         <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-32 h-10 bg-red-400/80 rotate-1 backdrop-blur-sm z-20 shadow-sm border-l-2 border-r-2 border-white/40"></div>
