@@ -85,10 +85,11 @@ test('collectBlogPostMeta keeps same-day posts in slug order', async () => {
   const blogDir = await mkdtemp(path.join(os.tmpdir(), 'blog-manifest-same-day-'));
 
   try {
-    for (const slug of ['same-day-a', 'same-day-b', 'same-day-c']) {
-      await writeFile(
-        path.join(blogDir, `${slug}.mdx`),
-        `---
+    await Promise.all(
+      ['same-day-a', 'same-day-b', 'same-day-c'].map((slug) =>
+        writeFile(
+          path.join(blogDir, `${slug}.mdx`),
+          `---
 title: "${slug}"
 excerpt: "${slug}"
 date: "2026-03-20"
@@ -100,9 +101,10 @@ featured: false
 
 Body for ${slug}.
 `,
-        'utf8'
-      );
-    }
+          'utf8'
+        )
+      ),
+    );
 
     const posts = await collectBlogPostMeta(blogDir);
 

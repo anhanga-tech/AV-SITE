@@ -87,9 +87,11 @@ export const BLOG_POST_MANIFEST: PostMeta[] = ${JSON.stringify(posts, null, 2)};
 }
 
 export async function writeBlogManifest(blogDir: string, outputFile: string): Promise<PostMeta[]> {
-  const posts = await collectBlogPostMeta(blogDir);
+  const [posts] = await Promise.all([
+    collectBlogPostMeta(blogDir),
+    mkdir(path.dirname(outputFile), { recursive: true }),
+  ]);
 
-  await mkdir(path.dirname(outputFile), { recursive: true });
   await writeFile(outputFile, serializeBlogPostMeta(posts), 'utf8');
 
   return posts;

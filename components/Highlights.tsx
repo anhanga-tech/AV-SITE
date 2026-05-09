@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { LazyImage } from './ui/LazyImage';
 import {
   UserCircleCheck,
@@ -93,7 +93,7 @@ const Highlights = memo(() => {
                 <div className="flex flex-col lg:flex-row gap-16 items-start">
 
                     {/* LEFT COLUMN */}
-                    <motion.div
+                    <m.div
                         className="w-full lg:w-5/12 lg:sticky lg:top-32"
                         variants={fadeUp}
                         initial="hidden"
@@ -104,7 +104,7 @@ const Highlights = memo(() => {
                         {/* Image with Tape Effect */}
                         <div className="relative mb-10 group cursor-pointer">
                             <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-yellow-100/80 rotate-2 backdrop-blur-sm z-20 shadow-sm border-l border-r border-white/50"></div>
-                            <motion.div
+                            <m.div
                                 className="relative rounded-2xl overflow-hidden border-8 border-white shadow-[0_10px_30px_rgba(0,0,0,0.1)]"
                                 initial={{ rotate: -3 }}
                                 whileHover={{ rotate: 0, scale: 1.02, boxShadow: '0 24px 50px rgba(0,0,0,0.15)' }}
@@ -120,7 +120,7 @@ const Highlights = memo(() => {
                                 <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-md px-4 py-1 rounded-full text-xs font-bold text-gray-700 shadow-sm transition-transform duration-300 group-hover:scale-110">
                                     📍 Caribe? Talvez.
                                 </div>
-                            </motion.div>
+                            </m.div>
                         </div>
 
                         <div className="bg-white p-8 rounded-[2rem] border-2 border-gray-100 shadow-[8px_8px_0px_rgba(0,0,0,0.05)] text-center lg:text-left">
@@ -142,11 +142,11 @@ const Highlights = memo(() => {
                                 <span>Falar com Especialista</span>
                             </button>
                         </div>
-                    </motion.div>
+                    </m.div>
 
                     {/* RIGHT COLUMN */}
                     <div className="w-full lg:w-7/12">
-                        <motion.div
+                        <m.div
                             className="mb-12"
                             variants={fadeUp}
                             initial="hidden"
@@ -169,14 +169,14 @@ const Highlights = memo(() => {
                             <p className="text-gray-600 text-lg md:text-xl font-medium leading-relaxed mb-8">
                                 A <strong>Anhangá</strong> é uma agência de viagens em São Paulo. Não trabalhamos com pacote pronto. Ouvimos o que você quer, pesquisamos o que faz sentido pra você e montamos cada detalhe do roteiro. Do primeiro voo ao último café da manhã, você não está sozinho.
                             </p>
-                        </motion.div>
+                        </m.div>
 
                         <div className="grid md:grid-cols-2 gap-8">
                             {HIGHLIGHTS.map((item, idx) => {
                                 const Icon = item.icon;
                                 const rotateVal = parseInt(item.rotate.replace('rotate-', ''), 10) || 0;
                                 return (
-                                    <motion.div
+                                    <m.div
                                         key={item.title}
                                         className={`group relative p-8 rounded-[2.5rem] bg-white border-[3px] ${item.accent} shadow-[8px_8px_0px_rgba(0,0,0,0.05)] flex flex-col h-full overflow-visible`}
                                         variants={fadeUp}
@@ -198,12 +198,12 @@ const Highlights = memo(() => {
                                         <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-yellow-50/90 backdrop-blur-sm border-l-2 border-r-2 border-white/40 rotate-1 shadow-sm z-20 opacity-90"></div>
 
                                         {/* Icon Badge */}
-                                        <motion.div
+                                        <m.div
                                             className={`w-16 h-16 rounded-2xl ${item.bg} border-2 ${item.accent} flex items-center justify-center mb-6 shadow-sm`}
                                             whileHover={{ scale: 1.1, rotate: 6, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
                                         >
                                             <Icon className={`w-8 h-8 ${item.iconColor}`} weight="fill" />
-                                        </motion.div>
+                                        </m.div>
 
                                         {/* Content */}
                                         <h3 className="text-xl font-extrabold text-gray-900 mb-3 leading-tight group-hover:text-brand-cyan transition-colors duration-300">
@@ -217,7 +217,7 @@ const Highlights = memo(() => {
                                         <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
                                             <ArrowRight className={`w-5 h-5 ${item.iconColor}`} />
                                         </div>
-                                    </motion.div>
+                                    </m.div>
                                 );
                             })}
                         </div>

@@ -310,19 +310,21 @@ test('blog posts should not hotlink third-party cover images', async () => {
   const filenames = await readdir(new URL('../content/blog', import.meta.url));
   const postFiles = filenames.filter((filename) => filename.endsWith('.mdx') && !filename.startsWith('_'));
 
-  for (const filename of postFiles) {
-    const content = await readRepoFile(`content/blog/${filename}`);
+  await Promise.all(
+    postFiles.map(async (filename) => {
+      const content = await readRepoFile(`content/blog/${filename}`);
 
-    assertMissingHosts(
-      content,
-      ['images.unsplash.com', 'img1.wsimg.com', 'blog.anhanga.tur.br'],
-      filename,
-    );
+      assertMissingHosts(
+        content,
+        ['images.unsplash.com', 'img1.wsimg.com', 'blog.anhanga.tur.br'],
+        filename,
+      );
 
-    assert.match(
-      content,
-      /image: "(?:images\/(?:blog|about|destinations)\/.+\.(jpg|jpeg|png|webp)|\/blog-viagem-solo-feminina\.png)"/,
-      `${filename} should point to a managed image path`,
-    );
-  }
+      assert.match(
+        content,
+        /image: "(?:images\/(?:blog|about|destinations)\/.+\.(jpg|jpeg|png|webp)|\/blog-viagem-solo-feminina\.png)"/,
+        `${filename} should point to a managed image path`,
+      );
+    }),
+  );
 });

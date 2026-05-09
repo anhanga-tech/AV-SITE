@@ -44,8 +44,10 @@ const renderAttrs = (tag: HeadTag): string => {
   const entries = Object.entries(attrs) as Array<[string, string | number | boolean | undefined]>;
 
   return entries
-    .filter(([, value]) => value !== undefined && value !== false)
-    .map(([name, value]) => (value === true ? name : `${name}="${escapeAttribute(value)}"`))
+    .flatMap(([name, value]) => {
+      if (value === undefined || value === false) return [];
+      return [value === true ? name : `${name}="${escapeAttribute(value)}"`];
+    })
     .join(' ');
 };
 
@@ -73,9 +75,9 @@ const applyHeadTag = (tag: HeadTag): HTMLElement => {
     existing.remove();
   }
 
-  Array.from(element.attributes)
-    .filter((attribute) => attribute.name !== 'data-av-head')
-    .forEach((attribute) => element.removeAttribute(attribute.name));
+  for (const attribute of Array.from(element.attributes)) {
+    if (attribute.name !== 'data-av-head') element.removeAttribute(attribute.name);
+  }
 
   element.setAttribute('data-av-head', tag.key);
 

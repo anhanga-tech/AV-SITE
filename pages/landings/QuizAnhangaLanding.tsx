@@ -203,13 +203,12 @@ const SUMMARY_LABELS: Record<string, Record<string, string>> = {
 
 function buildAnswersSummary(answers: QuizAnswers): string {
     return Object.entries(answers)
-        .filter(([, sel]) => sel?.length)
-        .map(([qId, sel]) => {
+        .flatMap(([qId, sel]) => {
+            if (!sel?.length) return [];
             const map = SUMMARY_LABELS[qId];
-            if (!map) return null;
-            return sel.map((id) => map[id] ?? id).join(', ');
+            if (!map) return [];
+            return [sel.map((id) => map[id] ?? id).join(', ')];
         })
-        .filter(Boolean)
         .join(' · ');
 }
 

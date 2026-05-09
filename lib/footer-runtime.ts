@@ -5,6 +5,8 @@ export interface FooterRuntimeMetadata {
   lastUpdatedLabel: string;
 }
 
+const ptBrDateFormat = new Intl.DateTimeFormat('pt-BR');
+
 export function useFooterRuntimeMetadata(): FooterRuntimeMetadata | null {
   const [metadata, setMetadata] = useState<FooterRuntimeMetadata | null>(null);
 
@@ -14,7 +16,7 @@ export function useFooterRuntimeMetadata(): FooterRuntimeMetadata | null {
     // Keep the first render deterministic for prerendered routes, then fill runtime-only labels.
     setMetadata({
       currentYear: String(now.getFullYear()),
-      lastUpdatedLabel: new Intl.DateTimeFormat('pt-BR').format(now),
+      lastUpdatedLabel: ptBrDateFormat.format(now),
     });
   }, []);
 

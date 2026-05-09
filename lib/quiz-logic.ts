@@ -31,9 +31,11 @@ export function validateQuizPayload(
 
     const destinos = Array.isArray(raw.destinos)
         ? raw.destinos
-            .filter((d): d is string => typeof d === 'string')
-            .map((d) => d.trim().slice(0, 50))
-            .filter(Boolean)
+            .flatMap((d): string[] => {
+                if (typeof d !== 'string') return [];
+                const trimmed = d.trim().slice(0, 50);
+                return trimmed ? [trimmed] : [];
+            })
             .slice(0, 10)
         : [];
 
