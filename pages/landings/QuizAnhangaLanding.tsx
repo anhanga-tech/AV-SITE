@@ -455,10 +455,9 @@ interface PreLeadScreenProps {
     profile: TravelerProfile;
     onSubmit: (form: LeadForm) => void;
     onBack: () => void;
-    isSubmitting: boolean;
 }
 
-function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting }: PreLeadScreenProps) {
+function PreLeadScreen({ profile, onSubmit, onBack }: PreLeadScreenProps) {
     const [form, setForm] = useState<LeadForm>({ nome: '', sobrenome: '', email: '', aceite: false });
     const [errors, setErrors] = useState<Partial<Record<keyof LeadForm, string>>>({});
 
@@ -515,7 +514,6 @@ function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting }: PreLeadScree
                             value={form.nome}
                             onChange={(e) => update('nome', e.target.value)}
                             className={errors.nome ? 'has-error' : ''}
-                            disabled={isSubmitting}
                             autoComplete="given-name"
                         />
                         {errors.nome && <span className="quiz-err">{errors.nome}</span>}
@@ -530,7 +528,6 @@ function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting }: PreLeadScree
                             value={form.sobrenome}
                             onChange={(e) => update('sobrenome', e.target.value)}
                             className={errors.sobrenome ? 'has-error' : ''}
-                            disabled={isSubmitting}
                             autoComplete="family-name"
                         />
                         {errors.sobrenome && <span className="quiz-err">{errors.sobrenome}</span>}
@@ -545,7 +542,6 @@ function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting }: PreLeadScree
                             value={form.email}
                             onChange={(e) => update('email', e.target.value)}
                             className={errors.email ? 'has-error' : ''}
-                            disabled={isSubmitting}
                             autoComplete="email"
                         />
                         {errors.email && <span className="quiz-err">{errors.email}</span>}
@@ -556,7 +552,6 @@ function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting }: PreLeadScree
                             type="checkbox"
                             checked={form.aceite}
                             onChange={(e) => update('aceite', e.target.checked)}
-                            disabled={isSubmitting}
                         />
                         <span className="quiz-check-box" aria-hidden="true" />
                         <span className="quiz-check-label">
@@ -564,11 +559,11 @@ function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting }: PreLeadScree
                             Veja nossa <a href="/politica-privacidade">política de privacidade</a>.
                         </span>
                     </label>
-                    {errors.aceite && <span className="quiz-err quiz-err-block">É só marcar a caixinha acima para continuar.</span>}
+                    {errors.aceite && <span role="status" className="quiz-err quiz-err-block">{errors.aceite}</span>}
 
-                    <button type="submit" className="quiz-btn quiz-btn-primary quiz-btn-lg" disabled={isSubmitting}>
-                        {isSubmitting ? 'Abrindo seu resultado…' : 'Revelar meu perfil'}
-                        {!isSubmitting && <span className="quiz-arrow">→</span>}
+                    <button type="submit" className="quiz-btn quiz-btn-primary quiz-btn-lg">
+                        Revelar meu perfil
+                        <span className="quiz-arrow">→</span>
                     </button>
                 </form>
             </div>
@@ -883,7 +878,7 @@ export default function QuizAnhangaLanding() {
     const [profileKey, setProfileKey] = useState<ProfileKey | null>(null);
     const [baseWaUrl, setBaseWaUrl] = useState('');
     const [submitFailed, setSubmitFailed] = useState(false);
-    const { submitQuiz, isSubmitting } = useQuizCapture();
+    const { submitQuiz } = useQuizCapture();
 
     const go = useCallback((next: Stage, dir: 'forward' | 'back' = 'forward') => {
         setDirection(dir);
@@ -987,7 +982,6 @@ export default function QuizAnhangaLanding() {
                     profile={TRAVELER_PROFILES[leadProfileKey]}
                     onSubmit={handleLeadSubmit}
                     onBack={() => go({ kind: 'question', index: QUIZ_QUESTIONS.length - 1 }, 'back')}
-                    isSubmitting={isSubmitting}
                 />
             );
         }
