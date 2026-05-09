@@ -452,12 +452,12 @@ function QuestionScreen({ q, qIndex, total, value, onChange, onNext, onBack }: Q
    ========================================================================== */
 
 interface PreLeadScreenProps {
+    profile: TravelerProfile;
     onSubmit: (form: LeadForm) => void;
     onBack: () => void;
-    isSubmitting: boolean;
 }
 
-function PreLeadScreen({ onSubmit, onBack, isSubmitting }: PreLeadScreenProps) {
+function PreLeadScreen({ profile, onSubmit, onBack }: PreLeadScreenProps) {
     const [form, setForm] = useState<LeadForm>({ nome: '', sobrenome: '', email: '', aceite: false });
     const [errors, setErrors] = useState<Partial<Record<keyof LeadForm, string>>>({});
 
@@ -485,11 +485,23 @@ function PreLeadScreen({ onSubmit, onBack, isSubmitting }: PreLeadScreenProps) {
             </div>
 
             <div className="quiz-lead-card">
-                <span className="quiz-stamp-lead">QUASE LÁ</span>
-                <h2 className="quiz-lead-title">A quem entregamos seu perfil?</h2>
+                <span className="quiz-stamp-lead">PRONTO</span>
+
+                <div className={`quiz-lead-preview quiz-lead-preview--${profile.color}`} aria-hidden="true">
+                    <div className="quiz-lead-preview-orbit">
+                        <span className="quiz-lead-preview-icon">{profile.icon}</span>
+                    </div>
+                    <div className="quiz-lead-preview-copy">
+                        <span className="quiz-lead-preview-kicker">perfil calculado</span>
+                        <strong>Resultado reservado</strong>
+                        <span className="quiz-lead-preview-line" />
+                    </div>
+                </div>
+
+                <h2 className="quiz-lead-title">Seu perfil está pronto.</h2>
                 <p className="quiz-lead-sub">
-                    Só falta um detalhe. Coloca seu nome e e-mail e a gente mostra tudo.
-                    Sem spam, palavra de viajante.
+                    Seu perfil, destino principal e três ideias para sonhar já estão separados.
+                    Deixe um contato para guardar o resultado e abrir tudo agora.
                 </p>
 
                 <form className="quiz-lead-form" onSubmit={submit}>
@@ -502,7 +514,6 @@ function PreLeadScreen({ onSubmit, onBack, isSubmitting }: PreLeadScreenProps) {
                             value={form.nome}
                             onChange={(e) => update('nome', e.target.value)}
                             className={errors.nome ? 'has-error' : ''}
-                            disabled={isSubmitting}
                             autoComplete="given-name"
                         />
                         {errors.nome && <span className="quiz-err">{errors.nome}</span>}
@@ -517,7 +528,6 @@ function PreLeadScreen({ onSubmit, onBack, isSubmitting }: PreLeadScreenProps) {
                             value={form.sobrenome}
                             onChange={(e) => update('sobrenome', e.target.value)}
                             className={errors.sobrenome ? 'has-error' : ''}
-                            disabled={isSubmitting}
                             autoComplete="family-name"
                         />
                         {errors.sobrenome && <span className="quiz-err">{errors.sobrenome}</span>}
@@ -532,7 +542,6 @@ function PreLeadScreen({ onSubmit, onBack, isSubmitting }: PreLeadScreenProps) {
                             value={form.email}
                             onChange={(e) => update('email', e.target.value)}
                             className={errors.email ? 'has-error' : ''}
-                            disabled={isSubmitting}
                             autoComplete="email"
                         />
                         {errors.email && <span className="quiz-err">{errors.email}</span>}
@@ -543,7 +552,6 @@ function PreLeadScreen({ onSubmit, onBack, isSubmitting }: PreLeadScreenProps) {
                             type="checkbox"
                             checked={form.aceite}
                             onChange={(e) => update('aceite', e.target.checked)}
-                            disabled={isSubmitting}
                         />
                         <span className="quiz-check-box" aria-hidden="true" />
                         <span className="quiz-check-label">
@@ -551,11 +559,11 @@ function PreLeadScreen({ onSubmit, onBack, isSubmitting }: PreLeadScreenProps) {
                             Veja nossa <a href="/politica-privacidade">política de privacidade</a>.
                         </span>
                     </label>
-                    {errors.aceite && <span className="quiz-err quiz-err-block">É só marcar a caixinha acima para continuar.</span>}
+                    {errors.aceite && <span role="status" className="quiz-err quiz-err-block">{errors.aceite}</span>}
 
-                    <button type="submit" className="quiz-btn quiz-btn-primary quiz-btn-lg" disabled={isSubmitting}>
-                        {isSubmitting ? 'Calculando seu perfil…' : 'Ver meu perfil'}
-                        {!isSubmitting && <span className="quiz-arrow">→</span>}
+                    <button type="submit" className="quiz-btn quiz-btn-primary quiz-btn-lg">
+                        Revelar meu perfil
+                        <span className="quiz-arrow">→</span>
                     </button>
                 </form>
             </div>
@@ -870,7 +878,7 @@ export default function QuizAnhangaLanding() {
     const [profileKey, setProfileKey] = useState<ProfileKey | null>(null);
     const [baseWaUrl, setBaseWaUrl] = useState('');
     const [submitFailed, setSubmitFailed] = useState(false);
-    const { submitQuiz, isSubmitting } = useQuizCapture();
+    const { submitQuiz } = useQuizCapture();
 
     const go = useCallback((next: Stage, dir: 'forward' | 'back' = 'forward') => {
         setDirection(dir);
@@ -968,11 +976,12 @@ export default function QuizAnhangaLanding() {
             );
         }
         if (stage.kind === 'lead') {
+            const leadProfileKey = matchProfile(answers);
             return (
                 <PreLeadScreen
+                    profile={TRAVELER_PROFILES[leadProfileKey]}
                     onSubmit={handleLeadSubmit}
                     onBack={() => go({ kind: 'question', index: QUIZ_QUESTIONS.length - 1 }, 'back')}
-                    isSubmitting={isSubmitting}
                 />
             );
         }
