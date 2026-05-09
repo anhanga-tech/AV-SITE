@@ -18,13 +18,15 @@ interface ServiceSchemaProps {
   aggregateRating?: AggregateRatingProps;
 }
 
+const EMPTY_KEYWORDS: string[] = [];
+
 export const ServiceSchema: React.FC<ServiceSchemaProps> = ({
   name,
   description,
   serviceUrl,
   serviceType,
   areaServed = 'Brasil',
-  keywords = [],
+  keywords = EMPTY_KEYWORDS,
   aggregateRating
 }) => {
   const schemaData: Record<string, unknown> = {
