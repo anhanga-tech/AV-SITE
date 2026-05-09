@@ -277,7 +277,7 @@ const CallToAction: React.FC = () => {
                                 <div className="flex justify-center items-stretch h-12 w-full overflow-hidden select-none bg-transparent gap-[1px]">
                                     {[4, 2, 1, 1, 3, 1, 2, 1, 4, 1, 1, 2, 3, 1, 2, 1, 3, 1, 1, 2, 1, 2, 1, 3, 1, 1, 2, 1, 4, 1, 2].map((w, i) => (
                                         <div
-                                            key={i}
+                                            key={`bar-start-${i}`}
                                             className="bg-black"
                                             style={{
                                                 width: `${w * 2}px`, // Thicker bars
@@ -288,7 +288,7 @@ const CallToAction: React.FC = () => {
                                     <div className="flex-1"></div> {/* Spacer to allow barcode to breathe or align left */}
                                     {[2, 1, 3, 1, 1, 2, 4, 1, 2, 1, 3, 1, 1, 2].map((w, i) => (
                                         <div
-                                            key={`end-${i}`}
+                                            key={`bar-end-${i}`}
                                             className="bg-black"
                                             style={{
                                                 width: `${w * 2}px`,

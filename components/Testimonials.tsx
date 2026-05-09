@@ -58,8 +58,8 @@ const Testimonials: React.FC = memo(() => {
                             className="flex transition-transform duration-700 ease-in-out will-change-transform"
                             style={{ transform: `translateX(-${currentIndex * 100}%)` }}
                         >
-                            {TESTIMONIALS.map((testimonial, index) => (
-                                <div key={index} className="w-full flex-shrink-0 px-2 md:px-12">
+                            {TESTIMONIALS.map((testimonial) => (
+                                <div key={testimonial.name} className="w-full flex-shrink-0 px-2 md:px-12">
                                     <div
                                         className="relative"
                                         itemScope
@@ -134,9 +134,9 @@ const Testimonials: React.FC = memo(() => {
                             <ChevronLeft className="w-6 h-6" />
                         </button>
                         <div className="flex gap-2 items-center z-20">
-                            {TESTIMONIALS.map((_, i) => (
+                            {TESTIMONIALS.map((t, i) => (
                                 <button
-                                    key={i}
+                                    key={t.name}
                                     onClick={() => setCurrentIndex(i)}
                                     className={`h-2 rounded-full transition-all duration-300 ${i === currentIndex ? 'bg-brand-cyan w-8' : 'bg-brand-cyan/20 w-2 hover:bg-brand-cyan/40'}`}
                                     aria-label={`Ir para depoimento ${i + 1}`}

@@ -171,7 +171,7 @@ export default function NPS() {
                       const hovered = hoveredScore === i && !selected;
                       return (
                         <button
-                          key={i}
+                          key={`score-${i}`}
                           type="button"
                           onClick={() => setScore(i)}
                           onMouseEnter={() => setHoveredScore(i)}

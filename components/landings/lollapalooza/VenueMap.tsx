@@ -266,7 +266,7 @@ const VenueMap: React.FC = () => {
                 const style = getPoiStyle(poi);
                 return (
                   <button
-                    key={idx}
+                    key={poi.name}
                     ref={el => {
                       itemsRef.current[idx] = el;
                     }}

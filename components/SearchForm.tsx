@@ -301,7 +301,7 @@ const DateField = memo(({
           </button>
         </div>
         <div className="grid grid-cols-7 mb-2 text-center text-xs font-bold text-gray-400">
-          {WEEK_DAYS.map((day, index) => <div key={`${day}-${index}`}>{day}</div>)}
+          {WEEK_DAYS.map((day) => <div key={day}>{day}</div>)}
         </div>
         <div className="grid grid-cols-7 gap-y-1">
           {calendarDays.map((date, index) => {
@@ -313,7 +313,7 @@ const DateField = memo(({
 
             return (
               <button
-                key={`${date.toISOString()}-${index}`}
+                key={date.toISOString()}
                 type="button"
                 onClick={() => onDateClick(date)}
                 disabled={past}

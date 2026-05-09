@@ -177,7 +177,7 @@ const Highlights = memo(() => {
                                 const rotateVal = parseInt(item.rotate.replace('rotate-', ''), 10) || 0;
                                 return (
                                     <motion.div
-                                        key={idx}
+                                        key={item.title}
                                         className={`group relative p-8 rounded-[2.5rem] bg-white border-[3px] ${item.accent} shadow-[8px_8px_0px_rgba(0,0,0,0.05)] flex flex-col h-full overflow-visible`}
                                         variants={fadeUp}
                                         initial="hidden"

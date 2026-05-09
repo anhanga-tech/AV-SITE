@@ -225,7 +225,7 @@ const FAQ = memo(() => {
 
                 <div className="space-y-4">
                     {FAQS.map((faq, idx) => (
-                        <FAQItem key={idx} {...faq} idx={idx} />
+                        <FAQItem key={faq.question} {...faq} idx={idx} />
                     ))}
                 </div>
 

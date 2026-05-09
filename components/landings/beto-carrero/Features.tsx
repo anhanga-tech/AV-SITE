@@ -45,7 +45,7 @@ const Features: React.FC = () => {
         <div className="grid md:grid-cols-3 gap-10 md:gap-8 mt-16">
           {features.map((feature, idx) => (
             <div 
-              key={idx} 
+              key={feature.title}
               className="relative group perspective-1000"
             >
               {/* The Large Number Floating Behind */}

@@ -620,9 +620,9 @@ const Destinations: React.FC = memo(() => {
 
                 {/* Destinations Grid - Luggage Tag Style */}
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {filteredDestinations.slice(0, 3).map((dest, idx) => (
+                    {filteredDestinations.slice(0, 3).map((dest) => (
                         <div
-                            key={idx}
+                            key={dest.city}
                             tabIndex={0}
                             role="button"
                             aria-label={`Ver detalhes de ${dest.city}, ${dest.country}`}
@@ -708,8 +708,8 @@ const Destinations: React.FC = memo(() => {
                                 <Star className="w-5 h-5 text-yellow-400 fill-current" /> Atrações Imperdíveis
                             </h4>
                             <div className="flex flex-wrap gap-3 mb-8">
-                                {selectedDestination.activities.map((act, i) => (
-                                    <span key={i} className="bg-white border-2 border-gray-100 px-4 py-2 rounded-xl text-sm text-gray-700 font-bold shadow-sm transform hover:-rotate-1 transition-transform cursor-default">
+                                {selectedDestination.activities.map((act) => (
+                                    <span key={act} className="bg-white border-2 border-gray-100 px-4 py-2 rounded-xl text-sm text-gray-700 font-bold shadow-sm transform hover:-rotate-1 transition-transform cursor-default">
                                         {act}
                                     </span>
                                 ))}

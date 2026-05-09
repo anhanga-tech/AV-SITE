@@ -116,7 +116,7 @@ const Hero: React.FC = () => {
             <div className="absolute -bottom-8 -right-2 md:-bottom-6 md:-right-6 lg:-bottom-2 lg:right-8 xl:right-4 xl:-bottom-8 bg-fun-green p-2 sm:p-3 lg:p-2 xl:p-4 rounded-full border-2 border-fun-dark shadow-hard z-20 transform rotate-6 hover:scale-110 transition-transform scale-90 sm:scale-100 lg:scale-75 xl:scale-110">
               <div className="flex gap-1 text-white">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={14} className="sm:w-4 sm:h-4 lg:w-6 lg:h-6" fill="currentColor" />
+                  <Star key={`star-${i}`} size={14} className="sm:w-4 sm:h-4 lg:w-6 lg:h-6" fill="currentColor" />
                 ))}
               </div>
             </div>
