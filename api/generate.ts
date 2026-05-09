@@ -124,8 +124,10 @@ function collectTextParts(parts: Array<{ text?: string | null }> | undefined): s
     if (!parts || parts.length === 0) return undefined;
 
     const text = parts
-        .map((part) => typeof part.text === 'string' ? part.text.trim() : '')
-        .filter(Boolean)
+        .flatMap((part) => {
+            const t = typeof part.text === 'string' ? part.text.trim() : '';
+            return t ? [t] : [];
+        })
         .join('\n')
         .trim();
 

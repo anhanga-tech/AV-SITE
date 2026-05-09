@@ -79,7 +79,7 @@ export async function collectBlogPostMeta(blogDir: string): Promise<PostMeta[]> 
   return posts.sort((a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug));
 }
 
-export function serializeBlogPostMeta(posts: PostMeta[]): string {
+function serializeBlogPostMeta(posts: PostMeta[]): string {
   return `import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = ${JSON.stringify(posts, null, 2)};
@@ -87,9 +87,11 @@ export const BLOG_POST_MANIFEST: PostMeta[] = ${JSON.stringify(posts, null, 2)};
 }
 
 export async function writeBlogManifest(blogDir: string, outputFile: string): Promise<PostMeta[]> {
-  const posts = await collectBlogPostMeta(blogDir);
+  const [posts] = await Promise.all([
+    collectBlogPostMeta(blogDir),
+    mkdir(path.dirname(outputFile), { recursive: true }),
+  ]);
 
-  await mkdir(path.dirname(outputFile), { recursive: true });
   await writeFile(outputFile, serializeBlogPostMeta(posts), 'utf8');
 
   return posts;

@@ -95,4 +95,3 @@ export const LandingFAQ: React.FC<LandingFAQProps> = ({
     );
 };
 
-export default LandingFAQ;

@@ -131,13 +131,13 @@ export function extractChipsFromText(text: string): ExtractChipsResult {
 
         if (Array.isArray(parsedArray)) {
             // Map objects (e.g. {"label": "x", "value": "x"}) to simple strings if Gemini hallucinates
-            const chipsArray = parsedArray.map(item => {
-                if (typeof item === 'string') return item;
-                if (typeof item === 'object' && item !== null) {
-                    return item.label || item.value || item.text || String(item);
-                }
-                return String(item);
-            }).filter(Boolean);
+            const chipsArray = parsedArray.flatMap(item => {
+                const v = typeof item === 'string' ? item
+                    : typeof item === 'object' && item !== null
+                        ? item.label || item.value || item.text || String(item)
+                        : String(item);
+                return v ? [v] : [];
+            });
 
             if (chipsArray.length > 0) {
                 // Remove the matched block and any residual newlines

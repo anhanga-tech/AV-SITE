@@ -134,13 +134,12 @@ test('orlando landing should not hotlink static images from partner websites', a
 });
 
 test('festival landings should use managed static imagery', async () => {
-  const [hero, packageFeatures, lineup, venueMap, audience, whyUs, betoTestimonials] =
+  const [hero, packageFeatures, lineup, venueMap, whyUs, betoTestimonials] =
     await Promise.all([
       readRepoFile('components/landings/lollapalooza/Hero.tsx'),
       readRepoFile('components/landings/lollapalooza/PackageFeatures.tsx'),
       readRepoFile('components/landings/lollapalooza/LineupSection.tsx'),
       readRepoFile('components/landings/lollapalooza/VenueMap.tsx'),
-      readRepoFile('components/landings/lollapalooza/Audience.tsx'),
       readRepoFile('components/landings/lollapalooza/WhyUs.tsx'),
       readRepoFile('components/landings/beto-carrero/Testimonials.tsx'),
     ]);
@@ -184,13 +183,6 @@ test('festival landings should use managed static imagery', async () => {
     'components/landings/lollapalooza/VenueMap.tsx',
   );
   assert.match(venueMap, /images\/lollapalooza\/venue\/.+\.(jpg|jpeg|webp)/);
-
-  assertMissingHosts(
-    audience,
-    ['picsum.photos'],
-    'components/landings/lollapalooza/Audience.tsx',
-  );
-  assert.match(audience, /images\/lollapalooza\/audience\/.+\.(jpg|jpeg|webp)/);
 
   assertMissingHosts(
     whyUs,
@@ -310,19 +302,21 @@ test('blog posts should not hotlink third-party cover images', async () => {
   const filenames = await readdir(new URL('../content/blog', import.meta.url));
   const postFiles = filenames.filter((filename) => filename.endsWith('.mdx') && !filename.startsWith('_'));
 
-  for (const filename of postFiles) {
-    const content = await readRepoFile(`content/blog/${filename}`);
+  await Promise.all(
+    postFiles.map(async (filename) => {
+      const content = await readRepoFile(`content/blog/${filename}`);
 
-    assertMissingHosts(
-      content,
-      ['images.unsplash.com', 'img1.wsimg.com', 'blog.anhanga.tur.br'],
-      filename,
-    );
+      assertMissingHosts(
+        content,
+        ['images.unsplash.com', 'img1.wsimg.com', 'blog.anhanga.tur.br'],
+        filename,
+      );
 
-    assert.match(
-      content,
-      /image: "(?:images\/(?:blog|about|destinations)\/.+\.(jpg|jpeg|png|webp)|\/blog-viagem-solo-feminina\.png)"/,
-      `${filename} should point to a managed image path`,
-    );
-  }
+      assert.match(
+        content,
+        /image: "(?:images\/(?:blog|about|destinations)\/.+\.(jpg|jpeg|png|webp)|\/blog-viagem-solo-feminina\.png)"/,
+        `${filename} should point to a managed image path`,
+      );
+    }),
+  );
 });

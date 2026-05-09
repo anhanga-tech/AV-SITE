@@ -19,9 +19,10 @@ export function normalizeAdults(value: unknown): number | undefined {
 export function normalizeChildAges(value: unknown): number[] {
     if (!Array.isArray(value)) return [];
 
-    return value
-        .map((age) => (typeof age === 'number' ? age : Number.parseInt(String(age), 10)))
-        .filter((age) => Number.isInteger(age) && age >= 0);
+    return value.flatMap((age) => {
+        const n = typeof age === 'number' ? age : Number.parseInt(String(age), 10);
+        return Number.isInteger(n) && n >= 0 ? [n] : [];
+    });
 }
 
 export function isCityValueAcceptable(value?: string): boolean {

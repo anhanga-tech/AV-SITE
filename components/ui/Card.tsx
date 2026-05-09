@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type CardVariant = 'default' | 'hard' | 'float';
+type CardVariant = 'default' | 'hard' | 'float';
 
 interface CardProps {
     children: React.ReactNode;

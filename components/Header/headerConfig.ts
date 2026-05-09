@@ -1,9 +1,9 @@
-export type HeaderSubLink = {
+type HeaderSubLink = {
   name: string;
   href: string;
 };
 
-export type HeaderLink = {
+type HeaderLink = {
   name: string;
   href?: string;
   subLinks?: HeaderSubLink[];

@@ -495,8 +495,9 @@ const Destinations: React.FC = memo(() => {
             marker.addTo(markersLayerRef.current!);
         });
 
+        let flyTimer: ReturnType<typeof setTimeout> | undefined;
         if (markersLayerRef.current.getLayers().length > 0 && mapInstance.current) {
-            setTimeout(() => {
+            flyTimer = setTimeout(() => {
                 const map = mapInstance.current;
                 const markers = markersLayerRef.current;
                 if (map && markers) {
@@ -514,6 +515,10 @@ const Destinations: React.FC = memo(() => {
                 }
             }, 100);
         }
+        return () => {
+            clearTimeout(flyTimer);
+            markersLayerRef.current?.clearLayers();
+        };
     }, [filteredDestinations, activeFilter]);
 
     // Custom Zoom Handlers
@@ -615,9 +620,9 @@ const Destinations: React.FC = memo(() => {
 
                 {/* Destinations Grid - Luggage Tag Style */}
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {filteredDestinations.slice(0, 3).map((dest, idx) => (
+                    {filteredDestinations.slice(0, 3).map((dest) => (
                         <div
-                            key={idx}
+                            key={`${dest.city}-${dest.country}`}
                             tabIndex={0}
                             role="button"
                             aria-label={`Ver detalhes de ${dest.city}, ${dest.country}`}
@@ -665,8 +670,8 @@ const Destinations: React.FC = memo(() => {
 
             {/* Modal - Scrapbook Page Style */}
             {selectedDestination && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedDestination(null)}>
-                    <div className="bg-[#fffdf5] w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden relative flex flex-col md:flex-row max-h-[90vh] border-8 border-white transform rotate-1" onClick={e => e.stopPropagation()}>
+                <div role="button" tabIndex={0} aria-label="Fechar destino" className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedDestination(null)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSelectedDestination(null); }}>
+                    <div role="presentation" className="bg-[#fffdf5] w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden relative flex flex-col md:flex-row max-h-[90vh] border-8 border-white transform rotate-1" onClick={e => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
 
                         {/* Washi Tape Decor */}
                         <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-32 h-10 bg-red-400/80 rotate-1 backdrop-blur-sm z-20 shadow-sm border-l-2 border-r-2 border-white/40"></div>
@@ -703,8 +708,8 @@ const Destinations: React.FC = memo(() => {
                                 <Star className="w-5 h-5 text-yellow-400 fill-current" /> Atrações Imperdíveis
                             </h4>
                             <div className="flex flex-wrap gap-3 mb-8">
-                                {selectedDestination.activities.map((act, i) => (
-                                    <span key={i} className="bg-white border-2 border-gray-100 px-4 py-2 rounded-xl text-sm text-gray-700 font-bold shadow-sm transform hover:-rotate-1 transition-transform cursor-default">
+                                {selectedDestination.activities.map((act) => (
+                                    <span key={act} className="bg-white border-2 border-gray-100 px-4 py-2 rounded-xl text-sm text-gray-700 font-bold shadow-sm transform hover:-rotate-1 transition-transform cursor-default">
                                         {act}
                                     </span>
                                 ))}

@@ -8,22 +8,28 @@ test.describe('Link Integrity Suite', () => {
 
     console.log(`Found ${links.length} links in footer`);
 
-    for (const link of links) {
-      const href = await link.getAttribute('href');
-      if (!href || href.startsWith('mailto:') || href.startsWith('tel:')) continue;
+    const allowedHosts = new Set(['localhost', 'anhanga.tur.br']);
 
-      const targetUrl = new URL(href, page.url()).href;
-
-      // Skip external links to avoid flakiness in local env, or use request.head
-      if (!targetUrl.includes('localhost') && !targetUrl.includes('anhanga.tur.br')) {
+    const hrefs = await Promise.all(links.map((link) => link.getAttribute('href')));
+    const targetUrls = hrefs
+      .filter((href): href is string => !!href && !href.startsWith('mailto:') && !href.startsWith('tel:'))
+      .map((href) => new URL(href, page.url()).href)
+      .filter((targetUrl) => {
+        const isLocal = allowedHosts.has(new URL(targetUrl).hostname.replace(/^www\./, '')) ||
+          targetUrl.includes('localhost') || targetUrl.includes('anhanga.tur.br');
+        if (!isLocal) {
           console.log(`Skipping external link: ${targetUrl}`);
-          continue;
-      }
+        }
+        return isLocal;
+      });
 
-      console.log(`Verifying: ${targetUrl}`);
-      const response = await page.request.get(targetUrl);
-      expect(response.status(), `Link ${targetUrl} returned ${response.status()}`).toBe(200);
-    }
+    await Promise.all(
+      targetUrls.map(async (targetUrl) => {
+        console.log(`Verifying: ${targetUrl}`);
+        const response = await page.request.get(targetUrl);
+        expect(response.status(), `Link ${targetUrl} returned ${response.status()}`).toBe(200);
+      }),
+    );
   });
 
   test('should verify main navigation links', async ({ page }) => {
@@ -37,9 +43,11 @@ test.describe('Link Integrity Suite', () => {
       '/politica-privacidade/',
     ];
 
-    for (const path of navLinks) {
-      const response = await page.request.get(path);
-      expect(response.status(), `Path ${path} returned ${response.status()}`).toBe(200);
-    }
+    await Promise.all(
+      navLinks.map(async (path) => {
+        const response = await page.request.get(path);
+        expect(response.status(), `Path ${path} returned ${response.status()}`).toBe(200);
+      }),
+    );
   });
 });

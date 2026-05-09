@@ -18,6 +18,7 @@ import type { SubmitLeadRequest } from '../types/leadCapture';
 import { triggerHaptic } from '../utils/haptics';
 
 interface Message {
+  id: string;
   role: 'user' | 'model';
   text: string;
   chips?: string[];
@@ -48,21 +49,21 @@ const FormattedText = memo(({ text }: { text: string }) => {
 
         const content = parts.map((part, i) => {
           if (part.startsWith('**') && part.endsWith('**')) {
-            return <strong key={i} className="font-bold text-gray-900">{part.slice(2, -2)}</strong>;
+            return <strong key={`part-${i}`} className="font-bold text-gray-900">{part.slice(2, -2)}</strong>;
           }
           return part;
         });
 
         if (isList) {
           return (
-            <div key={idx} className="flex items-start gap-2 ml-1">
+            <div key={`para-${idx}`} className="flex items-start gap-2 ml-1">
               <span className="shrink-0 mt-1.5 w-1.5 h-1.5 bg-brand-vibrant rounded-full opacity-70"></span>
               <span className="leading-relaxed text-gray-700">{content}</span>
             </div>
           );
         }
 
-        return <p key={idx} className="leading-relaxed text-gray-700">{content}</p>;
+        return <p key={`para-${idx}`} className="leading-relaxed text-gray-700">{content}</p>;
       })}
     </div>
   );
@@ -82,7 +83,7 @@ FormattedText.displayName = 'FormattedText';
 const AIChat: React.FC = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', text: 'Olá! Sou seu guia Anhangá 🧭.\n\nPosso te ajudar com:\n- Roteiros exclusivos\n- Dúvidas sobre o destino\n- **Orçamento personalizado**\n\nVamos começar?' }
+    { id: 'init', role: 'model', text: 'Olá! Sou seu guia Anhangá 🧭.\n\nPosso te ajudar com:\n- Roteiros exclusivos\n- Dúvidas sobre o destino\n- **Orçamento personalizado**\n\nVamos começar?' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -123,7 +124,8 @@ const AIChat: React.FC = memo(() => {
 
   useEffect(() => {
     if (isOpen && inputRef.current) {
-      setTimeout(() => inputRef.current?.focus(), 300);
+      const timer = setTimeout(() => inputRef.current?.focus(), 300);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
@@ -191,7 +193,7 @@ const AIChat: React.FC = memo(() => {
       void triggerHaptic('medium');
     }
 
-    const newHistory: Message[] = [...messagesRef.current, { role: 'user', text }];
+    const newHistory: Message[] = [...messagesRef.current, { id: crypto.randomUUID(), role: 'user', text }];
     setMessages(newHistory);
     setInput('');
 
@@ -210,6 +212,7 @@ const AIChat: React.FC = memo(() => {
 
     if (response.text) {
       nextMessages.push({
+        id: crypto.randomUUID(),
         role: 'model',
         text: response.text || '',
         chips: response.chips
@@ -226,6 +229,7 @@ const AIChat: React.FC = memo(() => {
       });
 
       nextMessages.push({
+        id: crypto.randomUUID(),
         role: 'model',
         text: 'Orçamento Pronto',
         isAction: true,
@@ -365,9 +369,13 @@ const AIChat: React.FC = memo(() => {
 
       {/* Backdrop Overlay */}
       <div
+        role="button"
+        tabIndex={0}
+        aria-label="Fechar chat"
         className={`fixed inset-0 z-[9998] transition-opacity duration-300 ease-in-out bg-brand-dark/20 backdrop-blur-sm ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
           }`}
         onClick={() => closeChatDrawer()}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') closeChatDrawer(); }}
       />
 
       {/* Drawer Panel - Soft Scrapbook Geometry */}
@@ -416,7 +424,7 @@ const AIChat: React.FC = memo(() => {
             const isLastModelMsg = msg.role === 'model' && idx === lastModelIndex;
 
             return (
-              <div key={idx} className={`relative flex flex-col gap-2 ${msg.role === 'user' ? 'items-end' : 'items-start'} z-10`}>
+              <div key={msg.id} className={`relative flex flex-col gap-2 ${msg.role === 'user' ? 'items-end' : 'items-start'} z-10`}>
                 <div className={`flex items-end gap-3 max-w-[90%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                   {/* Avatar */}
                   <div className={`w-9 h-9 flex items-center justify-center shrink-0 rounded-full shadow-sm ${msg.role === 'user'

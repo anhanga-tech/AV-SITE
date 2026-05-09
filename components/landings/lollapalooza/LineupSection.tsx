@@ -116,8 +116,8 @@ const LineupSection: React.FC = () => {
         <div className={`text-center mb-16 animate-on-scroll ${isVisible ? 'is-visible' : ''}`}>
           {/* Artist Avatars Cluster */}
           <div className="flex justify-center items-center -space-x-4 mb-8" aria-hidden="true">
-            {headliners.slice(0, 5).map((artist, idx) => (
-              <div key={idx} className="relative z-0 hover:z-10 transition-all duration-300 transform hover:scale-110 hover:-translate-y-2 group">
+            {headliners.slice(0, 5).map((artist) => (
+              <div key={artist.name} className="relative z-0 hover:z-10 transition-all duration-300 transform hover:scale-110 hover:-translate-y-2 group">
                 <div className="w-16 h-16 md:w-24 md:h-24 rounded-full border-4 border-black group-hover:border-anhanga-yellow overflow-hidden relative shadow-lg">
                   <img
                     src={getArtistImageUrl(artist.image, 96, 96)}
@@ -155,7 +155,7 @@ const LineupSection: React.FC = () => {
         {/* Headliners Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-20">
           {headliners.map((artist, index) => (
-            <div key={index} className={`group relative h-96 sm:h-80 lg:h-96 overflow-hidden rounded-2xl border border-gray-800 hover:border-anhanga-yellow transition-all duration-300 animate-on-scroll ${isVisible ? 'is-visible' : ''}`} style={{ transitionDelay: `${index * 50}ms` }}>
+            <div key={artist.name} className={`group relative h-96 sm:h-80 lg:h-96 overflow-hidden rounded-2xl border border-gray-800 hover:border-anhanga-yellow transition-all duration-300 animate-on-scroll ${isVisible ? 'is-visible' : ''}`} style={{ transitionDelay: `${index * 50}ms` }}>
               {/* Background Image - Optimized to 600px width */}
               <div className="absolute inset-0 bg-gray-900">
                 <img
@@ -195,8 +195,8 @@ const LineupSection: React.FC = () => {
             Programação por Dia
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {dailyLineup.map((day, idx) => (
-              <div key={idx} className="bg-gray-900 border border-gray-800 rounded-xl p-6 hover:border-anhanga-blue transition-colors">
+            {dailyLineup.map((day) => (
+              <div key={day.day} className="bg-gray-900 border border-gray-800 rounded-xl p-6 hover:border-anhanga-blue transition-colors">
                 <div className="flex items-center gap-2 mb-6">
                   <Calendar className="text-anhanga-yellow" size={20} aria-hidden="true" />
                   <span className="text-gray-400 font-bold uppercase text-sm tracking-wider">{day.day} • {day.date}</span>
@@ -204,8 +204,8 @@ const LineupSection: React.FC = () => {
 
                 {/* Main Acts with Images - Optimized to 100px width for thumbnails */}
                 <div className="mb-6 space-y-4">
-                  {day.main.map((act, i) => (
-                    <div key={i} className="flex items-center gap-4 group/artist">
+                  {day.main.map((act) => (
+                    <div key={act.name} className="flex items-center gap-4 group/artist">
                       <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-700 group-hover/artist:border-anhanga-yellow transition-colors shrink-0 bg-gray-800">
                         <img
                           src={getArtistImageUrl(act.image, 100, 100)}
@@ -246,8 +246,8 @@ const LineupSection: React.FC = () => {
                 O Lollapalooza é gigante e a logística pode ser cansativa. Com nossos pacotes, você elimina o estresse do trânsito, a busca por hotéis e a insegurança na saída do festival.
               </p>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {['Chegada tranquila ao Autódromo', 'Descanso em hotel 4 estrelas', 'Suporte local para imprevistos', 'After-parties sugeridas'].map((item, index) => (
-                  <li key={index} className="flex items-center gap-3 text-base text-gray-200">
+                {['Chegada tranquila ao Autódromo', 'Descanso em hotel 4 estrelas', 'Suporte local para imprevistos', 'After-parties sugeridas'].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-base text-gray-200">
                     <span className="flex-shrink-0 w-5 h-5 rounded-full bg-anhanga-blue flex items-center justify-center text-xs font-bold" aria-hidden="true">✓</span>
                     {item}
                   </li>

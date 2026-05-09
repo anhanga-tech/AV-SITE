@@ -14,7 +14,7 @@ const encodeAssetPath = (path: string): string =>
     .map((segment) => encodeURIComponent(segment))
     .join('/');
 
-export const getStaticAssetUrl = (path: string): string =>
+const getStaticAssetUrl = (path: string): string =>
   `${normalizedBaseUrl}assets/${encodeAssetPath(path)}`;
 
 export const NOISE_TEXTURE_URL = getStaticAssetUrl('noise.svg');

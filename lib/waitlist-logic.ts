@@ -3,7 +3,7 @@ import type { SubmitWaitlistRequest } from '../types/waitlist';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export function splitWaitlistName(name: string): { firstName: string; lastName: string } {
+function splitWaitlistName(name: string): { firstName: string; lastName: string } {
     const parts = name.trim().split(/\s+/).filter(Boolean);
     const [firstName = '', ...rest] = parts;
 
@@ -13,7 +13,7 @@ export function splitWaitlistName(name: string): { firstName: string; lastName: 
     };
 }
 
-export function buildWaitlistNoteBody(payload: SubmitWaitlistRequest): string {
+function buildWaitlistNoteBody(payload: SubmitWaitlistRequest): string {
     const lines = [
         'Lista de Espera Lollapalooza 2027',
         `Nome: ${payload.name}`,
