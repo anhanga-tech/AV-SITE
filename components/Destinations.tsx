@@ -495,8 +495,9 @@ const Destinations: React.FC = memo(() => {
             marker.addTo(markersLayerRef.current!);
         });
 
+        let flyTimer: ReturnType<typeof setTimeout> | undefined;
         if (markersLayerRef.current.getLayers().length > 0 && mapInstance.current) {
-            setTimeout(() => {
+            flyTimer = setTimeout(() => {
                 const map = mapInstance.current;
                 const markers = markersLayerRef.current;
                 if (map && markers) {
@@ -514,6 +515,10 @@ const Destinations: React.FC = memo(() => {
                 }
             }, 100);
         }
+        return () => {
+            clearTimeout(flyTimer);
+            markersLayerRef.current?.clearLayers();
+        };
     }, [filteredDestinations, activeFilter]);
 
     // Custom Zoom Handlers

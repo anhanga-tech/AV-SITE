@@ -36,9 +36,10 @@ const About: React.FC = () => {
       const id = hash.replace('#', '');
       const element = document.getElementById(id);
       if (element) {
-        setTimeout(() => {
+        const timer = setTimeout(() => {
           element.scrollIntoView({ behavior: 'smooth' });
         }, 100);
+        return () => clearTimeout(timer);
       }
     } else {
       window.scrollTo(0, 0);

@@ -36,12 +36,13 @@ const Home: React.FC = () => {
 
       if (element) {
         // Pequeno timeout para garantir que o DOM esteja pronto
-        setTimeout(() => {
+        const timer = setTimeout(() => {
           element.scrollIntoView({ behavior: 'smooth' });
         }, 100);
 
         // Limpeza opcional do estado (embora o history mantenha, evita scrolls indesejados em refresh simples sem limpar history)
         window.history.replaceState({}, document.title);
+        return () => clearTimeout(timer);
       }
     }
   }, [location]);
