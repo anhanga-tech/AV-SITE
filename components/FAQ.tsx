@@ -83,7 +83,7 @@ const FAQS = [
                     <li>Duração da viagem</li>
                     <li>Sazonalidade do destino</li>
                 </ul>
-                <p className="border-l-4 border-brand-yellow pl-4 italic">
+                <p className="shadow-[inset_3px_0_0_#fbbf24] pl-4 italic">
                     <strong>Receba uma cotação personalizada gratuitamente!</strong> <br />
                     Fale com nossa IA agora mesmo no chat!
                 </p>
@@ -214,7 +214,7 @@ const FAQ = memo(() => {
                     </div>
                     <h2 className="text-4xl md:text-5xl font-black text-brand-dark tracking-tight mb-4">
                         Tá na cabeça?<br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan to-blue-600">
+                        <span className="text-brand-cyan">
                             A gente responde.
                         </span>
                     </h2>

@@ -106,7 +106,7 @@ const LineupSection: React.FC = () => {
   ];
 
   return (
-    <section id="lineup" className="py-20 bg-black text-white relative overflow-hidden" aria-labelledby="lineup-heading" ref={elementRef}>
+    <section id="lineup" className="py-20 bg-gray-950 text-white relative overflow-hidden" aria-labelledby="lineup-heading" ref={elementRef}>
       {/* Decorative blobs */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-anhanga-blue opacity-20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" aria-hidden="true"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-anhanga-yellow opacity-10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" aria-hidden="true"></div>
@@ -144,7 +144,7 @@ const LineupSection: React.FC = () => {
           </div>
 
           <h2 id="lineup-heading" className="text-3xl sm:text-4xl md:text-6xl font-black mb-6 uppercase italic tracking-tighter">
-            Lineup <span className="text-transparent bg-clip-text bg-gradient-to-r from-anhanga-yellow to-anhanga-blue pr-2">2026</span>
+            Lineup <span className="text-anhanga-yellow pr-2">2026</span>
           </h2>
 
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto font-light mb-8">

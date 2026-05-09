@@ -143,7 +143,7 @@ const Hero: React.FC = () => {
               Agência de Viagens em São Paulo
             </span>
             Sua Próxima <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500 relative inline-block pb-2">
+            <span className="text-yellow-400 relative inline-block pb-2">
               {validCityForTitle ? `Aventura em ${validCityForTitle}` : 'Aventura'}
 
               {/* Underline Scribble - orgânico via Framer Motion pathLength */}

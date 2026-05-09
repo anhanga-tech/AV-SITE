@@ -94,7 +94,7 @@ const MelhorIdadeLanding: React.FC = () => {
               className="text-5xl md:text-7xl font-black text-brand-dark mb-8 leading-[1.1]"
             >
               O mundo no seu ritmo, <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-vibrant to-brand-cyan">
+              <span className="text-brand-cyan">
                 com o cuidado que você merece.
               </span>
             </m.h1>
@@ -184,7 +184,7 @@ const MelhorIdadeLanding: React.FC = () => {
               Ao contrário das grandes agências de massa, aqui você fala com pessoas que entendem suas necessidades. Ajustamos o roteiro conforme seu condicionamento físico e interesses, seja visitando museus na Europa ou relaxando em um resort no Nordeste.
             </p>
 
-            <blockquote className="border-l-4 border-brand-cyan pl-6 my-12 italic text-brand-dark font-bold text-xl">
+            <blockquote className="shadow-[inset_3px_0_0_#0ea5e9] pl-6 my-12 italic text-brand-dark font-bold text-xl">
               "A verdadeira viagem de luxo para a melhor idade é aquela onde a única preocupação do viajante é decidir qual será a próxima memória inesquecível."
             </blockquote>
 

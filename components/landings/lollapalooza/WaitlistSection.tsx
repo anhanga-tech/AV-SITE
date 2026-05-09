@@ -63,7 +63,7 @@ const WaitlistSection: React.FC = () => {
   return (
     <section
       id={WAITLIST_SECTION_ID}
-      className="relative scroll-mt-28 bg-black py-24 sm:py-32 overflow-hidden"
+      className="relative scroll-mt-28 bg-gray-950 py-24 sm:py-32 overflow-hidden"
       aria-labelledby="waitlist-heading"
     >
       {/* Background Graphic Elements */}
@@ -215,7 +215,7 @@ const WaitlistSection: React.FC = () => {
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
                       role="alert" 
-                      className="border-l-4 border-red-500 bg-red-500/10 px-4 py-3 text-xs font-bold text-red-400"
+                      className="shadow-[inset_3px_0_0_rgb(239_68_68)] rounded-sm bg-red-500/10 px-4 py-3 text-xs font-bold text-red-400"
                     >
                       {localError || error}
                     </m.div>
@@ -227,7 +227,7 @@ const WaitlistSection: React.FC = () => {
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
                       role="status"
-                      className="border-l-4 border-anhanga-yellow bg-anhanga-yellow/10 px-4 py-3 text-xs font-bold text-anhanga-yellow"
+                      className="shadow-[inset_3px_0_0_#FFD600] rounded-sm bg-anhanga-yellow/10 px-4 py-3 text-xs font-bold text-anhanga-yellow"
                     >
                       {successMessage}
                     </m.div>
@@ -239,7 +239,7 @@ const WaitlistSection: React.FC = () => {
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
                       role="status"
-                      className="border-l-4 border-amber-500 bg-amber-500/10 px-4 py-3 text-xs font-bold text-amber-400"
+                      className="shadow-[inset_3px_0_0_rgb(245_158_11)] rounded-sm bg-amber-500/10 px-4 py-3 text-xs font-bold text-amber-400"
                     >
                       {warningMessage}
                     </m.div>

@@ -340,7 +340,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                             </div>
                             <h2 className="text-4xl md:text-5xl font-black text-brand-dark leading-tight">
                                 Não existe roteiro certo <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan to-blue-500">
+                                <span className="text-brand-cyan">
                                     para o viajante errado.
                                 </span>
                             </h2>
@@ -465,7 +465,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
 
                                 <h2 className="text-4xl md:text-5xl font-black text-brand-dark leading-tight mb-6">
                                     Prefere que a gente <br />
-                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan to-blue-500">
+                                    <span className="text-brand-cyan">
                                         entre em contato?
                                     </span>
                                 </h2>

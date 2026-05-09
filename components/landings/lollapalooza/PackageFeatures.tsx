@@ -63,7 +63,7 @@ const PackageFeatures: React.FC = () => {
   ];
 
   return (
-    <section id="pacote" className="bg-black py-20 relative overflow-hidden" ref={elementRef}>
+    <section id="pacote" className="bg-gray-950 py-20 relative overflow-hidden" ref={elementRef}>
       {/* Abstract Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-anhanga-blue rounded-full blur-[120px] opacity-20"></div>
@@ -77,7 +77,7 @@ const PackageFeatures: React.FC = () => {
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-6xl font-black text-white leading-[0.9] tracking-tighter max-w-3xl">
             A EXPERIÊNCIA QUE LOTOU <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-anhanga-yellow to-white">E JÁ PREPARA 2027.</span>
+            <span className="text-anhanga-yellow">E JÁ PREPARA 2027.</span>
           </h2>
         </div>
 

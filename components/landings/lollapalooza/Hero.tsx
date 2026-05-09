@@ -96,7 +96,7 @@ const Hero: React.FC = () => {
             <p className="text-gray-300 text-[10px] sm:text-xs md:text-sm lg:text-lg uppercase tracking-[0.2em] mb-1 md:mb-2">Prepare-se para ver</p>
             <h2 
                 aria-live="polite"
-                className={`text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-anhanga-yellow via-yellow-200 to-anhanga-yellow transition-all duration-500 transform text-center break-words w-full max-w-5xl leading-[0.9] sm:leading-tight pb-2 ${
+                className={`text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase italic tracking-tighter text-anhanga-yellow transition-all duration-500 transform text-center break-words w-full max-w-5xl leading-[0.9] sm:leading-tight pb-2 ${
                     isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'
                 }`}
                 style={{ paddingRight: '0.1em' }}

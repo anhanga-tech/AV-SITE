@@ -78,7 +78,7 @@ const About: React.FC = () => {
           </div>
           <h1 className="text-5xl md:text-6xl font-black text-brand-dark mb-6 leading-tight">
             Viagens com alma, <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-vibrant to-brand-cyan">
+            <span className="text-brand-cyan">
               design e zero estresse.
             </span>
           </h1>
