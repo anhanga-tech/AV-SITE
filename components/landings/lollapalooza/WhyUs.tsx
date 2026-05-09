@@ -48,7 +48,7 @@ const WhyUs: React.FC = () => {
                 { Icon: UserCheck, title: "Gente de verdade, não robô", text: "Você fala com quem já organizou centenas de pacotes para o Lolla. Especialistas que sabem o que faz diferença no evento.", color: "yellow" },
                 { Icon: ShieldCheck, title: "Cada detalhe no lugar", text: "Hotel a distância do autódromo, transfer no horário certo, ingresso em mãos. Sem táxi às 23h. Sem susto na chegada.", color: "blue" },
                 { Icon: HeartHandshake, title: "WhatsApp aberto durante o festival", text: "Se surgir qualquer problema durante os três dias, estamos disponíveis. Você curte os shows, a gente resolve o resto.", color: "green" }
-              ].map((item, index) => (
+              ].map((item) => (
                 <div key={item.title} className="flex gap-4 group">
                   <div className="flex-shrink-0 mt-1">
                     <div className={`w-12 h-12 ${item.color === 'yellow' ? 'bg-yellow-100 text-anhanga-darkBlue group-hover:bg-anhanga-yellow' : item.color === 'blue' ? 'bg-blue-100 text-anhanga-blue group-hover:bg-anhanga-blue group-hover:text-white' : 'bg-green-100 text-green-600 group-hover:bg-green-500 group-hover:text-white'} transition-colors duration-300 rounded-full flex items-center justify-center`}>
