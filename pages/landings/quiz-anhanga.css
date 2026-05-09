@@ -1089,7 +1089,7 @@
   font-family: var(--av-font-display);
   font-weight: 800;
   font-size: 13px;
-  color: #ea580c;
+  color: var(--av-orange-600);
   animation: qMilestoneIn 400ms var(--av-ease-spring) both;
   white-space: nowrap;
 }
