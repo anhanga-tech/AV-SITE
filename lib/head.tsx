@@ -65,7 +65,7 @@ export const renderHeadTags = (tags: HeadTag[]): string =>
     })
     .join('\n');
 
-const applyHeadTag = (tag: HeadTag): HTMLElement => {
+const resolveHeadElement = (tag: HeadTag): HTMLElement => {
   const existing = document.head.querySelector<HTMLElement>(`[data-av-head="${tag.key}"]`);
   const element = existing && existing.tagName.toLowerCase() === tag.tagName
     ? existing
@@ -75,6 +75,10 @@ const applyHeadTag = (tag: HeadTag): HTMLElement => {
     existing.remove();
   }
 
+  return element;
+};
+
+const syncElementAttributes = (element: HTMLElement, tag: HeadTag): void => {
   for (const attribute of Array.from(element.attributes)) {
     if (attribute.name !== 'data-av-head') element.removeAttribute(attribute.name);
   }
@@ -82,16 +86,12 @@ const applyHeadTag = (tag: HeadTag): HTMLElement => {
   element.setAttribute('data-av-head', tag.key);
 
   for (const [name, value] of Object.entries(tag.attrs ?? {})) {
-    if (value === undefined || value === false) {
-      continue;
-    }
-    if (value === true) {
-      element.setAttribute(name, '');
-      continue;
-    }
-    element.setAttribute(name, String(value));
+    if (value === undefined || value === false) continue;
+    element.setAttribute(name, value === true ? '' : String(value));
   }
+};
 
+const setElementContent = (element: HTMLElement, tag: HeadTag): void => {
   if (tag.tagName === 'title') {
     element.textContent = tag.textContent ?? '';
   } else if (tag.tagName === 'script') {
@@ -99,6 +99,12 @@ const applyHeadTag = (tag: HeadTag): HTMLElement => {
   } else {
     element.textContent = '';
   }
+};
+
+const applyHeadTag = (tag: HeadTag): HTMLElement => {
+  const element = resolveHeadElement(tag);
+  syncElementAttributes(element, tag);
+  setElementContent(element, tag);
 
   if (!element.parentElement) {
     document.head.appendChild(element);
