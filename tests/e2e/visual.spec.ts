@@ -3,10 +3,12 @@ import { AIChat } from './pages/AIChat';
 
 test.describe('Visual Regression Suite', () => {
   test('home page should look correct', async ({ page }) => {
+    // Freeze Math.random so Hero background selection is deterministic across runs
+    await page.addInitScript(() => { Math.random = () => 0; });
     await page.goto('/');
-    // Use a large enough timeout for everything to stabilize
     await page.waitForLoadState('networkidle');
-    // Hide dynamic elements if necessary, but here we want to see the "Hero"
+    // Extra wait for JS-driven Framer Motion animations to complete
+    await page.waitForTimeout(1500);
     await expect(page).toHaveScreenshot('home-page.png', {
       fullPage: true,
       mask: [page.locator('.dynamic-blog-content')],
