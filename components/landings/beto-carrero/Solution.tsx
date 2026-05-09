@@ -118,9 +118,12 @@ const Solution: React.FC = () => {
 
                      {/* Card 3: Ticket Style */}
                      <div
+                        role="button"
+                        tabIndex={0}
                         onClick={() => openAiChat({
                            message: 'Olá! Gostaria de um orçamento para o Beto Carrero incluindo ingressos oficiais.'
                         })}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openAiChat({ message: 'Olá! Gostaria de um orçamento para o Beto Carrero incluindo ingressos oficiais.' }); }}
                         className="btn-specialist cursor-pointer group bg-white rounded-xl border-2 border-fun-dark shadow-hard transform -rotate-1 hover:rotate-0 transition-transform duration-300 flex overflow-hidden w-full max-w-sm lg:max-w-md"
                         data-tracking="mid-betocarrero"
                      >
@@ -282,8 +285,12 @@ const Solution: React.FC = () => {
             >
                {/* Backdrop */}
                <div
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Fechar modal"
                   className="absolute inset-0 bg-fun-dark/80 backdrop-blur-sm transition-opacity"
                   onClick={handleCloseModal}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleCloseModal(); }}
                ></div>
 
                {/* Modal Content */}

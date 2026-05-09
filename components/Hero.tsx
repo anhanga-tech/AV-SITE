@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { HERO_VIDEOS, optimizeRemoteImageUrl } from '../data/mediaConfig';
 import { QUICK_FEATURES } from '../data/destinations';
 import { NOISE_TEXTURE_URL } from '../lib/static-assets';
@@ -148,7 +148,7 @@ const Hero: React.FC = () => {
 
               {/* Underline Scribble - orgânico via Framer Motion pathLength */}
               <svg className="absolute w-full h-4 -bottom-0 left-0 text-yellow-400 overflow-visible" viewBox="0 0 100 10" preserveAspectRatio="none">
-                <motion.path
+                <m.path
                   d="M0 5 Q 50 15 100 5"
                   stroke="currentColor"
                   strokeWidth="3"
@@ -214,14 +214,14 @@ const Hero: React.FC = () => {
           </p>
 
           {/* Quick Features - Staggered Spring */}
-          <motion.div
+          <m.div
             className="mt-10 flex flex-wrap justify-center gap-6"
             initial="hidden"
             animate="visible"
             variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1, delayChildren: 0.7 } } }}
           >
             {QUICK_FEATURES.map((feat) => (
-              <motion.div
+              <m.div
                 key={feat.text}
                 variants={{
                   hidden: { opacity: 0, y: 16, scale: 0.9 },
@@ -232,9 +232,9 @@ const Hero: React.FC = () => {
               >
                 <feat.icon className="w-4 h-4 text-yellow-300" />
                 {feat.text}
-              </motion.div>
+              </m.div>
             ))}
-          </motion.div>
+          </m.div>
         </div>
       </div>
 

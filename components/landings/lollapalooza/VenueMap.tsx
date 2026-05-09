@@ -84,6 +84,7 @@ const VenueMap: React.FC = () => {
   };
 
   useEffect(() => {
+    let a11yTimer: ReturnType<typeof setTimeout>;
     if (mapContainerRef.current && !mapInstanceRef.current) {
       const interlagosCoords: [number, number] = [-23.701186, -46.697076];
 
@@ -103,7 +104,7 @@ const VenueMap: React.FC = () => {
       }).addTo(map);
 
       // Acessibilidade: Traduzir os botões de zoom para PT-BR
-      setTimeout(() => {
+      a11yTimer = setTimeout(() => {
         const zoomInBtn = mapContainerRef.current?.querySelector('.leaflet-control-zoom-in');
         const zoomOutBtn = mapContainerRef.current?.querySelector('.leaflet-control-zoom-out');
 
@@ -197,6 +198,7 @@ const VenueMap: React.FC = () => {
 
       mapInstanceRef.current = map;
     }
+    return () => clearTimeout(a11yTimer);
   }, []);
 
   // Efeito para rolar a lista até o item ativo quando selecionado via Mapa
@@ -264,7 +266,7 @@ const VenueMap: React.FC = () => {
                 const style = getPoiStyle(poi);
                 return (
                   <button
-                    key={idx}
+                    key={poi.name}
                     ref={el => {
                       itemsRef.current[idx] = el;
                     }}

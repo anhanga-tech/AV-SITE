@@ -42,8 +42,8 @@ const FAQ: React.FC = () => {
               {items.map((item, idx) => {
                 const isOpen = openIndex === idx;
                 return (
-                  <div 
-                    key={idx} 
+                  <div
+                    key={item.question}
                     className={`border-2 border-fun-dark rounded-2xl transition-all duration-300 overflow-hidden ${isOpen ? 'bg-blue-50 shadow-hard' : 'bg-white hover:bg-gray-50'}`}
                   >
                     <button 

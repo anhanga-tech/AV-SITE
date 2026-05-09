@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BellRing, CheckCircle2, Loader2, Mail, TicketX, ArrowRight, Zap } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useWaitlistCapture } from '../../../hooks/useWaitlistCapture';
 import { WAITLIST_SECTION_ID } from './constants';
 
@@ -78,32 +78,32 @@ const WaitlistSection: React.FC = () => {
         <div className="grid gap-12 lg:grid-cols-[1fr_minmax(400px,500px)] items-center">
           
           {/* Content Corner - Compressed Text */}
-          <motion.div 
+          <m.div 
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
             variants={containerVariants}
             className="flex flex-col items-start text-left"
           >
-            <motion.div variants={itemVariants} className="inline-flex items-center gap-2 bg-anhanga-yellow text-black px-4 py-1 text-[10px] font-black uppercase tracking-[0.25em] ring-2 ring-anhanga-yellow ring-offset-4 ring-offset-black mb-10">
+            <m.div variants={itemVariants} className="inline-flex items-center gap-2 bg-anhanga-yellow text-black px-4 py-1 text-[10px] font-black uppercase tracking-[0.25em] ring-2 ring-anhanga-yellow ring-offset-4 ring-offset-black mb-10">
               <TicketX size={14} strokeWidth={3} aria-hidden="true" />
               Sold Out 2026
-            </motion.div>
+            </m.div>
 
-            <motion.h2 
+            <m.h2 
               variants={itemVariants}
               id="waitlist-heading" 
               className="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-[0.9] uppercase italic tracking-tighter mb-8"
             >
               Não fique de fora do <span className="text-anhanga-yellow">Lolla 2027.</span>
-            </motion.h2>
+            </m.h2>
 
-            <motion.p variants={itemVariants} className="text-lg md:text-xl text-gray-400 font-medium leading-relaxed max-w-xl mb-12">
+            <m.p variants={itemVariants} className="text-lg md:text-xl text-gray-400 font-medium leading-relaxed max-w-xl mb-12">
               A jornada de 2026 lotou em tempo recorde. Garanta seu lugar na lista de prioridade para a edição 2027 e receba avisos antecipados sobre pacotes, logística e condições exclusivas Anhangá.
-            </motion.p>
+            </m.p>
 
             <div className="grid gap-6 w-full max-w-lg">
-              <motion.div variants={itemVariants} className="group flex gap-4 p-6 bg-white/[0.03] border border-white/10 hover:border-anhanga-yellow transition-colors duration-300">
+              <m.div variants={itemVariants} className="group flex gap-4 p-6 bg-white/[0.03] border border-white/10 hover:border-anhanga-yellow transition-colors duration-300">
                 <div className="bg-anhanga-yellow text-black p-3 h-fit">
                   <BellRing size={20} strokeWidth={3} aria-hidden="true" />
                 </div>
@@ -111,9 +111,9 @@ const WaitlistSection: React.FC = () => {
                   <h3 className="font-black text-white uppercase tracking-wider mb-2">Prioridade Total</h3>
                   <p className="text-sm text-gray-500 leading-relaxed font-medium">Recepção de ofertas antes do lançamento público geral.</p>
                 </div>
-              </motion.div>
+              </m.div>
 
-              <motion.div variants={itemVariants} className="group flex gap-4 p-6 bg-white/[0.03] border border-white/10 hover:border-anhanga-blue transition-colors duration-300">
+              <m.div variants={itemVariants} className="group flex gap-4 p-6 bg-white/[0.03] border border-white/10 hover:border-anhanga-blue transition-colors duration-300">
                 <div className="bg-anhanga-blue text-white p-3 h-fit">
                   <Zap size={20} strokeWidth={3} aria-hidden="true" />
                 </div>
@@ -121,12 +121,12 @@ const WaitlistSection: React.FC = () => {
                   <h3 className="font-black text-white uppercase tracking-wider mb-2">Logística Hardcore</h3>
                   <p className="text-sm text-gray-500 leading-relaxed font-medium">Saiba primeiro os hotéis mais próximos e as rotas mais eficientes.</p>
                 </div>
-              </motion.div>
+              </m.div>
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Form Block - The Asymmetric Tension */}
-          <motion.div 
+          <m.div 
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
@@ -210,7 +210,7 @@ const WaitlistSection: React.FC = () => {
 
                 <AnimatePresence mode="wait">
                   {(localError || error) && (
-                    <motion.div 
+                    <m.div 
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
@@ -218,11 +218,11 @@ const WaitlistSection: React.FC = () => {
                       className="border-l-4 border-red-500 bg-red-500/10 px-4 py-3 text-xs font-bold text-red-400"
                     >
                       {localError || error}
-                    </motion.div>
+                    </m.div>
                   )}
 
                   {successMessage && (
-                    <motion.div
+                    <m.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
@@ -230,11 +230,11 @@ const WaitlistSection: React.FC = () => {
                       className="border-l-4 border-anhanga-yellow bg-anhanga-yellow/10 px-4 py-3 text-xs font-bold text-anhanga-yellow"
                     >
                       {successMessage}
-                    </motion.div>
+                    </m.div>
                   )}
 
                   {warningMessage && (
-                    <motion.div
+                    <m.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
@@ -242,7 +242,7 @@ const WaitlistSection: React.FC = () => {
                       className="border-l-4 border-amber-500 bg-amber-500/10 px-4 py-3 text-xs font-bold text-amber-400"
                     >
                       {warningMessage}
-                    </motion.div>
+                    </m.div>
                   )}
                 </AnimatePresence>
 
@@ -270,7 +270,7 @@ const WaitlistSection: React.FC = () => {
                 </button>
               </form>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </div>
     </section>

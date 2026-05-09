@@ -84,8 +84,10 @@ function collectConversionFailures(
 
 async function processClosedWonEvent(event: HubSpotWebhookEvent, hubspotToken: string): Promise<void> {
   const dealId = String(event.objectId);
-  const deal = await getDeal(hubspotToken, dealId);
-  const contactId = await getAssociatedContactId(hubspotToken, dealId);
+  const [deal, contactId] = await Promise.all([
+    getDeal(hubspotToken, dealId),
+    getAssociatedContactId(hubspotToken, dealId),
+  ]);
 
   if (!contactId) return;
 
@@ -164,16 +166,18 @@ export default async function handler(request: Request): Promise<Response> {
     return buildJsonResponse({ error: 'Invalid JSON body' }, 400);
   }
 
-  for (const event of events) {
-    if (!isClosedWonDealEvent(event)) continue;
-
-    const dealId = String(event.objectId);
-    try {
-      await processClosedWonEvent(event, config.hubspotToken);
-    } catch (err) {
-      console.error(`HUBSPOT_WEBHOOK: Error processing deal ${dealId}:`, err);
-    }
-  }
+  await Promise.all(
+    events
+      .filter(isClosedWonDealEvent)
+      .map(async (event) => {
+        const dealId = String(event.objectId);
+        try {
+          await processClosedWonEvent(event, config.hubspotToken);
+        } catch (err) {
+          console.error(`HUBSPOT_WEBHOOK: Error processing deal ${dealId}:`, err);
+        }
+      })
+  );
 
   console.log('HUBSPOT_WEBHOOK: processed events', events?.length ?? 0);
   return buildJsonResponse({ success: true }, 200);

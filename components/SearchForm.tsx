@@ -214,6 +214,7 @@ const DestinationField = memo(({
                 role="option"
                 aria-selected={false}
                 onClick={() => onSelect(dest)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onSelect(dest); }}
                 className="px-6 py-3 hover:bg-brand-light cursor-pointer text-left text-sm text-gray-700 font-medium border-b border-gray-50 last:border-0 flex items-center gap-2 transition-colors"
               >
                 <MapPin className="w-4 h-4 text-brand-cyan/50 shrink-0" />
@@ -283,7 +284,7 @@ const DateField = memo(({
     </button>
 
     {showCalendar && (
-      <div onClick={(event) => event.stopPropagation()} className="absolute top-full left-0 md:left-auto md:right-0 bg-white rounded-3xl shadow-2xl border-2 border-gray-100 mt-4 p-6 z-[60] w-full md:w-80 cursor-default animate-pop-in origin-top">
+      <div onClick={(event) => event.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} role="presentation" className="absolute top-full left-0 md:left-auto md:right-0 bg-white rounded-3xl shadow-2xl border-2 border-gray-100 mt-4 p-6 z-[60] w-full md:w-80 cursor-default animate-pop-in origin-top">
         <div className="flex items-center justify-between mb-4">
           <button
             type="button"
@@ -300,7 +301,7 @@ const DateField = memo(({
           </button>
         </div>
         <div className="grid grid-cols-7 mb-2 text-center text-xs font-bold text-gray-400">
-          {WEEK_DAYS.map((day, index) => <div key={`${day}-${index}`}>{day}</div>)}
+          {WEEK_DAYS.map((day) => <div key={day}>{day}</div>)}
         </div>
         <div className="grid grid-cols-7 gap-y-1">
           {calendarDays.map((date, index) => {
@@ -312,7 +313,7 @@ const DateField = memo(({
 
             return (
               <button
-                key={`${date.toISOString()}-${index}`}
+                key={date.toISOString()}
                 type="button"
                 onClick={() => onDateClick(date)}
                 disabled={past}
@@ -377,7 +378,7 @@ const GuestsField = memo(({
     </button>
 
     {showGuestDropdown && (
-      <div onClick={(event) => event.stopPropagation()} className="absolute top-full left-0 md:left-auto md:right-0 bg-white rounded-3xl shadow-2xl border-2 border-gray-100 mt-4 p-6 z-[60] w-full md:w-72 cursor-default animate-pop-in origin-top">
+      <div onClick={(event) => event.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} role="presentation" className="absolute top-full left-0 md:left-auto md:right-0 bg-white rounded-3xl shadow-2xl border-2 border-gray-100 mt-4 p-6 z-[60] w-full md:w-72 cursor-default animate-pop-in origin-top">
         <div className="flex justify-between items-center mb-4">
           <p className="font-bold text-gray-800">Adultos</p>
           <div className="flex items-center gap-3">
@@ -496,7 +497,7 @@ const TripTypeField = memo(({
     </button>
 
     {showTripTypeDropdown && (
-      <div onClick={(event) => event.stopPropagation()} className="absolute top-full left-0 w-full md:w-[400px] bg-white rounded-3xl shadow-2xl border-2 border-gray-100 mt-2 z-[60] animate-pop-in origin-top overflow-hidden p-4">
+      <div onClick={(event) => event.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} role="presentation" className="absolute top-full left-0 w-full md:w-[400px] bg-white rounded-3xl shadow-2xl border-2 border-gray-100 mt-2 z-[60] animate-pop-in origin-top overflow-hidden p-4">
         <div className="grid grid-cols-2 gap-3">
           {TRIP_OPTIONS.map((type) => (
             <button
@@ -566,7 +567,7 @@ const BudgetField = memo(({
     </button>
 
     {showBudgetDropdown && (
-      <div onClick={(event) => event.stopPropagation()} className="absolute top-full left-0 w-full md:w-[320px] bg-white rounded-3xl shadow-2xl border-2 border-gray-100 mt-2 z-[60] animate-pop-in origin-top overflow-hidden p-3">
+      <div onClick={(event) => event.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} role="presentation" className="absolute top-full left-0 w-full md:w-[320px] bg-white rounded-3xl shadow-2xl border-2 border-gray-100 mt-2 z-[60] animate-pop-in origin-top overflow-hidden p-3">
         {BUDGET_TIERS.map((option) => (
           <button
             key={option.label}

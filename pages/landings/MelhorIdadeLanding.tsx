@@ -6,7 +6,7 @@ import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../../components/schemas/FAQPageSchema';
 import { ServiceSchema } from '../../components/schemas/ServiceSchema';
 import { openAiChat } from '../../utils/aiChat';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import ShieldCheck from 'lucide-react/dist/esm/icons/shield-check';
 import Heart from 'lucide-react/dist/esm/icons/heart';
 import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
@@ -80,14 +80,14 @@ const MelhorIdadeLanding: React.FC = () => {
       <section className="relative pt-20 pb-32 overflow-hidden">
         <div className="container mx-auto px-6 relative z-10">
           <div className="max-w-3xl">
-            <motion.div 
+            <m.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="inline-flex items-center gap-2 bg-brand-cyan/10 text-brand-cyan px-4 py-1 rounded-full text-sm font-bold mb-6"
             >
               <Heart className="w-4 h-4 fill-current" /> Viagens com Propósito
-            </motion.div>
-            <motion.h1 
+            </m.div>
+            <m.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
@@ -97,16 +97,16 @@ const MelhorIdadeLanding: React.FC = () => {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-vibrant to-brand-cyan">
                 com o cuidado que você merece.
               </span>
-            </motion.h1>
-            <motion.p 
+            </m.h1>
+            <m.p 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               className="text-xl text-gray-600 mb-10 leading-relaxed font-medium"
             >
               Na Anhangá, acreditamos que a "melhor idade" é a época perfeita para novas descobertas. Criamos roteiros 100% personalizados para quem não abre mão de conforto, segurança e boas histórias.
-            </motion.p>
-            <motion.div 
+            </m.p>
+            <m.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
@@ -120,7 +120,7 @@ const MelhorIdadeLanding: React.FC = () => {
                 Solicitar Orçamento
                 <Sparkles className="w-5 h-5" />
               </button>
-            </motion.div>
+            </m.div>
           </div>
         </div>
         

@@ -1,4 +1,5 @@
 import React, { Suspense, lazy } from 'react';
+import { LazyMotion, domAnimation } from 'framer-motion';
 import { BrowserRouter, MemoryRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
@@ -123,7 +124,9 @@ function App({
 
   return (
     <HeadContext.Provider value={headManager}>
-      {routerNode}
+      <LazyMotion features={domAnimation}>
+        {routerNode}
+      </LazyMotion>
     </HeadContext.Provider>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
     InstagramLogo,
     FacebookLogo,
@@ -203,7 +203,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                         <div className="flex flex-col items-center text-center">
 
                             {/* Event badge — skewed like Highlights badge */}
-                            <motion.div
+                            <m.div
                                 variants={fadeUp}
                                 initial="hidden"
                                 animate="visible"
@@ -215,9 +215,9 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                     <AirplaneTilt className="w-4 h-4" weight="fill" />
                                     Brazil Promotion Day 2026
                                 </span>
-                            </motion.div>
+                            </m.div>
 
-                            <motion.h1
+                            <m.h1
                                 variants={fadeUp}
                                 initial="hidden"
                                 animate="visible"
@@ -228,9 +228,9 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                 <span className="text-yellow-300">
                                     Viaja bem.
                                 </span>
-                            </motion.h1>
+                            </m.h1>
 
-                            <motion.p
+                            <m.p
                                 variants={fadeUp}
                                 initial="hidden"
                                 animate="visible"
@@ -239,9 +239,9 @@ const BrazilPromotionDayLanding: React.FC = () => {
                             >
                                 Roteiros exclusivos feitos do zero. Sem pacote pronto,
                                 sem estresse. Só a sua viagem.
-                            </motion.p>
+                            </m.p>
 
-                            <motion.div
+                            <m.div
                                 variants={fadeUp}
                                 initial="hidden"
                                 animate="visible"
@@ -265,10 +265,10 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                     Prefiro ser contatado
                                     <ArrowRight className="w-5 h-5" />
                                 </a>
-                            </motion.div>
+                            </m.div>
 
                             {/* Quick feature pills — identical pattern to main Hero */}
-                            <motion.div
+                            <m.div
                                 className="mt-10 flex flex-wrap justify-center gap-4"
                                 initial="hidden"
                                 animate="visible"
@@ -283,7 +283,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                     { icon: '🌎', text: 'Viagem Sob Medida' },
                                     { icon: '💛', text: 'Sem Pacote Pronto' },
                                 ].map((feat) => (
-                                    <motion.div
+                                    <m.div
                                         key={feat.text}
                                         variants={{
                                             hidden: { opacity: 0, y: 16, scale: 0.9 },
@@ -296,9 +296,9 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                     >
                                         <span>{feat.icon}</span>
                                         {feat.text}
-                                    </motion.div>
+                                    </m.div>
                                 ))}
-                            </motion.div>
+                            </m.div>
                         </div>
                     </div>
 
@@ -324,7 +324,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
 
                     <div className="container mx-auto px-6 relative z-10">
 
-                        <motion.div
+                        <m.div
                             variants={fadeUp}
                             initial="hidden"
                             whileInView="visible"
@@ -344,7 +344,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                     para o viajante errado.
                                 </span>
                             </h2>
-                        </motion.div>
+                        </m.div>
 
                         <div className="grid md:grid-cols-3 gap-8">
                             {PILLARS.map((item, idx) => {
@@ -353,7 +353,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                 const sign = item.rotate.startsWith('-') ? -1 : 1;
 
                                 return (
-                                    <motion.div
+                                    <m.div
                                         key={item.title}
                                         className={`relative p-8 rounded-[2.5rem] bg-white border-[3px] ${item.accent} shadow-[8px_8px_0px_rgba(0,0,0,0.05)] flex flex-col h-full group`}
                                         variants={fadeUp}
@@ -374,12 +374,12 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                         {/* Washi tape */}
                                         <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-yellow-50/90 backdrop-blur-sm border-l-2 border-r-2 border-white/40 rotate-1 shadow-sm z-20 opacity-90" />
 
-                                        <motion.div
+                                        <m.div
                                             className={`w-16 h-16 rounded-2xl ${item.bg} border-2 ${item.accent} flex items-center justify-center mb-6 shadow-sm`}
                                             whileHover={{ scale: 1.1, rotate: 6, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
                                         >
                                             <Icon className={`w-8 h-8 ${item.iconColor}`} weight="fill" />
-                                        </motion.div>
+                                        </m.div>
 
                                         <h3 className="text-xl font-extrabold text-gray-900 mb-3 leading-tight group-hover:text-brand-cyan transition-colors duration-300">
                                             {item.title}
@@ -391,7 +391,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                         <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0">
                                             <ArrowRight className={`w-5 h-5 ${item.iconColor}`} />
                                         </div>
-                                    </motion.div>
+                                    </m.div>
                                 );
                             })}
                         </div>
@@ -449,7 +449,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 items-start">
 
                             {/* Left: contact info */}
-                            <motion.div
+                            <m.div
                                 variants={fadeUp}
                                 initial="hidden"
                                 whileInView="visible"
@@ -520,10 +520,10 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                         ))}
                                     </div>
                                 </div>
-                            </motion.div>
+                            </m.div>
 
                             {/* Right: form */}
-                            <motion.div
+                            <m.div
                                 variants={fadeUp}
                                 initial="hidden"
                                 whileInView="visible"
@@ -533,13 +533,13 @@ const BrazilPromotionDayLanding: React.FC = () => {
                             >
                                 {submitState === 'success' ? (
                                     <div className="flex flex-col items-center text-center p-12">
-                                        <motion.div
+                                        <m.div
                                             initial={{ scale: 0.5, opacity: 0 }}
                                             animate={{ scale: 1, opacity: 1 }}
                                             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                                         >
                                             <CheckCircle className="w-16 h-16 text-emerald-500 mb-4" weight="fill" />
-                                        </motion.div>
+                                        </m.div>
                                         <h3 className="text-2xl font-black text-brand-dark mb-3">
                                             Mensagem recebida! 🎉
                                         </h3>
@@ -678,7 +678,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                         </div>
                                     </form>
                                 )}
-                            </motion.div>
+                            </m.div>
                         </div>
                     </div>
                 </section>

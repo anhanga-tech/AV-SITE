@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { motion, Variants } from 'framer-motion';
+import { m, Variants } from 'framer-motion';
 import { SEO } from '../components/SEO';
 import { OrganizationSchema } from '../components/schemas/OrganizationSchema';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
@@ -36,9 +36,10 @@ const About: React.FC = () => {
       const id = hash.replace('#', '');
       const element = document.getElementById(id);
       if (element) {
-        setTimeout(() => {
+        const timer = setTimeout(() => {
           element.scrollIntoView({ behavior: 'smooth' });
         }, 100);
+        return () => clearTimeout(timer);
       }
     } else {
       window.scrollTo(0, 0);
@@ -62,7 +63,7 @@ const About: React.FC = () => {
 
       <div className="container mx-auto px-6">
         {/* HERO SECTION */}
-        <motion.section
+        <m.section
           className="text-center mb-24"
           initial="hidden"
           animate="visible"
@@ -94,12 +95,12 @@ const About: React.FC = () => {
               <Sparkles className="w-5 h-5" />
             </button>
           </div>
-        </motion.section>
+        </m.section>
 
         {/* HISTORIA SECTION */}
         <section id="nossa-historia" className="mb-32">
           <div className="flex flex-col lg:flex-row gap-16 items-center">
-            <motion.div
+            <m.div
               className="w-full lg:w-1/2"
               initial="hidden"
               whileInView="visible"
@@ -128,9 +129,9 @@ const About: React.FC = () => {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </m.div>
 
-            <motion.div
+            <m.div
               className="w-full lg:w-1/2"
               initial="hidden"
               whileInView="visible"
@@ -150,13 +151,13 @@ const About: React.FC = () => {
                   Do primeiro café (virtual ou presencial) até o seu retorno para casa, cuidamos de cada detalhe como se a viagem fosse nossa. É esse cuidado artesanal que nos define.
                 </p>
               </div>
-            </motion.div>
+            </m.div>
           </div>
         </section>
 
         {/* EXPERTISE SECTION */}
         <section className="mb-32">
-          <motion.div
+          <m.div
             className="text-center mb-16"
             initial="hidden"
             whileInView="visible"
@@ -166,7 +167,7 @@ const About: React.FC = () => {
           >
             <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Por que viajar com a Anhangá?</h2>
             <p className="text-gray-500 font-medium">O que nos torna diferentes no mercado de turismo.</p>
-          </motion.div>
+          </m.div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
@@ -189,7 +190,7 @@ const About: React.FC = () => {
                 color: "bg-emerald-100 text-emerald-600"
               }
             ].map((item, i) => (
-              <motion.div
+              <m.div
                 key={item.title}
                 className="bg-white p-10 rounded-[2.5rem] border-2 border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300"
                 initial="hidden"
@@ -203,7 +204,7 @@ const About: React.FC = () => {
                 </div>
                 <h3 className="text-xl font-black text-brand-dark mb-4">{item.title}</h3>
                 <p className="text-gray-500 font-medium leading-relaxed">{item.desc}</p>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </section>
@@ -274,7 +275,7 @@ const About: React.FC = () => {
         </section>
 
         {/* CTA */}
-        <motion.section
+        <m.section
           className="mt-32 text-center"
           initial="hidden"
           whileInView="visible"
@@ -295,7 +296,7 @@ const About: React.FC = () => {
               <Sparkles className="w-5 h-5" />
             </button>
           </div>
-        </motion.section>
+        </m.section>
       </div>
     </div>
   );

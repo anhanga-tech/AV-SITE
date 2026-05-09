@@ -203,13 +203,12 @@ const SUMMARY_LABELS: Record<string, Record<string, string>> = {
 
 function buildAnswersSummary(answers: QuizAnswers): string {
     return Object.entries(answers)
-        .filter(([, sel]) => sel?.length)
-        .map(([qId, sel]) => {
+        .flatMap(([qId, sel]) => {
+            if (!sel?.length) return [];
             const map = SUMMARY_LABELS[qId];
-            if (!map) return null;
-            return sel.map((id) => map[id] ?? id).join(', ');
+            if (!map) return [];
+            return [sel.map((id) => map[id] ?? id).join(', ')];
         })
-        .filter(Boolean)
         .join(' · ');
 }
 
@@ -243,7 +242,7 @@ function ChunkyQuiz() {
             <div className="quiz-chunky quiz-chunky-layered">
                 {layerColors.map((c, idx) => (
                     <div
-                        key={idx}
+                        key={`layer-${idx}`}
                         className="quiz-ch-layer"
                         aria-hidden="true"
                         style={{
@@ -252,11 +251,11 @@ function ChunkyQuiz() {
                             zIndex: idx,
                         }}
                     >
-                        {letters.map((l, i) => <span key={i} className="quiz-ch-letter">{l}</span>)}
+                        {letters.map((l, i) => <span key={`letter-${i}`} className="quiz-ch-letter">{l}</span>)}
                     </div>
                 ))}
                 <div className="quiz-ch-front" style={{ zIndex: 99 }}>
-                    {letters.map((l, i) => <span key={i} className="quiz-ch-letter">{l}</span>)}
+                    {letters.map((l, i) => <span key={`letter-${i}`} className="quiz-ch-letter">{l}</span>)}
                 </div>
             </div>
         </div>

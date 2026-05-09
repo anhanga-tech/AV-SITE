@@ -85,28 +85,24 @@ const getFbp = (): string | null => {
 function parseTrackingDataString(dataString: string): TrackingData {
     const parsed: TrackingData = {};
 
-    dataString
-        .split(',')
-        .map((segment) => segment.trim())
-        .filter(Boolean)
-        .forEach((entry) => {
-            const separatorIndex = entry.indexOf('=');
-            if (separatorIndex <= 0) return;
+    for (const segment of dataString.split(',')) {
+        const entry = segment.trim();
+        if (!entry) continue;
 
-            const key = entry.slice(0, separatorIndex).trim();
-            const value = entry.slice(separatorIndex + 1).trim();
-            if (!key || !value) return;
+        const separatorIndex = entry.indexOf('=');
+        if (separatorIndex <= 0) continue;
 
-            parsed[key] = value;
-        });
+        const key = entry.slice(0, separatorIndex).trim();
+        const value = entry.slice(separatorIndex + 1).trim();
+        if (key && value) parsed[key] = value;
+    }
 
     return parsed;
 }
 
 function serializeTrackingData(data: TrackingData): string {
     return Object.entries(data)
-        .filter(([key, value]) => Boolean(key) && Boolean(value))
-        .map(([key, value]) => `${key}=${value}`)
+        .flatMap(([key, value]) => key && value ? [`${key}=${value}`] : [])
         .join(', ');
 }
 
