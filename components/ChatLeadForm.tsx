@@ -315,7 +315,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
                 />
                 <CheckCircle2 className="absolute h-3 w-3 text-white opacity-0 peer-checked:opacity-100 left-0.5 pointer-events-none transition-opacity" />
               </div>
-              <span className="text-[11px] text-gray-500 leading-tight">
+              <span className="text-xs text-gray-500 leading-tight">
                 Aceito receber comunicações e autorizo o tratamento dos meus dados conforme a <a href="https://www.anhanga.tur.br/politica-privacidade/" target="_blank" rel="noopener noreferrer" className="underline hover:text-brand-vibrant">Política de Privacidade</a>.
               </span>
             </label>

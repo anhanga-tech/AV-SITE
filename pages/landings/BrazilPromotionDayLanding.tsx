@@ -672,7 +672,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                                 )}
                                             </button>
 
-                                            <p className="text-[11px] text-gray-400 text-center leading-relaxed">
+                                            <p className="text-xs text-gray-400 text-center leading-relaxed">
                                                 Seus dados são usados apenas para entrar em contato. Não compartilhamos com terceiros.
                                             </p>
                                         </div>

@@ -859,6 +859,7 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
     }, 1000);
   }, [inputValue, startDate, endDate, adults, children, childAges, tripType, budget]);
 
+  // This form is intentionally client-only: it opens the AI chat drawer (SPA action, no server endpoint).
   const handleSubmit = useCallback((event: React.FormEvent) => {
     event.preventDefault();
     handleSearch();

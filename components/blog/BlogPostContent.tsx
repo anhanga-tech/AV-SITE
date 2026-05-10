@@ -58,7 +58,7 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
                         prose-strong:text-brand-dark prose-strong:font-black
                         prose-ul:list-disc prose-ul:pl-6 prose-ul:marker:text-brand-yellow
                         prose-li:font-serif prose-li:text-gray-600
-                        prose-blockquote:border-2 prose-blockquote:border-brand-yellow/40 prose-blockquote:bg-yellow-50 prose-blockquote:py-4 prose-blockquote:px-8 prose-blockquote:rounded-2xl prose-blockquote:not-italic prose-blockquote:font-serif prose-blockquote:text-brand-dark
+                        prose-blockquote:border-2 prose-blockquote:border-brand-yellow/40 prose-blockquote:bg-yellow-50 prose-blockquote:py-4 prose-blockquote:px-8 prose-blockquote:rounded-2xl prose-blockquote:not-italic prose-blockquote:font-serif prose-blockquote:text-brand-dark [&_blockquote_p]:text-brand-dark
                         first-letter:text-[3rem] first-letter:md:text-[4.5rem] first-letter:font-black first-letter:text-brand-dark first-letter:float-left first-letter:leading-none first-letter:mr-2 first-letter:mt-1
                     ">
                         <Suspense fallback={
