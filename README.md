@@ -25,7 +25,7 @@ O site institucional da **Anhangá Viagens** é uma plataforma moderna e interat
 - **TypeScript:** Segurança e escalabilidade com tipagem estática.
 - **Tailwind CSS:** Design system utility-first para estilização de alta performance.
 - **React Router 7:** Gerenciamento de rotas e navegação SPA.
-- **Google Gemini AI:** Motor de inteligência artificial generativa.
+- **Google Gemini AI + Cloudflare AI Gateway:** Motor de inteligência artificial generativa com proxy opcional para observabilidade de uso.
 - **HubSpot CRM:** API para gestão de leads e automação de vendas.
 - **Vercel Analytics & Speed Insights:** Monitoramento de experiência do usuário em tempo real.
 - **Lucide React:** Biblioteca de ícones moderna e leve.
@@ -35,7 +35,8 @@ O site institucional da **Anhangá Viagens** é uma plataforma moderna e interat
 
 - Node.js 18+
 - pnpm (Gerenciador de pacotes)
-- Chave da API do Google Gemini
+- Chave da API do Google Gemini no ambiente server-side
+- Opcional: Cloudflare AI Gateway autenticado para monitoramento de uso da IA
 - Token de app privado do HubSpot (para captura de leads do chatbot)
 - IDs de Pipeline e Stage de Deals no HubSpot
 
@@ -59,9 +60,15 @@ O site institucional da **Anhangá Viagens** é uma plataforma moderna e interat
    cp .env.example .env
    ```
    
-   Em seguida, adicione sua chave da API do Gemini e o token do HubSpot ao arquivo `.env`:
+   Em seguida, adicione sua chave da API do Gemini e o token do HubSpot ao arquivo `.env`.
+   O frontend chama `/api/generate`; a chave do Gemini fica apenas no runtime da API.
    ```env
    GEMINI_API_KEY=sua_chave_api_aqui
+   # Opcional: habilite depois de criar o gateway autenticado no Cloudflare
+   AI_GATEWAY_ENABLED=false
+   CLOUDFLARE_ACCOUNT_ID=seu_account_id_cloudflare
+   CLOUDFLARE_AI_GATEWAY_ID=default
+   CLOUDFLARE_AI_GATEWAY_TOKEN=seu_token_com_permissao_run
    HUBSPOT_TOKEN=seu_token_do_app_privado
    HUBSPOT_DEAL_PIPELINE_ID=id_do_pipeline_deals
    HUBSPOT_DEAL_STAGE_ID=id_do_stage_deals
@@ -111,7 +118,7 @@ O projeto está pré-configurado para deploy simplificado em plataformas como Ve
 
 1. Faça o fork do repositório.
 2. Conecte sua conta do GitHub ao Vercel.
-3. Importe o repositório e configure as variáveis de ambiente `GEMINI_API_KEY`, `HUBSPOT_TOKEN`, `HUBSPOT_DEAL_PIPELINE_ID`, `HUBSPOT_DEAL_STAGE_ID` e, se quiser classificar a waitlist do festival em uma lista estática, `HUBSPOT_LOLLAPALOOZA_LIST_ID` no painel do projeto.
+3. Importe o repositório e configure as variáveis de ambiente `GEMINI_API_KEY`, `HUBSPOT_TOKEN`, `HUBSPOT_DEAL_PIPELINE_ID`, `HUBSPOT_DEAL_STAGE_ID` e, se quiser classificar a waitlist do festival em uma lista estática, `HUBSPOT_LOLLAPALOOZA_LIST_ID` no painel do projeto. Para rotear o chat pelo Cloudflare AI Gateway, adicione também `AI_GATEWAY_ENABLED=true`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_AI_GATEWAY_ID` e `CLOUDFLARE_AI_GATEWAY_TOKEN`.
 4. O deploy será feito automaticamente a cada push para a branch principal.
 
 ### Netlify
