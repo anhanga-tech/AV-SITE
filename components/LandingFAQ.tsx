@@ -23,10 +23,7 @@ const FAQItemComponent = memo(({ question, answer, isOpen, onClick }: FAQItem & 
                 onClick={onClick}
                 aria-expanded={isOpen}
             >
-                <h3
-                    itemProp="name"
-                    className="text-xl font-bold text-brand-dark group-hover:text-brand-cyan transition-colors pr-8"
-                >
+                <h3 className="text-xl font-bold text-brand-dark group-hover:text-brand-cyan transition-colors pr-8">
                     {question}
                 </h3>
                 <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
@@ -39,14 +36,8 @@ const FAQItemComponent = memo(({ question, answer, isOpen, onClick }: FAQItem & 
                 className={`overflow-hidden transition-all duration-300 ease-in-out ${
                     isOpen ? 'max-h-[500px] opacity-100 pb-8' : 'max-h-0 opacity-0'
                 }`}
-                itemScope
-                itemProp="acceptedAnswer"
-                itemType="https://schema.org/Answer"
             >
-                <div
-                    itemProp="text"
-                    className="text-gray-600 text-lg leading-relaxed"
-                >
+                <div className="text-gray-600 text-lg leading-relaxed">
                     {typeof answer === 'string' ? <p>{answer}</p> : answer}
                 </div>
             </div>
@@ -70,7 +61,7 @@ export const LandingFAQ: React.FC<LandingFAQProps> = ({
 
     return (
         <section className="py-20 bg-white">
-            <div className="container mx-auto px-6 max-w-4xl" itemScope itemType="https://schema.org/FAQPage">
+            <div className="container mx-auto px-6 max-w-4xl">
                 <div className="text-center mb-12">
                     <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">
                         {title}
