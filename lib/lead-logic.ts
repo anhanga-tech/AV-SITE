@@ -33,6 +33,18 @@ export function maskEmail(email: string): string {
     return `${firstChar}***@${domainPart}`;
 }
 
+export function maskPhone(phone: string): string {
+    const trimmed = phone.trim();
+    if (trimmed.length <= 6) return '***';
+    return `${trimmed.slice(0, 3)}***${trimmed.slice(-3)}`;
+}
+
+export function maskName(name: string): string {
+    const trimmed = name.trim();
+    if (trimmed.length === 0) return '***';
+    return `${trimmed.charAt(0)}***`;
+}
+
 export function cleanString(value: unknown): string {
     if (typeof value !== 'string') return '';
     const trimmed = value.trim();

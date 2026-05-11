@@ -1,7 +1,7 @@
 import type { SubmitLeadRequest, SubmitLeadResponse } from '../types/leadCapture';
 import { buildCorsHeaders, createRequestId, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
-import { cleanString, maskEmail, validatePayload } from '../lib/lead-logic';
+import { cleanString, maskEmail, maskName, maskPhone, validatePayload } from '../lib/lead-logic';
 import { buildN8nLeadPayload } from '../lib/n8n-payloads';
 import { sendLeadToN8n } from '../services/n8n';
 
@@ -24,11 +24,6 @@ type LeadLogLevel = 'info' | 'warn' | 'error';
 function truncateDetail(detail: string): string | undefined {
     const normalized = detail.replace(/[\r\n]+/g, ' ').trim();
     return normalized ? normalized.substring(0, 600) : undefined;
-}
-
-function maskPhone(phone: string): string {
-    if (phone.length <= 6) return '***';
-    return `${phone.slice(0, 3)}***${phone.slice(-3)}`;
 }
 
 function emitLeadLog(level: LeadLogLevel, requestId: string, stage: string, details: Record<string, unknown> = {}): void {
@@ -287,7 +282,7 @@ export default async function handler(request: Request): Promise<Response> {
                 recoveredLead: {
                     maskedEmail: maskEmail(recoveryPayload.email),
                     maskedPhone: maskPhone(recoveryPayload.whatsapp),
-                    firstName: recoveryPayload.firstName,
+                    maskedFirstName: maskName(recoveryPayload.firstName),
                     destination: recoveryPayload.destination,
                     // bantSummary omitted — may contain sensitive PII (budget, health, family details).
                     // hasBantSummary preserves qualification signal without exposing content to log infra.
