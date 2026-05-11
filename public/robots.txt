@@ -44,7 +44,6 @@ User-agent: YandexBot
 Crawl-delay: 2
 
 Sitemap: https://www.anhanga.tur.br/sitemap.xml
-Sitemap: https://blog.anhanga.tur.br/sitemap.xml
 
 # Content Signals - AI usage preferences (https://contentsignals.org/)
 Content-Signal: ai-train=no, search=yes, ai-input=yes
