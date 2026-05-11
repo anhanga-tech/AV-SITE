@@ -175,3 +175,20 @@ test('buildGenerateSuccessBody should fall back to refinement when textual hando
     assert.match(body.text, /me confirme/i);
     assert.doesNotMatch(body.text, /wa\.me/i);
 });
+
+test('buildGenerateSuccessBody should require provider client options for unmocked textual handoff repair', async () => {
+    await assert.rejects(
+        buildGenerateSuccessBody(
+            {
+                responseId: 'resp-unmocked-repair',
+                text: 'Clique aqui para receber seu orçamento personalizado: https://wa.me/5511999999999',
+            },
+            {
+                apiKey: 'test-key',
+                modelName: 'test-model',
+                contents: [{ role: 'user', parts: [{ text: 'Quero orçamento.' }] }],
+            },
+        ),
+        /Gemini client options are required to repair textual handoff/,
+    );
+});

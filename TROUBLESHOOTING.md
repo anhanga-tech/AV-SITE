@@ -124,5 +124,5 @@ Antes de reportar um problema, verifique:
    ```
 
 4. **Verifique a versão do Node:**
-   - Use Node.js 18+ (verifique com `node -v`)
+   - Use Node.js 24.x (verifique com `node -v`)
    - Configure na plataforma se necessário

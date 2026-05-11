@@ -33,7 +33,7 @@ O Cloudflare AI Gateway é opcional e controlado por feature flag. Use esta rota
 
 - [ ] Build command: `pnpm build`
 - [ ] Output directory: `dist`
-- [ ] Node version: 18+ (se necessário)
+- [ ] Node version: 24.x
 - [ ] Environment variables: `GEMINI_API_KEY` e, se habilitado, variáveis `CLOUDFLARE_*`
 
 ### Após o Deploy:
@@ -76,7 +76,7 @@ netlify deploy --prod
   publish = "dist"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "24"
 ```
 
 ### GitHub Pages

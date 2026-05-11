@@ -74,7 +74,7 @@
 3. **Verifique configurações de build:**
    - Build command: `pnpm build`
    - Output directory: `dist`
-   - Node version: 18+ (se necessário)
+   - Node version: 24.x
 
 ### Durante o Deploy:
 

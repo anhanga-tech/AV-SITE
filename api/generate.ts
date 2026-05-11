@@ -309,6 +309,14 @@ function buildHandoffRepairPrompt(originalText: string): string {
     ].join('\n');
 }
 
+function getRepairClientOptions(options: BuildGenerateSuccessOptions): GeminiClientOptions {
+    if (!options.clientOptions) {
+        throw new Error('Gemini client options are required to repair textual handoff');
+    }
+
+    return options.clientOptions;
+}
+
 function extractModelOutput(
     response: ModelResponseShape,
 ): { responseText?: string; responseFunctionCall?: ResponseFunctionCall } {
@@ -436,7 +444,7 @@ async function repairTextualHandoff(
 
     const repairResponse = options.repairModelResponse
         ? await options.repairModelResponse(repairContents)
-        : await requestModelResponse(options.clientOptions || { apiKey: options.apiKey }, options.modelName, repairContents, {
+        : await requestModelResponse(getRepairClientOptions(options), options.modelName, repairContents, {
             systemInstruction: HANDOFF_REPAIR_SYSTEM_INSTRUCTION,
             temperature: HANDOFF_REPAIR_TEMPERATURE,
         });

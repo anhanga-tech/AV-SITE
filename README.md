@@ -33,7 +33,7 @@ O site institucional da **Anhangá Viagens** é uma plataforma moderna e interat
 
 ## 🚀 Pré-requisitos
 
-- Node.js 18+
+- Node.js 24.x
 - pnpm (Gerenciador de pacotes)
 - Chave da API do Google Gemini no ambiente server-side
 - Opcional: Cloudflare AI Gateway autenticado para monitoramento de uso da IA
