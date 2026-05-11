@@ -1,3 +1,4 @@
 Contact: mailto:contato@anhanga.tur.br
+Canonical: https://www.anhanga.tur.br/.well-known/security.txt
 Preferred-Languages: pt, en
 Expires: 2027-05-10T00:00:00.000Z
