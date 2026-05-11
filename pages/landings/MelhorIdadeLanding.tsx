@@ -47,7 +47,6 @@ const MelhorIdadeLanding: React.FC = () => {
         serviceType="Turismo para Melhor Idade"
         areaServed="Brasil"
         keywords={['viagens 50+', 'turismo melhor idade', 'viagens seguras']}
-        aggregateRating={{ ratingValue: 4.96, reviewCount: 18 }}
       />
       <BreadcrumbSchema
         items={[

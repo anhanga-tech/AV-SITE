@@ -45,7 +45,6 @@ const LollapaloozaLanding: React.FC = () => {
         serviceType="Lista de espera para pacote de viagem de festival"
         areaServed="São Paulo e Brasil"
         keywords={['lista de espera Lollapalooza 2027', 'viagem para festival', 'hotel em São Paulo para evento']}
-        aggregateRating={{ ratingValue: 4.94, reviewCount: 8 }}
       />
       <BreadcrumbSchema
         items={[
