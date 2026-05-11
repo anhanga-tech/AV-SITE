@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import handler, { classifySubmitQuizError } from '../api/submit-quiz.ts';
+import handler, { classifySubmitQuizError } from '../api/submit-quiz';
 
 const originalFetch = global.fetch;
 
