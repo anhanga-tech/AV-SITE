@@ -61,7 +61,7 @@ test('submit-quiz should enforce rate-limit even for invalid payloads', async ()
     process.env.N8N_WEBHOOK_SECRET = 'secret';
 
     const sharedIP = '10.0.0.1';
-    const buildSharedRequest = (body: any) => new Request('http://localhost/api/submit-quiz', {
+    const buildSharedRequest = (body: unknown) => new Request('http://localhost/api/submit-quiz', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
