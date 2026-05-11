@@ -25,11 +25,19 @@ User-agent: YouBot
 User-agent: Amazonbot
 User-agent: Meta-ExternalAgent
 Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /login/
+Disallow: /register/
+Disallow: /private/
+Disallow: /staging/
+Disallow: /cdn-cgi/
+Disallow: /_next/
 
 # Training-only scrapers - No recommendation benefit, block to reduce load
+# FacebookBot excluded: responsible for Open Graph previews on Facebook/Instagram
 User-agent: CCBot
 User-agent: Bytespider
-User-agent: FacebookBot
 Disallow: /
 
 # Aggressive SEO Bots - Throttled
