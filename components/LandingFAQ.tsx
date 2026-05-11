@@ -13,14 +13,15 @@ interface LandingFAQProps {
     subtitle?: string;
 }
 
-const FAQItemComponent = memo(({ question, answer, isOpen, onClick }: FAQItem & { isOpen: boolean; onClick: () => void }) => {
+const FAQItemComponent = memo(({ question, answer, isOpen, idx, onToggle }: FAQItem & { isOpen: boolean; idx: number; onToggle: (idx: number) => void }) => {
+    const handleClick = useCallback(() => onToggle(idx), [idx, onToggle]);
     return (
         <div
             className={`border-b border-brand-cyan/10 last:border-0 transition-all duration-300 ${isOpen ? 'bg-white/40' : ''}`}
         >
             <button
                 className="w-full py-6 flex justify-between items-center text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan group"
-                onClick={onClick}
+                onClick={handleClick}
                 aria-expanded={isOpen}
             >
                 <h3 className="text-xl font-bold text-brand-dark group-hover:text-brand-cyan transition-colors pr-8">
@@ -77,7 +78,8 @@ export const LandingFAQ: React.FC<LandingFAQProps> = ({
                             key={item.question}
                             {...item}
                             isOpen={openIndex === idx}
-                            onClick={() => handleToggle(idx)}
+                            idx={idx}
+                            onToggle={handleToggle}
                         />
                     ))}
                 </div>

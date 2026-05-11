@@ -15,12 +15,18 @@ export function escapeRegExp(value: string): string {
     return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+const _aliasPatternCache = new Map<string, RegExp>();
+
 export function hasAliasMatch(text: string, alias: string): boolean {
     const normalizedAlias = normalizeText(alias);
     if (!normalizedAlias) return false;
 
-    // Match aliases as independent terms to avoid false positives like "ira" inside "emirados"
-    const pattern = new RegExp(`(?:^|[^a-z0-9])${escapeRegExp(normalizedAlias)}(?:$|[^a-z0-9])`, 'i');
+    let pattern = _aliasPatternCache.get(normalizedAlias);
+    if (!pattern) {
+        // Match aliases as independent terms to avoid false positives like "ira" inside "emirados"
+        pattern = new RegExp(`(?:^|[^a-z0-9])${escapeRegExp(normalizedAlias)}(?:$|[^a-z0-9])`, 'i');
+        _aliasPatternCache.set(normalizedAlias, pattern);
+    }
     return pattern.test(text);
 }
 
