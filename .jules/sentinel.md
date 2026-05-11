@@ -82,3 +82,8 @@ Standardized the "Zero-Trust CORS" pattern for internal APIs. Public-facing endp
 **Vulnerability:** The HubSpot webhook handler leaked specific environment variable names (e.g., 'HUBSPOT_TOKEN') in public error responses when configuration was missing. This provides attackers with internal architectural details.
 **Learning:** Error responses should never disclose the name or nature of internal configuration keys.
 **Prevention:** Standardize on generic, localized error messages for infrastructure-level failures (500/502/503).
+
+## 2026-03-27 - [Privacy-Compliant Observability & Information Disclosure Protection]
+**Vulnerability:** The quiz submission API (`api/submit-quiz.ts`) was leaking raw upstream webhook error details to clients and lacked PII masking in server-side logs. Additionally, the `destinos` field was vulnerable to stored XSS as it bypassed standard sanitization filters.
+**Learning:** Observability must not come at the cost of privacy. Centralizing PII masking utilities (Email, Phone, Name) ensures consistent protection across all ingestion endpoints. Generic error messages prevent attackers from mapping internal infrastructure via leaked webhook responses.
+**Prevention:** Use `maskEmail`, `maskPhone`, and `maskName` from `lib/lead-logic.ts` in all structured logs. Always return sanitized, generic error codes/messages to the frontend, keeping technical details strictly for server-side logs.

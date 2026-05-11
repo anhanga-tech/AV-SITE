@@ -1,7 +1,7 @@
 import type { SubmitQuizRequest, SubmitQuizResponse } from '../types/quiz';
 import { buildCorsHeaders, createRequestId, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
-import { cleanString } from '../lib/lead-logic';
+import { cleanString, maskEmail, maskName, maskPhone } from '../lib/lead-logic';
 import { buildN8nQuizPayload } from '../lib/n8n-payloads';
 import { validateQuizPayload } from '../lib/quiz-logic';
 import { sendQuizToN8n } from '../services/n8n';
@@ -18,6 +18,33 @@ interface SubmitQuizConfig {
     webhookSecret: string;
 }
 
+type QuizLogLevel = 'info' | 'warn' | 'error';
+
+function truncateDetail(detail: string): string | undefined {
+    const normalized = detail.replace(/[\r\n]+/g, ' ').trim();
+    return normalized ? normalized.substring(0, 600) : undefined;
+}
+
+function emitQuizLog(level: QuizLogLevel, requestId: string, stage: string, details: Record<string, unknown> = {}): void {
+    const payload = {
+        requestId,
+        stage,
+        ...details,
+    };
+
+    if (level === 'warn') {
+        console.warn('SUBMIT_QUIZ', payload);
+        return;
+    }
+
+    if (level === 'error') {
+        console.error('SUBMIT_QUIZ', payload);
+        return;
+    }
+
+    console.log('SUBMIT_QUIZ', payload);
+}
+
 function buildJsonResponse(body: SubmitQuizResponse, status: number, corsHeaders: Record<string, string>): Response {
     return new Response(JSON.stringify(body), {
         status,
@@ -30,8 +57,8 @@ function buildJsonResponse(body: SubmitQuizResponse, status: number, corsHeaders
 }
 
 function getSubmitQuizConfig(): SubmitQuizConfig | null {
-    const webhookUrl = cleanString(process.env.N8N_SUBMIT_QUIZ_WEBHOOK_URL);
-    const webhookSecret = cleanString(process.env.N8N_WEBHOOK_SECRET);
+    const webhookUrl = process.env.N8N_SUBMIT_QUIZ_WEBHOOK_URL?.trim();
+    const webhookSecret = process.env.N8N_WEBHOOK_SECRET?.trim();
 
     if (!webhookUrl || !webhookSecret) {
         return null;
@@ -40,21 +67,23 @@ function getSubmitQuizConfig(): SubmitQuizConfig | null {
     return { webhookUrl, webhookSecret };
 }
 
-function classifySubmitQuizError(error: unknown): {
+export function classifySubmitQuizError(error: unknown): {
     code: 'N8N_WEBHOOK_ERROR' | 'INTERNAL_ERROR';
     status: number;
     error: string;
+    detail?: string;
 } {
     const message = error instanceof Error ? error.message : String(error);
     const match = message.match(/^N8N_WEBHOOK_ERROR:(\d+):(.*)$/s);
 
     if (match) {
         const httpStatus = Number.parseInt(match[1], 10);
-        const detail = match[2]?.trim().slice(0, 200) || 'Erro no webhook';
+        const detail = truncateDetail(match[2] || '');
         return {
             code: 'N8N_WEBHOOK_ERROR',
             status: httpStatus >= 400 && httpStatus < 600 ? httpStatus : 502,
-            error: detail,
+            error: 'Erro ao processar quiz.',
+            detail,
         };
     }
 
@@ -83,6 +112,7 @@ export default async function handler(request: Request): Promise<Response> {
 
     const config = getSubmitQuizConfig();
     if (!config) {
+        emitQuizLog('error', requestId, 'config', { code: 'SERVER_CONFIG_ERROR' });
         return buildJsonResponse(
             { ok: false, requestId, error: 'Serviço de quiz temporariamente indisponível.', code: 'SERVER_CONFIG_ERROR' },
             503,
@@ -94,23 +124,32 @@ export default async function handler(request: Request): Promise<Response> {
     const rateLimitResult = await checkRateLimit(clientIp, {
         limit: RATE_LIMIT_MAX_REQUESTS,
         windowMs: RATE_LIMIT_WINDOW_MS,
-        prefix: 'quiz',
+        prefix: 'ratelimit:submit-quiz',
     });
 
     if (!rateLimitResult.allowed) {
         const retryAfterSec = Math.ceil(rateLimitResult.resetIn / 1000);
-        return new Response(
-            JSON.stringify({ ok: false, requestId, error: 'Muitas tentativas. Aguarde um momento.', code: 'RATE_LIMIT_EXCEEDED' }),
+        emitQuizLog('warn', requestId, 'rate_limited', {
+            clientIp,
+            remaining: rateLimitResult.remaining,
+            retryAfterSeconds: retryAfterSec,
+        });
+
+        return buildJsonResponse(
             {
-                status: 429,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Request-Id': requestId,
-                    'Retry-After': String(retryAfterSec),
-                    'X-RateLimit-Remaining': '0',
-                    'X-RateLimit-Reset': String(Math.ceil((Date.now() + rateLimitResult.resetIn) / 1000)),
-                    ...corsHeaders,
-                },
+                ok: false,
+                requestId,
+                error: 'Muitas tentativas. Aguarde um momento.',
+                code: 'RATE_LIMIT_EXCEEDED',
+                // @ts-expect-error - retryAfter is used by discovery schemas but not in strict response type
+                retryAfter: retryAfterSec,
+            },
+            429,
+            {
+                ...corsHeaders,
+                'Retry-After': String(retryAfterSec),
+                'X-RateLimit-Remaining': '0',
+                'X-RateLimit-Reset': String(Math.ceil((Date.now() + rateLimitResult.resetIn) / 1000)),
             },
         );
     }
@@ -138,8 +177,16 @@ export default async function handler(request: Request): Promise<Response> {
     const payload: SubmitQuizRequest = validation.data;
     const n8nPayload = buildN8nQuizPayload(payload, requestId);
 
+    emitQuizLog('info', requestId, 'payload_validated', {
+        maskedEmail: maskEmail(payload.email),
+        profile: payload.profileKey,
+        destinosCount: payload.destinos?.length ?? 0,
+    });
+
     try {
         await sendQuizToN8n(config.webhookUrl, config.webhookSecret, requestId, n8nPayload);
+
+        emitQuizLog('info', requestId, 'done');
 
         return buildJsonResponse(
             { ok: true, requestId, message: 'Perfil registrado com sucesso.' },
@@ -148,6 +195,19 @@ export default async function handler(request: Request): Promise<Response> {
         );
     } catch (error: unknown) {
         const classified = classifySubmitQuizError(error);
+
+        emitQuizLog('error', requestId, classified.code === 'N8N_WEBHOOK_ERROR' ? 'n8n_webhook_failed' : 'unexpected', {
+            code: classified.code,
+            status: classified.status,
+            detail: classified.detail,
+            recoveredQuiz: {
+                maskedEmail: maskEmail(payload.email),
+                maskedPhone: payload.whatsapp ? maskPhone(payload.whatsapp) : undefined,
+                maskedFirstName: maskName(payload.firstName),
+                profile: payload.profileKey,
+            },
+        });
+
         return buildJsonResponse(
             { ok: false, requestId, error: classified.error, code: classified.code },
             classified.status,

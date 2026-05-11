@@ -1,4 +1,4 @@
-import { normalizeNullable, normalizeTracking, normalizeUtms, normalizeWhatsappNumber } from './lead-logic';
+import { cleanString, normalizeNullable, normalizeTracking, normalizeUtms, normalizeWhatsappNumber } from './lead-logic';
 import type { SubmitQuizRequest } from '../types/quiz';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -33,8 +33,8 @@ export function validateQuizPayload(
         ? raw.destinos
             .flatMap((d): string[] => {
                 if (typeof d !== 'string') return [];
-                const trimmed = d.trim().slice(0, 50);
-                return trimmed ? [trimmed] : [];
+                const cleaned = cleanString(d.slice(0, 50));
+                return cleaned ? [cleaned] : [];
             })
             .slice(0, 10)
         : [];

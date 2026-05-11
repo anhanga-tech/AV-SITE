@@ -87,3 +87,16 @@ test('buildN8nQuizPayload — inclui lastName no payload do n8n', () => {
     const n8n = buildN8nQuizPayload(payload, 'req-789');
     assert.equal(n8n.quiz.lastName, 'Silva');
 });
+
+test('validateQuizPayload — sanitiza destinos contra XSS', () => {
+    const payload = {
+        ...BASE_PAYLOAD,
+        destinos: ['<script>alert("xss")</script>', 'Orlando <img src=x onerror=alert(1)>'],
+    };
+    const result = validateQuizPayload(payload);
+    assert.ok(result.valid);
+    assert.deepEqual(result.data.destinos, [
+        '&lt;script&gt;alert("xss")&lt;/script&gt;',
+        'Orlando &lt;img src=x onerror=alert(1)&gt;',
+    ]);
+});
