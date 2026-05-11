@@ -1,25 +1,29 @@
 # 🚀 Guia de Deploy - Anhangá Viagens
 
-## ⚠️ Importante: Segurança da API Key
+## Segurança da API Key
 
-**ATENÇÃO:** Este projeto usa a chave da API do Gemini diretamente no cliente. Isso significa que a chave será exposta no código JavaScript após o build.
+O chat usa `/api/generate` como proxy server-side. A chave `GEMINI_API_KEY` deve ficar somente nas variáveis de ambiente da plataforma de deploy e não deve ser exposta com prefixo `VITE_`.
 
-### Opções de Segurança:
+### Cloudflare AI Gateway
 
-1. **Usar restrições de domínio na API Key do Google:**
-   - Configure restrições de HTTP referrer na Google Cloud Console
-   - Limite a chave apenas ao seu domínio de produção
+O Cloudflare AI Gateway é opcional e controlado por feature flag. Use esta rota para monitorar requests, tokens, erros e custo antes de qualquer migração futura para outro provedor/modelo.
 
-2. **Criar um backend proxy (Recomendado para produção):**
-   - Crie uma API backend que faça as chamadas ao Gemini
-   - Mantenha a chave da API apenas no servidor
-   - O frontend chama sua API, que por sua vez chama o Gemini
+1. Crie ou selecione um AI Gateway no painel da Cloudflare.
+2. Habilite Authenticated Gateway.
+3. Gere um token com permissão `Run` e salve-o com segurança.
+4. Configure as variáveis server-side:
+   - `AI_GATEWAY_ENABLED=true`
+   - `CLOUDFLARE_ACCOUNT_ID`
+   - `CLOUDFLARE_AI_GATEWAY_ID` (opcional; default: `default`)
+   - `CLOUDFLARE_AI_GATEWAY_TOKEN`
+5. Mantenha `GEMINI_API_KEY` configurada; nesta fase ela ainda é enviada pelo servidor ao endpoint nativo Google AI Studio via Gateway.
 
 ## 📋 Checklist de Deploy
 
 ### Antes do Deploy:
 
 - [ ] Configure a variável `GEMINI_API_KEY` na plataforma de deploy
+- [ ] Se usar AI Gateway, configure `AI_GATEWAY_ENABLED=true`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_AI_GATEWAY_ID` e `CLOUDFLARE_AI_GATEWAY_TOKEN`
 - [ ] Teste o build localmente: `pnpm build && pnpm preview`
 - [ ] Verifique se todas as rotas funcionam corretamente
 - [ ] Teste o chat AI com a chave de produção
@@ -29,8 +33,8 @@
 
 - [ ] Build command: `pnpm build`
 - [ ] Output directory: `dist`
-- [ ] Node version: 18+ (se necessário)
-- [ ] Environment variables: `GEMINI_API_KEY`
+- [ ] Node version: 24.x
+- [ ] Environment variables: `GEMINI_API_KEY` e, se habilitado, variáveis `CLOUDFLARE_*`
 
 ### Após o Deploy:
 
@@ -53,6 +57,7 @@ vercel --prod
 
 **Variáveis de Ambiente:**
 - Adicione `GEMINI_API_KEY` em: Project Settings → Environment Variables
+- Para observabilidade via Cloudflare, adicione `AI_GATEWAY_ENABLED=true`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_AI_GATEWAY_ID` e `CLOUDFLARE_AI_GATEWAY_TOKEN`
 
 ### Netlify
 
@@ -71,7 +76,7 @@ netlify deploy --prod
   publish = "dist"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "24"
 ```
 
 ### GitHub Pages
@@ -92,12 +97,12 @@ pnpm install --save-dev gh-pages
    - Se o repositório for `username.github.io/repo-name`, crie um arquivo `.env.production`:
    ```env
    VITE_BASE_PATH=/repo-name/
-   GEMINI_API_KEY=sua_chave_aqui
+   # Configure GEMINI_API_KEY na plataforma server-side; nao exponha no build estatico.
    ```
    - Se for `username.github.io` (sem subdiretório), use:
    ```env
    VITE_BASE_PATH=/
-   GEMINI_API_KEY=sua_chave_aqui
+   # Configure GEMINI_API_KEY na plataforma server-side; nao exponha no build estatico.
    ```
 
 4. Deploy:
@@ -113,12 +118,13 @@ pnpm deploy
 
 - Verifique se todas as dependências estão instaladas: `pnpm install`
 - Verifique se a variável `GEMINI_API_KEY` está configurada
+- Se `AI_GATEWAY_ENABLED=true`, verifique se as variáveis `CLOUDFLARE_*` estão configuradas
 - Limpe o cache: `rm -rf node_modules dist && pnpm install`
 
 ### Chat AI não funciona em produção
 
 - Verifique se `GEMINI_API_KEY` está configurada corretamente
-- Verifique as restrições de domínio na API Key
+- Se usar AI Gateway, confirme que o Gateway autenticado está ativo e que o token tem permissão `Run`
 - Verifique o console do navegador para erros
 
 ### Rotas não funcionam

@@ -180,8 +180,7 @@ export default defineConfig(({ mode, isSsrBuild }) => {
   const env = loadEnv(mode, '.', '');
 
   // Também verificar process.env diretamente (importante para Vercel/Netlify)
-  // Isso garante que variáveis de ambiente do sistema sejam capturadas
-  const geminiApiKey = env.GEMINI_API_KEY || process.env.GEMINI_API_KEY || '';
+  // Isso garante que variáveis públicas/configuracionais sejam capturadas sem expor secrets no bundle
   const geminiModel = env.GEMINI_MODEL || process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
 
   // Base path: '/' para Netlify/Vercel, ou '/repo-name/' para GitHub Pages

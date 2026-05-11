@@ -6,7 +6,11 @@ import { checkRateLimit } from '../lib/rate-limit';
 import { buildCorsHeaders, getClientIP } from '../lib/network';
 import { budgetTool } from '../lib/ai/tools';
 import { SYSTEM_INSTRUCTION } from '../lib/ai/prompt';
-import { DEFAULT_GEMINI_MODEL } from '../lib/ai/constants';
+import {
+    buildGeminiClientOptions,
+    resolveGeminiProviderConfig,
+    type GeminiProviderConfig,
+} from '../lib/ai/gemini-config';
 import { buildGenerateHandoff, type GenerateHandoff } from '../lib/ai/handoff';
 import type { BudgetToolArgs } from '../lib/ai/types';
 import {
@@ -96,8 +100,12 @@ interface BuildGenerateSuccessOptions {
     apiKey: string;
     modelName: string;
     contents: unknown[];
+    clientOptions?: GeminiClientOptions;
     repairModelResponse?: (repairContents: unknown[]) => Promise<ModelResponseShape>;
 }
+
+type ResolvedGeminiProviderConfig = Exclude<GeminiProviderConfig, { ok: false }>;
+type GeminiClientOptions = ReturnType<typeof buildGeminiClientOptions>;
 
 function buildJsonResponse(
     body: unknown,
@@ -190,28 +198,26 @@ async function getRateLimitState(
     });
 }
 
-function logEnvironmentStatus(apiKey: string | undefined): void {
-    console.log('[Edge Function] Environment check:');
-    console.log('- GEMINI_API_KEY present:', !!apiKey);
-    console.log('- GEMINI_MODEL:', process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite (default)');
-    console.log('- ALLOWED_ORIGIN:', process.env.ALLOWED_ORIGIN || '*');
-}
+function buildConfigErrorResponse(
+    config: Extract<GeminiProviderConfig, { ok: false }>,
+    corsHeaders: Record<string, string>,
+): Response {
+    console.error('SERVER: Gemini provider configuration is incomplete', {
+        missing: config.missing,
+    });
 
-function getConfiguredApiKey(corsHeaders: Record<string, string>): string | Response {
-    const apiKey = process.env.GEMINI_API_KEY;
-    logEnvironmentStatus(apiKey);
-
-    if (apiKey) {
-        console.log('SERVER: GEMINI_API_KEY is configured');
-        return apiKey;
-    }
-
-    console.error('SERVER: GEMINI_API_KEY not found in environment variables');
-    console.error('SERVER: Available GEMINI_* keys:', Object.keys(process.env).filter(k => k.includes('GEMINI')));
     return buildJsonResponse({
         code: 'SERVER_CONFIG_ERROR',
         error: 'Erro interno de configuração'
     }, 500, corsHeaders);
+}
+
+function logProviderStatus(config: ResolvedGeminiProviderConfig): void {
+    console.log('SERVER: Gemini provider configured', {
+        modelName: config.modelName,
+        useGateway: config.useGateway,
+        gatewayId: config.useGateway ? config.gatewayId : undefined,
+    });
 }
 
 async function parseGenerateContents(
@@ -242,13 +248,13 @@ async function parseGenerateContents(
 }
 
 async function requestModelResponse(
-    apiKey: string,
+    clientOptions: GeminiClientOptions,
     modelName: string,
     contents: unknown[],
     options: RequestModelResponseOptions = {},
 ): Promise<ModelResponseShape> {
     const { GoogleGenAI } = await import("@google/genai");
-    const ai = new GoogleGenAI({ apiKey });
+    const ai = new GoogleGenAI(clientOptions);
 
     return await ai.models.generateContent({
         model: modelName,
@@ -301,6 +307,14 @@ function buildHandoffRepairPrompt(originalText: string): string {
         'Resposta inválida anterior:',
         originalText,
     ].join('\n');
+}
+
+function getRepairClientOptions(options: BuildGenerateSuccessOptions): GeminiClientOptions {
+    if (!options.clientOptions) {
+        throw new Error('Gemini client options are required to repair textual handoff');
+    }
+
+    return options.clientOptions;
 }
 
 function extractModelOutput(
@@ -430,7 +444,7 @@ async function repairTextualHandoff(
 
     const repairResponse = options.repairModelResponse
         ? await options.repairModelResponse(repairContents)
-        : await requestModelResponse(options.apiKey, options.modelName, repairContents, {
+        : await requestModelResponse(getRepairClientOptions(options), options.modelName, repairContents, {
             systemInstruction: HANDOFF_REPAIR_SYSTEM_INSTRUCTION,
             temperature: HANDOFF_REPAIR_TEMPERATURE,
         });
@@ -549,18 +563,23 @@ export default async function handler(request: Request) {
         const rateLimitState = await getRateLimitState(request, corsHeaders);
         if (rateLimitState instanceof Response) return rateLimitState;
 
-        const apiKey = getConfiguredApiKey(corsHeaders);
-        if (apiKey instanceof Response) return apiKey;
+        const providerConfig = resolveGeminiProviderConfig();
+        if (providerConfig.ok === false) {
+            return buildConfigErrorResponse(providerConfig, corsHeaders);
+        }
+
+        logProviderStatus(providerConfig);
 
         const contents = await parseGenerateContents(request, corsHeaders);
         if (contents instanceof Response) return contents;
 
-        const modelName = process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
-        const response = await requestModelResponse(apiKey, modelName, contents);
+        const clientOptions = buildGeminiClientOptions(providerConfig);
+        const response = await requestModelResponse(clientOptions, providerConfig.modelName, contents);
         const successBody = await buildGenerateSuccessBody(response, {
-            apiKey,
-            modelName,
+            apiKey: providerConfig.apiKey,
+            modelName: providerConfig.modelName,
             contents,
+            clientOptions,
         });
 
         return buildJsonResponse(
