@@ -9,7 +9,7 @@ import {
   ShieldCheck,
   ArrowRight,
 } from '@phosphor-icons/react';
-import { openAiChat } from '../utils/aiChat';
+import { openContactModal } from '../utils/contactForm';
 
 const fadeUp = {
     hidden: { opacity: 0, y: 32 },
@@ -132,9 +132,7 @@ const Highlights = memo(() => {
                             <button
                                 onClick={(e) => {
                                     e.preventDefault();
-                                    openAiChat({
-                                        message: 'Olá! Quero conhecer a experiência Anhangá.'
-                                    });
+                                    openContactModal({ source: 'highlights' });
                                 }}
                                 className="flex items-center justify-center gap-3 w-full bg-brand-dark text-white px-6 py-4 rounded-xl font-bold transition-all duration-300 ease-spring shadow-[4px_4px_0px_#94a3b8] hover:shadow-[2px_2px_0px_#94a3b8] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
                             >
