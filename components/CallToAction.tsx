@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, memo } from 'react';
 import {
     ChatCentered,
     AirplaneTilt,
@@ -13,7 +13,14 @@ import { getWhatsAppLink } from '../utils/whatsapp';
 
 type FormState = 'closed' | 'open' | 'submitted';
 
-const CallToAction: React.FC = () => {
+/**
+ * CallToAction Component - Optimized with React.memo
+ *
+ * PERFORMANCE WIN: Prevents unnecessary re-renders when the Home page state changes.
+ * This component contains complex SVG logic (barcode) and form states that
+ * don't need to be reconciled during parent lifecycle updates.
+ */
+const CallToAction: React.FC = memo(() => {
     const { submitLead, isSubmitting, error } = useLeadCapture();
     const [formState, setFormState] = useState<FormState>('closed');
     const [name, setName] = useState('');
@@ -318,6 +325,8 @@ const CallToAction: React.FC = () => {
             </div>
         </section>
     );
-};
+});
+
+CallToAction.displayName = 'CallToAction';
 
 export default CallToAction;
