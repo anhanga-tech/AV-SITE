@@ -5,17 +5,13 @@ import { LandingFAQ } from '@/components/LandingFAQ';
 import { BreadcrumbSchema } from '@/components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '@/components/schemas/FAQPageSchema';
 import { ServiceSchema } from '@/components/schemas/ServiceSchema';
-import { useWhatsAppLink } from '@/utils/whatsapp';
-import { pushWhatsAppCta } from '@/utils/analytics';
+import { openContactModal } from '@/utils/contactForm';
 import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left';
 import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import Compass from 'lucide-react/dist/esm/icons/compass';
 import LayoutGrid from 'lucide-react/dist/esm/icons/layout-grid';
 import CalendarCheck from 'lucide-react/dist/esm/icons/calendar-check';
 import CheckCircle from 'lucide-react/dist/esm/icons/check-circle';
-
-const WHATSAPP_MESSAGE = 'Olá! Quero ajuda para escolher o cruzeiro certo no Brasil.';
-const PAGE_NAME = 'curadoria-cruzeiros-brasil';
 
 const FAQ_ITEMS = [
   {
@@ -96,8 +92,6 @@ const HOW_IT_WORKS = [
 ];
 
 const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
-  const whatsappUrl = useWhatsAppLink(WHATSAPP_MESSAGE, { appendTrackingRef: true });
-
   return (
     <div className="bg-anhanga-light min-h-screen font-sans">
       <SEO
@@ -138,15 +132,13 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
               Anhangá Viagens
             </span>
           </Link>
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => pushWhatsAppCta(PAGE_NAME)}
+          <button
+            type="button"
+            onClick={() => openContactModal({ source: 'cruzeiros-brasil' })}
             className="btn-whatsapp btn-specialist text-xs font-bold bg-anhanga-blue text-white px-4 py-2 rounded-xl hover:bg-anhanga-darkBlue transition-colors whitespace-nowrap"
           >
             Falar com especialista
-          </a>
+          </button>
         </div>
       </header>
 
@@ -162,17 +154,15 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
           <p className="text-xl text-gray-600 mb-10 leading-relaxed max-w-2xl">
             Entenda navio, cabine, roteiro, datas e perfil da viagem com uma curadoria consultiva da Anhangá.
           </p>
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => pushWhatsAppCta(PAGE_NAME)}
+          <button
+            type="button"
+            onClick={() => openContactModal({ source: 'cruzeiros-brasil' })}
             className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-anhanga-blue text-white font-bold px-8 py-4 rounded-2xl hover:bg-anhanga-darkBlue transition-colors text-lg shadow-lg"
-            aria-label="Falar com um especialista em cruzeiros via WhatsApp"
+            aria-label="Falar com um especialista em cruzeiros"
           >
             Falar com um especialista
             <ArrowRight className="w-5 h-5" />
-          </a>
+          </button>
           <p className="mt-4 text-sm text-gray-600">Sem taxa de curadoria. Gratuito.</p>
         </div>
       </section>
@@ -312,17 +302,15 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
           <p className="text-blue-100 text-lg mb-10 max-w-xl mx-auto">
             Fale com um especialista e resolva a escolha em uma conversa. Sem taxa, sem compromisso.
           </p>
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => pushWhatsAppCta(PAGE_NAME)}
+          <button
+            type="button"
+            onClick={() => openContactModal({ source: 'cruzeiros-brasil' })}
             className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-anhanga-yellow text-anhanga-dark font-black px-10 py-5 rounded-2xl hover:bg-anhanga-yellowHover transition-colors text-xl shadow-lg"
-            aria-label="Falar com um especialista em cruzeiros via WhatsApp"
+            aria-label="Falar com um especialista em cruzeiros"
           >
             Falar com um especialista
             <ArrowRight className="w-6 h-6" />
-          </a>
+          </button>
         </div>
       </section>
 

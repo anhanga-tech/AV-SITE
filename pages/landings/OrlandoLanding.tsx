@@ -1,13 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { getWhatsAppLink } from '../../utils/whatsapp';
 import { SEO } from '../../components/SEO';
 import { LandingFAQ } from '../../components/LandingFAQ';
 import OrlandoApp from '../../components/landings/orlando/OrlandoApp';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../../components/schemas/FAQPageSchema';
 import { ServiceSchema } from '../../components/schemas/ServiceSchema';
-import { openAiChat } from '../../utils/aiChat';
+import { openContactModal } from '../../utils/contactForm';
 import './orlando.css';
 
 const ORLANDO_FAQ_ITEMS = [
@@ -95,9 +94,7 @@ const OrlandoLanding: React.FC = () => {
             <button
               onClick={(e) => {
                 e.preventDefault();
-                openAiChat({
-                  message: 'Olá! Gostaria de um orçamento personalizado para Orlando.'
-                });
+                openContactModal({ source: 'orlando' });
               }}
               className="btn-whatsapp btn-specialist px-5 py-3 rounded-full bg-brand-cyan text-white font-bold hover:bg-brand-cyan/90 transition-colors"
               data-tracking="footer-orlando"

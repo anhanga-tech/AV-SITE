@@ -8,13 +8,10 @@ import { Link } from "react-router-dom";
 import { getMediaUrl, optimizeRemoteImageUrl } from "../../../data/mediaConfig";
 import { useFooterRuntimeMetadata } from "../../../lib/footer-runtime";
 import { BRAND_LOGO_BLUE_URL } from "../../../lib/media-assets";
-import { getWhatsAppLink } from "../../../utils/whatsapp";
-import { openAiChat } from "../../../utils/aiChat";
+import { openContactModal } from "../../../utils/contactForm";
 
 // --- Constants ---
 const SITE_URL = "https://www.anhanga.tur.br";
-const WHATSAPP_MESSAGE =
-  "Olá! Gostaria de saber mais sobre os pacotes para Orlando.";
 const LOGO_URL = BRAND_LOGO_BLUE_URL;
 
 // --- Components ---
@@ -150,7 +147,7 @@ function OrlandoApp() {
             <button
               onClick={(e) => {
                 e.preventDefault();
-                openAiChat({ message: WHATSAPP_MESSAGE });
+                openContactModal({ source: 'orlando', destination: 'Orlando' });
               }}
               className="btn-whatsapp btn-specialist main-btn"
               data-tracking="hero-orlando"
@@ -701,9 +698,7 @@ function OrlandoApp() {
           <button
             onClick={(e) => {
               e.preventDefault();
-              openAiChat({
-                message: "Olá! Gostaria de ver os pacotes para Orlando.",
-              });
+              openContactModal({ source: 'orlando', destination: 'Orlando' });
             }}
             className="btn-whatsapp btn-specialist main-btn secondary"
             data-tracking="mid-orlando"
@@ -771,10 +766,7 @@ function OrlandoApp() {
             <button
               onClick={(e) => {
                 e.preventDefault();
-                openAiChat({
-                  message:
-                    "Olá! Gostaria de um roteiro personalizado para Orlando baseado na sugestão de 7 dias.",
-                });
+                openContactModal({ source: 'orlando', destination: 'Orlando' });
               }}
               className="btn-whatsapp btn-specialist main-btn"
               data-tracking="itinerary-orlando"
@@ -820,7 +812,7 @@ function OrlandoApp() {
               <button
                 onClick={(e) => {
                   e.preventDefault();
-                  openAiChat({ message: WHATSAPP_MESSAGE });
+                  openContactModal({ source: 'orlando', destination: 'Orlando' });
                 }}
                 className="btn-whatsapp btn-specialist"
                 data-tracking="footer-whatsapp-orlando"
