@@ -1,4 +1,5 @@
 import type { SubmitLeadRequest } from '../types/leadCapture';
+import type { SubmitContactRequest } from '../types/contactCapture';
 import type { SubmitWaitlistRequest } from '../types/waitlist';
 import type { SubmitQuizRequest } from '../types/quiz';
 
@@ -50,6 +51,25 @@ export interface N8nWaitlistPayload {
     };
     utms: SubmitWaitlistRequest['utms'];
     tracking: SubmitWaitlistRequest['tracking'];
+    meta: {
+        receivedAt: string;
+    };
+}
+
+export interface N8nContactPayload {
+    requestId: string;
+    source: 'submit-contact';
+    contact: {
+        firstName: string;
+        lastName: string | null;
+        whatsapp: string;
+        email: string | null;
+        emailOptIn: boolean;
+        eventId: string | null;
+        ctaSource: string | null;
+        destination: string | null;
+    };
+    tracking: N8nLeadTracking;
     meta: {
         receivedAt: string;
     };
@@ -111,6 +131,46 @@ export function buildN8nLeadPayload(payload: SubmitLeadRequest, requestId: strin
         },
         utms: payload.utms,
         tracking: buildLeadTracking(payload),
+        meta: {
+            receivedAt: new Date().toISOString(),
+        },
+    };
+}
+
+export function buildN8nContactPayload(payload: SubmitContactRequest, requestId: string): N8nContactPayload {
+    const tracking: N8nLeadTracking = {
+        utm_source: payload.tracking?.utm_source ?? payload.utms.utm_source,
+        utm_medium: payload.tracking?.utm_medium ?? payload.utms.utm_medium,
+        utm_campaign: payload.tracking?.utm_campaign ?? payload.utms.utm_campaign,
+        utm_term: payload.tracking?.utm_term ?? payload.utms.utm_term,
+        utm_content: payload.tracking?.utm_content ?? payload.utms.utm_content,
+        cid: toNullableTrackingValue(payload.tracking?.cid),
+        sid: toNullableTrackingValue(payload.tracking?.sid),
+        gclid: toNullableTrackingValue(payload.tracking?.gclid),
+        fbclid: toNullableTrackingValue(payload.tracking?.fbclid),
+        msclkid: toNullableTrackingValue(payload.tracking?.msclkid),
+        ttclid: toNullableTrackingValue(payload.tracking?.ttclid),
+        wbraid: toNullableTrackingValue(payload.tracking?.wbraid),
+        gbraid: toNullableTrackingValue(payload.tracking?.gbraid),
+        fbc: toNullableTrackingValue(payload.tracking?.fbc),
+        fbp: toNullableTrackingValue(payload.tracking?.fbp),
+        extras: payload.tracking?.extras ?? {},
+    };
+
+    return {
+        requestId,
+        source: 'submit-contact',
+        contact: {
+            firstName: payload.firstName,
+            lastName: payload.lastName ?? null,
+            whatsapp: payload.whatsapp,
+            email: payload.email ?? null,
+            emailOptIn: payload.emailOptIn,
+            eventId: payload.eventId ?? null,
+            ctaSource: payload.source ?? null,
+            destination: payload.destination ?? null,
+        },
+        tracking,
         meta: {
             receivedAt: new Date().toISOString(),
         },
