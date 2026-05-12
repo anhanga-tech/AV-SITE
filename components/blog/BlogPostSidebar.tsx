@@ -4,7 +4,7 @@ import { PostMeta } from '../../lib/mdx';
 import { getBlogPostUrl } from '../../utils/blog';
 import { optimizeRemoteImageUrl } from '../../data/mediaConfig';
 import { getCategoryColor } from '../../utils/categoryColors';
-import { openAiChat } from '../../utils/aiChat';
+import { openContactModal } from '../../utils/contactForm';
 
 interface BlogPostSidebarProps {
     author: {
@@ -39,9 +39,7 @@ export const BlogPostSidebar: React.FC<BlogPostSidebarProps> = ({ author, author
                 <button
                     onClick={(e) => {
                         e.preventDefault();
-                        openAiChat({
-                            message: `Olá! Gostaria de falar com o especialista ${author?.name || authorFallbackName} sobre viagens.`
-                        });
+                        openContactModal({ source: 'blog-sidebar' });
                     }}
                     className="btn-whatsapp btn-specialist block w-full py-4 bg-white border-2 border-brand-dark text-brand-dark font-black tracking-wide text-sm uppercase rounded-xl hover:bg-brand-dark hover:text-white transition-colors shadow-[4px_4px_0px_#0f172a] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] text-center"
                     data-tracking="sidebar-blog-post"
