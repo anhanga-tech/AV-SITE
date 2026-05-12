@@ -1,6 +1,6 @@
 import React from 'react';
 import { MessageCircle } from 'lucide-react';
-import { openAiChat } from '../../../utils/aiChat';
+import { openContactModal } from '../../../utils/contactForm';
 
 interface ButtonProps {
   text: string;
@@ -53,7 +53,7 @@ const Button: React.FC<ButtonProps> = ({ text, className = '', variant = 'primar
     <button
       onClick={(e) => {
         e.preventDefault();
-        openAiChat();
+        openContactModal({ source: 'lollapalooza' });
       }}
       {...sharedProps}
     >
