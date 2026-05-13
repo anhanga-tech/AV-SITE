@@ -76,9 +76,9 @@ test.describe('Destructive & Security Suite', () => {
 
     await page.getByRole('button', { name: 'Salvar e abrir WhatsApp' }).click();
 
-    await expect.poll(() => submitPayload, { timeout: 15000 }).not.toBeNull();
+    await expect.poll(() => submitPayload !== null, { timeout: 15000 }).toBeTruthy();
     // Verified: Now frontend also sanitizes before sending to API
-    expect(submitPayload.firstName).toBe('&lt;script&gt;console.log("pwned")&lt;/script&gt;');
+    expect((submitPayload as unknown as SubmitLeadRequest).firstName).toBe('&lt;script&gt;console.log("pwned")&lt;/script&gt;');
   });
 
   test('should prevent multiple lead submissions on rage clicking', async ({ page }) => {
@@ -190,9 +190,9 @@ test.describe('Destructive & Security Suite', () => {
 
     await landing.submit();
 
-    await expect.poll(() => submitPayload, { timeout: 15000 }).not.toBeNull();
+    await expect.poll(() => submitPayload !== null, { timeout: 15000 }).toBeTruthy();
     // Verify frontend sanitization
-    expect(submitPayload?.firstName).toBe('&lt;img src=x onerror=alert(1)&gt;');
+    expect((submitPayload as unknown as SubmitLeadRequest).firstName).toBe('&lt;img src=x onerror=alert(1)&gt;');
   });
 
   test('should prevent multiple submissions on Brazil Promotion Day form via rage clicking', async ({ page }) => {

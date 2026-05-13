@@ -30,7 +30,7 @@ const originalSessionStorage = globalThis.sessionStorage;
 
 function restoreBrowserGlobals() {
     if (originalWindow === undefined) {
-        delete (globalThis as typeof globalThis & { window?: typeof globalThis.window }).window;
+        delete (globalThis as { window?: typeof globalThis.window }).window;
     } else {
         Object.defineProperty(globalThis, 'window', {
             configurable: true,
@@ -39,7 +39,7 @@ function restoreBrowserGlobals() {
     }
 
     if (originalDocument === undefined) {
-        delete (globalThis as typeof globalThis & { document?: typeof globalThis.document }).document;
+        delete (globalThis as { document?: typeof globalThis.document }).document;
     } else {
         Object.defineProperty(globalThis, 'document', {
             configurable: true,
@@ -48,7 +48,7 @@ function restoreBrowserGlobals() {
     }
 
     if (originalSessionStorage === undefined) {
-        delete (globalThis as typeof globalThis & { sessionStorage?: typeof globalThis.sessionStorage }).sessionStorage;
+        delete (globalThis as { sessionStorage?: typeof globalThis.sessionStorage }).sessionStorage;
     } else {
         Object.defineProperty(globalThis, 'sessionStorage', {
             configurable: true,

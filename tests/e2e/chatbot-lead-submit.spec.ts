@@ -104,21 +104,21 @@ test.describe('Chatbot lead handoff', () => {
     expect(decodeURIComponent(openedUrl)).toContain('gclid=test-gclid');
     expect(decodeURIComponent(openedUrl)).not.toContain('+5511988314487');
 
-    expect(submitPayload).not.toBeNull();
-    expect(submitPayload?.firstName).toBe('Felipe');
-    expect(submitPayload?.lastName).toBe('William');
-    expect(submitPayload?.email).toBe('felipe@example.com');
-    expect(submitPayload?.whatsapp).toBe('+5511988314487');
-    expect(submitPayload?.destination).toBe('Orlando, Flórida');
-    expect(submitPayload?.utms).toMatchObject({
+    const payload = submitPayload as unknown as Record<string, unknown>;
+    expect(payload.firstName).toBe('Felipe');
+    expect(payload.lastName).toBe('William');
+    expect(payload.email).toBe('felipe@example.com');
+    expect(payload.whatsapp).toBe('+5511988314487');
+    expect(payload.destination).toBe('Orlando, Flórida');
+    expect(payload.utms).toMatchObject({
       utm_source: 'google',
       utm_medium: 'cpc',
     });
-    expect(submitPayload?.tracking).toMatchObject({
+    expect(payload.tracking).toMatchObject({
       gclid: 'test-gclid',
     });
-    expect(typeof submitPayload?.event_id).toBe('string');
-    expect(String(submitPayload?.event_id)).toMatch(/^lead_(?:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+_[a-z0-9]{6})$/);
+    expect(typeof payload.event_id).toBe('string');
+    expect(String(payload.event_id)).toMatch(/^lead_(?:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+_[a-z0-9]{6})$/);
 
     const generateLeadEvent = await page.evaluate(() =>
       (window.dataLayer || []).find((entry) =>
@@ -127,7 +127,7 @@ test.describe('Chatbot lead handoff', () => {
     );
     expect(generateLeadEvent).toMatchObject({
       event: 'generate_lead',
-      event_id: submitPayload?.event_id,
+      event_id: payload.event_id,
       destination: 'Orlando, Flórida',
       utm_source: 'google',
       utm_medium: 'cpc',
@@ -247,10 +247,11 @@ test.describe('Chatbot lead handoff', () => {
         entry && typeof entry === 'object' && 'event' in entry && entry.event === 'generate_lead'
       ) || null
     );
-    expect(typeof submitPayload?.event_id).toBe('string');
+    const payload2 = submitPayload as unknown as Record<string, unknown>;
+    expect(typeof payload2.event_id).toBe('string');
     expect(generateLeadEvent).toMatchObject({
       event: 'generate_lead',
-      event_id: submitPayload?.event_id,
+      event_id: payload2.event_id,
       destination: 'Orlando, Flórida',
     });
   });

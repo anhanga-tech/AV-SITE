@@ -2,6 +2,7 @@ export const config = {
     runtime: 'edge',
 };
 
+import type { ContentListUnion } from '@google/genai';
 import { checkRateLimit } from '../lib/rate-limit';
 import { buildCorsHeaders, getClientIP } from '../lib/network';
 import { budgetTool } from '../lib/ai/tools';
@@ -258,7 +259,7 @@ async function requestModelResponse(
 
     return await ai.models.generateContent({
         model: modelName,
-        contents,
+        contents: contents as ContentListUnion,
         config: {
             tools: [{ functionDeclarations: [budgetTool] }],
             systemInstruction: options.systemInstruction || SYSTEM_INSTRUCTION,

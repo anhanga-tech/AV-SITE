@@ -85,7 +85,7 @@ export function resolveGeminiProviderConfig(env: EnvSource = process.env): Gemin
 
         return {
             ok: true,
-            apiKey,
+            apiKey: apiKey!,
             modelName,
             useGateway: false,
         };
@@ -109,12 +109,12 @@ export function resolveGeminiProviderConfig(env: EnvSource = process.env): Gemin
 
     return {
         ok: true,
-        apiKey,
+        apiKey: apiKey!,
         modelName,
         useGateway: true,
         gatewayId,
-        gatewayBaseUrl: buildGatewayBaseUrl(accountId, gatewayId),
-        gatewayToken,
+        gatewayBaseUrl: buildGatewayBaseUrl(accountId!, gatewayId),
+        gatewayToken: gatewayToken!,
         metadata: buildAiGatewayMetadata(env, modelName),
     };
 }

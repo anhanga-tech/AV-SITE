@@ -74,10 +74,10 @@ export function DesktopNavigation({
             </>
           ) : (
             <a
-              href={buildSectionHref(link.href, isHome)}
+              href={buildSectionHref(link.href!, isHome)}
               onClick={(event) => {
                 if (isHome) {
-                  onNavClick(event, link.href);
+                  onNavClick(event, link.href!);
                 }
               }}
               className={`cursor-pointer font-medium text-sm transition-colors duration-500 hover:opacity-80 focus:outline-none focus:underline decoration-2 underline-offset-4 ${navTextClass}`}
@@ -143,11 +143,11 @@ export function MobileNavigationMenu({
         return (
           <a
             key={link.name}
-            href={buildSectionHref(link.href, isHome)}
+            href={buildSectionHref(link.href!, isHome)}
             className="text-gray-700 font-medium py-2 border-b border-gray-50 focus:text-brand-vibrant focus:outline-none"
             onClick={(event) => {
               if (isHome) {
-                onNavClick(event, link.href);
+                onNavClick(event, link.href!);
               } else {
                 onCloseMenu();
               }

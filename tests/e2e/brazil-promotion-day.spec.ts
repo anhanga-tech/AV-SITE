@@ -63,14 +63,15 @@ test.describe('Brazil Promotion Day Landing Page', () => {
     await landing.expectSuccess();
 
     // Verify Payload
-    expect(submitPayload).toMatchObject({
+    const safePayload = submitPayload as unknown as SubmitLeadRequest;
+    expect(safePayload).toMatchObject({
       firstName: 'Teste',
       lastName: 'QR',
       email: 'qr@test.com',
       whatsapp: '+5511988314487',
       destination: 'Japão',
     });
-    expect(submitPayload?.bantSummary).toContain('Brazil Promotion Day 2026');
+    expect(safePayload.bantSummary).toContain('Brazil Promotion Day 2026');
 
     // Verify dataLayer
     const generateLeadEvent = await page.evaluate(() =>
