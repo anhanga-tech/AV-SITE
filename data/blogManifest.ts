@@ -155,7 +155,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "6 min de leitura"
   },
   {
-    "title": "Viagem solo feminina ganha espaço nos cruzeiros da Norwegian Cruise Line",
+    "title": "Viagem solo feminina nos cruzeiros da Norwegian",
     "excerpt": "Cruzeiros NCL para mulheres que viajam sozinhas: o que esperar a bordo, como escolher o roteiro certo e por que o modelo freestyle funciona para viagem solo.",
     "date": "2026-03-09",
     "dateModified": "2026-05-05",
@@ -176,7 +176,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "4 min de leitura"
   },
   {
-    "title": "Melhores destinos para o Carnaval 2026 no Brasil (com dicas para economizar)",
+    "title": "Melhores destinos para o Carnaval 2026 no Brasil",
     "excerpt": "Quer curtir o Carnaval sem estourar o orçamento? Conheça os melhores destinos no Brasil para diferentes estilos de folia ou descanso nesta retrospectiva da edição 2026.",
     "date": "2026-02-11",
     "dateModified": "2026-05-05",

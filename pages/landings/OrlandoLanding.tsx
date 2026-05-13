@@ -42,7 +42,7 @@ const OrlandoLanding: React.FC = () => {
         noHreflang
       />
       <ServiceSchema
-        name="Pacotes para Orlando 2026"
+        name="Pacotes para Orlando 2026/2027"
         description="Planejamento de viagem para Orlando com suporte especializado, incluindo aéreo, hotel, ingressos e roteiro personalizado."
         serviceUrl="https://www.anhanga.tur.br/orlando/"
         serviceType="Planejamento de viagem para Orlando"
