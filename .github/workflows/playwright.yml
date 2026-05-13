@@ -15,7 +15,7 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         fetch-depth: 0
-    - uses: pnpm/action-setup@v4.1.0
+    - uses: pnpm/action-setup@v6.0.5
     - uses: actions/setup-node@v4.2.0
       with:
         node-version: lts/*
