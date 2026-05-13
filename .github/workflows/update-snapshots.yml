@@ -13,7 +13,7 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4.2.2
+    - uses: actions/checkout@v6
       with:
         ref: ${{ github.event.inputs.branch }}
         token: ${{ secrets.GITHUB_TOKEN }}
