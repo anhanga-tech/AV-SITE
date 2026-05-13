@@ -143,22 +143,28 @@ function useSearchFormDismiss(refs: SearchPanelRefs, handlers: CloseHandlers): v
 
 interface DestinationFieldProps {
   destRef: React.RefObject<HTMLDivElement | null>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
   inputValue: string;
   showDestSuggestions: boolean;
   filteredDestinations: DestinationOption[];
+  activeSuggestionIndex: number;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onFocus: () => void;
+  onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
   onSelect: (destination: DestinationOption) => void;
   onClear: () => void;
 }
 
 const DestinationField = memo(({
   destRef,
+  inputRef,
   inputValue,
   showDestSuggestions,
   filteredDestinations,
+  activeSuggestionIndex,
   onChange,
   onFocus,
+  onKeyDown,
   onSelect,
   onClear,
 }: DestinationFieldProps) => {
@@ -176,11 +182,13 @@ const DestinationField = memo(({
       <div className="relative flex items-center">
         <input
           id="destination-input"
+          ref={inputRef}
           type="text"
           data-testid="destination-input"
           value={inputValue}
           onChange={onChange}
           onFocus={onFocus}
+          onKeyDown={onKeyDown}
           placeholder="Ex: Orlando, Paris, Brasil..."
           className="w-full outline-none text-gray-800 font-bold placeholder-gray-300 bg-transparent text-lg md:text-xl truncate transition-colors pr-8"
           autoComplete="off"
@@ -189,6 +197,7 @@ const DestinationField = memo(({
           aria-expanded={showDestSuggestions && hasSuggestions}
           aria-haspopup="listbox"
           aria-controls="destination-results"
+          aria-activedescendant={activeSuggestionIndex >= 0 ? `suggestion-${activeSuggestionIndex}` : undefined}
         />
         {inputValue && (
           <button
@@ -208,16 +217,19 @@ const DestinationField = memo(({
       {showDestSuggestions && hasSuggestions && (
         <div className="absolute top-full left-0 w-full bg-white rounded-2xl shadow-xl border-2 border-gray-100 mt-4 overflow-hidden z-[60] animate-pop-in origin-top">
           <ul id="destination-results" role="listbox" className="max-h-60 overflow-y-auto custom-scrollbar">
-            {filteredDestinations.map((dest) => (
+            {filteredDestinations.map((dest, index) => (
               <li
                 key={dest.label}
+                id={`suggestion-${index}`}
                 role="option"
-                aria-selected={false}
+                aria-selected={index === activeSuggestionIndex}
                 onClick={() => onSelect(dest)}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onSelect(dest); }}
-                className="px-6 py-3 hover:bg-brand-light cursor-pointer text-left text-sm text-gray-700 font-medium border-b border-gray-50 last:border-0 flex items-center gap-2 transition-colors"
+                className={`px-6 py-3 cursor-pointer text-left text-sm font-medium border-b border-gray-50 last:border-0 flex items-center gap-2 transition-colors ${
+                  index === activeSuggestionIndex ? 'bg-brand-light text-brand-cyan' : 'hover:bg-brand-light text-gray-700'
+                }`}
               >
-                <MapPin className="w-4 h-4 text-brand-cyan/50 shrink-0" />
+                <MapPin className={`w-4 h-4 shrink-0 ${index === activeSuggestionIndex ? 'text-brand-cyan' : 'text-brand-cyan/50'}`} />
                 <span className="truncate">{dest.label}</span>
               </li>
             ))}
@@ -643,6 +655,7 @@ SearchButton.displayName = 'SearchButton';
 const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
   const [inputValue, setInputValue] = useState('');
   const [showDestSuggestions, setShowDestSuggestions] = useState(false);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
   const [showCalendar, setShowCalendar] = useState(false);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
@@ -668,6 +681,7 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
 
   const guestDropdownRef = useRef<HTMLDivElement>(null);
   const destRef = useRef<HTMLDivElement>(null);
+  const destinationInputRef = useRef<HTMLInputElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
   const tripTypeRef = useRef<HTMLDivElement>(null);
   const budgetRef = useRef<HTMLDivElement>(null);
@@ -706,6 +720,7 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
     const value = event.target.value;
     setInputValue(value);
     setShowDestSuggestions(true);
+    setActiveSuggestionIndex(-1);
 
     const search = normalizeStr(value);
     const exactMatch = PRE_NORMALIZED_DB.find((destination) => (
@@ -719,12 +734,39 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
     setInputValue(destination.label);
     onDestinationMatch(destination.city);
     setShowDestSuggestions(false);
+    setActiveSuggestionIndex(-1);
   }, [onDestinationMatch]);
+
+  const handleDestinationKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showDestSuggestions || filteredDestinations.length === 0) return;
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setActiveSuggestionIndex((prev) => (prev < filteredDestinations.length - 1 ? prev + 1 : 0));
+      import('../utils/haptics').then(m => m.triggerHaptic('light'));
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setActiveSuggestionIndex((prev) => (prev > 0 ? prev - 1 : filteredDestinations.length - 1));
+      import('../utils/haptics').then(m => m.triggerHaptic('light'));
+    } else if (event.key === 'Enter') {
+      if (activeSuggestionIndex >= 0) {
+        event.preventDefault();
+        handleDestinationSelect(filteredDestinations[activeSuggestionIndex]);
+      }
+    } else if (event.key === 'Escape') {
+      setShowDestSuggestions(false);
+      setActiveSuggestionIndex(-1);
+    }
+  }, [showDestSuggestions, filteredDestinations, activeSuggestionIndex, handleDestinationSelect]);
 
   const handleClearDestination = useCallback(() => {
     setInputValue('');
     onDestinationMatch(null);
     setShowDestSuggestions(false);
+    setActiveSuggestionIndex(-1);
+    if (destinationInputRef.current) {
+      destinationInputRef.current.focus();
+    }
     import('../utils/haptics').then(m => m.triggerHaptic('light'));
   }, [onDestinationMatch]);
 
@@ -882,7 +924,10 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
     setShowBudgetDropdown((prev) => !prev);
     import('../utils/haptics').then(m => m.triggerHaptic('light'));
   }, []);
-  const onDestinationFocus = useCallback(() => setShowDestSuggestions(true), []);
+  const onDestinationFocus = useCallback(() => {
+    setShowDestSuggestions(true);
+    setActiveSuggestionIndex(-1);
+  }, []);
 
   return (
     <form
@@ -894,11 +939,14 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
       <div className="flex flex-col md:flex-row items-center w-full divide-y md:divide-y-0 md:divide-x divide-gray-100">
         <DestinationField
           destRef={destRef}
+          inputRef={destinationInputRef}
           inputValue={inputValue}
           showDestSuggestions={showDestSuggestions}
           filteredDestinations={filteredDestinations}
+          activeSuggestionIndex={activeSuggestionIndex}
           onChange={handleDestinationChange}
           onFocus={onDestinationFocus}
+          onKeyDown={handleDestinationKeyDown}
           onSelect={handleDestinationSelect}
           onClear={handleClearDestination}
         />
