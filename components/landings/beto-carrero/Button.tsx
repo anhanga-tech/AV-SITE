@@ -1,8 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { MessageCircle } from 'lucide-react';
-import { getWhatsAppLink } from '../../../utils/whatsapp';
-import { WHATSAPP_MESSAGE } from './constants';
-import { openAiChat } from '../../../utils/aiChat';
+import { openContactModal } from '../../../utils/contactForm';
 
 interface ButtonProps {
   text: string;
@@ -70,9 +68,7 @@ const Button: React.FC<ButtonProps> = ({
       <button
         onClick={(e) => {
           e.preventDefault();
-          openAiChat({
-            message: WHATSAPP_MESSAGE
-          });
+          openContactModal({ source: 'beto-carrero' });
           handleClick();
         }}
         className={`btn-whatsapp btn-specialist ${baseStyles} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className}`}

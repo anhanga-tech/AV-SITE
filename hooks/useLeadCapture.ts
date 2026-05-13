@@ -88,7 +88,7 @@ function toNullable(value: unknown): string | null {
     return normalized.length > 0 ? normalized : null;
 }
 
-function extractUtms(tracking: LeadTracking): LeadUtms {
+export function extractUtms(tracking: LeadTracking): LeadUtms {
     return {
         utm_source: tracking.utm_source ?? null,
         utm_medium: tracking.utm_medium ?? null,

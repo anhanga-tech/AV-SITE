@@ -12,7 +12,7 @@ import { optimizeRemoteImageUrl } from '../data/mediaConfig';
 import { getCategoryColor } from '../utils/categoryColors';
 import { SEO } from '../components/SEO';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
-import { openAiChat } from '../utils/aiChat';
+import { openContactModal } from '../utils/contactForm';
 
 /**
  * BlogList Page - Optimized with CSS hover
@@ -155,9 +155,7 @@ const BlogList: React.FC = () => {
                     <button
                         onClick={(e) => {
                             e.preventDefault();
-                            openAiChat({
-                                message: 'Olá! Vi o blog da Anhangá e gostaria de solicitar um orçamento personalizado.'
-                            });
+                            openContactModal({ source: 'blog-list' });
                         }}
                         className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-brand-dark text-white text-lg font-bold px-10 py-5 rounded-2xl shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
                         data-tracking="footer-blog-list"

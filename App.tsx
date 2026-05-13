@@ -6,6 +6,7 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import AIChat from './components/AIChat';
+import ContactModal from './components/ContactModal';
 import { ClientOnly } from './components/ClientOnly';
 import ScrollToTop from './components/ScrollToTop';
 import BackToTop from './components/ui/BackToTop';
@@ -39,6 +40,7 @@ const LandingRouteFallback: React.FC = () => <div className="min-h-screen bg-whi
 const ClientFeatures: React.FC = () => (
   <ClientOnly>
     <AIChat />
+    <ContactModal />
     <BackToTop />
     <Analytics />
     <SpeedInsights />

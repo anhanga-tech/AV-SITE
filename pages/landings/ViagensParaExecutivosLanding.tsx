@@ -5,16 +5,12 @@ import { LandingFAQ } from '@/components/LandingFAQ';
 import { BreadcrumbSchema } from '@/components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '@/components/schemas/FAQPageSchema';
 import { ServiceSchema } from '@/components/schemas/ServiceSchema';
-import { useWhatsAppLink } from '@/utils/whatsapp';
-import { pushWhatsAppCta } from '@/utils/analytics';
+import { openContactModal } from '@/utils/contactForm';
 import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left';
 import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
 import Search from 'lucide-react/dist/esm/icons/search';
 import LayoutList from 'lucide-react/dist/esm/icons/layout-list';
 import PhoneCall from 'lucide-react/dist/esm/icons/phone-call';
-
-const WHATSAPP_MESSAGE = 'Olá! Quero planejar uma viagem com atendimento consultivo.';
-const PAGE_NAME = 'viagens-para-executivos';
 
 const FAQ_ITEMS = [
   {
@@ -86,8 +82,6 @@ const HOW_IT_WORKS = [
 ];
 
 const ViagensParaExecutivosLanding: React.FC = () => {
-  const whatsappUrl = useWhatsAppLink(WHATSAPP_MESSAGE, { appendTrackingRef: true });
-
   return (
     <div className="bg-white min-h-screen font-sans">
       <SEO
@@ -128,15 +122,13 @@ const ViagensParaExecutivosLanding: React.FC = () => {
               Anhangá Viagens
             </span>
           </Link>
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => pushWhatsAppCta(PAGE_NAME)}
+          <button
+            type="button"
+            onClick={() => openContactModal({ source: 'viagens-executivos' })}
             className="btn-whatsapp btn-specialist text-xs font-bold bg-anhanga-blue text-white px-4 py-2 rounded-xl hover:bg-anhanga-darkBlue transition-colors whitespace-nowrap"
           >
             Falar com consultor
-          </a>
+          </button>
         </div>
       </header>
 
@@ -152,17 +144,15 @@ const ViagensParaExecutivosLanding: React.FC = () => {
           <p className="text-xl text-gray-300 mb-10 leading-relaxed max-w-2xl">
             Para profissionais e famílias que não querem perder tempo comparando opções nem correr risco com detalhes importantes.
           </p>
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => pushWhatsAppCta(PAGE_NAME)}
+          <button
+            type="button"
+            onClick={() => openContactModal({ source: 'viagens-executivos' })}
             className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-anhanga-yellow text-anhanga-dark font-bold px-8 py-4 rounded-2xl hover:bg-anhanga-yellowHover transition-colors text-lg shadow-lg"
-            aria-label="Falar com um consultor de viagens via WhatsApp"
+            aria-label="Falar com um consultor de viagens"
           >
             Falar com um consultor
             <ArrowRight className="w-5 h-5" />
-          </a>
+          </button>
           <p className="mt-4 text-sm text-gray-400">Consultor fixo do início ao fim.</p>
         </div>
       </section>
@@ -283,17 +273,15 @@ const ViagensParaExecutivosLanding: React.FC = () => {
           <p className="text-blue-100 text-lg mb-10 max-w-xl mx-auto">
             Um consultor disponível para cuidar de cada detalhe. Sem chatbot, sem formulário, sem burocracia.
           </p>
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => pushWhatsAppCta(PAGE_NAME)}
+          <button
+            type="button"
+            onClick={() => openContactModal({ source: 'viagens-executivos' })}
             className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-white text-anhanga-blue font-black px-10 py-5 rounded-2xl hover:bg-anhanga-light transition-colors text-xl shadow-lg"
-            aria-label="Falar com um consultor de viagens via WhatsApp"
+            aria-label="Falar com um consultor de viagens"
           >
             Falar com um consultor
             <ArrowRight className="w-6 h-6" />
-          </a>
+          </button>
         </div>
       </section>
 

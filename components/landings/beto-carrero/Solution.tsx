@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Check, MapPin, Plane, BedDouble, Ticket, MessageCircle, Send, ArrowRight, X, Sun, Fish, Building2, Sparkles } from 'lucide-react';
 import Button from './Button';
-import { openAiChat } from '../../../utils/aiChat';
+import { openContactModal } from '../../../utils/contactForm';
 
 const Solution: React.FC = () => {
    const [isModalOpen, setIsModalOpen] = useState(false);
@@ -120,10 +120,13 @@ const Solution: React.FC = () => {
                      <div
                         role="button"
                         tabIndex={0}
-                        onClick={() => openAiChat({
-                           message: 'Olá! Gostaria de um orçamento para o Beto Carrero incluindo ingressos oficiais.'
-                        })}
-                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openAiChat({ message: 'Olá! Gostaria de um orçamento para o Beto Carrero incluindo ingressos oficiais.' }); }}
+                        onClick={() => openContactModal({ source: 'beto-carrero-solution' })}
+                        onKeyDown={(e) => {
+                           if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              openContactModal({ source: 'beto-carrero-solution' });
+                           }
+                        }}
                         className="btn-specialist cursor-pointer group bg-white rounded-xl border-2 border-fun-dark shadow-hard transform -rotate-1 hover:rotate-0 transition-transform duration-300 flex overflow-hidden w-full max-w-sm lg:max-w-md"
                         data-tracking="mid-betocarrero"
                      >
