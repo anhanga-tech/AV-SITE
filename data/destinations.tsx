@@ -1,14 +1,4 @@
-import Palmtree from 'lucide-react/dist/esm/icons/palmtree';
-import Heart from 'lucide-react/dist/esm/icons/heart';
-import Briefcase from 'lucide-react/dist/esm/icons/briefcase';
-import Baby from 'lucide-react/dist/esm/icons/baby';
-import Compass from 'lucide-react/dist/esm/icons/compass';
-import Users from 'lucide-react/dist/esm/icons/users';
-import DollarSign from 'lucide-react/dist/esm/icons/dollar-sign';
-import Wallet from 'lucide-react/dist/esm/icons/wallet';
-import Gem from 'lucide-react/dist/esm/icons/gem';
-import Crown from 'lucide-react/dist/esm/icons/crown';
-import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
+import { TreePalm as Palmtree, Heart, Briefcase, Baby, Compass, Users, DollarSign, Wallet, Gem, Crown, Sparkles } from 'lucide-react';
 
 // --- DATA: COMPREHENSIVE DESTINATION LIST (IATA & TOURIST HOTSPOTS) ---
 const DESTINATIONS_DATABASE = [
