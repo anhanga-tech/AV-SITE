@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, memo } from 'react';
 import {
     ChatCentered,
     AirplaneTilt,
@@ -13,7 +13,14 @@ import { getWhatsAppLink } from '../utils/whatsapp';
 
 type FormState = 'closed' | 'open' | 'submitted';
 
-const CallToAction: React.FC = () => {
+/**
+ * CallToAction Component - Optimized with React.memo
+ *
+ * PERFORMANCE WIN: Prevents unnecessary re-renders when the Home page state changes.
+ * This component contains complex SVG logic (barcode) and form states that
+ * don't need to be reconciled during parent lifecycle updates.
+ */
+const CallToAction: React.FC = memo(() => {
     const { submitLead, isSubmitting, error } = useLeadCapture();
     const [formState, setFormState] = useState<FormState>('closed');
     const [name, setName] = useState('');
@@ -76,8 +83,9 @@ const CallToAction: React.FC = () => {
 
                         {/* Header Strip */}
                         <div className="flex justify-between items-center mb-8 border-b-2 border-dashed border-gray-100 pb-4">
-                            <div className="flex items-center gap-2 text-brand-cyan font-black tracking-widest text-sm uppercase">
+                            <div className="flex items-center gap-2 text-brand-cyan font-black tracking-widest text-sm uppercase" title="Estilo Boarding Pass">
                                 <AirplaneTilt className="w-5 h-5" weight="fill" /> Anhangá Airlines
+                                <span className="text-[10px] opacity-40 ml-1 hidden lg:inline">(Boarding Pass)</span>
                             </div>
                             <div className="text-gray-400 font-bold text-xs uppercase">First Class Experience</div>
                         </div>
@@ -318,6 +326,8 @@ const CallToAction: React.FC = () => {
             </div>
         </section>
     );
-};
+});
+
+CallToAction.displayName = 'CallToAction';
 
 export default CallToAction;
