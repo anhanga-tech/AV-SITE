@@ -1,7 +1,6 @@
 import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
-import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
-import TrendingUp from 'lucide-react/dist/esm/icons/trending-up';
+import { ArrowRight, TrendingUp } from 'lucide-react';
 import { LazyImage } from './ui/LazyImage';
 import { optimizeRemoteImageUrl } from '../data/mediaConfig';
 

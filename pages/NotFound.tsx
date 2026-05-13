@@ -1,10 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import MapPin from 'lucide-react/dist/esm/icons/map-pin';
-import HomeIcon from 'lucide-react/dist/esm/icons/home';
-import Compass from 'lucide-react/dist/esm/icons/compass';
-import BookOpen from 'lucide-react/dist/esm/icons/book-open';
-import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left';
+import { MapPin, Home as HomeIcon, Compass, BookOpen, ArrowLeft } from 'lucide-react';
 import { SEO } from '../components/SEO';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { getBlogHomeUrl } from '../utils/blog';

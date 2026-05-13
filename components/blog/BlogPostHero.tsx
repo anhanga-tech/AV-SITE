@@ -1,9 +1,5 @@
 import React from 'react';
-import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left';
-import Tag from 'lucide-react/dist/esm/icons/tag';
-import User from 'lucide-react/dist/esm/icons/user';
-import Calendar from 'lucide-react/dist/esm/icons/calendar';
-import Clock from 'lucide-react/dist/esm/icons/clock';
+import { ArrowLeft, Tag, User, Calendar, Clock } from 'lucide-react';
 import { PostMeta } from '../../lib/mdx';
 import { optimizeRemoteImageUrl } from '../../data/mediaConfig';
 import { getCategoryColor } from '../../utils/categoryColors';

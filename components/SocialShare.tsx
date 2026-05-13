@@ -1,10 +1,5 @@
 import React, { useState } from 'react';
-import Share2 from 'lucide-react/dist/esm/icons/share-2';
-import Facebook from 'lucide-react/dist/esm/icons/facebook';
-import Linkedin from 'lucide-react/dist/esm/icons/linkedin';
-import MessageCircle from 'lucide-react/dist/esm/icons/message-circle';
-import LinkIcon from 'lucide-react/dist/esm/icons/link';
-import Check from 'lucide-react/dist/esm/icons/check';
+import { Share2, Facebook, Linkedin, MessageCircle, Link as LinkIcon, Check } from 'lucide-react';
 import { shareContent, getSocialShareLinks } from '../utils/share';
 
 interface SocialShareProps {

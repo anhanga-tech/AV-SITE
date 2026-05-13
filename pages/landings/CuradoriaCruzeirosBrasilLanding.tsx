@@ -6,12 +6,7 @@ import { BreadcrumbSchema } from '@/components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '@/components/schemas/FAQPageSchema';
 import { ServiceSchema } from '@/components/schemas/ServiceSchema';
 import { openContactModal } from '@/utils/contactForm';
-import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left';
-import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
-import Compass from 'lucide-react/dist/esm/icons/compass';
-import LayoutGrid from 'lucide-react/dist/esm/icons/layout-grid';
-import CalendarCheck from 'lucide-react/dist/esm/icons/calendar-check';
-import CheckCircle from 'lucide-react/dist/esm/icons/check-circle';
+import { ArrowLeft, ArrowRight, Compass, LayoutGrid, CalendarCheck, CheckCircle } from 'lucide-react';
 
 const FAQ_ITEMS = [
   {

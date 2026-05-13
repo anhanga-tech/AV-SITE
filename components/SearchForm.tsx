@@ -1,17 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState, memo, useCallback } from 'react';
-import Search from 'lucide-react/dist/esm/icons/search';
-import MapPin from 'lucide-react/dist/esm/icons/map-pin';
-import ChevronDown from 'lucide-react/dist/esm/icons/chevron-down';
-import Plus from 'lucide-react/dist/esm/icons/plus';
-import Minus from 'lucide-react/dist/esm/icons/minus';
-import X from 'lucide-react/dist/esm/icons/x';
-import ChevronLeft from 'lucide-react/dist/esm/icons/chevron-left';
-import ChevronRight from 'lucide-react/dist/esm/icons/chevron-right';
-import Loader2 from 'lucide-react/dist/esm/icons/loader-2';
-import Calendar from 'lucide-react/dist/esm/icons/calendar';
-import User from 'lucide-react/dist/esm/icons/user';
-import Briefcase from 'lucide-react/dist/esm/icons/briefcase';
-import Wallet from 'lucide-react/dist/esm/icons/wallet';
+import { Search, MapPin, ChevronDown, Plus, Minus, X, ChevronLeft, ChevronRight, Loader2, Calendar, User, Briefcase, Wallet } from 'lucide-react';
 import {
   MONTH_NAMES,
   WEEK_DAYS,

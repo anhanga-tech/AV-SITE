@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useCallback, memo } from 'react';
-import ChevronLeft from 'lucide-react/dist/esm/icons/chevron-left';
-import ChevronRight from 'lucide-react/dist/esm/icons/chevron-right';
-import Quote from 'lucide-react/dist/esm/icons/quote';
-import MessageSquareHeart from 'lucide-react/dist/esm/icons/message-square-heart';
+import { ChevronLeft, ChevronRight, Quote, MessageSquareHeart } from 'lucide-react';
 import { TESTIMONIALS } from '../data/testimonialsData';
 import { BRAND_LOGO_PNG_URL } from '../lib/media-assets';
 import { SectionHeader } from './ui';

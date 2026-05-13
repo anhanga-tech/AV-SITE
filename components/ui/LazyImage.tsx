@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import ImageIcon from 'lucide-react/dist/esm/icons/image';
+import { Image as ImageIcon } from 'lucide-react';
 import { optimizeRemoteImageUrl } from '../../data/mediaConfig';
 
 interface LazyImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {

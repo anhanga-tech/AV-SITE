@@ -6,12 +6,7 @@ import { BreadcrumbSchema } from '@/components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '@/components/schemas/FAQPageSchema';
 import { ServiceSchema } from '@/components/schemas/ServiceSchema';
 import { openContactModal } from '@/utils/contactForm';
-import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left';
-import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
-import CheckCircle from 'lucide-react/dist/esm/icons/check-circle';
-import MessageSquare from 'lucide-react/dist/esm/icons/message-square';
-import Users from 'lucide-react/dist/esm/icons/users';
-import Headphones from 'lucide-react/dist/esm/icons/headphones';
+import { ArrowLeft, ArrowRight, CheckCircle, MessageSquare, Users, Headphones } from 'lucide-react';
 
 const FAQ_ITEMS = [
   {

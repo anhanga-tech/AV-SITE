@@ -1,8 +1,5 @@
 import React, { memo } from 'react';
-import Calendar from 'lucide-react/dist/esm/icons/calendar';
-import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
-import BookOpen from 'lucide-react/dist/esm/icons/book-open';
-import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
+import { Calendar, ArrowRight, BookOpen, Sparkles } from 'lucide-react';
 import { getAllPosts } from '../lib/mdx';
 import { AUTHORS } from '../data/blogData';
 import { SocialShare } from './SocialShare';

@@ -7,10 +7,7 @@ import { FAQPageSchema } from '../../components/schemas/FAQPageSchema';
 import { ServiceSchema } from '../../components/schemas/ServiceSchema';
 import { openContactModal } from '../../utils/contactForm';
 import { m } from 'framer-motion';
-import ShieldCheck from 'lucide-react/dist/esm/icons/shield-check';
-import Heart from 'lucide-react/dist/esm/icons/heart';
-import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
-import Coffee from 'lucide-react/dist/esm/icons/coffee';
+import { ShieldCheck, Heart, Sparkles, Coffee } from 'lucide-react';
 
 const MELHOR_IDADE_FAQ_ITEMS = [
   {

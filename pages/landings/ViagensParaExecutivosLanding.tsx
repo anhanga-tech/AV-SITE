@@ -6,11 +6,7 @@ import { BreadcrumbSchema } from '@/components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '@/components/schemas/FAQPageSchema';
 import { ServiceSchema } from '@/components/schemas/ServiceSchema';
 import { openContactModal } from '@/utils/contactForm';
-import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left';
-import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
-import Search from 'lucide-react/dist/esm/icons/search';
-import LayoutList from 'lucide-react/dist/esm/icons/layout-list';
-import PhoneCall from 'lucide-react/dist/esm/icons/phone-call';
+import { ArrowLeft, ArrowRight, Search, LayoutList, PhoneCall } from 'lucide-react';
 
 const FAQ_ITEMS = [
   {

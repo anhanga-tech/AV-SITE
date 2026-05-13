@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import { MDXProvider } from '@mdx-js/react';
-import Clock from 'lucide-react/dist/esm/icons/clock';
+import { Clock } from 'lucide-react';
 import { PostMeta } from '../../lib/mdx';
 import { mdxComponents } from './mdxComponents';
 import ChatCTA from './ChatCTA';

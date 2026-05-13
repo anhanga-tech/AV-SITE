@@ -6,12 +6,7 @@ import { OrganizationSchema } from '../components/schemas/OrganizationSchema';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { LazyImage } from '../components/ui/LazyImage';
 import { openContactModal } from '../utils/contactForm';
-import ShieldCheck from 'lucide-react/dist/esm/icons/shield-check';
-import Award from 'lucide-react/dist/esm/icons/award';
-import Users from 'lucide-react/dist/esm/icons/users';
-import Sparkles from 'lucide-react/dist/esm/icons/sparkles';
-import Heart from 'lucide-react/dist/esm/icons/heart';
-import Coffee from 'lucide-react/dist/esm/icons/coffee';
+import { ShieldCheck, Award, Users, Sparkles, Heart, Coffee } from 'lucide-react';
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 30 },

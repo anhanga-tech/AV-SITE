@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left';
+import { ArrowLeft } from 'lucide-react';
 
 import { SEO } from '../components/SEO';
 import { ArticleSchema } from '../components/schemas/ArticleSchema';

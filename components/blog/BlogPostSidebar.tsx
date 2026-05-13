@@ -1,5 +1,5 @@
 import React from 'react';
-import Clock from 'lucide-react/dist/esm/icons/clock';
+import { Clock } from 'lucide-react';
 import { PostMeta } from '../../lib/mdx';
 import { getBlogPostUrl } from '../../utils/blog';
 import { optimizeRemoteImageUrl } from '../../data/mediaConfig';
