@@ -21,3 +21,7 @@
 ## 2026-04-29 - Transitioning from Blocking Alerts to State-Driven Feedback
 **Learning:** Browser native `alert()` calls are disruptive and break the user's immersion. Replacing them with state-driven inline error messages, combined with 'medium' haptic feedback, provides a more modern and integrated experience. Using `role="alert"` ensures accessibility, while tactile feedback on both failure and success paths reinforces the user's actions.
 **Action:** Avoid native `alert()` for validation; use integrated UI components with animations for error feedback and leverage haptics to provide a "physical" feel to interactions.
+
+## 2026-05-13 - Implementing Accessible Search Comboboxes
+**Learning:** Search inputs with dynamic suggestions often lack essential keyboard navigation (ArrowUp/Down) and aria-activedescendant mapping, making them difficult for screen reader and keyboard-only users. Additionally, "Clear" actions on inputs should always programmatically return focus to the field to maintain context and allow immediate correction or new search.
+**Action:** Implement the WAI-ARIA combobox pattern (aria-activedescendant, aria-selected, role="option") for all autocomplete components. Ensure keyboard event listeners manage focus and selection, and always restore focus after destructive input resets.
