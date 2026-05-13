@@ -1,0 +1,8 @@
+legacyPeerDeps: true
+nodeLinker: hoisted
+minimumReleaseAge: 10080
+blockExoticSubdeps: true
+strictDepBuilds: true
+onlyBuiltDependencies:
+  - esbuild@0.27.3 || 0.27.7
+  - protobufjs@7.5.5

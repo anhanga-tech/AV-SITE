@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, memo } from 'react';
 import { m } from 'framer-motion';
 import { HERO_VIDEOS, optimizeRemoteImageUrl } from '../data/mediaConfig';
 import { QUICK_FEATURES } from '../data/destinations';
@@ -11,7 +11,14 @@ const noiseTextureStyle = {
   backgroundImage: `url("${NOISE_TEXTURE_URL}")`,
 };
 
-const Hero: React.FC = () => {
+/**
+ * Hero Component - Optimized with React.memo
+ *
+ * PERFORMANCE WIN: Prevents unnecessary re-renders when the Home page state changes
+ * (like shouldRenderBelowFold toggling). This protects the heavy Framer Motion
+ * animations and video playback logic from redundant reconciliation.
+ */
+const Hero: React.FC = memo(() => {
   // PERFORMANCE: Use the first video by default to match the LCP preload in index.html.
   // Randomization is moved to a useEffect to avoid hydration mismatch and LCP degradation.
   const [backgroundVideo, setBackgroundVideo] = useState(HERO_VIDEOS[0]);
@@ -246,6 +253,8 @@ const Hero: React.FC = () => {
       </div>
     </section>
   );
-};
+});
+
+Hero.displayName = 'Hero';
 
 export default Hero;

@@ -31,3 +31,7 @@
 ## 2026-08-20 - ⚡ Bolt: AIChat List Optimization
 **Learning:** High-frequency components like Chat UI can suffer from quadratic complexity ((N^2)$) if logic like finding the "last" element of a specific type (e.g., `lastIndexOf`) is performed inside a `map` loop on every render.
 **Action:** Always pre-calculate derived indices (like `lastModelIndex`) using `useMemo` outside the render loop to keep complexity at (N)$ and ensure smooth typing performance as history grows.
+
+## 2026-10-10 - ⚡ Bolt: Hero and CTA Memoization
+**Learning:** The "Hero" and "CallToAction" components are often the most complex above-the-fold and footer elements, respectively. On the homepage, they were being re-rendered when the `shouldRenderBelowFold` state was toggled, even though their content is static. Memoizing these "bookend" components ensures that the deferred loading of middle sections doesn't cause jank in the primary visual elements.
+**Action:** Always memoize the Hero and main CTA components on the home page to preserve smooth scrolling and interaction when lazy-loaded sections (like Blog or Destinations) eventually mount.
