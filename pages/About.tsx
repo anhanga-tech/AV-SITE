@@ -5,7 +5,7 @@ import { SEO } from '../components/SEO';
 import { OrganizationSchema } from '../components/schemas/OrganizationSchema';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { LazyImage } from '../components/ui/LazyImage';
-import { openAiChat } from '../utils/aiChat';
+import { openContactModal } from '../utils/contactForm';
 import ShieldCheck from 'lucide-react/dist/esm/icons/shield-check';
 import Award from 'lucide-react/dist/esm/icons/award';
 import Users from 'lucide-react/dist/esm/icons/users';
@@ -25,8 +25,6 @@ const fadeUp: Variants = {
     },
   }),
 };
-
-const CHAT_MESSAGE_ORCAMENTO = "Olá! Gostaria de conversar sobre um roteiro personalizado.";
 
 const About: React.FC = () => {
   const { hash } = useLocation();
@@ -87,7 +85,7 @@ const About: React.FC = () => {
           </p>
           <div className="flex justify-center">
             <button
-              onClick={() => openAiChat({ message: CHAT_MESSAGE_ORCAMENTO })}
+              onClick={() => openContactModal({ source: 'about' })}
               className="btn-whatsapp btn-specialist bg-brand-vibrant text-white px-8 py-4 rounded-2xl font-black text-lg shadow-xl shadow-brand-vibrant/20 hover:scale-105 transition-transform active:scale-95 flex items-center gap-3"
               data-tracking="hero-about"
             >
@@ -288,7 +286,7 @@ const About: React.FC = () => {
               Seja para um festival épico ou um refúgio relaxante, nós desenhamos a viagem perfeita para você.
             </p>
             <button
-              onClick={() => openAiChat({ message: CHAT_MESSAGE_ORCAMENTO })}
+              onClick={() => openContactModal({ source: 'about' })}
               className="btn-whatsapp btn-specialist bg-brand-vibrant text-white px-10 py-5 rounded-2xl font-black text-lg shadow-xl shadow-brand-vibrant/20 hover:scale-105 transition-transform active:scale-95 flex items-center gap-3 mx-auto"
               data-tracking="footer-about"
             >

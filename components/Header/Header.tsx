@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { List, X, Phone } from '@phosphor-icons/react';
-import { openAiChat } from '../../utils/aiChat';
+import { openContactModal } from '../../utils/contactForm';
 import { DesktopNavigation, MobileNavigationMenu } from './HeaderNavigation';
 import { SITE_URL } from './headerConfig';
 import { BRAND_LOGO_BLUE_URL, BRAND_LOGO_WHITE_URL } from '../../lib/media-assets';
@@ -32,9 +32,7 @@ const Header: React.FC = () => {
 
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    openAiChat({
-      message: 'Olá! Gostaria de falar com um especialista.'
-    });
+    openContactModal({ source: 'header' });
     setIsMobileMenuOpen(false);
   };
 
@@ -95,7 +93,7 @@ const Header: React.FC = () => {
               aria-label="Fale Conosco"
               data-testid="desktop-fale-conosco-btn"
               data-tracking="navbar-desktop"
-              onClick={(e) => handleNavClick(e, 'contato')}
+              onClick={handleContactClick}
               className={`btn-whatsapp btn-specialist rounded-full font-medium text-sm transition-all duration-500 flex items-center gap-2 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-vibrant ${ctaPaddingClass} ${buttonClass}`}
             >
               <Phone className="w-4 h-4" weight="fill" />

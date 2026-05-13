@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
 import { HomePage } from './pages/HomePage';
-import { AIChat } from './pages/AIChat';
 
 test.describe('Smoke Suite', () => {
   test('should load home page and verify key elements', async ({ page, isMobile }) => {
@@ -24,17 +23,19 @@ test.describe('Smoke Suite', () => {
     }
   });
 
-  test('should open AI Chatbot via "Fale Conosco" button', async ({ page, isMobile }) => {
+  test('should open contact modal via "Fale Conosco" button', async ({ page, isMobile }) => {
     await page.goto('/');
     const homePage = new HomePage(page);
-    const aiChat = new AIChat(page);
 
-    await homePage.openChat(isMobile);
+    if (isMobile) {
+      await homePage.openMobileMenu();
+      await homePage.mobileFaleConoscoBtn.click();
+    } else {
+      await homePage.faleConoscoBtn.click();
+    }
 
-    await aiChat.expectVisible();
-    await aiChat.expectOnlineStatus();
-    // Initial greeting is hardcoded in AIChat.tsx state — not AI-generated, so always deterministic
-    await aiChat.expectMessageContaining('Olá! Sou seu guia Anhangá');
+    await expect(page.getByRole('dialog', { name: 'Fale com um especialista' })).toBeVisible();
+    await expect(page.getByText('Fale com um especialista')).toBeVisible();
   });
 
   test('should navigate to basic landing pages', async ({ page }) => {
@@ -60,31 +61,18 @@ test.describe('Smoke Suite', () => {
     await expect(page.locator('#mobile-menu')).toBeVisible();
   });
 
-  test('should trigger chatbot from landing pages CTAs', async ({ page }) => {
-    const aiChat = new AIChat(page);
-
-    // Intercept Gemini proxy so tests are deterministic and don't hit the real API
-    await page.route('**/api/generate', route =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ text: 'Claro! Posso te ajudar com isso.' }),
-      })
-    );
-
+  test('should open contact modal from landing pages CTAs', async ({ page }) => {
     // Orlando
     await page.goto('/orlando');
     await page.getByTestId('cta-orlando-specialist').click();
-    await aiChat.expectVisible();
-    await aiChat.expectMessageContaining('Orlando');
-    await aiChat.close();
+    await expect(page.getByRole('dialog', { name: 'Fale com um especialista' })).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog', { name: 'Fale com um especialista' })).not.toBeVisible();
 
     // Beto Carrero
     await page.goto('/beto-carrero');
     await page.getByTestId('cta-betocarrero-specialist').click();
-    await aiChat.expectVisible();
-    await aiChat.expectMessageContaining('Beto Carrero');
-    await aiChat.close();
+    await expect(page.getByRole('dialog', { name: 'Fale com um especialista' })).toBeVisible();
 
   });
 

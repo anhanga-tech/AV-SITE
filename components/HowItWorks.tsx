@@ -9,7 +9,7 @@ import {
   Star,
   Heart,
 } from '@phosphor-icons/react';
-import { openAiChat } from '../utils/aiChat';
+import { openContactModal } from '../utils/contactForm';
 
 // Moved outside component to prevent re-allocation on every render
 const STEPS = [
@@ -175,9 +175,7 @@ const HowItWorks = memo(() => {
                 <button
                     onClick={(e) => {
                         e.preventDefault();
-                        openAiChat({
-                            message: 'Olá! Vi como a mágica acontece e quero meu roteiro personalizado agora!'
-                        });
+                        openContactModal({ source: 'how-it-works' });
                     }}
                     className="relative z-10 flex items-center gap-4 bg-white text-brand-dark px-10 py-6 rounded-full font-black text-xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.15)] hover:shadow-[0_20px_50px_rgba(8,_112,_184,_0.25)] transform transition-all hover:scale-105 active:scale-95 border-4 border-transparent hover:border-brand-yellow text-left"
                 >

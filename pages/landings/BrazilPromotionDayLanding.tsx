@@ -19,6 +19,7 @@ import {
 import { SEO } from '../../components/SEO';
 import { useLeadCapture, createLeadEventId } from '../../hooks/useLeadCapture';
 import { useWhatsAppLink } from '../../utils/whatsapp';
+import { openContactModal } from '../../utils/contactForm';
 import { BRAND_LOGO_BLUE_URL } from '../../lib/media-assets';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -162,16 +163,15 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                 className="h-12 w-auto object-contain"
                             />
                         </a>
-                        <a
-                            href={whatsappUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                        <button
+                            type="button"
+                            onClick={() => openContactModal({ source: 'brazil-promotion-day' })}
                             className="btn-whatsapp btn-specialist hidden sm:flex items-center gap-2 bg-brand-dark text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
                             data-contact-intent
                         >
                             <WhatsappLogo className="w-4 h-4" weight="fill" />
                             Falar no WhatsApp
-                        </a>
+                        </button>
                     </div>
                 </nav>
 
@@ -248,16 +248,15 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                 custom={3}
                                 className="flex flex-col sm:flex-row gap-4"
                             >
-                                <a
-                                    href={whatsappUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                <button
+                                    type="button"
+                                    onClick={() => openContactModal({ source: 'brazil-promotion-day' })}
                                     className="btn-whatsapp btn-specialist flex items-center justify-center gap-3 bg-brand-yellow text-brand-dark px-8 py-4 rounded-2xl font-bold text-lg shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
                                     data-contact-intent
                                 >
                                     <WhatsappLogo className="w-6 h-6" weight="fill" />
                                     Falar com a gente agora
-                                </a>
+                                </button>
                                 <a
                                     href="#contato"
                                     className="btn-specialist flex items-center justify-center gap-2 border-2 border-white/40 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:border-white hover:bg-white/10 transition-all duration-200"
@@ -423,16 +422,15 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                     <span className="text-brand-cyan">Bora conversar.</span>
                                 </h2>
                             </div>
-                            <a
-                                href={whatsappUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                            <button
+                                type="button"
+                                onClick={() => openContactModal({ source: 'brazil-promotion-day' })}
                                 className="btn-whatsapp btn-specialist shrink-0 flex items-center gap-3 bg-brand-yellow text-brand-dark px-10 py-5 rounded-2xl font-bold text-lg shadow-[4px_4px_0px_rgba(255,255,255,0.15)] hover:shadow-[2px_2px_0px_rgba(255,255,255,0.15)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all whitespace-nowrap"
                                 data-contact-intent
                             >
                                 <WhatsappLogo className="w-6 h-6" weight="fill" />
                                 Abrir WhatsApp
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </section>

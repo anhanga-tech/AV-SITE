@@ -2,7 +2,7 @@ import React from 'react';
 import { SEO } from '../../components/SEO';
 import { LandingFAQ } from '../../components/LandingFAQ';
 import LollapaloozaApp from '../../components/landings/lollapalooza/LollapaloozaApp';
-import { openAiChat } from '../../utils/aiChat';
+import { openContactModal } from '../../utils/contactForm';
 import { WAITLIST_SECTION_ID } from '../../components/landings/lollapalooza/constants';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../../components/schemas/FAQPageSchema';
@@ -106,9 +106,7 @@ const LollapaloozaLanding: React.FC = () => {
             <button
               onClick={(e) => {
                 e.preventDefault();
-                openAiChat({
-                  message: 'Olá! Tenho dúvidas sobre os pacotes do Lollapalooza. Podem me ajudar?'
-                });
+                openContactModal({ source: 'lollapalooza' });
               }}
               className="btn-whatsapp btn-specialist px-5 py-3 rounded-full bg-brand-cyan text-white font-bold hover:bg-brand-cyan/90 transition-colors"
               data-tracking="footer-lollapalooza-whatsapp"

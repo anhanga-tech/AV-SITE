@@ -1,5 +1,4 @@
 import { test, expect, type Page } from '@playwright/test';
-import { HomePage } from './pages/HomePage';
 import { AIChat } from './pages/AIChat';
 
 declare global {
@@ -12,7 +11,7 @@ const readVibrateCalls = async (page: Page) =>
   page.evaluate(() => window.__vibrateCalls ?? []);
 
 test.describe('Haptics', () => {
-  test('should trigger haptic feedback when a CTA opens the chat on Mobile Chrome', async ({ page }, testInfo) => {
+  test('should trigger haptic feedback when the chat opens on Mobile Chrome', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'Mobile Chrome', 'Haptic assertions are scoped to Mobile Chrome.');
 
     await page.addInitScript(() => {
@@ -27,19 +26,10 @@ test.describe('Haptics', () => {
       });
     });
 
-    await page.route('**/api/generate', route =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ text: 'Resposta automática do CTA.' }),
-      })
-    );
-
-    const homePage = new HomePage(page);
     const aiChat = new AIChat(page);
 
-    await homePage.goto();
-    await homePage.openChat(true);
+    await page.goto('/');
+    await aiChat.open();
     await aiChat.expectVisible();
     await expect.poll(() => readVibrateCalls(page).then(calls => calls.length)).toBe(1);
   });

@@ -1,6 +1,6 @@
 import React from 'react';
 import { PostMeta } from '../../lib/mdx';
-import { getWhatsAppLink } from '../../utils/whatsapp';
+import { openContactModal } from '../../utils/contactForm';
 
 interface BlogPostFinalCTAProps {
     post: PostMeta;
@@ -17,15 +17,17 @@ export const BlogPostFinalCTA: React.FC<BlogPostFinalCTAProps> = ({ post }) => {
             <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto relative z-10">
                 Transformamos essas inspirações em um roteiro real e exclusivo para você.
             </p>
-            <a
-                href={getWhatsAppLink(`Olá! Li o post "${post.title}" e gostaria de planejar minha viagem.`, { appendTrackingRef: true })}
-                target="_blank"
-                rel="noopener noreferrer"
+            <button
+                type="button"
+                onClick={() => openContactModal({
+                    source: 'blog-post-footer',
+                    message: `Olá! Li o post "${post.title}" e gostaria de planejar minha viagem.`,
+                })}
                 className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-brand-cyan text-white text-lg font-bold px-10 py-5 rounded-2xl shadow-[4px_4px_0px_#FFD600] hover:shadow-[2px_2px_0px_#FFD600] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all relative z-10"
                 data-tracking="footer-blog-post"
             >
                 Conversar com um Especialista
-            </a>
+            </button>
         </div>
     );
 };

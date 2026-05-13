@@ -21,11 +21,11 @@
   },
   "dependencies": {
     "@google/genai": "^1.44.0",
-    "@keystatic/core": "^0.5.48",
+    "@keystatic/core": "^0.5.50",
     "@mdx-js/react": "^3.1.1",
     "@mdx-js/rollup": "^3.1.1",
     "@phosphor-icons/react": "^2.1.10",
-    "@tailwindcss/postcss": "^4.2.1",
+    "@tailwindcss/postcss": "^4.2.4",
     "@tailwindcss/typography": "^0.5.19",
     "@upstash/redis": "^1.36.3",
     "@vercel/analytics": "^1.6.1",
@@ -45,7 +45,7 @@
     "web-haptics": "^0.0.6"
   },
   "devDependencies": {
-    "@playwright/test": "^1.58.2",
+    "@playwright/test": "^1.59.1",
     "@types/dompurify": "^3.2.0",
     "@types/mdx": "^2.0.13",
     "@types/node": "^25.3.5",

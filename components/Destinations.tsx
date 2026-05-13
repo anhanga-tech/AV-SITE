@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState, useMemo, memo } from 'react';
-import { getWhatsAppLink } from '../utils/whatsapp';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import MapPin from 'lucide-react/dist/esm/icons/map-pin';
@@ -17,7 +16,7 @@ import Minus from 'lucide-react/dist/esm/icons/minus';
 import Share from 'lucide-react/dist/esm/icons/share';
 import { SocialShare } from './SocialShare';
 import { LazyImage } from './ui/LazyImage';
-import { openAiChat } from '../utils/aiChat';
+import { openContactModal } from '../utils/contactForm';
 import { getDestinationImage } from '../data/mediaConfig';
 import { NOISE_TEXTURE_URL } from '../lib/static-assets';
 
@@ -737,8 +736,9 @@ const Destinations: React.FC = memo(() => {
                                 <button
                                     onClick={(e) => {
                                         e.preventDefault();
-                                        openAiChat({
-                                            message: `Olá! Gostaria de um orçamento para ${selectedDestination.city}.`
+                                        openContactModal({
+                                            source: 'destinations-modal',
+                                            destination: selectedDestination.city,
                                         });
                                         setSelectedDestination(null);
                                     }}
