@@ -1,4 +1,8 @@
-import type { SubmitContactRequest, SubmitContactResponse } from '../types/contactCapture';
+import type {
+    SubmitContactErrorCode,
+    SubmitContactRequest,
+    SubmitContactResponse,
+} from '../types/contactCapture';
 import { buildCorsHeaders, createRequestId, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
 import {
@@ -19,6 +23,7 @@ const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
 const RATE_LIMIT_KEY_PREFIX = 'ratelimit:submit-contact';
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const N8N_WEBHOOK_ERROR_PATTERN = /^N8N_WEBHOOK_ERROR:(\d{3}):/;
 
 interface ContactConfig {
     webhookUrl: string;
@@ -109,6 +114,21 @@ function validateContactRequest(body: unknown): SubmitContactRequest | null {
     };
 }
 
+function classifyContactSubmitError(error: unknown): {
+    code: SubmitContactErrorCode;
+    status: number;
+} {
+    const message = error instanceof Error ? error.message : String(error);
+    const match = message.match(N8N_WEBHOOK_ERROR_PATTERN);
+    if (!match) return { code: 'INTERNAL_ERROR', status: 500 };
+
+    const upstreamStatus = Number.parseInt(match[1], 10);
+    return {
+        code: 'N8N_WEBHOOK_ERROR',
+        status: upstreamStatus === 504 ? 504 : 502,
+    };
+}
+
 async function parseRequestBody(
     request: Request,
     corsHeaders: Record<string, string>,
@@ -140,7 +160,7 @@ export default async function handler(request: Request): Promise<Response> {
 
     if (request.method !== 'POST') {
         return buildJsonResponse(
-            { ok: false, requestId, error: 'Method not allowed.', code: 'METHOD_NOT_ALLOWED' },
+            { ok: false, requestId, error: 'Método não permitido.', code: 'METHOD_NOT_ALLOWED' },
             405,
             corsHeaders,
         );
@@ -188,16 +208,15 @@ export default async function handler(request: Request): Promise<Response> {
             buildN8nContactPayload(payload, requestId),
         );
     } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : String(error);
-        const isWebhookError = message.startsWith('N8N_WEBHOOK_ERROR:');
+        const classifiedError = classifyContactSubmitError(error);
         return buildJsonResponse(
             {
                 ok: false,
                 requestId,
                 error: 'Não foi possível enviar sua mensagem. Tente novamente.',
-                code: isWebhookError ? 'N8N_WEBHOOK_ERROR' : 'INTERNAL_ERROR',
+                code: classifiedError.code,
             },
-            isWebhookError ? 502 : 500,
+            classifiedError.status,
             corsHeaders,
         );
     }

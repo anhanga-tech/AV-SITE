@@ -73,6 +73,8 @@ test('rejects non-POST requests with 405', async () => {
     const req = buildRequest({}, { method: 'GET' });
     const res = await handler(req);
     assert.equal(res.status, 405);
+    const json = await res.json();
+    assert.equal(json.error, 'Método não permitido.');
 });
 
 test('returns 503 when N8N_SUBMIT_CONTACT_WEBHOOK_URL is missing', async () => {
@@ -143,6 +145,20 @@ test('returns 502 when n8n webhook fails', async () => {
     const res = await handler(req);
 
     assert.equal(res.status, 502);
+    const json = await res.json();
+    assert.equal(json.code, 'N8N_WEBHOOK_ERROR');
+});
+
+test('returns 504 when n8n webhook times out upstream', async () => {
+    process.env.N8N_SUBMIT_CONTACT_WEBHOOK_URL = 'https://n8n.example.com/hook';
+    process.env.N8N_WEBHOOK_SECRET = 'secret';
+    global.fetch = (async () => new Response('timeout', { status: 504 })) as typeof fetch;
+
+    const { default: handler } = await import('../api/submit-contact.ts');
+    const req = buildRequest(validBody());
+    const res = await handler(req);
+
+    assert.equal(res.status, 504);
     const json = await res.json();
     assert.equal(json.code, 'N8N_WEBHOOK_ERROR');
 });

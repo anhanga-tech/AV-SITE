@@ -10,7 +10,7 @@ import { useContactForm } from '../hooks/useContactForm';
 
 type FormState = 'closed' | 'open' | 'submitted';
 
-const CallToAction: React.FC = () => {
+const CallToActionComponent: React.FC = () => {
     const [formState, setFormState] = useState<FormState>('closed');
     const { fields, setField, isValid, isSubmitting, error, submitted, submit } =
         useContactForm({ source: 'cta-homepage' });
@@ -73,7 +73,10 @@ const CallToAction: React.FC = () => {
 
                         {formState === 'open' && (
                             <form
-                                onSubmit={(event) => event.preventDefault()}
+                                onSubmit={(event) => {
+                                    event.preventDefault();
+                                    void submit('whatsapp');
+                                }}
                                 className="flex flex-col gap-3 w-full"
                                 noValidate
                             >
@@ -154,8 +157,7 @@ const CallToAction: React.FC = () => {
 
                                 <div className="flex flex-col sm:flex-row gap-3">
                                     <button
-                                        type="button"
-                                        onClick={() => void submit('whatsapp')}
+                                        type="submit"
                                         disabled={!isValid || isSubmitting}
                                         className="w-full sm:flex-1 flex items-center justify-center gap-2 bg-[#25D366] text-white text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-[#1fba59] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                                     >
@@ -316,8 +318,9 @@ const CallToAction: React.FC = () => {
             </div>
         </section>
     );
-});
+};
 
+const CallToAction = React.memo(CallToActionComponent);
 CallToAction.displayName = 'CallToAction';
 
 export default CallToAction;

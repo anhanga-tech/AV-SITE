@@ -130,13 +130,20 @@ const ContactModal: React.FC = () => {
 
                 {submitted ? (
                     <div className="flex flex-col items-center gap-4 px-6 pb-6 text-center">
-                        <CheckCircle className="h-14 w-14 text-green-600" weight="fill" />
-                        <p className="font-bold text-gray-800">Recebemos seu contato!</p>
-                        <p className="text-sm text-gray-500">
-                            Nossa equipe entra em contato em breve pelo WhatsApp.
-                        </p>
+                        <div
+                            className="flex flex-col items-center gap-4"
+                            role="status"
+                            aria-live="polite"
+                        >
+                            <CheckCircle className="h-14 w-14 text-green-600" weight="fill" />
+                            <p className="font-bold text-gray-800">Recebemos seu contato!</p>
+                            <p className="text-sm text-gray-500">
+                                Nossa equipe entra em contato em breve pelo WhatsApp.
+                            </p>
+                        </div>
                         <button
                             type="button"
+                            autoFocus
                             onClick={close}
                             className="w-full rounded-xl bg-brand-dark py-3 font-bold text-white transition-colors hover:bg-brand-vibrant focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-dark focus-visible:ring-offset-2"
                         >
@@ -145,7 +152,10 @@ const ContactModal: React.FC = () => {
                     </div>
                 ) : (
                     <form
-                        onSubmit={(event) => event.preventDefault()}
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            void submit('whatsapp');
+                        }}
                         className="flex flex-col gap-3 px-6 pb-6"
                         noValidate
                     >
@@ -242,8 +252,7 @@ const ContactModal: React.FC = () => {
 
                         <div className="flex flex-col gap-2 pt-1">
                             <button
-                                type="button"
-                                onClick={() => void submit('whatsapp')}
+                                type="submit"
                                 disabled={!isValid || isSubmitting}
                                 className="w-full rounded-xl bg-[#25D366] py-3 text-sm font-black text-white transition-colors hover:bg-[#1fba59] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
                             >

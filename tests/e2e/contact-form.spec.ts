@@ -25,6 +25,12 @@ const contactDialog = (page: Page) =>
 
 test.describe('Contact form modal', () => {
   test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(window, 'open', {
+        configurable: true,
+        value: () => null,
+      });
+    });
     await mockSubmitContact(page);
     await page.goto('/');
   });
@@ -59,6 +65,18 @@ test.describe('Contact form modal', () => {
     await page.locator('#contact-firstName').fill('Maria');
     await page.locator('#contact-whatsapp').fill('11987654321');
     await page.getByRole('button', { name: /^me chamem no whatsapp$/i }).click();
+
+    await expect(page.getByText(/recebemos seu contato/i)).toBeVisible();
+    await expect(contactDialog(page).getByRole('status')).toContainText(/recebemos seu contato/i);
+    await expect(contactDialog(page).getByRole('button', { name: /^fechar$/i }).last()).toBeFocused();
+  });
+
+  test('envia o caminho principal ao pressionar Enter', async ({ page, isMobile }) => {
+    await openHeaderContactModal(page, isMobile);
+
+    await page.locator('#contact-firstName').fill('Maria');
+    await page.locator('#contact-whatsapp').fill('11987654321');
+    await page.locator('#contact-whatsapp').press('Enter');
 
     await expect(page.getByText(/recebemos seu contato/i)).toBeVisible();
   });
