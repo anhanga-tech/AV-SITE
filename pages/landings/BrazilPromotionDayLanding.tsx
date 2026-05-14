@@ -472,7 +472,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                 </h2>
 
                                 <p className="text-gray-500 font-medium text-lg leading-relaxed mb-10 max-w-sm">
-                                    Preencha o formulário e um consultor entra em contato pelo canal que você preferir — sem enrolação.
+                                    Preencha o formulário e um consultor entra em contato pelo canal que você preferir, sem enrolação.
                                 </p>
 
                                 <ul className="space-y-5 mb-10" role="list">

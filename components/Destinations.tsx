@@ -599,7 +599,7 @@ const Destinations: React.FC = memo(() => {
                             <div className="w-3 h-3 rounded-full bg-red-400 mx-auto -mt-6 mb-2 shadow-sm border border-red-500"></div>
                             <p className="font-serif italic text-gray-700 text-sm leading-tight text-center">
                                 "O mundo é um livro e quem não viaja lê apenas uma página."
-                                <span className="block not-italic text-gray-400 text-xs mt-1">— Santo Agostinho</span>
+                                <span className="block not-italic text-gray-400 text-xs mt-1">(Santo Agostinho)</span>
                             </p>
                         </div>
                     </div>

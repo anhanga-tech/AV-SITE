@@ -497,7 +497,7 @@ const AIChat: React.FC = memo(() => {
               </div>
               <div className="bg-white px-4 py-3 border border-gray-100 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-2.5">
                 <CircleNotch className="w-4 h-4 animate-spin text-brand-vibrant" weight="bold" />
-                <span className="text-xs font-medium text-gray-400">Anhangá digitando...</span>
+                <span className="text-xs font-medium text-gray-400">Anhangá digitando…</span>
               </div>
             </div>
           )}

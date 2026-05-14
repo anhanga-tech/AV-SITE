@@ -53,7 +53,7 @@ export const PassportStamp: React.FC<PassportStampProps> = ({
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-brand-vibrant font-black tracking-tighter uppercase p-2">
 
                     {/* Top Text Arc */}
-                    <div className="text-[7px] md:text-[8px] absolute top-6 tracking-widest opacity-90 font-bold">
+                    <div className="text-[7px] md:text-[8px] absolute top-6 tracking-widest uppercase opacity-90 font-bold">
                         ANHANGÁ VIAGENS
                     </div>
 

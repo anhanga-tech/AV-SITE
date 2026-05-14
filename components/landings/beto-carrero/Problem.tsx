@@ -14,7 +14,7 @@ const Problem: React.FC = () => {
          <div className="container mx-auto px-4 relative z-10">
             <SectionTitle
                title="Você já passou por isso?"
-               subtitle="Aquele momento em que você decide viajar... e o pesadelo começa."
+               subtitle="Aquele momento em que você decide viajar… e o pesadelo começa."
             />
 
             <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center mt-12 md:mt-16">
