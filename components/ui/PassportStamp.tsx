@@ -28,7 +28,7 @@ export const PassportStamp: React.FC<PassportStampProps> = ({
 
     return (
         <div
-            className={`pointer-events-none select-none absolute z-20 opacity-60 flex items-center justify-center animate-[stamp_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)_forwards] ${className}`}
+            className={`pointer-events-none select-none absolute z-20 opacity-60 flex items-center justify-center animate-[stamp_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards] ${className}`}
             style={{ transform: `rotate(${rotation}deg)` }}
             aria-hidden="true"
         >

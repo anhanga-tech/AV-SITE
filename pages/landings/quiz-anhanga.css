@@ -40,7 +40,7 @@
   --av-font-serif:    'Merriweather', Georgia, serif;
   --av-font-mono:     ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, monospace;
 
-  --av-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --av-ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
   --av-ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
 
   --layer-4: #FF9100;
