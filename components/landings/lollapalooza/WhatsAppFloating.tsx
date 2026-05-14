@@ -13,6 +13,7 @@ const WhatsAppFloating: React.FC = () => {
       className="fixed bottom-6 right-6 z-50 bg-anhanga-yellow text-anhanga-darkBlue px-4 py-3 rounded-full shadow-2xl hover:scale-110 transition-transform duration-300 flex items-center justify-center gap-2 animate-pulse hover:animate-none font-black uppercase text-xs tracking-wider"
       aria-label="Ir para a lista de espera"
       id="btn-lolla-waitlist-floating"
+      data-tracking="floating-lolla-waitlist"
     >
       <BellRing size={18} aria-hidden="true" />
       Lista 2027

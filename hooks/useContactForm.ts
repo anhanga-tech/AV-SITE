@@ -76,11 +76,22 @@ function pushContactDataLayerEvent(
     source?: string,
 ): void {
     if (typeof window === 'undefined' || !window.dataLayer) return;
+
+    // 1. Internal contact event
     window.dataLayer.push({
         event: 'contact_form_submission',
         event_id: eventId,
         form_action: action,
         cta_source: source ?? null,
+        page_location: window.location.href,
+    });
+
+    // 2. Unified form submission event for GA4/Ads
+    window.dataLayer.push({
+        event: 'form_submission',
+        form_type: 'contact_modal',
+        form_id: eventId,
+        destination: action,
         page_location: window.location.href,
     });
 }

@@ -123,6 +123,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
             type="button"
             onClick={() => openContactModal({ source: 'consultoria-viagem' })}
             className="btn-whatsapp btn-specialist text-xs font-bold bg-anhanga-blue text-white px-4 py-2 rounded-xl hover:bg-anhanga-darkBlue transition-colors whitespace-nowrap"
+            data-tracking="header-consultoria-viagem"
           >
             Falar com consultor
           </button>
@@ -146,6 +147,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
             onClick={() => openContactModal({ source: 'consultoria-viagem' })}
             className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-anhanga-blue text-white font-bold px-8 py-4 rounded-2xl hover:bg-anhanga-darkBlue transition-colors text-lg shadow-lg"
             aria-label="Falar com um consultor de viagens"
+            data-tracking="hero-consultoria-viagem"
           >
             Falar com um consultor
             <ArrowRight className="w-5 h-5" />
@@ -286,6 +288,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
             onClick={() => openContactModal({ source: 'consultoria-viagem' })}
             className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-anhanga-yellow text-anhanga-dark font-black px-10 py-5 rounded-2xl hover:bg-anhanga-yellowHover transition-colors text-xl shadow-lg"
             aria-label="Falar com um consultor"
+            data-tracking="footer-consultoria-viagem"
           >
             Falar com um consultor
             <ArrowRight className="w-6 h-6" />

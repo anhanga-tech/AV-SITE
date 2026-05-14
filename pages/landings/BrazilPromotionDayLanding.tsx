@@ -168,6 +168,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                             onClick={() => openContactModal({ source: 'brazil-promotion-day' })}
                             className="btn-whatsapp btn-specialist hidden sm:flex items-center gap-2 bg-brand-dark text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
                             data-contact-intent
+                            data-tracking="header-brazil-promotion-day"
                         >
                             <WhatsappLogo className="w-4 h-4" weight="fill" />
                             Falar no WhatsApp
@@ -253,6 +254,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                     onClick={() => openContactModal({ source: 'brazil-promotion-day' })}
                                     className="btn-whatsapp btn-specialist flex items-center justify-center gap-3 bg-brand-yellow text-brand-dark px-8 py-4 rounded-2xl font-bold text-lg shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
                                     data-contact-intent
+                                    data-tracking="hero-brazil-promotion-day"
                                 >
                                     <WhatsappLogo className="w-6 h-6" weight="fill" />
                                     Falar com a gente agora
@@ -427,6 +429,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                 onClick={() => openContactModal({ source: 'brazil-promotion-day' })}
                                 className="btn-whatsapp btn-specialist shrink-0 flex items-center gap-3 bg-brand-yellow text-brand-dark px-10 py-5 rounded-2xl font-bold text-lg shadow-[4px_4px_0px_rgba(255,255,255,0.15)] hover:shadow-[2px_2px_0px_rgba(255,255,255,0.15)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all whitespace-nowrap"
                                 data-contact-intent
+                                data-tracking="whatsapp-band-brazil-promotion-day"
                             >
                                 <WhatsappLogo className="w-6 h-6" weight="fill" />
                                 Abrir WhatsApp
@@ -511,7 +514,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                                 rel="noopener noreferrer"
                                                 className="w-11 h-11 rounded-xl bg-white border-2 border-gray-200 flex items-center justify-center text-gray-500 hover:border-brand-cyan hover:text-brand-cyan shadow-[2px_2px_0px_rgba(0,0,0,0.05)] hover:shadow-[4px_4px_0px_#fbbf24] hover:-translate-y-1 transition-all duration-200"
                                                 aria-label={label}
-                                                {...(contact ? { 'data-contact-intent': true } : {})}
+                                                {...(contact ? { 'data-contact-intent': true, 'data-tracking': 'social-whatsapp-brazil-promotion-day' } : {})}
                                             >
                                                 <Icon className="w-5 h-5" weight="fill" />
                                             </a>
@@ -550,6 +553,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                             rel="noopener noreferrer"
                                             className="btn-whatsapp btn-specialist flex items-center gap-2 bg-brand-dark text-white px-6 py-3 rounded-xl font-bold text-sm shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
                                             data-contact-intent
+                                            data-tracking="success-brazil-promotion-day"
                                         >
                                             <WhatsappLogo className="w-4 h-4" weight="fill" />
                                             Ou fale agora no WhatsApp →
@@ -656,6 +660,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                                 type="submit"
                                                 disabled={isSubmitting}
                                                 className="w-full flex items-center justify-center gap-3 bg-brand-dark text-white py-4 rounded-xl font-bold text-base shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all disabled:opacity-60 disabled:pointer-events-none"
+                                                data-tracking="submit-form-brazil-promotion-day"
                                             >
                                                 {isSubmitting ? (
                                                     <>
