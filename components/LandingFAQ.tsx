@@ -63,7 +63,7 @@ export const LandingFAQ: React.FC<LandingFAQProps> = ({
         <section className="py-20 bg-white">
             <div className="container mx-auto px-6 max-w-4xl">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">
+                    <h2 className="text-3xl md:text-4xl font-semibold text-brand-dark mb-4">
                         {title}
                     </h2>
                     <p className="text-lg text-gray-500">

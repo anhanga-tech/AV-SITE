@@ -530,7 +530,7 @@ const Destinations: React.FC = memo(() => {
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-dashed border-brand-dark bg-yellow-100 text-brand-dark font-black text-xs uppercase tracking-widest shadow-sm transform -rotate-1 mb-4">
                             <Compass className="w-4 h-4" /> Mapa Mundi
                         </div>
-                        <h2 className="text-4xl font-black text-brand-dark">Escolha seu <span className="text-brand-cyan relative inline-block">Pin 📍<svg className="absolute w-full h-3 -bottom-1 left-0 text-brand-cyan opacity-40" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="none" /></svg></span></h2>
+                        <h2 className="text-4xl font-semibold text-brand-dark">Escolha seu <span className="text-brand-cyan relative inline-block">Pin 📍<svg className="absolute w-full h-3 -bottom-1 left-0 text-brand-cyan opacity-40" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="none" /></svg></span></h2>
                     </div>
 
                     {/* Filter Pills - Sticker Style */}
@@ -639,7 +639,7 @@ const Destinations: React.FC = memo(() => {
 
                             <div className="px-2 pb-6">
                                 <div className="flex justify-between items-center mb-2">
-                                    <h3 className="text-2xl font-black text-gray-800">{dest.city}</h3>
+                                    <h3 className="text-2xl font-semibold text-gray-800">{dest.city}</h3>
                                     <div className="flex items-center gap-1 text-yellow-500 font-bold text-sm bg-yellow-50 px-2 py-1 rounded-full border border-yellow-100">
                                         <Star className="w-3 h-3 fill-current" /> {dest.rating}
                                     </div>
@@ -681,7 +681,7 @@ const Destinations: React.FC = memo(() => {
                             />
                             <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/60 to-transparent"></div>
                             <div className="absolute bottom-6 left-6 text-white">
-                                <h2 className="text-4xl font-black mb-1 drop-shadow-md">{selectedDestination.city}</h2>
+                                <h2 className="text-4xl font-semibold mb-1 drop-shadow-md">{selectedDestination.city}</h2>
                                 <div className="flex items-center gap-2 font-medium opacity-90 drop-shadow-sm">
                                     <MapPin className="w-4 h-4" /> {selectedDestination.country}
                                 </div>

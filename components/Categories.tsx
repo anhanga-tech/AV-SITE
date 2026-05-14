@@ -54,7 +54,7 @@ const Categories = memo(() => {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border-2 border-brand-dark bg-white text-brand-dark font-black text-xs uppercase tracking-widest shadow-[4px_4px_0px_#0f172a] mb-4">
               <TrendingUp className="w-4 h-4" /> Em Alta
             </div>
-            <h2 className="text-4xl md:text-5xl font-black text-brand-dark">
+            <h2 className="text-4xl md:text-5xl font-semibold text-brand-dark">
               Todo mundo <br className="md:hidden" /> quer ir pra cá 👇
             </h2>
           </div>
@@ -94,7 +94,7 @@ const Categories = memo(() => {
 
               {/* Caption (Handwritten feel) */}
               <div className="text-center">
-                <h3 className="text-2xl font-black text-gray-800 mb-1 font-sans tracking-tight">{item.title}</h3>
+                <h3 className="text-2xl font-semibold text-gray-800 mb-1 font-sans tracking-tight">{item.title}</h3>
                 <p className="text-gray-500 font-medium font-serif italic">{item.subtitle}</p>
               </div>
 

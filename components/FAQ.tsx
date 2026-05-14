@@ -212,7 +212,7 @@ const FAQ = memo(() => {
                     <div className="inline-block bg-brand-vibrant text-white px-4 py-1.5 rounded-full font-black text-xs uppercase tracking-widest mb-4 shadow-sm transform -rotate-1">
                         Tire suas dúvidas
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-black text-brand-dark tracking-tight mb-4">
+                    <h2 className="text-4xl md:text-5xl font-semibold text-brand-dark tracking-tight mb-4">
                         Tá na cabeça?<br />
                         <span className="text-brand-cyan">
                             A gente responde.

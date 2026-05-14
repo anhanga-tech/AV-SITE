@@ -36,7 +36,7 @@ const Blog: React.FC = memo(() => {
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border-2 border-brand-dark bg-brand-yellow text-brand-dark font-black text-xs uppercase tracking-widest shadow-[4px_4px_0px_#0f172a] transform -rotate-2 mb-4">
                         <BookOpen className="w-4 h-4" /> Diário de Bordo
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-black text-brand-dark mb-4">
+                    <h2 className="text-4xl md:text-5xl font-semibold text-brand-dark mb-4">
                         Histórias & <span className="text-brand-cyan border-b-8 border-brand-cyan/20 px-1 inline-block">Dicas</span>
                     </h2>
                     <p className="text-gray-500 font-medium text-lg max-w-2xl mx-auto">
@@ -83,7 +83,7 @@ const Blog: React.FC = memo(() => {
                                         </span>
                                         <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {formatDate(featuredPost.date)}</span>
                                     </div>
-                                    <h3 className="text-3xl md:text-4xl font-black text-brand-dark mb-4 leading-tight group-hover:text-brand-cyan transition-colors">
+                                    <h3 className="text-3xl md:text-4xl font-semibold text-brand-dark mb-4 leading-tight group-hover:text-brand-cyan transition-colors">
                                         {featuredPost.title}
                                     </h3>
                                     <p className="text-gray-600 text-lg mb-6 leading-relaxed">

@@ -31,7 +31,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
                     {badge}
                 </Badge>
             )}
-            <h2 className="text-4xl font-black text-anhanga-dark leading-tight">
+            <h2 className="text-4xl font-semibold text-anhanga-dark leading-tight">
                 {title}
             </h2>
             {subtitle && (

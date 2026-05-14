@@ -73,7 +73,7 @@ const LollapaloozaLanding: React.FC = () => {
       <LandingFAQ items={LOLLAPALOOZA_FAQ_ITEMS} />
       <section className="bg-[#fffdf5] border-t border-brand-cyan/10 py-14">
         <div className="container mx-auto px-6 max-w-5xl">
-          <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">2026 encerrou forte. 2027 já está no radar.</h2>
+          <h2 className="text-3xl md:text-4xl font-semibold text-brand-dark mb-4">2026 encerrou forte. 2027 já está no radar.</h2>
           <p className="text-gray-700 text-lg leading-relaxed mb-5">
             A página do <strong>Lollapalooza Brasil</strong> continua no ar porque a campanha 2026 foi um sucesso e segue relevante para quem pesquisa logística, hotel e planejamento de festival em São Paulo. Agora, o foco é transformar essa procura em prioridade para a próxima edição.
           </p>
@@ -84,7 +84,7 @@ const LollapaloozaLanding: React.FC = () => {
             </a>{' '}
             com foco em atendimento consultivo e <strong>viagens personalizadas</strong> — do planejamento inicial ao suporte no destino.
           </p>
-          <h3 className="text-xl md:text-2xl font-extrabold text-brand-dark mb-3">O que segue valendo para quem quer ir ao festival</h3>
+          <h3 className="text-xl md:text-2xl font-semibold text-brand-dark mb-3">O que segue valendo para quem quer ir ao festival</h3>
           <ul className="list-disc list-inside text-gray-700 space-y-1 mb-6">
             <li>Hospedagem próxima a rotas de acesso ao festival</li>
             <li>Transporte com melhor custo-benefício (Linha 9 – Esmeralda ou Lolla Express)</li>

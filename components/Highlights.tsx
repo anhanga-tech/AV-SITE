@@ -158,7 +158,7 @@ const Highlights = memo(() => {
                                     <Sparkle className="w-4 h-4" weight="fill" /> O Jeito Anhangá
                                 </span>
                             </div>
-                            <h2 className="text-4xl md:text-5xl font-black text-brand-dark leading-tight mb-6">
+                            <h2 className="text-4xl md:text-5xl font-semibold text-brand-dark leading-tight mb-6">
                                 Não existe roteiro certo <br />
                                 <span className="text-anhanga-blue">
                                     para o viajante errado.
@@ -204,7 +204,7 @@ const Highlights = memo(() => {
                                         </m.div>
 
                                         {/* Content */}
-                                        <h3 className="text-xl font-extrabold text-gray-900 mb-3 leading-tight group-hover:text-brand-cyan transition-colors duration-300">
+                                        <h3 className="text-xl font-semibold text-gray-900 mb-3 leading-tight group-hover:text-brand-cyan transition-colors duration-300">
                                             {item.title}
                                         </h3>
                                         <p className="text-gray-500 font-medium leading-relaxed text-sm md:text-base">

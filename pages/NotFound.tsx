@@ -33,7 +33,7 @@ const NotFound: React.FC = () => {
             <Compass className="w-12 h-12 text-brand-cyan" />
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-black text-brand-dark mb-6 leading-tight">
+          <h1 className="text-5xl md:text-7xl font-semibold text-brand-dark mb-6 leading-tight">
             Ops! Essa página <br />
             <span className="text-brand-cyan">pegou outro rumo.</span>
           </h1>

@@ -133,7 +133,7 @@ const MelhorIdadeLanding: React.FC = () => {
               <div className="w-16 h-16 bg-brand-cyan/10 rounded-2xl flex items-center justify-center text-brand-cyan mb-6">
                 <ShieldCheck className="w-8 h-8" />
               </div>
-              <h3 className="text-2xl font-black text-brand-dark">Segurança em 1º lugar</h3>
+              <h3 className="text-2xl font-semibold text-brand-dark">Segurança em 1º lugar</h3>
               <p className="text-gray-500 font-medium leading-relaxed">
                 Hotéis com acessibilidade, seguro-viagem premium e suporte 24h para você viajar com tranquilidade total.
               </p>
@@ -142,7 +142,7 @@ const MelhorIdadeLanding: React.FC = () => {
               <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 mb-6">
                 <Coffee className="w-8 h-8" />
               </div>
-              <h3 className="text-2xl font-black text-brand-dark">Ritmo Desacelerado</h3>
+              <h3 className="text-2xl font-semibold text-brand-dark">Ritmo Desacelerado</h3>
               <p className="text-gray-500 font-medium leading-relaxed">
                 Nada de correrias. Roteiros desenhados para respeitar o seu tempo, com pausas estratégicas e menos deslocamentos.
               </p>
@@ -151,7 +151,7 @@ const MelhorIdadeLanding: React.FC = () => {
               <div className="w-16 h-16 bg-brand-vibrant/10 rounded-2xl flex items-center justify-center text-brand-vibrant mb-6">
                 <Sparkles className="w-8 h-8" />
               </div>
-              <h3 className="text-2xl font-black text-brand-dark">Curadoria Personalizada</h3>
+              <h3 className="text-2xl font-semibold text-brand-dark">Curadoria Personalizada</h3>
               <p className="text-gray-500 font-medium leading-relaxed">
                 Experiências gastronômicas, culturais e de lazer selecionadas a dedo para viajantes exigentes e experientes.
               </p>
@@ -163,19 +163,19 @@ const MelhorIdadeLanding: React.FC = () => {
       {/* CONTENT RICH SECTION FOR GEO */}
       <section className="py-24 bg-[#fffdf5]">
         <div className="container mx-auto px-6 max-w-4xl">
-          <h2 className="text-3xl md:text-5xl font-black text-brand-dark mb-12 text-center">Por que planejar sua viagem 50+ com a Anhangá?</h2>
+          <h2 className="text-3xl md:text-5xl font-semibold text-brand-dark mb-12 text-center">Por que planejar sua viagem 50+ com a Anhangá?</h2>
           
           <div className="prose prose-lg prose-brand max-w-none text-gray-700 font-medium leading-[1.8]">
             <p>
               Viajar na maturidade exige um olhar diferente. Não se trata apenas de escolher um destino, mas de garantir que cada etapa da jornada seja fluida e prazerosa. Na <strong>Anhangá Viagens</strong>, somos especialistas em transformar o planejamento em um processo leve e transparente.
             </p>
             
-            <h3 className="text-2xl font-black text-brand-dark mt-12 mb-6">Infraestrutura e Acessibilidade</h3>
+            <h3 className="text-2xl font-semibold text-brand-dark mt-12 mb-6">Infraestrutura e Acessibilidade</h3>
             <p>
               Selecionamos hotéis que oferecem não apenas luxo, mas <strong>acessibilidade real</strong>. Elevadores, poucas escadas, banheiros adaptados e localização central para evitar longas caminhadas desnecessárias. Nosso foco é sua autonomia e bem-estar.
             </p>
 
-            <h3 className="text-2xl font-black text-brand-dark mt-12 mb-6">Atendimento Consultivo e Humano</h3>
+            <h3 className="text-2xl font-semibold text-brand-dark mt-12 mb-6">Atendimento Consultivo e Humano</h3>
             <p>
               Ao contrário das grandes agências de massa, aqui você fala com pessoas que entendem suas necessidades. Ajustamos o roteiro conforme seu condicionamento físico e interesses, seja visitando museus na Europa ou relaxando em um resort no Nordeste.
             </p>
@@ -198,7 +198,7 @@ const MelhorIdadeLanding: React.FC = () => {
       <section className="py-24 container mx-auto px-6 text-center">
         <div className="bg-brand-dark text-white rounded-[3rem] p-12 md:p-24 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-brand-cyan/20 blur-[100px] rounded-full"></div>
-          <h2 className="text-4xl md:text-6xl font-black mb-8 relative z-10">Sua próxima aventura <br className="hidden md:block" /> começa agora.</h2>
+          <h2 className="text-4xl md:text-6xl font-semibold mb-8 relative z-10">Sua próxima aventura <br className="hidden md:block" /> começa agora.</h2>
           <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto relative z-10">
             Fale conosco hoje mesmo e receba uma proposta exclusiva para sua viagem. Segurança, conforto e exclusividade em um só lugar.
           </p>

@@ -93,7 +93,7 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
             </div>
 
             <div className="mt-12 lg:hidden border-t border-gray-100 pt-10">
-                <h3 className="font-black text-2xl text-brand-dark mb-6 flex items-center gap-2">
+                <h3 className="font-semibold text-2xl text-brand-dark mb-6 flex items-center gap-2">
                     <span className="w-1.5 h-6 bg-brand-vibrant rounded-full"></span>
                     Leia Também
                 </h3>

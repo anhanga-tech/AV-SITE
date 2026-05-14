@@ -50,7 +50,7 @@ const BlogList: React.FC = () => {
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border-2 border-brand-dark bg-brand-yellow text-brand-dark font-black text-xs uppercase tracking-widest shadow-[4px_4px_0px_#0f172a] transform -rotate-1 mb-4">
                         <BookOpen className="w-4 h-4" /> Todos os Artigos
                     </div>
-                    <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-brand-dark mb-6">
+                    <h1 className="text-3xl md:text-5xl lg:text-6xl font-semibold text-brand-dark mb-6">
                         Diário de <span className="text-brand-cyan">Bordo</span>
                     </h1>
                     <p className="text-lg md:text-xl text-gray-500 font-medium mb-6">
@@ -143,7 +143,7 @@ const BlogList: React.FC = () => {
 
                 {/* Final CTA Section */}
                 <div className="mt-24 bg-brand-cyan/10 rounded-[3rem] p-10 md:p-16 text-center border-2 border-brand-cyan/20">
-                    <h2 className="text-3xl md:text-5xl font-black text-brand-dark mb-6">
+                    <h2 className="text-3xl md:text-5xl font-semibold text-brand-dark mb-6">
                         Pronto para transformar essas dicas em <span className="text-brand-cyan">Realidade?</span>
                     </h2>
                     <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">

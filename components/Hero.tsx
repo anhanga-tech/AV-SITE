@@ -142,7 +142,7 @@ const Hero: React.FC = memo(() => {
 
           {/* SEO H1 - Optimized with visible keywords for search engines */}
           <h1
-            className={`font-sans font-extrabold text-white mb-6 leading-[0.9] tracking-tight drop-shadow-lg transition-all duration-500
+            className={`font-sans font-semibold text-white mb-6 leading-[0.9] tracking-tight drop-shadow-lg transition-all duration-500
                 ${validCityForTitle ? 'text-4xl sm:text-5xl md:text-7xl' : 'text-5xl sm:text-6xl md:text-8xl'}
                 `}
           >

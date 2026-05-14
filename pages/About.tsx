@@ -69,7 +69,7 @@ const About: React.FC = () => {
               <Sparkles className="w-4 h-4 text-brand-cyan" /> Nossa Essência
             </span>
           </div>
-          <h1 className="text-5xl md:text-6xl font-black text-brand-dark mb-6 leading-tight">
+          <h1 className="text-5xl md:text-6xl font-semibold text-brand-dark mb-6 leading-tight">
             Viagens com alma, <br />
             <span className="text-brand-cyan">
               design e zero estresse.
@@ -132,7 +132,7 @@ const About: React.FC = () => {
               variants={fadeUp}
               custom={2}
             >
-              <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-6">Nossa História</h2>
+              <h2 className="text-3xl md:text-4xl font-semibold text-brand-dark mb-6">Nossa História</h2>
               <div className="space-y-4 text-gray-600 font-medium leading-relaxed text-lg">
                 <p>
                   A Anhangá Viagens nasceu em São Paulo com um propósito claro: resgatar o prazer de planejar uma viagem sem as dores de cabeça da burocracia digital e dos roteiros engessados.
@@ -158,7 +158,7 @@ const About: React.FC = () => {
             variants={fadeUp}
             custom={0}
           >
-            <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Por que viajar com a Anhangá?</h2>
+            <h2 className="text-3xl md:text-4xl font-semibold text-brand-dark mb-4">Por que viajar com a Anhangá?</h2>
             <p className="text-gray-500 font-medium">O que nos torna diferentes no mercado de turismo.</p>
           </m.div>
 
@@ -195,7 +195,7 @@ const About: React.FC = () => {
                 <div className={`w-14 h-14 rounded-2xl ${item.color} flex items-center justify-center mb-6`}>
                   <item.icon className="w-8 h-8" />
                 </div>
-                <h3 className="text-xl font-black text-brand-dark mb-4">{item.title}</h3>
+                <h3 className="text-xl font-semibold text-brand-dark mb-4">{item.title}</h3>
                 <p className="text-gray-500 font-medium leading-relaxed">{item.desc}</p>
               </m.div>
             ))}
@@ -212,7 +212,7 @@ const About: React.FC = () => {
               <div className="inline-flex items-center gap-2 px-4 py-1 bg-white/10 rounded-full text-brand-cyan text-sm font-bold mb-6">
                 <Award className="w-4 h-4" /> Credibilidade & Confiança
               </div>
-              <h2 className="text-3xl md:text-4xl font-black mb-6">Agência Certificada</h2>
+              <h2 className="text-3xl md:text-4xl font-semibold mb-6">Agência Certificada</h2>
               <p className="text-gray-300 text-lg font-medium leading-relaxed mb-8">
                 Sua segurança é nossa prioridade. A Anhangá Viagens é uma empresa devidamente registrada nos órgãos competentes, garantindo total conformidade legal para suas férias.
               </p>
@@ -276,7 +276,7 @@ const About: React.FC = () => {
           variants={fadeUp}
         >
           <div className="bg-brand-cyan/5 rounded-[3rem] p-12 md:p-20 border-2 border-dashed border-brand-cyan/20">
-            <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-6">Pronto para sua próxima história?</h2>
+            <h2 className="text-3xl md:text-4xl font-semibold text-brand-dark mb-6">Pronto para sua próxima história?</h2>
             <p className="text-gray-600 text-lg font-medium mb-10 max-w-xl mx-auto">
               Seja para um festival épico ou um refúgio relaxante, nós desenhamos a viagem perfeita para você.
             </p>

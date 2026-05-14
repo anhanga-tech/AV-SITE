@@ -35,10 +35,10 @@ const SiteMap: React.FC = () => {
       />
       <main className="min-h-screen bg-[#fffdf5] pt-32 pb-24">
         <section className="container mx-auto px-6 max-w-4xl">
-          <h1 className="text-4xl md:text-5xl font-black text-brand-dark mb-6">Mapa do Site</h1>
+          <h1 className="text-4xl md:text-5xl font-semibold text-brand-dark mb-6">Mapa do Site</h1>
           <p className="text-gray-600 mb-10">Acesse rapidamente as principais áreas do site.</p>
 
-          <h2 className="text-2xl font-extrabold text-brand-dark mb-4">Páginas Principais</h2>
+          <h2 className="text-2xl font-semibold text-brand-dark mb-4">Páginas Principais</h2>
           <ul className="space-y-3 mb-10">
             {coreLinks.map((link) => (
               <li key={link.to}>
@@ -49,7 +49,7 @@ const SiteMap: React.FC = () => {
             ))}
           </ul>
 
-          <h2 className="text-2xl font-extrabold text-brand-dark mb-4">Blog</h2>
+          <h2 className="text-2xl font-semibold text-brand-dark mb-4">Blog</h2>
           <ul className="space-y-3">
             {getAllPosts().map((post) => (
               <li key={post.slug}>

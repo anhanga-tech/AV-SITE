@@ -135,7 +135,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
           <p className="text-sm font-semibold text-anhanga-yellow mb-8 tracking-widest uppercase">
             Atendimento consultivo premium
           </p>
-          <h1 className="text-4xl md:text-6xl font-black text-white mb-6 leading-[1.1] font-serif">
+          <h1 className="text-4xl md:text-6xl font-semibold text-white mb-6 leading-[1.1] font-serif">
             Sua viagem planejada com precisão, conforto e atendimento humano
           </h1>
           <p className="text-xl text-gray-300 mb-10 leading-relaxed max-w-2xl">
@@ -158,7 +158,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
       {/* Para quem é */}
       <section className="py-20 bg-white">
         <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-4 font-serif">
+          <h2 className="text-3xl md:text-4xl font-semibold text-anhanga-dark mb-4 font-serif">
             Para quem é
           </h2>
           <p className="text-gray-600 text-lg mb-10">
@@ -183,7 +183,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
       {/* O que a gente resolve */}
       <section className="py-20 bg-[#fffdf5]">
         <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-12 font-serif">
+          <h2 className="text-3xl md:text-4xl font-semibold text-anhanga-dark mb-12 font-serif">
             O que a gente resolve
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
@@ -201,7 +201,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
                     className={`w-5 h-5 ${variant === 'filled' ? 'text-anhanga-yellow' : 'text-anhanga-blue'}`}
                   />
                 </div>
-                <h3 className={`text-xl font-black mb-3 ${variant === 'filled' ? 'text-white' : 'text-anhanga-dark'}`}>
+                <h3 className={`text-xl font-semibold mb-3 ${variant === 'filled' ? 'text-white' : 'text-anhanga-dark'}`}>
                   {title}
                 </h3>
                 <p className={variant === 'filled' ? 'text-gray-400 leading-relaxed' : 'text-gray-600 leading-relaxed'}>
@@ -216,7 +216,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
       {/* Como funciona */}
       <section className="py-20 bg-white">
         <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-12 font-serif">
+          <h2 className="text-3xl md:text-4xl font-semibold text-anhanga-dark mb-12 font-serif">
             Como funciona
           </h2>
           <div className="space-y-0">
@@ -229,7 +229,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
                   <span className="text-sm font-black text-anhanga-blue">{step}</span>
                 </div>
                 <div>
-                  <h3 className="text-xl font-black text-anhanga-dark mb-2">{title}</h3>
+                  <h3 className="text-xl font-semibold text-anhanga-dark mb-2">{title}</h3>
                   <p className="text-gray-600 leading-relaxed max-w-xl">{desc}</p>
                 </div>
               </div>
@@ -241,7 +241,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
       {/* Sobre a Anhangá */}
       <section className="py-20 bg-[#fffdf5]">
         <div className="max-w-4xl mx-auto px-6">
-          <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-6 font-serif">
+          <h2 className="text-3xl md:text-4xl font-semibold text-anhanga-dark mb-6 font-serif">
             Sobre a Anhangá Viagens
           </h2>
           <p className="text-lg text-gray-600 leading-relaxed max-w-2xl mb-10">
@@ -265,7 +265,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
       {/* CTA Final */}
       <section className="py-20 bg-anhanga-blue">
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-5xl font-black text-white mb-6 font-serif">
+          <h2 className="text-3xl md:text-5xl font-semibold text-white mb-6 font-serif">
             Você merece uma viagem sem erro.
           </h2>
           <p className="text-blue-100 text-lg mb-10 max-w-xl mx-auto">
@@ -287,7 +287,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
       {/* Outros serviços */}
       <section className="py-16 bg-[#fffdf5]">
         <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-2xl font-black text-anhanga-dark mb-8">Outros serviços</h2>
+          <h2 className="text-2xl font-semibold text-anhanga-dark mb-8">Outros serviços</h2>
           <div className="grid md:grid-cols-3 gap-4">
             <Link
               to="/consultoria-de-viagem"

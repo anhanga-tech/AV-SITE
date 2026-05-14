@@ -90,7 +90,7 @@ const HowItWorks = memo(() => {
                 <span className="absolute -inset-1 block -skew-y-2 bg-brand-yellow rounded-lg" aria-hidden="true"></span>
                 <span className="relative text-brand-dark font-black text-sm uppercase tracking-widest px-2 py-1">Sem Complicação</span>
             </div>
-            <h2 className="text-4xl md:text-6xl font-extrabold text-brand-dark mt-6 mb-6 leading-tight">
+            <h2 className="text-4xl md:text-6xl font-semibold text-brand-dark mt-6 mb-6 leading-tight">
                 Como a mágica <br className="md:hidden"/> acontece?
             </h2>
             <p className="text-xl text-gray-600 font-medium font-sans">

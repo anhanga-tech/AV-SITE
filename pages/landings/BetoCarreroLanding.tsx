@@ -71,14 +71,14 @@ const BetoCarreroLanding: React.FC = () => {
       <LandingFAQ items={BETO_FAQ_ITEMS} />
       <section className="bg-[#fffdf5] border-t border-brand-cyan/10 py-14">
         <div className="container mx-auto px-6 max-w-5xl">
-          <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Pacote Beto Carrero para viajar com tranquilidade</h2>
+          <h2 className="text-3xl md:text-4xl font-semibold text-brand-dark mb-4">Pacote Beto Carrero para viajar com tranquilidade</h2>
           <p className="text-gray-700 text-lg leading-relaxed mb-5">
             Nosso <strong>pacote Beto Carrero</strong> é desenhado para quem quer curtir o parque sem dor de cabeça com reservas, horários e deslocamentos.
           </p>
           <p className="text-gray-700 text-lg leading-relaxed mb-5">
             Você recebe planejamento completo com opções de hotel, logística e ingressos, além de orientação prática para aproveitar melhor cada dia de viagem em família.
           </p>
-          <h3 className="text-xl md:text-2xl font-extrabold text-brand-dark mb-3">O que pode entrar no seu pacote</h3>
+          <h3 className="text-xl md:text-2xl font-semibold text-brand-dark mb-3">O que pode entrar no seu pacote</h3>
           <ul className="list-disc list-inside text-gray-700 space-y-1 mb-6">
             <li>Hospedagem com localização estratégica</li>
             <li>Ingressos para o parque e upgrades opcionais</li>

@@ -339,7 +339,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                     <Sparkle className="w-4 h-4" weight="fill" /> O Jeito Anhangá
                                 </span>
                             </div>
-                            <h2 className="text-4xl md:text-5xl font-black text-brand-dark leading-tight">
+                            <h2 className="text-4xl md:text-5xl font-semibold text-brand-dark leading-tight">
                                 Não existe roteiro certo <br />
                                 <span className="text-brand-cyan">
                                     para o viajante errado.
@@ -382,7 +382,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                             <Icon className={`w-8 h-8 ${item.iconColor}`} weight="fill" />
                                         </m.div>
 
-                                        <h3 className="text-xl font-extrabold text-gray-900 mb-3 leading-tight group-hover:text-brand-cyan transition-colors duration-300">
+                                        <h3 className="text-xl font-semibold text-gray-900 mb-3 leading-tight group-hover:text-brand-cyan transition-colors duration-300">
                                             {item.title}
                                         </h3>
                                         <p className="text-gray-500 font-medium leading-relaxed text-sm">
@@ -419,7 +419,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                     <AirplaneTilt className="w-4 h-4" weight="fill" />
                                     Atendimento imediato
                                 </p>
-                                <h2 className="text-4xl md:text-5xl font-black text-white leading-tight">
+                                <h2 className="text-4xl md:text-5xl font-semibold text-white leading-tight">
                                     Veio pelo QR Code? <br />
                                     <span className="text-brand-cyan">Bora conversar.</span>
                                 </h2>
@@ -464,7 +464,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                     </span>
                                 </div>
 
-                                <h2 className="text-4xl md:text-5xl font-black text-brand-dark leading-tight mb-6">
+                                <h2 className="text-4xl md:text-5xl font-semibold text-brand-dark leading-tight mb-6">
                                     Prefere que a gente <br />
                                     <span className="text-brand-cyan">
                                         entre em contato?
@@ -541,7 +541,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                         >
                                             <CheckCircle className="w-16 h-16 text-emerald-500 mb-4" weight="fill" />
                                         </m.div>
-                                        <h3 className="text-2xl font-black text-brand-dark mb-3">
+                                        <h3 className="text-2xl font-semibold text-brand-dark mb-3">
                                             Mensagem recebida! 🎉
                                         </h3>
                                         <p className="text-gray-500 max-w-xs leading-relaxed mb-8">

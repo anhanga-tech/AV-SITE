@@ -39,7 +39,7 @@ export const BlogPostHero: React.FC<BlogPostHeroProps> = ({ post, authorName }) 
                             </span>
                         </div>
 
-                        <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-white mb-6 leading-[1.05] tracking-tight drop-shadow-lg md:mb-8">
+                        <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-semibold text-white mb-6 leading-[1.05] tracking-tight drop-shadow-lg md:mb-8">
                             {post.title}
                         </h1>
 

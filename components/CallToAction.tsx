@@ -52,7 +52,7 @@ const CallToActionComponent: React.FC = () => {
                         {formState === 'closed' && (
                             <>
                                 <div className="mb-8">
-                                    <h2 className="text-4xl md:text-5xl font-black text-brand-dark mb-4 leading-tight">
+                                    <h2 className="text-4xl md:text-5xl font-semibold text-brand-dark mb-4 leading-tight">
                                         Próxima parada: <br />
                                         <span className="text-brand-vibrant">aquele lugar que você sempre adiou.</span>
                                     </h2>

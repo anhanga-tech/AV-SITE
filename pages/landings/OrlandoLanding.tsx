@@ -76,14 +76,14 @@ const OrlandoLanding: React.FC = () => {
       <LandingFAQ items={ORLANDO_FAQ_ITEMS} />
       <section className="bg-[#fffdf5] border-t border-brand-cyan/10 py-14">
         <div className="container mx-auto px-6 max-w-5xl">
-          <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Pacote para Orlando sem improviso</h2>
+          <h2 className="text-3xl md:text-4xl font-semibold text-brand-dark mb-4">Pacote para Orlando sem improviso</h2>
           <p className="text-gray-700 text-lg leading-relaxed mb-5">
             Se você busca <strong>pacotes para Orlando</strong> com planejamento profissional, a Anhangá estrutura sua viagem com foco em custo-benefício, logística e experiência.
           </p>
           <p className="text-gray-700 text-lg leading-relaxed mb-5">
             Definimos roteiro de parques, hospedagem por região, estratégia de ingressos e suporte antes e durante a viagem para você evitar erros comuns e aproveitar melhor cada dia de viagem.
           </p>
-          <h3 className="text-xl md:text-2xl font-extrabold text-brand-dark mb-3">O que você pode incluir no pacote</h3>
+          <h3 className="text-xl md:text-2xl font-semibold text-brand-dark mb-3">O que você pode incluir no pacote</h3>
           <ul className="list-disc list-inside text-gray-700 space-y-1 mb-6">
             <li>Aéreo e hotel com perfil ideal para sua viagem</li>
             <li>Ingressos Disney e Universal com orientação de uso</li>
