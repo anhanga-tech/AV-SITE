@@ -867,6 +867,73 @@ function ResultScreen({ profile, mainDest, inspirations, lead, onRestart, baseWa
 }
 
 /* ==========================================================================
+   StageContent — renderiza a tela correta do quiz
+   ========================================================================== */
+
+interface StageContentProps {
+    stage: Stage;
+    answers: Record<string, string[]>;
+    profileKey: ProfileKey | null;
+    leadForm: LeadForm | null;
+    baseWaUrl: string;
+    submitFailed: boolean;
+    onStart: () => void;
+    onAnswerQ: (qId: string, value: string[]) => void;
+    onNextQ: (currentIndex: number) => void;
+    onBackQ: (currentIndex: number) => void;
+    onLeadSubmit: (data: LeadForm, skipped?: boolean) => void;
+    onRestart: () => void;
+    onGo: (next: Stage, dir?: 'forward' | 'back') => void;
+}
+
+function StageContent({
+    stage, answers, profileKey, leadForm, baseWaUrl, submitFailed,
+    onStart, onAnswerQ, onNextQ, onBackQ, onLeadSubmit, onRestart, onGo,
+}: StageContentProps) {
+    if (stage.kind === 'hero') return <HeroScreen onStart={onStart} />;
+    if (stage.kind === 'question') {
+        const q = QUIZ_QUESTIONS[stage.index];
+        return (
+            <QuestionScreen
+                q={q}
+                qIndex={stage.index}
+                total={QUIZ_QUESTIONS.length}
+                value={answers[q.id]}
+                onChange={(v) => onAnswerQ(q.id, v)}
+                onNext={() => onNextQ(stage.index)}
+                onBack={() => onBackQ(stage.index)}
+            />
+        );
+    }
+    if (stage.kind === 'lead') {
+        const leadProfileKey = matchProfile(answers);
+        return (
+            <PreLeadScreen
+                profile={TRAVELER_PROFILES[leadProfileKey]}
+                onSubmit={onLeadSubmit}
+                onBack={() => onGo({ kind: 'question', index: QUIZ_QUESTIONS.length - 1 }, 'back')}
+            />
+        );
+    }
+    if (stage.kind === 'result' && profileKey && leadForm) {
+        const mainDest = selectMainDestination(profileKey, answers.destino ?? []);
+        const inspirations = selectInspirationDestinations(profileKey, mainDest);
+        return (
+            <ResultScreen
+                profile={TRAVELER_PROFILES[profileKey]}
+                mainDest={mainDest}
+                inspirations={inspirations}
+                lead={leadForm}
+                onRestart={onRestart}
+                baseWaUrl={baseWaUrl}
+                submitFailed={submitFailed}
+            />
+        );
+    }
+    return null;
+}
+
+/* ==========================================================================
    Componente principal
    ========================================================================== */
 
@@ -960,50 +1027,6 @@ export default function QuizAnhangaLanding() {
 
     const stageKey = stage.kind === 'question' ? `q-${stage.index}` : stage.kind;
 
-    function renderStage() {
-        if (stage.kind === 'hero') return <HeroScreen onStart={start} />;
-        if (stage.kind === 'question') {
-            const q = QUIZ_QUESTIONS[stage.index];
-            return (
-                <QuestionScreen
-                    q={q}
-                    qIndex={stage.index}
-                    total={QUIZ_QUESTIONS.length}
-                    value={answers[q.id]}
-                    onChange={(v) => answerQ(q.id, v)}
-                    onNext={() => nextQ(stage.index)}
-                    onBack={() => backQ(stage.index)}
-                />
-            );
-        }
-        if (stage.kind === 'lead') {
-            const leadProfileKey = matchProfile(answers);
-            return (
-                <PreLeadScreen
-                    profile={TRAVELER_PROFILES[leadProfileKey]}
-                    onSubmit={handleLeadSubmit}
-                    onBack={() => go({ kind: 'question', index: QUIZ_QUESTIONS.length - 1 }, 'back')}
-                />
-            );
-        }
-        if (stage.kind === 'result' && profileKey && leadForm) {
-            const mainDest = selectMainDestination(profileKey, answers.destino ?? []);
-            const inspirations = selectInspirationDestinations(profileKey, mainDest);
-            return (
-                <ResultScreen
-                    profile={TRAVELER_PROFILES[profileKey]}
-                    mainDest={mainDest}
-                    inspirations={inspirations}
-                    lead={leadForm}
-                    onRestart={restart}
-                    baseWaUrl={baseWaUrl}
-                    submitFailed={submitFailed}
-                />
-            );
-        }
-        return null;
-    }
-
     return (
         <>
             <SEO
@@ -1016,7 +1039,21 @@ export default function QuizAnhangaLanding() {
                 <div className="quiz-app">
                     <div className={`quiz-stage quiz-stage--slide quiz-stage--${direction}`}>
                         <div className="quiz-stage-inner" key={stageKey}>
-                            {renderStage()}
+                            <StageContent
+                                stage={stage}
+                                answers={answers}
+                                profileKey={profileKey}
+                                leadForm={leadForm}
+                                baseWaUrl={baseWaUrl}
+                                submitFailed={submitFailed}
+                                onStart={start}
+                                onAnswerQ={answerQ}
+                                onNextQ={nextQ}
+                                onBackQ={backQ}
+                                onLeadSubmit={handleLeadSubmit}
+                                onRestart={restart}
+                                onGo={go}
+                            />
                         </div>
                     </div>
                 </div>
