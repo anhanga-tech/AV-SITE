@@ -230,9 +230,13 @@ export default defineConfig(({ mode, isSsrBuild }) => {
       minify: 'esbuild',
       rollupOptions: {
         output: {
-          manualChunks: isSsrBuild ? undefined : {
-            'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-            'ai-vendor': ['@google/genai'],
+          manualChunks: isSsrBuild ? undefined : (id) => {
+            if (id.includes('/node_modules/react/') || id.includes('/node_modules/react-dom/') || id.includes('/node_modules/react-router-dom/')) {
+              return 'react-vendor';
+            }
+            if (id.includes('/node_modules/@google/genai/')) {
+              return 'ai-vendor';
+            }
           }
         }
       },
