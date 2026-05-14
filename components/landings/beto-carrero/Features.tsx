@@ -12,7 +12,7 @@ const features: Feature[] = [
     tooltipText: "Agilidade Total"
   },
   {
-    icon: <Smile size={48} className="text-white group-hover:animate-bounce" />,
+    icon: <Smile size={48} className="text-white group-hover:animate-pulse" />,
     title: "Mais Diversão",
     description: "Casais, famílias e grupos. Você aproveita cada momento sem se preocupar com logística.",
     color: "bg-fun-pink",
