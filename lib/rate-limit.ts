@@ -21,24 +21,25 @@ interface RedisLike {
 const inMemoryStore = new Map<string, RateLimitEntry>();
 const IN_MEMORY_MAX_ENTRIES = 2500;
 
-// True when running inside Vercel (production, preview, or development deployment).
-// process.env.VERCEL_ENV is injected automatically by Vercel at build/runtime.
-const IS_VERCEL_RUNTIME = Boolean(process.env.VERCEL_ENV);
+// True when running inside a managed serverless edge runtime where module-level
+// state resets per request. Both Vercel (VERCEL_ENV) and Cloudflare Pages
+// (CF_PAGES) are detected; local development has neither variable set.
+const IS_EDGE_RUNTIME = Boolean(process.env.VERCEL_ENV || process.env.CF_PAGES);
 
 async function getRedisClient(): Promise<RedisLike | null> {
   const url = process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
 
   if (!url || !token) {
-    if (IS_VERCEL_RUNTIME) {
-      // Each Vercel Edge invocation gets a fresh V8 isolate — the in-memory Map
-      // above resets on every request and provides no real protection.
-      // Configure UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN to enable
-      // shared rate limiting across all Edge instances.
+    if (IS_EDGE_RUNTIME) {
+      // Each serverless edge invocation (Vercel or Cloudflare) gets a fresh V8
+      // isolate — the in-memory Map above resets on every request and provides
+      // no real protection. Configure Upstash Redis to enable shared rate
+      // limiting across all edge instances.
       console.error(
         'RateLimit: Upstash Redis not configured. ' +
-        'In-memory fallback is non-functional on Vercel Edge Runtime (isolated V8 contexts per request). ' +
-        'Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in your Vercel environment variables.'
+        'In-memory fallback is non-functional on edge runtimes (isolated V8 contexts per request). ' +
+        'Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in your environment variables.'
       );
     }
     return null;

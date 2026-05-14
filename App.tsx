@@ -1,8 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { LazyMotion, domAnimation } from 'framer-motion';
 import { BrowserRouter, MemoryRouter, Navigate, Route, Routes } from 'react-router-dom';
-import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import AIChat from './components/AIChat';
@@ -42,8 +40,6 @@ const ClientFeatures: React.FC = () => (
     <AIChat />
     <ContactModal />
     <BackToTop />
-    <Analytics />
-    <SpeedInsights />
   </ClientOnly>
 );
 
