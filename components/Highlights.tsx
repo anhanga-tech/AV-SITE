@@ -160,7 +160,7 @@ const Highlights = memo(() => {
                             </div>
                             <h2 className="text-4xl md:text-5xl font-black text-brand-dark leading-tight mb-6">
                                 Não existe roteiro certo <br />
-                                <span className="text-brand-cyan">
+                                <span className="text-anhanga-blue">
                                     para o viajante errado.
                                 </span>
                             </h2>
