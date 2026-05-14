@@ -1,4 +1,6 @@
 [![React Doctor](https://www.react.doctor/share/badge?p=anhanga-viagens&s=69&w=1111&f=133)](https://www.react.doctor/share?p=anhanga-viagens&s=69&w=1111&f=133)
+![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/felipewilliam2/AV-SITE)
+
 
 ## Anhangá Viagens - Site Institucional
 
