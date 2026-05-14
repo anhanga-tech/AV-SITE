@@ -716,10 +716,11 @@ function WhatsAppUpgrade({ profileName, mainDestName, firstName, baseWaUrl }: Wh
                     Perfeito! Agora é só abrir o WhatsApp.
                 </p>
                 <a
-                    className="quiz-btn quiz-btn-primary quiz-btn-lg"
+                    className="btn-whatsapp btn-specialist quiz-btn quiz-btn-primary quiz-btn-lg"
                     href={waUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    data-tracking="result-quiz-whatsapp"
                 >
                     Montar minha viagem
                     <span className="quiz-arrow">→</span>
@@ -752,10 +753,11 @@ function WhatsAppUpgrade({ profileName, mainDestName, firstName, baseWaUrl }: Wh
                 </button>
             </div>
             <a
-                className="quiz-wa-skip"
+                className="btn-whatsapp btn-specialist quiz-wa-skip"
                 href={baseWaUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                data-tracking="result-quiz-skip"
             >
                 Ir pro WhatsApp sem deixar número →
             </a>
