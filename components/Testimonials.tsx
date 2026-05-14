@@ -40,7 +40,7 @@ const Testimonials: React.FC = memo(() => {
             <div className="container mx-auto px-6 relative z-10">
                 <SectionHeader
                     badge="Love Notes"
-                    badgeIcon={<MessageSquareHeart className="w-4 h-4 text-red-500 fill-red-500" />}
+                    badgeIcon={<MessageSquareHeart className="size-4 text-red-500 fill-red-500" />}
                     title="Mural do Amor ❤️"
                     subtitle="Depoimentos reais de quem viajou com a gente"
                     className="mb-16"
@@ -82,11 +82,11 @@ const Testimonials: React.FC = memo(() => {
                                     transition-transform duration-500 hover:rotate-0 hover:scale-[1.01]
                                 `}>
                                             {/* Pin Graphic */}
-                                            <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-red-400 shadow-sm z-20 border border-red-600"></div>
+                                            <div className="absolute -top-6 left-1/2 -translate-x-1/2 size-4 rounded-full bg-red-400 shadow-sm z-20 border border-red-600"></div>
 
                                             {/* Animated Avatar Sticker */}
                                             <div className="relative shrink-0">
-                                                <div className="w-32 h-32 rounded-full border-4 border-white shadow-lg overflow-hidden bg-white animate-float">
+                                                <div className="size-32 rounded-full border-4 border-white shadow-lg overflow-hidden bg-white animate-float">
                                                     <LazyImage
                                                         src={testimonial.image}
                                                         alt={testimonial.name}
@@ -102,7 +102,7 @@ const Testimonials: React.FC = memo(() => {
 
                                             {/* Text */}
                                             <div className="text-center md:text-left">
-                                                <Quote className="w-10 h-10 text-brand-cyan/20 mx-auto md:mx-0 mb-4 fill-current" />
+                                                <Quote className="size-10 text-brand-cyan/20 mx-auto md:mx-0 mb-4 fill-current" />
                                                 <p itemProp="reviewBody" className="text-xl md:text-2xl font-bold text-gray-700 leading-snug mb-6 font-serif italic">
                                                     "{testimonial.text}"
                                                 </p>
@@ -127,8 +127,8 @@ const Testimonials: React.FC = memo(() => {
 
                     {/* Controls */}
                     <div className="flex justify-center gap-4 mt-8">
-                        <button onClick={prevSlide} className="w-12 h-12 bg-white border-2 border-white/50 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform text-brand-cyan hover:bg-brand-cyan hover:text-white z-20">
-                            <ChevronLeft className="w-6 h-6" />
+                        <button onClick={prevSlide} className="size-12 bg-white border-2 border-white/50 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform text-brand-cyan hover:bg-brand-cyan hover:text-white z-20">
+                            <ChevronLeft className="size-6" />
                         </button>
                         <div className="flex gap-2 items-center z-20">
                             {TESTIMONIALS.map((t, i) => (
@@ -140,8 +140,8 @@ const Testimonials: React.FC = memo(() => {
                                 />
                             ))}
                         </div>
-                        <button onClick={nextSlide} className="w-12 h-12 bg-white border-2 border-white/50 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform text-brand-cyan hover:bg-brand-cyan hover:text-white z-20">
-                            <ChevronRight className="w-6 h-6" />
+                        <button onClick={nextSlide} className="size-12 bg-white border-2 border-white/50 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform text-brand-cyan hover:bg-brand-cyan hover:text-white z-20">
+                            <ChevronRight className="size-6" />
                         </button>
                     </div>
 

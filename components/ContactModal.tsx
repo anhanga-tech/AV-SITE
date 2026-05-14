@@ -124,7 +124,7 @@ const ContactModal: React.FC = () => {
                         className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan"
                         aria-label="Fechar"
                     >
-                        <X className="h-5 w-5" weight="bold" />
+                        <X className="size-5" weight="bold" />
                     </button>
                 </div>
 
@@ -135,7 +135,7 @@ const ContactModal: React.FC = () => {
                             role="status"
                             aria-live="polite"
                         >
-                            <CheckCircle className="h-14 w-14 text-green-600" weight="fill" />
+                            <CheckCircle className="size-14 text-green-600" weight="fill" />
                             <p className="font-bold text-gray-800">Recebemos seu contato!</p>
                             <p className="text-sm text-gray-500">
                                 Nossa equipe entra em contato em breve pelo WhatsApp.
@@ -229,7 +229,7 @@ const ContactModal: React.FC = () => {
                                 type="checkbox"
                                 checked={fields.emailOptIn}
                                 onChange={(event) => setField('emailOptIn', event.target.checked)}
-                                className="mt-0.5 h-4 w-4 flex-shrink-0 cursor-pointer rounded border-2 border-brand-vibrant accent-brand-vibrant"
+                                className="mt-0.5 size-4 flex-shrink-0 cursor-pointer rounded border-2 border-brand-vibrant accent-brand-vibrant"
                             />
                             <label htmlFor="contact-optIn" className="cursor-pointer text-xs leading-relaxed text-blue-700">
                                 Quero receber novidades e ofertas de viagem por e-mail.{' '}

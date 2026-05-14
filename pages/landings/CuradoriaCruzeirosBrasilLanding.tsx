@@ -119,9 +119,9 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
             className="inline-flex items-center gap-2 group"
             aria-label="Voltar para o site principal da Anhangá Viagens"
           >
-            <ArrowLeft className="w-4 h-4 text-gray-400 group-hover:text-anhanga-blue transition-colors" />
-            <span className="w-7 h-7 bg-anhanga-blue/10 rounded-lg flex items-center justify-center flex-shrink-0">
-              <img src="/favicon.svg" alt="" aria-hidden="true" className="w-4 h-4" />
+            <ArrowLeft className="size-4 text-gray-400 group-hover:text-anhanga-blue transition-colors" />
+            <span className="size-7 bg-anhanga-blue/10 rounded-lg flex items-center justify-center flex-shrink-0">
+              <img src="/favicon.svg" alt="" aria-hidden="true" className="size-4" />
             </span>
             <span className="text-sm font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
               Anhangá Viagens
@@ -158,7 +158,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
             data-tracking="hero-cruzeiros-brasil"
           >
             Falar com um especialista
-            <ArrowRight className="w-5 h-5" />
+            <ArrowRight className="size-5" />
           </button>
           <p className="mt-4 text-sm text-gray-600">Sem taxa de curadoria. Gratuito.</p>
         </div>
@@ -176,7 +176,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
           <div className="grid sm:grid-cols-2 gap-4">
             {WHAT_WE_ANALYZE.map(item => (
               <div key={item} className="flex items-start gap-3 p-4 rounded-xl bg-anhanga-light">
-                <CheckCircle className="w-5 h-5 text-anhanga-blue flex-shrink-0 mt-0.5" aria-hidden="true" />
+                <CheckCircle className="size-5 text-anhanga-blue flex-shrink-0 mt-0.5" aria-hidden="true" />
                 <span className="text-gray-700">{item}</span>
               </div>
             ))}
@@ -204,12 +204,12 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
                 }`}
               >
                 <div
-                  className={`w-11 h-11 rounded-xl flex items-center justify-center mb-5 ${
+                  className={`size-11 rounded-xl flex items-center justify-center mb-5 ${
                     variant === 'filled' ? 'bg-white/15' : 'bg-anhanga-blue/10'
                   }`}
                 >
                   <Icon
-                    className={`w-5 h-5 ${variant === 'filled' ? 'text-white' : 'text-anhanga-blue'}`}
+                    className={`size-5 ${variant === 'filled' ? 'text-white' : 'text-anhanga-blue'}`}
                   />
                 </div>
                 <h3 className={`text-xl font-black mb-3 ${variant === 'filled' ? 'text-white' : 'text-anhanga-dark'}`}>
@@ -253,7 +253,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
                 key={step}
                 className={`flex gap-6 py-8 ${idx < HOW_IT_WORKS.length - 1 ? 'border-b border-anhanga-blue/10' : ''}`}
               >
-                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm">
+                <div className="flex-shrink-0 size-12 rounded-full bg-white flex items-center justify-center shadow-sm">
                   <span className="text-sm font-black text-anhanga-blue">{step}</span>
                 </div>
                 <div>
@@ -307,7 +307,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
             data-tracking="footer-cruzeiros-brasil"
           >
             Falar com um especialista
-            <ArrowRight className="w-6 h-6" />
+            <ArrowRight className="size-6" />
           </button>
         </div>
       </section>

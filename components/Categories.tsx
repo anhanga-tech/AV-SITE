@@ -52,7 +52,7 @@ const Categories = memo(() => {
         <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border-2 border-brand-dark bg-white text-brand-dark font-black text-xs uppercase tracking-widest shadow-[4px_4px_0px_#0f172a] mb-4">
-              <TrendingUp className="w-4 h-4" /> Em Alta
+              <TrendingUp className="size-4" /> Em Alta
             </div>
             <h2 className="text-4xl md:text-5xl font-black text-brand-dark">
               Todo mundo <br className="md:hidden" /> quer ir pra cá 👇
@@ -101,7 +101,7 @@ const Categories = memo(() => {
               {/* Sticker Decor */}
               <div className="absolute -bottom-4 -right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-0 group-hover:scale-110">
                 <div className="bg-brand-yellow text-brand-dark rounded-full p-3 shadow-lg border-2 border-white">
-                  <ArrowRight className="w-6 h-6 -rotate-45" />
+                  <ArrowRight className="size-6 -rotate-45" />
                 </div>
               </div>
             </Link>

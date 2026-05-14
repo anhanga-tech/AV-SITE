@@ -62,7 +62,7 @@ const Testimonials: React.FC = () => {
                  <div className={`absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-10 ${tapeColors[idx % 3]} backdrop-blur-sm shadow-sm transform -rotate-1 border-l-2 border-r-2 border-white/20 z-20`}></div>
 
                  {/* Giant Quote Icon Background */}
-                 <Quote className="absolute top-8 left-6 text-gray-100 w-24 h-24 rotate-12 z-0 pointer-events-none" />
+                 <Quote className="absolute top-8 left-6 text-gray-100 size-24 rotate-12 z-0 pointer-events-none" />
 
                  {/* Stars */}
                  <div className="flex gap-1 mb-6 text-fun-yellow relative z-10">
@@ -77,7 +77,7 @@ const Testimonials: React.FC = () => {
                  {/* Author & Verification */}
                  <div className="flex items-center gap-4 border-t-2 border-dashed border-gray-200 pt-6 mt-auto relative z-10">
                    <div className="relative">
-                      <img src={t.avatar} alt={t.name} width="56" height="56" loading="lazy" className="w-14 h-14 rounded-full border-2 border-fun-dark shadow-sm" />
+                      <img src={t.avatar} alt={t.name} width="56" height="56" loading="lazy" className="size-14 rounded-full border-2 border-fun-dark shadow-sm" />
                       <div className="absolute -bottom-1 -right-1 bg-fun-blue text-white rounded-full p-0.5 border border-white">
                         <CheckCircle2 size={12} strokeWidth={4} />
                       </div>

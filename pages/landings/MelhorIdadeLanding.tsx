@@ -57,8 +57,8 @@ const MelhorIdadeLanding: React.FC = () => {
       <div className="bg-white/80 backdrop-blur-md py-4 border-b border-gray-100 sticky top-0 z-[60]">
         <div className="container mx-auto px-6 flex justify-between items-center">
           <Link to="/" className="text-sm font-bold text-brand-dark hover:text-brand-cyan transition-colors flex items-center gap-2">
-            <span className="w-8 h-8 bg-brand-cyan/10 rounded-lg flex items-center justify-center">
-              <img src="/favicon.svg" alt="Anhangá" className="w-5 h-5" />
+            <span className="size-8 bg-brand-cyan/10 rounded-lg flex items-center justify-center">
+              <img src="/favicon.svg" alt="Anhangá" className="size-5" />
             </span>
             Anhangá Viagens
           </Link>
@@ -81,7 +81,7 @@ const MelhorIdadeLanding: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               className="inline-flex items-center gap-2 bg-brand-cyan/10 text-brand-cyan px-4 py-1 rounded-full text-sm font-bold mb-6"
             >
-              <Heart className="w-4 h-4 fill-current" /> Viagens com Propósito
+              <Heart className="size-4 fill-current" /> Viagens com Propósito
             </m.div>
             <m.h1 
               initial={{ opacity: 0, y: 20 }}
@@ -114,7 +114,7 @@ const MelhorIdadeLanding: React.FC = () => {
                 data-tracking="hero-melhor-idade"
               >
                 Solicitar Orçamento
-                <Sparkles className="w-5 h-5" />
+                <Sparkles className="size-5" />
               </button>
             </m.div>
           </div>
@@ -122,7 +122,7 @@ const MelhorIdadeLanding: React.FC = () => {
         
         {/* Background Decals */}
         <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-brand-cyan/5 to-transparent pointer-events-none"></div>
-        <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-brand-yellow/10 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="absolute -bottom-24 -right-24 size-96 bg-brand-yellow/10 rounded-full blur-[100px] pointer-events-none"></div>
       </section>
 
       {/* PILARES SECTION */}
@@ -130,8 +130,8 @@ const MelhorIdadeLanding: React.FC = () => {
         <div className="container mx-auto px-6">
           <div className="grid md:grid-cols-3 gap-12">
             <div className="space-y-4">
-              <div className="w-16 h-16 bg-brand-cyan/10 rounded-2xl flex items-center justify-center text-brand-cyan mb-6">
-                <ShieldCheck className="w-8 h-8" />
+              <div className="size-16 bg-brand-cyan/10 rounded-2xl flex items-center justify-center text-brand-cyan mb-6">
+                <ShieldCheck className="size-8" />
               </div>
               <h3 className="text-2xl font-black text-brand-dark">Segurança em 1º lugar</h3>
               <p className="text-gray-500 font-medium leading-relaxed">
@@ -139,8 +139,8 @@ const MelhorIdadeLanding: React.FC = () => {
               </p>
             </div>
             <div className="space-y-4">
-              <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 mb-6">
-                <Coffee className="w-8 h-8" />
+              <div className="size-16 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 mb-6">
+                <Coffee className="size-8" />
               </div>
               <h3 className="text-2xl font-black text-brand-dark">Ritmo Desacelerado</h3>
               <p className="text-gray-500 font-medium leading-relaxed">
@@ -148,8 +148,8 @@ const MelhorIdadeLanding: React.FC = () => {
               </p>
             </div>
             <div className="space-y-4">
-              <div className="w-16 h-16 bg-brand-vibrant/10 rounded-2xl flex items-center justify-center text-brand-vibrant mb-6">
-                <Sparkles className="w-8 h-8" />
+              <div className="size-16 bg-brand-vibrant/10 rounded-2xl flex items-center justify-center text-brand-vibrant mb-6">
+                <Sparkles className="size-8" />
               </div>
               <h3 className="text-2xl font-black text-brand-dark">Curadoria Personalizada</h3>
               <p className="text-gray-500 font-medium leading-relaxed">
@@ -197,7 +197,7 @@ const MelhorIdadeLanding: React.FC = () => {
       {/* FINAL CTA */}
       <section className="py-24 container mx-auto px-6 text-center">
         <div className="bg-brand-dark text-white rounded-[3rem] p-12 md:p-24 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-brand-cyan/20 blur-[100px] rounded-full"></div>
+          <div className="absolute top-0 right-0 size-64 bg-brand-cyan/20 blur-[100px] rounded-full"></div>
           <h2 className="text-4xl md:text-6xl font-black mb-8 relative z-10">Sua próxima aventura <br className="hidden md:block" /> começa agora.</h2>
           <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto relative z-10">
             Fale conosco hoje mesmo e receba uma proposta exclusiva para sua viagem. Segurança, conforto e exclusividade em um só lugar.

@@ -108,8 +108,8 @@ const LineupSection: React.FC = () => {
   return (
     <section id="lineup" className="py-20 bg-gray-950 text-white relative overflow-hidden" aria-labelledby="lineup-heading" ref={elementRef}>
       {/* Decorative blobs */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-anhanga-blue opacity-20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" aria-hidden="true"></div>
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-anhanga-yellow opacity-10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" aria-hidden="true"></div>
+      <div className="absolute top-0 right-0 size-64 bg-anhanga-blue opacity-20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" aria-hidden="true"></div>
+      <div className="absolute bottom-0 left-0 size-96 bg-anhanga-yellow opacity-10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" aria-hidden="true"></div>
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Headline Section */}
@@ -118,7 +118,7 @@ const LineupSection: React.FC = () => {
           <div className="flex justify-center items-center -space-x-4 mb-8" aria-hidden="true">
             {headliners.slice(0, 5).map((artist) => (
               <div key={artist.name} className="relative z-0 hover:z-10 transition-all duration-300 transform hover:scale-110 hover:-translate-y-2 group">
-                <div className="w-16 h-16 md:w-24 md:h-24 rounded-full border-4 border-black group-hover:border-anhanga-yellow overflow-hidden relative shadow-lg">
+                <div className="size-16 md:size-24 rounded-full border-4 border-black group-hover:border-anhanga-yellow overflow-hidden relative shadow-lg">
                   <img
                     src={getArtistImageUrl(artist.image, 96, 96)}
                     alt={`Foto de ${artist.name}`}
@@ -133,7 +133,7 @@ const LineupSection: React.FC = () => {
                 </div>
               </div>
             ))}
-            <div className="relative z-0 w-16 h-16 md:w-24 md:h-24 rounded-full border-4 border-black bg-anhanga-yellow flex flex-col items-center justify-center text-anhanga-darkBlue shadow-lg transform hover:scale-105 transition-transform">
+            <div className="relative z-0 size-16 md:size-24 rounded-full border-4 border-black bg-anhanga-yellow flex flex-col items-center justify-center text-anhanga-darkBlue shadow-lg transform hover:scale-105 transition-transform">
               <span className="font-black text-lg md:text-2xl leading-none">+50</span>
               <span className="text-[10px] font-bold uppercase tracking-wider">Stars</span>
             </div>
@@ -206,7 +206,7 @@ const LineupSection: React.FC = () => {
                 <div className="mb-6 space-y-4">
                   {day.main.map((act) => (
                     <div key={act.name} className="flex items-center gap-4 group/artist">
-                      <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-700 group-hover/artist:border-anhanga-yellow transition-colors shrink-0 bg-gray-800">
+                      <div className="size-12 rounded-full overflow-hidden border-2 border-gray-700 group-hover/artist:border-anhanga-yellow transition-colors shrink-0 bg-gray-800">
                         <img
                           src={getArtistImageUrl(act.image, 100, 100)}
                           alt={act.name}
@@ -248,7 +248,7 @@ const LineupSection: React.FC = () => {
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {['Chegada tranquila ao Autódromo', 'Descanso em hotel 4 estrelas', 'Suporte local para imprevistos', 'After-parties sugeridas'].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-base text-gray-200">
-                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-anhanga-blue flex items-center justify-center text-xs font-bold" aria-hidden="true">✓</span>
+                    <span className="flex-shrink-0 size-5 rounded-full bg-anhanga-blue flex items-center justify-center text-xs font-bold" aria-hidden="true">✓</span>
                     {item}
                   </li>
                 ))}

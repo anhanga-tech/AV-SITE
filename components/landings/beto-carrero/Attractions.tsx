@@ -70,8 +70,8 @@ const Attractions: React.FC = () => {
       </div>
 
       {/* Background Scribbles */}
-      <div className="absolute top-1/4 right-0 w-64 h-64 bg-fun-yellow/20 rounded-full blur-3xl -z-10"></div>
-      <div className="absolute bottom-1/4 left-0 w-64 h-64 bg-fun-pink/10 rounded-full blur-3xl -z-10"></div>
+      <div className="absolute top-1/4 right-0 size-64 bg-fun-yellow/20 rounded-full blur-3xl -z-10"></div>
+      <div className="absolute bottom-1/4 left-0 size-64 bg-fun-pink/10 rounded-full blur-3xl -z-10"></div>
 
       <div className="container mx-auto px-4">
         <SectionTitle

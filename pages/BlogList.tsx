@@ -48,7 +48,7 @@ const BlogList: React.FC = () => {
                 {/* Header */}
                 <div className="text-center mb-16 max-w-3xl mx-auto">
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border-2 border-brand-dark bg-brand-yellow text-brand-dark font-black text-xs uppercase tracking-widest shadow-[4px_4px_0px_#0f172a] transform -rotate-1 mb-4">
-                        <BookOpen className="w-4 h-4" /> Todos os Artigos
+                        <BookOpen className="size-4" /> Todos os Artigos
                     </div>
                     <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-brand-dark mb-6">
                         Diário de <span className="text-brand-cyan">Bordo</span>
@@ -68,7 +68,7 @@ const BlogList: React.FC = () => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="w-full px-6 py-4 rounded-full border-2 border-gray-200 focus:border-brand-cyan focus:outline-none shadow-sm pl-12 text-gray-700 font-medium transition-all"
                         />
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 size-5" />
                     </div>
                 </div>
 
@@ -125,10 +125,10 @@ const BlogList: React.FC = () => {
 
                                     <div className="pt-4 border-t border-dashed border-gray-100 flex items-center justify-between">
                                         <span className="text-xs font-bold text-gray-400 flex items-center gap-1">
-                                            <User className="w-3 h-3" /> {AUTHORS[post.author]?.name ?? post.author}
+                                            <User className="size-3" /> {AUTHORS[post.author]?.name ?? post.author}
                                         </span>
-                                        <span className="w-10 h-10 rounded-full flex items-center justify-center transition-colors bg-gray-100 text-gray-400 group-hover:bg-brand-cyan group-hover:text-white">
-                                            <ArrowRight className="w-5 h-5" />
+                                        <span className="size-10 rounded-full flex items-center justify-center transition-colors bg-gray-100 text-gray-400 group-hover:bg-brand-cyan group-hover:text-white">
+                                            <ArrowRight className="size-5" />
                                         </span>
                                     </div>
                                 </div>

@@ -21,8 +21,8 @@ export const BlogPostSidebar: React.FC<BlogPostSidebarProps> = ({ author, author
     return (
         <div className="sticky top-32 space-y-8">
             <div className="bg-white rounded-3xl p-8 border-2 border-gray-100 text-center relative overflow-hidden shadow-lg group hover:border-brand-yellow/30 transition-colors">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-brand-yellow/10 rounded-bl-full -mr-10 -mt-10 transition-all group-hover:scale-110"></div>
-                <div className="w-28 h-28 bg-gray-200 rounded-full mx-auto mb-6 overflow-hidden border-[6px] border-white shadow-xl relative z-10">
+                <div className="absolute top-0 right-0 size-32 bg-brand-yellow/10 rounded-bl-full -mr-10 -mt-10 transition-all group-hover:scale-110"></div>
+                <div className="size-28 bg-gray-200 rounded-full mx-auto mb-6 overflow-hidden border-[6px] border-white shadow-xl relative z-10">
                     {author?.image ? (
                         <img src={author.image} alt={author.name} width="112" height="112" loading="lazy" className="w-full h-full object-cover" />
                     ) : (
@@ -56,7 +56,7 @@ export const BlogPostSidebar: React.FC<BlogPostSidebarProps> = ({ author, author
                 <div className="space-y-4">
                     {relatedPosts.map(related => (
                         <a href={getBlogPostUrl(related.slug)} key={related.slug} className="group flex gap-5 items-center bg-white p-4 rounded-2xl hover:bg-white hover:shadow-xl transition-all border border-transparent hover:border-gray-100 duration-300">
-                            <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0 border border-gray-100 shadow-sm relative">
+                            <div className="size-24 rounded-2xl overflow-hidden shrink-0 border border-gray-100 shadow-sm relative">
                                 <img src={optimizeRemoteImageUrl(related.image, 200, 200)} alt={related.title} width="200" height="200" loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                             </div>
                             <div className="flex flex-col h-full justify-center">
@@ -69,7 +69,7 @@ export const BlogPostSidebar: React.FC<BlogPostSidebarProps> = ({ author, author
                                     {related.title}
                                 </h5>
                                 <span className="text-xs text-gray-400 font-bold flex items-center gap-1">
-                                    <Clock className="w-3 h-3" /> {related.readingTime}
+                                    <Clock className="size-3" /> {related.readingTime}
                                 </span>
                             </div>
                         </a>

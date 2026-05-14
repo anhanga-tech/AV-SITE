@@ -62,7 +62,7 @@ export const Button: React.FC<ButtonProps> = ({
         >
             {isLoading ? (
                 <>
-                    <CircleNotch className="w-4 h-4 animate-spin" weight="bold" aria-hidden="true" />
+                    <CircleNotch className="size-4 animate-spin" weight="bold" aria-hidden="true" />
                     {children}
                 </>
             ) : (

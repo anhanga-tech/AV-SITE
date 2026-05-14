@@ -75,7 +75,7 @@ const Button: React.FC<ButtonProps> = ({
         aria-label={computedAriaLabel}
         data-tracking={dataTracking}
       >
-        {icon && <MessageCircle className="w-6 h-6 mr-2" />}
+        {icon && <MessageCircle className="size-6 mr-2" />}
         {text}
       </button>
 
@@ -83,7 +83,7 @@ const Button: React.FC<ButtonProps> = ({
         <div className={`absolute left-1/2 transform -translate-x-1/2 w-max max-w-[200px] md:max-w-xs transition-all duration-200 opacity-0 group-hover:opacity-100 pointer-events-none z-50 ${positionStyles} ${animationStyles}`}>
           <div className="bg-fun-dark text-white text-sm font-bold py-2 px-3 rounded-xl shadow-lg border-2 border-white text-center relative">
             {tooltip}
-            <div className={`absolute left-1/2 transform -translate-x-1/2 w-3 h-3 bg-fun-dark rotate-45 ${arrowStyles}`}></div>
+            <div className={`absolute left-1/2 transform -translate-x-1/2 size-3 bg-fun-dark rotate-45 ${arrowStyles}`}></div>
           </div>
         </div>
       )}

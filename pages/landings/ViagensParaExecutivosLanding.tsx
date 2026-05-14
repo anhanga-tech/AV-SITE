@@ -110,9 +110,9 @@ const ViagensParaExecutivosLanding: React.FC = () => {
             className="inline-flex items-center gap-2 group"
             aria-label="Voltar para o site principal da Anhangá Viagens"
           >
-            <ArrowLeft className="w-4 h-4 text-gray-400 group-hover:text-anhanga-blue transition-colors" />
-            <span className="w-7 h-7 bg-anhanga-blue/10 rounded-lg flex items-center justify-center flex-shrink-0">
-              <img src="/favicon.svg" alt="" aria-hidden="true" className="w-4 h-4" />
+            <ArrowLeft className="size-4 text-gray-400 group-hover:text-anhanga-blue transition-colors" />
+            <span className="size-7 bg-anhanga-blue/10 rounded-lg flex items-center justify-center flex-shrink-0">
+              <img src="/favicon.svg" alt="" aria-hidden="true" className="size-4" />
             </span>
             <span className="text-sm font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
               Anhangá Viagens
@@ -149,7 +149,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
             data-tracking="hero-viagens-executivos"
           >
             Falar com um consultor
-            <ArrowRight className="w-5 h-5" />
+            <ArrowRight className="size-5" />
           </button>
           <p className="mt-4 text-sm text-gray-400">Consultor fixo do início ao fim.</p>
         </div>
@@ -193,12 +193,12 @@ const ViagensParaExecutivosLanding: React.FC = () => {
                 className={`p-8 rounded-2xl ${variant === 'filled' ? 'bg-anhanga-dark text-white' : 'bg-white'}`}
               >
                 <div
-                  className={`w-11 h-11 rounded-xl flex items-center justify-center mb-5 ${
+                  className={`size-11 rounded-xl flex items-center justify-center mb-5 ${
                     variant === 'filled' ? 'bg-anhanga-yellow/20' : 'bg-anhanga-blue/10'
                   }`}
                 >
                   <Icon
-                    className={`w-5 h-5 ${variant === 'filled' ? 'text-anhanga-yellow' : 'text-anhanga-blue'}`}
+                    className={`size-5 ${variant === 'filled' ? 'text-anhanga-yellow' : 'text-anhanga-blue'}`}
                   />
                 </div>
                 <h3 className={`text-xl font-black mb-3 ${variant === 'filled' ? 'text-white' : 'text-anhanga-dark'}`}>
@@ -225,7 +225,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
                 key={step}
                 className={`flex gap-8 py-8 ${idx < HOW_IT_WORKS.length - 1 ? 'border-b border-gray-100' : ''}`}
               >
-                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-anhanga-blue/10 flex items-center justify-center">
+                <div className="flex-shrink-0 size-12 rounded-full bg-anhanga-blue/10 flex items-center justify-center">
                   <span className="text-sm font-black text-anhanga-blue">{step}</span>
                 </div>
                 <div>
@@ -279,7 +279,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
             data-tracking="footer-viagens-executivos"
           >
             Falar com um consultor
-            <ArrowRight className="w-6 h-6" />
+            <ArrowRight className="size-6" />
           </button>
         </div>
       </section>

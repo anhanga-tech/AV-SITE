@@ -41,7 +41,7 @@ export const PassportStamp: React.FC<PassportStampProps> = ({
         }
       `}} />
 
-            <div className="relative w-24 h-24 md:w-28 md:h-28 shrink-0">
+            <div className="relative size-24 md:size-28 shrink-0">
                 {/* Outer distressed ring */}
                 <div className="absolute inset-0 rounded-full border-[3px] border-brand-vibrant border-dashed opacity-80" style={{ clipPath: 'polygon(0% 0%, 100% 0%, 100% 90%, 80% 100%, 0% 100%)' }}></div>
                 <div className="absolute inset-1 rounded-full border-[2px] border-brand-vibrant opacity-60"></div>

@@ -35,7 +35,7 @@ const FAQItem = memo(({ question, answer, idx }: FAQItemProps) => {
             >
                 <div className="flex items-center gap-3">
                     {/* Semantic icon visual aid (optional but nice) */}
-                    <span className="hidden md:flex items-center justify-center w-8 h-8 rounded-full bg-brand-light text-brand-cyan text-xs font-bold">
+                    <span className="hidden md:flex items-center justify-center size-8 rounded-full bg-brand-light text-brand-cyan text-xs font-bold">
                         {idx + 1}
                     </span>
                     <h3
@@ -45,11 +45,11 @@ const FAQItem = memo(({ question, answer, idx }: FAQItemProps) => {
                     </h3>
                 </div>
 
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${isOpen
+                <div className={`size-10 rounded-xl flex items-center justify-center transition-all duration-300 ${isOpen
                     ? 'bg-brand-cyan text-white rotate-180'
                     : 'bg-white text-gray-400 group-hover:text-brand-cyan'
                     }`}>
-                    {isOpen ? <CaretUp className="w-6 h-6" weight="bold" /> : <CaretDown className="w-6 h-6" weight="bold" />}
+                    {isOpen ? <CaretUp className="size-6" weight="bold" /> : <CaretDown className="size-6" weight="bold" />}
                 </div>
             </button>
             <div
@@ -99,11 +99,11 @@ const FAQS = [
                     Você recebe uma proposta com todos os custos listados:
                 </p>
                 <ul className="space-y-2 mb-4">
-                    <li className="flex items-center gap-2"><AirplaneTilt className="w-4 h-4 text-brand-cyan" weight="fill" /> Passagens aéreas (consultamos o melhor preço do dia)</li>
-                    <li className="flex items-center gap-2"><Buildings className="w-4 h-4 text-brand-cyan" weight="fill" /> Hospedagem (você escolhe o nível de conforto)</li>
-                    <li className="flex items-center gap-2"><Ticket className="w-4 h-4 text-brand-cyan" weight="fill" /> Entradas em atrações</li>
-                    <li className="flex items-center gap-2"><MapPin className="w-4 h-4 text-brand-cyan" weight="fill" /> Transporte terrestre</li>
-                    <li className="flex items-center gap-2"><Sparkle className="w-4 h-4 text-brand-cyan" weight="fill" /> Refeições recomendadas (opcionais)</li>
+                    <li className="flex items-center gap-2"><AirplaneTilt className="size-4 text-brand-cyan" weight="fill" /> Passagens aéreas (consultamos o melhor preço do dia)</li>
+                    <li className="flex items-center gap-2"><Buildings className="size-4 text-brand-cyan" weight="fill" /> Hospedagem (você escolhe o nível de conforto)</li>
+                    <li className="flex items-center gap-2"><Ticket className="size-4 text-brand-cyan" weight="fill" /> Entradas em atrações</li>
+                    <li className="flex items-center gap-2"><MapPin className="size-4 text-brand-cyan" weight="fill" /> Transporte terrestre</li>
+                    <li className="flex items-center gap-2"><Sparkle className="size-4 text-brand-cyan" weight="fill" /> Refeições recomendadas (opcionais)</li>
                 </ul>
                 <p className="font-bold text-brand-dark">Só avançamos após sua aprovação. Sem surpresas!</p>
             </div>
@@ -205,7 +205,7 @@ const FAQ = memo(() => {
             style={{ backgroundColor: '#fffdf5' }}
         >
             {/* Decorative blob for background interest */}
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-yellow-100/40 rounded-full blur-3xl pointer-events-none -z-10 translate-x-1/3 -translate-y-1/3"></div>
+            <div className="absolute top-0 right-0 size-[500px] bg-yellow-100/40 rounded-full blur-3xl pointer-events-none -z-10 translate-x-1/3 -translate-y-1/3"></div>
 
             <div className="container mx-auto px-6 max-w-4xl">
                 <div className="text-center mb-16">
@@ -233,7 +233,7 @@ const FAQ = memo(() => {
                 <div className="mt-16 flex justify-center">
                     <div className="bg-white/80 backdrop-blur-sm border border-brand-cyan/20 rounded-3xl p-6 flex flex-col md:flex-row items-center gap-5 max-w-lg shadow-[0_8px_30px_rgba(14,165,233,0.1)] hover:shadow-[0_8px_30px_rgba(14,165,233,0.2)] transition-shadow cursor-default">
                         <div className="bg-brand-light p-4 rounded-full">
-                            <Sparkle className="w-8 h-8 text-brand-cyan animate-pulse" weight="fill" />
+                            <Sparkle className="size-8 text-brand-cyan animate-pulse" weight="fill" />
                         </div>
                         <div className="text-center md:text-left">
                             <h4 className="font-bold text-brand-dark text-xl mb-1">Ainda tem dúvidas?</h4>

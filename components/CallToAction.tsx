@@ -43,7 +43,7 @@ const CallToActionComponent: React.FC = () => {
                         {/* Header Strip */}
                         <div className="flex justify-between items-center mb-8 border-b-2 border-dashed border-gray-100 pb-4">
                             <div className="flex items-center gap-2 text-brand-cyan font-black tracking-widest text-sm uppercase" title="Estilo Boarding Pass">
-                                <AirplaneTilt className="w-5 h-5" weight="fill" /> Anhangá Airlines
+                                <AirplaneTilt className="size-5" weight="fill" /> Anhangá Airlines
                                 <span className="text-[10px] opacity-40 ml-1 hidden lg:inline">(Boarding Pass)</span>
                             </div>
                             <div className="text-gray-400 font-bold text-xs uppercase">First Class Experience</div>
@@ -141,7 +141,7 @@ const CallToActionComponent: React.FC = () => {
                                         type="checkbox"
                                         checked={fields.emailOptIn}
                                         onChange={(event) => setField('emailOptIn', event.target.checked)}
-                                        className="mt-0.5 w-4 h-4 rounded border-2 border-brand-vibrant accent-brand-vibrant cursor-pointer flex-shrink-0"
+                                        className="mt-0.5 size-4 rounded border-2 border-brand-vibrant accent-brand-vibrant cursor-pointer flex-shrink-0"
                                     />
                                     <label htmlFor="cta-optIn" className="text-xs text-blue-700 leading-relaxed cursor-pointer">
                                         Quero receber novidades por e-mail.{' '}
@@ -162,9 +162,9 @@ const CallToActionComponent: React.FC = () => {
                                         className="w-full sm:flex-1 flex items-center justify-center gap-2 bg-[#25D366] text-white text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-[#1fba59] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                                     >
                                         {isSubmitting ? (
-                                            <SpinnerGap className="w-4 h-4 animate-spin" weight="bold" />
+                                            <SpinnerGap className="size-4 animate-spin" weight="bold" />
                                         ) : (
-                                            <WhatsappLogo className="w-4 h-4" weight="fill" />
+                                            <WhatsappLogo className="size-4" weight="fill" />
                                         )}
                                         Chamar no WhatsApp
                                     </button>
@@ -183,16 +183,16 @@ const CallToActionComponent: React.FC = () => {
                         {formState === 'submitted' && (
                             <div className="flex flex-col gap-3" role="status" aria-live="polite">
                                 <p className="flex items-center gap-2 text-green-600 text-sm font-bold">
-                                    <CheckCircle className="w-5 h-5" weight="fill" />
+                                    <CheckCircle className="size-5" weight="fill" />
                                     Recebemos! Nossa equipe entra em contato em breve.
                                 </p>
                             </div>
                         )}
 
                         {/* Top "Hole" for perforation illusion */}
-                        <div className="hidden md:block absolute -right-4 top-[-1.5rem] w-8 h-8 bg-brand-light rounded-full z-20"></div>
+                        <div className="hidden md:block absolute -right-4 top-[-1.5rem] size-8 bg-brand-light rounded-full z-20"></div>
                         {/* Bottom "Hole" for perforation illusion */}
-                        <div className="hidden md:block absolute -right-4 bottom-[-1.5rem] w-8 h-8 bg-brand-light rounded-full z-20"></div>
+                        <div className="hidden md:block absolute -right-4 bottom-[-1.5rem] size-8 bg-brand-light rounded-full z-20"></div>
                     </div>
 
                     {/* --- DIVIDER (Perforation) --- */}
@@ -201,8 +201,8 @@ const CallToActionComponent: React.FC = () => {
                         <div className="w-full h-[2px] md:w-[2px] md:h-[90%] border-t-2 md:border-t-0 md:border-l-2 border-dashed border-gray-300"></div>
 
                         {/* Mobile Holes (Left/Right) */}
-                        <div className="md:hidden absolute -left-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-brand-light rounded-full z-20"></div>
-                        <div className="md:hidden absolute -right-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-brand-light rounded-full z-20"></div>
+                        <div className="md:hidden absolute -left-4 top-1/2 -translate-y-1/2 size-8 bg-brand-light rounded-full z-20"></div>
+                        <div className="md:hidden absolute -right-4 top-1/2 -translate-y-1/2 size-8 bg-brand-light rounded-full z-20"></div>
                     </div>
 
                     {/* --- RIGHT SIDE: Stub / Details --- */}
@@ -211,7 +211,7 @@ const CallToActionComponent: React.FC = () => {
                         {/* Stub Header */}
                         <div className="flex justify-between items-center mb-5 opacity-60">
                             <span className="text-[10px] font-bold tracking-widest uppercase">Anhangá Air</span>
-                            <AirplaneTilt className="w-3 h-3" weight="fill" />
+                            <AirplaneTilt className="size-3" weight="fill" />
                         </div>
 
                         {/* Passenger Name */}
@@ -303,14 +303,14 @@ const CallToActionComponent: React.FC = () => {
                                     <span className="font-mono text-[9px] font-bold tracking-[0.3em] text-gray-400 uppercase">
                                         ETKT 29384910239
                                     </span>
-                                    <DeviceMobile className="w-3 h-3 text-gray-300" weight="fill" />
+                                    <DeviceMobile className="size-3 text-gray-300" weight="fill" />
                                 </div>
                             </div>
                         </div>
 
                         {/* Decorative Stamp Watermark */}
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] rotate-[-30deg] pointer-events-none">
-                            <AirplaneTilt className="w-32 h-32 text-brand-dark" weight="fill" />
+                            <AirplaneTilt className="size-32 text-brand-dark" weight="fill" />
                         </div>
                     </div>
 

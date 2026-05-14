@@ -27,14 +27,14 @@ const Blog: React.FC = memo(() => {
     return (
         <section id="blog" className="py-24 bg-white relative overflow-hidden dynamic-blog-content">
             {/* Background Decorations */}
-            <div className="absolute top-0 right-0 w-96 h-96 bg-brand-cyan/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+            <div className="absolute top-0 right-0 size-96 bg-brand-cyan/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
             <div className="absolute bottom-0 left-0 w-full h-24 bg-[#fffdf5] skew-y-2 translate-y-12"></div>
 
             <div className="container mx-auto px-6 relative z-10">
                 {/* Header Section */}
                 <div className="text-center mb-16">
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border-2 border-brand-dark bg-brand-yellow text-brand-dark font-black text-xs uppercase tracking-widest shadow-[4px_4px_0px_#0f172a] transform -rotate-2 mb-4">
-                        <BookOpen className="w-4 h-4" /> Diário de Bordo
+                        <BookOpen className="size-4" /> Diário de Bordo
                     </div>
                     <h2 className="text-4xl md:text-5xl font-black text-brand-dark mb-4">
                         Histórias & <span className="text-brand-cyan border-b-8 border-brand-cyan/20 px-1 inline-block">Dicas</span>
@@ -81,7 +81,7 @@ const Blog: React.FC = memo(() => {
                                         <span className={`px-3 py-1 rounded-full border ${getCategoryColor(featuredPost.category)}`}>
                                             {featuredPost.category}
                                         </span>
-                                        <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {formatDate(featuredPost.date)}</span>
+                                        <span className="flex items-center gap-1"><Calendar className="size-4" /> {formatDate(featuredPost.date)}</span>
                                     </div>
                                     <h3 className="text-3xl md:text-4xl font-black text-brand-dark mb-4 leading-tight group-hover:text-brand-cyan transition-colors">
                                         {featuredPost.title}
@@ -91,7 +91,7 @@ const Blog: React.FC = memo(() => {
                                     </p>
                                     <div className="flex items-center justify-between border-t border-gray-200 pt-6">
                                         <div className="flex items-center gap-2">
-                                            <div className="w-10 h-10 rounded-full bg-brand-dark flex items-center justify-center text-white text-base font-black shrink-0">
+                                            <div className="size-10 rounded-full bg-brand-dark flex items-center justify-center text-white text-base font-black shrink-0">
                                                 {(AUTHORS[featuredPost.author]?.name ?? featuredPost.author).charAt(0).toUpperCase()}
                                             </div>
                                             <div className="flex flex-col">
@@ -100,7 +100,7 @@ const Blog: React.FC = memo(() => {
                                             </div>
                                         </div>
                                         <span className="flex items-center gap-2 text-brand-cyan font-black uppercase tracking-wide group-hover:gap-4 transition-all">
-                                            Ler Agora <ArrowRight className="w-5 h-5" />
+                                            Ler Agora <ArrowRight className="size-5" />
                                         </span>
                                     </div>
                                 </div>
@@ -155,13 +155,13 @@ const Blog: React.FC = memo(() => {
 
                                 <div className="pt-4 border-t border-dashed border-gray-100 flex items-center justify-between">
                                     <span className="text-xs font-bold text-gray-400 flex items-center gap-2">
-                                        <div className="w-5 h-5 rounded-full bg-brand-dark flex items-center justify-center text-white text-[10px] font-black shrink-0">
+                                        <div className="size-5 rounded-full bg-brand-dark flex items-center justify-center text-white text-[10px] font-black shrink-0">
                                             {(AUTHORS[post.author]?.name ?? post.author).charAt(0).toUpperCase()}
                                         </div>
                                         {AUTHORS[post.author]?.name ?? post.author}
                                     </span>
-                                    <span className="w-8 h-8 rounded-full flex items-center justify-center transition-colors bg-gray-100 text-gray-400 group-hover:bg-brand-cyan group-hover:text-white">
-                                        <ArrowRight className="w-4 h-4" />
+                                    <span className="size-8 rounded-full flex items-center justify-center transition-colors bg-gray-100 text-gray-400 group-hover:bg-brand-cyan group-hover:text-white">
+                                        <ArrowRight className="size-4" />
                                     </span>
                                 </div>
                             </div>
@@ -172,9 +172,9 @@ const Blog: React.FC = memo(() => {
                 {/* View More Button */}
                 <div className="mt-16 text-center">
                     <a href={getBlogHomeUrl()} className="inline-flex items-center gap-2 px-8 py-4 bg-white border-2 border-gray-200 text-gray-600 rounded-full font-bold hover:border-brand-cyan hover:text-brand-cyan transition-all shadow-sm hover:shadow-md group">
-                        <Sparkles className="w-4 h-4 text-brand-yellow fill-brand-yellow" />
+                        <Sparkles className="size-4 text-brand-yellow fill-brand-yellow" />
                         Ver Todos os Artigos
-                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
                     </a>
                 </div>
             </div>
