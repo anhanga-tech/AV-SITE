@@ -671,7 +671,7 @@ const Destinations: React.FC = memo(() => {
                             <X className="w-5 h-5" />
                         </button>
 
-                        <div className="w-full md:w-1/2 h-64 md:h-auto relative bg-gray-100 border-b-4 md:border-b-0 md:border-r-4 border-white">
+                        <div className="w-full md:w-1/2 h-64 md:h-auto relative bg-gray-100">
                             <LazyImage
                                 src={selectedDestination.image}
                                 alt={selectedDestination.city}

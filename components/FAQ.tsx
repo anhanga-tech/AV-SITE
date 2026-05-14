@@ -83,7 +83,7 @@ const FAQS = [
                     <li>Duração da viagem</li>
                     <li>Sazonalidade do destino</li>
                 </ul>
-                <p className="shadow-[inset_3px_0_0_#fbbf24] pl-4 italic">
+                <p className="border-t border-amber-200 pt-3 pl-2 italic text-gray-700">
                     <strong>Receba uma cotação personalizada gratuitamente!</strong> <br />
                     Fale com nossa IA agora mesmo no chat!
                 </p>
