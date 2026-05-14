@@ -24,7 +24,7 @@ export function NpsThankOther({ firstname }: NpsThankOtherProps) {
       </div>
 
       <h1 className="text-3xl font-extrabold tracking-tight mb-4" style={{ letterSpacing: '-0.025em' }}>
-        Obrigado pelo seu feedback!
+        Obrigado pelo seu feedback{firstname ? `, ${firstname}` : ''}!
       </h1>
       <p className="text-base mb-8" style={{ color: '#94a3b8', lineHeight: '1.75' }}>
         Sua opinião nos ajuda a melhorar cada detalhe.<br />
