@@ -30,6 +30,7 @@ interface CardProps {
   imgSrc: string;
   imgAlt: string;
   label: string;
+  ref?: React.Ref<HTMLDivElement>;
   tape?: {
     style: React.CSSProperties;
   };
@@ -42,7 +43,7 @@ const Card = ({
   label,
   tape,
   ref,
-}: CardProps & { ref?: React.Ref<HTMLDivElement> }) => (
+}: CardProps) => (
   <div className={`card ${className}`} ref={ref}>
     <img src={imgSrc} alt={imgAlt} width="300" height="300" />
     <div className="card-label">{label}</div>
