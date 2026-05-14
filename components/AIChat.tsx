@@ -49,7 +49,7 @@ const FormattedText = memo(({ text }: { text: string }) => {
 
         const content = parts.map((part, i) => {
           if (part.startsWith('**') && part.endsWith('**')) {
-            return <strong key={`part-${i}`} className="font-bold text-gray-900">{part.slice(2, -2)}</strong>;
+            return <strong key={`part-${i}`} className="font-bold text-zinc-900">{part.slice(2, -2)}</strong>;
           }
           return part;
         });
@@ -58,12 +58,12 @@ const FormattedText = memo(({ text }: { text: string }) => {
           return (
             <div key={`para-${idx}`} className="flex items-start gap-2 ml-1">
               <span className="shrink-0 mt-1.5 w-1.5 h-1.5 bg-brand-vibrant rounded-full opacity-70"></span>
-              <span className="leading-relaxed text-gray-700">{content}</span>
+              <span className="leading-relaxed text-zinc-700">{content}</span>
             </div>
           );
         }
 
-        return <p key={`para-${idx}`} className="leading-relaxed text-gray-700">{content}</p>;
+        return <p key={`para-${idx}`} className="leading-relaxed text-zinc-700">{content}</p>;
       })}
     </div>
   );
@@ -386,9 +386,9 @@ const AIChat: React.FC = memo(() => {
         aria-label="Assistente Virtual Anhangá"
       >
         {/* Header - Scrapbook Softness */}
-        <div className="bg-white/80 backdrop-blur-md px-6 py-5 border-b border-gray-100 flex justify-between items-center shrink-0 z-10">
+        <div className="bg-white/80 backdrop-blur-md px-6 py-5 border-b border-zinc-100 flex justify-between items-center shrink-0 z-10">
           <div className="flex gap-4 items-center">
-            <div className="size-12 bg-gray-50 rounded-[1.25rem] flex items-center justify-center shadow-sm transform -rotate-3 hover:rotate-0 transition-transform">
+            <div className="size-12 bg-zinc-50 rounded-[1.25rem] flex items-center justify-center shadow-sm transform -rotate-3 hover:rotate-0 transition-transform">
               <Sparkle className="size-6 text-brand-vibrant" weight="fill" />
             </div>
             <div>
@@ -400,7 +400,7 @@ const AIChat: React.FC = memo(() => {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full size-2 bg-green-400"></span>
                 </span>
-                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+                <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
                   Assistente Online
                 </span>
               </div>
@@ -408,7 +408,7 @@ const AIChat: React.FC = memo(() => {
           </div>
           <button
             onClick={() => closeChatDrawer()}
-            className="text-gray-400 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-full p-2.5 transition-colors focus:outline-none"
+            className="text-zinc-400 hover:text-zinc-700 bg-zinc-50 hover:bg-zinc-100 rounded-full p-2.5 transition-colors focus:outline-none"
             aria-label="Fechar gaveta"
           >
             <X className="size-5" weight="bold" />
@@ -429,7 +429,7 @@ const AIChat: React.FC = memo(() => {
                   {/* Avatar */}
                   <div className={`size-9 flex items-center justify-center shrink-0 rounded-full shadow-sm ${msg.role === 'user'
                     ? 'bg-brand-dark text-white'
-                    : 'bg-white text-brand-vibrant border border-gray-100'
+                    : 'bg-white text-brand-vibrant border border-zinc-100'
                     }`}>
                     {msg.role === 'user' ? <User className="size-4" weight="fill" /> : <Robot className="size-5" weight="fill" />}
                   </div>
@@ -457,10 +457,10 @@ const AIChat: React.FC = memo(() => {
                       data-testid={msg.role === 'user' ? 'chat-user-message' : undefined}
                       className={`p-4 text-sm shadow-sm ${msg.role === 'user'
                       ? 'bg-brand-vibrant text-white rounded-2xl rounded-br-sm'
-                      : 'bg-white text-gray-800 border border-gray-100 rounded-2xl rounded-bl-sm'
+                      : 'bg-white text-zinc-800 border border-zinc-100 rounded-2xl rounded-bl-sm'
                       }`}>
                       {msg.role === 'model' ? (
-                        <div className="prose prose-sm max-w-none prose-p:text-gray-700 prose-p:leading-relaxed prose-strong:text-gray-900 prose-strong:font-bold prose-ul:text-gray-700">
+                        <div className="prose prose-sm max-w-none prose-p:text-zinc-700 prose-p:leading-relaxed prose-strong:text-zinc-900 prose-strong:font-bold prose-ul:text-zinc-700">
                           <ReactMarkdown>{msg.text}</ReactMarkdown>
                         </div>
                       ) : (
@@ -479,7 +479,7 @@ const AIChat: React.FC = memo(() => {
                       <button
                         key={chipIdx}
                         onClick={() => submitMessage(chip)}
-                        className="text-[12px] font-semibold text-gray-600 bg-white border border-gray-200 px-4 py-2 rounded-xl shadow-sm hover:shadow hover:border-brand-vibrant/30 hover:text-brand-vibrant hover:-translate-y-0.5 transition-all text-left"
+                        className="text-[12px] font-semibold text-zinc-600 bg-white border border-zinc-200 px-4 py-2 rounded-xl shadow-sm hover:shadow hover:border-brand-vibrant/30 hover:text-brand-vibrant hover:-translate-y-0.5 transition-all text-left"
                       >
                         {chip}
                       </button>
@@ -492,12 +492,12 @@ const AIChat: React.FC = memo(() => {
 
           {isLoading && (
             <div data-testid="chat-typing-indicator" className="flex items-end gap-3 z-10 relative">
-              <div className="size-9 bg-white rounded-full border border-gray-100 text-brand-vibrant flex items-center justify-center shadow-sm">
+              <div className="size-9 bg-white rounded-full border border-zinc-100 text-brand-vibrant flex items-center justify-center shadow-sm">
                 <Robot className="size-5" weight="fill" />
               </div>
-              <div className="bg-white px-4 py-3 border border-gray-100 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-2.5">
+              <div className="bg-white px-4 py-3 border border-zinc-100 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-2.5">
                 <CircleNotch className="w-4 h-4 animate-spin text-brand-vibrant" weight="bold" />
-                <span className="text-xs font-medium text-gray-400">Anhangá digitando…</span>
+                <span className="text-xs font-medium text-zinc-400">Anhangá digitando…</span>
               </div>
             </div>
           )}
@@ -505,8 +505,8 @@ const AIChat: React.FC = memo(() => {
         </div>
 
         {/* Input Area */}
-        <div className="p-4 sm:p-5 bg-white border-t border-gray-100 shrink-0 z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.02)]">
-          <div className="relative flex items-end bg-slate-50 border border-gray-200 rounded-2xl focus-within:border-brand-vibrant/40 focus-within:bg-white focus-within:ring-4 focus-within:ring-brand-vibrant/10 transition-all">
+        <div className="p-4 sm:p-5 bg-white border-t border-zinc-100 shrink-0 z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.02)]">
+          <div className="relative flex items-end bg-zinc-50 border border-zinc-200 rounded-2xl focus-within:border-brand-vibrant/40 focus-within:bg-white focus-within:ring-4 focus-within:ring-brand-vibrant/10 transition-all">
             <label htmlFor="chat-textarea" className="sr-only">Sua mensagem</label>
             <textarea
               id="chat-textarea"
@@ -516,7 +516,7 @@ const AIChat: React.FC = memo(() => {
               onKeyDown={handleKeyDown}
               placeholder="Digite sua dúvida aqui..."
               rows={1}
-              className="flex-1 max-h-[120px] pl-4 pr-[50px] py-4 bg-transparent outline-none text-sm text-gray-700 font-medium placeholder-gray-400 resize-none overflow-y-auto w-full leading-snug"
+              className="flex-1 max-h-[120px] pl-4 pr-[50px] py-4 bg-transparent outline-none text-sm text-zinc-700 font-medium placeholder-zinc-400 resize-none overflow-y-auto w-full leading-snug"
             />
             <button
               onClick={() => submitMessage(input)}
@@ -527,7 +527,7 @@ const AIChat: React.FC = memo(() => {
               <PaperPlaneTilt className="size-4 ml-0.5" weight="fill" />
             </button>
           </div>
-          <p className="text-center text-[10px] text-gray-400 mt-2">
+          <p className="text-center text-[10px] text-zinc-400 mt-2">
             Nossa IA pode cometer erros. Confirme os dados no WhatsApp.
           </p>
         </div>

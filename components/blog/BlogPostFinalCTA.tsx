@@ -14,7 +14,7 @@ export const BlogPostFinalCTA: React.FC<BlogPostFinalCTAProps> = ({ post }) => {
                 Gostou do conteúdo? <br />
                 <span className="text-brand-cyan">Sua viagem começa aqui.</span>
             </h2>
-            <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto relative z-10">
+            <p className="text-xl text-zinc-300 mb-10 max-w-2xl mx-auto relative z-10">
                 Transformamos essas inspirações em um roteiro real e exclusivo para você.
             </p>
             <button

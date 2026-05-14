@@ -76,7 +76,7 @@ const Categories = memo(() => {
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-32 h-8 bg-white/30 backdrop-blur-sm border-l border-r border-white/60 rotate-1 shadow-sm z-20"></div>
 
               {/* Image Area */}
-              <div className="aspect-square w-full overflow-hidden bg-gray-100 mb-6 relative">
+              <div className="aspect-square w-full overflow-hidden bg-zinc-100 mb-6 relative">
                 <LazyImage
                   src={item.image}
                   width={600}
@@ -94,8 +94,8 @@ const Categories = memo(() => {
 
               {/* Caption (Handwritten feel) */}
               <div className="text-center">
-                <h3 className="text-2xl font-black text-gray-800 mb-1 font-sans tracking-tight">{item.title}</h3>
-                <p className="text-gray-500 font-medium font-serif italic">{item.subtitle}</p>
+                <h3 className="text-2xl font-black text-zinc-800 mb-1 font-sans tracking-tight">{item.title}</h3>
+                <p className="text-zinc-500 font-medium font-serif italic">{item.subtitle}</p>
               </div>
 
               {/* Sticker Decor */}

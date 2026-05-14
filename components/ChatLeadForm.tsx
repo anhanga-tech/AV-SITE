@@ -152,7 +152,7 @@ function TextField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className={`w-full bg-white border ${error ? 'border-red-500' : 'border-gray-200'} rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm`}
+        className={`w-full bg-white border ${error ? 'border-red-500' : 'border-zinc-200'} rounded-xl px-4 py-3 text-sm text-zinc-700 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm`}
       />
       {error && <span className="text-[10px] text-red-500 font-bold ml-1 uppercase">{error}</span>}
     </div>
@@ -235,14 +235,14 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
 
   return (
     <div className="bg-white rounded-2xl border border-brand-blue/10 shadow-[0_8px_30px_rgb(0,0,0,0.08)] w-full overflow-hidden transform transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-1">
-      <div className="bg-gradient-to-r from-brand-vibrant/10 to-transparent p-3 flex items-center gap-2 border-b border-gray-100">
+      <div className="bg-gradient-to-r from-brand-vibrant/10 to-transparent p-3 flex items-center gap-2 border-b border-zinc-100">
         <CheckCircle2 className="size-5 text-green-500" />
         <span className="text-sm font-bold tracking-wide text-brand-dark uppercase">
           Link Gerado
         </span>
       </div>
-      <div className="p-5 bg-gradient-to-br from-white to-slate-50/50">
-        <p className="text-sm text-gray-600 mb-5 font-medium leading-relaxed">
+      <div className="p-5 bg-gradient-to-br from-white to-zinc-50/50">
+        <p className="text-sm text-zinc-600 mb-5 font-medium leading-relaxed">
           Sua solicitação para <strong className="font-bold text-brand-vibrant relative px-1"><span className="absolute inset-0 bg-brand-yellow/20 -skew-x-6 rounded"></span><span className="relative">{destination}</span></strong> está pronta. Finalize seus dados:
         </p>
 
@@ -285,7 +285,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
                 id="lead-country-code"
                 value={countryCode}
                 onChange={(e) => setCountryCode(e.target.value)}
-                className="w-[112px] shrink-0 bg-white border border-gray-200 rounded-xl p-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm"
+                className="w-[112px] shrink-0 bg-white border border-zinc-200 rounded-xl p-3 text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm"
               >
                 <option value="+55">+55 BR</option>
                 <option value="+1">+1 US/CA</option>
@@ -311,11 +311,11 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
                   type="checkbox"
                   checked={acceptedLGPD}
                   onChange={(e) => setAcceptedLGPD(e.target.checked)}
-                  className="peer size-4 cursor-pointer appearance-none rounded border border-gray-300 bg-white checked:bg-brand-vibrant checked:border-brand-vibrant transition-all focus:ring-2 focus:ring-brand-vibrant/20"
+                  className="peer size-4 cursor-pointer appearance-none rounded border border-zinc-300 bg-white checked:bg-brand-vibrant checked:border-brand-vibrant transition-all focus:ring-2 focus:ring-brand-vibrant/20"
                 />
                 <CheckCircle2 className="absolute size-3 text-white opacity-0 peer-checked:opacity-100 left-0.5 pointer-events-none transition-opacity" />
               </div>
-              <span className="text-xs text-gray-500 leading-tight">
+              <span className="text-xs text-zinc-500 leading-tight">
                 Aceito receber comunicações e autorizo o tratamento dos meus dados conforme a <a href="https://www.anhanga.tur.br/politica-privacidade/" target="_blank" rel="noopener noreferrer" className="underline hover:text-brand-vibrant">Política de Privacidade</a>.
               </span>
             </label>

@@ -47,7 +47,7 @@ const FAQItem = memo(({ question, answer, idx }: FAQItemProps) => {
 
                 <div className={`size-10 rounded-xl flex items-center justify-center transition-all duration-300 ${isOpen
                     ? 'bg-brand-cyan text-white rotate-180'
-                    : 'bg-white text-gray-400 group-hover:text-brand-cyan'
+                    : 'bg-white text-zinc-400 group-hover:text-brand-cyan'
                     }`}>
                     {isOpen ? <CaretUp className="size-6" weight="bold" /> : <CaretDown className="size-6" weight="bold" />}
                 </div>
@@ -55,7 +55,7 @@ const FAQItem = memo(({ question, answer, idx }: FAQItemProps) => {
             <div
                 className={`overflow-hidden transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}
             >
-                <div className="px-6 pb-8 pt-4 text-gray-700 font-medium leading-relaxed text-lg bg-white/40">
+                <div className="px-6 pb-8 pt-4 text-zinc-700 font-medium leading-relaxed text-lg bg-white/40">
                     {/* The answer content is injected here */}
                     {answer}
                 </div>
@@ -218,7 +218,7 @@ const FAQ = memo(() => {
                             A gente responde.
                         </span>
                     </h2>
-                    <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+                    <p className="text-lg text-zinc-500 max-w-2xl mx-auto">
                         As perguntas que chegam mais no nosso WhatsApp, com resposta de verdade.
                     </p>
                 </div>
@@ -237,7 +237,7 @@ const FAQ = memo(() => {
                         </div>
                         <div className="text-center md:text-left">
                             <h4 className="font-bold text-brand-dark text-xl mb-1">Ainda tem dúvidas?</h4>
-                            <p className="text-gray-600">
+                            <p className="text-zinc-600">
                                 Nossa <span className="font-bold text-brand-cyan">IA Especialista</span> está pronta para ajudar.
                                 Chame no chat aqui no canto! 👉
                             </p>

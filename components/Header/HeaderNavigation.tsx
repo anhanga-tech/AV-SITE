@@ -48,7 +48,7 @@ export function DesktopNavigation({
               </button>
 
               <div className="absolute top-full z-10 w-48 translate-y-2 pt-4 opacity-0 invisible transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 group-hover:visible focus-within:translate-y-0 focus-within:opacity-100 focus-within:visible">
-                <div className="rounded-md border border-gray-100 bg-white py-2 shadow-lg">
+                <div className="rounded-md border border-zinc-100 bg-white py-2 shadow-lg">
                   {link.subLinks.map((subLink) => {
                     const href = isPageLink(subLink.href)
                       ? `${SITE_URL}${subLink.href}`
@@ -63,7 +63,7 @@ export function DesktopNavigation({
                             onNavClick(event, subLink.href);
                           }
                         }}
-                        className="block px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100"
+                        className="block px-4 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100"
                       >
                         {subLink.name}
                       </a>
@@ -112,7 +112,7 @@ export function MobileNavigationMenu({
     <div
       id="mobile-menu"
       hidden={!isOpen}
-      className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg py-4 px-6 flex flex-col gap-4 border-t border-gray-100 text-gray-800 animate-fade-in-down"
+      className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg py-4 px-6 flex flex-col gap-4 border-t border-zinc-100 text-zinc-800 animate-fade-in-down"
     >
       {NAV_LINKS.map((link) => {
         if (link.subLinks) {
@@ -125,7 +125,7 @@ export function MobileNavigationMenu({
               <a
                 key={subLink.name}
                 href={href}
-                className="text-gray-700 font-medium py-2 border-b border-gray-50 focus:text-brand-vibrant focus:outline-none"
+                className="text-zinc-700 font-medium py-2 border-b border-zinc-50 focus:text-brand-vibrant focus:outline-none"
                 onClick={(event) => {
                   if (!isPageLink(subLink.href) && isHome) {
                     onNavClick(event, subLink.href);
@@ -144,7 +144,7 @@ export function MobileNavigationMenu({
           <a
             key={link.name}
             href={buildSectionHref(link.href!, isHome)}
-            className="text-gray-700 font-medium py-2 border-b border-gray-50 focus:text-brand-vibrant focus:outline-none"
+            className="text-zinc-700 font-medium py-2 border-b border-zinc-50 focus:text-brand-vibrant focus:outline-none"
             onClick={(event) => {
               if (isHome) {
                 onNavClick(event, link.href!);
@@ -160,7 +160,7 @@ export function MobileNavigationMenu({
 
       <a
         href={getBlogHomeUrl()}
-        className="text-gray-700 font-medium py-2 border-b border-gray-50 focus:text-brand-vibrant focus:outline-none"
+        className="text-zinc-700 font-medium py-2 border-b border-zinc-50 focus:text-brand-vibrant focus:outline-none"
         onClick={onCloseMenu}
       >
         Blog de Viagens

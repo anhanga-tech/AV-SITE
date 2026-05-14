@@ -163,7 +163,7 @@ const App: React.FC = () => {
             {/* Mobile Menu Toggle */}
             <button
               onClick={toggleMobileMenu}
-              className="lg:hidden relative z-50 p-2 text-fun-dark hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-4 focus:ring-fun-blue"
+              className="lg:hidden relative z-50 p-2 text-fun-dark hover:bg-zinc-100 rounded-lg transition-colors focus:outline-none focus:ring-4 focus:ring-fun-blue"
               aria-label={mobileMenuOpen ? "Fechar menu" : "Abrir menu"}
             >
               {mobileMenuOpen ? <X size={32} strokeWidth={2.5} /> : <Menu size={32} strokeWidth={2.5} />}
@@ -177,7 +177,7 @@ const App: React.FC = () => {
                 key={link.name}
                 href={link.href}
                 onClick={handleLinkClick}
-                className="font-sans font-bold text-2xl text-fun-dark text-center py-2 border-b-2 border-dashed border-gray-200 active:text-fun-pink"
+                className="font-sans font-bold text-2xl text-fun-dark text-center py-2 border-b-2 border-dashed border-zinc-200 active:text-fun-pink"
               >
                 {link.name}
               </a>

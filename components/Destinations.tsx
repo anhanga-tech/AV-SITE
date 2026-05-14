@@ -541,7 +541,7 @@ const Destinations: React.FC = memo(() => {
                                 onClick={() => setActiveFilter(filter)}
                                 className={`px-5 py-2 rounded-lg text-sm font-bold border-2 transition-all whitespace-nowrap flex-shrink-0 shadow-[3px_3px_0px_rgba(0,0,0,0.1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] ${activeFilter === filter
                                     ? 'bg-brand-dark text-white border-brand-dark transform -rotate-1'
-                                    : 'bg-white text-gray-600 border-gray-100 hover:border-brand-vibrant hover:text-brand-vibrant'
+                                    : 'bg-white text-zinc-600 border-zinc-100 hover:border-brand-vibrant hover:text-brand-vibrant'
                                     }`}
                             >
                                 {filter}
@@ -561,7 +561,7 @@ const Destinations: React.FC = memo(() => {
                         <div className="absolute -top-3 right-10 w-24 h-8 bg-yellow-400/80 rotate-[10deg] z-30 backdrop-blur-sm shadow-sm opacity-90 border-l border-r border-white/30"></div>
 
                         {/* Map Inner Border & Content */}
-                        <div className="w-full h-full border-2 border-gray-100 overflow-hidden relative bg-[#FAFAFA]">
+                        <div className="w-full h-full border-2 border-zinc-100 overflow-hidden relative bg-[#FAFAFA]">
                             {/* Paper Texture Overlay */}
                             <div className="absolute inset-0 z-[5] pointer-events-none opacity-[0.15] mix-blend-multiply" style={noiseTextureStyle}></div>
 
@@ -571,7 +571,7 @@ const Destinations: React.FC = memo(() => {
                             <div ref={mapRef} className="w-full h-full z-0" />
 
                             {/* Mobile Hint */}
-                            <div className="md:hidden absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full text-[10px] font-bold text-gray-500 pointer-events-none z-[400] shadow-md border border-gray-200">
+                            <div className="md:hidden absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full text-[10px] font-bold text-zinc-500 pointer-events-none z-[400] shadow-md border border-zinc-200">
                                 Use dois dedos para mover
                             </div>
                         </div>
@@ -580,14 +580,14 @@ const Destinations: React.FC = memo(() => {
                         <div className="absolute bottom-6 right-6 flex flex-col gap-2 z-[400]">
                             <button
                                 onClick={() => handleZoom('in')}
-                                className="size-10 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all text-gray-700 font-black"
+                                className="size-10 bg-white border-2 border-zinc-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all text-zinc-700 font-black"
                                 aria-label="Aumentar zoom no mapa"
                             >
                                 <Plus className="size-5" />
                             </button>
                             <button
                                 onClick={() => handleZoom('out')}
-                                className="size-10 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all text-gray-700 font-black"
+                                className="size-10 bg-white border-2 border-zinc-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all text-zinc-700 font-black"
                                 aria-label="Diminuir zoom no mapa"
                             >
                                 <Minus className="size-5" />
@@ -597,9 +597,9 @@ const Destinations: React.FC = memo(() => {
                         {/* "Note" Sticker */}
                         <div className="hidden md:block absolute top-8 left-8 bg-yellow-100 p-4 rounded-sm shadow-md transform -rotate-3 z-[400] max-w-[150px] border border-yellow-200">
                             <div className="size-3 rounded-full bg-red-400 mx-auto -mt-6 mb-2 shadow-sm border border-red-500"></div>
-                            <p className="font-serif italic text-gray-700 text-sm leading-tight text-center">
+                            <p className="font-serif italic text-zinc-700 text-sm leading-tight text-center">
                                 "O mundo é um livro e quem não viaja lê apenas uma página."
-                                <span className="block not-italic text-gray-400 text-xs mt-1">(Santo Agostinho)</span>
+                                <span className="block not-italic text-zinc-400 text-xs mt-1">(Santo Agostinho)</span>
                             </p>
                         </div>
                     </div>
@@ -613,7 +613,7 @@ const Destinations: React.FC = memo(() => {
                             tabIndex={0}
                             role="button"
                             aria-label={`Ver detalhes de ${dest.city}, ${dest.country}`}
-                            className="group bg-white rounded-[2rem] border-2 border-gray-100 p-4 pb-0 shadow-[6px_6px_0px_rgba(0,0,0,0.05)] hover:shadow-[10px_10px_0px_rgba(0,0,0,0.08)] hover:-translate-y-2 transition-all cursor-pointer flex flex-col focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-cyan"
+                            className="group bg-white rounded-[2rem] border-2 border-zinc-100 p-4 pb-0 shadow-[6px_6px_0px_rgba(0,0,0,0.05)] hover:shadow-[10px_10px_0px_rgba(0,0,0,0.08)] hover:-translate-y-2 transition-all cursor-pointer flex flex-col focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-cyan"
                             onClick={() => setSelectedDestination(dest)}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' || e.key === ' ') {
@@ -622,7 +622,7 @@ const Destinations: React.FC = memo(() => {
                                 }
                             }}
                         >
-                            <div className="relative h-56 rounded-[1.5rem] overflow-hidden mb-4 border border-gray-100">
+                            <div className="relative h-56 rounded-[1.5rem] overflow-hidden mb-4 border border-zinc-100">
                                 <LazyImage
                                     src={dest.image}
                                     alt={`${dest.city}, ${dest.country} — pacote de viagem personalizado Anhangá Viagens`}
@@ -632,19 +632,19 @@ const Destinations: React.FC = memo(() => {
                                 />
 
                                 {/* Price Tag Sticker */}
-                                <div className="absolute top-4 right-4 bg-white text-brand-dark font-black px-3 py-1 rounded-md shadow-[3px_3px_0px_rgba(0,0,0,0.2)] text-sm rotate-3 group-hover:rotate-6 transition-transform border border-gray-100">
+                                <div className="absolute top-4 right-4 bg-white text-brand-dark font-black px-3 py-1 rounded-md shadow-[3px_3px_0px_rgba(0,0,0,0.2)] text-sm rotate-3 group-hover:rotate-6 transition-transform border border-zinc-100">
                                     A partir de {dest.price}
                                 </div>
                             </div>
 
                             <div className="px-2 pb-6">
                                 <div className="flex justify-between items-center mb-2">
-                                    <h3 className="text-2xl font-black text-gray-800">{dest.city}</h3>
+                                    <h3 className="text-2xl font-black text-zinc-800">{dest.city}</h3>
                                     <div className="flex items-center gap-1 text-yellow-500 font-bold text-sm bg-yellow-50 px-2 py-1 rounded-full border border-yellow-100">
                                         <Star className="size-3 fill-current" /> {dest.rating}
                                     </div>
                                 </div>
-                                <p className="text-gray-500 text-sm font-medium mb-4">{dest.description}</p>
+                                <p className="text-zinc-500 text-sm font-medium mb-4">{dest.description}</p>
 
                                 <div className="flex items-center gap-2 text-brand-cyan font-bold text-sm uppercase tracking-wide group-hover:gap-3 transition-all">
                                     Saiba Mais <ArrowRight className="size-4" />
@@ -657,7 +657,7 @@ const Destinations: React.FC = memo(() => {
 
             {/* Modal - Scrapbook Page Style */}
             {selectedDestination && (
-                <div role="button" tabIndex={0} aria-label="Fechar destino" className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedDestination(null)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSelectedDestination(null); }}>
+                <div role="button" tabIndex={0} aria-label="Fechar destino" className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm" onClick={() => setSelectedDestination(null)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSelectedDestination(null); }}>
                     <div role="presentation" className="bg-[#fffdf5] w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden relative flex flex-col md:flex-row max-h-[90vh] border-8 border-white transform rotate-1" onClick={e => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
 
                         {/* Washi Tape Decor */}
@@ -665,13 +665,13 @@ const Destinations: React.FC = memo(() => {
 
                         <button
                             onClick={() => setSelectedDestination(null)}
-                            className="absolute top-4 right-4 z-30 bg-white border-2 border-gray-100 p-2 rounded-full shadow-md hover:scale-110 transition-transform text-gray-800"
+                            className="absolute top-4 right-4 z-30 bg-white border-2 border-zinc-100 p-2 rounded-full shadow-md hover:scale-110 transition-transform text-zinc-800"
                             aria-label="Fechar detalhes do destino"
                         >
                             <X className="size-5" />
                         </button>
 
-                        <div className="w-full md:w-1/2 h-64 md:h-auto relative bg-gray-100">
+                        <div className="w-full md:w-1/2 h-64 md:h-auto relative bg-zinc-100">
                             <LazyImage
                                 src={selectedDestination.image}
                                 alt={selectedDestination.city}
@@ -689,21 +689,21 @@ const Destinations: React.FC = memo(() => {
                         </div>
 
                         <div className="w-full md:w-1/2 p-8 md:p-10 overflow-y-auto" style={noiseTextureStyle}>
-                            <p className="text-gray-600 mb-8 text-lg leading-relaxed font-medium font-serif italic">"{selectedDestination.details}"</p>
+                            <p className="text-zinc-600 mb-8 text-lg leading-relaxed font-medium font-serif italic">"{selectedDestination.details}"</p>
 
-                            <h4 className="font-black text-gray-900 mb-4 flex items-center gap-2">
+                            <h4 className="font-black text-zinc-900 mb-4 flex items-center gap-2">
                                 <Star className="size-5 text-yellow-400 fill-current" /> Atrações Imperdíveis
                             </h4>
                             <div className="flex flex-wrap gap-3 mb-8">
                                 {selectedDestination.activities.map((act) => (
-                                    <span key={act} className="bg-white border-2 border-gray-100 px-4 py-2 rounded-xl text-sm text-gray-700 font-bold shadow-sm transform hover:-rotate-1 transition-transform cursor-default">
+                                    <span key={act} className="bg-white border-2 border-zinc-100 px-4 py-2 rounded-xl text-sm text-zinc-700 font-bold shadow-sm transform hover:-rotate-1 transition-transform cursor-default">
                                         {act}
                                     </span>
                                 ))}
                             </div>
 
-                            <div className="mb-8 p-4 bg-white/50 rounded-2xl border border-gray-100">
-                                <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3">Compartilhar destino</p>
+                            <div className="mb-8 p-4 bg-white/50 rounded-2xl border border-zinc-100">
+                                <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest mb-3">Compartilhar destino</p>
                                 <SocialShare
                                     url={`https://www.anhanga.tur.br/#destinos`}
                                     title={`Confira esse destino na Anhangá Viagens: ${selectedDestination.city}`}
@@ -716,7 +716,7 @@ const Destinations: React.FC = memo(() => {
                                     <Link
                                         to={selectedDestination.landingPage}
                                         onClick={() => setSelectedDestination(null)}
-                                        className="w-full bg-white border-2 border-brand-dark text-brand-dark py-4 rounded-xl font-black text-lg hover:bg-gray-50 transition-all shadow-[4px_4px_0px_#0f172a] active:shadow-none active:translate-y-1 flex items-center justify-center gap-2"
+                                        className="w-full bg-white border-2 border-brand-dark text-brand-dark py-4 rounded-xl font-black text-lg hover:bg-zinc-50 transition-all shadow-[4px_4px_0px_#0f172a] active:shadow-none active:translate-y-1 flex items-center justify-center gap-2"
                                     >
                                         Ver detalhes do pacote <ArrowRight className="size-5" />
                                     </Link>

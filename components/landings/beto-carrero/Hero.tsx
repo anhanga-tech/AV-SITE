@@ -74,7 +74,7 @@ const Hero: React.FC = () => {
               {/* Tape Effect */}
               <div className="absolute -top-4 lg:-top-6 left-1/2 -translate-x-1/2 w-20 md:w-24 lg:w-32 h-8 lg:h-12 bg-white/50 backdrop-blur-sm border-l-2 border-r-2 border-white/60 transform -rotate-2 shadow-sm z-20"></div>
 
-              <div className="bg-gray-200 border-2 border-fun-dark overflow-hidden rounded-sm relative w-full h-full">
+              <div className="bg-zinc-200 border-2 border-fun-dark overflow-hidden rounded-sm relative w-full h-full">
                 <img
                   src={optimizeRemoteImageUrl(`${PROD_ASSET_BASE}/grupo-em-frente-ao-castelo.jpg`, 1200)}
                   alt="Grupo em frente ao Castelo Beto Carrero"
@@ -95,7 +95,7 @@ const Hero: React.FC = () => {
                   <Plane size={20} className="sm:size-6 lg:size-8" />
                 </div>
                 <div>
-                  <div className="text-[10px] sm:text-xs lg:text-sm font-bold text-gray-400 leading-none mb-1">Voo Confirmado</div>
+                  <div className="text-[10px] sm:text-xs lg:text-sm font-bold text-zinc-400 leading-none mb-1">Voo Confirmado</div>
                   <div className="font-sans font-bold text-fun-dark text-sm sm:text-base lg:text-xl leading-none">GRU ➔ NVT</div>
                 </div>
               </div>

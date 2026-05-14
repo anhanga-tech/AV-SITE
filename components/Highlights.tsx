@@ -117,16 +117,16 @@ const Highlights = memo(() => {
                                     height={600}
                                     className="w-full object-cover aspect-[4/3]"
                                 />
-                                <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-md px-4 py-1 rounded-full text-xs font-bold text-gray-700 shadow-sm transition-transform duration-300 group-hover:scale-110">
+                                <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-md px-4 py-1 rounded-full text-xs font-bold text-zinc-700 shadow-sm transition-transform duration-300 group-hover:scale-110">
                                     📍 Caribe? Talvez.
                                 </div>
                             </m.div>
                         </div>
 
-                        <div className="bg-white p-8 rounded-[2rem] border-2 border-gray-100 shadow-[8px_8px_0px_rgba(0,0,0,0.05)] text-center lg:text-left">
+                        <div className="bg-white p-8 rounded-[2rem] border-2 border-zinc-100 shadow-[8px_8px_0px_rgba(0,0,0,0.05)] text-center lg:text-left">
                             {/* Changed h4 to p to maintain correct heading hierarchy and avoid SEO audit findings. */}
-                            <p className="font-black text-2xl text-gray-900 mb-2">Viaje Leve! 🎈</p>
-                            <p className="text-gray-500 text-lg mb-6 leading-relaxed">
+                            <p className="font-black text-2xl text-zinc-900 mb-2">Viaje Leve! 🎈</p>
+                            <p className="text-zinc-500 text-lg mb-6 leading-relaxed">
                                 Comece a planejar agora e receba um roteiro prévio sem compromisso.
                             </p>
                             <button
@@ -164,7 +164,7 @@ const Highlights = memo(() => {
                                     para o viajante errado.
                                 </span>
                             </h2>
-                            <p className="text-gray-600 text-lg md:text-xl font-medium leading-relaxed mb-8">
+                            <p className="text-zinc-600 text-lg md:text-xl font-medium leading-relaxed mb-8">
                                 A <strong>Anhangá</strong> é uma agência de viagens em São Paulo. Não trabalhamos com pacote pronto. Ouvimos o que você quer, pesquisamos o que faz sentido pra você e montamos cada detalhe do roteiro. Do primeiro voo ao último café da manhã, você não está sozinho.
                             </p>
                         </m.div>
@@ -204,10 +204,10 @@ const Highlights = memo(() => {
                                         </m.div>
 
                                         {/* Content */}
-                                        <h3 className="text-xl font-extrabold text-gray-900 mb-3 leading-tight group-hover:text-brand-cyan transition-colors duration-300">
+                                        <h3 className="text-xl font-extrabold text-zinc-900 mb-3 leading-tight group-hover:text-brand-cyan transition-colors duration-300">
                                             {item.title}
                                         </h3>
-                                        <p className="text-gray-500 font-medium leading-relaxed text-sm md:text-base">
+                                        <p className="text-zinc-500 font-medium leading-relaxed text-sm md:text-base">
                                             {item.description}
                                         </p>
 

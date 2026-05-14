@@ -44,7 +44,7 @@ const FAQ: React.FC = () => {
                 return (
                   <div
                     key={item.question}
-                    className={`border-2 border-fun-dark rounded-2xl transition-all duration-300 overflow-hidden ${isOpen ? 'bg-blue-50 shadow-hard' : 'bg-white hover:bg-gray-50'}`}
+                    className={`border-2 border-fun-dark rounded-2xl transition-all duration-300 overflow-hidden ${isOpen ? 'bg-blue-50 shadow-hard' : 'bg-white hover:bg-zinc-50'}`}
                   >
                     <button 
                       onClick={() => toggleAccordion(idx)}
@@ -67,7 +67,7 @@ const FAQ: React.FC = () => {
                         <div className="px-6 md:px-8 pb-6 md:pb-8">
                            {/* Improved Text Formatting */}
                            <div className="pt-6 border-t-2 border-dashed border-fun-dark/20">
-                             <p className="text-slate-700 text-base md:text-lg font-medium leading-relaxed md:leading-8">
+                             <p className="text-zinc-700 text-base md:text-lg font-medium leading-relaxed md:leading-8">
                                {item.answer}
                              </p>
                            </div>
@@ -93,7 +93,7 @@ const FAQ: React.FC = () => {
                     Sua viagem começa no <span className="text-[#25D366]">WhatsApp</span>
                  </h3>
                  
-                 <p className="text-gray-300 text-lg mb-8 max-w-lg mx-auto">
+                 <p className="text-zinc-300 text-lg mb-8 max-w-lg mx-auto">
                     Não perca tempo em sites confusos. Diga a data e receba sua proposta completa hoje mesmo.
                  </p>
                  

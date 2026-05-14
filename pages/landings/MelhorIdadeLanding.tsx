@@ -54,7 +54,7 @@ const MelhorIdadeLanding: React.FC = () => {
       <FAQPageSchema items={MELHOR_IDADE_FAQ_ITEMS} />
 
       {/* MINI HEADER */}
-      <div className="bg-white/80 backdrop-blur-md py-4 border-b border-gray-100 sticky top-0 z-[60]">
+      <div className="bg-white/80 backdrop-blur-md py-4 border-b border-zinc-100 sticky top-0 z-[60]">
         <div className="container mx-auto px-6 flex justify-between items-center">
           <Link to="/" className="text-sm font-bold text-brand-dark hover:text-brand-cyan transition-colors flex items-center gap-2">
             <span className="size-8 bg-brand-cyan/10 rounded-lg flex items-center justify-center">
@@ -98,7 +98,7 @@ const MelhorIdadeLanding: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-xl text-gray-600 mb-10 leading-relaxed font-medium"
+              className="text-xl text-zinc-600 mb-10 leading-relaxed font-medium"
             >
               Na Anhangá, acreditamos que a "melhor idade" é a época perfeita para novas descobertas. Criamos roteiros 100% personalizados para quem não abre mão de conforto, segurança e boas histórias.
             </m.p>
@@ -134,7 +134,7 @@ const MelhorIdadeLanding: React.FC = () => {
                 <ShieldCheck className="size-8" />
               </div>
               <h3 className="text-2xl font-black text-brand-dark">Segurança em 1º lugar</h3>
-              <p className="text-gray-500 font-medium leading-relaxed">
+              <p className="text-zinc-500 font-medium leading-relaxed">
                 Hotéis com acessibilidade, seguro-viagem premium e suporte 24h para você viajar com tranquilidade total.
               </p>
             </div>
@@ -143,7 +143,7 @@ const MelhorIdadeLanding: React.FC = () => {
                 <Coffee className="size-8" />
               </div>
               <h3 className="text-2xl font-black text-brand-dark">Ritmo Desacelerado</h3>
-              <p className="text-gray-500 font-medium leading-relaxed">
+              <p className="text-zinc-500 font-medium leading-relaxed">
                 Nada de correrias. Roteiros desenhados para respeitar o seu tempo, com pausas estratégicas e menos deslocamentos.
               </p>
             </div>
@@ -152,7 +152,7 @@ const MelhorIdadeLanding: React.FC = () => {
                 <Sparkles className="size-8" />
               </div>
               <h3 className="text-2xl font-black text-brand-dark">Curadoria Personalizada</h3>
-              <p className="text-gray-500 font-medium leading-relaxed">
+              <p className="text-zinc-500 font-medium leading-relaxed">
                 Experiências gastronômicas, culturais e de lazer selecionadas a dedo para viajantes exigentes e experientes.
               </p>
             </div>
@@ -165,7 +165,7 @@ const MelhorIdadeLanding: React.FC = () => {
         <div className="container mx-auto px-6 max-w-4xl">
           <h2 className="text-3xl md:text-5xl font-black text-brand-dark mb-12 text-center">Por que planejar sua viagem 50+ com a Anhangá?</h2>
           
-          <div className="prose prose-lg prose-brand max-w-none text-gray-700 font-medium leading-[1.8]">
+          <div className="prose prose-lg prose-brand max-w-none text-zinc-700 font-medium leading-[1.8]">
             <p>
               Viajar na maturidade exige um olhar diferente. Não se trata apenas de escolher um destino, mas de garantir que cada etapa da jornada seja fluida e prazerosa. Na <strong>Anhangá Viagens</strong>, somos especialistas em transformar o planejamento em um processo leve e transparente.
             </p>
@@ -199,7 +199,7 @@ const MelhorIdadeLanding: React.FC = () => {
         <div className="bg-brand-dark text-white rounded-[3rem] p-12 md:p-24 relative overflow-hidden">
           <div className="absolute top-0 right-0 size-64 bg-brand-cyan/20 blur-[100px] rounded-full"></div>
           <h2 className="text-4xl md:text-6xl font-black mb-8 relative z-10">Sua próxima aventura <br className="hidden md:block" /> começa agora.</h2>
-          <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto relative z-10">
+          <p className="text-xl text-zinc-300 mb-12 max-w-2xl mx-auto relative z-10">
             Fale conosco hoje mesmo e receba uma proposta exclusiva para sua viagem. Segurança, conforto e exclusividade em um só lugar.
           </p>
           <button

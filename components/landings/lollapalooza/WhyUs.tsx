@@ -15,7 +15,7 @@ const WhyUs: React.FC = () => {
           <div className={`w-full lg:w-1/2 animate-on-scroll ${isVisible ? 'is-visible' : ''}`}>
             <div className="relative group">
               {/* Image Display */}
-              <div className="relative overflow-hidden rounded-3xl shadow-2xl rotate-2 group-hover:rotate-0 transition-all duration-500 w-full aspect-[4/3] bg-gray-100">
+              <div className="relative overflow-hidden rounded-3xl shadow-2xl rotate-2 group-hover:rotate-0 transition-all duration-500 w-full aspect-[4/3] bg-zinc-100">
                  <img 
                     src={getMediaUrl('images/lollapalooza/why-us/multidao-festival.jpg')} 
                     alt="Multidão feliz em um festival de música com confetes e luzes" 
@@ -29,7 +29,7 @@ const WhyUs: React.FC = () => {
                   
                   <div className="absolute bottom-6 left-6 text-white max-w-xs">
                      <p className="font-bold text-lg mb-1">A vibe é sua.</p>
-                     <p className="text-sm text-gray-200">A logística é nossa.</p>
+                     <p className="text-sm text-zinc-200">A logística é nossa.</p>
                   </div>
               </div>
               
@@ -39,7 +39,7 @@ const WhyUs: React.FC = () => {
           </div>
           
           <div className={`w-full lg:w-1/2 animate-on-scroll ${isVisible ? 'is-visible' : ''}`} style={{ transitionDelay: '200ms' }}>
-            <h2 id="why-us-heading" className="text-3xl md:text-5xl font-black text-gray-900 mb-8 leading-tight">
+            <h2 id="why-us-heading" className="text-3xl md:text-5xl font-black text-zinc-900 mb-8 leading-tight">
               Você cuida da setlist.<br /><span className="text-anhanga-blue">A gente cuida do resto.</span>
             </h2>
 
@@ -56,8 +56,8 @@ const WhyUs: React.FC = () => {
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
-                    <p className="text-gray-600">{item.text}</p>
+                    <h3 className="text-xl font-bold text-zinc-900 mb-2">{item.title}</h3>
+                    <p className="text-zinc-600">{item.text}</p>
                   </div>
                 </div>
               ))}

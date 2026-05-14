@@ -53,7 +53,7 @@ const BlogList: React.FC = () => {
                     <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-brand-dark mb-6">
                         Diário de <span className="text-brand-cyan">Bordo</span>
                     </h1>
-                    <p className="text-lg md:text-xl text-gray-500 font-medium mb-6">
+                    <p className="text-lg md:text-xl text-zinc-500 font-medium mb-6">
                         Explore nosso acervo completo de dicas, roteiros e segredos de viagem.
                     </p>
 
@@ -66,9 +66,9 @@ const BlogList: React.FC = () => {
                             placeholder="Buscar por título ou categoria..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full px-6 py-4 rounded-full border-2 border-gray-200 focus:border-brand-cyan focus:outline-none shadow-sm pl-12 text-gray-700 font-medium transition-all"
+                            className="w-full px-6 py-4 rounded-full border-2 border-zinc-200 focus:border-brand-cyan focus:outline-none shadow-sm pl-12 text-zinc-700 font-medium transition-all"
                         />
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 size-5" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 size-5" />
                     </div>
                 </div>
 
@@ -80,13 +80,13 @@ const BlogList: React.FC = () => {
                                 to={`/blog/${post.slug}`}
                                 key={post.slug}
                                 className={`
-                                group bg-white rounded-3xl p-5 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.05)] border border-gray-100
+                                group bg-white rounded-3xl p-5 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.05)] border border-zinc-100
                                 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl
                                 flex flex-col h-full relative z-10
                             `}
                             >
                                 {/* Image Area — aspect ratio alternado para ritmo visual */}
-                                <div className={`relative ${index % 3 === 1 ? 'aspect-[4/3]' : index % 3 === 2 ? 'aspect-video' : 'aspect-[16/10]'} rounded-2xl overflow-hidden mb-5 bg-gray-100`}>
+                                <div className={`relative ${index % 3 === 1 ? 'aspect-[4/3]' : index % 3 === 2 ? 'aspect-video' : 'aspect-[16/10]'} rounded-2xl overflow-hidden mb-5 bg-zinc-100`}>
                                     <img
                                         src={optimizeRemoteImageUrl(post.image, 640, 400)}
                                         alt={post.title}
@@ -96,7 +96,7 @@ const BlogList: React.FC = () => {
                                         decoding="async"
                                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                     />
-                                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-800 shadow-sm">
+                                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-800 shadow-sm">
                                         {formatDate(post.date)}
                                     </div>
                                     <div className="absolute bottom-3 right-3 z-30">
@@ -116,18 +116,18 @@ const BlogList: React.FC = () => {
                                             {post.category}
                                         </span>
                                     </div>
-                                    <h4 className="text-2xl font-extrabold text-gray-800 mb-3 leading-tight group-hover:text-brand-cyan transition-colors">
+                                    <h4 className="text-2xl font-extrabold text-zinc-800 mb-3 leading-tight group-hover:text-brand-cyan transition-colors">
                                         {post.title}
                                     </h4>
-                                    <p className="text-gray-500 font-medium leading-relaxed mb-6 flex-1 line-clamp-3">
+                                    <p className="text-zinc-500 font-medium leading-relaxed mb-6 flex-1 line-clamp-3">
                                         {post.excerpt}
                                     </p>
 
-                                    <div className="pt-4 border-t border-dashed border-gray-100 flex items-center justify-between">
-                                        <span className="text-xs font-bold text-gray-400 flex items-center gap-1">
+                                    <div className="pt-4 border-t border-dashed border-zinc-100 flex items-center justify-between">
+                                        <span className="text-xs font-bold text-zinc-400 flex items-center gap-1">
                                             <User className="size-3" /> {AUTHORS[post.author]?.name ?? post.author}
                                         </span>
-                                        <span className="size-10 rounded-full flex items-center justify-center transition-colors bg-gray-100 text-gray-400 group-hover:bg-brand-cyan group-hover:text-white">
+                                        <span className="size-10 rounded-full flex items-center justify-center transition-colors bg-zinc-100 text-zinc-400 group-hover:bg-brand-cyan group-hover:text-white">
                                             <ArrowRight className="size-5" />
                                         </span>
                                     </div>
@@ -137,7 +137,7 @@ const BlogList: React.FC = () => {
                     </div>
                 ) : (
                     <div className="text-center py-20">
-                        <p className="text-gray-400 text-lg font-medium">Nenhum artigo encontrado com esse termo. 🕵️‍♂️</p>
+                        <p className="text-zinc-400 text-lg font-medium">Nenhum artigo encontrado com esse termo. 🕵️‍♂️</p>
                     </div>
                 )}
 
@@ -146,7 +146,7 @@ const BlogList: React.FC = () => {
                     <h2 className="text-3xl md:text-5xl font-black text-brand-dark mb-6">
                         Pronto para transformar essas dicas em <span className="text-brand-cyan">Realidade?</span>
                     </h2>
-                    <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
+                    <p className="text-xl text-zinc-600 mb-10 max-w-2xl mx-auto">
                         Fale com nossos especialistas e comece a planejar sua viagem personalizada hoje mesmo.
                     </p>
                     <button

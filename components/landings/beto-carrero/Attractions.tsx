@@ -110,7 +110,7 @@ const Attractions: React.FC = () => {
                 <h3 className="font-sans font-black text-3xl text-fun-dark mb-3 leading-[0.9]">
                   {item.name}
                 </h3>
-                <p className="font-sans text-slate-700 font-bold text-base leading-snug">
+                <p className="font-sans text-zinc-700 font-bold text-base leading-snug">
                   {item.description}
                 </p>
               </div>
