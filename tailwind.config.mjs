@@ -1,5 +1,7 @@
 import typography from '@tailwindcss/typography';
 
+const EASE_OUT_EXPO = 'cubic-bezier(0.16, 1, 0.3, 1)';
+
 /** @type {import('tailwindcss').Config} */
 export default {
     content: [
@@ -57,7 +59,7 @@ export default {
             animation: {
                 'fade-in-up': 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                 'fade-in-down': 'fadeInDown 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                'pop-in': 'popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+                'pop-in': `popIn 0.3s ${EASE_OUT_EXPO} forwards`,
                 'draw': 'draw 1.5s ease-in-out forwards',
                 'float': 'float 6s ease-in-out infinite',
                 'blob': 'blob 10s infinite',
@@ -91,7 +93,7 @@ export default {
                 }
             },
             transitionTimingFunction: {
-                'spring': 'cubic-bezier(0.16, 1, 0.3, 1)',
+                'spring': EASE_OUT_EXPO,
             }
         },
     },

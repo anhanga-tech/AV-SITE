@@ -297,7 +297,7 @@ const Solution: React.FC = () => {
                ></div>
 
                {/* Modal Content */}
-               <div className="relative bg-white w-full max-w-lg rounded-3xl border-4 border-fun-dark shadow-hard-lg p-6 md:p-8 animate-[scaleIn_0.3s_cubic-bezier(0.16,1,0.3,1)] overflow-hidden">
+               <div className="relative bg-white w-full max-w-lg rounded-3xl border-4 border-fun-dark shadow-hard-lg p-6 md:p-8 animate-pop-in overflow-hidden">
 
                   {/* Close Button */}
                   <button
