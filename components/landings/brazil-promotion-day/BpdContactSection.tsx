@@ -41,6 +41,7 @@ export function BpdContactSection() {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if (isLocallySubmitting.current) return;
+        if (!form.firstName.trim() || !form.lastName.trim() || !form.email.trim() || !form.whatsapp.trim()) return;
         isLocallySubmitting.current = true;
         setErrorMessage('');
 
@@ -169,7 +170,7 @@ export function BpdContactSection() {
                         className="bg-white rounded-[2rem] border-2 border-gray-100 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] overflow-hidden"
                     >
                         {submitState === 'success' ? (
-                            <div className="flex flex-col items-center text-center p-12">
+                            <div className="flex flex-col items-center text-center p-12" role="status" aria-live="polite">
                                 <m.div
                                     initial={{ scale: 0.5, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
