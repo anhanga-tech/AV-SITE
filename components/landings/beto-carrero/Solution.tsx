@@ -65,7 +65,7 @@ const Solution: React.FC = () => {
                      </p>
                   </div>
 
-                  <div className="space-y-6 relative z-10 w-full flex flex-col items-center lg:items-start">
+                  <div className="gap-y-6 flex flex-col relative z-10 w-full items-center lg:items-start">
 
                      {/* Card 1: Ticket Style */}
                      <div className="group bg-white rounded-xl border-2 border-fun-dark shadow-hard transform -rotate-2 hover:rotate-0 transition-transform duration-300 flex overflow-hidden w-full max-w-sm lg:max-w-md">

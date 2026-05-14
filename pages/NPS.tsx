@@ -134,7 +134,7 @@ export default function NPS() {
         className="min-h-screen flex flex-col"
         style={{ background: '#0f172a', color: '#f8fafc', fontFamily: 'Poppins, sans-serif' }}
       >
-        <header className="py-6 px-6 flex justify-center">
+        <header className="p-6 flex justify-center">
           <img
             src={BRAND_LOGO_WHITE_URL}
             alt="Anhangá Viagens"

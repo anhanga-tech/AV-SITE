@@ -285,7 +285,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
                 id="lead-country-code"
                 value={countryCode}
                 onChange={(e) => setCountryCode(e.target.value)}
-                className="w-[112px] shrink-0 bg-white border border-gray-200 rounded-xl px-3 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm"
+                className="w-[112px] shrink-0 bg-white border border-gray-200 rounded-xl p-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition-all shadow-sm"
               >
                 <option value="+55">+55 BR</option>
                 <option value="+1">+1 US/CA</option>

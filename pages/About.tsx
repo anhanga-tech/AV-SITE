@@ -76,7 +76,7 @@ const About: React.FC = () => {
             </span>
           </h1>
           <p className="max-w-2xl mx-auto text-gray-600 text-lg md:text-xl font-medium leading-relaxed mb-8">
-            Na Anhangá Viagens, acreditamos que viajar é mais do que carimbar um passaporte — é sobre colecionar histórias que valem a pena ser contadas.
+            Na Anhangá Viagens, acreditamos que viajar é mais do que carimbar um passaporte: é sobre colecionar histórias que valem a pena ser contadas.
           </p>
           <div className="flex justify-center">
             <button

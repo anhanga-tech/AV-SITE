@@ -256,7 +256,7 @@ const ContactModal: React.FC = () => {
                                 disabled={!isValid || isSubmitting}
                                 className="w-full rounded-xl bg-[#25D366] py-3 text-sm font-black text-white transition-colors hover:bg-[#1fba59] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
                             >
-                                {isSubmitting ? 'Enviando...' : 'Chamar no WhatsApp'}
+                                {isSubmitting ? 'Enviando…' : 'Chamar no WhatsApp'}
                             </button>
                             <button
                                 type="button"
@@ -264,7 +264,7 @@ const ContactModal: React.FC = () => {
                                 disabled={!isValid || isSubmitting}
                                 className="w-full rounded-xl bg-brand-dark py-3 text-sm font-black text-white transition-colors hover:bg-brand-vibrant focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-dark focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
                             >
-                                {isSubmitting ? 'Enviando...' : 'Me chamem no WhatsApp'}
+                                {isSubmitting ? 'Enviando…' : 'Me chamem no WhatsApp'}
                             </button>
                         </div>
                     </form>

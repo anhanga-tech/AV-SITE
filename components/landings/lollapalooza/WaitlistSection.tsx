@@ -255,7 +255,7 @@ const WaitlistSection: React.FC = () => {
                     {isSubmitting ? (
                       <>
                         <Loader2 size={18} className="animate-spin" />
-                        ENVIANDO...
+                        ENVIANDO…
                       </>
                     ) : (
                       <>

@@ -82,7 +82,7 @@ const LollapaloozaLanding: React.FC = () => {
             <a href="https://www.anhanga.tur.br/" className="text-brand-cyan font-semibold hover:underline">
               agência de viagens em São Paulo
             </a>{' '}
-            com foco em atendimento consultivo e <strong>viagens personalizadas</strong> — do planejamento inicial ao suporte no destino.
+            com foco em atendimento consultivo e <strong>viagens personalizadas</strong>, do planejamento inicial ao suporte no destino.
           </p>
           <h3 className="text-xl md:text-2xl font-extrabold text-brand-dark mb-3">O que segue valendo para quem quer ir ao festival</h3>
           <ul className="list-disc list-inside text-gray-700 space-y-1 mb-6">
