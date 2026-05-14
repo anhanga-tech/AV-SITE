@@ -53,7 +53,7 @@ const Hero: React.FC = () => {
             </div>
 
             {/* Hand-drawn Arrow pointing to button (Hidden on mobile to save space) */}
-            <div className="hidden lg:block text-fun-dark absolute lg:left-[380px] lg:-top-14 xl:left-[480px] xl:-top-8 animate-bounce z-30">
+            <div className="hidden lg:block text-fun-dark absolute lg:left-[380px] lg:-top-14 xl:left-[480px] xl:-top-8 animate-float z-30">
               <div className="font-handwriting font-bold text-2xl mb-0 transform -rotate-6 whitespace-nowrap">
                 Comece aqui!
               </div>
@@ -147,7 +147,7 @@ const Hero: React.FC = () => {
 
       {/* --- Floating Scroll Connector (Overlapping the ZigZag) --- */}
       <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 z-40 w-full flex justify-center pointer-events-none">
-        <div className="bg-white px-6 py-3 rounded-full border-4 border-fun-dark shadow-hard flex items-center gap-3 animate-bounce pointer-events-auto cursor-pointer group hover:scale-105 transition-transform">
+        <div className="bg-white px-6 py-3 rounded-full border-4 border-fun-dark shadow-hard flex items-center gap-3 animate-pulse pointer-events-auto cursor-pointer group hover:scale-105 transition-transform">
           <span className="font-sans font-bold text-fun-dark text-sm md:text-lg whitespace-nowrap">
             O pesadelo de planejar
           </span>

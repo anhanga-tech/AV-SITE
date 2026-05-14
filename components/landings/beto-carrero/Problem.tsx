@@ -68,7 +68,7 @@ const Problem: React.FC = () => {
                   </div>
 
                   {/* Floating Cursor */}
-                  <MousePointer2 className="absolute top-1/2 right-1/4 md:right-[20%] text-fun-dark w-8 h-8 lg:w-12 lg:h-12 fill-white stroke-[1.5px] z-40 animate-bounce" />
+                  <MousePointer2 className="absolute top-1/2 right-1/4 md:right-[20%] text-fun-dark w-8 h-8 lg:w-12 lg:h-12 fill-white stroke-[1.5px] z-40 animate-float" />
 
                   {/* Floating Question Marks */}
                   <HelpCircle className="absolute top-0 right-10 md:right-[15%] lg:right-0 text-gray-300 w-12 h-12 lg:w-20 lg:h-20 transform rotate-12" />
