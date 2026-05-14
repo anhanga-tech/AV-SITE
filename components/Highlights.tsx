@@ -153,8 +153,8 @@ const Highlights = memo(() => {
                             custom={1}
                         >
                             <div className="inline-block relative mb-4">
-                                <span className="absolute inset-0 bg-blue-100 transform -skew-x-12 rounded-lg"></span>
-                                <span className="relative px-3 py-1 text-blue-600 font-black uppercase tracking-widest text-sm flex items-center gap-2">
+                                <span className="absolute inset-0 bg-anhanga-blue/10 transform -skew-x-12 rounded-lg"></span>
+                                <span className="relative px-3 py-1 text-anhanga-blue font-black uppercase tracking-widest text-sm flex items-center gap-2">
                                     <Sparkle className="w-4 h-4" weight="fill" /> O Jeito Anhangá
                                 </span>
                             </div>
