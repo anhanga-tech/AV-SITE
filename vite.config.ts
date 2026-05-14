@@ -221,7 +221,6 @@ export default defineConfig(({ mode, isSsrBuild }) => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
-        'compute-scroll-into-view': path.resolve(__dirname, 'src/vendor/compute-scroll-into-view.ts'),
       }
     },
     build: {
