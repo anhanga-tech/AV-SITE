@@ -154,7 +154,7 @@ const WaitlistSection: React.FC = () => {
                       type="text"
                       value={name}
                       onChange={(event) => setName(event.target.value)}
-                      className="peer w-full bg-black/60 border-l-2 border-white/10 px-6 py-4 text-white placeholder-white/30 outline-none transition-all duration-300 focus:border-anhanga-yellow focus:bg-anhanga-yellow/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-anhanga-yellow focus-visible:outline-offset-2"
+                      className="peer w-full bg-anhanga-darkBlue/80 border-l-2 border-white/10 px-6 py-4 text-white placeholder-white/50 outline-none transition-all duration-300 focus:border-anhanga-yellow focus:bg-anhanga-yellow/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-anhanga-yellow focus-visible:outline-offset-2"
                       placeholder="EX: SABRINA CARPENTER"
                       autoComplete="name"
                     />
@@ -174,7 +174,7 @@ const WaitlistSection: React.FC = () => {
                       type="email"
                       value={email}
                       onChange={(event) => setEmail(event.target.value)}
-                      className="peer w-full bg-black/60 border-l-2 border-white/10 px-6 py-4 text-white placeholder-white/30 outline-none transition-all duration-300 focus:border-anhanga-blue focus:bg-anhanga-blue/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-anhanga-blue focus-visible:outline-offset-2"
+                      className="peer w-full bg-anhanga-darkBlue/80 border-l-2 border-white/10 px-6 py-4 text-white placeholder-white/50 outline-none transition-all duration-300 focus:border-anhanga-blue focus:bg-anhanga-blue/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-anhanga-blue focus-visible:outline-offset-2"
                       placeholder="VOICE@EXEMPLO.COM"
                       autoComplete="email"
                     />
