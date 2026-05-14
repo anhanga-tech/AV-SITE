@@ -3,16 +3,19 @@
 
 @layer base {
     body {
-        font-family: 'Inter', sans-serif;
+        @apply font-sans;
     }
 
     h1,
-    h2,
+    h2 {
+        @apply font-display;
+    }
+
     h3,
     h4,
     h5,
     h6 {
-        font-family: 'Poppins', sans-serif;
+        @apply font-sans;
     }
 }
 
