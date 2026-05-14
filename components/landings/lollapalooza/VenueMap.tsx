@@ -296,7 +296,7 @@ const VenueMap: React.FC = () => {
                     <div className="relative z-10 p-3 flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div
-                          className="w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors shrink-0"
+                          className="size-8 rounded-full flex items-center justify-center shadow-sm transition-colors shrink-0"
                           style={{
                             backgroundColor: activeIndex === idx ? '#0056D2' : style.bgColor,
                             color: activeIndex === idx ? 'white' : style.iconColor

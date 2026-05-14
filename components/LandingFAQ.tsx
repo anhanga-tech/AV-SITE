@@ -26,10 +26,10 @@ const FAQItemComponent = memo(({ question, answer, isOpen, idx, onToggle }: FAQI
                 <h3 className="text-xl font-bold text-brand-dark group-hover:text-brand-cyan transition-colors pr-8">
                     {question}
                 </h3>
-                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                <div className={`flex-shrink-0 size-8 rounded-full flex items-center justify-center transition-all duration-300 ${
                     isOpen ? 'bg-brand-cyan text-white rotate-180' : 'bg-brand-light text-brand-cyan'
                 }`}>
-                    {isOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                    {isOpen ? <ChevronUp className="size-5" /> : <ChevronDown className="size-5" />}
                 </div>
             </button>
             <div

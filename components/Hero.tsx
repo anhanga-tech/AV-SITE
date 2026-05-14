@@ -237,7 +237,7 @@ const Hero: React.FC = memo(() => {
                 className="flex items-center gap-2 text-white/90 font-bold text-sm bg-white/10 px-4 py-2 rounded-full backdrop-blur-md border border-white/10 hover:bg-white/20 transition-all duration-300 cursor-default"
                 whileHover={{ scale: 1.05, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
               >
-                <feat.icon className="w-4 h-4 text-yellow-300" />
+                <feat.icon className="size-4 text-yellow-300" />
                 {feat.text}
               </m.div>
             ))}

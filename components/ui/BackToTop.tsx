@@ -51,7 +51,7 @@ const BackToTop: React.FC = () => {
         ${isVisible ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'}
       `}
     >
-      <CaretUp className="w-6 h-6" weight="bold" />
+      <CaretUp className="size-6" weight="bold" />
     </button>
   );
 };

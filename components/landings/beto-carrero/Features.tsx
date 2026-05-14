@@ -79,7 +79,7 @@ const Features: React.FC = () => {
                   )}
 
                   {/* Icon Badge - Highlighted & Larger */}
-                  <div className={`w-24 h-24 rounded-2xl border-4 border-fun-dark flex items-center justify-center mb-8 shadow-hard transition-all duration-300 group-hover:shadow-hard-hover group-hover:scale-110 ${feature.color} relative z-10`}>
+                  <div className={`size-24 rounded-2xl border-4 border-fun-dark flex items-center justify-center mb-8 shadow-hard transition-all duration-300 group-hover:shadow-hard-hover group-hover:scale-110 ${feature.color} relative z-10`}>
                     {feature.icon}
                   </div>
 

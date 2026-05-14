@@ -134,8 +134,8 @@ const WaitlistSection: React.FC = () => {
             className="relative lg:mt-0 mt-12"
           >
             {/* Geometric Accent Decoration */}
-            <div className="absolute -top-6 -left-6 w-24 h-24 border-t-2 border-l-2 border-anhanga-yellow z-0 opacity-50" />
-            <div className="absolute -bottom-6 -right-6 w-24 h-24 border-b-2 border-r-2 border-anhanga-blue z-0 opacity-50" />
+            <div className="absolute -top-6 -left-6 size-24 border-t-2 border-l-2 border-anhanga-yellow z-0 opacity-50" />
+            <div className="absolute -bottom-6 -right-6 size-24 border-b-2 border-r-2 border-anhanga-blue z-0 opacity-50" />
 
             <div className="relative z-10 flex flex-col bg-anhanga-darkBlue/50 backdrop-blur-xl border border-white/10 ring-1 ring-white/5 p-8 md:p-10">
               <div className="mb-10 text-center lg:text-left">
@@ -192,7 +192,7 @@ const WaitlistSection: React.FC = () => {
                       onChange={(event) => setAcceptedLgpd(event.target.checked)}
                       className="peer sr-only"
                     />
-                    <div className="h-5 w-5 border-2 border-white/20 peer-checked:border-anhanga-yellow peer-checked:bg-anhanga-yellow transition-all duration-200 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-anhanga-yellow peer-focus-visible:outline-offset-2" />
+                    <div className="size-5 border-2 border-white/20 peer-checked:border-anhanga-yellow peer-checked:bg-anhanga-yellow transition-all duration-200 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-anhanga-yellow peer-focus-visible:outline-offset-2" />
                     <CheckCircle2 size={12} className="absolute text-black opacity-0 peer-checked:opacity-100 transition-opacity" />
                   </div>
                   <span className="text-xs text-gray-400 leading-snug group-hover:text-gray-300 transition-colors">

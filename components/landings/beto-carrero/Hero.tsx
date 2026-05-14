@@ -14,8 +14,8 @@ const Hero: React.FC = () => {
       </div>
 
       {/* --- Background Doodles (Abstract Shapes) --- */}
-      <div className="absolute top-10 left-0 w-24 h-24 md:w-40 md:h-40 bg-white/30 rounded-full blur-2xl animate-pulse"></div>
-      <div className="absolute bottom-1/4 right-0 w-32 h-32 md:w-64 md:h-64 bg-fun-pink/10 rounded-full blur-3xl"></div>
+      <div className="absolute top-10 left-0 size-24 md:w-40 md:h-40 bg-white/30 rounded-full blur-2xl animate-pulse"></div>
+      <div className="absolute bottom-1/4 right-0 size-32 md:w-64 md:h-64 bg-fun-pink/10 rounded-full blur-3xl"></div>
 
       <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-4 items-center relative z-20 mb-12 md:mb-0">
 
@@ -108,8 +108,8 @@ const Hero: React.FC = () => {
                 <span className="font-sans font-bold text-sm sm:text-lg lg:text-2xl">Ingresso VIP</span>
               </div>
               {/* Perforation line */}
-              <div className="absolute -right-1 top-1/2 -translate-y-1/2 w-3 h-3 lg:w-4 lg:h-4 bg-fun-yellow rounded-full border-2 border-fun-dark"></div>
-              <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-3 h-3 lg:w-4 lg:h-4 bg-fun-yellow rounded-full border-2 border-fun-dark"></div>
+              <div className="absolute -right-1 top-1/2 -translate-y-1/2 size-3 lg:w-4 lg:h-4 bg-fun-yellow rounded-full border-2 border-fun-dark"></div>
+              <div className="absolute -left-1 top-1/2 -translate-y-1/2 size-3 lg:w-4 lg:h-4 bg-fun-yellow rounded-full border-2 border-fun-dark"></div>
             </div>
 
             {/* 4. Floating Sticker: 5 Stars (Bottom Right) */}
@@ -122,7 +122,7 @@ const Hero: React.FC = () => {
             </div>
 
             {/* 5. Decorative Sparkles */}
-            <Sparkles className="absolute -top-10 left-0 lg:-left-10 text-white w-10 h-10 sm:w-12 sm:h-12 lg:w-20 lg:h-20 animate-pulse z-0" strokeWidth={1} />
+            <Sparkles className="absolute -top-10 left-0 lg:-left-10 text-white size-10 sm:w-12 sm:h-12 lg:w-20 lg:h-20 animate-pulse z-0" strokeWidth={1} />
           </div>
 
         </div>
@@ -151,7 +151,7 @@ const Hero: React.FC = () => {
           <span className="font-sans font-bold text-fun-dark text-sm md:text-lg whitespace-nowrap">
             O pesadelo de planejar
           </span>
-          <div className="bg-fun-pink text-white rounded-full w-8 h-8 flex items-center justify-center border-2 border-fun-dark group-hover:bg-fun-dark transition-colors">
+          <div className="bg-fun-pink text-white rounded-full size-8 flex items-center justify-center border-2 border-fun-dark group-hover:bg-fun-dark transition-colors">
             <ArrowDown size={18} strokeWidth={3} />
           </div>
         </div>

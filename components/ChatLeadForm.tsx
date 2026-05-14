@@ -236,7 +236,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
   return (
     <div className="bg-white rounded-2xl border border-brand-blue/10 shadow-[0_8px_30px_rgb(0,0,0,0.08)] w-full overflow-hidden transform transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-1">
       <div className="bg-gradient-to-r from-brand-vibrant/10 to-transparent p-3 flex items-center gap-2 border-b border-gray-100">
-        <CheckCircle2 className="w-5 h-5 text-green-500" />
+        <CheckCircle2 className="size-5 text-green-500" />
         <span className="text-sm font-bold tracking-wide text-brand-dark uppercase">
           Link Gerado
         </span>
@@ -311,9 +311,9 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
                   type="checkbox"
                   checked={acceptedLGPD}
                   onChange={(e) => setAcceptedLGPD(e.target.checked)}
-                  className="peer h-4 w-4 cursor-pointer appearance-none rounded border border-gray-300 bg-white checked:bg-brand-vibrant checked:border-brand-vibrant transition-all focus:ring-2 focus:ring-brand-vibrant/20"
+                  className="peer size-4 cursor-pointer appearance-none rounded border border-gray-300 bg-white checked:bg-brand-vibrant checked:border-brand-vibrant transition-all focus:ring-2 focus:ring-brand-vibrant/20"
                 />
-                <CheckCircle2 className="absolute h-3 w-3 text-white opacity-0 peer-checked:opacity-100 left-0.5 pointer-events-none transition-opacity" />
+                <CheckCircle2 className="absolute size-3 text-white opacity-0 peer-checked:opacity-100 left-0.5 pointer-events-none transition-opacity" />
               </div>
               <span className="text-xs text-gray-500 leading-tight">
                 Aceito receber comunicações e autorizo o tratamento dos meus dados conforme a <a href="https://www.anhanga.tur.br/politica-privacidade/" target="_blank" rel="noopener noreferrer" className="underline hover:text-brand-vibrant">Política de Privacidade</a>.
@@ -342,13 +342,13 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
         >
           {isSubmittingLead || isLocallySubmitting ? (
             <>
-              <Loader2 className="w-5 h-5 animate-spin" />
+              <Loader2 className="size-5 animate-spin" />
               <span>Salvando...</span>
             </>
           ) : (
             <>
               <span>Salvar e abrir WhatsApp</span>
-              <ExternalLink className="w-4 h-4 group-hover:scale-110 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
+              <ExternalLink className="size-4 group-hover:scale-110 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
             </>
           )}
         </button>

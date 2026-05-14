@@ -69,7 +69,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     title="Compartilhar"
                     aria-label="Compartilhar"
                 >
-                    <Share2 className="w-4 h-4" />
+                    <Share2 className="size-4" />
                 </button>
                 <button
                     onClick={(e) => {
@@ -82,7 +82,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     title={copied ? "Link copiado!" : "Copiar link"}
                     aria-label={copied ? "Link copiado com sucesso" : "Copiar link"}
                 >
-                    {copied ? <Check className="w-4 h-4" /> : <LinkIcon className="w-4 h-4" />}
+                    {copied ? <Check className="size-4" /> : <LinkIcon className="size-4" />}
                 </button>
             </div>
         );
@@ -96,7 +96,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                 onMouseEnter={prefetchHaptics}
                 className="flex items-center gap-2 px-5 py-2.5 bg-brand-cyan text-white font-bold rounded-xl hover:bg-brand-cyanDark transition-all shadow-[0_4px_0px_#0369a1] active:shadow-none active:translate-y-1 lg:hidden"
             >
-                <Share2 className="w-5 h-5" /> Compartilhar
+                <Share2 className="size-5" /> Compartilhar
             </button>
 
             {/* Social Buttons */}
@@ -115,7 +115,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                             .catch(() => {});
                     }}
                 >
-                    <MessageCircle className="w-5 h-5 fill-current" />
+                    <MessageCircle className="size-5 fill-current" />
                 </a>
                 <a
                     href={links.facebook}
@@ -131,7 +131,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                             .catch(() => {});
                     }}
                 >
-                    <Facebook className="w-5 h-5 fill-current" />
+                    <Facebook className="size-5 fill-current" />
                 </a>
                 <a
                     href={links.linkedin}
@@ -147,7 +147,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                             .catch(() => {});
                     }}
                 >
-                    <Linkedin className="w-5 h-5 fill-current" />
+                    <Linkedin className="size-5 fill-current" />
                 </a>
 
                 {/* Native Share (secondary on desktop) */}
@@ -158,7 +158,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     title="Mais opções de compartilhamento"
                     aria-label="Mais opções de compartilhamento"
                 >
-                    <Share2 className="w-5 h-5" />
+                    <Share2 className="size-5" />
                 </button>
 
                 {/* Copy Link button */}
@@ -169,7 +169,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     title={copied ? "Link copiado!" : "Copiar link"}
                     aria-label={copied ? "Link copiado com sucesso" : "Copiar link"}
                 >
-                    {copied ? <Check className="w-5 h-5" /> : <LinkIcon className="w-5 h-5" />}
+                    {copied ? <Check className="size-5" /> : <LinkIcon className="size-5" />}
                 </button>
             </div>
         </div>

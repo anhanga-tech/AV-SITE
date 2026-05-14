@@ -165,7 +165,7 @@ const DestinationField = memo(({
       ref={destRef}
     >
       <label htmlFor="destination-input" className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-focus-within:text-brand-cyan transition-colors">
-        <MapPin className="w-3 h-3" /> Para onde?
+        <MapPin className="size-3" /> Para onde?
       </label>
       <div className="relative flex items-center">
         <input
@@ -198,7 +198,7 @@ const DestinationField = memo(({
             className="absolute right-0 p-1 text-gray-400 hover:text-brand-vibrant transition-colors rounded-full focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-vibrant"
             aria-label="Limpar destino"
           >
-            <X className="w-4 h-4" />
+            <X className="size-4" />
           </button>
         )}
       </div>
@@ -217,7 +217,7 @@ const DestinationField = memo(({
                   index === activeSuggestionIndex ? 'bg-brand-light text-brand-cyan' : 'hover:bg-brand-light text-gray-700'
                 }`}
               >
-                <MapPin className={`w-4 h-4 shrink-0 ${index === activeSuggestionIndex ? 'text-brand-cyan' : 'text-brand-cyan/50'}`} />
+                <MapPin className={`size-4 shrink-0 ${index === activeSuggestionIndex ? 'text-brand-cyan' : 'text-brand-cyan/50'}`} />
                 <span className="truncate">{dest.label}</span>
               </li>
             ))}
@@ -273,13 +273,13 @@ const DateField = memo(({
       data-testid="dates-filter-btn"
     >
       <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan group-focus-within:text-brand-cyan transition-colors">
-        <Calendar className="w-3 h-3" /> Quando?
+        <Calendar className="size-3" /> Quando?
       </span>
       <div className="flex items-center justify-between">
         <span className={`text-lg md:text-xl font-bold truncate transition-colors ${startDate ? "text-gray-800" : "text-gray-300"}`}>
           {startDate ? `${formatDateDisplay(startDate)} - ${endDate ? formatDateDisplay(endDate) : '...'}` : "Definir datas"}
         </span>
-        <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${showCalendar ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`size-4 text-gray-400 transition-transform duration-300 ${showCalendar ? 'rotate-180' : ''}`} />
       </div>
     </button>
 
@@ -293,11 +293,11 @@ const DateField = memo(({
             className={`p-1 rounded-full transition-colors ${canGoToPreviousMonth ? 'hover:bg-gray-100 text-gray-600' : 'text-gray-300 cursor-not-allowed'}`}
             aria-label="Mês anterior"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="size-5" />
           </button>
           <span className="font-bold text-gray-800">{MONTH_NAMES[currentMonth.getMonth()]} {currentMonth.getFullYear()}</span>
           <button type="button" onClick={() => onChangeMonth(1)} className="p-1 hover:bg-gray-100 rounded-full text-gray-600 transition-colors" aria-label="Próximo mês">
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="size-5" />
           </button>
         </div>
         <div className="grid grid-cols-7 mb-2 text-center text-xs font-bold text-gray-400">
@@ -318,7 +318,7 @@ const DateField = memo(({
                 onClick={() => onDateClick(date)}
                 disabled={past}
                 aria-disabled={past}
-                className={`h-9 w-9 mx-auto flex items-center justify-center text-sm rounded-full transition-all duration-200 border-2
+                className={`size-9 mx-auto flex items-center justify-center text-sm rounded-full transition-all duration-200 border-2
                   ${past ? 'border-transparent text-gray-300 cursor-not-allowed' : selected ? 'bg-brand-cyan border-brand-cyan text-white font-bold scale-110' : inRange ? 'bg-brand-light border-transparent text-brand-cyan font-bold' : 'border-transparent text-gray-600 hover:bg-gray-100'}`}
               >
                 {date.getDate()}
@@ -369,11 +369,11 @@ const GuestsField = memo(({
       data-testid="guests-filter-btn"
     >
       <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan group-focus-within:text-brand-cyan transition-colors">
-        <User className="w-3 h-3" /> Quem vai?
+        <User className="size-3" /> Quem vai?
       </span>
       <div className="flex items-center justify-between">
         <span className="text-lg md:text-xl font-bold text-gray-800 truncate transition-colors">{guestSummary}</span>
-        <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${showGuestDropdown ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`size-4 text-gray-400 transition-transform duration-300 ${showGuestDropdown ? 'rotate-180' : ''}`} />
       </div>
     </button>
 
@@ -386,19 +386,19 @@ const GuestsField = memo(({
               type="button"
               onClick={(event) => { event.preventDefault(); event.stopPropagation(); onAdultsChange(Math.max(1, adults - 1)); }}
               disabled={adults <= 1}
-              className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-brand-cyan hover:text-brand-cyan transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="size-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-brand-cyan hover:text-brand-cyan transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               aria-label="Remover um adulto"
             >
-              <Minus className="w-4 h-4" />
+              <Minus className="size-4" />
             </button>
             <span className="font-bold w-8 text-center text-gray-900" aria-live="polite">{adults}</span>
             <button
               type="button"
               onClick={(event) => { event.preventDefault(); event.stopPropagation(); onAdultsChange(adults + 1); }}
-              className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-brand-cyan hover:text-brand-cyan transition-all"
+              className="size-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-brand-cyan hover:text-brand-cyan transition-all"
               aria-label="Adicionar um adulto"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="size-4" />
             </button>
           </div>
         </div>
@@ -409,19 +409,19 @@ const GuestsField = memo(({
               type="button"
               onClick={(event) => { event.preventDefault(); event.stopPropagation(); onChildCountChange('remove'); }}
               disabled={children <= 0}
-              className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-brand-cyan hover:text-brand-cyan transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="size-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-brand-cyan hover:text-brand-cyan transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               aria-label="Remover uma criança"
             >
-              <Minus className="w-4 h-4" />
+              <Minus className="size-4" />
             </button>
             <span className="font-bold w-8 text-center text-gray-900" aria-live="polite">{children}</span>
             <button
               type="button"
               onClick={(event) => { event.preventDefault(); event.stopPropagation(); onChildCountChange('add'); }}
-              className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-brand-cyan hover:text-brand-cyan transition-all"
+              className="size-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-brand-cyan hover:text-brand-cyan transition-all"
               aria-label="Adicionar uma criança"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="size-4" />
             </button>
           </div>
         </div>
@@ -481,18 +481,18 @@ const TripTypeField = memo(({
       data-testid="trip-type-filter-btn"
     >
       <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan group-focus-within:text-brand-cyan transition-colors">
-        <Briefcase className="w-3 h-3" /> Tipo de Viagem
+        <Briefcase className="size-3" /> Tipo de Viagem
       </span>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 overflow-hidden">
           {selectedTripObj && (
-            <selectedTripObj.icon className={`w-5 h-5 ${selectedTripObj.color}`} />
+            <selectedTripObj.icon className={`size-5 ${selectedTripObj.color}`} />
           )}
           <span className={`text-lg md:text-lg font-bold truncate transition-colors ${tripType ? "text-gray-800" : "text-gray-300"}`}>
             {tripType || "Lazer, Lua de Mel..."}
           </span>
         </div>
-        <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${showTripTypeDropdown ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`size-4 text-gray-400 transition-transform duration-300 ${showTripTypeDropdown ? 'rotate-180' : ''}`} />
       </div>
     </button>
 
@@ -508,7 +508,7 @@ const TripTypeField = memo(({
                 ${tripType === type.label ? 'bg-brand-light border-brand-cyan shadow-sm' : 'bg-white border-transparent hover:bg-gray-50 hover:border-gray-100'}`}
             >
               <div className={`p-2 rounded-xl ${type.bg} ${type.color}`}>
-                <type.icon className="w-5 h-5" />
+                <type.icon className="size-5" />
               </div>
               <span className={`font-bold text-base ${tripType === type.label ? 'text-brand-dark' : 'text-gray-600'}`}>
                 {type.label}
@@ -549,7 +549,7 @@ const BudgetField = memo(({
       data-testid="budget-filter-btn"
     >
       <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan group-focus-within:text-brand-cyan transition-colors">
-        <Wallet className="w-3 h-3" /> Orçamento Aprox.
+        <Wallet className="size-3" /> Orçamento Aprox.
       </span>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 overflow-hidden">
@@ -562,7 +562,7 @@ const BudgetField = memo(({
             {budget || "Definir padrão"}
           </span>
         </div>
-        <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${showBudgetDropdown ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`size-4 text-gray-400 transition-transform duration-300 ${showBudgetDropdown ? 'rotate-180' : ''}`} />
       </div>
     </button>
 
@@ -577,7 +577,7 @@ const BudgetField = memo(({
               ${budget === option.label ? 'bg-brand-light border-brand-cyan shadow-sm' : 'bg-white border-transparent hover:bg-gray-50 hover:border-gray-100'}`}
           >
             <div className={`p-2 rounded-xl bg-gray-100 text-gray-600 ${budget === option.label ? 'bg-brand-vibrant text-white' : ''}`}>
-              <option.icon className="w-5 h-5" />
+              <option.icon className="size-5" />
             </div>
             <div className="text-left">
               <div className="flex items-center gap-2">
@@ -626,12 +626,12 @@ const SearchButton = memo(({ isSearchLoading, validationError }: SearchButtonPro
     >
       {isSearchLoading ? (
         <>
-          <Loader2 className="w-6 h-6 animate-spin" />
+          <Loader2 className="size-6 animate-spin" />
           <span className="font-black text-lg">Planejando...</span>
         </>
       ) : (
         <>
-          <Search className="w-6 h-6 group-hover:rotate-12 transition-transform duration-300 ease-spring" strokeWidth={2.5} />
+          <Search className="size-6 group-hover:rotate-12 transition-transform duration-300 ease-spring" strokeWidth={2.5} />
           <span className="font-black text-lg">Planejar Viagem</span>
         </>
       )}
@@ -968,8 +968,8 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
       </div>
 
       <div className="w-full h-[2px] border-t-2 border-dashed border-gray-200 relative my-1">
-        <div className="absolute left-[-16px] top-[-8px] w-4 h-4 bg-brand-light rounded-full"></div>
-        <div className="absolute right-[-16px] top-[-8px] w-4 h-4 bg-brand-light rounded-full"></div>
+        <div className="absolute left-[-16px] top-[-8px] size-4 bg-brand-light rounded-full"></div>
+        <div className="absolute right-[-16px] top-[-8px] size-4 bg-brand-light rounded-full"></div>
       </div>
 
       <div className="flex flex-col md:flex-row items-stretch w-full divide-y md:divide-y-0 md:divide-x divide-gray-100">
