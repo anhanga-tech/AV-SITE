@@ -72,8 +72,8 @@ const Solution: React.FC = () => {
                         {/* Left Side: Content */}
                         <div className="p-3 pl-4 lg:p-6 lg:pl-8 flex-grow flex items-center gap-4 lg:gap-6">
                            {/* Redesigned Icon: Blue Circle Token */}
-                           <div className="size-14 lg:w-20 lg:h-20 bg-fun-blue rounded-full flex items-center justify-center border-2 border-fun-dark shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] text-white transform -rotate-6 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300 flex-shrink-0">
-                              <Plane className="size-6 lg:w-9 lg:h-9" strokeWidth={2.5} />
+                           <div className="size-14 lg:size-20 bg-fun-blue rounded-full flex items-center justify-center border-2 border-fun-dark shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] text-white transform -rotate-6 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300 flex-shrink-0">
+                              <Plane className="size-6 lg:size-9" strokeWidth={2.5} />
                            </div>
                            <div>
                               <h3 className="font-sans font-bold text-lg lg:text-2xl text-fun-dark">Passagem Aérea</h3>
@@ -87,8 +87,8 @@ const Solution: React.FC = () => {
                         </div>
                         {/* Right Side: Stamp */}
                         <div className="w-16 lg:w-20 bg-gray-50 flex items-center justify-center flex-shrink-0">
-                           <div className="bg-green-100 text-green-600 border-2 border-green-500 size-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center transform rotate-12 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all">
-                              <Check className="size-[18px] lg:w-6 lg:h-6" strokeWidth={3} />
+                           <div className="bg-green-100 text-green-600 border-2 border-green-500 size-8 lg:size-10 rounded-full flex items-center justify-center transform rotate-12 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all">
+                              <Check className="size-[18px] lg:size-6" strokeWidth={3} />
                            </div>
                         </div>
                      </div>
@@ -97,8 +97,8 @@ const Solution: React.FC = () => {
                      <div className="group bg-white rounded-xl border-2 border-fun-dark shadow-hard transform rotate-1 hover:rotate-0 transition-transform duration-300 flex overflow-hidden ml-0 md:ml-12 lg:ml-12 w-full max-w-sm lg:max-w-md">
                         <div className="p-3 pl-4 lg:p-6 lg:pl-8 flex-grow flex items-center gap-4 lg:gap-6">
                            {/* Redesigned Icon: Yellow Circle Token */}
-                           <div className="size-14 lg:w-20 lg:h-20 bg-fun-yellow rounded-full flex items-center justify-center border-2 border-fun-dark shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] text-fun-dark transform rotate-3 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300 flex-shrink-0">
-                              <BedDouble className="size-6 lg:w-9 lg:h-9" strokeWidth={2.5} />
+                           <div className="size-14 lg:size-20 bg-fun-yellow rounded-full flex items-center justify-center border-2 border-fun-dark shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] text-fun-dark transform rotate-3 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300 flex-shrink-0">
+                              <BedDouble className="size-6 lg:size-9" strokeWidth={2.5} />
                            </div>
                            <div>
                               <h3 className="font-sans font-bold text-lg lg:text-2xl text-fun-dark">Hotel Top</h3>
@@ -110,8 +110,8 @@ const Solution: React.FC = () => {
                            <div className="absolute -bottom-3 -left-1.5 size-3 bg-fun-blue rounded-full"></div>
                         </div>
                         <div className="w-16 lg:w-20 bg-gray-50 flex items-center justify-center flex-shrink-0">
-                           <div className="bg-green-100 text-green-600 border-2 border-green-500 size-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center transform -rotate-6 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all">
-                              <Check className="size-[18px] lg:w-6 lg:h-6" strokeWidth={3} />
+                           <div className="bg-green-100 text-green-600 border-2 border-green-500 size-8 lg:size-10 rounded-full flex items-center justify-center transform -rotate-6 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all">
+                              <Check className="size-[18px] lg:size-6" strokeWidth={3} />
                            </div>
                         </div>
                      </div>
@@ -132,8 +132,8 @@ const Solution: React.FC = () => {
                      >
                         <div className="p-3 pl-4 lg:p-6 lg:pl-8 flex-grow flex items-center gap-4 lg:gap-6">
                            {/* Redesigned Icon: Pink Circle Token */}
-                           <div className="size-14 lg:w-20 lg:h-20 bg-fun-pink rounded-full flex items-center justify-center border-2 border-fun-dark shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] text-white transform -rotate-3 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300 flex-shrink-0">
-                              <Ticket className="size-6 lg:w-9 lg:h-9" strokeWidth={2.5} />
+                           <div className="size-14 lg:size-20 bg-fun-pink rounded-full flex items-center justify-center border-2 border-fun-dark shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] text-white transform -rotate-3 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300 flex-shrink-0">
+                              <Ticket className="size-6 lg:size-9" strokeWidth={2.5} />
                            </div>
                            <div>
                               <h3 className="font-sans font-bold text-lg lg:text-2xl text-fun-dark">Ingresso Oficial</h3>
@@ -145,8 +145,8 @@ const Solution: React.FC = () => {
                            <div className="absolute -bottom-3 -left-1.5 size-3 bg-fun-blue rounded-full"></div>
                         </div>
                         <div className="w-16 lg:w-20 bg-gray-50 flex items-center justify-center flex-shrink-0">
-                           <div className="bg-green-100 text-green-600 border-2 border-green-500 size-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center transform rotate-3 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all">
-                              <Check className="size-[18px] lg:w-6 lg:h-6" strokeWidth={3} />
+                           <div className="bg-green-100 text-green-600 border-2 border-green-500 size-8 lg:size-10 rounded-full flex items-center justify-center transform rotate-3 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all">
+                              <Check className="size-[18px] lg:size-6" strokeWidth={3} />
                            </div>
                         </div>
                      </div>

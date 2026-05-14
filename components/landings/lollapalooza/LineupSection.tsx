@@ -118,7 +118,7 @@ const LineupSection: React.FC = () => {
           <div className="flex justify-center items-center -space-x-4 mb-8" aria-hidden="true">
             {headliners.slice(0, 5).map((artist) => (
               <div key={artist.name} className="relative z-0 hover:z-10 transition-all duration-300 transform hover:scale-110 hover:-translate-y-2 group">
-                <div className="size-16 md:w-24 md:h-24 rounded-full border-4 border-black group-hover:border-anhanga-yellow overflow-hidden relative shadow-lg">
+                <div className="size-16 md:size-24 rounded-full border-4 border-black group-hover:border-anhanga-yellow overflow-hidden relative shadow-lg">
                   <img
                     src={getArtistImageUrl(artist.image, 96, 96)}
                     alt={`Foto de ${artist.name}`}
@@ -133,7 +133,7 @@ const LineupSection: React.FC = () => {
                 </div>
               </div>
             ))}
-            <div className="relative z-0 size-16 md:w-24 md:h-24 rounded-full border-4 border-black bg-anhanga-yellow flex flex-col items-center justify-center text-anhanga-darkBlue shadow-lg transform hover:scale-105 transition-transform">
+            <div className="relative z-0 size-16 md:size-24 rounded-full border-4 border-black bg-anhanga-yellow flex flex-col items-center justify-center text-anhanga-darkBlue shadow-lg transform hover:scale-105 transition-transform">
               <span className="font-black text-lg md:text-2xl leading-none">+50</span>
               <span className="text-[10px] font-bold uppercase tracking-wider">Stars</span>
             </div>

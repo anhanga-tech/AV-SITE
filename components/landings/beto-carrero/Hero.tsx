@@ -14,8 +14,8 @@ const Hero: React.FC = () => {
       </div>
 
       {/* --- Background Doodles (Abstract Shapes) --- */}
-      <div className="absolute top-10 left-0 size-24 md:w-40 md:h-40 bg-white/30 rounded-full blur-2xl animate-pulse"></div>
-      <div className="absolute bottom-1/4 right-0 size-32 md:w-64 md:h-64 bg-fun-pink/10 rounded-full blur-3xl"></div>
+      <div className="absolute top-10 left-0 size-24 md:size-40 bg-white/30 rounded-full blur-2xl animate-pulse"></div>
+      <div className="absolute bottom-1/4 right-0 size-32 md:size-64 bg-fun-pink/10 rounded-full blur-3xl"></div>
 
       <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-4 items-center relative z-20 mb-12 md:mb-0">
 
@@ -92,7 +92,7 @@ const Hero: React.FC = () => {
             <div className="absolute -top-6 -right-4 sm:-right-10 md:-right-4 lg:-right-12 xl:-right-16 bg-white p-2 sm:p-3 lg:p-5 rounded-xl border-2 border-fun-dark shadow-hard transform rotate-12 z-20 animate-[float_4s_ease-in-out_infinite] scale-95 sm:scale-100 md:scale-90 lg:scale-110">
               <div className="flex items-center gap-2 sm:gap-3 lg:gap-4">
                 <div className="bg-blue-100 p-1.5 sm:p-2 lg:p-3 rounded-lg text-fun-blue border-2 border-fun-dark">
-                  <Plane size={20} className="sm:w-6 sm:h-6 lg:w-8 lg:h-8" />
+                  <Plane size={20} className="sm:size-6 lg:size-8" />
                 </div>
                 <div>
                   <div className="text-[10px] sm:text-xs lg:text-sm font-bold text-gray-400 leading-none mb-1">Voo Confirmado</div>
@@ -104,25 +104,25 @@ const Hero: React.FC = () => {
             {/* 3. Floating Sticker: Park Ticket (Bottom Left) */}
             <div className="absolute bottom-16 -left-4 sm:bottom-20 sm:-left-12 md:-left-4 md:bottom-24 lg:bottom-8 lg:-left-16 xl:bottom-24 xl:-left-20 bg-fun-pink text-white p-3 sm:p-4 lg:p-4 xl:p-6 px-4 sm:px-6 lg:px-6 xl:px-8 rounded-xl border-2 border-fun-dark shadow-hard transform -rotate-12 z-30 animate-[float_5s_ease-in-out_infinite_1s] scale-90 sm:scale-100 md:scale-85 lg:scale-75 xl:scale-110">
               <div className="flex items-center gap-2 lg:gap-3">
-                <Ticket size={20} className="sm:w-6 sm:h-6 lg:w-8 lg:h-8" />
+                <Ticket size={20} className="sm:size-6 lg:size-8" />
                 <span className="font-sans font-bold text-sm sm:text-lg lg:text-2xl">Ingresso VIP</span>
               </div>
               {/* Perforation line */}
-              <div className="absolute -right-1 top-1/2 -translate-y-1/2 size-3 lg:w-4 lg:h-4 bg-fun-yellow rounded-full border-2 border-fun-dark"></div>
-              <div className="absolute -left-1 top-1/2 -translate-y-1/2 size-3 lg:w-4 lg:h-4 bg-fun-yellow rounded-full border-2 border-fun-dark"></div>
+              <div className="absolute -right-1 top-1/2 -translate-y-1/2 size-3 lg:size-4 bg-fun-yellow rounded-full border-2 border-fun-dark"></div>
+              <div className="absolute -left-1 top-1/2 -translate-y-1/2 size-3 lg:size-4 bg-fun-yellow rounded-full border-2 border-fun-dark"></div>
             </div>
 
             {/* 4. Floating Sticker: 5 Stars (Bottom Right) */}
             <div className="absolute -bottom-8 -right-2 md:-bottom-6 md:-right-6 lg:-bottom-2 lg:right-8 xl:right-4 xl:-bottom-8 bg-fun-green p-2 sm:p-3 lg:p-2 xl:p-4 rounded-full border-2 border-fun-dark shadow-hard z-20 transform rotate-6 hover:scale-110 transition-transform scale-90 sm:scale-100 lg:scale-75 xl:scale-110">
               <div className="flex gap-1 text-white">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={`star-${i}`} size={14} className="sm:w-4 sm:h-4 lg:w-6 lg:h-6" fill="currentColor" />
+                  <Star key={`star-${i}`} size={14} className="sm:size-4 lg:size-6" fill="currentColor" />
                 ))}
               </div>
             </div>
 
             {/* 5. Decorative Sparkles */}
-            <Sparkles className="absolute -top-10 left-0 lg:-left-10 text-white size-10 sm:w-12 sm:h-12 lg:w-20 lg:h-20 animate-pulse z-0" strokeWidth={1} />
+            <Sparkles className="absolute -top-10 left-0 lg:-left-10 text-white size-10 sm:size-12 lg:size-20 animate-pulse z-0" strokeWidth={1} />
           </div>
 
         </div>
