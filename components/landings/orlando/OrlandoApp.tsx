@@ -35,14 +35,19 @@ interface CardProps {
   };
 }
 
-const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, imgSrc, imgAlt, label, tape }, ref) => (
-    <div className={`card ${className}`} ref={ref}>
-      <img src={imgSrc} alt={imgAlt} width="300" height="300" />
-      <div className="card-label">{label}</div>
-      {tape && <WashiTape style={tape.style} />}
-    </div>
-  ),
+const Card = ({
+  className,
+  imgSrc,
+  imgAlt,
+  label,
+  tape,
+  ref,
+}: CardProps & { ref?: React.Ref<HTMLDivElement> }) => (
+  <div className={`card ${className}`} ref={ref}>
+    <img src={imgSrc} alt={imgAlt} width="300" height="300" />
+    <div className="card-label">{label}</div>
+    {tape && <WashiTape style={tape.style} />}
+  </div>
 );
 
 interface BadgeProps {
