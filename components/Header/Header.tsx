@@ -96,7 +96,7 @@ const Header: React.FC = () => {
               onClick={handleContactClick}
               className={`btn-whatsapp btn-specialist rounded-full font-medium text-sm transition-all duration-500 flex items-center gap-2 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-vibrant ${ctaPaddingClass} ${buttonClass}`}
             >
-              <Phone className="w-4 h-4" weight="fill" />
+              <Phone className="size-4" weight="fill" />
               Fale Conosco
             </a>
           </div>
@@ -108,7 +108,7 @@ const Header: React.FC = () => {
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-menu"
           >
-            {isMobileMenuOpen ? <X className="w-6 h-6" weight="bold" /> : <List className="w-6 h-6" weight="bold" />}
+            {isMobileMenuOpen ? <X className="size-6" weight="bold" /> : <List className="size-6" weight="bold" />}
           </button>
         </div>
       </div>

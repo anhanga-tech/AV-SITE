@@ -44,7 +44,7 @@ export function DesktopNavigation({
             <>
               <button className={`flex items-center gap-1 cursor-pointer font-medium text-sm transition-colors duration-500 hover:opacity-80 focus:outline-none focus:underline decoration-2 underline-offset-4 ${navTextClass}`}>
                 {link.name}
-                <CaretDown className="w-4 h-4 transition-transform duration-300 group-hover:rotate-180" weight="bold" />
+                <CaretDown className="size-4 transition-transform duration-300 group-hover:rotate-180" weight="bold" />
               </button>
 
               <div className="absolute top-full z-10 w-48 translate-y-2 pt-4 opacity-0 invisible transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 group-hover:visible focus-within:translate-y-0 focus-within:opacity-100 focus-within:visible">

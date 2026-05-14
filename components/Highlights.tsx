@@ -136,7 +136,7 @@ const Highlights = memo(() => {
                                 }}
                                 className="flex items-center justify-center gap-3 w-full bg-brand-dark text-white px-6 py-4 rounded-xl font-bold transition-all duration-300 ease-spring shadow-[4px_4px_0px_#94a3b8] hover:shadow-[2px_2px_0px_#94a3b8] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
                             >
-                                <ShieldCheck className="w-5 h-5" weight="fill" />
+                                <ShieldCheck className="size-5" weight="fill" />
                                 <span>Falar com Especialista</span>
                             </button>
                         </div>
@@ -155,7 +155,7 @@ const Highlights = memo(() => {
                             <div className="inline-block relative mb-4">
                                 <span className="absolute inset-0 bg-anhanga-blue/10 transform -skew-x-12 rounded-lg"></span>
                                 <span className="relative px-3 py-1 text-anhanga-blue font-black uppercase tracking-widest text-sm flex items-center gap-2">
-                                    <Sparkle className="w-4 h-4" weight="fill" /> O Jeito Anhangá
+                                    <Sparkle className="size-4" weight="fill" /> O Jeito Anhangá
                                 </span>
                             </div>
                             <h2 className="text-4xl md:text-5xl font-black text-brand-dark leading-tight mb-6">
@@ -197,10 +197,10 @@ const Highlights = memo(() => {
 
                                         {/* Icon Badge */}
                                         <m.div
-                                            className={`w-16 h-16 rounded-2xl ${item.bg} border-2 ${item.accent} flex items-center justify-center mb-6 shadow-sm`}
+                                            className={`size-16 rounded-2xl ${item.bg} border-2 ${item.accent} flex items-center justify-center mb-6 shadow-sm`}
                                             whileHover={{ scale: 1.1, rotate: 6, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
                                         >
-                                            <Icon className={`w-8 h-8 ${item.iconColor}`} weight="fill" />
+                                            <Icon className={`size-8 ${item.iconColor}`} weight="fill" />
                                         </m.div>
 
                                         {/* Content */}
@@ -213,7 +213,7 @@ const Highlights = memo(() => {
 
                                         {/* Corner Arrow */}
                                         <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
-                                            <ArrowRight className={`w-5 h-5 ${item.iconColor}`} />
+                                            <ArrowRight className={`size-5 ${item.iconColor}`} />
                                         </div>
                                     </m.div>
                                 );

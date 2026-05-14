@@ -51,7 +51,7 @@ const WhyUs: React.FC = () => {
               ].map((item) => (
                 <div key={item.title} className="flex gap-4 group">
                   <div className="flex-shrink-0 mt-1">
-                    <div className={`w-12 h-12 ${item.color === 'yellow' ? 'bg-yellow-100 text-anhanga-darkBlue group-hover:bg-anhanga-yellow' : item.color === 'blue' ? 'bg-blue-100 text-anhanga-blue group-hover:bg-anhanga-blue group-hover:text-white' : 'bg-green-100 text-green-600 group-hover:bg-green-500 group-hover:text-white'} transition-colors duration-300 rounded-full flex items-center justify-center`}>
+                    <div className={`size-12 ${item.color === 'yellow' ? 'bg-yellow-100 text-anhanga-darkBlue group-hover:bg-anhanga-yellow' : item.color === 'blue' ? 'bg-blue-100 text-anhanga-blue group-hover:bg-anhanga-blue group-hover:text-white' : 'bg-green-100 text-green-600 group-hover:bg-green-500 group-hover:text-white'} transition-colors duration-300 rounded-full flex items-center justify-center`}>
                       <item.Icon size={24} aria-hidden="true" />
                     </div>
                   </div>

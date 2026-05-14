@@ -170,7 +170,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                             data-contact-intent
                             data-tracking="header-brazil-promotion-day"
                         >
-                            <WhatsappLogo className="w-4 h-4" weight="fill" />
+                            <WhatsappLogo className="size-4" weight="fill" />
                             Falar no WhatsApp
                         </button>
                     </div>
@@ -192,11 +192,11 @@ const BrazilPromotionDayLanding: React.FC = () => {
                     {/* Decorative blobs */}
                     <div
                         aria-hidden="true"
-                        className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-blue-500/20 blur-3xl animate-blob"
+                        className="absolute top-0 right-0 size-[500px] rounded-full bg-blue-500/20 blur-3xl animate-blob"
                     />
                     <div
                         aria-hidden="true"
-                        className="absolute bottom-0 left-0 w-96 h-96 rounded-full bg-brand-yellow/10 blur-3xl animate-blob"
+                        className="absolute bottom-0 left-0 size-96 rounded-full bg-brand-yellow/10 blur-3xl animate-blob"
                         style={{ animationDelay: '4s' }}
                     />
 
@@ -213,7 +213,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                             >
                                 <span className="absolute inset-0 bg-brand-yellow/30 transform -skew-x-12 rounded-lg" />
                                 <span className="relative px-4 py-1.5 text-white font-black uppercase tracking-widest text-xs flex items-center gap-2">
-                                    <AirplaneTilt className="w-4 h-4" weight="fill" />
+                                    <AirplaneTilt className="size-4" weight="fill" />
                                     Brazil Promotion Day 2026
                                 </span>
                             </m.div>
@@ -256,7 +256,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                     data-contact-intent
                                     data-tracking="hero-brazil-promotion-day"
                                 >
-                                    <WhatsappLogo className="w-6 h-6" weight="fill" />
+                                    <WhatsappLogo className="size-6" weight="fill" />
                                     Falar com a gente agora
                                 </button>
                                 <a
@@ -264,7 +264,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                     className="btn-specialist flex items-center justify-center gap-2 border-2 border-white/40 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:border-white hover:bg-white/10 transition-all duration-200"
                                 >
                                     Prefiro ser contatado
-                                    <ArrowRight className="w-5 h-5" />
+                                    <ArrowRight className="size-5" />
                                 </a>
                             </m.div>
 
@@ -336,7 +336,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                             <div className="inline-block relative mb-4">
                                 <span className="absolute inset-0 bg-blue-100 transform -skew-x-12 rounded-lg" />
                                 <span className="relative px-3 py-1 text-blue-600 font-black uppercase tracking-widest text-sm flex items-center gap-2">
-                                    <Sparkle className="w-4 h-4" weight="fill" /> O Jeito Anhangá
+                                    <Sparkle className="size-4" weight="fill" /> O Jeito Anhangá
                                 </span>
                             </div>
                             <h2 className="text-4xl md:text-5xl font-black text-brand-dark leading-tight">
@@ -376,10 +376,10 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                         <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-yellow-50/90 backdrop-blur-sm border-l-2 border-r-2 border-white/40 rotate-1 shadow-sm z-20 opacity-90" />
 
                                         <m.div
-                                            className={`w-16 h-16 rounded-2xl ${item.bg} border-2 ${item.accent} flex items-center justify-center mb-6 shadow-sm`}
+                                            className={`size-16 rounded-2xl ${item.bg} border-2 ${item.accent} flex items-center justify-center mb-6 shadow-sm`}
                                             whileHover={{ scale: 1.1, rotate: 6, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
                                         >
-                                            <Icon className={`w-8 h-8 ${item.iconColor}`} weight="fill" />
+                                            <Icon className={`size-8 ${item.iconColor}`} weight="fill" />
                                         </m.div>
 
                                         <h3 className="text-xl font-extrabold text-gray-900 mb-3 leading-tight group-hover:text-brand-cyan transition-colors duration-300">
@@ -390,7 +390,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                         </p>
 
                                         <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0">
-                                            <ArrowRight className={`w-5 h-5 ${item.iconColor}`} />
+                                            <ArrowRight className={`size-5 ${item.iconColor}`} />
                                         </div>
                                     </m.div>
                                 );
@@ -416,7 +416,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 bg-white/5 rounded-[2rem] p-10 border border-white/10">
                             <div>
                                 <p className="text-brand-yellow font-bold uppercase tracking-widest text-xs mb-3 flex items-center gap-2">
-                                    <AirplaneTilt className="w-4 h-4" weight="fill" />
+                                    <AirplaneTilt className="size-4" weight="fill" />
                                     Atendimento imediato
                                 </p>
                                 <h2 className="text-4xl md:text-5xl font-black text-white leading-tight">
@@ -431,7 +431,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                 data-contact-intent
                                 data-tracking="whatsapp-band-brazil-promotion-day"
                             >
-                                <WhatsappLogo className="w-6 h-6" weight="fill" />
+                                <WhatsappLogo className="size-6" weight="fill" />
                                 Abrir WhatsApp
                             </button>
                         </div>
@@ -460,7 +460,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                 <div className="inline-block relative mb-4">
                                     <span className="absolute inset-0 bg-emerald-100 transform -skew-x-12 rounded-lg" />
                                     <span className="relative px-3 py-1 text-emerald-600 font-black uppercase tracking-widest text-sm flex items-center gap-2">
-                                        <Sparkle className="w-4 h-4" weight="fill" /> Fale com a gente
+                                        <Sparkle className="size-4" weight="fill" /> Fale com a gente
                                     </span>
                                 </div>
 
@@ -482,8 +482,8 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                         { icon: MapPin, label: 'Av. Dom Pedro I, 773 — Vila Monumento, SP', href: null },
                                     ].map(({ icon: Icon, label, href }) => (
                                         <li key={label} className="flex items-start gap-4">
-                                            <div className="w-10 h-10 rounded-xl bg-blue-100 border-2 border-blue-200 flex items-center justify-center shrink-0 mt-0.5">
-                                                <Icon className="w-5 h-5 text-blue-600" weight="fill" />
+                                            <div className="size-10 rounded-xl bg-blue-100 border-2 border-blue-200 flex items-center justify-center shrink-0 mt-0.5">
+                                                <Icon className="size-5 text-blue-600" weight="fill" />
                                             </div>
                                             {href ? (
                                                 <a href={href} className="font-semibold text-gray-700 hover:text-brand-cyan transition-colors duration-150 pt-1.5">
@@ -512,11 +512,11 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                                 href={href}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="w-11 h-11 rounded-xl bg-white border-2 border-gray-200 flex items-center justify-center text-gray-500 hover:border-brand-cyan hover:text-brand-cyan shadow-[2px_2px_0px_rgba(0,0,0,0.05)] hover:shadow-[4px_4px_0px_#fbbf24] hover:-translate-y-1 transition-all duration-200"
+                                                className="size-11 rounded-xl bg-white border-2 border-gray-200 flex items-center justify-center text-gray-500 hover:border-brand-cyan hover:text-brand-cyan shadow-[2px_2px_0px_rgba(0,0,0,0.05)] hover:shadow-[4px_4px_0px_#fbbf24] hover:-translate-y-1 transition-all duration-200"
                                                 aria-label={label}
                                                 {...(contact ? { 'data-contact-intent': true, 'data-tracking': 'social-whatsapp-brazil-promotion-day' } : {})}
                                             >
-                                                <Icon className="w-5 h-5" weight="fill" />
+                                                <Icon className="size-5" weight="fill" />
                                             </a>
                                         ))}
                                     </div>
@@ -539,7 +539,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                             animate={{ scale: 1, opacity: 1 }}
                                             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                                         >
-                                            <CheckCircle className="w-16 h-16 text-emerald-500 mb-4" weight="fill" />
+                                            <CheckCircle className="size-16 text-emerald-500 mb-4" weight="fill" />
                                         </m.div>
                                         <h3 className="text-2xl font-black text-brand-dark mb-3">
                                             Mensagem recebida! 🎉
@@ -555,7 +555,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                             data-contact-intent
                                             data-tracking="success-brazil-promotion-day"
                                         >
-                                            <WhatsappLogo className="w-4 h-4" weight="fill" />
+                                            <WhatsappLogo className="size-4" weight="fill" />
                                             Ou fale agora no WhatsApp →
                                         </a>
                                     </div>
@@ -564,7 +564,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                         {/* Form header strip */}
                                         <div className="flex justify-between items-center px-8 py-5 border-b-2 border-dashed border-gray-100">
                                             <span className="text-brand-cyan font-black tracking-widest text-sm uppercase flex items-center gap-2">
-                                                <AirplaneTilt className="w-4 h-4" weight="fill" /> Formulário de Contato
+                                                <AirplaneTilt className="size-4" weight="fill" /> Formulário de Contato
                                             </span>
                                             <span className="text-gray-400 font-bold text-xs uppercase">Brazil Promotion Day</span>
                                         </div>
@@ -664,12 +664,12 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                             >
                                                 {isSubmitting ? (
                                                     <>
-                                                        <SpinnerGap className="w-5 h-5 animate-spin" weight="bold" />
+                                                        <SpinnerGap className="size-5 animate-spin" weight="bold" />
                                                         Enviando…
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <PaperPlaneTilt className="w-5 h-5" weight="fill" />
+                                                        <PaperPlaneTilt className="size-5" weight="fill" />
                                                         Quero ser contatado
                                                     </>
                                                 )}

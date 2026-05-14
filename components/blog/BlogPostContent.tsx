@@ -39,7 +39,7 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
                 <div className="mb-8 p-6 bg-yellow-50 border-2 border-brand-yellow text-brand-dark rounded-2xl font-serif italic text-base md:text-lg">
                     <div className="flex gap-3">
                         <div className="shrink-0 mt-1">
-                            <svg className="w-5 h-5 text-brand-yellow" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                            <svg className="size-5 text-brand-yellow" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                             </svg>
                         </div>
@@ -113,7 +113,7 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
                                     {related.title}
                                 </h5>
                                 <div className="flex items-center gap-3 text-xs text-gray-400 font-bold">
-                                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {related.readingTime}</span>
+                                    <span className="flex items-center gap-1"><Clock className="size-3" /> {related.readingTime}</span>
                                     <span>•</span>
                                     <span>{formatDate(related.date)}</span>
                                 </div>

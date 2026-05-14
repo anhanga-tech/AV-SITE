@@ -66,7 +66,7 @@ const About: React.FC = () => {
           <div className="inline-block relative mb-6">
             <span className="absolute inset-0 bg-brand-cyan/20 transform -skew-x-12 rounded-lg"></span>
             <span className="relative px-4 py-1 text-brand-dark font-black uppercase tracking-widest text-sm flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-brand-cyan" /> Nossa Essência
+              <Sparkles className="size-4 text-brand-cyan" /> Nossa Essência
             </span>
           </div>
           <h1 className="text-5xl md:text-6xl font-black text-brand-dark mb-6 leading-tight">
@@ -85,7 +85,7 @@ const About: React.FC = () => {
               data-tracking="hero-about"
             >
               Solicitar Orçamento
-              <Sparkles className="w-5 h-5" />
+              <Sparkles className="size-5" />
             </button>
           </div>
         </m.section>
@@ -102,7 +102,7 @@ const About: React.FC = () => {
               custom={1}
             >
               <div className="relative">
-                <div className="absolute -top-4 -left-4 w-24 h-24 bg-brand-yellow/30 rounded-full blur-2xl z-0"></div>
+                <div className="absolute -top-4 -left-4 size-24 bg-brand-yellow/30 rounded-full blur-2xl z-0"></div>
                 <div className="relative rounded-3xl overflow-hidden border-8 border-white shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500">
                   <LazyImage
                     src="images/about/equipe-anhanga.jpg"
@@ -112,8 +112,8 @@ const About: React.FC = () => {
                 </div>
                 <div className="absolute -bottom-6 -right-6 bg-white p-6 rounded-2xl shadow-xl border border-gray-100 hidden md:block">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-brand-cyan/10 rounded-full flex items-center justify-center text-brand-cyan">
-                      <Heart className="w-6 h-6 fill-current" />
+                    <div className="size-12 bg-brand-cyan/10 rounded-full flex items-center justify-center text-brand-cyan">
+                      <Heart className="size-6 fill-current" />
                     </div>
                     <div>
                       <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Paixão por</p>
@@ -192,8 +192,8 @@ const About: React.FC = () => {
                 variants={fadeUp}
                 custom={i + 1}
               >
-                <div className={`w-14 h-14 rounded-2xl ${item.color} flex items-center justify-center mb-6`}>
-                  <item.icon className="w-8 h-8" />
+                <div className={`size-14 rounded-2xl ${item.color} flex items-center justify-center mb-6`}>
+                  <item.icon className="size-8" />
                 </div>
                 <h3 className="text-xl font-black text-brand-dark mb-4">{item.title}</h3>
                 <p className="text-gray-500 font-medium leading-relaxed">{item.desc}</p>
@@ -204,13 +204,13 @@ const About: React.FC = () => {
 
         {/* TRUST & COMPLIANCE SECTION */}
         <section id="certificacoes" className="bg-brand-dark rounded-[3rem] p-12 md:p-20 text-white overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-brand-vibrant/20 blur-[100px] rounded-full"></div>
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-brand-cyan/10 blur-[100px] rounded-full"></div>
+          <div className="absolute top-0 right-0 size-64 bg-brand-vibrant/20 blur-[100px] rounded-full"></div>
+          <div className="absolute bottom-0 left-0 size-64 bg-brand-cyan/10 blur-[100px] rounded-full"></div>
 
           <div className="relative z-10 flex flex-col lg:flex-row gap-16 items-center">
             <div className="w-full lg:w-1/2">
               <div className="inline-flex items-center gap-2 px-4 py-1 bg-white/10 rounded-full text-brand-cyan text-sm font-bold mb-6">
-                <Award className="w-4 h-4" /> Credibilidade & Confiança
+                <Award className="size-4" /> Credibilidade & Confiança
               </div>
               <h2 className="text-3xl md:text-4xl font-black mb-6">Agência Certificada</h2>
               <p className="text-gray-300 text-lg font-medium leading-relaxed mb-8">
@@ -219,8 +219,8 @@ const About: React.FC = () => {
 
               <ul className="space-y-6">
                 <li className="flex items-start gap-4">
-                  <div className="w-6 h-6 rounded-full bg-brand-cyan/20 flex items-center justify-center shrink-0 mt-1">
-                    <div className="w-2 h-2 rounded-full bg-brand-cyan"></div>
+                  <div className="size-6 rounded-full bg-brand-cyan/20 flex items-center justify-center shrink-0 mt-1">
+                    <div className="size-2 rounded-full bg-brand-cyan"></div>
                   </div>
                   <div>
                     <p className="font-bold text-lg leading-none mb-1">Cadastur Oficial</p>
@@ -228,8 +228,8 @@ const About: React.FC = () => {
                   </div>
                 </li>
                 <li className="flex items-start gap-4">
-                  <div className="w-6 h-6 rounded-full bg-brand-cyan/20 flex items-center justify-center shrink-0 mt-1">
-                    <div className="w-2 h-2 rounded-full bg-brand-cyan"></div>
+                  <div className="size-6 rounded-full bg-brand-cyan/20 flex items-center justify-center shrink-0 mt-1">
+                    <div className="size-2 rounded-full bg-brand-cyan"></div>
                   </div>
                   <div>
                     <p className="font-bold text-lg leading-none mb-1">Sede Própria em São Paulo</p>
@@ -241,13 +241,13 @@ const About: React.FC = () => {
 
             <div className="w-full lg:w-1/2 grid grid-cols-2 gap-4">
               <div className="bg-white/5 backdrop-blur-sm p-8 rounded-3xl border border-white/10 flex flex-col items-center text-center">
-                <Award className="w-12 h-12 text-brand-cyan mb-4" />
+                <Award className="size-12 text-brand-cyan mb-4" />
                 <p className="text-sm font-bold uppercase tracking-tighter opacity-50 mb-2">Membro Oficial</p>
                 <p className="font-black text-xl">Beto Carrero World</p>
                 <p className="text-xs text-brand-cyan mt-1">Agente Credenciado</p>
               </div>
               <div className="bg-white/5 backdrop-blur-sm p-8 rounded-3xl border border-white/10 flex flex-col items-center text-center">
-                <Coffee className="w-12 h-12 text-brand-yellow mb-4" />
+                <Coffee className="size-12 text-brand-yellow mb-4" />
                 <p className="text-sm font-bold uppercase tracking-tighter opacity-50 mb-2">Localizada em</p>
                 <p className="font-black text-xl">São Paulo - SP</p>
                 <p className="text-xs text-brand-yellow mt-1">Atendimento Presencial</p>
@@ -286,7 +286,7 @@ const About: React.FC = () => {
               data-tracking="footer-about"
             >
               Começar Planejamento
-              <Sparkles className="w-5 h-5" />
+              <Sparkles className="size-5" />
             </button>
           </div>
         </m.section>

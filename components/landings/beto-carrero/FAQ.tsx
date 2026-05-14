@@ -22,12 +22,12 @@ const FAQ: React.FC = () => {
     <section className="py-24 bg-fun-yellow relative overflow-hidden">
       
       {/* Background Decor */}
-      <div className="absolute top-20 left-10 w-32 h-32 bg-white/20 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-20 right-10 w-40 h-40 bg-fun-pink/10 rounded-full blur-3xl"></div>
+      <div className="absolute top-20 left-10 size-32 bg-white/20 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-20 right-10 size-40 bg-fun-pink/10 rounded-full blur-3xl"></div>
       
       {/* Floating Question Marks */}
-      <HelpCircle className="absolute top-10 right-[10%] text-fun-dark/10 w-24 h-24 -rotate-12 animate-pulse" />
-      <HelpCircle className="absolute bottom-10 left-[5%] text-fun-dark/10 w-16 h-16 rotate-12" />
+      <HelpCircle className="absolute top-10 right-[10%] text-fun-dark/10 size-24 -rotate-12 animate-pulse" />
+      <HelpCircle className="absolute bottom-10 left-[5%] text-fun-dark/10 size-16 rotate-12" />
 
       <div className="container mx-auto px-4 max-w-4xl relative z-10">
         
@@ -54,7 +54,7 @@ const FAQ: React.FC = () => {
                       <span className={`font-sans font-bold text-lg md:text-xl pr-4 leading-tight ${isOpen ? 'text-fun-blue' : 'text-fun-dark'}`}>
                         {item.question}
                       </span>
-                      <div className={`flex-shrink-0 w-8 h-8 rounded-full border-2 border-fun-dark flex items-center justify-center transition-all duration-300 ${isOpen ? 'bg-fun-blue text-white rotate-180' : 'bg-white text-fun-dark'}`}>
+                      <div className={`flex-shrink-0 size-8 rounded-full border-2 border-fun-dark flex items-center justify-center transition-all duration-300 ${isOpen ? 'bg-fun-blue text-white rotate-180' : 'bg-white text-fun-dark'}`}>
                         <ChevronDown size={20} strokeWidth={3} />
                       </div>
                     </button>

@@ -528,7 +528,7 @@ const Destinations: React.FC = memo(() => {
                 <div className="flex flex-col md:flex-row justify-between items-end mb-12">
                     <div>
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-dashed border-brand-dark bg-yellow-100 text-brand-dark font-black text-xs uppercase tracking-widest shadow-sm transform -rotate-1 mb-4">
-                            <Compass className="w-4 h-4" /> Mapa Mundi
+                            <Compass className="size-4" /> Mapa Mundi
                         </div>
                         <h2 className="text-4xl font-black text-brand-dark">Escolha seu <span className="text-brand-cyan relative inline-block">Pin 📍<svg className="absolute w-full h-3 -bottom-1 left-0 text-brand-cyan opacity-40" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="none" /></svg></span></h2>
                     </div>
@@ -580,23 +580,23 @@ const Destinations: React.FC = memo(() => {
                         <div className="absolute bottom-6 right-6 flex flex-col gap-2 z-[400]">
                             <button
                                 onClick={() => handleZoom('in')}
-                                className="w-10 h-10 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all text-gray-700 font-black"
+                                className="size-10 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all text-gray-700 font-black"
                                 aria-label="Aumentar zoom no mapa"
                             >
-                                <Plus className="w-5 h-5" />
+                                <Plus className="size-5" />
                             </button>
                             <button
                                 onClick={() => handleZoom('out')}
-                                className="w-10 h-10 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all text-gray-700 font-black"
+                                className="size-10 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all text-gray-700 font-black"
                                 aria-label="Diminuir zoom no mapa"
                             >
-                                <Minus className="w-5 h-5" />
+                                <Minus className="size-5" />
                             </button>
                         </div>
 
                         {/* "Note" Sticker */}
                         <div className="hidden md:block absolute top-8 left-8 bg-yellow-100 p-4 rounded-sm shadow-md transform -rotate-3 z-[400] max-w-[150px] border border-yellow-200">
-                            <div className="w-3 h-3 rounded-full bg-red-400 mx-auto -mt-6 mb-2 shadow-sm border border-red-500"></div>
+                            <div className="size-3 rounded-full bg-red-400 mx-auto -mt-6 mb-2 shadow-sm border border-red-500"></div>
                             <p className="font-serif italic text-gray-700 text-sm leading-tight text-center">
                                 "O mundo é um livro e quem não viaja lê apenas uma página."
                                 <span className="block not-italic text-gray-400 text-xs mt-1">(Santo Agostinho)</span>
@@ -641,13 +641,13 @@ const Destinations: React.FC = memo(() => {
                                 <div className="flex justify-between items-center mb-2">
                                     <h3 className="text-2xl font-black text-gray-800">{dest.city}</h3>
                                     <div className="flex items-center gap-1 text-yellow-500 font-bold text-sm bg-yellow-50 px-2 py-1 rounded-full border border-yellow-100">
-                                        <Star className="w-3 h-3 fill-current" /> {dest.rating}
+                                        <Star className="size-3 fill-current" /> {dest.rating}
                                     </div>
                                 </div>
                                 <p className="text-gray-500 text-sm font-medium mb-4">{dest.description}</p>
 
                                 <div className="flex items-center gap-2 text-brand-cyan font-bold text-sm uppercase tracking-wide group-hover:gap-3 transition-all">
-                                    Saiba Mais <ArrowRight className="w-4 h-4" />
+                                    Saiba Mais <ArrowRight className="size-4" />
                                 </div>
                             </div>
                         </div>
@@ -668,7 +668,7 @@ const Destinations: React.FC = memo(() => {
                             className="absolute top-4 right-4 z-30 bg-white border-2 border-gray-100 p-2 rounded-full shadow-md hover:scale-110 transition-transform text-gray-800"
                             aria-label="Fechar detalhes do destino"
                         >
-                            <X className="w-5 h-5" />
+                            <X className="size-5" />
                         </button>
 
                         <div className="w-full md:w-1/2 h-64 md:h-auto relative bg-gray-100">
@@ -683,7 +683,7 @@ const Destinations: React.FC = memo(() => {
                             <div className="absolute bottom-6 left-6 text-white">
                                 <h2 className="text-4xl font-black mb-1 drop-shadow-md">{selectedDestination.city}</h2>
                                 <div className="flex items-center gap-2 font-medium opacity-90 drop-shadow-sm">
-                                    <MapPin className="w-4 h-4" /> {selectedDestination.country}
+                                    <MapPin className="size-4" /> {selectedDestination.country}
                                 </div>
                             </div>
                         </div>
@@ -692,7 +692,7 @@ const Destinations: React.FC = memo(() => {
                             <p className="text-gray-600 mb-8 text-lg leading-relaxed font-medium font-serif italic">"{selectedDestination.details}"</p>
 
                             <h4 className="font-black text-gray-900 mb-4 flex items-center gap-2">
-                                <Star className="w-5 h-5 text-yellow-400 fill-current" /> Atrações Imperdíveis
+                                <Star className="size-5 text-yellow-400 fill-current" /> Atrações Imperdíveis
                             </h4>
                             <div className="flex flex-wrap gap-3 mb-8">
                                 {selectedDestination.activities.map((act) => (
@@ -718,7 +718,7 @@ const Destinations: React.FC = memo(() => {
                                         onClick={() => setSelectedDestination(null)}
                                         className="w-full bg-white border-2 border-brand-dark text-brand-dark py-4 rounded-xl font-black text-lg hover:bg-gray-50 transition-all shadow-[4px_4px_0px_#0f172a] active:shadow-none active:translate-y-1 flex items-center justify-center gap-2"
                                     >
-                                        Ver detalhes do pacote <ArrowRight className="w-5 h-5" />
+                                        Ver detalhes do pacote <ArrowRight className="size-5" />
                                     </Link>
                                 )}
                                 <button

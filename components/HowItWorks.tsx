@@ -15,18 +15,18 @@ import { openContactModal } from '../utils/contactForm';
 const STEPS = [
   {
     id: 1,
-    icon: <ChatCircleDots className="w-8 h-8 text-white" weight="fill" />,
+    icon: <ChatCircleDots className="size-8 text-white" weight="fill" />,
     title: "Oie! Vamos conversar?",
     desc: "Nada de formulários chatos. A gente bate um papo no WhatsApp para entender seus sonhos e quanto você quer investir.",
     color: "bg-brand-yellow",
     lightColor: "bg-yellow-50",
     borderColor: "border-yellow-200",
     rotate: "-rotate-2",
-    sticker: <Heart className="w-20 h-20 text-yellow-400 drop-shadow-md" weight="fill" />
+    sticker: <Heart className="size-20 text-yellow-400 drop-shadow-md" weight="fill" />
   },
   {
     id: 2,
-    icon: <PaintBrushBroad className="w-8 h-8 text-white" weight="fill" />,
+    icon: <PaintBrushBroad className="size-8 text-white" weight="fill" />,
     title: "Desenhando o Sonho",
     desc: "Nossos especialistas criam um roteiro dia-a-dia só seu. Ajustamos cada detalhe até você dizer: 'É isso!'",
     color: "bg-brand-cyan",
@@ -34,15 +34,15 @@ const STEPS = [
     borderColor: "border-sky-200",
     rotate: "rotate-3",
     sticker: (
-      <div className="relative w-24 h-24 drop-shadow-md" aria-hidden="true">
-        <Star className="absolute inset-0 w-24 h-24 text-sky-200" weight="fill" />
-        <Star className="absolute inset-0 w-24 h-24 text-sky-400" weight="regular" />
+      <div className="relative size-24 drop-shadow-md" aria-hidden="true">
+        <Star className="absolute inset-0 size-24 text-sky-200" weight="fill" />
+        <Star className="absolute inset-0 size-24 text-sky-400" weight="regular" />
       </div>
     )
   },
   {
     id: 3,
-    icon: <CreditCard className="w-8 h-8 text-white" weight="fill" />,
+    icon: <CreditCard className="size-8 text-white" weight="fill" />,
     title: "Burocracia? Deixa com a gente",
     desc: "Aprovado? Ótimo! Nós emitimos voos, hotéis e passeios. Parcelamos tudo e você recebe os vouchers organizadinhos.",
     color: "bg-emerald-500",
@@ -53,7 +53,7 @@ const STEPS = [
   },
   {
     id: 4,
-    icon: <AirplaneTilt className="w-8 h-8 text-white" weight="fill" />,
+    icon: <AirplaneTilt className="size-8 text-white" weight="fill" />,
     title: "Fui! Partiu Viajar",
     desc: "Agora é só fazer as malas! E se precisar de algo lá longe? Nosso time fica de plantão 24h por você.",
     color: "bg-green-500",
@@ -136,7 +136,7 @@ const HowItWorks = memo(() => {
                                 
                                 {/* Header: Icon + Number */}
                                 <div className="flex justify-between items-start mb-6">
-                                    <div className={`w-16 h-16 rounded-2xl ${step.color} shadow-lg flex items-center justify-center transform -rotate-6 group-hover:rotate-0 transition-transform duration-300`}>
+                                    <div className={`size-16 rounded-2xl ${step.color} shadow-lg flex items-center justify-center transform -rotate-6 group-hover:rotate-0 transition-transform duration-300`}>
                                         {step.icon}
                                     </div>
                                     <span className="font-black text-6xl text-gray-100 select-none absolute top-4 right-6 z-0">
@@ -179,10 +179,10 @@ const HowItWorks = memo(() => {
                     }}
                     className="relative z-10 flex items-center gap-4 bg-white text-brand-dark px-10 py-6 rounded-full font-black text-xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.15)] hover:shadow-[0_20px_50px_rgba(8,_112,_184,_0.25)] transform transition-all hover:scale-105 active:scale-95 border-4 border-transparent hover:border-brand-yellow text-left"
                 >
-                    <Sparkle className="w-6 h-6 text-brand-yellow" weight="fill" />
+                    <Sparkle className="size-6 text-brand-yellow" weight="fill" />
                     <span>Quero meu roteiro agora!</span>
-                    <div className="w-10 h-10 bg-brand-dark rounded-full flex items-center justify-center text-white">
-                        <ArrowRight className="w-5 h-5" weight="bold" />
+                    <div className="size-10 bg-brand-dark rounded-full flex items-center justify-center text-white">
+                        <ArrowRight className="size-5" weight="bold" />
                     </div>
                 </button>
             </div>

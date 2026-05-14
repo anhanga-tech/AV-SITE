@@ -351,14 +351,14 @@ const AIChat: React.FC = memo(() => {
                     bg-brand-vibrant text-white
                     shadow-[0_8px_30px_rgba(255,107,53,0.3)] hover:shadow-[0_8px_30px_rgba(255,107,53,0.5)] hover:-translate-y-1
                     transition-all duration-300
-                    w-16 h-16 rounded-2xl sm:w-auto sm:h-auto sm:px-6 sm:py-3.5 sm:rounded-full
+                    size-16 rounded-2xl sm:w-auto sm:h-auto sm:px-6 sm:py-3.5 sm:rounded-full
                     focus:outline-none focus:ring-4 focus:ring-brand-vibrant/30
                     ${isOrlandoPage ? 'orlando-chat-glow' : ''}`}
         aria-label="Abrir assistente virtual"
       >
         <div className="relative flex items-center justify-center">
-          <ChatCircleDots className="w-7 h-7" weight="fill" />
-          <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse border-2 border-brand-vibrant"></span>
+          <ChatCircleDots className="size-7" weight="fill" />
+          <span className="absolute -top-1 -right-1 size-3 bg-red-500 rounded-full animate-pulse border-2 border-brand-vibrant"></span>
         </div>
 
         <div className="text-left hidden sm:flex sm:flex-col">
@@ -388,17 +388,17 @@ const AIChat: React.FC = memo(() => {
         {/* Header - Scrapbook Softness */}
         <div className="bg-white/80 backdrop-blur-md px-6 py-5 border-b border-gray-100 flex justify-between items-center shrink-0 z-10">
           <div className="flex gap-4 items-center">
-            <div className="w-12 h-12 bg-gray-50 rounded-[1.25rem] flex items-center justify-center shadow-sm transform -rotate-3 hover:rotate-0 transition-transform">
-              <Sparkle className="w-6 h-6 text-brand-vibrant" weight="fill" />
+            <div className="size-12 bg-gray-50 rounded-[1.25rem] flex items-center justify-center shadow-sm transform -rotate-3 hover:rotate-0 transition-transform">
+              <Sparkle className="size-6 text-brand-vibrant" weight="fill" />
             </div>
             <div>
               <h2 className="font-extrabold text-lg text-brand-dark tracking-tight leading-none">
                 Hub Anhangá
               </h2>
               <div className="flex items-center gap-1.5 mt-1 opacity-80">
-                <span className="relative flex h-2 w-2">
+                <span className="relative flex size-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400"></span>
+                  <span className="relative inline-flex rounded-full size-2 bg-green-400"></span>
                 </span>
                 <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">
                   Assistente Online
@@ -411,7 +411,7 @@ const AIChat: React.FC = memo(() => {
             className="text-gray-400 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-full p-2.5 transition-colors focus:outline-none"
             aria-label="Fechar gaveta"
           >
-            <X className="w-5 h-5" weight="bold" />
+            <X className="size-5" weight="bold" />
           </button>
         </div>
 
@@ -427,11 +427,11 @@ const AIChat: React.FC = memo(() => {
               <div key={msg.id} className={`relative flex flex-col gap-2 ${msg.role === 'user' ? 'items-end' : 'items-start'} z-10`}>
                 <div className={`flex items-end gap-3 max-w-[90%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                   {/* Avatar */}
-                  <div className={`w-9 h-9 flex items-center justify-center shrink-0 rounded-full shadow-sm ${msg.role === 'user'
+                  <div className={`size-9 flex items-center justify-center shrink-0 rounded-full shadow-sm ${msg.role === 'user'
                     ? 'bg-brand-dark text-white'
                     : 'bg-white text-brand-vibrant border border-gray-100'
                     }`}>
-                    {msg.role === 'user' ? <User className="w-4 h-4" weight="fill" /> : <Robot className="w-5 h-5" weight="fill" />}
+                    {msg.role === 'user' ? <User className="size-4" weight="fill" /> : <Robot className="size-5" weight="fill" />}
                   </div>
 
                   {/* Bubble */}
@@ -492,8 +492,8 @@ const AIChat: React.FC = memo(() => {
 
           {isLoading && (
             <div data-testid="chat-typing-indicator" className="flex items-end gap-3 z-10 relative">
-              <div className="w-9 h-9 bg-white rounded-full border border-gray-100 text-brand-vibrant flex items-center justify-center shadow-sm">
-                <Robot className="w-5 h-5" weight="fill" />
+              <div className="size-9 bg-white rounded-full border border-gray-100 text-brand-vibrant flex items-center justify-center shadow-sm">
+                <Robot className="size-5" weight="fill" />
               </div>
               <div className="bg-white px-4 py-3 border border-gray-100 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-2.5">
                 <CircleNotch className="w-4 h-4 animate-spin text-brand-vibrant" weight="bold" />
@@ -524,7 +524,7 @@ const AIChat: React.FC = memo(() => {
               className="absolute right-2 bottom-2 p-2.5 bg-brand-vibrant text-white rounded-[10px] shadow-sm hover:bg-brand-blue hover:shadow-md transition-all disabled:opacity-0 disabled:scale-75 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-vibrant/50"
               aria-label="Enviar mensagem"
             >
-              <PaperPlaneTilt className="w-4 h-4 ml-0.5" weight="fill" />
+              <PaperPlaneTilt className="size-4 ml-0.5" weight="fill" />
             </button>
           </div>
           <p className="text-center text-[10px] text-gray-400 mt-2">
