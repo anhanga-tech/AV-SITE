@@ -65,7 +65,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                         handleNativeShare();
                     }}
                     onMouseEnter={prefetchHaptics}
-                    className="p-2 bg-white/80 hover:bg-brand-cyan hover:text-white text-gray-400 rounded-full transition-all shadow-sm border border-gray-100"
+                    className="p-2 bg-white/80 hover:bg-brand-cyan hover:text-white text-gray-500 rounded-full transition-all shadow-sm border border-gray-100"
                     title="Compartilhar"
                     aria-label="Compartilhar"
                 >
@@ -78,7 +78,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                         handleCopy();
                     }}
                     onMouseEnter={prefetchHaptics}
-                    className={`p-2 rounded-full transition-all shadow-sm border ${copied ? 'bg-green-500 text-white border-green-600' : 'bg-white/80 text-gray-400 border-gray-100 hover:bg-gray-100'}`}
+                    className={`p-2 rounded-full transition-all shadow-sm border ${copied ? 'bg-green-500 text-white border-green-600' : 'bg-white/80 text-gray-500 border-gray-100 hover:bg-gray-100'}`}
                     title={copied ? "Link copiado!" : "Copiar link"}
                     aria-label={copied ? "Link copiado com sucesso" : "Copiar link"}
                 >
