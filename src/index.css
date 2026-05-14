@@ -3,19 +3,19 @@
 
 @layer base {
     body {
-        font-family: 'Poppins', sans-serif;
+        @apply font-sans;
     }
 
     h1,
     h2 {
-        font-family: 'Playfair Display', Georgia, serif;
+        @apply font-display;
     }
 
     h3,
     h4,
     h5,
     h6 {
-        font-family: 'Poppins', sans-serif;
+        @apply font-sans;
     }
 }
 
