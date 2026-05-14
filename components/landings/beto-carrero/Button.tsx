@@ -44,10 +44,6 @@ const Button: React.FC<ButtonProps> = ({
     outline: "bg-white text-fun-dark shadow-hard hover:shadow-hard-hover",
   };
 
-  const handleClick = () => {
-    if (onClick) onClick();
-  };
-
   const positionStyles = tooltipPosition === 'top'
     ? 'bottom-full mb-3'
     : 'top-full mt-3';
@@ -69,7 +65,7 @@ const Button: React.FC<ButtonProps> = ({
         onClick={(e) => {
           e.preventDefault();
           openContactModal({ source: 'beto-carrero' });
-          handleClick();
+          onClick?.();
         }}
         className={`btn-whatsapp btn-specialist ${baseStyles} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className}`}
         aria-label={computedAriaLabel}

@@ -181,7 +181,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
   const [isLocallySubmitting, setIsLocallySubmitting] = useState(false);
   const isProcessingRef = React.useRef(false);
 
-  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const submitLeadForm = async (e: React.MouseEvent<HTMLButtonElement>) => {
     if (isSubmittingLead || isLocallySubmitting || isProcessingRef.current) return;
     e.preventDefault();
     isProcessingRef.current = true;
@@ -336,7 +336,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
 
         <button
           type="button"
-          onClick={handleClick}
+          onClick={submitLeadForm}
           disabled={isSubmittingLead || isLocallySubmitting}
           className={`group flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3.5 px-4 rounded-xl shadow-md hover:shadow-lg transition-all ${isSubmittingLead || isLocallySubmitting ? 'opacity-90 cursor-wait' : ''}`}
         >
