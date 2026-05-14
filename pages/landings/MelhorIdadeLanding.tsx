@@ -90,7 +90,7 @@ const MelhorIdadeLanding: React.FC = () => {
               className="text-5xl md:text-7xl font-black text-brand-dark mb-8 leading-[1.1]"
             >
               O mundo no seu ritmo, <br />
-              <span className="text-brand-cyan">
+              <span className="text-anhanga-blue">
                 com o cuidado que você merece.
               </span>
             </m.h1>
