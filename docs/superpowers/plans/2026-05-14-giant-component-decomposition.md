@@ -690,7 +690,7 @@ export interface PoiItem {
 
 export const POI_DATA: PoiItem[] = [ /* ... */ ];
 
-export function getPoiStyle(type: string): { bg: string; text: string; icon: string } {
+export function getPoiStyle(poi: PoiItem): { bg: string; text: string; icon: string } {
   // ... from lines 72–84
 }
 ```
@@ -702,6 +702,7 @@ export function getPoiStyle(type: string): { bg: string; text: string; icon: str
 Extract the POI list item rendering (lines ~265–363).
 
 ```tsx
+import React from 'react';
 import type { PoiItem } from './poi-data';
 import { getPoiStyle } from './poi-data';
 
