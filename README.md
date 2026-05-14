@@ -1,3 +1,5 @@
+[![React Doctor](https://www.react.doctor/share/badge?p=anhanga-viagens&s=69&w=1111&f=133)](https://www.react.doctor/share?p=anhanga-viagens&s=69&w=1111&f=133)
+
 ## Anhangá Viagens - Site Institucional
 
 O site institucional da **Anhangá Viagens** é uma plataforma moderna e interativa desenvolvida para oferecer aos clientes uma experiência completa, desde a exploração de destinos até o planejamento de viagens com o auxílio de inteligência artificial.
