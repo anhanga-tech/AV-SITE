@@ -77,16 +77,16 @@ const Solution: React.FC = () => {
                            </div>
                            <div>
                               <h3 className="font-sans font-bold text-lg lg:text-2xl text-fun-dark">Passagem Aérea</h3>
-                              <p className="text-slate-600 text-xs lg:text-sm font-bold">Horários que funcionam.</p>
+                              <p className="text-zinc-600 text-xs lg:text-sm font-bold">Horários que funcionam.</p>
                            </div>
                         </div>
                         {/* Divider Line */}
-                        <div className="w-0 border-l-2 border-dashed border-gray-300 relative my-2">
+                        <div className="w-0 border-l-2 border-dashed border-zinc-300 relative my-2">
                            <div className="absolute -top-3 -left-1.5 size-3 bg-fun-blue rounded-full"></div>
                            <div className="absolute -bottom-3 -left-1.5 size-3 bg-fun-blue rounded-full"></div>
                         </div>
                         {/* Right Side: Stamp */}
-                        <div className="w-16 lg:w-20 bg-gray-50 flex items-center justify-center flex-shrink-0">
+                        <div className="w-16 lg:w-20 bg-zinc-50 flex items-center justify-center flex-shrink-0">
                            <div className="bg-green-100 text-green-600 border-2 border-green-500 size-8 lg:size-10 rounded-full flex items-center justify-center transform rotate-12 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all">
                               <Check className="size-[18px] lg:size-6" strokeWidth={3} />
                            </div>
@@ -102,14 +102,14 @@ const Solution: React.FC = () => {
                            </div>
                            <div>
                               <h3 className="font-sans font-bold text-lg lg:text-2xl text-fun-dark">Hotel Top</h3>
-                              <p className="text-slate-600 text-xs lg:text-sm font-bold">Perto da diversão.</p>
+                              <p className="text-zinc-600 text-xs lg:text-sm font-bold">Perto da diversão.</p>
                            </div>
                         </div>
-                        <div className="w-0 border-l-2 border-dashed border-gray-300 relative my-2">
+                        <div className="w-0 border-l-2 border-dashed border-zinc-300 relative my-2">
                            <div className="absolute -top-3 -left-1.5 size-3 bg-fun-blue rounded-full"></div>
                            <div className="absolute -bottom-3 -left-1.5 size-3 bg-fun-blue rounded-full"></div>
                         </div>
-                        <div className="w-16 lg:w-20 bg-gray-50 flex items-center justify-center flex-shrink-0">
+                        <div className="w-16 lg:w-20 bg-zinc-50 flex items-center justify-center flex-shrink-0">
                            <div className="bg-green-100 text-green-600 border-2 border-green-500 size-8 lg:size-10 rounded-full flex items-center justify-center transform -rotate-6 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all">
                               <Check className="size-[18px] lg:size-6" strokeWidth={3} />
                            </div>
@@ -137,14 +137,14 @@ const Solution: React.FC = () => {
                            </div>
                            <div>
                               <h3 className="font-sans font-bold text-lg lg:text-2xl text-fun-dark">Ingresso Oficial</h3>
-                              <p className="text-slate-600 text-xs lg:text-sm font-bold">Direto na catraca.</p>
+                              <p className="text-zinc-600 text-xs lg:text-sm font-bold">Direto na catraca.</p>
                            </div>
                         </div>
-                        <div className="w-0 border-l-2 border-dashed border-gray-300 relative my-2">
+                        <div className="w-0 border-l-2 border-dashed border-zinc-300 relative my-2">
                            <div className="absolute -top-3 -left-1.5 size-3 bg-fun-blue rounded-full"></div>
                            <div className="absolute -bottom-3 -left-1.5 size-3 bg-fun-blue rounded-full"></div>
                         </div>
-                        <div className="w-16 lg:w-20 bg-gray-50 flex items-center justify-center flex-shrink-0">
+                        <div className="w-16 lg:w-20 bg-zinc-50 flex items-center justify-center flex-shrink-0">
                            <div className="bg-green-100 text-green-600 border-2 border-green-500 size-8 lg:size-10 rounded-full flex items-center justify-center transform rotate-3 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all">
                               <Check className="size-[18px] lg:size-6" strokeWidth={3} />
                            </div>
@@ -174,7 +174,7 @@ const Solution: React.FC = () => {
                         </div>
 
                         {/* Description */}
-                        <p className="text-lg font-bold text-slate-800 mb-4 leading-snug">
+                        <p className="text-lg font-bold text-zinc-800 mb-4 leading-snug">
                            Dá pra incluir praia no roteiro? <br />
                            <span className="text-fun-pink text-xl">Com certeza!</span>
                         </p>
@@ -206,7 +206,7 @@ const Solution: React.FC = () => {
                   <div className="bg-white p-3 rounded-[3rem] border-4 border-fun-dark shadow-hard-lg max-w-sm w-full relative z-10 transform rotate-2 transition-transform hover:rotate-0 duration-500">
 
                      {/* Screen */}
-                     <div className="bg-slate-50 rounded-[2.5rem] overflow-hidden border-2 border-gray-200 h-[500px] relative flex flex-col">
+                     <div className="bg-zinc-50 rounded-[2.5rem] overflow-hidden border-2 border-zinc-200 h-[500px] relative flex flex-col">
 
                         {/* Header */}
                         <div className="bg-fun-green p-4 pt-8 flex items-center gap-3 border-b-2 border-fun-dark">
@@ -228,9 +228,9 @@ const Solution: React.FC = () => {
 
                            {/* Msg 1 (User) */}
                            <div className="flex justify-end animate-[slideUp_0.5s_ease-out_forwards]">
-                              <div className="bg-white border-2 border-gray-200 text-slate-700 p-3 px-4 rounded-2xl rounded-tr-none shadow-sm max-w-[85%]">
+                              <div className="bg-white border-2 border-zinc-200 text-zinc-700 p-3 px-4 rounded-2xl rounded-tr-none shadow-sm max-w-[85%]">
                                  <p className="text-sm">Oi! Quero levar as crianças pro Beto Carrero em Julho. 🎢</p>
-                                 <span className="text-[10px] text-gray-400 block text-right mt-1">10:42</span>
+                                 <span className="text-[10px] text-zinc-400 block text-right mt-1">10:42</span>
                               </div>
                            </div>
 
@@ -249,15 +249,15 @@ const Solution: React.FC = () => {
 
                            {/* Msg 3 (User) */}
                            <div className="flex justify-end animate-[slideUp_0.6s_ease-out_1.5s_both]">
-                              <div className="bg-white border-2 border-gray-200 text-slate-700 p-3 px-4 rounded-2xl rounded-tr-none shadow-sm max-w-[85%]">
+                              <div className="bg-white border-2 border-zinc-200 text-zinc-700 p-3 px-4 rounded-2xl rounded-tr-none shadow-sm max-w-[85%]">
                                  <p className="text-sm">Perfeito! Vamos fechar. 😍</p>
                               </div>
                            </div>
                         </div>
 
                         {/* Footer Input */}
-                        <div className="p-3 bg-white border-t border-gray-200 flex items-center gap-2">
-                           <div className="w-full h-10 bg-gray-100 rounded-full border border-gray-300"></div>
+                        <div className="p-3 bg-white border-t border-zinc-200 flex items-center gap-2">
+                           <div className="w-full h-10 bg-zinc-100 rounded-full border border-zinc-300"></div>
                            <div className="size-10 bg-fun-blue rounded-full flex items-center justify-center text-white">
                               <Send size={18} />
                            </div>
@@ -311,7 +311,7 @@ const Solution: React.FC = () => {
                   {/* Header */}
                   <div className="text-center mb-8">
                      <h3 className="font-sans font-bold text-3xl md:text-4xl text-fun-dark mb-2">Destinos Extras</h3>
-                     <p className="text-slate-600 font-bold">Escolha um (ou todos) e peça no Zap!</p>
+                     <p className="text-zinc-600 font-bold">Escolha um (ou todos) e peça no Zap!</p>
                   </div>
 
                   {/* Destinations List */}
@@ -326,7 +326,7 @@ const Solution: React.FC = () => {
                         </div>
                         <div className="z-10">
                            <h4 className="font-sans font-bold text-2xl text-fun-dark mb-1">Florianópolis</h4>
-                           <p className="text-sm font-bold text-slate-500 leading-tight">42 praias, dunas de areia e gastronomia.</p>
+                           <p className="text-sm font-bold text-zinc-500 leading-tight">42 praias, dunas de areia e gastronomia.</p>
                         </div>
                      </div>
 
@@ -339,7 +339,7 @@ const Solution: React.FC = () => {
                         </div>
                         <div className="z-10">
                            <h4 className="font-sans font-bold text-2xl text-fun-dark mb-1">Bombinhas</h4>
-                           <p className="text-sm font-bold text-slate-500 leading-tight">Mergulho ecológico e águas cristalinas.</p>
+                           <p className="text-sm font-bold text-zinc-500 leading-tight">Mergulho ecológico e águas cristalinas.</p>
                         </div>
                      </div>
 
@@ -352,14 +352,14 @@ const Solution: React.FC = () => {
                         </div>
                         <div className="z-10">
                            <h4 className="font-sans font-bold text-2xl text-fun-dark mb-1">Balneário Camboriú</h4>
-                           <p className="text-sm font-bold text-slate-500 leading-tight">Roda gigante, aquário e vida noturna.</p>
+                           <p className="text-sm font-bold text-zinc-500 leading-tight">Roda gigante, aquário e vida noturna.</p>
                         </div>
                      </div>
 
                   </div>
 
                   {/* Footer CTA */}
-                  <div className="text-center mt-8 pt-6 border-t-2 border-dashed border-gray-300">
+                  <div className="text-center mt-8 pt-6 border-t-2 border-dashed border-zinc-300">
                      <Button
                         text="Montar Roteiro no Zap"
                         variant="secondary"

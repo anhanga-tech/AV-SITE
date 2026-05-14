@@ -152,7 +152,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
             <div className="bg-[#fffdf5] min-h-screen font-sans">
 
                 {/* ── Nav ───────────────────────────────────────────────── */}
-                <nav className="bg-white/90 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50 px-6 py-2">
+                <nav className="bg-white/90 backdrop-blur-md border-b border-zinc-100 sticky top-0 z-50 px-6 py-2">
                     <div className="container mx-auto flex items-center justify-between">
                         <a href="https://www.anhanga.tur.br/" aria-label="Voltar para o site principal">
                             <img
@@ -382,10 +382,10 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                             <Icon className={`size-8 ${item.iconColor}`} weight="fill" />
                                         </m.div>
 
-                                        <h3 className="text-xl font-extrabold text-gray-900 mb-3 leading-tight group-hover:text-brand-cyan transition-colors duration-300">
+                                        <h3 className="text-xl font-extrabold text-zinc-900 mb-3 leading-tight group-hover:text-brand-cyan transition-colors duration-300">
                                             {item.title}
                                         </h3>
-                                        <p className="text-gray-500 font-medium leading-relaxed text-sm">
+                                        <p className="text-zinc-500 font-medium leading-relaxed text-sm">
                                             {item.description}
                                         </p>
 
@@ -471,7 +471,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                     </span>
                                 </h2>
 
-                                <p className="text-gray-500 font-medium text-lg leading-relaxed mb-10 max-w-sm">
+                                <p className="text-zinc-500 font-medium text-lg leading-relaxed mb-10 max-w-sm">
                                     Preencha o formulário e um consultor entra em contato pelo canal que você preferir, sem enrolação.
                                 </p>
 
@@ -486,11 +486,11 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                                 <Icon className="size-5 text-blue-600" weight="fill" />
                                             </div>
                                             {href ? (
-                                                <a href={href} className="font-semibold text-gray-700 hover:text-brand-cyan transition-colors duration-150 pt-1.5">
+                                                <a href={href} className="font-semibold text-zinc-700 hover:text-brand-cyan transition-colors duration-150 pt-1.5">
                                                     {label}
                                                 </a>
                                             ) : (
-                                                <span className="font-semibold text-gray-700 leading-snug pt-1.5">{label}</span>
+                                                <span className="font-semibold text-zinc-700 leading-snug pt-1.5">{label}</span>
                                             )}
                                         </li>
                                     ))}
@@ -498,7 +498,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
 
                                 {/* Social links */}
                                 <div>
-                                    <p className="text-xs font-bold tracking-widest uppercase text-gray-500 mb-4">
+                                    <p className="text-xs font-bold tracking-widest uppercase text-zinc-500 mb-4">
                                         Nos siga nas redes
                                     </p>
                                     <div className="flex gap-3">
@@ -512,7 +512,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                                 href={href}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="size-11 rounded-xl bg-white border-2 border-gray-200 flex items-center justify-center text-gray-500 hover:border-brand-cyan hover:text-brand-cyan shadow-[2px_2px_0px_rgba(0,0,0,0.05)] hover:shadow-[4px_4px_0px_#fbbf24] hover:-translate-y-1 transition-all duration-200"
+                                                className="size-11 rounded-xl bg-white border-2 border-zinc-200 flex items-center justify-center text-zinc-500 hover:border-brand-cyan hover:text-brand-cyan shadow-[2px_2px_0px_rgba(0,0,0,0.05)] hover:shadow-[4px_4px_0px_#fbbf24] hover:-translate-y-1 transition-all duration-200"
                                                 aria-label={label}
                                                 {...(contact ? { 'data-contact-intent': true, 'data-tracking': 'social-whatsapp-brazil-promotion-day' } : {})}
                                             >
@@ -530,7 +530,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                 whileInView="visible"
                                 viewport={{ once: true, amount: 0.2 }}
                                 custom={1}
-                                className="bg-white rounded-[2rem] border-2 border-gray-100 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] overflow-hidden"
+                                className="bg-white rounded-[2rem] border-2 border-zinc-100 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] overflow-hidden"
                             >
                                 {submitState === 'success' ? (
                                     <div className="flex flex-col items-center text-center p-12">
@@ -544,7 +544,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                         <h3 className="text-2xl font-black text-brand-dark mb-3">
                                             Mensagem recebida! 🎉
                                         </h3>
-                                        <p className="text-gray-500 max-w-xs leading-relaxed mb-8">
+                                        <p className="text-zinc-500 max-w-xs leading-relaxed mb-8">
                                             Um consultor da Anhangá vai entrar em contato em breve. Fique de olho no WhatsApp ou e-mail.
                                         </p>
                                         <a
@@ -562,17 +562,17 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                 ) : (
                                     <form onSubmit={handleSubmit} noValidate>
                                         {/* Form header strip */}
-                                        <div className="flex justify-between items-center px-8 py-5 border-b-2 border-dashed border-gray-100">
+                                        <div className="flex justify-between items-center px-8 py-5 border-b-2 border-dashed border-zinc-100">
                                             <span className="text-brand-cyan font-black tracking-widest text-sm uppercase flex items-center gap-2">
                                                 <AirplaneTilt className="size-4" weight="fill" /> Formulário de Contato
                                             </span>
-                                            <span className="text-gray-400 font-bold text-xs uppercase">Brazil Promotion Day</span>
+                                            <span className="text-zinc-400 font-bold text-xs uppercase">Brazil Promotion Day</span>
                                         </div>
 
                                         <div className="p-8 space-y-5">
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div>
-                                                    <label htmlFor="firstName" className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                                    <label htmlFor="firstName" className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">
                                                         Nome <span className="text-brand-cyan">*</span>
                                                     </label>
                                                     <input
@@ -583,11 +583,11 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                                         value={form.firstName}
                                                         onChange={handleField('firstName')}
                                                         required
-                                                        className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors duration-150 placeholder-gray-400"
+                                                        className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors duration-150 placeholder-zinc-400"
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label htmlFor="lastName" className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                                    <label htmlFor="lastName" className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">
                                                         Sobrenome <span className="text-brand-cyan">*</span>
                                                     </label>
                                                     <input
@@ -598,13 +598,13 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                                         value={form.lastName}
                                                         onChange={handleField('lastName')}
                                                         required
-                                                        className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors duration-150 placeholder-gray-400"
+                                                        className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors duration-150 placeholder-zinc-400"
                                                     />
                                                 </div>
                                             </div>
 
                                             <div>
-                                                <label htmlFor="email" className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                                <label htmlFor="email" className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">
                                                     E-mail <span className="text-brand-cyan">*</span>
                                                 </label>
                                                 <input
@@ -615,12 +615,12 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                                     value={form.email}
                                                     onChange={handleField('email')}
                                                     required
-                                                    className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors duration-150 placeholder-gray-400"
+                                                    className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors duration-150 placeholder-zinc-400"
                                                 />
                                             </div>
 
                                             <div>
-                                                <label htmlFor="whatsapp" className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                                <label htmlFor="whatsapp" className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">
                                                     WhatsApp <span className="text-brand-cyan">*</span>
                                                 </label>
                                                 <input
@@ -631,12 +631,12 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                                     value={form.whatsapp}
                                                     onChange={handleField('whatsapp')}
                                                     required
-                                                    className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors duration-150 placeholder-gray-400"
+                                                    className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors duration-150 placeholder-zinc-400"
                                                 />
                                             </div>
 
                                             <div>
-                                                <label htmlFor="destination" className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                                <label htmlFor="destination" className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">
                                                     Destino de interesse
                                                 </label>
                                                 <input
@@ -646,7 +646,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                                     autoComplete="off"
                                                     value={form.destination}
                                                     onChange={handleField('destination')}
-                                                    className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors duration-150 placeholder-gray-400"
+                                                    className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors duration-150 placeholder-zinc-400"
                                                 />
                                             </div>
 
@@ -675,7 +675,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                                                 )}
                                             </button>
 
-                                            <p className="text-xs text-gray-400 text-center leading-relaxed">
+                                            <p className="text-xs text-zinc-400 text-center leading-relaxed">
                                                 Seus dados são usados apenas para entrar em contato. Não compartilhamos com terceiros.
                                             </p>
                                         </div>
@@ -687,7 +687,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                 </section>
 
                 {/* ── Footer ────────────────────────────────────────────── */}
-                <footer className="bg-brand-dark text-gray-300 py-10">
+                <footer className="bg-brand-dark text-zinc-300 py-10">
                     <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
                         <img
                             src={BRAND_LOGO_BLUE_URL}

@@ -63,7 +63,7 @@ const PackageFeatures: React.FC = () => {
   ];
 
   return (
-    <section id="pacote" className="bg-gray-950 py-20 relative overflow-hidden" ref={elementRef}>
+    <section id="pacote" className="bg-zinc-950 py-20 relative overflow-hidden" ref={elementRef}>
       {/* Abstract Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-10%] size-[50%] bg-anhanga-blue rounded-full blur-[120px] opacity-20"></div>
@@ -123,7 +123,7 @@ const PackageFeatures: React.FC = () => {
                     {feature.title}
                   </h3>
                   <p className={`font-medium text-sm md:text-base leading-snug line-clamp-3 md:line-clamp-none
-                    ${feature.image ? 'text-gray-300' : (feature.bgColor === 'bg-anhanga-yellow' ? 'text-gray-800' : 'text-blue-100')}
+                    ${feature.image ? 'text-zinc-300' : (feature.bgColor === 'bg-anhanga-yellow' ? 'text-zinc-800' : 'text-blue-100')}
                   `}>
                     {feature.subtitle}
                   </p>

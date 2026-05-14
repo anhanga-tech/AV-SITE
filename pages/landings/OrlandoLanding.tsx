@@ -56,9 +56,9 @@ const OrlandoLanding: React.FC = () => {
         ]}
       />
       <FAQPageSchema items={ORLANDO_FAQ_ITEMS} />
-      <div className="bg-[#fffdf5] py-2 border-b border-gray-100 relative z-[60]">
+      <div className="bg-[#fffdf5] py-2 border-b border-zinc-100 relative z-[60]">
         <div className="container mx-auto px-6">
-          <a href="https://www.anhanga.tur.br/" className="text-sm font-medium text-gray-500 hover:text-brand-cyan transition-colors flex items-center gap-1 font-sans">
+          <a href="https://www.anhanga.tur.br/" className="text-sm font-medium text-zinc-500 hover:text-brand-cyan transition-colors flex items-center gap-1 font-sans">
             ← Voltar para o site principal
           </a>
         </div>
@@ -77,14 +77,14 @@ const OrlandoLanding: React.FC = () => {
       <section className="bg-[#fffdf5] border-t border-brand-cyan/10 py-14">
         <div className="container mx-auto px-6 max-w-5xl">
           <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Pacote para Orlando sem improviso</h2>
-          <p className="text-gray-700 text-lg leading-relaxed mb-5">
+          <p className="text-zinc-700 text-lg leading-relaxed mb-5">
             Se você busca <strong>pacotes para Orlando</strong> com planejamento profissional, a Anhangá estrutura sua viagem com foco em custo-benefício, logística e experiência.
           </p>
-          <p className="text-gray-700 text-lg leading-relaxed mb-5">
+          <p className="text-zinc-700 text-lg leading-relaxed mb-5">
             Definimos roteiro de parques, hospedagem por região, estratégia de ingressos e suporte antes e durante a viagem para você evitar erros comuns e aproveitar melhor cada dia de viagem.
           </p>
           <h3 className="text-xl md:text-2xl font-extrabold text-brand-dark mb-3">O que você pode incluir no pacote</h3>
-          <ul className="list-disc list-inside text-gray-700 space-y-1 mb-6">
+          <ul className="list-disc list-inside text-zinc-700 space-y-1 mb-6">
             <li>Aéreo e hotel com perfil ideal para sua viagem</li>
             <li>Ingressos Disney e Universal com orientação de uso</li>
             <li>Roteiro diário personalizado por prioridade</li>
@@ -102,13 +102,13 @@ const OrlandoLanding: React.FC = () => {
             >
               Falar com especialista
             </button>
-            <a href="https://www.anhanga.tur.br/beto-carrero/" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+            <a href="https://www.anhanga.tur.br/beto-carrero/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ver pacote Beto Carrero
             </a>
-            <a href="/blog" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+            <a href="/blog" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ler dicas no blog
             </a>
-            <a href="https://www.visitorlando.com/" target="_blank" rel="noopener noreferrer" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+            <a href="https://www.visitorlando.com/" target="_blank" rel="noopener noreferrer" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Guia Oficial Visit Orlando
             </a>
           </div>

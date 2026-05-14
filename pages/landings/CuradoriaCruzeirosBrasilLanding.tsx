@@ -119,7 +119,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
             className="inline-flex items-center gap-2 group"
             aria-label="Voltar para o site principal da Anhangá Viagens"
           >
-            <ArrowLeft className="size-4 text-gray-400 group-hover:text-anhanga-blue transition-colors" />
+            <ArrowLeft className="size-4 text-zinc-400 group-hover:text-anhanga-blue transition-colors" />
             <span className="size-7 bg-anhanga-blue/10 rounded-lg flex items-center justify-center flex-shrink-0">
               <img src="/favicon.svg" alt="" aria-hidden="true" className="size-4" />
             </span>
@@ -147,7 +147,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
           <h1 className="text-4xl md:text-6xl font-black text-anhanga-dark mb-6 leading-[1.1] font-serif">
             Escolha o cruzeiro certo no Brasil antes de fechar
           </h1>
-          <p className="text-xl text-gray-600 mb-10 leading-relaxed max-w-2xl">
+          <p className="text-xl text-zinc-600 mb-10 leading-relaxed max-w-2xl">
             Entenda navio, cabine, roteiro, datas e perfil da viagem com uma curadoria consultiva da Anhangá.
           </p>
           <button
@@ -160,7 +160,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
             Falar com um especialista
             <ArrowRight className="size-5" />
           </button>
-          <p className="mt-4 text-sm text-gray-600">Sem taxa de curadoria. Gratuito.</p>
+          <p className="mt-4 text-sm text-zinc-600">Sem taxa de curadoria. Gratuito.</p>
         </div>
       </section>
 
@@ -170,14 +170,14 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
           <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-4 font-serif">
             O que analisamos juntos
           </h2>
-          <p className="text-gray-600 text-lg mb-10">
+          <p className="text-zinc-600 text-lg mb-10">
             Na curadoria, passamos por todos esses pontos antes de você decidir.
           </p>
           <div className="grid sm:grid-cols-2 gap-4">
             {WHAT_WE_ANALYZE.map(item => (
               <div key={item} className="flex items-start gap-3 p-4 rounded-xl bg-anhanga-light">
                 <CheckCircle className="size-5 text-anhanga-blue flex-shrink-0 mt-0.5" aria-hidden="true" />
-                <span className="text-gray-700">{item}</span>
+                <span className="text-zinc-700">{item}</span>
               </div>
             ))}
           </div>
@@ -190,7 +190,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
           <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-3 font-serif">
             Por que curadoria?
           </h2>
-          <p className="text-gray-600 text-lg mb-12">
+          <p className="text-zinc-600 text-lg mb-12">
             Porque escolher um cruzeiro envolve mais variáveis do que parece.
           </p>
           <div className="grid md:grid-cols-3 gap-6">
@@ -215,7 +215,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
                 <h3 className={`text-xl font-black mb-3 ${variant === 'filled' ? 'text-white' : 'text-anhanga-dark'}`}>
                   {title}
                 </h3>
-                <p className={variant === 'filled' ? 'text-blue-100 leading-relaxed' : 'text-gray-600 leading-relaxed'}>
+                <p className={variant === 'filled' ? 'text-blue-100 leading-relaxed' : 'text-zinc-600 leading-relaxed'}>
                   {desc}
                 </p>
               </div>
@@ -234,7 +234,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
             {FOR_WHO.map(({ title, desc }) => (
               <div key={title} className="bg-anhanga-light rounded-2xl p-6">
                 <h3 className="font-black text-anhanga-dark mb-2">{title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{desc}</p>
+                <p className="text-zinc-600 text-sm leading-relaxed">{desc}</p>
               </div>
             ))}
           </div>
@@ -258,7 +258,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-xl font-black text-anhanga-dark mb-2">{title}</h3>
-                  <p className="text-gray-600 leading-relaxed max-w-xl">{desc}</p>
+                  <p className="text-zinc-600 leading-relaxed max-w-xl">{desc}</p>
                 </div>
               </div>
             ))}
@@ -272,7 +272,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
           <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-6 font-serif">
             Sobre a Anhangá Viagens
           </h2>
-          <p className="text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-lg text-zinc-600 leading-relaxed max-w-2xl mx-auto">
             Agência de viagens em São Paulo desde 2018, com especialistas em cruzeiros no Brasil e roteiros personalizados. Nota 5.0 no Google e atendimento humano do início ao fim.
           </p>
           <div className="mt-12 flex flex-wrap justify-center gap-12">
@@ -283,7 +283,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
             ].map(({ label, value }) => (
               <div key={label}>
                 <div className="text-4xl font-black text-anhanga-blue">{value}</div>
-                <div className="text-sm text-gray-600 mt-1">{label}</div>
+                <div className="text-sm text-zinc-600 mt-1">{label}</div>
               </div>
             ))}
           </div>
@@ -324,7 +324,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
               <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                 Consultoria de Viagem
               </div>
-              <div className="text-sm text-gray-600 mt-1">
+              <div className="text-sm text-zinc-600 mt-1">
                 Roteiro sob medida com consultor humano
               </div>
             </Link>
@@ -335,7 +335,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
               <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                 Viagens para Executivos
               </div>
-              <div className="text-sm text-gray-600 mt-1">
+              <div className="text-sm text-zinc-600 mt-1">
                 Planejamento com precisão para profissionais
               </div>
             </Link>
@@ -346,7 +346,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
               <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                 Site principal
               </div>
-              <div className="text-sm text-gray-600 mt-1">
+              <div className="text-sm text-zinc-600 mt-1">
                 Conheça todos os serviços da Anhangá
               </div>
             </a>
@@ -362,7 +362,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
       />
 
       {/* Footer */}
-      <footer className="py-8 bg-anhanga-light border-t border-anhanga-blue/10 text-center text-sm text-gray-600">
+      <footer className="py-8 bg-anhanga-light border-t border-anhanga-blue/10 text-center text-sm text-zinc-600">
         <p>Anhangá Viagens · Agência de viagens em São Paulo</p>
         <p className="mt-1">Atualizado em abril de 2026</p>
       </footer>

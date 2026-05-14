@@ -103,7 +103,7 @@ const Testimonials: React.FC = memo(() => {
                                             {/* Text */}
                                             <div className="text-center md:text-left">
                                                 <Quote className="size-10 text-brand-cyan/20 mx-auto md:mx-0 mb-4 fill-current" />
-                                                <p itemProp="reviewBody" className="text-xl md:text-2xl font-bold text-gray-700 leading-snug mb-6 font-serif italic">
+                                                <p itemProp="reviewBody" className="text-xl md:text-2xl font-bold text-zinc-700 leading-snug mb-6 font-serif italic">
                                                     "{testimonial.text}"
                                                 </p>
                                                 <div>

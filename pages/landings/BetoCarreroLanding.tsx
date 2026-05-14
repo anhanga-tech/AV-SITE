@@ -51,9 +51,9 @@ const BetoCarreroLanding: React.FC = () => {
         ]}
       />
       <FAQPageSchema items={BETO_FAQ_ITEMS} />
-      <div className="bg-[#fffdf5] py-2 border-b border-gray-100">
+      <div className="bg-[#fffdf5] py-2 border-b border-zinc-100">
         <div className="container mx-auto px-6">
-          <a href="https://www.anhanga.tur.br/" className="text-sm font-medium text-gray-500 hover:text-brand-cyan transition-colors flex items-center gap-1">
+          <a href="https://www.anhanga.tur.br/" className="text-sm font-medium text-zinc-500 hover:text-brand-cyan transition-colors flex items-center gap-1">
             ← Voltar para o site principal
           </a>
         </div>
@@ -72,14 +72,14 @@ const BetoCarreroLanding: React.FC = () => {
       <section className="bg-[#fffdf5] border-t border-brand-cyan/10 py-14">
         <div className="container mx-auto px-6 max-w-5xl">
           <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Pacote Beto Carrero para viajar com tranquilidade</h2>
-          <p className="text-gray-700 text-lg leading-relaxed mb-5">
+          <p className="text-zinc-700 text-lg leading-relaxed mb-5">
             Nosso <strong>pacote Beto Carrero</strong> é desenhado para quem quer curtir o parque sem dor de cabeça com reservas, horários e deslocamentos.
           </p>
-          <p className="text-gray-700 text-lg leading-relaxed mb-5">
+          <p className="text-zinc-700 text-lg leading-relaxed mb-5">
             Você recebe planejamento completo com opções de hotel, logística e ingressos, além de orientação prática para aproveitar melhor cada dia de viagem em família.
           </p>
           <h3 className="text-xl md:text-2xl font-extrabold text-brand-dark mb-3">O que pode entrar no seu pacote</h3>
-          <ul className="list-disc list-inside text-gray-700 space-y-1 mb-6">
+          <ul className="list-disc list-inside text-zinc-700 space-y-1 mb-6">
             <li>Hospedagem com localização estratégica</li>
             <li>Ingressos para o parque e upgrades opcionais</li>
             <li>Roteiro de atrações por perfil do grupo</li>
@@ -97,13 +97,13 @@ const BetoCarreroLanding: React.FC = () => {
             >
               Falar com especialista
             </button>
-            <a href="https://www.anhanga.tur.br/orlando/" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+            <a href="https://www.anhanga.tur.br/orlando/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ver pacotes para Orlando
             </a>
-            <a href="/blog" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+            <a href="/blog" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ver dicas de planejamento
             </a>
-            <a href="https://www.betocarrero.com.br/" target="_blank" rel="noopener noreferrer" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+            <a href="https://www.betocarrero.com.br/" target="_blank" rel="noopener noreferrer" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Site Oficial Beto Carrero
             </a>
           </div>

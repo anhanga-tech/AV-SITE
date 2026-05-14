@@ -104,14 +104,14 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
       <FAQPageSchema items={FAQ_ITEMS} />
 
       {/* Mini Header */}
-      <header className="bg-white/90 backdrop-blur-sm border-b border-gray-100 sticky top-0 z-50 py-3">
+      <header className="bg-white/90 backdrop-blur-sm border-b border-zinc-100 sticky top-0 z-50 py-3">
         <div className="max-w-5xl mx-auto px-6 flex items-center justify-between">
           <Link
             to="/"
             className="inline-flex items-center gap-2 group"
             aria-label="Voltar para o site principal da Anhangá Viagens"
           >
-            <ArrowLeft className="size-4 text-gray-400 group-hover:text-anhanga-blue transition-colors" />
+            <ArrowLeft className="size-4 text-zinc-400 group-hover:text-anhanga-blue transition-colors" />
             <span className="size-7 bg-anhanga-blue/10 rounded-lg flex items-center justify-center flex-shrink-0">
               <img src="/favicon.svg" alt="" aria-hidden="true" className="size-4" />
             </span>
@@ -139,7 +139,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
           <h1 className="text-4xl md:text-6xl font-black text-anhanga-dark mb-6 leading-[1.1] font-serif">
             Planeje uma viagem sob medida sem depender de pacote pronto
           </h1>
-          <p className="text-xl text-gray-600 mb-10 leading-relaxed max-w-2xl">
+          <p className="text-xl text-zinc-600 mb-10 leading-relaxed max-w-2xl">
             Um consultor da Anhangá entende seu perfil, destino, orçamento e restrições para desenhar o melhor caminho antes de você fechar.
           </p>
           <button
@@ -152,7 +152,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
             Falar com um consultor
             <ArrowRight className="size-5" />
           </button>
-          <p className="mt-4 text-sm text-gray-600">Sem taxa de consultoria. Gratuito.</p>
+          <p className="mt-4 text-sm text-zinc-600">Sem taxa de consultoria. Gratuito.</p>
         </div>
       </section>
 
@@ -162,7 +162,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
           <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-3 font-serif">
             Por que consultoria?
           </h2>
-          <p className="text-gray-600 text-lg mb-12">
+          <p className="text-zinc-600 text-lg mb-12">
             Porque viajar bem não é só escolher um destino.
           </p>
           <div className="grid md:grid-cols-3 gap-6">
@@ -187,7 +187,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
                 <h3 className={`text-xl font-black mb-3 ${variant === 'filled' ? 'text-white' : 'text-anhanga-dark'}`}>
                   {title}
                 </h3>
-                <p className={variant === 'filled' ? 'text-blue-100 leading-relaxed' : 'text-gray-600 leading-relaxed'}>
+                <p className={variant === 'filled' ? 'text-blue-100 leading-relaxed' : 'text-zinc-600 leading-relaxed'}>
                   {desc}
                 </p>
               </div>
@@ -208,7 +208,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
                 {FOR_WHO.map(item => (
                   <li key={item} className="flex items-start gap-3">
                     <CheckCircle className="size-5 text-anhanga-blue flex-shrink-0 mt-0.5" aria-hidden="true" />
-                    <span className="text-gray-700 leading-snug">{item}</span>
+                    <span className="text-zinc-700 leading-snug">{item}</span>
                   </li>
                 ))}
               </ul>
@@ -217,7 +217,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
               <blockquote className="text-xl text-anhanga-dark font-semibold leading-relaxed">
                 "A Anhangá cuidou de cada detalhe. Só precisei aparecer no aeroporto."
               </blockquote>
-              <p className="mt-4 text-gray-600 text-sm">
+              <p className="mt-4 text-zinc-600 text-sm">
                 R.M. · São Paulo · Viagem para Portugal, 2025
               </p>
             </div>
@@ -235,14 +235,14 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
             {HOW_IT_WORKS.map(({ step, title, desc }, idx) => (
               <div
                 key={step}
-                className={`flex gap-6 py-8 ${idx < HOW_IT_WORKS.length - 1 ? 'border-b border-gray-100' : ''}`}
+                className={`flex gap-6 py-8 ${idx < HOW_IT_WORKS.length - 1 ? 'border-b border-zinc-100' : ''}`}
               >
                 <div className="flex-shrink-0 size-12 rounded-full bg-anhanga-blue/10 flex items-center justify-center">
                   <span className="text-sm font-black text-anhanga-blue">{step}</span>
                 </div>
                 <div>
                   <h3 className="text-xl font-black text-anhanga-dark mb-2">{title}</h3>
-                  <p className="text-gray-600 leading-relaxed max-w-xl">{desc}</p>
+                  <p className="text-zinc-600 leading-relaxed max-w-xl">{desc}</p>
                 </div>
               </div>
             ))}
@@ -256,7 +256,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
           <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-6 font-serif">
             Sobre a Anhangá Viagens
           </h2>
-          <p className="text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-lg text-zinc-600 leading-relaxed max-w-2xl mx-auto">
             Agência de viagens em São Paulo, especializada em viagens personalizadas desde 2018. Atendimento humano, nota 5.0 no Google e consultor fixo do início ao fim da sua viagem.
           </p>
           <div className="mt-12 flex flex-wrap justify-center gap-12">
@@ -267,7 +267,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
             ].map(({ label, value }) => (
               <div key={label}>
                 <div className="text-4xl font-black text-anhanga-blue">{value}</div>
-                <div className="text-sm text-gray-600 mt-1">{label}</div>
+                <div className="text-sm text-zinc-600 mt-1">{label}</div>
               </div>
             ))}
           </div>
@@ -308,7 +308,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
               <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                 Viagens para Executivos
               </div>
-              <div className="text-sm text-gray-600 mt-1">
+              <div className="text-sm text-zinc-600 mt-1">
                 Planejamento com precisão para profissionais
               </div>
             </Link>
@@ -319,7 +319,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
               <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                 Curadoria de Cruzeiros
               </div>
-              <div className="text-sm text-gray-600 mt-1">
+              <div className="text-sm text-zinc-600 mt-1">
                 Escolha o navio e a cabine certos para você
               </div>
             </Link>
@@ -330,7 +330,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
               <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                 Site principal
               </div>
-              <div className="text-sm text-gray-600 mt-1">
+              <div className="text-sm text-zinc-600 mt-1">
                 Conheça todos os serviços da Anhangá
               </div>
             </a>
@@ -346,7 +346,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
       />
 
       {/* Footer */}
-      <footer className="py-8 bg-[#fffdf5] border-t border-gray-100 text-center text-sm text-gray-600">
+      <footer className="py-8 bg-[#fffdf5] border-t border-zinc-100 text-center text-sm text-zinc-600">
         <p>Anhangá Viagens · Agência de viagens em São Paulo</p>
         <p className="mt-1">Atualizado em abril de 2026</p>
       </footer>

@@ -41,7 +41,7 @@ test.describe('Hero UX and Accessibility', () => {
     // Open Calendar
     await page.getByTestId('dates-filter-btn').click();
     // Use a more specific locator for the calendar to avoid footer links
-    const calendarHeader = page.locator('span.text-gray-800').filter({ hasText: /202[56]/ });
+    const calendarHeader = page.locator('span.text-zinc-800').filter({ hasText: /202[56]/ });
     await expect(calendarHeader.first()).toBeVisible();
 
     await page.keyboard.press('Escape');

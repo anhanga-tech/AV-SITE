@@ -39,7 +39,7 @@ const Blog: React.FC = memo(() => {
                     <h2 className="text-4xl md:text-5xl font-black text-brand-dark mb-4">
                         Histórias & <span className="text-brand-cyan border-b-8 border-brand-cyan/20 px-1 inline-block">Dicas</span>
                     </h2>
-                    <p className="text-gray-500 font-medium text-lg max-w-2xl mx-auto">
+                    <p className="text-zinc-500 font-medium text-lg max-w-2xl mx-auto">
                         Inspiração real para sua próxima aventura. Sem filtros, só verdades.
                     </p>
                 </div>
@@ -48,7 +48,7 @@ const Blog: React.FC = memo(() => {
                 {featuredPost && (
                     <div className="mb-16 cursor-pointer relative">
                         <a href={getBlogPostUrl(featuredPost.slug)} className="group">
-                            <div className="bg-[#fffdf5] rounded-[2.5rem] p-6 md:p-8 border-4 border-gray-100 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] flex flex-col md:flex-row gap-8 items-center transition-transform duration-300 hover:scale-[1.01]">
+                            <div className="bg-[#fffdf5] rounded-[2.5rem] p-6 md:p-8 border-4 border-zinc-100 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] flex flex-col md:flex-row gap-8 items-center transition-transform duration-300 hover:scale-[1.01]">
 
                                 {/* Featured Image */}
                                 <div className="w-full md:w-1/2 relative">
@@ -77,7 +77,7 @@ const Blog: React.FC = memo(() => {
 
                                 {/* Featured Content */}
                                 <div className="w-full md:w-1/2 md:pr-8">
-                                    <div className="flex items-center gap-3 mb-4 text-sm font-bold text-gray-400">
+                                    <div className="flex items-center gap-3 mb-4 text-sm font-bold text-zinc-400">
                                         <span className={`px-3 py-1 rounded-full border ${getCategoryColor(featuredPost.category)}`}>
                                             {featuredPost.category}
                                         </span>
@@ -86,16 +86,16 @@ const Blog: React.FC = memo(() => {
                                     <h3 className="text-3xl md:text-4xl font-black text-brand-dark mb-4 leading-tight group-hover:text-brand-cyan transition-colors">
                                         {featuredPost.title}
                                     </h3>
-                                    <p className="text-gray-600 text-lg mb-6 leading-relaxed">
+                                    <p className="text-zinc-600 text-lg mb-6 leading-relaxed">
                                         {featuredPost.excerpt}
                                     </p>
-                                    <div className="flex items-center justify-between border-t border-gray-200 pt-6">
+                                    <div className="flex items-center justify-between border-t border-zinc-200 pt-6">
                                         <div className="flex items-center gap-2">
                                             <div className="size-10 rounded-full bg-brand-dark flex items-center justify-center text-white text-base font-black shrink-0">
                                                 {(AUTHORS[featuredPost.author]?.name ?? featuredPost.author).charAt(0).toUpperCase()}
                                             </div>
                                             <div className="flex flex-col">
-                                                <span className="text-xs font-bold text-gray-400 uppercase">Escrito por</span>
+                                                <span className="text-xs font-bold text-zinc-400 uppercase">Escrito por</span>
                                                 <span className="text-sm font-black text-brand-dark">{AUTHORS[featuredPost.author]?.name ?? featuredPost.author}</span>
                                             </div>
                                         </div>
@@ -115,10 +115,10 @@ const Blog: React.FC = memo(() => {
                         <a
                             href={getBlogPostUrl(post.slug)}
                             key={post.slug}
-                            className="group bg-white rounded-3xl p-4 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.05)] border border-gray-100 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl flex flex-col h-full"
+                            className="group bg-white rounded-3xl p-4 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.05)] border border-zinc-100 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl flex flex-col h-full"
                         >
                             {/* Image Area — aspect ratio alternado para quebrar ritmo uniforme */}
-                            <div className={`relative ${index % 2 === 0 ? 'aspect-[4/3]' : 'aspect-video'} rounded-2xl overflow-hidden mb-5 bg-gray-100`}>
+                            <div className={`relative ${index % 2 === 0 ? 'aspect-[4/3]' : 'aspect-video'} rounded-2xl overflow-hidden mb-5 bg-zinc-100`}>
                                 <LazyImage
                                     src={post.image}
                                     alt={post.title}
@@ -126,7 +126,7 @@ const Blog: React.FC = memo(() => {
                                     height={480}
                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                 />
-                                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-800 shadow-sm">
+                                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-800 shadow-sm">
                                     {formatDate(post.date)}
                                 </div>
                                 <div className="absolute bottom-3 right-3 z-30">
@@ -146,21 +146,21 @@ const Blog: React.FC = memo(() => {
                                         {post.category}
                                     </span>
                                 </div>
-                                <h4 className="text-xl font-extrabold text-gray-800 mb-3 leading-snug group-hover:text-brand-cyan transition-colors">
+                                <h4 className="text-xl font-extrabold text-zinc-800 mb-3 leading-snug group-hover:text-brand-cyan transition-colors">
                                     {post.title}
                                 </h4>
-                                <p className="text-sm text-gray-500 font-medium leading-relaxed mb-6 flex-1 line-clamp-3">
+                                <p className="text-sm text-zinc-500 font-medium leading-relaxed mb-6 flex-1 line-clamp-3">
                                     {post.excerpt}
                                 </p>
 
-                                <div className="pt-4 border-t border-dashed border-gray-100 flex items-center justify-between">
-                                    <span className="text-xs font-bold text-gray-400 flex items-center gap-2">
+                                <div className="pt-4 border-t border-dashed border-zinc-100 flex items-center justify-between">
+                                    <span className="text-xs font-bold text-zinc-400 flex items-center gap-2">
                                         <div className="size-5 rounded-full bg-brand-dark flex items-center justify-center text-white text-[10px] font-black shrink-0">
                                             {(AUTHORS[post.author]?.name ?? post.author).charAt(0).toUpperCase()}
                                         </div>
                                         {AUTHORS[post.author]?.name ?? post.author}
                                     </span>
-                                    <span className="size-8 rounded-full flex items-center justify-center transition-colors bg-gray-100 text-gray-400 group-hover:bg-brand-cyan group-hover:text-white">
+                                    <span className="size-8 rounded-full flex items-center justify-center transition-colors bg-zinc-100 text-zinc-400 group-hover:bg-brand-cyan group-hover:text-white">
                                         <ArrowRight className="size-4" />
                                     </span>
                                 </div>
@@ -171,7 +171,7 @@ const Blog: React.FC = memo(() => {
 
                 {/* View More Button */}
                 <div className="mt-16 text-center">
-                    <a href={getBlogHomeUrl()} className="inline-flex items-center gap-2 px-8 py-4 bg-white border-2 border-gray-200 text-gray-600 rounded-full font-bold hover:border-brand-cyan hover:text-brand-cyan transition-all shadow-sm hover:shadow-md group">
+                    <a href={getBlogHomeUrl()} className="inline-flex items-center gap-2 px-8 py-4 bg-white border-2 border-zinc-200 text-zinc-600 rounded-full font-bold hover:border-brand-cyan hover:text-brand-cyan transition-all shadow-sm hover:shadow-md group">
                         <Sparkles className="size-4 text-brand-yellow fill-brand-yellow" />
                         Ver Todos os Artigos
                         <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />

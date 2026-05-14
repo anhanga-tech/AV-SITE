@@ -75,7 +75,7 @@ const About: React.FC = () => {
               design e zero estresse.
             </span>
           </h1>
-          <p className="max-w-2xl mx-auto text-gray-600 text-lg md:text-xl font-medium leading-relaxed mb-8">
+          <p className="max-w-2xl mx-auto text-zinc-600 text-lg md:text-xl font-medium leading-relaxed mb-8">
             Na Anhangá Viagens, acreditamos que viajar é mais do que carimbar um passaporte: é sobre colecionar histórias que valem a pena ser contadas.
           </p>
           <div className="flex justify-center">
@@ -110,13 +110,13 @@ const About: React.FC = () => {
                     className="w-full h-auto object-cover aspect-[4/3]"
                   />
                 </div>
-                <div className="absolute -bottom-6 -right-6 bg-white p-6 rounded-2xl shadow-xl border border-gray-100 hidden md:block">
+                <div className="absolute -bottom-6 -right-6 bg-white p-6 rounded-2xl shadow-xl border border-zinc-100 hidden md:block">
                   <div className="flex items-center gap-4">
                     <div className="size-12 bg-brand-cyan/10 rounded-full flex items-center justify-center text-brand-cyan">
                       <Heart className="size-6 fill-current" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Paixão por</p>
+                      <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Paixão por</p>
                       <p className="text-lg font-black text-brand-dark leading-none">Pessoas</p>
                     </div>
                   </div>
@@ -133,7 +133,7 @@ const About: React.FC = () => {
               custom={2}
             >
               <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-6">Nossa História</h2>
-              <div className="space-y-4 text-gray-600 font-medium leading-relaxed text-lg">
+              <div className="space-y-4 text-zinc-600 font-medium leading-relaxed text-lg">
                 <p>
                   A Anhangá Viagens nasceu em São Paulo com um propósito claro: resgatar o prazer de planejar uma viagem sem as dores de cabeça da burocracia digital e dos roteiros engessados.
                 </p>
@@ -159,7 +159,7 @@ const About: React.FC = () => {
             custom={0}
           >
             <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Por que viajar com a Anhangá?</h2>
-            <p className="text-gray-500 font-medium">O que nos torna diferentes no mercado de turismo.</p>
+            <p className="text-zinc-500 font-medium">O que nos torna diferentes no mercado de turismo.</p>
           </m.div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -185,7 +185,7 @@ const About: React.FC = () => {
             ].map((item, i) => (
               <m.div
                 key={item.title}
-                className="bg-white p-10 rounded-[2.5rem] border-2 border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300"
+                className="bg-white p-10 rounded-[2.5rem] border-2 border-zinc-100 shadow-sm hover:shadow-xl transition-all duration-300"
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
@@ -196,7 +196,7 @@ const About: React.FC = () => {
                   <item.icon className="size-8" />
                 </div>
                 <h3 className="text-xl font-black text-brand-dark mb-4">{item.title}</h3>
-                <p className="text-gray-500 font-medium leading-relaxed">{item.desc}</p>
+                <p className="text-zinc-500 font-medium leading-relaxed">{item.desc}</p>
               </m.div>
             ))}
           </div>
@@ -213,7 +213,7 @@ const About: React.FC = () => {
                 <Award className="size-4" /> Credibilidade & Confiança
               </div>
               <h2 className="text-3xl md:text-4xl font-black mb-6">Agência Certificada</h2>
-              <p className="text-gray-300 text-lg font-medium leading-relaxed mb-8">
+              <p className="text-zinc-300 text-lg font-medium leading-relaxed mb-8">
                 Sua segurança é nossa prioridade. A Anhangá Viagens é uma empresa devidamente registrada nos órgãos competentes, garantindo total conformidade legal para suas férias.
               </p>
 
@@ -224,7 +224,7 @@ const About: React.FC = () => {
                   </div>
                   <div>
                     <p className="font-bold text-lg leading-none mb-1">Cadastur Oficial</p>
-                    <p className="text-gray-400">Registro MTUR: 37.036.732/0001-41</p>
+                    <p className="text-zinc-400">Registro MTUR: 37.036.732/0001-41</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-4">
@@ -233,7 +233,7 @@ const About: React.FC = () => {
                   </div>
                   <div>
                     <p className="font-bold text-lg leading-none mb-1">Sede Própria em São Paulo</p>
-                    <p className="text-gray-400">Av. Dom Pedro I, 773 - Vila Monumento</p>
+                    <p className="text-zinc-400">Av. Dom Pedro I, 773 - Vila Monumento</p>
                   </div>
                 </li>
               </ul>
@@ -277,7 +277,7 @@ const About: React.FC = () => {
         >
           <div className="bg-brand-cyan/5 rounded-[3rem] p-12 md:p-20 border-2 border-dashed border-brand-cyan/20">
             <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-6">Pronto para sua próxima história?</h2>
-            <p className="text-gray-600 text-lg font-medium mb-10 max-w-xl mx-auto">
+            <p className="text-zinc-600 text-lg font-medium mb-10 max-w-xl mx-auto">
               Seja para um festival épico ou um refúgio relaxante, nós desenhamos a viagem perfeita para você.
             </p>
             <button

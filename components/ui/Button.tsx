@@ -19,7 +19,7 @@ const variantClasses: Record<ButtonVariant, string> = {
     primary: 'bg-anhanga-dark text-white rounded-xl shadow-hard-yellow hover:shadow-[2px_2px_0px_0px_#FFD600] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none',
     action:  'bg-anhanga-action text-white rounded-full hover:bg-anhanga-actionDark',
     cta:     'bg-anhanga-yellow text-anhanga-dark rounded-2xl shadow-hard hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none',
-    ghost:   'bg-transparent text-gray-500 rounded-lg hover:text-anhanga-action',
+    ghost:   'bg-transparent text-zinc-500 rounded-lg hover:text-anhanga-action',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {

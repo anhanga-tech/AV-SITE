@@ -121,7 +121,7 @@ const ContactModal: React.FC = () => {
                     <button
                         type="button"
                         onClick={close}
-                        className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan"
+                        className="rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan"
                         aria-label="Fechar"
                     >
                         <X className="size-5" weight="bold" />
@@ -136,8 +136,8 @@ const ContactModal: React.FC = () => {
                             aria-live="polite"
                         >
                             <CheckCircle className="size-14 text-green-600" weight="fill" />
-                            <p className="font-bold text-gray-800">Recebemos seu contato!</p>
-                            <p className="text-sm text-gray-500">
+                            <p className="font-bold text-zinc-800">Recebemos seu contato!</p>
+                            <p className="text-sm text-zinc-500">
                                 Nossa equipe entra em contato em breve pelo WhatsApp.
                             </p>
                         </div>
@@ -161,7 +161,7 @@ const ContactModal: React.FC = () => {
                     >
                         <div className="flex gap-3">
                             <div className="flex-1">
-                                <label htmlFor="contact-firstName" className="mb-1 block text-xs font-bold uppercase tracking-wider text-gray-500">
+                                <label htmlFor="contact-firstName" className="mb-1 block text-xs font-bold uppercase tracking-wider text-zinc-500">
                                     Nome *
                                 </label>
                                 <input
@@ -172,12 +172,12 @@ const ContactModal: React.FC = () => {
                                     value={fields.firstName}
                                     onChange={(event) => setField('firstName', event.target.value)}
                                     required
-                                    className="w-full rounded-xl border-2 border-gray-200 px-3 py-2.5 text-sm font-medium text-gray-800 outline-none transition-colors placeholder-gray-400 focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan"
+                                    className="w-full rounded-xl border-2 border-zinc-200 px-3 py-2.5 text-sm font-medium text-zinc-800 outline-none transition-colors placeholder-zinc-400 focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan"
                                     placeholder="ex: Maria"
                                 />
                             </div>
                             <div className="flex-1">
-                                <label htmlFor="contact-lastName" className="mb-1 block text-xs font-bold uppercase tracking-wider text-gray-500">
+                                <label htmlFor="contact-lastName" className="mb-1 block text-xs font-bold uppercase tracking-wider text-zinc-500">
                                     Sobrenome
                                 </label>
                                 <input
@@ -186,14 +186,14 @@ const ContactModal: React.FC = () => {
                                     autoComplete="family-name"
                                     value={fields.lastName}
                                     onChange={(event) => setField('lastName', event.target.value)}
-                                    className="w-full rounded-xl border-2 border-gray-200 px-3 py-2.5 text-sm font-medium text-gray-800 outline-none transition-colors placeholder-gray-400 focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan"
+                                    className="w-full rounded-xl border-2 border-zinc-200 px-3 py-2.5 text-sm font-medium text-zinc-800 outline-none transition-colors placeholder-zinc-400 focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan"
                                     placeholder="ex: Silva"
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label htmlFor="contact-whatsapp" className="mb-1 block text-xs font-bold uppercase tracking-wider text-gray-500">
+                            <label htmlFor="contact-whatsapp" className="mb-1 block text-xs font-bold uppercase tracking-wider text-zinc-500">
                                 WhatsApp *
                             </label>
                             <input
@@ -203,13 +203,13 @@ const ContactModal: React.FC = () => {
                                 value={fields.whatsapp}
                                 onChange={(event) => setField('whatsapp', event.target.value)}
                                 required
-                                className="w-full rounded-xl border-2 border-gray-200 px-3 py-2.5 text-sm font-medium text-gray-800 outline-none transition-colors placeholder-gray-400 focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan"
+                                className="w-full rounded-xl border-2 border-zinc-200 px-3 py-2.5 text-sm font-medium text-zinc-800 outline-none transition-colors placeholder-zinc-400 focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan"
                                 placeholder="+55 (11) 9 0000-0000"
                             />
                         </div>
 
                         <div>
-                            <label htmlFor="contact-email" className="mb-1 block text-xs font-bold uppercase tracking-wider text-gray-500">
+                            <label htmlFor="contact-email" className="mb-1 block text-xs font-bold uppercase tracking-wider text-zinc-500">
                                 E-mail
                             </label>
                             <input
@@ -218,7 +218,7 @@ const ContactModal: React.FC = () => {
                                 autoComplete="email"
                                 value={fields.email}
                                 onChange={(event) => setField('email', event.target.value)}
-                                className="w-full rounded-xl border-2 border-gray-200 px-3 py-2.5 text-sm font-medium text-gray-800 outline-none transition-colors placeholder-gray-400 focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan"
+                                className="w-full rounded-xl border-2 border-zinc-200 px-3 py-2.5 text-sm font-medium text-zinc-800 outline-none transition-colors placeholder-zinc-400 focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan"
                                 placeholder="seu@email.com (opcional)"
                             />
                         </div>

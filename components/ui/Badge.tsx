@@ -10,7 +10,7 @@ interface BadgeProps {
 }
 
 const colorClasses: Record<BadgeColor, string> = {
-    default: 'bg-white border-gray-200 text-anhanga-dark shadow-sm',
+    default: 'bg-white border-zinc-200 text-anhanga-dark shadow-sm',
     blue:    'bg-blue-50 border-blue-200 text-anhanga-blue',
     yellow:  'bg-yellow-50 border-yellow-200 text-yellow-800',
 };

@@ -41,12 +41,12 @@ const CallToActionComponent: React.FC = () => {
                     <div className="w-full md:w-[70%] p-8 md:p-12 relative flex flex-col justify-between">
 
                         {/* Header Strip */}
-                        <div className="flex justify-between items-center mb-8 border-b-2 border-dashed border-gray-100 pb-4">
+                        <div className="flex justify-between items-center mb-8 border-b-2 border-dashed border-zinc-100 pb-4">
                             <div className="flex items-center gap-2 text-brand-cyan font-black tracking-widest text-sm uppercase" title="Estilo Boarding Pass">
                                 <AirplaneTilt className="size-5" weight="fill" /> Anhangá Airlines
                                 <span className="text-[10px] opacity-40 ml-1 hidden lg:inline">(Boarding Pass)</span>
                             </div>
-                            <div className="text-gray-400 font-bold text-xs uppercase">First Class Experience</div>
+                            <div className="text-zinc-400 font-bold text-xs uppercase">First Class Experience</div>
                         </div>
 
                         {formState === 'closed' && (
@@ -56,7 +56,7 @@ const CallToActionComponent: React.FC = () => {
                                         Próxima parada: <br />
                                         <span className="text-brand-vibrant">aquele lugar que você sempre adiou.</span>
                                     </h2>
-                                    <p className="text-gray-500 font-medium text-lg max-w-md">
+                                    <p className="text-zinc-500 font-medium text-lg max-w-md">
                                         Orçamento gratuito. Roteiro feito do zero, só pra você.
                                     </p>
                                 </div>
@@ -80,7 +80,7 @@ const CallToActionComponent: React.FC = () => {
                                 className="flex flex-col gap-3 w-full"
                                 noValidate
                             >
-                                <p className="text-xs font-black text-gray-500 uppercase tracking-widest mb-1">
+                                <p className="text-xs font-black text-zinc-500 uppercase tracking-widest mb-1">
                                     Seus dados para contato
                                 </p>
 
@@ -94,7 +94,7 @@ const CallToActionComponent: React.FC = () => {
                                             value={fields.firstName}
                                             onChange={(event) => setField('firstName', event.target.value)}
                                             required
-                                            className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-gray-400"
+                                            className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-zinc-400"
                                         />
                                     </div>
                                     <div className="flex-1">
@@ -105,7 +105,7 @@ const CallToActionComponent: React.FC = () => {
                                             placeholder="Sobrenome"
                                             value={fields.lastName}
                                             onChange={(event) => setField('lastName', event.target.value)}
-                                            className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-gray-400"
+                                            className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-zinc-400"
                                         />
                                     </div>
                                 </div>
@@ -119,7 +119,7 @@ const CallToActionComponent: React.FC = () => {
                                         value={fields.whatsapp}
                                         onChange={(event) => setField('whatsapp', event.target.value)}
                                         required
-                                        className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-gray-400"
+                                        className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-zinc-400"
                                     />
                                 </div>
 
@@ -131,7 +131,7 @@ const CallToActionComponent: React.FC = () => {
                                         placeholder="E-mail (opcional)"
                                         value={fields.email}
                                         onChange={(event) => setField('email', event.target.value)}
-                                        className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-gray-400"
+                                        className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-zinc-400"
                                     />
                                 </div>
 
@@ -198,7 +198,7 @@ const CallToActionComponent: React.FC = () => {
                     {/* --- DIVIDER (Perforation) --- */}
                     <div className="relative w-full h-8 md:w-8 md:h-auto flex items-center justify-center">
                         {/* The Dashed Line */}
-                        <div className="w-full h-[2px] md:w-[2px] md:h-[90%] border-t-2 md:border-t-0 md:border-l-2 border-dashed border-gray-300"></div>
+                        <div className="w-full h-[2px] md:w-[2px] md:h-[90%] border-t-2 md:border-t-0 md:border-l-2 border-dashed border-zinc-300"></div>
 
                         {/* Mobile Holes (Left/Right) */}
                         <div className="md:hidden absolute -left-4 top-1/2 -translate-y-1/2 size-8 bg-brand-light rounded-full z-20"></div>
@@ -206,7 +206,7 @@ const CallToActionComponent: React.FC = () => {
                     </div>
 
                     {/* --- RIGHT SIDE: Stub / Details --- */}
-                    <div className="w-full md:w-[30%] bg-gray-50 p-6 flex flex-col relative">
+                    <div className="w-full md:w-[30%] bg-zinc-50 p-6 flex flex-col relative">
 
                         {/* Stub Header */}
                         <div className="flex justify-between items-center mb-5 opacity-60">
@@ -216,44 +216,44 @@ const CallToActionComponent: React.FC = () => {
 
                         {/* Passenger Name */}
                         <div className="mb-4">
-                            <span className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider mb-0.5">Passenger Name</span>
+                            <span className="block text-[9px] uppercase font-bold text-zinc-400 tracking-wider mb-0.5">Passenger Name</span>
                             <span className="block text-lg font-black text-brand-dark truncate">VOCÊ / VIP</span>
                         </div>
 
                         {/* Flight Details Grid */}
-                        <div className="grid grid-cols-2 gap-y-3 gap-x-2 mb-4 border-b-2 border-dashed border-gray-200 pb-4">
+                        <div className="grid grid-cols-2 gap-y-3 gap-x-2 mb-4 border-b-2 border-dashed border-zinc-200 pb-4">
                             <div>
-                                <span className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider">Flight</span>
-                                <span className="block text-sm font-bold font-mono text-gray-800">ANH 777</span>
+                                <span className="block text-[9px] uppercase font-bold text-zinc-400 tracking-wider">Flight</span>
+                                <span className="block text-sm font-bold font-mono text-zinc-800">ANH 777</span>
                             </div>
                             <div>
-                                <span className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider">Date</span>
-                                <span className="block text-sm font-bold font-mono text-gray-800">HOJE</span>
+                                <span className="block text-[9px] uppercase font-bold text-zinc-400 tracking-wider">Date</span>
+                                <span className="block text-sm font-bold font-mono text-zinc-800">HOJE</span>
                             </div>
                             <div>
-                                <span className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider">From</span>
-                                <span className="block text-base font-black text-gray-800">GRU</span>
+                                <span className="block text-[9px] uppercase font-bold text-zinc-400 tracking-wider">From</span>
+                                <span className="block text-base font-black text-zinc-800">GRU</span>
                             </div>
                             <div>
-                                <span className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider">To</span>
+                                <span className="block text-[9px] uppercase font-bold text-zinc-400 tracking-wider">To</span>
                                 <span className="block text-base font-black text-brand-vibrant">MUNDO</span>
                             </div>
                         </div>
 
                         {/* Critical Boarding Info (Boxed) */}
-                        <div className="bg-white rounded-xl border-2 border-gray-100 p-2 flex justify-between items-center shadow-sm mb-4">
+                        <div className="bg-white rounded-xl border-2 border-zinc-100 p-2 flex justify-between items-center shadow-sm mb-4">
                             <div className="text-center flex-1">
-                                <span className="block text-[8px] font-bold text-gray-400 uppercase tracking-wider">Gate</span>
+                                <span className="block text-[8px] font-bold text-zinc-400 uppercase tracking-wider">Gate</span>
                                 <span className="block text-xl font-black text-brand-dark">01</span>
                             </div>
-                            <div className="w-[1px] h-8 bg-gray-100"></div>
+                            <div className="w-[1px] h-8 bg-zinc-100"></div>
                             <div className="text-center flex-1">
-                                <span className="block text-[8px] font-bold text-gray-400 uppercase tracking-wider">Seat</span>
+                                <span className="block text-[8px] font-bold text-zinc-400 uppercase tracking-wider">Seat</span>
                                 <span className="block text-xl font-black text-brand-dark">1A</span>
                             </div>
-                            <div className="w-[1px] h-8 bg-gray-100"></div>
+                            <div className="w-[1px] h-8 bg-zinc-100"></div>
                             <div className="text-center flex-1">
-                                <span className="block text-[8px] font-bold text-gray-400 uppercase tracking-wider">Zone</span>
+                                <span className="block text-[8px] font-bold text-zinc-400 uppercase tracking-wider">Zone</span>
                                 <span className="block text-xl font-black text-brand-dark">1</span>
                             </div>
                         </div>
@@ -262,23 +262,23 @@ const CallToActionComponent: React.FC = () => {
                         <div className="mt-auto">
                             <div className="flex justify-between items-end mb-2">
                                 <div>
-                                    <span className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider">Boarding</span>
+                                    <span className="block text-[9px] uppercase font-bold text-zinc-400 tracking-wider">Boarding</span>
                                     <span className="block text-sm font-black text-red-500">AGORA</span>
                                 </div>
                                 <div className="text-right">
-                                    <span className="block text-[9px] uppercase font-bold text-gray-400 tracking-wider">SEQ</span>
-                                    <span className="block text-sm font-mono font-bold text-gray-600">001</span>
+                                    <span className="block text-[9px] uppercase font-bold text-zinc-400 tracking-wider">SEQ</span>
+                                    <span className="block text-sm font-mono font-bold text-zinc-600">001</span>
                                 </div>
                             </div>
 
                             {/* High Fidelity Barcode */}
-                            <div className="pt-2 border-t border-gray-200">
+                            <div className="pt-2 border-t border-zinc-200">
                                 {/* Barcode Lines */}
                                 <div className="flex justify-center items-stretch h-12 w-full overflow-hidden select-none bg-transparent gap-[1px]">
                                     {[4, 2, 1, 1, 3, 1, 2, 1, 4, 1, 1, 2, 3, 1, 2, 1, 3, 1, 1, 2, 1, 2, 1, 3, 1, 1, 2, 1, 4, 1, 2].map((w, i) => (
                                         <div
                                             key={`bar-start-${i}`}
-                                            className="bg-gray-950"
+                                            className="bg-zinc-950"
                                             style={{
                                                 width: `${w * 2}px`, // Thicker bars
                                                 flexShrink: 0
@@ -289,7 +289,7 @@ const CallToActionComponent: React.FC = () => {
                                     {[2, 1, 3, 1, 1, 2, 4, 1, 2, 1, 3, 1, 1, 2].map((w, i) => (
                                         <div
                                             key={`bar-end-${i}`}
-                                            className="bg-gray-950"
+                                            className="bg-zinc-950"
                                             style={{
                                                 width: `${w * 2}px`,
                                                 flexShrink: 0
@@ -300,10 +300,10 @@ const CallToActionComponent: React.FC = () => {
 
                                 {/* Ticket Number & Icons */}
                                 <div className="flex justify-between items-center mt-1">
-                                    <span className="font-mono text-[9px] font-bold tracking-[0.3em] text-gray-400 uppercase">
+                                    <span className="font-mono text-[9px] font-bold tracking-[0.3em] text-zinc-400 uppercase">
                                         ETKT 29384910239
                                     </span>
-                                    <DeviceMobile className="size-3 text-gray-300" weight="fill" />
+                                    <DeviceMobile className="size-3 text-zinc-300" weight="fill" />
                                 </div>
                             </div>
                         </div>

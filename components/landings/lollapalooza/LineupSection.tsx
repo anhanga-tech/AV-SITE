@@ -106,7 +106,7 @@ const LineupSection: React.FC = () => {
   ];
 
   return (
-    <section id="lineup" className="py-20 bg-gray-950 text-white relative overflow-hidden" aria-labelledby="lineup-heading" ref={elementRef}>
+    <section id="lineup" className="py-20 bg-zinc-950 text-white relative overflow-hidden" aria-labelledby="lineup-heading" ref={elementRef}>
       {/* Decorative blobs */}
       <div className="absolute top-0 right-0 size-64 bg-anhanga-blue opacity-20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" aria-hidden="true"></div>
       <div className="absolute bottom-0 left-0 size-96 bg-anhanga-yellow opacity-10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" aria-hidden="true"></div>
@@ -139,7 +139,7 @@ const LineupSection: React.FC = () => {
             </div>
           </div>
 
-          <div className="inline-flex items-center justify-center p-3 bg-gray-800 rounded-full mb-4 animate-pulse">
+          <div className="inline-flex items-center justify-center p-3 bg-zinc-800 rounded-full mb-4 animate-pulse">
             <Music className="text-anhanga-yellow" size={24} aria-hidden="true" />
           </div>
 
@@ -147,7 +147,7 @@ const LineupSection: React.FC = () => {
             Lineup <span className="text-anhanga-yellow pr-2">2026</span>
           </h2>
 
-          <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto font-light mb-8">
+          <p className="text-xl md:text-2xl text-zinc-300 max-w-4xl mx-auto font-light mb-8">
             Os maiores nomes da música mundial confirmados no Autódromo de Interlagos.
           </p>
         </div>
@@ -155,9 +155,9 @@ const LineupSection: React.FC = () => {
         {/* Headliners Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-20">
           {headliners.map((artist, index) => (
-            <div key={artist.name} className={`group relative h-96 sm:h-80 lg:h-96 overflow-hidden rounded-2xl border border-gray-800 hover:border-anhanga-yellow transition-all duration-300 animate-on-scroll ${isVisible ? 'is-visible' : ''}`} style={{ transitionDelay: `${index * 50}ms` }}>
+            <div key={artist.name} className={`group relative h-96 sm:h-80 lg:h-96 overflow-hidden rounded-2xl border border-zinc-800 hover:border-anhanga-yellow transition-all duration-300 animate-on-scroll ${isVisible ? 'is-visible' : ''}`} style={{ transitionDelay: `${index * 50}ms` }}>
               {/* Background Image - Optimized to 600px width */}
-              <div className="absolute inset-0 bg-gray-900">
+              <div className="absolute inset-0 bg-zinc-900">
                 <img
                   src={getArtistImageUrl(artist.image, 600)}
                   alt={artist.name}
@@ -191,22 +191,22 @@ const LineupSection: React.FC = () => {
 
         {/* Daily Lineup - Festival Poster Style */}
         <div className={`mb-16 animate-on-scroll ${isVisible ? 'is-visible' : ''}`} style={{ transitionDelay: '300ms' }}>
-          <h3 className="text-center text-3xl font-black text-white mb-10 uppercase tracking-widest border-b border-gray-800 pb-4">
+          <h3 className="text-center text-3xl font-black text-white mb-10 uppercase tracking-widest border-b border-zinc-800 pb-4">
             Programação por Dia
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {dailyLineup.map((day) => (
-              <div key={day.day} className="bg-gray-900 border border-gray-800 rounded-xl p-6 hover:border-anhanga-blue transition-colors">
+              <div key={day.day} className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-anhanga-blue transition-colors">
                 <div className="flex items-center gap-2 mb-6">
                   <Calendar className="text-anhanga-yellow" size={20} aria-hidden="true" />
-                  <span className="text-gray-400 font-bold uppercase text-sm tracking-wider">{day.day} • {day.date}</span>
+                  <span className="text-zinc-400 font-bold uppercase text-sm tracking-wider">{day.day} • {day.date}</span>
                 </div>
 
                 {/* Main Acts with Images - Optimized to 100px width for thumbnails */}
                 <div className="mb-6 space-y-4">
                   {day.main.map((act) => (
                     <div key={act.name} className="flex items-center gap-4 group/artist">
-                      <div className="size-12 rounded-full overflow-hidden border-2 border-gray-700 group-hover/artist:border-anhanga-yellow transition-colors shrink-0 bg-gray-800">
+                      <div className="size-12 rounded-full overflow-hidden border-2 border-zinc-700 group-hover/artist:border-anhanga-yellow transition-colors shrink-0 bg-zinc-800">
                         <img
                           src={getArtistImageUrl(act.image, 100, 100)}
                           alt={act.name}
@@ -226,7 +226,7 @@ const LineupSection: React.FC = () => {
                 </div>
 
                 {/* Other Acts */}
-                <p className="text-sm text-gray-400 leading-relaxed text-justify uppercase font-medium pt-4 border-t border-gray-800">
+                <p className="text-sm text-zinc-400 leading-relaxed text-justify uppercase font-medium pt-4 border-t border-zinc-800">
                   {day.others}
                 </p>
               </div>
@@ -235,19 +235,19 @@ const LineupSection: React.FC = () => {
         </div>
 
         {/* Value Proposition */}
-        <div className={`bg-gray-900/50 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-gray-800 animate-on-scroll ${isVisible ? 'is-visible' : ''}`} style={{ transitionDelay: '500ms' }}>
+        <div className={`bg-zinc-900/50 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-zinc-800 animate-on-scroll ${isVisible ? 'is-visible' : ''}`} style={{ transitionDelay: '500ms' }}>
           <div className="flex flex-col md:flex-row items-stretch gap-12">
             <div className="flex-1 flex flex-col justify-center">
               <h3 className="text-3xl font-bold mb-4 text-white">
                 <Zap className="inline-block mr-2 text-anhanga-yellow" aria-hidden="true" />
                 Foque apenas na música
               </h3>
-              <p className="text-gray-300 mb-6 leading-relaxed text-lg">
+              <p className="text-zinc-300 mb-6 leading-relaxed text-lg">
                 O Lollapalooza é gigante e a logística pode ser cansativa. Com nossos pacotes, você elimina o estresse do trânsito, a busca por hotéis e a insegurança na saída do festival.
               </p>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {['Chegada tranquila ao Autódromo', 'Descanso em hotel 4 estrelas', 'Suporte local para imprevistos', 'After-parties sugeridas'].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-base text-gray-200">
+                  <li key={item} className="flex items-center gap-3 text-base text-zinc-200">
                     <span className="flex-shrink-0 size-5 rounded-full bg-anhanga-blue flex items-center justify-center text-xs font-bold" aria-hidden="true">✓</span>
                     {item}
                   </li>
@@ -256,7 +256,7 @@ const LineupSection: React.FC = () => {
             </div>
 
             <div className="w-full md:w-1/3 p-6 bg-gradient-to-br from-anhanga-darkBlue to-black rounded-2xl border border-white/10 text-center flex flex-col justify-center">
-              <p className="text-gray-400 text-sm uppercase tracking-widest mb-2">Ingressos</p>
+              <p className="text-zinc-400 text-sm uppercase tracking-widest mb-2">Ingressos</p>
               <p className="text-white text-lg font-medium mb-6">
                 Compre os ingressos com a <span className="font-bold text-anhanga-yellow">Ticketmaster</span> e deixa que a gente cuida do resto.
               </p>
@@ -264,11 +264,11 @@ const LineupSection: React.FC = () => {
                 href="https://www.ticketmaster.com.br/event/lollapaloozabr?utm_source=site&utm_medium=site_festival&utm_campaign=ll-ingressos2026&utm_id=header&utm_term=botao_compreagora&utm_content=site_site_festival_header_ll-ingressos2026_botao_compreagora_contlol01090"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 w-full py-3 bg-white text-anhanga-darkBlue font-bold rounded-full hover:bg-gray-200 transition-colors focus:outline-none focus:ring-4 focus:ring-anhanga-yellow/50"
+                className="inline-flex items-center justify-center gap-2 w-full py-3 bg-white text-anhanga-darkBlue font-bold rounded-full hover:bg-zinc-200 transition-colors focus:outline-none focus:ring-4 focus:ring-anhanga-yellow/50"
               >
                 Comprar Ingresso <ExternalLink size={16} />
               </a>
-              <p className="text-[10px] text-gray-500 mt-4 opacity-70">
+              <p className="text-[10px] text-zinc-500 mt-4 opacity-70">
                 *A Anhangá vende apenas o pacote de viagem.
               </p>
             </div>

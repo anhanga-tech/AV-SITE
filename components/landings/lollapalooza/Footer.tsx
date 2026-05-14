@@ -7,7 +7,7 @@ const Footer: React.FC = () => {
   const runtimeMetadata = useFooterRuntimeMetadata();
 
   return (
-    <footer className="bg-gray-900 text-gray-400 py-12 border-t border-gray-800" role="contentinfo">
+    <footer className="bg-zinc-900 text-zinc-400 py-12 border-t border-zinc-800" role="contentinfo">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
           <div className="mb-4 md:mb-0">
@@ -21,7 +21,7 @@ const Footer: React.FC = () => {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 pt-8 text-center md:text-left text-sm">
+        <div className="border-t border-zinc-800 pt-8 text-center md:text-left text-sm">
           <p className="mb-2">© {runtimeMetadata ? `${runtimeMetadata.currentYear} ` : ''}Anhangá Viagens. Todos os direitos reservados.</p>
           <p>
             Anhangá Viagens - Especialistas em experiências.

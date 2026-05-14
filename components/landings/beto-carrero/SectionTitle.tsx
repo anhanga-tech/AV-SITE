@@ -14,7 +14,7 @@ const SectionTitle: React.FC<SectionTitleProps> = ({
   color = 'dark'
 }) => {
   const textColor = color === 'white' ? 'text-white' : 'text-fun-dark';
-  const subtitleColor = color === 'white' ? 'text-blue-100' : 'text-slate-600';
+  const subtitleColor = color === 'white' ? 'text-blue-100' : 'text-zinc-600';
 
   return (
     <div className={`mb-12 ${align === 'center' ? 'text-center' : 'text-left'}`}>

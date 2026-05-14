@@ -244,7 +244,7 @@ const VenueMap: React.FC = () => {
 
           {/* Informações / Lista de Distâncias */}
           {/* Aumentei o max-h no mobile de 50vh para 600px para evitar cortes no card */}
-          <div className="w-full md:w-1/3 p-6 md:p-8 bg-white flex flex-col border-r border-gray-100 h-auto flex-shrink-0">
+          <div className="w-full md:w-1/3 p-6 md:p-8 bg-white flex flex-col border-r border-zinc-100 h-auto flex-shrink-0">
             <div className="inline-flex items-center gap-2 text-anhanga-blue font-bold uppercase tracking-wider text-xs mb-3">
               <MapPin size={16} aria-hidden="true" /> Localização & Referências
             </div>
@@ -253,7 +253,7 @@ const VenueMap: React.FC = () => {
               Explore os arredores de <br /><span className="text-anhanga-yellow">Interlagos</span>
             </h3>
 
-            <p className="text-gray-500 text-sm mb-6">
+            <p className="text-zinc-500 text-sm mb-6">
               Clique nos pontos abaixo para ver detalhes.
             </p>
 
@@ -273,7 +273,7 @@ const VenueMap: React.FC = () => {
                     onClick={() => handleListClick(idx)}
                     className={`w-full text-left transition-all duration-300 rounded-xl border-2 group overflow-hidden relative ${activeIndex === idx
                       ? 'border-anhanga-blue shadow-xl ring-2 ring-blue-100 z-10'
-                      : 'border-gray-100 hover:border-anhanga-yellow hover:shadow-md'
+                      : 'border-zinc-100 hover:border-anhanga-yellow hover:shadow-md'
                       }`}
                   >
                     {/* Imagem de Fundo Otimizada */}
@@ -305,10 +305,10 @@ const VenueMap: React.FC = () => {
                           <style.Icon size={14} />
                         </div>
                         <div className="min-w-0">
-                          <p className={`font-bold text-sm leading-tight transition-colors ${activeIndex === idx ? 'text-anhanga-darkBlue whitespace-normal' : 'text-gray-800 truncate'}`}>
+                          <p className={`font-bold text-sm leading-tight transition-colors ${activeIndex === idx ? 'text-anhanga-darkBlue whitespace-normal' : 'text-zinc-800 truncate'}`}>
                             {poi.name}
                           </p>
-                          <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">
+                          <p className="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold">
                             {style.label}
                           </p>
                         </div>
@@ -319,7 +319,7 @@ const VenueMap: React.FC = () => {
                         ) : (
                           <>
                             <p className="font-black text-anhanga-darkBlue text-sm">{poi.distance}</p>
-                            <p className="text-xs text-gray-500 flex items-center justify-end gap-1">
+                            <p className="text-xs text-zinc-500 flex items-center justify-end gap-1">
                               <CarFront size={10} /> {poi.time}
                             </p>
                           </>
@@ -331,7 +331,7 @@ const VenueMap: React.FC = () => {
                     <div className={`relative z-10 grid transition-all duration-300 ease-in-out ${activeIndex === idx ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
                       }`}>
                       <div className="overflow-hidden min-h-0">
-                        <div className="p-3 pt-0 text-sm text-gray-600 border-t border-blue-100/50 mx-3 mt-1 space-y-3">
+                        <div className="p-3 pt-0 text-sm text-zinc-600 border-t border-blue-100/50 mx-3 mt-1 space-y-3">
 
                           {/* Descrição Geral */}
                           <div className="flex items-start gap-2 pt-3">
@@ -340,12 +340,12 @@ const VenueMap: React.FC = () => {
                           </div>
 
                           {/* Rota de Transporte Público */}
-                          <div className="bg-white/60 backdrop-blur-sm p-2.5 rounded-lg border border-gray-200">
-                            <div className="flex items-center gap-2 mb-1.5 text-gray-800 font-bold text-xs uppercase tracking-wide">
-                              <TrainFront size={12} className="text-gray-600" />
+                          <div className="bg-white/60 backdrop-blur-sm p-2.5 rounded-lg border border-zinc-200">
+                            <div className="flex items-center gap-2 mb-1.5 text-zinc-800 font-bold text-xs uppercase tracking-wide">
+                              <TrainFront size={12} className="text-zinc-600" />
                               Rota até o Autódromo (Transporte Público):
                             </div>
-                            <p className="text-xs text-gray-600 leading-snug pl-5 border-l-2 border-gray-300">
+                            <p className="text-xs text-zinc-600 leading-snug pl-5 border-l-2 border-zinc-300">
                               {poi.transitInfo}
                             </p>
                           </div>
@@ -363,7 +363,7 @@ const VenueMap: React.FC = () => {
               })}
             </div>
 
-            <div className="mt-4 pt-4 border-t border-gray-100 hidden md:block">
+            <div className="mt-4 pt-4 border-t border-zinc-100 hidden md:block">
               <div className="flex items-start gap-3 bg-blue-50 p-3 rounded-lg">
                 <Navigation className="text-anhanga-blue shrink-0 mt-0.5" size={16} />
                 <p className="text-xs text-blue-800 leading-snug">
@@ -374,7 +374,7 @@ const VenueMap: React.FC = () => {
           </div>
 
           {/* Mapa */}
-          <div className="w-full md:w-2/3 h-[400px] md:h-auto min-h-[400px] relative bg-gray-200">
+          <div className="w-full md:w-2/3 h-[400px] md:h-auto min-h-[400px] relative bg-zinc-200">
             <div
               ref={mapContainerRef}
               className="w-full h-full z-0 outline-none"

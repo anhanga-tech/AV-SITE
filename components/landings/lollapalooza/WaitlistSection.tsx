@@ -63,7 +63,7 @@ const WaitlistSection: React.FC = () => {
   return (
     <section
       id={WAITLIST_SECTION_ID}
-      className="relative scroll-mt-28 bg-gray-950 py-24 sm:py-32 overflow-hidden"
+      className="relative scroll-mt-28 bg-zinc-950 py-24 sm:py-32 overflow-hidden"
       aria-labelledby="waitlist-heading"
     >
       {/* Background Graphic Elements */}
@@ -98,7 +98,7 @@ const WaitlistSection: React.FC = () => {
               Não fique de fora do <span className="text-anhanga-yellow">Lolla 2027.</span>
             </m.h2>
 
-            <m.p variants={itemVariants} className="text-lg md:text-xl text-gray-400 font-medium leading-relaxed max-w-xl mb-12">
+            <m.p variants={itemVariants} className="text-lg md:text-xl text-zinc-400 font-medium leading-relaxed max-w-xl mb-12">
               A jornada de 2026 lotou em tempo recorde. Garanta seu lugar na lista de prioridade para a edição 2027 e receba avisos antecipados sobre pacotes, logística e condições exclusivas Anhangá.
             </m.p>
 
@@ -109,7 +109,7 @@ const WaitlistSection: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-black text-white uppercase tracking-wider mb-2">Prioridade Total</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed font-medium">Recepção de ofertas antes do lançamento público geral.</p>
+                  <p className="text-sm text-zinc-500 leading-relaxed font-medium">Recepção de ofertas antes do lançamento público geral.</p>
                 </div>
               </m.div>
 
@@ -119,7 +119,7 @@ const WaitlistSection: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-black text-white uppercase tracking-wider mb-2">Logística Hardcore</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed font-medium">Saiba primeiro os hotéis mais próximos e as rotas mais eficientes.</p>
+                  <p className="text-sm text-zinc-500 leading-relaxed font-medium">Saiba primeiro os hotéis mais próximos e as rotas mais eficientes.</p>
                 </div>
               </m.div>
             </div>
@@ -195,7 +195,7 @@ const WaitlistSection: React.FC = () => {
                     <div className="size-5 border-2 border-white/20 peer-checked:border-anhanga-yellow peer-checked:bg-anhanga-yellow transition-all duration-200 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-anhanga-yellow peer-focus-visible:outline-offset-2" />
                     <CheckCircle2 size={12} className="absolute text-black opacity-0 peer-checked:opacity-100 transition-opacity" />
                   </div>
-                  <span className="text-xs text-gray-400 leading-snug group-hover:text-gray-300 transition-colors">
+                  <span className="text-xs text-zinc-400 leading-snug group-hover:text-zinc-300 transition-colors">
                     Autorizo a Anhangá a me enviar novidades exclusivas conforme a{' '}
                     <a
                       href="https://www.anhanga.tur.br/politica-privacidade/"

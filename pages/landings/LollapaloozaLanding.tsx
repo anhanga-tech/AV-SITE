@@ -53,9 +53,9 @@ const LollapaloozaLanding: React.FC = () => {
         ]}
       />
       <FAQPageSchema items={LOLLAPALOOZA_FAQ_ITEMS} />
-      <div className="bg-[#fffdf5] py-2 border-b border-gray-100 relative z-[60]">
+      <div className="bg-[#fffdf5] py-2 border-b border-zinc-100 relative z-[60]">
         <div className="container mx-auto px-6">
-          <a href="https://www.anhanga.tur.br/" className="text-sm font-medium text-gray-500 hover:text-brand-cyan transition-colors flex items-center gap-1 font-sans">
+          <a href="https://www.anhanga.tur.br/" className="text-sm font-medium text-zinc-500 hover:text-brand-cyan transition-colors flex items-center gap-1 font-sans">
             ← Voltar para o site principal
           </a>
         </div>
@@ -74,10 +74,10 @@ const LollapaloozaLanding: React.FC = () => {
       <section className="bg-[#fffdf5] border-t border-brand-cyan/10 py-14">
         <div className="container mx-auto px-6 max-w-5xl">
           <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">2026 encerrou forte. 2027 já está no radar.</h2>
-          <p className="text-gray-700 text-lg leading-relaxed mb-5">
+          <p className="text-zinc-700 text-lg leading-relaxed mb-5">
             A página do <strong>Lollapalooza Brasil</strong> continua no ar porque a campanha 2026 foi um sucesso e segue relevante para quem pesquisa logística, hotel e planejamento de festival em São Paulo. Agora, o foco é transformar essa procura em prioridade para a próxima edição.
           </p>
-          <p className="text-gray-700 text-lg leading-relaxed mb-5">
+          <p className="text-zinc-700 text-lg leading-relaxed mb-5">
             Se você quer chegar antes da próxima abertura, entre na <strong>Lista de Espera Lolla 2027</strong>. A <strong>Anhangá Viagens</strong> é uma{' '}
             <a href="https://www.anhanga.tur.br/" className="text-brand-cyan font-semibold hover:underline">
               agência de viagens em São Paulo
@@ -85,20 +85,20 @@ const LollapaloozaLanding: React.FC = () => {
             com foco em atendimento consultivo e <strong>viagens personalizadas</strong>, do planejamento inicial ao suporte no destino.
           </p>
           <h3 className="text-xl md:text-2xl font-extrabold text-brand-dark mb-3">O que segue valendo para quem quer ir ao festival</h3>
-          <ul className="list-disc list-inside text-gray-700 space-y-1 mb-6">
+          <ul className="list-disc list-inside text-zinc-700 space-y-1 mb-6">
             <li>Hospedagem próxima a rotas de acesso ao festival</li>
             <li>Transporte com melhor custo-benefício (Linha 9 – Esmeralda ou Lolla Express)</li>
             <li>Planejamento diário para os três dias de evento</li>
             <li>Suporte rápido para ajustes durante a viagem</li>
             <li>Curadoria de restaurantes e experiências em São Paulo ao redor do festival</li>
           </ul>
-          <p className="text-gray-700 text-lg leading-relaxed mb-6">
+          <p className="text-zinc-700 text-lg leading-relaxed mb-6">
             Enquanto a próxima edição não abre, você também pode explorar outros roteiros da Anhangá e continuar pesquisando o festival com a referência desta landing evergreen.
           </p>
           <div className="flex flex-wrap gap-3">
             <a
               href={`#${WAITLIST_SECTION_ID}`}
-              className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors"
+              className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors"
               data-tracking="footer-lollapalooza-waitlist"
             >
               Entrar na lista de espera 2027
@@ -113,13 +113,13 @@ const LollapaloozaLanding: React.FC = () => {
             >
               Falar com especialista
             </button>
-            <a href="https://www.anhanga.tur.br/orlando/" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+            <a href="https://www.anhanga.tur.br/orlando/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ver pacotes para Orlando
             </a>
-            <a href="https://www.anhanga.tur.br/" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+            <a href="https://www.anhanga.tur.br/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Conhecer a Anhangá Viagens
             </a>
-            <a href="/blog" className="px-5 py-3 rounded-full bg-white border border-gray-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+            <a href="/blog" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ler guia de festivais
             </a>
           </div>
