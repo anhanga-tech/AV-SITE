@@ -28,7 +28,6 @@ const BrazilPromotionDayLanding = lazy(() => import('./pages/landings/BrazilProm
 const ConsultoriaDeViagemLanding = lazy(() => import('./pages/landings/ConsultoriaDeViagemLanding'));
 const ViagensParaExecutivosLanding = lazy(() => import('./pages/landings/ViagensParaExecutivosLanding'));
 const CuradoriaCruzeirosBrasilLanding = lazy(() => import('./pages/landings/CuradoriaCruzeirosBrasilLanding'));
-const KeystaticPage = lazy(() => import('./pages/KeystaticPage'));
 const NPS = lazy(() => import('./pages/NPS'));
 const QuizAnhangaLanding = lazy(() => import('./pages/landings/QuizAnhangaLanding'));
 
@@ -74,8 +73,6 @@ const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClient
       <ScrollToTop />
       <Suspense fallback={<LandingRouteFallback />}>
         <Routes>
-          {/* Admin Keystatic — fora do layout principal, antes de todas as outras rotas */}
-          <Route path="/keystatic/*" element={<KeystaticPage />} />
           <Route path="/beto-carrero" element={<BetoCarreroLanding />} />
           <Route path="/lollapalooza" element={<LollapaloozaLanding />} />
           <Route path="/lollapalooza-2026" element={<Navigate to="/lollapalooza" replace />} />

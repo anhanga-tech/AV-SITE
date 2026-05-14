@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "@google/genai": "^1.52.0",
-    "@keystatic/core": "^0.5.50",
     "@mdx-js/react": "^3.1.1",
     "@mdx-js/rollup": "^3.1.1",
     "@phosphor-icons/react": "^2.1.10",
