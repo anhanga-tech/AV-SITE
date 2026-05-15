@@ -134,7 +134,7 @@ const Highlights = memo(() => {
                                     e.preventDefault();
                                     openContactModal({ source: 'highlights' });
                                 }}
-                                className="flex items-center justify-center gap-3 w-full bg-brand-dark text-white px-6 py-4 rounded-xl font-bold transition-all duration-300 ease-spring shadow-[4px_4px_0px_#94a3b8] hover:shadow-[2px_2px_0px_#94a3b8] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
+                                className="flex items-center justify-center gap-3 w-full bg-brand-dark text-white px-6 py-4 rounded-xl font-bold transition duration-300 ease-spring shadow-[4px_4px_0px_#94a3b8] hover:shadow-[2px_2px_0px_#94a3b8] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
                             >
                                 <ShieldCheck className="size-5" weight="fill" />
                                 <span>Falar com Especialista</span>
@@ -212,7 +212,7 @@ const Highlights = memo(() => {
                                         </p>
 
                                         {/* Corner Arrow */}
-                                        <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
+                                        <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition duration-300 transform translate-x-4 group-hover:translate-x-0">
                                             <ArrowRight className={`size-5 ${item.iconColor}`} />
                                         </div>
                                     </m.div>

@@ -539,7 +539,7 @@ const Destinations: React.FC = memo(() => {
                             <button
                                 key={filter}
                                 onClick={() => setActiveFilter(filter)}
-                                className={`px-5 py-2 rounded-lg text-sm font-bold border-2 transition-all whitespace-nowrap flex-shrink-0 shadow-[3px_3px_0px_rgba(0,0,0,0.1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] ${activeFilter === filter
+                                className={`px-5 py-2 rounded-lg text-sm font-bold border-2 transition whitespace-nowrap flex-shrink-0 shadow-[3px_3px_0px_rgba(0,0,0,0.1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] ${activeFilter === filter
                                     ? 'bg-brand-dark text-white border-brand-dark transform -rotate-1'
                                     : 'bg-white text-zinc-600 border-zinc-100 hover:border-brand-vibrant hover:text-brand-vibrant'
                                     }`}
@@ -580,14 +580,14 @@ const Destinations: React.FC = memo(() => {
                         <div className="absolute bottom-6 right-6 flex flex-col gap-2 z-[400]">
                             <button
                                 onClick={() => handleZoom('in')}
-                                className="size-10 bg-white border-2 border-zinc-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all text-zinc-700 font-black"
+                                className="size-10 bg-white border-2 border-zinc-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition text-zinc-700 font-black"
                                 aria-label="Aumentar zoom no mapa"
                             >
                                 <Plus className="size-5" />
                             </button>
                             <button
                                 onClick={() => handleZoom('out')}
-                                className="size-10 bg-white border-2 border-zinc-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all text-zinc-700 font-black"
+                                className="size-10 bg-white border-2 border-zinc-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition text-zinc-700 font-black"
                                 aria-label="Diminuir zoom no mapa"
                             >
                                 <Minus className="size-5" />
@@ -613,7 +613,7 @@ const Destinations: React.FC = memo(() => {
                             tabIndex={0}
                             role="button"
                             aria-label={`Ver detalhes de ${dest.city}, ${dest.country}`}
-                            className="group bg-white rounded-[2rem] border-2 border-zinc-100 p-4 pb-0 shadow-[6px_6px_0px_rgba(0,0,0,0.05)] hover:shadow-[10px_10px_0px_rgba(0,0,0,0.08)] hover:-translate-y-2 transition-all cursor-pointer flex flex-col focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-cyan"
+                            className="group bg-white rounded-[2rem] border-2 border-zinc-100 p-4 pb-0 shadow-[6px_6px_0px_rgba(0,0,0,0.05)] hover:shadow-[10px_10px_0px_rgba(0,0,0,0.08)] hover:-translate-y-2 transition cursor-pointer flex flex-col focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-cyan"
                             onClick={() => setSelectedDestination(dest)}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' || e.key === ' ') {
@@ -646,7 +646,7 @@ const Destinations: React.FC = memo(() => {
                                 </div>
                                 <p className="text-zinc-500 text-sm font-medium mb-4">{dest.description}</p>
 
-                                <div className="flex items-center gap-2 text-brand-cyan font-bold text-sm uppercase tracking-wide group-hover:gap-3 transition-all">
+                                <div className="flex items-center gap-2 text-brand-cyan font-bold text-sm uppercase tracking-wide group-hover:gap-3 transition-[gap,color]">
                                     Saiba Mais <ArrowRight className="size-4" />
                                 </div>
                             </div>
@@ -716,7 +716,7 @@ const Destinations: React.FC = memo(() => {
                                     <Link
                                         to={selectedDestination.landingPage}
                                         onClick={() => setSelectedDestination(null)}
-                                        className="w-full bg-white border-2 border-brand-dark text-brand-dark py-4 rounded-xl font-black text-lg hover:bg-zinc-50 transition-all shadow-[4px_4px_0px_#0f172a] active:shadow-none active:translate-y-1 flex items-center justify-center gap-2"
+                                        className="w-full bg-white border-2 border-brand-dark text-brand-dark py-4 rounded-xl font-black text-lg hover:bg-zinc-50 transition shadow-[4px_4px_0px_#0f172a] active:shadow-none active:translate-y-1 flex items-center justify-center gap-2"
                                     >
                                         Ver detalhes do pacote <ArrowRight className="size-5" />
                                     </Link>
@@ -730,7 +730,7 @@ const Destinations: React.FC = memo(() => {
                                         });
                                         setSelectedDestination(null);
                                     }}
-                                    className={`btn-whatsapp btn-specialist w-full bg-brand-dark text-white py-4 rounded-xl font-black text-lg hover:bg-brand-vibrant transition-all shadow-[4px_4px_0px_#94a3b8] active:shadow-none active:translate-y-1 flex items-center justify-center gap-2`}
+                                    className={`btn-whatsapp btn-specialist w-full bg-brand-dark text-white py-4 rounded-xl font-black text-lg hover:bg-brand-vibrant transition shadow-[4px_4px_0px_#94a3b8] active:shadow-none active:translate-y-1 flex items-center justify-center gap-2`}
                                     data-tracking={`modal-destinations-${selectedDestination.city.toLowerCase()}`}
                                 >
                                     Solicitar Orçamento

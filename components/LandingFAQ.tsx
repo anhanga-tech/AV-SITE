@@ -16,7 +16,7 @@ const FAQItemComponent = memo(({ question, answer, isOpen, idx, onToggle }: FAQI
     const toggleFaqItem = useCallback(() => onToggle(idx), [idx, onToggle]);
     return (
         <div
-            className={`border-b border-brand-cyan/10 last:border-0 transition-all duration-300 ${isOpen ? 'bg-white/40' : ''}`}
+            className={`border-b border-brand-cyan/10 last:border-0 transition duration-300 ${isOpen ? 'bg-white/40' : ''}`}
         >
             <button
                 className="w-full py-6 flex justify-between items-center text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan group"
@@ -26,14 +26,14 @@ const FAQItemComponent = memo(({ question, answer, isOpen, idx, onToggle }: FAQI
                 <h3 className="text-xl font-bold text-brand-dark group-hover:text-brand-cyan transition-colors pr-8">
                     {question}
                 </h3>
-                <div className={`flex-shrink-0 size-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                <div className={`flex-shrink-0 size-8 rounded-full flex items-center justify-center transition duration-300 ${
                     isOpen ? 'bg-brand-cyan text-white rotate-180' : 'bg-brand-light text-brand-cyan'
                 }`}>
                     {isOpen ? <ChevronUp className="size-5" /> : <ChevronDown className="size-5" />}
                 </div>
             </button>
             <div
-                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                className={`overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out ${
                     isOpen ? 'max-h-[500px] opacity-100 pb-8' : 'max-h-0 opacity-0'
                 }`}
             >

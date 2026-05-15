@@ -56,7 +56,7 @@ const Testimonials: React.FC = () => {
              return (
               <div 
                 key={t.id} 
-                className={`bg-white text-fun-dark p-8 rounded-sm shadow-hard border-4 border-white transition-all duration-300 group hover:scale-105 hover:z-20 relative flex flex-col ${rotationClasses[idx % 3]}`}
+                className={`bg-white text-fun-dark p-8 rounded-sm shadow-hard border-4 border-white transition duration-300 group hover:scale-105 hover:z-20 relative flex flex-col ${rotationClasses[idx % 3]}`}
               >
                  {/* Tape Effect (Top Center) */}
                  <div className={`absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-10 ${tapeColors[idx % 3]} backdrop-blur-sm shadow-sm transform -rotate-1 border-l-2 border-r-2 border-white/20 z-20`}></div>

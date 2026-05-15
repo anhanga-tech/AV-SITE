@@ -83,7 +83,7 @@ const Attractions: React.FC = () => {
           {attractions.map((item) => (
             <div
               key={item.id}
-              className={`group relative bg-white p-5 pb-8 rounded-[2rem] border-4 border-fun-dark shadow-hard transition-all duration-300 hover:-translate-y-3 hover:shadow-hard-hover hover:z-20 ${item.rotation}`}
+              className={`group relative bg-white p-5 pb-8 rounded-[2rem] border-4 border-fun-dark shadow-hard transition duration-300 hover:-translate-y-3 hover:shadow-hard-hover hover:z-20 ${item.rotation}`}
             >
               {/* Tape Effect on Card */}
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-28 h-10 bg-white/40 backdrop-blur-sm border-l-2 border-r-2 border-white/60 transform rotate-1 shadow-sm z-20"></div>
@@ -116,7 +116,7 @@ const Attractions: React.FC = () => {
               </div>
 
               {/* Hover Action "Sticker" */}
-              <div className="absolute -bottom-5 -right-5 bg-fun-dark text-white p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-0 group-hover:scale-100 rotate-12 border-2 border-white shadow-lg">
+              <div className="absolute -bottom-5 -right-5 bg-fun-dark text-white p-3 rounded-full opacity-0 group-hover:opacity-100 transition duration-300 transform scale-0 group-hover:scale-100 rotate-12 border-2 border-white shadow-lg">
                 <Camera size={28} />
               </div>
             </div>

@@ -98,7 +98,7 @@ const App: React.FC = () => {
          3. Shadow appears only on scroll (shadow-hard).
       */}
       <nav
-        className={`fixed top-0 left-0 right-0 bg-white border-fun-dark z-50 transition-all duration-300 ease-in-out border-b-4 ${isScrolled
+        className={`fixed top-0 left-0 right-0 bg-white border-fun-dark z-50 transition-[padding,box-shadow] duration-300 ease-in-out border-b-4 ${isScrolled
           ? 'py-3 shadow-hard' // Scrolled: Compact padding, Solid Shadow
           : 'py-5 md:py-6 shadow-none' // Top: Spacious, No shadow
           }`}
@@ -121,7 +121,7 @@ const App: React.FC = () => {
               width="154"
               height="80"
               fetchPriority="high"
-              className={`transition-all duration-300 w-auto ${isScrolled ? 'h-9 md:h-16' : 'h-10 md:h-20'}`}
+              className={`transition-[height] duration-300 w-auto ${isScrolled ? 'h-9 md:h-16' : 'h-10 md:h-20'}`}
             />
           </a>
           <div className="hidden lg:flex items-center gap-8 xl:gap-12">
@@ -153,7 +153,7 @@ const App: React.FC = () => {
                 text="Falar no WhatsApp"
                 variant="secondary"
                 icon={true}
-                className={`transition-all duration-300 ${isScrolled ? 'py-1 px-3 text-xs lg:py-1.5 lg:px-4 lg:text-sm' : 'py-1.5 px-4 text-sm lg:py-2 lg:px-5 lg:text-base'}`}
+                className={`transition-[padding,font-size] duration-300 ${isScrolled ? 'py-1 px-3 text-xs lg:py-1.5 lg:px-4 lg:text-sm' : 'py-1.5 px-4 text-sm lg:py-2 lg:px-5 lg:text-base'}`}
                 tooltip="Atendimento rápido"
                 tooltipPosition="bottom"
                 dataTracking="navbar-desktop-betocarrero"
@@ -171,7 +171,7 @@ const App: React.FC = () => {
           </div>
 
           {/* Mobile Menu Dropdown */}
-          <div className={`absolute top-full left-0 w-full bg-white border-b-4 border-fun-dark shadow-hard p-6 flex flex-col gap-6 lg:hidden transition-all duration-300 origin-top ${mobileMenuOpen ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0 pointer-events-none'}`}>
+          <div className={`absolute top-full left-0 w-full bg-white border-b-4 border-fun-dark shadow-hard p-6 flex flex-col gap-6 lg:hidden transition duration-300 origin-top ${mobileMenuOpen ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0 pointer-events-none'}`}>
             {navLinks.map((link) => (
               <a
                 key={link.name}
@@ -209,7 +209,7 @@ const App: React.FC = () => {
       </div>
 
       {/* Desktop Sticky Bubble */}
-      <div className={`fixed bottom-8 right-8 transition-all duration-500 z-50 hidden xl:block ${showSticky ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}>
+      <div className={`fixed bottom-8 right-8 transition duration-500 z-50 hidden xl:block ${showSticky ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}>
         <Button text="Orçamento Rápido" tooltip="Receba em poucos minutos" dataTracking="sticky-desktop-betocarrero" />
       </div>
 

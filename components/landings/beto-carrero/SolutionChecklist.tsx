@@ -35,7 +35,7 @@ export function SolutionChecklist({ onOpenModal }: SolutionChecklistProps) {
           {/* Left Side: Content */}
           <div className="p-3 pl-4 lg:p-6 lg:pl-8 flex-grow flex items-center gap-4 lg:gap-6">
             {/* Redesigned Icon: Blue Circle Token */}
-            <div className="size-14 lg:size-20 bg-fun-blue rounded-full flex items-center justify-center border-2 border-fun-dark shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] text-white transform -rotate-6 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300 flex-shrink-0">
+            <div className="size-14 lg:size-20 bg-fun-blue rounded-full flex items-center justify-center border-2 border-fun-dark shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] text-white transform -rotate-6 group-hover:rotate-0 group-hover:scale-110 transition duration-300 flex-shrink-0">
               <Plane className="size-6 lg:size-9" strokeWidth={2.5} />
             </div>
             <div>
@@ -50,7 +50,7 @@ export function SolutionChecklist({ onOpenModal }: SolutionChecklistProps) {
           </div>
           {/* Right Side: Stamp */}
           <div className="w-16 lg:w-20 bg-gray-50 flex items-center justify-center flex-shrink-0">
-            <div className="bg-green-100 text-green-600 border-2 border-green-500 size-8 lg:size-10 rounded-full flex items-center justify-center transform rotate-12 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all">
+            <div className="bg-green-100 text-green-600 border-2 border-green-500 size-8 lg:size-10 rounded-full flex items-center justify-center transform rotate-12 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition">
               <Check className="size-[18px] lg:size-6" strokeWidth={3} />
             </div>
           </div>
@@ -60,7 +60,7 @@ export function SolutionChecklist({ onOpenModal }: SolutionChecklistProps) {
         <div className="group bg-white rounded-xl border-2 border-fun-dark shadow-hard transform rotate-1 hover:rotate-0 transition-transform duration-300 flex overflow-hidden ml-0 md:ml-12 lg:ml-12 w-full max-w-sm lg:max-w-md">
           <div className="p-3 pl-4 lg:p-6 lg:pl-8 flex-grow flex items-center gap-4 lg:gap-6">
             {/* Redesigned Icon: Yellow Circle Token */}
-            <div className="size-14 lg:size-20 bg-fun-yellow rounded-full flex items-center justify-center border-2 border-fun-dark shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] text-fun-dark transform rotate-3 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300 flex-shrink-0">
+            <div className="size-14 lg:size-20 bg-fun-yellow rounded-full flex items-center justify-center border-2 border-fun-dark shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] text-fun-dark transform rotate-3 group-hover:rotate-0 group-hover:scale-110 transition duration-300 flex-shrink-0">
               <BedDouble className="size-6 lg:size-9" strokeWidth={2.5} />
             </div>
             <div>
@@ -73,7 +73,7 @@ export function SolutionChecklist({ onOpenModal }: SolutionChecklistProps) {
             <div className="absolute -bottom-3 -left-1.5 size-3 bg-fun-blue rounded-full"></div>
           </div>
           <div className="w-16 lg:w-20 bg-gray-50 flex items-center justify-center flex-shrink-0">
-            <div className="bg-green-100 text-green-600 border-2 border-green-500 size-8 lg:size-10 rounded-full flex items-center justify-center transform -rotate-6 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all">
+            <div className="bg-green-100 text-green-600 border-2 border-green-500 size-8 lg:size-10 rounded-full flex items-center justify-center transform -rotate-6 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition">
               <Check className="size-[18px] lg:size-6" strokeWidth={3} />
             </div>
           </div>
@@ -95,7 +95,7 @@ export function SolutionChecklist({ onOpenModal }: SolutionChecklistProps) {
         >
           <div className="p-3 pl-4 lg:p-6 lg:pl-8 flex-grow flex items-center gap-4 lg:gap-6">
             {/* Redesigned Icon: Pink Circle Token */}
-            <div className="size-14 lg:size-20 bg-fun-pink rounded-full flex items-center justify-center border-2 border-fun-dark shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] text-white transform -rotate-3 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300 flex-shrink-0">
+            <div className="size-14 lg:size-20 bg-fun-pink rounded-full flex items-center justify-center border-2 border-fun-dark shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] text-white transform -rotate-3 group-hover:rotate-0 group-hover:scale-110 transition duration-300 flex-shrink-0">
               <Ticket className="size-6 lg:size-9" strokeWidth={2.5} />
             </div>
             <div>
@@ -108,7 +108,7 @@ export function SolutionChecklist({ onOpenModal }: SolutionChecklistProps) {
             <div className="absolute -bottom-3 -left-1.5 size-3 bg-fun-blue rounded-full"></div>
           </div>
           <div className="w-16 lg:w-20 bg-gray-50 flex items-center justify-center flex-shrink-0">
-            <div className="bg-green-100 text-green-600 border-2 border-green-500 size-8 lg:size-10 rounded-full flex items-center justify-center transform rotate-3 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all">
+            <div className="bg-green-100 text-green-600 border-2 border-green-500 size-8 lg:size-10 rounded-full flex items-center justify-center transform rotate-3 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition">
               <Check className="size-[18px] lg:size-6" strokeWidth={3} />
             </div>
           </div>
@@ -124,7 +124,7 @@ export function SolutionChecklist({ onOpenModal }: SolutionChecklistProps) {
 
         <button
           onClick={onOpenModal}
-          className="bg-fun-yellow p-8 w-full rounded-xl border-4 border-fun-dark shadow-hard-lg transform -rotate-3 hover:rotate-0 hover:scale-105 active:scale-95 transition-all duration-300 text-left group focus:outline-none focus:ring-4 focus:ring-fun-blue focus:ring-offset-2"
+          className="bg-fun-yellow p-8 w-full rounded-xl border-4 border-fun-dark shadow-hard-lg transform -rotate-3 hover:rotate-0 hover:scale-105 active:scale-95 transition duration-300 text-left group focus:outline-none focus:ring-4 focus:ring-fun-blue focus:ring-offset-2"
           aria-label="Saiba mais sobre estender a viagem para praias próximas"
         >
 

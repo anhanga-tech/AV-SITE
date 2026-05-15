@@ -23,7 +23,7 @@ export const BlogPostFinalCTA: React.FC<BlogPostFinalCTAProps> = ({ post }) => {
                     source: 'blog-post-footer',
                     message: `Olá! Li o post "${post.title}" e gostaria de planejar minha viagem.`,
                 })}
-                className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-brand-cyan text-white text-lg font-bold px-10 py-5 rounded-2xl shadow-[4px_4px_0px_#FFD600] hover:shadow-[2px_2px_0px_#FFD600] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all relative z-10"
+                className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-brand-cyan text-white text-lg font-bold px-10 py-5 rounded-2xl shadow-[4px_4px_0px_#FFD600] hover:shadow-[2px_2px_0px_#FFD600] hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition relative z-10"
                 data-tracking="footer-blog-post"
             >
                 Conversar com um Especialista

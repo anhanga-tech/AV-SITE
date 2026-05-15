@@ -135,7 +135,7 @@ const Testimonials: React.FC = memo(() => {
                                 <button
                                     key={t.name}
                                     onClick={() => setCurrentIndex(i)}
-                                    className={`h-2 rounded-full transition-all duration-300 ${i === currentIndex ? 'bg-brand-cyan w-8' : 'bg-brand-cyan/20 w-2 hover:bg-brand-cyan/40'}`}
+                                    className={`h-2 rounded-full transition-[width,background-color] duration-300 ${i === currentIndex ? 'bg-brand-cyan w-8' : 'bg-brand-cyan/20 w-2 hover:bg-brand-cyan/40'}`}
                                     aria-label={`Ir para depoimento ${i + 1}`}
                                 />
                             ))}

@@ -41,7 +41,7 @@ export function VenuePoiList({ pois, activeIndex, listContainerRef, itemsRef, on
                 itemsRef.current[idx] = el;
               }}
               onClick={() => onItemClick(idx)}
-              className={`w-full text-left transition-all duration-300 rounded-xl border-2 group overflow-hidden relative ${activeIndex === idx
+              className={`w-full text-left transition duration-300 rounded-xl border-2 group overflow-hidden relative ${activeIndex === idx
                 ? 'border-anhanga-blue shadow-xl ring-2 ring-blue-100 z-10'
                 : 'border-gray-100 hover:border-anhanga-yellow hover:shadow-md'
                 }`}
@@ -98,7 +98,7 @@ export function VenuePoiList({ pois, activeIndex, listContainerRef, itemsRef, on
               </div>
 
               {/* Detalhes Expandidos */}
-              <div className={`relative z-10 grid transition-all duration-300 ease-in-out ${activeIndex === idx ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+              <div className={`relative z-10 grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${activeIndex === idx ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
                 }`}>
                 <div className="overflow-hidden min-h-0">
                   <div className="p-3 pt-0 text-sm text-gray-600 border-t border-blue-100/50 mx-3 mt-1 space-y-3">

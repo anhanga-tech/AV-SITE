@@ -54,7 +54,7 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
                         prose md:prose-lg max-w-none
                         prose-headings:font-sans prose-headings:font-black prose-headings:tracking-tight prose-headings:text-brand-dark
                         prose-p:font-serif prose-p:text-zinc-600 prose-p:leading-relaxed prose-p:mb-6
-                        prose-a:text-brand-cyan prose-a:font-bold prose-a:no-underline prose-a:border-b-2 prose-a:border-brand-cyan/30 hover:prose-a:border-brand-cyan hover:prose-a:text-brand-cyanDark hover:prose-a:bg-brand-cyan/5 prose-a:transition-all
+                        prose-a:text-brand-cyan prose-a:font-bold prose-a:no-underline prose-a:border-b-2 prose-a:border-brand-cyan/30 hover:prose-a:border-brand-cyan hover:prose-a:text-brand-cyanDark hover:prose-a:bg-brand-cyan/5 prose-a:transition
                         prose-strong:text-brand-dark prose-strong:font-black
                         prose-ul:list-disc prose-ul:pl-6 prose-ul:marker:text-brand-yellow
                         prose-li:font-serif prose-li:text-zinc-600
@@ -99,7 +99,7 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
                 </h3>
                 <div className="grid sm:grid-cols-2 gap-6">
                     {relatedPosts.map(related => (
-                        <a href={getBlogPostUrl(related.slug)} key={`mobile-${related.slug}`} className="group flex flex-col bg-white rounded-2xl overflow-hidden border border-zinc-100 shadow-sm hover:shadow-md transition-all">
+                        <a href={getBlogPostUrl(related.slug)} key={`mobile-${related.slug}`} className="group flex flex-col bg-white rounded-2xl overflow-hidden border border-zinc-100 shadow-sm hover:shadow-md transition">
                             <div className="aspect-video w-full overflow-hidden relative">
                                 <img src={optimizeRemoteImageUrl(related.image, 400, 225)} alt={related.title} width="400" height="225" loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                 <div className="absolute top-3 left-3">

@@ -161,7 +161,7 @@ const DestinationField = memo(({
 
   return (
     <div
-      className="w-full md:flex-[1.5] p-3 md:p-6 relative group text-left cursor-text hover:bg-zinc-50/80 transition-all duration-300 rounded-t-[2rem] md:rounded-tl-[2rem] md:rounded-tr-none"
+      className="w-full md:flex-[1.5] p-3 md:p-6 relative group text-left cursor-text hover:bg-zinc-50/80 transition duration-300 rounded-t-[2rem] md:rounded-tl-[2rem] md:rounded-tr-none"
       ref={destRef}
     >
       <label htmlFor="destination-input" className="block text-[10px] font-black text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-focus-within:text-brand-cyan transition-colors">
@@ -267,7 +267,7 @@ const DateField = memo(({
     <button
       type="button"
       onClick={onToggle}
-      className="w-full p-3 md:p-6 text-left hover:bg-zinc-50/80 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
+      className="w-full p-3 md:p-6 text-left hover:bg-zinc-50/80 transition duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
       aria-expanded={showCalendar}
       aria-haspopup="grid"
       data-testid="dates-filter-btn"
@@ -318,7 +318,7 @@ const DateField = memo(({
                 onClick={() => onDateClick(date)}
                 disabled={past}
                 aria-disabled={past}
-                className={`size-9 mx-auto flex items-center justify-center text-sm rounded-full transition-all duration-200 border-2
+                className={`size-9 mx-auto flex items-center justify-center text-sm rounded-full transition duration-200 border-2
                   ${past ? 'border-transparent text-zinc-300 cursor-not-allowed' : selected ? 'bg-brand-cyan border-brand-cyan text-white font-bold scale-110' : inRange ? 'bg-brand-light border-transparent text-brand-cyan font-bold' : 'border-transparent text-zinc-600 hover:bg-zinc-100'}`}
               >
                 {date.getDate()}
@@ -363,7 +363,7 @@ const GuestsField = memo(({
     <button
       type="button"
       onClick={onToggle}
-      className="w-full p-3 md:p-6 text-left hover:bg-zinc-50/80 transition-all duration-300 md:rounded-tr-[2rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
+      className="w-full p-3 md:p-6 text-left hover:bg-zinc-50/80 transition duration-300 md:rounded-tr-[2rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
       aria-expanded={showGuestDropdown}
       aria-haspopup="true"
       data-testid="guests-filter-btn"
@@ -386,7 +386,7 @@ const GuestsField = memo(({
               type="button"
               onClick={(event) => { event.preventDefault(); event.stopPropagation(); onAdultsChange(Math.max(1, adults - 1)); }}
               disabled={adults <= 1}
-              className="size-8 rounded-full border-2 border-zinc-200 flex items-center justify-center text-zinc-600 hover:border-brand-cyan hover:text-brand-cyan transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="size-8 rounded-full border-2 border-zinc-200 flex items-center justify-center text-zinc-600 hover:border-brand-cyan hover:text-brand-cyan transition disabled:opacity-40 disabled:cursor-not-allowed"
               aria-label="Remover um adulto"
             >
               <Minus className="size-4" />
@@ -395,7 +395,7 @@ const GuestsField = memo(({
             <button
               type="button"
               onClick={(event) => { event.preventDefault(); event.stopPropagation(); onAdultsChange(adults + 1); }}
-              className="size-8 rounded-full border-2 border-zinc-200 flex items-center justify-center text-zinc-600 hover:border-brand-cyan hover:text-brand-cyan transition-all"
+              className="size-8 rounded-full border-2 border-zinc-200 flex items-center justify-center text-zinc-600 hover:border-brand-cyan hover:text-brand-cyan transition"
               aria-label="Adicionar um adulto"
             >
               <Plus className="size-4" />
@@ -409,7 +409,7 @@ const GuestsField = memo(({
               type="button"
               onClick={(event) => { event.preventDefault(); event.stopPropagation(); onChildCountChange('remove'); }}
               disabled={children <= 0}
-              className="size-8 rounded-full border-2 border-zinc-200 flex items-center justify-center text-zinc-600 hover:border-brand-cyan hover:text-brand-cyan transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="size-8 rounded-full border-2 border-zinc-200 flex items-center justify-center text-zinc-600 hover:border-brand-cyan hover:text-brand-cyan transition disabled:opacity-40 disabled:cursor-not-allowed"
               aria-label="Remover uma criança"
             >
               <Minus className="size-4" />
@@ -418,7 +418,7 @@ const GuestsField = memo(({
             <button
               type="button"
               onClick={(event) => { event.preventDefault(); event.stopPropagation(); onChildCountChange('add'); }}
-              className="size-8 rounded-full border-2 border-zinc-200 flex items-center justify-center text-zinc-600 hover:border-brand-cyan hover:text-brand-cyan transition-all"
+              className="size-8 rounded-full border-2 border-zinc-200 flex items-center justify-center text-zinc-600 hover:border-brand-cyan hover:text-brand-cyan transition"
               aria-label="Adicionar uma criança"
             >
               <Plus className="size-4" />
@@ -447,7 +447,7 @@ const GuestsField = memo(({
           </div>
         )}
 
-        <button type="button" onClick={onClose} className="w-full mt-2 bg-brand-cyan text-white rounded-xl py-3 font-bold hover:bg-brand-cyanDark transition-all active:scale-95 shadow-[0_4px_0px_#0284c7] hover:shadow-[0_2px_0px_#0284c7] hover:translate-y-[2px]">Pronto</button>
+        <button type="button" onClick={onClose} className="w-full mt-2 bg-brand-cyan text-white rounded-xl py-3 font-bold hover:bg-brand-cyanDark transition active:scale-95 shadow-[0_4px_0px_#0284c7] hover:shadow-[0_2px_0px_#0284c7] hover:translate-y-[2px]">Pronto</button>
       </div>
     )}
   </div>
@@ -475,7 +475,7 @@ const TripTypeField = memo(({
     <button
       type="button"
       onClick={onToggle}
-      className="w-full p-3 md:p-6 text-left hover:bg-zinc-50/80 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
+      className="w-full p-3 md:p-6 text-left hover:bg-zinc-50/80 transition duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
       aria-expanded={showTripTypeDropdown}
       aria-haspopup="true"
       data-testid="trip-type-filter-btn"
@@ -504,7 +504,7 @@ const TripTypeField = memo(({
               key={type.label}
               type="button"
               onClick={() => onSelect(type.label)}
-              className={`flex flex-col items-start gap-2 p-3 rounded-2xl border-2 transition-all duration-200 text-left
+              className={`flex flex-col items-start gap-2 p-3 rounded-2xl border-2 transition duration-200 text-left
                 ${tripType === type.label ? 'bg-brand-light border-brand-cyan shadow-sm' : 'bg-white border-transparent hover:bg-zinc-50 hover:border-zinc-100'}`}
             >
               <div className={`p-2 rounded-xl ${type.bg} ${type.color}`}>
@@ -543,7 +543,7 @@ const BudgetField = memo(({
     <button
       type="button"
       onClick={onToggle}
-      className="w-full p-3 md:p-6 text-left hover:bg-zinc-50/80 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
+      className="w-full p-3 md:p-6 text-left hover:bg-zinc-50/80 transition duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
       aria-expanded={showBudgetDropdown}
       aria-haspopup="true"
       data-testid="budget-filter-btn"
@@ -573,7 +573,7 @@ const BudgetField = memo(({
             key={option.label}
             type="button"
             onClick={() => onSelect(option.label)}
-            className={`w-full flex items-center gap-4 p-3 rounded-2xl border-2 transition-all duration-200 mb-2 last:mb-0
+            className={`w-full flex items-center gap-4 p-3 rounded-2xl border-2 transition duration-200 mb-2 last:mb-0
               ${budget === option.label ? 'bg-brand-light border-brand-cyan shadow-sm' : 'bg-white border-transparent hover:bg-zinc-50 hover:border-zinc-100'}`}
           >
             <div className={`p-2 rounded-xl bg-zinc-100 text-zinc-600 ${budget === option.label ? 'bg-brand-vibrant text-white' : ''}`}>
@@ -621,7 +621,7 @@ const SearchButton = memo(({ isSearchLoading, validationError }: SearchButtonPro
       type="submit"
       disabled={isSearchLoading}
       data-testid="submit-search-btn"
-      className="btn-specialist w-full md:w-auto h-full min-h-[70px] bg-brand-yellow hover:bg-yellow-400 text-brand-dark rounded-2xl md:rounded-[1.5rem] shadow-lg flex items-center justify-center gap-2 px-6 transition-all duration-300 ease-spring hover:scale-105 hover:shadow-xl active:scale-90 group border-2 border-transparent whitespace-nowrap"
+      className="btn-specialist w-full md:w-auto h-full min-h-[70px] bg-brand-yellow hover:bg-yellow-400 text-brand-dark rounded-2xl md:rounded-[1.5rem] shadow-lg flex items-center justify-center gap-2 px-6 transition duration-300 ease-spring hover:scale-105 hover:shadow-xl active:scale-90 group border-2 border-transparent whitespace-nowrap"
       data-tracking="hero-home"
     >
       {isSearchLoading ? (
@@ -920,7 +920,7 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className={`w-full max-w-5xl mx-auto bg-white rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] p-2 relative z-50 border-[6px] border-white/20 backdrop-blur-sm flex flex-col transition-all duration-300 ${
+      className={`w-full max-w-5xl mx-auto bg-white rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] p-2 relative z-50 border-[6px] border-white/20 backdrop-blur-sm flex flex-col transition duration-300 ${
         validationError ? 'ring-4 ring-red-500/20 border-red-500/20' : ''
       }`}
     >

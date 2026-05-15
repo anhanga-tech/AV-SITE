@@ -78,7 +78,7 @@ export function BpdPillars() {
                                     {item.description}
                                 </p>
 
-                                <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0">
+                                <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition duration-300 translate-x-4 group-hover:translate-x-0">
                                     <ArrowRight className={`size-5 ${item.iconColor}`} />
                                 </div>
                             </m.div>

@@ -30,7 +30,7 @@ export function BpdWhatsAppBand() {
                     <button
                         type="button"
                         onClick={() => openContactModal({ source: 'brazil-promotion-day' })}
-                        className="btn-whatsapp btn-specialist shrink-0 flex items-center gap-3 bg-brand-yellow text-brand-dark px-10 py-5 rounded-2xl font-bold text-lg shadow-[4px_4px_0px_rgba(255,255,255,0.15)] hover:shadow-[2px_2px_0px_rgba(255,255,255,0.15)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all whitespace-nowrap"
+                        className="btn-whatsapp btn-specialist shrink-0 flex items-center gap-3 bg-brand-yellow text-brand-dark px-10 py-5 rounded-2xl font-bold text-lg shadow-[4px_4px_0px_rgba(255,255,255,0.15)] hover:shadow-[2px_2px_0px_rgba(255,255,255,0.15)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition whitespace-nowrap"
                         data-contact-intent
                         data-tracking="whatsapp-band-brazil-promotion-day"
                     >

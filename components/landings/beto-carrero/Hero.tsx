@@ -67,10 +67,10 @@ const Hero: React.FC = () => {
         <div className="flex justify-center lg:justify-end order-2 lg:order-2 mt-8 lg:mt-0 perspective-1000 relative">
 
           {/* Visual Container: keeps stickers relative to image. Scaled up for Desktop. */}
-          <div className="relative w-64 h-80 sm:w-80 sm:h-96 lg:w-[26rem] lg:h-[32rem] xl:w-[38rem] xl:h-[46rem] transition-all duration-300">
+          <div className="relative w-64 h-80 sm:w-80 sm:h-96 lg:w-[26rem] lg:h-[32rem] xl:w-[38rem] xl:h-[46rem] transition duration-300">
 
             {/* 1. Main Photo (Polaroid Style) */}
-            <div className="absolute inset-0 bg-white p-3 pb-12 lg:pb-16 rounded-sm border-4 border-fun-dark shadow-hard-lg transform rotate-3 hover:rotate-0 transition-all duration-500 z-10 group">
+            <div className="absolute inset-0 bg-white p-3 pb-12 lg:pb-16 rounded-sm border-4 border-fun-dark shadow-hard-lg transform rotate-3 hover:rotate-0 transition duration-500 z-10 group">
               {/* Tape Effect */}
               <div className="absolute -top-4 lg:-top-6 left-1/2 -translate-x-1/2 w-20 md:w-24 lg:w-32 h-8 lg:h-12 bg-white/50 backdrop-blur-sm border-l-2 border-r-2 border-white/60 transform -rotate-2 shadow-sm z-20"></div>
 

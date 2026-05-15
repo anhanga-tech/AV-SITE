@@ -45,7 +45,7 @@ const NotFound: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
             <a
               href={`${SITE_URL}/`}
-              className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition-all duration-300 group"
+              className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition duration-300 group"
             >
               <div className="size-12 rounded-2xl bg-brand-light flex items-center justify-center text-brand-cyan group-hover:bg-brand-cyan group-hover:text-white transition-colors">
                 <HomeIcon className="size-6" />
@@ -58,7 +58,7 @@ const NotFound: React.FC = () => {
 
             <a
               href={getBlogHomeUrl()}
-              className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition-all duration-300 group"
+              className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition duration-300 group"
             >
               <div className="size-12 rounded-2xl bg-brand-light flex items-center justify-center text-brand-cyan group-hover:bg-brand-cyan group-hover:text-white transition-colors">
                 <BookOpen className="size-6" />
@@ -71,7 +71,7 @@ const NotFound: React.FC = () => {
 
             <a
               href={`${SITE_URL}/orlando/`}
-              className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition-all duration-300 group"
+              className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition duration-300 group"
             >
               <div className="size-12 rounded-2xl bg-brand-light flex items-center justify-center text-brand-cyan group-hover:bg-brand-cyan group-hover:text-white transition-colors">
                 <MapPin className="size-6" />
@@ -86,7 +86,7 @@ const NotFound: React.FC = () => {
             <div className="sm:col-span-2 lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4 lg:max-w-2xl lg:mx-auto w-full">
               <a
                 href={`${SITE_URL}/beto-carrero/`}
-                className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition-all duration-300 group"
+                className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition duration-300 group"
               >
                 <div className="size-12 rounded-2xl bg-brand-light flex items-center justify-center text-brand-cyan group-hover:bg-brand-cyan group-hover:text-white transition-colors">
                   <MapPin className="size-6" />
@@ -99,7 +99,7 @@ const NotFound: React.FC = () => {
 
               <a
                 href={`${SITE_URL}/lollapalooza/`}
-                className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition-all duration-300 group"
+                className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition duration-300 group"
               >
                 <div className="size-12 rounded-2xl bg-brand-light flex items-center justify-center text-brand-cyan group-hover:bg-brand-cyan group-hover:text-white transition-colors">
                   <MapPin className="size-6" />
@@ -114,7 +114,7 @@ const NotFound: React.FC = () => {
 
           <a
             href={`${SITE_URL}/`}
-            className="inline-flex items-center gap-2 text-brand-cyan font-bold hover:gap-4 transition-all duration-300"
+            className="inline-flex items-center gap-2 text-brand-cyan font-bold hover:gap-4 transition-[gap,color] duration-300"
           >
             <ArrowLeft className="size-5" />
             Voltar para a Home
