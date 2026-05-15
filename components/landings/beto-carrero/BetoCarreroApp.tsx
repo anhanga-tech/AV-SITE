@@ -153,7 +153,7 @@ const App: React.FC = () => {
                 text="Falar no WhatsApp"
                 variant="secondary"
                 icon={true}
-                className={`transition-[padding,font-size] duration-300 ${isScrolled ? 'py-1 px-3 text-xs lg:py-1.5 lg:px-4 lg:text-sm' : 'py-1.5 px-4 text-sm lg:py-2 lg:px-5 lg:text-base'}`}
+                className={`transition-[padding,font-size,line-height,transform,box-shadow] duration-300 ${isScrolled ? 'py-1 px-3 text-xs lg:py-1.5 lg:px-4 lg:text-sm' : 'py-1.5 px-4 text-sm lg:py-2 lg:px-5 lg:text-base'}`}
                 tooltip="Atendimento rápido"
                 tooltipPosition="bottom"
                 dataTracking="navbar-desktop-betocarrero"
