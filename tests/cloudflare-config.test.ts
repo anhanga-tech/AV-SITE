@@ -42,6 +42,15 @@ test('wrangler production vars should mirror top-level runtime vars', async () =
   assert.deepEqual(productionVars, topLevelVars);
 });
 
+test('Cloudflare media vars should use the managed media zone for assets and transforms', async () => {
+  const source = await readFile(new URL('../wrangler.toml', import.meta.url), 'utf8');
+  const vars = collectTomlVarsSection(source, 'vars');
+
+  assert.equal(vars.get('VITE_MEDIA_BASE_URL'), '"https://media.anhanga.tur.br"');
+  assert.equal(vars.get('VITE_MEDIA_TRANSFORM_ZONE_URL'), '"https://media.anhanga.tur.br"');
+  assert.equal(vars.get('VITE_MEDIA_ENABLE_TRANSFORMS'), '"true"');
+});
+
 test('Cloudflare redirects should use supported status codes', async () => {
   const redirects = await readFile(new URL('../public/_redirects', import.meta.url), 'utf8');
 
