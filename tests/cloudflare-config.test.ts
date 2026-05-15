@@ -47,3 +47,24 @@ test('Cloudflare redirects should use supported status codes', async () => {
 
   assert.doesNotMatch(redirects, /(?:^|\s)(?:301|302|303|307|308)!(?:\s|$)/);
 });
+
+test('Cloudflare redirects should avoid redundant SPA fallback rewrites', async () => {
+  const redirects = await readFile(new URL('../public/_redirects', import.meta.url), 'utf8');
+
+  assert.doesNotMatch(redirects, /^\/\*\s+\/index\.html\s+200$/m);
+});
+
+test('Cloudflare splat redirects should come after exact redirects', async () => {
+  const redirects = await readFile(new URL('../public/_redirects', import.meta.url), 'utf8');
+  const lines = redirects
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith('#'));
+  const blogSplatIndex = lines.findIndex((line) => line.startsWith('/blog/* '));
+
+  assert.notEqual(blogSplatIndex, -1);
+  assert.equal(
+    lines.slice(blogSplatIndex + 1).some((line) => !line.includes('*')),
+    false,
+  );
+});
