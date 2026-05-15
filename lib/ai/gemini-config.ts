@@ -4,6 +4,7 @@ import { DEFAULT_GEMINI_MODEL } from './constants';
 
 const DEFAULT_AI_GATEWAY_ID = 'default';
 const AI_GATEWAY_PROVIDER_PATH = 'google-ai-studio';
+const DEPRECATED_GEMINI_3_1_FLASH_LITE_PREVIEW_PREFIX = 'gemini-3.1-flash-lite-preview';
 
 type EnvSource = Record<string, string | undefined>;
 
@@ -68,9 +69,19 @@ function buildAiGatewayMetadata(env: EnvSource, modelName: string): Record<strin
     };
 }
 
+function resolveGeminiModelName(env: EnvSource): string {
+    const configuredModelName = readEnv(env, 'GEMINI_MODEL') || DEFAULT_GEMINI_MODEL;
+
+    if (configuredModelName.toLowerCase().startsWith(DEPRECATED_GEMINI_3_1_FLASH_LITE_PREVIEW_PREFIX)) {
+        return DEFAULT_GEMINI_MODEL;
+    }
+
+    return configuredModelName;
+}
+
 export function resolveGeminiProviderConfig(env: EnvSource = process.env): GeminiProviderConfig {
     const apiKey = readEnv(env, 'GEMINI_API_KEY');
-    const modelName = readEnv(env, 'GEMINI_MODEL') || DEFAULT_GEMINI_MODEL;
+    const modelName = resolveGeminiModelName(env);
     const useGateway = isAiGatewayEnabled(readEnv(env, 'AI_GATEWAY_ENABLED'));
     const missing: string[] = [];
 

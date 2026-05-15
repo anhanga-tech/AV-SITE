@@ -20,6 +20,26 @@ test('resolveGeminiProviderConfig should keep direct Gemini as the default path'
     assert.deepEqual(buildGeminiClientOptions(config), { apiKey: 'google-key' });
 });
 
+test('resolveGeminiProviderConfig should normalize Gemini 3.1 Flash Lite preview aliases to GA', () => {
+    const config = resolveGeminiProviderConfig({
+        GEMINI_API_KEY: 'google-key',
+        GEMINI_MODEL: 'gemini-3.1-flash-lite-preview-05-25',
+        AI_GATEWAY_ENABLED: 'true',
+        CLOUDFLARE_ACCOUNT_ID: 'account-123',
+        CLOUDFLARE_AI_GATEWAY_TOKEN: 'cf-token',
+    });
+
+    assert.equal(config.ok, true);
+    assert.equal(config.modelName, 'gemini-3.1-flash-lite');
+
+    if (!config.ok || !config.useGateway) {
+        throw new Error('expected gateway config');
+    }
+
+    const metadataHeader = buildGeminiClientOptions(config).httpOptions?.headers?.['cf-aig-metadata'];
+    assert.equal(JSON.parse(metadataHeader || '{}').model, 'gemini-3.1-flash-lite');
+});
+
 test('resolveGeminiProviderConfig should require gateway credentials when AI Gateway is enabled', () => {
     const config = resolveGeminiProviderConfig({
         GEMINI_API_KEY: 'google-key',
