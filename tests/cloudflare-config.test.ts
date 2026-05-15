@@ -20,7 +20,7 @@ function collectTomlVarsSection(source: string, sectionName: string): Map<string
 
     const assignmentMatch = line.match(/^([A-Z0-9_]+)\s*=\s*(.+)$/);
     if (assignmentMatch) {
-      vars.set(assignmentMatch[1], assignmentMatch[2]);
+      vars.set(assignmentMatch[1], assignmentMatch[2].replace(/^["']|["']$/g, ''));
     }
   }
 
@@ -46,9 +46,9 @@ test('Cloudflare media vars should use the managed media zone for assets and tra
   const source = await readFile(new URL('../wrangler.toml', import.meta.url), 'utf8');
   const vars = collectTomlVarsSection(source, 'vars');
 
-  assert.equal(vars.get('VITE_MEDIA_BASE_URL'), '"https://media.anhanga.tur.br"');
-  assert.equal(vars.get('VITE_MEDIA_TRANSFORM_ZONE_URL'), '"https://media.anhanga.tur.br"');
-  assert.equal(vars.get('VITE_MEDIA_ENABLE_TRANSFORMS'), '"true"');
+  assert.equal(vars.get('VITE_MEDIA_BASE_URL'), 'https://media.anhanga.tur.br');
+  assert.equal(vars.get('VITE_MEDIA_TRANSFORM_ZONE_URL'), 'https://media.anhanga.tur.br');
+  assert.equal(vars.get('VITE_MEDIA_ENABLE_TRANSFORMS'), 'true');
 });
 
 test('Cloudflare redirects should use supported status codes', async () => {
