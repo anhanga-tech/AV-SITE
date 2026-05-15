@@ -318,7 +318,7 @@ const PROGRESS_MILESTONES: Record<number, string> = {
 };
 
 function Progress({ current, total }: { current: number; total: number }) {
-    const progress = current / total;
+    const progress = total > 0 ? current / total : 0;
     const milestone = PROGRESS_MILESTONES[current];
     return (
         <div className="quiz-progress">
