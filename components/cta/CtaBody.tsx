@@ -36,7 +36,7 @@ export function CtaBody() {
         className="flex flex-col gap-3 w-full"
         noValidate
       >
-        <p className="text-xs font-black text-gray-500 uppercase tracking-widest mb-1">
+        <p className="text-xs font-black text-zinc-500 uppercase tracking-widest mb-1">
           Seus dados para contato
         </p>
 
@@ -50,7 +50,7 @@ export function CtaBody() {
               value={fields.firstName}
               onChange={(event) => setField('firstName', event.target.value)}
               required
-              className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-gray-400"
+              className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-zinc-400"
             />
           </div>
           <div className="flex-1">
@@ -61,7 +61,7 @@ export function CtaBody() {
               placeholder="Sobrenome"
               value={fields.lastName}
               onChange={(event) => setField('lastName', event.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-gray-400"
+              className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-zinc-400"
             />
           </div>
         </div>
@@ -75,7 +75,7 @@ export function CtaBody() {
             value={fields.whatsapp}
             onChange={(event) => setField('whatsapp', event.target.value)}
             required
-            className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-gray-400"
+            className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-zinc-400"
           />
         </div>
 
@@ -87,7 +87,7 @@ export function CtaBody() {
             placeholder="E-mail (opcional)"
             value={fields.email}
             onChange={(event) => setField('email', event.target.value)}
-            className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-gray-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-gray-400"
+            className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-zinc-400"
           />
         </div>
 
@@ -145,7 +145,7 @@ export function CtaBody() {
           Próxima parada: <br />
           <span className="text-brand-vibrant">aquele lugar que você sempre adiou.</span>
         </h2>
-        <p className="text-gray-500 font-medium text-lg max-w-md">
+        <p className="text-zinc-500 font-medium text-lg max-w-md">
           Orçamento gratuito. Roteiro feito do zero, só pra você.
         </p>
       </div>

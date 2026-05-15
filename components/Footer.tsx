@@ -17,7 +17,7 @@ const Footer: React.FC = () => {
     const runtimeMetadata = useFooterRuntimeMetadata();
 
     return (
-        <footer className="relative bg-brand-dark text-gray-300 pt-32 pb-32 md:pb-24 font-sans overflow-hidden">
+        <footer className="relative bg-brand-dark text-zinc-300 pt-32 pb-32 md:pb-24 font-sans overflow-hidden">
 
             {/* Wavy Top Border */}
             <div className="absolute top-0 left-0 w-full overflow-hidden leading-none">
@@ -40,7 +40,7 @@ const Footer: React.FC = () => {
                                 className="h-32 w-auto object-contain"
                             />
                         </div>
-                        <p className="text-gray-400 leading-relaxed max-w-sm font-medium">
+                        <p className="text-zinc-400 leading-relaxed max-w-sm font-medium">
                             Roteiros feitos do zero. Sem pacote pronto, sem estresse. <br />
                             Só a sua viagem.
                         </p>
@@ -106,18 +106,18 @@ const Footer: React.FC = () => {
                     </div>
 
                     <div className="flex flex-col md:items-end gap-2 text-center md:text-right order-1 md:order-2">
-                        <div className="text-xs text-gray-500 font-medium flex items-center justify-center md:justify-end gap-1">
+                        <div className="text-xs text-zinc-500 font-medium flex items-center justify-center md:justify-end gap-1">
                             Feito com <Heart className="size-3 text-red-500" weight="fill" aria-hidden="true" /> pela <img src={ANHANGA_TECH_LOGO_URL} alt="Anhangá.tech" width="80" height="16" loading="lazy" className="h-4 w-auto inline-block mx-1 align-sub" />
                             {runtimeMetadata ? ` • ${runtimeMetadata.currentYear}` : null}
                         </div>
-                        <div className="text-[10px] text-gray-600 font-medium flex flex-wrap justify-center md:justify-end gap-x-2">
-                            <span>ANHANGA TURISMO LTDA • CNPJ/Cadastur: <a href="https://cadastur.turismo.gov.br/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline decoration-gray-600 underline-offset-2">37.036.732/0001-41</a></span>
+                        <div className="text-[10px] text-zinc-600 font-medium flex flex-wrap justify-center md:justify-end gap-x-2">
+                            <span>ANHANGA TURISMO LTDA • CNPJ/Cadastur: <a href="https://cadastur.turismo.gov.br/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline decoration-zinc-600 underline-offset-2">37.036.732/0001-41</a></span>
                             <span className="hidden md:inline">•</span>
-                            <a href="https://www.abav.com.br/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline decoration-gray-600 underline-offset-2">Membro ABAV</a>
+                            <a href="https://www.abav.com.br/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline decoration-zinc-600 underline-offset-2">Membro ABAV</a>
                             <span className="hidden md:inline">•</span>
-                            <a href="https://www.gov.br/turismo/pt-br" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline decoration-gray-600 underline-offset-2">Ministério do Turismo</a>
+                            <a href="https://www.gov.br/turismo/pt-br" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline decoration-zinc-600 underline-offset-2">Ministério do Turismo</a>
                         </div>
-                        <div className="text-[10px] text-gray-700 font-bold uppercase tracking-widest mt-2">
+                        <div className="text-[10px] text-zinc-700 font-bold uppercase tracking-widest mt-2">
                             Conteúdo da equipe Anhangá Viagens
                             {runtimeMetadata ? ` • Última atualização: ${runtimeMetadata.lastUpdatedLabel}` : null}
                         </div>

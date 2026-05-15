@@ -93,7 +93,7 @@ const Hero: React.FC = () => {
         
         {/* Dynamic Headliner Title */}
         <div className="mb-2 md:mb-4 min-h-[5rem] md:min-h-[7rem] flex flex-col items-center justify-center w-full px-2">
-            <p className="text-gray-300 text-[10px] sm:text-xs md:text-sm lg:text-lg uppercase tracking-[0.2em] mb-1 md:mb-2">Prepare-se para ver</p>
+            <p className="text-zinc-300 text-[10px] sm:text-xs md:text-sm lg:text-lg uppercase tracking-[0.2em] mb-1 md:mb-2">Prepare-se para ver</p>
             <h2 
                 aria-live="polite"
                 className={`text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase italic tracking-tighter text-anhanga-yellow transition-all duration-500 transform text-center break-words w-full max-w-5xl leading-[0.9] sm:leading-tight pb-2 ${
@@ -125,7 +125,7 @@ const Hero: React.FC = () => {
             </span>
         </div>
         
-        <p className="text-sm sm:text-lg md:text-xl mb-8 md:mb-10 max-w-2xl mx-auto text-gray-200 font-medium drop-shadow-md leading-relaxed px-2">
+        <p className="text-sm sm:text-lg md:text-xl mb-8 md:mb-10 max-w-2xl mx-auto text-zinc-200 font-medium drop-shadow-md leading-relaxed px-2">
           Hospedagem selecionada, transporte exclusivo e suporte dedicado para você só se preocupar em curtir os shows.
         </p>
         
@@ -171,7 +171,7 @@ const Hero: React.FC = () => {
           </button>
         </div>
         
-        <div className="mt-6 md:mt-8 flex items-center justify-center gap-2 text-[10px] sm:text-xs md:text-sm text-gray-400 font-medium">
+        <div className="mt-6 md:mt-8 flex items-center justify-center gap-2 text-[10px] sm:text-xs md:text-sm text-zinc-400 font-medium">
             <Music2 size={14} className="text-anhanga-yellow" aria-hidden="true" />
             <span>Campanha 2026 encerrada. Cadastre-se para ser avisado sobre 2027.</span>
         </div>

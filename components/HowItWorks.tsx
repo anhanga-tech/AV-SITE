@@ -93,7 +93,7 @@ const HowItWorks = memo(() => {
             <h2 className="text-4xl md:text-6xl font-extrabold text-brand-dark mt-6 mb-6 leading-tight">
                 Como a mágica <br className="md:hidden"/> acontece?
             </h2>
-            <p className="text-xl text-gray-600 font-medium font-sans">
+            <p className="text-xl text-zinc-600 font-medium font-sans">
                 Planejar viagem não precisa ser chato. <br className="hidden md:block"/>
                 Aqui vai funcionar assim: você fala, a gente afia o lápis e monta tudo.
             </p>
@@ -117,7 +117,7 @@ const HowItWorks = memo(() => {
             </div>
 
             {/* Mobile Vertical Line */}
-            <div className="md:hidden absolute top-4 bottom-4 left-8 w-1 bg-gray-200 border-l-2 border-dashed border-gray-300 z-0"></div>
+            <div className="md:hidden absolute top-4 bottom-4 left-8 w-1 bg-zinc-200 border-l-2 border-dashed border-zinc-300 z-0"></div>
 
             <div className="flex flex-col gap-12 md:gap-0">
                 {STEPS.map((step, idx) => {
@@ -139,15 +139,15 @@ const HowItWorks = memo(() => {
                                     <div className={`size-16 rounded-2xl ${step.color} shadow-lg flex items-center justify-center transform -rotate-6 group-hover:rotate-0 transition-transform duration-300`}>
                                         {step.icon}
                                     </div>
-                                    <span className="font-black text-6xl text-gray-100 select-none absolute top-4 right-6 z-0">
+                                    <span className="font-black text-6xl text-zinc-100 select-none absolute top-4 right-6 z-0">
                                         0{step.id}
                                     </span>
                                 </div>
 
                                 {/* Content */}
                                 <div className="relative z-10">
-                                    <h3 className="text-2xl font-bold text-gray-800 mb-3">{step.title}</h3>
-                                    <p className="text-gray-600 leading-relaxed font-medium">
+                                    <h3 className="text-2xl font-bold text-zinc-800 mb-3">{step.title}</h3>
+                                    <p className="text-zinc-600 leading-relaxed font-medium">
                                         {step.desc}
                                     </p>
                                 </div>
@@ -186,7 +186,7 @@ const HowItWorks = memo(() => {
                     </div>
                 </button>
             </div>
-            <p className="mt-6 text-gray-400 font-medium text-sm">
+            <p className="mt-6 text-zinc-400 font-medium text-sm">
                 (Prometemos: Zero estresse, 100% diversão)
             </p>
         </div>

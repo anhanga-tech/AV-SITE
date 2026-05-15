@@ -7,7 +7,7 @@ const Problem: React.FC = () => {
       <section className="py-24 pt-32 md:pt-40 lg:pt-24 bg-fun-white relative overflow-hidden">
 
          {/* Background Decor: Confused Squiggle */}
-         <svg className="absolute top-20 left-0 w-full h-full text-gray-200 pointer-events-none -z-0" fill="none" viewBox="0 0 100 100" preserveAspectRatio="none">
+         <svg className="absolute top-20 left-0 w-full h-full text-zinc-200 pointer-events-none -z-0" fill="none" viewBox="0 0 100 100" preserveAspectRatio="none">
             <path d="M0,50 Q25,30 50,50 T100,50" stroke="currentColor" strokeWidth="0.5" strokeDasharray="5,5" />
          </svg>
 
@@ -30,11 +30,11 @@ const Problem: React.FC = () => {
                   {/* Tablet Adjustment: Centered using translate-x logic and adjusted width */}
                   <div className="absolute top-10 left-0 md:left-1/2 md:-translate-x-1/2 lg:left-0 lg:translate-x-0 w-full md:w-[480px] lg:w-[32rem] bg-white border-2 border-fun-dark rounded-xl shadow-hard z-10 transform -rotate-3 transition-transform hover:rotate-0 duration-300">
                      {/* Browser Header */}
-                     <div className="bg-gray-100 border-b-2 border-fun-dark p-2 lg:p-3 flex items-center gap-2 rounded-t-lg">
+                     <div className="bg-zinc-100 border-b-2 border-fun-dark p-2 lg:p-3 flex items-center gap-2 rounded-t-lg">
                         <div className="size-3 lg:size-4 rounded-full bg-red-400 border border-fun-dark"></div>
                         <div className="size-3 lg:size-4 rounded-full bg-yellow-400 border border-fun-dark"></div>
                         <div className="size-3 lg:size-4 rounded-full bg-green-400 border border-fun-dark"></div>
-                        <div className="flex-grow bg-white border border-gray-300 h-5 lg:h-7 rounded-md text-[10px] lg:text-xs flex items-center px-2 text-gray-400 overflow-hidden">
+                        <div className="flex-grow bg-white border border-zinc-300 h-5 lg:h-7 rounded-md text-[10px] lg:text-xs flex items-center px-2 text-zinc-400 overflow-hidden">
                            betocarrero-hoteis-baratos-socorro.com...
                         </div>
                      </div>
@@ -42,7 +42,7 @@ const Problem: React.FC = () => {
                      <div className="p-6 md:p-8 lg:p-10 flex flex-col items-center text-center">
                         <Search className="text-fun-blue size-10 lg:size-16 mb-2 animate-pulse" />
                         <h3 className="font-sans font-bold text-xl md:text-2xl lg:text-3xl text-fun-dark">157 abas abertas</h3>
-                        <p className="text-sm md:text-base lg:text-lg text-slate-500 mt-2 leading-tight">
+                        <p className="text-sm md:text-base lg:text-lg text-zinc-500 mt-2 leading-tight">
                            Comparando preços, lendo reviews antigos e ficando cada vez mais confuso.
                         </p>
                      </div>
@@ -64,14 +64,14 @@ const Problem: React.FC = () => {
                   {/* Tablet Adjustment: Increased padding (md:p-4 md:px-8), icon size, and font size */}
                   <div className="absolute bottom-10 left-4 md:left-[5%] lg:left-4 bg-white p-3 px-5 md:p-4 md:px-8 lg:p-5 lg:px-8 rounded-full border-2 border-fun-dark shadow-hard z-30 transform -rotate-12 flex items-center gap-2 md:gap-3 lg:gap-3">
                      <BatteryLow className="text-fun-pink size-5 md:size-7 lg:size-8" />
-                     <span className="font-bold text-sm md:text-lg lg:text-xl text-slate-600">Exaustão Mental</span>
+                     <span className="font-bold text-sm md:text-lg lg:text-xl text-zinc-600">Exaustão Mental</span>
                   </div>
 
                   {/* Floating Cursor */}
                   <MousePointer2 className="absolute top-1/2 right-1/4 md:right-[20%] text-fun-dark size-8 lg:size-12 fill-white stroke-[1.5px] z-40 animate-float" />
 
                   {/* Floating Question Marks */}
-                  <HelpCircle className="absolute top-0 right-10 md:right-[15%] lg:right-0 text-gray-300 size-12 lg:size-20 transform rotate-12" />
+                  <HelpCircle className="absolute top-0 right-10 md:right-[15%] lg:right-0 text-zinc-300 size-12 lg:size-20 transform rotate-12" />
                </div>
 
 
@@ -87,7 +87,7 @@ const Problem: React.FC = () => {
                         </div>
                         <div>
                            <h3 className="font-sans font-extrabold text-xl md:text-2xl lg:text-3xl mb-2 text-fun-dark">Insegurança na escolha</h3>
-                           <p className="text-slate-600 font-medium leading-relaxed text-sm md:text-base lg:text-lg">
+                           <p className="text-zinc-600 font-medium leading-relaxed text-sm md:text-base lg:text-lg">
                               "Será que esse hotel é limpo? Fica longe do parque? O transfer busca a gente?"
                            </p>
                            <span className="inline-block mt-3 lg:mt-4 bg-fun-pink text-white text-xs lg:text-sm font-bold px-3 py-1 lg:px-4 lg:py-2 rounded-full border-2 border-fun-dark transform -rotate-1 shadow-sm">
@@ -105,7 +105,7 @@ const Problem: React.FC = () => {
                         </div>
                         <div>
                            <h3 className="font-sans font-extrabold text-xl md:text-2xl lg:text-3xl mb-2 text-fun-dark">Logística Complicada</h3>
-                           <p className="text-slate-600 font-medium leading-relaxed text-sm md:text-base lg:text-lg">
+                           <p className="text-zinc-600 font-medium leading-relaxed text-sm md:text-base lg:text-lg">
                               Conciliar horário de voo, check-in do hotel e dias de parque sem perder tempo é um quebra-cabeça chato.
                            </p>
                         </div>
@@ -120,7 +120,7 @@ const Problem: React.FC = () => {
                         </div>
                         <div>
                            <h3 className="font-sans font-extrabold text-xl md:text-2xl lg:text-3xl mb-2 text-fun-dark">Surpresas no Pagamento</h3>
-                           <p className="text-slate-600 font-medium leading-relaxed text-sm md:text-base lg:text-lg">
+                           <p className="text-zinc-600 font-medium leading-relaxed text-sm md:text-base lg:text-lg">
                               Taxas escondidas, sites que travam na hora de pagar e parcelamentos com juros abusivos.
                            </p>
                         </div>

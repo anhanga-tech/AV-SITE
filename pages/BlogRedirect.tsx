@@ -24,7 +24,7 @@ const BlogRedirect: React.FC = () => {
       <main className="min-h-screen bg-[#fffdf5] pt-32 pb-24 px-6">
         <div className="max-w-2xl mx-auto text-center">
           <h1 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Redirecionando para o Blog</h1>
-          <p className="text-gray-600 mb-6">
+          <p className="text-zinc-600 mb-6">
             O blog agora está em um novo endereço.
           </p>
           <a

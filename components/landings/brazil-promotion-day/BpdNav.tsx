@@ -4,7 +4,7 @@ import { openContactModal } from '../../../utils/contactForm';
 
 export function BpdNav() {
     return (
-        <nav className="bg-white/90 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50 px-6 py-2">
+        <nav className="bg-white/90 backdrop-blur-md border-b border-zinc-100 sticky top-0 z-50 px-6 py-2">
             <div className="container mx-auto flex items-center justify-between">
                 <a href="https://www.anhanga.tur.br/" aria-label="Voltar para o site principal">
                     <img

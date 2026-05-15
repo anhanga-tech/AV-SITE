@@ -13,14 +13,14 @@ interface LandingFAQProps {
 }
 
 const FAQItemComponent = memo(({ question, answer, isOpen, idx, onToggle }: FAQItem & { isOpen: boolean; idx: number; onToggle: (idx: number) => void }) => {
-    const handleClick = useCallback(() => onToggle(idx), [idx, onToggle]);
+    const toggleFaqItem = useCallback(() => onToggle(idx), [idx, onToggle]);
     return (
         <div
             className={`border-b border-brand-cyan/10 last:border-0 transition-all duration-300 ${isOpen ? 'bg-white/40' : ''}`}
         >
             <button
                 className="w-full py-6 flex justify-between items-center text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan group"
-                onClick={handleClick}
+                onClick={toggleFaqItem}
                 aria-expanded={isOpen}
             >
                 <h3 className="text-xl font-bold text-brand-dark group-hover:text-brand-cyan transition-colors pr-8">
@@ -37,7 +37,7 @@ const FAQItemComponent = memo(({ question, answer, isOpen, idx, onToggle }: FAQI
                     isOpen ? 'max-h-[500px] opacity-100 pb-8' : 'max-h-0 opacity-0'
                 }`}
             >
-                <div className="text-gray-600 text-lg leading-relaxed">
+                <div className="text-zinc-600 text-lg leading-relaxed">
                     {typeof answer === 'string' ? <p>{answer}</p> : answer}
                 </div>
             </div>
@@ -66,7 +66,7 @@ export const LandingFAQ: React.FC<LandingFAQProps> = ({
                     <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">
                         {title}
                     </h2>
-                    <p className="text-lg text-gray-500">
+                    <p className="text-lg text-zinc-500">
                         {subtitle}
                     </p>
                 </div>

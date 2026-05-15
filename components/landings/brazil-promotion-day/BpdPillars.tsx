@@ -71,10 +71,10 @@ export function BpdPillars() {
                                     <Icon className={`size-8 ${item.iconColor}`} weight="fill" />
                                 </m.div>
 
-                                <h3 className="text-xl font-extrabold text-gray-900 mb-3 leading-tight group-hover:text-brand-cyan transition-colors duration-300">
+                                <h3 className="text-xl font-extrabold text-zinc-900 mb-3 leading-tight group-hover:text-brand-cyan transition-colors duration-300">
                                     {item.title}
                                 </h3>
-                                <p className="text-gray-500 font-medium leading-relaxed text-sm">
+                                <p className="text-zinc-500 font-medium leading-relaxed text-sm">
                                     {item.description}
                                 </p>
 

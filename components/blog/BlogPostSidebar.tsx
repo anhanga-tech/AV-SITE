@@ -20,9 +20,9 @@ interface BlogPostSidebarProps {
 export const BlogPostSidebar: React.FC<BlogPostSidebarProps> = ({ author, authorFallbackName, relatedPosts }) => {
     return (
         <div className="sticky top-32 space-y-8">
-            <div className="bg-white rounded-3xl p-8 border-2 border-gray-100 text-center relative overflow-hidden shadow-lg group hover:border-brand-yellow/30 transition-colors">
+            <div className="bg-white rounded-3xl p-8 border-2 border-zinc-100 text-center relative overflow-hidden shadow-lg group hover:border-brand-yellow/30 transition-colors">
                 <div className="absolute top-0 right-0 size-32 bg-brand-yellow/10 rounded-bl-full -mr-10 -mt-10 transition-all group-hover:scale-110"></div>
-                <div className="size-28 bg-gray-200 rounded-full mx-auto mb-6 overflow-hidden border-[6px] border-white shadow-xl relative z-10">
+                <div className="size-28 bg-zinc-200 rounded-full mx-auto mb-6 overflow-hidden border-[6px] border-white shadow-xl relative z-10">
                     {author?.image ? (
                         <img src={author.image} alt={author.name} width="112" height="112" loading="lazy" className="w-full h-full object-cover" />
                     ) : (
@@ -32,8 +32,8 @@ export const BlogPostSidebar: React.FC<BlogPostSidebarProps> = ({ author, author
                     )}
                 </div>
                 <h4 className="font-black text-2xl text-brand-dark mb-1">{author?.name || authorFallbackName}</h4>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 bg-gray-50 inline-block px-3 py-1 rounded-full">{author?.role || 'Especialista em Viagens'}</p>
-                <p className="text-gray-600 font-serif italic text-base mb-8 leading-relaxed">
+                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-6 bg-zinc-50 inline-block px-3 py-1 rounded-full">{author?.role || 'Especialista em Viagens'}</p>
+                <p className="text-zinc-600 font-serif italic text-base mb-8 leading-relaxed">
                     {author?.bio ? `"${author.bio}"` : '"Apaixonado por descobrir lugares novos e compartilhar dicas que não estão nos guias turísticos."'}
                 </p>
                 <button
@@ -49,14 +49,14 @@ export const BlogPostSidebar: React.FC<BlogPostSidebarProps> = ({ author, author
             </div>
 
             <div className="bg-white p-2 rounded-3xl hidden lg:block">
-                <h3 className="font-black text-xl text-gray-800 mb-6 pl-2 flex items-center gap-2">
+                <h3 className="font-black text-xl text-zinc-800 mb-6 pl-2 flex items-center gap-2">
                     <span className="w-1.5 h-6 bg-brand-vibrant rounded-full"></span>
                     Leia Também
                 </h3>
                 <div className="space-y-4">
                     {relatedPosts.map(related => (
-                        <a href={getBlogPostUrl(related.slug)} key={related.slug} className="group flex gap-5 items-center bg-white p-4 rounded-2xl hover:bg-white hover:shadow-xl transition-all border border-transparent hover:border-gray-100 duration-300">
-                            <div className="size-24 rounded-2xl overflow-hidden shrink-0 border border-gray-100 shadow-sm relative">
+                        <a href={getBlogPostUrl(related.slug)} key={related.slug} className="group flex gap-5 items-center bg-white p-4 rounded-2xl hover:bg-white hover:shadow-xl transition-all border border-transparent hover:border-zinc-100 duration-300">
+                            <div className="size-24 rounded-2xl overflow-hidden shrink-0 border border-zinc-100 shadow-sm relative">
                                 <img src={optimizeRemoteImageUrl(related.image, 200, 200)} alt={related.title} width="200" height="200" loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                             </div>
                             <div className="flex flex-col h-full justify-center">
@@ -65,10 +65,10 @@ export const BlogPostSidebar: React.FC<BlogPostSidebarProps> = ({ author, author
                                         {related.category}
                                     </span>
                                 </div>
-                                <h5 className="font-bold text-gray-800 leading-tight group-hover:text-brand-cyan transition-colors text-base mb-2 font-sans">
+                                <h5 className="font-bold text-zinc-800 leading-tight group-hover:text-brand-cyan transition-colors text-base mb-2 font-sans">
                                     {related.title}
                                 </h5>
-                                <span className="text-xs text-gray-400 font-bold flex items-center gap-1">
+                                <span className="text-xs text-zinc-400 font-bold flex items-center gap-1">
                                     <Clock className="size-3" /> {related.readingTime}
                                 </span>
                             </div>

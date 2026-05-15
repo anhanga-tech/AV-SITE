@@ -18,14 +18,14 @@ interface BlogPostContentProps {
 
 export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonicalUrl, MdxContent, relatedPosts }) => {
     return (
-        <div className="bg-white rounded-[2.5rem] p-8 md:p-14 shadow-xl border border-gray-100">
+        <div className="bg-white rounded-[2.5rem] p-8 md:p-14 shadow-xl border border-zinc-100">
 
-            <div className="mb-6 pb-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="mb-6 pb-4 border-b border-zinc-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                     <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest border ${getCategoryColor(post.category)}`}>
                         {post.category}
                     </span>
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{formatDate(post.date)}</span>
+                    <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{formatDate(post.date)}</span>
                 </div>
                 <SocialShare
                     minimal
@@ -53,19 +53,19 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
                     <div className="
                         prose md:prose-lg max-w-none
                         prose-headings:font-sans prose-headings:font-black prose-headings:tracking-tight prose-headings:text-brand-dark
-                        prose-p:font-serif prose-p:text-gray-600 prose-p:leading-relaxed prose-p:mb-6
+                        prose-p:font-serif prose-p:text-zinc-600 prose-p:leading-relaxed prose-p:mb-6
                         prose-a:text-brand-cyan prose-a:font-bold prose-a:no-underline prose-a:border-b-2 prose-a:border-brand-cyan/30 hover:prose-a:border-brand-cyan hover:prose-a:text-brand-cyanDark hover:prose-a:bg-brand-cyan/5 prose-a:transition-all
                         prose-strong:text-brand-dark prose-strong:font-black
                         prose-ul:list-disc prose-ul:pl-6 prose-ul:marker:text-brand-yellow
-                        prose-li:font-serif prose-li:text-gray-600
+                        prose-li:font-serif prose-li:text-zinc-600
                         prose-blockquote:border-2 prose-blockquote:border-brand-yellow/40 prose-blockquote:bg-yellow-50 prose-blockquote:py-4 prose-blockquote:px-8 prose-blockquote:rounded-2xl prose-blockquote:not-italic prose-blockquote:font-serif prose-blockquote:text-brand-dark [&_blockquote_p]:text-brand-dark
                         first-letter:text-[3rem] first-letter:md:text-[4.5rem] first-letter:font-black first-letter:text-brand-dark first-letter:float-left first-letter:leading-none first-letter:mr-2 first-letter:mt-1
                     ">
                         <Suspense fallback={
                             <div className="animate-pulse space-y-4">
-                                <div className="h-4 bg-gray-200 rounded w-3/4" />
-                                <div className="h-4 bg-gray-200 rounded w-full" />
-                                <div className="h-4 bg-gray-200 rounded w-5/6" />
+                                <div className="h-4 bg-zinc-200 rounded w-3/4" />
+                                <div className="h-4 bg-zinc-200 rounded w-full" />
+                                <div className="h-4 bg-zinc-200 rounded w-5/6" />
                             </div>
                         }>
                             <MdxContent />
@@ -73,15 +73,15 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
                     </div>
                 </MDXProvider>
             ) : (
-                <div className="prose md:prose-lg max-w-none prose-p:font-serif prose-p:text-gray-600 prose-p:leading-relaxed">
+                <div className="prose md:prose-lg max-w-none prose-p:font-serif prose-p:text-zinc-600 prose-p:leading-relaxed">
                     <p>{post.excerpt}</p>
-                    <p className="text-gray-400 italic">Conteúdo completo em breve…</p>
+                    <p className="text-zinc-400 italic">Conteúdo completo em breve…</p>
                 </div>
             )}
 
             {post.showChatCTA && <ChatCTA destino={post.chatCTADestination} />}
 
-            <div className="mt-12 pt-8 border-t-2 border-dashed border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="mt-12 pt-8 border-t-2 border-dashed border-zinc-200 flex flex-col sm:flex-row items-center justify-between gap-6">
                 <div className="flex items-center gap-2">
                     <span className="font-bold text-brand-dark text-lg">Gostou? Espalhe a palavra:</span>
                 </div>
@@ -92,14 +92,14 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
                 />
             </div>
 
-            <div className="mt-12 lg:hidden border-t border-gray-100 pt-10">
+            <div className="mt-12 lg:hidden border-t border-zinc-100 pt-10">
                 <h3 className="font-black text-2xl text-brand-dark mb-6 flex items-center gap-2">
                     <span className="w-1.5 h-6 bg-brand-vibrant rounded-full"></span>
                     Leia Também
                 </h3>
                 <div className="grid sm:grid-cols-2 gap-6">
                     {relatedPosts.map(related => (
-                        <a href={getBlogPostUrl(related.slug)} key={`mobile-${related.slug}`} className="group flex flex-col bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                        <a href={getBlogPostUrl(related.slug)} key={`mobile-${related.slug}`} className="group flex flex-col bg-white rounded-2xl overflow-hidden border border-zinc-100 shadow-sm hover:shadow-md transition-all">
                             <div className="aspect-video w-full overflow-hidden relative">
                                 <img src={optimizeRemoteImageUrl(related.image, 400, 225)} alt={related.title} width="400" height="225" loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                 <div className="absolute top-3 left-3">
@@ -109,10 +109,10 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
                                 </div>
                             </div>
                             <div className="p-4">
-                                <h5 className="font-bold text-gray-800 leading-tight group-hover:text-brand-cyan transition-colors text-base mb-2">
+                                <h5 className="font-bold text-zinc-800 leading-tight group-hover:text-brand-cyan transition-colors text-base mb-2">
                                     {related.title}
                                 </h5>
-                                <div className="flex items-center gap-3 text-xs text-gray-400 font-bold">
+                                <div className="flex items-center gap-3 text-xs text-zinc-400 font-bold">
                                     <span className="flex items-center gap-1"><Clock className="size-3" /> {related.readingTime}</span>
                                     <span>•</span>
                                     <span>{formatDate(related.date)}</span>

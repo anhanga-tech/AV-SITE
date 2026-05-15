@@ -23,7 +23,7 @@ export const LazyImage = React.memo<LazyImageProps>(({
     src,
     alt,
     className = "",
-    placeholderClassName = "bg-gray-200",
+    placeholderClassName = "bg-zinc-200",
     width,
     height,
     ...props
@@ -74,7 +74,7 @@ export const LazyImage = React.memo<LazyImageProps>(({
         >
             {!isLoaded && (
                 <div className={`absolute inset-0 flex items-center justify-center z-10 ${placeholderClassName}`}>
-                    <ImageIcon className="size-8 text-gray-400 opacity-40" />
+                    <ImageIcon className="size-8 text-zinc-400 opacity-40" />
                 </div>
             )}
             {isVisible && (

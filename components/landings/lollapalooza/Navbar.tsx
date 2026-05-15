@@ -44,7 +44,7 @@ const Navbar: React.FC = () => {
             <a
               key={link.name}
               href={link.href}
-              className={`font-bold text-sm uppercase tracking-wide hover:text-anhanga-yellow transition-colors focus:outline-none focus:ring-2 focus:ring-anhanga-yellow rounded-sm px-2 ${scrolled ? 'text-gray-700' : 'text-white'}`}
+              className={`font-bold text-sm uppercase tracking-wide hover:text-anhanga-yellow transition-colors focus:outline-none focus:ring-2 focus:ring-anhanga-yellow rounded-sm px-2 ${scrolled ? 'text-zinc-700' : 'text-white'}`}
             >
               {link.name}
             </a>
@@ -68,7 +68,7 @@ const Navbar: React.FC = () => {
           aria-expanded={isOpen}
           aria-label={isOpen ? "Fechar menu de navegação" : "Abrir menu de navegação"}
         >
-          {isOpen ? <X size={32} className="text-gray-800" /> : <Menu size={32} color={scrolled ? '#0056D2' : '#FFD600'} />}
+          {isOpen ? <X size={32} className="text-zinc-800" /> : <Menu size={32} color={scrolled ? '#0056D2' : '#FFD600'} />}
         </button>
       </div>
 

@@ -199,7 +199,7 @@ const Hero: React.FC = memo(() => {
                   value={mobileDestination}
                   onChange={(e) => setMobileDestination(e.target.value)}
                   placeholder="Para onde você quer ir?"
-                  className="flex-1 outline-none text-gray-800 font-semibold placeholder-gray-400 bg-transparent text-base"
+                  className="flex-1 outline-none text-zinc-800 font-semibold placeholder-zinc-400 bg-transparent text-base"
                   autoComplete="off"
                   data-testid="destination-input-mobile"
                 />

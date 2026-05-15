@@ -161,10 +161,10 @@ const DestinationField = memo(({
 
   return (
     <div
-      className="w-full md:flex-[1.5] p-3 md:p-6 relative group text-left cursor-text hover:bg-gray-50/80 transition-all duration-300 rounded-t-[2rem] md:rounded-tl-[2rem] md:rounded-tr-none"
+      className="w-full md:flex-[1.5] p-3 md:p-6 relative group text-left cursor-text hover:bg-zinc-50/80 transition-all duration-300 rounded-t-[2rem] md:rounded-tl-[2rem] md:rounded-tr-none"
       ref={destRef}
     >
-      <label htmlFor="destination-input" className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-focus-within:text-brand-cyan transition-colors">
+      <label htmlFor="destination-input" className="block text-[10px] font-black text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-focus-within:text-brand-cyan transition-colors">
         <MapPin className="size-3" /> Para onde?
       </label>
       <div className="relative flex items-center">
@@ -178,7 +178,7 @@ const DestinationField = memo(({
           onFocus={onFocus}
           onKeyDown={onKeyDown}
           placeholder="Ex: Orlando, Paris, Brasil..."
-          className="w-full outline-none text-gray-800 font-bold placeholder-gray-300 bg-transparent text-lg md:text-xl truncate transition-colors pr-8"
+          className="w-full outline-none text-zinc-800 font-bold placeholder-zinc-300 bg-transparent text-lg md:text-xl truncate transition-colors pr-8"
           autoComplete="off"
           role="combobox"
           aria-autocomplete="list"
@@ -195,7 +195,7 @@ const DestinationField = memo(({
               e.stopPropagation();
               onClear();
             }}
-            className="absolute right-0 p-1 text-gray-400 hover:text-brand-vibrant transition-colors rounded-full focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-vibrant"
+            className="absolute right-0 p-1 text-zinc-400 hover:text-brand-vibrant transition-colors rounded-full focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-vibrant"
             aria-label="Limpar destino"
           >
             <X className="size-4" />
@@ -203,7 +203,7 @@ const DestinationField = memo(({
         )}
       </div>
       {showDestSuggestions && hasSuggestions && (
-        <div className="absolute top-full left-0 w-full bg-white rounded-2xl shadow-xl border-2 border-gray-100 mt-4 overflow-hidden z-[60] animate-pop-in origin-top">
+        <div className="absolute top-full left-0 w-full bg-white rounded-2xl shadow-xl border-2 border-zinc-100 mt-4 overflow-hidden z-[60] animate-pop-in origin-top">
           <ul id="destination-results" role="listbox" className="max-h-60 overflow-y-auto custom-scrollbar">
             {filteredDestinations.map((dest, index) => (
               <li
@@ -213,8 +213,8 @@ const DestinationField = memo(({
                 aria-selected={index === activeSuggestionIndex}
                 onClick={() => onSelect(dest)}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onSelect(dest); }}
-                className={`px-6 py-3 cursor-pointer text-left text-sm font-medium border-b border-gray-50 last:border-0 flex items-center gap-2 transition-colors ${
-                  index === activeSuggestionIndex ? 'bg-brand-light text-brand-cyan' : 'hover:bg-brand-light text-gray-700'
+                className={`px-6 py-3 cursor-pointer text-left text-sm font-medium border-b border-zinc-50 last:border-0 flex items-center gap-2 transition-colors ${
+                  index === activeSuggestionIndex ? 'bg-brand-light text-brand-cyan' : 'hover:bg-brand-light text-zinc-700'
                 }`}
               >
                 <MapPin className={`size-4 shrink-0 ${index === activeSuggestionIndex ? 'text-brand-cyan' : 'text-brand-cyan/50'}`} />
@@ -225,8 +225,8 @@ const DestinationField = memo(({
         </div>
       )}
       {shouldShowEmptyState && (
-        <div className="absolute top-full left-0 w-full bg-white rounded-2xl shadow-xl border-2 border-gray-100 mt-4 p-4 z-[60] animate-pop-in origin-top">
-          <p className="text-gray-400 text-sm font-medium text-center">Nenhum destino encontrado. Tente outra cidade ou país.</p>
+        <div className="absolute top-full left-0 w-full bg-white rounded-2xl shadow-xl border-2 border-zinc-100 mt-4 p-4 z-[60] animate-pop-in origin-top">
+          <p className="text-zinc-400 text-sm font-medium text-center">Nenhum destino encontrado. Tente outra cidade ou país.</p>
         </div>
       )}
     </div>
@@ -267,40 +267,40 @@ const DateField = memo(({
     <button
       type="button"
       onClick={onToggle}
-      className="w-full p-3 md:p-6 text-left hover:bg-gray-50/80 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
+      className="w-full p-3 md:p-6 text-left hover:bg-zinc-50/80 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
       aria-expanded={showCalendar}
       aria-haspopup="grid"
       data-testid="dates-filter-btn"
     >
-      <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan group-focus-within:text-brand-cyan transition-colors">
+      <span className="block text-[10px] font-black text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan group-focus-within:text-brand-cyan transition-colors">
         <Calendar className="size-3" /> Quando?
       </span>
       <div className="flex items-center justify-between">
-        <span className={`text-lg md:text-xl font-bold truncate transition-colors ${startDate ? "text-gray-800" : "text-gray-300"}`}>
+        <span className={`text-lg md:text-xl font-bold truncate transition-colors ${startDate ? "text-zinc-800" : "text-zinc-300"}`}>
           {startDate ? `${formatDateDisplay(startDate)} - ${endDate ? formatDateDisplay(endDate) : '...'}` : "Definir datas"}
         </span>
-        <ChevronDown className={`size-4 text-gray-400 transition-transform duration-300 ${showCalendar ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`size-4 text-zinc-400 transition-transform duration-300 ${showCalendar ? 'rotate-180' : ''}`} />
       </div>
     </button>
 
     {showCalendar && (
-      <div onClick={(event) => event.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} role="presentation" className="absolute top-full left-0 md:left-auto md:right-0 bg-white rounded-3xl shadow-2xl border-2 border-gray-100 mt-4 p-6 z-[60] w-full md:w-80 cursor-default animate-pop-in origin-top">
+      <div onClick={(event) => event.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} role="presentation" className="absolute top-full left-0 md:left-auto md:right-0 bg-white rounded-3xl shadow-2xl border-2 border-zinc-100 mt-4 p-6 z-[60] w-full md:w-80 cursor-default animate-pop-in origin-top">
         <div className="flex items-center justify-between mb-4">
           <button
             type="button"
             onClick={() => onChangeMonth(-1)}
             disabled={!canGoToPreviousMonth}
-            className={`p-1 rounded-full transition-colors ${canGoToPreviousMonth ? 'hover:bg-gray-100 text-gray-600' : 'text-gray-300 cursor-not-allowed'}`}
+            className={`p-1 rounded-full transition-colors ${canGoToPreviousMonth ? 'hover:bg-zinc-100 text-zinc-600' : 'text-zinc-300 cursor-not-allowed'}`}
             aria-label="Mês anterior"
           >
             <ChevronLeft className="size-5" />
           </button>
-          <span className="font-bold text-gray-800">{MONTH_NAMES[currentMonth.getMonth()]} {currentMonth.getFullYear()}</span>
-          <button type="button" onClick={() => onChangeMonth(1)} className="p-1 hover:bg-gray-100 rounded-full text-gray-600 transition-colors" aria-label="Próximo mês">
+          <span className="font-bold text-zinc-800">{MONTH_NAMES[currentMonth.getMonth()]} {currentMonth.getFullYear()}</span>
+          <button type="button" onClick={() => onChangeMonth(1)} className="p-1 hover:bg-zinc-100 rounded-full text-zinc-600 transition-colors" aria-label="Próximo mês">
             <ChevronRight className="size-5" />
           </button>
         </div>
-        <div className="grid grid-cols-7 mb-2 text-center text-xs font-bold text-gray-400">
+        <div className="grid grid-cols-7 mb-2 text-center text-xs font-bold text-zinc-400">
           {WEEK_DAYS.map((day) => <div key={day}>{day}</div>)}
         </div>
         <div className="grid grid-cols-7 gap-y-1">
@@ -319,7 +319,7 @@ const DateField = memo(({
                 disabled={past}
                 aria-disabled={past}
                 className={`size-9 mx-auto flex items-center justify-center text-sm rounded-full transition-all duration-200 border-2
-                  ${past ? 'border-transparent text-gray-300 cursor-not-allowed' : selected ? 'bg-brand-cyan border-brand-cyan text-white font-bold scale-110' : inRange ? 'bg-brand-light border-transparent text-brand-cyan font-bold' : 'border-transparent text-gray-600 hover:bg-gray-100'}`}
+                  ${past ? 'border-transparent text-zinc-300 cursor-not-allowed' : selected ? 'bg-brand-cyan border-brand-cyan text-white font-bold scale-110' : inRange ? 'bg-brand-light border-transparent text-brand-cyan font-bold' : 'border-transparent text-zinc-600 hover:bg-zinc-100'}`}
               >
                 {date.getDate()}
               </button>
@@ -363,39 +363,39 @@ const GuestsField = memo(({
     <button
       type="button"
       onClick={onToggle}
-      className="w-full p-3 md:p-6 text-left hover:bg-gray-50/80 transition-all duration-300 md:rounded-tr-[2rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
+      className="w-full p-3 md:p-6 text-left hover:bg-zinc-50/80 transition-all duration-300 md:rounded-tr-[2rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
       aria-expanded={showGuestDropdown}
       aria-haspopup="true"
       data-testid="guests-filter-btn"
     >
-      <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan group-focus-within:text-brand-cyan transition-colors">
+      <span className="block text-[10px] font-black text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan group-focus-within:text-brand-cyan transition-colors">
         <User className="size-3" /> Quem vai?
       </span>
       <div className="flex items-center justify-between">
-        <span className="text-lg md:text-xl font-bold text-gray-800 truncate transition-colors">{guestSummary}</span>
-        <ChevronDown className={`size-4 text-gray-400 transition-transform duration-300 ${showGuestDropdown ? 'rotate-180' : ''}`} />
+        <span className="text-lg md:text-xl font-bold text-zinc-800 truncate transition-colors">{guestSummary}</span>
+        <ChevronDown className={`size-4 text-zinc-400 transition-transform duration-300 ${showGuestDropdown ? 'rotate-180' : ''}`} />
       </div>
     </button>
 
     {showGuestDropdown && (
-      <div onClick={(event) => event.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} role="presentation" className="absolute top-full left-0 md:left-auto md:right-0 bg-white rounded-3xl shadow-2xl border-2 border-gray-100 mt-4 p-6 z-[60] w-full md:w-72 cursor-default animate-pop-in origin-top">
+      <div onClick={(event) => event.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} role="presentation" className="absolute top-full left-0 md:left-auto md:right-0 bg-white rounded-3xl shadow-2xl border-2 border-zinc-100 mt-4 p-6 z-[60] w-full md:w-72 cursor-default animate-pop-in origin-top">
         <div className="flex justify-between items-center mb-4">
-          <p className="font-bold text-gray-800">Adultos</p>
+          <p className="font-bold text-zinc-800">Adultos</p>
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={(event) => { event.preventDefault(); event.stopPropagation(); onAdultsChange(Math.max(1, adults - 1)); }}
               disabled={adults <= 1}
-              className="size-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-brand-cyan hover:text-brand-cyan transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="size-8 rounded-full border-2 border-zinc-200 flex items-center justify-center text-zinc-600 hover:border-brand-cyan hover:text-brand-cyan transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               aria-label="Remover um adulto"
             >
               <Minus className="size-4" />
             </button>
-            <span className="font-bold w-8 text-center text-gray-900" aria-live="polite">{adults}</span>
+            <span className="font-bold w-8 text-center text-zinc-900" aria-live="polite">{adults}</span>
             <button
               type="button"
               onClick={(event) => { event.preventDefault(); event.stopPropagation(); onAdultsChange(adults + 1); }}
-              className="size-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-brand-cyan hover:text-brand-cyan transition-all"
+              className="size-8 rounded-full border-2 border-zinc-200 flex items-center justify-center text-zinc-600 hover:border-brand-cyan hover:text-brand-cyan transition-all"
               aria-label="Adicionar um adulto"
             >
               <Plus className="size-4" />
@@ -403,22 +403,22 @@ const GuestsField = memo(({
           </div>
         </div>
         <div className="flex justify-between items-center mb-4">
-          <p className="font-bold text-gray-800">Crianças</p>
+          <p className="font-bold text-zinc-800">Crianças</p>
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={(event) => { event.preventDefault(); event.stopPropagation(); onChildCountChange('remove'); }}
               disabled={children <= 0}
-              className="size-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-brand-cyan hover:text-brand-cyan transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="size-8 rounded-full border-2 border-zinc-200 flex items-center justify-center text-zinc-600 hover:border-brand-cyan hover:text-brand-cyan transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               aria-label="Remover uma criança"
             >
               <Minus className="size-4" />
             </button>
-            <span className="font-bold w-8 text-center text-gray-900" aria-live="polite">{children}</span>
+            <span className="font-bold w-8 text-center text-zinc-900" aria-live="polite">{children}</span>
             <button
               type="button"
               onClick={(event) => { event.preventDefault(); event.stopPropagation(); onChildCountChange('add'); }}
-              className="size-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-brand-cyan hover:text-brand-cyan transition-all"
+              className="size-8 rounded-full border-2 border-zinc-200 flex items-center justify-center text-zinc-600 hover:border-brand-cyan hover:text-brand-cyan transition-all"
               aria-label="Adicionar uma criança"
             >
               <Plus className="size-4" />
@@ -430,7 +430,7 @@ const GuestsField = memo(({
           <div className="mb-4 grid grid-cols-2 gap-2 max-h-32 overflow-y-auto pr-1 custom-scrollbar animate-fade-in-up">
             {childAges.map((age, index) => (
               <div key={`child-age-${index}`} className="flex flex-col">
-                <label htmlFor={`child-age-input-${index}`} className="text-[10px] text-gray-400 font-bold mb-1">Idade Criança {index + 1}</label>
+                <label htmlFor={`child-age-input-${index}`} className="text-[10px] text-zinc-400 font-bold mb-1">Idade Criança {index + 1}</label>
                 <input
                   id={`child-age-input-${index}`}
                   type="number"
@@ -439,7 +439,7 @@ const GuestsField = memo(({
                   value={age}
                   onClick={(event) => event.stopPropagation()}
                   onChange={(event) => onChildAgeChange(index, event.target.value)}
-                  className="w-full border-2 border-gray-100 rounded-lg px-2 py-1 text-sm font-bold text-gray-700 outline-none focus:border-brand-cyan transition-colors"
+                  className="w-full border-2 border-zinc-100 rounded-lg px-2 py-1 text-sm font-bold text-zinc-700 outline-none focus:border-brand-cyan transition-colors"
                   placeholder="Ex: 5"
                 />
               </div>
@@ -475,12 +475,12 @@ const TripTypeField = memo(({
     <button
       type="button"
       onClick={onToggle}
-      className="w-full p-3 md:p-6 text-left hover:bg-gray-50/80 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
+      className="w-full p-3 md:p-6 text-left hover:bg-zinc-50/80 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
       aria-expanded={showTripTypeDropdown}
       aria-haspopup="true"
       data-testid="trip-type-filter-btn"
     >
-      <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan group-focus-within:text-brand-cyan transition-colors">
+      <span className="block text-[10px] font-black text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan group-focus-within:text-brand-cyan transition-colors">
         <Briefcase className="size-3" /> Tipo de Viagem
       </span>
       <div className="flex items-center justify-between">
@@ -488,16 +488,16 @@ const TripTypeField = memo(({
           {selectedTripObj && (
             <selectedTripObj.icon className={`size-5 ${selectedTripObj.color}`} />
           )}
-          <span className={`text-lg md:text-lg font-bold truncate transition-colors ${tripType ? "text-gray-800" : "text-gray-300"}`}>
+          <span className={`text-lg md:text-lg font-bold truncate transition-colors ${tripType ? "text-zinc-800" : "text-zinc-300"}`}>
             {tripType || "Lazer, Lua de Mel..."}
           </span>
         </div>
-        <ChevronDown className={`size-4 text-gray-400 transition-transform duration-300 ${showTripTypeDropdown ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`size-4 text-zinc-400 transition-transform duration-300 ${showTripTypeDropdown ? 'rotate-180' : ''}`} />
       </div>
     </button>
 
     {showTripTypeDropdown && (
-      <div onClick={(event) => event.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} role="presentation" className="absolute top-full left-0 w-full md:w-[400px] bg-white rounded-3xl shadow-2xl border-2 border-gray-100 mt-2 z-[60] animate-pop-in origin-top overflow-hidden p-4">
+      <div onClick={(event) => event.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} role="presentation" className="absolute top-full left-0 w-full md:w-[400px] bg-white rounded-3xl shadow-2xl border-2 border-zinc-100 mt-2 z-[60] animate-pop-in origin-top overflow-hidden p-4">
         <div className="grid grid-cols-2 gap-3">
           {TRIP_OPTIONS.map((type) => (
             <button
@@ -505,12 +505,12 @@ const TripTypeField = memo(({
               type="button"
               onClick={() => onSelect(type.label)}
               className={`flex flex-col items-start gap-2 p-3 rounded-2xl border-2 transition-all duration-200 text-left
-                ${tripType === type.label ? 'bg-brand-light border-brand-cyan shadow-sm' : 'bg-white border-transparent hover:bg-gray-50 hover:border-gray-100'}`}
+                ${tripType === type.label ? 'bg-brand-light border-brand-cyan shadow-sm' : 'bg-white border-transparent hover:bg-zinc-50 hover:border-zinc-100'}`}
             >
               <div className={`p-2 rounded-xl ${type.bg} ${type.color}`}>
                 <type.icon className="size-5" />
               </div>
-              <span className={`font-bold text-base ${tripType === type.label ? 'text-brand-dark' : 'text-gray-600'}`}>
+              <span className={`font-bold text-base ${tripType === type.label ? 'text-brand-dark' : 'text-zinc-600'}`}>
                 {type.label}
               </span>
             </button>
@@ -543,12 +543,12 @@ const BudgetField = memo(({
     <button
       type="button"
       onClick={onToggle}
-      className="w-full p-3 md:p-6 text-left hover:bg-gray-50/80 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
+      className="w-full p-3 md:p-6 text-left hover:bg-zinc-50/80 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan"
       aria-expanded={showBudgetDropdown}
       aria-haspopup="true"
       data-testid="budget-filter-btn"
     >
-      <span className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan group-focus-within:text-brand-cyan transition-colors">
+      <span className="block text-[10px] font-black text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan group-focus-within:text-brand-cyan transition-colors">
         <Wallet className="size-3" /> Orçamento Aprox.
       </span>
       <div className="flex items-center justify-between">
@@ -558,30 +558,30 @@ const BudgetField = memo(({
               {Array.from({ length: selectedBudgetObj.level }, (_, index) => <span key={`selected-budget-${index}`}>$</span>)}
             </div>
           )}
-          <span className={`text-lg md:text-lg font-bold truncate transition-colors ${budget ? "text-gray-800" : "text-gray-300"}`}>
+          <span className={`text-lg md:text-lg font-bold truncate transition-colors ${budget ? "text-zinc-800" : "text-zinc-300"}`}>
             {budget || "Definir padrão"}
           </span>
         </div>
-        <ChevronDown className={`size-4 text-gray-400 transition-transform duration-300 ${showBudgetDropdown ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`size-4 text-zinc-400 transition-transform duration-300 ${showBudgetDropdown ? 'rotate-180' : ''}`} />
       </div>
     </button>
 
     {showBudgetDropdown && (
-      <div onClick={(event) => event.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} role="presentation" className="absolute top-full left-0 w-full md:w-[320px] bg-white rounded-3xl shadow-2xl border-2 border-gray-100 mt-2 z-[60] animate-pop-in origin-top overflow-hidden p-3">
+      <div onClick={(event) => event.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} role="presentation" className="absolute top-full left-0 w-full md:w-[320px] bg-white rounded-3xl shadow-2xl border-2 border-zinc-100 mt-2 z-[60] animate-pop-in origin-top overflow-hidden p-3">
         {BUDGET_TIERS.map((option) => (
           <button
             key={option.label}
             type="button"
             onClick={() => onSelect(option.label)}
             className={`w-full flex items-center gap-4 p-3 rounded-2xl border-2 transition-all duration-200 mb-2 last:mb-0
-              ${budget === option.label ? 'bg-brand-light border-brand-cyan shadow-sm' : 'bg-white border-transparent hover:bg-gray-50 hover:border-gray-100'}`}
+              ${budget === option.label ? 'bg-brand-light border-brand-cyan shadow-sm' : 'bg-white border-transparent hover:bg-zinc-50 hover:border-zinc-100'}`}
           >
-            <div className={`p-2 rounded-xl bg-gray-100 text-gray-600 ${budget === option.label ? 'bg-brand-vibrant text-white' : ''}`}>
+            <div className={`p-2 rounded-xl bg-zinc-100 text-zinc-600 ${budget === option.label ? 'bg-brand-vibrant text-white' : ''}`}>
               <option.icon className="size-5" />
             </div>
             <div className="text-left">
               <div className="flex items-center gap-2">
-                <span className={`font-bold text-base ${budget === option.label ? 'text-brand-dark' : 'text-gray-800'}`}>
+                <span className={`font-bold text-base ${budget === option.label ? 'text-brand-dark' : 'text-zinc-800'}`}>
                   {option.label}
                 </span>
                 <div className="flex text-[10px] font-black text-green-600 bg-green-50 px-1.5 rounded">
@@ -589,9 +589,9 @@ const BudgetField = memo(({
                 </div>
               </div>
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-sm text-gray-400 font-medium">{option.desc}</span>
-                <span className="text-xs text-gray-500 font-semibold">•</span>
-                <span className="text-sm text-gray-600 font-semibold">{option.range}</span>
+                <span className="text-sm text-zinc-400 font-medium">{option.desc}</span>
+                <span className="text-xs text-zinc-500 font-semibold">•</span>
+                <span className="text-sm text-zinc-600 font-semibold">{option.range}</span>
               </div>
             </div>
           </button>
@@ -924,7 +924,7 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
         validationError ? 'ring-4 ring-red-500/20 border-red-500/20' : ''
       }`}
     >
-      <div className="flex flex-col md:flex-row items-center w-full divide-y md:divide-y-0 md:divide-x divide-gray-100">
+      <div className="flex flex-col md:flex-row items-center w-full divide-y md:divide-y-0 md:divide-x divide-zinc-100">
         <DestinationField
           destRef={destRef}
           inputRef={destinationInputRef}
@@ -967,12 +967,12 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
         />
       </div>
 
-      <div className="w-full h-[2px] border-t-2 border-dashed border-gray-200 relative my-1">
+      <div className="w-full h-[2px] border-t-2 border-dashed border-zinc-200 relative my-1">
         <div className="absolute left-[-16px] top-[-8px] size-4 bg-brand-light rounded-full"></div>
         <div className="absolute right-[-16px] top-[-8px] size-4 bg-brand-light rounded-full"></div>
       </div>
 
-      <div className="flex flex-col md:flex-row items-stretch w-full divide-y md:divide-y-0 md:divide-x divide-gray-100">
+      <div className="flex flex-col md:flex-row items-stretch w-full divide-y md:divide-y-0 md:divide-x divide-zinc-100">
         <TripTypeField
           tripTypeRef={tripTypeRef}
           showTripTypeDropdown={showTripTypeDropdown}

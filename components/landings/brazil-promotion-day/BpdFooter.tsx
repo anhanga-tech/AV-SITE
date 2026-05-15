@@ -2,7 +2,7 @@ import { BRAND_LOGO_BLUE_URL } from '../../../lib/media-assets';
 
 export function BpdFooter() {
     return (
-        <footer className="bg-brand-dark text-gray-300 py-10">
+        <footer className="bg-brand-dark text-zinc-300 py-10">
             <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
                 <img
                     src={BRAND_LOGO_BLUE_URL}

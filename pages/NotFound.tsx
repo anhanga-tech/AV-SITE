@@ -38,7 +38,7 @@ const NotFound: React.FC = () => {
             <span className="text-brand-cyan">pegou outro rumo.</span>
           </h1>
 
-          <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
+          <p className="text-xl text-zinc-600 mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
             Parece que o destino que você procurava não está no mapa. Que tal recomeçar a sua jornada por um desses caminhos?
           </p>
 
@@ -52,7 +52,7 @@ const NotFound: React.FC = () => {
               </div>
               <div className="text-left">
                 <p className="font-bold text-brand-dark">Página Inicial</p>
-                <p className="text-sm text-gray-500">Voltar ao começo</p>
+                <p className="text-sm text-zinc-500">Voltar ao começo</p>
               </div>
             </a>
 
@@ -65,7 +65,7 @@ const NotFound: React.FC = () => {
               </div>
               <div className="text-left">
                 <p className="font-bold text-brand-dark">Blog de Viagens</p>
-                <p className="text-sm text-gray-500">Dicas e roteiros</p>
+                <p className="text-sm text-zinc-500">Dicas e roteiros</p>
               </div>
             </a>
 
@@ -78,7 +78,7 @@ const NotFound: React.FC = () => {
               </div>
               <div className="text-left">
                 <p className="font-bold text-brand-dark">Orlando</p>
-                <p className="text-sm text-gray-500">Magia e diversão</p>
+                <p className="text-sm text-zinc-500">Magia e diversão</p>
               </div>
             </a>
 
@@ -93,7 +93,7 @@ const NotFound: React.FC = () => {
                 </div>
                 <div className="text-left">
                   <p className="font-bold text-brand-dark">Beto Carrero</p>
-                  <p className="text-sm text-gray-500">Aventura no Brasil</p>
+                  <p className="text-sm text-zinc-500">Aventura no Brasil</p>
                 </div>
               </a>
 
@@ -106,7 +106,7 @@ const NotFound: React.FC = () => {
                 </div>
                 <div className="text-left">
                   <p className="font-bold text-brand-dark">Lollapalooza</p>
-                  <p className="text-sm text-gray-500">Música e experiência</p>
+                  <p className="text-sm text-zinc-500">Música e experiência</p>
                 </div>
               </a>
             </div>

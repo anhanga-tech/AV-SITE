@@ -35,7 +35,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
                 {title}
             </h2>
             {subtitle && (
-                <p className="text-gray-500 text-base font-medium">{subtitle}</p>
+                <p className="text-zinc-500 text-base font-medium">{subtitle}</p>
             )}
         </div>
 );
