@@ -1,8 +1,8 @@
 # Blog redirects
-/blog/tag/dicas  https://blog.anhanga.tur.br/tag/dicas-de-expert/  301!
-/blog/tag/dicas/  https://blog.anhanga.tur.br/tag/dicas-de-expert/  301!
-/blog    https://blog.anhanga.tur.br    301!
-/blog/*  https://blog.anhanga.tur.br/:splat  301!
+/blog/tag/dicas  https://blog.anhanga.tur.br/tag/dicas-de-expert/  301
+/blog/tag/dicas/  https://blog.anhanga.tur.br/tag/dicas-de-expert/  301
+/blog    https://blog.anhanga.tur.br    301
+/blog/*  https://blog.anhanga.tur.br/:splat  301
 
 # Lollapalooza slug change
 /lollapalooza-2026    /lollapalooza    301
