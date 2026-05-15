@@ -44,8 +44,8 @@ export default {
             },
             fontFamily: {
                 sans: ['Poppins', 'sans-serif'],
-                serif: ['Merriweather', 'serif'], // Fonte editorial para o blog
-                display: ['Playfair Display', 'Georgia', 'serif'], // Display para headings principais
+                serif: ['Merriweather', 'serif'],
+                display: ['Poppins', 'sans-serif'],
             },
             boxShadow: {
                 'glow': '0 0 20px rgba(14, 165, 233, 0.5)',
