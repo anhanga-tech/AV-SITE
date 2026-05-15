@@ -22,7 +22,7 @@ interface ButtonProps {
  * A navegação é 100% nativa, garantindo funcionamento no iOS/Safari.
  */
 const Button: React.FC<ButtonProps> = ({ text, className = '', variant = 'primary', fullWidth = false, href, id, dataTestId, dataWhatsappLocation, dataTracking }) => {
-  const baseStyles = "inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full font-bold transition-all duration-300 transform hover:scale-105 shadow-lg text-lg uppercase tracking-wide cursor-pointer select-none";
+  const baseStyles = "inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full font-bold transition duration-300 transform hover:scale-105 shadow-lg text-lg uppercase tracking-wide cursor-pointer select-none";
 
   const variants = {
     primary: "bg-anhanga-yellow text-anhanga-darkBlue hover:bg-anhanga-yellowHover",

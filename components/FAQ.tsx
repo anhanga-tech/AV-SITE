@@ -26,7 +26,7 @@ const FAQItem = memo(({ question, answer, idx }: FAQItemProps) => {
 
     return (
         <div
-            className={`mb-4 rounded-2xl overflow-hidden transition-all duration-300 border border-white/40 shadow-sm custom-backdrop ${isOpen ? 'shadow-md scale-[1.01]' : ''}`}
+            className={`mb-4 rounded-2xl overflow-hidden transition duration-300 border border-white/40 shadow-sm custom-backdrop ${isOpen ? 'shadow-md scale-[1.01]' : ''}`}
         >
             <button
                 className="w-full px-6 py-5 flex justify-between items-center text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan group bg-white/60 hover:bg-white/80 transition-colors"
@@ -45,7 +45,7 @@ const FAQItem = memo(({ question, answer, idx }: FAQItemProps) => {
                     </h3>
                 </div>
 
-                <div className={`size-10 rounded-xl flex items-center justify-center transition-all duration-300 ${isOpen
+                <div className={`size-10 rounded-xl flex items-center justify-center transition duration-300 ${isOpen
                     ? 'bg-brand-cyan text-white rotate-180'
                     : 'bg-white text-zinc-400 group-hover:text-brand-cyan'
                     }`}>
@@ -53,7 +53,7 @@ const FAQItem = memo(({ question, answer, idx }: FAQItemProps) => {
                 </div>
             </button>
             <div
-                className={`overflow-hidden transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}
+                className={`overflow-hidden transition-[max-height,opacity] duration-500 ease-in-out ${isOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}
             >
                 <div className="px-6 pb-8 pt-4 text-zinc-700 font-medium leading-relaxed text-lg bg-white/40">
                     {/* The answer content is injected here */}

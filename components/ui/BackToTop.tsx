@@ -45,7 +45,7 @@ const BackToTop: React.FC = () => {
         fixed bottom-24 right-4 sm:bottom-32 sm:right-8 z-[9980]
         p-3 rounded-2xl bg-white text-brand-cyan border-2 border-brand-cyan/20
         shadow-lg shadow-brand-cyan/10 hover:shadow-brand-cyan/20
-        transition-all duration-300 ease-spring
+        transition duration-300 ease-spring
         hover:-translate-y-1 active:scale-90
         focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-cyan
         ${isVisible ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'}

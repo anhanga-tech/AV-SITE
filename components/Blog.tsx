@@ -99,7 +99,7 @@ const Blog: React.FC = memo(() => {
                                                 <span className="text-sm font-black text-brand-dark">{AUTHORS[featuredPost.author]?.name ?? featuredPost.author}</span>
                                             </div>
                                         </div>
-                                        <span className="flex items-center gap-2 text-brand-cyan font-black uppercase tracking-wide group-hover:gap-4 transition-all">
+                                        <span className="flex items-center gap-2 text-brand-cyan font-black uppercase tracking-wide group-hover:gap-4 transition-[gap,color]">
                                             Ler Agora <ArrowRight className="size-5" />
                                         </span>
                                     </div>
@@ -115,7 +115,7 @@ const Blog: React.FC = memo(() => {
                         <a
                             href={getBlogPostUrl(post.slug)}
                             key={post.slug}
-                            className="group bg-white rounded-3xl p-4 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.05)] border border-zinc-100 transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl flex flex-col h-full"
+                            className="group bg-white rounded-3xl p-4 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.05)] border border-zinc-100 transform transition duration-300 hover:-translate-y-2 hover:shadow-xl flex flex-col h-full"
                         >
                             {/* Image Area — aspect ratio alternado para quebrar ritmo uniforme */}
                             <div className={`relative ${index % 2 === 0 ? 'aspect-[4/3]' : 'aspect-video'} rounded-2xl overflow-hidden mb-5 bg-zinc-100`}>
@@ -171,7 +171,7 @@ const Blog: React.FC = memo(() => {
 
                 {/* View More Button */}
                 <div className="mt-16 text-center">
-                    <a href={getBlogHomeUrl()} className="inline-flex items-center gap-2 px-8 py-4 bg-white border-2 border-zinc-200 text-zinc-600 rounded-full font-bold hover:border-brand-cyan hover:text-brand-cyan transition-all shadow-sm hover:shadow-md group">
+                    <a href={getBlogHomeUrl()} className="inline-flex items-center gap-2 px-8 py-4 bg-white border-2 border-zinc-200 text-zinc-600 rounded-full font-bold hover:border-brand-cyan hover:text-brand-cyan transition shadow-sm hover:shadow-md group">
                         <Sparkles className="size-4 text-brand-yellow fill-brand-yellow" />
                         Ver Todos os Artigos
                         <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />

@@ -44,7 +44,7 @@ const FAQ: React.FC = () => {
                 return (
                   <div
                     key={item.question}
-                    className={`border-2 border-fun-dark rounded-2xl transition-all duration-300 overflow-hidden ${isOpen ? 'bg-blue-50 shadow-hard' : 'bg-white hover:bg-zinc-50'}`}
+                    className={`border-2 border-fun-dark rounded-2xl transition duration-300 overflow-hidden ${isOpen ? 'bg-blue-50 shadow-hard' : 'bg-white hover:bg-zinc-50'}`}
                   >
                     <button 
                       onClick={() => toggleAccordion(idx)}
@@ -54,7 +54,7 @@ const FAQ: React.FC = () => {
                       <span className={`font-sans font-bold text-lg md:text-xl pr-4 leading-tight ${isOpen ? 'text-fun-blue' : 'text-fun-dark'}`}>
                         {item.question}
                       </span>
-                      <div className={`flex-shrink-0 size-8 rounded-full border-2 border-fun-dark flex items-center justify-center transition-all duration-300 ${isOpen ? 'bg-fun-blue text-white rotate-180' : 'bg-white text-fun-dark'}`}>
+                      <div className={`flex-shrink-0 size-8 rounded-full border-2 border-fun-dark flex items-center justify-center transition duration-300 ${isOpen ? 'bg-fun-blue text-white rotate-180' : 'bg-white text-fun-dark'}`}>
                         <ChevronDown size={20} strokeWidth={3} />
                       </div>
                     </button>

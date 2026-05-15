@@ -31,7 +31,7 @@ export function DestinationsModal({ isOpen, onClose }: DestinationsModalProps) {
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 bg-fun-pink text-white p-2 rounded-full border-2 border-fun-dark shadow-hard hover:scale-110 hover:rotate-90 transition-all z-10"
+          className="absolute top-4 right-4 bg-fun-pink text-white p-2 rounded-full border-2 border-fun-dark shadow-hard hover:scale-110 hover:rotate-90 transition z-10"
           aria-label="Fechar janela"
         >
           <X size={20} strokeWidth={3} />
@@ -47,7 +47,7 @@ export function DestinationsModal({ isOpen, onClose }: DestinationsModalProps) {
         <div className="space-y-5 mb-4">
 
           {/* Item 1: Floripa */}
-          <div className="group bg-white p-5 rounded-2xl border-2 border-fun-dark shadow-hard hover:shadow-hard-hover hover:-translate-y-1 transition-all duration-300 flex items-center gap-5 cursor-default relative overflow-hidden">
+          <div className="group bg-white p-5 rounded-2xl border-2 border-fun-dark shadow-hard hover:shadow-hard-hover hover:-translate-y-1 transition duration-300 flex items-center gap-5 cursor-default relative overflow-hidden">
             <div className="absolute right-0 top-0 size-16 bg-fun-yellow/20 rounded-bl-full z-0"></div>
 
             <div className="size-16 bg-fun-yellow border-2 border-fun-dark rounded-full flex items-center justify-center shadow-sm shrink-0 z-10 group-hover:rotate-12 transition-transform duration-300">
@@ -60,7 +60,7 @@ export function DestinationsModal({ isOpen, onClose }: DestinationsModalProps) {
           </div>
 
           {/* Item 2: Bombinhas */}
-          <div className="group bg-white p-5 rounded-2xl border-2 border-fun-dark shadow-hard hover:shadow-hard-hover hover:-translate-y-1 transition-all duration-300 flex items-center gap-5 cursor-default relative overflow-hidden">
+          <div className="group bg-white p-5 rounded-2xl border-2 border-fun-dark shadow-hard hover:shadow-hard-hover hover:-translate-y-1 transition duration-300 flex items-center gap-5 cursor-default relative overflow-hidden">
             <div className="absolute right-0 top-0 size-16 bg-fun-green/20 rounded-bl-full z-0"></div>
 
             <div className="size-16 bg-fun-green border-2 border-fun-dark rounded-full flex items-center justify-center shadow-sm shrink-0 z-10 group-hover:-rotate-12 transition-transform duration-300">
@@ -73,7 +73,7 @@ export function DestinationsModal({ isOpen, onClose }: DestinationsModalProps) {
           </div>
 
           {/* Item 3: Balneário */}
-          <div className="group bg-white p-5 rounded-2xl border-2 border-fun-dark shadow-hard hover:shadow-hard-hover hover:-translate-y-1 transition-all duration-300 flex items-center gap-5 cursor-default relative overflow-hidden">
+          <div className="group bg-white p-5 rounded-2xl border-2 border-fun-dark shadow-hard hover:shadow-hard-hover hover:-translate-y-1 transition duration-300 flex items-center gap-5 cursor-default relative overflow-hidden">
             <div className="absolute right-0 top-0 size-16 bg-fun-blue/20 rounded-bl-full z-0"></div>
 
             <div className="size-16 bg-fun-blue border-2 border-fun-dark rounded-full flex items-center justify-center shadow-sm shrink-0 z-10 group-hover:rotate-6 transition-transform duration-300">

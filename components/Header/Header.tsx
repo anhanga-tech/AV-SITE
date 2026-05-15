@@ -53,7 +53,7 @@ const Header: React.FC = () => {
     <header
       data-testid="site-header"
       data-header-variant={isInternalPage ? 'internal' : 'home'}
-      className={`fixed top-0 w-full z-50 transition-all duration-500 ease-in-out ${headerToneClass} ${headerSizeClass}`}
+      className={`fixed top-0 w-full z-50 transition duration-500 ease-in-out ${headerToneClass} ${headerSizeClass}`}
     >
       <a
         href="#main-content"
@@ -64,7 +64,7 @@ const Header: React.FC = () => {
       <div className="container mx-auto px-6 flex justify-between items-center">
         <a
           href={`${SITE_URL}/`}
-          className="flex items-center gap-2 group rounded-lg p-1 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2"
+          className="flex items-center gap-2 group rounded-lg p-1 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2"
           aria-label="Anhangá Viagens - Ir para o topo"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
@@ -75,7 +75,7 @@ const Header: React.FC = () => {
             fetchPriority="high"
             width="185"
             height="96"
-            className={`w-auto transition-all duration-300 object-contain ${logoHeightClass}`}
+            className={`w-auto transition duration-300 object-contain ${logoHeightClass}`}
           />
         </a>
 
@@ -94,7 +94,7 @@ const Header: React.FC = () => {
               data-testid="desktop-fale-conosco-btn"
               data-tracking="navbar-desktop"
               onClick={handleContactClick}
-              className={`btn-whatsapp btn-specialist rounded-full font-medium text-sm transition-all duration-500 flex items-center gap-2 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-vibrant ${ctaPaddingClass} ${buttonClass}`}
+              className={`btn-whatsapp btn-specialist rounded-full font-medium text-sm transition duration-500 flex items-center gap-2 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-vibrant ${ctaPaddingClass} ${buttonClass}`}
             >
               <Phone className="size-4" weight="fill" />
               Fale Conosco

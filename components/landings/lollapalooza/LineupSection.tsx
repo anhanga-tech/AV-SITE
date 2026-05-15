@@ -117,7 +117,7 @@ const LineupSection: React.FC = () => {
           {/* Artist Avatars Cluster */}
           <div className="flex justify-center items-center -space-x-4 mb-8" aria-hidden="true">
             {headliners.slice(0, 5).map((artist) => (
-              <div key={artist.name} className="relative z-0 hover:z-10 transition-all duration-300 transform hover:scale-110 hover:-translate-y-2 group">
+              <div key={artist.name} className="relative z-0 hover:z-10 transition duration-300 transform hover:scale-110 hover:-translate-y-2 group">
                 <div className="size-16 md:size-24 rounded-full border-4 border-black group-hover:border-anhanga-yellow overflow-hidden relative shadow-lg">
                   <img
                     src={getArtistImageUrl(artist.image, 96, 96)}
@@ -155,7 +155,7 @@ const LineupSection: React.FC = () => {
         {/* Headliners Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-20">
           {headliners.map((artist, index) => (
-            <div key={artist.name} className={`group relative h-96 sm:h-80 lg:h-96 overflow-hidden rounded-2xl border border-zinc-800 hover:border-anhanga-yellow transition-all duration-300 animate-on-scroll ${isVisible ? 'is-visible' : ''}`} style={{ transitionDelay: `${index * 50}ms` }}>
+            <div key={artist.name} className={`group relative h-96 sm:h-80 lg:h-96 overflow-hidden rounded-2xl border border-zinc-800 hover:border-anhanga-yellow transition duration-300 animate-on-scroll ${isVisible ? 'is-visible' : ''}`} style={{ transitionDelay: `${index * 50}ms` }}>
               {/* Background Image - Optimized to 600px width */}
               <div className="absolute inset-0 bg-zinc-900">
                 <img

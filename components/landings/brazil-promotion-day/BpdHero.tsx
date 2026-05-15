@@ -80,7 +80,7 @@ export function BpdHero() {
                         <button
                             type="button"
                             onClick={() => openContactModal({ source: 'brazil-promotion-day' })}
-                            className="btn-whatsapp btn-specialist flex items-center justify-center gap-3 bg-brand-yellow text-brand-dark px-8 py-4 rounded-2xl font-bold text-lg shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
+                            className="btn-whatsapp btn-specialist flex items-center justify-center gap-3 bg-brand-yellow text-brand-dark px-8 py-4 rounded-2xl font-bold text-lg shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition"
                             data-contact-intent
                             data-tracking="hero-brazil-promotion-day"
                         >
@@ -89,7 +89,7 @@ export function BpdHero() {
                         </button>
                         <a
                             href="#contato"
-                            className="btn-specialist flex items-center justify-center gap-2 border-2 border-white/40 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:border-white hover:bg-white/10 transition-all duration-200"
+                            className="btn-specialist flex items-center justify-center gap-2 border-2 border-white/40 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:border-white hover:bg-white/10 transition duration-200"
                         >
                             Prefiro ser contatado
                             <ArrowRight className="size-5" />
@@ -121,7 +121,7 @@ export function BpdHero() {
                                         transition: { type: 'spring', stiffness: 400, damping: 20 },
                                     },
                                 }}
-                                className="flex items-center gap-2 text-white/90 font-bold text-sm bg-white/10 px-4 py-2 rounded-full backdrop-blur-md border border-white/10 hover:bg-white/20 transition-all duration-300 cursor-default"
+                                className="flex items-center gap-2 text-white/90 font-bold text-sm bg-white/10 px-4 py-2 rounded-full backdrop-blur-md border border-white/10 hover:bg-white/20 transition duration-300 cursor-default"
                             >
                                 <span>{feat.icon}</span>
                                 {feat.text}

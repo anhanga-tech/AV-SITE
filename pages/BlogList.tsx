@@ -66,7 +66,7 @@ const BlogList: React.FC = () => {
                             placeholder="Buscar por título ou categoria..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full px-6 py-4 rounded-full border-2 border-zinc-200 focus:border-brand-cyan focus:outline-none shadow-sm pl-12 text-zinc-700 font-medium transition-all"
+                            className="w-full px-6 py-4 rounded-full border-2 border-zinc-200 focus:border-brand-cyan focus:outline-none shadow-sm pl-12 text-zinc-700 font-medium transition"
                         />
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 size-5" />
                     </div>
@@ -81,7 +81,7 @@ const BlogList: React.FC = () => {
                                 key={post.slug}
                                 className={`
                                 group bg-white rounded-3xl p-5 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.05)] border border-zinc-100
-                                transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl
+                                transform transition duration-300 hover:-translate-y-2 hover:shadow-xl
                                 flex flex-col h-full relative z-10
                             `}
                             >
@@ -154,7 +154,7 @@ const BlogList: React.FC = () => {
                             e.preventDefault();
                             openContactModal({ source: 'blog-list' });
                         }}
-                        className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-brand-dark text-white text-lg font-bold px-10 py-5 rounded-2xl shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
+                        className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-brand-dark text-white text-lg font-bold px-10 py-5 rounded-2xl shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition"
                         data-tracking="footer-blog-list"
                     >
                         Solicitar Orçamento

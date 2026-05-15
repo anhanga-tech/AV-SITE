@@ -96,7 +96,7 @@ const Hero: React.FC = () => {
             <p className="text-zinc-300 text-[10px] sm:text-xs md:text-sm lg:text-lg uppercase tracking-[0.2em] mb-1 md:mb-2">Prepare-se para ver</p>
             <h2 
                 aria-live="polite"
-                className={`text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase italic tracking-tighter text-anhanga-yellow transition-all duration-500 transform text-center break-words w-full max-w-5xl leading-[0.9] sm:leading-tight pb-2 ${
+                className={`text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase italic tracking-tighter text-anhanga-yellow transition duration-500 transform text-center break-words w-full max-w-5xl leading-[0.9] sm:leading-tight pb-2 ${
                     isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'
                 }`}
                 style={{ paddingRight: '0.1em' }}
@@ -149,7 +149,7 @@ const Hero: React.FC = () => {
           <button 
             onClick={handleShare}
             className={`
-              group relative flex items-center justify-center gap-2 px-6 py-4 rounded-full border-2 transition-all duration-300 w-full sm:w-auto
+              group relative flex items-center justify-center gap-2 px-6 py-4 rounded-full border-2 transition duration-300 w-full sm:w-auto
               ${shareStatus === 'copied' 
                 ? 'bg-green-500 border-green-500 text-white' 
                 : 'border-white/20 text-white hover:bg-white/10 hover:border-anhanga-yellow hover:text-anhanga-yellow'

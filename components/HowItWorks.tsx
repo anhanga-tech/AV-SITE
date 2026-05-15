@@ -128,7 +128,7 @@ const HowItWorks = memo(() => {
                             {/* The Card */}
                             <div className={`
                                 w-full md:w-[45%] bg-white p-8 rounded-[2rem] shadow-[8px_8px_0px_rgba(0,0,0,0.05)] border-2 ${step.borderColor}
-                                transform transition-all duration-300 hover:scale-105 hover:-translate-y-2 hover:shadow-[12px_12px_0px_rgba(0,0,0,0.08)]
+                                transform transition duration-300 hover:scale-105 hover:-translate-y-2 hover:shadow-[12px_12px_0px_rgba(0,0,0,0.08)]
                                 relative group overflow-visible ${step.rotate}
                             `}>
                                 {/* Fake Tape Effect */}
@@ -170,14 +170,14 @@ const HowItWorks = memo(() => {
         <div className="mt-24 text-center relative z-20">
             <div className="inline-block relative group">
                 {/* Blobs behind button - Adjusted opacity and size */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-brand-yellow/30 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-500"></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-brand-yellow/30 rounded-full blur-2xl group-hover:blur-3xl transition duration-500"></div>
                 
                 <button
                     onClick={(e) => {
                         e.preventDefault();
                         openContactModal({ source: 'how-it-works' });
                     }}
-                    className="relative z-10 flex items-center gap-4 bg-white text-brand-dark px-10 py-6 rounded-full font-black text-xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.15)] hover:shadow-[0_20px_50px_rgba(8,_112,_184,_0.25)] transform transition-all hover:scale-105 active:scale-95 border-4 border-transparent hover:border-brand-yellow text-left"
+                    className="relative z-10 flex items-center gap-4 bg-white text-brand-dark px-10 py-6 rounded-full font-black text-xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.15)] hover:shadow-[0_20px_50px_rgba(8,_112,_184,_0.25)] transform transition hover:scale-105 active:scale-95 border-4 border-transparent hover:border-brand-yellow text-left"
                 >
                     <Sparkle className="size-6 text-brand-yellow" weight="fill" />
                     <span>Quero meu roteiro agora!</span>

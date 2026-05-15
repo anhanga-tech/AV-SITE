@@ -142,7 +142,7 @@ const Hero: React.FC = memo(() => {
 
           {/* SEO H1 - Optimized with visible keywords for search engines */}
           <h1
-            className={`font-sans font-extrabold text-white mb-6 leading-[0.9] tracking-tight drop-shadow-lg transition-all duration-500
+            className={`font-sans font-extrabold text-white mb-6 leading-[0.9] tracking-tight drop-shadow-lg transition duration-500
                 ${validCityForTitle ? 'text-4xl sm:text-5xl md:text-7xl' : 'text-5xl sm:text-6xl md:text-8xl'}
                 `}
           >
@@ -208,7 +208,7 @@ const Hero: React.FC = memo(() => {
                 type="submit"
                 data-testid="submit-search-btn-mobile"
                 data-tracking="hero-home-mobile"
-                className="btn-specialist w-full bg-brand-yellow text-brand-dark font-black text-base py-4 rounded-2xl shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
+                className="btn-specialist w-full bg-brand-yellow text-brand-dark font-black text-base py-4 rounded-2xl shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition"
               >
                 Quero meu orçamento →
               </button>
@@ -234,7 +234,7 @@ const Hero: React.FC = memo(() => {
                   hidden: { opacity: 0, y: 16, scale: 0.9 },
                   visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 400, damping: 20 } }
                 }}
-                className="flex items-center gap-2 text-white/90 font-bold text-sm bg-white/10 px-4 py-2 rounded-full backdrop-blur-md border border-white/10 hover:bg-white/20 transition-all duration-300 cursor-default"
+                className="flex items-center gap-2 text-white/90 font-bold text-sm bg-white/10 px-4 py-2 rounded-full backdrop-blur-md border border-white/10 hover:bg-white/20 transition duration-300 cursor-default"
                 whileHover={{ scale: 1.05, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
               >
                 <feat.icon className="size-4 text-yellow-300" />

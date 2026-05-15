@@ -47,7 +47,7 @@ export function DesktopNavigation({
                 <CaretDown className="size-4 transition-transform duration-300 group-hover:rotate-180" weight="bold" />
               </button>
 
-              <div className="absolute top-full z-10 w-48 translate-y-2 pt-4 opacity-0 invisible transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 group-hover:visible focus-within:translate-y-0 focus-within:opacity-100 focus-within:visible">
+              <div className="absolute top-full z-10 w-48 translate-y-2 pt-4 opacity-0 invisible transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 group-hover:visible focus-within:translate-y-0 focus-within:opacity-100 focus-within:visible">
                 <div className="rounded-md border border-zinc-100 bg-white py-2 shadow-lg">
                   {link.subLinks.map((subLink) => {
                     const href = isPageLink(subLink.href)

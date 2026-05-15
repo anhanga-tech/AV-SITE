@@ -99,7 +99,7 @@ const Categories = memo(() => {
               </div>
 
               {/* Sticker Decor */}
-              <div className="absolute -bottom-4 -right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-0 group-hover:scale-110">
+              <div className="absolute -bottom-4 -right-4 opacity-0 group-hover:opacity-100 transition duration-300 transform scale-0 group-hover:scale-110">
                 <div className="bg-brand-yellow text-brand-dark rounded-full p-3 shadow-lg border-2 border-white">
                   <ArrowRight className="size-6 -rotate-45" />
                 </div>

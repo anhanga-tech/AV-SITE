@@ -15,7 +15,7 @@ const WhyUs: React.FC = () => {
           <div className={`w-full lg:w-1/2 animate-on-scroll ${isVisible ? 'is-visible' : ''}`}>
             <div className="relative group">
               {/* Image Display */}
-              <div className="relative overflow-hidden rounded-3xl shadow-2xl rotate-2 group-hover:rotate-0 transition-all duration-500 w-full aspect-[4/3] bg-zinc-100">
+              <div className="relative overflow-hidden rounded-3xl shadow-2xl rotate-2 group-hover:rotate-0 transition duration-500 w-full aspect-[4/3] bg-zinc-100">
                  <img 
                     src={getMediaUrl('images/lollapalooza/why-us/multidao-festival.jpg')} 
                     alt="Multidão feliz em um festival de música com confetes e luzes" 

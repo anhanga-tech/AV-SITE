@@ -80,7 +80,7 @@ const Problem: React.FC = () => {
                <div className="lg:col-span-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6 md:gap-8 lg:gap-10">
 
                   {/* Problem Card 1 */}
-                  <div className="group bg-white p-6 lg:p-8 rounded-2xl border-2 border-fun-dark shadow-hard hover:shadow-hard-hover hover:-translate-y-1 transition-all duration-300 transform rotate-1 h-full">
+                  <div className="group bg-white p-6 lg:p-8 rounded-2xl border-2 border-fun-dark shadow-hard hover:shadow-hard-hover hover:-translate-y-1 transition duration-300 transform rotate-1 h-full">
                      <div className="flex gap-5 lg:gap-8 items-start h-full">
                         <div className="flex-shrink-0 size-14 lg:size-20 rounded-xl bg-red-100 flex items-center justify-center text-fun-pink border-2 border-fun-dark shadow-sm group-hover:scale-110 transition-transform">
                            <HelpCircle size={28} className="lg:size-10" strokeWidth={2.5} />
@@ -98,7 +98,7 @@ const Problem: React.FC = () => {
                   </div>
 
                   {/* Problem Card 2 */}
-                  <div className="group bg-white p-6 lg:p-8 rounded-2xl border-2 border-fun-dark shadow-hard hover:shadow-hard-hover hover:-translate-y-1 transition-all duration-300 transform -rotate-1 h-full">
+                  <div className="group bg-white p-6 lg:p-8 rounded-2xl border-2 border-fun-dark shadow-hard hover:shadow-hard-hover hover:-translate-y-1 transition duration-300 transform -rotate-1 h-full">
                      <div className="flex gap-5 lg:gap-8 items-start h-full">
                         <div className="flex-shrink-0 size-14 lg:size-20 rounded-xl bg-fun-yellow flex items-center justify-center text-fun-dark border-2 border-fun-dark shadow-sm group-hover:scale-110 transition-transform">
                            <X size={28} className="lg:size-10" strokeWidth={2.5} />
@@ -113,7 +113,7 @@ const Problem: React.FC = () => {
                   </div>
 
                   {/* Problem Card 3 - Spans 2 columns on tablet to center it */}
-                  <div className="group bg-white p-6 lg:p-8 rounded-2xl border-2 border-fun-dark shadow-hard hover:shadow-hard-hover hover:-translate-y-1 transition-all duration-300 transform rotate-1 md:col-span-2 lg:col-span-1 md:w-3/4 md:mx-auto lg:w-full">
+                  <div className="group bg-white p-6 lg:p-8 rounded-2xl border-2 border-fun-dark shadow-hard hover:shadow-hard-hover hover:-translate-y-1 transition duration-300 transform rotate-1 md:col-span-2 lg:col-span-1 md:w-3/4 md:mx-auto lg:w-full">
                      <div className="flex gap-5 lg:gap-8 items-start h-full">
                         <div className="flex-shrink-0 size-14 lg:size-20 rounded-xl bg-blue-100 flex items-center justify-center text-fun-blue border-2 border-fun-dark shadow-sm group-hover:scale-110 transition-transform">
                            <AlertTriangle size={28} className="lg:size-10" strokeWidth={2.5} />

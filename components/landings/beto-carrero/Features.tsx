@@ -49,12 +49,12 @@ const Features: React.FC = () => {
               className="relative group perspective-1000"
             >
               {/* The Large Number Floating Behind */}
-              <div className="absolute -top-10 -left-2 text-[120px] font-sans font-black text-zinc-100 select-none z-0 transition-all duration-300 group-hover:text-zinc-200 group-hover:-translate-y-4 group-hover:scale-105">
+              <div className="absolute -top-10 -left-2 text-[120px] font-sans font-black text-zinc-100 select-none z-0 transition duration-300 group-hover:text-zinc-200 group-hover:-translate-y-4 group-hover:scale-105">
                 0{idx + 1}
               </div>
 
               {/* The Card */}
-              <div className="relative z-10 bg-white rounded-2xl border-4 border-fun-dark shadow-hard transition-all duration-300 transform group-hover:-translate-y-3 group-hover:rotate-1 group-hover:shadow-hard-hover h-full flex flex-col overflow-hidden">
+              <div className="relative z-10 bg-white rounded-2xl border-4 border-fun-dark shadow-hard transition duration-300 transform group-hover:-translate-y-3 group-hover:rotate-1 group-hover:shadow-hard-hover h-full flex flex-col overflow-hidden">
                 
                 {/* Header Bar */}
                 <div className={`h-4 w-full border-b-4 border-fun-dark ${feature.color}`}></div>
@@ -79,7 +79,7 @@ const Features: React.FC = () => {
                   )}
 
                   {/* Icon Badge - Highlighted & Larger */}
-                  <div className={`size-24 rounded-2xl border-4 border-fun-dark flex items-center justify-center mb-8 shadow-hard transition-all duration-300 group-hover:shadow-hard-hover group-hover:scale-110 ${feature.color} relative z-10`}>
+                  <div className={`size-24 rounded-2xl border-4 border-fun-dark flex items-center justify-center mb-8 shadow-hard transition duration-300 group-hover:shadow-hard-hover group-hover:scale-110 ${feature.color} relative z-10`}>
                     {feature.icon}
                   </div>
 
@@ -93,7 +93,7 @@ const Features: React.FC = () => {
                 </div>
 
                 {/* Bottom Highlight */}
-                <div className={`h-3 w-0 group-hover:w-full transition-all duration-500 ease-out ${feature.color}`}></div>
+                <div className={`h-3 w-0 group-hover:w-full transition-[width] duration-500 ease-out ${feature.color}`}></div>
               </div>
             </div>
           ))}

@@ -87,7 +87,7 @@ const PackageFeatures: React.FC = () => {
             <div
               key={feature.id}
               className={`
-                group relative rounded-3xl overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl
+                group relative rounded-3xl overflow-hidden transition duration-500 hover:scale-[1.02] hover:shadow-2xl
                 ${feature.className}
                 animate-on-scroll ${isVisible ? 'is-visible' : ''}
               `}

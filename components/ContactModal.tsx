@@ -30,6 +30,9 @@ const ContactModal: React.FC = () => {
         triggerRef.current?.focus();
     }, [reset]);
 
+    const closeRef = useRef(close);
+    useEffect(() => { closeRef.current = close; });
+
     useEffect(() => {
         const handleOpen = (event: Event) => {
             triggerRef.current = document.activeElement as HTMLElement | null;
@@ -58,7 +61,7 @@ const ContactModal: React.FC = () => {
 
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
-                close();
+                closeRef.current();
                 return;
             }
 
@@ -86,7 +89,7 @@ const ContactModal: React.FC = () => {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [close, isOpen]);
+    }, [isOpen]);
 
     if (!isOpen) return null;
 
