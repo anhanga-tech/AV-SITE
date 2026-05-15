@@ -20,6 +20,16 @@ test('resolveGeminiProviderConfig should keep direct Gemini as the default path'
     assert.deepEqual(buildGeminiClientOptions(config), { apiKey: 'google-key' });
 });
 
+test('resolveGeminiProviderConfig should normalize configured Gemini model casing', () => {
+    const config = resolveGeminiProviderConfig({
+        GEMINI_API_KEY: 'google-key',
+        GEMINI_MODEL: 'Gemini-3.1-Flash-Lite',
+    });
+
+    assert.equal(config.ok, true);
+    assert.equal(config.modelName, 'gemini-3.1-flash-lite');
+});
+
 test('resolveGeminiProviderConfig should normalize Gemini 3.1 Flash Lite preview aliases to GA', () => {
     const config = resolveGeminiProviderConfig({
         GEMINI_API_KEY: 'google-key',

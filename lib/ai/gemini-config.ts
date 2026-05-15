@@ -71,12 +71,13 @@ function buildAiGatewayMetadata(env: EnvSource, modelName: string): Record<strin
 
 function resolveGeminiModelName(env: EnvSource): string {
     const configuredModelName = readEnv(env, 'GEMINI_MODEL') || DEFAULT_GEMINI_MODEL;
+    const lowerModelName = configuredModelName.toLowerCase();
 
-    if (configuredModelName.toLowerCase().startsWith(DEPRECATED_GEMINI_3_1_FLASH_LITE_PREVIEW_PREFIX)) {
+    if (lowerModelName.startsWith(DEPRECATED_GEMINI_3_1_FLASH_LITE_PREVIEW_PREFIX)) {
         return DEFAULT_GEMINI_MODEL;
     }
 
-    return configuredModelName;
+    return lowerModelName;
 }
 
 export function resolveGeminiProviderConfig(env: EnvSource = process.env): GeminiProviderConfig {
