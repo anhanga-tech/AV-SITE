@@ -325,9 +325,11 @@
 }
 .quiz-progress-fill {
   height: 100%;
+  width: 100%;
   background: linear-gradient(90deg, var(--av-yellow), var(--layer-4));
-  transition: width 0.55s var(--av-ease-spring);
-  border-right: 2px solid var(--av-dark);
+  transform: scaleX(var(--progress, 0));
+  transform-origin: left;
+  transition: transform 0.55s var(--av-ease-spring);
 }
 
 .quiz-q-body { width: 100%; max-width: 880px; display: flex; flex-direction: column; align-items: center; text-align: center; }

@@ -318,7 +318,7 @@ const PROGRESS_MILESTONES: Record<number, string> = {
 };
 
 function Progress({ current, total }: { current: number; total: number }) {
-    const pct = (current / total) * 100;
+    const progress = total > 0 ? current / total : 0;
     const milestone = PROGRESS_MILESTONES[current];
     return (
         <div className="quiz-progress">
@@ -329,7 +329,7 @@ function Progress({ current, total }: { current: number; total: number }) {
                 }
             </div>
             <div className="quiz-progress-bar" role="progressbar" aria-valuenow={current} aria-valuemin={1} aria-valuemax={total}>
-                <div className="quiz-progress-fill" style={{ width: `${pct}%` }} />
+                <div className="quiz-progress-fill" style={{ '--progress': progress } as React.CSSProperties} />
             </div>
         </div>
     );
