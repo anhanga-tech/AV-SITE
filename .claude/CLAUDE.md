@@ -87,7 +87,7 @@ Copy `.env.example` to `.env` for local development.
 - Block list of 18+ countries/regions (war zones, sanctioned territories)
 - Prompt injection prevention in system instruction
 
-**Styling:** Tailwind CSS with brand colors (cyan, blue, yellow, dark, light) and Anhangá palette (`#0056D2`, `#003B8E`, `#FFD600`). Custom animations (`fade-in-up`, `pop-in`, `float`, `blob`) and shadows (`glow`, `hard`, `float`) defined in `tailwind.config.js`. Fonts: Poppins/Inter (sans), Merriweather (serif/blog), Fredoka/Outfit (heading).
+**Styling:** Tailwind CSS with brand colors (cyan, blue, yellow, dark, light) and Anhangá palette (`#0056D2`, `#003B8E`, `#FFD600`). Custom animations (`fade-in-up`, `pop-in`, `float`, `blob`) and shadows (`glow`, `hard`, `float`) defined in `tailwind.config.js`. Fonts: Poppins (sans + display/headings — 400/600/700/800/900), Merriweather (serif — blog e pull-quotes).
 
 **SEO:** React Helmet Async for dynamic meta tags. Schema components in `/components/schemas/` emit JSON-LD (LocalBusiness, FAQ, Breadcrumb). GTM (GTM-T2KGS86G) and HubSpot tracking in `index.html`.
 
