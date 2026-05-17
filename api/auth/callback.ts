@@ -3,6 +3,7 @@ export const config = {
 };
 
 import { buildJsonError } from '../../lib/network';
+import { logger } from '../../lib/logger';
 
 const GITHUB_TOKEN_URL = 'https://github.com/login/oauth/access_token';
 const GITHUB_TOKEN_TIMEOUT_MS = 8000;
@@ -128,7 +129,7 @@ async function exchangeCodeForToken(clientId: string, clientSecret: string, code
         clearTimeout(timer);
 
         if (!tokenRes.ok) {
-            console.error('AUTH_CALLBACK', { stage: 'token_exchange', httpStatus: tokenRes.status });
+            logger.error('AUTH_CALLBACK', { stage: 'token_exchange', httpStatus: tokenRes.status });
             return buildPostMessageHtml('error', 'Token exchange failed', 502);
         }
 
@@ -136,12 +137,12 @@ async function exchangeCodeForToken(clientId: string, clientSecret: string, code
     } catch (err) {
         clearTimeout(timer);
         const isTimeout = err instanceof Error && err.name === 'AbortError';
-        console.error('AUTH_CALLBACK', { stage: 'token_fetch', error: isTimeout ? 'timeout' : err instanceof Error ? err.message : 'unknown' });
+        logger.error('AUTH_CALLBACK', { stage: 'token_fetch', error: isTimeout ? 'timeout' : err instanceof Error ? err.message : 'unknown' });
         return buildPostMessageHtml('error', isTimeout ? 'Token exchange timed out' : 'Token exchange request failed', 502);
     }
 
     if (tokenData['error'] || typeof tokenData['access_token'] !== 'string') {
-        console.error('AUTH_CALLBACK', { stage: 'token_parse', error: tokenData['error'] ?? 'missing_token' });
+        logger.error('AUTH_CALLBACK', { stage: 'token_parse', error: tokenData['error'] ?? 'missing_token' });
         return buildPostMessageHtml('error', String(tokenData['error_description'] ?? 'Token exchange failed'), 400);
     }
 

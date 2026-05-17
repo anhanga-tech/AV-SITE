@@ -8,6 +8,7 @@ import mdx from '@mdx-js/rollup';
 import remarkGfm from 'remark-gfm';
 import { DEFAULT_GEMINI_MODEL } from './lib/ai/constants.ts';
 import { stripYamlFrontmatter } from './lib/mdx-frontmatter.ts';
+import { logger } from './lib/logger.ts';
 
 type ApiHandler = (request: Request) => Promise<Response> | Response;
 
@@ -115,7 +116,7 @@ function apiDevPlugin() {
             server.ssrFixStacktrace?.(error);
           }
 
-          console.error('[vite-api] Failed to serve %s:', pathname, error);
+          logger.error(`[vite-api] Failed to serve ${pathname}:`, error);
 
           if (!res.headersSent) {
             res.statusCode = 500;
@@ -191,9 +192,9 @@ export default defineConfig(({ mode, isSsrBuild }) => {
   const devStrictPort = (env.VITE_DEV_STRICT_PORT || process.env.VITE_DEV_STRICT_PORT || 'false') === 'true';
 
   // Logs de debug (útil para verificar se a variável está sendo carregada)
-  console.log(`🔧 Building with base path: ${base}`);
-  console.log(`🔧 Mode: ${mode}`);
-  console.log(`🔧 GEMINI_MODEL: ${geminiModel}`);
+  logger.debug(`🔧 Building with base path: ${base}`);
+  logger.debug(`🔧 Mode: ${mode}`);
+  logger.debug(`🔧 GEMINI_MODEL: ${geminiModel}`);
 
   return {
     base,

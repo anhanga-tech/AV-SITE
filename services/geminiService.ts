@@ -1,6 +1,7 @@
 import { getWhatsAppLink } from "../utils/whatsapp.ts";
 import { buildGenerateHandoff, type GenerateHandoff } from "../lib/ai/handoff.ts";
 import type { BudgetToolArgs } from "../lib/ai/types.ts";
+import { logger } from "../lib/logger.ts";
 
 interface ChatResponse {
   text?: string;
@@ -84,7 +85,7 @@ const buildServerErrorResponse = (status: number, errorData: GenerateApiResponse
 
   if (status !== 500) return null;
 
-  console.error('[GeminiService] Server error:', errorData);
+  logger.error('[GeminiService] Server error:', errorData);
   if (errorData.code === 'SERVER_CONFIG_ERROR' || errorData.code === 'GEMINI_MODEL_ERROR') {
     return buildContactFallbackResponse(
       '⚠️ O chat está com um problema de configuração no servidor. Nossa equipe já precisa revisar isso.'
@@ -174,7 +175,7 @@ function applyGenerateApiData(result: ChatResponse, data: GenerateApiResponse): 
 }
 
 function buildUnexpectedServiceError(error: unknown): ChatResponse {
-  console.error("[GeminiService] Erro ao consultar Gemini:", error);
+  logger.error("[GeminiService] Erro ao consultar Gemini:", error);
   const errorMessage = getErrorMessage(error);
   const errorName = getErrorName(error);
 
@@ -210,7 +211,7 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
 
     const apiEndpoint = '/api/generate';
 
-    console.log('[GeminiService] Using endpoint:', apiEndpoint);
+    logger.debug('[GeminiService] Using endpoint:', apiEndpoint);
 
     const response = await fetch(apiEndpoint, {
       method: 'POST',

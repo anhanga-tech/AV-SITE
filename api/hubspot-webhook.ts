@@ -7,6 +7,7 @@ import { sendGoogleConversion } from '../lib/conversions/google.js';
 import { sendMetaConversion } from '../lib/conversions/meta.js';
 import { validateHubSpotSignature } from '../lib/hubspot-validation.js';
 import { getDeal, getAssociatedContactId, getContact } from '../services/hubspot.js';
+import { logger } from '../lib/logger.js';
 
 interface HubSpotWebhookEvent {
   subscriptionType?: string;
@@ -32,7 +33,7 @@ function getWebhookConfig(): { webhookSecret: string; hubspotToken: string } | n
       missingEnvVars.push('HUBSPOT_TOKEN');
     }
 
-    console.error(`HUBSPOT_WEBHOOK: Missing environment variables: ${missingEnvVars.join(', ')}`);
+    logger.error(`HUBSPOT_WEBHOOK: Missing environment variables: ${missingEnvVars.join(', ')}`);
     return null;
   }
 
@@ -127,11 +128,11 @@ async function processClosedWonEvent(event: HubSpotWebhookEvent, hubspotToken: s
 
   const conversionFailures = collectConversionFailures(googleResult, metaResult);
   if (conversionFailures.length > 0) {
-    console.warn(`HUBSPOT_WEBHOOK: Conversion tracking incomplete for deal ${dealId}: ${conversionFailures.join('; ')}`);
+    logger.warn(`HUBSPOT_WEBHOOK: Conversion tracking incomplete for deal ${dealId}: ${conversionFailures.join('; ')}`);
     return;
   }
 
-  console.log(`HUBSPOT_WEBHOOK: Conversion sent for deal ${dealId}`);
+  logger.info(`HUBSPOT_WEBHOOK: Conversion sent for deal ${dealId}`);
 }
 
 export default async function handler(request: Request): Promise<Response> {
@@ -174,11 +175,11 @@ export default async function handler(request: Request): Promise<Response> {
         try {
           await processClosedWonEvent(event, config.hubspotToken);
         } catch (err) {
-          console.error(`HUBSPOT_WEBHOOK: Error processing deal ${dealId}:`, err);
+          logger.error(`HUBSPOT_WEBHOOK: Error processing deal ${dealId}:`, err);
         }
       })
   );
 
-  console.log('HUBSPOT_WEBHOOK: processed events', events?.length ?? 0);
+  logger.info('HUBSPOT_WEBHOOK: processed events', events?.length ?? 0);
   return buildJsonResponse({ success: true }, 200);
 }
