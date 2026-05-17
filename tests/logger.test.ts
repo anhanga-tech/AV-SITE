@@ -64,3 +64,40 @@ test('logger escreve os níveis públicos com prefixos estáveis', () => {
         error.restore();
     }
 });
+
+test('logger chama métodos do console preservando o binding do objeto', () => {
+    const originalLog = console.log;
+    const calls: unknown[][] = [];
+
+    try {
+        console.log = function boundConsoleCapture(this: Console, ...args: unknown[]) {
+            assert.equal(this, console);
+            calls.push(args);
+        } as typeof console.log;
+
+        logger.info('info com binding preservado');
+
+        assert.deepEqual(calls, [['[info]', 'info com binding preservado']]);
+    } finally {
+        console.log = originalLog;
+    }
+});
+
+test('logger.debug normaliza DEBUG antes de comparar', () => {
+    const originalDebug = process.env.DEBUG;
+    const log = captureConsole('log');
+
+    try {
+        process.env.DEBUG = 'TRUE';
+        logger.debug('debug maiusculo');
+
+        assert.deepEqual(log.calls, [['[debug]', 'debug maiusculo']]);
+    } finally {
+        if (originalDebug === undefined) {
+            delete process.env.DEBUG;
+        } else {
+            process.env.DEBUG = originalDebug;
+        }
+        log.restore();
+    }
+});

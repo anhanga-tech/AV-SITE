@@ -1,17 +1,22 @@
 type LogPayload = unknown;
-type LogWriter = (prefix: string, message: string, payload?: LogPayload) => void;
+type LogMethod = 'log' | 'warn' | 'error';
 
 function isDebugEnabled(): boolean {
-    return typeof process !== 'undefined' && process.env.DEBUG === 'true';
+    if (typeof process === 'undefined') {
+        return false;
+    }
+
+    const debugValue = process.env.DEBUG;
+    return debugValue?.toLowerCase() === 'true';
 }
 
-function writeLog(writer: LogWriter, prefix: string, message: string, payload?: LogPayload): void {
+function writeLog(method: LogMethod, prefix: string, message: string, payload?: LogPayload): void {
     if (payload === undefined) {
-        writer(prefix, message);
+        console[method](prefix, message);
         return;
     }
 
-    writer(prefix, message, payload);
+    console[method](prefix, message, payload);
 }
 
 export const logger = {
@@ -20,15 +25,15 @@ export const logger = {
             return;
         }
 
-        writeLog(console.log, '[debug]', message, data);
+        writeLog('log', '[debug]', message, data);
     },
     info: (message: string, data?: LogPayload): void => {
-        writeLog(console.log, '[info]', message, data);
+        writeLog('log', '[info]', message, data);
     },
     warn: (message: string, data?: LogPayload): void => {
-        writeLog(console.warn, '[warn]', message, data);
+        writeLog('warn', '[warn]', message, data);
     },
     error: (message: string, error?: LogPayload): void => {
-        writeLog(console.error, '[error]', message, error);
+        writeLog('error', '[error]', message, error);
     },
 };
