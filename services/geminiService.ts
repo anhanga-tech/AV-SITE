@@ -85,7 +85,7 @@ const buildServerErrorResponse = (status: number, errorData: GenerateApiResponse
 
   if (status !== 500) return null;
 
-  logger.error('[GeminiService] Server error:', errorData);
+  logger.error('[GeminiService] Server error', { code: errorData.code, error: errorData.error });
   if (errorData.code === 'SERVER_CONFIG_ERROR' || errorData.code === 'GEMINI_MODEL_ERROR') {
     return buildContactFallbackResponse(
       '⚠️ O chat está com um problema de configuração no servidor. Nossa equipe já precisa revisar isso.'
@@ -175,7 +175,7 @@ function applyGenerateApiData(result: ChatResponse, data: GenerateApiResponse): 
 }
 
 function buildUnexpectedServiceError(error: unknown): ChatResponse {
-  logger.error("[GeminiService] Erro ao consultar Gemini:", error);
+  logger.error('[GeminiService] Erro ao consultar Gemini', error);
   const errorMessage = getErrorMessage(error);
   const errorName = getErrorName(error);
 
@@ -211,7 +211,7 @@ export const getTravelAdvice = async (history: { role: 'user' | 'model', text: s
 
     const apiEndpoint = '/api/generate';
 
-    logger.debug('[GeminiService] Using endpoint:', apiEndpoint);
+    logger.debug('[GeminiService] Using endpoint', { endpoint: apiEndpoint });
 
     const response = await fetch(apiEndpoint, {
       method: 'POST',
