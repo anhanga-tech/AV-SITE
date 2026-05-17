@@ -5,6 +5,7 @@ export const config = {
 import type { ContentListUnion } from '@google/genai';
 import { checkRateLimit } from '../lib/rate-limit';
 import { buildCorsHeaders, getClientIP } from '../lib/network';
+import { logger } from '../lib/logger';
 import { budgetTool } from '../lib/ai/tools';
 import { SYSTEM_INSTRUCTION } from '../lib/ai/prompt';
 import {
@@ -187,7 +188,10 @@ async function getRateLimitState(
         return { rateLimit };
     }
 
-    console.warn(`RATE_LIMIT: IP ${clientIP} exceeded limit. Reset in ${Math.ceil(rateLimit.resetIn / 1000)}s`);
+    logger.warn('RATE_LIMIT', {
+        clientIP,
+        retryAfterSeconds: Math.ceil(rateLimit.resetIn / 1000),
+    });
     return buildJsonResponse({
         error: 'Muitas requisições. Por favor, aguarde um momento.',
         retryAfter: Math.ceil(rateLimit.resetIn / 1000)
@@ -203,7 +207,7 @@ function buildConfigErrorResponse(
     config: Extract<GeminiProviderConfig, { ok: false }>,
     corsHeaders: Record<string, string>,
 ): Response {
-    console.error('SERVER: Gemini provider configuration is incomplete', {
+    logger.error('SERVER: Gemini provider configuration is incomplete', {
         missing: config.missing,
     });
 
@@ -214,7 +218,7 @@ function buildConfigErrorResponse(
 }
 
 function logProviderStatus(config: ResolvedGeminiProviderConfig): void {
-    console.log('SERVER: Gemini provider configured', {
+    logger.info('SERVER: Gemini provider configured', {
         modelName: config.modelName,
         useGateway: config.useGateway,
         gatewayId: config.useGateway ? config.gatewayId : undefined,
@@ -348,7 +352,7 @@ function logEmptyModelResponse(response: ModelResponseShape): void {
     const promptBlockReason = response.promptFeedback?.blockReason;
 
     if (promptBlockReason) {
-        console.warn('SERVER: Gemini blocked prompt', {
+        logger.warn('SERVER: Gemini blocked prompt', {
             blockReason: promptBlockReason,
             responseId: response.responseId,
             modelVersion: response.modelVersion,
@@ -356,7 +360,7 @@ function logEmptyModelResponse(response: ModelResponseShape): void {
         return;
     }
 
-    console.warn('SERVER: Gemini returned empty payload', {
+    logger.warn('SERVER: Gemini returned empty payload', {
         finishReason: candidate?.finishReason,
         responseId: response.responseId,
         modelVersion: response.modelVersion,
@@ -431,7 +435,7 @@ async function repairTextualHandoff(
     responseText: string,
     options: BuildGenerateSuccessOptions,
 ): Promise<GenerateSuccessBody | null> {
-    console.warn('SERVER: invalid textual handoff detected', {
+    logger.warn('SERVER: invalid textual handoff detected', {
         responseId: response.responseId,
         modelVersion: response.modelVersion,
         preview: responseText.slice(0, 160),
@@ -458,7 +462,7 @@ async function repairTextualHandoff(
     const repairedHandoff = buildStructuredHandoff(repairNormalizedOutput.responseFunctionCall, 'repair');
 
     if (repairedHandoff) {
-        console.log('SERVER: handoff repaired', {
+        logger.info('SERVER: handoff repaired', {
             responseId: response.responseId,
             repairResponseId: repairResponse.responseId,
             source: repairedHandoff.source,
@@ -471,7 +475,7 @@ async function repairTextualHandoff(
         };
     }
 
-    console.warn('SERVER: handoff repair failed', {
+    logger.warn('SERVER: handoff repair failed', {
         responseId: response.responseId,
         repairResponseId: repairResponse.responseId,
         missing: repairValidation?.missing || [],
@@ -513,7 +517,7 @@ export async function buildGenerateSuccessBody(
 
 function buildGeminiErrorResponse(error: unknown, corsHeaders: Record<string, string>): Response {
     const normalized = normalizeError(error);
-    console.error('SERVER: Error proxying to Gemini:', normalized);
+    logger.error('SERVER: Error proxying to Gemini', normalized);
 
     if (normalized.status === 401 || normalized.status === 403) {
         return buildJsonResponse({

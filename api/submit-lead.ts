@@ -2,6 +2,7 @@ import type { SubmitLeadRequest, SubmitLeadResponse } from '../types/leadCapture
 import { buildCorsHeaders, createRequestId, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
 import { cleanString, maskEmail, maskName, maskPhone, validatePayload } from '../lib/lead-logic';
+import { logger } from '../lib/logger';
 import { buildN8nLeadPayload } from '../lib/n8n-payloads';
 import { sendLeadToN8n } from '../services/n8n';
 
@@ -34,16 +35,16 @@ function emitLeadLog(level: LeadLogLevel, requestId: string, stage: string, deta
     };
 
     if (level === 'warn') {
-        console.warn('SUBMIT_LEAD', payload);
+        logger.warn('SUBMIT_LEAD', payload);
         return;
     }
 
     if (level === 'error') {
-        console.error('SUBMIT_LEAD', payload);
+        logger.error('SUBMIT_LEAD', payload);
         return;
     }
 
-    console.log('SUBMIT_LEAD', payload);
+    logger.info('SUBMIT_LEAD', payload);
 }
 
 function buildJsonResponse(
