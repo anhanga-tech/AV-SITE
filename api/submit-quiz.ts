@@ -1,6 +1,7 @@
 import type { SubmitQuizRequest, SubmitQuizResponse } from '../types/quiz';
 import { buildCorsHeaders, createRequestId, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
+import { logger } from '../lib/logger';
 import { cleanString, maskEmail, maskName, maskPhone } from '../lib/lead-logic';
 import { buildN8nQuizPayload } from '../lib/n8n-payloads';
 import { validateQuizPayload } from '../lib/quiz-logic';
@@ -33,16 +34,16 @@ function emitQuizLog(level: QuizLogLevel, requestId: string, stage: string, deta
     };
 
     if (level === 'warn') {
-        console.warn('SUBMIT_QUIZ', payload);
+        logger.warn('SUBMIT_QUIZ', payload);
         return;
     }
 
     if (level === 'error') {
-        console.error('SUBMIT_QUIZ', payload);
+        logger.error('SUBMIT_QUIZ', payload);
         return;
     }
 
-    console.log('SUBMIT_QUIZ', payload);
+    logger.info('SUBMIT_QUIZ', payload);
 }
 
 function buildJsonResponse(body: SubmitQuizResponse, status: number, corsHeaders: Record<string, string>): Response {

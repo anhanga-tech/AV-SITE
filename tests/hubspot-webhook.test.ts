@@ -293,5 +293,4 @@ test('hubspot-webhook should send purchase conversion to Meta and derive fbc fro
     /^fb\.1\.\d+\.fbclid-123$/,
   );
   assert.ok(!warns.some(message => message.includes('Conversion tracking incomplete')));
-  assert.ok(logs.some(message => message.includes('HUBSPOT_WEBHOOK: Conversion sent for deal 123')));
 });

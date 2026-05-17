@@ -1,3 +1,5 @@
+import { logger } from '../logger';
+
 interface MetaConversionPayload {
   eventName: 'Lead' | 'Purchase';
   eventId?: string;
@@ -147,14 +149,14 @@ async function handleMetaResponse(
 ): Promise<MetaConversionResult> {
   if (!response.ok) {
     const detail = await response.text().catch(() => '');
-    console.error(`META: Conversion failed with status ${response.status}`, detail);
+    logger.error(`META: Conversion failed with status ${response.status}`, detail);
     return {
       success: false,
       error: `HTTP ${response.status}${detail ? `: ${detail}` : ''}`,
     };
   }
 
-  console.log(`META: ${payload.eventName} conversion sent successfully`);
+  logger.info(`META: ${payload.eventName} conversion sent successfully`);
   return { success: true };
 }
 
@@ -165,7 +167,7 @@ export async function sendMetaConversion(
   const accessToken = process.env.META_ACCESS_TOKEN;
 
   if (!pixelId || !accessToken) {
-    console.warn('META: Missing Pixel ID or Access Token');
+    logger.warn('META: Missing Pixel ID or Access Token');
     return { success: false, error: 'Missing configuration' };
   }
 
@@ -177,7 +179,7 @@ export async function sendMetaConversion(
     const response = await postMetaConversion(url, body);
     return await handleMetaResponse(payload, response);
   } catch (error) {
-    console.error('META: Conversion failed', error);
+    logger.error('META: Conversion failed', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : String(error),

@@ -1,3 +1,5 @@
+import { logger } from '../logger';
+
 export function normalizeText(value: string): string {
     return value
         .normalize('NFD')
@@ -153,7 +155,7 @@ export function extractChipsFromText(text: string): ExtractChipsResult {
         }
     } catch (error) {
         // Invalid JSON, log for debugging and return original text
-        console.warn('Failed to parse chips from AI response', { error });
+        logger.warn('Failed to parse chips from AI response', { error });
     }
 
     return { text };
