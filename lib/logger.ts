@@ -1,39 +1,35 @@
-type LogPayload = unknown;
-type LogMethod = 'log' | 'warn' | 'error';
+type LoggerData = unknown;
+type ConsoleMethod = 'log' | 'info' | 'warn' | 'error';
 
 function isDebugEnabled(): boolean {
-    if (typeof process === 'undefined') {
-        return false;
-    }
-
-    const debugValue = process.env.DEBUG;
-    return debugValue?.toLowerCase() === 'true';
+    const debug = process.env.DEBUG;
+    return typeof debug === 'string' && debug.toLowerCase() === 'true';
 }
 
-function writeLog(method: LogMethod, prefix: string, message: string, payload?: LogPayload): void {
-    if (payload === undefined) {
-        console[method](prefix, message);
+function writeLog(method: ConsoleMethod, prefix: string, message: string, data?: LoggerData): void {
+    if (data !== undefined) {
+        console[method](prefix, message, data);
         return;
     }
 
-    console[method](prefix, message, payload);
+    console[method](prefix, message);
 }
 
 export const logger = {
-    debug: (message: string, data?: LogPayload): void => {
-        if (!isDebugEnabled()) {
-            return;
-        }
-
+    debug(message: string, data?: LoggerData): void {
+        if (!isDebugEnabled()) return;
         writeLog('log', '[debug]', message, data);
     },
-    info: (message: string, data?: LogPayload): void => {
-        writeLog('log', '[info]', message, data);
+
+    info(message: string, data?: LoggerData): void {
+        writeLog('info', '[info]', message, data);
     },
-    warn: (message: string, data?: LogPayload): void => {
+
+    warn(message: string, data?: LoggerData): void {
         writeLog('warn', '[warn]', message, data);
     },
-    error: (message: string, error?: LogPayload): void => {
-        writeLog('error', '[error]', message, error);
+
+    error(message: string, data?: LoggerData): void {
+        writeLog('error', '[error]', message, data);
     },
 };
