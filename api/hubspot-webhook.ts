@@ -180,6 +180,6 @@ export default async function handler(request: Request): Promise<Response> {
       })
   );
 
-  logger.info('HUBSPOT_WEBHOOK: processed events', events?.length ?? 0);
+  logger.info('HUBSPOT_WEBHOOK: processed events', events.length);
   return buildJsonResponse({ success: true }, 200);
 }
