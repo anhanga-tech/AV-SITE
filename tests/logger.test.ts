@@ -5,7 +5,7 @@ import { logger } from '../lib/logger.ts';
 
 type ConsoleMethod = (...args: unknown[]) => void;
 
-function captureConsole(method: 'log' | 'warn' | 'error') {
+function captureConsole(method: 'log' | 'info' | 'warn' | 'error') {
     const original = console[method];
     const calls: unknown[][] = [];
 
@@ -44,7 +44,7 @@ test('logger.debug escreve apenas quando DEBUG=true', () => {
 });
 
 test('logger escreve os níveis públicos com prefixos estáveis', () => {
-    const log = captureConsole('log');
+    const info = captureConsole('info');
     const warn = captureConsole('warn');
     const error = captureConsole('error');
 
@@ -53,33 +53,33 @@ test('logger escreve os níveis públicos com prefixos estáveis', () => {
         logger.warn('warn com dados', { code: 'WARN_TEST' });
         logger.error('error com causa', new Error('falha'));
 
-        assert.deepEqual(log.calls, [['[info]', 'info sem dados']]);
+        assert.deepEqual(info.calls, [['[info]', 'info sem dados']]);
         assert.deepEqual(warn.calls, [['[warn]', 'warn com dados', { code: 'WARN_TEST' }]]);
         assert.equal(error.calls.length, 1);
         assert.deepEqual(error.calls[0]?.slice(0, 2), ['[error]', 'error com causa']);
         assert.ok(error.calls[0]?.[2] instanceof Error);
     } finally {
-        log.restore();
+        info.restore();
         warn.restore();
         error.restore();
     }
 });
 
 test('logger chama métodos do console preservando o binding do objeto', () => {
-    const originalLog = console.log;
+    const originalInfo = console.info;
     const calls: unknown[][] = [];
 
     try {
-        console.log = function boundConsoleCapture(this: Console, ...args: unknown[]) {
+        console.info = function boundConsoleCapture(this: Console, ...args: unknown[]) {
             assert.equal(this, console);
             calls.push(args);
-        } as typeof console.log;
+        } as typeof console.info;
 
         logger.info('info com binding preservado');
 
         assert.deepEqual(calls, [['[info]', 'info com binding preservado']]);
     } finally {
-        console.log = originalLog;
+        console.info = originalInfo;
     }
 });
 
