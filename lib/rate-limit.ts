@@ -1,3 +1,5 @@
+import { logger } from './logger';
+
 export interface RateLimitResult {
   allowed: boolean;
   remaining: number;
@@ -36,7 +38,7 @@ async function getRedisClient(): Promise<RedisLike | null> {
       // isolate — the in-memory Map above resets on every request and provides
       // no real protection. Configure Upstash Redis to enable shared rate
       // limiting across all edge instances.
-      console.error(
+      logger.error(
         'RateLimit: Upstash Redis not configured. ' +
         'In-memory fallback is non-functional on edge runtimes (isolated V8 contexts per request). ' +
         'Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in your environment variables.'
@@ -49,7 +51,7 @@ async function getRedisClient(): Promise<RedisLike | null> {
     const { Redis } = await import('@upstash/redis');
     return new Redis({ url, token });
   } catch {
-    console.warn('RateLimit: @upstash/redis not available, using in-memory fallback');
+    logger.warn('RateLimit: @upstash/redis not available, using in-memory fallback');
     return null;
   }
 }
@@ -95,7 +97,7 @@ export async function checkRateLimit(
         resetIn,
       };
     } catch (error) {
-      console.error('RateLimit: Redis error, falling back to in-memory', error);
+      logger.error('RateLimit: Redis error, falling back to in-memory', error);
       // Fallback to in-memory if Redis fails
     }
   }
@@ -133,7 +135,7 @@ function checkInMemoryRateLimit(
   }
 
   if (inMemoryStore.size >= IN_MEMORY_MAX_ENTRIES && !entry) {
-    console.warn(`RateLimit: In-memory store capacity reached. Rejecting new key for ${clientIP}.`);
+    logger.warn(`RateLimit: In-memory store capacity reached. Rejecting new key for ${clientIP}.`);
     return {
       allowed: false,
       remaining: 0,
