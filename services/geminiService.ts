@@ -1,7 +1,7 @@
 import { getWhatsAppLink } from "../utils/whatsapp.ts";
 import { buildGenerateHandoff, type GenerateHandoff } from "../lib/ai/handoff.ts";
 import type { BudgetToolArgs } from "../lib/ai/types.ts";
-import { logger } from "../lib/logger";
+import { logger } from "../lib/logger.ts";
 
 interface ChatResponse {
   text?: string;

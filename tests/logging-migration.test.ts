@@ -64,7 +64,7 @@ for (const filePath of MIGRATED_API_FILES) {
     test(`${filePath} should use the shared logger instead of direct console calls`, async () => {
         const source = await readProjectFile(filePath);
 
-        assert.match(source, /from ['"](?:\.\.\/lib\/|\.\/|@\/lib\/)logger['"]/);
+        assert.match(source, /from ['"](?:\.\.\/lib\/|\.\/|@\/lib\/)logger(?:\.ts)?['"]/);
         assert.doesNotMatch(source, /\bconsole\.(?:log|info|warn|error)\b/);
     });
 }
