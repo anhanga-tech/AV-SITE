@@ -1,6 +1,7 @@
 import { buildCorsHeaders, createRequestId, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
 import { cleanString, maskEmail } from '../lib/lead-logic';
+import { logger } from '../lib/logger';
 
 export const config = {
   runtime: 'edge',
@@ -101,7 +102,7 @@ export default async function handler(request: Request): Promise<Response> {
 
   const webhookUrl = process.env.NPS_WEBHOOK_URL?.trim();
   if (!webhookUrl) {
-    console.error('SUBMIT_NPS', { requestId, stage: 'config', code: 'SERVER_CONFIG_ERROR' });
+    logger.error('SUBMIT_NPS', { requestId, stage: 'config', code: 'SERVER_CONFIG_ERROR' });
     return buildJsonResponse(
       { ok: false, requestId, code: 'SERVER_CONFIG_ERROR', error: 'Serviço de NPS indisponível no momento.' },
       500,
@@ -118,7 +119,7 @@ export default async function handler(request: Request): Promise<Response> {
   });
 
   if (!rateLimit.allowed) {
-    console.warn('SUBMIT_NPS', {
+    logger.warn('SUBMIT_NPS', {
       requestId,
       stage: 'rate_limited',
       clientIP,
@@ -166,7 +167,7 @@ export default async function handler(request: Request): Promise<Response> {
 
   const payload = validation.data;
 
-  console.log('SUBMIT_NPS', {
+  logger.info('SUBMIT_NPS', {
     requestId,
     stage: 'sending',
     email: maskEmail(payload.email),
@@ -187,7 +188,7 @@ export default async function handler(request: Request): Promise<Response> {
 
     if (!webhookRes.ok) {
       const text = await webhookRes.text().catch(() => '');
-      console.error('SUBMIT_NPS', {
+      logger.error('SUBMIT_NPS', {
         requestId,
         stage: 'webhook_failed',
         status: webhookRes.status,
@@ -201,7 +202,7 @@ export default async function handler(request: Request): Promise<Response> {
       );
     }
 
-    console.log('SUBMIT_NPS', { requestId, stage: 'done', score: payload.score });
+    logger.info('SUBMIT_NPS', { requestId, stage: 'done', score: payload.score });
     return buildJsonResponse(
       { ok: true, requestId, message: 'Avaliação registrada com sucesso.' },
       201,
@@ -210,7 +211,7 @@ export default async function handler(request: Request): Promise<Response> {
     );
   } catch (err) {
     clearTimeout(timeoutId);
-    console.error('SUBMIT_NPS', {
+    logger.error('SUBMIT_NPS', {
       requestId,
       stage: err instanceof Error && err.name === 'AbortError' ? 'webhook_timeout' : 'unexpected',
       errorType: err instanceof Error ? err.name : typeof err,

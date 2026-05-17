@@ -3,6 +3,7 @@ import { sendMetaConversion } from '../lib/conversions/meta';
 import { buildCorsHeaders, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
 import { timingSafeEqual } from '../lib/hubspot-validation';
+import { logger } from '../lib/logger';
 
 export const config = {
   runtime: 'edge',
@@ -126,16 +127,16 @@ function emitConversionLog(
   };
 
   if (level === 'warn') {
-    console.warn('CONVERSION_DISPATCH', payload);
+    logger.warn('CONVERSION_DISPATCH', payload);
     return;
   }
 
   if (level === 'error') {
-    console.error('CONVERSION_DISPATCH', payload);
+    logger.error('CONVERSION_DISPATCH', payload);
     return;
   }
 
-  console.log('CONVERSION_DISPATCH', payload);
+  logger.info('CONVERSION_DISPATCH', payload);
 }
 
 function getExpectedSecret(): string | null {

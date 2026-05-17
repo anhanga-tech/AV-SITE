@@ -1,3 +1,5 @@
+import { logger } from '../logger';
+
 type GA4EventName = 'lead_qualificado' | 'close_convert_lead' | 'purchase';
 
 interface GA4ConversionPayload {
@@ -51,12 +53,12 @@ export async function sendGoogleConversion(
   const apiSecret = process.env.GA4_API_SECRET;
 
   if (!measurementId || !apiSecret) {
-    console.warn('[GA4 MP] vars não configuradas — pulando');
+    logger.warn('[GA4 MP] vars não configuradas — pulando');
     return { success: false, error: 'Missing configuration' };
   }
 
   if (!payload.clientId) {
-    console.warn('[GA4 MP] clientId ausente — pulando');
+    logger.warn('[GA4 MP] clientId ausente — pulando');
     return { success: false, error: 'Missing clientId' };
   }
 
@@ -72,14 +74,14 @@ export async function sendGoogleConversion(
 
     if (!res.ok) {
       const detail = await res.text().catch(() => '');
-      console.error(`[GA4 MP] Status inesperado: ${res.status}`, detail);
+      logger.error(`[GA4 MP] Status inesperado: ${res.status}`, detail);
       return { success: false, error: `HTTP ${res.status}${detail ? `: ${detail}` : ''}` };
     }
 
-    console.log(`[GA4 MP] ${eventName} enviado com sucesso`);
+    logger.info(`[GA4 MP] ${eventName} enviado com sucesso`);
     return { success: true };
   } catch (error) {
-    console.error('[GA4 MP] Falha ao enviar evento', error);
+    logger.error('[GA4 MP] Falha ao enviar evento', error);
     return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
