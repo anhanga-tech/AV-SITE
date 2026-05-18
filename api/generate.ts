@@ -29,6 +29,7 @@ import {
     buildSafetyMessage,
     buildRefinementMessage,
 } from '../lib/ai/validation';
+import { GenerateRequestSchema } from '../lib/schemas/generate';
 
 // Configuration
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
@@ -53,10 +54,6 @@ interface ApiErrorShape {
         message?: string;
         status?: string | number;
     };
-}
-
-interface GenerateRequestBody {
-    contents?: unknown[];
 }
 
 interface ResponseFunctionCall {
@@ -229,16 +226,23 @@ async function parseGenerateContents(
     request: Request,
     corsHeaders: Record<string, string>,
 ): Promise<unknown[] | Response> {
-    const body = await request.json() as GenerateRequestBody;
-    const { contents } = body;
-
-    if (!contents || !Array.isArray(contents) || contents.length === 0) {
-        return buildJsonResponse({ error: 'Contents must be a non-empty array' }, 400, corsHeaders);
+    let body: unknown;
+    try {
+        body = await request.json();
+    } catch {
+        return buildJsonResponse({ error: 'VALIDATION_ERROR', details: { formErrors: ['Corpo JSON inválido'], fieldErrors: {} } }, 400, corsHeaders);
     }
 
-    if (contents.length > 50) {
-        return buildJsonResponse({ error: 'Too many messages in history' }, 400, corsHeaders);
+    const result = GenerateRequestSchema.safeParse(body);
+    if (!result.success) {
+        return buildJsonResponse(
+            { error: 'VALIDATION_ERROR', details: result.error.flatten() },
+            400,
+            corsHeaders,
+        );
     }
+
+    const { contents } = result.data;
 
     if (hasOversizedPayload(contents)) {
         return buildJsonResponse({ error: 'Payload too large' }, 400, corsHeaders);
