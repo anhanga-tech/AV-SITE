@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import type { LeadTracking, LeadUtms, SubmitLeadRequest } from '../types/leadCapture';
+import { SubmitLeadBodySchema } from './schemas/submit-lead';
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PHONE_DIGITS = 10;
 const MAX_PHONE_DIGITS = 15;
 
@@ -171,15 +172,23 @@ export function normalizeTracking(value: unknown, utms: LeadUtms): LeadTracking 
     };
 }
 
+function mapZodError(error: z.ZodError): string {
+    const issue = error.issues[0];
+    if (issue?.code === 'too_big') return 'Entrada muito longa.';
+    if (issue?.code === 'invalid_format' && 'format' in issue && issue.format === 'email') return 'Email inválido.';
+    return 'Campos obrigatórios ausentes.';
+}
+
 /**
  * Validates the lead submission payload.
  */
 export function validatePayload(payload: unknown): { valid: true; data: SubmitLeadRequest } | { valid: false; error: string } {
-    if (!payload || typeof payload !== 'object') {
-        return { valid: false, error: 'Payload inválido.' };
+    const parsed = SubmitLeadBodySchema.safeParse(payload);
+    if (!parsed.success) {
+        return { valid: false, error: mapZodError(parsed.error) };
     }
 
-    const raw = payload as Record<string, unknown>;
+    const raw = parsed.data;
     const firstName = cleanString(raw.firstName);
     const lastName = cleanString(raw.lastName);
     const email = cleanString(raw.email).toLowerCase();
@@ -188,16 +197,14 @@ export function validatePayload(payload: unknown): { valid: true; data: SubmitLe
     const bantSummary = cleanString(raw.bantSummary);
     const destination = cleanString(raw.destination);
 
-    if (!firstName || !lastName || !email || !whatsapp || !bantSummary || !destination) {
+    // normalizeWhatsappNumber can still fail for strings Zod accepted (e.g. non-digit-only content)
+    if (!whatsapp) {
         return { valid: false, error: 'Campos obrigatórios ausentes.' };
     }
 
-    if (firstName.length > 100 || lastName.length > 100 || email.length > 255 || whatsapp.length > 16 || bantSummary.length > 5000 || destination.length > 255) {
+    // Safety net: cleanString expands HTML entities which can push lengths past the Zod-checked raw limits
+    if (firstName.length > 100 || lastName.length > 100 || bantSummary.length > 5000 || destination.length > 255) {
         return { valid: false, error: 'Entrada muito longa.' };
-    }
-
-    if (!EMAIL_REGEX.test(email)) {
-        return { valid: false, error: 'Email inválido.' };
     }
 
     const utms = normalizeUtms(raw.utms);

@@ -133,6 +133,60 @@ function createMockN8nFetch(
     }) as typeof fetch;
 }
 
+test('validatePayload should reject payloads with an invalid email format', () => {
+    const result = validatePayload({
+        firstName: 'Felipe',
+        lastName: 'William',
+        email: 'not-an-email',
+        whatsapp: '+5511988314487',
+        bantSummary: 'Need: Praia | Authority: casal | Budget: 20k | Timeline: setembro',
+        destination: 'Rio de Janeiro',
+        utms: {},
+        tracking: {},
+    });
+
+    assert.equal(result.valid, false);
+    if (result.valid) return;
+
+    assert.equal(result.error, 'Email inválido.');
+});
+
+test('validatePayload should reject payloads with fields that exceed maximum length', () => {
+    const result = validatePayload({
+        firstName: 'F'.repeat(101),
+        lastName: 'William',
+        email: 'felipe@example.com',
+        whatsapp: '+5511988314487',
+        bantSummary: 'Need: Praia',
+        destination: 'Rio de Janeiro',
+        utms: {},
+        tracking: {},
+    });
+
+    assert.equal(result.valid, false);
+    if (result.valid) return;
+
+    assert.equal(result.error, 'Entrada muito longa.');
+});
+
+test('validatePayload should reject payloads missing required text fields', () => {
+    const result = validatePayload({
+        firstName: 'Felipe',
+        lastName: 'William',
+        email: 'felipe@example.com',
+        whatsapp: '+5511988314487',
+        // bantSummary missing
+        destination: 'Rio de Janeiro',
+        utms: {},
+        tracking: {},
+    });
+
+    assert.equal(result.valid, false);
+    if (result.valid) return;
+
+    assert.equal(result.error, 'Campos obrigatórios ausentes.');
+});
+
 test('validatePayload should preserve fbp as a top-level tracking field', () => {
     const result = validatePayload({
         firstName: 'Felipe',
