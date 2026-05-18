@@ -99,15 +99,12 @@ test('rejeita payload não-objeto', () => {
     assert.equal(result.success, false);
 });
 
-// Whitespace-only strings pass Zod .min(1) but become empty after cleanString.
-// The handler must guard against this after cleaning — these tests document the
-// contract so that future changes don't silently regress it.
-test('aceita whitespace-only firstname no schema (handler deve rejeitar após clean)', () => {
+test('rejeita whitespace-only firstname', () => {
     const result = SubmitNpsBodySchema.safeParse({ ...VALID, firstname: '   ' });
-    assert.equal(result.success, true, 'schema aceita; guard pós-clean deve rejeitar no handler');
+    assert.equal(result.success, false);
 });
 
-test('aceita whitespace-only reason no schema (handler deve rejeitar após clean)', () => {
+test('rejeita whitespace-only reason', () => {
     const result = SubmitNpsBodySchema.safeParse({ ...VALID, reason: '   ' });
-    assert.equal(result.success, true, 'schema aceita; guard pós-clean deve rejeitar no handler');
+    assert.equal(result.success, false);
 });

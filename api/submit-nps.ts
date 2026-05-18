@@ -130,16 +130,6 @@ export default async function handler(request: Request): Promise<Response> {
     highlight: cleanString(raw.highlight),
   };
 
-  // cleanString can zero out strings that Zod accepted as non-empty (e.g. whitespace-only)
-  if (!payload.firstname || !payload.email || !payload.reason) {
-    return buildJsonResponse(
-      { ok: false, requestId, code: 'VALIDATION_ERROR', error: 'Payload inválido.' },
-      400,
-      corsHeaders,
-      requestId,
-    );
-  }
-
   logger.info('SUBMIT_NPS', {
     requestId,
     stage: 'sending',

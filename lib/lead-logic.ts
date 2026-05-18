@@ -202,6 +202,11 @@ export function validatePayload(payload: unknown): { valid: true; data: SubmitLe
         return { valid: false, error: 'Campos obrigatórios ausentes.' };
     }
 
+    // cleanString can zero out strings that Zod accepted as non-empty (e.g. whitespace-only input)
+    if (!firstName || !lastName || !bantSummary || !destination) {
+        return { valid: false, error: 'Campos obrigatórios ausentes.' };
+    }
+
     // Safety net: cleanString expands HTML entities which can push lengths past the Zod-checked raw limits
     if (firstName.length > 100 || lastName.length > 100 || bantSummary.length > 5000 || destination.length > 255) {
         return { valid: false, error: 'Entrada muito longa.' };
