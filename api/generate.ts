@@ -230,7 +230,7 @@ async function parseGenerateContents(
     try {
         body = await request.json();
     } catch {
-        return buildJsonResponse({ error: 'VALIDATION_ERROR', details: 'Invalid JSON body' }, 400, corsHeaders);
+        return buildJsonResponse({ error: 'VALIDATION_ERROR', details: { formErrors: ['Corpo JSON inválido'], fieldErrors: {} } }, 400, corsHeaders);
     }
 
     const result = GenerateRequestSchema.safeParse(body);
