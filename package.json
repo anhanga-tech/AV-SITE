@@ -39,7 +39,8 @@
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.15.0",
     "remark-gfm": "^4.0.1",
-    "web-haptics": "^0.0.6"
+    "web-haptics": "^0.0.6",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",
@@ -66,7 +67,13 @@
     "minimatch": "^10.2.2"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["@google/genai", "esbuild", "protobufjs", "sharp", "workerd"],
+    "onlyBuiltDependencies": [
+      "@google/genai",
+      "esbuild",
+      "protobufjs",
+      "sharp",
+      "workerd"
+    ],
     "overrides": {
       "rimraf": "^6.1.3",
       "glob": "^13.0.6",
