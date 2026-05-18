@@ -1,6 +1,6 @@
 import React from 'react';
 import { PassThrough } from 'node:stream';
-import { renderToPipeableStream } from 'react-dom/server';
+import { renderToPipeableStream, renderToString } from 'react-dom/server';
 import App from './App';
 import { createHeadManager, renderHeadTags } from './lib/head';
 
@@ -15,10 +15,25 @@ const SSR_TIMEOUT_MS = Number.isFinite(parsedTimeout) && parsedTimeout > 0
   ? parsedTimeout
   : DEFAULT_SSR_TIMEOUT_MS;
 
-export async function render(url: string): Promise<RenderResult> {
-  const headManager = createHeadManager();
+function renderApp(url: string, headManager: ReturnType<typeof createHeadManager>): React.ReactElement {
+  return (
+    <React.StrictMode>
+      <App
+        router="memory"
+        initialEntries={[url]}
+        headManager={headManager}
+        includeClientFeatures={false}
+      />
+    </React.StrictMode>
+  );
+}
 
-  const appHtml = await new Promise<string>((resolve, reject) => {
+function isHomeRoute(url: string): boolean {
+  return url === '/' || url.replace(/\/+$/, '') === '';
+}
+
+async function renderStreamingHtml(url: string, headManager: ReturnType<typeof createHeadManager>): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
     const stream = new PassThrough();
     let html = '';
     let settled = false;
@@ -61,14 +76,7 @@ export async function render(url: string): Promise<RenderResult> {
     });
 
     const { pipe, abort } = renderToPipeableStream(
-      <React.StrictMode>
-        <App
-          router="memory"
-          initialEntries={[url]}
-          headManager={headManager}
-          includeClientFeatures={false}
-        />
-      </React.StrictMode>,
+      renderApp(url, headManager),
       {
         onAllReady() {
           if (startedPiping) {
@@ -91,6 +99,13 @@ export async function render(url: string): Promise<RenderResult> {
       }
     );
   });
+}
+
+export async function render(url: string): Promise<RenderResult> {
+  const headManager = createHeadManager();
+  const appHtml = isHomeRoute(url)
+    ? renderToString(renderApp(url, headManager))
+    : await renderStreamingHtml(url, headManager);
 
   return {
     appHtml,

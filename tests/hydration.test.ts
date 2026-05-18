@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { ClientOnly } from '../components/ClientOnly';
 import Footer from '../components/Footer';
 import { shouldHydratePrerenderedRoute } from '../lib/hydration.ts';
+import { render } from '../ssr.tsx';
 
 function withMockedNow<T>(iso: string, callback: () => T): T {
   const RealDate = Date;
@@ -67,4 +68,18 @@ test('Footer prerender should be deterministic across different runtime dates', 
 
   assert.equal(marchMarkup, januaryMarkup);
   assert.match(marchMarkup, /https:\/\/media\.anhanga\.tur\.br\/images\/brand\/LOGO%20ANHANGA%20VIAGENS%20-%20BRANCO\.svg/);
+});
+
+test('Home prerender renders primary content before the footer without streaming reveal shifts', async () => {
+  const { appHtml } = await render('/');
+
+  assert.doesNotMatch(appHtml, /hidden id="S:/);
+  assert.doesNotMatch(appHtml, /min-h-\[40vh\] bg-white/);
+
+  const heroIndex = appHtml.indexOf('Sua Próxima');
+  const footerIndex = appHtml.indexOf('<footer');
+
+  assert.notEqual(heroIndex, -1);
+  assert.notEqual(footerIndex, -1);
+  assert.ok(heroIndex < footerIndex);
 });
