@@ -230,7 +230,7 @@ async function parseGenerateContents(
     try {
         body = await request.json();
     } catch {
-        return buildJsonResponse({ error: 'VALIDATION_ERROR', details: 'Invalid JSON body' }, 400, corsHeaders);
+        return buildJsonResponse({ error: 'VALIDATION_ERROR', details: { formErrors: ['Corpo JSON inválido'], fieldErrors: {} } }, 400, corsHeaders);
     }
 
     const result = GenerateRequestSchema.safeParse(body);
@@ -245,7 +245,7 @@ async function parseGenerateContents(
     const { contents } = result.data;
 
     if (hasOversizedPayload(contents)) {
-        return buildJsonResponse({ error: 'Payload too large' }, 400, corsHeaders);
+        return buildJsonResponse({ error: 'VALIDATION_ERROR', details: { formErrors: ['Carga útil muito grande'], fieldErrors: {} } }, 400, corsHeaders);
     }
 
     const maxMessageLength = resolveMaxMessageLength(process.env.MAX_MESSAGE_LENGTH);
