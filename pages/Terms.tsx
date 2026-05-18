@@ -262,7 +262,7 @@ const Terms = () => {
                 </article>
             </main>
 
-            {/* Structured Data */}
+            {/* Structured Data — safe: JSON.stringify of a static object literal, no user input */}
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
