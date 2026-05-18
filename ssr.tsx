@@ -2,7 +2,7 @@ import React from 'react';
 import { PassThrough } from 'node:stream';
 import { renderToPipeableStream, renderToString } from 'react-dom/server';
 import App from './App';
-import { createHeadManager, renderHeadTags } from './lib/head';
+import { createHeadManager, renderHeadTags, type HeadManager } from './lib/head';
 
 export interface RenderResult {
   appHtml: string;
@@ -14,8 +14,10 @@ const parsedTimeout = Number.parseInt(process.env.SSR_TIMEOUT_MS ?? '', 10);
 const SSR_TIMEOUT_MS = Number.isFinite(parsedTimeout) && parsedTimeout > 0
   ? parsedTimeout
   : DEFAULT_SSR_TIMEOUT_MS;
+const QUERY_HASH_REGEX = /[?#]/;
+const TRAILING_SLASH_REGEX = /\/+$/;
 
-function renderApp(url: string, headManager: ReturnType<typeof createHeadManager>): React.ReactElement {
+function renderApp(url: string, headManager: HeadManager): React.ReactElement {
   return (
     <React.StrictMode>
       <App
@@ -29,10 +31,11 @@ function renderApp(url: string, headManager: ReturnType<typeof createHeadManager
 }
 
 function isHomeRoute(url: string): boolean {
-  return url === '/' || url.replace(/\/+$/, '') === '';
+  const pathname = url.split(QUERY_HASH_REGEX)[0];
+  return pathname.replace(TRAILING_SLASH_REGEX, '') === '';
 }
 
-async function renderStreamingHtml(url: string, headManager: ReturnType<typeof createHeadManager>): Promise<string> {
+async function renderStreamingHtml(url: string, headManager: HeadManager): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     const stream = new PassThrough();
     let html = '';
