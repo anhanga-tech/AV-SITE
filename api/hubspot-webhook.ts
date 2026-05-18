@@ -8,13 +8,7 @@ import { sendMetaConversion } from '../lib/conversions/meta.js';
 import { validateHubSpotSignature } from '../lib/hubspot-validation.js';
 import { getDeal, getAssociatedContactId, getContact } from '../services/hubspot.js';
 import { logger } from '../lib/logger.js';
-
-interface HubSpotWebhookEvent {
-  subscriptionType?: string;
-  propertyName?: string;
-  propertyValue?: string;
-  objectId?: string | number;
-}
+import { HubSpotWebhookPayloadSchema, type HubSpotWebhookEvent } from '../lib/schemas/hubspot-webhook.js';
 
 function buildJsonResponse(body: Record<string, unknown>, status: number): Response {
   return new Response(JSON.stringify(body), { status });
@@ -50,7 +44,8 @@ function getMissingConfigResponse(): Response {
 async function parseWebhookEvents(body: string): Promise<HubSpotWebhookEvent[] | null> {
   try {
     const parsedBody = JSON.parse(body) as unknown;
-    return Array.isArray(parsedBody) ? parsedBody as HubSpotWebhookEvent[] : null;
+    const result = HubSpotWebhookPayloadSchema.safeParse(parsedBody);
+    return result.success ? result.data : null;
   } catch {
     return null;
   }
