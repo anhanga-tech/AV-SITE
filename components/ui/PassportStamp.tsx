@@ -26,20 +26,29 @@ export const PassportStamp: React.FC<PassportStampProps> = ({
     // Random rotation between -15 and 15 degrees for an organic look
     const rotation = React.useMemo(() => Math.floor(Math.random() * 30) - 15, []);
 
+    // Unique animation name per instance so concurrent stamps don't overwrite each other's keyframes
+    const uid = React.useId().replace(/:/g, '');
+    const animName = `stamp-${uid}`;
+
+    React.useEffect(() => {
+        const style = document.createElement('style');
+        style.textContent = `
+      @keyframes ${animName} {
+        0% { transform: scale(2) rotate(${rotation - 10}deg); opacity: 0; }
+        50% { transform: scale(0.9) rotate(${rotation}deg); opacity: 0.9; }
+        100% { transform: scale(1) rotate(${rotation}deg); opacity: 0.60; }
+      }
+    `;
+        document.head.appendChild(style);
+        return () => { document.head.removeChild(style); };
+    }, [animName, rotation]);
+
     return (
         <div
-            className={`pointer-events-none select-none absolute z-20 opacity-60 flex items-center justify-center animate-[stamp_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards] ${className}`}
-            style={{ transform: `rotate(${rotation}deg)` }}
+            className={`pointer-events-none select-none absolute z-20 opacity-60 flex items-center justify-center ${className}`}
+            style={{ transform: `rotate(${rotation}deg)`, animation: `${animName} 0.4s cubic-bezier(0.16,1,0.3,1) forwards` }}
             aria-hidden="true"
         >
-            <style dangerouslySetInnerHTML={{
-                __html: `
-        @keyframes stamp {
-          0% { transform: scale(2) rotate(${rotation - 10}deg); opacity: 0; }
-          50% { transform: scale(0.9) rotate(${rotation}deg); opacity: 0.9; }
-          100% { transform: scale(1) rotate(${rotation}deg); opacity: 0.60; }
-        }
-      `}} />
 
             <div className="relative size-24 md:size-28 shrink-0">
                 {/* Outer distressed ring */}
