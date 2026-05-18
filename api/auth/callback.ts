@@ -4,6 +4,7 @@ export const config = {
 
 import { buildJsonError } from '../../lib/network';
 import { logger } from '../../lib/logger';
+import { AuthCallbackQuerySchema } from '../../lib/schemas/auth-callback';
 
 const GITHUB_TOKEN_URL = 'https://github.com/login/oauth/access_token';
 const GITHUB_TOKEN_TIMEOUT_MS = 8000;
@@ -162,8 +163,6 @@ export default async function handler(req: Request): Promise<Response> {
     }
 
     const url = new URL(req.url);
-    const code = url.searchParams.get('code');
-    const state = url.searchParams.get('state');
     const errorParam = url.searchParams.get('error');
 
     const cookies = parseCookies(req.headers.get('cookie') ?? '');
@@ -174,12 +173,19 @@ export default async function handler(req: Request): Promise<Response> {
         return buildPostMessageHtml('error', desc, 400);
     }
 
-    if (!state || !storedState || state !== storedState) {
-        return buildPostMessageHtml('error', 'Invalid state parameter', 400);
+    const queryParsed = AuthCallbackQuerySchema.safeParse({
+        code:  url.searchParams.get('code'),
+        state: url.searchParams.get('state'),
+    });
+
+    if (!queryParsed.success) {
+        return buildPostMessageHtml('error', 'Missing required parameters', 400);
     }
 
-    if (!code) {
-        return buildPostMessageHtml('error', 'Missing authorization code', 400);
+    const { code, state } = queryParsed.data;
+
+    if (!storedState || state !== storedState) {
+        return buildPostMessageHtml('error', 'Invalid state parameter', 400);
     }
 
     const result = await exchangeCodeForToken(clientId, clientSecret, code);

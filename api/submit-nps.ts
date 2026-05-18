@@ -1,7 +1,9 @@
+import { z } from 'zod';
 import { buildCorsHeaders, createRequestId, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
 import { cleanString, maskEmail } from '../lib/lead-logic';
 import { logger } from '../lib/logger';
+import { SubmitNpsBodySchema } from '../lib/schemas/submit-nps';
 
 export const config = {
   runtime: 'edge',
@@ -9,14 +11,6 @@ export const config = {
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 3;
-
-interface NpsPayload {
-  firstname: string;
-  email: string;
-  score: number;
-  reason: string;
-  highlight: string;
-}
 
 function buildJsonResponse(
   body: unknown,
@@ -34,53 +28,15 @@ function buildJsonResponse(
   });
 }
 
-function validateNpsPayload(
-  raw: unknown,
-): { valid: true; data: NpsPayload } | { valid: false; error: string } {
-  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
-    return { valid: false, error: 'Payload inválido.' };
-  }
-
-  const obj = raw as Record<string, unknown>;
-
-  const firstname = cleanString(typeof obj.firstname === 'string' ? obj.firstname : '');
-  const email = cleanString(typeof obj.email === 'string' ? obj.email : '');
-  const score = obj.score;
-  const reason = cleanString(typeof obj.reason === 'string' ? obj.reason : '');
-  const highlight = cleanString(typeof obj.highlight === 'string' ? obj.highlight : '');
-
-  if (!firstname || firstname.length > 100) {
-    return { valid: false, error: 'Nome inválido.' };
-  }
-
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
-    return { valid: false, error: 'E-mail inválido.' };
-  }
-
-  if (
-    typeof score !== 'number' ||
-    !Number.isInteger(score) ||
-    score < 0 ||
-    score > 10
-  ) {
-    return { valid: false, error: 'Nota deve ser um número inteiro entre 0 e 10.' };
-  }
-
-  if (!reason || reason.length > 2000) {
-    return {
-      valid: false,
-      error: 'O motivo da nota é obrigatório (máximo 2000 caracteres).',
-    };
-  }
-
-  if (highlight.length > 2000) {
-    return { valid: false, error: 'Momento marcante deve ter no máximo 2000 caracteres.' };
-  }
-
-  return {
-    valid: true,
-    data: { firstname, email, score, reason, highlight },
-  };
+function mapNpsZodError(error: z.ZodError): string {
+  const issue = error.issues[0];
+  const path = issue?.path[0];
+  if (path === 'firstname') return 'Nome inválido.';
+  if (path === 'email') return 'E-mail inválido.';
+  if (path === 'score') return 'Nota deve ser um número inteiro entre 0 e 10.';
+  if (path === 'reason') return 'O motivo da nota é obrigatório (máximo 2000 caracteres).';
+  if (path === 'highlight') return 'Momento marcante deve ter no máximo 2000 caracteres.';
+  return 'Payload inválido.';
 }
 
 export default async function handler(request: Request): Promise<Response> {
@@ -155,17 +111,24 @@ export default async function handler(request: Request): Promise<Response> {
     );
   }
 
-  const validation = validateNpsPayload(rawBody);
-  if (validation.valid === false) {
+  const parsed = SubmitNpsBodySchema.safeParse(rawBody);
+  if (!parsed.success) {
     return buildJsonResponse(
-      { ok: false, requestId, code: 'VALIDATION_ERROR', error: validation.error },
+      { ok: false, requestId, code: 'VALIDATION_ERROR', error: mapNpsZodError(parsed.error) },
       400,
       corsHeaders,
       requestId,
     );
   }
 
-  const payload = validation.data;
+  const raw = parsed.data;
+  const payload = {
+    firstname: cleanString(raw.firstname),
+    email:     cleanString(raw.email),
+    score:     raw.score,
+    reason:    cleanString(raw.reason),
+    highlight: cleanString(raw.highlight),
+  };
 
   logger.info('SUBMIT_NPS', {
     requestId,
