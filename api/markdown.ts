@@ -1,8 +1,13 @@
 export const config = { runtime: 'edge' };
 
 import { FAQ_SCHEMA_ITEMS } from '../data/faqData';
+import { checkRateLimit } from '../lib/rate-limit';
+import { getClientIP } from '../lib/network';
+import { logger } from '../lib/logger';
 
 const SITE_BASE = 'https://www.anhanga.tur.br';
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const RATE_LIMIT_MAX_REQUESTS = 20;
 
 function tokenCount(text: string): number {
     return Math.ceil(text.length / 4);
@@ -255,8 +260,30 @@ Realizamos uma conversa detalhada para entender preferências de mobilidade, res
 }
 
 export default async function handler(req: Request): Promise<Response> {
+    const clientIP = getClientIP(req);
+    const rateLimit = await checkRateLimit(clientIP, {
+        limit: RATE_LIMIT_MAX_REQUESTS,
+        windowMs: RATE_LIMIT_WINDOW_MS,
+        prefix: 'ratelimit:markdown',
+    });
+
+    if (!rateLimit.allowed) {
+        logger.warn('RATE_LIMIT:markdown', { clientIP });
+        return new Response('Muitas requisições. Tente novamente em breve.', {
+            status: 429,
+            headers: {
+                'Content-Type': 'text/plain; charset=utf-8',
+                'Retry-After': String(Math.ceil(rateLimit.resetIn / 1000)),
+            },
+        });
+    }
+
     const url = new URL(req.url);
     const rawPath = url.searchParams.get('path') ?? '/';
+
+    if (rawPath.length > 512) {
+        return markdownResponse('# Erro\n\nCaminho muito longo.', 400);
+    }
 
     // Normalize: single leading slash, no trailing slash, lowercase for case-insensitive matching
     const path = ('/' + rawPath.replace(/^\/+/, '').replace(/\/+$/, '')).toLowerCase();
