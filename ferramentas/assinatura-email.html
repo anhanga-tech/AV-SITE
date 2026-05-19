@@ -457,15 +457,15 @@ const iconImg = (key, size = 14) => {
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-const initials = (name) => {
-  const parts = (name || "").trim().split(/\s+/).filter(Boolean);
-  if (!parts.length) return "AV";
-  const first = parts[0][0] || "";
-  const last  = parts.length > 1 ? parts[parts.length - 1][0] : "";
-  return (first + last).toUpperCase();
-};
-
 const onlyDigits = (s) => (s || "").replace(/[^\d+]/g, "");
+
+// Escape user-supplied text before inserting into HTML to prevent XSS in preview.
+const escapeHtml = (s) =>
+  (s || "").replace(/&/g, "&amp;")
+           .replace(/</g, "&lt;")
+           .replace(/>/g, "&gt;")
+           .replace(/"/g, "&quot;")
+           .replace(/'/g, "&#39;");
 
 const waHref = (phone) => {
   const d = onlyDigits(phone).replace(/^\+/, "");
@@ -482,26 +482,9 @@ const stripProto = (url) =>
   (url || "").replace(/^https?:\/\//i, "").replace(/\/$/, "");
 
 // ─── Avatar & logo helpers ────────────────────────────────────────────────────
-const initialsAvatarDataURI = (name, bg = AV.yellow, fg = AV.dark, size = 96) => {
-  const ini = initials(name);
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 96 96"><rect width="96" height="96" rx="14" fill="${bg}"/><rect x="1.5" y="1.5" width="93" height="93" rx="13" fill="none" stroke="${AV.dark}" stroke-width="3"/><text x="48" y="48" text-anchor="middle" dominant-baseline="central" font-family="Poppins, Helvetica, Arial, sans-serif" font-weight="800" font-size="38" fill="${fg}" letter-spacing="-1">${ini}</text></svg>`;
-  return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
-};
-
-const avMarkDataURI = (size = 40) => {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 40 40"><rect width="40" height="40" rx="8" fill="${AV.dark}"/><text x="20" y="21" text-anchor="middle" dominant-baseline="central" font-family="Poppins, Helvetica, Arial, sans-serif" font-weight="800" font-size="16" fill="${AV.yellow}" letter-spacing="-0.5">AV</text></svg>`;
-  return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
-};
-
 const photoPlaceholderDataURI = (size = 112) => {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 112 112"><rect width="112" height="112" rx="10" fill="${AV.cream}"/><rect x="1.5" y="1.5" width="109" height="109" rx="9" fill="none" stroke="${AV.dark}" stroke-width="3"/><g transform="translate(56 58)" stroke="${AV.dark}" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="-22" y="-14" width="44" height="30" rx="4"/><circle cx="0" cy="2" r="9"/><path d="M-14 -14 l5 -7 h18 l5 7"/></g></svg>`;
   return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
-};
-
-// Logo image HTML — uses embedded data URI (no server needed)
-const logoImg = (height = 30) => {
-  const width = Math.round(height * (375 / 195));
-  return `<img src="${AV_LOGO}" alt="Anhangá Viagens" width="${width}" height="${height}" style="display:block;width:${width}px;height:${height}px;border:0" />`;
 };
 
 // ─── Social row ───────────────────────────────────────────────────────────────
@@ -520,27 +503,12 @@ function socialRow(data) {
   ).join("");
 }
 
-// ─── Logo footer block ────────────────────────────────────────────────────────
-function logoFooter(data, opts = {}) {
-  if (data.showLogo === false) return "";
-  const showRule = opts.rule !== false;
-  const tagline = data.tagline || "";
-  return `<div style="margin-top:12px;${showRule ? `border-top:1px dashed ${AV.gray200};padding-top:10px;` : ""}">
-    <table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse">
-      <tr>
-        <td style="vertical-align:middle;padding-right:12px">${logoImg(28)}</td>
-        ${tagline ? `<td style="vertical-align:middle;font:italic 400 12px/1.35 'Merriweather',Georgia,serif;color:${AV.gray500};border-left:1px solid ${AV.gray200};padding-left:12px">${tagline}</td>` : ""}
-      </tr>
-    </table>
-  </div>`;
-}
-
 // ─── VARIANT 1: Polaroid com foto ─────────────────────────────────────────────
 function buildV1(data) {
-  const photo = data.photo || photoPlaceholderDataURI(112);
-  const role  = data.role || "";
-  const team  = data.team || "";
-  const phone = data.phone || "";
+  const photo = data.photo ? ensureHttps(data.photo) : photoPlaceholderDataURI(112);
+  const role  = escapeHtml(data.role);
+  const team  = escapeHtml(data.team);
+  const phone = escapeHtml(data.phone);
   const site  = data.site || "";
   const cal   = data.calendly || "";
 
@@ -548,13 +516,13 @@ function buildV1(data) {
   if (phone) rows.push(
     `<tr><td style="padding:3px 0;font:400 13px/1.35 ${FONT};color:${AV.dark};vertical-align:middle">
       <span style="display:inline-block;width:18px;vertical-align:middle">${iconImg("whatsapp")}</span>
-      <a href="${waHref(phone)}" style="color:${AV.dark};text-decoration:none">${phone}</a>
+      <a href="${waHref(data.phone)}" style="color:${AV.dark};text-decoration:none">${phone}</a>
     </td></tr>`
   );
   if (site) rows.push(
     `<tr><td style="padding:3px 0;font:400 13px/1.35 ${FONT};color:${AV.dark};vertical-align:middle">
       <span style="display:inline-block;width:18px;vertical-align:middle">${iconImg("globe")}</span>
-      <a href="${ensureHttps(site)}" style="color:${AV.dark};text-decoration:none">${stripProto(site)}</a>
+      <a href="${ensureHttps(site)}" style="color:${AV.dark};text-decoration:none">${escapeHtml(stripProto(site))}</a>
     </td></tr>`
   );
   if (cal) rows.push(
@@ -576,14 +544,14 @@ function buildV1(data) {
       </table>
     </td>
     <td style="vertical-align:top;padding:4px 0">
-      <div style="font:800 20px/1.15 ${FONT};color:${AV.dark};letter-spacing:-0.02em;margin:0 0 4px 0">${data.name || "Seu Nome"}</div>
+      <div style="font:800 20px/1.15 ${FONT};color:${AV.dark};letter-spacing:-0.02em;margin:0 0 4px 0">${escapeHtml(data.name) || "Seu Nome"}</div>
       <div style="margin:0 0 2px 0">
         <span style="display:inline-block;background:linear-gradient(180deg,transparent 55%,${AV.yellow} 55%,${AV.yellow} 92%,transparent 92%);font:700 13px/1.4 ${FONT};color:${AV.dark};padding:0 4px">${role}</span>
       </div>
       ${team ? `<div style="font:400 12px/1.4 ${FONT};color:${AV.gray500};margin:0 0 10px 0">${team}</div>` : `<div style="height:10px"></div>`}
       <table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse">${rows.join("")}</table>
       <div style="height:10px;line-height:10px;font-size:0">&nbsp;</div>
-      <div style="line-height:0">${socialRow(data, AV.dark)}</div>
+      <div style="line-height:0">${socialRow(data)}</div>
     </td>
   </tr>
 </table>`;
@@ -591,9 +559,9 @@ function buildV1(data) {
 
 // ─── VARIANT 2: Logo Anhangá ───────────────────────────────────────────────────
 function buildV2(data) {
-  const role  = data.role || "";
-  const team  = data.team || "";
-  const phone = data.phone || "";
+  const role  = escapeHtml(data.role);
+  const team  = escapeHtml(data.team);
+  const phone = escapeHtml(data.phone);
   const site  = data.site || "";
   const cal   = data.calendly || "";
 
@@ -601,14 +569,12 @@ function buildV2(data) {
   const logoW = Math.round(logoH * (375 / 195));
 
   const contact = [];
-  if (phone) contact.push(`<a href="${waHref(phone)}" style="color:${AV.dark};text-decoration:none;font:600 13px/1.5 ${FONT}">${phone}</a>`);
+  if (phone) contact.push(`<a href="${waHref(data.phone)}" style="color:${AV.dark};text-decoration:none;font:600 13px/1.5 ${FONT}">${phone}</a>`);
   if (cal)   contact.push(`<a href="${ensureHttps(cal)}" style="color:${AV.dark};text-decoration:none;font:400 13px/1.5 ${FONT}">Agendar conversa</a>`);
-  if (site)  contact.push(`<a href="${ensureHttps(site)}" style="color:${AV.dark};text-decoration:none;font:400 13px/1.5 ${FONT}">${stripProto(site)}</a>`);
+  if (site)  contact.push(`<a href="${ensureHttps(site)}" style="color:${AV.dark};text-decoration:none;font:400 13px/1.5 ${FONT}">${escapeHtml(stripProto(site))}</a>`);
 
   const sep = `<span style="color:${AV.gray400};padding:0 8px">·</span>`;
-  const taglineLines = (data.tagline || "").includes(",")
-    ? (data.tagline || "").replace(/,\s*/, ",<br>")
-    : (data.tagline || "");
+  const taglineLines = escapeHtml(data.tagline || "").replace(/,\s*/g, ",<br>");
   const taglineBlock = data.tagline
     ? `<div style="margin-top:10px;text-align:center;font:italic 400 12px/1.45 'Merriweather',Georgia,serif;color:${AV.gray500}">${taglineLines}</div>`
     : "";
@@ -622,13 +588,13 @@ function buildV2(data) {
       </div>
     </td>
     <td style="vertical-align:top;padding:2px 0 2px 24px">
-      <div style="font:800 20px/1.15 ${FONT};color:${AV.dark};letter-spacing:-0.02em;margin:0 0 4px 0">${data.name || "Seu Nome"}</div>
+      <div style="font:800 20px/1.15 ${FONT};color:${AV.dark};letter-spacing:-0.02em;margin:0 0 4px 0">${escapeHtml(data.name) || "Seu Nome"}</div>
       <div style="margin:0 0 2px 0">
         <span style="display:inline-block;background:linear-gradient(180deg,transparent 55%,${AV.yellow} 55%,${AV.yellow} 92%,transparent 92%);font:700 13px/1.4 ${FONT};color:${AV.dark};padding:0 4px">${role}</span>
       </div>
       <div style="font:400 12px/1.4 ${FONT};color:${AV.gray500};margin:0 0 10px 0">${team}</div>
       <div style="margin:0 0 8px 0">${contact.join(sep)}</div>
-      <div style="line-height:0">${socialRow(data, AV.dark)}</div>
+      <div style="line-height:0">${socialRow(data)}</div>
     </td>
   </tr>
 </table>`;
@@ -636,27 +602,27 @@ function buildV2(data) {
 
 // ─── VARIANT 3: Compacta, barra amarela ────────────────────────────────────────
 function buildV3(data) {
-  const role  = data.role || "";
-  const team  = data.team || "";
-  const phone = data.phone || "";
+  const role  = escapeHtml(data.role);
+  const team  = escapeHtml(data.team);
+  const phone = escapeHtml(data.phone);
   const site  = data.site || "";
   const cal   = data.calendly || "";
 
   const contact = [];
-  if (phone) contact.push(`<a href="${waHref(phone)}" style="color:${AV.dark};text-decoration:none">${phone}</a>`);
+  if (phone) contact.push(`<a href="${waHref(data.phone)}" style="color:${AV.dark};text-decoration:none">${phone}</a>`);
   if (cal)   contact.push(`<a href="${ensureHttps(cal)}" style="color:${AV.dark};text-decoration:none">Agendar conversa</a>`);
-  if (site)  contact.push(`<a href="${ensureHttps(site)}" style="color:${AV.dark};text-decoration:none">${stripProto(site)}</a>`);
+  if (site)  contact.push(`<a href="${ensureHttps(site)}" style="color:${AV.dark};text-decoration:none">${escapeHtml(stripProto(site))}</a>`);
   const sep = `<span style="color:${AV.gray400};padding:0 8px">·</span>`;
 
   return `<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;font-family:${FONT};color:${AV.dark}">
   <tr>
     <td style="background:${AV.yellow};width:4px;padding:0;font-size:0;line-height:0">&nbsp;</td>
     <td style="padding:4px 0 4px 16px;vertical-align:top">
-      <div style="font:800 19px/1.15 ${FONT};color:${AV.dark};letter-spacing:-0.02em">${data.name || "Seu Nome"}</div>
+      <div style="font:800 19px/1.15 ${FONT};color:${AV.dark};letter-spacing:-0.02em">${escapeHtml(data.name) || "Seu Nome"}</div>
       <div style="font:600 12px/1.3 ${FONT};color:${AV.gray500};margin:2px 0 10px">${role}${team ? ` · ${team}` : ""}</div>
       <div style="font:400 13px/1.6 ${FONT};color:${AV.dark}">${contact.join(sep)}</div>
       <div style="height:8px;line-height:8px;font-size:0">&nbsp;</div>
-      <div style="line-height:0">${socialRow(data, AV.dark)}</div>
+      <div style="line-height:0">${socialRow(data)}</div>
     </td>
   </tr>
 </table>`;
