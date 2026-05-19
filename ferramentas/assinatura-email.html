@@ -755,9 +755,11 @@ async function copyRich() {
   try {
     if (navigator.clipboard && window.ClipboardItem) {
       const blobHtml  = new Blob([html], { type: "text/html" });
-      const plain = html.replace(/<style[^>]*>[\s\S]*?<\/style>/g, "")
-                        .replace(/<[^>]+>/g, " ")
-                        .replace(/\s+/g, " ").trim();
+      // Use the DOM parser to extract plain text — safer than chained regex
+      // (avoids "incomplete multi-character sanitization" on the html string).
+      const tmp = document.createElement("div");
+      tmp.innerHTML = html;
+      const plain = (tmp.textContent || tmp.innerText || "").replace(/\s+/g, " ").trim();
       const blobText = new Blob([plain], { type: "text/plain" });
       await navigator.clipboard.write([
         new ClipboardItem({ "text/html": blobHtml, "text/plain": blobText }),
