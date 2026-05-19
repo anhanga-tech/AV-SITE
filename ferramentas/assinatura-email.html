@@ -582,7 +582,6 @@ function buildV1(data) {
       <table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse">${rows.join("")}</table>
       <div style="height:10px;line-height:10px;font-size:0">&nbsp;</div>
       <div style="line-height:0">${socialRow(data, AV.dark)}</div>
-      ${logoFooter(data)}
     </td>
   </tr>
 </table>`;
@@ -651,7 +650,6 @@ function buildV3(data) {
   <tr>
     <td style="background:${AV.yellow};width:4px;padding:0;font-size:0;line-height:0">&nbsp;</td>
     <td style="padding:4px 0 4px 16px;vertical-align:top">
-      <div style="margin:0 0 10px 0">${logoImg(26)}</div>
       <div style="font:800 19px/1.15 ${FONT};color:${AV.dark};letter-spacing:-0.02em">${data.name || "Seu Nome"}</div>
       <div style="font:600 12px/1.3 ${FONT};color:${AV.gray500};margin:2px 0 10px">${role}${team ? ` · ${team}` : ""}</div>
       <div style="font:400 13px/1.6 ${FONT};color:${AV.dark}">${contact.join(sep)}</div>
