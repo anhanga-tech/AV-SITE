@@ -1,0 +1,787 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gerador de Assinatura · Anhangá Viagens</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Merriweather:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --dark:    #0f172a;
+      --blue:    #0056D2;
+      --yellow:  #FFD600;
+      --cream:   #fffdf5;
+      --white:   #ffffff;
+      --gray-50: #f9fafb;
+      --gray-100:#f3f4f6;
+      --gray-200:#e5e7eb;
+      --gray-400:#9ca3af;
+      --gray-500:#6b7280;
+      --gray-600:#4b5563;
+      --gray-700:#374151;
+      --yellow-50:#fefce8;
+      --yellow-200:#fef08a;
+      --font: 'Poppins', 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--cream);
+      color: var(--dark);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Page header ── */
+    .page-header {
+      border-bottom: 2px solid var(--dark);
+      background: var(--white);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .page-header img { display: block; }
+    .page-header-divider {
+      width: 1px; height: 28px;
+      background: var(--gray-200);
+    }
+    .page-header-title {
+      font: 700 14px/1 var(--font);
+      color: var(--gray-500);
+      letter-spacing: .04em;
+    }
+
+    /* ── Main layout ── */
+    .main {
+      display: grid;
+      grid-template-columns: minmax(340px, 440px) 1fr;
+      gap: 36px;
+      padding: 36px 36px 48px;
+      align-items: start;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    /* ── Form column ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: var(--yellow-50);
+      border: 1px solid var(--yellow-200);
+      color: #713f12;
+      font: 800 10px/1 var(--font);
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    h1.form-title {
+      margin: 12px 0 24px;
+      font: 800 36px/1.05 var(--font);
+      letter-spacing: -.03em;
+      color: var(--dark);
+    }
+
+    .fields-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 14px;
+      margin-bottom: 20px;
+    }
+
+    label.field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .field-title {
+      font: 700 11px/1 var(--font);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--gray-600);
+    }
+    .field input {
+      appearance: none;
+      border: 2px solid var(--dark);
+      background: var(--white);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font: 400 13px/1.3 var(--font);
+      color: var(--dark);
+      outline: none;
+      width: 100%;
+      transition: border-color .15s;
+    }
+    .field input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(0,86,210,.12);
+    }
+
+    /* ── Variant chips ── */
+    .section-label {
+      font: 700 11px/1 var(--font);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--gray-600);
+      margin-bottom: 8px;
+    }
+    .chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+    .chip {
+      appearance: none;
+      cursor: pointer;
+      border: 2px solid var(--dark);
+      border-radius: 999px;
+      padding: 8px 16px;
+      font: 700 12px/1 var(--font);
+      color: var(--dark);
+      letter-spacing: .04em;
+      background: var(--white);
+      transition: transform .15s cubic-bezier(.22,1,.36,1), box-shadow .15s;
+    }
+    .chip.active {
+      background: var(--yellow);
+      box-shadow: 4px 4px 0 0 var(--dark);
+      transform: translate(-2px, -2px);
+    }
+    .chip:hover:not(.active) {
+      background: var(--gray-50);
+    }
+
+    /* ── Buttons ── */
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+    .btn-primary {
+      appearance: none;
+      cursor: pointer;
+      background: var(--yellow);
+      border: 2px solid var(--dark);
+      border-radius: 999px;
+      padding: 14px 22px;
+      font: 800 14px/1 var(--font);
+      letter-spacing: .02em;
+      color: var(--dark);
+      box-shadow: 4px 4px 0 0 var(--dark);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .btn-primary:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0 0 var(--dark);
+    }
+    .btn-primary:active {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0 0 var(--dark);
+    }
+    .btn-ghost {
+      appearance: none;
+      cursor: pointer;
+      background: transparent;
+      border: 2px solid var(--dark);
+      border-radius: 999px;
+      padding: 14px 22px;
+      font: 700 14px/1 var(--font);
+      color: var(--dark);
+      transition: background .15s;
+    }
+    .btn-ghost:hover { background: var(--gray-50); }
+
+    /* ── How-to ── */
+    details.howto {
+      background: var(--white);
+      border: 2px solid var(--dark);
+      border-radius: 16px;
+      padding: 14px 18px;
+    }
+    details.howto summary {
+      cursor: pointer;
+      font: 800 13px/1 var(--font);
+      letter-spacing: .04em;
+      color: var(--dark);
+      list-style: none;
+    }
+    details.howto summary::-webkit-details-marker { display: none; }
+    details.howto summary::after {
+      content: ' ↓';
+      font-weight: 400;
+      color: var(--gray-400);
+    }
+    details.howto[open] summary::after { content: ' ↑'; }
+    details.howto ol {
+      margin: 12px 0 0 18px;
+      font: 400 13px/1.6 var(--font);
+      color: var(--gray-700);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    details.howto p {
+      margin-top: 10px;
+      font: 400 12px/1.5 var(--font);
+      color: var(--gray-500);
+    }
+
+    /* ── Gmail frame ── */
+    .gmail-frame {
+      background: var(--white);
+      border: 2px solid var(--dark);
+      border-radius: 16px;
+      box-shadow: 8px 8px 0 0 rgba(0,0,0,.06);
+      overflow: hidden;
+      position: sticky;
+      top: 24px;
+    }
+    .gmail-titlebar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 16px;
+      background: var(--gray-50);
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-red   { background: #f87171; }
+    .dot-yellow{ background: #fbbf24; }
+    .dot-green { background: #22c55e; }
+    .gmail-label {
+      margin-left: 14px;
+      font: 600 12px/1 var(--font);
+      color: var(--gray-500);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .gmail-body { padding: 18px 22px 28px; }
+    .gmail-row {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .gmail-row-label {
+      font: 600 11px/1 var(--font);
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--gray-400);
+      width: 60px;
+      flex-shrink: 0;
+    }
+    .gmail-row-value {
+      font: 400 13px/1.4 var(--font);
+      color: var(--gray-700);
+    }
+    .gmail-row-value.subject {
+      color: var(--dark);
+      font-weight: 600;
+    }
+    .gmail-message {
+      padding-top: 22px;
+    }
+    .gmail-body-text {
+      font: 400 14px/1.6 var(--font);
+      color: var(--dark);
+      margin-bottom: 14px;
+    }
+    .gmail-sig-area { margin-top: 24px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .main {
+        grid-template-columns: 1fr;
+        padding: 24px 20px;
+        gap: 28px;
+      }
+      .gmail-frame { position: static; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="page-header">
+  <span id="header-logo"></span>
+  <div class="page-header-divider"></div>
+  <span class="page-header-title">Gerador de Assinatura de Email</span>
+</header>
+
+<main class="main">
+  <!-- ── Left: Form ── -->
+  <div class="form-col">
+    <span class="badge">Ferramenta interna</span>
+    <h1 class="form-title">Sua assinatura,<br>do seu jeito.</h1>
+
+    <div class="fields-grid" id="fields-grid">
+      <!-- injected by JS -->
+    </div>
+
+    <div class="section-label">Variação ativa</div>
+    <div class="chips" id="chips">
+      <button class="chip active" data-variant="polaroid">Com foto</button>
+      <button class="chip" data-variant="logo">Com logo</button>
+      <button class="chip" data-variant="rail">Compacta</button>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="btn-copy-rich">Copiar assinatura →</button>
+      <button class="btn-ghost" id="btn-copy-html">Copiar como HTML</button>
+    </div>
+
+    <details class="howto">
+      <summary>Como colar no Gmail</summary>
+      <ol>
+        <li>Clique em <b>Copiar assinatura</b> acima.</li>
+        <li>No Gmail, abra <b>Configurações → Ver todas → Geral → Assinatura</b>.</li>
+        <li>Crie uma assinatura nova e cole (<kbd>Cmd/Ctrl + V</kbd>) no campo.</li>
+        <li>Salve as alterações no final da página.</li>
+      </ol>
+      <p>Dica: os ícones e o logo já vêm embutidos — não precisa hospedar imagem.</p>
+    </details>
+  </div>
+
+  <!-- ── Right: Gmail preview ── -->
+  <div class="preview-col">
+    <div class="gmail-frame">
+      <div class="gmail-titlebar">
+        <span class="dot dot-red"></span>
+        <span class="dot dot-yellow"></span>
+        <span class="dot dot-green"></span>
+        <span class="gmail-label">Pré-visualização · Gmail</span>
+      </div>
+      <div class="gmail-body">
+        <div class="gmail-row">
+          <span class="gmail-row-label">De</span>
+          <span class="gmail-row-value" id="preview-from">…</span>
+        </div>
+        <div class="gmail-row">
+          <span class="gmail-row-label">Para</span>
+          <span class="gmail-row-value">cliente@exemplo.com</span>
+        </div>
+        <div class="gmail-row">
+          <span class="gmail-row-label">Assunto</span>
+          <span class="gmail-row-value subject">Sua viagem para o Atacama — primeira proposta</span>
+        </div>
+        <div class="gmail-message">
+          <p class="gmail-body-text">Oi! Segue o primeiro rascunho do roteiro — dá uma olhada com calma e me conta o que ressoou. Qualquer ajuste é só falar.</p>
+          <p class="gmail-body-text">Abraço,</p>
+          <div class="gmail-sig-area" id="sig-preview"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+// ─── Logo (embedded, no server required) ───────────────────────────────────────
+const AV_LOGO = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20width%3D%22500%22%20zoomAndPan%3D%22magnify%22%20viewBox%3D%220%200%20375%20194.87999%22%20height%3D%22250%22%20preserveAspectRatio%3D%22xMidYMid%20meet%22%20version%3D%221.0%22%3E%3Cdefs%3E%3Cg%3E%3C%2Fg%3E%3CclipPath%20id%3D%22d86da5927f%22%3E%3Cpath%20d%3D%22M%200.117188%2027%20L%20374.882812%2027%20L%20374.882812%20158%20L%200.117188%20158%20Z%20M%200.117188%2027%20%22%20clip-rule%3D%22nonzero%22%3E%3C%2Fpath%3E%3C%2FclipPath%3E%3CclipPath%20id%3D%222a922dcd9d%22%3E%3Crect%20x%3D%220%22%20width%3D%22296%22%20y%3D%220%22%20height%3D%2257%22%3E%3C%2Frect%3E%3C%2FclipPath%3E%3CclipPath%20id%3D%22cbdf2cf2de%22%3E%3Cpath%20d%3D%22M%200.355469%2072%20L%20374.882812%2072%20L%20374.882812%2098%20L%200.355469%2098%20Z%20M%200.355469%2072%20%22%20clip-rule%3D%22nonzero%22%3E%3C%2Fpath%3E%3C%2FclipPath%3E%3CclipPath%20id%3D%2275b2cd858b%22%3E%3Cpath%20d%3D%22M%200.179688%2070.390625%20L%20373.816406%2061.082031%20L%20374.605469%2092.683594%20L%200.964844%20101.992188%20Z%20M%200.179688%2070.390625%20%22%20clip-rule%3D%22nonzero%22%3E%3C%2Fpath%3E%3C%2FclipPath%3E%3CclipPath%20id%3D%225016772e08%22%3E%3Cpath%20d%3D%22M%200.179688%2070.390625%20L%20373.816406%2061.082031%20L%20374.605469%2092.683594%20L%200.964844%20101.992188%20Z%20M%200.179688%2070.390625%20%22%20clip-rule%3D%22nonzero%22%3E%3C%2Fpath%3E%3C%2FclipPath%3E%3CclipPath%20id%3D%22082baf3a63%22%3E%3Cpath%20d%3D%22M%20315%202%20L%20339%202%20L%20339%2021%20L%20315%2021%20Z%20M%20315%202%20%22%20clip-rule%3D%22nonzero%22%3E%3C%2Fpath%3E%3C%2FclipPath%3E%3CclipPath%20id%3D%220473ade640%22%3E%3Cpath%20d%3D%22M%20314.082031%207.433594%20L%20339.328125%201.085938%20L%20343.410156%2017.316406%20L%20318.164062%2023.664062%20Z%20M%20314.082031%207.433594%20%22%20clip-rule%3D%22nonzero%22%3E%3C%2Fpath%3E%3C%2FclipPath%3E%3CclipPath%20id%3D%225ceee12a64%22%3E%3Cpath%20d%3D%22M%20314.082031%207.433594%20L%20339.328125%201.085938%20L%20343.410156%2017.316406%20L%20318.164062%2023.664062%20Z%20M%20314.082031%207.433594%20%22%20clip-rule%3D%22nonzero%22%3E%3C%2Fpath%3E%3C%2FclipPath%3E%3CclipPath%20id%3D%22f789bc2919%22%3E%3Cpath%20d%3D%22M%2073%20104%20L%20321%20104%20L%20321%20130.101562%20L%2073%20130.101562%20Z%20M%2073%20104%20%22%20clip-rule%3D%22nonzero%22%3E%3C%2Fpath%3E%3C%2FclipPath%3E%3CclipPath%20id%3D%227bce7b4fc2%22%3E%3Cpath%20d%3D%22M%200.03125%202%20L%2018%202%20L%2018%2020%20L%200.03125%2020%20Z%20M%200.03125%202%20%22%20clip-rule%3D%22nonzero%22%3E%3C%2Fpath%3E%3C%2FclipPath%3E%3CclipPath%20id%3D%22015d3b9b28%22%3E%3Crect%20x%3D%220%22%20width%3D%22248%22%20y%3D%220%22%20height%3D%2227%22%3E%3C%2Frect%3E%3C%2FclipPath%3E%3CclipPath%20id%3D%22a6bd628cf4%22%3E%3Crect%20x%3D%220%22%20width%3D%22375%22%20y%3D%220%22%20height%3D%22131%22%3E%3C%2Frect%3E%3C%2FclipPath%3E%3C%2Fdefs%3E%3Cg%20clip-path%3D%22url(%23d86da5927f)%22%3E%3Cg%20transform%3D%22matrix(1%2C%200%2C%200%2C%201%2C%200.000000000000000056%2C%2027)%22%3E%3Cg%20clip-path%3D%22url(%23a6bd628cf4)%22%3E%3Cg%20transform%3D%22matrix(1%2C%200%2C%200%2C%201%2C%2040%2C%2023)%22%3E%3Cg%20clip-path%3D%22url(%232a922dcd9d)%22%3E%3Cg%20fill%3D%22%231762a7%22%20fill-opacity%3D%221%22%3E%3Cg%20transform%3D%22translate(1.153568%2C%2042.338799)%22%3E%3Cg%3E%3Cpath%20d%3D%22M%2029.78125%200%20L%2027.5%20-4.90625%20L%2012.109375%20-4.90625%20L%209.8125%200%20L%200.0625%200%20L%200.0625%20-1.453125%20L%2017.625%20-39.546875%20L%2021.921875%20-39.546875%20L%2039.546875%20-1.453125%20L%2039.546875%200%20Z%20M%2024.265625%20-13.4375%20L%2019.75%20-23.703125%20L%2015.34375%20-13.4375%20Z%20M%2024.265625%20-13.4375%20%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20fill%3D%22%231762a7%22%20fill-opacity%3D%221%22%3E%3Cg%20transform%3D%22translate(40.861635%2C%2042.338799)%22%3E%3Cg%3E%3Cpath%20d%3D%22M%2034.96875%200.0625%20L%2015.28125%20-19.1875%20L%2015.28125%200%20C%2013.570312%200%2011.851562%200%2010.125%200%20C%208.394531%200%206.675781%200%204.96875%200%20L%204.96875%20-39.21875%20L%208.59375%20-39.21875%20L%2028.34375%20-19.90625%20L%2028.34375%20-39.046875%20C%2030.050781%20-39.046875%2031.75%20-39.046875%2033.4375%20-39.046875%20C%2035.132812%20-39.046875%2036.835938%20-39.046875%2038.546875%20-39.046875%20L%2038.546875%200.0625%20Z%20M%2034.96875%200.0625%20%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20fill%3D%22%231762a7%22%20fill-opacity%3D%221%22%3E%3Cg%20transform%3D%22translate(84.362053%2C%2042.338799)%22%3E%3Cg%3E%3Cpath%20d%3D%22M%2037.484375%20-39.046875%20L%2037.484375%200%20C%2035.773438%200%2034.070312%200%2032.375%200%20C%2030.6875%200%2028.988281%200%2027.28125%200%20L%2027.28125%20-15.671875%20L%2015.234375%20-15.671875%20L%2015.234375%200%20C%2013.515625%200%2011.800781%200%2010.09375%200%20C%208.382812%200%206.691406%200%205.015625%200%20L%205.015625%20-39.046875%20C%206.691406%20-39.046875%208.382812%20-39.046875%2010.09375%20-39.046875%20C%2011.800781%20-39.046875%2013.515625%20-39.046875%2015.234375%20-39.046875%20L%2015.234375%20-24.875%20L%2027.28125%20-24.875%20L%2027.28125%20-39.046875%20C%2028.988281%20-39.046875%2030.6875%20-39.046875%2032.375%20-39.046875%20C%2034.070312%20-39.046875%2035.773438%20-39.046875%2037.484375%20-39.046875%20Z%20M%2037.484375%20-39.046875%20%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20fill%3D%22%231762a7%22%20fill-opacity%3D%221%22%3E%3Cg%20transform%3D%22translate(126.858608%2C%2042.338799)%22%3E%3Cg%3E%3Cpath%20d%3D%22M%2029.78125%200%20L%2027.5%20-4.90625%20L%2012.109375%20-4.90625%20L%209.8125%200%20L%200.0625%200%20L%200.0625%20-1.453125%20L%2017.625%20-39.546875%20L%2021.921875%20-39.546875%20L%2039.546875%20-1.453125%20L%2039.546875%200%20Z%20M%2024.265625%20-13.4375%20L%2019.75%20-23.703125%20L%2015.34375%20-13.4375%20Z%20M%2024.265625%20-13.4375%20%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20fill%3D%22%231762a7%22%20fill-opacity%3D%221%22%3E%3Cg%20transform%3D%22translate(166.566676%2C%2042.338799)%22%3E%3Cg%3E%3Cpath%20d%3D%22M%2034.96875%200.0625%20L%2015.28125%20-19.1875%20L%2015.28125%200%20C%2013.570312%200%2011.851562%200%2010.125%200%20C%208.394531%200%206.675781%200%204.96875%200%20L%204.96875%20-39.21875%20L%208.59375%20-39.21875%20L%2028.34375%20-19.90625%20L%2028.34375%20-39.046875%20C%2030.050781%20-39.046875%2031.75%20-39.046875%2033.4375%20-39.046875%20C%2035.132812%20-39.046875%2036.835938%20-39.046875%2038.546875%20-39.046875%20L%2038.546875%200.0625%20Z%20M%2034.96875%200.0625%20%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20fill%3D%22%231762a7%22%20fill-opacity%3D%221%22%3E%3Cg%20transform%3D%22translate(210.067094%2C%2042.338799)%22%3E%3Cg%3E%3Cpath%20d%3D%22M%202.5625%20-19.53125%20C%202.5625%20-22.875%203.140625%20-25.789062%204.296875%20-28.28125%20C%205.453125%20-30.769531%206.984375%20-32.847656%208.890625%20-34.515625%20C%2010.804688%20-36.191406%2012.945312%20-37.445312%2015.3125%20-38.28125%20C%2017.675781%20-39.125%2020.101562%20-39.546875%2022.59375%20-39.546875%20C%2025.226562%20-39.546875%2027.800781%20-39.0625%2030.3125%20-38.09375%20C%2032.820312%20-37.125%2035%20-35.625%2036.84375%20-33.59375%20C%2038.6875%20-31.570312%2039.921875%20-28.945312%2040.546875%20-25.71875%20L%2030.734375%20-25.71875%20C%2029.921875%20-27.382812%2028.851562%20-28.582031%2027.53125%20-29.3125%20C%2026.207031%20-30.039062%2024.5625%20-30.40625%2022.59375%20-30.40625%20C%2020.507812%20-30.40625%2018.738281%20-29.910156%2017.28125%20-28.921875%20C%2015.832031%20-27.929688%2014.738281%20-26.617188%2014%20-24.984375%20C%2013.257812%20-23.347656%2012.890625%20-21.53125%2012.890625%20-19.53125%20C%2012.890625%20-16.289062%2013.769531%20-13.691406%2015.53125%20-11.734375%20C%2017.300781%20-9.785156%2019.65625%20-8.8125%2022.59375%20-8.8125%20C%2024.601562%20-8.8125%2026.273438%20-9.144531%2027.609375%20-9.8125%20C%2028.953125%20-10.488281%2030.066406%20-11.753906%2030.953125%20-13.609375%20L%2022.640625%20-13.609375%20L%2022.640625%20-22.25%20L%2041.109375%20-22.25%20C%2041.222656%20-20.320312%2041.234375%20-18.410156%2041.140625%20-16.515625%20C%2041.046875%20-14.617188%2040.664062%20-12.722656%2040%20-10.828125%20C%2039.0625%20-8.109375%2037.679688%20-5.921875%2035.859375%20-4.265625%20C%2034.046875%20-2.609375%2031.984375%20-1.40625%2029.671875%20-0.65625%20C%2027.367188%200.0820312%2025.007812%200.453125%2022.59375%200.453125%20C%2020.101562%200.453125%2017.675781%200.0351562%2015.3125%20-0.796875%20C%2012.945312%20-1.640625%2010.804688%20-2.890625%208.890625%20-4.546875%20C%206.984375%20-6.203125%205.453125%20-8.273438%204.296875%20-10.765625%20C%203.140625%20-13.253906%202.5625%20-16.175781%202.5625%20-19.53125%20Z%20M%202.5625%20-19.53125%20%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20fill%3D%22%231762a7%22%20fill-opacity%3D%221%22%3E%3Cg%20transform%3D%22translate(254.125204%2C%2042.338799)%22%3E%3Cg%3E%3Cpath%20d%3D%22M%2029.78125%200%20L%2027.5%20-4.90625%20L%2012.109375%20-4.90625%20L%209.8125%200%20L%200.0625%200%20L%200.0625%20-1.453125%20L%2017.625%20-39.546875%20L%2021.921875%20-39.546875%20L%2039.546875%20-1.453125%20L%2039.546875%200%20Z%20M%2024.265625%20-13.4375%20L%2019.75%20-23.703125%20L%2015.34375%20-13.4375%20Z%20M%2024.265625%20-13.4375%20%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20clip-path%3D%22url(%23cbdf2cf2de)%22%3E%3Cg%20clip-path%3D%22url(%2375b2cd858b)%22%3E%3Cg%20clip-path%3D%22url(%235016772e08)%22%3E%3Cpath%20fill%3D%22%23ffea00%22%20d%3D%22M%200.859375%2097.609375%20C%2059.175781%2069.027344%20125.199219%2077.324219%20187.546875%2082.953125%20C%20234.324219%2087.054688%20281.589844%2090.109375%20328.195312%2082.71875%20C%20343.703125%2080.390625%20359.050781%2076.957031%20374.285156%2072.914062%20C%20355.816406%2079.789062%20336.601562%2084.894531%20317.132812%2088.253906%20C%20274.132812%2095.710938%20230.199219%2093.460938%20186.964844%2089.808594%20C%20124.324219%2083.972656%2061.375%2074.371094%200.859375%2097.609375%20Z%20M%200.859375%2097.609375%20%22%20fill-opacity%3D%221%22%20fill-rule%3D%22nonzero%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20clip-path%3D%22url(%23082baf3a63)%22%3E%3Cg%20clip-path%3D%22url(%230473ade640)%22%3E%3Cg%20clip-path%3D%22url(%235ceee12a64)%22%3E%3Cpath%20fill%3D%22%23ffea00%22%20d%3D%22M%20335.796875%206.484375%20C%20336.898438%205.632812%20337.882812%204.632812%20338.722656%203.515625%20C%20338.890625%203.304688%20338.859375%202.996094%20338.644531%202.828125%20C%20338.617188%202.804688%20338.589844%202.785156%20338.5625%202.769531%20C%20336.984375%201.976562%20335.089844%202.167969%20333.707031%203.265625%20L%20328.488281%207.402344%20C%20328.460938%207.421875%20328.425781%207.433594%20328.390625%207.429688%20L%20322.039062%206.9375%20C%20321.109375%206.972656%20320.222656%207.34375%20319.542969%207.984375%20C%20319.449219%208.066406%20319.445312%208.210938%20319.527344%208.304688%20C%20319.550781%208.332031%20319.582031%208.355469%20319.621094%208.367188%20L%20324.769531%2010.070312%20C%20324.839844%2010.09375%20324.875%2010.171875%20324.851562%2010.246094%20C%20324.84375%2010.269531%20324.828125%2010.292969%20324.808594%2010.308594%20L%20320.40625%2013.796875%20C%20320.289062%2013.890625%20320.128906%2013.917969%20319.984375%2013.871094%20L%20316.359375%2012.691406%20C%20316.058594%2012.59375%20315.738281%2012.757812%20315.644531%2013.054688%20C%20315.582031%2013.238281%20315.621094%2013.441406%20315.746094%2013.59375%20L%20318.632812%2017.074219%20C%20318.894531%2017.390625%20319.308594%2017.53125%20319.710938%2017.445312%20C%20321.738281%2017.003906%20323.644531%2016.105469%20325.273438%2014.816406%20L%20328.332031%2012.390625%20C%20328.390625%2012.347656%20328.476562%2012.359375%20328.523438%2012.417969%20C%20328.535156%2012.4375%20328.546875%2012.464844%20328.550781%2012.492188%20L%20329.136719%2020.4375%20C%20329.144531%2020.5625%20329.253906%2020.65625%20329.378906%2020.644531%20C%20329.414062%2020.644531%20329.449219%2020.632812%20329.484375%2020.613281%20C%20330.183594%2020.167969%20330.710938%2019.496094%20330.972656%2018.710938%20L%20332.777344%208.914062%20C%20332.785156%208.878906%20332.800781%208.851562%20332.828125%208.828125%20L%20335.796875%206.484375%20%22%20fill-opacity%3D%221%22%20fill-rule%3D%22nonzero%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20clip-path%3D%22url(%23f789bc2919)%22%3E%3Cg%20transform%3D%22matrix(1%2C%200%2C%200%2C%201%2C%2073%2C%20104)%22%3E%3Cg%20clip-path%3D%22url(%23015d3b9b28)%22%3E%3Cg%20clip-path%3D%22url(%237bce7b4fc2)%22%3E%3Cg%20fill%3D%22%231762a7%22%20fill-opacity%3D%221%22%3E%3Cg%20transform%3D%22translate(0.397052%2C%2019.397578)%22%3E%3Cg%3E%3Cpath%20d%3D%22M%204.609375%20-17.34375%20L%208.671875%20-7.53125%20L%208.796875%20-7.53125%20L%2012.765625%20-17.34375%20L%2017.03125%20-17.34375%20L%2017.03125%20-16.671875%20L%209.671875%200.203125%20L%207.78125%200.203125%20L%200.34375%20-16.671875%20L%200.34375%20-17.34375%20Z%20M%204.609375%20-17.34375%20%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20fill%3D%22%231762a7%22%20fill-opacity%3D%221%22%3E%3Cg%20transform%3D%22translate(36.637559%2C%2019.397578)%22%3E%3Cg%3E%3Cpath%20d%3D%22M%207.359375%20-3.890625%20L%209.5625%20-3.890625%20L%209.5625%200%20L%200.765625%200%20L%200.765625%20-3.890625%20L%202.96875%20-3.890625%20L%202.96875%20-13.484375%20L%200.9375%20-13.484375%20L%200.9375%20-17.34375%20L%209.390625%20-17.34375%20L%209.390625%20-13.484375%20L%207.359375%20-13.484375%20Z%20M%207.359375%20-3.890625%20%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20fill%3D%22%231762a7%22%20fill-opacity%3D%221%22%3E%3Cg%20transform%3D%22translate(65.740502%2C%2019.397578)%22%3E%3Cg%3E%3Cpath%20d%3D%22M%2013.234375%200%20L%2012.21875%20-2.1875%20L%205.375%20-2.1875%20L%204.359375%200%20L%200.03125%200%20L%200.03125%20-0.640625%20L%207.828125%20-17.5625%20L%209.734375%20-17.5625%20L%2017.5625%20-0.640625%20L%2017.5625%200%20Z%20M%2010.78125%20-5.96875%20L%208.765625%20-10.53125%20L%206.8125%20-5.96875%20Z%20M%2010.78125%20-5.96875%20%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20fill%3D%22%231762a7%22%20fill-opacity%3D%221%22%3E%3Cg%20transform%3D%22translate(102.22885%2C%2019.397578)%22%3E%3Cg%3E%3Cpath%20d%3D%22M%201.140625%20-8.671875%20C%201.140625%20-10.160156%201.394531%20-11.457031%201.90625%20-12.5625%20C%202.414062%20-13.664062%203.097656%20-14.585938%203.953125%20-15.328125%20C%204.804688%20-16.078125%205.753906%20-16.632812%206.796875%20-17%20C%207.847656%20-17.375%208.925781%20-17.5625%2010.03125%20-17.5625%20C%2011.207031%20-17.5625%2012.351562%20-17.347656%2013.46875%20-16.921875%20C%2014.582031%20-16.492188%2015.546875%20-15.828125%2016.359375%20-14.921875%20C%2017.179688%20-14.023438%2017.734375%20-12.859375%2018.015625%20-11.421875%20L%2013.65625%20-11.421875%20C%2013.289062%20-12.171875%2012.8125%20-12.703125%2012.21875%20-13.015625%20C%2011.632812%20-13.335938%2010.90625%20-13.5%2010.03125%20-13.5%20C%209.113281%20-13.5%208.332031%20-13.28125%207.6875%20-12.84375%20C%207.039062%20-12.40625%206.550781%20-11.820312%206.21875%20-11.09375%20C%205.882812%20-10.375%205.71875%20-9.566406%205.71875%20-8.671875%20C%205.71875%20-7.234375%206.109375%20-6.082031%206.890625%20-5.21875%20C%207.679688%20-4.351562%208.726562%20-3.921875%2010.03125%20-3.921875%20C%2010.925781%20-3.921875%2011.671875%20-4.066406%2012.265625%20-4.359375%20C%2012.859375%20-4.660156%2013.351562%20-5.222656%2013.75%20-6.046875%20L%2010.0625%20-6.046875%20L%2010.0625%20-9.890625%20L%2018.265625%20-9.890625%20C%2018.316406%20-9.023438%2018.320312%20-8.171875%2018.28125%20-7.328125%20C%2018.238281%20-6.492188%2018.066406%20-5.65625%2017.765625%20-4.8125%20C%2017.359375%20-3.601562%2016.75%20-2.628906%2015.9375%20-1.890625%20C%2015.125%20-1.160156%2014.203125%20-0.628906%2013.171875%20-0.296875%20C%2012.148438%200.0351562%2011.101562%200.203125%2010.03125%200.203125%20C%208.925781%200.203125%207.847656%200.015625%206.796875%20-0.359375%20C%205.753906%20-0.734375%204.804688%20-1.285156%203.953125%20-2.015625%20C%203.097656%20-2.753906%202.414062%20-3.675781%201.90625%20-4.78125%20C%201.394531%20-5.882812%201.140625%20-7.179688%201.140625%20-8.671875%20Z%20M%201.140625%20-8.671875%20%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20fill%3D%22%231762a7%22%20fill-opacity%3D%221%22%3E%3Cg%20transform%3D%22translate(140.650287%2C%2019.397578)%22%3E%3Cg%3E%3Cpath%20d%3D%22M%2013.03125%20-17.34375%20C%2013.03125%20-16.695312%2013.03125%20-16.039062%2013.03125%20-15.375%20C%2013.03125%20-14.71875%2013.03125%20-14.050781%2013.03125%20-13.375%20C%2012.175781%20-13.375%2011.425781%20-13.375%2010.78125%20-13.375%20C%2010.132812%20-13.375%209.492188%20-13.375%208.859375%20-13.375%20C%208.222656%20-13.375%207.472656%20-13.375%206.609375%20-13.375%20L%206.609375%20-10.921875%20L%2012.515625%20-10.921875%20C%2012.515625%20-10.265625%2012.515625%20-9.609375%2012.515625%20-8.953125%20C%2012.515625%20-8.304688%2012.515625%20-7.648438%2012.515625%20-6.984375%20L%206.609375%20-6.984375%20C%206.609375%20-6.472656%206.609375%20-5.96875%206.609375%20-5.46875%20C%206.609375%20-4.976562%206.609375%20-4.46875%206.609375%20-3.9375%20C%207.472656%20-3.9375%208.238281%20-3.9375%208.90625%20-3.9375%20C%209.570312%20-3.9375%2010.25%20-3.9375%2010.9375%20-3.9375%20C%2011.625%20-3.9375%2012.398438%20-3.9375%2013.265625%20-3.9375%20C%2013.265625%20-3.289062%2013.265625%20-2.632812%2013.265625%20-1.96875%20C%2013.265625%20-1.3125%2013.265625%20-0.65625%2013.265625%200%20C%2011.898438%200%2010.628906%200%209.453125%200%20C%208.285156%200%207.117188%200%205.953125%200%20C%204.796875%200%203.546875%200%202.203125%200%20C%202.203125%20-2.90625%202.203125%20-5.800781%202.203125%20-8.6875%20C%202.203125%20-11.582031%202.203125%20-14.46875%202.203125%20-17.34375%20C%203.546875%20-17.34375%204.78125%20-17.34375%205.90625%20-17.34375%20C%207.039062%20-17.34375%208.171875%20-17.34375%209.296875%20-17.34375%20C%2010.429688%20-17.34375%2011.675781%20-17.34375%2013.03125%20-17.34375%20Z%20M%2013.03125%20-17.34375%20%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20fill%3D%22%231762a7%22%20fill-opacity%3D%221%22%3E%3Cg%20transform%3D%22translate(174.362916%2C%2019.397578)%22%3E%3Cg%3E%3Cpath%20d%3D%22M%2015.53125%200.03125%20L%206.796875%20-8.53125%20L%206.796875%200%20C%206.035156%200%205.269531%200%204.5%200%20C%203.726562%200%202.960938%200%202.203125%200%20L%202.203125%20-17.421875%20L%203.8125%20-17.421875%20L%2012.59375%20-8.84375%20L%2012.59375%20-17.34375%20C%2013.351562%20-17.34375%2014.109375%20-17.34375%2014.859375%20-17.34375%20C%2015.609375%20-17.34375%2016.363281%20-17.34375%2017.125%20-17.34375%20L%2017.125%200.03125%20Z%20M%2015.53125%200.03125%20%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20fill%3D%22%231762a7%22%20fill-opacity%3D%221%22%3E%3Cg%20transform%3D%22translate(212.536512%2C%2019.397578)%22%3E%3Cg%3E%3Cpath%20d%3D%22M%205.28125%20-5.296875%20C%205.28125%20-4.859375%205.460938%20-4.503906%205.828125%20-4.234375%20C%206.191406%20-3.972656%206.644531%20-3.789062%207.1875%20-3.6875%20C%207.726562%20-3.59375%208.265625%20-3.582031%208.796875%20-3.65625%20C%209.335938%20-3.726562%209.789062%20-3.882812%2010.15625%20-4.125%20C%2010.519531%20-4.363281%2010.703125%20-4.691406%2010.703125%20-5.109375%20C%2010.703125%20-5.515625%2010.554688%20-5.828125%2010.265625%20-6.046875%20C%209.984375%20-6.265625%209.601562%20-6.414062%209.125%20-6.5%20C%208.644531%20-6.59375%208.113281%20-6.65625%207.53125%20-6.6875%20C%206.28125%20-6.789062%205.179688%20-7.019531%204.234375%20-7.375%20C%203.296875%20-7.726562%202.566406%20-8.273438%202.046875%20-9.015625%20C%201.523438%20-9.765625%201.253906%20-10.765625%201.234375%20-12.015625%20C%201.222656%20-13.085938%201.453125%20-14.003906%201.921875%20-14.765625%20C%202.390625%20-15.523438%203.015625%20-16.132812%203.796875%20-16.59375%20C%204.585938%20-17.0625%205.457031%20-17.367188%206.40625%20-17.515625%20C%207.351562%20-17.671875%208.300781%20-17.671875%209.25%20-17.515625%20C%2010.207031%20-17.367188%2011.082031%20-17.0625%2011.875%20-16.59375%20C%2012.664062%20-16.132812%2013.300781%20-15.523438%2013.78125%20-14.765625%20C%2014.257812%20-14.003906%2014.488281%20-13.085938%2014.46875%20-12.015625%20C%2013.695312%20-12.015625%2012.992188%20-12.015625%2012.359375%20-12.015625%20C%2011.722656%20-12.015625%2011.023438%20-12.015625%2010.265625%20-12.015625%20C%2010.265625%20-12.484375%2010.101562%20-12.847656%209.78125%20-13.109375%20C%209.46875%20-13.367188%209.078125%20-13.539062%208.609375%20-13.625%20C%208.140625%20-13.707031%207.671875%20-13.695312%207.203125%20-13.59375%20C%206.734375%20-13.5%206.332031%20-13.320312%206%20-13.0625%20C%205.664062%20-12.8125%205.484375%20-12.476562%205.453125%20-12.0625%20C%205.421875%20-11.632812%205.523438%20-11.300781%205.765625%20-11.0625%20C%206.015625%20-10.820312%206.351562%20-10.648438%206.78125%20-10.546875%20C%207.21875%20-10.453125%207.691406%20-10.375%208.203125%20-10.3125%20C%209.054688%20-10.207031%209.890625%20-10.078125%2010.703125%20-9.921875%20C%2011.515625%20-9.765625%2012.242188%20-9.515625%2012.890625%20-9.171875%20C%2013.546875%20-8.835938%2014.0625%20-8.34375%2014.4375%20-7.6875%20C%2014.820312%20-7.039062%2015.015625%20-6.171875%2015.015625%20-5.078125%20C%2015.015625%20-4.035156%2014.757812%20-3.140625%2014.25%20-2.390625%20C%2013.738281%20-1.648438%2013.066406%20-1.050781%2012.234375%20-0.59375%20C%2011.398438%20-0.144531%2010.476562%200.148438%209.46875%200.296875%20C%208.457031%200.441406%207.453125%200.4375%206.453125%200.28125%20C%205.453125%200.125%204.539062%20-0.179688%203.71875%20-0.640625%20C%202.894531%20-1.109375%202.226562%20-1.726562%201.71875%20-2.5%20C%201.21875%20-3.28125%200.972656%20-4.210938%200.984375%20-5.296875%20C%201.734375%20-5.296875%202.445312%20-5.296875%203.125%20-5.296875%20C%203.800781%20-5.296875%204.519531%20-5.296875%205.28125%20-5.296875%20Z%20M%205.28125%20-5.296875%20%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E";
+
+// ─── Brand colors ──────────────────────────────────────────────────────────────
+const AV = {
+  dark:       "#0f172a",
+  blue:       "#0056D2",
+  yellow:     "#FFD600",
+  yellowSoft: "#FEF3B0",
+  cream:      "#fffdf5",
+  gray500:    "#6b7280",
+  gray400:    "#9ca3af",
+  gray200:    "#e5e7eb",
+  gray100:    "#f3f4f6",
+  white:      "#ffffff",
+};
+
+const FONT = "'Poppins','Helvetica Neue',Arial,sans-serif";
+
+// ─── PNG icon system ──────────────────────────────────────────────────────────
+// Gmail's signature editor strips inline <svg> AND <img src="data:image/svg+xml">.
+// The only reliable path: convert SVG → PNG via Canvas, embed as data:image/png.
+// <img src="data:image/png;base64,..."> is preserved by Gmail's paste handler.
+
+const ICON_SVGS = {
+  whatsapp: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${AV.dark}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>`,
+  globe:    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${AV.dark}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
+  calendar: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${AV.dark}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+  ig:       `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${AV.dark}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>`,
+  linkedin: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${AV.dark}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>`,
+  slack:    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${AV.dark}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/><path d="M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/><path d="M9.5 14c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5S8 21.33 8 20.5v-5c0-.83.67-1.5 1.5-1.5z"/><path d="M3.5 14H5v1.5c0 .83-.67 1.5-1.5 1.5S2 16.33 2 15.5 2.67 14 3.5 14z"/><path d="M14 14.5c0-.83.67-1.5 1.5-1.5h5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-5c-.83 0-1.5-.67-1.5-1.5z"/><path d="M15.5 19H14v1.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5-.67-1.5-1.5-1.5z"/><path d="M10 9.5C10 8.67 9.33 8 8.5 8H3.5C2.67 8 2 8.67 2 9.5S2.67 11 3.5 11h5c.83 0 1.5-.67 1.5-1.5z"/><path d="M8.5 5H10V3.5C10 2.67 9.33 2 8.5 2S7 2.67 7 3.5 7.67 5 8.5 5z"/></svg>`,
+};
+
+// Render one SVG string → PNG data URI using an offscreen Canvas.
+function svgToPng(svgStr, size = 16) {
+  return new Promise((resolve) => {
+    const dpr = 2; // retina
+    const canvas = document.createElement("canvas");
+    canvas.width  = size * dpr;
+    canvas.height = size * dpr;
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, size * dpr, size * dpr);
+      resolve(canvas.toDataURL("image/png"));
+    };
+    img.onerror = () => resolve(null);
+    img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgStr);
+  });
+}
+
+// Populated by initIcons() before first render.
+let ICON_PNG = {};
+
+async function initIcons() {
+  const entries = await Promise.all(
+    Object.entries(ICON_SVGS).map(([key, svg]) =>
+      svgToPng(svg, 16).then((uri) => [key, uri])
+    )
+  );
+  ICON_PNG = Object.fromEntries(entries);
+}
+
+// Inline <img> for use inside signature HTML strings.
+const iconImg = (key, size = 14) => {
+  const src = ICON_PNG[key];
+  if (!src) return "";
+  return `<img src="${src}" width="${size}" height="${size}" alt="" style="display:inline-block;width:${size}px;height:${size}px;vertical-align:middle;border:0" />`;
+};
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+const onlyDigits = (s) => (s || "").replace(/[^\d+]/g, "");
+
+// Escape user-supplied text before inserting into HTML to prevent XSS in preview.
+const escapeHtml = (s) =>
+  (s || "").replace(/&/g, "&amp;")
+           .replace(/</g, "&lt;")
+           .replace(/>/g, "&gt;")
+           .replace(/"/g, "&quot;")
+           .replace(/'/g, "&#39;");
+
+const waHref = (phone) => {
+  const d = onlyDigits(phone).replace(/^\+/, "");
+  return d ? `https://wa.me/${d}` : "";
+};
+
+const ensureHttps = (url) => {
+  if (!url) return "";
+  if (/^https?:\/\//i.test(url)) return url;
+  return "https://" + url.replace(/^\/+/, "");
+};
+
+const stripProto = (url) =>
+  (url || "").replace(/^https?:\/\//i, "").replace(/\/$/, "");
+
+// ─── Avatar & logo helpers ────────────────────────────────────────────────────
+const photoPlaceholderDataURI = (size = 112) => {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 112 112"><rect width="112" height="112" rx="10" fill="${AV.cream}"/><rect x="1.5" y="1.5" width="109" height="109" rx="9" fill="none" stroke="${AV.dark}" stroke-width="3"/><g transform="translate(56 58)" stroke="${AV.dark}" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="-22" y="-14" width="44" height="30" rx="4"/><circle cx="0" cy="2" r="9"/><path d="M-14 -14 l5 -7 h18 l5 7"/></g></svg>`;
+  return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+};
+
+// ─── Social row ───────────────────────────────────────────────────────────────
+function socialRow(data) {
+  const links = [];
+  if (data.instagram) links.push({ href: ensureHttps(data.instagram), key: "ig",       title: "Instagram" });
+  if (data.linkedin)  links.push({ href: ensureHttps(data.linkedin),  key: "linkedin", title: "LinkedIn"  });
+  if (data.whatsapp || data.phone) {
+    const wa = data.whatsapp ? ensureHttps(data.whatsapp) : waHref(data.phone);
+    if (wa) links.push({ href: wa, key: "whatsapp", title: "WhatsApp" });
+  }
+  if (data.slack) links.push({ href: ensureHttps(data.slack), key: "slack", title: "Slack Connect" });
+  if (!links.length) return "";
+  return links.map((l) =>
+    `<a href="${l.href}" title="${l.title}" style="display:inline-block;margin-right:10px;text-decoration:none;line-height:0;vertical-align:middle">${iconImg(l.key, 18)}</a>`
+  ).join("");
+}
+
+// ─── VARIANT 1: Polaroid com foto ─────────────────────────────────────────────
+function buildV1(data) {
+  const photo = data.photo ? ensureHttps(data.photo) : photoPlaceholderDataURI(112);
+  const role  = escapeHtml(data.role);
+  const team  = escapeHtml(data.team);
+  const phone = escapeHtml(data.phone);
+  const site  = data.site || "";
+  const cal   = data.calendly || "";
+
+  const rows = [];
+  if (phone) rows.push(
+    `<tr><td style="padding:3px 0;font:400 13px/1.35 ${FONT};color:${AV.dark};vertical-align:middle">
+      <span style="display:inline-block;width:18px;vertical-align:middle">${iconImg("whatsapp")}</span>
+      <a href="${waHref(data.phone)}" style="color:${AV.dark};text-decoration:none">${phone}</a>
+    </td></tr>`
+  );
+  if (site) rows.push(
+    `<tr><td style="padding:3px 0;font:400 13px/1.35 ${FONT};color:${AV.dark};vertical-align:middle">
+      <span style="display:inline-block;width:18px;vertical-align:middle">${iconImg("globe")}</span>
+      <a href="${ensureHttps(site)}" style="color:${AV.dark};text-decoration:none">${escapeHtml(stripProto(site))}</a>
+    </td></tr>`
+  );
+  if (cal) rows.push(
+    `<tr><td style="padding:3px 0;font:400 13px/1.35 ${FONT};color:${AV.dark};vertical-align:middle">
+      <span style="display:inline-block;width:18px;vertical-align:middle">${iconImg("calendar")}</span>
+      <a href="${ensureHttps(cal)}" style="color:${AV.dark};text-decoration:none">Agendar uma conversa</a>
+    </td></tr>`
+  );
+
+  return `<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;font-family:${FONT};color:${AV.dark};background:transparent">
+  <tr>
+    <td style="vertical-align:top;padding:6px 22px 6px 6px">
+      <table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:separate">
+        <tr><td style="background:${AV.dark};padding:0;border-radius:10px">
+          <table cellpadding="0" cellspacing="0" border="0" role="presentation"><tr><td style="transform:translate(-4px,-4px);display:block">
+            <img src="${photo}" width="112" height="112" alt="" style="display:block;width:112px;height:112px;border-radius:10px;border:2px solid ${AV.dark};background:${AV.cream}" />
+          </td></tr></table>
+        </td></tr>
+      </table>
+    </td>
+    <td style="vertical-align:top;padding:4px 0">
+      <div style="font:800 20px/1.15 ${FONT};color:${AV.dark};letter-spacing:-0.02em;margin:0 0 4px 0">${escapeHtml(data.name) || "Seu Nome"}</div>
+      <div style="margin:0 0 2px 0">
+        <span style="display:inline-block;background:linear-gradient(180deg,transparent 55%,${AV.yellow} 55%,${AV.yellow} 92%,transparent 92%);font:700 13px/1.4 ${FONT};color:${AV.dark};padding:0 4px">${role}</span>
+      </div>
+      ${team ? `<div style="font:400 12px/1.4 ${FONT};color:${AV.gray500};margin:0 0 10px 0">${team}</div>` : `<div style="height:10px"></div>`}
+      <table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse">${rows.join("")}</table>
+      <div style="height:10px;line-height:10px;font-size:0">&nbsp;</div>
+      <div style="line-height:0">${socialRow(data)}</div>
+    </td>
+  </tr>
+</table>`;
+}
+
+// ─── VARIANT 2: Logo Anhangá ───────────────────────────────────────────────────
+function buildV2(data) {
+  const role  = escapeHtml(data.role);
+  const team  = escapeHtml(data.team);
+  const phone = escapeHtml(data.phone);
+  const site  = data.site || "";
+  const cal   = data.calendly || "";
+
+  const logoH = 80;
+  const logoW = Math.round(logoH * (375 / 195));
+
+  const contact = [];
+  if (phone) contact.push(`<a href="${waHref(data.phone)}" style="color:${AV.dark};text-decoration:none;font:600 13px/1.5 ${FONT}">${phone}</a>`);
+  if (cal)   contact.push(`<a href="${ensureHttps(cal)}" style="color:${AV.dark};text-decoration:none;font:400 13px/1.5 ${FONT}">Agendar conversa</a>`);
+  if (site)  contact.push(`<a href="${ensureHttps(site)}" style="color:${AV.dark};text-decoration:none;font:400 13px/1.5 ${FONT}">${escapeHtml(stripProto(site))}</a>`);
+
+  const sep = `<span style="color:${AV.gray400};padding:0 8px">·</span>`;
+  const taglineLines = escapeHtml(data.tagline || "").replace(/,\s*/g, ",<br>");
+  const taglineBlock = data.tagline
+    ? `<div style="margin-top:10px;text-align:center;font:italic 400 12px/1.45 'Merriweather',Georgia,serif;color:${AV.gray500}">${taglineLines}</div>`
+    : "";
+
+  return `<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;font-family:${FONT};color:${AV.dark}">
+  <tr>
+    <td style="vertical-align:top;padding:6px 24px 6px 0;border-right:1px solid ${AV.gray200}">
+      <div style="width:${logoW}px;text-align:center">
+        <img src="${AV_LOGO}" alt="Anhangá Viagens" width="${logoW}" height="${logoH}" style="display:block;width:${logoW}px;height:${logoH}px;border:0" />
+        ${taglineBlock}
+      </div>
+    </td>
+    <td style="vertical-align:top;padding:2px 0 2px 24px">
+      <div style="font:800 20px/1.15 ${FONT};color:${AV.dark};letter-spacing:-0.02em;margin:0 0 4px 0">${escapeHtml(data.name) || "Seu Nome"}</div>
+      <div style="margin:0 0 2px 0">
+        <span style="display:inline-block;background:linear-gradient(180deg,transparent 55%,${AV.yellow} 55%,${AV.yellow} 92%,transparent 92%);font:700 13px/1.4 ${FONT};color:${AV.dark};padding:0 4px">${role}</span>
+      </div>
+      <div style="font:400 12px/1.4 ${FONT};color:${AV.gray500};margin:0 0 10px 0">${team}</div>
+      <div style="margin:0 0 8px 0">${contact.join(sep)}</div>
+      <div style="line-height:0">${socialRow(data)}</div>
+    </td>
+  </tr>
+</table>`;
+}
+
+// ─── VARIANT 3: Compacta, barra amarela ────────────────────────────────────────
+function buildV3(data) {
+  const role  = escapeHtml(data.role);
+  const team  = escapeHtml(data.team);
+  const phone = escapeHtml(data.phone);
+  const site  = data.site || "";
+  const cal   = data.calendly || "";
+
+  const contact = [];
+  if (phone) contact.push(`<a href="${waHref(data.phone)}" style="color:${AV.dark};text-decoration:none">${phone}</a>`);
+  if (cal)   contact.push(`<a href="${ensureHttps(cal)}" style="color:${AV.dark};text-decoration:none">Agendar conversa</a>`);
+  if (site)  contact.push(`<a href="${ensureHttps(site)}" style="color:${AV.dark};text-decoration:none">${escapeHtml(stripProto(site))}</a>`);
+  const sep = `<span style="color:${AV.gray400};padding:0 8px">·</span>`;
+
+  return `<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;font-family:${FONT};color:${AV.dark}">
+  <tr>
+    <td style="background:${AV.yellow};width:4px;padding:0;font-size:0;line-height:0">&nbsp;</td>
+    <td style="padding:4px 0 4px 16px;vertical-align:top">
+      <div style="font:800 19px/1.15 ${FONT};color:${AV.dark};letter-spacing:-0.02em">${escapeHtml(data.name) || "Seu Nome"}</div>
+      <div style="font:600 12px/1.3 ${FONT};color:${AV.gray500};margin:2px 0 10px">${role}${team ? ` · ${team}` : ""}</div>
+      <div style="font:400 13px/1.6 ${FONT};color:${AV.dark}">${contact.join(sep)}</div>
+      <div style="height:8px;line-height:8px;font-size:0">&nbsp;</div>
+      <div style="line-height:0">${socialRow(data)}</div>
+    </td>
+  </tr>
+</table>`;
+}
+
+// ─── Default data (from the brief) ────────────────────────────────────────────
+const DEFAULT_DATA = {
+  name:      "Felipe William Rodrigues Silva",
+  role:      "Agente de Viagens",
+  team:      "Operações | Anhangá Viagens",
+  phone:     "+55 11 5283-3309",
+  site:      "anhangaviagens.com",
+  calendly:  "",
+  instagram: "https://www.instagram.com/anhangaviagens",
+  linkedin:  "https://linkedin.com/company/anhangaviagens",
+  whatsapp:  "https://wa.me/551152833309",
+  slack:     "",
+  photo:     "",
+  tagline:   "",
+  showLogo:  true,
+};
+
+// ─── Form field definitions ───────────────────────────────────────────────────
+const FIELDS = [
+  { key: "name",      label: "Nome completo",         placeholder: "Felipe William Rodrigues Silva" },
+  { key: "role",      label: "Cargo",                 placeholder: "Agente de Viagens" },
+  { key: "team",      label: "Time / linha",          placeholder: "Operações | Anhangá Viagens" },
+  { key: "phone",     label: "Celular / WhatsApp",    placeholder: "+55 11 5283-3309" },
+  { key: "site",      label: "Site",                  placeholder: "anhangaviagens.com" },
+  { key: "calendly",  label: "Link para agendar",     placeholder: "calendly.com/..." },
+  { key: "instagram", label: "Instagram",             placeholder: "instagram.com/anhangaviagens" },
+  { key: "linkedin",  label: "LinkedIn",              placeholder: "linkedin.com/company/..." },
+  { key: "whatsapp",  label: "WhatsApp (link direto)",placeholder: "wa.me/5511..." },
+  { key: "slack",     label: "Slack Connect (link)",  placeholder: "app.slack.com/client/..." },
+  { key: "photo",     label: "URL da foto (variação 1)", placeholder: "https://...jpg" },
+];
+
+// ─── UI state ─────────────────────────────────────────────────────────────────
+let state = { ...DEFAULT_DATA };
+let activeVariant = "polaroid";
+
+const BUILDERS = {
+  polaroid: buildV1,
+  logo:     buildV2,
+  rail:     buildV3,
+};
+
+// Build form
+const fieldsGrid = document.getElementById("fields-grid");
+FIELDS.forEach(({ key, label, placeholder }) => {
+  const lbl = document.createElement("label");
+  lbl.className = "field";
+  lbl.innerHTML = `<span class="field-title">${label}</span>
+    <input type="text" data-key="${key}" placeholder="${placeholder}" value="${(DEFAULT_DATA[key] || "").replace(/"/g, "&quot;")}" />`;
+  fieldsGrid.appendChild(lbl);
+});
+
+// Input listeners
+fieldsGrid.addEventListener("input", (e) => {
+  const key = e.target.dataset.key;
+  if (key) {
+    state = { ...state, [key]: e.target.value };
+    updatePreview();
+    updateFromLine();
+  }
+});
+
+// Variant chips
+document.getElementById("chips").addEventListener("click", (e) => {
+  const btn = e.target.closest(".chip");
+  if (!btn) return;
+  activeVariant = btn.dataset.variant;
+  document.querySelectorAll(".chip").forEach((c) => {
+    c.classList.toggle("active", c.dataset.variant === activeVariant);
+  });
+  updatePreview();
+});
+
+function updatePreview() {
+  const html = BUILDERS[activeVariant](state);
+  document.getElementById("sig-preview").innerHTML = html;
+}
+
+function updateFromLine() {
+  const firstName = (state.name || "Seu Nome").toLowerCase().split(" ")[0];
+  document.getElementById("preview-from").textContent =
+    `${state.name || "Seu Nome"} <${firstName}@anhangaviagens.com>`;
+}
+
+// ─── Copy logic ───────────────────────────────────────────────────────────────
+const btnCopyRich = document.getElementById("btn-copy-rich");
+const btnCopyHtml = document.getElementById("btn-copy-html");
+
+async function copyRich() {
+  const html = BUILDERS[activeVariant](state);
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      const blobHtml  = new Blob([html], { type: "text/html" });
+      // Use the DOM parser to extract plain text — safer than chained regex
+      // (avoids "incomplete multi-character sanitization" on the html string).
+      const tmp = document.createElement("div");
+      tmp.innerHTML = html;
+      const plain = (tmp.textContent || tmp.innerText || "").replace(/\s+/g, " ").trim();
+      const blobText = new Blob([plain], { type: "text/plain" });
+      await navigator.clipboard.write([
+        new ClipboardItem({ "text/html": blobHtml, "text/plain": blobText }),
+      ]);
+      flash(btnCopyRich, "✓ Copiado — cole no Gmail →", "Copiar assinatura →");
+    } else {
+      // Fallback: select the rendered preview
+      const el = document.getElementById("sig-preview");
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      document.execCommand("copy");
+      sel.removeAllRanges();
+      flash(btnCopyRich, "✓ Copiado — cole no Gmail →", "Copiar assinatura →");
+    }
+  } catch (err) {
+    flash(btnCopyRich, "⚠ Use Ctrl+A no preview e Ctrl+C", "Copiar assinatura →", 3000);
+  }
+}
+
+async function copyHtml() {
+  const html = BUILDERS[activeVariant](state);
+  try {
+    await navigator.clipboard.writeText(html);
+    flash(btnCopyHtml, "✓ HTML copiado", "Copiar como HTML");
+  } catch {
+    flash(btnCopyHtml, "⚠ Não foi possível copiar", "Copiar como HTML", 3000);
+  }
+}
+
+function flash(btn, msg, original, ms = 2200) {
+  btn.textContent = msg;
+  setTimeout(() => { btn.textContent = original; }, ms);
+}
+
+btnCopyRich.addEventListener("click", copyRich);
+btnCopyHtml.addEventListener("click", copyHtml);
+
+// ─── Header logo ──────────────────────────────────────────────────────────────
+(function () {
+  const img = document.createElement("img");
+  img.src = AV_LOGO;
+  img.alt = "Anhangá Viagens";
+  img.height = 28;
+  img.style.cssText = "display:block;height:28px;width:auto";
+  document.getElementById("header-logo").appendChild(img);
+})();
+
+// ─── Initial render (wait for PNG icons before first draw) ───────────────────
+initIcons().then(() => {
+  updatePreview();
+  updateFromLine();
+});
+</script>
+
+</body>
+</html>
