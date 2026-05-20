@@ -243,7 +243,7 @@ export default defineConfig(({ mode, isSsrBuild }) => {
           }
         }
       },
-      chunkSizeWarningLimit: 300,
+      chunkSizeWarningLimit: 800,
     },
     preview: {
       port: 4173,
