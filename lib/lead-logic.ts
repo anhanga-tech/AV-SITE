@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { LeadTracking, LeadUtms, SubmitLeadRequest } from '../types/leadCapture';
 import { SubmitLeadBodySchema } from './schemas/submit-lead';
+import { isRecord } from './type-guards';
 
 const MIN_PHONE_DIGITS = 10;
 const MAX_PHONE_DIGITS = 15;
@@ -102,7 +103,7 @@ export function normalizeWhatsappNumber(value: unknown, defaultCountryCode = '+5
  * Normalizes UTM parameters.
  */
 export function normalizeUtms(value: unknown): LeadUtms {
-    const source = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
+    const source = isRecord(value) ? value : {};
 
     return {
         utm_source: normalizeNullable(source.utm_source),
@@ -114,7 +115,7 @@ export function normalizeUtms(value: unknown): LeadUtms {
 }
 
 function toRecord(value: unknown): Record<string, unknown> {
-    return value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
+    return isRecord(value) ? value : {};
 }
 
 function sanitizeTrackingKey(key: string): string {
