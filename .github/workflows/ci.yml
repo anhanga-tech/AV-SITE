@@ -45,6 +45,9 @@ jobs:
       - name: Build
         run: pnpm run build
 
+      - name: Check bundle size
+        run: pnpm run test:size
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v7
         with:

@@ -6,6 +6,7 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import mdx from '@mdx-js/rollup';
 import remarkGfm from 'remark-gfm';
+import { visualizer } from 'rollup-plugin-visualizer';
 import { DEFAULT_GEMINI_MODEL } from './lib/ai/constants.ts';
 import { stripYamlFrontmatter } from './lib/mdx-frontmatter.ts';
 import { logger } from './lib/logger.ts';
@@ -215,6 +216,7 @@ export default defineConfig(({ mode, isSsrBuild }) => {
       react({ include: /\.(jsx|tsx|mdx)$/ }),
       adminHtmlDevPlugin(),
       apiDevPlugin(),
+      visualizer({ filename: 'dist/stats.html', open: false, gzipSize: true }),
     ],
     define: {
       'process.env.GEMINI_MODEL': JSON.stringify(geminiModel)
@@ -241,7 +243,7 @@ export default defineConfig(({ mode, isSsrBuild }) => {
           }
         }
       },
-      chunkSizeWarningLimit: 1000,
+      chunkSizeWarningLimit: 800,
     },
     preview: {
       port: 4173,
