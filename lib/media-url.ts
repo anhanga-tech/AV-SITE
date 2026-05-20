@@ -13,6 +13,7 @@ export interface OptimizeImageUrlOptions {
     enableTransforms?: boolean;
     width?: number;
     height?: number;
+    format?: 'auto' | 'avif' | 'webp';
 }
 
 const RATIO_TOLERANCE = 0.08;
@@ -95,10 +96,11 @@ export function buildCloudflareImageUrl(
     sourcePathOrUrl: string,
     transformZoneUrl: string,
     preset: ImagePreset,
+    format: 'auto' | 'avif' | 'webp' = 'auto',
 ): string {
     const normalizedZone = stripTrailingSlash(transformZoneUrl);
     const params = [
-        'format=auto',
+        `format=${format}`,
         `quality=${DEFAULT_QUALITY}`,
         'metadata=none',
         `fit=${preset.fit}`,
@@ -167,5 +169,5 @@ export function optimizeImageUrl(rawUrl: string, options: OptimizeImageUrlOption
     }
 
     const preset = selectImagePreset(options.width, options.height);
-    return buildCloudflareImageUrl(sourcePath, options.transformZoneUrl, preset);
+    return buildCloudflareImageUrl(sourcePath, options.transformZoneUrl, preset, options.format ?? 'auto');
 }

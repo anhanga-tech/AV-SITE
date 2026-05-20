@@ -2,7 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { AUTHORS } from '../data/blogData.ts';
-import { getMediaRuntimeConfig, HERO_VIDEOS } from '../data/mediaConfig.ts';
+import {
+    getMediaRuntimeConfig,
+    HERO_VIDEOS,
+    generateAvifSrcSet,
+    generateWebpSrcSet,
+    optimizeCloudinaryUrl,
+} from '../data/mediaConfig.ts';
 import { BLOG_POST_MANIFEST } from '../data/blogManifest.ts';
 
 test('getMediaRuntimeConfig should enable same-host transforms from env values', () => {
@@ -75,6 +81,33 @@ test('migrated author avatars should use the Cloudflare R2 origin', () => {
         AUTHORS['queila-oliveira'].image,
         'https://media.anhanga.tur.br/images/authors/queila.jpg',
     );
+});
+
+test('generateAvifSrcSet should return empty string when transforms are not enabled', () => {
+    // Without VITE_MEDIA_ENABLE_TRANSFORMS=true, optimizeRemoteImageUrl returns
+    // the resolved URL without /cdn-cgi/image/ — format param has no effect, so
+    // formatted === unformatted and every entry is filtered out.
+    const result = generateAvifSrcSet('https://media.anhanga.tur.br/images/destinations/paris.jpg');
+    assert.equal(result, '');
+});
+
+test('generateWebpSrcSet should return empty string when transforms are not enabled', () => {
+    const result = generateWebpSrcSet('https://media.anhanga.tur.br/images/destinations/paris.jpg');
+    assert.equal(result, '');
+});
+
+test('optimizeCloudinaryUrl should pass format to the underlying helper (not silently ignore it)', () => {
+    // When transforms are disabled the URL falls back to the resolved source, so
+    // format has no visible effect — but the function must not throw and must not
+    // return a string containing the *wrong* format token.
+    const withAuto = optimizeCloudinaryUrl('https://media.anhanga.tur.br/images/destinations/paris.jpg', 800, 'auto');
+    const withWebp = optimizeCloudinaryUrl('https://media.anhanga.tur.br/images/destinations/paris.jpg', 800, 'webp');
+    const withAvif = optimizeCloudinaryUrl('https://media.anhanga.tur.br/images/destinations/paris.jpg', 800, 'avif');
+
+    // All three should resolve to the same plain URL when transforms are off.
+    assert.equal(withAuto, 'https://media.anhanga.tur.br/images/destinations/paris.jpg');
+    assert.equal(withWebp, 'https://media.anhanga.tur.br/images/destinations/paris.jpg');
+    assert.equal(withAvif, 'https://media.anhanga.tur.br/images/destinations/paris.jpg');
 });
 
 test('migrated blog cover images should be serialized as absolute URLs', () => {

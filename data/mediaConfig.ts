@@ -97,7 +97,8 @@ export const getMediaUrl = (path: string): string => {
 export const optimizeRemoteImageUrl = (
     rawUrl: string,
     width: number = 1200,
-    height?: number
+    height?: number,
+    format?: 'auto' | 'avif' | 'webp',
 ): string => {
     const { mediaBaseUrl, transformZoneUrl, enableTransforms } = getMediaRuntimeConfig();
     return optimizeImageUrl(rawUrl, {
@@ -106,6 +107,7 @@ export const optimizeRemoteImageUrl = (
         enableTransforms,
         width,
         height,
+        format,
     });
 };
 
@@ -260,11 +262,8 @@ export const getDestinationImage = (city: string): string => {
 export const optimizeCloudinaryUrl = (
     url: string,
     width: number = 800,
-    format: 'auto' | 'webp' | 'avif' = 'auto'
-): string => {
-    void format;
-    return optimizeRemoteImageUrl(url, width);
-};
+    format: 'auto' | 'webp' | 'avif' = 'auto',
+): string => optimizeRemoteImageUrl(url, width, undefined, format);
 
 /**
  * Generate srcset for responsive images using the active media provider.
@@ -273,4 +272,36 @@ export const generateSrcSet = (url: string, sizes: number[] = [400, 800, 1200]):
     return sizes
         .map(size => `${optimizeRemoteImageUrl(url, size)} ${size}w`)
         .join(', ');
+};
+
+/**
+ * Generate an AVIF srcset for use inside a <picture> <source> element.
+ * Returns an empty string when Cloudflare transforms are not enabled, preventing
+ * browsers from requesting JPEG/PNG origins with type="image/avif".
+ */
+export const generateAvifSrcSet = (url: string, sizes: number[] = [400, 800, 1200]): string => {
+    const entries = sizes
+        .map(size => {
+            const formatted = optimizeRemoteImageUrl(url, size, undefined, 'avif');
+            const unformatted = optimizeRemoteImageUrl(url, size);
+            return formatted !== unformatted ? `${formatted} ${size}w` : '';
+        })
+        .filter(Boolean);
+    return entries.join(', ');
+};
+
+/**
+ * Generate a WebP srcset for use inside a <picture> <source> element.
+ * Returns an empty string when Cloudflare transforms are not enabled, preventing
+ * browsers from requesting JPEG/PNG origins with type="image/webp".
+ */
+export const generateWebpSrcSet = (url: string, sizes: number[] = [400, 800, 1200]): string => {
+    const entries = sizes
+        .map(size => {
+            const formatted = optimizeRemoteImageUrl(url, size, undefined, 'webp');
+            const unformatted = optimizeRemoteImageUrl(url, size);
+            return formatted !== unformatted ? `${formatted} ${size}w` : '';
+        })
+        .filter(Boolean);
+    return entries.join(', ');
 };

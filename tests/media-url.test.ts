@@ -158,3 +158,58 @@ test('optimizeImageUrl should not double-wrap existing Cloudflare transformation
         transformed,
     );
 });
+
+test('buildCloudflareImageUrl should use format=avif when format is avif', () => {
+    const url = buildCloudflareImageUrl(
+        '/images/home/hero.jpg',
+        'https://media.anhanga.tur.br',
+        selectImagePreset(1280, 720),
+        'avif',
+    );
+
+    assert.equal(
+        url,
+        'https://media.anhanga.tur.br/cdn-cgi/image/format=avif,quality=85,metadata=none,fit=cover,width=1280,height=720/images/home/hero.jpg',
+    );
+});
+
+test('buildCloudflareImageUrl should use format=webp when format is webp', () => {
+    const url = buildCloudflareImageUrl(
+        '/images/home/hero.jpg',
+        'https://media.anhanga.tur.br',
+        selectImagePreset(640, 400),
+        'webp',
+    );
+
+    assert.equal(
+        url,
+        'https://media.anhanga.tur.br/cdn-cgi/image/format=webp,quality=85,metadata=none,fit=cover,width=640,height=400/images/home/hero.jpg',
+    );
+});
+
+test('optimizeImageUrl should propagate format=avif into the Cloudflare transform URL', () => {
+    assert.equal(
+        optimizeImageUrl('images/home/hero.jpg', {
+            mediaBaseUrl: 'https://media.anhanga.tur.br',
+            transformZoneUrl: 'https://media.anhanga.tur.br',
+            enableTransforms: true,
+            width: 1200,
+            height: 675,
+            format: 'avif',
+        }),
+        'https://media.anhanga.tur.br/cdn-cgi/image/format=avif,quality=85,metadata=none,fit=cover,width=1200,height=675/images/home/hero.jpg',
+    );
+});
+
+test('optimizeImageUrl should propagate format=webp into the Cloudflare transform URL', () => {
+    assert.equal(
+        optimizeImageUrl('images/home/hero.jpg', {
+            mediaBaseUrl: 'https://media.anhanga.tur.br',
+            transformZoneUrl: 'https://media.anhanga.tur.br',
+            enableTransforms: true,
+            width: 800,
+            format: 'webp',
+        }),
+        'https://media.anhanga.tur.br/cdn-cgi/image/format=webp,quality=85,metadata=none,fit=scale-down,width=800/images/home/hero.jpg',
+    );
+});
