@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { cleanString } from '../lib/lead-logic';
 import { getTrackingDataObject } from '../utils/whatsapp';
 import type { LeadTracking, LeadUtms } from '../types/leadCapture';
@@ -125,7 +125,6 @@ export function pushWaitlistSignupDataLayerEvent(payload: SubmitWaitlistRequest)
 
 export function useWaitlistCapture() {
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const isLocallySubmitting = useRef(false);
     const [error, setError] = useState<string | null>(null);
     const [trackingState, setTrackingState] = useState(() => captureTrackingState());
 
@@ -139,7 +138,7 @@ export function useWaitlistCapture() {
         return latest;
     };
 
-    const submitWaitlist = async (
+    const submitWaitlist = useCallback(async (
         input: Pick<SubmitWaitlistRequest, 'name' | 'email' | 'sourcePage'>,
     ): Promise<SubmitWaitlistResult> => {
         if (isLocallySubmitting.current) {
@@ -203,7 +202,7 @@ export function useWaitlistCapture() {
                 code: 'NETWORK_ERROR',
             };
         }
-    };
+    }, [refreshTrackingState]);
 
     return {
         tracking: trackingState.tracking,

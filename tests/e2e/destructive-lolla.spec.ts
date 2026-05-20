@@ -9,18 +9,19 @@ test.describe('Lollapalooza Waitlist Destructive Tests', () => {
     await lollaPage.goto();
   });
 
-  test('should handle XSS payloads gracefully', async () => {
+  test('should handle XSS payloads gracefully', async ({ page }) => {
     await lollaPage.fillForm({
       name: '<script>alert("xss")</script>Felipe',
       email: 'felipe@qa.com'
     });
 
-    // We mock the API to see what it receives or just ensure it doesn't crash the UI
-    await lollaPage.submit();
+    await page.route('**/api/submit-waitlist', route => {
+      const payload = route.request().postDataJSON();
+      expect(payload.name).not.toContain('<script>');
+      return route.fulfill({ status: 200, body: JSON.stringify({ ok: true }) });
+    });
 
-    // UI should not execute the script (Playwright won't trigger alert by default,
-    // but we check if the text is rendered safely if applicable)
-    // The main thing is the request payload should be sanitized if we were to intercept it.
+    await lollaPage.submit();
   });
 
   test('should prevent duplicate submissions on rapid clicks', async ({ page }) => {
