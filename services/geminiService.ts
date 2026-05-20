@@ -2,6 +2,7 @@ import { getWhatsAppLink } from "../utils/whatsapp.ts";
 import { buildGenerateHandoff, type GenerateHandoff } from "../lib/ai/handoff.ts";
 import type { BudgetToolArgs } from "../lib/ai/types.ts";
 import { logger } from "../lib/logger.ts";
+import { isObjectWithProp } from "../lib/type-guards.ts";
 
 interface ChatResponse {
   text?: string;
@@ -36,18 +37,16 @@ const INVALID_HANDOFF_MESSAGE = 'Tive um problema ao concluir seu orçamento ago
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
-  if (typeof error === 'object' && error !== null && 'message' in error) {
-    const message = (error as { message?: unknown }).message;
-    if (typeof message === 'string') return message;
+  if (isObjectWithProp(error, 'message') && typeof error.message === 'string') {
+    return error.message;
   }
   return '';
 }
 
 function getErrorName(error: unknown): string {
   if (error instanceof Error) return error.name;
-  if (typeof error === 'object' && error !== null && 'name' in error) {
-    const name = (error as { name?: unknown }).name;
-    if (typeof name === 'string') return name;
+  if (isObjectWithProp(error, 'name') && typeof error.name === 'string') {
+    return error.name;
   }
   return '';
 }
