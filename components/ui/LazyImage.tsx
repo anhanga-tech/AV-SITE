@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Image as ImageIcon } from 'lucide-react';
-import { optimizeRemoteImageUrl } from '../../data/mediaConfig';
+import { optimizeRemoteImageUrl, generateAvifSrcSet, generateWebpSrcSet, generateSrcSet } from '../../data/mediaConfig';
 
 interface LazyImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
     src: string;
     alt: string;
     className?: string;
     placeholderClassName?: string;
+    sizes?: string;
     width?: number | string;
     height?: number | string;
 }
@@ -24,6 +25,7 @@ export const LazyImage = React.memo<LazyImageProps>(({
     alt,
     className = "",
     placeholderClassName = "bg-zinc-200",
+    sizes,
     width,
     height,
     ...props
@@ -32,14 +34,16 @@ export const LazyImage = React.memo<LazyImageProps>(({
     const [isLoaded, setIsLoaded] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
-    // Optimize URL only when source or dimensions change
-    const optimizedSrc = useMemo(() => {
-        if (!src) return '';
-        // If width is provided as a number, use it for optimization.
-        // If it's a string (like "100%") or undefined, use default optimization.
+    const { optimizedSrc, avifSrcSet, webpSrcSet, srcSet } = useMemo(() => {
+        if (!src) return { optimizedSrc: '', avifSrcSet: '', webpSrcSet: '', srcSet: '' };
         const numericWidth = typeof width === 'number' ? width : 1200;
         const numericHeight = typeof height === 'number' ? height : undefined;
-        return optimizeRemoteImageUrl(src, numericWidth, numericHeight);
+        return {
+            optimizedSrc: optimizeRemoteImageUrl(src, numericWidth, numericHeight),
+            avifSrcSet: generateAvifSrcSet(src),
+            webpSrcSet: generateWebpSrcSet(src),
+            srcSet: generateSrcSet(src),
+        };
     }, [src, width, height]);
 
     useEffect(() => {
@@ -78,18 +82,28 @@ export const LazyImage = React.memo<LazyImageProps>(({
                 </div>
             )}
             {isVisible && (
-                <img
-                    src={optimizedSrc}
-                    alt={alt}
-                    width={width}
-                    height={height}
-                    loading={props.loading ?? "lazy"}
-                    fetchPriority={props.fetchPriority ?? "low"}
-                    decoding="async"
-                    onLoad={() => setIsLoaded(true)}
-                    className={`transition-opacity duration-500 w-full h-full object-cover ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
-                    {...props}
-                />
+                <picture>
+                    {avifSrcSet && (
+                        <source srcSet={avifSrcSet} type="image/avif" sizes={sizes} />
+                    )}
+                    {webpSrcSet && (
+                        <source srcSet={webpSrcSet} type="image/webp" sizes={sizes} />
+                    )}
+                    <img
+                        src={optimizedSrc}
+                        srcSet={srcSet || undefined}
+                        sizes={sizes}
+                        alt={alt}
+                        width={width}
+                        height={height}
+                        loading={props.loading ?? "lazy"}
+                        fetchPriority={props.fetchPriority ?? "low"}
+                        decoding="async"
+                        onLoad={() => setIsLoaded(true)}
+                        className={`transition-opacity duration-500 w-full h-full object-cover ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+                        {...props}
+                    />
+                </picture>
             )}
         </div>
     );
