@@ -35,3 +35,7 @@
 ## 2026-10-10 - ⚡ Bolt: Hero and CTA Memoization
 **Learning:** The "Hero" and "CallToAction" components are often the most complex above-the-fold and footer elements, respectively. On the homepage, they were being re-rendered when the `shouldRenderBelowFold` state was toggled, even though their content is static. Memoizing these "bookend" components ensures that the deferred loading of middle sections doesn't cause jank in the primary visual elements.
 **Action:** Always memoize the Hero and main CTA components on the home page to preserve smooth scrolling and interaction when lazy-loaded sections (like Blog or Destinations) eventually mount.
+
+## 2026-11-20 - ⚡ Bolt: Hero Search State Isolation
+**Learning:** Storing character-by-character input state in a high-level component that contains heavy Framer Motion animations and background videos (like Hero.tsx) is a significant performance anti-pattern. Every keystroke triggers a full re-render of the animations and the video element, causing noticeable typing lag and high CPU/GPU usage on mobile devices.
+**Action:** Always isolate high-frequency state (like text inputs) into dedicated, memoized sub-components to prevent parent components from re-rendering their expensive visual assets during interaction.
