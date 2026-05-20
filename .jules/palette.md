@@ -25,3 +25,7 @@
 ## 2026-05-13 - Implementing Accessible Search Comboboxes
 **Learning:** Search inputs with dynamic suggestions often lack essential keyboard navigation (ArrowUp/Down) and aria-activedescendant mapping, making them difficult for screen reader and keyboard-only users. Additionally, "Clear" actions on inputs should always programmatically return focus to the field to maintain context and allow immediate correction or new search.
 **Action:** Implement the WAI-ARIA combobox pattern (aria-activedescendant, aria-selected, role="option") for all autocomplete components. Ensure keyboard event listeners manage focus and selection, and always restore focus after destructive input resets.
+
+## 2026-06-15 - Robust Modal/Drawer Accessibility and Visibility
+**Learning:** Managing modal visibility using only CSS transforms (e.g., `translate-x-full`) is insufficient for accessibility and automated testing. Even if off-screen, elements may remain "visible" to screen readers and tools like Playwright, leading to focus management issues or test false positives. Additionally, drawers must follow the WAI-ARIA dialog pattern: trapping focus, handling the 'Escape' key, and restoring focus to the trigger element upon closing.
+**Action:** Use conditional `invisible` or `hidden` classes alongside transitions to ensure closed drawers are correctly removed from the accessibility tree. Always implement a manual focus trap and focus restoration for custom dialog components to support keyboard-only users.
