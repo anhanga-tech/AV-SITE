@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { cleanString } from '../lib/lead-logic';
 import { getTrackingDataObject } from '../utils/whatsapp';
 import type { LeadTracking, LeadUtms } from '../types/leadCapture';
 import type { SubmitWaitlistRequest, SubmitWaitlistResponse } from '../types/waitlist';
@@ -124,6 +125,7 @@ export function pushWaitlistSignupDataLayerEvent(payload: SubmitWaitlistRequest)
 
 export function useWaitlistCapture() {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const isLocallySubmitting = useRef(false);
     const [error, setError] = useState<string | null>(null);
     const [trackingState, setTrackingState] = useState(() => captureTrackingState());
 
@@ -140,14 +142,20 @@ export function useWaitlistCapture() {
     const submitWaitlist = async (
         input: Pick<SubmitWaitlistRequest, 'name' | 'email' | 'sourcePage'>,
     ): Promise<SubmitWaitlistResult> => {
+        if (isLocallySubmitting.current) {
+            return { ok: false, error: 'Submissão em andamento', code: 'ALREADY_SUBMITTING' };
+        }
+
         setError(null);
         setIsSubmitting(true);
+        isLocallySubmitting.current = true;
 
         const { tracking, utms } = refreshTrackingState();
         const payload: SubmitWaitlistRequest = {
             ...input,
-            email: input.email.trim().toLowerCase(),
-            name: input.name.trim(),
+            email: cleanString(input.email).toLowerCase(),
+            name: cleanString(input.name),
+            sourcePage: cleanString(input.sourcePage),
             tracking,
             utms,
         };
@@ -167,11 +175,13 @@ export function useWaitlistCapture() {
                 const failure = buildSubmitWaitlistError(response, responsePayload);
                 setError(failure.error);
                 setIsSubmitting(false);
+                isLocallySubmitting.current = false;
                 return failure;
             }
 
             pushWaitlistSignupDataLayerEvent(payload);
             setIsSubmitting(false);
+            isLocallySubmitting.current = false;
 
             return {
                 ok: true,
@@ -185,6 +195,7 @@ export function useWaitlistCapture() {
             const message = requestError instanceof Error ? requestError.message : 'Falha de rede ao enviar cadastro.';
             setError(message);
             setIsSubmitting(false);
+            isLocallySubmitting.current = false;
 
             return {
                 ok: false,
