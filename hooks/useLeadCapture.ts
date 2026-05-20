@@ -228,7 +228,7 @@ function buildSubmitLeadPayload(
     };
 }
 
-function isPreparedSubmitLeadRequest(value: LeadDraftPartial | SubmitLeadRequest): value is SubmitLeadRequest {
+export function isPreparedSubmitLeadRequest(value: LeadDraftPartial | SubmitLeadRequest): value is SubmitLeadRequest {
     const candidate = value as Partial<SubmitLeadRequest>;
 
     return Boolean(

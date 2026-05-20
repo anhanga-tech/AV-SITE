@@ -519,7 +519,7 @@ export async function buildGenerateSuccessBody(
     };
 }
 
-function buildGeminiErrorResponse(error: unknown, corsHeaders: Record<string, string>): Response {
+export function buildGeminiErrorResponse(error: unknown, corsHeaders: Record<string, string>): Response {
     const normalized = normalizeError(error);
     logger.error('SERVER: Error proxying to Gemini', normalized);
 
