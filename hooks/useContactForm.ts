@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useRef } from 'react';
 import { cleanString } from '../lib/lead-logic';
 import { getTrackingDataObject, getWhatsAppLink } from '../utils/whatsapp';
 import { createLeadEventId, extractUtms } from './useLeadCapture';
@@ -99,6 +99,7 @@ function pushContactDataLayerEvent(
 export function useContactForm(options: ContactModalOptions = {}) {
     const [fields, setFieldsState] = useState<ContactFormFields>(EMPTY_FIELDS);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const isLocallySubmitting = useRef(false);
     const [error, setError] = useState<string | null>(null);
     const [submitted, setSubmitted] = useState(false);
 
@@ -121,7 +122,11 @@ export function useContactForm(options: ContactModalOptions = {}) {
 
     const submit = useCallback(
         async (action: 'whatsapp' | 'callback'): Promise<void> => {
-            if (!isValid || isSubmitting) return;
+            if (!isValid || isLocallySubmitting.current) return;
+
+            isLocallySubmitting.current = true;
+            setIsSubmitting(true);
+            setError(null);
 
             const eventId = createLeadEventId();
             const { tracking, utms } = collectTracking();
@@ -135,10 +140,10 @@ export function useContactForm(options: ContactModalOptions = {}) {
             }
 
             const requestBody: SubmitContactRequest = {
-                firstName: fields.firstName.trim(),
-                lastName: fields.lastName.trim() || undefined,
-                whatsapp: fields.whatsapp.trim(),
-                email: fields.email.trim() || undefined,
+                firstName: cleanString(fields.firstName),
+                lastName: cleanString(fields.lastName) || undefined,
+                whatsapp: cleanString(fields.whatsapp),
+                email: cleanString(fields.email) || undefined,
                 emailOptIn: fields.emailOptIn,
                 source: options.source,
                 destination: options.destination,
@@ -146,9 +151,6 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 utms,
                 tracking,
             };
-
-            setIsSubmitting(true);
-            setError(null);
 
             try {
                 const response = await fetch('/api/submit-contact', {
@@ -182,9 +184,10 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 }
             } finally {
                 setIsSubmitting(false);
+                isLocallySubmitting.current = false;
             }
         },
-        [fields, isSubmitting, isValid, options],
+        [fields, isValid, options],
     );
 
     return { fields, setField, isValid, isSubmitting, error, submitted, submit, reset };

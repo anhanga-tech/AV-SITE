@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { cleanString } from '../lib/lead-logic';
 import { getTrackingDataObject } from '../utils/whatsapp';
 import type { LeadTracking, LeadUtms } from '../types/leadCapture';
 import type { SubmitWaitlistRequest, SubmitWaitlistResponse } from '../types/waitlist';
@@ -124,6 +125,7 @@ export function pushWaitlistSignupDataLayerEvent(payload: SubmitWaitlistRequest)
 
 export function useWaitlistCapture() {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const isLocallySubmitting = useRef(false);
     const [error, setError] = useState<string | null>(null);
     const [trackingState, setTrackingState] = useState(() => captureTrackingState());
 
@@ -131,23 +133,29 @@ export function useWaitlistCapture() {
         setTrackingState(captureTrackingState());
     }, []);
 
-    const refreshTrackingState = (): { tracking: LeadTracking; utms: LeadUtms } => {
+    const refreshTrackingState = useCallback((): { tracking: LeadTracking; utms: LeadUtms } => {
         const latest = captureTrackingState();
         setTrackingState(latest);
         return latest;
-    };
+    }, []);
 
-    const submitWaitlist = async (
+    const submitWaitlist = useCallback(async (
         input: Pick<SubmitWaitlistRequest, 'name' | 'email' | 'sourcePage'>,
     ): Promise<SubmitWaitlistResult> => {
+        if (isLocallySubmitting.current) {
+            return { ok: false, error: 'Submissão em andamento', code: 'ALREADY_SUBMITTING' };
+        }
+
         setError(null);
         setIsSubmitting(true);
+        isLocallySubmitting.current = true;
 
         const { tracking, utms } = refreshTrackingState();
         const payload: SubmitWaitlistRequest = {
             ...input,
-            email: input.email.trim().toLowerCase(),
-            name: input.name.trim(),
+            email: cleanString(input.email).toLowerCase(),
+            name: cleanString(input.name),
+            sourcePage: cleanString(input.sourcePage),
             tracking,
             utms,
         };
@@ -166,12 +174,10 @@ export function useWaitlistCapture() {
             if (!response.ok) {
                 const failure = buildSubmitWaitlistError(response, responsePayload);
                 setError(failure.error);
-                setIsSubmitting(false);
                 return failure;
             }
 
             pushWaitlistSignupDataLayerEvent(payload);
-            setIsSubmitting(false);
 
             return {
                 ok: true,
@@ -184,15 +190,17 @@ export function useWaitlistCapture() {
         } catch (requestError: unknown) {
             const message = requestError instanceof Error ? requestError.message : 'Falha de rede ao enviar cadastro.';
             setError(message);
-            setIsSubmitting(false);
 
             return {
                 ok: false,
                 error: message,
                 code: 'NETWORK_ERROR',
             };
+        } finally {
+            setIsSubmitting(false);
+            isLocallySubmitting.current = false;
         }
-    };
+    }, [refreshTrackingState]);
 
     return {
         tracking: trackingState.tracking,

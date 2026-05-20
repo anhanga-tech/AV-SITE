@@ -187,6 +187,7 @@ const WaitlistSection: React.FC = () => {
                 <label className="flex items-start gap-4 cursor-pointer group pt-4">
                   <div className="relative flex items-center justify-center">
                     <input
+                      id="lolla-waitlist-lgpd"
                       type="checkbox"
                       checked={acceptedLgpd}
                       onChange={(event) => setAcceptedLgpd(event.target.checked)}
@@ -247,6 +248,7 @@ const WaitlistSection: React.FC = () => {
                 </AnimatePresence>
 
                 <button
+                  id="lolla-waitlist-submit"
                   type="submit"
                   disabled={isSubmitting}
                   className="group relative flex w-full items-center justify-center gap-3 rounded-[1px] bg-anhanga-yellow px-8 py-5 text-sm font-black text-black transition-[letter-spacing,opacity] duration-300 hover:tracking-[0.1em] disabled:cursor-wait disabled:opacity-50"
