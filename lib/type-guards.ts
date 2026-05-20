@@ -1,10 +1,10 @@
-export function isRecord(value: unknown): value is Record<string, unknown> {
+export function isRecord<T>(value: T): value is T & Record<string, unknown> {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-export function isObjectWithProp<K extends string>(
-    value: unknown,
+export function isObjectWithProp<T, K extends string>(
+    value: T,
     key: K,
-): value is Record<K, unknown> {
+): value is T & Record<K, unknown> {
     return isRecord(value) && key in value;
 }
