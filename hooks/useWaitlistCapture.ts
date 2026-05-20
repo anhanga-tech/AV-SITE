@@ -125,6 +125,7 @@ export function pushWaitlistSignupDataLayerEvent(payload: SubmitWaitlistRequest)
 
 export function useWaitlistCapture() {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const isLocallySubmitting = useRef(false);
     const [error, setError] = useState<string | null>(null);
     const [trackingState, setTrackingState] = useState(() => captureTrackingState());
 
@@ -132,11 +133,11 @@ export function useWaitlistCapture() {
         setTrackingState(captureTrackingState());
     }, []);
 
-    const refreshTrackingState = (): { tracking: LeadTracking; utms: LeadUtms } => {
+    const refreshTrackingState = useCallback((): { tracking: LeadTracking; utms: LeadUtms } => {
         const latest = captureTrackingState();
         setTrackingState(latest);
         return latest;
-    };
+    }, []);
 
     const submitWaitlist = useCallback(async (
         input: Pick<SubmitWaitlistRequest, 'name' | 'email' | 'sourcePage'>,
@@ -173,14 +174,10 @@ export function useWaitlistCapture() {
             if (!response.ok) {
                 const failure = buildSubmitWaitlistError(response, responsePayload);
                 setError(failure.error);
-                setIsSubmitting(false);
-                isLocallySubmitting.current = false;
                 return failure;
             }
 
             pushWaitlistSignupDataLayerEvent(payload);
-            setIsSubmitting(false);
-            isLocallySubmitting.current = false;
 
             return {
                 ok: true,
@@ -193,14 +190,15 @@ export function useWaitlistCapture() {
         } catch (requestError: unknown) {
             const message = requestError instanceof Error ? requestError.message : 'Falha de rede ao enviar cadastro.';
             setError(message);
-            setIsSubmitting(false);
-            isLocallySubmitting.current = false;
 
             return {
                 ok: false,
                 error: message,
                 code: 'NETWORK_ERROR',
             };
+        } finally {
+            setIsSubmitting(false);
+            isLocallySubmitting.current = false;
         }
     }, [refreshTrackingState]);
 

@@ -27,11 +27,7 @@ export class LollapaloozaPage {
     await this.nameInput.fill(data.name);
     await this.emailInput.fill(data.email);
     if (data.acceptLgpd !== false) {
-      // Logic to click if not checked
-      const isChecked = await this.lgpdCheckbox.isChecked();
-      if (!isChecked) {
-        await this.lgpdCheckbox.click({ force: true });
-      }
+      await this.lgpdCheckbox.check({ force: true });
     }
   }
 
