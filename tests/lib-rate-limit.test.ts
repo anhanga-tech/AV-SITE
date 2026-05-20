@@ -2,15 +2,33 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { checkRateLimit } from '../lib/rate-limit.ts';
 
-// Force in-memory fallback for all tests in this file
-delete process.env.UPSTASH_REDIS_REST_URL;
-delete process.env.UPSTASH_REDIS_REST_TOKEN;
-
 function uid(): string {
     return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-test('rate limit allows first request in window', async () => {
+/** Deletes UPSTASH env vars for the duration of a test and restores them in after(). */
+function useInMemoryFallback(t: { after: (fn: () => void) => void }): void {
+    const savedUrl = process.env.UPSTASH_REDIS_REST_URL;
+    const savedToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+    delete process.env.UPSTASH_REDIS_REST_URL;
+    delete process.env.UPSTASH_REDIS_REST_TOKEN;
+    t.after(() => {
+        if (savedUrl === undefined) {
+            delete process.env.UPSTASH_REDIS_REST_URL;
+        } else {
+            process.env.UPSTASH_REDIS_REST_URL = savedUrl;
+        }
+        if (savedToken === undefined) {
+            delete process.env.UPSTASH_REDIS_REST_TOKEN;
+        } else {
+            process.env.UPSTASH_REDIS_REST_TOKEN = savedToken;
+        }
+    });
+}
+
+test('rate limit allows first request in window', async (t) => {
+    useInMemoryFallback(t);
+
     const result = await checkRateLimit(`10.0.0.${uid()}`, {
         limit: 5,
         windowMs: 60_000,
@@ -22,7 +40,9 @@ test('rate limit allows first request in window', async () => {
     assert.ok(result.resetIn > 0);
 });
 
-test('rate limit allows all requests within limit', async () => {
+test('rate limit allows all requests within limit', async (t) => {
+    useInMemoryFallback(t);
+
     const ip = `10.1.0.${uid()}`;
     const prefix = `test-rl-within-${uid()}`;
     const limit = 3;
@@ -33,7 +53,9 @@ test('rate limit allows all requests within limit', async () => {
     }
 });
 
-test('rate limit blocks request that exceeds limit and returns retryAfter', async () => {
+test('rate limit blocks request that exceeds limit and returns retryAfter', async (t) => {
+    useInMemoryFallback(t);
+
     const ip = `10.2.0.${uid()}`;
     const prefix = `test-rl-exceed-${uid()}`;
 
@@ -48,7 +70,9 @@ test('rate limit blocks request that exceeds limit and returns retryAfter', asyn
     assert.ok(exceeded.resetIn > 0, 'resetIn should indicate when to retry');
 });
 
-test('rate limit correctly decrements remaining count on each request', async () => {
+test('rate limit correctly decrements remaining count on each request', async (t) => {
+    useInMemoryFallback(t);
+
     const ip = `10.3.0.${uid()}`;
     const prefix = `test-rl-decrement-${uid()}`;
     const limit = 5;
@@ -59,7 +83,9 @@ test('rate limit correctly decrements remaining count on each request', async ()
     }
 });
 
-test('rate limit resets counter after window expires', async () => {
+test('rate limit resets counter after window expires', async (t) => {
+    useInMemoryFallback(t);
+
     const ip = `10.4.0.${uid()}`;
     const prefix = `test-rl-reset-${uid()}`;
 
@@ -79,8 +105,9 @@ test('rate limit resets counter after window expires', async () => {
     assert.equal(fresh.remaining, 1);
 });
 
-test('in-memory fallback works correctly without Redis configured', async () => {
-    // UPSTASH env vars are already deleted at top of file
+test('in-memory fallback works correctly without Redis configured', async (t) => {
+    useInMemoryFallback(t);
+
     const ip = `10.5.0.${uid()}`;
     const prefix = `test-rl-fallback-${uid()}`;
 
@@ -96,7 +123,9 @@ test('in-memory fallback works correctly without Redis configured', async () => 
     assert.equal(r3.allowed, false);
 });
 
-test('in-memory store GC runs when size exceeds 2000 and cleans expired entries', async () => {
+test('in-memory store GC runs when size exceeds 2000 and cleans expired entries', async (t) => {
+    useInMemoryFallback(t);
+
     // Create 2100 entries with a 1ms window so they expire almost immediately.
     // The store accumulates entries from all tests in this process, so total
     // size will exceed the GC threshold (2000) once these are added.

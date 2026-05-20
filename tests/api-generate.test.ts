@@ -125,7 +125,7 @@ test('generate handler returns 429 after exceeding rate limit', async (t) => {
     process.env.GEMINI_API_KEY = 'test-key';
     delete process.env.AI_GATEWAY_ENABLED;
 
-    const sharedIp = `172.16.${Math.floor(Math.random() * 254) + 1}.1`;
+    const sharedIp = `172.16.${Math.floor(Math.random() * 254) + 1}.${Math.floor(Math.random() * 254) + 1}`;
 
     const makeRequest = () => new Request('http://localhost/api/generate', {
         method: 'POST',
