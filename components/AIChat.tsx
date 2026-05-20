@@ -430,8 +430,8 @@ const AIChat: React.FC = memo(() => {
       {/* Drawer Panel - Soft Scrapbook Geometry */}
       <div
         ref={drawerRef}
-        className={`fixed top-0 right-0 h-full w-full sm:w-[450px] z-[9999] bg-[#fdfdfc] flex flex-col shadow-[-10px_0_40px_rgba(0,0,0,0.1)] transition-transform duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] sm:rounded-l-[2rem] overflow-hidden ${isOpen ? 'translate-x-0' : 'translate-x-full'
-          } ${isOpen ? 'visible' : 'invisible'}`}
+        className={`fixed top-0 right-0 h-full w-full sm:w-[450px] z-[9999] bg-[#fdfdfc] flex flex-col shadow-[-10px_0_40px_rgba(0,0,0,0.1)] transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] sm:rounded-l-[2rem] overflow-hidden ${isOpen ? 'translate-x-0 visible opacity-100' : 'translate-x-full invisible opacity-0'
+          }`}
         role="dialog"
         aria-modal="true"
         aria-label="Assistente Virtual Anhangá"

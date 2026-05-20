@@ -9,6 +9,7 @@ export class ContactModal {
   readonly emailInput: Locator;
   readonly optInCheckbox: Locator;
   readonly whatsappSubmitBtn: Locator;
+  readonly callbackSubmitBtn: Locator;
   readonly successMessage: Locator;
 
   constructor(page: Page) {
@@ -20,6 +21,7 @@ export class ContactModal {
     this.emailInput = page.locator('#contact-email');
     this.optInCheckbox = page.locator('#contact-optIn');
     this.whatsappSubmitBtn = page.getByRole('button', { name: 'Chamar no WhatsApp' });
+    this.callbackSubmitBtn = page.getByRole('button', { name: 'Me chamem no WhatsApp' });
     this.successMessage = page.getByText('Recebemos seu contato!');
   }
 
