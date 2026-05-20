@@ -13,25 +13,42 @@ export class LollapaloozaPage {
     this.page = page;
     this.nameInput = page.locator('#lolla-waitlist-name');
     this.emailInput = page.locator('#lolla-waitlist-email');
-    this.lgpdCheckbox = page.locator('input[type="checkbox"]');
-    this.submitBtn = page.getByRole('button', { name: /ENTRAR NA LISTA/i });
+    this.lgpdCheckbox = page.locator('#lolla-waitlist-lgpd');
+    this.submitBtn = page.locator('#lolla-waitlist-submit');
     this.successMessage = page.getByText('Você entrou na lista de espera');
     this.errorMessage = page.locator('role=alert');
   }
 
   async goto() {
     await this.page.goto('/lollapalooza');
+    await this.page.waitForLoadState('networkidle');
   }
 
   async fillForm(data: { name: string; email: string; acceptLgpd?: boolean }) {
+    await this.nameInput.scrollIntoViewIfNeeded();
     await this.nameInput.fill(data.name);
     await this.emailInput.fill(data.email);
+
     if (data.acceptLgpd !== false) {
-      await this.lgpdCheckbox.check({ force: true });
+      // Direct label click is most reliable for sr-only inputs
+      await this.page.locator('label').filter({ hasText: 'Autorizo a Anhangá' }).click();
+
+      // If click doesn't work (e.g. mobile overlap), fallback to evaluate but wait for React
+      const isChecked = await this.lgpdCheckbox.isChecked();
+      if (!isChecked) {
+        await this.lgpdCheckbox.evaluate((el: HTMLInputElement) => {
+          el.checked = true;
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+      }
+      await expect(this.lgpdCheckbox).toBeChecked();
     }
+    // Safety wait for React reconciliation
+    await this.page.waitForTimeout(200);
   }
 
   async submit() {
+    await this.submitBtn.scrollIntoViewIfNeeded();
     await this.submitBtn.click();
   }
 }

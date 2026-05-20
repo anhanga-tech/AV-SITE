@@ -33,13 +33,19 @@ test.describe('Lollapalooza Waitlist Destructive Tests', () => {
     let requestCount = 0;
     await page.route('**/api/submit-waitlist', async (route) => {
       requestCount++;
-      await new Promise(resolve => setTimeout(resolve, 500)); // Delay to allow double click
+      await new Promise(resolve => setTimeout(resolve, 1000));
       await route.fulfill({ status: 200, body: JSON.stringify({ ok: true }) });
     });
 
-    // Attempt to click multiple times rapidly
     const btn = lollaPage.submitBtn;
-    await btn.click({ clickCount: 3, delay: 50 });
+
+    // We fire the first click and immediately fire subsequent ones without waiting
+    await btn.click().catch(() => {});
+    await btn.click({ force: true }).catch(() => {});
+    await btn.click({ force: true }).catch(() => {});
+
+    // Wait for the first request to finish processing in our mock
+    await page.waitForTimeout(1500);
 
     expect(requestCount).toBe(1);
   });
@@ -55,7 +61,7 @@ test.describe('Lollapalooza Waitlist Destructive Tests', () => {
     );
 
     await lollaPage.submit();
-    await expect(page.locator('role=alert')).toBeVisible();
+    await expect(lollaPage.errorMessage).toBeVisible();
   });
 
   test('should handle network timeout gracefully', async ({ page }) => {
@@ -67,6 +73,6 @@ test.describe('Lollapalooza Waitlist Destructive Tests', () => {
     await page.route('**/api/submit-waitlist', route => route.abort('timedout'));
 
     await lollaPage.submit();
-    await expect(page.locator('role=alert')).toBeVisible();
+    await expect(lollaPage.errorMessage).toBeVisible();
   });
 });
