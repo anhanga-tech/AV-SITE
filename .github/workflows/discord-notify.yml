@@ -15,21 +15,21 @@ jobs:
       - name: Notify Discord
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_ACTION: ${{ github.event.action }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
-          if [ "${{ github.event_name }}" = "issues" ]; then
-            TITLE="${{ github.event.issue.title }}"
-            URL="${{ github.event.issue.html_url }}"
+          if [ "$EVENT_NAME" = "issues" ]; then
             MSG="$(printf '📝 Issue %s: #%s - %s\nLink: %s' \
-              "${{ github.event.action }}" \
-              "${{ github.event.issue.number }}" \
-              "$TITLE" "$URL")"
+              "$EVENT_ACTION" "$ISSUE_NUMBER" "$ISSUE_TITLE" "$ISSUE_URL")"
           else
-            TITLE="${{ github.event.pull_request.title }}"
-            URL="${{ github.event.pull_request.html_url }}"
             MSG="$(printf '🔀 PR %s: #%s - %s\nLink: %s' \
-              "${{ github.event.action }}" \
-              "${{ github.event.pull_request.number }}" \
-              "$TITLE" "$URL")"
+              "$EVENT_ACTION" "$PR_NUMBER" "$PR_TITLE" "$PR_URL")"
           fi
           PAYLOAD="$(jq -n --arg content "$MSG" '{"content": $content}')"
           curl -s -X POST "$DISCORD_WEBHOOK" \
