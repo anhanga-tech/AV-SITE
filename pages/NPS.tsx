@@ -65,7 +65,6 @@ export default function NPS() {
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [countdown, setCountdown] = useState(3);
-  const [hoveredScore, setHoveredScore] = useState<number | null>(null);
   const [year] = useState(() => new Date().getFullYear());
 
   useEffect(() => {
@@ -157,9 +156,7 @@ export default function NPS() {
 
                 <NpsScoreSelector
                   score={score}
-                  hoveredScore={hoveredScore}
                   onSelect={setScore}
-                  onHover={setHoveredScore}
                 />
 
                 <div className="mb-6">
@@ -219,17 +216,6 @@ export default function NPS() {
                   type="submit"
                   disabled={!submitEnabled}
                   className="nps-submit w-full py-4 text-sm font-extrabold uppercase rounded-lg"
-                  style={{
-                    letterSpacing: '0.12em',
-                    background: '#0056D2',
-                    color: '#ffffff',
-                    border: '2px solid #0056D2',
-                    boxShadow: submitEnabled ? '4px 4px 0 #003B8E' : 'none',
-                    opacity: submitEnabled ? 1 : 0.5,
-                    cursor: submitEnabled ? 'pointer' : 'not-allowed',
-                    transform: submitEnabled ? 'translate(-1px,-1px)' : 'none',
-                    transition: 'opacity 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease',
-                  }}
                 >
                   {submitting ? 'Enviando...' : 'Enviar avaliação'}
                 </button>
