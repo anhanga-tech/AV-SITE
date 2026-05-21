@@ -136,9 +136,11 @@ test('internal desktop header keeps the compact desktop treatment active', async
 
   await expectHomeHeaderVariant(page);
 
-  const homeHeaderHeight = await getElementHeight(page.getByTestId('site-header'));
-  const homeLogoHeight = await getElementHeight(page.getByTestId('header-logo'));
-  const homeDesktopCtaHeight = await getElementHeight(page.getByTestId('desktop-fale-conosco-btn'));
+  const [homeHeaderHeight, homeLogoHeight, homeDesktopCtaHeight] = await Promise.all([
+    getElementHeight(page.getByTestId('site-header')),
+    getElementHeight(page.getByTestId('header-logo')),
+    getElementHeight(page.getByTestId('desktop-fale-conosco-btn')),
+  ]);
 
   await page.goto(BLOG_LIST_PATH);
 
@@ -146,9 +148,11 @@ test('internal desktop header keeps the compact desktop treatment active', async
   await expect(page.locator('nav[aria-label="Menu Principal"]')).toBeVisible();
   await expect(page.getByTestId('desktop-fale-conosco-btn')).toBeVisible();
 
-  const internalHeaderHeight = await getElementHeight(page.getByTestId('site-header'));
-  const internalLogoHeight = await getElementHeight(page.getByTestId('header-logo'));
-  const internalDesktopCtaHeight = await getElementHeight(page.getByTestId('desktop-fale-conosco-btn'));
+  const [internalHeaderHeight, internalLogoHeight, internalDesktopCtaHeight] = await Promise.all([
+    getElementHeight(page.getByTestId('site-header')),
+    getElementHeight(page.getByTestId('header-logo')),
+    getElementHeight(page.getByTestId('desktop-fale-conosco-btn')),
+  ]);
 
   expect(internalHeaderHeight).toBeLessThan(homeHeaderHeight);
   expect(internalLogoHeight).toBeLessThan(homeLogoHeight);

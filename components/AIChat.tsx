@@ -57,7 +57,7 @@ const FormattedText = memo(({ text }: { text: string }) => {
         if (isList) {
           return (
             <div key={`para-${idx}`} className="flex items-start gap-2 ml-1">
-              <span className="shrink-0 mt-1.5 w-1.5 h-1.5 bg-brand-vibrant rounded-full opacity-70"></span>
+              <span className="shrink-0 mt-1.5 size-1.5 bg-brand-vibrant rounded-full opacity-70"></span>
               <span className="leading-relaxed text-zinc-700">{content}</span>
             </div>
           );
@@ -548,7 +548,7 @@ const AIChat: React.FC = memo(() => {
                 <Robot className="size-5" weight="fill" />
               </div>
               <div className="bg-white px-4 py-3 border border-zinc-100 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-2.5">
-                <CircleNotch className="w-4 h-4 animate-spin text-brand-vibrant" weight="bold" />
+                <CircleNotch className="size-4 animate-spin text-brand-vibrant" weight="bold" />
                 <span className="text-xs font-medium text-zinc-400">Anhangá digitando…</span>
               </div>
             </div>

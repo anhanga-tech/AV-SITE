@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { getTrackingDataObject } from '../utils/whatsapp';
 import type { LeadTracking, LeadUtms } from '../types/leadCapture';
 import type { SubmitQuizRequest, SubmitQuizResponse } from '../types/quiz';
@@ -82,10 +82,6 @@ export function useQuizCapture() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [trackingState, setTrackingState] = useState(() => captureTrackingState());
-
-    useEffect(() => {
-        setTrackingState(captureTrackingState());
-    }, []);
 
     const submitQuiz = async (
         input: Pick<SubmitQuizRequest, 'firstName' | 'lastName' | 'email' | 'whatsapp' | 'profileKey' | 'profileName' | 'bantSummary' | 'destinos' | 'skipped'>,

@@ -19,7 +19,7 @@ export function CtaBody() {
     return (
       <div className="flex flex-col gap-3" role="status" aria-live="polite">
         <p className="flex items-center gap-2 text-green-600 text-sm font-bold">
-          <CheckCircle className="w-5 h-5" weight="fill" />
+          <CheckCircle className="size-5" weight="fill" />
           Recebemos! Nossa equipe entra em contato em breve.
         </p>
       </div>
@@ -97,7 +97,7 @@ export function CtaBody() {
             type="checkbox"
             checked={fields.emailOptIn}
             onChange={(event) => setField('emailOptIn', event.target.checked)}
-            className="mt-0.5 w-4 h-4 rounded border-2 border-brand-vibrant accent-brand-vibrant cursor-pointer flex-shrink-0"
+            className="mt-0.5 size-4 rounded border-2 border-brand-vibrant accent-brand-vibrant cursor-pointer flex-shrink-0"
           />
           <label htmlFor="cta-optIn" className="text-xs text-blue-700 leading-relaxed cursor-pointer">
             Quero receber novidades por e-mail.{' '}
@@ -118,9 +118,9 @@ export function CtaBody() {
             className="w-full sm:flex-1 flex items-center justify-center gap-2 bg-[#25D366] text-white text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-[#1fba59] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             {isSubmitting ? (
-              <SpinnerGap className="w-4 h-4 animate-spin" weight="bold" />
+              <SpinnerGap className="size-4 animate-spin" weight="bold" />
             ) : (
-              <WhatsappLogo className="w-4 h-4" weight="fill" />
+              <WhatsappLogo className="size-4" weight="fill" />
             )}
             Chamar no WhatsApp
           </button>
