@@ -343,7 +343,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
           {isSubmittingLead || isLocallySubmitting ? (
             <>
               <Loader2 className="size-5 animate-spin" />
-              <span>Salvando...</span>
+              <span>Salvando…</span>
             </>
           ) : (
             <>

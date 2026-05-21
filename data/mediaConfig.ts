@@ -280,13 +280,11 @@ export const generateSrcSet = (url: string, sizes: number[] = [400, 800, 1200]):
  * browsers from requesting JPEG/PNG origins with type="image/avif".
  */
 export const generateAvifSrcSet = (url: string, sizes: number[] = [400, 800, 1200]): string => {
-    const entries = sizes
-        .map(size => {
-            const formatted = optimizeRemoteImageUrl(url, size, undefined, 'avif');
-            const unformatted = optimizeRemoteImageUrl(url, size);
-            return formatted !== unformatted ? `${formatted} ${size}w` : '';
-        })
-        .filter(Boolean);
+    const entries = sizes.flatMap(size => {
+        const formatted = optimizeRemoteImageUrl(url, size, undefined, 'avif');
+        const unformatted = optimizeRemoteImageUrl(url, size);
+        return formatted !== unformatted ? [`${formatted} ${size}w`] : [];
+    });
     return entries.join(', ');
 };
 
@@ -296,12 +294,10 @@ export const generateAvifSrcSet = (url: string, sizes: number[] = [400, 800, 120
  * browsers from requesting JPEG/PNG origins with type="image/webp".
  */
 export const generateWebpSrcSet = (url: string, sizes: number[] = [400, 800, 1200]): string => {
-    const entries = sizes
-        .map(size => {
-            const formatted = optimizeRemoteImageUrl(url, size, undefined, 'webp');
-            const unformatted = optimizeRemoteImageUrl(url, size);
-            return formatted !== unformatted ? `${formatted} ${size}w` : '';
-        })
-        .filter(Boolean);
+    const entries = sizes.flatMap(size => {
+        const formatted = optimizeRemoteImageUrl(url, size, undefined, 'webp');
+        const unformatted = optimizeRemoteImageUrl(url, size);
+        return formatted !== unformatted ? [`${formatted} ${size}w`] : [];
+    });
     return entries.join(', ');
 };

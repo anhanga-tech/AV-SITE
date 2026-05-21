@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, type Ref } from "react";
 import { Link } from "react-router-dom";
 import { optimizeRemoteImageUrl } from "../../../data/mediaConfig";
 import { BRAND_LOGO_BLUE_URL } from "../../../lib/media-assets";
@@ -30,16 +30,15 @@ interface CardProps {
   tape?: {
     style: React.CSSProperties;
   };
+  ref?: Ref<HTMLDivElement>;
 }
 
-const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, imgSrc, imgAlt, label, tape }, ref) => (
-    <div className={`card ${className}`} ref={ref}>
-      <img src={imgSrc} alt={imgAlt} width="300" height="300" />
-      <div className="card-label">{label}</div>
-      {tape && <WashiTape style={tape.style} />}
-    </div>
-  ),
+const Card = ({ className, imgSrc, imgAlt, label, tape, ref }: CardProps) => (
+  <div className={`card ${className}`} ref={ref}>
+    <img src={imgSrc} alt={imgAlt} width="300" height="300" />
+    <div className="card-label">{label}</div>
+    {tape && <WashiTape style={tape.style} />}
+  </div>
 );
 
 interface BadgeProps {

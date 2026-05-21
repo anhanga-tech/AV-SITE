@@ -19,13 +19,14 @@ function extractChipsFromText(text: string) {
 
         if (Array.isArray(parsedArray)) {
             // Map objects to simple strings
-            const chipsArray = parsedArray.map(item => {
-                if (typeof item === 'string') return item;
-                if (typeof item === 'object' && item !== null) {
-                    return item.label || item.value || item.text || String(item);
-                }
-                return String(item);
-            }).filter(Boolean);
+            const chipsArray = parsedArray.flatMap(item => {
+                const val = typeof item === 'string'
+                    ? item
+                    : typeof item === 'object' && item !== null
+                        ? (item.label || item.value || item.text || String(item))
+                        : String(item);
+                return val ? [val] : [];
+            });
 
             if (chipsArray.length > 0) {
                 const cleanedText = text.replace(chipsMatch[0], '').trim();

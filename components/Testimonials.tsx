@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, memo } from 'react';
 import { ChevronLeft, ChevronRight, Quote, MessageSquareHeart } from 'lucide-react';
 import { TESTIMONIALS } from '../data/testimonialsData';
 import { BRAND_LOGO_PNG_URL } from '../lib/media-assets';
-import { SectionHeader } from './ui';
+import { SectionHeader } from './ui/SectionHeader';
 import { LazyImage } from './ui/LazyImage';
 
 /**

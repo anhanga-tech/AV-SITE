@@ -55,9 +55,11 @@ async function collectTextFiles(targetPath: string): Promise<string[]> {
 async function collectDesignSystemReadmes(): Promise<string[]> {
   const entries = await readdir(ROOT_DIR, { withFileTypes: true });
 
-  return entries
-    .filter((entry) => entry.isDirectory() && entry.name.endsWith('Design System'))
-    .map((entry) => path.join(ROOT_DIR, entry.name, 'README.md'));
+  return entries.flatMap((entry) =>
+    entry.isDirectory() && entry.name.endsWith('Design System')
+      ? [path.join(ROOT_DIR, entry.name, 'README.md')]
+      : []
+  );
 }
 
 test('site positioning content does not use boutique agency positioning', async () => {

@@ -163,16 +163,15 @@ export default async function handler(request: Request): Promise<Response> {
   }
 
   await Promise.all(
-    events
-      .filter(isClosedWonDealEvent)
-      .map(async (event) => {
-        const dealId = String(event.objectId);
-        try {
-          await processClosedWonEvent(event, config.hubspotToken);
-        } catch (err) {
+    events.flatMap((event) => {
+      if (!isClosedWonDealEvent(event)) return [];
+      const dealId = String(event.objectId);
+      return [
+        processClosedWonEvent(event, config.hubspotToken).catch((err) => {
           logger.error(`HUBSPOT_WEBHOOK: Error processing deal ${dealId}:`, err);
-        }
-      })
+        }),
+      ];
+    })
   );
 
   logger.info('HUBSPOT_WEBHOOK: processed events', events?.length ?? 0);

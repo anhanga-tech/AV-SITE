@@ -146,7 +146,6 @@ const ContactModal: React.FC = () => {
                         </div>
                         <button
                             type="button"
-                            autoFocus
                             onClick={close}
                             className="w-full rounded-xl bg-brand-dark py-3 font-bold text-white transition-colors hover:bg-brand-vibrant focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-dark focus-visible:ring-offset-2"
                         >
