@@ -40,6 +40,7 @@ export default {
                     yellow: '#FFD600',
                     yellowHover: '#E5C000',
                     light: '#F4F8FF',
+                    whatsapp: '#25D366',
                 },
             },
             fontFamily: {

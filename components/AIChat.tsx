@@ -435,7 +435,7 @@ const AIChat: React.FC = memo(() => {
           }`}
         role="dialog"
         aria-modal="true"
-        aria-label="Assistente Virtual Anhangá"
+        aria-labelledby="ai-chat-title"
       >
         {/* Header - Scrapbook Softness */}
         <div className="bg-white/80 backdrop-blur-md px-6 py-5 border-b border-zinc-100 flex justify-between items-center shrink-0 z-10">
@@ -444,7 +444,7 @@ const AIChat: React.FC = memo(() => {
               <Sparkle className="size-6 text-brand-vibrant" weight="fill" />
             </div>
             <div>
-              <h2 className="font-extrabold text-lg text-brand-dark tracking-tight leading-none">
+              <h2 id="ai-chat-title" className="font-extrabold text-lg text-brand-dark tracking-tight leading-none">
                 Hub Anhangá
               </h2>
               <div className="flex items-center gap-1.5 mt-1 opacity-80">

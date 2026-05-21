@@ -330,10 +330,14 @@ const CONTINENT_COLORS: Record<string, string> = {
  * This is particularly important because this component initializes a Leaflet map and
  * iterates over a large set of destination markers and cards.
  */
+const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), input, textarea, select, [tabindex]:not([tabindex="-1"])';
+
 const Destinations: React.FC = memo(() => {
     const mapRef = useRef<HTMLDivElement>(null);
     const mapInstance = useRef<L.Map | null>(null);
     const markersLayerRef = useRef<L.FeatureGroup | null>(null);
+    const destinationModalRef = useRef<HTMLDivElement>(null);
+    const previousFocusRef = useRef<HTMLElement | null>(null);
 
     const [activeFilter, setActiveFilter] = useState('Todos');
     const [selectedDestination, setSelectedDestination] = useState<Destination | null>(null);
@@ -345,6 +349,36 @@ const Destinations: React.FC = memo(() => {
     }, [activeFilter]);
 
 
+
+    // Modal focus trap + restoration
+    useEffect(() => {
+        if (!selectedDestination) return;
+        previousFocusRef.current = document.activeElement as HTMLElement;
+        const modal = destinationModalRef.current;
+        if (!modal) return;
+        const firstFocusable = modal.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)[0];
+        firstFocusable?.focus();
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') { setSelectedDestination(null); return; }
+            if (e.key !== 'Tab') return;
+            const focusable = Array.from(modal.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
+            if (focusable.length === 0) return;
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (e.shiftKey) {
+                if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+            } else {
+                if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+            previousFocusRef.current?.focus();
+        };
+    }, [selectedDestination]);
 
     // Map Init
     useEffect(() => {
@@ -657,8 +691,15 @@ const Destinations: React.FC = memo(() => {
 
             {/* Modal - Scrapbook Page Style */}
             {selectedDestination && (
-                <div role="button" tabIndex={0} aria-label="Fechar destino" className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm" onClick={() => setSelectedDestination(null)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSelectedDestination(null); }}>
-                    <div role="presentation" className="bg-[#fffdf5] w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden relative flex flex-col md:flex-row max-h-[90vh] border-8 border-white transform rotate-1" onClick={e => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+                <button type="button" aria-label="Fechar destino" className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm cursor-default" onClick={() => setSelectedDestination(null)}>
+                    <div
+                        ref={destinationModalRef}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="dest-modal-title"
+                        className="bg-[#fffdf5] w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden relative flex flex-col md:flex-row max-h-[90vh] border-8 border-white transform rotate-1"
+                        onClick={e => e.stopPropagation()}
+                    >
 
                         {/* Washi Tape Decor */}
                         <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-32 h-10 bg-red-400/80 rotate-1 backdrop-blur-sm z-20 shadow-sm border-l-2 border-r-2 border-white/40"></div>
@@ -681,7 +722,7 @@ const Destinations: React.FC = memo(() => {
                             />
                             <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/60 to-transparent"></div>
                             <div className="absolute bottom-6 left-6 text-white">
-                                <h2 className="text-4xl font-black mb-1 drop-shadow-md">{selectedDestination.city}</h2>
+                                <h2 id="dest-modal-title" className="text-4xl font-black mb-1 drop-shadow-md">{selectedDestination.city}</h2>
                                 <div className="flex items-center gap-2 font-medium opacity-90 drop-shadow-sm">
                                     <MapPin className="size-4" /> {selectedDestination.country}
                                 </div>
@@ -738,7 +779,7 @@ const Destinations: React.FC = memo(() => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </button>
             )}
         </section>
     );
