@@ -99,6 +99,38 @@ Copy `.env.example` to `.env` for local development.
 
 Build chunks: `react-vendor` and `ai-vendor` (manual split in `vite.config.ts`).
 
+## Git Flow
+
+This project uses **GitHub Flow** — deploy contínuo, sem `develop` branch.
+
+### Branch naming
+
+```
+feature/nome-curto       # nova funcionalidade
+fix/descricao-do-bug     # correção de bug
+chore/o-que-for          # infra, deps, config, refactor
+docs/o-que-for           # documentação
+```
+
+### Rules
+
+- **Never commit directly to `main`** — always via Pull Request.
+- Keep branches short-lived (ideally < 2 days).
+- Use **squash merge** into `main` to keep history clean (one commit per feature).
+- Use **conventional commits**: `feat:`, `fix:`, `chore:`, `docs:`, `perf:`, `test:`, `refactor:`.
+- The CI job `build-and-test` must pass before merging (enforced by branch protection).
+- Resolve all PR conversations before merging.
+
+### Branch protection (active on `main`)
+
+- PR required to merge
+- CI `build-and-test` must pass
+- Branch must be up to date before merge
+- Force push and deletion blocked
+- `enforce_admins: false` — admin can bypass for urgent hotfixes (use sparingly)
+
+---
+
 ## Rules
 
 This repository uses `/docs/standards/` as the source of truth for engineering rules.
