@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo } from 'react';
+import React, { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { ChevronLeft, ChevronRight, Quote, MessageSquareHeart } from 'lucide-react';
 import { TESTIMONIALS } from '../data/testimonialsData';
 import { BRAND_LOGO_PNG_URL } from '../lib/media-assets';
@@ -19,6 +19,7 @@ import { LazyImage } from './ui/LazyImage';
 const Testimonials: React.FC = memo(() => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
+    const liveRegionRef = useRef<HTMLDivElement>(null);
 
     const nextSlide = useCallback(() => {
         setCurrentIndex((prev) => (prev === TESTIMONIALS.length - 1 ? 0 : prev + 1));
@@ -66,7 +67,7 @@ const Testimonials: React.FC = memo(() => {
                 <div className="max-w-4xl mx-auto relative">
 
                     {/* Viewport for Slides */}
-                    <div className="overflow-hidden py-4 px-2" aria-live={isPaused ? 'polite' : 'off'} aria-atomic="false"> {/* Padding prevent shadow clip */}
+                    <div className="overflow-hidden py-4 px-2" aria-live="polite" aria-atomic="false"> {/* Padding prevent shadow clip */}
                         <div
                             className="flex transition-transform duration-700 ease-in-out will-change-transform"
                             style={{ transform: `translateX(-${currentIndex * 100}%)` }}

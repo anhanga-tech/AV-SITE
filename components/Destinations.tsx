@@ -330,7 +330,7 @@ const CONTINENT_COLORS: Record<string, string> = {
  * This is particularly important because this component initializes a Leaflet map and
  * iterates over a large set of destination markers and cards.
  */
-const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), input, textarea, select, [tabindex]:not([tabindex="-1"])';
 
 const Destinations: React.FC = memo(() => {
     const mapRef = useRef<HTMLDivElement>(null);
@@ -356,13 +356,13 @@ const Destinations: React.FC = memo(() => {
         previousFocusRef.current = document.activeElement as HTMLElement;
         const modal = destinationModalRef.current;
         if (!modal) return;
-        const visibleFocusable = () => Array.from(modal.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(el => el.offsetParent !== null);
-        visibleFocusable()[0]?.focus();
+        const firstFocusable = modal.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)[0];
+        firstFocusable?.focus();
 
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') { setSelectedDestination(null); return; }
             if (e.key !== 'Tab') return;
-            const focusable = visibleFocusable();
+            const focusable = Array.from(modal.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
             if (focusable.length === 0) return;
             const first = focusable[0];
             const last = focusable[focusable.length - 1];
@@ -691,7 +691,7 @@ const Destinations: React.FC = memo(() => {
 
             {/* Modal - Scrapbook Page Style */}
             {selectedDestination && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm" onClick={() => setSelectedDestination(null)}>
+                <button type="button" aria-label="Fechar destino" className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm cursor-default" onClick={() => setSelectedDestination(null)}>
                     <div
                         ref={destinationModalRef}
                         role="dialog"
@@ -779,7 +779,7 @@ const Destinations: React.FC = memo(() => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </button>
             )}
         </section>
     );
