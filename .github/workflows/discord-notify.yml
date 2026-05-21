@@ -5,31 +5,33 @@ on:
     types: [opened, closed, reopened]
   pull_request:
     types: [opened, closed, reopened]
-  project_card:
-    types: [moved]
 
 jobs:
   notify:
-    permissions:
-      contents: read
     runs-on: ubuntu-latest
+    permissions:
+      contents: none
     steps:
       - name: Notify Discord
-        uses: Ilshidur/action-discord@master
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        with:
-          args: |
-            ${{ github.event_name == 'issues' && format('📝 Issue {0}: #{1} - {2}', 
-              github.event.action, 
-              github.event.issue.number, 
-              github.event.issue.title
-            ) || '' }}
-            
-            ${{ github.event_name == 'pull_request' && format('🔀 PR {0}: #{1} - {2}', 
-              github.event.action, 
-              github.event.pull_request.number, 
-              github.event.pull_request.title
-            ) || '' }}
-            
-            Link: ${{ github.event.issue.html_url || github.event.pull_request.html_url }}
+        run: |
+          if [ "${{ github.event_name }}" = "issues" ]; then
+            TITLE="${{ github.event.issue.title }}"
+            URL="${{ github.event.issue.html_url }}"
+            MSG="$(printf '📝 Issue %s: #%s - %s\nLink: %s' \
+              "${{ github.event.action }}" \
+              "${{ github.event.issue.number }}" \
+              "$TITLE" "$URL")"
+          else
+            TITLE="${{ github.event.pull_request.title }}"
+            URL="${{ github.event.pull_request.html_url }}"
+            MSG="$(printf '🔀 PR %s: #%s - %s\nLink: %s' \
+              "${{ github.event.action }}" \
+              "${{ github.event.pull_request.number }}" \
+              "$TITLE" "$URL")"
+          fi
+          PAYLOAD="$(jq -n --arg content "$MSG" '{"content": $content}')"
+          curl -s -X POST "$DISCORD_WEBHOOK" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
