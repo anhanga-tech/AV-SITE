@@ -5,31 +5,33 @@ on:
     types: [opened, closed, reopened]
   pull_request:
     types: [opened, closed, reopened]
-  project_card:
-    types: [moved]
 
 jobs:
   notify:
-    permissions:
-      contents: read
     runs-on: ubuntu-latest
+    permissions:
+      contents: none
     steps:
       - name: Notify Discord
-        uses: Ilshidur/action-discord@master
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        with:
-          args: |
-            ${{ github.event_name == 'issues' && format('📝 Issue {0}: #{1} - {2}', 
-              github.event.action, 
-              github.event.issue.number, 
-              github.event.issue.title
-            ) || '' }}
-            
-            ${{ github.event_name == 'pull_request' && format('🔀 PR {0}: #{1} - {2}', 
-              github.event.action, 
-              github.event.pull_request.number, 
-              github.event.pull_request.title
-            ) || '' }}
-            
-            Link: ${{ github.event.issue.html_url || github.event.pull_request.html_url }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_ACTION: ${{ github.event.action }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          if [ "$EVENT_NAME" = "issues" ]; then
+            MSG="$(printf '📝 Issue %s: #%s - %s\nLink: %s' \
+              "$EVENT_ACTION" "$ISSUE_NUMBER" "$ISSUE_TITLE" "$ISSUE_URL")"
+          else
+            MSG="$(printf '🔀 PR %s: #%s - %s\nLink: %s' \
+              "$EVENT_ACTION" "$PR_NUMBER" "$PR_TITLE" "$PR_URL")"
+          fi
+          PAYLOAD="$(jq -n --arg content "$MSG" '{"content": $content}')"
+          curl -s -X POST "$DISCORD_WEBHOOK" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
