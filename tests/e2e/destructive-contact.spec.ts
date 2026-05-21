@@ -50,10 +50,10 @@ test.describe('Contact Modal Destructive Tests', () => {
     });
 
     await page.route('**/api/submit-contact', route =>
-      route.fulfill({ status: 500, body: 'Error' })
+      route.fulfill({ status: 500, body: JSON.stringify({ ok: false, error: 'Erro de teste' }) })
     );
 
-    await contactModal.submitWhatsApp();
-    await expect(page.getByText(/erro/i)).toBeVisible();
+    await contactModal.callbackSubmitBtn.click();
+    await expect(contactModal.modal.getByRole('alert')).toBeVisible();
   });
 });

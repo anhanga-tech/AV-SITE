@@ -80,6 +80,15 @@ FormattedText.displayName = 'FormattedText';
  * 2. Pre-calculates the last model message index once per update (O(N))
  *    instead of within the render loop (O(N^2)).
  */
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',');
+
 const AIChat: React.FC = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -89,6 +98,8 @@ const AIChat: React.FC = memo(() => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
   const messagesRef = useRef<Message[]>(messages);
   const {
     getLeadWhatsAppUrl,
@@ -123,13 +134,14 @@ const AIChat: React.FC = memo(() => {
   }, [messages, isOpen, isLoading]);
 
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      const timer = setTimeout(() => inputRef.current?.focus(), 300);
-      return () => clearTimeout(timer);
+    if (isOpen) {
+      // Focus the drawer panel itself to ensure screen readers announce it immediately
+      drawerRef.current?.focus();
     }
   }, [isOpen]);
 
   const openChatDrawer = (enableHaptics: boolean = true) => {
+    triggerRef.current = document.activeElement as HTMLElement | null;
     if (enableHaptics) {
       void triggerHaptic('light');
     }
@@ -141,6 +153,7 @@ const AIChat: React.FC = memo(() => {
       void triggerHaptic('light');
     }
     setIsOpen(false);
+    triggerRef.current?.focus();
   };
 
   const handlePrepareLeadSubmitPayload = (payload: LeadFinalizePayload, eventId: string): SubmitLeadRequest => {
@@ -265,10 +278,46 @@ const AIChat: React.FC = memo(() => {
     }
   };
 
+  // Focus Trapping Logic
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeChatDrawer();
+        return;
+      }
+
+      if (event.key !== 'Tab' || !drawerRef.current) return;
+
+      const focusable = Array.from(
+        drawerRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+      ).filter((element) => element.offsetParent !== null);
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+        return;
+      }
+
+      if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
+
   useEffect(() => {
     const handleToggle = (event: Event) => {
       const customEvent = event as CustomEvent;
-      setIsOpen(true);
+      openChatDrawer(false);
       if (customEvent.detail?.message) {
         setTimeout(() => submitMessage(customEvent.detail.message, false), 400);
       }
@@ -352,7 +401,7 @@ const AIChat: React.FC = memo(() => {
                     shadow-[0_8px_30px_rgba(255,107,53,0.3)] hover:shadow-[0_8px_30px_rgba(255,107,53,0.5)] hover:-translate-y-1
                     transition duration-300
                     size-16 rounded-2xl sm:w-auto sm:h-auto sm:px-6 sm:py-3.5 sm:rounded-full
-                    focus:outline-none focus:ring-4 focus:ring-brand-vibrant/30
+                    focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-vibrant/30
                     ${isOrlandoPage ? 'orlando-chat-glow' : ''}`}
         aria-label="Abrir assistente virtual"
       >
@@ -380,9 +429,12 @@ const AIChat: React.FC = memo(() => {
 
       {/* Drawer Panel - Soft Scrapbook Geometry */}
       <div
-        className={`fixed top-0 right-0 h-full w-full sm:w-[450px] z-[9999] bg-[#fdfdfc] flex flex-col shadow-[-10px_0_40px_rgba(0,0,0,0.1)] transition-transform duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] sm:rounded-l-[2rem] overflow-hidden ${isOpen ? 'translate-x-0' : 'translate-x-full'
+        ref={drawerRef}
+        tabIndex={-1}
+        className={`fixed top-0 right-0 h-full w-full sm:w-[450px] z-[9999] bg-[#fdfdfc] flex flex-col shadow-[-10px_0_40px_rgba(0,0,0,0.1)] transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] sm:rounded-l-[2rem] overflow-hidden outline-none ${isOpen ? 'translate-x-0 visible opacity-100' : 'translate-x-full invisible opacity-0'
           }`}
         role="dialog"
+        aria-modal="true"
         aria-label="Assistente Virtual Anhangá"
       >
         {/* Header - Scrapbook Softness */}
@@ -408,7 +460,7 @@ const AIChat: React.FC = memo(() => {
           </div>
           <button
             onClick={() => closeChatDrawer()}
-            className="text-zinc-400 hover:text-zinc-700 bg-zinc-50 hover:bg-zinc-100 rounded-full p-2.5 transition-colors focus:outline-none"
+            className="text-zinc-400 hover:text-zinc-700 bg-zinc-50 hover:bg-zinc-100 rounded-full p-2.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-vibrant"
             aria-label="Fechar gaveta"
           >
             <X className="size-5" weight="bold" />
@@ -479,7 +531,7 @@ const AIChat: React.FC = memo(() => {
                       <button
                         key={chipIdx}
                         onClick={() => submitMessage(chip)}
-                        className="text-[12px] font-semibold text-zinc-600 bg-white border border-zinc-200 px-4 py-2 rounded-xl shadow-sm hover:shadow hover:border-brand-vibrant/30 hover:text-brand-vibrant hover:-translate-y-0.5 transition text-left"
+                        className="text-[12px] font-semibold text-zinc-600 bg-white border border-zinc-200 px-4 py-2 rounded-xl shadow-sm hover:shadow hover:border-brand-vibrant/30 hover:text-brand-vibrant hover:-translate-y-0.5 transition text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-vibrant/50"
                       >
                         {chip}
                       </button>
