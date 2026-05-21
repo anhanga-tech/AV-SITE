@@ -1,4 +1,4 @@
-[![React Doctor](https://www.react.doctor/share/badge?p=anhanga-viagens&s=72&w=913&f=389)](https://www.react.doctor/share?p=anhanga-viagens&s=72&w=913&f=389)
+[![React Doctor](https://www.react.doctor/share/badge?p=anhanga-viagens&s=81&w=230&f=95)](https://www.react.doctor/share?p=anhanga-viagens&s=81&w=230&f=95)
 ![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/felipewilliam2/AV-SITE)
 
 
