@@ -12,7 +12,7 @@ export class AIChat {
 
   constructor(page: Page) {
     this.page = page;
-    this.chatDialog = page.locator('div[role="dialog"][aria-label="Assistente Virtual Anhangá"]');
+    this.chatDialog = page.locator('div[role="dialog"][aria-labelledby="ai-chat-title"]');
     this.inputField = page.locator('textarea[placeholder="Digite sua dúvida aqui..."]');
     this.sendBtn = page.locator('button[aria-label="Enviar mensagem"]');
     this.closeBtn = page.locator('button[aria-label="Fechar gaveta"]');
