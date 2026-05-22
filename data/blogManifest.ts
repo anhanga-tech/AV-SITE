@@ -2,6 +2,26 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
+    "title": "Copa do Mundo 2026: as cidades-sede e o que cada uma tem a oferecer além do futebol",
+    "excerpt": "Guia das cidades-sede da Copa 2026 nos EUA, México e Canadá, com destaques, dicas locais e roteiros para aproveitar a viagem além dos jogos.",
+    "date": "2026-05-22",
+    "author": "felipe-william",
+    "category": "Planejamento",
+    "image": "https://media.anhanga.tur.br/images/blog/guadalajara.jpg",
+    "featured": true,
+    "showChatCTA": false,
+    "chatCTADestination": "América do Norte",
+    "tags": [
+      "copa-do-mundo",
+      "eua",
+      "mexico",
+      "canada",
+      "cidades-sede"
+    ],
+    "slug": "copa-do-mundo-2026-as-cidades-sede-e-o-que-cada-uma-tem-a-oferecer-alem-do-futebol",
+    "readingTime": "8 min de leitura"
+  },
+  {
     "title": "Tropical Americas: nova área da Disney no Animal Kingdom",
     "excerpt": "A Disney anunciou uma nova área temática no Animal Kingdom dedicada à América Latina, com atrações do Encanto e Indiana Jones. Abertura prevista para 2027. Vale começar a planejar já.",
     "date": "2026-05-02",
