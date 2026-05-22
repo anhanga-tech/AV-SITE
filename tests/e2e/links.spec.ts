@@ -13,17 +13,14 @@ test.describe('Link Integrity Suite', () => {
     const allowedHosts = new Set(['localhost']);
 
     const hrefs = await Promise.all(links.map((link) => link.getAttribute('href')));
-    const targetUrls = hrefs
-      .filter((href): href is string => !!href && !href.startsWith('mailto:') && !href.startsWith('tel:'))
-      .map((href) => new URL(href, page.url()).href)
-      .filter((targetUrl) => {
-        const isLocal = allowedHosts.has(new URL(targetUrl).hostname.replace(/^www\./, '')) ||
-          targetUrl.includes('localhost');
-        if (!isLocal) {
-          console.log(`Skipping external link: ${targetUrl}`);
-        }
-        return isLocal;
-      });
+    const targetUrls = hrefs.flatMap((href): string[] => {
+      if (!href || href.startsWith('mailto:') || href.startsWith('tel:')) return [];
+      const targetUrl = new URL(href, page.url()).href;
+      const isLocal = allowedHosts.has(new URL(targetUrl).hostname.replace(/^www\./, '')) ||
+        targetUrl.includes('localhost');
+      if (!isLocal) console.log(`Skipping external link: ${targetUrl}`);
+      return isLocal ? [targetUrl] : [];
+    });
 
     await Promise.all(
       targetUrls.map(async (targetUrl) => {

@@ -242,7 +242,7 @@ function ChunkyQuiz() {
             <div className="quiz-chunky quiz-chunky-layered">
                 {layerColors.map((c, idx) => (
                     <div
-                        key={`layer-${idx}`}
+                        key={c}
                         className="quiz-ch-layer"
                         aria-hidden="true"
                         style={{
@@ -251,11 +251,11 @@ function ChunkyQuiz() {
                             zIndex: idx,
                         }}
                     >
-                        {letters.map((l, i) => <span key={`letter-${i}`} className="quiz-ch-letter">{l}</span>)}
+                        {letters.map((l) => <span key={l} className="quiz-ch-letter">{l}</span>)}
                     </div>
                 ))}
                 <div className="quiz-ch-front" style={{ zIndex: 99 }}>
-                    {letters.map((l, i) => <span key={`letter-${i}`} className="quiz-ch-letter">{l}</span>)}
+                    {letters.map((l) => <span key={l} className="quiz-ch-letter">{l}</span>)}
                 </div>
             </div>
         </div>

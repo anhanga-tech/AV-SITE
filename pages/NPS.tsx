@@ -47,6 +47,13 @@ const PAGE_STYLES = `
     transform: translate(0, 0) !important;
     box-shadow: 2px 2px 0 #003B8E !important;
   }
+  .nps-field-label {
+    letter-spacing: 0.15em;
+    color: #94a3b8;
+  }
+  .nps-score-legend {
+    letter-spacing: 0.15em;
+  }
   @media (prefers-reduced-motion: reduce) {
     .nps-score-btn, .nps-cta, .nps-submit { transition: none !important; }
     .nps-thank-card { animation: none !important; opacity: 1 !important; transform: none !important; }
@@ -65,7 +72,6 @@ export default function NPS() {
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [countdown, setCountdown] = useState(3);
-  const [hoveredScore, setHoveredScore] = useState<number | null>(null);
   const [year] = useState(() => new Date().getFullYear());
 
   useEffect(() => {
@@ -157,16 +163,13 @@ export default function NPS() {
 
                 <NpsScoreSelector
                   score={score}
-                  hoveredScore={hoveredScore}
                   onSelect={setScore}
-                  onHover={setHoveredScore}
                 />
 
                 <div className="mb-6">
                   <label
                     htmlFor="nps-reason"
-                    className="block text-xs font-bold uppercase mb-2"
-                    style={{ letterSpacing: '0.15em', color: '#94a3b8' }}
+                    className="nps-field-label block text-xs font-bold uppercase mb-2"
                   >
                     O que te levou a dar essa nota?
                   </label>
@@ -184,8 +187,7 @@ export default function NPS() {
                 <div className="mb-8">
                   <label
                     htmlFor="nps-highlight"
-                    className="block text-xs font-bold uppercase mb-2"
-                    style={{ letterSpacing: '0.15em', color: '#94a3b8' }}
+                    className="nps-field-label block text-xs font-bold uppercase mb-2"
                   >
                     Qual foi o momento mais marcante da viagem?{' '}
                     <span
@@ -219,17 +221,6 @@ export default function NPS() {
                   type="submit"
                   disabled={!submitEnabled}
                   className="nps-submit w-full py-4 text-sm font-extrabold uppercase rounded-lg"
-                  style={{
-                    letterSpacing: '0.12em',
-                    background: '#0056D2',
-                    color: '#ffffff',
-                    border: '2px solid #0056D2',
-                    boxShadow: submitEnabled ? '4px 4px 0 #003B8E' : 'none',
-                    opacity: submitEnabled ? 1 : 0.5,
-                    cursor: submitEnabled ? 'pointer' : 'not-allowed',
-                    transform: submitEnabled ? 'translate(-1px,-1px)' : 'none',
-                    transition: 'opacity 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease',
-                  }}
                 >
                   {submitting ? 'Enviando...' : 'Enviar avaliação'}
                 </button>

@@ -67,13 +67,11 @@ export async function collectBlogPostMeta(blogDir: string): Promise<PostMeta[]> 
   const filenames = await readdir(blogDir);
 
   const posts = await Promise.all(
-    filenames
-      .filter((filename) => filename.endsWith('.mdx') && !filename.startsWith('_'))
-      .map(async (filename) => {
-        const filepath = path.join(blogDir, filename);
-        const rawContent = await readFile(filepath, 'utf8');
-        return toPostMeta(filepath, rawContent);
-      })
+    filenames.flatMap((filename) => {
+      if (!filename.endsWith('.mdx') || filename.startsWith('_')) return [];
+      const filepath = path.join(blogDir, filename);
+      return [readFile(filepath, 'utf8').then((rawContent) => toPostMeta(filepath, rawContent))];
+    })
   );
 
   return posts.sort((a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug));

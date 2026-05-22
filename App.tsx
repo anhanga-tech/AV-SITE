@@ -1,7 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import { LazyMotion, domAnimation } from 'framer-motion';
 import { BrowserRouter, MemoryRouter, Navigate, Route, Routes } from 'react-router-dom';
-import Header from './components/Header';
+import Header from './components/Header/Header';
 import Footer from './components/Footer';
 import AIChat from './components/AIChat';
 import ContactModal from './components/ContactModal';

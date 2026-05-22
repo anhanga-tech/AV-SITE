@@ -18,6 +18,7 @@ const ContactModal: React.FC = () => {
     const titleId = useId();
     const dialogRef = useRef<HTMLDivElement>(null);
     const firstFieldRef = useRef<HTMLInputElement>(null);
+    const closeButtonRef = useRef<HTMLButtonElement>(null);
     const triggerRef = useRef<HTMLElement | null>(null);
     const previousBodyOverflow = useRef<string>('');
 
@@ -43,6 +44,10 @@ const ContactModal: React.FC = () => {
         window.addEventListener('open-contact-modal', handleOpen);
         return () => window.removeEventListener('open-contact-modal', handleOpen);
     }, []);
+
+    useEffect(() => {
+        if (submitted) closeButtonRef.current?.focus();
+    }, [submitted]);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -145,8 +150,8 @@ const ContactModal: React.FC = () => {
                             </p>
                         </div>
                         <button
+                            ref={closeButtonRef}
                             type="button"
-                            autoFocus
                             onClick={close}
                             className="w-full rounded-xl bg-brand-dark py-3 font-bold text-white transition-colors hover:bg-brand-vibrant focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-dark focus-visible:ring-offset-2"
                         >

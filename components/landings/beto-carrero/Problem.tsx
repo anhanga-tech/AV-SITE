@@ -35,7 +35,7 @@ const Problem: React.FC = () => {
                         <div className="size-3 lg:size-4 rounded-full bg-yellow-400 border border-fun-dark"></div>
                         <div className="size-3 lg:size-4 rounded-full bg-green-400 border border-fun-dark"></div>
                         <div className="flex-grow bg-white border border-zinc-300 h-5 lg:h-7 rounded-md text-[10px] lg:text-xs flex items-center px-2 text-zinc-400 overflow-hidden">
-                           betocarrero-hoteis-baratos-socorro.com...
+                           betocarrero-hoteis-baratos-socorro.com…
                         </div>
                      </div>
                      {/* Browser Body */}

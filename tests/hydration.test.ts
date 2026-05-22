@@ -87,9 +87,8 @@ test('Home prerender renders primary content before the footer without streaming
 test('Home prerender keeps the CLS-safe path when URL contains tracking query or hash', async () => {
   const urls = ['/?utm_source=review', '/#contato'];
 
-  for (const url of urls) {
-    const { appHtml } = await render(url);
-
+  const results = await Promise.all(urls.map((url) => render(url)));
+  for (const { appHtml } of results) {
     assert.doesNotMatch(appHtml, /hidden id="S:/);
     assert.doesNotMatch(appHtml, /min-h-\[40vh\] bg-white/);
     assert.match(appHtml, /Sua Próxima/);

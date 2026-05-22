@@ -1,5 +1,8 @@
 import { AirplaneTilt, DeviceMobile } from '@phosphor-icons/react';
 
+const BAR_START = [4,2,1,1,3,1,2,1,4,1,1,2,3,1,2,1,3,1,1,2,1,2,1,3,1,1,2,1,4,1,2].map((w, i) => ({ id: `s${i}`, w }));
+const BAR_END = [2,1,3,1,1,2,4,1,2,1,3,1,1,2].map((w, i) => ({ id: `e${i}`, w }));
+
 export function CtaTicketStub() {
   return (
     <div className="w-full md:w-[30%] bg-zinc-50 p-6 flex flex-col relative">
@@ -69,12 +72,12 @@ export function CtaTicketStub() {
 
         <div className="pt-2 border-t border-zinc-200">
           <div className="flex justify-center items-stretch h-12 w-full overflow-hidden select-none bg-transparent gap-[1px]">
-            {[4, 2, 1, 1, 3, 1, 2, 1, 4, 1, 1, 2, 3, 1, 2, 1, 3, 1, 1, 2, 1, 2, 1, 3, 1, 1, 2, 1, 4, 1, 2].map((w, i) => (
-              <div key={`bar-start-${i}`} className="bg-zinc-950" style={{ width: `${w * 2}px`, flexShrink: 0 }} />
+            {BAR_START.map(({ id, w }) => (
+              <div key={id} className="bg-zinc-950" style={{ width: `${w * 2}px`, flexShrink: 0 }} />
             ))}
             <div className="flex-1"></div>
-            {[2, 1, 3, 1, 1, 2, 4, 1, 2, 1, 3, 1, 1, 2].map((w, i) => (
-              <div key={`bar-end-${i}`} className="bg-zinc-950" style={{ width: `${w * 2}px`, flexShrink: 0 }} />
+            {BAR_END.map(({ id, w }) => (
+              <div key={id} className="bg-zinc-950" style={{ width: `${w * 2}px`, flexShrink: 0 }} />
             ))}
           </div>
 

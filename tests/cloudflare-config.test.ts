@@ -67,8 +67,10 @@ test('Cloudflare splat redirects should come after exact redirects', async () =>
   const redirects = await readFile(new URL('../public/_redirects', import.meta.url), 'utf8');
   const lines = redirects
     .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => line && !line.startsWith('#'));
+    .flatMap((line) => {
+      const t = line.trim();
+      return t && !t.startsWith('#') ? [t] : [];
+    });
   const blogSplatIndex = lines.findIndex((line) => line.startsWith('/blog/* '));
 
   assert.notEqual(blogSplatIndex, -1);

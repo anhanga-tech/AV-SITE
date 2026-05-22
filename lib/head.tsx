@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, use, useEffect } from 'react';
 
 export interface HeadTag {
   tagName: 'title' | 'meta' | 'link' | 'script';
@@ -114,7 +114,7 @@ const applyHeadTag = (tag: HeadTag): HTMLElement => {
 };
 
 export const useHeadTags = (tags: HeadTag[]): null => {
-  const manager = useContext(HeadContext);
+  const manager = use(HeadContext);
   const serializedTags = JSON.stringify(tags);
 
   if (manager) {
