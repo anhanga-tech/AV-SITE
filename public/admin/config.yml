@@ -35,12 +35,8 @@ collections:
         name: author
         widget: select
         options:
-          - { label: Equipe Anhangá, value: equipe-anhanga }
-          - { label: Ana Souza, value: ana-souza }
-          - { label: Rafa Tech, value: rafa-tech }
-          - { label: Chef Luigi, value: luigi }
-          - { label: Mariana S., value: mariana }
-          - { label: Carlos Viajante, value: carlos }
+          - { label: Queila de Oliveira, value: queila-oliveira }
+          - { label: Felipe William, value: felipe-william }
       - label: Categoria
         name: category
         widget: select

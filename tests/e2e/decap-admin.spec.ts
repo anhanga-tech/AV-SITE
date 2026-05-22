@@ -32,7 +32,8 @@ test.describe('Decap CMS admin', () => {
       expect(configText).toMatch(new RegExp(`name:\\s+${fieldName}\\b`));
     }
 
-    expect(configText).toMatch(/value:\s+equipe-anhanga\b/);
+    expect(configText).toMatch(/value:\s+queila-oliveira\b/);
+    expect(configText).toMatch(/value:\s+felipe-william\b/);
 
     page.on('console', (message) => {
       if (message.type() === 'error' || message.type() === 'warning') {
