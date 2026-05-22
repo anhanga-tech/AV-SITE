@@ -1,3 +1,5 @@
+const SCORES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
 const SCORE_LABELS: Record<number, string> = {
   0: 'Nada provável',
   5: 'Neutro',
@@ -17,16 +19,16 @@ export function NpsScoreSelector({ score, onSelect }: NpsScoreSelectorProps) {
       </legend>
 
       <div className="nps-score-grid">
-        {Array.from({ length: 11 }, (_, i) => (
+        {SCORES.map((n) => (
           <button
-            key={`score-${i}`}
+            key={n}
             type="button"
-            onClick={() => onSelect(i)}
-            aria-pressed={score === i}
-            aria-label={`Nota ${i}${SCORE_LABELS[i] ? ` — ${SCORE_LABELS[i]}` : ''}`}
+            onClick={() => onSelect(n)}
+            aria-pressed={score === n}
+            aria-label={`Nota ${n}${SCORE_LABELS[n] ? ` — ${SCORE_LABELS[n]}` : ''}`}
             className="nps-score-btn"
           >
-            {i}
+            {n}
           </button>
         ))}
       </div>

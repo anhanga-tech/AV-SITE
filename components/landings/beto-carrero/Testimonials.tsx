@@ -66,7 +66,7 @@ const Testimonials: React.FC = () => {
 
                  {/* Stars */}
                  <div className="flex gap-1 mb-6 text-fun-yellow relative z-10">
-                   {[...Array(5)].map((_, i) => <Star key={`star-${i}`} fill="currentColor" size={24} strokeWidth={2} className="drop-shadow-sm" />)}
+                   {[1, 2, 3, 4, 5].map((n) => <Star key={n} fill="currentColor" size={24} strokeWidth={2} className="drop-shadow-sm" />)}
                  </div>
 
                  {/* Quote Content */}

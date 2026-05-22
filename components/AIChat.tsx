@@ -37,33 +37,33 @@ interface Message {
  * and re-renders of static message content during chat interactions.
  */
 const FormattedText = memo(({ text }: { text: string }) => {
-  const paragraphs = text.split('\n').filter(p => p.trim() !== '');
+  const paragraphs = text.split('\n').filter(p => p.trim() !== '').map((paragraph, idx) => {
+    const isList = paragraph.trim().startsWith('-');
+    const cleanText = isList ? paragraph.replace('-', '').trim() : paragraph;
+    const parts = cleanText.split(/(\*\*.*?\*\*)/g).map((part, i) => ({ id: `${idx}-${i}`, part }));
+    return { id: `para-${idx}-${paragraph.slice(0, 20)}`, isList, parts };
+  });
 
   return (
     <div className="space-y-3 font-sans">
-      {paragraphs.map((paragraph, idx) => {
-        const isList = paragraph.trim().startsWith('-');
-        const cleanText = isList ? paragraph.replace('-', '').trim() : paragraph;
-
-        const parts = cleanText.split(/(\*\*.*?\*\*)/g);
-
-        const content = parts.map((part, i) => {
+      {paragraphs.map(({ id, isList, parts }) => {
+        const content = parts.map(({ id: partId, part }) => {
           if (part.startsWith('**') && part.endsWith('**')) {
-            return <strong key={`part-${i}`} className="font-bold text-zinc-900">{part.slice(2, -2)}</strong>;
+            return <strong key={partId} className="font-bold text-zinc-900">{part.slice(2, -2)}</strong>;
           }
           return part;
         });
 
         if (isList) {
           return (
-            <div key={`para-${idx}`} className="flex items-start gap-2 ml-1">
+            <div key={id} className="flex items-start gap-2 ml-1">
               <span className="shrink-0 mt-1.5 size-1.5 bg-brand-vibrant rounded-full opacity-70"></span>
               <span className="leading-relaxed text-zinc-700">{content}</span>
             </div>
           );
         }
 
-        return <p key={`para-${idx}`} className="leading-relaxed text-zinc-700">{content}</p>;
+        return <p key={id} className="leading-relaxed text-zinc-700">{content}</p>;
       })}
     </div>
   );
