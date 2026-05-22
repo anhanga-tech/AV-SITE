@@ -1,15 +1,13 @@
-import React from 'react';
+import React, { useSyncExternalStore } from 'react';
 
 interface ClientOnlyProps {
   children: React.ReactNode;
 }
 
-export const ClientOnly: React.FC<ClientOnlyProps> = ({ children }) => {
-  const [isMounted, setIsMounted] = React.useState(false);
+const subscribe = () => () => {};
 
-  React.useEffect(() => {
-    setIsMounted(true);
-  }, []);
+export const ClientOnly: React.FC<ClientOnlyProps> = ({ children }) => {
+  const isMounted = useSyncExternalStore(subscribe, () => true, () => false);
 
   if (!isMounted) {
     return null;

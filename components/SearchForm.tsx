@@ -626,7 +626,7 @@ const SearchButton = memo(({ isSearchLoading, validationError }: SearchButtonPro
     >
       {isSearchLoading ? (
         <>
-          <Loader2 className="w-6 h-6 animate-spin" />
+          <Loader2 className="size-6 animate-spin" />
           <span className="font-black text-lg">Planejando…</span>
         </>
       ) : (

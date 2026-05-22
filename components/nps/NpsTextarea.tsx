@@ -27,16 +27,10 @@ export function NpsTextarea({ id, value, onChange, placeholder, rows, required, 
         rows={rows}
         required={required}
         maxLength={maxLength}
-        className="w-full rounded-xl px-4 py-3 text-sm resize-none"
+        className="w-full rounded-xl px-4 py-3 text-sm resize-none font-sans bg-slate-800 text-slate-100 outline-none leading-[1.65] [transition:border-color_0.2s_ease,box-shadow_0.2s_ease]"
         style={{
-          fontFamily: 'Poppins, sans-serif',
-          background: '#1e293b',
-          color: '#f1f5f9',
           border: focused ? '2px solid #0ea5e9' : '2px solid #334155',
           boxShadow: focused ? '0 0 0 4px rgba(14,165,233,0.15)' : 'none',
-          outline: 'none',
-          transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
-          lineHeight: '1.65',
         }}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
@@ -44,13 +38,8 @@ export function NpsTextarea({ id, value, onChange, placeholder, rows, required, 
       {showCounter && (
         <p
           aria-live="polite"
-          style={{
-            textAlign: 'right',
-            fontSize: '0.7rem',
-            color: counterColor,
-            marginTop: '4px',
-            transition: 'color 0.2s ease',
-          }}
+          className="text-right text-[0.75rem] mt-1 [transition:color_0.2s_ease]"
+          style={{ color: counterColor }}
         >
           {charsLeft} {charsLeft === 1 ? 'caractere restante' : 'caracteres restantes'}
         </p>

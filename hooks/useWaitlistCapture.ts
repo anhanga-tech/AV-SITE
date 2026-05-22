@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { cleanString } from '../lib/lead-logic';
 import { getTrackingDataObject } from '../utils/whatsapp';
 import type { LeadTracking, LeadUtms } from '../types/leadCapture';
@@ -128,10 +128,6 @@ export function useWaitlistCapture() {
     const isLocallySubmitting = useRef(false);
     const [error, setError] = useState<string | null>(null);
     const [trackingState, setTrackingState] = useState(() => captureTrackingState());
-
-    useEffect(() => {
-        setTrackingState(captureTrackingState());
-    }, []);
 
     const refreshTrackingState = useCallback((): { tracking: LeadTracking; utms: LeadUtms } => {
         const latest = captureTrackingState();

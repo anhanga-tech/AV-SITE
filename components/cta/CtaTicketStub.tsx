@@ -7,7 +7,7 @@ export function CtaTicketStub() {
       {/* Stub Header */}
       <div className="flex justify-between items-center mb-5 opacity-60">
         <span className="text-[10px] font-bold tracking-widest uppercase">Anhangá Air</span>
-        <AirplaneTilt className="w-3 h-3" weight="fill" />
+        <AirplaneTilt className="size-3" weight="fill" />
       </div>
 
       {/* Passenger Name */}
@@ -82,14 +82,14 @@ export function CtaTicketStub() {
             <span className="font-mono text-[9px] font-bold tracking-[0.3em] text-zinc-400 uppercase">
               ETKT 29384910239
             </span>
-            <DeviceMobile className="w-3 h-3 text-zinc-300" weight="fill" />
+            <DeviceMobile className="size-3 text-zinc-300" weight="fill" />
           </div>
         </div>
       </div>
 
       {/* Decorative Stamp Watermark */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] rotate-[-30deg] pointer-events-none">
-        <AirplaneTilt className="w-32 h-32 text-brand-dark" weight="fill" />
+        <AirplaneTilt className="size-32 text-brand-dark" weight="fill" />
       </div>
     </div>
   );

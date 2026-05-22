@@ -66,9 +66,7 @@ export default function NPS() {
   const [errorMessage, setErrorMessage] = useState('');
   const [countdown, setCountdown] = useState(3);
   const [hoveredScore, setHoveredScore] = useState<number | null>(null);
-  const [year, setYear] = useState(() => new Date().getFullYear());
-
-  useEffect(() => { setYear(new Date().getFullYear()); }, []);
+  const [year] = useState(() => new Date().getFullYear());
 
   useEffect(() => {
     const prev = document.title;

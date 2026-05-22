@@ -18,6 +18,7 @@ import { LazyImage } from './ui/LazyImage';
  */
 const Testimonials: React.FC = memo(() => {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [isPaused, setIsPaused] = useState(false);
 
     const nextSlide = useCallback(() => {
         setCurrentIndex((prev) => (prev === TESTIMONIALS.length - 1 ? 0 : prev + 1));
@@ -28,12 +29,27 @@ const Testimonials: React.FC = memo(() => {
     }, []);
 
     useEffect(() => {
-        const interval = setInterval(nextSlide, 6000); // Aumentei um pouco o tempo para leitura
+        const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (isPaused || prefersReduced) return;
+        const interval = setInterval(nextSlide, 6000);
         return () => clearInterval(interval);
-    }, [nextSlide]);
+    }, [nextSlide, isPaused]);
 
     return (
-        <section id="depoimentos" className="py-24 bg-brand-light overflow-hidden relative">
+        <section
+            id="depoimentos"
+            className="py-24 bg-brand-light overflow-hidden relative"
+            aria-roledescription="carousel"
+            aria-label="Depoimentos de clientes"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            onFocus={() => setIsPaused(true)}
+            onBlur={(e) => {
+                if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                    setIsPaused(false);
+                }
+            }}
+        >
 
             {/* Background Decor */}
 
@@ -50,7 +66,7 @@ const Testimonials: React.FC = memo(() => {
                 <div className="max-w-4xl mx-auto relative">
 
                     {/* Viewport for Slides */}
-                    <div className="overflow-hidden py-4 px-2"> {/* Padding prevent shadow clip */}
+                    <div className="overflow-hidden py-4 px-2" aria-live={isPaused ? 'polite' : 'off'} aria-atomic="false"> {/* Padding prevent shadow clip */}
                         <div
                             className="flex transition-transform duration-700 ease-in-out will-change-transform"
                             style={{ transform: `translateX(-${currentIndex * 100}%)` }}
@@ -136,7 +152,8 @@ const Testimonials: React.FC = memo(() => {
                                     key={t.name}
                                     onClick={() => setCurrentIndex(i)}
                                     className={`h-2 rounded-full transition-[width,background-color] duration-300 ${i === currentIndex ? 'bg-brand-cyan w-8' : 'bg-brand-cyan/20 w-2 hover:bg-brand-cyan/40'}`}
-                                    aria-label={`Ir para depoimento ${i + 1}`}
+                                    aria-label={`Ir para depoimento ${i + 1} de ${TESTIMONIALS.length}`}
+                                    aria-current={i === currentIndex ? 'true' : undefined}
                                 />
                             ))}
                         </div>
