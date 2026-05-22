@@ -17,12 +17,13 @@ interface SelectOption {
 
 function extractAuthorOptions(configText: string): SelectOption[] {
   const authorField = configText.match(
-    /^\s+- label: Autor\n\s+name: author\n\s+widget: select\n\s+options:\n(?<options>(?:\s+- \{ label: .+\n?)+)/m,
+    /^\s+- label: Autor\r?\n\s+name: author\r?\n\s+widget: select\r?\n\s+options:\r?\n(?<options>(?:\s+- \{ label: .+\r?\n?)+)/m,
   );
 
-  assert.ok(authorField?.groups?.options, 'Expected Decap author field options to be declared');
+  const options = authorField?.groups?.options;
+  assert.ok(options, 'Expected Decap author field options to be declared');
 
-  return [...authorField.groups.options.matchAll(/label: ([^,]+), value: ([^ }]+)/g)].map(
+  return [...options.matchAll(/label: ([^,]+), value: ([^ }]+)/g)].map(
     ([, label, value]) => ({ label, value }),
   );
 }
@@ -39,6 +40,12 @@ test('Decap CMS author select mirrors the site author registry', () => {
     .sort((a, b) => a.value.localeCompare(b.value));
 
   assert.deepEqual(authorOptions, registeredAuthors);
+});
+
+test('Decap CMS author select parser accepts CRLF line endings', () => {
+  const configWithCrlf = adminConfig.replace(/\n/g, '\r\n');
+
+  assert.deepEqual(extractAuthorOptions(configWithCrlf), extractAuthorOptions(adminConfig));
 });
 
 test('Decap CMS admin HTML sets an explicit base path for config resolution', () => {
