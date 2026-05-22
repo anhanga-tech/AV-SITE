@@ -21,7 +21,7 @@ const attractions: Attraction[] = [
     name: "FireWhip",
     category: "Radical",
     description: "A única montanha-russa invertida do Brasil. 5 loopings e pernas soltas no ar!",
-    image: optimizeRemoteImageUrl(`${PROD_ASSET_BASE}/firewhip.jpg`, 800),
+    image: optimizeRemoteImageUrl(`${PROD_ASSET_BASE}/firewhip.webp`, 800),
     color: "bg-fun-pink",
     icon: <Flame size={18} strokeWidth={3} className="text-white" />,
     rotation: "rotate-2"
@@ -31,7 +31,7 @@ const attractions: Attraction[] = [
     name: "Hot Wheels",
     category: "Show",
     description: "Manobras radicais, drift e muita velocidade em tamanho real. É de cair o queixo.",
-    image: optimizeRemoteImageUrl(`${PROD_ASSET_BASE}/hotwheels.png`, 800),
+    image: optimizeRemoteImageUrl(`${PROD_ASSET_BASE}/hotwheels.webp`, 800),
     color: "bg-fun-yellow",
     icon: <Star size={18} strokeWidth={3} className="text-fun-dark" />,
     rotation: "-rotate-1"
@@ -41,7 +41,7 @@ const attractions: Attraction[] = [
     name: "Crazy River",
     category: "Família",
     description: "Um rafting maluco nas corredeiras. Cuidado: você VAI se molhar.",
-    image: optimizeRemoteImageUrl(`${PROD_ASSET_BASE}/crazy-river.jpg`, 800),
+    image: optimizeRemoteImageUrl(`${PROD_ASSET_BASE}/crazy-river.webp`, 800),
     color: "bg-fun-green",
     icon: <Users size={18} strokeWidth={3} className="text-white" />,
     rotation: "rotate-1"
@@ -51,7 +51,7 @@ const attractions: Attraction[] = [
     name: "Big Tower",
     category: "Adrenalina",
     description: "100 metros de queda livre. A vista é linda, se você tiver coragem de abrir o olho.",
-    image: optimizeRemoteImageUrl(`${PROD_ASSET_BASE}/big-tower.jpg`, 800),
+    image: optimizeRemoteImageUrl(`${PROD_ASSET_BASE}/big-tower.webp`, 800),
     color: "bg-fun-blue",
     icon: <Zap size={18} strokeWidth={3} className="text-white" />,
     rotation: "-rotate-2"

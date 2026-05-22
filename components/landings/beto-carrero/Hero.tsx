@@ -76,10 +76,11 @@ const Hero: React.FC = () => {
 
               <div className="bg-zinc-200 border-2 border-fun-dark overflow-hidden rounded-sm relative w-full h-full">
                 <img
-                  src={optimizeRemoteImageUrl(`${PROD_ASSET_BASE}/grupo-em-frente-ao-castelo.jpg`, 1200)}
+                  src={optimizeRemoteImageUrl(`${PROD_ASSET_BASE}/grupo-em-frente-ao-castelo.webp`, 1200)}
                   alt="Grupo em frente ao Castelo Beto Carrero"
                   width="600"
                   height="800"
+                  fetchPriority="high"
                   className="object-cover w-full h-full transform group-hover:scale-110 transition-transform duration-700"
                 />
               </div>
