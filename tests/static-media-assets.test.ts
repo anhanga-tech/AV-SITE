@@ -303,6 +303,32 @@ test('remaining runtime media dependencies should use managed Cloudflare assets'
   assert.match(blogPost, /image: "images\/blog\/blog-viagem-solo-feminina\.png"/);
 });
 
+test('hero videos should all point to the media zone /videos/ path with .mp4 extension', async () => {
+  const mediaConfig = await readRepoFile('data/mediaConfig.ts');
+
+  const videoUrlMatches = [...mediaConfig.matchAll(/getMediaUrl\('(videos\/.+?\.mp4)'\)/g)];
+  assert.ok(videoUrlMatches.length >= 5, `Expected at least 5 hero video URLs, found ${videoUrlMatches.length}`);
+
+  for (const [, path] of videoUrlMatches) {
+    assert.ok(
+      path.startsWith('videos/'),
+      `Video path ${path} should start with videos/`,
+    );
+    assert.ok(
+      path.endsWith('.mp4'),
+      `Video path ${path} should end with .mp4`,
+    );
+  }
+
+  const posterMatches = [...mediaConfig.matchAll(/getMediaUrl\('(images\/hero\/.+?-poster\.jpg)'\)/g)];
+  assert.ok(posterMatches.length >= 5, `Expected at least 5 poster URLs, found ${posterMatches.length}`);
+});
+
+test('lollapalooza landing video should point to the media zone /videos/ path', async () => {
+  const lollaHero = await readRepoFile('components/landings/lollapalooza/Hero.tsx');
+  assert.match(lollaHero, /videos\/lollapalooza\/hero\/crowd-background\.mp4/);
+});
+
 test('blog posts should not hotlink third-party cover images', async () => {
   const filenames = await readdir(new URL('../content/blog', import.meta.url));
   const postFiles = filenames.filter((filename) => filename.endsWith('.mdx') && !filename.startsWith('_'));
