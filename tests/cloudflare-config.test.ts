@@ -27,6 +27,35 @@ function collectTomlVarsSection(source: string, sectionName: string): Map<string
   return vars;
 }
 
+function collectHeadersBlocks(source: string): Map<string, Map<string, string>> {
+  const blocks = new Map<string, Map<string, string>>();
+  let currentPath: string | undefined;
+
+  for (const rawLine of source.split(/\r?\n/)) {
+    if (!rawLine.trim()) continue;
+
+    const line = rawLine.trim();
+    if (line.startsWith('#')) continue;
+
+    if (!rawLine.startsWith(' ') && !rawLine.startsWith('\t')) {
+      currentPath = line;
+      if (!blocks.has(currentPath)) {
+        blocks.set(currentPath, new Map());
+      }
+      continue;
+    }
+
+    if (!currentPath) continue;
+
+    const headerMatch = line.match(/^([^:]+):\s*(.+)$/);
+    if (headerMatch) {
+      blocks.get(currentPath)?.set(headerMatch[1], headerMatch[2]);
+    }
+  }
+
+  return blocks;
+}
+
 test('Cloudflare Pages build should use the repo Node runtime target', async () => {
   const nodeVersion = await readFile(new URL('../.node-version', import.meta.url), 'utf8');
 
@@ -61,6 +90,18 @@ test('Cloudflare redirects should avoid redundant SPA fallback rewrites', async 
   const redirects = await readFile(new URL('../public/_redirects', import.meta.url), 'utf8');
 
   assert.doesNotMatch(redirects, /^\/\*\s+\/index\.html\s+200$/m);
+});
+
+test('Cloudflare Pages headers should cache hashed Vite assets immutably', async () => {
+  const headers = await readFile(new URL('../public/_headers', import.meta.url), 'utf8');
+  const blocks = collectHeadersBlocks(headers);
+  const assetHeaders = blocks.get('/assets/*');
+  const globalHeaders = blocks.get('/*');
+
+  assert.ok(assetHeaders);
+  assert.ok(globalHeaders);
+  assert.equal(assetHeaders.get('Cache-Control'), 'public, max-age=31536000, immutable');
+  assert.notEqual(globalHeaders.get('Cache-Control'), assetHeaders.get('Cache-Control'));
 });
 
 test('Cloudflare splat redirects should come after exact redirects', async () => {
