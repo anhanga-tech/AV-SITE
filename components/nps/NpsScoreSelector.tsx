@@ -14,7 +14,7 @@ export interface NpsScoreSelectorProps {
 export function NpsScoreSelector({ score, onSelect }: NpsScoreSelectorProps) {
   return (
     <fieldset className="mb-8">
-      <legend className="block text-xs font-bold uppercase mb-4 tracking-[0.15em] text-slate-400">
+      <legend className="nps-score-legend block text-xs font-bold uppercase mb-4 text-slate-400">
         De 0 a 10, o quanto você recomendaria a Anhangá Viagens para um amigo ou familiar?
       </legend>
 

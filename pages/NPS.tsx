@@ -47,6 +47,13 @@ const PAGE_STYLES = `
     transform: translate(0, 0) !important;
     box-shadow: 2px 2px 0 #003B8E !important;
   }
+  .nps-field-label {
+    letter-spacing: 0.15em;
+    color: #94a3b8;
+  }
+  .nps-score-legend {
+    letter-spacing: 0.15em;
+  }
   @media (prefers-reduced-motion: reduce) {
     .nps-score-btn, .nps-cta, .nps-submit { transition: none !important; }
     .nps-thank-card { animation: none !important; opacity: 1 !important; transform: none !important; }
@@ -162,8 +169,7 @@ export default function NPS() {
                 <div className="mb-6">
                   <label
                     htmlFor="nps-reason"
-                    className="block text-xs font-bold uppercase mb-2"
-                    style={{ letterSpacing: '0.15em', color: '#94a3b8' }}
+                    className="nps-field-label block text-xs font-bold uppercase mb-2"
                   >
                     O que te levou a dar essa nota?
                   </label>
@@ -181,8 +187,7 @@ export default function NPS() {
                 <div className="mb-8">
                   <label
                     htmlFor="nps-highlight"
-                    className="block text-xs font-bold uppercase mb-2"
-                    style={{ letterSpacing: '0.15em', color: '#94a3b8' }}
+                    className="nps-field-label block text-xs font-bold uppercase mb-2"
                   >
                     Qual foi o momento mais marcante da viagem?{' '}
                     <span

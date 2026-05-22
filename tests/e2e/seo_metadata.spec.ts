@@ -46,13 +46,13 @@ test.describe('SEO Metadata Verification', () => {
       // 4. Verify Hreflang Tags (pt-BR and x-default) — skipped for noHreflang pages
       if (!route.noHreflang) {
         const hreflangs = ['pt-BR', 'x-default'];
-        for (const lang of hreflangs) {
-          await test.step(`Verify hreflang="${lang}"`, async () => {
+        await Promise.all(hreflangs.map((lang) =>
+          test.step(`Verify hreflang="${lang}"`, async () => {
             const link = page.locator(`link[hreflang="${lang}"]`);
             await expect(link).toHaveAttribute('href', route.expectedCanonical, { timeout: 10000 });
             await expect(link).toHaveCount(1);
-          });
-        }
+          })
+        ));
       } else {
         await test.step('Verify no hreflang tags (noHreflang page)', async () => {
           await expect(page.locator('link[hreflang]')).toHaveCount(0);
