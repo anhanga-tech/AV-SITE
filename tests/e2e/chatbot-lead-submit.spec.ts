@@ -84,7 +84,7 @@ test.describe('Chatbot lead handoff', () => {
 
     await page.getByRole('button', { name: 'Salvar e abrir WhatsApp' }).click();
 
-    await expect(page.getByText('Salvando...')).toBeVisible();
+    await expect(page.getByText('Salvando…')).toBeVisible();
     await expect.poll(() => submitRequestCount).toBe(1);
     await expect.poll(() => page.evaluate(() => window.__openedUrls?.length ?? 0)).toBe(1);
     await expect
