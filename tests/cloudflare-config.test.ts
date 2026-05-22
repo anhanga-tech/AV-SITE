@@ -39,7 +39,9 @@ function collectHeadersBlocks(source: string): Map<string, Map<string, string>> 
 
     if (!rawLine.startsWith(' ') && !rawLine.startsWith('\t')) {
       currentPath = line;
-      blocks.set(currentPath, new Map());
+      if (!blocks.has(currentPath)) {
+        blocks.set(currentPath, new Map());
+      }
       continue;
     }
 
@@ -94,10 +96,12 @@ test('Cloudflare Pages headers should cache hashed Vite assets immutably', async
   const headers = await readFile(new URL('../public/_headers', import.meta.url), 'utf8');
   const blocks = collectHeadersBlocks(headers);
   const assetHeaders = blocks.get('/assets/*');
+  const globalHeaders = blocks.get('/*');
 
   assert.ok(assetHeaders);
+  assert.ok(globalHeaders);
   assert.equal(assetHeaders.get('Cache-Control'), 'public, max-age=31536000, immutable');
-  assert.notEqual(blocks.get('/*')?.get('Cache-Control'), assetHeaders.get('Cache-Control'));
+  assert.notEqual(globalHeaders.get('Cache-Control'), assetHeaders.get('Cache-Control'));
 });
 
 test('Cloudflare splat redirects should come after exact redirects', async () => {
