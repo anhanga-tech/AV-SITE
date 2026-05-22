@@ -304,7 +304,7 @@ const DateField = memo(({
           {WEEK_DAYS.map((day) => <div key={day}>{day}</div>)}
         </div>
         <div className="grid grid-cols-7 gap-y-1">
-          {calendarDays.map((date, index) => ({ slot: index, date })).map(({ slot, date }) => {
+          {calendarDays.map((date, slot) => {
             if (!date) return <div key={`empty-${slot}`} />;
 
             const selected = isDateSelected(date);
@@ -428,17 +428,17 @@ const GuestsField = memo(({
 
         {children > 0 && (
           <div className="mb-4 grid grid-cols-2 gap-2 max-h-32 overflow-y-auto pr-1 custom-scrollbar animate-fade-in-up">
-            {childAges.map((age, i) => ({ childNum: i + 1, slotIndex: i, age })).map(({ childNum, slotIndex, age }) => (
-              <div key={`child-age-${childNum}`} className="flex flex-col">
-                <label htmlFor={`child-age-input-${childNum}`} className="text-[10px] text-zinc-400 font-bold mb-1">Idade Criança {childNum}</label>
+            {childAges.map((age, i) => (
+              <div key={`child-age-${i + 1}`} className="flex flex-col">
+                <label htmlFor={`child-age-input-${i + 1}`} className="text-[10px] text-zinc-400 font-bold mb-1">Idade Criança {i + 1}</label>
                 <input
-                  id={`child-age-input-${childNum}`}
+                  id={`child-age-input-${i + 1}`}
                   type="number"
                   min="0"
                   max="17"
                   value={age}
                   onClick={(event) => event.stopPropagation()}
-                  onChange={(event) => onChildAgeChange(slotIndex, event.target.value)}
+                  onChange={(event) => onChildAgeChange(i, event.target.value)}
                   className="w-full border-2 border-zinc-100 rounded-lg px-2 py-1 text-sm font-bold text-zinc-700 outline-none focus:border-brand-cyan transition-colors"
                   placeholder="Ex: 5"
                 />
