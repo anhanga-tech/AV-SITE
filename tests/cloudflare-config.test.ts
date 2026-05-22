@@ -92,6 +92,12 @@ test('Cloudflare redirects should avoid redundant SPA fallback rewrites', async 
   assert.doesNotMatch(redirects, /^\/\*\s+\/index\.html\s+200$/m);
 });
 
+test('Cloudflare redirects should keep blog routes on the main site', async () => {
+  const redirects = await readFile(new URL('../public/_redirects', import.meta.url), 'utf8');
+
+  assert.doesNotMatch(redirects, /^\/blog(?:\s|\/\*)\s+https:\/\/blog\.anhanga\.tur\.br\b/m);
+});
+
 test('Cloudflare Pages headers should cache hashed Vite assets immutably', async () => {
   const headers = await readFile(new URL('../public/_headers', import.meta.url), 'utf8');
   const blocks = collectHeadersBlocks(headers);
@@ -104,7 +110,7 @@ test('Cloudflare Pages headers should cache hashed Vite assets immutably', async
   assert.notEqual(globalHeaders.get('Cache-Control'), assetHeaders.get('Cache-Control'));
 });
 
-test('Cloudflare splat redirects should come after exact redirects', async () => {
+test('Cloudflare splat redirects should come after exact redirects when present', async () => {
   const redirects = await readFile(new URL('../public/_redirects', import.meta.url), 'utf8');
   const lines = redirects
     .split(/\r?\n/)
@@ -114,7 +120,8 @@ test('Cloudflare splat redirects should come after exact redirects', async () =>
     });
   const blogSplatIndex = lines.findIndex((line) => line.startsWith('/blog/* '));
 
-  assert.notEqual(blogSplatIndex, -1);
+  if (blogSplatIndex === -1) return;
+
   assert.equal(
     lines.slice(blogSplatIndex + 1).some((line) => !line.includes('*')),
     false,
