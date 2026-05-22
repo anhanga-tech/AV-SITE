@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
+const LEGACY_BLOG_HOST_REDIRECT_RE = /^\/blog(?:[\/\s*].*)?\s+https:\/\/blog\.anhanga\.tur\.br\b/m;
+
 function collectTomlVarsSection(source: string, sectionName: string): Map<string, string> {
   const vars = new Map<string, string>();
   let inSection = false;
@@ -56,6 +58,35 @@ function collectHeadersBlocks(source: string): Map<string, Map<string, string>> 
   return blocks;
 }
 
+function normalizeRedirectLine(line: string): string {
+  return line.trim().replace(/^["']|["']$/g, '');
+}
+
+function collectRedirectRules(source: string): string[] {
+  return source
+    .split(/\r?\n/)
+    .flatMap((line) => {
+      const normalized = normalizeRedirectLine(line);
+      return normalized && !normalized.startsWith('#') ? [normalized] : [];
+    });
+}
+
+function hasLegacyBlogHostRedirect(source: string): boolean {
+  return collectRedirectRules(source).some((line) => LEGACY_BLOG_HOST_REDIRECT_RE.test(line));
+}
+
+function hasExactRedirectAfterFirstSplat(source: string): boolean {
+  const lines = collectRedirectRules(source);
+  const firstSplatIndex = lines.findIndex((line) => normalizeRedirectLine(line).includes('*'));
+
+  if (firstSplatIndex === -1) return false;
+
+  return lines.slice(firstSplatIndex + 1).some((line) => {
+    const normalized = normalizeRedirectLine(line);
+    return normalized.length > 0 && !normalized.includes('*');
+  });
+}
+
 test('Cloudflare Pages build should use the repo Node runtime target', async () => {
   const nodeVersion = await readFile(new URL('../.node-version', import.meta.url), 'utf8');
 
@@ -92,6 +123,18 @@ test('Cloudflare redirects should avoid redundant SPA fallback rewrites', async 
   assert.doesNotMatch(redirects, /^\/\*\s+\/index\.html\s+200$/m);
 });
 
+test('Cloudflare redirects should keep blog routes on the main site', async () => {
+  const redirects = await readFile(new URL('../public/_redirects', import.meta.url), 'utf8');
+
+  assert.equal(hasLegacyBlogHostRedirect(redirects), false);
+});
+
+test('Cloudflare blog redirect guard should catch nested legacy blog routes', () => {
+  const redirects = '/blog/post-1  https://blog.anhanga.tur.br/post-1  301';
+
+  assert.equal(hasLegacyBlogHostRedirect(redirects), true);
+});
+
 test('Cloudflare Pages headers should cache hashed Vite assets immutably', async () => {
   const headers = await readFile(new URL('../public/_headers', import.meta.url), 'utf8');
   const blocks = collectHeadersBlocks(headers);
@@ -104,19 +147,17 @@ test('Cloudflare Pages headers should cache hashed Vite assets immutably', async
   assert.notEqual(globalHeaders.get('Cache-Control'), assetHeaders.get('Cache-Control'));
 });
 
-test('Cloudflare splat redirects should come after exact redirects', async () => {
+test('Cloudflare splat redirects should come after exact redirects when present', async () => {
   const redirects = await readFile(new URL('../public/_redirects', import.meta.url), 'utf8');
-  const lines = redirects
-    .split(/\r?\n/)
-    .flatMap((line) => {
-      const t = line.trim();
-      return t && !t.startsWith('#') ? [t] : [];
-    });
-  const blogSplatIndex = lines.findIndex((line) => line.startsWith('/blog/* '));
 
-  assert.notEqual(blogSplatIndex, -1);
-  assert.equal(
-    lines.slice(blogSplatIndex + 1).some((line) => !line.includes('*')),
-    false,
-  );
+  assert.equal(hasExactRedirectAfterFirstSplat(redirects), false);
+});
+
+test('Cloudflare splat redirect ordering guard should handle non-blog splats', () => {
+  const redirects = [
+    '/assets/*  /assets/:splat  301',
+    '/admin  /admin/  301',
+  ].join('\n');
+
+  assert.equal(hasExactRedirectAfterFirstSplat(redirects), true);
 });
