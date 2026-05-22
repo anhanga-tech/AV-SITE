@@ -17,4 +17,4 @@ export const BETO_CARRERO_LANDING_IMAGE_URL =
   'https://media.anhanga.tur.br/images/categories/beto-carrero-world.jpg';
 
 export const BETO_CARRERO_FIREWHIP_IMAGE_URL =
-  'https://media.anhanga.tur.br/images/beto-carrero/landing/firewhip.jpg';
+  'https://media.anhanga.tur.br/images/beto-carrero/landing/firewhip.webp';
