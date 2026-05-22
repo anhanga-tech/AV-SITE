@@ -1,7 +1,6 @@
-# Blog redirects
-/blog/tag/dicas  https://blog.anhanga.tur.br/tag/dicas-de-expert/  301
-/blog/tag/dicas/  https://blog.anhanga.tur.br/tag/dicas-de-expert/  301
-/blog    https://blog.anhanga.tur.br    301
+# Legacy blog tag redirects
+/blog/tag/dicas  /blog  301
+/blog/tag/dicas/  /blog  301
 
 # Lollapalooza slug change
 /lollapalooza-2026    /lollapalooza    301
@@ -16,6 +15,3 @@
 /.well-known/api-catalog    /api/api-catalog    302
 /.well-known/api-docs       /api/api-docs       302
 /.well-known/openapi.json   /api/openapi        302
-
-# Blog catch-all must stay after exact redirects.
-/blog/*  https://blog.anhanga.tur.br/:splat  301
