@@ -89,6 +89,8 @@ test('resolveGeminiProviderConfig should build authenticated Cloudflare AI Gatew
         'https://gateway.ai.cloudflare.com/v1/account-123/travel-gateway/google-ai-studio',
     );
     assert.equal(clientOptions.httpOptions?.headers?.['cf-aig-authorization'], 'Bearer cf-token');
+    assert.equal(clientOptions.httpOptions?.headers?.['cf-aig-collect-log-payload'], 'false');
+    assert.equal(clientOptions.httpOptions?.headers?.['cf-aig-skip-cache'], 'true');
 
     const metadataHeader = clientOptions.httpOptions?.headers?.['cf-aig-metadata'];
     assert.equal(typeof metadataHeader, 'string');
