@@ -31,12 +31,15 @@ Cloudflare Dashboard → zona `anhanga.tur.br` → Caching → Cache Rules → C
 
 ### Resultado esperado
 
-Após ativar a regra, requisições repetidas devem mostrar progressão:
+Após ativar a regra, requisições GET repetidas devem mostrar progressão:
 
 ```
-cf-cache-status: MISS    → primeiro request (popula o cache)
-cf-cache-status: HIT     → requests subsequentes
+cf-cache-status: REVALIDATED  → primeiro GET (popula o cache; comportamento normal em R2 custom domains)
+cf-cache-status: HIT          → GETs subsequentes
 ```
+
+> R2 custom domains retornam `REVALIDATED` no primeiro GET porque o Cloudflare valida o asset
+> contra a origem antes de o escrever na borda — é o comportamento esperado, não um erro.
 
 `Accept-Ranges: bytes` deve continuar presente para suportar range requests (Safari/iOS).
 
@@ -57,19 +60,29 @@ Todos os vídeos referenciados em `data/mediaConfig.ts` e landings:
 
 ## Validação
 
+> **Atenção:** use requisições GET, não HEAD (`-I`). Cloudflare não popula nem serve cache
+> para HEAD requests — eles sempre retornam `cf-cache-status: DYNAMIC`, independente da regra.
+> O flag `-o /dev/null` descarta o body; `Range: bytes=0-1023` evita baixar o arquivo inteiro.
+
 Após criar a regra, verificar com:
 
 ```bash
-# Primeiro request (espera MISS)
-curl -sSI https://media.anhanga.tur.br/videos/hero/rio.mp4 | grep -i "cf-cache\|cache-control\|accept-ranges"
+# Primeiro request (espera MISS ou REVALIDATED)
+curl -sS -o /dev/null -D - -H "Range: bytes=0-1023" \
+  https://media.anhanga.tur.br/videos/hero/rio.mp4 \
+  | grep -i "cf-cache\|cache-control\|accept-ranges"
 
 # Segundo request (espera HIT)
-curl -sSI https://media.anhanga.tur.br/videos/hero/rio.mp4 | grep -i "cf-cache\|cache-control\|accept-ranges"
+curl -sS -o /dev/null -D - -H "Range: bytes=0-1023" \
+  https://media.anhanga.tur.br/videos/hero/rio.mp4 \
+  | grep -i "cf-cache\|cache-control\|accept-ranges"
 
 # Verificar todos os vídeos
 for v in videos/hero/rio.mp4 videos/hero/paris.mp4 videos/hero/maldivas.mp4 videos/hero/new-york.mp4 videos/hero/natureza.mp4 videos/lollapalooza/hero/crowd-background.mp4; do
   echo "=== $v ==="
-  curl -sSI "https://media.anhanga.tur.br/$v" | grep -i "cf-cache\|cache-control\|accept-ranges"
+  curl -sS -o /dev/null -D - -H "Range: bytes=0-1023" \
+    "https://media.anhanga.tur.br/$v" \
+    | grep -i "cf-cache\|cache-control\|accept-ranges"
 done
 ```
 
