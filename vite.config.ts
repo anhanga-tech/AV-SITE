@@ -174,8 +174,8 @@ function stripMdxFrontmatterPlugin() {
   };
 }
 
-const visualizerPlugin = process.env.ANALYZE === 'true'
-  ? (await import('rollup-plugin-visualizer')).visualizer({ filename: 'dist/stats.html', open: false, gzipSize: true })
+const visualizerModule = process.env.ANALYZE === 'true'
+  ? await import('rollup-plugin-visualizer')
   : null;
 
 export default defineConfig(({ mode, isSsrBuild }) => {
@@ -194,6 +194,10 @@ export default defineConfig(({ mode, isSsrBuild }) => {
   const devHost = env.VITE_DEV_HOST || process.env.VITE_DEV_HOST || '0.0.0.0';
   const devPort = Number(env.VITE_DEV_PORT || process.env.VITE_DEV_PORT || '3000');
   const devStrictPort = (env.VITE_DEV_STRICT_PORT || process.env.VITE_DEV_STRICT_PORT || 'false') === 'true';
+  const shouldAnalyze = (env.ANALYZE || process.env.ANALYZE) === 'true';
+  const visualizerPlugin = visualizerModule && shouldAnalyze && !isSsrBuild
+    ? visualizerModule.visualizer({ filename: 'dist/stats.html', open: false, gzipSize: true })
+    : null;
 
   // Logs de debug (útil para verificar se a variável está sendo carregada)
   logger.debug(`🔧 Building with base path: ${base}`);
@@ -236,7 +240,7 @@ export default defineConfig(({ mode, isSsrBuild }) => {
       minify: 'esbuild',
       rollupOptions: {
         output: {
-          manualChunks: isSsrBuild ? undefined : (id) => {
+          manualChunks: isSsrBuild ? undefined : (id: string) => {
             if (id.includes('/node_modules/react/') || id.includes('/node_modules/react-dom/') || id.includes('/node_modules/react-router-dom/')) {
               return 'react-vendor';
             }
