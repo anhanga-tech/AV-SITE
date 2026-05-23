@@ -155,7 +155,7 @@ test('Cloudflare Pages headers should include HSTS on the global route', async (
   assert.ok(globalHeaders, 'global /* block must exist');
   const hsts = globalHeaders.get('Strict-Transport-Security');
   assert.ok(hsts, 'Strict-Transport-Security header must be present in /* block');
-  assert.match(hsts, /^max-age=\d+/, 'Strict-Transport-Security must start with max-age=<number>');
+  assert.match(hsts, /^max-age=\d+/i, 'Strict-Transport-Security must start with max-age=<number>');
 });
 
 test('Cloudflare Pages HSTS should not include subdomains until subdomain inventory is complete', async () => {
@@ -165,7 +165,7 @@ test('Cloudflare Pages HSTS should not include subdomains until subdomain invent
 
   assert.ok(globalHeaders, 'global /* block must exist');
   const hsts = globalHeaders.get('Strict-Transport-Security') ?? '';
-  assert.doesNotMatch(hsts, /includeSubDomains/, 'includeSubDomains must not be set until beto.anhanga.tur.br HTTPS status is confirmed');
+  assert.doesNotMatch(hsts, /includesubdomains/i, 'includeSubDomains must not be set until beto.anhanga.tur.br HTTPS status is confirmed');
 });
 
 test('Cloudflare splat redirects should come after exact redirects when present', async () => {
