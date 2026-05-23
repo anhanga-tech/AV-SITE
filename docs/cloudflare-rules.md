@@ -9,7 +9,7 @@ Related evidence:
 
 - Baseline measurements: [`docs/baselines/cloudflare-2026-05-23.md`](./baselines/cloudflare-2026-05-23.md)
 - Media cache rule details: [`docs/cloudflare-cache-rules.md`](./cloudflare-cache-rules.md)
-- Cloudflare Security Insights export: [`docs/Cloudflare_Anhangá Viagens_SecurityInsights_20260510_2123.csv`](./Cloudflare_Anhangá%20Viagens_SecurityInsights_20260510_2123.csv)
+- Cloudflare Security Insights export: [`docs/cloudflare-security-insights-20260510-2123.csv`](./cloudflare-security-insights-20260510-2123.csv)
 - Repo regression guard: [`tests/cloudflare-config.test.ts`](../tests/cloudflare-config.test.ts)
 
 ## Source of truth boundaries
@@ -119,7 +119,7 @@ Use GET requests with `Range`, not HEAD, when checking whether this rule populat
 ```bash
 curl -sS -o /dev/null -D - -H "Range: bytes=0-1023" \
   https://media.anhanga.tur.br/videos/hero/rio.mp4 \
-  | grep -i "cf-cache\\|cache-control\\|accept-ranges"
+  | grep -Ei "cf-cache-status|cache-control|accept-ranges"
 ```
 
 The expected steady-state signal is `cf-cache-status: HIT` on repeated requests from
@@ -210,7 +210,7 @@ curl -sSI \
   https://media.anhanga.tur.br/cdn-cgi/image/format=webp,quality=85,metadata=none,fit=cover,width=1280,height=720/images/hero/rio-poster.jpg
 curl -sS -o /dev/null -D - -H "Range: bytes=0-1023" \
   https://media.anhanga.tur.br/videos/hero/rio.mp4 \
-  | grep -i "cf-cache\\|cache-control\\|accept-ranges"
+  | grep -Ei "cf-cache-status|cache-control|accept-ranges"
 ```
 
 When a dashboard rule cannot be verified because of plan limits or missing dashboard
