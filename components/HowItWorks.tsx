@@ -116,6 +116,7 @@ const HowItWorks = memo(() => {
                         stroke="#cbd5e1"
                         strokeWidth="4"
                         strokeDasharray="12 12"
+                        strokeLinecap="round"
                         className="opacity-30"
                     />
                     {/* Caminho animado — desenha-se sobre o ghost ao entrar na viewport */}
@@ -128,7 +129,7 @@ const HowItWorks = memo(() => {
                         initial={{ pathLength: 0 }}
                         whileInView={{ pathLength: 1 }}
                         viewport={{ once: true, amount: 0.1 }}
-                        transition={{ duration: 2.2, ease: "easeInOut" }}
+                        transition={{ duration: 2.2, ease: EASE_EXPO }}
                     />
                 </svg>
             </div>
