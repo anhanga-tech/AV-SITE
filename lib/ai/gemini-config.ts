@@ -142,7 +142,9 @@ export function buildGeminiClientOptions(config: Exclude<GeminiProviderConfig, G
             baseUrl: config.gatewayBaseUrl,
             headers: {
                 'cf-aig-authorization': `Bearer ${config.gatewayToken}`,
+                'cf-aig-collect-log-payload': 'false',
                 'cf-aig-metadata': JSON.stringify(config.metadata),
+                'cf-aig-skip-cache': 'true',
             },
         },
     };
