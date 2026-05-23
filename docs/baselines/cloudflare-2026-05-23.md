@@ -40,6 +40,8 @@ cf-cache-status: DYNAMIC
 content-length: 19190897   (~18,3 MB)
 etag: "e97891569d3951faec749f387f69bc2e"
 last-modified: Tue, 31 Mar 2026 19:34:28 GMT
+speculation-rules: "/cdn-cgi/speculation"
+cf-ray: a001833b5b64864b-GRU
 ```
 
 **Diagnóstico:** Vídeo de 18,3 MB servido como DYNAMIC. R2 não envia `Cache-Control` por padrão — Cloudflare não cacheia sem cache rule. Cada request baixa o vídeo completo da origem. Este é o maior impacto de cache identificado no baseline.
@@ -128,7 +130,7 @@ Cache Analytics **não disponível** — requer plano pago (Pro ou superior). O 
 A sprint será declarada bem-sucedida quando, na medição pós-mudanças:
 
 1. **Vídeo hero** — `cf-cache-status: HIT` no segundo request ao mesmo PoP.
-2. **Cache Hit Ratio** — aumento mensurável no Cache Analytics (alvo: >60% de requests em HIT ou REVALIDATED para `media.anhanga.tur.br`).
+2. **Cache Hit Ratio** — aumento mensurável via amostragem de headers HTTP (`cf-cache-status: HIT` vs `DYNAMIC`) em requests repetidos ao mesmo PoP (alvo: >60% de requests em HIT ou REVALIDATED para `media.anhanga.tur.br`). Cache Analytics não disponível no plano atual.
 3. **LCP p75** (zone) — manutenção ou melhora em relação ao baseline de 2.872 ms (P75 atual, dominado por tráfego interno).
 4. **Speed Brain** — permanecer ativo; sem regressão nos dados de navegação.
 
