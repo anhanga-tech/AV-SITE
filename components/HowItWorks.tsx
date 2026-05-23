@@ -1,4 +1,5 @@
 import React, { memo } from 'react';
+import { m } from 'framer-motion';
 import {
   ChatCircleDots,
   PaintBrushBroad,
@@ -10,6 +11,9 @@ import {
   Heart,
 } from '@phosphor-icons/react';
 import { openContactModal } from '../utils/contactForm';
+
+const PATH_D = "M 500 50 C 500 150, 200 150, 200 250 C 200 350, 800 350, 800 450 C 800 550, 200 550, 200 650 C 200 750, 500 750, 500 800";
+const EASE_EXPO = [0.16, 1, 0.3, 1] as const;
 
 // Moved outside component to prevent re-allocation on every render
 const STEPS = [
@@ -105,13 +109,26 @@ const HowItWorks = memo(() => {
             {/* The Winding Path (Dashed Line SVG) - Desktop Only */}
             <div className="hidden md:block absolute top-0 left-0 w-full h-full pointer-events-none z-0">
                 <svg className="w-full h-full" viewBox="0 0 1000 800" preserveAspectRatio="none">
-                    <path 
-                        d="M 500 50 C 500 150, 200 150, 200 250 C 200 350, 800 350, 800 450 C 800 550, 200 550, 200 650 C 200 750, 500 750, 500 800" 
-                        fill="none" 
-                        stroke="#cbd5e1" 
-                        strokeWidth="4" 
+                    {/* Ghost trail — sempre visível como guia */}
+                    <path
+                        d={PATH_D}
+                        fill="none"
+                        stroke="#cbd5e1"
+                        strokeWidth="4"
                         strokeDasharray="12 12"
-                        className="opacity-60"
+                        className="opacity-30"
+                    />
+                    {/* Caminho animado — desenha-se sobre o ghost ao entrar na viewport */}
+                    <m.path
+                        d={PATH_D}
+                        fill="none"
+                        stroke="#cbd5e1"
+                        strokeWidth="4"
+                        strokeLinecap="round"
+                        initial={{ pathLength: 0 }}
+                        whileInView={{ pathLength: 1 }}
+                        viewport={{ once: true, amount: 0.1 }}
+                        transition={{ duration: 2.2, ease: "easeInOut" }}
                     />
                 </svg>
             </div>
@@ -123,7 +140,14 @@ const HowItWorks = memo(() => {
                 {STEPS.map((step, idx) => {
                     const isEven = idx % 2 === 0;
                     return (
-                        <div key={step.id} className={`flex flex-col md:flex-row items-center w-full relative z-10 ${isEven ? 'md:justify-start' : 'md:justify-end'}`}>
+                        <m.div
+                            key={step.id}
+                            initial={{ opacity: 0, x: isEven ? -32 : 32, y: 20 }}
+                            whileInView={{ opacity: 1, x: 0, y: 0 }}
+                            viewport={{ once: true, amount: 0.25 }}
+                            transition={{ duration: 0.7, ease: EASE_EXPO, delay: idx * 0.15 }}
+                            className={`flex flex-col md:flex-row items-center w-full relative z-10 ${isEven ? 'md:justify-start' : 'md:justify-end'}`}
+                        >
                             
                             {/* The Card */}
                             <div className={`
@@ -160,7 +184,7 @@ const HowItWorks = memo(() => {
                             
                             {/* Empty space for the zig-zag on desktop */}
                             <div className="hidden md:block md:w-[10%]"></div>
-                        </div>
+                        </m.div>
                     );
                 })}
             </div>
