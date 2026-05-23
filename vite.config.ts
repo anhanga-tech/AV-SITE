@@ -6,7 +6,6 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import mdx from '@mdx-js/rollup';
 import remarkGfm from 'remark-gfm';
-import { visualizer } from 'rollup-plugin-visualizer';
 import { DEFAULT_GEMINI_MODEL } from './lib/ai/constants.ts';
 import { stripYamlFrontmatter } from './lib/mdx-frontmatter.ts';
 import { logger } from './lib/logger.ts';
@@ -175,6 +174,10 @@ function stripMdxFrontmatterPlugin() {
   };
 }
 
+const visualizerPlugin = process.env.ANALYZE === 'true'
+  ? (await import('rollup-plugin-visualizer')).visualizer({ filename: 'dist/stats.html', open: false, gzipSize: true })
+  : null;
+
 export default defineConfig(({ mode, isSsrBuild }) => {
   // Carregar variáveis de ambiente do arquivo .env e do sistema
   // O segundo parâmetro '.' significa o diretório atual (raiz do projeto)
@@ -216,7 +219,7 @@ export default defineConfig(({ mode, isSsrBuild }) => {
       react({ include: /\.(jsx|tsx|mdx)$/ }),
       adminHtmlDevPlugin(),
       apiDevPlugin(),
-      visualizer({ filename: 'dist/stats.html', open: false, gzipSize: true }),
+      ...(visualizerPlugin ? [visualizerPlugin] : []),
     ],
     define: {
       'process.env.GEMINI_MODEL': JSON.stringify(geminiModel)
