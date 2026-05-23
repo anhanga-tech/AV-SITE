@@ -6,7 +6,6 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import mdx from '@mdx-js/rollup';
 import remarkGfm from 'remark-gfm';
-import { visualizer } from 'rollup-plugin-visualizer';
 import { DEFAULT_GEMINI_MODEL } from './lib/ai/constants.ts';
 import { stripYamlFrontmatter } from './lib/mdx-frontmatter.ts';
 import { logger } from './lib/logger.ts';
@@ -175,6 +174,10 @@ function stripMdxFrontmatterPlugin() {
   };
 }
 
+const visualizerModule = process.env.ANALYZE === 'true'
+  ? await import('rollup-plugin-visualizer')
+  : null;
+
 export default defineConfig(({ mode, isSsrBuild }) => {
   // Carregar variáveis de ambiente do arquivo .env e do sistema
   // O segundo parâmetro '.' significa o diretório atual (raiz do projeto)
@@ -191,6 +194,10 @@ export default defineConfig(({ mode, isSsrBuild }) => {
   const devHost = env.VITE_DEV_HOST || process.env.VITE_DEV_HOST || '0.0.0.0';
   const devPort = Number(env.VITE_DEV_PORT || process.env.VITE_DEV_PORT || '3000');
   const devStrictPort = (env.VITE_DEV_STRICT_PORT || process.env.VITE_DEV_STRICT_PORT || 'false') === 'true';
+  const shouldAnalyze = (env.ANALYZE || process.env.ANALYZE) === 'true';
+  const visualizerPlugin = visualizerModule && shouldAnalyze && !isSsrBuild
+    ? visualizerModule.visualizer({ filename: 'dist/stats.html', open: false, gzipSize: true })
+    : null;
 
   // Logs de debug (útil para verificar se a variável está sendo carregada)
   logger.debug(`🔧 Building with base path: ${base}`);
@@ -216,7 +223,7 @@ export default defineConfig(({ mode, isSsrBuild }) => {
       react({ include: /\.(jsx|tsx|mdx)$/ }),
       adminHtmlDevPlugin(),
       apiDevPlugin(),
-      visualizer({ filename: 'dist/stats.html', open: false, gzipSize: true }),
+      ...(visualizerPlugin ? [visualizerPlugin] : []),
     ],
     define: {
       'process.env.GEMINI_MODEL': JSON.stringify(geminiModel)
@@ -233,7 +240,7 @@ export default defineConfig(({ mode, isSsrBuild }) => {
       minify: 'esbuild',
       rollupOptions: {
         output: {
-          manualChunks: isSsrBuild ? undefined : (id) => {
+          manualChunks: isSsrBuild ? undefined : (id: string) => {
             if (id.includes('/node_modules/react/') || id.includes('/node_modules/react-dom/') || id.includes('/node_modules/react-router-dom/')) {
               return 'react-vendor';
             }
