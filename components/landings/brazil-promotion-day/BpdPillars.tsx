@@ -4,7 +4,7 @@ import { PILLARS, fadeUp } from './constants';
 
 export function BpdPillars() {
     return (
-        <section className="py-24 bg-[#fffdf5] relative overflow-hidden">
+        <section className="py-24 bg-brand-surface relative overflow-hidden">
 
             {/* Dot pattern — same as Highlights */}
             <div

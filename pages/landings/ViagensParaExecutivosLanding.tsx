@@ -181,7 +181,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
       </section>
 
       {/* O que a gente resolve */}
-      <section className="py-20 bg-[#fffdf5]">
+      <section className="py-20 bg-brand-surface">
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-12 font-serif">
             O que a gente resolve
@@ -239,7 +239,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
       </section>
 
       {/* Sobre a Anhangá */}
-      <section className="py-20 bg-[#fffdf5]">
+      <section className="py-20 bg-brand-surface">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-6 font-serif">
             Sobre a Anhangá Viagens
@@ -285,7 +285,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
       </section>
 
       {/* Outros serviços */}
-      <section className="py-16 bg-[#fffdf5]">
+      <section className="py-16 bg-brand-surface">
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-2xl font-black text-anhanga-dark mb-8">Outros serviços</h2>
           <div className="grid md:grid-cols-3 gap-4">
@@ -334,7 +334,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
       />
 
       {/* Footer */}
-      <footer className="py-8 bg-[#fffdf5] border-t border-zinc-100 text-center text-sm text-zinc-600">
+      <footer className="py-8 bg-brand-surface border-t border-zinc-100 text-center text-sm text-zinc-600">
         <p>Anhangá Viagens · Agência de viagens em São Paulo</p>
         <p className="mt-1">Atualizado em abril de 2026</p>
       </footer>

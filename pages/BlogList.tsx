@@ -42,7 +42,7 @@ const BlogList: React.FC = () => {
                 { name: 'Home', item: 'https://www.anhanga.tur.br/' },
                 { name: 'Blog', item: getBlogHomeUrl() }
             ]} />
-            <div className="min-h-screen bg-[#fffdf5] pt-32 md:pt-36 lg:pt-40 pb-24">
+            <div className="min-h-screen bg-brand-surface pt-32 md:pt-36 lg:pt-40 pb-24">
                 <div className="container mx-auto px-6">
 
                 {/* Header */}
@@ -154,7 +154,7 @@ const BlogList: React.FC = () => {
                             e.preventDefault();
                             openContactModal({ source: 'blog-list' });
                         }}
-                        className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-brand-dark text-white text-lg font-bold px-10 py-5 rounded-2xl shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition"
+                        className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-brand-dark text-white text-lg font-bold px-10 py-5 rounded-2xl shadow-hard-yellow hover:shadow-[2px_2px_0px_theme(colors.brand.yellow)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition"
                         data-tracking="footer-blog-list"
                     >
                         Solicitar Orçamento

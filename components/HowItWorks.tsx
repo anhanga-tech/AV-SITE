@@ -77,7 +77,7 @@ const STEPS = [
 const HowItWorks = memo(() => {
 
   return (
-    <section id="como-funciona" className="pt-24 pb-32 relative overflow-hidden bg-[#fffdf5]" aria-label="Como Funciona">
+    <section id="como-funciona" className="pt-24 pb-32 relative overflow-hidden bg-brand-surface" aria-label="Como Funciona">
       
       {/* Background Pattern - Dot Grid */}
       <div className="absolute inset-0 z-0 opacity-[0.4]" 

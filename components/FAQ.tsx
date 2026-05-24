@@ -200,9 +200,7 @@ const FAQ = memo(() => {
     return (
         <section
             id="faq-section"
-            className="py-24 relative overflow-hidden"
-            // Soft background request
-            style={{ backgroundColor: '#fffdf5' }}
+            className="py-24 relative overflow-hidden bg-brand-surface"
         >
             {/* Decorative blob for background interest */}
             <div className="absolute top-0 right-0 size-[500px] bg-yellow-100/40 rounded-full blur-3xl pointer-events-none -z-10 translate-x-1/3 -translate-y-1/3"></div>

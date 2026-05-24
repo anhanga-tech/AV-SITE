@@ -28,7 +28,7 @@ const Blog: React.FC = memo(() => {
         <section id="blog" className="py-24 bg-white relative overflow-hidden dynamic-blog-content">
             {/* Background Decorations */}
             <div className="absolute top-0 right-0 size-96 bg-brand-cyan/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-            <div className="absolute bottom-0 left-0 w-full h-24 bg-[#fffdf5] skew-y-2 translate-y-12"></div>
+            <div className="absolute bottom-0 left-0 w-full h-24 bg-brand-surface skew-y-2 translate-y-12"></div>
 
             <div className="container mx-auto px-6 relative z-10">
                 {/* Header Section */}
@@ -48,7 +48,7 @@ const Blog: React.FC = memo(() => {
                 {featuredPost && (
                     <div className="mb-16 cursor-pointer relative">
                         <a href={getBlogPostUrl(featuredPost.slug)} className="group">
-                            <div className="bg-[#fffdf5] rounded-[2.5rem] p-6 md:p-8 border-4 border-zinc-100 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] flex flex-col md:flex-row gap-8 items-center transition-transform duration-300 hover:scale-[1.01]">
+                            <div className="bg-brand-surface rounded-[2.5rem] p-6 md:p-8 border-4 border-zinc-100 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] flex flex-col md:flex-row gap-8 items-center transition-transform duration-300 hover:scale-[1.01]">
 
                                 {/* Featured Image */}
                                 <div className="w-full md:w-1/2 relative">

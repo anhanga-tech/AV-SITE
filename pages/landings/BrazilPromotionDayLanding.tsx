@@ -26,7 +26,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
                 description="Conheça a Anhangá Viagens na Brazil Promotion Day. Agência de viagens em SP com roteiros exclusivos feitos do zero, sem pacote pronto."
                 canonical="https://www.anhanga.tur.br/brazil-promotion-day/"
             />
-            <div className="bg-[#fffdf5] min-h-screen font-sans">
+            <div className="bg-brand-surface min-h-screen font-sans">
                 <BpdNav />
                 <BpdHero />
                 <BpdPillars />

@@ -127,52 +127,52 @@ const Home: React.FC = () => {
 
       {shouldRenderBelowFold ? (
         <>
-          <Suspense fallback={<section id="experiencia" className="min-h-[700px] bg-[#fffdf5]" />}>
+          <Suspense fallback={<section id="experiencia" className="min-h-[700px] bg-brand-surface" />}>
             <Highlights />
           </Suspense>
-          <Suspense fallback={<section className="min-h-[300px] bg-[#fffdf5]" />}>
+          <Suspense fallback={<section className="min-h-[300px] bg-brand-surface" />}>
             <Categories />
           </Suspense>
         </>
       ) : (
         <>
-          <section id="experiencia" className="min-h-[700px] bg-[#fffdf5]" />
-          <section className="min-h-[300px] bg-[#fffdf5]" />
+          <section id="experiencia" className="min-h-[700px] bg-brand-surface" />
+          <section className="min-h-[300px] bg-brand-surface" />
         </>
       )}
       <div id="destinos" ref={destinationsSentinelRef} />
       {shouldRenderBelowFold && shouldLoadDestinations ? (
-        <Suspense fallback={<section className="min-h-[900px] bg-[#fffdf5]" />}>
+        <Suspense fallback={<section className="min-h-[900px] bg-brand-surface" />}>
           <Destinations />
         </Suspense>
       ) : (
-        <section className="min-h-[900px] bg-[#fffdf5]" />
+        <section className="min-h-[900px] bg-brand-surface" />
       )}
       {shouldRenderBelowFold ? (
         <>
-          <Suspense fallback={<section id="como-funciona" className="min-h-[800px] bg-[#fffdf5]" />}>
+          <Suspense fallback={<section id="como-funciona" className="min-h-[800px] bg-brand-surface" />}>
             <HowItWorks />
           </Suspense>
-          <Suspense fallback={<section id="faq" className="min-h-[600px] bg-[#fffdf5]" />}>
+          <Suspense fallback={<section id="faq" className="min-h-[600px] bg-brand-surface" />}>
             <FAQ />
           </Suspense>
-          <Suspense fallback={<section id="depoimentos" className="min-h-[500px] bg-[#fffdf5]" />}>
+          <Suspense fallback={<section id="depoimentos" className="min-h-[500px] bg-brand-surface" />}>
             <Testimonials />
           </Suspense>
-          <Suspense fallback={<section id="blog" className="min-h-[500px] bg-[#fffdf5]" />}>
+          <Suspense fallback={<section id="blog" className="min-h-[500px] bg-brand-surface" />}>
             <Blog />
           </Suspense>
-          <Suspense fallback={<section id="contato" className="min-h-[400px] bg-[#fffdf5]" />}>
+          <Suspense fallback={<section id="contato" className="min-h-[400px] bg-brand-surface" />}>
             <CallToAction />
           </Suspense>
         </>
       ) : (
         <>
-          <section id="como-funciona" className="min-h-[800px] bg-[#fffdf5]" />
-          <section id="faq" className="min-h-[600px] bg-[#fffdf5]" />
-          <section id="depoimentos" className="min-h-[500px] bg-[#fffdf5]" />
-          <section id="blog" className="min-h-[500px] bg-[#fffdf5]" />
-          <section id="contato" className="min-h-[400px] bg-[#fffdf5]" />
+          <section id="como-funciona" className="min-h-[800px] bg-brand-surface" />
+          <section id="faq" className="min-h-[600px] bg-brand-surface" />
+          <section id="depoimentos" className="min-h-[500px] bg-brand-surface" />
+          <section id="blog" className="min-h-[500px] bg-brand-surface" />
+          <section id="contato" className="min-h-[400px] bg-brand-surface" />
         </>
       )}
     </>

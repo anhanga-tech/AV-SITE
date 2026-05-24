@@ -21,9 +21,10 @@ export default {
                     cyanDark: '#0284c7', // Sky 600
                     blue: '#1e40af', // Blue 800
                     vibrant: '#0ea5e9', // Cyan
-                    yellow: '#fbbf24', // Amber 400
+                    yellow: '#FFD600', // Âmbar Vivo — canonical brand yellow
                     dark: '#0f172a', // Slate 900
                     light: '#f0f9ff', // Sky 50
+                    surface: '#fffdf5', // Superfície Quente — warm cream background
                 },
                 'fun-yellow': '#FFD23F',
                 'fun-blue': '#3B82F6',

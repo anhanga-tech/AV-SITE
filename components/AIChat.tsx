@@ -415,7 +415,7 @@ const AIChat: React.FC = memo(() => {
                     bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9990]
                     flex items-center justify-center gap-3
                     bg-brand-vibrant text-white
-                    shadow-[0_8px_30px_rgba(255,107,53,0.3)] hover:shadow-[0_8px_30px_rgba(255,107,53,0.5)] hover:-translate-y-1
+                    shadow-[0_8px_30px_theme(colors.brand.cyan/30%)] hover:shadow-[0_8px_30px_theme(colors.brand.cyan/50%)] hover:-translate-y-1
                     transition duration-300
                     size-16 rounded-2xl sm:w-auto sm:h-auto sm:px-6 sm:py-3.5 sm:rounded-full
                     focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-vibrant/30
@@ -448,7 +448,7 @@ const AIChat: React.FC = memo(() => {
       <div
         ref={drawerRef}
         tabIndex={-1}
-        className={`fixed top-0 right-0 h-full w-full sm:w-[450px] z-[9999] bg-[#fdfdfc] flex flex-col shadow-[-10px_0_40px_rgba(0,0,0,0.1)] transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] sm:rounded-l-[2rem] overflow-hidden outline-none ${isOpen ? 'translate-x-0 visible opacity-100' : 'translate-x-full invisible opacity-0'
+        className={`fixed top-0 right-0 h-full w-full sm:w-[450px] z-[9999] bg-white flex flex-col shadow-[-10px_0_40px_rgba(0,0,0,0.1)] transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] sm:rounded-l-[2rem] overflow-hidden outline-none ${isOpen ? 'translate-x-0 visible opacity-100' : 'translate-x-full invisible opacity-0'
           }`}
         role="dialog"
         aria-modal="true"
@@ -490,7 +490,7 @@ const AIChat: React.FC = memo(() => {
         </div>
 
         {/* Messages Area - Scrapbook vibe */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth bg-[#fdfdfc] relative">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth bg-white relative">
           {/* Fundo suave */}
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, black 1px, transparent 0)', backgroundSize: '32px 32px' }}></div>
 

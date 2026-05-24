@@ -80,7 +80,7 @@ const PILLARS = [
 
 const ConsultoriaDeViagemLanding: React.FC = () => {
   return (
-    <div className="bg-[#fffdf5] min-h-screen font-sans">
+    <div className="bg-brand-surface min-h-screen font-sans">
       <SEO
         title="Consultoria de Viagem Sob Medida em SP — Anhangá Viagens"
         description="Planeje sua viagem com consultores humanos. Sem pacote pronto, sem improviso. Roteiro personalizado com suporte antes, durante e depois."
@@ -172,7 +172,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
                 className={`p-8 rounded-2xl ${
                   variant === 'filled'
                     ? 'bg-anhanga-blue text-white'
-                    : 'bg-[#fffdf5]'
+                    : 'bg-brand-surface'
                 }`}
               >
                 <div
@@ -197,7 +197,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
       </section>
 
       {/* Para quem é */}
-      <section className="py-20 bg-[#fffdf5]">
+      <section className="py-20 bg-brand-surface">
         <div className="max-w-5xl mx-auto px-6">
           <div className="md:grid md:grid-cols-2 md:gap-16 items-start">
             <div>
@@ -251,7 +251,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
       </section>
 
       {/* Sobre a Anhangá */}
-      <section className="py-20 bg-[#fffdf5]">
+      <section className="py-20 bg-brand-surface">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-6 font-serif">
             Sobre a Anhangá Viagens
@@ -297,13 +297,13 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
       </section>
 
       {/* Outros serviços */}
-      <section className="py-16 bg-[#fffdf5]">
+      <section className="py-16 bg-brand-surface">
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-2xl font-black text-anhanga-dark mb-8">Outros serviços</h2>
           <div className="grid md:grid-cols-3 gap-4">
             <Link
               to="/viagens-para-executivos"
-              className="block p-5 rounded-xl bg-[#fffdf5] hover:bg-anhanga-blue/5 transition-colors group"
+              className="block p-5 rounded-xl bg-brand-surface hover:bg-anhanga-blue/5 transition-colors group"
             >
               <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                 Viagens para Executivos
@@ -314,7 +314,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
             </Link>
             <Link
               to="/curadoria-cruzeiros-brasil"
-              className="block p-5 rounded-xl bg-[#fffdf5] hover:bg-anhanga-blue/5 transition-colors group"
+              className="block p-5 rounded-xl bg-brand-surface hover:bg-anhanga-blue/5 transition-colors group"
             >
               <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                 Curadoria de Cruzeiros
@@ -325,7 +325,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
             </Link>
             <a
               href="https://www.anhanga.tur.br/"
-              className="block p-5 rounded-xl bg-[#fffdf5] hover:bg-anhanga-blue/5 transition-colors group"
+              className="block p-5 rounded-xl bg-brand-surface hover:bg-anhanga-blue/5 transition-colors group"
             >
               <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                 Site principal
@@ -346,7 +346,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
       />
 
       {/* Footer */}
-      <footer className="py-8 bg-[#fffdf5] border-t border-zinc-100 text-center text-sm text-zinc-600">
+      <footer className="py-8 bg-brand-surface border-t border-zinc-100 text-center text-sm text-zinc-600">
         <p>Anhangá Viagens · Agência de viagens em São Paulo</p>
         <p className="mt-1">Atualizado em abril de 2026</p>
       </footer>

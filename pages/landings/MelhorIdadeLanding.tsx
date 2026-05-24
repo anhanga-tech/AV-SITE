@@ -30,7 +30,7 @@ const MELHOR_IDADE_FAQ_ITEMS = [
 
 const MelhorIdadeLanding: React.FC = () => {
   return (
-    <div className="bg-[#fffdf5] min-h-screen font-sans">
+    <div className="bg-brand-surface min-h-screen font-sans">
       <SEO
         title="Turismo 50+: Viagens Seguras e Personalizadas"
         description="Experiências de viagem exclusivas para o público 50+. Roteiros com conforto, segurança e atendimento humano. Planeje sua próxima aventura com a Anhangá."
@@ -161,7 +161,7 @@ const MelhorIdadeLanding: React.FC = () => {
       </section>
 
       {/* CONTENT RICH SECTION FOR GEO */}
-      <section className="py-24 bg-[#fffdf5]">
+      <section className="py-24 bg-brand-surface">
         <div className="container mx-auto px-6 max-w-4xl">
           <h2 className="text-3xl md:text-5xl font-black text-brand-dark mb-12 text-center">Por que planejar sua viagem 50+ com a Anhangá?</h2>
           

@@ -81,7 +81,7 @@ const HIGHLIGHTS: HighlightItem[] = [
 
 const Highlights = memo(() => {
     return (
-        <section id="experiencia" className="py-24 bg-[#fffdf5] relative overflow-hidden">
+        <section id="experiencia" className="py-24 bg-brand-surface relative overflow-hidden">
 
             {/* Dot Pattern Background */}
             <div className="absolute inset-0 z-0 opacity-[0.3]"

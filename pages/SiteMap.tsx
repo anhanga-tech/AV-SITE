@@ -33,7 +33,7 @@ const SiteMap: React.FC = () => {
           { name: 'Mapa do Site', item: 'https://www.anhanga.tur.br/mapa-do-site/' }
         ]}
       />
-      <main className="min-h-screen bg-[#fffdf5] pt-32 pb-24">
+      <main className="min-h-screen bg-brand-surface pt-32 pb-24">
         <section className="container mx-auto px-6 max-w-4xl">
           <h1 className="text-4xl md:text-5xl font-black text-brand-dark mb-6">Mapa do Site</h1>
           <p className="text-zinc-600 mb-10">Acesse rapidamente as principais áreas do site.</p>
