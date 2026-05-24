@@ -61,7 +61,7 @@ const BlogPost: React.FC = () => {
 
     if (!post) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-[#fffdf5]">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-brand-surface">
                 <h2 className="text-4xl font-black text-brand-dark mb-4 text-center px-6">Ops! Artigo não encontrado.</h2>
                 <a href={getBlogHomeUrl()} className="text-brand-cyan font-bold hover:underline flex items-center gap-2">
                     <ArrowLeft className="size-4" /> Voltar para o Blog
@@ -91,7 +91,7 @@ const BlogPost: React.FC = () => {
     const MdxContent = getMdxComponent(slug!);
 
     return (
-        <article className="min-h-screen bg-[#fffdf5]">
+        <article className="min-h-screen bg-brand-surface">
             <SEO
                 title={post.title}
                 description={post.excerpt}

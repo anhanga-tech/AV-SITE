@@ -80,7 +80,7 @@ export function BpdContactSection() {
     }
 
     return (
-        <section id="contato" className="py-24 bg-[#fffdf5] relative overflow-hidden">
+        <section id="contato" className="py-24 bg-brand-surface relative overflow-hidden">
 
             <div
                 className="absolute inset-0 z-0 opacity-[0.3]"
@@ -153,7 +153,7 @@ export function BpdContactSection() {
                                         href={href}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="size-11 rounded-xl bg-white border-2 border-zinc-200 flex items-center justify-center text-zinc-500 hover:border-brand-cyan hover:text-brand-cyan shadow-[2px_2px_0px_rgba(0,0,0,0.05)] hover:shadow-[4px_4px_0px_#fbbf24] hover:-translate-y-1 transition duration-200"
+                                        className="size-11 rounded-xl bg-white border-2 border-zinc-200 flex items-center justify-center text-zinc-500 hover:border-brand-cyan hover:text-brand-cyan shadow-[2px_2px_0px_rgba(0,0,0,0.05)] hover:shadow-hard-yellow hover:-translate-y-1 transition duration-200"
                                         aria-label={label}
                                         {...(contact ? { 'data-contact-intent': true, 'data-tracking': 'social-whatsapp-brazil-promotion-day' } : {})}
                                     >
@@ -192,7 +192,7 @@ export function BpdContactSection() {
                                     href={whatsappUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="btn-whatsapp btn-specialist flex items-center gap-2 bg-brand-dark text-white px-6 py-3 rounded-xl font-bold text-sm shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition"
+                                    className="btn-whatsapp btn-specialist flex items-center gap-2 bg-brand-dark text-white px-6 py-3 rounded-xl font-bold text-sm shadow-hard-yellow hover:shadow-[2px_2px_0px_#FFD600] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition"
                                     data-contact-intent
                                     data-tracking="success-brazil-promotion-day"
                                 >
@@ -300,7 +300,7 @@ export function BpdContactSection() {
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="w-full flex items-center justify-center gap-3 bg-brand-dark text-white py-4 rounded-xl font-bold text-base shadow-[4px_4px_0px_#fbbf24] hover:shadow-[2px_2px_0px_#fbbf24] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition disabled:opacity-60 disabled:pointer-events-none"
+                                        className="w-full flex items-center justify-center gap-3 bg-brand-dark text-white py-4 rounded-xl font-bold text-base shadow-hard-yellow hover:shadow-[2px_2px_0px_#FFD600] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition disabled:opacity-60 disabled:pointer-events-none"
                                         data-tracking="submit-form-brazil-promotion-day"
                                     >
                                         {isSubmitting ? (

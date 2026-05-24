@@ -51,7 +51,7 @@ const BetoCarreroLanding: React.FC = () => {
         ]}
       />
       <FAQPageSchema items={BETO_FAQ_ITEMS} />
-      <div className="bg-[#fffdf5] py-2 border-b border-zinc-100">
+      <div className="bg-brand-surface py-2 border-b border-zinc-100">
         <div className="container mx-auto px-6">
           <a href="https://www.anhanga.tur.br/" className="text-sm font-medium text-zinc-500 hover:text-brand-cyan transition-colors flex items-center gap-1">
             ← Voltar para o site principal
@@ -69,7 +69,7 @@ const BetoCarreroLanding: React.FC = () => {
 
       <BetoCarreroApp />
       <LandingFAQ items={BETO_FAQ_ITEMS} />
-      <section className="bg-[#fffdf5] border-t border-brand-cyan/10 py-14">
+      <section className="bg-brand-surface border-t border-brand-cyan/10 py-14">
         <div className="container mx-auto px-6 max-w-5xl">
           <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Pacote Beto Carrero para viajar com tranquilidade</h2>
           <p className="text-zinc-700 text-lg leading-relaxed mb-5">

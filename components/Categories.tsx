@@ -45,7 +45,7 @@ const POPULAR_DESTINATIONS = [
 const Categories = memo(() => {
 
   return (
-    <section className="py-24 bg-[#fffdf5] relative">
+    <section className="py-24 bg-brand-surface relative">
       <div className="container mx-auto px-6">
 
         {/* Header */}

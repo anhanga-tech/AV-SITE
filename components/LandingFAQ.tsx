@@ -71,7 +71,7 @@ export const LandingFAQ: React.FC<LandingFAQProps> = ({
                     </p>
                 </div>
 
-                <div className="bg-[#fffdf5]/50 rounded-3xl p-4 md:p-8 border border-brand-cyan/10">
+                <div className="bg-brand-surface/50 rounded-3xl p-4 md:p-8 border border-brand-cyan/10">
                     {items.map((item, idx) => (
                         <FAQItemComponent
                             key={item.question}

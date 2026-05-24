@@ -53,7 +53,7 @@ const LollapaloozaLanding: React.FC = () => {
         ]}
       />
       <FAQPageSchema items={LOLLAPALOOZA_FAQ_ITEMS} />
-      <div className="bg-[#fffdf5] py-2 border-b border-zinc-100 relative z-[60]">
+      <div className="bg-brand-surface py-2 border-b border-zinc-100 relative z-[60]">
         <div className="container mx-auto px-6">
           <a href="https://www.anhanga.tur.br/" className="text-sm font-medium text-zinc-500 hover:text-brand-cyan transition-colors flex items-center gap-1 font-sans">
             ← Voltar para o site principal
@@ -71,7 +71,7 @@ const LollapaloozaLanding: React.FC = () => {
 
       <LollapaloozaApp />
       <LandingFAQ items={LOLLAPALOOZA_FAQ_ITEMS} />
-      <section className="bg-[#fffdf5] border-t border-brand-cyan/10 py-14">
+      <section className="bg-brand-surface border-t border-brand-cyan/10 py-14">
         <div className="container mx-auto px-6 max-w-5xl">
           <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">2026 encerrou forte. 2027 já está no radar.</h2>
           <p className="text-zinc-700 text-lg leading-relaxed mb-5">

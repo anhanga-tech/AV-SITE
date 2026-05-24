@@ -551,7 +551,7 @@ const Destinations: React.FC = memo(() => {
     };
 
     return (
-        <section id="destinos" className="py-24 bg-[#fffdf5] relative overflow-hidden">
+        <section id="destinos" className="py-24 bg-brand-surface relative overflow-hidden">
 
             {/* Background Doodles */}
             <div className="absolute top-0 right-0 w-full h-full opacity-[0.03] pointer-events-none z-0" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, black 1px, transparent 0)', backgroundSize: '40px 40px' }}></div>
@@ -697,7 +697,7 @@ const Destinations: React.FC = memo(() => {
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="dest-modal-title"
-                        className="bg-[#fffdf5] w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden relative flex flex-col md:flex-row max-h-[90vh] border-8 border-white transform rotate-1"
+                        className="bg-brand-surface w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden relative flex flex-col md:flex-row max-h-[90vh] border-8 border-white transform rotate-1"
                         onClick={e => e.stopPropagation()}
                     >
 
