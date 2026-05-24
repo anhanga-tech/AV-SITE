@@ -57,7 +57,7 @@ const Testimonials: React.FC = memo(() => {
                 <SectionHeader
                     badge="Love Notes"
                     badgeIcon={<MessageSquareHeart className="size-4 text-red-500 fill-red-500" />}
-                    title="Mural do Amor ❤️"
+                    title={<>Mural do Amor <span aria-hidden="true">❤️</span></>}
                     subtitle="Depoimentos reais de quem viajou com a gente"
                     className="mb-16"
                 />

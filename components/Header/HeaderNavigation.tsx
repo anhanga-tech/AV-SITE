@@ -42,7 +42,7 @@ export function DesktopNavigation({
         <div key={link.name} className="relative group">
           {link.subLinks ? (
             <>
-              <button className={`flex items-center gap-1 cursor-pointer font-medium text-sm transition-colors duration-500 hover:opacity-80 focus:outline-none focus:underline decoration-2 underline-offset-4 ${navTextClass}`}>
+              <button className={`flex items-center gap-1 cursor-pointer font-medium text-sm transition-colors duration-500 hover:opacity-80 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-yellow focus-visible:outline-offset-2 rounded ${navTextClass}`}>
                 {link.name}
                 <CaretDown className="size-4 transition-transform duration-300 group-hover:rotate-180" weight="bold" />
               </button>
@@ -80,7 +80,7 @@ export function DesktopNavigation({
                   onNavClick(event, link.href!);
                 }
               }}
-              className={`cursor-pointer font-medium text-sm transition-colors duration-500 hover:opacity-80 focus:outline-none focus:underline decoration-2 underline-offset-4 ${navTextClass}`}
+              className={`cursor-pointer font-medium text-sm transition-colors duration-500 hover:opacity-80 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-yellow focus-visible:outline-offset-2 rounded ${navTextClass}`}
             >
               {link.name}
             </a>
@@ -90,7 +90,7 @@ export function DesktopNavigation({
 
       <a
         href={getBlogHomeUrl()}
-        className={`font-medium text-sm transition-colors duration-500 hover:opacity-80 focus:outline-none focus:underline decoration-2 underline-offset-4 ${navTextClass}`}
+        className={`font-medium text-sm transition-colors duration-500 hover:opacity-80 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-yellow focus-visible:outline-offset-2 rounded ${navTextClass}`}
       >
         Blog de Viagens
       </a>
@@ -125,7 +125,7 @@ export function MobileNavigationMenu({
               <a
                 key={subLink.name}
                 href={href}
-                className="text-zinc-700 font-medium py-2 border-b border-zinc-50 focus:text-brand-vibrant focus:outline-none"
+                className="text-zinc-700 font-medium py-2 border-b border-zinc-50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-vibrant focus-visible:outline-offset-1 rounded"
                 onClick={(event) => {
                   if (!isPageLink(subLink.href) && isHome) {
                     onNavClick(event, subLink.href);
@@ -144,7 +144,7 @@ export function MobileNavigationMenu({
           <a
             key={link.name}
             href={buildSectionHref(link.href!, isHome)}
-            className="text-zinc-700 font-medium py-2 border-b border-zinc-50 focus:text-brand-vibrant focus:outline-none"
+            className="text-zinc-700 font-medium py-2 border-b border-zinc-50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-vibrant focus-visible:outline-offset-1 rounded"
             onClick={(event) => {
               if (isHome) {
                 onNavClick(event, link.href!);
@@ -160,7 +160,7 @@ export function MobileNavigationMenu({
 
       <a
         href={getBlogHomeUrl()}
-        className="text-zinc-700 font-medium py-2 border-b border-zinc-50 focus:text-brand-vibrant focus:outline-none"
+        className="text-zinc-700 font-medium py-2 border-b border-zinc-50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-vibrant focus-visible:outline-offset-1 rounded"
         onClick={onCloseMenu}
       >
         Blog de Viagens

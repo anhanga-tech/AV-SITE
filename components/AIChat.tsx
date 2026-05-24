@@ -112,6 +112,9 @@ const AIChat: React.FC = memo(() => {
   const navigate = useNavigate();
   const isOrlandoPage = location.pathname.startsWith('/orlando');
 
+  const [liveAnnouncement, setLiveAnnouncement] = useState('');
+  const prevMessagesCount = useRef(messages.length);
+
   // PERFORMANCE: Pre-calculate the index of the last model message to avoid O(N^2)
   // lookup inside the render loop's map function.
   const lastModelIndex = useMemo(() => {
@@ -119,6 +122,20 @@ const AIChat: React.FC = memo(() => {
       if (messages[i].role === 'model') return i;
     }
     return -1;
+  }, [messages]);
+
+  useEffect(() => {
+    if (messages.length > prevMessagesCount.current) {
+      const newModelMessages = messages
+        .slice(prevMessagesCount.current)
+        .filter(m => m.role === 'model' && !m.isAction);
+
+      if (newModelMessages.length > 0) {
+        const fullText = newModelMessages.map(m => m.text).join(' ');
+        setLiveAnnouncement(fullText.replace(/\*\*|\*|- /g, ''));
+      }
+    }
+    prevMessagesCount.current = messages.length;
   }, [messages]);
 
   useEffect(() => {
@@ -465,6 +482,11 @@ const AIChat: React.FC = memo(() => {
           >
             <X className="size-5" weight="bold" />
           </button>
+        </div>
+
+        {/* Screen-reader announcer for new AI messages */}
+        <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+          {liveAnnouncement}
         </div>
 
         {/* Messages Area - Scrapbook vibe */}
