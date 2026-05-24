@@ -1,3 +1,5 @@
+import { captureLoggerError } from './error-tracking.ts';
+
 type LoggerData = unknown;
 type ConsoleMethod = 'log' | 'info' | 'warn' | 'error';
 
@@ -30,6 +32,7 @@ export const logger = {
     },
 
     error(message: string, data?: LoggerData): void {
+        captureLoggerError(message, data);
         writeLog('error', '[error]', message, data);
     },
 };
