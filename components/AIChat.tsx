@@ -113,6 +113,7 @@ const AIChat: React.FC = memo(() => {
   const isOrlandoPage = location.pathname.startsWith('/orlando');
 
   const [liveAnnouncement, setLiveAnnouncement] = useState('');
+  const prevMessagesCount = useRef(messages.length);
 
   // PERFORMANCE: Pre-calculate the index of the last model message to avoid O(N^2)
   // lookup inside the render loop's map function.
@@ -124,10 +125,18 @@ const AIChat: React.FC = memo(() => {
   }, [messages]);
 
   useEffect(() => {
-    if (lastModelIndex >= 0 && !messages[lastModelIndex].isAction) {
-      setLiveAnnouncement(messages[lastModelIndex].text);
+    if (messages.length > prevMessagesCount.current) {
+      const newModelMessages = messages
+        .slice(prevMessagesCount.current)
+        .filter(m => m.role === 'model' && !m.isAction);
+
+      if (newModelMessages.length > 0) {
+        const fullText = newModelMessages.map(m => m.text).join(' ');
+        setLiveAnnouncement(fullText.replace(/\*\*|\*|- /g, ''));
+      }
     }
-  }, [lastModelIndex, messages]);
+    prevMessagesCount.current = messages.length;
+  }, [messages]);
 
   useEffect(() => {
     messagesRef.current = messages;
