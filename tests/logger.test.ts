@@ -2,6 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { logger } from '../lib/logger.ts';
+import {
+    resetErrorTrackerForTests,
+    setErrorTrackerForTests,
+    type ErrorCaptureContext,
+} from '../lib/error-tracking.ts';
 
 type ConsoleMethod = (...args: unknown[]) => void;
 
@@ -99,5 +104,85 @@ test('logger.debug normaliza DEBUG antes de comparar', () => {
             process.env.DEBUG = originalDebug;
         }
         log.restore();
+    }
+});
+
+test('logger.error captura erros no error tracker registrado', () => {
+    const error = captureConsole('error');
+    const captured: Array<{ error: unknown; context?: ErrorCaptureContext }> = [];
+
+    try {
+        setErrorTrackerForTests((capturedError, context) => {
+            captured.push({ error: capturedError, context });
+        });
+
+        const cause = new Error('falha upstream');
+        logger.error('SERVER: falha ao consultar provider', cause);
+
+        assert.equal(captured.length, 1);
+        assert.equal(captured[0]?.error, cause);
+        assert.deepEqual(captured[0]?.context, {
+            extra: {
+                message: 'SERVER: falha ao consultar provider',
+            },
+        });
+    } finally {
+        resetErrorTrackerForTests();
+        error.restore();
+    }
+});
+
+test('logger.error omite captura externa sem tracker registrado e mascara PII obvia no contexto', () => {
+    const error = captureConsole('error');
+    const captured: Array<{ error: unknown; context?: ErrorCaptureContext }> = [];
+
+    try {
+        resetErrorTrackerForTests();
+
+        logger.error('SUBMIT_LEAD', {
+            requestId: 'req_123',
+            email: 'cliente@example.com',
+            token: 'super-secret-token',
+            nested: {
+                phone: '+55 11 99999-9999',
+            },
+        });
+
+        assert.equal(captured.length, 0);
+
+        setErrorTrackerForTests((capturedError, context) => {
+            captured.push({ error: capturedError, context });
+        });
+
+        logger.error('SUBMIT_LEAD', {
+            requestId: 'req_123',
+            email: 'cliente@example.com',
+            token: 'super-secret-token',
+            nested: {
+                phone: '+55 11 99999-9999',
+            },
+        });
+
+        assert.equal(captured.length, 1);
+        const firstCapture = captured[0];
+        assert.ok(firstCapture);
+        assert.ok(firstCapture.error instanceof Error);
+        assert.equal(firstCapture.error.message, 'SUBMIT_LEAD');
+        assert.deepEqual(firstCapture.context, {
+            extra: {
+                message: 'SUBMIT_LEAD',
+                data: {
+                    requestId: 'req_123',
+                    email: '[redacted]',
+                    token: '[redacted]',
+                    nested: {
+                        phone: '[redacted]',
+                    },
+                },
+            },
+        });
+    } finally {
+        resetErrorTrackerForTests();
+        error.restore();
     }
 });

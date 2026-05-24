@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom/client';
 import './src/index.css';
 import App from './App';
 import { shouldHydratePrerenderedRoute } from './lib/hydration';
+import { initClientErrorTracking } from './lib/sentry-client';
+
+initClientErrorTracking();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
