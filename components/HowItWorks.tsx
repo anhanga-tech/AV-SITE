@@ -204,10 +204,10 @@ const HowItWorks = memo(() => {
                     }}
                     className="relative z-10 flex items-center gap-4 bg-white text-brand-dark px-10 py-6 rounded-full font-black text-xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.15)] hover:shadow-[0_20px_50px_rgba(8,_112,_184,_0.25)] transform transition hover:scale-105 active:scale-95 border-4 border-transparent hover:border-brand-yellow text-left"
                 >
-                    <Sparkle className="size-6 text-brand-yellow" weight="fill" />
+                    <Sparkle className="size-6 text-brand-yellow" weight="fill" aria-hidden="true" />
                     <span>Quero meu roteiro agora!</span>
                     <div className="size-10 bg-brand-dark rounded-full flex items-center justify-center text-white">
-                        <ArrowRight className="size-5" weight="bold" />
+                        <ArrowRight className="size-5" weight="bold" aria-hidden="true" />
                     </div>
                 </button>
             </div>

@@ -7,7 +7,7 @@ const alignClasses: Record<'center' | 'left', string> = {
 };
 
 interface SectionHeaderProps {
-    title: string;
+    title: React.ReactNode;
     badge?: string;
     badgeIcon?: React.ReactNode;
     badgeColor?: BadgeColor;

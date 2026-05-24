@@ -112,6 +112,8 @@ const AIChat: React.FC = memo(() => {
   const navigate = useNavigate();
   const isOrlandoPage = location.pathname.startsWith('/orlando');
 
+  const [liveAnnouncement, setLiveAnnouncement] = useState('');
+
   // PERFORMANCE: Pre-calculate the index of the last model message to avoid O(N^2)
   // lookup inside the render loop's map function.
   const lastModelIndex = useMemo(() => {
@@ -120,6 +122,12 @@ const AIChat: React.FC = memo(() => {
     }
     return -1;
   }, [messages]);
+
+  useEffect(() => {
+    if (lastModelIndex >= 0 && !messages[lastModelIndex].isAction) {
+      setLiveAnnouncement(messages[lastModelIndex].text);
+    }
+  }, [lastModelIndex, messages]);
 
   useEffect(() => {
     messagesRef.current = messages;
@@ -465,6 +473,11 @@ const AIChat: React.FC = memo(() => {
           >
             <X className="size-5" weight="bold" />
           </button>
+        </div>
+
+        {/* Screen-reader announcer for new AI messages */}
+        <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+          {liveAnnouncement}
         </div>
 
         {/* Messages Area - Scrapbook vibe */}
