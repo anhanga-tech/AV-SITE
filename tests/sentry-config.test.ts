@@ -30,6 +30,7 @@ test('client initializes Sentry before React mounts and filters browser extensio
 
     assert.match(entrySource, /initClientErrorTracking\(\);[\s\S]*ReactDOM\.(?:hydrateRoot|createRoot)/);
     assert.match(sentrySource, /@sentry\/react/);
+    assert.match(sentrySource, /setErrorTracker\(Sentry\.captureException\)/);
     assert.match(sentrySource, /import\.meta\.env\.VITE_SENTRY_DSN/);
     assert.match(sentrySource, /beforeSend/);
     assert.match(sentrySource, /extension:\/\//);
@@ -40,6 +41,16 @@ test('Cloudflare Pages middleware initializes Sentry from request environment', 
 
     assert.match(middlewareSource, /@sentry\/cloudflare/);
     assert.match(middlewareSource, /sentryPagesPlugin/);
-    assert.match(middlewareSource, /setServerErrorTracker\(Sentry\.captureException\)/);
+    assert.match(middlewareSource, /setErrorTracker\(Sentry\.captureException\)/);
     assert.match(middlewareSource, /context\.env\.SENTRY_DSN/);
+});
+
+test('shared error tracking module stays runtime-agnostic for browser bundles', async () => {
+    const [errorTrackingSource, loggerSource] = await Promise.all([
+        readProjectFile('lib/error-tracking.ts'),
+        readProjectFile('lib/logger.ts'),
+    ]);
+
+    assert.doesNotMatch(errorTrackingSource, /process\.env/);
+    assert.match(loggerSource, /from ['"]\.\/error-tracking['"]/);
 });

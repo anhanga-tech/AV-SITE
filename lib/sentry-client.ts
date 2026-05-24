@@ -1,5 +1,7 @@
 import * as Sentry from '@sentry/react';
 
+import { setErrorTracker } from './error-tracking';
+
 function isBrowserExtensionFrame(frame: { filename?: string }): boolean {
     const filename = frame.filename ?? '';
 
@@ -28,4 +30,6 @@ export function initClientErrorTracking(): void {
             return event;
         },
     });
+
+    setErrorTracker(Sentry.captureException);
 }

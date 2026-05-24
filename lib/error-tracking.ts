@@ -42,12 +42,8 @@ function sanitizeForErrorTracking(value: unknown, depth = 0): unknown {
     return value;
 }
 
-function isErrorTrackingConfigured(): boolean {
-    return typeof process.env.SENTRY_DSN === 'string' && process.env.SENTRY_DSN.trim().length > 0;
-}
-
 export function captureLoggerError(message: string, data?: unknown): void {
-    if (!isErrorTrackingConfigured()) return;
+    if (errorTracker === noopErrorTracker) return;
 
     const error = data instanceof Error ? data : new Error(message);
     const extra: Record<string, unknown> = { message };
@@ -59,8 +55,12 @@ export function captureLoggerError(message: string, data?: unknown): void {
     errorTracker(error, { extra });
 }
 
-export function setServerErrorTracker(tracker: ErrorTracker): void {
+export function setErrorTracker(tracker: ErrorTracker): void {
     errorTracker = tracker;
+}
+
+export function clearErrorTracker(): void {
+    errorTracker = noopErrorTracker;
 }
 
 export function setErrorTrackerForTests(tracker: ErrorTracker): void {
@@ -68,5 +68,5 @@ export function setErrorTrackerForTests(tracker: ErrorTracker): void {
 }
 
 export function resetErrorTrackerForTests(): void {
-    errorTracker = noopErrorTracker;
+    clearErrorTracker();
 }

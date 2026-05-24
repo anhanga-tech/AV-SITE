@@ -1,4 +1,4 @@
-import { captureLoggerError } from './error-tracking.ts';
+import { captureLoggerError } from './error-tracking';
 
 type LoggerData = unknown;
 type ConsoleMethod = 'log' | 'info' | 'warn' | 'error';

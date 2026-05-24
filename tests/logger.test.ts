@@ -107,13 +107,11 @@ test('logger.debug normaliza DEBUG antes de comparar', () => {
     }
 });
 
-test('logger.error captura erros no error tracker quando SENTRY_DSN esta configurado', () => {
-    const originalDsn = process.env.SENTRY_DSN;
+test('logger.error captura erros no error tracker registrado', () => {
     const error = captureConsole('error');
     const captured: Array<{ error: unknown; context?: ErrorCaptureContext }> = [];
 
     try {
-        process.env.SENTRY_DSN = 'https://public@example.ingest.sentry.io/1';
         setErrorTrackerForTests((capturedError, context) => {
             captured.push({ error: capturedError, context });
         });
@@ -130,25 +128,16 @@ test('logger.error captura erros no error tracker quando SENTRY_DSN esta configu
         });
     } finally {
         resetErrorTrackerForTests();
-        if (originalDsn === undefined) {
-            delete process.env.SENTRY_DSN;
-        } else {
-            process.env.SENTRY_DSN = originalDsn;
-        }
         error.restore();
     }
 });
 
-test('logger.error omite captura externa sem DSN e mascara PII obvia no contexto', () => {
-    const originalDsn = process.env.SENTRY_DSN;
+test('logger.error omite captura externa sem tracker registrado e mascara PII obvia no contexto', () => {
     const error = captureConsole('error');
     const captured: Array<{ error: unknown; context?: ErrorCaptureContext }> = [];
 
     try {
-        delete process.env.SENTRY_DSN;
-        setErrorTrackerForTests((capturedError, context) => {
-            captured.push({ error: capturedError, context });
-        });
+        resetErrorTrackerForTests();
 
         logger.error('SUBMIT_LEAD', {
             requestId: 'req_123',
@@ -161,7 +150,10 @@ test('logger.error omite captura externa sem DSN e mascara PII obvia no contexto
 
         assert.equal(captured.length, 0);
 
-        process.env.SENTRY_DSN = 'https://public@example.ingest.sentry.io/1';
+        setErrorTrackerForTests((capturedError, context) => {
+            captured.push({ error: capturedError, context });
+        });
+
         logger.error('SUBMIT_LEAD', {
             requestId: 'req_123',
             email: 'cliente@example.com',
@@ -191,11 +183,6 @@ test('logger.error omite captura externa sem DSN e mascara PII obvia no contexto
         });
     } finally {
         resetErrorTrackerForTests();
-        if (originalDsn === undefined) {
-            delete process.env.SENTRY_DSN;
-        } else {
-            process.env.SENTRY_DSN = originalDsn;
-        }
         error.restore();
     }
 });
