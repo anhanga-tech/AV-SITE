@@ -154,7 +154,7 @@ const BlogList: React.FC = () => {
                             e.preventDefault();
                             openContactModal({ source: 'blog-list' });
                         }}
-                        className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-brand-dark text-white text-lg font-bold px-10 py-5 rounded-2xl shadow-hard-yellow hover:shadow-[2px_2px_0px_#FFD600] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition"
+                        className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-brand-dark text-white text-lg font-bold px-10 py-5 rounded-2xl shadow-hard-yellow hover:shadow-[2px_2px_0px_theme(colors.brand.yellow)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition"
                         data-tracking="footer-blog-list"
                     >
                         Solicitar Orçamento

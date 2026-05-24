@@ -415,7 +415,7 @@ const AIChat: React.FC = memo(() => {
                     bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9990]
                     flex items-center justify-center gap-3
                     bg-brand-vibrant text-white
-                    shadow-[0_8px_30px_rgba(14,165,233,0.3)] hover:shadow-[0_8px_30px_rgba(14,165,233,0.5)] hover:-translate-y-1
+                    shadow-[0_8px_30px_theme(colors.brand.cyan/30%)] hover:shadow-[0_8px_30px_theme(colors.brand.cyan/50%)] hover:-translate-y-1
                     transition duration-300
                     size-16 rounded-2xl sm:w-auto sm:h-auto sm:px-6 sm:py-3.5 sm:rounded-full
                     focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-vibrant/30
