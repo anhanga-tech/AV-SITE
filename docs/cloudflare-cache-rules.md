@@ -70,19 +70,19 @@ Após criar a regra, verificar com:
 # Primeiro request (espera MISS ou REVALIDATED)
 curl -sS -o /dev/null -D - -H "Range: bytes=0-1023" \
   https://media.anhanga.tur.br/videos/hero/rio.mp4 \
-  | grep -i "cf-cache\|cache-control\|accept-ranges"
+  | grep -Ei "cf-cache-status|cache-control|accept-ranges"
 
 # Segundo request (espera HIT)
 curl -sS -o /dev/null -D - -H "Range: bytes=0-1023" \
   https://media.anhanga.tur.br/videos/hero/rio.mp4 \
-  | grep -i "cf-cache\|cache-control\|accept-ranges"
+  | grep -Ei "cf-cache-status|cache-control|accept-ranges"
 
 # Verificar todos os vídeos
 for v in videos/hero/rio.mp4 videos/hero/paris.mp4 videos/hero/maldivas.mp4 videos/hero/new-york.mp4 videos/hero/natureza.mp4 videos/lollapalooza/hero/crowd-background.mp4; do
   echo "=== $v ==="
   curl -sS -o /dev/null -D - -H "Range: bytes=0-1023" \
     "https://media.anhanga.tur.br/$v" \
-    | grep -i "cf-cache\|cache-control\|accept-ranges"
+    | grep -Ei "cf-cache-status|cache-control|accept-ranges"
 done
 ```
 
