@@ -44,9 +44,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <!-- Preload LCP Image (WebP for next-gen format delivery; browsers that requested this preload support WebP) -->
+  <!-- Preload LCP Image — responsive srcset so mobile fetches a smaller image -->
   <link rel="preload" as="image" fetchpriority="high"
-    href="https://media.anhanga.tur.br/cdn-cgi/image/format=webp,quality=85,metadata=none,fit=cover,width=1280,height=720/images/hero/rio-poster.jpg"
+    imagesrcset="
+      https://media.anhanga.tur.br/cdn-cgi/image/format=webp,quality=85,metadata=none,fit=cover,width=640,height=360/images/hero/rio-poster.jpg   640w,
+      https://media.anhanga.tur.br/cdn-cgi/image/format=webp,quality=85,metadata=none,fit=cover,width=1024,height=576/images/hero/rio-poster.jpg  1024w,
+      https://media.anhanga.tur.br/cdn-cgi/image/format=webp,quality=85,metadata=none,fit=cover,width=1280,height=720/images/hero/rio-poster.jpg  1280w
+    "
+    imagesizes="100vw"
     type="image/webp">
   <link rel="preload" as="style"
     href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap">

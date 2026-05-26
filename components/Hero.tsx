@@ -28,6 +28,15 @@ const Hero: React.FC = memo(() => {
     [backgroundVideo.poster]
   );
 
+  const posterSrcSet = useMemo(() => {
+    const url = backgroundVideo.poster;
+    return [
+      `${optimizeRemoteImageUrl(url, 640, 360)} 640w`,
+      `${optimizeRemoteImageUrl(url, 1024, 576)} 1024w`,
+      `${optimizeRemoteImageUrl(url, 1280, 720)} 1280w`,
+    ].join(', ');
+  }, [backgroundVideo.poster]);
+
   const [validCityForTitle, setValidCityForTitle] = useState<string | null>(null);
 
   // Defer video loading on mobile / save-data and wait for user intent.
@@ -103,6 +112,8 @@ const Hero: React.FC = memo(() => {
         {!shouldRenderVideo && (
           <img
             src={optimizedPoster}
+            srcSet={posterSrcSet}
+            sizes="100vw"
             alt="Paisagem de um destino de viagem paradisíaco, um dos roteiros exclusivos da Anhangá Viagens"
             width="1280"
             height="720"
