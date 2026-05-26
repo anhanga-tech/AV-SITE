@@ -44,9 +44,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <!-- Preload LCP Image (WebP for next-gen format delivery; browsers that requested this preload support WebP) -->
+  <!-- Preload LCP Image — responsive srcset so mobile fetches a smaller image.
+       Dimensions match Cloudflare preset outputs (960x540, 1200x675, 1280x720)
+       so the preload URL is identical to what Hero.tsx srcSet generates. -->
   <link rel="preload" as="image" fetchpriority="high"
-    href="https://media.anhanga.tur.br/cdn-cgi/image/format=webp,quality=85,metadata=none,fit=cover,width=1280,height=720/images/hero/rio-poster.jpg"
+    imagesrcset="
+      https://media.anhanga.tur.br/cdn-cgi/image/format=webp,quality=85,metadata=none,fit=cover,width=960,height=540/images/hero/rio-poster.jpg    960w,
+      https://media.anhanga.tur.br/cdn-cgi/image/format=webp,quality=85,metadata=none,fit=cover,width=1200,height=675/images/hero/rio-poster.jpg  1200w,
+      https://media.anhanga.tur.br/cdn-cgi/image/format=webp,quality=85,metadata=none,fit=cover,width=1280,height=720/images/hero/rio-poster.jpg  1280w
+    "
+    imagesizes="100vw"
     type="image/webp">
   <link rel="preload" as="style"
     href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap">

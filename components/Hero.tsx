@@ -28,6 +28,18 @@ const Hero: React.FC = memo(() => {
     [backgroundVideo.poster]
   );
 
+  const posterSrcSet = useMemo(() => {
+    const url = backgroundVideo.poster;
+    // Use the actual Cloudflare preset dimensions (960x540, 1200x675, 1280x720)
+    // so the w-descriptor matches the real pixel width of the generated URL,
+    // and force webp to match the preload in index.html (avoiding double download).
+    return [
+      `${optimizeRemoteImageUrl(url, 960, 540, 'webp')} 960w`,
+      `${optimizeRemoteImageUrl(url, 1200, 675, 'webp')} 1200w`,
+      `${optimizeRemoteImageUrl(url, 1280, 720, 'webp')} 1280w`,
+    ].join(', ');
+  }, [backgroundVideo.poster]);
+
   const [validCityForTitle, setValidCityForTitle] = useState<string | null>(null);
 
   // Defer video loading on mobile / save-data and wait for user intent.
@@ -103,6 +115,8 @@ const Hero: React.FC = memo(() => {
         {!shouldRenderVideo && (
           <img
             src={optimizedPoster}
+            srcSet={posterSrcSet}
+            sizes="100vw"
             alt="Paisagem de um destino de viagem paradisíaco, um dos roteiros exclusivos da Anhangá Viagens"
             width="1280"
             height="720"
