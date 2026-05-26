@@ -12,3 +12,12 @@
 
 /admin/*
   X-Robots-Tag: noindex, nofollow
+
+/nps
+  X-Robots-Tag: noindex, nofollow
+
+/nps/
+  X-Robots-Tag: noindex, nofollow
+
+/nps/*
+  X-Robots-Tag: noindex, nofollow

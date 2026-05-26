@@ -147,6 +147,15 @@ test('Cloudflare Pages headers should cache hashed Vite assets immutably', async
   assert.notEqual(globalHeaders.get('Cache-Control'), assetHeaders.get('Cache-Control'));
 });
 
+test('Cloudflare Pages headers should keep NPS routes out of search results', async () => {
+  const headers = await readFile(new URL('../public/_headers', import.meta.url), 'utf8');
+  const blocks = collectHeadersBlocks(headers);
+
+  for (const path of ['/nps', '/nps/', '/nps/*']) {
+    assert.equal(blocks.get(path)?.get('X-Robots-Tag'), 'noindex, nofollow');
+  }
+});
+
 test('Cloudflare Pages headers should include HSTS on the global route', async () => {
   const headers = await readFile(new URL('../public/_headers', import.meta.url), 'utf8');
   const blocks = collectHeadersBlocks(headers);

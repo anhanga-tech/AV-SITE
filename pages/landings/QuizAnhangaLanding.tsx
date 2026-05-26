@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { SEO } from '../../components/SEO';
+import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { useQuizCapture } from '../../hooks/useQuizCapture';
 import { getWhatsAppLink } from '../../utils/whatsapp';
 import { matchProfile, type ProfileKey } from '../../lib/quiz-scoring';
@@ -17,6 +18,10 @@ import './quiz-anhanga.css';
  */
 function useQuizUrlParams() {
     return useMemo(() => {
+        if (typeof window === 'undefined') {
+            return { email: '', nome: '', sobrenome: '', skip: false };
+        }
+
         const p = new URLSearchParams(window.location.search);
         const email = p.get('email') ?? '';
         const nome = p.get('nome') ?? '';
@@ -1034,6 +1039,12 @@ export default function QuizAnhangaLanding() {
                 description="6 perguntas rápidas para descobrir seu perfil de viajante e os destinos que mais combinam com você. Gratuito e sem compromisso."
                 canonical="https://www.anhanga.tur.br/quiz/"
                 noHreflang
+            />
+            <BreadcrumbSchema
+                items={[
+                    { name: 'Início', item: 'https://www.anhanga.tur.br/' },
+                    { name: 'Quiz de Destinos', item: 'https://www.anhanga.tur.br/quiz/' },
+                ]}
             />
             <div className="quiz-page">
                 <div className="quiz-app">

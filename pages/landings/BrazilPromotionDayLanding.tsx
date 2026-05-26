@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { SEO } from '../../components/SEO';
+import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { BpdNav } from '../../components/landings/brazil-promotion-day/BpdNav';
 import { BpdHero } from '../../components/landings/brazil-promotion-day/BpdHero';
 import { BpdPillars } from '../../components/landings/brazil-promotion-day/BpdPillars';
@@ -25,6 +26,12 @@ const BrazilPromotionDayLanding: React.FC = () => {
                 title="Anhangá Viagens na Brazil Promotion Day | Roteiros Personalizados"
                 description="Conheça a Anhangá Viagens na Brazil Promotion Day. Agência de viagens em SP com roteiros exclusivos feitos do zero, sem pacote pronto."
                 canonical="https://www.anhanga.tur.br/brazil-promotion-day/"
+            />
+            <BreadcrumbSchema
+                items={[
+                    { name: 'Início', item: 'https://www.anhanga.tur.br/' },
+                    { name: 'Brazil Promotion Day', item: 'https://www.anhanga.tur.br/brazil-promotion-day/' },
+                ]}
             />
             <div className="bg-brand-surface min-h-screen font-sans">
                 <BpdNav />
