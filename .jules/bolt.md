@@ -39,3 +39,7 @@
 ## 2026-11-20 - ⚡ Bolt: Hero Search State Isolation
 **Learning:** Storing character-by-character input state in a high-level component that contains heavy Framer Motion animations and background videos (like Hero.tsx) is a significant performance anti-pattern. Every keystroke triggers a full re-render of the animations and the video element, causing noticeable typing lag and high CPU/GPU usage on mobile devices.
 **Action:** Always isolate high-frequency state (like text inputs) into dedicated, memoized sub-components to prevent parent components from re-rendering their expensive visual assets during interaction.
+
+## 2026-12-10 - ⚡ Bolt: BackToTop Scroll Optimization
+**Learning:** Implementing multiple independent, unthrottled scroll listeners for small floating UI elements (like BackToTop) is a common source of main-thread congestion. Reusing a centralized, throttled hook (like `useScrolled`) that uses `requestAnimationFrame` significantly reduces CPU overhead during fast scrolling and ensures UI updates stay synchronized with the browser's refresh rate.
+**Action:** Always reuse existing throttled scroll hooks for any UI element that depends on scroll position to minimize the number of event listeners and prevent jank.
