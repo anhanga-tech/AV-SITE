@@ -1,40 +1,30 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useCallback, memo } from 'react';
 import { CaretUp } from '@phosphor-icons/react';
+import { useScrolled } from '../Header/useScrolled';
 
 /**
- * BackToTop Component
- * A floating button that appears after scrolling down and smoothly returns the user to the top.
+ * BackToTop Component - Optimized for Performance.
+ *
+ * PERFORMANCE WIN:
+ * 1. Utilizes the shared `useScrolled` hook which implements `requestAnimationFrame`
+ *    throttling for scroll events, reducing main-thread pressure compared to
+ *    unthrottled raw scroll listeners.
+ * 2. Wrapped in `React.memo` to prevent unnecessary re-renders when parent components
+ *    (like App layout) update their state.
  */
-const BackToTop: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(false);
+const BackToTop: React.FC = memo(() => {
+  const isVisible = useScrolled(400);
 
-  // Toggle visibility based on scroll position
-  useEffect(() => {
-    const toggleVisibility = () => {
-      if (window.scrollY > 400) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
-      }
-    };
-
-    window.addEventListener('scroll', toggleVisibility, { passive: true });
-    return () => window.removeEventListener('scroll', toggleVisibility);
-  }, []);
-
-  const scrollToTop = useCallback(async () => {
+  const scrollToTop = useCallback(() => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth',
     });
 
     // Trigger light haptic feedback
-    try {
-      const { triggerHaptic } = await import('../../utils/haptics');
-      triggerHaptic('light');
-    } catch (error) {
-      // Haptics not supported or failed to load
-    }
+    import('../../utils/haptics')
+      .then(m => m.triggerHaptic('light'))
+      .catch(() => {});
   }, []);
 
   return (
@@ -54,6 +44,8 @@ const BackToTop: React.FC = () => {
       <CaretUp className="size-6" weight="bold" />
     </button>
   );
-};
+});
+
+BackToTop.displayName = 'BackToTop';
 
 export default BackToTop;
