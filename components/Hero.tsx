@@ -30,10 +30,13 @@ const Hero: React.FC = memo(() => {
 
   const posterSrcSet = useMemo(() => {
     const url = backgroundVideo.poster;
+    // Use the actual Cloudflare preset dimensions (960x540, 1200x675, 1280x720)
+    // so the w-descriptor matches the real pixel width of the generated URL,
+    // and force webp to match the preload in index.html (avoiding double download).
     return [
-      `${optimizeRemoteImageUrl(url, 640, 360)} 640w`,
-      `${optimizeRemoteImageUrl(url, 1024, 576)} 1024w`,
-      `${optimizeRemoteImageUrl(url, 1280, 720)} 1280w`,
+      `${optimizeRemoteImageUrl(url, 960, 540, 'webp')} 960w`,
+      `${optimizeRemoteImageUrl(url, 1200, 675, 'webp')} 1200w`,
+      `${optimizeRemoteImageUrl(url, 1280, 720, 'webp')} 1280w`,
     ].join(', ');
   }, [backgroundVideo.poster]);
 
