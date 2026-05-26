@@ -90,6 +90,16 @@ export default async function handler(request: Request): Promise<Response> {
   });
 
   if (!rateLimit.allowed) {
+    if (rateLimit.serviceUnavailable) {
+      logger.error('SUBMIT_NPS', { requestId, stage: 'service_unavailable', clientIP });
+      return buildJsonResponse(
+        { ok: false, requestId, code: 'SERVICE_UNAVAILABLE', error: 'Serviço temporariamente indisponível. Tente novamente em instantes.' },
+        503,
+        corsHeaders,
+        requestId,
+      );
+    }
+
     logger.warn('SUBMIT_NPS', {
       requestId,
       stage: 'rate_limited',

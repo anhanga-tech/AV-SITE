@@ -11,6 +11,7 @@ mode = "off"
 mode = "smart"
 
 [vars]
+CF_PAGES = "1"
 NODE_VERSION = "24"
 AI_GATEWAY_ENABLED = "true"
 CLOUDFLARE_AI_GATEWAY_ID = "av-site"
@@ -32,6 +33,7 @@ HUBSPOT_DEAL_STAGE_ID = "appointmentscheduled"
 HUBSPOT_DEAL_BANT_PROPERTY = "bant_summary"
 
 [env.production.vars]
+CF_PAGES = "1"
 NODE_VERSION = "24"
 AI_GATEWAY_ENABLED = "true"
 CLOUDFLARE_AI_GATEWAY_ID = "av-site"

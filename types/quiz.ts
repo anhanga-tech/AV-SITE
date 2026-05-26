@@ -28,7 +28,8 @@ export type SubmitQuizErrorCode =
     | 'N8N_WEBHOOK_ERROR'
     | 'INTERNAL_ERROR'
     | 'METHOD_NOT_ALLOWED'
-    | 'RATE_LIMIT_EXCEEDED';
+    | 'RATE_LIMIT_EXCEEDED'
+    | 'SERVICE_UNAVAILABLE';
 
 export interface SubmitQuizError {
     ok: false;

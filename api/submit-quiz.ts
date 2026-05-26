@@ -129,6 +129,15 @@ export default async function handler(request: Request): Promise<Response> {
     });
 
     if (!rateLimitResult.allowed) {
+        if (rateLimitResult.serviceUnavailable) {
+            emitQuizLog('error', requestId, 'service_unavailable', { clientIp });
+            return buildJsonResponse(
+                { ok: false, requestId, error: 'Serviço temporariamente indisponível. Tente novamente em instantes.', code: 'SERVICE_UNAVAILABLE' },
+                503,
+                corsHeaders,
+            );
+        }
+
         const retryAfterSec = Math.ceil(rateLimitResult.resetIn / 1000);
         emitQuizLog('warn', requestId, 'rate_limited', {
             clientIp,

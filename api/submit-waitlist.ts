@@ -134,6 +134,14 @@ async function getRateLimitResponse(
 
     if (rateLimit.allowed) return null;
 
+    if (rateLimit.serviceUnavailable) {
+        return buildJsonResponse(
+            { ok: false, requestId, code: 'SERVICE_UNAVAILABLE', error: 'Serviço temporariamente indisponível. Tente novamente em instantes.' },
+            503,
+            corsHeaders,
+        );
+    }
+
     return buildJsonResponse(
         {
             ok: false,

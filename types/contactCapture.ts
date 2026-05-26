@@ -27,7 +27,8 @@ export type SubmitContactErrorCode =
     | 'SERVER_CONFIG_ERROR'
     | 'N8N_WEBHOOK_ERROR'
     | 'METHOD_NOT_ALLOWED'
-    | 'INTERNAL_ERROR';
+    | 'INTERNAL_ERROR'
+    | 'SERVICE_UNAVAILABLE';
 
 export interface SubmitContactSuccess {
     ok: true;

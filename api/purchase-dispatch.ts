@@ -322,6 +322,14 @@ async function enforceRateLimit(request: Request, requestId: string): Promise<Re
     return null;
   }
 
+  if (rateLimit.serviceUnavailable) {
+    emitConversionLog('error', requestId, 'service_unavailable', { clientIP });
+    return buildJsonResponse(
+      { ok: false, requestId, error: 'Serviço temporariamente indisponível. Tente novamente em instantes.' },
+      503,
+    );
+  }
+
   emitConversionLog('warn', requestId, 'rate_limited', {
     clientIP,
     remaining: rateLimit.remaining,

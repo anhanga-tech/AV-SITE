@@ -121,6 +121,15 @@ async function getRateLimitResponse(
 
     if (rateLimit.allowed) return null;
 
+    if (rateLimit.serviceUnavailable) {
+        emitLeadLog('error', requestId, 'service_unavailable', { clientIP });
+        return buildJsonResponse(
+            { ok: false, requestId, code: 'SERVICE_UNAVAILABLE', error: 'Serviço temporariamente indisponível. Tente novamente em instantes.' },
+            503,
+            corsHeaders,
+        );
+    }
+
     emitLeadLog('warn', requestId, 'rate_limited', {
         clientIP,
         remaining: rateLimit.remaining,

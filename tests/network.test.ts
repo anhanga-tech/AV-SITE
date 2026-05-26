@@ -15,12 +15,34 @@ test('getClientIP uses Cloudflare connecting IP before spoofable headers', () =>
     assert.equal(getClientIP(request), '203.0.113.10');
 });
 
-test('getClientIP uses the proxy-appended X-Forwarded-For value as generic fallback', () => {
+test('getClientIP uses the leftmost (original client) IP from X-Forwarded-For', () => {
     const request = new Request('https://example.com/api/generate', {
         headers: {
-            'x-forwarded-for': '10.0.0.42, 198.51.100.30',
+            'x-forwarded-for': '203.0.113.42, 198.51.100.30',
         },
     });
 
-    assert.equal(getClientIP(request), '198.51.100.30');
+    // Leftmost is the original client per RFC 7239; rightmost is the last proxy.
+    assert.equal(getClientIP(request), '203.0.113.42');
+});
+
+test('getClientIP X-Forwarded-For with single IP returns that IP', () => {
+    const request = new Request('https://example.com/api/generate', {
+        headers: {
+            'x-forwarded-for': '203.0.113.55',
+        },
+    });
+
+    assert.equal(getClientIP(request), '203.0.113.55');
+});
+
+test('getClientIP X-Forwarded-For is consistent with x-vercel-forwarded-for (both take first IP)', () => {
+    const vercelRequest = new Request('https://example.com/api/generate', {
+        headers: { 'x-vercel-forwarded-for': '203.0.113.10, 10.0.0.1' },
+    });
+    const xffRequest = new Request('https://example.com/api/generate', {
+        headers: { 'x-forwarded-for': '203.0.113.10, 10.0.0.1' },
+    });
+
+    assert.equal(getClientIP(vercelRequest), getClientIP(xffRequest));
 });
