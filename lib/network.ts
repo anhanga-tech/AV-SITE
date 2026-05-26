@@ -34,28 +34,34 @@ export function buildJsonError(status: number, code: string, message: string): R
 
 /**
  * Extracts the client IP from the request headers.
- * Specialized for Vercel's environment.
+ * Prioritizes Cloudflare's edge-provided header before legacy fallbacks.
  */
 export function getClientIP(request: Request): string {
-    // Prioritize X-Real-IP as it is more reliable on Vercel
-    const realIP = request.headers.get('x-real-ip');
-    if (realIP) {
-        return realIP.trim();
+    const cfConnectingIP = getTrimmedHeader(request, 'cf-connecting-ip');
+    if (cfConnectingIP) {
+        return cfConnectingIP;
     }
 
-    // Vercel-specific header
-    const vercelForwardedFor = request.headers.get('x-vercel-forwarded-for');
+    const realIP = getTrimmedHeader(request, 'x-real-ip');
+    if (realIP) {
+        return realIP;
+    }
+
+    const vercelForwardedFor = getTrimmedHeader(request, 'x-vercel-forwarded-for');
     if (vercelForwardedFor) {
         return vercelForwardedFor.split(',')[0].trim();
     }
 
-    // Fallback to X-Forwarded-For
-    const forwardedFor = request.headers.get('x-forwarded-for');
+    const forwardedFor = getTrimmedHeader(request, 'x-forwarded-for');
     if (forwardedFor) {
-        const ips = forwardedFor.split(',').map(ip => ip.trim());
-        // Standard practice: use the first one (original client)
-        return ips[0];
+        const ips = forwardedFor.split(',').map(ip => ip.trim()).filter(Boolean);
+        return ips[ips.length - 1] || 'unknown';
     }
 
     return 'unknown';
+}
+
+function getTrimmedHeader(request: Request, headerName: string): string | undefined {
+    const value = request.headers.get(headerName)?.trim();
+    return value || undefined;
 }
