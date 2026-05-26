@@ -4,6 +4,8 @@ import { checkRateLimit } from '../lib/rate-limit';
 import { cleanString, maskEmail } from '../lib/lead-logic';
 import { logger } from '../lib/logger';
 import { SubmitNpsBodySchema } from '../lib/schemas/submit-nps';
+import { sendNpsToN8n } from '../services/n8n';
+import type { N8nNpsPayload } from '../lib/n8n-payloads';
 
 export const config = {
   runtime: 'edge',
@@ -11,6 +13,7 @@ export const config = {
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 3;
+const N8N_WEBHOOK_ERROR_PATTERN = /^N8N_WEBHOOK_ERROR:(\d{3}):/;
 
 function buildJsonResponse(
   body: unknown,
@@ -39,6 +42,17 @@ function mapNpsZodError(error: z.ZodError): string {
   return 'Payload inválido.';
 }
 
+function classifyNpsWebhookError(error: unknown): { status: number; stage: string } {
+  const message = error instanceof Error ? error.message : String(error);
+  const match = message.match(N8N_WEBHOOK_ERROR_PATTERN);
+  if (!match) return { status: 500, stage: 'unexpected' };
+  const upstreamStatus = Number.parseInt(match[1], 10);
+  return {
+    status: upstreamStatus === 504 ? 504 : 502,
+    stage: upstreamStatus === 504 ? 'webhook_timeout' : 'webhook_failed',
+  };
+}
+
 export default async function handler(request: Request): Promise<Response> {
   const requestId = createRequestId();
   const corsHeaders = buildCorsHeaders();
@@ -57,7 +71,8 @@ export default async function handler(request: Request): Promise<Response> {
   }
 
   const webhookUrl = process.env.NPS_WEBHOOK_URL?.trim();
-  if (!webhookUrl) {
+  const webhookSecret = process.env.N8N_WEBHOOK_SECRET?.trim();
+  if (!webhookUrl || !webhookSecret) {
     logger.error('SUBMIT_NPS', { requestId, stage: 'config', code: 'SERVER_CONFIG_ERROR' });
     return buildJsonResponse(
       { ok: false, requestId, code: 'SERVER_CONFIG_ERROR', error: 'Serviço de NPS indisponível no momento.' },
@@ -122,68 +137,48 @@ export default async function handler(request: Request): Promise<Response> {
   }
 
   const raw = parsed.data;
-  const payload = {
-    firstname: cleanString(raw.firstname),
-    email:     cleanString(raw.email),
-    score:     raw.score,
-    reason:    cleanString(raw.reason),
-    highlight: cleanString(raw.highlight),
+  const npsPayload: N8nNpsPayload = {
+    requestId,
+    firstname:   cleanString(raw.firstname),
+    email:       cleanString(raw.email),
+    score:       raw.score,
+    reason:      cleanString(raw.reason),
+    highlight:   cleanString(raw.highlight),
+    submittedAt: new Date().toISOString(),
   };
 
   logger.info('SUBMIT_NPS', {
     requestId,
     stage: 'sending',
-    email: maskEmail(payload.email),
-    score: payload.score,
+    email: maskEmail(npsPayload.email),
+    score: npsPayload.score,
   });
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 8000);
-
   try {
-    const webhookRes = await fetch(webhookUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...payload, submittedAt: new Date().toISOString(), requestId }),
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
-
-    if (!webhookRes.ok) {
-      const text = await webhookRes.text().catch(() => '');
-      logger.error('SUBMIT_NPS', {
-        requestId,
-        stage: 'webhook_failed',
-        status: webhookRes.status,
-        detail: text.slice(0, 200),
-      });
-      return buildJsonResponse(
-        { ok: false, requestId, code: 'WEBHOOK_ERROR', error: 'Erro ao registrar avaliação. Tente novamente.' },
-        502,
-        corsHeaders,
-        requestId,
-      );
-    }
-
-    logger.info('SUBMIT_NPS', { requestId, stage: 'done', score: payload.score });
+    await sendNpsToN8n(webhookUrl, webhookSecret, requestId, npsPayload);
+  } catch (error: unknown) {
+    const { status, stage } = classifyNpsWebhookError(error);
+    logger.error('SUBMIT_NPS', { requestId, stage });
     return buildJsonResponse(
-      { ok: true, requestId, message: 'Avaliação registrada com sucesso.' },
-      201,
-      corsHeaders,
-      requestId,
-    );
-  } catch (err) {
-    clearTimeout(timeoutId);
-    logger.error('SUBMIT_NPS', {
-      requestId,
-      stage: err instanceof Error && err.name === 'AbortError' ? 'webhook_timeout' : 'unexpected',
-      errorType: err instanceof Error ? err.name : typeof err,
-    });
-    return buildJsonResponse(
-      { ok: false, requestId, code: 'INTERNAL_ERROR', error: 'Erro interno. Tente novamente.' },
-      500,
+      {
+        ok: false,
+        requestId,
+        code: status === 500 ? 'INTERNAL_ERROR' : 'WEBHOOK_ERROR',
+        error: status === 500
+          ? 'Erro interno. Tente novamente.'
+          : 'Erro ao registrar avaliação. Tente novamente.',
+      },
+      status,
       corsHeaders,
       requestId,
     );
   }
+
+  logger.info('SUBMIT_NPS', { requestId, stage: 'done', score: npsPayload.score });
+  return buildJsonResponse(
+    { ok: true, requestId, message: 'Avaliação registrada com sucesso.' },
+    201,
+    corsHeaders,
+    requestId,
+  );
 }

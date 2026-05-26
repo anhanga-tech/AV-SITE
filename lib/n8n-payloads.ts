@@ -239,3 +239,13 @@ export function buildN8nQuizPayload(payload: SubmitQuizRequest, requestId: strin
         },
     };
 }
+
+export interface N8nNpsPayload {
+    requestId: string;
+    firstname: string;
+    email: string;
+    score: number;
+    reason: string;
+    highlight: string;
+    submittedAt: string;
+}

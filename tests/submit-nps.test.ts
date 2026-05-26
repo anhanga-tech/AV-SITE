@@ -4,12 +4,18 @@ import handler from '../api/submit-nps.ts';
 
 const originalFetch = global.fetch;
 const originalNpsWebhookUrl = process.env.NPS_WEBHOOK_URL;
+const originalN8nWebhookSecret = process.env.N8N_WEBHOOK_SECRET;
 
 function restoreEnv() {
     if (originalNpsWebhookUrl === undefined) {
         delete process.env.NPS_WEBHOOK_URL;
     } else {
         process.env.NPS_WEBHOOK_URL = originalNpsWebhookUrl;
+    }
+    if (originalN8nWebhookSecret === undefined) {
+        delete process.env.N8N_WEBHOOK_SECRET;
+    } else {
+        process.env.N8N_WEBHOOK_SECRET = originalN8nWebhookSecret;
     }
 }
 
@@ -34,7 +40,19 @@ function buildRequest(
 interface MockWebhookCall {
     url: string;
     method: string;
+    headers: Record<string, string>;
     body?: Record<string, unknown>;
+}
+
+function extractHeaders(raw: HeadersInit | undefined): Record<string, string> {
+    if (!raw) return {};
+    if (raw instanceof Headers) {
+        const result: Record<string, string> = {};
+        raw.forEach((value, key) => { result[key] = value; });
+        return result;
+    }
+    if (Array.isArray(raw)) return Object.fromEntries(raw) as Record<string, string>;
+    return raw as Record<string, string>;
 }
 
 function createMockWebhookFetch(
@@ -42,10 +60,11 @@ function createMockWebhookFetch(
     response: Response,
 ): typeof fetch {
     return (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-        const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+        const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : (input as Request).url;
         calls.push({
             url,
             method: init?.method ?? 'GET',
+            headers: extractHeaders(init?.headers),
             body: init?.body ? JSON.parse(String(init.body)) as Record<string, unknown> : undefined,
         });
         return response;
@@ -63,6 +82,11 @@ function validBody(overrides?: Record<string, unknown>) {
     };
 }
 
+function setValidEnv() {
+    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
+    process.env.N8N_WEBHOOK_SECRET = 'test-secret-abc';
+}
+
 // ─── Config errors ──────────────────────────────────────────────────────────
 
 test('submit-nps returns 500 SERVER_CONFIG_ERROR when NPS_WEBHOOK_URL is absent', async (t) => {
@@ -72,6 +96,25 @@ test('submit-nps returns 500 SERVER_CONFIG_ERROR when NPS_WEBHOOK_URL is absent'
     });
 
     delete process.env.NPS_WEBHOOK_URL;
+    process.env.N8N_WEBHOOK_SECRET = 'test-secret-abc';
+    global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
+
+    const response = await handler(buildRequest(validBody()));
+    const body = await response.json() as Record<string, unknown>;
+
+    assert.equal(response.status, 500);
+    assert.equal(body.ok, false);
+    assert.equal(body.code, 'SERVER_CONFIG_ERROR');
+});
+
+test('submit-nps returns 500 SERVER_CONFIG_ERROR when N8N_WEBHOOK_SECRET is absent', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+        restoreEnv();
+    });
+
+    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
+    delete process.env.N8N_WEBHOOK_SECRET;
     global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
 
     const response = await handler(buildRequest(validBody()));
@@ -90,7 +133,7 @@ test('submit-nps returns 405 METHOD_NOT_ALLOWED for GET requests', async (t) => 
         restoreEnv();
     });
 
-    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
+    setValidEnv();
 
     const response = await handler(buildRequest({}, { method: 'GET' }));
     const body = await response.json() as Record<string, unknown>;
@@ -106,7 +149,7 @@ test('submit-nps returns 204 for OPTIONS preflight', async (t) => {
         restoreEnv();
     });
 
-    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
+    setValidEnv();
 
     const response = await handler(buildRequest({}, { method: 'OPTIONS' }));
 
@@ -121,7 +164,7 @@ test('submit-nps returns 400 VALIDATION_ERROR for malformed JSON body', async (t
         restoreEnv();
     });
 
-    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
+    setValidEnv();
     global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
 
     const request = new Request('http://localhost/api/submit-nps', {
@@ -149,7 +192,7 @@ test('submit-nps returns 400 for missing firstname', async (t) => {
         restoreEnv();
     });
 
-    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
+    setValidEnv();
     global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
 
     const response = await handler(buildRequest(validBody({ firstname: '' })));
@@ -166,7 +209,7 @@ test('submit-nps returns 400 for firstname over 100 characters', async (t) => {
         restoreEnv();
     });
 
-    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
+    setValidEnv();
     global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
 
     const response = await handler(buildRequest(validBody({ firstname: 'A'.repeat(101) })));
@@ -182,7 +225,7 @@ test('submit-nps returns 400 for invalid email', async (t) => {
         restoreEnv();
     });
 
-    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
+    setValidEnv();
     global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
 
     const response = await handler(buildRequest(validBody({ email: 'not-an-email' })));
@@ -198,7 +241,7 @@ test('submit-nps returns 400 for score below 0', async (t) => {
         restoreEnv();
     });
 
-    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
+    setValidEnv();
     global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
 
     const response = await handler(buildRequest(validBody({ score: -1 })));
@@ -214,7 +257,7 @@ test('submit-nps returns 400 for score above 10', async (t) => {
         restoreEnv();
     });
 
-    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
+    setValidEnv();
     global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
 
     const response = await handler(buildRequest(validBody({ score: 11 })));
@@ -230,7 +273,7 @@ test('submit-nps returns 400 for non-integer score', async (t) => {
         restoreEnv();
     });
 
-    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
+    setValidEnv();
     global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
 
     const response = await handler(buildRequest(validBody({ score: 7.5 })));
@@ -246,7 +289,7 @@ test('submit-nps returns 400 for non-numeric score', async (t) => {
         restoreEnv();
     });
 
-    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
+    setValidEnv();
     global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
 
     const response = await handler(buildRequest(validBody({ score: '9' })));
@@ -262,7 +305,7 @@ test('submit-nps returns 400 for empty reason', async (t) => {
         restoreEnv();
     });
 
-    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
+    setValidEnv();
     global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
 
     const response = await handler(buildRequest(validBody({ reason: '' })));
@@ -278,7 +321,7 @@ test('submit-nps returns 400 for reason over 2000 characters', async (t) => {
         restoreEnv();
     });
 
-    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
+    setValidEnv();
     global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
 
     const response = await handler(buildRequest(validBody({ reason: 'x'.repeat(2001) })));
@@ -294,7 +337,7 @@ test('submit-nps returns 400 for highlight over 2000 characters', async (t) => {
         restoreEnv();
     });
 
-    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
+    setValidEnv();
     global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
 
     const response = await handler(buildRequest(validBody({ highlight: 'x'.repeat(2001) })));
@@ -312,7 +355,7 @@ test('submit-nps returns 201 and forwards payload to webhook on success', async 
         restoreEnv();
     });
 
-    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
+    setValidEnv();
 
     const calls: MockWebhookCall[] = [];
     global.fetch = createMockWebhookFetch(calls, new Response('ok', { status: 200 }));
@@ -339,13 +382,35 @@ test('submit-nps returns 201 and forwards payload to webhook on success', async 
         'submittedAt deve ser gerado server-side em formato ISO 8601');
 });
 
+test('submit-nps sends X-Webhook-Secret header on outbound call', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+        restoreEnv();
+    });
+
+    setValidEnv();
+
+    const calls: MockWebhookCall[] = [];
+    global.fetch = createMockWebhookFetch(calls, new Response('ok', { status: 200 }));
+
+    const response = await handler(buildRequest(validBody()));
+
+    assert.equal(response.status, 201);
+    assert.equal(calls.length, 1);
+    assert.equal(
+        calls[0]!.headers['x-webhook-secret'],
+        'test-secret-abc',
+        'X-Webhook-Secret deve ser enviado para autenticar o webhook',
+    );
+});
+
 test('submit-nps accepts score 0 (boundary)', async (t) => {
     t.after(() => {
         global.fetch = originalFetch;
         restoreEnv();
     });
 
-    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
+    setValidEnv();
     global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
 
     const response = await handler(buildRequest(validBody({ score: 0 })));
@@ -358,7 +423,7 @@ test('submit-nps accepts score 10 (boundary)', async (t) => {
         restoreEnv();
     });
 
-    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
+    setValidEnv();
     global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
 
     const response = await handler(buildRequest(validBody({ score: 10 })));
@@ -371,7 +436,7 @@ test('submit-nps accepts empty highlight (optional field)', async (t) => {
         restoreEnv();
     });
 
-    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
+    setValidEnv();
     global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
 
     const response = await handler(buildRequest(validBody({ highlight: '' })));
@@ -386,7 +451,7 @@ test('submit-nps returns 502 WEBHOOK_ERROR when upstream returns non-2xx', async
         restoreEnv();
     });
 
-    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
+    setValidEnv();
     global.fetch = createMockWebhookFetch([], new Response('Bad Gateway', { status: 502 }));
 
     const response = await handler(buildRequest(validBody()));
@@ -405,7 +470,7 @@ test('submit-nps enforces rate limit after 3 requests from the same IP', async (
         restoreEnv();
     });
 
-    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
+    setValidEnv();
     global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
 
     // Use a fixed unique IP to isolate this test's rate limit bucket
@@ -445,7 +510,7 @@ test('submit-nps enforces rate-limit even for invalid payloads (DoS protection)'
         restoreEnv();
     });
 
-    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
+    setValidEnv();
     global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
 
     const uniqueIp = `10.${Math.floor(Math.random() * 254) + 1}.${Math.floor(Math.random() * 254) + 1}.4`;

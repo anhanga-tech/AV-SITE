@@ -1,4 +1,4 @@
-import type { N8nContactPayload, N8nLeadPayload, N8nQuizPayload, N8nWaitlistPayload } from '../lib/n8n-payloads';
+import type { N8nContactPayload, N8nLeadPayload, N8nNpsPayload, N8nQuizPayload, N8nWaitlistPayload } from '../lib/n8n-payloads';
 
 // 5 seconds gives self-hosted n8n enough headroom for cold-start workflows
 // without hanging the edge function indefinitely. Override with N8N_WEBHOOK_TIMEOUT_MS.
@@ -119,6 +119,15 @@ export function sendQuizToN8n(
     secret: string,
     requestId: string,
     payload: N8nQuizPayload,
+): Promise<Response> {
+    return n8nRequest(url, secret, requestId, payload);
+}
+
+export function sendNpsToN8n(
+    url: string,
+    secret: string,
+    requestId: string,
+    payload: N8nNpsPayload,
 ): Promise<Response> {
     return n8nRequest(url, secret, requestId, payload);
 }
