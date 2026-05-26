@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
-import { buildPrerenderRoutes } from '../lib/prerender-routes.js';
+import { BASE_PRERENDER_ROUTES, buildPrerenderRoutes } from '../lib/prerender-routes.js';
 
 test('buildPrerenderRoutes includes blog index and blog post routes from MDX files', async () => {
   const blogDir = await mkdtemp(path.join(os.tmpdir(), 'prerender-routes-'));
@@ -16,10 +16,23 @@ test('buildPrerenderRoutes includes blog index and blog post routes from MDX fil
     const routes = await buildPrerenderRoutes(blogDir);
 
     assert.ok(routes.includes('/blog'));
+    assert.ok(routes.includes('/consultoria-de-viagem'));
+    assert.ok(routes.includes('/viagens-para-executivos'));
+    assert.ok(routes.includes('/curadoria-cruzeiros-brasil'));
+    assert.ok(routes.includes('/quiz'));
     assert.ok(routes.includes('/blog/post-alpha'));
     assert.ok(routes.includes('/blog/post-beta'));
+    assert.equal(routes.includes('/nps'), false);
+    assert.equal(routes.length, new Set(routes).size);
     assert.equal(routes.some((route) => route.includes('_template')), false);
   } finally {
     await rm(blogDir, { recursive: true, force: true });
   }
+});
+
+test('base prerender routes come from the indexable static sitemap routes', () => {
+  assert.ok(BASE_PRERENDER_ROUTES.includes('/'));
+  assert.ok(BASE_PRERENDER_ROUTES.includes('/blog'));
+  assert.ok(BASE_PRERENDER_ROUTES.includes('/brazil-promotion-day'));
+  assert.equal(BASE_PRERENDER_ROUTES.includes('/nps'), false);
 });

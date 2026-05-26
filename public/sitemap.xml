@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-  <!-- Home -->
   <url>
     <loc>https://www.anhanga.tur.br/</loc>
-    <lastmod>2026-03-30</lastmod>
+    <lastmod>2026-05-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image>
@@ -12,11 +11,9 @@
       <image:caption>Anhangá Viagens - Agência de Viagens Personalizadas em São Paulo</image:caption>
     </image:image>
   </url>
-
-  <!-- Landing Pages -->
   <url>
     <loc>https://www.anhanga.tur.br/beto-carrero/</loc>
-    <lastmod>2026-03-04</lastmod>
+    <lastmod>2026-05-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -30,7 +27,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/lollapalooza/</loc>
-    <lastmod>2026-03-30</lastmod>
+    <lastmod>2026-05-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -40,7 +37,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/orlando/</loc>
-    <lastmod>2026-03-04</lastmod>
+    <lastmod>2026-05-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -48,10 +45,9 @@
       <image:caption>Pacotes para Orlando e Disney World - Anhangá Viagens</image:caption>
     </image:image>
   </url>
-
   <url>
     <loc>https://www.anhanga.tur.br/melhor-idade/</loc>
-    <lastmod>2026-03-22</lastmod>
+    <lastmod>2026-05-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -59,11 +55,39 @@
       <image:caption>Pacotes de Viagem para Melhor Idade 50+ - Anhangá Viagens</image:caption>
     </image:image>
   </url>
-
-  <!-- Institutional -->
+  <url>
+    <loc>https://www.anhanga.tur.br/consultoria-de-viagem/</loc>
+    <lastmod>2026-05-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.anhanga.tur.br/viagens-para-executivos/</loc>
+    <lastmod>2026-05-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.anhanga.tur.br/curadoria-cruzeiros-brasil/</loc>
+    <lastmod>2026-05-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.anhanga.tur.br/quiz/</loc>
+    <lastmod>2026-05-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.anhanga.tur.br/brazil-promotion-day/</loc>
+    <lastmod>2026-05-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
   <url>
     <loc>https://www.anhanga.tur.br/sobre/</loc>
-    <lastmod>2026-03-04</lastmod>
+    <lastmod>2026-05-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
@@ -73,76 +97,186 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/termos-de-uso/</loc>
-    <lastmod>2026-03-04</lastmod>
+    <lastmod>2026-05-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/politica-privacidade/</loc>
-    <lastmod>2026-03-04</lastmod>
+    <lastmod>2026-05-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/mapa-do-site/</loc>
-    <lastmod>2026-03-04</lastmod>
+    <lastmod>2026-05-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
-
-  <!-- Blog -->
   <url>
     <loc>https://www.anhanga.tur.br/blog/</loc>
-    <lastmod>2026-03-19</lastmod>
+    <lastmod>2026-05-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.anhanga.tur.br/blog/viagem-solo-feminina-ganha-espaco-nos-cruzeiros-da-norwegian-cruise-line/</loc>
-    <lastmod>2026-03-09</lastmod>
+    <loc>https://www.anhanga.tur.br/blog/copa-do-mundo-2026-as-cidades-sede-e-o-que-cada-uma-tem-a-oferecer-alem-do-futebol/</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/guadalajara.jpg</image:loc>
+      <image:caption>Copa do Mundo 2026: as cidades-sede e o que cada uma tem a oferecer além do futebol</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.anhanga.tur.br/blog/disney-tropical-americas-animal-kingdom/</loc>
+    <lastmod>2026-05-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/disney-tropical-americas-animal-kingdom.jpg</image:loc>
+      <image:caption>Tropical Americas: nova área da Disney no Animal Kingdom</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.anhanga.tur.br/blog/america-do-norte-destinos-alem-de-nova-york/</loc>
+    <lastmod>2026-05-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/america-do-norte-destinos-alem-de-nova-york.jpg</image:loc>
+      <image:caption>América do Norte: os melhores destinos além de Nova York</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.anhanga.tur.br/blog/asia-destinos-para-brasileiros-2026/</loc>
+    <lastmod>2026-05-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/destinations/toquio.jpg</image:loc>
+      <image:caption>Melhores destinos da Ásia para brasileiros em 2026</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.anhanga.tur.br/blog/caribe-destinos-para-brasileiros/</loc>
+    <lastmod>2026-05-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/caribe-destinos-para-brasileiros.jpg</image:loc>
+      <image:caption>Caribe para brasileiros: Punta Cana, Cancún ou Aruba? Entenda as diferenças</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.anhanga.tur.br/blog/destinos-america-do-sul-latam/</loc>
+    <lastmod>2026-05-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/destinations/cartagena.jpg</image:loc>
+      <image:caption>América do Sul: os destinos que mais valem a viagem saindo do Brasil</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.anhanga.tur.br/blog/melhores-destinos-brasil-2026/</loc>
+    <lastmod>2026-05-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/destinations/natal.jpg</image:loc>
+      <image:caption>Os melhores destinos do Brasil para viajar em 2026</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.anhanga.tur.br/blog/roteiro-europa-brasileiros-2026/</loc>
+    <lastmod>2026-05-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/destinations/lisboa.jpg</image:loc>
+      <image:caption>Roteiro Europa 2026: ETIAS, câmbio e custos para brasileiros</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.anhanga.tur.br/blog/viagem-solo-feminina-ganha-espaco-nos-cruzeiros-da-norwegian-cruise-line/</loc>
+    <lastmod>2026-05-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/blog-viagem-solo-feminina.png</image:loc>
+      <image:caption>Viagem solo feminina nos cruzeiros da Norwegian</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/destinos-carnaval-2026-brasil/</loc>
-    <lastmod>2026-02-11</lastmod>
+    <lastmod>2026-05-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/destinos-carnaval-2026.jpg</image:loc>
+      <image:caption>Melhores destinos para o Carnaval 2026 no Brasil</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/guia-definitivo-sobrevivencia-festivais/</loc>
-    <lastmod>2026-01-24</lastmod>
+    <lastmod>2026-05-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/guia-festivais.jpg</image:loc>
+      <image:caption>Guia de Sobrevivência em Festivais de Música</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/5-segredos-da-disney-que-ninguem-conta/</loc>
-    <lastmod>2025-12-12</lastmod>
+    <lastmod>2026-05-05</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/5-segredos-disney.jpg</image:loc>
+      <image:caption>5 Segredos da Disney que Ninguém Conta</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/malas-de-mao-o-guia-definitivo/</loc>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2026-05-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/malas-de-mao.jpg</image:loc>
+      <image:caption>Malas de Mão: O Guia Definitivo</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/europa-gastronomica-roteiro-italia/</loc>
-    <lastmod>2025-10-28</lastmod>
+    <lastmod>2026-05-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/europa-gastronomica-italia.jpg</image:loc>
+      <image:caption>Europa Gastronômica: Roteiro Itália</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/lua-de-mel-nas-maldivas/</loc>
-    <lastmod>2025-09-15</lastmod>
+    <lastmod>2026-05-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/lua-de-mel-maldivas.jpg</image:loc>
+      <image:caption>Lua de Mel nas Maldivas</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/nova-york-no-natal/</loc>
-    <lastmod>2025-01-10</lastmod>
+    <lastmod>2026-05-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/nova-york-natal.jpg</image:loc>
+      <image:caption>Nova York no Natal</image:caption>
+    </image:image>
   </url>
 </urlset>

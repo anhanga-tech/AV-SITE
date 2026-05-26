@@ -5,6 +5,7 @@ import { NpsTextarea } from '../components/nps/NpsTextarea';
 import { NpsScoreSelector } from '../components/nps/NpsScoreSelector';
 import { NpsThankPromoter } from '../components/nps/NpsThankPromoter';
 import { NpsThankOther } from '../components/nps/NpsThankOther';
+import { SEO } from '../components/SEO';
 
 const GOOGLE_REVIEW_URL = 'https://g.page/r/Ca7sLORX6EQ7EBM/review';
 
@@ -129,6 +130,13 @@ export default function NPS() {
 
   return (
     <>
+      <SEO
+        title="Avaliação de Viagem"
+        description="Pagina operacional para clientes avaliarem a experiencia com a Anhanga Viagens."
+        canonical="https://www.anhanga.tur.br/nps/"
+        robots="noindex, nofollow"
+        noHreflang
+      />
       <style>{PAGE_STYLES}</style>
 
       <div
