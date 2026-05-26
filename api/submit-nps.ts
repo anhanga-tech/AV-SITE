@@ -158,7 +158,7 @@ export default async function handler(request: Request): Promise<Response> {
     await sendNpsToN8n(webhookUrl, webhookSecret, requestId, npsPayload);
   } catch (error: unknown) {
     const { status, stage } = classifyNpsWebhookError(error);
-    logger.error('SUBMIT_NPS', { requestId, stage });
+    logger.error('SUBMIT_NPS', { requestId, stage, error: error instanceof Error ? error.message : String(error) });
     return buildJsonResponse(
       {
         ok: false,
