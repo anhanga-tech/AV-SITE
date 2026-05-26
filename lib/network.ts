@@ -55,7 +55,12 @@ export function getClientIP(request: Request): string {
     const forwardedFor = getTrimmedHeader(request, 'x-forwarded-for');
     if (forwardedFor) {
         const ips = forwardedFor.split(',').map(ip => ip.trim()).filter(Boolean);
-        return ips[ips.length - 1] || 'unknown';
+        // XFF is only reached in local dev or on platforms that don't set
+        // cf-connecting-ip / x-vercel-forwarded-for. In those contexts,
+        // the leftmost IP is the original client (RFC 7239). Spoofing via a
+        // client-controlled XFF value is irrelevant in local dev and not a
+        // concern on Cloudflare/Vercel because those headers take priority above.
+        return ips[0] || 'unknown';
     }
 
     return 'unknown';

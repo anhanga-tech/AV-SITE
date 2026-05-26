@@ -50,7 +50,8 @@ export type SubmitLeadErrorCode =
     | 'SERVER_CONFIG_ERROR'
     | 'N8N_WEBHOOK_ERROR'
     | 'METHOD_NOT_ALLOWED'
-    | 'RATE_LIMIT_EXCEEDED';
+    | 'RATE_LIMIT_EXCEEDED'
+    | 'SERVICE_UNAVAILABLE';
 
 export interface SubmitLeadError {
     ok: false;

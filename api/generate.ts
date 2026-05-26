@@ -185,6 +185,14 @@ async function getRateLimitState(
         return { rateLimit };
     }
 
+    if (rateLimit.serviceUnavailable) {
+        logger.error('RATE_LIMIT', { clientIP, stage: 'service_unavailable' });
+        return buildJsonResponse({
+            code: 'SERVICE_UNAVAILABLE',
+            error: 'Serviço temporariamente indisponível. Tente novamente em instantes.',
+        }, 503, corsHeaders);
+    }
+
     logger.warn('RATE_LIMIT', {
         clientIP,
         retryAfterSeconds: Math.ceil(rateLimit.resetIn / 1000),

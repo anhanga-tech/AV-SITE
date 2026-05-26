@@ -123,6 +123,74 @@ test('in-memory fallback works correctly without Redis configured', async (t) =>
     assert.equal(r3.allowed, false);
 });
 
+// --- Edge runtime safe-fail tests ---
+
+/** Sets CF_PAGES for the duration of a test to simulate edge runtime. */
+function useEdgeRuntime(t: { after: (fn: () => void) => void }): void {
+    const saved = process.env.CF_PAGES;
+    process.env.CF_PAGES = '1';
+    t.after(() => {
+        if (saved === undefined) delete process.env.CF_PAGES;
+        else process.env.CF_PAGES = saved;
+    });
+}
+
+test('edge runtime: denies when Redis is not configured (safe-fail)', async (t) => {
+    useEdgeRuntime(t);
+    useInMemoryFallback(t);
+
+    const result = await checkRateLimit(`edge-${uid()}`, {
+        limit: 100,
+        windowMs: 60_000,
+        prefix: `test-rl-edge-no-redis-${uid()}`,
+    });
+
+    assert.equal(result.allowed, false, 'should deny when Redis is absent on edge runtime');
+    assert.equal(result.remaining, 0);
+    assert.ok(result.resetIn > 0);
+});
+
+test('edge runtime: in-memory fallback is not used (safe-fail preserves deny across calls)', async (t) => {
+    useEdgeRuntime(t);
+    useInMemoryFallback(t);
+
+    const ip = `edge-multi-${uid()}`;
+    const prefix = `test-rl-edge-multi-${uid()}`;
+
+    // Multiple requests should all be denied, not counted against in-memory store
+    for (let i = 0; i < 3; i++) {
+        const result = await checkRateLimit(ip, { limit: 100, windowMs: 60_000, prefix });
+        assert.equal(result.allowed, false, `request ${i + 1} should be denied on edge without Redis`);
+    }
+});
+
+test('local dev: in-memory fallback still works when edge runtime is not detected', async (t) => {
+    // Ensure neither CF_PAGES nor VERCEL_ENV is set (local dev scenario)
+    const savedCf = process.env.CF_PAGES;
+    const savedVercel = process.env.VERCEL_ENV;
+    delete process.env.CF_PAGES;
+    delete process.env.VERCEL_ENV;
+    t.after(() => {
+        if (savedCf === undefined) delete process.env.CF_PAGES;
+        else process.env.CF_PAGES = savedCf;
+        if (savedVercel === undefined) delete process.env.VERCEL_ENV;
+        else process.env.VERCEL_ENV = savedVercel;
+    });
+    useInMemoryFallback(t);
+
+    const ip = `local-${uid()}`;
+    const prefix = `test-rl-local-dev-${uid()}`;
+
+    const r1 = await checkRateLimit(ip, { limit: 2, windowMs: 60_000, prefix });
+    assert.equal(r1.allowed, true, 'first request should be allowed in local dev');
+
+    const r2 = await checkRateLimit(ip, { limit: 2, windowMs: 60_000, prefix });
+    assert.equal(r2.allowed, true);
+
+    const r3 = await checkRateLimit(ip, { limit: 2, windowMs: 60_000, prefix });
+    assert.equal(r3.allowed, false, 'request over limit should be blocked in local dev');
+});
+
 test('in-memory store GC runs when size exceeds 2000 and cleans expired entries', async (t) => {
     useInMemoryFallback(t);
 

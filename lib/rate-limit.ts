@@ -4,6 +4,8 @@ export interface RateLimitResult {
   allowed: boolean;
   remaining: number;
   resetIn: number; // in milliseconds
+  /** True when denial is due to infrastructure unavailability, not quota exhaustion. */
+  serviceUnavailable?: true;
 }
 
 interface RateLimitEntry {
@@ -26,14 +28,17 @@ const IN_MEMORY_MAX_ENTRIES = 2500;
 // True when running inside a managed serverless edge runtime where module-level
 // state resets per request. Both Vercel (VERCEL_ENV) and Cloudflare Pages
 // (CF_PAGES) are detected; local development has neither variable set.
-const IS_EDGE_RUNTIME = Boolean(process.env.VERCEL_ENV || process.env.CF_PAGES);
+// Implemented as a function so tests can control env vars at call time.
+function isEdgeRuntime(): boolean {
+  return Boolean(process.env.VERCEL_ENV || process.env.CF_PAGES);
+}
 
 async function getRedisClient(): Promise<RedisLike | null> {
   const url = process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
 
   if (!url || !token) {
-    if (IS_EDGE_RUNTIME) {
+    if (isEdgeRuntime()) {
       // Each serverless edge invocation (Vercel or Cloudflare) gets a fresh V8
       // isolate — the in-memory Map above resets on every request and provides
       // no real protection. Configure Upstash Redis to enable shared rate
@@ -71,6 +76,16 @@ export async function checkRateLimit(
   const { limit, windowMs, prefix } = options;
   const redis = await getRedisClient();
 
+  // On edge runtimes the in-memory store resets every request (isolated V8
+  // context), so it provides zero real protection. Deny rather than allow when
+  // Redis is unavailable — this is the safe-fail default. The tradeoff is that
+  // a Redis outage will block all traffic on affected endpoints; this is
+  // preferable to silently bypassing rate limits entirely.
+  if (!redis && isEdgeRuntime()) {
+    logger.error('RateLimit: Redis unavailable on edge runtime. Denying request to prevent rate limit bypass.', { prefix, clientIP });
+    return { allowed: false, remaining: 0, resetIn: windowMs, serviceUnavailable: true };
+  }
+
   if (redis) {
     try {
       const key = `${prefix}:${clientIP}`;
@@ -97,12 +112,17 @@ export async function checkRateLimit(
         resetIn,
       };
     } catch (error) {
+      if (isEdgeRuntime()) {
+        // Redis failure on edge: in-memory fallback is non-functional. Deny to
+        // prevent the bypass rather than silently allowing all requests through.
+        logger.error('RateLimit: Redis error on edge runtime. Denying request.', { error, prefix, clientIP });
+        return { allowed: false, remaining: 0, resetIn: windowMs, serviceUnavailable: true };
+      }
       logger.error('RateLimit: Redis error, falling back to in-memory', error);
-      // Fallback to in-memory if Redis fails
     }
   }
 
-  // In-memory fallback
+  // In-memory fallback (local development only — isEdgeRuntime() is false here).
   return checkInMemoryRateLimit(clientIP, options);
 }
 
