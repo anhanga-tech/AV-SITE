@@ -30,8 +30,18 @@ for (const fallbackTag of requiredFallbackPatterns) {
 }
 
 test('index.html preloads the transformed default hero poster used for the initial LCP image', () => {
+  // Preload now uses imagesrcset (responsive) instead of a single href.
+  // Verify all three Cloudflare preset variants are present.
   assert.match(
     indexHtml,
-    /<link\b[^>]*rel="preload"[^>]*as="image"[^>]*href="https:\/\/media\.anhanga\.tur\.br\/cdn-cgi\/image\/format=webp,quality=85,metadata=none,fit=cover,width=1280,height=720\/images\/hero\/rio-poster\.jpg"/i,
+    /<link\b[^>]*rel="preload"[^>]*as="image"[^>]*imagesrcset="[^"]*https:\/\/media\.anhanga\.tur\.br\/cdn-cgi\/image\/format=webp,quality=85,metadata=none,fit=cover,width=960,height=540\/images\/hero\/rio-poster\.jpg\s+960w/i,
+  );
+  assert.match(
+    indexHtml,
+    /https:\/\/media\.anhanga\.tur\.br\/cdn-cgi\/image\/format=webp,quality=85,metadata=none,fit=cover,width=1200,height=675\/images\/hero\/rio-poster\.jpg\s+1200w/i,
+  );
+  assert.match(
+    indexHtml,
+    /https:\/\/media\.anhanga\.tur\.br\/cdn-cgi\/image\/format=webp,quality=85,metadata=none,fit=cover,width=1280,height=720\/images\/hero\/rio-poster\.jpg\s+1280w/i,
   );
 });
