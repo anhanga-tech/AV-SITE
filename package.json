@@ -20,7 +20,7 @@
     "test:size": "bundlesize --config bundlesize.config.json",
     "prepare": "node scripts/install-hooks.mjs",
     "update:dates": "node scripts/update-post-dates.mjs --all",
-    "doctor": "npx react-doctor@latest"
+    "doctor": "react-doctor"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

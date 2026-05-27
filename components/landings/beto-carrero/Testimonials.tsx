@@ -4,7 +4,7 @@ import { Star, Quote, CheckCircle2 } from 'lucide-react';
 import { Testimonial } from './types';
 import { optimizeRemoteImageUrl } from '../../../data/mediaConfig';
 
-export const BETO_TESTIMONIALS: Testimonial[] = [
+const BETO_TESTIMONIALS: Testimonial[] = [
   {
     id: 1,
     name: "Família Souza",
