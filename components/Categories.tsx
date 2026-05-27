@@ -69,7 +69,7 @@ const Categories = memo(() => {
               className={`
                         group bg-white p-4 pb-8 shadow-[0_15px_30px_-10px_rgba(0,0,0,0.15)] 
                         transform transition-transform duration-500 hover:scale-105 hover:z-10 hover:shadow-2xl 
-                        ${item.rotate} cursor-pointer relative block
+                        ${item.rotate} cursor-pointer relative block focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-cyan rounded-lg
                     `}
             >
               {/* Fake Tape */}
