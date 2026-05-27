@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { MapPin } from 'lucide-react';
 import { POIS, getPoiStyle } from './venueMapData';
 import { VenuePoiList } from './VenuePoiList';
