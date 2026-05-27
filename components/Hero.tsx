@@ -108,7 +108,7 @@ const Hero: React.FC = memo(() => {
   }, [shouldRenderVideo]);
 
   return (
-    <section className="relative w-full min-h-[850px] flex items-center bg-brand-light pb-20 z-20">
+    <section className="relative w-full min-h-[100svh] md:min-h-[850px] flex items-center bg-brand-light pb-20 z-20">
 
       {/* Background media (image first, deferred video on capable devices) */}
       <div className="absolute inset-0 z-0 overflow-hidden">
