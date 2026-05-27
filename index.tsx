@@ -6,6 +6,11 @@ import App from './App';
 import { shouldHydratePrerenderedRoute } from './lib/hydration';
 import { initClientErrorTracking } from './lib/sentry-client';
 
+// Reload on stale-cache preload failures so the browser fetches the latest HTML + hashed assets.
+window.addEventListener('vite:preloadError', () => {
+  window.location.reload();
+});
+
 initClientErrorTracking();
 
 const rootElement = document.getElementById('root');
