@@ -53,6 +53,13 @@ test('selectImagePreset should snap landscape requests to fixed cover presets', 
         fit: 'cover',
     });
 
+    assert.deepEqual(selectImagePreset(1200, 675), {
+        id: 'content',
+        width: 1200,
+        height: 675,
+        fit: 'cover',
+    });
+
     assert.deepEqual(selectImagePreset(1280, 720), {
         id: 'hero',
         width: 1280,
@@ -211,5 +218,26 @@ test('optimizeImageUrl should propagate format=webp into the Cloudflare transfor
             format: 'webp',
         }),
         'https://media.anhanga.tur.br/cdn-cgi/image/format=webp,quality=85,metadata=none,fit=scale-down,width=800/images/home/hero.jpg',
+    );
+});
+
+// Regression for issue #673: preload widths in index.html must match the URLs
+// that Hero.tsx generates for its posterSrcSet. If the preset snap logic changes
+// or Hero.tsx requests different dimensions, the preload URLs must be updated too.
+test('hero poster srcset URLs at each breakpoint match the preload hints in index.html', () => {
+    const POSTER_PATH = '/images/hero/rio-poster.jpg';
+    const BASE        = 'https://media.anhanga.tur.br';
+
+    assert.equal(
+        buildCloudflareImageUrl(POSTER_PATH, BASE, selectImagePreset(960, 540), 'webp'),
+        'https://media.anhanga.tur.br/cdn-cgi/image/format=webp,quality=85,metadata=none,fit=cover,width=960,height=540/images/hero/rio-poster.jpg',
+    );
+    assert.equal(
+        buildCloudflareImageUrl(POSTER_PATH, BASE, selectImagePreset(1200, 675), 'webp'),
+        'https://media.anhanga.tur.br/cdn-cgi/image/format=webp,quality=85,metadata=none,fit=cover,width=1200,height=675/images/hero/rio-poster.jpg',
+    );
+    assert.equal(
+        buildCloudflareImageUrl(POSTER_PATH, BASE, selectImagePreset(1280, 720), 'webp'),
+        'https://media.anhanga.tur.br/cdn-cgi/image/format=webp,quality=85,metadata=none,fit=cover,width=1280,height=720/images/hero/rio-poster.jpg',
     );
 });
