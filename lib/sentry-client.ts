@@ -20,6 +20,12 @@ export function initClientErrorTracking(): void {
         dsn,
         environment: import.meta.env.MODE,
         tracesSampleRate: 0.1,
+        enableLogs: true,
+        integrations: [
+            Sentry.browserTracingIntegration(),
+            Sentry.consoleLoggingIntegration({ levels: ['log', 'warn', 'error'] }),
+        ],
+        tracePropagationTargets: ['localhost', /^https:\/\/www\.anhanga\.tur\.br\/api/],
         beforeSend(event) {
             const frames = event.exception?.values?.flatMap(
                 (exception) => exception.stacktrace?.frames ?? []
