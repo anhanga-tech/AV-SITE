@@ -6,6 +6,13 @@ import App from './App';
 import { shouldHydratePrerenderedRoute } from './lib/hydration';
 import { initClientErrorTracking } from './lib/sentry-client';
 
+// Recover from stale-cache preload failures after redeployment.
+// Vite fires this event when a modulepreload (JS or CSS) cannot be fetched.
+// Reloading fetches the latest HTML and correct hashed asset URLs.
+window.addEventListener('vite:preloadError', () => {
+  window.location.reload();
+});
+
 initClientErrorTracking();
 
 const rootElement = document.getElementById('root');

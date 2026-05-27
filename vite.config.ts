@@ -247,6 +247,9 @@ export default defineConfig(({ mode, isSsrBuild }) => {
             if (id.includes('/node_modules/@google/genai/')) {
               return 'ai-vendor';
             }
+            if (id.includes('/node_modules/leaflet/')) {
+              return 'leaflet-vendor';
+            }
           }
         }
       },

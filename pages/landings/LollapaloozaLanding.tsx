@@ -7,7 +7,7 @@ import { WAITLIST_SECTION_ID } from '../../components/landings/lollapalooza/cons
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../../components/schemas/FAQPageSchema';
 import { ServiceSchema } from '../../components/schemas/ServiceSchema';
-import 'leaflet/dist/leaflet.css';
+
 import './lollapalooza.css';
 
 const LOLLAPALOOZA_FAQ_ITEMS = [
