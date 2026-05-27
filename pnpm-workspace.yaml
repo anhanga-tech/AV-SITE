@@ -4,7 +4,14 @@ minimumReleaseAge: 10080
 blockExoticSubdeps: true
 strictDepBuilds: true
 onlyBuiltDependencies:
-  - esbuild@0.27.3 || 0.27.7
-  - protobufjs@7.5.5
-  - sharp@0.34.5
-  - workerd@1.20260504.1
+  - "@google/genai"
+  - esbuild
+  - protobufjs
+  - sharp
+  - workerd
+allowBuilds:
+  '@google/genai': true
+  esbuild: true
+  protobufjs: true
+  sharp: true
+  workerd: true
