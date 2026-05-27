@@ -39,3 +39,16 @@ test('index.html lazy-loads GTM through the deferred analytics loader', () => {
   assert.ok(utmInjectIndex > -1, 'UTM tracking loader should still be present');
   assert.ok(loadGtmIndex < utmInjectIndex, 'GTM should be queued before UTM reads GA client data');
 });
+
+test('index.html loads only the required Poppins font weights', () => {
+  const fontUrls = [...indexHtml.matchAll(/href="([^"]*fonts\.googleapis\.com\/css2[^"]*)"/g)]
+    .map((match) => match[1])
+    .filter((url) => url.includes('family=Poppins'));
+
+  assert.equal(fontUrls.length, 3, 'preload, stylesheet, and noscript font URLs should stay aligned');
+
+  for (const url of fontUrls) {
+    assert.match(url, /family=Poppins:wght@400;600;700;900(?:&|$)/);
+    assert.doesNotMatch(url, /Poppins:wght@[^"]*800/);
+  }
+});
