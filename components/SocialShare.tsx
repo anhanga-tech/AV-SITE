@@ -59,26 +59,28 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
         return (
             <div className={`flex items-center gap-1 ${className}`}>
                 <button
+                    type="button"
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         handleNativeShare();
                     }}
                     onMouseEnter={prefetchHaptics}
-                    className="p-2 bg-white/80 hover:bg-brand-cyan hover:text-white text-zinc-600 rounded-full transition shadow-sm border border-zinc-100"
+                    className="p-2 bg-white/80 hover:bg-brand-cyan hover:text-white text-zinc-600 rounded-full transition shadow-sm border border-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-cyan"
                     title="Compartilhar"
                     aria-label="Compartilhar"
                 >
                     <Share2 className="size-4" />
                 </button>
                 <button
+                    type="button"
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         handleCopy();
                     }}
                     onMouseEnter={prefetchHaptics}
-                    className={`p-2 rounded-full transition shadow-sm border ${copied ? 'bg-green-700 text-white border-green-800' : 'bg-white/80 text-zinc-600 border-zinc-100 hover:bg-zinc-100'}`}
+                    className={`p-2 rounded-full transition shadow-sm border focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${copied ? 'bg-green-700 text-white border-green-800 focus-visible:ring-green-700' : 'bg-white/80 text-zinc-600 border-zinc-100 hover:bg-zinc-100 focus-visible:ring-zinc-400'}`}
                     role={copied ? "status" : undefined}
                     title={copied ? "Link copiado!" : "Copiar link"}
                     aria-label={copied ? "Link copiado com sucesso" : "Copiar link"}
@@ -93,9 +95,10 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
         <div className={`flex flex-wrap items-center gap-3 ${className}`}>
             {/* Native Share Button (Primary on Mobile) */}
             <button
+                type="button"
                 onClick={handleNativeShare}
                 onMouseEnter={prefetchHaptics}
-                className="flex items-center gap-2 px-5 py-2.5 bg-brand-cyan text-white font-bold rounded-xl hover:bg-brand-cyanDark transition shadow-[0_4px_0px_#0369a1] active:shadow-none active:translate-y-1 lg:hidden"
+                className="flex items-center gap-2 px-5 py-2.5 bg-brand-cyan text-white font-bold rounded-xl hover:bg-brand-cyanDark transition shadow-[0_4px_0px_#0369a1] active:shadow-none active:translate-y-1 lg:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-cyan"
             >
                 <Share2 className="size-5" /> Compartilhar
             </button>
@@ -106,7 +109,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     href={links.whatsapp}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2.5 bg-[#25D366] text-white rounded-xl hover:scale-110 transition-transform shadow-md"
+                    className="p-2.5 bg-[#25D366] text-white rounded-xl hover:scale-110 transition-transform shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#25D366]"
                     title="Compartilhar no WhatsApp"
                     aria-label="Compartilhar no WhatsApp"
                     onMouseEnter={prefetchHaptics}
@@ -122,7 +125,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     href={links.facebook}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2.5 bg-[#1877F2] text-white rounded-xl hover:scale-110 transition-transform shadow-md"
+                    className="p-2.5 bg-[#1877F2] text-white rounded-xl hover:scale-110 transition-transform shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1877F2]"
                     title="Compartilhar no Facebook"
                     aria-label="Compartilhar no Facebook"
                     onMouseEnter={prefetchHaptics}
@@ -138,7 +141,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     href={links.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2.5 bg-[#0A66C2] text-white rounded-xl hover:scale-110 transition-transform shadow-md"
+                    className="p-2.5 bg-[#0A66C2] text-white rounded-xl hover:scale-110 transition-transform shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#0A66C2]"
                     title="Compartilhar no LinkedIn"
                     aria-label="Compartilhar no LinkedIn"
                     onMouseEnter={prefetchHaptics}
@@ -153,9 +156,10 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
 
                 {/* Native Share (secondary on desktop) */}
                 <button
+                    type="button"
                     onClick={handleNativeShare}
                     onMouseEnter={prefetchHaptics}
-                    className="hidden lg:flex p-2.5 bg-zinc-100 text-zinc-600 rounded-xl hover:bg-zinc-200 transition shadow-sm"
+                    className="hidden lg:flex p-2.5 bg-zinc-100 text-zinc-600 rounded-xl hover:bg-zinc-200 transition shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-cyan"
                     title="Mais opções de compartilhamento"
                     aria-label="Mais opções de compartilhamento"
                 >
@@ -164,9 +168,10 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
 
                 {/* Copy Link button */}
                 <button
+                    type="button"
                     onClick={handleCopy}
                     onMouseEnter={prefetchHaptics}
-                    className={`p-2.5 rounded-xl transition shadow-sm border ${copied ? 'bg-green-700 text-white border-green-800' : 'bg-zinc-100 text-zinc-600 border-transparent hover:bg-zinc-200'}`}
+                    className={`p-2.5 rounded-xl transition shadow-sm border focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${copied ? 'bg-green-700 text-white border-green-800 focus-visible:ring-green-700' : 'bg-zinc-100 text-zinc-600 border-transparent hover:bg-zinc-200 focus-visible:ring-zinc-400'}`}
                     role={copied ? "status" : undefined}
                     title={copied ? "Link copiado!" : "Copiar link"}
                     aria-label={copied ? "Link copiado com sucesso" : "Copiar link"}
