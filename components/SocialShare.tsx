@@ -59,6 +59,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
         return (
             <div className={`flex items-center gap-1 ${className}`}>
                 <button
+                    type="button"
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -72,6 +73,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     <Share2 className="size-4" />
                 </button>
                 <button
+                    type="button"
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -93,6 +95,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
         <div className={`flex flex-wrap items-center gap-3 ${className}`}>
             {/* Native Share Button (Primary on Mobile) */}
             <button
+                type="button"
                 onClick={handleNativeShare}
                 onMouseEnter={prefetchHaptics}
                 className="flex items-center gap-2 px-5 py-2.5 bg-brand-cyan text-white font-bold rounded-xl hover:bg-brand-cyanDark transition shadow-[0_4px_0px_#0369a1] active:shadow-none active:translate-y-1 lg:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-cyan"
@@ -153,6 +156,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
 
                 {/* Native Share (secondary on desktop) */}
                 <button
+                    type="button"
                     onClick={handleNativeShare}
                     onMouseEnter={prefetchHaptics}
                     className="hidden lg:flex p-2.5 bg-zinc-100 text-zinc-600 rounded-xl hover:bg-zinc-200 transition shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-cyan"
@@ -164,6 +168,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
 
                 {/* Copy Link button */}
                 <button
+                    type="button"
                     onClick={handleCopy}
                     onMouseEnter={prefetchHaptics}
                     className={`p-2.5 rounded-xl transition shadow-sm border focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${copied ? 'bg-green-700 text-white border-green-800 focus-visible:ring-green-700' : 'bg-zinc-100 text-zinc-600 border-transparent hover:bg-zinc-200 focus-visible:ring-zinc-400'}`}
