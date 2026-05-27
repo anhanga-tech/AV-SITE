@@ -8,3 +8,9 @@ onlyBuiltDependencies:
   - protobufjs@7.5.5
   - sharp@0.34.5
   - workerd@1.20260504.1
+allowBuilds:
+  '@google/genai': set this to true or false
+  esbuild: set this to true or false
+  protobufjs: set this to true or false
+  sharp: set this to true or false
+  workerd: set this to true or false
