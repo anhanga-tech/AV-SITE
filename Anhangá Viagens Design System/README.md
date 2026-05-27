@@ -20,7 +20,7 @@ The working design system for **Anhangá Viagens**, a Brazilian-Portuguese conci
 
 ## 2 · Visual language (one-paragraph brief)
 
-Warm cream paper canvas (`#fffdf5`), heavy **Poppins 800/900** display type with negative tracking, and a **neobrutalist signature** of 2px dark outlines + flat offset shadows (`4px 4px 0 #0f172a`). Energy comes from a single vivid **yellow (#FFD600)** used as tape, highlights, stamps, and primary-CTA fill; the brand blue `#0056D2` lives mostly in the logo, while `sky-500 #0ea5e9` carries interactive/action states. Imagery is treated like a **scrapbook**: tilted polaroids, washi tape, rubber stamps ("Achado Anhangá"), underline scribbles, Merriweather-italic pull-quotes. Accent colors (orange/emerald/sky/blue) are used pastel-tinted to differentiate card families — never saturated.
+Warm cream paper canvas (`#fffdf5`), heavy **Poppins 900** display type with negative tracking, and a **neobrutalist signature** of 2px dark outlines + flat offset shadows (`4px 4px 0 #0f172a`). Energy comes from a single vivid **yellow (#FFD600)** used as tape, highlights, stamps, and primary-CTA fill; the brand blue `#0056D2` lives mostly in the logo, while `sky-500 #0ea5e9` carries interactive/action states. Imagery is treated like a **scrapbook**: tilted polaroids, washi tape, rubber stamps ("Achado Anhangá"), underline scribbles, Merriweather-italic pull-quotes. Accent colors (orange/emerald/sky/blue) are used pastel-tinted to differentiate card families — never saturated.
 
 **Do**
 - Commit to one bold yellow accent per screen.
@@ -58,7 +58,7 @@ Action         sky-500 #0ea5e9   sky-600 hover #0284c7
 Canvas         cream #fffdf5 (home)   sky-tinted #F4F8FF (alt sections)
 Accents        orange-100/600 · emerald-100/600 · sky-50/500 · blue-100/600
 Neutrals       Tailwind gray 50-900
-Display font   Poppins 800 · tracking -0.035em at hero scale
+Display font   Poppins 900 · tracking -0.035em at hero scale
 Body font      Poppins 400/600/700 · line-height 1.6
 Editorial font Merriweather 400/700 + italic · blog & pull-quotes
 Radius         8 · 12 · 16 · 24 · 32 · 40 · 48 · full
@@ -72,7 +72,7 @@ All of the above are available as CSS variables prefixed `--av-*` — see `color
 
 ## 5 · Signature patterns
 
-- **Hero H1** — 72–96px Poppins 800, the keyword wrapped in `.av-scribble` with the yellow gradient.
+- **Hero H1** — 72–96px Poppins 900, the keyword wrapped in `.av-scribble` with the yellow gradient.
 - **Section eyebrow** — `.av-badge` pill above every H2 (uppercase, 20% tracking).
 - **CTA (primary)** — yellow pill, 2px dark border, 4/4/0 dark shadow, arrow slides on hover.
 - **Polaroid** — white card, `-2deg` rotate, washi tape tab on top, optional rubber stamp at top-right, italic caption.
