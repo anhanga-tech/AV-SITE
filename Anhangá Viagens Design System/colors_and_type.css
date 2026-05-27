@@ -4,7 +4,7 @@
    ========================================================================== */
 
 /* Fonts — loaded from Google Fonts (matches index.html <head>) */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Merriweather:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Merriweather:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
 :root {
   /* ----- Brand palette (anhanga.*) ------------------------------------- */
@@ -97,9 +97,9 @@
   --av-weight-regular: 400;
   --av-weight-semi:    600;
   --av-weight-bold:    700;
-  --av-weight-xbold:   800;
-  /* Note: Poppins is loaded with 400/600/700/800 only.
-     Avoid 500 (medium) and 900 (black) — they'll fall back to the nearest weight. */
+  --av-weight-xbold:   900;
+  /* Note: Poppins is loaded with 400/600/700/900 only.
+     Avoid 500 (medium) and 800 (extrabold) — they'll fall back to the nearest weight. */
 
   --av-leading-tight:   1.1;
   --av-leading-snug:    1.25;
@@ -182,13 +182,13 @@ h1, h2, h3, h4, h5, h6 {
 
 h1 {
   font-size: clamp(3rem, 7vw, var(--av-text-8xl));
-  font-weight: var(--av-weight-xbold);   /* 800 */
+  font-weight: var(--av-weight-xbold);   /* 900 */
   letter-spacing: -0.035em;
 }
 
 h2 {
   font-size: clamp(var(--av-text-4xl), 5vw, var(--av-text-5xl));
-  font-weight: var(--av-weight-xbold);   /* 800 — loaded heaviest */
+  font-weight: var(--av-weight-xbold);   /* 900 — loaded heaviest */
   letter-spacing: -0.025em;
 }
 

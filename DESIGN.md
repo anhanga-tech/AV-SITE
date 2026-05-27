@@ -17,7 +17,7 @@ typography:
   display:
     fontFamily: "Poppins, sans-serif"
     fontSize: "clamp(3rem, 6vw, 5rem)"
-    fontWeight: 800
+    fontWeight: 900
     lineHeight: 0.9
     letterSpacing: "-0.02em"
   headline:
@@ -156,7 +156,7 @@ Uma paleta que evoca lugares reais, não categorias de produto. Azul de oceano p
 **Character:** Poppins é o rosto da marca: geométrica, calorosa, confiante. Inter serve o corpo de texto com legibilidade máxima em telas pequenas. Merriweather guarda o blog — um registro diferente, mais lento, editorial. As duas fontes principais não competem porque operam em registros diferentes: Poppins na estrutura de identidade, Inter no fluxo de leitura.
 
 ### Hierarchy
-- **Display** (800, clamp(3rem, 6vw, 5rem), line-height 0.9, letter-spacing -0.02em): H1 do Hero. Ocupa espaço físico com intenção. Ênfase tipográfica via cor sólida `text-yellow-300`, nunca gradient text.
+- **Display** (900, clamp(3rem, 6vw, 5rem), line-height 0.9, letter-spacing -0.02em): H1 do Hero. Ocupa espaço físico com intenção. Ênfase tipográfica via cor sólida `text-yellow-300`, nunca gradient text.
 - **Headline** (700, clamp(1.5rem, 3vw, 2.5rem), line-height 1.1): Títulos de seção (H2), cabeçalhos de página. Contraste mínimo 1.25× com o nível abaixo.
 - **Title** (700, 1.25rem / 20px, line-height 1.3): Subtítulos de card, labels de destaque. Poppins bold.
 - **Body** (400–500, 1rem / 16px, line-height 1.6): Parágrafos corridos. Inter. Máximo 65–75ch de largura de coluna.

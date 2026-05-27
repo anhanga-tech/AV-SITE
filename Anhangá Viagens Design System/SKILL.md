@@ -6,7 +6,7 @@ This is the skill the design system wants you to run whenever a user asks for a 
 
 ## 1 · Before you open a file
 
-1. **Read `README.md`.** It has the voice, the Do/Don'ts, and the one-paragraph visual brief. Don't skip it — the tokens alone won't give you the handmade scrapbook mood. **Fonts loaded: Poppins 400/600/700/800 and Merriweather 400/700 regular + italic — only these.** Requesting 500 or 900 falls back and looks wrong.
+1. **Read `README.md`.** It has the voice, the Do/Don'ts, and the one-paragraph visual brief. Don't skip it — the tokens alone won't give you the handmade scrapbook mood. **Fonts loaded: Poppins 400/600/700/900 and Merriweather 400/700 regular + italic — only these.** Requesting 500 or 800 falls back to the nearest loaded weight.
 2. **Decide the surface.** Web section? Phone mockup? Print? Deck slide? Pick the right starter component (`ios_frame.jsx`, `browser_window.jsx`, `deck_stage.js`, `design_canvas.jsx`). Anhangá designs usually need a *real* phone or browser frame — the brand is strongly about craft.
 3. **Ask** (if the brief is ambiguous): what page/flow, how many variations, tone (more sonhador vs. more prático), locale (Brazilian Portuguese is default, always).
 
