@@ -20,5 +20,9 @@ export const onRequest = Sentry.sentryPagesPlugin<CloudflareEnv>((context) => {
     dsn,
     environment: context.env.SENTRY_ENVIRONMENT || 'production',
     tracesSampleRate: 0.1,
+    enableLogs: true,
+    integrations: [
+      Sentry.consoleLoggingIntegration({ levels: ['log', 'warn', 'error'] }),
+    ],
   };
 });
