@@ -25,7 +25,7 @@ export function initClientErrorTracking(): void {
             Sentry.browserTracingIntegration(),
             Sentry.consoleLoggingIntegration({ levels: ['log', 'warn', 'error'] }),
         ],
-        tracePropagationTargets: ['localhost', /^https:\/\/www\.anhanga\.tur\.br\/api/],
+        tracePropagationTargets: ['localhost', /^https:\/\/(?:www\.)?anhanga\.tur\.br\/api/],
         beforeSend(event) {
             const frames = event.exception?.values?.flatMap(
                 (exception) => exception.stacktrace?.frames ?? []
