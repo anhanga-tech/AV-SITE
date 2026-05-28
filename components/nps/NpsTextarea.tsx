@@ -8,9 +8,10 @@ export interface NpsTextareaProps {
   rows: number;
   required?: boolean;
   maxLength?: number;
+  'aria-label'?: string;
 }
 
-export function NpsTextarea({ id, value, onChange, placeholder, rows, required, maxLength }: NpsTextareaProps) {
+export function NpsTextarea({ id, value, onChange, placeholder, rows, required, maxLength, 'aria-label': ariaLabel }: NpsTextareaProps) {
   const [focused, setFocused] = useState(false);
 
   const charsLeft = maxLength !== undefined ? maxLength - value.length : null;
@@ -27,6 +28,7 @@ export function NpsTextarea({ id, value, onChange, placeholder, rows, required, 
         rows={rows}
         required={required}
         maxLength={maxLength}
+        aria-label={ariaLabel}
         className={[
           'w-full rounded-xl px-4 py-3 text-sm font-sans resize-none leading-relaxed',
           'bg-slate-800/60 text-slate-100 placeholder:text-slate-500',

@@ -169,6 +169,7 @@ export default function NPS() {
                     rows={4}
                     required
                     maxLength={2000}
+                    aria-label="O que te levou a dar essa nota?"
                   />
                 </div>
 
@@ -189,6 +190,7 @@ export default function NPS() {
                     placeholder="Um momento especial que ficou na memória..."
                     rows={3}
                     maxLength={2000}
+                    aria-label="Qual foi o momento mais marcante da viagem?"
                   />
                 </div>
 
