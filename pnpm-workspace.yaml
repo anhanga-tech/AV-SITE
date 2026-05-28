@@ -9,6 +9,7 @@ nodeLinker: hoisted
 minimumReleaseAge: 10080
 blockExoticSubdeps: true
 strictDepBuilds: true
+trustPolicy: no-downgrade
 onlyBuiltDependencies:
   - "@google/genai"
   - esbuild
