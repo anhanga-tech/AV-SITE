@@ -10,6 +10,8 @@ minimumReleaseAge: 10080
 blockExoticSubdeps: true
 strictDepBuilds: true
 trustPolicy: no-downgrade
+trustPolicyExclude:
+  - semver@6.3.1
 onlyBuiltDependencies:
   - "@google/genai"
   - esbuild
