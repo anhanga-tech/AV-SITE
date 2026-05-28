@@ -77,7 +77,7 @@ const BlogList: React.FC = () => {
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {filteredPosts.map((post, index) => (
                             <Link
-                                to={`/blog/${post.slug}`}
+                                to={`/blog/${post.slug}/`}
                                 key={post.slug}
                                 className={`
                                 group bg-white rounded-3xl p-5 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.05)] border border-zinc-100

@@ -101,7 +101,7 @@ export function CtaBody() {
           />
           <label htmlFor="cta-optIn" className="text-xs text-blue-700 leading-relaxed cursor-pointer">
             Quero receber novidades por e-mail.{' '}
-            <a href="/politica-privacidade" target="_blank" rel="noopener noreferrer" className="underline">
+            <a href="/politica-privacidade/" target="_blank" rel="noopener noreferrer" className="underline">
               Política de Privacidade
             </a>
           </label>

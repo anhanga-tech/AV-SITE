@@ -114,8 +114,6 @@ const Footer: React.FC = () => {
                             <span>ANHANGA TURISMO LTDA • CNPJ/Cadastur: <a href="https://cadastur.turismo.gov.br/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline decoration-zinc-600 underline-offset-2">37.036.732/0001-41</a></span>
                             <span className="hidden md:inline">•</span>
                             <a href="https://www.abav.com.br/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline decoration-zinc-600 underline-offset-2">Membro ABAV</a>
-                            <span className="hidden md:inline">•</span>
-                            <a href="https://www.gov.br/turismo/pt-br" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline decoration-zinc-600 underline-offset-2">Ministério do Turismo</a>
                         </div>
                         <div className="text-[10px] text-zinc-700 font-bold uppercase tracking-widest mt-2">
                             Conteúdo da equipe Anhangá Viagens

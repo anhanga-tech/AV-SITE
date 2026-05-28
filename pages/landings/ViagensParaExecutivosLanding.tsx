@@ -290,7 +290,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
           <h2 className="text-2xl font-black text-anhanga-dark mb-8">Outros serviços</h2>
           <div className="grid md:grid-cols-3 gap-4">
             <Link
-              to="/consultoria-de-viagem"
+              to="/consultoria-de-viagem/"
               className="block p-5 rounded-xl bg-white hover:bg-anhanga-blue/5 transition-colors group"
             >
               <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
@@ -301,7 +301,7 @@ const ViagensParaExecutivosLanding: React.FC = () => {
               </div>
             </Link>
             <Link
-              to="/curadoria-cruzeiros-brasil"
+              to="/curadoria-cruzeiros-brasil/"
               className="block p-5 rounded-xl bg-white hover:bg-anhanga-blue/5 transition-colors group"
             >
               <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
