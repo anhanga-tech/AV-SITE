@@ -53,8 +53,13 @@ async function getRedisClient(): Promise<RedisLike | null> {
   }
 
   try {
-    const { Redis } = await import('@upstash/redis');
-    return new Redis({ url, token });
+    // CF Workers do not support the `cache` field on fetch RequestInit.
+    // The default entry point (`@upstash/redis`) passes `cache: 'no-store'`,
+    // which throws at runtime. The `/cloudflare` entry omits it.
+    const mod = process.env.CF_PAGES
+      ? await import('@upstash/redis/cloudflare')
+      : await import('@upstash/redis');
+    return new mod.Redis({ url, token });
   } catch {
     logger.warn('RateLimit: @upstash/redis not available, using in-memory fallback');
     return null;
