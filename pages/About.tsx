@@ -43,7 +43,7 @@ const About: React.FC = () => {
     <div className="bg-brand-surface pt-32 pb-20">
       <SEO
         title="Sobre a Anhangá Viagens | Agência de Viagens em São Paulo"
-        description="Conheça a história e os valores da Anhangá Viagens. Somos uma agência de turismo certificada pela Cadastur em São Paulo, especializada em roteiros personalizados."
+        description="Conheça a história da Anhangá Viagens. Agência de turismo credenciada no Cadastur em São Paulo, especializada em roteiros personalizados."
         canonical="https://www.anhanga.tur.br/sobre/"
       />
       <OrganizationSchema />
