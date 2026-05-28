@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Hero from './Hero';
 import Problem from './Problem';
 import Solution from './Solution';
@@ -21,6 +21,31 @@ const App: React.FC = () => {
   const throttleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const showStickyRef = useRef(false);
   const isScrolledRef = useRef(false);
+  const handleScrollRef = useRef<() => void>(() => {
+    // Throttle: só executa a cada 16ms (~60fps)
+    if (throttleTimeoutRef.current) return;
+
+    throttleTimeoutRef.current = setTimeout(() => {
+      throttleTimeoutRef.current = null;
+      const scrollY = window.scrollY;
+
+
+      // Só atualiza estado se realmente mudou para evitar re-renders desnecessários
+      const newShowSticky = scrollY > 600;
+      const newIsScrolled = scrollY > 20;
+
+      // Verifica se o estado realmente precisa mudar usando refs
+      if (newShowSticky !== showStickyRef.current) {
+        setShowSticky(newShowSticky);
+        showStickyRef.current = newShowSticky;
+      }
+
+      if (newIsScrolled !== isScrolledRef.current) {
+        setIsScrolled(newIsScrolled);
+        isScrolledRef.current = newIsScrolled;
+      }
+    }, 16);
+  });
 
   // Atualiza refs quando estado muda para usar valores atuais no handler
   useEffect(() => {
@@ -31,33 +56,8 @@ const App: React.FC = () => {
     isScrolledRef.current = isScrolled;
   }, [isScrolled]);
 
-  const handleScroll = useCallback(() => {
-    // Throttle: só executa a cada 16ms (~60fps)
-    if (throttleTimeoutRef.current) return;
-    
-    throttleTimeoutRef.current = setTimeout(() => {
-      throttleTimeoutRef.current = null;
-      const scrollY = window.scrollY;
-      
-
-      // Só atualiza estado se realmente mudou para evitar re-renders desnecessários
-      const newShowSticky = scrollY > 600;
-      const newIsScrolled = scrollY > 20;
-      
-      // Verifica se o estado realmente precisa mudar usando refs
-      if (newShowSticky !== showStickyRef.current) {
-        setShowSticky(newShowSticky);
-        showStickyRef.current = newShowSticky;
-      }
-      
-      if (newIsScrolled !== isScrolledRef.current) {
-        setIsScrolled(newIsScrolled);
-        isScrolledRef.current = newIsScrolled;
-      }
-    }, 16);
-  }, []);
-
   useEffect(() => {
+    const handleScroll = () => handleScrollRef.current();
     
     // Usa passive listener para melhor performance
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -70,7 +70,7 @@ const App: React.FC = () => {
       }
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [handleScroll]);
+  }, []);
 
   const navLinks = [
     { name: 'O Perrengue', href: '#problem' },

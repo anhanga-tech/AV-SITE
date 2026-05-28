@@ -21,7 +21,10 @@ interface Message {
   id: string;
   role: 'user' | 'model';
   text: string;
-  chips?: string[];
+  chips?: Array<{
+    id: string;
+    label: string;
+  }>;
   isAction?: boolean;
   actionData?: {
     destination: string;
@@ -245,7 +248,10 @@ const AIChat: React.FC = memo(() => {
         id: crypto.randomUUID(),
         role: 'model',
         text: response.text || '',
-        chips: response.chips
+        chips: response.chips?.map((label) => ({
+          id: crypto.randomUUID(),
+          label,
+        }))
       });
     }
 
@@ -549,13 +555,13 @@ const AIChat: React.FC = memo(() => {
                 {/* Action Chips */}
                 {isLastModelMsg && msg.chips && msg.chips.length > 0 && (
                   <div className="flex flex-wrap gap-2 pl-12 mt-1">
-                    {msg.chips.map((chip, chipIdx) => (
+                    {msg.chips.map((chip) => (
                       <button
-                        key={chipIdx}
-                        onClick={() => submitMessage(chip)}
+                        key={chip.id}
+                        onClick={() => submitMessage(chip.label)}
                         className="text-[12px] font-semibold text-zinc-600 bg-white border border-zinc-200 px-4 py-2 rounded-xl shadow-sm hover:shadow hover:border-brand-vibrant/30 hover:text-brand-vibrant hover:-translate-y-0.5 transition text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-vibrant/50"
                       >
-                        {chip}
+                        {chip.label}
                       </button>
                     ))}
                   </div>
