@@ -117,14 +117,21 @@ export async function checkRateLimit(
         resetIn,
       };
     } catch (error) {
-      const errInfo = error instanceof Error
-        ? { name: error.name, message: error.message, stack: error.stack }
-        : { value: String(error) };
+      const err = error instanceof Error ? error : new Error(String(error));
+      // Error properties are non-enumerable and serialize to {} in CF Workers
+      // JSON logs. Define toJSON so the runtime can serialize them while
+      // keeping the original Error instance intact for Sentry stack traces.
+      if (!('toJSON' in err)) {
+        Object.defineProperty(err, 'toJSON', {
+          value: () => ({ name: err.name, message: err.message, stack: err.stack }),
+          configurable: true,
+        });
+      }
       if (isEdgeRuntime()) {
-        logger.error('RateLimit: Redis error on edge runtime. Denying request.', { error: errInfo, prefix, clientIP });
+        logger.error('RateLimit: Redis error on edge runtime. Denying request.', { error: err, prefix, clientIP });
         return { allowed: false, remaining: 0, resetIn: windowMs, serviceUnavailable: true };
       }
-      logger.error('RateLimit: Redis error, falling back to in-memory', { error: errInfo });
+      logger.error('RateLimit: Redis error, falling back to in-memory', err);
     }
   }
 
