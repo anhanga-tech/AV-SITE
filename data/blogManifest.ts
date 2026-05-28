@@ -23,10 +23,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "8 min de leitura"
   },
   {
-    "title": "Tropical Americas: nova área da Disney no Animal Kingdom",
-    "excerpt": "A Disney anunciou uma nova área temática no Animal Kingdom dedicada à América Latina, com atrações do Encanto e Indiana Jones. Abertura prevista para 2027. Vale começar a planejar já.",
+    "title": "Tropical Americas: nova área no Animal Kingdom",
+    "excerpt": "Nova área da Disney no Animal Kingdom dedicada à América Latina, com Encanto e Indiana Jones. Abertura em 2027. Vale planejar já.",
     "date": "2026-05-02",
-    "dateModified": "2026-05-05",
+    "dateModified": "2026-05-28",
     "author": "queila-oliveira",
     "category": "Dicas de Expert",
     "image": "https://media.anhanga.tur.br/images/blog/disney-tropical-americas-animal-kingdom.jpg",
@@ -46,10 +46,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "4 min de leitura"
   },
   {
-    "title": "América do Norte: os melhores destinos além de Nova York",
+    "title": "América do Norte: destinos além de Nova York",
     "excerpt": "EUA, Canadá e México têm muito mais que Nova York e Disney. Veja os destinos em alta para brasileiros em 2026, com visto, custos e o que cada um tem de melhor.",
     "date": "2026-04-29",
-    "dateModified": "2026-05-05",
+    "dateModified": "2026-05-28",
     "author": "felipe-william",
     "category": "Destinos",
     "image": "https://media.anhanga.tur.br/images/blog/america-do-norte-destinos-alem-de-nova-york.jpg",
@@ -111,10 +111,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "6 min de leitura"
   },
   {
-    "title": "América do Sul: os destinos que mais valem a viagem saindo do Brasil",
+    "title": "América do Sul: destinos que valem a viagem",
     "excerpt": "Argentina, Chile, Peru, Colômbia e Bolívia: o que cada destino oferece ao viajante brasileiro, com documentação, custos e como chegar de verdade.",
     "date": "2026-04-29",
-    "dateModified": "2026-05-05",
+    "dateModified": "2026-05-28",
     "author": "felipe-william",
     "category": "Destinos",
     "image": "https://media.anhanga.tur.br/images/destinations/cartagena.jpg",
@@ -155,10 +155,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "6 min de leitura"
   },
   {
-    "title": "Roteiro Europa 2026: ETIAS, câmbio e custos para brasileiros",
+    "title": "Europa 2026: ETIAS, câmbio e custos reais",
     "excerpt": "O que mudou para viajar à Europa em 2026, quanto custa, quais países combinar e como montar um roteiro que realmente funciona saindo do Brasil.",
     "date": "2026-04-29",
-    "dateModified": "2026-05-05",
+    "dateModified": "2026-05-28",
     "author": "felipe-william",
     "category": "Destinos",
     "image": "https://media.anhanga.tur.br/images/destinations/lisboa.jpg",
@@ -198,9 +198,9 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   },
   {
     "title": "Melhores destinos para o Carnaval 2026 no Brasil",
-    "excerpt": "Quer curtir o Carnaval sem estourar o orçamento? Conheça os melhores destinos no Brasil para diferentes estilos de folia ou descanso nesta retrospectiva da edição 2026.",
+    "excerpt": "Quer curtir o Carnaval sem estourar o orçamento? Os melhores destinos no Brasil para folia ou descanso, nesta retrospectiva da edição 2026.",
     "date": "2026-02-11",
-    "dateModified": "2026-05-05",
+    "dateModified": "2026-05-28",
     "author": "queila-oliveira",
     "category": "Carnaval",
     "image": "https://media.anhanga.tur.br/images/blog/destinos-carnaval-2026.jpg",
