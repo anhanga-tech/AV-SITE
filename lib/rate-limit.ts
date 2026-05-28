@@ -112,13 +112,14 @@ export async function checkRateLimit(
         resetIn,
       };
     } catch (error) {
+      const errInfo = error instanceof Error
+        ? { name: error.name, message: error.message, stack: error.stack }
+        : { value: String(error) };
       if (isEdgeRuntime()) {
-        // Redis failure on edge: in-memory fallback is non-functional. Deny to
-        // prevent the bypass rather than silently allowing all requests through.
-        logger.error('RateLimit: Redis error on edge runtime. Denying request.', { error, prefix, clientIP });
+        logger.error('RateLimit: Redis error on edge runtime. Denying request.', { error: errInfo, prefix, clientIP });
         return { allowed: false, remaining: 0, resetIn: windowMs, serviceUnavailable: true };
       }
-      logger.error('RateLimit: Redis error, falling back to in-memory', error);
+      logger.error('RateLimit: Redis error, falling back to in-memory', { error: errInfo });
     }
   }
 
