@@ -53,8 +53,13 @@ async function getRedisClient(): Promise<RedisLike | null> {
   }
 
   try {
-    const { Redis } = await import('@upstash/redis');
-    return new Redis({ url, token });
+    // CF Workers do not support the `cache` field on fetch RequestInit.
+    // The default entry point (`@upstash/redis`) passes `cache: 'no-store'`,
+    // which throws at runtime. The `/cloudflare` entry omits it.
+    const mod = process.env.CF_PAGES
+      ? await import('@upstash/redis/cloudflare')
+      : await import('@upstash/redis');
+    return new mod.Redis({ url, token });
   } catch {
     logger.warn('RateLimit: @upstash/redis not available, using in-memory fallback');
     return null;
@@ -112,13 +117,21 @@ export async function checkRateLimit(
         resetIn,
       };
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      // Error properties are non-enumerable and serialize to {} in CF Workers
+      // JSON logs. Define toJSON so the runtime can serialize them while
+      // keeping the original Error instance intact for Sentry stack traces.
+      if (!('toJSON' in err)) {
+        Object.defineProperty(err, 'toJSON', {
+          value: () => ({ name: err.name, message: err.message, stack: err.stack }),
+          configurable: true,
+        });
+      }
       if (isEdgeRuntime()) {
-        // Redis failure on edge: in-memory fallback is non-functional. Deny to
-        // prevent the bypass rather than silently allowing all requests through.
-        logger.error('RateLimit: Redis error on edge runtime. Denying request.', { error, prefix, clientIP });
+        logger.error('RateLimit: Redis error on edge runtime. Denying request.', { error: err, prefix, clientIP });
         return { allowed: false, remaining: 0, resetIn: windowMs, serviceUnavailable: true };
       }
-      logger.error('RateLimit: Redis error, falling back to in-memory', error);
+      logger.error('RateLimit: Redis error, falling back to in-memory', err);
     }
   }
 
