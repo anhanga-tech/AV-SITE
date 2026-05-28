@@ -2,9 +2,10 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
-    "title": "Copa do Mundo 2026: as cidades-sede e o que cada uma tem a oferecer além do futebol",
+    "title": "Copa do Mundo 2026: guia das cidades-sede além do futebol",
     "excerpt": "Guia das cidades-sede da Copa 2026 nos EUA, México e Canadá, com destaques, dicas locais e roteiros para aproveitar a viagem além dos jogos.",
     "date": "2026-05-22",
+    "dateModified": "2026-05-28",
     "author": "felipe-william",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/guadalajara.jpg",
@@ -89,10 +90,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "6 min de leitura"
   },
   {
-    "title": "Caribe para brasileiros: Punta Cana, Cancún ou Aruba? Entenda as diferenças",
+    "title": "Caribe: Punta Cana, Cancún ou Aruba? Guia para brasileiros",
     "excerpt": "Praias perfeitas, all inclusive e mergulho: veja como escolher o destino certo no Caribe para o seu perfil, com tudo que você precisa saber antes de ir.",
     "date": "2026-04-29",
-    "dateModified": "2026-05-05",
+    "dateModified": "2026-05-28",
     "author": "queila-oliveira",
     "category": "Destinos",
     "image": "https://media.anhanga.tur.br/images/blog/caribe-destinos-para-brasileiros.jpg",

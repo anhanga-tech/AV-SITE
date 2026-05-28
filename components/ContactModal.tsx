@@ -242,7 +242,7 @@ const ContactModal: React.FC = () => {
                             <label htmlFor="contact-optIn" className="cursor-pointer text-xs leading-relaxed text-blue-700">
                                 Quero receber novidades e ofertas de viagem por e-mail.{' '}
                                 <a
-                                    href="/politica-privacidade"
+                                    href="/politica-privacidade/"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="underline hover:text-blue-900"

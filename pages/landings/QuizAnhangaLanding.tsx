@@ -560,7 +560,7 @@ function PreLeadScreen({ profile, onSubmit, onBack }: PreLeadScreenProps) {
                         <span className="quiz-check-box" aria-hidden="true" />
                         <span className="quiz-check-label">
                             Topo receber novidades e ofertas da Anhangá. Posso cancelar quando quiser.
-                            Veja nossa <a href="/politica-privacidade">política de privacidade</a>.
+                            Veja nossa <a href="/politica-privacidade/" target="_blank" rel="noopener noreferrer">política de privacidade</a>.
                         </span>
                     </label>
                     {errors.aceite && <span role="status" className="quiz-err quiz-err-block">{errors.aceite}</span>}
