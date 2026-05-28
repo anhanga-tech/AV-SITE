@@ -286,6 +286,7 @@ const LineupSection: React.FC = () => {
             frameBorder="0"
             allowFullScreen
             allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            sandbox="allow-popups allow-popups-to-escape-sandbox allow-scripts"
             loading="lazy"
             title="Playlist Lollapalooza 2026"
           ></iframe>
