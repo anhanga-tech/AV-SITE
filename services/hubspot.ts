@@ -57,7 +57,9 @@ async function assertHubSpotResponseOk(response: Response, errorCode: string): P
 }
 
 async function parseHubSpotJsonResponse<T>(response: Response, errorCode: string, fallback?: T): Promise<T> {
-    await assertHubSpotResponseOk(response, errorCode);
+    if (!response.ok) {
+        await assertHubSpotResponseOk(response, errorCode);
+    }
 
     if (fallback !== undefined) {
         return (await response.json().catch(() => fallback)) as T;
