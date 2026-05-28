@@ -7,57 +7,56 @@ import { NpsThankPromoter } from '../components/nps/NpsThankPromoter';
 import { NpsThankOther } from '../components/nps/NpsThankOther';
 import { SEO } from '../components/SEO';
 
-const GOOGLE_REVIEW_URL = 'https://g.page/r/Ca7sLORX6EQ7EBM/review';
-
 type PageState = 'form' | 'thank-promoter' | 'thank-other';
 
-// Scoped styles for states that inline styles cannot express (:hover, :active,
-// :focus-visible, @media prefers-reduced-motion).
 const PAGE_STYLES = `
-  .nps-score-btn:focus-visible {
-    outline: 2px solid #0ea5e9;
-    outline-offset: 2px;
-  }
   .nps-cta {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.75rem 2rem;
+    padding: 0.875rem 2rem;
     font-size: 0.875rem;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
     text-decoration: none;
-    transform: translate(-1px, -1px);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    border: 2px solid #0f172a;
+    transform: translate(-2px, -2px);
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.15s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .nps-cta:hover { transform: translate(0, 0); }
-  .nps-cta:focus-visible { outline: 2px solid #0ea5e9; outline-offset: 2px; }
+  .nps-cta:hover {
+    transform: translate(0, 0);
+  }
+  .nps-cta:active {
+    transform: translate(2px, 2px);
+    box-shadow: none !important;
+  }
+  .nps-cta:focus-visible {
+    outline: 2px solid #0ea5e9;
+    outline-offset: 2px;
+  }
   .nps-cta-yellow {
-    background: #FFD600; color: #0f172a;
-    border: 2px solid #0f172a; box-shadow: 4px 4px 0 #0f172a;
+    background: #FFD600;
+    color: #0f172a;
+    box-shadow: 4px 4px 0 #0f172a;
   }
   .nps-cta-yellow:hover { box-shadow: 2px 2px 0 #0f172a; }
   .nps-cta-whatsapp {
-    background: #25D366; color: #ffffff;
-    border: 2px solid #0f172a; box-shadow: 4px 4px 0 #0f172a;
+    background: #25D366;
+    color: #0f172a;
+    box-shadow: 4px 4px 0 #0f172a;
   }
   .nps-cta-whatsapp:hover { box-shadow: 2px 2px 0 #0f172a; }
-  .nps-submit:not(:disabled):active {
-    transform: translate(0, 0) !important;
-    box-shadow: 2px 2px 0 #003B8E !important;
-  }
-  .nps-field-label {
-    letter-spacing: 0.15em;
-    color: #94a3b8;
-  }
-  .nps-score-legend {
-    letter-spacing: 0.15em;
-  }
+
   @media (prefers-reduced-motion: reduce) {
-    .nps-score-btn, .nps-cta, .nps-submit { transition: none !important; }
-    .nps-thank-card { animation: none !important; opacity: 1 !important; transform: none !important; }
+    .nps-cta, .nps-thank-card {
+      transition: none !important;
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
   }
 `;
 
@@ -72,7 +71,6 @@ export default function NPS() {
   const [pageState, setPageState] = useState<PageState>('form');
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [countdown, setCountdown] = useState(3);
   const [year] = useState(() => new Date().getFullYear());
 
   useEffect(() => {
@@ -80,16 +78,6 @@ export default function NPS() {
     document.title = 'Avaliação de Viagem — Anhangá Viagens';
     return () => { document.title = prev; };
   }, []);
-
-  useEffect(() => {
-    if (pageState !== 'thank-promoter') return;
-    if (countdown <= 0) {
-      window.location.href = GOOGLE_REVIEW_URL;
-      return;
-    }
-    const id = setTimeout(() => setCountdown(c => c - 1), 1000);
-    return () => clearTimeout(id);
-  }, [pageState, countdown]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -139,33 +127,25 @@ export default function NPS() {
       />
       <style>{PAGE_STYLES}</style>
 
-      <div
-        className="min-h-screen flex flex-col"
-        style={{ background: '#0f172a', color: '#f8fafc', fontFamily: 'Poppins, sans-serif' }}
-      >
-        <header className="p-6 flex justify-center">
+      <div className="min-h-screen flex flex-col bg-anhanga-dark text-slate-50 font-sans">
+        <header className="pt-8 pb-6 flex justify-center">
           <img
             src={BRAND_LOGO_WHITE_URL}
             alt="Anhangá Viagens"
-            className="h-20 w-auto"
+            className="h-16 w-auto"
             loading="eager"
           />
         </header>
 
-        <div aria-hidden="true" style={{ height: '3px', background: '#FFD600', flexShrink: 0 }} />
-
-        <main className="flex-1 flex flex-col items-center px-6 py-12">
+        <main className="flex-1 flex flex-col items-center px-6 pb-16 pt-8">
           <div className="w-full max-w-lg">
 
             {pageState === 'form' && (
               <form onSubmit={handleSubmit} noValidate>
-                <h1
-                  className="text-3xl font-extrabold tracking-tight mb-2"
-                  style={{ letterSpacing: '-0.025em' }}
-                >
+                <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">
                   {firstname ? `Olá, ${firstname}!` : 'Olá!'}
                 </h1>
-                <p className="text-base mb-10" style={{ color: '#94a3b8', lineHeight: '1.75' }}>
+                <p className="text-base text-slate-400 leading-7 mb-12">
                   Sua opinião nos ajuda a cuidar de cada detalhe da próxima aventura.
                 </p>
 
@@ -174,10 +154,10 @@ export default function NPS() {
                   onSelect={setScore}
                 />
 
-                <div className="mb-6">
+                <div className="mb-8">
                   <label
                     htmlFor="nps-reason"
-                    className="nps-field-label block text-xs font-bold uppercase mb-2"
+                    className="block text-xs font-black uppercase tracking-[0.15em] text-slate-400 mb-2.5"
                   >
                     O que te levou a dar essa nota?
                   </label>
@@ -189,19 +169,17 @@ export default function NPS() {
                     rows={4}
                     required
                     maxLength={2000}
+                    aria-label="O que te levou a dar essa nota?"
                   />
                 </div>
 
-                <div className="mb-8">
+                <div className="mb-10">
                   <label
                     htmlFor="nps-highlight"
-                    className="nps-field-label block text-xs font-bold uppercase mb-2"
+                    className="block text-xs font-black uppercase tracking-[0.15em] text-slate-400 mb-2.5"
                   >
                     Qual foi o momento mais marcante da viagem?{' '}
-                    <span
-                      className="normal-case font-normal"
-                      style={{ letterSpacing: 'normal', color: '#475569' }}
-                    >
+                    <span className="normal-case font-normal tracking-normal text-slate-600">
                       (opcional)
                     </span>
                   </label>
@@ -212,14 +190,14 @@ export default function NPS() {
                     placeholder="Um momento especial que ficou na memória..."
                     rows={3}
                     maxLength={2000}
+                    aria-label="Qual foi o momento mais marcante da viagem?"
                   />
                 </div>
 
                 {errorMessage && (
                   <p
-                    className="mb-4 text-sm text-center rounded-lg px-4 py-3"
+                    className="mb-5 text-sm text-center rounded-xl px-4 py-3 text-red-400 bg-red-500/10 border border-red-500/20"
                     role="alert"
-                    style={{ color: '#f87171', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}
                   >
                     {errorMessage}
                   </p>
@@ -228,15 +206,34 @@ export default function NPS() {
                 <button
                   type="submit"
                   disabled={!submitEnabled}
-                  className="nps-submit w-full py-4 text-sm font-extrabold uppercase rounded-lg"
+                  className={[
+                    'w-full py-4 text-sm font-extrabold uppercase tracking-[0.1em] rounded-xl',
+                    'border-2 transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none',
+                    'outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action',
+                    submitEnabled
+                      ? [
+                          'bg-anhanga-action border-anhanga-action text-anhanga-dark',
+                          'hover:bg-anhanga-actionDark hover:border-anhanga-actionDark hover:text-white',
+                          'active:scale-[0.98] motion-reduce:active:scale-100',
+                        ].join(' ')
+                      : 'bg-slate-800 border-slate-700 text-slate-500 cursor-not-allowed',
+                  ].join(' ')}
                 >
-                  {submitting ? 'Enviando...' : 'Enviar avaliação'}
+                  {submitting ? (
+                    <span className="inline-flex items-center gap-2">
+                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      Enviando…
+                    </span>
+                  ) : 'Enviar avaliação'}
                 </button>
               </form>
             )}
 
             {pageState === 'thank-promoter' && (
-              <NpsThankPromoter firstname={firstname} countdown={countdown} />
+              <NpsThankPromoter firstname={firstname} />
             )}
             {pageState === 'thank-other' && (
               <NpsThankOther firstname={firstname} />
@@ -245,7 +242,7 @@ export default function NPS() {
           </div>
         </main>
 
-        <footer className="py-6 text-center" style={{ color: '#64748b', fontSize: '0.75rem' }}>
+        <footer className="py-6 text-center text-xs text-slate-600">
           &copy; {year} Anhangá Viagens. Todos os direitos reservados.
         </footer>
       </div>
