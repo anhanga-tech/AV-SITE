@@ -11,7 +11,9 @@ Adaptacao direta da landing Brazil Promotion Day. Mesma estrutura visual (6 comp
 ## Rota
 
 - `/corporativo` (nova rota)
-- `/brazil-promotion-day` redireciona 301 para `/corporativo`
+- `/brazil-promotion-day` redireciona para `/corporativo` em duas camadas:
+  1. **Host-level (Cloudflare Pages `_redirects`):** regra 301 para que bots e crawlers recebam redirect real com transferencia de link equity
+  2. **SPA fallback (App.tsx):** `<Navigate to="/corporativo" replace />` para navegacao client-side caso o usuario ja esteja no SPA
 
 ## Estrutura de componentes
 
@@ -66,7 +68,8 @@ Identico ao BpdNav. Botao WhatsApp com `source: 'corporativo'`.
   - Empresa (opcional)
   - Cargo/Funcao (opcional)
 - **bantSummary:** `Lead corporativo captado via landing /corporativo. Empresa: {empresa}. Cargo: {cargo}.`
-- **formType:** `corporate_lead`
+- **formType:** `corporate_lead` (requer adicionar `'corporate_lead'` ao union type `LeadFormType` em `hooks/useLeadCapture.ts` e garantir que o valor propaga corretamente pelo dataLayer)
+- **Campos empresa/cargo:** incluidos apenas no `bantSummary` como texto livre. Nao requerem campos estruturados novos no HubSpot neste momento. Se no futuro o segmento corporativo crescer, migrar para propriedades dedicadas no CRM.
 
 ### CorpFooter
 
@@ -114,9 +117,17 @@ PILLARS = [
 - Estrutura de arquivos (mesma convencao de pasta por landing)
 - Footer e Nav (mesma estrutura, so muda source no tracking)
 
+## Atualizacoes auxiliares
+
+- **Sitemap:** adicionar `/corporativo/` em `public/sitemap.xml` e remover ou atualizar entrada de `/brazil-promotion-day/`
+- **Prerender routes:** atualizar `tests/prerender-routes.test.ts` para incluir `/corporativo` e remover `/brazil-promotion-day`
+- **Cloudflare `_redirects`:** adicionar regra `/brazil-promotion-day /corporativo 301`
+- **Strings hardcoded nos componentes:** ao copiar os componentes BPD, substituir todas as strings e atributos `data-tracking` que referenciam "brazil-promotion-day" por "corporativo"
+
 ## Testes
 
-- Atualizar ou criar testes E2E para `/corporativo`
-- Verificar que redirect 301 de `/brazil-promotion-day` funciona
-- Verificar que formulario envia lead com campos corporativos
-- Verificar GTM dataLayer push com campaign corporativo
+- Atualizar ou criar testes E2E para `/corporativo` (baseado em `tests/e2e/brazil-promotion-day.spec.ts`)
+- Atualizar `tests/e2e/brazil-promotion-day.spec.ts` para testar que a rota redireciona para `/corporativo`
+- Verificar que formulario envia lead com campos corporativos e `formType: 'corporate_lead'`
+- Verificar GTM dataLayer push com `campaign: 'corporativo'`
+- Verificar que `pnpm typecheck` passa apos adicionar `'corporate_lead'` ao union type
