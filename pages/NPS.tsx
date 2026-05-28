@@ -45,7 +45,7 @@ const PAGE_STYLES = `
   .nps-cta-yellow:hover { box-shadow: 2px 2px 0 #0f172a; }
   .nps-cta-whatsapp {
     background: #25D366;
-    color: #ffffff;
+    color: #0f172a;
     box-shadow: 4px 4px 0 #0f172a;
   }
   .nps-cta-whatsapp:hover { box-shadow: 2px 2px 0 #0f172a; }
@@ -208,13 +208,13 @@ export default function NPS() {
                   disabled={!submitEnabled}
                   className={[
                     'w-full py-4 text-sm font-extrabold uppercase tracking-[0.1em] rounded-xl',
-                    'border-2 transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)]',
+                    'border-2 transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none',
                     'outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action',
                     submitEnabled
                       ? [
-                          'bg-anhanga-action border-anhanga-action text-white',
-                          'hover:bg-anhanga-actionDark hover:border-anhanga-actionDark',
-                          'active:scale-[0.98]',
+                          'bg-anhanga-action border-anhanga-action text-anhanga-dark',
+                          'hover:bg-anhanga-actionDark hover:border-anhanga-actionDark hover:text-white',
+                          'active:scale-[0.98] motion-reduce:active:scale-100',
                         ].join(' ')
                       : 'bg-slate-800 border-slate-700 text-slate-500 cursor-not-allowed',
                   ].join(' ')}

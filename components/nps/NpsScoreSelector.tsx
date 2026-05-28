@@ -32,11 +32,11 @@ export function NpsScoreSelector({ score, onSelect }: NpsScoreSelectorProps) {
                 'relative flex items-center justify-center',
                 'min-h-[48px] min-w-[48px] sm:min-h-[44px] sm:min-w-0',
                 'rounded-xl text-sm font-bold',
-                'border-2 transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)]',
+                'border-2 transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none',
                 'outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action',
                 selected
-                  ? 'bg-anhanga-action border-anhanga-action text-anhanga-dark scale-110 shadow-[0_0_16px_rgba(14,165,233,0.4)]'
-                  : 'bg-slate-800/60 border-slate-600/40 text-slate-300 hover:border-slate-400 hover:bg-slate-700/60 hover:text-white active:scale-95',
+                  ? 'bg-anhanga-action border-anhanga-action text-anhanga-dark scale-110 shadow-[0_0_16px_rgba(14,165,233,0.4)] motion-reduce:scale-100'
+                  : 'bg-slate-800/60 border-slate-600/40 text-slate-300 hover:border-slate-400 hover:bg-slate-700/60 hover:text-white active:scale-95 motion-reduce:active:scale-100',
               ].join(' ')}
             >
               {n}
