@@ -12,7 +12,7 @@ export class AIChat {
 
   constructor(page: Page) {
     this.page = page;
-    this.chatDialog = page.locator('div[role="dialog"][aria-labelledby="ai-chat-title"]');
+    this.chatDialog = page.locator('dialog[aria-labelledby="ai-chat-title"]');
     this.inputField = page.locator('textarea[placeholder="Digite sua dúvida aqui..."]');
     this.sendBtn = page.locator('button[aria-label="Enviar mensagem"]');
     this.closeBtn = page.locator('button[aria-label="Fechar gaveta"]');
@@ -22,9 +22,8 @@ export class AIChat {
   }
 
   async open() {
-    // The drawer hides via translateX (not display:none), so chatDialog.isVisible()
-    // returns true even when closed. Instead, check the open button: it becomes
-    // opacity-0 (invisible to Playwright) when the drawer is open.
+    // The drawer uses a <dialog> that animates via translateX. Check the open button
+    // visibility (it becomes opacity-0 when the drawer is open) as the reliable signal.
     if (await this.openBtn.isVisible()) {
       await this.openBtn.click();
       // Wait for the drawer slide-in animation (500ms) to complete by confirming
