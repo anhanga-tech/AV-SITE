@@ -1,10 +1,4 @@
-/**
- * Plain-text FAQ items for FAQPageSchema structured data.
- * Mirrors the questions from components/Faq.tsx but with string answers
- * so they can be serialised into JSON-LD without JSX or HTML markup.
- *
- * Keep in sync with FAQ.tsx whenever questions or answers change.
- */
+// Keep in sync with Faq.tsx whenever questions or answers change.
 
 export interface FAQSchemaItem {
   question: string;

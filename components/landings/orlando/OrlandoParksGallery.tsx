@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { CSSProperties } from 'react';
 import { getMediaUrl, optimizeRemoteImageUrl } from "../../../data/mediaConfig";
 import { openContactModal } from "../../../utils/contactForm";
 
@@ -11,7 +12,7 @@ interface ParkCardData {
   alt: string;
   logo: string;
   logoAlt: string;
-  logoStyle?: React.CSSProperties;
+  logoStyle?: CSSProperties;
   logoWidth: number;
   logoHeight: number;
   description: string;

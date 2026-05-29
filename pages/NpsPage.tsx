@@ -1,3 +1,4 @@
+import type { FormEvent } from 'react';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { BRAND_LOGO_WHITE_URL } from '../lib/media-assets';
@@ -79,7 +80,7 @@ export default function NpsPage() {
     return () => { document.title = prev; };
   }, []);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (score === null) return;
 
