@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { SEO } from '../../components/SEO';
+import { Seo } from '../../components/Seo';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { useQuizCapture } from '../../hooks/useQuizCapture';
 import { getWhatsAppLink } from '../../utils/whatsapp';
@@ -1037,7 +1037,7 @@ export default function QuizAnhangaLanding() {
 
     return (
         <>
-            <SEO
+            <Seo
                 title="Quiz de Destinos | Descubra seu próximo rolê — Anhangá Viagens"
                 description="6 perguntas rápidas para descobrir seu perfil de viajante e os destinos que mais combinam com você. Gratuito e sem compromisso."
                 canonical="https://www.anhanga.tur.br/quiz/"

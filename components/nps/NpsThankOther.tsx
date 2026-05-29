@@ -8,7 +8,7 @@ export function NpsThankOther({ firstname }: NpsThankOtherProps) {
   return (
     <div className="nps-thank-card animate-fade-in-up text-center py-8">
       <div
-        className="mx-auto mb-6 flex items-center justify-center rounded-full w-16 h-16 bg-anhanga-blue border-2 border-anhanga-dark shadow-[4px_4px_0_#003B8E]"
+        className="mx-auto mb-6 flex items-center justify-center rounded-full size-16 bg-anhanga-blue border-2 border-anhanga-dark shadow-[4px_4px_0_#003B8E]"
         aria-hidden="true"
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

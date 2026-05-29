@@ -1,4 +1,4 @@
-import { SEO } from "@/components/SEO";
+import { Seo } from "@/components/Seo";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { BreadcrumbSchema } from "@/components/schemas/BreadcrumbSchema";
@@ -11,7 +11,7 @@ const Terms = () => {
 
     return (
         <div className="min-h-screen bg-background text-foreground">
-            <SEO
+            <Seo
                 title="Termos e Condições de Uso | Anhangá Viagens"
                 description={metaDescription}
                 canonical={canonicalUrl}

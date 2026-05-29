@@ -237,7 +237,7 @@ test('remaining runtime media dependencies should use managed Cloudflare assets'
     readRepoFile('data/testimonialsData.ts'),
     readRepoFile('pages/landings/orlando.css'),
     readRepoFile('components/landings/lollapalooza/Hero.tsx'),
-    readRepoFile('components/SEO.tsx'),
+    readRepoFile('components/Seo.tsx'),
     readRepoFile('data/blogData.ts'),
     readRepoFile('components/Header/Header.tsx'),
     readRepoFile('components/Footer.tsx'),
@@ -273,7 +273,7 @@ test('remaining runtime media dependencies should use managed Cloudflare assets'
   assert.match(lollapaloozaHero, /videos\/lollapalooza\/hero\/crowd-background\.mp4/);
 
   for (const [label, content] of [
-    ['components/SEO.tsx', seo],
+    ['components/Seo.tsx', seo],
     ['data/blogData.ts', blogData],
     ['components/Header/Header.tsx', header],
     ['components/Footer.tsx', footer],

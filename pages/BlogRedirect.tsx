@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
-import { SEO } from '../components/SEO';
+import { Seo } from '../components/Seo';
 
 const BlogRedirect: React.FC = () => {
   const { slug } = useParams<{ slug?: string }>();
@@ -15,7 +15,7 @@ const BlogRedirect: React.FC = () => {
 
   return (
     <>
-      <SEO
+      <Seo
         title="Redirecionando para o blog"
         description="O blog da Anhangá foi movido para um novo endereço."
         canonical={destination}

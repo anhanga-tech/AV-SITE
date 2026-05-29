@@ -3,8 +3,186 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { CSSProperties } from 'react';
 import { getMediaUrl, optimizeRemoteImageUrl } from "../../../data/mediaConfig";
 import { openContactModal } from "../../../utils/contactForm";
+
+interface ParkCardData {
+  image: string;
+  alt: string;
+  logo: string;
+  logoAlt: string;
+  logoStyle?: CSSProperties;
+  logoWidth: number;
+  logoHeight: number;
+  description: string;
+}
+
+interface ParkGroupData {
+  label: string;
+  className: string;
+  parks: ParkCardData[];
+}
+
+function ParkCard({ image, alt, logo, logoAlt, logoStyle, logoWidth, logoHeight, description }: ParkCardData) {
+  return (
+    <div className="park-card">
+      <div className="park-image-frame">
+        <img
+          src={optimizeRemoteImageUrl(image, 600, 400)}
+          alt={alt}
+          width="600"
+          height="400"
+          loading="lazy"
+        />
+      </div>
+      <img
+        className="park-logo-title"
+        style={logoStyle}
+        src={getMediaUrl(logo)}
+        alt={logoAlt}
+        width={logoWidth}
+        height={logoHeight}
+        loading="lazy"
+      />
+      <p>{description}</p>
+    </div>
+  );
+}
+
+const PARK_GROUPS: ParkGroupData[] = [
+  {
+    label: "Walt Disney World",
+    className: "disney-group",
+    parks: [
+      {
+        image: "images/orlando/parks/magic-kingdom.jpg",
+        alt: "Magic Kingdom",
+        logo: "images/orlando/logos/magic-kingdom.png",
+        logoAlt: "Magic Kingdom Logo",
+        logoWidth: 120,
+        logoHeight: 40,
+        description: "Onde a fantasia é lei. O castelo icônico, fogos inesquecíveis e a magia que define Orlando.",
+      },
+      {
+        image: "images/orlando/parks/epcot.jpg",
+        alt: "Epcot",
+        logo: "images/orlando/logos/epcot.png",
+        logoAlt: "Epcot Logo",
+        logoStyle: { maxWidth: "120px", maxHeight: "33px" },
+        logoWidth: 120,
+        logoHeight: 33,
+        description: "Volta ao mundo em um dia. Coma em Paris, beba no Japão e voe para o futuro.",
+      },
+      {
+        image: "images/orlando/parks/hollywood-studios.jpg",
+        alt: "Hollywood Studios",
+        logo: "images/orlando/logos/hollywood-studios.svg",
+        logoAlt: "Hollywood Studios Logo",
+        logoWidth: 120,
+        logoHeight: 40,
+        description: "Luz, câmera, ação! Da saga Star Wars ao quintal de Toy Story: você é o protagonista.",
+      },
+      {
+        image: "images/orlando/parks/animal-kingdom.jpg",
+        alt: "Animal Kingdom",
+        logo: "images/orlando/logos/animal-kingdom.svg",
+        logoAlt: "Animal Kingdom Logo",
+        logoWidth: 120,
+        logoHeight: 40,
+        description: "A natureza ruge. Safáris reais, montanhas flutuantes em Pandora e expedições selvagens.",
+      },
+      {
+        image: "images/orlando/parks/typhoon-lagoon.jpg",
+        alt: "Typhoon Lagoon",
+        logo: "images/orlando/logos/typhoon-lagoon.png",
+        logoAlt: "Typhoon Lagoon Logo",
+        logoWidth: 120,
+        logoHeight: 40,
+        description: "Tsunamis de diversão. Encare ondas gigantes ou relaxe no rio lento deste paraíso tropical.",
+      },
+    ],
+  },
+  {
+    label: "Universal Orlando",
+    className: "universal-group",
+    parks: [
+      {
+        image: "images/orlando/universal-studios-orlando.jpg",
+        alt: "Universal Studios Orlando",
+        logo: "images/orlando/logos/universal-studios.png",
+        logoAlt: "Universal Studios Logo",
+        logoStyle: { maxHeight: "77px", maxWidth: "280px" },
+        logoWidth: 280,
+        logoHeight: 77,
+        description: "Entre no filme. Fuja do banco de Gringotts, brinque com os Minions e viva o cinema.",
+      },
+      {
+        image: "images/orlando/parks/islands-of-adventure.jpg",
+        alt: "Islands of Adventure",
+        logo: "images/orlando/logos/islands-of-adventure.png",
+        logoAlt: "Islands of Adventure Logo",
+        logoStyle: { maxHeight: "77px", maxWidth: "280px" },
+        logoWidth: 280,
+        logoHeight: 77,
+        description: "Aventura nível hard. Voe de moto com Hagrid, escape de dinossauros e sinta a fúria do Hulk.",
+      },
+      {
+        image: "images/orlando/parks/epic-universe.jpg",
+        alt: "Epic Universe",
+        logo: "images/orlando/logos/epic-universe.png",
+        logoAlt: "Epic Universe Logo",
+        logoStyle: { maxHeight: "77px", maxWidth: "280px" },
+        logoWidth: 280,
+        logoHeight: 77,
+        description: "5 mundos, 1 destino. De Super Nintendo World a Monstros Clássicos: o portal se abriu.",
+      },
+      {
+        image: "images/orlando/parks/volcano-bay.jpg",
+        alt: "Volcano Bay",
+        logo: "images/orlando/logos/volcano-bay.png",
+        logoAlt: "Volcano Bay Logo",
+        logoStyle: { maxHeight: "77px", maxWidth: "280px" },
+        logoWidth: 280,
+        logoHeight: 77,
+        description: "Praia e adrenalina. Despenque do vulcão Krakatau ou apenas relaxe na areia. O TapuTapu cuida da fila.",
+      },
+    ],
+  },
+  {
+    label: "Outras Aventuras",
+    className: "other-group",
+    parks: [
+      {
+        image: "images/orlando/parks/seaworld.jpg",
+        alt: "SeaWorld",
+        logo: "images/orlando/logos/seaworld.png",
+        logoAlt: "SeaWorld Logo",
+        logoWidth: 120,
+        logoHeight: 40,
+        description: "Coasters insanas. Acelere na Pipeline e na Mako, depois recupere o fôlego admirando a vida marinha.",
+      },
+      {
+        image: "images/orlando/parks/discovery-cove.jpg",
+        alt: "Discovery Cove",
+        logo: "images/orlando/logos/discovery-cove.png",
+        logoAlt: "Discovery Cove Logo",
+        logoWidth: 120,
+        logoHeight: 40,
+        description: "Seu dia de VIP. All-inclusive de luxo: nade com golfinhos e esqueça do mundo lá fora.",
+      },
+      {
+        image: "images/orlando/parks/kennedy-space-center.jpg",
+        alt: "Kennedy Space Center",
+        logo: "images/orlando/logos/kennedy-space-center.svg",
+        logoAlt: "Kennedy Space Center Logo",
+        logoWidth: 120,
+        logoHeight: 40,
+        description: "3... 2... 1... Decolar! Foguetes reais da NASA, pedras lunares e a história do universo.",
+      },
+    ],
+  },
+];
 
 export function OrlandoParksGallery() {
   return (
@@ -14,374 +192,18 @@ export function OrlandoParksGallery() {
         <span className="highlight-blue">Imperdíveis</span>
       </h2>
 
-      {/* --- WALT DISNEY WORLD --- */}
-      <div className="complex-group disney-group">
-        <div className="complex-label">
-          <span>Walt Disney World</span>
-        </div>
-        <div className="parks-grid">
-          <div className="park-card">
-            <div className="park-image-frame">
-              <img
-                src={optimizeRemoteImageUrl(
-                  "images/orlando/parks/magic-kingdom.jpg",
-                  600,
-                  400,
-                )}
-                alt="Magic Kingdom"
-                width="600"
-                height="400"
-                loading="lazy"
-              />
-            </div>
-            <img
-              className="park-logo-title"
-              src={getMediaUrl("images/orlando/logos/magic-kingdom.png")}
-              alt="Magic Kingdom Logo"
-              width="120"
-              height="40"
-              loading="lazy"
-            />
-            <p>
-              Onde a fantasia é lei. O castelo icônico, fogos inesquecíveis e
-              a magia que define Orlando.
-            </p>
+      {PARK_GROUPS.map((group) => (
+        <div key={group.label} className={`complex-group ${group.className}`}>
+          <div className="complex-label">
+            <span>{group.label}</span>
           </div>
-
-          <div className="park-card">
-            <div className="park-image-frame">
-              <img
-                src={optimizeRemoteImageUrl(
-                  "images/orlando/parks/epcot.jpg",
-                  600,
-                  400,
-                )}
-                alt="Epcot"
-                width="600"
-                height="400"
-                loading="lazy"
-              />
-            </div>
-            <img
-              className="park-logo-title"
-              style={{ maxWidth: "120px", maxHeight: "33px" }}
-              src={getMediaUrl("images/orlando/logos/epcot.png")}
-              alt="Epcot Logo"
-              width="120"
-              height="33"
-              loading="lazy"
-            />
-            <p>
-              Volta ao mundo em um dia. Coma em Paris, beba no Japão e voe
-              para o futuro.
-            </p>
-          </div>
-
-          <div className="park-card">
-            <div className="park-image-frame">
-              <img
-                src={optimizeRemoteImageUrl(
-                  "images/orlando/parks/hollywood-studios.jpg",
-                  600,
-                  400,
-                )}
-                alt="Hollywood Studios"
-                width="600"
-                height="400"
-                loading="lazy"
-              />
-            </div>
-            <img
-              className="park-logo-title"
-              src={getMediaUrl("images/orlando/logos/hollywood-studios.svg")}
-              alt="Hollywood Studios Logo"
-              width="120"
-              height="40"
-              loading="lazy"
-            />
-            <p>
-              Luz, câmera, ação! Da saga Star Wars ao quintal de Toy Story:
-              você é o protagonista.
-            </p>
-          </div>
-
-          <div className="park-card">
-            <div className="park-image-frame">
-              <img
-                src={optimizeRemoteImageUrl(
-                  "images/orlando/parks/animal-kingdom.jpg",
-                  600,
-                  400,
-                )}
-                alt="Animal Kingdom"
-                width="600"
-                height="400"
-                loading="lazy"
-              />
-            </div>
-            <img
-              className="park-logo-title"
-              src={getMediaUrl("images/orlando/logos/animal-kingdom.svg")}
-              alt="Animal Kingdom Logo"
-              width="120"
-              height="40"
-              loading="lazy"
-            />
-            <p>
-              A natureza ruge. Safáris reais, montanhas flutuantes em Pandora
-              e expedições selvagens.
-            </p>
-          </div>
-
-          <div className="park-card">
-            <div className="park-image-frame">
-              <img
-                src={optimizeRemoteImageUrl(
-                  "images/orlando/parks/typhoon-lagoon.jpg",
-                  600,
-                  400,
-                )}
-                alt="Typhoon Lagoon"
-                width="600"
-                height="400"
-                loading="lazy"
-              />
-            </div>
-            <img
-              className="park-logo-title"
-              src={getMediaUrl("images/orlando/logos/typhoon-lagoon.png")}
-              alt="Typhoon Lagoon Logo"
-              width="120"
-              height="40"
-              loading="lazy"
-            />
-            <p>
-              Tsunamis de diversão. Encare ondas gigantes ou relaxe no rio
-              lento deste paraíso tropical.
-            </p>
+          <div className="parks-grid">
+            {group.parks.map((park) => (
+              <ParkCard key={park.alt} {...park} />
+            ))}
           </div>
         </div>
-      </div>
-
-      {/* --- UNIVERSAL ORLANDO --- */}
-      <div className="complex-group universal-group">
-        <div className="complex-label">
-          <span>Universal Orlando</span>
-        </div>
-        <div className="parks-grid">
-          <div className="park-card">
-            <div className="park-image-frame">
-              <img
-                src={optimizeRemoteImageUrl(
-                  "images/orlando/universal-studios-orlando.jpg",
-                  600,
-                  400,
-                )}
-                alt="Universal Studios Orlando"
-                width="600"
-                height="400"
-                loading="lazy"
-              />
-            </div>
-            <img
-              className="park-logo-title"
-              style={{ maxHeight: "77px", maxWidth: "280px" }}
-              src={getMediaUrl("images/orlando/logos/universal-studios.png")}
-              alt="Universal Studios Logo"
-              width="280"
-              height="77"
-              loading="lazy"
-            />
-            <p>
-              Entre no filme. Fuja do banco de Gringotts, brinque com os
-              Minions e viva o cinema.
-            </p>
-          </div>
-
-          <div className="park-card">
-            <div className="park-image-frame">
-              <img
-                src={optimizeRemoteImageUrl(
-                  "images/orlando/parks/islands-of-adventure.jpg",
-                  600,
-                  400,
-                )}
-                alt="Islands of Adventure"
-                width="600"
-                height="400"
-                loading="lazy"
-              />
-            </div>
-            <img
-              className="park-logo-title"
-              style={{ maxHeight: "77px", maxWidth: "280px" }}
-              src={getMediaUrl(
-                "images/orlando/logos/islands-of-adventure.png",
-              )}
-              alt="Islands of Adventure Logo"
-              width="280"
-              height="77"
-              loading="lazy"
-            />
-            <p>
-              Aventura nível hard. Voe de moto com Hagrid, escape de
-              dinossauros e sinta a fúria do Hulk.
-            </p>
-          </div>
-
-          <div className="park-card">
-            <div className="park-image-frame">
-              <img
-                src={optimizeRemoteImageUrl(
-                  "images/orlando/parks/epic-universe.jpg",
-                  600,
-                  400,
-                )}
-                alt="Epic Universe"
-                width="600"
-                height="400"
-                loading="lazy"
-              />
-            </div>
-            <img
-              className="park-logo-title"
-              style={{ maxHeight: "77px", maxWidth: "280px" }}
-              src={getMediaUrl("images/orlando/logos/epic-universe.png")}
-              alt="Epic Universe Logo"
-              width="280"
-              height="77"
-              loading="lazy"
-            />
-            <p>
-              5 mundos, 1 destino. De Super Nintendo World a Monstros
-              Clássicos: o portal se abriu.
-            </p>
-          </div>
-
-          <div className="park-card">
-            <div className="park-image-frame">
-              <img
-                src={optimizeRemoteImageUrl(
-                  "images/orlando/parks/volcano-bay.jpg",
-                  600,
-                  400,
-                )}
-                alt="Volcano Bay"
-                width="600"
-                height="400"
-                loading="lazy"
-              />
-            </div>
-            <img
-              className="park-logo-title"
-              style={{ maxHeight: "77px", maxWidth: "280px" }}
-              src={getMediaUrl("images/orlando/logos/volcano-bay.png")}
-              alt="Volcano Bay Logo"
-              width="280"
-              height="77"
-              loading="lazy"
-            />
-            <p>
-              Praia e adrenalina. Despenque do vulcão Krakatau ou apenas
-              relaxe na areia. O TapuTapu cuida da fila.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* --- OUTRAS AVENTURAS --- */}
-      <div className="complex-group other-group">
-        <div className="complex-label">
-          <span>Outras Aventuras</span>
-        </div>
-        <div className="parks-grid">
-          <div className="park-card">
-            <div className="park-image-frame">
-              <img
-                src={optimizeRemoteImageUrl(
-                  "images/orlando/parks/seaworld.jpg",
-                  600,
-                  400,
-                )}
-                alt="SeaWorld"
-                width="600"
-                height="400"
-                loading="lazy"
-              />
-            </div>
-            <img
-              className="park-logo-title"
-              src={getMediaUrl("images/orlando/logos/seaworld.png")}
-              alt="SeaWorld Logo"
-              width="120"
-              height="40"
-              loading="lazy"
-            />
-            <p>
-              Coasters insanas. Acelere na Pipeline e na Mako, depois recupere
-              o fôlego admirando a vida marinha.
-            </p>
-          </div>
-
-          <div className="park-card">
-            <div className="park-image-frame">
-              <img
-                src={optimizeRemoteImageUrl(
-                  "images/orlando/parks/discovery-cove.jpg",
-                  600,
-                  400,
-                )}
-                alt="Discovery Cove"
-                width="600"
-                height="400"
-                loading="lazy"
-              />
-            </div>
-            <img
-              className="park-logo-title"
-              src={getMediaUrl("images/orlando/logos/discovery-cove.png")}
-              alt="Discovery Cove Logo"
-              width="120"
-              height="40"
-              loading="lazy"
-            />
-            <p>
-              Seu dia de VIP. All-inclusive de luxo: nade com golfinhos e
-              esqueça do mundo lá fora.
-            </p>
-          </div>
-
-          <div className="park-card">
-            <div className="park-image-frame">
-              <img
-                src={optimizeRemoteImageUrl(
-                  "images/orlando/parks/kennedy-space-center.jpg",
-                  600,
-                  400,
-                )}
-                alt="Kennedy Space Center"
-                width="600"
-                height="400"
-                loading="lazy"
-              />
-            </div>
-            <img
-              className="park-logo-title"
-              src={getMediaUrl(
-                "images/orlando/logos/kennedy-space-center.svg",
-              )}
-              alt="Kennedy Space Center Logo"
-              width="120"
-              height="40"
-              loading="lazy"
-            />
-            <p>
-              3... 2... 1... Decolar! Foguetes reais da NASA, pedras lunares e
-              a história do universo.
-            </p>
-          </div>
-        </div>
-      </div>
+      ))}
 
       <div className="gallery-cta">
         <button

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { SEO } from '../../components/SEO';
+import { Seo } from '../../components/Seo';
 import { LandingFAQ } from '../../components/LandingFAQ';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../../components/schemas/FAQPageSchema';
@@ -31,7 +31,7 @@ const MELHOR_IDADE_FAQ_ITEMS = [
 const MelhorIdadeLanding: React.FC = () => {
   return (
     <div className="bg-brand-surface min-h-screen font-sans">
-      <SEO
+      <Seo
         title="Turismo 50+: Viagens Seguras e Personalizadas"
         description="Experiências de viagem exclusivas para o público 50+. Roteiros com conforto, segurança e atendimento humano. Planeje sua próxima aventura com a Anhangá."
         canonical="https://www.anhanga.tur.br/melhor-idade/"

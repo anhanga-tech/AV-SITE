@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { SEO } from '../../components/SEO';
+import { Seo } from '../../components/Seo';
 import { LandingFAQ } from '../../components/LandingFAQ';
 import OrlandoApp from '../../components/landings/orlando/OrlandoApp';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
@@ -35,7 +35,7 @@ const ORLANDO_FAQ_ITEMS = [
 const OrlandoLanding: React.FC = () => {
   return (
     <>
-      <SEO
+      <Seo
         title="Pacotes para Orlando: Disney e Universal 2026"
         description="Planeje sua viagem para Orlando com roteiro personalizado, ingressos e hospedagem. Atendimento especializado por agência de viagens em São Paulo."
         canonical="https://www.anhanga.tur.br/orlando/"

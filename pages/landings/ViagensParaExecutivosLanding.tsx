@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { SEO } from '@/components/SEO';
+import { Seo } from '@/components/Seo';
 import { LandingFAQ } from '@/components/LandingFAQ';
 import { BreadcrumbSchema } from '@/components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '@/components/schemas/FAQPageSchema';
@@ -80,7 +80,7 @@ const HOW_IT_WORKS = [
 const ViagensParaExecutivosLanding: React.FC = () => {
   return (
     <div className="bg-white min-h-screen font-sans">
-      <SEO
+      <Seo
         title="Viagens Para Executivos e Profissionais — Anhangá Viagens"
         description="Planejamento de viagem com precisão para quem não tem tempo a perder. Atendimento consultivo, roteiro sob medida e suporte real."
         canonical="https://www.anhanga.tur.br/viagens-para-executivos/"

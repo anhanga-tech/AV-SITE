@@ -197,7 +197,7 @@ const FAQS = [
  * PERFORMANCE WIN: Prevents the entire FAQ section from re-rendering when parent state changes.
  * Individual FAQ items are already memoized, but memoizing the container avoids the outer render logic.
  */
-const FAQ = memo(() => {
+const Faq = memo(() => {
     return (
         <section
             id="faq-section"
@@ -255,6 +255,6 @@ const FAQ = memo(() => {
 });
 
 FAQItem.displayName = 'FAQItem';
-FAQ.displayName = 'FAQ';
+Faq.displayName = 'Faq';
 
-export default FAQ;
+export default Faq;
