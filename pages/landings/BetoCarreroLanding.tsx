@@ -87,6 +87,7 @@ const BetoCarreroLanding: React.FC = () => {
           </ul>
           <div className="flex flex-wrap gap-3">
             <button
+              type="button"
               onClick={(e) => {
                 e.preventDefault();
                 openContactModal({ source: 'beto-carrero' });

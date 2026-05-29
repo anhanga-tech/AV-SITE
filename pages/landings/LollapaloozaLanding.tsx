@@ -104,6 +104,7 @@ const LollapaloozaLanding: React.FC = () => {
               Entrar na lista de espera 2027
             </a>
             <button
+              type="button"
               onClick={(e) => {
                 e.preventDefault();
                 openContactModal({ source: 'lollapalooza' });
