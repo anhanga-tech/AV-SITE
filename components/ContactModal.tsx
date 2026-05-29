@@ -46,6 +46,10 @@ const ContactModal: React.FC = () => {
             dialog.close();
             document.body.style.overflow = previousBodyOverflow.current;
         }
+
+        return () => {
+            document.body.style.overflow = previousBodyOverflow.current;
+        };
     }, [isOpen]);
 
     useEffect(() => {
