@@ -30,6 +30,7 @@ export function DestinationsModal({ isOpen, onClose }: DestinationsModalProps) {
 
         {/* Close Button */}
         <button
+          type="button"
           onClick={onClose}
           className="absolute top-4 right-4 bg-fun-pink text-white p-2 rounded-full border-2 border-fun-dark shadow-hard hover:scale-110 hover:rotate-90 transition z-10"
           aria-label="Fechar janela"

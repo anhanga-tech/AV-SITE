@@ -284,7 +284,7 @@ const AIChat: React.FC = memo(() => {
         void triggerHaptic('heavy');
       }
     }
-  }, [isLoading]);
+  }, [isLoading, setLeadDraft]);
 
   const submitMessageRef = useRef(submitMessage);
   useEffect(() => { submitMessageRef.current = submitMessage; }, [submitMessage]);

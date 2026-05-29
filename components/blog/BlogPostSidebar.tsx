@@ -37,6 +37,7 @@ export const BlogPostSidebar: React.FC<BlogPostSidebarProps> = ({ author, author
                     {author?.bio ? `"${author.bio}"` : '"Apaixonado por descobrir lugares novos e compartilhar dicas que não estão nos guias turísticos."'}
                 </p>
                 <button
+                    type="button"
                     onClick={(e) => {
                         e.preventDefault();
                         openContactModal({ source: 'blog-sidebar' });

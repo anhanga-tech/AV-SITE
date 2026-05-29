@@ -123,6 +123,7 @@ export function SolutionChecklist({ onOpenModal }: SolutionChecklistProps) {
         <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-32 h-12 bg-white/40 rotate-2 backdrop-blur-sm border-l-2 border-r-2 border-white/50 shadow-sm pointer-events-none"></div>
 
         <button
+          type="button"
           onClick={onOpenModal}
           className="bg-fun-yellow p-8 w-full rounded-xl border-4 border-fun-dark shadow-hard-lg transform -rotate-3 hover:rotate-0 hover:scale-105 active:scale-95 transition duration-300 text-left group focus:outline-none focus:ring-4 focus:ring-fun-blue focus:ring-offset-2"
           aria-label="Saiba mais sobre estender a viagem para praias próximas"
