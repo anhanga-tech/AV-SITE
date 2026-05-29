@@ -204,12 +204,13 @@ const DestinationField = memo(({
       </div>
       {showDestSuggestions && hasSuggestions && (
         <div className="absolute top-full left-0 w-full bg-white rounded-2xl shadow-xl border-2 border-zinc-100 mt-4 overflow-hidden z-[60] animate-pop-in origin-top">
-          <ul id="destination-results" role="listbox" className="max-h-60 overflow-y-auto custom-scrollbar">
+          <div id="destination-results" role="listbox" className="max-h-60 overflow-y-auto custom-scrollbar">
             {filteredDestinations.map((dest, index) => (
-              <li
+              <div
                 key={dest.label}
                 id={`suggestion-${index}`}
                 role="option"
+                tabIndex={-1}
                 aria-selected={index === activeSuggestionIndex}
                 onClick={() => onSelect(dest)}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onSelect(dest); }}
@@ -219,9 +220,9 @@ const DestinationField = memo(({
               >
                 <MapPin className={`size-4 shrink-0 ${index === activeSuggestionIndex ? 'text-brand-cyan' : 'text-brand-cyan/50'}`} />
                 <span className="truncate">{dest.label}</span>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       )}
       {shouldShowEmptyState && (

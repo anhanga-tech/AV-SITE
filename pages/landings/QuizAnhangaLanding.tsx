@@ -566,7 +566,7 @@ function PreLeadScreen({ profile, onSubmit, onBack }: PreLeadScreenProps) {
                             Veja nossa <a href="/politica-privacidade/" target="_blank" rel="noopener noreferrer">política de privacidade</a>.
                         </span>
                     </label>
-                    {errors.aceite && <span role="status" className="quiz-err quiz-err-block">{errors.aceite}</span>}
+                    {errors.aceite && <span role="alert" className="quiz-err quiz-err-block">{errors.aceite}</span>}
 
                     <button type="submit" className="quiz-btn quiz-btn-primary quiz-btn-lg">
                         Revelar meu perfil

@@ -16,14 +16,13 @@ export function DestinationsModal({ isOpen, onClose }: DestinationsModalProps) {
       aria-modal="true"
     >
       {/* Backdrop */}
-      <div
-        role="button"
-        tabIndex={0}
-        aria-label="Fechar modal"
-        className="absolute inset-0 bg-fun-dark/80 backdrop-blur-sm transition-opacity"
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-hidden="true"
+        className="absolute inset-0 bg-fun-dark/80 backdrop-blur-sm transition-opacity w-full h-full border-0 p-0 cursor-default"
         onClick={onClose}
-        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClose(); }}
-      ></div>
+      />
 
       {/* Modal Content */}
       <div className="relative bg-white w-full max-w-lg rounded-3xl border-4 border-fun-dark shadow-hard-lg p-6 md:p-8 animate-[scaleIn_0.3s_cubic-bezier(0.16,1,0.3,1)] overflow-hidden">

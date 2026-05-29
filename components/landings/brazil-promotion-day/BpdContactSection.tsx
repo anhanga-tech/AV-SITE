@@ -97,7 +97,7 @@ export function BpdContactSection() {
                         className="bg-white rounded-[2rem] border-2 border-zinc-100 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] overflow-hidden"
                     >
                         {submitState === 'success' ? (
-                            <div className="flex flex-col items-center text-center p-12" role="status" aria-live="polite">
+                            <output className="flex flex-col items-center text-center p-12" aria-live="polite">
                                 <m.div
                                     initial={{ scale: 0.5, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
@@ -122,7 +122,7 @@ export function BpdContactSection() {
                                     <WhatsappLogo className="size-4" weight="fill" />
                                     Ou fale agora no WhatsApp →
                                 </a>
-                            </div>
+                            </output>
                         ) : (
                             <form onSubmit={handleSubmit} noValidate>
                                 <div className="flex justify-between items-center px-8 py-5 border-b-2 border-dashed border-zinc-100">

@@ -80,17 +80,10 @@ export function SolutionChecklist({ onOpenModal }: SolutionChecklistProps) {
         </div>
 
         {/* Card 3: Ticket Style */}
-        <div
-          role="button"
-          tabIndex={0}
+        <button
+          type="button"
           onClick={() => openContactModal({ source: 'beto-carrero-solution' })}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              openContactModal({ source: 'beto-carrero-solution' });
-            }
-          }}
-          className="btn-specialist cursor-pointer group bg-white rounded-xl border-2 border-fun-dark shadow-hard transform -rotate-1 hover:rotate-0 transition-transform duration-300 flex overflow-hidden w-full max-w-sm lg:max-w-md"
+          className="btn-specialist cursor-pointer group bg-white rounded-xl border-2 border-fun-dark shadow-hard transform -rotate-1 hover:rotate-0 transition-transform duration-300 flex overflow-hidden w-full max-w-sm lg:max-w-md text-left"
           data-tracking="mid-betocarrero"
         >
           <div className="p-3 pl-4 lg:p-6 lg:pl-8 flex-grow flex items-center gap-4 lg:gap-6">
@@ -112,7 +105,7 @@ export function SolutionChecklist({ onOpenModal }: SolutionChecklistProps) {
               <Check className="size-[18px] lg:size-6" strokeWidth={3} />
             </div>
           </div>
-        </div>
+        </button>
 
       </div>
 

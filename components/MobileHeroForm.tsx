@@ -37,6 +37,7 @@ const MobileHeroForm: React.FC = memo(() => {
             value={mobileDestination}
             onChange={(e) => setMobileDestination(e.target.value)}
             placeholder="Para onde você quer ir?"
+            aria-label="Destino"
             className="flex-1 outline-none text-zinc-800 font-semibold placeholder-zinc-400 bg-transparent text-base"
             autoComplete="off"
             data-testid="destination-input-mobile"
