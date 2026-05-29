@@ -115,7 +115,6 @@ const AIChat: React.FC = memo(() => {
   const navigate = useNavigate();
   const isOrlandoPage = location.pathname.startsWith('/orlando');
 
-  const [liveAnnouncement, setLiveAnnouncement] = useState('');
   const prevMessagesCount = useRef(messages.length);
 
   // PERFORMANCE: Pre-calculate the index of the last model message to avoid O(N^2)
@@ -127,17 +126,19 @@ const AIChat: React.FC = memo(() => {
     return -1;
   }, [messages]);
 
-  useEffect(() => {
-    if (messages.length > prevMessagesCount.current) {
-      const newModelMessages = messages
-        .slice(prevMessagesCount.current)
-        .filter(m => m.role === 'model' && !m.isAction);
+  // Derive the screen-reader announcement from the latest model messages added this render.
+  // Read the ref snapshot before useMemo so the memo body stays pure.
+  const prevCount = prevMessagesCount.current;
+  const liveAnnouncement = useMemo(() => {
+    if (messages.length <= prevCount) return '';
+    const newModelMessages = messages
+      .slice(prevCount)
+      .filter(m => m.role === 'model' && !m.isAction);
+    if (newModelMessages.length === 0) return '';
+    return newModelMessages.map(m => m.text).join(' ').replace(/\*\*|\*|- /g, '');
+  }, [messages, prevCount]);
 
-      if (newModelMessages.length > 0) {
-        const fullText = newModelMessages.map(m => m.text).join(' ');
-        setLiveAnnouncement(fullText.replace(/\*\*|\*|- /g, ''));
-      }
-    }
+  useEffect(() => {
     prevMessagesCount.current = messages.length;
   }, [messages]);
 
