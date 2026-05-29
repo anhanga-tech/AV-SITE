@@ -210,8 +210,10 @@ const DestinationField = memo(({
                 key={dest.label}
                 id={`suggestion-${index}`}
                 role="option"
+                tabIndex={-1}
                 aria-selected={index === activeSuggestionIndex}
                 onClick={() => onSelect(dest)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onSelect(dest); }}
                 className={`px-6 py-3 cursor-pointer text-left text-sm font-medium border-b border-zinc-50 last:border-0 flex items-center gap-2 transition-colors ${
                   index === activeSuggestionIndex ? 'bg-brand-light text-brand-cyan' : 'hover:bg-brand-light text-zinc-700'
                 }`}
