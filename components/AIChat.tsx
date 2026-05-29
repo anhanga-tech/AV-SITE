@@ -444,9 +444,11 @@ const AIChat: React.FC = memo(() => {
       </button>
 
       {/* Backdrop Overlay */}
-      <div
-        role="presentation"
-        className={`fixed inset-0 z-[9998] transition-opacity duration-300 ease-in-out bg-brand-dark/20 backdrop-blur-sm ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-hidden="true"
+        className={`fixed inset-0 z-[9998] transition-opacity duration-300 ease-in-out bg-brand-dark/20 backdrop-blur-sm border-0 p-0 cursor-default ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
           }`}
         onClick={() => closeChatDrawer()}
       />

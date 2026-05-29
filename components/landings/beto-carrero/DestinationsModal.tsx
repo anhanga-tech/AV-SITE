@@ -16,9 +16,11 @@ export function DestinationsModal({ isOpen, onClose }: DestinationsModalProps) {
       aria-modal="true"
     >
       {/* Backdrop */}
-      <div
-        role="presentation"
-        className="absolute inset-0 bg-fun-dark/80 backdrop-blur-sm transition-opacity"
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-hidden="true"
+        className="absolute inset-0 bg-fun-dark/80 backdrop-blur-sm transition-opacity w-full h-full border-0 p-0 cursor-default"
         onClick={onClose}
       />
 
