@@ -58,15 +58,16 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => handleScrollRef.current();
-    
+
     // Usa passive listener para melhor performance
     window.addEventListener('scroll', handleScroll, { passive: true });
-    
-    
+
+    const throttleTimeout = throttleTimeoutRef;
+
     return () => {
-      if (throttleTimeoutRef.current) {
-        clearTimeout(throttleTimeoutRef.current);
-        throttleTimeoutRef.current = null;
+      if (throttleTimeout.current) {
+        clearTimeout(throttleTimeout.current);
+        throttleTimeout.current = null;
       }
       window.removeEventListener('scroll', handleScroll);
     };
@@ -162,6 +163,7 @@ const App: React.FC = () => {
 
             {/* Mobile Menu Toggle */}
             <button
+              type="button"
               onClick={toggleMobileMenu}
               className="lg:hidden relative z-50 p-2 text-fun-dark hover:bg-zinc-100 rounded-lg transition-colors focus:outline-none focus:ring-4 focus:ring-fun-blue"
               aria-label={mobileMenuOpen ? "Fechar menu" : "Abrir menu"}

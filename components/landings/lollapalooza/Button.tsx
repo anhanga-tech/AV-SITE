@@ -51,6 +51,7 @@ const Button: React.FC<ButtonProps> = ({ text, className = '', variant = 'primar
 
   return (
     <button
+      type="button"
       onClick={(e) => {
         e.preventDefault();
         openContactModal({ source: 'lollapalooza' });

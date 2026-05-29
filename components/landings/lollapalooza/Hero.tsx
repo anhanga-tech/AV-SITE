@@ -4,18 +4,18 @@ import { Calendar, MapPin, Music2, Share2, Check } from 'lucide-react';
 import { WAITLIST_CTA_LABEL, WAITLIST_SECTION_ID } from './constants';
 import { getMediaUrl } from '../../../data/mediaConfig';
 
-const Hero: React.FC = () => {
-  const headliners = [
-    "SABRINA CARPENTER",
-    "CHAPPELL ROAN",
-    "TYLER, THE CREATOR",
-    "LORDE",
-    "SKRILLEX",
-    "DOECHII",
-    "LEWIS CAPALDI",
-    "TURNSTILE"
-  ];
+const HEADLINERS = [
+  "SABRINA CARPENTER",
+  "CHAPPELL ROAN",
+  "TYLER, THE CREATOR",
+  "LORDE",
+  "SKRILLEX",
+  "DOECHII",
+  "LEWIS CAPALDI",
+  "TURNSTILE",
+];
 
+const Hero: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const [shareStatus, setShareStatus] = useState<'idle' | 'copied'>('idle');
@@ -24,7 +24,7 @@ const Hero: React.FC = () => {
     const interval = setInterval(() => {
       setIsVisible(false); // Start fade out
       setTimeout(() => {
-        setCurrentIndex((prev) => (prev + 1) % headliners.length);
+        setCurrentIndex((prev) => (prev + 1) % HEADLINERS.length);
         setIsVisible(true); // Start fade in
       }, 500); // Wait for fade out to finish
     }, 3500); // Change every 3.5 seconds
@@ -101,7 +101,7 @@ const Hero: React.FC = () => {
                 }`}
                 style={{ paddingRight: '0.1em' }}
             >
-                {headliners[currentIndex]}
+                {HEADLINERS[currentIndex]}
             </h2>
         </div>
 
@@ -146,7 +146,8 @@ const Hero: React.FC = () => {
             id="btn-lolla-specialist-hero"
           />
           
-          <button 
+          <button
+            type="button"
             onClick={handleShare}
             className={`
               group relative flex items-center justify-center gap-2 px-6 py-4 rounded-full border-2 transition duration-300 w-full sm:w-auto

@@ -385,6 +385,7 @@ export function OrlandoParksGallery() {
 
       <div className="gallery-cta">
         <button
+          type="button"
           onClick={(e) => {
             e.preventDefault();
             openContactModal({ source: 'orlando', destination: 'Orlando' });

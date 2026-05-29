@@ -63,6 +63,7 @@ const Navbar: React.FC = () => {
 
         {/* Mobile Menu Button */}
         <button
+          type="button"
           className="md:hidden text-anhanga-yellow focus:outline-none focus:ring-2 focus:ring-anhanga-blue rounded p-1"
           onClick={() => setIsOpen(!isOpen)}
           aria-expanded={isOpen}

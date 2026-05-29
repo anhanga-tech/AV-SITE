@@ -5,26 +5,28 @@ const useIntersectionObserver = (threshold = 0.1) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    const element = elementRef.current;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
           // Stop observing once visible to run animation only once
-          if (elementRef.current) {
-            observer.unobserve(elementRef.current);
+          if (element) {
+            observer.unobserve(element);
           }
         }
       },
       { threshold }
     );
 
-    if (elementRef.current) {
-      observer.observe(elementRef.current);
+    if (element) {
+      observer.observe(element);
     }
 
     return () => {
-      if (elementRef.current) {
-        observer.unobserve(elementRef.current);
+      if (element) {
+        observer.unobserve(element);
       }
     };
   }, [threshold]);

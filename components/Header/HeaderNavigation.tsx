@@ -42,7 +42,7 @@ export function DesktopNavigation({
         <div key={link.name} className="relative group">
           {link.subLinks ? (
             <>
-              <button className={`flex items-center gap-1 cursor-pointer font-medium text-sm transition-colors duration-500 hover:opacity-80 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-yellow focus-visible:outline-offset-2 rounded ${navTextClass}`}>
+              <button type="button" className={`flex items-center gap-1 cursor-pointer font-medium text-sm transition-colors duration-500 hover:opacity-80 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-yellow focus-visible:outline-offset-2 rounded ${navTextClass}`}>
                 {link.name}
                 <CaretDown className="size-4 transition-transform duration-300 group-hover:rotate-180" weight="bold" />
               </button>

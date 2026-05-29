@@ -46,7 +46,8 @@ const FAQ: React.FC = () => {
                     key={item.question}
                     className={`border-2 border-fun-dark rounded-2xl transition duration-300 overflow-hidden ${isOpen ? 'bg-blue-50 shadow-hard' : 'bg-white hover:bg-zinc-50'}`}
                   >
-                    <button 
+                    <button
+                      type="button"
                       onClick={() => toggleAccordion(idx)}
                       className="w-full flex items-center justify-between p-5 md:p-6 text-left focus:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-fun-blue/50"
                       aria-expanded={isOpen}
