@@ -359,16 +359,15 @@ function QuestionScreen({ q, qIndex, total, value, onChange, onNext, onBack }: Q
     const [pendingId, setPendingId] = useState<string | null>(null);
     const advanceTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    // reset pending when question changes and clear any pending timer
+    // Timer cleanup on unmount (state resets via key={q.id} on the render site)
     useEffect(() => {
-        setPendingId(null);
         const timerRef = advanceTimerRef;
         return () => {
             if (timerRef.current !== null) {
                 clearTimeout(timerRef.current);
             }
         };
-    }, [q.id]);
+    }, []);
 
     function toggle(optId: string) {
         if (q.multi) {
@@ -903,6 +902,7 @@ function StageContent({
         const q = QUIZ_QUESTIONS[stage.index];
         return (
             <QuestionScreen
+                key={q.id}
                 q={q}
                 qIndex={stage.index}
                 total={QUIZ_QUESTIONS.length}
