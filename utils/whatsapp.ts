@@ -7,7 +7,7 @@
  * in memory + sessionStorage + cookie to ensure data is available after URL changes.
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 
 const TRACKING_PARAMS = [
     'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
@@ -304,24 +304,20 @@ export const getWhatsAppLink = (message: string, options: WhatsAppLinkOptions = 
 
 export const useWhatsAppLink = (message: string, options: WhatsAppLinkOptions = {}): string => {
     const { appendTrackingRef } = options;
-    const stableOptions: WhatsAppLinkOptions = useMemo(
-        () => ({ appendTrackingRef }),
-        [appendTrackingRef]
-    );
-    const [whatsappUrl, setWhatsappUrl] = useState(() => getWhatsAppLink(message, stableOptions));
+    const [whatsappUrl, setWhatsappUrl] = useState(() => getWhatsAppLink(message, { appendTrackingRef }));
 
     useEffect(() => {
-        const newUrl = getWhatsAppLink(message, stableOptions);
+        const newUrl = getWhatsAppLink(message, { appendTrackingRef });
         setWhatsappUrl((prev) => (prev === newUrl ? prev : newUrl));
 
         const timer = setTimeout(() => {
             captureTrackingDataObject();
-            const updatedUrl = getWhatsAppLink(message, stableOptions);
+            const updatedUrl = getWhatsAppLink(message, { appendTrackingRef });
             setWhatsappUrl((prev) => (prev === updatedUrl ? prev : updatedUrl));
         }, 1000);
 
         return () => clearTimeout(timer);
-    }, [message, stableOptions]);
+    }, [message, appendTrackingRef]);
 
     return whatsappUrl;
 };
