@@ -41,7 +41,7 @@ export function BpdContactInfo({ whatsappUrl }: BpdContactInfoProps) {
                 Preencha o formulário e um consultor entra em contato pelo canal que você preferir, sem enrolação.
             </p>
 
-            <ul className="space-y-5 mb-10" role="list">
+            <ul className="space-y-5 mb-10">
                 {[
                     { icon: Phone, label: '(11) 5283-3309', href: 'tel:+551152833309' },
                     { icon: Envelope, label: 'contato@anhanga.tur.br', href: 'mailto:contato@anhanga.tur.br' },
