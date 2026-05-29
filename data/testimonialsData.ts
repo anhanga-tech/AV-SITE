@@ -50,6 +50,3 @@ export const TESTIMONIALS: TestimonialItem[] = [
     ratingValue: 5,
   },
 ];
-
-/** The highest ratingValue across all testimonials (used in ServiceSchema). */
-export const TESTIMONIAL_MAX_RATING = Math.max(...TESTIMONIALS.map((t) => t.ratingValue));

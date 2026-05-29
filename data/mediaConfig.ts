@@ -164,7 +164,7 @@ export interface DestinationMedia {
 
 // Map of destination city names to their images
 // This allows easy updating when migrating to CDN
-export const DESTINATION_IMAGES: Record<string, DestinationMedia> = {
+const DESTINATION_IMAGES: Record<string, DestinationMedia> = {
     // Americas
     "Orlando": {
         image: "images/destinations/orlando.jpg",

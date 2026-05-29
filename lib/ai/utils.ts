@@ -13,7 +13,7 @@ export function normalizeLabel(value: string): string {
     return normalizeText(value).replace(/[–—]/g, '-');
 }
 
-export function escapeRegExp(value: string): string {
+function escapeRegExp(value: string): string {
     return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 

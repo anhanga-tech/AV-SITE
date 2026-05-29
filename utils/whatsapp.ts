@@ -280,7 +280,7 @@ export const getTrackingDataObject = (): TrackingData | null => {
     return null;
 };
 
-export const getTrackingRef = (): string | null => {
+const getTrackingRef = (): string | null => {
     const tracking = getTrackingDataObject();
     if (!tracking) return null;
 
@@ -322,8 +322,3 @@ export const useWhatsAppLink = (message: string, options: WhatsAppLinkOptions = 
     return whatsappUrl;
 };
 
-export const refreshTrackingData = (): string | null => {
-    cachedTrackingData = null;
-    cachedTrackingObject = null;
-    return captureTrackingData();
-};

@@ -4,7 +4,7 @@ import type { N8nContactPayload, N8nLeadPayload, N8nNpsPayload, N8nQuizPayload, 
 // without hanging the edge function indefinitely. Override with N8N_WEBHOOK_TIMEOUT_MS.
 const DEFAULT_N8N_REQUEST_TIMEOUT_MS = 5000;
 
-export function getN8nTimeoutMs(): number {
+function getN8nTimeoutMs(): number {
     const configured = Number.parseInt(String(process.env.N8N_WEBHOOK_TIMEOUT_MS ?? ''), 10);
     if (!Number.isFinite(configured) || configured < 50) {
         return DEFAULT_N8N_REQUEST_TIMEOUT_MS;
@@ -36,7 +36,7 @@ function normalizeNetworkError(): Error {
     return new Error('N8N_WEBHOOK_ERROR:502:Webhook request failed');
 }
 
-export async function n8nRequest(
+async function n8nRequest(
     url: string,
     secret: string,
     requestId: string,

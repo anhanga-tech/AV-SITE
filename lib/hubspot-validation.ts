@@ -32,7 +32,7 @@ export function timingSafeEqual(left: string, right: string): boolean {
   return mismatch === 0;
 }
 
-export function normalizeHubSpotRequestUri(url: string): string {
+function normalizeHubSpotRequestUri(url: string): string {
   return HUBSPOT_URI_DECODE_RULES.reduce(
     (normalizedUrl, [pattern, replacement]) => normalizedUrl.replace(pattern, replacement),
     url
