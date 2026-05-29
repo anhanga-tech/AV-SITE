@@ -46,6 +46,7 @@ export function OrlandoFooter() {
               Facebook
             </a>
             <button
+              type="button"
               onClick={(e) => {
                 e.preventDefault();
                 openContactModal({ source: 'orlando', destination: 'Orlando' });

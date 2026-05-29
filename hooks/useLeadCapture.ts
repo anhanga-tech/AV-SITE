@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getTrackingDataObject, getWhatsAppLink } from '../utils/whatsapp';
 import type { LeadTracking, LeadUtms, SubmitLeadRequest } from '../types/leadCapture';
 import { cleanString, normalizeWhatsappNumber } from '../lib/lead-logic';
@@ -366,9 +366,9 @@ export function useLeadCapture() {
         return { tracking: latestTracking, utms: latestUtms };
     };
 
-    const setLeadDraft = (partial: LeadDraftPartial): void => {
+    const setLeadDraft = useCallback((partial: LeadDraftPartial): void => {
         setLeadDraftState((prev) => mergeLeadDraft(prev, partial));
-    };
+    }, []);
 
     const resetLeadDraft = (): void => {
         setLeadDraftState(EMPTY_LEAD_DRAFT);

@@ -460,7 +460,9 @@ const Destinations: React.FC = memo(() => {
 
     useEffect(() => {
         if (!mapInstance.current || !markersLayerRef.current) return;
-        markersLayerRef.current.clearLayers();
+
+        const markersLayer = markersLayerRef.current;
+        markersLayer.clearLayers();
 
         const isMobile = window.innerWidth < 768;
         // Tamanho do pin ajustado para o novo SVG (Lollipop Style)
@@ -513,18 +515,17 @@ const Destinations: React.FC = memo(() => {
                 setSelectedDestination(dest);
             });
 
-            marker.addTo(markersLayerRef.current!);
+            marker.addTo(markersLayer);
         });
 
         let flyTimer: ReturnType<typeof setTimeout> | undefined;
-        if (markersLayerRef.current.getLayers().length > 0 && mapInstance.current) {
+        if (markersLayer.getLayers().length > 0 && mapInstance.current) {
             flyTimer = setTimeout(() => {
                 const map = mapInstance.current;
-                const markers = markersLayerRef.current;
-                if (map && markers) {
+                if (map && markersLayer) {
                     try {
                         map.invalidateSize();
-                        const bounds = markers.getBounds();
+                        const bounds = markersLayer.getBounds();
                         if (bounds.isValid()) {
                             map.flyToBounds(bounds, {
                                 padding: isMobile ? [40, 40] : [80, 80],
@@ -538,7 +539,7 @@ const Destinations: React.FC = memo(() => {
         }
         return () => {
             clearTimeout(flyTimer);
-            markersLayerRef.current?.clearLayers();
+            markersLayer.clearLayers();
         };
     }, [filteredDestinations, activeFilter]);
 

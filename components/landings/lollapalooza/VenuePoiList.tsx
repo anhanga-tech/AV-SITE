@@ -36,6 +36,7 @@ export function VenuePoiList({ pois, activeIndex, listContainerRef, itemsRef, on
           const style = getPoiStyle(poi);
           return (
             <button
+              type="button"
               key={poi.name}
               ref={el => {
                 itemsRef.current[idx] = el;

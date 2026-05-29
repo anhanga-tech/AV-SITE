@@ -128,7 +128,8 @@ export const useHeadTags = (tags: HeadTag[]): null => {
       return undefined;
     }
 
-    const elements = tags.map(applyHeadTag);
+    const parsedTags: HeadTag[] = JSON.parse(serializedTags);
+    const elements = parsedTags.map(applyHeadTag);
 
     return () => {
       for (const element of elements) {

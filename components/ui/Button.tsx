@@ -5,7 +5,6 @@ export type ButtonVariant = 'primary' | 'action' | 'cta' | 'ghost';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    children: React.ReactNode;
     variant?: ButtonVariant;
     size?: ButtonSize;
     leftIcon?: React.ReactNode;
@@ -55,6 +54,7 @@ export const Button: React.FC<ButtonProps> = ({
 
     return (
         <button
+            type="button"
             className={classes}
             disabled={isDisabled}
             aria-disabled={isDisabled || undefined}

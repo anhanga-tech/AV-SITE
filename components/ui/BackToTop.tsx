@@ -29,6 +29,7 @@ const BackToTop: React.FC = memo(() => {
 
   return (
     <button
+      type="button"
       onClick={scrollToTop}
       aria-label="Voltar ao topo"
       className={`

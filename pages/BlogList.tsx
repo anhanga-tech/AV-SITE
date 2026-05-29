@@ -150,6 +150,7 @@ const BlogList: React.FC = () => {
                         Fale com nossos especialistas e comece a planejar sua viagem personalizada hoje mesmo.
                     </p>
                     <button
+                        type="button"
                         onClick={(e) => {
                             e.preventDefault();
                             openContactModal({ source: 'blog-list' });
