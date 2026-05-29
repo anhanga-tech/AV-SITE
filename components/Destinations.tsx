@@ -698,7 +698,6 @@ const Destinations: React.FC = memo(() => {
                     role="presentation"
                     className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm"
                     onClick={() => setSelectedDestination(null)}
-                    onKeyDown={(e) => e.key === 'Escape' && setSelectedDestination(null)}
                 >
                     <div
                         ref={destinationModalRef}
