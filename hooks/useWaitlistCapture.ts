@@ -95,7 +95,7 @@ function buildSubmitWaitlistError(
     };
 }
 
-export function pushWaitlistSignupDataLayerEvent(payload: SubmitWaitlistRequest): void {
+function pushWaitlistSignupDataLayerEvent(payload: SubmitWaitlistRequest): void {
     if (typeof window === 'undefined' || !window.dataLayer) {
         return;
     }

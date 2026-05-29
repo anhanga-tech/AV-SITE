@@ -26,7 +26,7 @@ function formatLocation(city?: string, region?: string, fallback = 'A definir'):
     return `${cityText}, ${regionText}`;
 }
 
-export function buildBantSummary(args: Pick<BudgetToolArgs, 'budget_range' | 'need_summary' | 'decision_role' | 'timeline_window' | 'visa_status'>): string {
+function buildBantSummary(args: Pick<BudgetToolArgs, 'budget_range' | 'need_summary' | 'decision_role' | 'timeline_window' | 'visa_status'>): string {
     const budgetText = cleanOptional(args.budget_range) || 'A definir';
     const needText = cleanOptional(args.need_summary) || 'Não informado';
     const decisionRoleText = cleanOptional(args.decision_role) || 'Não informado';

@@ -71,7 +71,7 @@ async function parseHubSpotJsonResponse<T>(response: Response, errorCode: string
 /**
  * Generic HubSpot API request wrapper.
  */
-export async function hubspotRequest(
+async function hubspotRequest(
     token: string,
     path: string,
     init: RequestInit,
@@ -153,7 +153,7 @@ function getTrackingEntries(tracking?: LeadTracking): Record<string, string> {
 /**
  * Maps tracking data to HubSpot contact properties.
  */
-export function mapTrackingToContactProperties(tracking?: LeadTracking): {
+function mapTrackingToContactProperties(tracking?: LeadTracking): {
     properties: Record<string, string>;
     unmapped: Record<string, string>;
 } {
@@ -176,14 +176,14 @@ export function mapTrackingToContactProperties(tracking?: LeadTracking): {
 /**
  * Builds the full set of contact properties for HubSpot.
  */
-export function buildContactProperties(payload: SubmitLeadRequest): Record<string, string> {
+function buildContactProperties(payload: SubmitLeadRequest): Record<string, string> {
     return {
         ...buildCoreContactProperties(payload),
         ...buildAdditionalContactProperties(payload),
     };
 }
 
-export function buildCoreContactProperties(payload: SubmitLeadRequest): Record<string, string> {
+function buildCoreContactProperties(payload: SubmitLeadRequest): Record<string, string> {
     return {
         firstname: payload.firstName,
         lastname: payload.lastName,
@@ -191,7 +191,7 @@ export function buildCoreContactProperties(payload: SubmitLeadRequest): Record<s
     };
 }
 
-export function buildAdditionalContactProperties(payload: SubmitLeadRequest): Record<string, string> {
+function buildAdditionalContactProperties(payload: SubmitLeadRequest): Record<string, string> {
     const properties: Record<string, string> = {
     };
 
@@ -216,7 +216,7 @@ export function buildAdditionalContactProperties(payload: SubmitLeadRequest): Re
 /**
  * Search for a contact by email.
  */
-export async function getContactIdByEmail(token: string, email: string): Promise<string | null> {
+async function getContactIdByEmail(token: string, email: string): Promise<string | null> {
     const response = await hubspotRequest(token, '/crm/v3/objects/contacts/search', {
         method: 'POST',
         body: JSON.stringify({
@@ -249,7 +249,7 @@ export async function getContactIdByEmail(token: string, email: string): Promise
 /**
  * Updates existing contact properties.
  */
-export async function updateContactProperties(token: string, contactId: string, properties: Record<string, string>): Promise<void> {
+async function updateContactProperties(token: string, contactId: string, properties: Record<string, string>): Promise<void> {
     const response = await hubspotRequest(token, `/crm/v3/objects/contacts/${contactId}`, {
         method: 'PATCH',
         body: JSON.stringify({ properties }),
@@ -261,7 +261,7 @@ export async function updateContactProperties(token: string, contactId: string, 
 /**
  * Adds a contact to a static HubSpot list.
  */
-export async function addContactToList(token: string, listId: string, contactId: string): Promise<void> {
+async function addContactToList(token: string, listId: string, contactId: string): Promise<void> {
     const response = await hubspotRequest(token, `/crm/v3/lists/${encodeURIComponent(listId)}/memberships/add`, {
         method: 'PUT',
         body: JSON.stringify([contactId]),
@@ -273,7 +273,7 @@ export async function addContactToList(token: string, listId: string, contactId:
 /**
  * Creates a new deal in HubSpot.
  */
-export async function createDeal(token: string, properties: Record<string, string>): Promise<string> {
+async function createDeal(token: string, properties: Record<string, string>): Promise<string> {
     const response = await hubspotRequest(token, '/crm/v3/objects/deals', {
         method: 'POST',
         body: JSON.stringify({ properties }),
@@ -295,7 +295,7 @@ export async function createDeal(token: string, properties: Record<string, strin
 /**
  * Associates a deal to a contact.
  */
-export async function associateDealToContact(token: string, dealId: string, contactId: string): Promise<void> {
+async function associateDealToContact(token: string, dealId: string, contactId: string): Promise<void> {
     const response = await hubspotRequest(
         token,
         `/crm/v4/objects/deals/${dealId}/associations/default/contacts/${contactId}`,
@@ -311,7 +311,7 @@ export async function associateDealToContact(token: string, dealId: string, cont
 /**
  * Creates a note and associates it to a contact.
  */
-export async function createContactNote(token: string, contactId: string, body: string): Promise<void> {
+async function createContactNote(token: string, contactId: string, body: string): Promise<void> {
     const noteResponse = await hubspotRequest(token, '/crm/v3/objects/notes', {
         method: 'POST',
         body: JSON.stringify({
@@ -347,7 +347,7 @@ export async function createContactNote(token: string, contactId: string, body: 
 /**
  * Creates a note and associates it to a contact as a fallback when deal creation fails.
  */
-export async function createFallbackNote(token: string, contactId: string, body: string): Promise<void> {
+async function createFallbackNote(token: string, contactId: string, body: string): Promise<void> {
     return createContactNote(token, contactId, body);
 }
 

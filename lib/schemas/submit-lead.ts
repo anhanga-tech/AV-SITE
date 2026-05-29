@@ -3,7 +3,7 @@ import { z } from 'zod';
 const UTM_MAX = 255;
 const nullableUtmString = z.string().max(UTM_MAX).nullish();
 
-export const LeadUtmsSchema = z.object({
+const LeadUtmsSchema = z.object({
     utm_source: nullableUtmString,
     utm_medium: nullableUtmString,
     utm_campaign: nullableUtmString,
@@ -12,7 +12,7 @@ export const LeadUtmsSchema = z.object({
 }).passthrough().optional();
 
 // Validated as a plain object; individual fields are normalised by normalizeTracking.
-export const LeadTrackingSchema = z.record(z.string(), z.unknown()).optional();
+const LeadTrackingSchema = z.record(z.string(), z.unknown()).optional();
 
 export const SubmitLeadBodySchema = z.object({
     firstName:   z.string().min(1).max(100),
