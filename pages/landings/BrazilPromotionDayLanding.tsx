@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { SEO } from '../../components/SEO';
+import { Seo } from '../../components/Seo';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { BpdNav } from '../../components/landings/brazil-promotion-day/BpdNav';
 import { BpdHero } from '../../components/landings/brazil-promotion-day/BpdHero';
@@ -22,7 +22,7 @@ const BrazilPromotionDayLanding: React.FC = () => {
 
     return (
         <>
-            <SEO
+            <Seo
                 title="Anhangá Viagens na Brazil Promotion Day | Roteiros Personalizados"
                 description="Conheça a Anhangá Viagens na Brazil Promotion Day. Agência de viagens em SP com roteiros exclusivos feitos do zero, sem pacote pronto."
                 canonical="https://www.anhanga.tur.br/brazil-promotion-day/"

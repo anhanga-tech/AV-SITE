@@ -11,7 +11,7 @@ const items: FAQItem[] = [
   { question: "E se eu precisar cancelar?", answer: "Sem letras miúdas. Seguimos as regras da companhia aérea e do hotel, mas nossa equipe briga por você para conseguir as melhores condições de remarcação ou reembolso possíveis." },
 ];
 
-const FAQ: React.FC = () => {
+const Faq: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const toggleAccordion = (index: number) => {
@@ -114,4 +114,4 @@ const FAQ: React.FC = () => {
   );
 };
 
-export default FAQ;
+export default Faq;

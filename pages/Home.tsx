@@ -9,7 +9,7 @@ import { ServiceSchema } from '../components/schemas/ServiceSchema';
 import { FAQ_SCHEMA_ITEMS } from '../data/faqData';
 // aggregateRating was removed from ServiceSchema to comply with Google's visibility guidelines; individual reviews now use microdata.
 
-import { SEO } from '../components/SEO';
+import { Seo } from '../components/Seo';
 
 const Highlights = lazy(() => import('../components/Highlights'));
 const Categories = lazy(() => import('../components/Categories'));
@@ -17,7 +17,7 @@ const Destinations = lazy(() => import('../components/Destinations'));
 const HowItWorks = lazy(() => import('../components/HowItWorks'));
 const Testimonials = lazy(() => import('../components/Testimonials'));
 const Blog = lazy(() => import('../components/Blog'));
-const FAQ = lazy(() => import('../components/FAQ'));
+const Faq = lazy(() => import('../components/Faq'));
 const CallToAction = lazy(() => import('../components/CallToAction'));
 
 const Home: React.FC = () => {
@@ -97,7 +97,7 @@ const Home: React.FC = () => {
 
   return (
     <>
-      <SEO
+      <Seo
         title="Agência de Viagens em São Paulo | Roteiros Sob Medida"
         description="Agência de viagens em São Paulo. Cada roteiro começa do zero — sem pacote pronto. Orlando, Beto Carrero, Europa e muito mais. Orçamento gratuito."
         canonical="https://www.anhanga.tur.br/"
@@ -154,7 +154,7 @@ const Home: React.FC = () => {
             <HowItWorks />
           </Suspense>
           <Suspense fallback={<section id="faq" className="min-h-[600px] bg-brand-surface" />}>
-            <FAQ />
+            <Faq />
           </Suspense>
           <Suspense fallback={<section id="depoimentos" className="min-h-[500px] bg-brand-surface" />}>
             <Testimonials />

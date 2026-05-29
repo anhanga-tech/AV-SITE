@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import BetoCarreroApp from '../../components/landings/beto-carrero/BetoCarreroApp';
-import { SEO } from '../../components/SEO';
+import { Seo } from '../../components/Seo';
 import { LandingFAQ } from '../../components/LandingFAQ';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../../components/schemas/FAQPageSchema';
@@ -30,7 +30,7 @@ const BETO_FAQ_ITEMS = [
 const BetoCarreroLanding: React.FC = () => {
   return (
     <>
-      <SEO
+      <Seo
         title="Pacote Beto Carrero: Família e Diversão 2026"
         description="Garanta seu pacote para o Beto Carrero com hotel, passagens e ingressos. Planejamento completo para famílias com o suporte da Anhangá Viagens."
         canonical="https://www.anhanga.tur.br/beto-carrero/"

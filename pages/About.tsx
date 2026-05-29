@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { m, Variants } from 'framer-motion';
-import { SEO } from '../components/SEO';
+import { Seo } from '../components/Seo';
 import { OrganizationSchema } from '../components/schemas/OrganizationSchema';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { LazyImage } from '../components/ui/LazyImage';
@@ -41,7 +41,7 @@ const About: React.FC = () => {
 
   return (
     <div className="bg-brand-surface pt-32 pb-20">
-      <SEO
+      <Seo
         title="Sobre a Anhangá Viagens | Agência de Viagens em São Paulo"
         description="Conheça a história da Anhangá Viagens. Agência de turismo credenciada no Cadastur em São Paulo, especializada em roteiros personalizados."
         canonical="https://www.anhanga.tur.br/sobre/"

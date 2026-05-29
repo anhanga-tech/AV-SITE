@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { SEO } from '@/components/SEO';
+import { Seo } from '@/components/Seo';
 import { LandingFAQ } from '@/components/LandingFAQ';
 import { BreadcrumbSchema } from '@/components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '@/components/schemas/FAQPageSchema';
@@ -89,7 +89,7 @@ const HOW_IT_WORKS = [
 const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
   return (
     <div className="bg-anhanga-light min-h-screen font-sans">
-      <SEO
+      <Seo
         title="Curadoria de Cruzeiros no Brasil — Anhangá Viagens"
         description="Escolha navio, cabine e roteiro certos para o seu perfil. Curadoria consultiva para quem quer fazer o cruzeiro certo na primeira vez."
         canonical="https://www.anhanga.tur.br/curadoria-cruzeiros-brasil/"

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { SEO } from '@/components/SEO';
+import { Seo } from '@/components/Seo';
 import { LandingFAQ } from '@/components/LandingFAQ';
 import { BreadcrumbSchema } from '@/components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '@/components/schemas/FAQPageSchema';
@@ -81,7 +81,7 @@ const PILLARS = [
 const ConsultoriaDeViagemLanding: React.FC = () => {
   return (
     <div className="bg-brand-surface min-h-screen font-sans">
-      <SEO
+      <Seo
         title="Consultoria de Viagem Sob Medida em SP — Anhangá Viagens"
         description="Planeje sua viagem com consultores humanos. Sem pacote pronto, sem improviso. Roteiro personalizado com suporte antes, durante e depois."
         canonical="https://www.anhanga.tur.br/consultoria-de-viagem/"

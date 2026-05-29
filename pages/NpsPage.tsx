@@ -5,7 +5,7 @@ import { NpsTextarea } from '../components/nps/NpsTextarea';
 import { NpsScoreSelector } from '../components/nps/NpsScoreSelector';
 import { NpsThankPromoter } from '../components/nps/NpsThankPromoter';
 import { NpsThankOther } from '../components/nps/NpsThankOther';
-import { SEO } from '../components/SEO';
+import { Seo } from '../components/Seo';
 
 type PageState = 'form' | 'thank-promoter' | 'thank-other';
 
@@ -60,7 +60,7 @@ const PAGE_STYLES = `
   }
 `;
 
-export default function NPS() {
+export default function NpsPage() {
   const [params] = useSearchParams();
   const firstname = params.get('firstname')?.trim() ?? '';
   const email = params.get('email')?.trim() ?? '';
@@ -118,7 +118,7 @@ export default function NPS() {
 
   return (
     <>
-      <SEO
+      <Seo
         title="Avaliação de Viagem"
         description="Pagina operacional para clientes avaliarem a experiencia com a Anhanga Viagens."
         canonical="https://www.anhanga.tur.br/nps/"
@@ -221,7 +221,7 @@ export default function NPS() {
                 >
                   {submitting ? (
                     <span className="inline-flex items-center gap-2">
-                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <svg className="animate-spin size-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                       </svg>

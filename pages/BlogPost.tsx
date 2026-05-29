@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
-import { SEO } from '../components/SEO';
+import { Seo } from '../components/Seo';
 import { ArticleSchema } from '../components/schemas/ArticleSchema';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { PersonSchema } from '../components/schemas/PersonSchema';
@@ -92,7 +92,7 @@ const BlogPost: React.FC = () => {
 
     return (
         <article className="min-h-screen bg-brand-surface">
-            <SEO
+            <Seo
                 title={post.title}
                 description={post.excerpt}
                 image={post.image}
