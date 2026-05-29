@@ -83,15 +83,6 @@ FormattedText.displayName = 'FormattedText';
  * 2. Pre-calculates the last model message index once per update (O(N))
  *    instead of within the render loop (O(N^2)).
  */
-const FOCUSABLE_SELECTOR = [
-  'a[href]',
-  'button:not([disabled])',
-  'input:not([disabled])',
-  'select:not([disabled])',
-  'textarea:not([disabled])',
-  '[tabindex]:not([tabindex="-1"])',
-].join(',');
-
 const AIChat: React.FC = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -101,7 +92,7 @@ const AIChat: React.FC = memo(() => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const drawerRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
   const messagesRef = useRef<Message[]>(messages);
   const {
@@ -155,9 +146,14 @@ const AIChat: React.FC = memo(() => {
   }, [messages, isOpen, isLoading]);
 
   useEffect(() => {
-    if (isOpen) {
-      // Focus the drawer panel itself to ensure screen readers announce it immediately
-      drawerRef.current?.focus();
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    if (isOpen && !dialog.open) {
+      dialog.showModal();
+    } else if (!isOpen && dialog.open) {
+      dialog.close();
+      triggerRef.current?.focus();
     }
   }, [isOpen]);
 
@@ -174,8 +170,30 @@ const AIChat: React.FC = memo(() => {
       void triggerHaptic('light');
     }
     setIsOpen(false);
-    triggerRef.current?.focus();
   };
+
+  const closeChatDrawerRef = useRef(closeChatDrawer);
+  useEffect(() => { closeChatDrawerRef.current = closeChatDrawer; });
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    const handleCancel = (e: Event) => {
+      e.preventDefault();
+      closeChatDrawerRef.current();
+    };
+    const handleClick = (e: MouseEvent) => {
+      if (e.target === dialog) closeChatDrawerRef.current();
+    };
+
+    dialog.addEventListener('cancel', handleCancel);
+    dialog.addEventListener('click', handleClick);
+    return () => {
+      dialog.removeEventListener('cancel', handleCancel);
+      dialog.removeEventListener('click', handleClick);
+    };
+  }, []);
 
   const handlePrepareLeadSubmitPayload = (payload: LeadFinalizePayload, eventId: string): SubmitLeadRequest => {
     setLeadDraft({ ...payload });
@@ -305,42 +323,6 @@ const AIChat: React.FC = memo(() => {
     }
   };
 
-  // Focus Trapping Logic
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        closeChatDrawer();
-        return;
-      }
-
-      if (event.key !== 'Tab' || !drawerRef.current) return;
-
-      const focusable = Array.from(
-        drawerRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
-      ).filter((element) => element.offsetParent !== null);
-      if (focusable.length === 0) return;
-
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-        return;
-      }
-
-      if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen]);
-
   useEffect(() => {
     const handleToggle = (event: Event) => {
       const customEvent = event as CustomEvent;
@@ -444,24 +426,10 @@ const AIChat: React.FC = memo(() => {
         </div>
       </button>
 
-      {/* Backdrop Overlay */}
-      <button
-        type="button"
-        tabIndex={-1}
-        aria-hidden="true"
-        className={`fixed inset-0 z-[9998] transition-opacity duration-300 ease-in-out bg-brand-dark/20 backdrop-blur-sm border-0 p-0 cursor-default ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-          }`}
-        onClick={() => closeChatDrawer()}
-      />
-
-      {/* Drawer Panel - Soft Scrapbook Geometry */}
-      <div
-        ref={drawerRef}
-        tabIndex={-1}
-        className={`fixed top-0 right-0 h-full w-full sm:w-[450px] z-[9999] bg-white flex flex-col shadow-[-10px_0_40px_rgba(0,0,0,0.1)] transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] sm:rounded-l-[2rem] overflow-hidden outline-none ${isOpen ? 'translate-x-0 visible opacity-100' : 'translate-x-full invisible opacity-0'
-          }`}
-        role="dialog"
-        aria-modal="true"
+      {/* Drawer Dialog - Soft Scrapbook Geometry */}
+      <dialog
+        ref={dialogRef}
+        className="ai-chat-drawer fixed top-0 right-0 h-full w-full sm:w-[450px] z-[9999] m-0 ml-auto p-0 bg-white flex-col shadow-[-10px_0_40px_rgba(0,0,0,0.1)] sm:rounded-l-[2rem] overflow-hidden outline-none max-h-full max-w-full"
         aria-labelledby="ai-chat-title"
       >
         {/* Header - Scrapbook Softness */}
@@ -618,7 +586,7 @@ const AIChat: React.FC = memo(() => {
             Nossa IA pode cometer erros. Confirme os dados no WhatsApp.
           </p>
         </div>
-      </div>
+      </dialog>
     </>
   );
 });

@@ -3,23 +3,13 @@ import { CheckCircle, X } from '@phosphor-icons/react';
 import { useContactForm } from '../hooks/useContactForm';
 import type { ContactModalOptions } from '../utils/contactForm';
 
-const FOCUSABLE_SELECTOR = [
-    'a[href]',
-    'button:not([disabled])',
-    'input:not([disabled])',
-    'select:not([disabled])',
-    'textarea:not([disabled])',
-    '[tabindex]:not([tabindex="-1"])',
-].join(',');
-
 const ContactModal: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [options, setOptions] = useState<ContactModalOptions>({});
     const titleId = useId();
-    const dialogRef = useRef<HTMLDivElement>(null);
+    const dialogRef = useRef<HTMLDialogElement>(null);
     const firstFieldRef = useRef<HTMLInputElement>(null);
     const closeButtonRef = useRef<HTMLButtonElement>(null);
-    const triggerRef = useRef<HTMLElement | null>(null);
     const previousBodyOverflow = useRef<string>('');
 
     const { fields, setField, isValid, isSubmitting, error, submitted, submit, reset } =
@@ -28,7 +18,6 @@ const ContactModal: React.FC = () => {
     const close = useCallback(() => {
         setIsOpen(false);
         reset();
-        triggerRef.current?.focus();
     }, [reset]);
 
     const closeRef = useRef(close);
@@ -36,7 +25,6 @@ const ContactModal: React.FC = () => {
 
     useEffect(() => {
         const handleOpen = (event: Event) => {
-            triggerRef.current = document.activeElement as HTMLElement | null;
             setOptions((event as CustomEvent<ContactModalOptions>).detail ?? {});
             setIsOpen(true);
         };
@@ -46,15 +34,18 @@ const ContactModal: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        if (submitted) closeButtonRef.current?.focus();
-    }, [submitted]);
+        const dialog = dialogRef.current;
+        if (!dialog) return;
 
-    useEffect(() => {
-        if (!isOpen) return;
-
-        firstFieldRef.current?.focus();
-        previousBodyOverflow.current = document.body.style.overflow;
-        document.body.style.overflow = 'hidden';
+        if (isOpen && !dialog.open) {
+            previousBodyOverflow.current = document.body.style.overflow;
+            document.body.style.overflow = 'hidden';
+            dialog.showModal();
+            firstFieldRef.current?.focus();
+        } else if (!isOpen && dialog.open) {
+            dialog.close();
+            document.body.style.overflow = previousBodyOverflow.current;
+        }
 
         return () => {
             document.body.style.overflow = previousBodyOverflow.current;
@@ -62,61 +53,36 @@ const ContactModal: React.FC = () => {
     }, [isOpen]);
 
     useEffect(() => {
-        if (!isOpen) return;
+        if (submitted) closeButtonRef.current?.focus();
+    }, [submitted]);
 
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
-                closeRef.current();
-                return;
-            }
+    useEffect(() => {
+        const dialog = dialogRef.current;
+        if (!dialog) return;
 
-            if (event.key !== 'Tab' || !dialogRef.current) return;
-
-            const focusable = Array.from(
-                dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
-            ).filter((element) => element.offsetParent !== null);
-            if (focusable.length === 0) return;
-
-            const first = focusable[0];
-            const last = focusable[focusable.length - 1];
-
-            if (event.shiftKey && document.activeElement === first) {
-                event.preventDefault();
-                last.focus();
-                return;
-            }
-
-            if (!event.shiftKey && document.activeElement === last) {
-                event.preventDefault();
-                first.focus();
-            }
+        const handleCancel = (e: Event) => {
+            e.preventDefault();
+            closeRef.current();
+        };
+        const handleClick = (e: MouseEvent) => {
+            if (e.target === dialog) closeRef.current();
         };
 
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen]);
-
-    if (!isOpen) return null;
+        dialog.addEventListener('cancel', handleCancel);
+        dialog.addEventListener('click', handleClick);
+        return () => {
+            dialog.removeEventListener('cancel', handleCancel);
+            dialog.removeEventListener('click', handleClick);
+        };
+    }, []);
 
     return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            role="presentation"
+        <dialog
+            ref={dialogRef}
+            className="fixed inset-0 z-50 m-auto p-4 bg-transparent backdrop:bg-black/60 backdrop:backdrop-blur-sm max-w-md w-full"
+            aria-labelledby={titleId}
         >
-            <button
-                type="button"
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-                onClick={close}
-                aria-label="Fechar formulário"
-            />
-
-            <div
-                ref={dialogRef}
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby={titleId}
-                className="relative z-10 w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-[0_24px_60px_rgba(0,0,0,0.3)]"
-            >
+            {isOpen && <div className="relative z-10 w-full overflow-hidden rounded-2xl bg-white shadow-[0_24px_60px_rgba(0,0,0,0.3)]">
                 <div className="flex items-start justify-between p-6 pb-4">
                     <div>
                         <p className="mb-1 text-xs font-black uppercase tracking-widest text-brand-vibrant">
@@ -276,8 +242,8 @@ const ContactModal: React.FC = () => {
                         </div>
                     </form>
                 )}
-            </div>
-        </div>
+            </div>}
+        </dialog>
     );
 };
 

@@ -30,6 +30,52 @@
     }
 }
 
+/* AIChat drawer: animate open/close via @starting-style (Chrome 117+, FF 129+, Safari 17.5+) */
+.ai-chat-drawer {
+    transition:
+        transform 500ms cubic-bezier(0.19, 1, 0.22, 1),
+        opacity 500ms cubic-bezier(0.19, 1, 0.22, 1),
+        overlay 500ms cubic-bezier(0.19, 1, 0.22, 1) allow-discrete,
+        display 500ms cubic-bezier(0.19, 1, 0.22, 1) allow-discrete;
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+.ai-chat-drawer[open] {
+    display: flex;
+    transform: translateX(0);
+    opacity: 1;
+}
+
+@starting-style {
+    .ai-chat-drawer[open] {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.ai-chat-drawer::backdrop {
+    transition:
+        background-color 300ms ease-in-out,
+        backdrop-filter 300ms ease-in-out,
+        overlay 300ms ease-in-out allow-discrete,
+        display 300ms ease-in-out allow-discrete;
+    background-color: rgb(15 23 42 / 0);
+    backdrop-filter: blur(0);
+}
+
+.ai-chat-drawer[open]::backdrop {
+    background-color: rgb(15 23 42 / 0.2);
+    backdrop-filter: blur(4px);
+}
+
+@starting-style {
+    .ai-chat-drawer[open]::backdrop {
+        background-color: rgb(15 23 42 / 0);
+        backdrop-filter: blur(0);
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation-duration: 0.01ms !important;
