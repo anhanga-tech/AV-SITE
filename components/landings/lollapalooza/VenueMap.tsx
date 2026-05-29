@@ -187,10 +187,9 @@ const VenueMap: React.FC = () => {
 
           {/* Mapa */}
           <div className="w-full md:w-2/3 h-[400px] md:h-auto min-h-[400px] relative bg-gray-200">
-            <div
+            <section
               ref={mapContainerRef}
               className="w-full h-full z-0 outline-none"
-              role="region"
               aria-label="Mapa interativo com pontos de interesse"
               aria-describedby="map-a11y-instructions"
               tabIndex={0}

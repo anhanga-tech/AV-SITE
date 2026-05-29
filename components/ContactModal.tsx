@@ -138,9 +138,8 @@ const ContactModal: React.FC = () => {
 
                 {submitted ? (
                     <div className="flex flex-col items-center gap-4 px-6 pb-6 text-center">
-                        <div
+                        <output
                             className="flex flex-col items-center gap-4"
-                            role="status"
                             aria-live="polite"
                         >
                             <CheckCircle className="size-14 text-green-600" weight="fill" />
@@ -148,7 +147,7 @@ const ContactModal: React.FC = () => {
                             <p className="text-sm text-zinc-500">
                                 Nossa equipe entra em contato em breve pelo WhatsApp.
                             </p>
-                        </div>
+                        </output>
                         <button
                             ref={closeButtonRef}
                             type="button"

@@ -17,12 +17,12 @@ export function CtaBody() {
 
   if (formState === 'submitted') {
     return (
-      <div className="flex flex-col gap-3" role="status" aria-live="polite">
+      <output className="flex flex-col gap-3" aria-live="polite">
         <p className="flex items-center gap-2 text-green-600 text-sm font-bold">
           <CheckCircle className="size-5" weight="fill" />
           Recebemos! Nossa equipe entra em contato em breve.
         </p>
-      </div>
+      </output>
     );
   }
 

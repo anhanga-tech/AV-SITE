@@ -445,13 +445,10 @@ const AIChat: React.FC = memo(() => {
 
       {/* Backdrop Overlay */}
       <div
-        role="button"
-        tabIndex={0}
-        aria-label="Fechar chat"
+        role="presentation"
         className={`fixed inset-0 z-[9998] transition-opacity duration-300 ease-in-out bg-brand-dark/20 backdrop-blur-sm ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
           }`}
         onClick={() => closeChatDrawer()}
-        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') closeChatDrawer(); }}
       />
 
       {/* Drawer Panel - Soft Scrapbook Geometry */}
@@ -496,9 +493,9 @@ const AIChat: React.FC = memo(() => {
         </div>
 
         {/* Screen-reader announcer for new AI messages */}
-        <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+        <output aria-live="polite" aria-atomic="true" className="sr-only">
           {liveAnnouncement}
-        </div>
+        </output>
 
         {/* Messages Area - Scrapbook vibe */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth bg-white relative">
