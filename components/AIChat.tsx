@@ -286,6 +286,9 @@ const AIChat: React.FC = memo(() => {
     }
   }, [isLoading]);
 
+  const submitMessageRef = useRef(submitMessage);
+  useEffect(() => { submitMessageRef.current = submitMessage; }, [submitMessage]);
+
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
     if (inputRef.current) {
@@ -342,7 +345,7 @@ const AIChat: React.FC = memo(() => {
       const customEvent = event as CustomEvent;
       openChatDrawer(false);
       if (customEvent.detail?.message) {
-        setTimeout(() => submitMessage(customEvent.detail.message, false), 400);
+        setTimeout(() => submitMessageRef.current(customEvent.detail.message, false), 400);
       }
     };
     window.addEventListener('toggle-ai-chat', handleToggle);
@@ -370,7 +373,7 @@ const AIChat: React.FC = memo(() => {
 
         if (sanitizedDestination) {
           const message = `Olá! Gostaria de informações sobre viagem para ${sanitizedDestination}.`;
-          setTimeout(() => submitMessage(message, false), DEEP_LINK_MESSAGE_DELAY_MS);
+          setTimeout(() => submitMessageRef.current(message, false), DEEP_LINK_MESSAGE_DELAY_MS);
         }
       }
 
@@ -383,7 +386,7 @@ const AIChat: React.FC = memo(() => {
     }
 
     return () => window.removeEventListener('toggle-ai-chat', handleToggle);
-  }, [location, navigate, submitMessage]);
+  }, [location, navigate]);
 
   // Deep-link handling (chat=1, m/message, destino)
   useEffect(() => {
