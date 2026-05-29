@@ -572,6 +572,7 @@ const Destinations: React.FC = memo(() => {
                         {FILTERS.map(filter => (
                             <button
                                 key={filter}
+                                type="button"
                                 onClick={() => setActiveFilter(filter)}
                                 className={`px-5 py-2 rounded-lg text-sm font-bold border-2 transition whitespace-nowrap flex-shrink-0 shadow-[3px_3px_0px_rgba(0,0,0,0.1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] ${activeFilter === filter
                                     ? 'bg-brand-dark text-white border-brand-dark transform -rotate-1'
@@ -613,6 +614,7 @@ const Destinations: React.FC = memo(() => {
                         {/* Custom Controls (Stickers) */}
                         <div className="absolute bottom-6 right-6 flex flex-col gap-2 z-[400]">
                             <button
+                                type="button"
                                 onClick={() => handleZoom('in')}
                                 className="size-10 bg-white border-2 border-zinc-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition text-zinc-700 font-black"
                                 aria-label="Aumentar zoom no mapa"
@@ -620,6 +622,7 @@ const Destinations: React.FC = memo(() => {
                                 <Plus className="size-5" />
                             </button>
                             <button
+                                type="button"
                                 onClick={() => handleZoom('out')}
                                 className="size-10 bg-white border-2 border-zinc-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition text-zinc-700 font-black"
                                 aria-label="Diminuir zoom no mapa"
@@ -691,7 +694,12 @@ const Destinations: React.FC = memo(() => {
 
             {/* Modal - Scrapbook Page Style */}
             {selectedDestination && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm" onClick={() => setSelectedDestination(null)}>
+                <div
+                    role="presentation"
+                    className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm"
+                    onClick={() => setSelectedDestination(null)}
+                    onKeyDown={(e) => e.key === 'Escape' && setSelectedDestination(null)}
+                >
                     <div
                         ref={destinationModalRef}
                         role="dialog"
@@ -705,6 +713,7 @@ const Destinations: React.FC = memo(() => {
                         <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-32 h-10 bg-red-400/80 rotate-1 backdrop-blur-sm z-20 shadow-sm border-l-2 border-r-2 border-white/40"></div>
 
                         <button
+                            type="button"
                             onClick={() => setSelectedDestination(null)}
                             className="absolute top-4 right-4 z-30 bg-white border-2 border-zinc-100 p-2 rounded-full shadow-md hover:scale-110 transition-transform text-zinc-800"
                             aria-label="Fechar detalhes do destino"
@@ -763,6 +772,7 @@ const Destinations: React.FC = memo(() => {
                                     </Link>
                                 )}
                                 <button
+                                    type="button"
                                     onClick={(e) => {
                                         e.preventDefault();
                                         openContactModal({

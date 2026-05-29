@@ -130,6 +130,7 @@ const Highlights = memo(() => {
                                 Comece a planejar agora e receba um roteiro prévio sem compromisso.
                             </p>
                             <button
+                                type="button"
                                 onClick={(e) => {
                                     e.preventDefault();
                                     openContactModal({ source: 'highlights' });

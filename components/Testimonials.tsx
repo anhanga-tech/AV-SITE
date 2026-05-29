@@ -143,12 +143,13 @@ const Testimonials: React.FC = memo(() => {
 
                     {/* Controls */}
                     <div className="flex justify-center gap-4 mt-8">
-                        <button onClick={prevSlide} className="size-12 bg-white border-2 border-white/50 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform text-brand-cyan hover:bg-brand-cyan hover:text-white z-20">
+                        <button type="button" onClick={prevSlide} className="size-12 bg-white border-2 border-white/50 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform text-brand-cyan hover:bg-brand-cyan hover:text-white z-20">
                             <ChevronLeft className="size-6" />
                         </button>
                         <div className="flex gap-2 items-center z-20">
                             {TESTIMONIALS.map((t, i) => (
                                 <button
+                                    type="button"
                                     key={t.name}
                                     onClick={() => setCurrentIndex(i)}
                                     className={`h-2 rounded-full transition-[width,background-color] duration-300 ${i === currentIndex ? 'bg-brand-cyan w-8' : 'bg-brand-cyan/20 w-2 hover:bg-brand-cyan/40'}`}
@@ -157,7 +158,7 @@ const Testimonials: React.FC = memo(() => {
                                 />
                             ))}
                         </div>
-                        <button onClick={nextSlide} className="size-12 bg-white border-2 border-white/50 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform text-brand-cyan hover:bg-brand-cyan hover:text-white z-20">
+                        <button type="button" onClick={nextSlide} className="size-12 bg-white border-2 border-white/50 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform text-brand-cyan hover:bg-brand-cyan hover:text-white z-20">
                             <ChevronRight className="size-6" />
                         </button>
                     </div>

@@ -19,6 +19,7 @@ const FAQItemComponent = memo(({ question, answer, isOpen, idx, onToggle }: FAQI
             className={`border-b border-brand-cyan/10 last:border-0 transition duration-300 ${isOpen ? 'bg-white/40' : ''}`}
         >
             <button
+                type="button"
                 className="w-full py-6 flex justify-between items-center text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan group"
                 onClick={toggleFaqItem}
                 aria-expanded={isOpen}

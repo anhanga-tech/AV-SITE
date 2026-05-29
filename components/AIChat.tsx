@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, memo, useMemo } from 'react';
+import React, { useState, useRef, useEffect, memo, useMemo, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   ChatCircleDots,
@@ -219,7 +219,7 @@ const AIChat: React.FC = memo(() => {
     };
   };
 
-  const submitMessage = async (text: string, enableHaptics: boolean = true) => {
+  const submitMessage = useCallback(async (text: string, enableHaptics: boolean = true) => {
     if (!text.trim() || isLoading) return;
 
     if (enableHaptics) {
@@ -284,7 +284,7 @@ const AIChat: React.FC = memo(() => {
         void triggerHaptic('heavy');
       }
     }
-  };
+  }, [isLoading]);
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
@@ -383,7 +383,7 @@ const AIChat: React.FC = memo(() => {
     }
 
     return () => window.removeEventListener('toggle-ai-chat', handleToggle);
-  }, [location, navigate]);
+  }, [location, navigate, submitMessage]);
 
   // Deep-link handling (chat=1, m/message, destino)
   useEffect(() => {
@@ -416,6 +416,7 @@ const AIChat: React.FC = memo(() => {
     <>
       {/* Floating Toggle Button */}
       <button
+        type="button"
         onClick={() => openChatDrawer()}
         className={`fixed ${isOpen ? 'translate-y-32 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
                     bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9990]
@@ -482,6 +483,7 @@ const AIChat: React.FC = memo(() => {
             </div>
           </div>
           <button
+            type="button"
             onClick={() => closeChatDrawer()}
             className="text-zinc-400 hover:text-zinc-700 bg-zinc-50 hover:bg-zinc-100 rounded-full p-2.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-vibrant"
             aria-label="Fechar gaveta"
@@ -557,6 +559,7 @@ const AIChat: React.FC = memo(() => {
                   <div className="flex flex-wrap gap-2 pl-12 mt-1">
                     {msg.chips.map((chip) => (
                       <button
+                        type="button"
                         key={chip.id}
                         onClick={() => submitMessage(chip.label)}
                         className="text-[12px] font-semibold text-zinc-600 bg-white border border-zinc-200 px-4 py-2 rounded-xl shadow-sm hover:shadow hover:border-brand-vibrant/30 hover:text-brand-vibrant hover:-translate-y-0.5 transition text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-vibrant/50"
@@ -599,6 +602,7 @@ const AIChat: React.FC = memo(() => {
               className="flex-1 max-h-[120px] pl-4 pr-[50px] py-4 bg-transparent outline-none text-sm text-zinc-700 font-medium placeholder-zinc-400 resize-none overflow-y-auto w-full leading-snug"
             />
             <button
+              type="button"
               onClick={() => submitMessage(input)}
               disabled={isLoading || !input.trim()}
               className="absolute right-2 bottom-2 p-2.5 bg-brand-vibrant text-white rounded-[10px] shadow-sm hover:bg-brand-blue hover:shadow-md transition disabled:opacity-0 disabled:scale-75 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-vibrant/50"

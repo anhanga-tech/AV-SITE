@@ -198,6 +198,7 @@ const HowItWorks = memo(() => {
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-brand-yellow/30 rounded-full blur-2xl group-hover:blur-3xl transition duration-500"></div>
                 
                 <button
+                    type="button"
                     onClick={(e) => {
                         e.preventDefault();
                         openContactModal({ source: 'how-it-works' });
