@@ -157,19 +157,6 @@ const AIChat: React.FC = memo(() => {
     }
   }, [isOpen]);
 
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-
-    const handleCancel = (e: Event) => {
-      e.preventDefault();
-      closeChatDrawer();
-    };
-
-    dialog.addEventListener('cancel', handleCancel);
-    return () => dialog.removeEventListener('cancel', handleCancel);
-  }, []);
-
   const openChatDrawer = (enableHaptics: boolean = true) => {
     triggerRef.current = document.activeElement as HTMLElement | null;
     if (enableHaptics) {
@@ -184,6 +171,29 @@ const AIChat: React.FC = memo(() => {
     }
     setIsOpen(false);
   };
+
+  const closeChatDrawerRef = useRef(closeChatDrawer);
+  useEffect(() => { closeChatDrawerRef.current = closeChatDrawer; });
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    const handleCancel = (e: Event) => {
+      e.preventDefault();
+      closeChatDrawerRef.current();
+    };
+    const handleClick = (e: MouseEvent) => {
+      if (e.target === dialog) closeChatDrawerRef.current();
+    };
+
+    dialog.addEventListener('cancel', handleCancel);
+    dialog.addEventListener('click', handleClick);
+    return () => {
+      dialog.removeEventListener('cancel', handleCancel);
+      dialog.removeEventListener('click', handleClick);
+    };
+  }, []);
 
   const handlePrepareLeadSubmitPayload = (payload: LeadFinalizePayload, eventId: string): SubmitLeadRequest => {
     setLeadDraft({ ...payload });
@@ -421,7 +431,6 @@ const AIChat: React.FC = memo(() => {
         ref={dialogRef}
         className="ai-chat-drawer fixed top-0 right-0 h-full w-full sm:w-[450px] z-[9999] m-0 ml-auto p-0 bg-white flex-col shadow-[-10px_0_40px_rgba(0,0,0,0.1)] sm:rounded-l-[2rem] overflow-hidden outline-none max-h-full max-w-full"
         aria-labelledby="ai-chat-title"
-        onClick={(e) => { if (e.target === dialogRef.current) closeChatDrawer(); }}
       >
         {/* Header - Scrapbook Softness */}
         <div className="bg-white/80 backdrop-blur-md px-6 py-5 border-b border-zinc-100 flex justify-between items-center shrink-0 z-10">

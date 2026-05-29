@@ -366,8 +366,16 @@ const Destinations: React.FC = memo(() => {
             closeModal();
         };
 
+        const handleClick = (e: MouseEvent) => {
+            if (e.target === dialog) closeModal();
+        };
+
         dialog.addEventListener('cancel', handleCancel);
-        return () => dialog.removeEventListener('cancel', handleCancel);
+        dialog.addEventListener('click', handleClick);
+        return () => {
+            dialog.removeEventListener('cancel', handleCancel);
+            dialog.removeEventListener('click', handleClick);
+        };
     }, [closeModal]);
 
     // Map Init
@@ -681,7 +689,6 @@ const Destinations: React.FC = memo(() => {
                 ref={destinationModalRef}
                 className="fixed inset-0 z-[9999] m-auto p-4 bg-transparent backdrop:bg-zinc-900/60 backdrop:backdrop-blur-sm max-w-4xl w-full"
                 aria-labelledby="dest-modal-title"
-                onClick={(e) => { if (e.target === destinationModalRef.current) closeModal(); }}
             >
                 {selectedDestination && (
                     <div

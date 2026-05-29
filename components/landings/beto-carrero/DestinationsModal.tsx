@@ -29,23 +29,23 @@ export function DestinationsModal({ isOpen, onClose }: DestinationsModalProps) {
       e.preventDefault();
       onClose();
     };
+    const handleClick = (e: MouseEvent) => {
+      if (e.target === dialog) onClose();
+    };
 
     dialog.addEventListener('cancel', handleCancel);
-    return () => dialog.removeEventListener('cancel', handleCancel);
+    dialog.addEventListener('click', handleClick);
+    return () => {
+      dialog.removeEventListener('cancel', handleCancel);
+      dialog.removeEventListener('click', handleClick);
+    };
   }, [onClose]);
-
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDialogElement>) => {
-    if (e.target === dialogRef.current) {
-      onClose();
-    }
-  };
 
   return (
     <dialog
       ref={dialogRef}
       className="fixed inset-0 z-[100] m-auto p-4 bg-transparent backdrop:bg-fun-dark/80 backdrop:backdrop-blur-sm animate-[fadeIn_0.2s_ease-out] max-w-lg w-full"
       aria-label="Destinos Extras"
-      onClick={handleBackdropClick}
     >
       {/* Modal Content */}
       <div className="relative bg-white w-full rounded-3xl border-4 border-fun-dark shadow-hard-lg p-6 md:p-8 animate-[scaleIn_0.3s_cubic-bezier(0.16,1,0.3,1)] overflow-hidden">

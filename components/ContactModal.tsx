@@ -60,23 +60,23 @@ const ContactModal: React.FC = () => {
             e.preventDefault();
             closeRef.current();
         };
+        const handleClick = (e: MouseEvent) => {
+            if (e.target === dialog) closeRef.current();
+        };
 
         dialog.addEventListener('cancel', handleCancel);
-        return () => dialog.removeEventListener('cancel', handleCancel);
+        dialog.addEventListener('click', handleClick);
+        return () => {
+            dialog.removeEventListener('cancel', handleCancel);
+            dialog.removeEventListener('click', handleClick);
+        };
     }, []);
-
-    const handleBackdropClick = (e: React.MouseEvent<HTMLDialogElement>) => {
-        if (e.target === dialogRef.current) {
-            close();
-        }
-    };
 
     return (
         <dialog
             ref={dialogRef}
             className="fixed inset-0 z-50 m-auto p-4 bg-transparent backdrop:bg-black/60 backdrop:backdrop-blur-sm max-w-md w-full"
             aria-labelledby={titleId}
-            onClick={handleBackdropClick}
         >
             <div className="relative z-10 w-full overflow-hidden rounded-2xl bg-white shadow-[0_24px_60px_rgba(0,0,0,0.3)]">
                 <div className="flex items-start justify-between p-6 pb-4">
