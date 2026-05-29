@@ -63,6 +63,7 @@ const MelhorIdadeLanding: React.FC = () => {
             Anhangá Viagens
           </Link>
           <button 
+            type="button"
             onClick={() => openContactModal({ source: 'melhor-idade' })}
             className="btn-whatsapp btn-specialist text-xs font-black uppercase tracking-widest bg-brand-dark text-white px-4 py-2 rounded-full hover:bg-brand-cyan transition-colors focus:outline-dashed focus:outline-2 focus:outline-offset-2 focus:outline-brand-cyan"
             data-tracking="header-melhor-idade"
@@ -109,6 +110,7 @@ const MelhorIdadeLanding: React.FC = () => {
               className="flex flex-wrap gap-4"
             >
               <button
+                type="button"
                 onClick={() => openContactModal({ source: 'melhor-idade' })}
                 className="btn-whatsapp btn-specialist bg-brand-vibrant text-white px-8 py-4 rounded-2xl font-black text-lg shadow-xl shadow-brand-vibrant/20 hover:scale-105 transition-transform flex items-center gap-3 focus:outline-dashed focus:outline-2 focus:outline-offset-2 focus:outline-brand-vibrant"
                 data-tracking="hero-melhor-idade"
@@ -203,6 +205,7 @@ const MelhorIdadeLanding: React.FC = () => {
             Fale conosco hoje mesmo e receba uma proposta exclusiva para sua viagem. Segurança, conforto e exclusividade em um só lugar.
           </p>
           <button
+            type="button"
             onClick={() => openContactModal({ source: 'melhor-idade' })}
             className="btn-whatsapp btn-specialist bg-brand-cyan text-white px-10 py-5 rounded-2xl font-black text-xl shadow-2xl shadow-brand-cyan/20 hover:scale-105 transition-transform relative z-10 focus:outline-dashed focus:outline-2 focus:outline-offset-2 focus:outline-white"
             data-tracking="footer-melhor-idade"

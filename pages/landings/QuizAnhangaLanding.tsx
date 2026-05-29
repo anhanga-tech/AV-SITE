@@ -299,7 +299,7 @@ function HeroScreen({ onStart }: { onStart: () => void }) {
                     <em>perfil de viajante</em> e os destinos que combinam com você.
                 </p>
                 <div className="quiz-hero-cta">
-                    <button className="quiz-btn quiz-btn-primary quiz-btn-lg quiz-btn--hero" onClick={onStart}>
+                    <button type="button" className="quiz-btn quiz-btn-primary quiz-btn-lg quiz-btn--hero" onClick={onStart}>
                         Bora começar
                         <span className="quiz-arrow">→</span>
                     </button>
@@ -362,9 +362,10 @@ function QuestionScreen({ q, qIndex, total, value, onChange, onNext, onBack }: Q
     // reset pending when question changes and clear any pending timer
     useEffect(() => {
         setPendingId(null);
+        const timerRef = advanceTimerRef;
         return () => {
-            if (advanceTimerRef.current !== null) {
-                clearTimeout(advanceTimerRef.current);
+            if (timerRef.current !== null) {
+                clearTimeout(timerRef.current);
             }
         };
     }, [q.id]);
@@ -398,7 +399,7 @@ function QuestionScreen({ q, qIndex, total, value, onChange, onNext, onBack }: Q
     return (
         <div className="quiz-screen quiz-screen-question">
             <div className="quiz-q-top">
-                <button className="quiz-q-back" onClick={onBack} aria-label="Voltar">
+                <button type="button" className="quiz-q-back" onClick={onBack} aria-label="Voltar">
                     ← voltar
                 </button>
                 <Progress current={qIndex + 1} total={total} />
@@ -413,6 +414,7 @@ function QuestionScreen({ q, qIndex, total, value, onChange, onNext, onBack }: Q
                 <div className={`quiz-opt-grid ${gridClass}`}>
                     {q.options.map((opt, i) => (
                         <button
+                            type="button"
                             key={opt.id}
                             className={[
                                 `quiz-opt ${optClass}`,
@@ -434,6 +436,7 @@ function QuestionScreen({ q, qIndex, total, value, onChange, onNext, onBack }: Q
                 {q.multi && (
                     <div className="quiz-q-foot">
                         <button
+                            type="button"
                             className="quiz-btn quiz-btn-primary"
                             disabled={selected.length === 0}
                             onClick={onNext}
@@ -484,7 +487,7 @@ function PreLeadScreen({ profile, onSubmit, onBack }: PreLeadScreenProps) {
     return (
         <div className="quiz-screen quiz-screen-lead">
             <div className="quiz-q-top">
-                <button className="quiz-q-back" onClick={onBack} aria-label="Voltar">← voltar</button>
+                <button type="button" className="quiz-q-back" onClick={onBack} aria-label="Voltar">← voltar</button>
                 <span className="quiz-q-step">Último passo!</span>
             </div>
 
@@ -849,7 +852,7 @@ function ResultScreen({ profile, mainDest, inspirations, lead, onRestart, baseWa
                         firstName={firstName}
                         baseWaUrl={baseWaUrl}
                     />
-                    <button className="quiz-btn quiz-btn-ghost quiz-result-restart" onClick={onRestart}>
+                    <button type="button" className="quiz-btn quiz-btn-ghost quiz-result-restart" onClick={onRestart}>
                         Refazer o quiz
                     </button>
                 </div>
