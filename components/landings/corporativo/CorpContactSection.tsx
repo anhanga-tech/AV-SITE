@@ -122,7 +122,7 @@ export function CorpContactSection() {
                             {[
                                 { icon: Phone, label: '(11) 5283-3309', href: 'tel:+551152833309' },
                                 { icon: Envelope, label: 'contato@anhanga.tur.br', href: 'mailto:contato@anhanga.tur.br' },
-                                { icon: MapPin, label: 'Av. Dom Pedro I, 773 — Vila Monumento, SP', href: null },
+                                { icon: MapPin, label: 'Av. Dom Pedro I, 773, Vila Monumento, SP', href: null },
                             ].map(({ icon: Icon, label, href }) => (
                                 <li key={label} className="flex items-start gap-4">
                                     <div className="size-10 rounded-xl bg-blue-100 border-2 border-blue-200 flex items-center justify-center shrink-0 mt-0.5">
@@ -176,7 +176,7 @@ export function CorpContactSection() {
                         className="bg-white rounded-[2rem] border-2 border-zinc-100 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] overflow-hidden"
                     >
                         {submitState === 'success' ? (
-                            <div className="flex flex-col items-center text-center p-12" role="status" aria-live="polite">
+                            <div className="flex flex-col items-center text-center p-8 sm:p-12" role="status" aria-live="polite">
                                 <m.div
                                     initial={{ scale: 0.5, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
@@ -205,14 +205,14 @@ export function CorpContactSection() {
                         ) : (
                             <form onSubmit={handleSubmit} noValidate>
                                 {/* Form header strip */}
-                                <div className="flex justify-between items-center px-8 py-5 border-b-2 border-dashed border-zinc-100">
-                                    <span className="text-brand-cyan font-black tracking-widest text-sm uppercase flex items-center gap-2">
-                                        <AirplaneTilt className="size-4" weight="fill" /> Formulário de Contato
+                                <div className="flex justify-between items-center px-6 sm:px-8 py-5 border-b-2 border-dashed border-zinc-100 gap-4">
+                                    <span className="text-brand-cyan font-black tracking-widest text-xs sm:text-sm uppercase flex items-center gap-2 min-w-0">
+                                        <AirplaneTilt className="size-4 shrink-0" weight="fill" /> Contato
                                     </span>
-                                    <span className="text-zinc-400 font-bold text-xs uppercase">Corporativo</span>
+                                    <span className="text-zinc-400 font-bold text-xs uppercase shrink-0">Corporativo</span>
                                 </div>
 
-                                <div className="p-8 space-y-5">
+                                <div className="p-6 sm:p-8 space-y-5">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <label htmlFor="firstName" className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">
