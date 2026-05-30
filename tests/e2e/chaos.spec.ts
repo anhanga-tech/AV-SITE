@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { HomePage } from './pages/HomePage';
 import { AIChat } from './pages/AIChat';
-import { BrazilPromotionDayPage } from './pages/BrazilPromotionDayPage';
+import { CorporativoPage } from './pages/CorporativoPage';
 
 test.describe('Chaos & Unhappy Path Suite', () => {
   test('should handle Gemini API 500 error gracefully', async ({ page }) => {
@@ -68,8 +68,8 @@ test.describe('Chaos & Unhappy Path Suite', () => {
     await expect(page).toHaveURL(/\/$/);
   });
 
-  test('should handle API 500 error in Brazil Promotion Day form', async ({ page }) => {
-    const landing = new BrazilPromotionDayPage(page);
+  test('should handle API 500 error in corporativo form', async ({ page }) => {
+    const landing = new CorporativoPage(page);
     await page.route('**/api/submit-lead', route => {
       route.fulfill({
         status: 500,
@@ -85,7 +85,7 @@ test.describe('Chaos & Unhappy Path Suite', () => {
       lastName: 'Tester',
       email: 'chaos@test.com',
       whatsapp: '(11) 98831-4487',
-      destination: 'Paris',
+      empresa: 'Empresa Teste',
     });
 
     await landing.submit();
@@ -93,10 +93,9 @@ test.describe('Chaos & Unhappy Path Suite', () => {
     await landing.expectError('Internal Server Error');
   });
 
-  test('should handle network timeout in Brazil Promotion Day form', async ({ page }) => {
-    const landing = new BrazilPromotionDayPage(page);
+  test('should handle network timeout in corporativo form', async ({ page }) => {
+    const landing = new CorporativoPage(page);
     await page.route('**/api/submit-lead', async route => {
-      // Small delay to ensure it's not instantaneous but enough to trigger fetch failure
       await new Promise(resolve => setTimeout(resolve, 100));
       await route.abort('timedout');
     });
@@ -108,12 +107,11 @@ test.describe('Chaos & Unhappy Path Suite', () => {
       lastName: 'Tester',
       email: 'timeout@test.com',
       whatsapp: '(11) 98831-4487',
-      destination: 'Paris',
+      empresa: 'Empresa Teste',
     });
 
     await landing.submit();
 
-    // Since the request was aborted/timed out, useLeadCapture should catch the network error
     await landing.expectError();
   });
 });
