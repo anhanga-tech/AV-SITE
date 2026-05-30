@@ -7,19 +7,23 @@ import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 
 const SITE_URL = 'https://www.anhanga.tur.br';
 
-const SiteMap: React.FC = () => {
-  const coreLinks = [
-    { to: `${SITE_URL}/`, label: 'Agência de Viagens em São Paulo' },
-    { to: `${SITE_URL}/sobre/`, label: 'Sobre a Anhangá Viagens' },
-    { to: getBlogHomeUrl(), label: 'Blog de Viagens e Roteiros', external: true },
-    { to: `${SITE_URL}/orlando/`, label: 'Pacotes para Orlando' },
-    { to: `${SITE_URL}/beto-carrero/`, label: 'Pacote Beto Carrero' },
-    { to: `${SITE_URL}/melhor-idade/`, label: 'Viagens para Melhor Idade' },
-    { to: `${SITE_URL}/lollapalooza/`, label: 'Lollapalooza Brasil' },
-    { to: `${SITE_URL}/termos-de-uso/`, label: 'Termos de Uso' },
-    { to: `${SITE_URL}/politica-privacidade/`, label: 'Política de Privacidade' }
-  ];
+const CORE_LINKS = [
+  { to: `${SITE_URL}/`, label: 'Agência de Viagens em São Paulo' },
+  { to: `${SITE_URL}/sobre/`, label: 'Sobre a Anhangá Viagens' },
+  { to: getBlogHomeUrl(), label: 'Blog de Viagens e Roteiros', external: true },
+  { to: `${SITE_URL}/orlando/`, label: 'Pacotes para Orlando' },
+  { to: `${SITE_URL}/beto-carrero/`, label: 'Pacote Beto Carrero' },
+  { to: `${SITE_URL}/melhor-idade/`, label: 'Viagens para Melhor Idade' },
+  { to: `${SITE_URL}/lollapalooza/`, label: 'Lollapalooza Brasil' },
+  { to: `${SITE_URL}/consultoria-de-viagem/`, label: 'Consultoria de Viagem Personalizada' },
+  { to: `${SITE_URL}/curadoria-cruzeiros-brasil/`, label: 'Cruzeiros pelo Brasil' },
+  { to: `${SITE_URL}/corporativo/`, label: 'Viagens Corporativas' },
+  { to: `${SITE_URL}/quiz/`, label: 'Quiz: Descubra Seu Destino Ideal' },
+  { to: `${SITE_URL}/termos-de-uso/`, label: 'Termos de Uso' },
+  { to: `${SITE_URL}/politica-privacidade/`, label: 'Política de Privacidade' }
+];
 
+const SiteMap: React.FC = () => {
   return (
     <>
       <Seo
@@ -40,7 +44,7 @@ const SiteMap: React.FC = () => {
 
           <h2 className="text-2xl font-extrabold text-brand-dark mb-4">Páginas Principais</h2>
           <ul className="space-y-3 mb-10">
-            {coreLinks.map((link) => (
+            {CORE_LINKS.map((link) => (
               <li key={link.to}>
                 <a href={link.to} className="text-brand-cyan hover:underline font-semibold">
                   {link.label}
