@@ -244,7 +244,7 @@ export function isPreparedSubmitLeadRequest(value: LeadDraftPartial | SubmitLead
     );
 }
 
-export type LeadFormType = 'ai_chatbot_lead' | 'event_lead';
+export type LeadFormType = 'ai_chatbot_lead' | 'event_lead' | 'corporate_lead';
 
 export function pushGenerateLeadDataLayerEvent(
     payload: SubmitLeadRequest,

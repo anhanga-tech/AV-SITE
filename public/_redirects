@@ -6,6 +6,10 @@
 /lollapalooza-2026    /lollapalooza    301
 /lollapalooza-2026/   /lollapalooza    301
 
+# Brazil Promotion Day → Corporativo
+/brazil-promotion-day    /corporativo    301
+/brazil-promotion-day/   /corporativo    301
+
 # CMS admin trailing-slash normalisation
 /admin  /admin/  301
 
