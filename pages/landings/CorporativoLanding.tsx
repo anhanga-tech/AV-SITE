@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { SEO } from '@/components/Seo';
+import { Seo } from '@/components/Seo';
 import { BreadcrumbSchema } from '@/components/schemas/BreadcrumbSchema';
 import { CorpNav } from '@/components/landings/corporativo/CorpNav';
 import { CorpHero } from '@/components/landings/corporativo/CorpHero';
@@ -21,7 +21,7 @@ const CorporativoLanding: React.FC = () => {
 
     return (
         <>
-            <SEO
+            <Seo
                 title="Viagens Corporativas | Anhangá Viagens"
                 description="Viagens corporativas sob medida para micro e pequenas empresas. Incentivo, confraternização, eventos e viagens a trabalho com atendimento dedicado."
                 canonical="https://www.anhanga.tur.br/corporativo/"

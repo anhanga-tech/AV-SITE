@@ -124,7 +124,7 @@ export function CorpContactSection() {
                             Preencha o formulário e um consultor entra em contato pelo canal que você preferir, sem enrolação.
                         </p>
 
-                        <ul className="space-y-5 mb-10" role="list">
+                        <ul className="space-y-5 mb-10">
                             {[
                                 { icon: Phone, label: '(11) 5283-3309', href: 'tel:+551152833309' },
                                 { icon: Envelope, label: 'contato@anhanga.tur.br', href: 'mailto:contato@anhanga.tur.br' },
@@ -182,7 +182,7 @@ export function CorpContactSection() {
                         className="bg-white rounded-[2rem] border-2 border-zinc-100 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] overflow-hidden"
                     >
                         {submitState === 'success' ? (
-                            <div className="flex flex-col items-center text-center p-8 sm:p-12" role="status" aria-live="polite">
+                            <output className="flex flex-col items-center text-center p-8 sm:p-12" aria-live="polite">
                                 <m.div
                                     initial={{ scale: 0.5, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
@@ -207,7 +207,7 @@ export function CorpContactSection() {
                                     <WhatsappLogo className="size-4" weight="fill" />
                                     Ou fale agora no WhatsApp
                                 </a>
-                            </div>
+                            </output>
                         ) : (
                             <form onSubmit={handleSubmit} noValidate>
                                 {/* Form header strip */}
