@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import type { SubmitLeadRequest } from '../../types/leadCapture';
 import { AIChat } from './pages/AIChat';
-import { BrazilPromotionDayPage } from './pages/BrazilPromotionDayPage';
+import { CorporativoPage } from './pages/CorporativoPage';
 
 async function acceptLgpd(page: import('@playwright/test').Page) {
   await page.locator('input[type="checkbox"]').first().evaluate((element) => {
@@ -164,8 +164,8 @@ test.describe('Destructive & Security Suite', () => {
     await expect(page.getByText('Você deve aceitar os termos')).toBeVisible();
   });
 
-  test('should sanitize XSS payload in Brazil Promotion Day form', async ({ page }) => {
-    const landing = new BrazilPromotionDayPage(page);
+  test('should sanitize XSS payload in corporativo form', async ({ page }) => {
+    const landing = new CorporativoPage(page);
     const xssPayload = '<img src=x onerror=alert(1)>';
     let submitPayload: SubmitLeadRequest | null = null;
 
@@ -185,18 +185,17 @@ test.describe('Destructive & Security Suite', () => {
       lastName: 'XSS Test',
       email: 'xss@test.com',
       whatsapp: '(11) 98831-4487',
-      destination: 'Paris',
+      empresa: 'Empresa Teste',
     });
 
     await landing.submit();
 
     await expect.poll(() => submitPayload !== null, { timeout: 15000 }).toBeTruthy();
-    // Verify frontend sanitization
     expect((submitPayload as unknown as SubmitLeadRequest).firstName).toBe('&lt;img src=x onerror=alert(1)&gt;');
   });
 
-  test('should prevent multiple submissions on Brazil Promotion Day form via rage clicking', async ({ page }) => {
-    const landing = new BrazilPromotionDayPage(page);
+  test('should prevent multiple submissions on corporativo form via rage clicking', async ({ page }) => {
+    const landing = new CorporativoPage(page);
     let submissionCount = 0;
 
     await page.route('**/api/submit-lead', async route => {
@@ -216,7 +215,7 @@ test.describe('Destructive & Security Suite', () => {
       lastName: 'Tester',
       email: 'rage@test.com',
       whatsapp: '(11) 98831-4487',
-      destination: 'Paris',
+      empresa: 'Empresa Teste',
     });
 
     // Multiple rapid clicks via evaluate to ensure we hit the DOM directly
