@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { SEO } from '@/components/SEO';
+import { SEO } from '@/components/Seo';
 import { BreadcrumbSchema } from '@/components/schemas/BreadcrumbSchema';
 import { CorpNav } from '@/components/landings/corporativo/CorpNav';
 import { CorpHero } from '@/components/landings/corporativo/CorpHero';
