@@ -1,6 +1,6 @@
 import { WhatsappLogo } from '@phosphor-icons/react';
-import { BRAND_LOGO_BLUE_URL } from '../../../lib/media-assets';
-import { openContactModal } from '../../../utils/contactForm';
+import { BRAND_LOGO_BLUE_URL } from '@/lib/media-assets';
+import { openContactModal } from '@/utils/contactForm';
 
 interface LandingNavProps {
     source: string;

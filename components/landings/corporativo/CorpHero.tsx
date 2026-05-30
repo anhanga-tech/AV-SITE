@@ -1,6 +1,6 @@
 import { m } from 'framer-motion';
 import { AirplaneTilt, ArrowRight, WhatsappLogo } from '@phosphor-icons/react';
-import { openContactModal } from '../../../utils/contactForm';
+import { openContactModal } from '@/utils/contactForm';
 import { fadeUp } from './constants';
 
 export function CorpHero() {

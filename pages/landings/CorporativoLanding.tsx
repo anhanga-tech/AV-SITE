@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
-import { SEO } from '../../components/SEO';
-import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
-import { CorpNav } from '../../components/landings/corporativo/CorpNav';
-import { CorpHero } from '../../components/landings/corporativo/CorpHero';
-import { CorpPillars } from '../../components/landings/corporativo/CorpPillars';
-import { CorpWhatsAppBand } from '../../components/landings/corporativo/CorpWhatsAppBand';
-import { CorpContactSection } from '../../components/landings/corporativo/CorpContactSection';
-import { CorpFooter } from '../../components/landings/corporativo/CorpFooter';
+import { SEO } from '@/components/SEO';
+import { BreadcrumbSchema } from '@/components/schemas/BreadcrumbSchema';
+import { CorpNav } from '@/components/landings/corporativo/CorpNav';
+import { CorpHero } from '@/components/landings/corporativo/CorpHero';
+import { CorpPillars } from '@/components/landings/corporativo/CorpPillars';
+import { CorpWhatsAppBand } from '@/components/landings/corporativo/CorpWhatsAppBand';
+import { CorpContactSection } from '@/components/landings/corporativo/CorpContactSection';
+import { CorpFooter } from '@/components/landings/corporativo/CorpFooter';
 
 const CorporativoLanding: React.FC = () => {
     useEffect(() => {

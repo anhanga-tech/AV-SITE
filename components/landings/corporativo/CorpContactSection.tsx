@@ -13,8 +13,8 @@ import {
     PaperPlaneTilt,
     SpinnerGap,
 } from '@phosphor-icons/react';
-import { useLeadCapture, createLeadEventId } from '../../../hooks/useLeadCapture';
-import { useWhatsAppLink } from '../../../utils/whatsapp';
+import { useLeadCapture, createLeadEventId } from '@/hooks/useLeadCapture';
+import { useWhatsAppLink } from '@/utils/whatsapp';
 import { WHATSAPP_MESSAGE, SOCIAL_LINKS, fadeUp } from './constants';
 
 export function CorpContactSection() {

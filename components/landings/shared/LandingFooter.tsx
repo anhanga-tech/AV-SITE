@@ -1,4 +1,4 @@
-import { BRAND_LOGO_BLUE_URL } from '../../../lib/media-assets';
+import { BRAND_LOGO_BLUE_URL } from '@/lib/media-assets';
 
 export function LandingFooter() {
     return (
