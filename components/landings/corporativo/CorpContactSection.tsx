@@ -47,6 +47,12 @@ export function CorpContactSection() {
             setErrorMessage('Preencha todos os campos obrigatórios');
             return;
         }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(form.email.trim())) {
+            setSubmitState('error');
+            setErrorMessage('Insira um e-mail corporativo válido');
+            return;
+        }
         isLocallySubmitting.current = true;
         setErrorMessage('');
 

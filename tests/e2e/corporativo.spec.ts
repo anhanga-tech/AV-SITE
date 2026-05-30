@@ -58,17 +58,18 @@ test.describe('Corporativo Landing Page', () => {
 
     await landing.expectSuccess();
 
-    const safePayload = submitPayload as unknown as SubmitLeadRequest;
-    expect(safePayload).toMatchObject({
+    const payload = submitPayload as unknown as SubmitLeadRequest;
+    expect(payload).toBeTruthy();
+    expect(payload).toMatchObject({
       firstName: 'Maria',
       lastName: 'Santos',
       email: 'maria@empresa.com.br',
       whatsapp: '+5511988314487',
       destination: 'Corporativo',
     });
-    expect(safePayload.bantSummary).toContain('Lead corporativo');
-    expect(safePayload.bantSummary).toContain('Empresa Teste LTDA');
-    expect(safePayload.bantSummary).toContain('Sócia');
+    expect(payload.bantSummary).toContain('Lead corporativo');
+    expect(payload.bantSummary).toContain('Empresa Teste LTDA');
+    expect(payload.bantSummary).toContain('Sócia');
 
     const formSubmissionEvent = await page.evaluate(() =>
       (window.dataLayer || []).find(e => e.event === 'form_submission')
