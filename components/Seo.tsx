@@ -6,7 +6,7 @@ const DEFAULT_OG_IMAGE = DEFAULT_OG_IMAGE_URL;
 const DEFAULT_OG_IMAGE_WIDTH = '1200';
 const DEFAULT_OG_IMAGE_HEIGHT = '630';
 
-interface SEOProps {
+interface SeoProps {
   title?: string;
   description?: string;
   canonical?: string;
@@ -23,7 +23,7 @@ interface SEOProps {
   noHreflang?: boolean;
 }
 
-export const SEO: React.FC<SEOProps> = ({
+export const Seo: React.FC<SeoProps> = ({
   title = 'Anhangá Viagens | Agência de Viagens Personalizadas',
   description = 'Agência de viagens em São Paulo com roteiros personalizados, experiências no Brasil e no mundo e suporte especializado.',
   canonical,

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, memo, useMemo } from 'react';
+import React, { useState, useRef, useEffect, memo, useMemo, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   ChatCircleDots,
@@ -21,7 +21,10 @@ interface Message {
   id: string;
   role: 'user' | 'model';
   text: string;
-  chips?: string[];
+  chips?: Array<{
+    id: string;
+    label: string;
+  }>;
   isAction?: boolean;
   actionData?: {
     destination: string;
@@ -80,15 +83,6 @@ FormattedText.displayName = 'FormattedText';
  * 2. Pre-calculates the last model message index once per update (O(N))
  *    instead of within the render loop (O(N^2)).
  */
-const FOCUSABLE_SELECTOR = [
-  'a[href]',
-  'button:not([disabled])',
-  'input:not([disabled])',
-  'select:not([disabled])',
-  'textarea:not([disabled])',
-  '[tabindex]:not([tabindex="-1"])',
-].join(',');
-
 const AIChat: React.FC = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -98,7 +92,7 @@ const AIChat: React.FC = memo(() => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const drawerRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
   const messagesRef = useRef<Message[]>(messages);
   const {
@@ -112,7 +106,6 @@ const AIChat: React.FC = memo(() => {
   const navigate = useNavigate();
   const isOrlandoPage = location.pathname.startsWith('/orlando');
 
-  const [liveAnnouncement, setLiveAnnouncement] = useState('');
   const prevMessagesCount = useRef(messages.length);
 
   // PERFORMANCE: Pre-calculate the index of the last model message to avoid O(N^2)
@@ -124,17 +117,19 @@ const AIChat: React.FC = memo(() => {
     return -1;
   }, [messages]);
 
-  useEffect(() => {
-    if (messages.length > prevMessagesCount.current) {
-      const newModelMessages = messages
-        .slice(prevMessagesCount.current)
-        .filter(m => m.role === 'model' && !m.isAction);
+  // Derive the screen-reader announcement from the latest model messages added this render.
+  // Read the ref snapshot before useMemo so the memo body stays pure.
+  const prevCount = prevMessagesCount.current;
+  const liveAnnouncement = useMemo(() => {
+    if (messages.length <= prevCount) return '';
+    const newModelMessages = messages
+      .slice(prevCount)
+      .filter(m => m.role === 'model' && !m.isAction);
+    if (newModelMessages.length === 0) return '';
+    return newModelMessages.map(m => m.text).join(' ').replace(/\*\*|\*|- /g, '');
+  }, [messages, prevCount]);
 
-      if (newModelMessages.length > 0) {
-        const fullText = newModelMessages.map(m => m.text).join(' ');
-        setLiveAnnouncement(fullText.replace(/\*\*|\*|- /g, ''));
-      }
-    }
+  useEffect(() => {
     prevMessagesCount.current = messages.length;
   }, [messages]);
 
@@ -151,9 +146,14 @@ const AIChat: React.FC = memo(() => {
   }, [messages, isOpen, isLoading]);
 
   useEffect(() => {
-    if (isOpen) {
-      // Focus the drawer panel itself to ensure screen readers announce it immediately
-      drawerRef.current?.focus();
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    if (isOpen && !dialog.open) {
+      dialog.showModal();
+    } else if (!isOpen && dialog.open) {
+      dialog.close();
+      triggerRef.current?.focus();
     }
   }, [isOpen]);
 
@@ -170,8 +170,30 @@ const AIChat: React.FC = memo(() => {
       void triggerHaptic('light');
     }
     setIsOpen(false);
-    triggerRef.current?.focus();
   };
+
+  const closeChatDrawerRef = useRef(closeChatDrawer);
+  useEffect(() => { closeChatDrawerRef.current = closeChatDrawer; });
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    const handleCancel = (e: Event) => {
+      e.preventDefault();
+      closeChatDrawerRef.current();
+    };
+    const handleClick = (e: MouseEvent) => {
+      if (e.target === dialog) closeChatDrawerRef.current();
+    };
+
+    dialog.addEventListener('cancel', handleCancel);
+    dialog.addEventListener('click', handleClick);
+    return () => {
+      dialog.removeEventListener('cancel', handleCancel);
+      dialog.removeEventListener('click', handleClick);
+    };
+  }, []);
 
   const handlePrepareLeadSubmitPayload = (payload: LeadFinalizePayload, eventId: string): SubmitLeadRequest => {
     setLeadDraft({ ...payload });
@@ -216,7 +238,7 @@ const AIChat: React.FC = memo(() => {
     };
   };
 
-  const submitMessage = async (text: string, enableHaptics: boolean = true) => {
+  const submitMessage = useCallback(async (text: string, enableHaptics: boolean = true) => {
     if (!text.trim() || isLoading) return;
 
     if (enableHaptics) {
@@ -245,7 +267,10 @@ const AIChat: React.FC = memo(() => {
         id: crypto.randomUUID(),
         role: 'model',
         text: response.text || '',
-        chips: response.chips
+        chips: response.chips?.map((label) => ({
+          id: crypto.randomUUID(),
+          label,
+        }))
       });
     }
 
@@ -278,7 +303,10 @@ const AIChat: React.FC = memo(() => {
         void triggerHaptic('heavy');
       }
     }
-  };
+  }, [isLoading, setLeadDraft]);
+
+  const submitMessageRef = useRef(submitMessage);
+  useEffect(() => { submitMessageRef.current = submitMessage; }, [submitMessage]);
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
@@ -295,48 +323,12 @@ const AIChat: React.FC = memo(() => {
     }
   };
 
-  // Focus Trapping Logic
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        closeChatDrawer();
-        return;
-      }
-
-      if (event.key !== 'Tab' || !drawerRef.current) return;
-
-      const focusable = Array.from(
-        drawerRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
-      ).filter((element) => element.offsetParent !== null);
-      if (focusable.length === 0) return;
-
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-        return;
-      }
-
-      if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen]);
-
   useEffect(() => {
     const handleToggle = (event: Event) => {
       const customEvent = event as CustomEvent;
       openChatDrawer(false);
       if (customEvent.detail?.message) {
-        setTimeout(() => submitMessage(customEvent.detail.message, false), 400);
+        setTimeout(() => submitMessageRef.current(customEvent.detail.message, false), 400);
       }
     };
     window.addEventListener('toggle-ai-chat', handleToggle);
@@ -364,7 +356,7 @@ const AIChat: React.FC = memo(() => {
 
         if (sanitizedDestination) {
           const message = `Olá! Gostaria de informações sobre viagem para ${sanitizedDestination}.`;
-          setTimeout(() => submitMessage(message, false), DEEP_LINK_MESSAGE_DELAY_MS);
+          setTimeout(() => submitMessageRef.current(message, false), DEEP_LINK_MESSAGE_DELAY_MS);
         }
       }
 
@@ -410,6 +402,7 @@ const AIChat: React.FC = memo(() => {
     <>
       {/* Floating Toggle Button */}
       <button
+        type="button"
         onClick={() => openChatDrawer()}
         className={`fixed ${isOpen ? 'translate-y-32 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
                     bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9990]
@@ -433,25 +426,10 @@ const AIChat: React.FC = memo(() => {
         </div>
       </button>
 
-      {/* Backdrop Overlay */}
-      <div
-        role="button"
-        tabIndex={0}
-        aria-label="Fechar chat"
-        className={`fixed inset-0 z-[9998] transition-opacity duration-300 ease-in-out bg-brand-dark/20 backdrop-blur-sm ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-          }`}
-        onClick={() => closeChatDrawer()}
-        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') closeChatDrawer(); }}
-      />
-
-      {/* Drawer Panel - Soft Scrapbook Geometry */}
-      <div
-        ref={drawerRef}
-        tabIndex={-1}
-        className={`fixed top-0 right-0 h-full w-full sm:w-[450px] z-[9999] bg-white flex flex-col shadow-[-10px_0_40px_rgba(0,0,0,0.1)] transition-all duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] sm:rounded-l-[2rem] overflow-hidden outline-none ${isOpen ? 'translate-x-0 visible opacity-100' : 'translate-x-full invisible opacity-0'
-          }`}
-        role="dialog"
-        aria-modal="true"
+      {/* Drawer Dialog - Soft Scrapbook Geometry */}
+      <dialog
+        ref={dialogRef}
+        className="ai-chat-drawer fixed top-0 right-0 h-full w-full sm:w-[450px] z-[9999] m-0 ml-auto p-0 bg-white flex-col shadow-[-10px_0_40px_rgba(0,0,0,0.1)] sm:rounded-l-[2rem] overflow-hidden outline-none max-h-full max-w-full"
         aria-labelledby="ai-chat-title"
       >
         {/* Header - Scrapbook Softness */}
@@ -476,6 +454,7 @@ const AIChat: React.FC = memo(() => {
             </div>
           </div>
           <button
+            type="button"
             onClick={() => closeChatDrawer()}
             className="text-zinc-400 hover:text-zinc-700 bg-zinc-50 hover:bg-zinc-100 rounded-full p-2.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-vibrant"
             aria-label="Fechar gaveta"
@@ -485,9 +464,9 @@ const AIChat: React.FC = memo(() => {
         </div>
 
         {/* Screen-reader announcer for new AI messages */}
-        <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+        <output aria-live="polite" aria-atomic="true" className="sr-only">
           {liveAnnouncement}
-        </div>
+        </output>
 
         {/* Messages Area - Scrapbook vibe */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth bg-white relative">
@@ -549,13 +528,14 @@ const AIChat: React.FC = memo(() => {
                 {/* Action Chips */}
                 {isLastModelMsg && msg.chips && msg.chips.length > 0 && (
                   <div className="flex flex-wrap gap-2 pl-12 mt-1">
-                    {msg.chips.map((chip, chipIdx) => (
+                    {msg.chips.map((chip) => (
                       <button
-                        key={chipIdx}
-                        onClick={() => submitMessage(chip)}
+                        type="button"
+                        key={chip.id}
+                        onClick={() => submitMessage(chip.label)}
                         className="text-[12px] font-semibold text-zinc-600 bg-white border border-zinc-200 px-4 py-2 rounded-xl shadow-sm hover:shadow hover:border-brand-vibrant/30 hover:text-brand-vibrant hover:-translate-y-0.5 transition text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-vibrant/50"
                       >
-                        {chip}
+                        {chip.label}
                       </button>
                     ))}
                   </div>
@@ -593,6 +573,7 @@ const AIChat: React.FC = memo(() => {
               className="flex-1 max-h-[120px] pl-4 pr-[50px] py-4 bg-transparent outline-none text-sm text-zinc-700 font-medium placeholder-zinc-400 resize-none overflow-y-auto w-full leading-snug"
             />
             <button
+              type="button"
               onClick={() => submitMessage(input)}
               disabled={isLoading || !input.trim()}
               className="absolute right-2 bottom-2 p-2.5 bg-brand-vibrant text-white rounded-[10px] shadow-sm hover:bg-brand-blue hover:shadow-md transition disabled:opacity-0 disabled:scale-75 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-vibrant/50"
@@ -605,7 +586,7 @@ const AIChat: React.FC = memo(() => {
             Nossa IA pode cometer erros. Confirme os dados no WhatsApp.
           </p>
         </div>
-      </div>
+      </dialog>
     </>
   );
 });

@@ -73,6 +73,7 @@ export function OrlandoItinerary() {
         <div className="itinerary-footer">
           <p>* Personalizamos este roteiro 100% para você!</p>
           <button
+            type="button"
             onClick={(e) => {
               e.preventDefault();
               openContactModal({ source: 'orlando', destination: 'Orlando' });

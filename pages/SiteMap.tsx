@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { SEO } from '../components/SEO';
+import { Seo } from '../components/Seo';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { getAllPosts } from '../lib/mdx';
 import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
@@ -22,7 +22,7 @@ const SiteMap: React.FC = () => {
 
   return (
     <>
-      <SEO
+      <Seo
         title="Mapa do Site | Anhangá Viagens"
         description="Navegue pelas principais páginas da Anhangá Viagens, incluindo landings, blog e páginas institucionais."
         canonical="https://www.anhanga.tur.br/mapa-do-site/"

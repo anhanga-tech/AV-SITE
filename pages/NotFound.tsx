@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Home as HomeIcon, Compass, BookOpen, ArrowLeft } from 'lucide-react';
-import { SEO } from '../components/SEO';
+import { Seo } from '../components/Seo';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { getBlogHomeUrl } from '../utils/blog';
 
@@ -10,7 +10,7 @@ const SITE_URL = 'https://www.anhanga.tur.br';
 const NotFound: React.FC = () => {
   return (
     <>
-      <SEO
+      <Seo
         title="Página não encontrada"
         description="A página que você procura não foi encontrada. Explore nossos roteiros personalizados e planeje sua próxima aventura."
         robots="noindex, follow"

@@ -7,7 +7,7 @@ import { SocialShare } from '../components/SocialShare';
 import { getBlogPostUrl, getBlogHomeUrl, formatDate } from '../utils/blog';
 import { optimizeRemoteImageUrl } from '../data/mediaConfig';
 import { getCategoryColor } from '../utils/categoryColors';
-import { SEO } from '../components/SEO';
+import { Seo } from '../components/Seo';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { openContactModal } from '../utils/contactForm';
 
@@ -33,7 +33,7 @@ const BlogList: React.FC = () => {
 
     return (
         <>
-            <SEO
+            <Seo
                 title="Blog de Viagens e Dicas Práticas"
                 description="Roteiros práticos, dicas de insider e destinos que valem cada centavo. Planejamento de viagem do jeito que deveria ser. Leia no blog da Anhangá!"
                 canonical={getBlogHomeUrl()}
@@ -150,6 +150,7 @@ const BlogList: React.FC = () => {
                         Fale com nossos especialistas e comece a planejar sua viagem personalizada hoje mesmo.
                     </p>
                     <button
+                        type="button"
                         onClick={(e) => {
                             e.preventDefault();
                             openContactModal({ source: 'blog-list' });

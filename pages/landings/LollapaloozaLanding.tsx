@@ -1,5 +1,5 @@
 import React from 'react';
-import { SEO } from '../../components/SEO';
+import { Seo } from '../../components/Seo';
 import { LandingFAQ } from '../../components/LandingFAQ';
 import LollapaloozaApp from '../../components/landings/lollapalooza/LollapaloozaApp';
 import { openContactModal } from '../../utils/contactForm';
@@ -32,7 +32,7 @@ const LOLLAPALOOZA_FAQ_ITEMS = [
 const LollapaloozaLanding: React.FC = () => {
   return (
     <>
-      <SEO
+      <Seo
         title="Lollapalooza 2026 Esgotado | Lista de Espera 2027"
         description="A campanha do Lollapalooza 2026 foi encerrada com sucesso. Entre na lista de espera 2027 para receber prioridade quando os próximos pacotes abrirem."
         canonical="https://www.anhanga.tur.br/lollapalooza/"
@@ -104,6 +104,7 @@ const LollapaloozaLanding: React.FC = () => {
               Entrar na lista de espera 2027
             </a>
             <button
+              type="button"
               onClick={(e) => {
                 e.preventDefault();
                 openContactModal({ source: 'lollapalooza' });

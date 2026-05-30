@@ -1,32 +1,24 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { WhatsappLogo, SpinnerGap, CheckCircle } from '@phosphor-icons/react';
 import { useContactForm } from '../../hooks/useContactForm';
 
-type FormState = 'closed' | 'open' | 'submitted';
-
 export function CtaBody() {
-  const [formState, setFormState] = useState<FormState>('closed');
+  const [formOpen, setFormOpen] = useState(false);
   const { fields, setField, isValid, isSubmitting, error, submitted, submit } =
     useContactForm({ source: 'cta-homepage' });
 
-  useEffect(() => {
-    if (submitted && formState === 'open') {
-      setFormState('submitted');
-    }
-  }, [formState, submitted]);
-
-  if (formState === 'submitted') {
+  if (submitted && formOpen) {
     return (
-      <div className="flex flex-col gap-3" role="status" aria-live="polite">
+      <output className="flex flex-col gap-3" aria-live="polite">
         <p className="flex items-center gap-2 text-green-600 text-sm font-bold">
           <CheckCircle className="size-5" weight="fill" />
           Recebemos! Nossa equipe entra em contato em breve.
         </p>
-      </div>
+      </output>
     );
   }
 
-  if (formState === 'open') {
+  if (formOpen) {
     return (
       <form
         onSubmit={(event) => {
@@ -151,7 +143,7 @@ export function CtaBody() {
       </div>
       <button
         type="button"
-        onClick={() => setFormState('open')}
+        onClick={() => setFormOpen(true)}
         className="btn-specialist flex items-center gap-3 bg-brand-dark text-white text-lg font-bold px-8 py-4 rounded-xl shadow-hard-yellow hover:shadow-[2px_2px_0px_theme(colors.brand.yellow)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition self-start"
         data-tracking="cta-home-footer"
       >

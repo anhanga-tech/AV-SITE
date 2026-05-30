@@ -8,14 +8,15 @@ export interface NpsTextareaProps {
   rows: number;
   required?: boolean;
   maxLength?: number;
+  'aria-label'?: string;
 }
 
-export function NpsTextarea({ id, value, onChange, placeholder, rows, required, maxLength }: NpsTextareaProps) {
+export function NpsTextarea({ id, value, onChange, placeholder, rows, required, maxLength, 'aria-label': ariaLabel }: NpsTextareaProps) {
   const [focused, setFocused] = useState(false);
 
   const charsLeft = maxLength !== undefined ? maxLength - value.length : null;
   const showCounter = charsLeft !== null && (focused || value.length > (maxLength ?? 0) * 0.6);
-  const counterColor = charsLeft !== null && charsLeft < 100 ? '#f87171' : '#475569';
+  const counterUrgent = charsLeft !== null && charsLeft < 100;
 
   return (
     <div>
@@ -27,19 +28,26 @@ export function NpsTextarea({ id, value, onChange, placeholder, rows, required, 
         rows={rows}
         required={required}
         maxLength={maxLength}
-        className="w-full rounded-xl px-4 py-3 text-sm resize-none font-sans bg-slate-800 text-slate-100 outline-none leading-[1.65] [transition:border-color_0.2s_ease,box-shadow_0.2s_ease]"
-        style={{
-          border: focused ? '2px solid #0ea5e9' : '2px solid #334155',
-          boxShadow: focused ? '0 0 0 4px rgba(14,165,233,0.15)' : 'none',
-        }}
+        aria-label={ariaLabel}
+        className={[
+          'w-full rounded-xl px-4 py-3 text-sm font-sans resize-none leading-relaxed',
+          'bg-slate-800/60 text-slate-100 placeholder:text-slate-500',
+          'border-2 outline-none',
+          'transition-[border-color,box-shadow] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]',
+          focused
+            ? 'border-anhanga-action shadow-[0_0_0_4px_rgba(14,165,233,0.15)]'
+            : 'border-slate-600/40 shadow-none hover:border-slate-500',
+        ].join(' ')}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
       />
       {showCounter && (
         <p
           aria-live="polite"
-          className="text-right text-[0.75rem] mt-1 [transition:color_0.2s_ease]"
-          style={{ color: counterColor }}
+          className={[
+            'text-right text-xs mt-1.5 transition-colors duration-200',
+            counterUrgent ? 'text-red-400' : 'text-slate-500',
+          ].join(' ')}
         >
           {charsLeft} {charsLeft === 1 ? 'caractere restante' : 'caracteres restantes'}
         </p>

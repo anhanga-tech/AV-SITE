@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Sun, Fish, Building2, X } from 'lucide-react';
 import Button from './Button';
 
@@ -7,29 +8,51 @@ interface DestinationsModalProps {
 }
 
 export function DestinationsModal({ isOpen, onClose }: DestinationsModalProps) {
-  if (!isOpen) return null;
+  const dialogRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    if (isOpen && !dialog.open) {
+      dialog.showModal();
+    } else if (!isOpen && dialog.open) {
+      dialog.close();
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    const handleCancel = (e: Event) => {
+      e.preventDefault();
+      onClose();
+    };
+    const handleClick = (e: MouseEvent) => {
+      if (e.target === dialog) onClose();
+    };
+
+    dialog.addEventListener('cancel', handleCancel);
+    dialog.addEventListener('click', handleClick);
+    return () => {
+      dialog.removeEventListener('cancel', handleCancel);
+      dialog.removeEventListener('click', handleClick);
+    };
+  }, [onClose]);
 
   return (
-    <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-[fadeIn_0.2s_ease-out]"
-      role="dialog"
-      aria-modal="true"
+    <dialog
+      ref={dialogRef}
+      className="fixed inset-0 z-[100] m-auto p-4 bg-transparent backdrop:bg-fun-dark/80 backdrop:backdrop-blur-sm animate-[fadeIn_0.2s_ease-out] max-w-lg w-full"
+      aria-label="Destinos Extras"
     >
-      {/* Backdrop */}
-      <div
-        role="button"
-        tabIndex={0}
-        aria-label="Fechar modal"
-        className="absolute inset-0 bg-fun-dark/80 backdrop-blur-sm transition-opacity"
-        onClick={onClose}
-        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClose(); }}
-      ></div>
-
       {/* Modal Content */}
-      <div className="relative bg-white w-full max-w-lg rounded-3xl border-4 border-fun-dark shadow-hard-lg p-6 md:p-8 animate-[scaleIn_0.3s_cubic-bezier(0.16,1,0.3,1)] overflow-hidden">
+      <div className="relative bg-white w-full rounded-3xl border-4 border-fun-dark shadow-hard-lg p-6 md:p-8 animate-[scaleIn_0.3s_cubic-bezier(0.16,1,0.3,1)] overflow-hidden">
 
         {/* Close Button */}
         <button
+          type="button"
           onClick={onClose}
           className="absolute top-4 right-4 bg-fun-pink text-white p-2 rounded-full border-2 border-fun-dark shadow-hard hover:scale-110 hover:rotate-90 transition z-10"
           aria-label="Fechar janela"
@@ -100,6 +123,6 @@ export function DestinationsModal({ isOpen, onClose }: DestinationsModalProps) {
         </div>
 
       </div>
-    </div>
+    </dialog>
   );
 }

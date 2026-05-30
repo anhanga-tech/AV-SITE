@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Hero from './Hero';
 import Problem from './Problem';
 import Solution from './Solution';
 import Attractions from './Attractions';
 import Features from './Features';
 import Testimonials from './Testimonials';
-import FAQ from './FAQ';
+import Faq from './Faq';
 import Footer from './Footer';
 import Button from './Button';
 import { Menu, X } from 'lucide-react';
@@ -21,6 +21,31 @@ const App: React.FC = () => {
   const throttleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const showStickyRef = useRef(false);
   const isScrolledRef = useRef(false);
+  const handleScrollRef = useRef<() => void>(() => {
+    // Throttle: só executa a cada 16ms (~60fps)
+    if (throttleTimeoutRef.current) return;
+
+    throttleTimeoutRef.current = setTimeout(() => {
+      throttleTimeoutRef.current = null;
+      const scrollY = window.scrollY;
+
+
+      // Só atualiza estado se realmente mudou para evitar re-renders desnecessários
+      const newShowSticky = scrollY > 600;
+      const newIsScrolled = scrollY > 20;
+
+      // Verifica se o estado realmente precisa mudar usando refs
+      if (newShowSticky !== showStickyRef.current) {
+        setShowSticky(newShowSticky);
+        showStickyRef.current = newShowSticky;
+      }
+
+      if (newIsScrolled !== isScrolledRef.current) {
+        setIsScrolled(newIsScrolled);
+        isScrolledRef.current = newIsScrolled;
+      }
+    }, 16);
+  });
 
   // Atualiza refs quando estado muda para usar valores atuais no handler
   useEffect(() => {
@@ -31,46 +56,22 @@ const App: React.FC = () => {
     isScrolledRef.current = isScrolled;
   }, [isScrolled]);
 
-  const handleScroll = useCallback(() => {
-    // Throttle: só executa a cada 16ms (~60fps)
-    if (throttleTimeoutRef.current) return;
-    
-    throttleTimeoutRef.current = setTimeout(() => {
-      throttleTimeoutRef.current = null;
-      const scrollY = window.scrollY;
-      
-
-      // Só atualiza estado se realmente mudou para evitar re-renders desnecessários
-      const newShowSticky = scrollY > 600;
-      const newIsScrolled = scrollY > 20;
-      
-      // Verifica se o estado realmente precisa mudar usando refs
-      if (newShowSticky !== showStickyRef.current) {
-        setShowSticky(newShowSticky);
-        showStickyRef.current = newShowSticky;
-      }
-      
-      if (newIsScrolled !== isScrolledRef.current) {
-        setIsScrolled(newIsScrolled);
-        isScrolledRef.current = newIsScrolled;
-      }
-    }, 16);
-  }, []);
-
   useEffect(() => {
-    
+    const handleScroll = () => handleScrollRef.current();
+
     // Usa passive listener para melhor performance
     window.addEventListener('scroll', handleScroll, { passive: true });
-    
-    
+
+    const throttleTimeout = throttleTimeoutRef;
+
     return () => {
-      if (throttleTimeoutRef.current) {
-        clearTimeout(throttleTimeoutRef.current);
-        throttleTimeoutRef.current = null;
+      if (throttleTimeout.current) {
+        clearTimeout(throttleTimeout.current);
+        throttleTimeout.current = null;
       }
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [handleScroll]);
+  }, []);
 
   const navLinks = [
     { name: 'O Perrengue', href: '#problem' },
@@ -162,6 +163,7 @@ const App: React.FC = () => {
 
             {/* Mobile Menu Toggle */}
             <button
+              type="button"
               onClick={toggleMobileMenu}
               className="lg:hidden relative z-50 p-2 text-fun-dark hover:bg-zinc-100 rounded-lg transition-colors focus:outline-none focus:ring-4 focus:ring-fun-blue"
               aria-label={mobileMenuOpen ? "Fechar menu" : "Abrir menu"}
@@ -198,7 +200,7 @@ const App: React.FC = () => {
         <div id="attractions" className="scroll-mt-32 md:scroll-mt-48"><Attractions /></div>
         <Features />
         <div id="testimonials" className="scroll-mt-32 md:scroll-mt-48"><Testimonials /></div>
-        <div id="faq" className="scroll-mt-32 md:scroll-mt-48"><FAQ /></div>
+        <div id="faq" className="scroll-mt-32 md:scroll-mt-48"><Faq /></div>
       </main>
 
       <Footer />

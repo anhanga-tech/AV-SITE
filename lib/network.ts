@@ -54,7 +54,13 @@ export function getClientIP(request: Request): string {
 
     const forwardedFor = getTrimmedHeader(request, 'x-forwarded-for');
     if (forwardedFor) {
-        const ips = forwardedFor.split(',').map(ip => ip.trim()).filter(Boolean);
+        const ips: string[] = [];
+        for (const ip of forwardedFor.split(',')) {
+            const trimmed = ip.trim();
+            if (trimmed) {
+                ips.push(trimmed);
+            }
+        }
         // XFF is only reached in local dev or on platforms that don't set
         // cf-connecting-ip / x-vercel-forwarded-for. In those contexts,
         // the leftmost IP is the original client (RFC 7239). Spoofing via a

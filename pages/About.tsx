@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { m, Variants } from 'framer-motion';
-import { SEO } from '../components/SEO';
+import { Seo } from '../components/Seo';
 import { OrganizationSchema } from '../components/schemas/OrganizationSchema';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { LazyImage } from '../components/ui/LazyImage';
@@ -41,7 +41,7 @@ const About: React.FC = () => {
 
   return (
     <div className="bg-brand-surface pt-32 pb-20">
-      <SEO
+      <Seo
         title="Sobre a Anhangá Viagens | Agência de Viagens em São Paulo"
         description="Conheça a história da Anhangá Viagens. Agência de turismo credenciada no Cadastur em São Paulo, especializada em roteiros personalizados."
         canonical="https://www.anhanga.tur.br/sobre/"
@@ -80,6 +80,7 @@ const About: React.FC = () => {
           </p>
           <div className="flex justify-center">
             <button
+              type="button"
               onClick={() => openContactModal({ source: 'about' })}
               className="btn-whatsapp btn-specialist bg-brand-vibrant text-white px-8 py-4 rounded-2xl font-black text-lg shadow-xl shadow-brand-vibrant/20 hover:scale-105 transition-transform active:scale-95 flex items-center gap-3"
               data-tracking="hero-about"
@@ -281,6 +282,7 @@ const About: React.FC = () => {
               Seja para um festival épico ou um refúgio relaxante, nós desenhamos a viagem perfeita para você.
             </p>
             <button
+              type="button"
               onClick={() => openContactModal({ source: 'about' })}
               className="btn-whatsapp btn-specialist bg-brand-vibrant text-white px-10 py-5 rounded-2xl font-black text-lg shadow-xl shadow-brand-vibrant/20 hover:scale-105 transition-transform active:scale-95 flex items-center gap-3 mx-auto"
               data-tracking="footer-about"

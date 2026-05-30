@@ -29,6 +29,7 @@ const FAQItem = memo(({ question, answer, idx }: FAQItemProps) => {
             className={`mb-4 rounded-2xl overflow-hidden transition duration-300 border border-white/40 shadow-sm custom-backdrop ${isOpen ? 'shadow-md scale-[1.01]' : ''}`}
         >
             <button
+                type="button"
                 className="w-full px-6 py-5 flex justify-between items-center text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan group bg-white/60 hover:bg-white/80 transition-colors"
                 onClick={handleToggle}
                 aria-expanded={isOpen}
@@ -196,7 +197,7 @@ const FAQS = [
  * PERFORMANCE WIN: Prevents the entire FAQ section from re-rendering when parent state changes.
  * Individual FAQ items are already memoized, but memoizing the container avoids the outer render logic.
  */
-const FAQ = memo(() => {
+const Faq = memo(() => {
     return (
         <section
             id="faq-section"
@@ -254,6 +255,6 @@ const FAQ = memo(() => {
 });
 
 FAQItem.displayName = 'FAQItem';
-FAQ.displayName = 'FAQ';
+Faq.displayName = 'Faq';
 
-export default FAQ;
+export default Faq;

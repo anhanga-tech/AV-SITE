@@ -62,6 +62,7 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <div className={`relative group ${fullWidth ? 'w-full' : 'inline-block'}`}>
       <button
+        type="button"
         onClick={(e) => {
           e.preventDefault();
           openContactModal({ source: 'beto-carrero' });

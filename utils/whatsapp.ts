@@ -280,7 +280,7 @@ export const getTrackingDataObject = (): TrackingData | null => {
     return null;
 };
 
-export const getTrackingRef = (): string | null => {
+const getTrackingRef = (): string | null => {
     const tracking = getTrackingDataObject();
     if (!tracking) return null;
 
@@ -303,26 +303,22 @@ export const getWhatsAppLink = (message: string, options: WhatsAppLinkOptions = 
 };
 
 export const useWhatsAppLink = (message: string, options: WhatsAppLinkOptions = {}): string => {
-    const [whatsappUrl, setWhatsappUrl] = useState(() => getWhatsAppLink(message, options));
+    const { appendTrackingRef } = options;
+    const [whatsappUrl, setWhatsappUrl] = useState(() => getWhatsAppLink(message, { appendTrackingRef }));
 
     useEffect(() => {
-        const newUrl = getWhatsAppLink(message, options);
+        const newUrl = getWhatsAppLink(message, { appendTrackingRef });
         setWhatsappUrl((prev) => (prev === newUrl ? prev : newUrl));
 
         const timer = setTimeout(() => {
             captureTrackingDataObject();
-            const updatedUrl = getWhatsAppLink(message, options);
+            const updatedUrl = getWhatsAppLink(message, { appendTrackingRef });
             setWhatsappUrl((prev) => (prev === updatedUrl ? prev : updatedUrl));
         }, 1000);
 
         return () => clearTimeout(timer);
-    }, [message, options.appendTrackingRef]);
+    }, [message, appendTrackingRef]);
 
     return whatsappUrl;
 };
 
-export const refreshTrackingData = (): string | null => {
-    cachedTrackingData = null;
-    cachedTrackingObject = null;
-    return captureTrackingData();
-};

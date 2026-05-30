@@ -11,7 +11,7 @@ const items: FAQItem[] = [
   { question: "E se eu precisar cancelar?", answer: "Sem letras miúdas. Seguimos as regras da companhia aérea e do hotel, mas nossa equipe briga por você para conseguir as melhores condições de remarcação ou reembolso possíveis." },
 ];
 
-const FAQ: React.FC = () => {
+const Faq: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const toggleAccordion = (index: number) => {
@@ -46,7 +46,8 @@ const FAQ: React.FC = () => {
                     key={item.question}
                     className={`border-2 border-fun-dark rounded-2xl transition duration-300 overflow-hidden ${isOpen ? 'bg-blue-50 shadow-hard' : 'bg-white hover:bg-zinc-50'}`}
                   >
-                    <button 
+                    <button
+                      type="button"
                       onClick={() => toggleAccordion(idx)}
                       className="w-full flex items-center justify-between p-5 md:p-6 text-left focus:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-fun-blue/50"
                       aria-expanded={isOpen}
@@ -114,4 +115,4 @@ const FAQ: React.FC = () => {
   );
 };
 
-export default FAQ;
+export default Faq;

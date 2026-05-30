@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { SEO } from '../../components/SEO';
+import { Seo } from '../../components/Seo';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { useQuizCapture } from '../../hooks/useQuizCapture';
 import { getWhatsAppLink } from '../../utils/whatsapp';
@@ -299,7 +299,7 @@ function HeroScreen({ onStart }: { onStart: () => void }) {
                     <em>perfil de viajante</em> e os destinos que combinam com você.
                 </p>
                 <div className="quiz-hero-cta">
-                    <button className="quiz-btn quiz-btn-primary quiz-btn-lg quiz-btn--hero" onClick={onStart}>
+                    <button type="button" className="quiz-btn quiz-btn-primary quiz-btn-lg quiz-btn--hero" onClick={onStart}>
                         Bora começar
                         <span className="quiz-arrow">→</span>
                     </button>
@@ -359,15 +359,15 @@ function QuestionScreen({ q, qIndex, total, value, onChange, onNext, onBack }: Q
     const [pendingId, setPendingId] = useState<string | null>(null);
     const advanceTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    // reset pending when question changes and clear any pending timer
+    // Timer cleanup on unmount (state resets via key={q.id} on the render site)
     useEffect(() => {
-        setPendingId(null);
+        const timerRef = advanceTimerRef;
         return () => {
-            if (advanceTimerRef.current !== null) {
-                clearTimeout(advanceTimerRef.current);
+            if (timerRef.current !== null) {
+                clearTimeout(timerRef.current);
             }
         };
-    }, [q.id]);
+    }, []);
 
     function toggle(optId: string) {
         if (q.multi) {
@@ -398,7 +398,7 @@ function QuestionScreen({ q, qIndex, total, value, onChange, onNext, onBack }: Q
     return (
         <div className="quiz-screen quiz-screen-question">
             <div className="quiz-q-top">
-                <button className="quiz-q-back" onClick={onBack} aria-label="Voltar">
+                <button type="button" className="quiz-q-back" onClick={onBack} aria-label="Voltar">
                     ← voltar
                 </button>
                 <Progress current={qIndex + 1} total={total} />
@@ -413,6 +413,7 @@ function QuestionScreen({ q, qIndex, total, value, onChange, onNext, onBack }: Q
                 <div className={`quiz-opt-grid ${gridClass}`}>
                     {q.options.map((opt, i) => (
                         <button
+                            type="button"
                             key={opt.id}
                             className={[
                                 `quiz-opt ${optClass}`,
@@ -434,6 +435,7 @@ function QuestionScreen({ q, qIndex, total, value, onChange, onNext, onBack }: Q
                 {q.multi && (
                     <div className="quiz-q-foot">
                         <button
+                            type="button"
                             className="quiz-btn quiz-btn-primary"
                             disabled={selected.length === 0}
                             onClick={onNext}
@@ -484,7 +486,7 @@ function PreLeadScreen({ profile, onSubmit, onBack }: PreLeadScreenProps) {
     return (
         <div className="quiz-screen quiz-screen-lead">
             <div className="quiz-q-top">
-                <button className="quiz-q-back" onClick={onBack} aria-label="Voltar">← voltar</button>
+                <button type="button" className="quiz-q-back" onClick={onBack} aria-label="Voltar">← voltar</button>
                 <span className="quiz-q-step">Último passo!</span>
             </div>
 
@@ -563,7 +565,7 @@ function PreLeadScreen({ profile, onSubmit, onBack }: PreLeadScreenProps) {
                             Veja nossa <a href="/politica-privacidade/" target="_blank" rel="noopener noreferrer">política de privacidade</a>.
                         </span>
                     </label>
-                    {errors.aceite && <span role="status" className="quiz-err quiz-err-block">{errors.aceite}</span>}
+                    {errors.aceite && <span role="alert" className="quiz-err quiz-err-block">{errors.aceite}</span>}
 
                     <button type="submit" className="quiz-btn quiz-btn-primary quiz-btn-lg">
                         Revelar meu perfil
@@ -849,7 +851,7 @@ function ResultScreen({ profile, mainDest, inspirations, lead, onRestart, baseWa
                         firstName={firstName}
                         baseWaUrl={baseWaUrl}
                     />
-                    <button className="quiz-btn quiz-btn-ghost quiz-result-restart" onClick={onRestart}>
+                    <button type="button" className="quiz-btn quiz-btn-ghost quiz-result-restart" onClick={onRestart}>
                         Refazer o quiz
                     </button>
                 </div>
@@ -900,6 +902,7 @@ function StageContent({
         const q = QUIZ_QUESTIONS[stage.index];
         return (
             <QuestionScreen
+                key={q.id}
                 q={q}
                 qIndex={stage.index}
                 total={QUIZ_QUESTIONS.length}
@@ -1034,7 +1037,7 @@ export default function QuizAnhangaLanding() {
 
     return (
         <>
-            <SEO
+            <Seo
                 title="Quiz de Destinos | Descubra seu próximo rolê — Anhangá Viagens"
                 description="6 perguntas rápidas para descobrir seu perfil de viajante e os destinos que mais combinam com você. Gratuito e sem compromisso."
                 canonical="https://www.anhanga.tur.br/quiz/"
