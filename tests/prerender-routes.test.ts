@@ -33,6 +33,6 @@ test('buildPrerenderRoutes includes blog index and blog post routes from MDX fil
 test('base prerender routes come from the indexable static sitemap routes', () => {
   assert.ok(BASE_PRERENDER_ROUTES.includes('/'));
   assert.ok(BASE_PRERENDER_ROUTES.includes('/blog'));
-  assert.ok(BASE_PRERENDER_ROUTES.includes('/brazil-promotion-day'));
+  assert.ok(BASE_PRERENDER_ROUTES.includes('/corporativo'));
   assert.equal(BASE_PRERENDER_ROUTES.includes('/nps'), false);
 });
