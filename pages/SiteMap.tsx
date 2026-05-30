@@ -16,6 +16,10 @@ const SiteMap: React.FC = () => {
     { to: `${SITE_URL}/beto-carrero/`, label: 'Pacote Beto Carrero' },
     { to: `${SITE_URL}/melhor-idade/`, label: 'Viagens para Melhor Idade' },
     { to: `${SITE_URL}/lollapalooza/`, label: 'Lollapalooza Brasil' },
+    { to: `${SITE_URL}/consultoria-de-viagem/`, label: 'Consultoria de Viagem Personalizada' },
+    { to: `${SITE_URL}/curadoria-cruzeiros-brasil/`, label: 'Cruzeiros pelo Brasil' },
+    { to: `${SITE_URL}/corporativo/`, label: 'Viagens Corporativas' },
+    { to: `${SITE_URL}/quiz/`, label: 'Quiz: Descubra Seu Destino Ideal' },
     { to: `${SITE_URL}/termos-de-uso/`, label: 'Termos de Uso' },
     { to: `${SITE_URL}/politica-privacidade/`, label: 'Política de Privacidade' }
   ];

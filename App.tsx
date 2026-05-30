@@ -26,7 +26,7 @@ const OrlandoLanding = lazy(() => import('./pages/landings/OrlandoLanding'));
 const MelhorIdadeLanding = lazy(() => import('./pages/landings/MelhorIdadeLanding'));
 const CorporativoLanding = lazy(() => import('./pages/landings/CorporativoLanding'));
 const ConsultoriaDeViagemLanding = lazy(() => import('./pages/landings/ConsultoriaDeViagemLanding'));
-const ViagensParaExecutivosLanding = lazy(() => import('./pages/landings/ViagensParaExecutivosLanding'));
+
 const CuradoriaCruzeirosBrasilLanding = lazy(() => import('./pages/landings/CuradoriaCruzeirosBrasilLanding'));
 const NpsPage = lazy(() => import('./pages/NpsPage'));
 const QuizAnhangaLanding = lazy(() => import('./pages/landings/QuizAnhangaLanding'));
@@ -81,7 +81,7 @@ const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClient
           <Route path="/corporativo" element={<CorporativoLanding />} />
           <Route path="/brazil-promotion-day" element={<Navigate to="/corporativo" replace />} />
           <Route path="/consultoria-de-viagem" element={<ConsultoriaDeViagemLanding />} />
-          <Route path="/viagens-para-executivos" element={<ViagensParaExecutivosLanding />} />
+          <Route path="/viagens-para-executivos" element={<Navigate to="/corporativo" replace />} />
           <Route path="/curadoria-cruzeiros-brasil" element={<CuradoriaCruzeirosBrasilLanding />} />
           <Route path="/nps" element={<NpsPage />} />
           <Route path="/quiz" element={<QuizAnhangaLanding />} />

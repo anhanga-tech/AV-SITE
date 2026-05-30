@@ -57,6 +57,10 @@ const Footer: React.FC = () => {
                             <li><a href={`${SITE_URL}/beto-carrero/`} className="hover:text-brand-yellow transition-colors">Pacote Beto Carrero</a></li>
                             <li><a href={`${SITE_URL}/lollapalooza/`} className="hover:text-brand-yellow transition-colors">Lollapalooza Brasil</a></li>
                             <li><a href={`${SITE_URL}/melhor-idade/`} className="hover:text-brand-yellow transition-colors">Pacotes Melhor Idade 50+</a></li>
+                            <li><a href={`${SITE_URL}/consultoria-de-viagem/`} className="hover:text-brand-yellow transition-colors">Consultoria de Viagem</a></li>
+                            <li><a href={`${SITE_URL}/curadoria-cruzeiros-brasil/`} className="hover:text-brand-yellow transition-colors">Cruzeiros pelo Brasil</a></li>
+                            <li><a href={`${SITE_URL}/corporativo/`} className="hover:text-brand-yellow transition-colors">Viagens Corporativas</a></li>
+                            <li><a href={`${SITE_URL}/quiz/`} className="hover:text-brand-yellow transition-colors">Quiz de Destinos</a></li>
                             <li><a href={`${SITE_URL}/mapa-do-site/`} className="hover:text-brand-yellow transition-colors">Mapa do Site</a></li>
                             <li><a href={`${SITE_URL}/termos-de-uso/`} className="hover:text-brand-yellow transition-colors">Termos de Uso</a></li>
                             <li><a href={`${SITE_URL}/politica-privacidade/`} className="hover:text-brand-yellow transition-colors">Política de Privacidade</a></li>
