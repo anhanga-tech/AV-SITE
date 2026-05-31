@@ -18,9 +18,20 @@ export default defineConfig({
     baseURL: BASE_URL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
-    // Block Mautic tracking during tests — prevents anonymous contacts from being created in production Mautic
+    // Block third-party tracking during tests — prevents test data from polluting production CRMs
     launchOptions: {
-      args: ['--host-resolver-rules=MAP mkt.anhanga.tur.br ~NOTFOUND'],
+      args: [
+        '--host-resolver-rules='
+        + 'MAP mkt.anhanga.tur.br ~NOTFOUND, '
+        + 'MAP *.hubspot.com ~NOTFOUND, '
+        + 'MAP *.hsforms.com ~NOTFOUND, '
+        + 'MAP *.hsforms.net ~NOTFOUND, '
+        + 'MAP *.hscollectedforms.net ~NOTFOUND, '
+        + 'MAP *.hs-scripts.com ~NOTFOUND, '
+        + 'MAP *.hs-analytics.net ~NOTFOUND, '
+        + 'MAP *.hs-banner.com ~NOTFOUND, '
+        + 'MAP *.usemessages.com ~NOTFOUND',
+      ],
     },
   },
 
