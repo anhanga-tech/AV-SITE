@@ -219,7 +219,7 @@ const MelhorIdadeLanding: React.FC = () => {
             <a href="https://www.anhanga.tur.br/consultoria-de-viagem/" className="px-5 py-3 rounded-full bg-white/10 border border-white/20 text-white font-semibold hover:bg-white/20 transition-colors">
               Consultoria de Viagem
             </a>
-            <a href="/blog/" className="px-5 py-3 rounded-full bg-white/10 border border-white/20 text-white font-semibold hover:bg-white/20 transition-colors">
+            <a href="https://www.anhanga.tur.br/blog/" className="px-5 py-3 rounded-full bg-white/10 border border-white/20 text-white font-semibold hover:bg-white/20 transition-colors">
               Dicas de Viagem
             </a>
           </div>
