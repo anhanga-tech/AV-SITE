@@ -60,6 +60,7 @@ async function uploadPhotoToR2(
   sourceUrl: string,
   config: R2Config
 ): Promise<string> {
+  // @ts-expect-error — @aws-sdk/client-s3 is an optional runtime dependency
   const { S3Client, PutObjectCommand } = await import('@aws-sdk/client-s3');
   const response = await fetch(sourceUrl);
   if (!response.ok) return '';
