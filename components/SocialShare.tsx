@@ -66,7 +66,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                         handleNativeShare();
                     }}
                     onMouseEnter={prefetchHaptics}
-                    className="p-2 bg-white/80 hover:bg-brand-cyan hover:text-white text-zinc-600 rounded-full transition shadow-sm border border-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-cyan"
+                    className="min-h-12 min-w-12 flex items-center justify-center bg-white/80 hover:bg-brand-cyan hover:text-white text-zinc-600 rounded-full transition shadow-sm border border-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-cyan"
                     title="Compartilhar"
                     aria-label="Compartilhar"
                 >
@@ -80,7 +80,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                         handleCopy();
                     }}
                     onMouseEnter={prefetchHaptics}
-                    className={`p-2 rounded-full transition shadow-sm border focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${copied ? 'bg-green-700 text-white border-green-800 focus-visible:ring-green-700' : 'bg-white/80 text-zinc-600 border-zinc-100 hover:bg-zinc-100 focus-visible:ring-zinc-400'}`}
+                    className={`min-h-12 min-w-12 flex items-center justify-center rounded-full transition shadow-sm border focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${copied ? 'bg-green-700 text-white border-green-800 focus-visible:ring-green-700' : 'bg-white/80 text-zinc-600 border-zinc-100 hover:bg-zinc-100 focus-visible:ring-zinc-400'}`}
                     role={copied ? "status" : undefined}
                     title={copied ? "Link copiado!" : "Copiar link"}
                     aria-label={copied ? "Link copiado com sucesso" : "Copiar link"}
@@ -109,7 +109,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     href={links.whatsapp}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2.5 bg-[#25D366] text-white rounded-xl hover:scale-110 transition-transform shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#25D366]"
+                    className="min-h-12 min-w-12 flex items-center justify-center bg-[#25D366] text-white rounded-xl hover:scale-110 transition-transform shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#25D366]"
                     title="Compartilhar no WhatsApp"
                     aria-label="Compartilhar no WhatsApp"
                     onMouseEnter={prefetchHaptics}
@@ -125,7 +125,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     href={links.facebook}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2.5 bg-[#1877F2] text-white rounded-xl hover:scale-110 transition-transform shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1877F2]"
+                    className="min-h-12 min-w-12 flex items-center justify-center bg-[#1877F2] text-white rounded-xl hover:scale-110 transition-transform shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1877F2]"
                     title="Compartilhar no Facebook"
                     aria-label="Compartilhar no Facebook"
                     onMouseEnter={prefetchHaptics}
@@ -141,7 +141,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     href={links.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2.5 bg-[#0A66C2] text-white rounded-xl hover:scale-110 transition-transform shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#0A66C2]"
+                    className="min-h-12 min-w-12 flex items-center justify-center bg-[#0A66C2] text-white rounded-xl hover:scale-110 transition-transform shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#0A66C2]"
                     title="Compartilhar no LinkedIn"
                     aria-label="Compartilhar no LinkedIn"
                     onMouseEnter={prefetchHaptics}
@@ -159,7 +159,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     type="button"
                     onClick={handleNativeShare}
                     onMouseEnter={prefetchHaptics}
-                    className="hidden lg:flex p-2.5 bg-zinc-100 text-zinc-600 rounded-xl hover:bg-zinc-200 transition shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-cyan"
+                    className="hidden lg:flex min-h-12 min-w-12 items-center justify-center bg-zinc-100 text-zinc-600 rounded-xl hover:bg-zinc-200 transition shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-cyan"
                     title="Mais opções de compartilhamento"
                     aria-label="Mais opções de compartilhamento"
                 >
@@ -171,7 +171,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     type="button"
                     onClick={handleCopy}
                     onMouseEnter={prefetchHaptics}
-                    className={`p-2.5 rounded-xl transition shadow-sm border focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${copied ? 'bg-green-700 text-white border-green-800 focus-visible:ring-green-700' : 'bg-zinc-100 text-zinc-600 border-transparent hover:bg-zinc-200 focus-visible:ring-zinc-400'}`}
+                    className={`min-h-12 min-w-12 flex items-center justify-center rounded-xl transition shadow-sm border focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${copied ? 'bg-green-700 text-white border-green-800 focus-visible:ring-green-700' : 'bg-zinc-100 text-zinc-600 border-transparent hover:bg-zinc-200 focus-visible:ring-zinc-400'}`}
                     role={copied ? "status" : undefined}
                     title={copied ? "Link copiado!" : "Copiar link"}
                     aria-label={copied ? "Link copiado com sucesso" : "Copiar link"}
