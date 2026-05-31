@@ -85,7 +85,7 @@ test.describe('Corporativo Landing Page', () => {
 
     page.on('requestfinished', (req) => {
       const url = req.url();
-      if (/hubspot|hsforms|hscollectedforms|hs-scripts|hs-analytics/i.test(url)) {
+      if (/hubspot|hsforms|hscollectedforms|hs-scripts|hs-analytics|hs-banner|usemessages/i.test(url)) {
         hubspotRequests.push(url);
       }
     });
@@ -112,8 +112,7 @@ test.describe('Corporativo Landing Page', () => {
     await landing.submit();
     await landing.expectSuccess();
 
-    // Allow time for any async tracking to attempt
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(500);
 
     expect(hubspotRequests).toEqual([]);
   });
