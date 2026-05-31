@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { getInitials } from '../../data/reviewsAdapter';
 
 interface ReviewAvatarProps {
@@ -15,11 +15,13 @@ export const ReviewAvatar: React.FC<ReviewAvatarProps> = ({
   className = '',
 }) => {
   const [hasImageError, setHasImageError] = useState(false);
+  const prevPhotoUrl = useRef(photoUrl);
   const initials = getInitials(name);
 
-  useEffect(() => {
+  if (prevPhotoUrl.current !== photoUrl) {
+    prevPhotoUrl.current = photoUrl;
     setHasImageError(false);
-  }, [photoUrl]);
+  }
 
   if (!photoUrl || hasImageError) {
     return (
