@@ -615,7 +615,7 @@ const Destinations: React.FC = memo(() => {
                             <button
                                 type="button"
                                 onClick={() => handleZoom('in')}
-                                className="size-10 bg-white border-2 border-zinc-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition text-zinc-700 font-black"
+                                className="size-12 bg-white border-2 border-zinc-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition text-zinc-700 font-black"
                                 aria-label="Aumentar zoom no mapa"
                             >
                                 <Plus className="size-5" />
@@ -623,7 +623,7 @@ const Destinations: React.FC = memo(() => {
                             <button
                                 type="button"
                                 onClick={() => handleZoom('out')}
-                                className="size-10 bg-white border-2 border-zinc-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition text-zinc-700 font-black"
+                                className="size-12 bg-white border-2 border-zinc-200 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition text-zinc-700 font-black"
                                 aria-label="Diminuir zoom no mapa"
                             >
                                 <Minus className="size-5" />

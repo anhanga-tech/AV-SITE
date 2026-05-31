@@ -125,7 +125,7 @@ export function MobileNavigationMenu({
               <a
                 key={subLink.name}
                 href={href}
-                className="text-zinc-700 font-medium py-2 border-b border-zinc-50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-vibrant focus-visible:outline-offset-1 rounded"
+                className="text-zinc-700 font-medium py-3 border-b border-zinc-50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-vibrant focus-visible:outline-offset-1 rounded"
                 onClick={(event) => {
                   if (!isPageLink(subLink.href) && isHome) {
                     onNavClick(event, subLink.href);
@@ -144,7 +144,7 @@ export function MobileNavigationMenu({
           <a
             key={link.name}
             href={buildSectionHref(link.href!, isHome)}
-            className="text-zinc-700 font-medium py-2 border-b border-zinc-50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-vibrant focus-visible:outline-offset-1 rounded"
+            className="text-zinc-700 font-medium py-3 border-b border-zinc-50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-vibrant focus-visible:outline-offset-1 rounded"
             onClick={(event) => {
               if (isHome) {
                 onNavClick(event, link.href!);
@@ -160,7 +160,7 @@ export function MobileNavigationMenu({
 
       <a
         href={getBlogHomeUrl()}
-        className="text-zinc-700 font-medium py-2 border-b border-zinc-50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-vibrant focus-visible:outline-offset-1 rounded"
+        className="text-zinc-700 font-medium py-3 border-b border-zinc-50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-vibrant focus-visible:outline-offset-1 rounded"
         onClick={onCloseMenu}
       >
         Blog de Viagens
