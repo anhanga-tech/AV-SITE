@@ -8,7 +8,7 @@ const DEFAULT_OG_IMAGE_HEIGHT = '630';
 
 const SITE_NAME = "Anhangá Viagens";
 
-const normalizeStr = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+const normalizeStr = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
 function normalizeCanonical(urlStr: string): string {
   try {

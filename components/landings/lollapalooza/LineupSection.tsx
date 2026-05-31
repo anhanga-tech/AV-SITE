@@ -17,6 +17,7 @@ function getArtistImageUrl(url: string, width: number, height?: number) {
 }
 
 function handleImageError(e: React.SyntheticEvent<HTMLImageElement, Event>) {
+  e.currentTarget.onerror = null;
   e.currentTarget.src = FALLBACK_IMAGE;
 }
 
