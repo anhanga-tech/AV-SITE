@@ -80,6 +80,44 @@ test.describe('Corporativo Landing Page', () => {
     });
   });
 
+  test('should not leak form data to HubSpot tracking', async ({ page }) => {
+    const hubspotRequests: string[] = [];
+
+    page.on('requestfinished', (req) => {
+      const url = req.url();
+      if (/hubspot|hsforms|hscollectedforms|hs-scripts|hs-analytics/i.test(url)) {
+        hubspotRequests.push(url);
+      }
+    });
+
+    await page.route('**/api/submit-lead', async route => {
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true, requestId: 'corp-no-leak' }),
+      });
+    });
+
+    const landing = new CorporativoPage(page);
+    await landing.goto();
+    await landing.fillForm({
+      firstName: 'Teste',
+      lastName: 'Regressão',
+      email: 'regressao@teste.com.br',
+      whatsapp: '(11) 99999-0000',
+      empresa: 'Empresa Fictícia',
+      cargo: 'QA',
+    });
+
+    await landing.submit();
+    await landing.expectSuccess();
+
+    // Allow time for any async tracking to attempt
+    await page.waitForTimeout(2000);
+
+    expect(hubspotRequests).toEqual([]);
+  });
+
   test('should handle navigation to #contato anchor', async ({ page, isMobile }) => {
     const landing = new CorporativoPage(page);
     await landing.goto();
