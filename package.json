@@ -19,6 +19,7 @@
     "test:update-snapshots": "playwright test tests/e2e/visual.spec.ts --update-snapshots",
     "test:size": "bundlesize --config bundlesize.config.json",
     "prepare": "node scripts/install-hooks.mjs",
+    "reviews:fetch": "tsx scripts/fetch-google-reviews.ts",
     "update:dates": "node scripts/update-post-dates.mjs --all",
     "doctor": "react-doctor"
   },
