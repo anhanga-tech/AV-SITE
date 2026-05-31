@@ -63,10 +63,10 @@ export function CorpGlobe() {
                 .pointAltitude(0.01)
                 .pointResolution(10);
 
-            // High-DPI rendering — set DPR then resize canvas at physical pixels
+            // High-DPI rendering — cap DPR at 2 to balance sharpness vs. performance
             const renderer = globe.renderer();
             if (renderer) {
-                renderer.setPixelRatio(window.devicePixelRatio);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
                 renderer.setSize(el.clientWidth, el.clientHeight);
             }
 
@@ -81,12 +81,26 @@ export function CorpGlobe() {
 
             globe.pointOfView({ lat: -18, lng: -48, altitude: 1.55 }, 0);
 
+            const resizeObserver = new ResizeObserver(() => {
+                if (el) {
+                    globe.width(el.clientWidth);
+                    globe.height(el.clientHeight);
+                }
+            });
+            resizeObserver.observe(el);
+
             cleanupRef.current = () => {
                 try {
+                    resizeObserver.disconnect();
                     const r = globe.renderer();
-                    if (r) { r.dispose(); r.forceContextLoss?.(); }
+                    if (r) {
+                        r.dispose();
+                        r.getContext()?.getExtension('WEBGL_lose_context')?.loseContext();
+                    }
                 } catch { /* ignore cleanup errors */ }
             };
+        }).catch((err) => {
+            console.error('Failed to load globe.gl:', err);
         });
 
         return () => {
