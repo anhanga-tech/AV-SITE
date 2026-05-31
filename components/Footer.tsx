@@ -116,9 +116,9 @@ const Footer: React.FC = () => {
                             {runtimeMetadata ? ` • ${runtimeMetadata.currentYear}` : null}
                         </div>
                         <div className="text-[10px] text-zinc-400 font-medium flex flex-wrap justify-center md:justify-end gap-x-2">
-                            <span>ANHANGA TURISMO LTDA • CNPJ/Cadastur: <a href="https://cadastur.turismo.gov.br/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline decoration-zinc-500 underline-offset-2">37.036.732/0001-41</a></span>
+                            <span>ANHANGA TURISMO LTDA • CNPJ/Cadastur: <a href="https://cadastur.turismo.gov.br/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline underline-offset-2">37.036.732/0001-41</a></span>
                             <span className="hidden md:inline">•</span>
-                            <a href="https://www.abav.com.br/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline decoration-zinc-500 underline-offset-2">Membro ABAV</a>
+                            <a href="https://www.abav.com.br/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline underline-offset-2">Membro ABAV</a>
                         </div>
                         <div className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mt-2">
                             Conteúdo da equipe Anhangá Viagens

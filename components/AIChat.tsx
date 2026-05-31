@@ -576,7 +576,7 @@ const AIChat: React.FC = memo(() => {
               type="button"
               onClick={() => submitMessage(input)}
               disabled={isLoading || !input.trim()}
-              className="absolute right-2 bottom-1.5 min-h-12 min-w-12 flex items-center justify-center bg-brand-vibrant text-white rounded-[10px] shadow-sm hover:bg-brand-blue hover:shadow-md transition disabled:opacity-0 disabled:scale-75 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-vibrant/50"
+              className="absolute right-2 bottom-1 min-h-12 min-w-12 flex items-center justify-center bg-brand-vibrant text-white rounded-[10px] shadow-sm hover:bg-brand-blue hover:shadow-md transition disabled:opacity-0 disabled:scale-75 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-vibrant/50"
               aria-label="Enviar mensagem"
             >
               <PaperPlaneTilt className="size-5 ml-0.5" weight="fill" />
