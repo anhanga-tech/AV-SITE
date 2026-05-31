@@ -456,10 +456,10 @@ const AIChat: React.FC = memo(() => {
           <button
             type="button"
             onClick={() => closeChatDrawer()}
-            className="text-zinc-400 hover:text-zinc-700 bg-zinc-50 hover:bg-zinc-100 rounded-full p-2.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-vibrant"
+            className="text-zinc-400 hover:text-zinc-700 bg-zinc-50 hover:bg-zinc-100 rounded-full p-3 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-vibrant"
             aria-label="Fechar gaveta"
           >
-            <X className="size-5" weight="bold" />
+            <X className="size-6" weight="bold" />
           </button>
         </div>
 
@@ -533,7 +533,7 @@ const AIChat: React.FC = memo(() => {
                         type="button"
                         key={chip.id}
                         onClick={() => submitMessage(chip.label)}
-                        className="text-[12px] font-semibold text-zinc-600 bg-white border border-zinc-200 px-4 py-2 rounded-xl shadow-sm hover:shadow hover:border-brand-vibrant/30 hover:text-brand-vibrant hover:-translate-y-0.5 transition text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-vibrant/50"
+                        className="text-[13px] font-semibold text-zinc-600 bg-white border border-zinc-200 px-4 py-3 min-h-12 rounded-xl shadow-sm hover:shadow hover:border-brand-vibrant/30 hover:text-brand-vibrant hover:-translate-y-0.5 transition text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-vibrant/50"
                       >
                         {chip.label}
                       </button>
@@ -576,10 +576,10 @@ const AIChat: React.FC = memo(() => {
               type="button"
               onClick={() => submitMessage(input)}
               disabled={isLoading || !input.trim()}
-              className="absolute right-2 bottom-2 p-2.5 bg-brand-vibrant text-white rounded-[10px] shadow-sm hover:bg-brand-blue hover:shadow-md transition disabled:opacity-0 disabled:scale-75 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-vibrant/50"
+              className="absolute right-2 bottom-1 min-h-12 min-w-12 flex items-center justify-center bg-brand-vibrant text-white rounded-[10px] shadow-sm hover:bg-brand-blue hover:shadow-md transition disabled:opacity-0 disabled:scale-75 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-vibrant/50"
               aria-label="Enviar mensagem"
             >
-              <PaperPlaneTilt className="size-4 ml-0.5" weight="fill" />
+              <PaperPlaneTilt className="size-5 ml-0.5" weight="fill" />
             </button>
           </div>
           <p className="text-center text-[10px] text-zinc-400 mt-2">

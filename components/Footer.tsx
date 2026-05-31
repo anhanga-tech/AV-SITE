@@ -48,7 +48,7 @@ const Footer: React.FC = () => {
 
                     {/* Links */}
                     <div>
-                        <h4 className="font-bold text-white mb-6 uppercase tracking-wider text-xs">Menu</h4>
+                        <h3 className="font-bold text-white mb-6 uppercase tracking-wider text-xs">Menu</h3>
                         <ul className="space-y-3 font-medium">
                             <li><a href={`${SITE_URL}/`} className="hover:text-brand-yellow transition-colors">Agência de Viagens em São Paulo</a></li>
                             <li><a href={`${SITE_URL}/sobre/`} className="hover:text-brand-yellow transition-colors">Sobre a Anhangá</a></li>
@@ -69,7 +69,7 @@ const Footer: React.FC = () => {
 
                     {/* Contact */}
                     <div>
-                        <h4 className="font-bold text-white mb-6 uppercase tracking-wider text-xs">Fale Conosco</h4>
+                        <h3 className="font-bold text-white mb-6 uppercase tracking-wider text-xs">Fale Conosco</h3>
                         <ul className="space-y-4 font-medium text-sm">
                             <li className="flex items-center gap-3">
                                 <Phone className="size-5 text-brand-cyan" weight="fill" />
@@ -94,7 +94,7 @@ const Footer: React.FC = () => {
                             href="https://instagram.com/anhangaviagens"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-2 bg-white/5 rounded-full hover:bg-brand-vibrant hover:text-white transition-colors"
+                            className="min-h-12 min-w-12 flex items-center justify-center bg-white/5 rounded-full hover:bg-brand-vibrant hover:text-white transition-colors"
                             aria-label="Siga a Anhangá Viagens no Instagram"
                         >
                             <InstagramLogo className="size-5" weight="fill" />
@@ -103,7 +103,7 @@ const Footer: React.FC = () => {
                             href="https://facebook.com/profile.php?id=61585422494271"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-2 bg-white/5 rounded-full hover:bg-brand-vibrant hover:text-white transition-colors"
+                            className="min-h-12 min-w-12 flex items-center justify-center bg-white/5 rounded-full hover:bg-brand-vibrant hover:text-white transition-colors"
                             aria-label="Siga a Anhangá Viagens no Facebook"
                         >
                             <FacebookLogo className="size-5" weight="fill" />
@@ -111,16 +111,16 @@ const Footer: React.FC = () => {
                     </div>
 
                     <div className="flex flex-col md:items-end gap-2 text-center md:text-right order-1 md:order-2">
-                        <div className="text-xs text-zinc-500 font-medium flex items-center justify-center md:justify-end gap-1">
+                        <div className="text-xs text-zinc-400 font-medium flex items-center justify-center md:justify-end gap-1">
                             Feito com <Heart className="size-3 text-red-500" weight="fill" aria-hidden="true" /> pela <img src={ANHANGA_TECH_LOGO_URL} alt="Anhangá.tech" width="80" height="16" loading="lazy" className="h-4 w-auto inline-block mx-1 align-sub" />
                             {runtimeMetadata ? ` • ${runtimeMetadata.currentYear}` : null}
                         </div>
-                        <div className="text-[10px] text-zinc-600 font-medium flex flex-wrap justify-center md:justify-end gap-x-2">
-                            <span>ANHANGA TURISMO LTDA • CNPJ/Cadastur: <a href="https://cadastur.turismo.gov.br/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline decoration-zinc-600 underline-offset-2">37.036.732/0001-41</a></span>
+                        <div className="text-[10px] text-zinc-400 font-medium flex flex-wrap justify-center md:justify-end gap-x-2">
+                            <span>ANHANGA TURISMO LTDA • CNPJ/Cadastur: <a href="https://cadastur.turismo.gov.br/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline underline-offset-2">37.036.732/0001-41</a></span>
                             <span className="hidden md:inline">•</span>
-                            <a href="https://www.abav.com.br/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline decoration-zinc-600 underline-offset-2">Membro ABAV</a>
+                            <a href="https://www.abav.com.br/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline underline-offset-2">Membro ABAV</a>
                         </div>
-                        <div className="text-[10px] text-zinc-700 font-bold uppercase tracking-widest mt-2">
+                        <div className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mt-2">
                             Conteúdo da equipe Anhangá Viagens
                             {runtimeMetadata ? ` • Última atualização: ${runtimeMetadata.lastUpdatedLabel}` : null}
                         </div>
