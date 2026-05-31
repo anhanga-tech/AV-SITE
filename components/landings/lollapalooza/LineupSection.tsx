@@ -4,82 +4,42 @@ import useIntersectionObserver from './hooks/useIntersectionObserver';
 import sabrinaImage from './assets/sabrina-carpenter-devushka-vzgliad-volosy-litso-guby-blondin.webp';
 import { getMediaUrl, optimizeRemoteImageUrl } from '../../../data/mediaConfig';
 
-const LineupSection: React.FC = () => {
-  const { elementRef, isVisible } = useIntersectionObserver(0.05);
+const FALLBACK_IMAGE = getMediaUrl('images/lollapalooza/lineup/fallback-crowd.jpg');
 
-  const FALLBACK_IMAGE = getMediaUrl('images/lollapalooza/lineup/fallback-crowd.jpg');
+function getArtistImageUrl(url: string, width: number, height?: number) {
+  if (!url) return FALLBACK_IMAGE;
+  if (url.startsWith('images/')) {
+    return height
+      ? optimizeRemoteImageUrl(url, width, height)
+      : optimizeRemoteImageUrl(url, width);
+  }
+  return url;
+}
 
-  const getArtistImageUrl = (url: string, width: number, height?: number) => {
-    if (!url) return FALLBACK_IMAGE;
-    if (url.startsWith('images/')) {
-      return height
-        ? optimizeRemoteImageUrl(url, width, height)
-        : optimizeRemoteImageUrl(url, width);
-    }
+function handleImageError(e: React.SyntheticEvent<HTMLImageElement, Event>) {
+  e.currentTarget.src = FALLBACK_IMAGE;
+}
 
-    return url;
-  };
+const HEADLINERS = [
+  { name: "SABRINA CARPENTER", genre: "Pop", image: sabrinaImage },
+  { name: "CHAPPELL ROAN", genre: "Pop / Camp", image: "images/lollapalooza/lineup/chappell-roan.png" },
+  { name: "TYLER, THE CREATOR", genre: "Hip Hop", image: "images/lollapalooza/lineup/tyler-the-creator.jpg" },
+  { name: "LORDE", genre: "Alt Pop", image: "images/lollapalooza/lineup/lorde.jpg" },
+  { name: "SKRILLEX", genre: "Electronic", image: "images/lollapalooza/lineup/skrillex.jpg" },
+  { name: "DEFTONES", genre: "Alt Metal", image: "images/lollapalooza/lineup/deftones.jpg" },
+  { name: "DOECHII", genre: "Hip Hop", image: "images/lollapalooza/lineup/doechii.jpg" },
+  { name: "LEWIS CAPALDI", genre: "Pop / Soul", image: "images/lollapalooza/lineup/lewis-capaldi.jpg" },
+  { name: "TURNSTILE", genre: "Hardcore Punk", image: "images/lollapalooza/lineup/turnstile.jpg" },
+];
 
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    e.currentTarget.src = FALLBACK_IMAGE;
-  };
-
-  const headliners = [
-    {
-      name: "SABRINA CARPENTER",
-      genre: "Pop",
-      image: sabrinaImage
-    },
-    {
-      name: "CHAPPELL ROAN",
-      genre: "Pop / Camp",
-      image: "images/lollapalooza/lineup/chappell-roan.png"
-    },
-    {
-      name: "TYLER, THE CREATOR",
-      genre: "Hip Hop",
-      image: "images/lollapalooza/lineup/tyler-the-creator.jpg"
-    },
-    {
-      name: "LORDE",
-      genre: "Alt Pop",
-      image: "images/lollapalooza/lineup/lorde.jpg"
-    },
-    {
-      name: "SKRILLEX",
-      genre: "Electronic",
-      image: "images/lollapalooza/lineup/skrillex.jpg"
-    },
-    {
-      name: "DEFTONES",
-      genre: "Alt Metal",
-      image: "images/lollapalooza/lineup/deftones.jpg"
-    },
-    {
-      name: "DOECHII",
-      genre: "Hip Hop",
-      image: "images/lollapalooza/lineup/doechii.jpg"
-    },
-    {
-      name: "LEWIS CAPALDI",
-      genre: "Pop / Soul",
-      image: "images/lollapalooza/lineup/lewis-capaldi.jpg"
-    },
-    {
-      name: "TURNSTILE",
-      genre: "Hardcore Punk",
-      image: "images/lollapalooza/lineup/turnstile.jpg"
-    }
-  ];
-
-  const dailyLineup = [
+const DAILY_LINEUP = [
     {
       day: "Sexta-feira",
       date: "20 de Março",
       main: [
-        { name: "Sabrina Carpenter", image: headliners[0].image },
-        { name: "Deftones", image: headliners[5].image },
-        { name: "Doechii", image: headliners[6].image }
+        { name: "Sabrina Carpenter", image: HEADLINERS[0].image },
+        { name: "Deftones", image: HEADLINERS[5].image },
+        { name: "Doechii", image: HEADLINERS[6].image }
       ],
       others: "Kygo, Interpol, Ben Böhmer, Edson Gomes, Men I Trust, Bunt., Viagra Boys, DJ Diesel, Horsegiirl, Negra Li, Aline Rocha, Atkö, Scalene, Worst, Terraplana, Stefanie, Bruna Strait, Camila Jun."
     },
@@ -87,9 +47,9 @@ const LineupSection: React.FC = () => {
       day: "Sábado",
       date: "21 de Março",
       main: [
-        { name: "Chappell Roan", image: headliners[1].image },
-        { name: "Skrillex", image: headliners[4].image },
-        { name: "Lewis Capaldi", image: headliners[7].image }
+        { name: "Chappell Roan", image: HEADLINERS[1].image },
+        { name: "Skrillex", image: HEADLINERS[4].image },
+        { name: "Lewis Capaldi", image: HEADLINERS[7].image }
       ],
       others: "Cypress Hill, Brutalismus 3000, Marina, TV Girl, MU540, Riize, 2hollis, NL!NA, Foto em Grupo, The Warning, Hamdi, Febre90s, Agnes Nunes, Varanda, Cidade Dormitório, JadsA, Blackat, Crizin da Z.O., Marcelin o Brabo, Artur Menezes."
     },
@@ -97,13 +57,16 @@ const LineupSection: React.FC = () => {
       day: "Domingo",
       date: "22 de Março",
       main: [
-        { name: "Tyler, The Creator", image: headliners[2].image },
-        { name: "Lorde", image: headliners[3].image },
-        { name: "Turnstile", image: headliners[8].image }
+        { name: "Tyler, The Creator", image: HEADLINERS[2].image },
+        { name: "Lorde", image: HEADLINERS[3].image },
+        { name: "Turnstile", image: HEADLINERS[8].image }
       ],
       others: "Peggy Gou, Addison Rae, Katseye, Djo, Yousuke Yukimatsu, FBC, Royel Otis, The Dare, Balu Brigada, Mundo Livre S/A, Róz, Zopelar, Idlibra, Nina Maia, Oruã, Alírio, Papisa, Analu, Jonabug, Entropia."
     }
-  ];
+];
+
+const LineupSection: React.FC = () => {
+  const { elementRef, isVisible } = useIntersectionObserver(0.05);
 
   return (
     <section id="lineup" className="py-20 bg-zinc-950 text-white relative overflow-hidden" aria-labelledby="lineup-heading" ref={elementRef}>
@@ -116,7 +79,7 @@ const LineupSection: React.FC = () => {
         <div className={`text-center mb-16 animate-on-scroll ${isVisible ? 'is-visible' : ''}`}>
           {/* Artist Avatars Cluster */}
           <div className="flex justify-center items-center -space-x-4 mb-8" aria-hidden="true">
-            {headliners.slice(0, 5).map((artist) => (
+            {HEADLINERS.slice(0, 5).map((artist) => (
               <div key={artist.name} className="relative z-0 hover:z-10 transition duration-300 transform hover:scale-110 hover:-translate-y-2 group">
                 <div className="size-16 md:size-24 rounded-full border-4 border-black group-hover:border-anhanga-yellow overflow-hidden relative shadow-lg">
                   <img
@@ -154,7 +117,7 @@ const LineupSection: React.FC = () => {
 
         {/* Headliners Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-20">
-          {headliners.map((artist, index) => (
+          {HEADLINERS.map((artist, index) => (
             <div key={artist.name} className={`group relative h-96 sm:h-80 lg:h-96 overflow-hidden rounded-2xl border border-zinc-800 hover:border-anhanga-yellow transition duration-300 animate-on-scroll ${isVisible ? 'is-visible' : ''}`} style={{ transitionDelay: `${index * 50}ms` }}>
               {/* Background Image - Optimized to 600px width */}
               <div className="absolute inset-0 bg-zinc-900">
@@ -195,7 +158,7 @@ const LineupSection: React.FC = () => {
             Programação por Dia
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {dailyLineup.map((day) => (
+            {DAILY_LINEUP.map((day) => (
               <div key={day.day} className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-anhanga-blue transition-colors">
                 <div className="flex items-center gap-2 mb-6">
                   <Calendar className="text-anhanga-yellow" size={20} aria-hidden="true" />

@@ -16,51 +16,51 @@ interface FeatureItem {
   className: string; // Classes de grid (col-span, row-span)
 }
 
+const FEATURES: FeatureItem[] = [
+  {
+    id: 'experience',
+    title: 'O QUE FEZ 2026 ESGOTAR',
+    subtitle: 'A campanha combinou hotel estratégico, mobilidade planejada e suporte humano para quem queria viver o festival sem caos.',
+    icon: Wand2,
+    image: 'images/lollapalooza/package/esgotou-2026.webp',
+    className: 'col-span-1 md:col-span-2 md:row-span-2 min-h-[400px] sm:min-h-[500px]'
+  },
+  {
+    id: 'hotel',
+    title: 'HOTEL NA MEDIDA',
+    subtitle: 'Hospedagem bem localizada e pensada para descansar de verdade entre um dia de show e outro.',
+    icon: BedDouble,
+    image: 'images/lollapalooza/package/hotel-medida.jpg',
+    className: 'col-span-1 md:col-span-1 md:row-span-2 min-h-[300px] sm:min-h-[400px] md:min-h-full'
+  },
+  {
+    id: 'city',
+    title: 'SP ALÉM DO PALCO',
+    subtitle: 'Curadoria da cidade para aproveitar São Paulo antes, durante e depois do festival.',
+    icon: Map,
+    image: 'images/lollapalooza/package/sp-noite.jpg',
+    className: 'col-span-1 md:col-span-1 md:row-span-1 min-h-[250px] sm:min-h-[300px]'
+  },
+  {
+    id: 'transport',
+    title: 'LOGÍSTICA INTELIGENTE',
+    subtitle: 'Rotas e deslocamentos desenhados para evitar perrengue no entorno de Interlagos.',
+    icon: BusFront,
+    bgColor: 'bg-anhanga-yellow',
+    className: 'col-span-1 md:col-span-1 md:row-span-1 min-h-[250px] sm:min-h-[300px]'
+  },
+  {
+    id: 'support',
+    title: 'SUPORTE HUMANO',
+    subtitle: 'Time disponível para ajustes e imprevistos, do embarque ao retorno.',
+    icon: Headset,
+    bgColor: 'bg-anhanga-blue',
+    className: 'col-span-1 md:col-span-1 md:row-span-1 min-h-[250px] sm:min-h-[300px]'
+  }
+];
+
 const PackageFeatures: React.FC = () => {
   const { elementRef, isVisible } = useIntersectionObserver(0.1);
-
-  const features: FeatureItem[] = [
-    {
-      id: 'experience',
-      title: 'O QUE FEZ 2026 ESGOTAR',
-      subtitle: 'A campanha combinou hotel estratégico, mobilidade planejada e suporte humano para quem queria viver o festival sem caos.',
-      icon: Wand2,
-      image: 'images/lollapalooza/package/esgotou-2026.webp',
-      className: 'col-span-1 md:col-span-2 md:row-span-2 min-h-[400px] sm:min-h-[500px]'
-    },
-    {
-      id: 'hotel',
-      title: 'HOTEL NA MEDIDA',
-      subtitle: 'Hospedagem bem localizada e pensada para descansar de verdade entre um dia de show e outro.',
-      icon: BedDouble,
-      image: 'images/lollapalooza/package/hotel-medida.jpg',
-      className: 'col-span-1 md:col-span-1 md:row-span-2 min-h-[300px] sm:min-h-[400px] md:min-h-full'
-    },
-    {
-      id: 'city',
-      title: 'SP ALÉM DO PALCO',
-      subtitle: 'Curadoria da cidade para aproveitar São Paulo antes, durante e depois do festival.',
-      icon: Map,
-      image: 'images/lollapalooza/package/sp-noite.jpg',
-      className: 'col-span-1 md:col-span-1 md:row-span-1 min-h-[250px] sm:min-h-[300px]'
-    },
-    {
-      id: 'transport',
-      title: 'LOGÍSTICA INTELIGENTE',
-      subtitle: 'Rotas e deslocamentos desenhados para evitar perrengue no entorno de Interlagos.',
-      icon: BusFront,
-      bgColor: 'bg-anhanga-yellow',
-      className: 'col-span-1 md:col-span-1 md:row-span-1 min-h-[250px] sm:min-h-[300px]'
-    },
-    {
-      id: 'support',
-      title: 'SUPORTE HUMANO',
-      subtitle: 'Time disponível para ajustes e imprevistos, do embarque ao retorno.',
-      icon: Headset,
-      bgColor: 'bg-anhanga-blue',
-      className: 'col-span-1 md:col-span-1 md:row-span-1 min-h-[250px] sm:min-h-[300px]'
-    }
-  ];
 
   return (
     <section id="pacote" className="bg-zinc-950 py-20 relative overflow-hidden" ref={elementRef}>
@@ -83,7 +83,7 @@ const PackageFeatures: React.FC = () => {
 
         {/* BENTO GRID */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 auto-rows-min">
-          {features.map((feature, idx) => (
+          {FEATURES.map((feature, idx) => (
             <div
               key={feature.id}
               className={`

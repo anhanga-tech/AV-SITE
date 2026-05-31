@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { MessageCircle } from 'lucide-react';
 import { openContactModal } from '../../../utils/contactForm';
 
@@ -15,6 +15,14 @@ interface ButtonProps {
   dataTracking?: string;
 }
 
+const BASE_STYLES = "inline-flex items-center justify-center font-sans font-bold text-lg md:text-xl px-8 py-4 rounded-full transition duration-200 transform hover:-translate-y-1 border-2 border-fun-dark relative z-10 focus:outline-none focus:ring-4 focus:ring-fun-blue focus:ring-offset-2 focus:ring-offset-white";
+
+const VARIANTS = {
+  primary: "bg-fun-green text-white shadow-hard hover:shadow-hard-hover",
+  secondary: "bg-fun-pink text-white shadow-hard hover:shadow-hard-hover",
+  outline: "bg-white text-fun-dark shadow-hard hover:shadow-hard-hover",
+};
+
 const Button: React.FC<ButtonProps> = ({
   text,
   onClick,
@@ -27,22 +35,6 @@ const Button: React.FC<ButtonProps> = ({
   ariaLabel,
   dataTracking
 }) => {
-  const isMountedRef = useRef(true);
-
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
-
-  const baseStyles = "inline-flex items-center justify-center font-sans font-bold text-lg md:text-xl px-8 py-4 rounded-full transition duration-200 transform hover:-translate-y-1 border-2 border-fun-dark relative z-10 focus:outline-none focus:ring-4 focus:ring-fun-blue focus:ring-offset-2 focus:ring-offset-white";
-
-  const variants = {
-    primary: "bg-fun-green text-white shadow-hard hover:shadow-hard-hover",
-    secondary: "bg-fun-pink text-white shadow-hard hover:shadow-hard-hover",
-    outline: "bg-white text-fun-dark shadow-hard hover:shadow-hard-hover",
-  };
 
   const positionStyles = tooltipPosition === 'top'
     ? 'bottom-full mb-3'
@@ -68,7 +60,7 @@ const Button: React.FC<ButtonProps> = ({
           openContactModal({ source: 'beto-carrero' });
           onClick?.();
         }}
-        className={`btn-whatsapp btn-specialist ${baseStyles} ${variants[variant]} ${fullWidth ? 'w-full' : ''} ${className}`}
+        className={`btn-whatsapp btn-specialist ${BASE_STYLES} ${VARIANTS[variant]} ${fullWidth ? 'w-full' : ''} ${className}`}
         aria-label={computedAriaLabel}
         data-tracking={dataTracking}
       >

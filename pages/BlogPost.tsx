@@ -14,6 +14,11 @@ import { AUTHORS } from '../data/blogData';
 import { getAllPosts, type PostMeta } from '../lib/mdx';
 import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 
+function isValidSlug(value: unknown): value is string {
+    if (typeof value !== 'string') return false;
+    return /^[a-zA-Z0-9\-\/]+$/.test(value);
+}
+
 // Carregado no nível do módulo para o Vite processar em build time
 const allMdxPosts = getAllPosts();
 
@@ -44,13 +49,6 @@ const BlogPost: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
     const post: PostMeta | undefined = allMdxPosts.find(p => p.slug === slug);
     const author = post ? AUTHORS[post.author] ?? null : null;
-
-    // Validate slug to avoid propagating arbitrary user input into structured data
-    const isValidSlug = (value: unknown): value is string => {
-        if (typeof value !== 'string') return false;
-        // Allow only URL-safe slugs: letters, numbers, dashes and slashes
-        return /^[a-zA-Z0-9\-\/]+$/.test(value);
-    };
 
     const canonicalUrl = isValidSlug(slug) ? getBlogPostUrl(slug) : getBlogHomeUrl();
 

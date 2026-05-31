@@ -238,29 +238,30 @@ interface LeadForm {
    Componente: ChunkyQuiz
    ========================================================================== */
 
+const CHUNKY_LETTERS = ['Q', 'U', 'I', 'Z', '!'];
+const CHUNKY_LAYER_COLORS = ['#FFD600', '#FFB800', '#FF9100', '#F97316', '#EA580C'];
+
 function ChunkyQuiz() {
-    const letters = ['Q', 'U', 'I', 'Z', '!'];
-    const layerColors = ['#FFD600', '#FFB800', '#FF9100', '#F97316', '#EA580C'];
 
     return (
         <div className="quiz-chunky-wrap">
             <div className="quiz-chunky quiz-chunky-layered">
-                {layerColors.map((c, idx) => (
+                {CHUNKY_LAYER_COLORS.map((c, idx) => (
                     <div
                         key={c}
                         className="quiz-ch-layer"
                         aria-hidden="true"
                         style={{
-                            transform: `translate(${(layerColors.length - idx) * 6}px, ${(layerColors.length - idx) * 6}px)`,
+                            transform: `translate(${(CHUNKY_LAYER_COLORS.length - idx) * 6}px, ${(CHUNKY_LAYER_COLORS.length - idx) * 6}px)`,
                             color: c,
                             zIndex: idx,
                         }}
                     >
-                        {letters.map((l) => <span key={l} className="quiz-ch-letter">{l}</span>)}
+                        {CHUNKY_LETTERS.map((l) => <span key={l} className="quiz-ch-letter">{l}</span>)}
                     </div>
                 ))}
                 <div className="quiz-ch-front" style={{ zIndex: 99 }}>
-                    {letters.map((l) => <span key={l} className="quiz-ch-letter">{l}</span>)}
+                    {CHUNKY_LETTERS.map((l) => <span key={l} className="quiz-ch-letter">{l}</span>)}
                 </div>
             </div>
         </div>
@@ -638,9 +639,10 @@ function Confetti({ active }: { active: boolean }) {
 
 const QUIZ_IMG_BASE = 'https://media.anhanga.tur.br/quiz';
 
+const POLAROID_TILTS = [-2.4, 1.6, -1.2, 2, -1.8];
+
 function Polaroid({ dest, index }: { dest: InspirationDestination; index: number }) {
-    const tilts = [-2.4, 1.6, -1.2, 2, -1.8];
-    const tilt = tilts[index % tilts.length];
+    const tilt = POLAROID_TILTS[index % POLAROID_TILTS.length];
     const imgSrc = `${QUIZ_IMG_BASE}/${dest.imageKey}.webp`;
 
     return (
@@ -694,17 +696,17 @@ interface WhatsAppUpgradeProps {
     baseWaUrl: string;
 }
 
+function maskPhone(v: string): string {
+    const d = v.replace(/\D/g, '').slice(0, 11);
+    if (d.length <= 2) return d;
+    if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+    if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+    return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+}
+
 function WhatsAppUpgrade({ profileName, mainDestName, firstName, baseWaUrl }: WhatsAppUpgradeProps) {
     const [phone, setPhone] = useState('');
     const [submitted, setSubmitted] = useState(false);
-
-    function maskPhone(v: string): string {
-        const d = v.replace(/\D/g, '').slice(0, 11);
-        if (d.length <= 2) return d;
-        if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
-        if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
-        return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
-    }
 
     const digits = phone.replace(/\D/g, '');
     const isValid = digits.length >= 10;

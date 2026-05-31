@@ -6,6 +6,28 @@ const DEFAULT_OG_IMAGE = DEFAULT_OG_IMAGE_URL;
 const DEFAULT_OG_IMAGE_WIDTH = '1200';
 const DEFAULT_OG_IMAGE_HEIGHT = '630';
 
+const SITE_NAME = "Anhangá Viagens";
+
+const normalizeStr = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+function normalizeCanonical(urlStr: string): string {
+  try {
+    const url = new URL(urlStr, 'https://www.anhanga.tur.br');
+    url.protocol = 'https:';
+    url.hostname = 'www.anhanga.tur.br';
+    url.port = '';
+    url.search = '';
+    url.hash = '';
+    if (!url.pathname.endsWith('/') && !url.pathname.includes('.')) {
+      url.pathname += '/';
+    }
+    return url.toString();
+  } catch (error) {
+    console.error('[SEO] Failed to normalize canonical URL: "%s"', urlStr, error);
+    return '';
+  }
+}
+
 interface SeoProps {
   title?: string;
   description?: string;
@@ -38,39 +60,10 @@ export const Seo: React.FC<SeoProps> = ({
   // Blog posts and other pages with third-party images of unknown sizes omit these tags.
   const resolvedImageWidth = imageWidth ?? (image === DEFAULT_OG_IMAGE ? DEFAULT_OG_IMAGE_WIDTH : undefined);
   const resolvedImageHeight = imageHeight ?? (image === DEFAULT_OG_IMAGE ? DEFAULT_OG_IMAGE_HEIGHT : undefined);
-  const siteName = "Anhangá Viagens";
-  const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-  // Ensure title has the site name suffix if it doesn't already
-  const fullTitle = normalize(title).includes(normalize(siteName))
+  const fullTitle = normalizeStr(title).includes(normalizeStr(SITE_NAME))
     ? title
-    : `${title} | ${siteName}`;
-
-  // Helper to normalize canonical URLs
-  const normalizeCanonical = (urlStr: string): string => {
-    try {
-      const url = new URL(urlStr, 'https://www.anhanga.tur.br');
-
-      // Force production hostname and protocol
-      url.protocol = 'https:';
-      url.hostname = 'www.anhanga.tur.br';
-      url.port = ''; // Remove port (dev/preview servers)
-
-      // Strip query parameters and hash to prevent duplicate content
-      url.search = '';
-      url.hash = '';
-
-      // Normalize trailing slash on pathname (only for extension-less paths)
-      if (!url.pathname.endsWith('/') && !url.pathname.includes('.')) {
-        url.pathname += '/';
-      }
-
-      return url.toString();
-    } catch (error) {
-      console.error('[SEO] Failed to normalize canonical URL: "%s"', urlStr, error);
-      return '';
-    }
-  };
+    : `${title} | ${SITE_NAME}`;
 
   // Generate canonical URL
   let canonicalUrl = '';
@@ -121,7 +114,7 @@ export const Seo: React.FC<SeoProps> = ({
     {
       tagName: 'meta',
       key: 'meta:og:site_name',
-      attrs: { property: 'og:site_name', content: siteName }
+      attrs: { property: 'og:site_name', content: SITE_NAME }
     },
     {
       tagName: 'meta',

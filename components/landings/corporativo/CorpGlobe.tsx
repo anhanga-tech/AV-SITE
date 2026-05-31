@@ -31,10 +31,10 @@ const POINTS = [
 
 export function CorpGlobe() {
     const containerRef = useRef<HTMLDivElement>(null);
-    const cleanupRef = useRef<(() => void) | null>(null);
 
     useEffect(() => {
         let cancelled = false;
+        let cleanup: (() => void) | null = null;
         const el = containerRef.current;
         if (!el) return;
 
@@ -89,7 +89,7 @@ export function CorpGlobe() {
             });
             resizeObserver.observe(el);
 
-            cleanupRef.current = () => {
+            cleanup = () => {
                 try {
                     resizeObserver.disconnect();
                     const r = globe.renderer();
@@ -105,11 +105,9 @@ export function CorpGlobe() {
 
         return () => {
             cancelled = true;
-            cleanupRef.current?.();
-            cleanupRef.current = null;
+            cleanup?.();
+            cleanup = null;
         };
-    // refs are stable — intentional mount-only effect
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
