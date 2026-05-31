@@ -33,6 +33,7 @@ HUBSPOT_DEAL_STAGE_ID = "appointmentscheduled"
 HUBSPOT_DEAL_BANT_PROPERTY = "bant_summary"
 R2_BUCKET_NAME = "av-site-media"
 R2_CDN_BASE_URL = "https://media.anhanga.tur.br"
+GOOGLE_PLACE_ID = "ChIJ65P6-_G9oycRruws5FfoRDs"
 
 [env.production.vars]
 CF_PAGES = "1"
@@ -57,3 +58,4 @@ HUBSPOT_DEAL_STAGE_ID = "appointmentscheduled"
 HUBSPOT_DEAL_BANT_PROPERTY = "bant_summary"
 R2_BUCKET_NAME = "av-site-media"
 R2_CDN_BASE_URL = "https://media.anhanga.tur.br"
+GOOGLE_PLACE_ID = "ChIJ65P6-_G9oycRruws5FfoRDs"
