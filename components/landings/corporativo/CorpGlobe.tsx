@@ -94,6 +94,8 @@ export function CorpGlobe() {
             cleanupRef.current?.();
             cleanupRef.current = null;
         };
+    // refs are stable — intentional mount-only effect
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
