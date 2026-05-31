@@ -42,8 +42,7 @@ test.describe('Testimonials — seed data (empty)', () => {
     const summaryBar = section.locator('text=avaliações no Google');
     await expect(summaryBar).toHaveCount(0);
 
-    const carousel = section.locator('[aria-roledescription="carousel"]');
-    await expect(carousel).toBeVisible();
+    await expect(section).toHaveAttribute('aria-roledescription', 'carousel');
   });
 
   test('carousel navigation works', async ({ page }) => {
