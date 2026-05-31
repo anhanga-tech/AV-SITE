@@ -58,49 +58,41 @@ function parseOutscraperDate(value: unknown): string {
 async function uploadPhotoToR2(
   reviewId: string,
   sourceUrl: string,
-  config: R2Config
+  bucketName: string,
+  cdnBaseUrl: string
 ): Promise<string> {
-  // @ts-expect-error — @aws-sdk/client-s3 is an optional runtime dependency
-  const { S3Client, PutObjectCommand } = await import('@aws-sdk/client-s3');
+  const { execSync } = await import('node:child_process');
+  const { writeFileSync, unlinkSync, mkdirSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+
   const response = await fetch(sourceUrl);
   if (!response.ok) return '';
 
   const buffer = Buffer.from(await response.arrayBuffer());
   const key = `reviews/${reviewId}.jpg`;
 
-  const client = new S3Client({
-    region: 'auto',
-    endpoint: config.endpoint,
-    credentials: {
-      accessKeyId: config.accessKeyId,
-      secretAccessKey: config.secretAccessKey,
-    },
-  });
+  const tmpDir = join(tmpdir(), 'review-photos');
+  mkdirSync(tmpDir, { recursive: true });
+  const tmpFile = join(tmpDir, `${reviewId}.jpg`);
 
-  await client.send(new PutObjectCommand({
-    Bucket: config.bucketName,
-    Key: key,
-    Body: buffer,
-    ContentType: 'image/jpeg',
-  }));
+  writeFileSync(tmpFile, buffer);
+  try {
+    execSync(`npx wrangler r2 object put "${bucketName}/${key}" --file="${tmpFile}" --content-type="image/jpeg"`, {
+      stdio: 'pipe',
+    });
+  } finally {
+    try { unlinkSync(tmpFile); } catch {}
+  }
 
-  const cdnBase = config.endpoint
-    .replace(/\.r2\.cloudflarestorage\.com.*/, '')
-    .replace('https://', '');
-  return `https://${config.bucketName}.${cdnBase}.r2.dev/${key}`;
-}
-
-interface R2Config {
-  accessKeyId: string;
-  secretAccessKey: string;
-  bucketName: string;
-  endpoint: string;
+  return `${cdnBaseUrl}/${key}`;
 }
 
 interface EnvConfig {
   outscraperApiKey: string;
   googlePlaceId: string;
-  r2: R2Config | null;
+  r2BucketName: string | null;
+  r2CdnBaseUrl: string | null;
 }
 
 function loadConfig(): EnvConfig {
@@ -110,16 +102,12 @@ function loadConfig(): EnvConfig {
   if (!outscraperApiKey) throw new Error('Missing OUTSCRAPER_API_KEY');
   if (!googlePlaceId) throw new Error('Missing GOOGLE_PLACE_ID');
 
-  const r2AccessKeyId = process.env.R2_ACCESS_KEY_ID;
-  const r2SecretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
-  const r2BucketName = process.env.R2_BUCKET_NAME;
-  const r2Endpoint = process.env.R2_ENDPOINT;
-
-  const r2 = r2AccessKeyId && r2SecretAccessKey && r2BucketName && r2Endpoint
-    ? { accessKeyId: r2AccessKeyId, secretAccessKey: r2SecretAccessKey, bucketName: r2BucketName, endpoint: r2Endpoint }
-    : null;
-
-  return { outscraperApiKey, googlePlaceId, r2 };
+  return {
+    outscraperApiKey,
+    googlePlaceId,
+    r2BucketName: process.env.R2_BUCKET_NAME || null,
+    r2CdnBaseUrl: process.env.R2_CDN_BASE_URL || null,
+  };
 }
 
 async function fetchFromOutscraper(apiKey: string, placeId: string): Promise<{
@@ -177,12 +165,13 @@ async function main() {
 
   let photosUploaded = 0;
   const finalReviews: GoogleReview[] = [];
+  const canUpload = config.r2BucketName && config.r2CdnBaseUrl;
 
   for (const review of withAnnotations) {
     let photoUrl = '';
-    if (review.photoUrl && config.r2) {
+    if (review.photoUrl && canUpload) {
       try {
-        photoUrl = await uploadPhotoToR2(review.id, review.photoUrl, config.r2);
+        photoUrl = await uploadPhotoToR2(review.id, review.photoUrl, config.r2BucketName!, config.r2CdnBaseUrl!);
         if (photoUrl) photosUploaded++;
       } catch {
         console.warn(`Failed to upload photo for review ${review.id}`);
