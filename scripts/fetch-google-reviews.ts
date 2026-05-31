@@ -55,16 +55,22 @@ function parseOutscraperDate(value: unknown): string {
   return isNaN(d.getTime()) ? new Date().toISOString().split('T')[0] : d.toISOString().split('T')[0];
 }
 
+const SAFE_ID_RE = /^[a-zA-Z0-9_-]+$/;
+
 async function uploadPhotoToR2(
   reviewId: string,
   sourceUrl: string,
   bucketName: string,
   cdnBaseUrl: string
 ): Promise<string> {
-  const { execSync } = await import('node:child_process');
+  const { execFileSync } = await import('node:child_process');
   const { writeFileSync, unlinkSync, mkdirSync } = await import('node:fs');
   const { tmpdir } = await import('node:os');
   const { join } = await import('node:path');
+
+  if (!SAFE_ID_RE.test(reviewId)) {
+    throw new Error(`Invalid review ID: ${reviewId}`);
+  }
 
   const response = await fetch(sourceUrl);
   if (!response.ok) return '';
@@ -78,9 +84,12 @@ async function uploadPhotoToR2(
 
   writeFileSync(tmpFile, buffer);
   try {
-    execSync(`npx wrangler r2 object put "${bucketName}/${key}" --file="${tmpFile}" --content-type="image/jpeg"`, {
-      stdio: 'pipe',
-    });
+    execFileSync('npx', [
+      'wrangler', 'r2', 'object', 'put',
+      `${bucketName}/${key}`,
+      `--file=${tmpFile}`,
+      '--content-type=image/jpeg',
+    ], { stdio: 'pipe' });
   } finally {
     try { unlinkSync(tmpFile); } catch {}
   }
