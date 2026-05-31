@@ -7,7 +7,11 @@ import { FAQPageSchema } from '../components/schemas/FAQPageSchema';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { ServiceSchema } from '../components/schemas/ServiceSchema';
 import { FAQ_SCHEMA_ITEMS } from '../data/faqData';
-// aggregateRating was removed from ServiceSchema to comply with Google's visibility guidelines; individual reviews now use microdata.
+import { getReviewSummary } from '../data/reviewsAdapter';
+import type { GoogleReviewsData } from '../types/reviews';
+import googleReviewsRaw from '../data/googleReviews.json';
+
+const reviewSummary = getReviewSummary(googleReviewsRaw as GoogleReviewsData);
 
 import { Seo } from '../components/Seo';
 
@@ -122,6 +126,10 @@ const Home: React.FC = () => {
           'turismo melhor idade',
           'pacotes de viagem SP',
         ]}
+        aggregateRating={reviewSummary ? {
+          ratingValue: reviewSummary.averageRating,
+          reviewCount: reviewSummary.totalReviews,
+        } : undefined}
       />
       <Hero />
 
