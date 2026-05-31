@@ -111,7 +111,7 @@ const Testimonials: React.FC = memo(() => {
 
                         {/* Avatar */}
                         <div className="relative shrink-0">
-                          <div className="rounded-full border-3 border-white shadow-lg overflow-hidden motion-safe:animate-float">
+                          <div className="rounded-full border-4 border-white shadow-lg overflow-hidden motion-safe:animate-float">
                             <ReviewAvatar
                               name={review.authorName}
                               photoUrl={review.photoUrl}

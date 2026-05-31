@@ -115,6 +115,10 @@ describe('reviewsAdapter', () => {
     assert.match(result, /há [23] meses/);
   });
 
+  test('formatRelativeDate returns empty string for invalid date', () => {
+    assert.equal(formatRelativeDate('not-a-date'), '');
+  });
+
   test('formatRelativeDate returns "há 1 ano" for 12+ months', () => {
     const d = new Date();
     d.setFullYear(d.getFullYear() - 1);

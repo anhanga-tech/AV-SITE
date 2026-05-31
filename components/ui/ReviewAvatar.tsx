@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getInitials } from '../../data/reviewsAdapter';
 
 interface ReviewAvatarProps {
@@ -14,10 +14,14 @@ export const ReviewAvatar: React.FC<ReviewAvatarProps> = ({
   size = 88,
   className = '',
 }) => {
-  const [showFallback, setShowFallback] = useState(!photoUrl);
+  const [hasImageError, setHasImageError] = useState(false);
   const initials = getInitials(name);
 
-  if (showFallback) {
+  useEffect(() => {
+    setHasImageError(false);
+  }, [photoUrl]);
+
+  if (!photoUrl || hasImageError) {
     return (
       <div
         className={`rounded-full flex items-center justify-center text-white font-bold shrink-0 ${className}`}
@@ -36,12 +40,12 @@ export const ReviewAvatar: React.FC<ReviewAvatarProps> = ({
 
   return (
     <img
-      src={photoUrl!}
+      src={photoUrl}
       alt={name}
       width={size}
       height={size}
       className={`rounded-full object-cover shrink-0 ${className}`}
-      onError={() => setShowFallback(true)}
+      onError={() => setHasImageError(true)}
     />
   );
 };
