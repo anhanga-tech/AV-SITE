@@ -4,6 +4,7 @@ import { BreadcrumbSchema } from '@/components/schemas/BreadcrumbSchema';
 import { CorpNav } from '@/components/landings/corporativo/CorpNav';
 import { CorpHero } from '@/components/landings/corporativo/CorpHero';
 import { CorpPillars } from '@/components/landings/corporativo/CorpPillars';
+import { CorpProcess } from '@/components/landings/corporativo/CorpProcess';
 import { CorpWhatsAppBand } from '@/components/landings/corporativo/CorpWhatsAppBand';
 import { CorpContactSection } from '@/components/landings/corporativo/CorpContactSection';
 import { CorpFooter } from '@/components/landings/corporativo/CorpFooter';
@@ -36,6 +37,7 @@ const CorporativoLanding: React.FC = () => {
                 <CorpNav />
                 <CorpHero />
                 <CorpPillars />
+                <CorpProcess />
                 <CorpWhatsAppBand />
                 <CorpContactSection />
                 <CorpFooter />
