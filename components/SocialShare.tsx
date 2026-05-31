@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { Share2, MessageCircle, Link as LinkIcon, Check } from 'lucide-react';
 import { shareContent, getSocialShareLinks } from '../utils/share';
 
+function prefetchHaptics() {
+    import('../utils/haptics').catch(() => {});
+}
+
 const Facebook = ({ className }: { className?: string }) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
         <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
@@ -27,11 +31,6 @@ interface SocialShareProps {
 export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, className = "", minimal = false }) => {
     const [copied, setCopied] = useState(false);
     const links = getSocialShareLinks(url, title);
-
-    // PERFORMANCE: Prefetch haptics on hover to minimize interaction latency
-    const prefetchHaptics = () => {
-        import('../utils/haptics').catch(() => {});
-    };
 
     const handleNativeShare = async () => {
         import('../utils/haptics')

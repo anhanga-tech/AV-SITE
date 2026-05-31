@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useReducer } from 'react';
 import { Seo } from '../../components/Seo';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { useQuizCapture } from '../../hooks/useQuizCapture';
@@ -238,29 +238,30 @@ interface LeadForm {
    Componente: ChunkyQuiz
    ========================================================================== */
 
+const CHUNKY_LETTERS = ['Q', 'U', 'I', 'Z', '!'];
+const CHUNKY_LAYER_COLORS = ['#FFD600', '#FFB800', '#FF9100', '#F97316', '#EA580C'];
+
 function ChunkyQuiz() {
-    const letters = ['Q', 'U', 'I', 'Z', '!'];
-    const layerColors = ['#FFD600', '#FFB800', '#FF9100', '#F97316', '#EA580C'];
 
     return (
         <div className="quiz-chunky-wrap">
             <div className="quiz-chunky quiz-chunky-layered">
-                {layerColors.map((c, idx) => (
+                {CHUNKY_LAYER_COLORS.map((c, idx) => (
                     <div
                         key={c}
                         className="quiz-ch-layer"
                         aria-hidden="true"
                         style={{
-                            transform: `translate(${(layerColors.length - idx) * 6}px, ${(layerColors.length - idx) * 6}px)`,
+                            transform: `translate(${(CHUNKY_LAYER_COLORS.length - idx) * 6}px, ${(CHUNKY_LAYER_COLORS.length - idx) * 6}px)`,
                             color: c,
                             zIndex: idx,
                         }}
                     >
-                        {letters.map((l) => <span key={l} className="quiz-ch-letter">{l}</span>)}
+                        {CHUNKY_LETTERS.map((l) => <span key={l} className="quiz-ch-letter">{l}</span>)}
                     </div>
                 ))}
                 <div className="quiz-ch-front" style={{ zIndex: 99 }}>
-                    {letters.map((l) => <span key={l} className="quiz-ch-letter">{l}</span>)}
+                    {CHUNKY_LETTERS.map((l) => <span key={l} className="quiz-ch-letter">{l}</span>)}
                 </div>
             </div>
         </div>
@@ -333,9 +334,9 @@ function Progress({ current, total }: { current: number; total: number }) {
                     : `${current}/${total}`
                 }
             </div>
-            <div className="quiz-progress-bar" role="progressbar" aria-valuenow={current} aria-valuemin={1} aria-valuemax={total}>
-                <div className="quiz-progress-fill" style={{ '--progress': progress } as React.CSSProperties} />
-            </div>
+            <progress className="quiz-progress-bar" value={current} max={total}>
+                {Math.round(progress * 100)}%
+            </progress>
         </div>
     );
 }
@@ -638,9 +639,10 @@ function Confetti({ active }: { active: boolean }) {
 
 const QUIZ_IMG_BASE = 'https://media.anhanga.tur.br/quiz';
 
+const POLAROID_TILTS = [-2.4, 1.6, -1.2, 2, -1.8];
+
 function Polaroid({ dest, index }: { dest: InspirationDestination; index: number }) {
-    const tilts = [-2.4, 1.6, -1.2, 2, -1.8];
-    const tilt = tilts[index % tilts.length];
+    const tilt = POLAROID_TILTS[index % POLAROID_TILTS.length];
     const imgSrc = `${QUIZ_IMG_BASE}/${dest.imageKey}.webp`;
 
     return (
@@ -694,17 +696,17 @@ interface WhatsAppUpgradeProps {
     baseWaUrl: string;
 }
 
+function maskPhone(v: string): string {
+    const d = v.replace(/\D/g, '').slice(0, 11);
+    if (d.length <= 2) return d;
+    if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+    if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+    return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+}
+
 function WhatsAppUpgrade({ profileName, mainDestName, firstName, baseWaUrl }: WhatsAppUpgradeProps) {
     const [phone, setPhone] = useState('');
     const [submitted, setSubmitted] = useState(false);
-
-    function maskPhone(v: string): string {
-        const d = v.replace(/\D/g, '').slice(0, 11);
-        if (d.length <= 2) return d;
-        if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
-        if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
-        return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
-    }
 
     const digits = phone.replace(/\D/g, '');
     const isValid = digits.length >= 10;
@@ -945,27 +947,58 @@ function StageContent({
    Componente principal
    ========================================================================== */
 
+interface QuizState {
+    stage: Stage;
+    direction: 'forward' | 'back';
+    answers: QuizAnswers;
+    leadForm: LeadForm | null;
+    profileKey: ProfileKey | null;
+    baseWaUrl: string;
+    submitFailed: boolean;
+}
+
+type QuizAction =
+    | { type: 'GO'; stage: Stage; direction?: 'forward' | 'back' }
+    | { type: 'ANSWER'; qId: string; value: string[] }
+    | { type: 'SUBMIT_RESULT'; leadForm: LeadForm; profileKey: ProfileKey; baseWaUrl: string }
+    | { type: 'SUBMIT_FAILED' }
+    | { type: 'RESTART' };
+
+const QUIZ_INITIAL_STATE: QuizState = {
+    stage: { kind: 'hero' },
+    direction: 'forward',
+    answers: {},
+    leadForm: null,
+    profileKey: null,
+    baseWaUrl: '',
+    submitFailed: false,
+};
+
+function quizReducer(state: QuizState, action: QuizAction): QuizState {
+    switch (action.type) {
+        case 'GO': return { ...state, stage: action.stage, direction: action.direction ?? 'forward' };
+        case 'ANSWER': return { ...state, answers: { ...state.answers, [action.qId]: action.value } };
+        case 'SUBMIT_RESULT': return { ...state, leadForm: action.leadForm, profileKey: action.profileKey, baseWaUrl: action.baseWaUrl, submitFailed: false };
+        case 'SUBMIT_FAILED': return { ...state, submitFailed: true };
+        case 'RESTART': return { ...QUIZ_INITIAL_STATE };
+    }
+}
+
 export default function QuizAnhangaLanding() {
     const urlParams = useQuizUrlParams();
-    const [stage, setStage] = useState<Stage>({ kind: 'hero' });
-    const [direction, setDirection] = useState<'forward' | 'back'>('forward');
-    const [answers, setAnswers] = useState<QuizAnswers>({});
-    const [leadForm, setLeadForm] = useState<LeadForm | null>(null);
-    const [profileKey, setProfileKey] = useState<ProfileKey | null>(null);
-    const [baseWaUrl, setBaseWaUrl] = useState('');
-    const [submitFailed, setSubmitFailed] = useState(false);
+    const [state, dispatch] = useReducer(quizReducer, QUIZ_INITIAL_STATE);
+    const { stage, direction, answers, leadForm, profileKey, baseWaUrl, submitFailed } = state;
     const { submitQuiz } = useQuizCapture();
 
     const go = useCallback((next: Stage, dir: 'forward' | 'back' = 'forward') => {
-        setDirection(dir);
-        setStage(next);
+        dispatch({ type: 'GO', stage: next, direction: dir });
         window.scrollTo(0, 0);
     }, []);
 
     function start() { go({ kind: 'question', index: 0 }); }
 
     function answerQ(qId: string, value: string[]) {
-        setAnswers((a) => ({ ...a, [qId]: value }));
+        dispatch({ type: 'ANSWER', qId, value });
     }
 
     function nextQ(currentIndex: number) {
@@ -1001,11 +1034,7 @@ export default function QuizAnhangaLanding() {
         const waMsg = `Oi! Sou ${firstName}. Descobri no Quiz da Anhangá que meu perfil é ${profile.name} e meu próximo destino pode ser ${mainDest.name}. Bora planejar essa viagem?`;
         const waUrl = getWhatsAppLink(waMsg, { appendTrackingRef: true });
 
-        // Avança para o resultado imediatamente — API roda em paralelo
-        setLeadForm(form);
-        setProfileKey(pKey);
-        setBaseWaUrl(waUrl);
-        setSubmitFailed(false);
+        dispatch({ type: 'SUBMIT_RESULT', leadForm: form, profileKey: pKey, baseWaUrl: waUrl });
         go({ kind: 'result' });
 
         const result = await submitQuiz({
@@ -1020,17 +1049,13 @@ export default function QuizAnhangaLanding() {
         });
 
         if (!result.ok) {
-            setSubmitFailed(true);
+            dispatch({ type: 'SUBMIT_FAILED' });
         }
     }
 
     function restart() {
-        setAnswers({});
-        setLeadForm(null);
-        setProfileKey(null);
-        setBaseWaUrl('');
-        setSubmitFailed(false);
-        go({ kind: 'hero' }, 'back');
+        dispatch({ type: 'RESTART' });
+        window.scrollTo(0, 0);
     }
 
     const stageKey = stage.kind === 'question' ? `q-${stage.index}` : stage.kind;

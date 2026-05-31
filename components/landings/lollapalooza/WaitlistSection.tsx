@@ -1,31 +1,77 @@
-import React, { useState } from 'react';
+import React, { useReducer } from 'react';
 import { BellRing, CheckCircle2, Loader2, Mail, TicketX, ArrowRight, Zap } from 'lucide-react';
 import { m, AnimatePresence } from 'framer-motion';
 import { useWaitlistCapture } from '../../../hooks/useWaitlistCapture';
 import { WAITLIST_SECTION_ID } from './constants';
 
+const CONTAINER_VARIANTS = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.2 }
+  }
+};
+
+const ITEM_VARIANTS = {
+  hidden: { y: 20, opacity: 0 },
+  visible: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100 } as const }
+};
+
+interface WaitlistFormState {
+  name: string;
+  email: string;
+  acceptedLgpd: boolean;
+  localError: string | null;
+  successMessage: string | null;
+  warningMessage: string | null;
+}
+
+type WaitlistFormAction =
+  | { type: 'SET_NAME'; value: string }
+  | { type: 'SET_EMAIL'; value: string }
+  | { type: 'SET_LGPD'; value: boolean }
+  | { type: 'SET_ERROR'; value: string }
+  | { type: 'CLEAR_MESSAGES' }
+  | { type: 'SUBMIT_SUCCESS'; success: string; warning: string | null }
+  | { type: 'RESET_FORM' };
+
+const WAITLIST_INITIAL_STATE: WaitlistFormState = {
+  name: '',
+  email: '',
+  acceptedLgpd: false,
+  localError: null,
+  successMessage: null,
+  warningMessage: null,
+};
+
+function waitlistReducer(state: WaitlistFormState, action: WaitlistFormAction): WaitlistFormState {
+  switch (action.type) {
+    case 'SET_NAME': return { ...state, name: action.value };
+    case 'SET_EMAIL': return { ...state, email: action.value };
+    case 'SET_LGPD': return { ...state, acceptedLgpd: action.value };
+    case 'SET_ERROR': return { ...state, localError: action.value };
+    case 'CLEAR_MESSAGES': return { ...state, localError: null, successMessage: null, warningMessage: null };
+    case 'SUBMIT_SUCCESS': return { ...WAITLIST_INITIAL_STATE, successMessage: action.success, warningMessage: action.warning };
+    case 'RESET_FORM': return WAITLIST_INITIAL_STATE;
+  }
+}
+
 const WaitlistSection: React.FC = () => {
   const { submitWaitlist, isSubmitting, error } = useWaitlistCapture();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [acceptedLgpd, setAcceptedLgpd] = useState(false);
-  const [localError, setLocalError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [warningMessage, setWarningMessage] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(waitlistReducer, WAITLIST_INITIAL_STATE);
+  const { name, email, acceptedLgpd, localError, successMessage, warningMessage } = state;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setLocalError(null);
-    setSuccessMessage(null);
-    setWarningMessage(null);
+    dispatch({ type: 'CLEAR_MESSAGES' });
 
     if (!name.trim() || !email.trim()) {
-      setLocalError('Preencha nome completo e e-mail para entrar na lista.');
+      dispatch({ type: 'SET_ERROR', value: 'Preencha nome completo e e-mail para entrar na lista.' });
       return;
     }
 
     if (!acceptedLgpd) {
-      setLocalError('Você precisa aceitar a política de privacidade para continuar.');
+      dispatch({ type: 'SET_ERROR', value: 'Você precisa aceitar a política de privacidade para continuar.' });
       return;
     }
 
@@ -36,28 +82,11 @@ const WaitlistSection: React.FC = () => {
     });
 
     if (result.ok === false) {
-      setLocalError(result.error);
+      dispatch({ type: 'SET_ERROR', value: result.error });
       return;
     }
 
-    setSuccessMessage('Você entrou na lista de espera para o Lollapalooza 2027.');
-    setWarningMessage(result.warning || null);
-    setName('');
-    setEmail('');
-    setAcceptedLgpd(false);
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { staggerChildren: 0.1, delayChildren: 0.2 }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100 } as const }
+    dispatch({ type: 'SUBMIT_SUCCESS', success: 'Você entrou na lista de espera para o Lollapalooza 2027.', warning: result.warning || null });
   };
 
   return (
@@ -82,28 +111,28 @@ const WaitlistSection: React.FC = () => {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
-            variants={containerVariants}
+            variants={CONTAINER_VARIANTS}
             className="flex flex-col items-start text-left"
           >
-            <m.div variants={itemVariants} className="inline-flex items-center gap-2 bg-anhanga-yellow text-black px-4 py-1 text-[10px] font-black uppercase tracking-[0.25em] ring-2 ring-anhanga-yellow ring-offset-4 ring-offset-black mb-10">
+            <m.div variants={ITEM_VARIANTS} className="inline-flex items-center gap-2 bg-anhanga-yellow text-black px-4 py-1 text-[10px] font-black uppercase tracking-[0.25em] ring-2 ring-anhanga-yellow ring-offset-4 ring-offset-black mb-10">
               <TicketX size={14} strokeWidth={3} aria-hidden="true" />
               Sold Out 2026
             </m.div>
 
             <m.h2 
-              variants={itemVariants}
+              variants={ITEM_VARIANTS}
               id="waitlist-heading" 
               className="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-[0.9] uppercase italic tracking-tighter mb-8"
             >
               Não fique de fora do <span className="text-anhanga-yellow">Lolla 2027.</span>
             </m.h2>
 
-            <m.p variants={itemVariants} className="text-lg md:text-xl text-zinc-400 font-medium leading-relaxed max-w-xl mb-12">
+            <m.p variants={ITEM_VARIANTS} className="text-lg md:text-xl text-zinc-400 font-medium leading-relaxed max-w-xl mb-12">
               A jornada de 2026 lotou em tempo recorde. Garanta seu lugar na lista de prioridade para a edição 2027 e receba avisos antecipados sobre pacotes, logística e condições exclusivas Anhangá.
             </m.p>
 
             <div className="grid gap-6 w-full max-w-lg">
-              <m.div variants={itemVariants} className="group flex gap-4 p-6 bg-white/[0.03] border border-white/10 hover:border-anhanga-yellow transition-colors duration-300">
+              <m.div variants={ITEM_VARIANTS} className="group flex gap-4 p-6 bg-white/[0.03] border border-white/10 hover:border-anhanga-yellow transition-colors duration-300">
                 <div className="bg-anhanga-yellow text-black p-3 h-fit">
                   <BellRing size={20} strokeWidth={3} aria-hidden="true" />
                 </div>
@@ -113,7 +142,7 @@ const WaitlistSection: React.FC = () => {
                 </div>
               </m.div>
 
-              <m.div variants={itemVariants} className="group flex gap-4 p-6 bg-white/[0.03] border border-white/10 hover:border-anhanga-blue transition-colors duration-300">
+              <m.div variants={ITEM_VARIANTS} className="group flex gap-4 p-6 bg-white/[0.03] border border-white/10 hover:border-anhanga-blue transition-colors duration-300">
                 <div className="bg-anhanga-blue text-white p-3 h-fit">
                   <Zap size={20} strokeWidth={3} aria-hidden="true" />
                 </div>
@@ -153,7 +182,7 @@ const WaitlistSection: React.FC = () => {
                       id="lolla-waitlist-name"
                       type="text"
                       value={name}
-                      onChange={(event) => setName(event.target.value)}
+                      onChange={(event) => dispatch({ type: 'SET_NAME', value: event.target.value })}
                       className="peer w-full bg-anhanga-darkBlue/80 border-l-2 border-white/10 px-6 py-4 text-white placeholder-white/50 outline-none transition duration-300 focus:border-anhanga-yellow focus:bg-anhanga-yellow/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-anhanga-yellow focus-visible:outline-offset-2"
                       placeholder="EX: SABRINA CARPENTER"
                       autoComplete="name"
@@ -173,7 +202,7 @@ const WaitlistSection: React.FC = () => {
                       id="lolla-waitlist-email"
                       type="email"
                       value={email}
-                      onChange={(event) => setEmail(event.target.value)}
+                      onChange={(event) => dispatch({ type: 'SET_EMAIL', value: event.target.value })}
                       className="peer w-full bg-anhanga-darkBlue/80 border-l-2 border-white/10 px-6 py-4 text-white placeholder-white/50 outline-none transition duration-300 focus:border-anhanga-blue focus:bg-anhanga-blue/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-anhanga-blue focus-visible:outline-offset-2"
                       placeholder="VOICE@EXEMPLO.COM"
                       autoComplete="email"
@@ -190,7 +219,7 @@ const WaitlistSection: React.FC = () => {
                       id="lolla-waitlist-lgpd"
                       type="checkbox"
                       checked={acceptedLgpd}
-                      onChange={(event) => setAcceptedLgpd(event.target.checked)}
+                      onChange={(event) => dispatch({ type: 'SET_LGPD', value: event.target.checked })}
                       className="peer sr-only"
                     />
                     <div className="size-5 border-2 border-white/20 peer-checked:border-anhanga-yellow peer-checked:bg-anhanga-yellow transition duration-200 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-anhanga-yellow peer-focus-visible:outline-offset-2" />

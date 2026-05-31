@@ -316,20 +316,28 @@
 .quiz-progress { display: flex; align-items: center; gap: 12px; }
 .quiz-progress-text { font-family: var(--av-font-display); font-weight: 800; font-size: 14px; color: var(--av-dark); }
 .quiz-progress-bar {
+  appearance: none;
+  -webkit-appearance: none;
   width: 180px; height: 10px;
-  background: white;
   border: 2px solid var(--av-dark);
   border-radius: 9999px;
   overflow: hidden;
   box-shadow: 3px 3px 0 var(--av-dark);
+  background: white;
 }
-.quiz-progress-fill {
-  height: 100%;
-  width: 100%;
+.quiz-progress-bar::-webkit-progress-bar {
+  background: white;
+  border-radius: 9999px;
+}
+.quiz-progress-bar::-webkit-progress-value {
   background: linear-gradient(90deg, var(--av-yellow), var(--layer-4));
-  transform: scaleX(var(--progress, 0));
-  transform-origin: left;
-  transition: transform 0.55s var(--av-ease-spring);
+  border-radius: 9999px;
+  transition: width 0.55s var(--av-ease-spring);
+}
+.quiz-progress-bar::-moz-progress-bar {
+  background: linear-gradient(90deg, var(--av-yellow), var(--layer-4));
+  border-radius: 9999px;
+  transition: width 0.55s var(--av-ease-spring);
 }
 
 .quiz-q-body { width: 100%; max-width: 880px; display: flex; flex-direction: column; align-items: center; text-align: center; }
@@ -1163,7 +1171,8 @@
   .quiz-conf,
   .quiz-reveal-block,
   .quiz-result-inner,
-  .quiz-progress-fill,
+  .quiz-progress-bar::-webkit-progress-value,
+  .quiz-progress-bar::-moz-progress-bar,
   .quiz-deco-star,
   .quiz-arrow,
   .quiz-btn--hero,

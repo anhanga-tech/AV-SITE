@@ -14,6 +14,14 @@ import { getBetoAssetUrl } from './assetPath';
 
 const SITE_URL = 'https://www.anhanga.tur.br';
 
+const NAV_LINKS = [
+  { name: 'O Perrengue', href: '#problem' },
+  { name: 'A Solução', href: '#solution' },
+  { name: 'Atrações', href: '#attractions' },
+  { name: 'Depoimentos', href: '#testimonials' },
+  { name: 'Dúvidas', href: '#faq' },
+];
+
 const App: React.FC = () => {
   const [showSticky, setShowSticky] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -73,13 +81,7 @@ const App: React.FC = () => {
     };
   }, []);
 
-  const navLinks = [
-    { name: 'O Perrengue', href: '#problem' },
-    { name: 'A Solução', href: '#solution' },
-    { name: 'Atrações', href: '#attractions' },
-    { name: 'Depoimentos', href: '#testimonials' },
-    { name: 'Dúvidas', href: '#faq' },
-  ];
+  const navLinks = NAV_LINKS;
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);

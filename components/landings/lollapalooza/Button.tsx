@@ -21,19 +21,19 @@ interface ButtonProps {
  * O href é preenchido com a URL do WhatsApp incluindo todos os parâmetros de tracking.
  * A navegação é 100% nativa, garantindo funcionamento no iOS/Safari.
  */
+const BASE_STYLES = "inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full font-bold transition duration-300 transform hover:scale-105 shadow-lg text-lg uppercase tracking-wide cursor-pointer select-none";
+
+const VARIANTS = {
+  primary: "bg-anhanga-yellow text-anhanga-darkBlue hover:bg-anhanga-yellowHover",
+  secondary: "bg-white text-anhanga-blue hover:bg-zinc-100",
+  outline: "border-2 border-white text-white hover:bg-white hover:text-anhanga-blue"
+};
+
 const Button: React.FC<ButtonProps> = ({ text, className = '', variant = 'primary', fullWidth = false, href, id, dataTestId, dataWhatsappLocation, dataTracking }) => {
-  const baseStyles = "inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full font-bold transition duration-300 transform hover:scale-105 shadow-lg text-lg uppercase tracking-wide cursor-pointer select-none";
-
-  const variants = {
-    primary: "bg-anhanga-yellow text-anhanga-darkBlue hover:bg-anhanga-yellowHover",
-    secondary: "bg-white text-anhanga-blue hover:bg-zinc-100",
-    outline: "border-2 border-white text-white hover:bg-white hover:text-anhanga-blue"
-  };
-
   const widthClass = fullWidth ? "w-full" : "";
 
   const sharedProps = {
-    className: `${baseStyles} ${variants[variant]} ${widthClass} ${className}`,
+    className: `${BASE_STYLES} ${VARIANTS[variant]} ${widthClass} ${className}`,
     id,
     'data-testid': dataTestId,
     'data-whatsapp-location': dataWhatsappLocation,
