@@ -78,9 +78,9 @@ const LineupSection: React.FC = () => {
         {/* Headline Section */}
         <div className={`text-center mb-16 animate-on-scroll ${isVisible ? 'is-visible' : ''}`}>
           {/* Artist Avatars Cluster */}
-          <div className="flex justify-center items-center -space-x-4 mb-8" aria-hidden="true">
+          <div className="flex justify-center items-center mb-8" aria-hidden="true">
             {HEADLINERS.slice(0, 5).map((artist) => (
-              <div key={artist.name} className="relative z-0 hover:z-10 transition duration-300 transform hover:scale-110 hover:-translate-y-2 group">
+              <div key={artist.name} className="relative z-0 -ml-4 first:ml-0 hover:z-10 transition duration-300 transform hover:scale-110 hover:-translate-y-2 group">
                 <div className="size-16 md:size-24 rounded-full border-4 border-black group-hover:border-anhanga-yellow overflow-hidden relative shadow-lg">
                   <img
                     src={getArtistImageUrl(artist.image, 96, 96)}

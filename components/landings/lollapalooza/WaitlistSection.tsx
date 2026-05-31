@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useReducer } from 'react';
 import { BellRing, CheckCircle2, Loader2, Mail, TicketX, ArrowRight, Zap } from 'lucide-react';
 import { m, AnimatePresence } from 'framer-motion';
 import { useWaitlistCapture } from '../../../hooks/useWaitlistCapture';
@@ -17,28 +17,61 @@ const ITEM_VARIANTS = {
   visible: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100 } as const }
 };
 
+interface WaitlistFormState {
+  name: string;
+  email: string;
+  acceptedLgpd: boolean;
+  localError: string | null;
+  successMessage: string | null;
+  warningMessage: string | null;
+}
+
+type WaitlistFormAction =
+  | { type: 'SET_NAME'; value: string }
+  | { type: 'SET_EMAIL'; value: string }
+  | { type: 'SET_LGPD'; value: boolean }
+  | { type: 'SET_ERROR'; value: string }
+  | { type: 'CLEAR_MESSAGES' }
+  | { type: 'SUBMIT_SUCCESS'; success: string; warning: string | null }
+  | { type: 'RESET_FORM' };
+
+const WAITLIST_INITIAL_STATE: WaitlistFormState = {
+  name: '',
+  email: '',
+  acceptedLgpd: false,
+  localError: null,
+  successMessage: null,
+  warningMessage: null,
+};
+
+function waitlistReducer(state: WaitlistFormState, action: WaitlistFormAction): WaitlistFormState {
+  switch (action.type) {
+    case 'SET_NAME': return { ...state, name: action.value };
+    case 'SET_EMAIL': return { ...state, email: action.value };
+    case 'SET_LGPD': return { ...state, acceptedLgpd: action.value };
+    case 'SET_ERROR': return { ...state, localError: action.value };
+    case 'CLEAR_MESSAGES': return { ...state, localError: null, successMessage: null, warningMessage: null };
+    case 'SUBMIT_SUCCESS': return { ...WAITLIST_INITIAL_STATE, successMessage: action.success, warningMessage: action.warning };
+    case 'RESET_FORM': return WAITLIST_INITIAL_STATE;
+  }
+}
+
 const WaitlistSection: React.FC = () => {
   const { submitWaitlist, isSubmitting, error } = useWaitlistCapture();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [acceptedLgpd, setAcceptedLgpd] = useState(false);
-  const [localError, setLocalError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [warningMessage, setWarningMessage] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(waitlistReducer, WAITLIST_INITIAL_STATE);
+  const { name, email, acceptedLgpd, localError, successMessage, warningMessage } = state;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setLocalError(null);
-    setSuccessMessage(null);
-    setWarningMessage(null);
+    dispatch({ type: 'CLEAR_MESSAGES' });
 
     if (!name.trim() || !email.trim()) {
-      setLocalError('Preencha nome completo e e-mail para entrar na lista.');
+      dispatch({ type: 'SET_ERROR', value: 'Preencha nome completo e e-mail para entrar na lista.' });
       return;
     }
 
     if (!acceptedLgpd) {
-      setLocalError('Você precisa aceitar a política de privacidade para continuar.');
+      dispatch({ type: 'SET_ERROR', value: 'Você precisa aceitar a política de privacidade para continuar.' });
       return;
     }
 
@@ -49,15 +82,11 @@ const WaitlistSection: React.FC = () => {
     });
 
     if (result.ok === false) {
-      setLocalError(result.error);
+      dispatch({ type: 'SET_ERROR', value: result.error });
       return;
     }
 
-    setSuccessMessage('Você entrou na lista de espera para o Lollapalooza 2027.');
-    setWarningMessage(result.warning || null);
-    setName('');
-    setEmail('');
-    setAcceptedLgpd(false);
+    dispatch({ type: 'SUBMIT_SUCCESS', success: 'Você entrou na lista de espera para o Lollapalooza 2027.', warning: result.warning || null });
   };
 
   return (
@@ -153,7 +182,7 @@ const WaitlistSection: React.FC = () => {
                       id="lolla-waitlist-name"
                       type="text"
                       value={name}
-                      onChange={(event) => setName(event.target.value)}
+                      onChange={(event) => dispatch({ type: 'SET_NAME', value: event.target.value })}
                       className="peer w-full bg-anhanga-darkBlue/80 border-l-2 border-white/10 px-6 py-4 text-white placeholder-white/50 outline-none transition duration-300 focus:border-anhanga-yellow focus:bg-anhanga-yellow/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-anhanga-yellow focus-visible:outline-offset-2"
                       placeholder="EX: SABRINA CARPENTER"
                       autoComplete="name"
@@ -173,7 +202,7 @@ const WaitlistSection: React.FC = () => {
                       id="lolla-waitlist-email"
                       type="email"
                       value={email}
-                      onChange={(event) => setEmail(event.target.value)}
+                      onChange={(event) => dispatch({ type: 'SET_EMAIL', value: event.target.value })}
                       className="peer w-full bg-anhanga-darkBlue/80 border-l-2 border-white/10 px-6 py-4 text-white placeholder-white/50 outline-none transition duration-300 focus:border-anhanga-blue focus:bg-anhanga-blue/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-anhanga-blue focus-visible:outline-offset-2"
                       placeholder="VOICE@EXEMPLO.COM"
                       autoComplete="email"
@@ -190,7 +219,7 @@ const WaitlistSection: React.FC = () => {
                       id="lolla-waitlist-lgpd"
                       type="checkbox"
                       checked={acceptedLgpd}
-                      onChange={(event) => setAcceptedLgpd(event.target.checked)}
+                      onChange={(event) => dispatch({ type: 'SET_LGPD', value: event.target.checked })}
                       className="peer sr-only"
                     />
                     <div className="size-5 border-2 border-white/20 peer-checked:border-anhanga-yellow peer-checked:bg-anhanga-yellow transition duration-200 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-anhanga-yellow peer-focus-visible:outline-offset-2" />
