@@ -1,9 +1,10 @@
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { cleanString } from '../lib/lead-logic';
 import type { GoogleReview, GoogleReviewsData, ReviewAnnotations, ReviewsBlocklist } from '../types/reviews';
 
-for (const file of ['.env', '.env.local']) {
+for (const file of ['.env.local', '.env']) {
   const path = resolve(process.cwd(), file);
   if (existsSync(path) && typeof process.loadEnvFile === 'function') {
     process.loadEnvFile(path);
@@ -226,7 +227,7 @@ async function main() {
   }, null, 2));
 }
 
-const isDirectRun = import.meta.url === `file://${process.argv[1]}`;
+const isDirectRun = !!process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1]);
 
 if (isDirectRun) {
   main().catch((err) => {
