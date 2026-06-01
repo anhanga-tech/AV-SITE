@@ -136,7 +136,7 @@ export default async function handler(request: Request): Promise<Response> {
         return buildJsonResponse({ ok: true, requestId }, 201, corsHeaders);
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : String(error);
-        const isTimeout = (error instanceof Error || (error && typeof error === 'object' && 'name' in error)) && (error as { name: string }).name === 'AbortError';
+        const isTimeout = error instanceof Error && error.name === 'AbortError';
 
         logger.error('SUBMIT_LEAD_SF', {
             requestId,
