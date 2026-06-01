@@ -80,6 +80,14 @@ test('submit-lead-sf: invalid email returns 400', async () => {
     assert.match(data.error, /email/i);
 });
 
+test('submit-lead-sf: invalid phone returns 400 when provided', async () => {
+    const payload = { ...minimalPayload(), whatsapp: '123' };
+    const res = await handler(buildRequest(payload));
+    assert.equal(res.status, 400);
+    const data = await res.json();
+    assert.match(data.error, /telefone/i);
+});
+
 test('submit-lead-sf: full corporativo payload sends all fields', async () => {
     let capturedUrl = '';
     let capturedBody = '';
@@ -123,7 +131,7 @@ test('submit-lead-sf: minimal payload (only required fields) defaults leadSource
         assert.ok(capturedBody.includes('first_name=Maria'), 'first_name');
         assert.ok(capturedBody.includes('lead_source=Web'), 'default lead_source');
         assert.ok(!capturedBody.includes('phone='), 'no phone when absent');
-        assert.ok(!capturedBody.includes('company='), 'no company when absent');
+        assert.ok(capturedBody.includes('company=N%C3%A3o+informado'), 'company defaults to Não informado');
         assert.ok(!capturedBody.includes('title='), 'no title when absent');
         assert.ok(!capturedBody.includes('description='), 'no description when absent');
     } finally {

@@ -57,8 +57,13 @@ function validateSfLeadBody(raw: unknown): { valid: true; data: SalesforceLeadFi
         return { valid: false, error: 'Email inválido.' };
     }
 
-    const phone = normalizeWhatsappNumber(body.whatsapp) ?? undefined;
-    const company = cleanString(body.empresa) || undefined;
+    const hasWhatsapp = typeof body.whatsapp === 'string' && body.whatsapp.trim().length > 0;
+    const phone = hasWhatsapp ? (normalizeWhatsappNumber(body.whatsapp) ?? undefined) : undefined;
+    if (hasWhatsapp && !phone) {
+        return { valid: false, error: 'Número de telefone inválido.' };
+    }
+
+    const company = cleanString(body.empresa) || 'Não informado';
     const title = cleanString(body.cargo) || undefined;
     const description = cleanString(body.description) || undefined;
 
