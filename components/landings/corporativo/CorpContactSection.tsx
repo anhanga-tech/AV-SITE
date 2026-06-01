@@ -39,21 +39,6 @@ export function CorpContactSection() {
         };
     }
 
-    function submitToSalesforce() {
-        fetch('/api/submit-lead-sf', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                firstName: form.firstName,
-                lastName: form.lastName,
-                email: form.email,
-                whatsapp: form.whatsapp,
-                empresa: form.empresa,
-                cargo: form.cargo,
-            }),
-        }).catch(() => {});
-    }
-
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if (isLocallySubmitting.current) return;
@@ -76,7 +61,20 @@ export function CorpContactSection() {
             const empresa = form.empresa.trim() || 'Não informado';
             const cargo = form.cargo.trim() || 'Não informado';
 
-            const result = await submitLead(
+            const sfPromise = fetch('/api/submit-lead-sf', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    firstName: form.firstName,
+                    lastName: form.lastName,
+                    email: form.email,
+                    whatsapp: form.whatsapp,
+                    empresa: form.empresa,
+                    cargo: form.cargo,
+                }),
+            }).catch(() => {});
+
+            const n8nPromise = submitLead(
                 {
                     firstName: form.firstName,
                     lastName: form.lastName,
@@ -88,12 +86,13 @@ export function CorpContactSection() {
                 { eventId, pushDataLayerEvent: true, formType: 'corporate_lead' },
             );
 
-            if (result.ok) {
-                submitToSalesforce();
+            const [, n8nResult] = await Promise.all([sfPromise, n8nPromise]);
+
+            if (n8nResult.ok) {
                 setSubmitState('success');
             } else {
                 setSubmitState('error');
-                setErrorMessage('error' in result ? result.error : 'Ocorreu um erro ao enviar. Tente novamente.');
+                setErrorMessage('error' in n8nResult ? n8nResult.error : 'Ocorreu um erro ao enviar. Tente novamente.');
                 isLocallySubmitting.current = false;
             }
         } catch (err) {
