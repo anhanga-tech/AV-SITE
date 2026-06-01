@@ -47,9 +47,10 @@ test.describe('Home structured data', () => {
     const serviceSchema = parseStructuredData(await serviceScript.first().innerHTML());
     expect(serviceSchema['@type']).toBe('Service');
     expect(serviceSchema.name).toBe('Agência de Viagens Personalizadas');
-    expect(serviceSchema.aggregateRating).toBeDefined();
-    expect(serviceSchema.aggregateRating['@type']).toBe('AggregateRating');
-    expect(serviceSchema.aggregateRating.ratingValue).toBe(5);
-    expect(serviceSchema.aggregateRating.reviewCount).toBe(2);
+    const rating = serviceSchema.aggregateRating as Record<string, unknown>;
+    expect(rating).toBeDefined();
+    expect(rating['@type']).toBe('AggregateRating');
+    expect(rating['ratingValue']).toBe(5);
+    expect(rating['reviewCount']).toBe(2);
   });
 });
