@@ -47,8 +47,9 @@ test.describe('Home structured data', () => {
     const serviceSchema = parseStructuredData(await serviceScript.first().innerHTML());
     expect(serviceSchema['@type']).toBe('Service');
     expect(serviceSchema.name).toBe('Agência de Viagens Personalizadas');
-    // aggregateRating was intentionally removed from the home ServiceSchema to comply with
-    // Google's structured data visibility guidelines (reviews must be user-visible on the page).
-    expect(serviceSchema.aggregateRating).toBeUndefined();
+    expect(serviceSchema.aggregateRating).toBeDefined();
+    expect(serviceSchema.aggregateRating['@type']).toBe('AggregateRating');
+    expect(serviceSchema.aggregateRating.ratingValue).toBe(5);
+    expect(serviceSchema.aggregateRating.reviewCount).toBe(2);
   });
 });
