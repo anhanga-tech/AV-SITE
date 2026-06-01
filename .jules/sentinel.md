@@ -87,3 +87,8 @@ Standardized the "Zero-Trust CORS" pattern for internal APIs. Public-facing endp
 **Vulnerability:** The quiz submission API (`api/submit-quiz.ts`) was leaking raw upstream webhook error details to clients and lacked PII masking in server-side logs. Additionally, the `destinos` field was vulnerable to stored XSS as it bypassed standard sanitization filters.
 **Learning:** Observability must not come at the cost of privacy. Centralizing PII masking utilities (Email, Phone, Name) ensures consistent protection across all ingestion endpoints. Generic error messages prevent attackers from mapping internal infrastructure via leaked webhook responses.
 **Prevention:** Use `maskEmail`, `maskPhone`, and `maskName` from `lib/lead-logic.ts` in all structured logs. Always return sanitized, generic error codes/messages to the frontend, keeping technical details strictly for server-side logs.
+
+## 2026-03-28 - [Loose Origin Validation in OAuth Handshake]
+**Vulnerability:** The OAuth callback in `api/auth/callback.ts` used an over-permissive regex for subdomain validation and a wildcard `*` for the initial handshake `postMessage`.
+**Learning:** Permissive regex patterns like `.*\.anhanga\.tur\.br` can match crafted origins if not properly anchored. Wildcard `postMessage` targets allow any opened window to intercept handshakes.
+**Prevention:** Use restrictive regex patterns that validate specific subdomain structures (e.g., `(?:[a-zA-Z0-9-]+\.)*`). Always specify a target origin for `postMessage` when known, even for non-sensitive handshakes, to maintain a strict security posture.
