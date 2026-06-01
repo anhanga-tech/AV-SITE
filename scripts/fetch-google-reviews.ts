@@ -99,6 +99,7 @@ async function uploadPhotoToR2(
       `${bucketName}/${key}`,
       `--file=${tmpFile}`,
       '--content-type=image/jpeg',
+      '--remote',
     ], { stdio: 'pipe' });
   } finally {
     try { unlinkSync(tmpFile); } catch {}
