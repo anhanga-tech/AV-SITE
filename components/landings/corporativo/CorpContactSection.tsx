@@ -39,6 +39,21 @@ export function CorpContactSection() {
         };
     }
 
+    function submitToSalesforce() {
+        fetch('/api/submit-lead-sf', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                firstName: form.firstName,
+                lastName: form.lastName,
+                email: form.email,
+                whatsapp: form.whatsapp,
+                empresa: form.empresa,
+                cargo: form.cargo,
+            }),
+        }).catch(() => {});
+    }
+
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if (isLocallySubmitting.current) return;
@@ -74,6 +89,7 @@ export function CorpContactSection() {
             );
 
             if (result.ok) {
+                submitToSalesforce();
                 setSubmitState('success');
             } else {
                 setSubmitState('error');
