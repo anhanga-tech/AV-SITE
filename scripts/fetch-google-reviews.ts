@@ -73,11 +73,6 @@ async function uploadPhotoToR2(
   bucketName: string,
   cdnBaseUrl: string
 ): Promise<string> {
-  const { execFileSync } = await import('node:child_process');
-  const { writeFileSync, unlinkSync, mkdirSync } = await import('node:fs');
-  const { tmpdir } = await import('node:os');
-  const { join } = await import('node:path');
-
   if (!SAFE_ID_RE.test(reviewId)) {
     throw new Error(`Invalid review ID: ${reviewId}`);
   }
@@ -88,21 +83,26 @@ async function uploadPhotoToR2(
   const buffer = Buffer.from(await response.arrayBuffer());
   const key = `reviews/${reviewId}.jpg`;
 
-  const tmpDir = join(tmpdir(), 'review-photos');
-  mkdirSync(tmpDir, { recursive: true });
-  const tmpFile = join(tmpDir, `${reviewId}.jpg`);
+  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+  const apiToken = process.env.CLOUDFLARE_API_TOKEN;
 
-  writeFileSync(tmpFile, buffer);
-  try {
-    execFileSync('npx', [
-      'wrangler', 'r2', 'object', 'put',
-      `${bucketName}/${key}`,
-      `--file=${tmpFile}`,
-      '--content-type=image/jpeg',
-      '--remote',
-    ], { stdio: 'pipe' });
-  } finally {
-    try { unlinkSync(tmpFile); } catch {}
+  if (!accountId || !apiToken) {
+    throw new Error('Missing CLOUDFLARE_ACCOUNT_ID or CLOUDFLARE_API_TOKEN for R2 upload');
+  }
+
+  const uploadUrl = `https://api.cloudflare.com/client/v4/accounts/${accountId}/r2/buckets/${bucketName}/objects/${key}`;
+  const putRes = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${apiToken}`,
+      'Content-Type': 'image/jpeg',
+    },
+    body: buffer,
+  });
+
+  if (!putRes.ok) {
+    const errBody = await putRes.text();
+    throw new Error(`R2 upload failed (${putRes.status}): ${errBody.slice(0, 200)}`);
   }
 
   return `${cdnBaseUrl}/${key}`;
@@ -265,8 +265,9 @@ async function main() {
       try {
         photoUrl = await uploadPhotoToR2(review.id, review.photoUrl, config.r2BucketName!, config.r2CdnBaseUrl!);
         if (photoUrl) photosUploaded++;
-      } catch {
-        console.warn(`Failed to upload photo for review ${review.id}`);
+      } catch (err) {
+        const detail = err instanceof Error ? err.message : String(err);
+        console.warn(`Failed to upload photo for review ${review.id}: ${detail}`);
       }
     }
     finalReviews.push({
