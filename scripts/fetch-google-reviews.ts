@@ -70,7 +70,7 @@ const SAFE_ID_RE = /^[a-zA-Z0-9_-]+$/;
 async function uploadPhotoToR2(
   reviewId: string,
   sourceUrl: string,
-  _bucketName: string,
+  bucketName: string,
   cdnBaseUrl: string
 ): Promise<string> {
   if (!SAFE_ID_RE.test(reviewId)) {
@@ -85,10 +85,9 @@ async function uploadPhotoToR2(
 
   const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
   const apiToken = process.env.CLOUDFLARE_API_TOKEN;
-  const bucketName = process.env.R2_BUCKET_NAME;
 
-  if (!accountId || !apiToken || !bucketName) {
-    throw new Error('Missing CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN, or R2_BUCKET_NAME for R2 upload');
+  if (!accountId || !apiToken) {
+    throw new Error('Missing CLOUDFLARE_ACCOUNT_ID or CLOUDFLARE_API_TOKEN for R2 upload');
   }
 
   const uploadUrl = `https://api.cloudflare.com/client/v4/accounts/${accountId}/r2/buckets/${bucketName}/objects/${key}`;
