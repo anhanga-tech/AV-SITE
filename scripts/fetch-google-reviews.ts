@@ -1,5 +1,14 @@
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { cleanString } from '../lib/lead-logic';
 import type { GoogleReview, GoogleReviewsData, ReviewAnnotations, ReviewsBlocklist } from '../types/reviews';
+
+for (const file of ['.env', '.env.local']) {
+  const path = resolve(process.cwd(), file);
+  if (existsSync(path) && typeof process.loadEnvFile === 'function') {
+    process.loadEnvFile(path);
+  }
+}
 
 const MIN_RATING = 4;
 
