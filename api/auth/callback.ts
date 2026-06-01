@@ -78,7 +78,7 @@ export function buildPostMessageHtml(status: 'success' | 'error', content: strin
     var origin = e.origin || '';
     var isTrusted = origin === allowedOrigin ||
                     origin === window.location.origin ||
-                    /^https:\\/\\/.*\\.anhanga\\.tur\\.br$/.test(origin) ||
+                    /^https:\\/\\/(?:[a-zA-Z0-9-]+\\.)*anhanga\\.tur\\.br$/.test(origin) ||
                     /^http:\\/\\/localhost:\\d+$/.test(origin);
 
     if (!isTrusted) {
@@ -99,7 +99,7 @@ export function buildPostMessageHtml(status: 'success' | 'error', content: strin
   }, 10000);
 
   window.addEventListener('message', onMessage, false);
-  window.opener.postMessage(handshake, '*');
+  window.opener.postMessage(handshake, allowedOrigin);
 }());
 </script>
 </body>

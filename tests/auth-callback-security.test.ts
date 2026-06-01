@@ -13,7 +13,7 @@ test('buildPostMessageHtml includes origin validation logic', async () => {
     // Check for specific trusted origin patterns
     assert.match(html, /origin === allowedOrigin/);
     assert.match(html, /origin === window\.location\.origin/);
-    assert.match(html, /\/\^https:\\\/\\\/\.\*\\\.anhanga\\\.tur\\\.br\$\//);
+    assert.match(html, /\/\^https:\\\/\\\/\(\?:\[a-zA-Z0-9-\]\+\\\.\)\*anhanga\\\.tur\\\.br\$\//);
 
     // Check for localhost regex
     // In the HTML string it is: /^http:\\/\\/localhost:\\d+$/.test(origin)
