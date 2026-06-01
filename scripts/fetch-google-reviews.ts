@@ -226,7 +226,9 @@ async function main() {
   }, null, 2));
 }
 
-const isDirectRun = import.meta.url === `file://${process.argv[1]}`;
+const scriptPath = new URL(import.meta.url).pathname;
+const isDirectRun = scriptPath.endsWith('/fetch-google-reviews.ts') &&
+  !process.argv[1]?.includes('.test.');
 
 if (isDirectRun) {
   main().catch((err) => {
