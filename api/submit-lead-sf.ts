@@ -12,14 +12,19 @@ export const config = {
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
 
-interface SfLeadBody {
-    firstName: string;
-    lastName: string;
-    email: string;
-    whatsapp: string;
-    empresa?: string;
-    cargo?: string;
-}
+const VALID_LEAD_SOURCES = new Set([
+    'Advertisement',
+    'Employee Referral',
+    'External Referral',
+    'Partner',
+    'Public Relations',
+    'Seminar - Internal',
+    'Corporativo',
+    'Trade Show',
+    'Web',
+    'Word of mouth',
+    'Other',
+]);
 
 function buildJsonResponse(
     body: Record<string, unknown>,
@@ -42,9 +47,6 @@ function validateSfLeadBody(raw: unknown): { valid: true; data: SalesforceLeadFi
     const firstName = cleanString(body.firstName);
     const lastName = cleanString(body.lastName);
     const email = cleanString(body.email).toLowerCase();
-    const phone = normalizeWhatsappNumber(body.whatsapp);
-    const company = cleanString(body.empresa) || 'Não informado';
-    const title = cleanString(body.cargo) || '';
 
     if (!firstName || !lastName || !email) {
         return { valid: false, error: 'Campos obrigatórios ausentes.' };
@@ -55,9 +57,13 @@ function validateSfLeadBody(raw: unknown): { valid: true; data: SalesforceLeadFi
         return { valid: false, error: 'Email inválido.' };
     }
 
-    if (!phone) {
-        return { valid: false, error: 'Número de telefone inválido.' };
-    }
+    const phone = normalizeWhatsappNumber(body.whatsapp) ?? undefined;
+    const company = cleanString(body.empresa) || undefined;
+    const title = cleanString(body.cargo) || undefined;
+    const description = cleanString(body.description) || undefined;
+
+    const rawLeadSource = cleanString(body.leadSource);
+    const leadSource = VALID_LEAD_SOURCES.has(rawLeadSource) ? rawLeadSource : 'Web';
 
     return {
         valid: true,
@@ -68,7 +74,8 @@ function validateSfLeadBody(raw: unknown): { valid: true; data: SalesforceLeadFi
             phone,
             company,
             title,
-            leadSource: 'Corporativo',
+            leadSource,
+            description,
         },
     };
 }
@@ -121,7 +128,7 @@ export default async function handler(request: Request): Promise<Response> {
         requestId,
         stage: 'sending',
         email: maskEmail(fields.email),
-        company: fields.company,
+        leadSource: fields.leadSource,
     });
 
     try {

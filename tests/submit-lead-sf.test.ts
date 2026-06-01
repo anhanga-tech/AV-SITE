@@ -18,7 +18,7 @@ function buildRequest(body: Record<string, unknown>, init?: { method?: string })
     });
 }
 
-function validPayload() {
+function corporativoPayload() {
     return {
         firstName: 'João',
         lastName: 'Silva',
@@ -26,6 +26,15 @@ function validPayload() {
         whatsapp: '11999998888',
         empresa: 'Acme Corp',
         cargo: 'Diretor',
+        leadSource: 'Corporativo',
+    };
+}
+
+function minimalPayload() {
+    return {
+        firstName: 'Maria',
+        lastName: 'Santos',
+        email: 'maria@teste.com.br',
     };
 }
 
@@ -63,7 +72,7 @@ test('submit-lead-sf: missing required fields returns 400', async () => {
 });
 
 test('submit-lead-sf: invalid email returns 400', async () => {
-    const payload = validPayload();
+    const payload = corporativoPayload();
     payload.email = 'not-an-email';
     const res = await handler(buildRequest(payload));
     assert.equal(res.status, 400);
@@ -71,16 +80,7 @@ test('submit-lead-sf: invalid email returns 400', async () => {
     assert.match(data.error, /email/i);
 });
 
-test('submit-lead-sf: invalid phone returns 400', async () => {
-    const payload = validPayload();
-    payload.whatsapp = '123';
-    const res = await handler(buildRequest(payload));
-    assert.equal(res.status, 400);
-    const data = await res.json();
-    assert.match(data.error, /telefone/i);
-});
-
-test('submit-lead-sf: valid payload sends to Salesforce and returns 201', async () => {
+test('submit-lead-sf: full corporativo payload sends all fields', async () => {
     let capturedUrl = '';
     let capturedBody = '';
 
@@ -91,25 +91,24 @@ test('submit-lead-sf: valid payload sends to Salesforce and returns 201', async 
     };
 
     try {
-        const res = await handler(buildRequest(validPayload()));
+        const res = await handler(buildRequest(corporativoPayload()));
         assert.equal(res.status, 201);
-        const data = await res.json();
-        assert.equal(data.ok, true);
 
         const parsedUrl = new URL(capturedUrl);
-        assert.equal(parsedUrl.hostname, 'webto.salesforce.com', 'Should POST to Salesforce');
-        assert.ok(capturedBody.includes('first_name=Jo%C3%A3o'), 'Should include first_name');
-        assert.ok(capturedBody.includes('last_name=Silva'), 'Should include last_name');
-        assert.ok(capturedBody.includes('company=Acme+Corp'), 'Should include company');
-        assert.ok(capturedBody.includes('title=Diretor'), 'Should include title');
-        assert.ok(capturedBody.includes('lead_source=Corporativo'), 'Should set lead_source to Corporativo');
-        assert.ok(capturedBody.includes('oid=00Das00000EnTnB'), 'Should include org ID');
+        assert.equal(parsedUrl.hostname, 'webto.salesforce.com');
+        assert.ok(capturedBody.includes('first_name=Jo%C3%A3o'), 'first_name');
+        assert.ok(capturedBody.includes('last_name=Silva'), 'last_name');
+        assert.ok(capturedBody.includes('company=Acme+Corp'), 'company');
+        assert.ok(capturedBody.includes('title=Diretor'), 'title');
+        assert.ok(capturedBody.includes('phone='), 'phone');
+        assert.ok(capturedBody.includes('lead_source=Corporativo'), 'lead_source');
+        assert.ok(capturedBody.includes('oid=00Das00000EnTnB'), 'oid');
     } finally {
         global.fetch = originalFetch;
     }
 });
 
-test('submit-lead-sf: empty empresa defaults to "Não informado"', async () => {
+test('submit-lead-sf: minimal payload (only required fields) defaults leadSource to Web', async () => {
     let capturedBody = '';
 
     global.fetch = async (_input: RequestInfo | URL, init?: RequestInit) => {
@@ -118,11 +117,52 @@ test('submit-lead-sf: empty empresa defaults to "Não informado"', async () => {
     };
 
     try {
-        const payload = validPayload();
-        payload.empresa = '';
+        const res = await handler(buildRequest(minimalPayload()));
+        assert.equal(res.status, 201);
+
+        assert.ok(capturedBody.includes('first_name=Maria'), 'first_name');
+        assert.ok(capturedBody.includes('lead_source=Web'), 'default lead_source');
+        assert.ok(!capturedBody.includes('phone='), 'no phone when absent');
+        assert.ok(!capturedBody.includes('company='), 'no company when absent');
+        assert.ok(!capturedBody.includes('title='), 'no title when absent');
+        assert.ok(!capturedBody.includes('description='), 'no description when absent');
+    } finally {
+        global.fetch = originalFetch;
+    }
+});
+
+test('submit-lead-sf: description field is forwarded', async () => {
+    let capturedBody = '';
+
+    global.fetch = async (_input: RequestInfo | URL, init?: RequestInit) => {
+        capturedBody = typeof init?.body === 'string' ? init.body : '';
+        return new Response('', { status: 200 });
+    };
+
+    try {
+        const payload = { ...minimalPayload(), description: 'Destino: Paris. Datas: julho.' };
         const res = await handler(buildRequest(payload));
         assert.equal(res.status, 201);
-        assert.ok(capturedBody.includes('company=N%C3%A3o+informado'), 'Empty empresa should default');
+        assert.ok(capturedBody.includes('description='), 'should include description');
+        assert.ok(capturedBody.includes('Paris'), 'should contain description content');
+    } finally {
+        global.fetch = originalFetch;
+    }
+});
+
+test('submit-lead-sf: invalid leadSource defaults to Web', async () => {
+    let capturedBody = '';
+
+    global.fetch = async (_input: RequestInfo | URL, init?: RequestInit) => {
+        capturedBody = typeof init?.body === 'string' ? init.body : '';
+        return new Response('', { status: 200 });
+    };
+
+    try {
+        const payload = { ...minimalPayload(), leadSource: 'INVALID_SOURCE' };
+        const res = await handler(buildRequest(payload));
+        assert.equal(res.status, 201);
+        assert.ok(capturedBody.includes('lead_source=Web'), 'invalid source should fallback to Web');
     } finally {
         global.fetch = originalFetch;
     }
@@ -132,7 +172,7 @@ test('submit-lead-sf: Salesforce error returns 502', async () => {
     global.fetch = async () => new Response('error', { status: 500 });
 
     try {
-        const res = await handler(buildRequest(validPayload()));
+        const res = await handler(buildRequest(minimalPayload()));
         assert.equal(res.status, 502);
         const data = await res.json();
         assert.equal(data.ok, false);
@@ -145,7 +185,7 @@ test('submit-lead-sf: network error returns 500', async () => {
     global.fetch = async () => { throw new Error('Network failure'); };
 
     try {
-        const res = await handler(buildRequest(validPayload()));
+        const res = await handler(buildRequest(minimalPayload()));
         assert.equal(res.status, 500);
         const data = await res.json();
         assert.equal(data.ok, false);
