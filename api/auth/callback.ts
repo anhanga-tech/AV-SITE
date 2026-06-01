@@ -35,7 +35,7 @@ function safeJsonString(value: string): string {
  *
  * Protocol (canonical Decap CMS flow with security hardening):
  *  1. This page determines allowed origins for communication (the site itself).
- *  2. This page fires `window.opener.postMessage('authorizing:github', '*')` — no sensitive payload.
+ *  2. This page fires `window.opener.postMessage('authorizing:github', allowedOrigin)` — no sensitive payload.
  *  3. The CMS parent window echoes the same message back.
  *  4. This page verifies the echo's `e.origin` against the allowlist.
  *  5. This page replies to `e.source` at the VERIFIED `e.origin` with the auth result.
@@ -78,7 +78,7 @@ export function buildPostMessageHtml(status: 'success' | 'error', content: strin
     var origin = e.origin || '';
     var isTrusted = origin === allowedOrigin ||
                     origin === window.location.origin ||
-                    /^https:\\/\\/.*\\.anhanga\\.tur\\.br$/.test(origin) ||
+                    /^https:\\/\\/(?:[a-zA-Z0-9-]+\\.)*anhanga\\.tur\\.br$/.test(origin) ||
                     /^http:\\/\\/localhost:\\d+$/.test(origin);
 
     if (!isTrusted) {
@@ -99,7 +99,7 @@ export function buildPostMessageHtml(status: 'success' | 'error', content: strin
   }, 10000);
 
   window.addEventListener('message', onMessage, false);
-  window.opener.postMessage(handshake, '*');
+  window.opener.postMessage(handshake, allowedOrigin);
 }());
 </script>
 </body>
