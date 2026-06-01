@@ -132,6 +132,10 @@ function loadConfig(): EnvConfig {
 const POLL_INTERVAL_MS = 5000;
 const MAX_POLL_ATTEMPTS = 60;
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
 async function pollForResults(
   resultsUrl: string,
   apiKey: string
@@ -140,20 +144,34 @@ async function pollForResults(
     console.log(`Polling for results (attempt ${attempt}/${MAX_POLL_ATTEMPTS})...`);
     await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
 
-    const res = await fetch(resultsUrl, {
-      headers: { 'X-API-KEY': apiKey },
-    });
+    try {
+      const res = await fetch(resultsUrl, {
+        headers: { 'X-API-KEY': apiKey },
+      });
 
-    if (!res.ok) throw new Error(`Poll error: ${res.status} ${res.statusText}`);
+      if (!res.ok) {
+        console.warn(`Poll attempt ${attempt} failed: ${res.status} ${res.statusText}`);
+        continue;
+      }
 
-    const json = await res.json() as Record<string, unknown>;
+      const rawJson: unknown = await res.json();
+      if (!isRecord(rawJson)) {
+        console.warn(`Poll attempt ${attempt} returned invalid JSON`);
+        continue;
+      }
 
-    if (json['status'] === 'Success' || Array.isArray(json['data'])) {
-      return json;
-    }
+      if (rawJson['status'] === 'Success' || Array.isArray(rawJson['data'])) {
+        return rawJson;
+      }
 
-    if (json['status'] !== 'Pending') {
-      throw new Error(`Outscraper job failed with status: ${json['status']}`);
+      if (rawJson['status'] !== 'Pending') {
+        throw new Error(`Outscraper job failed with status: ${rawJson['status']}`);
+      }
+    } catch (err) {
+      if (err instanceof Error && err.message.startsWith('Outscraper job failed')) {
+        throw err;
+      }
+      console.warn(`Transient error during poll attempt ${attempt}:`, err);
     }
   }
 
@@ -179,25 +197,34 @@ async function fetchFromOutscraper(apiKey: string, placeId: string): Promise<{
     throw new Error(`Outscraper API error: ${response.status} ${response.statusText}`);
   }
 
-  let json = await response.json() as Record<string, unknown>;
+  const rawJson: unknown = await response.json();
+  if (!isRecord(rawJson)) {
+    throw new Error('Invalid JSON response from Outscraper');
+  }
+  let json = rawJson;
 
-  if (json['status'] === 'Pending' && typeof json['results_location'] === 'string') {
+  const resultsLocation = json['results_location'];
+  if (json['status'] === 'Pending' && typeof resultsLocation === 'string') {
     console.log('Job queued, waiting for results...');
-    json = await pollForResults(json['results_location'] as string, apiKey);
+    json = await pollForResults(resultsLocation, apiKey);
   }
 
   let place: Record<string, unknown> | undefined;
 
   if (Array.isArray(json['data'])) {
     const first = (json['data'] as unknown[])[0];
-    place = Array.isArray(first) ? first[0] as Record<string, unknown> : first as Record<string, unknown>;
+    if (isRecord(first)) {
+      place = first;
+    } else if (Array.isArray(first) && isRecord(first[0])) {
+      place = first[0];
+    }
   }
 
   if (!place) {
     throw new Error('No place data in Outscraper response');
   }
 
-  const reviewsRaw = (place['reviews_data'] ?? []) as Record<string, unknown>[];
+  const reviewsRaw = Array.isArray(place['reviews_data']) ? place['reviews_data'] as Record<string, unknown>[] : [];
   const averageRating = Number(place['rating'] ?? 0);
   const totalReviews = Number(place['reviews'] ?? 0);
 
