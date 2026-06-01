@@ -96,7 +96,8 @@ test('submit-lead-sf: valid payload sends to Salesforce and returns 201', async 
         const data = await res.json();
         assert.equal(data.ok, true);
 
-        assert.ok(capturedUrl.includes('webto.salesforce.com'), 'Should POST to Salesforce');
+        const parsedUrl = new URL(capturedUrl);
+        assert.equal(parsedUrl.hostname, 'webto.salesforce.com', 'Should POST to Salesforce');
         assert.ok(capturedBody.includes('first_name=Jo%C3%A3o'), 'Should include first_name');
         assert.ok(capturedBody.includes('last_name=Silva'), 'Should include last_name');
         assert.ok(capturedBody.includes('company=Acme+Corp'), 'Should include company');
