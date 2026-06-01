@@ -129,6 +129,37 @@ function loadConfig(): EnvConfig {
   };
 }
 
+const POLL_INTERVAL_MS = 5000;
+const MAX_POLL_ATTEMPTS = 60;
+
+async function pollForResults(
+  resultsUrl: string,
+  apiKey: string
+): Promise<Record<string, unknown>> {
+  for (let attempt = 1; attempt <= MAX_POLL_ATTEMPTS; attempt++) {
+    console.log(`Polling for results (attempt ${attempt}/${MAX_POLL_ATTEMPTS})...`);
+    await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
+
+    const res = await fetch(resultsUrl, {
+      headers: { 'X-API-KEY': apiKey },
+    });
+
+    if (!res.ok) throw new Error(`Poll error: ${res.status} ${res.statusText}`);
+
+    const json = await res.json() as Record<string, unknown>;
+
+    if (json['status'] === 'Success' || Array.isArray(json['data'])) {
+      return json;
+    }
+
+    if (json['status'] !== 'Pending') {
+      throw new Error(`Outscraper job failed with status: ${json['status']}`);
+    }
+  }
+
+  throw new Error(`Outscraper job timed out after ${MAX_POLL_ATTEMPTS * POLL_INTERVAL_MS / 1000}s`);
+}
+
 async function fetchFromOutscraper(apiKey: string, placeId: string): Promise<{
   reviews: Record<string, unknown>[];
   averageRating: number;
@@ -148,9 +179,23 @@ async function fetchFromOutscraper(apiKey: string, placeId: string): Promise<{
     throw new Error(`Outscraper API error: ${response.status} ${response.statusText}`);
   }
 
-  const json = await response.json() as { data: Record<string, unknown>[][] };
-  const place = json.data?.[0]?.[0];
-  if (!place) throw new Error('No place data in Outscraper response');
+  let json = await response.json() as Record<string, unknown>;
+
+  if (json['status'] === 'Pending' && typeof json['results_location'] === 'string') {
+    console.log('Job queued, waiting for results...');
+    json = await pollForResults(json['results_location'] as string, apiKey);
+  }
+
+  let place: Record<string, unknown> | undefined;
+
+  if (Array.isArray(json['data'])) {
+    const first = (json['data'] as unknown[])[0];
+    place = Array.isArray(first) ? first[0] as Record<string, unknown> : first as Record<string, unknown>;
+  }
+
+  if (!place) {
+    throw new Error('No place data in Outscraper response');
+  }
 
   const reviewsRaw = (place['reviews_data'] ?? []) as Record<string, unknown>[];
   const averageRating = Number(place['rating'] ?? 0);
