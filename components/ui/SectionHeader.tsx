@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Badge, type BadgeColor } from './Badge';
 
 const alignClasses: Record<'center' | 'left', string> = {
@@ -16,7 +16,14 @@ interface SectionHeaderProps {
     className?: string;
 }
 
-export const SectionHeader: React.FC<SectionHeaderProps> = ({
+/**
+ * SectionHeader Component - Optimized with React.memo
+ *
+ * PERFORMANCE WIN: Prevents unnecessary re-renders of section headings.
+ * Combined with stable prop references (e.g. badgeIcon), this ensures
+ * static headings don't reconcile during high-frequency parent updates.
+ */
+export const SectionHeader: React.FC<SectionHeaderProps> = memo(({
     title,
     badge,
     badgeIcon,
@@ -38,4 +45,6 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
                 <p className="text-zinc-500 text-base font-medium">{subtitle}</p>
             )}
         </div>
-);
+));
+
+SectionHeader.displayName = 'SectionHeader';

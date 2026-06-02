@@ -15,6 +15,11 @@ const reviewSummary = getReviewSummary(googleReviewsData);
 
 const ROTATIONS = ['-rotate-2', 'rotate-1', '-rotate-1', 'rotate-2', '-rotate-1', 'rotate-1', '-rotate-2'];
 
+// PERFORMANCE WIN: Static JSX props moved outside to stabilize references
+// for the memoized SectionHeader component.
+const SECTION_BADGE_ICON = <MessageSquareHeart className="size-4 text-red-500 fill-red-500" />;
+const SECTION_TITLE = <>Mural do Amor <span aria-hidden="true">❤️</span></>;
+
 const Testimonials: React.FC = memo(() => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -52,8 +57,8 @@ const Testimonials: React.FC = memo(() => {
       <div className="container mx-auto px-6 relative z-10">
         <SectionHeader
           badge="Love Notes"
-          badgeIcon={<MessageSquareHeart className="size-4 text-red-500 fill-red-500" />}
-          title={<>Mural do Amor <span aria-hidden="true">❤️</span></>}
+          badgeIcon={SECTION_BADGE_ICON}
+          title={SECTION_TITLE}
           subtitle="Depoimentos reais de quem viajou com a gente"
           className="mb-16"
         />

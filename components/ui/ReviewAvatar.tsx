@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, memo, useMemo } from 'react';
 import { getInitials } from '../../data/reviewsAdapter';
 
 interface ReviewAvatarProps {
@@ -8,7 +8,13 @@ interface ReviewAvatarProps {
   className?: string;
 }
 
-export const ReviewAvatar: React.FC<ReviewAvatarProps> = ({
+/**
+ * ReviewAvatar Component - Optimized with React.memo
+ *
+ * PERFORMANCE WIN: Prevents unnecessary re-renders when the parent (Testimonials)
+ * carousel cycles through slides.
+ */
+export const ReviewAvatar: React.FC<ReviewAvatarProps> = memo(({
   name,
   photoUrl,
   size = 88,
@@ -16,7 +22,9 @@ export const ReviewAvatar: React.FC<ReviewAvatarProps> = ({
 }) => {
   const [hasImageError, setHasImageError] = useState(false);
   const prevPhotoUrl = useRef(photoUrl);
-  const initials = getInitials(name);
+
+  // Memoize initials to avoid re-calculating during carousel transitions
+  const initials = useMemo(() => getInitials(name), [name]);
 
   if (prevPhotoUrl.current !== photoUrl) {
     prevPhotoUrl.current = photoUrl;
@@ -50,4 +58,6 @@ export const ReviewAvatar: React.FC<ReviewAvatarProps> = ({
       onError={() => setHasImageError(true)}
     />
   );
-};
+});
+
+ReviewAvatar.displayName = 'ReviewAvatar';

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { GoogleIcon } from './ui/GoogleIcon';
 
 interface ReviewSummaryBarProps {
@@ -8,7 +8,13 @@ interface ReviewSummaryBarProps {
 
 const STAR = '★';
 
-export const ReviewSummaryBar: React.FC<ReviewSummaryBarProps> = ({
+/**
+ * ReviewSummaryBar Component - Optimized with React.memo
+ *
+ * PERFORMANCE WIN: Prevents unnecessary re-renders of the rating bar
+ * when parent components (like Testimonials) update their state.
+ */
+export const ReviewSummaryBar: React.FC<ReviewSummaryBarProps> = memo(({
   averageRating,
   totalReviews,
 }) => {
@@ -32,4 +38,6 @@ export const ReviewSummaryBar: React.FC<ReviewSummaryBarProps> = ({
       </div>
     </div>
   );
-};
+});
+
+ReviewSummaryBar.displayName = 'ReviewSummaryBar';
