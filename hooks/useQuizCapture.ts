@@ -109,7 +109,7 @@ export function useQuizCapture() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 firstName: payload.firstName,
-                lastName: payload.lastName,
+                lastName: payload.lastName || '-',
                 email: payload.email,
                 whatsapp: payload.whatsapp,
                 leadSource: 'Web',
