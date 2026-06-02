@@ -2,6 +2,26 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
+    "title": "Viagem Corporativa para Pequenas Empresas: Guia Completo",
+    "excerpt": "O que é viagem corporativa, quais são os 4 tipos e quando vale contratar uma agência. Guia prático para micro e pequenas empresas no Brasil.",
+    "date": "2026-06-02",
+    "author": "felipe-william",
+    "category": "Planejamento",
+    "image": "https://media.anhanga.tur.br/images/blog/viagem-corp.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "tags": [
+      "viagens-corporativas",
+      "pequenas-empresas",
+      "planejamento",
+      "brasil"
+    ],
+    "seoTitle": "Viagem Corporativa para Pequenas Empresas: Guia Completo",
+    "seoDescription": "O que é viagem corporativa, quais são os 4 tipos e quando vale contratar uma agência. Guia prático para micro e pequenas empresas no Brasil.",
+    "slug": "viagem-corporativa-para-pequenas-empresas-guia-completo",
+    "readingTime": "6 min de leitura"
+  },
+  {
     "title": "Copa do Mundo 2026: guia das cidades-sede além do futebol",
     "excerpt": "Guia das cidades-sede da Copa 2026 nos EUA, México e Canadá, com destaques, dicas locais e roteiros para aproveitar a viagem além dos jogos.",
     "date": "2026-05-22",

@@ -114,6 +114,16 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.anhanga.tur.br/blog/viagem-corporativa-para-pequenas-empresas-guia-completo/</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/viagem-corp.jpg</image:loc>
+      <image:caption>Viagem Corporativa para Pequenas Empresas: Guia Completo</image:caption>
+    </image:image>
+  </url>
+  <url>
     <loc>https://www.anhanga.tur.br/blog/copa-do-mundo-2026-as-cidades-sede-e-o-que-cada-uma-tem-a-oferecer-alem-do-futebol/</loc>
     <lastmod>2026-05-28</lastmod>
     <changefreq>monthly</changefreq>
