@@ -43,3 +43,7 @@
 ## 2026-12-10 - ⚡ Bolt: BackToTop Scroll Optimization
 **Learning:** Implementing multiple independent, unthrottled scroll listeners for small floating UI elements (like BackToTop) is a common source of main-thread congestion. Reusing a centralized, throttled hook (like `useScrolled`) that uses `requestAnimationFrame` significantly reduces CPU overhead during fast scrolling and ensures UI updates stay synchronized with the browser's refresh rate.
 **Action:** Always reuse existing throttled scroll hooks for any UI element that depends on scroll position to minimize the number of event listeners and prevent jank.
+
+## 2026-12-15 - ⚡ Bolt: Carousel Sub-component Memoization
+**Learning:** Sub-components of a stateful carousel (like SectionHeader or ReviewAvatar in the Testimonials section) can trigger redundant reconciliation on every slide transition if they aren't memoized or if they receive fresh JSX references as props. Since carousels often update automatically via timers, these unnecessary re-renders can lead to sustained background CPU usage.
+**Action:** Always memoize presentation-heavy carousel sub-components using `React.memo` and stabilize JSX props by moving them to module-level constants outside the render loop.
