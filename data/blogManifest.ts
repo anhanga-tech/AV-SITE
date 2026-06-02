@@ -10,7 +10,12 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "image": "https://media.anhanga.tur.br/images/blog/viagem-corp.jpg",
     "featured": false,
     "showChatCTA": true,
-    "tags": [],
+    "tags": [
+      "viagens-corporativas",
+      "pequenas-empresas",
+      "planejamento",
+      "brasil"
+    ],
     "seoTitle": "Viagem Corporativa para Pequenas Empresas: Guia Completo",
     "seoDescription": "O que é viagem corporativa, quais são os 4 tipos e quando vale contratar uma agência. Guia prático para micro e pequenas empresas no Brasil.",
     "slug": "viagem-corporativa-para-pequenas-empresas-guia-completo",
