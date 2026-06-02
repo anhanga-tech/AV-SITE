@@ -67,6 +67,7 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
                     whatsapp: form.whatsapp,
                     empresa: form.empresa,
                     cargo: form.cargo,
+                    leadSource: 'Corporativo',
                 }),
             }).catch(() => {});
 

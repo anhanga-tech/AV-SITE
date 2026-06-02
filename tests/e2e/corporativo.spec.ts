@@ -89,6 +89,7 @@ test.describe('Corporativo Landing Page', () => {
       whatsapp: '(11) 98831-4487',
       empresa: 'Empresa Teste LTDA',
       cargo: 'Sócia',
+      leadSource: 'Corporativo',
     });
 
     const formSubmissionEvent = await page.evaluate(() =>
