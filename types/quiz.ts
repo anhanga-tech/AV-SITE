@@ -11,6 +11,7 @@ export interface SubmitQuizRequest {
     sourcePage: string;
     destinos?: string[];
     skipped?: boolean;
+    newsletterOptIn?: boolean;
     utms: LeadUtms;
     tracking?: LeadTracking;
 }

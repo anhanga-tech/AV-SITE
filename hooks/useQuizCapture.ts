@@ -84,7 +84,7 @@ export function useQuizCapture() {
     const [trackingState, setTrackingState] = useState(() => captureTrackingState());
 
     const submitQuiz = async (
-        input: Pick<SubmitQuizRequest, 'firstName' | 'lastName' | 'email' | 'whatsapp' | 'profileKey' | 'profileName' | 'bantSummary' | 'destinos' | 'skipped'>,
+        input: Pick<SubmitQuizRequest, 'firstName' | 'lastName' | 'email' | 'whatsapp' | 'profileKey' | 'profileName' | 'bantSummary' | 'destinos' | 'skipped' | 'newsletterOptIn'>,
     ): Promise<SubmitQuizResult> => {
         setError(null);
         setIsSubmitting(true);
@@ -102,6 +102,20 @@ export function useQuizCapture() {
             utms: latest.utms,
             tracking: latest.tracking,
         };
+
+        // Fire-and-forget — SF failure never blocks the quiz result
+        void fetch('/api/submit-lead-sf', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                firstName: payload.firstName,
+                lastName: payload.lastName || '-',
+                email: payload.email,
+                whatsapp: payload.whatsapp,
+                leadSource: 'Web',
+                description: `${payload.bantSummary} | Newsletter: ${payload.newsletterOptIn ? 'Sim' : 'Não'}`,
+            }),
+        }).catch(() => undefined);
 
         try {
             const response = await fetch('/api/submit-quiz', {

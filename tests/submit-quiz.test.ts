@@ -88,6 +88,36 @@ test('buildN8nQuizPayload — inclui lastName no payload do n8n', () => {
     assert.equal(n8n.quiz.lastName, 'Silva');
 });
 
+test('validateQuizPayload — newsletterOptIn true é preservado', () => {
+    const result = validateQuizPayload({ ...BASE_PAYLOAD, newsletterOptIn: true });
+    assert.ok(result.valid);
+    assert.equal(result.data.newsletterOptIn, true);
+});
+
+test('validateQuizPayload — newsletterOptIn ausente resulta em false', () => {
+    const result = validateQuizPayload({ ...BASE_PAYLOAD });
+    assert.ok(result.valid);
+    assert.equal(result.data.newsletterOptIn, false);
+});
+
+test('validateQuizPayload — newsletterOptIn com valor não-boolean resulta em false', () => {
+    const result = validateQuizPayload({ ...BASE_PAYLOAD, newsletterOptIn: 'sim' });
+    assert.ok(result.valid);
+    assert.equal(result.data.newsletterOptIn, false);
+});
+
+test('buildN8nQuizPayload — inclui newsletterOptIn no payload do n8n', () => {
+    const payload = { ...BASE_PAYLOAD, newsletterOptIn: true, tracking: undefined };
+    const n8n = buildN8nQuizPayload(payload, 'req-nl-1');
+    assert.equal(n8n.quiz.newsletterOptIn, true);
+});
+
+test('buildN8nQuizPayload — newsletterOptIn ausente resulta em false no payload n8n', () => {
+    const payload = { ...BASE_PAYLOAD, tracking: undefined };
+    const n8n = buildN8nQuizPayload(payload, 'req-nl-2');
+    assert.equal(n8n.quiz.newsletterOptIn, false);
+});
+
 test('validateQuizPayload — sanitiza destinos contra XSS', () => {
     const payload = {
         ...BASE_PAYLOAD,
