@@ -42,6 +42,7 @@ export function validateQuizPayload(
     const utms = normalizeUtms(raw.utms);
     const tracking = normalizeTracking(raw.tracking, utms);
     const skipped = raw.skipped === true;
+    const newsletterOptIn = raw.newsletterOptIn === true;
 
     return {
         valid: true,
@@ -56,6 +57,7 @@ export function validateQuizPayload(
             sourcePage,
             destinos,
             skipped,
+            newsletterOptIn,
             utms,
             tracking,
         },

@@ -479,7 +479,6 @@ function PreLeadScreen({ profile, onSubmit, onBack }: PreLeadScreenProps) {
         if (!form.nome.trim()) errs.nome = 'Conta pra gente seu nome';
         if (!form.sobrenome.trim()) errs.sobrenome = 'E o sobrenome?';
         if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email)) errs.email = 'E-mail inválido';
-        if (!form.aceite) errs.aceite = 'Precisa do aceite pra continuar';
         if (Object.keys(errs).length) { setErrors(errs); return; }
         onSubmit(form);
     }
@@ -1046,6 +1045,7 @@ export default function QuizAnhangaLanding() {
             bantSummary,
             destinos: answers.destino ?? [],
             skipped,
+            newsletterOptIn: form.aceite,
         });
 
         if (!result.ok) {
