@@ -8,6 +8,7 @@ import {
     SpinnerGap,
 } from '@phosphor-icons/react';
 import { useLeadCapture, createLeadEventId } from '@/hooks/useLeadCapture';
+import { normalizeWhatsappNumber } from '@/lib/lead-logic';
 import { fadeUp } from './constants';
 
 interface CorpContactFormProps {
@@ -47,6 +48,11 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
         if (!emailRegex.test(form.email.trim())) {
             setSubmitState('error');
             setErrorMessage('Insira um e-mail corporativo válido');
+            return;
+        }
+        if (!normalizeWhatsappNumber(form.whatsapp)) {
+            setSubmitState('error');
+            setErrorMessage('Insira um número de WhatsApp válido');
             return;
         }
         isLocallySubmitting.current = true;
