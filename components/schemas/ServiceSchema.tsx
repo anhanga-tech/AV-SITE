@@ -1,13 +1,6 @@
 import React from 'react';
 import { StructuredData } from './StructuredData';
 
-interface AggregateRatingProps {
-  ratingValue: number;
-  reviewCount: number;
-  bestRating?: number;
-  worstRating?: number;
-}
-
 interface ServiceSchemaProps {
   name: string;
   description: string;
@@ -15,7 +8,6 @@ interface ServiceSchemaProps {
   serviceType?: string;
   areaServed?: string;
   keywords?: string[];
-  aggregateRating?: AggregateRatingProps;
 }
 
 const EMPTY_KEYWORDS: string[] = [];
@@ -27,7 +19,6 @@ export const ServiceSchema: React.FC<ServiceSchemaProps> = ({
   serviceType,
   areaServed = 'Brasil',
   keywords = EMPTY_KEYWORDS,
-  aggregateRating
 }) => {
   const schemaData: Record<string, unknown> = {
     '@context': 'https://schema.org',
@@ -53,16 +44,6 @@ export const ServiceSchema: React.FC<ServiceSchemaProps> = ({
       }
     }
   };
-
-  if (aggregateRating) {
-    schemaData.aggregateRating = {
-      '@type': 'AggregateRating',
-      ratingValue: aggregateRating.ratingValue,
-      reviewCount: aggregateRating.reviewCount,
-      bestRating: aggregateRating.bestRating ?? 5,
-      worstRating: aggregateRating.worstRating ?? 1
-    };
-  }
 
   return <StructuredData id="service" data={schemaData} />;
 };

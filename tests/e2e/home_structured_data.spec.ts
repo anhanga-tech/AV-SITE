@@ -47,7 +47,17 @@ test.describe('Home structured data', () => {
     const serviceSchema = parseStructuredData(await serviceScript.first().innerHTML());
     expect(serviceSchema['@type']).toBe('Service');
     expect(serviceSchema.name).toBe('Agência de Viagens Personalizadas');
-    const rating = serviceSchema.aggregateRating as Record<string, unknown>;
+    expect(serviceSchema.aggregateRating).toBeUndefined();
+
+    // aggregateRating must be on the Organization schema (TravelAgency parent type),
+    // which Google supports for Review Snippets — Service is not a valid parent.
+    const orgScript = page.locator(
+      'script[type="application/ld+json"][data-av-head="script:ld-json:organization"]'
+    );
+    await expect(orgScript).toHaveCount(1);
+
+    const orgSchema = parseStructuredData(await orgScript.first().innerHTML());
+    const rating = orgSchema.aggregateRating as Record<string, unknown>;
     expect(rating).toBeDefined();
     expect(rating['@type']).toBe('AggregateRating');
     expect(rating['ratingValue']).toBe(5);
