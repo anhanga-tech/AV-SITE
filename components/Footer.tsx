@@ -8,6 +8,7 @@ import {
     Heart,
 } from '@phosphor-icons/react';
 import { getBlogHomeUrl } from '../utils/blog';
+import { triggerResetBanner } from '@/lib/consent';
 import { useFooterRuntimeMetadata } from '../lib/footer-runtime';
 import { ANHANGA_TECH_LOGO_URL, BRAND_LOGO_WHITE_URL } from '../lib/media-assets';
 
@@ -123,6 +124,14 @@ const Footer: React.FC = () => {
                         <div className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mt-2">
                             Conteúdo da equipe Anhangá Viagens
                             {runtimeMetadata ? ` • Última atualização: ${runtimeMetadata.lastUpdatedLabel}` : null}
+                        </div>
+                        <div className="text-[10px] text-zinc-400 mt-1">
+                            <button
+                                onClick={triggerResetBanner}
+                                className="underline underline-offset-2 hover:text-brand-yellow transition-colors"
+                            >
+                                Gerenciar cookies
+                            </button>
                         </div>
                     </div>
                 </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useFooterRuntimeMetadata } from '../../../lib/footer-runtime';
 import { BRAND_LOGO_WHITE_URL } from '../../../lib/media-assets';
+import { triggerResetBanner } from '@/lib/consent';
 
 const Footer: React.FC = () => {
   const logoUrl = BRAND_LOGO_WHITE_URL;
@@ -30,6 +31,14 @@ const Footer: React.FC = () => {
           </p>
           <p className="mt-4 text-xs opacity-50">
             Nota: Este site comercializa pacotes de viagem (hospedagem, transporte e turismo). Ingressos para o evento não estão inclusos no pacote base.
+          </p>
+          <p className="mt-3 text-xs opacity-50">
+            <button
+              onClick={triggerResetBanner}
+              className="underline underline-offset-2 hover:opacity-100 transition-opacity"
+            >
+              Gerenciar cookies
+            </button>
           </p>
         </div>
       </div>
