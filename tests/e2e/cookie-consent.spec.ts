@@ -95,7 +95,7 @@ test.describe('Cookie Consent Banner (CMP)', () => {
 
     // Aguardar possíveis triggers de scroll/idle
     await page.waitForTimeout(500);
-    const hasMautic = await page.evaluate(() => typeof window.MauticTrackingObject !== 'undefined');
+    const hasMautic = await page.evaluate(() => 'MauticTrackingObject' in window);
     expect(hasMautic).toBe(false);
   });
 
@@ -148,7 +148,7 @@ test.describe('Cookie Consent Banner (CMP)', () => {
     expect(value).toBe('essential');
 
     // Mautic não deve ter carregado
-    const hasMautic = await page.evaluate(() => typeof window.MauticTrackingObject !== 'undefined');
+    const hasMautic = await page.evaluate(() => 'MauticTrackingObject' in window);
     expect(hasMautic).toBe(false);
 
     // Banner não deve reaparecer
