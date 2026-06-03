@@ -40,6 +40,12 @@
   <link rel="preconnect" href="https://media.anhanga.tur.br" crossorigin>
   <link rel="dns-prefetch" href="https://media.anhanga.tur.br">
 
+  <!-- Stape sGTM — warm DNS/TLS before deferred loader fires -->
+  <link rel="preconnect" href="https://load.sst.anhanga.tur.br" crossorigin>
+  <link rel="dns-prefetch" href="https://load.sst.anhanga.tur.br">
+  <link rel="preconnect" href="https://sst.anhanga.tur.br" crossorigin>
+  <link rel="dns-prefetch" href="https://sst.anhanga.tur.br">
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -67,8 +73,8 @@
 </head>
 
 <body>
-  <!-- Google Tag Manager (noscript) -->
-  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T2KGS86G" height="0" width="0"
+  <!-- Google Tag Manager (noscript) — Stape Custom Loader (first-party) -->
+  <noscript><iframe src="https://load.sst.anhanga.tur.br/ns.html?id=GTM-T2KGS86G" height="0" width="0"
       style="display:none;visibility:hidden"></iframe></noscript>
   <!-- End Google Tag Manager (noscript) -->
   <div id="root"></div>
@@ -100,7 +106,7 @@
           'gtm.start': new Date().getTime(),
           event: 'gtm.js'
         });
-        injectScript('https://www.googletagmanager.com/gtm.js?id=GTM-T2KGS86G');
+        injectScript('https://load.sst.anhanga.tur.br/60oxrlttgl.js?56lu7e=BQNJMzg%2FVTteLDMnVEQ%2FSRpaRlpdVBwBUQYaHA0cHw5CEwEGQhAK');
       };
 
       var loadMautic = function () {
