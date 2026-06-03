@@ -6,6 +6,7 @@ import {
     AirplaneTilt,
     PaperPlaneTilt,
     SpinnerGap,
+    Check,
 } from '@phosphor-icons/react';
 import { useLeadCapture, createLeadEventId } from '@/hooks/useLeadCapture';
 import { normalizeWhatsappNumber } from '@/lib/lead-logic';
@@ -28,7 +29,10 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
     });
     const [submitState, setSubmitState] = useState<'idle' | 'success' | 'error'>('idle');
     const [errorMessage, setErrorMessage] = useState('');
+    const [acceptedLGPD, setAcceptedLGPD] = useState(false);
     const isLocallySubmitting = useRef(false);
+
+    const lgpdError = submitState === 'error' && !acceptedLGPD ? 'Aceite obrigatório' : '';
 
     function handleField(field: keyof typeof form) {
         return (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,6 +57,11 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
         if (!normalizeWhatsappNumber(form.whatsapp)) {
             setSubmitState('error');
             setErrorMessage('Insira um número de WhatsApp válido');
+            return;
+        }
+        if (!acceptedLGPD) {
+            setSubmitState('error');
+            setErrorMessage('Você deve aceitar os termos para continuar.');
             return;
         }
         isLocallySubmitting.current = true;
@@ -247,6 +256,44 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
                             </div>
                         </div>
 
+                        <div className="flex flex-col gap-1">
+                            <label htmlFor="lgpd-corp" className="flex items-start gap-3 cursor-pointer group">
+                                <span className="relative flex items-center mt-0.5">
+                                    <input
+                                        id="lgpd-corp"
+                                        type="checkbox"
+                                        checked={acceptedLGPD}
+                                        onChange={(e) => {
+                                            setAcceptedLGPD(e.target.checked);
+                                            if (e.target.checked && errorMessage === 'Você deve aceitar os termos para continuar.') {
+                                                setErrorMessage('');
+                                                setSubmitState('idle');
+                                            }
+                                        }}
+                                        className="peer size-4 cursor-pointer appearance-none rounded border-2 border-zinc-300 bg-white checked:bg-brand-cyan checked:border-brand-cyan transition focus-visible:ring-2 focus-visible:ring-brand-cyan/40"
+                                    />
+                                    <Check className="absolute size-3 text-white opacity-0 peer-checked:opacity-100 left-0.5 pointer-events-none transition-opacity" weight="bold" />
+                                </span>
+                                <span className="text-xs text-zinc-500 leading-tight">
+                                    Aceito receber comunicações e autorizo o tratamento dos meus dados conforme a{' '}
+                                    <a
+                                        href="https://www.anhanga.tur.br/politica-privacidade/"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="underline hover:text-brand-cyan"
+                                    >
+                                        Política de Privacidade
+                                    </a>
+                                    .
+                                </span>
+                            </label>
+                            {lgpdError && (
+                                <span className="text-[10px] text-red-500 font-bold ml-7 uppercase">
+                                    {lgpdError}
+                                </span>
+                            )}
+                        </div>
+
                         {submitState === 'error' && errorMessage && (
                             <p className="text-red-500 text-xs font-medium" role="alert">
                                 {errorMessage}
@@ -271,10 +318,6 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
                                 </>
                             )}
                         </button>
-
-                        <p className="text-xs text-zinc-400 text-center leading-relaxed">
-                            Seus dados são usados apenas para entrar em contato. Não compartilhamos com terceiros.
-                        </p>
                     </div>
                 </form>
             )}

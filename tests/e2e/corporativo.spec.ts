@@ -31,6 +31,38 @@ test.describe('Corporativo Landing Page', () => {
     await landing.expectError('Preencha todos os campos obrigatórios');
   });
 
+  test('should block submit when LGPD consent is not accepted', async ({ page }) => {
+    const corpRequests: string[] = [];
+    page.on('requestfinished', (req) => {
+      const url = req.url();
+      if (/\/api\/submit-lead(-sf)?$/.test(url)) {
+        corpRequests.push(url);
+      }
+    });
+
+    const landing = new CorporativoPage(page);
+    await landing.goto();
+
+    await landing.fillForm({
+      firstName: 'Sem',
+      lastName: 'Consentimento',
+      email: 'sem@consentimento.com.br',
+      whatsapp: '(11) 98831-4487',
+      empresa: 'Sem Consent LTDA',
+      cargo: 'Tester',
+      acceptLGPD: false,
+    });
+
+    await expect(landing.lgpdCheckbox).not.toBeChecked();
+
+    await landing.submit();
+
+    await landing.expectError('Você deve aceitar os termos para continuar.');
+
+    await page.waitForTimeout(300);
+    expect(corpRequests).toEqual([]);
+  });
+
   test('should capture corporate lead and trigger dataLayer events', async ({ page }) => {
     const landing = new CorporativoPage(page);
     let submitPayload: SubmitLeadRequest | null = null;
