@@ -31,7 +31,11 @@ const Footer: React.FC = () => {
 
                     {/* Brand */}
                     <div className="md:col-span-2">
-                        <div className="mb-6">
+                        <a
+                            href={`${SITE_URL}/`}
+                            className="inline-block mb-6 rounded-lg focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-cyan focus-visible:ring-offset-4"
+                            aria-label="Anhangá Viagens - Home"
+                        >
                             <img
                                 src={BRAND_LOGO_WHITE_URL}
                                 alt="Anhangá Viagens"
@@ -39,7 +43,7 @@ const Footer: React.FC = () => {
                                 height="128"
                                 className="h-32 w-auto object-contain"
                             />
-                        </div>
+                        </a>
                         <p className="text-zinc-400 leading-relaxed max-w-sm font-medium">
                             Roteiros feitos do zero. Sem pacote pronto, sem estresse. <br />
                             Só a sua viagem.
@@ -50,20 +54,20 @@ const Footer: React.FC = () => {
                     <div>
                         <h3 className="font-bold text-white mb-6 uppercase tracking-wider text-xs">Menu</h3>
                         <ul className="space-y-3 font-medium">
-                            <li><a href={`${SITE_URL}/`} className="hover:text-brand-yellow transition-colors">Agência de Viagens em São Paulo</a></li>
-                            <li><a href={`${SITE_URL}/sobre/`} className="hover:text-brand-yellow transition-colors">Sobre a Anhangá</a></li>
-                            <li><a href={getBlogHomeUrl()} className="hover:text-brand-yellow transition-colors">Blog de Viagens e Roteiros</a></li>
-                            <li><a href={`${SITE_URL}/orlando/`} className="hover:text-brand-yellow transition-colors">Pacotes para Orlando</a></li>
-                            <li><a href={`${SITE_URL}/beto-carrero/`} className="hover:text-brand-yellow transition-colors">Pacote Beto Carrero</a></li>
-                            <li><a href={`${SITE_URL}/lollapalooza/`} className="hover:text-brand-yellow transition-colors">Lollapalooza Brasil</a></li>
-                            <li><a href={`${SITE_URL}/melhor-idade/`} className="hover:text-brand-yellow transition-colors">Pacotes Melhor Idade 50+</a></li>
-                            <li><a href={`${SITE_URL}/consultoria-de-viagem/`} className="hover:text-brand-yellow transition-colors">Consultoria de Viagem</a></li>
-                            <li><a href={`${SITE_URL}/curadoria-cruzeiros-brasil/`} className="hover:text-brand-yellow transition-colors">Cruzeiros pelo Brasil</a></li>
-                            <li><a href={`${SITE_URL}/corporativo/`} className="hover:text-brand-yellow transition-colors">Viagens Corporativas</a></li>
-                            <li><a href={`${SITE_URL}/quiz/`} className="hover:text-brand-yellow transition-colors">Quiz de Destinos</a></li>
-                            <li><a href={`${SITE_URL}/mapa-do-site/`} className="hover:text-brand-yellow transition-colors">Mapa do Site</a></li>
-                            <li><a href={`${SITE_URL}/termos-de-uso/`} className="hover:text-brand-yellow transition-colors">Termos de Uso</a></li>
-                            <li><a href={`${SITE_URL}/politica-privacidade/`} className="hover:text-brand-yellow transition-colors">Política de Privacidade</a></li>
+                            <li><a href={`${SITE_URL}/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Agência de Viagens em São Paulo</a></li>
+                            <li><a href={`${SITE_URL}/sobre/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Sobre a Anhangá</a></li>
+                            <li><a href={getBlogHomeUrl()} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Blog de Viagens e Roteiros</a></li>
+                            <li><a href={`${SITE_URL}/orlando/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Pacotes para Orlando</a></li>
+                            <li><a href={`${SITE_URL}/beto-carrero/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Pacote Beto Carrero</a></li>
+                            <li><a href={`${SITE_URL}/lollapalooza/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Lollapalooza Brasil</a></li>
+                            <li><a href={`${SITE_URL}/melhor-idade/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Pacotes Melhor Idade 50+</a></li>
+                            <li><a href={`${SITE_URL}/consultoria-de-viagem/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Consultoria de Viagem</a></li>
+                            <li><a href={`${SITE_URL}/curadoria-cruzeiros-brasil/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Cruzeiros pelo Brasil</a></li>
+                            <li><a href={`${SITE_URL}/corporativo/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Viagens Corporativas</a></li>
+                            <li><a href={`${SITE_URL}/quiz/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Quiz de Destinos</a></li>
+                            <li><a href={`${SITE_URL}/mapa-do-site/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Mapa do Site</a></li>
+                            <li><a href={`${SITE_URL}/termos-de-uso/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Termos de Uso</a></li>
+                            <li><a href={`${SITE_URL}/politica-privacidade/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Política de Privacidade</a></li>
                         </ul>
                     </div>
 
@@ -73,11 +77,11 @@ const Footer: React.FC = () => {
                         <ul className="space-y-4 font-medium text-sm">
                             <li className="flex items-center gap-3">
                                 <Phone className="size-5 text-brand-cyan" weight="fill" />
-                                <a href="tel:+551152833309" className="hover:text-brand-yellow transition-colors">(11) 5283-3309</a>
+                                <a href="tel:+551152833309" className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">(11) 5283-3309</a>
                             </li>
                             <li className="flex items-center gap-3">
                                 <Envelope className="size-5 text-brand-cyan" weight="fill" />
-                                <a href="mailto:contato@anhanga.tur.br" className="hover:text-brand-yellow transition-colors">contato@anhanga.tur.br</a>
+                                <a href="mailto:contato@anhanga.tur.br" className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">contato@anhanga.tur.br</a>
                             </li>
                             <li className="flex items-start gap-3">
                                 <MapPin className="size-5 text-brand-cyan shrink-0 mt-1" weight="fill" />
@@ -94,7 +98,7 @@ const Footer: React.FC = () => {
                             href="https://instagram.com/anhangaviagens"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="min-h-12 min-w-12 flex items-center justify-center bg-white/5 rounded-full hover:bg-brand-vibrant hover:text-white transition-colors"
+                            className="min-h-12 min-w-12 flex items-center justify-center bg-white/5 rounded-full hover:bg-brand-vibrant hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2"
                             aria-label="Siga a Anhangá Viagens no Instagram"
                         >
                             <InstagramLogo className="size-5" weight="fill" />
@@ -103,7 +107,7 @@ const Footer: React.FC = () => {
                             href="https://facebook.com/profile.php?id=61585422494271"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="min-h-12 min-w-12 flex items-center justify-center bg-white/5 rounded-full hover:bg-brand-vibrant hover:text-white transition-colors"
+                            className="min-h-12 min-w-12 flex items-center justify-center bg-white/5 rounded-full hover:bg-brand-vibrant hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2"
                             aria-label="Siga a Anhangá Viagens no Facebook"
                         >
                             <FacebookLogo className="size-5" weight="fill" />
@@ -116,9 +120,9 @@ const Footer: React.FC = () => {
                             {runtimeMetadata ? ` • ${runtimeMetadata.currentYear}` : null}
                         </div>
                         <div className="text-[10px] text-zinc-400 font-medium flex flex-wrap justify-center md:justify-end gap-x-2">
-                            <span>ANHANGA TURISMO LTDA • CNPJ/Cadastur: <a href="https://cadastur.turismo.gov.br/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline underline-offset-2">37.036.732/0001-41</a></span>
+                            <span>ANHANGA TURISMO LTDA • CNPJ/Cadastur: <a href="https://cadastur.turismo.gov.br/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline underline-offset-2 focus:outline-none focus-visible:ring-1 focus-visible:ring-brand-cyan rounded-sm px-0.5">37.036.732/0001-41</a></span>
                             <span className="hidden md:inline">•</span>
-                            <a href="https://www.abav.com.br/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline underline-offset-2">Membro ABAV</a>
+                            <a href="https://www.abav.com.br/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-yellow transition-colors underline underline-offset-2 focus:outline-none focus-visible:ring-1 focus-visible:ring-brand-cyan rounded-sm px-0.5">Membro ABAV</a>
                         </div>
                         <div className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mt-2">
                             Conteúdo da equipe Anhangá Viagens
