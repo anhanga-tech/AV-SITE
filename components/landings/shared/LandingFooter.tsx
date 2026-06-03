@@ -22,6 +22,7 @@ export function LandingFooter() {
                     Ir para o site principal →
                 </a>
                 <button
+                    type="button"
                     onClick={triggerResetBanner}
                     className="text-xs text-white/50 hover:text-white transition-colors duration-150 font-medium underline underline-offset-2"
                 >

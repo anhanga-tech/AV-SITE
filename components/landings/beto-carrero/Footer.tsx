@@ -34,6 +34,7 @@ const Footer: React.FC = () => {
           &copy; {runtimeMetadata ? `${runtimeMetadata.currentYear} ` : ''}Anhangá Viagens. Todos os direitos reservados.
         </p>
         <button
+          type="button"
           onClick={triggerResetBanner}
           className="text-xs opacity-60 hover:opacity-100 transition-opacity underline underline-offset-2 mt-2"
         >

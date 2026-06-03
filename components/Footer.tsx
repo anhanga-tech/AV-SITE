@@ -127,6 +127,7 @@ const Footer: React.FC = () => {
                         </div>
                         <div className="text-[10px] text-zinc-400 mt-1">
                             <button
+                                type="button"
                                 onClick={triggerResetBanner}
                                 className="underline underline-offset-2 hover:text-brand-yellow transition-colors"
                             >

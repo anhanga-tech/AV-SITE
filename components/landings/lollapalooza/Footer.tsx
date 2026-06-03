@@ -34,6 +34,7 @@ const Footer: React.FC = () => {
           </p>
           <p className="mt-3 text-xs opacity-50">
             <button
+              type="button"
               onClick={triggerResetBanner}
               className="underline underline-offset-2 hover:opacity-100 transition-opacity"
             >
