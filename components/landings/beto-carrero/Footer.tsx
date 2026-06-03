@@ -1,6 +1,7 @@
 import React from 'react';
 import { getBetoAssetUrl } from './assetPath';
 import { useFooterRuntimeMetadata } from '../../../lib/footer-runtime';
+import { triggerResetBanner } from '@/lib/consent';
 
 const Footer: React.FC = () => {
   const runtimeMetadata = useFooterRuntimeMetadata();
@@ -32,6 +33,13 @@ const Footer: React.FC = () => {
         <p className="text-sm opacity-40">
           &copy; {runtimeMetadata ? `${runtimeMetadata.currentYear} ` : ''}Anhangá Viagens. Todos os direitos reservados.
         </p>
+        <button
+          type="button"
+          onClick={triggerResetBanner}
+          className="text-xs opacity-60 hover:opacity-100 transition-opacity underline underline-offset-2 mt-2"
+        >
+          Gerenciar cookies
+        </button>
       </div>
     </footer>
   );

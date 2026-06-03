@@ -1,4 +1,5 @@
 import { BRAND_LOGO_BLUE_URL } from '@/lib/media-assets';
+import { triggerResetBanner } from '@/lib/consent';
 
 export function LandingFooter() {
     return (
@@ -20,6 +21,13 @@ export function LandingFooter() {
                 >
                     Ir para o site principal →
                 </a>
+                <button
+                    type="button"
+                    onClick={triggerResetBanner}
+                    className="text-xs text-white/50 hover:text-white transition-colors duration-150 font-medium underline underline-offset-2"
+                >
+                    Gerenciar cookies
+                </button>
             </div>
         </footer>
     );
