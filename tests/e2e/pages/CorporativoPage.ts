@@ -8,6 +8,7 @@ export class CorporativoPage {
   readonly whatsappInput: Locator;
   readonly empresaInput: Locator;
   readonly cargoInput: Locator;
+  readonly lgpdCheckbox: Locator;
   readonly submitBtn: Locator;
   readonly successHeading: Locator;
   readonly errorAlert: Locator;
@@ -22,6 +23,7 @@ export class CorporativoPage {
     this.whatsappInput = page.locator('#whatsapp');
     this.empresaInput = page.locator('#empresa');
     this.cargoInput = page.locator('#cargo');
+    this.lgpdCheckbox = page.locator('#lgpd-corp');
     this.submitBtn = page.locator('button[type="submit"]');
     this.successHeading = page.locator('h3:has-text("Mensagem recebida!")');
     this.errorAlert = page.locator('p[role="alert"]');
@@ -40,6 +42,7 @@ export class CorporativoPage {
     whatsapp?: string;
     empresa?: string;
     cargo?: string;
+    acceptLGPD?: boolean;
   }) {
     if (data.firstName) await this.firstNameInput.fill(data.firstName);
     if (data.lastName) await this.lastNameInput.fill(data.lastName);
@@ -47,6 +50,7 @@ export class CorporativoPage {
     if (data.whatsapp) await this.whatsappInput.fill(data.whatsapp);
     if (data.empresa) await this.empresaInput.fill(data.empresa);
     if (data.cargo) await this.cargoInput.fill(data.cargo);
+    if (data.acceptLGPD !== false) await this.lgpdCheckbox.check();
   }
 
   async submit() {
