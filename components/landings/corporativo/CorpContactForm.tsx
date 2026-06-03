@@ -263,7 +263,13 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
                                         id="lgpd-corp"
                                         type="checkbox"
                                         checked={acceptedLGPD}
-                                        onChange={(e) => setAcceptedLGPD(e.target.checked)}
+                                        onChange={(e) => {
+                                            setAcceptedLGPD(e.target.checked);
+                                            if (e.target.checked && errorMessage === 'Você deve aceitar os termos para continuar.') {
+                                                setErrorMessage('');
+                                                setSubmitState('idle');
+                                            }
+                                        }}
                                         className="peer size-4 cursor-pointer appearance-none rounded border-2 border-zinc-300 bg-white checked:bg-brand-cyan checked:border-brand-cyan transition focus-visible:ring-2 focus-visible:ring-brand-cyan/40"
                                     />
                                     <Check className="absolute size-3 text-white opacity-0 peer-checked:opacity-100 left-0.5 pointer-events-none transition-opacity" weight="bold" />
@@ -271,7 +277,7 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
                                 <span className="text-xs text-zinc-500 leading-tight">
                                     Aceito receber comunicações e autorizo o tratamento dos meus dados conforme a{' '}
                                     <a
-                                        href="/politica-privacidade/"
+                                        href="https://www.anhanga.tur.br/politica-privacidade/"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="underline hover:text-brand-cyan"
