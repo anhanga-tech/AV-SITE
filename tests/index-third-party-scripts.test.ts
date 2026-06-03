@@ -40,7 +40,7 @@ test('index.html lazy-loads GTM through the deferred analytics loader', () => {
 
   assert.match(indexHtml, /var\s+gtmLoaded\s*=\s*false/i);
   assert.match(indexHtml, /'gtm\.start'\s*:\s*new Date\(\)\.getTime\(\)/i);
-  assert.match(indexHtml, /https:\/\/www\.googletagmanager\.com\/gtm\.js\?id=GTM-T2KGS86G/i);
+  assert.match(indexHtml, /https:\/\/load\.sst\.anhanga\.tur\.br\//i);
   assert.ok(loadGtmIndex > -1, 'GTM loader should be called from the analytics trigger');
   assert.ok(utmInjectIndex > -1, 'UTM tracking loader should still be present');
   assert.ok(loadGtmIndex < utmInjectIndex, 'GTM should be queued before UTM reads GA client data');
