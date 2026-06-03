@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import AIChat from './components/AIChat';
 import ContactModal from './components/ContactModal';
 import { ClientOnly } from './components/ClientOnly';
+import ChunkErrorBoundary from './components/ChunkErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
 import BackToTop from './components/ui/BackToTop';
 import { HeadContext, type HeadManager } from './lib/head';
@@ -47,6 +48,7 @@ const MainSiteShell: React.FC = () => {
     <div className="flex flex-col min-h-screen bg-white">
       <Header />
       <main id="main-content" className="flex-grow">
+        <ChunkErrorBoundary>
         <Suspense fallback={<MainRouteFallback />}>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -61,6 +63,7 @@ const MainSiteShell: React.FC = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
+        </ChunkErrorBoundary>
       </main>
       <Footer />
     </div>
@@ -71,6 +74,7 @@ const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClient
   return (
     <>
       <ScrollToTop />
+      <ChunkErrorBoundary>
       <Suspense fallback={<LandingRouteFallback />}>
         <Routes>
           <Route path="/beto-carrero" element={<BetoCarreroLanding />} />
@@ -88,6 +92,7 @@ const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClient
           <Route path="/*" element={<MainSiteShell />} />
         </Routes>
       </Suspense>
+      </ChunkErrorBoundary>
       {includeClientFeatures ? (
         <ClientFeatures />
       ) : null}
