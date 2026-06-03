@@ -67,3 +67,41 @@ test('design system documents the production Poppins font weights', () => {
   assert.doesNotMatch(importUrl, /Poppins:wght@[^']*800/);
   assert.match(designSystemCss, /Poppins is loaded with 400\/600\/700\/900 only/);
 });
+
+test('index.html configura gtag consent defaults antes da IIFE de scripts lazy', () => {
+  const consentBlockIndex = indexHtml.indexOf("gtag('consent', 'default'");
+  const iifeIndex = indexHtml.indexOf('var analyticsLoaded');
+
+  assert.ok(consentBlockIndex > -1, 'bloco gtag consent default deve existir');
+  assert.ok(iifeIndex > -1, 'IIFE de scripts lazy deve existir');
+  assert.ok(consentBlockIndex < iifeIndex, 'consent default deve vir antes da IIFE');
+
+  assert.match(indexHtml, /analytics_storage:\s*'granted'/, 'analytics_storage deve ser granted por padrão (legítimo interesse)');
+  assert.match(indexHtml, /ad_storage:.*'denied'/, 'ad_storage deve ser denied por padrão');
+  assert.match(indexHtml, /wait_for_update:\s*2000/, 'wait_for_update deve ser 2000ms');
+});
+
+test('loadMautic tem gate de consentimento LGPD', () => {
+  const loadMauticMatch = indexHtml.match(/var loadMautic\s*=\s*function\s*\(\)\s*\{([\s\S]*?)};/);
+  assert.ok(loadMauticMatch, 'loadMautic deve estar definida');
+  const body = loadMauticMatch[1];
+  assert.match(body, /_consentChoice\s*!==\s*'marketing'/, 'loadMautic deve ter gate de consentimento');
+});
+
+test('loadHubspot tem gate de consentimento LGPD', () => {
+  const loadHubspotMatch = indexHtml.match(/var loadHubspot\s*=\s*function\s*\(\)\s*\{([\s\S]*?)};/);
+  assert.ok(loadHubspotMatch, 'loadHubspot deve estar definida');
+  const body = loadHubspotMatch[1];
+  assert.match(body, /_consentChoice\s*!==\s*'marketing'/, 'loadHubspot deve ter gate de consentimento');
+});
+
+test('index.html tem listener anhanga:marketing-consent', () => {
+  assert.match(indexHtml, /anhanga:marketing-consent/, 'listener de aceite deve estar presente');
+});
+
+test('index.html tem listener anhanga:revoke-consent com reload', () => {
+  assert.match(indexHtml, /anhanga:revoke-consent/, 'listener de revogação deve estar presente');
+  const revokeIdx = indexHtml.indexOf('anhanga:revoke-consent');
+  const reloadIdx = indexHtml.indexOf('window.location.reload()', revokeIdx);
+  assert.ok(reloadIdx > revokeIdx, 'reload deve ocorrer após revoke-consent');
+});
