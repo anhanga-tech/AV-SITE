@@ -106,7 +106,12 @@ const Home: React.FC = () => {
         description="Agência de viagens em São Paulo. Cada roteiro começa do zero — sem pacote pronto. Orlando, Beto Carrero, Europa e muito mais. Orçamento gratuito."
         canonical="https://www.anhanga.tur.br/"
       />
-      <OrganizationSchema />
+      <OrganizationSchema
+        aggregateRating={reviewSummary ? {
+          ratingValue: reviewSummary.averageRating,
+          reviewCount: reviewSummary.totalReviews,
+        } : undefined}
+      />
       <FAQPageSchema items={FAQ_SCHEMA_ITEMS} />
       <BreadcrumbSchema
         items={[{ name: 'Home', item: 'https://www.anhanga.tur.br/' }]}
@@ -126,10 +131,6 @@ const Home: React.FC = () => {
           'turismo melhor idade',
           'pacotes de viagem SP',
         ]}
-        aggregateRating={reviewSummary ? {
-          ratingValue: reviewSummary.averageRating,
-          reviewCount: reviewSummary.totalReviews,
-        } : undefined}
       />
       <Hero />
 
