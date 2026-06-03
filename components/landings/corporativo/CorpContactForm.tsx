@@ -67,7 +67,7 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
             } else {
                 dispatch({
                     type: 'submit-error',
-                    message: 'error' in n8nResult ? n8nResult.error : 'Ocorreu um erro ao enviar. Tente novamente.',
+                    message: n8nResult.error || 'Ocorreu um erro ao enviar. Tente novamente.',
                 });
                 isSubmittingRef.current = false;
             }
