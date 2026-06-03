@@ -26,7 +26,7 @@ const CookieConsentBanner: React.FC = () => {
     <dialog
       open
       aria-label="Preferências de cookies"
-      className="fixed bottom-0 left-0 right-0 z-50 m-0 w-full max-w-none border-0 p-0 bg-brand-dark border-t border-white/10 shadow-lg"
+      className="fixed bottom-0 left-0 right-0 z-[10000] m-0 w-full max-w-none border-0 p-0 bg-brand-dark border-t border-white/10 shadow-lg"
     >
       <div className="container mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
         <p className="text-sm text-zinc-300 leading-relaxed max-w-2xl">
