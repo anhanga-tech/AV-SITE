@@ -30,8 +30,9 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
     const [submitState, setSubmitState] = useState<'idle' | 'success' | 'error'>('idle');
     const [errorMessage, setErrorMessage] = useState('');
     const [acceptedLGPD, setAcceptedLGPD] = useState(false);
-    const [lgpdError, setLgpdError] = useState('');
     const isLocallySubmitting = useRef(false);
+
+    const lgpdError = submitState === 'error' && !acceptedLGPD ? 'Aceite obrigatório' : '';
 
     function handleField(field: keyof typeof form) {
         return (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,10 +62,8 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
         if (!acceptedLGPD) {
             setSubmitState('error');
             setErrorMessage('Você deve aceitar os termos para continuar.');
-            setLgpdError('Aceite obrigatório');
             return;
         }
-        setLgpdError('');
         isLocallySubmitting.current = true;
         setErrorMessage('');
 
@@ -264,10 +263,7 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
                                         id="lgpd-corp"
                                         type="checkbox"
                                         checked={acceptedLGPD}
-                                        onChange={(e) => {
-                                            setAcceptedLGPD(e.target.checked);
-                                            if (e.target.checked) setLgpdError('');
-                                        }}
+                                        onChange={(e) => setAcceptedLGPD(e.target.checked)}
                                         className="peer size-4 cursor-pointer appearance-none rounded border-2 border-zinc-300 bg-white checked:bg-brand-cyan checked:border-brand-cyan transition focus-visible:ring-2 focus-visible:ring-brand-cyan/40"
                                     />
                                     <Check className="absolute size-3 text-white opacity-0 peer-checked:opacity-100 left-0.5 pointer-events-none transition-opacity" weight="bold" />
