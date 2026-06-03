@@ -7,8 +7,15 @@ test.describe('Cookie Consent Banner (CMP)', () => {
   test.setTimeout(15000);
 
   test.beforeEach(async ({ page }) => {
-    // Limpa o localStorage antes de cada navegação sem carregar a página duas vezes
-    await page.addInitScript((key) => localStorage.removeItem(key), CHOICE_KEY);
+    // Limpa o consentimento apenas na primeira navegação do teste.
+    // A flag de sessionStorage impede que reloads dentro do mesmo teste
+    // apaguem o consentimento salvo pelo clique (sessionStorage sobrevive a reloads).
+    await page.addInitScript((key) => {
+      if (sessionStorage.getItem('_cmp_test_init')) return;
+      sessionStorage.setItem('_cmp_test_init', '1');
+      localStorage.removeItem(key);
+      localStorage.removeItem(key + '_meta');
+    }, CHOICE_KEY);
   });
 
   // --- Visibilidade ---
