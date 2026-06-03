@@ -233,7 +233,9 @@
       window.addEventListener('anhanga:marketing-consent', function () {
         _consentChoice = 'marketing';
         loadMautic();
-        loadHubspot();
+        if (contactIntentLoaded) {
+          loadHubspot();
+        }
         if (typeof gtag === 'function') {
           gtag('consent', 'update', { ad_storage: 'granted', ad_personalization: 'granted', ad_user_data: 'granted' });
         }
