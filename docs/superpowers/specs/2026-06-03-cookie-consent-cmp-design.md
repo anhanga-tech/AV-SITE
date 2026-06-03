@@ -22,8 +22,8 @@ GA4 (via sGTM Stape) e o rastreamento UTM/click IDs (`initializeTracking()`) sã
 
 O RIPD v1.1 lista como pendência da issue #782 "bloquear `initializeTracking()` antes do consentimento". Esta implementação **revisa essa pendência**: a decisão de produto é que analytics e UTM são tratados por legítimo interesse e não serão gatekeados pelo banner. O RIPD v1.1 deverá ser atualizado na mesma PR para:
 
-1. Remover "bloquear `initializeTracking()`" das pendências da **Atividade 2** (único local onde o item existe — §3.6, linha do RIPD).
-2. Substituir a salvaguarda "opt-out via banner de cookies" pela descrição real: **direito de oposição ao legítimo interesse exercido via `privacidade@anhanga.tur.br` ou pelo opt-out do GA4 documentado em `/politica-privacidade#cookies`**.
+1. Em **§3.6** (salvaguardas pendentes da Atividade 2): remover "bloquear `initializeTracking()` antes do consentimento do usuário" e substituir pela salvaguarda real — **direito de oposição ao legítimo interesse exercido via `privacidade@anhanga.tur.br` ou pelo opt-out do GA4 documentado em `/politica-privacidade#cookies`**.
+2. Em **§3.5** (tabela de riscos da Atividade 2, linha de risco "Coleta de click IDs antes do consentimento"): substituir a mitigação "Condicionar `initializeTracking()` ao consentimento via banner" pela salvaguarda real — `initializeTracking()` opera sob legítimo interesse; repasse de conversões é integralmente server-side via Stape sGTM, sem cookie de terceiros no browser do usuário.
 
 ---
 
@@ -62,7 +62,7 @@ O RIPD v1.1 lista como pendência da issue #782 "bloquear `initializeTracking()`
 | `App.tsx` | `<CookieConsentBanner />` adicionado em `AppLayout` ao nível de `<ClientFeatures />` (não dentro de `MainSiteShell`), para que renderize em todas as páginas incluindo landing pages. |
 | `components/Footer.tsx` | Link "Gerenciar cookies" que dispara `anhanga:reset-consent`. |
 | Footers de landing pages | Mesmo link "Gerenciar cookies" — todas as landings com footer próprio. |
-| `docs/ripd-legitimo-interesse.md` | Atualizar pendências das Atividades 1 e 2 conforme descrito na Seção 1. |
+| `docs/ripd-legitimo-interesse.md` | Atualizar Atividade 2 conforme descrito na Seção 1. |
 
 ---
 
