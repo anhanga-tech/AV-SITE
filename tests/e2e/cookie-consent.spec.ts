@@ -3,11 +3,12 @@ import { test, expect } from '@playwright/test';
 const CHOICE_KEY = 'anhanga_cookie_consent';
 
 test.describe('Cookie Consent Banner (CMP)', () => {
+  // Timeout por teste: suficiente para navegações lentas, mas falha rápido em hangs
+  test.setTimeout(15000);
 
   test.beforeEach(async ({ page }) => {
-    // Garantir estado limpo: sem localStorage de consentimento
-    await page.goto('/');
-    await page.evaluate((key) => localStorage.removeItem(key), CHOICE_KEY);
+    // Limpa o localStorage antes de cada navegação sem carregar a página duas vezes
+    await page.addInitScript((key) => localStorage.removeItem(key), CHOICE_KEY);
   });
 
   // --- Visibilidade ---
@@ -127,6 +128,9 @@ test.describe('Cookie Consent Banner (CMP)', () => {
   });
 
   test('revogação: aceitar → gerenciar → recusar dispara reload e bloqueia Mautic', async ({ page }) => {
+    // Timeout maior apenas para este teste — envolve um reload completo de página
+    test.setTimeout(20000);
+
     // Aceitar
     await page.goto('/');
     await page.getByRole('button', { name: 'Aceitar' }).click();
