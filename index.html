@@ -79,10 +79,23 @@
   <!-- End Google Tag Manager (noscript) -->
   <div id="root"></div>
   <script>window.dataLayer = window.dataLayer || [];</script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    var _consentInit = (function () { try { return localStorage.getItem('anhanga_cookie_consent'); } catch (e) { return null; } })();
+    gtag('consent', 'default', {
+      analytics_storage: 'granted',
+      ad_storage: _consentInit === 'marketing' ? 'granted' : 'denied',
+      ad_personalization: _consentInit === 'marketing' ? 'granted' : 'denied',
+      ad_user_data: _consentInit === 'marketing' ? 'granted' : 'denied',
+      wait_for_update: 2000
+    });
+  </script>
   <script type="module" src="/index.tsx"></script>
   <!-- Defer third-party scripts to protect mobile TBT -->
   <script>
     (function () {
+      var _consentChoice = (function () { try { return localStorage.getItem('anhanga_cookie_consent'); } catch (e) { return null; } })();
       var analyticsLoaded = false;
       var gtmLoaded = false;
       var hubspotLoaded = false;
@@ -110,6 +123,7 @@
       };
 
       var loadMautic = function () {
+        if (_consentChoice !== 'marketing') return;
         if (mauticLoaded) return;
         mauticLoaded = true;
         var h = location.hostname;
@@ -133,6 +147,7 @@
       };
 
       var loadHubspot = function () {
+        if (_consentChoice !== 'marketing') return;
         if (hubspotLoaded) return;
         hubspotLoaded = true;
         injectScript('//js.hs-scripts.com/50895604.js', {
@@ -214,6 +229,25 @@
       }
 
       setTimeout(triggerHubspot, 35000);
+
+      window.addEventListener('anhanga:marketing-consent', function () {
+        _consentChoice = 'marketing';
+        loadMautic();
+        if (contactIntentLoaded) {
+          loadHubspot();
+        }
+        if (typeof gtag === 'function') {
+          gtag('consent', 'update', { ad_storage: 'granted', ad_personalization: 'granted', ad_user_data: 'granted' });
+        }
+      }, { once: true });
+
+      window.addEventListener('anhanga:revoke-consent', function () {
+        _consentChoice = 'essential';
+        if (typeof gtag === 'function') {
+          gtag('consent', 'update', { ad_storage: 'denied', ad_personalization: 'denied', ad_user_data: 'denied' });
+        }
+        window.location.reload();
+      }, { once: true });
     })();
   </script>
 </body>

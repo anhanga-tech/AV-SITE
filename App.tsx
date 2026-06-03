@@ -9,6 +9,7 @@ import { ClientOnly } from './components/ClientOnly';
 import ChunkErrorBoundary from './components/ChunkErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
 import BackToTop from './components/ui/BackToTop';
+import CookieConsentBanner from './components/CookieConsentBanner';
 import { HeadContext, type HeadManager } from './lib/head';
 
 // Pages
@@ -96,6 +97,9 @@ const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClient
       {includeClientFeatures ? (
         <ClientFeatures />
       ) : null}
+      <ClientOnly>
+        <CookieConsentBanner />
+      </ClientOnly>
     </>
   );
 };

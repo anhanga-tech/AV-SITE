@@ -18,6 +18,17 @@ export default defineConfig({
     baseURL: BASE_URL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
+    // Pre-set consent so the CMP banner doesn't block tests that don't test the banner.
+    // cookie-consent.spec.ts overrides this via page.addInitScript in its own beforeEach.
+    storageState: {
+      cookies: [],
+      origins: [
+        {
+          origin: BASE_URL,
+          localStorage: [{ name: 'anhanga_cookie_consent', value: 'essential' }],
+        },
+      ],
+    },
     // Block third-party tracking during tests — prevents test data from polluting production CRMs
     launchOptions: {
       args: [
