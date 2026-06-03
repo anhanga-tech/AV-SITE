@@ -16,7 +16,14 @@ O site não possui mecanismo de consentimento prévio para cookies de marketing,
 - **HubSpot tracking passivo** (`js.hs-scripts.com/50895604.js`) — rastreamento passivo de visitantes
 - **Tags de remarketing via GTM** — publicidade direcionada
 
-GA4 (via sGTM Stape) e o rastreamento UTM/click IDs (`initializeTracking()`) são classificados como **legítimo interesse** no RIPD v1.1 e não requerem opt-in, mas o titular tem direito de oposição.
+GA4 (via sGTM Stape) e o rastreamento UTM/click IDs (`initializeTracking()`) são classificados como **legítimo interesse** no RIPD v1.1 e não requerem opt-in, mas o titular tem direito de oposição (Art. 18).
+
+### Relação com o RIPD v1.1
+
+O RIPD v1.1 lista como pendência da issue #782 "bloquear `initializeTracking()` antes do consentimento". Esta implementação **revisa essa pendência**: a decisão de produto é que analytics e UTM são tratados por legítimo interesse e não serão gatekeados pelo banner. O RIPD v1.1 deverá ser atualizado na mesma PR para:
+
+1. Remover "bloquear `initializeTracking()`" das pendências das Atividades 1 e 2.
+2. Substituir a salvaguarda "opt-out via banner de cookies" pela descrição real: **direito de oposição ao legítimo interesse exercido via `privacidade@anhanga.tur.br` ou pelo opt-out do GA4 documentado em `/politica-privacidade#cookies`**.
 
 ---
 
@@ -24,13 +31,15 @@ GA4 (via sGTM Stape) e o rastreamento UTM/click IDs (`initializeTracking()`) sã
 
 | Decisão | Escolha | Justificativa |
 |---|---|---|
-| `initializeTracking()` | Não alterar | Legítimo interesse (RIPD Atividade 2) — não precisa de gate de consentimento |
-| Consent Mode v2 | Integrar | Preserva dados modelados do GA4 antes do aceite; `analytics_storage: 'granted'` por padrão |
-| Granularidade do banner | 2 botões (sem "Personalizar") | Apenas 1 categoria requer consentimento; granularidade desnecessária |
-| Labels dos botões | "Aceitar" / "Recusar" | Evitar a palavra "marketing" nos botões para reduzir aversão; informação está no texto do banner |
-| Peso visual dos botões | Idêntico | Resolução ANPD 15/2024 proíbe dark patterns (botão de aceite destacado) |
-| Persistência | `localStorage` chave `anhanga_cookie_consent` | Padrão do projeto; sem cookie para persistir consentimento |
-| Revogação | Link "Gerenciar cookies" na footer | Art. 8º, §5º — revogação gratuita e facilitada a qualquer momento |
+| `initializeTracking()` | Não alterar | Legítimo interesse (RIPD Atividade 2) — sem gate de consentimento |
+| Consent Mode v2 | Integrar | Preserva dados modelados do GA4; `analytics_storage: 'granted'` por padrão |
+| Granularidade do banner | 2 botões (sem "Personalizar") | Apenas 1 categoria requer consentimento |
+| Labels dos botões | "Aceitar" / "Recusar" | Evitar "marketing" nos botões para reduzir aversão; informação está no texto |
+| Peso visual dos botões | Idêntico | Resolução ANPD 15/2024 proíbe dark patterns |
+| Persistência | `localStorage` chave `anhanga_cookie_consent` (choice) + `anhanga_cookie_consent_meta` (JSON com timestamp e versão) | Chave simples para o script inline no `index.html`; metadados separados para auditabilidade (Art. 8º, §1º) |
+| Revogação na sessão | `gtag('consent', 'update', {...denied})` + `window.location.reload()` | Garante que scripts já carregados sejam descarregados; cumpre Art. 8º, §5º com efeito imediato |
+| Canal de revogação UI | `window.dispatchEvent(new Event('anhanga:reset-consent'))` disparado pelo Footer; banner escuta e reaparece | Evita prop-drilling através dos níveis de rota do `AppLayout` |
+| Footers com "Gerenciar cookies" | `Footer.tsx` (site principal) + footers de landing pages (`/beto-carrero`, `/lollapalooza`, etc.) | Revogação disponível em todas as páginas onde o banner aparece |
 
 ---
 
@@ -40,7 +49,7 @@ GA4 (via sGTM Stape) e o rastreamento UTM/click IDs (`initializeTracking()`) sã
 
 | Arquivo | Responsabilidade |
 |---|---|
-| `lib/consent.ts` | Lógica pura: ler/escrever localStorage, disparar `anhanga:marketing-consent`. Sem React, sem efeitos no import. |
+| `lib/consent.ts` | Lógica pura: ler/escrever localStorage, disparar eventos. Sem React, sem efeitos no import. |
 | `components/CookieConsentBanner.tsx` | UI do banner. Monta em `AppLayout`. Renderiza `null` se consentimento já registrado. |
 | `tests/consent.test.ts` | Testes unitários de `lib/consent.ts` via `node:test`. |
 | `tests/e2e/cookie-consent.spec.ts` | Playwright: primeira visita, persistência, revogação, carga condicional de Mautic/HubSpot. |
@@ -49,9 +58,11 @@ GA4 (via sGTM Stape) e o rastreamento UTM/click IDs (`initializeTracking()`) sã
 
 | Arquivo | Mudança |
 |---|---|
-| `index.html` | `gtag('consent', 'default', {...})` antes do GTM. Verificação de localStorage no topo do script inline. `loadMautic`/`loadHubspot` com gate de consentimento. Listener `anhanga:marketing-consent`. |
-| `App.tsx` | `<CookieConsentBanner />` dentro de `AppLayout`, fora das rotas (aparece em todas as páginas). |
-| `components/Footer.tsx` | Link "Gerenciar cookies" que chama `resetConsent()` e força re-mount do banner. |
+| `index.html` | Bloco `gtag('consent', 'default', {...})` antes da IIFE de carregamento lazy. Leitura de localStorage no topo da IIFE. Gate em `loadMautic`/`loadHubspot`. Listeners `anhanga:marketing-consent` e `anhanga:revoke-consent`. |
+| `App.tsx` | `<CookieConsentBanner />` dentro de `AppLayout`, fora das rotas. |
+| `components/Footer.tsx` | Link "Gerenciar cookies" que dispara `anhanga:reset-consent`. |
+| Footers de landing pages | Mesmo link "Gerenciar cookies" — todas as landings com footer próprio. |
+| `docs/ripd-legitimo-interesse.md` | Atualizar pendências das Atividades 1 e 2 conforme descrito na Seção 1. |
 
 ---
 
@@ -63,10 +74,14 @@ type ConsentChoice = 'marketing' | 'essential';
 // Lê a escolha do localStorage. Retorna null se ausente ou valor inválido.
 export function getConsent(): ConsentChoice | null
 
-// Persiste a escolha. Se 'marketing', dispara window.dispatchEvent('anhanga:marketing-consent').
+// Persiste a escolha no localStorage.
+// Grava 'anhanga_cookie_consent' = choice (string simples, lida pelo index.html).
+// Grava 'anhanga_cookie_consent_meta' = JSON { choice, timestamp: ISO8601, version: '1' } (auditoria Art. 8º §1º).
+// Se choice === 'marketing': dispara window.dispatchEvent(new CustomEvent('anhanga:marketing-consent')).
 export function setConsent(choice: ConsentChoice): void
 
-// Remove a chave do localStorage (para revogação via "Gerenciar cookies").
+// Remove ambas as chaves do localStorage.
+// Dispara window.dispatchEvent(new Event('anhanga:reset-consent')) para que o banner reaça.
 export function resetConsent(): void
 ```
 
@@ -94,7 +109,7 @@ React monta → CookieConsentBanner lê localStorage → null → exibe banner
 
 Usuário clica "Aceitar"
   → setConsent('marketing')
-  → localStorage ← 'marketing'
+  → localStorage ← 'marketing' + metadados { timestamp, version }
   → dispatchEvent('anhanga:marketing-consent')
   → index.html listener → loadMautic() + loadHubspot()
   → gtag('consent', 'update', { ad_storage: 'granted', ad_personalization: 'granted', ad_user_data: 'granted' })
@@ -102,9 +117,9 @@ Usuário clica "Aceitar"
 
 Usuário clica "Recusar"
   → setConsent('essential')
-  → localStorage ← 'essential'
-  → nenhum evento disparado
-  → Mautic e HubSpot nunca carregam
+  → localStorage ← 'essential' + metadados { timestamp, version }
+  → nenhum evento de marketing disparado
+  → Mautic e HubSpot nunca carregam na sessão
   → banner some
 ```
 
@@ -125,9 +140,23 @@ React monta → CookieConsentBanner → 'marketing' → renderiza null
 index.html carrega
   → lê localStorage → 'essential'
   → gtag('consent', 'default', { analytics_storage: 'granted', ad_storage: 'denied', ... })
-  → loadMautic() / loadHubspot() → 'essential' → no-op
+  → loadMautic() / loadHubspot() → gate bloqueia → no-op
 
 React monta → CookieConsentBanner → 'essential' → renderiza null
+```
+
+### Revogação (usuário que havia aceito clica "Gerenciar cookies")
+
+```
+Footer dispara window.dispatchEvent(new Event('anhanga:reset-consent'))
+  → CookieConsentBanner escuta o evento → exibe banner novamente
+
+Usuário clica "Recusar"
+  → setConsent('essential')
+  → localStorage ← 'essential'
+  → gtag('consent', 'update', { ad_storage: 'denied', ad_personalization: 'denied', ad_user_data: 'denied' })
+  → window.location.reload()
+    → no reload: localStorage = 'essential' → Mautic/HubSpot bloqueados desde o início da nova sessão
 ```
 
 ---
@@ -135,24 +164,22 @@ React monta → CookieConsentBanner → 'essential' → renderiza null
 ## 6. Design do componente `CookieConsentBanner`
 
 - **Posição:** `fixed bottom-0 left-0 right-0` — aparece sobre o conteúdo sem bloquear scroll
-- **Renderização:** `null` se `getConsent() !== null`; estado `visible` controlado por `useEffect` no mount
+- **Estado:** `visible: boolean`, iniciado como `false`; `useEffect` no mount define `true` se `getConsent() === null`; também escuta `anhanga:reset-consent` para voltar a `true`
 - **Texto obrigatório (LGPD transparência):**
-  > *"Usamos cookies de marketing (Mautic e HubSpot) para comunicações personalizadas. Analytics continua ativo por interesse legítimo. [Política de Privacidade →](/politica-privacidade#cookies)"*
+  > *"Usamos cookies de marketing (Mautic e HubSpot) para comunicações personalizadas. Analytics continua ativo por interesse legítimo — saiba como se opor em nossa [Política de Privacidade](/politica-privacidade#cookies)."*
 - **Botões:** "Aceitar" e "Recusar" com peso visual idêntico — sem cor de destaque exclusiva em nenhum dos dois
 - **Sem auto-fechamento:** o usuário deve escolher ativamente
 - **`role="dialog"` `aria-modal="false"` `aria-label="Preferências de cookies"`** para acessibilidade
 
-### Revogação (footer)
+### Revogação (footers)
 
-Link "Gerenciar cookies" na linha de copyright do `Footer.tsx`. Ao clicar:
-1. Chama `resetConsent()`
-2. Força re-render do banner via `key` prop em `AppLayout` (incrementa contador no estado de `AppLayout`)
+Link "Gerenciar cookies" na linha de copyright de **todos os footers** (site principal e landing pages). Ao clicar: `resetConsent()` + `window.dispatchEvent(new Event('anhanga:reset-consent'))`. O banner escuta o evento e volta a exibir sem prop-drilling.
 
 ---
 
 ## 7. Mudanças em `index.html`
 
-### Antes do bloco GTM existente — adicionar:
+### Bloco a adicionar antes da IIFE de carregamento lazy de scripts:
 
 ```html
 <script>
@@ -171,7 +198,7 @@ Link "Gerenciar cookies" na linha de copyright do `Footer.tsx`. Ao clicar:
 </script>
 ```
 
-### No script inline existente — adicionar no topo da IIFE:
+### Na IIFE existente — adicionar no topo:
 
 ```js
 var _consentChoice = (function() {
@@ -193,7 +220,7 @@ var loadHubspot = function() {
 };
 ```
 
-### Listener para aceite em tempo real (primeira visita):
+### Listener para aceite em primeira visita:
 
 ```js
 window.addEventListener('anhanga:marketing-consent', function() {
@@ -210,6 +237,26 @@ window.addEventListener('anhanga:marketing-consent', function() {
 }, { once: true });
 ```
 
+### Listener para revogação em sessão:
+
+```js
+window.addEventListener('anhanga:revoke-consent', function() {
+  _consentChoice = 'essential';
+  if (typeof gtag === 'function') {
+    gtag('consent', 'update', {
+      ad_storage: 'denied',
+      ad_personalization: 'denied',
+      ad_user_data: 'denied'
+    });
+  }
+  // Scripts já injetados no DOM não podem ser descarregados dinamicamente.
+  // O reload garante estado limpo na próxima carga.
+  window.location.reload();
+}, { once: true });
+```
+
+> **Nota:** `setConsent('essential')` em lib/consent.ts dispara `anhanga:revoke-consent` apenas quando estava anteriormente em `'marketing'` (i.e., no fluxo de revogação). No fluxo de primeira escolha "Recusar", nenhum reload é necessário pois nenhum script foi carregado.
+
 ---
 
 ## 8. Plano de testes
@@ -222,9 +269,9 @@ window.addEventListener('anhanga:marketing-consent', function() {
 | `getConsent()` com `'marketing'` | Retorna `'marketing'` |
 | `getConsent()` com `'essential'` | Retorna `'essential'` |
 | `getConsent()` com valor inválido | Retorna `null` |
-| `setConsent('marketing')` | Escreve localStorage + dispara `anhanga:marketing-consent` |
-| `setConsent('essential')` | Escreve localStorage + **não** dispara evento |
-| `resetConsent()` | Remove chave do localStorage |
+| `setConsent('marketing')` | Escreve localStorage + dispara `anhanga:marketing-consent` + grava metadados com timestamp e version |
+| `setConsent('essential')` | Escreve localStorage + **não** dispara `anhanga:marketing-consent` |
+| `resetConsent()` | Remove ambas as chaves do localStorage + dispara `anhanga:reset-consent` |
 | `getConsent()` após `resetConsent()` | Retorna `null` |
 | localStorage indisponível (throw simulado) | Não lança exceção |
 
@@ -234,12 +281,14 @@ window.addEventListener('anhanga:marketing-consent', function() {
 |---|---|
 | Primeira visita | Banner visível antes de qualquer interação |
 | Peso visual dos botões | Nenhum botão tem cor primária que o outro não tenha |
-| Clicar "Aceitar" | Banner some + localStorage `=== 'marketing'` |
+| Clicar "Aceitar" | Banner some + localStorage `=== 'marketing'` + metadados gravados |
 | Clicar "Recusar" | Banner some + localStorage `=== 'essential'` |
 | Recarregar após aceite | Banner não reaparece |
 | Recarregar após recusa | Banner não reaparece |
+| Recusar → analytics continua ativo | GTM ainda carregou; `window.dataLayer` existe (legítimo interesse não bloqueado) |
 | Link "Política de Privacidade" | Navega para `/politica-privacidade#cookies` |
 | "Gerenciar cookies" na footer | Banner reaparece + localStorage limpo |
+| Revogação: aceitar → gerenciar → recusar | `window.location.reload()` disparado; após reload Mautic não carrega |
 | Aceitar → Mautic carrega | `window.MauticTrackingObject` definido |
 | Recusar → Mautic não carrega | `window.MauticTrackingObject` indefinido |
 
@@ -254,11 +303,14 @@ Adicionar asserção: `loadMautic` e `loadHubspot` são no-ops quando localStora
 - [x] Base legal documentada (RIPD v1.1 + consentimento para marketing)
 - [x] Consentimento livre, informado e inequívoco (Art. 8º)
 - [x] Finalidade determinada — Mautic e HubSpot nomeados no banner (Art. 8º, §4º)
-- [x] Revogação gratuita e facilitada — link "Gerenciar cookies" na footer (Art. 8º, §5º)
+- [x] Ônus da prova no controlador — metadados gravados com timestamp e versão (Art. 8º, §1º)
+- [x] Revogação gratuita e facilitada com efeito imediato via reload (Art. 8º, §5º)
 - [x] Sem dark patterns — botões com peso visual idêntico (Resolução ANPD 15/2024)
-- [x] Transparência sobre legítimo interesse — mencionado no texto do banner (Art. 6º, VI)
+- [x] Transparência sobre legítimo interesse — mencionado no texto do banner com link de oposição (Art. 6º, VI)
+- [x] Direito de oposição ao legítimo interesse — canal declarado na Política de Privacidade (`/politica-privacidade#cookies`) e via `privacidade@anhanga.tur.br` (Art. 18)
 - [x] Consent Mode v2 com `analytics_storage: 'granted'` por padrão (legítimo interesse)
 - [x] Scripts bloqueados antes do aceite — gate no `index.html` antes do React montar
+- [x] RIPD v1.1 atualizado na mesma PR para refletir decisão sobre `initializeTracking()` e canal real de oposição
 
 ---
 
