@@ -98,6 +98,17 @@ test.describe('Contact form modal', () => {
 
     await expect(contactDialog(page)).not.toBeVisible();
   });
+
+  test('exibe aviso de transparência e link para política de privacidade', async ({ page, isMobile }) => {
+    await openHeaderContactModal(page, isMobile);
+
+    const dialog = contactDialog(page);
+    await expect(dialog.getByText(/registrados em nosso crm/i)).toBeVisible();
+    await expect(dialog.getByRole('link', { name: /política de privacidade/i })).toHaveAttribute(
+      'href',
+      '/politica-privacidade/',
+    );
+  });
 });
 
 test.describe('CallToAction inline form', () => {
