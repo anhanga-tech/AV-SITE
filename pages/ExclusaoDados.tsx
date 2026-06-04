@@ -39,7 +39,7 @@ const ExclusaoDados = () => (
                         </ol>
                         <p>Você também pode enviar sua solicitação pelos seguintes canais:</p>
                         <ul className="list-disc pl-6 space-y-1">
-                            <li><strong>WhatsApp:</strong> <a href="tel:+551152833309" className="text-primary underline">(11) 5283-3309</a> (informe "Exclusão de Dados" no início da mensagem)</li>
+                            <li><strong>WhatsApp:</strong> <a href="https://wa.me/551152833309?text=Exclus%C3%A3o%20de%20Dados" target="_blank" rel="noopener noreferrer" className="text-primary underline">(11) 5283-3309</a> (informe "Exclusão de Dados" no início da mensagem)</li>
                             <li><strong>Correio:</strong> Avenida Dom Pedro I, 773, Vila Monumento, São Paulo-SP, CEP 01552-001</li>
                         </ul>
                     </div>
@@ -53,8 +53,8 @@ const ExclusaoDados = () => (
                             <table className="w-full text-left border-collapse">
                                 <thead>
                                     <tr className="border-b border-border">
-                                        <th className="py-2 pr-4 font-semibold text-foreground">Dado</th>
-                                        <th className="py-2 font-semibold text-foreground">Sistema</th>
+                                        <th scope="col" className="py-2 pr-4 font-semibold text-foreground">Dado</th>
+                                        <th scope="col" className="py-2 font-semibold text-foreground">Sistema</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-border">
