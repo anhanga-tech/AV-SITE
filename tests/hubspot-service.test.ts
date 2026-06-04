@@ -129,9 +129,15 @@ test('getDeal throws HUBSPOT_TIMEOUT when request exceeds configured timeout', a
 
     process.env.HUBSPOT_REQUEST_TIMEOUT_MS = '50';
 
-    global.fetch = (async (): Promise<Response> => {
-        return new Promise<Response>((resolve) => {
-            setTimeout(() => resolve(new Response('{}', { status: 200 })), 300);
+    global.fetch = (async (_: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+        return new Promise<Response>((resolve, reject) => {
+            const timer = setTimeout(() => resolve(new Response('{}', { status: 200 })), 300);
+            init?.signal?.addEventListener('abort', () => {
+                clearTimeout(timer);
+                const err = new Error('The user aborted a request.');
+                err.name = 'AbortError';
+                reject(err);
+            });
         });
     }) as typeof fetch;
 

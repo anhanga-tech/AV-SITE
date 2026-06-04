@@ -24,7 +24,7 @@ function restoreEnv() {
     restoreEnvValue('GA4_API_SECRET', originalEnv.GA4_API_SECRET);
 }
 
-function silenceLogger(t: Parameters<Parameters<typeof test>[1]>[0]) {
+function silenceLogger(t: { after: (fn: () => void) => void }) {
     console.log = (() => {}) as typeof console.log;
     console.warn = (() => {}) as typeof console.warn;
     console.error = (() => {}) as typeof console.error;
@@ -89,7 +89,7 @@ test('sendGoogleConversion sends correct payload to GA4', async (t) => {
         requests.push({
             url: getUrl(input),
             method: init?.method || 'GET',
-            body: JSON.parse(String(init?.body)) as Record<string, unknown>,
+            body: init?.body ? JSON.parse(init.body as string) as Record<string, unknown> : {},
         });
         return new Response('{}', { status: 200 });
     }) as typeof fetch;
@@ -110,7 +110,7 @@ test('sendGoogleConversion sends correct payload to GA4', async (t) => {
     const req = requests[0]!;
     assert.ok(req.url.includes('G-ABCDE'));
     assert.ok(req.url.includes('secret-123'));
-    assert.ok(req.url.includes('google-analytics.com'));
+    assert.equal(new URL(req.url).hostname, 'www.google-analytics.com');
     assert.equal(req.method, 'POST');
     assert.equal(req.body.client_id, 'cid-abc');
 
@@ -133,7 +133,7 @@ test('sendGoogleConversion applies BRL as default currency and 0 as default valu
     process.env.GA4_API_SECRET = 'secret';
 
     global.fetch = (async (_: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-        requests.push({ body: JSON.parse(String(init?.body)) as Record<string, unknown> });
+        requests.push({ body: init?.body ? JSON.parse(init.body as string) as Record<string, unknown> : {} });
         return new Response('{}', { status: 200 });
     }) as typeof fetch;
 
@@ -154,7 +154,7 @@ test('sendGoogleConversion omits optional params when absent', async (t) => {
     process.env.GA4_API_SECRET = 'secret';
 
     global.fetch = (async (_: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-        requests.push({ body: JSON.parse(String(init?.body)) as Record<string, unknown> });
+        requests.push({ body: init?.body ? JSON.parse(init.body as string) as Record<string, unknown> : {} });
         return new Response('{}', { status: 200 });
     }) as typeof fetch;
 
