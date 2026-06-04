@@ -1,0 +1,15 @@
+export { PrivacySection1DisposicoesGerais } from "./PrivacySection1DisposicoesGerais";
+export { PrivacySection2Definicoes } from "./PrivacySection2Definicoes";
+export { PrivacySection3Categorias } from "./PrivacySection3Categorias";
+export { PrivacySection4MetodosColeta } from "./PrivacySection4MetodosColeta";
+export { PrivacySection5FinalidadesBases } from "./PrivacySection5FinalidadesBases";
+export { PrivacySection6Compartilhamento } from "./PrivacySection6Compartilhamento";
+export { PrivacySection7Armazenamento } from "./PrivacySection7Armazenamento";
+export { PrivacySection8DireitosTitulares } from "./PrivacySection8DireitosTitulares";
+export { PrivacySection9Cookies } from "./PrivacySection9Cookies";
+export { PrivacySection10TransferenciaInternacional } from "./PrivacySection10TransferenciaInternacional";
+export { PrivacySection11Seguranca } from "./PrivacySection11Seguranca";
+export { PrivacySection12Encarregado } from "./PrivacySection12Encarregado";
+export { PrivacySection13Alteracoes } from "./PrivacySection13Alteracoes";
+export { PrivacySection14Canais } from "./PrivacySection14Canais";
+export { PrivacySection15DisposicoesFinais } from "./PrivacySection15DisposicoesFinais";
