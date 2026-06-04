@@ -9,7 +9,7 @@
 | **Endereço** | Av. Dom Pedro I, 773, Vila Monumento, São Paulo-SP, CEP 01552-001 |
 | **Encarregado (DPO)** | Felipe William Rodrigues Silva |
 | **E-mail DPO** | privacidade@anhanga.tur.br |
-| **Versão** | 1.3 |
+| **Versão** | 1.4 |
 | **Data de elaboração** | 02/06/2026 |
 | **Próxima revisão** | 03/06/2027 |
 | **Status** | Rascunho — pendente de revisão jurídica e aprovação do DPO |
@@ -286,8 +286,8 @@ Contatos com `newsletterOptIn: false` ou com flag "Do Not Contact" no Mautic **n
 - [x] Dados transmitidos exclusivamente em formato SHA-256 via Stape sGTM
 - [x] Política de Privacidade atualizada com seção 5.5 e 6.1 documentando customer match (PR #803)
 - [x] Canal de revogação de consentimento disponível (`privacidade@anhanga.tur.br`)
-- [ ] **Pendente:** e-mail de notificação aos titulares existentes enviado (aguardar merge PR #803 + 15 dias)
-- [ ] **Pendente:** primeiro upload de customer match (só após os 15 dias de janela de opt-out)
+- [x] **Concluído (04/06/2026):** e-mail de notificação LGPD enviado à base `[S] Base Email Ativa` via Mautic (e-mail ID 24, agendado 10h00 de 04/06/2026) — janela de 15 dias de opt-out iniciada
+- [ ] **Pendente:** primeiro upload de customer match (só após 19/06/2026)
 - [ ] **Pendente:** processo documentado de auditoria pré-upload (checklist de segmentação)
 
 ---
@@ -315,9 +315,9 @@ O balancing test favorece o legítimo interesse nas Atividades 1, 2 e 3. A Ativi
 | 7 | Documentar processo de limpeza anual de leads inativos | Felipe (DPO) | 60 dias | Pendente |
 | 8 | Concluir capacitação DPO (Felipe) | Felipe | 90 dias | Pendente |
 | 9 | Adicionar Stape OÜ e customer match à Política de Privacidade | Dev | Issue #784 | ✅ PR #803 aberto |
-| 10 | Enviar e-mail de notificação LGPD aos titulares (merge PR #803 + 15 dias) | Felipe (DPO) | Após merge #803 | Pendente |
+| 10 | Enviar e-mail de notificação LGPD aos titulares | Felipe (DPO) | Após merge #803 | ✅ Enviado 04/06/2026 (Mautic ID 24) |
 | 11 | Documentar checklist de auditoria pré-upload de customer match | Felipe (DPO) | Antes do 1º upload | Pendente |
-| 12 | Realizar primeiro upload de customer match (após janela de 15 dias) | Felipe (DPO) | +15 dias do e-mail | Pendente |
+| 12 | Realizar primeiro upload de customer match (após janela de 15 dias) | Felipe (DPO) | A partir de 19/06/2026 | Pendente |
 
 ### Assinaturas
 
@@ -336,6 +336,7 @@ O balancing test favorece o legítimo interesse nas Atividades 1, 2 e 3. A Ativi
 | 1.1 | 02/06/2026 | Incorporada decisão de adoção do Stape.io (sGTM); atualização das Atividades 1 e 2 com nova arquitetura server-side, operadores, riscos e salvaguardas; Stape OÜ adicionado como subprocessador |
 | 1.2 | 03/06/2026 | Revisão pós issue #782: atualização de §3.5 e §3.6 da Atividade 2; `initializeTracking()` mantido sob legítimo interesse; canal de oposição documentado |
 | 1.3 | 03/06/2026 | Atividade 4 adicionada (Customer Match — base legal consentimento Art. 7º, I); n8n GmbH removido como operador da Atividade 3 (self-hosted); tabela de pendências atualizada com itens 10-12; Política de Privacidade PR #803 registrado como pendência concluída (#9) |
+| 1.4 | 04/06/2026 | Pendência #10 concluída: e-mail de notificação LGPD enviado à base via Mautic (ID 24, 04/06/2026 10h00); janela de 15 dias iniciada; primeiro upload de customer match liberado a partir de 19/06/2026 |
 
 ---
 
