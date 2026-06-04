@@ -250,7 +250,7 @@ const Terms = () => {
                             <h3 className="font-merriweather font-semibold">14.2 Canais de Comunicação</h3>
                             <p><strong>E-mail Geral:</strong> privacidade@anhanga.tur.br<br />
                                 <strong>WhatsApp Business:</strong> +55 (11) 5283-3309<br />
-                                <strong>Instagram:</strong> <a href="https://instagram.com/anhangatur" target="_blank" rel="noopener noreferrer" className="text-primary underline">@anhangatur</a><br />
+                                <strong>Instagram:</strong> <a href="https://instagram.com/anhangaviagens" target="_blank" rel="noopener noreferrer" className="text-primary underline">@anhangaviagens</a><br />
                                 <strong>Website:</strong> <a href="https://www.anhanga.tur.br/" target="_blank" rel="noopener noreferrer" className="text-primary underline">https://www.anhanga.tur.br/</a></p>
                             <h3 className="font-merriweather font-semibold">14.3 Atendimento</h3>
                             <p>Nossos canais funcionam em horário comercial, com compromisso de resposta em até 5 dias úteis para questões relacionadas a estes Termos.</p>
