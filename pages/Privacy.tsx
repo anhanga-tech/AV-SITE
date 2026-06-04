@@ -89,7 +89,7 @@ const Privacy = () => {
                                 <li>Histórico de cliques em anúncios e links</li>
                                 <li>Preferências manifestadas</li>
                                 <li>Dados coletados através de cookies e tecnologias similares</li>
-                                <li>E-mail e telefone hasheados (SHA-256) para criação de públicos personalizados (customer match) no Google Ads e Meta Ads, exclusivamente para titulares que consentiram com comunicações de marketing</li>
+                                <li>E-mail e telefone pseudonimizados por meio de hash unidirecional (SHA-256) para criação de públicos personalizados (customer match) no Google Ads e Meta Ads, exclusivamente para titulares que consentiram com comunicações de marketing</li>
                             </ul>
                         </div>
                     </section>
@@ -114,7 +114,7 @@ const Privacy = () => {
                                         <li>Meta Pixel (Facebook) para remarketing</li>
                                     </ul>
                                 </li>
-                                <li><strong>Rastreamento server-side via Stape:</strong> eventos de navegação e conversão são transmitidos do browser para um servidor intermediário hospedado no Brasil (Stape OÜ), onde o endereço IP é removido e dados pessoais são anonimizados antes de serem encaminhados ao Google e Meta. Essa camada reduz a exposição de dados pessoais em comparação ao rastreamento client-side convencional.</li>
+                                <li><strong>Rastreamento server-side via Stape:</strong> eventos de navegação e conversão são transmitidos do browser para um servidor intermediário (provido pela Stape OÜ, empresa sediada na Estônia, com servidores hospedados no Brasil), onde o endereço IP é removido e dados pessoais são anonimizados antes de serem encaminhados ao Google e Meta. Essa camada reduz a exposição de dados pessoais em comparação ao rastreamento client-side convencional.</li>
                                 <li><strong>Ferramentas de terceiros integradas:</strong>
                                     <ul className="list-disc pl-6 mt-1">
                                         <li>Substack para gestão de newsletters</li>
@@ -150,7 +150,7 @@ const Privacy = () => {
                             <h3 className="font-merriweather font-semibold">5.5 Customer Match e Públicos Personalizados</h3>
                             <p><strong>Finalidade:</strong> Criação de públicos personalizados no Google Ads e Meta Ads a partir de e-mails e telefones de clientes que consentiram com comunicações de marketing, para exibição de anúncios relevantes e exclusão de clientes ativos de campanhas de prospecção<br />
                                 <strong>Base Legal:</strong> Consentimento específico do titular (Art. 7º, I, LGPD)<br />
-                                <strong>Salvaguarda:</strong> Os dados são transmitidos exclusivamente em formato hasheado (SHA-256) via servidor intermediário (Stape OÜ). As plataformas utilizam os dados apenas para correspondência de audiência e não para outros fins.</p>
+                                <strong>Salvaguarda:</strong> Os dados são transmitidos exclusivamente em formato de hash unidirecional (SHA-256) via servidor intermediário (Stape OÜ). As plataformas utilizam os dados apenas para correspondência de audiência e não para outros fins.</p>
 
                             <h3 className="font-merriweather font-semibold">5.6 Cumprimento de Obrigações Legais</h3>
                             <p><strong>Finalidade:</strong> Atendimento a determinações legais, regulamentares ou de autoridades competentes<br />
@@ -166,7 +166,7 @@ const Privacy = () => {
                             <ul className="list-disc pl-6 space-y-1">
                                 <li><strong>Google LLC</strong> (analytics, publicidade e customer match — Google Ads e GA4)</li>
                                 <li><strong>Meta Platforms, Inc.</strong> (publicidade, remarketing e customer match — Facebook/Instagram Ads)</li>
-                                <li><strong>Stape OÜ</strong> (gerenciamento de tags server-side — servidor intermediário hospedado no Brasil, responsável pela anonimização de IP e dados de navegação antes do envio ao Google e Meta)</li>
+                                <li><strong>Stape OÜ</strong> (gerenciamento de tags server-side — empresa sediada na Estônia com servidor intermediário hospedado no Brasil, responsável pela anonimização de IP e dados de navegação antes do envio ao Google e Meta)</li>
                                 <li><strong>Salesforce, Inc.</strong> (CRM de vendas — registro e gestão de leads comerciais)</li>
                                 <li><strong>Substack, Inc.</strong> (plataforma de newsletter)</li>
                                 <li><strong>ONER Travel</strong> (serviços especializados em turismo)</li>
