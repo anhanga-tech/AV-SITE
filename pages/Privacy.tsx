@@ -2,6 +2,7 @@ import { Seo } from "@/components/Seo";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { BreadcrumbSchema } from "@/components/schemas/BreadcrumbSchema";
+import { WebPageSchema } from "@/components/schemas/WebPageSchema";
 
 const Privacy = () => {
     const metaDescription = "Política de Privacidade e Proteção de Dados da Anhangá Turismo: coleta, tratamento, armazenamento e direitos dos titulares.";
@@ -369,20 +370,11 @@ const Privacy = () => {
                 </article>
             </main>
 
-            {/* Structured Data — safe: JSON.stringify of a static object literal, no user input */}
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{
-                    __html: JSON.stringify({
-                        "@context": "https://schema.org",
-                        "@type": "WebPage",
-                        name: "Política de Privacidade - Anhangá Turismo",
-                        url: canonicalUrl,
-                        description: metaDescription,
-                        dateModified: lastUpdatedIso,
-                        inLanguage: "pt-BR",
-                    }),
-                }}
+            <WebPageSchema
+                name="Política de Privacidade - Anhangá Turismo"
+                url={canonicalUrl}
+                description={metaDescription}
+                dateModified={lastUpdatedIso}
             />
 
             <Footer />
