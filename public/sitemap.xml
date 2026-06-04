@@ -102,6 +102,12 @@
     <priority>0.3</priority>
   </url>
   <url>
+    <loc>https://www.anhanga.tur.br/exclusao-de-dados/</loc>
+    <lastmod>2026-06-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
     <loc>https://www.anhanga.tur.br/mapa-do-site/</loc>
     <lastmod>2026-05-24</lastmod>
     <changefreq>monthly</changefreq>

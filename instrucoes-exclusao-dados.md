@@ -21,7 +21,7 @@ Envie um e-mail para **privacidade@anhanga.tur.br** com o assunto **"Solicitaç�
 
 Você também pode enviar sua solicitação pelos seguintes canais:
 
-- **WhatsApp:** (11) 91234-5678 *(informe "Exclusão de Dados" no início da mensagem)*
+- **WhatsApp:** (11) 5283-3309 *(informe "Exclusão de Dados" no início da mensagem)*
 - **Correio:** Avenida Dom Pedro I, 773, Vila Monumento, São Paulo-SP, CEP 01552-001
 
 ---
@@ -41,7 +41,7 @@ Após a confirmação da sua identidade, removeremos os seguintes dados dos noss
 
 ## Prazo de resposta
 
-Responderemos à sua solicitação em até **15 dias úteis** a partir do recebimento. Caso precisemos verificar sua identidade, o prazo começa após a confirmação.
+Responderemos à sua solicitação em até **15 dias corridos** a partir do recebimento. Caso precisemos verificar sua identidade, o prazo começa após a confirmação.
 
 Você receberá uma confirmação por e-mail quando a exclusão for concluída.
 
