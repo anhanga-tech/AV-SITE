@@ -564,8 +564,6 @@ function PreLeadScreen({ profile, onSubmit, onBack }: PreLeadScreenProps) {
                             Quero receber novidades, ofertas e dicas de viagem da Anhangá Viagens.
                         </span>
                     </label>
-                    {errors.aceite && <span role="alert" className="quiz-err quiz-err-block">{errors.aceite}</span>}
-
                     <p className="text-xs text-zinc-500 leading-relaxed mt-1">
                         Ao revelar seu perfil, seus dados serão registrados em nosso CRM para atendimento
                         comercial e entraremos em contato via WhatsApp.{' '}
