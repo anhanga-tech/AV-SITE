@@ -40,6 +40,7 @@ test.describe('Link Integrity Suite', () => {
       '/lollapalooza-2026/',
       '/termos-de-uso/',
       '/politica-privacidade/',
+      '/exclusao-de-dados/',
     ];
 
     await Promise.all(
