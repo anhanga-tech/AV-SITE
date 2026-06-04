@@ -561,11 +561,19 @@ function PreLeadScreen({ profile, onSubmit, onBack }: PreLeadScreenProps) {
                         />
                         <span className="quiz-check-box" aria-hidden="true" />
                         <span className="quiz-check-label">
-                            Topo receber novidades e ofertas da Anhangá. Posso cancelar quando quiser.
-                            Veja nossa <a href="/politica-privacidade/" target="_blank" rel="noopener noreferrer">política de privacidade</a>.
+                            Quero receber novidades, ofertas e dicas de viagem da Anhangá Viagens.
                         </span>
                     </label>
                     {errors.aceite && <span role="alert" className="quiz-err quiz-err-block">{errors.aceite}</span>}
+
+                    <p className="text-xs text-zinc-500 leading-relaxed mt-1">
+                        Ao revelar seu perfil, seus dados serão registrados em nosso CRM para atendimento
+                        comercial e entraremos em contato via WhatsApp.{' '}
+                        <a href="/politica-privacidade/" target="_blank" rel="noopener noreferrer"
+                            className="underline hover:text-zinc-700">
+                            Política de Privacidade
+                        </a>.
+                    </p>
 
                     <button type="submit" className="quiz-btn quiz-btn-primary quiz-btn-lg">
                         Revelar meu perfil

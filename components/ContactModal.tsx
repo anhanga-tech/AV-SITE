@@ -205,17 +205,21 @@ const ContactModal: React.FC = () => {
                                 className="mt-0.5 size-4 flex-shrink-0 cursor-pointer rounded border-2 border-brand-vibrant accent-brand-vibrant"
                             />
                             <label htmlFor="contact-optIn" className="cursor-pointer text-xs leading-relaxed text-blue-700">
-                                Quero receber novidades e ofertas de viagem por e-mail.{' '}
-                                <a
-                                    href="/politica-privacidade/"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="underline hover:text-blue-900"
-                                >
-                                    Política de Privacidade
-                                </a>
+                                Quero receber novidades, ofertas e dicas de viagem da Anhangá Viagens.
                             </label>
                         </div>
+
+                        <p className="text-xs text-zinc-500 leading-relaxed">
+                            Seus dados serão registrados em nosso CRM e usados para entrar em contato via WhatsApp.{' '}
+                            <a
+                                href="/politica-privacidade/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="underline hover:text-zinc-700"
+                            >
+                                Política de Privacidade
+                            </a>.
+                        </p>
 
                         {error ? (
                             <p className="text-xs font-medium text-red-500" role="alert">
