@@ -69,6 +69,7 @@ const Footer: React.FC = () => {
                             <li><a href={`${SITE_URL}/mapa-do-site/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Mapa do Site</a></li>
                             <li><a href={`${SITE_URL}/termos-de-uso/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Termos de Uso</a></li>
                             <li><a href={`${SITE_URL}/politica-privacidade/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Política de Privacidade</a></li>
+                            <li><a href={`${SITE_URL}/exclusao-de-dados/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Exclusão de Dados</a></li>
                         </ul>
                     </div>
 

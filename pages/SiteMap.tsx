@@ -20,7 +20,8 @@ const CORE_LINKS = [
   { to: `${SITE_URL}/corporativo/`, label: 'Viagens Corporativas' },
   { to: `${SITE_URL}/quiz/`, label: 'Quiz: Descubra Seu Destino Ideal' },
   { to: `${SITE_URL}/termos-de-uso/`, label: 'Termos de Uso' },
-  { to: `${SITE_URL}/politica-privacidade/`, label: 'Política de Privacidade' }
+  { to: `${SITE_URL}/politica-privacidade/`, label: 'Política de Privacidade' },
+  { to: `${SITE_URL}/exclusao-de-dados/`, label: 'Exclusão de Dados' }
 ];
 
 const SiteMap: React.FC = () => {

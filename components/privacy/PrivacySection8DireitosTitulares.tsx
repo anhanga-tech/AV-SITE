@@ -17,7 +17,9 @@ export function PrivacySection8DireitosTitulares() {
                 </ul>
                 <h3 className="font-merriweather font-semibold">8.2 Exercício dos Direitos</h3>
                 <p>Para exercer qualquer dos direitos mencionados, o titular deve enviar solicitação através do e-mail:
-                    <a href="mailto:privacidade@anhanga.tur.br" className="text-primary underline"> privacidade@anhanga.tur.br</a></p>
+                    <a href="mailto:privacidade@anhanga.tur.br" className="text-primary underline"> privacidade@anhanga.tur.br</a>.
+                    Para instruções detalhadas sobre exclusão de dados, consulte a página{" "}
+                    <a href="/exclusao-de-dados/" className="text-primary underline">Instruções de Exclusão de Dados</a>.</p>
                 <p><strong>Prazo de Resposta:</strong> 15 (quinze) dias corridos, prorrogáveis por igual período mediante justificativa expressa.</p>
             </div>
         </section>

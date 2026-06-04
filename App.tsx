@@ -21,6 +21,7 @@ const Terms = lazy(() => import('./pages/Terms'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 const About = lazy(() => import('./pages/About'));
 const SiteMap = lazy(() => import('./pages/SiteMap'));
+const ExclusaoDados = lazy(() => import('./pages/ExclusaoDados'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const BetoCarreroLanding = lazy(() => import('./pages/landings/BetoCarreroLanding'));
 const LollapaloozaLanding = lazy(() => import('./pages/landings/LollapaloozaLanding'));
@@ -59,6 +60,7 @@ const MainSiteShell: React.FC = () => {
             <Route path="/old-blog/:slug" element={<BlogRedirect />} />
             <Route path="/termos-de-uso" element={<Terms />} />
             <Route path="/politica-privacidade" element={<Privacy />} />
+            <Route path="/exclusao-de-dados" element={<ExclusaoDados />} />
             <Route path="/sobre" element={<About />} />
             <Route path="/mapa-do-site" element={<SiteMap />} />
             <Route path="*" element={<NotFound />} />
