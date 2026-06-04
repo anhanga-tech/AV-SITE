@@ -9,9 +9,9 @@
 | **Endereço** | Av. Dom Pedro I, 773, Vila Monumento, São Paulo-SP, CEP 01552-001 |
 | **Encarregado (DPO)** | Felipe William Rodrigues Silva |
 | **E-mail DPO** | privacidade@anhanga.tur.br |
-| **Versão** | 1.1 |
+| **Versão** | 1.3 |
 | **Data de elaboração** | 02/06/2026 |
-| **Próxima revisão** | 02/06/2027 |
+| **Próxima revisão** | 03/06/2027 |
 | **Status** | Rascunho — pendente de revisão jurídica e aprovação do DPO |
 
 ---
@@ -20,15 +20,18 @@
 
 Este relatório documenta a avaliação de impacto sobre as atividades de tratamento de dados pessoais realizadas pela **Anhangá Turismo Ltda.** com fundamento em **legítimo interesse** (Art. 7º, IX da LGPD), conforme exigido pelo Art. 38 da mesma Lei e pelas orientações da Autoridade Nacional de Proteção de Dados (ANPD).
 
-O relatório cobre **três atividades de tratamento** identificadas:
+O relatório cobre **quatro atividades de tratamento** identificadas:
 
 1. Análise comportamental agregada via Google Analytics 4 (GA4)
 2. Atribuição UTM e click IDs para mensuração de campanhas de tráfego pago
 3. Armazenamento de histórico de qualificação BANT no CRM para atendimento ao cliente
+4. Customer Match — criação de públicos personalizados no Google Ads e Meta Ads
 
-**Decisão arquitetural relevante (v1.1):** A Anhangá Turismo adotou o **Stape.io** como plataforma de server-side tagging (sGTM gerenciado, servidores EU). Todo o rastreamento de analytics e conversões passa pelo container server-side antes de chegar às plataformas de terceiros (Google, Meta). Essa decisão fortalece materialmente o balancing test das Atividades 1 e 2, pois os dados são anonimizados e filtrados antes de qualquer repasse externo.
+**Decisão arquitetural relevante (v1.1):** A Anhangá Turismo adotou o **Stape.io** como plataforma de server-side tagging (sGTM gerenciado, servidores hospedados no Brasil). Todo o rastreamento de analytics e conversões passa pelo container server-side antes de chegar às plataformas de terceiros (Google, Meta). Essa decisão fortalece materialmente o balancing test das Atividades 1 e 2, pois os dados são anonimizados e filtrados antes de qualquer repasse externo.
 
-Atividades baseadas em **consentimento** (Art. 7º, I) — como cookies de publicidade cross-site, remarketing avançado, Mautic e HubSpot tracking passivo — são geridas pelo mecanismo de consentimento de cookies e **não estão no escopo deste RIPD**.
+**Nota sobre a Atividade 4 (v1.3):** O Customer Match tem base legal em **consentimento** (Art. 7º, I), e não em legítimo interesse. É incluído neste RIPD porque envolve compartilhamento de dados pessoais (ainda que hasheados) com plataformas internacionais para finalidade de perfilamento — perfil de alto risco que a ANPD pode exigir documentação de impacto independentemente da base legal (Art. 38).
+
+Atividades baseadas em **consentimento** de baixo risco — como cookies de publicidade cross-site, remarketing avançado, Mautic e HubSpot tracking passivo — são geridas pelo mecanismo de consentimento de cookies e **não estão no escopo deste RIPD**.
 
 ---
 
@@ -171,9 +174,9 @@ Sem atribuição, é impossível saber se R$ 10.000 gastos em tráfego pago gera
 |---|---|
 | **Dados tratados** | Nome, sobrenome, e-mail, WhatsApp, destino de viagem, resumo BANT (Budget/Autoridade/Necessidade/Timeline fornecidos voluntariamente no chatbot) |
 | **Titulares** | Usuários que completam o fluxo de qualificação no chatbot e submetem o formulário de lead |
-| **Operadores** | n8n GmbH (automação), HubSpot, Inc. (CRM), Salesforce, Inc. (CRM secundário) |
+| **Operadores** | HubSpot, Inc. (CRM), Salesforce, Inc. (CRM de vendas) |
 | **Retenção** | 5 anos após última interação (conforme Política de Privacidade seção 7.1) |
-| **Transferência internacional** | Sim — EUA (HubSpot, Salesforce, n8n; cobertos por cláusulas contratuais padrão) |
+| **Transferência internacional** | Sim — EUA (HubSpot, Salesforce; cobertos por cláusulas contratuais padrão) |
 
 ### 4.2 Interesse legítimo identificado
 
@@ -226,29 +229,95 @@ O titular que chegou até o ponto de submeter o formulário de lead **iniciou at
 
 ---
 
-## 5. Conclusão geral e aprovação
+## 5. Atividade 4 — Customer Match e Públicos Personalizados
 
-As três atividades de tratamento avaliadas são:
+### 5.1 Descrição do tratamento
+
+| Campo | Detalhe |
+|---|---|
+| **Dados tratados** | E-mail e telefone pseudonimizados por hash unidirecional (SHA-256) de contatos do CRM com `newsletterOptIn: true` |
+| **Titulares** | Contatos do CRM que consentiram explicitamente com comunicações de marketing |
+| **Operadores** | Stape OÜ (intermediação server-side, servidores BR) → Google LLC (Google Ads Customer Match) + Meta Platforms, Inc. (Meta Custom Audiences / CAPI) |
+| **Arquitetura** | CRM (segmento opt-in) → export com hash SHA-256 → upload via Stape sGTM → Google Ads / Meta Ads |
+| **Retenção** | Até revogação do consentimento ou exclusão do contato do CRM |
+| **Transferência internacional** | Sim — EUA (Google LLC, Meta Platforms), via Stape OÜ (Estônia / servidores BR) |
+
+### 5.2 Base legal
+
+**Art. 7º, I LGPD — Consentimento específico do titular.**
+
+O consentimento é coletado no momento do cadastro no quiz ou nos formulários de captura de lead, por meio de checkbox de opt-in explícito com texto: *"Quero receber novidades, ofertas e dicas de viagem da Anhangá Viagens."* Apenas contatos com `newsletterOptIn: true` no Mautic são elegíveis para inclusão em listas de customer match.
+
+Contatos com `newsletterOptIn: false` ou com flag "Do Not Contact" no Mautic **não entram nas listas de customer match**.
+
+### 5.3 Finalidade e necessidade
+
+**Finalidade principal:** Exibir anúncios relevantes para clientes existentes que já demonstraram interesse em viagens, aumentando a eficiência do investimento em mídia paga.
+
+**Finalidade secundária:** Excluir clientes ativos de campanhas de prospecção (exclusion lists), evitando desperdício de verba e redundância de contatos.
+
+**É necessário?** Sim. Sem customer match, todos os anúncios são exibidos para públicos frios — o custo por conversão é sistematicamente mais alto, e clientes já ativos são impactados por campanhas de aquisição desnecessariamente.
+
+**Poderia ser menos invasivo?** O dado transferido é apenas o hash SHA-256 do e-mail/telefone — o dado original não é transmitido às plataformas. As plataformas usam o hash apenas para correspondência interna e não armazenam nem utilizam para outros fins (conforme ToS Google Ads e Meta Ads).
+
+### 5.4 Avaliação de impacto
+
+| Fator | Avaliação |
+|---|---|
+| Natureza dos dados | Hash unidirecional — matematicamente irreversível sem o dado original; não permite re-identificação por terceiros |
+| Titulares afetados | Exclusivamente contatos com consentimento explícito de marketing |
+| Impacto sobre o titular | Baixo — o titular consente com comunicações de marketing; ver anúncios da empresa é consequência natural e esperada desse consentimento |
+| Risco de finalidade incompatível | Baixo — Google e Meta são obrigados contratualmente a usar os dados apenas para correspondência de audiência |
+| Direito de oposição | Garantido — titular pode revogar consentimento a qualquer momento via `privacidade@anhanga.tur.br` ou descadastrando-se das comunicações de marketing |
+
+### 5.5 Riscos identificados
+
+| Risco | Probabilidade | Impacto | Mitigação |
+|---|---|---|---|
+| Upload acidental de contatos sem opt-in | Média | Alto | Segmentação obrigatória no Mautic antes do export — filtro `newsletterOptIn: true`; auditoria do segmento antes de cada upload |
+| Hash SHA-256 invertido por força bruta (e-mails comuns) | Baixa | Médio | Adicionar salt ou substituir por hash com pepper antes do upload (melhoria futura); concentração de risco nas plataformas (Google/Meta), não na Stape |
+| Plataforma usa hash para fins além do matching | Muito Baixa | Médio | Coberto pelos ToS do Google Customer Match e Meta Custom Audiences; revisão anual dos termos |
+| Envio antes da notificação LGPD aos titulares | Alta (se não observada a sequência) | Alto | Ordem obrigatória: merge #784 → e-mail notificação → aguardar 15 dias → primeiro upload |
+
+### 5.6 Salvaguardas implementadas
+
+- [x] Consentimento explícito coletado via checkbox de opt-in nos formulários
+- [x] Segmento Mautic `newsletterOptIn: true` como pré-requisito para qualquer export
+- [x] Dados transmitidos exclusivamente em formato SHA-256 via Stape sGTM
+- [x] Política de Privacidade atualizada com seção 5.5 e 6.1 documentando customer match (PR #803)
+- [x] Canal de revogação de consentimento disponível (`privacidade@anhanga.tur.br`)
+- [ ] **Pendente:** e-mail de notificação aos titulares existentes enviado (aguardar merge PR #803 + 15 dias)
+- [ ] **Pendente:** primeiro upload de customer match (só após os 15 dias de janela de opt-out)
+- [ ] **Pendente:** processo documentado de auditoria pré-upload (checklist de segmentação)
+
+---
+
+## 6. Conclusão geral e aprovação
+
+As quatro atividades de tratamento avaliadas são:
 
 1. **Proporcionais** — limitadas ao mínimo necessário para as finalidades declaradas
 2. **Necessárias** — não há alternativas igualmente eficazes com menor impacto
-3. **Balanceadas** — o impacto sobre os titulares é baixo ou moderado, com salvaguardas adequadas e opt-out disponível
+3. **Balanceadas / Consentidas** — o impacto sobre os titulares é baixo ou moderado, com salvaguardas adequadas e opt-out disponível
 
-O balancing test favorece o legítimo interesse da Anhangá Turismo em todas as três atividades.
+O balancing test favorece o legítimo interesse nas Atividades 1, 2 e 3. A Atividade 4 é baseada em consentimento específico do titular com segmentação obrigatória de opt-in antes de qualquer upload.
 
 ### Pendências antes da vigência do RIPD
 
-| # | Ação | Responsável | Prazo sugerido |
-|---|---|---|---|
-| 1 | Implantar e configurar Stape.io (sGTM EU) com IP stripping, PII scrubbing e User-Agent redaction | Dev | 30 dias |
-| 2 | Validar ausência de PII nos request logs do sGTM após implantação | Dev + Felipe (DPO) | 30 dias |
-| 3 | Reduzir retenção GA4 para 14 meses no painel | Felipe (DPO) | 30 dias |
-| 4 | Assinar DPA com Stape OÜ no painel Stape | Felipe (DPO) | 30 dias |
-| 5 | Implementar banner de cookies condicionando `initializeTracking()` | Dev | Issue #782 |
-| 6 | Assinar DPA com Salesforce, Inc. | Gestão / Jurídico | 60 dias |
-| 7 | Documentar processo de limpeza anual de leads inativos | Felipe (DPO) | 60 dias |
-| 8 | Concluir capacitação DPO (Felipe) | Felipe | 90 dias |
-| 9 | Adicionar Stape OÜ à seção 6.1 da Política de Privacidade | Dev | Issue #784 |
+| # | Ação | Responsável | Prazo sugerido | Status |
+|---|---|---|---|---|
+| 1 | Implantar e configurar Stape.io (sGTM) com IP stripping, PII scrubbing e User-Agent redaction | Dev | 30 dias | Pendente |
+| 2 | Validar ausência de PII nos request logs do sGTM após implantação | Dev + Felipe (DPO) | 30 dias | Pendente |
+| 3 | Reduzir retenção GA4 para 14 meses no painel | Felipe (DPO) | 30 dias | Pendente |
+| 4 | Assinar DPA com Stape OÜ no painel Stape | Felipe (DPO) | 30 dias | Pendente |
+| 5 | Implementar banner de cookies condicionando `initializeTracking()` | Dev | Issue #782 | ✅ Concluído |
+| 6 | Assinar DPA com Salesforce, Inc. | Gestão / Jurídico | 60 dias | Pendente |
+| 7 | Documentar processo de limpeza anual de leads inativos | Felipe (DPO) | 60 dias | Pendente |
+| 8 | Concluir capacitação DPO (Felipe) | Felipe | 90 dias | Pendente |
+| 9 | Adicionar Stape OÜ e customer match à Política de Privacidade | Dev | Issue #784 | ✅ PR #803 aberto |
+| 10 | Enviar e-mail de notificação LGPD aos titulares (merge PR #803 + 15 dias) | Felipe (DPO) | Após merge #803 | Pendente |
+| 11 | Documentar checklist de auditoria pré-upload de customer match | Felipe (DPO) | Antes do 1º upload | Pendente |
+| 12 | Realizar primeiro upload de customer match (após janela de 15 dias) | Felipe (DPO) | +15 dias do e-mail | Pendente |
 
 ### Assinaturas
 
@@ -259,13 +328,14 @@ O balancing test favorece o legítimo interesse da Anhangá Turismo em todas as 
 
 ---
 
-## 6. Histórico de versões
+## 7. Histórico de versões
 
 | Versão | Data | Alterações |
 |---|---|---|
 | 1.0 | 02/06/2026 | Versão inicial — rascunho para revisão |
-| 1.1 | 02/06/2026 | Incorporada decisão de adoção do Stape.io (sGTM EU); atualização das Atividades 1 e 2 com nova arquitetura server-side, operadores, riscos e salvaguardas; Stape OÜ adicionado como subprocessador |
-| 1.2 | 2026-06-03 | Revisão pós issue #782: atualização de §3.5 e §3.6 da Atividade 2; `initializeTracking()` mantido sob legítimo interesse; canal de oposição documentado |
+| 1.1 | 02/06/2026 | Incorporada decisão de adoção do Stape.io (sGTM); atualização das Atividades 1 e 2 com nova arquitetura server-side, operadores, riscos e salvaguardas; Stape OÜ adicionado como subprocessador |
+| 1.2 | 03/06/2026 | Revisão pós issue #782: atualização de §3.5 e §3.6 da Atividade 2; `initializeTracking()` mantido sob legítimo interesse; canal de oposição documentado |
+| 1.3 | 03/06/2026 | Atividade 4 adicionada (Customer Match — base legal consentimento Art. 7º, I); n8n GmbH removido como operador da Atividade 3 (self-hosted); tabela de pendências atualizada com itens 10-12; Política de Privacidade PR #803 registrado como pendência concluída (#9) |
 
 ---
 
