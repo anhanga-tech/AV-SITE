@@ -257,7 +257,30 @@ const AIChat: React.FC = memo(() => {
 
     setIsLoading(true);
 
-    const response = await getTravelAdvice(newHistory);
+    // Filter out UI-only action messages before sending to the API.
+    // Action messages (isAction: true) represent budget-link handoff cards in
+    // the chat UI, but they are not part of the conversation from the model's
+    // perspective. Including them creates consecutive model-role turns in the
+    // history, which the Gemini API rejects with a 400 INVALID_ARGUMENT error
+    // ("role alternation" requirement). The preceding text message already
+    // carries the handoff context for the model.
+    const apiHistory = newHistory.filter(msg => !msg.isAction);
+
+    let response;
+    try {
+      response = await getTravelAdvice(apiHistory);
+    } catch {
+      setIsLoading(false);
+      setMessages(prev => [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          role: 'model' as const,
+          text: '⚙️ Tivemos um problema técnico. Por favor, tente novamente em alguns instantes.',
+        },
+      ]);
+      return;
+    }
     setIsLoading(false);
 
     const nextMessages: Message[] = [];
