@@ -120,6 +120,16 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.anhanga.tur.br/blog/agencia-de-viagens-ou-por-conta-propria/</loc>
+    <lastmod>2026-06-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/agencia-de-viagens-ou-conta-propria.jpg</image:loc>
+      <image:caption>Agência de Viagens ou Por Conta Própria? O Que Vale Mais — e Quando</image:caption>
+    </image:image>
+  </url>
+  <url>
     <loc>https://www.anhanga.tur.br/blog/seguro-viagem-internacional-2026/</loc>
     <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
@@ -271,7 +281,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/malas-de-mao-o-guia-definitivo/</loc>
-    <lastmod>2026-05-05</lastmod>
+    <lastmod>2026-06-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
