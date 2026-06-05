@@ -3,6 +3,62 @@ import assert from 'node:assert/strict';
 import { detectBlockedDestination } from '../lib/ai/validation.ts';
 import { SYSTEM_INSTRUCTION } from '../lib/ai/prompt.ts';
 
+// ─── Role alternation invariant ───────────────────────────────────────────────
+// The Gemini API requires strict user↔model alternation in the contents array.
+// After a budget-link handoff, AIChat adds two consecutive model messages:
+//   1. the handoff text ("Perfeito. Seu pré-atendimento está pronto…")
+//   2. the action card ("Orçamento Pronto", isAction: true)
+// Without filtering, the next user message produces consecutive model turns
+// that the API rejects with 400 INVALID_ARGUMENT — making the chatbot appear
+// unresponsive after every successful handoff.
+
+test('post-handoff history without filter has consecutive model turns (Gemini 400 scenario)', () => {
+    const history = [
+        { role: 'model' as const, text: 'Olá! Sou seu guia Anhangá.', isAction: false },
+        { role: 'user' as const, text: 'Quero ir para Paris.' },
+        { role: 'model' as const, text: 'Perfeito. Seu pré-atendimento está pronto.' },
+        { role: 'model' as const, text: 'Orçamento Pronto', isAction: true },
+        { role: 'user' as const, text: 'Posso adicionar mais uma pessoa?' },
+    ];
+
+    const hasConsecutiveModelTurns = history.some(
+        (msg, i) => i > 0 && msg.role === 'model' && history[i - 1].role === 'model',
+    );
+    assert.ok(
+        hasConsecutiveModelTurns,
+        'unfiltered post-handoff history must expose the consecutive-model-turn bug',
+    );
+});
+
+test('filtering isAction messages from post-handoff history eliminates consecutive model turns', () => {
+    const history = [
+        { role: 'model' as const, text: 'Olá! Sou seu guia Anhangá.', isAction: false },
+        { role: 'user' as const, text: 'Quero ir para Paris.' },
+        { role: 'model' as const, text: 'Perfeito. Seu pré-atendimento está pronto.' },
+        { role: 'model' as const, text: 'Orçamento Pronto', isAction: true },
+        { role: 'user' as const, text: 'Posso adicionar mais uma pessoa?' },
+    ];
+
+    // This replicates the filter applied in AIChat.tsx before calling getTravelAdvice.
+    const apiHistory = history.filter(msg => !msg.isAction);
+
+    assert.equal(apiHistory.length, 4, 'one action message should be removed');
+
+    const hasConsecutiveAfterFilter = apiHistory.some(
+        (msg, i) => i > 0 && msg.role === 'model' && apiHistory[i - 1].role === 'model',
+    );
+    assert.ok(
+        !hasConsecutiveAfterFilter,
+        'filtered history must have no consecutive model turns',
+    );
+
+    // Verify turn order is correct: model→user→model→user
+    assert.deepEqual(
+        apiHistory.map(m => m.role),
+        ['model', 'user', 'model', 'user'],
+    );
+});
+
 test('safety check should block "Emirados" (Policy #186)', () => {
     const result = detectBlockedDestination('Dubai, Emirados Árabes Unidos');
     assert.ok(result, 'UAE must be blocked');
