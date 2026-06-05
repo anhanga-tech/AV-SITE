@@ -16,8 +16,8 @@ function isBrowserExtensionFrame(frame: { filename?: string }): boolean {
 // filter above cannot catch these, so we also match against known extension
 // error message patterns.
 function isBrowserExtensionMessage(values: Array<{ value?: string }> | undefined): boolean {
-    return (values ?? []).some(({ value = '' }) =>
-        /runtime\.sendMessage|Extension context invalidated/i.test(value)
+    return !!values?.some(({ value }) =>
+        !!value && /runtime\.sendMessage|Extension context invalidated/i.test(value)
     );
 }
 
