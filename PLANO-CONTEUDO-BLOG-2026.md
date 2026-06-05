@@ -225,12 +225,12 @@ Disparada automaticamente pelo n8n após envio do quiz com `newsletterOptIn: tru
 
 | Data | Ação | Post / Newsletter | Pilar | Segmento |
 |------|------|-------------------|-------|----------|
-| 02/06 (seg) | Novo post | **Férias de julho 2026: 10 destinos para reservar nos próximos 15 dias** | S2 — Sazonalidade | Todos |
-| 03/06 (ter) | Newsletter | Assunto: "Julho chega em 4 semanas. Você já sabe pra onde vai?" | — | Todos |
-| 09/06 (seg) | Novo post | **Seguro viagem: quando é obrigatório, quando vale a pena e quanto custa** | P1.1 — Planejamento | Todos |
-| 10/06 (ter) | Newsletter | Assunto: "A pergunta que todo mundo esquece antes de embarcar" | — | Todos |
-| 12/06 (qui) | Atualizar | Mala de mão — adicionar tabela 2026 por companhia + schema FAQ | P1.5 | — |
-| 16/06 (seg) | Novo post | **Quanto custa contratar uma agência de viagens? Agência boutique vs OTA** | P1.2 — Planejamento | Todos |
+| 02/06 (seg) | ~~Novo post~~ | ~~**Férias de julho 2026: 10 destinos para reservar nos próximos 15 dias**~~ ✅ | S2 — Sazonalidade | Todos |
+| 03/06 (ter) | ~~Newsletter~~ | ~~Assunto: "Julho chega em 4 semanas. Você já sabe pra onde vai?"~~ ✅ | — | Todos |
+| 09/06 (seg) | ~~Novo post~~ | ~~**Seguro viagem: quando é obrigatório, quando vale a pena e quanto custa**~~ ✅ | P1.1 — Planejamento | Todos |
+| 10/06 (ter) | ~~Newsletter~~ | ~~Assunto: "A pergunta que todo mundo esquece antes de embarcar"~~ ✅ (Mautic ID 31) | — | Todos |
+| 12/06 (qui) | ~~Atualizar~~ | ~~Mala de mão — adicionar tabela 2026 por companhia + schema FAQ~~ ✅ | P1.5 | — |
+| 16/06 (seg) | ~~Novo post~~ | ~~**Quanto custa contratar uma agência de viagens? Agência boutique vs OTA**~~ ✅ "Agência de viagens ou por conta própria? O que vale mais — e quando" | P1.2 — Planejamento | Todos |
 | 17/06 (ter) | Newsletter | Assunto: "Por que nossos clientes param de usar sites de passagem depois da primeira viagem com a gente" | — | Viajante de Verdade, Bon Vivant |
 | 23/06 (seg) | Novo post | **ETIAS 2026: o que mudou para brasileiros na Europa** | P1.4 — Planejamento | Bon Vivant, Nômade de Alma |
 | 24/06 (ter) | Newsletter | Assunto: "Europa 2026: a novidade que pode travar sua viagem no aeroporto" | — | Bon Vivant, Viajante de Verdade, Nômade de Alma |
