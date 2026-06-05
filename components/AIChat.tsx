@@ -266,7 +266,7 @@ const AIChat: React.FC = memo(() => {
     // carries the handoff context for the model.
     const apiHistory = newHistory.filter(msg => !msg.isAction);
 
-    let response;
+    let response: Awaited<ReturnType<typeof getTravelAdvice>>;
     try {
       response = await getTravelAdvice(apiHistory);
     } catch {
