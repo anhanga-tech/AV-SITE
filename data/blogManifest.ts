@@ -2,6 +2,28 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
+    "title": "Agência de Viagens ou Por Conta Própria? O Que Vale Mais — e Quando",
+    "excerpt": "Booking, Google Flights ou agência? Entenda quando planejar por conta própria ou contratar uma agência de viagens compensa mais em preço, tempo e segurança.",
+    "date": "2026-06-16",
+    "author": "queila-oliveira",
+    "category": "Planejamento",
+    "image": "https://media.anhanga.tur.br/images/blog/agencia-de-viagens-ou-conta-propria.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Planejamento de Viagem",
+    "tags": [
+      "agencias-de-viagens",
+      "planejamentos",
+      "otas",
+      "dicas",
+      "viagens-internacionais"
+    ],
+    "seoTitle": "Agência de Viagens ou Por Conta Própria? O Que Vale em 2026",
+    "seoDescription": "Quando usar uma agência de viagens compensa mais do que o Booking ou o Google Flights? Comparação honesta de preço, tempo e segurança para decidir.",
+    "slug": "agencia-de-viagens-ou-por-conta-propria",
+    "readingTime": "7 min de leitura"
+  },
+  {
     "title": "Seguro Viagem Internacional: Quando É Obrigatório, Quando Vale a Pena e Quanto Custa em 2026",
     "excerpt": "Saiba em quais países o seguro viagem é obrigatório, quanto custa por dia, qual cobertura contratar e os erros comuns que podem arruinar suas férias.",
     "date": "2026-06-10",
@@ -345,7 +367,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Malas de Mão: O Guia Definitivo",
     "excerpt": "Dimensões por companhia, o que vai e o que não vai na cabine, e o checklist definitivo para viajar só com mala de mão sem abrir mão de nada essencial.",
     "date": "2025-11-05",
-    "dateModified": "2026-05-05",
+    "dateModified": "2026-06-05",
     "author": "felipe-william",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/malas-de-mao.jpg",
@@ -360,7 +382,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "viagem"
     ],
     "slug": "malas-de-mao-o-guia-definitivo",
-    "readingTime": "5 min de leitura"
+    "readingTime": "9 min de leitura"
   },
   {
     "title": "Europa Gastronômica: Roteiro Itália",
