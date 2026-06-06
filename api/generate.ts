@@ -529,10 +529,19 @@ export async function buildGenerateSuccessBody(
 
 export function buildGeminiErrorResponse(error: unknown, corsHeaders: Record<string, string>): Response {
     const normalized = normalizeError(error);
-    // Include the error constructor name to distinguish network errors (TypeError)
-    // from upstream HTTP errors (ApiError) in log analysis.
-    const errorClass = error instanceof Error ? error.constructor.name : 'UnknownError';
-    logger.error('SERVER: Error proxying to Gemini', { ...normalized, errorClass });
+    // Pass the original Error instance to preserve instanceof checks in Sentry.
+    // Define toJSON so the logger serializes the extra properties we care about.
+    if (error instanceof Error) {
+        const errorClass = error.constructor.name;
+        Object.defineProperty(error, 'toJSON', {
+            value: () => ({ ...normalized, errorClass, stack: error.stack }),
+            configurable: true,
+            writable: true,
+        });
+        logger.error('SERVER: Error proxying to Gemini', error);
+    } else {
+        logger.error('SERVER: Error proxying to Gemini', { ...normalized, errorClass: 'UnknownError' });
+    }
 
     if (normalized.status === 401 || normalized.status === 403) {
         return buildJsonResponse({
