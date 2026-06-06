@@ -227,7 +227,33 @@ test('buildGeminiErrorResponse maps 404 with model message to GEMINI_MODEL_ERROR
     assert.equal(body.code, 'GEMINI_MODEL_ERROR');
 });
 
-test('buildGeminiErrorResponse maps unknown errors to GEMINI_INTERNAL_ERROR', async () => {
+test('buildGeminiErrorResponse maps 404 without model message to GEMINI_UPSTREAM_ERROR', async () => {
+    // A 404 from the AI Gateway (gateway not found, no model context) must not
+    // silently collapse to GEMINI_INTERNAL_ERROR — it is an upstream reachability failure.
+    const corsHeaders = buildCorsHeaders();
+    const error = { status: 404, message: 'Not Found' };
+
+    const response = buildGeminiErrorResponse(error, corsHeaders);
+    const body = await response.json() as { code: string; error: string };
+
+    assert.equal(response.status, 503);
+    assert.equal(body.code, 'GEMINI_UPSTREAM_ERROR');
+    assert.ok(!body.error.includes('Not Found'), 'must not leak raw upstream error');
+});
+
+test('buildGeminiErrorResponse maps 400 from upstream to GEMINI_UPSTREAM_ERROR', async () => {
+    const corsHeaders = buildCorsHeaders();
+    const error = { status: 400, message: 'Bad Request from AI Gateway' };
+
+    const response = buildGeminiErrorResponse(error, corsHeaders);
+    const body = await response.json() as { code: string };
+
+    assert.equal(response.status, 503);
+    assert.equal(body.code, 'GEMINI_UPSTREAM_ERROR');
+});
+
+test('buildGeminiErrorResponse maps unknown errors (no status) to GEMINI_INTERNAL_ERROR', async () => {
+    // No status means a network-level failure: TypeError, DNS error, connection refused, etc.
     const corsHeaders = buildCorsHeaders();
     const error = { message: 'something unexpected happened' };
 

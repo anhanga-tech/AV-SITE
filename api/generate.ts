@@ -529,7 +529,10 @@ export async function buildGenerateSuccessBody(
 
 export function buildGeminiErrorResponse(error: unknown, corsHeaders: Record<string, string>): Response {
     const normalized = normalizeError(error);
-    logger.error('SERVER: Error proxying to Gemini', normalized);
+    // Include the error constructor name to distinguish network errors (TypeError)
+    // from upstream HTTP errors (ApiError) in log analysis.
+    const errorClass = error instanceof Error ? error.constructor.name : 'UnknownError';
+    logger.error('SERVER: Error proxying to Gemini', { ...normalized, errorClass });
 
     if (normalized.status === 401 || normalized.status === 403) {
         return buildJsonResponse({
@@ -552,13 +555,17 @@ export function buildGeminiErrorResponse(error: unknown, corsHeaders: Record<str
         }, 500, corsHeaders);
     }
 
-    if (normalized.status && normalized.status >= 500) {
+    // Any remaining HTTP error from the upstream (gateway 404/400/other 4xx, or 5xx)
+    // is treated as a temporary upstream unavailability rather than an internal error.
+    if (normalized.status && normalized.status >= 400) {
         return buildJsonResponse({
             code: 'GEMINI_UPSTREAM_ERROR',
             error: 'Serviço de IA temporariamente indisponível'
         }, 503, corsHeaders);
     }
 
+    // No HTTP status means a network-level failure (TypeError: Failed to fetch,
+    // DNS error, connection refused, etc.) — report as internal error.
     return buildJsonResponse({
         code: 'GEMINI_INTERNAL_ERROR',
         error: 'Error processing request'
