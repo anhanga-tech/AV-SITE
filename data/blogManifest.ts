@@ -71,6 +71,28 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "7 min de leitura"
   },
   {
+    "title": "ETIAS 2026: O Que Mudou para Brasileiros na Europa (Perguntas e Respostas)",
+    "excerpt": "A Europa exigirá autorização eletrônica de brasileiros a partir do fim de 2026. Entenda o que é o ETIAS, quanto custa, como pedir e o que muda na fronteira.",
+    "date": "2026-06-23",
+    "author": "felipe-william",
+    "category": "Planejamento",
+    "image": "https://media.anhanga.tur.br/images/blog/etias-2026-brasileiros-europa.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Viagem para a Europa",
+    "tags": [
+      "europa",
+      "documentos",
+      "planejamentos",
+      "viagens-internacionais",
+      "dicas"
+    ],
+    "seoTitle": "ETIAS 2026: Guia Completo para Brasileiros Viajando à Europa",
+    "seoDescription": "ETIAS começa no Q4/2026 e custa €20. Saiba o que é, quais países exigem, como pedir e o que já mudou na fronteira europeia para brasileiros.",
+    "slug": "etias-2026-brasileiros-europa",
+    "readingTime": "9 min de leitura"
+  },
+  {
     "title": "Agência de Viagens ou Por Conta Própria? O Que Vale Mais — e Quando",
     "excerpt": "Booking, Google Flights ou agência? Entenda quando planejar por conta própria ou contratar uma agência de viagens compensa mais em preço, tempo e segurança.",
     "date": "2026-06-16",
