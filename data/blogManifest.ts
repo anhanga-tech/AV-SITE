@@ -3,9 +3,9 @@ import type { PostMeta } from '../types/blog';
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
     "title": "Jalapão em Julho: Roteiro, Custos e Por Que Ir Antes Que Vire Mainstream",
-    "excerpt": "Em julho, os fervedouros do Jalapão estão no melhor momento do ano. Roteiro de 7 dias, custos reais e por que a janela para conhecer o Jalapão como ele é hoje está diminuindo.",
+    "excerpt": "Em julho, os fervedouros do Jalapão estão no melhor momento do ano. Roteiro de 7 dias, custos reais e por que ir antes que o destino mude.",
     "date": "2026-08-18",
-    "author": "felipe-williams",
+    "author": "felipe-william",
     "category": "Destinos",
     "image": "https://media.anhanga.tur.br/images/blog/jalapao-julho-roteiro-custos.jpg",
     "featured": false,
@@ -28,7 +28,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Cancún, Punta Cana ou Aruba para Lua de Mel? Comparação Honesta",
     "excerpt": "Caribe para lua de mel parece fácil até você sentar pra pesquisar. Cancún, Punta Cana e Aruba atendem casais completamente diferentes. Veja qual faz sentido pra vocês.",
     "date": "2026-08-04",
-    "author": "felipe-williams",
+    "author": "felipe-william",
     "category": "Destinos",
     "image": "https://media.anhanga.tur.br/images/blog/cancun-punta-cana-aruba-lua-de-mel.jpg",
     "featured": false,
@@ -51,7 +51,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Disney vs Beto Carrero: Qual Escolher para Crianças de 4 a 10 Anos?",
     "excerpt": "Disney ou Beto Carrero? A resposta depende da idade das crianças, do orçamento e de quanto a família está pronta para aproveitar. Comparação honesta com custos reais.",
     "date": "2026-07-14",
-    "author": "felipe-williams",
+    "author": "felipe-william",
     "category": "Experiencias",
     "image": "https://media.anhanga.tur.br/images/blog/disney-ou-beto-carrero.jpg",
     "featured": false,
@@ -69,28 +69,6 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "seoDescription": "Comparação honesta entre Disney Orlando e Beto Carrero World para famílias com crianças de 4 a 10 anos. Custos reais, idade ideal e o que cada parque entrega.",
     "slug": "disney-ou-beto-carrero",
     "readingTime": "7 min de leitura"
-  },
-  {
-    "title": "ETIAS 2026: O Que Mudou para Brasileiros na Europa (Perguntas e Respostas)",
-    "excerpt": "A Europa vai exigir uma autorização eletrônica de brasileiros a partir do Q4/2026. Entenda o que é o ETIAS, quanto custa, como pedir e o que já mudou na fronteira.",
-    "date": "2026-06-23",
-    "author": "felipe-williams",
-    "category": "Planejamento",
-    "image": "https://media.anhanga.tur.br/images/blog/etias-2026-brasileiros-europa.jpg",
-    "featured": false,
-    "showChatCTA": true,
-    "chatCTADestination": "Viagem para a Europa",
-    "tags": [
-      "europa",
-      "documentos",
-      "planejamentos",
-      "viagens-internacionais",
-      "dicas"
-    ],
-    "seoTitle": "ETIAS 2026: Guia Completo para Brasileiros Viajando à Europa",
-    "seoDescription": "ETIAS começa no Q4/2026 e custa €20. Saiba o que é, quais países exigem, como pedir e o que já mudou na fronteira europeia para brasileiros.",
-    "slug": "etias-2026-brasileiros-europa",
-    "readingTime": "9 min de leitura"
   },
   {
     "title": "Agência de Viagens ou Por Conta Própria? O Que Vale Mais — e Quando",

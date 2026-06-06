@@ -11,6 +11,16 @@ function isBrowserExtensionFrame(frame: { filename?: string }): boolean {
         || filename.includes('safari-web-extension://');
 }
 
+// Some browser extension errors arrive as unhandled rejections with no stack
+// frames (e.g. `runtime.sendMessage()` messaging failures). The frame-based
+// filter above cannot catch these, so we also match against known extension
+// error message patterns.
+function isBrowserExtensionMessage(values: Array<{ value?: string }> | undefined): boolean {
+    return !!values?.some(({ value }) =>
+        !!value && /runtime\.sendMessage|Extension context invalidated/i.test(value)
+    );
+}
+
 export function initClientErrorTracking(): void {
     const dsn = import.meta.env.VITE_SENTRY_DSN;
 
@@ -27,11 +37,13 @@ export function initClientErrorTracking(): void {
         ],
         tracePropagationTargets: ['localhost', /^https:\/\/(?:www\.)?anhanga\.tur\.br\/api/],
         beforeSend(event) {
-            const frames = event.exception?.values?.flatMap(
+            const exceptions = event.exception?.values;
+            const frames = exceptions?.flatMap(
                 (exception) => exception.stacktrace?.frames ?? []
             ) ?? [];
 
             if (frames.some(isBrowserExtensionFrame)) return null;
+            if (isBrowserExtensionMessage(exceptions)) return null;
 
             return event;
         },
