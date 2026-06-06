@@ -2,6 +2,75 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
+    "title": "Jalapão em Julho: Roteiro, Custos e Por Que Ir Antes Que Vire Mainstream",
+    "excerpt": "Em julho, os fervedouros do Jalapão estão no melhor momento do ano. Roteiro de 7 dias, custos reais e por que ir antes que o destino mude.",
+    "date": "2026-08-18",
+    "author": "felipe-william",
+    "category": "Destinos",
+    "image": "https://media.anhanga.tur.br/images/blog/jalapao-julho-roteiro-custos.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Roteiro Jalapão",
+    "tags": [
+      "jalapao",
+      "tocantins",
+      "ecoturismo",
+      "brasil",
+      "fervedouros",
+      "roteiros-nacionais"
+    ],
+    "seoTitle": "Jalapão em Julho: Roteiro de 7 Dias, Custos Reais e Dicas 2026",
+    "seoDescription": "Roteiro completo de 7 dias no Jalapão em julho com custos reais, fervedouros, dunas e por que ir agora antes que o destino mude. Guia atualizado 2026.",
+    "slug": "jalapao-julho-roteiro-custos",
+    "readingTime": "9 min de leitura"
+  },
+  {
+    "title": "Cancún, Punta Cana ou Aruba para Lua de Mel? Comparação Honesta",
+    "excerpt": "Caribe para lua de mel parece fácil até você sentar pra pesquisar. Cancún, Punta Cana e Aruba atendem casais completamente diferentes. Veja qual faz sentido pra vocês.",
+    "date": "2026-08-04",
+    "author": "felipe-william",
+    "category": "Destinos",
+    "image": "https://media.anhanga.tur.br/images/blog/cancun-punta-cana-aruba-lua-de-mel.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Lua de Mel no Caribe",
+    "tags": [
+      "cancun",
+      "punta-cana",
+      "aruba",
+      "lua-de-mel",
+      "caribe",
+      "viagens-internacionais"
+    ],
+    "seoTitle": "Cancún, Punta Cana ou Aruba para Lua de Mel? Comparação 2026",
+    "seoDescription": "Comparação honesta entre Cancún, Punta Cana e Aruba para lua de mel: preços, praias, furacões, resorts e o que cada destino entrega de verdade.",
+    "slug": "cancun-punta-cana-aruba-lua-de-mel",
+    "readingTime": "8 min de leitura"
+  },
+  {
+    "title": "Disney vs Beto Carrero: Qual Escolher para Crianças de 4 a 10 Anos?",
+    "excerpt": "Disney ou Beto Carrero? A resposta depende da idade das crianças, do orçamento e de quanto a família está pronta para aproveitar. Comparação honesta com custos reais.",
+    "date": "2026-07-14",
+    "author": "felipe-william",
+    "category": "Experiencias",
+    "image": "https://media.anhanga.tur.br/images/blog/disney-ou-beto-carrero.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Viagem em Família",
+    "tags": [
+      "disney",
+      "beto-carrero",
+      "familia",
+      "criancas",
+      "orlando",
+      "parques-tematicos"
+    ],
+    "seoTitle": "Disney vs Beto Carrero: Qual Escolher para Crianças de 4 a 10 Anos?",
+    "seoDescription": "Comparação honesta entre Disney Orlando e Beto Carrero World para famílias com crianças de 4 a 10 anos. Custos reais, idade ideal e o que cada parque entrega.",
+    "slug": "disney-ou-beto-carrero",
+    "readingTime": "7 min de leitura"
+  },
+  {
     "title": "Agência de Viagens ou Por Conta Própria? O Que Vale Mais — e Quando",
     "excerpt": "Booking, Google Flights ou agência? Entenda quando planejar por conta própria ou contratar uma agência de viagens compensa mais em preço, tempo e segurança.",
     "date": "2026-06-16",
