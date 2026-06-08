@@ -68,7 +68,7 @@
     "tsx": "^4.22.3",
     "turndown": "^7.2.4",
     "typescript": "~6.0.3",
-    "vite": "^8.0.14",
+    "vite": "^8.0.15",
     "wrangler": "^4.95.0"
   },
   "overrides": {
