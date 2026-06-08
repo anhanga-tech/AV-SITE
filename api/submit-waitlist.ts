@@ -37,8 +37,8 @@ function buildJsonResponse(body: SubmitWaitlistResponse, status: number, corsHea
 }
 
 function getSubmitWaitlistConfig(): SubmitWaitlistConfig | null {
-    const webhookUrl = cleanString(process.env.N8N_SUBMIT_WAITLIST_WEBHOOK_URL);
-    const webhookSecret = cleanString(process.env.N8N_WEBHOOK_SECRET);
+    const webhookUrl = process.env.N8N_SUBMIT_WAITLIST_WEBHOOK_URL?.trim() || '';
+    const webhookSecret = process.env.N8N_WEBHOOK_SECRET?.trim() || '';
 
     if (!webhookUrl || !webhookSecret) {
         return null;

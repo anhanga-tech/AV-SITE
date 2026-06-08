@@ -31,8 +31,8 @@ interface ContactConfig {
 }
 
 function getContactConfig(): ContactConfig | null {
-    const webhookUrl = cleanString(process.env.N8N_SUBMIT_CONTACT_WEBHOOK_URL);
-    const webhookSecret = cleanString(process.env.N8N_WEBHOOK_SECRET);
+    const webhookUrl = process.env.N8N_SUBMIT_CONTACT_WEBHOOK_URL?.trim() || '';
+    const webhookSecret = process.env.N8N_WEBHOOK_SECRET?.trim() || '';
     if (!webhookUrl || !webhookSecret) return null;
     return { webhookUrl, webhookSecret };
 }

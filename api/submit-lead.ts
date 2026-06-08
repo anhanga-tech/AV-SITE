@@ -67,8 +67,8 @@ function buildJsonResponse(
 }
 
 function getSubmitLeadConfig(): SubmitLeadConfig | null {
-    const webhookUrl = cleanString(process.env.N8N_SUBMIT_LEAD_WEBHOOK_URL);
-    const webhookSecret = cleanString(process.env.N8N_WEBHOOK_SECRET);
+    const webhookUrl = process.env.N8N_SUBMIT_LEAD_WEBHOOK_URL?.trim() || '';
+    const webhookSecret = process.env.N8N_WEBHOOK_SECRET?.trim() || '';
 
     if (!webhookUrl || !webhookSecret) {
         return null;
@@ -224,8 +224,8 @@ export default async function handler(request: Request): Promise<Response> {
         if (!config) {
             emitLeadLog('error', requestId, 'config', {
                 code: 'SERVER_CONFIG_ERROR',
-                hasWebhookUrl: Boolean(cleanString(process.env.N8N_SUBMIT_LEAD_WEBHOOK_URL)),
-                hasWebhookSecret: Boolean(cleanString(process.env.N8N_WEBHOOK_SECRET)),
+                hasWebhookUrl: Boolean(process.env.N8N_SUBMIT_LEAD_WEBHOOK_URL?.trim()),
+                hasWebhookSecret: Boolean(process.env.N8N_WEBHOOK_SECRET?.trim()),
             });
 
             return buildJsonResponse(
