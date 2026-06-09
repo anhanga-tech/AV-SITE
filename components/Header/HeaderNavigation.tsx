@@ -30,7 +30,7 @@ function buildSectionHref(href: string, isHome: boolean) {
   return isHome ? `#${href}` : `${SITE_URL}/#${href}`;
 }
 
-export function DesktopNavigation({
+export const DesktopNavigation = React.memo(function DesktopNavigation({
   isHome,
   navGapClass,
   navTextClass,
@@ -96,9 +96,9 @@ export function DesktopNavigation({
       </a>
     </nav>
   );
-}
+});
 
-export function MobileNavigationMenu({
+export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({
   isHome,
   isOpen,
   onCloseMenu,
@@ -169,4 +169,4 @@ export function MobileNavigationMenu({
       {contactButton}
     </div>
   );
-}
+});

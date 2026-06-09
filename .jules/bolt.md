@@ -1,3 +1,11 @@
+## 2027-01-20 - ⚡ Bolt: Header Scroll Stabilization
+**Learning:** Global components like the `Header` that listen to scroll events are high-frequency targets for optimization. Without stable function references and memoized sub-navigation components, every scroll tick triggers a full reconciliation of the entire navigation tree. Stabilizing the style object with `useMemo` and callbacks with `useCallback` ensures that the main thread remains free for smooth scrolling and interaction.
+**Action:** Always memoize sub-components and stabilize callback references in global UI elements that react to high-frequency events like scrolling or window resizing.
+
+## 2027-01-20 - ⚡ Bolt: Regression Test Side-Effects
+**Learning:** In this codebase, running the full regression suite (`pnpm test:regression`) automatically triggers sitemap and blog manifest generation. This can introduce unintended changes to `public/sitemap.xml` and `data/blogManifest.ts` that appear as "hallucinated" content if not reverted.
+**Action:** Always check and revert side-effects in `public/sitemap.xml` and `data/blogManifest.ts` after running the test suite, unless the task specifically involves content or SEO updates.
+
 ## 2025-05-15 - [Strict Scoping of Performance Tasks]
 **Learning:** In performance-focused tasks with strict constraints ("ONE small improvement"), bundling multiple optimizations—even if individually valid—can lead to rejection and potential build risks (e.g., missing imports). Prioritizing a single, high-impact reusable component optimization (like memoizing a common UI element) is safer and more focused.
 **Action:** Always pick the single most impactful optimization that fits the task's scope and ensure all necessary dependencies (like `React.memo` or `useMemo`) are correctly handled within the single context.
