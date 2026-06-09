@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { List, X, Phone } from '@phosphor-icons/react';
 import { openContactModal } from '../../utils/contactForm';
@@ -30,13 +30,13 @@ const Header: React.FC = () => {
 
   const logoSrc = (isScrolled || isInternalPage) ? BRAND_LOGO_BLUE_URL : BRAND_LOGO_WHITE_URL;
 
-  const handleContactClick = (e: React.MouseEvent) => {
+  const handleContactClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     openContactModal({ source: 'header' });
     setIsMobileMenuOpen(false);
-  };
+  }, []);
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+  const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
     if (isHome) {
       e.preventDefault();
       const element = document.getElementById(targetId);
@@ -47,7 +47,27 @@ const Header: React.FC = () => {
     } else {
       setIsMobileMenuOpen(false);
     }
-  };
+  }, [isHome]);
+
+  const toggleMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen(prev => !prev);
+  }, []);
+
+  const closeMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen(false);
+  }, []);
+
+  const mobileContactButton = useMemo(() => (
+    <button
+      type="button"
+      data-testid="mobile-fale-conosco-btn"
+      data-tracking="navbar-mobile"
+      className="btn-whatsapp btn-specialist bg-brand-vibrant text-center text-white px-5 py-3 rounded-lg font-bold mt-2 focus:ring-2 focus:ring-offset-2 focus:ring-brand-dark focus:outline-none flex justify-center items-center gap-2"
+      onClick={handleContactClick}
+    >
+      Fale Conosco
+    </button>
+  ), [handleContactClick]);
 
   return (
     <header
@@ -104,7 +124,7 @@ const Header: React.FC = () => {
           <button
             type="button"
             className={`md:hidden p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-yellow transition-colors duration-500 ${mobileToggleClass}`}
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            onClick={toggleMobileMenu}
             aria-label={isMobileMenuOpen ? "Fechar menu" : "Abrir menu"}
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-menu"
@@ -118,19 +138,9 @@ const Header: React.FC = () => {
         isHome={isHome}
         isOpen={isMobileMenuOpen}
         navTextClass={navTextClass}
-        onCloseMenu={() => setIsMobileMenuOpen(false)}
+        onCloseMenu={closeMobileMenu}
         onNavClick={handleNavClick}
-        contactButton={(
-          <button
-            type="button"
-            data-testid="mobile-fale-conosco-btn"
-            data-tracking="navbar-mobile"
-            className="btn-whatsapp btn-specialist bg-brand-vibrant text-center text-white px-5 py-3 rounded-lg font-bold mt-2 focus:ring-2 focus:ring-offset-2 focus:ring-brand-dark focus:outline-none flex justify-center items-center gap-2"
-            onClick={handleContactClick}
-          >
-            Fale Conosco
-          </button>
-        )}
+        contactButton={mobileContactButton}
       />
     </header>
   );
