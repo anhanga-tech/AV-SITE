@@ -193,6 +193,28 @@ Build chunks: `react-vendor`, `ai-vendor`, `leaflet-vendor` (manual split in `vi
 - `pnpm test:e2e` for browser-visible or critical-path changes
 - `pnpm typecheck` for TypeScript contract changes
 
+## Documentation Organization
+
+Keep the project root minimal — only `README.md`, `CLAUDE.md`, and code/tooling configs belong there. All other documentation lives under `/docs/`, organized by domain:
+
+| Directory | Contents |
+|---|---|
+| `docs/standards/` | Engineering source of truth (code style, testing, API conventions, security) |
+| `docs/ops/` | Deploy, troubleshooting, GitHub workflows, agents, security policy, Cloudflare rules |
+| `docs/design/` | Design system (`design-system.json`) and design context docs |
+| `docs/product/` | Product strategy and positioning |
+| `docs/seo/` | SEO plans, action plans, backlink strategy |
+| `docs/marketing/` | Brand profile, content calendars, brand reviews |
+| `docs/compliance/` | LGPD/RIPD and data-deletion documentation |
+| `docs/baselines/` | Point-in-time infrastructure/state snapshots |
+| `docs/n8n/`, `docs/superpowers/` | Automation and agent workflow docs |
+
+**Rules for new documentation:**
+- New strategy/audit/planning docs go into the matching `docs/<domain>/` subfolder — never the root.
+- Reports and briefs containing sensitive business data (ad account IDs, spend figures, competitive intelligence, active campaign strategy) stay **local only** — add the filename pattern to `.gitignore` instead of committing.
+- When a doc is superseded (new audit, new plan version), delete the old one rather than letting both linger — `git log` preserves history if needed.
+- If a moved/renamed doc is referenced elsewhere (other docs, tests, scripts), update those references in the same change.
+
 ## Git Flow
 
 GitHub Flow — continuous deployment, no `develop` branch.
