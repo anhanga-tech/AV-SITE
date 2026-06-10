@@ -4,6 +4,7 @@ const useIntersectionObserver = (threshold = 0.1) => {
   const elementRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
+  // react-doctor-disable-next-line no-adjust-state-on-prop-change
   useEffect(() => {
     const element = elementRef.current;
 
