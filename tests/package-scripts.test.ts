@@ -29,8 +29,8 @@ test('pnpm settings live in pnpm-workspace.yaml, not in the package.json "pnpm" 
   assert.equal(packageJson.pnpm, undefined, 'the "pnpm" field is ignored by pnpm >= 11 and must not exist');
   assert.equal(packageJson.overrides, undefined, 'npm-style "overrides" is not read by pnpm; use pnpm-workspace.yaml');
 
-  assert.match(workspaceConfig, /^overrides:$/m);
-  assert.match(workspaceConfig, /^onlyBuiltDependencies:$/m);
+  assert.match(workspaceConfig, /^overrides:\s*$/m);
+  assert.match(workspaceConfig, /^onlyBuiltDependencies:\s*$/m);
   for (const pinned of ['rimraf', 'glob', 'minimatch', 'qs']) {
     assert.match(workspaceConfig, new RegExp(`^  ${pinned}: `, 'm'), `security override for ${pinned} must stay pinned`);
   }
