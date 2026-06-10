@@ -124,6 +124,74 @@ test('resolveGeminiProviderConfig should default the gateway id without adding e
     assert.equal(Object.keys(JSON.parse(metadataHeader || '{}')).length, 5);
 });
 
+test('resolveGeminiProviderConfig should allow BYOK without GEMINI_API_KEY when the gateway is enabled', () => {
+    const config = resolveGeminiProviderConfig({
+        AI_GATEWAY_ENABLED: 'true',
+        AI_GATEWAY_BYOK_ALIAS: 'chatbot',
+        CLOUDFLARE_ACCOUNT_ID: 'account-123',
+        CLOUDFLARE_AI_GATEWAY_TOKEN: 'cf-token',
+    });
+
+    if (!config.ok || !config.useGateway) {
+        throw new Error('expected gateway config');
+    }
+
+    assert.equal(config.byokAlias, 'chatbot');
+
+    const clientOptions = buildGeminiClientOptions(config);
+    assert.equal(clientOptions.httpOptions?.headers?.['x-goog-api-key'], '');
+    assert.equal(clientOptions.httpOptions?.headers?.['cf-aig-byok-alias'], 'chatbot');
+    assert.equal(clientOptions.httpOptions?.headers?.['cf-aig-authorization'], 'Bearer cf-token');
+    assert.equal(typeof clientOptions.apiKey, 'string');
+    assert.notEqual(clientOptions.apiKey, '');
+});
+
+test('resolveGeminiProviderConfig should prefer the BYOK credential over a configured GEMINI_API_KEY', () => {
+    const config = resolveGeminiProviderConfig({
+        GEMINI_API_KEY: 'google-key',
+        AI_GATEWAY_ENABLED: 'true',
+        AI_GATEWAY_BYOK_ALIAS: 'chatbot',
+        CLOUDFLARE_ACCOUNT_ID: 'account-123',
+        CLOUDFLARE_AI_GATEWAY_TOKEN: 'cf-token',
+    });
+
+    if (!config.ok || !config.useGateway) {
+        throw new Error('expected gateway config');
+    }
+
+    const clientOptions = buildGeminiClientOptions(config);
+    // A chave do ambiente não pode vazar para a requisição: o gateway injeta a credencial BYOK.
+    assert.equal(clientOptions.httpOptions?.headers?.['x-goog-api-key'], '');
+    assert.notEqual(clientOptions.apiKey, 'google-key');
+});
+
+test('resolveGeminiProviderConfig should ignore the BYOK alias when the gateway is disabled', () => {
+    const config = resolveGeminiProviderConfig({
+        AI_GATEWAY_BYOK_ALIAS: 'chatbot',
+    });
+
+    assert.equal(config.ok, false);
+    assert.equal(config.code, 'SERVER_CONFIG_ERROR');
+    assert.deepEqual(config.missing, ['GEMINI_API_KEY']);
+});
+
+test('buildGeminiClientOptions should not send BYOK headers when no alias is configured', () => {
+    const config = resolveGeminiProviderConfig({
+        GEMINI_API_KEY: 'google-key',
+        AI_GATEWAY_ENABLED: 'true',
+        CLOUDFLARE_ACCOUNT_ID: 'account-123',
+        CLOUDFLARE_AI_GATEWAY_TOKEN: 'cf-token',
+    });
+
+    if (!config.ok || !config.useGateway) {
+        throw new Error('expected gateway config');
+    }
+
+    const headers = buildGeminiClientOptions(config).httpOptions?.headers || {};
+    assert.equal('x-goog-api-key' in headers, false);
+    assert.equal('cf-aig-byok-alias' in headers, false);
+});
+
 test('generate handler should return configuration error before provider calls when gateway credentials are missing', async () => {
     const previousEnv = {
         GEMINI_API_KEY: process.env.GEMINI_API_KEY,

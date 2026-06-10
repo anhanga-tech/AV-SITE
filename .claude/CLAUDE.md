@@ -68,6 +68,7 @@ VITE_SENTRY_DSN=          # Browser-side Sentry DSN
 VITE_MEDIA_BASE_URL=      # Cloudflare R2 media origin (default: https://media.anhanga.tur.br)
 VITE_MEDIA_ENABLE_TRANSFORMS=  # Enable Cloudflare image transforms via /cdn-cgi/image
 AI_GATEWAY_ENABLED=       # Route Gemini through Cloudflare AI Gateway
+AI_GATEWAY_BYOK_ALIAS=    # AI Gateway Provider Key alias (BYOK); makes GEMINI_API_KEY optional
 ALLOWED_ORIGIN=           # CORS allowed origin (default: https://www.anhanga.tur.br)
 DEBUG=                    # Enable verbose server logs
 ```
