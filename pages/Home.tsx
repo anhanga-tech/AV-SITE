@@ -102,7 +102,7 @@ const Home: React.FC = () => {
   return (
     <>
       <Seo
-        title="Agência de Viagens em São Paulo | Roteiros Sob Medida"
+        title="Agência de Viagens em São Paulo | Anhangá Viagens"
         description="Agência de viagens em São Paulo. Cada roteiro começa do zero — sem pacote pronto. Orlando, Beto Carrero, Europa e muito mais. Orçamento gratuito."
         canonical="https://www.anhanga.tur.br/"
       />
@@ -122,15 +122,6 @@ const Home: React.FC = () => {
         serviceUrl="https://www.anhanga.tur.br/"
         serviceType="Agência de Viagens"
         areaServed="São Paulo, Brasil"
-        keywords={[
-          'agência de viagens São Paulo',
-          'roteiro personalizado',
-          'viagem Orlando',
-          'Beto Carrero World',
-          'Lollapalooza Brasil',
-          'turismo melhor idade',
-          'pacotes de viagem SP',
-        ]}
       />
       <Hero />
 

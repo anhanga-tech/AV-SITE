@@ -14,6 +14,7 @@ test('sitemap includes every indexable static route and blog post', async () => 
   const locs = collectSitemapLocs(sitemap);
 
   for (const entry of STATIC_SITEMAP_ENTRIES) {
+    if (entry.noindex) continue;
     assert.ok(locs.has(routeToCanonicalUrl(entry.route)), `missing static route ${entry.route}`);
   }
 

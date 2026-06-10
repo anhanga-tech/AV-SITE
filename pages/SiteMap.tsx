@@ -29,7 +29,7 @@ const SiteMap: React.FC = () => {
     <>
       <Seo
         title="Mapa do Site | Anhangá Viagens"
-        description="Navegue pelas principais páginas da Anhangá Viagens, incluindo landings, blog e páginas institucionais."
+        description="Navegue pelas principais páginas da Anhangá Viagens: destinos, pacotes de viagem, blog com guias práticos, landings de eventos e páginas institucionais."
         canonical="https://www.anhanga.tur.br/mapa-do-site/"
       />
       <BreadcrumbSchema

@@ -36,7 +36,7 @@ const OrlandoLanding: React.FC = () => {
   return (
     <>
       <Seo
-        title="Pacotes para Orlando: Disney e Universal 2026"
+        title="Pacotes para Orlando: Disney e Universal"
         description="Planeje sua viagem para Orlando com roteiro personalizado, ingressos e hospedagem. Atendimento especializado por agência de viagens em São Paulo."
         canonical="https://www.anhanga.tur.br/orlando/"
         noHreflang
@@ -47,7 +47,6 @@ const OrlandoLanding: React.FC = () => {
         serviceUrl="https://www.anhanga.tur.br/orlando/"
         serviceType="Planejamento de viagem para Orlando"
         areaServed="São Paulo e Brasil"
-        keywords={['pacotes para Orlando', 'roteiro Disney', 'viagem Universal']}
       />
       <BreadcrumbSchema
         items={[

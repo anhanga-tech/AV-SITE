@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import { BreadcrumbSchema } from "@/components/schemas/BreadcrumbSchema";
 
 const Terms = () => {
-    const metaDescription = "Termos e Condições de Uso da Anhangá Turismo: intermediação, simulações, responsabilidade e privacidade.";
+    const metaDescription = "Termos e Condições de Uso da Anhangá Turismo: como funciona a intermediação de viagens, simulações de orçamento, responsabilidades e privacidade.";
     const canonicalUrl = "https://www.anhanga.tur.br/termos-de-uso/";
     const lastUpdatedDisplay = "27 de fevereiro de 2026";
     const lastUpdatedIso = "2026-02-27";

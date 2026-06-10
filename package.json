@@ -8,12 +8,12 @@
     "cms:proxy": "decap-server",
     "generate:blog-manifest": "tsx scripts/generate-blog-manifest.ts",
     "generate:sitemap": "tsx scripts/generate-sitemap.ts",
-    "dev": "pnpm generate:blog-manifest && pnpm generate:sitemap && vite",
-    "build": "pnpm generate:blog-manifest && pnpm generate:sitemap && vite build && node scripts/prerender.mjs",
+    "dev": "pnpm generate:blog-manifest && pnpm generate:sitemap && pnpm generate:feeds && vite",
+    "build": "pnpm generate:blog-manifest && pnpm generate:sitemap && pnpm generate:feeds && vite build && node scripts/prerender.mjs",
     "preview": "vite preview",
     "deploy": "pnpm build && gh-pages -d dist",
-    "typecheck": "pnpm generate:blog-manifest && pnpm generate:sitemap && tsc --noEmit",
-    "test:regression": "pnpm generate:blog-manifest && pnpm generate:sitemap && tsx --test tests/*.test.ts",
+    "typecheck": "pnpm generate:blog-manifest && pnpm generate:sitemap && pnpm generate:feeds && tsc --noEmit",
+    "test:regression": "pnpm generate:blog-manifest && pnpm generate:sitemap && pnpm generate:feeds && tsx --test tests/*.test.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:update-snapshots": "playwright test tests/e2e/visual.spec.ts --update-snapshots",
@@ -21,7 +21,8 @@
     "prepare": "node scripts/install-hooks.mjs",
     "reviews:fetch": "tsx scripts/fetch-google-reviews.ts",
     "update:dates": "node scripts/update-post-dates.mjs --all",
-    "doctor": "react-doctor"
+    "doctor": "react-doctor",
+    "generate:feeds": "tsx scripts/generate-feeds.ts"
   },
   "dependencies": {
     "@google/genai": "^2.7.0",
