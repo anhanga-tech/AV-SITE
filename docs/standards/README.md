@@ -2,7 +2,7 @@
 
 This directory is the source of truth for how work should be done in AV-SITE.
 
-It is written for both humans and coding agents. `AGENTS.md` is the fast entry point. These documents hold the full rules.
+It is written for both humans and coding agents. `docs/ops/agents.md` is the fast entry point. These documents hold the full rules.
 
 ## Scope
 
@@ -69,5 +69,5 @@ Each exception should include:
 
 ## Notes
 
-- The root-level `SECURITY.md` remains the vulnerability reporting policy.
+- `docs/ops/security.md` is the vulnerability reporting policy.
 - `docs/standards/security.md` is the engineering standard for building safely inside the codebase.
