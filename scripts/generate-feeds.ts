@@ -28,7 +28,7 @@ const blogSection = [
 ].join('\n');
 
 const llms = await readFile(LLMS_PATH, 'utf8');
-const sectionPattern = /## Blog — (?:artigos recentes|todos os artigos)[\s\S]*?(?=\n## |$)/;
+const sectionPattern = /## Blog — (?:artigos recentes|todos os artigos)[\s\S]*?(?=\r?\n## |$)/;
 
 if (!sectionPattern.test(llms)) {
   throw new Error('llms.txt: seção "## Blog" não encontrada — atualize o padrão em scripts/generate-feeds.ts');

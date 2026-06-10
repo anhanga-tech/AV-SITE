@@ -324,8 +324,10 @@ export default async function handler(req: Request): Promise<Response> {
         default: {
             const blogMatch = path.match(/^\/blog\/([a-z0-9-]+)$/);
             if (blogMatch) {
+                // typeof guard: slugs como "constructor" alcançariam propriedades
+                // herdadas do prototype em vez de retornar undefined.
                 const markdown = BLOG_POST_MARKDOWN[blogMatch[1]];
-                if (markdown) {
+                if (typeof markdown === 'string') {
                     return markdownResponse(markdown);
                 }
             }
