@@ -11,10 +11,27 @@ test('validation scripts regenerate the blog manifest before running checks', as
   assert.match(packageJson.scripts?.['test:regression'] ?? '', /generate:blog-manifest/);
 });
 
-test('package engines should target the active Node.js LTS line used by deploys', async () => {
+test('package engines should accept the deploy Node.js line (24) and newer local runtimes', async () => {
   const packageJson = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8')) as {
     engines?: Record<string, string>;
   };
 
-  assert.equal(packageJson.engines?.node, '24.x');
+  assert.equal(packageJson.engines?.node, '>=24');
+});
+
+test('pnpm settings live in pnpm-workspace.yaml, not in the package.json "pnpm" field ignored by pnpm 11', async () => {
+  const packageJson = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8')) as Record<
+    string,
+    unknown
+  >;
+  const workspaceConfig = await readFile(new URL('../pnpm-workspace.yaml', import.meta.url), 'utf8');
+
+  assert.equal(packageJson.pnpm, undefined, 'the "pnpm" field is ignored by pnpm >= 11 and must not exist');
+  assert.equal(packageJson.overrides, undefined, 'npm-style "overrides" is not read by pnpm; use pnpm-workspace.yaml');
+
+  assert.match(workspaceConfig, /^overrides:$/m);
+  assert.match(workspaceConfig, /^onlyBuiltDependencies:$/m);
+  for (const pinned of ['rimraf', 'glob', 'minimatch', 'qs']) {
+    assert.match(workspaceConfig, new RegExp(`^  ${pinned}: `, 'm'), `security override for ${pinned} must stay pinned`);
+  }
 });
