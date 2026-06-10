@@ -68,12 +68,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.anhanga.tur.br/quiz/</loc>
-    <lastmod>2026-05-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://www.anhanga.tur.br/corporativo/</loc>
     <lastmod>2026-05-29</lastmod>
     <changefreq>monthly</changefreq>
@@ -120,6 +114,46 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.anhanga.tur.br/blog/jalapao-julho-roteiro-custos/</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/jalapao-julho-roteiro-custos.jpg</image:loc>
+      <image:caption>Jalapão em Julho: Roteiro, Custos e Por Que Ir Antes Que Vire Mainstream</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.anhanga.tur.br/blog/cancun-punta-cana-aruba-lua-de-mel/</loc>
+    <lastmod>2026-08-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/cancun-punta-cana-aruba-lua-de-mel.jpg</image:loc>
+      <image:caption>Cancún, Punta Cana ou Aruba para Lua de Mel? Comparação Honesta</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.anhanga.tur.br/blog/disney-ou-beto-carrero/</loc>
+    <lastmod>2026-07-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/disney-ou-beto-carrero.jpg</image:loc>
+      <image:caption>Disney vs Beto Carrero: Qual Escolher para Crianças de 4 a 10 Anos?</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.anhanga.tur.br/blog/etias-2026-brasileiros-europa/</loc>
+    <lastmod>2026-06-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/etias-2026-brasileiros-europa.jpg</image:loc>
+      <image:caption>ETIAS 2026: O Que Mudou para Brasileiros na Europa (Perguntas e Respostas)</image:caption>
+    </image:image>
+  </url>
+  <url>
     <loc>https://www.anhanga.tur.br/blog/agencia-de-viagens-ou-por-conta-propria/</loc>
     <lastmod>2026-06-16</lastmod>
     <changefreq>monthly</changefreq>
@@ -141,7 +175,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/ferias-julho-2026-destinos/</loc>
-    <lastmod>2026-06-04</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <image:image>
@@ -151,7 +185,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/viagem-corporativa-para-pequenas-empresas-guia-completo/</loc>
-    <lastmod>2026-06-02</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
@@ -161,7 +195,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/copa-do-mundo-2026-as-cidades-sede-e-o-que-cada-uma-tem-a-oferecer-alem-do-futebol/</loc>
-    <lastmod>2026-05-28</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <image:image>
@@ -171,7 +205,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/disney-tropical-americas-animal-kingdom/</loc>
-    <lastmod>2026-05-28</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
@@ -181,7 +215,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/america-do-norte-destinos-alem-de-nova-york/</loc>
-    <lastmod>2026-05-28</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
@@ -191,7 +225,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/asia-destinos-para-brasileiros-2026/</loc>
-    <lastmod>2026-05-05</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
@@ -201,7 +235,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/caribe-destinos-para-brasileiros/</loc>
-    <lastmod>2026-05-28</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
@@ -211,7 +245,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/destinos-america-do-sul-latam/</loc>
-    <lastmod>2026-05-28</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
@@ -221,7 +255,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/melhores-destinos-brasil-2026/</loc>
-    <lastmod>2026-05-05</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
@@ -231,7 +265,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/roteiro-europa-brasileiros-2026/</loc>
-    <lastmod>2026-05-28</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
@@ -241,7 +275,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/viagem-solo-feminina-ganha-espaco-nos-cruzeiros-da-norwegian-cruise-line/</loc>
-    <lastmod>2026-05-05</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <image:image>
@@ -251,7 +285,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/destinos-carnaval-2026-brasil/</loc>
-    <lastmod>2026-05-28</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
@@ -261,7 +295,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/guia-definitivo-sobrevivencia-festivais/</loc>
-    <lastmod>2026-05-05</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
@@ -271,7 +305,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/5-segredos-da-disney-que-ninguem-conta/</loc>
-    <lastmod>2026-05-05</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
@@ -291,7 +325,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/europa-gastronomica-roteiro-italia/</loc>
-    <lastmod>2026-05-05</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
@@ -301,7 +335,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/lua-de-mel-nas-maldivas/</loc>
-    <lastmod>2026-05-05</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
@@ -311,7 +345,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/nova-york-no-natal/</loc>
-    <lastmod>2026-05-05</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>

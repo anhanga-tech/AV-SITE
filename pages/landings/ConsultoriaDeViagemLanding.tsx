@@ -93,7 +93,6 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
         serviceUrl="https://www.anhanga.tur.br/consultoria-de-viagem/"
         serviceType="Consultoria de Viagem"
         areaServed="São Paulo e Brasil"
-        keywords={['consultoria de viagem', 'viagem sob medida', 'planejamento de viagem personalizado', 'consultoria de viagem SP']}
       />
       <BreadcrumbSchema
         items={[

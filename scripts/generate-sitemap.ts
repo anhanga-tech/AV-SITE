@@ -10,7 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const OUTPUT_PATH = path.resolve(__dirname, '../public/sitemap.xml');
 
-const staticEntries: SitemapEntry[] = STATIC_SITEMAP_ENTRIES.map((entry) => ({
+const staticEntries: SitemapEntry[] = STATIC_SITEMAP_ENTRIES.filter((entry) => !entry.noindex).map((entry) => ({
   loc: routeToCanonicalUrl(entry.route),
   lastmod: entry.lastmod,
   changefreq: entry.changefreq,

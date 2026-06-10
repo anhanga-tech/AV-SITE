@@ -94,3 +94,51 @@ export async function writeBlogManifest(blogDir: string, outputFile: string): Pr
 
   return posts;
 }
+
+// Versão markdown dos posts para consumo por LLMs/agentes via /api/markdown.
+// Gerada em módulo separado do manifest para não inflar o bundle do cliente —
+// apenas a edge function importa este arquivo.
+function toPostMarkdown(meta: PostMeta, content: string): string {
+  const header = [
+    `# ${meta.title}`,
+    '',
+    `**Publicado em:** ${meta.date}${meta.dateModified ? ` (atualizado em ${meta.dateModified})` : ''}`,
+    `**Categoria:** ${meta.category}`,
+    `**URL:** https://www.anhanga.tur.br/blog/${meta.slug}/`,
+    '',
+    meta.excerpt,
+    '',
+  ].join('\n');
+
+  return `${header}\n${content.trim()}\n`;
+}
+
+export async function writeBlogMarkdown(blogDir: string, outputFile: string): Promise<number> {
+  const filenames = await readdir(blogDir);
+
+  const posts = await Promise.all(
+    filenames
+      .filter((filename) => filename.endsWith('.mdx') && !filename.startsWith('_'))
+      .sort()
+      .map(async (filename) => {
+        const filepath = path.join(blogDir, filename);
+        const rawContent = await readFile(filepath, 'utf8');
+        const { content } = matter(rawContent);
+        const meta = toPostMeta(filepath, rawContent);
+        return [meta.slug, toPostMarkdown(meta, content)] as const;
+      })
+  );
+
+  const entries: Record<string, string> = Object.fromEntries(posts);
+
+  await mkdir(path.dirname(outputFile), { recursive: true });
+  await writeFile(
+    outputFile,
+    `// Gerado por scripts/generate-blog-manifest.ts — não editar manualmente.
+export const BLOG_POST_MARKDOWN: Record<string, string> = ${JSON.stringify(entries, null, 2)};
+`,
+    'utf8'
+  );
+
+  return Object.keys(entries).length;
+}

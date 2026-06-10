@@ -14,12 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6.0.3
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: 'pnpm'
-      - name: Install dependencies
-        run: pnpm install
-      - name: Run React Doctor
-        run: pnpm run doctor . --fail-on none --annotations
+      # Pinado por SHA: o branch main da action quebrou em 10/06/2026
+      # ("error: too many arguments") — atualizar o pin só após validar upstream.
+      - uses: millionco/react-doctor@a64093c8a14255dc2108d834d56f4d21b9d9ac60

@@ -1072,6 +1072,7 @@ export default function QuizAnhangaLanding() {
                 title="Quiz de Destinos | Descubra seu próximo rolê — Anhangá Viagens"
                 description="6 perguntas rápidas para descobrir seu perfil de viajante e os destinos que mais combinam com você. Gratuito e sem compromisso."
                 canonical="https://www.anhanga.tur.br/quiz/"
+                robots="noindex, follow"
                 noHreflang
             />
             <BreadcrumbSchema

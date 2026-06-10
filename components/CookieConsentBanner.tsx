@@ -33,7 +33,7 @@ const CookieConsentBanner: React.FC = () => {
           Usamos cookies de marketing (Mautic e HubSpot) para comunicações personalizadas.
           Analytics continua ativo por interesse legítimo {'—'}{' '}
           <a
-            href="/politica-privacidade#cookies"
+            href="/politica-privacidade/#cookies"
             className="underline underline-offset-2 hover:text-brand-yellow transition-colors"
           >
             saiba como se opor em nossa Política de Privacidade
