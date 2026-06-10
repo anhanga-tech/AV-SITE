@@ -69,7 +69,7 @@
     "turndown": "^7.2.4",
     "typescript": "~6.0.3",
     "vite": "^8.0.15",
-    "wrangler": "^4.95.0"
+    "wrangler": "^4.97.0"
   },
   "overrides": {
     "rimraf": "^6.1.3",
