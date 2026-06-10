@@ -22,4 +22,4 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Run React Doctor
-        run: pnpm run doctor . --blocking none
+        run: pnpm run doctor . --fail-on none --annotations

@@ -1,10 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 
+/**
+ * Custom hook to detect when an element enters the viewport.
+ *
+ * @param threshold - The percentage of the element that must be visible to trigger.
+ * @returns An object containing the element ref and its visibility state.
+ */
 const useIntersectionObserver = (threshold = 0.1) => {
   const elementRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
-  // react-doctor-disable-next-line no-adjust-state-on-prop-change
   useEffect(() => {
     const element = elementRef.current;
 
@@ -22,6 +27,7 @@ const useIntersectionObserver = (threshold = 0.1) => {
     );
 
     if (element) {
+      /* eslint-disable-next-line react-doctor/no-adjust-state-on-prop-change */
       observer.observe(element);
     }
 

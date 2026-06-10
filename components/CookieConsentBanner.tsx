@@ -34,7 +34,7 @@ const CookieConsentBanner: React.FC = () => {
           Analytics continua ativo por interesse legítimo {'—'}{' '}
           <a
             href="/politica-privacidade#cookies"
-            className="underline underline-offset-2 hover:text-brand-yellow transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-brand-dark rounded px-1 -mx-1"
+            className="underline underline-offset-2 hover:text-brand-yellow transition-colors"
           >
             saiba como se opor em nossa Política de Privacidade
           </a>
@@ -44,14 +44,14 @@ const CookieConsentBanner: React.FC = () => {
           <button
             type="button"
             onClick={handleDecline}
-            className="px-4 py-2 text-sm font-medium text-zinc-300 border border-white/20 rounded-lg hover:border-white/40 hover:text-white hover:-translate-y-0.5 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-brand-dark"
+            className="px-4 py-2 text-sm font-medium text-zinc-300 border border-white/20 rounded-lg hover:border-white/40 hover:text-white transition-colors"
           >
             Recusar
           </button>
           <button
             type="button"
             onClick={handleAccept}
-            className="px-4 py-2 text-sm font-medium text-zinc-300 border border-white/20 rounded-lg hover:border-white/40 hover:text-white hover:-translate-y-0.5 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-brand-dark"
+            className="px-4 py-2 text-sm font-medium text-zinc-300 border border-white/20 rounded-lg hover:border-white/40 hover:text-white transition-colors"
           >
             Aceitar
           </button>
