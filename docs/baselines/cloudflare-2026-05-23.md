@@ -119,7 +119,7 @@ Cache Analytics **não disponível** — requer plano pago (Pro ou superior). O 
 |---|---|---|
 | Cache HTML (home) | DYNAMIC | DYNAMIC (aceitável para SPA — sem mudança planejada) |
 | Cache redirect `/lollapalooza` | DYNAMIC | HIT (via cache rule) |
-| Cache vídeo hero (18,3 MB) | DYNAMIC | HIT com TTL 1 ano (cache rule em `cloudflare-cache-rules.md`) |
+| Cache vídeo hero (18,3 MB) | DYNAMIC | HIT com TTL 1 ano (cache rule em `docs/ops/cloudflare-cache-rules.md`) |
 | Speed Brain | ATIVO | ATIVO — avaliar impacto via RUM |
 | Cache Hit Ratio geral | ~0% (estimado) | >60% (meta da sprint) |
 
@@ -138,7 +138,7 @@ A sprint será declarada bem-sucedida quando, na medição pós-mudanças:
 
 ## 7. Próximas issues da sprint (referência)
 
-- Implementar cache rule para vídeos: `cloudflare-cache-rules.md` já documenta a regra.
+- Implementar cache rule para vídeos: `docs/ops/cloudflare-cache-rules.md` já documenta a regra.
 - Avaliar cache rule para redirect `/lollapalooza → /lollapalooza/`.
 - Após mudanças, repetir os curls e preencher seção de comparação abaixo.
 

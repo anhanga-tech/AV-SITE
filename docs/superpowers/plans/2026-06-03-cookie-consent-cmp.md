@@ -732,7 +732,7 @@ git commit -m "feat(cmp): add CookieConsentBanner and Gerenciar cookies links"
 
 ### Files
 - Create: `tests/e2e/cookie-consent.spec.ts`
-- Modify: `docs/ripd-legitimo-interesse.md`
+- Modify: `docs/compliance/ripd-legitimo-interesse.md`
 
 ---
 
@@ -936,10 +936,10 @@ Esperado: todos os testes passam. Se algum falhar por timing, ajustar `waitForTi
 
 ---
 
-### Task 11: Atualizar `docs/ripd-legitimo-interesse.md`
+### Task 11: Atualizar `docs/compliance/ripd-legitimo-interesse.md`
 
 **Files:**
-- Modify: `docs/ripd-legitimo-interesse.md`
+- Modify: `docs/compliance/ripd-legitimo-interesse.md`
 
 - [ ] **11.1 Atualizar §3.5 — tabela de riscos da Atividade 2**
 
@@ -983,7 +983,7 @@ Esperado: zero falhas.
 - [ ] **11.5 Commit final**
 
 ```bash
-git add tests/e2e/cookie-consent.spec.ts docs/ripd-legitimo-interesse.md
+git add tests/e2e/cookie-consent.spec.ts docs/compliance/ripd-legitimo-interesse.md
 git commit -m "feat(cmp): add E2E tests and update RIPD v1.2 (issue #782)"
 ```
 

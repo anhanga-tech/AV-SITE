@@ -6,21 +6,17 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const POSITIONING_CONTENT_PATHS = [
-  'PLANO-SEO-2026.md',
-  'QWEN.md',
   'TODO.MD',
   'api/markdown.ts',
   'components',
   'content/blog',
-  'competitive-brief-conteudo.md',
   'data/blogManifest.ts',
-  'docs',
+  'docs/seo',
+  'docs/standards',
   'index.html',
   'pages',
   'public/llms.txt',
   'public/sitemap.xml',
-  'seo-audit-anhanga-viagens.md',
-  'seo-audit-completo-marco-2026.md',
 ];
 const BLOCKED_POSITIONING_PATTERN = /\bboutique\b/i;
 
