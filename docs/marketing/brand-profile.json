@@ -1,0 +1,123 @@
+{
+  "schema_version": "1.0",
+  "brand_name": "Anhangá Viagens",
+  "website_url": "https://www.anhanga.tur.br",
+  "extracted_at": "2026-06-08T00:00:00Z",
+  "voice": {
+    "formal_casual": 7,
+    "rational_emotional": 7,
+    "playful_serious": 6,
+    "bold_subtle": 7,
+    "traditional_innovative": 4,
+    "expert_accessible": 7,
+    "descriptors": ["caloroso", "confiante", "humano"],
+    "confidence_notes": {
+      "formal_casual": "High — consistent 'você/seu' throughout, short punchy CTA copy",
+      "rational_emotional": "High — 'colecionar histórias', testimonials, 'paixão por pessoas'",
+      "bold_subtle": "High — 'zero estresse', 'sem pacote pronto', assertive negations used as differentiators",
+      "traditional_innovative": "Medium — ABAV/Cadastur credentials + artisanal language pull toward traditional; personalized-from-scratch positioning nudges toward innovative"
+    }
+  },
+  "colors": {
+    "primary": "#0ea5e9",
+    "secondary": ["#0056D2", "#003B8E", "#FFD600"],
+    "forbidden": [],
+    "background": "#ffffff",
+    "background_warm": "#fffdf5",
+    "text": "#0f172a",
+    "cta_action": "#0ea5e9",
+    "cta_action_hover": "#0284c7",
+    "accent_yellow": "#FFD600",
+    "accent_yellow_hover": "#E5C000",
+    "whatsapp": "#25D366"
+  },
+  "typography": {
+    "heading_font": "Poppins",
+    "body_font": "Poppins",
+    "editorial_font": "Merriweather",
+    "heading_weight": "900",
+    "body_weight": "400",
+    "pairing_descriptor": "Poppins 900 for impactful display headings, Poppins 400 for body — clean, modern humanist sans-serif. Merriweather used only for blog editorial prose."
+  },
+  "imagery": {
+    "style": "professional photography",
+    "subjects": ["travel destinations", "landscapes", "people enjoying travel", "family experiences"],
+    "composition": "Full-bleed hero shots with warm, luminous tones. Covers fit (width 1280×720). Premium destination imagery — beaches, cities, nature.",
+    "forbidden": ["generic stock office photos", "cheesy tourist clichés", "AI-generated faces", "low-resolution imagery", "crowded busy compositions"]
+  },
+  "aesthetic": {
+    "mood_keywords": ["personalizado", "sem estresse", "humano", "premium acessível", "confiança", "aventura"],
+    "texture": "minimal",
+    "negative_space": "moderate",
+    "shadow_style": "hard shadows (4px offset, #0f172a) for interactive elements; soft float shadows for cards",
+    "motion": "smooth expo ease-out transitions; subtle float animations on hero elements"
+  },
+  "brand_values": [
+    "atendimento humano e consultivo",
+    "roteiros 100% personalizados",
+    "transparência e confiança",
+    "suporte completo do início ao fim",
+    "curadoria de experiências premium"
+  ],
+  "brand_differentiators": [
+    "Sem pacote pronto — cada roteiro começa do zero",
+    "Consultor humano fixo do início ao fim (não chatbot)",
+    "Suporte 24/7 via WhatsApp durante a viagem",
+    "Nota 5.0 Google, credenciada Cadastur e ABAV"
+  ],
+  "target_audience": {
+    "age_range": "28-60",
+    "location": "Grande São Paulo (foco principal) — atendimento remoto para todo o Brasil",
+    "geography_note": "Sede em São Paulo-SP. Atendimento 100% remoto, clientes de todo o Brasil. Prioridade geográfica: Grande São Paulo.",
+    "profession": "Famílias urbanas, casais, profissionais sem tempo, viajantes frequentes",
+    "pain_points": [
+      "pacotes genéricos que não se adaptam ao perfil",
+      "falta de suporte durante a viagem",
+      "burocracia digital e formulários impessoais",
+      "desconfiança com agências grandes e automatizadas",
+      "falta de tempo para pesquisar e comparar"
+    ],
+    "aspirations": [
+      "viajar bem sem preocupações logísticas",
+      "experiências únicas e memoráveis",
+      "sentir-se cuidado por um especialista de confiança",
+      "contar histórias que valem a pena"
+    ]
+  },
+  "cta_language": {
+    "primary_ctas": [
+      "Quero meu orçamento →",
+      "Planejar Viagem",
+      "Falar com um consultor",
+      "Começar Planejamento"
+    ],
+    "tone": "Direct, action-oriented, low-friction ('Sem compromisso', 'Gratuito', 'Sem taxa')",
+    "trust_signals": [
+      "Resposta em até 2h (dias úteis)",
+      "Roteiros Exclusivos",
+      "Suporte 24/7",
+      "Nota 5.0 Google",
+      "Membro ABAV",
+      "Cadastur 37.036.732/0001-41"
+    ]
+  },
+  "social_proof": {
+    "review_score": "4.9/5 (homepage) / 5.0 (consultoria page)",
+    "testimonial_example": "A Anhangá cuidou de cada detalhe. Só precisei aparecer no aeroporto. — R.M., São Paulo, Viagem para Portugal 2025"
+  },
+  "key_destinations": [
+    "Orlando (EUA)",
+    "Beto Carrero World (SC)",
+    "Europa",
+    "Portugal",
+    "América do Norte",
+    "Caribe",
+    "América do Sul",
+    "Ásia",
+    "Cruzeiros pelo Brasil",
+    "Lollapalooza Brasil"
+  ],
+  "screenshots": null,
+  "business_context": "Agência de viagens de lazer. Sede em São Paulo-SP, operação remota, atende clientes de todo o Brasil com foco na Grande São Paulo.",
+  "_extraction_notes": "Full extraction from homepage, /sobre, and /consultoria-de-viagem. CSS tokens confirmed from tailwind.config.mjs in repository. All voice axes rated High confidence except traditional_innovative (Medium). Site is React/Vite SPA — static HTML prerendered via MemoryRouter; content extraction was complete."
+}

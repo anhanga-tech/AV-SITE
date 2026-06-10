@@ -42,3 +42,11 @@ playwright/.cache/
 .worktrees/
 .codex/
 .claude/github-token
+
+# Marketing reports, audits & campaigns (dados sensíveis de negócio — apenas local)
+GOOGLE-ADS-REPORT.md
+campaign-brief.md
+competitive-brief*.md
+seo-audit-*.md
+*-ads-report.md
+*-campaign-brief.md

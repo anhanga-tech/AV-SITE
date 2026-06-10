@@ -4,7 +4,7 @@
 **Issue:** [#782](https://github.com/felipewilliam2/AV-SITE/issues/782)
 **Status:** Aprovado — aguardando implementação
 **Base legal:** LGPD Art. 7º, I (consentimento — marketing) e Art. 7º, IX (legítimo interesse — analytics/UTM)
-**Referência regulatória:** Resolução CD/ANPD nº 15/2024; RIPD v1.1 (`docs/ripd-legitimo-interesse.md`)
+**Referência regulatória:** Resolução CD/ANPD nº 15/2024; RIPD v1.1 (`docs/compliance/ripd-legitimo-interesse.md`)
 
 ---
 
@@ -62,7 +62,7 @@ O RIPD v1.1 lista como pendência da issue #782 "bloquear `initializeTracking()`
 | `App.tsx` | `<CookieConsentBanner />` adicionado em `AppLayout` ao nível de `<ClientFeatures />` (não dentro de `MainSiteShell`), para que renderize em todas as páginas incluindo landing pages. |
 | `components/Footer.tsx` | Link "Gerenciar cookies" que dispara `anhanga:reset-consent`. |
 | Footers de landing pages | Mesmo link "Gerenciar cookies" — todas as landings com footer próprio. |
-| `docs/ripd-legitimo-interesse.md` | Atualizar Atividade 2 conforme descrito na Seção 1. |
+| `docs/compliance/ripd-legitimo-interesse.md` | Atualizar Atividade 2 conforme descrito na Seção 1. |
 
 ---
 

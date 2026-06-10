@@ -8,7 +8,7 @@ verification shows drift.
 Related evidence:
 
 - Baseline measurements: [`docs/baselines/cloudflare-2026-05-23.md`](./baselines/cloudflare-2026-05-23.md)
-- Media cache rule details: [`docs/cloudflare-cache-rules.md`](./cloudflare-cache-rules.md)
+- Media cache rule details: [`docs/ops/cloudflare-cache-rules.md`](./cloudflare-cache-rules.md)
 - Cloudflare Security Insights export: [`docs/cloudflare-security-insights-20260510-2123.csv`](./cloudflare-security-insights-20260510-2123.csv)
 - Repo regression guard: [`tests/cloudflare-config.test.ts`](../tests/cloudflare-config.test.ts)
 
@@ -20,7 +20,7 @@ Related evidence:
 | Cloudflare Pages response headers | `public/_headers` | `curl -sSI https://www.anhanga.tur.br/` and `tests/cloudflare-config.test.ts` |
 | Path redirects that do not depend on hostname | `public/_redirects` | `tests/cloudflare-config.test.ts` |
 | Host-based redirects and cross-host canonicalization | Cloudflare dashboard Redirect Rules | `curl -sSI https://anhanga.tur.br/` and `curl -sSI http://www.anhanga.tur.br/` |
-| Media/video cache behavior | Cloudflare dashboard Cache Rules, documented in `docs/cloudflare-cache-rules.md` | Repeated GET requests with `Range` headers; do not rely on HEAD for cache population |
+| Media/video cache behavior | Cloudflare dashboard Cache Rules, documented in `docs/ops/cloudflare-cache-rules.md` | Repeated GET requests with `Range` headers; do not rely on HEAD for cache population |
 | Speed Brain and Web Analytics | Cloudflare dashboard | Response header `speculation-rules` and Cloudflare Web Analytics UI |
 | WAF and rate-limit rules | Cloudflare dashboard; paid-plan feature for this zone | Record as unavailable or unverified until the plan supports it |
 | SSL/TLS and HSTS decisions | Cloudflare dashboard plus `public/_headers` | `curl -sSI https://www.anhanga.tur.br/` and Cloudflare SSL/TLS UI |
@@ -99,7 +99,7 @@ as a broad dashboard rule unless the dashboard rule is narrower and documented h
 ### Media zone videos
 
 The media zone rule is dashboard-owned and documented in
-`docs/cloudflare-cache-rules.md`:
+`docs/ops/cloudflare-cache-rules.md`:
 
 ```text
 (http.host eq "media.anhanga.tur.br" and starts_with(http.request.uri.path, "/videos/"))
