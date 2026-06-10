@@ -115,16 +115,21 @@ function toPostMarkdown(meta: PostMeta, content: string): string {
 
 export async function writeBlogMarkdown(blogDir: string, outputFile: string): Promise<number> {
   const filenames = await readdir(blogDir);
-  const entries: Record<string, string> = {};
 
-  for (const filename of filenames.sort()) {
-    if (!filename.endsWith('.mdx') || filename.startsWith('_')) continue;
-    const filepath = path.join(blogDir, filename);
-    const rawContent = await readFile(filepath, 'utf8');
-    const { content } = matter(rawContent);
-    const meta = toPostMeta(filepath, rawContent);
-    entries[meta.slug] = toPostMarkdown(meta, content);
-  }
+  const posts = await Promise.all(
+    filenames
+      .filter((filename) => filename.endsWith('.mdx') && !filename.startsWith('_'))
+      .sort()
+      .map(async (filename) => {
+        const filepath = path.join(blogDir, filename);
+        const rawContent = await readFile(filepath, 'utf8');
+        const { content } = matter(rawContent);
+        const meta = toPostMeta(filepath, rawContent);
+        return [meta.slug, toPostMarkdown(meta, content)] as const;
+      })
+  );
+
+  const entries: Record<string, string> = Object.fromEntries(posts);
 
   await mkdir(path.dirname(outputFile), { recursive: true });
   await writeFile(
