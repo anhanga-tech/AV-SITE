@@ -33,3 +33,7 @@
 ## 2026-05-27 - Restoring Focus Visibility and Platform-Specific Branding
 **Learning:** The widespread use of `focus:outline-none` without `focus-visible` fallbacks is a critical accessibility barrier for keyboard users. Restoring visibility using brand-aligned colors (like `brand-cyan` for general links or platform-specific colors like `#25D366` for WhatsApp) maintains the design aesthetic while significantly improving WCAG compliance. For complex card layouts (like Polaroids), using a semantic `Link` container with a larger ring ensures the focus indicator follows the component's geometry without clipping.
 **Action:** Audit and replace `focus:outline-none` with `focus-visible:ring-4 focus-visible:ring-brand-cyan` (or context-specific colors). Ensure the focusable element is the container or a properly styled semantic element to provide clear visual feedback.
+
+## 2026-06-25 - Compliance Constraints on CMP Visual Hierarchy
+**Learning:** For Cookie Consent Banners (CMP), using a primary/secondary button pattern (e.g., one filled and one outlined) can be restricted by legal compliance tests or explicit E2E requirements that enforce "identical visual weight" to avoid nudging users toward acceptance. In this project, the `cookie-consent.spec.ts` strictly validates that both buttons share identical classes.
+**Action:** When enhancing CMP components, maintain identical styling for "Accept" and "Decline" buttons if weight-check tests are present. Focus on accessibility (focus rings) and micro-interactions (hover/active states) that apply equally to both.
