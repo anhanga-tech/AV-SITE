@@ -91,8 +91,8 @@ const BlogPost: React.FC = () => {
     return (
         <article className="min-h-screen bg-brand-surface">
             <Seo
-                title={post.title}
-                description={post.excerpt}
+                title={post.seoTitle ?? post.title}
+                description={post.seoDescription ?? post.excerpt}
                 image={post.image}
                 type="article"
                 canonical={canonicalUrl}

@@ -33,7 +33,7 @@ const LollapaloozaLanding: React.FC = () => {
   return (
     <>
       <Seo
-        title="Lollapalooza 2026 Esgotado | Lista de Espera 2027"
+        title="Lollapalooza 2027: Lista de Espera"
         description="A campanha do Lollapalooza 2026 foi encerrada com sucesso. Entre na lista de espera 2027 para receber prioridade quando os próximos pacotes abrirem."
         canonical="https://www.anhanga.tur.br/lollapalooza/"
         noHreflang
@@ -44,7 +44,6 @@ const LollapaloozaLanding: React.FC = () => {
         serviceUrl="https://www.anhanga.tur.br/lollapalooza/"
         serviceType="Lista de espera para pacote de viagem de festival"
         areaServed="São Paulo e Brasil"
-        keywords={['lista de espera Lollapalooza 2027', 'viagem para festival', 'hotel em São Paulo para evento']}
       />
       <BreadcrumbSchema
         items={[

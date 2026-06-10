@@ -75,8 +75,7 @@ export const OrganizationSchema: React.FC<OrganizationSchemaProps> = ({ aggregat
       "Turismo de Transformação",
       "Orlando & Disney",
       "Beto Carrero World"
-    ],
-    "blog": "https://www.anhanga.tur.br/blog/"
+    ]
   };
 
   if (aggregateRating) {

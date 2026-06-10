@@ -7,18 +7,16 @@ interface ServiceSchemaProps {
   serviceUrl: string;
   serviceType?: string;
   areaServed?: string;
-  keywords?: string[];
 }
 
-const EMPTY_KEYWORDS: string[] = [];
-
+// "keywords" não é propriedade válida de Service no schema.org (só CreativeWork/Event)
+// e gerava erro de validação em todas as páginas que usam este schema.
 export const ServiceSchema: React.FC<ServiceSchemaProps> = ({
   name,
   description,
   serviceUrl,
   serviceType,
   areaServed = 'Brasil',
-  keywords = EMPTY_KEYWORDS,
 }) => {
   const schemaData: Record<string, unknown> = {
     '@context': 'https://schema.org',
@@ -28,7 +26,6 @@ export const ServiceSchema: React.FC<ServiceSchemaProps> = ({
     url: serviceUrl,
     serviceType: serviceType || name,
     areaServed,
-    keywords: keywords.length ? keywords.join(', ') : undefined,
     provider: {
       '@type': 'TravelAgency',
       name: 'Anhangá Viagens',

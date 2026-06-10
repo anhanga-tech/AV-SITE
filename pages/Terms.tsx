@@ -2,9 +2,10 @@ import { Seo } from "@/components/Seo";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { BreadcrumbSchema } from "@/components/schemas/BreadcrumbSchema";
+import { WebPageSchema } from "@/components/schemas/WebPageSchema";
 
 const Terms = () => {
-    const metaDescription = "Termos e Condições de Uso da Anhangá Turismo: intermediação, simulações, responsabilidade e privacidade.";
+    const metaDescription = "Termos e Condições de Uso da Anhangá Turismo: como funciona a intermediação de viagens, simulações de orçamento, responsabilidades e privacidade.";
     const canonicalUrl = "https://www.anhanga.tur.br/termos-de-uso/";
     const lastUpdatedDisplay = "27 de fevereiro de 2026";
     const lastUpdatedIso = "2026-02-27";
@@ -262,20 +263,11 @@ const Terms = () => {
                 </article>
             </main>
 
-            {/* Structured Data — safe: JSON.stringify of a static object literal, no user input */}
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{
-                    __html: JSON.stringify({
-                        "@context": "https://schema.org",
-                        "@type": "WebPage",
-                        name: "Termos e Condições de Uso - Anhangá Turismo",
-                        url: canonicalUrl,
-                        description: metaDescription,
-                        dateModified: lastUpdatedIso,
-                        inLanguage: "pt-BR",
-                    }),
-                }}
+            <WebPageSchema
+                name="Termos e Condições de Uso - Anhangá Turismo"
+                url={canonicalUrl}
+                description={metaDescription}
+                dateModified={lastUpdatedIso}
             />
 
             <Footer />

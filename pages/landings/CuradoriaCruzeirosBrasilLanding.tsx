@@ -101,7 +101,6 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
         serviceUrl="https://www.anhanga.tur.br/curadoria-cruzeiros-brasil/"
         serviceType="Curadoria de Cruzeiros"
         areaServed="Brasil"
-        keywords={['cruzeiro no brasil', 'cruzeiro saindo de santos', 'como escolher cruzeiro', 'curadoria de cruzeiro', 'primeiro cruzeiro']}
       />
       <BreadcrumbSchema
         items={[

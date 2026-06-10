@@ -32,7 +32,7 @@ const MelhorIdadeLanding: React.FC = () => {
   return (
     <div className="bg-brand-surface min-h-screen font-sans">
       <Seo
-        title="Turismo 50+: Viagens Seguras e Personalizadas"
+        title="Turismo 50+: Viagens Personalizadas"
         description="Experiências de viagem exclusivas para o público 50+. Roteiros com conforto, segurança e atendimento humano. Planeje sua próxima aventura com a Anhangá."
         canonical="https://www.anhanga.tur.br/melhor-idade/"
         noHreflang
@@ -43,7 +43,6 @@ const MelhorIdadeLanding: React.FC = () => {
         serviceUrl="https://www.anhanga.tur.br/melhor-idade/"
         serviceType="Turismo para Melhor Idade"
         areaServed="Brasil"
-        keywords={['viagens 50+', 'turismo melhor idade', 'viagens seguras']}
       />
       <BreadcrumbSchema
         items={[
