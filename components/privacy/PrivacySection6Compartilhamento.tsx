@@ -10,10 +10,10 @@ export function PrivacySection6Compartilhamento() {
                     <li><strong>Meta Platforms, Inc.</strong> (publicidade, remarketing e customer match — Facebook/Instagram Ads)</li>
                     <li><strong>Stape OÜ</strong> (gerenciamento de tags server-side — empresa sediada na Estônia com servidor intermediário hospedado no Brasil, responsável pela anonimização de IP e dados de navegação antes do envio ao Google e Meta)</li>
                     <li><strong>Salesforce, Inc.</strong> (CRM de vendas — registro e gestão de leads comerciais)</li>
-                    <li><strong>Mautic</strong> (plataforma de automação de marketing e envio de comunicações por e-mail)</li>
                     <li><strong>ONER Travel</strong> (serviços especializados em turismo)</li>
                     <li><strong>Outros prestadores de serviços</strong> devidamente contratados</li>
                 </ul>
+                <p>A plataforma de automação de marketing (Mautic) é operada em infraestrutura própria da Anhangá Turismo; os dados nela tratados não são compartilhados com terceiros.</p>
 
                 <h3 className="font-merriweather font-semibold">6.2 Garantias Contratuais</h3>
                 <p>Todos os compartilhamentos são regidos por contratos específicos que asseguram:</p>
