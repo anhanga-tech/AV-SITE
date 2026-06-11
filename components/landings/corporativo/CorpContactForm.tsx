@@ -34,21 +34,7 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
             const empresa = state.form.empresa.trim() || 'Não informado';
             const cargo = state.form.cargo.trim() || 'Não informado';
 
-            const sfPromise = fetch('/api/submit-lead-sf', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    firstName: state.form.firstName,
-                    lastName: state.form.lastName,
-                    email: state.form.email,
-                    whatsapp: state.form.whatsapp,
-                    empresa: state.form.empresa,
-                    cargo: state.form.cargo,
-                    leadSource: 'Corporativo',
-                }),
-            }).catch(() => {});
-
-            const n8nPromise = submitLead(
+            const n8nResult = await submitLead(
                 {
                     firstName: state.form.firstName,
                     lastName: state.form.lastName,
@@ -57,10 +43,17 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
                     destination: 'Corporativo',
                     bantSummary: `Lead corporativo captado via landing /corporativo. Empresa: ${empresa}. Cargo: ${cargo}.`,
                 },
-                { eventId, pushDataLayerEvent: true, formType: 'corporate_lead' },
+                {
+                    eventId,
+                    pushDataLayerEvent: true,
+                    formType: 'corporate_lead',
+                    salesforce: {
+                        leadSource: 'Corporativo',
+                        empresa: state.form.empresa,
+                        cargo: state.form.cargo,
+                    },
+                },
             );
-
-            const [, n8nResult] = await Promise.all([sfPromise, n8nPromise]);
 
             if (n8nResult.ok) {
                 dispatch({ type: 'submit-success' });

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getTrackingDataObject, getWhatsAppLink } from '../utils/whatsapp';
+import { sendLeadToSalesforce } from '../utils/salesforce-lead';
 import type { LeadTracking, LeadUtms, SubmitLeadRequest } from '../types/leadCapture';
 import { cleanString, normalizeWhatsappNumber } from '../lib/lead-logic';
 
@@ -246,6 +247,29 @@ export function isPreparedSubmitLeadRequest(value: LeadDraftPartial | SubmitLead
 
 export type LeadFormType = 'ai_chatbot_lead' | 'event_lead' | 'corporate_lead';
 
+export interface SalesforceSubmitOptions {
+    leadSource: string;
+    empresa?: string;
+    cargo?: string;
+}
+
+function mirrorLeadToSalesforce(payload: SubmitLeadRequest, options: SalesforceSubmitOptions): void {
+    sendLeadToSalesforce({
+        firstName: payload.firstName,
+        lastName: payload.lastName,
+        email: payload.email,
+        whatsapp: payload.whatsapp,
+        empresa: options.empresa,
+        cargo: options.cargo,
+        leadSource: options.leadSource,
+        description: [
+            payload.bantSummary,
+            payload.destination ? `Destino: ${payload.destination}` : '',
+        ].filter(Boolean).join(' | '),
+        utms: payload.utms,
+    });
+}
+
 export function pushGenerateLeadDataLayerEvent(
     payload: SubmitLeadRequest,
     formType: LeadFormType = 'ai_chatbot_lead',
@@ -394,6 +418,7 @@ export function useLeadCapture() {
             eventId?: string;
             pushDataLayerEvent?: boolean;
             formType?: LeadFormType;
+            salesforce?: SalesforceSubmitOptions;
         } = {},
     ): Promise<SubmitLeadHookResult> => {
         setError(null);
@@ -413,6 +438,10 @@ export function useLeadCapture() {
                 error: validationError,
                 code: 'VALIDATION_ERROR',
             };
+        }
+
+        if (options.salesforce) {
+            mirrorLeadToSalesforce(payload, options.salesforce);
         }
 
         try {

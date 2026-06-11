@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { getTrackingDataObject } from '../utils/whatsapp';
+import { sendLeadToSalesforce } from '../utils/salesforce-lead';
 import type { LeadTracking, LeadUtms } from '../types/leadCapture';
 import type { SubmitQuizRequest, SubmitQuizResponse } from '../types/quiz';
 
@@ -104,18 +105,15 @@ export function useQuizCapture() {
         };
 
         // Fire-and-forget — SF failure never blocks the quiz result
-        void fetch('/api/submit-lead-sf', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                firstName: payload.firstName,
-                lastName: payload.lastName || '-',
-                email: payload.email,
-                whatsapp: payload.whatsapp,
-                leadSource: 'Web',
-                description: `${payload.bantSummary} | Newsletter: ${payload.newsletterOptIn ? 'Sim' : 'Não'}`,
-            }),
-        }).catch(() => undefined);
+        sendLeadToSalesforce({
+            firstName: payload.firstName,
+            lastName: payload.lastName || '-',
+            email: payload.email,
+            whatsapp: payload.whatsapp,
+            leadSource: 'Web',
+            description: `${payload.bantSummary} | Newsletter: ${payload.newsletterOptIn ? 'Sim' : 'Não'}`,
+            utms: latest.utms,
+        });
 
         try {
             const response = await fetch('/api/submit-quiz', {
