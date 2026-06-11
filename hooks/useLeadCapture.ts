@@ -256,9 +256,9 @@ export interface SalesforceSubmitOptions {
 function mirrorLeadToSalesforce(payload: SubmitLeadRequest, options: SalesforceSubmitOptions): void {
     sendLeadToSalesforce({
         firstName: payload.firstName,
-        lastName: payload.lastName || '-',
-        email: payload.email || undefined,
-        whatsapp: payload.whatsapp || undefined,
+        lastName: payload.lastName,
+        email: payload.email,
+        whatsapp: payload.whatsapp,
         empresa: options.empresa,
         cargo: options.cargo,
         leadSource: options.leadSource,
