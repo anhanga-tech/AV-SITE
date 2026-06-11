@@ -71,6 +71,26 @@ function collectTracking(): { tracking: LeadTracking; utms: SubmitContactRequest
     return { tracking, utms: extractUtms(tracking) };
 }
 
+function mirrorContactToSalesforce(
+    requestBody: SubmitContactRequest,
+    action: 'whatsapp' | 'callback',
+    options: ContactModalOptions,
+): void {
+    sendLeadToSalesforce({
+        firstName: requestBody.firstName,
+        lastName: requestBody.lastName || '-',
+        email: requestBody.email,
+        whatsapp: requestBody.whatsapp,
+        leadSource: 'Web',
+        description: [
+            `Contato rápido via site (${options.source ?? 'modal'}). Ação: ${action}.`,
+            options.destination ? `Destino de interesse: ${options.destination}.` : '',
+            `Newsletter: ${requestBody.emailOptIn ? 'Sim' : 'Não'}.`,
+        ].filter(Boolean).join(' '),
+        utms: requestBody.utms,
+    });
+}
+
 function pushContactDataLayerEvent(
     eventId: string,
     action: 'whatsapp' | 'callback',
@@ -153,19 +173,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 tracking,
             };
 
-            sendLeadToSalesforce({
-                firstName: requestBody.firstName,
-                lastName: requestBody.lastName || '-',
-                email: requestBody.email,
-                whatsapp: requestBody.whatsapp,
-                leadSource: 'Web',
-                description: [
-                    `Contato rápido via site (${options.source ?? 'modal'}). Ação: ${action}.`,
-                    options.destination ? `Destino de interesse: ${options.destination}.` : '',
-                    `Newsletter: ${fields.emailOptIn ? 'Sim' : 'Não'}.`,
-                ].filter(Boolean).join(' '),
-                utms,
-            });
+            mirrorContactToSalesforce(requestBody, action, options);
 
             try {
                 const response = await fetch('/api/submit-contact', {
