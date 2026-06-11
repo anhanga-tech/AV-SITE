@@ -2,8 +2,8 @@ import { buildCorsHeaders, createRequestId, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
 import { cleanString, normalizeWhatsappNumber, maskEmail } from '../lib/lead-logic';
 import { logger } from '../lib/logger';
-import { postWebToLead } from '../services/salesforce';
-import type { SalesforceLeadFields } from '../services/salesforce';
+import { postWebToLead, SF_UTM_KEYS } from '../services/salesforce';
+import type { SalesforceLeadFields, SfUtmKey } from '../services/salesforce';
 
 export const config = {
     runtime: 'edge',
@@ -37,6 +37,22 @@ function buildJsonResponse(
     });
 }
 
+const UTM_VALUE_MAX_LENGTH = 255;
+
+function parseUtms(raw: unknown): Partial<Record<SfUtmKey, string>> | undefined {
+    if (!raw || typeof raw !== 'object') return undefined;
+
+    const source = raw as Record<string, unknown>;
+    const utms: Partial<Record<SfUtmKey, string>> = {};
+
+    for (const key of SF_UTM_KEYS) {
+        const value = cleanString(source[key]).slice(0, UTM_VALUE_MAX_LENGTH);
+        if (value) utms[key] = value;
+    }
+
+    return Object.keys(utms).length > 0 ? utms : undefined;
+}
+
 function validateSfLeadBody(raw: unknown): { valid: true; data: SalesforceLeadFields } | { valid: false; error: string } {
     if (!raw || typeof raw !== 'object') {
         return { valid: false, error: 'Corpo da requisição inválido.' };
@@ -46,14 +62,14 @@ function validateSfLeadBody(raw: unknown): { valid: true; data: SalesforceLeadFi
 
     const firstName = cleanString(body.firstName);
     const lastName = cleanString(body.lastName);
-    const email = cleanString(body.email).toLowerCase();
+    const email = cleanString(body.email).toLowerCase() || undefined;
 
-    if (!firstName || !lastName || !email) {
+    if (!firstName || !lastName) {
         return { valid: false, error: 'Campos obrigatórios ausentes.' };
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (email && !emailRegex.test(email)) {
         return { valid: false, error: 'Email inválido.' };
     }
 
@@ -81,6 +97,7 @@ function validateSfLeadBody(raw: unknown): { valid: true; data: SalesforceLeadFi
             title,
             leadSource,
             description,
+            utms: parseUtms(body.utms),
         },
     };
 }
@@ -132,7 +149,7 @@ export default async function handler(request: Request): Promise<Response> {
     logger.info('SUBMIT_LEAD_SF', {
         requestId,
         stage: 'sending',
-        email: maskEmail(fields.email),
+        email: fields.email ? maskEmail(fields.email) : undefined,
         leadSource: fields.leadSource,
     });
 
