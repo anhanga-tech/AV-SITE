@@ -213,7 +213,10 @@ const AIChat: React.FC = memo(() => {
       bantSummary: payload.bantSummary,
       destination: payload.destination,
     });
-    const result = await submitLead(payload, { pushDataLayerEvent: false });
+    const result = await submitLead(payload, {
+      pushDataLayerEvent: false,
+      salesforce: { leadSource: 'Web' },
+    });
 
     if (!result.ok) {
       const errorResult = result as Extract<SubmitLeadHookResult, { ok: false }>;
