@@ -63,8 +63,8 @@ const ExclusaoDados = () => (
                                         <td className="py-2">Salesforce CRM</td>
                                     </tr>
                                     <tr>
-                                        <td className="py-2 pr-4">Histórico de conversas com nosso assistente de IA</td>
-                                        <td className="py-2">Servidores de processamento (Google Gemini)</td>
+                                        <td className="py-2 pr-4">Resumo da conversa com nosso assistente de IA e dados de qualificação da viagem registrados no atendimento</td>
+                                        <td className="py-2">Salesforce CRM (o processamento das mensagens pelo Google Gemini é transitório e não fica armazenado por nós)</td>
                                     </tr>
                                     <tr>
                                         <td className="py-2 pr-4">Contato e histórico de comunicações de marketing</td>
