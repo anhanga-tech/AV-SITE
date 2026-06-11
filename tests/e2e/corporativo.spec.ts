@@ -118,11 +118,13 @@ test.describe('Corporativo Landing Page', () => {
       firstName: 'Maria',
       lastName: 'Santos',
       email: 'maria@empresa.com.br',
-      whatsapp: '(11) 98831-4487',
+      whatsapp: '+5511988314487',
       empresa: 'Empresa Teste LTDA',
       cargo: 'Sócia',
       leadSource: 'Corporativo',
     });
+    expect(String((sfPayload as unknown as Record<string, unknown>).description)).toContain('Lead corporativo');
+    expect(sfPayload as unknown as Record<string, unknown>).toHaveProperty('utms');
 
     const formSubmissionEvent = await page.evaluate(() =>
       (window.dataLayer || []).find(e => e.event === 'form_submission')
