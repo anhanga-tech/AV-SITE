@@ -5,8 +5,8 @@ import { WebPageSchema } from "@/components/schemas/WebPageSchema";
 const Terms = () => {
     const metaDescription = "Termos e Condições de Uso da Anhangá Turismo: como funciona a intermediação de viagens, simulações de orçamento, responsabilidades e privacidade.";
     const canonicalUrl = "https://www.anhanga.tur.br/termos-de-uso/";
-    const lastUpdatedDisplay = "27 de fevereiro de 2026";
-    const lastUpdatedIso = "2026-02-27";
+    const lastUpdatedDisplay = "10 de junho de 2026";
+    const lastUpdatedIso = "2026-06-10";
 
     return (
         <>
@@ -100,7 +100,7 @@ const Terms = () => {
                                 <li>Adequação dos serviços às necessidades específicas do Usuário.</li>
                             </ul>
                             <h3 className="font-merriweather font-semibold">4.3 Limitação de Danos</h3>
-                            <p>Em hipótese alguma seremos responsáveis por danos diretos, indiretos, incidentais, especiais, consequenciais ou punitivos decorrentes do uso de nossa Plataforma.</p>
+                            <p>Na máxima extensão permitida pela legislação aplicável, em especial o Código de Defesa do Consumidor (Lei nº 8.078/1990), a Anhangá Turismo não se responsabiliza por danos decorrentes do uso indevido da Plataforma, de eventos fora de seu controle razoável ou de atos exclusivos de terceiros. Nada nestes Termos exclui ou limita direitos que a legislação assegura ao Usuário consumidor.</p>
                         </div>
                     </section>
 
@@ -117,7 +117,12 @@ const Terms = () => {
                             <h3 className="font-merriweather font-semibold">5.2 Processo de Reserva</h3>
                             <p>As reservas são processadas via plataformas especializadas (como ONER Travel), sistemas próprios dos Fornecedores ou canais oficiais de comercialização de terceiros.</p>
                             <h3 className="font-merriweather font-semibold">5.3 Confirmação e Contratação</h3>
-                            <p>A confirmação efetiva e contratação de serviços ocorre exclusivamente entre o Usuário e o Fornecedor final, não participando a Anhangá Turismo da relação contratual estabelecida.</p>
+                            <p>A contratação dos serviços turísticos poderá ocorrer de duas formas:</p>
+                            <ul className="list-disc pl-6 space-y-1">
+                                <li><strong>Venda direta:</strong> quando a Anhangá Turismo atua como vendedora ou emissora dos serviços e recebe o pagamento diretamente do Usuário;</li>
+                                <li><strong>Intermediação:</strong> quando a contratação se estabelece entre o Usuário e o Fornecedor final, inclusive nos casos em que o pagamento é realizado diretamente ao Fornecedor, por link de pagamento ou canal próprio deste.</li>
+                            </ul>
+                            <p>Em ambos os casos, a responsabilidade da Anhangá Turismo observará a legislação aplicável, em especial o Código de Defesa do Consumidor e a Lei Geral do Turismo (Lei nº 11.771/2008).</p>
                         </div>
                     </section>
 
@@ -132,6 +137,7 @@ const Terms = () => {
                             <h3 className="font-merriweather font-semibold">6.2 Bases Legais do Tratamento</h3>
                             <ul className="list-disc pl-6 space-y-1">
                                 <li>Consentimento livre, específico e informado;</li>
+                                <li>Execução de contrato ou procedimentos preliminares relacionados a contrato, a pedido do titular;</li>
                                 <li>Legítimo interesse para melhoria dos serviços;</li>
                                 <li>Cumprimento de obrigações legais e regulatórias.</li>
                             </ul>
@@ -220,7 +226,7 @@ const Terms = () => {
                             <h3 className="font-merriweather font-semibold">12.2 Mediação e Arbitragem</h3>
                             <p>Não sendo possível a composição, as partes poderão optar por mediação ou arbitragem, conforme regulamento aplicável.</p>
                             <h3 className="font-merriweather font-semibold">12.3 Legislação Aplicável e Foro</h3>
-                            <p>Estes Termos são regidos pela legislação brasileira. Fica eleito o Foro da Comarca da cidade de São Paulo, Estado de São Paulo, com exclusão de qualquer outro.</p>
+                            <p>Estes Termos são regidos pela legislação brasileira. Fica eleito o Foro da Comarca de São Paulo, Estado de São Paulo, ressalvado, nas relações de consumo, o direito do Usuário de optar pelo foro de seu próprio domicílio, nos termos do Código de Defesa do Consumidor.</p>
                         </div>
                     </section>
 

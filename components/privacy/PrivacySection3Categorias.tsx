@@ -36,6 +36,13 @@ export function PrivacySection3Categorias() {
                     <li>Dados coletados através de cookies e tecnologias similares</li>
                     <li>E-mail e telefone pseudonimizados por meio de hash unidirecional (SHA-256) para criação de públicos personalizados (customer match) no Google Ads e Meta Ads, exclusivamente para titulares que consentiram com comunicações de marketing</li>
                 </ul>
+                <h3 className="font-merriweather font-semibold">3.5 Dados de Crianças e Adolescentes</h3>
+                <p>
+                    Nossos serviços digitais não são direcionados a crianças. Informações sobre menores que integram o grupo de viajantes
+                    (como idades para cotação) devem ser fornecidas exclusivamente pelos pais ou responsáveis legais, são tratadas no melhor
+                    interesse da criança (Art. 14 da LGPD) e utilizadas apenas para a elaboração do orçamento e a prestação do serviço solicitado.
+                    Pais ou responsáveis podem solicitar acesso, correção ou exclusão desses dados pelos canais indicados na Seção 14.
+                </p>
             </div>
         </section>
     );

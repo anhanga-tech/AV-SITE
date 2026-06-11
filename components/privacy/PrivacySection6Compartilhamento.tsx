@@ -18,7 +18,7 @@ export function PrivacySection6Compartilhamento() {
                 <h3 className="font-merriweather font-semibold">6.2 Garantias Contratuais</h3>
                 <p>Todos os compartilhamentos são regidos por contratos específicos que asseguram:</p>
                 <ul className="list-disc pl-6 space-y-1">
-                    <li>Conformidade com a LGPD e GDPR</li>
+                    <li>Conformidade com a LGPD e demais normas aplicáveis de proteção de dados</li>
                     <li>Implementação de medidas de segurança adequadas</li>
                     <li>Limitação do uso dos dados às finalidades autorizadas</li>
                     <li>Responsabilização pelos danos causados</li>
