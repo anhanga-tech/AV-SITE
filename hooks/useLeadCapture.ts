@@ -270,6 +270,13 @@ function mirrorLeadToSalesforce(payload: SubmitLeadRequest, options: SalesforceS
     });
 }
 
+// Meta standard "Lead" carries no monetary value at capture time, but we send a
+// zero/BRL pair so the browser Pixel event matches the server-side CAPI Lead
+// (purchase-dispatch sends value 0 / BRL for lead_qualificado), keeping the two
+// events aligned for deduplication.
+const LEAD_EVENT_CURRENCY = 'BRL';
+const LEAD_EVENT_VALUE = 0;
+
 export function pushGenerateLeadDataLayerEvent(
     payload: SubmitLeadRequest,
     formType: LeadFormType = 'ai_chatbot_lead',
@@ -297,6 +304,20 @@ export function pushGenerateLeadDataLayerEvent(
         form_id: payload.event_id,
         destination: 'whatsapp',
         page_location: window.location.href,
+    });
+
+    // 3. Meta standard "Lead" event. Kept separate from the custom generate_lead/
+    //    form_submission events so a GTM Meta Pixel tag can map 1:1 to the standard
+    //    Lead. `event_id`/`eventID` is the dedup key shared with the server-side
+    //    CAPI Lead (api/purchase-dispatch). Meta's Pixel reads `eventID`; we expose
+    //    both spellings so a GTM Data Layer Variable can bind to either.
+    window.dataLayer.push({
+        event: 'meta_lead',
+        event_id: payload.event_id,
+        eventID: payload.event_id,
+        currency: LEAD_EVENT_CURRENCY,
+        value: LEAD_EVENT_VALUE,
+        destination: payload.destination,
     });
 }
 

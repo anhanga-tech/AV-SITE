@@ -5,6 +5,7 @@ import {
     extractUtms,
     buildLeadWhatsAppMessage,
     createLeadEventId,
+    pushGenerateLeadDataLayerEvent,
     type LeadDraft,
 } from '../hooks/useLeadCapture.ts';
 import type { SubmitLeadRequest } from '../types/leadCapture.ts';
@@ -196,4 +197,58 @@ test('createLeadEventId returns a non-empty string prefixed with lead_', () => {
 test('createLeadEventId generates unique IDs on successive calls', () => {
     const ids = new Set(Array.from({ length: 10 }, () => createLeadEventId()));
     assert.equal(ids.size, 10, 'each call should produce a unique ID');
+});
+
+// ─── pushGenerateLeadDataLayerEvent ──────────────────────────────────────────
+
+type DataLayerEvent = Record<string, unknown>;
+
+function withMockedWindow(run: (dataLayer: DataLayerEvent[]) => void): void {
+    const dataLayer: DataLayerEvent[] = [];
+    const previousWindow = (globalThis as { window?: unknown }).window;
+
+    (globalThis as { window?: unknown }).window = {
+        dataLayer,
+        location: { href: 'https://www.anhanga.tur.br/' },
+    };
+
+    try {
+        run(dataLayer);
+    } finally {
+        if (previousWindow === undefined) {
+            delete (globalThis as { window?: unknown }).window;
+        } else {
+            (globalThis as { window?: unknown }).window = previousWindow;
+        }
+    }
+}
+
+test('pushGenerateLeadDataLayerEvent emits a standard Meta Lead event sharing the event_id', () => {
+    withMockedWindow((dataLayer) => {
+        pushGenerateLeadDataLayerEvent(validPayload({ event_id: 'lead_abc123', destination: 'Maldivas' }));
+
+        const metaLead = dataLayer.find((entry) => entry.event === 'meta_lead');
+        assert.ok(metaLead, 'a meta_lead event should be pushed');
+        assert.equal(metaLead?.event_id, 'lead_abc123');
+        assert.equal(metaLead?.eventID, 'lead_abc123', 'Meta Pixel reads eventID for dedup');
+        assert.equal(metaLead?.currency, 'BRL');
+        assert.equal(metaLead?.value, 0);
+        assert.equal(metaLead?.destination, 'Maldivas');
+    });
+});
+
+test('pushGenerateLeadDataLayerEvent keeps the custom generate_lead/form_submission events', () => {
+    withMockedWindow((dataLayer) => {
+        pushGenerateLeadDataLayerEvent(validPayload({ event_id: 'lead_abc123' }));
+
+        const eventNames = dataLayer.map((entry) => entry.event);
+        assert.deepEqual(eventNames, ['generate_lead', 'form_submission', 'meta_lead']);
+    });
+});
+
+test('pushGenerateLeadDataLayerEvent is a no-op without an event_id (CAPI dedup fail-safe)', () => {
+    withMockedWindow((dataLayer) => {
+        pushGenerateLeadDataLayerEvent(validPayload({ event_id: undefined }));
+        assert.equal(dataLayer.length, 0);
+    });
 });

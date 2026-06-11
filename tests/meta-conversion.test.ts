@@ -70,6 +70,8 @@ test('sendMetaConversion should build the expected Meta CAPI payload', async (t)
     phone: '+55 (11) 99999-8888',
     fbclid: 'fbclid-1',
     fbp: 'fb.1.1736366050.1234567890',
+    clientIpAddress: '203.0.113.42',
+    clientUserAgent: 'Mozilla/5.0 (Macintosh)',
     value: 1200,
     currency: 'USD',
     contentName: 'Rio de Janeiro',
@@ -104,6 +106,8 @@ test('sendMetaConversion should build the expected Meta CAPI payload', async (t)
     ph: [hashNormalized('5511999998888')],
     fbp: 'fb.1.1736366050.1234567890',
     fbc: 'fb.1.1736366050123.fbclid-1',
+    client_ip_address: '203.0.113.42',
+    client_user_agent: 'Mozilla/5.0 (Macintosh)',
   });
   assert.equal(requests[0]?.body?.test_event_code, 'TEST123');
 });

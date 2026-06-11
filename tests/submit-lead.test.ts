@@ -344,10 +344,33 @@ test('buildN8nLeadPayload should build the outbound webhook contract', () => {
         },
         meta: {
             receivedAt: payload.meta.receivedAt,
+            clientIpAddress: null,
+            clientUserAgent: null,
         },
     });
 
     assert.match(payload.meta.receivedAt, /^\d{4}-\d{2}-\d{2}T/);
+});
+
+test('buildN8nLeadPayload should propagate normalized request context for Meta CAPI', () => {
+    const payload = buildN8nLeadPayload(buildLeadPayloadFixture(), 'req-ctx-1', {
+        clientIpAddress: '  203.0.113.7  ',
+        clientUserAgent: 'Mozilla/5.0 (iPhone)',
+    });
+
+    assert.equal(payload.meta.clientIpAddress, '203.0.113.7');
+    assert.equal(payload.meta.clientUserAgent, 'Mozilla/5.0 (iPhone)');
+    assert.equal(payload.lead.eventId, 'lead_test_123abc');
+});
+
+test('buildN8nLeadPayload should collapse blank request context to null', () => {
+    const payload = buildN8nLeadPayload(buildLeadPayloadFixture(), 'req-ctx-2', {
+        clientIpAddress: '   ',
+        clientUserAgent: undefined,
+    });
+
+    assert.equal(payload.meta.clientIpAddress, null);
+    assert.equal(payload.meta.clientUserAgent, null);
 });
 
 test('sendLeadToN8n should send request metadata and webhook auth headers', async (t) => {
@@ -640,6 +663,34 @@ test('submit-lead should deliver the validated payload to n8n and return a neutr
         extras: {},
     });
     assert.match(String((request.body?.meta as Record<string, unknown> | undefined)?.receivedAt), /^\d{4}-\d{2}-\d{2}T/);
+});
+
+test('submit-lead should propagate client IP and user agent to the n8n payload', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+        restoreEnv();
+    });
+
+    process.env.N8N_SUBMIT_LEAD_WEBHOOK_URL = 'https://n8n.example/webhook/submit-lead';
+    process.env.N8N_WEBHOOK_SECRET = 'secret-123';
+    process.env.N8N_WEBHOOK_TIMEOUT_MS = '200';
+
+    const calls: MockN8nRequest[] = [];
+    global.fetch = createMockN8nFetch(calls, new Response(JSON.stringify({ ok: true }), { status: 200 }));
+
+    const response = await handler(buildRequest(buildLeadPayloadFixture(), {
+        headers: {
+            'cf-connecting-ip': '203.0.113.42',
+            'user-agent': 'Mozilla/5.0 (Macintosh)',
+        },
+    }));
+
+    assert.equal(response.status, 201);
+    assert.equal(calls.length, 1);
+
+    const meta = calls[0]!.body?.meta as Record<string, unknown> | undefined;
+    assert.equal(meta?.clientIpAddress, '203.0.113.42');
+    assert.equal(meta?.clientUserAgent, 'Mozilla/5.0 (Macintosh)');
 });
 
 test('submit-lead should return N8N_WEBHOOK_ERROR when the webhook responds with a failure', async (t) => {
