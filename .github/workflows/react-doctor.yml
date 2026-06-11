@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6.0.3
-      # Pinado por SHA: o branch main da action quebrou em 10/06/2026
-      # ("error: too many arguments") — atualizar o pin só após validar upstream.
-      - uses: millionco/react-doctor@a64093c8a14255dc2108d834d56f4d21b9d9ac60
+      # Pinado na release v2.1.0 (esquema --diff, estável). O main migrou para
+      # --scope (PR #769), que ainda não chegou ao react-doctor@latest do npm;
+      # revisitar quando sair a release com --scope + latest correspondente.
+      - uses: millionco/react-doctor@547e1e4ecdb70315d81a91ec3605701d58616ee2 # v2.1.0
