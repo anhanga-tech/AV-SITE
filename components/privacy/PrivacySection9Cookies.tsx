@@ -11,15 +11,22 @@ export function PrivacySection9Cookies() {
                     <li>Coletar estatísticas de uso</li>
                     <li>Exibir publicidade direcionada</li>
                 </ul>
-                <h3 className="font-merriweather font-semibold">9.2 Categorias de Cookies</h3>
+                <h3 className="font-merriweather font-semibold">9.2 Categorias de Cookies e Bases Legais</h3>
                 <ul className="list-disc pl-6 space-y-1">
-                    <li><strong>Essenciais:</strong> Necessários para o funcionamento básico do website</li>
+                    <li><strong>Essenciais:</strong> Necessários para o funcionamento básico do website. Não dependem de consentimento</li>
                     <li><strong>Funcionais:</strong> Melhoram a funcionalidade e personalização</li>
-                    <li><strong>Analíticos:</strong> Coletam informações sobre o uso do website</li>
-                    <li><strong>Publicitários:</strong> Utilizados para publicidade direcionada</li>
+                    <li><strong>Analíticos:</strong> Coletam estatísticas de uso do website de forma agregada, com remoção de IP e anonimização via servidor intermediário (ver Seção 4.2). Tratados com base no <strong>legítimo interesse</strong> da controladora (Art. 7º, IX, LGPD), com direito de oposição garantido (ver Seção 9.4)</li>
+                    <li><strong>Publicitários e de marketing:</strong> Utilizados para publicidade direcionada, remarketing e automação de marketing. Carregados <strong>somente após o consentimento</strong> do titular, manifestado no aviso de cookies (Art. 7º, I, LGPD)</li>
                 </ul>
-                <h3 className="font-merriweather font-semibold">9.3 Gestão de Cookies</h3>
-                <p>O usuário pode gerenciar suas preferências de cookies através das configurações do navegador, podendo desativar ou restringir seu uso.</p>
+                <h3 className="font-merriweather font-semibold">9.3 Gestão e Revogação do Consentimento</h3>
+                <p>O titular pode alterar sua escolha a qualquer momento, de forma gratuita e facilitada:</p>
+                <ul className="list-disc pl-6 space-y-1">
+                    <li>Pelo link <strong>"Gerenciar cookies"</strong>, disponível no rodapé de todas as páginas do website, que reabre o aviso de preferências. Ao recusar, os cookies de marketing deixam de ser carregados imediatamente</li>
+                    <li>Pelas configurações do navegador, que permitem bloquear ou excluir cookies</li>
+                </ul>
+                <h3 className="font-merriweather font-semibold">9.4 Direito de Oposição ao Tratamento Analítico</h3>
+                <p>Nos termos do Art. 18, § 2º, da LGPD, o titular pode opor-se ao tratamento de dados analíticos realizado com base em legítimo interesse. Para exercer esse direito, envie solicitação ao nosso Encarregado pelo e-mail{" "}
+                    <a href="mailto:privacidade@anhanga.tur.br" className="text-primary underline">privacidade@anhanga.tur.br</a>, ou utilize as configurações de bloqueio de cookies do seu navegador, que impedem a coleta analítica neste website.</p>
             </div>
         </section>
     );

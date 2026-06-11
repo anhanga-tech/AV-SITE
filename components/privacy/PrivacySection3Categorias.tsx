@@ -10,7 +10,15 @@ export function PrivacySection3Categorias() {
                     <li>Número de telefone</li>
                     <li>Dados fornecidos voluntariamente através de formulários de contato</li>
                 </ul>
-                <h3 className="font-merriweather font-semibold">3.2 Dados Técnicos e de Navegação</h3>
+                <h3 className="font-merriweather font-semibold">3.2 Dados de Planejamento de Viagem (Assistente Virtual)</h3>
+                <p>Informações fornecidas voluntariamente durante conversas com nosso assistente virtual de viagens (chatbot com inteligência artificial):</p>
+                <ul className="list-disc pl-6 space-y-1">
+                    <li>Destino, datas e motivo da viagem</li>
+                    <li>Número de viajantes e perfil do grupo</li>
+                    <li>Faixa de orçamento estimada para a viagem</li>
+                    <li>Conteúdo das mensagens trocadas com o assistente</li>
+                </ul>
+                <h3 className="font-merriweather font-semibold">3.3 Dados Técnicos e de Navegação</h3>
                 <ul className="list-disc pl-6 space-y-1">
                     <li>Endereço de Protocolo de Internet (IP)</li>
                     <li>Informações de geolocalização</li>
@@ -20,7 +28,7 @@ export function PrivacySection3Categorias() {
                     <li>Páginas visitadas e tempo de permanência</li>
                     <li>Origem do tráfego e padrões de navegação</li>
                 </ul>
-                <h3 className="font-merriweather font-semibold">3.3 Dados de Marketing e Engajamento</h3>
+                <h3 className="font-merriweather font-semibold">3.4 Dados de Marketing e Engajamento</h3>
                 <ul className="list-disc pl-6 space-y-1">
                     <li>Interações com newsletters e comunicações promocionais</li>
                     <li>Histórico de cliques em anúncios e links</li>

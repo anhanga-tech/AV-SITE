@@ -4,7 +4,7 @@ import { WebPageSchema } from "@/components/schemas/WebPageSchema";
 
 const CANONICAL = "https://www.anhanga.tur.br/exclusao-de-dados/";
 const DESCRIPTION = "Instruções para solicitar a exclusão de dados pessoais junto à Anhangá Turismo, conforme a LGPD (Lei nº 13.709/2018).";
-const UPDATED = "03 de junho de 2026";
+const UPDATED = "10 de junho de 2026";
 
 const ExclusaoDados = () => (
     <>
@@ -60,11 +60,15 @@ const ExclusaoDados = () => (
                                 <tbody className="divide-y divide-border">
                                     <tr>
                                         <td className="py-2 pr-4">Nome, e-mail e telefone coletados pelo chatbot ou formulários</td>
-                                        <td className="py-2">HubSpot CRM</td>
+                                        <td className="py-2">Salesforce CRM</td>
                                     </tr>
                                     <tr>
                                         <td className="py-2 pr-4">Histórico de conversas com nosso assistente de IA</td>
                                         <td className="py-2">Servidores de processamento (Google Gemini)</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="py-2 pr-4">Contato e histórico de comunicações de marketing</td>
+                                        <td className="py-2">Mautic (automação de marketing)</td>
                                     </tr>
                                     <tr>
                                         <td className="py-2 pr-4">Dados de rastreamento (UTM, clique em anúncios) associados ao seu perfil</td>
@@ -119,7 +123,7 @@ const ExclusaoDados = () => (
                 </section>
             </article>
         </div>
-        <WebPageSchema name="Exclusão de Dados Pessoais - Anhangá Turismo" url={CANONICAL} description={DESCRIPTION} dateModified="2026-06-03" />
+        <WebPageSchema name="Exclusão de Dados Pessoais - Anhangá Turismo" url={CANONICAL} description={DESCRIPTION} dateModified="2026-06-10" />
     </>
 );
 

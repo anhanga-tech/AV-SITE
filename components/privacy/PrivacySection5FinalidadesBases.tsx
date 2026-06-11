@@ -24,7 +24,11 @@ export function PrivacySection5FinalidadesBases() {
                     <strong>Base Legal:</strong> Consentimento específico do titular (Art. 7º, I, LGPD)<br />
                     <strong>Salvaguarda:</strong> Os dados são transmitidos exclusivamente em formato de hash unidirecional (SHA-256) via servidor intermediário (Stape OÜ). As plataformas utilizam os dados apenas para correspondência de audiência e não para outros fins.</p>
 
-                <h3 className="font-merriweather font-semibold">5.6 Cumprimento de Obrigações Legais</h3>
+                <h3 className="font-merriweather font-semibold">5.6 Assistente Virtual de Viagens (Inteligência Artificial)</h3>
+                <p><strong>Finalidade:</strong> Prestar atendimento automatizado, entender as necessidades da viagem e preparar orçamentos personalizados a pedido do titular. As mensagens trocadas com o assistente são processadas pelo serviço Google Gemini (Google LLC) e as informações de planejamento da viagem podem ser registradas em nosso CRM para continuidade do atendimento por um consultor humano<br />
+                    <strong>Base Legal:</strong> Procedimentos preliminares relacionados a contrato, a pedido do titular (Art. 7º, V, LGPD)</p>
+
+                <h3 className="font-merriweather font-semibold">5.7 Cumprimento de Obrigações Legais</h3>
                 <p><strong>Finalidade:</strong> Atendimento a determinações legais, regulamentares ou de autoridades competentes<br />
                     <strong>Base Legal:</strong> Cumprimento de obrigação legal ou regulatória</p>
             </div>

@@ -1,6 +1,4 @@
 import { Seo } from "@/components/Seo";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { BreadcrumbSchema } from "@/components/schemas/BreadcrumbSchema";
 import { WebPageSchema } from "@/components/schemas/WebPageSchema";
 
@@ -11,7 +9,7 @@ const Terms = () => {
     const lastUpdatedIso = "2026-02-27";
 
     return (
-        <div className="min-h-screen bg-background text-foreground">
+        <>
             <Seo
                 title="Termos e Condições de Uso | Anhangá Viagens"
                 description={metaDescription}
@@ -21,8 +19,7 @@ const Terms = () => {
                 { name: "Home", item: "https://www.anhanga.tur.br/" },
                 { name: "Termos de Uso", item: canonicalUrl }
             ]} />
-            <Header />
-            <main className="container mx-auto px-4 py-10">
+            <div className="container mx-auto px-4 py-10">
                 <header className="mb-8 text-center">
                     <h1 className="text-3xl md:text-4xl font-merriweather font-bold">Termos e Condições de Uso</h1>
                     <p className="mt-2 text-sm md:text-base text-muted-foreground font-inter">
@@ -261,7 +258,7 @@ const Terms = () => {
                         </p>
                     </section>
                 </article>
-            </main>
+            </div>
 
             <WebPageSchema
                 name="Termos e Condições de Uso - Anhangá Turismo"
@@ -269,9 +266,7 @@ const Terms = () => {
                 description={metaDescription}
                 dateModified={lastUpdatedIso}
             />
-
-            <Footer />
-        </div>
+        </>
     );
 };
 

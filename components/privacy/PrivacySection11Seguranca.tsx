@@ -13,8 +13,8 @@ export function PrivacySection11Seguranca() {
                 <h3 className="font-merriweather font-semibold">11.2 Incidentes de Segurança</h3>
                 <p>Em caso de incidente de segurança que possa acarretar risco ou dano relevante aos titulares, a controladora:</p>
                 <ul className="list-disc pl-6 space-y-1">
-                    <li>Comunicará a ANPD no prazo de 72 (setenta e duas) horas</li>
-                    <li>Informará os titulares afetados quando aplicável</li>
+                    <li>Comunicará a ANPD no prazo de 3 (três) dias úteis, conforme a Resolução CD/ANPD nº 15/2024</li>
+                    <li>Informará os titulares afetados no mesmo prazo, quando aplicável</li>
                     <li>Implementará medidas corretivas imediatas</li>
                 </ul>
             </div>

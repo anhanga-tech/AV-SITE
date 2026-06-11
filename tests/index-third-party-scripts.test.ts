@@ -88,11 +88,9 @@ test('loadMautic tem gate de consentimento LGPD', () => {
   assert.match(body, /_consentChoice\s*!==\s*'marketing'/, 'loadMautic deve ter gate de consentimento');
 });
 
-test('loadHubspot tem gate de consentimento LGPD', () => {
-  const loadHubspotMatch = indexHtml.match(/var loadHubspot\s*=\s*function\s*\(\)\s*\{([\s\S]*?)};/);
-  assert.ok(loadHubspotMatch, 'loadHubspot deve estar definida');
-  const body = loadHubspotMatch[1];
-  assert.match(body, /_consentChoice\s*!==\s*'marketing'/, 'loadHubspot deve ter gate de consentimento');
+test('index.html não carrega scripts do HubSpot (ferramenta descontinuada)', () => {
+  assert.doesNotMatch(indexHtml, /hs-scripts\.com/i, 'script do HubSpot não deve ser injetado');
+  assert.doesNotMatch(indexHtml, /loadHubspot/i, 'loader do HubSpot não deve existir');
 });
 
 test('index.html tem listener anhanga:marketing-consent', () => {
