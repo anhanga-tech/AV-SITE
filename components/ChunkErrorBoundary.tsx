@@ -61,6 +61,7 @@ class ChunkErrorBoundary extends React.Component<Props, State> {
             Ocorreu um erro ao carregar esta página.
           </p>
           <button
+            type="button"
             onClick={() => window.location.reload()}
             className="px-6 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors"
           >
