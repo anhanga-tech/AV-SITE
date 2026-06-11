@@ -281,7 +281,7 @@ export function pushGenerateLeadDataLayerEvent(
     payload: SubmitLeadRequest,
     formType: LeadFormType = 'ai_chatbot_lead',
 ): void {
-    if (typeof window === 'undefined' || !window.dataLayer || !payload.event_id) {
+    if (typeof window === 'undefined' || !window.dataLayer) {
         return;
     }
 
@@ -306,19 +306,23 @@ export function pushGenerateLeadDataLayerEvent(
         page_location: window.location.href,
     });
 
-    // 3. Meta standard "Lead" event. Kept separate from the custom generate_lead/
-    //    form_submission events so a GTM Meta Pixel tag can map 1:1 to the standard
-    //    Lead. `event_id`/`eventID` is the dedup key shared with the server-side
-    //    CAPI Lead (api/purchase-dispatch). Meta's Pixel reads `eventID`; we expose
-    //    both spellings so a GTM Data Layer Variable can bind to either.
-    window.dataLayer.push({
-        event: 'meta_lead',
-        event_id: payload.event_id,
-        eventID: payload.event_id,
-        currency: LEAD_EVENT_CURRENCY,
-        value: LEAD_EVENT_VALUE,
-        destination: payload.destination,
-    });
+    // 3. Meta standard "Lead" event. Gated on event_id because it is the dedup key
+    //    shared with the server-side CAPI Lead (api/purchase-dispatch) — firing it
+    //    without one would risk double-counting. Kept separate from the custom
+    //    generate_lead/form_submission events (which still fire for GA4/Ads even
+    //    without an event_id) so a GTM Meta Pixel tag can map 1:1 to the standard
+    //    Lead. Meta's Pixel reads `eventID`; we expose both spellings so a GTM Data
+    //    Layer Variable can bind to either.
+    if (payload.event_id) {
+        window.dataLayer.push({
+            event: 'meta_lead',
+            event_id: payload.event_id,
+            eventID: payload.event_id,
+            currency: LEAD_EVENT_CURRENCY,
+            value: LEAD_EVENT_VALUE,
+            destination: payload.destination,
+        });
+    }
 }
 
 function getSubmitLeadValidationError(payload: SubmitLeadRequest): string | null {

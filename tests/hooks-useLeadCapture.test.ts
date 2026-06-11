@@ -246,9 +246,12 @@ test('pushGenerateLeadDataLayerEvent keeps the custom generate_lead/form_submiss
     });
 });
 
-test('pushGenerateLeadDataLayerEvent is a no-op without an event_id (CAPI dedup fail-safe)', () => {
+test('pushGenerateLeadDataLayerEvent omits meta_lead but keeps custom events without an event_id', () => {
     withMockedWindow((dataLayer) => {
         pushGenerateLeadDataLayerEvent(validPayload({ event_id: undefined }));
-        assert.equal(dataLayer.length, 0);
+
+        const eventNames = dataLayer.map((entry) => entry.event);
+        assert.deepEqual(eventNames, ['generate_lead', 'form_submission']);
+        assert.ok(!eventNames.includes('meta_lead'), 'meta_lead should be omitted without event_id (CAPI dedup fail-safe)');
     });
 });
