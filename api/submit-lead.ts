@@ -66,6 +66,13 @@ function buildJsonResponse(
     });
 }
 
+// getClientIP falls back to 'unknown' when no edge header is present. Meta CAPI
+// expects a real address or nothing, so collapse the sentinel to null.
+function resolveClientIpAddress(request: Request): string | null {
+    const ip = getClientIP(request);
+    return ip && ip !== 'unknown' ? ip : null;
+}
+
 function getSubmitLeadConfig(): SubmitLeadConfig | null {
     const webhookUrl = process.env.N8N_SUBMIT_LEAD_WEBHOOK_URL?.trim() || '';
     const webhookSecret = process.env.N8N_WEBHOOK_SECRET?.trim() || '';
@@ -270,7 +277,10 @@ export default async function handler(request: Request): Promise<Response> {
             config.webhookUrl,
             config.webhookSecret,
             requestId,
-            buildN8nLeadPayload(payload, requestId),
+            buildN8nLeadPayload(payload, requestId, {
+                clientIpAddress: resolveClientIpAddress(request),
+                clientUserAgent: request.headers.get('user-agent'),
+            }),
         );
 
         const response = buildJsonResponse(

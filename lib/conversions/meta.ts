@@ -10,6 +10,8 @@ interface MetaConversionPayload {
   fbclid?: string;
   fbc?: string;
   fbp?: string;
+  clientIpAddress?: string;
+  clientUserAgent?: string;
   value?: number;
   currency?: string;
   contentName?: string;
@@ -78,6 +80,10 @@ async function buildMetaUserData(payload: MetaConversionPayload, nowMs: number):
   const phone = normalizePhone(payload.phone);
   const fbp = normalizeString(payload.fbp);
   const fbc = deriveFbc(payload, nowMs);
+  // client_ip_address / client_user_agent are sent raw (NOT hashed) per the Meta
+  // CAPI spec — Meta uses them for event matching, not as hashed identifiers.
+  const clientIpAddress = normalizeString(payload.clientIpAddress);
+  const clientUserAgent = normalizeString(payload.clientUserAgent);
 
   if (email) userData.em = [await sha256(email)];
   if (firstName) userData.fn = [await sha256(firstName)];
@@ -85,6 +91,8 @@ async function buildMetaUserData(payload: MetaConversionPayload, nowMs: number):
   if (phone) userData.ph = [await sha256(phone)];
   if (fbp) userData.fbp = fbp;
   if (fbc) userData.fbc = fbc;
+  if (clientIpAddress) userData.client_ip_address = clientIpAddress;
+  if (clientUserAgent) userData.client_user_agent = clientUserAgent;
 
   return userData;
 }

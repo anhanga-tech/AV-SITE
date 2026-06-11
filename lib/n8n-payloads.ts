@@ -22,6 +22,11 @@ export interface N8nLeadTracking {
     extras: Record<string, string>;
 }
 
+export interface N8nLeadRequestContext {
+    clientIpAddress?: string | null;
+    clientUserAgent?: string | null;
+}
+
 export interface N8nLeadPayload {
     requestId: string;
     source: 'submit-lead';
@@ -38,6 +43,10 @@ export interface N8nLeadPayload {
     tracking: N8nLeadTracking;
     meta: {
         receivedAt: string;
+        // Propagated to the server-side Meta CAPI Lead (action_source: "website")
+        // for event-match quality. Raw IP/UA are PII — keep them out of logs.
+        clientIpAddress: string | null;
+        clientUserAgent: string | null;
     };
 }
 
@@ -116,7 +125,17 @@ function buildLeadTracking(payload: SubmitLeadRequest): N8nLeadTracking {
     };
 }
 
-export function buildN8nLeadPayload(payload: SubmitLeadRequest, requestId: string): N8nLeadPayload {
+function normalizeContextValue(value: string | null | undefined): string | null {
+    if (typeof value !== 'string') return null;
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : null;
+}
+
+export function buildN8nLeadPayload(
+    payload: SubmitLeadRequest,
+    requestId: string,
+    context: N8nLeadRequestContext = {},
+): N8nLeadPayload {
     return {
         requestId,
         source: 'submit-lead',
@@ -133,6 +152,8 @@ export function buildN8nLeadPayload(payload: SubmitLeadRequest, requestId: strin
         tracking: buildLeadTracking(payload),
         meta: {
             receivedAt: new Date().toISOString(),
+            clientIpAddress: normalizeContextValue(context.clientIpAddress),
+            clientUserAgent: normalizeContextValue(context.clientUserAgent),
         },
     };
 }

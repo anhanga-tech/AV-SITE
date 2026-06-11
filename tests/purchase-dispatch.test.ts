@@ -177,6 +177,8 @@ test('purchase-dispatch should send GA4 and Meta purchase payloads', async (t) =
     gclid: 'gclid-123',
     fbclid: 'fbclid-123',
     fbp: 'fb.1.1736366050.1234567890',
+    clientIpAddress: '203.0.113.42',
+    clientUserAgent: 'Mozilla/5.0 (Macintosh)',
     timestamp: '2026-04-07T12:00:00.000Z',
   }, 'expected-secret'));
 
@@ -205,6 +207,9 @@ test('purchase-dispatch should send GA4 and Meta purchase payloads', async (t) =
   assert.equal(metaEvent?.event_name, 'Purchase');
   assert.equal(metaEvent?.event_id, '<deal-1>');
   assert.equal((metaEvent?.custom_data as Record<string, unknown>)?.value, 4200);
+  const metaUserData = metaEvent?.user_data as Record<string, unknown> | undefined;
+  assert.equal(metaUserData?.client_ip_address, '203.0.113.42');
+  assert.equal(metaUserData?.client_user_agent, 'Mozilla/5.0 (Macintosh)');
 });
 
 test('purchase-dispatch should dispatch lead_qualificado with attributionKey', async (t) => {
