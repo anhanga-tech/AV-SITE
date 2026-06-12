@@ -8,11 +8,11 @@ começar, honre as STOP conditions e atualize sua linha ao terminar.
 
 | Plan | Title | Priority | Effort | Depends on | Status |
 |------|-------|----------|--------|------------|--------|
-| 001 | Atualizar docs pós-migração (Cloudflare Pages + Salesforce) | P1 | S | — | TODO |
-| 002 | Remover lockfile npm fantasma + mesclar testes lead-logic | P2 | S | — | TODO |
-| 003 | Hardening: HTTPS nos webhooks n8n + validar ALLOWED_ORIGIN | P2 | S | — | TODO |
-| 004 | Links internos absolutos → navegação SPA nas landings | P2 | M | — | TODO |
-| 005 | Rejeitar markdown/URL em campos de destino do handoff IA | P3 | M | — | TODO |
+| 001 | Atualizar docs pós-migração (Cloudflare Pages + Salesforce) | P1 | S | — | DONE |
+| 002 | Remover lockfile npm fantasma + mesclar testes lead-logic | P2 | S | — | DONE |
+| 003 | Hardening: HTTPS nos webhooks n8n + validar ALLOWED_ORIGIN | P2 | S | — | DONE |
+| 004 | Links internos absolutos → navegação SPA nas landings | P2 | M | — | DONE |
+| 005 | Rejeitar markdown/URL em campos de destino do handoff IA | P3 | M | — | DONE |
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (com motivo) | REJECTED (com justificativa)
 
