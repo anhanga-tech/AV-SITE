@@ -30,7 +30,7 @@ test('cleanString should trim whitespace', () => {
 test('cleanString should truncate strings longer than 10000 chars', () => {
     const long = 'a'.repeat(10001);
     const result = cleanString(long);
-    assert.equal(result.length, 10000);
+    assert.equal(result, 'a'.repeat(10000));
 });
 
 test('cleanString should sanitize after truncating, not before (no XSS bypass)', () => {
@@ -140,13 +140,15 @@ test('normalizeNullable should return null for non-string input', () => {
 
 test('normalizeNullable should respect maxLength after truncation', () => {
     const result = normalizeNullable('a'.repeat(300), 255);
-    assert.equal(result?.length, 255);
+    assert.ok(result);
+    assert.equal(result, 'a'.repeat(255));
 });
 
 test('normalizeNullable should truncate strings longer than 10000 chars before sanitization', () => {
     const long = 'a'.repeat(10001);
     const result = normalizeNullable(long, 20000);
-    assert.equal(result?.length, 10000);
+    assert.ok(result);
+    assert.equal(result, 'a'.repeat(10000));
 });
 
 test('normalizeNullable should sanitize after truncating (no XSS bypass)', () => {
