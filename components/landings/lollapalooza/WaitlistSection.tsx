@@ -228,7 +228,7 @@ const WaitlistSection: React.FC = () => {
                   <span className="text-xs text-zinc-400 leading-snug group-hover:text-zinc-300 transition-colors">
                     Autorizo a Anhangá a me enviar novidades exclusivas conforme a{' '}
                     <a
-                      href="https://www.anhanga.tur.br/politica-privacidade/"
+                      href="/politica-privacidade/"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-white hover:text-anhanga-yellow underline underline-offset-4"

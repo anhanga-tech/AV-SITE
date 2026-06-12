@@ -322,8 +322,8 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
                 Escolha o navio e a cabine certos para você
               </div>
             </Link>
-            <a
-              href="https://www.anhanga.tur.br/"
+            <Link
+              to="/"
               className="block p-5 rounded-xl bg-brand-surface hover:bg-anhanga-blue/5 transition-colors group"
             >
               <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
@@ -332,7 +332,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
               <div className="text-sm text-zinc-600 mt-1">
                 Conheça todos os serviços da Anhangá
               </div>
-            </a>
+            </Link>
           </div>
         </div>
       </section>

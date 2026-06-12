@@ -338,8 +338,8 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
                 Planejamento com precisão para profissionais
               </div>
             </Link>
-            <a
-              href="https://www.anhanga.tur.br/"
+            <Link
+              to="/"
               className="block p-5 rounded-xl bg-white hover:bg-anhanga-blue/10 transition-colors group"
             >
               <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
@@ -348,7 +348,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
               <div className="text-sm text-zinc-600 mt-1">
                 Conheça todos os serviços da Anhangá
               </div>
-            </a>
+            </Link>
           </div>
         </div>
       </section>

@@ -9,7 +9,7 @@ export function PrivacySection14Canais() {
                     <strong>WhatsApp:</strong> <a href="https://wa.me/551152833309" className="text-primary underline" target="_blank" rel="noopener noreferrer">+55 (11) 5283-3309</a><br />
                     <strong>Instagram:</strong> <a href="https://instagram.com/anhangaviagens" className="text-primary underline" target="_blank" rel="noopener noreferrer">@anhangaviagens</a><br />
                     <strong>Facebook Messenger:</strong> Anhangá Viagens<br />
-                    <strong>Website:</strong> <a href="https://www.anhanga.tur.br/" target="_blank" rel="noopener noreferrer" className="text-primary underline">https://www.anhanga.tur.br/</a>
+                    <strong>Website:</strong> <a href="/" target="_blank" rel="noopener noreferrer" className="text-primary underline">https://www.anhanga.tur.br/</a>
                 </p>
             </div>
         </section>
