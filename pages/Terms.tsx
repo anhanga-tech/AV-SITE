@@ -36,7 +36,7 @@ const Terms = () => {
                                 Os presentes Termos e Condições de Uso ("Termos") são estabelecidos pela <strong>Anhangá Turismo Ltda.</strong>,
                                 pessoa jurídica de direito privado, inscrita no CNPJ sob o nº <strong>37.036.732/0001-41</strong>, com sede em
                                 <em> Avenida Dom Pedro I, 773, Vila Monumento, São Paulo-SP</em> ("Anhangá Turismo", "Controladora" ou "nós"), que opera o website
-                                <a href="https://www.anhanga.tur.br/" target="_blank" rel="noopener noreferrer" className="text-primary underline"> https://www.anhanga.tur.br/</a>
+                                <a href="/" target="_blank" rel="noopener noreferrer" className="text-primary underline"> https://www.anhanga.tur.br/</a>
                                 e demais plataformas digitais correlatas.
                             </p>
                             <h3 className="font-merriweather font-semibold">1.2 Aceitação e Concordância</h3>
@@ -132,7 +132,7 @@ const Terms = () => {
                             <h3 className="font-merriweather font-semibold">6.1 Remissão à Política Específica</h3>
                             <p>
                                 O tratamento de dados pessoais é regulamentado por nossa <strong>Política de Privacidade e Proteção de Dados Pessoais</strong>,
-                                disponível em: <a href="https://www.anhanga.tur.br/politica-privacidade/" target="_blank" rel="noopener noreferrer" className="text-primary underline">https://www.anhanga.tur.br/politica-privacidade/</a>.
+                                disponível em: <a href="/politica-privacidade/" target="_blank" rel="noopener noreferrer" className="text-primary underline">https://www.anhanga.tur.br/politica-privacidade/</a>.
                             </p>
                             <h3 className="font-merriweather font-semibold">6.2 Bases Legais do Tratamento</h3>
                             <ul className="list-disc pl-6 space-y-1">
@@ -255,7 +255,7 @@ const Terms = () => {
                             <p><strong>E-mail Geral:</strong> privacidade@anhanga.tur.br<br />
                                 <strong>WhatsApp Business:</strong> +55 (11) 5283-3309<br />
                                 <strong>Instagram:</strong> <a href="https://instagram.com/anhangaviagens" target="_blank" rel="noopener noreferrer" className="text-primary underline">@anhangaviagens</a><br />
-                                <strong>Website:</strong> <a href="https://www.anhanga.tur.br/" target="_blank" rel="noopener noreferrer" className="text-primary underline">https://www.anhanga.tur.br/</a></p>
+                                <strong>Website:</strong> <a href="/" target="_blank" rel="noopener noreferrer" className="text-primary underline">https://www.anhanga.tur.br/</a></p>
                             <h3 className="font-merriweather font-semibold">14.3 Atendimento</h3>
                             <p>Nossos canais funcionam em horário comercial, com compromisso de resposta em até 5 dias úteis para questões relacionadas a estes Termos.</p>
                         </div>

@@ -57,9 +57,9 @@ const OrlandoLanding: React.FC = () => {
       <FAQPageSchema items={ORLANDO_FAQ_ITEMS} />
       <div className="bg-brand-surface py-2 border-b border-zinc-100 relative z-[60]">
         <div className="container mx-auto px-6">
-          <a href="https://www.anhanga.tur.br/" className="text-sm font-medium text-zinc-500 hover:text-brand-cyan transition-colors flex items-center gap-1 font-sans">
+          <Link to="/" className="text-sm font-medium text-zinc-500 hover:text-brand-cyan transition-colors flex items-center gap-1 font-sans">
             ← Voltar para o site principal
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -102,9 +102,9 @@ const OrlandoLanding: React.FC = () => {
             >
               Falar com especialista
             </button>
-            <a href="https://www.anhanga.tur.br/beto-carrero/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+            <Link to="/beto-carrero/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ver pacote Beto Carrero
-            </a>
+            </Link>
             <a href="/blog/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ler dicas no blog
             </a>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Seo } from '../../components/Seo';
 import { LandingFAQ } from '../../components/LandingFAQ';
 import LollapaloozaApp from '../../components/landings/lollapalooza/LollapaloozaApp';
@@ -54,9 +55,9 @@ const LollapaloozaLanding: React.FC = () => {
       <FAQPageSchema items={LOLLAPALOOZA_FAQ_ITEMS} />
       <div className="bg-brand-surface py-2 border-b border-zinc-100 relative z-[60]">
         <div className="container mx-auto px-6">
-          <a href="https://www.anhanga.tur.br/" className="text-sm font-medium text-zinc-500 hover:text-brand-cyan transition-colors flex items-center gap-1 font-sans">
+          <Link to="/" className="text-sm font-medium text-zinc-500 hover:text-brand-cyan transition-colors flex items-center gap-1 font-sans">
             ← Voltar para o site principal
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -78,9 +79,9 @@ const LollapaloozaLanding: React.FC = () => {
           </p>
           <p className="text-zinc-700 text-lg leading-relaxed mb-5">
             Se você quer chegar antes da próxima abertura, entre na <strong>Lista de Espera Lolla 2027</strong>. A <strong>Anhangá Viagens</strong> é uma{' '}
-            <a href="https://www.anhanga.tur.br/" className="text-brand-cyan font-semibold hover:underline">
+            <Link to="/" className="text-brand-cyan font-semibold hover:underline">
               agência de viagens em São Paulo
-            </a>{' '}
+            </Link>{' '}
             com foco em atendimento consultivo e <strong>viagens personalizadas</strong>, do planejamento inicial ao suporte no destino.
           </p>
           <h3 className="text-xl md:text-2xl font-extrabold text-brand-dark mb-3">O que segue valendo para quem quer ir ao festival</h3>
@@ -113,12 +114,12 @@ const LollapaloozaLanding: React.FC = () => {
             >
               Falar com especialista
             </button>
-            <a href="https://www.anhanga.tur.br/orlando/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+            <Link to="/orlando/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ver pacotes para Orlando
-            </a>
-            <a href="https://www.anhanga.tur.br/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+            </Link>
+            <Link to="/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Conhecer a Anhangá Viagens
-            </a>
+            </Link>
             <a href="/blog/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ler guia de festivais
             </a>
