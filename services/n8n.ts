@@ -36,12 +36,31 @@ function normalizeNetworkError(): Error {
     return new Error('N8N_WEBHOOK_ERROR:502:Webhook request failed');
 }
 
+const LOCAL_HOSTNAMES = new Set(['localhost', '127.0.0.1']);
+
+function assertSecureWebhookUrl(url: string): void {
+    let parsed: URL;
+    try {
+        parsed = new URL(url);
+    } catch {
+        throw new Error('N8N_WEBHOOK_ERROR:500:Invalid webhook URL');
+    }
+
+    if (parsed.protocol === 'https:') return;
+
+    if (parsed.protocol === 'http:' && LOCAL_HOSTNAMES.has(parsed.hostname)) return;
+
+    throw new Error('N8N_WEBHOOK_ERROR:500:Webhook URL must use HTTPS');
+}
+
 async function n8nRequest(
     url: string,
     secret: string,
     requestId: string,
     payload: unknown,
 ): Promise<Response> {
+    assertSecureWebhookUrl(url);
+
     const headers = new Headers();
     headers.set('Content-Type', 'application/json');
     headers.set('X-Webhook-Secret', secret);

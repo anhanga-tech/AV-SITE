@@ -10,12 +10,43 @@ export function createRequestId(): string {
     return `req_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
+const DEFAULT_ALLOWED_ORIGIN = 'https://www.anhanga.tur.br';
+const LOCAL_ORIGIN_HOSTNAMES = new Set(['localhost', '127.0.0.1']);
+
+/**
+ * Returns the candidate origin only if it is a single, valid HTTPS origin
+ * (no path/query), or an http://localhost / http://127.0.0.1 origin for
+ * local development. Anything else (including '*' or comma-separated
+ * lists) falls back to the default origin.
+ */
+function resolveAllowedOrigin(candidate?: string): string {
+    if (!candidate) return DEFAULT_ALLOWED_ORIGIN;
+
+    let parsed: URL;
+    try {
+        parsed = new URL(candidate);
+    } catch {
+        return DEFAULT_ALLOWED_ORIGIN;
+    }
+
+    if (parsed.pathname !== '/' && parsed.pathname !== '') return DEFAULT_ALLOWED_ORIGIN;
+    if (parsed.search || parsed.hash) return DEFAULT_ALLOWED_ORIGIN;
+
+    if (parsed.protocol === 'https:') return parsed.origin;
+
+    if (parsed.protocol === 'http:' && LOCAL_ORIGIN_HOSTNAMES.has(parsed.hostname)) {
+        return parsed.origin;
+    }
+
+    return DEFAULT_ALLOWED_ORIGIN;
+}
+
 /**
  * Normalizes and builds CORS headers for the response.
  */
 export function buildCorsHeaders(allowedOrigin?: string): Record<string, string> {
     return {
-        'Access-Control-Allow-Origin': allowedOrigin || process.env.ALLOWED_ORIGIN || 'https://www.anhanga.tur.br',
+        'Access-Control-Allow-Origin': resolveAllowedOrigin(allowedOrigin || process.env.ALLOWED_ORIGIN),
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Expose-Headers': 'X-RateLimit-Remaining, X-RateLimit-Reset, X-Request-Id',

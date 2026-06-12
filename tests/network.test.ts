@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { getClientIP } from '../lib/network.ts';
+import { buildCorsHeaders, getClientIP } from '../lib/network.ts';
 
 test('getClientIP uses Cloudflare connecting IP before spoofable headers', () => {
     const request = new Request('https://example.com/api/generate', {
@@ -45,4 +45,35 @@ test('getClientIP X-Forwarded-For is consistent with x-vercel-forwarded-for (bot
     });
 
     assert.equal(getClientIP(vercelRequest), getClientIP(xffRequest));
+});
+
+test('buildCorsHeaders falls back to the default origin for a wildcard', () => {
+    const headers = buildCorsHeaders('*');
+    assert.equal(headers['Access-Control-Allow-Origin'], 'https://www.anhanga.tur.br');
+});
+
+test('buildCorsHeaders echoes a valid HTTPS origin', () => {
+    const headers = buildCorsHeaders('https://www.anhanga.tur.br');
+    assert.equal(headers['Access-Control-Allow-Origin'], 'https://www.anhanga.tur.br');
+});
+
+test('buildCorsHeaders echoes a local http origin for dev', () => {
+    const headers = buildCorsHeaders('http://localhost:3000');
+    assert.equal(headers['Access-Control-Allow-Origin'], 'http://localhost:3000');
+});
+
+test('buildCorsHeaders falls back to the default origin when ALLOWED_ORIGIN is a wildcard', (t) => {
+    const original = process.env.ALLOWED_ORIGIN;
+    t.after(() => {
+        if (original === undefined) {
+            delete process.env.ALLOWED_ORIGIN;
+        } else {
+            process.env.ALLOWED_ORIGIN = original;
+        }
+    });
+
+    process.env.ALLOWED_ORIGIN = '*';
+
+    const headers = buildCorsHeaders();
+    assert.equal(headers['Access-Control-Allow-Origin'], 'https://www.anhanga.tur.br');
 });
