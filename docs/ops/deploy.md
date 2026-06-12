@@ -75,7 +75,7 @@ Consulte `.env.example` para a lista completa com descrições. Grupos principai
 
 ### Rotas não funcionam
 
-- Pages Functions em `functions/` tratam as rotas de API. Verifique se o build inclui a pasta `functions/`.
+- Pages Functions em `functions/` tratam as rotas de API. Verifique se a pasta `functions/` está presente na raiz do repositório.
 - Para rotas do SPA, o `_redirects` ou a config de Pages deve reescrever `/*` para `/index.html`.
 
 ## Plataformas Legadas / Secundárias

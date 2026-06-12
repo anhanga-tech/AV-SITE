@@ -110,7 +110,7 @@ O deploy primário é **Cloudflare Pages**. Vercel e Netlify são plataformas le
 
 1. Conecte o repositório ao Cloudflare Pages via dashboard.
 2. Build command: `pnpm build` | Output directory: `dist` | Node version: 24.
-3. Configure os secrets no dashboard do Pages (Settings → Environment Variables): `GEMINI_API_KEY`, variáveis n8n/Salesforce, Upstash Redis, GitHub OAuth. Consulte `.env.example` para a lista completa.
+3. Configure os secrets no dashboard do Pages (Settings → Environment Variables): `GEMINI_API_KEY`, variáveis do n8n, Upstash Redis, GitHub OAuth. Consulte `.env.example` para a lista completa.
 4. O deploy é feito automaticamente a cada push para `main`.
 
 ### Vercel / Netlify (legado/secundário)
