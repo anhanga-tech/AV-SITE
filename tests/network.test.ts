@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildCorsHeaders, getClientIP } from '../lib/network.ts';
+import { buildCorsHeaders, buildJsonResponse, getClientIP } from '../lib/network.ts';
 
 test('getClientIP uses Cloudflare connecting IP before spoofable headers', () => {
     const request = new Request('https://example.com/api/generate', {
@@ -81,4 +81,36 @@ test('buildCorsHeaders falls back to the default origin when ALLOWED_ORIGIN is a
 
     const headers = buildCorsHeaders();
     assert.equal(headers['Access-Control-Allow-Origin'], 'https://www.anhanga.tur.br');
+});
+
+test('buildJsonResponse auto-derives X-Request-Id from body.requestId', async () => {
+    const response = buildJsonResponse({ requestId: 'r1', ok: true }, 200, {});
+    assert.equal(response.headers.get('X-Request-Id'), 'r1');
+    assert.equal(response.headers.get('Content-Type'), 'application/json');
+});
+
+test('buildJsonResponse omits X-Request-Id when body has no requestId', async () => {
+    const response = buildJsonResponse({ ok: true }, 200, {});
+    assert.equal(response.headers.get('X-Request-Id'), null);
+});
+
+test('buildJsonResponse uses options.requestId over body.requestId', async () => {
+    const response = buildJsonResponse({ requestId: 'r1', ok: true }, 200, {}, { requestId: 'explicit' });
+    assert.equal(response.headers.get('X-Request-Id'), 'explicit');
+});
+
+test('buildJsonResponse suppresses X-Request-Id when options.requestId is null', async () => {
+    const response = buildJsonResponse({ requestId: 'r1', ok: true }, 200, {}, { requestId: null });
+    assert.equal(response.headers.get('X-Request-Id'), null);
+});
+
+test('buildJsonResponse handles a null body without throwing', async () => {
+    const response = buildJsonResponse(null, 200, {});
+    assert.equal(response.headers.get('X-Request-Id'), null);
+    assert.equal(response.headers.get('Content-Type'), 'application/json');
+});
+
+test('buildJsonResponse merges corsHeaders', async () => {
+    const response = buildJsonResponse({ ok: true }, 200, { 'Access-Control-Allow-Origin': 'https://example.com' });
+    assert.equal(response.headers.get('Access-Control-Allow-Origin'), 'https://example.com');
 });

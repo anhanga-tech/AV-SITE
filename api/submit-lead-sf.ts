@@ -1,4 +1,4 @@
-import { buildCorsHeaders, createRequestId, getClientIP } from '../lib/network';
+import { buildCorsHeaders, buildJsonResponse, createRequestId, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
 import { cleanString, normalizeWhatsappNumber, maskEmail } from '../lib/lead-logic';
 import { logger } from '../lib/logger';
@@ -25,17 +25,6 @@ const VALID_LEAD_SOURCES = new Set([
     'Word of mouth',
     'Other',
 ]);
-
-function buildJsonResponse(
-    body: Record<string, unknown>,
-    status: number,
-    corsHeaders: Record<string, string>,
-): Response {
-    return new Response(JSON.stringify(body), {
-        status,
-        headers: { 'Content-Type': 'application/json', ...corsHeaders },
-    });
-}
 
 const UTM_VALUE_MAX_LENGTH = 255;
 
@@ -124,7 +113,7 @@ export default async function handler(request: Request): Promise<Response> {
     }
 
     if (request.method !== 'POST') {
-        return buildJsonResponse({ ok: false, requestId, error: 'Method not allowed' }, 405, corsHeaders);
+        return buildJsonResponse({ ok: false, requestId, error: 'Method not allowed' }, 405, corsHeaders, { requestId: null });
     }
 
     const clientIP = getClientIP(request);
@@ -136,12 +125,13 @@ export default async function handler(request: Request): Promise<Response> {
 
     if (!rateLimit.allowed) {
         if (rateLimit.serviceUnavailable) {
-            return buildJsonResponse({ ok: false, requestId, error: 'Serviço temporariamente indisponível.' }, 503, corsHeaders);
+            return buildJsonResponse({ ok: false, requestId, error: 'Serviço temporariamente indisponível.' }, 503, corsHeaders, { requestId: null });
         }
         return buildJsonResponse(
             { ok: false, requestId, error: 'Muitas tentativas. Tente novamente em breve.' },
             429,
             { ...corsHeaders, 'Retry-After': String(Math.ceil(rateLimit.resetIn / 1000)) },
+            { requestId: null },
         );
     }
 
@@ -149,12 +139,12 @@ export default async function handler(request: Request): Promise<Response> {
     try {
         rawBody = await request.json();
     } catch {
-        return buildJsonResponse({ ok: false, requestId, error: 'JSON inválido.' }, 400, corsHeaders);
+        return buildJsonResponse({ ok: false, requestId, error: 'JSON inválido.' }, 400, corsHeaders, { requestId: null });
     }
 
     const validation = validateSfLeadBody(rawBody);
     if (!validation.valid) {
-        return buildJsonResponse({ ok: false, requestId, error: validation.error }, 400, corsHeaders);
+        return buildJsonResponse({ ok: false, requestId, error: validation.error }, 400, corsHeaders, { requestId: null });
     }
 
     const fields = validation.data;
@@ -171,11 +161,11 @@ export default async function handler(request: Request): Promise<Response> {
 
         if (!result.ok) {
             logger.error('SUBMIT_LEAD_SF', { requestId, stage: 'sf_rejected' });
-            return buildJsonResponse({ ok: false, requestId, error: 'Falha ao enviar para Salesforce.' }, 502, corsHeaders);
+            return buildJsonResponse({ ok: false, requestId, error: 'Falha ao enviar para Salesforce.' }, 502, corsHeaders, { requestId: null });
         }
 
         logger.info('SUBMIT_LEAD_SF', { requestId, stage: 'success' });
-        return buildJsonResponse({ ok: true, requestId }, 201, corsHeaders);
+        return buildJsonResponse({ ok: true, requestId }, 201, corsHeaders, { requestId: null });
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : String(error);
         const isTimeout = error instanceof Error && error.name === 'AbortError';
@@ -190,6 +180,7 @@ export default async function handler(request: Request): Promise<Response> {
             { ok: false, requestId, error: 'Erro ao processar envio para Salesforce.' },
             isTimeout ? 504 : 500,
             corsHeaders,
+            { requestId: null },
         );
     }
 }
