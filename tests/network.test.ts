@@ -62,6 +62,11 @@ test('buildCorsHeaders echoes a local http origin for dev', () => {
     assert.equal(headers['Access-Control-Allow-Origin'], 'http://localhost:3000');
 });
 
+test('buildCorsHeaders echoes the IPv6 loopback origin for dev', () => {
+    const headers = buildCorsHeaders('http://[::1]:3000');
+    assert.equal(headers['Access-Control-Allow-Origin'], 'http://[::1]:3000');
+});
+
 test('buildCorsHeaders falls back to the default origin when ALLOWED_ORIGIN is a wildcard', (t) => {
     const original = process.env.ALLOWED_ORIGIN;
     t.after(() => {

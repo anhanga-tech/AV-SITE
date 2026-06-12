@@ -36,7 +36,7 @@ function normalizeNetworkError(): Error {
     return new Error('N8N_WEBHOOK_ERROR:502:Webhook request failed');
 }
 
-const LOCAL_HOSTNAMES = new Set(['localhost', '127.0.0.1']);
+const LOCAL_HOSTNAMES = new Set(['localhost', '127.0.0.1', '[::1]']);
 
 function assertSecureWebhookUrl(url: string): void {
     let parsed: URL;

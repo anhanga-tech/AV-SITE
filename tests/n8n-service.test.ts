@@ -63,6 +63,22 @@ test('sendContactToN8n allows http://localhost webhook URLs', async (t) => {
     assert.equal(called, true);
 });
 
+test('sendContactToN8n allows http://[::1] webhook URLs', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+    });
+
+    let called = false;
+    global.fetch = (async () => {
+        called = true;
+        return new Response(JSON.stringify({ ok: true }), { status: 200 });
+    }) as typeof fetch;
+
+    await sendContactToN8n('http://[::1]:5678/webhook', 'secret', 'req-3b', buildContactPayload());
+
+    assert.equal(called, true);
+});
+
 test('sendContactToN8n allows https webhook URLs', async (t) => {
     t.after(() => {
         global.fetch = originalFetch;

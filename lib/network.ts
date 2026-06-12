@@ -11,7 +11,7 @@ export function createRequestId(): string {
 }
 
 const DEFAULT_ALLOWED_ORIGIN = 'https://www.anhanga.tur.br';
-const LOCAL_ORIGIN_HOSTNAMES = new Set(['localhost', '127.0.0.1']);
+const LOCAL_ORIGIN_HOSTNAMES = new Set(['localhost', '127.0.0.1', '[::1]']);
 
 /**
  * Returns the candidate origin only if it is a single, valid HTTPS origin
