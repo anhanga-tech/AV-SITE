@@ -44,7 +44,7 @@ Copy `.env.example` to `.env`. Required groups:
 GEMINI_API_KEY=           # Google Gemini API key
 GEMINI_MODEL=             # Optional override (default: gemini-3.1-flash-lite)
 
-# CRM ativo: Salesforce via n8n + api/submit-lead-sf.ts (web-to-lead)
+# CRM ativo: Salesforce + api/submit-lead-sf.ts (web-to-lead)
 # Leads novos criados pelo chatbot seguem este caminho; HubSpot abaixo é legado.
 
 # n8n Webhooks (required in prod)
