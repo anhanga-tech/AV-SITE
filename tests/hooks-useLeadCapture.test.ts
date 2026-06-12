@@ -223,35 +223,20 @@ function withMockedWindow(run: (dataLayer: DataLayerEvent[]) => void): void {
     }
 }
 
-test('pushGenerateLeadDataLayerEvent emits a standard Meta Lead event sharing the event_id', () => {
-    withMockedWindow((dataLayer) => {
-        pushGenerateLeadDataLayerEvent(validPayload({ event_id: 'lead_abc123', destination: 'Maldivas' }));
-
-        const metaLead = dataLayer.find((entry) => entry.event === 'meta_lead');
-        assert.ok(metaLead, 'a meta_lead event should be pushed');
-        assert.equal(metaLead?.event_id, 'lead_abc123');
-        assert.equal(metaLead?.eventID, 'lead_abc123', 'Meta Pixel reads eventID for dedup');
-        assert.equal(metaLead?.currency, 'BRL');
-        assert.equal(metaLead?.value, 0);
-        assert.equal(metaLead?.destination, 'Maldivas');
-    });
-});
-
-test('pushGenerateLeadDataLayerEvent keeps the custom generate_lead/form_submission events', () => {
+test('pushGenerateLeadDataLayerEvent emits the custom generate_lead/form_submission events', () => {
     withMockedWindow((dataLayer) => {
         pushGenerateLeadDataLayerEvent(validPayload({ event_id: 'lead_abc123' }));
 
         const eventNames = dataLayer.map((entry) => entry.event);
-        assert.deepEqual(eventNames, ['generate_lead', 'form_submission', 'meta_lead']);
+        assert.deepEqual(eventNames, ['generate_lead', 'form_submission']);
     });
 });
 
-test('pushGenerateLeadDataLayerEvent omits meta_lead but keeps custom events without an event_id', () => {
+test('pushGenerateLeadDataLayerEvent keeps custom events even without an event_id', () => {
     withMockedWindow((dataLayer) => {
         pushGenerateLeadDataLayerEvent(validPayload({ event_id: undefined }));
 
         const eventNames = dataLayer.map((entry) => entry.event);
         assert.deepEqual(eventNames, ['generate_lead', 'form_submission']);
-        assert.ok(!eventNames.includes('meta_lead'), 'meta_lead should be omitted without event_id (CAPI dedup fail-safe)');
     });
 });
