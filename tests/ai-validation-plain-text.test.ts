@@ -94,3 +94,15 @@ test('validateBudgetToolArgs rejects markdown in origin_city', () => {
     assert.equal(result.valid, false);
     assert.ok(result.missing.includes('origin_city'));
 });
+
+test('validateBudgetToolArgs sanitizes markdown links in origin_region to default Brasil', () => {
+    const result = validateBudgetToolArgs(
+        buildValidArgs({
+            origin_region: '[clique aqui](https://attacker.example)',
+        }),
+    );
+
+    assert.equal(result.valid, true);
+    assert.equal(result.normalizedArgs?.origin_region, 'Brasil');
+    assert.equal(result.normalizedArgs?.assumed_origin_br, true);
+});

@@ -163,7 +163,7 @@ function sanitizeBudgetFields(raw: BudgetToolArgs) {
     const destinationCity = rejectLinkyLocation(cleanString(raw.destination_city));
     const destinationRegion = rejectLinkyLocation(cleanString(raw.destination_region));
     const originCity = rejectLinkyLocation(cleanString(raw.origin_city));
-    const providedOriginRegion = cleanString(raw.origin_region);
+    const providedOriginRegion = rejectLinkyLocation(cleanString(raw.origin_region));
     const rawDestination = rejectLinkyLocation(cleanString(raw.destination));
     const destination = rawDestination || [destinationCity, destinationRegion].filter(Boolean).join(', ');
 
