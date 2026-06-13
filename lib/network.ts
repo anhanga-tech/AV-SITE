@@ -59,8 +59,8 @@ export function buildCorsHeaders(allowedOrigin?: string): Record<string, string>
  * - options.requestId é string  → usa esse valor.
  * - options.requestId ausente   → auto-deriva de body.requestId (se string).
  */
-export function buildJsonResponse(
-    body: unknown,
+export function buildJsonResponse<T = unknown>(
+    body: T,
     status: number,
     corsHeaders: Record<string, string>,
     options: { requestId?: string | null } = {},
