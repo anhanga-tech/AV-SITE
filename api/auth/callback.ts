@@ -10,6 +10,9 @@ const GITHUB_TOKEN_URL = 'https://github.com/login/oauth/access_token';
 const GITHUB_TOKEN_TIMEOUT_MS = 8000;
 const PROVIDER = 'github';
 
+/** CSP for the OAuth callback HTML page: only the inline handshake script is allowed; no other resources, framing, or forms. */
+const CALLBACK_CSP = "default-src 'none'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
+
 function parseCookies(header: string): Record<string, string> {
     const cookies: Record<string, string> = {};
     for (const part of header.split(';')) {
@@ -109,6 +112,7 @@ export function buildPostMessageHtml(status: 'success' | 'error', content: strin
         status: httpStatus,
         headers: {
             'Content-Type': 'text/html; charset=utf-8',
+            'Content-Security-Policy': CALLBACK_CSP,
             'Set-Cookie': 'oauth_state=; Path=/api/auth; Max-Age=0; HttpOnly; SameSite=Lax; Secure',
         },
     });

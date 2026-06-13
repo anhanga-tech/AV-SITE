@@ -22,3 +22,12 @@ test('buildPostMessageHtml includes origin validation logic', async () => {
     // Ensure it doesn't just blindly trust e.origin anymore
     assert.match(html, /if \(!isTrusted\) \{/);
 });
+
+test('buildPostMessageHtml sets a restrictive Content-Security-Policy header', async () => {
+    const response = await buildPostMessageHtml('success', '{"token":"test"}', 200);
+    const csp = response.headers.get('Content-Security-Policy');
+
+    assert.ok(csp, 'Content-Security-Policy header must be present');
+    assert.match(csp, /default-src 'none'/);
+    assert.match(csp, /script-src 'unsafe-inline'/);
+});
