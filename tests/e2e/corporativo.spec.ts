@@ -180,6 +180,15 @@ test.describe('Corporativo Landing Page', () => {
     expect(hubspotRequests).toEqual([]);
   });
 
+  test('should show fallback when globe.gl fails to load', async ({ page }) => {
+    await page.route(/globe(\.|__)gl|three-globe/, route => route.abort());
+
+    const landing = new CorporativoPage(page);
+    await landing.goto();
+
+    await expect(page.getByTestId('corp-globe-fallback')).toBeVisible();
+  });
+
   test('should handle navigation to #contato anchor', async ({ page, isMobile }) => {
     const landing = new CorporativoPage(page);
     await landing.goto();

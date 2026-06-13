@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const SP = { lat: -23.5505, lng: -46.6333 };
 
@@ -31,6 +31,7 @@ const POINTS = [
 
 export function CorpGlobe() {
     const containerRef = useRef<HTMLDivElement>(null);
+    const [loadFailed, setLoadFailed] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -101,6 +102,7 @@ export function CorpGlobe() {
             };
         }).catch((err) => {
             console.error('Failed to load globe.gl:', err);
+            if (!cancelled) setLoadFailed(true);
         });
 
         return () => {
@@ -109,6 +111,31 @@ export function CorpGlobe() {
             cleanup = null;
         };
     }, []);
+
+    if (loadFailed) {
+        return (
+            <div
+                data-testid="corp-globe-fallback"
+                className="w-full h-full flex flex-col items-center justify-center gap-3 text-center px-6"
+            >
+                <svg
+                    className="w-16 h-16 text-yellow"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    aria-hidden="true"
+                >
+                    <circle cx="12" cy="12" r="9" />
+                    <ellipse cx="12" cy="12" rx="4" ry="9" />
+                    <path d="M3 12h18" />
+                </svg>
+                <p className="text-sm font-medium text-white/80 max-w-xs">
+                    Conectamos empresas a destinos no mundo todo
+                </p>
+            </div>
+        );
+    }
 
     return (
         <div
