@@ -10,6 +10,15 @@ const GITHUB_TOKEN_URL = 'https://github.com/login/oauth/access_token';
 const GITHUB_TOKEN_TIMEOUT_MS = 8000;
 const PROVIDER = 'github';
 
+/**
+ * CSP for the OAuth callback HTML page: only the nonce-tagged handshake script
+ * runs; no other resources, framing, or forms. A fresh nonce per request avoids
+ * 'unsafe-inline', so an injected inline script without the nonce won't execute.
+ */
+function buildCallbackCsp(nonce: string): string {
+    return `default-src 'none'; script-src 'nonce-${nonce}'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'`;
+}
+
 function parseCookies(header: string): Record<string, string> {
     const cookies: Record<string, string> = {};
     for (const part of header.split(';')) {
@@ -45,6 +54,7 @@ export function buildPostMessageHtml(status: 'success' | 'error', content: strin
     const safeStatus = safeJsonString(status);
     const safeContent = safeJsonString(content);
     const allowedOrigin = process.env.ALLOWED_ORIGIN || 'https://www.anhanga.tur.br';
+    const nonce = crypto.randomUUID();
 
     const html = `<!doctype html>
 <html lang="pt-BR">
@@ -54,7 +64,7 @@ export function buildPostMessageHtml(status: 'success' | 'error', content: strin
   <title>Autenticação</title>
 </head>
 <body>
-<script>
+<script nonce="${nonce}">
 (function () {
   var provider = ${safeProvider};
   var status = ${safeStatus};
@@ -109,6 +119,7 @@ export function buildPostMessageHtml(status: 'success' | 'error', content: strin
         status: httpStatus,
         headers: {
             'Content-Type': 'text/html; charset=utf-8',
+            'Content-Security-Policy': buildCallbackCsp(nonce),
             'Set-Cookie': 'oauth_state=; Path=/api/auth; Max-Age=0; HttpOnly; SameSite=Lax; Secure',
         },
     });
