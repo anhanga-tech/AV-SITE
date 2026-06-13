@@ -7,7 +7,9 @@ const ANHANGA_SUBDOMAIN_SUFFIX = `.${ANHANGA_HOSTNAME}`;
  * that tries to render phishing links inside the branded chat UI.
  */
 export function sanitizeAiLinkUrl(url: string): string {
-  if (url.startsWith('/') || url.startsWith('#')) {
+  // Reject protocol-relative URLs (`//evil.com`): they start with `/` but
+  // resolve to an external origin, bypassing the host allowlist below.
+  if ((url.startsWith('/') && !url.startsWith('//')) || url.startsWith('#')) {
     return url;
   }
 

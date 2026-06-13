@@ -544,12 +544,22 @@ const AIChat: React.FC = memo(() => {
                           <ReactMarkdown
                             urlTransform={sanitizeAiLinkUrl}
                             components={{
-                              a: ({ href, children, ...props }) =>
-                                href ? (
-                                  <a href={href} rel="noopener noreferrer" {...props}>{children}</a>
-                                ) : (
-                                  <span>{children}</span>
-                                ),
+                              a: ({ href, children, ...props }) => {
+                                if (!href) return <span>{children}</span>;
+                                // Internal SPA links stay in-tab; external (allowlisted)
+                                // links open in a new tab to preserve chat state.
+                                const isInternal = href.startsWith('/') && !href.startsWith('//');
+                                return (
+                                  <a
+                                    href={href}
+                                    rel="noopener noreferrer"
+                                    target={isInternal ? undefined : '_blank'}
+                                    {...props}
+                                  >
+                                    {children}
+                                  </a>
+                                );
+                              },
                             }}
                           >
                             {msg.text}

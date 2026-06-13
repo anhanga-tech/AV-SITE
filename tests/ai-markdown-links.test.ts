@@ -41,6 +41,10 @@ test('blocks lookalike subdomains that are actually other domains', () => {
   assert.equal(sanitizeAiLinkUrl('https://anhanga.tur.br.evil.com'), '');
 });
 
+test('blocks protocol-relative URLs', () => {
+  assert.equal(sanitizeAiLinkUrl('//evil.com'), '');
+});
+
 test('blocks unparseable strings', () => {
   assert.equal(sanitizeAiLinkUrl('not a url'), '');
 });
