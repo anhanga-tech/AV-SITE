@@ -119,7 +119,7 @@ export function CorpGlobe() {
                 className="w-full h-full flex flex-col items-center justify-center gap-3 text-center px-6"
             >
                 <svg
-                    className="w-16 h-16 text-yellow"
+                    className="w-16 h-16 text-brand-yellow"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
