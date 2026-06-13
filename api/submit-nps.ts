@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { buildCorsHeaders, createRequestId, getClientIP } from '../lib/network';
+import { buildCorsHeaders, buildJsonResponse, createRequestId, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
 import { cleanString, maskEmail } from '../lib/lead-logic';
 import { logger } from '../lib/logger';
@@ -14,22 +14,6 @@ export const config = {
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 3;
 const N8N_WEBHOOK_ERROR_PATTERN = /^N8N_WEBHOOK_ERROR:(\d{3}):/;
-
-function buildJsonResponse(
-  body: unknown,
-  status: number,
-  corsHeaders: Record<string, string>,
-  requestId?: string,
-): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(requestId ? { 'X-Request-Id': requestId } : {}),
-      ...corsHeaders,
-    },
-  });
-}
 
 function mapNpsZodError(error: z.ZodError): string {
   const issue = error.issues[0];
@@ -66,7 +50,6 @@ export default async function handler(request: Request): Promise<Response> {
       { ok: false, requestId, code: 'METHOD_NOT_ALLOWED', error: 'Method not allowed' },
       405,
       corsHeaders,
-      requestId,
     );
   }
 
@@ -78,7 +61,6 @@ export default async function handler(request: Request): Promise<Response> {
       { ok: false, requestId, code: 'SERVER_CONFIG_ERROR', error: 'Serviço de NPS indisponível no momento.' },
       500,
       corsHeaders,
-      requestId,
     );
   }
 
@@ -96,7 +78,6 @@ export default async function handler(request: Request): Promise<Response> {
         { ok: false, requestId, code: 'SERVICE_UNAVAILABLE', error: 'Serviço temporariamente indisponível. Tente novamente em instantes.' },
         503,
         corsHeaders,
-        requestId,
       );
     }
 
@@ -120,7 +101,6 @@ export default async function handler(request: Request): Promise<Response> {
         'X-RateLimit-Remaining': String(rateLimit.remaining),
         'X-RateLimit-Reset': String(Math.ceil((Date.now() + rateLimit.resetIn) / 1000)),
       },
-      requestId,
     );
   }
 
@@ -132,7 +112,6 @@ export default async function handler(request: Request): Promise<Response> {
       { ok: false, requestId, code: 'VALIDATION_ERROR', error: 'JSON inválido no corpo da requisição.' },
       400,
       corsHeaders,
-      requestId,
     );
   }
 
@@ -142,7 +121,6 @@ export default async function handler(request: Request): Promise<Response> {
       { ok: false, requestId, code: 'VALIDATION_ERROR', error: mapNpsZodError(parsed.error) },
       400,
       corsHeaders,
-      requestId,
     );
   }
 
@@ -180,7 +158,6 @@ export default async function handler(request: Request): Promise<Response> {
       },
       status,
       corsHeaders,
-      requestId,
     );
   }
 
@@ -189,6 +166,5 @@ export default async function handler(request: Request): Promise<Response> {
     { ok: true, requestId, message: 'Avaliação registrada com sucesso.' },
     201,
     corsHeaders,
-    requestId,
   );
 }

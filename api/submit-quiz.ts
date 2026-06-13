@@ -1,5 +1,5 @@
-import type { SubmitQuizRequest, SubmitQuizResponse } from '../types/quiz';
-import { buildCorsHeaders, createRequestId, getClientIP } from '../lib/network';
+import type { SubmitQuizRequest } from '../types/quiz';
+import { buildCorsHeaders, buildJsonResponse, createRequestId, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
 import { logger } from '../lib/logger';
 import { cleanString, maskEmail, maskName, maskPhone } from '../lib/lead-logic';
@@ -44,17 +44,6 @@ function emitQuizLog(level: QuizLogLevel, requestId: string, stage: string, deta
     }
 
     logger.info('SUBMIT_QUIZ', payload);
-}
-
-function buildJsonResponse(body: SubmitQuizResponse, status: number, corsHeaders: Record<string, string>): Response {
-    return new Response(JSON.stringify(body), {
-        status,
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Request-Id': body.requestId,
-            ...corsHeaders,
-        },
-    });
 }
 
 function getSubmitQuizConfig(): SubmitQuizConfig | null {
@@ -151,7 +140,6 @@ export default async function handler(request: Request): Promise<Response> {
                 requestId,
                 error: 'Muitas tentativas. Aguarde um momento.',
                 code: 'RATE_LIMIT_EXCEEDED',
-                // @ts-expect-error - retryAfter is used by discovery schemas but not in strict response type
                 retryAfter: retryAfterSec,
             },
             429,
