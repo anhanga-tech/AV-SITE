@@ -180,6 +180,20 @@ test.describe('Corporativo Landing Page', () => {
     expect(hubspotRequests).toEqual([]);
   });
 
+  test('should show fallback when globe.gl fails to load', async ({ page, isMobile }) => {
+    // O globo (e seu fallback) só é montado em telas lg+ — o wrapper em
+    // CorpHero usa `hidden lg:block`. Em viewports mobile fica display:none
+    // por design, então a asserção de visibilidade só vale no desktop.
+    test.skip(isMobile, 'Globo é decorativo desktop-only (hidden lg:block)');
+
+    await page.route(/globe(\.|__)gl|three-globe/, route => route.abort());
+
+    const landing = new CorporativoPage(page);
+    await landing.goto();
+
+    await expect(page.getByTestId('corp-globe-fallback')).toBeVisible();
+  });
+
   test('should handle navigation to #contato anchor', async ({ page, isMobile }) => {
     const landing = new CorporativoPage(page);
     await landing.goto();
