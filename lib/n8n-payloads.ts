@@ -85,9 +85,8 @@ export interface N8nContactPayload {
 }
 
 function toNullableTrackingValue(value: string | null | undefined): string | null {
-    if (typeof value !== 'string') return null;
-    const trimmed = value.trim();
-    return trimmed.length > 0 ? trimmed : null;
+    // Mesma normalização do contexto: trima e converte vazio/whitespace em null.
+    return normalizeContextValue(value);
 }
 
 function buildLeadTrackingUtms(payload: SubmitLeadRequest) {
