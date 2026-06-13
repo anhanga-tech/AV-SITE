@@ -16,6 +16,7 @@ import { PassportStamp } from './ui/PassportStamp';
 import { ChatLeadForm, type LeadFinalizePayload, type LeadFinalizeResult } from './ChatLeadForm';
 import type { SubmitLeadRequest } from '../types/leadCapture';
 import { triggerHaptic } from '../utils/haptics';
+import { sanitizeAiLinkUrl } from '../lib/ai/safe-link';
 
 interface Message {
   id: string;
@@ -540,7 +541,29 @@ const AIChat: React.FC = memo(() => {
                       }`}>
                       {msg.role === 'model' ? (
                         <div className="prose prose-sm max-w-none prose-p:text-zinc-700 prose-p:leading-relaxed prose-strong:text-zinc-900 prose-strong:font-bold prose-ul:text-zinc-700">
-                          <ReactMarkdown>{msg.text}</ReactMarkdown>
+                          <ReactMarkdown
+                            urlTransform={sanitizeAiLinkUrl}
+                            components={{
+                              a: ({ href, children, ...props }) => {
+                                if (!href) return <span>{children}</span>;
+                                // Internal SPA links stay in-tab; external (allowlisted)
+                                // links open in a new tab to preserve chat state.
+                                const isInternal = href.startsWith('/') && !href.startsWith('//');
+                                return (
+                                  <a
+                                    href={href}
+                                    rel="noopener noreferrer"
+                                    target={isInternal ? undefined : '_blank'}
+                                    {...props}
+                                  >
+                                    {children}
+                                  </a>
+                                );
+                              },
+                            }}
+                          >
+                            {msg.text}
+                          </ReactMarkdown>
                         </div>
                       ) : (
                         <div className="text-white font-medium leading-relaxed max-w-[300px] break-words">
