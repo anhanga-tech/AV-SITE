@@ -33,6 +33,8 @@ test('buildN8nLeadPayload — source e requestId no shape de topo', () => {
     const result = buildN8nLeadPayload(LEAD_PAYLOAD, 'req-lead-1');
     assert.equal(result.source, 'submit-lead');
     assert.equal(result.requestId, 'req-lead-1');
+    assert.ok(result.meta);
+    assert.match(result.meta.receivedAt, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
 });
 
 test('buildN8nLeadPayload — eventId é null quando event_id ausente', () => {
@@ -75,9 +77,11 @@ test('buildN8nLeadPayload — meta.clientIpAddress é null quando context fornec
     assert.equal(result.meta.clientUserAgent, null);
 });
 
-test('buildN8nLeadPayload — utms são repassados intactos', () => {
+test('buildN8nLeadPayload — utms são repassados intactos e extras default é vazio', () => {
     const result = buildN8nLeadPayload(LEAD_PAYLOAD, 'req-lead-8');
     assert.deepEqual(result.utms, BASE_UTMS);
+    assert.ok(result.tracking);
+    assert.deepEqual(result.tracking.extras, {});
 });
 
 const CONTACT_PAYLOAD: SubmitContactRequest = {
@@ -154,12 +158,16 @@ test('buildN8nContactPayload — tracking.extras é {} quando payload.tracking.e
     assert.deepEqual(result.tracking.extras, {});
 });
 
-test('buildN8nContactPayload — lastName e email são null quando ausentes', () => {
+test('buildN8nContactPayload — campos opcionais são null quando ausentes', () => {
     const { lastName: _omitLast, email: _omitEmail, ...minimalPayload } = CONTACT_PAYLOAD;
     const payload: SubmitContactRequest = { ...minimalPayload };
     const result = buildN8nContactPayload(payload, 'req-contact-7');
+    assert.ok(result.contact);
     assert.equal(result.contact.lastName, null);
     assert.equal(result.contact.email, null);
+    assert.equal(result.contact.eventId, null);
+    assert.equal(result.contact.ctaSource, null);
+    assert.equal(result.contact.destination, null);
 });
 
 const WAITLIST_PAYLOAD: SubmitWaitlistRequest = {
@@ -200,9 +208,13 @@ test('buildN8nQuizPayload — source correto no shape de topo', () => {
     assert.equal(result.requestId, 'req-quiz-1');
 });
 
-test('buildN8nQuizPayload — mapeia profileKey, profileName e destinos', () => {
+test('buildN8nQuizPayload — mapeia profileKey, profileName e destinos, e aplica defaults para opcionais ausentes', () => {
     const result = buildN8nQuizPayload(QUIZ_PAYLOAD, 'req-quiz-2');
+    assert.ok(result.quiz);
     assert.equal(result.quiz.profileKey, QUIZ_PAYLOAD.profileKey);
     assert.equal(result.quiz.profileName, QUIZ_PAYLOAD.profileName);
     assert.deepEqual(result.quiz.destinos, ['europa', 'latam']);
+    assert.equal(result.quiz.whatsapp, null);
+    assert.equal(result.quiz.skipped, false);
+    assert.equal(result.quiz.newsletterOptIn, false);
 });
