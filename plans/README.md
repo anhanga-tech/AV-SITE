@@ -13,13 +13,26 @@ começar, honre as STOP conditions e atualize sua linha ao terminar.
 | 003 | Hardening: HTTPS nos webhooks n8n + validar ALLOWED_ORIGIN | P2 | S | — | DONE |
 | 004 | Links internos absolutos → navegação SPA nas landings | P2 | M | — | DONE |
 | 005 | Rejeitar markdown/URL em campos de destino do handoff IA | P3 | M | — | DONE |
+| 006 | Restringir links do markdown da IA a allowlist no chat | P2 | S | — | MERGED (#873) |
+| 007 | Testes unitários diretos dos builders de payload do n8n | P2 | S | — | MERGED (#874) |
+| 008 | Extrair helper de resposta JSON dos handlers submit-* | P3 | M | 007 (recomendado) | MERGED (#875) |
+| 009 | Fallback visível quando globe.gl falha (CorpGlobe) | P3 | S | — | MERGED (#876) |
+| 010 | Header CSP na página de callback OAuth do Decap | P3 | S | — | MERGED (#878) |
+| 011 | Normalizar click IDs vazios/whitespace → null nos payloads n8n | P3 | S | 007 | MERGED (#879) |
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (com motivo) | REJECTED (com justificativa)
 
+> **Rodada 2** (commit `68eecf6`, 2026-06-12): planos 001–005 já executados
+> (DONE, PRs #868–#872). Planos 006–010 são desta rodada — foco em performance
+> (gap da rodada 1), segurança de defesa-em-profundidade e cobertura de testes.
+
 ## Dependency notes
 
-- Sem dependências rígidas. Recomenda-se 001 primeiro porque executores dos
-  demais planos leem o `.claude/CLAUDE.md` (hoje desatualizado) como contexto.
+- 001–005: sem dependências rígidas (todos DONE).
+- 006, 007, 009, 010: independentes entre si.
+- 008 não depende rigidamente de 007, mas recomenda-se executá-lo **depois** —
+  os testes dos builders (007) dão rede de segurança extra ao refatorar os
+  handlers de lead.
 
 ## Findings considered and rejected
 
@@ -45,7 +58,36 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (com motivo) | REJECTED (com 
 - Script `verify` unificado / cache de Chrome no CI / `dev:cms` com concurrently:
   ganhos pequenos de DX; fazer oportunisticamente.
 
+### Considered and rejected — rodada 2 (commit `68eecf6`)
+
+- **PERF: Leaflet importado no topo de `Destinations.tsx`** — falso positivo. O
+  componente é lazy-loaded em `pages/Home.tsx` e gated por IntersectionObserver
+  (`shouldLoadDestinations`); Leaflet fica num chunk separado, fora do bundle
+  crítico.
+- **Cache de regex unbounded em `lib/ai/utils.ts`** — Cloudflare reseta estado
+  de módulo por request; o `_aliasPatternCache` não cresce entre requests.
+  Impacto desprezível em produção.
+- **`lib/ai/validation.ts` "sem testes"** — falso; já coberto por
+  `tests/ai-validation-plain-text.test.ts`.
+- **Timing-safe compare no state OAuth (`api/auth/callback.ts`)** — state é
+  gerado server-side, alta entropia, single-use; timing attack impraticável.
+  Já avaliado e descartado na rodada 1.
+- **Teste de schema dedicado para `submit-lead`** — coberto indiretamente por
+  `tests/submit-lead.test.ts`; baixo valor isolar.
+- **Cache do cliente Gemini em `api/generate.ts`** — o edge runtime já cacheia
+  imports de módulo; ganho especulativo, não medido.
+- **Re-renders do `SearchForm.tsx` (PERF-06)** — plausível mas especulativo;
+  exige profiling para confirmar impacto real. Não priorizado sem medição.
+- **Config sprawl (.agent/.agents/.qwen/.codex/.Jules), Vercel/Netlify configs,
+  script `verify` unificado** — DX menor; fazer oportunisticamente (já anotado
+  na rodada 1).
+
 ## Audit gaps
 
-- A categoria **performance** não foi auditada adequadamente nesta rodada (o
-  agente retornou vazio). Reauditar em sessão futura se houver interesse.
+- Rodada 1 não auditou performance; rodada 2 cobriu. O achado de maior valor de
+  perf (lazy de chunks pesados) já estava resolvido no código — ver rejeitados.
+- **Direção/features** auditada só superficialmente. Rodar `/improve next` se
+  houver interesse em roadmap de produto.
+- Decomposição de `QuizAnhangaLanding.tsx` (1109) e `SearchForm.tsx` (1005)
+  permanece debt real (L de esforço) — habilitaria testes unitários hoje
+  impossíveis; não planejado nesta rodada.
