@@ -84,6 +84,24 @@ test('buildN8nLeadPayload — utms são repassados intactos e extras default é 
     assert.deepEqual(result.tracking.extras, {});
 });
 
+test('buildN8nLeadPayload — click ID vazio/whitespace é normalizado para null', () => {
+    const payload: SubmitLeadRequest = {
+        ...LEAD_PAYLOAD,
+        tracking: {
+            utm_source: null,
+            utm_medium: null,
+            utm_campaign: null,
+            utm_term: null,
+            utm_content: null,
+            gclid: '',
+            fbclid: '   ',
+        },
+    };
+    const result = buildN8nLeadPayload(payload, 'req-lead-9');
+    assert.equal(result.tracking.gclid, null);
+    assert.equal(result.tracking.fbclid, null);
+});
+
 const CONTACT_PAYLOAD: SubmitContactRequest = {
     firstName: 'João',
     lastName: 'Pereira',
@@ -119,7 +137,7 @@ test('buildN8nContactPayload — fallback de UTM usa payload.utms quando trackin
     assert.equal(result.tracking.utm_source, BASE_UTMS.utm_source);
 });
 
-test('buildN8nContactPayload — click ID vazio/whitespace é repassado sem normalização (toNullableTrackingValue só trata undefined/null)', () => {
+test('buildN8nContactPayload — click ID vazio/whitespace é normalizado para null', () => {
     const payload: SubmitContactRequest = {
         ...CONTACT_PAYLOAD,
         tracking: {
@@ -133,11 +151,11 @@ test('buildN8nContactPayload — click ID vazio/whitespace é repassado sem norm
         },
     };
     const result = buildN8nContactPayload(payload, 'req-contact-4');
-    assert.equal(result.tracking.gclid, '');
-    assert.equal(result.tracking.fbclid, '   ');
+    assert.equal(result.tracking.gclid, null);
+    assert.equal(result.tracking.fbclid, null);
 });
 
-test('buildN8nContactPayload — click ID válido ecoa o valor', () => {
+test('buildN8nContactPayload — click ID válido ecoa o valor trimado', () => {
     const payload: SubmitContactRequest = {
         ...CONTACT_PAYLOAD,
         tracking: {
@@ -147,10 +165,12 @@ test('buildN8nContactPayload — click ID válido ecoa o valor', () => {
             utm_term: null,
             utm_content: null,
             gclid: 'abc123',
+            fbclid: ' xyz789 ',
         },
     };
     const result = buildN8nContactPayload(payload, 'req-contact-5');
     assert.equal(result.tracking.gclid, 'abc123');
+    assert.equal(result.tracking.fbclid, 'xyz789');
 });
 
 test('buildN8nContactPayload — tracking.extras é {} quando payload.tracking.extras ausente', () => {
