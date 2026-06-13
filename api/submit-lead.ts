@@ -1,5 +1,5 @@
-import type { SubmitLeadRequest, SubmitLeadResponse } from '../types/leadCapture';
-import { buildCorsHeaders, createRequestId, getClientIP } from '../lib/network';
+import type { SubmitLeadRequest } from '../types/leadCapture';
+import { buildCorsHeaders, buildJsonResponse, createRequestId, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
 import { cleanString, maskEmail, maskName, maskPhone, validatePayload } from '../lib/lead-logic';
 import { logger } from '../lib/logger';
@@ -45,25 +45,6 @@ function emitLeadLog(level: LeadLogLevel, requestId: string, stage: string, deta
     }
 
     logger.info('SUBMIT_LEAD', payload);
-}
-
-function buildJsonResponse(
-    body: SubmitLeadResponse,
-    status: number,
-    corsHeaders: Record<string, string>,
-): Response {
-    const requestId = typeof body === 'object' && body && 'requestId' in body && typeof body.requestId === 'string'
-        ? body.requestId
-        : undefined;
-
-    return new Response(JSON.stringify(body), {
-        status,
-        headers: {
-            'Content-Type': 'application/json',
-            ...(requestId ? { 'X-Request-Id': requestId } : {}),
-            ...corsHeaders,
-        },
-    });
 }
 
 // getClientIP falls back to 'unknown' when no edge header is present. Meta CAPI

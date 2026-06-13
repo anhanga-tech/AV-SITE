@@ -54,6 +54,42 @@ export function buildCorsHeaders(allowedOrigin?: string): Record<string, string>
 }
 
 /**
+ * Resposta JSON padrão dos handlers. O header X-Request-Id é resolvido assim:
+ * - options.requestId === null  → suprime o header (ex.: submit-lead-sf).
+ * - options.requestId é string  → usa esse valor.
+ * - options.requestId ausente   → auto-deriva de body.requestId (se string).
+ */
+export function buildJsonResponse<T = unknown>(
+    body: T,
+    status: number,
+    corsHeaders: Record<string, string>,
+    options: { requestId?: string | null } = {},
+): Response {
+    let requestId: string | undefined;
+    if (options.requestId === null) {
+        requestId = undefined;
+    } else if (typeof options.requestId === 'string') {
+        requestId = options.requestId;
+    } else if (
+        body !== null &&
+        typeof body === 'object' &&
+        'requestId' in body &&
+        typeof (body as { requestId?: unknown }).requestId === 'string'
+    ) {
+        requestId = (body as { requestId: string }).requestId;
+    }
+
+    return new Response(JSON.stringify(body), {
+        status,
+        headers: {
+            'Content-Type': 'application/json',
+            ...(requestId ? { 'X-Request-Id': requestId } : {}),
+            ...corsHeaders,
+        },
+    });
+}
+
+/**
  * Builds a structured JSON error response.
  */
 export function buildJsonError(status: number, code: string, message: string): Response {
