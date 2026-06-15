@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useReducer } from 'react';
+import { Link } from 'react-router-dom';
 import { Seo } from '../../components/Seo';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { useQuizCapture } from '../../hooks/useQuizCapture';
@@ -567,10 +568,10 @@ function PreLeadScreen({ profile, onSubmit, onBack }: PreLeadScreenProps) {
                     <p className="text-xs text-zinc-500 leading-relaxed mt-1">
                         Ao revelar seu perfil, seus dados serão registrados em nosso CRM para atendimento
                         comercial e entraremos em contato via WhatsApp.{' '}
-                        <a href="/politica-privacidade/" target="_blank" rel="noopener noreferrer"
+                        <Link to="/politica-privacidade/" target="_blank" rel="noopener noreferrer"
                             className="underline hover:text-zinc-700">
                             Política de Privacidade
-                        </a>.
+                        </Link>.
                     </p>
 
                     <button type="submit" className="quiz-btn quiz-btn-primary quiz-btn-lg">

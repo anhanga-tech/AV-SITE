@@ -120,9 +120,9 @@ const LollapaloozaLanding: React.FC = () => {
             <Link to="/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Conhecer a Anhangá Viagens
             </Link>
-            <a href="/blog/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+            <Link to="/blog/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ler guia de festivais
-            </a>
+            </Link>
           </div>
         </div>
       </section>
