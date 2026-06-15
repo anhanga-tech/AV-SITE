@@ -92,3 +92,8 @@ Standardized the "Zero-Trust CORS" pattern for internal APIs. Public-facing endp
 **Vulnerability:** The OAuth callback in `api/auth/callback.ts` used an over-permissive regex for subdomain validation and a wildcard `*` for the initial handshake `postMessage`.
 **Learning:** Permissive regex patterns like `.*\.anhanga\.tur\.br` can match crafted origins if not properly anchored. Wildcard `postMessage` targets allow any opened window to intercept handshakes.
 **Prevention:** Use restrictive regex patterns that validate specific subdomain structures (e.g., `(?:[a-zA-Z0-9-]+\.)*`). Always specify a target origin for `postMessage` when known, even for non-sensitive handshakes, to maintain a strict security posture.
+
+## 2026-03-30 - [Auth Flow Hardening & Security Utility Centralization]
+**Vulnerability:** Insecure (timing-sensitive) token comparison and lack of rate limiting on sensitive OAuth endpoints.
+**Learning:** Authentication flows, even if for administrative use, require multi-layered protection including rate limiting and timing-safe comparisons to prevent brute-force and side-channel attacks. Centralizing these utilities ensures consistency across the codebase.
+**Prevention:** Centralize security-critical utilities like `timingSafeEqual` in `lib/security.ts`. Enforce rate limits on all public-facing authentication or data ingestion endpoints to provide defense-in-depth against automated abuse.
