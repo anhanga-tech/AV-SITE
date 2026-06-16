@@ -16,6 +16,16 @@ test('img do MDX reserva espaço com width/height default (evita CLS)', () => {
     assert.ok(html.includes('loading="lazy"'), 'deve manter lazy loading');
 });
 
+test('img do MDX passa o src por optimizeRemoteImageUrl', () => {
+    const html = renderToStaticMarkup(
+        React.createElement(Img, { src: 'foto.jpg', alt: 'Praia' })
+    );
+    assert.ok(
+        html.includes('src="https://media.anhanga.tur.br/foto.jpg"'),
+        'src relativo deve ser resolvido pelo media host via optimizeRemoteImageUrl'
+    );
+});
+
 test('img do MDX permite sobrescrever width/height por post', () => {
     const html = renderToStaticMarkup(
         React.createElement(Img, { src: 'retrato.jpg', alt: 'Retrato', width: 800, height: 1000 })
