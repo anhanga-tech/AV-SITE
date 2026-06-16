@@ -100,9 +100,9 @@ const BetoCarreroLanding: React.FC = () => {
             <Link to="/orlando/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ver pacotes para Orlando
             </Link>
-            <a href="/blog/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+            <Link to="/blog/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ver dicas de planejamento
-            </a>
+            </Link>
             <a href="https://www.betocarrero.com.br/" target="_blank" rel="noopener noreferrer" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Site Oficial Beto Carrero
             </a>
