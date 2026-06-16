@@ -74,7 +74,7 @@ interface Options {
   backupPrefix: string;
 }
 
-function parseArgs(argv: string[]): Options {
+export function parseArgs(argv: string[]): Options {
   const opts: Options = {
     apply: false,
     prefix: 'images/',
@@ -84,17 +84,31 @@ function parseArgs(argv: string[]): Options {
     quality: DEFAULT_QUALITY,
     backupPrefix: DEFAULT_BACKUP_PREFIX,
   };
-  for (let i = 0; i < argv.length; i++) {
+  let i = 0;
+  const next = (arg: string): string => {
+    const value = argv[++i];
+    if (value === undefined) {
+      throw new Error(`Missing value for argument: ${arg}`);
+    }
+    return value;
+  };
+  const nextNum = (arg: string): number => {
+    const value = Number(next(arg));
+    if (Number.isNaN(value)) {
+      throw new Error(`Invalid numeric value for argument: ${arg}`);
+    }
+    return value;
+  };
+  for (; i < argv.length; i++) {
     const arg = argv[i];
-    const next = () => argv[++i];
     switch (arg) {
       case '--apply': opts.apply = true; break;
-      case '--prefix': opts.prefix = next(); break;
-      case '--limit': opts.limit = Number(next()); break;
-      case '--max-width': opts.maxWidth = Number(next()); break;
-      case '--min-kb': opts.minBytes = Number(next()) * 1024; break;
-      case '--quality': opts.quality = Number(next()); break;
-      case '--backup-prefix': opts.backupPrefix = next(); break;
+      case '--prefix': opts.prefix = next(arg); break;
+      case '--limit': opts.limit = nextNum(arg); break;
+      case '--max-width': opts.maxWidth = nextNum(arg); break;
+      case '--min-kb': opts.minBytes = nextNum(arg) * 1024; break;
+      case '--quality': opts.quality = nextNum(arg); break;
+      case '--backup-prefix': opts.backupPrefix = next(arg); break;
       default:
         throw new Error(`Unknown argument: ${arg}`);
     }
@@ -138,8 +152,21 @@ async function listAllObjects(client: S3Client, bucket: string, prefix: string):
   return objects;
 }
 
-function contentTypeFor(format: ImageFormat, existing?: string): string {
-  if (existing) return existing;
+/**
+ * Build an S3 `CopySource` for `bucket/key`. Each path segment is URL-encoded
+ * (so spaces/specials in keys are safe) while the `/` separators stay literal —
+ * the form R2 accepts unambiguously, avoiding reliance on the store decoding
+ * `%2F` back into a separator.
+ */
+export function encodeCopySource(bucket: string, key: string): string {
+  const encodedKey = key.split('/').map(encodeURIComponent).join('/');
+  return `${bucket}/${encodedKey}`;
+}
+
+export function contentTypeFor(format: ImageFormat, existing?: string): string {
+  // Trust the stored type only when it is already an image/* type; correct
+  // generic uploads (e.g. application/octet-stream) to the real mime-type.
+  if (existing && existing.startsWith('image/')) return existing;
   return format === 'png' ? 'image/png' : 'image/jpeg';
 }
 
@@ -214,7 +241,10 @@ async function main(): Promise<void> {
 
     try {
       const getRes = await client.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
-      const input = Buffer.from(await getRes.Body!.transformToByteArray());
+      if (!getRes.Body) {
+        throw new Error('R2 object has no body');
+      }
+      const input = Buffer.from(await getRes.Body.transformToByteArray());
       const { output, width, resized } = await reencode(input, format, opts);
       const after = output.length;
 
@@ -238,7 +268,7 @@ async function main(): Promise<void> {
           new CopyObjectCommand({
             Bucket: bucket,
             Key: backupKey,
-            CopySource: `${bucket}/${encodeURIComponent(key).replace(/%2F/g, '/')}`,
+            CopySource: encodeCopySource(bucket, key),
           }),
         );
       }
