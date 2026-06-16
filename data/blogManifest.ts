@@ -72,7 +72,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   },
   {
     "title": "Documentos para Viajar com Criança ao Exterior: Guia Completo 2026",
-    "excerpt": "Passaporte, autorização de viagem, certidão de nascimento: o que você precisa levar quando viaja com filho menor de 18 anos para fora do Brasil depende do cenário. Este guia cobre todos eles.",
+    "excerpt": "Passaporte, autorização de viagem, certidão de nascimento: saiba o que levar ao viajar com menor de 18 anos para fora do Brasil de acordo com cada cenário.",
     "date": "2026-06-30",
     "author": "felipe-william",
     "category": "Planejamento",
@@ -85,7 +85,9 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "documentos",
       "viagem-com-criança",
       "passaporte",
-      "planejamento"
+      "planejamento",
+      "america-do-sul",
+      "europa"
     ],
     "seoTitle": "Documentos para Viajar com Criança 2026",
     "seoDescription": "Saiba quais documentos são obrigatórios para viajar ao exterior com crianças e adolescentes: passaporte, autorização de viagem, AEV e casos especiais.",
