@@ -55,3 +55,7 @@
 ## 2026-12-15 - ⚡ Bolt: Carousel Sub-component Memoization
 **Learning:** Sub-components of a stateful carousel (like SectionHeader or ReviewAvatar in the Testimonials section) can trigger redundant reconciliation on every slide transition if they aren't memoized or if they receive fresh JSX references as props. Since carousels often update automatically via timers, these unnecessary re-renders can lead to sustained background CPU usage.
 **Action:** Always memoize presentation-heavy carousel sub-components using `React.memo` and stabilize JSX props by moving them to module-level constants outside the render loop.
+
+## 2026-06-16 - ⚡ Bolt: Media Configuration Memoization
+**Learning:** Utilities like `getMediaRuntimeConfig` that access environment variables (`import.meta.env`) and global browser state (`window.location`) can become significant overhead when called within high-frequency paths, such as `LazyImage` rendering or `srcset` generation in large lists. Since these values are effectively static during a session, redundant lookups and object allocations can be avoided entirely.
+**Action:** Always memoize session-static configuration lookups that are used within the rendering loop of repeatable UI components.

@@ -37,6 +37,7 @@ test('getMediaRuntimeConfig should accept quoted boolean env values', () => {
         getMediaRuntimeConfig(
             {
                 VITE_MEDIA_BASE_URL: 'https://media.anhanga.tur.br',
+                VITE_MEDIA_TRANSFORM_ZONE_URL: 'https://media.anhanga.tur.br',
                 VITE_MEDIA_ENABLE_TRANSFORMS: '"true"',
             },
             {
@@ -50,6 +51,14 @@ test('getMediaRuntimeConfig should accept quoted boolean env values', () => {
             enableTransforms: true,
         },
     );
+});
+
+test('getMediaRuntimeConfig should memoize the default configuration', () => {
+    const config1 = getMediaRuntimeConfig();
+    const config2 = getMediaRuntimeConfig();
+
+    // Reference equality check
+    assert.equal(config1, config2, 'Default configuration should be memoized');
 });
 
 test('hero media should point to the Cloudflare R2 origin', () => {
