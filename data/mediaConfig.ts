@@ -75,18 +75,38 @@ function getRuntimeLocation(): RuntimeLocation | undefined {
     };
 }
 
-export function getMediaRuntimeConfig(
-    env: MediaEnv = getImportMetaEnv(),
-    location: RuntimeLocation | undefined = getRuntimeLocation(),
-): MediaRuntimeConfig {
-    const mediaBaseUrl = env.VITE_MEDIA_BASE_URL || env.VITE_MEDIA_CDN_URL || DEFAULT_MEDIA_BASE_URL;
-    const enableTransforms = parseBooleanEnv(env.VITE_MEDIA_ENABLE_TRANSFORMS);
+let cachedConfig: MediaRuntimeConfig | null = null;
 
-    return {
+/**
+ * Retrieves the current media configuration, optionally overriding environment or location.
+ * PERFORMANCE: Results for the default call (no arguments) are memoized to avoid
+ * redundant lookups of environment variables and window location.
+ */
+export function getMediaRuntimeConfig(
+    env?: MediaEnv,
+    location?: RuntimeLocation,
+): MediaRuntimeConfig {
+    if (!env && !location && cachedConfig) {
+        return cachedConfig;
+    }
+
+    const resolvedEnv = env ?? getImportMetaEnv();
+    const resolvedLocation = location ?? getRuntimeLocation();
+
+    const mediaBaseUrl = resolvedEnv.VITE_MEDIA_BASE_URL || resolvedEnv.VITE_MEDIA_CDN_URL || DEFAULT_MEDIA_BASE_URL;
+    const enableTransforms = parseBooleanEnv(resolvedEnv.VITE_MEDIA_ENABLE_TRANSFORMS);
+
+    const config = {
         mediaBaseUrl,
-        transformZoneUrl: env.VITE_MEDIA_TRANSFORM_ZONE_URL || (enableTransforms ? mediaBaseUrl : getDefaultTransformZoneUrl(location)),
+        transformZoneUrl: resolvedEnv.VITE_MEDIA_TRANSFORM_ZONE_URL || (enableTransforms ? mediaBaseUrl : getDefaultTransformZoneUrl(resolvedLocation)),
         enableTransforms,
     };
+
+    if (!env && !location) {
+        cachedConfig = config;
+    }
+
+    return config;
 }
 
 export const getMediaUrl = (path: string): string => {
