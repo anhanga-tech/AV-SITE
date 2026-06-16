@@ -1,16 +1,15 @@
 import { Seo } from "@/components/Seo";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { BreadcrumbSchema } from "@/components/schemas/BreadcrumbSchema";
+import { WebPageSchema } from "@/components/schemas/WebPageSchema";
 
 const Terms = () => {
-    const metaDescription = "Termos e Condições de Uso da Anhangá Turismo: intermediação, simulações, responsabilidade e privacidade.";
+    const metaDescription = "Termos e Condições de Uso da Anhangá Turismo: como funciona a intermediação de viagens, simulações de orçamento, responsabilidades e privacidade.";
     const canonicalUrl = "https://www.anhanga.tur.br/termos-de-uso/";
-    const lastUpdatedDisplay = "27 de fevereiro de 2026";
-    const lastUpdatedIso = "2026-02-27";
+    const lastUpdatedDisplay = "10 de junho de 2026";
+    const lastUpdatedIso = "2026-06-10";
 
     return (
-        <div className="min-h-screen bg-background text-foreground">
+        <>
             <Seo
                 title="Termos e Condições de Uso | Anhangá Viagens"
                 description={metaDescription}
@@ -20,8 +19,7 @@ const Terms = () => {
                 { name: "Home", item: "https://www.anhanga.tur.br/" },
                 { name: "Termos de Uso", item: canonicalUrl }
             ]} />
-            <Header />
-            <main className="container mx-auto px-4 py-10">
+            <div className="container mx-auto px-4 py-10">
                 <header className="mb-8 text-center">
                     <h1 className="text-3xl md:text-4xl font-merriweather font-bold">Termos e Condições de Uso</h1>
                     <p className="mt-2 text-sm md:text-base text-muted-foreground font-inter">
@@ -38,7 +36,7 @@ const Terms = () => {
                                 Os presentes Termos e Condições de Uso ("Termos") são estabelecidos pela <strong>Anhangá Turismo Ltda.</strong>,
                                 pessoa jurídica de direito privado, inscrita no CNPJ sob o nº <strong>37.036.732/0001-41</strong>, com sede em
                                 <em> Avenida Dom Pedro I, 773, Vila Monumento, São Paulo-SP</em> ("Anhangá Turismo", "Controladora" ou "nós"), que opera o website
-                                <a href="https://www.anhanga.tur.br/" target="_blank" rel="noopener noreferrer" className="text-primary underline"> https://www.anhanga.tur.br/</a>
+                                <a href="/" target="_blank" rel="noopener noreferrer" className="text-primary underline"> https://www.anhanga.tur.br/</a>
                                 e demais plataformas digitais correlatas.
                             </p>
                             <h3 className="font-merriweather font-semibold">1.2 Aceitação e Concordância</h3>
@@ -102,7 +100,7 @@ const Terms = () => {
                                 <li>Adequação dos serviços às necessidades específicas do Usuário.</li>
                             </ul>
                             <h3 className="font-merriweather font-semibold">4.3 Limitação de Danos</h3>
-                            <p>Em hipótese alguma seremos responsáveis por danos diretos, indiretos, incidentais, especiais, consequenciais ou punitivos decorrentes do uso de nossa Plataforma.</p>
+                            <p>Na máxima extensão permitida pela legislação aplicável, em especial o Código de Defesa do Consumidor (Lei nº 8.078/1990), a Anhangá Turismo não se responsabiliza por danos decorrentes do uso indevido da Plataforma, de eventos fora de seu controle razoável ou de atos exclusivos de terceiros. Nada nestes Termos exclui ou limita direitos que a legislação assegura ao Usuário consumidor.</p>
                         </div>
                     </section>
 
@@ -119,7 +117,12 @@ const Terms = () => {
                             <h3 className="font-merriweather font-semibold">5.2 Processo de Reserva</h3>
                             <p>As reservas são processadas via plataformas especializadas (como ONER Travel), sistemas próprios dos Fornecedores ou canais oficiais de comercialização de terceiros.</p>
                             <h3 className="font-merriweather font-semibold">5.3 Confirmação e Contratação</h3>
-                            <p>A confirmação efetiva e contratação de serviços ocorre exclusivamente entre o Usuário e o Fornecedor final, não participando a Anhangá Turismo da relação contratual estabelecida.</p>
+                            <p>A contratação dos serviços turísticos poderá ocorrer de duas formas:</p>
+                            <ul className="list-disc pl-6 space-y-1">
+                                <li><strong>Venda direta:</strong> quando a Anhangá Turismo atua como vendedora ou emissora dos serviços e recebe o pagamento diretamente do Usuário;</li>
+                                <li><strong>Intermediação:</strong> quando a contratação se estabelece entre o Usuário e o Fornecedor final, inclusive nos casos em que o pagamento é realizado diretamente ao Fornecedor, por link de pagamento ou canal próprio deste.</li>
+                            </ul>
+                            <p>Em ambos os casos, a responsabilidade da Anhangá Turismo observará a legislação aplicável, em especial o Código de Defesa do Consumidor e a Lei Geral do Turismo (Lei nº 11.771/2008).</p>
                         </div>
                     </section>
 
@@ -129,11 +132,12 @@ const Terms = () => {
                             <h3 className="font-merriweather font-semibold">6.1 Remissão à Política Específica</h3>
                             <p>
                                 O tratamento de dados pessoais é regulamentado por nossa <strong>Política de Privacidade e Proteção de Dados Pessoais</strong>,
-                                disponível em: <a href="https://www.anhanga.tur.br/politica-privacidade/" target="_blank" rel="noopener noreferrer" className="text-primary underline">https://www.anhanga.tur.br/politica-privacidade/</a>.
+                                disponível em: <a href="/politica-privacidade/" target="_blank" rel="noopener noreferrer" className="text-primary underline">https://www.anhanga.tur.br/politica-privacidade/</a>.
                             </p>
                             <h3 className="font-merriweather font-semibold">6.2 Bases Legais do Tratamento</h3>
                             <ul className="list-disc pl-6 space-y-1">
                                 <li>Consentimento livre, específico e informado;</li>
+                                <li>Execução de contrato ou procedimentos preliminares relacionados a contrato, a pedido do titular;</li>
                                 <li>Legítimo interesse para melhoria dos serviços;</li>
                                 <li>Cumprimento de obrigações legais e regulatórias.</li>
                             </ul>
@@ -222,7 +226,7 @@ const Terms = () => {
                             <h3 className="font-merriweather font-semibold">12.2 Mediação e Arbitragem</h3>
                             <p>Não sendo possível a composição, as partes poderão optar por mediação ou arbitragem, conforme regulamento aplicável.</p>
                             <h3 className="font-merriweather font-semibold">12.3 Legislação Aplicável e Foro</h3>
-                            <p>Estes Termos são regidos pela legislação brasileira. Fica eleito o Foro da Comarca da cidade de São Paulo, Estado de São Paulo, com exclusão de qualquer outro.</p>
+                            <p>Estes Termos são regidos pela legislação brasileira. Fica eleito o Foro da Comarca de São Paulo, Estado de São Paulo, ressalvado, nas relações de consumo, o direito do Usuário de optar pelo foro de seu próprio domicílio, nos termos do Código de Defesa do Consumidor.</p>
                         </div>
                     </section>
 
@@ -251,7 +255,7 @@ const Terms = () => {
                             <p><strong>E-mail Geral:</strong> privacidade@anhanga.tur.br<br />
                                 <strong>WhatsApp Business:</strong> +55 (11) 5283-3309<br />
                                 <strong>Instagram:</strong> <a href="https://instagram.com/anhangaviagens" target="_blank" rel="noopener noreferrer" className="text-primary underline">@anhangaviagens</a><br />
-                                <strong>Website:</strong> <a href="https://www.anhanga.tur.br/" target="_blank" rel="noopener noreferrer" className="text-primary underline">https://www.anhanga.tur.br/</a></p>
+                                <strong>Website:</strong> <a href="/" target="_blank" rel="noopener noreferrer" className="text-primary underline">https://www.anhanga.tur.br/</a></p>
                             <h3 className="font-merriweather font-semibold">14.3 Atendimento</h3>
                             <p>Nossos canais funcionam em horário comercial, com compromisso de resposta em até 5 dias úteis para questões relacionadas a estes Termos.</p>
                         </div>
@@ -260,26 +264,15 @@ const Terms = () => {
                         </p>
                     </section>
                 </article>
-            </main>
+            </div>
 
-            {/* Structured Data — safe: JSON.stringify of a static object literal, no user input */}
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{
-                    __html: JSON.stringify({
-                        "@context": "https://schema.org",
-                        "@type": "WebPage",
-                        name: "Termos e Condições de Uso - Anhangá Turismo",
-                        url: canonicalUrl,
-                        description: metaDescription,
-                        dateModified: lastUpdatedIso,
-                        inLanguage: "pt-BR",
-                    }),
-                }}
+            <WebPageSchema
+                name="Termos e Condições de Uso - Anhangá Turismo"
+                url={canonicalUrl}
+                description={metaDescription}
+                dateModified={lastUpdatedIso}
             />
-
-            <Footer />
-        </div>
+        </>
     );
 };
 

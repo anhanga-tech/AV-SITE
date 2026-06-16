@@ -2,7 +2,9 @@ const BLOG_BASE_URL = 'https://www.anhanga.tur.br/blog/';
 
 export const getBlogHomeUrl = (): string => BLOG_BASE_URL;
 
-export const getBlogPostUrl = (slug: string): string => `${BLOG_BASE_URL}${slug}`;
+// Trailing slash obrigatório: o Cloudflare Pages responde 308 para a versão sem barra,
+// o que desperdiça link equity interno (auditoria Ahrefs jun/2026).
+export const getBlogPostUrl = (slug: string): string => `${BLOG_BASE_URL}${slug}/`;
 
 // Converte ISO 8601 (AAAA-MM-DD) para o padrão brasileiro DD/MM/AAAA.
 // Usa parsing de string para evitar o bug de fuso horário do new Date().

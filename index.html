@@ -15,6 +15,7 @@
   <link data-av-head="link:hreflang:pt-BR" rel="alternate" hreflang="pt-BR" href="https://www.anhanga.tur.br/" />
   <link data-av-head="link:hreflang:x-default" rel="alternate" hreflang="x-default" href="https://www.anhanga.tur.br/" />
   <link rel="alternate" type="text/plain" title="LLMs.txt" href="/llms.txt" />
+  <link rel="alternate" type="application/rss+xml" title="Blog Anhangá Viagens" href="/feed.xml" />
   <meta data-av-head="meta:og:type" property="og:type" content="website" />
   <meta data-av-head="meta:og:title" property="og:title"
     content="Agência de Viagens em SP | Anhangá Viagens" />
@@ -98,7 +99,6 @@
       var _consentChoice = (function () { try { return localStorage.getItem('anhanga_cookie_consent'); } catch (e) { return null; } })();
       var analyticsLoaded = false;
       var gtmLoaded = false;
-      var hubspotLoaded = false;
       var utmLoaded = false;
       var mauticLoaded = false;
 
@@ -146,17 +146,6 @@
         }
       };
 
-      var loadHubspot = function () {
-        if (_consentChoice !== 'marketing') return;
-        if (hubspotLoaded) return;
-        hubspotLoaded = true;
-        injectScript('//js.hs-scripts.com/50895604.js', {
-          type: 'text/javascript',
-          id: 'hs-script-loader',
-          defer: true
-        });
-      };
-
       var triggerAnalytics = function () {
         loadAnalytics();
       };
@@ -175,67 +164,9 @@
         setTimeout(triggerAnalytics, 12000);
       }, { once: true });
 
-      // HubSpot only after strong conversion intent or long dwell time.
-      var contactIntentLoaded = false;
-      var triggerHubspot = function () {
-        if (contactIntentLoaded) return;
-        contactIntentLoaded = true;
-        loadAnalytics();
-        loadHubspot();
-      };
-
-      document.addEventListener('click', function (event) {
-        var target = event.target;
-        if (!target || !target.closest) return;
-        var directIntent = target.closest('a[href^="tel:"],a[href*="wa.me"],a[href*="api.whatsapp.com"],a[href*="#contato"],[data-contact-intent]');
-        if (directIntent) {
-          triggerHubspot();
-          return;
-        }
-        var btn = target.closest('button,[role="button"]');
-        if (!btn) return;
-        var hint = ((btn.id || '') + ' ' + (btn.className || '') + ' ' + (btn.textContent || '')).toLowerCase();
-        if (hint.indexOf('whatsapp') !== -1 || hint.indexOf('contato') !== -1 || hint.indexOf('orcamento') !== -1) {
-          triggerHubspot();
-        }
-      }, { capture: true });
-
-      var onDeepScroll = function () {
-        var doc = document.documentElement;
-        var scrollable = Math.max(1, doc.scrollHeight - doc.clientHeight);
-        if ((window.scrollY / scrollable) > 0.65) {
-          triggerHubspot();
-          window.removeEventListener('scroll', onDeepScroll);
-        }
-      };
-      window.addEventListener('scroll', onDeepScroll, { passive: true });
-
-      if ('IntersectionObserver' in window) {
-        var observeContactSection = function (attempt) {
-          var contactSection = document.getElementById('contato');
-          if (!contactSection) {
-            if (attempt < 10) setTimeout(function () { observeContactSection(attempt + 1); }, 500);
-            return;
-          }
-          var io = new IntersectionObserver(function (entries) {
-            if (entries[0] && entries[0].isIntersecting) {
-              triggerHubspot();
-              io.disconnect();
-            }
-          }, { rootMargin: '180px 0px', threshold: 0.05 });
-          io.observe(contactSection);
-        };
-        observeContactSection(0);
-      }
-
-      setTimeout(triggerHubspot, 35000);
-
       window.addEventListener('anhanga:marketing-consent', function () {
         _consentChoice = 'marketing';
         loadMautic();
-        if (contactIntentLoaded) {
-          loadHubspot();
-        }
         if (typeof gtag === 'function') {
           gtag('consent', 'update', { ad_storage: 'granted', ad_personalization: 'granted', ad_user_data: 'granted' });
         }

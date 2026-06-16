@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { BRAND_LOGO_BLUE_URL } from '@/lib/media-assets';
 import { triggerResetBanner } from '@/lib/consent';
 
@@ -15,12 +16,12 @@ export function LandingFooter() {
                 <p className="text-xs text-white/50 font-medium text-center">
                     ANHANGA TURISMO LTDA • CNPJ 37.036.732/0001-41
                 </p>
-                <a
-                    href="https://www.anhanga.tur.br/"
+                <Link
+                    to="/"
                     className="text-xs text-white/50 hover:text-white transition-colors duration-150 font-medium underline underline-offset-2"
                 >
                     Ir para o site principal →
-                </a>
+                </Link>
                 <button
                     type="button"
                     onClick={triggerResetBanner}

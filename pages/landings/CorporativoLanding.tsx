@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Seo } from '@/components/Seo';
 import { BreadcrumbSchema } from '@/components/schemas/BreadcrumbSchema';
 import { CorpNav } from '@/components/landings/corporativo/CorpNav';
@@ -44,15 +45,15 @@ const CorporativoLanding: React.FC = () => {
                     <div className="container mx-auto px-6 text-center">
                         <p className="text-sm text-zinc-500 font-medium mb-4">Conheça também</p>
                         <div className="flex flex-wrap justify-center gap-3">
-                            <a href="https://www.anhanga.tur.br/consultoria-de-viagem/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+                            <Link to="/consultoria-de-viagem/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
                                 Consultoria de Viagem
-                            </a>
-                            <a href="https://www.anhanga.tur.br/melhor-idade/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+                            </Link>
+                            <Link to="/melhor-idade/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
                                 Viagens Melhor Idade
-                            </a>
-                            <a href="https://www.anhanga.tur.br/curadoria-cruzeiros-brasil/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+                            </Link>
+                            <Link to="/curadoria-cruzeiros-brasil/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
                                 Cruzeiros pelo Brasil
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </nav>

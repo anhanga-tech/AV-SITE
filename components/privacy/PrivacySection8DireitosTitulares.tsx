@@ -20,7 +20,7 @@ export function PrivacySection8DireitosTitulares() {
                     <a href="mailto:privacidade@anhanga.tur.br" className="text-primary underline"> privacidade@anhanga.tur.br</a>.
                     Para instruções detalhadas sobre exclusão de dados, consulte a página{" "}
                     <a href="/exclusao-de-dados/" className="text-primary underline">Instruções de Exclusão de Dados</a>.</p>
-                <p><strong>Prazo de Resposta:</strong> 15 (quinze) dias corridos, prorrogáveis por igual período mediante justificativa expressa.</p>
+                <p><strong>Prazo de Resposta:</strong> Pedidos de confirmação e acesso serão atendidos em até 15 (quinze) dias, conforme o Art. 19, II, da LGPD. As demais solicitações serão respondidas no menor prazo possível; havendo necessidade de mais tempo, o titular será informado com a devida justificativa.</p>
             </div>
         </section>
     );

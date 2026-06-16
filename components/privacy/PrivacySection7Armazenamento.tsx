@@ -6,7 +6,7 @@ export function PrivacySection7Armazenamento() {
                 <h3 className="font-merriweather font-semibold">7.1 Períodos de Retenção</h3>
                 <ul className="list-disc pl-6 space-y-1">
                     <li><strong>Dados de contato e relacionamento:</strong> 5 (cinco) anos após a última interação</li>
-                    <li><strong>Dados de navegação:</strong> até 26 (vinte e seis) meses conforme políticas de privacidade</li>
+                    <li><strong>Dados de navegação (analytics):</strong> até 14 (quatorze) meses, conforme a configuração de retenção do Google Analytics 4</li>
                     <li><strong>Cookies:</strong> conforme configurações do navegador e políticas específicas de cada tecnologia</li>
                 </ul>
                 <h3 className="font-merriweather font-semibold">7.2 Critérios para Retenção</h3>

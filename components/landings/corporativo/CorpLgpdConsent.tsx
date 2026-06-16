@@ -23,7 +23,7 @@ export function CorpLgpdConsent({ checked, onChange, error }: CorpLgpdConsentPro
                 <span className="text-xs text-zinc-500 leading-tight">
                     Aceito receber comunicações e autorizo o tratamento dos meus dados conforme a{' '}
                     <a
-                        href="https://www.anhanga.tur.br/politica-privacidade/"
+                        href="/politica-privacidade/"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="underline hover:text-brand-cyan"

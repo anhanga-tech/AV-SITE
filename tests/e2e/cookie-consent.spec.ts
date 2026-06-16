@@ -109,11 +109,12 @@ test.describe('Cookie Consent Banner (CMP)', () => {
 
   // --- Link de Política de Privacidade ---
 
-  test('link "Política de Privacidade" aponta para /politica-privacidade#cookies', async ({ page }) => {
+  test('link "Política de Privacidade" aponta para /politica-privacidade/#cookies', async ({ page }) => {
     await page.goto('/');
     const link = page.getByRole('dialog').getByRole('link');
     const href = await link.getAttribute('href');
-    expect(href).toBe('/politica-privacidade#cookies');
+    // Trailing slash antes da âncora evita o 308 do Cloudflare Pages (auditoria SEO jun/2026)
+    expect(href).toBe('/politica-privacidade/#cookies');
   });
 
   // --- Gerenciar cookies (revogação) ---

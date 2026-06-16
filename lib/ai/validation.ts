@@ -25,6 +25,12 @@ export function normalizeChildAges(value: unknown): number[] {
     });
 }
 
+const LINKY_PATTERN = /\[[^\]]*\]\([^)]*\)|https?:\/\/|wa\.me|\bwww\./i;
+
+function isPlainTextLocation(value: string): boolean {
+    return value.length > 0 && !LINKY_PATTERN.test(value);
+}
+
 export function isCityValueAcceptable(value?: string): boolean {
     if (!value) return false;
 
@@ -149,12 +155,17 @@ function buildInvalidBudgetResult(missing: string[], safetyBlock?: SafetyBlock):
     };
 }
 
+function rejectLinkyLocation(value: string): string {
+    return isPlainTextLocation(value) ? value : '';
+}
+
 function sanitizeBudgetFields(raw: BudgetToolArgs) {
-    const destinationCity = cleanString(raw.destination_city);
-    const destinationRegion = cleanString(raw.destination_region);
-    const originCity = cleanString(raw.origin_city);
-    const providedOriginRegion = cleanString(raw.origin_region);
-    const destination = cleanString(raw.destination) || [destinationCity, destinationRegion].filter(Boolean).join(', ');
+    const destinationCity = rejectLinkyLocation(cleanString(raw.destination_city));
+    const destinationRegion = rejectLinkyLocation(cleanString(raw.destination_region));
+    const originCity = rejectLinkyLocation(cleanString(raw.origin_city));
+    const providedOriginRegion = rejectLinkyLocation(cleanString(raw.origin_region));
+    const rawDestination = rejectLinkyLocation(cleanString(raw.destination));
+    const destination = rawDestination || [destinationCity, destinationRegion].filter(Boolean).join(', ');
 
     return {
         destination,

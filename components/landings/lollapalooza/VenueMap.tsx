@@ -192,7 +192,6 @@ const VenueMap: React.FC = () => {
               className="w-full h-full z-0 outline-none"
               aria-label="Mapa interativo com pontos de interesse"
               aria-describedby="map-a11y-instructions"
-              tabIndex={0}
             />
             {/* Gradient Overlay apenas desktop */}
             <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-white to-transparent pointer-events-none hidden md:block z-[400]" aria-hidden="true"></div>

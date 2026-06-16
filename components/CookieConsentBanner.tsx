@@ -30,10 +30,10 @@ const CookieConsentBanner: React.FC = () => {
     >
       <div className="container mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
         <p className="text-sm text-zinc-300 leading-relaxed max-w-2xl">
-          Usamos cookies de marketing (Mautic e HubSpot) para comunicações personalizadas.
+          Usamos cookies de marketing para comunicações personalizadas.
           Analytics continua ativo por interesse legítimo {'—'}{' '}
           <a
-            href="/politica-privacidade#cookies"
+            href="/politica-privacidade/#cookies"
             className="underline underline-offset-2 hover:text-brand-yellow transition-colors"
           >
             saiba como se opor em nossa Política de Privacidade

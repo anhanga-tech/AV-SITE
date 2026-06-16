@@ -5,6 +5,7 @@ import {
     extractUtms,
     buildLeadWhatsAppMessage,
     createLeadEventId,
+    pushGenerateLeadDataLayerEvent,
     type LeadDraft,
 } from '../hooks/useLeadCapture.ts';
 import type { SubmitLeadRequest } from '../types/leadCapture.ts';
@@ -196,4 +197,46 @@ test('createLeadEventId returns a non-empty string prefixed with lead_', () => {
 test('createLeadEventId generates unique IDs on successive calls', () => {
     const ids = new Set(Array.from({ length: 10 }, () => createLeadEventId()));
     assert.equal(ids.size, 10, 'each call should produce a unique ID');
+});
+
+// ─── pushGenerateLeadDataLayerEvent ──────────────────────────────────────────
+
+type DataLayerEvent = Record<string, unknown>;
+
+function withMockedWindow(run: (dataLayer: DataLayerEvent[]) => void): void {
+    const dataLayer: DataLayerEvent[] = [];
+    const previousWindow = (globalThis as { window?: unknown }).window;
+
+    (globalThis as { window?: unknown }).window = {
+        dataLayer,
+        location: { href: 'https://www.anhanga.tur.br/' },
+    };
+
+    try {
+        run(dataLayer);
+    } finally {
+        if (previousWindow === undefined) {
+            delete (globalThis as { window?: unknown }).window;
+        } else {
+            (globalThis as { window?: unknown }).window = previousWindow;
+        }
+    }
+}
+
+test('pushGenerateLeadDataLayerEvent emits the custom generate_lead/form_submission events', () => {
+    withMockedWindow((dataLayer) => {
+        pushGenerateLeadDataLayerEvent(validPayload({ event_id: 'lead_abc123' }));
+
+        const eventNames = dataLayer.map((entry) => entry.event);
+        assert.deepEqual(eventNames, ['generate_lead', 'form_submission']);
+    });
+});
+
+test('pushGenerateLeadDataLayerEvent keeps custom events even without an event_id', () => {
+    withMockedWindow((dataLayer) => {
+        pushGenerateLeadDataLayerEvent(validPayload({ event_id: undefined }));
+
+        const eventNames = dataLayer.map((entry) => entry.event);
+        assert.deepEqual(eventNames, ['generate_lead', 'form_submission']);
+    });
 });

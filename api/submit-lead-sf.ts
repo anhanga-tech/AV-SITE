@@ -1,9 +1,9 @@
-import { buildCorsHeaders, createRequestId, getClientIP } from '../lib/network';
+import { buildCorsHeaders, buildJsonResponse, createRequestId, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
 import { cleanString, normalizeWhatsappNumber, maskEmail } from '../lib/lead-logic';
 import { logger } from '../lib/logger';
-import { postWebToLead } from '../services/salesforce';
-import type { SalesforceLeadFields } from '../services/salesforce';
+import { postWebToLead, SF_UTM_KEYS } from '../services/salesforce';
+import type { SalesforceLeadFields, SfUtmKey } from '../services/salesforce';
 
 export const config = {
     runtime: 'edge',
@@ -26,15 +26,35 @@ const VALID_LEAD_SOURCES = new Set([
     'Other',
 ]);
 
-function buildJsonResponse(
-    body: Record<string, unknown>,
-    status: number,
-    corsHeaders: Record<string, string>,
-): Response {
-    return new Response(JSON.stringify(body), {
-        status,
-        headers: { 'Content-Type': 'application/json', ...corsHeaders },
-    });
+const UTM_VALUE_MAX_LENGTH = 255;
+
+function parseUtms(raw: unknown): Partial<Record<SfUtmKey, string>> | undefined {
+    if (!raw || typeof raw !== 'object') return undefined;
+
+    const source = raw as Record<string, unknown>;
+    const utms: Partial<Record<SfUtmKey, string>> = {};
+
+    for (const key of SF_UTM_KEYS) {
+        const value = cleanString(source[key]).slice(0, UTM_VALUE_MAX_LENGTH);
+        if (value) utms[key] = value;
+    }
+
+    return Object.keys(utms).length > 0 ? utms : undefined;
+}
+
+function parseOptionalEmail(raw: unknown): { valid: boolean; email?: string } {
+    const email = cleanString(raw).toLowerCase();
+    if (!email) return { valid: true };
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email) ? { valid: true, email } : { valid: false };
+}
+
+function parseOptionalPhone(raw: unknown): { valid: boolean; phone?: string } {
+    if (typeof raw !== 'string' || raw.trim().length === 0) return { valid: true };
+
+    const phone = normalizeWhatsappNumber(raw) ?? undefined;
+    return phone ? { valid: true, phone } : { valid: false };
 }
 
 function validateSfLeadBody(raw: unknown): { valid: true; data: SalesforceLeadFields } | { valid: false; error: string } {
@@ -46,20 +66,18 @@ function validateSfLeadBody(raw: unknown): { valid: true; data: SalesforceLeadFi
 
     const firstName = cleanString(body.firstName);
     const lastName = cleanString(body.lastName);
-    const email = cleanString(body.email).toLowerCase();
 
-    if (!firstName || !lastName || !email) {
+    if (!firstName || !lastName) {
         return { valid: false, error: 'Campos obrigatórios ausentes.' };
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    const emailResult = parseOptionalEmail(body.email);
+    if (!emailResult.valid) {
         return { valid: false, error: 'Email inválido.' };
     }
 
-    const hasWhatsapp = typeof body.whatsapp === 'string' && body.whatsapp.trim().length > 0;
-    const phone = hasWhatsapp ? (normalizeWhatsappNumber(body.whatsapp) ?? undefined) : undefined;
-    if (hasWhatsapp && !phone) {
+    const phoneResult = parseOptionalPhone(body.whatsapp);
+    if (!phoneResult.valid) {
         return { valid: false, error: 'Número de telefone inválido.' };
     }
 
@@ -75,12 +93,13 @@ function validateSfLeadBody(raw: unknown): { valid: true; data: SalesforceLeadFi
         data: {
             firstName,
             lastName,
-            email,
-            phone,
+            email: emailResult.email,
+            phone: phoneResult.phone,
             company,
             title,
             leadSource,
             description,
+            utms: parseUtms(body.utms),
         },
     };
 }
@@ -94,7 +113,7 @@ export default async function handler(request: Request): Promise<Response> {
     }
 
     if (request.method !== 'POST') {
-        return buildJsonResponse({ ok: false, requestId, error: 'Method not allowed' }, 405, corsHeaders);
+        return buildJsonResponse({ ok: false, requestId, error: 'Method not allowed' }, 405, corsHeaders, { requestId: null });
     }
 
     const clientIP = getClientIP(request);
@@ -106,12 +125,13 @@ export default async function handler(request: Request): Promise<Response> {
 
     if (!rateLimit.allowed) {
         if (rateLimit.serviceUnavailable) {
-            return buildJsonResponse({ ok: false, requestId, error: 'Serviço temporariamente indisponível.' }, 503, corsHeaders);
+            return buildJsonResponse({ ok: false, requestId, error: 'Serviço temporariamente indisponível.' }, 503, corsHeaders, { requestId: null });
         }
         return buildJsonResponse(
             { ok: false, requestId, error: 'Muitas tentativas. Tente novamente em breve.' },
             429,
             { ...corsHeaders, 'Retry-After': String(Math.ceil(rateLimit.resetIn / 1000)) },
+            { requestId: null },
         );
     }
 
@@ -119,12 +139,12 @@ export default async function handler(request: Request): Promise<Response> {
     try {
         rawBody = await request.json();
     } catch {
-        return buildJsonResponse({ ok: false, requestId, error: 'JSON inválido.' }, 400, corsHeaders);
+        return buildJsonResponse({ ok: false, requestId, error: 'JSON inválido.' }, 400, corsHeaders, { requestId: null });
     }
 
     const validation = validateSfLeadBody(rawBody);
     if (!validation.valid) {
-        return buildJsonResponse({ ok: false, requestId, error: validation.error }, 400, corsHeaders);
+        return buildJsonResponse({ ok: false, requestId, error: validation.error }, 400, corsHeaders, { requestId: null });
     }
 
     const fields = validation.data;
@@ -132,7 +152,7 @@ export default async function handler(request: Request): Promise<Response> {
     logger.info('SUBMIT_LEAD_SF', {
         requestId,
         stage: 'sending',
-        email: maskEmail(fields.email),
+        email: fields.email ? maskEmail(fields.email) : undefined,
         leadSource: fields.leadSource,
     });
 
@@ -141,11 +161,11 @@ export default async function handler(request: Request): Promise<Response> {
 
         if (!result.ok) {
             logger.error('SUBMIT_LEAD_SF', { requestId, stage: 'sf_rejected' });
-            return buildJsonResponse({ ok: false, requestId, error: 'Falha ao enviar para Salesforce.' }, 502, corsHeaders);
+            return buildJsonResponse({ ok: false, requestId, error: 'Falha ao enviar para Salesforce.' }, 502, corsHeaders, { requestId: null });
         }
 
         logger.info('SUBMIT_LEAD_SF', { requestId, stage: 'success' });
-        return buildJsonResponse({ ok: true, requestId }, 201, corsHeaders);
+        return buildJsonResponse({ ok: true, requestId }, 201, corsHeaders, { requestId: null });
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : String(error);
         const isTimeout = error instanceof Error && error.name === 'AbortError';
@@ -160,6 +180,7 @@ export default async function handler(request: Request): Promise<Response> {
             { ok: false, requestId, error: 'Erro ao processar envio para Salesforce.' },
             isTimeout ? 504 : 500,
             corsHeaders,
+            { requestId: null },
         );
     }
 }

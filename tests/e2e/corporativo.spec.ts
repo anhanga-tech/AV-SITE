@@ -118,11 +118,13 @@ test.describe('Corporativo Landing Page', () => {
       firstName: 'Maria',
       lastName: 'Santos',
       email: 'maria@empresa.com.br',
-      whatsapp: '(11) 98831-4487',
+      whatsapp: '+5511988314487',
       empresa: 'Empresa Teste LTDA',
       cargo: 'Sócia',
       leadSource: 'Corporativo',
     });
+    expect(String((sfPayload as unknown as Record<string, unknown>).description)).toContain('Lead corporativo');
+    expect(sfPayload as unknown as Record<string, unknown>).toHaveProperty('utms');
 
     const formSubmissionEvent = await page.evaluate(() =>
       (window.dataLayer || []).find(e => e.event === 'form_submission')
@@ -176,6 +178,20 @@ test.describe('Corporativo Landing Page', () => {
     await page.waitForTimeout(500);
 
     expect(hubspotRequests).toEqual([]);
+  });
+
+  test('should show fallback when globe.gl fails to load', async ({ page, isMobile }) => {
+    // O globo (e seu fallback) só é montado em telas lg+ — o wrapper em
+    // CorpHero usa `hidden lg:block`. Em viewports mobile fica display:none
+    // por design, então a asserção de visibilidade só vale no desktop.
+    test.skip(isMobile, 'Globo é decorativo desktop-only (hidden lg:block)');
+
+    await page.route(/globe(\.|__)gl|three-globe/, route => route.abort());
+
+    const landing = new CorporativoPage(page);
+    await landing.goto();
+
+    await expect(page.getByTestId('corp-globe-fallback')).toBeVisible();
   });
 
   test('should handle navigation to #contato anchor', async ({ page, isMobile }) => {

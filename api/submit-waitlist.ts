@@ -1,5 +1,5 @@
-import type { SubmitWaitlistRequest, SubmitWaitlistResponse } from '../types/waitlist';
-import { buildCorsHeaders, createRequestId, getClientIP } from '../lib/network';
+import type { SubmitWaitlistRequest } from '../types/waitlist';
+import { buildCorsHeaders, buildJsonResponse, createRequestId, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
 import { cleanString } from '../lib/lead-logic';
 import { buildN8nWaitlistPayload } from '../lib/n8n-payloads';
@@ -25,20 +25,9 @@ function truncateDetail(detail: string): string | undefined {
     return trimmed.slice(0, 200);
 }
 
-function buildJsonResponse(body: SubmitWaitlistResponse, status: number, corsHeaders: Record<string, string>): Response {
-    return new Response(JSON.stringify(body), {
-        status,
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Request-Id': body.requestId,
-            ...corsHeaders,
-        },
-    });
-}
-
 function getSubmitWaitlistConfig(): SubmitWaitlistConfig | null {
-    const webhookUrl = cleanString(process.env.N8N_SUBMIT_WAITLIST_WEBHOOK_URL);
-    const webhookSecret = cleanString(process.env.N8N_WEBHOOK_SECRET);
+    const webhookUrl = process.env.N8N_SUBMIT_WAITLIST_WEBHOOK_URL?.trim() || '';
+    const webhookSecret = process.env.N8N_WEBHOOK_SECRET?.trim() || '';
 
     if (!webhookUrl || !webhookSecret) {
         return null;

@@ -14,10 +14,10 @@ export function PrivacySection1DisposicoesGerais() {
                 <p>Esta Política está em conformidade com:</p>
                 <ul className="list-disc pl-6 space-y-1">
                     <li>Lei Geral de Proteção de Dados Pessoais (Lei nº 13.709/2018 - LGPD)</li>
-                    <li>Regulamento Geral sobre a Proteção de Dados da União Europeia (GDPR)</li>
                     <li>Marco Civil da Internet (Lei nº 12.965/2014)</li>
                     <li>Código de Defesa do Consumidor (Lei nº 8.078/1990)</li>
                 </ul>
+                <p>Adotamos ainda, como referência de boas práticas, padrões internacionais de proteção de dados, como o Regulamento Geral sobre a Proteção de Dados da União Europeia (GDPR).</p>
             </div>
         </section>
     );

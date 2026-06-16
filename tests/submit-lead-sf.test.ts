@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import handler from '../api/submit-lead-sf.ts';
+import { postWebToLead } from '../services/salesforce.ts';
 
 const originalFetch = global.fetch;
 
@@ -171,6 +172,118 @@ test('submit-lead-sf: invalid leadSource defaults to Web', async () => {
         const res = await handler(buildRequest(payload));
         assert.equal(res.status, 201);
         assert.ok(capturedBody.includes('lead_source=Web'), 'invalid source should fallback to Web');
+    } finally {
+        global.fetch = originalFetch;
+    }
+});
+
+test('submit-lead-sf: missing email is accepted (lead without email)', async () => {
+    let capturedBody = '';
+
+    global.fetch = async (_input: RequestInfo | URL, init?: RequestInit) => {
+        capturedBody = typeof init?.body === 'string' ? init.body : '';
+        return new Response('', { status: 200 });
+    };
+
+    try {
+        const res = await handler(buildRequest({ firstName: 'Ana', lastName: 'Costa', whatsapp: '11988887777' }));
+        assert.equal(res.status, 201);
+        assert.ok(!capturedBody.includes('email='), 'no email param when absent');
+        assert.ok(capturedBody.includes('last_name=Costa'), 'last_name');
+        assert.ok(capturedBody.includes('phone='), 'phone forwarded');
+    } finally {
+        global.fetch = originalFetch;
+    }
+});
+
+test('submit-lead-sf: utms are appended to description while custom field IDs are not configured', async () => {
+    let capturedBody = '';
+
+    global.fetch = async (_input: RequestInfo | URL, init?: RequestInit) => {
+        capturedBody = typeof init?.body === 'string' ? init.body : '';
+        return new Response('', { status: 200 });
+    };
+
+    try {
+        const payload = {
+            ...minimalPayload(),
+            description: 'Lead via chatbot.',
+            utms: {
+                utm_source: 'google',
+                utm_medium: 'cpc',
+                utm_campaign: 'verao-2026',
+                utm_term: null,
+                utm_content: '',
+            },
+        };
+        const res = await handler(buildRequest(payload));
+        assert.equal(res.status, 201);
+
+        const decoded = decodeURIComponent(capturedBody.replace(/\+/g, ' '));
+        assert.ok(decoded.includes('Lead via chatbot.'), 'original description preserved');
+        assert.ok(decoded.includes('utm_source=google'), 'utm_source in description');
+        assert.ok(decoded.includes('utm_medium=cpc'), 'utm_medium in description');
+        assert.ok(decoded.includes('utm_campaign=verao-2026'), 'utm_campaign in description');
+        assert.ok(!decoded.includes('utm_term'), 'null utm ignored');
+    } finally {
+        global.fetch = originalFetch;
+    }
+});
+
+test('submit-lead-sf: malformed utms object is ignored', async () => {
+    let capturedBody = '';
+
+    global.fetch = async (_input: RequestInfo | URL, init?: RequestInit) => {
+        capturedBody = typeof init?.body === 'string' ? init.body : '';
+        return new Response('', { status: 200 });
+    };
+
+    try {
+        const payload = { ...minimalPayload(), utms: { utm_source: { nested: true }, bogus: 'x' } };
+        const res = await handler(buildRequest(payload));
+        assert.equal(res.status, 201);
+        assert.ok(!capturedBody.includes('utm_source'), 'non-string utm dropped');
+        assert.ok(!capturedBody.includes('bogus'), 'unknown keys dropped');
+    } finally {
+        global.fetch = originalFetch;
+    }
+});
+
+test('salesforce service: utms map to custom field IDs when configured', async () => {
+    let capturedBody = '';
+
+    global.fetch = async (_input: RequestInfo | URL, init?: RequestInit) => {
+        capturedBody = typeof init?.body === 'string' ? init.body : '';
+        return new Response('', { status: 200 });
+    };
+
+    try {
+        const result = await postWebToLead(
+            {
+                firstName: 'Maria',
+                lastName: 'Santos',
+                email: 'maria@teste.com.br',
+                leadSource: 'Web',
+                description: 'Lead via chatbot.',
+                utms: { utm_source: 'google', utm_medium: 'cpc' },
+            },
+            {
+                utm_source: '00N000000000001',
+                utm_medium: '00N000000000002',
+                utm_campaign: '00N000000000003',
+                utm_term: '00N000000000004',
+                utm_content: '00N000000000005',
+            },
+        );
+
+        assert.equal(result.ok, true);
+        assert.ok(capturedBody.includes('00N000000000001=google'), 'utm_source mapped to field ID');
+        assert.ok(capturedBody.includes('00N000000000002=cpc'), 'utm_medium mapped to field ID');
+        assert.ok(!capturedBody.includes('00N000000000003'), 'unset utm field omitted');
+
+        const decoded = decodeURIComponent(capturedBody.replace(/\+/g, ' '));
+        assert.ok(!decoded.includes('UTMs:'), 'no description fallback when fields are mapped');
+        assert.ok(decoded.includes('Lead via chatbot.'), 'description untouched');
     } finally {
         global.fetch = originalFetch;
     }

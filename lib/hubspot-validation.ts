@@ -3,6 +3,8 @@
  * Docs: https://developers.hubspot.com/docs/api/webhooks/validating-signatures
  */
 
+import { timingSafeEqual } from './security';
+
 const HUBSPOT_MAX_REQUEST_AGE_MS = 5 * 60 * 1000;
 const HUBSPOT_URI_DECODE_RULES: Array<[RegExp, string]> = [
   [/%3A/gi, ':'],
@@ -18,19 +20,6 @@ const HUBSPOT_URI_DECODE_RULES: Array<[RegExp, string]> = [
   [/%2C/gi, ','],
   [/%3B/gi, ';']
 ];
-
-export function timingSafeEqual(left: string, right: string): boolean {
-  if (left.length !== right.length) {
-    return false;
-  }
-
-  let mismatch = 0;
-  for (let index = 0; index < left.length; index += 1) {
-    mismatch |= left.charCodeAt(index) ^ right.charCodeAt(index);
-  }
-
-  return mismatch === 0;
-}
 
 function normalizeHubSpotRequestUri(url: string): string {
   return HUBSPOT_URI_DECODE_RULES.reduce(

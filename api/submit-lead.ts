@@ -1,5 +1,5 @@
-import type { SubmitLeadRequest, SubmitLeadResponse } from '../types/leadCapture';
-import { buildCorsHeaders, createRequestId, getClientIP } from '../lib/network';
+import type { SubmitLeadRequest } from '../types/leadCapture';
+import { buildCorsHeaders, buildJsonResponse, createRequestId, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
 import { cleanString, maskEmail, maskName, maskPhone, validatePayload } from '../lib/lead-logic';
 import { logger } from '../lib/logger';
@@ -47,28 +47,16 @@ function emitLeadLog(level: LeadLogLevel, requestId: string, stage: string, deta
     logger.info('SUBMIT_LEAD', payload);
 }
 
-function buildJsonResponse(
-    body: SubmitLeadResponse,
-    status: number,
-    corsHeaders: Record<string, string>,
-): Response {
-    const requestId = typeof body === 'object' && body && 'requestId' in body && typeof body.requestId === 'string'
-        ? body.requestId
-        : undefined;
-
-    return new Response(JSON.stringify(body), {
-        status,
-        headers: {
-            'Content-Type': 'application/json',
-            ...(requestId ? { 'X-Request-Id': requestId } : {}),
-            ...corsHeaders,
-        },
-    });
+// getClientIP falls back to 'unknown' when no edge header is present. Meta CAPI
+// expects a real address or nothing, so collapse the sentinel to null.
+function resolveClientIpAddress(request: Request): string | null {
+    const ip = getClientIP(request);
+    return ip && ip !== 'unknown' ? ip : null;
 }
 
 function getSubmitLeadConfig(): SubmitLeadConfig | null {
-    const webhookUrl = cleanString(process.env.N8N_SUBMIT_LEAD_WEBHOOK_URL);
-    const webhookSecret = cleanString(process.env.N8N_WEBHOOK_SECRET);
+    const webhookUrl = process.env.N8N_SUBMIT_LEAD_WEBHOOK_URL?.trim() || '';
+    const webhookSecret = process.env.N8N_WEBHOOK_SECRET?.trim() || '';
 
     if (!webhookUrl || !webhookSecret) {
         return null;
@@ -224,8 +212,8 @@ export default async function handler(request: Request): Promise<Response> {
         if (!config) {
             emitLeadLog('error', requestId, 'config', {
                 code: 'SERVER_CONFIG_ERROR',
-                hasWebhookUrl: Boolean(cleanString(process.env.N8N_SUBMIT_LEAD_WEBHOOK_URL)),
-                hasWebhookSecret: Boolean(cleanString(process.env.N8N_WEBHOOK_SECRET)),
+                hasWebhookUrl: Boolean(process.env.N8N_SUBMIT_LEAD_WEBHOOK_URL?.trim()),
+                hasWebhookSecret: Boolean(process.env.N8N_WEBHOOK_SECRET?.trim()),
             });
 
             return buildJsonResponse(
@@ -270,7 +258,10 @@ export default async function handler(request: Request): Promise<Response> {
             config.webhookUrl,
             config.webhookSecret,
             requestId,
-            buildN8nLeadPayload(payload, requestId),
+            buildN8nLeadPayload(payload, requestId, {
+                clientIpAddress: resolveClientIpAddress(request),
+                clientUserAgent: request.headers.get('user-agent'),
+            }),
         );
 
         const response = buildJsonResponse(

@@ -32,7 +32,7 @@ const MelhorIdadeLanding: React.FC = () => {
   return (
     <div className="bg-brand-surface min-h-screen font-sans">
       <Seo
-        title="Turismo 50+: Viagens Seguras e Personalizadas"
+        title="Turismo 50+: Viagens Personalizadas"
         description="Experiências de viagem exclusivas para o público 50+. Roteiros com conforto, segurança e atendimento humano. Planeje sua próxima aventura com a Anhangá."
         canonical="https://www.anhanga.tur.br/melhor-idade/"
         noHreflang
@@ -43,7 +43,6 @@ const MelhorIdadeLanding: React.FC = () => {
         serviceUrl="https://www.anhanga.tur.br/melhor-idade/"
         serviceType="Turismo para Melhor Idade"
         areaServed="Brasil"
-        keywords={['viagens 50+', 'turismo melhor idade', 'viagens seguras']}
       />
       <BreadcrumbSchema
         items={[
@@ -213,15 +212,15 @@ const MelhorIdadeLanding: React.FC = () => {
             Falar com um Consultor
           </button>
           <div className="flex flex-wrap justify-center gap-3 mt-8 relative z-10">
-            <a href="https://www.anhanga.tur.br/curadoria-cruzeiros-brasil/" className="px-5 py-3 rounded-full bg-white/10 border border-white/20 text-white font-semibold hover:bg-white/20 transition-colors">
+            <Link to="/curadoria-cruzeiros-brasil/" className="px-5 py-3 rounded-full bg-white/10 border border-white/20 text-white font-semibold hover:bg-white/20 transition-colors">
               Cruzeiros pelo Brasil
-            </a>
-            <a href="https://www.anhanga.tur.br/consultoria-de-viagem/" className="px-5 py-3 rounded-full bg-white/10 border border-white/20 text-white font-semibold hover:bg-white/20 transition-colors">
+            </Link>
+            <Link to="/consultoria-de-viagem/" className="px-5 py-3 rounded-full bg-white/10 border border-white/20 text-white font-semibold hover:bg-white/20 transition-colors">
               Consultoria de Viagem
-            </a>
-            <a href="https://www.anhanga.tur.br/blog/" className="px-5 py-3 rounded-full bg-white/10 border border-white/20 text-white font-semibold hover:bg-white/20 transition-colors">
+            </Link>
+            <Link to="/blog/" className="px-5 py-3 rounded-full bg-white/10 border border-white/20 text-white font-semibold hover:bg-white/20 transition-colors">
               Dicas de Viagem
-            </a>
+            </Link>
           </div>
         </div>
       </section>

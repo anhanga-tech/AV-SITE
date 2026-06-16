@@ -19,7 +19,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "fervedouros",
       "roteiros-nacionais"
     ],
-    "seoTitle": "Jalapão em Julho: Roteiro de 7 Dias, Custos Reais e Dicas 2026",
+    "seoTitle": "Jalapão em Julho: Roteiro e Custos",
     "seoDescription": "Roteiro completo de 7 dias no Jalapão em julho com custos reais, fervedouros, dunas e por que ir agora antes que o destino mude. Guia atualizado 2026.",
     "slug": "jalapao-julho-roteiro-custos",
     "readingTime": "9 min de leitura"
@@ -42,7 +42,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "caribe",
       "viagens-internacionais"
     ],
-    "seoTitle": "Cancún, Punta Cana ou Aruba para Lua de Mel? Comparação 2026",
+    "seoTitle": "Lua de Mel: Cancún, Punta Cana ou Aruba?",
     "seoDescription": "Comparação honesta entre Cancún, Punta Cana e Aruba para lua de mel: preços, praias, furacões, resorts e o que cada destino entrega de verdade.",
     "slug": "cancun-punta-cana-aruba-lua-de-mel",
     "readingTime": "8 min de leitura"
@@ -65,7 +65,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "orlando",
       "parques-tematicos"
     ],
-    "seoTitle": "Disney vs Beto Carrero: Qual Escolher para Crianças de 4 a 10 Anos?",
+    "seoTitle": "Disney ou Beto Carrero: Qual Escolher?",
     "seoDescription": "Comparação honesta entre Disney Orlando e Beto Carrero World para famílias com crianças de 4 a 10 anos. Custos reais, idade ideal e o que cada parque entrega.",
     "slug": "disney-ou-beto-carrero",
     "readingTime": "7 min de leitura"
@@ -87,7 +87,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "viagens-internacionais",
       "dicas"
     ],
-    "seoTitle": "ETIAS 2026: Guia Completo para Brasileiros Viajando à Europa",
+    "seoTitle": "ETIAS 2026: Guia para Brasileiros",
     "seoDescription": "ETIAS começa no Q4/2026 e custa €20. Saiba o que é, quais países exigem, como pedir e o que já mudou na fronteira europeia para brasileiros.",
     "slug": "etias-2026-brasileiros-europa",
     "readingTime": "9 min de leitura"
@@ -109,7 +109,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "dicas",
       "viagens-internacionais"
     ],
-    "seoTitle": "Agência de Viagens ou Por Conta Própria? O Que Vale em 2026",
+    "seoTitle": "Agência de Viagens ou Por Conta Própria?",
     "seoDescription": "Quando usar uma agência de viagens compensa mais do que o Booking ou o Google Flights? Comparação honesta de preço, tempo e segurança para decidir.",
     "slug": "agencia-de-viagens-ou-por-conta-propria",
     "readingTime": "7 min de leitura"
@@ -137,7 +137,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "caribe",
       "asia"
     ],
-    "seoTitle": "Seguro Viagem Internacional 2026: Obrigatório, Preços e Coberturas",
+    "seoTitle": "Seguro Viagem Internacional: Vale a Pena?",
     "seoDescription": "Guia completo sobre seguro viagem internacional em 2026: países que exigem, quanto custa por dia, cobertura mínima por destino e como escolher o melhor plano.",
     "slug": "seguro-viagem-internacional-2026",
     "readingTime": "8 min de leitura"
@@ -146,6 +146,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Férias de Julho 2026: 10 Destinos Para Reservar nos Próximos 15 Dias",
     "excerpt": "Julho está a três semanas. Veja 10 destinos nacionais e internacionais com disponibilidade, que fazem sentido para o período e cabem em diferentes orçamentos.",
     "date": "2026-06-04",
+    "dateModified": "2026-06-10",
     "author": "queila-oliveira",
     "category": "Destinos",
     "image": "https://media.anhanga.tur.br/images/blog/ferias-julho-2026.jpg",
@@ -170,8 +171,8 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "caribe",
       "america-do-sul"
     ],
-    "seoTitle": "Férias de Julho 2026: 10 Destinos Para Reservar Agora",
-    "seoDescription": "Julho está chegando e você ainda não reservou? Veja 10 destinos nacionais e internacionais com disponibilidade, preços estimados e o mínimo de planejamento para cada um.",
+    "seoTitle": "Férias de Julho 2026: 10 Destinos",
+    "seoDescription": "Julho está chegando e você ainda não reservou? Veja 10 destinos nacionais e internacionais com disponibilidade, preços e o planejamento mínimo de cada um.",
     "slug": "ferias-julho-2026-destinos",
     "readingTime": "11 min de leitura"
   },
@@ -179,6 +180,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Viagem Corporativa para Pequenas Empresas: Guia Completo",
     "excerpt": "O que é viagem corporativa, quais são os 4 tipos e quando vale contratar uma agência. Guia prático para micro e pequenas empresas no Brasil.",
     "date": "2026-06-02",
+    "dateModified": "2026-06-10",
     "author": "felipe-william",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/viagem-corp.jpg",
@@ -190,16 +192,17 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "planejamento",
       "brasil"
     ],
-    "seoTitle": "Viagem Corporativa para Pequenas Empresas: Guia Completo",
+    "seoTitle": "Viagem Corporativa: Guia para PMEs",
     "seoDescription": "O que é viagem corporativa, quais são os 4 tipos e quando vale contratar uma agência. Guia prático para micro e pequenas empresas no Brasil.",
     "slug": "viagem-corporativa-para-pequenas-empresas-guia-completo",
     "readingTime": "6 min de leitura"
   },
   {
     "title": "Copa do Mundo 2026: guia das cidades-sede além do futebol",
+    "seoTitle": "Copa do Mundo 2026: Guia das Cidades-Sede",
     "excerpt": "Guia das cidades-sede da Copa 2026 nos EUA, México e Canadá, com destaques, dicas locais e roteiros para aproveitar a viagem além dos jogos.",
     "date": "2026-05-22",
-    "dateModified": "2026-05-28",
+    "dateModified": "2026-06-10",
     "author": "felipe-william",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/guadalajara.jpg",
@@ -218,9 +221,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   },
   {
     "title": "Tropical Americas: nova área no Animal Kingdom",
+    "seoTitle": "Tropical Americas no Animal Kingdom",
     "excerpt": "Nova área da Disney no Animal Kingdom dedicada à América Latina, com Encanto e Indiana Jones. Abertura em 2027. Vale planejar já.",
     "date": "2026-05-02",
-    "dateModified": "2026-05-28",
+    "dateModified": "2026-06-10",
     "author": "queila-oliveira",
     "category": "Dicas de Expert",
     "image": "https://media.anhanga.tur.br/images/blog/disney-tropical-americas-animal-kingdom.jpg",
@@ -241,9 +245,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   },
   {
     "title": "América do Norte: destinos além de Nova York",
+    "seoTitle": "América do Norte Além de Nova York",
     "excerpt": "EUA, Canadá e México têm muito mais que Nova York e Disney. Veja os destinos em alta para brasileiros em 2026, com visto, custos e o que cada um tem de melhor.",
     "date": "2026-04-29",
-    "dateModified": "2026-05-28",
+    "dateModified": "2026-06-10",
     "author": "felipe-william",
     "category": "Destinos",
     "image": "https://media.anhanga.tur.br/images/blog/america-do-norte-destinos-alem-de-nova-york.jpg",
@@ -263,9 +268,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   },
   {
     "title": "Melhores destinos da Ásia para brasileiros em 2026",
+    "seoTitle": "Ásia para Brasileiros: Destinos 2026",
     "excerpt": "A Ásia está no topo das buscas dos brasileiros em 2026. Veja os melhores destinos, custos reais, vistos e como planejar uma viagem que realmente entrega.",
     "date": "2026-04-29",
-    "dateModified": "2026-05-05",
+    "dateModified": "2026-06-10",
     "author": "felipe-william",
     "category": "Destinos",
     "image": "https://media.anhanga.tur.br/images/destinations/toquio.jpg",
@@ -285,9 +291,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   },
   {
     "title": "Caribe: Punta Cana, Cancún ou Aruba? Guia para brasileiros",
+    "seoTitle": "Caribe para Brasileiros: Qual Destino?",
     "excerpt": "Praias perfeitas, all inclusive e mergulho: veja como escolher o destino certo no Caribe para o seu perfil, com tudo que você precisa saber antes de ir.",
     "date": "2026-04-29",
-    "dateModified": "2026-05-28",
+    "dateModified": "2026-06-10",
     "author": "queila-oliveira",
     "category": "Destinos",
     "image": "https://media.anhanga.tur.br/images/blog/caribe-destinos-para-brasileiros.jpg",
@@ -306,9 +313,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   },
   {
     "title": "América do Sul: destinos que valem a viagem",
+    "seoTitle": "América do Sul: Destinos Imperdíveis",
     "excerpt": "Argentina, Chile, Peru, Colômbia e Bolívia: o que cada destino oferece ao viajante brasileiro, com documentação, custos e como chegar de verdade.",
     "date": "2026-04-29",
-    "dateModified": "2026-05-28",
+    "dateModified": "2026-06-10",
     "author": "felipe-william",
     "category": "Destinos",
     "image": "https://media.anhanga.tur.br/images/destinations/cartagena.jpg",
@@ -329,9 +337,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   },
   {
     "title": "Os melhores destinos do Brasil para viajar em 2026",
+    "seoTitle": "Melhores Destinos do Brasil em 2026",
     "excerpt": "Do Nordeste ao Pantanal: os destinos brasileiros que mais valem em 2026 para quem quer praia, natureza ou cidade — com custos reais e melhor época para ir.",
     "date": "2026-04-29",
-    "dateModified": "2026-05-05",
+    "dateModified": "2026-06-10",
     "author": "queila-oliveira",
     "category": "Destinos",
     "image": "https://media.anhanga.tur.br/images/destinations/natal.jpg",
@@ -352,7 +361,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Europa 2026: ETIAS, câmbio e custos reais",
     "excerpt": "O que mudou para viajar à Europa em 2026, quanto custa, quais países combinar e como montar um roteiro que realmente funciona saindo do Brasil.",
     "date": "2026-04-29",
-    "dateModified": "2026-06-06",
+    "dateModified": "2026-06-10",
     "author": "felipe-william",
     "category": "Destinos",
     "image": "https://media.anhanga.tur.br/images/destinations/lisboa.jpg",
@@ -371,9 +380,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   },
   {
     "title": "Viagem solo feminina nos cruzeiros da Norwegian",
+    "seoTitle": "Viagem Solo Feminina em Cruzeiros",
     "excerpt": "Cruzeiros NCL para mulheres que viajam sozinhas: o que esperar a bordo, como escolher o roteiro certo e por que o modelo freestyle funciona para viagem solo.",
     "date": "2026-03-09",
-    "dateModified": "2026-05-05",
+    "dateModified": "2026-06-10",
     "author": "queila-oliveira",
     "category": "Cruzeiros",
     "image": "https://media.anhanga.tur.br/images/blog/blog-viagem-solo-feminina.png",
@@ -392,9 +402,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   },
   {
     "title": "Melhores destinos para o Carnaval 2026 no Brasil",
+    "seoTitle": "Destinos para o Carnaval 2026 no Brasil",
     "excerpt": "Quer curtir o Carnaval sem estourar o orçamento? Veja os melhores destinos no Brasil para folia ou descanso nesta retrospectiva de 2026.",
     "date": "2026-02-11",
-    "dateModified": "2026-05-28",
+    "dateModified": "2026-06-10",
     "author": "queila-oliveira",
     "category": "Carnaval",
     "image": "https://media.anhanga.tur.br/images/blog/destinos-carnaval-2026.jpg",
@@ -414,9 +425,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   },
   {
     "title": "Guia de Sobrevivência em Festivais de Música",
+    "seoTitle": "Guia de Sobrevivência em Festivais",
     "excerpt": "Estratégias práticas, dicas de alimentação e o kit de sobrevivência essencial para aproveitar seu festival ao máximo.",
     "date": "2026-01-24",
-    "dateModified": "2026-05-05",
+    "dateModified": "2026-06-10",
     "author": "felipe-william",
     "category": "Festivais",
     "image": "https://media.anhanga.tur.br/images/blog/guia-festivais.jpg",
@@ -437,7 +449,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "5 Segredos da Disney que Ninguém Conta",
     "excerpt": "Descubra como furar filas legalmente, onde encontrar os personagens raros e os melhores snacks escondidos nos parques.",
     "date": "2025-12-12",
-    "dateModified": "2026-05-05",
+    "dateModified": "2026-06-10",
     "author": "queila-oliveira",
     "category": "Dicas de Expert",
     "image": "https://media.anhanga.tur.br/images/blog/5-segredos-disney.jpg",
@@ -479,7 +491,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Europa Gastronômica: Roteiro Itália",
     "excerpt": "De Roma a Florença, o roteiro gastronômico pela Itália que vai além dos touristy spots: onde comer carbonara de verdade, vinhos locais e os melhores gelatos.",
     "date": "2025-10-28",
-    "dateModified": "2026-05-05",
+    "dateModified": "2026-06-10",
     "author": "felipe-william",
     "category": "Gastronomia",
     "image": "https://media.anhanga.tur.br/images/blog/europa-gastronomica-italia.jpg",
@@ -499,8 +511,9 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
     "title": "Lua de Mel nas Maldivas",
     "excerpt": "Quanto custa? Qual a melhor época? Vale a pena o All-Inclusive? Respondemos tudo.",
+    "seoDescription": "Lua de mel nas Maldivas: quanto custa, qual a melhor época e se o All-Inclusive vale a pena. Roteiro, dicas de resorts e planejamento completo.",
     "date": "2025-09-15",
-    "dateModified": "2026-05-05",
+    "dateModified": "2026-06-10",
     "author": "queila-oliveira",
     "category": "Romance",
     "image": "https://media.anhanga.tur.br/images/blog/lua-de-mel-maldivas.jpg",
@@ -520,8 +533,9 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
     "title": "Nova York no Natal",
     "excerpt": "O guia completo para ver as luzes de Dyker Heights e patinar no Central Park.",
+    "seoDescription": "Nova York no Natal: guia completo para ver as luzes de Dyker Heights, patinar no Central Park e aproveitar a cidade na época mais mágica do ano.",
     "date": "2025-01-10",
-    "dateModified": "2026-05-05",
+    "dateModified": "2026-06-10",
     "author": "felipe-william",
     "category": "Sazonal",
     "image": "https://media.anhanga.tur.br/images/blog/nova-york-natal.jpg",

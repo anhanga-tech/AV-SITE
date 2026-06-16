@@ -2,7 +2,7 @@ import { sendGoogleConversion } from '../lib/conversions/google';
 import { sendMetaConversion } from '../lib/conversions/meta';
 import { buildCorsHeaders, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
-import { timingSafeEqual } from '../lib/hubspot-validation';
+import { timingSafeEqual } from '../lib/security';
 import { logger } from '../lib/logger';
 
 export const config = {
@@ -30,6 +30,8 @@ interface ConversionDispatchPayloadInput {
   fbclid?: unknown;
   fbc?: unknown;
   fbp?: unknown;
+  clientIpAddress?: unknown;
+  clientUserAgent?: unknown;
   timestamp?: unknown;
 }
 
@@ -61,6 +63,8 @@ interface ConversionDispatchPayload {
   fbclid?: string;
   fbc?: string;
   fbp?: string;
+  clientIpAddress?: string;
+  clientUserAgent?: string;
   timestamp?: string;
 }
 
@@ -220,6 +224,8 @@ function normalizePayload(raw: unknown): NormalizePayloadResult {
     fbclid: toStringOrUndefined(payload.fbclid),
     fbc: toStringOrUndefined(payload.fbc),
     fbp: toStringOrUndefined(payload.fbp),
+    clientIpAddress: toStringOrUndefined(payload.clientIpAddress),
+    clientUserAgent: toStringOrUndefined(payload.clientUserAgent),
     timestamp: toStringOrUndefined(payload.timestamp),
   };
 }
@@ -387,6 +393,8 @@ async function dispatchConversion(
       fbclid: payload.fbclid,
       fbc: payload.fbc,
       fbp: payload.fbp,
+      clientIpAddress: payload.clientIpAddress,
+      clientUserAgent: payload.clientUserAgent,
       value: payload.value,
       currency: payload.currency,
       contentName: payload.destination,

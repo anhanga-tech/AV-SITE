@@ -10,16 +10,83 @@ export function createRequestId(): string {
     return `req_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
+const DEFAULT_ALLOWED_ORIGIN = 'https://www.anhanga.tur.br';
+const LOCAL_ORIGIN_HOSTNAMES = new Set(['localhost', '127.0.0.1', '[::1]']);
+
+/**
+ * Returns the candidate origin only if it is a single, valid HTTPS origin
+ * (no path/query), or an http://localhost / http://127.0.0.1 origin for
+ * local development. Anything else (including '*' or comma-separated
+ * lists) falls back to the default origin.
+ */
+function resolveAllowedOrigin(candidate?: string): string {
+    if (!candidate) return DEFAULT_ALLOWED_ORIGIN;
+
+    let parsed: URL;
+    try {
+        parsed = new URL(candidate);
+    } catch {
+        return DEFAULT_ALLOWED_ORIGIN;
+    }
+
+    if (parsed.pathname !== '/' && parsed.pathname !== '') return DEFAULT_ALLOWED_ORIGIN;
+    if (parsed.search || parsed.hash) return DEFAULT_ALLOWED_ORIGIN;
+
+    if (parsed.protocol === 'https:') return parsed.origin;
+
+    if (parsed.protocol === 'http:' && LOCAL_ORIGIN_HOSTNAMES.has(parsed.hostname)) {
+        return parsed.origin;
+    }
+
+    return DEFAULT_ALLOWED_ORIGIN;
+}
+
 /**
  * Normalizes and builds CORS headers for the response.
  */
 export function buildCorsHeaders(allowedOrigin?: string): Record<string, string> {
     return {
-        'Access-Control-Allow-Origin': allowedOrigin || process.env.ALLOWED_ORIGIN || 'https://www.anhanga.tur.br',
+        'Access-Control-Allow-Origin': resolveAllowedOrigin(allowedOrigin || process.env.ALLOWED_ORIGIN),
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Expose-Headers': 'X-RateLimit-Remaining, X-RateLimit-Reset, X-Request-Id',
     };
+}
+
+/**
+ * Resposta JSON padrão dos handlers. O header X-Request-Id é resolvido assim:
+ * - options.requestId === null  → suprime o header (ex.: submit-lead-sf).
+ * - options.requestId é string  → usa esse valor.
+ * - options.requestId ausente   → auto-deriva de body.requestId (se string).
+ */
+export function buildJsonResponse<T = unknown>(
+    body: T,
+    status: number,
+    corsHeaders: Record<string, string>,
+    options: { requestId?: string | null } = {},
+): Response {
+    let requestId: string | undefined;
+    if (options.requestId === null) {
+        requestId = undefined;
+    } else if (typeof options.requestId === 'string') {
+        requestId = options.requestId;
+    } else if (
+        body !== null &&
+        typeof body === 'object' &&
+        'requestId' in body &&
+        typeof (body as { requestId?: unknown }).requestId === 'string'
+    ) {
+        requestId = (body as { requestId: string }).requestId;
+    }
+
+    return new Response(JSON.stringify(body), {
+        status,
+        headers: {
+            'Content-Type': 'application/json',
+            ...(requestId ? { 'X-Request-Id': requestId } : {}),
+            ...corsHeaders,
+        },
+    });
 }
 
 /**

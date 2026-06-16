@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Anhangá Viagens is an institutional website for a Brazilian boutique travel agency. It features an AI-powered chatbot (Google Gemini) for travel consultation, destination showcases, blog, and WhatsApp lead generation.
 
-**Stack:** React 19 + TypeScript + Vite + Tailwind CSS + Vercel Edge Functions
+**Stack:** React 19 + TypeScript + Vite + Tailwind CSS + Cloudflare Pages Functions (handlers edge-style em `api/`, adaptados em `functions/`)
 
 ## Development Commands
 
@@ -44,10 +44,8 @@ Copy `.env.example` to `.env`. Required groups:
 GEMINI_API_KEY=           # Google Gemini API key
 GEMINI_MODEL=             # Optional override (default: gemini-3.1-flash-lite)
 
-# HubSpot CRM (required)
-HUBSPOT_TOKEN=            # Private app token
-HUBSPOT_DEAL_PIPELINE_ID= # Pipeline for new deals
-HUBSPOT_DEAL_STAGE_ID=    # Stage for new deals
+# CRM ativo: Salesforce + api/submit-lead-sf.ts (web-to-lead)
+# Leads novos criados pelo chatbot seguem este caminho; HubSpot abaixo é legado.
 
 # n8n Webhooks (required in prod)
 N8N_WEBHOOK_SECRET=           # Shared HMAC secret for inbound n8n calls
@@ -68,8 +66,13 @@ VITE_SENTRY_DSN=          # Browser-side Sentry DSN
 VITE_MEDIA_BASE_URL=      # Cloudflare R2 media origin (default: https://media.anhanga.tur.br)
 VITE_MEDIA_ENABLE_TRANSFORMS=  # Enable Cloudflare image transforms via /cdn-cgi/image
 AI_GATEWAY_ENABLED=       # Route Gemini through Cloudflare AI Gateway
+AI_GATEWAY_BYOK_ALIAS=    # AI Gateway Provider Key alias (BYOK); makes GEMINI_API_KEY optional
 ALLOWED_ORIGIN=           # CORS allowed origin (default: https://www.anhanga.tur.br)
 DEBUG=                    # Enable verbose server logs
+
+# Legacy (somente webhook de deals Closed-Won — não usar para leads novos)
+HUBSPOT_TOKEN=            # Private app token
+HUBSPOT_WEBHOOK_SECRET=   # HMAC secret para validar payloads do HubSpot webhook
 ```
 
 ## Architecture
@@ -86,7 +89,7 @@ Two layout tiers, resolved at the top-level `Routes`:
 ### Directory Layout (key areas)
 
 ```
-/api          Vercel Edge Functions (15 handlers)
+/api          Handlers edge-style (executados como Cloudflare Pages Functions via `functions/`)
 /lib          Shared server-side helpers (40+ files, organized into subsystems)
   /ai         Gemini config, BANT prompt, tool definitions, handoff logic
   /schemas    Zod validators for each API endpoint
@@ -104,17 +107,17 @@ Two layout tiers, resolved at the top-level `Routes`:
 
 ### API Handlers (`/api`)
 
-All handlers export `export const config = { runtime: 'edge' }`. Standard response shape: `{ ok: boolean, code?: string, error?: string, data?: T }`.
+Handlers rodam como Cloudflare Pages Functions (via `functions/`). O campo `export const config = { runtime: 'edge' }` é um legado do Vercel e não tem efeito no Cloudflare — ignorar. Standard response shape: `{ ok: boolean, code?: string, error?: string, data?: T }`.
 
 | Handler | Purpose |
 |---|---|
 | `generate.ts` | Gemini chatbot proxy; runs BANT qualification state machine |
-| `submit-lead.ts` | Lead capture → HubSpot via n8n webhook |
+| `submit-lead.ts` | Lead capture → n8n webhook |
 | `submit-contact.ts` | Quick contact form → n8n |
 | `submit-waitlist.ts` | Event waitlist → n8n |
 | `submit-nps.ts` | Post-trip NPS form → n8n |
 | `submit-quiz.ts` | Travel quiz results → n8n |
-| `submit-lead-sf.ts` | Alternative Salesforce lead path |
+| `submit-lead-sf.ts` | Lead capture via Salesforce web-to-lead (CRM ativo) |
 | `hubspot-webhook.ts` | Inbound HubSpot "Closed-Won" deal events |
 | `purchase-dispatch.ts` | Receives n8n purchase events; validates `N8N_WEBHOOK_SECRET` |
 | `auth.ts` / `auth/callback.ts` | GitHub OAuth for Decap CMS `/admin` |
@@ -140,12 +143,12 @@ The AI subsystem is fully isolated in `lib/ai/`: `constants.ts` (models, budget 
 
 ### Lead Capture Flow
 
-Lead data flows through n8n (not directly to HubSpot):
+Lead data flows through n8n e Salesforce (CRM ativo desde mai/2026):
 1. `useLeadCapture.ts` collects BANT summary + UTM attribution from `geminiService.ts`
 2. Submits to `/api/submit-lead.ts`
 3. Handler validates + normalizes via `lib/lead-logic.ts` and Zod schema in `lib/schemas/submit-lead.ts`
 4. Calls n8n webhook (`N8N_SUBMIT_CONTACT_WEBHOOK_URL`) via `services/n8n.ts` with payload shaped by `lib/n8n-payloads.ts`
-5. n8n creates/updates the HubSpot contact and deal via `HUBSPOT_TOKEN`
+5. n8n cria/atualiza o lead no **Salesforce** via `api/submit-lead-sf.ts` + `services/salesforce.ts` (web-to-lead). O caminho HubSpot é legado — não usar para leads novos.
 6. Error codes: 400 (validation), 401 (bad token), 429 (rate limit), 500 (server/n8n)
 
 ### UTM Tracking (`utils/whatsapp.ts`)
@@ -176,9 +179,10 @@ Tailwind CSS (`tailwind.config.mjs`). Brand palette: `action` (#0056D2), `action
 
 ### Deployment
 
-- **Vercel** (primary) — `vercel.json`: security headers, SPA rewrite, domain redirects (`anhanga.tur.br` → `www`, `beto.anhanga.tur.br` → `/beto-carrero`)
-- **Netlify** — `netlify.toml`
-- **GitHub Pages** — `pnpm deploy` with `VITE_BASE_PATH`
+- **Cloudflare Pages** (primário) — `wrangler.toml` (`pages_build_output_dir = "dist"`), functions em `functions/` (incl. `_middleware.ts`), Node 24 via `.node-version`. Secrets configurados no dashboard do Pages.
+- **Vercel** (legado/secundário) — `vercel.json` mantido no repo para compatibilidade; não é a plataforma ativa.
+- **Netlify** (legado/secundário) — `netlify.toml` mantido no repo.
+- **GitHub Pages** — `pnpm deploy` with `VITE_BASE_PATH` (estático, sem API)
 
 Build chunks: `react-vendor`, `ai-vendor`, `leaflet-vendor` (manual split in `vite.config.ts`).
 
@@ -192,6 +196,28 @@ Build chunks: `react-vendor`, `ai-vendor`, `leaflet-vendor` (manual split in `vi
 - `pnpm test:regression` for unit/regression changes
 - `pnpm test:e2e` for browser-visible or critical-path changes
 - `pnpm typecheck` for TypeScript contract changes
+
+## Documentation Organization
+
+Keep the project root minimal — only `README.md`, `CLAUDE.md`, and code/tooling configs belong there. All other documentation lives under `/docs/`, organized by domain:
+
+| Directory | Contents |
+|---|---|
+| `docs/standards/` | Engineering source of truth (code style, testing, API conventions, security) |
+| `docs/ops/` | Deploy, troubleshooting, GitHub workflows, agents, security policy, Cloudflare rules |
+| `docs/design/` | Design system (`design-system.json`) and design context docs |
+| `docs/product/` | Product strategy and positioning |
+| `docs/seo/` | SEO plans, action plans, backlink strategy |
+| `docs/marketing/` | Brand profile, content calendars, brand reviews |
+| `docs/compliance/` | LGPD/RIPD and data-deletion documentation |
+| `docs/baselines/` | Point-in-time infrastructure/state snapshots |
+| `docs/n8n/`, `docs/superpowers/` | Automation and agent workflow docs |
+
+**Rules for new documentation:**
+- New strategy/audit/planning docs go into the matching `docs/<domain>/` subfolder — never the root.
+- Reports and briefs containing sensitive business data (ad account IDs, spend figures, competitive intelligence, active campaign strategy) stay **local only** — add the filename pattern to `.gitignore` instead of committing.
+- When a doc is superseded (new audit, new plan version), delete the old one rather than letting both linger — `git log` preserves history if needed.
+- If a moved/renamed doc is referenced elsewhere (other docs, tests, scripts), update those references in the same change.
 
 ## Git Flow
 

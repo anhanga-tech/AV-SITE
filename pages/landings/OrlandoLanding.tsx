@@ -36,7 +36,7 @@ const OrlandoLanding: React.FC = () => {
   return (
     <>
       <Seo
-        title="Pacotes para Orlando: Disney e Universal 2026"
+        title="Pacotes para Orlando: Disney e Universal"
         description="Planeje sua viagem para Orlando com roteiro personalizado, ingressos e hospedagem. Atendimento especializado por agência de viagens em São Paulo."
         canonical="https://www.anhanga.tur.br/orlando/"
         noHreflang
@@ -47,7 +47,6 @@ const OrlandoLanding: React.FC = () => {
         serviceUrl="https://www.anhanga.tur.br/orlando/"
         serviceType="Planejamento de viagem para Orlando"
         areaServed="São Paulo e Brasil"
-        keywords={['pacotes para Orlando', 'roteiro Disney', 'viagem Universal']}
       />
       <BreadcrumbSchema
         items={[
@@ -58,9 +57,9 @@ const OrlandoLanding: React.FC = () => {
       <FAQPageSchema items={ORLANDO_FAQ_ITEMS} />
       <div className="bg-brand-surface py-2 border-b border-zinc-100 relative z-[60]">
         <div className="container mx-auto px-6">
-          <a href="https://www.anhanga.tur.br/" className="text-sm font-medium text-zinc-500 hover:text-brand-cyan transition-colors flex items-center gap-1 font-sans">
+          <Link to="/" className="text-sm font-medium text-zinc-500 hover:text-brand-cyan transition-colors flex items-center gap-1 font-sans">
             ← Voltar para o site principal
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -103,12 +102,12 @@ const OrlandoLanding: React.FC = () => {
             >
               Falar com especialista
             </button>
-            <a href="https://www.anhanga.tur.br/beto-carrero/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+            <Link to="/beto-carrero/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ver pacote Beto Carrero
-            </a>
-            <a href="/blog/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+            </Link>
+            <Link to="/blog/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Ler dicas no blog
-            </a>
+            </Link>
             <a href="https://www.visitorlando.com/" target="_blank" rel="noopener noreferrer" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
               Guia Oficial Visit Orlando
             </a>

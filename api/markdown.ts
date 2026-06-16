@@ -1,6 +1,8 @@
 export const config = { runtime: 'edge' };
 
 import { FAQ_SCHEMA_ITEMS } from '../data/faqData';
+import { BLOG_POST_MANIFEST } from '../data/blogManifest';
+import { BLOG_POST_MARKDOWN } from '../data/blogMarkdown';
 import { checkRateLimit } from '../lib/rate-limit';
 import { getClientIP } from '../lib/network';
 import { logger } from '../lib/logger';
@@ -259,6 +261,24 @@ Realizamos uma conversa detalhada para entender preferências de mobilidade, res
 `;
 }
 
+function blogIndexPage(): string {
+    const postList = BLOG_POST_MANIFEST.map(
+        (post) =>
+            `- [${post.title}](${SITE_BASE}/blog/${post.slug}/) — ${post.date}\n  ${post.excerpt}`
+    ).join('\n');
+
+    return `# Blog Anhangá Viagens
+
+**URL:** ${SITE_BASE}/blog/
+
+Guias práticos de viagem escritos pela equipe da Anhangá Viagens: destinos, documentação (vistos, ETIAS), seguros, festivais, parques e roteiros para viajantes brasileiros.
+
+## Posts
+
+${postList}
+`;
+}
+
 export default async function handler(req: Request): Promise<Response> {
     const clientIP = getClientIP(req);
     const rateLimit = await checkRateLimit(clientIP, {
@@ -299,7 +319,18 @@ export default async function handler(req: Request): Promise<Response> {
             return markdownResponse(orlandoPage());
         case '/melhor-idade':
             return markdownResponse(melhorIdadePage());
+        case '/blog':
+            return markdownResponse(blogIndexPage());
         default: {
+            const blogMatch = path.match(/^\/blog\/([a-z0-9-]+)$/);
+            if (blogMatch) {
+                // typeof guard: slugs como "constructor" alcançariam propriedades
+                // herdadas do prototype em vez de retornar undefined.
+                const markdown = BLOG_POST_MARKDOWN[blogMatch[1]];
+                if (typeof markdown === 'string') {
+                    return markdownResponse(markdown);
+                }
+            }
             // Sanitize before including in response body
             const safeDisplay = rawPath.slice(0, 80).replace(/[^\w\-\/]/g, '');
             return markdownResponse(
