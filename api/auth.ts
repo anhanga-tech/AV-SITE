@@ -17,6 +17,12 @@ export default async function handler(req: Request): Promise<Response> {
         return buildJsonError(405, 'METHOD_NOT_ALLOWED', 'Method not allowed');
     }
 
+    const clientId = process.env.GITHUB_CLIENT_ID;
+    if (!clientId) {
+        logger.error('AUTH: GITHUB_CLIENT_ID missing');
+        return buildJsonError(500, 'CONFIGURATION_ERROR', 'OAuth provider not configured');
+    }
+
     const clientIP = getClientIP(req);
     const rateLimit = await checkRateLimit(clientIP, {
         limit: RATE_LIMIT_MAX_REQUESTS,
@@ -27,12 +33,6 @@ export default async function handler(req: Request): Promise<Response> {
     if (!rateLimit.allowed) {
         logger.warn('AUTH: rate limit exceeded', { clientIP });
         return buildJsonError(429, 'RATE_LIMIT_EXCEEDED', 'Too many requests. Please try again later.');
-    }
-
-    const clientId = process.env.GITHUB_CLIENT_ID;
-    if (!clientId) {
-        logger.error('AUTH: GITHUB_CLIENT_ID missing');
-        return buildJsonError(500, 'CONFIGURATION_ERROR', 'OAuth provider not configured');
     }
 
     logger.info('AUTH: initiating OAuth flow', { clientIP });

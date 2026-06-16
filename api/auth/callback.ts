@@ -170,6 +170,14 @@ export default async function handler(req: Request): Promise<Response> {
         return buildJsonError(405, 'METHOD_NOT_ALLOWED', 'Method not allowed');
     }
 
+    const clientId = process.env.GITHUB_CLIENT_ID;
+    const clientSecret = process.env.GITHUB_CLIENT_SECRET;
+
+    if (!clientId || !clientSecret) {
+        logger.error('AUTH_CALLBACK: OAuth configuration missing');
+        return buildJsonError(500, 'CONFIGURATION_ERROR', 'OAuth provider not configured');
+    }
+
     const clientIP = getClientIP(req);
     const rateLimit = await checkRateLimit(clientIP, {
         limit: RATE_LIMIT_MAX_REQUESTS,
@@ -180,14 +188,6 @@ export default async function handler(req: Request): Promise<Response> {
     if (!rateLimit.allowed) {
         logger.warn('AUTH_CALLBACK: rate limit exceeded', { clientIP });
         return buildPostMessageHtml('error', 'Too many requests. Please try again later.', 429);
-    }
-
-    const clientId = process.env.GITHUB_CLIENT_ID;
-    const clientSecret = process.env.GITHUB_CLIENT_SECRET;
-
-    if (!clientId || !clientSecret) {
-        logger.error('AUTH_CALLBACK: OAuth configuration missing');
-        return buildJsonError(500, 'CONFIGURATION_ERROR', 'OAuth provider not configured');
     }
 
     const url = new URL(req.url);
@@ -215,10 +215,9 @@ export default async function handler(req: Request): Promise<Response> {
     const { code, state } = queryParsed.data;
 
     const stateMatches = storedState ? timingSafeEqual(state, storedState) : false;
-    if (!storedState || !stateMatches) {
+    if (!stateMatches) {
         logger.warn('AUTH_CALLBACK: state mismatch or missing cookie', {
             hasStoredState: Boolean(storedState),
-            stateMatches
         });
         return buildPostMessageHtml('error', 'Invalid state parameter', 400);
     }
