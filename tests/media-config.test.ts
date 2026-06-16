@@ -37,7 +37,6 @@ test('getMediaRuntimeConfig should accept quoted boolean env values', () => {
         getMediaRuntimeConfig(
             {
                 VITE_MEDIA_BASE_URL: 'https://media.anhanga.tur.br',
-                VITE_MEDIA_TRANSFORM_ZONE_URL: 'https://media.anhanga.tur.br',
                 VITE_MEDIA_ENABLE_TRANSFORMS: '"true"',
             },
             {
@@ -57,8 +56,34 @@ test('getMediaRuntimeConfig should memoize the default configuration', () => {
     const config1 = getMediaRuntimeConfig();
     const config2 = getMediaRuntimeConfig();
 
-    // Reference equality check
+    // Consecutive default calls must return the exact same cached reference.
     assert.equal(config1, config2, 'Default configuration should be memoized');
+});
+
+test('getMediaRuntimeConfig should bypass the cache when arguments are provided', () => {
+    const cached = getMediaRuntimeConfig();
+    const explicit = getMediaRuntimeConfig(
+        {
+            VITE_MEDIA_BASE_URL: 'https://media.anhanga.tur.br',
+            VITE_MEDIA_ENABLE_TRANSFORMS: 'true',
+        },
+        {
+            hostname: 'www.anhanga.tur.br',
+            origin: 'https://www.anhanga.tur.br',
+        },
+    );
+
+    // An explicit call must recompute and never return the memoized reference,
+    // otherwise overrides (e.g. tests) would silently read stale defaults.
+    assert.notEqual(explicit, cached, 'Explicit calls must bypass the cache');
+    assert.deepEqual(explicit, {
+        mediaBaseUrl: 'https://media.anhanga.tur.br',
+        transformZoneUrl: 'https://media.anhanga.tur.br',
+        enableTransforms: true,
+    });
+
+    // The default cache must remain intact after an explicit call.
+    assert.equal(getMediaRuntimeConfig(), cached, 'Default cache should survive explicit calls');
 });
 
 test('hero media should point to the Cloudflare R2 origin', () => {
