@@ -2,7 +2,7 @@ import { sendGoogleConversion } from '../lib/conversions/google';
 import { sendMetaConversion } from '../lib/conversions/meta';
 import { buildCorsHeaders, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
-import { timingSafeEqual } from '../lib/hubspot-validation';
+import { timingSafeEqual } from '../lib/security';
 import { logger } from '../lib/logger';
 
 export const config = {
