@@ -23,8 +23,10 @@ jobs:
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
     - name: Install Playwright Browsers
-      # In CI only install Chromium to match the CI-only project set in playwright.config.ts
-      run: pnpm exec playwright install --with-deps chromium
+      # In CI only install Chromium to match the CI-only project set in playwright.config.ts.
+      # Omit --with-deps to avoid apt-get failures with external Microsoft/Ubuntu repos;
+      # GitHub ubuntu-latest already includes necessary dependencies for Chromium.
+      run: pnpm exec playwright install chromium
 
     - name: Update visual snapshots
       run: pnpm exec playwright test tests/e2e/visual.spec.ts --update-snapshots

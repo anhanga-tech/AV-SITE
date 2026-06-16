@@ -2,12 +2,16 @@ export const config = {
     runtime: 'edge',
 };
 
-import { buildJsonError } from '../../lib/network';
+import { buildJsonError, getClientIP } from '../../lib/network';
 import { logger } from '../../lib/logger';
+import { checkRateLimit } from '../../lib/rate-limit';
+import { timingSafeEqual } from '../../lib/security';
 import { AuthCallbackQuerySchema } from '../../lib/schemas/auth-callback';
 
 const GITHUB_TOKEN_URL = 'https://github.com/login/oauth/access_token';
 const GITHUB_TOKEN_TIMEOUT_MS = 8000;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const RATE_LIMIT_MAX_REQUESTS = 10;
 const PROVIDER = 'github';
 
 /**
@@ -170,7 +174,20 @@ export default async function handler(req: Request): Promise<Response> {
     const clientSecret = process.env.GITHUB_CLIENT_SECRET;
 
     if (!clientId || !clientSecret) {
+        logger.error('AUTH_CALLBACK: OAuth configuration missing');
         return buildJsonError(500, 'CONFIGURATION_ERROR', 'OAuth provider not configured');
+    }
+
+    const clientIP = getClientIP(req);
+    const rateLimit = await checkRateLimit(clientIP, {
+        limit: RATE_LIMIT_MAX_REQUESTS,
+        windowMs: RATE_LIMIT_WINDOW_MS,
+        prefix: 'ratelimit:auth-callback',
+    });
+
+    if (!rateLimit.allowed) {
+        logger.warn('AUTH_CALLBACK: rate limit exceeded', { clientIP });
+        return buildPostMessageHtml('error', 'Too many requests. Please try again later.', 429);
     }
 
     const url = new URL(req.url);
@@ -181,6 +198,7 @@ export default async function handler(req: Request): Promise<Response> {
 
     if (errorParam) {
         const desc = url.searchParams.get('error_description') ?? errorParam;
+        logger.warn('AUTH_CALLBACK: provider returned error', { error: errorParam, description: desc });
         return buildPostMessageHtml('error', desc, 400);
     }
 
@@ -190,17 +208,24 @@ export default async function handler(req: Request): Promise<Response> {
     });
 
     if (!queryParsed.success) {
+        logger.warn('AUTH_CALLBACK: validation failed', { error: queryParsed.error.flatten() });
         return buildPostMessageHtml('error', 'Missing required parameters', 400);
     }
 
     const { code, state } = queryParsed.data;
 
-    if (!storedState || state !== storedState) {
+    const stateMatches = storedState ? timingSafeEqual(state, storedState) : false;
+    if (!stateMatches) {
+        logger.warn('AUTH_CALLBACK: state mismatch or missing cookie', {
+            hasStoredState: Boolean(storedState),
+        });
         return buildPostMessageHtml('error', 'Invalid state parameter', 400);
     }
 
     const result = await exchangeCodeForToken(clientId, clientSecret, code);
     if (result instanceof Response) return result;
+
+    logger.info('AUTH_CALLBACK: authentication successful');
 
     const successContent = JSON.stringify({ token: result, provider: PROVIDER });
     return buildPostMessageHtml('success', successContent, 200);
