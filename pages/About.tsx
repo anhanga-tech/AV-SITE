@@ -108,6 +108,8 @@ const About: React.FC = () => {
                   <LazyImage
                     src="images/about/equipe-anhanga.jpg"
                     alt="Equipe da Anhangá Viagens planejando um roteiro personalizado"
+                    width={800}
+                    height={600}
                     className="w-full h-auto object-cover aspect-[4/3]"
                   />
                 </div>
