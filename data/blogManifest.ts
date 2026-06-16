@@ -71,6 +71,30 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "7 min de leitura"
   },
   {
+    "title": "Documentos para Viajar com Criança ao Exterior: Guia Completo 2026",
+    "excerpt": "Passaporte, autorização de viagem, certidão de nascimento: saiba o que levar ao viajar com menor de 18 anos para fora do Brasil de acordo com cada cenário.",
+    "date": "2026-06-30",
+    "author": "felipe-william",
+    "category": "Planejamento",
+    "image": "https://media.anhanga.tur.br/images/blog/documentos-viajar-crianca-exterior.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Viagem em família",
+    "tags": [
+      "família",
+      "documentos",
+      "viagem-com-criança",
+      "passaporte",
+      "planejamento",
+      "america-do-sul",
+      "europa"
+    ],
+    "seoTitle": "Documentos para Viajar com Criança 2026",
+    "seoDescription": "Saiba quais documentos são obrigatórios para viajar ao exterior com crianças e adolescentes: passaporte, autorização de viagem, AEV e casos especiais.",
+    "slug": "documentos-para-viajar-com-crianca",
+    "readingTime": "8 min de leitura"
+  },
+  {
     "title": "ETIAS 2026: O Que Mudou para Brasileiros na Europa (Perguntas e Respostas)",
     "excerpt": "A Europa exigirá autorização eletrônica de brasileiros a partir do fim de 2026. Entenda o que é o ETIAS, quanto custa, como pedir e o que muda na fronteira.",
     "date": "2026-06-23",
