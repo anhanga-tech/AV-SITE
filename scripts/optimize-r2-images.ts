@@ -208,6 +208,66 @@ interface RowResult {
   reason: string;
 }
 
+/** Copy the original to the backup prefix once, before it is overwritten. */
+async function backupOriginal(client: S3Client, bucket: string, key: string, backupPrefix: string): Promise<void> {
+  const backupKey = buildBackupKey(key, backupPrefix);
+  if (await backupExists(client, bucket, backupKey)) return;
+  await client.send(
+    new CopyObjectCommand({ Bucket: bucket, Key: backupKey, CopySource: encodeCopySource(bucket, key) }),
+  );
+}
+
+function formatSaving(before: number, after: number, width: number, resized: boolean): string {
+  const pct = (((before - after) / before) * 100).toFixed(0);
+  return `${formatBytes(before)} → ${formatBytes(after)}  (-${pct}%)${resized ? `  ↧${width}px` : ''}`;
+}
+
+/** Fetch, re-encode and (when --apply) back up + overwrite a single object. */
+async function processObject(client: S3Client, bucket: string, obj: _Object, opts: Options): Promise<RowResult> {
+  const key = obj.Key!;
+  const before = obj.Size ?? 0;
+  const format = detectFormatFromKey(key);
+
+  try {
+    const getRes = await client.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
+    if (!getRes.Body) {
+      throw new Error('R2 object has no body');
+    }
+    const input = Buffer.from(await getRes.Body.transformToByteArray());
+    const { output, width, resized } = await reencode(input, format, opts);
+    const after = output.length;
+
+    if (!isWorthOverwriting(before, after)) {
+      console.log(`  ↷ ${key}  ${formatBytes(before)} → ${formatBytes(after)}  (sem ganho, mantido)`);
+      return { key, before, after, status: 'skipped-no-gain', reason: 'recompressão não reduziu' };
+    }
+
+    const detail = formatSaving(before, after, width, resized);
+
+    if (!opts.apply) {
+      console.log(`  • ${key}  ${detail}`);
+      return { key, before, after, status: 'would-optimize', reason: 'dry-run' };
+    }
+
+    await backupOriginal(client, bucket, key, opts.backupPrefix);
+    await client.send(
+      new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        Body: output,
+        ContentType: contentTypeFor(format, getRes.ContentType),
+        CacheControl: getRes.CacheControl,
+      }),
+    );
+
+    console.log(`  ✓ ${key}  ${detail}`);
+    return { key, before, after, status: 'optimized', reason: 'ok' };
+  } catch (err) {
+    console.error(`  ✗ ${key}  erro: ${err instanceof Error ? err.message : err}`);
+    return { key, before, after: before, status: 'skipped', reason: err instanceof Error ? err.message : String(err) };
+  }
+}
+
 async function main(): Promise<void> {
   const opts = parseArgs(process.argv.slice(2));
   const bucket = process.env.R2_BUCKET_NAME || 'av-site-media';
@@ -235,60 +295,7 @@ async function main(): Promise<void> {
 
   const rows: RowResult[] = [];
   for (const obj of selected) {
-    const key = obj.Key!;
-    const before = obj.Size ?? 0;
-    const format = detectFormatFromKey(key);
-
-    try {
-      const getRes = await client.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
-      if (!getRes.Body) {
-        throw new Error('R2 object has no body');
-      }
-      const input = Buffer.from(await getRes.Body.transformToByteArray());
-      const { output, width, resized } = await reencode(input, format, opts);
-      const after = output.length;
-
-      if (!isWorthOverwriting(before, after)) {
-        rows.push({ key, before, after, status: 'skipped-no-gain', reason: 'recompressão não reduziu' });
-        console.log(`  ↷ ${key}  ${formatBytes(before)} → ${formatBytes(after)}  (sem ganho, mantido)`);
-        continue;
-      }
-
-      const detail = `${formatBytes(before)} → ${formatBytes(after)}  (-${(((before - after) / before) * 100).toFixed(0)}%)${resized ? `  ↧${width}px` : ''}`;
-
-      if (!opts.apply) {
-        rows.push({ key, before, after, status: 'would-optimize', reason: 'dry-run' });
-        console.log(`  • ${key}  ${detail}`);
-        continue;
-      }
-
-      const backupKey = buildBackupKey(key, opts.backupPrefix);
-      if (!(await backupExists(client, bucket, backupKey))) {
-        await client.send(
-          new CopyObjectCommand({
-            Bucket: bucket,
-            Key: backupKey,
-            CopySource: encodeCopySource(bucket, key),
-          }),
-        );
-      }
-
-      await client.send(
-        new PutObjectCommand({
-          Bucket: bucket,
-          Key: key,
-          Body: output,
-          ContentType: contentTypeFor(format, getRes.ContentType),
-          CacheControl: getRes.CacheControl,
-        }),
-      );
-
-      rows.push({ key, before, after, status: 'optimized', reason: 'ok' });
-      console.log(`  ✓ ${key}  ${detail}`);
-    } catch (err) {
-      rows.push({ key, before, after: before, status: 'skipped', reason: err instanceof Error ? err.message : String(err) });
-      console.error(`  ✗ ${key}  erro: ${err instanceof Error ? err.message : err}`);
-    }
+    rows.push(await processObject(client, bucket, obj, opts));
   }
 
   const touched = rows.filter((r) => r.status === 'optimized' || r.status === 'would-optimize');
