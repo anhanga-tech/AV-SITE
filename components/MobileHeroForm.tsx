@@ -1,4 +1,5 @@
-import React, { useState, memo } from 'react';
+import React, { useState, memo, useRef } from 'react';
+import { X } from 'lucide-react';
 import { openAiChat } from '../utils/aiChat';
 import { triggerHaptic } from '../utils/haptics';
 
@@ -12,6 +13,7 @@ import { triggerHaptic } from '../utils/haptics';
  */
 const MobileHeroForm: React.FC = memo(() => {
   const [mobileDestination, setMobileDestination] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,30 +26,47 @@ const MobileHeroForm: React.FC = memo(() => {
     });
   };
 
+  const handleClear = () => {
+    setMobileDestination('');
+    void triggerHaptic('light');
+    inputRef.current?.focus();
+  };
+
   return (
     <div className="md:hidden w-full max-w-sm mx-auto">
       <form
         onSubmit={handleSubmit}
         className="flex flex-col gap-3"
       >
-        <div className="flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-2xl px-4 py-3 shadow-lg border border-white/30">
-          <span className="text-brand-cyan text-lg">📍</span>
+        <div className="flex items-center gap-2 bg-white/95 backdrop-blur-md rounded-2xl px-4 py-3 shadow-lg border border-white/30 transition-shadow focus-within:ring-2 focus-within:ring-brand-cyan">
+          <span className="text-brand-cyan text-lg" aria-hidden="true">📍</span>
           <input
+            ref={inputRef}
             type="text"
             value={mobileDestination}
             onChange={(e) => setMobileDestination(e.target.value)}
             placeholder="Para onde você quer ir?"
-            aria-label="Destino"
+            aria-label="Para onde você quer ir?"
             className="flex-1 outline-none text-zinc-800 font-semibold placeholder-zinc-400 bg-transparent text-base"
             autoComplete="off"
             data-testid="destination-input-mobile"
           />
+          {mobileDestination && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="p-1 text-zinc-400 hover:text-brand-vibrant transition-colors rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-vibrant"
+              aria-label="Limpar destino"
+            >
+              <X className="size-4" />
+            </button>
+          )}
         </div>
         <button
           type="submit"
           data-testid="submit-search-btn-mobile"
           data-tracking="hero-home-mobile"
-          className="btn-specialist w-full bg-brand-yellow text-brand-dark font-black text-base py-4 rounded-2xl shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition"
+          className="btn-specialist w-full bg-brand-yellow text-brand-dark font-black text-base py-4 rounded-2xl shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-vibrant/30"
         >
           Quero meu orçamento →
         </button>
