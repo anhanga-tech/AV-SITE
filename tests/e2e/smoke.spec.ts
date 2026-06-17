@@ -61,6 +61,26 @@ test.describe('Smoke Suite', () => {
     await expect(page.locator('#mobile-menu')).toBeVisible();
   });
 
+  test('should clear the mobile destination input and keep focus', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'This test is for the mobile hero form only');
+    await page.goto('/');
+    const homePage = new HomePage(page);
+
+    // Clear button is hidden until the user types something.
+    await expect(homePage.mobileClearDestinationBtn).toHaveCount(0);
+
+    await homePage.mobileDestinationInput.fill('Paris');
+    await expect(homePage.mobileClearDestinationBtn).toBeVisible();
+
+    await homePage.mobileClearDestinationBtn.click();
+
+    // Input is reset, button disappears again, and focus stays on the input
+    // so the virtual keyboard does not dismiss.
+    await expect(homePage.mobileDestinationInput).toHaveValue('');
+    await expect(homePage.mobileClearDestinationBtn).toHaveCount(0);
+    await expect(homePage.mobileDestinationInput).toBeFocused();
+  });
+
   test('should open contact modal from landing pages CTAs', async ({ page }) => {
     // Orlando
     await page.goto('/orlando');
