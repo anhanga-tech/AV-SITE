@@ -115,6 +115,12 @@
       var loadGtm = function () {
         if (gtmLoaded) return;
         gtmLoaded = true;
+        // Não carregar GTM em ambientes não-produtivos (dev local + Playwright/CI em 127.0.0.1).
+        // Sem este gate, submits de teste disparam generate_lead -> GTM -> GA4 de produção e
+        // poluem o sinal de conversão (treina o Smart Bidding com tráfego de bot). Espelha o
+        // gate de host do loadMautic.
+        var h = location.hostname;
+        if (h === 'localhost' || h === '127.0.0.1' || h.endsWith('.local') || h.endsWith('.test')) return;
         window.dataLayer.push({
           'gtm.start': new Date().getTime(),
           event: 'gtm.js'

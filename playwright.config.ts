@@ -29,11 +29,17 @@ export default defineConfig({
         },
       ],
     },
-    // Block third-party tracking during tests — prevents test data from polluting production CRMs
+    // Block third-party tracking during tests — prevents test data from polluting production
+    // CRMs and the production GA4 property (generate_lead via GTM/sGTM). Belt-and-suspenders
+    // alongside the localhost gate in index.html's loadGtm.
     launchOptions: {
       args: [
         '--host-resolver-rules='
         + 'MAP mkt.anhanga.tur.br ~NOTFOUND, '
+        + 'MAP load.sst.anhanga.tur.br ~NOTFOUND, '
+        + 'MAP *.googletagmanager.com ~NOTFOUND, '
+        + 'MAP *.google-analytics.com ~NOTFOUND, '
+        + 'MAP *.analytics.google.com ~NOTFOUND, '
         + 'MAP *.hubspot.com ~NOTFOUND, '
         + 'MAP *.hsforms.com ~NOTFOUND, '
         + 'MAP *.hsforms.net ~NOTFOUND, '
