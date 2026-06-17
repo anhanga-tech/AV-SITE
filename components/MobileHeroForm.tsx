@@ -54,6 +54,9 @@ const MobileHeroForm: React.FC = memo(() => {
           {mobileDestination && (
             <button
               type="button"
+              // Prevent the input from blurring on pointer-down so the mobile
+              // keyboard does not flicker before handleClear restores focus.
+              onMouseDown={(e) => e.preventDefault()}
               onClick={handleClear}
               data-testid="clear-destination-btn-mobile"
               className="p-1 text-zinc-400 hover:text-brand-vibrant transition-colors rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-vibrant"
