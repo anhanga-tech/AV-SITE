@@ -46,7 +46,7 @@ const MobileHeroForm: React.FC = memo(() => {
             value={mobileDestination}
             onChange={(e) => setMobileDestination(e.target.value)}
             placeholder="Para onde você quer ir?"
-            aria-label="Para onde você quer ir?"
+            aria-label="Destino"
             className="flex-1 outline-none text-zinc-800 font-semibold placeholder-zinc-400 bg-transparent text-base"
             autoComplete="off"
             data-testid="destination-input-mobile"
@@ -54,6 +54,9 @@ const MobileHeroForm: React.FC = memo(() => {
           {mobileDestination && (
             <button
               type="button"
+              // Prevent the input from blurring on pointer-down so the mobile
+              // keyboard does not flicker before handleClear restores focus.
+              onMouseDown={(e) => e.preventDefault()}
               onClick={handleClear}
               className="p-1 text-zinc-400 hover:text-brand-vibrant transition-colors rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-vibrant"
               aria-label="Limpar destino"

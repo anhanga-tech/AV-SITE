@@ -30,8 +30,8 @@
     "@mdx-js/react": "^3.1.1",
     "@mdx-js/rollup": "^3.1.1",
     "@phosphor-icons/react": "^2.1.10",
-    "@sentry/cloudflare": "^10.56.0",
-    "@sentry/react": "^10.56.0",
+    "@sentry/cloudflare": "^10.57.0",
+    "@sentry/react": "^10.57.0",
     "@tailwindcss/postcss": "^4.3.0",
     "@tailwindcss/typography": "^0.5.20",
     "@upstash/redis": "^1.38.0",
@@ -72,7 +72,7 @@
     "turndown": "^7.2.4",
     "typescript": "~6.0.3",
     "vite": "^8.0.16",
-    "wrangler": "^4.98.0"
+    "wrangler": "^4.99.0"
   },
   "engines": {
     "node": ">=24"
