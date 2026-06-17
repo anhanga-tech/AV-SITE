@@ -120,7 +120,7 @@
         // poluem o sinal de conversão (treina o Smart Bidding com tráfego de bot). Espelha o
         // gate de host do loadMautic.
         var h = location.hostname;
-        if (h === 'localhost' || h === '127.0.0.1' || h.endsWith('.local') || h.endsWith('.test')) return;
+        if (h === 'localhost' || h === '127.0.0.1' || h === '[::1]' || h === '::1' || h === '0.0.0.0' || h.endsWith('.local') || h.endsWith('.test')) return;
         window.dataLayer.push({
           'gtm.start': new Date().getTime(),
           event: 'gtm.js'

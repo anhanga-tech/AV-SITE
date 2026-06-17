@@ -91,6 +91,9 @@ test('loadGtm tem gate de host para não poluir o GA4 de produção em dev/CI', 
   assert.match(body, /location\.hostname/, 'loadGtm deve checar location.hostname');
   assert.match(body, /'localhost'/, 'gate deve cobrir localhost');
   assert.match(body, /'127\.0\.0\.1'/, 'gate deve cobrir 127.0.0.1');
+  assert.match(body, /'\[::1\]'/, 'gate deve cobrir o loopback IPv6 [::1]');
+  assert.match(body, /'::1'/, 'gate deve cobrir o loopback IPv6 ::1');
+  assert.match(body, /'0\.0\.0\.0'/, 'gate deve cobrir 0.0.0.0 (Docker/CI)');
   assert.match(body, /\.endsWith\('\.local'\)/, 'gate deve cobrir hosts .local');
   assert.match(body, /\.endsWith\('\.test'\)/, 'gate deve cobrir hosts .test');
 
