@@ -81,6 +81,29 @@ test('index.html configura gtag consent defaults antes da IIFE de scripts lazy',
   assert.match(indexHtml, /wait_for_update:\s*2000/, 'wait_for_update deve ser 2000ms');
 });
 
+test('loadGtm tem gate de host para não poluir o GA4 de produção em dev/CI', () => {
+  const loadGtmMatch = indexHtml.match(/var loadGtm\s*=\s*function\s*\(\)\s*\{([\s\S]*?)};/);
+  assert.ok(loadGtmMatch, 'loadGtm deve estar definida');
+  const body = loadGtmMatch[1];
+
+  // O gate de host deve bloquear localhost/127.0.0.1/.local/.test, onde o Playwright/CI roda.
+  // Sem isto, generate_lead de testes vaza para o GA4 de produção (gatilho G0 do plano 360).
+  assert.match(body, /location\.hostname/, 'loadGtm deve checar location.hostname');
+  assert.match(body, /'localhost'/, 'gate deve cobrir localhost');
+  assert.match(body, /'127\.0\.0\.1'/, 'gate deve cobrir 127.0.0.1');
+  assert.match(body, /'\[::1\]'/, 'gate deve cobrir o loopback IPv6 [::1]');
+  assert.match(body, /'::1'/, 'gate deve cobrir o loopback IPv6 ::1');
+  assert.match(body, /'0\.0\.0\.0'/, 'gate deve cobrir 0.0.0.0 (Docker/CI)');
+  assert.match(body, /\.endsWith\('\.local'\)/, 'gate deve cobrir hosts .local');
+  assert.match(body, /\.endsWith\('\.test'\)/, 'gate deve cobrir hosts .test');
+
+  // O return do gate precisa vir ANTES da injeção do loader do GTM/sGTM.
+  const gateIndex = body.indexOf('location.hostname');
+  const injectIndex = body.indexOf('load.sst.anhanga.tur.br');
+  assert.ok(gateIndex > -1 && injectIndex > -1, 'gate e injeção devem existir em loadGtm');
+  assert.ok(gateIndex < injectIndex, 'o gate de host deve preceder a injeção do GTM');
+});
+
 test('loadMautic tem gate de consentimento LGPD', () => {
   const loadMauticMatch = indexHtml.match(/var loadMautic\s*=\s*function\s*\(\)\s*\{([\s\S]*?)};/);
   assert.ok(loadMauticMatch, 'loadMautic deve estar definida');
