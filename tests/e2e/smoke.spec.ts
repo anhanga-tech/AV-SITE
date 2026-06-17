@@ -72,7 +72,9 @@ test.describe('Smoke Suite', () => {
     await homePage.mobileDestinationInput.fill('Paris');
     await expect(homePage.mobileClearDestinationBtn).toBeVisible();
 
-    await homePage.mobileClearDestinationBtn.click();
+    // force: the fixed home header can overlap the button when Playwright
+    // auto-scrolls it to the top of the viewport; the user reaches it fine.
+    await homePage.mobileClearDestinationBtn.click({ force: true });
 
     // Input is reset, button disappears again, and focus stays on the input
     // so the virtual keyboard does not dismiss.
