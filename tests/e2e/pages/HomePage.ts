@@ -12,6 +12,7 @@ export class HomePage {
   readonly submitSearchBtn: Locator;
   readonly mobileDestinationInput: Locator;
   readonly mobileSubmitSearchBtn: Locator;
+  readonly mobileClearDestinationBtn: Locator;
   readonly mobileMenuBtn: Locator;
   readonly mobileFaleConoscoBtn: Locator;
 
@@ -31,6 +32,7 @@ export class HomePage {
     this.submitSearchBtn = page.getByTestId('submit-search-btn');
     this.mobileDestinationInput = page.getByTestId('destination-input-mobile');
     this.mobileSubmitSearchBtn = page.getByTestId('submit-search-btn-mobile');
+    this.mobileClearDestinationBtn = page.getByTestId('clear-destination-btn-mobile');
     this.mobileMenuBtn = page.locator('button[aria-label="Abrir menu"]');
   }
 

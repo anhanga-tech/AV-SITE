@@ -102,4 +102,21 @@ test.describe('Smoke Suite', () => {
     // Should navigate back to home with the anchor
     await expect(page).toHaveURL(/\/.*#contato$/);
   });
+
+  test('should clear the mobile destination input and keep focus', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'This test is for mobile only');
+    await page.goto('/');
+    const homePage = new HomePage(page);
+
+    await homePage.mobileDestinationInput.fill('Paris');
+    await expect(homePage.mobileClearDestinationBtn).toBeVisible();
+
+    await homePage.mobileClearDestinationBtn.click({ force: true });
+
+    // Input is reset, button disappears again, and focus stays on the input
+    // so the virtual keyboard does not dismiss.
+    await expect(homePage.mobileDestinationInput).toHaveValue('');
+    await expect(homePage.mobileClearDestinationBtn).not.toBeVisible();
+    await expect(homePage.mobileDestinationInput).toBeFocused();
+  });
 });
