@@ -3,6 +3,10 @@ overrides:
   glob: "^13.0.6"
   minimatch: "^10.2.2"
   qs: "^6.15.2"
+  # Dependabot #35 (medium): protobufjs <= 7.6.2 schema-property shadowing.
+  # Transitivo via @google/genai (SDK do Gemini, produção). 7.6.3 corrige.
+  # Pinado na linha 7.6.x: a 8.x não tem trusted publisher e viola no-downgrade.
+  protobufjs: ">=7.6.3 <8"
 
 legacyPeerDeps: true
 nodeLinker: hoisted
