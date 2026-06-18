@@ -90,17 +90,6 @@ export function detectBlockedDestination(destinationText: string): SafetyBlock |
     const normalized = normalizeText(destinationText);
     if (!normalized) return null;
 
-    const isEquadorCosta =
-        (normalized.includes('equador') || normalized.includes('ecuador')) &&
-        (normalized.includes('guayaquil') || normalized.includes('costa'));
-
-    if (isEquadorCosta) {
-        return {
-            category: 'instability',
-            country: 'Equador (Costa/Guayaquil)',
-        };
-    }
-
     for (const rule of BLOCKED_DESTINATIONS) {
         const hit = rule.aliases.some((alias) => hasAliasMatch(normalized, alias));
         if (hit) {

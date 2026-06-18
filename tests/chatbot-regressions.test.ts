@@ -59,30 +59,20 @@ test('filtering isAction messages from post-handoff history eliminates consecuti
     );
 });
 
-test('safety check should block "Emirados" (Policy #186)', () => {
-    const result = detectBlockedDestination('Dubai, Emirados Árabes Unidos');
-    assert.ok(result, 'UAE must be blocked');
-    assert.equal(result?.country, 'Emirados Árabes Unidos');
-});
-
 test('safety check should still block explicit Iran destinations', () => {
     const result = detectBlockedDestination('Teerã, Irã');
     assert.ok(result, 'Iran must be blocked');
     assert.equal(result?.country, 'Irã');
 });
 
-test('safety check should block all Middle Eastern countries (Policy #186)', () => {
+test('safety check should block remaining Middle Eastern countries', () => {
     const testCases = [
-        { destination: 'Riad, Arábia Saudita', expected: 'Arábia Saudita' },
-        { destination: 'Dubai, Emirados Árabes Unidos', expected: 'Emirados Árabes Unidos' },
-        { destination: 'Doha, Catar', expected: 'Catar' },
-        { destination: 'Istambul, Turquia', expected: 'Turquia' },
-        { destination: 'Cairo, Egito', expected: 'Egito' },
         { destination: 'Amã, Jordânia', expected: 'Jordânia' },
         { destination: 'Mascate, Omã', expected: 'Omã' },
         { destination: 'Kuwait City, Kuwait', expected: 'Kuwait' },
         { destination: 'Manama, Bahrein', expected: 'Bahrein' },
         { destination: 'Bagdá, Iraque', expected: 'Iraque' },
+        { destination: 'Tel Aviv, Israel', expected: 'Israel' },
     ];
 
     for (const { destination, expected } of testCases) {
@@ -90,6 +80,25 @@ test('safety check should block all Middle Eastern countries (Policy #186)', () 
         assert.ok(result, `${destination} must be blocked`);
         assert.equal(result?.country, expected);
         assert.equal(result?.category, 'war');
+    }
+});
+
+// Liberados em jun/2026 após estabilização do conflito regional. Antes bloqueados pela Policy #186.
+test('safety check should allow destinations released in jun/2026', () => {
+    const releasedDestinations = [
+        'Dubai, Emirados Árabes Unidos',
+        'Riad, Arábia Saudita',
+        'Doha, Catar',
+        'Istambul, Turquia',
+        'Capadócia, Turquia',
+        'Cairo, Egito',
+        'Sharm El Sheikh, Egito',
+        'Guayaquil, Equador',
+        'Galápagos, Equador',
+    ];
+    for (const destination of releasedDestinations) {
+        const result = detectBlockedDestination(destination);
+        assert.equal(result, null, `${destination} should be allowed`);
     }
 });
 
