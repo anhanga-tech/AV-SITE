@@ -65,7 +65,7 @@
     "gray-matter": "^4.0.3",
     "react-doctor": "^0.2.3",
     "rollup-plugin-visualizer": "^7.0.1",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.1",
     "tailwindcss": "^4.3.0",
     "tsx": "^4.22.4",
     "turndown": "^7.2.4",
