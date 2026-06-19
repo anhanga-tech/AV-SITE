@@ -10,7 +10,7 @@ overrides:
   minimatch: ^10.2.2
   qs: ^6.15.2
   protobufjs: '>=7.6.3 <8'
-  esbuild: '>=0.28.1'
+  esbuild: ^0.28.1
 
 importers:
 
@@ -3713,7 +3713,7 @@ packages:
     peerDependencies:
       '@types/node': ^20.19.0 || >=22.12.0
       '@vitejs/devtools': ^0.1.18
-      esbuild: '>=0.28.1'
+      esbuild: ^0.28.1
       jiti: '>=1.21.0'
       less: ^4.0.0
       sass: ^1.70.0

@@ -10,7 +10,9 @@ overrides:
   # Dependabot #31 (low): esbuild < 0.28.1 permite leitura arbitrária de
   # arquivos via dev-server no Windows. Transitivo (wrangler + vite/tsx).
   # 0.28.1 corrige; força as duas árvores (0.27.3 e 0.28.0) para a versão segura.
-  esbuild: ">=0.28.1"
+  # Pinado em ^0.28.1 (>=0.28.1 <0.29.0): esbuild é pré-1.0, minor bumps são
+  # breaking pelo SemVer e poderiam quebrar vite/wrangler/tsx.
+  esbuild: "^0.28.1"
 
 legacyPeerDeps: true
 nodeLinker: hoisted
