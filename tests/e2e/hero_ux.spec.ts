@@ -49,8 +49,9 @@ test.describe('Hero UX and Accessibility', () => {
 
     // Open Guests
     await page.getByTestId('guests-filter-btn').click();
-    // The dropdown contains "Adultos", "Crianças", etc.
-    const guestLabel = page.getByText('Crianças').first();
+    // The dropdown contains exact labels "Adultos", "Crianças", etc.
+    // Use exact match to avoid matching blog card headings that contain "Crianças" as a substring.
+    const guestLabel = page.getByText('Crianças', { exact: true });
     await expect(guestLabel).toBeVisible();
 
     await page.keyboard.press('Escape');
