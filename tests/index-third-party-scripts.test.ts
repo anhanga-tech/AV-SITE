@@ -5,11 +5,9 @@ import path from 'node:path';
 
 const indexHtmlPath = path.resolve(process.cwd(), 'index.html');
 const indexHtml = fs.readFileSync(indexHtmlPath, 'utf8');
-const designSystemDir = fs.readdirSync(process.cwd()).find((entry) => entry.endsWith('Design System'));
+const designSystemCssPath = path.resolve(process.cwd(), 'docs/design/brand-system', 'colors_and_type.css');
+assert.ok(fs.existsSync(designSystemCssPath), 'design system colors_and_type.css should exist at docs/design/brand-system');
 
-assert.ok(designSystemDir, 'design system directory should exist');
-
-const designSystemCssPath = path.resolve(process.cwd(), designSystemDir, 'colors_and_type.css');
 const designSystemCss = fs.readFileSync(designSystemCssPath, 'utf8');
 
 function getHeadHtml(html: string): string {
