@@ -47,11 +47,16 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/googleReviews.json
-          if git diff --cached --quiet; then
-            echo "No changes to googleReviews.json — skipping."
+          # Compara conteúdo ignorando o carimbo `lastFetched`, que muda a cada
+          # run. Sem isso, todo run semanal abriria um PR só de timestamp.
+          NEW_CONTENT="$(jq -S 'del(.lastFetched)' data/googleReviews.json)"
+          OLD_CONTENT="$(git show HEAD:data/googleReviews.json | jq -S 'del(.lastFetched)')"
+          if [ "$NEW_CONTENT" = "$OLD_CONTENT" ]; then
+            echo "Apenas lastFetched mudou — nenhum review novo. Pulando PR."
+            git checkout -- data/googleReviews.json
             exit 0
           fi
+          git add data/googleReviews.json
           BRANCH="chore/update-google-reviews-${{ github.run_id }}"
           git checkout -b "$BRANCH"
           git commit -m "chore: atualiza data/googleReviews.json"
