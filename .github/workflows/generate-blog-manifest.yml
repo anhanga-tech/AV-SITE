@@ -18,7 +18,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6.0.3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # Não persistir o GITHUB_TOKEN como credencial git no runner: assim um
+          # script de lifecycle de dependência (pnpm install abaixo) não consegue
+          # lê-lo. O push reautentica explicitamente via token no passo final.
+          persist-credentials: false
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6.0.9
@@ -49,7 +52,7 @@ jobs:
           BRANCH="chore/update-blog-manifest-${{ github.run_id }}"
           git checkout -b "$BRANCH"
           git commit -m "chore: regenerate blogManifest.ts"
-          git push origin "$BRANCH"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}" "HEAD:refs/heads/$BRANCH"
           gh pr create \
             --title "chore: regenerate blogManifest.ts" \
             --body "Regeneração automática do blog manifest disparada por mudança em \`content/blog/\`." \

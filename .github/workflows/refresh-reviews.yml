@@ -17,7 +17,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6.0.3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # Não persistir o GITHUB_TOKEN como credencial git no runner: assim os
+          # scripts de lifecycle do pnpm install não conseguem lê-lo. O push
+          # reautentica explicitamente via token no passo de abertura do PR.
+          persist-credentials: false
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6.0.9
@@ -60,7 +63,7 @@ jobs:
           BRANCH="chore/update-google-reviews-${{ github.run_id }}"
           git checkout -b "$BRANCH"
           git commit -m "chore: atualiza data/googleReviews.json"
-          git push origin "$BRANCH"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}" "HEAD:refs/heads/$BRANCH"
           gh pr create \
             --title "chore: atualiza data/googleReviews.json" \
             --body "Atualização automática semanal dos reviews do Google, disparada pelo workflow agendado \`refresh-reviews.yml\`." \
