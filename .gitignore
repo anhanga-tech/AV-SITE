@@ -54,3 +54,6 @@ seo-audit-*.md
 content-calendar-*.md
 brand-review-*.md
 brand-profile.json
+
+# SEO crawl exports / audit dumps (business data — local only)
+SEO/
