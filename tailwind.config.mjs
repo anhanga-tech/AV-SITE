@@ -16,6 +16,9 @@ export default {
     theme: {
         extend: {
             colors: {
+                // LEGADO — não usar em código novo. Namespace canônico: `anhanga-*`
+                // (ver lib/design-tokens.ts). Congelado por tests/tailwind-brand-namespace-guard.test.ts;
+                // migre usos de brand-* → anhanga-* oportunisticamente e abaixe o baseline do guard.
                 brand: {
                     cyan: '#0ea5e9', // Sky 500
                     cyanDark: '#0284c7', // Sky 600
