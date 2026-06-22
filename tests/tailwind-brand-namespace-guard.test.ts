@@ -35,12 +35,22 @@ function collectTailwindFiles(dir: string): string[] {
   return out;
 }
 
+// O content do tailwind.config.mjs também inclui `./*.{js,ts,jsx,tsx}` —
+// arquivos na raiz (ex: App.tsx, index.tsx, ssr.tsx). Varremos a raiz (não
+// recursivo) para o guard cobrir todo o escopo que o Tailwind compila.
+function collectRootFiles(): string[] {
+  return fs
+    .readdirSync(ROOT, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && TARGET_EXTENSIONS.some((ext) => entry.name.endsWith(ext)))
+    .map((entry) => path.join(ROOT, entry.name));
+}
+
 // Baseline medido em 2026-06-21 (commit e14a6cd-descendant). Ao migrar
 // usos de brand-* para anhanga-*, ABAIXE este número para travar o ganho.
 const BRAND_NAMESPACE_BASELINE = 629;
 
 test('legacy brand-* namespace does not grow (ratchet)', () => {
-  const files = SCAN_DIRS.flatMap(collectTailwindFiles);
+  const files = [...SCAN_DIRS.flatMap(collectTailwindFiles), ...collectRootFiles()];
   assert.ok(files.length > 0, 'Expected to scan at least one Tailwind file');
   const offenders: string[] = [];
   let total = 0;
