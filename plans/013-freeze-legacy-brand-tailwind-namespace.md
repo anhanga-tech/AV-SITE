@@ -125,14 +125,18 @@ Conventions to follow:
 ### Step 1: Create the guard test (without the baseline number yet)
 
 Create `tests/tailwind-brand-namespace-guard.test.ts`, structured like
-`tests/tailwind-bare-yellow-guard.test.ts`. Use this regex (mirrors the
-bare-yellow prefix list; matches legacy `-brand-<subtoken>` color utilities and
-not the `anhanga-*` canonical ones):
+`tests/tailwind-bare-yellow-guard.test.ts`. Use this regex (based on the
+bare-yellow prefix list, **extended** with `placeholder` and `ring-offset` so
+those legacy utilities can't slip past the guard; matches legacy
+`-brand-<subtoken>` color utilities and not the `anhanga-*` canonical ones):
 
 ```ts
 const LEGACY_BRAND =
-  /(?<![\w-])(text|bg|border|fill|stroke|ring|from|to|via|divide|decoration|outline|accent|caret|shadow)-brand-[a-z][a-zA-Z]*(?![\w-])/g;
+  /(?<![\w-])(text|bg|border|fill|stroke|ring(?:-offset)?|placeholder|from|to|via|divide|decoration|outline|accent|caret|shadow)-brand-[a-z][a-zA-Z]*(?![\w-])/g;
 ```
+
+(The ~629 baseline was measured with these same prefixes, so the count stays
+aligned. Re-measure in Step 1 regardless and pin what the guard actually counts.)
 
 Reuse the exemplar's `SCAN_DIRS`, `TARGET_EXTENSIONS`, `ROOT`, and
 `collectTailwindFiles` verbatim. Count every match across all scanned files into
