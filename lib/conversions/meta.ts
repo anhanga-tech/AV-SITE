@@ -113,11 +113,17 @@ function buildMetaCustomData(payload: MetaConversionPayload): Record<string, unk
 
 async function buildMetaRequestBody(
   payload: MetaConversionPayload,
+  accessToken: string,
   testEventCode: string | undefined,
   nowMs: number
 ): Promise<Record<string, unknown>> {
   const eventId = normalizeString(payload.eventId);
   const body: Record<string, unknown> = {
+    // access_token is sent in the POST body rather than the query string so the
+    // secret never appears in a URL (CWE-598). Outbound request URLs can be
+    // captured by edge/CDN observability, proxies, and APM tooling; request
+    // bodies are not. Meta's Graph API accepts access_token as a body param.
+    access_token: accessToken,
     data: [
       {
         event_name: payload.eventName,
@@ -137,8 +143,8 @@ async function buildMetaRequestBody(
   return body;
 }
 
-function buildMetaUrl(pixelId: string, accessToken: string): string {
-  return `https://graph.facebook.com/${META_GRAPH_VERSION}/${pixelId}/events?access_token=${accessToken}`;
+function buildMetaUrl(pixelId: string): string {
+  return `https://graph.facebook.com/${META_GRAPH_VERSION}/${pixelId}/events`;
 }
 
 async function postMetaConversion(url: string, body: Record<string, unknown>): Promise<Response> {
@@ -182,8 +188,8 @@ export async function sendMetaConversion(
   try {
     const nowMs = Date.now();
     const testEventCode = normalizeString(process.env.META_TEST_EVENT_CODE);
-    const body = await buildMetaRequestBody(payload, testEventCode, nowMs);
-    const url = buildMetaUrl(pixelId, accessToken);
+    const body = await buildMetaRequestBody(payload, accessToken, testEventCode, nowMs);
+    const url = buildMetaUrl(pixelId);
     const response = await postMetaConversion(url, body);
     return await handleMetaResponse(payload, response);
   } catch (error) {

@@ -97,3 +97,8 @@ Standardized the "Zero-Trust CORS" pattern for internal APIs. Public-facing endp
 **Vulnerability:** Insecure (timing-sensitive) token comparison and lack of rate limiting on sensitive OAuth endpoints.
 **Learning:** Authentication flows, even if for administrative use, require multi-layered protection including rate limiting and timing-safe comparisons to prevent brute-force and side-channel attacks. Centralizing these utilities ensures consistency across the codebase.
 **Prevention:** Centralize security-critical utilities like `timingSafeEqual` in `lib/security.ts`. Enforce rate limits on all public-facing authentication or data ingestion endpoints to provide defense-in-depth against automated abuse.
+
+## 2026-06-22 - [Secrets in Outbound Request URLs (CWE-598)]
+**Vulnerability:** `lib/conversions/meta.ts` passed the Meta CAPI `access_token` as a query-string parameter (`?access_token=...`). On Cloudflare Pages Functions, outbound request URLs are exposed to edge/CDN observability, proxies, and APM tooling, while request bodies are not — so a long-lived provider secret rode along in a loggable surface.
+**Learning:** The Graph API accepts `access_token` in the POST body; moving it there removes the URL exposure with zero behavior change. NOT all providers can do this — GA4 Measurement Protocol (`lib/conversions/google.ts`) *requires* `api_secret` in the query string, so that one is an unavoidable exception, not a bug to "fix".
+**Prevention:** When integrating a provider, prefer sending credentials in headers or the request body. Only place a secret in a URL when the provider's API offers no alternative, and document why. Add a test asserting the secret never appears in the request URL.
