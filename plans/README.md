@@ -19,12 +19,26 @@ começar, honre as STOP conditions e atualize sua linha ao terminar.
 | 009 | Fallback visível quando globe.gl falha (CorpGlobe) | P3 | S | — | MERGED (#876) |
 | 010 | Header CSP na página de callback OAuth do Decap | P3 | S | — | MERGED (#878) |
 | 011 | Normalizar click IDs vazios/whitespace → null nos payloads n8n | P3 | S | 007 | MERGED (#879) |
+| 012 | Tirar artefatos/dumps obsoletos da raiz para `docs/` (root mínima) | P3 | S | — | PR ABERTO (#914) |
+| 013 | Congelar namespace Tailwind legado `brand-*` com guard ratchet | P3 | S | — | TODO |
+| 014 | Atualização automática de reviews do Google (GH Actions agendado) | P3 | S | — | TODO |
+| 015 | SPIKE: expandir superfície de tools do chatbot (design doc) | P3 | M | — | TODO |
+| 016 | SPIKE: rotear resultado do quiz para o chatbot (design doc) | P3 | M | — | TODO |
+| 017 | Mover folder do design system → `docs/design/brand-system/` + ajustar teste | P3 | S | — | TODO |
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (com motivo) | REJECTED (com justificativa)
 
 > **Rodada 2** (commit `68eecf6`, 2026-06-12): planos 001–005 já executados
 > (DONE, PRs #868–#872). Planos 006–010 são desta rodada — foco em performance
 > (gap da rodada 1), segurança de defesa-em-profundidade e cobertura de testes.
+
+> **Rodada 3** (commit `ec3029a`, 2026-06-21): audit focado no delta de 44
+> commits desde a rodada 2. Núcleos críticos (generate, OAuth callback, leads),
+> cobertura de testes (83 arquivos) e o código novo (otimizador R2, hardening
+> OAuth, UX mobile) estão sólidos e foram mudanças intencionais/testadas. Sobram
+> só achados de baixa alavancagem: 012 (higiene de raiz, ganho claro) e 013
+> (freeze do namespace de cor — versão segura S/LOW, não o big-bang). Direção
+> auditada via `/improve next` — sugestões grounded apresentadas ao mantenedor.
 
 ## Dependency notes
 
@@ -81,6 +95,41 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (com motivo) | REJECTED (com 
 - **Config sprawl (.agent/.agents/.qwen/.codex/.Jules), Vercel/Netlify configs,
   script `verify` unificado** — DX menor; fazer oportunisticamente (já anotado
   na rodada 1).
+
+### Considered and rejected — rodada 3 (commit `ec3029a`)
+
+- **Advisories do `pnpm audit` (ws/undici em wrangler→miniflare)** — dev-only.
+  Atingem só o emulador local; não estão no runtime de produção (Cloudflare
+  edge) nem no output de build. Ruído de baixo sinal, sem plano.
+- **Big-bang `brand-*` → `anhanga-*` (~629 usos)** — débito real, mas L de
+  esforço e risco MED–HIGH com só snapshots visuais de rede; péssimo encaixe
+  para executor barato. Reformulado como plano 013 (freeze ratchet, S/LOW);
+  migração fica oportunística.
+- **Tokens de cor pouco usados (`brand.blue`, `brand.cyanDark` — 3 usos cada)**
+  — removê-los exige migrar os call sites; coberto pela política do 013, sem
+  plano isolado.
+- **`feat(ai)` #908 (liberação de destinos Oriente Médio + visa_status)** —
+  mudança de produto intencional (estabilização do conflito), testada. By-design.
+- **`functions/api/*` fazem `Object.assign(process.env, env)` por request** —
+  padrão canônico de bridge das Pages Functions; coberto por
+  `cloudflare-config.test.ts`. By-design.
+- **Decomposição de `SearchForm.tsx` (1005) / `QuizAnhangaLanding.tsx` (1110)**
+  — segue sendo débito real (L), reafirmado das rodadas 1–2; sem bug ativo, não
+  priorizado.
+
+### Direção (`/improve next`) — rodada 3
+
+- **D1: loop NPS → review no Google** — **já implementado**. `pages/NpsPage.tsx`
+  ramifica por nota (`score >= 9 → thank-promoter`) e `components/nps/NpsThankPromoter.tsx`
+  já mostra o CTA "Deixar minha review no Google". O que falta é automação no
+  lado n8n (fora do repo). Sem plano.
+- **D2 → plano 014**: refresh automático de reviews (gap real — nenhum workflow
+  `schedule:` hoje).
+- **D3 → plano 015 (spike)**: expandir tools do chatbot. Arquitetura permite, mas
+  roteamento é hardcoded p/ `generate_budget_link`; valor de produto especulativo.
+- **D4 → plano 016 (spike)**: rotear resultado do quiz p/ o chatbot. Assimetria
+  real (quiz → WhatsApp, ignora o chatbot apesar de já ter perfil + bantSummary),
+  mas o caminho atual converte lead morno — medir antes de mudar.
 
 ## Audit gaps
 
