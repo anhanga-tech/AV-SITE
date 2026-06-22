@@ -81,10 +81,11 @@ test('sendMetaConversion should build the expected Meta CAPI payload', async (t)
 
   assert.deepEqual(result, { success: true });
   assert.equal(requests.length, 1);
-  assert.equal(
-    requests[0]?.url,
-    'https://graph.facebook.com/v19.0/pixel-1/events?access_token=token-1',
-  );
+  // Security (CWE-598): the access token must never appear in the URL/query
+  // string — it is sent in the POST body instead.
+  assert.equal(requests[0]?.url, 'https://graph.facebook.com/v19.0/pixel-1/events');
+  assert.ok(!requests[0]?.url.includes('token-1'), 'access token must not leak into the URL');
+  assert.equal(requests[0]?.body?.access_token, 'token-1');
   assert.equal(requests[0]?.method, 'POST');
 
   const event = (requests[0]?.body?.data as Array<Record<string, unknown>> | undefined)?.[0];
