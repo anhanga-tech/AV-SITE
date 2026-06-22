@@ -24,10 +24,13 @@ overrides:
   # injeção de header/cookie). Transitivo via wrangler > miniflare.
   # 7.28.0 corrige; pinado em ^7.28.0 (mesma major).
   undici: "^7.28.0"
-  # pnpm audit (moderate): GHSA-h67p-54hq-rp68 — js-yaml <= 4.1.1 sofre DoS
-  # de complexidade quadrática em merge keys. Transitivo via bundlesize2 e
-  # gray-matter. 4.1.2 corrige.
-  js-yaml: "^4.1.2"
+  # NOTA: GHSA-h67p-54hq-rp68 (moderate, DoS quadrático em merge keys do
+  # js-yaml <= 4.1.1) NÃO é corrigível por override aqui. O patch exige
+  # js-yaml >= 4.1.2, mas o gray-matter (build-time, scripts/blog-manifest)
+  # depende de js-yaml 3.x e usa a API yaml.safeLoad, removida na 4.x — forçar
+  # a 4.x quebra a geração do manifest. Não há release de gray-matter sobre
+  # js-yaml 4. O risco é build/dev-time apenas e já existe na main; revisitar
+  # se/quando o gray-matter for substituído ou migrar para js-yaml 4.
 
 legacyPeerDeps: true
 nodeLinker: hoisted
