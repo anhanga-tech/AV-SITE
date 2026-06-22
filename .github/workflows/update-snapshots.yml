@@ -17,7 +17,7 @@ jobs:
       with:
         ref: ${{ github.event.inputs.branch }}
         token: ${{ secrets.GITHUB_TOKEN }}
-    - uses: pnpm/action-setup@v6.0.8
+    - uses: pnpm/action-setup@v6.0.9
     - uses: actions/setup-node@v6
       with:
         node-version: lts/*
