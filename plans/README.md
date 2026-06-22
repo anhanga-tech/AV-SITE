@@ -13,18 +13,19 @@ começar, honre as STOP conditions e atualize sua linha ao terminar.
 | 003 | Hardening: HTTPS nos webhooks n8n + validar ALLOWED_ORIGIN | P2 | S | — | DONE |
 | 004 | Links internos absolutos → navegação SPA nas landings | P2 | M | — | DONE |
 | 005 | Rejeitar markdown/URL em campos de destino do handoff IA | P3 | M | — | DONE |
-| 006 | Restringir links do markdown da IA a allowlist no chat | P2 | S | — | MERGED (#873) |
-| 007 | Testes unitários diretos dos builders de payload do n8n | P2 | S | — | MERGED (#874) |
-| 008 | Extrair helper de resposta JSON dos handlers submit-* | P3 | M | 007 (recomendado) | MERGED (#875) |
-| 009 | Fallback visível quando globe.gl falha (CorpGlobe) | P3 | S | — | MERGED (#876) |
-| 010 | Header CSP na página de callback OAuth do Decap | P3 | S | — | MERGED (#878) |
-| 011 | Normalizar click IDs vazios/whitespace → null nos payloads n8n | P3 | S | 007 | MERGED (#879) |
-| 012 | Tirar artefatos/dumps obsoletos da raiz para `docs/` (root mínima) | P3 | S | — | PR ABERTO (#914) |
-| 013 | Congelar namespace Tailwind legado `brand-*` com guard ratchet | P3 | S | — | TODO |
-| 014 | Atualização automática de reviews do Google (GH Actions agendado) | P3 | S | — | TODO |
-| 015 | SPIKE: expandir superfície de tools do chatbot (design doc) | P3 | M | — | TODO |
-| 016 | SPIKE: rotear resultado do quiz para o chatbot (design doc) | P3 | M | — | TODO |
-| 017 | Mover folder do design system → `docs/design/brand-system/` + ajustar teste | P3 | S | — | TODO |
+| 006 | Restringir links do markdown da IA a allowlist no chat | P2 | S | — | DONE |
+| 007 | Testes unitários diretos dos builders de payload do n8n | P2 | S | — | DONE |
+| 008 | Extrair helper de resposta JSON dos handlers submit-* | P3 | M | 007 (recomendado) | DONE |
+| 009 | Fallback visível quando globe.gl falha (CorpGlobe) | P3 | S | — | DONE |
+| 010 | Header CSP na página de callback OAuth do Decap | P3 | S | — | DONE |
+| 011 | Normalizar click IDs vazios/whitespace → null nos payloads n8n | P3 | S | 007 | DONE |
+| 012 | Tirar artefatos/dumps obsoletos da raiz para `docs/` (root mínima) | P3 | S | — | DONE |
+| 013 | Congelar namespace Tailwind legado `brand-*` com guard ratchet | P3 | S | — | DONE |
+| 014 | Atualização automática de reviews do Google (GH Actions agendado) | P3 | S | — | DONE |
+| 015 | SPIKE: expandir superfície de tools do chatbot (design doc) | P3 | M | — | DONE |
+| 016 | SPIKE: rotear resultado do quiz para o chatbot (design doc) | P3 | M | — | DONE |
+| 017 | Mover folder do design system → `docs/design/brand-system/` + ajustar teste | P3 | S | — | DONE |
+| 018 | Guard do workflow de reviews ignora mudança só de `lastFetched` | P3 | S | 014 | DONE |
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (com motivo) | REJECTED (com justificativa)
 
