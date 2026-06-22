@@ -13,6 +13,24 @@ overrides:
   # Pinado em ^0.28.1 (>=0.28.1 <0.29.0): esbuild é pré-1.0, minor bumps são
   # breaking pelo SemVer e poderiam quebrar vite/wrangler/tsx.
   esbuild: "^0.28.1"
+  # pnpm audit (high): GHSA-96hv-2xvq-fx4p — ws < 8.21.0 sofre DoS por
+  # exaustão de memória com fragmentos/chunks minúsculos. Transitivo via
+  # wrangler > miniflare (runtime de dev local). 8.21.0 corrige.
+  ws: "^8.21.0"
+  # pnpm audit (high/moderate/low): GHSA-vmh5-mc38-953g, GHSA-vxpw-j846-p89q,
+  # GHSA-hm92-r4w5-c3mj, GHSA-pr7r-676h-xcf6, GHSA-p88m-4jfj-68fv,
+  # GHSA-35p6-xmwp-9g52, GHSA-g8m3-5g58-fq7m — undici 7.x < 7.28.0
+  # (bypass de validação TLS, DoS WebSocket, vazamento entre origens,
+  # injeção de header/cookie). Transitivo via wrangler > miniflare.
+  # 7.28.0 corrige; pinado em ^7.28.0 (mesma major).
+  undici: "^7.28.0"
+  # NOTA: GHSA-h67p-54hq-rp68 (moderate, DoS quadrático em merge keys do
+  # js-yaml <= 4.1.1) NÃO é corrigível por override aqui. O patch exige
+  # js-yaml >= 4.1.2, mas o gray-matter (build-time, scripts/blog-manifest)
+  # depende de js-yaml 3.x e usa a API yaml.safeLoad, removida na 4.x — forçar
+  # a 4.x quebra a geração do manifest. Não há release de gray-matter sobre
+  # js-yaml 4. O risco é build/dev-time apenas e já existe na main; revisitar
+  # se/quando o gray-matter for substituído ou migrar para js-yaml 4.
 
 legacyPeerDeps: true
 nodeLinker: hoisted
