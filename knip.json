@@ -3,7 +3,7 @@
   "entry": [
     "ssr.tsx!",
     "functions/**/*.{ts,tsx}!",
-    "scripts/**/*.{ts,mjs}",
+    "scripts/**/*.{ts,mts,js,mjs,cjs}",
     "tests/**/*.test.ts",
     "tests/e2e/**/*.spec.ts"
   ],
