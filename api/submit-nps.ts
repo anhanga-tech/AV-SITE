@@ -7,10 +7,6 @@ import { SubmitNpsBodySchema } from '../lib/schemas/submit-nps';
 import { sendNpsToN8n } from '../services/n8n';
 import type { N8nNpsPayload } from '../lib/n8n-payloads';
 
-export const config = {
-  runtime: 'edge',
-};
-
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 3;
 const N8N_WEBHOOK_ERROR_PATTERN = /^N8N_WEBHOOK_ERROR:(\d{3}):/;

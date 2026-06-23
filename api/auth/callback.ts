@@ -1,7 +1,3 @@
-export const config = {
-    runtime: 'edge',
-};
-
 import { buildJsonError, getClientIP } from '../../lib/network';
 import { logger } from '../../lib/logger';
 import { checkRateLimit } from '../../lib/rate-limit';

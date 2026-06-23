@@ -177,7 +177,7 @@ export const HERO_VIDEOS: HeroVideo[] = [
 // =============================================================================
 // DESTINATION IMAGES
 // =============================================================================
-export interface DestinationMedia {
+interface DestinationMedia {
     image: string;
     thumbnail?: string; // Optional smaller version for cards
 }

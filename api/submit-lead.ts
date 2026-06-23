@@ -6,10 +6,6 @@ import { logger } from '../lib/logger';
 import { buildN8nLeadPayload } from '../lib/n8n-payloads';
 import { sendLeadToN8n } from '../services/n8n';
 
-export const config = {
-    runtime: 'edge',
-};
-
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
 

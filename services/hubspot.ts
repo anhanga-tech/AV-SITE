@@ -1,14 +1,6 @@
 const DEFAULT_HUBSPOT_REQUEST_TIMEOUT_MS = 1500;
 
-export interface HubSpotObjectResponse {
-    id?: string;
-}
-
-export interface HubSpotSearchResponse {
-    results?: Array<{ id?: string }>;
-}
-
-export interface HubSpotAssociationResponse {
+interface HubSpotAssociationResponse {
     results?: Array<{ toObjectId: string }>;
 }
 

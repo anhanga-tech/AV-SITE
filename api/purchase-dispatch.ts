@@ -5,10 +5,6 @@ import { checkRateLimit } from '../lib/rate-limit';
 import { timingSafeEqual } from '../lib/security';
 import { logger } from '../lib/logger';
 
-export const config = {
-  runtime: 'edge',
-};
-
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 30;
 const SANITIZED_DISPATCH_ERROR = 'Conversion dispatch failed';

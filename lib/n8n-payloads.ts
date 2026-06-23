@@ -3,7 +3,7 @@ import type { SubmitContactRequest } from '../types/contactCapture';
 import type { SubmitWaitlistRequest } from '../types/waitlist';
 import type { SubmitQuizRequest } from '../types/quiz';
 
-export interface N8nLeadTracking {
+interface N8nLeadTracking {
     utm_source: string | null;
     utm_medium: string | null;
     utm_campaign: string | null;

@@ -6,10 +6,6 @@ import { buildN8nWaitlistPayload } from '../lib/n8n-payloads';
 import { validateWaitlistPayload } from '../lib/waitlist-logic';
 import { sendWaitlistToN8n } from '../services/n8n';
 
-export const config = {
-    runtime: 'edge',
-};
-
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
 

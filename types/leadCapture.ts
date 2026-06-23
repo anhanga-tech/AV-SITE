@@ -37,14 +37,14 @@ export interface SubmitLeadRequest {
     destination: string;
 }
 
-export interface SubmitLeadSuccess {
+interface SubmitLeadSuccess {
     ok: true;
     requestId: string;
     warning?: string;
     message: string;
 }
 
-export type SubmitLeadErrorCode =
+type SubmitLeadErrorCode =
     | 'VALIDATION_ERROR'
     | 'INTERNAL_ERROR'
     | 'SERVER_CONFIG_ERROR'
@@ -53,11 +53,10 @@ export type SubmitLeadErrorCode =
     | 'RATE_LIMIT_EXCEEDED'
     | 'SERVICE_UNAVAILABLE';
 
-export interface SubmitLeadError {
+interface SubmitLeadError {
     ok: false;
     requestId: string;
     error: string;
     code: SubmitLeadErrorCode;
 }
 
-export type SubmitLeadResponse = SubmitLeadSuccess | SubmitLeadError;

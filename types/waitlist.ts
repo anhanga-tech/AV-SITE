@@ -8,14 +8,14 @@ export interface SubmitWaitlistRequest {
     tracking?: LeadTracking;
 }
 
-export interface SubmitWaitlistSuccess {
+interface SubmitWaitlistSuccess {
     ok: true;
     requestId: string;
     warning?: string;
     message: string;
 }
 
-export type SubmitWaitlistErrorCode =
+type SubmitWaitlistErrorCode =
     | 'VALIDATION_ERROR'
     | 'SERVER_CONFIG_ERROR'
     | 'N8N_WEBHOOK_ERROR'
@@ -24,7 +24,7 @@ export type SubmitWaitlistErrorCode =
     | 'RATE_LIMIT_EXCEEDED'
     | 'SERVICE_UNAVAILABLE';
 
-export interface SubmitWaitlistError {
+interface SubmitWaitlistError {
     ok: false;
     requestId: string;
     error: string;

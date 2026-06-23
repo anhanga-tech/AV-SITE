@@ -16,14 +16,14 @@ export interface SubmitQuizRequest {
     tracking?: LeadTracking;
 }
 
-export interface SubmitQuizSuccess {
+interface SubmitQuizSuccess {
     ok: true;
     requestId: string;
     warning?: string;
     message: string;
 }
 
-export type SubmitQuizErrorCode =
+type SubmitQuizErrorCode =
     | 'VALIDATION_ERROR'
     | 'SERVER_CONFIG_ERROR'
     | 'N8N_WEBHOOK_ERROR'
@@ -32,7 +32,7 @@ export type SubmitQuizErrorCode =
     | 'RATE_LIMIT_EXCEEDED'
     | 'SERVICE_UNAVAILABLE';
 
-export interface SubmitQuizError {
+interface SubmitQuizError {
     ok: false;
     requestId: string;
     error: string;

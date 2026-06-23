@@ -5,4 +5,3 @@ export const AuthCallbackQuerySchema = z.object({
     state: z.string().min(1),
 });
 
-export type AuthCallbackQuery = z.infer<typeof AuthCallbackQuerySchema>;

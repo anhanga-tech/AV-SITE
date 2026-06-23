@@ -17,11 +17,11 @@ interface GeminiProviderConfigBase {
     modelName: string;
 }
 
-export interface DirectGeminiProviderConfig extends GeminiProviderConfigBase {
+interface DirectGeminiProviderConfig extends GeminiProviderConfigBase {
     useGateway: false;
 }
 
-export interface AiGatewayGeminiProviderConfig extends GeminiProviderConfigBase {
+interface AiGatewayGeminiProviderConfig extends GeminiProviderConfigBase {
     useGateway: true;
     gatewayBaseUrl: string;
     gatewayId: string;

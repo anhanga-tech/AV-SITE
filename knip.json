@@ -1,3 +1,16 @@
 {
-  "ignore": ["ssr.tsx"]
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "ssr.tsx!",
+    "functions/**/*.{ts,tsx}!",
+    "scripts/**/*.{ts,mjs}",
+    "tests/**/*.test.ts",
+    "tests/e2e/**/*.spec.ts"
+  ],
+  "ignore": [
+    "content/**",
+    "public/**",
+    "docs/**"
+  ],
+  "ignoreDependencies": ["wrangler"]
 }

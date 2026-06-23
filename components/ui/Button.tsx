@@ -1,8 +1,8 @@
 import React from 'react';
 import { CircleNotch } from '@phosphor-icons/react';
 
-export type ButtonVariant = 'primary' | 'action' | 'cta' | 'ghost';
-export type ButtonSize = 'sm' | 'md' | 'lg';
+type ButtonVariant = 'primary' | 'action' | 'cta' | 'ghost';
+type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: ButtonVariant;

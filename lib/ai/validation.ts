@@ -10,13 +10,13 @@ import {
 import { normalizeText, normalizeLabel, hasAliasMatch } from './utils';
 import { cleanString } from '../lead-logic';
 
-export function normalizeAdults(value: unknown): number | undefined {
+function normalizeAdults(value: unknown): number | undefined {
     const parsed = typeof value === 'number' ? value : Number.parseInt(String(value ?? ''), 10);
     if (!Number.isInteger(parsed) || parsed <= 0) return undefined;
     return parsed;
 }
 
-export function normalizeChildAges(value: unknown): number[] {
+function normalizeChildAges(value: unknown): number[] {
     if (!Array.isArray(value)) return [];
 
     return value.flatMap((age) => {
@@ -31,7 +31,7 @@ function isPlainTextLocation(value: string): boolean {
     return value.length > 0 && !LINKY_PATTERN.test(value);
 }
 
-export function isCityValueAcceptable(value?: string): boolean {
+function isCityValueAcceptable(value?: string): boolean {
     if (!value) return false;
 
     const normalized = normalizeText(value);
@@ -42,7 +42,7 @@ export function isCityValueAcceptable(value?: string): boolean {
     return /[a-z]/i.test(normalized);
 }
 
-export function normalizeTripScope(value: unknown): TripScope | undefined {
+function normalizeTripScope(value: unknown): TripScope | undefined {
     if (typeof value !== 'string') return undefined;
 
     const normalized = normalizeText(value)
@@ -56,7 +56,7 @@ export function normalizeTripScope(value: unknown): TripScope | undefined {
     return undefined;
 }
 
-export function inferTripScope(destinationText: string, originRegion: string): TripScope | undefined {
+function inferTripScope(destinationText: string, originRegion: string): TripScope | undefined {
     const destinationNorm = normalizeText(destinationText);
     const originNorm = normalizeText(originRegion);
 
@@ -75,7 +75,7 @@ export function inferTripScope(destinationText: string, originRegion: string): T
     return undefined;
 }
 
-export function normalizeBudgetRange(scope: TripScope, value?: string): string {
+function normalizeBudgetRange(scope: TripScope, value?: string): string {
     if (!value) return 'a definir';
 
     const normalized = normalizeText(value);

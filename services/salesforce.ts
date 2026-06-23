@@ -11,7 +11,7 @@ export type SfUtmKey = (typeof SF_UTM_KEYS)[number];
 // preencher aqui com o ID que aparece no gerador de Web-to-Lead ou na URL do campo.
 // Enquanto um ID estiver vazio, o UTM correspondente é anexado à description
 // para que a atribuição não se perca.
-export const SF_UTM_FIELD_IDS: Record<SfUtmKey, string> = {
+const SF_UTM_FIELD_IDS: Record<SfUtmKey, string> = {
     utm_source: '',
     utm_medium: '',
     utm_campaign: '',

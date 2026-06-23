@@ -1,5 +1,3 @@
-export const config = { runtime: 'edge' };
-
 import {
     buildHealthDocument,
     buildJsonHeaders,

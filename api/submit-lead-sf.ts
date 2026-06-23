@@ -5,10 +5,6 @@ import { logger } from '../lib/logger';
 import { postWebToLead, SF_UTM_KEYS } from '../services/salesforce';
 import type { SalesforceLeadFields, SfUtmKey } from '../services/salesforce';
 
-export const config = {
-    runtime: 'edge',
-};
-
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
 
