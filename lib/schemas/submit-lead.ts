@@ -26,4 +26,3 @@ export const SubmitLeadBodySchema = z.object({
     tracking:    LeadTrackingSchema,
 });
 
-export type SubmitLeadBody = z.infer<typeof SubmitLeadBodySchema>;

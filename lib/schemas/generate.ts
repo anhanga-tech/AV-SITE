@@ -16,4 +16,3 @@ export const GenerateRequestSchema = z.object({
     contents: z.array(GenerateMessageSchema).min(1).max(MAX_CONTENTS_ENTRIES),
 });
 
-export type ValidatedGenerateRequest = z.infer<typeof GenerateRequestSchema>;

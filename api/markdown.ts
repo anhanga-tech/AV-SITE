@@ -1,5 +1,3 @@
-export const config = { runtime: 'edge' };
-
 import { FAQ_SCHEMA_ITEMS } from '../data/faqData';
 import { BLOG_POST_MANIFEST } from '../data/blogManifest';
 import { BLOG_POST_MARKDOWN } from '../data/blogMarkdown';

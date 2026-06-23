@@ -10,14 +10,14 @@ export type FormFields = {
     cargo: string;
 };
 
-export type ErrorField = 'required' | 'email' | 'whatsapp' | 'lgpd';
+type ErrorField = 'required' | 'email' | 'whatsapp' | 'lgpd';
 
 type IdleState = { phase: 'idle'; form: FormFields; acceptedLGPD: boolean };
 type SubmittingState = { phase: 'submitting'; form: FormFields; acceptedLGPD: boolean };
 type ErrorState = { phase: 'error'; form: FormFields; acceptedLGPD: boolean; message: string; field?: ErrorField };
 type SuccessState = { phase: 'success'; form: FormFields; acceptedLGPD: boolean };
 
-export type CorpFormState = IdleState | SubmittingState | ErrorState | SuccessState;
+type CorpFormState = IdleState | SubmittingState | ErrorState | SuccessState;
 
 type Action =
     | { type: 'change-field'; field: keyof FormFields; value: string }

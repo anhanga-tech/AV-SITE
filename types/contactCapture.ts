@@ -30,12 +30,12 @@ export type SubmitContactErrorCode =
     | 'INTERNAL_ERROR'
     | 'SERVICE_UNAVAILABLE';
 
-export interface SubmitContactSuccess {
+interface SubmitContactSuccess {
     ok: true;
     requestId: string;
 }
 
-export interface SubmitContactError {
+interface SubmitContactError {
     ok: false;
     requestId: string;
     error: string;

@@ -1,7 +1,3 @@
-export const config = {
-    runtime: 'edge',
-};
-
 import type { ContentListUnion } from '@google/genai';
 import { checkRateLimit } from '../lib/rate-limit';
 import { buildCorsHeaders, getClientIP } from '../lib/network';

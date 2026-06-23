@@ -1,4 +1,4 @@
-export interface SitemapImage {
+interface SitemapImage {
   loc: string;
   caption?: string | null;
 }

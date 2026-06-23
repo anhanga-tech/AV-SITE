@@ -37,27 +37,3 @@ export interface SubmitLeadRequest {
     destination: string;
 }
 
-export interface SubmitLeadSuccess {
-    ok: true;
-    requestId: string;
-    warning?: string;
-    message: string;
-}
-
-export type SubmitLeadErrorCode =
-    | 'VALIDATION_ERROR'
-    | 'INTERNAL_ERROR'
-    | 'SERVER_CONFIG_ERROR'
-    | 'N8N_WEBHOOK_ERROR'
-    | 'METHOD_NOT_ALLOWED'
-    | 'RATE_LIMIT_EXCEEDED'
-    | 'SERVICE_UNAVAILABLE';
-
-export interface SubmitLeadError {
-    ok: false;
-    requestId: string;
-    error: string;
-    code: SubmitLeadErrorCode;
-}
-
-export type SubmitLeadResponse = SubmitLeadSuccess | SubmitLeadError;

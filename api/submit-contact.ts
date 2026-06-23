@@ -14,10 +14,6 @@ import {
 import { buildN8nContactPayload } from '../lib/n8n-payloads';
 import { sendContactToN8n } from '../services/n8n';
 
-export const config = {
-    runtime: 'edge',
-};
-
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
 const RATE_LIMIT_KEY_PREFIX = 'ratelimit:submit-contact';
