@@ -342,22 +342,48 @@ export const generateResponsiveSrcSets = (
 
 /**
  * Generate srcset for responsive images using the active media provider.
+ *
+ * Standalone helper: when all three srcsets are needed for a single element,
+ * prefer {@link generateResponsiveSrcSets} so the per-size base URL is computed
+ * once instead of recomputed by each generator.
  */
-export const generateSrcSet = (url: string, sizes: number[] = DEFAULT_SRCSET_SIZES): string =>
-    generateResponsiveSrcSets(url, sizes).srcSet;
+export const generateSrcSet = (url: string, sizes: number[] = DEFAULT_SRCSET_SIZES): string => {
+    if (!url) return '';
+    const entries: string[] = [];
+    for (const size of sizes) {
+        entries.push(`${optimizeRemoteImageUrl(url, size)} ${size}w`);
+    }
+    return entries.join(', ');
+};
 
 /**
  * Generate an AVIF srcset for use inside a <picture> <source> element.
  * Returns an empty string when Cloudflare transforms are not enabled, preventing
  * browsers from requesting JPEG/PNG origins with type="image/avif".
  */
-export const generateAvifSrcSet = (url: string, sizes: number[] = DEFAULT_SRCSET_SIZES): string =>
-    generateResponsiveSrcSets(url, sizes).avifSrcSet;
+export const generateAvifSrcSet = (url: string, sizes: number[] = DEFAULT_SRCSET_SIZES): string => {
+    if (!url) return '';
+    const entries: string[] = [];
+    for (const size of sizes) {
+        const formatted = optimizeRemoteImageUrl(url, size, undefined, 'avif');
+        const unformatted = optimizeRemoteImageUrl(url, size);
+        if (formatted !== unformatted) entries.push(`${formatted} ${size}w`);
+    }
+    return entries.join(', ');
+};
 
 /**
  * Generate a WebP srcset for use inside a <picture> <source> element.
  * Returns an empty string when Cloudflare transforms are not enabled, preventing
  * browsers from requesting JPEG/PNG origins with type="image/webp".
  */
-export const generateWebpSrcSet = (url: string, sizes: number[] = DEFAULT_SRCSET_SIZES): string =>
-    generateResponsiveSrcSets(url, sizes).webpSrcSet;
+export const generateWebpSrcSet = (url: string, sizes: number[] = DEFAULT_SRCSET_SIZES): string => {
+    if (!url) return '';
+    const entries: string[] = [];
+    for (const size of sizes) {
+        const formatted = optimizeRemoteImageUrl(url, size, undefined, 'webp');
+        const unformatted = optimizeRemoteImageUrl(url, size);
+        if (formatted !== unformatted) entries.push(`${formatted} ${size}w`);
+    }
+    return entries.join(', ');
+};
