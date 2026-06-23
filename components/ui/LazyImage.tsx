@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Image as ImageIcon } from 'lucide-react';
-import { optimizeRemoteImageUrl, generateAvifSrcSet, generateWebpSrcSet, generateSrcSet } from '../../data/mediaConfig';
+import { optimizeRemoteImageUrl, generateResponsiveSrcSets } from '../../data/mediaConfig';
 
 interface LazyImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
     src: string;
@@ -38,11 +38,14 @@ export const LazyImage = React.memo<LazyImageProps>(({
         if (!src) return { optimizedSrc: '', avifSrcSet: '', webpSrcSet: '', srcSet: '' };
         const numericWidth = typeof width === 'number' ? width : 1200;
         const numericHeight = typeof height === 'number' ? height : undefined;
+        // Single pass builds all three srcsets while computing each size's base
+        // URL only once, instead of three generators recomputing it separately.
+        const { srcSet, avifSrcSet, webpSrcSet } = generateResponsiveSrcSets(src);
         return {
             optimizedSrc: optimizeRemoteImageUrl(src, numericWidth, numericHeight),
-            avifSrcSet: generateAvifSrcSet(src),
-            webpSrcSet: generateWebpSrcSet(src),
-            srcSet: generateSrcSet(src),
+            avifSrcSet,
+            webpSrcSet,
+            srcSet,
         };
     }, [src, width, height]);
 

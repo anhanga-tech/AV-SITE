@@ -285,39 +285,79 @@ export const optimizeCloudinaryUrl = (
     format: 'auto' | 'webp' | 'avif' = 'auto',
 ): string => optimizeRemoteImageUrl(url, width, undefined, format);
 
+const DEFAULT_SRCSET_SIZES = [400, 800, 1200];
+
+export interface ResponsiveSrcSets {
+    /** Base srcset (provider default-format negotiation). */
+    srcSet: string;
+    /** AVIF srcset for a <picture> <source>; empty when transforms are off. */
+    avifSrcSet: string;
+    /** WebP srcset for a <picture> <source>; empty when transforms are off. */
+    webpSrcSet: string;
+}
+
+/**
+ * Build the base, AVIF and WebP srcsets in a single pass.
+ *
+ * PERFORMANCE: the base (unformatted) URL for each size is computed once and
+ * reused as the comparison baseline for AVIF/WebP transform detection, instead
+ * of being recomputed independently inside three separate generators. A
+ * LazyImage that emits all three srcsets previously triggered 16
+ * optimizeImageUrl() calls per image (regex + URL parsing); sharing the base
+ * brings that down to 10 (~37% fewer), which adds up across image-heavy lists
+ * and galleries.
+ */
+export const generateResponsiveSrcSets = (
+    url: string,
+    sizes: number[] = DEFAULT_SRCSET_SIZES,
+): ResponsiveSrcSets => {
+    if (!url) {
+        return { srcSet: '', avifSrcSet: '', webpSrcSet: '' };
+    }
+
+    const baseEntries: string[] = [];
+    const avifEntries: string[] = [];
+    const webpEntries: string[] = [];
+
+    for (const size of sizes) {
+        // Compute the base URL once; the format-specific variants only differ
+        // from it when Cloudflare transforms are active for this URL, so the
+        // shared baseline doubles as the "transforms enabled?" detector.
+        const base = optimizeRemoteImageUrl(url, size);
+        baseEntries.push(`${base} ${size}w`);
+
+        const avif = optimizeRemoteImageUrl(url, size, undefined, 'avif');
+        if (avif !== base) avifEntries.push(`${avif} ${size}w`);
+
+        const webp = optimizeRemoteImageUrl(url, size, undefined, 'webp');
+        if (webp !== base) webpEntries.push(`${webp} ${size}w`);
+    }
+
+    return {
+        srcSet: baseEntries.join(', '),
+        avifSrcSet: avifEntries.join(', '),
+        webpSrcSet: webpEntries.join(', '),
+    };
+};
+
 /**
  * Generate srcset for responsive images using the active media provider.
  */
-export const generateSrcSet = (url: string, sizes: number[] = [400, 800, 1200]): string => {
-    return sizes
-        .map(size => `${optimizeRemoteImageUrl(url, size)} ${size}w`)
-        .join(', ');
-};
+export const generateSrcSet = (url: string, sizes: number[] = DEFAULT_SRCSET_SIZES): string =>
+    generateResponsiveSrcSets(url, sizes).srcSet;
 
 /**
  * Generate an AVIF srcset for use inside a <picture> <source> element.
  * Returns an empty string when Cloudflare transforms are not enabled, preventing
  * browsers from requesting JPEG/PNG origins with type="image/avif".
  */
-export const generateAvifSrcSet = (url: string, sizes: number[] = [400, 800, 1200]): string => {
-    const entries = sizes.flatMap(size => {
-        const formatted = optimizeRemoteImageUrl(url, size, undefined, 'avif');
-        const unformatted = optimizeRemoteImageUrl(url, size);
-        return formatted !== unformatted ? [`${formatted} ${size}w`] : [];
-    });
-    return entries.join(', ');
-};
+export const generateAvifSrcSet = (url: string, sizes: number[] = DEFAULT_SRCSET_SIZES): string =>
+    generateResponsiveSrcSets(url, sizes).avifSrcSet;
 
 /**
  * Generate a WebP srcset for use inside a <picture> <source> element.
  * Returns an empty string when Cloudflare transforms are not enabled, preventing
  * browsers from requesting JPEG/PNG origins with type="image/webp".
  */
-export const generateWebpSrcSet = (url: string, sizes: number[] = [400, 800, 1200]): string => {
-    const entries = sizes.flatMap(size => {
-        const formatted = optimizeRemoteImageUrl(url, size, undefined, 'webp');
-        const unformatted = optimizeRemoteImageUrl(url, size);
-        return formatted !== unformatted ? [`${formatted} ${size}w`] : [];
-    });
-    return entries.join(', ');
-};
+export const generateWebpSrcSet = (url: string, sizes: number[] = DEFAULT_SRCSET_SIZES): string =>
+    generateResponsiveSrcSets(url, sizes).webpSrcSet;
