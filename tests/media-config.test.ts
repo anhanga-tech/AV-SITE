@@ -5,8 +5,10 @@ import { AUTHORS } from '../data/blogData.ts';
 import {
     getMediaRuntimeConfig,
     HERO_VIDEOS,
+    generateSrcSet,
     generateAvifSrcSet,
     generateWebpSrcSet,
+    generateResponsiveSrcSets,
     optimizeCloudinaryUrl,
 } from '../data/mediaConfig.ts';
 import { BLOG_POST_MANIFEST } from '../data/blogManifest.ts';
@@ -128,6 +130,32 @@ test('generateAvifSrcSet should return empty string when transforms are not enab
 test('generateWebpSrcSet should return empty string when transforms are not enabled', () => {
     const result = generateWebpSrcSet('https://media.anhanga.tur.br/images/destinations/paris.jpg');
     assert.equal(result, '');
+});
+
+test('generateResponsiveSrcSets should match the standalone generators in one pass', () => {
+    // The combined generator shares each size's base URL across all three
+    // srcsets, so its output must stay identical to calling the individual
+    // generators that LazyImage previously used.
+    const url = 'https://media.anhanga.tur.br/images/destinations/paris.jpg';
+    const combined = generateResponsiveSrcSets(url);
+
+    assert.equal(combined.srcSet, generateSrcSet(url));
+    assert.equal(combined.avifSrcSet, generateAvifSrcSet(url));
+    assert.equal(combined.webpSrcSet, generateWebpSrcSet(url));
+
+    // Base srcset always lists every requested width descriptor.
+    assert.deepEqual(
+        combined.srcSet.split(', ').map((entry) => entry.split(' ').pop()),
+        ['400w', '800w', '1200w'],
+    );
+});
+
+test('generateResponsiveSrcSets should return empty strings for an empty url', () => {
+    assert.deepEqual(generateResponsiveSrcSets(''), {
+        srcSet: '',
+        avifSrcSet: '',
+        webpSrcSet: '',
+    });
 });
 
 test('optimizeCloudinaryUrl should pass format to the underlying helper (not silently ignore it)', () => {

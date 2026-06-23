@@ -59,3 +59,7 @@
 ## 2026-06-16 - ⚡ Bolt: Media Configuration Memoization
 **Learning:** Utilities like `getMediaRuntimeConfig` that access environment variables (`import.meta.env`) and global browser state (`window.location`) can become significant overhead when called within high-frequency paths, such as `LazyImage` rendering or `srcset` generation in large lists. Since these values are effectively static during a session, redundant lookups and object allocations can be avoided entirely.
 **Action:** Always memoize session-static configuration lookups that are used within the rendering loop of repeatable UI components.
+
+## 2026-06-23 - ⚡ Bolt: LazyImage srcset fan-out
+**Learning:** `LazyImage` is the single render hot path for nearly every image (lists, galleries, blog). It called `generateSrcSet` + `generateAvifSrcSet` + `generateWebpSrcSet` independently, and the AVIF/WebP generators each recomputed the *same* unformatted base URL per size to detect whether transforms applied — so the base URL was computed 3× per size (16 `optimizeImageUrl` calls/image). Production runs with `VITE_MEDIA_ENABLE_TRANSFORMS=true` (wrangler.toml), so this redundancy hit real users.
+**Action:** When several derived outputs share a comparison baseline, compute the baseline once in a single-pass helper (`generateResponsiveSrcSets`) and keep the old functions as thin wrappers for API/test stability. Cut per-image work 16→10 calls (~37%).
