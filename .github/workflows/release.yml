@@ -22,14 +22,15 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
-          node-version: '22.14.0'
+          node-version: 24
           cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Sem NPM_TOKEN: este repo é um site, não um pacote npm. O fluxo usa apenas
+      # @semantic-release/github (cria releases/tags no GitHub), nunca publica no npm.
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: pnpm dlx semantic-release --plugins "@semantic-release/commit-analyzer,@semantic-release/release-notes-generator,@semantic-release/github"

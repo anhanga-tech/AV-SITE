@@ -4,6 +4,13 @@ on:
     branches:
       - main
 
+# Não cancela execuções em andamento: cada push traz um conjunto distinto de
+# TODOs/diffs; cancelar poderia perder a criação/fechamento de issues de um push
+# anterior. O group só serializa para evitar corrida na criação de issues.
+concurrency:
+  group: todo-to-issue
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: "ubuntu-latest"
@@ -12,7 +19,30 @@ jobs:
       issues: write
     steps:
       - uses: "actions/checkout@v6.0.3"
+        with:
+          # A action compara o diff entre commits para detectar TODOs adicionados
+          # e removidos. fetch-depth: 0 garante histórico suficiente para isso e
+          # para o fechamento automático (CLOSE_ISSUES) funcionar de forma confiável.
+          fetch-depth: 0
       - name: "TODO to Issue"
-        uses: "alstr/todo-to-issue-action@v5"
+        # Pinada no commit da v5.1.14 (SHA) — third-party action.
+        uses: "alstr/todo-to-issue-action@64aca8fda7023259aada83ba44ad988c4c443657" # v5.1.14
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          # Fecha a issue automaticamente quando o TODO correspondente é removido.
+          CLOSE_ISSUES: true
+          # Atribui a issue ao autor do commit que introduziu o TODO.
+          AUTO_ASSIGN: true
+          # Identificadores reconhecidos e labels aplicadas a cada um.
+          IDENTIFIERS: |
+            [
+              { "name": "TODO", "labels": ["todo"] },
+              { "name": "FIXME", "labels": ["bug", "todo"] },
+              { "name": "HACK", "labels": ["tech-debt", "todo"] }
+            ]
+          # Não varre artefatos de build, dependências nem snapshots de teste.
+          IGNORE: |
+            (^|/)dist/
+            (^|/)node_modules/
+            (^|/)\.github/
+            -snapshots/
