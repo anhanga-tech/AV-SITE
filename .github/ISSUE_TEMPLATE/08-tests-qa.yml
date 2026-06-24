@@ -1,0 +1,63 @@
+name: 🧪 Testes / QA
+description: Criar ou ajustar testes, casos de regressão e checks de CI
+title: "[TEST] "
+labels: ["tests"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Preencha com informação real.** Testes de regressão: `node:test` via `tsx` em `tests/*.test.ts`. E2E: Playwright em `tests/e2e/`.
+        Priorize testes determinísticos (sem flakiness) e validação de comportamento, não de detalhes internos.
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo
+      description: Que cobertura de teste/validação está faltando?
+    validations:
+      required: true
+  - type: textarea
+    id: contexto
+    attributes:
+      label: Contexto
+      description: Bug/feature que motivou isso. Linke a issue/PR relacionada se existir.
+    validations:
+      required: false
+  - type: dropdown
+    id: camada
+    attributes:
+      label: Camada de teste
+      multiple: true
+      options:
+        - Unit / regressão (node:test em tests/)
+        - E2E (Playwright em tests/e2e/)
+        - Visual regression (snapshots)
+        - CI (workflow / checks)
+    validations:
+      required: true
+  - type: textarea
+    id: cenarios
+    attributes:
+      label: Cenários a cobrir
+      value: |
+        - [ ] Caminho feliz (happy path)
+        - [ ] Erros / edge cases
+        - [ ] Regressão específica:
+    validations:
+      required: true
+  - type: textarea
+    id: criterios
+    attributes:
+      label: Critérios de aceitação
+      value: |
+        - [ ] Teste(s) novo(s) cobrindo o cenário
+        - [ ] Testes passam no CI e localmente
+        - [ ] Determinístico (sem sleeps arbitrários nem estado compartilhado)
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirmacao
+    attributes:
+      label: Confirmação
+      options:
+        - label: Preenchi os campos com informações reais (sem placeholders).
+          required: true

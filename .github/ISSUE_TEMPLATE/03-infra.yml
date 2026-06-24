@@ -1,0 +1,89 @@
+name: ⚙️ Configuração / Infra
+description: Ajustes de ambiente, integrações, variáveis ou infraestrutura
+title: "[INFRA] "
+labels: ["infra"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Preencha cada campo com informação real — não deixe placeholders.**
+        Deploy ativo: **Cloudflare Pages** (functions em `functions/`). Secrets ficam no dashboard do Pages.
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo
+      description: O que precisa ser configurado ou ajustado, e por que agora?
+    validations:
+      required: true
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: Tipo de configuração
+      multiple: true
+      options:
+        - Variáveis de ambiente / secrets (.env, dashboard Cloudflare Pages)
+        - Cloudflare Pages (deploy, domínio, functions)
+        - Cloudflare DNS / R2 / image transforms
+        - Salesforce (web-to-lead, campos, UTMs)
+        - n8n (workflows, credenciais, webhooks)
+        - Gemini API / AI Gateway
+        - Upstash Redis (rate limit)
+        - Sentry
+        - GitHub Actions / CI
+        - Decap CMS / OAuth
+        - Outro
+    validations:
+      required: true
+  - type: textarea
+    id: checklist
+    attributes:
+      label: Checklist de implementação
+      description: Passos necessários para completar a configuração.
+      value: |
+        - [ ]
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+  - type: dropdown
+    id: ambientes
+    attributes:
+      label: Ambientes afetados
+      multiple: true
+      options:
+        - Produção (Cloudflare Pages)
+        - Preview (Cloudflare Pages)
+        - Local (pnpm dev)
+    validations:
+      required: true
+  - type: dropdown
+    id: lgpd
+    attributes:
+      label: Segurança e LGPD
+      description: Há dados pessoais envolvidos?
+      options:
+        - Nenhum dado pessoal envolvido
+        - Dados pessoais tratados conforme LGPD (detalhar abaixo)
+    validations:
+      required: true
+  - type: textarea
+    id: lgpd-detalhes
+    attributes:
+      label: Detalhamento LGPD
+      description: Se houver dados pessoais, detalhe quais dados, finalidade e base legal do tratamento.
+    validations:
+      required: false
+  - type: textarea
+    id: riscos
+    attributes:
+      label: Impacto, riscos e documentação
+      description: O que pode ser afetado? Há downtime ou plano de rollback? Precisa atualizar README/.env.example?
+    validations:
+      required: false
+  - type: checkboxes
+    id: confirmacao
+    attributes:
+      label: Confirmação
+      options:
+        - label: Nenhum secret/token foi colado no corpo desta issue.
+          required: true

@@ -1,0 +1,61 @@
+name: 🔍 SEO
+description: SEO técnico ou on-page (meta tags, schema, indexação, Core Web Vitals)
+title: "[SEO] "
+labels: ["seo"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Preencha com dados reais.** Lembre-se: o conteúdo precisa estar no **HTML estático servido ao crawler**
+        (validar com `curl -s URL | grep`), não apenas no DOM renderizado por JS.
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo
+      description: O que precisa melhorar? Ex.- indexação, ranking, CTR orgânico.
+    validations:
+      required: true
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: Tipo de SEO
+      multiple: true
+      options:
+        - Técnico (crawling, indexação, sitemap, robots.txt, canonical, redirects)
+        - On-page (title, meta description, headings, alt text, internal linking)
+        - Structured Data (Schema JSON-LD)
+        - Core Web Vitals (LCP, INP, CLS)
+        - E-E-A-T (autoridade, credenciais, links externos)
+    validations:
+      required: true
+  - type: textarea
+    id: paginas
+    attributes:
+      label: Página(s) / rota(s) afetada(s)
+      description: URLs ou rotas impactadas.
+    validations:
+      required: true
+  - type: textarea
+    id: evidencia
+    attributes:
+      label: Evidência do problema
+      description: Como foi identificado? Search Console, Lighthouse, Ahrefs, audit. Inclua métrica atual vs. meta quando possível.
+    validations:
+      required: true
+  - type: textarea
+    id: criterios
+    attributes:
+      label: Critérios de aceitação
+      value: |
+        - [ ] HTML servido ao crawler contém a correção (testado com `curl`)
+        - [ ] Schema validado no Rich Results Test (se aplicável)
+        - [ ] Sem regressões em outras métricas SEO
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirmacao
+    attributes:
+      label: Confirmação
+      options:
+        - label: Preenchi os campos com informações reais (sem placeholders).
+          required: true

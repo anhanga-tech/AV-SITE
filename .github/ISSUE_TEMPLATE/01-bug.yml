@@ -1,0 +1,97 @@
+name: 🐛 Bug
+description: Reportar um comportamento inesperado
+title: "[BUG] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reportar. **Preencha cada campo com informação real — não deixe placeholders nem texto genérico.**
+        Issues abertas por agentes/LLMs devem seguir a mesma regra: descreva o que foi de fato observado.
+  - type: textarea
+    id: descricao
+    attributes:
+      label: Descrição do bug
+      description: O que está acontecendo de errado? Seja específico e objetivo.
+    validations:
+      required: true
+  - type: textarea
+    id: reproducao
+    attributes:
+      label: Como reproduzir
+      description: Passo a passo mínimo para reproduzir.
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: esperado-vs-atual
+    attributes:
+      label: Comportamento esperado vs. atual
+      description: O que deveria acontecer e o que acontece de fato.
+    validations:
+      required: true
+  - type: textarea
+    id: evidencias
+    attributes:
+      label: Evidências
+      description: Prints, vídeos, logs de erro ou mensagens do console. Cole logs em bloco de código.
+    validations:
+      required: false
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área afetada
+      multiple: true
+      options:
+        - Chatbot (Gemini / api/generate)
+        - Captação de leads (Salesforce web-to-lead / n8n)
+        - WhatsApp / tracking UTM
+        - Frontend (React / Vite / Tailwind)
+        - Cloudflare Pages Functions (api/, functions/)
+        - Automações n8n
+        - Blog / MDX
+        - Decap CMS (/admin)
+        - SEO / Schema / prerender
+        - Rate limiting (Upstash Redis)
+        - Mídia (Cloudflare R2)
+        - Observabilidade (Sentry)
+        - Outro
+    validations:
+      required: true
+  - type: dropdown
+    id: ambiente
+    attributes:
+      label: Ambiente
+      multiple: true
+      options:
+        - Produção (Cloudflare Pages)
+        - Preview (Cloudflare Pages)
+        - Local (pnpm dev)
+    validations:
+      required: true
+  - type: input
+    id: navegador-dispositivo
+    attributes:
+      label: Navegador / dispositivo
+      description: Ex.- Chrome 126 desktop, Safari iOS 17 mobile.
+    validations:
+      required: false
+  - type: textarea
+    id: causa-provavel
+    attributes:
+      label: Causa provável / referências
+      description: Hipóteses, commits suspeitos, issues relacionadas, links de documentação.
+    validations:
+      required: false
+  - type: checkboxes
+    id: confirmacao
+    attributes:
+      label: Confirmação
+      options:
+        - label: Busquei por issues abertas semelhantes antes de criar esta.
+          required: true
+        - label: Preenchi os campos com informações reais (sem placeholders).
+          required: true

@@ -1,0 +1,59 @@
+name: ♻️ Refatoração / Melhoria técnica
+description: Melhorar código existente sem alterar comportamento externo
+title: "[REFACTOR] "
+labels: ["refactor"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Preencha com informação real.** Refatoração não muda comportamento externo — deixe isso explícito nos critérios.
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo da refatoração
+      description: O que será melhorado e por quê (legibilidade, performance, manutenibilidade)?
+    validations:
+      required: true
+  - type: textarea
+    id: motivacao
+    attributes:
+      label: Motivação
+      description: O que motivou agora? Dívida técnica, escalabilidade, novo requisito?
+    validations:
+      required: true
+  - type: textarea
+    id: atual-vs-desejado
+    attributes:
+      label: Estado atual vs. desejado
+      description: Como o código está hoje e como deve ficar.
+    validations:
+      required: true
+  - type: input
+    id: arquivos
+    attributes:
+      label: Arquivos / módulos envolvidos
+    validations:
+      required: false
+  - type: textarea
+    id: criterios
+    attributes:
+      label: Critérios de aceitação
+      value: |
+        - [ ] Comportamento externo preservado (nenhuma funcionalidade quebrada)
+        - [ ] Cobertura de testes mantida ou ampliada
+    validations:
+      required: true
+  - type: textarea
+    id: riscos
+    attributes:
+      label: Riscos e cuidados
+      description: O que pode quebrar? Dependências? Testes específicos necessários?
+    validations:
+      required: false
+  - type: checkboxes
+    id: confirmacao
+    attributes:
+      label: Confirmação
+      options:
+        - label: Esta mudança não altera comportamento externo observável.
+          required: true

@@ -1,0 +1,54 @@
+name: ⚡ Performance
+description: Melhorias de performance (bundle, LCP/INP/CLS, render, caching)
+title: "[PERF] "
+labels: ["performance"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Preencha com números reais antes/depois.** Mudanças de performance só valem quando são mensuráveis.
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo
+      description: Qual métrica ou comportamento precisa melhorar, e em qual fluxo/página?
+    validations:
+      required: true
+  - type: textarea
+    id: metrica
+    attributes:
+      label: Métrica / benchmark
+      description: Valores antes e meta depois, e a ferramenta usada (Lighthouse, Web Vitals, DevTools, logs).
+      placeholder: |
+        - Antes:
+        - Depois (esperado):
+        - Ferramenta:
+    validations:
+      required: true
+  - type: textarea
+    id: medir
+    attributes:
+      label: Como reproduzir / medir
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: criterios
+    attributes:
+      label: Critérios de aceitação
+      value: |
+        - [ ] Melhoria mensurável (antes/depois)
+        - [ ] Sem regressões funcionais
+        - [ ] Sem aumentar risco de custo (ex.- chamadas desnecessárias)
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirmacao
+    attributes:
+      label: Confirmação
+      options:
+        - label: Preenchi os campos com informações reais (sem placeholders).
+          required: true
