@@ -132,7 +132,7 @@ function openWhatsAppWindow(url: string): void {
   }
 }
 
-function TextField({
+export function TextField({
   id,
   label,
   type,
@@ -142,6 +142,7 @@ function TextField({
   onChange,
   inputMode,
 }: TextFieldProps) {
+  const errorId = `${id}-error`;
   return (
     <div className="space-y-1">
       <label htmlFor={id} className="sr-only">{label}</label>
@@ -152,9 +153,11 @@ function TextField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errorId : undefined}
         className={`w-full bg-white border ${error ? 'border-red-500' : 'border-zinc-200'} rounded-xl px-4 py-3 text-sm text-zinc-700 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition shadow-sm`}
       />
-      {error && <span className="text-[10px] text-red-500 font-bold ml-1 uppercase">{error}</span>}
+      {error && <span id={errorId} role="alert" className="text-[10px] text-red-500 font-bold ml-1 uppercase">{error}</span>}
     </div>
   );
 }
@@ -311,6 +314,8 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
                   type="checkbox"
                   checked={acceptedLGPD}
                   onChange={(e) => setAcceptedLGPD(e.target.checked)}
+                  aria-invalid={fieldErrors.lgpd ? true : undefined}
+                  aria-describedby={fieldErrors.lgpd ? 'lead-lgpd-error' : undefined}
                   className="peer size-4 cursor-pointer appearance-none rounded border border-zinc-300 bg-white checked:bg-brand-vibrant checked:border-brand-vibrant transition focus:ring-2 focus:ring-brand-vibrant/20"
                 />
                 <CheckCircle2 className="absolute size-3 text-white opacity-0 peer-checked:opacity-100 left-0.5 pointer-events-none transition-opacity" />
@@ -319,7 +324,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
                 Aceito receber comunicações e autorizo o tratamento dos meus dados conforme a <a href="/politica-privacidade/" target="_blank" rel="noopener noreferrer" className="underline hover:text-brand-vibrant">Política de Privacidade</a>.
               </span>
             </label>
-            {fieldErrors.lgpd && <span className="text-[10px] text-red-500 font-bold ml-7 uppercase">{fieldErrors.lgpd}</span>}
+            {fieldErrors.lgpd && <span id="lead-lgpd-error" role="alert" className="text-[10px] text-red-500 font-bold ml-7 uppercase">{fieldErrors.lgpd}</span>}
           </div>
         </div>
 
