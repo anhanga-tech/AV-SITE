@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        **Preencha com informação real.** Regressão tests: `node:test` via `tsx` em `tests/*.test.ts`. E2E: Playwright em `tests/e2e/`.
+        **Preencha com informação real.** Testes de regressão: `node:test` via `tsx` em `tests/*.test.ts`. E2E: Playwright em `tests/e2e/`.
         Priorize testes determinísticos (sem flakiness) e validação de comportamento, não de detalhes internos.
   - type: textarea
     id: objetivo

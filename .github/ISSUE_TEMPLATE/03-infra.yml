@@ -67,6 +67,13 @@ body:
     validations:
       required: true
   - type: textarea
+    id: lgpd-detalhes
+    attributes:
+      label: Detalhamento LGPD
+      description: Se houver dados pessoais, detalhe quais dados, finalidade e base legal do tratamento.
+    validations:
+      required: false
+  - type: textarea
     id: riscos
     attributes:
       label: Impacto, riscos e documentação
