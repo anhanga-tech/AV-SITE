@@ -1,0 +1,47 @@
+name: 📚 Documentação
+description: Melhorias em docs (README, guias, exemplos, .env.example, docs/)
+title: "[DOCS] "
+labels: ["documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Preencha com informação real.** Docs de projeto vivem em `/docs/` por domínio; só `README.md` e `CLAUDE.md` ficam na raiz.
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo
+      description: O que precisa ser documentado ou atualizado?
+    validations:
+      required: true
+  - type: textarea
+    id: contexto
+    attributes:
+      label: Contexto
+      description: Por que agora? O que está confuso, faltando ou desatualizado?
+    validations:
+      required: true
+  - type: textarea
+    id: escopo
+    attributes:
+      label: Arquivos / páginas afetadas
+      description: Quais docs serão criadas/alteradas e que conteúdo deve constar.
+    validations:
+      required: true
+  - type: textarea
+    id: criterios
+    attributes:
+      label: Critérios de aceitação
+      value: |
+        - [ ] Links revisados e funcionando
+        - [ ] Passos testados (copiar/colar) em ambiente limpo
+        - [ ] Referências cruzadas atualizadas (se um doc foi movido/renomeado)
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirmacao
+    attributes:
+      label: Confirmação
+      options:
+        - label: Preenchi os campos com informações reais (sem placeholders).
+          required: true

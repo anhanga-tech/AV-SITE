@@ -1,0 +1,75 @@
+name: ✨ Nova funcionalidade
+description: Adicionar uma nova feature ao projeto
+title: "[FEAT] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Preencha cada campo com informação real — não deixe placeholders.**
+        Defina critérios de aceitação verificáveis: é o que delimita o escopo da implementação (humana ou por agente).
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo
+      description: O que essa funcionalidade deve fazer? Uma frase clara basta.
+    validations:
+      required: true
+  - type: textarea
+    id: contexto
+    attributes:
+      label: Contexto / problema
+      description: Por que é necessária? Qual problema de negócio ou de usuário resolve?
+    validations:
+      required: true
+  - type: textarea
+    id: criterios
+    attributes:
+      label: Critérios de aceitação
+      description: O que precisa estar funcionando para considerar a issue concluída. Use itens verificáveis.
+      value: |
+        - [ ]
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: escopo-tecnico
+    attributes:
+      label: Escopo técnico
+      description: Arquivos/componentes/handlers a criar ou modificar, se já souber.
+    validations:
+      required: false
+  - type: dropdown
+    id: integracoes
+    attributes:
+      label: Integrações envolvidas
+      multiple: true
+      options:
+        - Nenhuma
+        - Salesforce (web-to-lead)
+        - Gemini API
+        - n8n (webhooks)
+        - Upstash Redis (rate limit)
+        - Cloudflare R2 (mídia)
+        - Sentry
+        - Decap CMS
+        - Outro
+    validations:
+      required: true
+  - type: textarea
+    id: fora-de-escopo
+    attributes:
+      label: Fora do escopo
+      description: O que NÃO deve ser feito nesta issue, para manter o foco.
+    validations:
+      required: false
+  - type: checkboxes
+    id: confirmacao
+    attributes:
+      label: Confirmação
+      options:
+        - label: Busquei por issues abertas semelhantes antes de criar esta.
+          required: true
+        - label: Os critérios de aceitação são verificáveis (não genéricos).
+          required: true

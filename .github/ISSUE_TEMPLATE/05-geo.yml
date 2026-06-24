@@ -1,0 +1,75 @@
+name: 🤖 GEO (Generative Engine Optimization)
+description: Otimização para visibilidade em respostas de IA (ChatGPT, Claude, Perplexity, Google AI Overview)
+title: "[GEO] "
+labels: ["geo", "seo"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Preencha com dados reais.** GEO depende de conteúdo acessível no **HTML estático** (IAs fazem crawl do HTML cru).
+        Sempre verifique com `curl` se o conteúdo otimizado está no HTML servido, não só no DOM.
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo
+      description: O que precisa melhorar na visibilidade do site em respostas de IA?
+    validations:
+      required: true
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: Tipo de GEO
+      multiple: true
+      options:
+        - Conteúdo citável (dados originais, estatísticas, definições claras)
+        - Autoridade (credenciais, quotes atribuídos, autoria)
+        - Estrutura (FAQ, tabelas, step-by-step, listas)
+        - Freshness (timestamps, dados atualizados)
+        - Entity SEO (Knowledge Graph, Wikidata, schemas)
+    validations:
+      required: true
+  - type: dropdown
+    id: ia-alvo
+    attributes:
+      label: IA(s) alvo
+      multiple: true
+      options:
+        - Google AI Overview / SGE
+        - ChatGPT (com browsing)
+        - Claude
+        - Perplexity
+        - Bing Copilot
+        - Outro
+    validations:
+      required: true
+  - type: textarea
+    id: paginas
+    attributes:
+      label: Página(s) / conteúdo afetado
+      description: URLs, seções ou peças de conteúdo impactadas.
+    validations:
+      required: true
+  - type: textarea
+    id: situacao-atual
+    attributes:
+      label: Situação atual
+      description: Query testada, IA usada, resultado (citado / mencionado sem link / não aparece) e concorrentes citados no lugar.
+    validations:
+      required: true
+  - type: textarea
+    id: criterios
+    attributes:
+      label: Critérios de aceitação
+      value: |
+        - [ ] Conteúdo crawlável (presente no HTML estático, testado com `curl`)
+        - [ ] Testado manualmente em pelo menos 1 IA (query + verificação de citação)
+        - [ ] Schema markup válido no Rich Results Test
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirmacao
+    attributes:
+      label: Confirmação
+      options:
+        - label: Preenchi os campos com informações reais (sem placeholders).
+          required: true
