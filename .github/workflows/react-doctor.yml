@@ -13,8 +13,8 @@ jobs:
   react-doctor:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6.0.3
+      - uses: actions/checkout@v7.0.0
       # Pinado na release v2.1.0 (esquema --diff, estável). O main migrou para
       # --scope (PR #769), que ainda não chegou ao react-doctor@latest do npm;
       # revisitar quando sair a release com --scope + latest correspondente.
-      - uses: millionco/react-doctor@547e1e4ecdb70315d81a91ec3605701d58616ee2 # v2.1.0
+      - uses: millionco/react-doctor@80574975084d71741b69340acb6be1e03f045f1b # v2.1.1
