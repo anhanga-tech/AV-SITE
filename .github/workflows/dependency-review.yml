@@ -1,0 +1,26 @@
+name: Dependency Review
+
+# Bloqueia PRs que introduzam dependências com vulnerabilidades conhecidas ou
+# licenças problemáticas. Complementa o Dependabot (que faz bumps), atuando como
+# gate no momento em que a dependência é proposta.
+on:
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.3
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v5.0.0
+        with:
+          # Falha o PR a partir de severidade "high" (ajustar para "moderate" se
+          # quiser um gate mais rígido).
+          fail-on-severity: high
+          comment-summary-in-pr: on-failure

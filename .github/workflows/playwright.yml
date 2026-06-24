@@ -5,23 +5,20 @@ on:
   pull_request:
     branches: [ main ]
 permissions:
-  contents: write
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6.0.3
-      with:
-        # Não persistir o GITHUB_TOKEN como credencial git: evita que scripts de
-        # lifecycle de dependências (pnpm install) leiam o token. O push de
-        # snapshots reautentica explicitamente via token URL no passo final.
-        persist-credentials: false
-        fetch-depth: 0
     - uses: pnpm/action-setup@v6.0.9
     - uses: actions/setup-node@v6
       with:
-        node-version: lts/*
+        node-version: 24
         cache: 'pnpm'
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
@@ -30,29 +27,9 @@ jobs:
       # Omit --with-deps to avoid apt-get failures with external Microsoft/Ubuntu repos;
       # GitHub ubuntu-latest already includes necessary dependencies for Chromium.
       run: pnpm exec playwright install chromium
-
-    - name: Update visual snapshots
-      run: pnpm exec playwright test tests/e2e/visual.spec.ts --update-snapshots
-    - name: Commit updated snapshots
-      env:
-        HEAD_REF: ${{ github.head_ref }}
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        git add tests/e2e/visual.spec.ts-snapshots/
-        if git diff --staged --quiet; then
-          echo "No snapshot changes to commit."
-        else
-          git commit -m "test: update visual regression baselines [skip ci]"
-          REMOTE="https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}"
-          # Push to the PR head branch (HEAD_REF is set only on pull_request events)
-          if [ -n "$HEAD_REF" ]; then
-            git push "$REMOTE" "HEAD:refs/heads/$HEAD_REF"
-          else
-            git push "$REMOTE" "HEAD:refs/heads/${{ github.ref_name }}"
-          fi
-        fi
+    # As baselines visuais NÃO são regeradas aqui: um diff visual deve FALHAR o gate.
+    # Atualização intencional de snapshots é feita só pelo workflow manual
+    # update-snapshots.yml (workflow_dispatch).
     - name: Run Playwright tests
       run: pnpm exec playwright test
     - uses: actions/upload-artifact@v7
