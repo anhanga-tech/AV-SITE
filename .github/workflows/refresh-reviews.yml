@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.0
         with:
           # Não persistir o GITHUB_TOKEN como credencial git no runner: assim os
           # scripts de lifecycle do pnpm install não conseguem lê-lo. O push
