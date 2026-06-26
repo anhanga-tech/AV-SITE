@@ -52,12 +52,6 @@ export function CorpProcess() {
                     custom={0}
                     className="text-center mb-16"
                 >
-                    <div className="inline-block relative mb-5">
-                        <span className="absolute inset-0 bg-anhanga-yellow/30 transform -skew-x-12 rounded-lg" />
-                        <span className="relative px-4 py-1.5 text-anhanga-dark font-black uppercase tracking-widest text-xs">
-                            Simples assim
-                        </span>
-                    </div>
                     <h2 className="text-4xl md:text-5xl font-black text-brand-dark leading-tight">
                         Como funciona em <br />
                         <span className="text-brand-cyan">3 passos</span>
