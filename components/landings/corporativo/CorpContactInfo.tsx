@@ -24,8 +24,8 @@ export function CorpContactInfo({ whatsappUrl }: CorpContactInfoProps) {
             custom={0}
         >
             <div className="inline-block relative mb-4">
-                <span className="absolute inset-0 bg-emerald-100 transform -skew-x-12 rounded-lg" />
-                <span className="relative px-3 py-1 text-emerald-600 font-black uppercase tracking-widest text-sm flex items-center gap-2">
+                <span className="absolute inset-0 bg-anhanga-yellow/30 transform -skew-x-12 rounded-lg" />
+                <span className="relative px-3 py-1 text-anhanga-dark font-black uppercase tracking-widest text-sm flex items-center gap-2">
                     <Sparkle className="size-4" weight="fill" /> Fale com a gente
                 </span>
             </div>
