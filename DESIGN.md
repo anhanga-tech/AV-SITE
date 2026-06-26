@@ -155,7 +155,7 @@ Uma paleta que evoca lugares reais, não categorias de produto. Azul de oceano p
 **Character:** Poppins é o rosto da marca: geométrica, calorosa, confiante. O sistema usa uma família só na interface e cria hierarquia por contraste de peso (400 → 700 → 800 → 900), não por troca de tipo — disciplina que mantém a identidade coesa em telas pequenas. Merriweather guarda o blog: um registro diferente, mais lento, editorial, que só aparece em conteúdo longo. Pesos carregados: Poppins 400/600/700/900 e Merriweather 400/700 (+ itálico).
 
 ### Hierarchy
-- **Display** (900, clamp(3rem, 6vw, 5rem), line-height 0.9, letter-spacing -0.02em): H1 do Hero. Ocupa espaço físico com intenção. Ênfase tipográfica via cor sólida (`text-yellow-300`), nunca gradient text.
+- **Display** (900, clamp(3rem, 6vw, 5rem), line-height 0.9, letter-spacing -0.02em): H1 do Hero. Ocupa espaço físico com intenção. Ênfase tipográfica via cor sólida (`text-anhanga-yellow`), nunca gradient text.
 - **Headline** (800, clamp(1.5rem, 3vw, 2.5rem), line-height 1.1): Títulos de seção (H2), cabeçalhos de página (`font-display font-extrabold`). Contraste mínimo 1.25× com o nível abaixo.
 - **Title** (700, 1.25rem / 20px, line-height 1.3): Subtítulos de card, labels de destaque. Poppins bold.
 - **Body** (400–500, 1rem / 16px, line-height 1.6): Parágrafos corridos. Poppins peso 400. Máximo 65–75ch de largura de coluna.
@@ -237,7 +237,7 @@ O `shadow-glow` (brilho ciano) é reservado para highlights de estado ativo em e
 ### SectionHeader (Signature Component)
 *O padrão de entrada visual para cada seção — badge + headline + subtítulo com ritmo consistente.*
 
-Badge colorido (pílula pequena) acima do H2 `font-black text-4xl leading-tight text-anhanga-dark`. Subtítulo em `text-gray-500 font-medium base`. Os três elementos em coluna com `gap-3`. Alinhamento center (seções completas) ou left (seções com texto corrido). O badge comunica a categoria antes que o headline revele o conteúdo.
+Badge colorido (pílula pequena) acima do H2 `font-black text-4xl leading-tight text-anhanga-dark`. Subtítulo em `text-gray-500 font-medium text-base`. Os três elementos em coluna com `gap-3`. Alinhamento center (seções completas) ou left (seções com texto corrido). O badge comunica a categoria antes que o headline revele o conteúdo.
 
 ## 6. Do's and Don'ts
 
