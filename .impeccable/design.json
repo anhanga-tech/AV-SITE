@@ -1,0 +1,314 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-26T00:00:00Z",
+  "title": "Design System: Anhangá Viagens",
+  "extensions": {
+    "colorMeta": {
+      "action": {
+        "role": "primary",
+        "displayName": "Céu Vivo",
+        "canonical": "oklch(66% 0.17 233)",
+        "tonalRamp": ["#011522", "#012d44", "#01568a", "#0272b5", "#0284c7", "#0ea5e9", "#5ac7f7", "#b2e8fc"]
+      },
+      "action-dark": {
+        "role": "primary",
+        "displayName": "Céu Fundo",
+        "canonical": "oklch(57% 0.17 235)",
+        "tonalRamp": ["#011522", "#012d44", "#01568a", "#0272b5", "#0284c7", "#0ea5e9", "#5ac7f7", "#b2e8fc"]
+      },
+      "brand-blue": {
+        "role": "secondary",
+        "displayName": "Safira Profunda",
+        "canonical": "oklch(45% 0.19 262)",
+        "tonalRamp": ["#010a22", "#01184a", "#012b90", "#0044b8", "#0056D2", "#1a74e8", "#6699f2", "#a8c2fa"]
+      },
+      "brand-blue-deep": {
+        "role": "secondary",
+        "displayName": "Safira Noturna",
+        "canonical": "oklch(34% 0.17 264)",
+        "tonalRamp": ["#010a22", "#01184a", "#012b90", "#003B8E", "#0056D2", "#1a74e8", "#6699f2", "#a8c2fa"]
+      },
+      "brand-yellow": {
+        "role": "tertiary",
+        "displayName": "Âmbar Vivo",
+        "canonical": "oklch(89% 0.19 98)",
+        "tonalRamp": ["#231900", "#4a3300", "#7a5500", "#b07d00", "#d4a000", "#eec300", "#FFD600", "#fff3a0"]
+      },
+      "brand-yellow-hover": {
+        "role": "tertiary",
+        "displayName": "Âmbar Quente",
+        "canonical": "oklch(81% 0.17 96)",
+        "tonalRamp": ["#231900", "#4a3300", "#7a5500", "#b07d00", "#d4a000", "#E5C000", "#FFD600", "#fff3a0"]
+      },
+      "dark": {
+        "role": "neutral",
+        "displayName": "Ardósia Profunda",
+        "canonical": "oklch(18% 0.012 264)",
+        "tonalRamp": ["#070a10", "#0b1020", "#0f172a", "#1a2440", "#273660", "#405088", "#7080b0", "#c0c8dc"]
+      },
+      "light": {
+        "role": "neutral",
+        "displayName": "Névoa de Amanhecer",
+        "canonical": "oklch(97% 0.010 262)",
+        "tonalRamp": ["#070a10", "#1a2440", "#405088", "#7080b0", "#a8b8d8", "#c8d8f0", "#dfe8f8", "#F4F8FF"]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Superfície Quente",
+        "canonical": "oklch(99% 0.005 90)",
+        "tonalRamp": ["#1a1400", "#3a2c00", "#6b5200", "#a07c00", "#d4aa00", "#f0d060", "#f8ec99", "#fffdf5"]
+      },
+      "gray-text": {
+        "role": "neutral",
+        "displayName": "Cinza Texto",
+        "canonical": "oklch(52% 0.010 264)",
+        "tonalRamp": ["#111418", "#222830", "#374050", "#4a5568", "#6b7280", "#9ca3af", "#d1d5db", "#f3f4f6"]
+      },
+      "gray-border": {
+        "role": "neutral",
+        "displayName": "Cinza Borda",
+        "canonical": "oklch(91% 0.005 264)",
+        "tonalRamp": ["#111418", "#374050", "#6b7280", "#9ca3af", "#d1d5db", "#e5e7eb", "#f3f4f6", "#f9fafb"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "H1 do Hero exclusivamente. Ocupa espaço físico com intenção. Comprimido (line-height 0.9) para impacto visual. Poppins 900."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "H2 de seção, cabeçalhos de página interna. Poppins extrabold (800). Contraste mínimo 1.25× com o nível title."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Subtítulos de card, destaques de conteúdo, labels de item em listas. Poppins 700."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Texto corrido e parágrafos. Poppins peso 400. Máximo 65–75ch."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Badges, chips, rótulos categóricos. Poppins 900 uppercase. Nunca em texto corrido."
+      }
+    },
+    "shadows": [
+      {
+        "name": "hard",
+        "value": "4px 4px 0px 0px #0f172a",
+        "purpose": "Botões CTA em repouso sobre fundos claros. Indica elemento clicável com peso físico."
+      },
+      {
+        "name": "hard-yellow",
+        "value": "4px 4px 0px 0px #FFD600",
+        "purpose": "Variante do hard para botão primary. Âmbar Vivo como assinatura press."
+      },
+      {
+        "name": "hard-lg",
+        "value": "8px 8px 0px 0px #0f172a",
+        "purpose": "Hard ampliado para elementos hero ou cards de destaque de grande formato."
+      },
+      {
+        "name": "hard-hover",
+        "value": "6px 6px 0px 0px #0f172a",
+        "purpose": "Token definido para tratamentos de lift-on-hover (sombra cresce de 4px → 6px). Distinto do press-down dos botões, que usa offset inline 2px."
+      },
+      {
+        "name": "float",
+        "value": "0 10px 40px -10px rgba(0,0,0,0.15)",
+        "purpose": "Cards, painéis e dropdowns em repouso. Presença sutil sem peso direcional."
+      },
+      {
+        "name": "float-lg",
+        "value": "0 20px 60px -15px rgba(0,0,0,0.2)",
+        "purpose": "Cards elevados, banners flutuantes de destaque."
+      },
+      {
+        "name": "glow",
+        "value": "0 0 20px rgba(14,165,233,0.5)",
+        "purpose": "Highlights ciano em elementos de identidade premium. Usar com parcimônia."
+      }
+    ],
+    "motion": [
+      {
+        "name": "fade-in-up",
+        "value": "fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "purpose": "Entrada de seções e cards. Ease-out-quart. Desativar com prefers-reduced-motion."
+      },
+      {
+        "name": "fade-in-down",
+        "value": "fadeInDown 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "purpose": "Dropdown e menus. Mais rápido que o fade-in-up."
+      },
+      {
+        "name": "pop-in",
+        "value": "popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "purpose": "Ícones, badges e pequenos elementos que surgem (scale 0.9 → 1)."
+      },
+      {
+        "name": "float-ambient",
+        "value": "float 6s ease-in-out infinite",
+        "purpose": "Elementos decorativos flutuantes (blobs). Desativar com prefers-reduced-motion."
+      },
+      {
+        "name": "press-down",
+        "value": "transition: transform 150ms ease-out, box-shadow 150ms ease-out",
+        "purpose": "Sequência de press nos botões: rest(translate 0,0 / shadow 4px) → hover(2px,2px / shadow 2px) → active(4px,4px / shadow none)."
+      },
+      {
+        "name": "ease-spring",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Ease-out-expo padrão do projeto (token transitionTimingFunction.spring). Sem bounce ou elastic."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Button Primary",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ação principal em contexto light. Hard shadow amarela, press-down físico.",
+      "html": "<button class=\"ds-btn-primary\">Quero meu orçamento</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #0f172a; color: #f8fafc; font-family: Poppins, sans-serif; font-size: 14px; font-weight: 700; padding: 14px 28px; border-radius: 12px; border: none; cursor: pointer; box-shadow: 4px 4px 0px 0px #FFD600; transition: transform 150ms ease-out, box-shadow 150ms ease-out; } .ds-btn-primary:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0px 0px #FFD600; } .ds-btn-primary:active { transform: translate(4px, 4px); box-shadow: none; } .ds-btn-primary:focus-visible { outline: 2px solid #0ea5e9; outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }"
+    },
+    {
+      "name": "Button Action",
+      "kind": "button",
+      "refersTo": "button-action",
+      "description": "Ação de fluxo e navegação. Pílula Céu Vivo, sem hard shadow.",
+      "html": "<button class=\"ds-btn-action\">Fale Conosco</button>",
+      "css": ".ds-btn-action { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #0ea5e9; color: #f8fafc; font-family: Poppins, sans-serif; font-size: 14px; font-weight: 700; padding: 10px 20px; border-radius: 9999px; border: none; cursor: pointer; transition: background 200ms ease-out; } .ds-btn-action:hover { background: #0284c7; } .ds-btn-action:focus-visible { outline: 2px solid #0ea5e9; outline-offset: 2px; } .ds-btn-action:disabled { opacity: 0.5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Button CTA",
+      "kind": "button",
+      "refersTo": "button-cta",
+      "description": "Botão de conversão máxima. Âmbar Vivo + hard shadow escura. Um por tela.",
+      "html": "<button class=\"ds-btn-cta\">→ Quero meu orçamento</button>",
+      "css": ".ds-btn-cta { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #FFD600; color: #0f172a; font-family: Poppins, sans-serif; font-size: 16px; font-weight: 900; padding: 16px 32px; border-radius: 16px; border: none; cursor: pointer; box-shadow: 4px 4px 0px 0px rgba(15,23,42,1); transition: transform 150ms ease-out, box-shadow 150ms ease-out; } .ds-btn-cta:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0px 0px rgba(15,23,42,1); } .ds-btn-cta:active { transform: translate(4px, 4px); box-shadow: none; } .ds-btn-cta:focus-visible { outline: 2px solid #0f172a; outline-offset: 2px; } .ds-btn-cta:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }"
+    },
+    {
+      "name": "Button Ghost",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Ação terciária discreta. Transparente, sem shadow.",
+      "html": "<button class=\"ds-btn-ghost\">Saiba mais</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: transparent; color: #6b7280; font-family: Poppins, sans-serif; font-size: 14px; font-weight: 700; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; transition: color 150ms ease-out; } .ds-btn-ghost:hover { color: #0ea5e9; } .ds-btn-ghost:focus-visible { outline: 2px solid #0ea5e9; outline-offset: 2px; }"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input-default",
+      "description": "Campo de texto padrão. Borda 2px, foco em Céu Vivo.",
+      "html": "<div class=\"ds-field\"><label class=\"ds-field-label\" for=\"ds-input\">Destino</label><input class=\"ds-input\" id=\"ds-input\" type=\"text\" placeholder=\"Para onde você quer ir?\" /></div>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; } .ds-field-label { font-family: Poppins, sans-serif; font-size: 12px; font-weight: 900; color: #0f172a; text-transform: uppercase; letter-spacing: 0.1em; } .ds-input { width: 100%; padding: 10px 16px; background: #ffffff; border: 2px solid #e5e7eb; border-radius: 12px; font-family: Poppins, sans-serif; font-size: 14px; font-weight: 500; color: #0f172a; outline: none; transition: border-color 150ms ease-out; } .ds-input::placeholder { color: #d1d5db; } .ds-input:focus { border-color: #0ea5e9; } .ds-input:focus-visible { outline: 2px solid rgba(14,165,233,0.5); outline-offset: 1px; }"
+    },
+    {
+      "name": "Badge Default",
+      "kind": "chip",
+      "refersTo": "badge-default",
+      "description": "Rótulo categórico. Pílula com tipografia label forte.",
+      "html": "<span class=\"ds-badge\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/></svg>Destinos</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 9999px; font-family: Poppins, sans-serif; font-size: 12px; font-weight: 900; color: #0f172a; text-transform: uppercase; letter-spacing: 0.1em; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }"
+    },
+    {
+      "name": "Badge Blue",
+      "kind": "chip",
+      "refersTo": "badge-default",
+      "description": "Variante azul do badge. Identidade de marca em contextos de destaque.",
+      "html": "<span class=\"ds-badge-blue\">Exclusivo</span>",
+      "css": ".ds-badge-blue { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 9999px; font-family: Poppins, sans-serif; font-size: 12px; font-weight: 900; color: #0056D2; text-transform: uppercase; letter-spacing: 0.1em; }"
+    },
+    {
+      "name": "Card Default",
+      "kind": "card",
+      "refersTo": "button-primary",
+      "description": "Superfície de conteúdo padrão. Float shadow sutil, sem borda.",
+      "html": "<div class=\"ds-card\"><p class=\"ds-card-title\">Machu Picchu</p><p class=\"ds-card-body\">Uma das sete maravilhas do mundo moderno, com roteiro exclusivo preparado para você.</p></div>",
+      "css": ".ds-card { background: #ffffff; border-radius: 16px; padding: 24px; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15); } .ds-card-title { font-family: Poppins, sans-serif; font-size: 20px; font-weight: 700; color: #0f172a; line-height: 1.3; margin: 0 0 8px; } .ds-card-body { font-family: Poppins, sans-serif; font-size: 16px; font-weight: 400; color: #6b7280; line-height: 1.6; margin: 0; }"
+    },
+    {
+      "name": "Section Header",
+      "kind": "custom",
+      "refersTo": "badge-default",
+      "description": "Padrão de entrada visual para seções: badge + H2 + subtítulo.",
+      "html": "<div class=\"ds-section-header\"><span class=\"ds-badge\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/></svg>Destinos</span><h2 class=\"ds-section-title\">Onde você quer ir?</h2><p class=\"ds-section-subtitle\">Roteiros exclusivos para os destinos mais desejados do mundo.</p></div>",
+      "css": ".ds-section-header { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; } .ds-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 9999px; font-family: Poppins, sans-serif; font-size: 12px; font-weight: 900; color: #0f172a; text-transform: uppercase; letter-spacing: 0.1em; box-shadow: 0 1px 3px rgba(0,0,0,0.08); } .ds-section-title { font-family: Poppins, sans-serif; font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 900; color: #0f172a; line-height: 1.1; margin: 0; } .ds-section-subtitle { font-family: Poppins, sans-serif; font-size: 16px; font-weight: 500; color: #6b7280; line-height: 1.6; margin: 0; max-width: 60ch; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "O Diário de Bordo",
+    "overview": "O design system da Anhangá Viagens parte de uma imagem: o caderno de viagem de alguém que viajou muito e tem histórias para contar. Não é um catálogo de destinos — é um relato pessoal, guardado com cuidado, com marcas de uso e afeto. Cada tela carrega esse peso emocional: tipografia que respira, sombras que têm presença física, cores que remetem a lugares reais.\n\nO sistema é ao mesmo tempo íntimo e confiante. Íntimo porque a Anhangá conhece seus clientes pelo nome; cada interação é projetada como uma conversa, não uma transação. Confiante porque a agência tem autoridade: os componentes são tácteis, têm peso, respondem ao toque com feedback visual claro.\n\nEste sistema rejeita explicitamente o formulário corporativo frio, o SaaS genérico de gradiente azul-roxo, glassmorphism decorativo, e o template de métricas com número grande e fundo gradient.",
+    "keyCharacteristics": [
+      "Escuro e íntimo: Ardósia Profunda (#0f172a) como base noturna em fluxos de conversação",
+      "Sombras hard neo-brutalistas exclusivamente nos pontos de ação, nunca decorativas",
+      "Poppins como voz única da marca: geométrica, amigável, confiante sem ser agressiva",
+      "Âmbar Vivo (#FFD600) como sinal de urgência e calor, usado com parcimônia máxima",
+      "Touch targets 44px+, mobile-first absoluto, acessível por padrão (WCAG AA)"
+    ],
+    "rules": [
+      {
+        "name": "A Regra do Âmbar",
+        "body": "O Âmbar Vivo (#FFD600) aparece em no máximo 1 elemento por tela. Ele é o grito, não o fundo.",
+        "section": "colors"
+      },
+      {
+        "name": "A Regra do Branco Rebaixado",
+        "body": "Em contextos com fundo Ardósia Profunda, texto branco é sempre rgba(255,255,255,0.9) — nunca #ffffff pleno.",
+        "section": "colors"
+      },
+      {
+        "name": "A Regra do Tint Neutral",
+        "body": "Todos os fundos neutros têm um toque da paleta de ação. Cinza puro sem tint é proibido em superfícies principais.",
+        "section": "colors"
+      },
+      {
+        "name": "A Regra do Peso Duplo",
+        "body": "Hierarquia é criada por weight e scale juntos. Salto mínimo entre níveis adjacentes: 1.25× no tamanho OU 200 de diferença no peso.",
+        "section": "typography"
+      },
+      {
+        "name": "A Regra da Voz da Marca",
+        "body": "Poppins é a única voz da interface: headings, body, badges, labels, botões e inputs. Merriweather é permitida apenas em conteúdo editorial de blog.",
+        "section": "typography"
+      },
+      {
+        "name": "A Regra Hard-Only nas Ações",
+        "body": "Sombras com offset direcional são proibidas em qualquer elemento não-interativo. Se tem hard shadow, o usuário espera poder clicar.",
+        "section": "elevation"
+      },
+      {
+        "name": "A Regra do Feedback Físico",
+        "body": "Todo botão com hard shadow executa a sequência completa: rest(0,0) shadow-hard → hover(2px,2px) shadow reduzida → active(4px,4px) shadow-none.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do usar Poppins em toda a interface: headings, body, badges, labels, botões e inputs",
+      "Do aplicar hard shadows exclusivamente em botões primary e CTA",
+      "Do usar o Âmbar Vivo (#FFD600) em no máximo 1 elemento por tela",
+      "Do manter touch targets mínimos de 44×44px em todos os elementos interativos",
+      "Do rebaixar branco puro para white/90 em texto sobre Ardósia Profunda",
+      "Do adicionar prefers-reduced-motion em todas as animações de entrada",
+      "Do executar a sequência completa de press-down em todo botão com hard shadow",
+      "Do tratar cada touchpoint como uma conversa: segunda pessoa do singular, tom caloroso"
+    ],
+    "donts": [
+      "Don't usar formulário corporativo frio: cinza neutro, campos sem identidade, fonte do sistema",
+      "Don't aplicar glassmorphism decorativamente",
+      "Don't usar border-left maior que 1px como acento colorido decorativo",
+      "Don't usar gradient text (background-clip: text + gradient)",
+      "Don't repetir o template hero-métrica: número grande + label pequeno + gradient",
+      "Don't colocar hard shadow em elementos passivos não-interativos",
+      "Don't usar cards idênticos em grade repetida",
+      "Don't substituir o fundo Ardósia Profunda por branco em fluxos pós-viagem e quiz"
+    ]
+  }
+}

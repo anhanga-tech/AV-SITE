@@ -205,7 +205,7 @@ Keep the project root minimal — only `README.md`, `CLAUDE.md`, and code/toolin
 |---|---|
 | `docs/standards/` | Engineering source of truth (code style, testing, API conventions, security) |
 | `docs/ops/` | Deploy, troubleshooting, GitHub workflows, agents, security policy, Cloudflare rules |
-| `docs/design/` | Design system (`design-system.json`) and design context docs |
+| `docs/design/` | Brand-system assets (`brand-system/`) + pointers to the canonical design system, which lives at root: `DESIGN.md` + `.impeccable/design.json` |
 | `docs/product/` | Product strategy and positioning |
 | `docs/seo/` | SEO plans, action plans, backlink strategy |
 | `docs/marketing/` | Brand profile, content calendars, brand reviews |
