@@ -37,13 +37,13 @@ export function CorpHero() {
                 aria-hidden="true"
                 className="hidden lg:block absolute z-[5] pointer-events-none"
                 style={{
-                    right: '-600px',
+                    right: '-480px',
                     top: '50%',
                     transform: 'translateY(-50%)',
-                    width: '1520px',
-                    height: '1520px',
-                    WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 18%, black 100%)',
-                    maskImage: 'linear-gradient(to right, transparent 0%, black 18%, black 100%)',
+                    width: '1200px',
+                    height: '1200px',
+                    WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 26%, black 100%)',
+                    maskImage: 'linear-gradient(to right, transparent 0%, black 26%, black 100%)',
                 }}
             >
                 <Suspense fallback={null}>
@@ -52,7 +52,7 @@ export function CorpHero() {
             </div>
 
             {/* Content */}
-            <div className="container mx-auto px-6 relative z-10 pt-24 pb-28">
+            <div className="container mx-auto px-6 relative z-10 pt-20 pb-20">
                 <div className="flex flex-col items-center text-center lg:items-start lg:text-left max-w-xl">
 
                     <m.div
@@ -74,7 +74,7 @@ export function CorpHero() {
                         initial="hidden"
                         animate="visible"
                         custom={1}
-                        className="font-sans font-extrabold text-white leading-[0.9] tracking-tight drop-shadow-lg text-5xl sm:text-6xl md:text-7xl xl:text-8xl mb-6"
+                        className="font-sans font-extrabold text-white leading-[0.95] tracking-tight drop-shadow-lg text-5xl sm:text-6xl md:text-6xl xl:text-7xl mb-5 text-balance"
                     >
                         A viagem da sua equipe <br />
                         <span className="text-yellow-300">começa aqui.</span>
@@ -85,7 +85,7 @@ export function CorpHero() {
                         initial="hidden"
                         animate="visible"
                         custom={2}
-                        className="text-white/90 text-xl md:text-2xl max-w-lg mb-10 font-medium leading-relaxed drop-shadow-md"
+                        className="text-white/90 text-lg md:text-xl max-w-lg mb-8 font-medium leading-relaxed drop-shadow-md"
                     >
                         Incentivo, confraternização, evento ou viagem a trabalho.
                         A gente monta o roteiro do zero, você só embarca.
@@ -118,7 +118,7 @@ export function CorpHero() {
                     </m.div>
 
                     <m.div
-                        className="mt-10 flex flex-wrap justify-center lg:justify-start gap-3"
+                        className="mt-8 flex flex-wrap justify-center lg:justify-start gap-3"
                         initial="hidden"
                         animate="visible"
                         variants={{
