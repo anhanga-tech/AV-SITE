@@ -8,30 +8,30 @@ const STEPS = [
         Icon: ChatCircleText,
         title: 'Você nos conta o que precisa',
         description: 'Incentivo, confraternização, evento ou viagem a trabalho. Basta mandar uma mensagem. Seu consultor entende o contexto e já começa a pensar na melhor solução.',
-        iconBg: 'bg-sky-100',
-        iconColor: 'text-sky-600',
-        numberColor: 'text-sky-200',
-        border: 'border-sky-200',
+        iconBg: 'bg-blue-100',
+        iconColor: 'text-blue-700',
+        numberColor: 'text-blue-200',
+        border: 'border-blue-200',
     },
     {
         number: '02',
         Icon: MapTrifold,
         title: 'Montamos o roteiro do zero',
         description: 'Seu consultor dedicado elabora uma proposta completa: destino, hospedagem, transfer, seguro e tudo mais. Você avalia, ajusta e aprova.',
-        iconBg: 'bg-amber-100',
-        iconColor: 'text-amber-600',
-        numberColor: 'text-amber-200',
-        border: 'border-amber-200',
+        iconBg: 'bg-sky-100',
+        iconColor: 'text-sky-700',
+        numberColor: 'text-sky-200',
+        border: 'border-sky-200',
     },
     {
         number: '03',
         Icon: AirplaneTilt,
         title: 'Você só embarca',
         description: 'Toda a burocracia fica com a gente. Faturamento no CNPJ, condições para grupo e atendimento durante a viagem. Você cuida da empresa, a gente cuida de tudo mais.',
-        iconBg: 'bg-emerald-100',
-        iconColor: 'text-emerald-600',
-        numberColor: 'text-emerald-200',
-        border: 'border-emerald-200',
+        iconBg: 'bg-amber-100',
+        iconColor: 'text-amber-700',
+        numberColor: 'text-amber-200',
+        border: 'border-amber-200',
     },
 ] as const;
 
@@ -52,12 +52,6 @@ export function CorpProcess() {
                     custom={0}
                     className="text-center mb-16"
                 >
-                    <div className="inline-block relative mb-5">
-                        <span className="absolute inset-0 bg-emerald-100 transform -skew-x-12 rounded-lg" />
-                        <span className="relative px-4 py-1.5 text-emerald-700 font-black uppercase tracking-widest text-xs">
-                            Simples assim
-                        </span>
-                    </div>
                     <h2 className="text-4xl md:text-5xl font-black text-brand-dark leading-tight">
                         Como funciona em <br />
                         <span className="text-brand-cyan">3 passos</span>

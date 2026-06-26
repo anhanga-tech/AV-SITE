@@ -7,7 +7,7 @@ interface CorpFormFieldsProps {
 }
 
 const INPUT_CLASS =
-    'w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors duration-150 placeholder-zinc-400';
+    'w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors duration-150 placeholder-zinc-500';
 
 export function CorpFormFields({ form, onField }: CorpFormFieldsProps) {
     return (
