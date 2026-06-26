@@ -74,7 +74,7 @@ export function CorpHero() {
                         initial="hidden"
                         animate="visible"
                         custom={1}
-                        className="font-sans font-extrabold text-white leading-[0.95] tracking-tight drop-shadow-lg text-5xl sm:text-6xl md:text-6xl xl:text-7xl mb-5 text-balance"
+                        className="font-sans font-extrabold text-white leading-[0.95] tracking-tight drop-shadow-lg text-5xl sm:text-6xl xl:text-7xl mb-5 text-balance"
                     >
                         A viagem da sua equipe <br />
                         <span className="text-yellow-300">começa aqui.</span>
