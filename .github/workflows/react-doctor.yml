@@ -17,4 +17,4 @@ jobs:
       # Pinado na release v2.1.0 (esquema --diff, estável). O main migrou para
       # --scope (PR #769), que ainda não chegou ao react-doctor@latest do npm;
       # revisitar quando sair a release com --scope + latest correspondente.
-      - uses: millionco/react-doctor@740211cf201ee28910c105b59b79e9aa73e1bd45 # v2.2.0
+      - uses: millionco/react-doctor@0b4f4f4bd248a154e64eb508a48347f71154b3f3 # v2.2.2
