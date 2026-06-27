@@ -123,7 +123,7 @@ test('Cloudflare redirects should expose the /indica short link with NPS referra
     .map((line) => line.split(/\s+/))
     .filter(([from]) => from === '/indica' || from === '/indica/');
 
-  assert.ok(rules.length >= 1, 'expected at least one /indica redirect rule');
+  assert.equal(rules.length, 2, 'expected exactly two /indica redirect rules (with and without trailing slash)');
 
   for (const [, target, status] of rules) {
     assert.equal(status, '302', '/indica must use a temporary 302 redirect');
