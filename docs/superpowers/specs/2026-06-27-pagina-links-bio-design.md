@@ -38,7 +38,7 @@ Alternativas descartadas:
   <Route path="/links" element={<LinksPage />} />
   ```
 - Página standalone: **sem Header, Footer, AIChat**.
-- `<Seo>` com **`noindex`** — é destino de bio, não página de conteúdo para busca; evita thin content. Sem `BreadcrumbSchema`.
+- `<Seo robots="noindex, follow">` — é destino de bio, não página de conteúdo para busca; evita thin content. (O componente `Seo` expõe `robots?: string`, default `'index, follow'`; mesmo padrão da `QuizAnhangaLanding`.) Sem `BreadcrumbSchema`.
 - O `<CookieConsentBanner>` continua aparecendo (é global no `AppLayout` via `ClientOnly`), necessário para o consentimento de marketing.
 
 ## Arquivo de dados — `data/linksPage.ts`
@@ -99,7 +99,11 @@ export interface LinksPageConfig {
 | 11 | `curadoria-cruzeiros-brasil` | Cruzeiros pelo Brasil | `internal` | `/curadoria-cruzeiros-brasil` |
 | 12 | `lollapalooza` | Lollapalooza | `internal` | `/lollapalooza` |
 
-Todas as 7 landings entram com `visible: true`. As mensagens de WhatsApp exatas (geral e chip/eSIM) ficam definidas no arquivo de dados.
+Todas as 7 landings entram com `visible: true`.
+
+Mensagens de WhatsApp iniciais (texto base; o `getWhatsAppLink` anexa os dados de tracking automaticamente). Ajustáveis no arquivo de dados:
+- **Geral**: "Olá! Vim pelo Instagram e gostaria de falar com a Anhangá Viagens."
+- **Chip/eSIM**: "Olá! Vim pelo Instagram e quero informações sobre chip / eSIM internacional para minha viagem."
 
 ## Componentes
 
@@ -107,7 +111,7 @@ Todas as 7 landings entram com `visible: true`. As mensagens de WhatsApp exatas 
 - Importa `linksPageConfig` de `data/linksPage.ts`.
 - Layout (de cima para baixo): logo da marca → banner (se `visible`) → lista de `LinkButton` filtrada por `visible` → selos de confiança.
 - No mount (`useEffect`), dispara o PageView de retargeting (ver Tracking).
-- `<Seo noindex>`.
+- `<Seo robots="noindex, follow">`.
 
 ### `LinkButton` (componente reutilizável)
 Localização: `components/links/LinkButton.tsx` (pasta nova e enxuta para esta feature).
@@ -122,16 +126,16 @@ Resolve o destino conforme `type`:
 **Interface (props):** recebe um `LinkItem`. Sem estado interno além do necessário para render. Pode ser entendido e testado isoladamente: dado um `LinkItem`, produz o elemento de link correto e dispara o evento certo.
 
 ### Selos de confiança (rodapé)
-Bloco compacto, somente texto/links (sem imagens de selo), reusando os dados já presentes em `components/Footer.tsx`:
-- **Cadastur** — CNPJ/Cadastur `37.036.732/0001-41`, link para `cadastur.turismo.gov.br/hotsite/`.
-- **Membro ABAV** — link para `abav.com.br`.
-- **Nota 5.0 Google** — texto (sem link obrigatório).
+Bloco compacto, somente texto/links (sem imagens de selo):
+- **Cadastur** — CNPJ/Cadastur `37.036.732/0001-41`, link para `cadastur.turismo.gov.br/hotsite/`. Fonte: mesmos dados de `components/Footer.tsx`.
+- **Membro ABAV** — link para `abav.com.br`. Fonte: `components/Footer.tsx`.
+- **Nota 5.0 Google** — a nota **não** está no `Footer`; deriva dos reviews em `data/googleReviews.json` (via `data/reviewsAdapter.ts`). Confirmar o valor agregado vigente na implementação antes de fixar "5.0".
 
-Pode ser inline em `LinksPage.tsx` ou um pequeno `components/links/TrustSeals.tsx`. Decisão de implementação; manter a fonte dos dados consistente com o `Footer`.
+Pode ser inline em `LinksPage.tsx` ou um pequeno `components/links/TrustSeals.tsx`. Decisão de implementação.
 
 ## Tracking (ponto central)
 
-Arquitetura confirmada: o site **não carrega o Meta Pixel direto** (`fbq` não existe). Tudo passa por `window.dataLayer` → GTM server-side (Stape sGTM, container `GTM-T2KGS86G`), carregado globalmente no `index.html`. O GTM é injetado por `loadAnalytics()`/`triggerAnalytics()` na primeira interação (scroll/touch/click) ou após ~12s de idle — **independente de consentimento** —, então `/links` herda o pipeline sem qualquer infra adicional na página.
+Arquitetura confirmada: o site **não carrega o Meta Pixel direto** (`fbq` não existe). Tudo passa por `window.dataLayer` → GTM server-side (Stape sGTM, container `GTM-T2KGS86G`), carregado globalmente no `index.html`. O GTM é injetado por `loadAnalytics()`/`triggerAnalytics()` na primeira interação (listeners `scroll`/`pointerdown`/`keydown`/`touchstart`) ou após ~12s de idle — **independente de consentimento** —, então `/links` herda o pipeline sem qualquer infra adicional na página.
 
 Helper de tracking (novo, pequeno): `utils/linksTracking.ts` (ou inline em `LinkButton`/`LinksPage`), com guarda SSR (`typeof window`).
 
@@ -159,10 +163,10 @@ Helper de tracking (novo, pequeno): `utils/linksTracking.ts` (ou inline em `Link
 
 - Mobile-first (100% do tráfego vem do app do Instagram).
 - Poppins (já é a `font-sans` no `tailwind.config.mjs`).
-- Fundo no gradiente da marca (`#003B8E → #0ea5e9`); logo branca (`BRAND_LOGO_WHITE_URL` de `lib/media-assets.ts`) no topo.
-- Botão WhatsApp em amarelo `#FFD600` (CTA mais quente); demais em branco/translúcido.
+- Fundo no gradiente da marca usando tokens `anhanga-*` reais: `anhanga-blue` (`#0056D2`) → `anhanga-action` (`#0ea5e9`). Logo branca (`BRAND_LOGO_WHITE_URL` de `lib/media-assets.ts`) no topo.
+- Botão WhatsApp em amarelo `#FFD600` (token `anhanga-yellow`; CTA mais quente); demais em branco/translúcido.
 - Botões grandes, full-width, com hierarquia clara por intenção.
-- Usar namespace de cor canônico `anhanga-*` (tokens em `lib/design-tokens.ts`); `brand-*` é legado.
+- Usar namespace de cor canônico `anhanga-*` (tokens em `lib/design-tokens.ts`); `brand-*` é legado e congelado por teste. Nota: `#003B8E` é o legado `brand-actionDark` e **não** tem equivalente `anhanga-*` — não usar.
 
 ## Testes
 
