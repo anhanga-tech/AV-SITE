@@ -117,6 +117,25 @@ test('Cloudflare redirects should use supported status codes', async () => {
   assert.doesNotMatch(redirects, /(?:^|\s)(?:301|302|303|307|308)!(?:\s|$)/);
 });
 
+test('Cloudflare redirects should expose the /indica short link with NPS referral UTMs', async () => {
+  const redirects = await readFile(new URL('../public/_redirects', import.meta.url), 'utf8');
+  const rules = collectRedirectRules(redirects)
+    .map((line) => line.split(/\s+/))
+    .filter(([from]) => from === '/indica' || from === '/indica/');
+
+  assert.equal(rules.length, 2, 'expected exactly two /indica redirect rules (with and without trailing slash)');
+
+  for (const [, target, status] of rules) {
+    assert.equal(status, '302', '/indica must use a temporary 302 redirect');
+
+    const url = new URL(target, 'https://www.anhanga.tur.br');
+    assert.equal(url.pathname, '/', '/indica must redirect to the home route');
+    assert.equal(url.searchParams.get('utm_source'), 'indicacao');
+    assert.equal(url.searchParams.get('utm_medium'), 'whatsapp');
+    assert.equal(url.searchParams.get('utm_campaign'), 'nps_promotor');
+  }
+});
+
 test('Cloudflare redirects should avoid redundant SPA fallback rewrites', async () => {
   const redirects = await readFile(new URL('../public/_redirects', import.meta.url), 'utf8');
 
