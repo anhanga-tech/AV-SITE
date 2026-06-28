@@ -2,11 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
+const readQuizData = (): Promise<string> =>
+  readFile(new URL('../data/quiz.ts', import.meta.url), 'utf8');
+
 const readQuizLanding = (): Promise<string> =>
   readFile(new URL('../pages/landings/QuizAnhangaLanding.tsx', import.meta.url), 'utf8');
 
-test('quiz landing should expose the six Plog question fields from FEL-129', async () => {
-  const source = await readQuizLanding();
+const readResultScreen = (): Promise<string> =>
+  readFile(new URL('../components/landings/quiz/ResultScreen.tsx', import.meta.url), 'utf8');
+
+test('quiz data should expose the six Plog question fields from FEL-129', async () => {
+  const source = await readQuizData();
   const questionIds = [...source.matchAll(/^\s*id:\s*['"]([^'"]+)['"],\r?\n\s*eyebrow:\s*['"]Pergunta \d\d['"]/gm)]
     .map((match) => match[1]);
 
@@ -21,11 +27,13 @@ test('quiz landing should expose the six Plog question fields from FEL-129', asy
 
   assert.match(source, /title: 'Você acabou de pousar\. Onde chegou\?'/);
   assert.match(source, /title: 'Como você organiza uma viagem antes de sair\?'/);
-  assert.match(source, /6 perguntas rápidas/);
+
+  const landing = await readQuizLanding();
+  assert.match(landing, /6 perguntas rápidas/);
 });
 
 test('quiz destination options should use Mautic-aligned destination ids', async () => {
-  const source = await readQuizLanding();
+  const source = await readQuizData();
 
   assert.doesNotMatch(source, /id: 'america-n'/);
   assert.match(source, /id: 'america-norte'/);
@@ -34,7 +42,7 @@ test('quiz destination options should use Mautic-aligned destination ids', async
 });
 
 test('quiz result submit failure message should announce itself as an alert', async () => {
-  const source = await readQuizLanding();
+  const source = await readResultScreen();
   const submitFailedBranch = source.match(/submitFailed \? \(\s*([\s\S]*?)\s*\) : \(/)?.[1];
   const submitFailedWarning = submitFailedBranch?.match(/<p\b[^>]*>/)?.[0];
 
