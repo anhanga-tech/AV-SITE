@@ -10,26 +10,18 @@ Handoff para continuar a melhoria da landing `/corporativo` em outra sessão.
 
 - **Polish** (PR #961, mergeado): eyebrow do hero (oliva → vidro com âmbar) e brilho do globo (`brightness` 2 → 1.45, arcos amarelo/ciano legíveis).
 - **Harden** (PR #963): a11y de motion (`MotionConfig reducedMotion="user"` + globo respeita `prefers-reduced-motion` + helper `prefersReducedMotion()`) e visibilidade sem JS (`<noscript>` para o `opacity:0` que o framer serializa no prerender). Cobertura: unit + e2e reduced-motion.
+- **Colorize**: rampa oceânica navy→sky→ciano nos pilares e no processo. 3º card/passo (`amber` → `cyan`) e fita washi (`emerald` → `cyan`); âmbar agora exclusivo dos CTAs (Regra do Âmbar). Dot-grids tintados para sapphire (sai o `#94a3b8` indocumentado) e corpo `text-sm` `zinc-500` → `zinc-600` (contraste ~7.5:1 sobre o creme). `text-emerald-500` mantido só no ícone de sucesso do form (verde = semântica de sucesso).
+- **Distill**: removidos os eyebrows de seção de pilares (`O Jeito Anhangá`) e banda (`Bate-papo rápido`) — ambas entram pelo H2. Resta só o eyebrow do hero (`Viagens para Empresas`), que identifica a página. Eyebrow virou prop opcional em `LandingPillars` (`eyebrow`, default preserva consumidores) e `subtitle` opcional em `LandingWhatsAppBand`. O header `✈ Contato / Corporativo` do form foi mantido (device de bilhete de embarque, não eyebrow).
+- **Polish**: foco visível de 2 sinais (`focus-visible:outline-2 outline-offset-2 outline-anhanga-action`, padrão do `components/ui/Button.tsx`) em todos os interativos que não tinham — nav (logo + botão), CTAs do hero, banda (`outline-white` sobre o navy), submit do form, links de contato/sociais, link do success e nav inferior "Conheça também". Antes só os campos do form tinham foco; os CTAs (caminho de conversão) dependiam do outline default do browser, violando o piso WCAG AA do PRODUCT.md.
+- **Globo no R2**: textura `earth-night.jpg` (4096×2048, 715KB) subida para `av-site-media/textures/earth-night.jpg`, servida em `https://media.anhanga.tur.br/textures/earth-night.jpg`. `CorpGlobe.tsx` agora usa `GLOBE_EARTH_NIGHT_TEXTURE_URL` (`lib/media-assets.ts`) — zero requests ao `unpkg`. Verificado: globo renderiza idêntico, sem erros.
 
-## Pendências (em ordem de impacto)
+## Pendências
 
-### 1. Cor — `/impeccable colorize corporativo` · P2 (maior ganho)
-Pilares e processo usam `blue-100 / sky-100 / amber-100` por item, diluindo a identidade navy + ciano + amarelo para um genérico "SaaS simpático".
-- **Onde:** `components/landings/corporativo/constants.ts` (PILLARS) e `components/landings/corporativo/CorpProcess.tsx` (STEPS); tape colors em `components/landings/shared/LandingPillars.tsx:21` (`bg-emerald-100/90` destoa do acento âmbar do 3º card).
-- **Fix:** restringir a 2–3 cores da marca ou 1 acento por seção.
-
-### 2. Cadência de eyebrow — `/impeccable distill corporativo` · P3
-4 eyebrows skewed em sequência (hero, pilares, banda, contato) lê como andaime. O processo já entra direto pelo H2 — bom.
-- **Fix:** manter o eyebrow só no hero e no contato; pilares e banda entram pelo H2.
-
-### 3. Higiene final — `/impeccable polish corporativo` · P3
-- Cor `#94a3b8` fora do DESIGN.md (único achado do `detect.mjs`) — pontos do fundo em `LandingPillars.tsx:29`. Tokenizar.
-- Globo carrega `earth-night.jpg` de `//unpkg.com` (`CorpGlobe.tsx`) — hospedar no R2 próprio.
-- Reconferir contraste do corpo `zinc-500` sobre `#fffdf5` (limite de 4.5:1).
+Nenhuma específica da landing. Nota atual **34/40** (sem P0/P1), detector limpo. Resta só chrome global (fora do escopo da landing):
 
 ## Observações menores (do critique)
 
-- Dois widgets fixos globais (launcher "Roteiro IA" + back-to-top) competem com os CTAs e usam z-index arbitrário.
-- Globo sem loading state.
+- Dois widgets fixos globais (launcher "Roteiro IA" + back-to-top) competem com os CTAs e usam z-index arbitrário — concern global, não da landing.
+- Globo sem loading state (Suspense fallback null) — decorativo/`aria-hidden`, impacto baixo.
 
 Após as pendências, re-rodar `/impeccable critique corporativo` para confirmar a nota subindo.

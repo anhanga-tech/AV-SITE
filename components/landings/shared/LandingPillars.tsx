@@ -16,17 +16,29 @@ export interface PillarItem {
 interface LandingPillarsProps {
     heading: React.ReactNode;
     pillars: PillarItem[];
+    // Eyebrow kicker acima do H2. Passe `null` para suprimir (evita cadência
+    // de eyebrow repetida quando a landing já abre outras seções pelo H2).
+    eyebrow?: React.ReactNode;
 }
 
-const TAPE_COLORS = ['bg-brand-yellow/80', 'bg-sky-100/90', 'bg-emerald-100/90'];
+const TAPE_COLORS = ['bg-brand-yellow/80', 'bg-sky-100/90', 'bg-cyan-100/90'];
 
-export function LandingPillars({ heading, pillars }: LandingPillarsProps) {
+const DEFAULT_EYEBROW = (
+    <div className="inline-block relative mb-5">
+        <span className="absolute inset-0 bg-brand-yellow/30 transform -skew-x-12 rounded-lg" />
+        <span className="relative px-4 py-1.5 text-brand-dark font-black uppercase tracking-widest text-xs flex items-center gap-2">
+            <Sparkle className="size-4" weight="fill" /> O Jeito Anhangá
+        </span>
+    </div>
+);
+
+export function LandingPillars({ heading, pillars, eyebrow = DEFAULT_EYEBROW }: LandingPillarsProps) {
     return (
         <section className="py-24 bg-brand-surface relative overflow-hidden">
 
             <div
                 className="absolute inset-0 z-0 opacity-[0.25]"
-                style={{ backgroundImage: 'radial-gradient(#94a3b8 1.5px, transparent 1.5px)', backgroundSize: '28px 28px' }}
+                style={{ backgroundImage: 'radial-gradient(#9fb8d4 1.5px, transparent 1.5px)', backgroundSize: '28px 28px' }}
             />
 
             <div className="container mx-auto px-6 relative z-10">
@@ -39,12 +51,7 @@ export function LandingPillars({ heading, pillars }: LandingPillarsProps) {
                     custom={0}
                     className="text-center mb-16"
                 >
-                    <div className="inline-block relative mb-5">
-                        <span className="absolute inset-0 bg-brand-yellow/30 transform -skew-x-12 rounded-lg" />
-                        <span className="relative px-4 py-1.5 text-brand-dark font-black uppercase tracking-widest text-xs flex items-center gap-2">
-                            <Sparkle className="size-4" weight="fill" /> O Jeito Anhangá
-                        </span>
-                    </div>
+                    {eyebrow}
                     <h2 className="text-4xl md:text-5xl font-black text-brand-dark leading-tight">
                         {heading}
                     </h2>
@@ -92,7 +99,7 @@ export function LandingPillars({ heading, pillars }: LandingPillarsProps) {
                                 <h3 className="text-xl font-extrabold text-zinc-900 mb-3 leading-tight group-hover:text-brand-cyan transition-colors duration-300 pr-10">
                                     {item.title}
                                 </h3>
-                                <p className="text-zinc-500 font-medium leading-relaxed text-sm">
+                                <p className="text-zinc-600 font-medium leading-relaxed text-sm">
                                     {item.description}
                                 </p>
                             </m.div>

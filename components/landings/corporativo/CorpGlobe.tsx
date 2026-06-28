@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { GLOBE_EARTH_NIGHT_TEXTURE_URL } from '@/lib/media-assets';
 import { prefersReducedMotion } from '../shared/motion';
 
 const SP = { lat: -23.5505, lng: -46.6333 };
@@ -49,7 +50,7 @@ export function CorpGlobe() {
                 .backgroundColor('rgba(0,0,0,0)')
                 .width(el.clientWidth)
                 .height(el.clientHeight)
-                .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+                .globeImageUrl(GLOBE_EARTH_NIGHT_TEXTURE_URL)
                 .atmosphereColor('#60c8f5')
                 .atmosphereAltitude(0.22)
                 // Arcs — trajectórias suaves, altura moderada
