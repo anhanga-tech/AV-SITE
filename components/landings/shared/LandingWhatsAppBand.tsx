@@ -3,7 +3,9 @@ import { openContactModal } from '@/utils/contactForm';
 
 interface LandingWhatsAppBandProps {
     source: string;
-    subtitle: string;
+    // Eyebrow opcional acima do headline. Omita para a banda entrar direto
+    // pelo H2 (evita cadência de eyebrow repetida na landing).
+    subtitle?: string;
     headline: React.ReactNode;
 }
 
@@ -24,10 +26,12 @@ export function LandingWhatsAppBand({ source, subtitle, headline }: LandingWhats
             <div className="container mx-auto px-6 relative z-10">
                 <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 bg-white/5 rounded-[2rem] p-10 border border-white/10">
                     <div>
-                        <p className="text-brand-yellow font-bold uppercase tracking-widest text-xs mb-3 flex items-center gap-2">
-                            <AirplaneTilt className="size-4" weight="fill" />
-                            {subtitle}
-                        </p>
+                        {subtitle && (
+                            <p className="text-brand-yellow font-bold uppercase tracking-widest text-xs mb-3 flex items-center gap-2">
+                                <AirplaneTilt className="size-4" weight="fill" />
+                                {subtitle}
+                            </p>
+                        )}
                         <h2 className="text-4xl md:text-5xl font-black text-white leading-tight">
                             {headline}
                         </h2>

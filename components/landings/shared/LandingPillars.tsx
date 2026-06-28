@@ -16,11 +16,23 @@ export interface PillarItem {
 interface LandingPillarsProps {
     heading: React.ReactNode;
     pillars: PillarItem[];
+    // Eyebrow kicker acima do H2. Passe `null` para suprimir (evita cadência
+    // de eyebrow repetida quando a landing já abre outras seções pelo H2).
+    eyebrow?: React.ReactNode;
 }
 
 const TAPE_COLORS = ['bg-brand-yellow/80', 'bg-sky-100/90', 'bg-cyan-100/90'];
 
-export function LandingPillars({ heading, pillars }: LandingPillarsProps) {
+const DEFAULT_EYEBROW = (
+    <div className="inline-block relative mb-5">
+        <span className="absolute inset-0 bg-brand-yellow/30 transform -skew-x-12 rounded-lg" />
+        <span className="relative px-4 py-1.5 text-brand-dark font-black uppercase tracking-widest text-xs flex items-center gap-2">
+            <Sparkle className="size-4" weight="fill" /> O Jeito Anhangá
+        </span>
+    </div>
+);
+
+export function LandingPillars({ heading, pillars, eyebrow = DEFAULT_EYEBROW }: LandingPillarsProps) {
     return (
         <section className="py-24 bg-brand-surface relative overflow-hidden">
 
@@ -39,12 +51,7 @@ export function LandingPillars({ heading, pillars }: LandingPillarsProps) {
                     custom={0}
                     className="text-center mb-16"
                 >
-                    <div className="inline-block relative mb-5">
-                        <span className="absolute inset-0 bg-brand-yellow/30 transform -skew-x-12 rounded-lg" />
-                        <span className="relative px-4 py-1.5 text-brand-dark font-black uppercase tracking-widest text-xs flex items-center gap-2">
-                            <Sparkle className="size-4" weight="fill" /> O Jeito Anhangá
-                        </span>
-                    </div>
+                    {eyebrow}
                     <h2 className="text-4xl md:text-5xl font-black text-brand-dark leading-tight">
                         {heading}
                     </h2>
