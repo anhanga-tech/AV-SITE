@@ -144,6 +144,83 @@ export interface CreateN8nSubmitHandlerOptions<TData> {
     onError?: (params: { data: TData; requestId: string; classification: N8nErrorClassification }) => Record<string, unknown> | void;
 }
 
+/** Internal per-request state shared between the handler and its helpers. */
+interface RequestEnv<TData> {
+    options: CreateN8nSubmitHandlerOptions<TData>;
+    requestId: string;
+    corsHeaders: Record<string, string>;
+}
+
+/** Builds the 503/429 denial response (with logging) for an exhausted bucket. */
+function buildRateLimitDenial<TData>(
+    env: RequestEnv<TData>,
+    clientIp: string,
+    rateLimit: Awaited<ReturnType<typeof checkRateLimit>>,
+): Response {
+    const { options, requestId, corsHeaders } = env;
+
+    if (rateLimit.serviceUnavailable) {
+        logger.error(options.logScope, { requestId, stage: 'service_unavailable', clientIp });
+        return buildJsonResponse(
+            { ok: false, requestId, code: 'SERVICE_UNAVAILABLE', error: 'Serviço temporariamente indisponível. Tente novamente em instantes.' },
+            503,
+            corsHeaders,
+        );
+    }
+
+    const retryAfterSeconds = Math.ceil(rateLimit.resetIn / 1000);
+    logger.warn(options.logScope, {
+        requestId,
+        stage: 'rate_limited',
+        clientIp,
+        remaining: rateLimit.remaining,
+        retryAfterSeconds,
+    });
+
+    return buildJsonResponse(
+        {
+            ok: false,
+            requestId,
+            code: 'RATE_LIMIT_EXCEEDED',
+            error: options.rateLimit.exceededError,
+            ...(options.rateLimit.includeRetryAfterInBody ? { retryAfter: retryAfterSeconds } : {}),
+        },
+        429,
+        {
+            ...corsHeaders,
+            'Retry-After': String(retryAfterSeconds),
+            'X-RateLimit-Remaining': String(rateLimit.remaining),
+            'X-RateLimit-Reset': String(Math.ceil((Date.now() + rateLimit.resetIn) / 1000)),
+        },
+    );
+}
+
+/** Classifies a thrown webhook/internal error, logs it, and builds the response. */
+function buildWebhookErrorResponse<TData>(
+    env: RequestEnv<TData>,
+    data: TData,
+    error: unknown,
+): Response {
+    const { options, requestId, corsHeaders } = env;
+    const classification = classifyN8nSubmitError(error, options.error);
+    const errorLogFields = options.onError?.({ data, requestId, classification }) ?? {};
+
+    logger.error(options.logScope, {
+        requestId,
+        stage: classification.code === 'INTERNAL_ERROR' ? 'unexpected' : 'n8n_webhook_failed',
+        code: classification.code,
+        status: classification.status,
+        detail: classification.detail,
+        ...errorLogFields,
+    });
+
+    return buildJsonResponse(
+        { ok: false, requestId, code: classification.code, error: classification.error },
+        classification.status,
+        corsHeaders,
+    );
+}
+
 /**
  * Builds a `submit-*` request handler from per-endpoint configuration. The
  * returned function is the default export each `api/submit-*.ts` exposes.
@@ -156,6 +233,7 @@ export function createN8nSubmitHandler<TData>(
     return async function handler(request: Request): Promise<Response> {
         const requestId = createRequestId();
         const corsHeaders = buildCorsHeaders();
+        const env: RequestEnv<TData> = { options, requestId, corsHeaders };
 
         if (request.method === 'OPTIONS') {
             return new Response(null, { status: 204, headers: corsHeaders });
@@ -188,40 +266,7 @@ export function createN8nSubmitHandler<TData>(
         });
 
         if (!rateLimit.allowed) {
-            if (rateLimit.serviceUnavailable) {
-                logger.error(options.logScope, { requestId, stage: 'service_unavailable', clientIp });
-                return buildJsonResponse(
-                    { ok: false, requestId, code: 'SERVICE_UNAVAILABLE', error: 'Serviço temporariamente indisponível. Tente novamente em instantes.' },
-                    503,
-                    corsHeaders,
-                );
-            }
-
-            const retryAfterSeconds = Math.ceil(rateLimit.resetIn / 1000);
-            logger.warn(options.logScope, {
-                requestId,
-                stage: 'rate_limited',
-                clientIp,
-                remaining: rateLimit.remaining,
-                retryAfterSeconds,
-            });
-
-            return buildJsonResponse(
-                {
-                    ok: false,
-                    requestId,
-                    code: 'RATE_LIMIT_EXCEEDED',
-                    error: options.rateLimit.exceededError,
-                    ...(options.rateLimit.includeRetryAfterInBody ? { retryAfter: retryAfterSeconds } : {}),
-                },
-                429,
-                {
-                    ...corsHeaders,
-                    'Retry-After': String(retryAfterSeconds),
-                    'X-RateLimit-Remaining': String(rateLimit.remaining),
-                    'X-RateLimit-Reset': String(Math.ceil((Date.now() + rateLimit.resetIn) / 1000)),
-                },
-            );
+            return buildRateLimitDenial(env, clientIp, rateLimit);
         }
 
         let rawBody: unknown;
@@ -260,23 +305,7 @@ export function createN8nSubmitHandler<TData>(
             const payload = options.buildPayload(data, requestId, ctx) as never;
             await options.send(webhookUrl, webhookSecret, requestId, payload);
         } catch (error: unknown) {
-            const classification = classifyN8nSubmitError(error, options.error);
-            const errorLogFields = options.onError?.({ data, requestId, classification }) ?? {};
-
-            logger.error(options.logScope, {
-                requestId,
-                stage: classification.code === 'INTERNAL_ERROR' ? 'unexpected' : 'n8n_webhook_failed',
-                code: classification.code,
-                status: classification.status,
-                detail: classification.detail,
-                ...errorLogFields,
-            });
-
-            return buildJsonResponse(
-                { ok: false, requestId, code: classification.code, error: classification.error },
-                classification.status,
-                corsHeaders,
-            );
+            return buildWebhookErrorResponse(env, data, error);
         }
 
         logger.info(options.logScope, { requestId, stage: 'done' });
