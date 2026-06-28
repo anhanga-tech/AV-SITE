@@ -97,7 +97,7 @@ export type ValidationResult<TData> =
     | { ok: true; data: TData }
     | { ok: false; error: string };
 
-export interface CreateN8nSubmitHandlerOptions<TData> {
+export interface CreateN8nSubmitHandlerOptions<TData, TPayload = unknown> {
     /** Logger scope, e.g. 'SUBMIT_LEAD'. */
     logScope: string;
     /** Env var holding the destination webhook URL. */
@@ -128,9 +128,9 @@ export interface CreateN8nSubmitHandlerOptions<TData> {
     /** Validates and normalizes the raw body into the typed payload data. */
     validate: (rawBody: unknown) => ValidationResult<TData>;
     /** Builds the outbound n8n payload from validated data. */
-    buildPayload: (data: TData, requestId: string, ctx: N8nSubmitRequestContext) => unknown;
+    buildPayload: (data: TData, requestId: string, ctx: N8nSubmitRequestContext) => TPayload;
     /** Sends the payload to n8n (a `services/n8n.ts` function). */
-    send: (url: string, secret: string, requestId: string, payload: never) => Promise<unknown>;
+    send: (url: string, secret: string, requestId: string, payload: TPayload) => Promise<unknown>;
     success: {
         status: number;
         /** Optional success message; omitted from the body when absent. */
@@ -145,15 +145,15 @@ export interface CreateN8nSubmitHandlerOptions<TData> {
 }
 
 /** Internal per-request state shared between the handler and its helpers. */
-interface RequestEnv<TData> {
-    options: CreateN8nSubmitHandlerOptions<TData>;
+interface RequestEnv<TData, TPayload> {
+    options: CreateN8nSubmitHandlerOptions<TData, TPayload>;
     requestId: string;
     corsHeaders: Record<string, string>;
 }
 
 /** Builds the 503/429 denial response (with logging) for an exhausted bucket. */
-function buildRateLimitDenial<TData>(
-    env: RequestEnv<TData>,
+function buildRateLimitDenial<TData, TPayload>(
+    env: RequestEnv<TData, TPayload>,
     clientIp: string,
     rateLimit: Awaited<ReturnType<typeof checkRateLimit>>,
 ): Response {
@@ -196,8 +196,8 @@ function buildRateLimitDenial<TData>(
 }
 
 /** Classifies a thrown webhook/internal error, logs it, and builds the response. */
-function buildWebhookErrorResponse<TData>(
-    env: RequestEnv<TData>,
+function buildWebhookErrorResponse<TData, TPayload>(
+    env: RequestEnv<TData, TPayload>,
     data: TData,
     error: unknown,
 ): Response {
@@ -225,15 +225,15 @@ function buildWebhookErrorResponse<TData>(
  * Builds a `submit-*` request handler from per-endpoint configuration. The
  * returned function is the default export each `api/submit-*.ts` exposes.
  */
-export function createN8nSubmitHandler<TData>(
-    options: CreateN8nSubmitHandlerOptions<TData>,
+export function createN8nSubmitHandler<TData, TPayload = unknown>(
+    options: CreateN8nSubmitHandlerOptions<TData, TPayload>,
 ): (request: Request) => Promise<Response> {
     const secretEnvVar = options.webhookSecretEnvVar ?? DEFAULT_WEBHOOK_SECRET_ENV_VAR;
 
     return async function handler(request: Request): Promise<Response> {
         const requestId = createRequestId();
         const corsHeaders = buildCorsHeaders();
-        const env: RequestEnv<TData> = { options, requestId, corsHeaders };
+        const env: RequestEnv<TData, TPayload> = { options, requestId, corsHeaders };
 
         if (request.method === 'OPTIONS') {
             return new Response(null, { status: 204, headers: corsHeaders });
@@ -302,7 +302,7 @@ export function createN8nSubmitHandler<TData>(
         };
 
         try {
-            const payload = options.buildPayload(data, requestId, ctx) as never;
+            const payload = options.buildPayload(data, requestId, ctx);
             await options.send(webhookUrl, webhookSecret, requestId, payload);
         } catch (error: unknown) {
             return buildWebhookErrorResponse(env, data, error);
