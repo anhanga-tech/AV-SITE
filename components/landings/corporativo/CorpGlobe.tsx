@@ -91,7 +91,7 @@ export function CorpGlobe() {
                 controls.autoRotate = !e.matches;
                 globe.arcDashAnimateTime(e.matches ? 0 : 3500);
             };
-            motionQuery?.addEventListener('change', onMotionChange);
+            motionQuery?.addEventListener?.('change', onMotionChange);
 
             const resizeObserver = new ResizeObserver(() => {
                 if (el) {
@@ -103,7 +103,7 @@ export function CorpGlobe() {
 
             cleanup = () => {
                 try {
-                    motionQuery?.removeEventListener('change', onMotionChange);
+                    motionQuery?.removeEventListener?.('change', onMotionChange);
                     resizeObserver.disconnect();
                     const r = globe.renderer();
                     if (r) {

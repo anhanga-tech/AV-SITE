@@ -43,7 +43,7 @@ const CorporativoLanding: React.FC = () => {
               entrances animate normally.
             */}
             <noscript>
-                <style>{`[data-corp-landing] [style*="opacity"]{opacity:1!important;transform:none!important}`}</style>
+                <style>{`[data-corp-landing] [style*="opacity"]{opacity:1!important}`}</style>
             </noscript>
             <MotionConfig reducedMotion="user">
             <div data-corp-landing className="bg-brand-surface min-h-screen font-sans">

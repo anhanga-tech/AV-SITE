@@ -208,9 +208,22 @@ test.describe('Corporativo Landing Page', () => {
     const pillarsHeading = page.getByRole('heading', { name: /escolhem a Anhangá/i });
     await pillarsHeading.scrollIntoViewIfNeeded();
     await expect(pillarsHeading).toBeVisible();
+    // opacity isn't inherited, so walk every ancestor and take the minimum —
+    // a framer-hidden wrapper higher up would otherwise pass a single-level check.
     await expect
       .poll(() =>
-        pillarsHeading.evaluate(el => Number(getComputedStyle(el.closest('div') || el).opacity))
+        pillarsHeading.evaluate(el => {
+          let current: HTMLElement | null = el as HTMLElement;
+          let minOpacity = 1;
+          while (current) {
+            const opacity = parseFloat(getComputedStyle(current).opacity);
+            if (!Number.isNaN(opacity)) {
+              minOpacity = Math.min(minOpacity, opacity);
+            }
+            current = current.parentElement;
+          }
+          return minOpacity;
+        })
       )
       .toBeGreaterThan(0.95);
 
