@@ -1,3 +1,4 @@
+import { cleanString } from './lead-logic';
 import type { SubmitLeadRequest } from '../types/leadCapture';
 import type { SubmitContactRequest } from '../types/contactCapture';
 import type { SubmitWaitlistRequest } from '../types/waitlist';
@@ -272,4 +273,24 @@ export interface N8nNpsPayload {
     reason: string;
     highlight: string;
     submittedAt: string;
+}
+
+export interface N8nNpsInput {
+    firstname: string;
+    email: string;
+    score: number;
+    reason: string;
+    highlight: string;
+}
+
+export function buildN8nNpsPayload(input: N8nNpsInput, requestId: string): N8nNpsPayload {
+    return {
+        requestId,
+        firstname: cleanString(input.firstname),
+        email: cleanString(input.email),
+        score: input.score,
+        reason: cleanString(input.reason),
+        highlight: cleanString(input.highlight),
+        submittedAt: new Date().toISOString(),
+    };
 }
