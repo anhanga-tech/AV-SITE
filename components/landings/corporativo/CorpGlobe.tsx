@@ -141,7 +141,7 @@ export function CorpGlobe() {
         <div
             ref={containerRef}
             className="w-full h-full"
-            style={{ filter: 'brightness(2) contrast(1.05) saturate(1.35)' }}
+            style={{ filter: 'brightness(1.45) contrast(1.08) saturate(1.5)' }}
         />
     );
 }
