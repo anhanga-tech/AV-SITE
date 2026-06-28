@@ -43,7 +43,10 @@ const ROUTES_WITHOUT_AICHAT = ['/links'];
 
 const ClientFeatures: React.FC = () => {
   const { pathname } = useLocation();
-  const showAIChat = !ROUTES_WITHOUT_AICHAT.includes(pathname);
+  // Normaliza trailing slash (ex.: /links/ vindo da bio) antes de comparar — o React Router
+  // casa a rota com ou sem a barra, mas location.pathname preserva a barra.
+  const normalizedPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
+  const showAIChat = !ROUTES_WITHOUT_AICHAT.includes(normalizedPath);
   return (
     <ClientOnly>
       {showAIChat ? <AIChat /> : null}

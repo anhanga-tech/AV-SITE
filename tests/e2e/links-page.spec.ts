@@ -52,6 +52,11 @@ test('não renderiza o assistente virtual (AIChat) na página standalone', async
     // /links é página de bio standalone — o FAB do AIChat não deve aparecer (cobriria os selos
     // e competiria com os destinos curados). Ver ROUTES_WITHOUT_AICHAT em App.tsx.
     await expect(page.getByRole('button', { name: 'Abrir assistente virtual' })).toHaveCount(0);
+
+    // Também não deve renderizar com barra no final (trailing slash, comum em links de bio).
+    await page.goto('/links/');
+    await expect(page.getByTestId('link-whatsapp')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Abrir assistente virtual' })).toHaveCount(0);
 });
 
 test('botão WhatsApp aponta para wa.me com texto', async ({ page }) => {
