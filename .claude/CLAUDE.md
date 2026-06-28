@@ -177,8 +177,8 @@ Tailwind CSS (`tailwind.config.mjs`). Brand palette: `action` (#0056D2), `action
 
 Source of truth for design decisions, maintained by the `/impeccable` skill. Read before any UI/UX work:
 
-- **[`PRODUCT.md`](../PRODUCT.md)** (strategic — who/what/why): register (`brand`), users, brand personality, anti-references, design principles, accessibility. **Wins on voice/strategy decisions.**
-- **[`DESIGN.md`](../DESIGN.md)** + **[`.impeccable/design.json`](../.impeccable/design.json)** (visual — how it looks): the "O Diário de Bordo" system — tokens, colors, typography, elevation, components, do's & don'ts. **Wins on visual decisions.**
+- **[PRODUCT.md](../PRODUCT.md)** (strategic — who/what/why): register (`brand`), users, brand personality, anti-references, design principles, accessibility. **Wins on voice/strategy decisions.**
+- **[DESIGN.md](../DESIGN.md)** + **[.impeccable/design.json](../.impeccable/design.json)** (visual — how it looks): the "O Diário de Bordo" system — tokens, colors, typography, elevation, components, do's & don'ts. **Wins on visual decisions.**
 
 Five strategic principles (from PRODUCT.md): conversa não transação · curadoria sobre catálogo · peso físico só onde se age · lugares reais não categorias · mobile-first e íntimo por padrão. The `anhanga-*` Tailwind tokens above are the implementation of DESIGN.md's palette.
 
