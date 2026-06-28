@@ -18,3 +18,8 @@ export const BETO_CARRERO_LANDING_IMAGE_URL =
 
 export const BETO_CARRERO_FIREWHIP_IMAGE_URL =
   'https://media.anhanga.tur.br/images/beto-carrero/landing/firewhip.webp';
+
+// Textura do globo do hero corporativo (CorpGlobe). Hospedada no R2 próprio
+// em vez do CDN público do three-globe (unpkg) para resiliência do hero.
+export const GLOBE_EARTH_NIGHT_TEXTURE_URL =
+  'https://media.anhanga.tur.br/textures/earth-night.jpg';

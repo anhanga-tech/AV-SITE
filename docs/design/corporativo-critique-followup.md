@@ -13,15 +13,15 @@ Handoff para continuar a melhoria da landing `/corporativo` em outra sessão.
 - **Colorize**: rampa oceânica navy→sky→ciano nos pilares e no processo. 3º card/passo (`amber` → `cyan`) e fita washi (`emerald` → `cyan`); âmbar agora exclusivo dos CTAs (Regra do Âmbar). Dot-grids tintados para sapphire (sai o `#94a3b8` indocumentado) e corpo `text-sm` `zinc-500` → `zinc-600` (contraste ~7.5:1 sobre o creme). `text-emerald-500` mantido só no ícone de sucesso do form (verde = semântica de sucesso).
 - **Distill**: removidos os eyebrows de seção de pilares (`O Jeito Anhangá`) e banda (`Bate-papo rápido`) — ambas entram pelo H2. Resta só o eyebrow do hero (`Viagens para Empresas`), que identifica a página. Eyebrow virou prop opcional em `LandingPillars` (`eyebrow`, default preserva consumidores) e `subtitle` opcional em `LandingWhatsAppBand`. O header `✈ Contato / Corporativo` do form foi mantido (device de bilhete de embarque, não eyebrow).
 - **Polish**: foco visível de 2 sinais (`focus-visible:outline-2 outline-offset-2 outline-anhanga-action`, padrão do `components/ui/Button.tsx`) em todos os interativos que não tinham — nav (logo + botão), CTAs do hero, banda (`outline-white` sobre o navy), submit do form, links de contato/sociais, link do success e nav inferior "Conheça também". Antes só os campos do form tinham foco; os CTAs (caminho de conversão) dependiam do outline default do browser, violando o piso WCAG AA do PRODUCT.md.
+- **Globo no R2**: textura `earth-night.jpg` (4096×2048, 715KB) subida para `av-site-media/textures/earth-night.jpg`, servida em `https://media.anhanga.tur.br/textures/earth-night.jpg`. `CorpGlobe.tsx` agora usa `GLOBE_EARTH_NIGHT_TEXTURE_URL` (`lib/media-assets.ts`) — zero requests ao `unpkg`. Verificado: globo renderiza idêntico, sem erros.
 
-## Pendências (em ordem de impacto)
+## Pendências
 
-### 1. Globo via CDN de terceiros — `/impeccable polish` · P3
-- `CorpGlobe.tsx` carrega `earth-night.jpg` de `//unpkg.com` (dependência externa no caminho do hero) — hospedar no R2 próprio. Tarefa de infra (upload no R2), fora do alcance de uma mudança só de código.
+Nenhuma específica da landing. Nota atual **34/40** (sem P0/P1), detector limpo. Resta só chrome global (fora do escopo da landing):
 
 ## Observações menores (do critique)
 
-- Dois widgets fixos globais (launcher "Roteiro IA" + back-to-top) competem com os CTAs e usam z-index arbitrário.
-- Globo sem loading state.
+- Dois widgets fixos globais (launcher "Roteiro IA" + back-to-top) competem com os CTAs e usam z-index arbitrário — concern global, não da landing.
+- Globo sem loading state (Suspense fallback null) — decorativo/`aria-hidden`, impacto baixo.
 
 Após as pendências, re-rodar `/impeccable critique corporativo` para confirmar a nota subindo.
