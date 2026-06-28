@@ -29,9 +29,9 @@ export const PILLARS: PillarItem[] = [
         icon: ClipboardText,
         title: 'Sem burocracia',
         description: 'Faturamento direto no CNPJ e condições pra grupo. Você cuida da empresa, a gente cuida da viagem.',
-        bg: 'bg-amber-100',
-        accent: 'border-amber-200',
-        iconColor: 'text-amber-700',
+        bg: 'bg-cyan-100',
+        accent: 'border-cyan-200',
+        iconColor: 'text-cyan-700',
         rotateDeg: -2,
     },
 ];

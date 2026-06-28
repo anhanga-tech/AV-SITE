@@ -18,7 +18,7 @@ interface LandingPillarsProps {
     pillars: PillarItem[];
 }
 
-const TAPE_COLORS = ['bg-brand-yellow/80', 'bg-sky-100/90', 'bg-emerald-100/90'];
+const TAPE_COLORS = ['bg-brand-yellow/80', 'bg-sky-100/90', 'bg-cyan-100/90'];
 
 export function LandingPillars({ heading, pillars }: LandingPillarsProps) {
     return (
@@ -26,7 +26,7 @@ export function LandingPillars({ heading, pillars }: LandingPillarsProps) {
 
             <div
                 className="absolute inset-0 z-0 opacity-[0.25]"
-                style={{ backgroundImage: 'radial-gradient(#94a3b8 1.5px, transparent 1.5px)', backgroundSize: '28px 28px' }}
+                style={{ backgroundImage: 'radial-gradient(#9fb8d4 1.5px, transparent 1.5px)', backgroundSize: '28px 28px' }}
             />
 
             <div className="container mx-auto px-6 relative z-10">
@@ -92,7 +92,7 @@ export function LandingPillars({ heading, pillars }: LandingPillarsProps) {
                                 <h3 className="text-xl font-extrabold text-zinc-900 mb-3 leading-tight group-hover:text-brand-cyan transition-colors duration-300 pr-10">
                                     {item.title}
                                 </h3>
-                                <p className="text-zinc-500 font-medium leading-relaxed text-sm">
+                                <p className="text-zinc-600 font-medium leading-relaxed text-sm">
                                     {item.description}
                                 </p>
                             </m.div>

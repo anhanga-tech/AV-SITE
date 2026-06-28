@@ -28,10 +28,10 @@ const STEPS = [
         Icon: AirplaneTilt,
         title: 'Você só embarca',
         description: 'Toda a burocracia fica com a gente. Faturamento no CNPJ, condições para grupo e atendimento durante a viagem. Você cuida da empresa, a gente cuida de tudo mais.',
-        iconBg: 'bg-amber-100',
-        iconColor: 'text-amber-700',
-        numberColor: 'text-amber-200',
-        border: 'border-amber-200',
+        iconBg: 'bg-cyan-100',
+        iconColor: 'text-cyan-700',
+        numberColor: 'text-cyan-200',
+        border: 'border-cyan-200',
     },
 ] as const;
 
@@ -40,7 +40,7 @@ export function CorpProcess() {
         <section className="py-24 bg-white relative overflow-hidden">
             <div
                 className="absolute inset-0 opacity-[0.35]"
-                style={{ backgroundImage: 'radial-gradient(#e2e8f0 1px, transparent 1px)', backgroundSize: '20px 20px' }}
+                style={{ backgroundImage: 'radial-gradient(#dbe6f4 1px, transparent 1px)', backgroundSize: '20px 20px' }}
             />
 
             <div className="container mx-auto px-6 relative z-10">
@@ -92,7 +92,7 @@ export function CorpProcess() {
                                 <h3 className="text-lg font-extrabold text-zinc-900 leading-snug mb-3">
                                     {step.title}
                                 </h3>
-                                <p className="text-zinc-500 font-medium leading-relaxed text-sm max-w-xs">
+                                <p className="text-zinc-600 font-medium leading-relaxed text-sm max-w-xs">
                                     {step.description}
                                 </p>
 
