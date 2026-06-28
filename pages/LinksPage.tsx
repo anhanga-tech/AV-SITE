@@ -24,7 +24,7 @@ const LinksPage: React.FC = () => {
                 robots="noindex, follow"
                 noHreflang
             />
-            <main className="min-h-screen bg-gradient-to-b from-anhanga-darkBlue to-anhanga-action px-5 py-10 font-sans">
+            <main className="min-h-screen bg-gradient-to-b from-anhanga-darkBlue via-anhanga-action to-anhanga-darkBlue px-5 py-10 font-sans">
                 <div className="mx-auto flex w-full max-w-md flex-col items-center">
                     <img
                         src={BRAND_LOGO_WHITE_URL}
