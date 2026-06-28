@@ -38,18 +38,19 @@ const LinksPage = lazy(() => import('./pages/LinksPage'));
 const MainRouteFallback: React.FC = () => <section className="min-h-[40vh] bg-white" aria-hidden="true" />;
 const LandingRouteFallback: React.FC = () => <div className="min-h-screen bg-white" aria-hidden="true" />;
 
-// Rotas standalone que não devem carregar o assistente virtual (página de bio, etc.)
-const ROUTES_WITHOUT_AICHAT = ['/links'];
+// Rotas standalone (página de bio, etc.): sem nenhum overlay flutuante — nem AIChat, nem
+// ContactModal, nem BackToTop. Esses FABs cobririam o conteúdo curado e os selos de confiança.
+const STANDALONE_ROUTES = ['/links'];
 
 const ClientFeatures: React.FC = () => {
   const { pathname } = useLocation();
   // Normaliza trailing slash (ex.: /links/ vindo da bio) antes de comparar — o React Router
   // casa a rota com ou sem a barra, mas location.pathname preserva a barra.
   const normalizedPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
-  const showAIChat = !ROUTES_WITHOUT_AICHAT.includes(normalizedPath);
+  if (STANDALONE_ROUTES.includes(normalizedPath)) return null;
   return (
     <ClientOnly>
-      {showAIChat ? <AIChat /> : null}
+      <AIChat />
       <ContactModal />
       <BackToTop />
     </ClientOnly>
