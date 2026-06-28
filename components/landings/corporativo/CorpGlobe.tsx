@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { prefersReducedMotion } from '../shared/motion';
 
 const SP = { lat: -23.5505, lng: -46.6333 };
 
@@ -39,6 +40,8 @@ export function CorpGlobe() {
         const el = containerRef.current;
         if (!el) return;
 
+        const reduced = prefersReducedMotion();
+
         import('globe.gl').then(({ default: Globe }) => {
             if (cancelled || !el) return;
 
@@ -54,7 +57,7 @@ export function CorpGlobe() {
                 .arcColor(() => ['rgba(255,214,0,0.85)', 'rgba(56,189,248,0.95)'])
                 .arcDashLength(0.5)
                 .arcDashGap(0.5)
-                .arcDashAnimateTime(3500)
+                .arcDashAnimateTime(reduced ? 0 : 3500)
                 .arcStroke(0.35)
                 .arcAltitude(0.18)
                 // Destination dots
@@ -71,9 +74,9 @@ export function CorpGlobe() {
                 renderer.setSize(el.clientWidth, el.clientHeight);
             }
 
-            // Camera controls
+            // Camera controls — auto-rotation is motion; respect reduced-motion
             const controls = globe.controls();
-            controls.autoRotate = true;
+            controls.autoRotate = !reduced;
             controls.autoRotateSpeed = 0.1;
             controls.enableZoom = false;
             controls.enablePan = false;
@@ -81,6 +84,14 @@ export function CorpGlobe() {
             controls.dampingFactor = 0.08;
 
             globe.pointOfView({ lat: -18, lng: -48, altitude: 1.55 }, 0);
+
+            // React to live changes of the reduced-motion preference
+            const motionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+            const onMotionChange = (e: MediaQueryListEvent) => {
+                controls.autoRotate = !e.matches;
+                globe.arcDashAnimateTime(e.matches ? 0 : 3500);
+            };
+            motionQuery?.addEventListener('change', onMotionChange);
 
             const resizeObserver = new ResizeObserver(() => {
                 if (el) {
@@ -92,6 +103,7 @@ export function CorpGlobe() {
 
             cleanup = () => {
                 try {
+                    motionQuery?.removeEventListener('change', onMotionChange);
                     resizeObserver.disconnect();
                     const r = globe.renderer();
                     if (r) {

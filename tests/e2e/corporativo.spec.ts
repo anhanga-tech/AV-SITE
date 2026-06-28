@@ -194,6 +194,31 @@ test.describe('Corporativo Landing Page', () => {
     await expect(page.getByTestId('corp-globe-fallback')).toBeVisible();
   });
 
+  test('should keep section content visible under reduced motion', async ({ page }) => {
+    // PRODUCT.md: "Reduced motion não é opcional." Reveal-on-scroll must not
+    // gate visibility — with motion reduced, sections should read immediately.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+
+    const landing = new CorporativoPage(page);
+    await landing.goto();
+
+    const heroHeading = page.getByRole('heading', { level: 1 });
+    await expect(heroHeading).toBeVisible();
+
+    const pillarsHeading = page.getByRole('heading', { name: /escolhem a Anhangá/i });
+    await pillarsHeading.scrollIntoViewIfNeeded();
+    await expect(pillarsHeading).toBeVisible();
+    await expect
+      .poll(() =>
+        pillarsHeading.evaluate(el => Number(getComputedStyle(el.closest('div') || el).opacity))
+      )
+      .toBeGreaterThan(0.95);
+
+    const processHeading = page.getByRole('heading', { name: /3 passos/i });
+    await processHeading.scrollIntoViewIfNeeded();
+    await expect(processHeading).toBeVisible();
+  });
+
   test('should handle navigation to #contato anchor', async ({ page, isMobile }) => {
     const landing = new CorporativoPage(page);
     await landing.goto();

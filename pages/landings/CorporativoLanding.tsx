@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { MotionConfig } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Seo } from '@/components/Seo';
 import { BreadcrumbSchema } from '@/components/schemas/BreadcrumbSchema';
@@ -34,7 +35,18 @@ const CorporativoLanding: React.FC = () => {
                     { name: 'Corporativo', item: 'https://www.anhanga.tur.br/corporativo/' },
                 ]}
             />
-            <div className="bg-brand-surface min-h-screen font-sans">
+            {/*
+              No-JS / pre-hydration fallback: framer-motion serializes `initial`
+              styles (opacity:0) into the prerendered HTML. Without JS the reveal
+              never fires, so the sections would ship blank. This forces them
+              visible when scripts are disabled; with JS it's inert and the
+              entrances animate normally.
+            */}
+            <noscript>
+                <style>{`[data-corp-landing] [style*="opacity"]{opacity:1!important;transform:none!important}`}</style>
+            </noscript>
+            <MotionConfig reducedMotion="user">
+            <div data-corp-landing className="bg-brand-surface min-h-screen font-sans">
                 <CorpNav />
                 <CorpHero />
                 <CorpPillars />
@@ -59,6 +71,7 @@ const CorporativoLanding: React.FC = () => {
                 </nav>
                 <CorpFooter />
             </div>
+            </MotionConfig>
         </>
     );
 };
