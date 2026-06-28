@@ -9,12 +9,14 @@ test.beforeEach(async ({ page }) => {
     });
 });
 
-test('renderiza a página /links com banner, botões e selos', async ({ page }) => {
+test('renderiza a página /links com logo, botões e selos', async ({ page }) => {
     await page.goto('/links');
     await expect(page.getByRole('img', { name: 'Anhangá Viagens' })).toBeVisible();
-    await expect(page.getByTestId('links-banner')).toBeVisible();
     await expect(page.getByTestId('link-whatsapp')).toBeVisible();
     await expect(page.getByText('Membro ABAV')).toBeVisible();
+    // Banner do quiz está desligado (banner.visible=false): o quiz vive como link na lista,
+    // e o WhatsApp é o único amarelo na 1ª dobra. Ver data/linksPage.ts.
+    await expect(page.getByTestId('links-banner')).toHaveCount(0);
 });
 
 test('links_page_view é empurrado no dataLayer no load', async ({ page }) => {
@@ -46,17 +48,26 @@ test('clique dispara links_page_click com o label correto', async ({ page }) => 
     expect(clicks.some((c) => c.label === 'orlando')).toBe(true);
 });
 
-test('não renderiza o assistente virtual (AIChat) na página standalone', async ({ page }) => {
+test('não renderiza overlays flutuantes (AIChat / BackToTop) na página standalone', async ({ page }) => {
     await page.goto('/links');
     await expect(page.getByTestId('link-whatsapp')).toBeVisible();
-    // /links é página de bio standalone — o FAB do AIChat não deve aparecer (cobriria os selos
-    // e competiria com os destinos curados). Ver ROUTES_WITHOUT_AICHAT em App.tsx.
+    // /links é página de bio standalone — nenhum FAB deve aparecer (cobririam os selos de
+    // confiança e os destinos curados). Ver STANDALONE_ROUTES em App.tsx.
     await expect(page.getByRole('button', { name: 'Abrir assistente virtual' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Voltar ao topo' })).toHaveCount(0);
 
     // Também não deve renderizar com barra no final (trailing slash, comum em links de bio).
     await page.goto('/links/');
     await expect(page.getByTestId('link-whatsapp')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Abrir assistente virtual' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Voltar ao topo' })).toHaveCount(0);
+
+    // Nem em caixa alta: o React Router casa a rota case-insensitive, então STANDALONE_ROUTES
+    // normaliza para minúsculas — /LINKS também não deve carregar overlays.
+    await page.goto('/LINKS');
+    await expect(page.getByTestId('link-whatsapp')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Abrir assistente virtual' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Voltar ao topo' })).toHaveCount(0);
 });
 
 test('botão WhatsApp aponta para wa.me com texto', async ({ page }) => {

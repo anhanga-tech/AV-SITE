@@ -35,7 +35,10 @@ export interface LinksPageConfig {
 // ⚙️ EDITÁVEL: troque banner e links aqui sem mexer em componente.
 export const linksPageConfig: LinksPageConfig = {
     banner: {
-        visible: true,
+        // Desligado: o quiz já aparece como link "Planejar minha viagem" abaixo, então o banner
+        // duplicava o destino /quiz e somava um segundo amarelo na 1ª dobra (a "Regra do Âmbar"
+        // reserva o amarelo a 1 ação — o WhatsApp). Reative trocando para `true` se necessário.
+        visible: false,
         title: 'Descubra sua próxima viagem',
         subtitle: 'Responda 6 perguntas rápidas e receba ideias de roteiro personalizadas.',
         ctaLabel: 'Fazer o quiz',

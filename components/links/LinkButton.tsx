@@ -15,6 +15,14 @@ const ICON_MAP: Record<string, Icon> = {
 
 interface LinkButtonProps {
     item: LinkItem;
+    /** classes extra (ex.: margem de ritmo na fronteira entre tiers) */
+    className?: string;
+}
+
+// Tier de peso: ações (WhatsApp/quiz/utilidades — com ícone ou sublabel) ganham peso físico cheio;
+// destinos "secos" ficam mais leves. Exportado para o LinksPage marcar a quebra de ritmo entre tiers.
+export function isPrimaryLink(item: LinkItem): boolean {
+    return Boolean(item.highlight) || Boolean(item.icon) || Boolean(item.sublabel);
 }
 
 // Slot de ícone com largura fixa garante que todos os rótulos alinhem na mesma coluna,
@@ -31,18 +39,17 @@ const pressSecondary =
 // Dois níveis de peso quebram a monotonia da pilha: ações (WhatsApp/quiz/utilidades) com
 // peso físico cheio; destinos "secos" ficam mais leves e compactos, como uma lista de apoio.
 function tierClasses(item: LinkItem): string {
-    const isPrimary = item.highlight || Boolean(item.icon) || Boolean(item.sublabel);
     if (item.highlight) {
         return `min-h-[4.5rem] py-4 text-base bg-anhanga-yellow text-anhanga-darkBlue ${pressPrimary}`;
     }
-    if (isPrimary) {
+    if (isPrimaryLink(item)) {
         return `min-h-[4.5rem] py-4 text-base bg-white text-anhanga-darkBlue ${pressPrimary}`;
     }
     return `min-h-[3.25rem] py-3 text-[0.95rem] bg-white/90 text-anhanga-darkBlue ${pressSecondary}`;
 }
 
-export const LinkButton: React.FC<LinkButtonProps> = ({ item }) => {
-    const className = `${baseClasses} ${tierClasses(item)}`;
+export const LinkButton: React.FC<LinkButtonProps> = ({ item, className: extraClassName }) => {
+    const className = `${baseClasses} ${tierClasses(item)}${extraClassName ? ` ${extraClassName}` : ''}`;
     const IconComponent = item.icon ? ICON_MAP[item.icon] : undefined;
 
     const content = (

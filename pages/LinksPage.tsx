@@ -4,7 +4,7 @@ import { Seo } from '../components/Seo';
 import { BRAND_LOGO_WHITE_URL } from '../lib/media-assets';
 import { linksPageConfig } from '../data/linksPage';
 import { withTrackingParams, pushLinksPageView } from '../utils/linksTracking';
-import LinkButton from '../components/links/LinkButton';
+import LinkButton, { isPrimaryLink } from '../components/links/LinkButton';
 import TrustSeals from '../components/links/TrustSeals';
 
 const LinksPage: React.FC = () => {
@@ -48,10 +48,16 @@ const LinksPage: React.FC = () => {
                         </Link>
                     ) : null}
 
-                    <nav aria-label="Links Anhangá Viagens" className="mt-6 flex w-full flex-col gap-3">
-                        {visibleLinks.map((link) => (
-                            <LinkButton key={link.id} item={link} />
-                        ))}
+                    <nav aria-label="Links Anhangá Viagens" className="mt-8 flex w-full flex-col gap-3">
+                        {visibleLinks.map((link, index) => {
+                            // Quebra de ritmo na fronteira ações → destinos: um respiro a mais
+                            // marca a mudança de tier sem precisar de divisor ou rótulo.
+                            const previous = index > 0 ? visibleLinks[index - 1] : undefined;
+                            const startsDestinations = Boolean(previous && isPrimaryLink(previous) && !isPrimaryLink(link));
+                            return (
+                                <LinkButton key={link.id} item={link} className={startsDestinations ? 'mt-3' : undefined} />
+                            );
+                        })}
                     </nav>
 
                     <TrustSeals />
