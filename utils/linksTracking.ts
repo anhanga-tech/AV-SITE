@@ -32,13 +32,17 @@ export function withTrackingParams(path: string, search?: string): string {
 
 /** PageView que alimenta o público de retargeting via GTM. */
 export function pushLinksPageView(): void {
-    if (typeof window === 'undefined' || !window.dataLayer) return;
+    if (typeof window === 'undefined') return;
+    // Inicializa a fila se o GTM ainda não carregou (espelha o bootstrap do index.html),
+    // garantindo que o evento seja enfileirado e processado quando o GTM inicializar.
+    window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({ event: 'links_page_view' });
 }
 
 /** Evento GA4 por clique de botão. */
 export function pushLinksPageClick(item: LinkItem, destination: string): void {
-    if (typeof window === 'undefined' || !window.dataLayer) return;
+    if (typeof window === 'undefined') return;
+    window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
         event: 'links_page_click',
         label: item.id,
