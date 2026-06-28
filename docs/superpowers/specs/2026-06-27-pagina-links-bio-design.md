@@ -163,10 +163,10 @@ Helper de tracking (novo, pequeno): `utils/linksTracking.ts` (ou inline em `Link
 
 - Mobile-first (100% do tráfego vem do app do Instagram).
 - Poppins (já é a `font-sans` no `tailwind.config.mjs`).
-- Fundo no gradiente da marca usando tokens `anhanga-*` reais: `anhanga-blue` (`#0056D2`) → `anhanga-action` (`#0ea5e9`). Logo branca (`BRAND_LOGO_WHITE_URL` de `lib/media-assets.ts`) no topo.
+- Fundo no gradiente da marca usando tokens `anhanga-*` reais: `anhanga-darkBlue` (`#003B8E`) → `anhanga-action` (`#0ea5e9`), batendo exatamente com as cores pedidas na issue. Logo branca (`BRAND_LOGO_WHITE_URL` de `lib/media-assets.ts`) no topo.
 - Botão WhatsApp em amarelo `#FFD600` (token `anhanga-yellow`; CTA mais quente); demais em branco/translúcido.
 - Botões grandes, full-width, com hierarquia clara por intenção.
-- Usar namespace de cor canônico `anhanga-*` (tokens em `lib/design-tokens.ts`); `brand-*` é legado e congelado por teste. Nota: `#003B8E` é o legado `brand-actionDark` e **não** tem equivalente `anhanga-*` — não usar.
+- Usar namespace de cor canônico `anhanga-*` (tokens em `tailwind.config.mjs`); `brand-*` é legado e congelado por teste.
 
 ## Testes
 

@@ -31,7 +31,7 @@
 - `Seo` expõe `robots?: string` e `noHreflang?: boolean` (`components/Seo.tsx`). Landing single-locale usa `noHreflang`.
 - WhatsApp: `getWhatsAppLink(message, { appendTrackingRef: true })` (`utils/whatsapp.ts`).
 - `window.dataLayer?: Array<Record<string, unknown>>` já tipado em `types/analytics.d.ts`.
-- Tokens: `anhanga-blue` (#0056D2), `anhanga-action` (#0ea5e9), `anhanga-yellow` (#FFD600).
+- Tokens (em `tailwind.config.mjs`): `anhanga-darkBlue` (#003B8E), `anhanga-blue` (#0056D2), `anhanga-action` (#0ea5e9), `anhanga-yellow` (#FFD600). O gradiente de fundo usa `anhanga-darkBlue` → `anhanga-action`, batendo com a identidade pedida na issue (#003B8E/#0ea5e9).
 - Teste: `node:test` + `node:assert/strict`, rodado com `tsx --test` (ver `tests/submit-lead.test.ts`).
 
 ---
@@ -339,12 +339,12 @@ interface LinkButtonProps {
 }
 
 const baseClasses =
-    'flex w-full items-center justify-center gap-3 rounded-2xl px-6 py-4 text-base font-semibold shadow-sm transition-transform duration-150 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-anhanga-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-anhanga-blue';
+    'flex w-full items-center justify-center gap-3 rounded-2xl px-6 py-4 text-base font-semibold shadow-sm transition-transform duration-150 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-anhanga-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-anhanga-darkBlue';
 
 function variantClasses(highlight?: boolean): string {
     return highlight
-        ? 'bg-anhanga-yellow text-anhanga-blue hover:brightness-95'
-        : 'bg-white/95 text-anhanga-blue hover:bg-white';
+        ? 'bg-anhanga-yellow text-anhanga-darkBlue hover:brightness-95'
+        : 'bg-white/95 text-anhanga-darkBlue hover:bg-white';
 }
 
 export const LinkButton: React.FC<LinkButtonProps> = ({ item }) => {
@@ -502,7 +502,7 @@ const LinksPage: React.FC = () => {
                 robots="noindex, follow"
                 noHreflang
             />
-            <main className="min-h-screen bg-gradient-to-b from-anhanga-blue to-anhanga-action px-5 py-10 font-sans">
+            <main className="min-h-screen bg-gradient-to-b from-anhanga-darkBlue to-anhanga-action px-5 py-10 font-sans">
                 <div className="mx-auto flex w-full max-w-md flex-col items-center">
                     <img
                         src={BRAND_LOGO_WHITE_URL}
@@ -520,7 +520,7 @@ const LinksPage: React.FC = () => {
                         >
                             <p className="text-lg font-bold text-white">{banner.title}</p>
                             {banner.subtitle ? <p className="mt-1 text-sm text-white/80">{banner.subtitle}</p> : null}
-                            <span className="mt-3 inline-block rounded-full bg-anhanga-yellow px-4 py-1.5 text-sm font-semibold text-anhanga-blue">
+                            <span className="mt-3 inline-block rounded-full bg-anhanga-yellow px-4 py-1.5 text-sm font-semibold text-anhanga-darkBlue">
                                 {banner.ctaLabel}
                             </span>
                         </Link>
@@ -633,6 +633,10 @@ test('renderiza a página /links com banner, botões e selos', async ({ page }) 
 
 test('links_page_view é empurrado no dataLayer no load', async ({ page }) => {
     await page.goto('/links');
+    await page.waitForFunction(() =>
+        (window as unknown as { dataLayer?: Array<{ event?: string }> }).dataLayer
+            ?.some((e) => e.event === 'links_page_view'),
+    );
     const events = await page.evaluate(() =>
         (window as unknown as { dataLayer: Array<{ event?: string }> }).dataLayer
             .filter((e) => e.event === 'links_page_view'),
@@ -642,14 +646,18 @@ test('links_page_view é empurrado no dataLayer no load', async ({ page }) => {
 
 test('clique dispara links_page_click com o label correto', async ({ page }) => {
     await page.goto('/links');
-    // Seguro viagem (external) abre em nova aba; previne navegação para asserir o evento.
-    await page.getByTestId('link-seguro-viagem').evaluate((el) => el.setAttribute('target', '_self'));
-    await page.getByTestId('link-seguro-viagem').click({ noWaitAfter: true });
+    // Usa um link INTERNO (orlando): React Router navega client-side, sem rede externa,
+    // e preserva window.dataLayer para a asserção. Não clicar em links external (hit de rede + flaky).
+    await page.getByTestId('link-orlando').click();
+    await page.waitForFunction(() =>
+        (window as unknown as { dataLayer?: Array<{ event?: string; label?: string }> }).dataLayer
+            ?.some((e) => e.event === 'links_page_click' && e.label === 'orlando'),
+    );
     const clicks = await page.evaluate(() =>
         (window as unknown as { dataLayer: Array<{ event?: string; label?: string }> }).dataLayer
             .filter((e) => e.event === 'links_page_click'),
     );
-    expect(clicks.some((c) => c.label === 'seguro-viagem')).toBe(true);
+    expect(clicks.some((c) => c.label === 'orlando')).toBe(true);
 });
 
 test('botão WhatsApp aponta para wa.me com texto', async ({ page }) => {
@@ -743,4 +751,5 @@ EOF
 - **Pixel sem `fbq`:** não injetar Pixel na página. O mapeamento de `links_page_view`/`links_page_click` para tags do Meta é config no GTM (externa ao repo) — está nos "Passos de operação".
 - **Consent Mode / LGPD:** o retargeting só captura visitantes que aceitam marketing no banner de cookies (global, já presente). Comportamento esperado; não é bug.
 - **Ícones:** `ICON_MAP` é allowlist — nome de ícone fora do mapa simplesmente não renderiza (sem erro). Para adicionar um ícone novo, importar no `LinkButton` e registrar no mapa.
-- **Não usar `#003B8E`** (legado `brand-actionDark`): gradiente usa `anhanga-blue` → `anhanga-action`.
+- **Gradiente:** usa os tokens `anhanga-darkBlue` (#003B8E) → `anhanga-action` (#0ea5e9), que correspondem exatamente às cores pedidas na issue. Ambos existem no namespace canônico `anhanga-*`; nada de `brand-*` (legado, congelado pelo guard).
+- **Prerender:** `/links` **não** é registrada em `scripts/prerender.mjs` — intencional, por ser destino de bio com `noindex`. Não adicionar ao prerender.
