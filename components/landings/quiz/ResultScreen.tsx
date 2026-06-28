@@ -14,9 +14,10 @@ interface ResultScreenProps {
     onRestart: () => void;
     baseWaUrl: string;
     submitFailed: boolean;
+    onPhoneSubmit: (phone: string) => void;
 }
 
-export function ResultScreen({ profile, mainDest, inspirations, lead, onRestart, baseWaUrl, submitFailed }: ResultScreenProps) {
+export function ResultScreen({ profile, mainDest, inspirations, lead, onRestart, baseWaUrl, submitFailed, onPhoneSubmit }: ResultScreenProps) {
     const [reveal, setReveal] = useState(false);
     const firstName = lead.nome.trim().split(/\s+/)[0] || 'Viajante';
 
@@ -80,6 +81,7 @@ export function ResultScreen({ profile, mainDest, inspirations, lead, onRestart,
                         mainDestName={mainDest.name}
                         firstName={firstName}
                         baseWaUrl={baseWaUrl}
+                        onPhoneSubmit={onPhoneSubmit}
                     />
                     <button type="button" className="quiz-btn quiz-btn-ghost quiz-result-restart" onClick={onRestart}>
                         Refazer o quiz

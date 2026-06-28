@@ -118,6 +118,37 @@ test('buildN8nQuizPayload — newsletterOptIn ausente resulta em false no payloa
     assert.equal(n8n.quiz.newsletterOptIn, false);
 });
 
+test('validateQuizPayload — whatsapp mascarado é normalizado para E.164', () => {
+    const result = validateQuizPayload({ ...BASE_PAYLOAD, whatsapp: '(11) 99999-9999' });
+    assert.ok(result.valid);
+    assert.equal(result.data.whatsapp, '+5511999999999');
+});
+
+test('validateQuizPayload — whatsapp ausente resulta em undefined', () => {
+    const result = validateQuizPayload({ ...BASE_PAYLOAD });
+    assert.ok(result.valid);
+    assert.equal(result.data.whatsapp, undefined);
+});
+
+test('validateQuizPayload — whatsapp inválido (poucos dígitos) resulta em undefined', () => {
+    const result = validateQuizPayload({ ...BASE_PAYLOAD, whatsapp: '123' });
+    assert.ok(result.valid);
+    assert.equal(result.data.whatsapp, undefined);
+});
+
+test('buildN8nQuizPayload — inclui whatsapp normalizado no payload do n8n', () => {
+    const validation = validateQuizPayload({ ...BASE_PAYLOAD, whatsapp: '(11) 99999-9999' });
+    assert.ok(validation.valid);
+    const n8n = buildN8nQuizPayload(validation.data, 'req-wa-1');
+    assert.equal(n8n.quiz.whatsapp, '+5511999999999');
+});
+
+test('buildN8nQuizPayload — whatsapp ausente resulta em null no payload n8n', () => {
+    const payload = { ...BASE_PAYLOAD, tracking: undefined };
+    const n8n = buildN8nQuizPayload(payload, 'req-wa-2');
+    assert.equal(n8n.quiz.whatsapp, null);
+});
+
 test('validateQuizPayload — sanitiza destinos contra XSS', () => {
     const payload = {
         ...BASE_PAYLOAD,

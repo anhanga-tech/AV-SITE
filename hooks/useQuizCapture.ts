@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { getTrackingDataObject } from '../utils/whatsapp';
 import { sendLeadToSalesforce } from '../utils/salesforce-lead';
 import type { LeadTracking, LeadUtms } from '../types/leadCapture';
@@ -84,8 +84,12 @@ export function useQuizCapture() {
     const [error, setError] = useState<string | null>(null);
     const [trackingState, setTrackingState] = useState(() => captureTrackingState());
 
-    const submitQuiz = async (
+    // useState setters are stable, so an empty dep list keeps submitQuiz's
+    // reference stable across renders — consumers depend on it in their own
+    // useCallback hooks (e.g. handlePhoneSubmit).
+    const submitQuiz = useCallback(async (
         input: Pick<SubmitQuizRequest, 'firstName' | 'lastName' | 'email' | 'whatsapp' | 'profileKey' | 'profileName' | 'bantSummary' | 'destinos' | 'skipped' | 'newsletterOptIn'>,
+        options?: { trackConversion?: boolean },
     ): Promise<SubmitQuizResult> => {
         setError(null);
         setIsSubmitting(true);
@@ -134,7 +138,12 @@ export function useQuizCapture() {
                 return { ok: false, error: errMsg, code: errCode, status: response.status };
             }
 
-            pushQuizDataLayerEvent(payload);
+            // Enrichment calls (e.g. WhatsApp added on the result screen) reuse the
+            // same endpoint to update the existing lead, but must not re-fire the
+            // conversion event that already fired on the first submit.
+            if (options?.trackConversion !== false) {
+                pushQuizDataLayerEvent(payload);
+            }
             setIsSubmitting(false);
 
             return {
@@ -150,7 +159,7 @@ export function useQuizCapture() {
             setIsSubmitting(false);
             return { ok: false, error: message, code: 'NETWORK_ERROR' };
         }
-    };
+    }, []);
 
     return {
         tracking: trackingState.tracking,

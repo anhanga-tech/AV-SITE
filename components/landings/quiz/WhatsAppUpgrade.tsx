@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getWhatsAppLink } from '../../../utils/whatsapp';
 
 interface WhatsAppUpgradeProps {
@@ -6,6 +6,7 @@ interface WhatsAppUpgradeProps {
     mainDestName: string;
     firstName: string;
     baseWaUrl: string;
+    onPhoneSubmit: (phone: string) => void;
 }
 
 function maskPhone(v: string): string {
@@ -16,12 +17,25 @@ function maskPhone(v: string): string {
     return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
 }
 
-export function WhatsAppUpgrade({ profileName, mainDestName, firstName, baseWaUrl }: WhatsAppUpgradeProps) {
+export function WhatsAppUpgrade({ profileName, mainDestName, firstName, baseWaUrl, onPhoneSubmit }: WhatsAppUpgradeProps) {
     const [phone, setPhone] = useState('');
     const [submitted, setSubmitted] = useState(false);
+    const doneCtaRef = useRef<HTMLAnchorElement | null>(null);
 
     const digits = phone.replace(/\D/g, '');
     const isValid = digits.length >= 10;
+
+    // On success, move focus to the next primary action so keyboard and screen
+    // reader users land on it without hunting (autoFocus is unreliable on <a>).
+    useEffect(() => {
+        if (submitted) doneCtaRef.current?.focus();
+    }, [submitted]);
+
+    function handleSubmit() {
+        if (!isValid || submitted) return;
+        onPhoneSubmit(phone);
+        setSubmitted(true);
+    }
 
     const waUrl = isValid && submitted
         ? getWhatsAppLink(
@@ -32,11 +46,12 @@ export function WhatsAppUpgrade({ profileName, mainDestName, firstName, baseWaUr
 
     if (submitted) {
         return (
-            <div className="quiz-wa-upgrade quiz-wa-upgrade--done">
+            <div className="quiz-wa-upgrade quiz-wa-upgrade--done" role="status">
                 <p className="quiz-wa-upgrade-done">
                     Perfeito! Agora é só abrir o WhatsApp.
                 </p>
                 <a
+                    ref={doneCtaRef}
                     className="btn-whatsapp btn-specialist quiz-btn quiz-btn-primary quiz-btn-lg"
                     href={waUrl}
                     target="_blank"
@@ -67,7 +82,7 @@ export function WhatsAppUpgrade({ profileName, mainDestName, firstName, baseWaUr
                 <button
                     type="button"
                     className={`quiz-btn quiz-btn-primary ${isValid ? 'quiz-btn--ready' : ''}`}
-                    onClick={() => isValid && setSubmitted(true)}
+                    onClick={handleSubmit}
                     disabled={!isValid}
                 >
                     Enviar

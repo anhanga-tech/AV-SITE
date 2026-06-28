@@ -68,11 +68,12 @@ interface StageContentProps {
     onLeadSubmit: (data: LeadForm, skipped?: boolean) => void;
     onRestart: () => void;
     onGo: (next: Stage, dir?: 'forward' | 'back') => void;
+    onPhoneSubmit: (phone: string) => void;
 }
 
 function StageContent({
     stage, answers, profileKey, leadForm, baseWaUrl, submitFailed,
-    onStart, onAnswerQ, onNextQ, onBackQ, onLeadSubmit, onRestart, onGo,
+    onStart, onAnswerQ, onNextQ, onBackQ, onLeadSubmit, onRestart, onGo, onPhoneSubmit,
 }: StageContentProps) {
     if (stage.kind === 'hero') return <HeroScreen onStart={onStart} />;
     if (stage.kind === 'question') {
@@ -112,6 +113,7 @@ function StageContent({
                 onRestart={onRestart}
                 baseWaUrl={baseWaUrl}
                 submitFailed={submitFailed}
+                onPhoneSubmit={onPhoneSubmit}
             />
         );
     }
@@ -159,6 +161,36 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
     }
 }
 
+type QuizSubmitInput = Parameters<ReturnType<typeof useQuizCapture>['submitQuiz']>[0];
+
+/** Builds the submit-quiz payload shared by the initial reveal submit and the
+ *  later WhatsApp enrichment submit, so both stay in sync on a single source. */
+function buildQuizSubmitInput(
+    form: LeadForm,
+    pKey: ProfileKey,
+    answers: QuizAnswers,
+    opts: { skipped: boolean; whatsapp?: string },
+): QuizSubmitInput {
+    const profile = TRAVELER_PROFILES[pKey];
+    const mainDest = selectMainDestination(pKey, answers.destino ?? []);
+    const firstName = form.nome.trim().split(/\s+/)[0] || 'Viajante';
+    const lastName = form.sobrenome.trim();
+    const bantSummary = `Quiz Anhangá · Perfil: ${profile.name} · Destino: ${mainDest.name} · ${buildAnswersSummary(answers)}`;
+
+    return {
+        firstName,
+        lastName,
+        email: form.email,
+        whatsapp: opts.whatsapp,
+        profileKey: pKey,
+        profileName: profile.name,
+        bantSummary,
+        destinos: answers.destino ?? [],
+        skipped: opts.skipped,
+        newsletterOptIn: form.aceite,
+    };
+}
+
 export default function QuizAnhangaLanding() {
     const urlParams = useQuizUrlParams();
     const [state, dispatch] = useReducer(quizReducer, QUIZ_INITIAL_STATE);
@@ -203,31 +235,29 @@ export default function QuizAnhangaLanding() {
         const mainDest = selectMainDestination(pKey, answers.destino ?? []);
 
         const firstName = form.nome.trim().split(/\s+/)[0] || 'Viajante';
-        const lastName = form.sobrenome.trim();
-        const bantSummary = `Quiz Anhangá · Perfil: ${profile.name} · Destino: ${mainDest.name} · ${buildAnswersSummary(answers)}`;
-
         const waMsg = `Oi! Sou ${firstName}. Descobri no Quiz da Anhangá que meu perfil é ${profile.name} e meu próximo destino pode ser ${mainDest.name}. Bora planejar essa viagem?`;
         const waUrl = getWhatsAppLink(waMsg, { appendTrackingRef: true });
 
         dispatch({ type: 'SUBMIT_RESULT', leadForm: form, profileKey: pKey, baseWaUrl: waUrl });
         go({ kind: 'result' });
 
-        const result = await submitQuiz({
-            firstName,
-            lastName,
-            email: form.email,
-            profileKey: pKey,
-            profileName: profile.name,
-            bantSummary,
-            destinos: answers.destino ?? [],
-            skipped,
-            newsletterOptIn: form.aceite,
-        });
+        const result = await submitQuiz(buildQuizSubmitInput(form, pKey, answers, { skipped }));
 
         if (!result.ok) {
             dispatch({ type: 'SUBMIT_FAILED' });
         }
     }
+
+    // Phone is captured only on the result screen, after the lead already exists.
+    // Re-submit to enrich the existing lead (n8n + Salesforce) with the WhatsApp
+    // number; suppress the conversion event so it isn't double-counted.
+    const handlePhoneSubmit = useCallback((phone: string) => {
+        if (!leadForm || !profileKey) return;
+        void submitQuiz(
+            buildQuizSubmitInput(leadForm, profileKey, answers, { skipped: urlParams.skip, whatsapp: phone }),
+            { trackConversion: false },
+        );
+    }, [leadForm, profileKey, answers, urlParams.skip, submitQuiz]);
 
     function restart() {
         dispatch({ type: 'RESTART' });
@@ -269,6 +299,7 @@ export default function QuizAnhangaLanding() {
                                 onLeadSubmit={handleLeadSubmit}
                                 onRestart={restart}
                                 onGo={go}
+                                onPhoneSubmit={handlePhoneSubmit}
                             />
                         </div>
                     </div>
