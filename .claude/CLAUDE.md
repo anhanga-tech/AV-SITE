@@ -173,6 +173,15 @@ Decap CMS at `/admin`. Authenticates via GitHub OAuth through `api/auth.ts` + `a
 
 Tailwind CSS (`tailwind.config.mjs`). Brand palette: `action` (#0056D2), `actionDark` (#003B8E), `yellow` (#FFD600). Custom animations: `fade-in-up`, `fade-in-down`, `pop-in`, `draw`, `float`, `blob`. Custom shadows: `glow`, `float`, `hard`, `hard-yellow`. Fonts: Poppins (sans + display headings), Merriweather (serif for blog prose). Design tokens shared between CSS and TS via `lib/design-tokens.ts`. The canonical Tailwind color namespace is `anhanga-*` (semantic tokens in `lib/design-tokens.ts`); `brand-*` is legacy and frozen by `tests/tailwind-brand-namespace-guard.test.ts` — new code must use `anhanga-*`.
 
+### Design Context
+
+Source of truth for design decisions, maintained by the `/impeccable` skill. Read before any UI/UX work:
+
+- **[PRODUCT.md](../PRODUCT.md)** (strategic — who/what/why): register (`brand`), users, brand personality, anti-references, design principles, accessibility. **Wins on voice/strategy decisions.**
+- **[DESIGN.md](../DESIGN.md)** + **[.impeccable/design.json](../.impeccable/design.json)** (visual — how it looks): the "O Diário de Bordo" system — tokens, colors, typography, elevation, components, do's & don'ts. **Wins on visual decisions.**
+
+Five strategic principles (from PRODUCT.md): conversa não transação · curadoria sobre catálogo · peso físico só onde se age · lugares reais não categorias · mobile-first e íntimo por padrão. The `anhanga-*` Tailwind tokens above are the implementation of DESIGN.md's palette.
+
 ### SEO + Prerender
 
 `lib/head.ts` provides `HeadContext` for SSR-safe head management (replaces React Helmet in SSR context). `scripts/prerender.mjs` renders each route via `MemoryRouter` + `HeadContext` at build time. Schema components in `/components/schemas/` emit JSON-LD (LocalBusiness, FAQ, Breadcrumb).
