@@ -8,21 +8,23 @@ export type PanelRegistryEntry = {
   ref: React.RefObject<HTMLDivElement | null>;
 };
 
-// Click-outside + Escape dismissal for the search panels. Iterates over a
-// registry of { panel, ref } instead of branching per panel: a click outside
-// a panel's ref closes that panel (a no-op for panels that aren't open).
+// Click-outside + Escape dismissal for the search panels. Since the panels are
+// mutually exclusive, the listeners are only attached while a panel is open and
+// a click outside that one panel's ref closes it — no per-panel branching.
 export function useSearchFormDismiss(
   registry: PanelRegistryEntry[],
+  openPanel: OpenPanel,
   closePanel: (panel: ActivePanel) => void,
   closeAllPanels: () => void,
 ): void {
   useEffect(() => {
+    if (!openPanel) return;
+
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Node;
-      for (const { panel, ref } of registry) {
-        if (ref.current && !ref.current.contains(target)) {
-          closePanel(panel);
-        }
+      if (!(event.target instanceof Node)) return;
+      const activeEntry = registry.find((entry) => entry.panel === openPanel);
+      if (activeEntry?.ref.current && !activeEntry.ref.current.contains(event.target)) {
+        closePanel(openPanel);
       }
     };
 
@@ -39,5 +41,5 @@ export function useSearchFormDismiss(
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEsc);
     };
-  }, [registry, closePanel, closeAllPanels]);
+  }, [registry, openPanel, closePanel, closeAllPanels]);
 }

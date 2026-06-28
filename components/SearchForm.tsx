@@ -73,7 +73,7 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
     { panel: 'budget', ref: budgetRef },
   ]), []);
 
-  useSearchFormDismiss(panelRegistry, closePanel, closeAllPanels);
+  useSearchFormDismiss(panelRegistry, openPanel, closePanel, closeAllPanels);
 
   const calendarDays = useMemo(() => getDaysInMonth(currentMonth), [currentMonth]);
 

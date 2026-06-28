@@ -63,6 +63,9 @@ const DestinationField = memo(({
         {inputValue && (
           <button
             type="button"
+            // Prevent the input from blurring on press so the mobile keyboard
+            // stays open when clearing the destination.
+            onMouseDown={(e) => e.preventDefault()}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
