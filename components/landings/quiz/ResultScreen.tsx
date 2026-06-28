@@ -68,7 +68,7 @@ export function ResultScreen({ profile, mainDest, inspirations, lead, onRestart,
                     </div>
                     <div className="quiz-dest-grid">
                         {inspirations.map((d, i) => (
-                            <Polaroid key={d.name} dest={d} index={i} />
+                            <Polaroid key={`${d.name}-${d.region}`} dest={d} index={i} />
                         ))}
                     </div>
                 </div>
