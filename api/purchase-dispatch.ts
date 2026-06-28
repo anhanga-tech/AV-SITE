@@ -4,6 +4,7 @@ import { buildCorsHeaders, getClientIP } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
 import { timingSafeEqual } from '../lib/security';
 import { logger } from '../lib/logger';
+import { truncateDetail } from '../lib/n8n-submit-handler';
 
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 30;
@@ -107,11 +108,6 @@ function createRequestId(): string {
   }
 
   return `conv_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
-}
-
-function truncateDetail(detail: string): string | undefined {
-  const normalized = detail.replace(/[\r\n]+/g, ' ').trim();
-  return normalized ? normalized.substring(0, 600) : undefined;
 }
 
 function emitConversionLog(

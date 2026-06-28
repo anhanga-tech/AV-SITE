@@ -5,7 +5,8 @@ import { logger } from '../lib/logger.ts';
 
 const MIGRATED_API_FILES = [
     'api/generate.ts',
-    'api/submit-lead.ts',
+    // submit-* handlers delegate all logging to the shared n8n submit factory.
+    'lib/n8n-submit-handler.ts',
     'services/geminiService.ts',
     'lib/rate-limit.ts',
 ];
