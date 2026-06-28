@@ -62,9 +62,9 @@ export function CorpHero() {
                         custom={0}
                         className="inline-block relative mb-6"
                     >
-                        <span className="absolute inset-0 bg-brand-yellow/30 transform -skew-x-12 rounded-lg" />
+                        <span className="absolute inset-0 bg-white/10 border border-white/15 transform -skew-x-12 rounded-lg" />
                         <span className="relative px-4 py-1.5 text-white font-black uppercase tracking-widest text-xs flex items-center gap-2">
-                            <AirplaneTilt className="size-4" weight="fill" />
+                            <AirplaneTilt className="size-4 text-brand-yellow" weight="fill" />
                             Viagens para Empresas
                         </span>
                     </m.div>
