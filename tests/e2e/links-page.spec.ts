@@ -46,6 +46,19 @@ test('clique dispara links_page_click com o label correto', async ({ page }) => 
     expect(clicks.some((c) => c.label === 'orlando')).toBe(true);
 });
 
+test('não renderiza o assistente virtual (AIChat) na página standalone', async ({ page }) => {
+    await page.goto('/links');
+    await expect(page.getByTestId('link-whatsapp')).toBeVisible();
+    // /links é página de bio standalone — o FAB do AIChat não deve aparecer (cobriria os selos
+    // e competiria com os destinos curados). Ver ROUTES_WITHOUT_AICHAT em App.tsx.
+    await expect(page.getByRole('button', { name: 'Abrir assistente virtual' })).toHaveCount(0);
+
+    // Também não deve renderizar com barra no final (trailing slash, comum em links de bio).
+    await page.goto('/links/');
+    await expect(page.getByTestId('link-whatsapp')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Abrir assistente virtual' })).toHaveCount(0);
+});
+
 test('botão WhatsApp aponta para wa.me com texto', async ({ page }) => {
     await page.goto('/links');
     const href = await page.getByTestId('link-whatsapp').getAttribute('href');

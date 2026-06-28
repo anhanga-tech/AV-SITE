@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { LazyMotion, domAnimation } from 'framer-motion';
-import { BrowserRouter, MemoryRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, MemoryRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import Header from './components/Header/Header';
 import Footer from './components/Footer';
 import AIChat from './components/AIChat';
@@ -38,13 +38,23 @@ const LinksPage = lazy(() => import('./pages/LinksPage'));
 const MainRouteFallback: React.FC = () => <section className="min-h-[40vh] bg-white" aria-hidden="true" />;
 const LandingRouteFallback: React.FC = () => <div className="min-h-screen bg-white" aria-hidden="true" />;
 
-const ClientFeatures: React.FC = () => (
-  <ClientOnly>
-    <AIChat />
-    <ContactModal />
-    <BackToTop />
-  </ClientOnly>
-);
+// Rotas standalone que não devem carregar o assistente virtual (página de bio, etc.)
+const ROUTES_WITHOUT_AICHAT = ['/links'];
+
+const ClientFeatures: React.FC = () => {
+  const { pathname } = useLocation();
+  // Normaliza trailing slash (ex.: /links/ vindo da bio) antes de comparar — o React Router
+  // casa a rota com ou sem a barra, mas location.pathname preserva a barra.
+  const normalizedPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
+  const showAIChat = !ROUTES_WITHOUT_AICHAT.includes(normalizedPath);
+  return (
+    <ClientOnly>
+      {showAIChat ? <AIChat /> : null}
+      <ContactModal />
+      <BackToTop />
+    </ClientOnly>
+  );
+};
 
 const MainSiteShell: React.FC = () => {
   return (
