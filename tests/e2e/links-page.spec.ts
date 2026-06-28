@@ -61,6 +61,13 @@ test('não renderiza overlays flutuantes (AIChat / BackToTop) na página standal
     await expect(page.getByTestId('link-whatsapp')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Abrir assistente virtual' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Voltar ao topo' })).toHaveCount(0);
+
+    // Nem em caixa alta: o React Router casa a rota case-insensitive, então STANDALONE_ROUTES
+    // normaliza para minúsculas — /LINKS também não deve carregar overlays.
+    await page.goto('/LINKS');
+    await expect(page.getByTestId('link-whatsapp')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Abrir assistente virtual' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Voltar ao topo' })).toHaveCount(0);
 });
 
 test('botão WhatsApp aponta para wa.me com texto', async ({ page }) => {

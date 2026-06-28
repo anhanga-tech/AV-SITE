@@ -44,9 +44,10 @@ const STANDALONE_ROUTES = ['/links'];
 
 const ClientFeatures: React.FC = () => {
   const { pathname } = useLocation();
-  // Normaliza trailing slash (ex.: /links/ vindo da bio) antes de comparar — o React Router
-  // casa a rota com ou sem a barra, mas location.pathname preserva a barra.
-  const normalizedPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
+  // Normaliza trailing slash e caixa antes de comparar: o React Router casa a rota com ou sem
+  // a barra E de forma case-insensitive (/LINKS renderiza LinksPage), mas location.pathname
+  // preserva ambos — sem normalizar, os overlays vazariam em /links/ ou /LINKS.
+  const normalizedPath = (pathname === '/' ? '/' : pathname.replace(/\/$/, '')).toLowerCase();
   if (STANDALONE_ROUTES.includes(normalizedPath)) return null;
   return (
     <ClientOnly>
