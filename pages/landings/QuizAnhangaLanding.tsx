@@ -59,6 +59,7 @@ interface StageContentProps {
     answers: QuizAnswers;
     profileKey: ProfileKey | null;
     leadForm: LeadForm | null;
+    leadInitialValues: Partial<LeadForm>;
     baseWaUrl: string;
     submitFailed: boolean;
     onStart: () => void;
@@ -72,7 +73,7 @@ interface StageContentProps {
 }
 
 function StageContent({
-    stage, answers, profileKey, leadForm, baseWaUrl, submitFailed,
+    stage, answers, profileKey, leadForm, leadInitialValues, baseWaUrl, submitFailed,
     onStart, onAnswerQ, onNextQ, onBackQ, onLeadSubmit, onRestart, onGo, onPhoneSubmit,
 }: StageContentProps) {
     if (stage.kind === 'hero') return <HeroScreen onStart={onStart} />;
@@ -98,6 +99,7 @@ function StageContent({
                 profile={TRAVELER_PROFILES[leadProfileKey]}
                 onSubmit={onLeadSubmit}
                 onBack={() => onGo({ kind: 'question', index: QUIZ_QUESTIONS.length - 1 }, 'back')}
+                initialValues={leadInitialValues}
             />
         );
     }
@@ -197,6 +199,13 @@ export default function QuizAnhangaLanding() {
     const { stage, direction, answers, leadForm, profileKey, baseWaUrl, submitFailed } = state;
     const { submitQuiz } = useQuizCapture();
 
+    // Pré-preenche o PreLeadScreen quando a URL traz dados mas o form não é
+    // pulado (skip ausente/false). O `aceite` segue de fora: opt-in explícito.
+    const leadInitialValues = useMemo<Partial<LeadForm>>(
+        () => ({ nome: urlParams.nome, sobrenome: urlParams.sobrenome, email: urlParams.email }),
+        [urlParams],
+    );
+
     const go = useCallback((next: Stage, dir: 'forward' | 'back' = 'forward') => {
         dispatch({ type: 'GO', stage: next, direction: dir });
         window.scrollTo(0, 0);
@@ -290,6 +299,7 @@ export default function QuizAnhangaLanding() {
                                 answers={answers}
                                 profileKey={profileKey}
                                 leadForm={leadForm}
+                                leadInitialValues={leadInitialValues}
                                 baseWaUrl={baseWaUrl}
                                 submitFailed={submitFailed}
                                 onStart={start}
