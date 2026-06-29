@@ -223,6 +223,8 @@ test('Cloudflare Pages CSP should stay non-breaking until a source allowlist is 
   // otherwise the SPA breaks. Keep this policy to source-agnostic directives.
   assert.doesNotMatch(csp, /\bdefault-src\b/, 'default-src needs a full source audit first');
   assert.doesNotMatch(csp, /\bscript-src\b/, 'script-src needs a full source audit first');
+  assert.doesNotMatch(csp, /\bstyle-src\b/, 'style-src needs a full source audit first');
+  assert.doesNotMatch(csp, /\bconnect-src\b/, 'connect-src needs a full source audit first');
 });
 
 test('Cloudflare splat redirects should come after exact redirects when present', async () => {
