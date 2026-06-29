@@ -6,9 +6,10 @@ interface PreLeadScreenProps {
     profile: TravelerProfile;
     onSubmit: (form: LeadForm) => void;
     onBack: () => void;
+    isSubmitting: boolean;
 }
 
-export function PreLeadScreen({ profile, onSubmit, onBack }: PreLeadScreenProps) {
+export function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting }: PreLeadScreenProps) {
     const [form, setForm] = useState<LeadForm>({ nome: '', sobrenome: '', email: '', aceite: false });
     const [errors, setErrors] = useState<Partial<Record<keyof LeadForm, string>>>({});
 
@@ -117,8 +118,8 @@ export function PreLeadScreen({ profile, onSubmit, onBack }: PreLeadScreenProps)
                         </Link>.
                     </p>
 
-                    <button type="submit" className="quiz-btn quiz-btn-primary quiz-btn-lg">
-                        Revelar meu perfil
+                    <button type="submit" className="quiz-btn quiz-btn-primary quiz-btn-lg" disabled={isSubmitting}>
+                        {isSubmitting ? 'Enviando...' : 'Revelar meu perfil'}
                         <span className="quiz-arrow">→</span>
                     </button>
                 </form>
