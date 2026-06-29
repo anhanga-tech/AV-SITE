@@ -7,10 +7,19 @@ interface PreLeadScreenProps {
     onSubmit: (form: LeadForm) => void;
     onBack: () => void;
     isSubmitting: boolean;
+    /** Valores vindos da URL (ex.: ?nome=&email=) para pré-preencher o form.
+     *  `aceite` fica de fora de propósito: o opt-in de newsletter precisa de
+     *  marcação explícita do usuário e não é presumido a partir do link. */
+    initialValues?: Partial<LeadForm>;
 }
 
-export function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting }: PreLeadScreenProps) {
-    const [form, setForm] = useState<LeadForm>({ nome: '', sobrenome: '', email: '', aceite: false });
+export function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting, initialValues }: PreLeadScreenProps) {
+    const [form, setForm] = useState<LeadForm>(() => ({
+        nome: initialValues?.nome ?? '',
+        sobrenome: initialValues?.sobrenome ?? '',
+        email: initialValues?.email ?? '',
+        aceite: false,
+    }));
     const [errors, setErrors] = useState<Partial<Record<keyof LeadForm, string>>>({});
 
     function update<K extends keyof LeadForm>(k: K, v: LeadForm[K]) {
