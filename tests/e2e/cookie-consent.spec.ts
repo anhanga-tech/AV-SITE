@@ -175,7 +175,16 @@ test.describe('Cookie Consent Banner (CMP)', () => {
     // Playwright roda em 127.0.0.1 por padrão (local e CI), logo o skip precisa
     // depender do host real, não só de process.env.CI. A lógica de despacho e a gate
     // de consentimento já são cobertas por consent.test.ts e index-third-party-scripts.test.ts.
-    const host = baseURL ? new URL(baseURL).hostname : '127.0.0.1';
+    let host = '127.0.0.1';
+    if (baseURL) {
+      try {
+        host = new URL(baseURL).hostname;
+      } catch {
+        // baseURL sem protocolo (ex.: sobrescrito via CLI) — usa o valor cru,
+        // que ainda casa com os sufixos .local/.test do gate abaixo.
+        host = baseURL;
+      }
+    }
     const isMauticGatedHost =
       host === 'localhost' || host === '127.0.0.1' || host.endsWith('.local') || host.endsWith('.test');
     test.skip(isMauticGatedHost, `loadMautic retorna cedo em ${host} — coberto por testes unitários`);
