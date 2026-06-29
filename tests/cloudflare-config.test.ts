@@ -196,6 +196,35 @@ test('Cloudflare Pages HSTS should not include subdomains until subdomain invent
   assert.doesNotMatch(hsts, /includesubdomains/i, 'includeSubDomains must not be set until beto.anhanga.tur.br HTTPS status is confirmed');
 });
 
+test('Cloudflare Pages headers should set a defense-in-depth Content-Security-Policy', async () => {
+  const headers = await readFile(new URL('../public/_headers', import.meta.url), 'utf8');
+  const blocks = collectHeadersBlocks(headers);
+  const globalHeaders = blocks.get('/*');
+
+  assert.ok(globalHeaders, 'global /* block must exist');
+  const csp = globalHeaders.get('Content-Security-Policy');
+  assert.ok(csp, 'Content-Security-Policy header must be present in /* block');
+
+  // These restrictive directives close real attack surface (base-tag injection,
+  // plugin-based content, clickjacking) without constraining where scripts,
+  // styles, images, or XHR/fetch may load from.
+  assert.match(csp, /\bbase-uri 'self'/, 'base-uri must be locked to self');
+  assert.match(csp, /\bobject-src 'none'/, 'object-src must be none');
+  assert.match(csp, /\bframe-ancestors 'none'/, 'frame-ancestors must be none');
+});
+
+test('Cloudflare Pages CSP should stay non-breaking until a source allowlist is audited', async () => {
+  const headers = await readFile(new URL('../public/_headers', import.meta.url), 'utf8');
+  const blocks = collectHeadersBlocks(headers);
+  const csp = blocks.get('/*')?.get('Content-Security-Policy') ?? '';
+
+  // Guard: do not introduce default-src/script-src/style-src/connect-src here
+  // without first auditing GTM, Gemini, Leaflet/globe.gl and the media zone,
+  // otherwise the SPA breaks. Keep this policy to source-agnostic directives.
+  assert.doesNotMatch(csp, /\bdefault-src\b/, 'default-src needs a full source audit first');
+  assert.doesNotMatch(csp, /\bscript-src\b/, 'script-src needs a full source audit first');
+});
+
 test('Cloudflare splat redirects should come after exact redirects when present', async () => {
   const redirects = await readFile(new URL('../public/_redirects', import.meta.url), 'utf8');
 
