@@ -118,14 +118,16 @@ test.describe('CallToAction inline form', () => {
   });
 
   test('expande formulário ao clicar em "Solicitar meu Orçamento"', async ({ page }) => {
-    await page.locator('#contato').scrollIntoViewIfNeeded();
+    // O click do Playwright já rola até o alvo e aguarda actionability/estabilidade.
+    // Rolar o container #contato antes desacopla o elemento se a seção re-renderiza
+    // entre o scroll e a ação (flaky em firefox/webkit) — agir direto no botão evita
+    // a janela de detach.
     await page.getByRole('button', { name: /solicitar meu orçamento/i }).click();
 
     await expect(page.locator('#cta-firstName')).toBeVisible();
   });
 
   test('exibe confirmação após "Me chamem"', async ({ page }) => {
-    await page.locator('#contato').scrollIntoViewIfNeeded();
     await page.getByRole('button', { name: /solicitar meu orçamento/i }).click();
 
     await page.locator('#cta-firstName').fill('João');
