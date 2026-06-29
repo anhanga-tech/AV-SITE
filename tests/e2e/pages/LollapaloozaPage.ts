@@ -21,7 +21,11 @@ export class LollapaloozaPage {
 
   async goto() {
     await this.page.goto('/lollapalooza');
-    await this.page.waitForLoadState('networkidle');
+    // networkidle é flaky em firefox/webkit: timers de analytics e o vídeo de
+    // fundo mantêm conexões abertas e a página nunca atinge idle dentro do
+    // timeout. Espera o formulário da waitlist renderizar — sinal observável e
+    // determinístico de que a página hidratou e está interativa.
+    await this.nameInput.waitFor({ state: 'visible' });
   }
 
   async fillForm(data: { name: string; email: string; acceptLgpd?: boolean }) {
