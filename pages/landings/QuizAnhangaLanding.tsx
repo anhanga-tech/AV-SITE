@@ -203,7 +203,7 @@ export default function QuizAnhangaLanding() {
     // pulado (skip ausente/false). O `aceite` segue de fora: opt-in explícito.
     const leadInitialValues = useMemo<Partial<LeadForm>>(
         () => ({ nome: urlParams.nome, sobrenome: urlParams.sobrenome, email: urlParams.email }),
-        [urlParams],
+        [urlParams.nome, urlParams.sobrenome, urlParams.email],
     );
 
     const go = useCallback((next: Stage, dir: 'forward' | 'back' = 'forward') => {
