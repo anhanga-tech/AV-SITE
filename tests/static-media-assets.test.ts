@@ -16,9 +16,9 @@ function assertMissingHosts(content: string, hosts: string[], label: string): vo
 }
 
 test('core static image sources should not rely on external image CDNs', async () => {
-  const [mediaConfig, destinations, aboutPage, highlights, sitemap] = await Promise.all([
+  const [mediaConfig, mapDestinations, aboutPage, highlights, sitemap] = await Promise.all([
     readRepoFile('data/mediaConfig.ts'),
-    readRepoFile('components/Destinations.tsx'),
+    readRepoFile('data/mapDestinations.ts'),
     readRepoFile('pages/About.tsx'),
     readRepoFile('components/Highlights.tsx'),
     readRepoFile('public/sitemap.xml'),
@@ -32,11 +32,11 @@ test('core static image sources should not rely on external image CDNs', async (
   assert.match(mediaConfig, /images\/destinations\/orlando\.(jpg|jpeg|webp)/);
 
   assertMissingHosts(
-    destinations,
+    mapDestinations,
     ['images.pexels.com', 'res.cloudinary.com'],
-    'components/Destinations.tsx',
+    'data/mapDestinations.ts',
   );
-  assert.match(destinations, /getDestinationImage\("Beto Carrero"\)/);
+  assert.match(mapDestinations, /getDestinationImage\("Beto Carrero"\)/);
 
   assertMissingHosts(
     aboutPage,
