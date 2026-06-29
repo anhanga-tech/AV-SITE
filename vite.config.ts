@@ -211,6 +211,16 @@ export default defineConfig(({ mode, isSsrBuild }) => {
       host: devHost,
       strictPort: devStrictPort,
     },
+    // globe.gl é um dynamic import alcançado só em /corporativo, então o scan
+    // inicial do Vite não o descobre. Sem isto, o primeiro acesso descobre
+    // globe.gl + three + three-globe e dispara uma re-otimização que invalida
+    // node_modules/.vite/deps em pleno carregamento → "Failed to fetch
+    // dynamically imported module". Pré-bundlar de forma estável elimina a
+    // flakiness no e2e do /corporativo. Dev-only; em build o globe entra no
+    // grafo normal de chunks.
+    optimizeDeps: {
+      include: ['globe.gl', 'three', 'three-globe'],
+    },
     plugins: [
       stripMdxFrontmatterPlugin(),
       {
