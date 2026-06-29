@@ -27,6 +27,9 @@ Make behavior changes safe by choosing the smallest meaningful automated test fi
   - `pnpm test:regression` for unit and regression coverage
   - `pnpm test:e2e` when the change affects Playwright-covered browser behavior
   - `pnpm typecheck` when the change touches TypeScript code in a way that could break compile-time contracts
+- Visual regression tests (`tests/e2e/visual.spec.ts`) are tagged `@visual` and **excluded from the default `pnpm test:e2e`** run, because their baselines are generated on CI (Linux) and font antialiasing differs per platform — so they always diff locally without being a real regression.
+  - Run them explicitly with `pnpm test:e2e:visual` (reliable only on Linux / the CI image).
+  - Update baselines intentionally via the `update-snapshots.yml` workflow (`workflow_dispatch`), not by committing locally-generated snapshots. CI runs raw `playwright test`, which includes `@visual`, so a visual diff still gates `main`.
 
 ## RECOMMENDED
 

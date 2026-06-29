@@ -1,7 +1,12 @@
 import { test, expect } from '@playwright/test';
 import { AIChat } from './pages/AIChat';
 
-test.describe('Visual Regression Suite', () => {
+// Tag @visual: as baselines são geradas no CI (Linux). O antialiasing de fontes
+// difere por plataforma (e até entre máquinas macOS), então rodar localmente
+// acusa diff sempre — sem ser regressão de produto. O `pnpm test:e2e` default
+// exclui esta tag; use `pnpm test:e2e:visual` (ou o CI) para rodá-la. Atualize
+// baselines pelo workflow update-snapshots.yml. Ver docs/standards/testing.md.
+test.describe('Visual Regression Suite', { tag: '@visual' }, () => {
   test('home page should look correct', async ({ page }) => {
     // Freeze Math.random so Hero background selection is deterministic across runs
     await page.addInitScript(() => { Math.random = () => 0; });
