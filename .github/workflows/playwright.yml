@@ -27,9 +27,12 @@ jobs:
       # Omit --with-deps to avoid apt-get failures with external Microsoft/Ubuntu repos;
       # GitHub ubuntu-latest already includes necessary dependencies for Chromium.
       run: pnpm exec playwright install chromium
-    # As baselines visuais NÃO são regeradas aqui: um diff visual deve FALHAR o gate.
-    # Atualização intencional de snapshots é feita só pelo workflow manual
-    # update-snapshots.yml (workflow_dispatch).
+    # Roda `playwright test` cru (não `pnpm test:e2e`) DE PROPÓSITO: o script
+    # test:e2e exclui a tag @visual para não poluir o run local (baselines são
+    # Linux-only), mas aqui — no CI Linux — os testes visuais devem rodar e
+    # gatear. As baselines visuais NÃO são regeradas aqui: um diff visual deve
+    # FALHAR o gate. Atualização intencional de snapshots é feita só pelo
+    # workflow manual update-snapshots.yml (workflow_dispatch).
     - name: Run Playwright tests
       run: pnpm exec playwright test
     - uses: actions/upload-artifact@v7
