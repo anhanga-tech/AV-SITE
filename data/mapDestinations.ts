@@ -1,5 +1,14 @@
 import { getDestinationImage } from './mediaConfig';
 
+export type Continent =
+    | 'América do Norte'
+    | 'América Central'
+    | 'América do Sul'
+    | 'Europa'
+    | 'Ásia'
+    | 'África'
+    | 'Oceania';
+
 export interface Destination {
     coords: [number, number];
     image: string;
@@ -8,7 +17,7 @@ export interface Destination {
     rating: string;
     price: string;
     description: string;
-    continent: string;
+    continent: Continent;
     details: string;
     activities: string[];
     landingPage?: string;
@@ -295,7 +304,7 @@ export const DESTINATIONS: Destination[] = [
 
 export const FILTERS = ['Todos', 'América do Norte', 'América Central', 'América do Sul', 'Europa', 'Ásia', 'África', 'Oceania'];
 
-export const CONTINENT_COLORS: Record<string, string> = {
+export const CONTINENT_COLORS: Record<Continent, string> = {
     'América do Norte': '#0ea5e9',
     'América Central': '#06b6d4',
     'América do Sul': '#10b981',
