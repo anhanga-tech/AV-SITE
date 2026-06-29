@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useReducer } from 'react';
+import { useMemo, useCallback, useReducer, useRef } from 'react';
 import { Seo } from '../../components/Seo';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { useQuizCapture } from '../../hooks/useQuizCapture';
@@ -61,6 +61,7 @@ interface StageContentProps {
     leadForm: LeadForm | null;
     baseWaUrl: string;
     submitFailed: boolean;
+    isSubmitting: boolean;
     onStart: () => void;
     onAnswerQ: (qId: string, value: string[]) => void;
     onNextQ: (currentIndex: number) => void;
@@ -72,7 +73,7 @@ interface StageContentProps {
 }
 
 function StageContent({
-    stage, answers, profileKey, leadForm, baseWaUrl, submitFailed,
+    stage, answers, profileKey, leadForm, baseWaUrl, submitFailed, isSubmitting,
     onStart, onAnswerQ, onNextQ, onBackQ, onLeadSubmit, onRestart, onGo, onPhoneSubmit,
 }: StageContentProps) {
     if (stage.kind === 'hero') return <HeroScreen onStart={onStart} />;
@@ -98,6 +99,7 @@ function StageContent({
                 profile={TRAVELER_PROFILES[leadProfileKey]}
                 onSubmit={onLeadSubmit}
                 onBack={() => onGo({ kind: 'question', index: QUIZ_QUESTIONS.length - 1 }, 'back')}
+                isSubmitting={isSubmitting}
             />
         );
     }
@@ -195,7 +197,13 @@ export default function QuizAnhangaLanding() {
     const urlParams = useQuizUrlParams();
     const [state, dispatch] = useReducer(quizReducer, QUIZ_INITIAL_STATE);
     const { stage, direction, answers, leadForm, profileKey, baseWaUrl, submitFailed } = state;
-    const { submitQuiz } = useQuizCapture();
+    const { submitQuiz, isSubmitting } = useQuizCapture();
+
+    // Synchronous re-entrancy guard: handleLeadSubmit navigates to the result
+    // screen before awaiting submitQuiz, so the disabled button can race with the
+    // unmount. This ref blocks a second submit fired in the same tick, preventing
+    // duplicate leads in the CRM.
+    const submittingRef = useRef(false);
 
     const go = useCallback((next: Stage, dir: 'forward' | 'back' = 'forward') => {
         dispatch({ type: 'GO', stage: next, direction: dir });
@@ -230,6 +238,9 @@ export default function QuizAnhangaLanding() {
     }
 
     async function handleLeadSubmit(form: LeadForm, skipped = false) {
+        if (submittingRef.current) return;
+        submittingRef.current = true;
+
         const pKey = matchProfile(answers);
         const profile = TRAVELER_PROFILES[pKey];
         const mainDest = selectMainDestination(pKey, answers.destino ?? []);
@@ -242,6 +253,7 @@ export default function QuizAnhangaLanding() {
         go({ kind: 'result' });
 
         const result = await submitQuiz(buildQuizSubmitInput(form, pKey, answers, { skipped }));
+        submittingRef.current = false;
 
         if (!result.ok) {
             dispatch({ type: 'SUBMIT_FAILED' });
@@ -292,6 +304,7 @@ export default function QuizAnhangaLanding() {
                                 leadForm={leadForm}
                                 baseWaUrl={baseWaUrl}
                                 submitFailed={submitFailed}
+                                isSubmitting={isSubmitting}
                                 onStart={start}
                                 onAnswerQ={answerQ}
                                 onNextQ={nextQ}
