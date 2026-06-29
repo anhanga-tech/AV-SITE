@@ -48,14 +48,30 @@ async function collectTextFiles(targetPath: string): Promise<string[]> {
   return nestedFiles.flat();
 }
 
+async function isReadableFile(filePath: string): Promise<boolean> {
+  try {
+    return (await stat(filePath)).isFile();
+  } catch {
+    // Untracked local folders (e.g. an empty "* Design System" dir holding only
+    // .DS_Store) may match without a README — skip them so the test stays
+    // deterministic regardless of the local working tree.
+    return false;
+  }
+}
+
 async function collectDesignSystemReadmes(): Promise<string[]> {
   const entries = await readdir(ROOT_DIR, { withFileTypes: true });
-
-  return entries.flatMap((entry) =>
+  const candidates = entries.flatMap((entry) =>
     entry.isDirectory() && entry.name.endsWith('Design System')
       ? [path.join(ROOT_DIR, entry.name, 'README.md')]
       : []
   );
+
+  const existing = await Promise.all(
+    candidates.map(async (candidate) => ((await isReadableFile(candidate)) ? candidate : null)),
+  );
+
+  return existing.filter((candidate): candidate is string => candidate !== null);
 }
 
 test('site positioning content does not use boutique agency positioning', async () => {
