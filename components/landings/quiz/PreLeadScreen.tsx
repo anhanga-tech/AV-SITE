@@ -6,13 +6,14 @@ interface PreLeadScreenProps {
     profile: TravelerProfile;
     onSubmit: (form: LeadForm) => void;
     onBack: () => void;
+    isSubmitting: boolean;
     /** Valores vindos da URL (ex.: ?nome=&email=) para pré-preencher o form.
      *  `aceite` fica de fora de propósito: o opt-in de newsletter precisa de
      *  marcação explícita do usuário e não é presumido a partir do link. */
     initialValues?: Partial<LeadForm>;
 }
 
-export function PreLeadScreen({ profile, onSubmit, onBack, initialValues }: PreLeadScreenProps) {
+export function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting, initialValues }: PreLeadScreenProps) {
     const [form, setForm] = useState<LeadForm>(() => ({
         nome: initialValues?.nome ?? '',
         sobrenome: initialValues?.sobrenome ?? '',
@@ -126,8 +127,8 @@ export function PreLeadScreen({ profile, onSubmit, onBack, initialValues }: PreL
                         </Link>.
                     </p>
 
-                    <button type="submit" className="quiz-btn quiz-btn-primary quiz-btn-lg">
-                        Revelar meu perfil
+                    <button type="submit" className="quiz-btn quiz-btn-primary quiz-btn-lg" disabled={isSubmitting}>
+                        {isSubmitting ? 'Enviando...' : 'Revelar meu perfil'}
                         <span className="quiz-arrow">→</span>
                     </button>
                 </form>

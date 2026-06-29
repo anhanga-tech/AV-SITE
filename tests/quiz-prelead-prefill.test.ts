@@ -18,6 +18,7 @@ function renderScreen(initialValues?: Partial<LeadForm>): string {
                 profile,
                 onSubmit: noop,
                 onBack: noop,
+                isSubmitting: false,
                 initialValues,
             }),
         ),
