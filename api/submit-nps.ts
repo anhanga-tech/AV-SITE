@@ -1,8 +1,14 @@
-import { z } from 'zod';
-import { createN8nSubmitHandler } from '../lib/n8n-submit-handler';
-import { buildN8nNpsPayload } from '../lib/n8n-payloads';
+import {
+    classifyN8nSubmitError,
+    type ClassifyN8nErrorOptions,
+    type N8nErrorClassification,
+} from '../lib/n8n-submit-handler';
+import { createOdooSubmitHandler } from '../lib/odoo-submit-handler';
+import { leadInputFromSubmitNps } from '../lib/odoo-lead-mapping';
 import { SubmitNpsBodySchema } from '../lib/schemas/submit-nps';
-import { sendNpsToN8n } from '../services/n8n';
+import type { z } from 'zod';
+
+const ODOO_ERROR_PATTERN = /^ODOO_ERROR:(\d+):(.*)$/s;
 
 function mapNpsZodError(error: z.ZodError): string {
     const issue = error.issues[0];
@@ -15,9 +21,20 @@ function mapNpsZodError(error: z.ZodError): string {
     return 'Payload inválido.';
 }
 
-export default createN8nSubmitHandler({
+const NPS_ERROR_OPTIONS: ClassifyN8nErrorOptions = {
+    webhookCode: 'ODOO_ERROR',
+    webhookError: 'Erro ao registrar avaliação. Tente novamente.',
+    internalError: 'Erro interno. Tente novamente.',
+    mapStatus: (upstreamStatus) => (upstreamStatus === 504 ? 504 : 502),
+    errorPattern: ODOO_ERROR_PATTERN,
+};
+
+export function classifySubmitNpsError(error: unknown): N8nErrorClassification {
+    return classifyN8nSubmitError(error, NPS_ERROR_OPTIONS);
+}
+
+export default createOdooSubmitHandler({
     logScope: 'SUBMIT_NPS',
-    webhookEnvVar: 'NPS_WEBHOOK_URL',
     config: {
         missingStatus: 500,
         missingError: 'Serviço de NPS indisponível no momento.',
@@ -37,13 +54,7 @@ export default createN8nSubmitHandler({
         }
         return { ok: true, data: parsed.data };
     },
-    buildPayload: (data, requestId) => buildN8nNpsPayload(data, requestId),
-    send: sendNpsToN8n,
+    buildInput: leadInputFromSubmitNps,
     success: { status: 201, message: 'Avaliação registrada com sucesso.' },
-    error: {
-        webhookCode: 'WEBHOOK_ERROR',
-        webhookError: 'Erro ao registrar avaliação. Tente novamente.',
-        internalError: 'Erro interno. Tente novamente.',
-        mapStatus: (upstreamStatus) => (upstreamStatus === 504 ? 504 : 502),
-    },
+    error: NPS_ERROR_OPTIONS,
 });

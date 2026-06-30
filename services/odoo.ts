@@ -133,8 +133,13 @@ export type OdooPartnerFields = Record<string, unknown>;
  * Per-submit session: authenticates once, then exposes ORM helpers that share a
  * single time budget. Create one with `openOdooSession()` at the start of a submit.
  */
+export interface UpsertPartnerOptions {
+    /** Skip overwriting `name` on an existing match (the form only captured a partial name). */
+    preserveName?: boolean;
+}
+
 export interface OdooSession {
-    upsertPartner: (fields: OdooPartnerFields) => Promise<number>;
+    upsertPartner: (fields: OdooPartnerFields, options?: UpsertPartnerOptions) => Promise<number>;
     createLead: (fields: Record<string, unknown>) => Promise<number>;
 }
 
@@ -166,7 +171,7 @@ export async function openOdooSession(config: OdooConfig): Promise<OdooSession> 
     }
 
     return {
-        async upsertPartner(fields) {
+        async upsertPartner(fields, options) {
             const existing = await findPartner(fields);
             if (existing) {
                 const updateFields: OdooPartnerFields = { ...fields };
@@ -176,6 +181,9 @@ export async function openOdooSession(config: OdooConfig): Promise<OdooSession> 
                     const previous = typeof existing.comment === 'string' ? existing.comment.trim() : '';
                     updateFields.comment = previous ? `${previous}\n\n${fields.comment}` : fields.comment;
                 }
+                // Forms that only capture a partial name (e.g. NPS asks for firstname
+                // only) must not clobber a fuller name already on file.
+                if (options?.preserveName) delete updateFields.name;
                 await executeKw<boolean>(config, uid, 'res.partner', 'write', [[existing.id], updateFields], deadline);
                 return existing.id;
             }
