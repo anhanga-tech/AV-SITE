@@ -53,6 +53,8 @@ type ValidationResult =
   | {
       ok: true;
       payload: LeadFinalizePayload;
+      /** LGPD checkbox is mandatory, so a valid submit always carries consent. */
+      marketingOptIn: boolean;
     }
   | {
       ok: false;
@@ -71,7 +73,7 @@ type TextFieldProps = {
   inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];
 };
 
-function validateLeadForm(values: LeadFormValues): ValidationResult {
+export function validateLeadForm(values: LeadFormValues): ValidationResult {
   const normalizedFirstName = values.firstName.trim();
   const normalizedLastName = values.lastName.trim();
   const normalizedEmail = values.email.trim().toLowerCase();
@@ -122,6 +124,7 @@ function validateLeadForm(values: LeadFormValues): ValidationResult {
       bantSummary: values.defaultBantSummary || 'Não informado',
       destination: normalizedDestination,
     },
+    marketingOptIn: values.acceptedLGPD,
   };
 }
 
@@ -211,12 +214,17 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
       isProcessingRef.current = false;
       return;
     }
-    const { payload } = validation;
+    const { payload, marketingOptIn } = validation;
 
     void triggerHaptic('medium');
 
     const eventId = createLeadEventId();
-    const submitPayload = prepareLeadSubmitPayload(payload, eventId);
+    // Forward the LGPD/marketing consent so the handler sets x_lgpd_consent on
+    // the Odoo res.partner; prepareLeadSubmitPayload only maps draft + tracking.
+    const submitPayload: SubmitLeadRequest = {
+      ...prepareLeadSubmitPayload(payload, eventId),
+      marketingOptIn,
+    };
     pushGenerateLeadDataLayerEvent(submitPayload);
 
     // Open WhatsApp synchronously in the click handler to prevent popup blockers on mobile/Safari

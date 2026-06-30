@@ -47,6 +47,8 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
                     eventId,
                     pushDataLayerEvent: true,
                     formType: 'corporate_lead',
+                    // Mandatory LGPD checkbox → Odoo x_lgpd_consent on the partner.
+                    marketingOptIn: state.acceptedLGPD,
                 },
             );
 

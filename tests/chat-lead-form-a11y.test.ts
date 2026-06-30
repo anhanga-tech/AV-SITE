@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { TextField } from '../components/ChatLeadForm.tsx';
+import { TextField, validateLeadForm } from '../components/ChatLeadForm.tsx';
 
 const baseProps = {
   id: 'lead-email',
@@ -36,4 +36,28 @@ test('TextField sem erro não adiciona atributos de erro', () => {
   assert.ok(!html.includes('aria-invalid'), 'não deve ter aria-invalid sem erro');
   assert.ok(!html.includes('aria-describedby'), 'não deve ter aria-describedby sem erro');
   assert.ok(!html.includes('role="alert"'), 'não deve ter role="alert" sem erro');
+});
+
+const validLeadValues = {
+  firstName: 'Ana',
+  lastName: 'Silva',
+  email: 'ana@example.com',
+  whatsapp: '11999998888',
+  countryCode: '+55',
+  destination: 'Orlando',
+  defaultBantSummary: 'Need: Disney',
+};
+
+test('validateLeadForm — lead válido carrega o consentimento de marketing (→ x_lgpd_consent)', () => {
+  const result = validateLeadForm({ ...validLeadValues, acceptedLGPD: true });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.ok && result.marketingOptIn, true);
+});
+
+test('validateLeadForm — sem aceite de LGPD a submissão é bloqueada', () => {
+  const result = validateLeadForm({ ...validLeadValues, acceptedLGPD: false });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.ok === false && result.fieldErrors?.lgpd, 'Você deve aceitar os termos');
 });
