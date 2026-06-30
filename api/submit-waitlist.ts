@@ -1,27 +1,28 @@
 import {
     classifyN8nSubmitError,
-    createN8nSubmitHandler,
     type ClassifyN8nErrorOptions,
     type N8nErrorClassification,
 } from '../lib/n8n-submit-handler';
-import { buildN8nWaitlistPayload } from '../lib/n8n-payloads';
+import { createOdooSubmitHandler } from '../lib/odoo-submit-handler';
+import { leadInputFromSubmitWaitlist } from '../lib/odoo-lead-mapping';
 import { validateWaitlistPayload } from '../lib/waitlist-logic';
-import { sendWaitlistToN8n } from '../services/n8n';
+
+const ODOO_ERROR_PATTERN = /^ODOO_ERROR:(\d+):(.*)$/s;
 
 const WAITLIST_ERROR_OPTIONS: ClassifyN8nErrorOptions = {
-    webhookCode: 'N8N_WEBHOOK_ERROR',
+    webhookCode: 'ODOO_ERROR',
     webhookError: 'Erro ao enviar inscrição na lista de espera.',
     internalError: 'Erro interno ao processar envio da lista de espera.',
     mapStatus: (upstreamStatus) => (Number.isFinite(upstreamStatus) && upstreamStatus >= 400 ? upstreamStatus : 502),
+    errorPattern: ODOO_ERROR_PATTERN,
 };
 
 export function classifySubmitWaitlistError(error: unknown): N8nErrorClassification {
     return classifyN8nSubmitError(error, WAITLIST_ERROR_OPTIONS);
 }
 
-export default createN8nSubmitHandler({
+export default createOdooSubmitHandler({
     logScope: 'SUBMIT_WAITLIST',
-    webhookEnvVar: 'N8N_SUBMIT_WAITLIST_WEBHOOK_URL',
     config: {
         missingStatus: 500,
         missingError: 'Integração de waitlist indisponível no momento.',
@@ -41,8 +42,7 @@ export default createN8nSubmitHandler({
         }
         return { ok: true, data: validation.data };
     },
-    buildPayload: (data, requestId) => buildN8nWaitlistPayload(data, requestId),
-    send: sendWaitlistToN8n,
+    buildInput: leadInputFromSubmitWaitlist,
     success: { status: 201, message: 'Enviado com sucesso' },
     error: WAITLIST_ERROR_OPTIONS,
 });

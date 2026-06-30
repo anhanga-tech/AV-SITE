@@ -6,9 +6,9 @@ import {
     normalizeUtms,
     normalizeWhatsappNumber,
 } from '../lib/lead-logic';
-import { createN8nSubmitHandler, type ValidationResult } from '../lib/n8n-submit-handler';
-import { buildN8nContactPayload } from '../lib/n8n-payloads';
-import { sendContactToN8n } from '../services/n8n';
+import { type ValidationResult } from '../lib/n8n-submit-handler';
+import { createOdooSubmitHandler } from '../lib/odoo-submit-handler';
+import { leadInputFromSubmitContact } from '../lib/odoo-lead-mapping';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CONTACT_VALIDATION_ERROR = 'Nome e WhatsApp são obrigatórios.';
@@ -45,9 +45,8 @@ function validateContactRequest(body: unknown): ValidationResult<SubmitContactRe
     };
 }
 
-export default createN8nSubmitHandler({
+export default createOdooSubmitHandler({
     logScope: 'SUBMIT_CONTACT',
-    webhookEnvVar: 'N8N_SUBMIT_CONTACT_WEBHOOK_URL',
     config: {
         missingStatus: 503,
         missingError: 'Serviço temporariamente indisponível.',
@@ -61,12 +60,11 @@ export default createN8nSubmitHandler({
     parse: { invalidJsonError: 'Corpo da requisição inválido.' },
     methodNotAllowedError: 'Método não permitido.',
     validate: validateContactRequest,
-    buildPayload: (data, requestId) => buildN8nContactPayload(data, requestId),
-    send: sendContactToN8n,
+    buildInput: leadInputFromSubmitContact,
     success: { status: 200 },
     error: {
         // Contact returns the same neutral message for upstream and internal failures.
-        webhookCode: 'N8N_WEBHOOK_ERROR',
+        webhookCode: 'ODOO_ERROR',
         webhookError: 'Não foi possível enviar sua mensagem. Tente novamente.',
         internalError: 'Não foi possível enviar sua mensagem. Tente novamente.',
         mapStatus: (upstreamStatus) => (upstreamStatus === 504 ? 504 : 502),

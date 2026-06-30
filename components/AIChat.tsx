@@ -216,7 +216,6 @@ const AIChat: React.FC = memo(() => {
     });
     const result = await submitLead(payload, {
       pushDataLayerEvent: false,
-      salesforce: { leadSource: 'Web' },
     });
 
     if (!result.ok) {

@@ -1,28 +1,29 @@
 import {
     classifyN8nSubmitError,
-    createN8nSubmitHandler,
     type ClassifyN8nErrorOptions,
     type N8nErrorClassification,
 } from '../lib/n8n-submit-handler';
+import { createOdooSubmitHandler } from '../lib/odoo-submit-handler';
 import { maskEmail, maskName, maskPhone } from '../lib/lead-logic';
-import { buildN8nQuizPayload } from '../lib/n8n-payloads';
+import { leadInputFromSubmitQuiz } from '../lib/odoo-lead-mapping';
 import { validateQuizPayload } from '../lib/quiz-logic';
-import { sendQuizToN8n } from '../services/n8n';
+
+const ODOO_ERROR_PATTERN = /^ODOO_ERROR:(\d+):(.*)$/s;
 
 const QUIZ_ERROR_OPTIONS: ClassifyN8nErrorOptions = {
-    webhookCode: 'N8N_WEBHOOK_ERROR',
+    webhookCode: 'ODOO_ERROR',
     webhookError: 'Erro ao processar quiz.',
     internalError: 'Erro interno ao processar o quiz.',
     mapStatus: (upstreamStatus) => (upstreamStatus >= 400 && upstreamStatus < 600 ? upstreamStatus : 502),
+    errorPattern: ODOO_ERROR_PATTERN,
 };
 
 export function classifySubmitQuizError(error: unknown): N8nErrorClassification {
     return classifyN8nSubmitError(error, QUIZ_ERROR_OPTIONS);
 }
 
-export default createN8nSubmitHandler({
+export default createOdooSubmitHandler({
     logScope: 'SUBMIT_QUIZ',
-    webhookEnvVar: 'N8N_SUBMIT_QUIZ_WEBHOOK_URL',
     config: {
         missingStatus: 503,
         missingError: 'Serviço de quiz temporariamente indisponível.',
@@ -43,8 +44,7 @@ export default createN8nSubmitHandler({
         }
         return { ok: true, data: validation.data };
     },
-    buildPayload: (data, requestId) => buildN8nQuizPayload(data, requestId),
-    send: sendQuizToN8n,
+    buildInput: leadInputFromSubmitQuiz,
     success: { status: 200, message: 'Perfil registrado com sucesso.' },
     error: QUIZ_ERROR_OPTIONS,
     onValidated: (data) => ({

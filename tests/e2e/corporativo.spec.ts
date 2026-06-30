@@ -66,7 +66,6 @@ test.describe('Corporativo Landing Page', () => {
   test('should capture corporate lead and trigger dataLayer events', async ({ page }) => {
     const landing = new CorporativoPage(page);
     let submitPayload: SubmitLeadRequest | null = null;
-    let sfPayload: Record<string, unknown> | null = null;
 
     await page.route('**/api/submit-lead', async route => {
       submitPayload = route.request().postDataJSON();
@@ -74,15 +73,6 @@ test.describe('Corporativo Landing Page', () => {
         status: 201,
         contentType: 'application/json',
         body: JSON.stringify({ ok: true, requestId: 'corp-123' }),
-      });
-    });
-
-    await page.route('**/api/submit-lead-sf', async route => {
-      sfPayload = route.request().postDataJSON();
-      await route.fulfill({
-        status: 201,
-        contentType: 'application/json',
-        body: JSON.stringify({ ok: true, requestId: 'sf-123' }),
       });
     });
 
@@ -113,19 +103,6 @@ test.describe('Corporativo Landing Page', () => {
     expect(payload.bantSummary).toContain('Empresa Teste LTDA');
     expect(payload.bantSummary).toContain('Sócia');
 
-    await expect.poll(() => sfPayload).toBeTruthy();
-    expect(sfPayload).toMatchObject({
-      firstName: 'Maria',
-      lastName: 'Santos',
-      email: 'maria@empresa.com.br',
-      whatsapp: '+5511988314487',
-      empresa: 'Empresa Teste LTDA',
-      cargo: 'Sócia',
-      leadSource: 'Corporativo',
-    });
-    expect(String((sfPayload as unknown as Record<string, unknown>).description)).toContain('Lead corporativo');
-    expect(sfPayload as unknown as Record<string, unknown>).toHaveProperty('utms');
-
     const formSubmissionEvent = await page.evaluate(() =>
       (window.dataLayer || []).find(e => e.event === 'form_submission')
     );
@@ -150,14 +127,6 @@ test.describe('Corporativo Landing Page', () => {
         status: 201,
         contentType: 'application/json',
         body: JSON.stringify({ ok: true, requestId: 'corp-no-leak' }),
-      });
-    });
-
-    await page.route('**/api/submit-lead-sf', async route => {
-      await route.fulfill({
-        status: 201,
-        contentType: 'application/json',
-        body: JSON.stringify({ ok: true, requestId: 'sf-no-leak' }),
       });
     });
 

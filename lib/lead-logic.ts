@@ -226,6 +226,7 @@ export function validatePayload(payload: unknown): { valid: true; data: SubmitLe
             event_id: eventId,
             bantSummary,
             destination,
+            marketingOptIn: raw.marketingOptIn === true,
             utms,
             tracking,
         },

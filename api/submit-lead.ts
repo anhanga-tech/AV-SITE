@@ -1,27 +1,28 @@
 import {
     classifyN8nSubmitError,
-    createN8nSubmitHandler,
     type ClassifyN8nErrorOptions,
     type N8nErrorClassification,
 } from '../lib/n8n-submit-handler';
+import { createOdooSubmitHandler } from '../lib/odoo-submit-handler';
 import { maskEmail, maskName, maskPhone, validatePayload } from '../lib/lead-logic';
-import { buildN8nLeadPayload } from '../lib/n8n-payloads';
-import { sendLeadToN8n } from '../services/n8n';
+import { leadInputFromSubmitLead } from '../lib/odoo-lead-mapping';
+
+const ODOO_ERROR_PATTERN = /^ODOO_ERROR:(\d+):(.*)$/s;
 
 const LEAD_ERROR_OPTIONS: ClassifyN8nErrorOptions = {
-    webhookCode: 'N8N_WEBHOOK_ERROR',
+    webhookCode: 'ODOO_ERROR',
     webhookError: 'Erro ao enviar lead.',
     internalError: 'Erro interno ao processar envio do lead.',
     mapStatus: (upstreamStatus) => (Number.isFinite(upstreamStatus) && upstreamStatus >= 400 ? upstreamStatus : 502),
+    errorPattern: ODOO_ERROR_PATTERN,
 };
 
 export function classifySubmitLeadError(error: unknown): N8nErrorClassification {
     return classifyN8nSubmitError(error, LEAD_ERROR_OPTIONS);
 }
 
-export default createN8nSubmitHandler({
+export default createOdooSubmitHandler({
     logScope: 'SUBMIT_LEAD',
-    webhookEnvVar: 'N8N_SUBMIT_LEAD_WEBHOOK_URL',
     config: {
         missingStatus: 500,
         missingError: 'Integração de lead indisponível no momento.',
@@ -41,11 +42,7 @@ export default createN8nSubmitHandler({
         }
         return { ok: true, data: validation.data };
     },
-    buildPayload: (data, requestId, ctx) => buildN8nLeadPayload(data, requestId, {
-        clientIpAddress: ctx.clientIpAddress,
-        clientUserAgent: ctx.clientUserAgent,
-    }),
-    send: sendLeadToN8n,
+    buildInput: leadInputFromSubmitLead,
     success: { status: 201, message: 'Enviado com sucesso' },
     error: LEAD_ERROR_OPTIONS,
     onValidated: (data) => ({

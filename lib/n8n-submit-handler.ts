@@ -52,6 +52,12 @@ export interface ClassifyN8nErrorOptions {
     mapStatus: (upstreamStatus: number) => number;
     /** Optional override for the truncation length of the logged detail. */
     detailMaxLength?: number;
+    /**
+     * Pattern matching the normalized upstream error string, capturing
+     * `(status)(detail)`. Defaults to the n8n `N8N_WEBHOOK_ERROR:` format; the
+     * Odoo dispatch passes its own `ODOO_ERROR:` pattern.
+     */
+    errorPattern?: RegExp;
 }
 
 /**
@@ -64,7 +70,7 @@ export function classifyN8nSubmitError(
     options: ClassifyN8nErrorOptions,
 ): N8nErrorClassification {
     const message = error instanceof Error ? error.message : String(error);
-    const match = message.match(N8N_WEBHOOK_ERROR_PATTERN);
+    const match = message.match(options.errorPattern ?? N8N_WEBHOOK_ERROR_PATTERN);
 
     if (!match) {
         return {
@@ -96,6 +102,63 @@ export interface N8nSubmitRequestContext {
 export type ValidationResult<TData> =
     | { ok: true; data: TData }
     | { ok: false; error: string };
+
+/** Result of a per-request provider config check. */
+export type DispatchConfigCheck =
+    | { ok: true }
+    | { ok: false; status: number; error: string };
+
+/**
+ * Provider-specific behavior plugged into the generic submit machine. n8n and
+ * Odoo each supply one of these; everything else (method gate, CORS, rate limit,
+ * parse, validate, response) is shared.
+ */
+export interface SubmitDispatch<TData, TPayload> {
+    /** Verifies provider config (env presence) at request time. */
+    checkConfig: () => DispatchConfigCheck;
+    /** Builds the outbound payload from validated data. */
+    buildPayload: (data: TData, requestId: string, ctx: N8nSubmitRequestContext) => TPayload;
+    /** Sends the payload to the provider; throws a normalized error on failure. */
+    send: (requestId: string, payload: TPayload) => Promise<unknown>;
+    /** Classifies a thrown send error into the structured response shape. */
+    classifyError: (error: unknown) => N8nErrorClassification;
+    /** Log `stage` used for non-internal send failures. */
+    failureStage?: string;
+}
+
+/** Provider-agnostic options for the shared submit machine. */
+export interface CreateSubmitHandlerOptions<TData, TPayload = unknown> {
+    /** Logger scope, e.g. 'SUBMIT_LEAD'. */
+    logScope: string;
+    rateLimit: {
+        windowMs: number;
+        max: number;
+        keyPrefix: string;
+        /** Client-facing message when the bucket is exhausted. */
+        exceededError: string;
+        /** When true, mirrors the retry window into the JSON body as `retryAfter`. */
+        includeRetryAfterInBody?: boolean;
+    };
+    parse: {
+        /** Client-facing message for malformed JSON bodies. */
+        invalidJsonError: string;
+    };
+    /** Client-facing message for the 405 method gate. */
+    methodNotAllowedError: string;
+    /** Validates and normalizes the raw body into the typed payload data. */
+    validate: (rawBody: unknown) => ValidationResult<TData>;
+    /** Provider plug-in (n8n or Odoo). */
+    dispatch: SubmitDispatch<TData, TPayload>;
+    success: {
+        status: number;
+        /** Optional success message; omitted from the body when absent. */
+        message?: string;
+    };
+    /** Optional extra fields for the `payload_validated` info log. */
+    onValidated?: (data: TData, requestId: string) => Record<string, unknown> | void;
+    /** Optional extra fields (e.g. masked recovery data) for the error log. */
+    onError?: (params: { data: TData; requestId: string; classification: N8nErrorClassification }) => Record<string, unknown> | void;
+}
 
 export interface CreateN8nSubmitHandlerOptions<TData, TPayload = unknown> {
     /** Logger scope, e.g. 'SUBMIT_LEAD'. */
@@ -146,7 +209,7 @@ export interface CreateN8nSubmitHandlerOptions<TData, TPayload = unknown> {
 
 /** Internal per-request state shared between the handler and its helpers. */
 interface RequestEnv<TData, TPayload> {
-    options: CreateN8nSubmitHandlerOptions<TData, TPayload>;
+    options: CreateSubmitHandlerOptions<TData, TPayload>;
     requestId: string;
     corsHeaders: Record<string, string>;
 }
@@ -202,12 +265,12 @@ function buildWebhookErrorResponse<TData, TPayload>(
     error: unknown,
 ): Response {
     const { options, requestId, corsHeaders } = env;
-    const classification = classifyN8nSubmitError(error, options.error);
+    const classification = options.dispatch.classifyError(error);
     const errorLogFields = options.onError?.({ data, requestId, classification }) ?? {};
 
     logger.error(options.logScope, {
         requestId,
-        stage: classification.code === 'INTERNAL_ERROR' ? 'unexpected' : 'n8n_webhook_failed',
+        stage: classification.code === 'INTERNAL_ERROR' ? 'unexpected' : (options.dispatch.failureStage ?? 'dispatch_failed'),
         code: classification.code,
         status: classification.status,
         detail: classification.detail,
@@ -222,14 +285,13 @@ function buildWebhookErrorResponse<TData, TPayload>(
 }
 
 /**
- * Builds a `submit-*` request handler from per-endpoint configuration. The
- * returned function is the default export each `api/submit-*.ts` exposes.
+ * Builds a `submit-*` request handler from provider-agnostic configuration. The
+ * returned function is the default export each `api/submit-*.ts` exposes. The
+ * `dispatch` plug-in supplies the provider (n8n or Odoo).
  */
-export function createN8nSubmitHandler<TData, TPayload = unknown>(
-    options: CreateN8nSubmitHandlerOptions<TData, TPayload>,
+export function createSubmitHandler<TData, TPayload = unknown>(
+    options: CreateSubmitHandlerOptions<TData, TPayload>,
 ): (request: Request) => Promise<Response> {
-    const secretEnvVar = options.webhookSecretEnvVar ?? DEFAULT_WEBHOOK_SECRET_ENV_VAR;
-
     return async function handler(request: Request): Promise<Response> {
         const requestId = createRequestId();
         const corsHeaders = buildCorsHeaders();
@@ -247,13 +309,12 @@ export function createN8nSubmitHandler<TData, TPayload = unknown>(
             );
         }
 
-        const webhookUrl = process.env[options.webhookEnvVar]?.trim();
-        const webhookSecret = process.env[secretEnvVar]?.trim();
-        if (!webhookUrl || !webhookSecret) {
+        const configCheck = options.dispatch.checkConfig();
+        if (!configCheck.ok) {
             logger.error(options.logScope, { requestId, stage: 'config', code: 'SERVER_CONFIG_ERROR' });
             return buildJsonResponse(
-                { ok: false, requestId, code: 'SERVER_CONFIG_ERROR', error: options.config.missingError },
-                options.config.missingStatus,
+                { ok: false, requestId, code: 'SERVER_CONFIG_ERROR', error: configCheck.error },
+                configCheck.status,
                 corsHeaders,
             );
         }
@@ -302,8 +363,8 @@ export function createN8nSubmitHandler<TData, TPayload = unknown>(
         };
 
         try {
-            const payload = options.buildPayload(data, requestId, ctx);
-            await options.send(webhookUrl, webhookSecret, requestId, payload);
+            const payload = options.dispatch.buildPayload(data, requestId, ctx);
+            await options.dispatch.send(requestId, payload);
         } catch (error: unknown) {
             return buildWebhookErrorResponse(env, data, error);
         }
@@ -320,4 +381,47 @@ export function createN8nSubmitHandler<TData, TPayload = unknown>(
             corsHeaders,
         );
     };
+}
+
+/**
+ * n8n adapter over {@link createSubmitHandler}. Keeps the existing per-endpoint
+ * config shape (webhook env var + `send(url, secret, …)`) so the NPS handler — the
+ * only remaining n8n consumer — and its tests stay unchanged.
+ */
+export function createN8nSubmitHandler<TData, TPayload = unknown>(
+    options: CreateN8nSubmitHandlerOptions<TData, TPayload>,
+): (request: Request) => Promise<Response> {
+    const secretEnvVar = options.webhookSecretEnvVar ?? DEFAULT_WEBHOOK_SECRET_ENV_VAR;
+
+    return createSubmitHandler<TData, TPayload>({
+        logScope: options.logScope,
+        rateLimit: options.rateLimit,
+        parse: options.parse,
+        methodNotAllowedError: options.methodNotAllowedError,
+        validate: options.validate,
+        success: options.success,
+        onValidated: options.onValidated,
+        onError: options.onError,
+        dispatch: {
+            checkConfig: () => {
+                const webhookUrl = process.env[options.webhookEnvVar]?.trim();
+                const webhookSecret = process.env[secretEnvVar]?.trim();
+                if (!webhookUrl || !webhookSecret) {
+                    return { ok: false, status: options.config.missingStatus, error: options.config.missingError };
+                }
+                return { ok: true };
+            },
+            buildPayload: options.buildPayload,
+            // checkConfig guarantees both env vars are present within this request.
+            send: (requestId, payload) =>
+                options.send(
+                    process.env[options.webhookEnvVar]!.trim(),
+                    process.env[secretEnvVar]!.trim(),
+                    requestId,
+                    payload,
+                ),
+            classifyError: (error) => classifyN8nSubmitError(error, options.error),
+            failureStage: 'n8n_webhook_failed',
+        },
+    });
 }

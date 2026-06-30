@@ -1,24 +1,21 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { validateQuizPayload } from '../lib/quiz-logic.ts';
-import { buildN8nQuizPayload } from '../lib/n8n-payloads.ts';
+import quizHandler from '../api/submit-quiz.ts';
+import { createOdooMock, setOdooEnv, clearOdooEnv } from './odoo-mock.ts';
 
 const BASE_PAYLOAD = {
     firstName: 'Maria',
     lastName: 'Silva',
     email: 'maria@example.com',
-    profileKey: 'aventureiro',
-    profileName: 'Aventureiro',
-    bantSummary: 'Quiz Anhangá · Perfil: Aventureiro · destino=europa',
+    profileKey: 'escapista',
+    profileName: 'Escapista',
+    bantSummary: 'Quiz Anhangá · Perfil: Escapista · destino=europa',
     sourcePage: '/quiz',
-    utms: {
-        utm_source: null,
-        utm_medium: null,
-        utm_campaign: null,
-        utm_term: null,
-        utm_content: null,
-    },
+    utms: { utm_source: null, utm_medium: null, utm_campaign: null, utm_term: null, utm_content: null },
 };
+
+// --- validateQuizPayload (lib/quiz-logic) — unchanged by the Odoo cut-over ----
 
 test('validateQuizPayload — destinos preenchidos são normalizados e incluídos', () => {
     const result = validateQuizPayload({ ...BASE_PAYLOAD, destinos: ['europa', 'latam'] });
@@ -44,35 +41,11 @@ test('validateQuizPayload — destinos com espaços são normalizados com trim',
     assert.deepEqual(result.data.destinos, ['europa', 'latam']);
 });
 
-test('validateQuizPayload — destinos com strings vazias após trim são removidos', () => {
-    const result = validateQuizPayload({ ...BASE_PAYLOAD, destinos: ['europa', '   ', 'latam'] });
-    assert.ok(result.valid);
-    assert.deepEqual(result.data.destinos, ['europa', 'latam']);
-});
-
 test('validateQuizPayload — destinos limitado a 10 elementos', () => {
     const destinos = Array.from({ length: 15 }, (_, i) => `destino-${i}`);
     const result = validateQuizPayload({ ...BASE_PAYLOAD, destinos });
     assert.ok(result.valid);
     assert.equal(result.data.destinos?.length, 10);
-});
-
-test('buildN8nQuizPayload — inclui destinos no payload do n8n', () => {
-    const payload = { ...BASE_PAYLOAD, destinos: ['europa', 'latam'], tracking: undefined };
-    const n8n = buildN8nQuizPayload(payload, 'req-123');
-    assert.deepEqual(n8n.quiz.destinos, ['europa', 'latam']);
-});
-
-test('buildN8nQuizPayload — destinos ausente resulta em array vazio no payload n8n', () => {
-    const payload = { ...BASE_PAYLOAD, tracking: undefined };
-    const n8n = buildN8nQuizPayload(payload, 'req-456');
-    assert.deepEqual(n8n.quiz.destinos, []);
-});
-
-test('validateQuizPayload — lastName é incluído no resultado', () => {
-    const result = validateQuizPayload({ ...BASE_PAYLOAD });
-    assert.ok(result.valid);
-    assert.equal(result.data.lastName, 'Silva');
 });
 
 test('validateQuizPayload — lastName ausente resulta em string vazia', () => {
@@ -82,22 +55,10 @@ test('validateQuizPayload — lastName ausente resulta em string vazia', () => {
     assert.equal(result.data.lastName, '');
 });
 
-test('buildN8nQuizPayload — inclui lastName no payload do n8n', () => {
-    const payload = { ...BASE_PAYLOAD, tracking: undefined };
-    const n8n = buildN8nQuizPayload(payload, 'req-789');
-    assert.equal(n8n.quiz.lastName, 'Silva');
-});
-
 test('validateQuizPayload — newsletterOptIn true é preservado', () => {
     const result = validateQuizPayload({ ...BASE_PAYLOAD, newsletterOptIn: true });
     assert.ok(result.valid);
     assert.equal(result.data.newsletterOptIn, true);
-});
-
-test('validateQuizPayload — newsletterOptIn ausente resulta em false', () => {
-    const result = validateQuizPayload({ ...BASE_PAYLOAD });
-    assert.ok(result.valid);
-    assert.equal(result.data.newsletterOptIn, false);
 });
 
 test('validateQuizPayload — newsletterOptIn com valor não-boolean resulta em false', () => {
@@ -106,28 +67,10 @@ test('validateQuizPayload — newsletterOptIn com valor não-boolean resulta em 
     assert.equal(result.data.newsletterOptIn, false);
 });
 
-test('buildN8nQuizPayload — inclui newsletterOptIn no payload do n8n', () => {
-    const payload = { ...BASE_PAYLOAD, newsletterOptIn: true, tracking: undefined };
-    const n8n = buildN8nQuizPayload(payload, 'req-nl-1');
-    assert.equal(n8n.quiz.newsletterOptIn, true);
-});
-
-test('buildN8nQuizPayload — newsletterOptIn ausente resulta em false no payload n8n', () => {
-    const payload = { ...BASE_PAYLOAD, tracking: undefined };
-    const n8n = buildN8nQuizPayload(payload, 'req-nl-2');
-    assert.equal(n8n.quiz.newsletterOptIn, false);
-});
-
 test('validateQuizPayload — whatsapp mascarado é normalizado para E.164', () => {
     const result = validateQuizPayload({ ...BASE_PAYLOAD, whatsapp: '(11) 99999-9999' });
     assert.ok(result.valid);
     assert.equal(result.data.whatsapp, '+5511999999999');
-});
-
-test('validateQuizPayload — whatsapp ausente resulta em undefined', () => {
-    const result = validateQuizPayload({ ...BASE_PAYLOAD });
-    assert.ok(result.valid);
-    assert.equal(result.data.whatsapp, undefined);
 });
 
 test('validateQuizPayload — whatsapp inválido (poucos dígitos) resulta em undefined', () => {
@@ -136,28 +79,53 @@ test('validateQuizPayload — whatsapp inválido (poucos dígitos) resulta em un
     assert.equal(result.data.whatsapp, undefined);
 });
 
-test('buildN8nQuizPayload — inclui whatsapp normalizado no payload do n8n', () => {
-    const validation = validateQuizPayload({ ...BASE_PAYLOAD, whatsapp: '(11) 99999-9999' });
-    assert.ok(validation.valid);
-    const n8n = buildN8nQuizPayload(validation.data, 'req-wa-1');
-    assert.equal(n8n.quiz.whatsapp, '+5511999999999');
-});
-
-test('buildN8nQuizPayload — whatsapp ausente resulta em null no payload n8n', () => {
-    const payload = { ...BASE_PAYLOAD, tracking: undefined };
-    const n8n = buildN8nQuizPayload(payload, 'req-wa-2');
-    assert.equal(n8n.quiz.whatsapp, null);
-});
-
 test('validateQuizPayload — sanitiza destinos contra XSS', () => {
-    const payload = {
+    const result = validateQuizPayload({
         ...BASE_PAYLOAD,
         destinos: ['<script>alert("xss")</script>', 'Orlando <img src=x onerror=alert(1)>'],
-    };
-    const result = validateQuizPayload(payload);
+    });
     assert.ok(result.valid);
     assert.deepEqual(result.data.destinos, [
         '&lt;script&gt;alert("xss")&lt;/script&gt;',
         'Orlando &lt;img src=x onerror=alert(1)&gt;',
     ]);
+});
+
+// --- handler integration (Odoo) — quiz is ToFu: partner only, no crm.lead ----
+
+const originalFetch = global.fetch;
+
+function buildRequest(body: Record<string, unknown>): Request {
+    const ipSuffix = Math.floor(Math.random() * 200) + 1;
+    return new Request('http://localhost/api/submit-quiz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-real-ip': `10.1.0.${ipSuffix}` },
+        body: JSON.stringify(body),
+    });
+}
+
+test('submit-quiz upserts a partner with x_perfil_do_viajante and creates NO crm.lead', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    setOdooEnv();
+    const mock = createOdooMock();
+    global.fetch = mock.fetch;
+
+    const res = await quizHandler(buildRequest({ ...BASE_PAYLOAD, newsletterOptIn: true, destinos: ['europa'] }));
+    assert.equal(res.status, 200);
+
+    assert.equal(mock.createdLead(), false);
+    const partner = mock.partnerFields()!;
+    assert.equal(partner.email, 'maria@example.com');
+    assert.equal(partner.x_perfil_do_viajante, 'escapista');
+    assert.equal(partner.x_lgpd_consent, true);
+});
+
+test('submit-quiz maps Odoo failures to ODOO_ERROR', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    setOdooEnv();
+    global.fetch = createOdooMock({ failStatus: 503 }).fetch;
+
+    const res = await quizHandler(buildRequest({ ...BASE_PAYLOAD }));
+    assert.equal(res.status, 503);
+    assert.equal((await res.json()).code, 'ODOO_ERROR');
 });

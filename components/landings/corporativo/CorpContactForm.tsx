@@ -34,7 +34,7 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
             const empresa = state.form.empresa.trim() || 'Não informado';
             const cargo = state.form.cargo.trim() || 'Não informado';
 
-            const n8nResult = await submitLead(
+            const result = await submitLead(
                 {
                     firstName: state.form.firstName,
                     lastName: state.form.lastName,
@@ -47,20 +47,15 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
                     eventId,
                     pushDataLayerEvent: true,
                     formType: 'corporate_lead',
-                    salesforce: {
-                        leadSource: 'Corporativo',
-                        empresa: state.form.empresa,
-                        cargo: state.form.cargo,
-                    },
                 },
             );
 
-            if (n8nResult.ok) {
+            if (result.ok) {
                 dispatch({ type: 'submit-success' });
             } else {
                 dispatch({
                     type: 'submit-error',
-                    message: n8nResult.error || 'Ocorreu um erro ao enviar. Tente novamente.',
+                    message: result.error || 'Ocorreu um erro ao enviar. Tente novamente.',
                 });
                 isSubmittingRef.current = false;
             }
