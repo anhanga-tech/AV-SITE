@@ -79,6 +79,9 @@ const WaitlistSection: React.FC = () => {
       name,
       email,
       sourcePage: typeof window !== 'undefined' ? window.location.pathname : '/lollapalooza',
+      // The checkbox copy ("Autorizo a Anhangá a me enviar novidades") is a
+      // marketing opt-in → feeds Odoo x_lgpd_consent.
+      emailOptIn: acceptedLgpd,
     });
 
     if (result.ok === false) {

@@ -55,7 +55,7 @@ export function buildCorsHeaders(allowedOrigin?: string): Record<string, string>
 
 /**
  * Resposta JSON padrão dos handlers. O header X-Request-Id é resolvido assim:
- * - options.requestId === null  → suprime o header (ex.: submit-lead-sf).
+ * - options.requestId === null  → suprime o header.
  * - options.requestId é string  → usa esse valor.
  * - options.requestId ausente   → auto-deriva de body.requestId (se string).
  */

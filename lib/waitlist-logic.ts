@@ -57,6 +57,9 @@ export function validateWaitlistPayload(
             name,
             email,
             sourcePage,
+            // Marketing opt-in (separate from the privacy/LGPD submission gate) →
+            // feeds Odoo x_lgpd_consent.
+            emailOptIn: raw.emailOptIn === true,
             utms,
             tracking,
         },

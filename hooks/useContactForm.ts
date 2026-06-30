@@ -1,7 +1,6 @@
 import { useCallback, useState, useRef } from 'react';
 import { cleanString } from '../lib/lead-logic';
 import { getTrackingDataObject, getWhatsAppLink } from '../utils/whatsapp';
-import { sendLeadToSalesforce } from '../utils/salesforce-lead';
 import { createLeadEventId, extractUtms } from './useLeadCapture';
 import type { ContactFormFields, SubmitContactRequest, SubmitContactResponse } from '../types/contactCapture';
 import type { LeadTracking } from '../types/leadCapture';
@@ -69,26 +68,6 @@ function collectTracking(): { tracking: LeadTracking; utms: SubmitContactRequest
     };
 
     return { tracking, utms: extractUtms(tracking) };
-}
-
-function mirrorContactToSalesforce(
-    requestBody: SubmitContactRequest,
-    action: 'whatsapp' | 'callback',
-    options: ContactModalOptions,
-): void {
-    sendLeadToSalesforce({
-        firstName: requestBody.firstName,
-        lastName: requestBody.lastName || '-',
-        email: requestBody.email,
-        whatsapp: requestBody.whatsapp,
-        leadSource: 'Web',
-        description: [
-            `Contato rápido via site (${options.source ?? 'modal'}). Ação: ${action}.`,
-            options.destination ? `Destino de interesse: ${options.destination}.` : '',
-            `Newsletter: ${requestBody.emailOptIn ? 'Sim' : 'Não'}.`,
-        ].filter(Boolean).join(' '),
-        utms: requestBody.utms,
-    });
 }
 
 function pushContactDataLayerEvent(
@@ -172,8 +151,6 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 utms,
                 tracking,
             };
-
-            mirrorContactToSalesforce(requestBody, action, options);
 
             try {
                 const response = await fetch('/api/submit-contact', {

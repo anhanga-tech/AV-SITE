@@ -136,7 +136,7 @@ export function useWaitlistCapture() {
     }, []);
 
     const submitWaitlist = useCallback(async (
-        input: Pick<SubmitWaitlistRequest, 'name' | 'email' | 'sourcePage'>,
+        input: Pick<SubmitWaitlistRequest, 'name' | 'email' | 'sourcePage' | 'emailOptIn'>,
     ): Promise<SubmitWaitlistResult> => {
         if (isLocallySubmitting.current) {
             return { ok: false, error: 'Submissão em andamento', code: 'ALREADY_SUBMITTING' };

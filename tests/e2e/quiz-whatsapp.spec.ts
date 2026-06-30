@@ -25,15 +25,6 @@ test.describe('Quiz — captura de WhatsApp no resultado', () => {
             });
         });
 
-        // Salesforce mirror is fire-and-forget; stub it so it never errors in CI.
-        await page.route('**/api/submit-lead-sf', async route => {
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify({ ok: true }),
-            });
-        });
-
         await page.goto('/quiz');
 
         await page.getByRole('button', { name: /bora começar/i }).click();

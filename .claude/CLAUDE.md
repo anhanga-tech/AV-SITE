@@ -44,12 +44,17 @@ Copy `.env.example` to `.env`. Required groups:
 GEMINI_API_KEY=           # Google Gemini API key
 GEMINI_MODEL=             # Optional override (default: gemini-3.1-flash-lite)
 
-# CRM ativo: Salesforce + api/submit-lead-sf.ts (web-to-lead)
-# Leads novos criados pelo chatbot seguem este caminho; HubSpot abaixo é legado.
+# CRM ativo: Odoo (External API JSON-RPC) — ver bloco ODOO_* abaixo.
+# Os 4 formulários de lead postam direto no Odoo. Salesforce e HubSpot são legado.
 
-# n8n Webhooks (required in prod)
-N8N_WEBHOOK_SECRET=           # Shared HMAC secret for inbound n8n calls
-N8N_SUBMIT_CONTACT_WEBHOOK_URL=   # Contact form webhook
+# Odoo — CRM ativo (required in prod): intake dos 4 formulários de lead via JSON-RPC
+ODOO_URL=                     # https://anhanga.odoo.com
+ODOO_DB=                      # anhanga
+ODOO_LOGIN=                   # e-mail de um usuário Odoo
+ODOO_API_KEY=                 # API key (entra no lugar da senha)
+
+# n8n Webhooks (required in prod) — só NPS + purchase-dispatch após o cut-over Odoo
+N8N_WEBHOOK_SECRET=           # Shared HMAC secret (purchase-dispatch + NPS sender)
 NPS_WEBHOOK_URL=              # Post-trip NPS form webhook
 
 # Rate limiting (required in prod — module-level state resets per request on Cloudflare)
@@ -94,7 +99,7 @@ Two layout tiers, resolved at the top-level `Routes`:
   /ai         Gemini config, BANT prompt, tool definitions, handoff logic
   /schemas    Zod validators for each API endpoint
   /conversions  Google + Meta pixel helpers
-/services     Client/server provider integrations (geminiService, n8n, hubspot, salesforce)
+/services     Client/server provider integrations (geminiService, odoo, n8n, hubspot)
 /hooks        React form hooks (useLeadCapture, useContactForm, useQuizCapture, useWaitlistCapture)
 /components   React UI; /ui for primitives, /schemas for JSON-LD, /landings for event pages, /blog for post layout
 /pages        Route components; /landings for standalone event pages
@@ -112,12 +117,11 @@ Handlers rodam como Cloudflare Pages Functions (via `functions/`). O campo `expo
 | Handler | Purpose |
 |---|---|
 | `generate.ts` | Gemini chatbot proxy; runs BANT qualification state machine |
-| `submit-lead.ts` | Lead capture → n8n webhook |
-| `submit-contact.ts` | Quick contact form → n8n |
-| `submit-waitlist.ts` | Event waitlist → n8n |
-| `submit-nps.ts` | Post-trip NPS form → n8n |
-| `submit-quiz.ts` | Travel quiz results → n8n |
-| `submit-lead-sf.ts` | Lead capture via Salesforce web-to-lead (CRM ativo) |
+| `submit-lead.ts` | Lead capture (chatbot/corporativo) → Odoo `res.partner` + `crm.lead` |
+| `submit-contact.ts` | Quick contact form → Odoo `res.partner` + `crm.lead` |
+| `submit-waitlist.ts` | Event waitlist → Odoo `res.partner` (ToFu, sem oportunidade) |
+| `submit-nps.ts` | Post-trip NPS form → n8n (único consumidor n8n restante) |
+| `submit-quiz.ts` | Travel quiz results → Odoo `res.partner` (ToFu, sem oportunidade) |
 | `hubspot-webhook.ts` | Inbound HubSpot "Closed-Won" deal events |
 | `purchase-dispatch.ts` | Receives n8n purchase events; validates `N8N_WEBHOOK_SECRET` |
 | `auth.ts` / `auth/callback.ts` | GitHub OAuth for Decap CMS `/admin` |
@@ -143,13 +147,13 @@ The AI subsystem is fully isolated in `lib/ai/`: `constants.ts` (models, budget 
 
 ### Lead Capture Flow
 
-Lead data flows through n8n e Salesforce (CRM ativo desde mai/2026):
-1. `useLeadCapture.ts` collects BANT summary + UTM attribution from `geminiService.ts`
-2. Submits to `/api/submit-lead.ts`
-3. Handler validates + normalizes via `lib/lead-logic.ts` and Zod schema in `lib/schemas/submit-lead.ts`
-4. Calls n8n webhook (`N8N_SUBMIT_CONTACT_WEBHOOK_URL`) via `services/n8n.ts` with payload shaped by `lib/n8n-payloads.ts`
-5. n8n cria/atualiza o lead no **Salesforce** via `api/submit-lead-sf.ts` + `services/salesforce.ts` (web-to-lead). O caminho HubSpot é legado — não usar para leads novos.
-6. Error codes: 400 (validation), 401 (bad token), 429 (rate limit), 500 (server/n8n)
+Os 4 formulários de lead postam **direto no Odoo** via External API JSON-RPC (cut-over do n8n/Salesforce em jun/2026):
+1. `useLeadCapture.ts` (e os hooks de contato/quiz/waitlist) coletam BANT/perfil + atribuição UTM + opt-in de marketing
+2. Submetem a `/api/submit-{lead,contact,quiz,waitlist}.ts`
+3. O handler valida/normaliza (`lib/lead-logic.ts`, `lib/quiz-logic.ts`, `lib/waitlist-logic.ts`, Zod em `lib/schemas/`)
+4. `createOdooSubmitHandler` (`lib/odoo-submit-handler.ts`) chama `services/odoo.ts` (JSON-RPC sobre fetch — runtime Workers não roda `xmlrpc`): `openOdooSession` → `upsertPartner` (dedup por e-mail) **+** `createLead` em lead/contato
+5. Mapeamento puro em `lib/odoo-lead-mapping.ts`: `res.partner` (incl. `x_perfil_do_viajante` no quiz, `x_lgpd_consent` via opt-in de e-mail marketing) e `crm.lead` (opportunity, `partner_id` ligado, `source_id`/`medium_id` por UTM). Quiz/waitlist são ToFu → só `res.partner`. NPS segue no n8n; `purchase-dispatch` ainda usa `N8N_WEBHOOK_SECRET`.
+6. Falha do Odoo retorna erro visível (502/504, code `ODOO_ERROR`) → fallback de WhatsApp do cliente. Error codes: 400 (validation), 429 (rate limit), 500 (config), 502/504 (Odoo)
 
 ### UTM Tracking (`utils/whatsapp.ts`)
 

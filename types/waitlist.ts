@@ -4,6 +4,8 @@ export interface SubmitWaitlistRequest {
     name: string;
     email: string;
     sourcePage: string;
+    /** E-mail-marketing opt-in (separate from the privacy/LGPD submission gate). */
+    emailOptIn?: boolean;
     utms: LeadUtms;
     tracking?: LeadTracking;
 }
