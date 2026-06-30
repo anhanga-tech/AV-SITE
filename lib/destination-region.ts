@@ -138,9 +138,15 @@ function escapeRegExp(value: string): string {
     return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function matchesKeyword(haystack: string, keyword: string): boolean {
-    return new RegExp(`\\b${escapeRegExp(keyword)}\\b`).test(haystack);
-}
+// One alternation regex per region, compiled once at module load (avoids
+// recompiling a RegExp per keyword on every submit). Word boundaries keep short
+// tokens from matching inside longer words (e.g. "usa" inside "jerusalem").
+const REGION_RULES: Array<{ tag: RegionTagId; regex: RegExp }> = REGION_KEYWORDS.map(
+    ({ tag, keywords }) => ({
+        tag,
+        regex: new RegExp(`\\b(?:${keywords.map(escapeRegExp).join('|')})\\b`),
+    }),
+);
 
 /** Quiz answer ids → region tags (structured, exact lookup). */
 export function resolveQuizDestinoTags(destinos: string[] | undefined | null): RegionTagId[] {
@@ -160,8 +166,8 @@ export function resolveRegionTagsFromText(text: string | null | undefined): Regi
     if (!normalized) return [];
 
     const tags = new Set<RegionTagId>();
-    for (const { tag, keywords } of REGION_KEYWORDS) {
-        if (keywords.some((kw) => matchesKeyword(normalized, kw))) {
+    for (const { tag, regex } of REGION_RULES) {
+        if (regex.test(normalized)) {
             tags.add(tag);
         }
     }
