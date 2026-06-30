@@ -48,7 +48,7 @@ async function sendToOdoo(input: OdooLeadInput): Promise<void> {
 
     const session = await openOdooSession(config);
     const partnerId = await session.upsertPartner(buildPartnerFields(input), {
-        preserveName: input.formType === 'nps',
+        preserveName: input.preserveName,
     });
 
     if (input.createsLead) {

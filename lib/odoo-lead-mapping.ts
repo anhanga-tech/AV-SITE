@@ -76,6 +76,12 @@ export interface OdooLeadInput {
     contextNote?: string | null;
     /** Post-trip NPS (0-10) → x_nps_score. */
     npsScore?: number;
+    /**
+     * Skip overwriting `name` on an existing partner match. Set by adapters whose
+     * form only captures a partial name (e.g. NPS asks for firstname only) so a
+     * fuller name already on file isn't clobbered.
+     */
+    preserveName?: boolean;
 }
 
 export interface SourceMedium {
@@ -294,6 +300,7 @@ export function leadInputFromSubmitNps(data: SubmitNpsRequest): OdooLeadInput {
         utms: EMPTY_UTMS,
         originSignal: null,
         contextNote,
+        preserveName: true,
     };
 }
 
