@@ -16,6 +16,11 @@ import type { LeadTracking, LeadUtms, SubmitLeadRequest } from '../types/leadCap
 import type { SubmitContactRequest } from '../types/contactCapture';
 import type { SubmitQuizRequest } from '../types/quiz';
 import type { SubmitWaitlistRequest } from '../types/waitlist';
+import {
+    type RegionTagId,
+    resolveQuizDestinoTags,
+    resolveRegionTagsFromText,
+} from './destination-region';
 
 // utm.source / utm.medium record IDs (see contract §3, validated against instance).
 const SOURCE = { referral: 8, googleAds: 17, metaAds: 18, quiz: 16, whatsapp: 19, site: 15 } as const;
@@ -55,6 +60,8 @@ export interface OdooLeadInput {
     marketingOptIn: boolean;
     /** Quiz ProfileKey → x_perfil_do_viajante (selection). */
     profileKey?: string | null;
+    /** "Destino de Interesse" tags (res.partner.category) → category_id. */
+    destinationTagIds?: RegionTagId[];
     destination?: string | null;
     bantSummary?: string | null;
     referred?: string | null;
@@ -100,6 +107,8 @@ function fullName(firstName: string, lastName: string): string {
  * Builds the `res.partner` create/write dict. Only includes fields with content:
  * `x_lgpd_consent` is written only when opting in (we never revoke consent on an
  * update), and `x_perfil_do_viajante` only for a recognized quiz profile.
+ * `category_id` uses link commands `(4, id)` so tags are added without removing
+ * any existing ones on a deduped partner.
  */
 export function buildPartnerFields(input: OdooLeadInput): Record<string, unknown> {
     const fields: Record<string, unknown> = { name: fullName(input.firstName, input.lastName) };
@@ -109,6 +118,9 @@ export function buildPartnerFields(input: OdooLeadInput): Record<string, unknown
     if (input.marketingOptIn) fields.x_lgpd_consent = true;
     if (input.profileKey && VALID_PROFILE_KEYS.has(input.profileKey)) {
         fields.x_perfil_do_viajante = input.profileKey;
+    }
+    if (input.destinationTagIds && input.destinationTagIds.length > 0) {
+        fields.category_id = input.destinationTagIds.map((id) => [4, id]);
     }
     if (input.contextNote) fields.comment = input.contextNote;
 
@@ -188,6 +200,7 @@ export function leadInputFromSubmitLead(data: SubmitLeadRequest): OdooLeadInput 
         phone: data.whatsapp || null,
         marketingOptIn: data.marketingOptIn === true,
         destination: data.destination,
+        destinationTagIds: resolveRegionTagsFromText(data.destination),
         bantSummary: data.bantSummary,
         eventId: data.event_id ?? null,
         utms: data.utms,
@@ -206,6 +219,7 @@ export function leadInputFromSubmitContact(data: SubmitContactRequest): OdooLead
         phone: data.whatsapp || null,
         marketingOptIn: data.emailOptIn === true,
         destination: data.destination ?? null,
+        destinationTagIds: resolveRegionTagsFromText(data.destination ?? null),
         eventId: data.eventId ?? null,
         utms: data.utms,
         tracking: data.tracking,
@@ -236,6 +250,7 @@ export function leadInputFromSubmitQuiz(data: SubmitQuizRequest): OdooLeadInput 
         phone: data.whatsapp || null,
         marketingOptIn: data.newsletterOptIn === true,
         profileKey: data.profileKey,
+        destinationTagIds: resolveQuizDestinoTags(data.destinos),
         utms: data.utms,
         tracking: data.tracking,
         originSignal: 'quiz',

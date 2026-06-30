@@ -10,6 +10,7 @@ import {
     leadInputFromSubmitWaitlist,
     type OdooLeadInput,
 } from '../lib/odoo-lead-mapping.ts';
+import { REGION_TAG } from '../lib/destination-region.ts';
 import type { LeadUtms } from '../types/leadCapture.ts';
 
 const EMPTY_UTMS: LeadUtms = { utm_source: null, utm_medium: null, utm_campaign: null, utm_term: null, utm_content: null };
@@ -89,6 +90,18 @@ test('buildPartnerFields — ignores an unrecognized profileKey', () => {
     assert.equal('x_perfil_do_viajante' in fields, false);
 });
 
+test('buildPartnerFields — emite category_id com comandos de link (4, id) por tag', () => {
+    const fields = buildPartnerFields(
+        baseInput({ destinationTagIds: [REGION_TAG.americaNorte, REGION_TAG.caribe] }),
+    );
+    assert.deepEqual(fields.category_id, [[4, 6], [4, 10]]);
+});
+
+test('buildPartnerFields — omite category_id quando não há tag (fallback)', () => {
+    assert.equal('category_id' in buildPartnerFields(baseInput({ destinationTagIds: [] })), false);
+    assert.equal('category_id' in buildPartnerFields(baseInput({})), false);
+});
+
 // --- buildLeadFields ---------------------------------------------------------
 
 test('buildLeadFields — opportunity shape with partner_id and resolved source/medium', () => {
@@ -127,6 +140,16 @@ test('leadInputFromSubmitLead — creates a lead, maps marketingOptIn', () => {
     assert.equal(input.createsLead, true);
     assert.equal(input.marketingOptIn, true);
     assert.equal(input.destination, 'Orlando');
+    assert.deepEqual(input.destinationTagIds, [REGION_TAG.americaNorte]);
+});
+
+test('leadInputFromSubmitLead — destino livre não reconhecido não gera tag (fallback)', () => {
+    const input = leadInputFromSubmitLead({
+        firstName: 'Ana', lastName: 'Silva', email: 'ana@example.com', whatsapp: '+5511999990000',
+        bantSummary: 'Need: X', destination: 'Marte', marketingOptIn: true,
+        utms: EMPTY_UTMS, tracking: undefined,
+    } as never);
+    assert.deepEqual(input.destinationTagIds, []);
 });
 
 test('leadInputFromSubmitContact — creates a lead, emailOptIn → marketingOptIn', () => {
@@ -142,13 +165,14 @@ test('leadInputFromSubmitQuiz — partner only (no lead), carries profileKey + q
     const input = leadInputFromSubmitQuiz({
         firstName: 'Ana', lastName: 'Silva', email: 'ana@example.com',
         profileKey: 'escapista', profileName: 'Escapista', bantSummary: 'Quiz', sourcePage: '/quiz',
-        destinos: ['Maldivas'], newsletterOptIn: true, utms: EMPTY_UTMS,
+        destinos: ['europa', 'asia'], newsletterOptIn: true, utms: EMPTY_UTMS,
     } as never);
     assert.equal(input.createsLead, false);
     assert.equal(input.profileKey, 'escapista');
     assert.equal(input.originSignal, 'quiz');
     assert.equal(input.marketingOptIn, true);
-    assert.match(String(input.contextNote), /Destinos: Maldivas/);
+    assert.deepEqual(input.destinationTagIds, [REGION_TAG.europa, REGION_TAG.asia]);
+    assert.match(String(input.contextNote), /Destinos: europa, asia/);
 });
 
 test('leadInputFromSubmitWaitlist — partner only, splits name, emailOptIn → marketingOptIn', () => {
