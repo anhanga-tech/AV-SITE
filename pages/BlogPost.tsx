@@ -70,19 +70,26 @@ const BlogPost: React.FC = () => {
 
     const CATEGORY_MATCH_SCORE = 3;
 
-    // Related posts: prioriza mesma categoria e tags em comum
+    // Related posts: prioriza mesma categoria e tags em comum.
+    // Perf: calcula o score de cada candidato UMA vez (transformação de Schwartz)
+    // em vez de recomputá-lo dentro do comparador — o `sort` invoca o comparador
+    // O(n log n) vezes, então pontuar ali repetia o mesmo trabalho a cada
+    // comparação. Um Set das tags do post atual também troca o `includes` (varredura
+    // O(t) por tag) por lookup O(1). `Array.sort` é estável, então a ordem de
+    // empates permanece idêntica à versão anterior.
+    const postTagSet = new Set(post.tags);
     const relatedPosts = allMdxPosts
         .filter(p => p.slug !== slug)
-        .sort((a, b) => {
-            const score = (p: typeof allMdxPosts[0]) => {
-                let s = 0;
-                if (p.category === post.category) s += CATEGORY_MATCH_SCORE;
-                s += p.tags.filter(t => post.tags.includes(t)).length;
-                return s;
-            };
-            return score(b) - score(a);
+        .map(p => {
+            let score = p.category === post.category ? CATEGORY_MATCH_SCORE : 0;
+            for (const tag of p.tags) {
+                if (postTagSet.has(tag)) score += 1;
+            }
+            return { post: p, score };
         })
-        .slice(0, 2);
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 2)
+        .map(entry => entry.post);
 
     const sameAs = author?.social ? (Object.values(author.social).filter(Boolean) as string[]) : [];
 
