@@ -52,12 +52,17 @@ test('validateLeadForm — lead válido carrega o consentimento de marketing (�
   const result = validateLeadForm({ ...validLeadValues, acceptedLGPD: true });
 
   assert.equal(result.ok, true);
-  assert.equal(result.ok && result.marketingOptIn, true);
+  if (result.ok) {
+    assert.equal(result.marketingOptIn, true);
+  }
 });
 
 test('validateLeadForm — sem aceite de LGPD a submissão é bloqueada', () => {
   const result = validateLeadForm({ ...validLeadValues, acceptedLGPD: false });
 
   assert.equal(result.ok, false);
-  assert.equal(result.ok === false && result.fieldErrors?.lgpd, 'Você deve aceitar os termos');
+  if (!result.ok) {
+    assert.ok(result.fieldErrors);
+    assert.equal(result.fieldErrors.lgpd, 'Você deve aceitar os termos');
+  }
 });
