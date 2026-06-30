@@ -142,9 +142,10 @@ export async function openOdooSession(config: OdooConfig): Promise<OdooSession> 
     const deadline = Date.now() + TOTAL_DEADLINE_MS;
     const uid = await authenticate(config, deadline);
 
-    async function findPartnerId(fields: OdooPartnerFields): Promise<number | null> {
-        const email = typeof fields.email === 'string' ? fields.email : null;
-        const phone = typeof fields.phone === 'string' ? fields.phone : null;
+    // Odoo returns `false` (not '') for empty text fields over JSON-RPC.
+    async function findPartner(fields: OdooPartnerFields): Promise<{ id: number; comment: string | false } | null> {
+        const email = typeof fields.email === 'string' && fields.email.trim() !== '' ? fields.email.trim() : null;
+        const phone = typeof fields.phone === 'string' && fields.phone.trim() !== '' ? fields.phone.trim() : null;
         const domain = email
             ? [['email', '=', email]]
             : phone
@@ -152,24 +153,31 @@ export async function openOdooSession(config: OdooConfig): Promise<OdooSession> 
                 : null;
         if (!domain) return null;
 
-        const rows = await executeKw<Array<{ id: number }>>(
+        const rows = await executeKw<Array<{ id: number; comment: string | false }>>(
             config,
             uid,
             'res.partner',
             'search_read',
-            [domain, ['id']],
+            [domain, ['id', 'comment']],
             deadline,
             { limit: 1 },
         );
-        return rows[0]?.id ?? null;
+        return rows[0] ?? null;
     }
 
     return {
         async upsertPartner(fields) {
-            const existingId = await findPartnerId(fields);
-            if (existingId) {
-                await executeKw<boolean>(config, uid, 'res.partner', 'write', [[existingId], fields], deadline);
-                return existingId;
+            const existing = await findPartner(fields);
+            if (existing) {
+                const updateFields: OdooPartnerFields = { ...fields };
+                // `comment` (Internal Notes) is append-only — a sales agent may have
+                // written notes we must not overwrite. Concatenate instead.
+                if (typeof fields.comment === 'string' && fields.comment) {
+                    const previous = typeof existing.comment === 'string' ? existing.comment.trim() : '';
+                    updateFields.comment = previous ? `${previous}\n\n${fields.comment}` : fields.comment;
+                }
+                await executeKw<boolean>(config, uid, 'res.partner', 'write', [[existing.id], updateFields], deadline);
+                return existing.id;
             }
             return executeKw<number>(config, uid, 'res.partner', 'create', [fields], deadline);
         },

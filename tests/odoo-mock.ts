@@ -30,6 +30,8 @@ export interface OdooMockOptions {
     uid?: number;
     /** search_read result: id of an existing partner, or null for none. */
     existingPartnerId?: number | null;
+    /** `comment` returned for the existing partner (Odoo returns false when empty). */
+    existingComment?: string | false;
     newPartnerId?: number;
     leadId?: number;
     /** Force every RPC to fail with this HTTP status. */
@@ -69,6 +71,7 @@ export function createOdooMock(options: OdooMockOptions = {}): OdooMock {
     const {
         uid = 7,
         existingPartnerId = null,
+        existingComment = false,
         newPartnerId = 101,
         leadId = 555,
         failStatus,
@@ -99,7 +102,7 @@ export function createOdooMock(options: OdooMockOptions = {}): OdooMock {
             calls.push({ model, method: ormMethod, args: ormArgs, kwargs });
 
             if (ormMethod === 'search_read') {
-                result = existingPartnerId ? [{ id: existingPartnerId }] : [];
+                result = existingPartnerId ? [{ id: existingPartnerId, comment: existingComment }] : [];
             } else if (ormMethod === 'create') {
                 result = model === 'crm.lead' ? leadId : newPartnerId;
             } else if (ormMethod === 'write') {

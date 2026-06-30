@@ -56,6 +56,31 @@ test('upsertPartner — updates the existing partner (dedup by e-mail)', async (
     assert.deepEqual(write!.args[0], [99]);
 });
 
+test('upsertPartner — appends to the existing comment instead of overwriting it', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    const mock = createOdooMock({ existingPartnerId: 50, existingComment: 'Nota do vendedor' });
+    global.fetch = mock.fetch;
+
+    const session = await openOdooSession(config());
+    await session.upsertPartner({ name: 'Ana', email: 'ana@example.com', comment: 'Nova nota do quiz' });
+
+    const write = mock.calls.find((c) => c.method === 'write')!;
+    const fields = write.args[1] as Record<string, unknown>;
+    assert.equal(fields.comment, 'Nota do vendedor\n\nNova nota do quiz');
+});
+
+test('upsertPartner — uses the new comment when the partner has none', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    const mock = createOdooMock({ existingPartnerId: 51, existingComment: false });
+    global.fetch = mock.fetch;
+
+    const session = await openOdooSession(config());
+    await session.upsertPartner({ name: 'Ana', email: 'ana@example.com', comment: 'Primeira nota' });
+
+    const write = mock.calls.find((c) => c.method === 'write')!;
+    assert.equal((write.args[1] as Record<string, unknown>).comment, 'Primeira nota');
+});
+
 test('createLead — issues a crm.lead.create and returns the id', async (t) => {
     t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
     const mock = createOdooMock({ leadId: 777 });
