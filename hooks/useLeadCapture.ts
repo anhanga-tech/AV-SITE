@@ -15,6 +15,7 @@ export interface LeadDraft {
     baggagePreference: string;
     empresa?: string;
     cargo?: string;
+    referred?: string;
 }
 
 export type LeadDraftPartial = Partial<LeadDraft>;
@@ -55,6 +56,7 @@ const EMPTY_LEAD_DRAFT: LeadDraft = {
     baggagePreference: '',
     empresa: '',
     cargo: '',
+    referred: '',
 };
 
 function cleanValue(value: unknown): string {
@@ -155,6 +157,10 @@ function captureInitialTracking(): LeadTracking {
     };
 }
 
+function referralFromTracking(tracking: LeadTracking): string {
+    return cleanValue(tracking.extras?.ref);
+}
+
 export function buildLeadWhatsAppMessage(lead: LeadDraft): string {
     const origin = cleanValue(lead.origin) || 'A definir';
     const destination = cleanValue(lead.destination) || 'A definir';
@@ -207,7 +213,7 @@ export function createLeadEventId(): string {
     return `lead_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function buildSubmitLeadPayload(
+export function buildSubmitLeadPayload(
     leadDraft: LeadDraft,
     overrides: LeadDraftPartial,
     latestTracking: LeadTracking,
@@ -231,9 +237,11 @@ function buildSubmitLeadPayload(
     };
     const empresa = cleanValue(merged.empresa);
     const cargo = cleanValue(merged.cargo);
+    const referred = cleanValue(merged.referred) || referralFromTracking(latestTracking);
 
     if (empresa) payload.empresa = empresa;
     if (cargo) payload.cargo = cargo;
+    if (referred) payload.referred = referred;
 
     return payload;
 }

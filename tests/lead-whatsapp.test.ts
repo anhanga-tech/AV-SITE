@@ -7,6 +7,7 @@ import {
     pushGenerateLeadDataLayerEvent,
     type LeadDraft,
 } from '../hooks/useLeadCapture.ts';
+import { getTrackingDataObject } from '../utils/whatsapp.ts';
 
 type MockWindow = {
     location: {
@@ -123,6 +124,36 @@ test('buildLeadWhatsAppUrl should include origin, destination, dates, baggage an
     assert.match(message, /Dados: .*utm_source=google/);
     assert.match(message, /Dados: .*utm_medium=cpc/);
     assert.match(message, /Dados: .*gclid=test-gclid/);
+
+    restoreBrowserGlobals();
+});
+
+test('getTrackingDataObject should capture referral ref from URL params', () => {
+    const mockWindow: MockWindow = {
+        location: {
+            search: '?ref=Maria%20Silva',
+            hash: '',
+            href: 'https://www.anhanga.tur.br/?ref=Maria%20Silva',
+        },
+        dataLayer: [],
+    };
+
+    Object.defineProperty(globalThis, 'window', {
+        configurable: true,
+        value: mockWindow,
+    });
+    Object.defineProperty(globalThis, 'document', {
+        configurable: true,
+        value: { cookie: '' },
+    });
+    Object.defineProperty(globalThis, 'sessionStorage', {
+        configurable: true,
+        value: createSessionStorage(),
+    });
+
+    const tracking = getTrackingDataObject();
+
+    assert.equal(tracking?.ref, 'Maria Silva');
 
     restoreBrowserGlobals();
 });

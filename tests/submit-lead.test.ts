@@ -119,6 +119,18 @@ test('validatePayload should accept optional empresa/cargo as structured lead fi
     assert.equal(result.data.cargo, 'Diretora de Pessoas');
 });
 
+test('validatePayload should accept optional referred as a structured referral field', () => {
+    const result = validatePayload({
+        firstName: 'Felipe', lastName: 'William', email: 'felipe@example.com', whatsapp: '+5511988314487',
+        bantSummary: 'Lead indicado', destination: 'Orlando',
+        referred: '  Maria <Silva>  ',
+        utms: {}, tracking: {},
+    });
+    assert.equal(result.valid, true);
+    if (!result.valid) return;
+    assert.equal(result.data.referred, 'Maria &lt;Silva&gt;');
+});
+
 // --- handler integration (Odoo) ---------------------------------------------
 
 test('submit-lead upserts a partner and creates a linked crm.lead opportunity', async (t) => {
@@ -163,6 +175,27 @@ test('submit-lead maps corporate empresa/cargo to crm.lead partner_name/function
     const lead = mock.leadFields()!;
     assert.equal(lead.partner_name, 'Acme Viagens');
     assert.equal(lead.function, 'Diretora de Pessoas');
+});
+
+test('submit-lead maps referred leads to Indicação/indicacao in Odoo', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    const mock = createOdooMock({ newPartnerId: 101, leadId: 555 });
+    global.fetch = mock.fetch;
+
+    const response = await handler(buildRequest({
+        ...buildLeadPayloadFixture(),
+        utms: {},
+        tracking: {},
+        referred: 'Maria Silva',
+    }));
+    assert.equal(response.status, 201);
+
+    const lead = mock.leadFields()!;
+    assert.equal(lead.source_id, 8);
+    assert.equal(lead.medium_id, 6);
+    assert.equal(lead.referred, 'Maria Silva');
+    assert.match(String(lead.description), /<li>Indicado por: Maria Silva<\/li>/);
 });
 
 test('submit-lead sends sanitized values into the Odoo records', async (t) => {

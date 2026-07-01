@@ -214,10 +214,11 @@ export function leadInputFromSubmitLead(data: SubmitLeadRequest): OdooLeadInput 
         bantSummary: data.bantSummary,
         empresa: data.empresa ?? null,
         cargo: data.cargo ?? null,
+        referred: data.referred ?? null,
         eventId: data.event_id ?? null,
         utms: data.utms,
         tracking: data.tracking,
-        originSignal: null,
+        originSignal: data.referred ? 'referral' : null,
     };
 }
 
