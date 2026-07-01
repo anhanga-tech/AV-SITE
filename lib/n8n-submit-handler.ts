@@ -2,27 +2,28 @@
  * Shared factory for the `submit-*` Cloudflare Pages Functions.
  *
  * Every `submit-*` handler runs the same machine — method gate → CORS → config
- * check → rate limit → JSON parse → validation → payload build → `postToN8n` →
+ * check → rate limit → JSON parse → validation → payload build → dispatch →
  * error classification → structured response. The only things that genuinely
- * differ per endpoint are the validator, the payload builder, the webhook env
- * var, the rate-limit numbers and a handful of copy strings. This module owns
- * the machine; each handler supplies the differences as config.
+ * differ per endpoint are the validator, the payload builder, the provider
+ * dispatch (Odoo today), the rate-limit numbers and a handful of copy strings.
+ * This module owns the machine; each handler supplies the differences as
+ * config (see `lib/odoo-submit-handler.ts` for the Odoo adapter).
  *
- * `truncateDetail` and the n8n webhook-error classifier also live here so they
- * have a single source of truth (they used to be copy-pasted across handlers,
- * and one copy had already diverged).
+ * `truncateDetail` and the error classifier also live here so they have a
+ * single source of truth (they used to be copy-pasted across handlers, and one
+ * copy had already diverged). The error pattern/codes are named after n8n for
+ * historical reasons (pre cut-over, every form posted to n8n); `ODOO_ERROR:...`
+ * is matched the same way via the `errorPattern` option each handler supplies.
  */
 import { buildCorsHeaders, buildJsonResponse, createRequestId, getClientIP } from './network';
 import { checkRateLimit } from './rate-limit';
 import { logger } from './logger';
 
-// Upstream errors are encoded by services/n8n.ts as
-// `N8N_WEBHOOK_ERROR:<status>:<detail>`. The `s` flag lets the detail span the
-// newlines that providers sometimes return.
+// Default error pattern, overridable per handler via `errorPattern` (e.g. Odoo
+// handlers supply `ODOO_ERROR:<status>:<detail>`).
 const N8N_WEBHOOK_ERROR_PATTERN = /^N8N_WEBHOOK_ERROR:(\d+):(.*)$/s;
 
 const DEFAULT_DETAIL_MAX_LENGTH = 600;
-const DEFAULT_WEBHOOK_SECRET_ENV_VAR = 'N8N_WEBHOOK_SECRET';
 
 /**
  * Collapses provider error detail into a single, length-bounded line safe for
@@ -154,53 +155,6 @@ export interface CreateSubmitHandlerOptions<TData, TPayload = unknown> {
         /** Optional success message; omitted from the body when absent. */
         message?: string;
     };
-    /** Optional extra fields for the `payload_validated` info log. */
-    onValidated?: (data: TData, requestId: string) => Record<string, unknown> | void;
-    /** Optional extra fields (e.g. masked recovery data) for the error log. */
-    onError?: (params: { data: TData; requestId: string; classification: N8nErrorClassification }) => Record<string, unknown> | void;
-}
-
-export interface CreateN8nSubmitHandlerOptions<TData, TPayload = unknown> {
-    /** Logger scope, e.g. 'SUBMIT_LEAD'. */
-    logScope: string;
-    /** Env var holding the destination webhook URL. */
-    webhookEnvVar: string;
-    /** Env var holding the shared webhook secret (defaults to N8N_WEBHOOK_SECRET). */
-    webhookSecretEnvVar?: string;
-    config: {
-        /** Status returned when the webhook URL or secret is missing. */
-        missingStatus: number;
-        /** Client-facing message when config is missing. */
-        missingError: string;
-    };
-    rateLimit: {
-        windowMs: number;
-        max: number;
-        keyPrefix: string;
-        /** Client-facing message when the bucket is exhausted. */
-        exceededError: string;
-        /** When true, mirrors the retry window into the JSON body as `retryAfter`. */
-        includeRetryAfterInBody?: boolean;
-    };
-    parse: {
-        /** Client-facing message for malformed JSON bodies. */
-        invalidJsonError: string;
-    };
-    /** Client-facing message for the 405 method gate. */
-    methodNotAllowedError: string;
-    /** Validates and normalizes the raw body into the typed payload data. */
-    validate: (rawBody: unknown) => ValidationResult<TData>;
-    /** Builds the outbound n8n payload from validated data. */
-    buildPayload: (data: TData, requestId: string, ctx: N8nSubmitRequestContext) => TPayload;
-    /** Sends the payload to n8n (a `services/n8n.ts` function). */
-    send: (url: string, secret: string, requestId: string, payload: TPayload) => Promise<unknown>;
-    success: {
-        status: number;
-        /** Optional success message; omitted from the body when absent. */
-        message?: string;
-    };
-    /** Webhook-error classification config (also reused by exported classifiers). */
-    error: ClassifyN8nErrorOptions;
     /** Optional extra fields for the `payload_validated` info log. */
     onValidated?: (data: TData, requestId: string) => Record<string, unknown> | void;
     /** Optional extra fields (e.g. masked recovery data) for the error log. */
@@ -383,45 +337,3 @@ export function createSubmitHandler<TData, TPayload = unknown>(
     };
 }
 
-/**
- * n8n adapter over {@link createSubmitHandler}. Keeps the existing per-endpoint
- * config shape (webhook env var + `send(url, secret, …)`) so the NPS handler — the
- * only remaining n8n consumer — and its tests stay unchanged.
- */
-export function createN8nSubmitHandler<TData, TPayload = unknown>(
-    options: CreateN8nSubmitHandlerOptions<TData, TPayload>,
-): (request: Request) => Promise<Response> {
-    const secretEnvVar = options.webhookSecretEnvVar ?? DEFAULT_WEBHOOK_SECRET_ENV_VAR;
-
-    return createSubmitHandler<TData, TPayload>({
-        logScope: options.logScope,
-        rateLimit: options.rateLimit,
-        parse: options.parse,
-        methodNotAllowedError: options.methodNotAllowedError,
-        validate: options.validate,
-        success: options.success,
-        onValidated: options.onValidated,
-        onError: options.onError,
-        dispatch: {
-            checkConfig: () => {
-                const webhookUrl = process.env[options.webhookEnvVar]?.trim();
-                const webhookSecret = process.env[secretEnvVar]?.trim();
-                if (!webhookUrl || !webhookSecret) {
-                    return { ok: false, status: options.config.missingStatus, error: options.config.missingError };
-                }
-                return { ok: true };
-            },
-            buildPayload: options.buildPayload,
-            // checkConfig guarantees both env vars are present within this request.
-            send: (requestId, payload) =>
-                options.send(
-                    process.env[options.webhookEnvVar]!.trim(),
-                    process.env[secretEnvVar]!.trim(),
-                    requestId,
-                    payload,
-                ),
-            classifyError: (error) => classifyN8nSubmitError(error, options.error),
-            failureStage: 'n8n_webhook_failed',
-        },
-    });
-}

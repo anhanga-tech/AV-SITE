@@ -1,26 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import handler from '../api/submit-nps.ts';
+import handler, { classifySubmitNpsError } from '../api/submit-nps.ts';
+import { createOdooMock, setOdooEnv, clearOdooEnv } from './odoo-mock.ts';
 
 const originalFetch = global.fetch;
-const originalNpsWebhookUrl = process.env.NPS_WEBHOOK_URL;
-const originalN8nWebhookSecret = process.env.N8N_WEBHOOK_SECRET;
 
-function restoreEnv() {
-    if (originalNpsWebhookUrl === undefined) {
-        delete process.env.NPS_WEBHOOK_URL;
-    } else {
-        process.env.NPS_WEBHOOK_URL = originalNpsWebhookUrl;
-    }
-    if (originalN8nWebhookSecret === undefined) {
-        delete process.env.N8N_WEBHOOK_SECRET;
-    } else {
-        process.env.N8N_WEBHOOK_SECRET = originalN8nWebhookSecret;
-    }
+function restore() {
+    global.fetch = originalFetch;
+    clearOdooEnv();
 }
 
 function buildRequest(
-    body: unknown,
+    body: Record<string, unknown> | string,
     init?: { headers?: Record<string, string>; method?: string },
 ): Request {
     const ipSuffix = Math.floor(Math.random() * 200) + 1;
@@ -33,42 +24,8 @@ function buildRequest(
             'x-real-ip': `127.0.0.${ipSuffix}`,
             ...init?.headers,
         },
-        body: method === 'OPTIONS' || method === 'GET' ? undefined : JSON.stringify(body),
+        body: method === 'OPTIONS' || method === 'GET' ? undefined : typeof body === 'string' ? body : JSON.stringify(body),
     });
-}
-
-interface MockWebhookCall {
-    url: string;
-    method: string;
-    headers: Record<string, string>;
-    body?: Record<string, unknown>;
-}
-
-function extractHeaders(raw: HeadersInit | undefined): Record<string, string> {
-    if (!raw) return {};
-    if (raw instanceof Headers) {
-        const result: Record<string, string> = {};
-        raw.forEach((value, key) => { result[key] = value; });
-        return result;
-    }
-    if (Array.isArray(raw)) return Object.fromEntries(raw) as Record<string, string>;
-    return raw as Record<string, string>;
-}
-
-function createMockWebhookFetch(
-    calls: MockWebhookCall[],
-    response: Response,
-): typeof fetch {
-    return (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-        const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : (input as Request).url;
-        calls.push({
-            url,
-            method: init?.method ?? 'GET',
-            headers: extractHeaders(init?.headers),
-            body: init?.body ? JSON.parse(String(init.body)) as Record<string, unknown> : undefined,
-        });
-        return response;
-    }) as typeof fetch;
 }
 
 function validBody(overrides?: Record<string, unknown>) {
@@ -82,44 +39,19 @@ function validBody(overrides?: Record<string, unknown>) {
     };
 }
 
-function setValidEnv() {
-    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
-    process.env.N8N_WEBHOOK_SECRET = 'test-secret-abc';
-}
-
 // ─── Config errors ──────────────────────────────────────────────────────────
 
-test('submit-nps returns 500 SERVER_CONFIG_ERROR when NPS_WEBHOOK_URL is absent', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
+test('submit-nps returns 500 SERVER_CONFIG_ERROR when Odoo config is missing', async (t) => {
+    t.after(restore);
+    clearOdooEnv();
 
-    delete process.env.NPS_WEBHOOK_URL;
-    process.env.N8N_WEBHOOK_SECRET = 'test-secret-abc';
-    global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
+    let fetchCalled = false;
+    global.fetch = (async () => { fetchCalled = true; throw new Error('should not run'); }) as typeof fetch;
 
     const response = await handler(buildRequest(validBody()));
     const body = await response.json() as Record<string, unknown>;
 
-    assert.equal(response.status, 500);
-    assert.equal(body.ok, false);
-    assert.equal(body.code, 'SERVER_CONFIG_ERROR');
-});
-
-test('submit-nps returns 500 SERVER_CONFIG_ERROR when N8N_WEBHOOK_SECRET is absent', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
-
-    process.env.NPS_WEBHOOK_URL = 'https://n8n.example/webhook/nps';
-    delete process.env.N8N_WEBHOOK_SECRET;
-    global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
-
-    const response = await handler(buildRequest(validBody()));
-    const body = await response.json() as Record<string, unknown>;
-
+    assert.equal(fetchCalled, false);
     assert.equal(response.status, 500);
     assert.equal(body.ok, false);
     assert.equal(body.code, 'SERVER_CONFIG_ERROR');
@@ -128,12 +60,8 @@ test('submit-nps returns 500 SERVER_CONFIG_ERROR when N8N_WEBHOOK_SECRET is abse
 // ─── Method gate ─────────────────────────────────────────────────────────────
 
 test('submit-nps returns 405 METHOD_NOT_ALLOWED for GET requests', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
-
-    setValidEnv();
+    t.after(restore);
+    setOdooEnv();
 
     const response = await handler(buildRequest({}, { method: 'GET' }));
     const body = await response.json() as Record<string, unknown>;
@@ -144,12 +72,8 @@ test('submit-nps returns 405 METHOD_NOT_ALLOWED for GET requests', async (t) => 
 });
 
 test('submit-nps returns 204 for OPTIONS preflight', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
-
-    setValidEnv();
+    t.after(restore);
+    setOdooEnv();
 
     const response = await handler(buildRequest({}, { method: 'OPTIONS' }));
 
@@ -159,24 +83,11 @@ test('submit-nps returns 204 for OPTIONS preflight', async (t) => {
 // ─── JSON parse error ────────────────────────────────────────────────────────
 
 test('submit-nps returns 400 VALIDATION_ERROR for malformed JSON body', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
+    t.after(restore);
+    setOdooEnv();
+    global.fetch = createOdooMock().fetch;
 
-    setValidEnv();
-    global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
-
-    const request = new Request('http://localhost/api/submit-nps', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-real-ip': '127.0.0.1',
-        },
-        body: '{ not valid json',
-    });
-
-    const response = await handler(request);
+    const response = await handler(buildRequest('{ not valid json', { headers: { 'x-real-ip': '127.0.0.1' } }));
     const body = await response.json() as Record<string, unknown>;
 
     assert.equal(response.status, 400);
@@ -187,13 +98,9 @@ test('submit-nps returns 400 VALIDATION_ERROR for malformed JSON body', async (t
 // ─── Validation errors ───────────────────────────────────────────────────────
 
 test('submit-nps returns 400 for missing firstname', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
-
-    setValidEnv();
-    global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
+    t.after(restore);
+    setOdooEnv();
+    global.fetch = createOdooMock().fetch;
 
     const response = await handler(buildRequest(validBody({ firstname: '' })));
     const body = await response.json() as Record<string, unknown>;
@@ -204,13 +111,9 @@ test('submit-nps returns 400 for missing firstname', async (t) => {
 });
 
 test('submit-nps returns 400 for firstname over 100 characters', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
-
-    setValidEnv();
-    global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
+    t.after(restore);
+    setOdooEnv();
+    global.fetch = createOdooMock().fetch;
 
     const response = await handler(buildRequest(validBody({ firstname: 'A'.repeat(101) })));
     const body = await response.json() as Record<string, unknown>;
@@ -220,13 +123,9 @@ test('submit-nps returns 400 for firstname over 100 characters', async (t) => {
 });
 
 test('submit-nps returns 400 for invalid email', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
-
-    setValidEnv();
-    global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
+    t.after(restore);
+    setOdooEnv();
+    global.fetch = createOdooMock().fetch;
 
     const response = await handler(buildRequest(validBody({ email: 'not-an-email' })));
     const body = await response.json() as Record<string, unknown>;
@@ -236,13 +135,9 @@ test('submit-nps returns 400 for invalid email', async (t) => {
 });
 
 test('submit-nps returns 400 for score below 0', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
-
-    setValidEnv();
-    global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
+    t.after(restore);
+    setOdooEnv();
+    global.fetch = createOdooMock().fetch;
 
     const response = await handler(buildRequest(validBody({ score: -1 })));
     const body = await response.json() as Record<string, unknown>;
@@ -252,13 +147,9 @@ test('submit-nps returns 400 for score below 0', async (t) => {
 });
 
 test('submit-nps returns 400 for score above 10', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
-
-    setValidEnv();
-    global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
+    t.after(restore);
+    setOdooEnv();
+    global.fetch = createOdooMock().fetch;
 
     const response = await handler(buildRequest(validBody({ score: 11 })));
     const body = await response.json() as Record<string, unknown>;
@@ -268,13 +159,9 @@ test('submit-nps returns 400 for score above 10', async (t) => {
 });
 
 test('submit-nps returns 400 for non-integer score', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
-
-    setValidEnv();
-    global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
+    t.after(restore);
+    setOdooEnv();
+    global.fetch = createOdooMock().fetch;
 
     const response = await handler(buildRequest(validBody({ score: 7.5 })));
     const body = await response.json() as Record<string, unknown>;
@@ -284,13 +171,9 @@ test('submit-nps returns 400 for non-integer score', async (t) => {
 });
 
 test('submit-nps returns 400 for non-numeric score', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
-
-    setValidEnv();
-    global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
+    t.after(restore);
+    setOdooEnv();
+    global.fetch = createOdooMock().fetch;
 
     const response = await handler(buildRequest(validBody({ score: '9' })));
     const body = await response.json() as Record<string, unknown>;
@@ -300,13 +183,9 @@ test('submit-nps returns 400 for non-numeric score', async (t) => {
 });
 
 test('submit-nps returns 400 for empty reason', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
-
-    setValidEnv();
-    global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
+    t.after(restore);
+    setOdooEnv();
+    global.fetch = createOdooMock().fetch;
 
     const response = await handler(buildRequest(validBody({ reason: '' })));
     const body = await response.json() as Record<string, unknown>;
@@ -316,13 +195,9 @@ test('submit-nps returns 400 for empty reason', async (t) => {
 });
 
 test('submit-nps returns 400 for reason over 2000 characters', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
-
-    setValidEnv();
-    global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
+    t.after(restore);
+    setOdooEnv();
+    global.fetch = createOdooMock().fetch;
 
     const response = await handler(buildRequest(validBody({ reason: 'x'.repeat(2001) })));
     const body = await response.json() as Record<string, unknown>;
@@ -332,13 +207,9 @@ test('submit-nps returns 400 for reason over 2000 characters', async (t) => {
 });
 
 test('submit-nps returns 400 for highlight over 2000 characters', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
-
-    setValidEnv();
-    global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
+    t.after(restore);
+    setOdooEnv();
+    global.fetch = createOdooMock().fetch;
 
     const response = await handler(buildRequest(validBody({ highlight: 'x'.repeat(2001) })));
     const body = await response.json() as Record<string, unknown>;
@@ -347,133 +218,128 @@ test('submit-nps returns 400 for highlight over 2000 characters', async (t) => {
     assert.equal(body.code, 'VALIDATION_ERROR');
 });
 
-// ─── Success path ─────────────────────────────────────────────────────────────
+// ─── Success path — new partner ──────────────────────────────────────────────
 
-test('submit-nps returns 201 and forwards payload to webhook on success', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
+test('submit-nps creates a res.partner with x_nps_score and NO crm.lead when no match exists', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    global.fetch = createOdooMock({ newPartnerId: 909 }).fetch;
 
-    setValidEnv();
-
-    const calls: MockWebhookCall[] = [];
-    global.fetch = createMockWebhookFetch(calls, new Response('ok', { status: 200 }));
-
-    const payload = validBody();
-    const response = await handler(buildRequest(payload));
+    const response = await handler(buildRequest(validBody()));
     const body = await response.json() as Record<string, unknown>;
 
     assert.equal(response.status, 201);
     assert.equal(body.ok, true);
+    assert.equal(body.message, 'Avaliação registrada com sucesso.');
     assert.ok(typeof body.requestId === 'string' && body.requestId.length > 0);
-
-    assert.equal(calls.length, 1);
-    const webhookCall = calls[0]!;
-    assert.equal(webhookCall.url, 'https://n8n.example/webhook/nps');
-    assert.equal(webhookCall.method, 'POST');
-    assert.equal(webhookCall.body?.firstname, 'Maria');
-    assert.equal(webhookCall.body?.email, 'maria@example.com');
-    assert.equal(webhookCall.body?.score, 9);
-    assert.equal(webhookCall.body?.reason, 'Atendimento excelente e viagem perfeita.');
-    assert.equal(webhookCall.body?.highlight, 'A visita às Cataratas do Iguaçu.');
-    assert.ok(typeof webhookCall.body?.requestId === 'string');
-    assert.match(String(webhookCall.body?.submittedAt), /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/,
-        'submittedAt deve ser gerado server-side em formato ISO 8601');
-});
-
-test('submit-nps sends X-Webhook-Secret header on outbound call', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
-
-    setValidEnv();
-
-    const calls: MockWebhookCall[] = [];
-    global.fetch = createMockWebhookFetch(calls, new Response('ok', { status: 200 }));
-
-    const response = await handler(buildRequest(validBody()));
-
-    assert.equal(response.status, 201);
-    assert.equal(calls.length, 1);
-    assert.equal(
-        calls[0]!.headers['x-webhook-secret'],
-        'test-secret-abc',
-        'X-Webhook-Secret deve ser enviado para autenticar o webhook',
-    );
 });
 
 test('submit-nps accepts score 0 (boundary)', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
-
-    setValidEnv();
-    global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
+    t.after(restore);
+    setOdooEnv();
+    global.fetch = createOdooMock().fetch;
 
     const response = await handler(buildRequest(validBody({ score: 0 })));
     assert.equal(response.status, 201);
 });
 
 test('submit-nps accepts score 10 (boundary)', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
-
-    setValidEnv();
-    global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
+    t.after(restore);
+    setOdooEnv();
+    global.fetch = createOdooMock().fetch;
 
     const response = await handler(buildRequest(validBody({ score: 10 })));
     assert.equal(response.status, 201);
 });
 
 test('submit-nps accepts empty highlight (optional field)', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
-
-    setValidEnv();
-    global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
+    t.after(restore);
+    setOdooEnv();
+    global.fetch = createOdooMock().fetch;
 
     const response = await handler(buildRequest(validBody({ highlight: '' })));
     assert.equal(response.status, 201);
 });
 
-// ─── Webhook upstream failure ────────────────────────────────────────────────
+// ─── res.partner field mapping ───────────────────────────────────────────────
 
-test('submit-nps returns 502 WEBHOOK_ERROR when upstream returns non-2xx', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
+test('submit-nps writes x_nps_score and a comment with reason/highlight on the partner', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    const mock = createOdooMock();
+    global.fetch = mock.fetch;
 
-    setValidEnv();
-    global.fetch = createMockWebhookFetch([], new Response('Bad Gateway', { status: 502 }));
+    const response = await handler(buildRequest(validBody()));
+    assert.equal(response.status, 201);
+
+    assert.equal(mock.createdLead(), false, 'NPS is post-sale — no opportunity is created');
+    const partner = mock.partnerFields()!;
+    assert.equal(partner.email, 'maria@example.com');
+    assert.equal(partner.x_nps_score, 9);
+    assert.match(String(partner.comment), /NPS 9\/10 — Atendimento excelente e viagem perfeita\./);
+    assert.match(String(partner.comment), /Momento marcante: A visita às Cataratas do Iguaçu\./);
+});
+
+test('submit-nps does NOT overwrite the full name of an existing partner (firstname-only form)', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    const mock = createOdooMock({ existingPartnerId: 506 });
+    global.fetch = mock.fetch;
+
+    const response = await handler(buildRequest(validBody({ firstname: 'Ana' })));
+    assert.equal(response.status, 201);
+
+    const writeCall = mock.calls.find((c) => c.model === 'res.partner' && c.method === 'write');
+    assert.ok(writeCall, 'expected a res.partner write for the existing match');
+    const updateFields = writeCall!.args[1] as Record<string, unknown>;
+    assert.equal('name' in updateFields, false, 'name must be omitted so it is not clobbered to the bare firstname');
+    assert.equal(updateFields.x_nps_score, 9);
+});
+
+test('submit-nps sets name on create when no existing partner matches', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    const mock = createOdooMock({ existingPartnerId: null });
+    global.fetch = mock.fetch;
+
+    const response = await handler(buildRequest(validBody({ firstname: 'Ana' })));
+    assert.equal(response.status, 201);
+
+    const createCall = mock.calls.find((c) => c.model === 'res.partner' && c.method === 'create');
+    assert.ok(createCall, 'expected a res.partner create when no match exists');
+    const fields = createCall!.args[0] as Record<string, unknown>;
+    assert.equal(fields.name, 'Ana');
+});
+
+// ─── Upstream failure ─────────────────────────────────────────────────────────
+
+test('submit-nps returns 502 ODOO_ERROR when upstream returns non-2xx', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    global.fetch = createOdooMock({ failStatus: 503 }).fetch;
 
     const response = await handler(buildRequest(validBody()));
     const body = await response.json() as Record<string, unknown>;
 
     assert.equal(response.status, 502);
     assert.equal(body.ok, false);
-    assert.equal(body.code, 'WEBHOOK_ERROR');
+    assert.equal(body.code, 'ODOO_ERROR');
+});
+
+test('classifySubmitNpsError preserves unexpected internal failures', () => {
+    const classified = classifySubmitNpsError(new Error('unexpected database failure'));
+    assert.equal(classified.code, 'INTERNAL_ERROR');
+    assert.equal(classified.status, 500);
+    assert.equal(classified.error, 'Erro interno. Tente novamente.');
 });
 
 // ─── Rate limiting ────────────────────────────────────────────────────────────
 
 test('submit-nps enforces rate limit after 3 requests from the same IP', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
+    t.after(restore);
+    setOdooEnv();
+    global.fetch = createOdooMock().fetch;
 
-    setValidEnv();
-    global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
-
-    // Use a fixed unique IP to isolate this test's rate limit bucket
     const uniqueIp = `10.${Math.floor(Math.random() * 254) + 1}.${Math.floor(Math.random() * 254) + 1}.1`;
 
     function buildRateLimitRequest() {
@@ -505,13 +371,9 @@ test('submit-nps enforces rate limit after 3 requests from the same IP', async (
 });
 
 test('submit-nps enforces rate-limit even for invalid payloads (DoS protection)', async (t) => {
-    t.after(() => {
-        global.fetch = originalFetch;
-        restoreEnv();
-    });
-
-    setValidEnv();
-    global.fetch = createMockWebhookFetch([], new Response('ok', { status: 200 }));
+    t.after(restore);
+    setOdooEnv();
+    global.fetch = createOdooMock().fetch;
 
     const uniqueIp = `10.${Math.floor(Math.random() * 254) + 1}.${Math.floor(Math.random() * 254) + 1}.4`;
 

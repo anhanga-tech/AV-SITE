@@ -47,7 +47,9 @@ async function sendToOdoo(input: OdooLeadInput): Promise<void> {
     if (!config) throw new Error('ODOO_ERROR:503:Odoo config missing');
 
     const session = await openOdooSession(config);
-    const partnerId = await session.upsertPartner(buildPartnerFields(input));
+    const partnerId = await session.upsertPartner(buildPartnerFields(input), {
+        preserveName: input.preserveName,
+    });
 
     if (input.createsLead) {
         await session.createLead(buildLeadFields(input, partnerId));

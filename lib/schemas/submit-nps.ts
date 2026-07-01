@@ -8,3 +8,5 @@ export const SubmitNpsBodySchema = z.object({
     highlight: z.string().trim().max(2000).default(''),
 });
 
+export type SubmitNpsRequest = z.infer<typeof SubmitNpsBodySchema>;
+

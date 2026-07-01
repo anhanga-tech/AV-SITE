@@ -16,6 +16,7 @@ import type { LeadTracking, LeadUtms, SubmitLeadRequest } from '../types/leadCap
 import type { SubmitContactRequest } from '../types/contactCapture';
 import type { SubmitQuizRequest } from '../types/quiz';
 import type { SubmitWaitlistRequest } from '../types/waitlist';
+import type { SubmitNpsRequest } from './schemas/submit-nps';
 import {
     type RegionTagId,
     resolveQuizDestinoTags,
@@ -43,7 +44,7 @@ const VALID_PROFILE_KEYS = new Set([
     'nomade-de-alma',
 ]);
 
-export type LeadFormType = 'lead' | 'contact' | 'quiz' | 'waitlist';
+export type LeadFormType = 'lead' | 'contact' | 'quiz' | 'waitlist' | 'nps';
 
 /** Explicit non-UTM origin signal, when the form itself implies a channel. */
 export type OriginSignal = 'referral' | 'quiz' | 'whatsapp' | null;
@@ -71,8 +72,16 @@ export interface OdooLeadInput {
     utms: LeadUtms;
     tracking?: LeadTracking;
     originSignal: OriginSignal;
-    /** Free-text context for partner-only forms (quiz/waitlist) — no crm.lead. */
+    /** Free-text context for partner-only forms (quiz/waitlist/nps) — no crm.lead. */
     contextNote?: string | null;
+    /** Post-trip NPS (0-10) → x_nps_score. */
+    npsScore?: number;
+    /**
+     * Skip overwriting `name` on an existing partner match. Set by adapters whose
+     * form only captures a partial name (e.g. NPS asks for firstname only) so a
+     * fuller name already on file isn't clobbered.
+     */
+    preserveName?: boolean;
 }
 
 export interface SourceMedium {
@@ -123,6 +132,7 @@ export function buildPartnerFields(input: OdooLeadInput): Record<string, unknown
         fields.category_id = input.destinationTagIds.map((id) => [4, id]);
     }
     if (input.contextNote) fields.comment = input.contextNote;
+    if (typeof input.npsScore === 'number') fields.x_nps_score = input.npsScore;
 
     return fields;
 }
@@ -255,6 +265,42 @@ export function leadInputFromSubmitQuiz(data: SubmitQuizRequest): OdooLeadInput 
         tracking: data.tracking,
         originSignal: 'quiz',
         contextNote,
+    };
+}
+
+const EMPTY_UTMS: LeadUtms = {
+    utm_source: null,
+    utm_medium: null,
+    utm_campaign: null,
+    utm_term: null,
+    utm_content: null,
+};
+
+/**
+ * Post-trip NPS form → partner-only update (no crm.lead — the opportunity is
+ * already Won by the time NPS is collected). Score goes to `x_nps_score`;
+ * reason/highlight are appended to `comment` since there is no dedicated
+ * free-text NPS field on res.partner.
+ */
+export function leadInputFromSubmitNps(data: SubmitNpsRequest): OdooLeadInput {
+    const contextNote = buildContextNote([
+        `NPS ${data.score}/10 — ${data.reason}`,
+        data.highlight ? `Momento marcante: ${data.highlight}` : null,
+    ]);
+
+    return {
+        formType: 'nps',
+        createsLead: false,
+        firstName: data.firstname,
+        lastName: '',
+        email: data.email,
+        phone: null,
+        marketingOptIn: false,
+        npsScore: data.score,
+        utms: EMPTY_UTMS,
+        originSignal: null,
+        contextNote,
+        preserveName: true,
     };
 }
 
