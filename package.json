@@ -27,7 +27,7 @@
     "images:optimize": "tsx scripts/optimize-r2-images.ts"
   },
   "dependencies": {
-    "@google/genai": "^2.9.0",
+    "@google/genai": "^2.10.0",
     "@mdx-js/react": "^3.1.1",
     "@mdx-js/rollup": "^3.1.1",
     "@phosphor-icons/react": "^2.1.10",
