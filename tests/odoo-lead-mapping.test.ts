@@ -103,6 +103,11 @@ test('buildPartnerFields — sempre inclui a tag Lead mesmo sem destino', () => 
     assert.deepEqual(buildPartnerFields(baseInput({})).category_id, [[4, LEAD_TAG_ID]]);
 });
 
+test('buildPartnerFields — NPS não recebe a tag Lead (respondente já é cliente)', () => {
+    assert.equal('category_id' in buildPartnerFields(baseInput({ formType: 'nps', destinationTagIds: [] })), false);
+    assert.equal('category_id' in buildPartnerFields(baseInput({ formType: 'nps' })), false);
+});
+
 // --- buildLeadFields ---------------------------------------------------------
 
 test('buildLeadFields — opportunity shape with partner_id and resolved source/medium', () => {

@@ -122,8 +122,10 @@ function fullName(firstName: string, lastName: string): string {
  * `x_lgpd_consent` is written only when opting in (we never revoke consent on an
  * update), and `x_perfil_do_viajante` only for a recognized quiz profile.
  * `category_id` uses link commands `(4, id)` so tags are added without removing
- * any existing ones on a deduped partner. Every intake partner gets the Lead tag
- * (Fase 0), plus any resolved "Destino de Interesse" tags.
+ * any existing ones on a deduped partner. Intake partners get the Lead tag
+ * (Fase 0) plus any resolved "Destino de Interesse" tags — except NPS, whose
+ * respondent is already a customer (the trip happened), so tagging them Lead
+ * would mislabel an active client.
  */
 export function buildPartnerFields(input: OdooLeadInput): Record<string, unknown> {
     const fields: Record<string, unknown> = { name: fullName(input.firstName, input.lastName) };
@@ -134,8 +136,11 @@ export function buildPartnerFields(input: OdooLeadInput): Record<string, unknown
     if (input.profileKey && VALID_PROFILE_KEYS.has(input.profileKey)) {
         fields.x_perfil_do_viajante = input.profileKey;
     }
-    const tagIds = [LEAD_TAG_ID, ...(input.destinationTagIds ?? [])];
-    fields.category_id = tagIds.map((id) => [4, id]);
+    const tagIds =
+        input.formType === 'nps'
+            ? (input.destinationTagIds ?? [])
+            : [LEAD_TAG_ID, ...(input.destinationTagIds ?? [])];
+    if (tagIds.length > 0) fields.category_id = tagIds.map((id) => [4, id]);
     if (input.contextNote) fields.comment = input.contextNote;
     if (typeof input.npsScore === 'number') fields.x_nps_score = input.npsScore;
 
