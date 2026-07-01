@@ -8,6 +8,7 @@ import {
     leadInputFromSubmitContact,
     leadInputFromSubmitQuiz,
     leadInputFromSubmitWaitlist,
+    LEAD_TAG_ID,
     type OdooLeadInput,
 } from '../lib/odoo-lead-mapping.ts';
 import { REGION_TAG } from '../lib/destination-region.ts';
@@ -90,16 +91,16 @@ test('buildPartnerFields — ignores an unrecognized profileKey', () => {
     assert.equal('x_perfil_do_viajante' in fields, false);
 });
 
-test('buildPartnerFields — emite category_id com comandos de link (4, id) por tag', () => {
+test('buildPartnerFields — emite category_id com Lead + comandos (4, id) por destino', () => {
     const fields = buildPartnerFields(
         baseInput({ destinationTagIds: [REGION_TAG.americaNorte, REGION_TAG.caribe] }),
     );
-    assert.deepEqual(fields.category_id, [[4, 6], [4, 10]]);
+    assert.deepEqual(fields.category_id, [[4, LEAD_TAG_ID], [4, 6], [4, 10]]);
 });
 
-test('buildPartnerFields — omite category_id quando não há tag (fallback)', () => {
-    assert.equal('category_id' in buildPartnerFields(baseInput({ destinationTagIds: [] })), false);
-    assert.equal('category_id' in buildPartnerFields(baseInput({})), false);
+test('buildPartnerFields — sempre inclui a tag Lead mesmo sem destino', () => {
+    assert.deepEqual(buildPartnerFields(baseInput({ destinationTagIds: [] })).category_id, [[4, LEAD_TAG_ID]]);
+    assert.deepEqual(buildPartnerFields(baseInput({})).category_id, [[4, LEAD_TAG_ID]]);
 });
 
 // --- buildLeadFields ---------------------------------------------------------
