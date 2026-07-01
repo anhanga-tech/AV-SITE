@@ -24,6 +24,7 @@ export const SubmitLeadBodySchema = z.object({
     destination: z.string().min(1).max(255),
     empresa:     z.string().max(255).optional(),
     cargo:       z.string().max(255).optional(),
+    referred:    z.string().max(255).optional(),
     marketingOptIn: z.boolean().optional(),
     utms:        LeadUtmsSchema,
     tracking:    LeadTrackingSchema,

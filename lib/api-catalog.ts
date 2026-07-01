@@ -155,6 +155,10 @@ const API_ENDPOINTS: readonly ApiEndpointDefinition[] = [
                             whatsapp: { type: 'string' },
                             bantSummary: { type: 'string' },
                             destination: { type: 'string' },
+                            referred: {
+                                type: 'string',
+                                description: 'Nome ou identificador de quem indicou o lead; aciona atribuição Odoo de indicação.',
+                            },
                             utms: {
                                 type: 'object',
                                 additionalProperties: true,

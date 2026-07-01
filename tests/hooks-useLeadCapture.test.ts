@@ -3,12 +3,13 @@ import assert from 'node:assert/strict';
 import {
     isPreparedSubmitLeadRequest,
     extractUtms,
+    buildSubmitLeadPayload,
     buildLeadWhatsAppMessage,
     createLeadEventId,
     pushGenerateLeadDataLayerEvent,
     type LeadDraft,
 } from '../hooks/useLeadCapture.ts';
-import type { SubmitLeadRequest } from '../types/leadCapture.ts';
+import type { LeadTracking, SubmitLeadRequest } from '../types/leadCapture.ts';
 
 function validPayload(overrides?: Partial<SubmitLeadRequest>): SubmitLeadRequest {
     return {
@@ -143,6 +144,59 @@ test('extractUtms preserves null UTM values', () => {
 
     assert.equal(result.utm_source, null);
     assert.equal(result.utm_medium, null);
+});
+
+// ─── buildSubmitLeadPayload ─────────────────────────────────────────────────
+
+function validLeadDraft(overrides?: Partial<LeadDraft>): LeadDraft {
+    return {
+        firstName: 'Maria',
+        lastName: 'Silva',
+        email: 'maria@example.com',
+        whatsapp: '+5511988314487',
+        bantSummary: 'Need: praia | Authority: casal | Budget: 15k | Timeline: outubro',
+        origin: 'São Paulo',
+        destination: 'Porto de Galinhas',
+        dates: 'outubro',
+        baggagePreference: '',
+        ...overrides,
+    };
+}
+
+test('buildSubmitLeadPayload maps URL ref tracking into referred', () => {
+    const payload = buildSubmitLeadPayload(
+        validLeadDraft(),
+        {},
+        validPayload({ tracking: { ...validPayload().tracking!, extras: { ref: 'Maria Silva' } } }).tracking!,
+        validPayload().utms,
+        'lead_ref_test',
+    );
+
+    assert.equal(payload.referred, 'Maria Silva');
+});
+
+test('buildSubmitLeadPayload prefers explicit draft referred over URL ref tracking', () => {
+    const payload = buildSubmitLeadPayload(
+        validLeadDraft({ referred: 'João Souza' }),
+        {},
+        validPayload({ tracking: { ...validPayload().tracking!, extras: { ref: 'Maria Silva' } } }).tracking!,
+        validPayload().utms,
+        'lead_ref_test',
+    );
+
+    assert.equal(payload.referred, 'João Souza');
+});
+
+test('buildSubmitLeadPayload tolerates missing tracking while deriving referred', () => {
+    const payload = buildSubmitLeadPayload(
+        validLeadDraft(),
+        {},
+        null as unknown as LeadTracking,
+        validPayload().utms,
+        'lead_ref_test',
+    );
+
+    assert.equal(payload.referred, undefined);
 });
 
 // ─── buildLeadWhatsAppMessage ─────────────────────────────────────────────────

@@ -154,6 +154,28 @@ test('leadInputFromSubmitLead — carries empresa/cargo into Odoo lead input', (
     assert.equal(input.cargo, 'Diretora de Pessoas');
 });
 
+test('leadInputFromSubmitLead — referred lead uses referral origin signal', () => {
+    const input = leadInputFromSubmitLead({
+        firstName: 'Ana', lastName: 'Silva', email: 'ana@example.com', whatsapp: '+5511999990000',
+        bantSummary: 'Lead indicado', destination: 'Orlando', marketingOptIn: true,
+        referred: 'Maria Silva',
+        utms: EMPTY_UTMS, tracking: undefined,
+    } as never);
+    assert.equal(input.referred, 'Maria Silva');
+    assert.equal(input.originSignal, 'referral');
+});
+
+test('leadInputFromSubmitLead — blank referred is ignored', () => {
+    const input = leadInputFromSubmitLead({
+        firstName: 'Ana', lastName: 'Silva', email: 'ana@example.com', whatsapp: '+5511999990000',
+        bantSummary: 'Lead comum', destination: 'Orlando', marketingOptIn: true,
+        referred: '   ',
+        utms: EMPTY_UTMS, tracking: undefined,
+    } as never);
+    assert.equal(input.referred, null);
+    assert.equal(input.originSignal, null);
+});
+
 test('leadInputFromSubmitLead — destino livre não reconhecido não gera tag (fallback)', () => {
     const input = leadInputFromSubmitLead({
         firstName: 'Ana', lastName: 'Silva', email: 'ana@example.com', whatsapp: '+5511999990000',

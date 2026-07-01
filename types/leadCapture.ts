@@ -37,6 +37,7 @@ export interface SubmitLeadRequest {
     destination: string;
     empresa?: string;
     cargo?: string;
+    referred?: string;
     /** E-mail-marketing opt-in → Odoo x_lgpd_consent. */
     marketingOptIn?: boolean;
 }

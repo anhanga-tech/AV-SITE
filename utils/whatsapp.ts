@@ -11,7 +11,8 @@ import { useState, useEffect } from 'react';
 
 const TRACKING_PARAMS = [
     'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
-    'gclid', 'fbclid', 'ttclid', 'wbraid', 'gbraid', 'msclkid'
+    'gclid', 'fbclid', 'ttclid', 'wbraid', 'gbraid', 'msclkid',
+    'ref',
 ];
 // Microsoft Ads (hsa_*) parameters are captured dynamically
 const HSA_PREFIX = 'hsa_';
@@ -321,4 +322,3 @@ export const useWhatsAppLink = (message: string, options: WhatsAppLinkOptions = 
 
     return whatsappUrl;
 };
-
