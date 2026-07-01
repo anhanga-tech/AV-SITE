@@ -28,6 +28,11 @@ const SOURCE = { referral: 8, googleAds: 17, metaAds: 18, quiz: 16, whatsapp: 19
 const MEDIUM = { indicacao: 6, cpc: 7, organic: 8 } as const;
 const DEFAULT_SOURCE_MEDIUM = { source_id: SOURCE.site, medium_id: MEDIUM.organic } as const;
 
+// res.partner.category "Tipo de Contato" tags. Intake only ever sets Lead;
+// Cliente/Fornecedor derive from Odoo's native ranks (customer_rank/supplier_rank).
+const CONTACT_TYPE_TAG = { lead: 15, cliente: 16, fornecedor: 17 } as const;
+export const LEAD_TAG_ID = CONTACT_TYPE_TAG.lead;
+
 // crm.lead fixed records.
 const STAGE_NOVO = 1;
 const TEAM_SALES = 1;
@@ -117,7 +122,10 @@ function fullName(firstName: string, lastName: string): string {
  * `x_lgpd_consent` is written only when opting in (we never revoke consent on an
  * update), and `x_perfil_do_viajante` only for a recognized quiz profile.
  * `category_id` uses link commands `(4, id)` so tags are added without removing
- * any existing ones on a deduped partner.
+ * any existing ones on a deduped partner. Intake partners get the Lead tag
+ * (Fase 0) plus any resolved "Destino de Interesse" tags — except NPS, whose
+ * respondent is already a customer (the trip happened), so tagging them Lead
+ * would mislabel an active client.
  */
 export function buildPartnerFields(input: OdooLeadInput): Record<string, unknown> {
     const fields: Record<string, unknown> = { name: fullName(input.firstName, input.lastName) };
@@ -128,9 +136,11 @@ export function buildPartnerFields(input: OdooLeadInput): Record<string, unknown
     if (input.profileKey && VALID_PROFILE_KEYS.has(input.profileKey)) {
         fields.x_perfil_do_viajante = input.profileKey;
     }
-    if (input.destinationTagIds && input.destinationTagIds.length > 0) {
-        fields.category_id = input.destinationTagIds.map((id) => [4, id]);
-    }
+    const tagIds =
+        input.formType === 'nps'
+            ? (input.destinationTagIds ?? [])
+            : [LEAD_TAG_ID, ...(input.destinationTagIds ?? [])];
+    if (tagIds.length > 0) fields.category_id = tagIds.map((id) => [4, id]);
     if (input.contextNote) fields.comment = input.contextNote;
     if (typeof input.npsScore === 'number') fields.x_nps_score = input.npsScore;
 
