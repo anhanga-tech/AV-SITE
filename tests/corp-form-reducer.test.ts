@@ -94,11 +94,25 @@ describe('validateCorpForm', () => {
 
     it('should build a lead draft with empresa/cargo as structured fields', () => {
         const draft = buildCorporateLeadDraft(VALID_FORM);
+        assert.ok(draft, 'Expected draft to be defined');
         assert.equal(draft.destination, 'Corporativo');
         assert.equal(draft.empresa, 'Empresa Teste');
         assert.equal(draft.cargo, 'Sócia');
-        if (!draft.bantSummary) assert.fail('Expected corporate draft to include bantSummary');
+        assert.ok(draft.bantSummary, 'Expected corporate draft to include bantSummary');
         assert.match(draft.bantSummary, /Empresa: Empresa Teste/);
         assert.match(draft.bantSummary, /Cargo: Sócia/);
+    });
+
+    it('should build a lead draft when optional empresa/cargo are missing at runtime', () => {
+        const { empresa: _empresa, cargo: _cargo, ...partialForm } = VALID_FORM;
+        const draft = buildCorporateLeadDraft(partialForm as FormFields);
+
+        assert.ok(draft, 'Expected draft to be defined');
+        assert.equal(draft.destination, 'Corporativo');
+        assert.equal(draft.empresa, undefined);
+        assert.equal(draft.cargo, undefined);
+        assert.ok(draft.bantSummary, 'Expected corporate draft to include bantSummary');
+        assert.match(draft.bantSummary, /Empresa: Não informado/);
+        assert.match(draft.bantSummary, /Cargo: Não informado/);
     });
 });

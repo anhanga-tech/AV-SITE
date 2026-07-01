@@ -2,8 +2,8 @@ import type { LeadDraftPartial } from '@/hooks/useLeadCapture';
 import type { FormFields } from './useCorpFormReducer';
 
 export function buildCorporateLeadDraft(form: FormFields): LeadDraftPartial {
-    const empresa = form.empresa.trim();
-    const cargo = form.cargo.trim();
+    const empresa = form.empresa?.trim() ?? '';
+    const cargo = form.cargo?.trim() ?? '';
 
     return {
         firstName: form.firstName,
