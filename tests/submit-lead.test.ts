@@ -106,6 +106,19 @@ test('validatePayload should map marketingOptIn from the request body', () => {
     assert.equal(result.data.marketingOptIn, true);
 });
 
+test('validatePayload should accept optional empresa/cargo as structured lead fields', () => {
+    const result = validatePayload({
+        firstName: 'Felipe', lastName: 'William', email: 'felipe@example.com', whatsapp: '+5511988314487',
+        bantSummary: 'Lead corporativo', destination: 'Corporativo',
+        empresa: '  Acme Viagens  ', cargo: '  Diretora de Pessoas  ',
+        utms: {}, tracking: {},
+    });
+    assert.equal(result.valid, true);
+    if (!result.valid) return;
+    assert.equal(result.data.empresa, 'Acme Viagens');
+    assert.equal(result.data.cargo, 'Diretora de Pessoas');
+});
+
 // --- handler integration (Odoo) ---------------------------------------------
 
 test('submit-lead upserts a partner and creates a linked crm.lead opportunity', async (t) => {
@@ -131,6 +144,25 @@ test('submit-lead upserts a partner and creates a linked crm.lead opportunity', 
     assert.equal(lead.source_id, 17); // google + cpc → Google Ads
     assert.equal(lead.medium_id, 7);
     assert.match(String(lead.name), /^Lead Site — Felipe William \(Rio de Janeiro\)$/);
+});
+
+test('submit-lead maps corporate empresa/cargo to crm.lead partner_name/function', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    const mock = createOdooMock({ newPartnerId: 101, leadId: 555 });
+    global.fetch = mock.fetch;
+
+    const response = await handler(buildRequest({
+        ...buildLeadPayloadFixture(),
+        destination: 'Corporativo',
+        empresa: 'Acme Viagens',
+        cargo: 'Diretora de Pessoas',
+    }));
+    assert.equal(response.status, 201);
+
+    const lead = mock.leadFields()!;
+    assert.equal(lead.partner_name, 'Acme Viagens');
+    assert.equal(lead.function, 'Diretora de Pessoas');
 });
 
 test('submit-lead sends sanitized values into the Odoo records', async (t) => {

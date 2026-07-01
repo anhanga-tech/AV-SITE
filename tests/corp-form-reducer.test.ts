@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { validateCorpForm } from '../components/landings/corporativo/useCorpFormReducer';
+import { buildCorporateLeadDraft } from '../components/landings/corporativo/CorpLeadDraft';
 import type { FormFields } from '../components/landings/corporativo/useCorpFormReducer';
 
 const VALID_FORM: FormFields = {
@@ -89,5 +90,29 @@ describe('validateCorpForm', () => {
     it('should accept form without optional empresa and cargo', () => {
         const result = validateCorpForm({ ...VALID_FORM, empresa: '', cargo: '' }, true);
         assert.deepStrictEqual(result, { ok: true });
+    });
+
+    it('should build a lead draft with empresa/cargo as structured fields', () => {
+        const draft = buildCorporateLeadDraft(VALID_FORM);
+        assert.ok(draft, 'Expected draft to be defined');
+        assert.equal(draft.destination, 'Corporativo');
+        assert.equal(draft.empresa, 'Empresa Teste');
+        assert.equal(draft.cargo, 'Sócia');
+        assert.ok(draft.bantSummary, 'Expected corporate draft to include bantSummary');
+        assert.match(draft.bantSummary, /Empresa: Empresa Teste/);
+        assert.match(draft.bantSummary, /Cargo: Sócia/);
+    });
+
+    it('should build a lead draft when optional empresa/cargo are missing at runtime', () => {
+        const { empresa: _empresa, cargo: _cargo, ...partialForm } = VALID_FORM;
+        const draft = buildCorporateLeadDraft(partialForm as FormFields);
+
+        assert.ok(draft, 'Expected draft to be defined');
+        assert.equal(draft.destination, 'Corporativo');
+        assert.equal(draft.empresa, undefined);
+        assert.equal(draft.cargo, undefined);
+        assert.ok(draft.bantSummary, 'Expected corporate draft to include bantSummary');
+        assert.match(draft.bantSummary, /Empresa: Não informado/);
+        assert.match(draft.bantSummary, /Cargo: Não informado/);
     });
 });
