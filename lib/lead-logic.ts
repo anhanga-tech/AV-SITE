@@ -197,6 +197,8 @@ export function validatePayload(payload: unknown): { valid: true; data: SubmitLe
     const eventId = normalizeNullable(raw.event_id, 128) ?? undefined;
     const bantSummary = cleanString(raw.bantSummary);
     const destination = cleanString(raw.destination);
+    const empresa = normalizeNullable(raw.empresa) ?? undefined;
+    const cargo = normalizeNullable(raw.cargo) ?? undefined;
 
     // normalizeWhatsappNumber can still fail for strings Zod accepted (e.g. non-digit-only content)
     if (!whatsapp) {
@@ -209,7 +211,14 @@ export function validatePayload(payload: unknown): { valid: true; data: SubmitLe
     }
 
     // Safety net: cleanString expands HTML entities which can push lengths past the Zod-checked raw limits
-    if (firstName.length > 100 || lastName.length > 100 || bantSummary.length > 5000 || destination.length > 255) {
+    if (
+        firstName.length > 100
+        || lastName.length > 100
+        || bantSummary.length > 5000
+        || destination.length > 255
+        || (empresa && empresa.length > 255)
+        || (cargo && cargo.length > 255)
+    ) {
         return { valid: false, error: 'Entrada muito longa.' };
     }
 
@@ -226,6 +235,8 @@ export function validatePayload(payload: unknown): { valid: true; data: SubmitLe
             event_id: eventId,
             bantSummary,
             destination,
+            empresa,
+            cargo,
             marketingOptIn: raw.marketingOptIn === true,
             utms,
             tracking,

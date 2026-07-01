@@ -3,6 +3,7 @@ import { m } from 'framer-motion';
 import { AirplaneTilt, PaperPlaneTilt, SpinnerGap } from '@phosphor-icons/react';
 import { useLeadCapture, createLeadEventId } from '@/hooks/useLeadCapture';
 import { useCorpFormReducer, validateCorpForm } from './useCorpFormReducer';
+import { buildCorporateLeadDraft } from './CorpLeadDraft';
 import { CorpFormFields } from './CorpFormFields';
 import { CorpLgpdConsent } from './CorpLgpdConsent';
 import { CorpSuccessState } from './CorpSuccessState';
@@ -31,18 +32,9 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
 
         try {
             const eventId = createLeadEventId();
-            const empresa = state.form.empresa.trim() || 'Não informado';
-            const cargo = state.form.cargo.trim() || 'Não informado';
 
             const result = await submitLead(
-                {
-                    firstName: state.form.firstName,
-                    lastName: state.form.lastName,
-                    email: state.form.email,
-                    whatsapp: state.form.whatsapp,
-                    destination: 'Corporativo',
-                    bantSummary: `Lead corporativo captado via landing /corporativo. Empresa: ${empresa}. Cargo: ${cargo}.`,
-                },
+                buildCorporateLeadDraft(state.form),
                 {
                     eventId,
                     pushDataLayerEvent: true,

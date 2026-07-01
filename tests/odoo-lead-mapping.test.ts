@@ -143,6 +143,17 @@ test('leadInputFromSubmitLead — creates a lead, maps marketingOptIn', () => {
     assert.deepEqual(input.destinationTagIds, [REGION_TAG.americaNorte]);
 });
 
+test('leadInputFromSubmitLead — carries empresa/cargo into Odoo lead input', () => {
+    const input = leadInputFromSubmitLead({
+        firstName: 'Ana', lastName: 'Silva', email: 'ana@example.com', whatsapp: '+5511999990000',
+        bantSummary: 'Lead corporativo', destination: 'Corporativo', marketingOptIn: true,
+        empresa: 'Acme Viagens', cargo: 'Diretora de Pessoas',
+        utms: EMPTY_UTMS, tracking: undefined,
+    } as never);
+    assert.equal(input.empresa, 'Acme Viagens');
+    assert.equal(input.cargo, 'Diretora de Pessoas');
+});
+
 test('leadInputFromSubmitLead — destino livre não reconhecido não gera tag (fallback)', () => {
     const input = leadInputFromSubmitLead({
         firstName: 'Ana', lastName: 'Silva', email: 'ana@example.com', whatsapp: '+5511999990000',

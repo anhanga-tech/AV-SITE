@@ -13,6 +13,8 @@ export interface LeadDraft {
     destination: string;
     dates: string;
     baggagePreference: string;
+    empresa?: string;
+    cargo?: string;
 }
 
 export type LeadDraftPartial = Partial<LeadDraft>;
@@ -51,9 +53,11 @@ const EMPTY_LEAD_DRAFT: LeadDraft = {
     destination: '',
     dates: '',
     baggagePreference: '',
+    empresa: '',
+    cargo: '',
 };
 
-function cleanValue(value: string): string {
+function cleanValue(value: unknown): string {
     return cleanString(value);
 }
 
@@ -211,8 +215,7 @@ function buildSubmitLeadPayload(
     eventId?: string,
 ): SubmitLeadRequest {
     const merged = mergeLeadDraft(leadDraft, overrides);
-
-    return {
+    const payload: SubmitLeadRequest = {
         firstName: cleanValue(merged.firstName),
         lastName: cleanValue(merged.lastName),
         email: cleanValue(merged.email).toLowerCase(),
@@ -226,6 +229,13 @@ function buildSubmitLeadPayload(
             ...latestUtms,
         },
     };
+    const empresa = cleanValue(merged.empresa);
+    const cargo = cleanValue(merged.cargo);
+
+    if (empresa) payload.empresa = empresa;
+    if (cargo) payload.cargo = cargo;
+
+    return payload;
 }
 
 export function isPreparedSubmitLeadRequest(value: LeadDraftPartial | SubmitLeadRequest): value is SubmitLeadRequest {

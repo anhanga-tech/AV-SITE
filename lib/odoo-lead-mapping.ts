@@ -212,6 +212,8 @@ export function leadInputFromSubmitLead(data: SubmitLeadRequest): OdooLeadInput 
         destination: data.destination,
         destinationTagIds: resolveRegionTagsFromText(data.destination),
         bantSummary: data.bantSummary,
+        empresa: data.empresa ?? null,
+        cargo: data.cargo ?? null,
         eventId: data.event_id ?? null,
         utms: data.utms,
         tracking: data.tracking,
