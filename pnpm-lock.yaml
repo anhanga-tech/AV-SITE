@@ -19,8 +19,8 @@ importers:
   .:
     dependencies:
       '@google/genai':
-        specifier: ^2.9.0
-        version: 2.9.0
+        specifier: ^2.10.0
+        version: 2.10.0
       '@mdx-js/react':
         specifier: ^3.1.1
         version: 3.1.1(@types/react@19.2.14)(react@19.2.7)
@@ -575,8 +575,8 @@ packages:
     resolution: {integrity: sha512-+CNAzxglkrpNf/kKywqQfk74QjtceuOE7Qm+AF8miRvPF/wmmK5+OJOgVh3AVTT3RP2mH3+FOaxlE5v72owk0A==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
-  '@google/genai@2.9.0':
-    resolution: {integrity: sha512-3DRdSJ0LaKFig3FNGeRDn9BQxtjZm2qr0hNH2d771LKcG0HvUYddlN0LPdSp8XU7Ekb04i9q3+tt64uYqavUdw==}
+  '@google/genai@2.10.0':
+    resolution: {integrity: sha512-e4cFxj3tiuMtsgOT4G9c1hXyGJhg7/Buj7VVeBacRY3fRtkRZZ59Q3nuVp2xbq8BGQXLXCDB253qMhklMOeUDg==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@modelcontextprotocol/sdk': ^1.25.2
@@ -4835,7 +4835,7 @@ snapshots:
       '@eslint/core': 1.2.1
       levn: 0.4.1
 
-  '@google/genai@2.9.0':
+  '@google/genai@2.10.0':
     dependencies:
       google-auth-library: 10.7.0
       p-retry: 4.6.2
