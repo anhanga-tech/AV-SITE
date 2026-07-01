@@ -33,6 +33,7 @@ dist-ssr
 
 # Local tooling and skill repositories
 .gemini/
+.deepsec/
 
 # Playwright
 test-results/
