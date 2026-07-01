@@ -157,8 +157,8 @@ function captureInitialTracking(): LeadTracking {
     };
 }
 
-function referralFromTracking(tracking: LeadTracking): string {
-    return cleanValue(tracking.extras?.ref);
+function referralFromTracking(tracking?: LeadTracking | null): string {
+    return cleanValue(tracking?.extras?.ref);
 }
 
 export function buildLeadWhatsAppMessage(lead: LeadDraft): string {

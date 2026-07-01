@@ -9,7 +9,7 @@ import {
     pushGenerateLeadDataLayerEvent,
     type LeadDraft,
 } from '../hooks/useLeadCapture.ts';
-import type { SubmitLeadRequest } from '../types/leadCapture.ts';
+import type { LeadTracking, SubmitLeadRequest } from '../types/leadCapture.ts';
 
 function validPayload(overrides?: Partial<SubmitLeadRequest>): SubmitLeadRequest {
     return {
@@ -185,6 +185,18 @@ test('buildSubmitLeadPayload prefers explicit draft referred over URL ref tracki
     );
 
     assert.equal(payload.referred, 'João Souza');
+});
+
+test('buildSubmitLeadPayload tolerates missing tracking while deriving referred', () => {
+    const payload = buildSubmitLeadPayload(
+        validLeadDraft(),
+        {},
+        null as unknown as LeadTracking,
+        validPayload().utms,
+        'lead_ref_test',
+    );
+
+    assert.equal(payload.referred, undefined);
 });
 
 // ─── buildLeadWhatsAppMessage ─────────────────────────────────────────────────

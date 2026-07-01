@@ -201,6 +201,8 @@ export function buildLeadFields(input: OdooLeadInput, partnerId: number): Record
 // --- Per-form adapters: validated payload → OdooLeadInput ------------------
 
 export function leadInputFromSubmitLead(data: SubmitLeadRequest): OdooLeadInput {
+    const referred = data.referred?.trim() || null;
+
     return {
         formType: 'lead',
         createsLead: true,
@@ -214,11 +216,11 @@ export function leadInputFromSubmitLead(data: SubmitLeadRequest): OdooLeadInput 
         bantSummary: data.bantSummary,
         empresa: data.empresa ?? null,
         cargo: data.cargo ?? null,
-        referred: data.referred ?? null,
+        referred,
         eventId: data.event_id ?? null,
         utms: data.utms,
         tracking: data.tracking,
-        originSignal: data.referred ? 'referral' : null,
+        originSignal: referred ? 'referral' : null,
     };
 }
 
