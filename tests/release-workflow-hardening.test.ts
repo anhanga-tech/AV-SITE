@@ -8,7 +8,7 @@ import { readFile } from 'node:fs/promises';
 // (2) semantic-release runs from lockfile-locked devDependencies via `pnpm exec`,
 // never `pnpm dlx` (which resolves and runs remote code at job time).
 
-const SHA_PIN = /@[0-9a-f]{40}(?:\s|$)/;
+const SHA_PIN = /@[0-9a-f]{40}$/;
 
 async function readReleaseWorkflow(): Promise<string> {
   return readFile(new URL('../.github/workflows/release.yml', import.meta.url), 'utf8');
@@ -21,11 +21,14 @@ async function readPackageJson(): Promise<{ devDependencies?: Record<string, str
 test('release workflow pins every GitHub Action to a full commit SHA', async () => {
   const workflow = await readReleaseWorkflow();
 
-  const usesLines = workflow.split('\n').filter((line) => /^\s*(-\s*)?uses:/.test(line));
+  const usesLines = workflow.split(/\r?\n/).filter((line) => /^\s*(-\s*)?uses:/.test(line));
   assert.ok(usesLines.length >= 3, 'expected at least the checkout/pnpm/node action steps');
 
   for (const line of usesLines) {
-    const ref = line.replace(/^\s*(-\s*)?uses:\s*/, '').trim();
+    // Strip inline `# tag` comments before validating so the SHA is anchored to
+    // the action ref itself, not to a version tag mentioned in the comment.
+    const ref = line.split('#')[0].replace(/^\s*(-\s*)?uses:\s*/, '').trim();
+    if (ref.startsWith('./')) continue; // local composite actions have no SHA to pin
     assert.match(ref, SHA_PIN, `action must be pinned by SHA, not a mutable tag: ${ref}`);
   }
 });
