@@ -70,6 +70,18 @@ const BlogList: React.FC = () => {
                         />
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 size-5" />
                     </div>
+
+                    {/* Live result count — announced to screen readers as the filter updates */}
+                    <p
+                        role="status"
+                        aria-live="polite"
+                        className="mt-3 min-h-[1.25rem] text-sm font-semibold text-zinc-400"
+                        data-testid="blog-search-results-count"
+                    >
+                        {searchTerm.trim()
+                            ? `${filteredPosts.length} ${filteredPosts.length === 1 ? 'artigo encontrado' : 'artigos encontrados'}`
+                            : ''}
+                    </p>
                 </div>
 
                 {/* Grid */}
