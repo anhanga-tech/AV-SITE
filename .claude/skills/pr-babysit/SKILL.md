@@ -24,14 +24,18 @@ Uma PR está pronta quando, simultaneamente: (1) todos os checks verdes, (2) nen
    ```bash
    PR=N; REPO=OWNER/REPO; last_comment=""
    while true; do
-     checks=$(gh pr checks "$PR" --repo "$REPO" --json name,bucket 2>/dev/null || echo '[]')
+     # Falha de rede/rate-limit NUNCA pode virar evento: em erro, aguardar e tentar de novo.
+     checks=$(gh pr checks "$PR" --repo "$REPO" --json name,bucket 2>/dev/null)
+     if [ $? -ne 0 ] || [ -z "$checks" ]; then sleep 10; continue; fi
      fail=$(jq -r '[.[] | select(.bucket=="fail")] | length' <<<"$checks")
      pending=$(jq -r '[.[] | select(.bucket=="pending")] | length' <<<"$checks")
      [ "$fail" -gt 0 ] && { echo "CI_FAIL: $(jq -r '[.[] | select(.bucket=="fail") | .name] | join(",")' <<<"$checks")"; break; }
-     newc=$(gh api "repos/$REPO/pulls/$PR/comments" --jq 'map(.id) | max // 0' 2>/dev/null || echo 0)
+     newc=$(gh api "repos/$REPO/pulls/$PR/comments" --jq 'map(.id) | max // 0' 2>/dev/null)
+     if [ $? -ne 0 ] || [ -z "$newc" ]; then sleep 10; continue; fi
      if [ -n "$last_comment" ] && [ "$newc" != "$last_comment" ]; then echo "NEW_REVIEW_COMMENT"; break; fi
      last_comment=$newc
-     m=$(gh pr view "$PR" --repo "$REPO" --json mergeable --jq .mergeable 2>/dev/null || echo UNKNOWN)
+     m=$(gh pr view "$PR" --repo "$REPO" --json mergeable --jq .mergeable 2>/dev/null)
+     if [ $? -ne 0 ] || [ -z "$m" ]; then sleep 10; continue; fi
      [ "$m" = "CONFLICTING" ] && { echo "MERGE_CONFLICT"; break; }
      [ "$pending" -eq 0 ] && { echo "ALL_GREEN"; break; }
      sleep 60
