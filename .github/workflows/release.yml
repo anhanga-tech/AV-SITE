@@ -12,15 +12,17 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v7
+      # Actions pinadas por SHA completo (supply-chain hardening): a tag ainda é
+      # anotada no comentário para leitura/atualização por humanos e Dependabot.
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
-          
+
       - name: Install pnpm
-        uses: pnpm/action-setup@v6.0.9
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: 24
           cache: "pnpm"
@@ -30,7 +32,9 @@ jobs:
 
       # Sem NPM_TOKEN: este repo é um site, não um pacote npm. O fluxo usa apenas
       # @semantic-release/github (cria releases/tags no GitHub), nunca publica no npm.
+      # semantic-release e seus plugins são devDependencies travadas no lockfile;
+      # `pnpm exec` roda o binário local (nunca baixa código remoto como `pnpm dlx`).
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm dlx semantic-release --plugins "@semantic-release/commit-analyzer,@semantic-release/release-notes-generator,@semantic-release/github"
+        run: pnpm exec semantic-release --plugins "@semantic-release/commit-analyzer,@semantic-release/release-notes-generator,@semantic-release/github"
