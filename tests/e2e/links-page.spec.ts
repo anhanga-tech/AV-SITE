@@ -73,6 +73,6 @@ test('não renderiza overlays flutuantes (AIChat / BackToTop) na página standal
 test('botão WhatsApp aponta para wa.me com texto', async ({ page }) => {
     await page.goto('/links');
     const href = await page.getByTestId('link-whatsapp').getAttribute('href');
-    expect(href).toContain('wa.me/551152833309');
+    expect(href).toContain('wa.me/5511955020352');
     expect(href).toContain('text=');
 });

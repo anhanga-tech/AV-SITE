@@ -98,7 +98,7 @@ test.describe('Chatbot lead handoff', () => {
       .not.toBeNull();
 
     const openedUrl = await page.evaluate(() => window.__openedUrls?.[0] ?? '');
-    expect(decodeURIComponent(openedUrl)).toContain('wa.me/551152833309');
+    expect(decodeURIComponent(openedUrl)).toContain('wa.me/5511955020352');
     expect(decodeURIComponent(openedUrl)).toContain('Origem: São Paulo, SP');
     expect(decodeURIComponent(openedUrl)).toContain('Dados: utm_source=google');
     expect(decodeURIComponent(openedUrl)).toContain('gclid=test-gclid');

@@ -39,7 +39,7 @@ const ExclusaoDados = () => (
                         </ol>
                         <p>Você também pode enviar sua solicitação pelos seguintes canais:</p>
                         <ul className="list-disc pl-6 space-y-1">
-                            <li><strong>WhatsApp:</strong> <a href="https://wa.me/551152833309?text=Exclus%C3%A3o%20de%20Dados" target="_blank" rel="noopener noreferrer" className="text-primary underline">(11) 5283-3309</a> (informe "Exclusão de Dados" no início da mensagem)</li>
+                            <li><strong>WhatsApp:</strong> <a href="https://wa.me/5511955020352?text=Exclus%C3%A3o%20de%20Dados" target="_blank" rel="noopener noreferrer" className="text-primary underline">(11) 95502-0352</a> (informe "Exclusão de Dados" no início da mensagem)</li>
                             <li><strong>Correio:</strong> Avenida Dom Pedro I, 773, Vila Monumento, São Paulo-SP, CEP 01552-001</li>
                         </ul>
                     </div>
