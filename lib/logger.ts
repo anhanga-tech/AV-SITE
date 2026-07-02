@@ -8,7 +8,7 @@ function isDebugEnabled(): boolean {
     // browser bundle `process` is not defined (Vite only replaces the
     // `process.env.GEMINI_MODEL` token), so reading it unguarded throws a
     // ReferenceError and breaks the caller (e.g. the chat request path).
-    if (typeof process === 'undefined' || !process.env) return false;
+    if (typeof process === 'undefined' || !process?.env) return false;
     const debug = process.env.DEBUG;
     return typeof debug === 'string' && debug.toLowerCase() === 'true';
 }

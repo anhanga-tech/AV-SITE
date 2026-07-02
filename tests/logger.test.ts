@@ -57,8 +57,13 @@ test('logger.debug não quebra quando process é indefinido (bundle do browser)'
         // Simula o bundle do browser, onde `process` não existe: a leitura
         // desprotegida de process.env.DEBUG lançava ReferenceError.
         delete globalWithProcess.process;
+        assert.doesNotThrow(() => logger.debug('debug sem process', { source: 'test' }));
 
-        assert.doesNotThrow(() => logger.debug('debug no browser', { source: 'test' }));
+        // Alguns ambientes/mocks definem `process` como null: `!process.env`
+        // sem optional chaining lançaria TypeError.
+        globalWithProcess.process = null as unknown as NodeJS.Process;
+        assert.doesNotThrow(() => logger.debug('debug com process null', { source: 'test' }));
+
         assert.deepEqual(log.calls, []);
     } finally {
         globalWithProcess.process = originalProcess;
