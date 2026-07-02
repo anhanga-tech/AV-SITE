@@ -38,6 +38,10 @@ function splitJobs(workflow: string): Map<string, string> {
   };
 
   for (const line of lines.slice(jobsStart + 1)) {
+    // Stop at the next top-level key (e.g. a `concurrency:` block after `jobs:`)
+    // so unindented content never leaks into the last job's buffer. Comments and
+    // blank lines are ignored.
+    if (line.trim() !== '' && !line.trim().startsWith('#') && /^\S/.test(line)) break;
     const jobHeader = line.match(/^ {2}([A-Za-z0-9_-]+):\s*$/);
     if (jobHeader) {
       flush();
@@ -81,7 +85,18 @@ test('refresh-reviews confines secrets and write scope to separate jobs', async 
   // Workflow-level default grants no scope; each job opts in explicitly.
   assert.match(workflow, /^permissions:\s*\{\}\s*$/m, 'workflow-level permissions must default to no scope');
 
-  const jobs = splitJobs(workflow);
+  // Strip comments up front so prose mentions (e.g. explaining why a scope or
+  // secret is absent) never cause a false-positive job match or trip the
+  // scope/install checks below.
+  const stripComments = (block: string) =>
+    block
+      .split(/\r?\n/)
+      .map((line) => line.split('#')[0])
+      .join('\n');
+
+  const jobs = new Map(
+    [...splitJobs(workflow).entries()].map(([id, block]) => [id, stripComments(block)]),
+  );
   const fetchEntry = [...jobs.entries()].find(([, block]) => block.includes('OUTSCRAPER_API_KEY'));
   const prEntry = [...jobs.entries()].find(([, block]) => block.includes('GH_TOKEN'));
 
@@ -89,16 +104,8 @@ test('refresh-reviews confines secrets and write scope to separate jobs', async 
   assert.ok(prEntry, 'expected a job that opens the PR with the GITHUB_TOKEN');
   assert.notEqual(fetchEntry![0], prEntry![0], 'secret-bearing fetch and PR-opening work must be separate jobs');
 
-  // Strip comments so prose mentions (e.g. explaining why a scope is absent) do
-  // not trip the scope/install checks below.
-  const stripComments = (block: string) =>
-    block
-      .split(/\r?\n/)
-      .map((line) => line.split('#')[0])
-      .join('\n');
-
-  const fetchBlock = stripComments(fetchEntry![1]);
-  const prBlock = stripComments(prEntry![1]);
+  const fetchBlock = fetchEntry![1];
+  const prBlock = prEntry![1];
 
   // The fetch job runs untrusted dependency lifecycle scripts, so it must not hold
   // any write scope that a compromised install could abuse.
