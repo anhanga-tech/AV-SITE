@@ -83,5 +83,5 @@ Versão markdown de qualquer página: https://www.anhanga.tur.br/api/markdown?pa
 
 Para orçamentos e planejamento de viagem, o primeiro contato pode ser feito via:
 - Chat com IA no site: https://www.anhanga.tur.br/ (disponível 24h)
-- WhatsApp: https://wa.me/551152833309
+- WhatsApp: https://wa.me/5511955020352
 - E-mail: contato@anhanga.tur.br
