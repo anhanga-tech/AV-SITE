@@ -243,6 +243,14 @@ GitHub Flow — continuous deployment, no `develop` branch.
 - Conventional commits: `feat:`, `fix:`, `chore:`, `docs:`, `perf:`, `test:`, `refactor:`
 - CI `build-and-test` must pass before merging
 
+### Fluxo de PR (para o agente)
+
+- **Merge é sempre humano** (squash via GitHub). O agente nunca executa `gh pr merge` nem considera a tarefa concluída no merge — o estado final do agente é "PR pronta para merge".
+- Uma PR só está **pronta** quando: checks verdes **+** reviews do `gemini-code-assist` tratados **+** sem merge conflicts. Após o CI passar, sempre buscar reviews pendentes: `gh api repos/felipewilliam2/AV-SITE/pulls/<N>/comments` e `.../pulls/<N>/reviews`. Reviews chegam *depois* do CI verde — não declarar a PR pronta sem checar.
+- CodeQL usa default setup e pode aparecer como "skipping"/neutral — **não é falha** (`gh pr checks` retorna exit code 8 nesse caso; ignorar esse exit).
+- Para poll de CI/reviews, usar a ferramenta **Monitor** em background — nunca `sleep` em foreground (bloqueado pelo sandbox). Para acompanhamento contínuo até a PR ficar pronta, usar a skill `pr-babysit`.
+- Presets de custo (salvo pedido contrário do usuário): issue rotineira/fix pontual → effort low/medium; feature ou refactor multi-arquivo → medium/high; review de segurança ou debugging difícil → high.
+
 ## Engineering Standards
 
 `/docs/standards/` is the source of truth. Read before making changes:
