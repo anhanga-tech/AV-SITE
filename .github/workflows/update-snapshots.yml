@@ -13,6 +13,24 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
+    - name: Validate branch input
+      env:
+        # A entrada `branch` é livre (workflow_dispatch) e mais adiante entra num
+        # `git push` com o GITHUB_TOKEN presente. Expressões `${{ }}` são
+        # substituídas ANTES do shell interpretar o `run`, então um nome como
+        # `$(comando)` executaria comandos arbitrários no runner. Passamos a
+        # entrada por env var (sem interpolação no corpo do script) e validamos
+        # com allowlist estrita + git check-ref-format antes de qualquer uso.
+        BRANCH: ${{ github.event.inputs.branch }}
+      run: |
+        if ! printf '%s' "$BRANCH" | grep -qE '^[A-Za-z0-9._/-]+$'; then
+          echo "::error::Branch inválida: só são permitidos os caracteres [A-Za-z0-9._/-]."
+          exit 1
+        fi
+        if ! git check-ref-format "refs/heads/$BRANCH"; then
+          echo "::error::Branch inválida: falhou em git check-ref-format."
+          exit 1
+        fi
     - uses: actions/checkout@v7
       with:
         ref: ${{ github.event.inputs.branch }}
@@ -33,6 +51,9 @@ jobs:
     - name: Commit updated snapshots
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Branch validada no passo "Validate branch input"; usada como env var
+        # (nunca interpolada direto no corpo do script) para evitar injeção.
+        BRANCH: ${{ github.event.inputs.branch }}
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -41,5 +62,5 @@ jobs:
           echo "No snapshot changes to commit."
         else
           git commit -m "test: update visual regression baselines [skip ci]"
-          git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}" "HEAD:refs/heads/${{ github.event.inputs.branch }}"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}" "HEAD:refs/heads/${BRANCH}"
         fi
