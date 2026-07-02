@@ -32,6 +32,12 @@ export interface OdooMockOptions {
     existingPartnerId?: number | null;
     /** `comment` returned for the existing partner (Odoo returns false when empty). */
     existingComment?: string | false;
+    /**
+     * Extra scalar fields the search_read row reports for the existing partner
+     * (e.g. `{ name: 'Ana Silva', x_nps_score: 8 }`). Lets tests exercise the
+     * non-destructive fill-if-blank guard. Odoo returns `false` for unset fields.
+     */
+    existingFields?: Record<string, unknown>;
     newPartnerId?: number;
     leadId?: number;
     /** Force every RPC to fail with this HTTP status. */
@@ -72,6 +78,7 @@ export function createOdooMock(options: OdooMockOptions = {}): OdooMock {
         uid = 7,
         existingPartnerId = null,
         existingComment = false,
+        existingFields = {},
         newPartnerId = 101,
         leadId = 555,
         failStatus,
@@ -102,7 +109,9 @@ export function createOdooMock(options: OdooMockOptions = {}): OdooMock {
             calls.push({ model, method: ormMethod, args: ormArgs, kwargs });
 
             if (ormMethod === 'search_read') {
-                result = existingPartnerId ? [{ id: existingPartnerId, comment: existingComment }] : [];
+                result = existingPartnerId
+                    ? [{ id: existingPartnerId, comment: existingComment, ...existingFields }]
+                    : [];
             } else if (ormMethod === 'create') {
                 result = model === 'crm.lead' ? leadId : newPartnerId;
             } else if (ormMethod === 'write') {

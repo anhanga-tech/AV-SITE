@@ -130,6 +130,30 @@ function executeKw<T>(
 export type OdooPartnerFields = Record<string, unknown>;
 
 /**
+ * Scalar `res.partner` fields a public form must never overwrite on an existing
+ * match — they are only filled when the record's value is blank. The 5 forms are
+ * public and dedup by caller-supplied e-mail/phone, so overwriting would let
+ * anyone who knows a customer's contact corrupt their record (issue #1021).
+ * `comment` (append-only) and `category_id` (additive `(4, id)` link commands)
+ * are non-destructive and handled separately.
+ */
+const PROTECTED_SCALAR_FIELDS = [
+    'name',
+    'email',
+    'phone',
+    'x_lgpd_consent',
+    'x_perfil_do_viajante',
+    'x_nps_score',
+] as const;
+
+type ExistingPartner = { id: number } & Record<string, unknown>;
+
+/** Odoo returns `false` (not '' or 0-as-empty) for unset text/number fields over JSON-RPC. */
+function isBlankOdooValue(value: unknown): boolean {
+    return value === false || value === null || value === undefined || value === '';
+}
+
+/**
  * Per-submit session: authenticates once, then exposes ORM helpers that share a
  * single time budget. Create one with `openOdooSession()` at the start of a submit.
  */
@@ -147,8 +171,9 @@ export async function openOdooSession(config: OdooConfig): Promise<OdooSession> 
     const deadline = Date.now() + TOTAL_DEADLINE_MS;
     const uid = await authenticate(config, deadline);
 
-    // Odoo returns `false` (not '') for empty text fields over JSON-RPC.
-    async function findPartner(fields: OdooPartnerFields): Promise<{ id: number; comment: string | false } | null> {
+    // Odoo returns `false` (not '') for empty text fields over JSON-RPC. Reads the
+    // protected scalars so upsertPartner can fill-if-blank without overwriting.
+    async function findPartner(fields: OdooPartnerFields): Promise<ExistingPartner | null> {
         const email = typeof fields.email === 'string' && fields.email.trim() !== '' ? fields.email.trim() : null;
         const phone = typeof fields.phone === 'string' && fields.phone.trim() !== '' ? fields.phone.trim() : null;
         const domain = email
@@ -158,12 +183,12 @@ export async function openOdooSession(config: OdooConfig): Promise<OdooSession> 
                 : null;
         if (!domain) return null;
 
-        const rows = await executeKw<Array<{ id: number; comment: string | false }>>(
+        const rows = await executeKw<ExistingPartner[]>(
             config,
             uid,
             'res.partner',
             'search_read',
-            [domain, ['id', 'comment']],
+            [domain, ['id', 'comment', ...PROTECTED_SCALAR_FIELDS]],
             deadline,
             { limit: 1 },
         );
@@ -181,9 +206,20 @@ export async function openOdooSession(config: OdooConfig): Promise<OdooSession> 
                     const previous = typeof existing.comment === 'string' ? existing.comment.trim() : '';
                     updateFields.comment = previous ? `${previous}\n\n${fields.comment}` : fields.comment;
                 }
+                // Non-destructive upsert: never overwrite a protected scalar that
+                // already holds a value — a public form can't prove it owns the
+                // matched record (issue #1021). Blank fields are still enriched.
+                for (const key of PROTECTED_SCALAR_FIELDS) {
+                    if (key in updateFields && !isBlankOdooValue(existing[key])) {
+                        delete updateFields[key];
+                    }
+                }
                 // Forms that only capture a partial name (e.g. NPS asks for firstname
                 // only) must not clobber a fuller name already on file.
                 if (options?.preserveName) delete updateFields.name;
+                // The filter above may leave only additive updates (comment/tags) or
+                // nothing at all; skip the write when there's nothing left to persist.
+                if (Object.keys(updateFields).length === 0) return existing.id;
                 await executeKw<boolean>(config, uid, 'res.partner', 'write', [[existing.id], updateFields], deadline);
                 return existing.id;
             }
