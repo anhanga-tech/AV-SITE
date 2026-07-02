@@ -48,6 +48,24 @@ test('logger.debug escreve apenas quando DEBUG=true', () => {
     }
 });
 
+test('logger.debug não quebra quando process é indefinido (bundle do browser)', () => {
+    const globalWithProcess = globalThis as { process?: NodeJS.Process };
+    const originalProcess = globalWithProcess.process;
+    const log = captureConsole('log');
+
+    try {
+        // Simula o bundle do browser, onde `process` não existe: a leitura
+        // desprotegida de process.env.DEBUG lançava ReferenceError.
+        delete globalWithProcess.process;
+
+        assert.doesNotThrow(() => logger.debug('debug no browser', { source: 'test' }));
+        assert.deepEqual(log.calls, []);
+    } finally {
+        globalWithProcess.process = originalProcess;
+        log.restore();
+    }
+});
+
 test('logger escreve os níveis públicos com prefixos estáveis', () => {
     const info = captureConsole('info');
     const warn = captureConsole('warn');
