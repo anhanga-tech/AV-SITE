@@ -78,7 +78,7 @@ const BlogList: React.FC = () => {
                         className="mt-3 min-h-[1.25rem] text-sm font-semibold text-zinc-400"
                         data-testid="blog-search-results-count"
                     >
-                        {searchTerm.trim()
+                        {searchTerm
                             ? `${filteredPosts.length} ${filteredPosts.length === 1 ? 'artigo encontrado' : 'artigos encontrados'}`
                             : ''}
                     </p>
