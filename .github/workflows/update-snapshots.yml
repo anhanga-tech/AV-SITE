@@ -6,12 +6,18 @@ on:
         description: 'Branch to update snapshots on'
         required: true
         default: 'main'
-permissions:
-  contents: write
+# Padrão sem escopo: cada job pede apenas a permissão que precisa (least privilege).
+# O job que roda código controlado pela branch escolhida (pnpm install, Playwright)
+# fica com contents: read e SEM o GITHUB_TOKEN de escrita; o push privilegiado vive
+# num job separado que não instala dependências. As duas capacidades nunca coexistem
+# no mesmo runner, então código da branch não persiste estado (hooks git, processos)
+# capaz de abusar do token de escrita.
+permissions: {}
 jobs:
-  update-snapshots:
-    timeout-minutes: 60
+  validate-branch:
+    name: Validar branch de entrada
     runs-on: ubuntu-latest
+    permissions: {}
     steps:
     - name: Validate branch input
       env:
@@ -31,14 +37,29 @@ jobs:
           echo "::error::Branch inválida: falhou em git check-ref-format."
           exit 1
         fi
-    - uses: actions/checkout@v7
+  generate-snapshots:
+    name: Gerar snapshots atualizados
+    needs: validate-branch
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    # Só leitura. Este job faz checkout da branch escolhida pelo chamador e roda os
+    # lifecycle scripts de terceiros (pnpm install) + Playwright. Sem contents: write
+    # e sem o GITHUB_TOKEN de escrita, código da branch não tem como abusar do push
+    # nem exfiltrar o token privilegiado — ele nunca está presente neste runner.
+    permissions:
+      contents: read
+    steps:
+    - name: Checkout
+      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       with:
         ref: ${{ github.event.inputs.branch }}
         # Não persistir o GITHUB_TOKEN como credencial git: evita que scripts de
-        # lifecycle do pnpm install leiam o token. O push reautentica via token URL.
+        # lifecycle do pnpm install o leiam.
         persist-credentials: false
-    - uses: pnpm/action-setup@v6.0.9
-    - uses: actions/setup-node@v6
+    - name: Install pnpm
+      uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+    - name: Use Node.js 24
+      uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
       with:
         node-version: 24
         cache: 'pnpm'
@@ -48,11 +69,39 @@ jobs:
       run: pnpm exec playwright install --with-deps chromium
     - name: Update visual snapshots
       run: pnpm exec playwright test tests/e2e/visual.spec.ts --update-snapshots
+    - name: Upload updated snapshots
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: updated-snapshots
+        path: tests/e2e/visual.spec.ts-snapshots/
+        retention-days: 1
+        if-no-files-found: error
+  commit-snapshots:
+    name: Commitar snapshots atualizados
+    needs: generate-snapshots
+    runs-on: ubuntu-latest
+    # Escrita confinada aqui: este job NÃO instala dependências (nenhum lifecycle
+    # script de terceiros roda) e faz um checkout limpo da branch. Só o GITHUB_TOKEN
+    # de escrita é exposto, e apenas para git — código de primeira parte.
+    permissions:
+      contents: write
+    steps:
+    - name: Checkout
+      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      with:
+        ref: ${{ github.event.inputs.branch }}
+        # O push reautentica explicitamente via token URL no passo de commit.
+        persist-credentials: false
+    - name: Download updated snapshots
+      uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+      with:
+        name: updated-snapshots
+        path: tests/e2e/visual.spec.ts-snapshots/
     - name: Commit updated snapshots
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # Branch validada no passo "Validate branch input"; usada como env var
-        # (nunca interpolada direto no corpo do script) para evitar injeção.
+        # Branch já validada no job "validate-branch"; usada como env var (nunca
+        # interpolada direto no corpo do script) para evitar injeção.
         BRANCH: ${{ github.event.inputs.branch }}
       run: |
         git config user.name "github-actions[bot]"
@@ -61,6 +110,9 @@ jobs:
         if git diff --staged --quiet; then
           echo "No snapshot changes to commit."
         else
-          git commit -m "test: update visual regression baselines [skip ci]"
+          # --no-verify: checkout limpo, mas como este é o único job com o token de
+          # escrita, desabilitamos hooks no commit por defesa em profundidade
+          # (nenhum install ativou core.hooksPath aqui).
+          git commit --no-verify -m "test: update visual regression baselines [skip ci]"
           git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}" "HEAD:refs/heads/${BRANCH}"
         fi
