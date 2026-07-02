@@ -17,6 +17,12 @@ import { readFile } from 'node:fs/promises';
 
 const SHA_PIN = /@[0-9a-f]{40}$/;
 
+// Matches any spelling of the write-scoped token so the guard stays correct if the
+// workflow is refactored from `GH_TOKEN`/`secrets.GITHUB_TOKEN` to the
+// `${{ github.token }}` form. Word boundaries keep `GH_TOKEN` from being conflated
+// with unrelated identifiers.
+const WRITE_TOKEN = /\bGH_TOKEN\b|\bGITHUB_TOKEN\b|github\.token/;
+
 async function readWorkflow(): Promise<string> {
   return readFile(new URL('../.github/workflows/update-snapshots.yml', import.meta.url), 'utf8');
 }
@@ -95,7 +101,7 @@ test('update-snapshots confines branch code and write scope to separate jobs', a
     [...splitJobs(workflow).entries()].map(([id, block]) => [id, stripComments(block)]),
   );
   const generateEntry = [...jobs.entries()].find(([, block]) => block.includes('pnpm install'));
-  const commitEntry = [...jobs.entries()].find(([, block]) => block.includes('GH_TOKEN'));
+  const commitEntry = [...jobs.entries()].find(([, block]) => WRITE_TOKEN.test(block));
 
   assert.ok(generateEntry, 'expected a job that installs dependencies and runs branch code');
   assert.ok(commitEntry, 'expected a job that pushes with the GITHUB_TOKEN');
@@ -111,7 +117,7 @@ test('update-snapshots confines branch code and write scope to separate jobs', a
   // The generation job runs untrusted branch code (pnpm lifecycle scripts,
   // Playwright), so it must not hold any write scope that code could abuse.
   assert.doesNotMatch(generateBlock, /contents:\s*write/, 'generation job must not have contents:write');
-  assert.doesNotMatch(generateBlock, /GH_TOKEN/, 'generation job must not receive the write-scoped token');
+  assert.doesNotMatch(generateBlock, WRITE_TOKEN, 'generation job must not receive the write-scoped token');
 
   // The commit job holds the write token, so it must not install dependencies
   // (no third-party lifecycle code runs in the same runner as the token).
