@@ -470,7 +470,7 @@ const escapeHtml = (s) =>
 
 const telHref = (phone) => {
   const d = onlyDigits(phone);
-  return d ? `tel:${d.startsWith("+") ? d : "+" + d}` : "";
+  return d ? "tel:" + d : "";
 };
 
 const ensureHttps = (url) => {
