@@ -81,6 +81,79 @@ test('upsertPartner — uses the new comment when the partner has none', async (
     assert.equal((write.args[1] as Record<string, unknown>).comment, 'Primeira nota');
 });
 
+// Non-destructive upsert — a public form must not overwrite populated scalar
+// fields of a partner it matched by e-mail/phone (issue #1021).
+
+test('upsertPartner — does not overwrite populated name/phone/email on an existing match', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    const mock = createOdooMock({
+        existingPartnerId: 60,
+        existingFields: { name: 'Ana Carolina Silva', email: 'ana@example.com', phone: '+5511999998888' },
+    });
+    global.fetch = mock.fetch;
+
+    const session = await openOdooSession(config());
+    await session.upsertPartner({
+        name: 'Hacker',
+        email: 'ana@example.com',
+        phone: '+5511000000000',
+        comment: 'nota',
+    });
+
+    const fields = mock.calls.find((c) => c.method === 'write')!.args[1] as Record<string, unknown>;
+    assert.equal('name' in fields, false, 'populated name must not be overwritten');
+    assert.equal('phone' in fields, false, 'populated phone must not be overwritten');
+    assert.equal('email' in fields, false, 'populated email must not be overwritten');
+    assert.equal(fields.comment, 'nota', 'additive comment still applies');
+});
+
+test('upsertPartner — fills a blank protected field on an existing match (enrichment)', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    // Matched by e-mail; phone is unset (Odoo reports `false`), so it may be filled.
+    const mock = createOdooMock({
+        existingPartnerId: 61,
+        existingFields: { name: 'Ana', email: 'ana@example.com', phone: false },
+    });
+    global.fetch = mock.fetch;
+
+    const session = await openOdooSession(config());
+    await session.upsertPartner({ name: 'Ana', email: 'ana@example.com', phone: '+5511999998888' });
+
+    const fields = mock.calls.find((c) => c.method === 'write')!.args[1] as Record<string, unknown>;
+    assert.equal(fields.phone, '+5511999998888', 'a blank field is enriched, not blocked');
+    assert.equal('name' in fields, false, 'populated name stays untouched');
+});
+
+test('upsertPartner — does not overwrite an existing NPS score (0 counts as populated)', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    const mock = createOdooMock({
+        existingPartnerId: 62,
+        existingFields: { email: 'ana@example.com', x_nps_score: 0 },
+    });
+    global.fetch = mock.fetch;
+
+    const session = await openOdooSession(config());
+    await session.upsertPartner({ email: 'ana@example.com', x_nps_score: 10, comment: 'nps' });
+
+    const fields = mock.calls.find((c) => c.method === 'write')!.args[1] as Record<string, unknown>;
+    assert.equal('x_nps_score' in fields, false, 'an existing score (even 0) must not be overwritten');
+});
+
+test('upsertPartner — skips the write when the guard leaves nothing to persist', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    const mock = createOdooMock({
+        existingPartnerId: 63,
+        existingFields: { name: 'Ana', email: 'ana@example.com', x_lgpd_consent: true },
+    });
+    global.fetch = mock.fetch;
+
+    const session = await openOdooSession(config());
+    const id = await session.upsertPartner({ name: 'Ana', email: 'ana@example.com', x_lgpd_consent: true });
+
+    assert.equal(id, 63);
+    assert.equal(mock.calls.some((c) => c.method === 'write'), false, 'no write when only no-op overwrites remain');
+});
+
 test('createLead — issues a crm.lead.create and returns the id', async (t) => {
     t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
     const mock = createOdooMock({ leadId: 777 });
