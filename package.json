@@ -31,7 +31,7 @@
     "@mdx-js/react": "^3.1.1",
     "@mdx-js/rollup": "^3.1.1",
     "@phosphor-icons/react": "^2.1.10",
-    "@sentry/cloudflare": "^10.60.0",
+    "@sentry/cloudflare": "^10.62.0",
     "@sentry/react": "^10.61.0",
     "@tailwindcss/postcss": "^4.3.1",
     "@tailwindcss/typography": "^0.5.20",
