@@ -83,6 +83,36 @@ test('safety check should block remaining Middle Eastern countries', () => {
     }
 });
 
+// Issue #1022: destinos bloqueados devem ser detectados mesmo quando o modelo
+// emite só a cidade, sem o nome do país.
+test('safety check should block city-only blocked destinations', () => {
+    const testCases = [
+        { destination: 'Moscou', expected: 'Rússia', category: 'sanctions' },
+        { destination: 'São Petersburgo', expected: 'Rússia', category: 'sanctions' },
+        { destination: 'Havana', expected: 'Cuba', category: 'sanctions' },
+        { destination: 'Varadero', expected: 'Cuba', category: 'sanctions' },
+        { destination: 'Caracas', expected: 'Venezuela', category: 'sanctions' },
+        { destination: 'Pyongyang', expected: 'Coreia do Norte', category: 'sanctions' },
+        { destination: 'Minsk', expected: 'Bielorrússia', category: 'sanctions' },
+        { destination: 'Kiev', expected: 'Ucrânia', category: 'war' },
+        { destination: 'Kyiv', expected: 'Ucrânia', category: 'war' },
+        { destination: 'Cabul', expected: 'Afeganistão', category: 'war' },
+        { destination: 'Cartum', expected: 'Sudão', category: 'war' },
+        { destination: 'Porto Príncipe', expected: 'Haiti', category: 'instability' },
+        { destination: 'Port-au-Prince', expected: 'Haiti', category: 'instability' },
+        { destination: 'Yangon', expected: 'Mianmar', category: 'instability' },
+        { destination: 'Trípoli', expected: 'Líbia', category: 'instability' },
+        { destination: 'Mogadíscio', expected: 'Somália', category: 'instability' },
+    ];
+
+    for (const { destination, expected, category } of testCases) {
+        const result = detectBlockedDestination(destination);
+        assert.ok(result, `${destination} must be blocked`);
+        assert.equal(result?.country, expected);
+        assert.equal(result?.category, category);
+    }
+});
+
 // Liberados em jun/2026 após estabilização do conflito regional. Antes bloqueados pela Policy #186.
 test('safety check should allow destinations released in jun/2026', () => {
     const releasedDestinations = [
