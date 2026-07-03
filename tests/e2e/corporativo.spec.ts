@@ -2,7 +2,44 @@ import { test, expect } from '@playwright/test';
 import type { SubmitLeadRequest } from '../../types/leadCapture';
 import { CorporativoPage } from './pages/CorporativoPage';
 
+// CorpGlobe faz `import('globe.gl')` em runtime e busca uma textura em
+// media.anhanga.tur.br — dependência externa + contexto WebGL que só existe
+// para enfeitar o hero (aria-hidden). Em e2e isso é fonte de ruído (console
+// errors) e de flakiness (WebGL headless, re-otimização de deps do Vite, fetch
+// externo). Trocamos o módulo pré-bundlado do Vite (`globe__gl.js`) por um stub
+// no-op encadeável, então o `import()` resolve, nada renderiza no canvas e
+// nenhuma rede externa é tocada. O teste de fallback sobrescreve isto abortando
+// a rota (registro posterior tem precedência no Playwright).
+const GLOBE_STUB_MODULE = `
+  export default function Globe() {
+    const api = new Proxy(function () {}, {
+      get(_target, prop) {
+        if (prop === 'renderer') return () => null;
+        if (prop === 'controls') return () => ({});
+        return () => api;
+      },
+      apply() { return api; },
+      construct() { return api; },
+    });
+    return api;
+  }
+`;
+
+async function stubCorpGlobe(page: import('@playwright/test').Page) {
+  await page.route('**/globe__gl.js*', route =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/javascript',
+      body: GLOBE_STUB_MODULE,
+    })
+  );
+}
+
 test.describe('Corporativo Landing Page', () => {
+  test.beforeEach(async ({ page }) => {
+    await stubCorpGlobe(page);
+  });
+
   test('should push correct dataLayer event on landing view', async ({ page }) => {
     const landing = new CorporativoPage(page);
     await landing.goto();
@@ -155,6 +192,8 @@ test.describe('Corporativo Landing Page', () => {
     // por design, então a asserção de visibilidade só vale no desktop.
     test.skip(isMobile, 'Globo é decorativo desktop-only (hidden lg:block)');
 
+    // Sobrescreve o stub no-op do beforeEach: registrado depois, tem precedência
+    // no Playwright, então aqui o módulo falha de fato e exercita o catch → fallback.
     await page.route(/globe(\.|__)gl|three-globe/, route => route.abort());
 
     const landing = new CorporativoPage(page);
