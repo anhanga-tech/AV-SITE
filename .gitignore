@@ -58,3 +58,4 @@ brand-profile.json
 
 # SEO crawl exports / audit dumps (business data — local only)
 SEO/
+.claude/settings.json
