@@ -6,10 +6,12 @@ import { CorporativoPage } from './pages/CorporativoPage';
 // media.anhanga.tur.br — dependência externa + contexto WebGL que só existe
 // para enfeitar o hero (aria-hidden). Em e2e isso é fonte de ruído (console
 // errors) e de flakiness (WebGL headless, re-otimização de deps do Vite, fetch
-// externo). Trocamos o módulo pré-bundlado do Vite (`globe__gl.js`) por um stub
-// no-op encadeável, então o `import()` resolve, nada renderiza no canvas e
-// nenhuma rede externa é tocada. O teste de fallback sobrescreve isto abortando
-// a rota (registro posterior tem precedência no Playwright).
+// externo). Trocamos o módulo do globe.gl por um stub no-op encadeável, então o
+// `import()` resolve, nada renderiza no canvas e nenhuma rede externa é tocada.
+// A rota casa tanto o pré-bundle do Vite dev (`.vite/deps/globe__gl.js`) quanto
+// um chunk de build (`globe.gl-HASH.js`) — mesma regex do teste de fallback,
+// que sobrescreve isto abortando a rota (registro posterior tem precedência).
+const GLOBE_MODULE_ROUTE = /globe(\.|__)gl/;
 const GLOBE_STUB_MODULE = `
   export default function Globe() {
     const api = new Proxy(function () {}, {
@@ -26,7 +28,7 @@ const GLOBE_STUB_MODULE = `
 `;
 
 async function stubCorpGlobe(page: import('@playwright/test').Page) {
-  await page.route('**/globe__gl.js*', route =>
+  await page.route(GLOBE_MODULE_ROUTE, route =>
     route.fulfill({
       status: 200,
       contentType: 'application/javascript',
