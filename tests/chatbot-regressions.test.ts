@@ -103,6 +103,12 @@ test('safety check should block city-only blocked destinations', () => {
         { destination: 'Yangon', expected: 'Mianmar', category: 'instability' },
         { destination: 'Trípoli', expected: 'Líbia', category: 'instability' },
         { destination: 'Mogadíscio', expected: 'Somália', category: 'instability' },
+        { destination: 'Sochi', expected: 'Rússia', category: 'sanctions' },
+        { destination: 'St. Petersburg', expected: 'Rússia', category: 'sanctions' },
+        { destination: 'Odesa', expected: 'Ucrânia', category: 'war' },
+        { destination: 'Kharkiv', expected: 'Ucrânia', category: 'war' },
+        { destination: 'Isla Margarita', expected: 'Venezuela', category: 'sanctions' },
+        { destination: 'Somaliland', expected: 'Somália', category: 'instability' },
     ];
 
     for (const { destination, expected, category } of testCases) {

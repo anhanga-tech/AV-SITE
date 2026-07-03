@@ -59,16 +59,16 @@ export const BLOCKED_DESTINATIONS: Array<{ category: SafetyCategory; country: st
     })),
     // Other blocked regions — aliases include major cities/endonyms so a city-only
     // destination (ex: "Moscou") still triggers the block (issue #1022)
-    { category: 'war', country: 'Ucrânia', aliases: ['ucrania', 'ukraine', 'kiev', 'kyiv', 'odessa', 'lviv'] },
+    { category: 'war', country: 'Ucrânia', aliases: ['ucrania', 'ukraine', 'kiev', 'kyiv', 'odessa', 'odesa', 'lviv', 'kharkiv', 'kharkov', 'dnipro'] },
     { category: 'war', country: 'Sudão', aliases: ['sudao', 'sudan', 'cartum', 'khartoum'] },
     { category: 'war', country: 'Afeganistão', aliases: ['afeganistao', 'afghanistan', 'cabul', 'kabul'] },
-    { category: 'sanctions', country: 'Rússia', aliases: ['russia', 'moscou', 'moscow', 'moscovo', 'sao petersburgo', 'saint petersburg', 'st petersburg', 'san petersburgo'] },
+    { category: 'sanctions', country: 'Rússia', aliases: ['russia', 'moscou', 'moscow', 'moscovo', 'sao petersburgo', 'saint petersburg', 'st petersburg', 'st. petersburg', 'san petersburgo', 'sochi'] },
     { category: 'sanctions', country: 'Bielorrússia', aliases: ['bielorrussia', 'belarus', 'minsk'] },
     { category: 'sanctions', country: 'Coreia do Norte', aliases: ['coreia do norte', 'north korea', 'pyongyang', 'pionguiangue'] },
-    { category: 'sanctions', country: 'Venezuela', aliases: ['venezuela', 'caracas', 'maracaibo'] },
+    { category: 'sanctions', country: 'Venezuela', aliases: ['venezuela', 'caracas', 'maracaibo', 'margarita', 'isla margarita'] },
     { category: 'sanctions', country: 'Cuba', aliases: ['cuba', 'havana', 'habana', 'varadero'] },
     { category: 'instability', country: 'Haiti', aliases: ['haiti', 'porto principe', 'port-au-prince', 'port au prince'] },
     { category: 'instability', country: 'Mianmar', aliases: ['mianmar', 'myanmar', 'birmania', 'burma', 'yangon', 'rangum', 'rangoon', 'naypyidaw'] },
     { category: 'instability', country: 'Líbia', aliases: ['libia', 'libya', 'tripoli'] },
-    { category: 'instability', country: 'Somália', aliases: ['somalia', 'mogadiscio', 'mogadishu'] },
+    { category: 'instability', country: 'Somália', aliases: ['somalia', 'mogadiscio', 'mogadishu', 'somaliland', 'somalilandia'] },
 ];
