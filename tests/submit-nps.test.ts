@@ -280,6 +280,28 @@ test('submit-nps writes x_nps_score and a comment with reason/highlight on the p
     assert.match(String(partner.comment), /Momento marcante: A visita às Cataratas do Iguaçu\./);
 });
 
+test('submit-nps escapes angle brackets from free text before writing the partner comment', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    const mock = createOdooMock();
+    global.fetch = mock.fetch;
+
+    const response = await handler(buildRequest(validBody({
+        firstname: 'Ana <b>',
+        reason: '<script>alert(1)</script>',
+        highlight: '<img src=x onerror=alert(2)>',
+    })));
+    assert.equal(response.status, 201);
+
+    const partner = mock.partnerFields()!;
+    const comment = String(partner.comment);
+    assert.equal(comment.includes('<'), false, 'comment must not contain raw angle brackets');
+    assert.equal(comment.includes('>'), false, 'comment must not contain raw angle brackets');
+    assert.match(comment, /&lt;script&gt;alert\(1\)&lt;\/script&gt;/);
+    assert.match(comment, /&lt;img src=x onerror=alert\(2\)&gt;/);
+    assert.equal(String(partner.name).includes('<'), false, 'partner name must be escaped too');
+});
+
 test('submit-nps does NOT overwrite the full name of an existing partner (firstname-only form)', async (t) => {
     t.after(restore);
     setOdooEnv();
