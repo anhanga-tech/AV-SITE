@@ -1,4 +1,4 @@
-import { captureLoggerError } from './error-tracking';
+import { captureLoggerError, sanitizeForErrorTracking } from './error-tracking';
 
 type LoggerData = unknown;
 type ConsoleMethod = 'log' | 'info' | 'warn' | 'error';
@@ -15,7 +15,13 @@ function isDebugEnabled(): boolean {
 
 function writeLog(method: ConsoleMethod, prefix: string, message: string, data?: LoggerData): void {
     if (data !== undefined) {
-        console[method](prefix, message, data);
+        // Both the client Sentry setup and the Cloudflare middleware capture console
+        // output, so redact sensitive keys before writing — never rely on the
+        // error-tracker context alone (see captureLoggerError). Error instances are
+        // passed through so console keeps the stack trace (parity with the tracker,
+        // which also keeps the Error object rather than its data).
+        const safe = data instanceof Error ? data : sanitizeForErrorTracking(data);
+        console[method](prefix, message, safe);
         return;
     }
 

@@ -86,6 +86,36 @@ test('validatePayload should preserve fbp and extras as tracking fields', () => 
     assert.deepEqual(result.data.tracking?.extras, { custom_source: 'chatbot' });
 });
 
+test('validatePayload should reject tracking objects with an abusive number of keys', () => {
+    const tracking: Record<string, string> = {};
+    for (let i = 0; i < 200; i += 1) {
+        tracking[`k_${i}`] = `v_${i}`;
+    }
+
+    const result = validatePayload({
+        firstName: 'Felipe', lastName: 'William', email: 'felipe@example.com', whatsapp: '+5511988314487',
+        bantSummary: 'Need: Praia', destination: 'Rio de Janeiro',
+        utms: {}, tracking,
+    });
+
+    assert.equal(result.valid, false);
+});
+
+test('validatePayload should reject tracking whose nested extras has an abusive number of keys', () => {
+    const extras: Record<string, string> = {};
+    for (let i = 0; i < 200; i += 1) {
+        extras[`k_${i}`] = `v_${i}`;
+    }
+
+    const result = validatePayload({
+        firstName: 'Felipe', lastName: 'William', email: 'felipe@example.com', whatsapp: '+5511988314487',
+        bantSummary: 'Need: Praia', destination: 'Rio de Janeiro',
+        utms: {}, tracking: { extras },
+    });
+
+    assert.equal(result.valid, false);
+});
+
 test('validatePayload should require whatsapp and normalize it to E.164 digits', () => {
     const result = validatePayload({
         firstName: 'Felipe', lastName: 'William', email: 'felipe@example.com', whatsapp: ' (11) 98831-4487 ',

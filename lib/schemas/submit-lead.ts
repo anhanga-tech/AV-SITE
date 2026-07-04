@@ -12,7 +12,24 @@ const LeadUtmsSchema = z.looseObject({
 }).optional();
 
 // Validated as a plain object; individual fields are normalised by normalizeTracking.
-const LeadTrackingSchema = z.record(z.string(), z.unknown()).optional();
+// Cap the key count so an attacker cannot force expensive validation/normalization
+// with an unbounded tracking object (only ~15 extras are ever persisted).
+const MAX_TRACKING_KEYS = 50;
+const LeadTrackingSchema = z
+    .record(z.string(), z.unknown())
+    .refine((value) => {
+        if (Object.keys(value).length > MAX_TRACKING_KEYS) return false;
+        // extras is typed as z.unknown() (not recursed by Zod), so an attacker
+        // could otherwise nest a huge object here to bypass the top-level cap.
+        const extras = value.extras;
+        if (typeof extras === 'object' && extras !== null && !Array.isArray(extras)) {
+            return Object.keys(extras).length <= MAX_TRACKING_KEYS;
+        }
+        return true;
+    }, {
+        message: `tracking and its extras accept at most ${MAX_TRACKING_KEYS} keys`,
+    })
+    .optional();
 
 export const SubmitLeadBodySchema = z.object({
     firstName:   z.string().min(1).max(100),

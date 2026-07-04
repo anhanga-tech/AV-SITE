@@ -130,6 +130,62 @@ test('logger.debug normaliza DEBUG antes de comparar', () => {
     }
 });
 
+test('logger redige chaves sensíveis na saída de console em todos os níveis', () => {
+    const info = captureConsole('info');
+    const warn = captureConsole('warn');
+    const error = captureConsole('error');
+
+    try {
+        resetErrorTrackerForTests();
+
+        const payload = {
+            requestId: 'req_123',
+            email: 'cliente@example.com',
+            token: 'super-secret-token',
+            nested: { phone: '+55 11 99999-9999' },
+        };
+        const expected = {
+            requestId: 'req_123',
+            email: '[redacted]',
+            token: '[redacted]',
+            nested: { phone: '[redacted]' },
+        };
+
+        logger.info('SUBMIT_LEAD info', payload);
+        logger.warn('SUBMIT_LEAD warn', payload);
+        logger.error('SUBMIT_LEAD error', payload);
+
+        assert.deepEqual(info.calls[0], ['[info]', 'SUBMIT_LEAD info', expected]);
+        assert.deepEqual(warn.calls[0], ['[warn]', 'SUBMIT_LEAD warn', expected]);
+        assert.deepEqual(error.calls[0], ['[error]', 'SUBMIT_LEAD error', expected]);
+
+        // O objeto original não deve ser mutado pela redação.
+        assert.equal(payload.email, 'cliente@example.com');
+        assert.equal(payload.token, 'super-secret-token');
+    } finally {
+        info.restore();
+        warn.restore();
+        error.restore();
+    }
+});
+
+test('logger preserva objetos nativos (Date) sem achatá-los em {}', () => {
+    const info = captureConsole('info');
+
+    try {
+        resetErrorTrackerForTests();
+        const when = new Date('2026-07-03T12:00:00.000Z');
+
+        logger.info('EVENTO', { when, count: 3 });
+
+        const logged = info.calls[0]?.[2] as { when: unknown; count: number };
+        assert.equal(logged.when, when, 'Date deve ser preservada como valor, não virar {}');
+        assert.equal(logged.count, 3);
+    } finally {
+        info.restore();
+    }
+});
+
 test('logger.error captura erros no error tracker registrado', () => {
     const error = captureConsole('error');
     const captured: Array<{ error: unknown; context?: ErrorCaptureContext }> = [];

@@ -39,10 +39,25 @@ async function readRequestBody(req: IncomingMessage): Promise<Buffer> {
   return Buffer.concat(chunks);
 }
 
+// Client-supplied forwarding headers must not reach the handlers in dev: the
+// shared getClientIP() trusts them when Cloudflare headers are absent, so a
+// network-adjacent attacker could spoof them to rotate rate-limit keys and abuse
+// the developer's local Gemini/Odoo credentials. Strip them at the boundary.
+const STRIPPED_FORWARDING_HEADERS = new Set([
+  'cf-connecting-ip',
+  'x-real-ip',
+  'x-vercel-forwarded-for',
+  'x-forwarded-for',
+]);
+
 async function toWebRequest(req: IncomingMessage, origin: string): Promise<Request> {
   const headers = new Headers();
 
   for (const [key, value] of Object.entries(req.headers)) {
+    if (STRIPPED_FORWARDING_HEADERS.has(key.toLowerCase())) {
+      continue;
+    }
+
     if (Array.isArray(value)) {
       for (const item of value) {
         headers.append(key, item);
@@ -54,6 +69,9 @@ async function toWebRequest(req: IncomingMessage, origin: string): Promise<Reque
       headers.set(key, value);
     }
   }
+
+  // Provide a fixed, trusted local client address for dev rate limiting.
+  headers.set('x-forwarded-for', '127.0.0.1');
 
   const method = req.method?.toUpperCase() || 'GET';
   const requestInit: RequestInit & { duplex?: 'half' } = {
@@ -191,7 +209,10 @@ export default defineConfig(({ mode, isSsrBuild }) => {
   // Base path: '/' para Netlify/Vercel, ou '/repo-name/' para GitHub Pages
   // Para GitHub Pages, defina a variável de ambiente VITE_BASE_PATH
   const base = env.VITE_BASE_PATH || process.env.VITE_BASE_PATH || '/';
-  const devHost = env.VITE_DEV_HOST || process.env.VITE_DEV_HOST || '0.0.0.0';
+  // Bind to loopback by default so the dev server (which proxies real
+  // provider-backed handlers with the developer's local credentials) is not
+  // reachable from the LAN. Set VITE_DEV_HOST=0.0.0.0 to opt into LAN exposure.
+  const devHost = env.VITE_DEV_HOST || process.env.VITE_DEV_HOST || '127.0.0.1';
   const devPort = Number(env.VITE_DEV_PORT || process.env.VITE_DEV_PORT || '3000');
   const devStrictPort = (env.VITE_DEV_STRICT_PORT || process.env.VITE_DEV_STRICT_PORT || 'false') === 'true';
   const shouldAnalyze = (env.ANALYZE || process.env.ANALYZE) === 'true';
