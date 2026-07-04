@@ -230,6 +230,32 @@ test('normalizeTracking sanitizes XSS in tracking keys and values', () => {
     );
 });
 
+test('normalizeTracking caps extras at 15 keys even for large unbounded objects', () => {
+    const utms = { utm_source: null, utm_medium: null, utm_campaign: null, utm_term: null, utm_content: null };
+
+    const extras: Record<string, string> = {};
+    for (let i = 0; i < 5000; i += 1) {
+        extras[`extra_${i}`] = `value_${i}`;
+    }
+
+    const result = normalizeTracking({ extras }, utms);
+
+    assert.equal(Object.keys(result.extras ?? {}).length, 15, 'extras must be capped at 15 entries');
+});
+
+test('normalizeTracking caps extras drawn from top-level unknown keys too', () => {
+    const utms = { utm_source: null, utm_medium: null, utm_campaign: null, utm_term: null, utm_content: null };
+
+    const source: Record<string, unknown> = {};
+    for (let i = 0; i < 5000; i += 1) {
+        source[`custom_${i}`] = `value_${i}`;
+    }
+
+    const result = normalizeTracking(source, utms);
+
+    assert.equal(Object.keys(result.extras ?? {}).length, 15, 'top-level extras must be capped at 15 entries');
+});
+
 test('normalizeTracking falls back to UTMs for missing tracking UTM fields', () => {
     const utms = {
         utm_source: 'google',

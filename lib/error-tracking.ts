@@ -16,7 +16,7 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
     return typeof value === 'object' && value !== null && !Array.isArray(value) && !(value instanceof Error);
 }
 
-function sanitizeForErrorTracking(value: unknown, depth = 0): unknown {
+export function sanitizeForErrorTracking(value: unknown, depth = 0): unknown {
     if (depth > 4) return TRUNCATED_VALUE;
 
     if (value instanceof Error) {

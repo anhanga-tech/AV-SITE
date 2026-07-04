@@ -122,26 +122,32 @@ function sanitizeTrackingKey(key: string): string {
     return key.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;').substring(0, 64);
 }
 
+const MAX_TRACKING_EXTRAS = 15;
+
 function normalizeTrackingExtras(source: Record<string, unknown>): Record<string, string> | undefined {
     const extrasInput = toRecord(source.extras);
     const extras: Record<string, string> = {};
 
-    const appendExtra = (key: string, raw: unknown) => {
-        if (Object.keys(extras).length >= 15) return;
+    // Returns false once the cap is reached so callers can stop iterating over
+    // an attacker-supplied object with an unbounded number of keys.
+    const appendExtra = (key: string, raw: unknown): boolean => {
+        if (Object.keys(extras).length >= MAX_TRACKING_EXTRAS) return false;
 
         const normalized = normalizeNullable(raw);
-        if (!normalized) return;
+        if (normalized) {
+            extras[sanitizeTrackingKey(key)] = normalized;
+        }
 
-        extras[sanitizeTrackingKey(key)] = normalized;
+        return true;
     };
 
     for (const [key, raw] of Object.entries(extrasInput)) {
-        appendExtra(key, raw);
+        if (!appendExtra(key, raw)) break;
     }
 
     for (const [key, raw] of Object.entries(source)) {
         if (key === 'extras' || KNOWN_TRACKING_KEYS.has(key)) continue;
-        appendExtra(key, raw);
+        if (!appendExtra(key, raw)) break;
     }
 
     return Object.keys(extras).length > 0 ? extras : undefined;

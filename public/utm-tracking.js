@@ -159,19 +159,6 @@
         trackSpecialistClick(target);
     }
 
-    function handleHubSpotMessage(event) {
-        if (event.data.type !== 'hsFormCallback' || event.data.eventName !== 'onFormSubmitted') {
-            return;
-        }
-
-        pushDataLayerEvent({
-            event: 'form_submission',
-            form_type: 'hubspot',
-            form_id: event.data.id,
-            page_location: window.location.href
-        });
-    }
-
     function initWhatsAppTracking() {
         const urlParams = new URLSearchParams(window.location.search);
         const tracking = readStoredTracking();
@@ -184,9 +171,6 @@
 
     // --- EVENT DELEGATION LOGIC ---
     document.body.addEventListener('click', handleBodyClick, { capture: true });
-
-    // 3. HubSpot Form Tracking
-    window.addEventListener("message", handleHubSpotMessage);
 
     // Inicialização: espera a página carregar + delay para GA4
     const init = () => setTimeout(initWhatsAppTracking, 1500);

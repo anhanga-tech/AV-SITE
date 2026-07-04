@@ -39,9 +39,6 @@ jobs:
       - name: Typecheck
         run: pnpm run typecheck
 
-      - name: Install Puppeteer Browser
-        run: npx puppeteer browsers install chrome
-
       - name: Build
         run: pnpm run build
 
