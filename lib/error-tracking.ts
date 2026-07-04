@@ -13,7 +13,12 @@ const noopErrorTracker: ErrorTracker = () => undefined;
 let errorTracker: ErrorTracker = noopErrorTracker;
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
-    return typeof value === 'object' && value !== null && !Array.isArray(value) && !(value instanceof Error);
+    if (typeof value !== 'object' || value === null) return false;
+    // Only literal/plain objects. Native objects (Date, RegExp, Map, URL, …) are
+    // left untouched by the sanitizer so logs keep their meaningful values instead
+    // of being flattened into `{}`.
+    const proto = Object.getPrototypeOf(value);
+    return proto === null || proto === Object.prototype;
 }
 
 export function sanitizeForErrorTracking(value: unknown, depth = 0): unknown {

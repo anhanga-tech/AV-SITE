@@ -169,6 +169,23 @@ test('logger redige chaves sensíveis na saída de console em todos os níveis',
     }
 });
 
+test('logger preserva objetos nativos (Date) sem achatá-los em {}', () => {
+    const info = captureConsole('info');
+
+    try {
+        resetErrorTrackerForTests();
+        const when = new Date('2026-07-03T12:00:00.000Z');
+
+        logger.info('EVENTO', { when, count: 3 });
+
+        const logged = info.calls[0]?.[2] as { when: unknown; count: number };
+        assert.equal(logged.when, when, 'Date deve ser preservada como valor, não virar {}');
+        assert.equal(logged.count, 3);
+    } finally {
+        info.restore();
+    }
+});
+
 test('logger.error captura erros no error tracker registrado', () => {
     const error = captureConsole('error');
     const captured: Array<{ error: unknown; context?: ErrorCaptureContext }> = [];
