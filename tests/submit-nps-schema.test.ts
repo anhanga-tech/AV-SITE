@@ -108,3 +108,30 @@ test('rejeita whitespace-only reason', () => {
     const result = SubmitNpsBodySchema.safeParse({ ...VALID, reason: '   ' });
     assert.equal(result.success, false);
 });
+
+test('escapa angle brackets em reason (sanitização de fronteira)', () => {
+    const result = SubmitNpsBodySchema.safeParse({
+        ...VALID,
+        reason: '<script>alert(1)</script>',
+    });
+    assert.equal(result.success, true);
+    if (result.success) {
+        assert.equal(result.data.reason, '&lt;script&gt;alert(1)&lt;/script&gt;');
+        assert.equal(result.data.reason.includes('<'), false);
+        assert.equal(result.data.reason.includes('>'), false);
+    }
+});
+
+test('escapa angle brackets em highlight e firstname', () => {
+    const result = SubmitNpsBodySchema.safeParse({
+        ...VALID,
+        firstname: 'João <b>',
+        highlight: 'Japão <img src=x onerror=alert(1)>',
+    });
+    assert.equal(result.success, true);
+    if (result.success) {
+        assert.equal(result.data.firstname, 'João &lt;b&gt;');
+        assert.equal(result.data.highlight.includes('<'), false);
+        assert.equal(result.data.highlight.includes('>'), false);
+    }
+});
