@@ -16,10 +16,11 @@ function assertMissingHosts(content: string, hosts: string[], label: string): vo
 }
 
 test('core static image sources should not rely on external image CDNs', async () => {
-  const [mediaConfig, mapDestinations, aboutPage, highlights, sitemap] = await Promise.all([
+  const [mediaConfig, mapDestinations, aboutPage, aboutHistoria, highlights, sitemap] = await Promise.all([
     readRepoFile('data/mediaConfig.ts'),
     readRepoFile('data/mapDestinations.ts'),
     readRepoFile('pages/About.tsx'),
+    readRepoFile('components/about/HistoriaSection.tsx'),
     readRepoFile('components/Highlights.tsx'),
     readRepoFile('public/sitemap.xml'),
   ]);
@@ -43,7 +44,14 @@ test('core static image sources should not rely on external image CDNs', async (
     ['images.pexels.com'],
     'pages/About.tsx',
   );
-  assert.match(aboutPage, /images\/about\/.+\.(jpg|jpeg|webp)/);
+  // A imagem local da /sobre vive na HistoriaSection (extraída de About.tsx
+  // na composição enxuta — ver components/about/).
+  assertMissingHosts(
+    aboutHistoria,
+    ['images.pexels.com'],
+    'components/about/HistoriaSection.tsx',
+  );
+  assert.match(aboutHistoria, /images\/about\/.+\.(jpg|jpeg|webp)/);
 
   assertMissingHosts(
     highlights,
