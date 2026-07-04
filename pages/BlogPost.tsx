@@ -3,13 +3,10 @@ import { useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
 import { Seo } from '../components/Seo';
-import { ArticleSchema } from '../components/schemas/ArticleSchema';
-import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
-import { FAQPageSchema } from '../components/schemas/FAQPageSchema';
-import { PersonSchema } from '../components/schemas/PersonSchema';
 import { BlogPostContent } from '../components/blog/BlogPostContent';
 import { BlogPostFinalCTA } from '../components/blog/BlogPostFinalCTA';
 import { BlogPostHero } from '../components/blog/BlogPostHero';
+import { BlogPostSchemas } from '../components/blog/BlogPostSchemas';
 import { BlogPostSidebar } from '../components/blog/BlogPostSidebar';
 import { AUTHORS } from '../data/blogData';
 import { getAllPosts, type PostMeta } from '../lib/mdx';
@@ -94,8 +91,6 @@ const BlogPost: React.FC = () => {
         .slice(0, 2)
         .map(entry => entry.post);
 
-    const sameAs = author?.social ? (Object.values(author.social).filter(Boolean) as string[]) : [];
-
     const MdxContent = getMdxComponent(slug!);
 
     return (
@@ -107,32 +102,7 @@ const BlogPost: React.FC = () => {
                 type="article"
                 canonical={canonicalUrl}
             />
-            <ArticleSchema
-                title={post.title}
-                description={post.excerpt}
-                image={post.image}
-                datePublished={post.date}
-                dateModified={post.dateModified}
-                authorName={author?.name || post.author}
-                authorImage={author?.image}
-                url={canonicalUrl}
-            />
-            {author && (
-                <PersonSchema
-                    name={author.name}
-                    image={author.image}
-                    description={author.bio}
-                    jobTitle={author.role}
-                    url={canonicalUrl}
-                    sameAs={sameAs}
-                />
-            )}
-            {post.faq && post.faq.length > 0 && <FAQPageSchema items={post.faq} />}
-            <BreadcrumbSchema items={[
-                { name: 'Home', item: 'https://www.anhanga.tur.br/' },
-                { name: 'Blog', item: getBlogHomeUrl() },
-                { name: post.title, item: canonicalUrl }
-            ]} />
+            <BlogPostSchemas post={post} author={author} canonicalUrl={canonicalUrl} />
 
             <BlogPostHero post={post} authorName={author?.name || post.author} />
 
