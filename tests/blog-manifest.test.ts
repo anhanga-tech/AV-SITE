@@ -148,6 +148,72 @@ Body for yaml date post.
   }
 });
 
+test('collectBlogPostMeta passes through faq frontmatter for FAQPageSchema', async () => {
+  const blogDir = await mkdtemp(path.join(os.tmpdir(), 'blog-manifest-faq-'));
+
+  try {
+    await writeFile(
+      path.join(blogDir, 'faq-post.mdx'),
+      `---
+title: "FAQ Post"
+excerpt: "FAQ excerpt"
+date: "2026-04-01"
+author: "equipe-anhanga"
+category: "Planejamento"
+image: "https://example.com/faq-post.jpg"
+featured: false
+faq:
+  - question: "Pergunta um?"
+    answer: "Resposta um."
+  - question: "Pergunta dois?"
+    answer: "Resposta dois."
+---
+
+Body with a FAQ section.
+`,
+      'utf8',
+    );
+
+    const [post] = await collectBlogPostMeta(blogDir);
+
+    assert.deepEqual(post.faq, [
+      { question: 'Pergunta um?', answer: 'Resposta um.' },
+      { question: 'Pergunta dois?', answer: 'Resposta dois.' },
+    ]);
+  } finally {
+    await rm(blogDir, { recursive: true, force: true });
+  }
+});
+
+test('collectBlogPostMeta leaves faq undefined when frontmatter omits it', async () => {
+  const blogDir = await mkdtemp(path.join(os.tmpdir(), 'blog-manifest-no-faq-'));
+
+  try {
+    await writeFile(
+      path.join(blogDir, 'no-faq-post.mdx'),
+      `---
+title: "No FAQ Post"
+excerpt: "No FAQ excerpt"
+date: "2026-04-01"
+author: "equipe-anhanga"
+category: "Planejamento"
+image: "https://example.com/no-faq-post.jpg"
+featured: false
+---
+
+Body without a FAQ section.
+`,
+      'utf8',
+    );
+
+    const [post] = await collectBlogPostMeta(blogDir);
+
+    assert.equal(post.faq, undefined);
+  } finally {
+    await rm(blogDir, { recursive: true, force: true });
+  }
+});
+
 test('blog content filenames stay ASCII slug-safe for canonical URLs', async () => {
   const filenames = await readdir(new URL('../content/blog', import.meta.url));
 
