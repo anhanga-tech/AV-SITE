@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { useAntiBot } from './useAntiBot';
 import { getTrackingDataObject } from '../utils/whatsapp';
 import type { LeadTracking, LeadUtms } from '../types/leadCapture';
 import type { SubmitQuizRequest, SubmitQuizResponse } from '../types/quiz';
@@ -79,6 +80,7 @@ function pushQuizDataLayerEvent(payload: SubmitQuizRequest): void {
 }
 
 export function useQuizCapture() {
+    const { getAntiBotFields, honeypotProps } = useAntiBot();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [trackingState, setTrackingState] = useState(() => captureTrackingState());
@@ -111,7 +113,7 @@ export function useQuizCapture() {
             const response = await fetch('/api/submit-quiz', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
+                body: JSON.stringify({ ...payload, ...getAntiBotFields() }),
             });
 
             const data = await response.json().catch(() => ({})) as Partial<SubmitQuizResponse> & Record<string, unknown>;
@@ -147,13 +149,14 @@ export function useQuizCapture() {
             setIsSubmitting(false);
             return { ok: false, error: message, code: 'NETWORK_ERROR' };
         }
-    }, []);
+    }, [getAntiBotFields]);
 
     return {
         tracking: trackingState.tracking,
         utms: trackingState.utms,
         isSubmitting,
         error,
+        honeypotProps,
         submitQuiz,
     };
 }

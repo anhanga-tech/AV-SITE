@@ -4,7 +4,7 @@ import { useContactForm } from '../../hooks/useContactForm';
 
 export function CtaBody() {
   const [formOpen, setFormOpen] = useState(false);
-  const { fields, setField, isValid, isSubmitting, error, submitted, submit } =
+  const { fields, setField, isValid, isSubmitting, error, submitted, submit, honeypotProps } =
     useContactForm({ source: 'cta-homepage' });
 
   if (submitted && formOpen) {
@@ -28,6 +28,8 @@ export function CtaBody() {
         className="flex flex-col gap-3 w-full"
         noValidate
       >
+        {/* Honeypot: hidden from humans, blind form-fillers populate it. */}
+        <input {...honeypotProps} />
         <p className="text-xs font-black text-zinc-500 uppercase tracking-widest mb-1">
           Seus dados para contato
         </p>

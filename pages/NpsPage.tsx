@@ -7,6 +7,7 @@ import { NpsScoreSelector } from '../components/nps/NpsScoreSelector';
 import { NpsThankPromoter } from '../components/nps/NpsThankPromoter';
 import { NpsThankOther } from '../components/nps/NpsThankOther';
 import { Seo } from '../components/Seo';
+import { useAntiBot } from '../hooks/useAntiBot';
 
 type PageState = 'form' | 'thank-promoter' | 'thank-other';
 
@@ -73,6 +74,7 @@ export default function NpsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [year] = useState(() => new Date().getFullYear());
+  const { getAntiBotFields, honeypotProps } = useAntiBot();
 
   useEffect(() => {
     const prev = document.title;
@@ -97,6 +99,7 @@ export default function NpsPage() {
           score,
           reason: reason.trim(),
           highlight: highlight.trim(),
+          ...getAntiBotFields(),
         }),
       });
 
@@ -143,6 +146,8 @@ export default function NpsPage() {
 
             {pageState === 'form' && (
               <form onSubmit={handleSubmit} noValidate>
+                {/* Honeypot: hidden from humans, blind form-fillers populate it. */}
+                <input {...honeypotProps} />
                 <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">
                   {firstname ? `Olá, ${firstname}!` : 'Olá!'}
                 </h1>

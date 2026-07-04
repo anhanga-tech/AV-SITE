@@ -2,6 +2,7 @@ import { useMemo, useCallback, useReducer, useRef } from 'react';
 import { Seo } from '../../components/Seo';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { useQuizCapture } from '../../hooks/useQuizCapture';
+import type { HoneypotProps } from '../../hooks/useAntiBot';
 import { getWhatsAppLink } from '../../utils/whatsapp';
 import { matchProfile, type ProfileKey } from '../../lib/quiz-scoring';
 import {
@@ -71,11 +72,12 @@ interface StageContentProps {
     onRestart: () => void;
     onGo: (next: Stage, dir?: 'forward' | 'back') => void;
     onPhoneSubmit: (phone: string) => void;
+    honeypotProps: HoneypotProps;
 }
 
 function StageContent({
     stage, answers, profileKey, leadForm, leadInitialValues, baseWaUrl, submitFailed, isSubmitting,
-    onStart, onAnswerQ, onNextQ, onBackQ, onLeadSubmit, onRestart, onGo, onPhoneSubmit,
+    onStart, onAnswerQ, onNextQ, onBackQ, onLeadSubmit, onRestart, onGo, onPhoneSubmit, honeypotProps,
 }: StageContentProps) {
     if (stage.kind === 'hero') return <HeroScreen onStart={onStart} />;
     if (stage.kind === 'question') {
@@ -102,6 +104,7 @@ function StageContent({
                 onBack={() => onGo({ kind: 'question', index: QUIZ_QUESTIONS.length - 1 }, 'back')}
                 isSubmitting={isSubmitting}
                 initialValues={leadInitialValues}
+                honeypotProps={honeypotProps}
             />
         );
     }
@@ -199,7 +202,7 @@ export default function QuizAnhangaLanding() {
     const urlParams = useQuizUrlParams();
     const [state, dispatch] = useReducer(quizReducer, QUIZ_INITIAL_STATE);
     const { stage, direction, answers, leadForm, profileKey, baseWaUrl, submitFailed } = state;
-    const { submitQuiz, isSubmitting } = useQuizCapture();
+    const { submitQuiz, isSubmitting, honeypotProps } = useQuizCapture();
 
     // Synchronous re-entrancy guard: handleLeadSubmit navigates to the result
     // screen before awaiting submitQuiz, so the disabled button can race with the
@@ -323,6 +326,7 @@ export default function QuizAnhangaLanding() {
                                 onRestart={restart}
                                 onGo={go}
                                 onPhoneSubmit={handlePhoneSubmit}
+                                honeypotProps={honeypotProps}
                             />
                         </div>
                     </div>

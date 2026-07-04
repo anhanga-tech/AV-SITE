@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { LeadForm, TravelerProfile } from '../../../data/quiz';
+import type { HoneypotProps } from '../../../hooks/useAntiBot';
 
 interface PreLeadScreenProps {
     profile: TravelerProfile;
@@ -11,9 +12,11 @@ interface PreLeadScreenProps {
      *  `aceite` fica de fora de propósito: o opt-in de newsletter precisa de
      *  marcação explícita do usuário e não é presumido a partir do link. */
     initialValues?: Partial<LeadForm>;
+    /** Props do input honeypot (anti-bot); ver hooks/useAntiBot. */
+    honeypotProps?: HoneypotProps;
 }
 
-export function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting, initialValues }: PreLeadScreenProps) {
+export function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting, initialValues, honeypotProps }: PreLeadScreenProps) {
     const [form, setForm] = useState<LeadForm>(() => ({
         nome: initialValues?.nome ?? '',
         sobrenome: initialValues?.sobrenome ?? '',
@@ -65,6 +68,8 @@ export function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting, initial
                 </p>
 
                 <form className="quiz-lead-form" onSubmit={submit}>
+                    {/* Honeypot: hidden from humans, blind form-fillers populate it. */}
+                    {honeypotProps && <input {...honeypotProps} />}
                     <div className="quiz-field">
                         <label htmlFor="quiz-nome">Como podemos te chamar?</label>
                         <input

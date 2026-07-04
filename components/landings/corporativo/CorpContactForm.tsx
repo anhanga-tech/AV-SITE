@@ -14,7 +14,7 @@ interface CorpContactFormProps {
 }
 
 export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
-    const { submitLead, isSubmitting } = useLeadCapture();
+    const { submitLead, isSubmitting, honeypotProps } = useLeadCapture();
     const { state, dispatch, isSubmittingRef, handleField, toggleLgpd } = useCorpFormReducer();
 
     async function handleSubmit(e: React.FormEvent) {
@@ -76,6 +76,8 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
                 <CorpSuccessState whatsappUrl={whatsappUrl} />
             ) : (
                 <form onSubmit={handleSubmit} noValidate>
+                    {/* Honeypot: hidden from humans, blind form-fillers populate it. */}
+                    <input {...honeypotProps} />
                     <div className="flex justify-between items-center px-6 sm:px-8 py-5 border-b-2 border-dashed border-zinc-100 gap-4">
                         <span className="text-brand-cyan font-black tracking-widest text-xs sm:text-sm uppercase flex items-center gap-2 min-w-0">
                             <AirplaneTilt className="size-4 shrink-0" weight="fill" /> Contato
