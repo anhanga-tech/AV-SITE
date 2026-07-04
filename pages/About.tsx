@@ -393,13 +393,11 @@ const About: React.FC = () => {
                 custom={i + 1}
               >
                 {member.image && (
-                  <img
+                  <LazyImage
                     src={member.image}
                     alt={`${member.name}, ${member.role} na Anhangá Viagens`}
                     width={96}
                     height={96}
-                    loading="lazy"
-                    decoding="async"
                     className="size-24 rounded-2xl object-cover shrink-0 border-4 border-white shadow-md"
                   />
                 )}
@@ -407,7 +405,7 @@ const About: React.FC = () => {
                   <h3 className="text-xl font-black text-anhanga-dark leading-tight">{member.name}</h3>
                   <p className="text-sm font-bold text-anhanga-action uppercase tracking-wide mb-3">{member.role}</p>
                   <p className="text-zinc-500 font-medium leading-relaxed mb-4">{member.bio}</p>
-                  {member.social && (
+                  {member.social && (member.social.instagram || member.social.linkedin) && (
                     <div className="flex items-center justify-center sm:justify-start gap-3">
                       {member.social.instagram && (
                         <a
