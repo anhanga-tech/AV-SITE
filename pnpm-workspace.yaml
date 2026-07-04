@@ -24,21 +24,15 @@ overrides:
   # injeção de header/cookie). Transitivo via wrangler > miniflare.
   # 7.28.0 corrige; pinado em ^7.28.0 (mesma major).
   undici: "^7.28.0"
-  # PENDENTE: GHSA-h67p-54hq-rp68 (moderate, DoS quadrático em merge keys do
-  # js-yaml via aliases repetidos). Transitivo build/dev-time via gray-matter
-  # (scripts/blog-manifest) e bundlesize2 > cosmiconfig — ambos na linha 3.x,
-  # que usa a API yaml.safeLoad. Resolvido instalado: js-yaml@3.14.2 (vulnerável).
-  #
-  # CORREÇÃO conhecida (atualiza nota anterior que dizia ser inviável): existe o
-  # backport js-yaml@3.15.0 (dist-tag v3-legacy, publicado 2026-06-26) que corrige
-  # NA PRÓPRIA linha 3.x e preserva safeLoad — logo NÃO quebra o gray-matter.
-  # O override correto é:  js-yaml: "^3.15.0"  (>=3.15.0 <4, mantém major 3.x).
-  #
-  # BLOQUEIO temporário: 3.15.0 ainda está dentro da janela `minimumReleaseAge`
-  # (10080 min / 7 dias) desta config — `pnpm install` rejeita com
-  # ERR_PNPM_NO_MATURE_MATCHING_VERSION até ~2026-07-03. Adotar o override acima
-  # quando a versão amadurecer (não burlar o cooldown via exclude para um release
-  # de poucos dias). Risco até lá: build/dev-time apenas, moderate, já na main.
+  # Dependabot #45 (moderate): GHSA-h67p-54hq-rp68 — DoS quadrático em merge
+  # keys do js-yaml via aliases repetidos. Transitivo build/dev-time via
+  # gray-matter (scripts/blog-manifest) e bundlesize2 > cosmiconfig@5 — ambos
+  # na linha 3.x, que usa a API yaml.safeLoad. O backport js-yaml@3.15.0
+  # (dist-tag v3-legacy, publicado 2026-06-26, cooldown de 7 dias vencido em
+  # 2026-07-03) corrige na própria linha 3.x e preserva safeLoad.
+  # Override escopado a "@3" de propósito: um override global rebaixaria a
+  # árvore js-yaml@4.2.0 (cosmiconfig@9), que já está corrigida e usa a API v4.
+  "js-yaml@3": "^3.15.0"
 
 legacyPeerDeps: true
 nodeLinker: hoisted
