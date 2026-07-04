@@ -1,5 +1,5 @@
 import { useCallback, useRef, type CSSProperties, type RefObject } from 'react';
-import { HONEYPOT_FIELD, RENDERED_AT_FIELD } from '../lib/bot-detection';
+import { HONEYPOT_FIELD, ELAPSED_TIME_FIELD } from '../lib/bot-detection';
 
 /**
  * Client half of the anti-bot contract (server half in `lib/bot-detection`).
@@ -8,7 +8,8 @@ import { HONEYPOT_FIELD, RENDERED_AT_FIELD } from '../lib/bot-detection';
  * hidden `<input>`, and merges `getAntiBotFields()` into its POST body. That
  * ships two zero-friction signals to the `submit-*` handlers:
  *  - the honeypot value (empty for humans; a blind form-filler populates it)
- *  - `renderedAt`, captured at mount, so implausibly fast submits are visible.
+ *  - `elapsedMs`, the client-measured time since mount, so implausibly fast
+ *    submits are visible without any cross-clock comparison.
  *
  * The hidden input stays in the layout (off-screen, not `display:none`) so naive
  * bots still "see" it, while `tabIndex=-1` / `aria-hidden` / `autoComplete=off`
@@ -37,7 +38,7 @@ export interface HoneypotProps {
 
 export interface AntiBotFields {
     [HONEYPOT_FIELD]: string;
-    [RENDERED_AT_FIELD]: number;
+    [ELAPSED_TIME_FIELD]: number;
 }
 
 export interface UseAntiBotResult {
@@ -54,7 +55,9 @@ export function useAntiBot(): UseAntiBotResult {
 
     const getAntiBotFields = useCallback((): AntiBotFields => ({
         [HONEYPOT_FIELD]: honeypotRef.current?.value ?? '',
-        [RENDERED_AT_FIELD]: renderedAt.current,
+        // Elapsed computed here (submit time − mount time), both on the client, so
+        // the wire value carries no absolute timestamp and no clock-skew exposure.
+        [ELAPSED_TIME_FIELD]: Date.now() - renderedAt.current,
     }), []);
 
     const honeypotProps: HoneypotProps = {

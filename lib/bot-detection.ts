@@ -5,8 +5,13 @@
  * write (see `lib/n8n-submit-handler`):
  *  - honeypot: a hidden field no human ever fills; a non-empty value means a bot
  *    that blindly populated every input.
- *  - timing: forms submitted implausibly fast (< {@link MIN_FORM_ELAPSED_MS}
- *    after the UI mounted) are almost always automated.
+ *  - timing: forms submitted implausibly fast (< {@link MIN_FORM_ELAPSED_MS} of
+ *    elapsed time on the client since the UI mounted) are almost always automated.
+ *
+ * The elapsed time is measured **entirely on the client** (`Date.now()` at mount
+ * minus `Date.now()` at submit) and sent as a plain duration, so there is no
+ * cross-clock comparison and clock skew between the browser and the edge can
+ * never produce a false positive.
  *
  * Both signals fail **open**: a missing or mangled field never blocks a submit,
  * so a genuine lead is never lost to a false positive. This is spam hygiene, not
@@ -18,8 +23,8 @@
 /** Hidden input name. Plausible-but-unused so blind form-fillers target it. */
 export const HONEYPOT_FIELD = 'website';
 
-/** Epoch-ms timestamp of when the form UI mounted (client clock). */
-export const RENDERED_AT_FIELD = 'renderedAt';
+/** Client-measured elapsed time (ms) between the form mounting and submit. */
+export const ELAPSED_TIME_FIELD = 'elapsedMs';
 
 // A human needs at least a couple of seconds to read and fill even the shortest
 // form (NPS is a single tap + submit). Kept conservative to avoid dropping fast
@@ -33,10 +38,10 @@ export type BotDetection =
     | { bot: true; reason: BotSignal };
 
 /**
- * Classifies a raw request body against the two heuristics. `now` is injectable
- * for deterministic tests. Never throws and never blocks on absent/odd input.
+ * Classifies a raw request body against the two heuristics. Never throws and
+ * never blocks on absent/odd input.
  */
-export function detectBot(body: unknown, now: number = Date.now()): BotDetection {
+export function detectBot(body: unknown): BotDetection {
     if (typeof body !== 'object' || body === null) return { bot: false };
 
     const record = body as Record<string, unknown>;
@@ -46,11 +51,10 @@ export function detectBot(body: unknown, now: number = Date.now()): BotDetection
         return { bot: true, reason: 'honeypot' };
     }
 
-    const renderedAt = record[RENDERED_AT_FIELD];
-    if (typeof renderedAt === 'number' && Number.isFinite(renderedAt)) {
-        const elapsed = now - renderedAt;
-        // Only the "too fast" window is bot-shaped. Negative elapsed (client clock
-        // ahead of the edge) or a large gap are treated as human — fail open.
+    const elapsed = record[ELAPSED_TIME_FIELD];
+    if (typeof elapsed === 'number' && Number.isFinite(elapsed)) {
+        // Only the "too fast" window is bot-shaped. A negative duration can only
+        // come from a spoofed/monotonic-clock oddity, so treat it as human.
         if (elapsed >= 0 && elapsed < MIN_FORM_ELAPSED_MS) {
             return { bot: true, reason: 'timing' };
         }

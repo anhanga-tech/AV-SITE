@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import handler, { classifySubmitLeadError } from '../api/submit-lead.ts';
 import { validatePayload } from '../lib/lead-logic.ts';
 import { createOdooMock, setOdooEnv, clearOdooEnv } from './odoo-mock.ts';
-import { HONEYPOT_FIELD, RENDERED_AT_FIELD } from '../lib/bot-detection.ts';
+import { HONEYPOT_FIELD, ELAPSED_TIME_FIELD } from '../lib/bot-detection.ts';
 
 const originalFetch = global.fetch;
 
@@ -238,7 +238,7 @@ test('submit-lead silently accepts an implausibly fast submit without touching O
 
     const response = await handler(buildRequest({
         ...buildLeadPayloadFixture(),
-        [RENDERED_AT_FIELD]: Date.now(), // elapsed ~0ms → under the minimum window
+        [ELAPSED_TIME_FIELD]: 100, // 100ms → under the minimum window
     }));
 
     assert.equal(response.status, 201);
@@ -256,7 +256,7 @@ test('submit-lead processes a normal, human-paced submit that carries anti-bot f
     const response = await handler(buildRequest({
         ...buildLeadPayloadFixture(),
         [HONEYPOT_FIELD]: '',
-        [RENDERED_AT_FIELD]: Date.now() - 30_000, // 30s → clearly human
+        [ELAPSED_TIME_FIELD]: 30_000, // 30s → clearly human
     }));
 
     assert.equal(response.status, 201);
