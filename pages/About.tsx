@@ -1,19 +1,21 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { m, Variants } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Seo } from '../components/Seo';
 import { OrganizationSchema } from '../components/schemas/OrganizationSchema';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../components/schemas/FAQPageSchema';
 import { PersonSchema } from '../components/schemas/PersonSchema';
 import { LazyImage } from '../components/ui/LazyImage';
+import { ConsultoresSection } from '../components/about/ConsultoresSection';
+import { TrustFaqSection } from '../components/about/TrustFaqSection';
+import { fadeUp } from '../components/about/aboutMotion';
 import { openContactModal } from '../utils/contactForm';
 import { getReviewSummary } from '../data/reviewsAdapter';
 import { AUTHORS } from '../data/blogData';
 import googleReviewsRaw from '../data/googleReviews.json';
 import type { GoogleReviewsData } from '../types/reviews';
 import { ShieldCheck, Award, Users, Sparkles, Heart, Coffee, Ship, Anchor } from 'lucide-react';
-import { InstagramLogo, LinkedinLogo } from '@phosphor-icons/react';
 
 const ORG_NAME = 'Anhangá Viagens';
 const ORG_URL = 'https://www.anhanga.tur.br/';
@@ -54,19 +56,6 @@ const TRUST_FAQ_ITEMS = [
 
 // Consultores expostos como entidades Person (E-E-A-T) ligados à organização.
 const TEAM = [AUTHORS['felipe-william'], AUTHORS['queila-oliveira']].filter(Boolean);
-
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.1,
-      duration: 0.6,
-      ease: 'easeOut',
-    },
-  }),
-};
 
 const About: React.FC = () => {
   const { hash } = useLocation();
@@ -366,110 +355,10 @@ const About: React.FC = () => {
         </section>
 
         {/* TEAM / CONSULTORES SECTION */}
-        <section id="consultores" className="mt-32">
-          <m.div
-            className="text-center mb-16"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeUp}
-            custom={0}
-          >
-            <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-4">Quem planeja a sua viagem</h2>
-            <p className="text-zinc-500 font-medium max-w-2xl mx-auto">
-              Atendimento consultivo é feito por gente de verdade. Conheça os consultores que desenham cada roteiro sob medida.
-            </p>
-          </m.div>
-
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {TEAM.map((member, i) => (
-              <m.div
-                key={member.id}
-                className="bg-white p-8 rounded-[2.5rem] border-2 border-zinc-100 shadow-sm hover:shadow-xl transition duration-300 flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fadeUp}
-                custom={i + 1}
-              >
-                {member.image && (
-                  <LazyImage
-                    src={member.image}
-                    alt={`${member.name}, ${member.role} na Anhangá Viagens`}
-                    width={96}
-                    height={96}
-                    className="size-24 rounded-2xl object-cover shrink-0 border-4 border-white shadow-md"
-                  />
-                )}
-                <div>
-                  <h3 className="text-xl font-black text-anhanga-dark leading-tight">{member.name}</h3>
-                  <p className="text-sm font-bold text-anhanga-action uppercase tracking-wide mb-3">{member.role}</p>
-                  <p className="text-zinc-500 font-medium leading-relaxed mb-4">{member.bio}</p>
-                  {member.social && (member.social.instagram || member.social.linkedin) && (
-                    <div className="flex items-center justify-center sm:justify-start gap-3">
-                      {member.social.instagram && (
-                        <a
-                          href={member.social.instagram}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={`Instagram de ${member.name}`}
-                          className="size-9 rounded-full bg-anhanga-action/10 text-anhanga-action flex items-center justify-center hover:bg-anhanga-action hover:text-white transition-colors"
-                        >
-                          <InstagramLogo className="size-4" weight="fill" />
-                        </a>
-                      )}
-                      {member.social.linkedin && (
-                        <a
-                          href={member.social.linkedin}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={`LinkedIn de ${member.name}`}
-                          className="size-9 rounded-full bg-anhanga-action/10 text-anhanga-action flex items-center justify-center hover:bg-anhanga-action hover:text-white transition-colors"
-                        >
-                          <LinkedinLogo className="size-4" weight="fill" />
-                        </a>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </m.div>
-            ))}
-          </div>
-        </section>
+        <ConsultoresSection team={TEAM} />
 
         {/* FAQ / CONFIANÇA SECTION */}
-        <section id="perguntas-frequentes" className="mt-32">
-          <m.div
-            className="text-center mb-16"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeUp}
-            custom={0}
-          >
-            <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-4">Perguntas frequentes sobre a Anhangá</h2>
-            <p className="text-zinc-500 font-medium max-w-2xl mx-auto">
-              Confiança, credenciamentos e como funciona o atendimento — em respostas diretas.
-            </p>
-          </m.div>
-
-          <div className="max-w-3xl mx-auto space-y-5">
-            {TRUST_FAQ_ITEMS.map((item, i) => (
-              <m.div
-                key={item.question}
-                className="bg-white p-8 rounded-3xl border-2 border-zinc-100 shadow-sm"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fadeUp}
-                custom={i + 1}
-              >
-                <h3 className="text-lg md:text-xl font-black text-anhanga-dark mb-3">{item.question}</h3>
-                <p className="text-zinc-600 font-medium leading-relaxed">{item.answer}</p>
-              </m.div>
-            ))}
-          </div>
-        </section>
+        <TrustFaqSection items={TRUST_FAQ_ITEMS} />
 
         {/* CTA */}
         <m.section

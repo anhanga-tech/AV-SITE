@@ -36,9 +36,21 @@ test('About FAQ de confiança cobre as queries de entidade', async () => {
   const source = await readRepoFile('pages/About.tsx');
   assert.match(source, /é confiável\?/, 'Falta a pergunta "é confiável?"');
   assert.match(source, /registrada no Cadastur\?/, 'Falta a pergunta sobre Cadastur');
-  // O mesmo array alimenta o JSON-LD e a seção visível — sem drift possível.
+  // O mesmo array (TRUST_FAQ_ITEMS) alimenta o JSON-LD e a seção visível — sem
+  // drift possível. O render visível vive em TrustFaqSection (ver teste abaixo).
   assert.match(source, /<FAQPageSchema items=\{TRUST_FAQ_ITEMS\}/);
-  assert.match(source, /TRUST_FAQ_ITEMS\.map/, 'FAQ não é renderizado visivelmente');
+  assert.match(source, /<TrustFaqSection items=\{TRUST_FAQ_ITEMS\}/, 'FAQ visível não recebe a mesma fonte do schema');
+});
+
+test('seções visíveis extraídas renderizam a partir da fonte compartilhada', async () => {
+  const faqSection = await readRepoFile('components/about/TrustFaqSection.tsx');
+  assert.match(faqSection, /items\.map/, 'TrustFaqSection não renderiza os itens');
+  assert.match(faqSection, /item\.question/, 'TrustFaqSection não exibe a pergunta');
+  assert.match(faqSection, /item\.answer/, 'TrustFaqSection não exibe a resposta');
+
+  const consultores = await readRepoFile('components/about/ConsultoresSection.tsx');
+  assert.match(consultores, /team\.map/, 'ConsultoresSection não renderiza os consultores');
+  assert.match(consultores, /member\.social\.instagram \|\| member\.social\.linkedin/, 'guard de social vazio ausente');
 });
 
 test('PersonSchema emite worksFor e id configurável', async () => {
