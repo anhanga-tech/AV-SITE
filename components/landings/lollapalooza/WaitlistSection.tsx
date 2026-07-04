@@ -57,7 +57,7 @@ function waitlistReducer(state: WaitlistFormState, action: WaitlistFormAction): 
 }
 
 const WaitlistSection: React.FC = () => {
-  const { submitWaitlist, isSubmitting, error } = useWaitlistCapture();
+  const { submitWaitlist, isSubmitting, error, honeypotProps } = useWaitlistCapture();
   const [state, dispatch] = useReducer(waitlistReducer, WAITLIST_INITIAL_STATE);
   const { name, email, acceptedLgpd, localError, successMessage, warningMessage } = state;
 
@@ -176,6 +176,8 @@ const WaitlistSection: React.FC = () => {
               </div>
 
               <form className="space-y-8" onSubmit={handleSubmit}>
+                {/* Honeypot: hidden from humans, blind form-fillers populate it. */}
+                <input {...honeypotProps} />
                 <div className="group relative space-y-2">
                   <label htmlFor="lolla-waitlist-name" className="block text-[10px] font-black text-anhanga-yellow uppercase tracking-[0.2em] transition-colors group-focus-within:text-white">
                     Nome completo

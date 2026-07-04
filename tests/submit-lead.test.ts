@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import handler, { classifySubmitLeadError } from '../api/submit-lead.ts';
 import { validatePayload } from '../lib/lead-logic.ts';
 import { createOdooMock, setOdooEnv, clearOdooEnv } from './odoo-mock.ts';
+import { HONEYPOT_FIELD, ELAPSED_TIME_FIELD } from '../lib/bot-detection.ts';
 
 const originalFetch = global.fetch;
 
@@ -205,6 +206,63 @@ test('submit-lead maps corporate empresa/cargo to crm.lead partner_name/function
     const lead = mock.leadFields()!;
     assert.equal(lead.partner_name, 'Acme Viagens');
     assert.equal(lead.function, 'Diretora de Pessoas');
+});
+
+// --- bot heuristics (honeypot + timing) -------------------------------------
+
+test('submit-lead silently accepts a filled honeypot without touching Odoo', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    const mock = createOdooMock({ newPartnerId: 101, leadId: 555 });
+    global.fetch = mock.fetch;
+
+    const response = await handler(buildRequest({
+        ...buildLeadPayloadFixture(),
+        [HONEYPOT_FIELD]: 'http://spam.example',
+    }));
+
+    // Mirrors the real success envelope so a bot cannot detect the drop...
+    assert.equal(response.status, 201);
+    const payload = await response.json() as { ok: boolean; message: string };
+    assert.equal(payload.ok, true);
+    assert.equal(payload.message, 'Enviado com sucesso');
+    // ...but no partner/lead is ever written.
+    assert.equal(mock.calls.length, 0);
+});
+
+test('submit-lead silently accepts an implausibly fast submit without touching Odoo', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    const mock = createOdooMock({ newPartnerId: 101, leadId: 555 });
+    global.fetch = mock.fetch;
+
+    const response = await handler(buildRequest({
+        ...buildLeadPayloadFixture(),
+        [ELAPSED_TIME_FIELD]: 100, // 100ms → under the minimum window
+    }));
+
+    assert.equal(response.status, 201);
+    const payload = await response.json() as { ok: boolean };
+    assert.equal(payload.ok, true);
+    assert.equal(mock.calls.length, 0);
+});
+
+test('submit-lead processes a normal, human-paced submit that carries anti-bot fields', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    const mock = createOdooMock({ newPartnerId: 101, leadId: 555 });
+    global.fetch = mock.fetch;
+
+    const response = await handler(buildRequest({
+        ...buildLeadPayloadFixture(),
+        [HONEYPOT_FIELD]: '',
+        [ELAPSED_TIME_FIELD]: 30_000, // 30s → clearly human
+    }));
+
+    assert.equal(response.status, 201);
+    // The extra fields are stripped by the schema and the lead still persists.
+    assert.equal(mock.partnerFields()!.email, 'felipe@example.com');
+    assert.equal(mock.leadFields()!.partner_id, 101);
 });
 
 test('submit-lead maps referred leads to Indicação/indicacao in Odoo', async (t) => {

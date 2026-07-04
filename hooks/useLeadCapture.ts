@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useAntiBot } from './useAntiBot';
 import { getTrackingDataObject, getWhatsAppLink } from '../utils/whatsapp';
 import type { LeadTracking, LeadUtms, SubmitLeadRequest } from '../types/leadCapture';
 import { cleanString, normalizeWhatsappNumber } from '../lib/lead-logic';
@@ -363,6 +364,7 @@ function buildNetworkErrorResult(requestError: unknown): SubmitLeadFailureResult
 }
 
 export function useLeadCapture() {
+    const { getAntiBotFields, honeypotProps } = useAntiBot();
     const [tracking, setTracking] = useState<LeadTracking>(() => captureInitialTracking());
     const [utms, setUtms] = useState<LeadUtms>(() => extractUtms(captureInitialTracking()));
     const [leadDraft, setLeadDraftState] = useState<LeadDraft>(EMPTY_LEAD_DRAFT);
@@ -444,7 +446,7 @@ export function useLeadCapture() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(payload),
+                body: JSON.stringify({ ...payload, ...getAntiBotFields() }),
             });
 
             const parsed = await parseSubmitLeadResponse(response);
@@ -475,6 +477,7 @@ export function useLeadCapture() {
         leadDraft,
         isSubmitting,
         error,
+        honeypotProps,
         getLeadWhatsAppUrl,
         prepareLeadSubmitPayload,
         setLeadDraft,

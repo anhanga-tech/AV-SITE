@@ -12,7 +12,7 @@ const ContactModal: React.FC = () => {
     const closeButtonRef = useRef<HTMLButtonElement>(null);
     const previousBodyOverflow = useRef<string>('');
 
-    const { fields, setField, isValid, isSubmitting, error, submitted, submit, reset } =
+    const { fields, setField, isValid, isSubmitting, error, submitted, submit, reset, honeypotProps } =
         useContactForm(options);
 
     const close = useCallback(() => {
@@ -132,6 +132,8 @@ const ContactModal: React.FC = () => {
                         className="flex flex-col gap-3 px-6 pb-6"
                         noValidate
                     >
+                        {/* Honeypot: hidden from humans, blind form-fillers populate it. */}
+                        <input {...honeypotProps} />
                         <div className="flex gap-3">
                             <div className="flex-1">
                                 <label htmlFor="contact-firstName" className="mb-1 block text-xs font-bold uppercase tracking-wider text-zinc-500">

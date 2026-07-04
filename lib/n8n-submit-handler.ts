@@ -17,6 +17,7 @@
  */
 import { buildCorsHeaders, buildJsonResponse, createRequestId, getClientIP } from './network';
 import { checkRateLimit } from './rate-limit';
+import { detectBot } from './bot-detection';
 import { logger } from './logger';
 
 // Default error pattern, overridable per handler via `errorPattern` (e.g. Odoo
@@ -291,6 +292,25 @@ export function createSubmitHandler<TData, TPayload = unknown>(
             return buildJsonResponse(
                 { ok: false, requestId, code: 'VALIDATION_ERROR', error: options.parse.invalidJsonError },
                 400,
+                corsHeaders,
+            );
+        }
+
+        // Bot heuristics (honeypot + timing) run before validation so their extra
+        // fields never reach the per-form schema. On a hit we mirror the success
+        // envelope but skip the provider entirely: an automated client cannot tell
+        // the drop from a real submit, and a genuine lead is never lost (both
+        // signals fail open — see lib/bot-detection).
+        const botCheck = detectBot(rawBody);
+        if (botCheck.bot) {
+            logger.warn(options.logScope, { requestId, stage: 'bot_rejected', reason: botCheck.reason });
+            return buildJsonResponse(
+                {
+                    ok: true,
+                    requestId,
+                    ...(options.success.message ? { message: options.success.message } : {}),
+                },
+                options.success.status,
                 corsHeaders,
             );
         }

@@ -1,4 +1,5 @@
 import { useCallback, useState, useRef } from 'react';
+import { useAntiBot } from './useAntiBot';
 import { cleanString } from '../lib/lead-logic';
 import { getTrackingDataObject, getWhatsAppLink } from '../utils/whatsapp';
 import { createLeadEventId, extractUtms } from './useLeadCapture';
@@ -97,6 +98,7 @@ function pushContactDataLayerEvent(
 }
 
 export function useContactForm(options: ContactModalOptions = {}) {
+    const { getAntiBotFields, honeypotProps } = useAntiBot();
     const [fields, setFieldsState] = useState<ContactFormFields>(EMPTY_FIELDS);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const isLocallySubmitting = useRef(false);
@@ -156,7 +158,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 const response = await fetch('/api/submit-contact', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(requestBody),
+                    body: JSON.stringify({ ...requestBody, ...getAntiBotFields() }),
                     keepalive: true,
                 });
 
@@ -187,8 +189,8 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 isLocallySubmitting.current = false;
             }
         },
-        [fields, isValid, options],
+        [fields, isValid, options, getAntiBotFields],
     );
 
-    return { fields, setField, isValid, isSubmitting, error, submitted, submit, reset };
+    return { fields, setField, isValid, isSubmitting, error, submitted, submit, reset, honeypotProps };
 }

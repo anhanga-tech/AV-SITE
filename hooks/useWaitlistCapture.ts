@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import { useAntiBot } from './useAntiBot';
 import { cleanString } from '../lib/lead-logic';
 import { getTrackingDataObject } from '../utils/whatsapp';
 import type { LeadTracking, LeadUtms } from '../types/leadCapture';
@@ -124,6 +125,7 @@ function pushWaitlistSignupDataLayerEvent(payload: SubmitWaitlistRequest): void 
 }
 
 export function useWaitlistCapture() {
+    const { getAntiBotFields, honeypotProps } = useAntiBot();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const isLocallySubmitting = useRef(false);
     const [error, setError] = useState<string | null>(null);
@@ -162,7 +164,7 @@ export function useWaitlistCapture() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(payload),
+                body: JSON.stringify({ ...payload, ...getAntiBotFields() }),
             });
 
             const responsePayload = await response.json().catch(() => ({})) as Partial<SubmitWaitlistResponse> & Record<string, unknown>;
@@ -196,13 +198,14 @@ export function useWaitlistCapture() {
             setIsSubmitting(false);
             isLocallySubmitting.current = false;
         }
-    }, [refreshTrackingState]);
+    }, [refreshTrackingState, getAntiBotFields]);
 
     return {
         tracking: trackingState.tracking,
         utms: trackingState.utms,
         isSubmitting,
         error,
+        honeypotProps,
         submitWaitlist,
     };
 }
