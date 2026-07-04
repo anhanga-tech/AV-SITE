@@ -122,6 +122,15 @@ test('escapa angle brackets em reason (sanitização de fronteira)', () => {
     }
 });
 
+test('rejeita firstname que excede 100 chars APÓS o escape', () => {
+    // 40 caracteres "<" → 160 chars após cleanString (cada "<" vira "&lt;").
+    const result = SubmitNpsBodySchema.safeParse({ ...VALID, firstname: '<'.repeat(40) });
+    assert.equal(result.success, false);
+    if (!result.success) {
+        assert.equal(result.error.issues[0]?.path[0], 'firstname');
+    }
+});
+
 test('escapa angle brackets em highlight e firstname', () => {
     const result = SubmitNpsBodySchema.safeParse({
         ...VALID,
