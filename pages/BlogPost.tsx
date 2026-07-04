@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Seo } from '../components/Seo';
 import { ArticleSchema } from '../components/schemas/ArticleSchema';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
+import { FAQPageSchema } from '../components/schemas/FAQPageSchema';
 import { PersonSchema } from '../components/schemas/PersonSchema';
 import { BlogPostContent } from '../components/blog/BlogPostContent';
 import { BlogPostFinalCTA } from '../components/blog/BlogPostFinalCTA';
@@ -126,6 +127,7 @@ const BlogPost: React.FC = () => {
                     sameAs={sameAs}
                 />
             )}
+            {post.faq && post.faq.length > 0 && <FAQPageSchema items={post.faq} />}
             <BreadcrumbSchema items={[
                 { name: 'Home', item: 'https://www.anhanga.tur.br/' },
                 { name: 'Blog', item: getBlogHomeUrl() },

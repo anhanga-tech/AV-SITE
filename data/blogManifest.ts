@@ -2,32 +2,9 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
-    "title": "Jalapão em Julho: Roteiro, Custos e Por Que Ir Antes Que Vire Mainstream",
-    "excerpt": "Em julho, os fervedouros do Jalapão estão no melhor momento do ano. Roteiro de 7 dias, custos reais e por que ir antes que o destino mude.",
-    "date": "2026-08-18",
-    "author": "felipe-william",
-    "category": "Destinos",
-    "image": "https://media.anhanga.tur.br/images/blog/jalapao-julho-roteiro-custos.jpg",
-    "featured": false,
-    "showChatCTA": true,
-    "chatCTADestination": "Roteiro Jalapão",
-    "tags": [
-      "jalapao",
-      "tocantins",
-      "ecoturismo",
-      "brasil",
-      "fervedouros",
-      "roteiros-nacionais"
-    ],
-    "seoTitle": "Jalapão em Julho: Roteiro e Custos",
-    "seoDescription": "Roteiro completo de 7 dias no Jalapão em julho com custos reais, fervedouros, dunas e por que ir agora antes que o destino mude. Guia atualizado 2026.",
-    "slug": "jalapao-julho-roteiro-custos",
-    "readingTime": "9 min de leitura"
-  },
-  {
     "title": "Cancún, Punta Cana ou Aruba para Lua de Mel? Comparação Honesta",
     "excerpt": "Caribe para lua de mel parece fácil até você sentar pra pesquisar. Cancún, Punta Cana e Aruba atendem casais completamente diferentes. Veja qual faz sentido pra vocês.",
-    "date": "2026-08-04",
+    "date": "2026-07-04",
     "author": "felipe-william",
     "category": "Destinos",
     "image": "https://media.anhanga.tur.br/images/blog/cancun-punta-cana-aruba-lua-de-mel.jpg",
@@ -44,13 +21,35 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     ],
     "seoTitle": "Lua de Mel: Cancún, Punta Cana ou Aruba?",
     "seoDescription": "Comparação honesta entre Cancún, Punta Cana e Aruba para lua de mel: preços, praias, furacões, resorts e o que cada destino entrega de verdade.",
+    "faq": [
+      {
+        "question": "Qual destino no Caribe é o mais seguro para lua de mel em agosto e setembro?",
+        "answer": "Aruba. A ilha fica abaixo do cinturão de furacões do Atlântico e raramente é afetada por tempestades severas. Cancún e Punta Cana ficam na zona de risco entre junho e novembro."
+      },
+      {
+        "question": "Vale mais a pena contratar all-inclusive em Punta Cana ou Cancún?",
+        "answer": "Os dois têm ótimas opções de all-inclusive. Punta Cana costuma ter custo menor com qualidade comparável. Cancún tem mais variedade de resorts premium e mais opções para sair e explorar além do hotel."
+      },
+      {
+        "question": "Precisa de visto para visitar Cancún, Punta Cana ou Aruba?",
+        "answer": "Brasileiros não precisam de visto para o México, República Dominicana ou Aruba. Os três destinos exigem passaporte válido."
+      },
+      {
+        "question": "Qual o melhor período para visitar Aruba?",
+        "answer": "Aruba tem clima estável o ano todo: sol com vento constante, temperatura entre 27°C e 31°C. Não existe baixa temporada climática. Os meses mais tranquilos em termos de ocupação são maio, junho e outubro."
+      },
+      {
+        "question": "É melhor fazer lua de mel no Caribe ou na Europa?",
+        "answer": "Depende do casal. O Caribe entrega praia, sol e descanso com facilidade logística. A Europa entrega cultura, gastronomia e variedade, mas exige mais planejamento e resistência física."
+      }
+    ],
     "slug": "cancun-punta-cana-aruba-lua-de-mel",
-    "readingTime": "8 min de leitura"
+    "readingTime": "7 min de leitura"
   },
   {
     "title": "Disney vs Beto Carrero: Qual Escolher para Crianças de 4 a 10 Anos?",
     "excerpt": "Disney ou Beto Carrero? A resposta depende da idade das crianças, do orçamento e de quanto a família está pronta para aproveitar. Comparação honesta com custos reais.",
-    "date": "2026-07-14",
+    "date": "2026-07-04",
     "author": "felipe-william",
     "category": "Experiencias",
     "image": "https://media.anhanga.tur.br/images/blog/disney-ou-beto-carrero.jpg",
@@ -67,14 +66,81 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     ],
     "seoTitle": "Disney ou Beto Carrero: Qual Escolher?",
     "seoDescription": "Comparação honesta entre Disney Orlando e Beto Carrero World para famílias com crianças de 4 a 10 anos. Custos reais, idade ideal e o que cada parque entrega.",
+    "faq": [
+      {
+        "question": "Qual é mais barato, Beto Carrero ou Disney?",
+        "answer": "O Beto Carrero é bem mais acessível. Uma família de 4 pessoas consegue fazer a viagem completa por R$ 8.000 a R$ 15.000. A mesma família na Disney dificilmente sai por menos de R$ 40.000 considerando voos, hospedagem, ingressos e alimentação por 8 dias."
+      },
+      {
+        "question": "Com que idade a criança aproveita mais a Disney?",
+        "answer": "A partir dos 6 anos a criança já conhece os personagens pelos filmes, tem estatura para as atrações principais e resistência física para dias longos de caminhada. O pico de aproveitamento costuma ser entre 7 e 11 anos."
+      },
+      {
+        "question": "Precisa de visto para levar criança à Disney Orlando?",
+        "answer": "Sim. Brasileiros precisam de passaporte válido e visto americano B1/B2 para todos os viajantes, incluindo crianças. O processo exige agendamento no consulado. Se a criança vai com apenas um dos pais, é necessária autorização notarial do outro responsável."
+      },
+      {
+        "question": "Quanto tempo antes devo planejar a viagem para a Disney?",
+        "answer": "O ideal é começar com 6 a 12 meses de antecedência, especialmente para julho, dezembro ou spring break americano. Hotéis dentro do complexo esgotam rápido e os ingressos têm preço dinâmico: quanto mais perto da data, mais caro."
+      },
+      {
+        "question": "O Beto Carrero tem atrações para adultos?",
+        "answer": "Tem sim. O parque tem montanhas-russas radicais, área de aventura e shows noturnos. A experiência é pensada para toda a família, não só para criança pequena."
+      }
+    ],
     "slug": "disney-ou-beto-carrero",
+    "readingTime": "6 min de leitura"
+  },
+  {
+    "title": "Jalapão em Julho: Roteiro, Custos e Por Que Ir Antes Que Vire Mainstream",
+    "excerpt": "Em julho, os fervedouros do Jalapão estão no melhor momento do ano. Roteiro de 7 dias, custos reais e por que ir antes que o destino mude.",
+    "date": "2026-07-04",
+    "author": "felipe-william",
+    "category": "Destinos",
+    "image": "https://media.anhanga.tur.br/images/blog/jalapao-julho-roteiro-custos.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Roteiro Jalapão",
+    "tags": [
+      "jalapao",
+      "tocantins",
+      "ecoturismo",
+      "brasil",
+      "fervedouros",
+      "roteiros-nacionais"
+    ],
+    "seoTitle": "Jalapão em Julho: Roteiro e Custos",
+    "seoDescription": "Roteiro completo de 7 dias no Jalapão em julho com custos reais, fervedouros, dunas e por que ir agora antes que o destino mude. Guia atualizado 2026.",
+    "faq": [
+      {
+        "question": "Precisa de guia para visitar o Jalapão?",
+        "answer": "Sim, é obrigatório por lei. O Naturatins exige guia habilitado para acesso às áreas protegidas, incluindo os fervedouros e o Parque Estadual do Jalapão."
+      },
+      {
+        "question": "É possível fazer o Jalapão de carro comum?",
+        "answer": "Não é recomendado e em várias rotas é inviável. As estradas de areia exigem tração nas quatro rodas. Alugue um 4x4 em Palmas ou contrate um pacote que inclua o transporte."
+      },
+      {
+        "question": "Julho é frio no Jalapão?",
+        "answer": "A temperatura em julho fica entre 15°C e 32°C. Dias quentes, noites frias. Leve roupas de camadas: jaqueta para a manhã e roupa de banho para o meio-dia."
+      },
+      {
+        "question": "Qual o melhor ponto de partida para o Jalapão?",
+        "answer": "Palmas (TO) é a cidade com melhor conexão aérea, com voos diretos de São Paulo, Brasília, Goiânia e Belo Horizonte. De Palmas são aproximadamente 4 horas de estrada até Mateiros."
+      },
+      {
+        "question": "Vale a pena ir ao Jalapão sozinho ou é melhor pacote com agência?",
+        "answer": "Os dois funcionam. O pacote com agência custa entre R$ 4.500 e R$ 7.000/pessoa e elimina a logística. A viagem autônoma custa menos, mas exige planejamento antecipado e tolerância para imprevistos."
+      }
+    ],
+    "slug": "jalapao-julho-roteiro-custos",
     "readingTime": "7 min de leitura"
   },
   {
     "title": "Documentos para Viajar com Criança ao Exterior: Guia Completo 2026",
     "excerpt": "Passaporte, autorização de viagem, certidão de nascimento: saiba o que levar ao viajar com menor de 18 anos para fora do Brasil de acordo com cada cenário.",
     "date": "2026-06-30",
-    "dateModified": "2026-07-02",
+    "dateModified": "2026-07-04",
     "author": "felipe-william",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/documentos-viajar-crianca-exterior.jpg",
@@ -92,14 +158,40 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     ],
     "seoTitle": "Documentos para Viajar com Criança 2026",
     "seoDescription": "Saiba quais documentos são obrigatórios para viajar ao exterior com crianças e adolescentes: passaporte, autorização de viagem, AEV e casos especiais.",
+    "faq": [
+      {
+        "question": "Meu filho tem 2 anos. Precisa de passaporte para viajar?",
+        "answer": "Sim. Não existe faixa etária mínima: bebês de qualquer idade precisam de passaporte próprio para viagens internacionais. Para países do Mercosul, a certidão de nascimento pode ser aceita em alguns casos, mas o passaporte é sempre o documento mais seguro."
+      },
+      {
+        "question": "Posso tirar o passaporte do meu filho sem o outro pai estar presente?",
+        "answer": "Sim, desde que o outro genitor assine o formulário de autorização de emissão de passaporte. A Polícia Federal aceita a assinatura com firma reconhecida em cartório, sem necessidade de presença física."
+      },
+      {
+        "question": "Quanto tempo antes devo tirar o passaporte do meu filho?",
+        "answer": "Pelo menos 60 dias antes da viagem. O prazo oficial de emissão é de cerca de 6 dias úteis (podendo chegar a 15 em períodos de alta demanda), mas agendamento e eventuais pendências de documentação podem estender bastante esse prazo."
+      },
+      {
+        "question": "A autorização de viagem tem prazo de validade?",
+        "answer": "Quando não especificado, a validade é de dois anos. É possível especificar um prazo menor ou maior no documento conforme a necessidade."
+      },
+      {
+        "question": "Preciso de autorização se viajo com meu filho e meu marido/esposa, mas a criança tem um sobrenome diferente?",
+        "answer": "Não. Se ambos os pais viajam juntos com a criança, não é necessária autorização de viagem. Levar a certidão de nascimento pode ajudar em caso de questionamento na fronteira."
+      },
+      {
+        "question": "A AEV (Autorização Eletrônica de Viagem) é aceita em todos os aeroportos?",
+        "answer": "Sim. A AEV tem validade nacional e é aceita pela Polícia Federal em todos os pontos de fronteira e aeroportos internacionais do Brasil."
+      }
+    ],
     "slug": "documentos-para-viajar-com-crianca",
-    "readingTime": "8 min de leitura"
+    "readingTime": "7 min de leitura"
   },
   {
     "title": "ETIAS 2026: O Que Mudou para Brasileiros na Europa (Perguntas e Respostas)",
     "excerpt": "A Europa exigirá autorização eletrônica de brasileiros a partir do fim de 2026. Entenda o que é o ETIAS, quanto custa, como pedir e o que muda na fronteira.",
     "date": "2026-06-23",
-    "dateModified": "2026-07-02",
+    "dateModified": "2026-07-04",
     "author": "felipe-william",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/etias-2026-brasileiros-europa.jpg",
@@ -115,13 +207,40 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     ],
     "seoTitle": "ETIAS 2026: Guia para Brasileiros",
     "seoDescription": "ETIAS começa no Q4/2026 e custa €20. Saiba o que é, quais países exigem, como pedir e o que já mudou na fronteira europeia para brasileiros.",
+    "faq": [
+      {
+        "question": "O ETIAS substitui o visto para a Europa?",
+        "answer": "Não. O Brasil já é isento de visto para o Espaço Schengen, e isso não muda. O ETIAS é uma autorização de viagem adicional, um passo a mais no processo, mas bem mais simples que um visto. O processo é online, rápido e válido por 3 anos."
+      },
+      {
+        "question": "Quando exatamente o ETIAS começa a ser obrigatório para brasileiros?",
+        "answer": "A previsão oficial é o último trimestre de 2026 (outubro a dezembro). A data exata não foi divulgada pela Comissão Europeia. Após o lançamento, haverá um período de graça de 6 meses antes de a entrada ser recusada sem o ETIAS."
+      },
+      {
+        "question": "Quanto custa o ETIAS em 2026?",
+        "answer": "€20 por pessoa, conforme anunciado oficialmente pela Comissão Europeia em julho de 2025. Menores de 18 e maiores de 70 anos não pagam."
+      },
+      {
+        "question": "O ETIAS vale para Portugal?",
+        "answer": "Sim. Portugal faz parte do Espaço Schengen, então o ETIAS é obrigatório para entrar em Portugal da mesma forma que nos outros 29 países do bloco."
+      },
+      {
+        "question": "E para o Reino Unido? Precisa do ETIAS?",
+        "answer": "Não. O Reino Unido tem seu próprio sistema, o ETA, já obrigatório para brasileiros desde fevereiro de 2026. Se o roteiro inclui UK mais Europa continental, você vai precisar dos dois: ETA (UK) e ETIAS (Schengen)."
+      },
+      {
+        "question": "O que acontece se meu ETIAS for negado?",
+        "answer": "Você tem direito a recurso. A rejeição pode ocorrer por inconsistências no formulário, histórico de imigração ou alertas em bases de dados. A taxa de €20 não é reembolsável em caso de recusa."
+      }
+    ],
     "slug": "etias-2026-brasileiros-europa",
-    "readingTime": "9 min de leitura"
+    "readingTime": "7 min de leitura"
   },
   {
     "title": "Agência de Viagens ou Por Conta Própria? O Que Vale Mais — e Quando",
     "excerpt": "Booking, Google Flights ou agência? Entenda quando planejar por conta própria ou contratar uma agência de viagens compensa mais em preço, tempo e segurança.",
     "date": "2026-06-16",
+    "dateModified": "2026-07-04",
     "author": "queila-oliveira",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/agencia-de-viagens-ou-conta-propria.jpg",
@@ -137,13 +256,36 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     ],
     "seoTitle": "Agência de Viagens ou Por Conta Própria?",
     "seoDescription": "Quando usar uma agência de viagens compensa mais do que o Booking ou o Google Flights? Comparação honesta de preço, tempo e segurança para decidir.",
+    "faq": [
+      {
+        "question": "Agência de viagens cobra taxa de serviço?",
+        "answer": "Depende da agência e do tipo de serviço. Algumas cobram uma taxa de consultoria por roteiro personalizado; outras trabalham com a comissão dos fornecedores sem custo direto para o cliente."
+      },
+      {
+        "question": "Consigo preço melhor pelo Booking ou pelo agente de viagens?",
+        "answer": "Para reservas avulsas simples, os preços costumam ser parecidos. Para pacotes completos com aéreo, hospedagem e serviços combinados, agências frequentemente acessam tarifas de consolidadora e bloqueios que não estão disponíveis nas plataformas abertas."
+      },
+      {
+        "question": "Agência de viagens ainda faz sentido em 2026?",
+        "answer": "Sim — especialmente para viagens internacionais complexas, destinos menos comuns, famílias com logística específica e cruzeiros. Para viagens simples a destinos conhecidos, as plataformas funcionam bem."
+      },
+      {
+        "question": "O que acontece se meu voo for cancelado e eu reservei por agência?",
+        "answer": "A agência acompanha o roteiro e aciona os fornecedores em seu nome. O processo de remarcação ou reembolso passa pela agência, que tem relacionamento direto com as companhias e hotéis."
+      },
+      {
+        "question": "Qual a diferença entre agência de viagens e OTA (Booking, Expedia)?",
+        "answer": "Uma OTA é uma plataforma de reservas online — você pesquisa, compara e reserva sem atendimento humano. Uma agência de viagens tem consultores que planejam o roteiro, recomendam opções e dão suporte antes, durante e depois da viagem."
+      }
+    ],
     "slug": "agencia-de-viagens-ou-por-conta-propria",
-    "readingTime": "7 min de leitura"
+    "readingTime": "6 min de leitura"
   },
   {
     "title": "Seguro Viagem Internacional: Quando É Obrigatório, Quando Vale a Pena e Quanto Custa em 2026",
     "excerpt": "Saiba em quais países o seguro viagem é obrigatório, quanto custa por dia, qual cobertura contratar e os erros comuns que podem arruinar suas férias.",
     "date": "2026-06-10",
+    "dateModified": "2026-07-04",
     "author": "queila-oliveira",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/seguro-viagem-2026.jpg",
@@ -496,7 +638,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Malas de Mão: O Guia Definitivo",
     "excerpt": "Dimensões por companhia, o que vai e o que não vai na cabine, e o checklist definitivo para viajar só com mala de mão sem abrir mão de nada essencial.",
     "date": "2025-11-05",
-    "dateModified": "2026-06-05",
+    "dateModified": "2026-07-04",
     "author": "felipe-william",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/malas-de-mao.jpg",
@@ -510,8 +652,30 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "companhias-aereas",
       "viagem"
     ],
+    "faq": [
+      {
+        "question": "Qual o tamanho máximo de mala de mão permitido nas companhias brasileiras?",
+        "answer": "LATAM, Gol e Azul aceitam malas de até 55 × 35 × 25 cm com peso máximo de 10 kg na classe Economy (cabines Premium podem permitir até 16 kg)."
+      },
+      {
+        "question": "Mala de mão é pesada em todos os voos?",
+        "answer": "Depende da companhia. Low-cost europeias como Ryanair e EasyJet pesam e medem na fila de embarque com frequência. Emirates e Qatar também fiscalizam no gate. Companhias americanas como United e American raramente pesam, mas podem pedir que a mala seja despachada se o compartimento encher."
+      },
+      {
+        "question": "Posso levar mala de mão e item pessoal ao mesmo tempo?",
+        "answer": "Sim, na maioria das companhias. A mala de mão vai no compartimento superior e o item pessoal (bolsa, mochila pequena, laptop bag) embaixo do assento à sua frente. Verifique as dimensões permitidas para o item pessoal — cada companhia tem a sua."
+      },
+      {
+        "question": "Quanto peso posso colocar na mala de mão para não ter problema?",
+        "answer": "Uma margem segura é ficar 1 kg abaixo do limite oficial. Se a companhia permite 10 kg, planeje para 9 kg — variações de balança existem e uma diferença pequena pode ser cobrada."
+      },
+      {
+        "question": "Ryanair e EasyJet permitem mala de cabine gratuita?",
+        "answer": "Apenas a bagagem pequena que cabe embaixo do assento é gratuita (40 × 25 × 20 cm na Ryanair; 45 × 36 × 20 cm na EasyJet). A mala maior, que vai no compartimento superior, é paga e precisa ser adquirida com antecedência."
+      }
+    ],
     "slug": "malas-de-mao-o-guia-definitivo",
-    "readingTime": "9 min de leitura"
+    "readingTime": "8 min de leitura"
   },
   {
     "title": "Europa Gastronômica: Roteiro Itália",

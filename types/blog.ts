@@ -1,3 +1,8 @@
+export interface BlogPostFaqItem {
+  question: string;
+  answer: string;
+}
+
 export interface BlogPostFrontmatter {
   title: string;
   excerpt: string;         // max 160 chars — usado no <meta description> e nos cards
@@ -13,6 +18,7 @@ export interface BlogPostFrontmatter {
   tags?: string[];
   seoTitle?: string;       // opcional: título diferente para <title> tag SEO
   seoDescription?: string; // opcional: meta description diferente do excerpt
+  faq?: BlogPostFaqItem[]; // perguntas/respostas já presentes no corpo do post — alimenta o FAQPageSchema sem duplicar texto
 }
 
 export type PostMeta = Omit<BlogPostFrontmatter, 'tags'> & {
