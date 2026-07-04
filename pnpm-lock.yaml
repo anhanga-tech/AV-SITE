@@ -13,6 +13,7 @@ overrides:
   esbuild: ^0.28.1
   ws: ^8.21.0
   undici: ^7.28.0
+  js-yaml@3: ^3.15.0
 
 importers:
 
@@ -3596,8 +3597,8 @@ packages:
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
 
-  js-yaml@3.14.2:
-    resolution: {integrity: sha512-PMSmkqxr106Xa156c2M265Z+FTrPl+oxd/rgOQy2tijQeK5TxQ43psO1ZCwhVOSdnn+RzkzlRz/eY4BgJBYVpg==}
+  js-yaml@3.15.0:
+    resolution: {integrity: sha512-ttBQIIQPDeLjpPOohtUdXuXUVoA2uIB6fEH9HyJ7234s5mBJ5wTx20njxplLZQgLaOfpmPQA7X2t5AX6tIPbog==}
     hasBin: true
 
   js-yaml@4.2.0:
@@ -7670,7 +7671,7 @@ snapshots:
     dependencies:
       import-fresh: 2.0.0
       is-directory: 0.3.1
-      js-yaml: 3.14.2
+      js-yaml: 3.15.0
       parse-json: 4.0.0
 
   cosmiconfig@9.0.2(typescript@6.0.3):
@@ -8418,7 +8419,7 @@ snapshots:
 
   gray-matter@4.0.3:
     dependencies:
-      js-yaml: 3.14.2
+      js-yaml: 3.15.0
       kind-of: 6.0.3
       section-matter: 1.0.0
       strip-bom-string: 1.0.0
@@ -8672,7 +8673,7 @@ snapshots:
 
   js-tokens@4.0.0: {}
 
-  js-yaml@3.14.2:
+  js-yaml@3.15.0:
     dependencies:
       argparse: 1.0.10
       esprima: 4.0.1
