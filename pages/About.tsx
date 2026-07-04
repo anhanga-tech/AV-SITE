@@ -4,9 +4,56 @@ import { m, Variants } from 'framer-motion';
 import { Seo } from '../components/Seo';
 import { OrganizationSchema } from '../components/schemas/OrganizationSchema';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
+import { FAQPageSchema } from '../components/schemas/FAQPageSchema';
+import { PersonSchema } from '../components/schemas/PersonSchema';
 import { LazyImage } from '../components/ui/LazyImage';
 import { openContactModal } from '../utils/contactForm';
-import { ShieldCheck, Award, Users, Sparkles, Heart, Coffee } from 'lucide-react';
+import { getReviewSummary } from '../data/reviewsAdapter';
+import { AUTHORS } from '../data/blogData';
+import googleReviewsRaw from '../data/googleReviews.json';
+import type { GoogleReviewsData } from '../types/reviews';
+import { ShieldCheck, Award, Users, Sparkles, Heart, Coffee, Ship, Anchor } from 'lucide-react';
+import { InstagramLogo, LinkedinLogo } from '@phosphor-icons/react';
+
+const ORG_NAME = 'Anhangá Viagens';
+const ORG_URL = 'https://www.anhanga.tur.br/';
+
+const reviewSummary = getReviewSummary(googleReviewsRaw as GoogleReviewsData);
+
+// FAQ de entidade/confiança — respostas answer-first e verificáveis, o padrão
+// que motores de resposta (ChatGPT, Gemini, Perplexity) extraem para
+// *recomendar* a marca, não só citar fatos. Mantido em sincronia com a seção
+// visível renderizada abaixo e com o FAQPage JSON-LD.
+const TRUST_FAQ_ITEMS = [
+  {
+    question: 'A Anhangá Viagens é confiável?',
+    answer:
+      'Sim. A Anhangá Viagens é uma agência de turismo registrada no Cadastur (Ministério do Turismo) sob o CNPJ 37.036.732/0001-41, com sede física em São Paulo, na Av. Dom Pedro I, 773 — Vila Monumento. É agente credenciado do Beto Carrero World e do Hopi Hari e parceira da Norwegian Cruise Line (NCL). O atendimento é consultivo e humano, com suporte 24h por WhatsApp durante toda a viagem.',
+  },
+  {
+    question: 'A Anhangá é registrada no Cadastur?',
+    answer:
+      'Sim. O registro no Cadastur, cadastro oficial do Ministério do Turismo do Brasil, é 37.036.732/0001-41 — o mesmo número do CNPJ. O Cadastur é a autorização que habilita uma empresa a operar legalmente como agência de turismo no país.',
+  },
+  {
+    question: 'Quais credenciamentos e parcerias a Anhangá possui?',
+    answer:
+      'A Anhangá é agente credenciado do Beto Carrero World e do Hopi Hari, parceira da Norwegian Cruise Line (NCL) para cruzeiros e registrada no Cadastur do Ministério do Turismo. Esses credenciamentos permitem emitir ingressos, pacotes e reservas oficiais desses parceiros com condições e suporte diretos.',
+  },
+  {
+    question: 'Como funciona o atendimento da Anhangá?',
+    answer:
+      'O atendimento é consultivo, não de balcão. Um consultor humano desenha o roteiro dia a dia conforme seu perfil e orçamento — sem pacotes prontos de prateleira. Você aprova a proposta com todos os custos listados antes de qualquer emissão e conta com suporte 24h por WhatsApp durante a viagem. O primeiro contato pode ser pelo chat com IA no site, por WhatsApp ou presencialmente em São Paulo.',
+  },
+  {
+    question: 'A Anhangá tem sede física e atendimento presencial?',
+    answer:
+      'Sim. A sede fica na Av. Dom Pedro I, 773 — Vila Monumento, São Paulo (SP), CEP 01552-001. O atendimento pode ser presencial, por WhatsApp no (11) 5283-3309 ou pelo chat com IA disponível no site.',
+  },
+];
+
+// Consultores expostos como entidades Person (E-E-A-T) ligados à organização.
+const TEAM = [AUTHORS['felipe-william'], AUTHORS['queila-oliveira']].filter(Boolean);
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 30 },
@@ -43,10 +90,28 @@ const About: React.FC = () => {
     <div className="bg-brand-surface pt-32 pb-20">
       <Seo
         title="Sobre a Anhangá Viagens | Agência de Viagens em São Paulo"
-        description="Conheça a história da Anhangá Viagens. Agência de turismo credenciada no Cadastur em São Paulo, especializada em roteiros personalizados."
+        description="Anhangá Viagens: agência registrada no Cadastur (CNPJ 37.036.732/0001-41), com sede em São Paulo, agente credenciado Beto Carrero World e Hopi Hari e parceira Norwegian Cruise Line. Atendimento consultivo e roteiros personalizados."
         canonical="https://www.anhanga.tur.br/sobre/"
       />
-      <OrganizationSchema />
+      <OrganizationSchema
+        aggregateRating={reviewSummary ? {
+          ratingValue: reviewSummary.averageRating,
+          reviewCount: reviewSummary.totalReviews,
+        } : undefined}
+      />
+      <FAQPageSchema items={TRUST_FAQ_ITEMS} />
+      {TEAM.map((member) => (
+        <PersonSchema
+          key={member.id}
+          id={`person-${member.id}`}
+          name={member.name}
+          image={member.image}
+          description={member.bio}
+          jobTitle={member.role}
+          sameAs={member.social ? (Object.values(member.social).filter(Boolean) as string[]) : undefined}
+          worksFor={{ name: ORG_NAME, url: ORG_URL }}
+        />
+      ))}
       <BreadcrumbSchema
         items={[
           { name: 'Home', item: 'https://www.anhanga.tur.br/' },
@@ -236,7 +301,25 @@ const About: React.FC = () => {
                   </div>
                   <div>
                     <p className="font-bold text-lg leading-none mb-1">Sede Própria em São Paulo</p>
-                    <p className="text-zinc-400">Av. Dom Pedro I, 773 - Vila Monumento</p>
+                    <p className="text-zinc-400">Av. Dom Pedro I, 773 - Vila Monumento, CEP 01552-001</p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-4">
+                  <div className="size-6 rounded-full bg-anhanga-action/20 flex items-center justify-center shrink-0 mt-1">
+                    <div className="size-2 rounded-full bg-anhanga-action"></div>
+                  </div>
+                  <div>
+                    <p className="font-bold text-lg leading-none mb-1">Agente Credenciado</p>
+                    <p className="text-zinc-400">Beto Carrero World e Hopi Hari</p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-4">
+                  <div className="size-6 rounded-full bg-anhanga-action/20 flex items-center justify-center shrink-0 mt-1">
+                    <div className="size-2 rounded-full bg-anhanga-action"></div>
+                  </div>
+                  <div>
+                    <p className="font-bold text-lg leading-none mb-1">Parceira Norwegian Cruise Line</p>
+                    <p className="text-zinc-400">Cruzeiros nacionais e internacionais (NCL)</p>
                   </div>
                 </li>
               </ul>
@@ -248,6 +331,18 @@ const About: React.FC = () => {
                 <p className="text-sm font-bold uppercase tracking-tighter opacity-50 mb-2">Membro Oficial</p>
                 <p className="font-black text-xl">Beto Carrero World</p>
                 <p className="text-xs text-brand-cyan mt-1">Agente Credenciado</p>
+              </div>
+              <div className="bg-white/5 backdrop-blur-sm p-8 rounded-3xl border border-white/10 flex flex-col items-center text-center">
+                <Anchor className="size-12 text-anhanga-action mb-4" />
+                <p className="text-sm font-bold uppercase tracking-tighter opacity-50 mb-2">Membro Oficial</p>
+                <p className="font-black text-xl">Hopi Hari</p>
+                <p className="text-xs text-anhanga-action mt-1">Agente Credenciado</p>
+              </div>
+              <div className="bg-white/5 backdrop-blur-sm p-8 rounded-3xl border border-white/10 flex flex-col items-center text-center">
+                <Ship className="size-12 text-anhanga-action mb-4" />
+                <p className="text-sm font-bold uppercase tracking-tighter opacity-50 mb-2">Parceira</p>
+                <p className="font-black text-xl">Norwegian Cruise Line</p>
+                <p className="text-xs text-anhanga-action mt-1">Cruzeiros NCL</p>
               </div>
               <div className="bg-white/5 backdrop-blur-sm p-8 rounded-3xl border border-white/10 flex flex-col items-center text-center">
                 <Coffee className="size-12 text-brand-yellow mb-4" />
@@ -267,6 +362,114 @@ const About: React.FC = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* TEAM / CONSULTORES SECTION */}
+        <section id="consultores" className="mt-32">
+          <m.div
+            className="text-center mb-16"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
+            custom={0}
+          >
+            <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-4">Quem planeja a sua viagem</h2>
+            <p className="text-zinc-500 font-medium max-w-2xl mx-auto">
+              Atendimento consultivo é feito por gente de verdade. Conheça os consultores que desenham cada roteiro sob medida.
+            </p>
+          </m.div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {TEAM.map((member, i) => (
+              <m.div
+                key={member.id}
+                className="bg-white p-8 rounded-[2.5rem] border-2 border-zinc-100 shadow-sm hover:shadow-xl transition duration-300 flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                custom={i + 1}
+              >
+                {member.image && (
+                  <img
+                    src={member.image}
+                    alt={`${member.name}, ${member.role} na Anhangá Viagens`}
+                    width={96}
+                    height={96}
+                    loading="lazy"
+                    decoding="async"
+                    className="size-24 rounded-2xl object-cover shrink-0 border-4 border-white shadow-md"
+                  />
+                )}
+                <div>
+                  <h3 className="text-xl font-black text-anhanga-dark leading-tight">{member.name}</h3>
+                  <p className="text-sm font-bold text-anhanga-action uppercase tracking-wide mb-3">{member.role}</p>
+                  <p className="text-zinc-500 font-medium leading-relaxed mb-4">{member.bio}</p>
+                  {member.social && (
+                    <div className="flex items-center justify-center sm:justify-start gap-3">
+                      {member.social.instagram && (
+                        <a
+                          href={member.social.instagram}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Instagram de ${member.name}`}
+                          className="size-9 rounded-full bg-anhanga-action/10 text-anhanga-action flex items-center justify-center hover:bg-anhanga-action hover:text-white transition-colors"
+                        >
+                          <InstagramLogo className="size-4" weight="fill" />
+                        </a>
+                      )}
+                      {member.social.linkedin && (
+                        <a
+                          href={member.social.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`LinkedIn de ${member.name}`}
+                          className="size-9 rounded-full bg-anhanga-action/10 text-anhanga-action flex items-center justify-center hover:bg-anhanga-action hover:text-white transition-colors"
+                        >
+                          <LinkedinLogo className="size-4" weight="fill" />
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </m.div>
+            ))}
+          </div>
+        </section>
+
+        {/* FAQ / CONFIANÇA SECTION */}
+        <section id="perguntas-frequentes" className="mt-32">
+          <m.div
+            className="text-center mb-16"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
+            custom={0}
+          >
+            <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-4">Perguntas frequentes sobre a Anhangá</h2>
+            <p className="text-zinc-500 font-medium max-w-2xl mx-auto">
+              Confiança, credenciamentos e como funciona o atendimento — em respostas diretas.
+            </p>
+          </m.div>
+
+          <div className="max-w-3xl mx-auto space-y-5">
+            {TRUST_FAQ_ITEMS.map((item, i) => (
+              <m.div
+                key={item.question}
+                className="bg-white p-8 rounded-3xl border-2 border-zinc-100 shadow-sm"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                custom={i + 1}
+              >
+                <h3 className="text-lg md:text-xl font-black text-anhanga-dark mb-3">{item.question}</h3>
+                <p className="text-zinc-600 font-medium leading-relaxed">{item.answer}</p>
+              </m.div>
+            ))}
           </div>
         </section>
 
