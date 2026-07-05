@@ -6,6 +6,7 @@ import type { HoneypotProps } from '../../hooks/useAntiBot';
 import { getWhatsAppLink } from '../../utils/whatsapp';
 import { pushFormAnalyticsEvent } from '../../utils/formAnalytics';
 import { matchProfile, type ProfileKey } from '../../lib/quiz-scoring';
+import { deriveQuizLeadName } from '../../lib/quiz-logic';
 import {
     selectMainDestination,
     selectInspirationDestinations,
@@ -181,8 +182,7 @@ function buildQuizSubmitInput(
 ): QuizSubmitInput {
     const profile = TRAVELER_PROFILES[pKey];
     const mainDest = selectMainDestination(pKey, answers.destino ?? []);
-    const firstName = form.nome.trim().split(/\s+/)[0] || 'Viajante';
-    const lastName = form.sobrenome.trim();
+    const { firstName, lastName } = deriveQuizLeadName(form.nome, form.sobrenome);
     const bantSummary = `Quiz Anhangá · Perfil: ${profile.name} · Destino: ${mainDest.name} · ${buildAnswersSummary(answers)}`;
 
     return {

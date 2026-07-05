@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { validateQuizPayload } from '../lib/quiz-logic.ts';
+import { validateQuizPayload, deriveQuizLeadName } from '../lib/quiz-logic.ts';
 import quizHandler from '../api/submit-quiz.ts';
 import { createOdooMock, setOdooEnv, clearOdooEnv } from './odoo-mock.ts';
 
@@ -14,6 +14,35 @@ const BASE_PAYLOAD = {
     sourcePage: '/quiz',
     utms: { utm_source: null, utm_medium: null, utm_campaign: null, utm_term: null, utm_content: null },
 };
+
+// --- deriveQuizLeadName — split single "nome" field into first/last name ------
+
+test('deriveQuizLeadName — sobrenome explícito é preservado (prefill via URL)', () => {
+    assert.deepEqual(deriveQuizLeadName('João', 'Silva'), { firstName: 'João', lastName: 'Silva' });
+});
+
+test('deriveQuizLeadName — nome completo no campo único deriva o sobrenome', () => {
+    assert.deepEqual(deriveQuizLeadName('João Silva', ''), { firstName: 'João', lastName: 'Silva' });
+});
+
+test('deriveQuizLeadName — sobrenome tem precedência sobre o nome completo', () => {
+    assert.deepEqual(deriveQuizLeadName('João Silva', 'Souza'), { firstName: 'João', lastName: 'Souza' });
+});
+
+test('deriveQuizLeadName — nome com múltiplos sobrenomes junta o restante', () => {
+    assert.deepEqual(
+        deriveQuizLeadName('  Ana   Maria de Souza  ', ''),
+        { firstName: 'Ana', lastName: 'Maria de Souza' },
+    );
+});
+
+test('deriveQuizLeadName — só primeiro nome resulta em sobrenome vazio', () => {
+    assert.deepEqual(deriveQuizLeadName('João', ''), { firstName: 'João', lastName: '' });
+});
+
+test('deriveQuizLeadName — nome vazio usa o fallback "Viajante"', () => {
+    assert.deepEqual(deriveQuizLeadName('   ', '  '), { firstName: 'Viajante', lastName: '' });
+});
 
 // --- validateQuizPayload (lib/quiz-logic) — unchanged by the Odoo cut-over ----
 

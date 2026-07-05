@@ -54,7 +54,12 @@ function currentPageLocation(): string | undefined {
     }
     return url.toString();
   } catch {
-    return window.location.href.replace(EMAIL_PATTERN, 'redacted').replace(PHONE_PATTERN, 'redacted');
+    // Non-global shared regexes only redact the first match; instantiate global
+    // copies on the fly so every email/phone in the URL is scrubbed, without
+    // making the shared patterns stateful (a global `lastIndex` breaks `.test()`).
+    return window.location.href
+      .replace(new RegExp(EMAIL_PATTERN, 'g'), 'redacted')
+      .replace(new RegExp(PHONE_PATTERN, 'g'), 'redacted');
   }
 }
 

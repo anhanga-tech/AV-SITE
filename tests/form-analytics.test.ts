@@ -43,6 +43,38 @@ test('pushFormAnalyticsEvent sends a non-PII form event to dataLayer', () => {
   });
 });
 
+test('pushFormAnalyticsEvent redige todos os e-mails/telefones no fallback de URL malformada', () => {
+  const pushed: unknown[] = [];
+  const previousWindow = globalThis.window;
+  // href sem origin válido força o catch de currentPageLocation (new URL() lança),
+  // exercitando o fallback baseado em regex global — que deve redigir TODAS as
+  // ocorrências, não só a primeira.
+  Object.defineProperty(globalThis, 'window', {
+    value: {
+      location: { href: 'a@b.com and c@d.com and +5511999999999' },
+      dataLayer: { push: (event: unknown) => pushed.push(event) },
+    },
+    configurable: true,
+  });
+
+  try {
+    pushFormAnalyticsEvent({
+      event: 'form_view',
+      formType: 'quiz_lead',
+      formId: 'quiz-anhanga',
+    });
+  } finally {
+    Object.defineProperty(globalThis, 'window', {
+      value: previousWindow,
+      configurable: true,
+    });
+  }
+
+  const pageLocation = (pushed[0] as Record<string, string>).page_location;
+  assert.doesNotMatch(pageLocation, /@/, 'nenhum e-mail deve sobrar');
+  assert.doesNotMatch(pageLocation, /\d{5,}/, 'nenhum telefone deve sobrar');
+});
+
 test('pushFormAnalyticsEvent ignores unknown field names and sensitive destinations', () => {
   const pushed: unknown[] = [];
   const previousWindow = globalThis.window;

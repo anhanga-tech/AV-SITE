@@ -3,6 +3,21 @@ import type { SubmitQuizRequest } from '../types/quiz';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/** Derives firstName/lastName from the quiz form, whose UI collapsed
+ *  nome+sobrenome into a single "nome" field to cut friction. Keeps an
+ *  explicit `sobrenome` when present (e.g. prefilled from the URL); otherwise
+ *  falls back to the remaining tokens of the full name ("João Silva" → "Silva")
+ *  so the last name is not silently dropped before it reaches the CRM. */
+export function deriveQuizLeadName(
+    nome: string,
+    sobrenome: string,
+): { firstName: string; lastName: string } {
+    const nameParts = nome.trim().split(/\s+/).filter(Boolean);
+    const firstName = nameParts[0] || 'Viajante';
+    const lastName = sobrenome.trim() || nameParts.slice(1).join(' ');
+    return { firstName, lastName };
+}
+
 export function validateQuizPayload(
     payload: unknown,
 ): { valid: true; data: SubmitQuizRequest } | { valid: false; error: string } {

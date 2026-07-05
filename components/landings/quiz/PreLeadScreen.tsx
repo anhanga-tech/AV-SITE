@@ -20,7 +20,7 @@ interface PreLeadScreenProps {
 export function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting, initialValues, honeypotProps }: PreLeadScreenProps) {
     const [form, setForm] = useState<LeadForm>(() => ({
         nome: initialValues?.nome ?? '',
-        sobrenome: '',
+        sobrenome: initialValues?.sobrenome ?? '',
         email: initialValues?.email ?? '',
         aceite: false,
     }));
