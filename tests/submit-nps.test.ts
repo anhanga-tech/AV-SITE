@@ -182,16 +182,27 @@ test('submit-nps returns 400 for non-numeric score', async (t) => {
     assert.equal(body.code, 'VALIDATION_ERROR');
 });
 
-test('submit-nps returns 400 for empty reason', async (t) => {
+test('submit-nps accepts empty reason', async (t) => {
     t.after(restore);
     setOdooEnv();
     global.fetch = createOdooMock().fetch;
 
     const response = await handler(buildRequest(validBody({ reason: '' })));
-    const body = await response.json() as Record<string, unknown>;
+    assert.equal(response.status, 201);
+});
 
-    assert.equal(response.status, 400);
-    assert.equal(body.code, 'VALIDATION_ERROR');
+test('submit-nps writes a clean comment when reason is empty', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    const mock = createOdooMock();
+    global.fetch = mock.fetch;
+
+    const response = await handler(buildRequest(validBody({ reason: '', highlight: '' })));
+    assert.equal(response.status, 201);
+
+    const partner = mock.partnerFields()!;
+    assert.match(String(partner.comment), /NPS 9\/10/);
+    assert.doesNotMatch(String(partner.comment), /—\s*$/);
 });
 
 test('submit-nps returns 400 for reason over 2000 characters', async (t) => {

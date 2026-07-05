@@ -50,7 +50,6 @@ test.describe('Quiz — proteção contra duplo envio do lead', () => {
         // Tela de lead.
         await expect(page.locator('#quiz-nome')).toBeVisible();
         await page.locator('#quiz-nome').fill('Maria');
-        await page.locator('#quiz-sobrenome').fill('Silva');
         await page.locator('#quiz-email').fill('maria@example.com');
 
         // Dispara dois cliques no mesmo tick, antes de qualquer re-render do React.

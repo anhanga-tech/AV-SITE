@@ -26,7 +26,7 @@ export class CorporativoPage {
     this.lgpdCheckbox = page.locator('#lgpd-corp');
     this.submitBtn = page.locator('button[type="submit"]');
     this.successHeading = page.locator('h3:has-text("Mensagem recebida!")');
-    this.errorAlert = page.locator('p[role="alert"]');
+    this.errorAlert = page.locator('[role="alert"]');
     this.whatsappCta = page.locator('a[data-contact-intent]').first();
     this.contactAnchor = page.locator('a[href="#contato"]');
   }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { WhatsappLogo, SpinnerGap, CheckCircle } from '@phosphor-icons/react';
 import { useContactForm } from '../../hooks/useContactForm';
+import { pushFormAnalyticsEvent } from '../../utils/formAnalytics';
 
 export function CtaBody() {
   const [formOpen, setFormOpen] = useState(false);
@@ -34,38 +35,30 @@ export function CtaBody() {
           Seus dados para contato
         </p>
 
-        <div className="flex gap-3">
-          <div className="flex-1">
-            <label htmlFor="cta-firstName" className="sr-only">Nome</label>
-            <input
-              id="cta-firstName"
-              type="text"
-              placeholder="Nome *"
-              value={fields.firstName}
-              onChange={(event) => setField('firstName', event.target.value)}
-              required
-              className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-zinc-400"
-            />
-          </div>
-          <div className="flex-1">
-            <label htmlFor="cta-lastName" className="sr-only">Sobrenome</label>
-            <input
-              id="cta-lastName"
-              type="text"
-              placeholder="Sobrenome"
-              value={fields.lastName}
-              onChange={(event) => setField('lastName', event.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-zinc-400"
-            />
-          </div>
+        <div>
+          <label htmlFor="cta-firstName" className="mb-1 block text-xs font-bold uppercase tracking-wider text-zinc-500">
+            Nome *
+          </label>
+          <input
+            id="cta-firstName"
+            type="text"
+            placeholder="ex: João Silva"
+            autoComplete="name"
+            value={fields.firstName}
+            onChange={(event) => setField('firstName', event.target.value)}
+            required
+            className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-zinc-400"
+          />
         </div>
 
         <div>
-          <label htmlFor="cta-whatsapp" className="sr-only">WhatsApp</label>
+          <label htmlFor="cta-whatsapp" className="mb-1 block text-xs font-bold uppercase tracking-wider text-zinc-500">
+            WhatsApp *
+          </label>
           <input
             id="cta-whatsapp"
             type="tel"
-            placeholder="WhatsApp *"
+            placeholder="(11) 99999-9999"
             value={fields.whatsapp}
             onChange={(event) => setField('whatsapp', event.target.value)}
             required
@@ -74,11 +67,13 @@ export function CtaBody() {
         </div>
 
         <div>
-          <label htmlFor="cta-email" className="sr-only">E-mail</label>
+          <label htmlFor="cta-email" className="mb-1 block text-xs font-bold uppercase tracking-wider text-zinc-500">
+            E-mail
+          </label>
           <input
             id="cta-email"
             type="email"
-            placeholder="E-mail (opcional)"
+            placeholder="voce@email.com (opcional)"
             value={fields.email}
             onChange={(event) => setField('email', event.target.value)}
             className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-zinc-400"
@@ -94,12 +89,16 @@ export function CtaBody() {
             className="mt-0.5 size-4 rounded border-2 border-brand-vibrant accent-brand-vibrant cursor-pointer flex-shrink-0"
           />
           <label htmlFor="cta-optIn" className="text-xs text-blue-700 leading-relaxed cursor-pointer">
-            Quero receber novidades por e-mail.{' '}
-            <a href="/politica-privacidade/" target="_blank" rel="noopener noreferrer" className="underline">
-              Política de Privacidade
-            </a>
+            Quero receber novidades por e-mail.
           </label>
         </div>
+
+        <p className="text-xs text-zinc-500 leading-relaxed">
+          Seus dados serão usados para retornar seu contato.{' '}
+          <a href="/politica-privacidade/" target="_blank" rel="noopener noreferrer" className="underline hover:text-zinc-700">
+            Política de Privacidade
+          </a>.
+        </p>
 
         {error && (
           <p className="text-red-500 text-xs font-medium" role="alert">{error}</p>
@@ -145,7 +144,14 @@ export function CtaBody() {
       </div>
       <button
         type="button"
-        onClick={() => setFormOpen(true)}
+        onClick={() => {
+          setFormOpen(true);
+          pushFormAnalyticsEvent({
+            event: 'form_view',
+            formType: 'contact_modal',
+            formId: 'cta-homepage',
+          });
+        }}
         className="btn-specialist flex items-center gap-3 bg-brand-dark text-white text-lg font-bold px-8 py-4 rounded-xl shadow-hard-yellow hover:shadow-[2px_2px_0px_theme(colors.brand.yellow)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition self-start"
         data-tracking="cta-home-footer"
       >

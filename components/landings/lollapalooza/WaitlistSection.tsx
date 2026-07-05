@@ -1,8 +1,9 @@
-import React, { useReducer } from 'react';
+import React, { useEffect, useReducer, useRef } from 'react';
 import { BellRing, CheckCircle2, Loader2, Mail, TicketX, ArrowRight, Zap } from 'lucide-react';
 import { m, AnimatePresence } from 'framer-motion';
 import { useWaitlistCapture } from '../../../hooks/useWaitlistCapture';
 import { WAITLIST_SECTION_ID } from './constants';
+import { pushFormAnalyticsEvent } from '../../../utils/formAnalytics';
 
 const CONTAINER_VARIANTS = {
   hidden: { opacity: 0 },
@@ -60,18 +61,62 @@ const WaitlistSection: React.FC = () => {
   const { submitWaitlist, isSubmitting, error, honeypotProps } = useWaitlistCapture();
   const [state, dispatch] = useReducer(waitlistReducer, WAITLIST_INITIAL_STATE);
   const { name, email, acceptedLgpd, localError, successMessage, warningMessage } = state;
+  const startedRef = useRef(false);
+  const completedFields = useRef<Set<string> | null>(null);
+
+  useEffect(() => {
+    pushFormAnalyticsEvent({
+      event: 'form_view',
+      formType: 'waitlist',
+      formId: 'lolla-waitlist-2027',
+      destination: 'Lollapalooza Brasil',
+    });
+  }, []);
+
+  function trackField(fieldName: 'name' | 'email' | 'marketingOptIn', value: string | boolean) {
+    if (!startedRef.current) {
+      startedRef.current = true;
+      pushFormAnalyticsEvent({
+        event: 'form_start',
+        formType: 'waitlist',
+        formId: 'lolla-waitlist-2027',
+        destination: 'Lollapalooza Brasil',
+      });
+    }
+
+    const completed = typeof value === 'boolean' ? value : value.trim().length > 0;
+    const trackedFields = completedFields.current ?? (completedFields.current = new Set());
+    if (completed && !trackedFields.has(fieldName)) {
+      trackedFields.add(fieldName);
+      pushFormAnalyticsEvent({
+        event: 'field_complete',
+        formType: 'waitlist',
+        formId: 'lolla-waitlist-2027',
+        fieldName,
+        destination: 'Lollapalooza Brasil',
+      });
+    }
+  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     dispatch({ type: 'CLEAR_MESSAGES' });
+    pushFormAnalyticsEvent({
+      event: 'submit_attempt',
+      formType: 'waitlist',
+      formId: 'lolla-waitlist-2027',
+      destination: 'Lollapalooza Brasil',
+    });
 
     if (!name.trim() || !email.trim()) {
       dispatch({ type: 'SET_ERROR', value: 'Preencha nome completo e e-mail para entrar na lista.' });
-      return;
-    }
-
-    if (!acceptedLgpd) {
-      dispatch({ type: 'SET_ERROR', value: 'Você precisa aceitar a política de privacidade para continuar.' });
+      pushFormAnalyticsEvent({
+        event: 'field_error',
+        formType: 'waitlist',
+        formId: 'lolla-waitlist-2027',
+        errorType: 'required',
+        destination: 'Lollapalooza Brasil',
+      });
       return;
     }
 
@@ -86,9 +131,22 @@ const WaitlistSection: React.FC = () => {
 
     if (result.ok === false) {
       dispatch({ type: 'SET_ERROR', value: result.error });
+      pushFormAnalyticsEvent({
+        event: 'submit_failure',
+        formType: 'waitlist',
+        formId: 'lolla-waitlist-2027',
+        errorType: result.code,
+        destination: 'Lollapalooza Brasil',
+      });
       return;
     }
 
+    pushFormAnalyticsEvent({
+      event: 'submit_success',
+      formType: 'waitlist',
+      formId: 'lolla-waitlist-2027',
+      destination: 'Lollapalooza Brasil',
+    });
     dispatch({ type: 'SUBMIT_SUCCESS', success: 'Você entrou na lista de espera para o Lollapalooza 2027.', warning: result.warning || null });
   };
 
@@ -187,7 +245,10 @@ const WaitlistSection: React.FC = () => {
                       id="lolla-waitlist-name"
                       type="text"
                       value={name}
-                      onChange={(event) => dispatch({ type: 'SET_NAME', value: event.target.value })}
+                      onChange={(event) => {
+                        dispatch({ type: 'SET_NAME', value: event.target.value });
+                        trackField('name', event.target.value);
+                      }}
                       className="peer w-full bg-anhanga-darkBlue/80 border-l-2 border-white/10 px-6 py-4 text-white placeholder-white/50 outline-none transition duration-300 focus:border-anhanga-yellow focus:bg-anhanga-yellow/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-anhanga-yellow focus-visible:outline-offset-2"
                       placeholder="EX: SABRINA CARPENTER"
                       autoComplete="name"
@@ -207,7 +268,10 @@ const WaitlistSection: React.FC = () => {
                       id="lolla-waitlist-email"
                       type="email"
                       value={email}
-                      onChange={(event) => dispatch({ type: 'SET_EMAIL', value: event.target.value })}
+                      onChange={(event) => {
+                        dispatch({ type: 'SET_EMAIL', value: event.target.value });
+                        trackField('email', event.target.value);
+                      }}
                       className="peer w-full bg-anhanga-darkBlue/80 border-l-2 border-white/10 px-6 py-4 text-white placeholder-white/50 outline-none transition duration-300 focus:border-anhanga-blue focus:bg-anhanga-blue/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-anhanga-blue focus-visible:outline-offset-2"
                       placeholder="VOICE@EXEMPLO.COM"
                       autoComplete="email"
@@ -224,14 +288,22 @@ const WaitlistSection: React.FC = () => {
                       id="lolla-waitlist-lgpd"
                       type="checkbox"
                       checked={acceptedLgpd}
-                      onChange={(event) => dispatch({ type: 'SET_LGPD', value: event.target.checked })}
+                      onChange={(event) => {
+                        dispatch({ type: 'SET_LGPD', value: event.target.checked });
+                        trackField('marketingOptIn', event.target.checked);
+                      }}
                       className="peer sr-only"
                     />
                     <div className="size-5 border-2 border-white/20 peer-checked:border-anhanga-yellow peer-checked:bg-anhanga-yellow transition duration-200 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-anhanga-yellow peer-focus-visible:outline-offset-2" />
                     <CheckCircle2 size={12} className="absolute text-black opacity-0 peer-checked:opacity-100 transition-opacity" />
                   </div>
                   <span className="text-xs text-zinc-400 leading-snug group-hover:text-zinc-300 transition-colors">
-                    Autorizo a Anhangá a me enviar novidades exclusivas conforme a{' '}
+                    Quero receber novidades exclusivas da Anhangá por e-mail.
+                  </span>
+                </label>
+
+                <p className="text-xs text-zinc-500 leading-relaxed">
+                  Ao entrar na lista, seus dados serão usados para avisos sobre pacotes do Lollapalooza. Consulte a{' '}
                     <a
                       href="/politica-privacidade/"
                       target="_blank"
@@ -240,8 +312,7 @@ const WaitlistSection: React.FC = () => {
                     >
                       Política de Privacidade
                     </a>.
-                  </span>
-                </label>
+                </p>
 
                 <AnimatePresence mode="wait">
                   {(localError || error) && (

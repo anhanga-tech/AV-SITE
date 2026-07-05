@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { m } from 'framer-motion';
 import { AirplaneTilt, PaperPlaneTilt, SpinnerGap } from '@phosphor-icons/react';
 import { useLeadCapture, createLeadEventId } from '@/hooks/useLeadCapture';
@@ -8,6 +8,7 @@ import { CorpFormFields } from './CorpFormFields';
 import { CorpLgpdConsent } from './CorpLgpdConsent';
 import { CorpSuccessState } from './CorpSuccessState';
 import { fadeUp } from './constants';
+import { pushFormAnalyticsEvent } from '@/utils/formAnalytics';
 
 interface CorpContactFormProps {
     whatsappUrl: string;
@@ -16,14 +17,77 @@ interface CorpContactFormProps {
 export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
     const { submitLead, isSubmitting, honeypotProps } = useLeadCapture();
     const { state, dispatch, isSubmittingRef, handleField, toggleLgpd } = useCorpFormReducer();
+    const startedRef = useRef(false);
+    const completedFields = useRef<Set<string> | null>(null);
+
+    useEffect(() => {
+        pushFormAnalyticsEvent({
+            event: 'form_view',
+            formType: 'corporate_lead',
+            formId: 'corporativo-contact-form',
+            destination: 'Corporativo',
+        });
+    }, []);
+
+    function trackField(fieldName: string, value: string | boolean) {
+        if (!startedRef.current) {
+            startedRef.current = true;
+            pushFormAnalyticsEvent({
+                event: 'form_start',
+                formType: 'corporate_lead',
+                formId: 'corporativo-contact-form',
+                destination: 'Corporativo',
+            });
+        }
+
+        const completed = typeof value === 'boolean' ? value : value.trim().length > 0;
+        const trackedFields = completedFields.current ?? (completedFields.current = new Set());
+        if (completed && !trackedFields.has(fieldName)) {
+            trackedFields.add(fieldName);
+            pushFormAnalyticsEvent({
+                event: 'field_complete',
+                formType: 'corporate_lead',
+                formId: 'corporativo-contact-form',
+                fieldName,
+                destination: 'Corporativo',
+            });
+        }
+    }
+
+    const handleTrackedField = (field: Parameters<typeof handleField>[0]) => {
+        const baseHandler = handleField(field);
+        return (event: React.ChangeEvent<HTMLInputElement>) => {
+            baseHandler(event);
+            trackField(field, event.target.value);
+        };
+    };
+
+    function handleTrackedLgpd(value: boolean) {
+        toggleLgpd(value);
+        trackField('lgpd', value);
+    }
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if (isSubmittingRef.current) return;
+        pushFormAnalyticsEvent({
+            event: 'submit_attempt',
+            formType: 'corporate_lead',
+            formId: 'corporativo-contact-form',
+            destination: 'Corporativo',
+        });
 
         const validation = validateCorpForm(state.form, state.acceptedLGPD);
         if (!validation.ok) {
             dispatch({ type: 'submit-error', message: validation.message, field: validation.field });
+            pushFormAnalyticsEvent({
+                event: 'field_error',
+                formType: 'corporate_lead',
+                formId: 'corporativo-contact-form',
+                fieldName: validation.field,
+                errorType: validation.field,
+                destination: 'Corporativo',
+            });
             return;
         }
 
@@ -45,8 +109,21 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
             );
 
             if (result.ok) {
+                pushFormAnalyticsEvent({
+                    event: 'submit_success',
+                    formType: 'corporate_lead',
+                    formId: 'corporativo-contact-form',
+                    destination: 'Corporativo',
+                });
                 dispatch({ type: 'submit-success' });
             } else {
+                pushFormAnalyticsEvent({
+                    event: 'submit_failure',
+                    formType: 'corporate_lead',
+                    formId: 'corporativo-contact-form',
+                    errorType: result.code,
+                    destination: 'Corporativo',
+                });
                 dispatch({
                     type: 'submit-error',
                     message: result.error || 'Ocorreu um erro ao enviar. Tente novamente.',
@@ -54,12 +131,19 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
                 isSubmittingRef.current = false;
             }
         } catch {
+            pushFormAnalyticsEvent({
+                event: 'submit_failure',
+                formType: 'corporate_lead',
+                formId: 'corporativo-contact-form',
+                errorType: 'unexpected',
+                destination: 'Corporativo',
+            });
             dispatch({ type: 'submit-error', message: 'Ocorreu um erro inesperado. Tente novamente.' });
             isSubmittingRef.current = false;
         }
     }
 
-    const showError = state.phase === 'error' && state.message;
+    const showError = state.phase === 'error' && state.message && (!state.field || state.field === 'lgpd');
     const lgpdError = state.phase === 'error' && !state.acceptedLGPD;
     const busy = state.phase === 'submitting' || isSubmitting;
 
@@ -86,11 +170,16 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
                     </div>
 
                     <div className="p-6 sm:p-8 space-y-5">
-                        <CorpFormFields form={state.form} onField={handleField} />
+                        <CorpFormFields
+                            form={state.form}
+                            onField={handleTrackedField}
+                            errorField={state.phase === 'error' ? state.field : undefined}
+                            errorMessage={state.phase === 'error' ? state.message : undefined}
+                        />
 
                         <CorpLgpdConsent
                             checked={state.acceptedLGPD}
-                            onChange={toggleLgpd}
+                            onChange={handleTrackedLgpd}
                             error={lgpdError}
                         />
 

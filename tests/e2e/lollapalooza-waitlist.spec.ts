@@ -1,14 +1,5 @@
 import { expect, test } from '@playwright/test';
 
-async function acceptLgpd(page: import('@playwright/test').Page) {
-  await page.locator('input[type="checkbox"]').first().evaluate((element) => {
-    const input = element as HTMLInputElement;
-    if (!input.checked) {
-      input.click();
-    }
-  });
-}
-
 test.describe('Lollapalooza evergreen landing waitlist', () => {
   test('should redirect the legacy year route to the evergreen route', async ({ page }) => {
     await page.goto('/lollapalooza-2026');
@@ -41,7 +32,6 @@ test.describe('Lollapalooza evergreen landing waitlist', () => {
 
     await page.locator('#lolla-waitlist-name').fill('Felipe William');
     await page.locator('#lolla-waitlist-email').fill('felipe@example.com');
-    await acceptLgpd(page);
 
     await page.getByRole('button', { name: /entrar na lista/i }).click();
 
@@ -51,6 +41,7 @@ test.describe('Lollapalooza evergreen landing waitlist', () => {
     expect(submitPayload).toMatchObject({
       name: 'Felipe William',
       email: 'felipe@example.com',
+      emailOptIn: false,
       sourcePage: '/lollapalooza',
       utms: {
         utm_source: 'google',

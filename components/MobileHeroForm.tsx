@@ -1,7 +1,8 @@
-import React, { useState, memo, useRef } from 'react';
+import React, { useEffect, useState, memo, useRef } from 'react';
 import { X } from 'lucide-react';
 import { openAiChat } from '../utils/aiChat';
 import { triggerHaptic } from '../utils/haptics';
+import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
 
 /**
  * MobileHeroForm Component - Optimized with React.memo
@@ -14,15 +15,52 @@ import { triggerHaptic } from '../utils/haptics';
 const MobileHeroForm: React.FC = memo(() => {
   const [mobileDestination, setMobileDestination] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const startedRef = useRef(false);
+
+  useEffect(() => {
+    pushFormAnalyticsEvent({
+      event: 'form_view',
+      formType: 'home_search',
+      formId: 'hero-search-mobile',
+    });
+  }, []);
+
+  const trackStart = (value: string) => {
+    if (!value.trim() || startedRef.current) return;
+    startedRef.current = true;
+    pushFormAnalyticsEvent({
+      event: 'form_start',
+      formType: 'home_search',
+      formId: 'hero-search-mobile',
+    });
+    pushFormAnalyticsEvent({
+      event: 'field_complete',
+      formType: 'home_search',
+      formId: 'hero-search-mobile',
+      fieldName: 'destination',
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     void triggerHaptic('light');
+    pushFormAnalyticsEvent({
+      event: 'submit_attempt',
+      formType: 'home_search',
+      formId: 'hero-search-mobile',
+      destination: mobileDestination,
+    });
     openAiChat({
       haptic: 'none',
       message: mobileDestination.trim()
         ? `Olá! Tenho interesse em viajar para ${mobileDestination.trim()}. Podem me ajudar com um orçamento?`
         : 'Olá! Gostaria de montar um roteiro personalizado. Podem me ajudar?',
+    });
+    pushFormAnalyticsEvent({
+      event: 'submit_success',
+      formType: 'home_search',
+      formId: 'hero-search-mobile',
+      destination: mobileDestination,
     });
   };
 
@@ -44,7 +82,10 @@ const MobileHeroForm: React.FC = memo(() => {
             ref={inputRef}
             type="text"
             value={mobileDestination}
-            onChange={(e) => setMobileDestination(e.target.value)}
+            onChange={(e) => {
+              setMobileDestination(e.target.value);
+              trackStart(e.target.value);
+            }}
             placeholder="Para onde você quer ir?"
             aria-label="Destino"
             className="flex-1 outline-none text-zinc-800 font-semibold placeholder-zinc-400 bg-transparent text-base"

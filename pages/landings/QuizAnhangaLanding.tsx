@@ -4,6 +4,7 @@ import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { useQuizCapture } from '../../hooks/useQuizCapture';
 import type { HoneypotProps } from '../../hooks/useAntiBot';
 import { getWhatsAppLink } from '../../utils/whatsapp';
+import { pushFormAnalyticsEvent } from '../../utils/formAnalytics';
 import { matchProfile, type ProfileKey } from '../../lib/quiz-scoring';
 import {
     selectMainDestination,
@@ -268,7 +269,21 @@ export default function QuizAnhangaLanding() {
         submittingRef.current = false;
 
         if (!result.ok) {
+            pushFormAnalyticsEvent({
+                event: 'submit_failure',
+                formType: 'quiz_lead',
+                formId: 'quiz-anhanga',
+                errorType: result.code,
+                destination: mainDest.name,
+            });
             dispatch({ type: 'SUBMIT_FAILED' });
+        } else {
+            pushFormAnalyticsEvent({
+                event: 'submit_success',
+                formType: 'quiz_lead',
+                formId: 'quiz-anhanga',
+                destination: mainDest.name,
+            });
         }
     }
 

@@ -4,7 +4,6 @@ export class ContactModal {
   readonly page: Page;
   readonly modal: Locator;
   readonly firstNameInput: Locator;
-  readonly lastNameInput: Locator;
   readonly whatsappInput: Locator;
   readonly emailInput: Locator;
   readonly optInCheckbox: Locator;
@@ -16,7 +15,6 @@ export class ContactModal {
     this.page = page;
     this.modal = page.getByRole('dialog', { name: 'Fale com um especialista' });
     this.firstNameInput = page.locator('#contact-firstName');
-    this.lastNameInput = page.locator('#contact-lastName');
     this.whatsappInput = page.locator('#contact-whatsapp');
     this.emailInput = page.locator('#contact-email');
     this.optInCheckbox = page.locator('#contact-optIn');
@@ -27,13 +25,11 @@ export class ContactModal {
 
   async fillForm(data: {
     firstName: string;
-    lastName?: string;
     whatsapp: string;
     email?: string;
     optIn?: boolean;
   }) {
     await this.firstNameInput.fill(data.firstName);
-    if (data.lastName) await this.lastNameInput.fill(data.lastName);
     await this.whatsappInput.fill(data.whatsapp);
     if (data.email) await this.emailInput.fill(data.email);
     if (data.optIn) {

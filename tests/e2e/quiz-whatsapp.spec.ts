@@ -43,7 +43,6 @@ test.describe('Quiz — captura de WhatsApp no resultado', () => {
         // Tela de lead.
         await expect(page.locator('#quiz-nome')).toBeVisible();
         await page.locator('#quiz-nome').fill('Maria');
-        await page.locator('#quiz-sobrenome').fill('Silva');
         await page.locator('#quiz-email').fill('maria@example.com');
         await page.getByRole('button', { name: /revelar meu perfil/i }).click();
 

@@ -16,6 +16,7 @@ import SearchButton from './search/SearchButton';
 import { buildSearchMessage, getGuestSummary, isDateInPast } from './search/helpers';
 import { useSearchFormDismiss, type PanelRegistryEntry } from './search/useSearchFormDismiss';
 import type { DestinationOption, OpenPanel } from './search/types';
+import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
 
 type ActivePanel = Exclude<OpenPanel, null>;
 
@@ -38,6 +39,37 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
   const [isSearchLoading, setIsSearchLoading] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const errorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const startedRef = useRef(false);
+  const completedFields = useRef<Set<'destination' | 'date' | 'budget'> | null>(null);
+
+  useEffect(() => {
+    pushFormAnalyticsEvent({
+      event: 'form_view',
+      formType: 'home_search',
+      formId: 'hero-search',
+    });
+  }, []);
+
+  const markStarted = useCallback((fieldName: 'destination' | 'date' | 'budget') => {
+    if (!startedRef.current) {
+      startedRef.current = true;
+      pushFormAnalyticsEvent({
+        event: 'form_start',
+        formType: 'home_search',
+        formId: 'hero-search',
+      });
+    }
+    const trackedFields = completedFields.current ?? (completedFields.current = new Set());
+    if (!trackedFields.has(fieldName)) {
+      trackedFields.add(fieldName);
+      pushFormAnalyticsEvent({
+        event: 'field_complete',
+        formType: 'home_search',
+        formId: 'hero-search',
+        fieldName,
+      });
+    }
+  }, []);
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -90,6 +122,7 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
   const handleDestinationChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setInputValue(value);
+    if (value.trim()) markStarted('destination');
     setOpenPanel('dest');
     setActiveSuggestionIndex(-1);
 
@@ -99,7 +132,7 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
     ));
 
     onDestinationMatch(exactMatch ? exactMatch.city : null);
-  }, [onDestinationMatch]);
+  }, [onDestinationMatch, markStarted]);
 
   const handleDestinationSelect = useCallback((destination: DestinationOption) => {
     setInputValue(destination.label);
@@ -173,6 +206,7 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
     if (!startDate || endDate) {
       setStartDate(date);
       setEndDate(null);
+      markStarted('date');
       return;
     }
 
@@ -184,7 +218,7 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
 
     setEndDate(date);
     closePanel('calendar');
-  }, [startDate, endDate, closePanel]);
+  }, [startDate, endDate, closePanel, markStarted]);
 
   const isDateSelected = useCallback((date: Date) => {
     if (!startDate) return false;
@@ -229,29 +263,34 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
 
   const handleBudgetSelect = useCallback((label: string) => {
     setBudget(label);
+    markStarted('budget');
     closePanel('budget');
-  }, [closePanel]);
+  }, [closePanel, markStarted]);
 
   const handleSearch = useCallback(() => {
     if (!inputValue.trim()) {
       if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
       setValidationError("Por favor, informe o destino.");
+      pushFormAnalyticsEvent({
+        event: 'field_error',
+        formType: 'home_search',
+        formId: 'hero-search',
+        fieldName: 'destination',
+        errorType: 'required',
+      });
       import('../utils/haptics').then(m => m.triggerHaptic('medium'));
-      errorTimeoutRef.current = setTimeout(() => setValidationError(null), 4000);
-      return;
-    }
-
-    if (!startDate) {
-      if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
-      setValidationError("Por favor, selecione a data de ida.");
-      import('../utils/haptics').then(m => m.triggerHaptic('medium'));
-      setOpenPanel('calendar');
       errorTimeoutRef.current = setTimeout(() => setValidationError(null), 4000);
       return;
     }
 
     setIsSearchLoading(true);
     setValidationError(null);
+    pushFormAnalyticsEvent({
+      event: 'submit_attempt',
+      formType: 'home_search',
+      formId: 'hero-search',
+      destination: inputValue,
+    });
 
     openAiChat({
       haptic: 'medium',
@@ -265,6 +304,12 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
         tripType,
         budget,
       }),
+    });
+    pushFormAnalyticsEvent({
+      event: 'submit_success',
+      formType: 'home_search',
+      formId: 'hero-search',
+      destination: inputValue,
     });
 
     setTimeout(() => {

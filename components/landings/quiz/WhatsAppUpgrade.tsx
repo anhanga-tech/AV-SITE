@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { getWhatsAppLink } from '../../../utils/whatsapp';
+import { pushFormAnalyticsEvent } from '../../../utils/formAnalytics';
 
 interface WhatsAppUpgradeProps {
     profileName: string;
@@ -33,8 +34,24 @@ export function WhatsAppUpgrade({ profileName, mainDestName, firstName, baseWaUr
 
     function handleSubmit() {
         if (!isValid || submitted) return;
+        pushFormAnalyticsEvent({
+            event: 'field_complete',
+            formType: 'quiz_lead',
+            formId: 'quiz-whatsapp-enrichment',
+            fieldName: 'whatsapp',
+            destination: mainDestName,
+        });
         onPhoneSubmit(phone);
         setSubmitted(true);
+    }
+
+    function trackWhatsAppOpened() {
+        pushFormAnalyticsEvent({
+            event: 'whatsapp_opened',
+            formType: 'quiz_lead',
+            formId: 'quiz-whatsapp-enrichment',
+            destination: mainDestName,
+        });
     }
 
     const waUrl = isValid && submitted
@@ -56,6 +73,7 @@ export function WhatsAppUpgrade({ profileName, mainDestName, firstName, baseWaUr
                     href={waUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={trackWhatsAppOpened}
                     data-tracking="result-quiz-whatsapp"
                 >
                     Montar minha viagem
@@ -93,6 +111,7 @@ export function WhatsAppUpgrade({ profileName, mainDestName, firstName, baseWaUr
                 href={baseWaUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={trackWhatsAppOpened}
                 data-tracking="result-quiz-skip"
             >
                 Ir pro WhatsApp sem deixar número →

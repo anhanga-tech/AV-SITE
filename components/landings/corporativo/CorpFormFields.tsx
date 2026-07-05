@@ -1,15 +1,28 @@
 import React from 'react';
-import type { FormFields } from './useCorpFormReducer';
+import type { ErrorField, FormFields } from './useCorpFormReducer';
 
 interface CorpFormFieldsProps {
     form: FormFields;
     onField: (field: keyof FormFields) => (e: React.ChangeEvent<HTMLInputElement>) => void;
+    errorField?: ErrorField;
+    errorMessage?: string;
 }
 
 const INPUT_CLASS =
-    'w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors duration-150 placeholder-zinc-500';
+    'w-full px-4 py-2.5 rounded-xl border-2 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors duration-150 placeholder-zinc-500';
 
-export function CorpFormFields({ form, onField }: CorpFormFieldsProps) {
+function fieldClass(hasError: boolean): string {
+    return `${INPUT_CLASS} ${hasError ? 'border-red-400' : 'border-zinc-200'}`;
+}
+
+function FieldError({ show, message }: { show: boolean; message?: string }) {
+    if (!show || !message) return null;
+    return <span className="mt-1 block text-xs font-semibold text-red-500" role="alert">{message}</span>;
+}
+
+export function CorpFormFields({ form, onField, errorField, errorMessage }: CorpFormFieldsProps) {
+    const isError = (field: keyof FormFields) => errorField === field;
+
     return (
         <>
             <div className="grid grid-cols-2 gap-4">
@@ -25,8 +38,10 @@ export function CorpFormFields({ form, onField }: CorpFormFieldsProps) {
                         value={form.firstName}
                         onChange={onField('firstName')}
                         required
-                        className={INPUT_CLASS}
+                        aria-invalid={isError('firstName') || undefined}
+                        className={fieldClass(isError('firstName'))}
                     />
+                    <FieldError show={isError('firstName')} message={errorMessage} />
                 </div>
                 <div>
                     <label htmlFor="lastName" className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">
@@ -40,14 +55,16 @@ export function CorpFormFields({ form, onField }: CorpFormFieldsProps) {
                         value={form.lastName}
                         onChange={onField('lastName')}
                         required
-                        className={INPUT_CLASS}
+                        aria-invalid={isError('lastName') || undefined}
+                        className={fieldClass(isError('lastName'))}
                     />
+                    <FieldError show={isError('lastName')} message={errorMessage} />
                 </div>
             </div>
 
             <div>
                 <label htmlFor="email" className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">
-                    E-mail corporativo <span className="text-brand-cyan">*</span>
+                    E-mail profissional <span className="text-brand-cyan">*</span>
                 </label>
                 <input
                     id="email"
@@ -57,8 +74,10 @@ export function CorpFormFields({ form, onField }: CorpFormFieldsProps) {
                     value={form.email}
                     onChange={onField('email')}
                     required
-                    className={INPUT_CLASS}
+                    aria-invalid={isError('email') || undefined}
+                    className={fieldClass(isError('email'))}
                 />
+                <FieldError show={isError('email')} message={errorMessage} />
             </div>
 
             <div>
@@ -73,8 +92,10 @@ export function CorpFormFields({ form, onField }: CorpFormFieldsProps) {
                     value={form.whatsapp}
                     onChange={onField('whatsapp')}
                     required
-                    className={INPUT_CLASS}
+                    aria-invalid={isError('whatsapp') || undefined}
+                    className={fieldClass(isError('whatsapp'))}
                 />
+                <FieldError show={isError('whatsapp')} message={errorMessage} />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -89,7 +110,7 @@ export function CorpFormFields({ form, onField }: CorpFormFieldsProps) {
                         autoComplete="organization"
                         value={form.empresa}
                         onChange={onField('empresa')}
-                        className={INPUT_CLASS}
+                        className={fieldClass(false)}
                     />
                 </div>
                 <div>
@@ -103,7 +124,7 @@ export function CorpFormFields({ form, onField }: CorpFormFieldsProps) {
                         autoComplete="organization-title"
                         value={form.cargo}
                         onChange={onField('cargo')}
-                        className={INPUT_CLASS}
+                        className={fieldClass(false)}
                     />
                 </div>
             </div>

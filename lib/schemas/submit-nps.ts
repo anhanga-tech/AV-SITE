@@ -18,9 +18,8 @@ export const SubmitNpsBodySchema = z.object({
     firstname: z.string().trim().min(1).max(100).transform(cleanString).refine((v) => v.length <= 100, { message: 'Nome inválido.' }),
     email:     z.email().max(254),
     score:     z.number().int().min(0).max(10),
-    reason:    z.string().trim().min(1).max(2000).transform(cleanString),
+    reason:    z.string().trim().max(2000).default('').transform(cleanString),
     highlight: z.string().trim().max(2000).default('').transform(cleanString),
 });
 
 export type SubmitNpsRequest = z.infer<typeof SubmitNpsBodySchema>;
-

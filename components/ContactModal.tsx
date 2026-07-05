@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { CheckCircle, X } from '@phosphor-icons/react';
 import { useContactForm } from '../hooks/useContactForm';
 import type { ContactModalOptions } from '../utils/contactForm';
+import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
 
 const ContactModal: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -38,6 +39,11 @@ const ContactModal: React.FC = () => {
         if (!dialog) return;
 
         if (isOpen && !dialog.open) {
+            pushFormAnalyticsEvent({
+                event: 'form_view',
+                formType: 'contact_modal',
+                formId: options.source ?? 'contact-modal',
+            });
             previousBodyOverflow.current = document.body.style.overflow;
             document.body.style.overflow = 'hidden';
             dialog.showModal();
@@ -50,7 +56,7 @@ const ContactModal: React.FC = () => {
         return () => {
             document.body.style.overflow = previousBodyOverflow.current;
         };
-    }, [isOpen]);
+    }, [isOpen, options.source]);
 
     useEffect(() => {
         if (submitted) closeButtonRef.current?.focus();
@@ -134,37 +140,21 @@ const ContactModal: React.FC = () => {
                     >
                         {/* Honeypot: hidden from humans, blind form-fillers populate it. */}
                         <input {...honeypotProps} />
-                        <div className="flex gap-3">
-                            <div className="flex-1">
-                                <label htmlFor="contact-firstName" className="mb-1 block text-xs font-bold uppercase tracking-wider text-zinc-500">
-                                    Nome *
-                                </label>
-                                <input
-                                    ref={firstFieldRef}
-                                    id="contact-firstName"
-                                    type="text"
-                                    autoComplete="given-name"
-                                    value={fields.firstName}
-                                    onChange={(event) => setField('firstName', event.target.value)}
-                                    required
-                                    className="w-full rounded-xl border-2 border-zinc-200 px-3 py-2.5 text-sm font-medium text-zinc-800 outline-none transition-colors placeholder-zinc-400 focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan"
-                                    placeholder="ex: Maria"
-                                />
-                            </div>
-                            <div className="flex-1">
-                                <label htmlFor="contact-lastName" className="mb-1 block text-xs font-bold uppercase tracking-wider text-zinc-500">
-                                    Sobrenome
-                                </label>
-                                <input
-                                    id="contact-lastName"
-                                    type="text"
-                                    autoComplete="family-name"
-                                    value={fields.lastName}
-                                    onChange={(event) => setField('lastName', event.target.value)}
-                                    className="w-full rounded-xl border-2 border-zinc-200 px-3 py-2.5 text-sm font-medium text-zinc-800 outline-none transition-colors placeholder-zinc-400 focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan"
-                                    placeholder="ex: Silva"
-                                />
-                            </div>
+                        <div>
+                            <label htmlFor="contact-firstName" className="mb-1 block text-xs font-bold uppercase tracking-wider text-zinc-500">
+                                Nome *
+                            </label>
+                            <input
+                                ref={firstFieldRef}
+                                id="contact-firstName"
+                                type="text"
+                                autoComplete="name"
+                                value={fields.firstName}
+                                onChange={(event) => setField('firstName', event.target.value)}
+                                required
+                                className="w-full rounded-xl border-2 border-zinc-200 px-3 py-2.5 text-sm font-medium text-zinc-800 outline-none transition-colors placeholder-zinc-400 focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan"
+                                placeholder="ex: Maria Silva"
+                            />
                         </div>
 
                         <div>
