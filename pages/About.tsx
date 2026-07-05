@@ -53,6 +53,11 @@ const TRUST_FAQ_ITEMS = [
     answer:
       'Sim. A sede fica na Av. Dom Pedro I, 773 — Vila Monumento, São Paulo (SP), CEP 01552-001. O atendimento pode ser presencial, por WhatsApp no (11) 5283-3309 ou pelo chat com IA disponível no site.',
   },
+  {
+    question: 'A Anhangá atende viagens corporativas e em grupo?',
+    answer:
+      'Sim. Além do atendimento consultivo para viajantes individuais e famílias, a Anhangá organiza viagens corporativas, eventos e viagens de incentivo para empresas e grupos, com um consultor dedicado cuidando de logística, orçamento e prazos. Conheça o atendimento corporativo em anhanga.tur.br/corporativo.',
+  },
 ];
 
 // Consultores expostos como entidades Person (E-E-A-T) ligados à organização.

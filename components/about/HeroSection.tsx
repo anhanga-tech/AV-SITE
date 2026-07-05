@@ -15,14 +15,14 @@ export const HeroSection: React.FC = () => (
     custom={0}
   >
     <div className="inline-block relative mb-6">
-      <span className="absolute inset-0 bg-brand-cyan/20 transform -skew-x-12 rounded-lg"></span>
-      <span className="relative px-4 py-1 text-brand-dark font-black uppercase tracking-widest text-sm flex items-center gap-2">
-        <Sparkles className="size-4 text-brand-cyan" /> Nossa Essência
+      <span className="absolute inset-0 bg-anhanga-action/20 transform -skew-x-12 rounded-lg"></span>
+      <span className="relative px-4 py-1 text-anhanga-dark font-black uppercase tracking-widest text-sm flex items-center gap-2">
+        <Sparkles className="size-4 text-anhanga-action" aria-hidden="true" /> Nossa Essência
       </span>
     </div>
-    <h1 className="text-5xl md:text-6xl font-black text-brand-dark mb-6 leading-tight">
+    <h1 className="text-5xl md:text-6xl font-black text-anhanga-dark mb-6 leading-tight">
       Viagens com alma, <br />
-      <span className="text-brand-cyan">
+      <span className="text-anhanga-action">
         design e zero estresse.
       </span>
     </h1>
@@ -35,7 +35,7 @@ export const HeroSection: React.FC = () => (
         size="lg"
         onClick={() => openContactModal({ source: 'about' })}
         className="btn-whatsapp btn-specialist font-black"
-        rightIcon={<Sparkles className="size-5" />}
+        rightIcon={<Sparkles className="size-5" aria-hidden="true" />}
         data-tracking="hero-about"
       >
         Solicitar Orçamento

@@ -31,7 +31,7 @@ export const ConsultoresSection: React.FC<ConsultoresSectionProps> = ({ team }) 
       {team.map((member, i) => (
         <m.div
           key={member.id}
-          className="bg-white p-8 rounded-[2.5rem] border-2 border-zinc-100 shadow-sm hover:shadow-xl transition duration-300 flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left"
+          className="bg-white p-8 rounded-2xl shadow-float hover:shadow-float-lg transition duration-300 flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
@@ -59,9 +59,9 @@ export const ConsultoresSection: React.FC<ConsultoresSectionProps> = ({ team }) 
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`Instagram de ${member.name}`}
-                    className="size-9 rounded-full bg-anhanga-action/10 text-anhanga-action flex items-center justify-center hover:bg-anhanga-action hover:text-white transition-colors"
+                    className="size-11 rounded-full bg-anhanga-action/10 text-anhanga-action flex items-center justify-center hover:bg-anhanga-action hover:text-white transition-colors"
                   >
-                    <InstagramLogo className="size-4" weight="fill" />
+                    <InstagramLogo className="size-4" weight="fill" aria-hidden="true" />
                   </a>
                 )}
                 {member.social.linkedin && (
@@ -70,9 +70,9 @@ export const ConsultoresSection: React.FC<ConsultoresSectionProps> = ({ team }) 
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`LinkedIn de ${member.name}`}
-                    className="size-9 rounded-full bg-anhanga-action/10 text-anhanga-action flex items-center justify-center hover:bg-anhanga-action hover:text-white transition-colors"
+                    className="size-11 rounded-full bg-anhanga-action/10 text-anhanga-action flex items-center justify-center hover:bg-anhanga-action hover:text-white transition-colors"
                   >
-                    <LinkedinLogo className="size-4" weight="fill" />
+                    <LinkedinLogo className="size-4" weight="fill" aria-hidden="true" />
                   </a>
                 )}
               </div>
