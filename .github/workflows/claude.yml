@@ -123,5 +123,5 @@ jobs:
             Você não tem acesso a Bash além de comandos git de plumbing (add/commit/rm) e não tem `gh` disponível. Não tente instalar dependências, nem rodar lint/typecheck/build/testes — isso já roda no CI e você não tem permissão para executá-los. Revise usando apenas Read/Grep/Glob no checkout e reporte via comentário/inline comment.
 
           claude_args: |
-            --max-turns 30
+            --max-turns 45
             --allowedTools "mcp__github_inline_comment__create_inline_comment"
