@@ -1,6 +1,6 @@
 import React from 'react';
 import { m } from 'framer-motion';
-import { Award, Anchor, Ship, MapPin } from 'lucide-react';
+import { Award, Anchor, MapPin } from 'lucide-react';
 import { fadeUp } from './aboutMotion';
 
 const CREDENTIAL_BADGES = [
