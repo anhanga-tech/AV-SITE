@@ -144,7 +144,7 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
     }
 
     const showError = state.phase === 'error' && state.message && (!state.field || state.field === 'lgpd');
-    const lgpdError = state.phase === 'error' && !state.acceptedLGPD;
+    const lgpdError = state.phase === 'error' && state.field === 'lgpd';
     const busy = state.phase === 'submitting' || isSubmitting;
 
     return (
