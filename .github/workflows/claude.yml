@@ -118,6 +118,8 @@ jobs:
 
             Não repita o que já é coberto por lint, typecheck ou CI. Não comente sobre estilo já garantido por ferramentas automatizadas. Poste um resumo curto e comentários inline apenas onde houver um problema real e acionável — prefira silêncio a ruído.
 
+            Você não tem acesso a Bash além de comandos git de plumbing (add/commit/rm) e não tem `gh` disponível. Não tente instalar dependências, nem rodar lint/typecheck/build/testes — isso já roda no CI e você não tem permissão para executá-los. Revise usando apenas Read/Grep/Glob no checkout e reporte via comentário/inline comment.
+
           claude_args: |
-            --max-turns 15
+            --max-turns 30
             --allowedTools "mcp__github_inline_comment__create_inline_comment"
