@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { ChatLeadForm, TextField, validateLeadForm } from '../components/ChatLeadForm.tsx';
+import { ChatLeadForm, TextField } from '../components/ChatLeadForm.tsx';
+import { validateLeadForm } from '../lib/chat-lead-form-logic.ts';
 
 const baseProps = {
   id: 'lead-email',
