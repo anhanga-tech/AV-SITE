@@ -228,7 +228,7 @@ const API_ENDPOINTS: readonly ApiEndpointDefinition[] = [
                 'application/json': {
                     schema: {
                         type: 'object',
-                        required: ['firstname', 'email', 'score', 'reason'],
+                        required: ['firstname', 'email', 'score'],
                         properties: {
                             firstname: { type: 'string' },
                             email: { type: 'string', format: 'email' },

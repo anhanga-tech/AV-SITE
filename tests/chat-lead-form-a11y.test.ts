@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { TextField, validateLeadForm } from '../components/ChatLeadForm.tsx';
+import { ChatLeadForm, TextField, validateLeadForm } from '../components/ChatLeadForm.tsx';
 
 const baseProps = {
   id: 'lead-email',
@@ -65,4 +65,34 @@ test('validateLeadForm — sem aceite de LGPD a submissão é bloqueada', () => 
     assert.ok(result.fieldErrors);
     assert.equal(result.fieldErrors.lgpd, 'Você deve aceitar os termos');
   }
+});
+
+test('ChatLeadForm oferece caminho direto para WhatsApp sem salvar lead', () => {
+  const html = renderToStaticMarkup(
+    React.createElement(ChatLeadForm, {
+      destination: 'Orlando',
+      defaultBantSummary: 'Need: Disney',
+      getWhatsAppUrl: () => 'https://wa.me/5511999999999',
+      prepareLeadSubmitPayload: () => ({
+        firstName: 'Ana',
+        lastName: 'Silva',
+        email: 'ana@example.com',
+        whatsapp: '+5511999999999',
+        bantSummary: 'Need: Disney',
+        destination: 'Orlando',
+        event_id: 'lead_test',
+        utms: {
+          utm_source: null,
+          utm_medium: null,
+          utm_campaign: null,
+          utm_term: null,
+          utm_content: null,
+        },
+      }),
+      isSubmittingLead: false,
+      onFinalizeLead: async () => ({ ok: true }),
+    }),
+  );
+
+  assert.match(html, /Ir direto para o WhatsApp/);
 });

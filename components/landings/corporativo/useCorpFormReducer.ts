@@ -10,7 +10,7 @@ export type FormFields = {
     cargo: string;
 };
 
-type ErrorField = 'required' | 'email' | 'whatsapp' | 'lgpd';
+export type ErrorField = keyof FormFields | 'lgpd';
 
 type IdleState = { phase: 'idle'; form: FormFields; acceptedLGPD: boolean };
 type SubmittingState = { phase: 'submitting'; form: FormFields; acceptedLGPD: boolean };
@@ -83,12 +83,21 @@ type ValidationResult =
     | { ok: false; message: string; field: ErrorField };
 
 export function validateCorpForm(form: FormFields, acceptedLGPD: boolean): ValidationResult {
-    if (!form.firstName.trim() || !form.lastName.trim() || !form.email.trim() || !form.whatsapp.trim()) {
-        return { ok: false, message: 'Preencha todos os campos obrigatórios', field: 'required' };
+    if (!form.firstName.trim()) {
+        return { ok: false, message: 'Informe seu nome.', field: 'firstName' };
+    }
+    if (!form.lastName.trim()) {
+        return { ok: false, message: 'Informe seu sobrenome.', field: 'lastName' };
+    }
+    if (!form.email.trim()) {
+        return { ok: false, message: 'Informe seu e-mail profissional.', field: 'email' };
+    }
+    if (!form.whatsapp.trim()) {
+        return { ok: false, message: 'Informe seu WhatsApp.', field: 'whatsapp' };
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(form.email.trim())) {
-        return { ok: false, message: 'Insira um e-mail corporativo válido', field: 'email' };
+        return { ok: false, message: 'Insira um e-mail profissional válido', field: 'email' };
     }
     if (!normalizeWhatsappNumber(form.whatsapp)) {
         return { ok: false, message: 'Insira um número de WhatsApp válido', field: 'whatsapp' };

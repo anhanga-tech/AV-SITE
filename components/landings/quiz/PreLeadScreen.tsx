@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { LeadForm, TravelerProfile } from '../../../data/quiz';
 import type { HoneypotProps } from '../../../hooks/useAntiBot';
+import { pushFormAnalyticsEvent } from '../../../utils/formAnalytics';
 
 interface PreLeadScreenProps {
     profile: TravelerProfile;
@@ -24,19 +25,74 @@ export function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting, initial
         aceite: false,
     }));
     const [errors, setErrors] = useState<Partial<Record<keyof LeadForm, string>>>({});
+    const startedRef = useRef(false);
+    const completedFields = useRef<Set<string> | null>(null);
+
+    useEffect(() => {
+        pushFormAnalyticsEvent({
+            event: 'form_view',
+            formType: 'quiz_lead',
+            formId: 'quiz-anhanga',
+            destination: profile.name,
+        });
+    }, [profile.name]);
+
+    function trackField(fieldName: 'name' | 'email' | 'marketingOptIn', value: string | boolean) {
+        if (!startedRef.current) {
+            startedRef.current = true;
+            pushFormAnalyticsEvent({
+                event: 'form_start',
+                formType: 'quiz_lead',
+                formId: 'quiz-anhanga',
+                destination: profile.name,
+            });
+        }
+
+        const completed = typeof value === 'boolean' ? value : value.trim().length > 0;
+        const trackedFields = completedFields.current ?? (completedFields.current = new Set());
+        if (completed && !trackedFields.has(fieldName)) {
+            trackedFields.add(fieldName);
+            pushFormAnalyticsEvent({
+                event: 'field_complete',
+                formType: 'quiz_lead',
+                formId: 'quiz-anhanga',
+                fieldName,
+                destination: profile.name,
+            });
+        }
+    }
 
     function update<K extends keyof LeadForm>(k: K, v: LeadForm[K]) {
         setForm((f) => ({ ...f, [k]: v }));
         setErrors((e) => ({ ...e, [k]: undefined }));
+        if (k === 'nome') trackField('name', String(v));
+        if (k === 'email') trackField('email', String(v));
+        if (k === 'aceite') trackField('marketingOptIn', Boolean(v));
     }
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
+        pushFormAnalyticsEvent({
+            event: 'submit_attempt',
+            formType: 'quiz_lead',
+            formId: 'quiz-anhanga',
+            destination: profile.name,
+        });
         const errs: typeof errors = {};
         if (!form.nome.trim()) errs.nome = 'Conta pra gente seu nome';
-        if (!form.sobrenome.trim()) errs.sobrenome = 'E o sobrenome?';
         if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email)) errs.email = 'E-mail inválido';
-        if (Object.keys(errs).length) { setErrors(errs); return; }
+        if (Object.keys(errs).length) {
+            setErrors(errs);
+            pushFormAnalyticsEvent({
+                event: 'field_error',
+                formType: 'quiz_lead',
+                formId: 'quiz-anhanga',
+                errorType: errs.email ? 'email' : 'required',
+                fieldName: errs.email ? 'email' : 'name',
+                destination: profile.name,
+            });
+            return;
+        }
         onSubmit(form);
     }
 
@@ -82,20 +138,6 @@ export function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting, initial
                             autoComplete="given-name"
                         />
                         {errors.nome && <span className="quiz-err">{errors.nome}</span>}
-                    </div>
-
-                    <div className="quiz-field">
-                        <label htmlFor="quiz-sobrenome">Sobrenome</label>
-                        <input
-                            id="quiz-sobrenome"
-                            type="text"
-                            placeholder="Seu sobrenome"
-                            value={form.sobrenome}
-                            onChange={(e) => update('sobrenome', e.target.value)}
-                            className={errors.sobrenome ? 'has-error' : ''}
-                            autoComplete="family-name"
-                        />
-                        {errors.sobrenome && <span className="quiz-err">{errors.sobrenome}</span>}
                     </div>
 
                     <div className="quiz-field">

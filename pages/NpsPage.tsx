@@ -1,5 +1,5 @@
 import type { FormEvent } from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { BRAND_LOGO_WHITE_URL } from '../lib/media-assets';
 import { NpsTextarea } from '../components/nps/NpsTextarea';
@@ -8,6 +8,7 @@ import { NpsThankPromoter } from '../components/nps/NpsThankPromoter';
 import { NpsThankOther } from '../components/nps/NpsThankOther';
 import { Seo } from '../components/Seo';
 import { useAntiBot } from '../hooks/useAntiBot';
+import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
 
 type PageState = 'form' | 'thank-promoter' | 'thank-other';
 
@@ -75,6 +76,8 @@ export default function NpsPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [year] = useState(() => new Date().getFullYear());
   const { getAntiBotFields, honeypotProps } = useAntiBot();
+  const startedRef = useRef(false);
+  const completedFields = useRef<Set<string> | null>(null);
 
   useEffect(() => {
     const prev = document.title;
@@ -82,12 +85,46 @@ export default function NpsPage() {
     return () => { document.title = prev; };
   }, []);
 
+  useEffect(() => {
+    pushFormAnalyticsEvent({
+      event: 'form_view',
+      formType: 'nps',
+      formId: 'post-trip-nps',
+    });
+  }, []);
+
+  function markStarted(fieldName: 'score' | 'reason' | 'highlight') {
+    if (!startedRef.current) {
+      startedRef.current = true;
+      pushFormAnalyticsEvent({
+        event: 'form_start',
+        formType: 'nps',
+        formId: 'post-trip-nps',
+      });
+    }
+    const trackedFields = completedFields.current ?? (completedFields.current = new Set());
+    if (!trackedFields.has(fieldName)) {
+      trackedFields.add(fieldName);
+      pushFormAnalyticsEvent({
+        event: 'field_complete',
+        formType: 'nps',
+        formId: 'post-trip-nps',
+        fieldName,
+      });
+    }
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (score === null) return;
 
     setSubmitting(true);
     setErrorMessage('');
+    pushFormAnalyticsEvent({
+      event: 'submit_attempt',
+      formType: 'nps',
+      formId: 'post-trip-nps',
+    });
 
     try {
       const res = await fetch('/api/submit-nps', {
@@ -110,15 +147,26 @@ export default function NpsPage() {
         );
       }
 
+      pushFormAnalyticsEvent({
+        event: 'submit_success',
+        formType: 'nps',
+        formId: 'post-trip-nps',
+      });
       setPageState(score >= 9 ? 'thank-promoter' : 'thank-other');
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : 'Erro inesperado. Tente novamente.');
+      pushFormAnalyticsEvent({
+        event: 'submit_failure',
+        formType: 'nps',
+        formId: 'post-trip-nps',
+        errorType: 'api',
+      });
     } finally {
       setSubmitting(false);
     }
   }
 
-  const submitEnabled = score !== null && !!reason.trim() && !submitting;
+  const submitEnabled = score !== null && !submitting;
 
   return (
     <>
@@ -157,7 +205,10 @@ export default function NpsPage() {
 
                 <NpsScoreSelector
                   score={score}
-                  onSelect={setScore}
+                  onSelect={(nextScore) => {
+                    setScore(nextScore);
+                    markStarted('score');
+                  }}
                 />
 
                 <div className="mb-8">
@@ -165,17 +216,22 @@ export default function NpsPage() {
                     htmlFor="nps-reason"
                     className="block text-xs font-black uppercase tracking-[0.15em] text-slate-400 mb-2.5"
                   >
-                    O que te levou a dar essa nota?
+                    Quer contar o motivo?
+                    <span className="normal-case font-normal tracking-normal text-slate-600">
+                      {' '}(opcional)
+                    </span>
                   </label>
                   <NpsTextarea
                     id="nps-reason"
                     value={reason}
-                    onChange={setReason}
+                    onChange={(value) => {
+                      setReason(value);
+                      if (value.trim()) markStarted('reason');
+                    }}
                     placeholder="Conte-nos sua experiência..."
                     rows={4}
-                    required
                     maxLength={2000}
-                    aria-label="O que te levou a dar essa nota?"
+                    aria-label="Quer contar o motivo?"
                   />
                 </div>
 
@@ -192,7 +248,10 @@ export default function NpsPage() {
                   <NpsTextarea
                     id="nps-highlight"
                     value={highlight}
-                    onChange={setHighlight}
+                    onChange={(value) => {
+                      setHighlight(value);
+                      if (value.trim()) markStarted('highlight');
+                    }}
                     placeholder="Um momento especial que ficou na memória..."
                     rows={3}
                     maxLength={2000}

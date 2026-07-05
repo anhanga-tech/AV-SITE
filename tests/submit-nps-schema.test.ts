@@ -74,9 +74,12 @@ test('rejeita firstname acima de 100 chars', () => {
     assert.equal(result.success, false);
 });
 
-test('rejeita reason vazia', () => {
+test('aceita reason vazia e normaliza para string vazia', () => {
     const result = SubmitNpsBodySchema.safeParse({ ...VALID, reason: '' });
-    assert.equal(result.success, false);
+    assert.equal(result.success, true);
+    if (result.success) {
+        assert.equal(result.data.reason, '');
+    }
 });
 
 test('rejeita reason acima de 2000 chars', () => {
@@ -104,9 +107,12 @@ test('rejeita whitespace-only firstname', () => {
     assert.equal(result.success, false);
 });
 
-test('rejeita whitespace-only reason', () => {
+test('aceita whitespace-only reason e normaliza para string vazia', () => {
     const result = SubmitNpsBodySchema.safeParse({ ...VALID, reason: '   ' });
-    assert.equal(result.success, false);
+    assert.equal(result.success, true);
+    if (result.success) {
+        assert.equal(result.data.reason, '');
+    }
 });
 
 test('escapa angle brackets em reason (sanitização de fronteira)', () => {

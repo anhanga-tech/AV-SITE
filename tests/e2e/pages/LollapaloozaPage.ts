@@ -35,7 +35,7 @@ export class LollapaloozaPage {
 
     if (data.acceptLgpd !== false) {
       // Direct label click is most reliable for sr-only inputs
-      await this.page.locator('label').filter({ hasText: 'Autorizo a Anhangá' }).click();
+      await this.page.locator('label').filter({ hasText: 'Quero receber novidades' }).click();
 
       // If click doesn't work (e.g. mobile overlap), fallback to evaluate but wait for React
       const isChecked = await this.lgpdCheckbox.isChecked();

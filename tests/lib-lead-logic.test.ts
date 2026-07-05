@@ -6,10 +6,41 @@ import {
     maskPhone,
     maskName,
     cleanString,
+    splitFullName,
     normalizeNullable,
     normalizeUtms,
     normalizeTracking,
 } from '../lib/lead-logic.ts';
+
+// ─── splitFullName ────────────────────────────────────────────────────────────
+
+test('splitFullName preserva um sobrenome explícito quando fornecido', () => {
+    assert.deepEqual(splitFullName('João', 'Silva'), { firstName: 'João', lastName: 'Silva' });
+});
+
+test('splitFullName deriva o sobrenome do nome completo quando não há explícito', () => {
+    assert.deepEqual(splitFullName('Maria Silva'), { firstName: 'Maria', lastName: 'Silva' });
+});
+
+test('splitFullName junta os tokens restantes como sobrenome', () => {
+    assert.deepEqual(splitFullName('Ana Maria de Souza'), { firstName: 'Ana', lastName: 'Maria de Souza' });
+});
+
+test('splitFullName dá precedência ao sobrenome explícito sobre o nome completo', () => {
+    assert.deepEqual(splitFullName('João Silva', 'Souza'), { firstName: 'João', lastName: 'Souza' });
+});
+
+test('splitFullName colapsa espaços múltiplos e faz trim', () => {
+    assert.deepEqual(splitFullName('  João   Pedro  ', ''), { firstName: 'João', lastName: 'Pedro' });
+});
+
+test('splitFullName com só o primeiro nome resulta em sobrenome vazio', () => {
+    assert.deepEqual(splitFullName('João', ''), { firstName: 'João', lastName: '' });
+});
+
+test('splitFullName com nome vazio não inventa nome (sem fallback)', () => {
+    assert.deepEqual(splitFullName('   ', '  '), { firstName: '', lastName: '' });
+});
 
 // ─── cleanString ──────────────────────────────────────────────────────────────
 

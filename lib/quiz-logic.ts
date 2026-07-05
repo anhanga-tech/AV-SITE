@@ -1,7 +1,18 @@
-import { cleanString, normalizeNullable, normalizeTracking, normalizeUtms, normalizeWhatsappNumber } from './lead-logic';
+import { cleanString, normalizeNullable, normalizeTracking, normalizeUtms, normalizeWhatsappNumber, splitFullName } from './lead-logic';
 import type { SubmitQuizRequest } from '../types/quiz';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Derives firstName/lastName from the quiz form via {@link splitFullName},
+ *  applying the quiz-specific "Viajante" fallback when the name is empty so the
+ *  WhatsApp copy and CRM payload always have a first name. */
+export function deriveQuizLeadName(
+    nome: string,
+    sobrenome: string,
+): { firstName: string; lastName: string } {
+    const { firstName, lastName } = splitFullName(nome, sobrenome);
+    return { firstName: firstName || 'Viajante', lastName };
+}
 
 export function validateQuizPayload(
     payload: unknown,

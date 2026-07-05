@@ -1,9 +1,10 @@
-import React, { memo, useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import { CheckCircle2, ExternalLink, Loader2 } from 'lucide-react';
 import { createLeadEventId, pushGenerateLeadDataLayerEvent } from '../hooks/useLeadCapture';
 import type { SubmitLeadRequest } from '../types/leadCapture';
 import { normalizeWhatsappNumber } from '../lib/lead-logic';
 import { triggerHaptic } from '../utils/haptics';
+import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
 
 export interface LeadFinalizePayload {
   firstName: string;
@@ -186,6 +187,62 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
   const [notice, setNotice] = useState<string | null>(null);
   const [isLocallySubmitting, setIsLocallySubmitting] = useState(false);
   const isProcessingRef = React.useRef(false);
+  const startedRef = useRef(false);
+  const completedFields = useRef<Set<string> | null>(null);
+
+  useEffect(() => {
+    pushFormAnalyticsEvent({
+      event: 'form_view',
+      formType: 'ai_chatbot_lead',
+      formId: 'chat-lead-form',
+      destination,
+    });
+  }, [destination]);
+
+  function trackField(fieldName: keyof FieldErrors, value: string | boolean) {
+    if (!startedRef.current) {
+      startedRef.current = true;
+      pushFormAnalyticsEvent({
+        event: 'form_start',
+        formType: 'ai_chatbot_lead',
+        formId: 'chat-lead-form',
+        destination,
+      });
+    }
+
+    const completed = typeof value === 'boolean' ? value : value.trim().length > 0;
+    const trackedFields = completedFields.current ?? (completedFields.current = new Set());
+    if (completed && !trackedFields.has(fieldName)) {
+      trackedFields.add(fieldName);
+      pushFormAnalyticsEvent({
+        event: 'field_complete',
+        formType: 'ai_chatbot_lead',
+        formId: 'chat-lead-form',
+        fieldName,
+        destination,
+      });
+    }
+  }
+
+  const buildDirectWhatsAppPayload = (): LeadFinalizePayload => ({
+    firstName: firstName.trim() || 'Viajante',
+    lastName: lastName.trim(),
+    email: email.trim().toLowerCase(),
+    whatsapp: normalizeWhatsappNumber(whatsapp, countryCode) ?? '',
+    bantSummary: defaultBantSummary || 'Não informado',
+    destination: destination?.trim() || 'roteiro personalizado',
+  });
+
+  const openDirectWhatsApp = () => {
+    void triggerHaptic('light');
+    pushFormAnalyticsEvent({
+      event: 'whatsapp_opened',
+      formType: 'ai_chatbot_direct_whatsapp',
+      formId: 'chat-lead-direct-whatsapp',
+      destination,
+    });
+    openWhatsAppWindow(getWhatsAppUrl(buildDirectWhatsAppPayload()));
+  };
 
   const submitLeadForm = async (e: React.MouseEvent<HTMLButtonElement>) => {
     if (isSubmittingLead || isLocallySubmitting || isProcessingRef.current) return;
@@ -195,6 +252,12 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
     setLocalError(null);
     setNotice(null);
     setFieldErrors({});
+    pushFormAnalyticsEvent({
+      event: 'submit_attempt',
+      formType: 'ai_chatbot_lead',
+      formId: 'chat-lead-form',
+      destination,
+    });
 
     const validation = validateLeadForm({
       firstName,
@@ -210,6 +273,17 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
     if (validation.ok === false) {
       setFieldErrors(validation.fieldErrors || {});
       setLocalError(validation.localError);
+      const firstErrorField = validation.fieldErrors
+        ? (Object.keys(validation.fieldErrors)[0] as keyof FieldErrors | undefined)
+        : undefined;
+      pushFormAnalyticsEvent({
+        event: 'field_error',
+        formType: 'ai_chatbot_lead',
+        formId: 'chat-lead-form',
+        fieldName: firstErrorField,
+        errorType: firstErrorField ?? 'validation',
+        destination,
+      });
       setIsLocallySubmitting(false);
       isProcessingRef.current = false;
       return;
@@ -228,15 +302,36 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
     pushGenerateLeadDataLayerEvent(submitPayload);
 
     // Open WhatsApp synchronously in the click handler to prevent popup blockers on mobile/Safari
+    pushFormAnalyticsEvent({
+      event: 'whatsapp_opened',
+      formType: 'ai_chatbot_lead',
+      formId: 'chat-lead-form',
+      destination,
+    });
     openWhatsAppWindow(getWhatsAppUrl(payload));
 
     // Submit lead data in the background — user is already heading to WhatsApp
     try {
       const result = await onFinalizeLead(submitPayload);
       if (!result.ok) {
+        pushFormAnalyticsEvent({
+          event: 'submit_failure',
+          formType: 'ai_chatbot_lead',
+          formId: 'chat-lead-form',
+          errorType: result.error ? 'api' : 'unknown',
+          destination,
+        });
         console.warn('Background lead submission failed:', { error: result.error, requestId: result.requestId });
-      } else if (result.notice) {
-        setNotice(result.notice);
+      } else {
+        pushFormAnalyticsEvent({
+          event: 'submit_success',
+          formType: 'ai_chatbot_lead',
+          formId: 'chat-lead-form',
+          destination,
+        });
+        if (result.notice) {
+          setNotice(result.notice);
+        }
       }
     } finally {
       setIsLocallySubmitting(false);
@@ -265,7 +360,10 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
             value={firstName}
             placeholder="Nome"
             error={fieldErrors.firstName}
-            onChange={setFirstName}
+            onChange={(value) => {
+              setFirstName(value);
+              trackField('firstName', value);
+            }}
           />
 
           <TextField
@@ -275,7 +373,10 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
             value={lastName}
             placeholder="Sobrenome"
             error={fieldErrors.lastName}
-            onChange={setLastName}
+            onChange={(value) => {
+              setLastName(value);
+              trackField('lastName', value);
+            }}
           />
 
           <TextField
@@ -285,7 +386,10 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
             value={email}
             placeholder="E-mail"
             error={fieldErrors.email}
-            onChange={setEmail}
+            onChange={(value) => {
+              setEmail(value);
+              trackField('email', value);
+            }}
           />
 
           <div className="space-y-1">
@@ -310,7 +414,10 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
                 value={whatsapp}
                 placeholder="WhatsApp"
                 error={fieldErrors.whatsapp}
-                onChange={setWhatsapp}
+                onChange={(value) => {
+                  setWhatsapp(value);
+                  trackField('whatsapp', value);
+                }}
               />
             </div>
           </div>
@@ -321,7 +428,10 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
                 <input
                   type="checkbox"
                   checked={acceptedLGPD}
-                  onChange={(e) => setAcceptedLGPD(e.target.checked)}
+                  onChange={(e) => {
+                    setAcceptedLGPD(e.target.checked);
+                    trackField('lgpd', e.target.checked);
+                  }}
                   aria-invalid={fieldErrors.lgpd ? true : undefined}
                   aria-describedby={fieldErrors.lgpd ? 'lead-lgpd-error' : undefined}
                   className="peer size-4 cursor-pointer appearance-none rounded border border-zinc-300 bg-white checked:bg-brand-vibrant checked:border-brand-vibrant transition focus:ring-2 focus:ring-brand-vibrant/20"
@@ -364,6 +474,13 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
               <ExternalLink className="size-4 group-hover:scale-110 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
             </>
           )}
+        </button>
+        <button
+          type="button"
+          onClick={openDirectWhatsApp}
+          className="mt-3 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-bold text-zinc-700 transition hover:border-brand-vibrant hover:text-brand-vibrant focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-vibrant/30"
+        >
+          Ir direto para o WhatsApp
         </button>
       </div>
     </div>

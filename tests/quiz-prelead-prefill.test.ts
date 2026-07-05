@@ -29,7 +29,7 @@ test('pré-preenche os campos com os valores da URL', () => {
     const html = renderScreen({ nome: 'João', sobrenome: 'Silva', email: 'joao@example.com' });
 
     assert.match(html, /id="quiz-nome"[^>]*value="João"/);
-    assert.match(html, /id="quiz-sobrenome"[^>]*value="Silva"/);
+    assert.doesNotMatch(html, /id="quiz-sobrenome"/);
     assert.match(html, /id="quiz-email"[^>]*value="joao@example.com"/);
 });
 
@@ -37,7 +37,7 @@ test('sem initialValues, o formulário inicia vazio (sem regressão)', () => {
     const html = renderScreen();
 
     assert.match(html, /id="quiz-nome"[^>]*value=""/);
-    assert.match(html, /id="quiz-sobrenome"[^>]*value=""/);
+    assert.doesNotMatch(html, /id="quiz-sobrenome"/);
     assert.match(html, /id="quiz-email"[^>]*value=""/);
 });
 

@@ -23,8 +23,8 @@ describe('validateCorpForm', () => {
         const result = validateCorpForm({ ...VALID_FORM, firstName: '' }, true);
         assert.equal(result.ok, false);
         if (!result.ok) {
-            assert.equal(result.field, 'required');
-            assert.equal(result.message, 'Preencha todos os campos obrigatórios');
+            assert.equal(result.field, 'firstName');
+            assert.equal(result.message, 'Informe seu nome.');
         }
     });
 
@@ -32,7 +32,7 @@ describe('validateCorpForm', () => {
         const result = validateCorpForm({ ...VALID_FORM, email: '   ' }, true);
         assert.equal(result.ok, false);
         if (!result.ok) {
-            assert.equal(result.field, 'required');
+            assert.equal(result.field, 'email');
         }
     });
 
@@ -41,7 +41,7 @@ describe('validateCorpForm', () => {
         assert.equal(result.ok, false);
         if (!result.ok) {
             assert.equal(result.field, 'email');
-            assert.equal(result.message, 'Insira um e-mail corporativo válido');
+            assert.equal(result.message, 'Insira um e-mail profissional válido');
         }
     });
 
@@ -67,7 +67,7 @@ describe('validateCorpForm', () => {
         const result = validateCorpForm({ ...VALID_FORM, firstName: '', email: 'bad' }, true);
         assert.equal(result.ok, false);
         if (!result.ok) {
-            assert.equal(result.field, 'required');
+            assert.equal(result.field, 'firstName');
         }
     });
 

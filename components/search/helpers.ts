@@ -17,7 +17,7 @@ export const getGuestSummary = (adults: number, children: number): string => {
 
 export const buildSearchMessage = (params: {
   inputValue: string;
-  startDate: Date;
+  startDate: Date | null;
   endDate: Date | null;
   adults: number;
   children: number;
@@ -25,7 +25,7 @@ export const buildSearchMessage = (params: {
   tripType: string;
   budget: string;
 }): string => {
-  const startStr = params.startDate.toLocaleDateString('pt-BR');
+  const startStr = params.startDate ? params.startDate.toLocaleDateString('pt-BR') : 'Datas flexíveis';
   const endStr = params.endDate ? params.endDate.toLocaleDateString('pt-BR') : 'A definir';
   const childAgesStr = params.children > 0
     ? ` (${params.childAges.map((age) => age ? `${age} anos` : 'Idade N/I').join(', ')})`

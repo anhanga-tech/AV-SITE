@@ -55,6 +55,23 @@ export function cleanString(value: unknown): string {
 }
 
 /**
+ * Splits a single "full name" field into first/last name, preserving an
+ * explicit last name when one is provided. Several forms collapsed the
+ * nome+sobrenome pair into one field to cut friction, so a full name typed
+ * there ("João Silva") would otherwise drop everything past the first token
+ * before reaching the CRM. Falls back to the remaining tokens as the last name.
+ */
+export function splitFullName(
+    fullName: string,
+    explicitLastName = '',
+): { firstName: string; lastName: string } {
+    const parts = fullName.trim().split(/\s+/).filter(Boolean);
+    const firstName = parts[0] ?? '';
+    const lastName = explicitLastName.trim() || parts.slice(1).join(' ');
+    return { firstName, lastName };
+}
+
+/**
  * Normalizes a string or returns null if empty.
  * Includes a maximum length check to prevent DoS via excessive regex execution.
  */

@@ -299,7 +299,7 @@ const EMPTY_UTMS: LeadUtms = {
  */
 export function leadInputFromSubmitNps(data: SubmitNpsRequest): OdooLeadInput {
     const contextNote = buildContextNote([
-        `NPS ${data.score}/10 — ${data.reason}`,
+        data.reason ? `NPS ${data.score}/10 — ${data.reason}` : `NPS ${data.score}/10`,
         data.highlight ? `Momento marcante: ${data.highlight}` : null,
     ]);
 

@@ -67,7 +67,8 @@ test.describe('Corporativo Landing Page', () => {
 
     await landing.submit();
 
-    await landing.expectError('Preencha todos os campos obrigatórios');
+    await landing.expectError('Informe seu nome.');
+    await expect(page.getByText('Aceite obrigatório')).toHaveCount(0);
   });
 
   test('should block submit when LGPD consent is not accepted', async ({ page }) => {

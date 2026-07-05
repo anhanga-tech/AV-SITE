@@ -1,11 +1,12 @@
 import { useCallback, useState, useRef } from 'react';
 import { useAntiBot } from './useAntiBot';
-import { cleanString } from '../lib/lead-logic';
+import { cleanString, splitFullName } from '../lib/lead-logic';
 import { getTrackingDataObject, getWhatsAppLink } from '../utils/whatsapp';
 import { createLeadEventId, extractUtms } from './useLeadCapture';
 import type { ContactFormFields, SubmitContactRequest, SubmitContactResponse } from '../types/contactCapture';
 import type { LeadTracking } from '../types/leadCapture';
 import type { ContactModalOptions } from '../utils/contactForm';
+import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
 
 const EMPTY_FIELDS: ContactFormFields = {
     firstName: '',
@@ -102,17 +103,40 @@ export function useContactForm(options: ContactModalOptions = {}) {
     const [fields, setFieldsState] = useState<ContactFormFields>(EMPTY_FIELDS);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const isLocallySubmitting = useRef(false);
+    const hasStarted = useRef(false);
+    const completedFields = useRef<Set<keyof ContactFormFields>>(new Set());
     const [error, setError] = useState<string | null>(null);
     const [submitted, setSubmitted] = useState(false);
 
     const isValid = Boolean(fields.firstName.trim() && fields.whatsapp.trim());
+    const formId = options.source ?? 'contact-modal';
 
     const setField = useCallback(
         (key: keyof ContactFormFields, value: string | boolean) => {
             setFieldsState((prev) => ({ ...prev, [key]: value }));
             setError(null);
+
+            if (!hasStarted.current) {
+                hasStarted.current = true;
+                pushFormAnalyticsEvent({
+                    event: 'form_start',
+                    formType: 'contact_modal',
+                    formId,
+                });
+            }
+
+            const completed = typeof value === 'boolean' ? value : value.trim().length > 0;
+            if (completed && !completedFields.current.has(key)) {
+                completedFields.current.add(key);
+                pushFormAnalyticsEvent({
+                    event: 'field_complete',
+                    formType: 'contact_modal',
+                    formId,
+                    fieldName: key,
+                });
+            }
         },
-        [],
+        [formId],
     );
 
     const reset = useCallback(() => {
@@ -120,6 +144,8 @@ export function useContactForm(options: ContactModalOptions = {}) {
         setIsSubmitting(false);
         setError(null);
         setSubmitted(false);
+        hasStarted.current = false;
+        completedFields.current.clear();
     }, []);
 
     const submit = useCallback(
@@ -129,6 +155,12 @@ export function useContactForm(options: ContactModalOptions = {}) {
             isLocallySubmitting.current = true;
             setIsSubmitting(true);
             setError(null);
+            pushFormAnalyticsEvent({
+                event: 'submit_attempt',
+                formType: 'contact_modal',
+                formId,
+                destination: action,
+            });
 
             const eventId = createLeadEventId();
             const { tracking, utms } = collectTracking();
@@ -138,12 +170,22 @@ export function useContactForm(options: ContactModalOptions = {}) {
             const whatsappUrl = getWhatsAppLink(whatsappMessage, { appendTrackingRef: true });
 
             if (action === 'whatsapp') {
+                pushFormAnalyticsEvent({
+                    event: 'whatsapp_opened',
+                    formType: 'contact_modal',
+                    formId,
+                    destination: action,
+                });
                 window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
             }
 
+            // The UI dropped the separate sobrenome input (ContactModal/CtaBody now
+            // ask for the full name in `firstName`), so split it here to keep the
+            // last name flowing into the CRM instead of leaving it empty.
+            const { firstName, lastName } = splitFullName(fields.firstName, fields.lastName);
             const requestBody: SubmitContactRequest = {
-                firstName: cleanString(fields.firstName),
-                lastName: cleanString(fields.lastName) || undefined,
+                firstName: cleanString(firstName),
+                lastName: cleanString(lastName) || undefined,
                 whatsapp: cleanString(fields.whatsapp),
                 email: cleanString(fields.email) || undefined,
                 emailOptIn: fields.emailOptIn,
@@ -168,28 +210,62 @@ export function useContactForm(options: ContactModalOptions = {}) {
                     const errData = data as Extract<SubmitContactResponse, { ok: false }>;
                     if (action === 'whatsapp') {
                         console.warn('[submit-contact] tracking failed:', errData.code);
+                        pushFormAnalyticsEvent({
+                            event: 'submit_failure',
+                            formType: 'contact_modal',
+                            formId,
+                            errorType: errData.code,
+                            destination: action,
+                        });
                         setSubmitted(true);
                     } else {
                         setError(errData.error || 'Não foi possível enviar. Tente novamente.');
+                        pushFormAnalyticsEvent({
+                            event: 'submit_failure',
+                            formType: 'contact_modal',
+                            formId,
+                            errorType: errData.code,
+                            destination: action,
+                        });
                     }
                     return;
                 }
 
                 pushContactDataLayerEvent(eventId, action, options.source);
+                pushFormAnalyticsEvent({
+                    event: 'submit_success',
+                    formType: 'contact_modal',
+                    formId,
+                    destination: action,
+                });
                 setSubmitted(true);
             } catch {
                 if (action === 'whatsapp') {
                     console.warn('[submit-contact] fetch failed after opening WhatsApp');
+                    pushFormAnalyticsEvent({
+                        event: 'submit_failure',
+                        formType: 'contact_modal',
+                        formId,
+                        errorType: 'network',
+                        destination: action,
+                    });
                     setSubmitted(true);
                 } else {
                     setError('Erro de conexão. Verifique sua internet e tente novamente.');
+                    pushFormAnalyticsEvent({
+                        event: 'submit_failure',
+                        formType: 'contact_modal',
+                        formId,
+                        errorType: 'network',
+                        destination: action,
+                    });
                 }
             } finally {
                 setIsSubmitting(false);
                 isLocallySubmitting.current = false;
             }
         },
-        [fields, isValid, options, getAntiBotFields],
+        [fields, isValid, options, getAntiBotFields, formId],
     );
 
     return { fields, setField, isValid, isSubmitting, error, submitted, submit, reset, honeypotProps };
