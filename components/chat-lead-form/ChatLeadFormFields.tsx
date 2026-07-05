@@ -67,7 +67,6 @@ export function ChatLeadFormFields({
       />
 
       <div className="space-y-1">
-        <label htmlFor="lead-whatsapp" className="sr-only">WhatsApp</label>
         <div className="flex gap-2">
           <label htmlFor="lead-country-code" className="sr-only">Código do país</label>
           <select
@@ -107,7 +106,7 @@ export function ChatLeadFormFields({
             <CheckCircle2 className="absolute size-3 text-white opacity-0 peer-checked:opacity-100 left-0.5 pointer-events-none transition-opacity" />
           </div>
           <span className="text-xs text-zinc-500 leading-tight">
-            Aceito receber comunicações e autorizo o tratamento dos meus dados conforme a <a href="/politica-privacidade/" target="_blank" rel="noopener noreferrer" className="underline hover:text-brand-vibrant">Política de Privacidade</a>.
+            Aceito receber comunicações e autorizo o tratamento dos meus dados conforme a <a href="/politica-privacidade/" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="underline hover:text-brand-vibrant">Política de Privacidade</a>.
           </span>
         </label>
         {fieldErrors.lgpd && <span id="lead-lgpd-error" role="alert" className="text-[10px] text-red-500 font-bold ml-7 uppercase">{fieldErrors.lgpd}</span>}
