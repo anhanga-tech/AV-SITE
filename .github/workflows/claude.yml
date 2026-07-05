@@ -9,6 +9,8 @@ on:
     types: [opened, assigned]
   pull_request_review:
     types: [submitted]
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
 
 jobs:
   claude:
@@ -42,7 +44,7 @@ jobs:
 
       - name: Run Claude Code
         id: claude
-        uses: anthropics/claude-code-action@a92e7c70a4da9793dc164451d829089dc057a464 # v1.0.159
+        uses: anthropics/claude-code-action@558b1d6cab4085c7753fe402c10bef0fbb92ac7a # v1.0.165
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
@@ -57,3 +59,56 @@ jobs:
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
           # claude_args: '--allowed-tools Bash(gh pr:*)'
+
+  claude-review:
+    # Substitui o Gemini Code Assist (descontinuado) como reviewer automático de PR.
+    # Restrito a autores confiáveis e a PRs não-draft para não gastar créditos à toa.
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.draft == false &&
+      (
+        github.event.pull_request.user.login == github.repository_owner ||
+        contains(fromJson('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association)
+      )
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+      actions: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code Review
+        uses: anthropics/claude-code-action@558b1d6cab4085c7753fe402c10bef0fbb92ac7a # v1.0.165
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
+          additional_permissions: |
+            actions: read
+
+          # Uma review consolidada por push, não um comentário novo a cada commit
+          use_sticky_comment: true
+          # Filtra comentários de teste/sonda antes de postar inline
+          classify_inline_comments: true
+
+          prompt: |
+            Revise este pull request como reviewer automático deste repositório.
+
+            Leia primeiro os padrões do projeto antes de avaliar o diff:
+            - docs/standards/code-style.md, testing.md, api-conventions.md, security.md
+            - .claude/rules/ (mesmas regras, aplicadas via CLAUDE.md)
+
+            Foque em, nesta ordem de prioridade:
+            1. Bugs de correção, regressões e edge cases não tratados
+            2. Riscos de segurança: validação/sanitização de input, secrets, verificação de webhooks, rate limiting
+            3. Violação de convenções documentadas (ex.: lógica de handler fora de api/, helpers duplicados em vez de reuso de lib/ e services/, resposta fora do formato { ok, code?, error?, data? })
+            4. Mudança de comportamento sem teste automatizado correspondente (docs/standards/testing.md)
+
+            Não repita o que já é coberto por lint, typecheck ou CI. Não comente sobre estilo já garantido por ferramentas automatizadas. Poste um resumo curto e comentários inline apenas onde houver um problema real e acionável — prefira silêncio a ruído.
+
+          claude_args: |
+            --max-turns 15
