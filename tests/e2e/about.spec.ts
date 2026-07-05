@@ -48,4 +48,19 @@ test.describe('Sobre Page E-E-A-T Verification', () => {
 
     await expect(page).toHaveURL(/\/sobre/);
   });
+
+  test('FAQ accordion expands and collapses a question on click', async ({ page }) => {
+    await page.goto('/sobre');
+
+    const firstItem = page.locator('#perguntas-frequentes details').first();
+    await expect(firstItem).not.toHaveAttribute('open', '');
+
+    const summary = firstItem.locator('summary');
+    await summary.click();
+    await expect(firstItem).toHaveAttribute('open', '');
+    await expect(firstItem.locator('p')).toBeVisible();
+
+    await summary.click();
+    await expect(firstItem).not.toHaveAttribute('open', '');
+  });
 });

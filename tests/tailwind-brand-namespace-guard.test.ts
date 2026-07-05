@@ -45,9 +45,10 @@ function collectRootFiles(): string[] {
     .map((entry) => path.join(ROOT, entry.name));
 }
 
-// Baseline medido em 2026-06-21 (commit e14a6cd-descendant). Ao migrar
-// usos de brand-* para anhanga-*, ABAIXE este número para travar o ganho.
-const BRAND_NAMESPACE_BASELINE = 629;
+// Baseline medido em 2026-07-05 (migração de components/about/* para
+// anhanga-* nos fixes de /impeccable critique). Ao migrar usos de brand-*
+// para anhanga-*, ABAIXE este número para travar o ganho.
+const BRAND_NAMESPACE_BASELINE = 594;
 
 test('legacy brand-* namespace does not grow (ratchet)', () => {
   const files = [...SCAN_DIRS.flatMap(collectTailwindFiles), ...collectRootFiles()];

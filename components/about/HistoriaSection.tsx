@@ -17,7 +17,7 @@ export const HistoriaSection: React.FC = () => (
         custom={1}
       >
         <div className="relative">
-          <div className="absolute -top-4 -left-4 size-24 bg-brand-yellow/30 rounded-full blur-2xl z-0"></div>
+          <div className="absolute -top-4 -left-4 size-24 bg-anhanga-yellow/30 rounded-full blur-2xl z-0"></div>
           <div className="relative rounded-3xl overflow-hidden border-8 border-white shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500">
             <LazyImage
               src="images/about/equipe-anhanga.jpg"
@@ -27,14 +27,14 @@ export const HistoriaSection: React.FC = () => (
               className="w-full h-auto object-cover aspect-[4/3]"
             />
           </div>
-          <div className="absolute -bottom-6 -right-6 bg-white p-6 rounded-2xl shadow-xl border border-zinc-100 hidden md:block">
+          <div className="absolute -bottom-6 -right-6 bg-white p-6 rounded-2xl shadow-float-lg hidden md:block">
             <div className="flex items-center gap-4">
-              <div className="size-12 bg-brand-cyan/10 rounded-full flex items-center justify-center text-brand-cyan">
-                <Heart className="size-6 fill-current" />
+              <div className="size-12 bg-anhanga-action/10 rounded-full flex items-center justify-center text-anhanga-action">
+                <Heart className="size-6 fill-current" aria-hidden="true" />
               </div>
               <div>
                 <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Paixão por</p>
-                <p className="text-lg font-black text-brand-dark leading-none">Pessoas</p>
+                <p className="text-lg font-black text-anhanga-dark leading-none">Pessoas</p>
               </div>
             </div>
           </div>
@@ -49,7 +49,7 @@ export const HistoriaSection: React.FC = () => (
         variants={fadeUp}
         custom={2}
       >
-        <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-6">Nossa História</h2>
+        <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-6">Nossa História</h2>
         <div className="space-y-4 text-zinc-600 font-medium leading-relaxed text-lg">
           <p>
             A Anhangá Viagens nasceu em São Paulo com um propósito claro: resgatar o prazer de planejar uma viagem sem as dores de cabeça da burocracia digital e dos roteiros engessados.

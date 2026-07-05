@@ -1,5 +1,6 @@
 import React from 'react';
 import { m } from 'framer-motion';
+import { ChevronDown } from 'lucide-react';
 import { fadeUp } from './aboutMotion';
 
 interface TrustFaqItem {
@@ -31,18 +32,21 @@ export const TrustFaqSection: React.FC<TrustFaqSectionProps> = ({ items }) => (
 
     <div className="max-w-3xl mx-auto space-y-5">
       {items.map((item, i) => (
-        <m.div
+        <m.details
           key={item.question}
-          className="bg-white p-8 rounded-3xl border-2 border-zinc-100 shadow-sm"
+          className="group bg-white rounded-2xl shadow-float [&_summary::-webkit-details-marker]:hidden"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeUp}
           custom={i + 1}
         >
-          <h3 className="text-lg md:text-xl font-black text-anhanga-dark mb-3">{item.question}</h3>
-          <p className="text-zinc-600 font-medium leading-relaxed">{item.answer}</p>
-        </m.div>
+          <summary className="flex items-center justify-between gap-4 p-8 cursor-pointer list-none font-black text-lg md:text-xl text-anhanga-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action rounded-2xl">
+            {item.question}
+            <ChevronDown className="size-5 shrink-0 text-anhanga-action transition-transform duration-300 group-open:rotate-180" aria-hidden="true" />
+          </summary>
+          <p className="px-8 pb-8 -mt-2 text-zinc-600 font-medium leading-relaxed">{item.answer}</p>
+        </m.details>
       ))}
     </div>
   </section>

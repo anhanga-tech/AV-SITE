@@ -42,6 +42,18 @@ test('About FAQ de confiança cobre as queries de entidade', async () => {
   assert.match(source, /<TrustFaqSection items=\{TRUST_FAQ_ITEMS\}/, 'FAQ visível não recebe a mesma fonte do schema');
 });
 
+test('About FAQ dá presença ao segmento Corporativo/Eventos (PRODUCT.md)', async () => {
+  const source = await readRepoFile('pages/About.tsx');
+  assert.match(source, /atende viagens corporativas e em grupo\?/, 'Falta a pergunta sobre viagens corporativas/em grupo');
+  assert.match(source, /corporativas, eventos e viagens de incentivo/, 'Resposta não cobre corporativo/eventos/incentivo');
+});
+
+test('CtaSection da /sobre sinaliza o atendimento corporativo', async () => {
+  const source = await readRepoFile('components/about/CtaSection.tsx');
+  assert.match(source, /to="\/corporativo"/, 'CtaSection não linka para /corporativo');
+  assert.match(source, /corporativa ou em grupo/i, 'CtaSection não menciona viagem corporativa/em grupo');
+});
+
 test('seções visíveis extraídas renderizam a partir da fonte compartilhada', async () => {
   const faqSection = await readRepoFile('components/about/TrustFaqSection.tsx');
   assert.match(faqSection, /items\.map/, 'TrustFaqSection não renderiza os itens');
