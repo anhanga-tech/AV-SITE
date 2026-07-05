@@ -255,4 +255,44 @@ test.describe('Chatbot lead handoff', () => {
       destination: 'Orlando, Flórida',
     });
   });
+
+  test('clicking the privacy policy link does not toggle the LGPD checkbox', async ({ page, context }) => {
+    await page.route('**/api/generate', route =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          text: 'Perfeito. Seu pré-atendimento está pronto. Preencha seus dados abaixo para continuar com nossa equipe.',
+          handoff: {
+            origin: 'São Paulo, SP',
+            destination: 'Orlando, Flórida',
+            dates: 'Julho de 2026',
+            baggagePreference: '1 mala despachada',
+            bantSummary: 'Need: Roteiro personalizado | Authority: Casal | Budget: R$ 15.000 | Timeline: 30 dias',
+            iataCode: 'MCO',
+            source: 'repair',
+          },
+        }),
+      }),
+    );
+
+    const aiChat = new AIChat(page);
+
+    await page.goto('/');
+    await aiChat.open();
+    await aiChat.sendMessage('Quero uma viagem para Orlando');
+
+    await expect(page.getByText('Link Gerado')).toBeVisible();
+
+    const lgpdCheckbox = page.locator('input[type="checkbox"]').first();
+    await expect(lgpdCheckbox).not.toBeChecked();
+
+    const [popup] = await Promise.all([
+      context.waitForEvent('page'),
+      aiChat.chatDialog.getByRole('link', { name: 'Política de Privacidade' }).last().click(),
+    ]);
+    await popup.close();
+
+    await expect(lgpdCheckbox).not.toBeChecked();
+  });
 });
