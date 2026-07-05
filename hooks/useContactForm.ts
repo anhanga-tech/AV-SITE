@@ -1,6 +1,6 @@
 import { useCallback, useState, useRef } from 'react';
 import { useAntiBot } from './useAntiBot';
-import { cleanString } from '../lib/lead-logic';
+import { cleanString, splitFullName } from '../lib/lead-logic';
 import { getTrackingDataObject, getWhatsAppLink } from '../utils/whatsapp';
 import { createLeadEventId, extractUtms } from './useLeadCapture';
 import type { ContactFormFields, SubmitContactRequest, SubmitContactResponse } from '../types/contactCapture';
@@ -179,9 +179,13 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
             }
 
+            // The UI dropped the separate sobrenome input (ContactModal/CtaBody now
+            // ask for the full name in `firstName`), so split it here to keep the
+            // last name flowing into the CRM instead of leaving it empty.
+            const { firstName, lastName } = splitFullName(fields.firstName, fields.lastName);
             const requestBody: SubmitContactRequest = {
-                firstName: cleanString(fields.firstName),
-                lastName: cleanString(fields.lastName) || undefined,
+                firstName: cleanString(firstName),
+                lastName: cleanString(lastName) || undefined,
                 whatsapp: cleanString(fields.whatsapp),
                 email: cleanString(fields.email) || undefined,
                 emailOptIn: fields.emailOptIn,
