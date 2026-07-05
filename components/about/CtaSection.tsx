@@ -19,16 +19,18 @@ export const CtaSection: React.FC = () => (
       <p className="text-zinc-600 text-lg font-medium mb-10 max-w-xl mx-auto">
         Seja para um festival épico ou um refúgio relaxante, nós desenhamos a viagem perfeita para você.
       </p>
-      <Button
-        variant="cta"
-        size="lg"
-        onClick={() => openContactModal({ source: 'about' })}
-        className="btn-whatsapp btn-specialist mx-auto font-black"
-        rightIcon={<Sparkles className="size-5" />}
-        data-tracking="footer-about"
-      >
-        Começar Planejamento
-      </Button>
+      <div className="flex justify-center">
+        <Button
+          variant="cta"
+          size="lg"
+          onClick={() => openContactModal({ source: 'about' })}
+          className="btn-whatsapp btn-specialist font-black"
+          rightIcon={<Sparkles className="size-5" />}
+          data-tracking="footer-about"
+        >
+          Começar Planejamento
+        </Button>
+      </div>
     </div>
   </m.section>
 );
