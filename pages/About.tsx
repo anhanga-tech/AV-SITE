@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { MotionConfig } from 'framer-motion';
 import { Seo } from '../components/Seo';
 import { OrganizationSchema } from '../components/schemas/OrganizationSchema';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
@@ -76,7 +77,17 @@ const About: React.FC = () => {
   }, [hash]);
 
   return (
-    <div className="bg-brand-surface pt-32 pb-20">
+    <div data-about-page className="bg-brand-surface pt-32 pb-20">
+      {/*
+        No-JS / pre-hydration fallback: framer-motion serializes `initial`
+        styles (opacity:0) into the prerendered HTML. Without JS the reveal
+        never fires, so the sections would ship blank. This forces them
+        visible when scripts are disabled; with JS it's inert and the
+        entrances animate normally.
+      */}
+      <noscript>
+        <style>{`[data-about-page] [style*="opacity"]{opacity:1!important}`}</style>
+      </noscript>
       <Seo
         title="Sobre a Anhangá Viagens | Agência de Viagens em São Paulo"
         description="Anhangá Viagens: agência registrada no Cadastur (CNPJ 37.036.732/0001-41), com sede em São Paulo, agente credenciado Beto Carrero World e Hopi Hari e parceira Norwegian Cruise Line. Atendimento consultivo e roteiros personalizados."
@@ -108,15 +119,17 @@ const About: React.FC = () => {
         ]}
       />
 
-      <div className="container mx-auto px-6">
-        <HeroSection />
-        <HistoriaSection />
-        <ExpertiseSection />
-        <TrustSection />
-        <ConsultoresSection team={TEAM} />
-        <TrustFaqSection items={TRUST_FAQ_ITEMS} />
-        <CtaSection />
-      </div>
+      <MotionConfig reducedMotion="user">
+        <div className="container mx-auto px-6">
+          <HeroSection />
+          <HistoriaSection />
+          <ExpertiseSection />
+          <TrustSection />
+          <ConsultoresSection team={TEAM} />
+          <TrustFaqSection items={TRUST_FAQ_ITEMS} />
+          <CtaSection />
+        </div>
+      </MotionConfig>
     </div>
   );
 };

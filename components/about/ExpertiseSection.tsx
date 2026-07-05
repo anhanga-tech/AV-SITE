@@ -7,7 +7,7 @@ const EXPERTISE_ITEMS = [
   {
     icon: Users,
     title: 'Atendimento Humano',
-    desc: 'Nada de bots ou respostas automáticas. Você fala com especialistas que conhecem os destinos de verdade.',
+    desc: 'O chat com IA no site faz a triagem inicial, mas quem desenha seu roteiro é sempre um especialista humano.',
     color: 'bg-orange-100 text-orange-600',
   },
   {

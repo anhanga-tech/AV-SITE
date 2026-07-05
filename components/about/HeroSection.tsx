@@ -2,6 +2,7 @@ import React from 'react';
 import { m } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { openContactModal } from '../../utils/contactForm';
+import { Button } from '../ui/Button';
 import { fadeUp } from './aboutMotion';
 
 // Hero da página /sobre: proposta de valor + CTA de orçamento.
@@ -29,15 +30,16 @@ export const HeroSection: React.FC = () => (
       Na Anhangá Viagens, acreditamos que viajar é mais do que carimbar um passaporte: é sobre colecionar histórias que valem a pena ser contadas.
     </p>
     <div className="flex justify-center">
-      <button
-        type="button"
+      <Button
+        variant="cta"
+        size="lg"
         onClick={() => openContactModal({ source: 'about' })}
-        className="btn-whatsapp btn-specialist bg-brand-vibrant text-white px-8 py-4 rounded-2xl font-black text-lg shadow-xl shadow-brand-vibrant/20 hover:scale-105 transition-transform active:scale-95 flex items-center gap-3"
+        className="btn-whatsapp btn-specialist font-black"
+        rightIcon={<Sparkles className="size-5" />}
         data-tracking="hero-about"
       >
         Solicitar Orçamento
-        <Sparkles className="size-5" />
-      </button>
+      </Button>
     </div>
   </m.section>
 );

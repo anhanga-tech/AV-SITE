@@ -2,6 +2,7 @@ import React from 'react';
 import { m } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { openContactModal } from '../../utils/contactForm';
+import { Button } from '../ui/Button';
 import { fadeUp } from './aboutMotion';
 
 // CTA final da página /sobre.
@@ -18,15 +19,18 @@ export const CtaSection: React.FC = () => (
       <p className="text-zinc-600 text-lg font-medium mb-10 max-w-xl mx-auto">
         Seja para um festival épico ou um refúgio relaxante, nós desenhamos a viagem perfeita para você.
       </p>
-      <button
-        type="button"
-        onClick={() => openContactModal({ source: 'about' })}
-        className="btn-whatsapp btn-specialist bg-brand-vibrant text-white px-10 py-5 rounded-2xl font-black text-lg shadow-xl shadow-brand-vibrant/20 hover:scale-105 transition-transform active:scale-95 flex items-center gap-3 mx-auto"
-        data-tracking="footer-about"
-      >
-        Começar Planejamento
-        <Sparkles className="size-5" />
-      </button>
+      <div className="flex justify-center">
+        <Button
+          variant="cta"
+          size="lg"
+          onClick={() => openContactModal({ source: 'about' })}
+          className="btn-whatsapp btn-specialist font-black"
+          rightIcon={<Sparkles className="size-5" />}
+          data-tracking="footer-about"
+        >
+          Começar Planejamento
+        </Button>
+      </div>
     </div>
   </m.section>
 );
