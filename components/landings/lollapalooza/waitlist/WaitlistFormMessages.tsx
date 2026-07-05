@@ -13,6 +13,7 @@ export function WaitlistFormMessages({ localError, error, successMessage, warnin
     <AnimatePresence mode="wait">
       {(localError || error) && (
         <m.div
+          key="error-message"
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
@@ -25,6 +26,7 @@ export function WaitlistFormMessages({ localError, error, successMessage, warnin
 
       {successMessage && (
         <m.div
+          key="success-message"
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
@@ -37,6 +39,7 @@ export function WaitlistFormMessages({ localError, error, successMessage, warnin
 
       {warningMessage && (
         <m.div
+          key="warning-message"
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
