@@ -59,6 +59,22 @@ test.describe('Contact form modal', () => {
     await expect(page.getByRole('button', { name: /^me chamem no whatsapp$/i })).toBeEnabled();
   });
 
+  test('bloqueia envio com e-mail inválido após clique e mantém dados editáveis', async ({ page, isMobile }) => {
+    await openHeaderContactModal(page, isMobile);
+
+    await page.locator('#contact-firstName').fill('Maria');
+    await page.locator('#contact-whatsapp').fill('11987654321');
+    await page.locator('#contact-email').fill('maria@');
+
+    const callbackButton = page.getByRole('button', { name: /^me chamem no whatsapp$/i });
+    await expect(callbackButton).toBeEnabled();
+    await callbackButton.click();
+
+    await expect(page.locator('#contact-email')).toHaveAttribute('aria-invalid', 'true');
+    await expect(contactDialog(page).getByText('Informe um e-mail válido ou deixe em branco.')).toBeVisible();
+    await expect(page.getByText(/recebemos seu contato/i)).not.toBeVisible();
+  });
+
   test('envia o pedido de retorno e exibe confirmação', async ({ page, isMobile }) => {
     await openHeaderContactModal(page, isMobile);
 
