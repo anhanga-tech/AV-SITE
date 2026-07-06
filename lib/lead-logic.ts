@@ -5,6 +5,12 @@ import { isRecord } from './type-guards';
 
 const MIN_PHONE_DIGITS = 10;
 const MAX_PHONE_DIGITS = 15;
+// Hard cap on the raw phone string before any regex runs. A valid number is at
+// most MAX_PHONE_DIGITS digits plus formatting (+, spaces, parens, dashes), so
+// 64 is generous; anything beyond is malformed/abusive. Guarding here protects
+// every caller (lead/contact/quiz/waitlist) at the shared chokepoint, so an
+// unbounded body can't force regex work through the manually-validated handlers.
+const MAX_PHONE_RAW_LENGTH = 64;
 export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const KNOWN_TRACKING_KEYS = new Set([
@@ -97,6 +103,8 @@ export function normalizeNullable(value: unknown, maxLength = 255): string | nul
 
 export function normalizeWhatsappNumber(value: unknown, defaultCountryCode = '+55'): string | null {
     if (typeof value !== 'string') return null;
+    // Reject implausibly long input before running any regex passes over it.
+    if (value.length > MAX_PHONE_RAW_LENGTH) return null;
 
     const trimmed = value.trim();
     if (!trimmed) return null;
