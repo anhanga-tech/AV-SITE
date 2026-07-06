@@ -83,6 +83,7 @@ test.describe('Contact form modal', () => {
     await page.getByRole('button', { name: /^me chamem no whatsapp$/i }).click();
 
     await expect(page.getByText(/recebemos seu contato/i)).toBeVisible();
+    await expect(page.getByText('Nossa equipe chama você em breve pelo WhatsApp.')).toBeVisible();
     await expect(contactDialog(page).getByRole('status')).toContainText(/recebemos seu contato/i);
     await expect(contactDialog(page).getByRole('button', { name: /^fechar$/i }).last()).toBeFocused();
   });
@@ -95,6 +96,7 @@ test.describe('Contact form modal', () => {
     await page.locator('#contact-whatsapp').press('Enter');
 
     await expect(page.getByText(/recebemos seu contato/i)).toBeVisible();
+    await expect(page.getByText('Abrimos o WhatsApp para você continuar com a nossa equipe.')).toBeVisible();
   });
 
   test('fecha com tecla Escape', async ({ page, isMobile }) => {
