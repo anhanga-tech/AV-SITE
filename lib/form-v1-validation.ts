@@ -86,10 +86,10 @@ export function validateNpsFormFields(input: { firstname: string; email: string;
   return { valid: true, normalized: { firstname, email, score: input.score! }, errors };
 }
 
-export function isFieldCompleteForAnalytics(fieldName: string, value: string | boolean | number | null): boolean {
+export function isFieldCompleteForAnalytics(fieldName: string, value: string | boolean | number | null | undefined): boolean {
   if (typeof value === 'boolean') return value;
   if (typeof value === 'number') return Number.isFinite(value);
-  if (value === null) return false;
+  if (value === null || value === undefined) return false;
 
   const trimmed = value.trim();
   if (!trimmed) return false;

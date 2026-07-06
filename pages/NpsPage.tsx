@@ -9,7 +9,7 @@ import { NpsThankOther } from '../components/nps/NpsThankOther';
 import { Seo } from '../components/Seo';
 import { useAntiBot } from '../hooks/useAntiBot';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
-import { isFieldCompleteForAnalytics, validateNpsFormFields, type NpsFormFieldErrors } from '../lib/form-v1-validation';
+import { isFieldCompleteForAnalytics, isValidEmail, validateNpsFormFields, type NpsFormFieldErrors } from '../lib/form-v1-validation';
 
 type PageState = 'form' | 'thank-promoter' | 'thank-other';
 
@@ -68,7 +68,8 @@ export default function NpsPage() {
   const [params] = useSearchParams();
   const initialFirstname = params.get('firstname')?.trim() ?? '';
   const initialEmail = params.get('email')?.trim() ?? '';
-  const needsIdentityFields = !initialFirstname || !initialEmail;
+  const isInitialEmailValid = initialEmail ? isValidEmail(initialEmail) : false;
+  const needsIdentityFields = !initialFirstname || !isInitialEmailValid;
 
   const [score, setScore] = useState<number | null>(null);
   const [firstname, setFirstname] = useState(initialFirstname);
@@ -263,7 +264,7 @@ export default function NpsPage() {
                       </div>
                     )}
 
-                    {!initialEmail && (
+                    {!isInitialEmailValid && (
                       <div>
                         <label
                           htmlFor="nps-email"

@@ -51,6 +51,7 @@ test('validateNpsFormFields requires missing URL identity fields locally', () =>
 });
 
 test('isFieldCompleteForAnalytics only completes contact fields when useful', () => {
+  assert.equal(isFieldCompleteForAnalytics('email', undefined), false);
   assert.equal(isFieldCompleteForAnalytics('email', 'ana@'), false);
   assert.equal(isFieldCompleteForAnalytics('email', 'ana@example.com'), true);
   assert.equal(isFieldCompleteForAnalytics('whatsapp', '123'), false);

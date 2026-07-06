@@ -123,9 +123,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
         (key: keyof ContactFormFields, value: string | boolean) => {
             setFieldsState((prev) => ({ ...prev, [key]: value }));
             setError(null);
-            if (typeof key === 'string' && key in fieldErrors) {
-                setFieldErrors((prev) => ({ ...prev, [key]: undefined }));
-            }
+            setFieldErrors((prev) => (key in prev ? { ...prev, [key]: undefined } : prev));
 
             if (!hasStarted.current) {
                 hasStarted.current = true;
@@ -148,7 +146,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 });
             }
         },
-        [fieldErrors, formId],
+        [formId],
     );
 
     const reset = useCallback(() => {
@@ -298,7 +296,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 isLocallySubmitting.current = false;
             }
         },
-        [fields, options, getAntiBotFields, formId],
+        [fields, options.destination, options.message, options.source, getAntiBotFields, formId],
     );
 
     return { fields, setField, isValid, canAttemptSubmit, isSubmitting, error, fieldErrors, submitted, lastAction, submit, reset, honeypotProps };
