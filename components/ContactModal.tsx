@@ -3,6 +3,10 @@ import { CheckCircle, X } from '@phosphor-icons/react';
 import { useContactForm } from '../hooks/useContactForm';
 import type { ContactModalOptions } from '../utils/contactForm';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
+import { FormField } from './forms/FormField';
+
+const FIELD_CLASSNAME =
+    'w-full rounded-xl border-2 border-zinc-200 px-3 py-2.5 text-sm font-medium text-zinc-800 outline-none transition-colors placeholder-zinc-400 focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan';
 
 const ContactModal: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -142,74 +146,43 @@ const ContactModal: React.FC = () => {
                     >
                         {/* Honeypot: hidden from humans, blind form-fillers populate it. */}
                         <input {...honeypotProps} />
-                        <div>
-                            <label htmlFor="contact-firstName" className="mb-1 block text-xs font-bold uppercase tracking-wider text-zinc-500">
-                                Nome *
-                            </label>
-                            <input
-                                ref={firstFieldRef}
-                                id="contact-firstName"
-                                type="text"
-                                autoComplete="name"
-                                value={fields.firstName}
-                                onChange={(event) => setField('firstName', event.target.value)}
-                                required
-                                className="w-full rounded-xl border-2 border-zinc-200 px-3 py-2.5 text-sm font-medium text-zinc-800 outline-none transition-colors placeholder-zinc-400 focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan"
-                                placeholder="ex: Maria Silva"
-                                aria-invalid={fieldErrors.firstName ? true : undefined}
-                                aria-describedby={fieldErrors.firstName ? 'contact-firstName-error' : undefined}
-                            />
-                            {fieldErrors.firstName ? (
-                                <p id="contact-firstName-error" className="mt-1 text-xs font-semibold text-red-500" role="alert">
-                                    {fieldErrors.firstName}
-                                </p>
-                            ) : null}
-                        </div>
+                        <FormField
+                            inputRef={firstFieldRef}
+                            id="contact-firstName"
+                            label="Nome *"
+                            autoComplete="name"
+                            value={fields.firstName}
+                            onChange={(value) => setField('firstName', value)}
+                            required
+                            inputClassName={FIELD_CLASSNAME}
+                            placeholder="ex: Maria Silva"
+                            error={fieldErrors.firstName}
+                        />
 
-                        <div>
-                            <label htmlFor="contact-whatsapp" className="mb-1 block text-xs font-bold uppercase tracking-wider text-zinc-500">
-                                WhatsApp *
-                            </label>
-                            <input
-                                id="contact-whatsapp"
-                                type="tel"
-                                autoComplete="tel"
-                                value={fields.whatsapp}
-                                onChange={(event) => setField('whatsapp', event.target.value)}
-                                required
-                                className="w-full rounded-xl border-2 border-zinc-200 px-3 py-2.5 text-sm font-medium text-zinc-800 outline-none transition-colors placeholder-zinc-400 focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan"
-                                placeholder="+55 (11) 9 0000-0000"
-                                aria-invalid={fieldErrors.whatsapp ? true : undefined}
-                                aria-describedby={fieldErrors.whatsapp ? 'contact-whatsapp-error' : undefined}
-                            />
-                            {fieldErrors.whatsapp ? (
-                                <p id="contact-whatsapp-error" className="mt-1 text-xs font-semibold text-red-500" role="alert">
-                                    {fieldErrors.whatsapp}
-                                </p>
-                            ) : null}
-                        </div>
+                        <FormField
+                            id="contact-whatsapp"
+                            label="WhatsApp *"
+                            type="tel"
+                            autoComplete="tel"
+                            value={fields.whatsapp}
+                            onChange={(value) => setField('whatsapp', value)}
+                            required
+                            inputClassName={FIELD_CLASSNAME}
+                            placeholder="+55 (11) 9 0000-0000"
+                            error={fieldErrors.whatsapp}
+                        />
 
-                        <div>
-                            <label htmlFor="contact-email" className="mb-1 block text-xs font-bold uppercase tracking-wider text-zinc-500">
-                                E-mail
-                            </label>
-                            <input
-                                id="contact-email"
-                                type="email"
-                                autoComplete="email"
-                                value={fields.email}
-                                onChange={(event) => setField('email', event.target.value)}
-                                className="w-full rounded-xl border-2 border-zinc-200 px-3 py-2.5 text-sm font-medium text-zinc-800 outline-none transition-colors placeholder-zinc-400 focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan"
-                                placeholder="seu@email.com (opcional)"
-                                aria-invalid={fieldErrors.email ? true : undefined}
-                                aria-describedby={fieldErrors.email ? 'contact-email-error' : undefined}
-                            />
-                            {fieldErrors.email ? (
-                                <p id="contact-email-error" className="mt-1 text-xs font-semibold text-red-500" role="alert">
-                                    {fieldErrors.email}
-                                </p>
-                            ) : null}
-                        </div>
+                        <FormField
+                            id="contact-email"
+                            label="E-mail"
+                            type="email"
+                            autoComplete="email"
+                            value={fields.email}
+                            onChange={(value) => setField('email', value)}
+                            inputClassName={FIELD_CLASSNAME}
+                            placeholder="seu@email.com (opcional)"
+                            error={fieldErrors.email}
+                        />
 
                         <div className="flex items-start gap-2.5 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2.5">
                             <input
