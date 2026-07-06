@@ -13,7 +13,7 @@ const ContactModal: React.FC = () => {
     const closeButtonRef = useRef<HTMLButtonElement>(null);
     const previousBodyOverflow = useRef<string>('');
 
-    const { fields, setField, isValid, isSubmitting, error, submitted, submit, reset, honeypotProps } =
+    const { fields, setField, canAttemptSubmit, isSubmitting, error, fieldErrors, submitted, lastAction, submit, reset, honeypotProps } =
         useContactForm(options);
 
     const close = useCallback(() => {
@@ -117,7 +117,9 @@ const ContactModal: React.FC = () => {
                             <CheckCircle className="size-14 text-green-600" weight="fill" />
                             <p className="font-bold text-zinc-800">Recebemos seu contato!</p>
                             <p className="text-sm text-zinc-500">
-                                Nossa equipe entra em contato em breve pelo WhatsApp.
+                                {lastAction === 'callback'
+                                    ? 'Nossa equipe chama você em breve pelo WhatsApp.'
+                                    : 'Abrimos o WhatsApp para você continuar com a nossa equipe.'}
                             </p>
                         </output>
                         <button
@@ -154,7 +156,14 @@ const ContactModal: React.FC = () => {
                                 required
                                 className="w-full rounded-xl border-2 border-zinc-200 px-3 py-2.5 text-sm font-medium text-zinc-800 outline-none transition-colors placeholder-zinc-400 focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan"
                                 placeholder="ex: Maria Silva"
+                                aria-invalid={fieldErrors.firstName ? true : undefined}
+                                aria-describedby={fieldErrors.firstName ? 'contact-firstName-error' : undefined}
                             />
+                            {fieldErrors.firstName ? (
+                                <p id="contact-firstName-error" className="mt-1 text-xs font-semibold text-red-500" role="alert">
+                                    {fieldErrors.firstName}
+                                </p>
+                            ) : null}
                         </div>
 
                         <div>
@@ -170,7 +179,14 @@ const ContactModal: React.FC = () => {
                                 required
                                 className="w-full rounded-xl border-2 border-zinc-200 px-3 py-2.5 text-sm font-medium text-zinc-800 outline-none transition-colors placeholder-zinc-400 focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan"
                                 placeholder="+55 (11) 9 0000-0000"
+                                aria-invalid={fieldErrors.whatsapp ? true : undefined}
+                                aria-describedby={fieldErrors.whatsapp ? 'contact-whatsapp-error' : undefined}
                             />
+                            {fieldErrors.whatsapp ? (
+                                <p id="contact-whatsapp-error" className="mt-1 text-xs font-semibold text-red-500" role="alert">
+                                    {fieldErrors.whatsapp}
+                                </p>
+                            ) : null}
                         </div>
 
                         <div>
@@ -185,7 +201,14 @@ const ContactModal: React.FC = () => {
                                 onChange={(event) => setField('email', event.target.value)}
                                 className="w-full rounded-xl border-2 border-zinc-200 px-3 py-2.5 text-sm font-medium text-zinc-800 outline-none transition-colors placeholder-zinc-400 focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan"
                                 placeholder="seu@email.com (opcional)"
+                                aria-invalid={fieldErrors.email ? true : undefined}
+                                aria-describedby={fieldErrors.email ? 'contact-email-error' : undefined}
                             />
+                            {fieldErrors.email ? (
+                                <p id="contact-email-error" className="mt-1 text-xs font-semibold text-red-500" role="alert">
+                                    {fieldErrors.email}
+                                </p>
+                            ) : null}
                         </div>
 
                         <div className="flex items-start gap-2.5 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2.5">
@@ -222,7 +245,7 @@ const ContactModal: React.FC = () => {
                         <div className="flex flex-col gap-2 pt-1">
                             <button
                                 type="submit"
-                                disabled={!isValid || isSubmitting}
+                                disabled={!canAttemptSubmit || isSubmitting}
                                 className="w-full rounded-xl bg-[#25D366] py-3 text-sm font-black text-white transition-colors hover:bg-[#1fba59] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
                             >
                                 {isSubmitting ? 'Enviando…' : 'Chamar no WhatsApp'}
@@ -230,7 +253,7 @@ const ContactModal: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={() => void submit('callback')}
-                                disabled={!isValid || isSubmitting}
+                                disabled={!canAttemptSubmit || isSubmitting}
                                 className="w-full rounded-xl bg-brand-dark py-3 text-sm font-black text-white transition-colors hover:bg-brand-vibrant focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-dark focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
                             >
                                 {isSubmitting ? 'Enviando…' : 'Me chamem no WhatsApp'}

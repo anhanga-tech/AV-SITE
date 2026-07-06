@@ -17,6 +17,7 @@ interface ChatLeadFormFieldsProps {
   onWhatsappChange: (value: string) => void;
   onCountryCodeChange: (value: string) => void;
   onLgpdChange: (value: boolean) => void;
+  fieldRefs?: Partial<Record<keyof FieldErrors, React.Ref<HTMLInputElement>>>;
 }
 
 export function ChatLeadFormFields({
@@ -33,6 +34,7 @@ export function ChatLeadFormFields({
   onWhatsappChange,
   onCountryCodeChange,
   onLgpdChange,
+  fieldRefs,
 }: ChatLeadFormFieldsProps) {
   return (
     <div className="space-y-3 mb-5">
@@ -44,6 +46,7 @@ export function ChatLeadFormFields({
         placeholder="Nome"
         error={fieldErrors.firstName}
         onChange={onFirstNameChange}
+        inputRef={fieldRefs?.firstName}
       />
 
       <TextField
@@ -54,6 +57,7 @@ export function ChatLeadFormFields({
         placeholder="Sobrenome"
         error={fieldErrors.lastName}
         onChange={onLastNameChange}
+        inputRef={fieldRefs?.lastName}
       />
 
       <TextField
@@ -64,6 +68,7 @@ export function ChatLeadFormFields({
         placeholder="E-mail"
         error={fieldErrors.email}
         onChange={onEmailChange}
+        inputRef={fieldRefs?.email}
       />
 
       <div className="space-y-1">
@@ -88,6 +93,7 @@ export function ChatLeadFormFields({
             placeholder="WhatsApp"
             error={fieldErrors.whatsapp}
             onChange={onWhatsappChange}
+            inputRef={fieldRefs?.whatsapp}
           />
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { normalizeWhatsappNumber } from './lead-logic';
+import { isValidEmail, normalizeWhatsappNumber } from './lead-logic';
 
 export interface LeadFinalizePayload {
   firstName: string;
@@ -60,7 +60,7 @@ export function validateLeadForm(values: LeadFormValues): ValidationResult {
   if (!normalizedLastName) errors.lastName = 'Campo obrigatório';
   if (!normalizedEmail) {
     errors.email = 'Campo obrigatório';
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+  } else if (!isValidEmail(normalizedEmail)) {
     errors.email = 'E-mail inválido';
   }
 

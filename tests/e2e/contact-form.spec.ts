@@ -59,6 +59,22 @@ test.describe('Contact form modal', () => {
     await expect(page.getByRole('button', { name: /^me chamem no whatsapp$/i })).toBeEnabled();
   });
 
+  test('bloqueia envio com e-mail inválido após clique e mantém dados editáveis', async ({ page, isMobile }) => {
+    await openHeaderContactModal(page, isMobile);
+
+    await page.locator('#contact-firstName').fill('Maria');
+    await page.locator('#contact-whatsapp').fill('11987654321');
+    await page.locator('#contact-email').fill('maria@');
+
+    const callbackButton = page.getByRole('button', { name: /^me chamem no whatsapp$/i });
+    await expect(callbackButton).toBeEnabled();
+    await callbackButton.click();
+
+    await expect(page.locator('#contact-email')).toHaveAttribute('aria-invalid', 'true');
+    await expect(contactDialog(page).getByText('Informe um e-mail válido ou deixe em branco.')).toBeVisible();
+    await expect(page.getByText(/recebemos seu contato/i)).not.toBeVisible();
+  });
+
   test('envia o pedido de retorno e exibe confirmação', async ({ page, isMobile }) => {
     await openHeaderContactModal(page, isMobile);
 
@@ -67,6 +83,7 @@ test.describe('Contact form modal', () => {
     await page.getByRole('button', { name: /^me chamem no whatsapp$/i }).click();
 
     await expect(page.getByText(/recebemos seu contato/i)).toBeVisible();
+    await expect(page.getByText('Nossa equipe chama você em breve pelo WhatsApp.')).toBeVisible();
     await expect(contactDialog(page).getByRole('status')).toContainText(/recebemos seu contato/i);
     await expect(contactDialog(page).getByRole('button', { name: /^fechar$/i }).last()).toBeFocused();
   });
@@ -79,6 +96,7 @@ test.describe('Contact form modal', () => {
     await page.locator('#contact-whatsapp').press('Enter');
 
     await expect(page.getByText(/recebemos seu contato/i)).toBeVisible();
+    await expect(page.getByText('Abrimos o WhatsApp para você continuar com a nossa equipe.')).toBeVisible();
   });
 
   test('fecha com tecla Escape', async ({ page, isMobile }) => {

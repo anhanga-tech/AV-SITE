@@ -5,16 +5,18 @@ import { pushFormAnalyticsEvent } from '../../utils/formAnalytics';
 
 export function CtaBody() {
   const [formOpen, setFormOpen] = useState(false);
-  const { fields, setField, isValid, isSubmitting, error, submitted, submit, honeypotProps } =
+  const { fields, setField, canAttemptSubmit, isSubmitting, error, fieldErrors, submitted, lastAction, submit, honeypotProps } =
     useContactForm({ source: 'cta-homepage' });
 
   if (submitted && formOpen) {
     return (
       <output className="flex flex-col gap-3" aria-live="polite">
-        <p className="flex items-center gap-2 text-green-600 text-sm font-bold">
-          <CheckCircle className="size-5" weight="fill" />
-          Recebemos! Nossa equipe entra em contato em breve.
-        </p>
+          <p className="flex items-center gap-2 text-green-600 text-sm font-bold">
+            <CheckCircle className="size-5" weight="fill" />
+          {lastAction === 'callback'
+            ? 'Recebemos! Nossa equipe chama você em breve.'
+            : 'Recebemos! Abrimos o WhatsApp para continuar por lá.'}
+          </p>
       </output>
     );
   }
@@ -48,7 +50,12 @@ export function CtaBody() {
             onChange={(event) => setField('firstName', event.target.value)}
             required
             className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-zinc-400"
+            aria-invalid={fieldErrors.firstName ? true : undefined}
+            aria-describedby={fieldErrors.firstName ? 'cta-firstName-error' : undefined}
           />
+          {fieldErrors.firstName && (
+            <p id="cta-firstName-error" className="mt-1 text-xs font-semibold text-red-500" role="alert">{fieldErrors.firstName}</p>
+          )}
         </div>
 
         <div>
@@ -63,7 +70,12 @@ export function CtaBody() {
             onChange={(event) => setField('whatsapp', event.target.value)}
             required
             className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-zinc-400"
+            aria-invalid={fieldErrors.whatsapp ? true : undefined}
+            aria-describedby={fieldErrors.whatsapp ? 'cta-whatsapp-error' : undefined}
           />
+          {fieldErrors.whatsapp && (
+            <p id="cta-whatsapp-error" className="mt-1 text-xs font-semibold text-red-500" role="alert">{fieldErrors.whatsapp}</p>
+          )}
         </div>
 
         <div>
@@ -77,7 +89,12 @@ export function CtaBody() {
             value={fields.email}
             onChange={(event) => setField('email', event.target.value)}
             className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-zinc-400"
+            aria-invalid={fieldErrors.email ? true : undefined}
+            aria-describedby={fieldErrors.email ? 'cta-email-error' : undefined}
           />
+          {fieldErrors.email && (
+            <p id="cta-email-error" className="mt-1 text-xs font-semibold text-red-500" role="alert">{fieldErrors.email}</p>
+          )}
         </div>
 
         <div className="flex items-start gap-2 px-3 py-2.5 bg-blue-50 rounded-xl border border-blue-100">
@@ -107,7 +124,7 @@ export function CtaBody() {
         <div className="flex flex-col sm:flex-row gap-3">
           <button
             type="submit"
-            disabled={!isValid || isSubmitting}
+            disabled={!canAttemptSubmit || isSubmitting}
             className="w-full sm:flex-1 flex items-center justify-center gap-2 bg-[#25D366] text-white text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-[#1fba59] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             {isSubmitting ? (
@@ -120,7 +137,7 @@ export function CtaBody() {
           <button
             type="button"
             onClick={() => void submit('callback')}
-            disabled={!isValid || isSubmitting}
+            disabled={!canAttemptSubmit || isSubmitting}
             className="w-full sm:flex-1 bg-brand-dark text-white text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-brand-vibrant disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             Me chamem

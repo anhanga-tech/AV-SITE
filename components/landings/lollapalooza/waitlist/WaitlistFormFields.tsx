@@ -1,19 +1,24 @@
 import React from 'react';
 import { CheckCircle2 } from 'lucide-react';
+import type { WaitlistFormFieldErrors } from '../../../../lib/form-v1-validation';
 
 interface WaitlistFormFieldsProps {
   name: string;
   email: string;
   acceptedLgpd: boolean;
+  errors?: WaitlistFormFieldErrors;
   onNameChange: (value: string) => void;
   onEmailChange: (value: string) => void;
   onLgpdChange: (value: boolean) => void;
 }
 
+const EMPTY_ERRORS: WaitlistFormFieldErrors = {};
+
 export function WaitlistFormFields({
   name,
   email,
   acceptedLgpd,
+  errors = EMPTY_ERRORS,
   onNameChange,
   onEmailChange,
   onLgpdChange,
@@ -33,11 +38,18 @@ export function WaitlistFormFields({
             className="peer w-full bg-anhanga-darkBlue/80 border-l-2 border-white/10 px-6 py-4 text-white placeholder-white/50 outline-none transition duration-300 focus:border-anhanga-yellow focus:bg-anhanga-yellow/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-anhanga-yellow focus-visible:outline-offset-2"
             placeholder="EX: SABRINA CARPENTER"
             autoComplete="name"
+            aria-invalid={errors.name ? true : undefined}
+            aria-describedby={errors.name ? 'lolla-waitlist-name-error' : undefined}
           />
           {/* Focus geometric accent */}
           <div className="absolute left-0 bottom-0 h-0.5 w-0 bg-anhanga-yellow transition-[width] duration-500 peer-focus:w-full" />
           <div className="absolute -left-[2px] top-0 h-0 w-2.5 bg-anhanga-yellow transition-[height] duration-500 peer-focus:h-full" />
         </div>
+        {errors.name && (
+          <p id="lolla-waitlist-name-error" role="alert" className="text-xs font-bold text-red-400">
+            {errors.name}
+          </p>
+        )}
       </div>
 
       <div className="group relative space-y-2">
@@ -53,11 +65,18 @@ export function WaitlistFormFields({
             className="peer w-full bg-anhanga-darkBlue/80 border-l-2 border-white/10 px-6 py-4 text-white placeholder-white/50 outline-none transition duration-300 focus:border-anhanga-blue focus:bg-anhanga-blue/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-anhanga-blue focus-visible:outline-offset-2"
             placeholder="VOICE@EXEMPLO.COM"
             autoComplete="email"
+            aria-invalid={errors.email ? true : undefined}
+            aria-describedby={errors.email ? 'lolla-waitlist-email-error' : undefined}
           />
           {/* Focus geometric accent */}
           <div className="absolute left-0 bottom-0 h-0.5 w-0 bg-anhanga-blue transition-[width] duration-500 peer-focus:w-full" />
           <div className="absolute -left-[2px] top-0 h-0 w-2.5 bg-anhanga-blue transition-[height] duration-500 peer-focus:h-full" />
         </div>
+        {errors.email && (
+          <p id="lolla-waitlist-email-error" role="alert" className="text-xs font-bold text-red-400">
+            {errors.email}
+          </p>
+        )}
       </div>
 
       <label className="flex items-start gap-4 cursor-pointer group pt-4">
@@ -73,12 +92,12 @@ export function WaitlistFormFields({
           <CheckCircle2 size={12} className="absolute text-black opacity-0 peer-checked:opacity-100 transition-opacity" />
         </div>
         <span className="text-xs text-zinc-400 leading-snug group-hover:text-zinc-300 transition-colors">
-          Quero receber novidades exclusivas da Anhangá por e-mail.
+          Também quero receber novidades, ofertas e dicas de viagem da Anhangá por e-mail.
         </span>
       </label>
 
       <p className="text-xs text-zinc-500 leading-relaxed">
-        Ao entrar na lista, seus dados serão usados para avisos sobre pacotes do Lollapalooza. Consulte a{' '}
+        Ao entrar na lista, seus dados serão usados para avisar você sobre pacotes do Lollapalooza 2027. O checkbox acima é opcional e serve apenas para novidades de marketing. Consulte a{' '}
           <a
             href="/politica-privacidade/"
             target="_blank"

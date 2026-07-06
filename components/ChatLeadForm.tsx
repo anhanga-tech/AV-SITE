@@ -11,6 +11,7 @@ import {
 } from '../lib/chat-lead-form-logic';
 import { triggerHaptic } from '../utils/haptics';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
+import { isFieldCompleteForAnalytics } from '../lib/form-v1-validation';
 import { ChatLeadFormFields } from './chat-lead-form/ChatLeadFormFields';
 import { ChatLeadFormFeedback } from './chat-lead-form/ChatLeadFormFeedback';
 import { ChatLeadFormActions } from './chat-lead-form/ChatLeadFormActions';
@@ -56,6 +57,10 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
   const isProcessingRef = React.useRef(false);
   const startedRef = useRef(false);
   const completedFields = useRef<Set<string> | null>(null);
+  const firstNameRef = useRef<HTMLInputElement>(null);
+  const lastNameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const whatsappRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     pushFormAnalyticsEvent({
@@ -65,6 +70,19 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
       destination,
     });
   }, [destination]);
+
+  useEffect(() => {
+    const firstError = Object.keys(fieldErrors)[0] as keyof FieldErrors | undefined;
+    if (!firstError) return;
+
+    const refs: Partial<Record<keyof FieldErrors, React.RefObject<HTMLInputElement | null>>> = {
+      firstName: firstNameRef,
+      lastName: lastNameRef,
+      email: emailRef,
+      whatsapp: whatsappRef,
+    };
+    refs[firstError]?.current?.focus();
+  }, [fieldErrors]);
 
   function trackField(fieldName: keyof FieldErrors, value: string | boolean) {
     if (!startedRef.current) {
@@ -77,7 +95,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
       });
     }
 
-    const completed = typeof value === 'boolean' ? value : value.trim().length > 0;
+    const completed = isFieldCompleteForAnalytics(fieldName, value);
     const trackedFields = completedFields.current ?? (completedFields.current = new Set());
     if (completed && !trackedFields.has(fieldName)) {
       trackedFields.add(fieldName);
@@ -233,6 +251,12 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
           onWhatsappChange={(value) => { setWhatsapp(value); trackField('whatsapp', value); }}
           onCountryCodeChange={setCountryCode}
           onLgpdChange={(value) => { setAcceptedLGPD(value); trackField('lgpd', value); }}
+          fieldRefs={{
+            firstName: firstNameRef,
+            lastName: lastNameRef,
+            email: emailRef,
+            whatsapp: whatsappRef,
+          }}
         />
 
         <ChatLeadFormFeedback localError={localError} notice={notice} />

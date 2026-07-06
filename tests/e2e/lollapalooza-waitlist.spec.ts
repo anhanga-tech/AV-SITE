@@ -69,4 +69,31 @@ test.describe('Lollapalooza evergreen landing waitlist', () => {
         utm_medium: 'cpc',
       });
   });
+
+  test('should block invalid email before submitting the waitlist form', async ({ page }) => {
+    let submitCalls = 0;
+
+    await page.route('**/api/submit-waitlist', route => {
+      submitCalls += 1;
+      return route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          ok: true,
+          requestId: 'req-waitlist-e2e',
+          message: 'Cadastro recebido com sucesso.',
+        }),
+      });
+    });
+
+    await page.goto('/lollapalooza#lista-de-espera');
+
+    await page.locator('#lolla-waitlist-name').fill('Ana Maria');
+    await page.locator('#lolla-waitlist-email').fill('ana@');
+    await page.getByRole('button', { name: /entrar na lista/i }).click();
+
+    await expect(page.locator('#lolla-waitlist-email')).toHaveAttribute('aria-invalid', 'true');
+    await expect(page.getByText('Informe um e-mail válido.')).toBeVisible();
+    expect(submitCalls).toBe(0);
+  });
 });

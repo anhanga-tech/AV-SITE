@@ -3,6 +3,7 @@ import { m } from 'framer-motion';
 import { useWaitlistCapture } from '../../../hooks/useWaitlistCapture';
 import { WAITLIST_SECTION_ID } from './constants';
 import { pushFormAnalyticsEvent } from '../../../utils/formAnalytics';
+import { isFieldCompleteForAnalytics, validateWaitlistFormFields, type WaitlistFormFieldErrors } from '../../../lib/form-v1-validation';
 import { WaitlistCopyPanel } from './waitlist/WaitlistCopyPanel';
 import { WaitlistFormFields } from './waitlist/WaitlistFormFields';
 import { WaitlistFormMessages } from './waitlist/WaitlistFormMessages';
@@ -13,6 +14,7 @@ interface WaitlistFormState {
   email: string;
   acceptedLgpd: boolean;
   localError: string | null;
+  fieldErrors: WaitlistFormFieldErrors;
   successMessage: string | null;
   warningMessage: string | null;
 }
@@ -22,6 +24,7 @@ type WaitlistFormAction =
   | { type: 'SET_EMAIL'; value: string }
   | { type: 'SET_LGPD'; value: boolean }
   | { type: 'SET_ERROR'; value: string }
+  | { type: 'SET_FIELD_ERRORS'; value: WaitlistFormFieldErrors }
   | { type: 'CLEAR_MESSAGES' }
   | { type: 'SUBMIT_SUCCESS'; success: string; warning: string | null }
   | { type: 'RESET_FORM' };
@@ -31,17 +34,19 @@ const WAITLIST_INITIAL_STATE: WaitlistFormState = {
   email: '',
   acceptedLgpd: false,
   localError: null,
+  fieldErrors: {},
   successMessage: null,
   warningMessage: null,
 };
 
 function waitlistReducer(state: WaitlistFormState, action: WaitlistFormAction): WaitlistFormState {
   switch (action.type) {
-    case 'SET_NAME': return { ...state, name: action.value };
-    case 'SET_EMAIL': return { ...state, email: action.value };
+    case 'SET_NAME': return { ...state, name: action.value, fieldErrors: { ...state.fieldErrors, name: undefined } };
+    case 'SET_EMAIL': return { ...state, email: action.value, fieldErrors: { ...state.fieldErrors, email: undefined } };
     case 'SET_LGPD': return { ...state, acceptedLgpd: action.value };
     case 'SET_ERROR': return { ...state, localError: action.value };
-    case 'CLEAR_MESSAGES': return { ...state, localError: null, successMessage: null, warningMessage: null };
+    case 'SET_FIELD_ERRORS': return { ...state, fieldErrors: action.value };
+    case 'CLEAR_MESSAGES': return { ...state, localError: null, fieldErrors: {}, successMessage: null, warningMessage: null };
     case 'SUBMIT_SUCCESS': return { ...WAITLIST_INITIAL_STATE, successMessage: action.success, warningMessage: action.warning };
     case 'RESET_FORM': return WAITLIST_INITIAL_STATE;
   }
@@ -50,7 +55,7 @@ function waitlistReducer(state: WaitlistFormState, action: WaitlistFormAction): 
 const WaitlistSection: React.FC = () => {
   const { submitWaitlist, isSubmitting, error, honeypotProps } = useWaitlistCapture();
   const [state, dispatch] = useReducer(waitlistReducer, WAITLIST_INITIAL_STATE);
-  const { name, email, acceptedLgpd, localError, successMessage, warningMessage } = state;
+  const { name, email, acceptedLgpd, localError, fieldErrors, successMessage, warningMessage } = state;
   const startedRef = useRef(false);
   const completedFields = useRef<Set<string> | null>(null);
 
@@ -74,7 +79,7 @@ const WaitlistSection: React.FC = () => {
       });
     }
 
-    const completed = typeof value === 'boolean' ? value : value.trim().length > 0;
+    const completed = isFieldCompleteForAnalytics(fieldName === 'marketingOptIn' ? 'emailOptIn' : fieldName, value);
     const trackedFields = completedFields.current ?? (completedFields.current = new Set());
     if (completed && !trackedFields.has(fieldName)) {
       trackedFields.add(fieldName);
@@ -98,21 +103,25 @@ const WaitlistSection: React.FC = () => {
       destination: 'Lollapalooza Brasil',
     });
 
-    if (!name.trim() || !email.trim()) {
-      dispatch({ type: 'SET_ERROR', value: 'Preencha nome completo e e-mail para entrar na lista.' });
+    const validation = validateWaitlistFormFields({ name, email });
+    if (!validation.valid) {
+      dispatch({ type: 'SET_FIELD_ERRORS', value: validation.errors });
+      dispatch({ type: 'SET_ERROR', value: 'Confira os campos destacados para entrar na lista.' });
+      const firstErrorField = Object.keys(validation.errors)[0];
       pushFormAnalyticsEvent({
         event: 'field_error',
         formType: 'waitlist',
         formId: 'lolla-waitlist-2027',
-        errorType: 'required',
+        fieldName: firstErrorField,
+        errorType: firstErrorField ?? 'validation',
         destination: 'Lollapalooza Brasil',
       });
       return;
     }
 
     const result = await submitWaitlist({
-      name,
-      email,
+      name: validation.normalized.name,
+      email: validation.normalized.email,
       sourcePage: typeof window !== 'undefined' ? window.location.pathname : '/lollapalooza',
       // The checkbox copy ("Autorizo a Anhangá a me enviar novidades") is a
       // marketing opt-in → feeds Odoo x_lgpd_consent.
@@ -177,7 +186,7 @@ const WaitlistSection: React.FC = () => {
                 <div className="h-1 w-20 bg-anhanga-yellow mt-4 mx-auto lg:mx-0" />
               </div>
 
-              <form className="space-y-8" onSubmit={handleSubmit}>
+              <form className="space-y-8" onSubmit={handleSubmit} noValidate>
                 {/* Honeypot: hidden from humans, blind form-fillers populate it. */}
                 <input {...honeypotProps} />
 
@@ -185,6 +194,7 @@ const WaitlistSection: React.FC = () => {
                   name={name}
                   email={email}
                   acceptedLgpd={acceptedLgpd}
+                  errors={fieldErrors}
                   onNameChange={(value) => {
                     dispatch({ type: 'SET_NAME', value });
                     trackField('name', value);

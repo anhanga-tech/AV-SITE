@@ -5,12 +5,12 @@ import {
     normalizeTracking,
     normalizeUtms,
     normalizeWhatsappNumber,
+    isValidEmail,
 } from '../lib/lead-logic';
 import { type ValidationResult } from '../lib/n8n-submit-handler';
 import { createOdooSubmitHandler } from '../lib/odoo-submit-handler';
 import { leadInputFromSubmitContact } from '../lib/odoo-lead-mapping';
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CONTACT_VALIDATION_ERROR = 'Nome e WhatsApp são obrigatórios.';
 
 function validateContactRequest(body: unknown): ValidationResult<SubmitContactRequest> {
@@ -23,7 +23,7 @@ function validateContactRequest(body: unknown): ValidationResult<SubmitContactRe
 
     if (!firstName || !whatsapp) return { ok: false, error: CONTACT_VALIDATION_ERROR };
     if (firstName.length > 100 || whatsapp.length > 16) return { ok: false, error: CONTACT_VALIDATION_ERROR };
-    if (email && !EMAIL_REGEX.test(email)) return { ok: false, error: CONTACT_VALIDATION_ERROR };
+    if (email && !isValidEmail(email)) return { ok: false, error: CONTACT_VALIDATION_ERROR };
 
     const utms = normalizeUtms(raw.utms);
     const tracking = normalizeTracking(raw.tracking, utms);

@@ -39,6 +39,13 @@ test('TextField sem erro não adiciona atributos de erro', () => {
   assert.ok(!html.includes('role="alert"'), 'não deve ter role="alert" sem erro');
 });
 
+test('TextField renderiza label visual, não apenas placeholder', () => {
+  const html = renderToStaticMarkup(React.createElement(TextField, baseProps));
+
+  assert.match(html, /<label[^>]*for="lead-email"[^>]*>E-mail<\/label>/);
+  assert.doesNotMatch(html, /<label[^>]*class="sr-only"/);
+});
+
 const validLeadValues = {
   firstName: 'Ana',
   lastName: 'Silva',

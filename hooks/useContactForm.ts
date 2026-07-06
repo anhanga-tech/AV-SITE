@@ -1,6 +1,11 @@
 import { useCallback, useState, useRef } from 'react';
 import { useAntiBot } from './useAntiBot';
 import { cleanString, splitFullName } from '../lib/lead-logic';
+import {
+    isFieldCompleteForAnalytics,
+    validateContactFormFields,
+    type ContactFormFieldErrors,
+} from '../lib/form-v1-validation';
 import { getTrackingDataObject, getWhatsAppLink } from '../utils/whatsapp';
 import { createLeadEventId, extractUtms } from './useLeadCapture';
 import type { ContactFormFields, SubmitContactRequest, SubmitContactResponse } from '../types/contactCapture';
@@ -104,17 +109,20 @@ export function useContactForm(options: ContactModalOptions = {}) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const isLocallySubmitting = useRef(false);
     const hasStarted = useRef(false);
-    const completedFields = useRef<Set<keyof ContactFormFields>>(new Set());
+    const completedFields = useRef<Set<keyof ContactFormFields> | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [fieldErrors, setFieldErrors] = useState<ContactFormFieldErrors>({});
     const [submitted, setSubmitted] = useState(false);
+    const [lastAction, setLastAction] = useState<'whatsapp' | 'callback' | null>(null);
 
-    const isValid = Boolean(fields.firstName.trim() && fields.whatsapp.trim());
+    const canAttemptSubmit = Boolean(fields.firstName.trim() && fields.whatsapp.trim());
     const formId = options.source ?? 'contact-modal';
 
     const setField = useCallback(
         (key: keyof ContactFormFields, value: string | boolean) => {
             setFieldsState((prev) => ({ ...prev, [key]: value }));
             setError(null);
+            setFieldErrors((prev) => (key in prev ? { ...prev, [key]: undefined } : prev));
 
             if (!hasStarted.current) {
                 hasStarted.current = true;
@@ -125,9 +133,10 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 });
             }
 
-            const completed = typeof value === 'boolean' ? value : value.trim().length > 0;
-            if (completed && !completedFields.current.has(key)) {
-                completedFields.current.add(key);
+            const completed = isFieldCompleteForAnalytics(key, value);
+            const trackedFields = completedFields.current ?? (completedFields.current = new Set());
+            if (completed && !trackedFields.has(key)) {
+                trackedFields.add(key);
                 pushFormAnalyticsEvent({
                     event: 'field_complete',
                     formType: 'contact_modal',
@@ -143,18 +152,36 @@ export function useContactForm(options: ContactModalOptions = {}) {
         setFieldsState(EMPTY_FIELDS);
         setIsSubmitting(false);
         setError(null);
+        setFieldErrors({});
         setSubmitted(false);
+        setLastAction(null);
         hasStarted.current = false;
-        completedFields.current.clear();
+        completedFields.current = null;
     }, []);
 
     const submit = useCallback(
         async (action: 'whatsapp' | 'callback'): Promise<void> => {
-            if (!isValid || isLocallySubmitting.current) return;
+            if (isLocallySubmitting.current) return;
+
+            const validation = validateContactFormFields(fields);
+            if (!validation.valid) {
+                setFieldErrors(validation.errors);
+                const firstErrorField = Object.keys(validation.errors)[0] as keyof ContactFormFieldErrors | undefined;
+                pushFormAnalyticsEvent({
+                    event: 'field_error',
+                    formType: 'contact_modal',
+                    formId,
+                    fieldName: firstErrorField,
+                    errorType: firstErrorField ?? 'validation',
+                    destination: action,
+                });
+                return;
+            }
 
             isLocallySubmitting.current = true;
             setIsSubmitting(true);
             setError(null);
+            setFieldErrors({});
             pushFormAnalyticsEvent({
                 event: 'submit_attempt',
                 formType: 'contact_modal',
@@ -166,7 +193,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
             const { tracking, utms } = collectTracking();
             const whatsappMessage =
                 options.message
-                ?? `Olá! Meu nome é ${fields.firstName.trim()}. Gostaria de saber mais sobre viagens.`;
+                ?? `Olá! Meu nome é ${validation.normalized.firstName}. Gostaria de saber mais sobre viagens.`;
             const whatsappUrl = getWhatsAppLink(whatsappMessage, { appendTrackingRef: true });
 
             if (action === 'whatsapp') {
@@ -182,12 +209,12 @@ export function useContactForm(options: ContactModalOptions = {}) {
             // The UI dropped the separate sobrenome input (ContactModal/CtaBody now
             // ask for the full name in `firstName`), so split it here to keep the
             // last name flowing into the CRM instead of leaving it empty.
-            const { firstName, lastName } = splitFullName(fields.firstName, fields.lastName);
+            const { firstName, lastName } = splitFullName(validation.normalized.firstName, fields.lastName);
             const requestBody: SubmitContactRequest = {
                 firstName: cleanString(firstName),
                 lastName: cleanString(lastName) || undefined,
-                whatsapp: cleanString(fields.whatsapp),
-                email: cleanString(fields.email) || undefined,
+                whatsapp: validation.normalized.whatsapp,
+                email: validation.normalized.email,
                 emailOptIn: fields.emailOptIn,
                 source: options.source,
                 destination: options.destination,
@@ -217,6 +244,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
                             errorType: errData.code,
                             destination: action,
                         });
+                        setLastAction(action);
                         setSubmitted(true);
                     } else {
                         setError(errData.error || 'Não foi possível enviar. Tente novamente.');
@@ -238,6 +266,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
                     formId,
                     destination: action,
                 });
+                setLastAction(action);
                 setSubmitted(true);
             } catch {
                 if (action === 'whatsapp') {
@@ -249,6 +278,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
                         errorType: 'network',
                         destination: action,
                     });
+                    setLastAction(action);
                     setSubmitted(true);
                 } else {
                     setError('Erro de conexão. Verifique sua internet e tente novamente.');
@@ -265,8 +295,8 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 isLocallySubmitting.current = false;
             }
         },
-        [fields, isValid, options, getAntiBotFields, formId],
+        [fields, options.destination, options.message, options.source, getAntiBotFields, formId],
     );
 
-    return { fields, setField, isValid, isSubmitting, error, submitted, submit, reset, honeypotProps };
+    return { fields, setField, canAttemptSubmit, isSubmitting, error, fieldErrors, submitted, lastAction, submit, reset, honeypotProps };
 }

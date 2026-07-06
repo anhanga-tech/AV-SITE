@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import type { LeadForm, TravelerProfile } from '../../../data/quiz';
 import type { HoneypotProps } from '../../../hooks/useAntiBot';
 import { pushFormAnalyticsEvent } from '../../../utils/formAnalytics';
+import { isFieldCompleteForAnalytics, isValidEmail } from '../../../lib/form-v1-validation';
 
 interface PreLeadScreenProps {
     profile: TravelerProfile;
@@ -48,7 +49,7 @@ export function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting, initial
             });
         }
 
-        const completed = typeof value === 'boolean' ? value : value.trim().length > 0;
+        const completed = isFieldCompleteForAnalytics(fieldName === 'name' ? 'firstName' : fieldName, value);
         const trackedFields = completedFields.current ?? (completedFields.current = new Set());
         if (completed && !trackedFields.has(fieldName)) {
             trackedFields.add(fieldName);
@@ -80,7 +81,7 @@ export function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting, initial
         });
         const errs: typeof errors = {};
         if (!form.nome.trim()) errs.nome = 'Conta pra gente seu nome';
-        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email)) errs.email = 'E-mail inválido';
+        if (!isValidEmail(form.email)) errs.email = 'E-mail inválido';
         if (Object.keys(errs).length) {
             setErrors(errs);
             pushFormAnalyticsEvent({
@@ -120,7 +121,7 @@ export function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting, initial
                 <h2 className="quiz-lead-title">Seu perfil está pronto.</h2>
                 <p className="quiz-lead-sub">
                     Seu perfil, destino principal e três ideias para sonhar já estão separados.
-                    Deixe um contato para guardar o resultado e abrir tudo agora.
+                    Deixe seu e-mail para guardar o resultado e abrir tudo agora.
                 </p>
 
                 <form className="quiz-lead-form" onSubmit={submit}>
@@ -166,8 +167,8 @@ export function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting, initial
                         </span>
                     </label>
                     <p className="text-xs text-zinc-500 leading-relaxed mt-1">
-                        Ao revelar seu perfil, seus dados serão registrados em nosso CRM para atendimento
-                        comercial e entraremos em contato via WhatsApp.{' '}
+                        Ao revelar seu perfil, seus dados serão registrados em nosso CRM para guardar seu resultado
+                        e permitir atendimento comercial por e-mail. O WhatsApp é opcional na próxima etapa.{' '}
                         <Link to="/politica-privacidade/" target="_blank" rel="noopener noreferrer"
                             className="underline hover:text-zinc-700">
                             Política de Privacidade

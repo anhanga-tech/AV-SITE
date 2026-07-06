@@ -54,3 +54,11 @@ test('o aceite de newsletter nunca é pré-marcado a partir do link', () => {
 
     assert.doesNotMatch(html, /type="checkbox"[^>]*checked/);
 });
+
+test('copy antes do telefone promete revelar por e-mail, não contato via WhatsApp', () => {
+    const html = renderScreen();
+
+    assert.match(html, /guardar o resultado/i);
+    assert.match(html, /e-mail/i);
+    assert.doesNotMatch(html, /entraremos em contato via WhatsApp/i);
+});

@@ -1,5 +1,5 @@
 import { useReducer, useRef, useCallback } from 'react';
-import { normalizeWhatsappNumber } from '@/lib/lead-logic';
+import { isValidEmail, normalizeWhatsappNumber } from '@/lib/lead-logic';
 
 export type FormFields = {
     firstName: string;
@@ -95,8 +95,7 @@ export function validateCorpForm(form: FormFields, acceptedLGPD: boolean): Valid
     if (!form.whatsapp.trim()) {
         return { ok: false, message: 'Informe seu WhatsApp.', field: 'whatsapp' };
     }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(form.email.trim())) {
+    if (!isValidEmail(form.email)) {
         return { ok: false, message: 'Insira um e-mail profissional válido', field: 'email' };
     }
     if (!normalizeWhatsappNumber(form.whatsapp)) {
