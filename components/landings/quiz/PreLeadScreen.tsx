@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import type { LeadForm, TravelerProfile } from '../../../data/quiz';
 import type { HoneypotProps } from '../../../hooks/useAntiBot';
 import { pushFormAnalyticsEvent } from '../../../utils/formAnalytics';
-import { isFieldCompleteForAnalytics } from '../../../lib/form-v1-validation';
+import { isFieldCompleteForAnalytics, isValidEmail } from '../../../lib/form-v1-validation';
 
 interface PreLeadScreenProps {
     profile: TravelerProfile;
@@ -81,7 +81,7 @@ export function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting, initial
         });
         const errs: typeof errors = {};
         if (!form.nome.trim()) errs.nome = 'Conta pra gente seu nome';
-        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email)) errs.email = 'E-mail inválido';
+        if (!isValidEmail(form.email)) errs.email = 'E-mail inválido';
         if (Object.keys(errs).length) {
             setErrors(errs);
             pushFormAnalyticsEvent({
