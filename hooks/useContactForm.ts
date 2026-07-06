@@ -115,7 +115,6 @@ export function useContactForm(options: ContactModalOptions = {}) {
     const [submitted, setSubmitted] = useState(false);
     const [lastAction, setLastAction] = useState<'whatsapp' | 'callback' | null>(null);
 
-    const isValid = validateContactFormFields(fields).valid;
     const canAttemptSubmit = Boolean(fields.firstName.trim() && fields.whatsapp.trim());
     const formId = options.source ?? 'contact-modal';
 
@@ -299,5 +298,5 @@ export function useContactForm(options: ContactModalOptions = {}) {
         [fields, options.destination, options.message, options.source, getAntiBotFields, formId],
     );
 
-    return { fields, setField, isValid, canAttemptSubmit, isSubmitting, error, fieldErrors, submitted, lastAction, submit, reset, honeypotProps };
+    return { fields, setField, canAttemptSubmit, isSubmitting, error, fieldErrors, submitted, lastAction, submit, reset, honeypotProps };
 }
