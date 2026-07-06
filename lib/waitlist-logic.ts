@@ -1,7 +1,5 @@
-import { normalizeNullable, normalizeTracking, normalizeUtms } from './lead-logic';
+import { isValidEmail, normalizeNullable, normalizeTracking, normalizeUtms } from './lead-logic';
 import type { SubmitWaitlistRequest } from '../types/waitlist';
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function splitWaitlistName(name: string): { firstName: string; lastName: string } {
     const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -44,7 +42,7 @@ export function validateWaitlistPayload(
         return { valid: false, error: 'Campos obrigatórios ausentes.' };
     }
 
-    if (!EMAIL_REGEX.test(email)) {
+    if (!isValidEmail(email)) {
         return { valid: false, error: 'Email inválido.' };
     }
 

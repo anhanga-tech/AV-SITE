@@ -1,6 +1,6 @@
-import { normalizeWhatsappNumber } from './lead-logic';
+import { isValidEmail, normalizeWhatsappNumber } from './lead-logic';
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export { isValidEmail } from './lead-logic';
 
 export type ContactFormValidationInput = {
   firstName: string;
@@ -16,10 +16,6 @@ export type NpsFormFieldErrors = Partial<Record<'firstname' | 'email' | 'score',
 
 function cleanEmail(value: string | undefined): string {
   return (value ?? '').trim().toLowerCase();
-}
-
-export function isValidEmail(value: string): boolean {
-  return EMAIL_REGEX.test(value.trim());
 }
 
 export function validateContactFormFields(input: ContactFormValidationInput):

@@ -1,7 +1,5 @@
-import { cleanString, normalizeNullable, normalizeTracking, normalizeUtms, normalizeWhatsappNumber, splitFullName } from './lead-logic';
+import { cleanString, isValidEmail, normalizeNullable, normalizeTracking, normalizeUtms, normalizeWhatsappNumber, splitFullName } from './lead-logic';
 import type { SubmitQuizRequest } from '../types/quiz';
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** Derives firstName/lastName from the quiz form via {@link splitFullName},
  *  applying the quiz-specific "Viajante" fallback when the name is empty so the
@@ -34,7 +32,7 @@ export function validateQuizPayload(
         return { valid: false, error: 'Campos obrigatórios ausentes.' };
     }
 
-    if (!EMAIL_REGEX.test(email)) {
+    if (!isValidEmail(email)) {
         return { valid: false, error: 'Email inválido.' };
     }
 

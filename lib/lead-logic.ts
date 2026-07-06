@@ -5,6 +5,7 @@ import { isRecord } from './type-guards';
 
 const MIN_PHONE_DIGITS = 10;
 const MAX_PHONE_DIGITS = 15;
+export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const KNOWN_TRACKING_KEYS = new Set([
     'utm_source',
@@ -52,6 +53,10 @@ export function cleanString(value: unknown): string {
     const trimmed = value.trim();
     const truncated = trimmed.length > 10000 ? trimmed.substring(0, 10000) : trimmed;
     return truncated.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+export function isValidEmail(value: string): boolean {
+    return EMAIL_REGEX.test(value.trim());
 }
 
 /**
