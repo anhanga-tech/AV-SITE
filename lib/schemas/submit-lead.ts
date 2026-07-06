@@ -35,7 +35,11 @@ export const SubmitLeadBodySchema = z.object({
     firstName:   z.string().min(1).max(100),
     lastName:    z.string().min(1).max(100),
     email:       z.email().max(254),
-    whatsapp:    z.string().min(1),
+    // Bound the raw phone at the boundary so oversized input is rejected before
+    // normalizeWhatsappNumber runs its regex passes over the full string. A valid
+    // number is at most 15 digits (MAX_PHONE_DIGITS) plus formatting (+, spaces,
+    // parens, dashes); 32 leaves generous room without allowing abuse.
+    whatsapp:    z.string().min(1).max(32),
     event_id:    z.string().max(128).optional(),
     bantSummary: z.string().min(1).max(5000),
     destination: z.string().min(1).max(255),
