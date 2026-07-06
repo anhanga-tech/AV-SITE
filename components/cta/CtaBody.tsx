@@ -2,6 +2,10 @@ import { useState } from 'react';
 import { WhatsappLogo, SpinnerGap, CheckCircle } from '@phosphor-icons/react';
 import { useContactForm } from '../../hooks/useContactForm';
 import { pushFormAnalyticsEvent } from '../../utils/formAnalytics';
+import { FormField } from '../forms/FormField';
+
+const FIELD_CLASSNAME =
+  'w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-zinc-400';
 
 export function CtaBody() {
   const [formOpen, setFormOpen] = useState(false);
@@ -37,65 +41,40 @@ export function CtaBody() {
           Seus dados para contato
         </p>
 
-        <div>
-          <label htmlFor="cta-firstName" className="mb-1 block text-xs font-bold uppercase tracking-wider text-zinc-500">
-            Nome *
-          </label>
-          <input
-            id="cta-firstName"
-            type="text"
-            placeholder="ex: João Silva"
-            autoComplete="name"
-            value={fields.firstName}
-            onChange={(event) => setField('firstName', event.target.value)}
-            required
-            className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-zinc-400"
-            aria-invalid={fieldErrors.firstName ? true : undefined}
-            aria-describedby={fieldErrors.firstName ? 'cta-firstName-error' : undefined}
-          />
-          {fieldErrors.firstName && (
-            <p id="cta-firstName-error" className="mt-1 text-xs font-semibold text-red-500" role="alert">{fieldErrors.firstName}</p>
-          )}
-        </div>
+        <FormField
+          id="cta-firstName"
+          label="Nome *"
+          autoComplete="name"
+          value={fields.firstName}
+          onChange={(value) => setField('firstName', value)}
+          required
+          inputClassName={FIELD_CLASSNAME}
+          placeholder="ex: João Silva"
+          error={fieldErrors.firstName}
+        />
 
-        <div>
-          <label htmlFor="cta-whatsapp" className="mb-1 block text-xs font-bold uppercase tracking-wider text-zinc-500">
-            WhatsApp *
-          </label>
-          <input
-            id="cta-whatsapp"
-            type="tel"
-            placeholder="(11) 99999-9999"
-            value={fields.whatsapp}
-            onChange={(event) => setField('whatsapp', event.target.value)}
-            required
-            className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-zinc-400"
-            aria-invalid={fieldErrors.whatsapp ? true : undefined}
-            aria-describedby={fieldErrors.whatsapp ? 'cta-whatsapp-error' : undefined}
-          />
-          {fieldErrors.whatsapp && (
-            <p id="cta-whatsapp-error" className="mt-1 text-xs font-semibold text-red-500" role="alert">{fieldErrors.whatsapp}</p>
-          )}
-        </div>
+        <FormField
+          id="cta-whatsapp"
+          label="WhatsApp *"
+          type="tel"
+          value={fields.whatsapp}
+          onChange={(value) => setField('whatsapp', value)}
+          required
+          inputClassName={FIELD_CLASSNAME}
+          placeholder="(11) 99999-9999"
+          error={fieldErrors.whatsapp}
+        />
 
-        <div>
-          <label htmlFor="cta-email" className="mb-1 block text-xs font-bold uppercase tracking-wider text-zinc-500">
-            E-mail
-          </label>
-          <input
-            id="cta-email"
-            type="email"
-            placeholder="voce@email.com (opcional)"
-            value={fields.email}
-            onChange={(event) => setField('email', event.target.value)}
-            className="w-full px-4 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-medium text-zinc-800 outline-none focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan transition-colors placeholder-zinc-400"
-            aria-invalid={fieldErrors.email ? true : undefined}
-            aria-describedby={fieldErrors.email ? 'cta-email-error' : undefined}
-          />
-          {fieldErrors.email && (
-            <p id="cta-email-error" className="mt-1 text-xs font-semibold text-red-500" role="alert">{fieldErrors.email}</p>
-          )}
-        </div>
+        <FormField
+          id="cta-email"
+          label="E-mail"
+          type="email"
+          value={fields.email}
+          onChange={(value) => setField('email', value)}
+          inputClassName={FIELD_CLASSNAME}
+          placeholder="voce@email.com (opcional)"
+          error={fieldErrors.email}
+        />
 
         <div className="flex items-start gap-2 px-3 py-2.5 bg-blue-50 rounded-xl border border-blue-100">
           <input
