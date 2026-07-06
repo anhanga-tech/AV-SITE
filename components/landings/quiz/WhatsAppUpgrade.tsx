@@ -86,7 +86,7 @@ export function WhatsAppUpgrade({ profileName, mainDestName, firstName, baseWaUr
     return (
         <div className="quiz-wa-upgrade">
             <p className="quiz-wa-upgrade-label">
-                Quer guardar seu perfil no WhatsApp?
+                Quer continuar essa conversa pelo WhatsApp?
             </p>
             <div className="quiz-wa-upgrade-row">
                 <input
@@ -114,7 +114,7 @@ export function WhatsAppUpgrade({ profileName, mainDestName, firstName, baseWaUr
                 onClick={trackWhatsAppOpened}
                 data-tracking="result-quiz-skip"
             >
-                Ir pro WhatsApp sem deixar número →
+                Pular número e abrir WhatsApp →
             </a>
         </div>
     );

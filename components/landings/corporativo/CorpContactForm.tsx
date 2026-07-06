@@ -9,6 +9,7 @@ import { CorpLgpdConsent } from './CorpLgpdConsent';
 import { CorpSuccessState } from './CorpSuccessState';
 import { fadeUp } from './constants';
 import { pushFormAnalyticsEvent } from '@/utils/formAnalytics';
+import { isFieldCompleteForAnalytics } from '@/lib/form-v1-validation';
 
 interface CorpContactFormProps {
     whatsappUrl: string;
@@ -40,7 +41,7 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
             });
         }
 
-        const completed = typeof value === 'boolean' ? value : value.trim().length > 0;
+        const completed = isFieldCompleteForAnalytics(fieldName, value);
         const trackedFields = completedFields.current ?? (completedFields.current = new Set());
         if (completed && !trackedFields.has(fieldName)) {
             trackedFields.add(fieldName);

@@ -9,6 +9,7 @@ import { NpsThankOther } from '../components/nps/NpsThankOther';
 import { Seo } from '../components/Seo';
 import { useAntiBot } from '../hooks/useAntiBot';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
+import { isFieldCompleteForAnalytics, validateNpsFormFields, type NpsFormFieldErrors } from '../lib/form-v1-validation';
 
 type PageState = 'form' | 'thank-promoter' | 'thank-other';
 
@@ -65,15 +66,19 @@ const PAGE_STYLES = `
 
 export default function NpsPage() {
   const [params] = useSearchParams();
-  const firstname = params.get('firstname')?.trim() ?? '';
-  const email = params.get('email')?.trim() ?? '';
+  const initialFirstname = params.get('firstname')?.trim() ?? '';
+  const initialEmail = params.get('email')?.trim() ?? '';
+  const needsIdentityFields = !initialFirstname || !initialEmail;
 
   const [score, setScore] = useState<number | null>(null);
+  const [firstname, setFirstname] = useState(initialFirstname);
+  const [email, setEmail] = useState(initialEmail);
   const [reason, setReason] = useState('');
   const [highlight, setHighlight] = useState('');
   const [pageState, setPageState] = useState<PageState>('form');
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<NpsFormFieldErrors>({});
   const [year] = useState(() => new Date().getFullYear());
   const { getAntiBotFields, honeypotProps } = useAntiBot();
   const startedRef = useRef(false);
@@ -93,7 +98,7 @@ export default function NpsPage() {
     });
   }, []);
 
-  function markStarted(fieldName: 'score' | 'reason' | 'highlight') {
+  function markStarted(fieldName: 'firstname' | 'email' | 'score' | 'reason' | 'highlight', value: string | number | null = '') {
     if (!startedRef.current) {
       startedRef.current = true;
       pushFormAnalyticsEvent({
@@ -103,7 +108,7 @@ export default function NpsPage() {
       });
     }
     const trackedFields = completedFields.current ?? (completedFields.current = new Set());
-    if (!trackedFields.has(fieldName)) {
+    if (isFieldCompleteForAnalytics(fieldName, value) && !trackedFields.has(fieldName)) {
       trackedFields.add(fieldName);
       pushFormAnalyticsEvent({
         event: 'field_complete',
@@ -116,10 +121,23 @@ export default function NpsPage() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (score === null) return;
+    const validation = validateNpsFormFields({ firstname, email, score });
+    if (!validation.valid) {
+      setFieldErrors(validation.errors);
+      setErrorMessage('Confira os campos destacados para enviar sua avaliação.');
+      pushFormAnalyticsEvent({
+        event: 'field_error',
+        formType: 'nps',
+        formId: 'post-trip-nps',
+        fieldName: Object.keys(validation.errors)[0],
+        errorType: Object.keys(validation.errors)[0] ?? 'validation',
+      });
+      return;
+    }
 
     setSubmitting(true);
     setErrorMessage('');
+    setFieldErrors({});
     pushFormAnalyticsEvent({
       event: 'submit_attempt',
       formType: 'nps',
@@ -131,9 +149,9 @@ export default function NpsPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          firstname,
-          email,
-          score,
+          firstname: validation.normalized.firstname,
+          email: validation.normalized.email,
+          score: validation.normalized.score,
           reason: reason.trim(),
           highlight: highlight.trim(),
           ...getAntiBotFields(),
@@ -152,7 +170,7 @@ export default function NpsPage() {
         formType: 'nps',
         formId: 'post-trip-nps',
       });
-      setPageState(score >= 9 ? 'thank-promoter' : 'thank-other');
+      setPageState(validation.normalized.score >= 9 ? 'thank-promoter' : 'thank-other');
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : 'Erro inesperado. Tente novamente.');
       pushFormAnalyticsEvent({
@@ -207,9 +225,82 @@ export default function NpsPage() {
                   score={score}
                   onSelect={(nextScore) => {
                     setScore(nextScore);
-                    markStarted('score');
+                    setFieldErrors((prev) => ({ ...prev, score: undefined }));
+                    markStarted('score', nextScore);
                   }}
                 />
+
+                {needsIdentityFields && (
+                  <div className="mb-8 grid gap-4 sm:grid-cols-2">
+                    {!initialFirstname && (
+                      <div>
+                        <label
+                          htmlFor="nps-firstname"
+                          className="block text-xs font-black uppercase tracking-[0.15em] text-slate-400 mb-2.5"
+                        >
+                          Seu nome
+                        </label>
+                        <input
+                          id="nps-firstname"
+                          type="text"
+                          value={firstname}
+                          onChange={(event) => {
+                            setFirstname(event.target.value);
+                            setFieldErrors((prev) => ({ ...prev, firstname: undefined }));
+                            markStarted('firstname', event.target.value);
+                          }}
+                          autoComplete="given-name"
+                          aria-invalid={fieldErrors.firstname ? true : undefined}
+                          aria-describedby={fieldErrors.firstname ? 'nps-firstname-error' : undefined}
+                          className="w-full rounded-xl px-4 py-3 text-sm font-sans bg-slate-800/60 text-slate-100 placeholder:text-slate-500 border-2 border-slate-600/40 outline-none focus:border-anhanga-action focus:shadow-[0_0_0_4px_rgba(14,165,233,0.15)]"
+                          placeholder="Como podemos te chamar?"
+                        />
+                        {fieldErrors.firstname && (
+                          <p id="nps-firstname-error" className="mt-1.5 text-xs font-semibold text-red-400" role="alert">
+                            {fieldErrors.firstname}
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    {!initialEmail && (
+                      <div>
+                        <label
+                          htmlFor="nps-email"
+                          className="block text-xs font-black uppercase tracking-[0.15em] text-slate-400 mb-2.5"
+                        >
+                          Seu e-mail
+                        </label>
+                        <input
+                          id="nps-email"
+                          type="email"
+                          value={email}
+                          onChange={(event) => {
+                            setEmail(event.target.value);
+                            setFieldErrors((prev) => ({ ...prev, email: undefined }));
+                            markStarted('email', event.target.value);
+                          }}
+                          autoComplete="email"
+                          aria-invalid={fieldErrors.email ? true : undefined}
+                          aria-describedby={fieldErrors.email ? 'nps-email-error' : undefined}
+                          className="w-full rounded-xl px-4 py-3 text-sm font-sans bg-slate-800/60 text-slate-100 placeholder:text-slate-500 border-2 border-slate-600/40 outline-none focus:border-anhanga-action focus:shadow-[0_0_0_4px_rgba(14,165,233,0.15)]"
+                          placeholder="voce@email.com"
+                        />
+                        {fieldErrors.email && (
+                          <p id="nps-email-error" className="mt-1.5 text-xs font-semibold text-red-400" role="alert">
+                            {fieldErrors.email}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {fieldErrors.score && (
+                  <p className="mb-6 text-sm text-center rounded-xl px-4 py-3 text-red-400 bg-red-500/10 border border-red-500/20" role="alert">
+                    {fieldErrors.score}
+                  </p>
+                )}
 
                 <div className="mb-8">
                   <label
@@ -226,7 +317,7 @@ export default function NpsPage() {
                     value={reason}
                     onChange={(value) => {
                       setReason(value);
-                      if (value.trim()) markStarted('reason');
+                      if (value.trim()) markStarted('reason', value);
                     }}
                     placeholder="Conte-nos sua experiência..."
                     rows={4}
@@ -250,7 +341,7 @@ export default function NpsPage() {
                     value={highlight}
                     onChange={(value) => {
                       setHighlight(value);
-                      if (value.trim()) markStarted('highlight');
+                      if (value.trim()) markStarted('highlight', value);
                     }}
                     placeholder="Um momento especial que ficou na memória..."
                     rows={3}

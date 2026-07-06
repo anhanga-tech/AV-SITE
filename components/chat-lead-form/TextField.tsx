@@ -9,6 +9,7 @@ type TextFieldProps = {
   error?: string;
   onChange: (value: string) => void;
   inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];
+  inputRef?: React.Ref<HTMLInputElement>;
 };
 
 export function TextField({
@@ -20,13 +21,17 @@ export function TextField({
   error,
   onChange,
   inputMode,
+  inputRef,
 }: TextFieldProps) {
   const errorId = `${id}-error`;
   return (
-    <div className="space-y-1">
-      <label htmlFor={id} className="sr-only">{label}</label>
+    <div className="space-y-1.5">
+      <label htmlFor={id} className="block text-[11px] font-black uppercase tracking-[0.12em] text-zinc-500">
+        {label}
+      </label>
       <input
         id={id}
+        ref={inputRef}
         type={type}
         inputMode={inputMode}
         value={value}
