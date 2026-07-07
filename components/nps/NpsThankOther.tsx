@@ -1,4 +1,4 @@
-const WHATSAPP_URL = 'https://wa.me/5511955020352';
+const WHATSAPP_URL = 'https://wa.me/5511955021519';
 
 export interface NpsThankOtherProps {
   firstname: string;

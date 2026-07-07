@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { getWhatsAppLink, getTrackingDataObject } from '../utils/whatsapp.ts';
 
-const WHATSAPP_BASE = 'https://wa.me/5511955020352';
+const WHATSAPP_BASE = 'https://wa.me/5511955021519';
 
 function decodeMessageFrom(url: string): string {
     const part = url.split('?text=')[1];

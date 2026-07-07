@@ -18,7 +18,7 @@ const TRACKING_PARAMS = [
 const HSA_PREFIX = 'hsa_';
 const COOKIE_NAME = 'tracking_data';
 const STORAGE_KEY = 'anhanga_tracking_data';
-const WHATSAPP_NUMBER = '5511955020352';
+const WHATSAPP_NUMBER = '5511955021519';
 // Cookie name for GA4 session (dynamic based on measurement ID suffix)
 const GA4_SESSION_COOKIE = '_ga_QDBT5PM4KP';
 
