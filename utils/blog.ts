@@ -14,3 +14,47 @@ export function formatDate(isoDate: string): string {
   const [, year, month, day] = match;
   return `${day}/${month}/${year}`;
 }
+
+interface SearchablePost {
+  title: string;
+  category: string;
+  tags: string[];
+}
+
+export interface BlogSearchEntry<T> {
+  post: T;
+  haystack: string;
+}
+
+// PERFORMANCE: precompute one lowercased "haystack" per post so the search box
+// filter doesn't re-lowercase every title/category/tag on each keystroke.
+// Fields are joined with "\n" so a term (which can never contain "\n" from an
+// <input>) can only match within a single field — identical semantics to the
+// previous per-field `.toLowerCase().includes()` / `tags.some()` checks.
+export function buildBlogSearchIndex<T extends SearchablePost>(
+  posts: readonly T[],
+): BlogSearchEntry<T>[] {
+  return posts.map((post) => ({
+    post,
+    haystack: `${post.title}\n${post.category}\n${post.tags.join('\n')}`.toLowerCase(),
+  }));
+}
+
+// Filters a prebuilt index by a search term. An empty term is a fast path that
+// returns every post without scanning any string.
+export function filterBlogSearchIndex<T>(
+  index: readonly BlogSearchEntry<T>[],
+  rawTerm: string,
+): T[] {
+  const term = rawTerm.toLowerCase();
+  const result: T[] = [];
+  // Single pass filters and maps at once, avoiding the double iteration and
+  // per-element callback overhead of chaining .filter().map() on each keystroke.
+  // An empty term short-circuits the `includes` scan and keeps every post.
+  for (const entry of index) {
+    if (!term || entry.haystack.includes(term)) {
+      result.push(entry.post);
+    }
+  }
+  return result;
+}

@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllPosts } from '../lib/mdx';
 import { AUTHORS } from '../data/blogData';
 import { User, ArrowRight, Search, BookOpen } from 'lucide-react';
 import { SocialShare } from '../components/SocialShare';
-import { getBlogPostUrl, getBlogHomeUrl, formatDate } from '../utils/blog';
+import { getBlogPostUrl, getBlogHomeUrl, formatDate, buildBlogSearchIndex, filterBlogSearchIndex } from '../utils/blog';
 import { optimizeRemoteImageUrl } from '../data/mediaConfig';
 import { getCategoryColor } from '../utils/categoryColors';
 import { Seo } from '../components/Seo';
@@ -20,15 +20,18 @@ import { openContactModal } from '../utils/contactForm';
  */
 
 const allPosts = getAllPosts();
+// Lowercased search haystacks are built once at module load, not per keystroke.
+const searchIndex = buildBlogSearchIndex(allPosts);
 
 const BlogList: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
 
-    const term = searchTerm.toLowerCase();
-    const filteredPosts = allPosts.filter(post =>
-        post.title.toLowerCase().includes(term) ||
-        post.category.toLowerCase().includes(term) ||
-        post.tags.some(tag => tag.toLowerCase().includes(term))
+    // Memoize the filtered list so it only recomputes when the term changes,
+    // and so each keystroke scans precomputed strings instead of re-lowercasing
+    // every post's title/category/tags.
+    const filteredPosts = useMemo(
+        () => filterBlogSearchIndex(searchIndex, searchTerm),
+        [searchTerm],
     );
 
     return (
