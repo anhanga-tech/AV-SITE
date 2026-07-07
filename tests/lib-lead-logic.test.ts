@@ -111,6 +111,13 @@ test('normalizeWhatsappNumber returns null for a number with too many digits', (
     assert.equal(normalizeWhatsappNumber('1234567890123456'), null);
 });
 
+test('normalizeWhatsappNumber returns null for implausibly long input before regex runs', () => {
+    // Guards the raw-length cap (MAX_PHONE_RAW_LENGTH): an unbounded string must
+    // be rejected up front so no regex pass runs over it (DoS hardening). This is
+    // the shared chokepoint that also protects submit-contact and submit-quiz.
+    assert.equal(normalizeWhatsappNumber('+55' + '9'.repeat(4000)), null);
+});
+
 test('normalizeWhatsappNumber returns null for non-string input', () => {
     assert.equal(normalizeWhatsappNumber(null), null);
     assert.equal(normalizeWhatsappNumber(undefined), null);
