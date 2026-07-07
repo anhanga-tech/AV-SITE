@@ -128,6 +128,14 @@ test('buildLeadFields — opportunity shape with partner_id and resolved source/
     assert.match(String(fields.description), /<li>Destino: Orlando<\/li>/);
 });
 
+test('buildLeadFields — não duplica utm_campaign na descrição (vira campaign_id a montante)', () => {
+    const fields = buildLeadFields(
+        baseInput({ bantSummary: 'Need: X', utms: utms({ utm_campaign: 'verao2026' }) }),
+        5,
+    );
+    assert.doesNotMatch(String(fields.description), /utm_campaign/);
+});
+
 test('buildLeadFields — inclui Origem (CTA) na descrição quando presente', () => {
     const fields = buildLeadFields(baseInput({ ctaSource: 'blog-sidebar' }), 5);
     assert.match(String(fields.description), /<li>Origem \(CTA\): blog-sidebar<\/li>/);

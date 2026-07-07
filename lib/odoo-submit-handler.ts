@@ -17,6 +17,7 @@ import {
 } from './n8n-submit-handler';
 import { buildLeadFields, buildPartnerFields, type OdooLeadInput } from './odoo-lead-mapping';
 import { getOdooConfig, openOdooSession } from '../services/odoo';
+import { logger } from './logger';
 
 // services/odoo.ts encodes failures as `ODOO_ERROR:<status>:<detail>`.
 const ODOO_ERROR_PATTERN = /^ODOO_ERROR:(\d+):(.*)$/s;
@@ -52,7 +53,25 @@ async function sendToOdoo(input: OdooLeadInput): Promise<void> {
     });
 
     if (input.createsLead) {
-        await session.createLead(buildLeadFields(input, partnerId));
+        const leadFields = buildLeadFields(input, partnerId);
+        // utm_campaign is highly variable (one per ad campaign), unlike the fixed
+        // source/medium table, so it's resolved against Odoo's native utm.campaign
+        // model (find-or-create) instead of a hardcoded id.
+        const campaignName = input.utms.utm_campaign?.trim();
+        if (campaignName) {
+            // Enrichment, not essential: a hiccup resolving the campaign must not
+            // cost the lead itself (which already succeeded via upsertPartner).
+            try {
+                leadFields.campaign_id = await session.resolveCampaignId(campaignName);
+            } catch (error) {
+                logger.warn('ODOO_CAMPAIGN_RESOLVE', {
+                    stage: 'campaign_resolve_failed',
+                    campaignName,
+                    detail: error instanceof Error ? error.message : String(error),
+                });
+            }
+        }
+        await session.createLead(leadFields);
     }
 }
 
