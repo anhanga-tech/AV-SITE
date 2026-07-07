@@ -23,6 +23,15 @@ test('index.html keeps GTM out of the render-critical head path', () => {
   assert.doesNotMatch(headHtml, /GTM-T2KGS86G/i);
 });
 
+test('index.html não tem iframe noscript do GTM (furava o Consent Mode)', () => {
+  // O <noscript> do GTM carregava tags sem os defaults do Consent Mode (setados
+  // via JS) — único caminho que disparava rastreamento sem sinal de consentimento.
+  // Removido na auditoria LGPD de jul/2026; a SPA não renderiza sem JS, então o
+  // iframe não tinha valor de mensuração.
+  assert.doesNotMatch(indexHtml, /ns\.html\?id=GTM/i, 'iframe noscript do GTM não deve existir');
+  assert.doesNotMatch(indexHtml, /<noscript>\s*<iframe/i, 'nenhum iframe deve ser injetado via noscript');
+});
+
 test('index.html initializes dataLayer before the React entrypoint runs', () => {
   const dataLayerIndex = indexHtml.indexOf('window.dataLayer = window.dataLayer || []');
   const entrypointIndex = indexHtml.indexOf('<script type="module" src="/index.tsx"></script>');

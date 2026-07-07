@@ -9,7 +9,7 @@
 | **Endereço** | Av. Dom Pedro I, 773, Vila Monumento, São Paulo-SP, CEP 01552-001 |
 | **Encarregado (DPO)** | Felipe William Rodrigues Silva |
 | **E-mail DPO** | privacidade@anhanga.tur.br |
-| **Versão** | 1.4 |
+| **Versão** | 1.5 |
 | **Data de elaboração** | 02/06/2026 |
 | **Próxima revisão** | 03/06/2027 |
 | **Status** | Rascunho — pendente de revisão jurídica e aprovação do DPO |
@@ -32,6 +32,8 @@ O relatório cobre **quatro atividades de tratamento** identificadas:
 **Nota sobre a Atividade 4 (v1.3):** O Customer Match tem base legal em **consentimento** (Art. 7º, I), e não em legítimo interesse. É incluído neste RIPD porque envolve compartilhamento de dados pessoais (ainda que hasheados) com plataformas internacionais para finalidade de perfilamento — perfil de alto risco que a ANPD pode exigir documentação de impacto independentemente da base legal (Art. 38).
 
 Atividades baseadas em **consentimento** de baixo risco — como cookies de publicidade cross-site, remarketing avançado, Mautic e HubSpot tracking passivo — são geridas pelo mecanismo de consentimento de cookies e **não estão no escopo deste RIPD**.
+
+**Nota sobre o registro do consentimento de cookies (v1.5):** A escolha do titular no banner de cookies é registrada exclusivamente no navegador do próprio titular (`localStorage`, chave `anhanga_cookie_consent_meta`, com data/hora e versão do schema do registro). O texto do aviso não é versionado no registro em si; como a copy do banner é versionada em código, o texto vigente em qualquer data é reconstituível pelo histórico do repositório a partir do timestamp gravado. Não há registro server-side dessa escolha — se o titular limpar o armazenamento local ou trocar de dispositivo, o controlador não dispõe de prova individual do aceite (Art. 8º, §2º). **Risco aceito** pela seguinte ponderação: (i) o consentimento de cookies rege apenas o carregamento de scripts de marketing no navegador, sem tratamento server-side associado; (ii) a arquitetura *fail-closed* — sem registro local, os scripts de marketing simplesmente não carregam — faz com que a ausência de prova coincida com a ausência de tratamento; (iii) registrar cada escolha em servidor criaria novo tratamento de dados (IP/identificador + escolha) desproporcional à finalidade. Consentimentos com efeito server-side (opt-in de marketing nos formulários) **são** registrados no CRM Odoo (campo `x_lgpd_consent`).
 
 ---
 
@@ -337,6 +339,7 @@ O balancing test favorece o legítimo interesse nas Atividades 1, 2 e 3. A Ativi
 | 1.2 | 03/06/2026 | Revisão pós issue #782: atualização de §3.5 e §3.6 da Atividade 2; `initializeTracking()` mantido sob legítimo interesse; canal de oposição documentado |
 | 1.3 | 03/06/2026 | Atividade 4 adicionada (Customer Match — base legal consentimento Art. 7º, I); n8n GmbH removido como operador da Atividade 3 (self-hosted); tabela de pendências atualizada com itens 10-12; Política de Privacidade PR #803 registrado como pendência concluída (#9) |
 | 1.4 | 04/06/2026 | Pendência #10 concluída: e-mail de notificação LGPD enviado à base via Mautic (ID 24, 04/06/2026 10h00); janela de 15 dias iniciada; primeiro upload de customer match liberado a partir de 19/06/2026 |
+| 1.5 | 07/07/2026 | Auditoria do banner de cookies: nota sobre registro client-side do consentimento (risco aceito, §1); `<noscript>` do GTM removido do site (furava o Consent Mode para usuários sem JS) |
 
 ---
 

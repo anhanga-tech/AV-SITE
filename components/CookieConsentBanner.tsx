@@ -1,14 +1,34 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getConsent, setConsent } from '@/lib/consent';
 
 const CookieConsentBanner: React.FC = () => {
   const [visible, setVisible] = useState(() => getConsent() === null);
+  const bannerRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     const handleReset = () => setVisible(true);
     window.addEventListener('anhanga:reset-consent', handleReset);
     return () => window.removeEventListener('anhanga:reset-consent', handleReset);
   }, []);
+
+  // Expõe a altura do banner em --cookie-banner-h para elementos flutuantes
+  // (ex.: botão do AIChat) se deslocarem e não ficarem cobertos pelo banner.
+  useEffect(() => {
+    if (!visible) return;
+    const el = bannerRef.current;
+    if (!el) return;
+    const root = document.documentElement;
+    const update = () => root.style.setProperty('--cookie-banner-h', `${el.offsetHeight}px`);
+    update();
+    // Guard: o banner está fora do ChunkErrorBoundary — sem ResizeObserver
+    // (browser antigo), mantém a altura inicial em vez de derrubar o app.
+    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(update) : null;
+    observer?.observe(el);
+    return () => {
+      observer?.disconnect();
+      root.style.setProperty('--cookie-banner-h', '0px');
+    };
+  }, [visible]);
 
   if (!visible) return null;
 
@@ -24,17 +44,18 @@ const CookieConsentBanner: React.FC = () => {
 
   return (
     <dialog
+      ref={bannerRef}
       open
       aria-label="Preferências de cookies"
-      className="fixed bottom-0 left-0 right-0 z-[10000] m-0 w-full max-w-none border-0 p-0 bg-brand-dark border-t border-white/10 shadow-lg"
+      className="fixed bottom-0 left-0 right-0 z-[10000] m-0 w-full max-w-none border-0 p-0 bg-anhanga-dark border-t border-white/10 shadow-lg"
     >
       <div className="container mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
         <p className="text-sm text-zinc-300 leading-relaxed max-w-2xl">
-          Usamos cookies de marketing para comunicações personalizadas.
+          Usamos cookies de marketing para te mostrar ofertas de viagem mais relevantes.
           Analytics continua ativo por interesse legítimo {'—'}{' '}
           <a
             href="/politica-privacidade/#cookies"
-            className="underline underline-offset-2 hover:text-brand-yellow transition-colors"
+            className="underline underline-offset-2 hover:text-anhanga-yellow transition-colors"
           >
             saiba como se opor em nossa Política de Privacidade
           </a>

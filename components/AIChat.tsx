@@ -432,11 +432,11 @@ const AIChat: React.FC = memo(() => {
         type="button"
         onClick={() => openChatDrawer()}
         className={`fixed ${isOpen ? 'translate-y-32 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
-                    bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9990]
+                    bottom-[calc(1rem+var(--cookie-banner-h,0px))] right-4 sm:bottom-[calc(1.5rem+var(--cookie-banner-h,0px))] sm:right-6 z-[9990]
                     flex items-center justify-center gap-3
                     bg-brand-vibrant text-white
                     shadow-[0_8px_30px_theme(colors.brand.cyan/30%)] hover:shadow-[0_8px_30px_theme(colors.brand.cyan/50%)] hover:-translate-y-1
-                    transition duration-300
+                    transition-[bottom,transform,opacity,box-shadow] duration-300
                     size-16 rounded-2xl sm:w-auto sm:h-auto sm:px-6 sm:py-3.5 sm:rounded-full
                     focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-vibrant/30
                     ${isOrlandoPage ? 'orlando-chat-glow' : ''}`}
