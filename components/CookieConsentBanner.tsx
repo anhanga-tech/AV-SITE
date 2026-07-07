@@ -20,10 +20,12 @@ const CookieConsentBanner: React.FC = () => {
     const root = document.documentElement;
     const update = () => root.style.setProperty('--cookie-banner-h', `${el.offsetHeight}px`);
     update();
-    const observer = new ResizeObserver(update);
-    observer.observe(el);
+    // Guard: o banner está fora do ChunkErrorBoundary — sem ResizeObserver
+    // (browser antigo), mantém a altura inicial em vez de derrubar o app.
+    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(update) : null;
+    observer?.observe(el);
     return () => {
-      observer.disconnect();
+      observer?.disconnect();
       root.style.setProperty('--cookie-banner-h', '0px');
     };
   }, [visible]);

@@ -128,6 +128,24 @@ test.describe('Cookie Consent Banner (CMP)', () => {
     expect(heightAfterChoice).toBe('0px');
   });
 
+  test('com o banner visível, o BackToTop não fica coberto pelo banner', async ({ page }) => {
+    await page.goto('/');
+    const dialog = page.getByRole('dialog', { name: 'Preferências de cookies' });
+    await expect(dialog).toBeVisible();
+
+    // BackToTop só se revela após 400px de scroll (useScrolled)
+    await page.evaluate(() => window.scrollTo(0, 600));
+    const backToTop = page.getByRole('button', { name: 'Voltar ao topo' });
+    await backToTop.waitFor({ state: 'visible', timeout: 15000 });
+
+    const bannerBox = await dialog.boundingBox();
+    const buttonBox = await backToTop.boundingBox();
+    expect(bannerBox).not.toBeNull();
+    expect(buttonBox).not.toBeNull();
+    // O botão deve terminar acima do topo do banner (offset via --cookie-banner-h)
+    expect(buttonBox!.y + buttonBox!.height).toBeLessThanOrEqual(bannerBox!.y);
+  });
+
   test('banner precede o conteúdo das rotas na ordem do DOM (acessibilidade de teclado)', async ({ page }) => {
     await page.goto('/');
     const dialogPrecedesMain = await page.evaluate(() => {

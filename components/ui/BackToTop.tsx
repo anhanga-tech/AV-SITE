@@ -33,12 +33,12 @@ const BackToTop: React.FC = memo(() => {
       onClick={scrollToTop}
       aria-label="Voltar ao topo"
       className={`
-        fixed bottom-24 right-4 sm:bottom-32 sm:right-8 z-[9980]
-        p-3 rounded-2xl bg-white text-brand-cyan border-2 border-brand-cyan/20
-        shadow-lg shadow-brand-cyan/10 hover:shadow-brand-cyan/20
-        transition duration-300 ease-spring
+        fixed bottom-[calc(6rem+var(--cookie-banner-h,0px))] right-4 sm:bottom-[calc(8rem+var(--cookie-banner-h,0px))] sm:right-8 z-[9980]
+        p-3 rounded-2xl bg-white text-anhanga-action border-2 border-anhanga-action/20
+        shadow-lg shadow-anhanga-action/10 hover:shadow-anhanga-action/20
+        transition-[bottom,transform,opacity,box-shadow] duration-300 ease-spring
         hover:-translate-y-1 active:scale-90
-        focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-cyan
+        focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-anhanga-action
         ${isVisible ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'}
       `}
     >
