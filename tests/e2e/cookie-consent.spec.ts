@@ -148,6 +148,9 @@ test.describe('Cookie Consent Banner (CMP)', () => {
 
   test('banner precede o conteúdo das rotas na ordem do DOM (acessibilidade de teclado)', async ({ page }) => {
     await page.goto('/');
+    // Banner só monta após a hidratação (ClientOnly) — sem esta espera o
+    // querySelector abaixo corre contra o mount e falha por timing
+    await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).toBeVisible();
     const dialogPrecedesMain = await page.evaluate(() => {
       const dialog = document.querySelector('dialog[aria-label="Preferências de cookies"]');
       const main = document.querySelector('header, main');
