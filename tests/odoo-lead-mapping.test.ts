@@ -128,6 +128,16 @@ test('buildLeadFields — opportunity shape with partner_id and resolved source/
     assert.match(String(fields.description), /<li>Destino: Orlando<\/li>/);
 });
 
+test('buildLeadFields — inclui Origem (CTA) na descrição quando presente', () => {
+    const fields = buildLeadFields(baseInput({ ctaSource: 'blog-sidebar' }), 5);
+    assert.match(String(fields.description), /<li>Origem \(CTA\): blog-sidebar<\/li>/);
+});
+
+test('buildLeadFields — omite Origem (CTA) quando ausente', () => {
+    const fields = buildLeadFields(baseInput({ bantSummary: 'Need: X' }), 5);
+    assert.doesNotMatch(String(fields.description), /Origem \(CTA\)/);
+});
+
 test('buildLeadFields — maps empresa/cargo and referred when present', () => {
     const fields = buildLeadFields(baseInput({ empresa: 'ACME', cargo: 'CTO', referred: 'João' }), 5);
     assert.equal(fields.partner_name, 'ACME');
@@ -198,6 +208,22 @@ test('leadInputFromSubmitContact — creates a lead, emailOptIn → marketingOpt
     } as never);
     assert.equal(input.createsLead, true);
     assert.equal(input.marketingOptIn, true);
+});
+
+test('leadInputFromSubmitContact — carries the CTA source through to ctaSource', () => {
+    const input = leadInputFromSubmitContact({
+        firstName: 'Ana', whatsapp: '+5511999990000', emailOptIn: false,
+        source: 'blog-sidebar', utms: EMPTY_UTMS,
+    } as never);
+    assert.equal(input.ctaSource, 'blog-sidebar');
+});
+
+test('leadInputFromSubmitContact — missing source maps to null', () => {
+    const input = leadInputFromSubmitContact({
+        firstName: 'Ana', whatsapp: '+5511999990000', emailOptIn: false,
+        utms: EMPTY_UTMS,
+    } as never);
+    assert.equal(input.ctaSource, null);
 });
 
 test('leadInputFromSubmitQuiz — partner only (no lead), carries profileKey + quiz signal', () => {
