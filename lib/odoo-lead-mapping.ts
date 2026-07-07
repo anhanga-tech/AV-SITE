@@ -171,7 +171,8 @@ function buildDescriptionHtml(input: OdooLeadInput): string {
     push('fbc', t?.fbc);
     push('GA cid', t?.cid);
     push('GA sid', t?.sid);
-    push('utm_campaign', input.utms.utm_campaign);
+    // utm_campaign is deliberately omitted here — it's resolved to the native
+    // crm.lead.campaign_id (utm.campaign) upstream in odoo-submit-handler.ts.
     push('utm_term', input.utms.utm_term);
     push('utm_content', input.utms.utm_content);
     push('event_id', input.eventId);

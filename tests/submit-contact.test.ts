@@ -75,6 +75,32 @@ test('returns 200 and creates a partner + crm.lead on valid request', async () =
     assert.match(String(lead.name), /Orlando/);
 });
 
+test('sets campaign_id on the crm.lead when utm_campaign is present', async () => {
+    setOdooEnv();
+    const mock = createOdooMock({ existingCampaignId: 9 });
+    global.fetch = mock.fetch;
+
+    const res = await handler(buildRequest(validBody({
+        utms: { utm_source: 'google', utm_medium: 'cpc', utm_campaign: 'verao2026' },
+    })));
+    assert.equal(res.status, 200);
+
+    const lead = mock.leadFields()!;
+    assert.equal(lead.campaign_id, 9);
+});
+
+test('omits campaign_id when utm_campaign is absent', async () => {
+    setOdooEnv();
+    const mock = createOdooMock();
+    global.fetch = mock.fetch;
+
+    const res = await handler(buildRequest(validBody()));
+    assert.equal(res.status, 200);
+
+    const lead = mock.leadFields()!;
+    assert.equal('campaign_id' in lead, false);
+});
+
 test('returns 502 when Odoo fails', async () => {
     setOdooEnv();
     global.fetch = createOdooMock({ failStatus: 500 }).fetch;

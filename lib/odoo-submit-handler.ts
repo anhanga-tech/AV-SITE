@@ -52,7 +52,15 @@ async function sendToOdoo(input: OdooLeadInput): Promise<void> {
     });
 
     if (input.createsLead) {
-        await session.createLead(buildLeadFields(input, partnerId));
+        const leadFields = buildLeadFields(input, partnerId);
+        // utm_campaign is highly variable (one per ad campaign), unlike the fixed
+        // source/medium table, so it's resolved against Odoo's native utm.campaign
+        // model (find-or-create) instead of a hardcoded id.
+        const campaignName = input.utms.utm_campaign?.trim();
+        if (campaignName) {
+            leadFields.campaign_id = await session.resolveCampaignId(campaignName);
+        }
+        await session.createLead(leadFields);
     }
 }
 

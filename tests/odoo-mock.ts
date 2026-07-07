@@ -40,6 +40,10 @@ export interface OdooMockOptions {
     existingFields?: Record<string, unknown>;
     newPartnerId?: number;
     leadId?: number;
+    /** utm.campaign search_read result: id of an existing campaign, or null/absent for none (default: none). */
+    existingCampaignId?: number | null;
+    /** id returned by utm.campaign.create when no existing campaign matches. */
+    newCampaignId?: number;
     /** Force every RPC to fail with this HTTP status. */
     failStatus?: number;
     failDetail?: string;
@@ -81,6 +85,8 @@ export function createOdooMock(options: OdooMockOptions = {}): OdooMock {
         existingFields = {},
         newPartnerId = 101,
         leadId = 555,
+        existingCampaignId = null,
+        newCampaignId = 900,
         failStatus,
         failDetail = 'odoo upstream failed',
         hang = false,
@@ -109,11 +115,15 @@ export function createOdooMock(options: OdooMockOptions = {}): OdooMock {
             calls.push({ model, method: ormMethod, args: ormArgs, kwargs });
 
             if (ormMethod === 'search_read') {
-                result = existingPartnerId
-                    ? [{ id: existingPartnerId, comment: existingComment, ...existingFields }]
-                    : [];
+                if (model === 'utm.campaign') {
+                    result = existingCampaignId ? [{ id: existingCampaignId }] : [];
+                } else {
+                    result = existingPartnerId
+                        ? [{ id: existingPartnerId, comment: existingComment, ...existingFields }]
+                        : [];
+                }
             } else if (ormMethod === 'create') {
-                result = model === 'crm.lead' ? leadId : newPartnerId;
+                result = model === 'crm.lead' ? leadId : model === 'utm.campaign' ? newCampaignId : newPartnerId;
             } else if (ormMethod === 'write') {
                 result = true;
             }

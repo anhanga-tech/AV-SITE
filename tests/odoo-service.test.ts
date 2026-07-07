@@ -166,6 +166,32 @@ test('createLead — issues a crm.lead.create and returns the id', async (t) => 
     assert.ok(mock.createdLead());
 });
 
+test('resolveCampaignId — returns the existing utm.campaign id when the name matches', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    const mock = createOdooMock({ existingCampaignId: 42 });
+    global.fetch = mock.fetch;
+
+    const session = await openOdooSession(config());
+    const id = await session.resolveCampaignId('Verão 2026');
+
+    assert.equal(id, 42);
+    assert.equal(mock.calls.some((c) => c.model === 'utm.campaign' && c.method === 'create'), false);
+});
+
+test('resolveCampaignId — creates a new utm.campaign when none matches', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    const mock = createOdooMock({ existingCampaignId: null, newCampaignId: 88 });
+    global.fetch = mock.fetch;
+
+    const session = await openOdooSession(config());
+    const id = await session.resolveCampaignId('  Campanha Nova  ');
+
+    assert.equal(id, 88);
+    const create = mock.calls.find((c) => c.model === 'utm.campaign' && c.method === 'create');
+    assert.ok(create, 'should create a utm.campaign');
+    assert.equal((create!.args[0] as Record<string, unknown>).name, 'Campanha Nova');
+});
+
 test('openOdooSession — rejects with ODOO_ERROR:401 when auth fails', async (t) => {
     t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
     global.fetch = createOdooMock({ uid: 0 }).fetch;

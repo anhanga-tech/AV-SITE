@@ -9,9 +9,10 @@
  *
  * Auth flow: `common.authenticate` → uid, then `object.execute_kw` for ORM calls.
  * Module-level state does not persist across requests on Workers, so each submit
- * re-authenticates. A lead submit makes up to 4 sequential round-trips
- * (auth → partner search → partner write/create → lead create); a shared deadline
- * bounds the worst case so an upstream stall never hangs the form.
+ * re-authenticates. A lead submit makes up to 5 sequential round-trips
+ * (auth → partner search → partner write/create → campaign find-or-create →
+ * lead create); a shared deadline bounds the worst case so an upstream stall
+ * never hangs the form.
  *
  * Errors are normalized to `ODOO_ERROR:<status>:<detail>` so the submit-handler
  * factory classifies them uniformly (see lib/odoo-submit-handler.ts).
@@ -165,6 +166,8 @@ export interface UpsertPartnerOptions {
 export interface OdooSession {
     upsertPartner: (fields: OdooPartnerFields, options?: UpsertPartnerOptions) => Promise<number>;
     createLead: (fields: Record<string, unknown>) => Promise<number>;
+    /** Finds a `utm.campaign` by exact name, creating one if none matches. */
+    resolveCampaignId: (name: string) => Promise<number>;
 }
 
 export async function openOdooSession(config: OdooConfig): Promise<OdooSession> {
@@ -227,6 +230,20 @@ export async function openOdooSession(config: OdooConfig): Promise<OdooSession> 
         },
         createLead(fields) {
             return executeKw<number>(config, uid, 'crm.lead', 'create', [fields], deadline);
+        },
+        async resolveCampaignId(name) {
+            const trimmed = name.trim();
+            const rows = await executeKw<{ id: number }[]>(
+                config,
+                uid,
+                'utm.campaign',
+                'search_read',
+                [[['name', '=', trimmed]], ['id']],
+                deadline,
+                { limit: 1 },
+            );
+            if (rows[0]) return rows[0].id;
+            return executeKw<number>(config, uid, 'utm.campaign', 'create', [{ name: trimmed }], deadline);
         },
     };
 }
