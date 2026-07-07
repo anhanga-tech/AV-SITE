@@ -70,6 +70,8 @@ export interface OdooLeadInput {
     destinationTagIds?: RegionTagId[];
     destination?: string | null;
     bantSummary?: string | null;
+    /** Which on-site CTA opened the form (e.g. 'header', 'blog-sidebar') — visibility only, not a UTM source. */
+    ctaSource?: string | null;
     referred?: string | null;
     empresa?: string | null;
     cargo?: string | null;
@@ -157,6 +159,7 @@ function buildDescriptionHtml(input: OdooLeadInput): string {
 
     push('BANT', input.bantSummary);
     push('Destino', input.destination);
+    push('Origem (CTA)', input.ctaSource);
     push('Indicado por', input.referred);
     push('Empresa', input.empresa);
     push('Cargo', input.cargo);
@@ -245,6 +248,7 @@ export function leadInputFromSubmitContact(data: SubmitContactRequest): OdooLead
         marketingOptIn: data.emailOptIn === true,
         destination: data.destination ?? null,
         destinationTagIds: resolveRegionTagsFromText(data.destination ?? null),
+        ctaSource: data.source ?? null,
         eventId: data.eventId ?? null,
         utms: data.utms,
         tracking: data.tracking,
