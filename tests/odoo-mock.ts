@@ -77,6 +77,34 @@ function ormFields(call: OdooExecuteCall | undefined): Record<string, unknown> |
     return fields as Record<string, unknown> | undefined;
 }
 
+interface SearchReadDefaults {
+    existingPartnerId: number | null;
+    existingComment: string | false;
+    existingFields: Record<string, unknown>;
+    existingCampaignId: number | null;
+}
+
+/** `search_read` result per model: dedup row for res.partner, find-or-create lookup for utm.campaign. */
+function searchReadResult(model: string, d: SearchReadDefaults): unknown[] {
+    if (model === 'utm.campaign') {
+        return d.existingCampaignId ? [{ id: d.existingCampaignId }] : [];
+    }
+    return d.existingPartnerId ? [{ id: d.existingPartnerId, comment: d.existingComment, ...d.existingFields }] : [];
+}
+
+interface CreateDefaults {
+    leadId: number;
+    newPartnerId: number;
+    newCampaignId: number;
+}
+
+/** `create` result id per model. */
+function createResult(model: string, d: CreateDefaults): number {
+    if (model === 'crm.lead') return d.leadId;
+    if (model === 'utm.campaign') return d.newCampaignId;
+    return d.newPartnerId;
+}
+
 export function createOdooMock(options: OdooMockOptions = {}): OdooMock {
     const {
         uid = 7,
@@ -115,15 +143,9 @@ export function createOdooMock(options: OdooMockOptions = {}): OdooMock {
             calls.push({ model, method: ormMethod, args: ormArgs, kwargs });
 
             if (ormMethod === 'search_read') {
-                if (model === 'utm.campaign') {
-                    result = existingCampaignId ? [{ id: existingCampaignId }] : [];
-                } else {
-                    result = existingPartnerId
-                        ? [{ id: existingPartnerId, comment: existingComment, ...existingFields }]
-                        : [];
-                }
+                result = searchReadResult(model, { existingPartnerId, existingComment, existingFields, existingCampaignId });
             } else if (ormMethod === 'create') {
-                result = model === 'crm.lead' ? leadId : model === 'utm.campaign' ? newCampaignId : newPartnerId;
+                result = createResult(model, { leadId, newPartnerId, newCampaignId });
             } else if (ormMethod === 'write') {
                 result = true;
             }
