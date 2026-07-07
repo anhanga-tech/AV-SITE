@@ -120,8 +120,11 @@ test.describe('Cookie Consent Banner (CMP)', () => {
     expect(heightWithBanner).toMatch(/^\d+px$/);
     expect(parseInt(heightWithBanner, 10)).toBeGreaterThan(0);
 
-    // Após escolher, o offset volta a zero (FAB retorna à posição original)
+    // Após escolher, o offset volta a zero (FAB retorna à posição original).
+    // O reset da var acontece no cleanup assíncrono do effect — aguardar o
+    // banner fechar antes de ler, como nos demais testes do describe.
     await page.getByRole('button', { name: 'Aceitar' }).click();
+    await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).not.toBeVisible();
     const heightAfterChoice = await page.evaluate(() =>
       document.documentElement.style.getPropertyValue('--cookie-banner-h')
     );
