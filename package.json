@@ -46,7 +46,7 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-markdown": "^10.1.0",
-    "react-router-dom": "^7.18.0",
+    "react-router-dom": "^7.18.1",
     "remark-gfm": "^4.0.1",
     "web-haptics": "^0.0.6",
     "zod": "^4.4.3"
