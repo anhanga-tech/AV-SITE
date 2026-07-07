@@ -89,6 +89,21 @@ test('sets campaign_id on the crm.lead when utm_campaign is present', async () =
     assert.equal(lead.campaign_id, 9);
 });
 
+test('still creates the lead when campaign resolution fails (non-essential enrichment)', async () => {
+    setOdooEnv();
+    const mock = createOdooMock({ existingCampaignId: null, campaignCreateShouldFail: true });
+    global.fetch = mock.fetch;
+
+    const res = await handler(buildRequest(validBody({
+        utms: { utm_source: 'google', utm_medium: 'cpc', utm_campaign: 'verao2026' },
+    })));
+    assert.equal(res.status, 200);
+
+    assert.ok(mock.createdLead(), 'the lead must still be created despite the campaign_id failure');
+    const lead = mock.leadFields()!;
+    assert.equal('campaign_id' in lead, false);
+});
+
 test('omits campaign_id when utm_campaign is absent', async () => {
     setOdooEnv();
     const mock = createOdooMock();

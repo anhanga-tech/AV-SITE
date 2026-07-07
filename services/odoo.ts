@@ -233,17 +233,35 @@ export async function openOdooSession(config: OdooConfig): Promise<OdooSession> 
         },
         async resolveCampaignId(name) {
             const trimmed = name.trim();
-            const rows = await executeKw<{ id: number }[]>(
-                config,
-                uid,
-                'utm.campaign',
-                'search_read',
-                [[['name', '=', trimmed]], ['id']],
-                deadline,
-                { limit: 1 },
-            );
-            if (rows[0]) return rows[0].id;
-            return executeKw<number>(config, uid, 'utm.campaign', 'create', [{ name: trimmed }], deadline);
+
+            async function findByName(): Promise<number | null> {
+                const rows = await executeKw<{ id: number }[]>(
+                    config,
+                    uid,
+                    'utm.campaign',
+                    'search_read',
+                    [[['name', '=', trimmed]], ['id']],
+                    deadline,
+                    { limit: 1 },
+                );
+                return rows[0]?.id ?? null;
+            }
+
+            const existingId = await findByName();
+            if (existingId) return existingId;
+
+            // Not atomic: two concurrent requests for the same brand-new campaign
+            // name can both miss this search and both attempt create. If Odoo
+            // rejects the second create (unique constraint) or a duplicate slips
+            // through, re-checking by name once recovers the id another request
+            // just created instead of surfacing a spurious failure.
+            try {
+                return await executeKw<number>(config, uid, 'utm.campaign', 'create', [{ name: trimmed }], deadline);
+            } catch (error) {
+                const raceWinnerId = await findByName();
+                if (raceWinnerId) return raceWinnerId;
+                throw error;
+            }
         },
     };
 }

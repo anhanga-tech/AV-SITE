@@ -44,6 +44,8 @@ export interface OdooMockOptions {
     existingCampaignId?: number | null;
     /** id returned by utm.campaign.create when no existing campaign matches. */
     newCampaignId?: number;
+    /** Makes utm.campaign.create return a JSON-RPC error (simulates a concurrent-create conflict). */
+    campaignCreateShouldFail?: boolean;
     /** Force every RPC to fail with this HTTP status. */
     failStatus?: number;
     failDetail?: string;
@@ -105,6 +107,20 @@ function createResult(model: string, d: CreateDefaults): number {
     return d.newPartnerId;
 }
 
+function jsonRpcResponse(result: unknown): Response {
+    return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+    });
+}
+
+function jsonRpcError(message: string): Response {
+    return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, error: { message } }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+    });
+}
+
 export function createOdooMock(options: OdooMockOptions = {}): OdooMock {
     const {
         uid = 7,
@@ -115,6 +131,7 @@ export function createOdooMock(options: OdooMockOptions = {}): OdooMock {
         leadId = 555,
         existingCampaignId = null,
         newCampaignId = 900,
+        campaignCreateShouldFail = false,
         failStatus,
         failDetail = 'odoo upstream failed',
         hang = false,
@@ -131,30 +148,24 @@ export function createOdooMock(options: OdooMockOptions = {}): OdooMock {
         };
         const { service, method, args } = body.params;
 
-        let result: unknown = false;
+        if (service === 'common' && method === 'authenticate') return jsonRpcResponse(uid);
+        if (service !== 'object' || method !== 'execute_kw') return jsonRpcResponse(false);
 
-        if (service === 'common' && method === 'authenticate') {
-            result = uid;
-        } else if (service === 'object' && method === 'execute_kw') {
-            const model = args[3] as string;
-            const ormMethod = args[4] as string;
-            const ormArgs = (args[5] as unknown[]) ?? [];
-            const kwargs = (args[6] as Record<string, unknown>) ?? {};
-            calls.push({ model, method: ormMethod, args: ormArgs, kwargs });
+        const model = args[3] as string;
+        const ormMethod = args[4] as string;
+        const ormArgs = (args[5] as unknown[]) ?? [];
+        const kwargs = (args[6] as Record<string, unknown>) ?? {};
+        calls.push({ model, method: ormMethod, args: ormArgs, kwargs });
 
-            if (ormMethod === 'search_read') {
-                result = searchReadResult(model, { existingPartnerId, existingComment, existingFields, existingCampaignId });
-            } else if (ormMethod === 'create') {
-                result = createResult(model, { leadId, newPartnerId, newCampaignId });
-            } else if (ormMethod === 'write') {
-                result = true;
-            }
+        if (ormMethod === 'create' && model === 'utm.campaign' && campaignCreateShouldFail) {
+            return jsonRpcError('duplicate key value violates unique constraint "utm_campaign_name_uniq"');
         }
-
-        return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        if (ormMethod === 'search_read') {
+            return jsonRpcResponse(searchReadResult(model, { existingPartnerId, existingComment, existingFields, existingCampaignId }));
+        }
+        if (ormMethod === 'create') return jsonRpcResponse(createResult(model, { leadId, newPartnerId, newCampaignId }));
+        if (ormMethod === 'write') return jsonRpcResponse(true);
+        return jsonRpcResponse(false);
     }) as typeof fetch;
 
     return {

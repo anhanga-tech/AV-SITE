@@ -192,6 +192,54 @@ test('resolveCampaignId — creates a new utm.campaign when none matches', async
     assert.equal((create!.args[0] as Record<string, unknown>).name, 'Campanha Nova');
 });
 
+test('resolveCampaignId — recovers from a concurrent create conflict via retry search', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+
+    // Bespoke stateful mock: the shared createOdooMock returns a fixed
+    // search_read result regardless of call order, but this scenario needs the
+    // *first* search_read to miss and the *retry* (after the failed create) to
+    // find the id a concurrent request just created.
+    let createAttempted = false;
+    global.fetch = (async (_input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+        const body = JSON.parse(String(init?.body ?? '{}')) as { params: { service: string; method: string; args: unknown[] } };
+        const { service, method, args } = body.params;
+        if (service === 'common' && method === 'authenticate') {
+            return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: 7 }), { status: 200 });
+        }
+        const ormMethod = args[4] as string;
+        if (ormMethod === 'search_read') {
+            const result = createAttempted ? [{ id: 77 }] : [];
+            return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result }), { status: 200 });
+        }
+        if (ormMethod === 'create') {
+            createAttempted = true;
+            return new Response(
+                JSON.stringify({ jsonrpc: '2.0', id: 1, error: { message: 'duplicate key value violates unique constraint' } }),
+                { status: 200 },
+            );
+        }
+        throw new Error(`unexpected ORM call: ${ormMethod}`);
+    }) as typeof fetch;
+
+    const session = await openOdooSession(config());
+    const id = await session.resolveCampaignId('Lançamento Verão');
+
+    assert.equal(id, 77, 'should recover the id the concurrent request created, not throw');
+});
+
+test('resolveCampaignId — rethrows when the retry search also finds nothing', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    const mock = createOdooMock({ existingCampaignId: null, campaignCreateShouldFail: true });
+    global.fetch = mock.fetch;
+
+    const session = await openOdooSession(config());
+
+    await assert.rejects(
+        () => session.resolveCampaignId('Campanha Fantasma'),
+        (e: unknown) => e instanceof Error && e.message.startsWith('ODOO_ERROR:502:'),
+    );
+});
+
 test('openOdooSession — rejects with ODOO_ERROR:401 when auth fails', async (t) => {
     t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
     global.fetch = createOdooMock({ uid: 0 }).fetch;
