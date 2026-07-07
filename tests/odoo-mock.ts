@@ -138,6 +138,10 @@ export function createOdooMock(options: OdooMockOptions = {}): OdooMock {
     } = options;
 
     const calls: OdooExecuteCall[] = [];
+    // Stateful: once utm.campaign.create succeeds, subsequent search_read calls
+    // for that model must find it (mirrors real Odoo, and resolveCampaignId now
+    // always re-queries after create to converge on a canonical row).
+    let campaignId = existingCampaignId;
 
     const fetchMock = (async (_input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
         if (hang) return new Promise<Response>(() => {});
@@ -161,9 +165,13 @@ export function createOdooMock(options: OdooMockOptions = {}): OdooMock {
             return jsonRpcError('duplicate key value violates unique constraint "utm_campaign_name_uniq"');
         }
         if (ormMethod === 'search_read') {
-            return jsonRpcResponse(searchReadResult(model, { existingPartnerId, existingComment, existingFields, existingCampaignId }));
+            return jsonRpcResponse(searchReadResult(model, { existingPartnerId, existingComment, existingFields, existingCampaignId: campaignId }));
         }
-        if (ormMethod === 'create') return jsonRpcResponse(createResult(model, { leadId, newPartnerId, newCampaignId }));
+        if (ormMethod === 'create') {
+            const result = createResult(model, { leadId, newPartnerId, newCampaignId });
+            if (model === 'utm.campaign') campaignId = newCampaignId;
+            return jsonRpcResponse(result);
+        }
         if (ormMethod === 'write') return jsonRpcResponse(true);
         return jsonRpcResponse(false);
     }) as typeof fetch;

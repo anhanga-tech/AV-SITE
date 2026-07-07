@@ -192,6 +192,39 @@ test('resolveCampaignId — creates a new utm.campaign when none matches', async
     assert.equal((create!.args[0] as Record<string, unknown>).name, 'Campanha Nova');
 });
 
+test('resolveCampaignId — after a successful create, converges on the canonical (oldest) row instead of trusting the create id', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+
+    // utm.campaign has no unique constraint on name in stock Odoo: a concurrent
+    // request can create a same-named row *before* this one, and this one's
+    // create can still succeed — it must not return its own id blindly.
+    let searchReadCalls = 0;
+    global.fetch = (async (_input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+        const body = JSON.parse(String(init?.body ?? '{}')) as { params: { service: string; method: string; args: unknown[] } };
+        const { service, method, args } = body.params;
+        if (service === 'common' && method === 'authenticate') {
+            return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: 7 }), { status: 200 });
+        }
+        const ormMethod = args[4] as string;
+        if (ormMethod === 'search_read') {
+            searchReadCalls += 1;
+            // 1st search (before create): nothing found yet. 2nd (after create):
+            // a concurrent request's earlier row is now visible.
+            const result = searchReadCalls === 1 ? [] : [{ id: 10 }];
+            return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result }), { status: 200 });
+        }
+        if (ormMethod === 'create') {
+            return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: 500 }), { status: 200 });
+        }
+        throw new Error(`unexpected ORM call: ${ormMethod}`);
+    }) as typeof fetch;
+
+    const session = await openOdooSession(config());
+    const id = await session.resolveCampaignId('Lançamento Verão');
+
+    assert.equal(id, 10, 'must converge to the canonical row, not the id this create call returned');
+});
+
 test('resolveCampaignId — recovers from a concurrent create conflict via retry search', async (t) => {
     t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
 

@@ -234,7 +234,9 @@ export async function openOdooSession(config: OdooConfig): Promise<OdooSession> 
         async resolveCampaignId(name) {
             const trimmed = name.trim();
 
-            async function findByName(): Promise<number | null> {
+            // Ordered by id so every concurrent caller that reaches this query
+            // converges on the same (oldest) row, even if more than one exists.
+            async function findCanonicalByName(): Promise<number | null> {
                 const rows = await executeKw<{ id: number }[]>(
                     config,
                     uid,
@@ -242,26 +244,33 @@ export async function openOdooSession(config: OdooConfig): Promise<OdooSession> 
                     'search_read',
                     [[['name', '=', trimmed]], ['id']],
                     deadline,
-                    { limit: 1 },
+                    { limit: 1, order: 'id asc' },
                 );
                 return rows[0]?.id ?? null;
             }
 
-            const existingId = await findByName();
+            const existingId = await findCanonicalByName();
             if (existingId) return existingId;
 
-            // Not atomic: two concurrent requests for the same brand-new campaign
-            // name can both miss this search and both attempt create. If Odoo
-            // rejects the second create (unique constraint) or a duplicate slips
-            // through, re-checking by name once recovers the id another request
-            // just created instead of surfacing a spurious failure.
+            // Not atomic, and Odoo's stock utm.campaign has no unique constraint
+            // on name: two concurrent requests for the same brand-new campaign can
+            // both miss the search above. Whichever way the create lands — it
+            // throws (a constraint conflict) or silently succeeds alongside a
+            // duplicate another request just created — re-resolving by name
+            // afterward (oldest id wins) means every concurrent caller returns the
+            // same campaign_id instead of fragmenting leads across duplicate rows.
             try {
-                return await executeKw<number>(config, uid, 'utm.campaign', 'create', [{ name: trimmed }], deadline);
+                await executeKw<number>(config, uid, 'utm.campaign', 'create', [{ name: trimmed }], deadline);
             } catch (error) {
-                const raceWinnerId = await findByName();
-                if (raceWinnerId) return raceWinnerId;
+                const canonicalId = await findCanonicalByName();
+                if (canonicalId) return canonicalId;
                 throw error;
             }
+
+            const canonicalId = await findCanonicalByName();
+            if (canonicalId) return canonicalId;
+            // Unreachable in practice: create just succeeded for this exact name.
+            throw new Error('utm.campaign create succeeded but could not be resolved afterward');
         },
     };
 }
