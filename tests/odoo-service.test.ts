@@ -166,6 +166,113 @@ test('createLead — issues a crm.lead.create and returns the id', async (t) => 
     assert.ok(mock.createdLead());
 });
 
+test('resolveCampaignId — returns the existing utm.campaign id when the name matches', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    const mock = createOdooMock({ existingCampaignId: 42 });
+    global.fetch = mock.fetch;
+
+    const session = await openOdooSession(config());
+    const id = await session.resolveCampaignId('Verão 2026');
+
+    assert.equal(id, 42);
+    assert.equal(mock.calls.some((c) => c.model === 'utm.campaign' && c.method === 'create'), false);
+});
+
+test('resolveCampaignId — creates a new utm.campaign when none matches', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    const mock = createOdooMock({ existingCampaignId: null, newCampaignId: 88 });
+    global.fetch = mock.fetch;
+
+    const session = await openOdooSession(config());
+    const id = await session.resolveCampaignId('  Campanha Nova  ');
+
+    assert.equal(id, 88);
+    const create = mock.calls.find((c) => c.model === 'utm.campaign' && c.method === 'create');
+    assert.ok(create, 'should create a utm.campaign');
+    assert.equal((create!.args[0] as Record<string, unknown>).name, 'Campanha Nova');
+});
+
+test('resolveCampaignId — after a successful create, converges on the canonical (oldest) row instead of trusting the create id', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+
+    // utm.campaign has no unique constraint on name in stock Odoo: a concurrent
+    // request can create a same-named row *before* this one, and this one's
+    // create can still succeed — it must not return its own id blindly.
+    let searchReadCalls = 0;
+    global.fetch = (async (_input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+        const body = JSON.parse(String(init?.body ?? '{}')) as { params: { service: string; method: string; args: unknown[] } };
+        const { service, method, args } = body.params;
+        if (service === 'common' && method === 'authenticate') {
+            return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: 7 }), { status: 200 });
+        }
+        const ormMethod = args[4] as string;
+        if (ormMethod === 'search_read') {
+            searchReadCalls += 1;
+            // 1st search (before create): nothing found yet. 2nd (after create):
+            // a concurrent request's earlier row is now visible.
+            const result = searchReadCalls === 1 ? [] : [{ id: 10 }];
+            return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result }), { status: 200 });
+        }
+        if (ormMethod === 'create') {
+            return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: 500 }), { status: 200 });
+        }
+        throw new Error(`unexpected ORM call: ${ormMethod}`);
+    }) as typeof fetch;
+
+    const session = await openOdooSession(config());
+    const id = await session.resolveCampaignId('Lançamento Verão');
+
+    assert.equal(id, 10, 'must converge to the canonical row, not the id this create call returned');
+});
+
+test('resolveCampaignId — recovers from a concurrent create conflict via retry search', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+
+    // Bespoke stateful mock: the shared createOdooMock returns a fixed
+    // search_read result regardless of call order, but this scenario needs the
+    // *first* search_read to miss and the *retry* (after the failed create) to
+    // find the id a concurrent request just created.
+    let createAttempted = false;
+    global.fetch = (async (_input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+        const body = JSON.parse(String(init?.body ?? '{}')) as { params: { service: string; method: string; args: unknown[] } };
+        const { service, method, args } = body.params;
+        if (service === 'common' && method === 'authenticate') {
+            return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: 7 }), { status: 200 });
+        }
+        const ormMethod = args[4] as string;
+        if (ormMethod === 'search_read') {
+            const result = createAttempted ? [{ id: 77 }] : [];
+            return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result }), { status: 200 });
+        }
+        if (ormMethod === 'create') {
+            createAttempted = true;
+            return new Response(
+                JSON.stringify({ jsonrpc: '2.0', id: 1, error: { message: 'duplicate key value violates unique constraint' } }),
+                { status: 200 },
+            );
+        }
+        throw new Error(`unexpected ORM call: ${ormMethod}`);
+    }) as typeof fetch;
+
+    const session = await openOdooSession(config());
+    const id = await session.resolveCampaignId('Lançamento Verão');
+
+    assert.equal(id, 77, 'should recover the id the concurrent request created, not throw');
+});
+
+test('resolveCampaignId — rethrows when the retry search also finds nothing', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    const mock = createOdooMock({ existingCampaignId: null, campaignCreateShouldFail: true });
+    global.fetch = mock.fetch;
+
+    const session = await openOdooSession(config());
+
+    await assert.rejects(
+        () => session.resolveCampaignId('Campanha Fantasma'),
+        (e: unknown) => e instanceof Error && e.message.startsWith('ODOO_ERROR:502:'),
+    );
+});
+
 test('openOdooSession — rejects with ODOO_ERROR:401 when auth fails', async (t) => {
     t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
     global.fetch = createOdooMock({ uid: 0 }).fetch;

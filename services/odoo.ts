@@ -9,9 +9,10 @@
  *
  * Auth flow: `common.authenticate` → uid, then `object.execute_kw` for ORM calls.
  * Module-level state does not persist across requests on Workers, so each submit
- * re-authenticates. A lead submit makes up to 4 sequential round-trips
- * (auth → partner search → partner write/create → lead create); a shared deadline
- * bounds the worst case so an upstream stall never hangs the form.
+ * re-authenticates. A lead submit makes up to 5 sequential round-trips
+ * (auth → partner search → partner write/create → campaign find-or-create →
+ * lead create); a shared deadline bounds the worst case so an upstream stall
+ * never hangs the form.
  *
  * Errors are normalized to `ODOO_ERROR:<status>:<detail>` so the submit-handler
  * factory classifies them uniformly (see lib/odoo-submit-handler.ts).
@@ -165,6 +166,8 @@ export interface UpsertPartnerOptions {
 export interface OdooSession {
     upsertPartner: (fields: OdooPartnerFields, options?: UpsertPartnerOptions) => Promise<number>;
     createLead: (fields: Record<string, unknown>) => Promise<number>;
+    /** Finds a `utm.campaign` by exact name, creating one if none matches. */
+    resolveCampaignId: (name: string) => Promise<number>;
 }
 
 export async function openOdooSession(config: OdooConfig): Promise<OdooSession> {
@@ -227,6 +230,47 @@ export async function openOdooSession(config: OdooConfig): Promise<OdooSession> 
         },
         createLead(fields) {
             return executeKw<number>(config, uid, 'crm.lead', 'create', [fields], deadline);
+        },
+        async resolveCampaignId(name) {
+            const trimmed = name.trim();
+
+            // Ordered by id so every concurrent caller that reaches this query
+            // converges on the same (oldest) row, even if more than one exists.
+            async function findCanonicalByName(): Promise<number | null> {
+                const rows = await executeKw<{ id: number }[]>(
+                    config,
+                    uid,
+                    'utm.campaign',
+                    'search_read',
+                    [[['name', '=', trimmed]], ['id']],
+                    deadline,
+                    { limit: 1, order: 'id asc' },
+                );
+                return rows[0]?.id ?? null;
+            }
+
+            const existingId = await findCanonicalByName();
+            if (existingId) return existingId;
+
+            // Not atomic, and Odoo's stock utm.campaign has no unique constraint
+            // on name: two concurrent requests for the same brand-new campaign can
+            // both miss the search above. Whichever way the create lands — it
+            // throws (a constraint conflict) or silently succeeds alongside a
+            // duplicate another request just created — re-resolving by name
+            // afterward (oldest id wins) means every concurrent caller returns the
+            // same campaign_id instead of fragmenting leads across duplicate rows.
+            try {
+                await executeKw<number>(config, uid, 'utm.campaign', 'create', [{ name: trimmed }], deadline);
+            } catch (error) {
+                const canonicalId = await findCanonicalByName();
+                if (canonicalId) return canonicalId;
+                throw error;
+            }
+
+            const canonicalId = await findCanonicalByName();
+            if (canonicalId) return canonicalId;
+            // Unreachable in practice: create just succeeded for this exact name.
+            throw new Error('utm.campaign create succeeded but could not be resolved afterward');
         },
     };
 }
