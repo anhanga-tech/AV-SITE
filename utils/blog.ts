@@ -47,6 +47,14 @@ export function filterBlogSearchIndex<T>(
   rawTerm: string,
 ): T[] {
   const term = rawTerm.toLowerCase();
-  if (!term) return index.map((entry) => entry.post);
-  return index.filter((entry) => entry.haystack.includes(term)).map((entry) => entry.post);
+  const result: T[] = [];
+  // Single pass filters and maps at once, avoiding the double iteration and
+  // per-element callback overhead of chaining .filter().map() on each keystroke.
+  // An empty term short-circuits the `includes` scan and keeps every post.
+  for (const entry of index) {
+    if (!term || entry.haystack.includes(term)) {
+      result.push(entry.post);
+    }
+  }
+  return result;
 }
