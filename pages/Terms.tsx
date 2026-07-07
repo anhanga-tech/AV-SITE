@@ -253,7 +253,7 @@ const Terms = () => {
                                 <strong>Função:</strong> Data Protection Officer</p>
                             <h3 className="font-merriweather font-semibold">14.2 Canais de Comunicação</h3>
                             <p><strong>E-mail Geral:</strong> privacidade@anhanga.tur.br<br />
-                                <strong>WhatsApp Business:</strong> +55 (11) 95502-0352<br />
+                                <strong>WhatsApp Business:</strong> +55 (11) 95502-1519<br />
                                 <strong>Instagram:</strong> <a href="https://instagram.com/anhangaviagens" target="_blank" rel="noopener noreferrer" className="text-primary underline">@anhangaviagens</a><br />
                                 <strong>Website:</strong> <a href="/" target="_blank" rel="noopener noreferrer" className="text-primary underline">https://www.anhanga.tur.br/</a></p>
                             <h3 className="font-merriweather font-semibold">14.3 Atendimento</h3>
