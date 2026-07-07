@@ -432,7 +432,7 @@ const AIChat: React.FC = memo(() => {
         type="button"
         onClick={() => openChatDrawer()}
         className={`fixed ${isOpen ? 'translate-y-32 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
-                    bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9990]
+                    bottom-[calc(1rem+var(--cookie-banner-h,0px))] right-4 sm:bottom-[calc(1.5rem+var(--cookie-banner-h,0px))] sm:right-6 z-[9990]
                     flex items-center justify-center gap-3
                     bg-brand-vibrant text-white
                     shadow-[0_8px_30px_theme(colors.brand.cyan/30%)] hover:shadow-[0_8px_30px_theme(colors.brand.cyan/50%)] hover:-translate-y-1

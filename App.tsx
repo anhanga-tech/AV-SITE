@@ -89,6 +89,11 @@ const MainSiteShell: React.FC = () => {
 const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClientFeatures }) => {
   return (
     <>
+      {/* Primeiro na ordem do DOM: usuários de teclado/leitor de tela alcançam as
+          preferências de cookies sem atravessar a página inteira (visual segue fixed no rodapé) */}
+      <ClientOnly>
+        <CookieConsentBanner />
+      </ClientOnly>
       <ScrollToTop />
       <ChunkErrorBoundary>
       <Suspense fallback={<LandingRouteFallback />}>
@@ -113,9 +118,6 @@ const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClient
       {includeClientFeatures ? (
         <ClientFeatures />
       ) : null}
-      <ClientOnly>
-        <CookieConsentBanner />
-      </ClientOnly>
     </>
   );
 };

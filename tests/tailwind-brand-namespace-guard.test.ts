@@ -48,7 +48,8 @@ function collectRootFiles(): string[] {
 // Baseline medido em 2026-07-05 (migração de components/about/* para
 // anhanga-* nos fixes de /impeccable critique). Ao migrar usos de brand-*
 // para anhanga-*, ABAIXE este número para travar o ganho.
-const BRAND_NAMESPACE_BASELINE = 594;
+// 2026-07-07: 594 → 592 (CookieConsentBanner migrado na auditoria LGPD).
+const BRAND_NAMESPACE_BASELINE = 592;
 
 test('legacy brand-* namespace does not grow (ratchet)', () => {
   const files = [...SCAN_DIRS.flatMap(collectTailwindFiles), ...collectRootFiles()];

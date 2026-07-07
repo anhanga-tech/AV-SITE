@@ -107,6 +107,39 @@ test.describe('Cookie Consent Banner (CMP)', () => {
     expect(hasMautic).toBe(false);
   });
 
+  // --- Convivência com elementos flutuantes e ordem do DOM ---
+
+  test('banner visível define --cookie-banner-h no <html>; escolher limpa o offset', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).toBeVisible();
+
+    // Com o banner visível, a CSS var expõe a altura para o FAB do chat se deslocar
+    const heightWithBanner = await page.evaluate(() =>
+      document.documentElement.style.getPropertyValue('--cookie-banner-h')
+    );
+    expect(heightWithBanner).toMatch(/^\d+px$/);
+    expect(parseInt(heightWithBanner, 10)).toBeGreaterThan(0);
+
+    // Após escolher, o offset volta a zero (FAB retorna à posição original)
+    await page.getByRole('button', { name: 'Aceitar' }).click();
+    const heightAfterChoice = await page.evaluate(() =>
+      document.documentElement.style.getPropertyValue('--cookie-banner-h')
+    );
+    expect(heightAfterChoice).toBe('0px');
+  });
+
+  test('banner precede o conteúdo das rotas na ordem do DOM (acessibilidade de teclado)', async ({ page }) => {
+    await page.goto('/');
+    const dialogPrecedesMain = await page.evaluate(() => {
+      const dialog = document.querySelector('dialog[aria-label="Preferências de cookies"]');
+      const main = document.querySelector('header, main');
+      if (!dialog || !main) return false;
+      // DOCUMENT_POSITION_FOLLOWING (4): main vem depois do dialog no DOM
+      return Boolean(dialog.compareDocumentPosition(main) & Node.DOCUMENT_POSITION_FOLLOWING);
+    });
+    expect(dialogPrecedesMain).toBe(true);
+  });
+
   // --- Link de Política de Privacidade ---
 
   test('link "Política de Privacidade" aponta para /politica-privacidade/#cookies', async ({ page }) => {
