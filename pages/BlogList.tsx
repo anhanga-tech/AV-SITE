@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllPosts } from '../lib/mdx';
 import { AUTHORS } from '../data/blogData';
@@ -25,6 +25,7 @@ const searchIndex = buildBlogSearchIndex(allPosts);
 
 const BlogList: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
+    const searchInputRef = useRef<HTMLInputElement>(null);
 
     // Memoize the filtered list so it only recomputes when the term changes,
     // and so each keystroke scans precomputed strings instead of re-lowercasing
@@ -64,6 +65,7 @@ const BlogList: React.FC = () => {
                     <div className="relative max-w-lg mx-auto">
                         <label htmlFor="blog-search-input" className="sr-only">Buscar artigos</label>
                         <input
+                            ref={searchInputRef}
                             id="blog-search-input"
                             type="text"
                             placeholder="Buscar por título ou categoria..."
@@ -152,7 +154,17 @@ const BlogList: React.FC = () => {
                     </div>
                 ) : (
                     <div className="text-center py-20">
-                        <p className="text-zinc-400 text-lg font-medium">Nenhum artigo encontrado com esse termo. 🕵️‍♂️</p>
+                        <p className="text-zinc-400 text-lg font-medium mb-4">Nenhum artigo encontrado com esse termo. 🕵️‍♂️</p>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setSearchTerm('');
+                                searchInputRef.current?.focus();
+                            }}
+                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border-2 border-brand-cyan text-brand-cyan font-bold text-sm hover:bg-brand-cyan hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-cyan"
+                        >
+                            Limpar busca
+                        </button>
                     </div>
                 )}
 
