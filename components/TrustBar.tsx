@@ -34,9 +34,9 @@ const TrustBar = memo(() => (
               <Icon className="size-5" strokeWidth={2.4} aria-hidden="true" />
             </div>
             <div>
-              <h3 className="text-sm font-black uppercase tracking-wide text-anhanga-dark">
+              <p className="text-sm font-black uppercase tracking-wide text-anhanga-dark">
                 {title}
-              </h3>
+              </p>
               <p className="mt-1 text-sm font-medium leading-snug text-zinc-500">
                 {description}
               </p>
