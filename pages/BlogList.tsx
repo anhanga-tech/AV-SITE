@@ -157,6 +157,9 @@ const BlogList: React.FC = () => {
                         <p className="text-zinc-400 text-lg font-medium mb-4">Nenhum artigo encontrado com esse termo. 🕵️‍♂️</p>
                         <button
                             type="button"
+                            // Prevent the input from blurring on press so the mobile keyboard
+                            // stays open when clearing the search.
+                            onMouseDown={(e) => e.preventDefault()}
                             onClick={() => {
                                 setSearchTerm('');
                                 searchInputRef.current?.focus();
