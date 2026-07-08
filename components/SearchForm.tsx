@@ -36,6 +36,7 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
   const [childAges, setChildAges] = useState<string[]>([]);
   const [tripType, setTripType] = useState('');
   const [budget, setBudget] = useState('');
+  const [showTripType, setShowTripType] = useState(false);
   const [isSearchLoading, setIsSearchLoading] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const errorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -85,6 +86,14 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
   const calendarRef = useRef<HTMLDivElement>(null);
   const tripTypeRef = useRef<HTMLDivElement>(null);
   const budgetRef = useRef<HTMLDivElement>(null);
+
+  // Move o foco pro botão do TripTypeField assim que ele é revelado —
+  // o próximo passo natural do usuário é abrir o dropdown de opções.
+  useEffect(() => {
+    if (showTripType) {
+      tripTypeRef.current?.querySelector<HTMLButtonElement>('[data-testid="trip-type-filter-btn"]')?.focus();
+    }
+  }, [showTripType]);
 
   const closePanel = useCallback((panel: ActivePanel) => {
     setOpenPanel((prev) => (prev === panel ? null : prev));
@@ -261,6 +270,10 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
     closePanel('trip');
   }, [closePanel]);
 
+  const revealTripType = useCallback(() => {
+    setShowTripType(true);
+  }, []);
+
   const handleBudgetSelect = useCallback((label: string) => {
     setBudget(label);
     markStarted('budget');
@@ -389,14 +402,29 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
       </div>
 
       <div className="flex flex-col md:flex-row items-stretch w-full divide-y md:divide-y-0 md:divide-x divide-zinc-100">
-        <TripTypeField
-          tripTypeRef={tripTypeRef}
-          isOpen={openPanel === 'trip'}
-          tripType={tripType}
-          selectedTripObj={selectedTripObj}
-          onToggle={toggleTripTypeDropdown}
-          onSelect={handleTripTypeSelect}
-        />
+        <div id="hero-trip-type-panel" className="w-full md:flex-1 flex">
+          {showTripType ? (
+            <TripTypeField
+              tripTypeRef={tripTypeRef}
+              isOpen={openPanel === 'trip'}
+              tripType={tripType}
+              selectedTripObj={selectedTripObj}
+              onToggle={toggleTripTypeDropdown}
+              onSelect={handleTripTypeSelect}
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={revealTripType}
+              aria-expanded={showTripType}
+              aria-controls="hero-trip-type-panel"
+              data-testid="trip-type-reveal-btn"
+              className="w-full p-3 md:p-6 text-left hover:bg-zinc-50/80 transition duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan flex items-center"
+            >
+              <span className="text-zinc-400 font-bold text-sm">+ Tipo de viagem</span>
+            </button>
+          )}
+        </div>
         <BudgetField
           budgetRef={budgetRef}
           isOpen={openPanel === 'budget'}
