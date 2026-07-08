@@ -57,4 +57,32 @@ test.describe('Hero UX and Accessibility', () => {
     await page.keyboard.press('Escape');
     await expect(guestLabel).not.toBeVisible();
   });
+
+  test('should reveal Trip Type field only after activating its toggle', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'SearchForm complex interactions are desktop-only');
+
+    const tripTypeReveal = page.getByTestId('trip-type-reveal-btn');
+    const tripTypeField = page.getByTestId('trip-type-filter-btn');
+
+    // Colapsado por padrão
+    await expect(tripTypeReveal).toBeVisible();
+    await expect(tripTypeField).not.toBeVisible();
+    await expect(tripTypeReveal).toHaveAttribute('aria-expanded', 'false');
+    await expect(tripTypeReveal).toHaveAttribute('aria-controls', 'hero-trip-type-panel');
+
+    // Ativa o toggle
+    await tripTypeReveal.click();
+
+    // Campo revelado, toggle não existe mais (reveal unidirecional)
+    await expect(tripTypeField).toBeVisible();
+    await expect(tripTypeReveal).not.toBeVisible();
+
+    // Foco move para o botão do campo revelado
+    await expect(tripTypeField).toBeFocused();
+
+    // Fluxo normal de seleção continua funcionando
+    await tripTypeField.click();
+    await page.getByRole('button', { name: 'Férias / Lazer' }).click();
+    await expect(tripTypeField).toContainText('Férias / Lazer');
+  });
 });
