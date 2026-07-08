@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildBlogAnnouncementPayload } from '../lib/social-announcement.ts';
+import { buildBlogAnnouncementPayload, isFrontmatterLike } from '../lib/social-announcement.ts';
 import type { BlogPostFrontmatter } from '../types/blog';
 
 const baseFrontmatter: BlogPostFrontmatter = {
@@ -54,4 +54,32 @@ test('buildBlogAnnouncementPayload drops non-string tags and defaults missing ta
 test('buildBlogAnnouncementPayload respects a custom site base URL', () => {
   const payload = buildBlogAnnouncementPayload('slug', baseFrontmatter, 'https://staging.anhanga.tur.br');
   assert.equal(payload.url, 'https://staging.anhanga.tur.br/blog/slug/');
+});
+
+test('buildBlogAnnouncementPayload falls back to empty strings for missing optional fields', () => {
+  const sparse = {
+    ...baseFrontmatter,
+    title: undefined,
+    excerpt: undefined,
+    image: undefined,
+    category: undefined,
+    date: undefined,
+  } as unknown as BlogPostFrontmatter;
+
+  const payload = buildBlogAnnouncementPayload('slug', sparse);
+
+  assert.equal(payload.title, '');
+  assert.equal(payload.excerpt, '');
+  assert.equal(payload.image, '');
+  assert.equal(payload.category, '');
+  assert.equal(payload.publishedAt, '');
+});
+
+test('isFrontmatterLike accepts objects and rejects null/scalars', () => {
+  assert.equal(isFrontmatterLike(baseFrontmatter), true);
+  assert.equal(isFrontmatterLike({}), true);
+  assert.equal(isFrontmatterLike(null), false);
+  assert.equal(isFrontmatterLike(undefined), false);
+  assert.equal(isFrontmatterLike('not an object'), false);
+  assert.equal(isFrontmatterLike(42), false);
 });

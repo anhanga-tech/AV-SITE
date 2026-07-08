@@ -11,34 +11,45 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import matter from 'gray-matter';
-import { buildBlogAnnouncementPayload } from '../lib/social-announcement.ts';
-import type { BlogPostFrontmatter } from '../types/blog';
+import { buildBlogAnnouncementPayload, isFrontmatterLike } from '../lib/social-announcement.ts';
 
 const webhookUrl = process.env.N8N_SOCIAL_ANNOUNCE_WEBHOOK_URL?.trim();
 const webhookSecret = process.env.N8N_WEBHOOK_SECRET?.trim();
 
 async function dispatchAnnouncement(filepath: string, url: string, secret: string): Promise<boolean> {
   const slug = path.basename(filepath, '.mdx');
-  const raw = await readFile(filepath, 'utf8');
-  const { data } = matter(raw);
-  const payload = buildBlogAnnouncementPayload(slug, data as BlogPostFrontmatter);
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Webhook-Secret': secret,
-    },
-    body: JSON.stringify(payload),
-  });
+  try {
+    const raw = await readFile(filepath, 'utf8');
+    const { data } = matter(raw);
 
-  if (!response.ok) {
-    console.error(`✗ ${slug}: n8n respondeu ${response.status}`);
+    if (!isFrontmatterLike(data)) {
+      console.error(`✗ ${slug}: frontmatter inválido ou ausente`);
+      return false;
+    }
+
+    const payload = buildBlogAnnouncementPayload(slug, data);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Webhook-Secret': secret,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      console.error(`✗ ${slug}: n8n respondeu ${response.status}`);
+      return false;
+    }
+
+    console.log(`✓ ${slug}: anúncio enviado para o n8n`);
+    return true;
+  } catch (error) {
+    console.error(`✗ ${slug}: erro ao processar ou enviar`, error);
     return false;
   }
-
-  console.log(`✓ ${slug}: anúncio enviado para o n8n`);
-  return true;
 }
 
 function readFileList(): string[] {
