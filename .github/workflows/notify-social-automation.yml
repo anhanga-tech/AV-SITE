@@ -1,0 +1,74 @@
+name: Notify Social Automation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "content/blog/**.mdx"
+
+# Padrão sem escopo: o job só lê o histórico do git e chama um webhook externo.
+permissions:
+  contents: read
+
+jobs:
+  notify-new-posts:
+    name: Anunciar novos posts do blog
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          # Histórico completo: precisamos do commit anterior ao push para
+          # diferenciar posts novos de posts só editados.
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Find newly added blog posts
+        id: added-posts
+        env:
+          # github.event.before/after são SHAs de commit, mas passamos via env
+          # (não interpolados no shell) seguindo o mesmo padrão exigido para
+          # qualquer contexto de evento — ver tests/workflow-command-injection-guard.test.ts.
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.event.after }}
+        run: |
+          BEFORE="$BEFORE_SHA"
+          AFTER="$AFTER_SHA"
+          EMPTY_TREE="4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            BEFORE="$EMPTY_TREE"
+          fi
+
+          ADDED_FILES="$(git diff --name-status --diff-filter=A "$BEFORE" "$AFTER" -- content/blog | awk '{print $2}' | grep '\.mdx$' || true)"
+          echo "$ADDED_FILES"
+          {
+            echo "files<<EOF"
+            echo "$ADDED_FILES"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Install pnpm
+        if: steps.added-posts.outputs.files != ''
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+
+      - name: Use Node.js 24
+        if: steps.added-posts.outputs.files != ''
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24
+          cache: "pnpm"
+
+      - name: Install dependencies
+        if: steps.added-posts.outputs.files != ''
+        run: pnpm install --frozen-lockfile
+
+      - name: Notify n8n of new blog posts
+        if: steps.added-posts.outputs.files != ''
+        env:
+          # Passado via env (não interpolado no shell) para evitar script
+          # injection a partir de nomes de arquivo — ver docs/standards/security.md.
+          ADDED_BLOG_FILES: ${{ steps.added-posts.outputs.files }}
+          N8N_SOCIAL_ANNOUNCE_WEBHOOK_URL: ${{ secrets.N8N_SOCIAL_ANNOUNCE_WEBHOOK_URL }}
+          N8N_WEBHOOK_SECRET: ${{ secrets.N8N_WEBHOOK_SECRET }}
+        run: pnpm exec tsx scripts/notify-blog-published.ts
