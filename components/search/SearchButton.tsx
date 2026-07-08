@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Search, Loader2 } from 'lucide-react';
+import { Loader2, Send } from 'lucide-react';
 
 interface SearchButtonProps {
   isSearchLoading: boolean;
@@ -26,12 +26,12 @@ const SearchButton = memo(({ isSearchLoading, validationError }: SearchButtonPro
       {isSearchLoading ? (
         <>
           <Loader2 className="size-6 animate-spin" />
-          <span className="font-black text-lg">Planejando…</span>
+          <span className="font-black text-lg">Abrindo chat...</span>
         </>
       ) : (
         <>
-          <Search className="size-6 group-hover:rotate-12 transition-transform duration-300 ease-spring" strokeWidth={2.5} />
-          <span className="font-black text-lg">Planejar Viagem</span>
+          <Send className="size-6 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300 ease-spring" strokeWidth={2.5} />
+          <span className="font-black text-lg">Solicitar proposta</span>
         </>
       )}
     </button>

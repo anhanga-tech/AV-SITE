@@ -180,8 +180,8 @@ const Hero: React.FC = memo(() => {
             </span>
           </h1>
 
-          <p className="text-white/90 text-xl md:text-2xl max-w-2xl mx-auto mb-12 font-medium leading-relaxed drop-shadow-md">
-            Cada roteiro nasce de uma conversa.
+          <p className="text-white/90 text-xl md:text-2xl max-w-3xl mx-auto mb-12 font-medium leading-relaxed drop-shadow-md">
+            Roteiro sob medida, proposta sem compromisso e atendimento humano para viajar sem pacote pronto
           </p>
 
           {/* Formulário completo — apenas desktop */}
@@ -194,7 +194,7 @@ const Hero: React.FC = memo(() => {
 
           {/* Micro-texto abaixo da barra de busca */}
           <p className="text-sm text-white/70 text-center mt-3">
-            Sem compromisso • Resposta em até 2h (dias úteis)
+            Sem compromisso • Retorno humano em até 2h úteis
           </p>
 
           {/* Quick Features - Staggered Spring */}

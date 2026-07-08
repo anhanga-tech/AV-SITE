@@ -86,7 +86,7 @@ const FAQS = [
                 </ul>
                 <p className="border-t border-amber-200 pt-3 italic">
                     <strong>Receba uma cotação personalizada gratuitamente!</strong> <br />
-                    Fale com nossa IA agora mesmo no chat!
+                    Comece pelo chat e nossa equipe continua o atendimento com você.
                 </p>
             </div>
         )
@@ -136,7 +136,7 @@ const FAQS = [
             <div>
                 <p className="mb-2"><strong>1. Roteiros 100% personalizados:</strong> Não vendemos pacotes prontos.</p>
                 <p className="mb-2"><strong>2. Sem burocracia:</strong> Cuidamos de vistos, formulários, tudo.</p>
-                <p className="mb-2"><strong>3. Concierge humano:</strong> Fale com especialistas, não robôs.</p>
+                <p className="mb-2"><strong>3. Concierge humano:</strong> O chat agiliza o início, mas seu roteiro é conduzido por especialistas.</p>
                 <p className="mb-2"><strong>4. Suporte 24/7:</strong> Temos um "botão de pânico" no WhatsApp.</p>
                 <p><strong>5. Especialistas em transformação:</strong> Viagens que mudam vidas, não apenas destinos.</p>
             </div>
@@ -148,7 +148,7 @@ const FAQS = [
             <div>
                 <strong className="block mb-3">4 passos simples:</strong>
                 <ol className="list-decimal pl-5 space-y-3">
-                    <li className="pl-1"><strong className="text-brand-dark">Oie! Vamos conversar?</strong> <br /> Você nos conta seus sonhos e orçamento via Chatbot</li>
+                    <li className="pl-1"><strong className="text-brand-dark">Oie! Vamos conversar?</strong> <br /> Você começa pelo chat, conta seus sonhos e informa quanto quer investir</li>
                     <li className="pl-1"><strong className="text-brand-dark">Desenhando o Sonho</strong> <br /> Nossos especialistas criam um roteiro dia-a-dia personalizado</li>
                     <li className="pl-1"><strong className="text-brand-dark">Burocracia? Deixa com a gente</strong> <br /> Emitimos voos, hotéis, passeios e parcelamos</li>
                     <li className="pl-1"><strong className="text-brand-dark">Fui! Partiu Viajar</strong> <br /> Você recebe vouchers organizados. A gente fica de plantão 24h</li>
@@ -237,8 +237,8 @@ const Faq = memo(() => {
                         <div className="text-center md:text-left">
                             <h4 className="font-bold text-brand-dark text-xl mb-1">Ainda tem dúvidas?</h4>
                             <p className="text-zinc-600">
-                                Nossa <span className="font-bold text-brand-cyan">IA Especialista</span> está pronta para ajudar.
-                                Chame no chat aqui no canto! 👉
+                                Nosso <span className="font-bold text-brand-cyan">assistente inicial</span> ajuda a organizar sua ideia.
+                                Chame no chat aqui no canto e nossa equipe continua com você.
                             </p>
                         </div>
                     </div>

@@ -113,7 +113,7 @@ const MobileHeroForm: React.FC = memo(() => {
           data-tracking="hero-home-mobile"
           className="btn-specialist w-full bg-brand-yellow text-brand-dark font-black text-base py-4 rounded-2xl shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-vibrant/30"
         >
-          Quero meu orçamento →
+          Solicitar proposta →
         </button>
       </form>
     </div>
