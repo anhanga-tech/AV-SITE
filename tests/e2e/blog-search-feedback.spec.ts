@@ -24,4 +24,19 @@ test.describe('blog list search feedback', () => {
     await page.fill(SEARCH_INPUT, '');
     await expect(results).toHaveText('');
   });
+
+  test('offers a clear-search button when no articles match', async ({ page }) => {
+    await page.goto(BLOG_LIST_PATH);
+
+    await page.fill(SEARCH_INPUT, 'zzzzzznotarealterm');
+
+    const clearButton = page.getByRole('button', { name: 'Limpar busca' });
+    await expect(clearButton).toBeVisible();
+
+    await clearButton.click();
+
+    await expect(page.locator(SEARCH_INPUT)).toHaveValue('');
+    await expect(page.locator(SEARCH_INPUT)).toBeFocused();
+    await expect(clearButton).toBeHidden();
+  });
 });
