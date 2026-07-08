@@ -44,7 +44,7 @@ const HIGHLIGHTS: HighlightItem[] = [
     {
         icon: UserCircleCheck,
         title: "Concierge Humano",
-        description: "Esqueça os robôs. Fale com gente que entende de gente.",
+        description: "Você começa pelo chat e nossa equipe humana continua com orientação de verdade.",
         bg: "bg-orange-100",
         accent: "border-orange-200",
         iconColor: "text-orange-600",

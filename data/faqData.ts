@@ -9,7 +9,7 @@ export const FAQ_SCHEMA_ITEMS: FAQSchemaItem[] = [
   {
     question: 'Quanto custa um roteiro personalizado?',
     answer:
-      'O preço varia conforme a complexidade, duração e destino. Nossos roteiros começam em R$ 3.800 e podem chegar a R$ 50.000+ para experiências premium. Fatores que influenciam o preço: passagens aéreas (variável conforme data e companhia), hospedagem (economia a luxo), experiências e passeios, duração da viagem e sazonalidade do destino. Receba uma cotação personalizada gratuitamente pelo chat da IA no site.',
+      'O preço varia conforme a complexidade, duração e destino. Nossos roteiros começam em R$ 3.800 e podem chegar a R$ 50.000+ para experiências premium. Fatores que influenciam o preço: passagens aéreas (variável conforme data e companhia), hospedagem (economia a luxo), experiências e passeios, duração da viagem e sazonalidade do destino. Receba uma cotação personalizada gratuitamente pelo chat; nossa equipe continua o atendimento com você.',
   },
   {
     question: 'Como funciona a estrutura de preço da Anhangá?',
@@ -24,12 +24,12 @@ export const FAQ_SCHEMA_ITEMS: FAQSchemaItem[] = [
   {
     question: 'Por que a Anhangá em vez de outra agência?',
     answer:
-      '1. Roteiros 100% personalizados: não vendemos pacotes prontos. 2. Sem burocracia: cuidamos de vistos, formulários e tudo mais. 3. Concierge humano: fale com especialistas, não robôs. 4. Suporte 24/7: temos um "botão de pânico" no WhatsApp. 5. Especialistas em transformação: viagens que mudam vidas, não apenas destinos.',
+      '1. Roteiros 100% personalizados: não vendemos pacotes prontos. 2. Sem burocracia: cuidamos de vistos, formulários e tudo mais. 3. Concierge humano: o chat agiliza o início, mas seu roteiro é conduzido por especialistas. 4. Suporte 24/7: temos um "botão de pânico" no WhatsApp. 5. Especialistas em transformação: viagens que mudam vidas, não apenas destinos.',
   },
   {
     question: 'Como funciona o processo? É complicado?',
     answer:
-      '4 passos simples. 1. Oie! Vamos conversar? — você nos conta seus sonhos e orçamento via chatbot. 2. Desenhando o Sonho — nossos especialistas criam um roteiro dia a dia personalizado. 3. Burocracia? Deixa com a gente — emitimos voos, hotéis e passeios e parcelamos. 4. Fui! Partiu Viajar — você recebe os vouchers organizados e a gente fica de plantão 24h.',
+      '4 passos simples. 1. Oie! Vamos conversar? — você começa pelo chat, conta seus sonhos e informa quanto quer investir. 2. Desenhando o Sonho — nossos especialistas criam um roteiro dia a dia personalizado. 3. Burocracia? Deixa com a gente — emitimos voos, hotéis e passeios e parcelamos. 4. Fui! Partiu Viajar — você recebe os vouchers organizados e a gente fica de plantão 24h.',
   },
   {
     question: 'Como funciona a página do Lollapalooza Brasil na Anhangá?',
