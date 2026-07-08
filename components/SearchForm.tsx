@@ -91,7 +91,7 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
   // o próximo passo natural do usuário é abrir o dropdown de opções.
   useEffect(() => {
     if (showTripType) {
-      tripTypeRef.current?.querySelector('button')?.focus();
+      tripTypeRef.current?.querySelector<HTMLButtonElement>('[data-testid="trip-type-filter-btn"]')?.focus();
     }
   }, [showTripType]);
 
