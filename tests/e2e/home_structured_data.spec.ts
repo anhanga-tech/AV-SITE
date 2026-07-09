@@ -61,6 +61,6 @@ test.describe('Home structured data', () => {
     expect(rating).toBeDefined();
     expect(rating['@type']).toBe('AggregateRating');
     expect(rating['ratingValue']).toBe(5);
-    expect(rating['reviewCount']).toBe(2);
+    expect(rating['reviewCount']).toBe(3);
   });
 });
