@@ -1,9 +1,17 @@
 {
   "placeId": "ChIJ65P6-_G9oycRruws5FfoRDs",
   "averageRating": 5,
-  "totalReviews": 2,
-  "lastFetched": "2026-06-29T10:16:09.841Z",
+  "totalReviews": 3,
+  "lastFetched": "2026-07-09T17:04:47.948Z",
   "reviews": [
+    {
+      "id": "Ci9DQUlRQUNvZENodHljRjlvT2tKVlVXeFVZelphUzE5b01IZ3pUMWRRYUdSZmRtYxAB",
+      "authorName": "Biern Formu",
+      "rating": 5,
+      "text": "Atendimento impecável, do inicio ao fim. Fui recebido com atenção, não me mostraram apenas valores, me deram dicas, excelentes dicas de viagem e do destino que eu buscava.",
+      "date": "2026-07-09",
+      "photoUrl": ""
+    },
     {
       "id": "Ci9DQUlRQUNvZENodHljRjlvT25JMVpVeFFORWR6VWxrdFVrcHpWSE5xY2xGQ00yYxAB",
       "authorName": "Daryw Mena",
