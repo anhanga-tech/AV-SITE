@@ -6,8 +6,8 @@
  *    the custom funnel fields (`x_perfil_do_viajante`, `x_lgpd_consent`). This is
  *    what the native Odoo nurture segments filter on.
  *  - `crm.lead` — only lead/corporativo/contato create an opportunity (linked to
- *    the partner via `partner_id`). Quiz and waitlist are ToFu: partner only, so
- *    they don't inflate the pipeline.
+ *    the partner via `partner_id`), including the per-trip `x_destino` field.
+ *    Quiz and waitlist are ToFu: partner only, so they don't inflate the pipeline.
  *
  * IDs (`source_id`/`medium_id`/`stage_id`/`team_id`) are fixed records of the
  * `anhanga` instance, validated via MCP against the contract's §3 table.
@@ -182,7 +182,9 @@ function buildDescriptionHtml(input: OdooLeadInput): string {
 
 /**
  * Builds the `crm.lead` create dict for forms that become an opportunity. Links
- * the deduped partner via `partner_id`.
+ * the deduped partner via `partner_id`. `destination` is also written to the
+ * structured `x_destino` field (Studio, added for the Contato/Oportunidade/
+ * Chamado field redesign) in addition to the human-readable description line.
  */
 export function buildLeadFields(input: OdooLeadInput, partnerId: number): Record<string, unknown> {
     const name = fullName(input.firstName, input.lastName);
@@ -205,6 +207,7 @@ export function buildLeadFields(input: OdooLeadInput, partnerId: number): Record
     if (input.referred) fields.referred = input.referred;
     if (input.empresa) fields.partner_name = input.empresa;
     if (input.cargo) fields.function = input.cargo;
+    if (input.destination) fields.x_destino = input.destination;
 
     const description = buildDescriptionHtml(input);
     if (description) fields.description = description;

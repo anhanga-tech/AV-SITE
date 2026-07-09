@@ -128,6 +128,16 @@ test('buildLeadFields — opportunity shape with partner_id and resolved source/
     assert.match(String(fields.description), /<li>Destino: Orlando<\/li>/);
 });
 
+test('buildLeadFields — grava destination no campo estruturado x_destino', () => {
+    const fields = buildLeadFields(baseInput({ destination: 'Orlando' }), 5);
+    assert.equal(fields.x_destino, 'Orlando');
+});
+
+test('buildLeadFields — omite x_destino quando não há destino', () => {
+    const fields = buildLeadFields(baseInput({}), 5);
+    assert.equal('x_destino' in fields, false);
+});
+
 test('buildLeadFields — não duplica utm_campaign na descrição (vira campaign_id a montante)', () => {
     const fields = buildLeadFields(
         baseInput({ bantSummary: 'Need: X', utms: utms({ utm_campaign: 'verao2026' }) }),
