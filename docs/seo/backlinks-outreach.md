@@ -69,4 +69,4 @@ Os resultados serão monitorados mensalmente utilizando as seguintes métricas:
 ---
 
 ## 📎 Referências Internas
-- [Plano de SEO 2026](./plan-2026.md)
+- [Auditoria SEO/GEO 2026-06](./seo-geo-audit-2026-06.md) (substitui o plano de março/2026, superado após o fix do prerender)
