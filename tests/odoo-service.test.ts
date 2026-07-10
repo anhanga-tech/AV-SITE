@@ -255,6 +255,59 @@ test('createLead — different idempotency keys never merge into the same lead',
     assert.notEqual(idA, idB, 'two genuinely distinct trip requests from the same customer must not be merged');
 });
 
+test("createLead — a key that is a literal prefix of another lead's key does not match it", async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+
+    // Odoo's `like` operator does an unanchored `%value%` substring match —
+    // this mock reproduces that (unlike createOdooMock, which never simulates
+    // real substring behavior) so the exact-match guard in services/odoo.ts
+    // actually gets exercised: "evt-trip" is a literal substring of
+    // "evt-trip-2", so a naive `like`-only lookup would wrongly return the
+    // first lead's id for the second, distinct request.
+    const leads: { id: number; description: string }[] = [];
+    let nextLeadId = 3000;
+    global.fetch = (async (_input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+        const body = JSON.parse(String(init?.body ?? '{}')) as { params: { service: string; method: string; args: unknown[] } };
+        const { service, method, args } = body.params;
+        if (service === 'common' && method === 'authenticate') {
+            return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: 7 }), { status: 200 });
+        }
+        const ormMethod = args[4] as string;
+        const ormArgs = args[5] as unknown[];
+        if (ormMethod === 'search_read') {
+            const domain = ormArgs[0] as [string, string, string][];
+            const [, , marker] = domain[0];
+            const matches = leads.filter((lead) => lead.description.includes(marker));
+            return new Response(
+                JSON.stringify({ jsonrpc: '2.0', id: 1, result: matches.map((l) => ({ id: l.id, description: l.description })) }),
+                { status: 200 },
+            );
+        }
+        if (ormMethod === 'create') {
+            nextLeadId += 1;
+            const fields = ormArgs[0] as Record<string, unknown>;
+            leads.push({ id: nextLeadId, description: String(fields.description ?? '') });
+            return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: nextLeadId }), { status: 200 });
+        }
+        throw new Error(`unexpected ORM call: ${ormMethod}`);
+    }) as typeof fetch;
+
+    // Create the longer key first so its stored description already contains
+    // the shorter key as a literal substring — the actual collision shape:
+    // searching for "evt-trip" afterward must not match "evt-trip-2"'s row.
+    const session = await openOdooSession(config());
+    const longerKeyId = await session.createLead(
+        { name: 'Lead B', description: '<ul><li>idempotency_key: evt-trip-2</li></ul>' },
+        'evt-trip-2',
+    );
+    const shortKeyId = await session.createLead(
+        { name: 'Lead A', description: '<ul><li>idempotency_key: evt-trip</li></ul>' },
+        'evt-trip',
+    );
+
+    assert.notEqual(shortKeyId, longerKeyId, "a key that is a substring prefix of another lead's key must not match it");
+});
+
 test('resolveCampaignId — returns the existing utm.campaign id when the name matches', async (t) => {
     t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
     const mock = createOdooMock({ existingCampaignId: 42 });

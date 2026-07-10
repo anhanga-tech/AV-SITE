@@ -247,16 +247,25 @@ export async function openOdooSession(config: OdooConfig): Promise<OdooSession> 
             // after a response was lost post-commit) idempotent.
             async function findExisting(): Promise<number | null> {
                 const marker = `${IDEMPOTENCY_KEY_LABEL}: ${idempotencyKey}`;
-                const rows = await executeKw<{ id: number }[]>(
+                // Odoo's `like` wraps the value in `%...%` — an unanchored substring
+                // match. A key that's a literal prefix of another lead's key (e.g.
+                // "evt-trip" vs. "evt-trip-a") would otherwise match the wrong row,
+                // especially since idempotencyKey can be raw client-supplied
+                // event_id on a public, unauthenticated endpoint. `like` here is only
+                // a narrowing prefilter (bounded by `limit`); the exact, delimited
+                // line is what actually decides a match.
+                const exactMarker = `<li>${marker}</li>`;
+                const rows = await executeKw<{ id: number; description: string | false }[]>(
                     config,
                     uid,
                     'crm.lead',
                     'search_read',
-                    [[['description', 'like', marker]], ['id']],
+                    [[['description', 'like', marker]], ['id', 'description']],
                     deadline,
-                    { limit: 1, order: 'id asc' },
+                    { limit: 20, order: 'id asc' },
                 );
-                return rows[0]?.id ?? null;
+                const match = rows.find((row) => typeof row.description === 'string' && row.description.includes(exactMarker));
+                return match?.id ?? null;
             }
 
             return withLeadIdempotencyLock(idempotencyKey, async () => {

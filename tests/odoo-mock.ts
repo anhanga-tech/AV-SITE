@@ -89,13 +89,24 @@ interface SearchReadDefaults {
     existingLeadId: number | null;
 }
 
-/** `search_read` result per model: dedup row for res.partner, find-or-create lookup for utm.campaign/crm.lead. */
-function searchReadResult(model: string, d: SearchReadDefaults): unknown[] {
+/**
+ * `search_read` result per model: dedup row for res.partner, find-or-create
+ * lookup for utm.campaign/crm.lead. For crm.lead, `domain` is the real
+ * `[['description', 'like', marker], ...]` the caller searched with —
+ * `services/odoo.ts` now requires the row's `description` to contain the
+ * exact `<li>marker</li>` line (not just the bare `like` match) before
+ * treating it as the same lead, so an existing lead's row must actually
+ * carry a description built from that same marker to be found — exactly
+ * like a real previously-created lead would.
+ */
+function searchReadResult(model: string, d: SearchReadDefaults, domain?: unknown[]): unknown[] {
     if (model === 'utm.campaign') {
         return d.existingCampaignId ? [{ id: d.existingCampaignId }] : [];
     }
     if (model === 'crm.lead') {
-        return d.existingLeadId ? [{ id: d.existingLeadId }] : [];
+        if (!d.existingLeadId) return [];
+        const marker = Array.isArray(domain) && Array.isArray(domain[0]) ? (domain[0] as unknown[])[2] as string : '';
+        return [{ id: d.existingLeadId, description: `<ul><li>${marker}</li></ul>` }];
     }
     return d.existingPartnerId ? [{ id: d.existingPartnerId, comment: d.existingComment, ...d.existingFields }] : [];
 }
@@ -136,6 +147,7 @@ interface ExecuteKwState {
 function handleExecuteKw(
     model: string,
     ormMethod: string,
+    ormArgs: unknown[],
     state: ExecuteKwState,
     options: {
         existingPartnerId: number | null;
@@ -151,13 +163,14 @@ function handleExecuteKw(
         return jsonRpcError('duplicate key value violates unique constraint "utm_campaign_name_uniq"');
     }
     if (ormMethod === 'search_read') {
+        const domain = ormArgs[0] as unknown[] | undefined;
         return jsonRpcResponse(searchReadResult(model, {
             existingPartnerId: options.existingPartnerId,
             existingComment: options.existingComment,
             existingFields: options.existingFields,
             existingCampaignId: state.campaignId,
             existingLeadId: state.leadIdState,
-        }));
+        }, domain));
     }
     if (ormMethod === 'create') {
         const result = createResult(model, { leadId: options.leadId, newPartnerId: options.newPartnerId, newCampaignId: options.newCampaignId });
@@ -211,7 +224,7 @@ export function createOdooMock(options: OdooMockOptions = {}): OdooMock {
         const kwargs = (args[6] as Record<string, unknown>) ?? {};
         calls.push({ model, method: ormMethod, args: ormArgs, kwargs });
 
-        return handleExecuteKw(model, ormMethod, state, {
+        return handleExecuteKw(model, ormMethod, ormArgs, state, {
             existingPartnerId,
             existingComment,
             existingFields,

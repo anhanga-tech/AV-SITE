@@ -63,6 +63,35 @@ test('withLeadIdempotencyLock serializes two concurrent calls for the same key',
     assert.ok(order.indexOf('first-end') < order.indexOf('second-start'));
 });
 
+test('withLeadIdempotencyLock polls until release for a winner slower than the old fixed pause', async (t) => {
+    useInMemoryFallback(t);
+    const key = `key-${uid()}`;
+    const order: string[] = [];
+
+    // 600ms is longer than the previous fixed 300ms wait — with the old
+    // implementation the loser would run its critical section blind at
+    // ~300ms, well before the winner (still running at 600ms) finished.
+    const first = withLeadIdempotencyLock(key, async () => {
+        order.push('first-start');
+        await new Promise((resolve) => setTimeout(resolve, 600));
+        order.push('first-end');
+        return 'first';
+    });
+    // Let the first call actually acquire the lock before racing the second.
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    const second = withLeadIdempotencyLock(key, async () => {
+        order.push('second-start');
+        return 'second';
+    });
+
+    await Promise.all([first, second]);
+
+    assert.ok(
+        order.indexOf('first-end') < order.indexOf('second-start'),
+        `expected the loser to poll until real release, not a fixed pause — order was ${order.join(', ')}`,
+    );
+});
+
 test('withLeadIdempotencyLock releases the lock even when fn throws', async (t) => {
     useInMemoryFallback(t);
     const key = `key-${uid()}`;
