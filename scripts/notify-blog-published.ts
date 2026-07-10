@@ -10,13 +10,11 @@
  */
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import matter from 'gray-matter';
 import { buildBlogAnnouncementPayload, isFrontmatterLike } from '../lib/social-announcement.ts';
 
-const webhookUrl = process.env.N8N_SOCIAL_ANNOUNCE_WEBHOOK_URL?.trim();
-const webhookSecret = process.env.N8N_WEBHOOK_SECRET?.trim();
-
-async function dispatchAnnouncement(filepath: string, url: string, secret: string): Promise<boolean> {
+export async function dispatchAnnouncement(filepath: string, url: string, secret: string): Promise<boolean> {
   const slug = path.basename(filepath, '.mdx');
 
   try {
@@ -52,20 +50,25 @@ async function dispatchAnnouncement(filepath: string, url: string, secret: strin
   }
 }
 
-function readFileList(): string[] {
+export function readFileList(): string[] {
   const fromEnv = process.env.ADDED_BLOG_FILES ?? '';
   const fromArgv = process.argv.slice(2);
   const combined = fromArgv.length > 0 ? fromArgv : fromEnv.split('\n');
   return combined.map((line) => line.trim()).filter(Boolean);
 }
 
-async function main(): Promise<void> {
+export async function main(): Promise<void> {
   const files = readFileList();
 
   if (files.length === 0) {
     console.log('Nenhum post novo para anunciar.');
     return;
   }
+
+  // Read at call time (not module load) so tests can exercise both the
+  // "configured" and "not configured" paths without re-importing the module.
+  const webhookUrl = process.env.N8N_SOCIAL_ANNOUNCE_WEBHOOK_URL?.trim();
+  const webhookSecret = process.env.N8N_WEBHOOK_SECRET?.trim();
 
   if (!webhookUrl || !webhookSecret) {
     console.log('N8N_SOCIAL_ANNOUNCE_WEBHOOK_URL ou N8N_WEBHOOK_SECRET não configurados — pulando automação social.');
@@ -79,4 +82,9 @@ async function main(): Promise<void> {
   }
 }
 
-await main();
+// Only auto-run when executed directly (`pnpm exec tsx scripts/notify-blog-published.ts`
+// in CI) — guarded so tests can import the functions above without triggering a live run.
+const isMainModule = process.argv[1] !== undefined && import.meta.url === pathToFileURL(process.argv[1]).href;
+if (isMainModule) {
+  await main();
+}
