@@ -57,9 +57,17 @@ function main(): void {
   console.log(`Linting ${files.length} changed file(s) vs ${baseRef}:`);
   for (const file of files) console.log(`  ${file}`);
 
-  // No --max-warnings: warnings are surfaced but never fail the ratchet —
-  // only errors (rules-of-hooks, floating promises, etc.) block CI.
-  execFileSync('pnpm', ['exec', 'eslint', ...files], { stdio: 'inherit' });
+  try {
+    // No --max-warnings: warnings are surfaced but never fail the ratchet —
+    // only errors (rules-of-hooks, floating promises, etc.) block CI.
+    execFileSync('pnpm', ['exec', 'eslint', ...files], { stdio: 'inherit' });
+  } catch (error) {
+    // eslint's own output (already forwarded via stdio: 'inherit') is the
+    // useful signal here — exit with its status instead of letting Node
+    // print a redundant SpawnSyncReturns stack trace on top of it.
+    const status = (error as { status?: number | null }).status;
+    process.exit(typeof status === 'number' ? status : 1);
+  }
 }
 
 main();
