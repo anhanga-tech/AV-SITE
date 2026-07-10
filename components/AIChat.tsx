@@ -24,6 +24,27 @@ const ChatPanelLoadingFallback: React.FC = () => (
   </div>
 );
 
+// AIChat renders as a sibling of routed page content, not inside a fixed
+// wrapper — the default ChunkErrorBoundary fallback (a full-width
+// min-h-[40vh] section meant for route-level failures) would render inline
+// in the normal document flow and read as a full-page error. This stays
+// fixed-position and widget-sized, matching where the trigger button lives.
+const ChatPanelErrorFallback: React.FC = () => (
+  <div
+    role="alert"
+    className="fixed bottom-[calc(5.5rem+var(--cookie-banner-h,0px))] right-4 sm:right-6 z-[9999] flex items-center gap-3 bg-white text-zinc-700 shadow-[0_8px_30px_rgba(0,0,0,0.12)] px-5 py-4 rounded-2xl border border-zinc-100 max-w-[280px]"
+  >
+    <span className="text-sm font-medium flex-1">Não foi possível carregar o assistente.</span>
+    <button
+      type="button"
+      onClick={() => window.location.reload()}
+      className="shrink-0 text-xs font-bold text-brand-vibrant underline underline-offset-2"
+    >
+      Recarregar
+    </button>
+  </div>
+);
+
 /**
  * AIChat — always-mounted floating trigger for the travel-advice chatbot.
  *
@@ -170,7 +191,7 @@ const AIChat: React.FC = memo(() => {
       </button>
 
       {hasIntent && (
-        <ChunkErrorBoundary>
+        <ChunkErrorBoundary fallback={<ChatPanelErrorFallback />}>
           <Suspense fallback={<ChatPanelLoadingFallback />}>
             <AIChatPanel
               isOpen={isOpen}

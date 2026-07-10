@@ -33,6 +33,14 @@ interface Message {
   };
 }
 
+/** crypto.randomUUID() is unavailable in older browsers and non-secure (HTTP) contexts. */
+function generateMessageId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return Math.random().toString(36).slice(2, 11);
+}
+
 export interface AIChatPanelProps {
   /** Whether the drawer should be visually open (`<dialog>` shown as modal). */
   isOpen: boolean;
@@ -185,19 +193,16 @@ const AIChatPanel: React.FC<AIChatPanelProps> = memo(({
     onClose();
   }, [onClose]);
 
-  const closeChatDrawerRef = useRef(closeChatDrawer);
-  useEffect(() => { closeChatDrawerRef.current = closeChatDrawer; });
-
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
 
     const handleCancel = (e: Event) => {
       e.preventDefault();
-      closeChatDrawerRef.current();
+      closeChatDrawer();
     };
     const handleClick = (e: MouseEvent) => {
-      if (e.target === dialog) closeChatDrawerRef.current();
+      if (e.target === dialog) closeChatDrawer();
     };
 
     dialog.addEventListener('cancel', handleCancel);
@@ -206,7 +211,7 @@ const AIChatPanel: React.FC<AIChatPanelProps> = memo(({
       dialog.removeEventListener('cancel', handleCancel);
       dialog.removeEventListener('click', handleClick);
     };
-  }, []);
+  }, [closeChatDrawer]);
 
   const handlePrepareLeadSubmitPayload = (payload: LeadFinalizePayload, eventId: string): SubmitLeadRequest => {
     setLeadDraft({ ...payload });
@@ -260,7 +265,7 @@ const AIChatPanel: React.FC<AIChatPanelProps> = memo(({
       void triggerHaptic('medium');
     }
 
-    const newHistory: Message[] = [...messagesRef.current, { id: crypto.randomUUID(), role: 'user', text }];
+    const newHistory: Message[] = [...messagesRef.current, { id: generateMessageId(), role: 'user', text }];
     setMessages(newHistory);
     setInput('');
 
@@ -289,7 +294,7 @@ const AIChatPanel: React.FC<AIChatPanelProps> = memo(({
       setMessages(prev => [
         ...prev,
         {
-          id: crypto.randomUUID(),
+          id: generateMessageId(),
           role: 'model' as const,
           text: '⚙️ Tivemos um problema técnico. Por favor, tente novamente em alguns instantes.',
         },
@@ -302,11 +307,11 @@ const AIChatPanel: React.FC<AIChatPanelProps> = memo(({
 
     if (response.text) {
       nextMessages.push({
-        id: crypto.randomUUID(),
+        id: generateMessageId(),
         role: 'model',
         text: response.text || '',
         chips: response.chips?.map((label) => ({
-          id: crypto.randomUUID(),
+          id: generateMessageId(),
           label,
         }))
       });
@@ -322,7 +327,7 @@ const AIChatPanel: React.FC<AIChatPanelProps> = memo(({
       });
 
       nextMessages.push({
-        id: crypto.randomUUID(),
+        id: generateMessageId(),
         role: 'model',
         text: 'Orçamento Pronto',
         isAction: true,
@@ -372,16 +377,14 @@ const AIChatPanel: React.FC<AIChatPanelProps> = memo(({
     }, initialAutoSendDelayMs ?? 500);
 
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialAutoSendMessage, initialAutoSendDelayMs]);
+  }, [initialAutoSendMessage, initialAutoSendDelayMs, onConsumePending]);
 
   // Applies a pending input pre-fill (`?chat=1&m=`/`message=`/`destino=`) once mounted.
   useEffect(() => {
     if (!initialInputPrefill) return;
     setInput(initialInputPrefill);
     onConsumePending();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialInputPrefill]);
+  }, [initialInputPrefill, onConsumePending]);
 
   return (
     <dialog
