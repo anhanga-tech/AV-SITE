@@ -272,3 +272,21 @@ Templates in `/docs/standards/templates/`: `api-endpoint-template.md` (required 
 - Reuse `lib/network.ts`, `lib/rate-limit.ts`, `lib/lead-logic.ts`, and `lib/schemas/` instead of creating parallel patterns
 - When adding API handlers, use `/docs/standards/templates/api-endpoint-template.md`
 - Record intentional rule deviations in PR notes; silence is not an exception process
+
+## Agent skills
+
+### Issue tracker
+
+Work is tracked in GitHub Issues for `felipewilliam2/AV-SITE`; external pull
+requests are not a triage surface. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Use the repository's existing `status:*`, `question`, and `wontfix` labels for
+the five canonical triage roles. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+This is a single-context repository. Read the existing product, design, and
+engineering standards first, plus `CONTEXT.md` and relevant ADRs when those
+files exist. See `docs/agents/domain.md`.
