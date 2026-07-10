@@ -52,11 +52,14 @@ O Cloudflare AI Gateway é opcional e controlado por feature flag. Use para moni
 Consulte `.env.example` para a lista completa com descrições. Grupos principais:
 
 - **Gemini AI** (required): `GEMINI_API_KEY`
-- **n8n Webhooks** (required in prod): `N8N_WEBHOOK_SECRET`, `N8N_SUBMIT_CONTACT_WEBHOOK_URL`, `NPS_WEBHOOK_URL`
+- **Odoo** (required in prod): `ODOO_URL`, `ODOO_DB`, `ODOO_LOGIN`, `ODOO_API_KEY` — CRM ativo; os 5 formulários (lead/contato/quiz/waitlist/nps) postam direto via JSON-RPC
+- **n8n Webhook** (required in prod): `N8N_WEBHOOK_SECRET` — restrito a `purchase-dispatch` (inbound) e ao anúncio social do blog (outbound); não é mais usado para intake de formulários
 - **Rate Limiting** (required in prod): `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`
 - **Decap CMS OAuth** (required in prod): `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`
 - **Meta CAPI** (optional): `META_PIXEL_ID`, `META_ACCESS_TOKEN`
-- **Legado HubSpot** (somente webhook Closed-Won): `HUBSPOT_TOKEN`, `HUBSPOT_WEBHOOK_SECRET`
+- **Legado HubSpot** (somente webhook Closed-Won, não usado para leads novos): `HUBSPOT_TOKEN`, `HUBSPOT_WEBHOOK_SECRET`
+
+**Retiradas do checklist (não lidas por nenhum handler após o cut-over para Odoo):** `N8N_SUBMIT_CONTACT_WEBHOOK_URL`, `NPS_WEBHOOK_URL`. Remova-as do dashboard do Cloudflare Pages se ainda estiverem configuradas.
 
 ## Troubleshooting
 
