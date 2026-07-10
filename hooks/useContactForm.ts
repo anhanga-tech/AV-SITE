@@ -7,7 +7,8 @@ import {
     type ContactFormFieldErrors,
 } from '../lib/form-v1-validation';
 import { getTrackingDataObject, getWhatsAppLink } from '../utils/whatsapp';
-import { createLeadEventId, extractUtms } from './useLeadCapture';
+import { createLeadEventId } from './useLeadCapture';
+import { extractUtms, normalizeLeadTracking } from '../lib/tracking-normalization';
 import type { ContactFormFields, SubmitContactRequest, SubmitContactResponse } from '../types/contactCapture';
 import type { LeadTracking } from '../types/leadCapture';
 import type { ContactModalOptions } from '../utils/contactForm';
@@ -21,59 +22,8 @@ const EMPTY_FIELDS: ContactFormFields = {
     emailOptIn: false,
 };
 
-const KNOWN_TRACKING_KEYS = new Set([
-    'utm_source',
-    'utm_medium',
-    'utm_campaign',
-    'utm_term',
-    'utm_content',
-    'cid',
-    'sid',
-    'gclid',
-    'fbclid',
-    'msclkid',
-    'ttclid',
-    'wbraid',
-    'gbraid',
-    'fbc',
-    'fbp',
-]);
-
-function toNullable(value: unknown): string | null {
-    if (typeof value !== 'string') return null;
-    const normalized = cleanString(value);
-    return normalized.length > 0 ? normalized : null;
-}
-
 function collectTracking(): { tracking: LeadTracking; utms: SubmitContactRequest['utms'] } {
-    const raw = getTrackingDataObject() ?? {};
-    const extras: Record<string, string> = {};
-
-    for (const [key, value] of Object.entries(raw)) {
-        if (KNOWN_TRACKING_KEYS.has(key)) continue;
-        const normalized = toNullable(value);
-        if (normalized) extras[key] = normalized;
-    }
-
-    const tracking: LeadTracking = {
-        utm_source: toNullable(raw.utm_source),
-        utm_medium: toNullable(raw.utm_medium),
-        utm_campaign: toNullable(raw.utm_campaign),
-        utm_term: toNullable(raw.utm_term),
-        utm_content: toNullable(raw.utm_content),
-        cid: toNullable(raw.cid),
-        sid: toNullable(raw.sid),
-        gclid: toNullable(raw.gclid),
-        fbclid: toNullable(raw.fbclid),
-        msclkid: toNullable(raw.msclkid),
-        ttclid: toNullable(raw.ttclid),
-        wbraid: toNullable(raw.wbraid),
-        gbraid: toNullable(raw.gbraid),
-        fbc: toNullable(raw.fbc),
-        fbp: toNullable(raw.fbp),
-        extras: Object.keys(extras).length > 0 ? extras : undefined,
-    };
-
+    const tracking = normalizeLeadTracking(getTrackingDataObject());
     return { tracking, utms: extractUtms(tracking) };
 }
 

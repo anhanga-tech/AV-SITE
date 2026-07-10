@@ -10,7 +10,7 @@ Site institucional da **Anhangá Viagens**, uma agência de viagens boutique bra
 ## ✨ Features
 
 - **🤖 Chat com IA Gemini:** Assistente de viagens que responde dúvidas, sugere roteiros e conduz uma qualificação BANT (Need, Authority, Budget, Timeline) com handoff para atendimento humano em reservas de curto prazo.
-- **🎯 Captura de Leads Inteligente:** Leads do chatbot e dos formulários fluem para o **Salesforce** via n8n (web-to-lead), com atribuição de UTMs/click IDs preservada.
+- **🎯 Captura de Leads Inteligente:** Leads do chatbot e dos formulários fluem direto para o **Odoo** (CRM ativo, via JSON-RPC), com atribuição de UTMs/click IDs preservada.
 - **🏝️ Landing Pages Especializadas:** Páginas de alta conversão sem o shell do site (Orlando, Beto Carrero, Lollapalooza, Melhor Idade, Corporativo, Cruzeiros, NPS, Quiz).
 - **📊 Rastreamento e Performance:** GTM/sGTM (Stape) com persistência de UTMs/GCLID e conversões server-side (Meta CAPI) com deduplicação por `event_id`.
 - **📝 Blog de Viagens:** Posts em MDX, manifest gerado no build e CMS headless (Decap) em `/admin` via OAuth do GitHub.
@@ -27,7 +27,7 @@ Site institucional da **Anhangá Viagens**, uma agência de viagens boutique bra
 | Build | Vite, TypeScript, prerender via `MemoryRouter` |
 | IA | Google Gemini + Cloudflare AI Gateway (proxy opcional para observabilidade) |
 | API | Cloudflare Pages Functions (handlers edge-style em `api/`, adaptados em `functions/`) |
-| CRM / Automação | Salesforce (web-to-lead) + n8n webhooks |
+| CRM / Automação | Odoo (External API JSON-RPC) — n8n restrito a purchase-dispatch (inbound) e ao anúncio social do blog (outbound) |
 | Infra | Cloudflare Pages (deploy), Upstash Redis (rate limiting), R2 (mídia) |
 | Conteúdo | MDX, Decap CMS |
 | Testes | `node:test` (regressão) + Playwright (e2e) |
@@ -41,7 +41,7 @@ Site institucional da **Anhangá Viagens**, uma agência de viagens boutique bra
 
 **Fluxo do chatbot:** `AIChat.tsx` → `services/geminiService.ts` → `api/generate.ts`, que valida a entrada, aplica rate limit, chama o Gemini com o prompt de `lib/ai/`, extrai a tool call de orçamento quando a qualificação BANT está completa e roda o handoff em `lib/ai/handoff.ts`.
 
-**Fluxo de leads:** `hooks/useLeadCapture.ts` → `api/submit-lead.ts` (valida + normaliza via `lib/lead-logic.ts` e schemas Zod) → webhook n8n → Salesforce.
+**Fluxo de leads:** `hooks/useLeadCapture.ts` → `api/submit-lead.ts` (valida + normaliza via `lib/lead-logic.ts` e schemas Zod) → `services/odoo.ts` (JSON-RPC) → `res.partner` + `crm.lead` no Odoo. Os outros 4 formulários (contato, quiz, waitlist, NPS) seguem o mesmo padrão via `createOdooSubmitHandler`; quiz/waitlist/NPS só criam `res.partner` (sem oportunidade). HubSpot e Salesforce são legado — HubSpot mantém só o webhook inbound de deals Closed-Won, Salesforce está aposentado.
 
 **Build:** os scripts de `scripts/` geram o manifest do blog, sitemap e feeds; o Vite empacota; e `scripts/prerender.mjs` renderiza cada rota em HTML estático.
 
@@ -66,7 +66,7 @@ cp .env.example .env   # preencha GEMINI_API_KEY (mínimo para o chatbot rodar l
 pnpm dev
 ```
 
-O site sobe em `http://localhost:3000`. Consulte `.env.example` para a lista completa de variáveis (IA, n8n, Upstash, OAuth do Decap, mídia R2 etc.).
+O site sobe em `http://localhost:3000`. Consulte `.env.example` para a lista completa de variáveis (IA, Odoo, n8n, Upstash, OAuth do Decap, mídia R2 etc.).
 
 > **Nota:** `pnpm preview` serve apenas estáticos — não há servidor de API. Para testar o chatbot localmente use `pnpm dev` com `GEMINI_API_KEY` no `.env`.
 
@@ -95,7 +95,7 @@ Deploy primário em **Cloudflare Pages**. Vercel e Netlify são legados (configs
 **Cloudflare Pages:**
 1. Conecte o repositório no dashboard do Cloudflare Pages.
 2. Build command `pnpm build` · Output `dist` · Node 24 (pinado via `.node-version` e `wrangler.toml`).
-3. Configure os secrets em Settings → Environment Variables (`GEMINI_API_KEY`, n8n, Upstash Redis, GitHub OAuth — ver `.env.example`).
+3. Configure os secrets em Settings → Environment Variables (`GEMINI_API_KEY`, Odoo, n8n, Upstash Redis, GitHub OAuth — ver `.env.example`).
 4. Deploy automático a cada push em `main`.
 
 `pnpm deploy` publica uma versão **estática (sem API)** no GitHub Pages, usado apenas para previews/mirror.
@@ -112,7 +112,7 @@ lib/          Helpers server-side (44 arquivos)
   ai/         Config do Gemini, prompt BANT, tools, handoff
   schemas/    Validadores Zod por endpoint
   conversions/  Helpers de pixels Google + Meta
-services/     Integrações de provider (gemini, n8n, salesforce)
+services/     Integrações de provider (gemini, odoo, hubspot [legado])
 hooks/        Hooks de formulário (useLeadCapture, useContactForm, ...)
 components/   UI React (118) — /ui, /schemas, /landings, /blog
 pages/        Componentes de rota (19) — /landings para eventos

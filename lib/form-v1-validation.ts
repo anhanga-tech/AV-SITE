@@ -12,7 +12,9 @@ export type ContactFormFieldErrors = Partial<Record<'firstName' | 'whatsapp' | '
 
 export type WaitlistFormFieldErrors = Partial<Record<'name' | 'email', string>>;
 
-export type NpsFormFieldErrors = Partial<Record<'firstname' | 'email' | 'score', string>>;
+// Identity (firstname/email) is bound server-side to the signed invitation
+// token (issue #1137) — the form only ever collects/validates the score.
+export type NpsFormFieldErrors = Partial<Record<'score', string>>;
 
 function cleanEmail(value: string | undefined): string {
   return (value ?? '').trim().toLowerCase();
@@ -63,23 +65,18 @@ export function validateWaitlistFormFields(input: { name: string; email: string 
   return { valid: true, normalized: { name, email }, errors };
 }
 
-export function validateNpsFormFields(input: { firstname: string; email: string; score: number | null }):
-  | { valid: true; normalized: { firstname: string; email: string; score: number }; errors: NpsFormFieldErrors }
-  | { valid: false; normalized: { firstname: string; email: string; score: number | null }; errors: NpsFormFieldErrors } {
-  const firstname = input.firstname.trim();
-  const email = cleanEmail(input.email);
+export function validateNpsFormFields(input: { score: number | null }):
+  | { valid: true; normalized: { score: number }; errors: NpsFormFieldErrors }
+  | { valid: false; normalized: { score: number | null }; errors: NpsFormFieldErrors } {
   const errors: NpsFormFieldErrors = {};
 
-  if (!firstname) errors.firstname = 'Informe seu nome.';
-  if (!email) errors.email = 'Informe seu e-mail.';
-  else if (!isValidEmail(email)) errors.email = 'Informe um e-mail válido.';
   if (input.score === null) errors.score = 'Escolha uma nota.';
 
   if (Object.keys(errors).length > 0) {
-    return { valid: false, normalized: { firstname, email, score: input.score }, errors };
+    return { valid: false, normalized: { score: input.score }, errors };
   }
 
-  return { valid: true, normalized: { firstname, email, score: input.score! }, errors };
+  return { valid: true, normalized: { score: input.score! }, errors };
 }
 
 export function isFieldCompleteForAnalytics(fieldName: string, value: string | boolean | number | null | undefined): boolean {

@@ -56,6 +56,9 @@ ODOO_API_KEY=                 # API key (entra no lugar da senha)
 # n8n Webhook (required in prod) — só purchase-dispatch após o cut-over Odoo (NPS também migrou pro Odoo)
 N8N_WEBHOOK_SECRET=           # Shared HMAC secret validado por /api/purchase-dispatch
 
+# NPS Invitation (required in prod): assina/verifica o link de convite de /api/submit-nps
+NPS_INVITE_SECRET=            # HMAC-SHA256 key (lib/nps-invite.ts) — ver docs/ops/nps-invite.md
+
 # Rate limiting (required in prod — module-level state resets per request on Cloudflare)
 UPSTASH_REDIS_REST_URL=
 UPSTASH_REDIS_REST_TOKEN=
@@ -119,7 +122,7 @@ Handlers rodam como Cloudflare Pages Functions (via `functions/`). O campo `expo
 | `submit-lead.ts` | Lead capture (chatbot/corporativo) → Odoo `res.partner` + `crm.lead` |
 | `submit-contact.ts` | Quick contact form → Odoo `res.partner` + `crm.lead` |
 | `submit-waitlist.ts` | Event waitlist → Odoo `res.partner` (ToFu, sem oportunidade) |
-| `submit-nps.ts` | Post-trip NPS form → Odoo `res.partner` (`x_nps_score` + nota; sem oportunidade) |
+| `submit-nps.ts` | Post-trip NPS form → Odoo `res.partner` (`x_nps_score` + nota; sem oportunidade). Requer convite assinado (`token`, `lib/nps-invite.ts`) — identidade nunca vem do corpo da requisição |
 | `submit-quiz.ts` | Travel quiz results → Odoo `res.partner` (ToFu, sem oportunidade) |
 | `hubspot-webhook.ts` | Inbound HubSpot "Closed-Won" deal events |
 | `purchase-dispatch.ts` | Receives n8n purchase events; validates `N8N_WEBHOOK_SECRET` |

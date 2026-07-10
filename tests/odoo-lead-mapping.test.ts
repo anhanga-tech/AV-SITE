@@ -163,6 +163,16 @@ test('buildLeadFields — maps empresa/cargo and referred when present', () => {
     assert.equal(fields.referred, 'João');
 });
 
+test('buildLeadFields — writes the idempotency key to the description when provided (issue #1136)', () => {
+    const fields = buildLeadFields(baseInput({}), 5, 'evt-abc-123');
+    assert.match(String(fields.description), /<li>idempotency_key: evt-abc-123<\/li>/);
+});
+
+test('buildLeadFields — omits the idempotency_key line when no key is provided', () => {
+    const fields = buildLeadFields(baseInput({ bantSummary: 'Need: X' }), 5);
+    assert.doesNotMatch(String(fields.description), /idempotency_key/);
+});
+
 // --- per-form adapters -------------------------------------------------------
 
 test('leadInputFromSubmitLead — creates a lead, maps marketingOptIn', () => {

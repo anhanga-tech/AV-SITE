@@ -67,5 +67,5 @@ Keep API handlers under `api/` consistent in structure, validation order, respon
 
 ## Exceptions
 
-- Library-owned handlers such as the Keystatic generic route may require framework-specific wiring that does not fully match custom handler structure. Keep the surrounding security and validation posture as close to the standard as the library allows.
+- Library-owned handlers such as the Decap CMS OAuth routes (`api/auth.ts`, `api/auth/callback.ts`) may require framework-specific wiring that does not fully match custom handler structure. Keep the surrounding security and validation posture as close to the standard as the library allows.
 - A trivial read-only endpoint may use a smaller helper surface, but it must still return structured JSON and validate its inputs.

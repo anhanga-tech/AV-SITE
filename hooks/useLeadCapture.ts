@@ -3,6 +3,7 @@ import { useAntiBot } from './useAntiBot';
 import { getTrackingDataObject, getWhatsAppLink } from '../utils/whatsapp';
 import type { LeadTracking, LeadUtms, SubmitLeadRequest } from '../types/leadCapture';
 import { cleanString, normalizeWhatsappNumber } from '../lib/lead-logic';
+import { extractUtms, normalizeLeadTracking } from '../lib/tracking-normalization';
 
 export interface LeadDraft {
     firstName: string;
@@ -89,73 +90,8 @@ function parseResponseData(value: string): SubmitLeadResponseData {
     }
 }
 
-function toNullable(value: unknown): string | null {
-    if (typeof value !== 'string') return null;
-    const normalized = value.trim();
-    return normalized.length > 0 ? normalized : null;
-}
-
-export function extractUtms(tracking: LeadTracking): LeadUtms {
-    return {
-        utm_source: tracking.utm_source ?? null,
-        utm_medium: tracking.utm_medium ?? null,
-        utm_campaign: tracking.utm_campaign ?? null,
-        utm_term: tracking.utm_term ?? null,
-        utm_content: tracking.utm_content ?? null,
-    };
-}
-
 function captureInitialTracking(): LeadTracking {
-    const source = getTrackingDataObject() || {};
-
-    const knownKeys = new Set([
-        'utm_source',
-        'utm_medium',
-        'utm_campaign',
-        'utm_term',
-        'utm_content',
-        'cid',
-        'sid',
-        'gclid',
-        'fbclid',
-        'msclkid',
-        'ttclid',
-        'wbraid',
-        'gbraid',
-        'fbc',
-        'fbp',
-    ]);
-
-    const extras: Record<string, string> = {};
-
-    for (const [key, value] of Object.entries(source)) {
-        if (knownKeys.has(key)) continue;
-        if (typeof value !== 'string') continue;
-
-        const normalized = value.trim();
-        if (!normalized) continue;
-
-        extras[key] = normalized;
-    }
-
-    return {
-        utm_source: toNullable(source.utm_source),
-        utm_medium: toNullable(source.utm_medium),
-        utm_campaign: toNullable(source.utm_campaign),
-        utm_term: toNullable(source.utm_term),
-        utm_content: toNullable(source.utm_content),
-        cid: toNullable(source.cid),
-        sid: toNullable(source.sid),
-        gclid: toNullable(source.gclid),
-        fbclid: toNullable(source.fbclid),
-        msclkid: toNullable(source.msclkid),
-        ttclid: toNullable(source.ttclid),
-        wbraid: toNullable(source.wbraid),
-        gbraid: toNullable(source.gbraid),
-        fbc: toNullable(source.fbc),
-        fbp: toNullable(source.fbp),
-        extras: Object.keys(extras).length > 0 ? extras : undefined,
-    };
+    return normalizeLeadTracking(getTrackingDataObject());
 }
 
 function referralFromTracking(tracking?: LeadTracking | null): string {
