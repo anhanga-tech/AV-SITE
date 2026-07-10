@@ -73,12 +73,13 @@ function withEnv(vars: Record<string, string | undefined>, fn: () => Promise<voi
 }
 
 test('readFileList prefers argv over the ADDED_BLOG_FILES env var', () => {
-  process.argv = [...process.argv.slice(0, 2), 'content/blog/a.mdx', 'content/blog/b.mdx'];
+  const originalArgv = process.argv;
+  process.argv = [...originalArgv.slice(0, 2), 'content/blog/a.mdx', 'content/blog/b.mdx'];
   process.env.ADDED_BLOG_FILES = 'content/blog/ignored.mdx';
   try {
     assert.deepEqual(readFileList(), ['content/blog/a.mdx', 'content/blog/b.mdx']);
   } finally {
-    process.argv = process.argv.slice(0, 2);
+    process.argv = originalArgv;
     delete process.env.ADDED_BLOG_FILES;
   }
 });

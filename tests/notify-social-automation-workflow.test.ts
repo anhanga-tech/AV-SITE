@@ -81,7 +81,7 @@ async function runStepInTempRepo(
     });
 
     const output = await readFile(githubOutputPath, 'utf8');
-    const match = output.match(/^files<<EOF\n([\s\S]*?)\nEOF$/m);
+    const match = output.match(/^files<<EOF\r?\n([\s\S]*?)\r?\nEOF$/m);
     return (match ? match[1] : '').split('\n').map((line) => line.trim()).filter(Boolean);
   } finally {
     await rm(repoDir, { recursive: true, force: true });
@@ -162,7 +162,8 @@ test('workflow gates install/notify steps on the added-posts output and passes s
 
   const notifyIdx = lines.findIndex((line) => line.includes('name: Notify n8n of new blog posts'));
   assert.ok(notifyIdx !== -1);
-  const notifyBlock = lines.slice(notifyIdx, notifyIdx + 15).join('\n');
+  const nextStepIdx = lines.findIndex((line, i) => i > notifyIdx && /^\s*-\s*(name|uses):/.test(line));
+  const notifyBlock = lines.slice(notifyIdx, nextStepIdx !== -1 ? nextStepIdx : undefined).join('\n');
 
   for (const envVar of ['ADDED_BLOG_FILES', 'N8N_SOCIAL_ANNOUNCE_WEBHOOK_URL', 'N8N_WEBHOOK_SECRET']) {
     assert.match(notifyBlock, new RegExp(`^\\s*${envVar}:\\s*\\$\\{\\{`, 'm'), `${envVar} must be passed via the step's env: block`);
