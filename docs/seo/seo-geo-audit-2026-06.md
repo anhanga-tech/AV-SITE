@@ -122,4 +122,4 @@ Meta descriptions fora da faixa 110–160: `disney-ou-beto-carrero` (166), `canc
 
 ## Limpeza de documentação sugerida
 
-Docs SEO antigos supersedidos por esta auditoria (avaliar remoção; movidos da raiz para `docs/seo/` pelo PR #843): `docs/seo/issues-2026.md` e `docs/seo/plan-2026.md` (março/2026, baseados em relatórios anteriores), além do diretório `SEO/` na raiz com CSVs do crawl de maio/2026 (dados brutos, candidatos a `.gitignore` ou exclusão).
+`docs/seo/issues-2026.md` e `docs/seo/plan-2026.md` (março/2026, baseados no bug do prerender corrigido antes desta auditoria) foram removidos por serem supersedidos por este documento (issue #1145). Segue pendente: avaliar o diretório `SEO/` na raiz com CSVs do crawl de maio/2026 (dados brutos, candidato a `.gitignore` ou exclusão).
