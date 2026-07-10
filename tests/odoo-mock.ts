@@ -127,6 +127,48 @@ function jsonRpcError(message: string): Response {
     });
 }
 
+interface ExecuteKwState {
+    campaignId: number | null;
+    leadIdState: number | null;
+}
+
+/** Dispatches a single `execute_kw` ORM call to its mocked result, given the running state. */
+function handleExecuteKw(
+    model: string,
+    ormMethod: string,
+    state: ExecuteKwState,
+    options: {
+        existingPartnerId: number | null;
+        existingComment: string | false;
+        existingFields: Record<string, unknown>;
+        leadId: number;
+        newPartnerId: number;
+        newCampaignId: number;
+        campaignCreateShouldFail: boolean;
+    },
+): Response {
+    if (ormMethod === 'create' && model === 'utm.campaign' && options.campaignCreateShouldFail) {
+        return jsonRpcError('duplicate key value violates unique constraint "utm_campaign_name_uniq"');
+    }
+    if (ormMethod === 'search_read') {
+        return jsonRpcResponse(searchReadResult(model, {
+            existingPartnerId: options.existingPartnerId,
+            existingComment: options.existingComment,
+            existingFields: options.existingFields,
+            existingCampaignId: state.campaignId,
+            existingLeadId: state.leadIdState,
+        }));
+    }
+    if (ormMethod === 'create') {
+        const result = createResult(model, { leadId: options.leadId, newPartnerId: options.newPartnerId, newCampaignId: options.newCampaignId });
+        if (model === 'utm.campaign') state.campaignId = options.newCampaignId;
+        if (model === 'crm.lead') state.leadIdState = options.leadId;
+        return jsonRpcResponse(result);
+    }
+    if (ormMethod === 'write') return jsonRpcResponse(true);
+    return jsonRpcResponse(false);
+}
+
 export function createOdooMock(options: OdooMockOptions = {}): OdooMock {
     const {
         uid = 7,
@@ -149,8 +191,7 @@ export function createOdooMock(options: OdooMockOptions = {}): OdooMock {
     // search_read calls for that model must find it (mirrors real Odoo, and
     // both resolveCampaignId and the createLead idempotency lookup re-query
     // to converge on the same row).
-    let campaignId = existingCampaignId;
-    let leadIdState = existingLeadId;
+    const state: ExecuteKwState = { campaignId: existingCampaignId, leadIdState: existingLeadId };
 
     const fetchMock = (async (_input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
         if (hang) return new Promise<Response>(() => {});
@@ -170,26 +211,15 @@ export function createOdooMock(options: OdooMockOptions = {}): OdooMock {
         const kwargs = (args[6] as Record<string, unknown>) ?? {};
         calls.push({ model, method: ormMethod, args: ormArgs, kwargs });
 
-        if (ormMethod === 'create' && model === 'utm.campaign' && campaignCreateShouldFail) {
-            return jsonRpcError('duplicate key value violates unique constraint "utm_campaign_name_uniq"');
-        }
-        if (ormMethod === 'search_read') {
-            return jsonRpcResponse(searchReadResult(model, {
-                existingPartnerId,
-                existingComment,
-                existingFields,
-                existingCampaignId: campaignId,
-                existingLeadId: leadIdState,
-            }));
-        }
-        if (ormMethod === 'create') {
-            const result = createResult(model, { leadId, newPartnerId, newCampaignId });
-            if (model === 'utm.campaign') campaignId = newCampaignId;
-            if (model === 'crm.lead') leadIdState = leadId;
-            return jsonRpcResponse(result);
-        }
-        if (ormMethod === 'write') return jsonRpcResponse(true);
-        return jsonRpcResponse(false);
+        return handleExecuteKw(model, ormMethod, state, {
+            existingPartnerId,
+            existingComment,
+            existingFields,
+            leadId,
+            newPartnerId,
+            newCampaignId,
+            campaignCreateShouldFail,
+        });
     }) as typeof fetch;
 
     return {
