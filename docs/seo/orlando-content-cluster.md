@@ -43,7 +43,7 @@ Conteúdo Orlando pré-existente no blog, e por que não há sobreposição:
 - `ferias-julho-2026-destinos.mdx` — lista **10 destinos** para uma janela específica (julho 2026), Orlando é um item entre outros nove, não o foco. Intenção é "onde ir em julho", não "como planejar Orlando".
 - `disney-tropical-americas-animal-kingdom.mdx` — foco em um parque específico (Animal Kingdom) dentro do complexo Disney, não no processo de planejamento da viagem inteira.
 
-Nenhum desses três compete pelas queries-alvo do pilar ou do spoke.
+Nenhum desses três compete pelas queries-alvo do pilar ou do spoke pela intenção da **página**. Uma revisão de review encontrou, porém, uma sobreposição mais fina: duas perguntas do FAQ do pilar (visto para viajar / prazo de antecedência) tinham resposta quase idêntica às perguntas equivalentes já publicadas em `disney-ou-beto-carrero.mdx` — mesmos elementos, mesma resposta, competindo pelo mesmo rich result do Google apesar de as páginas terem intenções diferentes. Reescritas para focar no ângulo próprio do pilar (sequência de decisões e a relação entre escolha de parque e hospedagem) em vez de duplicar fato por fato. Checar isso — não só a intenção da página, mas o conteúdo do FAQPage schema linha a linha — é parte obrigatória da checagem de canibalização para qualquer spoke futuro.
 
 ## Frescor e ownership
 
