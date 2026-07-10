@@ -176,9 +176,9 @@ Sem atribuição, é impossível saber se R$ 10.000 gastos em tráfego pago gera
 |---|---|
 | **Dados tratados** | Nome, sobrenome, e-mail, WhatsApp, destino de viagem, resumo BANT (Budget/Autoridade/Necessidade/Timeline fornecidos voluntariamente no chatbot) |
 | **Titulares** | Usuários que completam o fluxo de qualificação no chatbot e submetem o formulário de lead |
-| **Operadores** | HubSpot, Inc. (CRM), Salesforce, Inc. (CRM de vendas) |
+| **Operadores** | Odoo S.A. (CRM ativo — `res.partner` + `crm.lead` via JSON-RPC, cut-over concluído em jun/2026). HubSpot, Inc. permanece apenas como destino do webhook legado de deals Closed-Won (não recebe mais os dados deste formulário). Salesforce, Inc. foi aposentado — não processa mais dados de leads. |
 | **Retenção** | 5 anos após última interação (conforme Política de Privacidade seção 7.1) |
-| **Transferência internacional** | Sim — EUA (HubSpot, Salesforce; cobertos por cláusulas contratuais padrão) |
+| **Transferência internacional** | A confirmar com o DPO — depende da região de hospedagem da instância Odoo Online contratada; verificar em Configurações → Informações técnicas antes de atualizar este RIPD |
 
 ### 4.2 Interesse legítimo identificado
 
@@ -215,7 +215,7 @@ O titular que chegou até o ponto de submeter o formulário de lead **iniciou at
 
 | Risco | Probabilidade | Impacto | Mitigação |
 |---|---|---|---|
-| Vazamento de dados no CRM | Baixa | Alto | DPA com HubSpot e Salesforce; senhas fortes; 2FA habilitado |
+| Vazamento de dados no CRM | Baixa | Alto | DPA com Odoo S.A.; senhas fortes; 2FA habilitado |
 | bantSummary contendo dados sensíveis (ex.: necessidades de saúde) | Média | Médio | Instruir o chatbot a não coletar dados de saúde; prompt de sistema já bloqueia esse escopo |
 | Retenção além do necessário | Baixa | Médio | Processo anual de revisão e limpeza de leads inativos há mais de 5 anos |
 
@@ -226,7 +226,7 @@ O titular que chegou até o ponto de submeter o formulário de lead **iniciou at
 - [x] PII mascarada nos logs (`maskEmail`, `maskPhone`, `maskName`)
 - [x] Direito de exclusão operacional documentado e canal funcional (`privacidade@anhanga.tur.br`)
 - [x] Opt-out de comunicações de marketing disponível
-- [ ] **Pendente:** DPA formal assinado com Salesforce, Inc.
+- [ ] **Pendente:** DPA formal assinado com Odoo S.A. (substitui o item antigo de DPA com Salesforce, Inc. — CRM aposentado)
 - [ ] **Pendente:** Processo documentado de revisão anual e limpeza de leads inativos
 
 ---
@@ -313,7 +313,7 @@ O balancing test favorece o legítimo interesse nas Atividades 1, 2 e 3. A Ativi
 | 3 | Reduzir retenção GA4 para 14 meses no painel | Felipe (DPO) | 30 dias | Pendente |
 | 4 | Assinar DPA com Stape OÜ no painel Stape | Felipe (DPO) | 30 dias | Pendente |
 | 5 | Implementar banner de cookies condicionando `initializeTracking()` | Dev | Issue #782 | ✅ Concluído |
-| 6 | Assinar DPA com Salesforce, Inc. | Gestão / Jurídico | 60 dias | Pendente |
+| 6 | Assinar DPA com Odoo S.A. (item atualizado — CRM ativo desde o cut-over de jun/2026; Salesforce foi aposentado) | Gestão / Jurídico | 60 dias | Pendente |
 | 7 | Documentar processo de limpeza anual de leads inativos | Felipe (DPO) | 60 dias | Pendente |
 | 8 | Concluir capacitação DPO (Felipe) | Felipe | 90 dias | Pendente |
 | 9 | Adicionar Stape OÜ e customer match à Política de Privacidade | Dev | Issue #784 | ✅ PR #803 aberto |
