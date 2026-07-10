@@ -285,9 +285,11 @@ function containsWhatsAppUrl(text?: string): boolean {
     return /wa\.me|api\.whatsapp\.com/i.test(text);
 }
 
-export function containsInvalidTextualHandoff(text?: string): boolean {
-    if (!text) return false;
-    if (containsWhatsAppUrl(text)) return true;
+const WHATSAPP_URL_SIGNAL = 'whatsapp_url';
+
+function detectInvalidTextualHandoffSignal(text?: string): string | undefined {
+    if (!text) return undefined;
+    if (containsWhatsAppUrl(text)) return WHATSAPP_URL_SIGNAL;
 
     const normalized = normalizeText(text);
     const invalidSignals = [
@@ -300,7 +302,11 @@ export function containsInvalidTextualHandoff(text?: string): boolean {
         'orcamento personalizado',
     ];
 
-    return invalidSignals.some((signal) => normalized.includes(signal));
+    return invalidSignals.find((signal) => normalized.includes(signal));
+}
+
+export function containsInvalidTextualHandoff(text?: string): boolean {
+    return detectInvalidTextualHandoffSignal(text) !== undefined;
 }
 
 function stripUnsafeWhatsAppLinks(text: string): string {
@@ -442,11 +448,13 @@ async function repairTextualHandoff(
     response: ModelResponseShape,
     responseText: string,
     options: BuildGenerateSuccessOptions,
+    matchedSignal: string,
 ): Promise<GenerateSuccessBody | null> {
     logger.warn('SERVER: invalid textual handoff detected', {
         responseId: response.responseId,
         modelVersion: response.modelVersion,
-        preview: responseText.slice(0, 160),
+        outputLength: responseText.length,
+        matchedSignal,
     });
 
     const repairContents = [
@@ -505,10 +513,13 @@ export async function buildGenerateSuccessBody(
     const normalizedOutput = normalizeBudgetToolResponse(ensureResponseText(response, rawOutput));
     const handoff = buildStructuredHandoff(normalizedOutput.responseFunctionCall, 'tool');
 
-    if (!handoff && containsInvalidTextualHandoff(normalizedOutput.responseText)) {
-        const repaired = await repairTextualHandoff(response, normalizedOutput.responseText, options);
-        if (repaired) {
-            return repaired;
+    if (!handoff) {
+        const matchedSignal = detectInvalidTextualHandoffSignal(normalizedOutput.responseText);
+        if (matchedSignal) {
+            const repaired = await repairTextualHandoff(response, normalizedOutput.responseText, options, matchedSignal);
+            if (repaired) {
+                return repaired;
+            }
         }
     }
 
