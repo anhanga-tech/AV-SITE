@@ -2,9 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { SubmitNpsBodySchema } from '../lib/schemas/submit-nps.ts';
 
+// Identity (firstname/email) is no longer part of the wire-format body —
+// it's derived server-side from the verified invitation token (issue #1137).
+// See tests/submit-nps.test.ts for token verification and tests/nps-invite.test.ts
+// for the signing/verification module itself.
 const VALID = {
-    firstname: 'João',
-    email: 'joao@example.com',
+    token: 'opaque-signed-token-value',
     score: 9,
     reason: 'Ótimo atendimento',
     highlight: 'A viagem ao Japão',
@@ -54,23 +57,19 @@ test('rejeita score como string', () => {
     assert.equal(result.success, false);
 });
 
-test('rejeita email inválido', () => {
-    const result = SubmitNpsBodySchema.safeParse({ ...VALID, email: 'nao-e-email' });
+test('rejeita token ausente', () => {
+    const { token: _t, ...without } = VALID;
+    const result = SubmitNpsBodySchema.safeParse(without);
     assert.equal(result.success, false);
 });
 
-test('rejeita email acima de 254 chars', () => {
-    const result = SubmitNpsBodySchema.safeParse({ ...VALID, email: 'a'.repeat(245) + '@example.com' });
+test('rejeita token vazio', () => {
+    const result = SubmitNpsBodySchema.safeParse({ ...VALID, token: '' });
     assert.equal(result.success, false);
 });
 
-test('rejeita firstname vazio', () => {
-    const result = SubmitNpsBodySchema.safeParse({ ...VALID, firstname: '' });
-    assert.equal(result.success, false);
-});
-
-test('rejeita firstname acima de 100 chars', () => {
-    const result = SubmitNpsBodySchema.safeParse({ ...VALID, firstname: 'a'.repeat(101) });
+test('rejeita token acima de 4096 chars', () => {
+    const result = SubmitNpsBodySchema.safeParse({ ...VALID, token: 'a'.repeat(4097) });
     assert.equal(result.success, false);
 });
 
@@ -102,11 +101,6 @@ test('rejeita payload não-objeto', () => {
     assert.equal(result.success, false);
 });
 
-test('rejeita whitespace-only firstname', () => {
-    const result = SubmitNpsBodySchema.safeParse({ ...VALID, firstname: '   ' });
-    assert.equal(result.success, false);
-});
-
 test('aceita whitespace-only reason e normaliza para string vazia', () => {
     const result = SubmitNpsBodySchema.safeParse({ ...VALID, reason: '   ' });
     assert.equal(result.success, true);
@@ -128,24 +122,13 @@ test('escapa angle brackets em reason (sanitização de fronteira)', () => {
     }
 });
 
-test('rejeita firstname que excede 100 chars APÓS o escape', () => {
-    // 40 caracteres "<" → 160 chars após cleanString (cada "<" vira "&lt;").
-    const result = SubmitNpsBodySchema.safeParse({ ...VALID, firstname: '<'.repeat(40) });
-    assert.equal(result.success, false);
-    if (!result.success) {
-        assert.equal(result.error.issues[0]?.path[0], 'firstname');
-    }
-});
-
-test('escapa angle brackets em highlight e firstname', () => {
+test('escapa angle brackets em highlight', () => {
     const result = SubmitNpsBodySchema.safeParse({
         ...VALID,
-        firstname: 'João <b>',
         highlight: 'Japão <img src=x onerror=alert(1)>',
     });
     assert.equal(result.success, true);
     if (result.success) {
-        assert.equal(result.data.firstname, 'João &lt;b&gt;');
         assert.equal(result.data.highlight.includes('<'), false);
         assert.equal(result.data.highlight.includes('>'), false);
     }

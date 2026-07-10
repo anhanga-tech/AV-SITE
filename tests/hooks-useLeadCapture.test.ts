@@ -2,13 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
     isPreparedSubmitLeadRequest,
-    extractUtms,
     buildSubmitLeadPayload,
     buildLeadWhatsAppMessage,
     createLeadEventId,
     pushGenerateLeadDataLayerEvent,
     type LeadDraft,
 } from '../hooks/useLeadCapture.ts';
+import { extractUtms } from '../lib/tracking-normalization.ts';
 import type { LeadTracking, SubmitLeadRequest } from '../types/leadCapture.ts';
 
 function validPayload(overrides?: Partial<SubmitLeadRequest>): SubmitLeadRequest {

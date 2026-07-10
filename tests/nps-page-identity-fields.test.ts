@@ -15,16 +15,26 @@ function renderNpsPage(path: string): string {
   );
 }
 
-test('NpsPage renders email field when URL email is present but invalid', () => {
-  const html = renderNpsPage('/nps?firstname=Ana&email=cliente@');
+// Identity (firstname/email) is bound server-side to the signed invitation
+// token (issue #1137) — the page never collects them as free text.
 
-  assert.match(html, /id="nps-email"/);
-  assert.match(html, /value="cliente@"/);
+test('NpsPage shows an invalid-link state and no form when the token is missing', () => {
+  const html = renderNpsPage('/nps?firstname=Ana');
+
+  assert.match(html, /Link inválido/);
+  assert.doesNotMatch(html, /id="nps-reason"/);
 });
 
-test('NpsPage keeps identity fields hidden when URL name and email are valid', () => {
-  const html = renderNpsPage('/nps?firstname=Ana&email=ana%40example.com');
+test('NpsPage renders the score form when a token is present, with no identity inputs', () => {
+  const html = renderNpsPage('/nps?firstname=Ana&token=some-signed-token');
 
   assert.doesNotMatch(html, /id="nps-firstname"/);
   assert.doesNotMatch(html, /id="nps-email"/);
+  assert.match(html, /id="nps-reason"/);
+});
+
+test('NpsPage greets by the display-only firstname param without trusting it as identity', () => {
+  const html = renderNpsPage('/nps?firstname=Ana&token=some-signed-token');
+
+  assert.match(html, /Olá, Ana!/);
 });
