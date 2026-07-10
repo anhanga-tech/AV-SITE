@@ -8,6 +8,7 @@ import {
 } from '../lib/auth-origin.ts';
 
 const ORIGINAL_ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN;
+const ORIGINAL_ENABLE_DEV_OAUTH_ORIGIN = process.env.ENABLE_DEV_OAUTH_ORIGIN;
 
 test.afterEach(() => {
     if (ORIGINAL_ALLOWED_ORIGIN === undefined) {
@@ -15,23 +16,37 @@ test.afterEach(() => {
     } else {
         process.env.ALLOWED_ORIGIN = ORIGINAL_ALLOWED_ORIGIN;
     }
+    if (ORIGINAL_ENABLE_DEV_OAUTH_ORIGIN === undefined) {
+        delete process.env.ENABLE_DEV_OAUTH_ORIGIN;
+    } else {
+        process.env.ENABLE_DEV_OAUTH_ORIGIN = ORIGINAL_ENABLE_DEV_OAUTH_ORIGIN;
+    }
 });
 
-test('getAllowedOAuthOrigins defaults to the production origin plus the declared local dev origin', () => {
+test('getAllowedOAuthOrigins defaults to only the production origin — dev origin is opt-in', () => {
     delete process.env.ALLOWED_ORIGIN;
+    delete process.env.ENABLE_DEV_OAUTH_ORIGIN;
+    assert.deepEqual(getAllowedOAuthOrigins(), ['https://www.anhanga.tur.br']);
+});
+
+test('getAllowedOAuthOrigins includes the declared local dev origin only when explicitly enabled', () => {
+    delete process.env.ALLOWED_ORIGIN;
+    process.env.ENABLE_DEV_OAUTH_ORIGIN = 'true';
     assert.deepEqual(getAllowedOAuthOrigins(), ['https://www.anhanga.tur.br', 'http://localhost:3000']);
 });
 
 test('getAllowedOAuthOrigins honors a configured ALLOWED_ORIGIN override', () => {
     process.env.ALLOWED_ORIGIN = 'https://staging.anhanga.tur.br';
-    assert.deepEqual(getAllowedOAuthOrigins(), ['https://staging.anhanga.tur.br', 'http://localhost:3000']);
+    delete process.env.ENABLE_DEV_OAUTH_ORIGIN;
+    assert.deepEqual(getAllowedOAuthOrigins(), ['https://staging.anhanga.tur.br']);
 });
 
-test('isAllowedOAuthOrigin: exact allowlist match only — no subdomain wildcard', async (t) => {
+test('isAllowedOAuthOrigin: exact allowlist match only — no subdomain wildcard, dev origin off by default', async (t) => {
     delete process.env.ALLOWED_ORIGIN;
+    delete process.env.ENABLE_DEV_OAUTH_ORIGIN;
     const cases = [
         { origin: 'https://www.anhanga.tur.br', expected: true },
-        { origin: 'http://localhost:3000', expected: true },
+        { origin: 'http://localhost:3000', expected: false }, // opt-in only, not set here
         { origin: 'https://anhanga.tur.br', expected: false },
         { origin: 'https://preview.anhanga.tur.br', expected: false },
         { origin: 'https://dev-123.anhanga.tur.br', expected: false },
@@ -71,10 +86,21 @@ test('validateOAuthInitiationOrigin accepts an allowlisted referer', () => {
         validateOAuthInitiationOrigin('https://www.anhanga.tur.br/admin/'),
         'https://www.anhanga.tur.br',
     );
+});
+
+test('validateOAuthInitiationOrigin accepts the local dev referer only when explicitly enabled', () => {
+    delete process.env.ALLOWED_ORIGIN;
+    process.env.ENABLE_DEV_OAUTH_ORIGIN = 'true';
     assert.equal(
         validateOAuthInitiationOrigin('http://localhost:3000/admin/'),
         'http://localhost:3000',
     );
+});
+
+test('validateOAuthInitiationOrigin rejects the local dev referer when the flag is not set', () => {
+    delete process.env.ALLOWED_ORIGIN;
+    delete process.env.ENABLE_DEV_OAUTH_ORIGIN;
+    assert.equal(validateOAuthInitiationOrigin('http://localhost:3000/admin/'), null);
 });
 
 test('validateOAuthInitiationOrigin rejects an unauthorized subdomain referer', () => {

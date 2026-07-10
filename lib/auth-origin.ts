@@ -7,12 +7,23 @@
  */
 const DECLARED_DEV_ORIGINS = ['http://localhost:3000'];
 
+/**
+ * `http://localhost:3000` is opt-in (via `ENABLE_DEV_OAUTH_ORIGIN=true`), not
+ * gated by `NODE_ENV` — Cloudflare Pages Functions don't reliably set
+ * `NODE_ENV=production` at runtime, so that check could silently stay "not
+ * production" in prod and leave the dev origin trusted anyway. An explicit,
+ * default-off flag can't fail open that way: production must never set it.
+ */
+function includeDevOrigins(): boolean {
+    return process.env.ENABLE_DEV_OAUTH_ORIGIN === 'true';
+}
+
 export function resolveProductionOAuthOrigin(): string {
     return process.env.ALLOWED_ORIGIN || 'https://www.anhanga.tur.br';
 }
 
 export function getAllowedOAuthOrigins(): string[] {
-    return [resolveProductionOAuthOrigin(), ...DECLARED_DEV_ORIGINS];
+    return [resolveProductionOAuthOrigin(), ...(includeDevOrigins() ? DECLARED_DEV_ORIGINS : [])];
 }
 
 export function isAllowedOAuthOrigin(origin: string | null | undefined): origin is string {

@@ -6,6 +6,7 @@ import callbackHandler from '../api/auth/callback.ts';
 const ORIGINAL_ENV = {
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
+    ENABLE_DEV_OAUTH_ORIGIN: process.env.ENABLE_DEV_OAUTH_ORIGIN,
 };
 
 function setOAuthEnv(): void {
@@ -103,13 +104,27 @@ test('auth: rejects initiation from an unauthorized subdomain referer', async ()
     }
 });
 
-test('auth: accepts the declared local dev origin', async () => {
+test('auth: accepts the declared local dev origin when explicitly enabled', async () => {
     setOAuthEnv();
+    process.env.ENABLE_DEV_OAUTH_ORIGIN = 'true';
     try {
         const res = await authHandler(authRequest('10.0.0.12', { referer: 'http://localhost:3000/admin/' }));
         assert.equal(res.status, 302);
         const setCookies = res.headers.getSetCookie();
         assert.ok(setCookies.some((c) => c.startsWith('oauth_origin=http://localhost:3000;')));
+    } finally {
+        restoreEnv();
+    }
+});
+
+test('auth: rejects the local dev origin when the opt-in flag is not set', async () => {
+    setOAuthEnv();
+    delete process.env.ENABLE_DEV_OAUTH_ORIGIN;
+    try {
+        const res = await authHandler(authRequest('10.0.0.13', { referer: 'http://localhost:3000/admin/' }));
+        assert.equal(res.status, 400);
+        const body = await res.json();
+        assert.equal(body.error, 'INVALID_ORIGIN');
     } finally {
         restoreEnv();
     }
