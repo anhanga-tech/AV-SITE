@@ -30,12 +30,13 @@ async function stubWindowOpen(page: Page) {
 function captureSubmitContact(page: Page): Promise<Record<string, unknown>> {
   return new Promise((resolve) => {
     page.route('**/api/submit-contact', async (route: Route) => {
-      resolve(route.request().postDataJSON());
+      const payload = route.request().postDataJSON();
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({ ok: true, requestId: 'req_attribution_e2e' }),
       });
+      resolve(payload);
     });
   });
 }
