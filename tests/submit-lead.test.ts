@@ -221,6 +221,27 @@ test('submit-lead maps corporate empresa/cargo to crm.lead partner_name/function
     assert.equal(lead.function, 'Diretora de Pessoas');
 });
 
+// --- idempotency (issue #1136) ----------------------------------------------
+
+test('submit-lead — a retry with the same event_id does not create a second crm.lead opportunity', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    const mock = createOdooMock({ newPartnerId: 101, leadId: 555 });
+    global.fetch = mock.fetch;
+
+    const payload = buildLeadPayloadFixture();
+    const first = await handler(buildRequest(payload, { headers: { 'x-real-ip': '127.0.0.50' } }));
+    assert.equal(first.status, 201);
+
+    // Simulates the client retrying after never seeing the first response
+    // (perceived timeout) — same event_id, same body.
+    const second = await handler(buildRequest(payload, { headers: { 'x-real-ip': '127.0.0.50' } }));
+    assert.equal(second.status, 201);
+
+    const leadCreateCalls = mock.calls.filter((c) => c.model === 'crm.lead' && c.method === 'create');
+    assert.equal(leadCreateCalls.length, 1, 'a retry with the same event_id must not create a duplicate opportunity');
+});
+
 // --- bot heuristics (honeypot + timing) -------------------------------------
 
 test('submit-lead silently accepts a filled honeypot without touching Odoo', async (t) => {
