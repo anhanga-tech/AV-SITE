@@ -48,7 +48,11 @@ function splitJobs(workflow: string): Map<string, string> {
   };
 
   for (const line of lines.slice(jobsStart + 1)) {
-    const jobHeader = line.match(/^ {2}([A-Za-z0-9_-]+):\s*$/);
+    // Stop at the next top-level key (e.g. a trailing `concurrency:`/`on:`
+    // block after `jobs:`) so unrelated content never leaks into the last
+    // job's buffer.
+    if (line.trim() !== '' && !line.startsWith('#') && !line.startsWith(' ')) break;
+    const jobHeader = line.match(/^ {2}([A-Za-z0-9_-]+):\s*(?:#.*)?$/);
     if (jobHeader) {
       flush();
       currentId = jobHeader[1];
@@ -85,7 +89,7 @@ test('claude workflow pins every GitHub Action to a full commit SHA', async () =
   assert.ok(usesLines.length >= 4, 'expected at least the checkout + claude-code-action steps for both jobs');
 
   for (const line of usesLines) {
-    const ref = line.split('#')[0].replace(/^\s*(-\s*)?uses:\s*/, '').trim();
+    const ref = line.split('#')[0].replace(/^\s*(-\s*)?uses:\s*/, '').replace(/['"]/g, '').trim();
     if (ref.startsWith('./')) continue; // local composite actions have no SHA to pin
     assert.match(ref, SHA_PIN, `action must be pinned by SHA, not a mutable tag: ${ref}`);
   }
@@ -149,7 +153,7 @@ test('claude-review never holds contents: write, so its scope cannot silently sp
     const indent = lines[start].match(/^(\s*)/)![1].length;
     const body: string[] = [];
     for (const line of lines.slice(start + 1)) {
-      if (line.trim() === '') continue;
+      if (line.trim() === '' || line.trim().startsWith('#')) continue;
       const lineIndent = line.match(/^(\s*)/)![1].length;
       if (lineIndent <= indent) break;
       body.push(line.trim());
