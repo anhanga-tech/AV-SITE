@@ -12,8 +12,8 @@
 - `BlogPost.tsx` emite `ArticleSchema` + `PersonSchema` + `BreadcrumbSchema` por post
 - `FAQ.tsx` usa microdata `schema.org/FAQPage` na Home
 - `SEO.tsx` robusto: hreflang pt-BR + x-default, canonical normalizado, OG 1200×630, Twitter cards
-- Keystatic CMS instalado para edição sem código
-- Vercel Analytics + Speed Insights ativos
+- ~~Keystatic CMS instalado para edição sem código~~ — desatualizado: o CMS headless em `/admin` é **Decap CMS** (OAuth do GitHub), não Keystatic
+- ~~Vercel Analytics + Speed Insights ativos~~ — desatualizado: deploy migrou para **Cloudflare Pages** em mai/2026; Vercel é plataforma legada
 
 ### Gaps identificados
 
