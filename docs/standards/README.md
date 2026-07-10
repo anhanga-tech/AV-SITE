@@ -27,6 +27,8 @@ They do not require repo-wide cleanup when a task touches a small, legacy area.
 
 - [`code-style.md`](./code-style.md)
   TypeScript, React, file boundaries, imports, naming, comments, hooks, and Tailwind usage.
+- [`linting.md`](./linting.md)
+  The progressive lint ratchet (`pnpm lint:changed`), what's enforced today, and the adoption path for widening it.
 - [`testing.md`](./testing.md)
   Expectations for `node:test`, Playwright, regression coverage, and completion checks.
 - [`api-conventions.md`](./api-conventions.md)

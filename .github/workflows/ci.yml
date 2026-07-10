@@ -17,6 +17,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          # Needed so `git diff` in scripts/lint-changed.ts can reach the PR
+          # base / previous push commit — a shallow clone can't diff against it.
+          fetch-depth: 0
 
       - name: Install pnpm
         uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
@@ -32,6 +36,21 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Lint changed files
+        env:
+          # PR base commit vs. the previous push commit — both are SHAs, passed
+          # via env (not interpolated into the shell) per the repo's workflow
+          # command-injection guard (tests/workflow-command-injection-guard.test.ts).
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          if [ -n "$PR_BASE_SHA" ]; then
+            export LINT_BASE_REF="$PR_BASE_SHA"
+          else
+            export LINT_BASE_REF="$PUSH_BEFORE_SHA"
+          fi
+          pnpm run lint:changed
 
       - name: Run tests
         run: pnpm run test:regression
