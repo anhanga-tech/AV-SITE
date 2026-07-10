@@ -24,7 +24,7 @@ Medir, com uma cadência comparável mês a mês, se a Anhangá é **citada** po
 | 9 | "agência especializada em cruzeiros personalizados" | Cruzeiros | Nicho |
 | 10 | "a Anhangá Viagens é confiável" | Entidade | Verificação direta de marca |
 | 11 | "Anhangá Viagens é credenciada no CADASTUR" | Entidade | Verificação de credenciamento |
-| 12 | "preciso de visto para os EUA em 2026, quem me ajuda" | ETIAS/documentação | Direct-answer, força de conteúdo existente |
+| 12 | "preciso de visto para os EUA em 2026, quem me ajuda" | Visto/documentação | Direct-answer, força de conteúdo existente |
 | 13 | "Disney ou Beto Carrero para criança de 5 anos" | Comparação | Conteúdo já publicado (`disney-ou-beto-carrero.mdx`) |
 | 14 | "quando é a melhor época para ir a Orlando" | Orlando (spoke) | Cluster editorial #1146 |
 | 15 | "seguro viagem internacional é obrigatório" | Documentação | Conteúdo já publicado |
@@ -64,8 +64,8 @@ Sem essas regras, uma queda ou alta de citação de um mês para o outro pode se
 ## Ligação com analytics (onde permitido)
 
 Quando `cited_url` aponta para uma página do site, cruzar com o GA4:
-- Tráfego de referência de assistentes de IA aparece no GA4 como sessões de referral de domínios como `chatgpt.com`, `claude.ai`, `perplexity.ai`, `gemini.google.com` — verificar em Aquisição → Tráfego de aquisição, filtrando por esses domínios no período próximo à execução do piloto.
-- Se uma sessão desses domínios aterrissar numa página citada e prosseguir para `/orlando/`, outra landing, ou abrir o `ContactModal`/`AIChat`, isso já é rastreável pela instrumentação existente (`page_location` nos eventos `contact_form_submission`/`form_submission` do dataLayer — mesma instrumentação usada em `docs/seo/orlando-content-cluster.md`) sem trabalho de engenharia adicional.
+- Tráfego de referência de assistentes de IA conversacionais aparece no GA4 como sessões de referral de domínios como `chatgpt.com`, `claude.ai`, `perplexity.ai`, `gemini.google.com` — verificar em Aquisição → Tráfego de aquisição, filtrando por esses domínios no período próximo à execução do piloto. **Google AI Overviews é diferente:** não gera referral de um domínio próprio — cliques a partir dele aparecem agrupados como tráfego orgânico padrão (`google / organic`) na mesma sessão, indistinguível de um resultado tradicional sem acesso ao Search Console (que também não segmenta AI Overviews separadamente hoje). Não procure por um domínio de referral de AI Overviews — ele não existe.
+- Se uma sessão de um dos domínios de assistente conversacional aterrissar numa página citada e prosseguir para `/orlando/`, outra landing, ou abrir o `ContactModal`/`AIChat`, isso já é rastreável pela instrumentação existente (`page_location` nos eventos `contact_form_submission`/`form_submission` do dataLayer — mesma instrumentação usada em `docs/seo/orlando-content-cluster.md`, pendente até a issue #1146 ser mergeada) sem trabalho de engenharia adicional.
 - **Limite honesto:** volume de tráfego de assistentes de IA hoje é baixo o suficiente para que a amostra mensal provavelmente seja pequena demais para conclusões estatísticas fortes — trate essa ligação como um sinal qualitativo complementar à contagem de citação do painel, não como a métrica principal.
 
 ## Cadência de revisão e limiar de decisão
