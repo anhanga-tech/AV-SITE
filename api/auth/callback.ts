@@ -3,12 +3,17 @@ import { logger } from '../../lib/logger';
 import { checkRateLimit } from '../../lib/rate-limit';
 import { timingSafeEqual } from '../../lib/security';
 import { AuthCallbackQuerySchema } from '../../lib/schemas/auth-callback';
+import { isAllowedOAuthOrigin, resolveProductionOAuthOrigin } from '../../lib/auth-origin';
 
 const GITHUB_TOKEN_URL = 'https://github.com/login/oauth/access_token';
 const GITHUB_TOKEN_TIMEOUT_MS = 8000;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 10;
 const PROVIDER = 'github';
+const CLEAR_COOKIES = [
+    'oauth_state=; Path=/api/auth; Max-Age=0; HttpOnly; SameSite=Lax; Secure',
+    'oauth_origin=; Path=/api/auth; Max-Age=0; HttpOnly; SameSite=Lax; Secure',
+];
 
 /**
  * CSP for the OAuth callback HTML page: only the nonce-tagged handshake script
@@ -42,18 +47,25 @@ function safeJsonString(value: string): string {
 /**
  * Returns an HTML page that completes the Decap CMS OAuth handshake via postMessage.
  *
- * Protocol (canonical Decap CMS flow with security hardening):
- *  1. This page determines allowed origins for communication (the site itself).
+ * Protocol (canonical Decap CMS flow with security hardening, issue #1135):
+ *  1. `allowedOrigin` is the single origin the server validated and bound to
+ *     this OAuth attempt — never a regex, never `window.location.origin`.
  *  2. This page fires `window.opener.postMessage('authorizing:github', allowedOrigin)` — no sensitive payload.
  *  3. The CMS parent window echoes the same message back.
- *  4. This page verifies the echo's `e.origin` against the allowlist.
- *  5. This page replies to `e.source` at the VERIFIED `e.origin` with the auth result.
+ *  4. This page verifies the echo came from `window.opener` itself (not just
+ *     any window that guessed the handshake string) AND that `e.origin`
+ *     equals the bound `allowedOrigin` exactly.
+ *  5. Only then does this page reply to `e.source` with the auth result.
  */
-export function buildPostMessageHtml(status: 'success' | 'error', content: string, httpStatus: number): Response {
+export function buildPostMessageHtml(
+    status: 'success' | 'error',
+    content: string,
+    httpStatus: number,
+    allowedOrigin: string = resolveProductionOAuthOrigin(),
+): Response {
     const safeProvider = safeJsonString(PROVIDER);
     const safeStatus = safeJsonString(status);
     const safeContent = safeJsonString(content);
-    const allowedOrigin = process.env.ALLOWED_ORIGIN || 'https://www.anhanga.tur.br';
     const nonce = crypto.randomUUID();
 
     const html = `<!doctype html>
@@ -83,22 +95,23 @@ export function buildPostMessageHtml(status: 'success' | 'error', content: strin
   function onMessage(e) {
     if (e.data !== handshake) return;
 
-    // Hardened origin check: only respond to the site's own origin or localhost (for dev).
-    // The CMS must be hosted on the same domain or a trusted subdomain.
-    var origin = e.origin || '';
-    var isTrusted = origin === allowedOrigin ||
-                    origin === window.location.origin ||
-                    /^https:\\/\\/(?:[a-zA-Z0-9-]+\\.)*anhanga\\.tur\\.br$/.test(origin) ||
-                    /^http:\\/\\/localhost:\\d+$/.test(origin);
+    // Bind the reply to the original opener window, not merely to any
+    // window that happens to know the handshake string and post from the
+    // expected origin (issue #1135).
+    if (e.source !== window.opener) {
+      console.error('AUTH_CALLBACK: Blocked message from a non-opener source');
+      return;
+    }
 
-    if (!isTrusted) {
-      console.error('AUTH_CALLBACK: Blocked unauthorized origin:', origin);
+    // Single validated origin, bound server-side to this OAuth attempt.
+    if (e.origin !== allowedOrigin) {
+      console.error('AUTH_CALLBACK: Blocked unauthorized origin:', e.origin);
       return;
     }
 
     clearTimeout(handshakeTimeout);
     window.removeEventListener('message', onMessage, false);
-    e.source.postMessage(message, e.origin);
+    e.source.postMessage(message, allowedOrigin);
     window.close();
   }
 
@@ -115,18 +128,24 @@ export function buildPostMessageHtml(status: 'success' | 'error', content: strin
 </body>
 </html>`;
 
-    return new Response(html, {
-        status: httpStatus,
-        headers: {
-            'Content-Type': 'text/html; charset=utf-8',
-            'Content-Security-Policy': buildCallbackCsp(nonce),
-            'Set-Cookie': 'oauth_state=; Path=/api/auth; Max-Age=0; HttpOnly; SameSite=Lax; Secure',
-        },
+    const headers = new Headers({
+        'Content-Type': 'text/html; charset=utf-8',
+        'Content-Security-Policy': buildCallbackCsp(nonce),
     });
+    for (const cookie of CLEAR_COOKIES) {
+        headers.append('Set-Cookie', cookie);
+    }
+
+    return new Response(html, { status: httpStatus, headers });
 }
 
 /** Returns the access token string on success, or an error Response on failure. */
-async function exchangeCodeForToken(clientId: string, clientSecret: string, code: string): Promise<Response | string> {
+async function exchangeCodeForToken(
+    clientId: string,
+    clientSecret: string,
+    code: string,
+    allowedOrigin: string,
+): Promise<Response | string> {
     const ac = new AbortController();
     const timer = setTimeout(() => ac.abort(), GITHUB_TOKEN_TIMEOUT_MS);
 
@@ -142,7 +161,7 @@ async function exchangeCodeForToken(clientId: string, clientSecret: string, code
 
         if (!tokenRes.ok) {
             logger.error('AUTH_CALLBACK', { stage: 'token_exchange', httpStatus: tokenRes.status });
-            return buildPostMessageHtml('error', 'Token exchange failed', 502);
+            return buildPostMessageHtml('error', 'Token exchange failed', 502, allowedOrigin);
         }
 
         tokenData = (await tokenRes.json()) as Record<string, unknown>;
@@ -150,12 +169,12 @@ async function exchangeCodeForToken(clientId: string, clientSecret: string, code
         clearTimeout(timer);
         const isTimeout = err instanceof Error && err.name === 'AbortError';
         logger.error('AUTH_CALLBACK', { stage: 'token_fetch', error: isTimeout ? 'timeout' : err instanceof Error ? err.message : 'unknown' });
-        return buildPostMessageHtml('error', isTimeout ? 'Token exchange timed out' : 'Token exchange request failed', 502);
+        return buildPostMessageHtml('error', isTimeout ? 'Token exchange timed out' : 'Token exchange request failed', 502, allowedOrigin);
     }
 
     if (tokenData['error'] || typeof tokenData['access_token'] !== 'string') {
         logger.error('AUTH_CALLBACK', { stage: 'token_parse', error: tokenData['error'] ?? 'missing_token' });
-        return buildPostMessageHtml('error', String(tokenData['error_description'] ?? 'Token exchange failed'), 400);
+        return buildPostMessageHtml('error', String(tokenData['error_description'] ?? 'Token exchange failed'), 400, allowedOrigin);
     }
 
     return tokenData['access_token'];
@@ -191,11 +210,17 @@ export default async function handler(req: Request): Promise<Response> {
 
     const cookies = parseCookies(req.headers.get('cookie') ?? '');
     const storedState = cookies['oauth_state'];
+    const storedOrigin = cookies['oauth_origin'];
+
+    // The origin bound at initiation must still be in the allowlist — it was
+    // validated once already, but a stale/replayed cookie from a config
+    // change (e.g. ALLOWED_ORIGIN rotated) should not stay trusted forever.
+    const boundOrigin = isAllowedOAuthOrigin(storedOrigin) ? storedOrigin : resolveProductionOAuthOrigin();
 
     if (errorParam) {
         const desc = url.searchParams.get('error_description') ?? errorParam;
         logger.warn('AUTH_CALLBACK: provider returned error', { error: errorParam, description: desc });
-        return buildPostMessageHtml('error', desc, 400);
+        return buildPostMessageHtml('error', desc, 400, boundOrigin);
     }
 
     const queryParsed = AuthCallbackQuerySchema.safeParse({
@@ -205,24 +230,26 @@ export default async function handler(req: Request): Promise<Response> {
 
     if (!queryParsed.success) {
         logger.warn('AUTH_CALLBACK: validation failed', { error: queryParsed.error.flatten() });
-        return buildPostMessageHtml('error', 'Missing required parameters', 400);
+        return buildPostMessageHtml('error', 'Missing required parameters', 400, boundOrigin);
     }
 
     const { code, state } = queryParsed.data;
 
     const stateMatches = storedState ? timingSafeEqual(state, storedState) : false;
-    if (!stateMatches) {
-        logger.warn('AUTH_CALLBACK: state mismatch or missing cookie', {
+    const originMatches = isAllowedOAuthOrigin(storedOrigin);
+    if (!stateMatches || !originMatches) {
+        logger.warn('AUTH_CALLBACK: state mismatch or missing/unauthorized origin binding', {
             hasStoredState: Boolean(storedState),
+            hasStoredOrigin: Boolean(storedOrigin),
         });
-        return buildPostMessageHtml('error', 'Invalid state parameter', 400);
+        return buildPostMessageHtml('error', 'Invalid state parameter', 400, boundOrigin);
     }
 
-    const result = await exchangeCodeForToken(clientId, clientSecret, code);
+    const result = await exchangeCodeForToken(clientId, clientSecret, code, boundOrigin);
     if (result instanceof Response) return result;
 
     logger.info('AUTH_CALLBACK: authentication successful');
 
     const successContent = JSON.stringify({ token: result, provider: PROVIDER });
-    return buildPostMessageHtml('success', successContent, 200);
+    return buildPostMessageHtml('success', successContent, 200, boundOrigin);
 }

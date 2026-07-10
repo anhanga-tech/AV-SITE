@@ -24,19 +24,28 @@ function restoreEnv(): void {
 }
 
 /** Each test uses a distinct IP so the in-memory rate-limit buckets stay isolated. */
-function authRequest(ip: string): Request {
+function authRequest(ip: string, opts: { referer?: string | null } = {}): Request {
+    const headers: Record<string, string> = { 'cf-connecting-ip': ip };
+    const referer = opts.referer === undefined ? 'https://www.anhanga.tur.br/admin/' : opts.referer;
+    if (referer !== null) headers['referer'] = referer;
     return new Request('https://www.anhanga.tur.br/api/auth', {
         method: 'GET',
-        headers: { 'cf-connecting-ip': ip },
+        headers,
     });
 }
 
-function callbackRequest(ip: string, opts: { code?: string; state?: string; cookie?: string } = {}): Request {
+function callbackRequest(
+    ip: string,
+    opts: { code?: string; state?: string; state_cookie?: string; origin_cookie?: string } = {},
+): Request {
     const url = new URL('https://www.anhanga.tur.br/api/auth/callback');
     if (opts.code !== undefined) url.searchParams.set('code', opts.code);
     if (opts.state !== undefined) url.searchParams.set('state', opts.state);
     const headers: Record<string, string> = { 'cf-connecting-ip': ip };
-    if (opts.cookie) headers['cookie'] = opts.cookie;
+    const cookieParts: string[] = [];
+    if (opts.state_cookie) cookieParts.push(`oauth_state=${opts.state_cookie}`);
+    if (opts.origin_cookie) cookieParts.push(`oauth_origin=${opts.origin_cookie}`);
+    if (cookieParts.length) headers['cookie'] = cookieParts.join('; ');
     return new Request(url.toString(), { method: 'GET', headers });
 }
 
@@ -70,6 +79,55 @@ test('auth: returns 429 once the request limit is exceeded', async () => {
     }
 });
 
+test('auth: rejects initiation with a missing referer (fail closed)', async () => {
+    setOAuthEnv();
+    try {
+        const res = await authHandler(authRequest('10.0.0.10', { referer: null }));
+        assert.equal(res.status, 400);
+        const body = await res.json();
+        assert.equal(body.error, 'INVALID_ORIGIN');
+    } finally {
+        restoreEnv();
+    }
+});
+
+test('auth: rejects initiation from an unauthorized subdomain referer', async () => {
+    setOAuthEnv();
+    try {
+        const res = await authHandler(authRequest('10.0.0.11', { referer: 'https://evil.anhanga.tur.br/admin/' }));
+        assert.equal(res.status, 400);
+        const body = await res.json();
+        assert.equal(body.error, 'INVALID_ORIGIN');
+    } finally {
+        restoreEnv();
+    }
+});
+
+test('auth: accepts the declared local dev origin', async () => {
+    setOAuthEnv();
+    try {
+        const res = await authHandler(authRequest('10.0.0.12', { referer: 'http://localhost:3000/admin/' }));
+        assert.equal(res.status, 302);
+        const setCookies = res.headers.getSetCookie();
+        assert.ok(setCookies.some((c) => c.startsWith('oauth_origin=http://localhost:3000;')));
+    } finally {
+        restoreEnv();
+    }
+});
+
+test('auth: binds the validated origin into the oauth_origin cookie', async () => {
+    setOAuthEnv();
+    try {
+        const res = await authHandler(authRequest('10.0.0.13'));
+        assert.equal(res.status, 302);
+        const setCookies = res.headers.getSetCookie();
+        assert.ok(setCookies.some((c) => c.startsWith('oauth_origin=https://www.anhanga.tur.br;')));
+        assert.ok(setCookies.some((c) => c.startsWith('oauth_state=')));
+    } finally {
+        restoreEnv();
+    }
+});
+
 test('callback: rejects a missing state cookie with 400', async () => {
     setOAuthEnv();
     try {
@@ -86,7 +144,12 @@ test('callback: rejects a mismatched state with 400', async () => {
     setOAuthEnv();
     try {
         const res = await callbackHandler(
-            callbackRequest('10.0.1.2', { code: 'c', state: 'expected', cookie: 'oauth_state=different' }),
+            callbackRequest('10.0.1.2', {
+                code: 'c',
+                state: 'expected',
+                state_cookie: 'different',
+                origin_cookie: 'https://www.anhanga.tur.br',
+            }),
         );
         assert.equal(res.status, 400);
         const html = await res.text();
@@ -96,7 +159,40 @@ test('callback: rejects a mismatched state with 400', async () => {
     }
 });
 
-test('callback: a matching state passes the timing-safe guard and completes', async () => {
+test('callback: rejects a matching state with a missing origin cookie', async () => {
+    setOAuthEnv();
+    try {
+        const res = await callbackHandler(
+            callbackRequest('10.0.1.5', { code: 'c', state: 'matching-state', state_cookie: 'matching-state' }),
+        );
+        assert.equal(res.status, 400);
+        const html = await res.text();
+        assert.match(html, /Invalid state parameter/);
+    } finally {
+        restoreEnv();
+    }
+});
+
+test('callback: rejects a matching state with an unauthorized origin cookie', async () => {
+    setOAuthEnv();
+    try {
+        const res = await callbackHandler(
+            callbackRequest('10.0.1.6', {
+                code: 'c',
+                state: 'matching-state',
+                state_cookie: 'matching-state',
+                origin_cookie: 'https://evil.anhanga.tur.br',
+            }),
+        );
+        assert.equal(res.status, 400);
+        const html = await res.text();
+        assert.match(html, /Invalid state parameter/);
+    } finally {
+        restoreEnv();
+    }
+});
+
+test('callback: a matching state and bound origin pass the guard and complete', async () => {
     setOAuthEnv();
     const originalFetch = globalThis.fetch;
     globalThis.fetch = async () =>
@@ -106,11 +202,17 @@ test('callback: a matching state passes the timing-safe guard and completes', as
         });
     try {
         const res = await callbackHandler(
-            callbackRequest('10.0.1.3', { code: 'c', state: 'matching-state', cookie: 'oauth_state=matching-state' }),
+            callbackRequest('10.0.1.3', {
+                code: 'c',
+                state: 'matching-state',
+                state_cookie: 'matching-state',
+                origin_cookie: 'https://www.anhanga.tur.br',
+            }),
         );
         assert.equal(res.status, 200);
         const html = await res.text();
         assert.match(html, /tok-abc/);
+        assert.match(html, /var allowedOrigin = "https:\/\/www\.anhanga\.tur\.br"/);
     } finally {
         globalThis.fetch = originalFetch;
         restoreEnv();
