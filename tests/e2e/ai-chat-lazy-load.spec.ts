@@ -32,6 +32,14 @@ test.describe('AI chat lazy loading', () => {
   });
 
   test('opens the chat and auto-sends a message from the toggle-ai-chat custom event', async ({ page }) => {
+    await page.route('**/api/generate', route =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ text: 'Claro! Me conta mais sobre a viagem para Lisboa.' }),
+      }),
+    );
+
     await page.goto('/');
     const aiChat = new AIChat(page);
 
