@@ -127,6 +127,64 @@ test('buildGenerateSuccessBody should repair textual handoff into structured pay
     assert.doesNotMatch(body.text, /wa\.me/i);
 });
 
+test('buildGenerateSuccessBody should log only structural metadata for invalid textual handoff, never conversation content', async () => {
+    const originalWarn = console.warn;
+    const warnCalls: unknown[][] = [];
+    console.warn = (...args: unknown[]) => {
+        warnCalls.push(args);
+    };
+
+    const conversationSecret = 'Quero ir para Orlando em junho, meu nome é Maria da Silva';
+    const modelText = 'Clique aqui para receber seu orçamento personalizado: [WhatsApp](https://wa.me/5511999999999)';
+
+    try {
+        await buildGenerateSuccessBody(
+            {
+                responseId: 'resp-log-check',
+                modelVersion: 'gemini-test-version',
+                text: modelText,
+            },
+            {
+                apiKey: 'test-key',
+                modelName: 'test-model',
+                contents: [{ role: 'user', parts: [{ text: conversationSecret }] }],
+                repairModelResponse: async () => buildToolResponse({
+                    destination: 'Orlando',
+                    destination_city: 'Orlando',
+                    destination_region: 'Flórida',
+                    origin_city: 'Campinas',
+                    origin_region: 'SP',
+                    dates: 'junho de 2026',
+                    adults: 2,
+                    need_summary: 'Viagem em família',
+                    decision_role: 'casal',
+                    budget_range: 'R$ 20 mil+',
+                    timeline_window: 'junho de 2026',
+                    baggage_preference: 'bagagem despachada',
+                    iata_code: 'MCO',
+                }),
+            },
+        );
+    } finally {
+        console.warn = originalWarn;
+    }
+
+    const invalidHandoffCall = warnCalls.find(([, message]) => message === 'SERVER: invalid textual handoff detected');
+    assert.ok(invalidHandoffCall, 'expected an "invalid textual handoff" warning to be logged');
+
+    const serialized = JSON.stringify(invalidHandoffCall);
+    assert.doesNotMatch(serialized, /wa\.me/i);
+    assert.doesNotMatch(serialized, /orçamento personalizado/i);
+    assert.doesNotMatch(serialized, /Maria da Silva/i);
+    assert.doesNotMatch(serialized, /Orlando em junho/i);
+
+    const [, , payload] = invalidHandoffCall as [string, string, Record<string, unknown>];
+    assert.equal(payload.responseId, 'resp-log-check');
+    assert.equal(payload.modelVersion, 'gemini-test-version');
+    assert.equal(payload.outputLength, modelText.length);
+    assert.equal(typeof payload.matchedSignal, 'string');
+});
+
 test('buildGenerateSuccessBody should handle non-array parts from Gemini response gracefully', async () => {
     // Gemini can return non-array `parts` on certain safety stops
     const malformedResponse: ModelResponseShape = {
