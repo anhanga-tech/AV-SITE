@@ -4,6 +4,14 @@ const RELOAD_FLAG = 'chunk_reload_attempted';
 
 interface Props {
   children: React.ReactNode;
+  /**
+   * Overrides the default full-page fallback. Use for boundaries wrapping a
+   * small widget rather than routed page content (e.g. AIChat.tsx) — the
+   * default `min-h-[40vh]` section reads as a full-page failure and can
+   * break layout when it renders in the normal document flow instead of a
+   * fixed-position widget's own space.
+   */
+  fallback?: React.ReactNode;
 }
 
 interface State {
@@ -55,6 +63,8 @@ class ChunkErrorBoundary extends React.Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
+      if (this.props.fallback) return this.props.fallback;
+
       return (
         <section className="min-h-[40vh] flex flex-col items-center justify-center gap-4 bg-white px-4 text-center">
           <p className="text-gray-700 text-lg font-medium">
