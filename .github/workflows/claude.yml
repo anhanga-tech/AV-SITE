@@ -107,7 +107,7 @@ jobs:
             Revise este pull request como reviewer automático deste repositório.
 
             Leia primeiro os padrões do projeto antes de avaliar o diff:
-            - docs/standards/code-style.md, testing.md, api-conventions.md, security.md
+            - docs/standards/code-style.md, linting.md, testing.md, api-conventions.md, security.md
             - .claude/rules/ (mesmas regras, aplicadas via CLAUDE.md)
 
             Foque em, nesta ordem de prioridade:
@@ -116,7 +116,7 @@ jobs:
             3. Violação de convenções documentadas (ex.: lógica de handler fora de api/, helpers duplicados em vez de reuso de lib/ e services/, resposta fora do formato { ok, code?, error?, data? })
             4. Mudança de comportamento sem teste automatizado correspondente (docs/standards/testing.md)
 
-            Não repita o que já é coberto por lint, typecheck ou CI. Não comente sobre estilo já garantido por ferramentas automatizadas. Poste um resumo curto e comentários inline apenas onde houver um problema real e acionável — prefira silêncio a ruído.
+            Não repita o que já é coberto por CI (`pnpm test:regression`, `pnpm typecheck`, `pnpm build`, `pnpm test:size`) nem pelo lint automático (`pnpm lint:changed`, que já roda em CI e cobre exatamente: `react-hooks/rules-of-hooks`, `@typescript-eslint/no-floating-promises`/`no-misused-promises`, e o conjunto recomendado de `jsx-a11y` — ver docs/standards/linting.md para o que está e o que NÃO está coberto). Fora desse escopo — nomenclatura, organização de imports, agrupamento de classes Tailwind, qualidade de comentários — não existe ferramenta automática hoje; comente normalmente quando for um problema real, não assuma que "o lint pega". Poste um resumo curto e comentários inline apenas onde houver um problema real e acionável — prefira silêncio a ruído.
 
             Para cada achado específico e acionável (bug, risco de segurança, convenção violada), use `create_inline_comment` ancorado na linha exata — não descreva o achado só em prosa no resumo. Reserve o resumo (sticky comment) para visão geral, contexto entre achados e itens que não têm uma linha específica para ancorar (ex.: padrão repetido em vários arquivos). Um achado por comentário inline, mesmo quando o diff tem muitos arquivos.
 

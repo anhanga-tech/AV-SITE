@@ -15,6 +15,8 @@ pnpm dev                  # Generates blog manifest + sitemap, then starts Vite 
 pnpm build                # Generates manifest + sitemap, runs Vite build, then prerenders static routes
 pnpm preview              # Preview production build at http://localhost:4173
 pnpm typecheck            # Type-check without emitting (also regenerates manifest + sitemap first)
+pnpm lint:changed         # Lint only files changed vs. the base branch (the CI-enforced ratchet, see docs/standards/linting.md)
+pnpm lint                 # Lint the whole repo — informational, not a CI gate (pre-existing debt is expected)
 pnpm test:regression      # Run all unit/regression tests (Node built-in test runner via tsx)
 pnpm test:e2e             # Run Playwright e2e tests
 pnpm test:e2e:ui          # Run Playwright with interactive UI
@@ -208,6 +210,7 @@ Build chunks: `react-vendor`, `ai-vendor`, `leaflet-vendor` (manual split in `vi
 - `pnpm test:regression` for unit/regression changes
 - `pnpm test:e2e` for browser-visible or critical-path changes
 - `pnpm typecheck` for TypeScript contract changes
+- `pnpm lint:changed` for any `.ts`/`.tsx` change (see `docs/standards/linting.md`)
 
 ## Documentation Organization
 
@@ -257,9 +260,10 @@ GitHub Flow — continuous deployment, no `develop` branch.
 
 1. `/docs/standards/README.md` — standards map and exception process
 2. `/docs/standards/code-style.md` — TypeScript, React, naming, imports, Tailwind
-3. `/docs/standards/testing.md` — node:test, Playwright, regression coverage
-4. `/docs/standards/api-conventions.md` — handler patterns, validation, JSON responses
-5. `/docs/standards/security.md` — sanitization, secrets, webhooks, rate limits, AI safety
+3. `/docs/standards/linting.md` — the `pnpm lint:changed` ratchet, what's enforced today, adoption path
+4. `/docs/standards/testing.md` — node:test, Playwright, regression coverage
+5. `/docs/standards/api-conventions.md` — handler patterns, validation, JSON responses
+6. `/docs/standards/security.md` — sanitization, secrets, webhooks, rate limits, AI safety
 
 Templates in `/docs/standards/templates/`: `api-endpoint-template.md` (required for new endpoints), `pr-checklist.md`, `change-plan-template.md`.
 
