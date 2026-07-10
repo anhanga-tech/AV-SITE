@@ -35,7 +35,7 @@ test('public/ deployment tree has no unexpectedly large files', async () => {
   for (const file of files) {
     const relativePath = path.relative(PUBLIC_DIR, file);
     if (relativePath.endsWith('.DS_Store')) continue;
-    if (relativePath in ALLOWLIST) continue;
+    if (Object.hasOwn(ALLOWLIST, relativePath)) continue;
 
     const { size } = await stat(file);
     if (size > MAX_FILE_SIZE_BYTES) {
