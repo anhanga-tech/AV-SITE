@@ -63,6 +63,17 @@ export default tseslint.config(
     },
   },
   {
+    // Root-level config files and build scripts (postcss.config.mjs,
+    // scripts/*.mjs) run under Node outside the TS project service, so they
+    // don't pick up the globals set on the `**/*.{ts,tsx}` block above —
+    // without this, `console`/`process` are flagged as no-undef false
+    // positives.
+    files: ['**/*.{js,mjs,cjs}'],
+    languageOptions: {
+      globals: { ...globals.node },
+    },
+  },
+  {
     // Regression/e2e tests run under node:test / Playwright, not a browser —
     // node globals apply, and test files legitimately use `any` more freely
     // for mock/fixture shaping.
