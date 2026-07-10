@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import { useAntiBot } from './useAntiBot';
 import { cleanString } from '../lib/lead-logic';
 import { getTrackingDataObject } from '../utils/whatsapp';
+import { extractUtms, normalizeLeadTracking } from '../lib/tracking-normalization';
 import type { LeadTracking, LeadUtms } from '../types/leadCapture';
 import type { SubmitWaitlistRequest, SubmitWaitlistResponse } from '../types/waitlist';
 
@@ -22,65 +23,9 @@ type SubmitWaitlistResult =
 
 type SubmitWaitlistFailure = Extract<SubmitWaitlistResult, { ok: false }>;
 
-function toNullable(value: unknown): string | null {
-    if (typeof value !== 'string') return null;
-    const normalized = value.trim();
-    return normalized.length > 0 ? normalized : null;
-}
-
 function captureTrackingState(): { tracking: LeadTracking; utms: LeadUtms } {
-    const source = getTrackingDataObject() || {};
-    const extras: Record<string, string> = {};
-    const knownKeys = new Set([
-        'utm_source',
-        'utm_medium',
-        'utm_campaign',
-        'utm_term',
-        'utm_content',
-        'cid',
-        'sid',
-        'gclid',
-        'fbclid',
-        'msclkid',
-        'ttclid',
-        'wbraid',
-        'gbraid',
-        'fbc',
-        'fbp',
-    ]);
-
-    for (const [key, value] of Object.entries(source)) {
-        if (knownKeys.has(key) || typeof value !== 'string') continue;
-        const normalized = value.trim();
-        if (!normalized) continue;
-        extras[key] = normalized;
-    }
-
-    const utms: LeadUtms = {
-        utm_source: toNullable(source.utm_source),
-        utm_medium: toNullable(source.utm_medium),
-        utm_campaign: toNullable(source.utm_campaign),
-        utm_term: toNullable(source.utm_term),
-        utm_content: toNullable(source.utm_content),
-    };
-
-    return {
-        utms,
-        tracking: {
-            ...utms,
-            cid: toNullable(source.cid),
-            sid: toNullable(source.sid),
-            gclid: toNullable(source.gclid),
-            fbclid: toNullable(source.fbclid),
-            msclkid: toNullable(source.msclkid),
-            ttclid: toNullable(source.ttclid),
-            wbraid: toNullable(source.wbraid),
-            gbraid: toNullable(source.gbraid),
-            fbc: toNullable(source.fbc),
-            fbp: toNullable(source.fbp),
-            extras: Object.keys(extras).length > 0 ? extras : undefined,
-        },
-    };
+    const tracking = normalizeLeadTracking(getTrackingDataObject());
+    return { tracking, utms: extractUtms(tracking) };
 }
 
 function buildSubmitWaitlistError(
