@@ -9,7 +9,7 @@ import { leadInputFromSubmitNps } from '../lib/odoo-lead-mapping';
 import { SubmitNpsBodySchema, type SubmitNpsRequest } from '../lib/schemas/submit-nps';
 import { cleanString } from '../lib/lead-logic';
 import { getNpsInviteSecret, verifyNpsInviteToken } from '../lib/nps-invite';
-import { consumeNpsInviteOnce } from '../lib/nps-invite-replay';
+import { consumeNpsInviteOnce, releaseNpsInvite } from '../lib/nps-invite-replay';
 import { logger } from '../lib/logger';
 import { z } from 'zod';
 
@@ -83,6 +83,7 @@ async function validateNpsSubmission(rawBody: unknown): Promise<ValidationResult
             score: parsed.data.score,
             reason: parsed.data.reason,
             highlight: parsed.data.highlight,
+            jti: payload.jti,
         },
     };
 }
@@ -121,4 +122,11 @@ export default createOdooSubmitHandler({
     buildInput: leadInputFromSubmitNps,
     success: { status: 201, message: 'Avaliação registrada com sucesso.' },
     error: NPS_ERROR_OPTIONS,
+    // validateNpsSubmission consumes the jti before the Odoo write (atomic,
+    // so concurrent double-submits are still rejected) — if the write then
+    // fails, release it so a legitimate retry with the same link succeeds
+    // instead of permanently burning a customer's single-use invite.
+    onSendFailure: async (data) => {
+        await releaseNpsInvite(data.jti);
+    },
 });

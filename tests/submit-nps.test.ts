@@ -489,6 +489,30 @@ test('submit-nps returns 502 ODOO_ERROR when upstream returns non-2xx', async (t
     assert.equal(body.code, 'ODOO_ERROR');
 });
 
+test('submit-nps releases the invitation on an Odoo failure — the same link can be retried', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    setNpsInviteEnv();
+    const token = await buildToken();
+    const ip = '10.55.55.1';
+    const body = { token, score: 9, reason: 'Ótima viagem.', highlight: 'Cataratas.' };
+
+    // First attempt: Odoo is down. The invite must not be permanently burned.
+    global.fetch = createOdooMock({ failStatus: 503 }).fetch;
+    const firstResponse = await handler(buildRequest(body, { headers: { 'x-real-ip': ip } }));
+    assert.equal(firstResponse.status, 502);
+
+    // Second attempt, same token: Odoo is back up. If the invite had been
+    // permanently consumed on the first (failed) attempt, this would be
+    // rejected as a replay instead of succeeding.
+    global.fetch = createOdooMock({}).fetch;
+    const secondResponse = await handler(buildRequest(body, { headers: { 'x-real-ip': ip } }));
+    const secondBody = await secondResponse.json() as Record<string, unknown>;
+
+    assert.equal(secondResponse.status, 201, `expected the retry to succeed, got: ${JSON.stringify(secondBody)}`);
+    assert.equal(secondBody.ok, true);
+});
+
 test('classifySubmitNpsError preserves unexpected internal failures', () => {
     const classified = classifySubmitNpsError(new Error('unexpected database failure'));
     assert.equal(classified.code, 'INTERNAL_ERROR');

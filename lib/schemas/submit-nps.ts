@@ -29,4 +29,10 @@ export interface SubmitNpsRequest {
     score: number;
     reason: string;
     highlight: string;
+    /**
+     * The invitation token's jti, carried through internally so `onSendFailure`
+     * can release the single-use guard if the Odoo write fails — never sent to
+     * Odoo (leadInputFromSubmitNps destructures only the named fields above).
+     */
+    jti: string;
 }

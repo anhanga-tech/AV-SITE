@@ -47,6 +47,8 @@ export interface CreateOdooSubmitHandlerOptions<TData> {
     checkExtraConfig?: () => DispatchConfigCheck;
     onValidated?: (data: TData, requestId: string) => Record<string, unknown> | void;
     onError?: (params: { data: TData; requestId: string; classification: N8nErrorClassification }) => Record<string, unknown> | void;
+    /** Runs only when the Odoo write throws — see CreateSubmitHandlerOptions.onSendFailure. */
+    onSendFailure?: (data: TData, requestId: string) => void | Promise<void>;
 }
 
 /** Persists an Odoo input: upsert partner (dedup by e-mail), then optional lead. */
@@ -96,6 +98,7 @@ export function createOdooSubmitHandler<TData>(
         success: options.success,
         onValidated: options.onValidated,
         onError: options.onError,
+        onSendFailure: options.onSendFailure,
         dispatch: {
             checkConfig: () => {
                 if (!getOdooConfig()) {

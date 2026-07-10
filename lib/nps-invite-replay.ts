@@ -11,6 +11,7 @@ const KEY_PREFIX = 'nps:invite:used';
 
 interface RedisSetLike {
     set(key: string, value: string, opts: { nx: true; ex: number }): Promise<string | null>;
+    del(key: string): Promise<unknown>;
 }
 
 // True when running inside a managed serverless edge runtime where module-level
@@ -63,4 +64,29 @@ export async function consumeNpsInviteOnce(jti: string, ttlSeconds: number): Pro
 
     const result = await redis.set(key, '1', { nx: true, ex: Math.max(1, ttlSeconds) });
     return result === 'OK';
+}
+
+/**
+ * Releases a `jti` marked consumed by `consumeNpsInviteOnce`. Call this only
+ * when the Odoo write that was supposed to follow actually failed — the token
+ * is consumed *before* the write (so concurrent double-submits are still
+ * rejected atomically), but a transient provider failure must not permanently
+ * burn a customer's single-use invite; releasing it lets a retry with the
+ * same link succeed instead of forcing a brand-new invitation to be issued.
+ */
+export async function releaseNpsInvite(jti: string): Promise<void> {
+    const key = `${KEY_PREFIX}:${jti}`;
+    const redis = await getRedisClient();
+
+    if (!redis) {
+        inMemoryConsumed.delete(key);
+        return;
+    }
+
+    await redis.del(key).catch((error) => {
+        logger.warn('NPS_INVITE_REPLAY: failed to release jti after a send failure', {
+            jti,
+            detail: error instanceof Error ? error.message : String(error),
+        });
+    });
 }

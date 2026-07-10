@@ -163,6 +163,13 @@ export interface CreateSubmitHandlerOptions<TData, TPayload = unknown> {
     onValidated?: (data: TData, requestId: string) => Record<string, unknown> | void;
     /** Optional extra fields (e.g. masked recovery data) for the error log. */
     onError?: (params: { data: TData; requestId: string; classification: N8nErrorClassification }) => Record<string, unknown> | void;
+    /**
+     * Runs only when `dispatch.send()` throws — for releasing a side effect
+     * that `validate()` optimistically applied (e.g. consuming a single-use
+     * token) so a transient provider failure doesn't permanently block a
+     * legitimate retry. Never runs on success or on a validation failure.
+     */
+    onSendFailure?: (data: TData, requestId: string) => void | Promise<void>;
 }
 
 /** Internal per-request state shared between the handler and its helpers. */
@@ -343,6 +350,7 @@ export function createSubmitHandler<TData, TPayload = unknown>(
             const payload = options.dispatch.buildPayload(data, requestId, ctx);
             await options.dispatch.send(requestId, payload);
         } catch (error: unknown) {
+            await options.onSendFailure?.(data, requestId);
             return buildWebhookErrorResponse(env, data, error);
         }
 

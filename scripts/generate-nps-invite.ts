@@ -48,7 +48,15 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  const expiresInMs = days ? Number(days) * 24 * 60 * 60 * 1000 : undefined;
+  let expiresInMs: number | undefined;
+  if (days !== undefined) {
+    const parsedDays = Number(days);
+    if (!Number.isFinite(parsedDays) || parsedDays <= 0) {
+      console.error(`--days must be a positive number, got "${days}".`);
+      process.exit(1);
+    }
+    expiresInMs = parsedDays * 24 * 60 * 60 * 1000;
+  }
   const token = await createNpsInviteToken({ email, firstname, expiresInMs }, secret);
   const url = new URL('/nps', SITE_URL);
   url.searchParams.set('token', token);

@@ -72,6 +72,26 @@ test('verifyNpsInviteToken rejects a payload missing required fields', async () 
     assert.equal(result.reason, 'malformed');
 });
 
+test('verifyNpsInviteToken rejects a non-finite exp instead of treating it as never-expiring', async () => {
+    // `1e999` is valid JSON (a numeric literal that overflows on parse), and
+    // JSON.parse('{"exp":1e999}') yields `Infinity` — typeof 'number', but not
+    // finite. `Date.now() > Infinity` is always false, so a naive
+    // `typeof exp === 'number'` shape check would treat this token as never
+    // expiring. (A literal `NaN` can't survive this path: JSON has no NaN
+    // literal, and JSON.stringify(NaN) itself collapses to `null`, which the
+    // shape check already rejected before this fix — `1e999`/`Infinity` is
+    // the actual reachable case.)
+    const rawJson = '{"email":"ana@example.com","firstname":"Ana","exp":1e999,"jti":"fake-jti"}';
+    const encoder = new TextEncoder();
+    const payloadB64 = btoa(String.fromCharCode(...encoder.encode(rawJson)))
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    const result = await verifyNpsInviteToken(`${payloadB64}.somesignature`, SECRET);
+
+    assert.equal(result.valid, false);
+    if (result.valid) return;
+    assert.equal(result.reason, 'malformed');
+});
+
 test('each created token has a distinct jti', async () => {
     const tokenA = await createNpsInviteToken({ email: 'ana@example.com', firstname: 'Ana' }, SECRET);
     const tokenB = await createNpsInviteToken({ email: 'ana@example.com', firstname: 'Ana' }, SECRET);

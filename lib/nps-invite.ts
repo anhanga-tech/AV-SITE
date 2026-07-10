@@ -83,7 +83,11 @@ function isNpsInvitePayload(value: unknown): value is NpsInvitePayload {
     return (
         typeof candidate.email === 'string' &&
         typeof candidate.firstname === 'string' &&
+        // Number.isFinite (not just typeof === 'number') rejects NaN — otherwise
+        // a token with a corrupted/invalid exp would compare `Date.now() > NaN`,
+        // which is always false, and never expire.
         typeof candidate.exp === 'number' &&
+        Number.isFinite(candidate.exp) &&
         typeof candidate.jti === 'string'
     );
 }
