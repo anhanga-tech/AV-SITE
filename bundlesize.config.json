@@ -7,6 +7,10 @@
     {
       "path": "dist/assets/index-*.js",
       "maxSize": "360 kB"
+    },
+    {
+      "path": "dist/assets/AIChatPanel-*.js",
+      "maxSize": "80 kB"
     }
   ]
 }
