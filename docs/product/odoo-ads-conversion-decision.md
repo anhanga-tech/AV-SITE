@@ -12,7 +12,7 @@ Existe infraestrutura de dispatch **já construída e funcional, mas órfã**: `
 
 ## Estado atual verificado no código (jul/2026)
 
-- `api/purchase-dispatch.ts`: aceita `eventType` (`lead_qualificado`, `close_convert_lead`, `purchase`), autentica via `X-Webhook-Secret` (HMAC contra `N8N_WEBHOOK_SECRET`), dispara `sendGoogleConversion` + `sendMetaConversion` em paralelo, retorna `mode: full/partial/failed`.
+- `api/purchase-dispatch.ts`: aceita `eventType` (`lead_qualificado`, `close_convert_lead`, `purchase`), autentica via `X-Webhook-Secret` (comparação de segredo estático em tempo constante contra `N8N_WEBHOOK_SECRET`, via `timingSafeEqual` — não é uma assinatura HMAC sobre o payload), dispara `sendGoogleConversion` + `sendMetaConversion` em paralelo, retorna `mode: full/partial/failed`.
 - `lib/conversions/google.ts`: **GA4 Measurement Protocol** (`client_id` + `gclid` como evento GA4), não é a API nativa de Offline Conversion Import do Google Ads.
 - `lib/conversions/meta.ts`: Conversions API da Meta, `em`/`ph`/`fn`/`ln` hasheados SHA-256, `fbclid`/`fbc`/`fbp`/IP/UA crus, dedup por `event_id`.
 - `crm.lead` hoje **não tem campos estruturados/consultáveis** para `gclid`, `fbclid`, `fbp`, `fbc`, GA `cid`/`sid` nem `event_id` — só existem como texto dentro do HTML de `description` (`lib/odoo-lead-mapping.ts::buildDescriptionHtml`). Nenhuma automação do Odoo consegue lê-los hoje.
