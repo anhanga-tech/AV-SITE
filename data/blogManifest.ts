@@ -2,6 +2,91 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
+    "title": "Como Planejar uma Viagem para Orlando Sob Medida: o Guia Completo",
+    "excerpt": "Orlando não é só Disney. É passaporte, visto, escolha de parques, hospedagem e um orçamento que muda conforme cada decisão. Veja como planejar sem se perder.",
+    "date": "2026-07-10",
+    "author": "felipe-william",
+    "category": "Planejamento",
+    "image": "https://media.anhanga.tur.br/images/blog/como-planejar-viagem-orlando-sob-medida.jpg",
+    "featured": true,
+    "showChatCTA": true,
+    "chatCTADestination": "Orlando",
+    "tags": [
+      "orlando",
+      "planejamento",
+      "disney",
+      "universal",
+      "viagem-em-familia",
+      "eua"
+    ],
+    "seoTitle": "Como Planejar sua Viagem para Orlando",
+    "seoDescription": "Guia completo para planejar uma viagem para Orlando sob medida: documentos, escolha de parques, hospedagem e como montar um roteiro que cabe no seu orçamento.",
+    "faq": [
+      {
+        "question": "Por onde começar o planejamento de uma viagem para Orlando?",
+        "answer": "Pela documentação, não pelos parques. Visto americano B1/B2 (obrigatório para todos, incluindo crianças) é o item que mais trava o cronograma — só depois de resolvido faz sentido decidir quais parques visitar, escolher hospedagem e travar datas. Fazer essa sequência fora de ordem (comprar passagem antes de confirmar o visto, por exemplo) é a causa mais comum de estresse de última hora."
+      },
+      {
+        "question": "A escolha dos parques muda a decisão de hospedagem?",
+        "answer": "Muda, e por isso vem antes na ordem de decisões. Se a família só vai a um complexo (Disney ou Universal), hospedagem dentro dele costuma valer mais a pena pela simplicidade. Se o roteiro cobre os dois, uma região neutra como International Drive evita pagar hospedagem interna dupla e ainda fica a poucos minutos de qualquer um dos dois."
+      },
+      {
+        "question": "Vale mais a pena ficar hospedado dentro dos parques ou fora?",
+        "answer": "Depende do perfil da viagem. Hospedagem dentro do complexo Disney ou Universal custa mais, mas elimina deslocamento, dá acesso a horários exclusivos de parque em alguns casos e simplifica a logística com crianças pequenas. Hospedagem fora (na região de International Drive, por exemplo) custa menos e ainda fica a poucos minutos dos parques — funciona bem para quem prioriza orçamento e não se importa com um transfer curto todo dia."
+      },
+      {
+        "question": "Dá para conhecer Disney e Universal na mesma viagem?",
+        "answer": "Dá, mas exige planejamento de dias. Cada complexo (Disney tem 4 parques principais, Universal tem 3) pede pelo menos um dia por parque para não virar corrida. Uma viagem que cobre os dois com folga costuma precisar de 8 a 12 dias completos, incluindo pelo menos um dia de descanso sem parque no meio do roteiro."
+      },
+      {
+        "question": "Uma agência de viagens faz diferença para uma viagem a Orlando?",
+        "answer": "Faz, principalmente pela complexidade de coordenar visto, parques com sistemas de reserva próprios, hospedagem e voos ao mesmo tempo. Uma consultoria especializada acompanha o processo do início ao fim, ajusta o roteiro conforme a idade das crianças e o orçamento, e resolve imprevistos durante a viagem — o tipo de coisa que consome tempo e gera ansiedade quando feito sozinho pela primeira vez."
+      }
+    ],
+    "slug": "como-planejar-viagem-orlando-sob-medida",
+    "readingTime": "4 min de leitura"
+  },
+  {
+    "title": "Melhor Época para Viajar para Orlando: Guia por Perfil de Viajante",
+    "excerpt": "Não existe uma única melhor época para Orlando — existe a melhor época para o seu perfil de viagem. Veja como calor, multidão e preço mudam ao longo do ano.",
+    "date": "2026-07-10",
+    "author": "queila-oliveira",
+    "category": "Planejamento",
+    "image": "https://media.anhanga.tur.br/images/blog/melhor-epoca-viajar-orlando-guia-perfil-viajante.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Orlando",
+    "tags": [
+      "orlando",
+      "melhor-epoca",
+      "planejamento",
+      "disney",
+      "universal"
+    ],
+    "seoTitle": "Melhor Época para Viajar para Orlando",
+    "seoDescription": "Não existe uma única melhor época para Orlando. Veja como calor, movimento nos parques e preço de hospedagem mudam ao longo do ano e escolha o período certo.",
+    "faq": [
+      {
+        "question": "Qual a época mais barata para viajar para Orlando?",
+        "answer": "De forma geral, os períodos fora das férias escolares brasileiras e americanas (como partes de setembro a novembro, e janeiro a fevereiro fora do carnaval) tendem a ter hospedagem e passagens mais em conta, porque a demanda cai. Julho, dezembro e a época de spring break americano concentram alta demanda dos dois lados — brasileiro e americano — e costumam ser os períodos mais caros."
+      },
+      {
+        "question": "Orlando tem estação chuvosa?",
+        "answer": "Sim. A Flórida tem um padrão bem definido de chuvas de verão (aproximadamente junho a setembro), geralmente pancadas fortes no fim da tarde que passam rápido e não costumam comprometer o dia inteiro nos parques. Fora desse período, o clima tende a ser mais seco."
+      },
+      {
+        "question": "Vale a pena evitar a época de furacões na Flórida?",
+        "answer": "A temporada oficial de furacões no Atlântico vai de junho a novembro, com pico estatístico entre agosto e outubro. Isso não significa que toda viagem nesse período terá problema — a maioria das temporadas passa sem impacto direto em Orlando — mas quem viaja nessa janela deve considerar seguro viagem com cobertura de cancelamento e acompanhar a previsão perto da data."
+      },
+      {
+        "question": "Dezembro em Orlando vale o preço mais alto?",
+        "answer": "Para quem busca a decoração natalina dos parques e o clima de fim de ano, sim — é uma experiência que não se repete em nenhuma outra época. O trade-off é claro: parques mais cheios e hospedagem mais cara. Funciona melhor para quem prioriza a experiência temática e consegue reservar com bastante antecedência."
+      }
+    ],
+    "slug": "melhor-epoca-viajar-orlando-guia-perfil-viajante",
+    "readingTime": "3 min de leitura"
+  },
+  {
     "title": "Cancún, Punta Cana ou Aruba para Lua de Mel? Comparação Honesta",
     "excerpt": "Caribe para lua de mel parece fácil até você sentar pra pesquisar. Cancún, Punta Cana e Aruba atendem casais completamente diferentes. Veja qual faz sentido pra vocês.",
     "date": "2026-07-04",
