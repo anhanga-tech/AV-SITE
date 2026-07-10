@@ -16,6 +16,14 @@ export function isEdgeRuntime(): boolean {
     return Boolean(process.env.VERCEL_ENV || process.env.CF_PAGES);
 }
 
+// Cached by (url, token) so a warm isolate/process reuses the same client
+// instead of reconstructing it on every call, while still picking up a
+// credential rotation (or a test swapping env vars) instead of serving a
+// stale instance. On Cloudflare Workers this only helps requests that land on
+// an already-warm isolate — a fresh isolate still starts with no cache — but
+// costs nothing on the cold path either.
+let cachedClient: { url: string; token: string; instance: RedisClientLike } | null = null;
+
 export async function getRedisClient(): Promise<RedisClientLike | null> {
     const url = process.env.UPSTASH_REDIS_REST_URL;
     const token = process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -35,6 +43,10 @@ export async function getRedisClient(): Promise<RedisClientLike | null> {
         return null;
     }
 
+    if (cachedClient && cachedClient.url === url && cachedClient.token === token) {
+        return cachedClient.instance;
+    }
+
     try {
         // CF Workers do not support the `cache` field on fetch RequestInit.
         // The default entry point (`@upstash/redis`) passes `cache: 'no-store'`,
@@ -42,7 +54,9 @@ export async function getRedisClient(): Promise<RedisClientLike | null> {
         const mod = process.env.CF_PAGES
             ? await import('@upstash/redis/cloudflare')
             : await import('@upstash/redis');
-        return new mod.Redis({ url, token });
+        const instance = new mod.Redis({ url, token });
+        cachedClient = { url, token, instance };
+        return instance;
     } catch {
         logger.warn('RedisClient: @upstash/redis not available, using in-memory fallback');
         return null;
