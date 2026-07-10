@@ -9,7 +9,7 @@ import { NpsThankOther } from '../components/nps/NpsThankOther';
 import { Seo } from '../components/Seo';
 import { useAntiBot } from '../hooks/useAntiBot';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
-import { isFieldCompleteForAnalytics, isValidEmail, validateNpsFormFields, type NpsFormFieldErrors } from '../lib/form-v1-validation';
+import { isFieldCompleteForAnalytics, validateNpsFormFields, type NpsFormFieldErrors } from '../lib/form-v1-validation';
 
 type PageState = 'form' | 'thank-promoter' | 'thank-other';
 
@@ -66,14 +66,13 @@ const PAGE_STYLES = `
 
 export default function NpsPage() {
   const [params] = useSearchParams();
-  const initialFirstname = params.get('firstname')?.trim() ?? '';
-  const initialEmail = params.get('email')?.trim() ?? '';
-  const isInitialEmailValid = initialEmail ? isValidEmail(initialEmail) : false;
-  const needsIdentityFields = !initialFirstname || !isInitialEmailValid;
+  // Identity is bound server-side to the signed invitation token (issue
+  // #1137) — `firstname` here is display-only (the greeting) and never sent
+  // to the API; the token is the only thing that proves who is answering.
+  const firstname = params.get('firstname')?.trim() ?? '';
+  const token = params.get('token')?.trim() ?? '';
 
   const [score, setScore] = useState<number | null>(null);
-  const [firstname, setFirstname] = useState(initialFirstname);
-  const [email, setEmail] = useState(initialEmail);
   const [reason, setReason] = useState('');
   const [highlight, setHighlight] = useState('');
   const [pageState, setPageState] = useState<PageState>('form');
@@ -99,7 +98,7 @@ export default function NpsPage() {
     });
   }, []);
 
-  function markStarted(fieldName: 'firstname' | 'email' | 'score' | 'reason' | 'highlight', value: string | number | null = '') {
+  function markStarted(fieldName: 'score' | 'reason' | 'highlight', value: string | number | null = '') {
     if (!startedRef.current) {
       startedRef.current = true;
       pushFormAnalyticsEvent({
@@ -122,7 +121,7 @@ export default function NpsPage() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    const validation = validateNpsFormFields({ firstname, email, score });
+    const validation = validateNpsFormFields({ score });
     if (!validation.valid) {
       setFieldErrors(validation.errors);
       setErrorMessage('Confira os campos destacados para enviar sua avaliação.');
@@ -150,8 +149,7 @@ export default function NpsPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          firstname: validation.normalized.firstname,
-          email: validation.normalized.email,
+          token,
           score: validation.normalized.score,
           reason: reason.trim(),
           highlight: highlight.trim(),
@@ -211,7 +209,16 @@ export default function NpsPage() {
         <main className="flex-1 flex flex-col items-center px-6 pb-16 pt-8">
           <div className="w-full max-w-lg">
 
-            {pageState === 'form' && (
+            {!token && (
+              <div className="nps-thank-card text-center">
+                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3">Link inválido</h1>
+                <p className="text-base text-slate-400 leading-7">
+                  Este link de avaliação não é válido ou já expirou. Solicite um novo link à nossa equipe.
+                </p>
+              </div>
+            )}
+
+            {token && pageState === 'form' && (
               <form onSubmit={handleSubmit} noValidate>
                 {/* Honeypot: hidden from humans, blind form-fillers populate it. */}
                 <input {...honeypotProps} />
@@ -230,72 +237,6 @@ export default function NpsPage() {
                     markStarted('score', nextScore);
                   }}
                 />
-
-                {needsIdentityFields && (
-                  <div className="mb-8 grid gap-4 sm:grid-cols-2">
-                    {!initialFirstname && (
-                      <div>
-                        <label
-                          htmlFor="nps-firstname"
-                          className="block text-xs font-black uppercase tracking-[0.15em] text-slate-400 mb-2.5"
-                        >
-                          Seu nome
-                        </label>
-                        <input
-                          id="nps-firstname"
-                          type="text"
-                          value={firstname}
-                          onChange={(event) => {
-                            setFirstname(event.target.value);
-                            setFieldErrors((prev) => ({ ...prev, firstname: undefined }));
-                            markStarted('firstname', event.target.value);
-                          }}
-                          autoComplete="given-name"
-                          aria-invalid={fieldErrors.firstname ? true : undefined}
-                          aria-describedby={fieldErrors.firstname ? 'nps-firstname-error' : undefined}
-                          className="w-full rounded-xl px-4 py-3 text-sm font-sans bg-slate-800/60 text-slate-100 placeholder:text-slate-500 border-2 border-slate-600/40 outline-none focus:border-anhanga-action focus:shadow-[0_0_0_4px_rgba(14,165,233,0.15)]"
-                          placeholder="Como podemos te chamar?"
-                        />
-                        {fieldErrors.firstname && (
-                          <p id="nps-firstname-error" className="mt-1.5 text-xs font-semibold text-red-400" role="alert">
-                            {fieldErrors.firstname}
-                          </p>
-                        )}
-                      </div>
-                    )}
-
-                    {!isInitialEmailValid && (
-                      <div>
-                        <label
-                          htmlFor="nps-email"
-                          className="block text-xs font-black uppercase tracking-[0.15em] text-slate-400 mb-2.5"
-                        >
-                          Seu e-mail
-                        </label>
-                        <input
-                          id="nps-email"
-                          type="email"
-                          value={email}
-                          onChange={(event) => {
-                            setEmail(event.target.value);
-                            setFieldErrors((prev) => ({ ...prev, email: undefined }));
-                            markStarted('email', event.target.value);
-                          }}
-                          autoComplete="email"
-                          aria-invalid={fieldErrors.email ? true : undefined}
-                          aria-describedby={fieldErrors.email ? 'nps-email-error' : undefined}
-                          className="w-full rounded-xl px-4 py-3 text-sm font-sans bg-slate-800/60 text-slate-100 placeholder:text-slate-500 border-2 border-slate-600/40 outline-none focus:border-anhanga-action focus:shadow-[0_0_0_4px_rgba(14,165,233,0.15)]"
-                          placeholder="voce@email.com"
-                        />
-                        {fieldErrors.email && (
-                          <p id="nps-email-error" className="mt-1.5 text-xs font-semibold text-red-400" role="alert">
-                            {fieldErrors.email}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
 
                 {fieldErrors.score && (
                   <p className="mb-6 text-sm text-center rounded-xl px-4 py-3 text-red-400 bg-red-500/10 border border-red-500/20" role="alert">

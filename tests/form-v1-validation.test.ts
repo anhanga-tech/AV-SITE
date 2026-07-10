@@ -38,16 +38,18 @@ test('validateWaitlistFormFields blocks invalid email without requiring opt-in',
   assert.equal(valid.valid, true);
 });
 
-test('validateNpsFormFields requires missing URL identity fields locally', () => {
-  const result = validateNpsFormFields({
-    firstname: '',
-    email: '',
-    score: 10,
-  });
+test('validateNpsFormFields requires a chosen score', () => {
+  const result = validateNpsFormFields({ score: null });
 
   assert.equal(result.valid, false);
-  assert.equal(result.errors.firstname, 'Informe seu nome.');
-  assert.equal(result.errors.email, 'Informe seu e-mail.');
+  assert.equal(result.errors.score, 'Escolha uma nota.');
+});
+
+test('validateNpsFormFields accepts a chosen score', () => {
+  const result = validateNpsFormFields({ score: 10 });
+
+  assert.equal(result.valid, true);
+  if (result.valid) assert.equal(result.normalized.score, 10);
 });
 
 test('isFieldCompleteForAnalytics only completes contact fields when useful', () => {
