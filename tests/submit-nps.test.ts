@@ -2,12 +2,23 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import handler, { classifySubmitNpsError } from '../api/submit-nps.ts';
 import { createOdooMock, setOdooEnv, clearOdooEnv } from './odoo-mock.ts';
+import { createNpsInviteToken } from '../lib/nps-invite.ts';
 
 const originalFetch = global.fetch;
+const NPS_INVITE_SECRET = 'test-nps-invite-secret';
+
+function setNpsInviteEnv() {
+    process.env.NPS_INVITE_SECRET = NPS_INVITE_SECRET;
+}
+
+function clearNpsInviteEnv() {
+    delete process.env.NPS_INVITE_SECRET;
+}
 
 function restore() {
     global.fetch = originalFetch;
     clearOdooEnv();
+    clearNpsInviteEnv();
 }
 
 function buildRequest(
@@ -28,10 +39,20 @@ function buildRequest(
     });
 }
 
-function validBody(overrides?: Record<string, unknown>) {
+async function buildToken(overrides?: { email?: string; firstname?: string; expiresInMs?: number }): Promise<string> {
+    return createNpsInviteToken(
+        {
+            email: overrides?.email ?? 'maria@example.com',
+            firstname: overrides?.firstname ?? 'Maria',
+            expiresInMs: overrides?.expiresInMs,
+        },
+        NPS_INVITE_SECRET,
+    );
+}
+
+async function validBody(overrides?: Record<string, unknown>) {
     return {
-        firstname: 'Maria',
-        email: 'maria@example.com',
+        token: await buildToken(),
         score: 9,
         reason: 'Atendimento excelente e viagem perfeita.',
         highlight: 'A visita às Cataratas do Iguaçu.',
@@ -44,11 +65,12 @@ function validBody(overrides?: Record<string, unknown>) {
 test('submit-nps returns 500 SERVER_CONFIG_ERROR when Odoo config is missing', async (t) => {
     t.after(restore);
     clearOdooEnv();
+    setNpsInviteEnv();
 
     let fetchCalled = false;
     global.fetch = (async () => { fetchCalled = true; throw new Error('should not run'); }) as typeof fetch;
 
-    const response = await handler(buildRequest(validBody()));
+    const response = await handler(buildRequest(await validBody()));
     const body = await response.json() as Record<string, unknown>;
 
     assert.equal(fetchCalled, false);
@@ -85,6 +107,7 @@ test('submit-nps returns 204 for OPTIONS preflight', async (t) => {
 test('submit-nps returns 400 VALIDATION_ERROR for malformed JSON body', async (t) => {
     t.after(restore);
     setOdooEnv();
+    setNpsInviteEnv();
     global.fetch = createOdooMock().fetch;
 
     const response = await handler(buildRequest('{ not valid json', { headers: { 'x-real-ip': '127.0.0.1' } }));
@@ -95,51 +118,30 @@ test('submit-nps returns 400 VALIDATION_ERROR for malformed JSON body', async (t
     assert.equal(body.code, 'VALIDATION_ERROR');
 });
 
-// ─── Validation errors ───────────────────────────────────────────────────────
+// ─── Score/reason/highlight validation ──────────────────────────────────────
 
-test('submit-nps returns 400 for missing firstname', async (t) => {
+test('submit-nps returns 400 for missing token', async (t) => {
     t.after(restore);
     setOdooEnv();
+    setNpsInviteEnv();
     global.fetch = createOdooMock().fetch;
 
-    const response = await handler(buildRequest(validBody({ firstname: '' })));
-    const body = await response.json() as Record<string, unknown>;
+    const body = await validBody();
+    const { token: _t, ...withoutToken } = body;
+    const response = await handler(buildRequest(withoutToken));
+    const json = await response.json() as Record<string, unknown>;
 
     assert.equal(response.status, 400);
-    assert.equal(body.ok, false);
-    assert.equal(body.code, 'VALIDATION_ERROR');
-});
-
-test('submit-nps returns 400 for firstname over 100 characters', async (t) => {
-    t.after(restore);
-    setOdooEnv();
-    global.fetch = createOdooMock().fetch;
-
-    const response = await handler(buildRequest(validBody({ firstname: 'A'.repeat(101) })));
-    const body = await response.json() as Record<string, unknown>;
-
-    assert.equal(response.status, 400);
-    assert.equal(body.code, 'VALIDATION_ERROR');
-});
-
-test('submit-nps returns 400 for invalid email', async (t) => {
-    t.after(restore);
-    setOdooEnv();
-    global.fetch = createOdooMock().fetch;
-
-    const response = await handler(buildRequest(validBody({ email: 'not-an-email' })));
-    const body = await response.json() as Record<string, unknown>;
-
-    assert.equal(response.status, 400);
-    assert.equal(body.code, 'VALIDATION_ERROR');
+    assert.equal(json.code, 'VALIDATION_ERROR');
 });
 
 test('submit-nps returns 400 for score below 0', async (t) => {
     t.after(restore);
     setOdooEnv();
+    setNpsInviteEnv();
     global.fetch = createOdooMock().fetch;
 
-    const response = await handler(buildRequest(validBody({ score: -1 })));
+    const response = await handler(buildRequest(await validBody({ score: -1 })));
     const body = await response.json() as Record<string, unknown>;
 
     assert.equal(response.status, 400);
@@ -149,9 +151,10 @@ test('submit-nps returns 400 for score below 0', async (t) => {
 test('submit-nps returns 400 for score above 10', async (t) => {
     t.after(restore);
     setOdooEnv();
+    setNpsInviteEnv();
     global.fetch = createOdooMock().fetch;
 
-    const response = await handler(buildRequest(validBody({ score: 11 })));
+    const response = await handler(buildRequest(await validBody({ score: 11 })));
     const body = await response.json() as Record<string, unknown>;
 
     assert.equal(response.status, 400);
@@ -161,9 +164,10 @@ test('submit-nps returns 400 for score above 10', async (t) => {
 test('submit-nps returns 400 for non-integer score', async (t) => {
     t.after(restore);
     setOdooEnv();
+    setNpsInviteEnv();
     global.fetch = createOdooMock().fetch;
 
-    const response = await handler(buildRequest(validBody({ score: 7.5 })));
+    const response = await handler(buildRequest(await validBody({ score: 7.5 })));
     const body = await response.json() as Record<string, unknown>;
 
     assert.equal(response.status, 400);
@@ -173,9 +177,10 @@ test('submit-nps returns 400 for non-integer score', async (t) => {
 test('submit-nps returns 400 for non-numeric score', async (t) => {
     t.after(restore);
     setOdooEnv();
+    setNpsInviteEnv();
     global.fetch = createOdooMock().fetch;
 
-    const response = await handler(buildRequest(validBody({ score: '9' })));
+    const response = await handler(buildRequest(await validBody({ score: '9' })));
     const body = await response.json() as Record<string, unknown>;
 
     assert.equal(response.status, 400);
@@ -185,19 +190,21 @@ test('submit-nps returns 400 for non-numeric score', async (t) => {
 test('submit-nps accepts empty reason', async (t) => {
     t.after(restore);
     setOdooEnv();
+    setNpsInviteEnv();
     global.fetch = createOdooMock().fetch;
 
-    const response = await handler(buildRequest(validBody({ reason: '' })));
+    const response = await handler(buildRequest(await validBody({ reason: '' })));
     assert.equal(response.status, 201);
 });
 
 test('submit-nps writes a clean comment when reason is empty', async (t) => {
     t.after(restore);
     setOdooEnv();
+    setNpsInviteEnv();
     const mock = createOdooMock();
     global.fetch = mock.fetch;
 
-    const response = await handler(buildRequest(validBody({ reason: '', highlight: '' })));
+    const response = await handler(buildRequest(await validBody({ reason: '', highlight: '' })));
     assert.equal(response.status, 201);
 
     const partner = mock.partnerFields()!;
@@ -208,9 +215,10 @@ test('submit-nps writes a clean comment when reason is empty', async (t) => {
 test('submit-nps returns 400 for reason over 2000 characters', async (t) => {
     t.after(restore);
     setOdooEnv();
+    setNpsInviteEnv();
     global.fetch = createOdooMock().fetch;
 
-    const response = await handler(buildRequest(validBody({ reason: 'x'.repeat(2001) })));
+    const response = await handler(buildRequest(await validBody({ reason: 'x'.repeat(2001) })));
     const body = await response.json() as Record<string, unknown>;
 
     assert.equal(response.status, 400);
@@ -220,9 +228,118 @@ test('submit-nps returns 400 for reason over 2000 characters', async (t) => {
 test('submit-nps returns 400 for highlight over 2000 characters', async (t) => {
     t.after(restore);
     setOdooEnv();
+    setNpsInviteEnv();
     global.fetch = createOdooMock().fetch;
 
-    const response = await handler(buildRequest(validBody({ highlight: 'x'.repeat(2001) })));
+    const response = await handler(buildRequest(await validBody({ highlight: 'x'.repeat(2001) })));
+    const body = await response.json() as Record<string, unknown>;
+
+    assert.equal(response.status, 400);
+    assert.equal(body.code, 'VALIDATION_ERROR');
+});
+
+// ─── Signed invitation (issue #1137) ─────────────────────────────────────────
+
+test('submit-nps returns 500 when NPS_INVITE_SECRET is not configured', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    clearNpsInviteEnv();
+    global.fetch = createOdooMock().fetch;
+
+    // Token is built with some secret, but the server has none configured.
+    const token = await createNpsInviteToken({ email: 'maria@example.com', firstname: 'Maria' }, 'any-secret');
+    const response = await handler(buildRequest({ token, score: 9, reason: '', highlight: '' }));
+    const body = await response.json() as Record<string, unknown>;
+
+    assert.equal(response.status, 500);
+    assert.equal(body.code, 'SERVER_CONFIG_ERROR');
+});
+
+test('submit-nps rejects a token signed with the wrong secret (tampered/forged)', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    setNpsInviteEnv();
+    global.fetch = createOdooMock().fetch;
+
+    const token = await createNpsInviteToken({ email: 'maria@example.com', firstname: 'Maria' }, 'wrong-secret');
+    const response = await handler(buildRequest({ token, score: 9, reason: '', highlight: '' }));
+    const body = await response.json() as Record<string, unknown>;
+
+    assert.equal(response.status, 400);
+    assert.equal(body.code, 'VALIDATION_ERROR');
+});
+
+test('submit-nps rejects a malformed token', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    setNpsInviteEnv();
+    global.fetch = createOdooMock().fetch;
+
+    const response = await handler(buildRequest({ token: 'not-a-real-token', score: 9, reason: '', highlight: '' }));
+    const body = await response.json() as Record<string, unknown>;
+
+    assert.equal(response.status, 400);
+    assert.equal(body.code, 'VALIDATION_ERROR');
+});
+
+test('submit-nps rejects an expired token', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    setNpsInviteEnv();
+    global.fetch = createOdooMock().fetch;
+
+    const token = await buildToken({ expiresInMs: -1000 });
+    const response = await handler(buildRequest({ token, score: 9, reason: '', highlight: '' }));
+    const body = await response.json() as Record<string, unknown>;
+
+    assert.equal(response.status, 400);
+    assert.equal(body.code, 'VALIDATION_ERROR');
+});
+
+test('submit-nps rejects a replayed token (already used)', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    setNpsInviteEnv();
+    global.fetch = createOdooMock().fetch;
+
+    const body = await validBody();
+    const first = await handler(buildRequest(body));
+    assert.equal(first.status, 201, 'first submission with a fresh token should succeed');
+
+    const second = await handler(buildRequest(body));
+    const secondBody = await second.json() as Record<string, unknown>;
+    assert.equal(second.status, 400, 'the same token must not be usable twice');
+    assert.equal(secondBody.code, 'VALIDATION_ERROR');
+});
+
+test('submit-nps derives firstname/email from the token, not from the request body', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    setNpsInviteEnv();
+    const mock = createOdooMock();
+    global.fetch = mock.fetch;
+
+    const token = await buildToken({ email: 'real-customer@example.com', firstname: 'Cliente Real' });
+    // Even if a client tried to smuggle a different identity in the body, the
+    // schema no longer accepts firstname/email fields at all — there is
+    // nothing to smuggle them through.
+    const response = await handler(buildRequest({ token, score: 9, reason: '', highlight: '', email: 'attacker@evil.com' }));
+    assert.equal(response.status, 201);
+
+    const partner = mock.partnerFields()!;
+    assert.equal(partner.email, 'real-customer@example.com');
+    assert.equal(partner.name, 'Cliente Real');
+});
+
+test('submit-nps rejects a token whose firstname exceeds 100 chars after escaping', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    setNpsInviteEnv();
+    global.fetch = createOdooMock().fetch;
+
+    // 40 "<" chars → 160 chars after cleanString escapes each to "&lt;".
+    const token = await buildToken({ firstname: '<'.repeat(40) });
+    const response = await handler(buildRequest({ token, score: 9, reason: '', highlight: '' }));
     const body = await response.json() as Record<string, unknown>;
 
     assert.equal(response.status, 400);
@@ -234,9 +351,10 @@ test('submit-nps returns 400 for highlight over 2000 characters', async (t) => {
 test('submit-nps creates a res.partner with x_nps_score and NO crm.lead when no match exists', async (t) => {
     t.after(restore);
     setOdooEnv();
+    setNpsInviteEnv();
     global.fetch = createOdooMock({ newPartnerId: 909 }).fetch;
 
-    const response = await handler(buildRequest(validBody()));
+    const response = await handler(buildRequest(await validBody()));
     const body = await response.json() as Record<string, unknown>;
 
     assert.equal(response.status, 201);
@@ -248,27 +366,30 @@ test('submit-nps creates a res.partner with x_nps_score and NO crm.lead when no 
 test('submit-nps accepts score 0 (boundary)', async (t) => {
     t.after(restore);
     setOdooEnv();
+    setNpsInviteEnv();
     global.fetch = createOdooMock().fetch;
 
-    const response = await handler(buildRequest(validBody({ score: 0 })));
+    const response = await handler(buildRequest(await validBody({ score: 0 })));
     assert.equal(response.status, 201);
 });
 
 test('submit-nps accepts score 10 (boundary)', async (t) => {
     t.after(restore);
     setOdooEnv();
+    setNpsInviteEnv();
     global.fetch = createOdooMock().fetch;
 
-    const response = await handler(buildRequest(validBody({ score: 10 })));
+    const response = await handler(buildRequest(await validBody({ score: 10 })));
     assert.equal(response.status, 201);
 });
 
 test('submit-nps accepts empty highlight (optional field)', async (t) => {
     t.after(restore);
     setOdooEnv();
+    setNpsInviteEnv();
     global.fetch = createOdooMock().fetch;
 
-    const response = await handler(buildRequest(validBody({ highlight: '' })));
+    const response = await handler(buildRequest(await validBody({ highlight: '' })));
     assert.equal(response.status, 201);
 });
 
@@ -277,10 +398,11 @@ test('submit-nps accepts empty highlight (optional field)', async (t) => {
 test('submit-nps writes x_nps_score and a comment with reason/highlight on the partner', async (t) => {
     t.after(restore);
     setOdooEnv();
+    setNpsInviteEnv();
     const mock = createOdooMock();
     global.fetch = mock.fetch;
 
-    const response = await handler(buildRequest(validBody()));
+    const response = await handler(buildRequest(await validBody()));
     assert.equal(response.status, 201);
 
     assert.equal(mock.createdLead(), false, 'NPS is post-sale — no opportunity is created');
@@ -294,14 +416,17 @@ test('submit-nps writes x_nps_score and a comment with reason/highlight on the p
 test('submit-nps escapes angle brackets from free text before writing the partner comment', async (t) => {
     t.after(restore);
     setOdooEnv();
+    setNpsInviteEnv();
     const mock = createOdooMock();
     global.fetch = mock.fetch;
 
-    const response = await handler(buildRequest(validBody({
-        firstname: 'Ana <b>',
+    const token = await buildToken({ firstname: 'Ana <b>' });
+    const response = await handler(buildRequest({
+        token,
+        score: 9,
         reason: '<script>alert(1)</script>',
         highlight: '<img src=x onerror=alert(2)>',
-    })));
+    }));
     assert.equal(response.status, 201);
 
     const partner = mock.partnerFields()!;
@@ -316,10 +441,12 @@ test('submit-nps escapes angle brackets from free text before writing the partne
 test('submit-nps does NOT overwrite the full name of an existing partner (firstname-only form)', async (t) => {
     t.after(restore);
     setOdooEnv();
+    setNpsInviteEnv();
     const mock = createOdooMock({ existingPartnerId: 506 });
     global.fetch = mock.fetch;
 
-    const response = await handler(buildRequest(validBody({ firstname: 'Ana' })));
+    const token = await buildToken({ firstname: 'Ana' });
+    const response = await handler(buildRequest({ token, score: 9, reason: '', highlight: '' }));
     assert.equal(response.status, 201);
 
     const writeCall = mock.calls.find((c) => c.model === 'res.partner' && c.method === 'write');
@@ -332,10 +459,12 @@ test('submit-nps does NOT overwrite the full name of an existing partner (firstn
 test('submit-nps sets name on create when no existing partner matches', async (t) => {
     t.after(restore);
     setOdooEnv();
+    setNpsInviteEnv();
     const mock = createOdooMock({ existingPartnerId: null });
     global.fetch = mock.fetch;
 
-    const response = await handler(buildRequest(validBody({ firstname: 'Ana' })));
+    const token = await buildToken({ firstname: 'Ana' });
+    const response = await handler(buildRequest({ token, score: 9, reason: '', highlight: '' }));
     assert.equal(response.status, 201);
 
     const createCall = mock.calls.find((c) => c.model === 'res.partner' && c.method === 'create');
@@ -349,9 +478,10 @@ test('submit-nps sets name on create when no existing partner matches', async (t
 test('submit-nps returns 502 ODOO_ERROR when upstream returns non-2xx', async (t) => {
     t.after(restore);
     setOdooEnv();
+    setNpsInviteEnv();
     global.fetch = createOdooMock({ failStatus: 503 }).fetch;
 
-    const response = await handler(buildRequest(validBody()));
+    const response = await handler(buildRequest(await validBody()));
     const body = await response.json() as Record<string, unknown>;
 
     assert.equal(response.status, 502);
@@ -371,25 +501,26 @@ test('classifySubmitNpsError preserves unexpected internal failures', () => {
 test('submit-nps enforces rate limit after 3 requests from the same IP', async (t) => {
     t.after(restore);
     setOdooEnv();
+    setNpsInviteEnv();
     global.fetch = createOdooMock().fetch;
 
     const uniqueIp = `10.${Math.floor(Math.random() * 254) + 1}.${Math.floor(Math.random() * 254) + 1}.1`;
 
-    function buildRateLimitRequest() {
+    async function buildRateLimitRequest() {
         return new Request('http://localhost/api/submit-nps', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'x-real-ip': uniqueIp,
             },
-            body: JSON.stringify(validBody()),
+            body: JSON.stringify(await validBody()),
         });
     }
 
-    const r1 = await handler(buildRateLimitRequest());
-    const r2 = await handler(buildRateLimitRequest());
-    const r3 = await handler(buildRateLimitRequest());
-    const r4 = await handler(buildRateLimitRequest());
+    const r1 = await handler(await buildRateLimitRequest());
+    const r2 = await handler(await buildRateLimitRequest());
+    const r3 = await handler(await buildRateLimitRequest());
+    const r4 = await handler(await buildRateLimitRequest());
 
     assert.equal(r1.status, 201, 'first request should succeed');
     assert.equal(r2.status, 201, 'second request should succeed');
@@ -406,28 +537,29 @@ test('submit-nps enforces rate limit after 3 requests from the same IP', async (
 test('submit-nps enforces rate-limit even for invalid payloads (DoS protection)', async (t) => {
     t.after(restore);
     setOdooEnv();
+    setNpsInviteEnv();
     global.fetch = createOdooMock().fetch;
 
     const uniqueIp = `10.${Math.floor(Math.random() * 254) + 1}.${Math.floor(Math.random() * 254) + 1}.4`;
 
-    function buildFixedRequest(body: unknown, valid: boolean) {
+    async function buildFixedRequest(body: unknown, valid: boolean) {
         return new Request('http://localhost/api/submit-nps', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'x-real-ip': uniqueIp,
             },
-            body: JSON.stringify(valid ? validBody() : body),
+            body: JSON.stringify(valid ? await validBody() : body),
         });
     }
 
     // 3 invalid requests should consume the bucket (limit is 3)
     for (let i = 0; i < 3; i++) {
-        const r = await handler(buildFixedRequest({ score: 'not-a-number' }, false));
+        const r = await handler(await buildFixedRequest({ score: 'not-a-number' }, false));
         assert.equal(r.status, 400);
     }
 
     // 4th request should be rate limited, even if it would be valid
-    const limitResponse = await handler(buildFixedRequest(null, true));
+    const limitResponse = await handler(await buildFixedRequest(null, true));
     assert.equal(limitResponse.status, 429, 'should be rate limited after 3 invalid attempts');
 });

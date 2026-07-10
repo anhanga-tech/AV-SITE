@@ -12,8 +12,9 @@ import {
     createSubmitHandler,
     type ClassifyN8nErrorOptions,
     type CreateSubmitHandlerOptions,
+    type DispatchConfigCheck,
     type N8nErrorClassification,
-    type ValidationResult,
+    type MaybeAsyncValidationResult,
 } from './n8n-submit-handler';
 import { buildLeadFields, buildPartnerFields, type OdooLeadInput } from './odoo-lead-mapping';
 import { getOdooConfig, openOdooSession } from '../services/odoo';
@@ -30,7 +31,7 @@ export interface CreateOdooSubmitHandlerOptions<TData> {
     rateLimit: CreateSubmitHandlerOptions<TData, OdooLeadInput>['rateLimit'];
     parse: { invalidJsonError: string };
     methodNotAllowedError: string;
-    validate: (rawBody: unknown) => ValidationResult<TData>;
+    validate: (rawBody: unknown) => MaybeAsyncValidationResult<TData>;
     /** Per-form adapter: validated data → normalized Odoo input. */
     buildInput: (data: TData) => OdooLeadInput;
     success: { status: number; message?: string };
@@ -38,6 +39,12 @@ export interface CreateOdooSubmitHandlerOptions<TData> {
     error: Omit<ClassifyN8nErrorOptions, 'errorPattern'>;
     /** Client-facing message + status when Odoo env config is missing. */
     config?: { missingStatus?: number; missingError?: string };
+    /**
+     * Extra provider-agnostic config check run after the Odoo config check
+     * (e.g. a form-specific signing secret like NPS_INVITE_SECRET). Reuses
+     * the same SERVER_CONFIG_ERROR response shape instead of a parallel path.
+     */
+    checkExtraConfig?: () => DispatchConfigCheck;
     onValidated?: (data: TData, requestId: string) => Record<string, unknown> | void;
     onError?: (params: { data: TData; requestId: string; classification: N8nErrorClassification }) => Record<string, unknown> | void;
 }
@@ -90,14 +97,16 @@ export function createOdooSubmitHandler<TData>(
         onValidated: options.onValidated,
         onError: options.onError,
         dispatch: {
-            checkConfig: () =>
-                getOdooConfig()
-                    ? { ok: true }
-                    : {
+            checkConfig: () => {
+                if (!getOdooConfig()) {
+                    return {
                         ok: false,
                         status: options.config?.missingStatus ?? ODOO_CONFIG_MISSING_STATUS,
                         error: options.config?.missingError ?? ODOO_CONFIG_MISSING_ERROR,
-                    },
+                    };
+                }
+                return options.checkExtraConfig?.() ?? { ok: true };
+            },
             buildPayload: (data) => options.buildInput(data),
             send: (_requestId, input) => sendToOdoo(input),
             classifyError: (error) => classifyN8nSubmitError(error, errorOptions),

@@ -105,6 +105,9 @@ export type ValidationResult<TData> =
     | { ok: true; data: TData }
     | { ok: false; error: string };
 
+/** Per-form validators may be async (e.g. NPS signed-invitation verification). */
+export type MaybeAsyncValidationResult<TData> = ValidationResult<TData> | Promise<ValidationResult<TData>>;
+
 /** Result of a per-request provider config check. */
 export type DispatchConfigCheck =
     | { ok: true }
@@ -148,7 +151,7 @@ export interface CreateSubmitHandlerOptions<TData, TPayload = unknown> {
     /** Client-facing message for the 405 method gate. */
     methodNotAllowedError: string;
     /** Validates and normalizes the raw body into the typed payload data. */
-    validate: (rawBody: unknown) => ValidationResult<TData>;
+    validate: (rawBody: unknown) => MaybeAsyncValidationResult<TData>;
     /** Provider plug-in (n8n or Odoo). */
     dispatch: SubmitDispatch<TData, TPayload>;
     success: {
@@ -315,7 +318,7 @@ export function createSubmitHandler<TData, TPayload = unknown>(
             );
         }
 
-        const validation = options.validate(rawBody);
+        const validation = await options.validate(rawBody);
         if (!validation.ok) {
             return buildJsonResponse(
                 { ok: false, requestId, code: 'VALIDATION_ERROR', error: validation.error },
