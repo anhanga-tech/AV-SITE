@@ -1,4 +1,5 @@
 import { logger } from './logger';
+import { getRedisClient, isEdgeRuntime } from './redis-client';
 
 export interface RateLimitResult {
   allowed: boolean;
@@ -13,58 +14,12 @@ interface RateLimitEntry {
   resetTime: number;
 }
 
-interface RedisLike {
-  pipeline(): { incr(key: string): void; ttl(key: string): void; exec(): Promise<unknown[]> };
-  expire(key: string, seconds: number): Promise<unknown>;
-}
-
 // On Vercel Edge Runtime, each request runs in an isolated V8 context.
 // Module-level state does NOT persist across concurrent requests, making
 // this Map non-functional as a shared rate limiter without Redis.
 // It is kept only as a local-dev convenience (single-process, single-isolate).
 const inMemoryStore = new Map<string, RateLimitEntry>();
 const IN_MEMORY_MAX_ENTRIES = 2500;
-
-// True when running inside a managed serverless edge runtime where module-level
-// state resets per request. Both Vercel (VERCEL_ENV) and Cloudflare Pages
-// (CF_PAGES) are detected; local development has neither variable set.
-// Implemented as a function so tests can control env vars at call time.
-function isEdgeRuntime(): boolean {
-  return Boolean(process.env.VERCEL_ENV || process.env.CF_PAGES);
-}
-
-async function getRedisClient(): Promise<RedisLike | null> {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-
-  if (!url || !token) {
-    if (isEdgeRuntime()) {
-      // Each serverless edge invocation (Vercel or Cloudflare) gets a fresh V8
-      // isolate — the in-memory Map above resets on every request and provides
-      // no real protection. Configure Upstash Redis to enable shared rate
-      // limiting across all edge instances.
-      logger.error(
-        'RateLimit: Upstash Redis not configured. ' +
-        'In-memory fallback is non-functional on edge runtimes (isolated V8 contexts per request). ' +
-        'Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in your environment variables.'
-      );
-    }
-    return null;
-  }
-
-  try {
-    // CF Workers do not support the `cache` field on fetch RequestInit.
-    // The default entry point (`@upstash/redis`) passes `cache: 'no-store'`,
-    // which throws at runtime. The `/cloudflare` entry omits it.
-    const mod = process.env.CF_PAGES
-      ? await import('@upstash/redis/cloudflare')
-      : await import('@upstash/redis');
-    return new mod.Redis({ url, token });
-  } catch {
-    logger.warn('RateLimit: @upstash/redis not available, using in-memory fallback');
-    return null;
-  }
-}
 
 /**
  * Shared rate limiter that uses Upstash Redis if configured,

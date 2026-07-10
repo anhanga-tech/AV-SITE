@@ -40,6 +40,8 @@ export interface OdooMockOptions {
     existingFields?: Record<string, unknown>;
     newPartnerId?: number;
     leadId?: number;
+    /** crm.lead search_read (idempotency lookup) result: id of an already-created lead, or null/absent for none. */
+    existingLeadId?: number | null;
     /** utm.campaign search_read result: id of an existing campaign, or null/absent for none (default: none). */
     existingCampaignId?: number | null;
     /** id returned by utm.campaign.create when no existing campaign matches. */
@@ -84,12 +86,16 @@ interface SearchReadDefaults {
     existingComment: string | false;
     existingFields: Record<string, unknown>;
     existingCampaignId: number | null;
+    existingLeadId: number | null;
 }
 
-/** `search_read` result per model: dedup row for res.partner, find-or-create lookup for utm.campaign. */
+/** `search_read` result per model: dedup row for res.partner, find-or-create lookup for utm.campaign/crm.lead. */
 function searchReadResult(model: string, d: SearchReadDefaults): unknown[] {
     if (model === 'utm.campaign') {
         return d.existingCampaignId ? [{ id: d.existingCampaignId }] : [];
+    }
+    if (model === 'crm.lead') {
+        return d.existingLeadId ? [{ id: d.existingLeadId }] : [];
     }
     return d.existingPartnerId ? [{ id: d.existingPartnerId, comment: d.existingComment, ...d.existingFields }] : [];
 }
@@ -129,6 +135,7 @@ export function createOdooMock(options: OdooMockOptions = {}): OdooMock {
         existingFields = {},
         newPartnerId = 101,
         leadId = 555,
+        existingLeadId = null,
         existingCampaignId = null,
         newCampaignId = 900,
         campaignCreateShouldFail = false,
@@ -138,10 +145,12 @@ export function createOdooMock(options: OdooMockOptions = {}): OdooMock {
     } = options;
 
     const calls: OdooExecuteCall[] = [];
-    // Stateful: once utm.campaign.create succeeds, subsequent search_read calls
-    // for that model must find it (mirrors real Odoo, and resolveCampaignId now
-    // always re-queries after create to converge on a canonical row).
+    // Stateful: once utm.campaign.create/crm.lead.create succeeds, subsequent
+    // search_read calls for that model must find it (mirrors real Odoo, and
+    // both resolveCampaignId and the createLead idempotency lookup re-query
+    // to converge on the same row).
     let campaignId = existingCampaignId;
+    let leadIdState = existingLeadId;
 
     const fetchMock = (async (_input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
         if (hang) return new Promise<Response>(() => {});
@@ -165,11 +174,18 @@ export function createOdooMock(options: OdooMockOptions = {}): OdooMock {
             return jsonRpcError('duplicate key value violates unique constraint "utm_campaign_name_uniq"');
         }
         if (ormMethod === 'search_read') {
-            return jsonRpcResponse(searchReadResult(model, { existingPartnerId, existingComment, existingFields, existingCampaignId: campaignId }));
+            return jsonRpcResponse(searchReadResult(model, {
+                existingPartnerId,
+                existingComment,
+                existingFields,
+                existingCampaignId: campaignId,
+                existingLeadId: leadIdState,
+            }));
         }
         if (ormMethod === 'create') {
             const result = createResult(model, { leadId, newPartnerId, newCampaignId });
             if (model === 'utm.campaign') campaignId = newCampaignId;
+            if (model === 'crm.lead') leadIdState = leadId;
             return jsonRpcResponse(result);
         }
         if (ormMethod === 'write') return jsonRpcResponse(true);

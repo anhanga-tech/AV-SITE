@@ -166,6 +166,95 @@ test('createLead — issues a crm.lead.create and returns the id', async (t) => 
     assert.ok(mock.createdLead());
 });
 
+// --- createLead idempotency (issue #1136) -----------------------------------
+
+test('createLead — without an idempotency key, always creates (unchanged legacy behavior)', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    const mock = createOdooMock({ leadId: 111 });
+    global.fetch = mock.fetch;
+
+    const session = await openOdooSession(config());
+    const id = await session.createLead({ name: 'Lead' });
+
+    assert.equal(id, 111);
+    assert.equal(mock.calls.some((c) => c.model === 'crm.lead' && c.method === 'search_read'), false);
+});
+
+test('createLead — sequential replay with the same idempotency key returns the already-created lead', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    const mock = createOdooMock({ existingLeadId: 321 });
+    global.fetch = mock.fetch;
+
+    const session = await openOdooSession(config());
+    const id = await session.createLead({ name: 'Lead' }, 'evt-sequential-replay');
+
+    assert.equal(id, 321);
+    assert.equal(mock.createdLead(), false, 'must not create a duplicate crm.lead when one already matches the key');
+});
+
+test('createLead — a client-timeout replay (Odoo committed, response was lost) converges on the first id', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    const mock = createOdooMock({ existingLeadId: null, leadId: 909 });
+    global.fetch = mock.fetch;
+
+    const session = await openOdooSession(config());
+    // First call: the client's real submission — Odoo commits successfully.
+    const firstId = await session.createLead({ name: 'Lead' }, 'evt-timeout-replay');
+    // Second call: the client never saw that response (perceived timeout) and
+    // retries with the same event_id.
+    const secondId = await session.createLead({ name: 'Lead' }, 'evt-timeout-replay');
+
+    assert.equal(firstId, 909);
+    assert.equal(secondId, 909);
+    const createCalls = mock.calls.filter((c) => c.model === 'crm.lead' && c.method === 'create');
+    assert.equal(createCalls.length, 1, 'only the first call should create a crm.lead');
+});
+
+test('createLead — two concurrent requests with the same idempotency key create only one crm.lead', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    const mock = createOdooMock({ existingLeadId: null, leadId: 4242 });
+    global.fetch = mock.fetch;
+
+    const session = await openOdooSession(config());
+    const [id1, id2] = await Promise.all([
+        session.createLead({ name: 'Lead' }, 'evt-concurrent'),
+        session.createLead({ name: 'Lead' }, 'evt-concurrent'),
+    ]);
+
+    assert.equal(id1, 4242);
+    assert.equal(id2, 4242);
+    const createCalls = mock.calls.filter((c) => c.model === 'crm.lead' && c.method === 'create');
+    assert.equal(createCalls.length, 1, 'concurrent requests for the same key must not both create a lead');
+});
+
+test('createLead — different idempotency keys never merge into the same lead', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+
+    let nextLeadId = 1000;
+    global.fetch = (async (_input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+        const body = JSON.parse(String(init?.body ?? '{}')) as { params: { service: string; method: string; args: unknown[] } };
+        const { service, method, args } = body.params;
+        if (service === 'common' && method === 'authenticate') {
+            return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: 7 }), { status: 200 });
+        }
+        const ormMethod = args[4] as string;
+        if (ormMethod === 'search_read') {
+            return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: [] }), { status: 200 });
+        }
+        if (ormMethod === 'create') {
+            nextLeadId += 1;
+            return new Response(JSON.stringify({ jsonrpc: '2.0', id: 1, result: nextLeadId }), { status: 200 });
+        }
+        throw new Error(`unexpected ORM call: ${ormMethod}`);
+    }) as typeof fetch;
+
+    const session = await openOdooSession(config());
+    const idA = await session.createLead({ name: 'Lead A' }, 'evt-trip-a');
+    const idB = await session.createLead({ name: 'Lead B' }, 'evt-trip-b');
+
+    assert.notEqual(idA, idB, 'two genuinely distinct trip requests from the same customer must not be merged');
+});
+
 test('resolveCampaignId — returns the existing utm.campaign id when the name matches', async (t) => {
     t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
     const mock = createOdooMock({ existingCampaignId: 42 });

@@ -149,7 +149,13 @@ export function buildPartnerFields(input: OdooLeadInput): Record<string, unknown
     return fields;
 }
 
-function buildDescriptionHtml(input: OdooLeadInput): string {
+// Odoo has no dedicated idempotency field on crm.lead (issue #1136), so the
+// resolved key is written as a description line and re-queried via a `like`
+// domain before create. Exported so services/odoo.ts builds the exact same
+// search marker it was written with.
+export const IDEMPOTENCY_KEY_LABEL = 'idempotency_key';
+
+function buildDescriptionHtml(input: OdooLeadInput, idempotencyKey?: string): string {
     // Values arrive already sanitized (cleanString/normalizeNullable escape `<`/`>`
     // at validation), so they are inserted as-is — re-escaping would double-encode.
     const items: string[] = [];
@@ -175,7 +181,7 @@ function buildDescriptionHtml(input: OdooLeadInput): string {
     // crm.lead.campaign_id (utm.campaign) upstream in odoo-submit-handler.ts.
     push('utm_term', input.utms.utm_term);
     push('utm_content', input.utms.utm_content);
-    push('event_id', input.eventId);
+    push(IDEMPOTENCY_KEY_LABEL, idempotencyKey);
 
     return items.length > 0 ? `<ul>${items.join('')}</ul>` : '';
 }
@@ -186,7 +192,7 @@ function buildDescriptionHtml(input: OdooLeadInput): string {
  * structured `x_destino` field (Studio, added for the Contato/Oportunidade/
  * Chamado field redesign) in addition to the human-readable description line.
  */
-export function buildLeadFields(input: OdooLeadInput, partnerId: number): Record<string, unknown> {
+export function buildLeadFields(input: OdooLeadInput, partnerId: number, idempotencyKey?: string): Record<string, unknown> {
     const name = fullName(input.firstName, input.lastName);
     const title = input.destination ? `Lead Site — ${name} (${input.destination})` : `Lead Site — ${name}`;
     const { source_id, medium_id } = resolveSourceMedium(input.utms, input.originSignal);
@@ -209,7 +215,7 @@ export function buildLeadFields(input: OdooLeadInput, partnerId: number): Record
     if (input.cargo) fields.function = input.cargo;
     if (input.destination) fields.x_destino = input.destination;
 
-    const description = buildDescriptionHtml(input);
+    const description = buildDescriptionHtml(input, idempotencyKey);
     if (description) fields.description = description;
 
     return fields;

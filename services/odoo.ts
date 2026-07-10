@@ -17,6 +17,8 @@
  * Errors are normalized to `ODOO_ERROR:<status>:<detail>` so the submit-handler
  * factory classifies them uniformly (see lib/odoo-submit-handler.ts).
  */
+import { withLeadIdempotencyLock } from '../lib/odoo-lead-idempotency';
+import { IDEMPOTENCY_KEY_LABEL } from '../lib/odoo-lead-mapping';
 
 const PER_CALL_TIMEOUT_MS = 3000;
 const TOTAL_DEADLINE_MS = 8000;
@@ -165,7 +167,13 @@ export interface UpsertPartnerOptions {
 
 export interface OdooSession {
     upsertPartner: (fields: OdooPartnerFields, options?: UpsertPartnerOptions) => Promise<number>;
-    createLead: (fields: Record<string, unknown>) => Promise<number>;
+    /**
+     * Creates a `crm.lead`, or returns the id of one already created for the
+     * same `idempotencyKey` (issue #1136) — a retry, duplicate delivery, or a
+     * client that never saw the first attempt's response must not create a
+     * second opportunity.
+     */
+    createLead: (fields: Record<string, unknown>, idempotencyKey?: string) => Promise<number>;
     /** Finds a `utm.campaign` by exact name, creating one if none matches. */
     resolveCampaignId: (name: string) => Promise<number>;
 }
@@ -228,8 +236,34 @@ export async function openOdooSession(config: OdooConfig): Promise<OdooSession> 
             }
             return executeKw<number>(config, uid, 'res.partner', 'create', [fields], deadline);
         },
-        createLead(fields) {
-            return executeKw<number>(config, uid, 'crm.lead', 'create', [fields], deadline);
+        async createLead(fields, idempotencyKey) {
+            if (!idempotencyKey) {
+                return executeKw<number>(config, uid, 'crm.lead', 'create', [fields], deadline);
+            }
+
+            // Odoo has no unique constraint to lean on, so the lock below only
+            // narrows the concurrent-duplicate window — this find-before-create
+            // is what actually makes a sequential replay (or a client retry
+            // after a response was lost post-commit) idempotent.
+            async function findExisting(): Promise<number | null> {
+                const marker = `${IDEMPOTENCY_KEY_LABEL}: ${idempotencyKey}`;
+                const rows = await executeKw<{ id: number }[]>(
+                    config,
+                    uid,
+                    'crm.lead',
+                    'search_read',
+                    [[['description', 'like', marker]], ['id']],
+                    deadline,
+                    { limit: 1, order: 'id asc' },
+                );
+                return rows[0]?.id ?? null;
+            }
+
+            return withLeadIdempotencyLock(idempotencyKey, async () => {
+                const existingId = await findExisting();
+                if (existingId) return existingId;
+                return executeKw<number>(config, uid, 'crm.lead', 'create', [fields], deadline);
+            });
         },
         async resolveCampaignId(name) {
             const trimmed = name.trim();

@@ -42,6 +42,28 @@ export interface CreateOdooSubmitHandlerOptions<TData> {
     onError?: (params: { data: TData; requestId: string; classification: N8nErrorClassification }) => Record<string, unknown> | void;
 }
 
+/**
+ * Resolves the stable idempotency key a lead-producing submission carries
+ * through the server boundary (issue #1136). Prefers the client-supplied
+ * `event_id` (already generated once per submit attempt for Meta CAPI dedup —
+ * see hooks/useLeadCapture.ts's `createLeadEventId()`); older/other callers
+ * that omit it still get a stable key derived from the submission's own
+ * identifying content, so a byte-identical retry still converges on the same
+ * key without merging two genuinely distinct submissions from the same
+ * customer (different destination/BANT text hashes differently).
+ */
+async function resolveIdempotencyKey(input: OdooLeadInput): Promise<string> {
+    const eventId = input.eventId?.trim();
+    if (eventId) return eventId;
+
+    const material = [input.email, input.phone, input.destination, input.bantSummary, input.firstName, input.lastName]
+        .map((value) => (value ?? '').trim().toLowerCase())
+        .join('|');
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(material));
+    const hex = Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, '0')).join('');
+    return `hash_${hex}`;
+}
+
 /** Persists an Odoo input: upsert partner (dedup by e-mail), then optional lead. */
 async function sendToOdoo(input: OdooLeadInput): Promise<void> {
     const config = getOdooConfig();
@@ -53,7 +75,8 @@ async function sendToOdoo(input: OdooLeadInput): Promise<void> {
     });
 
     if (input.createsLead) {
-        const leadFields = buildLeadFields(input, partnerId);
+        const idempotencyKey = await resolveIdempotencyKey(input);
+        const leadFields = buildLeadFields(input, partnerId, idempotencyKey);
         // utm_campaign is highly variable (one per ad campaign), unlike the fixed
         // source/medium table, so it's resolved against Odoo's native utm.campaign
         // model (find-or-create) instead of a hardcoded id.
@@ -71,7 +94,7 @@ async function sendToOdoo(input: OdooLeadInput): Promise<void> {
                 });
             }
         }
-        await session.createLead(leadFields);
+        await session.createLead(leadFields, idempotencyKey);
     }
 }
 
