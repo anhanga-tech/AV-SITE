@@ -105,6 +105,10 @@ const AIChat: React.FC = memo(() => {
     const destinationParam = searchParams.get(DESTINATION_URL_PARAM);
 
     if (chatParam === 'open') {
+      // One-shot deep-link handler: opening the chat is an unavoidable side effect of
+      // a URL param (not a user event), and this same effect also rewrites the URL via
+      // navigate() below — so the state can't be derived during render.
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional one-shot open driven by URL, fires once per navigation
       setHasIntent(true);
       setIsOpen(true);
 
@@ -128,7 +132,7 @@ const AIChat: React.FC = memo(() => {
       searchParams.delete(DESTINATION_URL_PARAM);
       const newSearch = searchParams.toString();
       const newPath = `${location.pathname}${newSearch ? `?${newSearch}` : ''}${location.hash}`;
-      navigate(newPath, { replace: true });
+      void navigate(newPath, { replace: true });
     }
 
     return () => window.removeEventListener('toggle-ai-chat', handleToggle);
@@ -142,6 +146,9 @@ const AIChat: React.FC = memo(() => {
     const shouldOpenChat = urlParams.get('chat') === '1';
 
     if (shouldOpenChat) {
+      // Same one-shot deep-link pattern as above (?chat=1): URL-driven open, not derivable
+      // during render.
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional one-shot open driven by URL, fires once per navigation
       setHasIntent(true);
       setIsOpen(true);
 

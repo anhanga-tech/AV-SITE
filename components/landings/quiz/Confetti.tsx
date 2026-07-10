@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useState } from 'react';
 
 interface ConfettiPiece {
     id: number; left: number; delay: number; duration: number;
@@ -12,7 +12,10 @@ const CONF_SHAPES: ConfettiPiece['shape'][] = [
 ];
 
 export function Confetti({ active }: { active: boolean }) {
-    const pieces = useMemo<ConfettiPiece[]>(() => {
+    // Randomized once per mount via lazy state init (not useMemo — React may drop
+    // a useMemo cache and recompute, which with Math.random() would reshuffle every
+    // piece mid-animation; lazy useState is guaranteed to run exactly once).
+    const [pieces] = useState<ConfettiPiece[]>(() => {
         return Array.from({ length: 70 }).map((_, i) => ({
             id: i,
             left: Math.random() * 100,
@@ -24,7 +27,7 @@ export function Confetti({ active }: { active: boolean }) {
             color: ['#FFD600', '#0ea5e9', '#ea580c', '#10b981', '#f97316', '#ffffff'][i % 6],
             shape: CONF_SHAPES[i % CONF_SHAPES.length],
         }));
-    }, []);
+    });
 
     if (!active) return null;
 

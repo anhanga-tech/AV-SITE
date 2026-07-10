@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useAntiBot } from './useAntiBot';
 import { getTrackingDataObject, getWhatsAppLink } from '../utils/whatsapp';
 import type { LeadTracking, LeadUtms, SubmitLeadRequest } from '../types/leadCapture';
@@ -307,11 +307,10 @@ export function useLeadCapture() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        const captured = captureInitialTracking();
-        setTracking(captured);
-        setUtms(extractUtms(captured));
-    }, []);
+    // Tracking is captured at first render by the lazy `useState` initializers above
+    // (which run on the client during hydration too), and re-captured fresh at submit
+    // time via `refreshTrackingState()`. An extra post-mount effect that re-set the
+    // identical value was redundant — no consumer reads `tracking`/`utms` reactively.
 
     const refreshTrackingState = (): { tracking: LeadTracking; utms: LeadUtms } => {
         const latestTracking = captureInitialTracking();
