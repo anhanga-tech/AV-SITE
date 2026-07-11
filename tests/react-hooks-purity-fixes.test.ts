@@ -37,24 +37,24 @@ test('Confetti (inactive) renders nothing', () => {
 });
 
 test('useAntiBot exposes a finite non-negative elapsed time and empty honeypot', () => {
-    let captured: { honeypot: string; elapsed: number } | null = null;
+    const captured: Array<{ honeypot: string; elapsed: number }> = [];
 
     const Harness: React.FC = () => {
         const { getAntiBotFields } = useAntiBot();
         const fields = getAntiBotFields();
-        captured = {
+        captured.push({
             honeypot: fields[HONEYPOT_FIELD],
             elapsed: fields[ELAPSED_TIME_FIELD],
-        };
+        });
         return null;
     };
 
     renderToStaticMarkup(React.createElement(Harness));
 
-    assert.ok(captured, 'o harness deve ter chamado getAntiBotFields');
-    assert.equal(captured!.honeypot, '', 'honeypot deve ser string vazia sem input preenchido');
-    assert.ok(Number.isFinite(captured!.elapsed), 'elapsedMs deve ser um número finito');
-    assert.ok(captured!.elapsed >= 0, 'elapsedMs não pode ser negativo');
+    assert.equal(captured.length, 1, 'o harness deve ter chamado getAntiBotFields');
+    assert.equal(captured[0].honeypot, '', 'honeypot deve ser string vazia sem input preenchido');
+    assert.ok(Number.isFinite(captured[0].elapsed), 'elapsedMs deve ser um número finito');
+    assert.ok(captured[0].elapsed >= 0, 'elapsedMs não pode ser negativo');
 });
 
 test('useWhatsAppLink derives a wa.me URL with the encoded message', () => {
