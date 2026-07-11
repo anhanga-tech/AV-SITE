@@ -48,3 +48,4 @@ The ratchet is deliberately narrow today. Widen it in small, separate PRs as deb
 
 - Generated files (`data/blogManifest.ts`, `data/blogMarkdown.ts`) are excluded entirely — they're machine-written on every build, matching the exception already documented in `docs/standards/code-style.md`.
 - `tests/**/*.ts` disables `@typescript-eslint/no-explicit-any` — mock/fixture shaping in tests legitimately needs looser typing than production code at a runtime boundary.
+- `tests/*.test.ts` (the flat `node:test` regression files only) disables `@typescript-eslint/no-floating-promises` — top-level `test()`/`describe()` return a Promise the runner awaits internally, so the "floating" call is the API contract, not an unhandled rejection. Scoped to the flat glob on purpose: Playwright e2e specs and page objects under `tests/e2e/**` keep the rule on, where it still catches real bugs like a forgotten `await page.click()`.
