@@ -312,13 +312,16 @@ export const useWhatsAppLink = (message: string, options: WhatsAppLinkOptions = 
     const [trackingVersion, setTrackingVersion] = useState(0);
 
     useEffect(() => {
+        // Fire exactly once ~1s after mount: the timer only re-captures GA cookies and
+        // bumps the version — it reads neither `message` nor `appendTrackingRef`, so an
+        // empty dep array is correct and avoids restarting the timer on prop changes.
         const timer = setTimeout(() => {
             captureTrackingDataObject();
             setTrackingVersion((v) => v + 1);
         }, 1000);
 
         return () => clearTimeout(timer);
-    }, [message, appendTrackingRef]);
+    }, []);
 
     return useMemo(
         () => getWhatsAppLink(message, { appendTrackingRef }),
