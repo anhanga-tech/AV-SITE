@@ -5,7 +5,7 @@ import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { Confetti } from '../components/landings/quiz/Confetti.tsx';
 import { useAntiBot } from '../hooks/useAntiBot.ts';
-import { useWhatsAppLink } from '../utils/whatsapp.ts';
+import { getTrackingDataObject, useWhatsAppLink } from '../utils/whatsapp.ts';
 import { HONEYPOT_FIELD, ELAPSED_TIME_FIELD } from '../lib/bot-detection.ts';
 
 // Regression coverage for issue #1173: the react-hooks/purity and
@@ -72,4 +72,56 @@ test('useWhatsAppLink derives a wa.me URL with the encoded message', () => {
         url.includes(encodeURIComponent('Olá, quero um orçamento!')),
         'a mensagem deve estar codificada na URL',
     );
+});
+
+test('useWhatsAppLink does not capture tracking during render', () => {
+    const dataLayer: unknown[] = [];
+    const storage = new Map<string, string>();
+    const originalWindow = Object.getOwnPropertyDescriptor(globalThis, 'window');
+    const originalDocument = Object.getOwnPropertyDescriptor(globalThis, 'document');
+    const originalSessionStorage = Object.getOwnPropertyDescriptor(globalThis, 'sessionStorage');
+
+    Object.defineProperty(globalThis, 'window', {
+        configurable: true,
+        value: {
+            dataLayer,
+            location: {
+                search: '?utm_source=render-test',
+                hash: '',
+                href: 'https://example.com/?utm_source=render-test',
+            },
+        },
+    });
+    Object.defineProperty(globalThis, 'document', {
+        configurable: true,
+        value: { cookie: '' },
+    });
+    Object.defineProperty(globalThis, 'sessionStorage', {
+        configurable: true,
+        value: {
+            getItem: (key: string) => storage.get(key) ?? null,
+            setItem: (key: string, value: string) => storage.set(key, value),
+        },
+    });
+
+    try {
+        getTrackingDataObject();
+        dataLayer.length = 0;
+
+        const Harness: React.FC = () => {
+            useWhatsAppLink('Mensagem', { appendTrackingRef: true });
+            return null;
+        };
+
+        renderToStaticMarkup(React.createElement(Harness));
+
+        assert.equal(dataLayer.length, 0, 'render não deve emitir tracking_data_captured');
+    } finally {
+        if (originalWindow) Object.defineProperty(globalThis, 'window', originalWindow);
+        else Reflect.deleteProperty(globalThis, 'window');
+        if (originalDocument) Object.defineProperty(globalThis, 'document', originalDocument);
+        else Reflect.deleteProperty(globalThis, 'document');
+        if (originalSessionStorage) Object.defineProperty(globalThis, 'sessionStorage', originalSessionStorage);
+        else Reflect.deleteProperty(globalThis, 'sessionStorage');
+    }
 });

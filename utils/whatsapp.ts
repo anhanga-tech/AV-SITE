@@ -289,18 +289,28 @@ const getTrackingRef = (): string | null => {
     return serialized.length > 0 ? serialized : null;
 };
 
-export const getWhatsAppLink = (message: string, options: WhatsAppLinkOptions = {}): string => {
-    const { appendTrackingRef = false } = options;
-    const ref = appendTrackingRef ? getTrackingRef() : null;
+const getCachedTrackingRef = (): string | null => {
+    if (!cachedTrackingObject) return null;
 
+    const serialized = serializeTrackingData(cachedTrackingObject);
+    return serialized.length > 0 ? serialized : null;
+};
+
+const buildWhatsAppLink = (message: string, ref: string | null): string => {
     let finalMessage = message;
     finalMessage = finalMessage.split(' || Dados:')[0].split(' [ref:')[0].trim();
 
-    if (appendTrackingRef && ref) {
+    if (ref) {
         finalMessage += ` || Dados: ${ref}`;
     }
 
     return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(finalMessage)}`;
+};
+
+export const getWhatsAppLink = (message: string, options: WhatsAppLinkOptions = {}): string => {
+    const { appendTrackingRef = false } = options;
+    const ref = appendTrackingRef ? getTrackingRef() : null;
+    return buildWhatsAppLink(message, ref);
 };
 
 export const useWhatsAppLink = (message: string, options: WhatsAppLinkOptions = {}): string => {
@@ -324,7 +334,9 @@ export const useWhatsAppLink = (message: string, options: WhatsAppLinkOptions = 
     }, []);
 
     return useMemo(
-        () => getWhatsAppLink(message, { appendTrackingRef }),
+        // Render only formats the latest cached snapshot. Tracking capture and its
+        // cookie/sessionStorage/dataLayer side effects stay outside render.
+        () => buildWhatsAppLink(message, appendTrackingRef ? getCachedTrackingRef() : null),
         // eslint-disable-next-line react-hooks/exhaustive-deps -- trackingVersion is a deliberate recompute trigger, not read inside the callback
         [message, appendTrackingRef, trackingVersion],
     );
