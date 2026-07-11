@@ -1,4 +1,4 @@
-import { useCallback, useRef, type CSSProperties, type RefObject } from 'react';
+import { useCallback, useRef, useState, type CSSProperties, type RefObject } from 'react';
 import { HONEYPOT_FIELD, ELAPSED_TIME_FIELD } from '../lib/bot-detection';
 
 /**
@@ -49,16 +49,18 @@ export interface UseAntiBotResult {
 }
 
 export function useAntiBot(): UseAntiBotResult {
-    // Captured once at mount; a ref keeps it stable across re-renders.
-    const renderedAt = useRef(Date.now());
+    // Captured once at first render via lazy state init (not `useRef(Date.now())`,
+    // which would call the impure `Date.now()` during every render); the value is
+    // stable across re-renders.
+    const [renderedAt] = useState(() => Date.now());
     const honeypotRef = useRef<HTMLInputElement | null>(null);
 
     const getAntiBotFields = useCallback((): AntiBotFields => ({
         [HONEYPOT_FIELD]: honeypotRef.current?.value ?? '',
         // Elapsed computed here (submit time − mount time), both on the client, so
         // the wire value carries no absolute timestamp and no clock-skew exposure.
-        [ELAPSED_TIME_FIELD]: Date.now() - renderedAt.current,
-    }), []);
+        [ELAPSED_TIME_FIELD]: Date.now() - renderedAt,
+    }), [renderedAt]);
 
     const honeypotProps: HoneypotProps = {
         ref: honeypotRef,

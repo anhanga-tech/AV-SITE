@@ -35,6 +35,10 @@ const Home: React.FC = () => {
   useEffect(() => {
     // Verifica se há um targetId no estado da navegação
     if (location.state && location.state.targetId) {
+      // Reacting to router navigation state (arriving from another page to scroll to a
+      // section): this effect also scrolls the DOM and clears history state, so revealing
+      // the below-fold content is an intrinsic side effect, not derivable during render.
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot reveal driven by navigation state, fires once per navigation
       setShouldRenderBelowFold(true);
       const targetId = location.state.targetId;
       const element = document.getElementById(targetId);

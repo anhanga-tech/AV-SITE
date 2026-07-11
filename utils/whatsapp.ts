@@ -7,7 +7,7 @@
  * in memory + sessionStorage + cookie to ensure data is available after URL changes.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 const TRACKING_PARAMS = [
     'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
@@ -289,36 +289,55 @@ const getTrackingRef = (): string | null => {
     return serialized.length > 0 ? serialized : null;
 };
 
-export const getWhatsAppLink = (message: string, options: WhatsAppLinkOptions = {}): string => {
-    const { appendTrackingRef = false } = options;
-    const ref = appendTrackingRef ? getTrackingRef() : null;
+const getCachedTrackingRef = (): string | null => {
+    if (!cachedTrackingObject) return null;
 
+    const serialized = serializeTrackingData(cachedTrackingObject);
+    return serialized.length > 0 ? serialized : null;
+};
+
+const buildWhatsAppLink = (message: string, ref: string | null): string => {
     let finalMessage = message;
     finalMessage = finalMessage.split(' || Dados:')[0].split(' [ref:')[0].trim();
 
-    if (appendTrackingRef && ref) {
+    if (ref) {
         finalMessage += ` || Dados: ${ref}`;
     }
 
     return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(finalMessage)}`;
 };
 
+export const getWhatsAppLink = (message: string, options: WhatsAppLinkOptions = {}): string => {
+    const { appendTrackingRef = false } = options;
+    const ref = appendTrackingRef ? getTrackingRef() : null;
+    return buildWhatsAppLink(message, ref);
+};
+
 export const useWhatsAppLink = (message: string, options: WhatsAppLinkOptions = {}): string => {
     const { appendTrackingRef } = options;
-    const [whatsappUrl, setWhatsappUrl] = useState(() => getWhatsAppLink(message, { appendTrackingRef }));
+    // GA4 client/session cookies are often set slightly after mount, so we re-capture
+    // tracking ~1s later and bump this version to force a recompute of the link. The
+    // URL itself is derived (not effect-synced state), so it also stays current when
+    // `message`/`appendTrackingRef` change across renders.
+    const [trackingVersion, setTrackingVersion] = useState(0);
 
     useEffect(() => {
-        const newUrl = getWhatsAppLink(message, { appendTrackingRef });
-        setWhatsappUrl((prev) => (prev === newUrl ? prev : newUrl));
-
+        // Fire exactly once ~1s after mount: the timer only re-captures GA cookies and
+        // bumps the version — it reads neither `message` nor `appendTrackingRef`, so an
+        // empty dep array is correct and avoids restarting the timer on prop changes.
         const timer = setTimeout(() => {
             captureTrackingDataObject();
-            const updatedUrl = getWhatsAppLink(message, { appendTrackingRef });
-            setWhatsappUrl((prev) => (prev === updatedUrl ? prev : updatedUrl));
+            setTrackingVersion((v) => v + 1);
         }, 1000);
 
         return () => clearTimeout(timer);
-    }, [message, appendTrackingRef]);
+    }, []);
 
-    return whatsappUrl;
+    return useMemo(
+        // Render only formats the latest cached snapshot. Tracking capture and its
+        // cookie/sessionStorage/dataLayer side effects stay outside render.
+        () => buildWhatsAppLink(message, appendTrackingRef ? getCachedTrackingRef() : null),
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- trackingVersion is a deliberate recompute trigger, not read inside the callback
+        [message, appendTrackingRef, trackingVersion],
+    );
 };
