@@ -26,6 +26,9 @@ começar, honre as STOP conditions e atualize sua linha ao terminar.
 | 016 | SPIKE: rotear resultado do quiz para o chatbot (design doc) | P3 | M | — | DONE |
 | 017 | Mover folder do design system → `docs/design/brand-system/` + ajustar teste | P3 | S | — | DONE |
 | 018 | Guard do workflow de reviews ignora mudança só de `lastFetched` | P3 | S | 014 | DONE |
+| 019 | Fechar o loop de conversão Odoo → Google/Meta (parte repo, flags off) | P1 | M | — (gates externos p/ ativação) | TODO |
+| 020 | SPIKE: spec do funil canônico de medição (visitante → receita CRM) | P2 | M | — | TODO |
+| 021 | Protótipo de prova social casada ao destino no modal de Destinations | P2 | M | — | TODO |
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (com motivo) | REJECTED (com justificativa)
 
@@ -41,6 +44,14 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (com motivo) | REJECTED (com 
 > (freeze do namespace de cor — versão segura S/LOW, não o big-bang). Direção
 > auditada via `/improve next` — sugestões grounded apresentadas ao mantenedor.
 
+> **Rodada 4** (commit `f5e4324`, 2026-07-12): planos de direção derivados do
+> `/improve next` desta rodada, escopo confirmado pelo mantenedor (achados 1–3).
+> 019 implementa a parte repo de `docs/product/odoo-ads-conversion-decision.md`
+> atrás de flags default-off — a **ativação** segue bloqueada pelos gates
+> externos (campos no Odoo, RIPD/DPO, fase de sombra); não declarar completo
+> sem validação viva. 020 é spec/docs-only (define antes de implementar).
+> 021 é protótipo mensurável com fallback honesto.
+
 ## Dependency notes
 
 - 001–005: sem dependências rígidas (todos DONE).
@@ -48,6 +59,12 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (com motivo) | REJECTED (com 
 - 008 não depende rigidamente de 007, mas recomenda-se executá-lo **depois** —
   os testes dos builders (007) dão rede de segurança extra ao refatorar os
   handlers de lead.
+- 019, 020, 021: independentes entre si (executáveis em qualquer ordem).
+  Sinergia sem dependência rígida: os campos estruturados do 019 (x_gclid,
+  x_ga_client_id etc.) são o mecanismo de correlação do estágio `won` que a
+  spec do 020 referencia; e a instrumentação que o 020 especifica (ex.
+  `handoff_created`) é pré-requisito do A/B test quiz→chat do plano 016 —
+  a spec vem antes de qualquer implementação de eventos.
 
 ## Findings considered and rejected
 
@@ -131,6 +148,29 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (com motivo) | REJECTED (com 
 - **D4 → plano 016 (spike)**: rotear resultado do quiz p/ o chatbot. Assimetria
   real (quiz → WhatsApp, ignora o chatbot apesar de já ter perfil + bantSummary),
   mas o caminho atual converte lead morno — medir antes de mudar.
+
+### Direção (`/improve next`) — rodada 4 (commit `f5e4324`, 2026-07-12)
+
+Achados 1–3 viraram os planos 019–021 (escopo confirmado pelo mantenedor).
+Opções de menor prioridade, **estudadas e não planejadas** — exigem nova
+evidência antes de reabrir:
+
+- **Retomada de conversa mobile (consentida, expirável)** em
+  `components/AIChatPanel.tsx`/`components/AIChat.tsx` — não planejar sem um
+  design de privacidade prévio (não persistir histórico sensível sem base
+  clara); demanda também sinal de que abandono de conversa é problema real.
+- **Estados explícitos de campanha evergreen** (`pages/landings/LollapaloozaLanding.tsx`
+  + `App.tsx`) — não generalizar máquina de estados até uma **segunda**
+  campanha recorrente provar o padrão.
+- **Clusters editoriais / GEO** (`docs/seo/orlando-content-cluster.md`,
+  `docs/seo/geo-citation-monitoring-pilot.md`, `docs/seo/geo-content-strategy-2026-07.md`)
+  — gated em evidência: o primeiro baseline de citação GEO ainda não rodou;
+  rodar o piloto antes de investir em produção de conteúdo.
+- **Expansão de tools do chatbot** — segue deferida
+  (`docs/product/chatbot-tool-expansion-spike.md`, plano 015).
+- **Quiz → chatbot** — segue como A/B test instrumentado
+  (`docs/product/quiz-to-chatbot-funnel-spike.md`, plano 016), bloqueado pela
+  lacuna de medição que o plano 020 especifica.
 
 ## Audit gaps
 
