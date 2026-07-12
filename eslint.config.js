@@ -82,4 +82,17 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'off',
     },
   },
+  {
+    // node:test regression files (flat `tests/*.test.ts`) call `test()`/
+    // `describe()` at the top level; those return a Promise the runner awaits
+    // internally, so the intentional "floating" call is the API contract, not
+    // an unhandled rejection — the rule would otherwise fire on every one.
+    // Scoped to the flat glob on purpose: Playwright e2e specs and page objects
+    // under tests/e2e/** don't float `test()` this way, and there the rule still
+    // catches real bugs (e.g. a forgotten `await page.click()`), so keep it on.
+    files: ['tests/*.test.ts'],
+    rules: {
+      '@typescript-eslint/no-floating-promises': 'off',
+    },
+  },
 );

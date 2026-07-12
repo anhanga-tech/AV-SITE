@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises -- node:test's `test()` returns a promise the runner awaits internally; top-level calls are meant to float, matching every other file under tests/. */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import React from 'react';
