@@ -197,8 +197,11 @@ export function findReviewsForDestination(
   city: string,
   country: string,
 ): DisplayReview[] {
-  // normalizar: lowercase + remoção de acentos (NFD + strip ̀-ͯ)
-  // match: review.destination normalizado === city normalizado OU === country normalizado
+  // normalizar: lowercase + remoção de acentos via NFD + .replace(/[\u0300-\u036f]/g, "")
+  //   (usar o escape Unicode explícito, nunca caracteres combinantes literais na regex)
+  // match: review.destination existe (é opcional em DisplayReview — guard antes de
+  //   normalizar, senão TypeError) && (destination normalizado === city normalizado
+  //   OU === country normalizado)
 }
 ```
 
