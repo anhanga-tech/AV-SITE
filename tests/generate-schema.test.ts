@@ -57,6 +57,18 @@ test('rejeita parts vazio', () => {
     assert.equal(result.success, false);
 });
 
+test('aceita até 20 parts por mensagem', () => {
+    const parts = Array.from({ length: 20 }, () => ({ text: 'Olá' }));
+    const result = GenerateRequestSchema.safeParse({ contents: [{ role: 'user', parts }] });
+    assert.equal(result.success, true);
+});
+
+test('rejeita mais de 20 parts por mensagem (DoS guard)', () => {
+    const parts = Array.from({ length: 21 }, () => ({ text: 'Olá' }));
+    const result = GenerateRequestSchema.safeParse({ contents: [{ role: 'user', parts }] });
+    assert.equal(result.success, false);
+});
+
 test('rejeita text com mais de 5000 chars', () => {
     const result = GenerateRequestSchema.safeParse({
         contents: [{ role: 'user', parts: [{ text: 'a'.repeat(5001) }] }],
