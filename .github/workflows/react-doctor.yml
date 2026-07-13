@@ -57,48 +57,17 @@ jobs:
         #   directory: apps/web      # Scan a sub-directory (default: ".")
         #   project: "web,admin"     # In a monorepo, scan specific workspace project(s)
 
-  debug-react-doctor-raw:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
-        with:
-          node-version: "24"
-          package-manager-cache: false
-      - name: Run react-doctor directly and capture raw output
-        env:
-          REACT_DOCTOR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          RUNNER_TEMP: ${{ runner.temp }}
-          REACT_DOCTOR_CACHE_DIR: ${{ runner.temp }}/react-doctor-cache
-          GITHUB_RUN_ID: ${{ github.run_id }}
-          REACT_DOCTOR_GITHUB_ACTION: ${{ github.action_ref || '1' }}
-          REACT_DOCTOR_ACTION_BLOCKING: none
-          REACT_DOCTOR_ACTION_COMMENT: true
-          REACT_DOCTOR_ACTION_REVIEW_COMMENTS: true
-          REACT_DOCTOR_ACTION_VERSION: latest
-          NO_COLOR: "1"
+      - name: DEBUG - inspect report file and re-run CLI in-situ
+        if: always()
         run: |
-          set +e
-          mkdir -p "$REACT_DOCTOR_CACHE_DIR"
-          git diff --name-only --diff-filter=AMR "${REACT_DOCTOR_BASE_SHA}...HEAD" > /tmp/changed.txt
-          echo "--- changed files ---"
-          cat /tmp/changed.txt
-          wc -l < /tmp/changed.txt
-
-          echo "--- installing exactly like the action (npm install --prefix) ---"
-          mkdir -p /tmp/toolchain
-          npm install --prefix /tmp/toolchain --no-save --no-audit --no-fund react-doctor@0.7.7
-          echo "npm install exit: $?"
-          /tmp/toolchain/node_modules/.bin/react-doctor --version
-          echo "--version exit: $?"
-
-          echo "--- running the installed bin with FULL action env (not npx) ---"
-          /tmp/toolchain/node_modules/.bin/react-doctor . --json --json-compact --blocking none --project '*' --scope changed --changed-files-from /tmp/changed.txt > /tmp/raw-report.json 2> /tmp/raw-report.err
-          echo "EXIT_CODE=$?"
-          echo "--- stdout (len=$(wc -c < /tmp/raw-report.json)) ---"
-          cat /tmp/raw-report.json
-          echo "--- stderr (len=$(wc -c < /tmp/raw-report.err)) ---"
-          cat /tmp/raw-report.err
-          echo "--- END ---"
+          echo "=== report file ==="
+          cat "${RUNNER_TEMP}/react-doctor-report-${GITHUB_RUN_ID}.json" 2>&1 || echo "(none / not found)"
+          echo "=== changed-files-from file ==="
+          cat "${RUNNER_TEMP}/react-doctor-changed-files.txt" 2>&1 || echo "(none / not found)"
+          echo "=== toolchain bin present? ==="
+          ls -la "${RUNNER_TEMP}/react-doctor-toolchain/node_modules/.bin/" 2>&1 || echo "(no toolchain dir)"
+          echo "=== re-run CLI in-situ, capture stderr ==="
+          "${RUNNER_TEMP}/react-doctor-toolchain/node_modules/.bin/react-doctor" . \
+            --json --json-compact --blocking none --project '*' \
+            --scope changed --changed-files-from "${RUNNER_TEMP}/react-doctor-changed-files.txt" 2>&1 | head -80
+          echo "in-situ exit: $?"
