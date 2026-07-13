@@ -70,8 +70,18 @@ jobs:
       - name: Run react-doctor directly and capture raw output
         env:
           REACT_DOCTOR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          RUNNER_TEMP: ${{ runner.temp }}
+          REACT_DOCTOR_CACHE_DIR: ${{ runner.temp }}/react-doctor-cache
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          REACT_DOCTOR_GITHUB_ACTION: ${{ github.action_ref || '1' }}
+          REACT_DOCTOR_ACTION_BLOCKING: none
+          REACT_DOCTOR_ACTION_COMMENT: true
+          REACT_DOCTOR_ACTION_REVIEW_COMMENTS: true
+          REACT_DOCTOR_ACTION_VERSION: latest
+          NO_COLOR: "1"
         run: |
           set +e
+          mkdir -p "$REACT_DOCTOR_CACHE_DIR"
           git diff --name-only --diff-filter=AMR "${REACT_DOCTOR_BASE_SHA}...HEAD" > /tmp/changed.txt
           echo "--- changed files ---"
           cat /tmp/changed.txt
@@ -84,7 +94,7 @@ jobs:
           /tmp/toolchain/node_modules/.bin/react-doctor --version
           echo "--version exit: $?"
 
-          echo "--- running the installed bin (not npx) ---"
+          echo "--- running the installed bin with FULL action env (not npx) ---"
           /tmp/toolchain/node_modules/.bin/react-doctor . --json --json-compact --blocking none --project '*' --scope changed --changed-files-from /tmp/changed.txt > /tmp/raw-report.json 2> /tmp/raw-report.err
           echo "EXIT_CODE=$?"
           echo "--- stdout (len=$(wc -c < /tmp/raw-report.json)) ---"
