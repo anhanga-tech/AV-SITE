@@ -26,7 +26,7 @@ jobs:
           fetch-depth: 0
       - name: "TODO to Issue"
         # Pinada no commit da v5.1.14 (SHA) — third-party action.
-        uses: "alstr/todo-to-issue-action@64aca8fda7023259aada83ba44ad988c4c443657" # v5.1.14
+        uses: "alstr/todo-to-issue-action@37bb7b56e58569ef273b60678048030a7f0c261a" # v5.1.15
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           # Fecha a issue automaticamente quando o TODO correspondente é removido.
