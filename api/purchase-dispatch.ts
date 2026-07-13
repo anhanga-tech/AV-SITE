@@ -142,6 +142,16 @@ function getExpectedSecret(): string | null {
   return secret || null;
 }
 
+// Kill switch (Fase 3a, docs/product/odoo-ads-conversion-decision.md §6/§8). Default
+// true: absence of the env does not disable the endpoint. Checked after auth so an
+// unauthenticated caller can't discover the flag's state.
+function isDispatchEnabled(): boolean {
+  const raw = typeof process.env.PURCHASE_DISPATCH_ENABLED === 'string'
+    ? process.env.PURCHASE_DISPATCH_ENABLED.trim().toLowerCase()
+    : '';
+  return raw !== 'false' && raw !== '0';
+}
+
 function isAuthorized(request: Request, expectedSecret: string): boolean {
   const providedSecret = request.headers.get('X-Webhook-Secret');
   const normalizedSecret = providedSecret?.trim() ?? '';
@@ -194,7 +204,10 @@ function normalizePayload(raw: unknown): NormalizePayloadResult {
   } else if (!dealId) {
     return { error: 'Missing dealId' };
   } else {
-    deduplicationId = dealId;
+    // Purchase gets a deterministic id (`purchase_{dealId}`) so re-runs of the
+    // Odoo automation stay idempotent on the Meta/GA4 side without requiring the
+    // automation to generate its own event id (§4 of the decision doc).
+    deduplicationId = eventType === 'purchase' ? `purchase_${dealId}` : dealId;
   }
   const value = eventType === 'lead_qualificado' ? 0 : toNumberOrZero(payload.value);
 
@@ -418,6 +431,14 @@ export default async function handler(request: Request): Promise<Response> {
   const authError = validateAuthorization(request, requestId);
   if (authError) {
     return authError;
+  }
+
+  if (!isDispatchEnabled()) {
+    emitConversionLog('warn', requestId, 'dispatch_disabled');
+    return buildJsonResponse(
+      { ok: false, requestId, code: 'DISPATCH_DISABLED', error: 'Conversion dispatch disabled' },
+      503,
+    );
   }
 
   const rateLimitError = await enforceRateLimit(request, requestId);

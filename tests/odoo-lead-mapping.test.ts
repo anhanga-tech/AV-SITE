@@ -173,6 +173,54 @@ test('buildLeadFields — omits the idempotency_key line when no key is provided
     assert.doesNotMatch(String(fields.description), /idempotency_key/);
 });
 
+// --- buildLeadFields — conversion tracking fields (ODOO_CONVERSION_FIELDS_ENABLED) ---
+
+const FULL_TRACKING = {
+    utm_source: null,
+    utm_medium: null,
+    utm_campaign: null,
+    utm_term: null,
+    utm_content: null,
+    gclid: 'gclid-abc',
+    fbclid: 'fbclid-abc',
+    fbc: 'fb.1.111.fbclid-abc',
+    fbp: 'fb.1.111.222',
+    cid: 'ga-client-1',
+    sid: 'ga-session-1',
+};
+
+test('buildLeadFields — flag off (default) omits structured tracking fields', () => {
+    const fields = buildLeadFields(baseInput({ tracking: FULL_TRACKING }), 5, 'k');
+    for (const key of ['x_gclid', 'x_fbclid', 'x_fbc', 'x_fbp', 'x_ga_client_id', 'x_ga_session_id']) {
+        assert.equal(key in fields, false, `${key} should not be present when flag is off`);
+    }
+});
+
+test('buildLeadFields — flag on writes structured tracking fields from input.tracking', () => {
+    const fields = buildLeadFields(baseInput({ tracking: FULL_TRACKING }), 5, 'k', { includeConversionFields: true });
+    assert.equal(fields.x_gclid, 'gclid-abc');
+    assert.equal(fields.x_fbclid, 'fbclid-abc');
+    assert.equal(fields.x_fbc, 'fb.1.111.fbclid-abc');
+    assert.equal(fields.x_fbp, 'fb.1.111.222');
+    assert.equal(fields.x_ga_client_id, 'ga-client-1');
+    assert.equal(fields.x_ga_session_id, 'ga-session-1');
+});
+
+test('buildLeadFields — flag on omits fields absent from input.tracking', () => {
+    const fields = buildLeadFields(baseInput({ tracking: { ...FULL_TRACKING, gclid: undefined, fbclid: undefined } }), 5, 'k', {
+        includeConversionFields: true,
+    });
+    assert.equal('x_gclid' in fields, false);
+    assert.equal('x_fbclid' in fields, false);
+    assert.equal(fields.x_fbc, 'fb.1.111.fbclid-abc');
+});
+
+test('buildLeadFields — flag on still writes the human-readable description lines (no regression)', () => {
+    const fields = buildLeadFields(baseInput({ tracking: FULL_TRACKING }), 5, 'k', { includeConversionFields: true });
+    assert.match(String(fields.description), /<li>gclid: gclid-abc<\/li>/);
+    assert.match(String(fields.description), /<li>fbclid: fbclid-abc<\/li>/);
+});
+
 // --- per-form adapters -------------------------------------------------------
 
 test('leadInputFromSubmitLead — creates a lead, maps marketingOptIn', () => {
