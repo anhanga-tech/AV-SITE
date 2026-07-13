@@ -15,7 +15,18 @@ const GeneratePartSchema = z.object({
 
 const GenerateMessageSchema = z.object({
     role: z.enum(['user', 'model']),
-    parts: z.array(GeneratePartSchema).min(1).max(MAX_PARTS_PER_MESSAGE),
+    // Guard the array length BEFORE validating elements. z.array().max() parses
+    // every element against GeneratePartSchema first and only then enforces the
+    // cap, so a huge `parts` array would still be iterated in full (CPU-exhaustion
+    // DoS) before being rejected. Pre-checking the length via refine short-circuits
+    // that iteration, so an oversized array is rejected in O(1).
+    parts: z
+        .unknown()
+        .refine(
+            (value): value is unknown[] => Array.isArray(value) && value.length <= MAX_PARTS_PER_MESSAGE,
+            { message: `parts deve ter no máximo ${MAX_PARTS_PER_MESSAGE} itens` },
+        )
+        .pipe(z.array(GeneratePartSchema).min(1)),
 });
 
 export const GenerateRequestSchema = z.object({
