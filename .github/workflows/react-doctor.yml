@@ -34,9 +34,11 @@ jobs:
         with:
           # The action's own PR-diff step needs the base commit reachable to
           # compute the changed-file set locally; a shallow checkout (the
-          # default) forces it onto a GitHub-API fallback path that has been
-          # producing "Scan could not complete" failures on this repo's PRs
-          # since 2026-07-12 (every PR, regardless of diff content).
+          # default) forces it onto a GitHub-API changed-files fallback.
+          # This doesn't fix the separate "Scan could not complete" failures
+          # (root-caused to an intermittent CLI stdout-truncation-on-exit race
+          # upstream, filed as millionco/react-doctor#1242), but it's a
+          # correctness improvement in its own right and worth keeping.
           fetch-depth: 0
 
       - uses: millionco/react-doctor@ced746f518f11e8283d488c4ff31c44e478bb0e5 # v2.2.6
@@ -56,18 +58,3 @@ jobs:
         #   version: "0.4.0"         # Pin to a specific react-doctor version instead of "latest"
         #   directory: apps/web      # Scan a sub-directory (default: ".")
         #   project: "web,admin"     # In a monorepo, scan specific workspace project(s)
-
-      - name: DEBUG - inspect report file and re-run CLI in-situ
-        if: always()
-        run: |
-          echo "=== report file ==="
-          cat "${RUNNER_TEMP}/react-doctor-report-${GITHUB_RUN_ID}.json" 2>&1 || echo "(none / not found)"
-          echo "=== changed-files-from file ==="
-          cat "${RUNNER_TEMP}/react-doctor-changed-files.txt" 2>&1 || echo "(none / not found)"
-          echo "=== toolchain bin present? ==="
-          ls -la "${RUNNER_TEMP}/react-doctor-toolchain/node_modules/.bin/" 2>&1 || echo "(no toolchain dir)"
-          echo "=== re-run CLI in-situ, capture stderr ==="
-          "${RUNNER_TEMP}/react-doctor-toolchain/node_modules/.bin/react-doctor" . \
-            --json --json-compact --blocking none --project '*' \
-            --scope changed --changed-files-from "${RUNNER_TEMP}/react-doctor-changed-files.txt" 2>&1 | head -80
-          echo "in-situ exit: $?"
