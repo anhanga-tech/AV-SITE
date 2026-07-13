@@ -56,3 +56,20 @@ jobs:
         #   version: "0.4.0"         # Pin to a specific react-doctor version instead of "latest"
         #   directory: apps/web      # Scan a sub-directory (default: ".")
         #   project: "web,admin"     # In a monorepo, scan specific workspace project(s)
+
+  debug-react-doctor-raw:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: "24"
+      - name: Run react-doctor directly and capture raw output
+        run: |
+          set +e
+          npx --yes react-doctor@0.7.7 . --json --json-compact --blocking none --project '*' > /tmp/raw-report.json 2> /tmp/raw-report.err
+          echo "EXIT_CODE=$?"
+          echo "--- stdout ---"
+          cat /tmp/raw-report.json
+          echo "--- stderr ---"
+          cat /tmp/raw-report.err
