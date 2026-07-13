@@ -12,6 +12,7 @@ const originalEnv = {
   META_TEST_EVENT_CODE: process.env.META_TEST_EVENT_CODE,
   UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
   UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
+  PURCHASE_DISPATCH_ENABLED: process.env.PURCHASE_DISPATCH_ENABLED,
 };
 
 function restoreEnvValue(key: string, value: string | undefined) {
@@ -32,6 +33,7 @@ function restoreEnv() {
   restoreEnvValue('META_TEST_EVENT_CODE', originalEnv.META_TEST_EVENT_CODE);
   restoreEnvValue('UPSTASH_REDIS_REST_URL', originalEnv.UPSTASH_REDIS_REST_URL);
   restoreEnvValue('UPSTASH_REDIS_REST_TOKEN', originalEnv.UPSTASH_REDIS_REST_TOKEN);
+  restoreEnvValue('PURCHASE_DISPATCH_ENABLED', originalEnv.PURCHASE_DISPATCH_ENABLED);
 }
 
 function buildRequest(
@@ -195,7 +197,7 @@ test('purchase-dispatch should send GA4 and Meta purchase payloads', async (t) =
   assert.ok(gaEvent, 'GA4 event should exist');
   assert.equal(gaRequest!.body?.client_id, '123456789.1234567890');
   assert.equal(gaEvent?.name, 'purchase');
-  assert.equal((gaEvent?.params as Record<string, unknown>)?.transaction_id, '<deal-1>');
+  assert.equal((gaEvent?.params as Record<string, unknown>)?.transaction_id, 'purchase_<deal-1>');
   assert.equal((gaEvent?.params as Record<string, unknown>)?.session_id, '174');
   assert.equal((gaEvent?.params as Record<string, unknown>)?.value, 4200);
 
@@ -205,7 +207,7 @@ test('purchase-dispatch should send GA4 and Meta purchase payloads', async (t) =
   const metaEvent = (metaRequest!.body?.data as Array<Record<string, unknown>> | undefined)?.[0];
   assert.ok(metaEvent, 'Meta event should exist');
   assert.equal(metaEvent?.event_name, 'Purchase');
-  assert.equal(metaEvent?.event_id, '<deal-1>');
+  assert.equal(metaEvent?.event_id, 'purchase_<deal-1>');
   assert.equal((metaEvent?.custom_data as Record<string, unknown>)?.value, 4200);
   const metaUserData = metaEvent?.user_data as Record<string, unknown> | undefined;
   assert.equal(metaUserData?.client_ip_address, '203.0.113.42');
@@ -636,4 +638,148 @@ test('purchase-dispatch should rate limit repeated requests from the same client
   assert.equal(typeof data.requestId, 'string');
   assert.equal(response!.headers.get('X-Request-Id'), data.requestId);
   assert.equal(calls.length, 60);
+});
+
+test('purchase-dispatch should return 503 when disabled via kill switch', async (t) => {
+  let fetchCalled = false;
+
+  t.after(() => {
+    global.fetch = originalFetch;
+    restoreEnv();
+  });
+
+  process.env.N8N_WEBHOOK_SECRET = 'expected-secret';
+  process.env.GA4_MEASUREMENT_ID = 'G-TEST12345';
+  process.env.GA4_API_SECRET = 'test-api-secret';
+  process.env.META_PIXEL_ID = 'pixel-1';
+  process.env.META_ACCESS_TOKEN = 'token-1';
+  process.env.PURCHASE_DISPATCH_ENABLED = 'false';
+
+  global.fetch = (async (): Promise<Response> => {
+    fetchCalled = true;
+    return new Response(JSON.stringify({ error: 'should not be called' }), { status: 500 });
+  }) as typeof fetch;
+
+  const response = await handler(buildRequest({
+    dealId: 'deal-disabled',
+    value: 1000,
+  }, 'expected-secret'));
+
+  assert.equal(response.status, 503);
+
+  const data = await response.json() as Record<string, unknown>;
+  assert.equal(data.ok, false);
+  assert.equal(data.code, 'DISPATCH_DISABLED');
+  assert.equal(fetchCalled, false, 'provider fetch should not be called when dispatch is disabled');
+});
+
+test('purchase-dispatch kill switch state should not leak to an unauthenticated caller', async (t) => {
+  t.after(() => {
+    restoreEnv();
+  });
+
+  process.env.N8N_WEBHOOK_SECRET = 'expected-secret';
+  process.env.PURCHASE_DISPATCH_ENABLED = 'false';
+
+  const response = await handler(buildRequest({ dealId: 'deal-1' }, 'wrong-secret'));
+
+  assert.equal(response.status, 401);
+});
+
+test('purchase-dispatch should stay enabled when PURCHASE_DISPATCH_ENABLED is unset (default on)', async (t) => {
+  t.after(() => {
+    global.fetch = originalFetch;
+    restoreEnv();
+  });
+
+  process.env.N8N_WEBHOOK_SECRET = 'expected-secret';
+  process.env.GA4_MEASUREMENT_ID = 'G-TEST12345';
+  process.env.GA4_API_SECRET = 'test-api-secret';
+  process.env.META_PIXEL_ID = 'pixel-1';
+  process.env.META_ACCESS_TOKEN = 'token-1';
+  delete process.env.PURCHASE_DISPATCH_ENABLED;
+
+  global.fetch = (async (input: RequestInfo | URL): Promise<Response> => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+
+    if (url.startsWith('https://www.google-analytics.com/mp/collect')) {
+      return new Response(null, { status: 204 });
+    }
+
+    if (url.startsWith('https://graph.facebook.com/v19.0/pixel-1/events')) {
+      return new Response(JSON.stringify({ events_received: 1 }), { status: 200 });
+    }
+
+    return new Response(JSON.stringify({ error: 'unexpected request' }), { status: 500 });
+  }) as typeof fetch;
+
+  const response = await handler(buildRequest({
+    dealId: 'deal-default-enabled',
+    value: 1000,
+    gaClientId: '123456789.1234567890',
+    fbclid: 'fbclid-123',
+  }, 'expected-secret'));
+
+  assert.equal(response.status, 200);
+  const data = await response.json() as Record<string, unknown>;
+  assert.equal(data.mode, 'full');
+});
+
+test('purchase-dispatch should derive a deterministic id for purchase but not for close_convert_lead', async (t) => {
+  const calls: Array<{ url: string; body?: Record<string, unknown> }> = [];
+
+  t.after(() => {
+    global.fetch = originalFetch;
+    restoreEnv();
+  });
+
+  process.env.N8N_WEBHOOK_SECRET = 'expected-secret';
+  process.env.GA4_MEASUREMENT_ID = 'G-TEST12345';
+  process.env.GA4_API_SECRET = 'test-api-secret';
+  process.env.META_PIXEL_ID = 'pixel-1';
+  process.env.META_ACCESS_TOKEN = 'token-1';
+
+  global.fetch = (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+    const body = init?.body ? JSON.parse(String(init.body)) as Record<string, unknown> : undefined;
+    calls.push({ url, body });
+
+    if (url.startsWith('https://www.google-analytics.com/mp/collect')) {
+      return new Response(null, { status: 204 });
+    }
+
+    if (url.startsWith('https://graph.facebook.com/v19.0/pixel-1/events')) {
+      return new Response(JSON.stringify({ events_received: 1 }), { status: 200 });
+    }
+
+    return new Response(JSON.stringify({ error: 'unexpected request' }), { status: 500 });
+  }) as typeof fetch;
+
+  await handler(buildRequest({
+    eventType: 'purchase',
+    dealId: '123',
+    value: 500,
+    gaClientId: '123456789.1234567890',
+    fbclid: 'fbclid-123',
+  }, 'expected-secret'));
+
+  const purchaseMetaEvent = (calls.find(c => c.url.includes('graph.facebook'))!.body?.data as Array<Record<string, unknown>>)?.[0];
+  assert.equal(purchaseMetaEvent?.event_id, 'purchase_123');
+  const purchaseGaEvent = (calls.find(c => c.url.includes('google-analytics'))!.body?.events as Array<Record<string, unknown>>)?.[0];
+  assert.equal((purchaseGaEvent?.params as Record<string, unknown>)?.transaction_id, 'purchase_123');
+
+  calls.length = 0;
+
+  await handler(buildRequest({
+    eventType: 'close_convert_lead',
+    dealId: '123',
+    value: 500,
+    gaClientId: '123456789.1234567890',
+    fbclid: 'fbclid-123',
+  }, 'expected-secret'));
+
+  const closeMetaEvent = (calls.find(c => c.url.includes('graph.facebook'))!.body?.data as Array<Record<string, unknown>>)?.[0];
+  assert.equal(closeMetaEvent?.event_id, '123');
+  const closeGaEvent = (calls.find(c => c.url.includes('google-analytics'))!.body?.events as Array<Record<string, unknown>>)?.[0];
+  assert.equal((closeGaEvent?.params as Record<string, unknown>)?.transaction_id, '123');
 });

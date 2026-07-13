@@ -1,6 +1,6 @@
 # Decisão — Fechar o ciclo de conversão Odoo → Google e Meta
 
-**Status:** decisão de arquitetura tomada; implementação ainda não iniciada.
+**Status:** decisão de arquitetura tomada; parte repo implementada (plans/019) atrás de flags — ativação pendente dos gates externos.
 **Origem:** issue #1149 (spike), que sucede `docs/marketing/plano-conversao-offline.md` (removido — conteúdo evoluído para este documento, decisões antes em aberto agora resolvidas).
 **Autor:** spike de engenharia solo (agente), sem acesso a admin do Odoo/Google Ads/Meta Business — as decisões marcadas **[requer confirmação externa]** são recomendações fundamentadas, não fatos verificados em produção.
 

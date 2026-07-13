@@ -26,7 +26,7 @@ começar, honre as STOP conditions e atualize sua linha ao terminar.
 | 016 | SPIKE: rotear resultado do quiz para o chatbot (design doc) | P3 | M | — | DONE |
 | 017 | Mover folder do design system → `docs/design/brand-system/` + ajustar teste | P3 | S | — | DONE |
 | 018 | Guard do workflow de reviews ignora mudança só de `lastFetched` | P3 | S | 014 | DONE |
-| 019 | Fechar o loop de conversão Odoo → Google/Meta (parte repo, flags off) | P1 | M | — (gates externos p/ ativação) | TODO |
+| 019 | Fechar o loop de conversão Odoo → Google/Meta (parte repo, flags off) | P1 | M | — (gates externos p/ ativação) | DONE |
 | 020 | SPIKE: spec do funil canônico de medição (visitante → receita CRM) | P2 | M | — | TODO |
 | 021 | Protótipo de prova social casada ao destino no modal de Destinations | P2 | M | — | TODO |
 

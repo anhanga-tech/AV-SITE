@@ -85,7 +85,8 @@ async function sendToOdoo(input: OdooLeadInput): Promise<void> {
 
     if (input.createsLead) {
         const idempotencyKey = await resolveIdempotencyKey(input);
-        const leadFields = buildLeadFields(input, partnerId, idempotencyKey);
+        const includeConversionFields = process.env.ODOO_CONVERSION_FIELDS_ENABLED === 'true';
+        const leadFields = buildLeadFields(input, partnerId, idempotencyKey, { includeConversionFields });
         // utm_campaign is highly variable (one per ad campaign), unlike the fixed
         // source/medium table, so it's resolved against Odoo's native utm.campaign
         // model (find-or-create) instead of a hardcoded id.

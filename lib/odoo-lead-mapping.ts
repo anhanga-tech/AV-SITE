@@ -186,13 +186,29 @@ function buildDescriptionHtml(input: OdooLeadInput, idempotencyKey?: string): st
     return items.length > 0 ? `<ul>${items.join('')}</ul>` : '';
 }
 
+export interface BuildLeadFieldsOptions {
+    /**
+     * Escreve os campos estruturados de tracking (x_gclid, x_fbclid, x_fbc,
+     * x_fbp, x_ga_client_id, x_ga_session_id) exigidos pela automação de
+     * conversão Odoo→Ads (docs/product/odoo-ads-conversion-decision.md §1).
+     * Default false: os campos custom precisam existir na instância Odoo
+     * antes — escrever campo inexistente derruba o create via JSON-RPC.
+     */
+    includeConversionFields?: boolean;
+}
+
 /**
  * Builds the `crm.lead` create dict for forms that become an opportunity. Links
  * the deduped partner via `partner_id`. `destination` is also written to the
  * structured `x_destino` field (Studio, added for the Contato/Oportunidade/
  * Chamado field redesign) in addition to the human-readable description line.
  */
-export function buildLeadFields(input: OdooLeadInput, partnerId: number, idempotencyKey?: string): Record<string, unknown> {
+export function buildLeadFields(
+    input: OdooLeadInput,
+    partnerId: number,
+    idempotencyKey?: string,
+    options: BuildLeadFieldsOptions = {},
+): Record<string, unknown> {
     const name = fullName(input.firstName, input.lastName);
     const title = input.destination ? `Lead Site — ${name} (${input.destination})` : `Lead Site — ${name}`;
     const { source_id, medium_id } = resolveSourceMedium(input.utms, input.originSignal);
@@ -214,6 +230,16 @@ export function buildLeadFields(input: OdooLeadInput, partnerId: number, idempot
     if (input.empresa) fields.partner_name = input.empresa;
     if (input.cargo) fields.function = input.cargo;
     if (input.destination) fields.x_destino = input.destination;
+
+    if (options.includeConversionFields) {
+        const t = input.tracking;
+        if (t?.gclid) fields.x_gclid = t.gclid;
+        if (t?.fbclid) fields.x_fbclid = t.fbclid;
+        if (t?.fbc) fields.x_fbc = t.fbc;
+        if (t?.fbp) fields.x_fbp = t.fbp;
+        if (t?.cid) fields.x_ga_client_id = t.cid;
+        if (t?.sid) fields.x_ga_session_id = t.sid;
+    }
 
     const description = buildDescriptionHtml(input, idempotencyKey);
     if (description) fields.description = description;
