@@ -61,16 +61,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
           node-version: "24"
           package-manager-cache: false
       - name: Run react-doctor directly and capture raw output
+        env:
+          REACT_DOCTOR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           set +e
-          npx --yes react-doctor@0.7.7 . --json --json-compact --blocking none --project '*' > /tmp/raw-report.json 2> /tmp/raw-report.err
+          git diff --name-only --diff-filter=AMR "${REACT_DOCTOR_BASE_SHA}...HEAD" > /tmp/changed.txt
+          echo "--- changed files ---"
+          cat /tmp/changed.txt
+          wc -l < /tmp/changed.txt
+          npx --yes react-doctor@0.7.7 . --json --json-compact --blocking none --project '*' --scope changed --changed-files-from /tmp/changed.txt > /tmp/raw-report.json 2> /tmp/raw-report.err
           echo "EXIT_CODE=$?"
-          echo "--- stdout ---"
+          echo "--- stdout (len=$(wc -c < /tmp/raw-report.json)) ---"
           cat /tmp/raw-report.json
-          echo "--- stderr ---"
+          echo "--- stderr (len=$(wc -c < /tmp/raw-report.err)) ---"
           cat /tmp/raw-report.err
+          echo "--- END ---"
