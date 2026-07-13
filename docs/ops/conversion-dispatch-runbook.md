@@ -16,11 +16,13 @@ Odoo — cada uma representa uma conversão que nunca chegou ao Google/Meta.
 
 ## Retry
 
-- Reprocessar automaticamente registros com `status = 'failed' AND attempts < 5`,
+- Reprocessar automaticamente registros com
+  `x_conversion_dispatch_status = 'failed' AND x_conversion_dispatch_attempts < 5`,
   com backoff: 1h, 4h, 12h, 24h.
-- `attempts >= 5` → não reprocessar automaticamente; abrir investigação manual.
-  O reenvio manual é feito chamando `/api/purchase-dispatch` diretamente com o
-  `dealId` da oportunidade (mesmo payload que a automação do Odoo enviaria).
+- `x_conversion_dispatch_attempts >= 5` → não reprocessar automaticamente; abrir
+  investigação manual. O reenvio manual é feito chamando `/api/purchase-dispatch`
+  diretamente com o `dealId` da oportunidade (mesmo payload que a automação do
+  Odoo enviaria).
 
 ## Kill switch / rollback
 
@@ -29,7 +31,8 @@ Odoo — cada uma representa uma conversão que nunca chegou ao Google/Meta.
   sem expor o estado da flag a chamadores não autenticados (o gate roda depois
   da checagem de `X-Webhook-Secret`).
 - Enquanto desligado, a automação do Odoo continua tentando e gravando
-  `status = 'failed'` — nenhum evento é perdido silenciosamente.
+  `x_conversion_dispatch_status = 'failed'` — nenhum evento é perdido
+  silenciosamente.
 - Ao religar (removendo a env ou setando um valor diferente de `'false'`/`'0'`),
   o ciclo de reconciliação/retry acima reprocessa o backlog acumulado.
 
