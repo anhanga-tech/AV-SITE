@@ -76,7 +76,16 @@ jobs:
           echo "--- changed files ---"
           cat /tmp/changed.txt
           wc -l < /tmp/changed.txt
-          npx --yes react-doctor@0.7.7 . --json --json-compact --blocking none --project '*' --scope changed --changed-files-from /tmp/changed.txt > /tmp/raw-report.json 2> /tmp/raw-report.err
+
+          echo "--- installing exactly like the action (npm install --prefix) ---"
+          mkdir -p /tmp/toolchain
+          npm install --prefix /tmp/toolchain --no-save --no-audit --no-fund react-doctor@0.7.7
+          echo "npm install exit: $?"
+          /tmp/toolchain/node_modules/.bin/react-doctor --version
+          echo "--version exit: $?"
+
+          echo "--- running the installed bin (not npx) ---"
+          /tmp/toolchain/node_modules/.bin/react-doctor . --json --json-compact --blocking none --project '*' --scope changed --changed-files-from /tmp/changed.txt > /tmp/raw-report.json 2> /tmp/raw-report.err
           echo "EXIT_CODE=$?"
           echo "--- stdout (len=$(wc -c < /tmp/raw-report.json)) ---"
           cat /tmp/raw-report.json
