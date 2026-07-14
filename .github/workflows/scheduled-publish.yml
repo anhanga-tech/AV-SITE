@@ -1,0 +1,55 @@
+# Publica posts agendados: o build de produção do Cloudflare Pages oculta
+# posts com `date` futura (ver lib/blog-schedule.js). Este workflow dispara o
+# Deploy Hook do Pages todo dia de manhã — o rebuild materializa qualquer
+# post vencido no site, no sitemap, no feed RSS e no llms.txt.
+#
+# O rebuild é INCONDICIONAL de propósito. As duas variantes condicionais
+# foram testadas e descartadas (sondas em 14/07/2026):
+#   - conferir o sitemap de produção → 403: o WAF do Cloudflare bloqueia
+#     IPs de runner do GitHub para o site, com qualquer user-agent;
+#   - conferir o último deploy via API do Pages → 401: o CLOUDFLARE_API_TOKEN
+#     do repo não tem escopo de leitura do Pages.
+# Um build diário (~30/mês) é irrelevante perto da cota e elimina qualquer
+# cenário de post preso: o catch-up é inerente.
+#
+# Setup (uma vez): criar um Deploy Hook no dashboard do Cloudflare Pages
+# (av-site → Settings → Builds & deployments → Deploy hooks, branch main) e
+# salvar a URL no secret CLOUDFLARE_PAGES_DEPLOY_HOOK_URL do repositório.
+name: Scheduled Blog Publish
+
+on:
+  schedule:
+    - cron: "15 9 * * *" # 06:15 América/São_Paulo (UTC-3)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  trigger-rebuild:
+    name: Rebuild diário de produção (publica posts vencidos)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      # Informativo apenas — não condiciona o disparo.
+      - name: Lista posts que vencem hoje
+        run: |
+          TODAY="$(TZ=America/Sao_Paulo date +%F)"
+          echo "Hoje (São Paulo): $TODAY"
+          grep -rlE "^date: *[\"']?${TODAY}" content/blog --include='*.mdx' \
+            | sed 's|.*/|• publica hoje: |; s|\.mdx$||' || echo "Nenhum post vence hoje."
+
+      - name: Dispara Deploy Hook do Cloudflare Pages
+        env:
+          DEPLOY_HOOK_URL: ${{ secrets.CLOUDFLARE_PAGES_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$DEPLOY_HOOK_URL" ]; then
+            echo "::error::Secret CLOUDFLARE_PAGES_DEPLOY_HOOK_URL não configurado — crie o Deploy Hook no dashboard do Pages e salve a URL como secret do repositório."
+            exit 1
+          fi
+          curl -fsS -X POST "$DEPLOY_HOOK_URL" >/dev/null
+          echo "Deploy hook disparado — o Cloudflare Pages vai rebuildar a main."
