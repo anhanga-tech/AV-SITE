@@ -171,7 +171,7 @@ On page load: captures UTM params + click IDs (gclid, fbclid, ttclid, etc.), ext
 
 ### Blog
 
-Blog posts are MDX files processed by `@mdx-js/rollup`. `scripts/generate-blog-manifest.ts` generates a manifest at build/dev time. `pages/BlogList.tsx` and `pages/BlogPost.tsx` serve the blog locally. `/old-blog` and `/old-blog/:slug` redirect to an external domain via `BlogRedirect.tsx`. `api/markdown.ts` serves raw markdown for content negotiation (`Accept: text/markdown`).
+Blog posts are MDX files processed by `@mdx-js/rollup`. `scripts/generate-blog-manifest.ts` generates a manifest at build/dev time. Posts com `date` futura são ocultados no build de produção (CF Pages/main) e publicados pelo rebuild diário de `.github/workflows/scheduled-publish.yml` — ver `lib/blog-schedule.js` e `content/blog/README.md`. `pages/BlogList.tsx` and `pages/BlogPost.tsx` serve the blog locally. `/old-blog` and `/old-blog/:slug` redirect to an external domain via `BlogRedirect.tsx`. `api/markdown.ts` serves raw markdown for content negotiation (`Accept: text/markdown`).
 
 ### CMS
 
