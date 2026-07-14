@@ -19,7 +19,10 @@ function getSharedObserver(): IntersectionObserver | null {
     if (typeof IntersectionObserver === 'undefined') return null;
     if (!sharedObserver) {
         sharedObserver = new IntersectionObserver(
-            (entries) => {
+            // Use the `observer` the callback receives natively rather than the
+            // module-scoped `sharedObserver`, so the callback is self-contained
+            // and never depends on the mutable outer reference.
+            (entries, observer) => {
                 for (const entry of entries) {
                     if (!entry.isIntersecting) continue;
                     const callback = observerCallbacks.get(entry.target);
@@ -27,7 +30,7 @@ function getSharedObserver(): IntersectionObserver | null {
                         // Reveal once, then stop observing — mirrors the old
                         // observer.disconnect() after the first intersection.
                         observerCallbacks.delete(entry.target);
-                        sharedObserver?.unobserve(entry.target);
+                        observer.unobserve(entry.target);
                         callback();
                     }
                 }
