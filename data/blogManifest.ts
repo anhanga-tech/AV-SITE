@@ -3,7 +3,7 @@ import type { PostMeta } from '../types/blog';
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
     "title": "Quanto Custa uma Viagem para a Disney em 2026? Planilha Real, Item por Item",
-    "excerpt": "Família de 4 pessoas, 8 dias em Orlando: entre R$ 42 mil e R$ 62 mil. Planilha completa com voos, hotel, ingressos e os custos que ninguém coloca na conta.",
+    "excerpt": "Família de 4, 8 dias em Orlando: entre R$ 42 mil e R$ 62 mil. Planilha completa com voos, hotel, ingressos e os custos que ninguém coloca na conta.",
     "date": "2026-07-21",
     "author": "felipe-william",
     "category": "Destinos",
