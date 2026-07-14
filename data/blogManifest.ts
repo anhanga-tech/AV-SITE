@@ -19,8 +19,8 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "familia",
       "orcamento-viagem"
     ],
-    "seoTitle": "Quanto Custa uma Viagem para a Disney em 2026?",
-    "seoDescription": "Planilha real de custos da Disney em 2026 para família de 4 pessoas: voos, hospedagem, ingressos, alimentação e os gastos escondidos. Três cenários de orçamento.",
+    "seoTitle": "Quanto Custa uma Viagem para a Disney?",
+    "seoDescription": "Planilha real de custos da Disney em 2026 para família de 4: voos, hospedagem, ingressos, alimentação e os gastos escondidos. Três cenários de orçamento.",
     "faq": [
       {
         "question": "Quanto custa uma viagem para a Disney para uma família de 4 pessoas?",
