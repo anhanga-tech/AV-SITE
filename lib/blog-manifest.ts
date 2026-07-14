@@ -55,8 +55,8 @@ function normalizePostImageUrl(image: string): string {
   return resolveMediaUrl(image, DEFAULT_MEDIA_BASE_URL);
 }
 
-function toPostMeta(filepath: string, rawContent: string): PostMeta {
-  const { data, content } = matter(rawContent);
+function toPostMeta(filepath: string, parsed: ReturnType<typeof matter>): PostMeta {
+  const { data, content } = parsed;
   const slug = path.basename(filepath, '.mdx');
   const frontmatter = data as BlogPostFrontmatter;
   const dateModified = normalizeFrontmatterDate(frontmatter.dateModified);
@@ -83,7 +83,7 @@ export async function collectBlogPostMeta(
     filenames.flatMap((filename) => {
       if (!filename.endsWith('.mdx') || filename.startsWith('_')) return [];
       const filepath = path.join(blogDir, filename);
-      return [readFile(filepath, 'utf8').then((rawContent) => toPostMeta(filepath, rawContent))];
+      return [readFile(filepath, 'utf8').then((rawContent) => toPostMeta(filepath, matter(rawContent)))];
     })
   );
 
@@ -147,9 +147,8 @@ export async function writeBlogMarkdown(
       .map(async (filename) => {
         const filepath = path.join(blogDir, filename);
         const rawContent = await readFile(filepath, 'utf8');
-        const { content } = matter(rawContent);
-        const meta = toPostMeta(filepath, rawContent);
-        return [meta, content] as const;
+        const parsed = matter(rawContent);
+        return [toPostMeta(filepath, parsed), parsed.content] as const;
       })
   );
 

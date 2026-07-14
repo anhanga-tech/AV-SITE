@@ -33,12 +33,6 @@ async function makeBlogDir(dates: { passado: string; hoje: string; futuro: strin
 const FIXED_DATES = { passado: '2026-07-01', hoje: '2026-07-14', futuro: '2026-07-21' };
 const FIXED_TODAY = '2026-07-14';
 
-function isoDateWithOffset(isoDate: string, days: number): string {
-  const base = new Date(`${isoDate}T12:00:00Z`);
-  base.setUTCDate(base.getUTCDate() + days);
-  return base.toISOString().slice(0, 10);
-}
-
 test('todayInSaoPaulo converte UTC para o dia civil de São Paulo (UTC-3)', () => {
   assert.equal(todayInSaoPaulo(new Date('2026-07-14T02:59:00Z')), '2026-07-13');
   assert.equal(todayInSaoPaulo(new Date('2026-07-14T03:00:00Z')), '2026-07-14');
@@ -92,27 +86,16 @@ test('writeBlogMarkdown aplica o mesmo filtro de agendamento do manifest', async
 });
 
 test('buildPrerenderRoutes não prerenderiza rota de post futuro em produção', async () => {
-  // buildPrerenderRoutes usa o relógio real; as datas das fixtures são
-  // derivadas de hoje para o teste continuar determinístico em qualquer data.
-  const today = todayInSaoPaulo();
-  const dir = await makeBlogDir({
-    passado: isoDateWithOffset(today, -7),
-    hoje: today,
-    futuro: isoDateWithOffset(today, 7),
-  });
-  const previous = process.env.BLOG_HIDE_FUTURE_POSTS;
-  process.env.BLOG_HIDE_FUTURE_POSTS = 'true';
+  const dir = await makeBlogDir(FIXED_DATES);
   try {
-    const routes = await buildPrerenderRoutes(dir);
+    const routes = await buildPrerenderRoutes(dir, { hideFuture: true, today: FIXED_TODAY });
     assert.ok(routes.includes('/blog/post-passado'));
     assert.ok(routes.includes('/blog/post-hoje'));
     assert.ok(!routes.includes('/blog/post-futuro'));
+
+    const allRoutes = await buildPrerenderRoutes(dir, { hideFuture: false, today: FIXED_TODAY });
+    assert.ok(allRoutes.includes('/blog/post-futuro'));
   } finally {
-    if (previous === undefined) {
-      delete process.env.BLOG_HIDE_FUTURE_POSTS;
-    } else {
-      process.env.BLOG_HIDE_FUTURE_POSTS = previous;
-    }
     await rm(dir, { recursive: true, force: true });
   }
 });

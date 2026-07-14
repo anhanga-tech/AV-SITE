@@ -114,6 +114,26 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.anhanga.tur.br/blog/como-planejar-viagem-orlando-sob-medida/</loc>
+    <lastmod>2026-07-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/como-planejar-viagem-orlando-sob-medida.jpg</image:loc>
+      <image:caption>Como Planejar uma Viagem para Orlando Sob Medida: o Guia Completo</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.anhanga.tur.br/blog/melhor-epoca-viajar-orlando-guia-perfil-viajante/</loc>
+    <lastmod>2026-07-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/melhor-epoca-viajar-orlando-guia-perfil-viajante.jpg</image:loc>
+      <image:caption>Melhor Época para Viajar para Orlando: Guia por Perfil de Viajante</image:caption>
+    </image:image>
+  </url>
+  <url>
     <loc>https://www.anhanga.tur.br/blog/cancun-punta-cana-aruba-lua-de-mel/</loc>
     <lastmod>2026-07-04</lastmod>
     <changefreq>monthly</changefreq>
@@ -145,7 +165,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/documentos-para-viajar-com-crianca/</loc>
-    <lastmod>2026-07-04</lastmod>
+    <lastmod>2026-07-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
@@ -155,7 +175,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/etias-2026-brasileiros-europa/</loc>
-    <lastmod>2026-07-04</lastmod>
+    <lastmod>2026-07-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
