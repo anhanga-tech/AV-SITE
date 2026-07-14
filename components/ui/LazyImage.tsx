@@ -2,6 +2,59 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Image as ImageIcon } from 'lucide-react';
 import { optimizeRemoteImageUrl, generateResponsiveSrcSets } from '../../data/mediaConfig';
 
+// PERFORMANCE: one IntersectionObserver shared by every LazyImage instance.
+// Each image used to allocate its own observer, so a page with N below-the-fold
+// images (Categories, Blog cards, Highlights, Testimonials …) ran N separate
+// observers and dispatched N callbacks per scroll tick. A single shared observer
+// collapses that to one instance and one callback loop — less per-image memory
+// and less main-thread work while scrolling. Options match the previous
+// per-instance config exactly (rootMargin '100px', threshold 0.01), so all
+// instances can safely share one observer.
+type VisibilityCallback = () => void;
+
+const observerCallbacks = new WeakMap<Element, VisibilityCallback>();
+let sharedObserver: IntersectionObserver | null = null;
+
+function getSharedObserver(): IntersectionObserver | null {
+    if (typeof IntersectionObserver === 'undefined') return null;
+    if (!sharedObserver) {
+        sharedObserver = new IntersectionObserver(
+            (entries) => {
+                for (const entry of entries) {
+                    if (!entry.isIntersecting) continue;
+                    const callback = observerCallbacks.get(entry.target);
+                    if (callback) {
+                        // Reveal once, then stop observing — mirrors the old
+                        // observer.disconnect() after the first intersection.
+                        observerCallbacks.delete(entry.target);
+                        sharedObserver?.unobserve(entry.target);
+                        callback();
+                    }
+                }
+            },
+            { rootMargin: '100px', threshold: 0.01 },
+        );
+    }
+    return sharedObserver;
+}
+
+/** Registers an element with the shared observer; returns a cleanup fn. */
+function observeVisibility(element: Element, onVisible: VisibilityCallback): () => void {
+    const observer = getSharedObserver();
+    if (!observer) {
+        // No IntersectionObserver available: reveal immediately so the image
+        // still loads rather than staying hidden forever.
+        onVisible();
+        return () => {};
+    }
+    observerCallbacks.set(element, onVisible);
+    observer.observe(element);
+    return () => {
+        observerCallbacks.delete(element);
+        observer.unobserve(element);
+    };
+}
+
 interface LazyImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
     src: string;
     alt: string;
@@ -50,20 +103,10 @@ export const LazyImage = React.memo<LazyImageProps>(({
     }, [src, width, height]);
 
     useEffect(() => {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    setIsVisible(true);
-                    observer.disconnect();
-                }
-            });
-        }, { rootMargin: '100px', threshold: 0.01 });
-
-        if (containerRef.current) {
-            observer.observe(containerRef.current);
-        }
-
-        return () => observer.disconnect();
+        const element = containerRef.current;
+        if (!element) return;
+        // Register with the shared observer instead of allocating one per image.
+        return observeVisibility(element, () => setIsVisible(true));
     }, []);
 
     const style = useMemo(() => {
