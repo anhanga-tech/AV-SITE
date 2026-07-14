@@ -4,7 +4,7 @@ Posts do blog em formato MDX com frontmatter YAML.
 
 ## Agendamento de publicação
 
-O campo `date` do frontmatter agenda a publicação: **no build de produção** (Cloudflare Pages, branch `main`), posts com `date` futura ficam fora do manifest, do prerender, do `sitemap.xml`, do `feed.xml` e do `llms.txt`. Um workflow diário (`.github/workflows/scheduled-publish.yml`, 06:15 de São Paulo) verifica se algum post vencido (data <= hoje) ainda está fora do sitemap de produção e, se sim, dispara o Deploy Hook do Pages — o rebuild coloca o post no ar. A comparação com o sitemap dá catch-up automático: se o cron falhar no dia do post, a execução seguinte publica o atrasado.
+O campo `date` do frontmatter agenda a publicação: **no build de produção** (Cloudflare Pages, branch `main`), posts com `date` futura ficam fora do manifest, do prerender, do `sitemap.xml`, do `feed.xml` e do `llms.txt`. Um workflow diário (`.github/workflows/scheduled-publish.yml`, 06:15 de São Paulo) dispara o Deploy Hook do Pages incondicionalmente — o rebuild materializa qualquer post vencido, e um cron perdido é coberto pelo dia seguinte (catch-up inerente). O porquê de não haver verificação condicional está documentado no cabeçalho do próprio workflow.
 
 Na prática: pode mergear a PR do post quando o conteúdo estiver pronto; ele só publica na data do frontmatter.
 
