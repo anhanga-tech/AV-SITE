@@ -1,8 +1,12 @@
 # Publica posts agendados: o build de produção do Cloudflare Pages oculta
 # posts com `date` futura (ver lib/blog-schedule.js). Este workflow roda todo
-# dia de manhã e, quando existe um post cuja data é hoje, dispara o Deploy
-# Hook do Pages para rebuildar a main — o rebuild materializa o post no site,
-# no sitemap, no feed RSS e no llms.txt.
+# dia de manhã e, quando existe um post vencido (date <= hoje) que ainda não
+# aparece no sitemap de produção, dispara o Deploy Hook do Pages — o rebuild
+# materializa o post no site, no sitemap, no feed RSS e no llms.txt.
+#
+# Comparar com o sitemap (em vez de "date == hoje") dá catch-up automático:
+# se o cron falhar ou atrasar no dia do post (schedule é best-effort no
+# GitHub Actions), a execução seguinte ainda enxerga o post pendente.
 #
 # Setup (uma vez): criar um Deploy Hook no dashboard do Cloudflare Pages
 # (av-site → Settings → Builds & deployments → Deploy hooks, branch main) e
@@ -19,7 +23,7 @@ permissions:
 
 jobs:
   trigger-rebuild:
-    name: Rebuild produção se há post agendado para hoje
+    name: Rebuild produção se há post vencido fora do ar
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,23 +31,41 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Verifica se há post com data de hoje
-        id: today
+      - name: Verifica se há post vencido fora do ar
+        id: due
         run: |
           TODAY="$(TZ=America/Sao_Paulo date +%F)"
           echo "Hoje (São Paulo): $TODAY"
-          if grep -rlEq "^date: *[\"']?${TODAY}" content/blog --include='*.mdx'; then
-            echo "Post agendado para hoje encontrado."
-            echo "publish=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "Nenhum post agendado para hoje — nada a fazer."
-            echo "publish=false" >> "$GITHUB_OUTPUT"
+
+          SITEMAP="$(curl -fsS --max-time 30 https://www.anhanga.tur.br/sitemap.xml)" || {
+            echo "::error::Não consegui ler o sitemap de produção — sem ele não dá para saber o que já está publicado."
+            exit 1
+          }
+
+          publish=false
+          for file in content/blog/*.mdx; do
+            slug="$(basename "$file" .mdx)"
+            case "$slug" in _*) continue ;; esac
+            date="$(sed -nE "s/^date: *[\"']?([0-9]{4}-[0-9]{2}-[0-9]{2}).*/\1/p" "$file" | head -1)"
+            [ -z "$date" ] && continue
+            [ "$date" \> "$TODAY" ] && continue
+            # O sitemap usa URLs com barra final; o -F exato evita casar
+            # slugs que são prefixo de outros.
+            if ! printf '%s' "$SITEMAP" | grep -qF "/blog/$slug/"; then
+              echo "Post vencido ausente de produção: $slug (date: $date)"
+              publish=true
+            fi
+          done
+
+          if [ "$publish" = false ]; then
+            echo "Todos os posts vencidos já estão publicados — nada a fazer."
           fi
+          echo "publish=$publish" >> "$GITHUB_OUTPUT"
 
       # workflow_dispatch sempre dispara o rebuild, para permitir publicação
       # manual fora do horário do cron.
       - name: Dispara Deploy Hook do Cloudflare Pages
-        if: steps.today.outputs.publish == 'true' || github.event_name == 'workflow_dispatch'
+        if: steps.due.outputs.publish == 'true' || github.event_name == 'workflow_dispatch'
         env:
           DEPLOY_HOOK_URL: ${{ secrets.CLOUDFLARE_PAGES_DEPLOY_HOOK_URL }}
         run: |
