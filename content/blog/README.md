@@ -2,6 +2,18 @@
 
 Posts do blog em formato MDX com frontmatter YAML.
 
+## Agendamento de publicação
+
+O campo `date` do frontmatter agenda a publicação: **no build de produção** (Cloudflare Pages, branch `main`), posts com `date` futura ficam fora do manifest, do prerender, do `sitemap.xml`, do `feed.xml` e do `llms.txt`. Um workflow diário (`.github/workflows/scheduled-publish.yml`, 06:15 de São Paulo) verifica se algum post "vence" no dia e dispara o Deploy Hook do Pages — o rebuild coloca o post no ar automaticamente.
+
+Na prática: pode mergear a PR do post quando o conteúdo estiver pronto; ele só publica na data do frontmatter.
+
+- Dev local e previews de PR mostram **todos** os posts, inclusive futuros (bom para revisão).
+- Para simular produção localmente: `BLOG_HIDE_FUTURE_POSTS=true pnpm build`.
+- O fuso de referência é `America/Sao_Paulo` (ver `lib/blog-schedule.js`).
+- Depende do secret `CLOUDFLARE_PAGES_DEPLOY_HOOK_URL` (URL de Deploy Hook criada no dashboard do Pages).
+- Um post mergeado com data já passada publica no próprio deploy do merge, como sempre.
+
 ## Limitação: JSX inline não é suportado pelo Decap CMS
 
 O widget `markdown` do Decap CMS não renderiza nem preserva JSX. Por isso, **não inclua componentes JSX diretamente no corpo dos posts** (ex.: `<ChatCTA />`, `<VideoEmbed />`, etc.).
