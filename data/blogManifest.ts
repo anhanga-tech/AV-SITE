@@ -2,6 +2,51 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
+    "title": "Quanto Custa uma Viagem para a Disney em 2026? Planilha Real, Item por Item",
+    "excerpt": "Família de 4, 8 dias em Orlando: entre R$ 42 mil e R$ 62 mil. Planilha completa com voos, hotel, ingressos e os custos que ninguém coloca na conta.",
+    "date": "2026-07-21",
+    "author": "felipe-william",
+    "category": "Destinos",
+    "image": "https://media.anhanga.tur.br/images/blog/quanto-custa-viagem-disney-2026.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Orlando",
+    "tags": [
+      "disney",
+      "orlando",
+      "quanto-custa",
+      "planejamento",
+      "familia",
+      "orcamento-viagem"
+    ],
+    "seoTitle": "Quanto Custa uma Viagem para a Disney?",
+    "seoDescription": "Planilha real de custos da Disney em 2026 para família de 4: voos, hospedagem, ingressos, alimentação e os gastos escondidos. Três cenários de orçamento.",
+    "faq": [
+      {
+        "question": "Quanto custa uma viagem para a Disney para uma família de 4 pessoas?",
+        "answer": "Para 8 dias em Orlando com 5 dias de parque, uma família de 4 pessoas gasta entre R$ 42 mil e R$ 62 mil, dependendo do padrão de hotel, da época e de quanto se gasta com alimentação e compras. No padrão mais confortável, com hotel Disney e fura-fila todos os dias, a conta passa de R$ 80 mil."
+      },
+      {
+        "question": "Quanto custa o ingresso da Disney em 2026?",
+        "answer": "O preço é dinâmico e muda conforme a data. Na nossa pesquisa de julho de 2026, o ingresso de 5 dias saiu por cerca de R$ 3.700 por adulto (o de 4 dias custa só R$ 182 a menos) e o de 1 dia chega a R$ 1.170 no teto do calendário. Crianças de 3 a 9 anos pagam um pouco menos."
+      },
+      {
+        "question": "Dá para fazer uma viagem para a Disney gastando menos de R$ 40 mil?",
+        "answer": "Dá, mas por pouco: nosso cenário enxuto fecha em R$ 42 mil, com voo com conexão, hotel fora do complexo e 4 dias de parque. Para ficar abaixo de R$ 40 mil é preciso ir além: 3 dias de parque, baixa temporada e voos comprados com bastante antecedência."
+      },
+      {
+        "question": "Qual é a época mais barata para ir à Disney?",
+        "answer": "Fim de janeiro, fevereiro (fora do Carnaval brasileiro), as primeiras semanas de maio e setembro. Nessas janelas os voos caem bastante em relação a julho e os ingressos ficam na faixa baixa do preço dinâmico. Julho e dezembro são os meses mais caros."
+      },
+      {
+        "question": "O que sai mais barato: fechar com agência ou montar a viagem por conta própria?",
+        "answer": "Em itens tabelados, como ingressos oficiais, o preço é praticamente o mesmo. A diferença da agência está em montar o roteiro no número certo de dias, evitar gastos que não valem a pena para o seu perfil de família e resolver imprevistos durante a viagem. O erro caro não costuma ser pagar comissão: é comprar dias de parque, fura-fila e hotel errados para a sua família."
+      }
+    ],
+    "slug": "quanto-custa-viagem-disney-2026",
+    "readingTime": "11 min de leitura"
+  },
+  {
     "title": "Como Planejar uma Viagem para Orlando Sob Medida: o Guia Completo",
     "excerpt": "Orlando não é só Disney. É passaporte, visto, escolha de parques, hospedagem e um orçamento que muda conforme cada decisão. Veja como planejar sem se perder.",
     "date": "2026-07-10",
