@@ -1,3 +1,7 @@
+## 2026-07-14 - ⚡ Bolt: react-doctor CI check is a false-red (tool bug)
+**Learning:** The `react-doctor` CI check fails on *every* PR with "Scan could not complete / react-doctor exited with status 0 before producing a JSON report" — the job log shows `ERROR_COUNT: 0`, `WARNING_COUNT: 0` and `SCAN_EXIT: 1`. This is a bug in the react-doctor 0.7.1 action (bumped in #1180), not a finding on the diff, and it does NOT block human merge (PR #1190 merged red on react-doctor). Re-running the failed job reproduces it identically.
+**Action:** When a Bolt PR shows red on `react-doctor`, don't investigate it as a code problem or try to fix it — confirm `ERROR_COUNT`/`WARNING_COUNT` are 0 in the job log, flag it once to the user as a known tool bug needing a CI/deps decision, and leave workflows/deps untouched (out of scope for a perf PR).
+
 ## 2027-01-20 - ⚡ Bolt: Header Scroll Stabilization
 **Learning:** Global components like the `Header` that listen to scroll events are high-frequency targets for optimization. Without stable function references and memoized sub-navigation components, every scroll tick triggers a full reconciliation of the entire navigation tree. Stabilizing the style object with `useMemo` and callbacks with `useCallback` ensures that the main thread remains free for smooth scrolling and interaction.
 **Action:** Always memoize sub-components and stabilize callback references in global UI elements that react to high-frequency events like scrolling or window resizing.
