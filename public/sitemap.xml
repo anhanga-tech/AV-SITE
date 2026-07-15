@@ -114,6 +114,16 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.anhanga.tur.br/blog/roteiro-bonito-ms-5-dias/</loc>
+    <lastmod>2026-07-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/roteiro-bonito-ms-5-dias.jpg</image:loc>
+      <image:caption>Roteiro Bonito MS em 5 Dias: O Que Vale e O Que Não Vale</image:caption>
+    </image:image>
+  </url>
+  <url>
     <loc>https://www.anhanga.tur.br/blog/quanto-custa-viagem-disney-2026/</loc>
     <lastmod>2026-07-21</lastmod>
     <changefreq>monthly</changefreq>

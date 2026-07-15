@@ -2,6 +2,51 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
+    "title": "Roteiro Bonito MS em 5 Dias: O Que Vale e O Que Não Vale",
+    "excerpt": "Bonito é o ecoturismo mais regulado do Brasil: preço tabelado, guia e vaga limitada. Roteiro de 5 dias, custos de 2026 e por que não é mais segredo.",
+    "date": "2026-07-28",
+    "author": "felipe-william",
+    "category": "Destinos",
+    "image": "https://media.anhanga.tur.br/images/blog/roteiro-bonito-ms-5-dias.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Roteiro Bonito",
+    "tags": [
+      "bonito",
+      "mato-grosso-do-sul",
+      "ecoturismo",
+      "brasil",
+      "flutuacao",
+      "roteiros-nacionais"
+    ],
+    "seoTitle": "Roteiro Bonito MS em 5 Dias: Preços 2026",
+    "seoDescription": "Roteiro de 5 dias em Bonito MS com preços reais de 2026 por passeio e como funciona o Voucher Único, o sistema que tabela preço e limita vaga.",
+    "faq": [
+      {
+        "question": "Preciso de guia para os passeios em Bonito?",
+        "answer": "Sim. Guia credenciado é obrigatório em todos os passeios, parte do sistema de Voucher Único. Não existe atração em Bonito que se visite sem guia."
+      },
+      {
+        "question": "Dá para comprar o passeio direto e economizar, sem agência?",
+        "answer": "Não. O preço é tabelado por lei municipal e é o mesmo em qualquer operadora credenciada. A vantagem de contratar uma agência é logística e garantia de vaga, não desconto."
+      },
+      {
+        "question": "Qual a melhor época para ir a Bonito?",
+        "answer": "Maio a setembro, período de seca, quando a água dos rios fica mais transparente e o clima é mais ameno. Dezembro a março traz cachoeiras mais cheias, só que com preço mais alto e mais gente."
+      },
+      {
+        "question": "Quantos dias são suficientes para conhecer Bonito?",
+        "answer": "De 4 a 5 dias cobre os passeios principais sem correria, incluindo ao menos uma flutuação e a Gruta do Lago Azul."
+      },
+      {
+        "question": "Como chegar a Bonito?",
+        "answer": "De voo direto até o Aeroporto Regional de Bonito (BYO), pela Gol via Congonhas ou pela Azul via Campinas e Corumbá, cerca de 2 horas de voo. Ou de voo até Campo Grande, com mais frequência e preço menor, seguido de van ou ônibus de aproximadamente 4h30 até a cidade."
+      }
+    ],
+    "slug": "roteiro-bonito-ms-5-dias",
+    "readingTime": "8 min de leitura"
+  },
+  {
     "title": "Quanto Custa uma Viagem para a Disney em 2026? Planilha Real, Item por Item",
     "excerpt": "Família de 4, 8 dias em Orlando: entre R$ 42 mil e R$ 62 mil. Planilha completa com voos, hotel, ingressos e os custos que ninguém coloca na conta.",
     "date": "2026-07-21",
