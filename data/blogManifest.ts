@@ -3,7 +3,7 @@ import type { PostMeta } from '../types/blog';
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
     "title": "Roteiro Bonito MS em 5 Dias: O Que Vale e O Que Não Vale",
-    "excerpt": "Bonito é o destino de ecoturismo mais regulado do Brasil: preço tabelado, guia obrigatório e vaga limitada em cada passeio. Roteiro de 5 dias, custos reais de 2026 e por que essa fama já não é segredo.",
+    "excerpt": "Bonito é o ecoturismo mais regulado do Brasil: preço tabelado, guia e vaga limitada. Roteiro de 5 dias, custos de 2026 e por que não é mais segredo.",
     "date": "2026-07-28",
     "author": "felipe-william",
     "category": "Destinos",
