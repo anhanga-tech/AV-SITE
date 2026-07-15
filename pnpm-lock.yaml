@@ -33,8 +33,8 @@ importers:
         specifier: ^2.1.10
         version: 2.1.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@sentry/cloudflare':
-        specifier: ^10.63.0
-        version: 10.63.0
+        specifier: ^10.64.0
+        version: 10.64.0(@opentelemetry/core@2.9.0(@opentelemetry/api@1.9.1))
       '@sentry/react':
         specifier: ^10.64.0
         version: 10.64.0(react@19.2.7)
@@ -1964,8 +1964,8 @@ packages:
     resolution: {integrity: sha512-CHZ7+79evh8knBtVHjW/XqV3mRaWs2TdjX7i55zpFe9vcNngQHV++0ss8ird/xfMY1mfCDtbyAN+Z6XY2o5aJA==}
     engines: {node: '>=18'}
 
-  '@sentry/cloudflare@10.63.0':
-    resolution: {integrity: sha512-no7bfrBqO3Niy+3vEqktYrNoTtBJtlJxpnTutmpSz55x+ytpNj+1YUUUbJRFctttDuPe38/+c6m1FwXGQg074A==}
+  '@sentry/cloudflare@10.64.0':
+    resolution: {integrity: sha512-YmOoJjQ7P7tSXf4O0CbPdtP0acrl4jnBNjVVksEmrxU9NZOwS9MtesDL1i93u0rGtU20WvwxUI7kQMTXp15U9w==}
     engines: {node: '>=18'}
     peerDependencies:
       '@cloudflare/workers-types': ^4.x
@@ -1976,10 +1976,6 @@ packages:
   '@sentry/conventions@0.15.1':
     resolution: {integrity: sha512-ZLP8bRdMON3prWE2tJyImuYscCxdcJeIPIhrOs/rgyFm3C1nCh1B6gdvPj3AZ5zW08oSFFCsq7T+tYEW3h8MNA==}
     engines: {node: '>=14'}
-
-  '@sentry/core@10.63.0':
-    resolution: {integrity: sha512-OtUbsrnbEHffOF2S2+M5zXa3HIM0U2b4CDVLKMY1dgS0J3ivRF8XvkjvyIcEG/y8JXnwXbnprLyjhG+AqMdUZQ==}
-    engines: {node: '>=18'}
 
   '@sentry/core@10.64.0':
     resolution: {integrity: sha512-HjojJcXD1l2qZ1AXje2s0XY/nYsaUt00wsM1HMBImA8vAClyPisFE/CC0/UD6pEvsGFhVgi8Dcxo7EN41uyeFw==}
@@ -7317,14 +7313,18 @@ snapshots:
       '@sentry/replay': 10.64.0
       '@sentry/replay-canvas': 10.64.0
 
-  '@sentry/cloudflare@10.63.0':
+  '@sentry/cloudflare@10.64.0(@opentelemetry/core@2.9.0(@opentelemetry/api@1.9.1))':
     dependencies:
       '@opentelemetry/api': 1.9.1
-      '@sentry/core': 10.63.0
+      '@sentry/core': 10.64.0
+      '@sentry/node': 10.64.0(@opentelemetry/core@2.9.0(@opentelemetry/api@1.9.1))
+      '@sentry/server-utils': 10.64.0
+    transitivePeerDependencies:
+      - '@opentelemetry/core'
+      - '@opentelemetry/exporter-trace-otlp-http'
+      - supports-color
 
   '@sentry/conventions@0.15.1': {}
-
-  '@sentry/core@10.63.0': {}
 
   '@sentry/core@10.64.0':
     dependencies:
