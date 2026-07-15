@@ -91,8 +91,19 @@ const CREDENTIALS = [
 
 const ConsultoriaDeViagemLanding: React.FC = () => {
   return (
-    <MotionConfig reducedMotion="user">
-      <div className="bg-white min-h-screen font-sans">
+    <>
+      {/*
+        No-JS / pre-hydration fallback: framer-motion serializa os estilos
+        `initial` (opacity:0) no HTML pré-renderizado. Sem JS a revelação
+        nunca dispara e as seções ficariam em branco. Isso força visibilidade
+        quando scripts estão desabilitados; com JS o seletor fica inerte e as
+        entradas animam normalmente.
+      */}
+      <noscript>
+        <style>{`[data-consultoria-landing] [style*="opacity"]{opacity:1!important}`}</style>
+      </noscript>
+      <MotionConfig reducedMotion="user">
+      <div data-consultoria-landing className="bg-white min-h-screen font-sans">
         <Seo
           title="Consultoria de Viagem Sob Medida em SP — Anhangá Viagens"
           description="Planeje sua viagem com consultores humanos. Sem pacote pronto, sem improviso. Roteiro personalizado com suporte antes, durante e depois."
@@ -407,7 +418,8 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
 
         <LandingFooter />
       </div>
-    </MotionConfig>
+      </MotionConfig>
+    </>
   );
 };
 
