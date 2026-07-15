@@ -45,6 +45,7 @@ A Anhangá Viagens é uma agência de viagens localizada em São Paulo (SP), fun
 Feed RSS: https://www.anhanga.tur.br/feed.xml
 Versão markdown de qualquer página: https://www.anhanga.tur.br/api/markdown?path=/blog/{slug}/
 
+- [Roteiro Bonito MS em 5 Dias: O Que Vale e O Que Não Vale](https://www.anhanga.tur.br/blog/roteiro-bonito-ms-5-dias/) (2026-07-28)
 - [Quanto Custa uma Viagem para a Disney em 2026? Planilha Real, Item por Item](https://www.anhanga.tur.br/blog/quanto-custa-viagem-disney-2026/) (2026-07-21)
 - [Como Planejar uma Viagem para Orlando Sob Medida: o Guia Completo](https://www.anhanga.tur.br/blog/como-planejar-viagem-orlando-sob-medida/) (2026-07-10)
 - [Melhor Época para Viajar para Orlando: Guia por Perfil de Viajante](https://www.anhanga.tur.br/blog/melhor-epoca-viajar-orlando-guia-perfil-viajante/) (2026-07-10)
