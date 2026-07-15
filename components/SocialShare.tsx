@@ -45,7 +45,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
     };
 
     const handleCopy = () => {
-        navigator.clipboard.writeText(url);
+        void navigator.clipboard.writeText(url);
         setCopied(true);
         import('../utils/haptics')
             .then(m => m.triggerHaptic('medium'))
@@ -57,12 +57,15 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
     if (minimal) {
         return (
             <div className={`flex items-center gap-1 ${className}`}>
+                <output aria-live="polite" aria-atomic="true" className="sr-only">
+                    {copied ? 'Link copiado com sucesso' : ''}
+                </output>
                 <button
                     type="button"
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        handleNativeShare();
+                        void handleNativeShare();
                     }}
                     onMouseEnter={prefetchHaptics}
                     className="min-h-12 min-w-12 flex items-center justify-center bg-white/80 hover:bg-brand-cyan hover:text-white text-zinc-600 rounded-full transition shadow-sm border border-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-cyan"
@@ -80,7 +83,6 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     }}
                     onMouseEnter={prefetchHaptics}
                     className={`min-h-12 min-w-12 flex items-center justify-center rounded-full transition shadow-sm border focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${copied ? 'bg-green-700 text-white border-green-800 focus-visible:ring-green-700' : 'bg-white/80 text-zinc-600 border-zinc-100 hover:bg-zinc-100 focus-visible:ring-zinc-400'}`}
-                    role={copied ? "status" : undefined}
                     title={copied ? "Link copiado!" : "Copiar link"}
                     aria-label={copied ? "Link copiado com sucesso" : "Copiar link"}
                 >
@@ -92,10 +94,13 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
 
     return (
         <div className={`flex flex-wrap items-center gap-3 ${className}`}>
+            <output aria-live="polite" aria-atomic="true" className="sr-only">
+                {copied ? 'Link copiado com sucesso' : ''}
+            </output>
             {/* Native Share Button (Primary on Mobile) */}
             <button
                 type="button"
-                onClick={handleNativeShare}
+                onClick={() => void handleNativeShare()}
                 onMouseEnter={prefetchHaptics}
                 className="flex items-center gap-2 px-5 py-2.5 bg-brand-cyan text-white font-bold rounded-xl hover:bg-brand-cyanDark transition shadow-[0_4px_0px_#0369a1] active:shadow-none active:translate-y-1 lg:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-cyan"
             >
@@ -156,7 +161,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                 {/* Native Share (secondary on desktop) */}
                 <button
                     type="button"
-                    onClick={handleNativeShare}
+                    onClick={() => void handleNativeShare()}
                     onMouseEnter={prefetchHaptics}
                     className="hidden lg:flex min-h-12 min-w-12 items-center justify-center bg-zinc-100 text-zinc-600 rounded-xl hover:bg-zinc-200 transition shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-cyan"
                     title="Mais opções de compartilhamento"
@@ -171,7 +176,6 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
                     onClick={handleCopy}
                     onMouseEnter={prefetchHaptics}
                     className={`min-h-12 min-w-12 flex items-center justify-center rounded-xl transition shadow-sm border focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${copied ? 'bg-green-700 text-white border-green-800 focus-visible:ring-green-700' : 'bg-zinc-100 text-zinc-600 border-transparent hover:bg-zinc-200 focus-visible:ring-zinc-400'}`}
-                    role={copied ? "status" : undefined}
                     title={copied ? "Link copiado!" : "Copiar link"}
                     aria-label={copied ? "Link copiado com sucesso" : "Copiar link"}
                 >
