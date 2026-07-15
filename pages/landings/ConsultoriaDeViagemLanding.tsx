@@ -1,12 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { m, MotionConfig } from 'framer-motion';
 import { Seo } from '@/components/Seo';
 import { LandingFAQ } from '@/components/LandingFAQ';
 import { BreadcrumbSchema } from '@/components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '@/components/schemas/FAQPageSchema';
 import { ServiceSchema } from '@/components/schemas/ServiceSchema';
+import { Button } from '@/components/ui/Button';
+import { LandingNav } from '@/components/landings/shared/LandingNav';
+import { LandingFooter } from '@/components/landings/shared/LandingFooter';
+import { fadeUp } from '@/components/landings/shared/constants';
 import { openContactModal } from '@/utils/contactForm';
-import { ArrowLeft, ArrowRight, CheckCircle, MessageSquare, Users, Headphones } from 'lucide-react';
+import { ArrowRight, CheckCircle, MessageSquare, Users, Headphones, Compass } from 'lucide-react';
 
 const FAQ_ITEMS = [
   {
@@ -78,278 +83,331 @@ const PILLARS = [
   },
 ];
 
+const CREDENTIALS = [
+  'Fundada em 2018',
+  'Nota 5.0 no Google',
+  'Atendimento humano',
+];
+
 const ConsultoriaDeViagemLanding: React.FC = () => {
   return (
-    <div className="bg-brand-surface min-h-screen font-sans">
-      <Seo
-        title="Consultoria de Viagem Sob Medida em SP — Anhangá Viagens"
-        description="Planeje sua viagem com consultores humanos. Sem pacote pronto, sem improviso. Roteiro personalizado com suporte antes, durante e depois."
-        canonical="https://www.anhanga.tur.br/consultoria-de-viagem/"
-        noHreflang
-      />
-      <ServiceSchema
-        name="Consultoria de Viagem Sob Medida"
-        description="Planejamento personalizado de viagens com consultor humano, sem pacote pronto. Atendimento consultivo com suporte antes, durante e depois da viagem."
-        serviceUrl="https://www.anhanga.tur.br/consultoria-de-viagem/"
-        serviceType="Consultoria de Viagem"
-        areaServed="São Paulo e Brasil"
-      />
-      <BreadcrumbSchema
-        items={[
-          { name: 'Home', item: 'https://www.anhanga.tur.br/' },
-          { name: 'Consultoria de Viagem', item: 'https://www.anhanga.tur.br/consultoria-de-viagem/' }
-        ]}
-      />
-      <FAQPageSchema items={FAQ_ITEMS} />
+    <MotionConfig reducedMotion="user">
+      <div className="bg-white min-h-screen font-sans">
+        <Seo
+          title="Consultoria de Viagem Sob Medida em SP — Anhangá Viagens"
+          description="Planeje sua viagem com consultores humanos. Sem pacote pronto, sem improviso. Roteiro personalizado com suporte antes, durante e depois."
+          canonical="https://www.anhanga.tur.br/consultoria-de-viagem/"
+          noHreflang
+        />
+        <ServiceSchema
+          name="Consultoria de Viagem Sob Medida"
+          description="Planejamento personalizado de viagens com consultor humano, sem pacote pronto. Atendimento consultivo com suporte antes, durante e depois da viagem."
+          serviceUrl="https://www.anhanga.tur.br/consultoria-de-viagem/"
+          serviceType="Consultoria de Viagem"
+          areaServed="São Paulo e Brasil"
+        />
+        <BreadcrumbSchema
+          items={[
+            { name: 'Home', item: 'https://www.anhanga.tur.br/' },
+            { name: 'Consultoria de Viagem', item: 'https://www.anhanga.tur.br/consultoria-de-viagem/' }
+          ]}
+        />
+        <FAQPageSchema items={FAQ_ITEMS} />
 
-      {/* Mini Header */}
-      <header className="bg-white/90 backdrop-blur-sm border-b border-zinc-100 sticky top-0 z-50 py-3">
-        <div className="max-w-5xl mx-auto px-6 flex items-center justify-between">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 group"
-            aria-label="Voltar para o site principal da Anhangá Viagens"
-          >
-            <ArrowLeft className="size-4 text-zinc-400 group-hover:text-anhanga-blue transition-colors" />
-            <span className="size-7 bg-anhanga-blue/10 rounded-lg flex items-center justify-center flex-shrink-0">
-              <img src="/favicon.svg" alt="" aria-hidden="true" className="size-4" />
-            </span>
-            <span className="text-sm font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
-              Anhangá Viagens
-            </span>
-          </Link>
-          <button
-            type="button"
-            onClick={() => openContactModal({ source: 'consultoria-viagem' })}
-            className="btn-whatsapp btn-specialist text-xs font-bold bg-anhanga-blue text-white px-4 py-2 rounded-xl hover:bg-anhanga-darkBlue transition-colors whitespace-nowrap"
-            data-tracking="header-consultoria-viagem"
-          >
-            Falar com consultor
-          </button>
-        </div>
-      </header>
+        <LandingNav source="consultoria-viagem" />
 
-      {/* Hero */}
-      <section className="pt-16 pb-20 px-6">
-        <div className="max-w-3xl mx-auto">
-          <p className="text-sm font-semibold text-anhanga-blue mb-4 tracking-wide uppercase">
-            Consultoria de viagem · São Paulo
-          </p>
-          <h1 className="text-4xl md:text-6xl font-black text-anhanga-dark mb-6 leading-[1.1] font-serif">
-            Planeje uma viagem sob medida sem depender de pacote pronto
-          </h1>
-          <p className="text-xl text-zinc-600 mb-10 leading-relaxed max-w-2xl">
-            Um consultor da Anhangá entende seu perfil, destino, orçamento e restrições para desenhar o melhor caminho antes de você fechar.
-          </p>
-          <button
-            type="button"
-            onClick={() => openContactModal({ source: 'consultoria-viagem' })}
-            className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-anhanga-blue text-white font-bold px-8 py-4 rounded-2xl hover:bg-anhanga-darkBlue transition-colors text-lg shadow-lg"
-            aria-label="Falar com um consultor de viagens"
-            data-tracking="hero-consultoria-viagem"
-          >
-            Falar com um consultor
-            <ArrowRight className="size-5" />
-          </button>
-          <p className="mt-4 text-sm text-zinc-600">Sem taxa de consultoria. Gratuito.</p>
-        </div>
-      </section>
-
-      {/* Por que consultoria? */}
-      <section className="py-20 bg-white">
-        <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-3 font-serif">
-            Por que consultoria?
-          </h2>
-          <p className="text-zinc-600 text-lg mb-12">
-            Porque viajar bem não é só escolher um destino.
-          </p>
-          <div className="grid md:grid-cols-3 gap-6">
-            {PILLARS.map(({ icon: Icon, title, desc, variant }) => (
-              <div
-                key={title}
-                className={`p-8 rounded-2xl ${
-                  variant === 'filled'
-                    ? 'bg-anhanga-blue text-white'
-                    : 'bg-brand-surface'
-                }`}
+        {/* Hero */}
+        <section className="pt-16 pb-20 px-6">
+          <div className="max-w-3xl mx-auto">
+            <m.div
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={0}
+              className="inline-flex items-center gap-2 rounded-full border border-anhanga-blue/20 bg-anhanga-blue/5 px-3 py-1 mb-5 text-xs font-black uppercase tracking-widest text-anhanga-blue"
+            >
+              <Compass className="size-3.5" aria-hidden="true" />
+              Consultoria de viagem · São Paulo
+            </m.div>
+            <m.h1
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={1}
+              className="text-balance text-4xl md:text-6xl font-black text-anhanga-dark mb-6 leading-[1.1]"
+            >
+              Planeje uma viagem sob medida sem depender de pacote pronto
+            </m.h1>
+            <m.p
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={2}
+              className="text-xl text-zinc-600 mb-10 leading-relaxed max-w-2xl"
+            >
+              Um consultor da Anhangá entende seu perfil, destino, orçamento e restrições para desenhar o melhor caminho antes de você fechar.
+            </m.p>
+            <m.div variants={fadeUp} initial="hidden" animate="visible" custom={3}>
+              <Button
+                variant="cta"
+                size="lg"
+                onClick={() => openContactModal({ source: 'consultoria-viagem' })}
+                className="btn-whatsapp btn-specialist font-black"
+                rightIcon={<ArrowRight className="size-5" aria-hidden="true" />}
+                data-tracking="hero-consultoria-viagem"
               >
-                <div
-                  className={`size-11 rounded-xl flex items-center justify-center mb-5 ${
-                    variant === 'filled' ? 'bg-white/15' : 'bg-anhanga-blue/10'
+                Falar com um consultor
+              </Button>
+              <p className="mt-4 text-sm text-zinc-600">Sem taxa de consultoria. Gratuito.</p>
+            </m.div>
+          </div>
+        </section>
+
+        {/* Por que consultoria? */}
+        <section className="py-20 bg-white">
+          <div className="max-w-5xl mx-auto px-6">
+            <m.div
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              custom={0}
+              className="mb-12"
+            >
+              <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-3">
+                Por que consultoria?
+              </h2>
+              <p className="text-zinc-600 text-lg">
+                Porque viajar bem não é só escolher um destino.
+              </p>
+            </m.div>
+            <div className="grid md:grid-cols-3 gap-6">
+              {PILLARS.map(({ icon: Icon, title, desc, variant }, idx) => (
+                <m.div
+                  key={title}
+                  variants={fadeUp}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.2 }}
+                  custom={idx + 1}
+                  className={`p-8 rounded-2xl transition duration-300 ${
+                    variant === 'filled'
+                      ? 'bg-anhanga-blue text-white'
+                      : 'bg-anhanga-light shadow-float hover:shadow-float-lg'
                   }`}
                 >
-                  <Icon
-                    className={`size-5 ${variant === 'filled' ? 'text-white' : 'text-anhanga-blue'}`}
-                  />
-                </div>
-                <h3 className={`text-xl font-black mb-3 ${variant === 'filled' ? 'text-white' : 'text-anhanga-dark'}`}>
-                  {title}
-                </h3>
-                <p className={variant === 'filled' ? 'text-blue-100 leading-relaxed' : 'text-zinc-600 leading-relaxed'}>
-                  {desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Para quem é */}
-      <section className="py-20 bg-brand-surface">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="md:grid md:grid-cols-2 md:gap-16 items-start">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-8 font-serif">
-                Para quem é
-              </h2>
-              <ul className="space-y-4">
-                {FOR_WHO.map(item => (
-                  <li key={item} className="flex items-start gap-3">
-                    <CheckCircle className="size-5 text-anhanga-blue flex-shrink-0 mt-0.5" aria-hidden="true" />
-                    <span className="text-zinc-700 leading-snug">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="mt-12 md:mt-0 bg-white rounded-3xl p-8 shadow-float">
-              <blockquote className="text-xl text-anhanga-dark font-semibold leading-relaxed">
-                "A Anhangá cuidou de cada detalhe. Só precisei aparecer no aeroporto."
-              </blockquote>
-              <p className="mt-4 text-zinc-600 text-sm">
-                R.M. · São Paulo · Viagem para Portugal, 2025
-              </p>
+                  <div
+                    className={`size-11 rounded-xl flex items-center justify-center mb-5 ${
+                      variant === 'filled' ? 'bg-white/15' : 'bg-anhanga-blue/10'
+                    }`}
+                  >
+                    <Icon
+                      className={`size-5 ${variant === 'filled' ? 'text-white' : 'text-anhanga-blue'}`}
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <h3 className={`text-xl font-black mb-3 ${variant === 'filled' ? 'text-white' : 'text-anhanga-dark'}`}>
+                    {title}
+                  </h3>
+                  <p className={variant === 'filled' ? 'text-blue-100 leading-relaxed' : 'text-zinc-600 leading-relaxed'}>
+                    {desc}
+                  </p>
+                </m.div>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Como funciona */}
-      <section className="py-20 bg-white">
-        <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-12 font-serif">
-            Como funciona
-          </h2>
-          <div className="space-y-0">
-            {HOW_IT_WORKS.map(({ step, title, desc }, idx) => (
-              <div
-                key={step}
-                className={`flex gap-6 py-8 ${idx < HOW_IT_WORKS.length - 1 ? 'border-b border-zinc-100' : ''}`}
+        {/* Para quem é */}
+        <section className="py-20 bg-anhanga-light">
+          <div className="max-w-5xl mx-auto px-6">
+            <div className="md:grid md:grid-cols-2 md:gap-16 items-start">
+              <m.div
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                custom={0}
               >
-                <div className="flex-shrink-0 size-12 rounded-full bg-anhanga-blue/10 flex items-center justify-center">
-                  <span className="text-sm font-black text-anhanga-blue">{step}</span>
-                </div>
-                <div>
-                  <h3 className="text-xl font-black text-anhanga-dark mb-2">{title}</h3>
-                  <p className="text-zinc-600 leading-relaxed max-w-xl">{desc}</p>
-                </div>
-              </div>
-            ))}
+                <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-8">
+                  Para quem é
+                </h2>
+                <ul className="space-y-4">
+                  {FOR_WHO.map(item => (
+                    <li key={item} className="flex items-start gap-3">
+                      <CheckCircle className="size-5 text-anhanga-blue flex-shrink-0 mt-0.5" aria-hidden="true" />
+                      <span className="text-zinc-700 leading-snug">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </m.div>
+              <m.div
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                custom={1}
+                className="mt-12 md:mt-0 bg-white rounded-3xl p-8 shadow-float"
+              >
+                <blockquote className="text-xl text-anhanga-dark font-semibold leading-relaxed">
+                  "A Anhangá cuidou de cada detalhe. Só precisei aparecer no aeroporto."
+                </blockquote>
+                <p className="mt-4 text-zinc-600 text-sm">
+                  R.M. · São Paulo · Viagem para Portugal, 2025
+                </p>
+              </m.div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Sobre a Anhangá */}
-      <section className="py-20 bg-brand-surface">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-6 font-serif">
-            Sobre a Anhangá Viagens
-          </h2>
-          <p className="text-lg text-zinc-600 leading-relaxed max-w-2xl mx-auto">
-            Agência de viagens em São Paulo, especializada em viagens personalizadas desde 2018. Atendimento humano, nota 5.0 no Google e consultor fixo do início ao fim da sua viagem.
-          </p>
-          <div className="mt-12 flex flex-wrap justify-center gap-12">
-            {[
-              { label: 'Fundada em', value: '2018' },
-              { label: 'Nota Google', value: '5.0' },
-              { label: 'Atendimento', value: 'Humano' },
-            ].map(({ label, value }) => (
-              <div key={label}>
-                <div className="text-4xl font-black text-anhanga-blue">{value}</div>
-                <div className="text-sm text-zinc-600 mt-1">{label}</div>
-              </div>
-            ))}
+        {/* Como funciona */}
+        <section className="py-20 bg-white">
+          <div className="max-w-5xl mx-auto px-6">
+            <m.h2
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              custom={0}
+              className="text-3xl md:text-4xl font-black text-anhanga-dark mb-12"
+            >
+              Como funciona
+            </m.h2>
+            <div className="space-y-0">
+              {HOW_IT_WORKS.map(({ step, title, desc }, idx) => (
+                <m.div
+                  key={step}
+                  variants={fadeUp}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.3 }}
+                  custom={idx + 1}
+                  className={`flex gap-6 py-8 ${idx < HOW_IT_WORKS.length - 1 ? 'border-b border-zinc-100' : ''}`}
+                >
+                  <div className="flex-shrink-0 size-12 rounded-full bg-anhanga-blue/10 flex items-center justify-center">
+                    <span className="text-sm font-black text-anhanga-blue">{step}</span>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-anhanga-dark mb-2">{title}</h3>
+                    <p className="text-zinc-600 leading-relaxed max-w-xl">{desc}</p>
+                  </div>
+                </m.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* CTA Final */}
-      <section className="py-20 bg-anhanga-blue">
-        <div className="max-w-3xl mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-5xl font-black text-white mb-6 font-serif">
-            Pronto para planejar sua viagem?
-          </h2>
-          <p className="text-blue-100 text-lg mb-10 max-w-xl mx-auto">
-            Fale com um consultor agora. Sem taxa, sem compromisso.
-          </p>
-          <button
-            type="button"
-            onClick={() => openContactModal({ source: 'consultoria-viagem' })}
-            className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-anhanga-yellow text-anhanga-dark font-black px-10 py-5 rounded-2xl hover:bg-anhanga-yellowHover transition-colors text-xl shadow-lg"
-            aria-label="Falar com um consultor"
-            data-tracking="footer-consultoria-viagem"
+        {/* Sobre a Anhangá */}
+        <section className="py-20 bg-anhanga-light">
+          <m.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            custom={0}
+            className="max-w-4xl mx-auto px-6 text-center"
           >
-            Falar com um consultor
-            <ArrowRight className="size-6" />
-          </button>
-        </div>
-      </section>
+            <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-6">
+              Sobre a Anhangá Viagens
+            </h2>
+            <p className="text-lg text-zinc-600 leading-relaxed max-w-2xl mx-auto">
+              Agência de viagens em São Paulo, especializada em viagens personalizadas desde 2018. Atendimento humano, nota 5.0 no Google e consultor fixo do início ao fim da sua viagem.
+            </p>
+            <div className="mt-10 flex flex-wrap justify-center gap-3">
+              {CREDENTIALS.map(item => (
+                <span
+                  key={item}
+                  className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-anhanga-dark shadow-float"
+                >
+                  <CheckCircle className="size-4 text-anhanga-blue" aria-hidden="true" />
+                  {item}
+                </span>
+              ))}
+            </div>
+          </m.div>
+        </section>
 
-      {/* Outros serviços */}
-      <section className="py-16 bg-brand-surface">
-        <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-2xl font-black text-anhanga-dark mb-8">Outros serviços</h2>
-          <div className="grid md:grid-cols-3 gap-4">
-            <Link
-              to="/corporativo/"
-              className="block p-5 rounded-xl bg-brand-surface hover:bg-anhanga-blue/5 transition-colors group"
+        {/* CTA Final */}
+        <section className="py-20 bg-anhanga-blue">
+          <m.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            custom={0}
+            className="max-w-3xl mx-auto px-6 text-center"
+          >
+            <h2 className="text-3xl md:text-5xl font-black text-white mb-6">
+              Pronto para planejar sua viagem?
+            </h2>
+            <p className="text-blue-100 text-lg mb-10 max-w-xl mx-auto">
+              Fale com um consultor agora. Sem taxa, sem compromisso.
+            </p>
+            <Button
+              variant="cta"
+              size="lg"
+              onClick={() => openContactModal({ source: 'consultoria-viagem' })}
+              className="btn-whatsapp btn-specialist font-black"
+              rightIcon={<ArrowRight className="size-6" aria-hidden="true" />}
+              data-tracking="footer-consultoria-viagem"
             >
-              <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
-                Viagens para Executivos
-              </div>
-              <div className="text-sm text-zinc-600 mt-1">
-                Planejamento com precisão para profissionais
-              </div>
-            </Link>
-            <Link
-              to="/curadoria-cruzeiros-brasil/"
-              className="block p-5 rounded-xl bg-brand-surface hover:bg-anhanga-blue/5 transition-colors group"
-            >
-              <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
-                Curadoria de Cruzeiros
-              </div>
-              <div className="text-sm text-zinc-600 mt-1">
-                Escolha o navio e a cabine certos para você
-              </div>
-            </Link>
-            <Link
-              to="/"
-              className="block p-5 rounded-xl bg-brand-surface hover:bg-anhanga-blue/5 transition-colors group"
-            >
-              <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
-                Site principal
-              </div>
-              <div className="text-sm text-zinc-600 mt-1">
-                Conheça todos os serviços da Anhangá
-              </div>
-            </Link>
+              Falar com um consultor
+            </Button>
+          </m.div>
+        </section>
+
+        {/* Outros serviços */}
+        <section className="py-16 bg-anhanga-light">
+          <div className="max-w-5xl mx-auto px-6">
+            <h2 className="text-2xl font-black text-anhanga-dark mb-8">Outros serviços</h2>
+            <div className="grid md:grid-cols-3 gap-4">
+              <Link
+                to="/corporativo/"
+                className="block p-5 rounded-xl bg-white hover:bg-anhanga-blue/5 transition-colors group"
+              >
+                <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
+                  Viagens para Executivos
+                </div>
+                <div className="text-sm text-zinc-600 mt-1">
+                  Planejamento com precisão para profissionais
+                </div>
+              </Link>
+              <Link
+                to="/curadoria-cruzeiros-brasil/"
+                className="block p-5 rounded-xl bg-white hover:bg-anhanga-blue/5 transition-colors group"
+              >
+                <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
+                  Curadoria de Cruzeiros
+                </div>
+                <div className="text-sm text-zinc-600 mt-1">
+                  Escolha o navio e a cabine certos para você
+                </div>
+              </Link>
+              <Link
+                to="/"
+                className="block p-5 rounded-xl bg-white hover:bg-anhanga-blue/5 transition-colors group"
+              >
+                <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
+                  Site principal
+                </div>
+                <div className="text-sm text-zinc-600 mt-1">
+                  Conheça todos os serviços da Anhangá
+                </div>
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* FAQ */}
-      <LandingFAQ
-        items={FAQ_ITEMS}
-        title="Dúvidas sobre consultoria de viagem"
-        subtitle="Tire suas dúvidas sobre como funciona a consultoria personalizada da Anhangá."
-      />
+        {/* FAQ */}
+        <LandingFAQ
+          items={FAQ_ITEMS}
+          title="Dúvidas sobre consultoria de viagem"
+          subtitle="Tire suas dúvidas sobre como funciona a consultoria personalizada da Anhangá."
+        />
 
-      {/* Footer */}
-      <footer className="py-8 bg-brand-surface border-t border-zinc-100 text-center text-sm text-zinc-600">
-        <p>Anhangá Viagens · Agência de viagens em São Paulo</p>
-        <p className="mt-1">Atualizado em abril de 2026</p>
-      </footer>
-    </div>
+        <LandingFooter />
+      </div>
+    </MotionConfig>
   );
 };
 
