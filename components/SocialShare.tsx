@@ -45,15 +45,20 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
     };
 
     const handleCopy = () => {
-        if (navigator.clipboard) {
-            navigator.clipboard.writeText(url).catch(() => {});
+        if (!navigator.clipboard) {
+            return;
         }
-        setCopied(true);
-        import('../utils/haptics')
-            .then(m => m.triggerHaptic('medium'))
-            .catch(() => {});
 
-        setTimeout(() => setCopied(false), 2000);
+        navigator.clipboard.writeText(url)
+            .then(() => {
+                setCopied(true);
+                import('../utils/haptics')
+                    .then(m => m.triggerHaptic('medium'))
+                    .catch(() => {});
+
+                setTimeout(() => setCopied(false), 2000);
+            })
+            .catch(() => {});
     };
 
     if (minimal) {
