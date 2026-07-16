@@ -50,7 +50,10 @@ function collectRootFiles(): string[] {
 // para anhanga-*, ABAIXE este número para travar o ganho.
 // 2026-07-07: 594 → 592 (CookieConsentBanner migrado na auditoria LGPD).
 // 2026-07-07: 592 → 587 (BackToTop migrado no follow-up de review da PR #1107).
-const BRAND_NAMESPACE_BASELINE = 587;
+// 2026-07-16: 587 → 562 (ContactModal.tsx migrado — P3 do critique de
+// /consultoria-de-viagem, débito registrado na PR #1203; baseline reajustado
+// para a contagem real após a migração, não apenas os 9 usos removidos aqui).
+const BRAND_NAMESPACE_BASELINE = 562;
 
 test('legacy brand-* namespace does not grow (ratchet)', () => {
   const files = [...SCAN_DIRS.flatMap(collectTailwindFiles), ...collectRootFiles()];
