@@ -137,13 +137,16 @@ const RegionBadge: React.FC<{ regiao: string; saida: string }> = ({ regiao, said
 
 const FeaturedOffer: React.FC<{ offer: CruiseOffer }> = ({ offer }) => (
   <article className="grid md:grid-cols-2 gap-0 rounded-3xl overflow-hidden bg-white shadow-float border border-anhanga-blue/10">
+    {/* w-full é obrigatório: o LazyImage aplica `aspect-ratio` inline a partir de
+        width/height, e sem uma largura explícita o container deriva a largura da
+        altura (h-full) e estoura a coluna do grid. */}
     <LazyImage
       src={offer.imagem}
       alt={offer.imagemAlt}
       width={800}
       height={600}
       sizes="(min-width: 768px) 50vw, 100vw"
-      className="h-64 md:h-full"
+      className="w-full h-64 md:h-full"
     />
     <div className="p-8 md:p-10 flex flex-col">
       <RegionBadge regiao={offer.regiao} saida={offer.saida} />
@@ -182,7 +185,7 @@ const OfferCard: React.FC<{ offer: CruiseOffer }> = ({ offer }) => (
       width={480}
       height={300}
       sizes="(min-width: 768px) 33vw, 100vw"
-      className="h-48"
+      className="w-full h-48"
     />
     <div className="p-6 flex flex-col flex-1">
       <RegionBadge regiao={offer.regiao} saida={offer.saida} />
