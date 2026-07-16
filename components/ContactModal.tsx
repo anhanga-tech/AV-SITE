@@ -228,7 +228,7 @@ const ContactModal: React.FC = () => {
                             <button
                                 type="submit"
                                 disabled={!canAttemptSubmit || isSubmitting}
-                                className="w-full rounded-xl bg-[#25D366] py-3 text-sm font-black text-white transition-colors hover:bg-[#1fba59] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
+                                className="w-full rounded-xl bg-[#25D366] py-3 text-sm font-black text-white transition-colors hover:bg-[#1fba59] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366] disabled:cursor-not-allowed disabled:opacity-40"
                             >
                                 {isSubmitting ? 'Enviando…' : 'Abrir WhatsApp agora'}
                             </button>
@@ -236,7 +236,7 @@ const ContactModal: React.FC = () => {
                                 type="button"
                                 onClick={() => void submit('callback')}
                                 disabled={!canAttemptSubmit || isSubmitting}
-                                className="w-full rounded-xl border-2 border-zinc-200 bg-white py-3 text-sm font-bold text-zinc-600 transition-colors hover:border-anhanga-action hover:text-anhanga-action focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-anhanga-action focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
+                                className="w-full rounded-xl border-2 border-zinc-200 bg-white py-3 text-sm font-bold text-zinc-600 transition-colors hover:border-anhanga-action hover:text-anhanga-action focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action disabled:cursor-not-allowed disabled:opacity-40"
                             >
                                 {isSubmitting ? 'Enviando…' : 'Prefiro que me chamem'}
                             </button>

@@ -190,7 +190,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
+              viewport={{ once: true, amount: 0.2, margin: '0px 0px 100% 0px' }}
               custom={0}
               className="mb-12"
             >
@@ -208,7 +208,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
                   variants={fadeUp}
                   initial="hidden"
                   whileInView="visible"
-                  viewport={{ once: true, amount: 0.2 }}
+                  viewport={{ once: true, amount: 0.2, margin: '0px 0px 100% 0px' }}
                   custom={idx + 1}
                   className={`p-8 rounded-2xl transition duration-300 ${
                     variant === 'filled'
@@ -246,7 +246,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
                 variants={fadeUp}
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, amount: 0.2 }}
+                viewport={{ once: true, amount: 0.2, margin: '0px 0px 100% 0px' }}
                 custom={0}
               >
                 <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-8">
@@ -265,7 +265,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
                 variants={fadeUp}
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, amount: 0.2 }}
+                viewport={{ once: true, amount: 0.2, margin: '0px 0px 100% 0px' }}
                 custom={1}
                 className="mt-12 md:mt-0 overflow-hidden rounded-3xl bg-white shadow-float"
               >
@@ -302,7 +302,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
+              viewport={{ once: true, amount: 0.2, margin: '0px 0px 100% 0px' }}
               custom={0}
               className="text-3xl md:text-4xl font-black text-anhanga-dark mb-12"
             >
@@ -315,7 +315,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
                   variants={fadeUp}
                   initial="hidden"
                   whileInView="visible"
-                  viewport={{ once: true, amount: 0.3 }}
+                  viewport={{ once: true, amount: 0.3, margin: '0px 0px 100% 0px' }}
                   custom={idx + 1}
                   className={`flex gap-6 py-8 ${idx < HOW_IT_WORKS.length - 1 ? 'border-b border-zinc-100' : ''}`}
                 >
@@ -338,7 +338,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
+            viewport={{ once: true, amount: 0.2, margin: '0px 0px 100% 0px' }}
             custom={0}
             className="max-w-4xl mx-auto px-6 text-center"
           >
@@ -368,7 +368,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
+            viewport={{ once: true, amount: 0.3, margin: '0px 0px 100% 0px' }}
             custom={0}
             className="max-w-3xl mx-auto px-6 text-center"
           >
