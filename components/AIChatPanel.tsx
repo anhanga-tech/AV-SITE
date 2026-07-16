@@ -362,7 +362,7 @@ const AIChatPanel: React.FC<AIChatPanelProps> = memo(({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      submitMessage(input);
+      void submitMessage(input);
     }
   };
 
@@ -372,7 +372,7 @@ const AIChatPanel: React.FC<AIChatPanelProps> = memo(({
     if (!initialAutoSendMessage) return;
 
     const timer = setTimeout(() => {
-      submitMessageRef.current(initialAutoSendMessage, false);
+      void submitMessageRef.current(initialAutoSendMessage, false);
       onConsumePending();
     }, initialAutoSendDelayMs ?? 500);
 
@@ -514,7 +514,7 @@ const AIChatPanel: React.FC<AIChatPanelProps> = memo(({
                     <button
                       type="button"
                       key={chip.id}
-                      onClick={() => submitMessage(chip.label)}
+                      onClick={() => void submitMessage(chip.label)}
                       className="text-[13px] font-semibold text-zinc-600 bg-white border border-zinc-200 px-4 py-3 min-h-12 rounded-xl shadow-sm hover:shadow hover:border-brand-vibrant/30 hover:text-brand-vibrant hover:-translate-y-0.5 transition text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-vibrant/50"
                     >
                       {chip.label}
@@ -556,9 +556,9 @@ const AIChatPanel: React.FC<AIChatPanelProps> = memo(({
           />
           <button
             type="button"
-            onClick={() => submitMessage(input)}
+            onClick={() => void submitMessage(input)}
             disabled={isLoading || !input.trim()}
-            className="absolute right-2 bottom-1 min-h-12 min-w-12 flex items-center justify-center bg-brand-vibrant text-white rounded-[10px] shadow-sm hover:bg-brand-blue hover:shadow-md transition disabled:opacity-0 disabled:scale-75 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-vibrant/50"
+            className="absolute right-2 bottom-1 min-h-12 min-w-12 flex items-center justify-center bg-brand-vibrant text-white rounded-[10px] shadow-sm hover:bg-brand-blue hover:shadow-md transition disabled:opacity-0 disabled:scale-75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-vibrant/50"
             aria-label="Enviar mensagem"
           >
             <PaperPlaneTilt className="size-5 ml-0.5" weight="fill" />

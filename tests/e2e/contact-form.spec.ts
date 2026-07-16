@@ -45,8 +45,8 @@ test.describe('Contact form modal', () => {
   test('mantém botões desabilitados com campos vazios', async ({ page, isMobile }) => {
     await openHeaderContactModal(page, isMobile);
 
-    await expect(page.getByRole('button', { name: /^chamar no whatsapp$/i })).toBeDisabled();
-    await expect(page.getByRole('button', { name: /^me chamem no whatsapp$/i })).toBeDisabled();
+    await expect(page.getByRole('button', { name: /^abrir whatsapp agora$/i })).toBeDisabled();
+    await expect(page.getByRole('button', { name: /^prefiro que me chamem$/i })).toBeDisabled();
   });
 
   test('habilita botões após preencher nome e WhatsApp', async ({ page, isMobile }) => {
@@ -55,8 +55,8 @@ test.describe('Contact form modal', () => {
     await page.locator('#contact-firstName').fill('Maria');
     await page.locator('#contact-whatsapp').fill('11987654321');
 
-    await expect(page.getByRole('button', { name: /^chamar no whatsapp$/i })).toBeEnabled();
-    await expect(page.getByRole('button', { name: /^me chamem no whatsapp$/i })).toBeEnabled();
+    await expect(page.getByRole('button', { name: /^abrir whatsapp agora$/i })).toBeEnabled();
+    await expect(page.getByRole('button', { name: /^prefiro que me chamem$/i })).toBeEnabled();
   });
 
   test('bloqueia envio com e-mail inválido após clique e mantém dados editáveis', async ({ page, isMobile }) => {
@@ -66,7 +66,7 @@ test.describe('Contact form modal', () => {
     await page.locator('#contact-whatsapp').fill('11987654321');
     await page.locator('#contact-email').fill('maria@');
 
-    const callbackButton = page.getByRole('button', { name: /^me chamem no whatsapp$/i });
+    const callbackButton = page.getByRole('button', { name: /^prefiro que me chamem$/i });
     await expect(callbackButton).toBeEnabled();
     await callbackButton.click();
 
@@ -80,7 +80,7 @@ test.describe('Contact form modal', () => {
 
     await page.locator('#contact-firstName').fill('Maria');
     await page.locator('#contact-whatsapp').fill('11987654321');
-    await page.getByRole('button', { name: /^me chamem no whatsapp$/i }).click();
+    await page.getByRole('button', { name: /^prefiro que me chamem$/i }).click();
 
     await expect(page.getByText(/recebemos seu contato/i)).toBeVisible();
     await expect(page.getByText('Nossa equipe chama você em breve pelo WhatsApp.')).toBeVisible();

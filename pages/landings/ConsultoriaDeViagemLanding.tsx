@@ -7,10 +7,12 @@ import { BreadcrumbSchema } from '@/components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '@/components/schemas/FAQPageSchema';
 import { ServiceSchema } from '@/components/schemas/ServiceSchema';
 import { Button } from '@/components/ui/Button';
+import { LazyImage } from '@/components/ui/LazyImage';
 import { LandingNav } from '@/components/landings/shared/LandingNav';
 import { LandingFooter } from '@/components/landings/shared/LandingFooter';
 import { fadeUp } from '@/components/landings/shared/constants';
 import { openContactModal } from '@/utils/contactForm';
+import { getDestinationImage } from '@/data/mediaConfig';
 import { ArrowRight, CheckCircle, MessageSquare, Users, Headphones, Compass } from 'lucide-react';
 
 const FAQ_ITEMS = [
@@ -177,6 +179,13 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
         {/* Por que consultoria? */}
         <section className="py-20 bg-white">
           <div className="max-w-5xl mx-auto px-6">
+            {/*
+              margin '200px' abaixo do viewport (mesma convenção em todas as
+              seções seguintes): dispara a revelação antes da seção entrar na
+              tela, não quando já está visível. Sem isso, rolagem rápida
+              mostrava conteúdo semitransparente mesmo já dentro do viewport
+              — lia como página quebrada. Ver critique de /consultoria-de-viagem.
+            */}
             <m.div
               variants={fadeUp}
               initial="hidden"
@@ -258,14 +267,29 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.2 }}
                 custom={1}
-                className="mt-12 md:mt-0 bg-white rounded-3xl p-8 shadow-float"
+                className="mt-12 md:mt-0 overflow-hidden rounded-3xl bg-white shadow-float"
               >
-                <blockquote className="text-xl text-anhanga-dark font-semibold leading-relaxed">
-                  "A Anhangá cuidou de cada detalhe. Só precisei aparecer no aeroporto."
-                </blockquote>
-                <p className="mt-4 text-zinc-600 text-sm">
-                  R.M. · São Paulo · Viagem para Portugal, 2025
-                </p>
+                {/*
+                  Depoimento pareado com o lugar real da viagem (não um ícone
+                  genérico): reforça "lugares reais, não categorias de
+                  produto" — a página inteira era só tipografia + ícones antes
+                  desta correção. Ver critique de /consultoria-de-viagem.
+                */}
+                <LazyImage
+                  src={getDestinationImage('Lisboa')}
+                  alt="Lisboa, Portugal — destino da viagem relatada no depoimento"
+                  width={640}
+                  height={280}
+                  className="h-48 w-full"
+                />
+                <div className="p-8">
+                  <blockquote className="text-xl text-anhanga-dark font-semibold leading-relaxed">
+                    "A Anhangá cuidou de cada detalhe. Só precisei aparecer no aeroporto."
+                  </blockquote>
+                  <p className="mt-4 text-zinc-600 text-sm">
+                    R.M. · São Paulo · Viagem para Portugal, 2025
+                  </p>
+                </div>
               </m.div>
             </div>
           </div>

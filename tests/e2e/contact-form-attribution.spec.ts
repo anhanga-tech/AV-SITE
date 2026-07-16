@@ -29,7 +29,7 @@ async function stubWindowOpen(page: Page) {
 
 function captureSubmitContact(page: Page): Promise<Record<string, unknown>> {
   return new Promise((resolve) => {
-    page.route('**/api/submit-contact', async (route: Route) => {
+    void page.route('**/api/submit-contact', async (route: Route) => {
       const payload = route.request().postDataJSON();
       await route.fulfill({
         status: 200,
@@ -57,7 +57,7 @@ test.describe('Contact form attribution payload', () => {
     await page.locator('#contact-whatsapp').fill('11987654321');
     await page.locator('#contact-email').fill('maria@example.com');
     await page.locator('#contact-optIn').check();
-    await page.getByRole('button', { name: /^me chamem no whatsapp$/i }).click();
+    await page.getByRole('button', { name: /^prefiro que me chamem$/i }).click();
 
     const payload = await payloadPromise;
 
@@ -95,7 +95,7 @@ test.describe('Contact form attribution payload', () => {
 
     await page.locator('#contact-firstName').fill('João Souza');
     await page.locator('#contact-whatsapp').fill('11988887777');
-    await page.getByRole('button', { name: /^me chamem no whatsapp$/i }).click();
+    await page.getByRole('button', { name: /^prefiro que me chamem$/i }).click();
 
     const payload = await payloadPromise;
 
@@ -145,7 +145,7 @@ test.describe('Contact form attribution payload', () => {
 
     await page.locator('#contact-firstName').fill('Carla Mendes');
     await page.locator('#contact-whatsapp').fill('11977776666');
-    await page.getByRole('button', { name: /^chamar no whatsapp$/i }).click();
+    await page.getByRole('button', { name: /^abrir whatsapp agora$/i }).click();
 
     // The WhatsApp tab opens regardless of whether the background CRM tracking call
     // succeeds — the visitor's path to a human must never depend on Odoo being up.

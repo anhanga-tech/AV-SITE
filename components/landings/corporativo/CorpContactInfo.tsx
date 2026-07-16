@@ -44,7 +44,7 @@ export function CorpContactInfo({ whatsappUrl }: CorpContactInfoProps) {
                             <Icon className="size-5 text-blue-600" weight="fill" />
                         </div>
                         {href ? (
-                            <a href={href} className="font-semibold text-zinc-700 hover:text-brand-cyan transition-colors duration-150 pt-1.5 rounded focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
+                            <a href={href} className="font-semibold text-zinc-700 hover:text-brand-cyan transition-colors duration-150 pt-1.5 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
                                 {label}
                             </a>
                         ) : (
@@ -69,7 +69,7 @@ export function CorpContactInfo({ whatsappUrl }: CorpContactInfoProps) {
                             href={href}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="size-11 rounded-xl bg-white border-2 border-zinc-200 flex items-center justify-center text-zinc-500 hover:border-brand-cyan hover:text-brand-cyan shadow-[2px_2px_0px_rgba(0,0,0,0.05)] hover:shadow-hard-yellow hover:-translate-y-1 transition duration-200 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
+                            className="size-11 rounded-xl bg-white border-2 border-zinc-200 flex items-center justify-center text-zinc-500 hover:border-brand-cyan hover:text-brand-cyan shadow-[2px_2px_0px_rgba(0,0,0,0.05)] hover:shadow-hard-yellow hover:-translate-y-1 transition duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
                             aria-label={label}
                             {...(contact ? { 'data-contact-intent': true, 'data-tracking': 'social-whatsapp-corporativo' } : {})}
                         >
