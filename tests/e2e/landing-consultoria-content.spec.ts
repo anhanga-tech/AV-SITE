@@ -50,6 +50,19 @@ test('landing de consultoria mostra uma foto real do destino junto ao depoimento
     .toBeGreaterThan(0);
 });
 
+test('landing de consultoria mostra uma foto real do Rio de Janeiro na seção "Sobre"', async ({ page }) => {
+  await page.goto('/consultoria-de-viagem');
+
+  await page.getByRole('heading', { name: 'Sobre a Anhangá Viagens' }).scrollIntoViewIfNeeded();
+
+  const photo = page.getByRole('img', { name: /rio de janeiro/i });
+  await expect(photo).toBeVisible();
+  await expect(photo).toHaveAttribute('src', /rio-de-janeiro/);
+  await expect
+    .poll(async () => photo.evaluate((img: HTMLImageElement) => img.naturalWidth))
+    .toBeGreaterThan(0);
+});
+
 test('links de "Outros serviços" recebem foco visível ao navegar por teclado', async ({ page }) => {
   await page.goto('/consultoria-de-viagem');
 
