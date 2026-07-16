@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-const LEGACY_BLOG_HOST_REDIRECT_RE = /^\/blog(?:[\/\s*].*)?\s+https:\/\/blog\.anhanga\.tur\.br\b/m;
+const LEGACY_BLOG_HOST_REDIRECT_RE = /^\/blog(?:[/\s*].*)?\s+https:\/\/blog\.anhanga\.tur\.br\b/m;
 
 function collectTomlVarsSection(source: string, sectionName: string): Map<string, string> {
   const vars = new Map<string, string>();
