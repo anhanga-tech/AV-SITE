@@ -55,7 +55,9 @@ export const linksPageConfig: LinksPageConfig = {
         { id: 'melhor-idade', label: 'Viagens Melhor Idade', type: 'internal', href: '/melhor-idade', visible: true },
         { id: 'consultoria-de-viagem', label: 'Consultoria de Viagem', type: 'internal', href: '/consultoria-de-viagem', visible: true },
         { id: 'corporativo', label: 'Viagens Corporativas', type: 'internal', href: '/corporativo', visible: true },
-        { id: 'curadoria-cruzeiros-brasil', label: 'Cruzeiros pelo Brasil', type: 'internal', href: '/curadoria-cruzeiros-brasil', visible: true },
+        // `id` preservado apesar da URL ter mudado para /cruzeiros: ele vira data-testid e vai
+        // ao dataLayer via pushLinksPageClick — renomear quebraria a série histórica de cliques.
+        { id: 'curadoria-cruzeiros-brasil', label: 'Cruzeiros pelo Brasil', type: 'internal', href: '/cruzeiros', visible: true },
         { id: 'lollapalooza', label: 'Lollapalooza', type: 'internal', href: '/lollapalooza', visible: true },
     ],
 };

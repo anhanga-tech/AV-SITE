@@ -14,6 +14,11 @@
 /brazil-promotion-day    /corporativo/    301
 /brazil-promotion-day/   /corporativo/    301
 
+# Cruzeiros: escopo abriu de "saídas do Brasil" para Brasil + internacional,
+# então a URL deixou de descrever a página.
+/curadoria-cruzeiros-brasil    /cruzeiros    301
+/curadoria-cruzeiros-brasil/   /cruzeiros    301
+
 # Link curto de indicação (e-mail #14 NPS promotor → WhatsApp share)
 # 302 (temporário) para permitir ajustar os UTMs depois sem cache de 301.
 /indica    /?utm_source=indicacao&utm_medium=whatsapp&utm_campaign=nps_promotor    302
