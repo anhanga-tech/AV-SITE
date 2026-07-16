@@ -30,7 +30,7 @@ const MelhorIdadeLanding = lazy(() => import('./pages/landings/MelhorIdadeLandin
 const CorporativoLanding = lazy(() => import('./pages/landings/CorporativoLanding'));
 const ConsultoriaDeViagemLanding = lazy(() => import('./pages/landings/ConsultoriaDeViagemLanding'));
 
-const CuradoriaCruzeirosBrasilLanding = lazy(() => import('./pages/landings/CuradoriaCruzeirosBrasilLanding'));
+const CruzeirosLanding = lazy(() => import('./pages/landings/CruzeirosLanding'));
 const NpsPage = lazy(() => import('./pages/NpsPage'));
 const QuizAnhangaLanding = lazy(() => import('./pages/landings/QuizAnhangaLanding'));
 const LinksPage = lazy(() => import('./pages/LinksPage'));
@@ -57,7 +57,7 @@ const LANDING_PAGE_ROUTES = [
   '/melhor-idade',
   '/corporativo',
   '/consultoria-de-viagem',
-  '/curadoria-cruzeiros-brasil',
+  '/cruzeiros',
   '/nps',
   '/quiz',
 ];
@@ -128,7 +128,8 @@ const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClient
           <Route path="/brazil-promotion-day" element={<Navigate to="/corporativo" replace />} />
           <Route path="/consultoria-de-viagem" element={<ConsultoriaDeViagemLanding />} />
           <Route path="/viagens-para-executivos" element={<Navigate to="/corporativo" replace />} />
-          <Route path="/curadoria-cruzeiros-brasil" element={<CuradoriaCruzeirosBrasilLanding />} />
+          <Route path="/cruzeiros" element={<CruzeirosLanding />} />
+          <Route path="/curadoria-cruzeiros-brasil" element={<Navigate to="/cruzeiros" replace />} />
           <Route path="/nps" element={<NpsPage />} />
           <Route path="/quiz" element={<QuizAnhangaLanding />} />
           <Route path="/links" element={<LinksPage />} />

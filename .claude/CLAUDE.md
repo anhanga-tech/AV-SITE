@@ -90,7 +90,7 @@ HUBSPOT_WEBHOOK_SECRET=   # HMAC secret para validar payloads do HubSpot webhook
 
 Two layout tiers, resolved at the top-level `Routes`:
 
-1. **Landing pages** (no Header/Footer/AIChat): `/beto-carrero`, `/lollapalooza`, `/orlando`, `/melhor-idade`, `/corporativo`, `/consultoria-de-viagem`, `/curadoria-cruzeiros-brasil`, `/nps`, `/quiz`. Several redirect aliases exist (e.g. `/lollapalooza-2026` → `/lollapalooza`).
+1. **Landing pages** (no Header/Footer/AIChat): `/beto-carrero`, `/lollapalooza`, `/orlando`, `/melhor-idade`, `/corporativo`, `/consultoria-de-viagem`, `/cruzeiros`, `/nps`, `/quiz`. Several redirect aliases exist (e.g. `/lollapalooza-2026` → `/lollapalooza`, `/curadoria-cruzeiros-brasil` → `/cruzeiros`).
 2. **Main site shell** (Header + AIChat + Footer): all other routes via `MainSiteShell`, including `/blog`, `/blog/:slug`, legal pages, `/sobre`, and a catch-all `NotFound`.
 
 `App` accepts `router`, `initialEntries`, `headManager`, and `includeClientFeatures` props — used by `scripts/prerender.mjs` to render static HTML for each route at build time via `MemoryRouter`.

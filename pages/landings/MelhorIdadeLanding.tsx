@@ -212,7 +212,7 @@ const MelhorIdadeLanding: React.FC = () => {
             Falar com um Consultor
           </button>
           <div className="flex flex-wrap justify-center gap-3 mt-8 relative z-10">
-            <Link to="/curadoria-cruzeiros-brasil/" className="px-5 py-3 rounded-full bg-white/10 border border-white/20 text-white font-semibold hover:bg-white/20 transition-colors">
+            <Link to="/cruzeiros/" className="px-5 py-3 rounded-full bg-white/10 border border-white/20 text-white font-semibold hover:bg-white/20 transition-colors">
               Cruzeiros pelo Brasil
             </Link>
             <Link to="/consultoria-de-viagem/" className="px-5 py-3 rounded-full bg-white/10 border border-white/20 text-white font-semibold hover:bg-white/20 transition-colors">

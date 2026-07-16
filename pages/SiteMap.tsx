@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { Seo } from '../components/Seo';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { getAllPosts } from '../lib/mdx';
@@ -16,7 +15,7 @@ const CORE_LINKS = [
   { to: `${SITE_URL}/melhor-idade/`, label: 'Viagens para Melhor Idade' },
   { to: `${SITE_URL}/lollapalooza/`, label: 'Lollapalooza Brasil' },
   { to: `${SITE_URL}/consultoria-de-viagem/`, label: 'Consultoria de Viagem Personalizada' },
-  { to: `${SITE_URL}/curadoria-cruzeiros-brasil/`, label: 'Cruzeiros pelo Brasil' },
+  { to: `${SITE_URL}/cruzeiros/`, label: 'Cruzeiros pelo Brasil' },
   { to: `${SITE_URL}/corporativo/`, label: 'Viagens Corporativas' },
   { to: `${SITE_URL}/quiz/`, label: 'Quiz: Descubra Seu Destino Ideal' },
   { to: `${SITE_URL}/termos-de-uso/`, label: 'Termos de Uso' },

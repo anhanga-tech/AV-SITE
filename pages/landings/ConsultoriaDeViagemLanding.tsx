@@ -462,7 +462,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
                 </div>
               </Link>
               <Link
-                to="/curadoria-cruzeiros-brasil/"
+                to="/cruzeiros/"
                 className="block p-5 rounded-xl bg-white hover:bg-anhanga-blue/5 transition-colors group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
               >
                 <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
