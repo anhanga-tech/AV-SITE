@@ -1,14 +1,18 @@
 # Legacy blog tag redirects
-/blog/tag/dicas  /blog  301
-/blog/tag/dicas/  /blog  301
+# Destino COM barra de propósito: o site normaliza trailing slash com um 308, e
+# apontar para /blog encadearia 301 → 308 → 200. Verificado com curl.
+/blog/tag/dicas  /blog/  301
+/blog/tag/dicas/  /blog/  301
 
 # Lollapalooza slug change
-/lollapalooza-2026    /lollapalooza    301
-/lollapalooza-2026/   /lollapalooza    301
+# Destino COM barra pelo mesmo motivo do bloco acima.
+/lollapalooza-2026    /lollapalooza/    301
+/lollapalooza-2026/   /lollapalooza/    301
 
 # Brazil Promotion Day → Corporativo
-/brazil-promotion-day    /corporativo    301
-/brazil-promotion-day/   /corporativo    301
+# Destino COM barra pelo mesmo motivo do bloco acima.
+/brazil-promotion-day    /corporativo/    301
+/brazil-promotion-day/   /corporativo/    301
 
 # Link curto de indicação (e-mail #14 NPS promotor → WhatsApp share)
 # 302 (temporário) para permitir ajustar os UTMs depois sem cache de 301.

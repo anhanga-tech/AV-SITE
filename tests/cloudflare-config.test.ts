@@ -136,6 +136,30 @@ test('Cloudflare redirects should expose the /indica short link with NPS referra
   }
 });
 
+test('Cloudflare page redirects should target the canonical trailing-slash form', async () => {
+  const redirects = await readFile(new URL('../public/_redirects', import.meta.url), 'utf8');
+
+  // O site normaliza trailing slash com um 308, então um destino sem barra
+  // encadeia 301 → 308 → 200 e dilui link equity. Handlers de função (/api/*),
+  // destinos com query string e splats não passam por essa normalização.
+  const pageRedirects = collectRedirectRules(redirects)
+    .map((line) => line.split(/\s+/))
+    .filter(([from, target]) => {
+      if (!from?.startsWith('/') || !target?.startsWith('/')) return false;
+      if (target.startsWith('/api/') || target.includes('?') || target.includes('*')) return false;
+      return target !== '/';
+    });
+
+  assert.ok(pageRedirects.length > 0, 'expected at least one internal page redirect to guard');
+
+  for (const [from, target] of pageRedirects) {
+    assert.ok(
+      target.endsWith('/'),
+      `${from} redirects to ${target} without a trailing slash, which chains 301 → 308 → 200`,
+    );
+  }
+});
+
 test('Cloudflare redirects should avoid redundant SPA fallback rewrites', async () => {
   const redirects = await readFile(new URL('../public/_redirects', import.meta.url), 'utf8');
 
