@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-const LEGACY_BLOG_HOST_REDIRECT_RE = /^\/blog(?:[\/\s*].*)?\s+https:\/\/blog\.anhanga\.tur\.br\b/m;
+const LEGACY_BLOG_HOST_REDIRECT_RE = /^\/blog(?:[/\s*].*)?\s+https:\/\/blog\.anhanga\.tur\.br\b/m;
 
 function collectTomlVarsSection(source: string, sectionName: string): Map<string, string> {
   const vars = new Map<string, string>();
@@ -133,6 +133,33 @@ test('Cloudflare redirects should expose the /indica short link with NPS referra
     assert.equal(url.searchParams.get('utm_source'), 'indicacao');
     assert.equal(url.searchParams.get('utm_medium'), 'whatsapp');
     assert.equal(url.searchParams.get('utm_campaign'), 'nps_promotor');
+  }
+});
+
+test('Cloudflare page redirects should target the canonical trailing-slash form', async () => {
+  const redirects = await readFile(new URL('../public/_redirects', import.meta.url), 'utf8');
+
+  // O site normaliza trailing slash com um 308, então um destino sem barra
+  // encadeia 301 → 308 → 200 e dilui link equity. Só o pathname importa: a query
+  // não isenta da normalização (/x?a=1 → 308 → /x/?a=1), mas a raiz sim.
+  // Handlers de função (/api/*) e splats não passam por ela.
+  const pathnameOf = (target: string): string => target.split('?')[0].split('#')[0];
+
+  const pageRedirects = collectRedirectRules(redirects)
+    .map((line) => line.split(/\s+/))
+    .filter(([from, target]) => {
+      if (!from?.startsWith('/') || !target?.startsWith('/')) return false;
+      if (target.startsWith('/api/') || target.includes('*')) return false;
+      return pathnameOf(target) !== '/';
+    });
+
+  assert.ok(pageRedirects.length > 0, 'expected at least one internal page redirect to guard');
+
+  for (const [from, target] of pageRedirects) {
+    assert.ok(
+      pathnameOf(target).endsWith('/'),
+      `${from} redirects to ${target} without a trailing slash on its pathname, which chains 301 → 308 → 200`,
+    );
   }
 });
 
