@@ -43,10 +43,13 @@ const LandingRouteFallback: React.FC = () => <div className="min-h-screen bg-whi
 const STANDALONE_ROUTES = ['/links'];
 
 // Landing pages de campanha (ver "Routing" no CLAUDE.md — mesma lista das rotas registradas
-// abaixo em AppLayout): já não renderizam Header/Footer, e o AIChat também fica de fora aqui.
-// Cada uma tem seu próprio CTA de conversão; um segundo overlay flutuante de contato
-// competindo com ele dilui "um CTA dominante por tela" (PRODUCT.md). ContactModal continua
-// montado — os CTAs dessas landings disparam openContactModal() e dependem dele.
+// abaixo em AppLayout): já não renderizam Header/Footer, e o AIChat e o BackToTop também
+// ficam de fora aqui. Cada uma tem seu próprio CTA de conversão; um segundo overlay
+// flutuante competindo com ele dilui "um CTA dominante por tela" (PRODUCT.md) — e o FAB
+// de "voltar ao topo" cobria conteúdo (FAQ, cards, CNPJ) na zona do polegar em mobile,
+// exatamente o imóvel que o critique de /consultoria-de-viagem reservou à conversão.
+// ContactModal continua montado — os CTAs dessas landings disparam openContactModal()
+// e dependem dele.
 const LANDING_PAGE_ROUTES = [
   '/beto-carrero',
   '/lollapalooza',
@@ -66,12 +69,12 @@ const ClientFeatures: React.FC = () => {
   // preserva ambos — sem normalizar, os overlays vazariam em /links/ ou /LINKS.
   const normalizedPath = (pathname === '/' ? '/' : pathname.replace(/\/$/, '')).toLowerCase();
   if (STANDALONE_ROUTES.includes(normalizedPath)) return null;
-  const hideAIChat = LANDING_PAGE_ROUTES.includes(normalizedPath);
+  const isLandingRoute = LANDING_PAGE_ROUTES.includes(normalizedPath);
   return (
     <ClientOnly>
-      {hideAIChat ? null : <AIChat />}
+      {isLandingRoute ? null : <AIChat />}
       <ContactModal />
-      <BackToTop />
+      {isLandingRoute ? null : <BackToTop />}
     </ClientOnly>
   );
 };

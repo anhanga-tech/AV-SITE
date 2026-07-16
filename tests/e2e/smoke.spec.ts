@@ -34,8 +34,8 @@ test.describe('Smoke Suite', () => {
       await homePage.faleConoscoBtn.click();
     }
 
-    await expect(page.getByRole('dialog', { name: 'Fale com um especialista' })).toBeVisible();
-    await expect(page.getByText('Fale com um especialista')).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Fale com um consultor' })).toBeVisible();
+    await expect(page.getByText('Fale com um consultor')).toBeVisible();
   });
 
   test('should navigate to basic landing pages', async ({ page }) => {
@@ -65,14 +65,14 @@ test.describe('Smoke Suite', () => {
     // Orlando
     await page.goto('/orlando');
     await page.getByTestId('cta-orlando-specialist').click();
-    await expect(page.getByRole('dialog', { name: 'Fale com um especialista' })).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Fale com um consultor' })).toBeVisible();
     await page.keyboard.press('Escape');
-    await expect(page.getByRole('dialog', { name: 'Fale com um especialista' })).not.toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Fale com um consultor' })).not.toBeVisible();
 
     // Beto Carrero
     await page.goto('/beto-carrero');
     await page.getByTestId('cta-betocarrero-specialist').click();
-    await expect(page.getByRole('dialog', { name: 'Fale com um especialista' })).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Fale com um consultor' })).toBeVisible();
 
   });
 

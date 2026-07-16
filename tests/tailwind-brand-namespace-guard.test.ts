@@ -53,7 +53,9 @@ function collectRootFiles(): string[] {
 // 2026-07-16: 587 → 562 (ContactModal.tsx migrado — P3 do critique de
 // /consultoria-de-viagem, débito registrado na PR #1203; baseline reajustado
 // para a contagem real após a migração, não apenas os 9 usos removidos aqui).
-const BRAND_NAMESPACE_BASELINE = 562;
+// 2026-07-16: 562 → 552 (LandingFAQ.tsx migrado na rodada 3 do critique de
+// /consultoria-de-viagem — cluster do FAQ apontado pelo detector).
+const BRAND_NAMESPACE_BASELINE = 552;
 
 test('legacy brand-* namespace does not grow (ratchet)', () => {
   const files = [...SCAN_DIRS.flatMap(collectTailwindFiles), ...collectRootFiles()];

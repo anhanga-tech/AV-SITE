@@ -50,7 +50,7 @@ test.describe('Contact form attribution payload', () => {
     );
 
     await page.getByRole('button', { name: 'Falar com Especialista' }).click();
-    const dialog = page.getByRole('dialog', { name: 'Fale com um especialista' });
+    const dialog = page.getByRole('dialog', { name: 'Fale com um consultor' });
     await expect(dialog).toBeVisible();
 
     await page.locator('#contact-firstName').fill('Maria Silva');
@@ -90,7 +90,7 @@ test.describe('Contact form attribution payload', () => {
     // The hero's "Solicitar Orçamento" CTA is the one that threads destination: 'Orlando'
     // alongside source: 'orlando' — other Orlando CTAs only set source.
     await page.getByRole('button', { name: /solicitar orçamento/i }).first().click();
-    const dialog = page.getByRole('dialog', { name: 'Fale com um especialista' });
+    const dialog = page.getByRole('dialog', { name: 'Fale com um consultor' });
     await expect(dialog).toBeVisible();
 
     await page.locator('#contact-firstName').fill('João Souza');
@@ -140,7 +140,7 @@ test.describe('Contact form attribution payload', () => {
 
     await page.goto('/');
     await page.getByRole('button', { name: 'Falar com Especialista' }).click();
-    const dialog = page.getByRole('dialog', { name: 'Fale com um especialista' });
+    const dialog = page.getByRole('dialog', { name: 'Fale com um consultor' });
     await expect(dialog).toBeVisible();
 
     await page.locator('#contact-firstName').fill('Carla Mendes');

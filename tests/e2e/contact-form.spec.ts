@@ -21,7 +21,7 @@ async function openHeaderContactModal(page: Page, isMobile: boolean) {
 }
 
 const contactDialog = (page: Page) =>
-  page.getByRole('dialog', { name: 'Fale com um especialista' });
+  page.getByRole('dialog', { name: 'Fale com um consultor' });
 
 test.describe('Contact form modal', () => {
   test.beforeEach(async ({ page }) => {

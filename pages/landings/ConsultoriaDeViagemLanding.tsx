@@ -22,7 +22,9 @@ const FAQ_ITEMS = [
   },
   {
     question: 'Quanto custa a consultoria?',
-    answer: 'Sem taxa de consultoria no momento. Você fala com um consultor gratuitamente e decide se quer fechar sua viagem com a Anhangá.'
+    // Sem "no momento": a ressalva plantava a dúvida que o hero ("Gratuito.")
+    // trabalha para matar. Ver critique de /consultoria-de-viagem.
+    answer: 'Nada. Você fala com um consultor gratuitamente, sem compromisso, e decide se quer fechar sua viagem com a Anhangá.'
   },
   {
     question: 'Vocês fazem viagens internacionais?',
@@ -38,19 +40,22 @@ const FAQ_ITEMS = [
   }
 ];
 
+// 4 itens, não 5: chunking ≤4 do critique — os antigos itens 4 e 5
+// ("viajantes frequentes" / "profissionais sem tempo") eram o mesmo perfil.
 const FOR_WHO = [
   'Quem quer viajar bem sem precisar cuidar de cada detalhe',
   'Famílias que buscam conforto e segurança no roteiro',
   'Casais planejando viagem especial ou lua de mel',
-  'Viajantes frequentes que querem uma agência de confiança',
-  'Profissionais sem tempo para pesquisar e comparar opções',
+  'Viajantes frequentes sem tempo de pesquisar e comparar opções',
 ];
 
 const HOW_IT_WORKS = [
   {
     step: '01',
     title: 'Conversa inicial',
-    desc: 'Você fala com um consultor e conta o que precisa. Sem formulário, sem burocracia.'
+    // Não prometer "sem formulário": o CTA da página abre o ContactModal, que
+    // é um formulário — Riley pegava a contradição na hora. Ver critique.
+    desc: 'Você fala com um consultor e conta o que precisa. Uma conversa de verdade, sem burocracia.'
   },
   {
     step: '02',
@@ -74,7 +79,7 @@ const PILLARS = [
   {
     icon: Users,
     title: 'Atendimento humano',
-    desc: 'Um consultor real do início ao fim. Não um chatbot, não um formulário.',
+    desc: 'Um consultor real do início ao fim. Não um chatbot, não uma central de atendimento.',
     variant: 'filled' as const
   },
   {
@@ -138,8 +143,13 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
           — combinado com CookieConsentBanner.tsx, que também foi compactado
           no mobile. Ver critique de /consultoria-de-viagem.
         */}
+        {/*
+          max-w-4xl (não 3xl): a 3xl o H1 text-6xl quebrava em 4 linhas e
+          empurrava o par CTA + "Sem taxa..." para fora da dobra a 1366×768
+          (laptop mais comum no Brasil). Ver critique de /consultoria-de-viagem.
+        */}
         <section className="pt-3 md:pt-16 pb-20 px-6">
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-4xl mx-auto">
             <m.div
               variants={fadeUp}
               initial="hidden"
@@ -147,8 +157,14 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
               custom={0}
               className="inline-flex items-center gap-2 rounded-full border border-anhanga-blue/20 bg-anhanga-blue/5 px-3 py-0.5 md:py-1 mb-2 md:mb-5 text-[11px] md:text-xs font-black uppercase tracking-widest text-anhanga-blue"
             >
+              {/*
+                "todo o Brasil", não "São Paulo": o badge é a primeira leitura da
+                página e cercava quem chega de fora de SP — a correção só aparecia
+                na 3ª pergunta do FAQ. O sinal local de SEO permanece no <title> e
+                no areaServed do ServiceSchema. Ver critique de /consultoria-de-viagem.
+              */}
               <Compass className="size-3.5" aria-hidden="true" />
-              Consultoria de viagem · São Paulo
+              Consultoria de viagem · todo o Brasil
             </m.div>
             <m.h1
               variants={fadeUp}
@@ -218,10 +234,12 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
                   whileInView="visible"
                   viewport={{ once: true, amount: 0.2, margin: '0px 0px 100% 0px' }}
                   custom={idx + 1}
-                  className={`p-8 rounded-2xl transition duration-300 ${
+                  // Sem lift no hover: os cards não são clicáveis, e sombra que
+                  // cresce ao passar o mouse é affordance de clique sem clique.
+                  className={`p-8 rounded-2xl ${
                     variant === 'filled'
                       ? 'bg-anhanga-blue text-white'
-                      : 'bg-anhanga-light shadow-float hover:shadow-float-lg'
+                      : 'bg-anhanga-light shadow-float'
                   }`}
                 >
                   <div
@@ -384,7 +402,9 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
                   {CREDENTIALS.map(item => (
                     <span
                       key={item}
-                      className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-anhanga-dark shadow-float"
+                      // Borda 1px, não shadow-float: pílula branca elevada parecia
+                      // clicável (spec de Badge do DESIGN.md: borda, sem sombra).
+                      className="inline-flex items-center gap-2 rounded-full bg-white border border-zinc-200 px-4 py-2 text-sm font-bold text-anhanga-dark"
                     >
                       <CheckCircle className="size-4 text-anhanga-blue" aria-hidden="true" />
                       {item}
@@ -432,7 +452,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
             <div className="grid md:grid-cols-3 gap-4">
               <Link
                 to="/corporativo/"
-                className="block p-5 rounded-xl bg-white hover:bg-anhanga-blue/5 transition-colors group"
+                className="block p-5 rounded-xl bg-white hover:bg-anhanga-blue/5 transition-colors group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
               >
                 <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                   Viagens para Executivos
@@ -443,7 +463,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
               </Link>
               <Link
                 to="/curadoria-cruzeiros-brasil/"
-                className="block p-5 rounded-xl bg-white hover:bg-anhanga-blue/5 transition-colors group"
+                className="block p-5 rounded-xl bg-white hover:bg-anhanga-blue/5 transition-colors group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
               >
                 <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                   Curadoria de Cruzeiros
@@ -454,7 +474,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
               </Link>
               <Link
                 to="/"
-                className="block p-5 rounded-xl bg-white hover:bg-anhanga-blue/5 transition-colors group"
+                className="block p-5 rounded-xl bg-white hover:bg-anhanga-blue/5 transition-colors group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
               >
                 <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                   Site principal

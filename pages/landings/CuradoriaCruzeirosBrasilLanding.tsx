@@ -296,7 +296,7 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
             Descubra o cruzeiro certo para você.
           </h2>
           <p className="text-blue-100 text-lg mb-10 max-w-xl mx-auto">
-            Fale com um especialista e resolva a escolha em uma conversa. Sem taxa, sem compromisso.
+            Fale com um consultor e resolva a escolha em uma conversa. Sem taxa, sem compromisso.
           </p>
           <button
             type="button"
