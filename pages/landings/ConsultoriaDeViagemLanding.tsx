@@ -180,10 +180,10 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
         <section className="py-20 bg-white">
           <div className="max-w-5xl mx-auto px-6">
             {/*
-              margin '200px' abaixo do viewport (mesma convenção em todas as
-              seções seguintes): dispara a revelação antes da seção entrar na
-              tela, não quando já está visível. Sem isso, rolagem rápida
-              mostrava conteúdo semitransparente mesmo já dentro do viewport
+              margin de um viewport de altura (100%) abaixo do viewport (mesma
+              convenção em todas as seções seguintes): dispara a revelação antes da
+              seção entrar na tela, não quando já está visível. Sem isso, rolagem
+              rápida mostrava conteúdo semitransparente mesmo já dentro do viewport
               — lia como página quebrada. Ver critique de /consultoria-de-viagem.
             */}
             <m.div
