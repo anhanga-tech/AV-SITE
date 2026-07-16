@@ -19,8 +19,10 @@ const variantClasses: Record<ButtonVariant, string> = {
     // texto Ardósia, não branco: branco sobre bg-anhanga-action mede 2.8:1
     // (abaixo do piso de 4.5:1 do WCAG AA) — mesma lógica de par acessível já
     // usada no variant `cta` (bg saturado + texto escuro). Ver critique de
-    // /consultoria-de-viagem.
-    action:  'bg-anhanga-action text-anhanga-dark rounded-full hover:bg-anhanga-actionDark',
+    // /consultoria-de-viagem. hover:bg-anhanga-actionDark foi removido: esse
+    // par media 4.36:1 com o texto Ardósia, abaixo do piso — brightness-105
+    // dá feedback de hover sem escurecer o fundo (só melhora o contraste).
+    action:  'bg-anhanga-action text-anhanga-dark rounded-full hover:brightness-105',
     cta:     'bg-anhanga-yellow text-anhanga-dark rounded-2xl shadow-hard hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none',
     ghost:   'bg-transparent text-zinc-500 rounded-lg hover:text-anhanga-action',
 };

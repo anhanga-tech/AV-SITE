@@ -65,14 +65,14 @@ const CookieConsentBanner: React.FC = () => {
           <button
             type="button"
             onClick={handleDecline}
-            className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-zinc-300 border border-white/20 rounded-lg hover:border-white/40 hover:text-white transition-colors"
+            className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-zinc-300 border border-white/20 rounded-lg hover:border-white/40 hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
           >
             Recusar
           </button>
           <button
             type="button"
             onClick={handleAccept}
-            className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-zinc-300 border border-white/20 rounded-lg hover:border-white/40 hover:text-white transition-colors"
+            className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-zinc-300 border border-white/20 rounded-lg hover:border-white/40 hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
           >
             Aceitar
           </button>
