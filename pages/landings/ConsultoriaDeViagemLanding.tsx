@@ -342,32 +342,58 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
 
         {/* Sobre a Anhangá */}
         <section className="py-20 bg-anhanga-light">
-          <m.div
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2, margin: '0px 0px 100% 0px' }}
-            custom={0}
-            className="max-w-4xl mx-auto px-6 text-center"
-          >
-            <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-6">
-              Sobre a Anhangá Viagens
-            </h2>
-            <p className="text-lg text-zinc-600 leading-relaxed max-w-2xl mx-auto">
-              Agência de viagens em São Paulo, especializada em viagens personalizadas desde 2018. Atendimento humano, nota 5.0 no Google e consultor fixo do início ao fim da sua viagem.
-            </p>
-            <div className="mt-10 flex flex-wrap justify-center gap-3">
-              {CREDENTIALS.map(item => (
-                <span
-                  key={item}
-                  className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-anhanga-dark shadow-float"
-                >
-                  <CheckCircle className="size-4 text-anhanga-blue" aria-hidden="true" />
-                  {item}
-                </span>
-              ))}
+          <div className="max-w-5xl mx-auto px-6">
+            <div className="md:grid md:grid-cols-2 md:gap-16 items-center">
+              <m.div
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2, margin: '0px 0px 100% 0px' }}
+                custom={0}
+                className="overflow-hidden rounded-3xl shadow-float"
+              >
+                {/*
+                  Segunda foto real da página (a primeira é o depoimento de
+                  Lisboa) — "Sobre" era só tipografia antes, contrariando
+                  "lugares reais, não categorias" para um brief sobre viagens.
+                  Ver critique de /consultoria-de-viagem (P2).
+                */}
+                <LazyImage
+                  src={getDestinationImage('Rio de Janeiro')}
+                  alt="Rio de Janeiro — um dos destinos planejados pela Anhangá Viagens"
+                  width={640}
+                  height={480}
+                  className="h-64 md:h-80 w-full"
+                />
+              </m.div>
+              <m.div
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2, margin: '0px 0px 100% 0px' }}
+                custom={1}
+                className="mt-10 md:mt-0 text-center md:text-left"
+              >
+                <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-6">
+                  Sobre a Anhangá Viagens
+                </h2>
+                <p className="text-lg text-zinc-600 leading-relaxed">
+                  Agência de viagens em São Paulo, especializada em viagens personalizadas desde 2018. Atendimento humano, nota 5.0 no Google e consultor fixo do início ao fim da sua viagem.
+                </p>
+                <div className="mt-10 flex flex-wrap justify-center md:justify-start gap-3">
+                  {CREDENTIALS.map(item => (
+                    <span
+                      key={item}
+                      className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-anhanga-dark shadow-float"
+                    >
+                      <CheckCircle className="size-4 text-anhanga-blue" aria-hidden="true" />
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </m.div>
             </div>
-          </m.div>
+          </div>
         </section>
 
         {/* CTA Final */}
