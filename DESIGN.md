@@ -65,12 +65,12 @@ components:
     padding: "14px 28px"
   button-action:
     backgroundColor: "{colors.action}"
-    textColor: "#f8fafc"
+    textColor: "{colors.dark}"
     rounded: "{rounded.full}"
     padding: "10px 20px"
   button-action-hover:
-    backgroundColor: "{colors.action-dark}"
-    textColor: "#f8fafc"
+    backgroundColor: "{colors.action}"
+    textColor: "{colors.dark}"
     rounded: "{rounded.full}"
     padding: "10px 20px"
   button-cta:
@@ -195,7 +195,7 @@ O `shadow-glow` (brilho ciano) é reservado para highlights de estado ativo em e
 
 - **Shape:** Varia por variante. Primary: arredondado médio (12px / `rounded-xl`). Action: pílula completa (9999px / `rounded-full`). CTA: arredondado generoso (16px / `rounded-2xl`). Ghost: arredondado suave (8px / `rounded-lg`).
 - **Primary** (Ardósia Profunda, texto branco, `shadow-hard-yellow`): Para ações importantes em contexto light. Press-down com Âmbar Vivo. Tamanhos: `sm` (text-xs, px-4 py-2), `md` (text-sm, px-5 py-2.5), `lg` (text-base, px-7 py-3.5).
-- **Action** (Céu Vivo, texto branco, pílula): Ações de fluxo, navegação, CTAs em contexto dark. `hover:bg-action-dark`. Sem hard shadow — a pílula já comunica interatividade.
+- **Action** (Céu Vivo, texto Ardósia, pílula): Ações de fluxo, navegação, CTAs em contexto dark. `hover:brightness-105` (sem escurecer o fundo — `bg-action-dark` no hover derruba o par para 4.36:1, abaixo do piso). Sem hard shadow — a pílula já comunica interatividade. Texto Ardósia (não branco): branco sobre Céu Vivo mede 2.8:1, abaixo do piso de 4.5:1 do WCAG AA.
 - **CTA** (Âmbar Vivo, texto Ardósia, `shadow-hard`): O botão de conversão máxima. Reservado para o principal call-to-action de cada tela — nunca dois CTAs na mesma tela.
 - **Ghost** (transparente, texto Cinza): Ações terciárias e navegação discreta. `hover:text-action`. Sem sombra, sem borda.
 - **Estados:** `disabled:opacity-50 disabled:cursor-not-allowed`. Foco: `focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action` em todas as variantes. Loading: ícone spin `CircleNotch` do `@phosphor-icons/react`.
