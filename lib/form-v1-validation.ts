@@ -29,7 +29,9 @@ export function validateContactFormFields(input: ContactFormValidationInput):
   const errors: ContactFormFieldErrors = {};
 
   if (!firstName) errors.firstName = 'Informe seu nome.';
-  if (!whatsapp) errors.whatsapp = 'Informe um WhatsApp válido.';
+  // Mensagem diz o formato aceito (fórmula de erro: o quê + como corrigir) —
+  // "Informe um WhatsApp válido." sozinho não dizia se o +55 era obrigatório.
+  if (!whatsapp) errors.whatsapp = 'Informe um WhatsApp válido, com DDD. Ex.: (11) 90000-0000';
   if (email && !isValidEmail(email)) errors.email = 'Informe um e-mail válido ou deixe em branco.';
 
   if (Object.keys(errors).length > 0) {

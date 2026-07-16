@@ -1,5 +1,5 @@
 import React, { useState, memo, useCallback } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 interface FAQItem {
     question: string;
@@ -12,34 +12,49 @@ interface LandingFAQProps {
     subtitle?: string;
 }
 
+/*
+  Estrutura pós-critique de /consultoria-de-viagem (via detector do impeccable):
+  - Sem card externo envolvendo os itens (era card dentro de card + filhos
+    encostados na borda sem inset lateral) — lista plana com divisores.
+  - Expansão anima grid-template-rows 0fr→1fr, não max-height: o max-h-[500px]
+    era um número mágico que distorcia a curva de timing e disparava o
+    detector de layout-transition.
+  - Respostas limitadas a 65ch (linhas de ~87ch estouravam o alvo de leitura).
+  - Namespace Tailwind canônico anhanga-* (brand-* é legado congelado).
+  - Hover do título em anhanga-blue (6.5:1 sobre branco): o cyan anterior
+    media 2.8:1.
+*/
 const FAQItemComponent = memo(({ question, answer, isOpen, idx, onToggle }: FAQItem & { isOpen: boolean; idx: number; onToggle: (idx: number) => void }) => {
     const toggleFaqItem = useCallback(() => onToggle(idx), [idx, onToggle]);
     return (
-        <div
-            className={`border-b border-brand-cyan/10 last:border-0 transition duration-300 ${isOpen ? 'bg-white/40' : ''}`}
-        >
+        <div className="border-b border-zinc-200 last:border-0">
             <button
                 type="button"
-                className="w-full py-6 flex justify-between items-center text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan group"
+                className="w-full py-6 flex justify-between items-center gap-4 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action group"
                 onClick={toggleFaqItem}
                 aria-expanded={isOpen}
             >
-                <h3 className="text-xl font-bold text-brand-dark group-hover:text-brand-cyan transition-colors pr-8">
+                <h3 className="text-xl font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                     {question}
                 </h3>
                 <div className={`flex-shrink-0 size-8 rounded-full flex items-center justify-center transition duration-300 ${
-                    isOpen ? 'bg-brand-cyan text-white rotate-180' : 'bg-brand-light text-brand-cyan'
+                    isOpen ? 'bg-anhanga-action text-anhanga-dark' : 'bg-anhanga-light text-anhanga-actionDark'
                 }`}>
-                    {isOpen ? <ChevronUp className="size-5" /> : <ChevronDown className="size-5" />}
+                    <ChevronDown
+                        className={`size-5 transition-transform duration-300 motion-reduce:transition-none ${isOpen ? 'rotate-180' : ''}`}
+                        aria-hidden="true"
+                    />
                 </div>
             </button>
             <div
-                className={`overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out ${
-                    isOpen ? 'max-h-[500px] opacity-100 pb-8' : 'max-h-0 opacity-0'
+                className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${
+                    isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
                 }`}
             >
-                <div className="text-zinc-600 text-lg leading-relaxed">
-                    {typeof answer === 'string' ? <p>{answer}</p> : answer}
+                <div className="overflow-hidden">
+                    <div className="pb-8 text-zinc-600 text-lg leading-relaxed max-w-[65ch]">
+                        {typeof answer === 'string' ? <p>{answer}</p> : answer}
+                    </div>
                 </div>
             </div>
         </div>
@@ -57,14 +72,16 @@ export const LandingFAQ: React.FC<LandingFAQProps> = ({
 
     const handleToggle = useCallback((idx: number) => {
         setOpenIndex(prev => prev === idx ? null : idx);
-        import('../utils/haptics').then(m => m.triggerHaptic('light'));
+        import('../utils/haptics')
+            .then(m => m.triggerHaptic('light'))
+            .catch(() => {});
     }, []);
 
     return (
         <section className="py-20 bg-white">
             <div className="container mx-auto px-6 max-w-4xl">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">
+                    <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-4">
                         {title}
                     </h2>
                     <p className="text-lg text-zinc-500">
@@ -72,7 +89,7 @@ export const LandingFAQ: React.FC<LandingFAQProps> = ({
                     </p>
                 </div>
 
-                <div className="bg-brand-surface/50 rounded-3xl p-4 md:p-8 border border-brand-cyan/10">
+                <div>
                     {items.map((item, idx) => (
                         <FAQItemComponent
                             key={item.question}
@@ -87,4 +104,3 @@ export const LandingFAQ: React.FC<LandingFAQProps> = ({
         </section>
     );
 };
-

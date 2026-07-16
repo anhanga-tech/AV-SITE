@@ -27,7 +27,22 @@ export function LandingNav({ source }: LandingNavProps) {
                   ocupado pelo CTA principal da página. O nav em estado "scrolled/
                   internal" usa exatamente `bg-action hover:bg-action-dark` por
                   especificação do componente Navigation do DESIGN.md.
+
+                  No mobile o botão vira pílula só-ícone (44×44px): antes era
+                  `hidden sm:block` e, entre o hero e o CTA final, a página não
+                  tinha nenhuma ação alcançável pelo polegar — contra o
+                  mobile-first do PRODUCT.md. Ver critique de /consultoria-de-viagem.
                 */}
+                <button
+                    type="button"
+                    onClick={() => openContactModal({ source })}
+                    className="sm:hidden inline-flex size-11 items-center justify-center rounded-full bg-anhanga-action text-anhanga-dark transition duration-150 hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action btn-whatsapp btn-specialist"
+                    aria-label="Falar com um consultor"
+                    data-contact-intent
+                    data-tracking={`header-mobile-${source}`}
+                >
+                    <WhatsappLogo className="size-5" weight="fill" aria-hidden="true" />
+                </button>
                 <div className="hidden sm:block">
                     <Button
                         variant="action"
@@ -37,7 +52,7 @@ export function LandingNav({ source }: LandingNavProps) {
                         data-contact-intent
                         data-tracking={`header-${source}`}
                     >
-                        Falar no WhatsApp
+                        Falar com um consultor
                     </Button>
                 </div>
             </div>

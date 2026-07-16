@@ -98,8 +98,15 @@ const ContactModal: React.FC = () => {
                         <p className="mb-1 text-xs font-black uppercase tracking-widest text-anhanga-action">
                             Anhangá Viagens
                         </p>
+                        {/*
+                          "consultor", não "especialista": a mesma conversa tinha três
+                          rótulos (nav "Falar no WhatsApp", CTA "Falar com um consultor",
+                          modal "Fale com um especialista") — Jordan não sabia se eram
+                          três coisas diferentes. Terminologia unificada em "consultor",
+                          a palavra do PRODUCT.md. Ver critique de /consultoria-de-viagem.
+                        */}
                         <h2 id={titleId} className="text-lg font-black text-anhanga-dark">
-                            Fale com um especialista
+                            Fale com um consultor
                         </h2>
                         {/* Confirma ao visitante que o clique carregou o contexto certo
                             (ex.: a oferta de cruzeiro escolhida). Aditivo: só aparece
@@ -176,7 +183,7 @@ const ContactModal: React.FC = () => {
                             onChange={(value) => setField('whatsapp', value)}
                             required
                             inputClassName={FIELD_CLASSNAME}
-                            placeholder="+55 (11) 9 0000-0000"
+                            placeholder="(11) 90000-0000"
                             error={fieldErrors.whatsapp}
                         />
 
@@ -236,7 +243,11 @@ const ContactModal: React.FC = () => {
                             <button
                                 type="submit"
                                 disabled={!canAttemptSubmit || isSubmitting}
-                                className="w-full rounded-xl bg-[#25D366] py-3 text-sm font-black text-white transition-colors hover:bg-[#1fba59] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366] disabled:cursor-not-allowed disabled:opacity-40"
+                                // Texto Ardósia, não branco: branco sobre o verde WhatsApp mede
+                                // ~2.0:1 (piso WCAG AA: 4.5:1 em text-sm) — mesmo par acessível
+                                // dos variants `cta`/`action` do Button (bg saturado + texto
+                                // escuro). Ver critique de /consultoria-de-viagem (P1).
+                                className="w-full rounded-xl bg-anhanga-whatsapp py-3 text-sm font-black text-anhanga-dark transition duration-150 hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action disabled:cursor-not-allowed disabled:opacity-40"
                             >
                                 {isSubmitting ? 'Enviando…' : 'Abrir WhatsApp agora'}
                             </button>

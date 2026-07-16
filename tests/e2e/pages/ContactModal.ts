@@ -13,7 +13,7 @@ export class ContactModal {
 
   constructor(page: Page) {
     this.page = page;
-    this.modal = page.getByRole('dialog', { name: 'Fale com um especialista' });
+    this.modal = page.getByRole('dialog', { name: 'Fale com um consultor' });
     this.firstNameInput = page.locator('#contact-firstName');
     this.whatsappInput = page.locator('#contact-whatsapp');
     this.emailInput = page.locator('#contact-email');
