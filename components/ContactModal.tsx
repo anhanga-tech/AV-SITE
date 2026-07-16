@@ -6,7 +6,7 @@ import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
 import { FormField } from './forms/FormField';
 
 const FIELD_CLASSNAME =
-    'w-full rounded-xl border-2 border-zinc-200 px-3 py-2.5 text-sm font-medium text-zinc-800 outline-none transition-colors placeholder-zinc-400 focus:border-brand-cyan focus-visible:ring-2 focus-visible:ring-brand-cyan';
+    'w-full rounded-xl border-2 border-zinc-200 px-3 py-2.5 text-sm font-medium text-zinc-800 outline-none transition-colors placeholder-zinc-400 focus:border-anhanga-action focus-visible:ring-2 focus-visible:ring-anhanga-action';
 
 const ContactModal: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -95,17 +95,17 @@ const ContactModal: React.FC = () => {
             {isOpen && <div className="relative z-10 w-full overflow-hidden rounded-2xl bg-white shadow-[0_24px_60px_rgba(0,0,0,0.3)]">
                 <div className="flex items-start justify-between p-6 pb-4">
                     <div>
-                        <p className="mb-1 text-xs font-black uppercase tracking-widest text-brand-vibrant">
+                        <p className="mb-1 text-xs font-black uppercase tracking-widest text-anhanga-action">
                             Anhangá Viagens
                         </p>
-                        <h2 id={titleId} className="text-lg font-black text-brand-dark">
+                        <h2 id={titleId} className="text-lg font-black text-anhanga-dark">
                             Fale com um especialista
                         </h2>
                     </div>
                     <button
                         type="button"
                         onClick={close}
-                        className="rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan"
+                        className="rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-anhanga-action"
                         aria-label="Fechar"
                     >
                         <X className="size-5" weight="bold" />
@@ -130,7 +130,7 @@ const ContactModal: React.FC = () => {
                             ref={closeButtonRef}
                             type="button"
                             onClick={close}
-                            className="w-full rounded-xl bg-brand-dark py-3 font-bold text-white transition-colors hover:bg-brand-vibrant focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-dark focus-visible:ring-offset-2"
+                            className="w-full rounded-xl bg-anhanga-dark py-3 font-bold text-white transition-colors hover:bg-anhanga-action focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-anhanga-dark focus-visible:ring-offset-2"
                         >
                             Fechar
                         </button>
@@ -190,7 +190,7 @@ const ContactModal: React.FC = () => {
                                 type="checkbox"
                                 checked={fields.emailOptIn}
                                 onChange={(event) => setField('emailOptIn', event.target.checked)}
-                                className="mt-0.5 size-4 flex-shrink-0 cursor-pointer rounded border-2 border-brand-vibrant accent-brand-vibrant"
+                                className="mt-0.5 size-4 flex-shrink-0 cursor-pointer rounded border-2 border-anhanga-action accent-anhanga-action"
                             />
                             <label htmlFor="contact-optIn" className="cursor-pointer text-xs leading-relaxed text-blue-700">
                                 Quero receber novidades, ofertas e dicas de viagem da Anhangá Viagens.
