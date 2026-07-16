@@ -63,7 +63,7 @@ const CorporativoLanding: React.FC = () => {
                             <Link to="/melhor-idade/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
                                 Viagens Melhor Idade
                             </Link>
-                            <Link to="/curadoria-cruzeiros-brasil/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
+                            <Link to="/cruzeiros/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
                                 Cruzeiros pelo Brasil
                             </Link>
                         </div>

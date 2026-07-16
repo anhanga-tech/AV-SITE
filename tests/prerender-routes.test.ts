@@ -17,7 +17,7 @@ test('buildPrerenderRoutes includes blog index and blog post routes from MDX fil
 
     assert.ok(routes.includes('/blog'));
     assert.ok(routes.includes('/consultoria-de-viagem'));
-    assert.ok(routes.includes('/curadoria-cruzeiros-brasil'));
+    assert.ok(routes.includes('/cruzeiros'));
     assert.ok(routes.includes('/quiz'));
     assert.ok(routes.includes('/blog/post-alpha'));
     assert.ok(routes.includes('/blog/post-beta'));

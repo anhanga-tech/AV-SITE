@@ -24,7 +24,7 @@ test('no page passes the removed keywords prop to ServiceSchema', async () => {
     'pages/landings/OrlandoLanding.tsx',
     'pages/landings/MelhorIdadeLanding.tsx',
     'pages/landings/LollapaloozaLanding.tsx',
-    'pages/landings/CuradoriaCruzeirosBrasilLanding.tsx',
+    'pages/landings/CruzeirosLanding.tsx',
     'pages/landings/ConsultoriaDeViagemLanding.tsx',
   ];
   for (const page of pages) {

@@ -86,26 +86,26 @@ const HOW_IT_WORKS = [
   },
 ];
 
-const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
+const CruzeirosLanding: React.FC = () => {
   return (
     <div className="bg-anhanga-light min-h-screen font-sans">
       <Seo
         title="Curadoria de Cruzeiros no Brasil — Anhangá Viagens"
         description="Escolha navio, cabine e roteiro certos para o seu perfil. Curadoria consultiva para quem quer fazer o cruzeiro certo na primeira vez."
-        canonical="https://www.anhanga.tur.br/curadoria-cruzeiros-brasil/"
+        canonical="https://www.anhanga.tur.br/cruzeiros/"
         noHreflang
       />
       <ServiceSchema
         name="Curadoria de Cruzeiros no Brasil"
         description="Ajuda especializada para escolher navio, cabine, roteiro e datas ideais para seu cruzeiro no Brasil. Atendimento consultivo para casais, famílias e primeira viagem."
-        serviceUrl="https://www.anhanga.tur.br/curadoria-cruzeiros-brasil/"
+        serviceUrl="https://www.anhanga.tur.br/cruzeiros/"
         serviceType="Curadoria de Cruzeiros"
         areaServed="Brasil"
       />
       <BreadcrumbSchema
         items={[
           { name: 'Home', item: 'https://www.anhanga.tur.br/' },
-          { name: 'Curadoria de Cruzeiros', item: 'https://www.anhanga.tur.br/curadoria-cruzeiros-brasil/' }
+          { name: 'Curadoria de Cruzeiros', item: 'https://www.anhanga.tur.br/cruzeiros/' }
         ]}
       />
       <FAQPageSchema items={FAQ_ITEMS} />
@@ -369,4 +369,4 @@ const CuradoriaCruzeirosBrasilLanding: React.FC = () => {
   );
 };
 
-export default CuradoriaCruzeirosBrasilLanding;
+export default CruzeirosLanding;
