@@ -1144,7 +1144,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   },
   {
     "title": "Europa gastronômica: roteiro pela Itália",
-    "excerpt": "De Roma a Florença, um roteiro gastronômico pela Itália longe das armadilhas de turista: onde comer carbonara de verdade, provar vinhos locais e achar o gelato que vale a fila.",
+    "excerpt": "De Roma a Nápoles, um roteiro gastronômico pela Itália sem cair em armadilha de turista: onde comer carbonara de verdade e achar o gelato que vale a fila.",
     "date": "2025-10-28",
     "dateModified": "2026-07-16",
     "author": "felipe-william",
