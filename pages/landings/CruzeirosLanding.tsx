@@ -166,7 +166,7 @@ const FeaturedOffer: React.FC<{ offer: CruiseOffer }> = ({ offer }) => (
       <button
         type="button"
         onClick={() => openOfferConversation(offer)}
-        className="btn-whatsapp btn-specialist mt-8 inline-flex items-center justify-center gap-2 bg-anhanga-blue text-white font-bold px-7 py-4 rounded-2xl hover:bg-anhanga-darkBlue transition-colors shadow-lg self-start"
+        className="btn-whatsapp btn-specialist mt-8 inline-flex items-center justify-center gap-2 bg-anhanga-blue text-white font-bold px-7 py-4 rounded-2xl hover:bg-anhanga-darkBlue transition-colors shadow-lg self-start focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
         aria-label={`Falar com um especialista sobre o cruzeiro ${offer.navio}`}
         data-tracking={`oferta-featured-${offer.id}`}
       >
@@ -203,7 +203,7 @@ const OfferCard: React.FC<{ offer: CruiseOffer }> = ({ offer }) => (
       <button
         type="button"
         onClick={() => openOfferConversation(offer)}
-        className="btn-whatsapp btn-specialist mt-5 inline-flex items-center justify-center gap-2 w-full bg-white border-2 border-anhanga-blue/15 text-anhanga-blue font-bold px-5 py-3 rounded-xl hover:bg-anhanga-blue hover:text-white hover:border-anhanga-blue transition-colors"
+        className="btn-whatsapp btn-specialist mt-5 inline-flex items-center justify-center gap-2 w-full bg-white border-2 border-anhanga-blue/15 text-anhanga-blue font-bold px-5 py-3 rounded-xl hover:bg-anhanga-blue hover:text-white hover:border-anhanga-blue transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
         aria-label={`Falar com um especialista sobre o cruzeiro ${offer.navio}`}
         data-tracking={`oferta-${offer.id}`}
       >
@@ -259,7 +259,7 @@ const CruzeirosLanding: React.FC = () => {
           <button
             type="button"
             onClick={() => openContactModal({ source: 'cruzeiros' })}
-            className="btn-whatsapp btn-specialist text-xs font-bold bg-anhanga-blue text-white px-4 py-2 rounded-xl hover:bg-anhanga-darkBlue transition-colors whitespace-nowrap"
+            className="btn-whatsapp btn-specialist text-xs font-bold bg-anhanga-blue text-white px-4 py-2 rounded-xl hover:bg-anhanga-darkBlue transition-colors whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
             data-tracking="header-cruzeiros"
           >
             Falar com especialista
@@ -282,7 +282,7 @@ const CruzeirosLanding: React.FC = () => {
           <button
             type="button"
             onClick={() => openContactModal({ source: 'cruzeiros' })}
-            className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-anhanga-blue text-white font-bold px-8 py-4 rounded-2xl hover:bg-anhanga-darkBlue transition-colors text-lg shadow-lg"
+            className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-anhanga-blue text-white font-bold px-8 py-4 rounded-2xl hover:bg-anhanga-darkBlue transition-colors text-lg shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
             aria-label="Falar com um especialista em cruzeiros"
             data-tracking="hero-cruzeiros"
           >
@@ -324,7 +324,7 @@ const CruzeirosLanding: React.FC = () => {
               <button
                 type="button"
                 onClick={() => openContactModal({ source: 'cruzeiros' })}
-                className="font-bold text-anhanga-blue underline underline-offset-2 hover:text-anhanga-darkBlue transition-colors"
+                className="font-bold text-anhanga-blue underline underline-offset-2 hover:text-anhanga-darkBlue transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action rounded"
                 data-tracking="ofertas-fallback-cruzeiros"
               >
                 Conte o que procura
@@ -419,7 +419,10 @@ const CruzeirosLanding: React.FC = () => {
           <button
             type="button"
             onClick={() => openContactModal({ source: 'cruzeiros' })}
-            className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-anhanga-yellow text-anhanga-dark font-black px-10 py-5 rounded-2xl hover:bg-anhanga-yellowHover transition-colors text-xl shadow-lg"
+            /* outline branco (não o anhanga-action canônico): este CTA fica sobre
+               bg-anhanga-blue, onde o ciano do foco não teria contraste. Mesmo
+               padrão de components/landings/shared/LandingWhatsAppBand.tsx. */
+            className="btn-whatsapp btn-specialist inline-flex items-center gap-3 bg-anhanga-yellow text-anhanga-dark font-black px-10 py-5 rounded-2xl hover:bg-anhanga-yellowHover transition-colors text-xl shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             aria-label="Falar com um especialista em cruzeiros"
             data-tracking="footer-cruzeiros"
           >
