@@ -160,7 +160,7 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
             {state.phase === 'success' ? (
                 <CorpSuccessState whatsappUrl={whatsappUrl} />
             ) : (
-                <form onSubmit={handleSubmit} noValidate>
+                <form onSubmit={(e) => void handleSubmit(e)} noValidate>
                     {/* Honeypot: hidden from humans, blind form-fillers populate it. */}
                     <input {...honeypotProps} />
                     <div className="flex justify-between items-center px-6 sm:px-8 py-5 border-b-2 border-dashed border-zinc-100 gap-4">
@@ -193,7 +193,7 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
                         <button
                             type="submit"
                             disabled={busy}
-                            className="w-full flex items-center justify-center gap-3 bg-brand-dark text-white py-4 rounded-xl font-bold text-base shadow-hard-yellow hover:shadow-[2px_2px_0px_theme(colors.brand.yellow)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition disabled:opacity-60 disabled:pointer-events-none focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
+                            className="w-full flex items-center justify-center gap-3 bg-brand-dark text-white py-4 rounded-xl font-bold text-base shadow-hard-yellow hover:shadow-[2px_2px_0px_theme(colors.brand.yellow)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition disabled:opacity-60 disabled:pointer-events-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
                             data-tracking="submit-form-corporativo"
                         >
                             {busy ? (

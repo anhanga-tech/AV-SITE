@@ -7,10 +7,12 @@ import { BreadcrumbSchema } from '@/components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '@/components/schemas/FAQPageSchema';
 import { ServiceSchema } from '@/components/schemas/ServiceSchema';
 import { Button } from '@/components/ui/Button';
+import { LazyImage } from '@/components/ui/LazyImage';
 import { LandingNav } from '@/components/landings/shared/LandingNav';
 import { LandingFooter } from '@/components/landings/shared/LandingFooter';
 import { fadeUp } from '@/components/landings/shared/constants';
 import { openContactModal } from '@/utils/contactForm';
+import { getDestinationImage } from '@/data/mediaConfig';
 import { ArrowRight, CheckCircle, MessageSquare, Users, Headphones, Compass } from 'lucide-react';
 
 const FAQ_ITEMS = [
@@ -177,11 +179,18 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
         {/* Por que consultoria? */}
         <section className="py-20 bg-white">
           <div className="max-w-5xl mx-auto px-6">
+            {/*
+              margin de um viewport de altura (100%) abaixo do viewport (mesma
+              convenção em todas as seções seguintes): dispara a revelação antes da
+              seção entrar na tela, não quando já está visível. Sem isso, rolagem
+              rápida mostrava conteúdo semitransparente mesmo já dentro do viewport
+              — lia como página quebrada. Ver critique de /consultoria-de-viagem.
+            */}
             <m.div
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
+              viewport={{ once: true, amount: 0.2, margin: '0px 0px 100% 0px' }}
               custom={0}
               className="mb-12"
             >
@@ -199,7 +208,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
                   variants={fadeUp}
                   initial="hidden"
                   whileInView="visible"
-                  viewport={{ once: true, amount: 0.2 }}
+                  viewport={{ once: true, amount: 0.2, margin: '0px 0px 100% 0px' }}
                   custom={idx + 1}
                   className={`p-8 rounded-2xl transition duration-300 ${
                     variant === 'filled'
@@ -237,7 +246,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
                 variants={fadeUp}
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, amount: 0.2 }}
+                viewport={{ once: true, amount: 0.2, margin: '0px 0px 100% 0px' }}
                 custom={0}
               >
                 <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-8">
@@ -256,16 +265,31 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
                 variants={fadeUp}
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, amount: 0.2 }}
+                viewport={{ once: true, amount: 0.2, margin: '0px 0px 100% 0px' }}
                 custom={1}
-                className="mt-12 md:mt-0 bg-white rounded-3xl p-8 shadow-float"
+                className="mt-12 md:mt-0 overflow-hidden rounded-3xl bg-white shadow-float"
               >
-                <blockquote className="text-xl text-anhanga-dark font-semibold leading-relaxed">
-                  "A Anhangá cuidou de cada detalhe. Só precisei aparecer no aeroporto."
-                </blockquote>
-                <p className="mt-4 text-zinc-600 text-sm">
-                  R.M. · São Paulo · Viagem para Portugal, 2025
-                </p>
+                {/*
+                  Depoimento pareado com o lugar real da viagem (não um ícone
+                  genérico): reforça "lugares reais, não categorias de
+                  produto" — a página inteira era só tipografia + ícones antes
+                  desta correção. Ver critique de /consultoria-de-viagem.
+                */}
+                <LazyImage
+                  src={getDestinationImage('Lisboa')}
+                  alt="Lisboa, Portugal — destino da viagem relatada no depoimento"
+                  width={640}
+                  height={280}
+                  className="h-48 w-full"
+                />
+                <div className="p-8">
+                  <blockquote className="text-xl text-anhanga-dark font-semibold leading-relaxed">
+                    "A Anhangá cuidou de cada detalhe. Só precisei aparecer no aeroporto."
+                  </blockquote>
+                  <p className="mt-4 text-zinc-600 text-sm">
+                    R.M. · São Paulo · Viagem para Portugal, 2025
+                  </p>
+                </div>
               </m.div>
             </div>
           </div>
@@ -278,7 +302,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
+              viewport={{ once: true, amount: 0.2, margin: '0px 0px 100% 0px' }}
               custom={0}
               className="text-3xl md:text-4xl font-black text-anhanga-dark mb-12"
             >
@@ -291,7 +315,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
                   variants={fadeUp}
                   initial="hidden"
                   whileInView="visible"
-                  viewport={{ once: true, amount: 0.3 }}
+                  viewport={{ once: true, amount: 0.3, margin: '0px 0px 100% 0px' }}
                   custom={idx + 1}
                   className={`flex gap-6 py-8 ${idx < HOW_IT_WORKS.length - 1 ? 'border-b border-zinc-100' : ''}`}
                 >
@@ -314,7 +338,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
+            viewport={{ once: true, amount: 0.2, margin: '0px 0px 100% 0px' }}
             custom={0}
             className="max-w-4xl mx-auto px-6 text-center"
           >
@@ -344,7 +368,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
+            viewport={{ once: true, amount: 0.3, margin: '0px 0px 100% 0px' }}
             custom={0}
             className="max-w-3xl mx-auto px-6 text-center"
           >

@@ -101,7 +101,7 @@ export function CorpHero() {
                         <button
                             type="button"
                             onClick={() => openContactModal({ source: 'corporativo' })}
-                            className="btn-whatsapp btn-specialist flex items-center justify-center gap-3 bg-brand-yellow text-brand-dark px-8 py-4 rounded-2xl font-bold text-lg shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
+                            className="btn-whatsapp btn-specialist flex items-center justify-center gap-3 bg-brand-yellow text-brand-dark px-8 py-4 rounded-2xl font-bold text-lg shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
                             data-contact-intent
                             data-tracking="hero-corporativo"
                         >
@@ -110,7 +110,7 @@ export function CorpHero() {
                         </button>
                         <a
                             href="#contato"
-                            className="btn-specialist flex items-center justify-center gap-2 border-2 border-white/40 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:border-white hover:bg-white/10 transition duration-200 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
+                            className="btn-specialist flex items-center justify-center gap-2 border-2 border-white/40 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:border-white hover:bg-white/10 transition duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
                         >
                             Prefiro ser contatado
                             <ArrowRight className="size-5" />

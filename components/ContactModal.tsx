@@ -215,21 +215,30 @@ const ContactModal: React.FC = () => {
                             </p>
                         ) : null}
 
+                        {/*
+                          As duas ações usam raízes de verbo distintas ("Abrir" vs. "chamem")
+                          e pesos visuais diferentes de propósito: a primária (preenchida,
+                          verde WhatsApp) é quem age agora; a secundária (borda, sem
+                          preenchimento) é quem prefere que a equipe chame depois. Antes as
+                          duas liam como opções gêmeas de mesmo peso ("Chamar no WhatsApp" /
+                          "Me chamem no WhatsApp"), causando hesitação no ponto de maior risco
+                          do funil — ver critique de /consultoria-de-viagem.
+                        */}
                         <div className="flex flex-col gap-2 pt-1">
                             <button
                                 type="submit"
                                 disabled={!canAttemptSubmit || isSubmitting}
-                                className="w-full rounded-xl bg-[#25D366] py-3 text-sm font-black text-white transition-colors hover:bg-[#1fba59] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
+                                className="w-full rounded-xl bg-[#25D366] py-3 text-sm font-black text-white transition-colors hover:bg-[#1fba59] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366] disabled:cursor-not-allowed disabled:opacity-40"
                             >
-                                {isSubmitting ? 'Enviando…' : 'Chamar no WhatsApp'}
+                                {isSubmitting ? 'Enviando…' : 'Abrir WhatsApp agora'}
                             </button>
                             <button
                                 type="button"
                                 onClick={() => void submit('callback')}
                                 disabled={!canAttemptSubmit || isSubmitting}
-                                className="w-full rounded-xl bg-brand-dark py-3 text-sm font-black text-white transition-colors hover:bg-brand-vibrant focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-dark focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
+                                className="w-full rounded-xl border-2 border-zinc-200 bg-white py-3 text-sm font-bold text-zinc-600 transition-colors hover:border-anhanga-action hover:text-anhanga-action focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action disabled:cursor-not-allowed disabled:opacity-40"
                             >
-                                {isSubmitting ? 'Enviando…' : 'Me chamem no WhatsApp'}
+                                {isSubmitting ? 'Enviando…' : 'Prefiro que me chamem'}
                             </button>
                         </div>
                     </form>

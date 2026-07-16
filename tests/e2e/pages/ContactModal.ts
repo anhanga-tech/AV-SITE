@@ -18,8 +18,8 @@ export class ContactModal {
     this.whatsappInput = page.locator('#contact-whatsapp');
     this.emailInput = page.locator('#contact-email');
     this.optInCheckbox = page.locator('#contact-optIn');
-    this.whatsappSubmitBtn = page.getByRole('button', { name: 'Chamar no WhatsApp' });
-    this.callbackSubmitBtn = page.getByRole('button', { name: 'Me chamem no WhatsApp' });
+    this.whatsappSubmitBtn = page.getByRole('button', { name: 'Abrir WhatsApp agora' });
+    this.callbackSubmitBtn = page.getByRole('button', { name: 'Prefiro que me chamem' });
     this.successMessage = page.getByText('Recebemos seu contato!');
   }
 

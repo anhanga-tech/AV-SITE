@@ -27,7 +27,13 @@ const sizeClasses: Record<ButtonSize, string> = {
     lg: 'text-base px-7 py-3.5',
 };
 
-const baseClasses = 'inline-flex items-center justify-center gap-2 font-bold transition duration-150 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none';
+// Sem `focus:outline-none`: no Tailwind v4, essa classe zera a custom property
+// --tw-outline-style para "none", e como todo elemento com foco de teclado
+// casa com :focus E :focus-visible ao mesmo tempo, esse valor "vaza" para a
+// regra focus-visible (que lê a mesma variável) e o anel nunca pinta —
+// mesmo com outline-width/color corretos. Só as classes focus-visible:*
+// já evitam o anel em foco de mouse nos navegadores modernos.
+const baseClasses = 'inline-flex items-center justify-center gap-2 font-bold transition duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none';
 
 export const Button: React.FC<ButtonProps> = ({
     children,
