@@ -948,7 +948,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "seoTitle": "Viagem Solo Feminina em Cruzeiros",
     "excerpt": "Cruzeiros NCL para mulheres que viajam sozinhas: o que esperar a bordo, como escolher o roteiro certo e por que o modelo freestyle funciona para viagem solo.",
     "date": "2026-03-09",
-    "dateModified": "2026-07-04",
+    "dateModified": "2026-07-16",
     "author": "queila-oliveira",
     "category": "Cruzeiros",
     "image": "https://media.anhanga.tur.br/images/blog/blog-viagem-solo-feminina.png",
@@ -969,7 +969,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "O que é o freestyle cruising da Norwegian?",
-        "answer": "É o modelo de cruzeiro sem horários fixos de jantar ou programação obrigatória — você organiza o dia como quiser, com liberdade total de agenda."
+        "answer": "É o modelo de cruzeiro sem horários fixos de jantar ou programação obrigatória: você organiza o dia como quiser, com liberdade total de agenda."
       },
       {
         "question": "Preciso participar de atividades sociais nas cabines Studio?",
@@ -981,14 +981,14 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       }
     ],
     "slug": "viagem-solo-feminina-ganha-espaco-nos-cruzeiros-da-norwegian-cruise-line",
-    "readingTime": "5 min de leitura"
+    "readingTime": "4 min de leitura"
   },
   {
     "title": "Melhores destinos para o Carnaval 2026 no Brasil",
     "seoTitle": "Destinos para o Carnaval 2026 no Brasil",
-    "excerpt": "Quer curtir o Carnaval sem estourar o orçamento? Veja os melhores destinos no Brasil para folia ou descanso nesta retrospectiva de 2026.",
+    "excerpt": "Do trio de Salvador ao frevo de Olinda: os melhores destinos de Carnaval no Brasil por estilo, com dicas práticas para economizar em passagem e hospedagem.",
     "date": "2026-02-11",
-    "dateModified": "2026-07-04",
+    "dateModified": "2026-07-16",
     "author": "queila-oliveira",
     "category": "Carnaval",
     "image": "https://media.anhanga.tur.br/images/blog/destinos-carnaval-2026.jpg",
@@ -1023,9 +1023,9 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
     "title": "Guia de Sobrevivência em Festivais de Música",
     "seoTitle": "Guia de Sobrevivência em Festivais",
-    "excerpt": "Estratégias práticas, dicas de alimentação e o kit de sobrevivência essencial para aproveitar seu festival ao máximo.",
+    "excerpt": "Estratégias práticas, dicas de alimentação e o kit essencial para aproveitar seu festival de música sem se esgotar no meio do dia.",
     "date": "2026-01-24",
-    "dateModified": "2026-07-04",
+    "dateModified": "2026-07-16",
     "author": "felipe-william",
     "category": "Festivais",
     "image": "https://media.anhanga.tur.br/images/blog/guia-festivais.jpg",
@@ -1050,7 +1050,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "Qual a melhor forma de manter energia durante um festival de dia inteiro?",
-        "answer": "Comer bem antes de sair de casa, beber água constantemente e levar snacks rápidos como barras de cereal, castanhas e frutas desidratadas — eles ajudam quando as filas de comida estão longas."
+        "answer": "Comer bem antes de sair de casa, beber água constantemente e levar snacks rápidos como barras de cereal, castanhas e frutas desidratadas, que ajudam quando as filas de comida estão longas."
       },
       {
         "question": "Vale a pena chegar cedo em um festival?",
@@ -1058,7 +1058,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       }
     ],
     "slug": "guia-definitivo-sobrevivencia-festivais",
-    "readingTime": "4 min de leitura"
+    "readingTime": "3 min de leitura"
   },
   {
     "title": "5 Segredos da Disney que Ninguém Conta",
@@ -1143,10 +1143,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "8 min de leitura"
   },
   {
-    "title": "Europa Gastronômica: Roteiro Itália",
-    "excerpt": "De Roma a Florença, o roteiro gastronômico pela Itália que vai além dos touristy spots: onde comer carbonara de verdade, vinhos locais e os melhores gelatos.",
+    "title": "Europa gastronômica: roteiro pela Itália",
+    "excerpt": "De Roma a Nápoles, um roteiro gastronômico pela Itália sem cair em armadilha de turista: onde comer carbonara de verdade e achar o gelato que vale a fila.",
     "date": "2025-10-28",
-    "dateModified": "2026-07-04",
+    "dateModified": "2026-07-16",
     "author": "felipe-william",
     "category": "Gastronomia",
     "image": "https://media.anhanga.tur.br/images/blog/europa-gastronomica-italia.jpg",
@@ -1163,7 +1163,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "faq": [
       {
         "question": "Qual a melhor época para fazer um roteiro gastronômico pela Itália?",
-        "answer": "Abril, maio e setembro são as janelas ideais — evite julho e agosto nas cidades mais turísticas, quando os restaurantes que valem a pena ficam lotados e os preços sobem."
+        "answer": "Abril, maio e setembro são as janelas ideais. Evite julho e agosto nas cidades mais turísticas, quando os restaurantes que valem a pena ficam lotados e os preços sobem."
       },
       {
         "question": "Com quanta antecedência preciso reservar restaurantes na Itália?",
@@ -1175,7 +1175,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "A gorjeta é obrigatória nos restaurantes italianos?",
-        "answer": "Não. O \"coperto\" (couvert) já vem na conta, e a gorjeta não é obrigatória — mas arredondar a conta ou deixar de 5% a 10% é bem visto em serviços excepcionais."
+        "answer": "Não. O \"coperto\" (couvert) já vem na conta, e a gorjeta não é obrigatória. Arredondar a conta ou deixar de 5% a 10% é bem visto em serviços excepcionais."
       }
     ],
     "slug": "europa-gastronomica-roteiro-italia",

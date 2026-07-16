@@ -71,7 +71,7 @@ Versão markdown de qualquer página: https://www.anhanga.tur.br/api/markdown?pa
 - [Guia de Sobrevivência em Festivais de Música](https://www.anhanga.tur.br/blog/guia-definitivo-sobrevivencia-festivais/) (2026-01-24)
 - [5 Segredos da Disney que Ninguém Conta](https://www.anhanga.tur.br/blog/5-segredos-da-disney-que-ninguem-conta/) (2025-12-12)
 - [Malas de Mão: O Guia Definitivo](https://www.anhanga.tur.br/blog/malas-de-mao-o-guia-definitivo/) (2025-11-05)
-- [Europa Gastronômica: Roteiro Itália](https://www.anhanga.tur.br/blog/europa-gastronomica-roteiro-italia/) (2025-10-28)
+- [Europa gastronômica: roteiro pela Itália](https://www.anhanga.tur.br/blog/europa-gastronomica-roteiro-italia/) (2025-10-28)
 - [Lua de Mel nas Maldivas](https://www.anhanga.tur.br/blog/lua-de-mel-nas-maldivas/) (2025-09-15)
 - [Nova York no Natal](https://www.anhanga.tur.br/blog/nova-york-no-natal/) (2025-01-10)
 
