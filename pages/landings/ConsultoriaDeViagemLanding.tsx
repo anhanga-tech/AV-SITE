@@ -130,14 +130,22 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
         <LandingNav source="consultoria-viagem" />
 
         {/* Hero */}
-        <section className="pt-16 pb-20 px-6">
+        {/*
+          Espaçamento e tamanho do texto reduzidos em mobile (md: restaura os
+          valores originais): em telas curtas (~360-812px de altura) o CTA e o
+          disclaimer "Sem taxa..." caem perto do fim do viewport inicial, e o
+          banner de cookies (fixed bottom-0) os cobre antes de qualquer scroll
+          — combinado com CookieConsentBanner.tsx, que também foi compactado
+          no mobile. Ver critique de /consultoria-de-viagem.
+        */}
+        <section className="pt-3 md:pt-16 pb-20 px-6">
           <div className="max-w-3xl mx-auto">
             <m.div
               variants={fadeUp}
               initial="hidden"
               animate="visible"
               custom={0}
-              className="inline-flex items-center gap-2 rounded-full border border-anhanga-blue/20 bg-anhanga-blue/5 px-3 py-1 mb-5 text-xs font-black uppercase tracking-widest text-anhanga-blue"
+              className="inline-flex items-center gap-2 rounded-full border border-anhanga-blue/20 bg-anhanga-blue/5 px-3 py-0.5 md:py-1 mb-2 md:mb-5 text-[11px] md:text-xs font-black uppercase tracking-widest text-anhanga-blue"
             >
               <Compass className="size-3.5" aria-hidden="true" />
               Consultoria de viagem · São Paulo
@@ -147,7 +155,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
               initial="hidden"
               animate="visible"
               custom={1}
-              className="text-balance text-4xl md:text-6xl font-black text-anhanga-dark mb-6 leading-[1.1]"
+              className="text-balance text-4xl md:text-6xl font-black text-anhanga-dark mb-2 md:mb-6 leading-[1.1]"
             >
               Planeje uma viagem sob medida sem depender de pacote pronto
             </m.h1>
@@ -156,7 +164,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
               initial="hidden"
               animate="visible"
               custom={2}
-              className="text-xl text-zinc-600 mb-10 leading-relaxed max-w-2xl"
+              className="text-base md:text-xl text-zinc-600 mb-3 md:mb-10 leading-relaxed max-w-2xl"
             >
               Um consultor da Anhangá entende seu perfil, destino, orçamento e restrições para desenhar o melhor caminho antes de você fechar.
             </m.p>
@@ -171,7 +179,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
               >
                 Falar com um consultor
               </Button>
-              <p className="mt-4 text-sm text-zinc-600">Sem taxa de consultoria. Gratuito.</p>
+              <p className="mt-1 md:mt-4 text-sm text-zinc-600">Sem taxa de consultoria. Gratuito.</p>
             </m.div>
           </div>
         </section>

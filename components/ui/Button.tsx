@@ -16,7 +16,11 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<ButtonVariant, string> = {
     primary: 'bg-anhanga-dark text-white rounded-xl shadow-hard-yellow hover:shadow-[2px_2px_0px_0px_#FFD600] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none',
-    action:  'bg-anhanga-action text-white rounded-full hover:bg-anhanga-actionDark',
+    // texto Ardósia, não branco: branco sobre bg-anhanga-action mede 2.8:1
+    // (abaixo do piso de 4.5:1 do WCAG AA) — mesma lógica de par acessível já
+    // usada no variant `cta` (bg saturado + texto escuro). Ver critique de
+    // /consultoria-de-viagem.
+    action:  'bg-anhanga-action text-anhanga-dark rounded-full hover:bg-anhanga-actionDark',
     cta:     'bg-anhanga-yellow text-anhanga-dark rounded-2xl shadow-hard hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none',
     ghost:   'bg-transparent text-zinc-500 rounded-lg hover:text-anhanga-action',
 };
