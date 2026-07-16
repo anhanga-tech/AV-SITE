@@ -106,7 +106,7 @@ const ContactModal: React.FC = () => {
                             quando o CTA passa `destination`. */}
                         {options.destination ? (
                             <p className="mt-1.5 text-sm font-semibold text-zinc-500">
-                                Sobre: <span className="text-brand-dark">{options.destination}</span>
+                                Sobre: <span className="text-anhanga-dark">{options.destination}</span>
                             </p>
                         ) : null}
                     </div>
