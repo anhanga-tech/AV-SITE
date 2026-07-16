@@ -79,21 +79,28 @@ const HOW_IT_WORKS = [
   },
 ];
 
+// `variant` não é decoração: DESIGN.md:261 proíbe cards idênticos em grade
+// repetida. O card preenchido quebra a repetição e ancora a leitura no meio —
+// mesma razão pela qual a seção de ofertas destaca uma saída em vez de listar
+// tudo com o mesmo peso.
 const WHY_CURATION = [
   {
     icon: Compass,
     title: 'Navio certo para seu perfil',
     desc: 'Cada companhia tem um DNA diferente. Indicamos o que combina com o que você quer viver a bordo.',
+    variant: 'light' as const,
   },
   {
     icon: MapPin,
     title: 'Roteiro que vale a viagem',
     desc: 'Saída do Brasil ou internacional, escalas e temporada mudam o preço e a experiência. Analisamos tudo junto.',
+    variant: 'filled' as const,
   },
   {
     icon: CalendarCheck,
     title: 'Cabine sem arrependimento',
     desc: 'Interna, varanda ou suíte: explicamos o que cada categoria entrega e o que vale para o seu caso.',
+    variant: 'light' as const,
   },
 ];
 
@@ -370,13 +377,24 @@ const CruzeirosLanding: React.FC = () => {
             Porque escolher um cruzeiro envolve mais variáveis do que parece.
           </p>
           <div className="grid md:grid-cols-3 gap-6">
-            {WHY_CURATION.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="p-8 rounded-2xl bg-anhanga-light">
-                <div className="size-11 rounded-xl flex items-center justify-center mb-5 bg-anhanga-blue/10">
-                  <Icon className="size-5 text-anhanga-blue" />
+            {WHY_CURATION.map(({ icon: Icon, title, desc, variant }) => (
+              <div
+                key={title}
+                className={`p-8 rounded-2xl ${variant === 'filled' ? 'bg-anhanga-blue' : 'bg-anhanga-light'}`}
+              >
+                <div
+                  className={`size-11 rounded-xl flex items-center justify-center mb-5 ${
+                    variant === 'filled' ? 'bg-white/15' : 'bg-anhanga-blue/10'
+                  }`}
+                >
+                  <Icon className={`size-5 ${variant === 'filled' ? 'text-white' : 'text-anhanga-blue'}`} />
                 </div>
-                <h3 className="text-xl font-black mb-3 text-anhanga-dark">{title}</h3>
-                <p className="text-zinc-600 leading-relaxed">{desc}</p>
+                <h3 className={`text-xl font-black mb-3 ${variant === 'filled' ? 'text-white' : 'text-anhanga-dark'}`}>
+                  {title}
+                </h3>
+                <p className={variant === 'filled' ? 'text-blue-100 leading-relaxed' : 'text-zinc-600 leading-relaxed'}>
+                  {desc}
+                </p>
               </div>
             ))}
           </div>
