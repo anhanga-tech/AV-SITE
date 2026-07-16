@@ -101,6 +101,14 @@ const ContactModal: React.FC = () => {
                         <h2 id={titleId} className="text-lg font-black text-anhanga-dark">
                             Fale com um especialista
                         </h2>
+                        {/* Confirma ao visitante que o clique carregou o contexto certo
+                            (ex.: a oferta de cruzeiro escolhida). Aditivo: só aparece
+                            quando o CTA passa `destination`. */}
+                        {options.destination ? (
+                            <p className="mt-1.5 text-sm font-semibold text-zinc-500">
+                                Sobre: <span className="text-brand-dark">{options.destination}</span>
+                            </p>
+                        ) : null}
                     </div>
                     <button
                         type="button"
