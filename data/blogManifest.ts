@@ -457,10 +457,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "6 min de leitura"
   },
   {
-    "title": "Seguro Viagem Internacional: Quando É Obrigatório, Quando Vale a Pena e Quanto Custa em 2026",
+    "title": "Seguro viagem internacional: quando é obrigatório, quando vale a pena e quanto custa em 2026",
     "excerpt": "Saiba em quais países o seguro viagem é obrigatório, quanto custa por dia, qual cobertura contratar e os erros comuns que podem arruinar suas férias.",
     "date": "2026-06-10",
-    "dateModified": "2026-07-04",
+    "dateModified": "2026-07-17",
     "author": "queila-oliveira",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/seguro-viagem-2026.jpg",
@@ -480,7 +480,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "caribe",
       "asia"
     ],
-    "seoTitle": "Seguro Viagem Internacional: Vale a Pena?",
+    "seoTitle": "Seguro viagem internacional: vale a pena?",
     "seoDescription": "Guia completo sobre seguro viagem internacional em 2026: países que exigem, quanto custa por dia, cobertura mínima por destino e como escolher o melhor plano.",
     "faq": [
       {
@@ -651,7 +651,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "seoTitle": "Tropical Americas no Animal Kingdom",
     "excerpt": "Nova área da Disney no Animal Kingdom dedicada à América Latina, com Encanto e Indiana Jones. Abertura em 2027. Vale planejar já.",
     "date": "2026-05-02",
-    "dateModified": "2026-07-04",
+    "dateModified": "2026-07-17",
     "author": "queila-oliveira",
     "category": "Dicas de Expert",
     "image": "https://media.anhanga.tur.br/images/blog/disney-tropical-americas-animal-kingdom.jpg",
@@ -1061,10 +1061,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "3 min de leitura"
   },
   {
-    "title": "5 Segredos da Disney que Ninguém Conta",
+    "title": "5 segredos da Disney que ninguém conta",
     "excerpt": "Descubra como furar filas legalmente, onde encontrar os personagens raros e os melhores snacks escondidos nos parques.",
     "date": "2025-12-12",
-    "dateModified": "2026-07-04",
+    "dateModified": "2026-07-17",
     "author": "queila-oliveira",
     "category": "Dicas de Expert",
     "image": "https://media.anhanga.tur.br/images/blog/5-segredos-disney.jpg",
@@ -1081,7 +1081,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "faq": [
       {
         "question": "O que é o Rider Switch na Disney?",
-        "answer": "É um recurso que permite que pais de crianças pequenas (ou bebês) que não podem entrar numa atração se revezem sem perder a vez na fila: um adulto vai com a criança maior, e quando termina, o outro entra direto pela fila expressa. Não é automático — é preciso avisar o cast member na entrada da atração."
+        "answer": "É um recurso que permite que pais de crianças pequenas (ou bebês) que não podem entrar numa atração se revezem sem perder a vez na fila: um adulto vai com a criança maior, e quando termina, o outro entra direto pela fila expressa. Não é automático, é preciso avisar o cast member na entrada da atração."
       },
       {
         "question": "Como conseguir água gelada grátis nos parques da Disney?",
@@ -1100,10 +1100,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "6 min de leitura"
   },
   {
-    "title": "Malas de Mão: O Guia Definitivo",
+    "title": "Malas de mão: o guia definitivo",
     "excerpt": "Dimensões por companhia, o que vai e o que não vai na cabine, e o checklist definitivo para viajar só com mala de mão sem abrir mão de nada essencial.",
     "date": "2025-11-05",
-    "dateModified": "2026-07-04",
+    "dateModified": "2026-07-17",
     "author": "felipe-william",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/malas-de-mao.jpg",
@@ -1128,11 +1128,11 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "Posso levar mala de mão e item pessoal ao mesmo tempo?",
-        "answer": "Sim, na maioria das companhias. A mala de mão vai no compartimento superior e o item pessoal (bolsa, mochila pequena, laptop bag) embaixo do assento à sua frente. Verifique as dimensões permitidas para o item pessoal — cada companhia tem a sua."
+        "answer": "Sim, na maioria das companhias. A mala de mão vai no compartimento superior e o item pessoal (bolsa, mochila pequena, laptop bag) embaixo do assento à sua frente. Verifique as dimensões permitidas para o item pessoal, cada companhia tem a sua."
       },
       {
         "question": "Quanto peso posso colocar na mala de mão para não ter problema?",
-        "answer": "Uma margem segura é ficar 1 kg abaixo do limite oficial. Se a companhia permite 10 kg, planeje para 9 kg — variações de balança existem e uma diferença pequena pode ser cobrada."
+        "answer": "Uma margem segura é ficar 1 kg abaixo do limite oficial. Se a companhia permite 10 kg, planeje para 9 kg, já que variações de balança existem e uma diferença pequena pode ser cobrada."
       },
       {
         "question": "Ryanair e EasyJet permitem mala de cabine gratuita?",
@@ -1182,11 +1182,11 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "7 min de leitura"
   },
   {
-    "title": "Lua de Mel nas Maldivas",
-    "excerpt": "Quanto custa? Qual a melhor época? Vale a pena o All-Inclusive? Respondemos tudo.",
+    "title": "Lua de mel nas Maldivas",
+    "excerpt": "Quanto custa, qual a melhor época e se o all-inclusive vale a pena numa lua de mel nas Maldivas.",
     "seoDescription": "Lua de mel nas Maldivas: quanto custa, qual a melhor época e se o All-Inclusive vale a pena. Roteiro, dicas de resorts e planejamento completo.",
     "date": "2025-09-15",
-    "dateModified": "2026-07-04",
+    "dateModified": "2026-07-17",
     "author": "queila-oliveira",
     "category": "Romance",
     "image": "https://media.anhanga.tur.br/images/blog/lua-de-mel-maldivas.jpg",
@@ -1207,7 +1207,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "Qual a melhor época para ir às Maldivas?",
-        "answer": "De dezembro a abril, quando o tempo é seco, o sol quase garantido e o mar calmo e cristalino — é também a alta temporada, então os preços sobem. Evite junho a outubro, período de monções com chuvas mais frequentes."
+        "answer": "De dezembro a abril, quando o tempo é seco, o sol quase garantido e o mar calmo e cristalino. É também a alta temporada, então os preços sobem. Evite junho a outubro, período de monções com chuvas mais frequentes."
       },
       {
         "question": "Preciso de visto para ir às Maldivas?",
@@ -1215,11 +1215,11 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "Quanto tempo de voo é do Brasil até as Maldivas?",
-        "answer": "Entre 20 e 24 horas, com pelo menos uma conexão. As rotas mais comuns passam por Dubai (Emirates), Doha (Qatar Airways) ou Istambul (Turkish Airlines) — não há voos diretos do Brasil."
+        "answer": "Entre 20 e 24 horas, com pelo menos uma conexão. As rotas mais comuns passam por Dubai (Emirates), Doha (Qatar Airways) ou Istambul (Turkish Airlines), já que não há voos diretos do Brasil."
       },
       {
         "question": "Vale a pena levar crianças pequenas para as Maldivas?",
-        "answer": "Geralmente não é a melhor escolha. A maioria dos resorts de luxo não é projetada para famílias e alguns têm restrições de idade — o destino faz mais sentido para casais buscando isolamento e privacidade."
+        "answer": "Geralmente não é a melhor escolha. A maioria dos resorts de luxo não é projetada para famílias e alguns têm restrições de idade. O destino faz mais sentido para casais buscando isolamento e privacidade."
       }
     ],
     "slug": "lua-de-mel-nas-maldivas",
@@ -1228,9 +1228,9 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
     "title": "Nova York no Natal",
     "excerpt": "O guia completo para ver as luzes de Dyker Heights e patinar no Central Park.",
-    "seoDescription": "Nova York no Natal: guia completo para ver as luzes de Dyker Heights, patinar no Central Park e aproveitar a cidade na época mais mágica do ano.",
+    "seoDescription": "Nova York no Natal: guia completo para ver as luzes de Dyker Heights, patinar no Central Park e aproveitar a cidade entre o Thanksgiving e o Ano Novo.",
     "date": "2025-01-10",
-    "dateModified": "2026-07-04",
+    "dateModified": "2026-07-17",
     "author": "felipe-william",
     "category": "Sazonal",
     "image": "https://media.anhanga.tur.br/images/blog/nova-york-natal.jpg",
@@ -1251,11 +1251,11 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "Com quanta antecedência preciso comprar ingressos para Broadway e patinação no Rockefeller?",
-        "answer": "Pelo menos 2 semanas de antecedência — esses ingressos vendem rápido na época de Natal."
+        "answer": "Pelo menos 2 semanas de antecedência, esses ingressos vendem rápido na época de Natal."
       },
       {
         "question": "Quanto custa viajar para Nova York no Natal?",
-        "answer": "Preveja pelo menos US$ 200 por dia por pessoa, sem contar hotel e passagem — é um período de alta temporada com preços de hospedagem mais altos."
+        "answer": "Preveja pelo menos US$ 200 por dia por pessoa, sem contar hotel e passagem, já que é um período de alta temporada com preços de hospedagem mais altos."
       },
       {
         "question": "Qual a temperatura em Nova York no período do Natal?",

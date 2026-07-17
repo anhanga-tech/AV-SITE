@@ -55,7 +55,7 @@ Versão markdown de qualquer página: https://www.anhanga.tur.br/api/markdown?pa
 - [Documentos para Viajar com Criança ao Exterior: Guia Completo 2026](https://www.anhanga.tur.br/blog/documentos-para-viajar-com-crianca/) (2026-06-30)
 - [ETIAS 2026: O Que Mudou para Brasileiros na Europa (Perguntas e Respostas)](https://www.anhanga.tur.br/blog/etias-2026-brasileiros-europa/) (2026-06-23)
 - [Agência de Viagens ou Por Conta Própria? O Que Vale Mais — e Quando](https://www.anhanga.tur.br/blog/agencia-de-viagens-ou-por-conta-propria/) (2026-06-16)
-- [Seguro Viagem Internacional: Quando É Obrigatório, Quando Vale a Pena e Quanto Custa em 2026](https://www.anhanga.tur.br/blog/seguro-viagem-internacional-2026/) (2026-06-10)
+- [Seguro viagem internacional: quando é obrigatório, quando vale a pena e quanto custa em 2026](https://www.anhanga.tur.br/blog/seguro-viagem-internacional-2026/) (2026-06-10)
 - [Férias de Julho 2026: 10 Destinos Para Reservar nos Próximos 15 Dias](https://www.anhanga.tur.br/blog/ferias-julho-2026-destinos/) (2026-06-04)
 - [Viagem Corporativa para Pequenas Empresas: Guia Completo](https://www.anhanga.tur.br/blog/viagem-corporativa-para-pequenas-empresas-guia-completo/) (2026-06-02)
 - [Copa do Mundo 2026: guia das cidades-sede além do futebol](https://www.anhanga.tur.br/blog/copa-do-mundo-2026-as-cidades-sede-e-o-que-cada-uma-tem-a-oferecer-alem-do-futebol/) (2026-05-22)
@@ -69,10 +69,10 @@ Versão markdown de qualquer página: https://www.anhanga.tur.br/api/markdown?pa
 - [Viagem solo feminina nos cruzeiros da Norwegian](https://www.anhanga.tur.br/blog/viagem-solo-feminina-ganha-espaco-nos-cruzeiros-da-norwegian-cruise-line/) (2026-03-09)
 - [Melhores destinos para o Carnaval 2026 no Brasil](https://www.anhanga.tur.br/blog/destinos-carnaval-2026-brasil/) (2026-02-11)
 - [Guia de Sobrevivência em Festivais de Música](https://www.anhanga.tur.br/blog/guia-definitivo-sobrevivencia-festivais/) (2026-01-24)
-- [5 Segredos da Disney que Ninguém Conta](https://www.anhanga.tur.br/blog/5-segredos-da-disney-que-ninguem-conta/) (2025-12-12)
-- [Malas de Mão: O Guia Definitivo](https://www.anhanga.tur.br/blog/malas-de-mao-o-guia-definitivo/) (2025-11-05)
+- [5 segredos da Disney que ninguém conta](https://www.anhanga.tur.br/blog/5-segredos-da-disney-que-ninguem-conta/) (2025-12-12)
+- [Malas de mão: o guia definitivo](https://www.anhanga.tur.br/blog/malas-de-mao-o-guia-definitivo/) (2025-11-05)
 - [Europa gastronômica: roteiro pela Itália](https://www.anhanga.tur.br/blog/europa-gastronomica-roteiro-italia/) (2025-10-28)
-- [Lua de Mel nas Maldivas](https://www.anhanga.tur.br/blog/lua-de-mel-nas-maldivas/) (2025-09-15)
+- [Lua de mel nas Maldivas](https://www.anhanga.tur.br/blog/lua-de-mel-nas-maldivas/) (2025-09-15)
 - [Nova York no Natal](https://www.anhanga.tur.br/blog/nova-york-no-natal/) (2025-01-10)
 
 
