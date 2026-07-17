@@ -548,7 +548,7 @@ const CruzeirosLanding: React.FC = () => {
               variant="cta"
               size="lg"
               onClick={() => openContactModal({ source: 'cruzeiros' })}
-              className="btn-whatsapp btn-specialist font-black"
+              className="btn-whatsapp btn-specialist font-black focus-visible:outline-white"
               rightIcon={<ArrowRight className="size-6" aria-hidden="true" />}
               aria-label="Falar com um especialista em cruzeiros"
               data-tracking="footer-cruzeiros"
