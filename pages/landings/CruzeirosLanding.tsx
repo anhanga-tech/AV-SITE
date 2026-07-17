@@ -565,7 +565,7 @@ const CruzeirosLanding: React.FC = () => {
             <div className="grid md:grid-cols-3 gap-4">
               <Link
                 to="/consultoria-de-viagem/"
-                className="block p-5 rounded-xl bg-white hover:bg-anhanga-blue/10 transition-colors group"
+                className="block p-5 rounded-xl bg-white hover:bg-anhanga-blue/10 transition-colors group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
               >
                 <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                   Consultoria de Viagem
@@ -576,7 +576,7 @@ const CruzeirosLanding: React.FC = () => {
               </Link>
               <Link
                 to="/corporativo/"
-                className="block p-5 rounded-xl bg-white hover:bg-anhanga-blue/10 transition-colors group"
+                className="block p-5 rounded-xl bg-white hover:bg-anhanga-blue/10 transition-colors group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
               >
                 <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                   Viagens para Executivos
@@ -587,7 +587,7 @@ const CruzeirosLanding: React.FC = () => {
               </Link>
               <Link
                 to="/"
-                className="block p-5 rounded-xl bg-white hover:bg-anhanga-blue/10 transition-colors group"
+                className="block p-5 rounded-xl bg-white hover:bg-anhanga-blue/10 transition-colors group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
               >
                 <div className="font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                   Site principal
