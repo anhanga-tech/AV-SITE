@@ -20,7 +20,9 @@ const VenueMap: React.FC = () => {
   useEffect(() => {
     let a11yTimer: ReturnType<typeof setTimeout> | undefined;
     let ownedMap: L.Map | null = null;
-    const markerDisposers: Array<() => void> = [];
+    let ownedGroup: L.FeatureGroup | null = null;
+    let handleGroupClick: ((event: L.LeafletEvent) => void) | null = null;
+    const markerIndexes = new Map<L.Marker, number>();
     if (mapContainerRef.current && !mapInstanceRef.current) {
       const interlagosCoords: [number, number] = [-23.701186, -46.697076];
 
@@ -121,35 +123,51 @@ const VenueMap: React.FC = () => {
           </div>
         `);
 
-        const handleMarkerClick = () => {
-          setActiveIndex(index);
-          map.flyTo(poi.coords, 13, { animate: true, duration: 1 });
-        };
-
-        marker.on('click', handleMarkerClick);
-        markerDisposers.push(() => marker.off('click', handleMarkerClick));
-
+        markerIndexes.set(marker, index);
         markersRef.current.push(marker);
         markers.push(marker);
       });
 
-      const group = new L.FeatureGroup(markers);
-      map.fitBounds(group.getBounds(), { padding: [50, 50] });
+      ownedGroup = new L.FeatureGroup(markers);
+      handleGroupClick = (event) => {
+        const index = markerIndexes.get(event.propagatedFrom as L.Marker);
+        if (index === undefined) return;
+
+        const poi = POIS[index];
+        setActiveIndex(index);
+        map.flyTo(poi.coords, 13, { animate: true, duration: 1 });
+      };
+
+      ownedGroup.on('click', handleGroupClick);
+      map.fitBounds(ownedGroup.getBounds(), { padding: [50, 50] });
 
       mapInstanceRef.current = map;
     }
     return () => {
-      if (a11yTimer !== undefined) clearTimeout(a11yTimer);
-      markerDisposers.forEach((dispose) => dispose());
-      markersRef.current = [];
-
-      if (ownedMap) {
-        ownedMap.off();
-        ownedMap.remove();
+      if (a11yTimer !== undefined) {
+        clearTimeout(a11yTimer);
+        a11yTimer = undefined;
       }
 
-      if (mapInstanceRef.current === ownedMap) {
+      if (ownedGroup && handleGroupClick) {
+        ownedGroup.off('click', handleGroupClick);
+        ownedGroup.clearLayers();
+      }
+      ownedGroup = null;
+      handleGroupClick = null;
+      markerIndexes.clear();
+      markersRef.current = [];
+
+      const mapToRemove = ownedMap;
+      ownedMap = null;
+
+      if (mapInstanceRef.current === mapToRemove) {
         mapInstanceRef.current = null;
+      }
+
+      if (mapToRemove) {
+        mapToRemove.off();
+        mapToRemove.remove();
       }
     };
   }, []);
