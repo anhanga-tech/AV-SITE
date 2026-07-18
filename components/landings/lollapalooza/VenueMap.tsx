@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapPin } from 'lucide-react';
+import { removeLeafletMapAfterActiveZoom } from '@/components/maps/removeLeafletMapAfterActiveZoom';
 import { POIS, getPoiStyle } from './venueMapData';
 import { VenuePoiList } from './VenuePoiList';
 
@@ -18,7 +19,18 @@ const VenueMap: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    let a11yTimer: ReturnType<typeof setTimeout>;
+    let a11yTimer: ReturnType<typeof setTimeout> | undefined;
+    let ownedMap: L.Map | null = null;
+    let ownedGroup: L.FeatureGroup | null = null;
+    let handleGroupClick: ((event: L.LeafletEvent) => void) | null = null;
+    let zoomInProgress = false;
+    const markerIndexes = new Map<L.Marker, number>();
+    const handleZoomStart = () => {
+      zoomInProgress = true;
+    };
+    const handleZoomEnd = () => {
+      zoomInProgress = false;
+    };
     if (mapContainerRef.current && !mapInstanceRef.current) {
       const interlagosCoords: [number, number] = [-23.701186, -46.697076];
 
@@ -31,6 +43,9 @@ const VenueMap: React.FC = () => {
         zoomControl: false, // Vamos adicionar manualmente
         keyboard: true
       });
+      ownedMap = map;
+      ownedMap.on('zoomstart', handleZoomStart);
+      ownedMap.on('zoomend', handleZoomEnd);
 
       // Adiciona controle de zoom no canto inferior direito (mais fácil em mobile)
       L.control.zoom({
@@ -118,21 +133,54 @@ const VenueMap: React.FC = () => {
           </div>
         `);
 
-        marker.on('click', () => {
-          setActiveIndex(index);
-          map.flyTo(poi.coords, 13, { animate: true, duration: 1 });
-        });
-
+        markerIndexes.set(marker, index);
         markersRef.current.push(marker);
         markers.push(marker);
       });
 
-      const group = new L.FeatureGroup(markers);
-      map.fitBounds(group.getBounds(), { padding: [50, 50] });
+      ownedGroup = new L.FeatureGroup(markers);
+      handleGroupClick = (event) => {
+        const index = markerIndexes.get(event.propagatedFrom as L.Marker);
+        if (index === undefined) return;
+
+        const poi = POIS[index];
+        setActiveIndex(index);
+        map.flyTo(poi.coords, 13, { animate: true, duration: 1 });
+      };
+
+      ownedGroup.on('click', handleGroupClick);
+      map.fitBounds(ownedGroup.getBounds(), { padding: [50, 50] });
 
       mapInstanceRef.current = map;
     }
-    return () => clearTimeout(a11yTimer);
+    return () => {
+      if (a11yTimer !== undefined) {
+        clearTimeout(a11yTimer);
+        a11yTimer = undefined;
+      }
+
+      if (ownedGroup && handleGroupClick) {
+        ownedGroup.off('click', handleGroupClick);
+        ownedGroup.clearLayers();
+      }
+      ownedGroup = null;
+      handleGroupClick = null;
+      markerIndexes.clear();
+      markersRef.current = [];
+
+      if (ownedMap) {
+        const shouldWaitForZoomEnd = zoomInProgress;
+        ownedMap.off('zoomstart', handleZoomStart);
+        ownedMap.off('zoomend', handleZoomEnd);
+
+        if (mapInstanceRef.current === ownedMap) {
+          mapInstanceRef.current = null;
+        }
+
+        removeLeafletMapAfterActiveZoom(ownedMap, shouldWaitForZoomEnd);
+        ownedMap = null;
+      }
+    };
   }, []);
 
   // Efeito para rolar a lista até o item ativo quando selecionado via Mapa
