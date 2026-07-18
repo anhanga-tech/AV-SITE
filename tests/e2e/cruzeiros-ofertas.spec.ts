@@ -63,7 +63,17 @@ test.describe('Landing de cruzeiros — ofertas', () => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto('/cruzeiros');
 
+    // Âncora num elemento sempre presente na seção antes de checar a grade
+    // secundária: `[data-testid="ofertas-secundarias"]` só existe no DOM
+    // quando secondaryOffers.length > 0 (CruzeirosLandingSections.tsx) — se
+    // só a oferta featured estiver ativa (nenhuma secundária), esperar
+    // direto por ela travaria até o timeout padrão em vez de pular.
+    await expect(page.getByRole('heading', { name: 'Seleção da temporada' })).toBeVisible();
+
     const grid = page.getByTestId('ofertas-secundarias');
+    const gridCount = await grid.count();
+    test.skip(gridCount === 0, 'sem ofertas secundárias hoje (só a featured está ativa)');
+
     const cards = grid.locator('> *');
     // `.count()` não espera hidratação — sem isso a contagem pode ler o DOM
     // ainda vazio logo após o goto e o teste pula por engano.
