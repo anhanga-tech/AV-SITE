@@ -215,7 +215,7 @@ test('festival landings should use managed static imagery', async () => {
 test('home decorative textures should not hotlink grain overlays from third-party hosts', async () => {
   const [hero, destinations, indexHtml] = await Promise.all([
     readRepoFile('components/Hero.tsx'),
-    readRepoFile('components/Destinations.tsx'),
+    readRepoFile('components/destinations/DestinationsView.tsx'),
     readRepoFile('index.html'),
   ]);
 
@@ -229,7 +229,7 @@ test('home decorative textures should not hotlink grain overlays from third-part
   assertMissingHosts(
     destinations,
     ['grainy-gradients.vercel.app'],
-    'components/Destinations.tsx',
+    'components/destinations/DestinationsView.tsx',
   );
   assert.match(destinations, /assets\/noise\.svg|NOISE_TEXTURE_URL/);
 
@@ -314,10 +314,10 @@ test('remaining runtime media dependencies should use managed Cloudflare assets'
 test('hero videos should all point to the media zone /videos/ path with .mp4 extension', async () => {
   const mediaConfig = await readRepoFile('data/mediaConfig.ts');
 
-  const videoUrlMatches = [...mediaConfig.matchAll(/getMediaUrl\(['\"](videos\/.+?\.mp4)['"]\)/g)];
+  const videoUrlMatches = [...mediaConfig.matchAll(/getMediaUrl\(['"](videos\/.+?\.mp4)['"]\)/g)];
   assert.ok(videoUrlMatches.length >= 5, `Expected at least 5 hero video URLs, found ${videoUrlMatches.length}`);
 
-  const posterMatches = [...mediaConfig.matchAll(/getMediaUrl\(['\"](images\/hero\/.+?-poster\.jpg)['"]\)/g)];
+  const posterMatches = [...mediaConfig.matchAll(/getMediaUrl\(['"](images\/hero\/.+?-poster\.jpg)['"]\)/g)];
   assert.ok(posterMatches.length >= 5, `Expected at least 5 poster URLs, found ${posterMatches.length}`);
 });
 
