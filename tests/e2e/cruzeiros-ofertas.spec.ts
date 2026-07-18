@@ -2,7 +2,8 @@ import { test, expect } from '@playwright/test';
 
 // A landing /cruzeiros mostra ofertas selecionadas; o CTA de cada oferta abre o
 // ContactModal já carregado com o contexto da oferta (linha "Sobre:"), que
-// também viaja ao CRM via `destination`. Ver pages/landings/CruzeirosLanding.tsx.
+// também viaja ao CRM via `destination`. Ver
+// components/landings/cruzeiros/CruiseOfferCards.tsx.
 //
 // ACOPLAMENTO AO CALENDÁRIO (intencional): o filtro de expiração
 // (lib/cruise-offers-schedule.js) usa o relógio real, então estes specs dependem
