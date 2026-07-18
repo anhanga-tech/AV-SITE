@@ -35,7 +35,7 @@ test.describe('Landing de cruzeiros — ofertas', () => {
 
     await cta.click();
 
-    const modal = page.getByRole('dialog', { name: 'Fale com um especialista' });
+    const modal = page.getByRole('dialog', { name: 'Fale com um consultor' });
     await expect(modal).toBeVisible();
     // A linha de contexto confirma ao visitante qual oferta foi carregada — e é o
     // mesmo texto que vai ao CRM em `destination`.

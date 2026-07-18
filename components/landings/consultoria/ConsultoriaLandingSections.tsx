@@ -86,7 +86,7 @@ export function ConsultoriaHero() {
           initial="hidden"
           animate="visible"
           custom={0}
-          className="inline-flex items-center gap-2 rounded-full border border-anhanga-blue/20 bg-anhanga-blue/5 px-3 py-0.5 md:py-1 mb-2 md:mb-5 text-[11px] md:text-xs font-black uppercase tracking-widest text-anhanga-blue"
+          className="inline-flex items-center gap-2 rounded-full border border-anhanga-blue/20 bg-anhanga-blue/5 px-3 py-0.5 md:py-1 mb-2 md:mb-5 text-[11px] md:text-xs font-black uppercase tracking-wide md:tracking-widest text-anhanga-blue"
         >
           {/*
             "todo o Brasil", não "São Paulo": o badge é a primeira leitura da

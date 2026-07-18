@@ -1,4 +1,28 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Locator } from '@playwright/test';
+
+// O CTA e o disclaimer ficam dentro do m.div de entrada (fadeUp, custom={3},
+// delay 0.3s + duration 0.55s). Medir a posição antes dessa transição
+// assentar pega estados transitórios de layout — flaky em CI (falhou com
+// y+height=549.97 vs limite 542) e reproduzido localmente até com
+// `reducedMotion: 'reduce'` e esperando `opacity: 1` isoladamente (nenhum
+// dos dois é suficiente sozinho: a posição pode assentar antes ou depois da
+// opacidade, dependendo do timing). Espera cause-agnóstica: lê a caixa de
+// cada locator repetidamente até duas leituras consecutivas baterem.
+async function waitForStableBoxes(locators: Locator[]): Promise<void> {
+  let previous: string | null = null;
+  await expect
+    .poll(
+      async () => {
+        const boxes = await Promise.all(locators.map((l) => l.boundingBox()));
+        const snapshot = JSON.stringify(boxes);
+        const stable = snapshot === previous;
+        previous = snapshot;
+        return stable;
+      },
+      { timeout: 5000 }
+    )
+    .toBe(true);
+}
 
 test.describe('CTA do hero não fica coberto pelo banner de cookies em mobile curto', () => {
   test.use({ viewport: { width: 375, height: 667 } }); // iPhone SE — o mobile mais curto testado no critique
@@ -18,6 +42,8 @@ test.describe('CTA do hero não fica coberto pelo banner de cookies em mobile cu
 
     const cta = page.locator('[data-tracking="hero-consultoria-viagem"]');
     const disclaimer = page.getByText('Sem taxa de consultoria. Gratuito.');
+
+    await waitForStableBoxes([cta, disclaimer]);
 
     const bannerBox = await banner.boundingBox();
     const ctaBox = await cta.boundingBox();
