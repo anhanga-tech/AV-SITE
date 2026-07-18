@@ -386,7 +386,7 @@ const CruzeirosLanding: React.FC = () => {
               ) : null}
 
               {SECONDARY_OFFERS.length > 0 ? (
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div data-testid="ofertas-secundarias" className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {SECONDARY_OFFERS.map((offer, idx) => (
                     <m.div
                       key={offer.id}

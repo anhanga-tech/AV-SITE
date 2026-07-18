@@ -51,21 +51,26 @@ test.describe('Landing de cruzeiros — ofertas', () => {
   // SECONDARY_LAST_ORPHAN_AT_LG em CruzeirosLanding.tsx). Se o mix mudar para
   // uma contagem sem órfão, o teste pula em vez de falhar — não há nada a
   // verificar nesse dia.
+  //
+  // O locator é escopado direto ao container da grade secundária
+  // (data-testid="ofertas-secundarias"), não inferido subtraindo 1 do total
+  // de <article> assumindo que o primeiro é sempre a oferta featured:
+  // FEATURED_OFFER pode ser undefined (nenhuma oferta ativa com featured:true)
+  // e, nesse caso, SECONDARY_OFFERS vira a lista inteira — a subtração erraria
+  // a contagem e o teste falharia de forma espúria nesse cenário real.
   test('centraliza o último card órfão da grade de ofertas em telas grandes', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto('/cruzeiros');
 
-    const region = page.getByRole('region', { name: 'Seleção da temporada' });
-    const articles = region.locator('article');
+    const grid = page.getByTestId('ofertas-secundarias');
+    const cards = grid.locator('> *');
     // `.count()` não espera hidratação — sem isso a contagem pode ler o DOM
     // ainda vazio logo após o goto e o teste pula por engano.
-    await expect(articles.first()).toBeVisible();
-    const totalCount = await articles.count();
-    const secondaryCount = totalCount - 1; // o primeiro article é a oferta featured, fora da grade
+    await expect(cards.first()).toBeVisible();
+    const secondaryCount = await cards.count();
 
     test.skip(secondaryCount % 3 !== 1, `sem card órfão hoje (${secondaryCount} ofertas secundárias)`);
 
-    const lastCardWrapper = articles.nth(totalCount - 1).locator('xpath=..');
-    await expect(lastCardWrapper).toHaveCSS('grid-column-start', '2');
+    await expect(cards.last()).toHaveCSS('grid-column-start', '2');
   });
 });
