@@ -18,7 +18,9 @@ const VenueMap: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    let a11yTimer: ReturnType<typeof setTimeout>;
+    let a11yTimer: ReturnType<typeof setTimeout> | undefined;
+    let ownedMap: L.Map | null = null;
+    const markerDisposers: Array<() => void> = [];
     if (mapContainerRef.current && !mapInstanceRef.current) {
       const interlagosCoords: [number, number] = [-23.701186, -46.697076];
 
@@ -31,6 +33,7 @@ const VenueMap: React.FC = () => {
         zoomControl: false, // Vamos adicionar manualmente
         keyboard: true
       });
+      ownedMap = map;
 
       // Adiciona controle de zoom no canto inferior direito (mais fácil em mobile)
       L.control.zoom({
@@ -118,10 +121,13 @@ const VenueMap: React.FC = () => {
           </div>
         `);
 
-        marker.on('click', () => {
+        const handleMarkerClick = () => {
           setActiveIndex(index);
           map.flyTo(poi.coords, 13, { animate: true, duration: 1 });
-        });
+        };
+
+        marker.on('click', handleMarkerClick);
+        markerDisposers.push(() => marker.off('click', handleMarkerClick));
 
         markersRef.current.push(marker);
         markers.push(marker);
@@ -132,7 +138,20 @@ const VenueMap: React.FC = () => {
 
       mapInstanceRef.current = map;
     }
-    return () => clearTimeout(a11yTimer);
+    return () => {
+      if (a11yTimer !== undefined) clearTimeout(a11yTimer);
+      markerDisposers.forEach((dispose) => dispose());
+      markersRef.current = [];
+
+      if (ownedMap) {
+        ownedMap.off();
+        ownedMap.remove();
+      }
+
+      if (mapInstanceRef.current === ownedMap) {
+        mapInstanceRef.current = null;
+      }
+    };
   }, []);
 
   // Efeito para rolar a lista até o item ativo quando selecionado via Mapa
