@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { removeLeafletMapAfterActiveZoom } from '@/components/maps/removeLeafletMapAfterActiveZoom';
 import { CONTINENT_COLORS, type Destination } from '../../data/mapDestinations';
 
 const MARKER_STYLE_ID = 'leaflet-marker-anim-styles';
@@ -99,6 +100,13 @@ export function useDestinationMap(
     useEffect(() => {
         if (!mapRef.current || mapInstance.current) return;
 
+        let zoomInProgress = false;
+        const handleZoomStart = () => {
+            zoomInProgress = true;
+        };
+        const handleZoomEnd = () => {
+            zoomInProgress = false;
+        };
         const isMobile = window.innerWidth < 768;
         ensureMarkerStyles();
 
@@ -111,6 +119,8 @@ export function useDestinationMap(
             zoomDelta: 0.5
         }).setView([20, -40], 3);
         const markersLayer = L.featureGroup().addTo(map);
+        map.on('zoomstart', handleZoomStart);
+        map.on('zoomend', handleZoomEnd);
 
         mapInstance.current = map;
         markersLayerRef.current = markersLayer;
@@ -121,13 +131,16 @@ export function useDestinationMap(
         }).addTo(map);
 
         return () => {
+            const shouldWaitForZoomEnd = zoomInProgress;
+            map.off('zoomstart', handleZoomStart);
+            map.off('zoomend', handleZoomEnd);
             if (markersLayerRef.current === markersLayer) {
                 markersLayerRef.current = null;
             }
             if (mapInstance.current === map) {
                 mapInstance.current = null;
             }
-            map.remove();
+            removeLeafletMapAfterActiveZoom(map, shouldWaitForZoomEnd);
         };
     }, []);
 
