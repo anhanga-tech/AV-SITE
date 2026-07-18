@@ -21,6 +21,12 @@ const ACTIVE_OFFERS = getActiveOffers(CRUISE_OFFERS);
 const FEATURED_OFFER = ACTIVE_OFFERS.find((o) => o.featured);
 const SECONDARY_OFFERS = ACTIVE_OFFERS.filter((o) => o !== FEATURED_OFFER);
 
+// `lg:grid-cols-3` deixa o último card sozinho numa linha nova sempre que a
+// contagem % 3 === 1 (ex.: 4, 7 ofertas) — grid auto-placement o encosta na
+// coluna esquerda com duas colunas vazias ao lado. Centralizar esse card em
+// vez de deixá-lo órfão.
+const SECONDARY_LAST_ORPHAN_AT_LG = SECONDARY_OFFERS.length % 3 === 1;
+
 const VIEWPORT_REVEAL = { once: true, amount: 0.2, margin: '0px 0px 100% 0px' } as const;
 
 // Rótulo enviado ao CRM (campo `destination` → x_destino no Odoo) e mostrado no
@@ -181,7 +187,7 @@ const FeaturedOffer: React.FC<{ offer: CruiseOffer }> = ({ offer }) => (
         <ProfileTags perfis={offer.perfis} />
       </div>
       <Button
-        variant="primary"
+        variant="action"
         size="lg"
         onClick={() => openOfferConversation(offer)}
         className="btn-whatsapp btn-specialist mt-8 self-start"
@@ -219,7 +225,7 @@ const OfferCard: React.FC<{ offer: CruiseOffer }> = ({ offer }) => (
         <ProfileTags perfis={offer.perfis} />
       </div>
       <Button
-        variant="primary"
+        variant="action"
         onClick={() => openOfferConversation(offer)}
         className="btn-whatsapp btn-specialist mt-5 w-full"
         rightIcon={<ArrowRight className="size-4" aria-hidden="true" />}
@@ -389,6 +395,11 @@ const CruzeirosLanding: React.FC = () => {
                       whileInView="visible"
                       viewport={VIEWPORT_REVEAL}
                       custom={idx + 2}
+                      className={
+                        SECONDARY_LAST_ORPHAN_AT_LG && idx === SECONDARY_OFFERS.length - 1
+                          ? 'lg:col-start-2'
+                          : undefined
+                      }
                     >
                       <OfferCard offer={offer} />
                     </m.div>
@@ -396,7 +407,7 @@ const CruzeirosLanding: React.FC = () => {
                 </div>
               ) : null}
 
-              <p className="mt-10 text-zinc-600">
+              <p className="mt-10 text-zinc-600 max-w-2xl">
                 Não achou a saída ideal?{' '}
                 <button
                   type="button"
@@ -514,10 +525,13 @@ const CruzeirosLanding: React.FC = () => {
               Agência de viagens em São Paulo desde 2018, com especialistas em cruzeiros e roteiros personalizados. Nota 5.0 no Google e atendimento humano do início ao fim.
             </p>
             <div className="mt-12 flex flex-wrap justify-center gap-12">
+              {/* Terceiro item ("Especialistas / Em cruzeiros") removido: não é um
+                  valor quantitativo como os outros dois, quebrava o paralelismo
+                  do trio e já era dito no parágrafo acima ("com especialistas em
+                  cruzeiros"). Redundante, não uma estatística real. */}
               {[
                 { label: 'Fundada em', value: '2018' },
                 { label: 'Nota Google', value: '5.0' },
-                { label: 'Especialistas', value: 'Em cruzeiros' },
               ].map(({ label, value }) => (
                 <div key={label}>
                   <div className="text-4xl font-black text-anhanga-blue">{value}</div>
