@@ -145,6 +145,12 @@ export function CruiseOffersSection({
 }: CruiseOffersSectionProps): React.ReactElement | null {
   if (!featuredOffer && secondaryOffers.length === 0) return null;
 
+  // `lg:grid-cols-3` deixa o último card sozinho numa linha nova sempre que a
+  // contagem % 3 === 1 (ex.: 4, 7 ofertas) — grid auto-placement o encosta na
+  // coluna esquerda com duas colunas vazias ao lado. Centralizar esse card em
+  // vez de deixá-lo órfão.
+  const secondaryLastOrphanAtLg = secondaryOffers.length % 3 === 1;
+
   return (
     <section className="py-20 bg-white" aria-labelledby="ofertas-titulo">
       <div className="max-w-6xl mx-auto px-6">
@@ -178,7 +184,7 @@ export function CruiseOffersSection({
         ) : null}
 
         {secondaryOffers.length > 0 ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div data-testid="ofertas-secundarias" className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {secondaryOffers.map((offer, idx) => (
               <m.div
                 key={offer.id}
@@ -187,6 +193,11 @@ export function CruiseOffersSection({
                 whileInView="visible"
                 viewport={VIEWPORT_REVEAL}
                 custom={idx + 2}
+                className={
+                  secondaryLastOrphanAtLg && idx === secondaryOffers.length - 1
+                    ? 'lg:col-start-2'
+                    : undefined
+                }
               >
                 <OfferCard offer={offer} />
               </m.div>
@@ -194,7 +205,7 @@ export function CruiseOffersSection({
           </div>
         ) : null}
 
-        <p className="mt-10 text-zinc-600">
+        <p className="mt-10 text-zinc-600 max-w-2xl">
           Não achou a saída ideal?{' '}
           <button
             type="button"
@@ -320,10 +331,13 @@ export function CruiseAbout(): React.ReactElement {
           Agência de viagens em São Paulo desde 2018, com especialistas em cruzeiros e roteiros personalizados. Nota 5.0 no Google e atendimento humano do início ao fim.
         </p>
         <div className="mt-12 flex flex-wrap justify-center gap-12">
+          {/* Terceiro item ("Especialistas / Em cruzeiros") removido: não é um
+              valor quantitativo como os outros dois, quebrava o paralelismo
+              do trio e já era dito no parágrafo acima ("com especialistas em
+              cruzeiros"). Redundante, não uma estatística real. */}
           {[
             { label: 'Fundada em', value: '2018' },
             { label: 'Nota Google', value: '5.0' },
-            { label: 'Especialistas', value: 'Em cruzeiros' },
           ].map(({ label, value }) => (
             <div key={label}>
               <div className="text-4xl font-black text-anhanga-blue">{value}</div>

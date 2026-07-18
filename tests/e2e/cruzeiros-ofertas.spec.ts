@@ -46,4 +46,42 @@ test.describe('Landing de cruzeiros — ofertas', () => {
     await page.goto('/cruzeiros');
     await expect(page.getByRole('button', { name: 'Abrir assistente virtual' })).toHaveCount(0);
   });
+
+  // Mesmo acoplamento ao calendário do topo do arquivo: só há card órfão para
+  // centralizar quando a contagem de ofertas secundárias % 3 === 1 (ver
+  // secondaryLastOrphanAtLg em CruiseOffersSection, components/landings/cruzeiros/CruzeirosLandingSections.tsx).
+  // Se o mix mudar para uma contagem sem órfão, o teste pula em vez de
+  // falhar — não há nada a verificar nesse dia.
+  //
+  // O locator é escopado direto ao container da grade secundária
+  // (data-testid="ofertas-secundarias"), não inferido subtraindo 1 do total
+  // de <article> assumindo que o primeiro é sempre a oferta featured:
+  // FEATURED_OFFER pode ser undefined (nenhuma oferta ativa com featured:true)
+  // e, nesse caso, SECONDARY_OFFERS vira a lista inteira — a subtração erraria
+  // a contagem e o teste falharia de forma espúria nesse cenário real.
+  test('centraliza o último card órfão da grade de ofertas em telas grandes', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/cruzeiros');
+
+    // Âncora num elemento sempre presente na seção antes de checar a grade
+    // secundária: `[data-testid="ofertas-secundarias"]` só existe no DOM
+    // quando secondaryOffers.length > 0 (CruzeirosLandingSections.tsx) — se
+    // só a oferta featured estiver ativa (nenhuma secundária), esperar
+    // direto por ela travaria até o timeout padrão em vez de pular.
+    await expect(page.getByRole('heading', { name: 'Seleção da temporada' })).toBeVisible();
+
+    const grid = page.getByTestId('ofertas-secundarias');
+    const gridCount = await grid.count();
+    test.skip(gridCount === 0, 'sem ofertas secundárias hoje (só a featured está ativa)');
+
+    const cards = grid.locator('> *');
+    // `.count()` não espera hidratação — sem isso a contagem pode ler o DOM
+    // ainda vazio logo após o goto e o teste pula por engano.
+    await expect(cards.first()).toBeVisible();
+    const secondaryCount = await cards.count();
+
+    test.skip(secondaryCount % 3 !== 1, `sem card órfão hoje (${secondaryCount} ofertas secundárias)`);
+
+    await expect(cards.last()).toHaveCSS('grid-column-start', '2');
+  });
 });

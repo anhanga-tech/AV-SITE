@@ -104,7 +104,7 @@ export function FeaturedOffer({ offer }: { offer: CruiseOffer }): React.ReactEle
           <ProfileTags perfis={offer.perfis} />
         </div>
         <Button
-          variant="primary"
+          variant="action"
           size="lg"
           onClick={() => openOfferConversation(offer)}
           className="btn-whatsapp btn-specialist mt-8 self-start"
@@ -144,7 +144,7 @@ export function OfferCard({ offer }: { offer: CruiseOffer }): React.ReactElement
           <ProfileTags perfis={offer.perfis} />
         </div>
         <Button
-          variant="primary"
+          variant="action"
           onClick={() => openOfferConversation(offer)}
           className="btn-whatsapp btn-specialist mt-5 w-full"
           rightIcon={<ArrowRight className="size-4" aria-hidden="true" />}
