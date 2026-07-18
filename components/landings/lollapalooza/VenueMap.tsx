@@ -6,6 +6,52 @@ import { MapPin } from 'lucide-react';
 import { POIS, getPoiStyle } from './venueMapData';
 import { VenuePoiList } from './VenuePoiList';
 
+const LEAFLET_ZOOM_FALLBACK_MS = 300;
+
+const removeMapAfterActiveZoom = (map: L.Map, zoomInProgress: boolean) => {
+  if (!zoomInProgress) {
+    map.remove();
+    return;
+  }
+
+  let fallbackTimer: ReturnType<typeof setTimeout> | undefined;
+  let removalTimer: ReturnType<typeof setTimeout> | undefined;
+  let removed = false;
+  let handleZoomEnd: (() => void) | undefined;
+
+  const clearOwnedResources = () => {
+    if (handleZoomEnd) {
+      map.off('zoomend', handleZoomEnd);
+      handleZoomEnd = undefined;
+    }
+    if (fallbackTimer !== undefined) {
+      clearTimeout(fallbackTimer);
+      fallbackTimer = undefined;
+    }
+    if (removalTimer !== undefined) {
+      clearTimeout(removalTimer);
+      removalTimer = undefined;
+    }
+  };
+
+  const removeMap = () => {
+    if (removed) return;
+    removed = true;
+    clearOwnedResources();
+    map.remove();
+  };
+
+  const queueRemoval = () => {
+    if (removed || removalTimer !== undefined) return;
+    removalTimer = setTimeout(removeMap, 0);
+  };
+
+  handleZoomEnd = queueRemoval;
+  map.on('zoomend', handleZoomEnd);
+  // Leaflet's CSS zoom fallback runs after 250 ms; this guarantees eventual teardown.
+  fallbackTimer = setTimeout(removeMap, LEAFLET_ZOOM_FALLBACK_MS);
+};
+
 const VenueMap: React.FC = () => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
@@ -22,7 +68,14 @@ const VenueMap: React.FC = () => {
     let ownedMap: L.Map | null = null;
     let ownedGroup: L.FeatureGroup | null = null;
     let handleGroupClick: ((event: L.LeafletEvent) => void) | null = null;
+    let zoomInProgress = false;
     const markerIndexes = new Map<L.Marker, number>();
+    const handleZoomStart = () => {
+      zoomInProgress = true;
+    };
+    const handleZoomEnd = () => {
+      zoomInProgress = false;
+    };
     if (mapContainerRef.current && !mapInstanceRef.current) {
       const interlagosCoords: [number, number] = [-23.701186, -46.697076];
 
@@ -36,6 +89,8 @@ const VenueMap: React.FC = () => {
         keyboard: true
       });
       ownedMap = map;
+      ownedMap.on('zoomstart', handleZoomStart);
+      ownedMap.on('zoomend', handleZoomEnd);
 
       // Adiciona controle de zoom no canto inferior direito (mais fácil em mobile)
       L.control.zoom({
@@ -158,16 +213,17 @@ const VenueMap: React.FC = () => {
       markerIndexes.clear();
       markersRef.current = [];
 
-      const mapToRemove = ownedMap;
-      ownedMap = null;
+      if (ownedMap) {
+        const shouldWaitForZoomEnd = zoomInProgress;
+        ownedMap.off('zoomstart', handleZoomStart);
+        ownedMap.off('zoomend', handleZoomEnd);
 
-      if (mapInstanceRef.current === mapToRemove) {
-        mapInstanceRef.current = null;
-      }
+        if (mapInstanceRef.current === ownedMap) {
+          mapInstanceRef.current = null;
+        }
 
-      if (mapToRemove) {
-        mapToRemove.off();
-        mapToRemove.remove();
+        removeMapAfterActiveZoom(ownedMap, shouldWaitForZoomEnd);
+        ownedMap = null;
       }
     };
   }, []);
