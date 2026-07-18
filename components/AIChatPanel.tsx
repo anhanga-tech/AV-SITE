@@ -1,4 +1,12 @@
-import React, { useState, useRef, useEffect, memo, useMemo, useCallback } from 'react';
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   X,
   PaperPlaneTilt,
@@ -120,6 +128,7 @@ const AIChatPanel: React.FC<AIChatPanelProps> = memo(({
   initialInputPrefill,
   onConsumePending,
 }) => {
+  const onConsumePendingEvent = useEffectEvent(onConsumePending);
   const [messages, setMessages] = useState<Message[]>([
     { id: 'init', role: 'model', text: 'Olá! Sou seu guia Anhangá 🧭.\n\nPosso te ajudar com:\n- Roteiros exclusivos\n- Dúvidas sobre o destino\n- **Orçamento personalizado**\n\nVamos começar?\n\n_Ao conversar comigo, você concorda com nossa [Política de Privacidade](/politica-privacidade/)._' }
   ]);
@@ -373,18 +382,18 @@ const AIChatPanel: React.FC<AIChatPanelProps> = memo(({
 
     const timer = setTimeout(() => {
       void submitMessageRef.current(initialAutoSendMessage, false);
-      onConsumePending();
+      onConsumePendingEvent();
     }, initialAutoSendDelayMs ?? 500);
 
     return () => clearTimeout(timer);
-  }, [initialAutoSendMessage, initialAutoSendDelayMs, onConsumePending]);
+  }, [initialAutoSendMessage, initialAutoSendDelayMs]);
 
   // Applies a pending input pre-fill (`?chat=1&m=`/`message=`/`destino=`) once mounted.
   useEffect(() => {
     if (!initialInputPrefill) return;
     setInput(initialInputPrefill);
-    onConsumePending();
-  }, [initialInputPrefill, onConsumePending]);
+    onConsumePendingEvent();
+  }, [initialInputPrefill]);
 
   return (
     <dialog
