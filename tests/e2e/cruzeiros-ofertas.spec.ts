@@ -45,4 +45,27 @@ test.describe('Landing de cruzeiros — ofertas', () => {
     await page.goto('/cruzeiros');
     await expect(page.getByRole('button', { name: 'Abrir assistente virtual' })).toHaveCount(0);
   });
+
+  // Mesmo acoplamento ao calendário do topo do arquivo: só há card órfão para
+  // centralizar quando a contagem de ofertas secundárias % 3 === 1 (ver
+  // SECONDARY_LAST_ORPHAN_AT_LG em CruzeirosLanding.tsx). Se o mix mudar para
+  // uma contagem sem órfão, o teste pula em vez de falhar — não há nada a
+  // verificar nesse dia.
+  test('centraliza o último card órfão da grade de ofertas em telas grandes', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/cruzeiros');
+
+    const region = page.getByRole('region', { name: 'Seleção da temporada' });
+    const articles = region.locator('article');
+    // `.count()` não espera hidratação — sem isso a contagem pode ler o DOM
+    // ainda vazio logo após o goto e o teste pula por engano.
+    await expect(articles.first()).toBeVisible();
+    const totalCount = await articles.count();
+    const secondaryCount = totalCount - 1; // o primeiro article é a oferta featured, fora da grade
+
+    test.skip(secondaryCount % 3 !== 1, `sem card órfão hoje (${secondaryCount} ofertas secundárias)`);
+
+    const lastCardWrapper = articles.nth(totalCount - 1).locator('xpath=..');
+    await expect(lastCardWrapper).toHaveCSS('grid-column-start', '2');
+  });
 });
