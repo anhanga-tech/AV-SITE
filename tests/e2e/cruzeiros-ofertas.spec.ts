@@ -2,7 +2,8 @@ import { test, expect } from '@playwright/test';
 
 // A landing /cruzeiros mostra ofertas selecionadas; o CTA de cada oferta abre o
 // ContactModal já carregado com o contexto da oferta (linha "Sobre:"), que
-// também viaja ao CRM via `destination`. Ver pages/landings/CruzeirosLanding.tsx.
+// também viaja ao CRM via `destination`. Ver
+// components/landings/cruzeiros/CruiseOfferCards.tsx.
 //
 // ACOPLAMENTO AO CALENDÁRIO (intencional): o filtro de expiração
 // (lib/cruise-offers-schedule.js) usa o relógio real, então estes specs dependem
@@ -48,9 +49,9 @@ test.describe('Landing de cruzeiros — ofertas', () => {
 
   // Mesmo acoplamento ao calendário do topo do arquivo: só há card órfão para
   // centralizar quando a contagem de ofertas secundárias % 3 === 1 (ver
-  // SECONDARY_LAST_ORPHAN_AT_LG em CruzeirosLanding.tsx). Se o mix mudar para
-  // uma contagem sem órfão, o teste pula em vez de falhar — não há nada a
-  // verificar nesse dia.
+  // secondaryLastOrphanAtLg em CruiseOffersSection, components/landings/cruzeiros/CruzeirosLandingSections.tsx).
+  // Se o mix mudar para uma contagem sem órfão, o teste pula em vez de
+  // falhar — não há nada a verificar nesse dia.
   //
   // O locator é escopado direto ao container da grade secundária
   // (data-testid="ofertas-secundarias"), não inferido subtraindo 1 do total
