@@ -155,13 +155,21 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
               initial="hidden"
               animate="visible"
               custom={0}
-              className="inline-flex items-center gap-2 rounded-full border border-anhanga-blue/20 bg-anhanga-blue/5 px-3 py-0.5 md:py-1 mb-2 md:mb-5 text-[11px] md:text-xs font-black uppercase tracking-widest text-anhanga-blue"
+              className="inline-flex items-center gap-2 rounded-full border border-anhanga-blue/20 bg-anhanga-blue/5 px-3 py-0.5 md:py-1 mb-2 md:mb-5 text-[11px] md:text-xs font-black uppercase tracking-wide md:tracking-widest text-anhanga-blue"
             >
               {/*
                 "todo o Brasil", não "São Paulo": o badge é a primeira leitura da
                 página e cercava quem chega de fora de SP — a correção só aparecia
                 na 3ª pergunta do FAQ. O sinal local de SEO permanece no <title> e
                 no areaServed do ServiceSchema. Ver critique de /consultoria-de-viagem.
+
+                tracking-wide (não -widest) no mobile: com "todo o Brasil" (mais
+                longo que o "São Paulo" original), o letter-spacing largo
+                empurrava a última palavra para uma 2ª linha em alguns
+                navegadores/fontes de fallback — quebra que, por sua vez, descia
+                CTA + disclaimer para trás do banner de cookies em telas curtas
+                (título deste bug: reproduzido no Chromium do CI/Linux, não no
+                macOS local — ver tests/e2e/landing-consultoria-content.spec.ts).
               */}
               <Compass className="size-3.5" aria-hidden="true" />
               Consultoria de viagem · todo o Brasil
