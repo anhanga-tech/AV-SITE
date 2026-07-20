@@ -94,3 +94,19 @@ test('Home prerender keeps the CLS-safe path when URL contains tracking query or
     assert.match(appHtml, /Sua Próxima/);
   }
 });
+
+test('Home prerender includes the below-the-fold H2 sections in the first-response HTML', async () => {
+  const { appHtml } = await render('/');
+
+  const h2Matches = Array.from(appHtml.matchAll(/<h2[^>]*>([^<]*)/g))
+    .map((match) => match[1].trim())
+    .filter(Boolean);
+
+  // Highlights, Categories, HowItWorks, Faq and Blog each render one real H2.
+  // Regressing to the old client-only reveal gate would collapse this to 0,
+  // since renderToString never waits on the lazy imports those sections used to be behind.
+  assert.ok(
+    h2Matches.length >= 5,
+    `expected at least 5 non-empty H2 headings in the first-response HTML, found ${h2Matches.length}`
+  );
+});
