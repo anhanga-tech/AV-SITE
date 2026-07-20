@@ -41,7 +41,10 @@ test.describe('CTA do hero não fica coberto pelo banner de cookies em mobile cu
     await expect(banner).toBeVisible();
 
     const cta = page.locator('[data-tracking="hero-consultoria-viagem"]');
-    const disclaimer = page.getByText('Sem taxa de consultoria. Gratuito.');
+    // exact: true — sem isso o locator também casa com o CTA final da
+    // página ("...Sem taxa, sem compromisso."), que contém o mesmo texto
+    // como substring e agora usa a mesma frase do disclaimer do hero.
+    const disclaimer = page.getByText('Sem taxa, sem compromisso.', { exact: true });
 
     await waitForStableBoxes([cta, disclaimer]);
 

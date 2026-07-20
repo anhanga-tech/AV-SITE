@@ -328,7 +328,7 @@ export function CruiseAbout(): React.ReactElement {
           Sobre a Anhangá Viagens
         </h2>
         <p className="text-lg text-zinc-600 leading-relaxed max-w-2xl mx-auto">
-          Agência de viagens em São Paulo desde 2018, com especialistas em cruzeiros e roteiros personalizados. Nota 5.0 no Google e atendimento humano do início ao fim.
+          Agência de viagens fundada em São Paulo em 2025, hoje atendendo viajantes de todo o Brasil, com especialistas em cruzeiros e roteiros personalizados. Nota 5.0 no Google e atendimento humano do início ao fim.
         </p>
         <div className="mt-12 flex flex-wrap justify-center gap-12">
           {/* Terceiro item ("Especialistas / Em cruzeiros") removido: não é um
@@ -336,7 +336,7 @@ export function CruiseAbout(): React.ReactElement {
               do trio e já era dito no parágrafo acima ("com especialistas em
               cruzeiros"). Redundante, não uma estatística real. */}
           {[
-            { label: 'Fundada em', value: '2018' },
+            { label: 'Fundada em', value: '2025' },
             { label: 'Nota Google', value: '5.0' },
           ].map(({ label, value }) => (
             <div key={label}>
@@ -431,7 +431,7 @@ export function CruiseOtherServices(): React.ReactElement {
 export function CruiseLandingFooter(): React.ReactElement {
   return (
     <footer className="py-8 bg-anhanga-light border-t border-anhanga-blue/10 text-center text-sm text-zinc-600">
-      <p>Anhangá Viagens · Agência de viagens em São Paulo</p>
+      <p>Anhangá Viagens · Agência de viagens de São Paulo para todo o Brasil</p>
     </footer>
   );
 }
