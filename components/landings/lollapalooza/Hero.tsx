@@ -42,7 +42,7 @@ const Hero: React.FC = () => {
     if (navigator.share) {
       try {
         await navigator.share(shareData);
-      } catch (err) {
+      } catch {
         // User cancelled or share failed, ignore
       }
     } else {
@@ -148,7 +148,7 @@ const Hero: React.FC = () => {
           
           <button
             type="button"
-            onClick={handleShare}
+            onClick={() => void handleShare()}
             className={`
               group relative flex items-center justify-center gap-2 px-6 py-4 rounded-full border-2 transition duration-300 w-full sm:w-auto
               ${shareStatus === 'copied' 

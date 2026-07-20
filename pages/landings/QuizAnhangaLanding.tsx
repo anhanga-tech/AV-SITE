@@ -337,7 +337,7 @@ export default function QuizAnhangaLanding() {
                                 onAnswerQ={answerQ}
                                 onNextQ={nextQ}
                                 onBackQ={backQ}
-                                onLeadSubmit={handleLeadSubmit}
+                                onLeadSubmit={(data, skipped) => void handleLeadSubmit(data, skipped)}
                                 onRestart={restart}
                                 onGo={go}
                                 onPhoneSubmit={handlePhoneSubmit}
