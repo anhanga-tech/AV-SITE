@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import SectionTitle from './SectionTitle';
 import Button from './Button';
 import { FAQItem } from './types';
-import { ChevronDown, HelpCircle, Sparkles, ArrowRight } from 'lucide-react';
+import { ChevronDown, HelpCircle, Sparkles } from 'lucide-react';
 
 const items: FAQItem[] = [
   { question: "Os pacotes incluem ingresso do Beto Carrero?", answer: "Sim! Trabalhamos com ingressos oficiais. Você recebe o QR Code direto no seu WhatsApp e entra no parque sem pegar fila na bilheteria." },

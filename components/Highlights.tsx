@@ -24,11 +24,6 @@ const fadeUp = {
     }),
 };
 
-const cardHover = {
-    rest: { scale: 1, rotate: 'var(--card-rotate)', y: 0, transition: { type: 'spring', stiffness: 400, damping: 20 } },
-    hover: { scale: 1.03, rotate: 0, y: -8, transition: { type: 'spring', stiffness: 400, damping: 20 } },
-};
-
 interface HighlightItem {
     icon: React.ElementType;
     title: string;
