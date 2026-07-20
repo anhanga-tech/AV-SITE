@@ -58,7 +58,7 @@ const PILLARS = [
 ];
 
 const CREDENTIALS = [
-  'Fundada em 2018',
+  'Fundada em 2025',
   'Nota 5.0 no Google',
   'Atendimento humano',
 ];
@@ -126,7 +126,7 @@ export function ConsultoriaHero() {
           >
             Falar com um consultor
           </Button>
-          <p className="mt-1 md:mt-4 text-sm text-zinc-600">Sem taxa de consultoria. Gratuito.</p>
+          <p className="mt-1 md:mt-4 text-sm text-zinc-600">Sem taxa, sem compromisso.</p>
         </m.div>
       </div>
     </section>
@@ -339,7 +339,7 @@ export function ConsultoriaAbout() {
               Sobre a Anhangá Viagens
             </h2>
             <p className="text-lg text-zinc-600 leading-relaxed">
-              Agência de viagens em São Paulo, especializada em viagens personalizadas desde 2018. Atendimento humano, nota 5.0 no Google e consultor fixo do início ao fim da sua viagem.
+              Agência de viagens fundada em São Paulo em 2025, hoje atendendo viajantes de todo o Brasil. Atendimento humano, nota 5.0 no Google e consultor fixo do início ao fim da sua viagem.
             </p>
             <div className="mt-10 flex flex-wrap justify-center md:justify-start gap-3">
               {CREDENTIALS.map(item => (
