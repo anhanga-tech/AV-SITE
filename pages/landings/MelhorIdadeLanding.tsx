@@ -134,7 +134,7 @@ const MelhorIdadeLanding: React.FC = () => {
               <div className="size-16 bg-brand-cyan/10 rounded-2xl flex items-center justify-center text-brand-cyan mb-6">
                 <ShieldCheck className="size-8" />
               </div>
-              <h3 className="text-2xl font-black text-brand-dark">Segurança em 1º lugar</h3>
+              <h2 className="text-2xl font-black text-brand-dark">Segurança em 1º lugar</h2>
               <p className="text-zinc-500 font-medium leading-relaxed">
                 Hotéis com acessibilidade, seguro-viagem premium e suporte 24h para você viajar com tranquilidade total.
               </p>
@@ -143,7 +143,7 @@ const MelhorIdadeLanding: React.FC = () => {
               <div className="size-16 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 mb-6">
                 <Coffee className="size-8" />
               </div>
-              <h3 className="text-2xl font-black text-brand-dark">Ritmo Desacelerado</h3>
+              <h2 className="text-2xl font-black text-brand-dark">Ritmo Desacelerado</h2>
               <p className="text-zinc-500 font-medium leading-relaxed">
                 Nada de correrias. Roteiros desenhados para respeitar o seu tempo, com pausas estratégicas e menos deslocamentos.
               </p>
@@ -152,7 +152,7 @@ const MelhorIdadeLanding: React.FC = () => {
               <div className="size-16 bg-brand-vibrant/10 rounded-2xl flex items-center justify-center text-brand-vibrant mb-6">
                 <Sparkles className="size-8" />
               </div>
-              <h3 className="text-2xl font-black text-brand-dark">Curadoria Personalizada</h3>
+              <h2 className="text-2xl font-black text-brand-dark">Curadoria Personalizada</h2>
               <p className="text-zinc-500 font-medium leading-relaxed">
                 Experiências gastronômicas, culturais e de lazer selecionadas a dedo para viajantes exigentes e experientes.
               </p>
