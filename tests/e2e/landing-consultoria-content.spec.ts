@@ -41,7 +41,7 @@ test.describe('CTA do hero não fica coberto pelo banner de cookies em mobile cu
     await expect(banner).toBeVisible();
 
     const cta = page.locator('[data-tracking="hero-consultoria-viagem"]');
-    const disclaimer = page.getByText('Sem taxa de consultoria. Gratuito.');
+    const disclaimer = page.getByText('Sem taxa, sem compromisso.');
 
     await waitForStableBoxes([cta, disclaimer]);
 
