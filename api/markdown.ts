@@ -330,7 +330,7 @@ export default async function handler(req: Request): Promise<Response> {
                 }
             }
             // Sanitize before including in response body
-            const safeDisplay = rawPath.slice(0, 80).replace(/[^\w\-\/]/g, '');
+            const safeDisplay = rawPath.slice(0, 80).replace(/[^\w\-/]/g, '');
             return markdownResponse(
                 `# Página não encontrada\n\nNão há versão em Markdown para o caminho \`${safeDisplay}\`.\n\nConsulte [${SITE_BASE}](${SITE_BASE}) para o conteúdo completo.\n`,
                 404
