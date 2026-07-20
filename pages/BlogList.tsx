@@ -133,9 +133,9 @@ const BlogList: React.FC = () => {
                                             {post.category}
                                         </span>
                                     </div>
-                                    <h4 className="text-2xl font-extrabold text-zinc-800 mb-3 leading-tight group-hover:text-brand-cyan transition-colors">
+                                    <h2 className="text-2xl font-extrabold text-zinc-800 mb-3 leading-tight group-hover:text-brand-cyan transition-colors">
                                         {post.title}
-                                    </h4>
+                                    </h2>
                                     <p className="text-zinc-500 font-medium leading-relaxed mb-6 flex-1 line-clamp-3">
                                         {post.excerpt}
                                     </p>
