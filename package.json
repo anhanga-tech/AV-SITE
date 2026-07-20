@@ -75,7 +75,7 @@
     "gray-matter": "^4.0.3",
     "react-doctor": "^0.7.3",
     "rollup-plugin-visualizer": "^7.0.1",
-    "semantic-release": "25.0.5",
+    "semantic-release": "25.0.7",
     "sharp": "^0.35.3",
     "tailwindcss": "^4.3.2",
     "tsx": "^4.23.0",
