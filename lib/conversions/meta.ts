@@ -1,4 +1,5 @@
 import { logger } from '../logger';
+import { readTruncatedProviderDetail } from './provider-detail';
 
 interface MetaConversionPayload {
   eventName: 'Lead' | 'Purchase';
@@ -162,7 +163,9 @@ async function handleMetaResponse(
   response: Response
 ): Promise<MetaConversionResult> {
   if (!response.ok) {
-    const detail = await response.text().catch(() => '');
+    // Untrusted, unbounded upstream body — truncate at the boundary before it
+    // reaches logs/Sentry or the returned error string.
+    const detail = await readTruncatedProviderDetail(response);
     logger.error(`META: Conversion failed with status ${response.status}`, detail);
     return {
       success: false,

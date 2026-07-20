@@ -182,6 +182,24 @@ test('sendGoogleConversion returns failure on non-ok HTTP response', async (t) =
     assert.ok(result.error?.includes('HTTP 401'));
 });
 
+test('sendGoogleConversion truncates an oversized upstream error body', async (t) => {
+    silenceLogger(t);
+    t.after(() => { global.fetch = originalFetch; restoreEnv(); });
+
+    process.env.GA4_MEASUREMENT_ID = 'G-TEST';
+    process.env.GA4_API_SECRET = 'secret';
+
+    const huge = 'z'.repeat(50_000);
+    global.fetch = (async (): Promise<Response> => new Response(huge, { status: 500 })) as typeof fetch;
+
+    const result = await sendGoogleConversion('lead_qualificado', { clientId: 'cid-1' });
+    assert.equal(result.success, false);
+    // Untrusted upstream detail must not flow through untruncated into the error
+    // string (and, via logger.error, into Sentry).
+    assert.ok((result.error?.length ?? 0) < huge.length);
+    assert.ok(result.error?.includes('… [truncated]'));
+});
+
 test('sendGoogleConversion returns failure when fetch throws', async (t) => {
     silenceLogger(t);
     t.after(() => { global.fetch = originalFetch; restoreEnv(); });
