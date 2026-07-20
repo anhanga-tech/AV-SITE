@@ -1,31 +1,6 @@
 import { isValidEmail, normalizeNullable, normalizeTracking, normalizeUtms } from './lead-logic';
 import type { SubmitWaitlistRequest } from '../types/waitlist';
 
-function splitWaitlistName(name: string): { firstName: string; lastName: string } {
-    const parts = name.trim().split(/\s+/).filter(Boolean);
-    const [firstName = '', ...rest] = parts;
-
-    return {
-        firstName,
-        lastName: rest.join(' '),
-    };
-}
-
-function buildWaitlistNoteBody(payload: SubmitWaitlistRequest): string {
-    const lines = [
-        'Lista de Espera Lollapalooza 2027',
-        `Nome: ${payload.name}`,
-        `Email: ${payload.email}`,
-        `Origem da captura: ${payload.sourcePage}`,
-    ];
-
-    if (payload.utms.utm_source) lines.push(`UTM Source: ${payload.utms.utm_source}`);
-    if (payload.utms.utm_medium) lines.push(`UTM Medium: ${payload.utms.utm_medium}`);
-    if (payload.utms.utm_campaign) lines.push(`UTM Campaign: ${payload.utms.utm_campaign}`);
-
-    return lines.join('\n');
-}
-
 export function validateWaitlistPayload(
     payload: unknown,
 ): { valid: true; data: SubmitWaitlistRequest } | { valid: false; error: string } {

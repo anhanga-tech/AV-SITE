@@ -263,7 +263,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
 
         <ChatLeadFormActions
           isSubmitting={isSubmittingLead || isLocallySubmitting}
-          onSubmit={submitLeadForm}
+          onSubmit={(e) => void submitLeadForm(e)}
           onOpenDirectWhatsApp={openDirectWhatsApp}
         />
       </div>

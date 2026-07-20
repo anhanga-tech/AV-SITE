@@ -219,7 +219,7 @@ export default function NpsPage() {
             )}
 
             {token && pageState === 'form' && (
-              <form onSubmit={handleSubmit} noValidate>
+              <form onSubmit={(e) => void handleSubmit(e)} noValidate>
                 {/* Honeypot: hidden from humans, blind form-fillers populate it. */}
                 <input {...honeypotProps} />
                 <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">

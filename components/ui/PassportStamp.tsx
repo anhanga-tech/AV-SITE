@@ -1,4 +1,5 @@
 import React from 'react';
+import { deriveRotation } from './passport-stamp-rotation';
 
 interface PassportStampProps {
     destination: string;
@@ -23,12 +24,12 @@ export const PassportStamp: React.FC<PassportStampProps> = ({
 }) => {
     const displayIata = iataCode || generatePseudoIata(destination);
 
-    // Random rotation between -15 and 15 degrees for an organic look
-    const rotation = React.useMemo(() => Math.floor(Math.random() * 30) - 15, []);
-
     // Unique animation name per instance so concurrent stamps don't overwrite each other's keyframes
     const uid = React.useId().replace(/:/g, '');
     const animName = `stamp-${uid}`;
+
+    // Rotation between -15 and 15 degrees for an organic look, deterministic per instance
+    const rotation = React.useMemo(() => deriveRotation(uid), [uid]);
 
     React.useEffect(() => {
         const style = document.createElement('style');

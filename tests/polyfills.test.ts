@@ -23,7 +23,7 @@ test('polyfill installs Object.hasOwn when missing', () => {
     }
 
     assert.equal(typeof Object.hasOwn, 'function', 'polyfill must install a function');
-    assert.equal(Object.propertyIsEnumerable('hasOwn'), false, 'polyfill must be non-enumerable');
+    assert.equal(Object.prototype.propertyIsEnumerable.call(Object, 'hasOwn'), false, 'polyfill must be non-enumerable');
     assert.equal(Object.hasOwn({ a: 1 }, 'a'), true);
     assert.equal(Object.hasOwn({ a: 1 }, 'b'), false);
     assert.equal(Object.hasOwn(Object.create({ inherited: true }), 'inherited'), false);

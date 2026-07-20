@@ -9,7 +9,6 @@ import Faq from './Faq';
 import Footer from './Footer';
 import Button from './Button';
 import { Menu, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { getBetoAssetUrl } from './assetPath';
 
 const SITE_URL = 'https://www.anhanga.tur.br';

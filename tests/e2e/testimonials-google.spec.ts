@@ -68,7 +68,7 @@ test.describe('Testimonials — Google data (fixture)', () => {
 
   test.afterAll(() => {
     copyFileSync(BACKUP_PATH, REVIEWS_PATH);
-    try { unlinkSync(BACKUP_PATH); } catch {}
+    try { unlinkSync(BACKUP_PATH); } catch { /* backup already removed */ }
   });
 
   test('summary bar shows rating and review count', async ({ page }) => {

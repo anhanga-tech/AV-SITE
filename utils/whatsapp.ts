@@ -28,7 +28,6 @@ export interface WhatsAppLinkOptions {
 
 export type TrackingData = Record<string, string>;
 
-let cachedTrackingData: string | null = null;
 let cachedTrackingObject: TrackingData | null = null;
 let hasInitialized = false;
 
@@ -201,7 +200,6 @@ function persistTrackingData(trackingData: TrackingData): TrackingData | null {
     }
 
     setCookie(COOKIE_NAME, dataString, 30);
-    cachedTrackingData = dataString;
     cachedTrackingObject = { ...trackingData };
 
     if (typeof window !== 'undefined' && window.dataLayer) {
@@ -218,7 +216,6 @@ function getCookieTrackingData(): TrackingData | null {
     const cookieData = getCookie(COOKIE_NAME);
     if (!cookieData) return null;
 
-    cachedTrackingData = cookieData;
     cachedTrackingObject = parseTrackingDataString(cookieData);
     return { ...cachedTrackingObject };
 }
@@ -238,15 +235,6 @@ const captureTrackingDataObject = (): TrackingData | null => {
     }
 
     return getCookieTrackingData();
-};
-
-const captureTrackingData = (): string | null => {
-    const objectData = captureTrackingDataObject();
-    if (!objectData) return null;
-
-    const serialized = serializeTrackingData(objectData);
-    cachedTrackingData = serialized || null;
-    return cachedTrackingData;
 };
 
 const initializeTracking = () => {

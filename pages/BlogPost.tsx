@@ -14,7 +14,7 @@ import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 
 function isValidSlug(value: unknown): value is string {
     if (typeof value !== 'string') return false;
-    return /^[a-zA-Z0-9\-\/]+$/.test(value);
+    return /^[a-zA-Z0-9\-/]+$/.test(value);
 }
 
 // Carregado no nível do módulo para o Vite processar em build time

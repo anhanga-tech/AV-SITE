@@ -44,7 +44,7 @@ test.describe('SEO Smoke Check', () => {
       console.log(`Route: ${route} | Canonical: ${canonical}`);
       // Regex explanation: https://www.anhanga.tur.br/ followed by anything (or nothing) and a trailing slash
       // The home route is exactly https://www.anhanga.tur.br/
-      expect(canonical).toMatch(/^https:\/\/www\.anhanga\.tur\.br\/([^\/].*\/|)$/);
+      expect(canonical).toMatch(/^https:\/\/www\.anhanga\.tur\.br\/([^/].*\/|)$/);
 
       // 4. Check Robots
       const robotsLocator = page.locator('meta[name="robots"]');

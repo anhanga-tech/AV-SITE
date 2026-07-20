@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { MapPin, Home as HomeIcon, Compass, BookOpen, ArrowLeft } from 'lucide-react';
 import { Seo } from '../components/Seo';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';

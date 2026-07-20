@@ -27,7 +27,6 @@ const useIntersectionObserver = (threshold = 0.1) => {
     );
 
     if (element) {
-      /* eslint-disable-next-line react-doctor/no-adjust-state-on-prop-change */
       observer.observe(element);
     }
 

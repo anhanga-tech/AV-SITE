@@ -1,4 +1,4 @@
-import React, { createContext, use, useEffect } from 'react';
+import { createContext, use, useEffect } from 'react';
 
 export interface HeadTag {
   tagName: 'title' | 'meta' | 'link' | 'script';

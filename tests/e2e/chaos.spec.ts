@@ -9,8 +9,8 @@ test.describe('Chaos & Unhappy Path Suite', () => {
     const aiChat = new AIChat(page);
 
     // Mock the API response to return a 500 error
-    await page.route('**/api/generate', route => {
-      route.fulfill({
+    await page.route('**/api/generate', async route => {
+      await route.fulfill({
         status: 500,
         contentType: 'application/json',
         body: JSON.stringify({ error: 'Internal Server Error' }),
@@ -32,7 +32,7 @@ test.describe('Chaos & Unhappy Path Suite', () => {
     // Simulate slow network for the API call
     await page.route('**/api/generate', async route => {
       await new Promise(resolve => setTimeout(resolve, 3000));
-      route.fulfill({
+      await route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({ text: 'Respondendo após delay' }),
@@ -70,8 +70,8 @@ test.describe('Chaos & Unhappy Path Suite', () => {
 
   test('should handle API 500 error in corporativo form', async ({ page }) => {
     const landing = new CorporativoPage(page);
-    await page.route('**/api/submit-lead', route => {
-      route.fulfill({
+    await page.route('**/api/submit-lead', async route => {
+      await route.fulfill({
         status: 500,
         contentType: 'application/json',
         body: JSON.stringify({ error: 'Internal Server Error', code: 'SERVER_ERROR' }),

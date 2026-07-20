@@ -186,7 +186,7 @@ const WaitlistSection: React.FC = () => {
                 <div className="h-1 w-20 bg-anhanga-yellow mt-4 mx-auto lg:mx-0" />
               </div>
 
-              <form className="space-y-8" onSubmit={handleSubmit} noValidate>
+              <form className="space-y-8" onSubmit={(event) => void handleSubmit(event)} noValidate>
                 {/* Honeypot: hidden from humans, blind form-fillers populate it. */}
                 <input {...honeypotProps} />
 
