@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import { MDXProvider } from '@mdx-js/react';
 import { Clock } from 'lucide-react';
 import { PostMeta } from '../../lib/mdx';
@@ -12,7 +12,7 @@ import { optimizeRemoteImageUrl } from '../../data/mediaConfig';
 interface BlogPostContentProps {
     post: PostMeta;
     canonicalUrl: string;
-    MdxContent: React.LazyExoticComponent<React.ComponentType> | null;
+    MdxContent: React.ComponentType | null;
     relatedPosts: PostMeta[];
 }
 
@@ -61,15 +61,7 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
                         prose-blockquote:border-2 prose-blockquote:border-brand-yellow/40 prose-blockquote:bg-yellow-50 prose-blockquote:py-4 prose-blockquote:px-8 prose-blockquote:rounded-2xl prose-blockquote:not-italic prose-blockquote:font-serif prose-blockquote:text-brand-dark [&_blockquote_p]:text-brand-dark
                         first-letter:text-[3rem] first-letter:md:text-[4.5rem] first-letter:font-black first-letter:text-brand-dark first-letter:float-left first-letter:leading-none first-letter:mr-2 first-letter:mt-1
                     ">
-                        <Suspense fallback={
-                            <div className="animate-pulse space-y-4">
-                                <div className="h-4 bg-zinc-200 rounded w-3/4" />
-                                <div className="h-4 bg-zinc-200 rounded w-full" />
-                                <div className="h-4 bg-zinc-200 rounded w-5/6" />
-                            </div>
-                        }>
-                            <MdxContent />
-                        </Suspense>
+                        <MdxContent />
                     </div>
                 </MDXProvider>
             ) : (

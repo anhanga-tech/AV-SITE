@@ -20,27 +20,20 @@ function isValidSlug(value: unknown): value is string {
 // Carregado no nível do módulo para o Vite processar em build time
 const allMdxPosts = getAllPosts();
 
-// import.meta.glob deve ficar no nível do módulo para o Vite processar em build time
+// eager: true resolve todos os módulos MDX em build time, no nível do módulo — sem
+// React.lazy/Suspense, o conteúdo do post fica disponível de forma síncrona durante o
+// SSR (renderToPipeableStream nunca aguarda um Suspense boundary suspenso: sem esse
+// eager, o corpo real do post caía num streaming fora de ordem, resolvido só por JS
+// no cliente — ver issue #1249). BlogPost já é uma rota lazy-carregada em App.tsx, então
+// empacotar os ~29 posts juntos não afeta o bundle inicial da aplicação.
 const mdxModuleMap = import.meta.glob<{ default: React.ComponentType }>(
-    '/content/blog/*.mdx'
+    '/content/blog/*.mdx',
+    { eager: true }
 );
 
-// Cache de lazy components por slug para evitar re-criação a cada render
-const lazyComponentCache: Record<
-    string,
-    React.LazyExoticComponent<React.ComponentType>
-> = {};
-
-function getMdxComponent(
-    slug: string
-): React.LazyExoticComponent<React.ComponentType> | null {
+function getMdxComponent(slug: string): React.ComponentType | null {
     const key = `/content/blog/${slug}.mdx`;
-    const importFn = mdxModuleMap[key];
-    if (!importFn) return null;
-    if (!lazyComponentCache[slug]) {
-        lazyComponentCache[slug] = React.lazy(importFn);
-    }
-    return lazyComponentCache[slug];
+    return mdxModuleMap[key]?.default ?? null;
 }
 
 const BlogPost: React.FC = () => {
