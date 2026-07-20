@@ -197,3 +197,29 @@ test('sendMetaConversion should return failure when Meta responds with an HTTP e
   assert.match(result.error || '', /HTTP 400/);
   assert.ok(errors.some((entry) => entry.includes('META: Conversion failed with status 400')));
 });
+
+test('sendMetaConversion truncates an oversized upstream error body', async (t) => {
+  t.after(() => {
+    global.fetch = originalFetch;
+    console.log = originalConsoleLog;
+    console.error = originalConsoleError;
+    restoreEnv();
+  });
+
+  process.env.META_PIXEL_ID = 'pixel-1';
+  process.env.META_ACCESS_TOKEN = 'token-1';
+  delete process.env.META_TEST_EVENT_CODE;
+  console.log = (() => {}) as typeof console.log;
+  console.error = (() => {}) as typeof console.error;
+
+  const huge = 'z'.repeat(50_000);
+  global.fetch = (async (): Promise<Response> => new Response(huge, { status: 500 })) as typeof fetch;
+
+  const result = await sendMetaConversion({ eventName: 'Lead', email: 'felipe@example.com' });
+
+  assert.equal(result.success, false);
+  // Untrusted upstream detail must not flow through untruncated into the error
+  // string (and, via logger.error, into Sentry).
+  assert.ok((result.error?.length ?? 0) < huge.length);
+  assert.ok(result.error?.includes('… [truncated]'));
+});
