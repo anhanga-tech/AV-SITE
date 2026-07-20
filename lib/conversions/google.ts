@@ -1,4 +1,5 @@
 import { logger } from '../logger';
+import { readTruncatedProviderDetail } from './provider-detail';
 
 type GA4EventName = 'lead_qualificado' | 'close_convert_lead' | 'purchase';
 
@@ -73,7 +74,9 @@ export async function sendGoogleConversion(
     });
 
     if (!res.ok) {
-      const detail = await res.text().catch(() => '');
+      // Untrusted, unbounded upstream body — truncate at the boundary before it
+      // reaches logs/Sentry or the returned error string.
+      const detail = await readTruncatedProviderDetail(res);
       logger.error(`[GA4 MP] Status inesperado: ${res.status}`, detail);
       return { success: false, error: `HTTP ${res.status}${detail ? `: ${detail}` : ''}` };
     }
