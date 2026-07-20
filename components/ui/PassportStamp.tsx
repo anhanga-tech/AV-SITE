@@ -15,6 +15,17 @@ const generatePseudoIata = (city: string): string => {
     return clean.substring(0, 3);
 };
 
+// Deterministic rotation derived from the instance's useId, instead of Math.random:
+// calling an impure function during render breaks React's purity rules (and would
+// mismatch between server and client render passes).
+export const deriveRotation = (seed: string): number => {
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) {
+        hash = (hash * 31 + seed.charCodeAt(i)) | 0;
+    }
+    return (Math.abs(hash) % 31) - 15;
+};
+
 export const PassportStamp: React.FC<PassportStampProps> = ({
     destination,
     date = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ de /g, '/').toUpperCase(),
@@ -23,12 +34,12 @@ export const PassportStamp: React.FC<PassportStampProps> = ({
 }) => {
     const displayIata = iataCode || generatePseudoIata(destination);
 
-    // Random rotation between -15 and 15 degrees for an organic look
-    const rotation = React.useMemo(() => Math.floor(Math.random() * 30) - 15, []);
-
     // Unique animation name per instance so concurrent stamps don't overwrite each other's keyframes
     const uid = React.useId().replace(/:/g, '');
     const animName = `stamp-${uid}`;
+
+    // Rotation between -15 and 15 degrees for an organic look, deterministic per instance
+    const rotation = React.useMemo(() => deriveRotation(uid), [uid]);
 
     React.useEffect(() => {
         const style = document.createElement('style');
