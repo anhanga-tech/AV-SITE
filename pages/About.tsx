@@ -95,7 +95,7 @@ const About: React.FC = () => {
       </noscript>
       <Seo
         title="Sobre a Anhangá Viagens | Agência de Viagens em São Paulo"
-        description="Anhangá Viagens: agência registrada no Cadastur (CNPJ 37.036.732/0001-41), com sede em São Paulo, agente credenciado Beto Carrero World e Hopi Hari e parceira Norwegian Cruise Line. Atendimento consultivo e roteiros personalizados."
+        description="Agência de viagens em São Paulo com atendimento consultivo e roteiros sob medida — sem pacote pronto. Credenciada Cadastur, agente Beto Carrero World."
         canonical="https://www.anhanga.tur.br/sobre/"
       />
       <OrganizationSchema
