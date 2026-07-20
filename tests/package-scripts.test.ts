@@ -19,6 +19,15 @@ test('package engines should accept the deploy Node.js line (24) and newer local
   assert.equal(packageJson.engines?.node, '>=24');
 });
 
+test('TypeScript 7 compiler stays isolated from tools that require the TypeScript 6 API', async () => {
+  const packageJson = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8')) as {
+    devDependencies?: Record<string, string>;
+  };
+
+  assert.equal(packageJson.devDependencies?.typescript, 'npm:@typescript/typescript6@~6.0.2');
+  assert.equal(packageJson.devDependencies?.['@typescript/native'], 'npm:typescript@~7.0.2');
+});
+
 test('pnpm settings live in pnpm-workspace.yaml, not in the package.json "pnpm" field ignored by pnpm 11', async () => {
   const packageJson = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8')) as Record<
     string,
