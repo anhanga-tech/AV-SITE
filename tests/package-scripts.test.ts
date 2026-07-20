@@ -31,7 +31,18 @@ test('pnpm settings live in pnpm-workspace.yaml, not in the package.json "pnpm" 
 
   assert.match(workspaceConfig, /^overrides:\s*$/m);
   assert.match(workspaceConfig, /^onlyBuiltDependencies:\s*$/m);
-  for (const pinned of ['rimraf', 'glob', 'minimatch', 'qs']) {
+  for (const pinned of ['rimraf', 'glob', 'qs']) {
     assert.match(workspaceConfig, new RegExp(`^  ${pinned}: `, 'm'), `security override for ${pinned} must stay pinned`);
   }
+
+  assert.match(
+    workspaceConfig,
+    /^[ ]{2}"minimatch@3": "\^3\.1\.5"$/m,
+    'jsx-a11y must use the patched minimatch 3 backport that preserves its CommonJS API',
+  );
+  assert.doesNotMatch(
+    workspaceConfig,
+    /^[ ]{2}minimatch: /m,
+    'a global minimatch override breaks eslint-plugin-jsx-a11y by forcing the incompatible v10 API',
+  );
 });
