@@ -22,6 +22,7 @@ export default tseslint.config(
       'public/**',
       '.worktrees/**',
       '.claude/**',
+      '.deepsec/**',
     ],
   },
   js.configs.recommended,
