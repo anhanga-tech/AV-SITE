@@ -1,4 +1,5 @@
 import React from 'react';
+import { deriveRotation } from './passport-stamp-rotation';
 
 interface PassportStampProps {
     destination: string;
@@ -13,17 +14,6 @@ const generatePseudoIata = (city: string): string => {
     const clean = city.replace(/[^a-zA-Z]/g, '').toUpperCase();
     if (clean.length < 3) return 'UNK';
     return clean.substring(0, 3);
-};
-
-// Deterministic rotation derived from the instance's useId, instead of Math.random:
-// calling an impure function during render breaks React's purity rules (and would
-// mismatch between server and client render passes).
-export const deriveRotation = (seed: string): number => {
-    let hash = 0;
-    for (let i = 0; i < seed.length; i++) {
-        hash = (hash * 31 + seed.charCodeAt(i)) | 0;
-    }
-    return (Math.abs(hash) % 31) - 15;
 };
 
 export const PassportStamp: React.FC<PassportStampProps> = ({

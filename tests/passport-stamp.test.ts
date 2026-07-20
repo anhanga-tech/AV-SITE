@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { deriveRotation } from '../components/ui/PassportStamp';
+import { deriveRotation } from '../components/ui/passport-stamp-rotation';
 
 test('deriveRotation is deterministic for the same seed', () => {
     assert.equal(deriveRotation('abc123'), deriveRotation('abc123'));
