@@ -118,6 +118,38 @@ test('loadMautic tem gate de consentimento LGPD', () => {
   assert.match(body, /_consentChoice\s*!==\s*'marketing'/, 'loadMautic deve ter gate de consentimento');
 });
 
+test('index.html difere terceiros sem atraso fixo de ~12s que fixa TTI no lab (issue #1259)', () => {
+  // O atraso fixo antigo (setTimeout ~12s / 15s / requestIdleCallback timeout 25s) empurrava a
+  // atividade dos scripts de terceiros para dentro da janela de medição do Lighthouse/PageSpeed,
+  // fixando TTI/TBT em ~12s. O fallback agora dispara no primeiro tempo ocioso pós-load.
+  assert.doesNotMatch(indexHtml, /setTimeout\(\s*triggerAnalytics\s*,\s*1[25]000\s*\)/, 'sem atraso fixo de 12s/15s no trigger de analytics');
+  assert.doesNotMatch(indexHtml, /requestIdleCallback\([^)]*\{\s*timeout:\s*25000/, 'sem requestIdleCallback com timeout de 25s');
+
+  // O fallback ocioso curto (<= 4s) e os gatilhos de interação devem continuar presentes.
+  assert.match(indexHtml, /requestIdleCallback\(\s*triggerAnalytics\s*,\s*\{\s*timeout:\s*4000\s*\}\s*\)/, 'fallback ocioso curto deve existir');
+  assert.match(indexHtml, /\['scroll',\s*'pointerdown',\s*'keydown',\s*'touchstart'\]/, 'gatilhos de interação devem permanecer');
+  assert.match(indexHtml, /scheduleFallback/, 'fallback pós-load deve estar agendado');
+});
+
+test('index.html não abre preconnect ocioso para os hosts sGTM (pré-conexão não usada)', () => {
+  const headHtml = getHeadHtml(indexHtml);
+  // Os hosts sGTM só são contatados quando o loader difere dispara (após o LCP). Um preconnect
+  // mantido aberto no load é apontado como "pré-conexão não usada" pelo Lighthouse (issue #1259).
+  assert.doesNotMatch(headHtml, /rel="preconnect"[^>]*sst\.anhanga\.tur\.br/, 'sst não deve usar preconnect');
+  assert.doesNotMatch(headHtml, /sst\.anhanga\.tur\.br[^>]*rel="preconnect"/, 'sst não deve usar preconnect (ordem invertida)');
+  // dns-prefetch (barato) deve permanecer para os dois hosts.
+  assert.match(headHtml, /rel="dns-prefetch"\s+href="https:\/\/load\.sst\.anhanga\.tur\.br"/, 'dns-prefetch de load.sst deve permanecer');
+  assert.match(headHtml, /rel="dns-prefetch"\s+href="https:\/\/sst\.anhanga\.tur\.br"/, 'dns-prefetch de sst deve permanecer');
+});
+
+test('index.html mantém no máximo 4 preconnects no head (guia de performance)', () => {
+  const headHtml = getHeadHtml(indexHtml);
+  const preconnects = [...headHtml.matchAll(/rel="preconnect"/g)];
+  assert.ok(preconnects.length <= 4, `esperado <= 4 preconnects, encontrado ${preconnects.length}`);
+  // O preconnect do CDN de mídia (origem do LCP) deve permanecer.
+  assert.match(headHtml, /rel="preconnect"\s+href="https:\/\/media\.anhanga\.tur\.br"/, 'preconnect do CDN de mídia (LCP) deve permanecer');
+});
+
 test('index.html não carrega scripts do HubSpot (ferramenta descontinuada)', () => {
   assert.doesNotMatch(indexHtml, /hs-scripts\.com/i, 'script do HubSpot não deve ser injetado');
   assert.doesNotMatch(indexHtml, /loadHubspot/i, 'loader do HubSpot não deve existir');

@@ -41,10 +41,11 @@
   <link rel="preconnect" href="https://media.anhanga.tur.br" crossorigin>
   <link rel="dns-prefetch" href="https://media.anhanga.tur.br">
 
-  <!-- Stape sGTM — warm DNS/TLS before deferred loader fires -->
-  <link rel="preconnect" href="https://load.sst.anhanga.tur.br" crossorigin>
+  <!-- Stape sGTM — apenas dns-prefetch (barato): o loader difere os scripts de terceiros para
+       depois do LCP, então um preconnect mantido aberto no load só desperdiça uma conexão e é
+       apontado como "pré-conexão não usada" pelo Lighthouse (issue #1259). A conexão real é
+       estabelecida quando o loader dispara, com o DNS já resolvido. -->
   <link rel="dns-prefetch" href="https://load.sst.anhanga.tur.br">
-  <link rel="preconnect" href="https://sst.anhanga.tur.br" crossorigin>
   <link rel="dns-prefetch" href="https://sst.anhanga.tur.br">
 
   <!-- Fonts -->
@@ -158,15 +159,25 @@
         window.addEventListener(eventName, triggerAnalytics, { passive: true, once: true });
       });
 
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(function () { setTimeout(triggerAnalytics, 12000); }, { timeout: 25000 });
+      // Fallback para sessões sem interação: dispara no primeiro tempo ocioso após o load.
+      // ANTES havia um atraso fixo de ~12s. Em testes de laboratório (Lighthouse/PageSpeed com
+      // throttling simulado) esse atraso empurrava a atividade dos scripts de terceiros para
+      // DENTRO da janela de medição, fixando TTI/TBT em ~12s (issue #1259). O LCP é o hero
+      // pré-renderizado, já pintado bem antes disso, então adiar só até o primeiro ocioso
+      // pós-load protege o LCP/TBT reais, encurta a janela do lab e ainda cobre analytics de
+      // quem não interage (na prática, captura MAIS sessões que dão bounce antes dos 12s).
+      var scheduleFallback = function () {
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(triggerAnalytics, { timeout: 4000 });
+        } else {
+          setTimeout(triggerAnalytics, 4000);
+        }
+      };
+      if (document.readyState === 'complete') {
+        scheduleFallback();
       } else {
-        setTimeout(triggerAnalytics, 15000);
+        window.addEventListener('load', scheduleFallback, { once: true });
       }
-
-      window.addEventListener('load', function () {
-        setTimeout(triggerAnalytics, 12000);
-      }, { once: true });
 
       window.addEventListener('anhanga:marketing-consent', function () {
         _consentChoice = 'marketing';
