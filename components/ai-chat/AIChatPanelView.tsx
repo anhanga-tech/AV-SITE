@@ -7,7 +7,7 @@ import {
   User,
   X,
 } from '@phosphor-icons/react';
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown, { type Components } from 'react-markdown';
 import { ChatLeadForm } from '../ChatLeadForm';
 import { PassportStamp } from '../ui/PassportStamp';
 import type { useLeadCapture } from '../../hooks/useLeadCapture';
@@ -87,6 +87,48 @@ const FormattedText = memo(({ text }: { text: string }) => {
 });
 
 FormattedText.displayName = 'FormattedText';
+
+// Hoisted to a module constant so the `components` object keeps a stable identity
+// across renders — a fresh object on every render would defeat ModelMessageBody's memo.
+const MARKDOWN_COMPONENTS: Components = {
+  a: ({ href, children, ...props }) => {
+    if (!href) return <span>{children}</span>;
+    // Internal SPA links stay in-tab; external (allowlisted) links open in a new
+    // tab to preserve chat state.
+    const isInternal = href.startsWith('/') && !href.startsWith('//');
+    return (
+      <a
+        href={href}
+        rel="noopener noreferrer"
+        target={isInternal ? undefined : '_blank'}
+        {...props}
+      >
+        {children}
+      </a>
+    );
+  },
+};
+
+/**
+ * Model message body, memoized on its (immutable) `text`.
+ *
+ * PERFORMANCE WIN: ReactMarkdown runs a full remark→rehype parse pipeline on
+ * every render. Because the composer's `input` state lives above this subtree,
+ * each keystroke re-rendered the whole message list and re-parsed the markdown
+ * of *every* prior model message — so typing lag grew linearly with the
+ * conversation length. Message text never changes once created, so memoizing on
+ * the `text` string reuses the parsed output and keeps keystrokes O(1)
+ * regardless of history size.
+ */
+const ModelMessageBody = memo(({ text }: { text: string }) => (
+  <div className="prose prose-sm max-w-none prose-p:text-zinc-700 prose-p:leading-relaxed prose-strong:text-zinc-900 prose-strong:font-bold prose-ul:text-zinc-700">
+    <ReactMarkdown urlTransform={sanitizeAiLinkUrl} components={MARKDOWN_COMPONENTS}>
+      {text}
+    </ReactMarkdown>
+  </div>
+));
+
+ModelMessageBody.displayName = 'ModelMessageBody';
 
 function ChatPanelHeader({ onClose }: Pick<AIChatPanelViewProps, 'onClose'>) {
   return (
@@ -199,31 +241,7 @@ function ChatMessageList({
                     : 'bg-white text-zinc-800 border border-zinc-100 rounded-2xl rounded-bl-sm'
                     }`}>
                     {msg.role === 'model' ? (
-                      <div className="prose prose-sm max-w-none prose-p:text-zinc-700 prose-p:leading-relaxed prose-strong:text-zinc-900 prose-strong:font-bold prose-ul:text-zinc-700">
-                        <ReactMarkdown
-                          urlTransform={sanitizeAiLinkUrl}
-                          components={{
-                            a: ({ href, children, ...props }) => {
-                              if (!href) return <span>{children}</span>;
-                              // Internal SPA links stay in-tab; external (allowlisted)
-                              // links open in a new tab to preserve chat state.
-                              const isInternal = href.startsWith('/') && !href.startsWith('//');
-                              return (
-                                <a
-                                  href={href}
-                                  rel="noopener noreferrer"
-                                  target={isInternal ? undefined : '_blank'}
-                                  {...props}
-                                >
-                                  {children}
-                                </a>
-                              );
-                            },
-                          }}
-                        >
-                          {msg.text}
-                        </ReactMarkdown>
-                      </div>
+                      <ModelMessageBody text={msg.text} />
                     ) : (
                       <div className="text-white font-medium leading-relaxed max-w-[300px] break-words">
                         <FormattedText text={msg.text} />
