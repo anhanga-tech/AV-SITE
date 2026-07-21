@@ -131,6 +131,19 @@ test('index.html difere terceiros sem atraso fixo de ~12s que fixa TTI no lab (i
   assert.match(indexHtml, /scheduleFallback/, 'fallback pós-load deve estar agendado');
 });
 
+test('index.html mantém teto absoluto de analytics independente do evento load', () => {
+  // Se o 'load' atrasar/travar (iframe, tiles do Leaflet em /lollapalooza), o fallback de
+  // analytics ainda precisa disparar para sessões sem interação. O backstop absoluto roda no
+  // parse do script (não gated no load) e é idempotente/limpo via analyticsLoaded.
+  assert.match(indexHtml, /absoluteFallbackTimer\s*=\s*setTimeout\(\s*triggerAnalytics\s*,\s*10000\s*\)/, 'backstop absoluto (10s) independente do load deve existir');
+  assert.match(indexHtml, /clearTimeout\(absoluteFallbackTimer\)/, 'backstop deve ser limpo quando o analytics carrega (idempotência)');
+
+  // A limpeza do timer deve ocorrer dentro de loadAnalytics, após marcar analyticsLoaded.
+  const loadAnalyticsMatch = indexHtml.match(/var loadAnalytics\s*=\s*function\s*\(\)\s*\{([\s\S]*?)\n\s{6}\};/);
+  assert.ok(loadAnalyticsMatch, 'loadAnalytics deve estar definida');
+  assert.match(loadAnalyticsMatch[1], /clearTimeout\(absoluteFallbackTimer\)/, 'clearTimeout deve estar dentro de loadAnalytics');
+});
+
 test('index.html não abre preconnect ocioso para os hosts sGTM (pré-conexão não usada)', () => {
   const headHtml = getHeadHtml(indexHtml);
   // Os hosts sGTM só são contatados quando o loader difere dispara (após o LCP). Um preconnect

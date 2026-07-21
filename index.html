@@ -140,9 +140,11 @@
         mt('send', 'pageview');
       };
 
+      var absoluteFallbackTimer = null;
       var loadAnalytics = function () {
         if (analyticsLoaded) return;
         analyticsLoaded = true;
+        if (absoluteFallbackTimer !== null) clearTimeout(absoluteFallbackTimer);
         loadGtm();
         loadMautic();
         if (!utmLoaded) {
@@ -178,6 +180,13 @@
       } else {
         window.addEventListener('load', scheduleFallback, { once: true });
       }
+      // Teto absoluto INDEPENDENTE do 'load': em rotas com iframe/tiles do Leaflet (ex.:
+      // /lollapalooza) o evento 'load' pode atrasar ou nunca disparar se um terceiro travar —
+      // sem este backstop, sessões sem interação lá deixariam de gerar analytics. É idempotente
+      // (loadAnalytics é guardado por analyticsLoaded), então no caminho normal o path ocioso
+      // pós-load já rodou antes dos 10s e este timer é limpo em loadAnalytics — não reintroduz
+      // o pinning de ~12s no lab, onde 'load' dispara cedo e o analytics carrega no primeiro ocioso.
+      absoluteFallbackTimer = setTimeout(triggerAnalytics, 10000);
 
       window.addEventListener('anhanga:marketing-consent', function () {
         _consentChoice = 'marketing';
