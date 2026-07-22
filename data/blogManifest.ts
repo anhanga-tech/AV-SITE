@@ -2,6 +2,90 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
+    "title": "Viagem Solo Depois dos 50: Por Que Cada Vez Mais Gente Está Viajando Sozinha",
+    "excerpt": "Viajar sozinho depois dos 50 deixou de ser exceção. Veja por que está crescendo, como fica a questão de segurança e companhia, e por que cruzeiro costuma ser o formato mais fácil para começar.",
+    "date": "2026-08-11",
+    "author": "felipe-william",
+    "category": "Melhor Idade",
+    "image": "https://media.anhanga.tur.br/images/blog/viagem-solo-depois-dos-50.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Melhor Idade",
+    "tags": [
+      "melhor-idade",
+      "viagem-solo",
+      "cruzeiros",
+      "planejamento",
+      "norwegian-cruise-line"
+    ],
+    "seoTitle": "Viagem Solo Depois dos 50: Como Funciona",
+    "seoDescription": "Viajar sozinho depois dos 50 está em alta. Veja por que é seguro, como encontrar companhia e por que cruzeiros são o formato ideal para começar.",
+    "faq": [
+      {
+        "question": "É seguro viajar sozinho depois dos 50 anos?",
+        "answer": "É, com os cuidados certos: hospedagem bem localizada, seguro-viagem adequado e compartilhar o itinerário com alguém de confiança. Cada vez mais viajantes dessa faixa etária optam por viajar sozinhos justamente pela liberdade de montar o roteiro do próprio jeito."
+      },
+      {
+        "question": "Por que cruzeiro é indicado para quem vai viajar sozinho pela primeira vez?",
+        "answer": "Porque resolve hospedagem, alimentação e deslocamento em um único pacote, e cria oportunidade de convívio social (mesas comunitárias, atividades em grupo) sem exigir que a pessoa organize isso sozinha em cada porto."
+      },
+      {
+        "question": "Viajar sozinho depois dos 50 significa viajar sem nenhum apoio?",
+        "answer": "Não necessariamente. É possível ter consultor fixo cuidando do roteiro do início ao fim mesmo numa viagem individual. A diferença de viajar em grupo fechado não é o suporte, é a liberdade de não seguir roteiro e ritmo de outras pessoas."
+      },
+      {
+        "question": "Cruzeiro sozinho tem taxa extra por ocupação individual?",
+        "answer": "Na maioria das companhias, sim: é a chamada taxa de ocupação single. Vale confirmar isso na cotação antes de fechar, porque varia bastante por companhia e por cabine."
+      }
+    ],
+    "slug": "viagem-solo-depois-dos-50",
+    "readingTime": "5 min de leitura"
+  },
+  {
+    "title": "Turismo para a Terceira Idade: o Guia Completo para Planejar Sem Sustos",
+    "excerpt": "Viajar depois dos 60 muda o que importa no planejamento: ritmo, segurança e o tipo certo de viagem. Veja como decidir sem cair em oferta genérica.",
+    "date": "2026-08-04",
+    "author": "felipe-william",
+    "category": "Melhor Idade",
+    "image": "https://media.anhanga.tur.br/images/blog/turismo-terceira-idade-guia-completo.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Melhor Idade",
+    "tags": [
+      "melhor-idade",
+      "terceira-idade",
+      "planejamento",
+      "turismo-senior",
+      "viagem-em-grupo"
+    ],
+    "seoTitle": "Turismo para Terceira Idade: Guia 2026",
+    "seoDescription": "Guia completo de turismo para a terceira idade: segurança, ritmo, tipos de viagem e como decidir entre excursão em grupo ou consultoria personalizada.",
+    "faq": [
+      {
+        "question": "Qual a diferença entre viajar em grupo com a Pastore e consultoria personalizada com a Anhangá?",
+        "answer": "Viagem em grupo com a Pastore Turismo segue roteiro e datas fixas, com acompanhamento especializado do início ao fim, ótima para quem quer socializar e não decidir cada detalhe. Consultoria personalizada com a Anhangá monta o roteiro do zero para o ritmo e as restrições específicas de quem vai viajar, em casal, família ou sozinho."
+      },
+      {
+        "question": "Viagem para terceira idade precisa de seguro-viagem diferente?",
+        "answer": "Precisa de atenção redobrada: a maioria dos seguros-padrão exclui ou limita cobertura para condições preexistentes. Vale confirmar isso antes de fechar qualquer pacote, não depois de embarcar."
+      },
+      {
+        "question": "Qual o ritmo ideal para um roteiro de viagem 60+?",
+        "answer": "Menos pontos por dia, com folga real entre atividades, não só menos caminhada. A recomendação prática é reservar pelo menos um dia sem compromisso a cada três ou quatro dias de roteiro."
+      },
+      {
+        "question": "A Anhangá vende viagens em grupo para a terceira idade?",
+        "answer": "Vende, através da parceria com a Pastore Turismo, maior empresa do Brasil especializada nisso, com mais de 33 anos de mercado. Para quem prefere roteiro individual, a Anhangá monta a viagem sob medida diretamente."
+      },
+      {
+        "question": "É seguro viajar sozinho depois dos 60?",
+        "answer": "É, com o planejamento certo: seguro-viagem adequado, hospedagem com fácil acesso a serviços, e um roteiro com ritmo realista. Cada vez mais viajantes 50+ e 60+ optam por viajar sozinhos, sobretudo em formatos como cruzeiro, que resolvem parte da logística."
+      }
+    ],
+    "slug": "turismo-terceira-idade-guia-completo",
+    "readingTime": "6 min de leitura"
+  },
+  {
     "title": "Roteiro Bonito MS em 5 Dias: O Que Vale e O Que Não Vale",
     "excerpt": "Bonito é o ecoturismo mais regulado do Brasil: preço tabelado, guia e vaga limitada. Roteiro de 5 dias, custos de 2026 e por que não é mais segredo.",
     "date": "2026-07-28",

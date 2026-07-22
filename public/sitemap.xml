@@ -114,6 +114,26 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.anhanga.tur.br/blog/viagem-solo-depois-dos-50/</loc>
+    <lastmod>2026-08-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/viagem-solo-depois-dos-50.jpg</image:loc>
+      <image:caption>Viagem Solo Depois dos 50: Por Que Cada Vez Mais Gente Está Viajando Sozinha</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.anhanga.tur.br/blog/turismo-terceira-idade-guia-completo/</loc>
+    <lastmod>2026-08-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/turismo-terceira-idade-guia-completo.jpg</image:loc>
+      <image:caption>Turismo para a Terceira Idade: o Guia Completo para Planejar Sem Sustos</image:caption>
+    </image:image>
+  </url>
+  <url>
     <loc>https://www.anhanga.tur.br/blog/roteiro-bonito-ms-5-dias/</loc>
     <lastmod>2026-07-28</lastmod>
     <changefreq>monthly</changefreq>
