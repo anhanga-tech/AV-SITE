@@ -136,7 +136,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "date": "2026-07-22",
     "author": "felipe-william",
     "category": "Destinos",
-    "image": "https://media.anhanga.tur.br/images/blog/quanto-custa-beto-carrero-world-2026.jpg",
+    "image": "https://media.anhanga.tur.br/images/blog/quanto-custa-beto-carrero-world-2026.webp",
     "featured": false,
     "showChatCTA": true,
     "chatCTADestination": "Beto Carrero",
