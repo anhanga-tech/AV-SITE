@@ -7,7 +7,7 @@ import { FAQPageSchema } from '../../components/schemas/FAQPageSchema';
 import { ServiceSchema } from '../../components/schemas/ServiceSchema';
 import { openContactModal } from '../../utils/contactForm';
 import { m } from 'framer-motion';
-import { ShieldCheck, Heart, Sparkles, Coffee } from 'lucide-react';
+import { ShieldCheck, Heart, Sparkles, Coffee, CheckCircle } from 'lucide-react';
 
 const MELHOR_IDADE_FAQ_ITEMS = [
   {
@@ -164,7 +164,13 @@ const MelhorIdadeLanding: React.FC = () => {
       {/* CONTENT RICH SECTION FOR GEO */}
       <section className="py-24 bg-brand-surface">
         <div className="container mx-auto px-6 max-w-4xl">
-          <h2 className="text-3xl md:text-5xl font-black text-brand-dark mb-12 text-center">Por que planejar sua viagem 50+ com a Anhangá?</h2>
+          <h2 className="text-3xl md:text-5xl font-black text-brand-dark mb-6 text-center">Por que planejar sua viagem 50+ com a Anhangá?</h2>
+          <div className="flex justify-center mb-12">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white border border-zinc-200 px-4 py-2 text-sm font-bold text-anhanga-dark">
+              <CheckCircle className="size-4 text-anhanga-blue" aria-hidden="true" />
+              Parceira Pastore Turismo
+            </span>
+          </div>
           
           <div className="prose prose-lg prose-brand max-w-none text-zinc-700 font-medium leading-[1.8]">
             <p>
