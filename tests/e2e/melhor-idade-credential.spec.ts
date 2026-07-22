@@ -18,7 +18,10 @@ test.describe('credencial Pastore na landing Melhor Idade', () => {
     await heading.scrollIntoViewIfNeeded();
     await expect(credential).toBeVisible();
     await expect(credential).toHaveCSS('box-shadow', 'none');
+    await expect(credential).toHaveCSS('background-color', 'rgb(255, 255, 255)');
     await expect(credential).toHaveCSS('border-top-style', 'solid');
+    await expect(credential).toHaveCSS('border-top-width', '1px');
+    await expect(credential.locator('svg')).toHaveAttribute('aria-hidden', 'true');
 
     const headingBox = await heading.boundingBox();
     const credentialBox = await credential.boundingBox();
@@ -26,6 +29,10 @@ test.describe('credencial Pastore na landing Melhor Idade', () => {
     expect(headingBox).not.toBeNull();
     expect(credentialBox).not.toBeNull();
     expect(paragraphBox).not.toBeNull();
+    const borderRadius = await credential.evaluate((element) =>
+      Number.parseFloat(getComputedStyle(element).borderTopLeftRadius),
+    );
+    expect(borderRadius).toBeGreaterThanOrEqual(credentialBox!.height / 2);
     expect(credentialBox!.y).toBeGreaterThanOrEqual(headingBox!.y + headingBox!.height);
     expect(paragraphBox!.y).toBeGreaterThanOrEqual(credentialBox!.y + credentialBox!.height);
 
