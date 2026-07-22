@@ -39,7 +39,7 @@ const BudgetField = memo(({
               <span>{'$'.repeat(selectedBudgetObj.level)}</span>
             </div>
           )}
-          <span className={`text-lg md:text-lg font-bold truncate transition-colors ${budget ? "text-zinc-800" : "text-zinc-300"}`}>
+          <span className={`text-lg md:text-lg font-bold truncate transition-colors ${budget ? "text-zinc-800" : "text-zinc-500"}`}>
             {budget || "Definir padrão"}
           </span>
         </div>
