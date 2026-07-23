@@ -354,7 +354,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Disney vs Beto Carrero: Qual Escolher para Crianças de 4 a 10 Anos?",
     "excerpt": "Disney ou Beto Carrero? A resposta depende da idade das crianças, do orçamento e de quanto a família está pronta para aproveitar. Comparação honesta com custos reais.",
     "date": "2026-07-04",
-    "dateModified": "2026-07-20",
+    "dateModified": "2026-07-23",
     "author": "felipe-william",
     "category": "Experiencias",
     "image": "https://media.anhanga.tur.br/images/blog/disney-ou-beto-carrero.jpg",
