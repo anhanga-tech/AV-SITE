@@ -100,6 +100,31 @@
       var gtmLoaded = false;
       var utmLoaded = false;
       var mauticLoaded = false;
+      var consentListeners = [];
+
+      var callConsentListener = function (callback, choice) {
+        try {
+          callback(choice);
+        } catch (error) {
+          console.error('Anhangá consent listener failed', error);
+        }
+      };
+
+      window.addAnhangaConsentListener = function (callback) {
+        if (typeof callback !== 'function') return;
+        consentListeners.push(callback);
+        callConsentListener(callback, _consentChoice);
+      };
+
+      var notifyConsentListeners = function (choice) {
+        consentListeners.slice().forEach(function (callback) {
+          callConsentListener(callback, choice);
+        });
+      };
+
+      window.dataLayer.push({
+        anhanga_marketing_consent: _consentChoice === 'marketing'
+      });
 
       var injectScript = function (src, options) {
         var script = document.createElement('script');
@@ -194,6 +219,11 @@
         if (typeof gtag === 'function') {
           gtag('consent', 'update', { ad_storage: 'granted', ad_personalization: 'granted', ad_user_data: 'granted' });
         }
+        notifyConsentListeners('marketing');
+        window.dataLayer.push({
+          event: 'marketing_consent_granted',
+          anhanga_marketing_consent: true
+        });
       }, { once: true });
 
       window.addEventListener('anhanga:revoke-consent', function () {
@@ -201,6 +231,10 @@
         if (typeof gtag === 'function') {
           gtag('consent', 'update', { ad_storage: 'denied', ad_personalization: 'denied', ad_user_data: 'denied' });
         }
+        notifyConsentListeners('essential');
+        window.dataLayer.push({
+          anhanga_marketing_consent: false
+        });
         window.location.reload();
       }, { once: true });
     })();
