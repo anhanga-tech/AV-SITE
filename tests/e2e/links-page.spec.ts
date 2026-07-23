@@ -13,7 +13,7 @@ test('renderiza a página /links com logo, botões e selos', async ({ page }) =>
     await page.goto('/links');
     await expect(page.getByRole('img', { name: 'Anhangá Viagens' })).toBeVisible();
     await expect(page.getByTestId('link-whatsapp')).toBeVisible();
-    await expect(page.getByText('Membro ABAV')).toBeVisible();
+    await expect(page.getByText(/Cadastur 37\.036\.732\/0001-41/)).toBeVisible();
     // Banner do quiz está desligado (banner.visible=false): o quiz vive como link na lista,
     // e o WhatsApp é o único amarelo na 1ª dobra. Ver data/linksPage.ts.
     await expect(page.getByTestId('links-banner')).toHaveCount(0);

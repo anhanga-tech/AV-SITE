@@ -16,11 +16,6 @@ export const TrustSeals: React.FC = () => {
                     Cadastur {CADASTUR}
                 </a>
                 <span aria-hidden="true">·</span>
-                <a href="https://abav.com.br/" target="_blank" rel="noopener noreferrer"
-                   className="underline underline-offset-2 hover:text-anhanga-yellow transition-colors">
-                    Membro ABAV
-                </a>
-                <span aria-hidden="true">·</span>
                 <span>Nota {rating} no Google</span>
             </div>
             <p className="mt-1 text-white/85">ANHANGA TURISMO LTDA</p>
