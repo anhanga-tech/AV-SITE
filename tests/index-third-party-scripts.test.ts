@@ -5,6 +5,8 @@ import path from 'node:path';
 
 const indexHtmlPath = path.resolve(process.cwd(), 'index.html');
 const indexHtml = fs.readFileSync(indexHtmlPath, 'utf8');
+const utmTrackingPath = path.resolve(process.cwd(), 'public/utm-tracking.js');
+const utmTrackingScript = fs.readFileSync(utmTrackingPath, 'utf8');
 const designSystemCssPath = path.resolve(process.cwd(), 'docs/design/brand-system', 'colors_and_type.css');
 assert.ok(fs.existsSync(designSystemCssPath), 'design system colors_and_type.css should exist at docs/design/brand-system');
 
@@ -51,6 +53,19 @@ test('index.html lazy-loads GTM through the deferred analytics loader', () => {
   assert.ok(loadGtmIndex > -1, 'GTM loader should be called from the analytics trigger');
   assert.ok(utmInjectIndex > -1, 'UTM tracking loader should still be present');
   assert.ok(loadGtmIndex < utmInjectIndex, 'GTM should be queued before UTM reads GA client data');
+});
+
+test('index.html keeps the global gtag wrapper used by the deferred UTM tracker', () => {
+  assert.match(
+    indexHtml,
+    /function\s+gtag\s*\(\)\s*\{\s*dataLayer\.push\(arguments\);\s*\}/,
+    'the UTM tracker needs a global gtag wrapper to query the GA4 client_id',
+  );
+  assert.match(
+    utmTrackingScript,
+    /gtag\(\s*['"]get['"]\s*,\s*GA4_MEASUREMENT_ID\s*,\s*['"]client_id['"]/,
+    'the deferred UTM tracker should continue querying the GA4 client_id through gtag',
+  );
 });
 
 test('index.html loads only the required Poppins font weights', () => {
