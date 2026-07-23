@@ -225,7 +225,7 @@ Keep the project root minimal — only `README.md`, `CLAUDE.md`, and code/toolin
 | `docs/ops/` | Deploy, troubleshooting, GitHub workflows, agents, security policy, Cloudflare rules |
 | `docs/design/` | Brand-system assets (`brand-system/`) + pointers to the canonical design system, which lives at root: `DESIGN.md` + `.impeccable/design.json` |
 | `docs/product/` | Product strategy and positioning |
-| `docs/seo/` | SEO plans, action plans, backlink strategy |
+| `docs/seo/` | SEO plans, action plans, backlink strategy — **entirely gitignored** (repo is public; see Rules below) |
 | `docs/marketing/` | Brand profile, content calendars, brand reviews |
 | `docs/compliance/` | LGPD/RIPD and data-deletion documentation |
 | `docs/baselines/` | Point-in-time infrastructure/state snapshots |
@@ -234,6 +234,7 @@ Keep the project root minimal — only `README.md`, `CLAUDE.md`, and code/toolin
 **Rules for new documentation:**
 - New strategy/audit/planning docs go into the matching `docs/<domain>/` subfolder — never the root.
 - Reports and briefs containing sensitive business data (ad account IDs, spend figures, competitive intelligence, active campaign strategy) stay **local only** — add the filename pattern to `.gitignore` instead of committing.
+- `docs/seo/` specifically is **entirely local-only** (`.gitignore`'d as a whole directory, not file-by-file) — the repo is public, and SEO/GEO strategy content (competitor traffic and backlink data, outreach drafts with real contacts, content priorities) is exactly the kind of thing not to expose there. Write new SEO docs into `docs/seo/` as usual (it's a normal working directory locally), just don't expect `git add` to track them — that's intentional.
 - When a doc is superseded (new audit, new plan version), delete the old one rather than letting both linger — `git log` preserves history if needed.
 - If a moved/renamed doc is referenced elsewhere (other docs, tests, scripts), update those references in the same change.
 
