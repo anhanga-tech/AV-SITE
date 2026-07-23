@@ -131,6 +131,51 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "8 min de leitura"
   },
   {
+    "title": "Como Saber se uma Agência de Viagens é Confiável (Cadastur e CNPJ)",
+    "excerpt": "Cadastur, CNPJ, avaliações reais: veja os sinais concretos para checar antes de fechar pacote com uma agência de viagens, sem depender só do feed do Instagram.",
+    "date": "2026-07-22",
+    "dateModified": "2026-07-23",
+    "author": "felipe-william",
+    "category": "Planejamento",
+    "image": "https://media.anhanga.tur.br/images/blog/agencia-de-viagens-confiavel-cadastur.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Consultoria de Viagem",
+    "tags": [
+      "agencias-de-viagens",
+      "confianca",
+      "cadastur",
+      "dicas",
+      "seguranca"
+    ],
+    "seoTitle": "Agência de Viagens Confiável: Como Saber",
+    "seoDescription": "Veja como consultar o Cadastur, conferir o CNPJ e identificar sinais reais de confiança antes de contratar uma agência de viagens para sua próxima viagem.",
+    "faq": [
+      {
+        "question": "O que é o Cadastur?",
+        "answer": "É o cadastro obrigatório do Ministério do Turismo para quem presta serviço turístico no Brasil, incluindo agências de viagens, guias e meios de hospedagem. Sem ele, a empresa não está regularizada para operar como agência."
+      },
+      {
+        "question": "Como eu confirmo se uma agência de viagens tem Cadastur?",
+        "answer": "Acesse cadastur.turismo.gov.br, use a Consulta Pública e busque pelo CNPJ ou nome da empresa. Confira se o status aparece como ativo na categoria Agência de Viagens."
+      },
+      {
+        "question": "Quais agências de viagens são confiáveis?",
+        "answer": "Não existe uma lista fechada de agências confiáveis. O caminho é verificar critérios concretos: Cadastur ativo, CNPJ regular, avaliações reais no Google (não só no site da própria empresa) e forma de pagamento rastreável, em vez de confiar apenas na indicação de terceiros."
+      },
+      {
+        "question": "Uma agência sem loja física pode ser confiável?",
+        "answer": "Sim. Muitas agências sérias operam em formato home office ou totalmente remoto. O que importa não é ter vitrine na rua, mas ter CNPJ ativo, Cadastur regular e um histórico de atendimento que dá pra checar."
+      },
+      {
+        "question": "Que documentos uma agência de viagens confiável deve emitir?",
+        "answer": "Contrato ou voucher com CNPJ, confirmação de reserva com o fornecedor (companhia aérea, hotel ou operadora) e nota fiscal ou recibo. Combinar tudo só por Pix pessoal, sem nenhum desses documentos, é sinal de alerta."
+      }
+    ],
+    "slug": "agencia-de-viagens-confiavel-cadastur",
+    "readingTime": "5 min de leitura"
+  },
+  {
     "title": "Beto Carrero World 2026: Quantos Dias, Quanto Custa e Vale a Pena?",
     "excerpt": "Ingresso a partir de R$ 129,90, 2 dias inteiros de parque e onde ficar hospedado. Respostas diretas de quem é agente credenciado do parque.",
     "date": "2026-07-22",
