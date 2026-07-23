@@ -75,17 +75,17 @@ test('design system documents the production Poppins font weights', () => {
   assert.match(designSystemCss, /Poppins is loaded with 400\/600\/700\/900 only/);
 });
 
-test('index.html configura gtag consent defaults antes da IIFE de scripts lazy', () => {
-  const consentBlockIndex = indexHtml.indexOf("gtag('consent', 'default'");
-  const iifeIndex = indexHtml.indexOf('var analyticsLoaded');
-
-  assert.ok(consentBlockIndex > -1, 'bloco gtag consent default deve existir');
-  assert.ok(iifeIndex > -1, 'IIFE de scripts lazy deve existir');
-  assert.ok(consentBlockIndex < iifeIndex, 'consent default deve vir antes da IIFE');
-
-  assert.match(indexHtml, /analytics_storage:\s*'granted'/, 'analytics_storage deve ser granted por padrão (legítimo interesse)');
-  assert.match(indexHtml, /ad_storage:.*'denied'/, 'ad_storage deve ser denied por padrão');
-  assert.match(indexHtml, /wait_for_update:\s*2000/, 'wait_for_update deve ser 2000ms');
+test('index.html delega os defaults de consentimento ao Consent Bridge do GTM', () => {
+  // O template Anhangá Consent Bridge roda em Consent Initialization e usa
+  // setDefaultConsentState. Manter também um gtag('consent', 'default') inline
+  // cria dois defaults e permite que a sincronização da escolha persistida seja
+  // processada antes do segundo, gerando update-before-default no Tag Assistant.
+  // Os updates também pertencem ao Bridge para não duplicar transições.
+  assert.doesNotMatch(
+    indexHtml,
+    /gtag\(\s*['"]consent['"]/,
+    'o Consent Bridge deve ser a única fonte dos comandos de consentimento',
+  );
 });
 
 test('loadGtm tem gate de host para não poluir o GA4 de produção em dev/CI', () => {
