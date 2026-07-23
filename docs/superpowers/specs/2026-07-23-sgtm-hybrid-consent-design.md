@@ -2,7 +2,7 @@
 
 - **Data:** 2026-07-23
 - **Issue:** [#1261](https://github.com/felipewilliam2/AV-SITE/issues/1261)
-- **Status:** Proposta consolidada — aguardando revisão do usuário
+- **Status:** Revisão técnica proposta — aguardando nova aprovação do usuário
 - **Containers:** web e server identificados somente no inventário operacional local
 - **Premissa de consentimento vigente no projeto:** analytics por legítimo
   interesse; publicidade e marketing condicionados a consentimento. Esta
@@ -121,7 +121,8 @@ Ausência de `x-ga-gcs`, valor inválido ou qualquer estado que não conceda
 ```text
 setConsent('marketing')
   → evento DOM anhanga:marketing-consent
-  → gtag consent update (granted)
+  → notifica a ponte de consentimento registrada pelo GTM
+  → template GTM chama updateConsentState(granted)
   → dataLayer.push({ event: 'marketing_consent_granted' })
 
 Web GTM
@@ -139,6 +140,12 @@ O evento explícito no `dataLayer` permite iniciar os pixels na mesma página em
 que o usuário aceita. Sem ele, tags bloqueadas em DOM Ready/All Pages poderiam
 esperar até o próximo reload.
 
+O evento só é empurrado depois que os callbacks da ponte foram notificados. A
+ponte usa `updateConsentState`, não uma tag Custom HTML nem apenas
+`gtag('consent', 'update')`. A API do GTM garante que a atualização seja
+processada antes dos itens já enfileirados no `dataLayer`; `gtag` isoladamente
+não oferece essa garantia para o evento seguinte.
+
 ### 5.3 Deduplicação e sobreposição
 
 - Meta browser e Meta server continuam recebendo o mesmo `event_id` gerado pelo
@@ -152,43 +159,110 @@ esperar até o próximo reload.
 
 ### 6.1 `index.html`
 
-No listener existente de `anhanga:marketing-consent`, após o `gtag('consent',
-'update', ...)`, adicionar:
+Adicionar uma API de assinatura restrita a callbacks — sem expor função pública
+capaz de conceder consentimento:
 
 ```js
-window.dataLayer.push({ event: 'marketing_consent_granted' });
+var consentListeners = [];
+window.addAnhangaConsentListener = function (callback) {
+  if (typeof callback !== 'function') return;
+  consentListeners.push(callback);
+  callback(_consentChoice);
+};
 ```
 
-O push ocorre uma vez por aceite na sessão. O listener já usa `{ once: true }`.
-Revogação continua atualizando o Consent Mode para denied e recarregando a
-página.
+No listener existente de `anhanga:marketing-consent`:
+
+1. manter o `gtag('consent', 'update', ...)` para compatibilidade com a
+   integração atual;
+2. notificar cada callback com `marketing`;
+3. somente depois empurrar:
+
+```js
+window.dataLayer.push({
+  event: 'marketing_consent_granted',
+  anhanga_marketing_consent: true
+});
+```
+
+Na inicialização da IIFE, empurrar
+`anhanga_marketing_consent: _consentChoice === 'marketing'` para que as tags
+tenham o valor persistido também em visitas posteriores. Na revogação, notificar
+os callbacks com `essential`, empurrar o valor `false`, manter o update para
+`denied` e então recarregar a página.
+
+O evento de aceite ocorre uma vez por sessão. O listener DOM já usa
+`{ once: true }`; a ponte aceita vários assinantes para não acoplar o site a uma
+única tag.
 
 ### 6.2 Testes
 
 `tests/index-third-party-scripts.test.ts` deve verificar:
 
+- presença de `addAnhangaConsentListener`;
+- callback imediato com o estado persistido;
+- notificação dos callbacks antes de `marketing_consent_granted`;
 - presença de `marketing_consent_granted`;
-- ordem: consent update antes do push;
+- payload `anhanga_marketing_consent: true`;
 - listener continua registrado com `{ once: true }`;
-- revogação continua fail-closed com reload.
+- revogação notifica `essential`, registra `false` e continua fail-closed com
+  reload.
 
 Não será adicionado SDK Meta/TikTok ao bundle da aplicação.
 
+### 6.3 `docs/compliance/ripd-legitimo-interesse.md`
+
+Corrigir somente as afirmações factualmente incompatíveis com a arquitetura
+híbrida:
+
+- click IDs continuam first-party e só são repassados às plataformas após
+  consentimento de marketing;
+- conversões são enviadas server-side, mas Meta/TikTok também podem carregar
+  pixels no browser depois do opt-in;
+- antes do consentimento e após recusa não há cookie, script ou beacon desses
+  fornecedores.
+
+A base legal e o balancing test não serão reescritos nesta issue. A correção
+remove afirmações absolutas como “sem pixel JS de terceiros no browser”, que já
+não descrevem a configuração real.
+
 ## 7. Mudanças no container web
 
-### 7.1 Variável de consentimento
+### 7.1 Template `Anhangá Consent Bridge`
 
-Criar uma variável de estado de consentimento para `ad_storage` e uma variável
-booleana `Marketing Consent Granted`:
+Criar um template sandboxed do GTM que:
 
-- `granted` → `true`;
-- qualquer outro valor, inclusive ausente → `false`.
+- usa `callInWindow('addAnhangaConsentListener', callback)` para assinar a API
+  do site;
+- transforma `marketing` em `granted` para `ad_storage`, `ad_user_data` e
+  `ad_personalization`;
+- transforma qualquer outro valor, inclusive ausente, em `denied`;
+- mantém `analytics_storage: granted`;
+- aplica a mudança com `updateConsentState`;
+- possui permissão de escrita somente para esses quatro consent types e permissão
+  de chamada somente para `addAnhangaConsentListener`.
 
-Como o site atualiza `ad_storage`, `ad_user_data` e `ad_personalization` em
-conjunto, `ad_storage` é o sinal canônico do gate. As tags também terão consent
-checks adicionais para os três tipos.
+Criar uma tag a partir desse template e dispará-la em **Consent Initialization —
+All Pages**. O callback imediato do site sincroniza a escolha persistida; os
+callbacks posteriores tratam o aceite e aplicam a revogação antes do reload
+controlado.
 
-### 7.2 Meta PageView
+Não usar Custom HTML para escrever consentimento.
+
+### 7.2 Variável de consentimento
+
+Criar uma variável Data Layer v2 `DLV - anhanga_marketing_consent`, com nome
+`anhanga_marketing_consent` e default `false`. Usá-la no campo
+`Consent Granted (GDPR)` da tag Meta:
+
+- `true` somente após escolha `marketing`;
+- `false` para ausência, recusa ou revogação.
+
+Os consent checks adicionais do GTM continuam sendo o gate autoritativo. A
+variável existe porque o template Meta também possui o campo próprio
+`Consent Granted (GDPR)`.
+
+### 7.3 Meta PageView
 
 Reutilizar a tag pausada `Meta - PageView` (`51`) em vez de criar uma terceira
 tag Meta:
@@ -200,15 +274,15 @@ tag Meta:
 - firing option: uma vez por página;
 - consent checks: `ad_storage`, `ad_user_data`, `ad_personalization`.
 
-### 7.3 Meta Lead
+### 7.4 Meta Lead
 
 Na tag dinâmica Meta (`50`):
 
 - remover o trigger DOM Ready;
 - manter somente os eventos de conversão já mapeados, incluindo
   `generate_lead → Lead`;
-- trocar `Consent Granted (GDPR) = True` pela variável
-  `Marketing Consent Granted`;
+- trocar `Consent Granted (GDPR) = True` por
+  `DLV - anhanga_marketing_consent`;
 - exigir `ad_storage`, `ad_user_data` e `ad_personalization`;
 - desmarcar **Opt in to a Meta-enabled Conversions API integration**;
 - manter o mesmo Pixel ID e a mesma variável de `event_id`;
@@ -218,7 +292,7 @@ Desmarcar a integração remove a justificativa para o
 `capiParamBuilder.bundle.js`; a ausência do bundle deve ser confirmada no
 Preview antes de publicação.
 
-### 7.4 TikTok PageView
+### 7.5 TikTok PageView
 
 Na tag HTML TikTok (`5`):
 
@@ -232,6 +306,14 @@ Na tag HTML TikTok (`5`):
 
 O HTML não será reescrito para implementar um consent manager paralelo. O GTM é
 o único gate.
+
+### 7.6 Consent Overview
+
+Habilitar o Consent Overview do container e confirmar:
+
+- Meta e TikTok exigem `ad_storage`, `ad_user_data` e `ad_personalization`;
+- Google/GA4 continuam usando os checks nativos, sem bloqueio adicional;
+- nenhuma tag de marketing permanece em **Consent Not Configured**.
 
 ## 8. Mudanças no container server
 
@@ -308,11 +390,13 @@ Em uma sessão limpa:
 ### 9.3 Preview — aceite
 
 1. em sessão limpa, clicar em Aceitar;
-2. confirmar `marketing_consent_granted`;
-3. confirmar carga imediata de Meta/TikTok sem reload;
-4. confirmar `x-ga-gcs = G111`;
-5. confirmar ausência permanente do `capiParamBuilder`;
-6. confirmar um único PageView por plataforma e por página.
+2. confirmar que `Anhangá Consent Bridge` chama `updateConsentState`;
+3. confirmar que o estado concedido é aplicado antes de
+   `marketing_consent_granted`;
+4. confirmar carga imediata de Meta/TikTok sem reload;
+5. confirmar `x-ga-gcs = G111`;
+6. confirmar ausência permanente do `capiParamBuilder`;
+7. confirmar um único PageView por plataforma e por página.
 
 ### 9.4 Conversão
 
@@ -388,3 +472,17 @@ não serão publicados na mesma ação.
   três rotas da issue.
 - As versões podem ser revertidas independentemente sem reabrir o furo de
   consentimento.
+
+## 14. Referências técnicas
+
+- [Google — The data layer](https://developers.google.com/tag-platform/tag-manager/datalayer):
+  ordem de processamento e garantia das Consent APIs.
+- [Google — Create a consent mode template](https://developers.google.com/tag-platform/tag-manager/templates/consent-apis):
+  `updateConsentState`, listener e permissões do template.
+- [Google — Tag Manager consent mode support](https://support.google.com/tagmanager/answer/10718549):
+  Consent Initialization, consent checks adicionais e Consent Overview.
+- [Google — Server-side internal parameters](https://developers.google.com/tag-platform/tag-manager/server-side/internal-parameters):
+  propagação de `x-ga-gcs`.
+- [TikTok — Events API](https://ads.tiktok.com/help/article/events-api):
+  envio server-side e deduplicação quando o mesmo evento existir nos dois
+  canais.
