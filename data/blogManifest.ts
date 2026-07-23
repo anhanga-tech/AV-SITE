@@ -131,6 +131,51 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "8 min de leitura"
   },
   {
+    "title": "Onde Fica o Beto Carrero World e Como Chegar de Qualquer Lugar do Brasil",
+    "excerpt": "O parque fica em Penha, Santa Catarina — mas de onde você sai muda o aeroporto, o tempo de viagem e a melhor forma de chegar. Guia direto por região do Brasil.",
+    "date": "2026-07-26",
+    "author": "felipe-william",
+    "category": "Destinos",
+    "image": "https://media.anhanga.tur.br/images/blog/onde-fica-beto-carrero-como-chegar.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Beto Carrero",
+    "tags": [
+      "beto-carrero",
+      "penha",
+      "santa-catarina",
+      "como-chegar",
+      "planejamento",
+      "logistica-viagem"
+    ],
+    "seoTitle": "Onde Fica o Beto Carrero e Como Chegar",
+    "seoDescription": "Beto Carrero World fica em Penha, SC. Veja o aeroporto mais próximo, como chegar de avião, carro ou ônibus partindo de qualquer região do Brasil.",
+    "faq": [
+      {
+        "question": "Onde fica o Beto Carrero World?",
+        "answer": "Em Penha, no litoral norte de Santa Catarina, a cerca de 40 a 50 minutos de Balneário Camboriú e 15 km de Navegantes."
+      },
+      {
+        "question": "Qual o aeroporto mais próximo do Beto Carrero World?",
+        "answer": "Navegantes (NVT), a cerca de 15 km do parque e com voos diretos de várias capitais brasileiras. Florianópolis (FLN) fica mais longe e só compensa se o voo sair bem mais barato."
+      },
+      {
+        "question": "Como chegar ao Beto Carrero de avião partindo de outras regiões do Brasil?",
+        "answer": "A maioria das capitais do Sudeste, Sul e Centro-Oeste tem voo direto ou com uma conexão para Navegantes. De regiões mais distantes (Norte e parte do Nordeste), geralmente é necessária uma conexão em São Paulo ou no Rio antes de seguir para NVT."
+      },
+      {
+        "question": "Dá para ir ao Beto Carrero de carro ou ônibus?",
+        "answer": "Dá, especialmente para quem sai do Sul e Sudeste — o acesso é pela BR-101. Quem prefere ônibus encontra linhas regulares até Balneário Camboriú ou Itajaí, com deslocamento final até Penha."
+      },
+      {
+        "question": "Vale a pena contratar transfer ou é melhor ir por conta própria?",
+        "answer": "Para quem vem de outra região do Brasil, fechar o transfer junto com o pacote costuma sair mais simples e não muito mais caro do que organizar transporte avulso — principalmente porque evita depender de aluguel de carro ou app de transporte numa cidade pequena."
+      }
+    ],
+    "slug": "onde-fica-beto-carrero-como-chegar",
+    "readingTime": "5 min de leitura"
+  },
+  {
     "title": "Como Saber se uma Agência de Viagens é Confiável (Cadastur e CNPJ)",
     "excerpt": "Cadastur, CNPJ, avaliações reais: veja os sinais concretos para checar antes de fechar pacote com uma agência de viagens, sem depender só do feed do Instagram.",
     "date": "2026-07-22",
@@ -179,6 +224,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Beto Carrero World 2026: Quantos Dias, Quanto Custa e Vale a Pena?",
     "excerpt": "Ingresso a partir de R$ 129,90, 2 dias inteiros de parque e onde ficar hospedado. Respostas diretas de quem é agente credenciado do parque.",
     "date": "2026-07-22",
+    "dateModified": "2026-07-23",
     "author": "felipe-william",
     "category": "Destinos",
     "image": "https://media.anhanga.tur.br/images/blog/quanto-custa-beto-carrero-world-2026.webp",
