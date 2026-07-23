@@ -75,7 +75,7 @@ const OrlandoLanding: React.FC = () => {
       <LandingFAQ items={ORLANDO_FAQ_ITEMS} />
       <section className="bg-brand-surface border-t border-brand-cyan/10 py-14">
         <div className="container mx-auto px-6 max-w-5xl">
-          <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Pacote para Orlando sem improviso</h2>
+          <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Pacotes para Orlando sem improviso</h2>
           <p className="text-zinc-700 text-lg leading-relaxed mb-5">
             Se você busca <strong>pacotes para Orlando</strong> com planejamento profissional, a Anhangá estrutura sua viagem com foco em custo-benefício, logística e experiência.
           </p>
