@@ -31,10 +31,25 @@ function pushContactDataLayerEvent(
     eventId: string,
     action: 'whatsapp' | 'callback',
     source?: string,
+    tracking?: LeadTracking,
+    utms?: SubmitContactRequest['utms'],
+    destination?: string,
 ): void {
     if (typeof window === 'undefined' || !window.dataLayer) return;
 
-    // 1. Internal contact event
+    // 1. Canonical conversion event consumed by GTM web and sGTM.
+    window.dataLayer.push({
+        event: 'generate_lead',
+        event_id: eventId,
+        destination: destination ?? action,
+        utm_source: utms?.utm_source,
+        utm_medium: utms?.utm_medium,
+        utm_campaign: utms?.utm_campaign,
+        ga_client_id: tracking?.cid,
+        ga_session_id: tracking?.sid,
+    });
+
+    // 2. Internal contact event
     window.dataLayer.push({
         event: 'contact_form_submission',
         event_id: eventId,
@@ -43,7 +58,7 @@ function pushContactDataLayerEvent(
         page_location: window.location.href,
     });
 
-    // 2. Unified form submission event for GA4/Ads
+    // 3. Unified form submission event for GA4/Ads
     window.dataLayer.push({
         event: 'form_submission',
         form_type: 'contact_modal',
@@ -209,7 +224,14 @@ export function useContactForm(options: ContactModalOptions = {}) {
                     return;
                 }
 
-                pushContactDataLayerEvent(eventId, action, options.source);
+                pushContactDataLayerEvent(
+                    eventId,
+                    action,
+                    options.source,
+                    tracking,
+                    utms,
+                    options.destination,
+                );
                 pushFormAnalyticsEvent({
                     event: 'submit_success',
                     formType: 'contact_modal',
