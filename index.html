@@ -81,15 +81,8 @@
   <script>window.dataLayer = window.dataLayer || [];</script>
   <script>
     window.dataLayer = window.dataLayer || [];
+    // Required by the deferred UTM tracker to query the GA4 client_id.
     function gtag() { dataLayer.push(arguments); }
-    var _consentInit = (function () { try { return localStorage.getItem('anhanga_cookie_consent'); } catch (e) { return null; } })();
-    gtag('consent', 'default', {
-      analytics_storage: 'granted',
-      ad_storage: _consentInit === 'marketing' ? 'granted' : 'denied',
-      ad_personalization: _consentInit === 'marketing' ? 'granted' : 'denied',
-      ad_user_data: _consentInit === 'marketing' ? 'granted' : 'denied',
-      wait_for_update: 2000
-    });
   </script>
   <script type="module" src="/index.tsx"></script>
   <!-- Defer third-party scripts to protect mobile TBT -->
@@ -216,9 +209,6 @@
       window.addEventListener('anhanga:marketing-consent', function () {
         _consentChoice = 'marketing';
         loadMautic();
-        if (typeof gtag === 'function') {
-          gtag('consent', 'update', { ad_storage: 'granted', ad_personalization: 'granted', ad_user_data: 'granted' });
-        }
         notifyConsentListeners('marketing');
         window.dataLayer.push({
           event: 'marketing_consent_granted',
@@ -228,9 +218,6 @@
 
       window.addEventListener('anhanga:revoke-consent', function () {
         _consentChoice = 'essential';
-        if (typeof gtag === 'function') {
-          gtag('consent', 'update', { ad_storage: 'denied', ad_personalization: 'denied', ad_user_data: 'denied' });
-        }
         notifyConsentListeners('essential');
         window.dataLayer.push({
           anhanga_marketing_consent: false

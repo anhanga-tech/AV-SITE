@@ -180,10 +180,9 @@ window.addAnhangaConsentListener = function (callback) {
 
 No listener existente de `anhanga:marketing-consent`:
 
-1. manter o `gtag('consent', 'update', ...)` para compatibilidade com a
-   integração atual;
-2. notificar cada callback com `marketing`;
-3. somente depois empurrar:
+1. notificar cada callback com `marketing`; o Consent Bridge é o único
+   responsável por chamar `updateConsentState`, evitando transições duplicadas;
+2. somente depois empurrar:
 
 ```js
 window.dataLayer.push({
