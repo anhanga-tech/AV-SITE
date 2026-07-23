@@ -57,5 +57,15 @@ brand-review-*.md
 brand-profile.json
 
 # SEO crawl exports / audit dumps (business data — local only)
-SEO/
+# Anchored to repo root — do not drop the leading slash, "SEO/" alone also
+# matches docs/seo/ on case-insensitive filesystems (macOS/Windows) and
+# silently hides that whole directory from git.
+/SEO/
+
+# SEO strategy/competitive docs (docs/seo/) — repo is public; content here
+# (competitor traffic/backlink data, outreach drafts with real contacts,
+# GEO/content priorities) stays local-only, never committed. Nothing in
+# this directory is provided by the repo itself (git never ships it, by
+# design) — whoever is doing SEO work populates it locally.
+docs/seo/
 .claude/settings.json

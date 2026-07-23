@@ -11,7 +11,6 @@ const POSITIONING_CONTENT_PATHS = [
   'components',
   'content/blog',
   'data/blogManifest.ts',
-  'docs/seo',
   'docs/standards',
   'index.html',
   'pages',
