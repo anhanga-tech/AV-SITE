@@ -2,7 +2,7 @@
 
 - **Data:** 2026-07-23
 - **Issue:** [#1261](https://github.com/felipewilliam2/AV-SITE/issues/1261)
-- **Status:** Revisão técnica proposta — aguardando nova aprovação do usuário
+- **Status:** Aprovado — plano de implementação pronto
 - **Containers:** web e server identificados somente no inventário operacional local
 - **Premissa de consentimento vigente no projeto:** analytics por legítimo
   interesse; publicidade e marketing condicionados a consentimento. Esta
@@ -133,7 +133,7 @@ Web GTM
 sGTM (x-ga-gcs = G111)
   ├─ GA4 continua normalmente
   ├─ generate_lead → Meta CAPI Lead
-  └─ generate_lead → TikTok Events API SubmitForm
+  └─ generate_lead → TikTok Events API Lead
 ```
 
 O evento explícito no `dataLayer` permite iniciar os pixels na mesma página em
@@ -150,9 +150,9 @@ não oferece essa garantia para o evento seguinte.
 
 - Meta browser e Meta server continuam recebendo o mesmo `event_id` gerado pelo
   pipeline GTM existente. A mudança de consentimento não altera essa origem.
-- TikTok browser envia PageView; TikTok server envia `SubmitForm`. Não há o mesmo
+- TikTok browser envia PageView; TikTok server envia `Lead`. Não há o mesmo
   evento nos dois canais nesta fase, portanto não há cópia para deduplicar.
-- A introdução futura de `SubmitForm` também no browser exigirá o mesmo
+- A introdução futura de `Lead` também no browser exigirá o mesmo
   `event_id` nos dois canais antes de ser publicada.
 
 ## 6. Mudança no repositório
@@ -164,10 +164,17 @@ capaz de conceder consentimento:
 
 ```js
 var consentListeners = [];
+var callConsentListener = function (callback, choice) {
+  try {
+    callback(choice);
+  } catch (error) {
+    console.error('Anhangá consent listener failed', error);
+  }
+};
 window.addAnhangaConsentListener = function (callback) {
   if (typeof callback !== 'function') return;
   consentListeners.push(callback);
-  callback(_consentChoice);
+  callConsentListener(callback, _consentChoice);
 };
 ```
 
@@ -354,7 +361,7 @@ Instalar a tag TikTok Events API da Stape no server container:
 - Pixel ID: o mesmo da conexão web atual;
 - Access Token: gerado no TikTok Events Manager e inserido diretamente no GTM;
 - evento de entrada: `generate_lead`;
-- evento TikTok: `SubmitForm`;
+- evento TikTok: `Lead` (nome atual recomendado; `SubmitForm` é legado);
 - trigger adicional: `x-ga-gcs matches RegEx ^G11[01]$`;
 - URL/referrer/IP/user-agent/`ttclid`: obtidos do event data suportado pela tag;
 - test event code: somente durante Preview e removido antes da versão publicada.
@@ -406,7 +413,7 @@ momento do teste. Com essa autorização:
 - usar identidade claramente marcada como teste;
 - confirmar `generate_lead` no web e server Preview;
 - Meta: Pixel e CAPI com o mesmo `event_id`;
-- TikTok: uma chamada Events API `SubmitForm`;
+- TikTok: uma chamada Events API `Lead`;
 - confirmar resposta de sucesso das duas APIs;
 - remover ou arquivar o registro de teste no Odoo pelo procedimento operacional
   aprovado pelo usuário.
@@ -453,7 +460,7 @@ não serão publicados na mesma ação.
   - deduplicação;
   - ausência de eventos sem consentimento;
 - TikTok Events Manager:
-  - `SubmitForm` server-side;
+  - `Lead` server-side;
   - ausência de duplicação;
 - GA4:
   - continuidade de pageviews e eventos;
@@ -466,7 +473,7 @@ não serão publicados na mesma ação.
 - `capiParamBuilder.bundle.js` não aparece em nenhuma condição.
 - Após aceite, Meta e TikTok carregam sem reload.
 - Meta Lead browser/server preserva o mesmo `event_id`.
-- TikTok recebe `SubmitForm` apenas server-side.
+- TikTok recebe `Lead` apenas server-side.
 - Nenhum token ou PII aparece no Git.
 - O JavaScript de terceiros do carregamento inicial cai de forma mensurável nas
   três rotas da issue.
