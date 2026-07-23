@@ -9,8 +9,9 @@
 | **Endereço** | Av. Dom Pedro I, 773, Vila Monumento, São Paulo-SP, CEP 01552-001 |
 | **Encarregado (DPO)** | Felipe William Rodrigues Silva |
 | **E-mail DPO** | privacidade@anhanga.tur.br |
-| **Versão** | 1.5 |
+| **Versão** | 1.6 |
 | **Data de elaboração** | 02/06/2026 |
+| **Última revisão** | 23/07/2026 |
 | **Próxima revisão** | 03/06/2027 |
 | **Status** | Rascunho — pendente de revisão jurídica e aprovação do DPO |
 
@@ -112,11 +113,11 @@ Sem essa análise, decisões de investimento em tráfego pago seriam baseadas em
 |---|---|
 | **Dados tratados** | Parâmetros UTM (`utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`), GA4 Client ID/Session ID; click IDs (`gclid`, `fbclid`, `msclkid`, `ttclid`) armazenados em cookie first-party `tracking_data` (30 dias) e `sessionStorage` |
 | **Titulares** | Visitantes do site que chegam via campanhas de mídia paga ou orgânica |
-| **Operadores** | Anhangá Turismo (armazenamento first-party); Stape OÜ/sGTM (repasse server-side de conversões ao Google Ads e Meta CAPI) |
+| **Operadores** | Anhangá Turismo (armazenamento first-party); Stape OÜ/sGTM (repasse de conversões ao Google Ads, Meta CAPI e TikTok Events API; destinos de marketing somente após consentimento) |
 | **Retenção** | 30 dias (cookie `tracking_data`); duração da sessão (`sessionStorage`) |
-| **Transferência internacional** | Click IDs são enviados ao Google Ads e Meta via sGTM Stape (EU) com hashing de dados pessoais e remoção de IP antes do repasse |
+| **Transferência internacional** | Click IDs permanecem first-party antes do consentimento. Após opt-in de marketing, sinais necessários podem ser enviados ao Google, Meta e TikTok pelo sGTM e pelos pixels consentidos, conforme a finalidade de atribuição/conversão. |
 
-> **Mudança arquitetural (v1.1):** Com o sGTM Stape, os click IDs (`gclid`, `fbclid`) não são mais transmitidos em chamadas browser-side para Google/Meta. O repasse de conversões ocorre server-side via **Enhanced Conversions** (Google) e **Conversions API / CAPI** (Meta), com dados pessoais hasheados (SHA-256) quando aplicável. Isso reduz materialmente o perfil de rastreamento no navegador do usuário.
+> **Arquitetura híbrida (issue #1261):** UTMs e click IDs são armazenados first-party para atribuição. GA4 continua via sGTM sob a premissa de legítimo interesse do projeto. Meta e TikTok permanecem bloqueados antes do consentimento e após recusa; depois do opt-in, os pixels podem medir PageView/Lead no navegador e as conversões server-side seguem por Meta CAPI e TikTok Events API.
 
 ### 3.2 Interesse legítimo identificado
 
@@ -143,8 +144,8 @@ Sem atribuição, é impossível saber se R$ 10.000 gastos em tráfego pago gera
 |---|---|
 | Natureza dos dados | Técnico/comportamental; não sensível; não identifica diretamente o indivíduo |
 | Expectativa razoável do titular | Usuários que clicam em anúncios pagos têm expectativa razoável de que o anunciante mede o resultado |
-| Impacto sobre o titular | Mínimo — dados não saem do navegador do usuário neste fluxo |
-| Salvaguardas | Cookie first-party; expiração 30 dias; opt-out via banner; nenhuma re-identificação |
+| Impacto sobre o titular | Antes do opt-in, os identificadores permanecem first-party e não há script/beacon Meta ou TikTok. Após consentimento, pixels e APIs recebem somente os sinais necessários às finalidades informadas. |
+| Salvaguardas | Cookie first-party; expiração de 30 dias; opt-in para marketing; gates no GTM web e server; nenhuma re-identificação fora das plataformas autorizadas. |
 
 **Conclusão:** Interesse legítimo prevalece com clareza. O impacto sobre o titular é mínimo e a expectativa de rastreamento de conversão é padrão em qualquer site comercial.
 
@@ -153,18 +154,19 @@ Sem atribuição, é impossível saber se R$ 10.000 gastos em tráfego pago gera
 | Risco | Probabilidade | Impacto | Mitigação |
 |---|---|---|---|
 | Acesso não autorizado ao cookie `tracking_data` | Baixa | Baixo | Dados não sensíveis; cookie first-party; sem credenciais ou PII direto |
-| Coleta de click IDs antes do consentimento (client-side) | Baixa (pós issue #782) | Baixo | `initializeTracking()` opera sob legítimo interesse (RIPD Atividade 2); repasse de conversões é integralmente server-side via Stape sGTM, sem cookie de terceiros no browser; titular pode exercer direito de oposição via `privacidade@anhanga.tur.br` |
+| Coleta de click IDs antes do consentimento (client-side) | Baixa (pós issues #782/#1261) | Baixo | `initializeTracking()` armazena atribuição first-party sob a premissa documentada de legítimo interesse; GTM web e sGTM bloqueiam Meta/TikTok até `ad_storage=granted`; titular pode exercer oposição via `privacidade@anhanga.tur.br` |
 | Hashing incorreto no sGTM (dados pessoais não hasheados) | Média (durante implantação) | Médio | Testes de validação obrigatórios; revisar payload das tags Enhanced Conversions e CAPI no sGTM |
 
 ### 3.6 Salvaguardas implementadas
 
 - [x] Cookie first-party com expiração de 30 dias
-- [x] Conversões enviadas server-side via sGTM Stape (EU) — sem pixel JS de terceiros no browser
-- [x] Dados pessoais hasheados (SHA-256) antes do repasse ao Google Ads e Meta CAPI
+- [x] Conversões enviadas server-side via sGTM Stape; pixels Meta/TikTok só carregam após opt-in de marketing
+- [x] Antes do consentimento e após recusa, Meta/TikTok não carregam script, criam cookie ou emitem beacon
+- [x] Dados pessoais usados para matching são hasheados (SHA-256) antes do repasse ao Google Ads e Meta CAPI; a TikTok Events API não recebe e-mail ou telefone nesta fase
 - [x] Opt-out disponível via banner (issue #782)
 - [x] DPA assinado com Stape OÜ
 - [x] **Implementado (issue #782):** `initializeTracking()` opera sob legítimo interesse; banner de cookies bloqueia Mautic e HubSpot; direito de oposição ao tratamento por interesse legítimo disponível via `privacidade@anhanga.tur.br` e documentado em `/politica-privacidade#cookies`
-- [ ] **Pendente:** validar hashing de e-mail/telefone nas tags Enhanced Conversions e CAPI no sGTM
+- [ ] **Pendente:** validar hashing de e-mail/telefone nas tags Enhanced Conversions e Meta CAPI no sGTM
 
 ---
 
@@ -340,6 +342,7 @@ O balancing test favorece o legítimo interesse nas Atividades 1, 2 e 3. A Ativi
 | 1.3 | 03/06/2026 | Atividade 4 adicionada (Customer Match — base legal consentimento Art. 7º, I); n8n GmbH removido como operador da Atividade 3 (self-hosted); tabela de pendências atualizada com itens 10-12; Política de Privacidade PR #803 registrado como pendência concluída (#9) |
 | 1.4 | 04/06/2026 | Pendência #10 concluída: e-mail de notificação LGPD enviado à base via Mautic (ID 24, 04/06/2026 10h00); janela de 15 dias iniciada; primeiro upload de customer match liberado a partir de 19/06/2026 |
 | 1.5 | 07/07/2026 | Auditoria do banner de cookies: nota sobre registro client-side do consentimento (risco aceito, §1); `<noscript>` do GTM removido do site (furava o Consent Mode para usuários sem JS) |
+| 1.6 | 23/07/2026 | Atividade 2 alinhada à arquitetura híbrida consent-gated: Meta/TikTok bloqueados antes do opt-in; destinos server-side e salvaguardas de matching atualizados; base legal e conclusão preservadas |
 
 ---
 

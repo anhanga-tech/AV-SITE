@@ -71,6 +71,84 @@ test.describe('Cookie Consent Banner (CMP)', () => {
     expect(() => new Date(meta.timestamp)).not.toThrow();
   });
 
+  test('ponte notifica aceite antes de enfileirar marketing_consent_granted', async ({ page }) => {
+    await page.goto('/');
+
+    await page.evaluate(() => {
+      type ConsentChoice = string | null;
+      type DataLayerEntry = { event?: string; anhanga_marketing_consent?: boolean };
+      type TestWindow = Window & {
+        dataLayer: DataLayerEntry[];
+        addAnhangaConsentListener: (callback: (choice: ConsentChoice) => void) => void;
+        __consentBridgeCalls: Array<{ choice: ConsentChoice; eventAlreadyQueued: boolean }>;
+        __consentBridgeErrors: Array<{ message: string; error: string }>;
+        __restoreConsentConsoleError: () => void;
+      };
+
+      const testWindow = window as unknown as TestWindow;
+      testWindow.__consentBridgeCalls = [];
+      testWindow.__consentBridgeErrors = [];
+      const originalConsoleError = console.error;
+      console.error = (message: unknown, error: unknown) => {
+        testWindow.__consentBridgeErrors.push({
+          message: String(message),
+          error: error instanceof Error ? error.message : String(error),
+        });
+      };
+      testWindow.__restoreConsentConsoleError = () => {
+        console.error = originalConsoleError;
+      };
+      testWindow.addAnhangaConsentListener((choice) => {
+        testWindow.__consentBridgeCalls.push({
+          choice,
+          eventAlreadyQueued: testWindow.dataLayer.some(
+            (entry) => entry.event === 'marketing_consent_granted'
+          ),
+        });
+      });
+
+      // Um assinante defeituoso não pode impedir o restante do fluxo.
+      testWindow.addAnhangaConsentListener(() => {
+        throw new Error('synthetic listener failure');
+      });
+    });
+
+    await page.getByRole('button', { name: 'Aceitar' }).click();
+
+    const result = await page.evaluate(() => {
+      type DataLayerEntry = { event?: string; anhanga_marketing_consent?: boolean };
+      type TestWindow = Window & {
+        dataLayer: DataLayerEntry[];
+        __consentBridgeCalls: Array<{ choice: string | null; eventAlreadyQueued: boolean }>;
+        __consentBridgeErrors: Array<{ message: string; error: string }>;
+        __restoreConsentConsoleError: () => void;
+      };
+      const testWindow = window as unknown as TestWindow;
+      const result = {
+        calls: testWindow.__consentBridgeCalls,
+        errors: testWindow.__consentBridgeErrors,
+        consentEvent: testWindow.dataLayer.find(
+          (entry) => entry.event === 'marketing_consent_granted'
+        ),
+      };
+      testWindow.__restoreConsentConsoleError();
+      return result;
+    });
+
+    expect(result.calls).toEqual([
+      { choice: null, eventAlreadyQueued: false },
+      { choice: 'marketing', eventAlreadyQueued: false },
+    ]);
+    expect(result.errors).toEqual([
+      { message: 'Anhangá consent listener failed', error: 'synthetic listener failure' },
+      { message: 'Anhangá consent listener failed', error: 'synthetic listener failure' },
+    ]);
+    expect(result.consentEvent).toEqual({
+      event: 'marketing_consent_granted',
+      anhanga_marketing_consent: true,
+    });
+  });
+
   // --- Recusar ---
 
   test('clicar "Recusar" fecha o banner e salva "essential" no localStorage', async ({ page }) => {

@@ -172,6 +172,45 @@ test('index.html tem listener anhanga:marketing-consent', () => {
   assert.match(indexHtml, /anhanga:marketing-consent/, 'listener de aceite deve estar presente');
 });
 
+test('index.html expõe ponte fail-closed para o template de consentimento do GTM', () => {
+  assert.match(indexHtml, /window\.addAnhangaConsentListener\s*=\s*function/);
+  assert.match(
+    indexHtml,
+    /callConsentListener\(callback,\s*_consentChoice\)/,
+    'assinante recebe imediatamente a escolha persistida com isolamento de falha'
+  );
+  assert.match(
+    indexHtml,
+    /anhanga_marketing_consent:\s*_consentChoice\s*===\s*'marketing'/,
+    'estado inicial deve ser publicado no dataLayer'
+  );
+});
+
+test('aceite notifica a ponte antes do evento marketing_consent_granted', () => {
+  const acceptStart = indexHtml.indexOf("window.addEventListener('anhanga:marketing-consent'");
+  const revokeStart = indexHtml.indexOf("window.addEventListener('anhanga:revoke-consent'");
+  const acceptBlock = indexHtml.slice(acceptStart, revokeStart);
+  const notifyIndex = acceptBlock.indexOf("notifyConsentListeners('marketing')");
+  const eventIndex = acceptBlock.indexOf("event: 'marketing_consent_granted'");
+
+  assert.ok(acceptStart > -1 && revokeStart > acceptStart);
+  assert.ok(notifyIndex > -1, 'aceite deve notificar os assinantes');
+  assert.ok(eventIndex > notifyIndex, 'updateConsentState deve ser solicitado antes do evento GTM');
+  assert.match(acceptBlock, /anhanga_marketing_consent:\s*true/);
+});
+
+test('revogação notifica denied antes do reload', () => {
+  const revokeStart = indexHtml.indexOf("window.addEventListener('anhanga:revoke-consent'");
+  const revokeBlock = indexHtml.slice(revokeStart);
+  const notifyIndex = revokeBlock.indexOf("notifyConsentListeners('essential')");
+  const deniedIndex = revokeBlock.indexOf('anhanga_marketing_consent: false');
+  const reloadIndex = revokeBlock.indexOf('window.location.reload()');
+
+  assert.ok(notifyIndex > -1);
+  assert.ok(deniedIndex > notifyIndex);
+  assert.ok(reloadIndex > deniedIndex);
+});
+
 test('index.html tem listener anhanga:revoke-consent com reload', () => {
   assert.match(indexHtml, /anhanga:revoke-consent/, 'listener de revogação deve estar presente');
   const revokeIdx = indexHtml.indexOf('anhanga:revoke-consent');
