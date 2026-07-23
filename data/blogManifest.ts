@@ -148,7 +148,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "dicas",
       "seguranca"
     ],
-    "seoTitle": "Agência de Viagens Confiável: Como Verificar",
+    "seoTitle": "Agência de Viagens Confiável: Como Saber",
     "seoDescription": "Veja como consultar o Cadastur, conferir o CNPJ e identificar sinais reais de confiança antes de contratar uma agência de viagens para sua próxima viagem.",
     "faq": [
       {
