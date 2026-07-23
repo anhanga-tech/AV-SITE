@@ -37,7 +37,7 @@ const TripTypeField = memo(({
           {selectedTripObj && (
             <selectedTripObj.icon className={`size-5 ${selectedTripObj.color}`} />
           )}
-          <span className={`text-lg md:text-lg font-bold truncate transition-colors ${tripType ? "text-zinc-800" : "text-zinc-300"}`}>
+          <span className={`text-lg md:text-lg font-bold truncate transition-colors ${tripType ? "text-zinc-800" : "text-zinc-500"}`}>
             {tripType || "Lazer, Lua de Mel..."}
           </span>
         </div>

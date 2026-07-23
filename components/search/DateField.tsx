@@ -45,7 +45,7 @@ const DateField = memo(({
         <Calendar className="size-3" /> Quando?
       </span>
       <div className="flex items-center justify-between">
-        <span className={`text-lg md:text-xl font-bold truncate transition-colors ${startDate ? "text-zinc-800" : "text-zinc-300"}`}>
+        <span className={`text-lg md:text-xl font-bold truncate transition-colors ${startDate ? "text-zinc-800" : "text-zinc-500"}`}>
           {startDate ? `${formatDateDisplay(startDate)} - ${endDate ? formatDateDisplay(endDate) : '...'}` : "Definir datas"}
         </span>
         <ChevronDown className={`size-4 text-zinc-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
