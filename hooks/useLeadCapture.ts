@@ -4,6 +4,7 @@ import { getTrackingDataObject, getWhatsAppLink } from '../utils/whatsapp';
 import type { LeadTracking, LeadUtms, SubmitLeadRequest } from '../types/leadCapture';
 import { cleanString, normalizeWhatsappNumber } from '../lib/lead-logic';
 import { extractUtms, normalizeLeadTracking } from '../lib/tracking-normalization';
+import { pushGenerateLeadConversionEvent } from '../utils/generate-lead-analytics';
 
 export interface LeadDraft {
     firstName: string;
@@ -210,15 +211,11 @@ export function pushGenerateLeadDataLayerEvent(
     }
 
     // 1. Internal generation event
-    window.dataLayer.push({
-        event: 'generate_lead',
-        event_id: payload.event_id,
+    pushGenerateLeadConversionEvent({
+        eventId: payload.event_id,
         destination: payload.destination,
-        utm_source: payload.utms.utm_source,
-        utm_medium: payload.utms.utm_medium,
-        utm_campaign: payload.utms.utm_campaign,
-        ga_client_id: payload.tracking?.cid,
-        ga_session_id: payload.tracking?.sid,
+        utms: payload.utms,
+        tracking: payload.tracking,
     });
 
     // 2. Unified form submission event for GA4/Ads

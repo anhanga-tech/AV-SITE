@@ -171,6 +171,48 @@ test.describe('Contact form modal', () => {
 
     await expect(page.getByText(/recebemos seu contato/i)).toBeVisible();
     await expect(page.getByText('Abrimos o WhatsApp para você continuar com a nossa equipe.')).toBeVisible();
+
+    const generateLeadEvents = await page.evaluate(() =>
+      window.dataLayer?.filter((entry) => entry.event === 'generate_lead') ?? [],
+    );
+    const [submittedRequest] = capturedSubmitContactRequests.get(page) ?? [];
+
+    expect(submittedRequest).toBeDefined();
+    expect(generateLeadEvents).toHaveLength(1);
+    expect(generateLeadEvents[0]).toMatchObject({
+      event: 'generate_lead',
+      event_id: submittedRequest.eventId,
+      destination: 'whatsapp',
+    });
+  });
+
+  test('não gera conversão no caminho WhatsApp quando a API rejeita o contato', async ({
+    page,
+    isMobile,
+  }) => {
+    await page.unroute('**/api/submit-contact');
+    await page.route('**/api/submit-contact', route =>
+      route.fulfill({
+        status: 502,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          ok: false,
+          error: 'Não foi possível enviar. Tente novamente.',
+          code: 'CRM_UNAVAILABLE',
+        }),
+      }),
+    );
+    await openHeaderContactModal(page, isMobile);
+
+    await page.locator('#contact-firstName').fill('Maria');
+    await page.locator('#contact-whatsapp').fill('11987654321');
+    await page.locator('#contact-whatsapp').press('Enter');
+
+    await expect(page.getByText('Abrimos o WhatsApp para você continuar com a nossa equipe.')).toBeVisible();
+    const generateLeadEvents = await page.evaluate(() =>
+      window.dataLayer?.filter((entry) => entry.event === 'generate_lead') ?? [],
+    );
+    expect(generateLeadEvents).toHaveLength(0);
   });
 
   test('fecha com tecla Escape', async ({ page, isMobile }) => {

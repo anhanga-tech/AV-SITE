@@ -13,6 +13,7 @@ import type { ContactFormFields, SubmitContactRequest, SubmitContactResponse } f
 import type { LeadTracking } from '../types/leadCapture';
 import type { ContactModalOptions } from '../utils/contactForm';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
+import { pushGenerateLeadConversionEvent } from '../utils/generate-lead-analytics';
 
 const EMPTY_FIELDS: ContactFormFields = {
     firstName: '',
@@ -38,15 +39,11 @@ function pushContactDataLayerEvent(
     if (typeof window === 'undefined' || !window.dataLayer) return;
 
     // 1. Canonical conversion event consumed by GTM web and sGTM.
-    window.dataLayer.push({
-        event: 'generate_lead',
-        event_id: eventId,
+    pushGenerateLeadConversionEvent({
+        eventId,
         destination: destination ?? action,
-        utm_source: utms?.utm_source,
-        utm_medium: utms?.utm_medium,
-        utm_campaign: utms?.utm_campaign,
-        ga_client_id: tracking?.cid,
-        ga_session_id: tracking?.sid,
+        utms,
+        tracking,
     });
 
     // 2. Internal contact event
