@@ -1,13 +1,21 @@
 import { expect, test, type Page } from '@playwright/test';
+import type { SubmitContactRequest } from '../../types/contactCapture';
+
+const capturedSubmitContactRequests = new WeakMap<Page, SubmitContactRequest[]>();
 
 async function mockSubmitContact(page: Page) {
-  await page.route('**/api/submit-contact', route =>
-    route.fulfill({
+  const capturedRequests: SubmitContactRequest[] = [];
+  capturedSubmitContactRequests.set(page, capturedRequests);
+
+  await page.route('**/api/submit-contact', route => {
+    capturedRequests.push(route.request().postDataJSON() as SubmitContactRequest);
+
+    return route.fulfill({
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify({ ok: true, requestId: 'req_contact_e2e' }),
-    }),
-  );
+    });
+  });
 }
 
 async function openHeaderContactModal(page: Page, isMobile: boolean) {
@@ -76,6 +84,7 @@ test.describe('Contact form modal', () => {
   });
 
   test('envia o pedido de retorno e exibe confirmação', async ({ page, isMobile }) => {
+    await page.goto('/?utm_source=google&utm_medium=cpc&utm_campaign=issue-1261');
     await openHeaderContactModal(page, isMobile);
 
     await page.locator('#contact-firstName').fill('Maria');
@@ -86,6 +95,71 @@ test.describe('Contact form modal', () => {
     await expect(page.getByText('Nossa equipe chama você em breve pelo WhatsApp.')).toBeVisible();
     await expect(contactDialog(page).getByRole('status')).toContainText(/recebemos seu contato/i);
     await expect(contactDialog(page).getByRole('button', { name: /^fechar$/i }).last()).toBeFocused();
+
+    const generateLeadEvents = await page.evaluate(() =>
+      window.dataLayer?.filter((entry) => entry.event === 'generate_lead') ?? [],
+    );
+    const [submittedRequest] = capturedSubmitContactRequests.get(page) ?? [];
+
+    expect(submittedRequest).toBeDefined();
+    expect(generateLeadEvents).toHaveLength(1);
+    expect(generateLeadEvents[0]).toMatchObject({
+      event: 'generate_lead',
+      event_id: submittedRequest.eventId,
+      destination: 'callback',
+      utm_source: submittedRequest.utms.utm_source,
+      utm_medium: submittedRequest.utms.utm_medium,
+      utm_campaign: submittedRequest.utms.utm_campaign,
+      ga_client_id: submittedRequest.tracking?.cid,
+      ga_session_id: submittedRequest.tracking?.sid,
+    });
+    expect(generateLeadEvents[0]?.event_id).toMatch(/^lead_/);
+  });
+
+  test('não gera conversão quando a API rejeita o contato', async ({ page, isMobile }) => {
+    await page.unroute('**/api/submit-contact');
+    await page.route('**/api/submit-contact', route =>
+      route.fulfill({
+        status: 502,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          ok: false,
+          error: 'Não foi possível enviar. Tente novamente.',
+          code: 'CRM_UNAVAILABLE',
+        }),
+      }),
+    );
+    await openHeaderContactModal(page, isMobile);
+
+    await page.locator('#contact-firstName').fill('Maria');
+    await page.locator('#contact-whatsapp').fill('11987654321');
+    await page.getByRole('button', { name: /^prefiro que me chamem$/i }).click();
+
+    await expect(
+      contactDialog(page).getByText('Não foi possível enviar. Tente novamente.'),
+    ).toBeVisible();
+    const generateLeadEvents = await page.evaluate(() =>
+      window.dataLayer?.filter((entry) => entry.event === 'generate_lead') ?? [],
+    );
+    expect(generateLeadEvents).toHaveLength(0);
+  });
+
+  test('não gera conversão quando a requisição falha na rede', async ({ page, isMobile }) => {
+    await page.unroute('**/api/submit-contact');
+    await page.route('**/api/submit-contact', route => route.abort('failed'));
+    await openHeaderContactModal(page, isMobile);
+
+    await page.locator('#contact-firstName').fill('Maria');
+    await page.locator('#contact-whatsapp').fill('11987654321');
+    await page.getByRole('button', { name: /^prefiro que me chamem$/i }).click();
+
+    await expect(
+      contactDialog(page).getByText('Erro de conexão. Verifique sua internet e tente novamente.'),
+    ).toBeVisible();
+    const generateLeadEvents = await page.evaluate(() =>
+      window.dataLayer?.filter((entry) => entry.event === 'generate_lead') ?? [],
+    );
+    expect(generateLeadEvents).toHaveLength(0);
   });
 
   test('envia o caminho principal ao pressionar Enter', async ({ page, isMobile }) => {
@@ -97,6 +171,48 @@ test.describe('Contact form modal', () => {
 
     await expect(page.getByText(/recebemos seu contato/i)).toBeVisible();
     await expect(page.getByText('Abrimos o WhatsApp para você continuar com a nossa equipe.')).toBeVisible();
+
+    const generateLeadEvents = await page.evaluate(() =>
+      window.dataLayer?.filter((entry) => entry.event === 'generate_lead') ?? [],
+    );
+    const [submittedRequest] = capturedSubmitContactRequests.get(page) ?? [];
+
+    expect(submittedRequest).toBeDefined();
+    expect(generateLeadEvents).toHaveLength(1);
+    expect(generateLeadEvents[0]).toMatchObject({
+      event: 'generate_lead',
+      event_id: submittedRequest.eventId,
+      destination: 'whatsapp',
+    });
+  });
+
+  test('não gera conversão no caminho WhatsApp quando a API rejeita o contato', async ({
+    page,
+    isMobile,
+  }) => {
+    await page.unroute('**/api/submit-contact');
+    await page.route('**/api/submit-contact', route =>
+      route.fulfill({
+        status: 502,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          ok: false,
+          error: 'Não foi possível enviar. Tente novamente.',
+          code: 'CRM_UNAVAILABLE',
+        }),
+      }),
+    );
+    await openHeaderContactModal(page, isMobile);
+
+    await page.locator('#contact-firstName').fill('Maria');
+    await page.locator('#contact-whatsapp').fill('11987654321');
+    await page.locator('#contact-whatsapp').press('Enter');
+
+    await expect(page.getByText('Abrimos o WhatsApp para você continuar com a nossa equipe.')).toBeVisible();
+    const generateLeadEvents = await page.evaluate(() =>
+      window.dataLayer?.filter((entry) => entry.event === 'generate_lead') ?? [],
+    );
+    expect(generateLeadEvents).toHaveLength(0);
   });
 
   test('fecha com tecla Escape', async ({ page, isMobile }) => {

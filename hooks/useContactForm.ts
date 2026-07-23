@@ -13,6 +13,7 @@ import type { ContactFormFields, SubmitContactRequest, SubmitContactResponse } f
 import type { LeadTracking } from '../types/leadCapture';
 import type { ContactModalOptions } from '../utils/contactForm';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
+import { pushGenerateLeadConversionEvent } from '../utils/generate-lead-analytics';
 
 const EMPTY_FIELDS: ContactFormFields = {
     firstName: '',
@@ -31,10 +32,21 @@ function pushContactDataLayerEvent(
     eventId: string,
     action: 'whatsapp' | 'callback',
     source?: string,
+    tracking?: LeadTracking,
+    utms?: SubmitContactRequest['utms'],
+    destination?: string,
 ): void {
     if (typeof window === 'undefined' || !window.dataLayer) return;
 
-    // 1. Internal contact event
+    // 1. Canonical conversion event consumed by GTM web and sGTM.
+    pushGenerateLeadConversionEvent({
+        eventId,
+        destination: destination ?? action,
+        utms,
+        tracking,
+    });
+
+    // 2. Internal contact event
     window.dataLayer.push({
         event: 'contact_form_submission',
         event_id: eventId,
@@ -43,7 +55,7 @@ function pushContactDataLayerEvent(
         page_location: window.location.href,
     });
 
-    // 2. Unified form submission event for GA4/Ads
+    // 3. Unified form submission event for GA4/Ads
     window.dataLayer.push({
         event: 'form_submission',
         form_type: 'contact_modal',
@@ -209,7 +221,14 @@ export function useContactForm(options: ContactModalOptions = {}) {
                     return;
                 }
 
-                pushContactDataLayerEvent(eventId, action, options.source);
+                pushContactDataLayerEvent(
+                    eventId,
+                    action,
+                    options.source,
+                    tracking,
+                    utms,
+                    options.destination,
+                );
                 pushFormAnalyticsEvent({
                     event: 'submit_success',
                     formType: 'contact_modal',
