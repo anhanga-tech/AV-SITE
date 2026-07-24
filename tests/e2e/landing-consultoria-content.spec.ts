@@ -34,17 +34,18 @@ test.describe('CTA do hero não fica coberto pelo banner de cookies em mobile cu
     });
   });
 
-  test('CTA "Falar com um consultor" e o disclaimer ficam acima do banner', async ({ page }) => {
+  test('CTA "Agendar consultoria" e a sub-linha ficam acima do banner', async ({ page }) => {
     await page.goto('/consultoria-de-viagem');
 
     const banner = page.getByRole('dialog', { name: 'Preferências de cookies' });
     await expect(banner).toBeVisible();
 
     const cta = page.locator('[data-tracking="hero-consultoria-viagem"]');
-    // exact: true — sem isso o locator também casa com o CTA final da
-    // página ("...Sem taxa, sem compromisso."), que contém o mesmo texto
-    // como substring e agora usa a mesma frase do disclaimer do hero.
-    const disclaimer = page.getByText('Sem taxa, sem compromisso.', { exact: true });
+    // A sub-linha do hero é UMA <p> (abatimento + porta gratuita embutida). Ela
+    // é o elemento mais baixo do bloco de entrada — se ela clareia o banner,
+    // tudo acima também clareia. O count de sub-linhas do hero é load-bearing
+    // para a dobra em 375×667: não re-adicionar uma segunda linha aqui.
+    const disclaimer = page.getByText(/Vai viajar com a Anhangá/);
 
     await waitForStableBoxes([cta, disclaimer]);
 
