@@ -80,6 +80,22 @@ test('CTAs pagos linkam para o Cal.com (não abrem mais o ContactModal)', async 
   await expect(footerCta).toHaveAttribute('href', bookingUrl);
 });
 
+test('CTAs carregam a classificação de tracking correta (specialist vs. opt-out)', async ({ page }) => {
+  await page.goto('/consultoria-de-viagem');
+
+  // A porta gratuita (abre o ContactModal) precisa contar em specialist_cta_click,
+  // mas o texto "Fale com um consultor" NÃO casa no heurístico textual de
+  // public/utm-tracking.js ("consultor" ≠ "consultoria") — daí o opt-in explícito
+  // data-specialist-cta nos dois convites in-content.
+  await expect(page.locator('[data-tracking="hero-consultoria-porta-gratuita"][data-specialist-cta]')).toHaveCount(1);
+  await expect(page.locator('[data-tracking="audience-consultoria-porta-gratuita"][data-specialist-cta]')).toHaveCount(1);
+
+  // O CTA pago (link Cal.com) NÃO deve contar como specialist, apesar de o texto
+  // "Agendar consultoria" casar no heurístico textual — daí o opt-out.
+  await expect(page.locator('[data-tracking="hero-consultoria-viagem"][data-no-specialist-cta]')).toHaveCount(1);
+  await expect(page.locator('[data-tracking="footer-consultoria-viagem"][data-no-specialist-cta]')).toHaveCount(1);
+});
+
 test('landing de consultoria mostra uma foto real do destino junto ao depoimento', async ({ page }) => {
   await page.goto('/consultoria-de-viagem');
 

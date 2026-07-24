@@ -152,11 +152,19 @@ export function ConsultoriaHero() {
           */}
           <p className="mt-1 md:mt-4 text-sm text-zinc-600">
             Vai viajar com a Anhangá?{' '}
+            {/*
+              data-specialist-cta: opt-in explícito no specialist_cta_click. O
+              texto "Fale com um consultor" não casa no heurístico textual de
+              isSpecialistCtaText ("consultor" ≠ "consultoria"), então sem este
+              atributo a porta gratuita ficaria fora da métrica do funil. Sem
+              btn-whatsapp (abre modal, não é link de WhatsApp).
+            */}
             <button
               type="button"
               onClick={() => openContactModal({ source: 'consultoria-viagem-gratuito' })}
               className="font-bold text-anhanga-blue underline underline-offset-2 hover:text-anhanga-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
               data-tracking="hero-consultoria-porta-gratuita"
+              data-specialist-cta
             >
               Fale com um consultor
             </button>
@@ -266,11 +274,13 @@ export function ConsultoriaAudience() {
             <div className="mt-8 rounded-2xl border border-anhanga-blue/20 bg-white p-5">
               <p className="text-zinc-700 leading-snug">
                 Vai fechar a viagem com a Anhangá? A conversa é outra, e é gratuita.{' '}
+                {/* data-specialist-cta: mesma razão do link do hero — mantém a porta gratuita no specialist_cta_click. */}
                 <button
                   type="button"
                   onClick={() => openContactModal({ source: 'consultoria-viagem-gratuito' })}
                   className="font-bold text-anhanga-blue underline underline-offset-2 hover:text-anhanga-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
                   data-tracking="audience-consultoria-porta-gratuita"
+                  data-specialist-cta
                 >
                   Fale com um consultor
                 </button>
