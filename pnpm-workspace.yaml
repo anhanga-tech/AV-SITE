@@ -41,6 +41,13 @@ overrides:
   # chatbot, e @mdx-js/mdx, caminho do blog). 1.3.2 corrige; override escopado
   # a "@1" porque só existe uma major (1.x) na árvore.
   "@ungap/structured-clone@1": "^1.3.2"
+  # Dependabot #47 (high): sharp < 0.35.0 herda CVEs da libvips
+  # (CVE-2026-33327/33328/35590/35591). Transitivo via wrangler > miniflare
+  # (runtime de dev local), pinado em 0.34.5 no package.json da própria
+  # miniflare. O bump nativo (miniflare 4.20260722.0) só saiu em 2026-07-23 e
+  # ainda está em cooldown (minimumReleaseAge); override global para 0.35.3
+  # unifica com a versão já usada como dependência direta (scripts de imagem).
+  sharp: "^0.35.3"
 
 legacyPeerDeps: true
 nodeLinker: hoisted
