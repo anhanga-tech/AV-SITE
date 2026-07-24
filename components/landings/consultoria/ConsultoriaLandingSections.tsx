@@ -76,16 +76,16 @@ export function ConsultoriaHero() {
     /* Hero */
     /*
       Espaçamento e tamanho do texto reduzidos em mobile (md: restaura os
-      valores originais): em telas curtas (~360-812px de altura) o CTA e o
-      disclaimer "Sem taxa..." caem perto do fim do viewport inicial, e o
+      valores originais): em telas curtas (~360-812px de altura) o CTA e a
+      sub-linha logo abaixo dele caem perto do fim do viewport inicial, e o
       banner de cookies (fixed bottom-0) os cobre antes de qualquer scroll
       — combinado com CookieConsentBanner.tsx, que também foi compactado
-      no mobile. Ver critique de /consultoria-de-viagem.
+      no mobile. Regressão travada em landing-consultoria-content.spec.ts.
     */
     /*
-      max-w-4xl (não 3xl): a 3xl o H1 text-6xl quebrava em 4 linhas e
-      empurrava o par CTA + "Sem taxa..." para fora da dobra a 1366×768
-      (laptop mais comum no Brasil). Ver critique de /consultoria-de-viagem.
+      max-w-4xl (não 3xl): a 3xl o H1 text-6xl quebrava em linhas demais e
+      empurrava o par CTA + sub-linha para fora da dobra a 1366×768 (laptop
+      mais comum no Brasil). Ver landing-consultoria-content.spec.ts.
     */
     <section className="pt-3 md:pt-16 pb-20 px-6">
       <div className="max-w-4xl mx-auto">
@@ -128,7 +128,9 @@ export function ConsultoriaHero() {
             CTA pago: <a> real para o Cal.com (asChild) em vez de onClick, e SEM
             as classes btn-whatsapp/btn-specialist — public/utm-tracking.js
             dispara whatsapp_cta_click em qualquer .btn-whatsapp, o que seria um
-            evento de WhatsApp falso num link de agendamento.
+            evento de WhatsApp falso num link de agendamento. data-no-specialist-cta
+            também evita o falso specialist_cta_click: o texto "Agendar consultoria"
+            casaria no heurístico textual de isSpecialistCtaText (contém "consultoria").
           */}
           <Button
             asChild
@@ -136,7 +138,7 @@ export function ConsultoriaHero() {
             size="lg"
             className="font-black"
           >
-            <a href={CONSULTORIA_BOOKING_URL} data-tracking="hero-consultoria-viagem">
+            <a href={CONSULTORIA_BOOKING_URL} data-tracking="hero-consultoria-viagem" data-no-specialist-cta>
               Agendar consultoria · R$ 250
               <ArrowRight className="size-5" aria-hidden="true" />
             </a>
@@ -429,14 +431,14 @@ export function ConsultoriaFinalCta() {
         <p className="text-blue-100 text-lg mb-10 max-w-xl mx-auto">
           50 minutos com um consultor da Anhangá e um plano por escrito. Se você seguir com a consultoria completa, os R$ 250 entram no valor.
         </p>
-        {/* Sem btn-whatsapp/btn-specialist: link de agendamento, não CTA de WhatsApp (ver Hero). */}
+        {/* Sem btn-whatsapp/btn-specialist e com data-no-specialist-cta: link de agendamento, não CTA de contato (ver Hero). */}
         <Button
           asChild
           variant="cta"
           size="lg"
           className="font-black"
         >
-          <a href={CONSULTORIA_BOOKING_URL} data-tracking="footer-consultoria-viagem">
+          <a href={CONSULTORIA_BOOKING_URL} data-tracking="footer-consultoria-viagem" data-no-specialist-cta>
             Agendar consultoria · R$ 250
             <ArrowRight className="size-6" aria-hidden="true" />
           </a>
