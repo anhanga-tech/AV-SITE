@@ -64,6 +64,22 @@ test.describe('CTA do hero não fica coberto pelo banner de cookies em mobile cu
   });
 });
 
+test('CTAs pagos linkam para o Cal.com (não abrem mais o ContactModal)', async ({ page }) => {
+  await page.goto('/consultoria-de-viagem');
+
+  // A mudança de comportamento central do produto pago: os CTAs do hero e do
+  // rodapé deixaram de abrir o modal (onClick) e passaram a ser <a> para o
+  // agendamento. toHaveAttribute('href', ...) pega tanto um typo na URL quanto
+  // uma regressão que volte o CTA a <button> (sem href) abrindo o modal.
+  const bookingUrl = 'https://cal.anhanga.tur.br/felipe/consultoria';
+
+  await expect(page.locator('[data-tracking="hero-consultoria-viagem"]')).toHaveAttribute('href', bookingUrl);
+
+  const footerCta = page.locator('[data-tracking="footer-consultoria-viagem"]');
+  await footerCta.scrollIntoViewIfNeeded();
+  await expect(footerCta).toHaveAttribute('href', bookingUrl);
+});
+
 test('landing de consultoria mostra uma foto real do destino junto ao depoimento', async ({ page }) => {
   await page.goto('/consultoria-de-viagem');
 
