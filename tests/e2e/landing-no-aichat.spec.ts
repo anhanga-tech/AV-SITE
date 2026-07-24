@@ -11,9 +11,11 @@ test.describe('Landing pages de campanha não renderizam overlays flutuantes', (
     await expect(page.getByRole('button', { name: 'Abrir assistente virtual' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Voltar ao topo' })).toHaveCount(0);
 
-    // O CTA do hero, especificamente: o nav agora também tem um botão com o
-    // mesmo nome acessível (versão mobile fica oculta em viewport desktop).
-    await page.locator('[data-tracking="hero-consultoria-viagem"]').click();
+    // A porta gratuita é o CTA do nav ("Falar com um consultor" → ContactModal).
+    // O CTA do hero agora é o produto pago (link externo para o Cal.com), não
+    // abre modal — por isso o teste de contato usa o botão do nav desktop
+    // (data-tracking header-*, visível no viewport padrão 1280).
+    await page.locator('[data-tracking="header-consultoria-viagem"]').click();
     await expect(page.getByRole('heading', { name: 'Fale com um consultor' })).toBeVisible();
   });
 
