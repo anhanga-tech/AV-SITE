@@ -68,29 +68,6 @@ test('index.html keeps the global gtag wrapper used by the deferred UTM tracker'
   );
 });
 
-test('UTM tracker respeita o opt-out data-no-specialist-cta antes de disparar specialist_cta_click', () => {
-  // O heurístico textual isSpecialistCtaText casa em qualquer clicável com
-  // "consultoria"/"especialista"/"orçamento" no texto — o CTA pago de
-  // agendamento ("Agendar consultoria") casaria e poluiria a métrica da porta
-  // gratuita. O guard early-return por data-no-specialist-cta precisa existir e
-  // vir ANTES de getSpecialistSourceElement/isSpecialistCtaText.
-  const guardIndex = utmTrackingScript.search(
-    /if\s*\(\s*target\.closest\(\s*['"]\[data-no-specialist-cta\]['"]\s*\)\s*\)\s*return;/,
-  );
-  assert.ok(guardIndex > -1, 'trackSpecialistClick deve ter o early-return de opt-out');
-
-  // Ancorar na desestruturação (só existe no corpo de trackSpecialistClick),
-  // não em getSpecialistSourceElement — cujo primeiro match seria a definição.
-  const callIndex = utmTrackingScript.indexOf(
-    'const { specialistButton, clickable } = getSpecialistSourceElement(target)',
-  );
-  assert.ok(callIndex > -1, 'trackSpecialistClick deve chamar getSpecialistSourceElement');
-  assert.ok(
-    guardIndex < callIndex,
-    'o opt-out deve vir antes da classificação por texto/atributo',
-  );
-});
-
 test('index.html loads only the required Poppins font weights', () => {
   const fontUrls = [...indexHtml.matchAll(/href="([^"]*fonts\.googleapis\.com\/css2[^"]*)"/g)]
     .map((match) => match[1])

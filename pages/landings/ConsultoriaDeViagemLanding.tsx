@@ -19,36 +19,26 @@ import {
 
 const FAQ_ITEMS = [
   {
-    question: 'O que é a consultoria de viagem da Anhangá?',
-    answer: 'É uma sessão paga com um consultor humano para diagnosticar a sua viagem (destino, roteiro, milhas, orçamento) e te entregar um plano por escrito. Serve para quem está começando a planejar e para quem já comprou a viagem e quer aproveitá-la melhor.'
+    question: 'O que é uma consultoria de viagem?',
+    answer: 'É uma sessão com um consultor humano da Anhangá para entender seu perfil, destino e orçamento e montar o melhor roteiro — sem pacote pronto e sem improviso.'
   },
   {
-    question: 'Quanto custa?',
-    answer: 'R$ 250 por uma sessão de 50 minutos, com o plano por escrito incluído. Se você seguir com a consultoria completa (o roteiro executado pela gente), esse valor é abatido.'
-  },
-  {
-    question: 'Vocês não são uma agência? Por que a consultoria é paga?',
-    answer: 'Somos. Organizar e emitir a sua viagem, o agenciamento, continua sendo uma conversa gratuita. A consultoria paga é para quando você quer o diagnóstico e o roteiro em si: passagem já emitida, milhas próprias, extensão de uma viagem de trabalho.'
-  },
-  {
-    question: 'E se eu precisar remarcar ou não puder comparecer?',
-    answer: 'Você pode remarcar uma vez até 24h antes, sem custo. Em caso de falta, o valor vira um crédito de 90 dias, usável numa nova sessão ou na consultoria completa.'
-  },
-  {
-    question: 'Posso desistir e pedir reembolso?',
-    answer: 'Pode. Se desistir em até 7 dias e antes de a sessão acontecer, devolvemos o valor. Depois disso, ou se a sessão já ocorreu, o valor fica como crédito.'
-  },
-  {
-    question: 'A sessão é presencial?',
-    answer: 'Não. É por videochamada, com link no e-mail de confirmação. Atendemos viajantes de todo o Brasil.'
-  },
-  {
-    question: 'Em quanto tempo recebo o plano?',
-    answer: 'Em até 48h úteis após a sessão.'
+    question: 'Quanto custa a consultoria?',
+    // Sem "no momento": a ressalva plantava a dúvida que o hero ("Gratuito.")
+    // trabalha para matar. Ver critique de /consultoria-de-viagem.
+    answer: 'Nada. Você fala com um consultor gratuitamente, sem compromisso, e decide se quer fechar sua viagem com a Anhangá.'
   },
   {
     question: 'Vocês fazem viagens internacionais?',
     answer: 'Sim. A Anhangá Viagens planeja viagens internacionais para Europa, América do Norte, América do Sul, Ásia e Caribe, com foco em roteiros personalizados e suporte durante toda a viagem.'
+  },
+  {
+    question: 'Qual o diferencial da Anhangá?',
+    answer: 'Atendimento consultivo com consultor fixo do início ao fim, roteiro feito do zero para o seu perfil e suporte 24h via WhatsApp durante a viagem.'
+  },
+  {
+    question: 'Qual o prazo para montar um roteiro?',
+    answer: 'Entre 2 e 5 dias úteis após a conversa inicial, dependendo da complexidade do destino e do número de viajantes.'
   }
 ];
 
@@ -68,14 +58,14 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
       <MotionConfig reducedMotion="user">
       <div data-consultoria-landing className="bg-white min-h-screen font-sans">
         <Seo
-          title="Consultoria de Viagem com Especialista — Anhangá Viagens"
-          description="Sessão de 50 min com um consultor para diagnosticar sua viagem: destino, roteiro, milhas, orçamento. Você sai com um plano por escrito. R$ 250, abatidos na consultoria completa."
+          title="Consultoria de Viagem Sob Medida em SP — Anhangá Viagens"
+          description="Planeje sua viagem com consultores humanos. Sem pacote pronto, sem improviso. Roteiro personalizado com suporte antes, durante e depois."
           canonical="https://www.anhanga.tur.br/consultoria-de-viagem/"
           noHreflang
         />
         <ServiceSchema
-          name="Consultoria de Viagem com Especialista"
-          description="Sessão paga de diagnóstico de viagem com consultor humano: destino, roteiro, milhas e orçamento, com plano por escrito entregue em até 48h. Por videochamada, para viajantes de todo o Brasil."
+          name="Consultoria de Viagem Sob Medida"
+          description="Planejamento personalizado de viagens com consultor humano, sem pacote pronto. Atendimento consultivo com suporte antes, durante e depois da viagem."
           serviceUrl="https://www.anhanga.tur.br/consultoria-de-viagem/"
           serviceType="Consultoria de Viagem"
           areaServed="São Paulo e Brasil"

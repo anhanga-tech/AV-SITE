@@ -34,18 +34,17 @@ test.describe('CTA do hero não fica coberto pelo banner de cookies em mobile cu
     });
   });
 
-  test('CTA "Agendar consultoria" e a sub-linha ficam acima do banner', async ({ page }) => {
+  test('CTA "Falar com um consultor" e o disclaimer ficam acima do banner', async ({ page }) => {
     await page.goto('/consultoria-de-viagem');
 
     const banner = page.getByRole('dialog', { name: 'Preferências de cookies' });
     await expect(banner).toBeVisible();
 
     const cta = page.locator('[data-tracking="hero-consultoria-viagem"]');
-    // A sub-linha do hero é UMA <p> (abatimento + porta gratuita embutida). Ela
-    // é o elemento mais baixo do bloco de entrada — se ela clareia o banner,
-    // tudo acima também clareia. O count de sub-linhas do hero é load-bearing
-    // para a dobra em 375×667: não re-adicionar uma segunda linha aqui.
-    const disclaimer = page.getByText(/Vai viajar com a Anhangá/);
+    // exact: true — sem isso o locator também casa com o CTA final da
+    // página ("...Sem taxa, sem compromisso."), que contém o mesmo texto
+    // como substring e agora usa a mesma frase do disclaimer do hero.
+    const disclaimer = page.getByText('Sem taxa, sem compromisso.', { exact: true });
 
     await waitForStableBoxes([cta, disclaimer]);
 
@@ -62,38 +61,6 @@ test.describe('CTA do hero não fica coberto pelo banner de cookies em mobile cu
     expect(ctaBox!.y + ctaBox!.height).toBeLessThanOrEqual(bannerBox!.y);
     expect(disclaimerBox!.y + disclaimerBox!.height).toBeLessThanOrEqual(bannerBox!.y);
   });
-});
-
-test('CTAs pagos linkam para o Cal.com (não abrem mais o ContactModal)', async ({ page }) => {
-  await page.goto('/consultoria-de-viagem');
-
-  // A mudança de comportamento central do produto pago: os CTAs do hero e do
-  // rodapé deixaram de abrir o modal (onClick) e passaram a ser <a> para o
-  // agendamento. toHaveAttribute('href', ...) pega tanto um typo na URL quanto
-  // uma regressão que volte o CTA a <button> (sem href) abrindo o modal.
-  const bookingUrl = 'https://cal.anhanga.tur.br/felipe/consultoria';
-
-  await expect(page.locator('[data-tracking="hero-consultoria-viagem"]')).toHaveAttribute('href', bookingUrl);
-
-  const footerCta = page.locator('[data-tracking="footer-consultoria-viagem"]');
-  await footerCta.scrollIntoViewIfNeeded();
-  await expect(footerCta).toHaveAttribute('href', bookingUrl);
-});
-
-test('CTAs carregam a classificação de tracking correta (specialist vs. opt-out)', async ({ page }) => {
-  await page.goto('/consultoria-de-viagem');
-
-  // A porta gratuita (abre o ContactModal) precisa contar em specialist_cta_click,
-  // mas o texto "Fale com um consultor" NÃO casa no heurístico textual de
-  // public/utm-tracking.js ("consultor" ≠ "consultoria") — daí o opt-in explícito
-  // data-specialist-cta nos dois convites in-content.
-  await expect(page.locator('[data-tracking="hero-consultoria-porta-gratuita"][data-specialist-cta]')).toHaveCount(1);
-  await expect(page.locator('[data-tracking="audience-consultoria-porta-gratuita"][data-specialist-cta]')).toHaveCount(1);
-
-  // O CTA pago (link Cal.com) NÃO deve contar como specialist, apesar de o texto
-  // "Agendar consultoria" casar no heurístico textual — daí o opt-out.
-  await expect(page.locator('[data-tracking="hero-consultoria-viagem"][data-no-specialist-cta]')).toHaveCount(1);
-  await expect(page.locator('[data-tracking="footer-consultoria-viagem"][data-no-specialist-cta]')).toHaveCount(1);
 });
 
 test('landing de consultoria mostra uma foto real do destino junto ao depoimento', async ({ page }) => {
