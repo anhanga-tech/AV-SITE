@@ -71,7 +71,7 @@ test('CTAs pagos linkam para o Cal.com (não abrem mais o ContactModal)', async 
   // rodapé deixaram de abrir o modal (onClick) e passaram a ser <a> para o
   // agendamento. toHaveAttribute('href', ...) pega tanto um typo na URL quanto
   // uma regressão que volte o CTA a <button> (sem href) abrindo o modal.
-  const bookingUrl = 'https://cal.anhanga.tur.br/felipe/consultoria';
+  const bookingUrl = 'https://cal.com/anhanga-viagens/consultoria';
 
   await expect(page.locator('[data-tracking="hero-consultoria-viagem"]')).toHaveAttribute('href', bookingUrl);
 
