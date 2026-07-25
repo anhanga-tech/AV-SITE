@@ -5,14 +5,13 @@ import { Button } from '@/components/ui/Button';
 import { LazyImage } from '@/components/ui/LazyImage';
 import { fadeUp } from '@/components/landings/shared/constants';
 import { openContactModal } from '@/utils/contactForm';
-import { openConsultoriaBooking } from '@/lib/cal-embed';
+import { openConsultoriaBooking, CONSULTORIA_BOOKING_URL } from '@/lib/cal-embed';
 import { getDestinationImage } from '@/data/mediaConfig';
 
-// Event type do Cal.com Cloud (plano gratuito) onde o cliente agenda e paga a
-// sessão (R$250) via Stripe. Cloud, não self-hosted: a imagem self-host estava
-// sem patch de segurança desde março/2026 e não é recomendada para produção —
-// inaceitável no caminho do pagamento. Ver memória project-consultoria-modelo-pago.
-const CONSULTORIA_BOOKING_URL = 'https://cal.com/anhanga-viagens/consultoria';
+// CONSULTORIA_BOOKING_URL (Cal.com Cloud) e openConsultoriaBooking vêm de
+// lib/cal-embed — fonte única do link e do embed. Cloud, não self-hosted: a
+// imagem self-host estava sem patch de segurança desde março/2026, inaceitável
+// no caminho do pagamento. Ver memória project-consultoria-modelo-pago.
 
 // A autosseleção da página (grilling 24/07): a consultoria paga é para os
 // casos NÃO-comissionáveis. Quem vai fechar a viagem com a Anhangá cai na

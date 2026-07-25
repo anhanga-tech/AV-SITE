@@ -3,6 +3,8 @@
 // mantém a landing leve, dentro da disciplina de terceiros do projeto. O CTA
 // mantém o <a href> (progressive enhancement): sem JS/no prerender é um link
 // para a página do Cal.com; com JS, este helper abre o modal por cima do site.
+// Se o embed.js falhar ao carregar, o clique cai de volta na navegação para
+// CONSULTORIA_BOOKING_URL (ver fallback abaixo) — o CTA pago nunca fica morto.
 //
 // Ver project-consultoria-modelo-pago (memória) e a PR do embed.
 
@@ -11,10 +13,19 @@ const CAL_NAMESPACE = 'consultoria';
 const CAL_ORIGIN = 'https://app.cal.com';
 const CAL_EMBED_JS = 'https://app.cal.com/embed/embed.js';
 
+// URL pública de agendamento no Cal.com Cloud. Fonte única de verdade: o <a href>
+// do CTA (fallback sem-JS) e o fallback de falha do embed usam esta constante.
+export const CONSULTORIA_BOOKING_URL = `https://cal.com/${CAL_LINK}`;
+
 // Cores de marca do design-tokens: azul de identidade no claro, azul de ação
 // (mais vivo) no escuro. Espelha o que foi configurado no dashboard do Cal.com.
 const BRAND_LIGHT = '#0056D2'; // anhanga-blue
 const BRAND_DARK = '#0EA5E9'; // anhanga-action
+
+// Se o embed.js não carregar neste tempo após o clique, o CTA navega para a
+// página do Cal.com em vez de ficar morto (backstop para o caso "lento, sem
+// erro"; falhas duras disparam o onerror imediatamente).
+const FALLBACK_TIMEOUT_MS = 4000;
 
 // A API global do Cal.com é injetada em runtime e não é tipada; tratamos como
 // função variádica no boundary. Único ponto de `any` neste módulo.
@@ -32,13 +43,20 @@ declare global {
 }
 
 let initialized = false;
+let scriptState: 'idle' | 'loading' | 'loaded' | 'failed' = 'idle';
+
+function navigateToBooking(): void {
+  window.location.href = CONSULTORIA_BOOKING_URL;
+}
 
 // Loader oficial do Cal.com (o IIFE do snippet element-click), encapsulado para
-// rodar on-demand em vez de no load. Cria o stub window.Cal e injeta o embed.js
-// na primeira chamada; chamadas subsequentes são enfileiradas até o script
-// carregar. Mantido próximo ao original para não divergir do que o Cal.com testa.
+// rodar on-demand em vez de no load. Cria o stub window.Cal; o embed.js real só
+// é injetado na primeira chamada a Cal(...). Mantido próximo ao original para
+// não divergir do que o Cal.com testa — daí a supressão escopada abaixo:
+// prefer-const e no-explicit-any são estilo/tipagem do snippet vendored, não
+// bugs; nenhuma regra de correção é silenciada.
 function loadCalScript(): void {
-  /* eslint-disable */
+  /* eslint-disable prefer-const, prefer-rest-params, @typescript-eslint/no-explicit-any -- snippet vendored do Cal.com, mantido fiel ao original */
   (function (C: any, A: string, L: string) {
     let p = function (a: any, ar: any) { a.q.push(ar); };
     let d = C.document;
@@ -55,7 +73,7 @@ function loadCalScript(): void {
       p(cal, ar);
     };
   })(window, CAL_EMBED_JS, 'init');
-  /* eslint-enable */
+  /* eslint-enable prefer-const, prefer-rest-params, @typescript-eslint/no-explicit-any */
 }
 
 function ensureInitialized(): void {
@@ -65,6 +83,7 @@ function ensureInitialized(): void {
   const Cal = window.Cal;
   if (!Cal) return;
 
+  // Este primeiro Cal(...) é o que injeta o <script> do embed.js no head.
   Cal('init', CAL_NAMESPACE, { origin: CAL_ORIGIN });
 
   // Encaminha query params da URL (ex.: UTMs no primeiro acesso) para o booking.
@@ -80,6 +99,14 @@ function ensureInitialized(): void {
     layout: 'month_view',
   });
 
+  // Fallback de carregamento: o clique já deu preventDefault, então sem isto um
+  // embed.js bloqueado/lento/fora do ar deixaria o CTA pago morto. onerror
+  // navega na hora; o timeout em openConsultoriaBooking cobre "lento, sem erro".
+  scriptState = 'loading';
+  const script = document.querySelector<HTMLScriptElement>(`script[src="${CAL_EMBED_JS}"]`);
+  script?.addEventListener('load', () => { scriptState = 'loaded'; }, { once: true });
+  script?.addEventListener('error', () => { scriptState = 'failed'; navigateToBooking(); }, { once: true });
+
   initialized = true;
 }
 
@@ -91,4 +118,10 @@ export function openConsultoriaBooking(): void {
     calLink: CAL_LINK,
     config: { layout: 'month_view', theme: 'auto' },
   });
+
+  // Backstop: se o embed.js não tiver carregado a tempo, navega para a página
+  // do Cal.com em vez de deixar o clique morto.
+  window.setTimeout(() => {
+    if (scriptState !== 'loaded') navigateToBooking();
+  }, FALLBACK_TIMEOUT_MS);
 }
