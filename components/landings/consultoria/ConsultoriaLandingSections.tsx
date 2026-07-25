@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { LazyImage } from '@/components/ui/LazyImage';
 import { fadeUp } from '@/components/landings/shared/constants';
 import { openContactModal } from '@/utils/contactForm';
+import { openConsultoriaBooking } from '@/lib/cal-embed';
 import { getDestinationImage } from '@/data/mediaConfig';
 
 // Event type do Cal.com Cloud (plano gratuito) onde o cliente agenda e paga a
@@ -127,12 +128,14 @@ export function ConsultoriaHero() {
         </m.p>
         <m.div variants={fadeUp} initial="hidden" animate="visible" custom={3}>
           {/*
-            CTA pago: <a> real para o Cal.com (asChild) em vez de onClick, e SEM
-            as classes btn-whatsapp/btn-specialist — public/utm-tracking.js
-            dispara whatsapp_cta_click em qualquer .btn-whatsapp, o que seria um
-            evento de WhatsApp falso num link de agendamento. data-no-specialist-cta
-            também evita o falso specialist_cta_click: o texto "Agendar consultoria"
-            casaria no heurístico textual de isSpecialistCtaText (contém "consultoria").
+            CTA pago com progressive enhancement: <a href> real para o Cal.com
+            (asChild) + onClick que abre o embed (openConsultoriaBooking) com
+            preventDefault. Sem JS/no prerender continua um link que funciona;
+            com JS, abre o modal sobre a página. SEM btn-whatsapp/btn-specialist
+            (public/utm-tracking.js dispara whatsapp_cta_click em qualquer
+            .btn-whatsapp — falso num link de agendamento). data-no-specialist-cta
+            evita o falso specialist_cta_click: "Agendar consultoria" casaria no
+            heurístico textual de isSpecialistCtaText (contém "consultoria").
           */}
           <Button
             asChild
@@ -140,7 +143,12 @@ export function ConsultoriaHero() {
             size="lg"
             className="font-black"
           >
-            <a href={CONSULTORIA_BOOKING_URL} data-tracking="hero-consultoria-viagem" data-no-specialist-cta>
+            <a
+              href={CONSULTORIA_BOOKING_URL}
+              onClick={(e) => { e.preventDefault(); openConsultoriaBooking(); }}
+              data-tracking="hero-consultoria-viagem"
+              data-no-specialist-cta
+            >
               Agendar consultoria · R$ 250
               <ArrowRight className="size-5" aria-hidden="true" />
             </a>
@@ -450,7 +458,12 @@ export function ConsultoriaFinalCta() {
           size="lg"
           className="font-black"
         >
-          <a href={CONSULTORIA_BOOKING_URL} data-tracking="footer-consultoria-viagem" data-no-specialist-cta>
+          <a
+            href={CONSULTORIA_BOOKING_URL}
+            onClick={(e) => { e.preventDefault(); openConsultoriaBooking(); }}
+            data-tracking="footer-consultoria-viagem"
+            data-no-specialist-cta
+          >
             Agendar consultoria · R$ 250
             <ArrowRight className="size-6" aria-hidden="true" />
           </a>

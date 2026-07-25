@@ -80,6 +80,19 @@ test('CTAs pagos linkam para o Cal.com (não abrem mais o ContactModal)', async 
   await expect(footerCta).toHaveAttribute('href', bookingUrl);
 });
 
+test('CTA pago abre o embed do Cal.com sem sair da página (progressive enhancement)', async ({ page }) => {
+  // Aborta o embed.js externo — o teste é hermético e só verifica o comportamento
+  // de progressive enhancement: o onClick chama preventDefault e abre o modal em
+  // vez de navegar. Sem isso, o clique dispararia uma request real ao app.cal.com.
+  await page.route('https://app.cal.com/**', (route) => route.abort());
+  await page.goto('/consultoria-de-viagem');
+
+  // O <a href> continua sendo o fallback sem-JS (coberto pelo teste de href acima).
+  // Com JS, clicar não deve navegar para o Cal.com — permanecemos na landing.
+  await page.locator('[data-tracking="hero-consultoria-viagem"]').click();
+  await expect(page).toHaveURL(/\/consultoria-de-viagem/);
+});
+
 test('CTAs carregam a classificação de tracking correta (specialist vs. opt-out)', async ({ page }) => {
   await page.goto('/consultoria-de-viagem');
 
