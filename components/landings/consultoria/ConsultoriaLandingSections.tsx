@@ -5,13 +5,13 @@ import { Button } from '@/components/ui/Button';
 import { LazyImage } from '@/components/ui/LazyImage';
 import { fadeUp } from '@/components/landings/shared/constants';
 import { openContactModal } from '@/utils/contactForm';
+import { openConsultoriaBooking, CONSULTORIA_BOOKING_URL } from '@/lib/cal-embed';
 import { getDestinationImage } from '@/data/mediaConfig';
 
-// Event type do Cal.com Cloud (plano gratuito) onde o cliente agenda e paga a
-// sessão (R$250) via Stripe. Cloud, não self-hosted: a imagem self-host estava
-// sem patch de segurança desde março/2026 e não é recomendada para produção —
-// inaceitável no caminho do pagamento. Ver memória project-consultoria-modelo-pago.
-const CONSULTORIA_BOOKING_URL = 'https://cal.com/anhanga-viagens/consultoria';
+// CONSULTORIA_BOOKING_URL (Cal.com Cloud) e openConsultoriaBooking vêm de
+// lib/cal-embed — fonte única do link e do embed. Cloud, não self-hosted: a
+// imagem self-host estava sem patch de segurança desde março/2026, inaceitável
+// no caminho do pagamento. Ver memória project-consultoria-modelo-pago.
 
 // A autosseleção da página (grilling 24/07): a consultoria paga é para os
 // casos NÃO-comissionáveis. Quem vai fechar a viagem com a Anhangá cai na
@@ -127,12 +127,14 @@ export function ConsultoriaHero() {
         </m.p>
         <m.div variants={fadeUp} initial="hidden" animate="visible" custom={3}>
           {/*
-            CTA pago: <a> real para o Cal.com (asChild) em vez de onClick, e SEM
-            as classes btn-whatsapp/btn-specialist — public/utm-tracking.js
-            dispara whatsapp_cta_click em qualquer .btn-whatsapp, o que seria um
-            evento de WhatsApp falso num link de agendamento. data-no-specialist-cta
-            também evita o falso specialist_cta_click: o texto "Agendar consultoria"
-            casaria no heurístico textual de isSpecialistCtaText (contém "consultoria").
+            CTA pago com progressive enhancement: <a href> real para o Cal.com
+            (asChild) + onClick que abre o embed (openConsultoriaBooking) com
+            preventDefault. Sem JS/no prerender continua um link que funciona;
+            com JS, abre o modal sobre a página. SEM btn-whatsapp/btn-specialist
+            (public/utm-tracking.js dispara whatsapp_cta_click em qualquer
+            .btn-whatsapp — falso num link de agendamento). data-no-specialist-cta
+            evita o falso specialist_cta_click: "Agendar consultoria" casaria no
+            heurístico textual de isSpecialistCtaText (contém "consultoria").
           */}
           <Button
             asChild
@@ -140,7 +142,12 @@ export function ConsultoriaHero() {
             size="lg"
             className="font-black"
           >
-            <a href={CONSULTORIA_BOOKING_URL} data-tracking="hero-consultoria-viagem" data-no-specialist-cta>
+            <a
+              href={CONSULTORIA_BOOKING_URL}
+              onClick={(e) => { e.preventDefault(); openConsultoriaBooking(); }}
+              data-tracking="hero-consultoria-viagem"
+              data-no-specialist-cta
+            >
               Agendar consultoria · R$ 250
               <ArrowRight className="size-5" aria-hidden="true" />
             </a>
@@ -450,7 +457,12 @@ export function ConsultoriaFinalCta() {
           size="lg"
           className="font-black"
         >
-          <a href={CONSULTORIA_BOOKING_URL} data-tracking="footer-consultoria-viagem" data-no-specialist-cta>
+          <a
+            href={CONSULTORIA_BOOKING_URL}
+            onClick={(e) => { e.preventDefault(); openConsultoriaBooking(); }}
+            data-tracking="footer-consultoria-viagem"
+            data-no-specialist-cta
+          >
             Agendar consultoria · R$ 250
             <ArrowRight className="size-6" aria-hidden="true" />
           </a>
