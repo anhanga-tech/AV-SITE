@@ -7,6 +7,7 @@ import { fadeUp } from '@/components/landings/shared/constants';
 import { openContactModal } from '@/utils/contactForm';
 import { openConsultoriaBooking, CONSULTORIA_BOOKING_URL } from '@/lib/cal-embed';
 import { getDestinationImage } from '@/data/mediaConfig';
+import { NOISE_TEXTURE_URL } from '@/lib/static-assets';
 
 // CONSULTORIA_BOOKING_URL (Cal.com Cloud) e openConsultoriaBooking vêm de
 // lib/cal-embed — fonte única do link e do embed. Cloud, não self-hosted: a
@@ -103,7 +104,7 @@ export function ConsultoriaHero() {
         />
         <div
           className="hidden md:block absolute inset-0 opacity-20"
-          style={{ backgroundImage: "url('/noise.png')" }}
+          style={{ backgroundImage: `url('${NOISE_TEXTURE_URL}')` }}
         />
       </div>
 
@@ -122,7 +123,7 @@ export function ConsultoriaHero() {
               na 3ª pergunta do FAQ. O sinal local de SEO permanece no <title> e
               no areaServed do ServiceSchema. Ver critique de /consultoria-de-viagem.
             */}
-            <Compass className="size-3.5 text-anhanga-yellow" aria-hidden="true" weight="fill" />
+            <Compass className="size-3.5 text-anhanga-yellow" aria-hidden="true" />
             Consultoria de viagem · online, todo o Brasil
           </m.div>
           <m.h1
@@ -158,7 +159,7 @@ export function ConsultoriaHero() {
               asChild
               variant="cta"
               size="lg"
-              className="font-black bg-anhanga-yellow text-anhanga-dark hover:bg-yellow-400 border-none shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_rgba(0,0,0,0.2)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+              className="font-black bg-anhanga-yellow text-anhanga-dark hover:bg-yellow-400 border-none shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_rgba(0,0,0,0.2)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-[background-color,box-shadow,transform]"
             >
               <a
                 href={CONSULTORIA_BOOKING_URL}
@@ -219,7 +220,7 @@ export function ConsultoriaHero() {
             <div className="absolute inset-0 bg-gradient-to-tr from-anhanga-dark/40 to-transparent pointer-events-none" />
           </div>
           
-          <div className="absolute -bottom-6 -left-2 sm:-left-4 md:-bottom-8 md:-left-8 bg-white p-3 sm:p-4 rounded-2xl shadow-xl border border-zinc-100 flex items-center gap-3 sm:gap-4 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500 fill-mode-both">
+          <div className="absolute -bottom-6 -left-2 sm:-left-4 md:-bottom-8 md:-left-8 bg-white p-3 sm:p-4 rounded-2xl shadow-xl border border-zinc-100 flex items-center gap-3 sm:gap-4 animate-pop-in [animation-delay:500ms] [animation-fill-mode:both]">
             <div className="flex -space-x-2">
               <div className="size-8 sm:size-10 rounded-full border-2 border-white bg-anhanga-blue/10 flex items-center justify-center shrink-0">
                 <CheckCircle className="size-4 sm:size-5 text-anhanga-blue" aria-hidden="true" />
