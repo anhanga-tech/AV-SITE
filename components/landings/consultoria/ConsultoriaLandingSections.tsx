@@ -1,58 +1,66 @@
 import { Link } from 'react-router-dom';
 import { m } from 'framer-motion';
-import { ArrowRight, CheckCircle, MessageSquare, Users, Headphones, Compass } from 'lucide-react';
+import { ArrowRight, CheckCircle, Eye, FileText, Compass } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { LazyImage } from '@/components/ui/LazyImage';
 import { fadeUp } from '@/components/landings/shared/constants';
 import { openContactModal } from '@/utils/contactForm';
 import { getDestinationImage } from '@/data/mediaConfig';
 
-// 4 itens, não 5: chunking ≤4 do critique — os antigos itens 4 e 5
-// ("viajantes frequentes" / "profissionais sem tempo") eram o mesmo perfil.
+// Event type do Cal.com self-hosted onde o cliente agenda e paga a sessão
+// (R$250) via Stripe. Ver memória project-consultoria-modelo-pago.
+const CONSULTORIA_BOOKING_URL = 'https://cal.anhanga.tur.br/felipe/consultoria';
+
+// A autosseleção da página (grilling 24/07): a consultoria paga é para os
+// casos NÃO-comissionáveis. Quem vai fechar a viagem com a Anhangá cai na
+// porta gratuita (ContactModal), sinalizada no callout de ConsultoriaAudience.
 const FOR_WHO = [
-  'Quem quer viajar bem sem precisar cuidar de cada detalhe',
-  'Famílias que buscam conforto e segurança no roteiro',
-  'Casais planejando viagem especial ou lua de mel',
-  'Viajantes frequentes sem tempo de pesquisar e comparar opções',
+  'Você já comprou a viagem e quer um roteiro que aproveite cada dia',
+  'Vai usar milhas próprias e quer emitir do jeito certo',
+  'Tem uma viagem de trabalho e quer emendar uns dias de lazer',
+  'Quer o olhar de um especialista antes de decidir, sem pacote pronto',
 ];
 
 const HOW_IT_WORKS = [
   {
     step: '01',
-    title: 'Conversa inicial',
-    // Não prometer "sem formulário": o CTA da página abre o ContactModal, que
-    // é um formulário — Riley pegava a contradição na hora. Ver critique.
-    desc: 'Você fala com um consultor e conta o que precisa. Uma conversa de verdade, sem burocracia.'
+    title: 'Agende e reserve seu horário',
+    desc: 'Escolha o horário, pague a sessão e receba o link da videochamada no e-mail.'
   },
   {
     step: '02',
-    title: 'Roteiro personalizado',
-    desc: 'Em até 5 dias úteis, você recebe um roteiro feito do zero para o seu perfil.'
+    title: 'Sessão de 50 minutos',
+    desc: 'Você conta o caso e o consultor diagnostica destino, roteiro, milhas e orçamento.'
   },
   {
     step: '03',
-    title: 'Suporte durante a viagem',
-    desc: 'WhatsApp 24h com o mesmo consultor. Qualquer imprevisto tem resposta imediata.'
+    title: 'Seu plano por escrito',
+    desc: 'Em até 48h chega um documento com o diagnóstico, o que recomendamos e por onde começar.'
+  },
+  {
+    step: '04',
+    title: 'Se quiser, a gente executa',
+    desc: 'O roteiro completo é orçado à parte, e os R$ 250 da sessão entram no valor.'
   },
 ];
 
 const PILLARS = [
   {
-    icon: MessageSquare,
-    title: 'Sem pacote pronto',
-    desc: 'Cada roteiro começa do zero, no perfil de quem vai viajar. Nada de escolher entre opções genéricas.',
+    icon: Eye,
+    title: 'Um olhar de quem faz isso todo dia',
+    desc: 'Quem planeja viagens para viver enxerga a sua de um jeito que buscador nenhum entrega.',
     variant: 'light' as const
   },
   {
-    icon: Users,
-    title: 'Atendimento humano',
-    desc: 'Um consultor real do início ao fim. Não um chatbot, não uma central de atendimento.',
+    icon: FileText,
+    title: 'Você sai com um plano',
+    desc: 'Não paramos na conversa. Em até 48h você recebe um documento com o diagnóstico e os próximos passos.',
     variant: 'filled' as const
   },
   {
-    icon: Headphones,
-    title: 'Suporte completo',
-    desc: 'Antes, durante e depois da viagem. WhatsApp direto com seu consultor para qualquer imprevisto.',
+    icon: Compass,
+    title: 'Conselho sobre a sua viagem, não sobre o catálogo',
+    desc: 'A gente recomenda o que é melhor pra você, mesmo quando não é o que temos para vender.',
     variant: 'light' as const
   },
 ];
@@ -68,16 +76,16 @@ export function ConsultoriaHero() {
     /* Hero */
     /*
       Espaçamento e tamanho do texto reduzidos em mobile (md: restaura os
-      valores originais): em telas curtas (~360-812px de altura) o CTA e o
-      disclaimer "Sem taxa..." caem perto do fim do viewport inicial, e o
+      valores originais): em telas curtas (~360-812px de altura) o CTA e a
+      sub-linha logo abaixo dele caem perto do fim do viewport inicial, e o
       banner de cookies (fixed bottom-0) os cobre antes de qualquer scroll
       — combinado com CookieConsentBanner.tsx, que também foi compactado
-      no mobile. Ver critique de /consultoria-de-viagem.
+      no mobile. Regressão travada em landing-consultoria-content.spec.ts.
     */
     /*
-      max-w-4xl (não 3xl): a 3xl o H1 text-6xl quebrava em 4 linhas e
-      empurrava o par CTA + "Sem taxa..." para fora da dobra a 1366×768
-      (laptop mais comum no Brasil). Ver critique de /consultoria-de-viagem.
+      max-w-4xl (não 3xl): a 3xl o H1 text-6xl quebrava em linhas demais e
+      empurrava o par CTA + sub-linha para fora da dobra a 1366×768 (laptop
+      mais comum no Brasil). Ver landing-consultoria-content.spec.ts.
     */
     <section className="pt-3 md:pt-16 pb-20 px-6">
       <div className="max-w-4xl mx-auto">
@@ -95,7 +103,7 @@ export function ConsultoriaHero() {
             no areaServed do ServiceSchema. Ver critique de /consultoria-de-viagem.
           */}
           <Compass className="size-3.5" aria-hidden="true" />
-          Consultoria de viagem · todo o Brasil
+          Consultoria de viagem · online, todo o Brasil
         </m.div>
         <m.h1
           variants={fadeUp}
@@ -104,7 +112,7 @@ export function ConsultoriaHero() {
           custom={1}
           className="text-balance text-4xl md:text-6xl font-black text-anhanga-dark mb-2 md:mb-6 leading-[1.1]"
         >
-          Planeje uma viagem sob medida sem depender de pacote pronto
+          Um especialista para pensar a sua viagem
         </m.h1>
         <m.p
           variants={fadeUp}
@@ -113,20 +121,55 @@ export function ConsultoriaHero() {
           custom={2}
           className="text-base md:text-xl text-zinc-600 mb-3 md:mb-10 leading-relaxed max-w-2xl"
         >
-          Um consultor da Anhangá entende seu perfil, destino, orçamento e restrições para desenhar o melhor caminho antes de você fechar.
+          Uma sessão de 50 minutos para diagnosticar a sua viagem e te entregar um plano por escrito.
         </m.p>
         <m.div variants={fadeUp} initial="hidden" animate="visible" custom={3}>
+          {/*
+            CTA pago: <a> real para o Cal.com (asChild) em vez de onClick, e SEM
+            as classes btn-whatsapp/btn-specialist — public/utm-tracking.js
+            dispara whatsapp_cta_click em qualquer .btn-whatsapp, o que seria um
+            evento de WhatsApp falso num link de agendamento. data-no-specialist-cta
+            também evita o falso specialist_cta_click: o texto "Agendar consultoria"
+            casaria no heurístico textual de isSpecialistCtaText (contém "consultoria").
+          */}
           <Button
+            asChild
             variant="cta"
             size="lg"
-            onClick={() => openContactModal({ source: 'consultoria-viagem' })}
-            className="btn-whatsapp btn-specialist font-black"
-            rightIcon={<ArrowRight className="size-5" aria-hidden="true" />}
-            data-tracking="hero-consultoria-viagem"
+            className="font-black"
           >
-            Falar com um consultor
+            <a href={CONSULTORIA_BOOKING_URL} data-tracking="hero-consultoria-viagem" data-no-specialist-cta>
+              Agendar consultoria · R$ 250
+              <ArrowRight className="size-5" aria-hidden="true" />
+            </a>
           </Button>
-          <p className="mt-1 md:mt-4 text-sm text-zinc-600">Sem taxa, sem compromisso.</p>
+          {/*
+            UMA sub-linha (não duas): em 375×667 com o banner de cookies (fixed
+            bottom-0), cada linha extra empurra o conteúdo para baixo da dobra —
+            o hero foi calibrado a ferro para isso (ver landing-consultoria-
+            content.spec.ts). A porta gratuita fica embutida aqui, não numa
+            segunda linha, para proteger o funil do core sem estourar a dobra.
+          */}
+          <p className="mt-1 md:mt-4 text-sm text-zinc-600">
+            Vai viajar com a Anhangá?{' '}
+            {/*
+              data-specialist-cta: opt-in explícito no specialist_cta_click. O
+              texto "Fale com um consultor" não casa no heurístico textual de
+              isSpecialistCtaText ("consultor" ≠ "consultoria"), então sem este
+              atributo a porta gratuita ficaria fora da métrica do funil. Sem
+              btn-whatsapp (abre modal, não é link de WhatsApp).
+            */}
+            <button
+              type="button"
+              onClick={() => openContactModal({ source: 'consultoria-viagem-gratuito' })}
+              className="font-bold text-anhanga-blue underline underline-offset-2 hover:text-anhanga-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
+              data-tracking="hero-consultoria-porta-gratuita"
+              data-specialist-cta
+            >
+              Fale com um consultor
+            </button>
+            , é grátis.
+          </p>
         </m.div>
       </div>
     </section>
@@ -153,10 +196,10 @@ export function ConsultoriaBenefits() {
           className="mb-12"
         >
           <h2 className="text-3xl md:text-4xl font-black text-anhanga-dark mb-3">
-            Por que consultoria?
+            Por que uma consultoria paga?
           </h2>
           <p className="text-zinc-600 text-lg">
-            Porque viajar bem não é só escolher um destino.
+            Um bom plano de viagem dá trabalho. E trabalho rende mais quando começa a sério.
           </p>
         </m.div>
         <div className="grid md:grid-cols-3 gap-6">
@@ -223,6 +266,26 @@ export function ConsultoriaAudience() {
                 </li>
               ))}
             </ul>
+            {/*
+              Porta gratuita da autosseleção (grilling 24/07): quem vai fechar
+              a viagem com a Anhangá dá comissão e não deve pagar a sessão —
+              este callout o desvia para o ContactModal antes do checkout pago.
+            */}
+            <div className="mt-8 rounded-2xl border border-anhanga-blue/20 bg-white p-5">
+              <p className="text-zinc-700 leading-snug">
+                Vai fechar a viagem com a Anhangá? A conversa é outra, e é gratuita.{' '}
+                {/* data-specialist-cta: mesma razão do link do hero — mantém a porta gratuita no specialist_cta_click. */}
+                <button
+                  type="button"
+                  onClick={() => openContactModal({ source: 'consultoria-viagem-gratuito' })}
+                  className="font-bold text-anhanga-blue underline underline-offset-2 hover:text-anhanga-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
+                  data-tracking="audience-consultoria-porta-gratuita"
+                  data-specialist-cta
+                >
+                  Fale com um consultor
+                </button>
+              </p>
+            </div>
           </m.div>
           <m.div
             variants={fadeUp}
@@ -373,20 +436,22 @@ export function ConsultoriaFinalCta() {
         className="max-w-3xl mx-auto px-6 text-center"
       >
         <h2 className="text-3xl md:text-5xl font-black text-white mb-6">
-          Pronto para planejar sua viagem?
+          Vamos pensar a sua próxima viagem
         </h2>
         <p className="text-blue-100 text-lg mb-10 max-w-xl mx-auto">
-          Fale com um consultor agora. Sem taxa, sem compromisso.
+          50 minutos com um consultor da Anhangá e um plano por escrito. Se você seguir com a consultoria completa, os R$ 250 entram no valor.
         </p>
+        {/* Sem btn-whatsapp/btn-specialist e com data-no-specialist-cta: link de agendamento, não CTA de contato (ver Hero). */}
         <Button
+          asChild
           variant="cta"
           size="lg"
-          onClick={() => openContactModal({ source: 'consultoria-viagem' })}
-          className="btn-whatsapp btn-specialist font-black"
-          rightIcon={<ArrowRight className="size-6" aria-hidden="true" />}
-          data-tracking="footer-consultoria-viagem"
+          className="font-black"
         >
-          Falar com um consultor
+          <a href={CONSULTORIA_BOOKING_URL} data-tracking="footer-consultoria-viagem" data-no-specialist-cta>
+            Agendar consultoria · R$ 250
+            <ArrowRight className="size-6" aria-hidden="true" />
+          </a>
         </Button>
       </m.div>
     </section>

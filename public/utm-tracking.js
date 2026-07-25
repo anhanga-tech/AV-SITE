@@ -131,6 +131,12 @@
     }
 
     function trackSpecialistClick(target) {
+        // Opt-out explícito: CTAs marcados data-no-specialist-cta (ex.: o link de
+        // agendamento pago da consultoria, cujo texto "Agendar consultoria" casaria
+        // no heurístico textual isSpecialistCtaText) não são pedidos de contato com
+        // especialista da porta gratuita e não devem disparar specialist_cta_click.
+        if (target.closest('[data-no-specialist-cta]')) return;
+
         const { specialistButton, clickable } = getSpecialistSourceElement(target);
         const sourceElement = specialistButton || clickable;
         const buttonText = specialistButton
