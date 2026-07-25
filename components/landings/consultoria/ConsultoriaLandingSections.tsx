@@ -7,6 +7,7 @@ import { fadeUp } from '@/components/landings/shared/constants';
 import { openContactModal } from '@/utils/contactForm';
 import { openConsultoriaBooking, CONSULTORIA_BOOKING_URL } from '@/lib/cal-embed';
 import { getDestinationImage } from '@/data/mediaConfig';
+import { NOISE_TEXTURE_URL } from '@/lib/static-assets';
 
 // CONSULTORIA_BOOKING_URL (Cal.com Cloud) e openConsultoriaBooking vêm de
 // lib/cal-embed — fonte única do link e do embed. Cloud, não self-hosted: a
@@ -85,101 +86,165 @@ export function ConsultoriaHero() {
       no mobile. Regressão travada em landing-consultoria-content.spec.ts.
     */
     /*
-      max-w-4xl (não 3xl): a 3xl o H1 text-6xl quebrava em linhas demais e
-      empurrava o par CTA + sub-linha para fora da dobra a 1366×768 (laptop
-      mais comum no Brasil). Ver landing-consultoria-content.spec.ts.
+      A estrutura DOM coloca a imagem após o bloco de texto para garantir que
+      a "dobra" do mobile permaneça livre de interferências visuais grandes e 
+      o CTA continue visível num iPhone SE (375x667). 
+      Em Desktop, renderiza em grid simétrico de duas colunas (max-w-6xl).
     */
-    <section className="pt-3 md:pt-16 pb-20 px-6">
-      <div className="max-w-4xl mx-auto">
+    <section className="relative w-full pt-16 md:pt-24 pb-28 px-6 overflow-hidden">
+      {/* Background Premium Dark */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#001836] via-[#003B8E] to-[#0056D2]" />
+        <div
+          className="absolute inset-0 opacity-[0.06]"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px)',
+            backgroundSize: '60px 60px',
+          }}
+        />
+        <div
+          className="hidden md:block absolute inset-0 opacity-20"
+          style={{ backgroundImage: `url('${NOISE_TEXTURE_URL}')` }}
+        />
+      </div>
+
+      <div className="relative z-10 max-w-6xl mx-auto md:grid md:grid-cols-2 md:gap-12 md:items-center">
+        <div className="mb-16 md:mb-0">
+          <m.div
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            custom={0}
+            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-0.5 md:py-1 mb-2 md:mb-5 text-[11px] md:text-xs font-black uppercase tracking-wide md:tracking-widest text-white backdrop-blur-sm"
+          >
+            {/*
+              "todo o Brasil", não "São Paulo": o badge é a primeira leitura da
+              página e cercava quem chega de fora de SP — a correção só aparecia
+              na 3ª pergunta do FAQ. O sinal local de SEO permanece no <title> e
+              no areaServed do ServiceSchema. Ver critique de /consultoria-de-viagem.
+            */}
+            <Compass className="size-3.5 text-anhanga-yellow" aria-hidden="true" />
+            Consultoria de viagem · online, todo o Brasil
+          </m.div>
+          <m.h1
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            custom={1}
+            className="text-balance text-4xl md:text-5xl lg:text-6xl font-black text-white mb-2 md:mb-6 leading-[1.1] drop-shadow-lg"
+          >
+            Um especialista para pensar a sua viagem
+          </m.h1>
+          <m.p
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            custom={2}
+            className="text-base md:text-xl text-white/90 mb-3 md:mb-10 leading-relaxed max-w-lg drop-shadow-md"
+          >
+            Uma sessão de 50 minutos para diagnosticar a sua viagem e te entregar um plano por escrito.
+          </m.p>
+          <m.div variants={fadeUp} initial="hidden" animate="visible" custom={3}>
+            {/*
+              CTA pago com progressive enhancement: <a href> real para o Cal.com
+              (asChild) + onClick que abre o embed (openConsultoriaBooking) com
+              preventDefault. Sem JS/no prerender continua um link que funciona;
+              com JS, abre o modal sobre a página. SEM btn-whatsapp/btn-specialist
+              (public/utm-tracking.js dispara whatsapp_cta_click em qualquer
+              .btn-whatsapp — falso num link de agendamento). data-no-specialist-cta
+              evita o falso specialist_cta_click: "Agendar consultoria" casaria no
+              heurístico textual de isSpecialistCtaText (contém "consultoria").
+            */}
+            <Button
+              asChild
+              variant="cta"
+              size="lg"
+              className="font-black bg-anhanga-yellow text-anhanga-dark hover:bg-yellow-400 border-none shadow-[4px_4px_0px_rgba(0,0,0,0.2)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_rgba(0,0,0,0.2)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-[background-color,box-shadow,transform]"
+            >
+              <a
+                href={CONSULTORIA_BOOKING_URL}
+                onClick={(e) => { e.preventDefault(); openConsultoriaBooking(); }}
+                data-tracking="hero-consultoria-viagem"
+                data-no-specialist-cta
+              >
+                Agendar consultoria · R$ 250
+                <ArrowRight className="size-5" aria-hidden="true" />
+              </a>
+            </Button>
+            {/*
+              UMA sub-linha (não duas): em 375×667 com o banner de cookies (fixed
+              bottom-0), cada linha extra empurra o conteúdo para baixo da dobra —
+              o hero foi calibrado a ferro para isso (ver landing-consultoria-
+              content.spec.ts). A porta gratuita fica embutida aqui, não numa
+              segunda linha, para proteger o funil do core sem estourar a dobra.
+            */}
+            <p className="mt-4 md:mt-6 text-sm text-white/80">
+              Vai viajar com a Anhangá?{' '}
+              {/*
+                data-specialist-cta: opt-in explícito no specialist_cta_click. O
+                texto "Fale com um consultor" não casa no heurístico textual de
+                isSpecialistCtaText ("consultor" ≠ "consultoria"), então sem este
+                atributo a porta gratuita ficaria fora da métrica do funil. Sem
+                btn-whatsapp (abre modal, não é link de WhatsApp).
+              */}
+              <button
+                type="button"
+                onClick={() => openContactModal({ source: 'consultoria-viagem-gratuito' })}
+                className="font-bold text-white underline underline-offset-4 hover:text-white/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white transition-colors"
+                data-tracking="hero-consultoria-porta-gratuita"
+                data-specialist-cta
+              >
+                Fale com um consultor
+              </button>
+              , é grátis.
+            </p>
+          </m.div>
+        </div>
+
+        {/* O "Diário de Bordo" / Visualização da proposta */}
         <m.div
           variants={fadeUp}
           initial="hidden"
           animate="visible"
-          custom={0}
-          className="inline-flex items-center gap-2 rounded-full border border-anhanga-blue/20 bg-anhanga-blue/5 px-3 py-0.5 md:py-1 mb-2 md:mb-5 text-[11px] md:text-xs font-black uppercase tracking-wide md:tracking-widest text-anhanga-blue"
+          custom={4}
+          className="relative block"
         >
-          {/*
-            "todo o Brasil", não "São Paulo": o badge é a primeira leitura da
-            página e cercava quem chega de fora de SP — a correção só aparecia
-            na 3ª pergunta do FAQ. O sinal local de SEO permanece no <title> e
-            no areaServed do ServiceSchema. Ver critique de /consultoria-de-viagem.
-          */}
-          <Compass className="size-3.5" aria-hidden="true" />
-          Consultoria de viagem · online, todo o Brasil
+          <div className="relative overflow-hidden rounded-3xl bg-anhanga-light shadow-2xl aspect-[4/3] md:aspect-square lg:aspect-[4/3] border-[6px] border-white/20 backdrop-blur-sm">
+            <LazyImage
+              src={getDestinationImage('Paris')}
+              alt="Plano de viagem em Paris"
+              width={800}
+              height={600}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-tr from-anhanga-dark/40 to-transparent pointer-events-none" />
+          </div>
+          
+          <div className="absolute -bottom-6 -left-2 sm:-left-4 md:-bottom-8 md:-left-8 bg-white p-3 sm:p-4 rounded-2xl shadow-xl border border-zinc-100 flex items-center gap-3 sm:gap-4 animate-pop-in [animation-delay:500ms] [animation-fill-mode:both]">
+            <div className="flex -space-x-2">
+              <div className="size-8 sm:size-10 rounded-full border-2 border-white bg-anhanga-blue/10 flex items-center justify-center shrink-0">
+                <CheckCircle className="size-4 sm:size-5 text-anhanga-blue" aria-hidden="true" />
+              </div>
+              <div className="size-8 sm:size-10 rounded-full border-2 border-white bg-green-50 flex items-center justify-center shrink-0">
+                <FileText className="size-4 text-green-600" aria-hidden="true" />
+              </div>
+            </div>
+            <div>
+              <p className="text-[10px] sm:text-xs font-black text-anhanga-dark uppercase tracking-wider">O Diário de Bordo</p>
+              <p className="text-xs sm:text-sm text-zinc-500 font-medium">Plano por escrito</p>
+            </div>
+          </div>
         </m.div>
-        <m.h1
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          custom={1}
-          className="text-balance text-4xl md:text-6xl font-black text-anhanga-dark mb-2 md:mb-6 leading-[1.1]"
-        >
-          Um especialista para pensar a sua viagem
-        </m.h1>
-        <m.p
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          custom={2}
-          className="text-base md:text-xl text-zinc-600 mb-3 md:mb-10 leading-relaxed max-w-2xl"
-        >
-          Uma sessão de 50 minutos para diagnosticar a sua viagem e te entregar um plano por escrito.
-        </m.p>
-        <m.div variants={fadeUp} initial="hidden" animate="visible" custom={3}>
-          {/*
-            CTA pago com progressive enhancement: <a href> real para o Cal.com
-            (asChild) + onClick que abre o embed (openConsultoriaBooking) com
-            preventDefault. Sem JS/no prerender continua um link que funciona;
-            com JS, abre o modal sobre a página. SEM btn-whatsapp/btn-specialist
-            (public/utm-tracking.js dispara whatsapp_cta_click em qualquer
-            .btn-whatsapp — falso num link de agendamento). data-no-specialist-cta
-            evita o falso specialist_cta_click: "Agendar consultoria" casaria no
-            heurístico textual de isSpecialistCtaText (contém "consultoria").
-          */}
-          <Button
-            asChild
-            variant="cta"
-            size="lg"
-            className="font-black"
-          >
-            <a
-              href={CONSULTORIA_BOOKING_URL}
-              onClick={(e) => { e.preventDefault(); openConsultoriaBooking(); }}
-              data-tracking="hero-consultoria-viagem"
-              data-no-specialist-cta
-            >
-              Agendar consultoria · R$ 250
-              <ArrowRight className="size-5" aria-hidden="true" />
-            </a>
-          </Button>
-          {/*
-            UMA sub-linha (não duas): em 375×667 com o banner de cookies (fixed
-            bottom-0), cada linha extra empurra o conteúdo para baixo da dobra —
-            o hero foi calibrado a ferro para isso (ver landing-consultoria-
-            content.spec.ts). A porta gratuita fica embutida aqui, não numa
-            segunda linha, para proteger o funil do core sem estourar a dobra.
-          */}
-          <p className="mt-1 md:mt-4 text-sm text-zinc-600">
-            Vai viajar com a Anhangá?{' '}
-            {/*
-              data-specialist-cta: opt-in explícito no specialist_cta_click. O
-              texto "Fale com um consultor" não casa no heurístico textual de
-              isSpecialistCtaText ("consultor" ≠ "consultoria"), então sem este
-              atributo a porta gratuita ficaria fora da métrica do funil. Sem
-              btn-whatsapp (abre modal, não é link de WhatsApp).
-            */}
-            <button
-              type="button"
-              onClick={() => openContactModal({ source: 'consultoria-viagem-gratuito' })}
-              className="font-bold text-anhanga-blue underline underline-offset-2 hover:text-anhanga-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
-              data-tracking="hero-consultoria-porta-gratuita"
-              data-specialist-cta
-            >
-              Fale com um consultor
-            </button>
-            , é grátis.
-          </p>
-        </m.div>
+      </div>
+
+      {/* Wave transition para ligar com a seção branca inferior */}
+      <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none rotate-180 z-10">
+        <svg className="relative block w-[calc(100%+1.3px)] h-[60px]" viewBox="0 0 1200 120" preserveAspectRatio="none">
+          <path
+            d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"
+            className="fill-white"
+          />
+        </svg>
       </div>
     </section>
   );

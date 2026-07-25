@@ -2,12 +2,11 @@ import { test, expect, type Locator } from '@playwright/test';
 
 // O CTA e o disclaimer ficam dentro do m.div de entrada (fadeUp, custom={3},
 // delay 0.3s + duration 0.55s). Medir a posição antes dessa transição
-// assentar pega estados transitórios de layout — flaky em CI (falhou com
-// y+height=549.97 vs limite 542) e reproduzido localmente até com
-// `reducedMotion: 'reduce'` e esperando `opacity: 1` isoladamente (nenhum
-// dos dois é suficiente sozinho: a posição pode assentar antes ou depois da
-// opacidade, dependendo do timing). Espera cause-agnóstica: lê a caixa de
-// cada locator repetidamente até duas leituras consecutivas baterem.
+// assentar pega estados transitórios de layout. Duas caixas consecutivas
+// iguais também não bastam: no CI elas podem cair dentro do delay de 0.3s,
+// enquanto o grupo ainda está opacity: 0 e translateY(28px). Primeiro
+// esperamos o estado final explícito da animação; depois confirmamos que as
+// caixas assentaram, protegendo também contra uma troca tardia de fonte.
 async function waitForStableBoxes(locators: Locator[]): Promise<void> {
   let previous: string | null = null;
   await expect
@@ -47,6 +46,9 @@ test.describe('CTA do hero não fica coberto pelo banner de cookies em mobile cu
     // para a dobra em 375×667: não re-adicionar uma segunda linha aqui.
     const disclaimer = page.getByText(/Vai viajar com a Anhangá/);
 
+    const animatedCtaGroup = cta.locator('xpath=..');
+    await expect(animatedCtaGroup).toHaveCSS('opacity', '1');
+    await expect(animatedCtaGroup).toHaveCSS('transform', 'none');
     await waitForStableBoxes([cta, disclaimer]);
 
     const bannerBox = await banner.boundingBox();
