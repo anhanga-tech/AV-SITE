@@ -1,5 +1,14 @@
 # Automação de posts sociais no publish do blog
 
+> **TODO(dead code):** o workflow n8n que receberia este webhook nunca foi
+> implementado. A divulgação social de posts do blog passou a ser feita
+> manualmente via Postiz (ver conversa de 26/07/2026). Deletar este doc
+> junto com `.github/workflows/notify-social-automation.yml`,
+> `scripts/notify-blog-published.ts`, `lib/social-announcement.ts` e os
+> testes correspondentes (`tests/notify-blog-published.test.ts`,
+> `tests/social-announcement.test.ts`,
+> `tests/notify-social-automation-workflow.test.ts`).
+
 ## Escopo
 
 Só o publish de um novo post do blog é automatizado. Posts sociais avulsos

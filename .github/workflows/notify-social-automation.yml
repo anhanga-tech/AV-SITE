@@ -1,3 +1,10 @@
+# TODO(dead code): o workflow n8n do outro lado deste webhook nunca foi
+# implementado — a divulgação social de posts do blog passou a ser feita
+# manualmente via Postiz (ver conversa de 26/07/2026). Deletar este arquivo,
+# scripts/notify-blog-published.ts, lib/social-announcement.ts,
+# docs/ops/social-automation.md e os testes correspondentes
+# (tests/notify-blog-published.test.ts, tests/social-announcement.test.ts,
+# tests/notify-social-automation-workflow.test.ts) juntos, na mesma PR.
 name: Notify Social Automation
 
 on:
