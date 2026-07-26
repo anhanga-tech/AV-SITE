@@ -48,6 +48,12 @@ overrides:
   # ainda está em cooldown (minimumReleaseAge); override global para 0.35.3
   # unifica com a versão já usada como dependência direta (scripts de imagem).
   sharp: "^0.35.3"
+  # Dependabot #48 (high): GHSA-v2hh-gcrm-f6hx — fast-uri <= 4.1.0 não trata
+  # `\` como delimitador de authority, gerando host confusion entre o parser
+  # de fast-uri e a WHATWG URL nativa do Node (fetch/undici), risco de SSRF.
+  # Transitivo via ajv (react-doctor > conf > ajv-formats), só dev. 3.1.4
+  # corrige; override escopado a "@3" porque só existe a linha 3.x na árvore.
+  "fast-uri@3": "^3.1.4"
 
 legacyPeerDeps: true
 nodeLinker: hoisted
