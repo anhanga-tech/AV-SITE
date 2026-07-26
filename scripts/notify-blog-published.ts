@@ -7,6 +7,15 @@
  * payload per file to the n8n webhook that schedules the post in Postiz.
  *
  * Not wired into `pnpm build`/`pnpm dev` — this only runs in CI, after merge.
+ *
+ * TODO(dead code): the n8n workflow on the receiving end was never built —
+ * blog social announcements are now scheduled by hand via Postiz (see
+ * conversation from 2026-07-26). Delete this file together with
+ * `.github/workflows/notify-social-automation.yml`,
+ * `lib/social-announcement.ts`, `docs/ops/social-automation.md`, and their
+ * tests (`tests/notify-blog-published.test.ts`,
+ * `tests/social-announcement.test.ts`,
+ * `tests/notify-social-automation-workflow.test.ts`).
  */
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
