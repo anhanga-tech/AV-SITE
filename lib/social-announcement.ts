@@ -3,6 +3,16 @@
  * webhook. `scripts/notify-blog-published.ts` is the only caller today; kept
  * here (rather than inline in the script) so the shaping logic is unit
  * testable without touching the filesystem or network.
+ *
+ * TODO(dead code): the n8n workflow on the receiving end was never built —
+ * blog social announcements are now scheduled by hand via Postiz (see
+ * conversation from 2026-07-26). Delete this file together with
+ * `scripts/notify-blog-published.ts`,
+ * `.github/workflows/notify-social-automation.yml`,
+ * `docs/ops/social-automation.md`, and their tests
+ * (`tests/social-announcement.test.ts`,
+ * `tests/notify-blog-published.test.ts`,
+ * `tests/notify-social-automation-workflow.test.ts`).
  */
 import type { BlogPostFrontmatter } from '../types/blog';
 
