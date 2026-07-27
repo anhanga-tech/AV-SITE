@@ -54,8 +54,12 @@ overrides:
   # Transitivo via ajv (react-doctor > conf > ajv-formats), só dev. 3.1.4
   # corrige; override escopado a "@3" porque só existe a linha 3.x na árvore.
   "fast-uri@3": "^3.1.4"
-
-legacyPeerDeps: true
+  # pnpm audit (low): GHSA-v422-hmwv-36x6 — body-parser < 1.20.6 desabilita
+  # silenciosamente o enforcement de tamanho quando recebe um `limit` inválido
+  # (DoS). Transitivo dev-only via decap-server > express@4 > body-parser
+  # (proxy local do Decap CMS, `pnpm cms:proxy`). 1.20.6 corrige; escopado a
+  # "@1" porque express 4.x consome a linha 1.x — a 2.x quebraria a API.
+  "body-parser@1": "^1.20.6"
 nodeLinker: hoisted
 minimumReleaseAge: 10080
 blockExoticSubdeps: true
