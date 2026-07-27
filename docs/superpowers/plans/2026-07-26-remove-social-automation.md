@@ -28,6 +28,7 @@
 - Delete: `tests/notify-blog-published.test.ts`
 - Delete: `tests/social-announcement.test.ts`
 - Delete: `tests/notify-social-automation-workflow.test.ts`
+- Modify: `README.md:30`
 - Modify: `docs/ops/deploy.md:56`
 
 **Interfaces:**
@@ -58,7 +59,13 @@ tests/social-announcement.test.ts
 tests/notify-social-automation-workflow.test.ts
 ```
 
-- [ ] **Step 3: Narrow the n8n deployment documentation**
+- [ ] **Step 3: Narrow the n8n repository documentation**
+
+Replace the CRM/automation row in `README.md` with:
+
+```markdown
+| CRM / Automação | Odoo (External API JSON-RPC) — n8n restrito a purchase-dispatch (inbound) |
+```
 
 Replace the n8n environment-variable bullet in `docs/ops/deploy.md` with:
 
@@ -105,11 +112,11 @@ git diff --stat HEAD
 git diff HEAD -- docs/ops/deploy.md
 ```
 
-Expected: no whitespace errors; exactly seven deletions, the one-line deployment documentation edit, and no generated or unrelated files.
+Expected: no whitespace errors; exactly seven deletions, the two documentation-line edits, and no generated or unrelated files.
 
 - [ ] **Step 8: Commit the implementation**
 
 ```bash
-git add .github/workflows/notify-social-automation.yml scripts/notify-blog-published.ts lib/social-announcement.ts docs/ops/social-automation.md tests/notify-blog-published.test.ts tests/social-announcement.test.ts tests/notify-social-automation-workflow.test.ts docs/ops/deploy.md
+git add .github/workflows/notify-social-automation.yml scripts/notify-blog-published.ts lib/social-announcement.ts docs/ops/social-automation.md tests/notify-blog-published.test.ts tests/social-announcement.test.ts tests/notify-social-automation-workflow.test.ts README.md docs/ops/deploy.md docs/superpowers/specs/2026-07-26-remove-social-automation-design.md docs/superpowers/plans/2026-07-26-remove-social-automation.md
 git commit -m "chore: remove dead social automation"
 ```

@@ -27,7 +27,7 @@ Site institucional da **Anhangá Viagens**, uma agência de viagens boutique bra
 | Build | Vite, TypeScript, prerender via `MemoryRouter` |
 | IA | Google Gemini + Cloudflare AI Gateway (proxy opcional para observabilidade) |
 | API | Cloudflare Pages Functions (handlers edge-style em `api/`, adaptados em `functions/`) |
-| CRM / Automação | Odoo (External API JSON-RPC) — n8n restrito a purchase-dispatch (inbound) e ao anúncio social do blog (outbound) |
+| CRM / Automação | Odoo (External API JSON-RPC) — n8n restrito a purchase-dispatch (inbound) |
 | Infra | Cloudflare Pages (deploy), Upstash Redis (rate limiting), R2 (mídia) |
 | Conteúdo | MDX, Decap CMS |
 | Testes | `node:test` (regressão) + Playwright (e2e) |

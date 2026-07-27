@@ -19,9 +19,9 @@ Remover, na mesma mudança:
 - `tests/social-announcement.test.ts`;
 - `tests/notify-social-automation-workflow.test.ts`.
 
-Atualizar `docs/ops/deploy.md` para não afirmar que `N8N_WEBHOOK_SECRET`
-também atende ao anúncio social do blog. O uso ativo em `purchase-dispatch`
-permanece documentado e não será alterado.
+Atualizar `README.md` e `docs/ops/deploy.md` para não afirmarem que n8n ou
+`N8N_WEBHOOK_SECRET` também atendem ao anúncio social do blog. O uso ativo em
+`purchase-dispatch` permanece documentado e não será alterado.
 
 ## Comportamento e limites
 
