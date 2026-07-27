@@ -169,6 +169,42 @@ test('logger redige chaves sensíveis na saída de console em todos os níveis',
     }
 });
 
+test('logger redige segredos por nome de chave (apiKey, signature, credential, bearer)', () => {
+    const error = captureConsole('error');
+
+    try {
+        resetErrorTrackerForTests();
+
+        const payload = {
+            requestId: 'req_123',
+            apiKey: 'gemini-super-secret',
+            api_key: 'odoo-super-secret',
+            signature: 'hmac-webhook-signature',
+            credential: 'oauth-credential',
+            bearer: 'Bearer abc123',
+            // chaves benignas não devem ser redigidas por engano
+            idempotencyKey: 'evt-42',
+            gatewayId: 'gw_1',
+        };
+        const expected = {
+            requestId: 'req_123',
+            apiKey: '[redacted]',
+            api_key: '[redacted]',
+            signature: '[redacted]',
+            credential: '[redacted]',
+            bearer: '[redacted]',
+            idempotencyKey: 'evt-42',
+            gatewayId: 'gw_1',
+        };
+
+        logger.error('SUBMIT_LEAD secrets', payload);
+
+        assert.deepEqual(error.calls[0], ['[error]', 'SUBMIT_LEAD secrets', expected]);
+    } finally {
+        error.restore();
+    }
+});
+
 test('logger preserva objetos nativos (Date) sem achatá-los em {}', () => {
     const info = captureConsole('info');
 
