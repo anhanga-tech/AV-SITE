@@ -174,7 +174,12 @@ export function MelhorIdadePillars() {
           {/* Pilares secundários, peso visual menor */}
           <div className="lg:col-span-2 space-y-10 lg:pt-4">
             <div className="flex gap-5">
-              <span className="size-12 shrink-0 bg-anhanga-yellow/15 rounded-xl flex items-center justify-center text-anhanga-dark">
+              {/*
+                Safira Noturna, não âmbar: a Regra do Âmbar reserva o anhanga-yellow
+                a 1 elemento por tela (o CTA do hero) e o DESIGN.md o restringe a CTAs
+                de alta prioridade — um chip de ícone não qualifica, nem diluído.
+              */}
+              <span className="size-12 shrink-0 bg-anhanga-darkBlue/10 rounded-xl flex items-center justify-center text-anhanga-darkBlue">
                 <Coffee className="size-6" aria-hidden="true" />
               </span>
               <div>
