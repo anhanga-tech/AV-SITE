@@ -256,7 +256,7 @@ export const ParquesCta: React.FC<SectionProps> = ({ onCtaClick, whatsappUrl }) 
         <button
           type="button"
           onClick={onCtaClick}
-          className="inline-flex min-h-[44px] w-full items-center justify-center rounded-2xl bg-anhanga-yellow px-8 py-4 font-display font-bold text-anhanga-dark shadow-hard transition-all duration-150 ease-out hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] active:translate-x-1 active:translate-y-1 active:shadow-none motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action sm:w-auto"
+          className="inline-flex min-h-[44px] w-full items-center justify-center rounded-2xl bg-anhanga-yellow px-8 py-4 font-display font-bold text-anhanga-dark shadow-hard transition-[transform,box-shadow] duration-150 ease-out hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] active:translate-x-1 active:translate-y-1 active:shadow-none motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action sm:w-auto"
         >
           Falar com um consultor
         </button>
