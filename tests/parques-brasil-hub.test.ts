@@ -89,7 +89,10 @@ test('o FAQ não promete credenciamento nos parques aquáticos', () => {
   assert.ok(credentialClaim, 'FAQ deve responder sobre credenciamento');
 
   for (const name of waterParkNames) {
-    const sentenceWithPark = credentialClaim.answer
+    // Anotação explícita: `assert.ok` é assertion function e, sem o tipo
+    // declarado, o TS tenta inferir a partir de um uso posterior da própria
+    // variável (TS7022).
+    const sentenceWithPark: string | undefined = credentialClaim.answer
       .split('.')
       .find((sentence) => sentence.includes(name));
     assert.ok(sentenceWithPark, `${name} deve ser citado na resposta sobre credenciamento`);

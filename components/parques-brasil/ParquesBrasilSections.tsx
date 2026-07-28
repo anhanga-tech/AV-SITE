@@ -23,9 +23,14 @@ interface SectionProps {
   whatsappUrl: string;
 }
 
+// pt-32 é o padrão das páginas do MainSiteShell (BlogList, SiteMap): o Header
+// é `fixed` com 72px, e qualquer coisa acima disso some atrás dele no topo da
+// página — o eyebrow ficava coberto em mobile.
 export const ParquesHero: React.FC = () => (
-  <section className="bg-anhanga-light pt-14 pb-16 sm:pt-20 sm:pb-24">
-    <div className="container mx-auto px-6 max-w-4xl">
+  <section className="bg-anhanga-light pt-32 pb-16 sm:pt-36 sm:pb-24">
+    {/* max-w-5xl em todas as seções: larguras diferentes deslocam o eixo
+        esquerdo entre uma seção e outra, e a coluna "pula" ao rolar. */}
+    <div className="container mx-auto px-6 max-w-5xl">
       <p className="font-display text-xs font-black uppercase tracking-[0.1em] text-anhanga-actionDark">
         Parques do Brasil
       </p>
@@ -48,7 +53,10 @@ const CredentialedPark: React.FC<{ park: Park; index: number }> = ({ park, index
       index === 0 ? 'lg:col-span-3' : 'lg:col-span-2'
     }`}
   >
-    <div className="flex flex-wrap items-center gap-3">
+    {/* Badge e local em linhas próprias, não lado a lado: no card estreito o
+        par quebrava e derrubava o título 20px abaixo do card vizinho, o que
+        lê como acidente e não como a assimetria pretendida. */}
+    <div className="flex flex-col items-start gap-2">
       <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 font-display text-xs font-black uppercase tracking-[0.1em] text-anhanga-darkBlue">
         <BadgeCheck className="size-3.5" aria-hidden="true" />
         Agente credenciado
@@ -130,13 +138,7 @@ export const PackageSection: React.FC = () => (
       <ul className="mt-10 divide-y divide-zinc-200/80">
         {PACKAGE_PARKS.map((park) => (
           <li key={park.slug} className="py-7 first:pt-0 last:pb-0">
-            <div className="sm:flex sm:items-baseline sm:justify-between sm:gap-6">
-              <h3 className="font-display text-xl font-bold text-anhanga-dark">{park.name}</h3>
-              <span className="mt-1 inline-flex items-center gap-1.5 text-sm text-zinc-500 sm:mt-0 sm:shrink-0">
-                <MapPin className="size-4" aria-hidden="true" />
-                {park.city}, {park.state}
-              </span>
-            </div>
+            <h3 className="font-display text-xl font-bold text-anhanga-dark">{park.name}</h3>
             <p className="mt-3 text-base leading-relaxed text-zinc-700 max-w-[65ch]">
               {park.claim}
             </p>
@@ -144,7 +146,14 @@ export const PackageSection: React.FC = () => (
               <span className="font-semibold text-anhanga-dark">Rende mais para:</span>{' '}
               {park.bestFor}
             </p>
+            {/* Local, duração e época são a mesma classe de informação — na
+                mesma linha. Jogado na borda oposta do container, o local
+                abria um vazio no meio em telas largas. */}
             <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-zinc-600">
+              <span className="inline-flex items-center gap-1.5">
+                <MapPin className="size-4 text-anhanga-actionDark" aria-hidden="true" />
+                {park.city}, {park.state}
+              </span>
               <span className="inline-flex items-center gap-1.5">
                 <Clock className="size-4 text-anhanga-actionDark" aria-hidden="true" />
                 {park.days}
@@ -213,7 +222,7 @@ export const ComparisonSection: React.FC = () => (
 
 export const UpcomingSection: React.FC = () => (
   <section className="bg-anhanga-dark py-14 sm:py-16">
-    <div className="container mx-auto px-6 max-w-3xl">
+    <div className="container mx-auto px-6 max-w-5xl">
       {UPCOMING_PARKS.map((park) => (
         <div key={park.slug}>
           <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 px-3 py-1 font-display text-xs font-black uppercase tracking-[0.1em] text-white/90">

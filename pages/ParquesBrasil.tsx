@@ -79,14 +79,13 @@ const ParquesBrasil: React.FC = () => {
       <ComparisonSection />
       <UpcomingSection />
 
-      <section className="bg-anhanga-light py-16 sm:py-24">
-        <div className="container mx-auto px-6 max-w-3xl">
-          <LandingFAQ
-            items={PARQUES_FAQ_ITEMS}
-            title="Perguntas que chegam antes da viagem"
-          />
-        </div>
-      </section>
+      {/* LandingFAQ já traz a própria <section> e container — envolvê-lo
+          aninhava seção em seção e dobrava o padding. */}
+      <LandingFAQ
+        items={PARQUES_FAQ_ITEMS}
+        title="Perguntas que chegam antes da viagem"
+        subtitle="O que costuma decidir entre um parque e outro."
+      />
 
       <ParquesCta onCtaClick={handleCtaClick} whatsappUrl={whatsappUrl} />
     </>
