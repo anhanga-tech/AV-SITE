@@ -20,8 +20,28 @@ import { openContactModal } from '../utils/contactForm';
  */
 
 const allPosts = getAllPosts();
+
+// PERFORMANCE: every card value that depends only on the (immutable) manifest
+// entry is derived once at module load instead of inside the render `.map()`.
+// Typing in the search box changes `searchTerm`, which re-renders the grid and
+// previously re-ran, per visible post: `optimizeRemoteImageUrl` (which with
+// VITE_MEDIA_ENABLE_TRANSFORMS=true — the production setting in wrangler.toml —
+// parses two `new URL()`s and rebuilds the /cdn-cgi/image path), `formatDate`'s
+// regex, `getBlogPostUrl`, `getCategoryColor` and the AUTHORS lookup. With 34
+// posts that was ~170 recomputations (68 of them URL parses) per keystroke, all
+// producing byte-identical strings every time.
+const blogCards = allPosts.map((post) => ({
+    ...post,
+    href: `/blog/${post.slug}/`,
+    shareUrl: getBlogPostUrl(post.slug),
+    imageUrl: optimizeRemoteImageUrl(post.image, 640, 400),
+    formattedDate: formatDate(post.date),
+    categoryClass: getCategoryColor(post.category),
+    authorName: AUTHORS[post.author]?.name ?? post.author,
+}));
+
 // Lowercased search haystacks are built once at module load, not per keystroke.
-const searchIndex = buildBlogSearchIndex(allPosts);
+const searchIndex = buildBlogSearchIndex(blogCards);
 
 const BlogList: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -94,7 +114,7 @@ const BlogList: React.FC = () => {
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {filteredPosts.map((post, index) => (
                             <Link
-                                to={`/blog/${post.slug}/`}
+                                to={post.href}
                                 key={post.slug}
                                 className={`
                                 group bg-white rounded-3xl p-5 shadow-[0_10px_20px_-5px_rgba(0,0,0,0.05)] border border-zinc-100
@@ -105,7 +125,7 @@ const BlogList: React.FC = () => {
                                 {/* Image Area — aspect ratio alternado para ritmo visual */}
                                 <div className={`relative ${index % 3 === 1 ? 'aspect-[4/3]' : index % 3 === 2 ? 'aspect-video' : 'aspect-[16/10]'} rounded-2xl overflow-hidden mb-5 bg-zinc-100`}>
                                     <img
-                                        src={optimizeRemoteImageUrl(post.image, 640, 400)}
+                                        src={post.imageUrl}
                                         alt={post.title}
                                         width="640"
                                         height="400"
@@ -114,12 +134,12 @@ const BlogList: React.FC = () => {
                                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                     />
                                     <div className="absolute top-3 right-3 bg-white/90 backdrop-blur rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-800 shadow-sm">
-                                        {formatDate(post.date)}
+                                        {post.formattedDate}
                                     </div>
                                     <div className="absolute bottom-3 right-3 z-30">
                                         <SocialShare
                                             minimal
-                                            url={getBlogPostUrl(post.slug)}
+                                            url={post.shareUrl}
                                             title={post.title}
                                             excerpt={post.excerpt}
                                         />
@@ -129,7 +149,7 @@ const BlogList: React.FC = () => {
                                 {/* Content */}
                                 <div className="flex-1 flex flex-col">
                                     <div className="mb-3">
-                                        <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md border ${getCategoryColor(post.category)}`}>
+                                        <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md border ${post.categoryClass}`}>
                                             {post.category}
                                         </span>
                                     </div>
@@ -142,7 +162,7 @@ const BlogList: React.FC = () => {
 
                                     <div className="pt-4 border-t border-dashed border-zinc-100 flex items-center justify-between">
                                         <span className="text-xs font-bold text-zinc-400 flex items-center gap-1">
-                                            <User className="size-3" /> {AUTHORS[post.author]?.name ?? post.author}
+                                            <User className="size-3" /> {post.authorName}
                                         </span>
                                         <span className="size-10 rounded-full flex items-center justify-center transition-colors bg-zinc-100 text-zinc-400 group-hover:bg-brand-cyan group-hover:text-white">
                                             <ArrowRight className="size-5" />
