@@ -55,7 +55,9 @@ function collectRootFiles(): string[] {
 // para a contagem real após a migração, não apenas os 9 usos removidos aqui).
 // 2026-07-16: 562 → 552 (LandingFAQ.tsx migrado na rodada 3 do critique de
 // /consultoria-de-viagem — cluster do FAQ apontado pelo detector).
-const BRAND_NAMESPACE_BASELINE = 552;
+// 2026-07-27: 552 → 509 (MelhorIdadeLanding.tsx migrado no pivô de design
+// da landing /melhor-idade).
+const BRAND_NAMESPACE_BASELINE = 509;
 
 test('legacy brand-* namespace does not grow (ratchet)', () => {
   const files = [...SCAN_DIRS.flatMap(collectTailwindFiles), ...collectRootFiles()];
