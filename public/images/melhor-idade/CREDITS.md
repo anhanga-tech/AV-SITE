@@ -8,8 +8,8 @@ reais de clientes quando houver acervo próprio com autorização de uso.
 |---|---|---|
 | `hero-desktop-1600.webp` / `hero-desktop-1100.webp` | https://www.pexels.com/photo/11299597/ | Recorte paisagem: casal apontando para a vista de uma cidade, céu aberto à esquerda para o texto do hero |
 | `hero-mobile-800.webp` | https://www.pexels.com/photo/11299597/ | Recorte retrato da mesma foto, enquadrado no casal |
-| `ritmo-ferry.webp` | https://www.pexels.com/photo/32638510/ | Casal num ferry ao entardecer, apontando para a orla |
-| `curadoria-loja.webp` | https://www.pexels.com/photo/8201182/ | Casal escolhendo chapéu numa loja durante a viagem |
+| `ritmo-ferry-1400.webp` / `-700.webp` | https://www.pexels.com/photo/32638510/ | Casal num ferry ao entardecer, apontando para a orla |
+| `curadoria-loja-1400.webp` / `-700.webp` | https://www.pexels.com/photo/8201182/ | Casal escolhendo chapéu numa loja durante a viagem |
 
 ## Critério de seleção
 

@@ -228,11 +228,12 @@ export function MelhorIdadeRhythm() {
           </div>
           <div className="order-1 md:order-2">
             <img
-              src="/images/melhor-idade/ritmo-ferry.webp"
+              src="/images/melhor-idade/ritmo-ferry-1400.webp"
+              srcSet="/images/melhor-idade/ritmo-ferry-700.webp 700w, /images/melhor-idade/ritmo-ferry-1400.webp 1400w"
+              sizes="(min-width: 768px) 50vw, 100vw"
               alt="Casal sentado no deck de um barco observando a orla ao entardecer"
               width={1400}
               height={933}
-              sizes="(min-width: 768px) 50vw, 100vw"
               className="w-full rounded-2xl shadow-float object-cover aspect-[4/3]"
               loading="lazy"
               decoding="async"
@@ -251,11 +252,12 @@ export function MelhorIdadeAdvisory() {
         <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div>
             <img
-              src="/images/melhor-idade/curadoria-loja.webp"
+              src="/images/melhor-idade/curadoria-loja-1400.webp"
+              srcSet="/images/melhor-idade/curadoria-loja-700.webp 700w, /images/melhor-idade/curadoria-loja-1400.webp 1400w"
+              sizes="(min-width: 768px) 50vw, 100vw"
               alt="Casal escolhendo um chapéu em uma loja durante a viagem"
               width={1400}
               height={933}
-              sizes="(min-width: 768px) 50vw, 100vw"
               className="w-full rounded-2xl shadow-float object-cover aspect-[4/3]"
               loading="lazy"
               decoding="async"
