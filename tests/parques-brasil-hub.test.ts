@@ -72,9 +72,22 @@ test('parque em obras fica fora da comparação e do que se vende', () => {
 
 test('a filha declara o hub como pai no breadcrumb', async () => {
   const betoCarrero = await readRepoFile('pages/landings/BetoCarreroLanding.tsx');
+
+  // Casa nome e URL no mesmo item do breadcrumb, em vez de procurar a URL solta
+  // no arquivo: prova que o hub entrou como degrau da hierarquia, não que a
+  // string existe em algum lugar. (Um `.includes()` de URL também aciona
+  // js/incomplete-url-substring-sanitization no CodeQL.)
+  assert.match(
+    betoCarrero,
+    /name: 'Parques no Brasil',\s*item: 'https:\/\/www\.anhanga\.tur\.br\/parques-brasil\/'/,
+    'BetoCarreroLanding deve listar o hub como item do BreadcrumbSchema',
+  );
+
+  const hubPosition = betoCarrero.indexOf("name: 'Parques no Brasil'");
+  const childPosition = betoCarrero.indexOf("name: 'Pacote Beto Carrero'");
   assert.ok(
-    betoCarrero.includes('https://www.anhanga.tur.br/parques-brasil/'),
-    'BetoCarreroLanding deve listar o hub no BreadcrumbSchema',
+    hubPosition > 0 && hubPosition < childPosition,
+    'o hub precisa vir antes da própria página na ordem do breadcrumb',
   );
 });
 
