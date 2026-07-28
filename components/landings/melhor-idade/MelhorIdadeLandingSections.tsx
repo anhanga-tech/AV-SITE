@@ -76,13 +76,29 @@ export function MelhorIdadeHero() {
 
   return (
     <section className="relative isolate overflow-hidden bg-anhanga-dark">
-      <img
-        src="/images/melhor-idade/hero-vista-cidade.jpg"
-        alt="Casal apontando para a vista de uma cidade durante uma viagem"
-        className="absolute inset-0 size-full object-cover object-bottom"
-        fetchPriority="high"
-        decoding="async"
-      />
+      {/*
+        Dois recortes da mesma foto: retrato no mobile e paisagem no desktop.
+        Um asset retrato só, esticado por object-cover num hero largo e baixo,
+        cortava as cabeças do casal e todo o céu que segura o texto (apontado
+        na review da PR #1316 e confirmado em 1440px).
+      */}
+      <picture>
+        <source
+          media="(min-width: 768px)"
+          type="image/webp"
+          srcSet="/images/melhor-idade/hero-desktop-1100.webp 1100w, /images/melhor-idade/hero-desktop-1600.webp 1600w"
+          sizes="100vw"
+        />
+        <img
+          src="/images/melhor-idade/hero-mobile-800.webp"
+          alt="Casal apontando para a vista de uma cidade durante uma viagem"
+          width={533}
+          height={800}
+          className="absolute inset-0 size-full object-cover object-center"
+          fetchPriority="high"
+          decoding="async"
+        />
+      </picture>
       {/*
         Escurecimento funcional (não decorativo) para garantir contraste do texto.
         Mobile: véu uniforme, porque o texto ocupa a largura toda.
@@ -212,8 +228,11 @@ export function MelhorIdadeRhythm() {
           </div>
           <div className="order-1 md:order-2">
             <img
-              src="/images/melhor-idade/ritmo-ferry.jpg"
+              src="/images/melhor-idade/ritmo-ferry.webp"
               alt="Casal sentado no deck de um barco observando a orla ao entardecer"
+              width={1400}
+              height={933}
+              sizes="(min-width: 768px) 50vw, 100vw"
               className="w-full rounded-2xl shadow-float object-cover aspect-[4/3]"
               loading="lazy"
               decoding="async"
@@ -232,8 +251,11 @@ export function MelhorIdadeAdvisory() {
         <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div>
             <img
-              src="/images/melhor-idade/curadoria-loja.jpg"
+              src="/images/melhor-idade/curadoria-loja.webp"
               alt="Casal escolhendo um chapéu em uma loja durante a viagem"
+              width={1400}
+              height={933}
+              sizes="(min-width: 768px) 50vw, 100vw"
               className="w-full rounded-2xl shadow-float object-cover aspect-[4/3]"
               loading="lazy"
               decoding="async"
