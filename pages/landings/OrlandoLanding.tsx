@@ -90,13 +90,16 @@ const OrlandoLanding: React.FC = () => {
             <li>Suporte rápido por WhatsApp para ajustes</li>
           </ul>
           <div className="flex flex-wrap gap-3">
+            {/* Texto Ardósia, não branco: o DESIGN.md registra que branco sobre
+                Céu Vivo mede 2,8:1 — abaixo do piso de 4,5:1. E hover por
+                brightness em vez de escurecer o fundo, que derruba o par. */}
             <button
               type="button"
               onClick={(e) => {
                 e.preventDefault();
                 openContactModal({ source: 'orlando' });
               }}
-              className="btn-whatsapp btn-specialist px-5 py-3 rounded-full bg-brand-cyan text-white font-bold hover:bg-brand-cyan/90 transition-colors"
+              className="btn-whatsapp btn-specialist px-5 py-3 rounded-full bg-anhanga-action text-anhanga-dark font-bold hover:brightness-105 transition-[filter]"
               data-tracking="footer-orlando"
               data-testid="cta-orlando-specialist"
             >

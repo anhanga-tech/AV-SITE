@@ -57,7 +57,9 @@ function collectRootFiles(): string[] {
 // /consultoria-de-viagem — cluster do FAQ apontado pelo detector).
 // 2026-07-27: 552 → 509 (MelhorIdadeLanding.tsx migrado no pivô de design
 // da landing /melhor-idade).
-const BRAND_NAMESPACE_BASELINE = 509;
+// 2026-07-28: 509 → 507 (CTA "Falar com especialista" da /orlando migrado ao
+// corrigir o contraste do par branco-sobre-Céu-Vivo).
+const BRAND_NAMESPACE_BASELINE = 507;
 
 test('legacy brand-* namespace does not grow (ratchet)', () => {
   const files = [...SCAN_DIRS.flatMap(collectTailwindFiles), ...collectRootFiles()];
