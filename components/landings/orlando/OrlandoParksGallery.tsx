@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { CSSProperties, SyntheticEvent } from 'react';
+import type { CSSProperties } from 'react';
 import { getMediaUrl, optimizeRemoteImageUrl } from "../../../data/mediaConfig";
 import { openContactModal } from "../../../utils/contactForm";
+import { handleLogoTransformError } from "./logoFallback";
 
 /*
   Por que não há `srcSet` aqui: `selectImagePreset` (lib/media-url.ts) normaliza
@@ -23,25 +24,6 @@ import { openContactModal } from "../../../utils/contactForm";
   byte nenhum e o `/cdn-cgi/image` pode rasterizá-lo. 3 dos 12 logos são SVG.
 */
 const isVector = (path: string): boolean => path.toLowerCase().endsWith('.svg');
-
-/*
-  Nem todo original aceita transform. O `magic-kingdom.png` (11502×1942, 22,3
-  megapixels) devolve HTTP 422 / "ERROR 9516: error during decoding" no
-  `/cdn-cgi/image` — o arquivo cru serve normalmente, mas o resizer não o
-  decodifica. Sem este fallback o logo simplesmente não apareceria.
-
-  A causa raiz é o arquivo, não o código: precisa ser reencodado no R2 (issue
-  separada, mesmo bloqueio de acesso ao bucket da #1333). Até lá o fallback
-  vale para qualquer transform que falhe, não só este.
-*/
-export const handleLogoTransformError =
-  (logo: string) =>
-  (event: SyntheticEvent<HTMLImageElement>): void => {
-    const img = event.currentTarget;
-    const raw = getMediaUrl(logo);
-    // Guarda contra loop: se o próprio original falhar, não tenta de novo.
-    if (img.src !== raw) img.src = raw;
-  };
 
 interface ParkCardData {
   image: string;

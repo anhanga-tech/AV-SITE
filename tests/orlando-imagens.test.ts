@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 
 import { optimizeImageUrl, selectImagePreset } from '../lib/media-url.ts';
 import { getMediaUrl } from '../data/mediaConfig.ts';
-import { handleLogoTransformError } from '../components/landings/orlando/OrlandoParksGallery.tsx';
+import { handleLogoTransformError } from '../components/landings/orlando/logoFallback.ts';
 
 /*
   Guards da issue #1326 — dimensionamento das imagens da /orlando.
