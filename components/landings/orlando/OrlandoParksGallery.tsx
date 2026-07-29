@@ -70,6 +70,12 @@ function ParkCard({ image, alt, logo, logoAlt, logoStyle, logoWidth, logoHeight,
         // Os PNG passavam crus pelo getMediaUrl, sem transform nenhuma — é onde
         // vivia o magic-kingdom.png de 11502×1942 e 243 KB para um slot de
         // 200×55. SVG segue cru: transform raster não economiza em vetor.
+        //
+        // O `200` não define o tamanho pedido: como no caso da foto acima,
+        // `selectImagePreset` colapsa qualquer largura <= 800 no preset
+        // `inline-sm` de 800px. Mudar este número não muda byte nenhum enquanto
+        // ficar dentro dessa faixa — inclusive para os logos do grupo Universal,
+        // que o `logoStyle` exibe a até 280px e o preset de 800 já cobre.
         src={isVector(logo) ? getMediaUrl(logo) : optimizeRemoteImageUrl(logo, 200)}
         onError={isVector(logo) ? undefined : handleLogoTransformError(logo)}
         alt={logoAlt}
