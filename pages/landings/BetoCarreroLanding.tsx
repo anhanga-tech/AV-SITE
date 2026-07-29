@@ -43,17 +43,24 @@ const BetoCarreroLanding: React.FC = () => {
         serviceType="Pacote de viagem para parque temático"
         areaServed="São Paulo e Brasil"
       />
+      {/* O hub /parques-brasil é o pai desta página na árvore do site — o
+          breadcrumb precisa refletir isso, senão o par hub/filha declara
+          hierarquias divergentes no JSON-LD. */}
       <BreadcrumbSchema
         items={[
           { name: 'Home', item: 'https://www.anhanga.tur.br/' },
+          { name: 'Parques no Brasil', item: 'https://www.anhanga.tur.br/parques-brasil/' },
           { name: 'Pacote Beto Carrero', item: 'https://www.anhanga.tur.br/beto-carrero/' }
         ]}
       />
       <FAQPageSchema items={BETO_FAQ_ITEMS} />
       <div className="bg-brand-surface py-2 border-b border-zinc-100">
-        <div className="container mx-auto px-6">
-          <Link to="/" className="text-sm font-medium text-zinc-500 hover:text-brand-cyan transition-colors flex items-center gap-1">
+        <div className="container mx-auto px-6 flex flex-wrap items-center gap-x-5 gap-y-1">
+          <Link to="/" className="text-sm font-medium text-zinc-500 hover:text-anhanga-action transition-colors flex items-center gap-1">
             ← Voltar para o site principal
+          </Link>
+          <Link to="/parques-brasil/" className="text-sm font-medium text-zinc-500 hover:text-anhanga-action transition-colors">
+            Comparar com os outros parques do Brasil
           </Link>
         </div>
       </div>

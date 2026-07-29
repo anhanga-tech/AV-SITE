@@ -21,6 +21,7 @@ const Terms = lazy(() => import('./pages/Terms'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 const About = lazy(() => import('./pages/About'));
 const SiteMap = lazy(() => import('./pages/SiteMap'));
+const ParquesBrasil = lazy(() => import('./pages/ParquesBrasil'));
 const ExclusaoDados = lazy(() => import('./pages/ExclusaoDados'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const BetoCarreroLanding = lazy(() => import('./pages/landings/BetoCarreroLanding'));
@@ -96,6 +97,10 @@ const MainSiteShell: React.FC = () => {
             <Route path="/politica-privacidade" element={<Privacy />} />
             <Route path="/exclusao-de-dados" element={<ExclusaoDados />} />
             <Route path="/sobre" element={<About />} />
+            {/* Hub de conteúdo, não landing de campanha: fica no MainSiteShell
+                para herdar Header, Footer e navegação interna — é por onde a
+                busca orgânica chega e distribui para /beto-carrero. */}
+            <Route path="/parques-brasil" element={<ParquesBrasil />} />
             <Route path="/mapa-do-site" element={<SiteMap />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
