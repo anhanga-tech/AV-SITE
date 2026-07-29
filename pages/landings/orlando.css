@@ -54,6 +54,42 @@
         url("https://media.anhanga.tur.br/images/textures/felt.png");
 }
 
+/*
+  Foco visível na linguagem da página. Sem nenhuma regra própria, a landing
+  caía no anel padrão do Chrome — 1px azul de sistema, imperceptível numa
+  página construída inteira com bordas pretas de 2 a 4px.
+
+  São DOIS sinais, como o PRODUCT.md exige: o outline preto e uma borda rosa
+  desenhada por `box-shadow: inset`. A borda vai por box-shadow, e não por
+  `border`, porque a maioria destes elementos não tem borda declarada — dar
+  uma no foco mudaria o tamanho da caixa e empurraria o layout ao redor.
+
+  `:focus-visible` e não `:focus`: os sinais aparecem na navegação por
+  teclado, não a cada clique de mouse.
+*/
+.landing-orlando a:focus-visible,
+.landing-orlando button:focus-visible,
+.landing-orlando [tabindex]:focus-visible {
+    outline: 3px solid var(--text-dark);
+    outline-offset: 3px;
+    box-shadow: inset 0 0 0 2px var(--accent-pink-ink);
+}
+
+/*
+  `box-shadow` não soma entre regras: a declaração acima substituiria por
+  inteiro a sombra "sticker" do logo e do CTA principal, que é o relevo 3D da
+  colagem. Eles perderiam o peso físico exatamente ao serem alcançados por
+  teclado. Aqui os dois valores são compostos na mesma declaração.
+
+  A especificidade (0,3,0) supera os (0,2,1) da regra genérica acima.
+*/
+.landing-orlando .logo:focus-visible,
+.landing-orlando .main-btn:focus-visible {
+    box-shadow:
+        inset 0 0 0 2px var(--accent-pink-ink),
+        var(--solid-shadow);
+}
+
 /* SVG Grain Filter */
 .landing-orlando .grain-overlay {
     position: fixed;
