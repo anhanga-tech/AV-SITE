@@ -57,7 +57,7 @@ const OrlandoLanding: React.FC = () => {
       <FAQPageSchema items={ORLANDO_FAQ_ITEMS} />
       <div className="bg-brand-surface py-2 border-b border-zinc-100 relative z-[60]">
         <div className="container mx-auto px-6">
-          <Link to="/" className="text-sm font-medium text-zinc-500 hover:text-anhanga-action transition-colors flex items-center gap-1 font-sans focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
+          <Link to="/" className="text-sm font-medium text-zinc-500 hover:text-anhanga-action transition-colors flex items-center gap-1 font-sans focus-visible:shadow-[inset_0_0_0_2px_theme(colors.anhanga.action)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
             ← Voltar para o site principal
           </Link>
         </div>
@@ -99,19 +99,19 @@ const OrlandoLanding: React.FC = () => {
                 e.preventDefault();
                 openContactModal({ source: 'orlando' });
               }}
-              className="btn-whatsapp btn-specialist px-5 py-3 rounded-full bg-anhanga-action text-anhanga-dark font-bold hover:brightness-105 transition-[filter] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
+              className="btn-whatsapp btn-specialist px-5 py-3 rounded-full bg-anhanga-action text-anhanga-dark font-bold hover:brightness-105 transition-[filter] focus-visible:shadow-[inset_0_0_0_2px_theme(colors.anhanga.action)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
               data-tracking="footer-orlando"
               data-testid="cta-orlando-specialist"
             >
               Falar com especialista
             </button>
-            <Link to="/beto-carrero/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-anhanga-dark font-semibold hover:border-anhanga-action/40 focus-visible:border-anhanga-action transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
+            <Link to="/beto-carrero/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-anhanga-dark font-semibold hover:border-anhanga-action/40 focus-visible:shadow-[inset_0_0_0_2px_theme(colors.anhanga.action)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
               Ver pacote Beto Carrero
             </Link>
-            <Link to="/blog/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-anhanga-dark font-semibold hover:border-anhanga-action/40 focus-visible:border-anhanga-action transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
+            <Link to="/blog/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-anhanga-dark font-semibold hover:border-anhanga-action/40 focus-visible:shadow-[inset_0_0_0_2px_theme(colors.anhanga.action)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
               Ler dicas no blog
             </Link>
-            <a href="https://www.visitorlando.com/" target="_blank" rel="noopener noreferrer" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-anhanga-dark font-semibold hover:border-anhanga-action/40 focus-visible:border-anhanga-action transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
+            <a href="https://www.visitorlando.com/" target="_blank" rel="noopener noreferrer" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-anhanga-dark font-semibold hover:border-anhanga-action/40 focus-visible:shadow-[inset_0_0_0_2px_theme(colors.anhanga.action)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
               Guia Oficial Visit Orlando
             </a>
           </div>

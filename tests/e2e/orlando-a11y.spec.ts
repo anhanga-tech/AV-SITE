@@ -98,14 +98,26 @@ test.describe('/orlando — acessibilidade', () => {
 
     for (const controle of controles) {
       await controle.scrollIntoViewIfNeeded();
+
+      // Shift+Tab e volta: o último movimento precisa ser um Tab REAL, senão o
+      // Chromium não considera o foco como vindo do teclado e :focus-visible
+      // não dispara — o teste passaria com a regra ausente. Mesmo motivo do
+      // teste acima; aqui o vaivém evita ter de saber quem é o tabável
+      // anterior de cada controle.
       await controle.focus();
+      await page.keyboard.press('Shift+Tab');
+      await page.keyboard.press('Tab');
+      await expect(controle).toBeFocused();
+
       const estilo = await controle.evaluate((el) => {
         const cs = getComputedStyle(el);
-        return { style: cs.outlineStyle, width: cs.outlineWidth };
+        return { style: cs.outlineStyle, width: cs.outlineWidth, shadow: cs.boxShadow };
       });
       const nome = (await controle.textContent())?.trim().slice(0, 30);
       expect(estilo.style, `sem outline em "${nome}"`).not.toBe('none');
       expect(parseFloat(estilo.width), `outline fino em "${nome}"`).toBeGreaterThanOrEqual(2);
+      // Dois sinais, como o PRODUCT.md exige — não só o outline.
+      expect(estilo.shadow, `sem segundo sinal em "${nome}"`).not.toBe('none');
     }
   });
 });
