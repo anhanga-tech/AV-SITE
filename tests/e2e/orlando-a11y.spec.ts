@@ -55,17 +55,57 @@ test.describe('/orlando — acessibilidade', () => {
     await page.goto('/orlando/');
     await page.getByRole('heading', { level: 1 }).waitFor();
 
-    const link = page.getByRole('link', { name: 'Parques', exact: true });
-    await link.focus();
+    const anterior = page.getByRole('link', { name: 'Destaques', exact: true });
+    const alvo = page.getByRole('link', { name: 'Parques', exact: true });
 
-    const estilo = await link.evaluate((el) => {
+    // Foca o tabável anterior e avança com um Tab REAL: `.focus()` direto no
+    // alvo é foco programático e não aciona o heurístico de :focus-visible do
+    // Chromium — o teste passaria sem exercitar a regra que esta PR adiciona.
+    // Mesmo padrão de tests/e2e/landing-consultoria-content.spec.ts.
+    await anterior.focus();
+    await page.keyboard.press('Tab');
+    await expect(alvo).toBeFocused();
+
+    const estilo = await alvo.evaluate((el) => {
       const cs = getComputedStyle(el);
-      return { width: cs.outlineWidth, style: cs.outlineStyle, color: cs.outlineColor };
+      return {
+        width: cs.outlineWidth,
+        style: cs.outlineStyle,
+        // Segundo sinal exigido pelo PRODUCT.md, além do outline.
+        shadow: cs.boxShadow,
+      };
     });
 
     // O padrão do Chrome é `auto 1px rgb(0,95,204)` — some numa página de
-    // bordas pretas de 2–4px. O DESIGN.md pede dois sinais visíveis.
+    // bordas pretas de 2–4px.
     expect(parseFloat(estilo.width)).toBeGreaterThanOrEqual(3);
     expect(estilo.style).toBe('solid');
+    expect(estilo.shadow, 'falta o segundo sinal de foco').not.toBe('none');
+  });
+
+  test('os controles fora do OrlandoApp também recebem foco visível', async ({ page }) => {
+    await page.goto('/orlando/');
+    await page.getByRole('heading', { level: 1 }).waitFor();
+
+    // O escopo `.landing-orlando` termina no <OrlandoApp />: o backlink do topo
+    // e os controles do bloco de SEO são irmãos na mesma rota e ficavam com o
+    // foco padrão do browser (achado do review da PR #1351).
+    const controles = [
+      page.getByRole('link', { name: /Voltar para o site principal/i }),
+      page.getByRole('button', { name: 'Falar com especialista' }),
+      page.getByRole('link', { name: 'Ver pacote Beto Carrero' }),
+    ];
+
+    for (const controle of controles) {
+      await controle.scrollIntoViewIfNeeded();
+      await controle.focus();
+      const estilo = await controle.evaluate((el) => {
+        const cs = getComputedStyle(el);
+        return { style: cs.outlineStyle, width: cs.outlineWidth };
+      });
+      const nome = (await controle.textContent())?.trim().slice(0, 30);
+      expect(estilo.style, `sem outline em "${nome}"`).not.toBe('none');
+      expect(parseFloat(estilo.width), `outline fino em "${nome}"`).toBeGreaterThanOrEqual(2);
+    }
   });
 });

@@ -57,17 +57,22 @@
 /*
   Foco visível na linguagem da página. Sem nenhuma regra própria, a landing
   caía no anel padrão do Chrome — 1px azul de sistema, imperceptível numa
-  página construída inteira com bordas pretas de 2 a 4px, e sem cumprir a
-  regra de dois sinais do DESIGN.md.
+  página construída inteira com bordas pretas de 2 a 4px.
 
-  `:focus-visible` e não `:focus`: o anel aparece para navegação por teclado,
-  não a cada clique de mouse.
+  São DOIS sinais, como o PRODUCT.md exige: o outline preto e uma borda rosa
+  desenhada por `box-shadow: inset`. A borda vai por box-shadow, e não por
+  `border`, porque a maioria destes elementos não tem borda declarada — dar
+  uma no foco mudaria o tamanho da caixa e empurraria o layout ao redor.
+
+  `:focus-visible` e não `:focus`: os sinais aparecem na navegação por
+  teclado, não a cada clique de mouse.
 */
 .landing-orlando a:focus-visible,
 .landing-orlando button:focus-visible,
 .landing-orlando [tabindex]:focus-visible {
     outline: 3px solid var(--text-dark);
     outline-offset: 3px;
+    box-shadow: inset 0 0 0 2px var(--accent-pink-ink);
 }
 
 /* SVG Grain Filter */
