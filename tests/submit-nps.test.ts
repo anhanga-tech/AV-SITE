@@ -21,18 +21,30 @@ function restore() {
     clearNpsInviteEnv();
 }
 
+// Um IP aleatório em 200 valores colidia: são 33 requisições neste arquivo e o
+// rate limit é de 3 por IP, então de vez em quando quatro sorteios caíam no
+// mesmo endereço e um teste sem relação com rate limit recebia 429 no lugar de
+// 201 (~0,5% das execuções). O contador dá um IP distinto a cada chamada, como
+// pede `docs/standards/testing.md` ("gere IPs novos quando rate limiting importa").
+// Os testes de rate limit montam o Request próprio, com IP fixo — não usam isto.
+let requestCounter = 0;
+
+function nextClientIp(): string {
+    requestCounter += 1;
+    return `127.${(requestCounter >> 16) & 0xff}.${(requestCounter >> 8) & 0xff}.${requestCounter & 0xff}`;
+}
+
 function buildRequest(
     body: Record<string, unknown> | string,
     init?: { headers?: Record<string, string>; method?: string },
 ): Request {
-    const ipSuffix = Math.floor(Math.random() * 200) + 1;
     const method = init?.method ?? 'POST';
 
     return new Request('http://localhost/api/submit-nps', {
         method,
         headers: {
             'Content-Type': 'application/json',
-            'x-real-ip': `127.0.0.${ipSuffix}`,
+            'x-real-ip': nextClientIp(),
             ...init?.headers,
         },
         body: method === 'OPTIONS' || method === 'GET' ? undefined : typeof body === 'string' ? body : JSON.stringify(body),

@@ -1,4 +1,4 @@
-type HeaderSubLink = {
+export type HeaderSubLink = {
   name: string;
   href: string;
 };
