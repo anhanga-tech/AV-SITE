@@ -84,6 +84,16 @@
     </image:image>
   </url>
   <url>
+    <loc>https://www.anhanga.tur.br/parques-brasil/</loc>
+    <lastmod>2026-07-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/categories/beto-carrero-world.jpg</image:loc>
+      <image:caption>Parques do Brasil - Beto Carrero, Hopi Hari e parques aquáticos | Anhangá Viagens</image:caption>
+    </image:image>
+  </url>
+  <url>
     <loc>https://www.anhanga.tur.br/termos-de-uso/</loc>
     <lastmod>2026-05-18</lastmod>
     <changefreq>monthly</changefreq>

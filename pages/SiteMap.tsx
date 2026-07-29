@@ -11,6 +11,7 @@ const CORE_LINKS = [
   { to: `${SITE_URL}/sobre/`, label: 'Sobre a Anhangá Viagens' },
   { to: getBlogHomeUrl(), label: 'Blog de Viagens e Roteiros', external: true },
   { to: `${SITE_URL}/orlando/`, label: 'Pacotes para Orlando' },
+  { to: `${SITE_URL}/parques-brasil/`, label: 'Parques do Brasil: qual escolher' },
   { to: `${SITE_URL}/beto-carrero/`, label: 'Pacote Beto Carrero' },
   { to: `${SITE_URL}/melhor-idade/`, label: 'Viagens para Melhor Idade' },
   { to: `${SITE_URL}/lollapalooza/`, label: 'Lollapalooza Brasil' },
