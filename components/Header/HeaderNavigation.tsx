@@ -16,7 +16,7 @@ interface DesktopNavigationProps extends SharedNavigationProps {
   navGapClass: string;
 }
 
-interface NavDropdownProps extends Omit<SharedNavigationProps, 'navGapClass'> {
+interface NavDropdownProps extends SharedNavigationProps {
   link: { name: string; subLinks: HeaderSubLink[] };
 }
 
@@ -57,7 +57,14 @@ function NavDropdown({ link, isHome, navTextClass, onNavClick }: NavDropdownProp
     <div
       className="relative"
       onMouseEnter={() => { isPointerInside.current = true; setIsOpen(true); }}
-      onMouseLeave={() => { isPointerInside.current = false; close(); }}
+      // Só o ponteiro saindo não basta para fechar: se o foco está num sublink,
+      // fechar o esconde (`visibility: hidden`) e o teclado perde a posição —
+      // exatamente a regressão que esta mudança existe para corrigir. Quando o
+      // foco sai, o `onBlur` abaixo fecha.
+      onMouseLeave={(event) => {
+        isPointerInside.current = false;
+        if (!event.currentTarget.contains(document.activeElement)) close();
+      }}
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) close();
       }}

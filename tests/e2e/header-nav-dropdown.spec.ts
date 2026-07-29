@@ -61,4 +61,20 @@ test.describe('Submenu do header desktop', () => {
 
     await expect(firstSubLink(page)).toBeVisible();
   });
+
+  // Mouse e teclado combinados: com o foco dentro do submenu, tirar o ponteiro
+  // não pode fechar o painel — ele vira `visibility: hidden`, o link focado
+  // some e o usuário perde a posição do teclado.
+  test('não fecha ao tirar o ponteiro enquanto o foco está dentro do submenu', async ({ page }) => {
+    await trigger(page).hover();
+    await trigger(page).focus();
+    await page.keyboard.press('Tab');
+    await expect(firstSubLink(page)).toBeFocused();
+
+    // Ponteiro sai do wrapper (dispara mouseleave), foco continua no sublink.
+    await page.mouse.move(5, 600);
+
+    await expect(firstSubLink(page)).toBeVisible();
+    await expect(firstSubLink(page)).toBeFocused();
+  });
 });
