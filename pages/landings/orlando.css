@@ -1,9 +1,17 @@
 .landing-orlando {
     --bg-color: #fdfcf5;
+    /* Vibrantes: fita, selo, sombra, fundo de etiqueta — decoração, onde o
+       WCAG não se aplica. A identidade do caderno vive aqui. */
     --accent-pink: #ff6b9d;
     --accent-blue: #4cc9f0;
     --accent-yellow: #ffd166;
     --accent-green: #06d6a0;
+    /* Tintas: as mesmas cores rebaixadas ao valor que passa AA como TEXTO.
+       O rosa/ciano claros medem 2,68 e 1,85 sobre o creme — abaixo do piso de
+       3:1 para texto grande. Separar tinta de decoração corrige a leitura sem
+       apagar a paleta. */
+    --accent-pink-ink: #d1356b;
+    --accent-blue-ink: #12718f;
     --text-dark: #1a1a1a;
     --tape-color: rgba(255, 255, 255, 0.4);
     --sticker-shadow: 2px 4px 12px rgba(0, 0, 0, 0.12);
@@ -26,8 +34,24 @@
     font-family: "Outfit", sans-serif;
     color: var(--text-dark);
     line-height: 1.5;
-    overflow-x: hidden;
-    background-image: url("https://media.anhanga.tur.br/images/textures/felt.png");
+    /* `hidden` fazia deste container o ancestral rolável mais próximo, então o
+       navegador tentava rolar ELE ao seguir uma âncora — e como ele não tem
+       overflow próprio, nenhum dos 4 links do menu movia a página.
+
+       Sem fallback para `hidden` de propósito (review da PR #1325): num
+       navegador sem suporte a `clip` (Safari < 16) a declaração é ignorada e
+       o container volta a `visible` — o que pode gerar scroll horizontal, mas
+       mantém o menu funcionando. `hidden` como fallback recriaria exatamente
+       o defeito que esta linha existe para corrigir. Medido sem clip: 32px de
+       excesso a 320px e 5px a 375px, ambos vindos da nav e dos cartões de
+       destaque, que a #1336 corrige na origem. */
+    overflow-x: clip;
+    /* Véu creme sobre a textura: o feltro cru é cinza médio e derrubava todos
+       os pares de contraste da página de uma vez. O grão continua legível e a
+       superfície volta a ser papel, não feltro. */
+    background-image:
+        linear-gradient(rgba(253, 252, 245, 0.82), rgba(253, 252, 245, 0.82)),
+        url("https://media.anhanga.tur.br/images/textures/felt.png");
 }
 
 /* SVG Grain Filter */
@@ -112,7 +136,7 @@
 }
 
 .landing-orlando .nav-links a:hover {
-    color: var(--accent-pink);
+    color: var(--accent-pink-ink);
 }
 
 .landing-orlando .nav-links a:hover::after {
@@ -174,14 +198,14 @@
 }
 
 .landing-orlando .highlight-blue {
-    color: var(--accent-blue);
+    color: var(--accent-blue-ink);
     display: block;
     transform: rotate(-1.5deg);
     text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.05);
 }
 
 .landing-orlando .highlight-pink {
-    color: var(--accent-pink);
+    color: var(--accent-pink-ink);
     display: block;
     margin-left: 0.2em;
 }
@@ -356,7 +380,10 @@
     justify-content: center;
     gap: 12px;
     background: #25d366;
-    color: white;
+    /* Tinta preta sobre a fita colorida, não branco: branco sobre este verde
+       mede 1,98 (piso 4,5). O preto da página dá 7,7 e é o mesmo tratamento
+       que a etiqueta "Dia 1" do roteiro já usa. */
+    color: var(--text-dark);
     padding: 1.25rem 2.5rem;
     font-family: "Space Mono", monospace;
     font-weight: 700;
@@ -439,7 +466,7 @@
     font-family: "Space Mono", monospace;
     font-style: italic;
     font-weight: 700;
-    color: var(--accent-pink);
+    color: var(--accent-pink-ink);
     transform: rotate(-3deg);
     font-size: 1.1rem;
     text-decoration: underline;
@@ -775,7 +802,7 @@
     display: block;
     font-family: "Outfit", sans-serif;
     font-weight: 900;
-    color: var(--accent-pink);
+    color: var(--accent-pink-ink);
     font-size: 1.2rem;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -926,7 +953,7 @@
 }
 
 .landing-orlando .social-links a:hover {
-    color: var(--accent-pink);
+    color: var(--accent-pink-ink);
 }
 
 .landing-orlando .social-links a::after {
