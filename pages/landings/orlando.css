@@ -36,10 +36,15 @@
     line-height: 1.5;
     /* `hidden` fazia deste container o ancestral rolável mais próximo, então o
        navegador tentava rolar ELE ao seguir uma âncora — e como ele não tem
-       overflow próprio, nenhum dos 4 links do menu movia a página. `clip`
-       corta igual sem criar contexto de rolagem. `hidden` fica como fallback
-       para navegadores sem suporte a clip (Safari < 16). */
-    overflow-x: hidden;
+       overflow próprio, nenhum dos 4 links do menu movia a página.
+
+       Sem fallback para `hidden` de propósito (review da PR #1325): num
+       navegador sem suporte a `clip` (Safari < 16) a declaração é ignorada e
+       o container volta a `visible` — o que pode gerar scroll horizontal, mas
+       mantém o menu funcionando. `hidden` como fallback recriaria exatamente
+       o defeito que esta linha existe para corrigir. Medido sem clip: 32px de
+       excesso a 320px e 5px a 375px, ambos vindos da nav e dos cartões de
+       destaque, que a #1336 corrige na origem. */
     overflow-x: clip;
     /* Véu creme sobre a textura: o feltro cru é cinza médio e derrubava todos
        os pares de contraste da página de uma vez. O grão continua legível e a
