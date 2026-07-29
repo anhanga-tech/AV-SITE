@@ -60,7 +60,23 @@ export function OrlandoHero() {
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    // Devolve os cartões à posição de repouso quando a preferência muda no meio
+    // da sessão — sem isto eles congelariam no último deslocamento aplicado.
+    const resetCards = () => {
+      cardsRef.current.forEach((card) => {
+        if (card) card.style.transform = "";
+      });
+    };
+
     const handleMouseMove = (e: MouseEvent) => {
+      // O reset global de motion (src/index.css) zera animation-duration e
+      // transition-duration com !important, mas não alcança um transform
+      // inline aplicado por JS: o movimento acontecia mesmo com a preferência
+      // ligada. O PRODUCT.md é explícito — "reduced motion não é opcional".
+      if (reduceMotion.matches) return;
+
       // Disable parallax on mobile/tablet (matches CSS breakpoint)
       if (window.innerWidth <= 1100) return;
 
@@ -81,7 +97,11 @@ export function OrlandoHero() {
     };
 
     window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    reduceMotion.addEventListener("change", resetCards);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      reduceMotion.removeEventListener("change", resetCards);
+    };
   }, []);
 
   return (

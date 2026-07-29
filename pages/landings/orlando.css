@@ -54,6 +54,23 @@
         url("https://media.anhanga.tur.br/images/textures/felt.png");
 }
 
+/*
+  Foco visível na linguagem da página. Sem nenhuma regra própria, a landing
+  caía no anel padrão do Chrome — 1px azul de sistema, imperceptível numa
+  página construída inteira com bordas pretas de 2 a 4px, e sem cumprir a
+  regra de dois sinais do DESIGN.md.
+
+  `:focus-visible` e não `:focus`: o anel aparece para navegação por teclado,
+  não a cada clique de mouse.
+*/
+.landing-orlando a:focus-visible,
+.landing-orlando button:focus-visible,
+.landing-orlando [tabindex]:focus-visible {
+    outline: 3px solid var(--text-dark);
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+
 /* SVG Grain Filter */
 .landing-orlando .grain-overlay {
     position: fixed;
