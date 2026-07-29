@@ -88,16 +88,14 @@ test.describe('/orlando — acessibilidade', () => {
     await page.getByRole('heading', { level: 1 }).waitFor();
 
     // O escopo `.landing-orlando` termina no <OrlandoApp />: o backlink do topo
-    // e os controles do bloco de SEO são irmãos na mesma rota e ficavam com o
-    // foco padrão do browser (achado do review da PR #1351).
-    // Os cinco controles que a mudança tocou — não três: um guard parcial
-    // deixaria dois regredirem sem o teste acusar.
+    // e o CTA do bloco de SEO são irmãos na mesma rota e ficavam com o foco
+    // padrão do browser (achado do review da PR #1351).
+    // A #1328 removeu os outros três controles deste bloco (Beto Carrero, blog,
+    // Visit Orlando externo): tiravam o visitante do funil bem no ponto de
+    // maior intenção de conversão. Restam só os dois que continuam na página.
     const controles = [
       page.getByRole('link', { name: /Voltar para o site principal/i }),
       page.getByRole('button', { name: 'Falar com especialista' }),
-      page.getByRole('link', { name: 'Ver pacote Beto Carrero' }),
-      page.getByRole('link', { name: 'Ler dicas no blog' }),
-      page.getByRole('link', { name: 'Guia Oficial Visit Orlando' }),
     ];
 
     for (const controle of controles) {
@@ -145,6 +143,27 @@ test.describe('/orlando — acessibilidade', () => {
     // acha várias partes mesmo com UMA sombra só — o teste passava sem a regra.
     expect(shadow, 'faltou a borda rosa de foco').toContain('inset');
     expect(shadow, `faltou a sombra dura da colagem — veio "${shadow}"`).toMatch(
+      /(?<!inset[^,]*)\b4px 4px\b/,
+    );
+  });
+
+  // Companion do teste acima, para a #1328: a aba do FAQ também tem sombra
+  // hard própria (`.faq-tab`) e caiu na mesma regra genérica de foco sem a
+  // composição — perderia o relevo exatamente como .logo e .main-btn já
+  // perderam antes da #1329.
+  test('o relevo da aba do FAQ sobrevive ao foco por teclado', async ({ page }) => {
+    await page.goto('/orlando/');
+    await page.getByRole('heading', { level: 1 }).waitFor();
+
+    const tab = page.getByRole('button', { name: 'Qual a melhor época para viajar para Orlando?' });
+    await tab.focus();
+    await page.keyboard.press('Shift+Tab');
+    await page.keyboard.press('Tab');
+    await expect(tab).toBeFocused();
+
+    const shadow = await tab.evaluate((el) => getComputedStyle(el).boxShadow);
+    expect(shadow, 'faltou a borda rosa de foco').toContain('inset');
+    expect(shadow, `faltou a sombra dura da aba — veio "${shadow}"`).toMatch(
       /(?<!inset[^,]*)\b4px 4px\b/,
     );
   });

@@ -7,6 +7,7 @@ import { OrlandoHero } from "./OrlandoHero";
 import { OrlandoFeatures } from "./OrlandoFeatures";
 import { OrlandoParksGallery } from "./OrlandoParksGallery";
 import { OrlandoItinerary } from "./OrlandoItinerary";
+import { OrlandoFAQ } from "./OrlandoFAQ";
 import { OrlandoFooter } from "./OrlandoFooter";
 
 function OrlandoApp() {
@@ -28,6 +29,7 @@ function OrlandoApp() {
       <OrlandoFeatures />
       <OrlandoParksGallery />
       <OrlandoItinerary />
+      <OrlandoFAQ />
       <OrlandoFooter />
     </div>
   );

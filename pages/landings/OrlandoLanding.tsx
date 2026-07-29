@@ -1,36 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Seo } from '../../components/Seo';
-import { LandingFAQ } from '../../components/LandingFAQ';
 import OrlandoApp from '../../components/landings/orlando/OrlandoApp';
+import { ORLANDO_FAQ_ITEMS } from '../../components/landings/orlando/orlandoFaqItems';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../../components/schemas/FAQPageSchema';
 import { ServiceSchema } from '../../components/schemas/ServiceSchema';
 import { openContactModal } from '../../utils/contactForm';
 import './orlando.css';
-
-const ORLANDO_FAQ_ITEMS = [
-  {
-    question: 'Qual a melhor época para viajar para Orlando?',
-    answer: 'Para quem busca economia e parques menos cheios, os meses de maio, setembro e final de outubro são excelentes. Se o foco for clima agradável e eventos sazonais, novembro e dezembro oferecem a magia das festas, embora com maior movimento.'
-  },
-  {
-    question: 'Preciso de visto americano para viajar para Orlando?',
-    answer: 'Sim, cidadãos brasileiros necessitam de visto americano válido. Nossa equipe orienta sobre os passos necessários e prazos recomendados para que você organize sua documentação com antecedência e segurança. Se ainda não tem, fale conosco no chat que te ajudamos com os primeiros passos.'
-  },
-  {
-    question: 'A Anhangá oferece suporte se eu tiver algum problema lá fora?',
-    answer: 'Sim! Nosso diferencial é o suporte especializado 24h via WhatsApp. Seja um ajuste no roteiro, dúvida em um hotel ou qualquer imprevisto, nossa equipe está pronta para te atender em tempo real para que sua única preocupação seja aproveitar a magia.'
-  },
-  {
-    question: 'É a nossa primeira viagem. Vocês ajudam com o roteiro detalhado?',
-    answer: 'Com certeza. Entregamos um roteiro personalizado dia a dia, indicando quais parques visitar primeiro, dicas de filas (Genie+ e Lightning Lane) e até sugestões de restaurantes onde as crianças mais se divertem.'
-  },
-  {
-    question: 'Qual a duração ideal de uma viagem para Orlando?',
-    answer: 'Para conseguir visitar os principais parques da Disney e Universal com calma, recomendamos uma estadia de 10 a 14 dias. Isso permite intercalar dias intensos de parque com dias de descanso ou compras.'
-  }
-];
 
 const OrlandoLanding: React.FC = () => {
   return (
@@ -72,7 +49,6 @@ const OrlandoLanding: React.FC = () => {
       />
 
       <OrlandoApp />
-      <LandingFAQ items={ORLANDO_FAQ_ITEMS} />
       <section className="bg-brand-surface border-t border-brand-cyan/10 py-14">
         <div className="container mx-auto px-6 max-w-5xl">
           <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Pacotes para Orlando sem improviso</h2>
@@ -105,15 +81,6 @@ const OrlandoLanding: React.FC = () => {
             >
               Falar com especialista
             </button>
-            <Link to="/beto-carrero/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-anhanga-dark font-semibold hover:border-anhanga-action/40 focus-visible:shadow-[inset_0_0_0_2px_theme(colors.anhanga.action)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
-              Ver pacote Beto Carrero
-            </Link>
-            <Link to="/blog/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-anhanga-dark font-semibold hover:border-anhanga-action/40 focus-visible:shadow-[inset_0_0_0_2px_theme(colors.anhanga.action)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
-              Ler dicas no blog
-            </Link>
-            <a href="https://www.visitorlando.com/" target="_blank" rel="noopener noreferrer" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-anhanga-dark font-semibold hover:border-anhanga-action/40 focus-visible:shadow-[inset_0_0_0_2px_theme(colors.anhanga.action)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
-              Guia Oficial Visit Orlando
-            </a>
           </div>
         </div>
       </section>
