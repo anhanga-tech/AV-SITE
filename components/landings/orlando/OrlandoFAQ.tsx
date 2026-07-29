@@ -75,6 +75,7 @@ export function OrlandoFAQ() {
                   id={panelId}
                   role="region"
                   aria-labelledby={tabId}
+                  aria-hidden={!isOpen}
                   className={`faq-panel ${isOpen ? "is-open" : ""}`}
                 >
                   <div className="faq-panel-inner">

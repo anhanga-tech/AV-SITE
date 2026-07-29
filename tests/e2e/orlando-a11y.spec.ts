@@ -167,4 +167,25 @@ test.describe('/orlando — acessibilidade', () => {
       /(?<!inset[^,]*)\b4px 4px\b/,
     );
   });
+
+  // Review do Codex na #1352: o painel fechado (`grid-template-rows: 0fr` +
+  // overflow hidden) some visualmente, mas continuava na árvore de
+  // acessibilidade — um leitor de tela em modo de navegação por virtual
+  // cursor conseguia ler a resposta de uma pergunta "fechada", tornando
+  // `aria-expanded="false"` enganoso.
+  test('a resposta fechada do FAQ sai da árvore de acessibilidade', async ({ page }) => {
+    await page.goto('/orlando/');
+    await page.getByRole('heading', { level: 1 }).waitFor();
+
+    // O primeiro item vem aberto por padrão — testa o segundo, que começa fechado.
+    const segundaAba = page.getByRole('button', { name: 'Preciso de visto americano para viajar para Orlando?' });
+    await expect(segundaAba).toHaveAttribute('aria-expanded', 'false');
+
+    const painel = page.locator('#faq-panel-1');
+    await expect(painel).toHaveAttribute('aria-hidden', 'true');
+
+    await segundaAba.click();
+    await expect(segundaAba).toHaveAttribute('aria-expanded', 'true');
+    await expect(painel).toHaveAttribute('aria-hidden', 'false');
+  });
 });
