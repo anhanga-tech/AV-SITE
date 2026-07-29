@@ -90,10 +90,14 @@ test.describe('/orlando — acessibilidade', () => {
     // O escopo `.landing-orlando` termina no <OrlandoApp />: o backlink do topo
     // e os controles do bloco de SEO são irmãos na mesma rota e ficavam com o
     // foco padrão do browser (achado do review da PR #1351).
+    // Os cinco controles que a mudança tocou — não três: um guard parcial
+    // deixaria dois regredirem sem o teste acusar.
     const controles = [
       page.getByRole('link', { name: /Voltar para o site principal/i }),
       page.getByRole('button', { name: 'Falar com especialista' }),
       page.getByRole('link', { name: 'Ver pacote Beto Carrero' }),
+      page.getByRole('link', { name: 'Ler dicas no blog' }),
+      page.getByRole('link', { name: 'Guia Oficial Visit Orlando' }),
     ];
 
     for (const controle of controles) {
@@ -119,5 +123,29 @@ test.describe('/orlando — acessibilidade', () => {
       // Dois sinais, como o PRODUCT.md exige — não só o outline.
       expect(estilo.shadow, `sem segundo sinal em "${nome}"`).not.toBe('none');
     }
+  });
+
+  test('o relevo da colagem sobrevive ao foco por teclado', async ({ page }) => {
+    await page.goto('/orlando/');
+    await page.getByRole('heading', { level: 1 }).waitFor();
+
+    // `box-shadow` não soma entre regras: a regra genérica de foco apagaria a
+    // sombra "sticker" do logo e do CTA, que é o relevo 3D da colagem — eles
+    // perderiam o peso físico justamente ao serem alcançados por teclado.
+    const cta = page.getByRole('button', { name: 'Solicitar Orçamento' });
+    await cta.focus();
+    await page.keyboard.press('Shift+Tab');
+    await page.keyboard.press('Tab');
+    await expect(cta).toBeFocused();
+
+    const shadow = await cta.evaluate((el) => getComputedStyle(el).boxShadow);
+
+    // Verificar os dois valores nominalmente, e não contar vírgulas: o
+    // computed style traz cores como `rgb(209, 53, 107)`, então um split(',')
+    // acha várias partes mesmo com UMA sombra só — o teste passava sem a regra.
+    expect(shadow, 'faltou a borda rosa de foco').toContain('inset');
+    expect(shadow, `faltou a sombra dura da colagem — veio "${shadow}"`).toMatch(
+      /(?<!inset[^,]*)\b4px 4px\b/,
+    );
   });
 });

@@ -75,6 +75,21 @@
     box-shadow: inset 0 0 0 2px var(--accent-pink-ink);
 }
 
+/*
+  `box-shadow` não soma entre regras: a declaração acima substituiria por
+  inteiro a sombra "sticker" do logo e do CTA principal, que é o relevo 3D da
+  colagem. Eles perderiam o peso físico exatamente ao serem alcançados por
+  teclado. Aqui os dois valores são compostos na mesma declaração.
+
+  A especificidade (0,3,0) supera os (0,2,1) da regra genérica acima.
+*/
+.landing-orlando .logo:focus-visible,
+.landing-orlando .main-btn:focus-visible {
+    box-shadow:
+        inset 0 0 0 2px var(--accent-pink-ink),
+        var(--solid-shadow);
+}
+
 /* SVG Grain Filter */
 .landing-orlando .grain-overlay {
     position: fixed;
