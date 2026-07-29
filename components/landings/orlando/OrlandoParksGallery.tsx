@@ -6,6 +6,24 @@
 import type { CSSProperties } from 'react';
 import { getMediaUrl, optimizeRemoteImageUrl } from "../../../data/mediaConfig";
 import { openContactModal } from "../../../utils/contactForm";
+import { handleLogoTransformError } from "./logoFallback";
+
+/*
+  Por que não há `srcSet` aqui: `selectImagePreset` (lib/media-url.ts) normaliza
+  qualquer largura para um conjunto fixo de presets — tudo abaixo de 800 vira
+  `inline-sm` 800. Um srcSet de várias entradas geraria a MESMA URL repetida,
+  markup morto. O que decide os bytes neste repo é qual preset a chamada cai,
+  não quantos candidatos ela oferece.
+
+  Um único candidato de 800 cobre a página inteira: a foto ocupa 328px no
+  desktop e 237px no celular, então mesmo em DPR 3 o alvo fica abaixo de 800.
+*/
+
+/*
+  Vetor não passa por transform raster — redimensionar um SVG não economiza
+  byte nenhum e o `/cdn-cgi/image` pode rasterizá-lo. 3 dos 12 logos são SVG.
+*/
+const isVector = (path: string): boolean => path.toLowerCase().endsWith('.svg');
 
 interface ParkCardData {
   image: string;
@@ -28,8 +46,18 @@ function ParkCard({ image, alt, logo, logoAlt, logoStyle, logoWidth, logoHeight,
   return (
     <div className="park-card">
       <div className="park-image-frame">
+        {/*
+          Sem `height` na chamada de propósito: com (600, 400) o ratio 1,5 não
+          casa com nenhum preset dentro da tolerância de 0,08 e caía no fallback
+          `content` 1200×675 — para um frame de 220px de altura. Sem height cai
+          em `inline-sm` 800 `scale-down`.
+
+          Trocar `cover` por `scale-down` não muda o enquadramento visível: o
+          `.park-image-frame img` já aplica `object-fit: cover` com altura fixa,
+          então o recorte é do CSS, não do transform.
+        */}
         <img
-          src={optimizeRemoteImageUrl(image, 600, 400)}
+          src={optimizeRemoteImageUrl(image, 660)}
           alt={alt}
           width="600"
           height="400"
@@ -39,7 +67,17 @@ function ParkCard({ image, alt, logo, logoAlt, logoStyle, logoWidth, logoHeight,
       <img
         className="park-logo-title"
         style={logoStyle}
-        src={getMediaUrl(logo)}
+        // Os PNG passavam crus pelo getMediaUrl, sem transform nenhuma — é onde
+        // vivia o magic-kingdom.png de 11502×1942 e 243 KB para um slot de
+        // 200×55. SVG segue cru: transform raster não economiza em vetor.
+        //
+        // O `200` não define o tamanho pedido: como no caso da foto acima,
+        // `selectImagePreset` colapsa qualquer largura <= 800 no preset
+        // `inline-sm` de 800px. Mudar este número não muda byte nenhum enquanto
+        // ficar dentro dessa faixa — inclusive para os logos do grupo Universal,
+        // que o `logoStyle` exibe a até 280px e o preset de 800 já cobre.
+        src={isVector(logo) ? getMediaUrl(logo) : optimizeRemoteImageUrl(logo, 200)}
+        onError={isVector(logo) ? undefined : handleLogoTransformError(logo)}
         alt={logoAlt}
         width={logoWidth}
         height={logoHeight}
