@@ -3,9 +3,45 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { CSSProperties } from 'react';
+import type { CSSProperties, SyntheticEvent } from 'react';
 import { getMediaUrl, optimizeRemoteImageUrl } from "../../../data/mediaConfig";
 import { openContactModal } from "../../../utils/contactForm";
+
+/*
+  Por que não há `srcSet` aqui: `selectImagePreset` (lib/media-url.ts) normaliza
+  qualquer largura para um conjunto fixo de presets — tudo abaixo de 800 vira
+  `inline-sm` 800. Um srcSet de várias entradas geraria a MESMA URL repetida,
+  markup morto. O que decide os bytes neste repo é qual preset a chamada cai,
+  não quantos candidatos ela oferece.
+
+  Um único candidato de 800 cobre a página inteira: a foto ocupa 328px no
+  desktop e 237px no celular, então mesmo em DPR 3 o alvo fica abaixo de 800.
+*/
+
+/*
+  Vetor não passa por transform raster — redimensionar um SVG não economiza
+  byte nenhum e o `/cdn-cgi/image` pode rasterizá-lo. 3 dos 12 logos são SVG.
+*/
+const isVector = (path: string): boolean => path.toLowerCase().endsWith('.svg');
+
+/*
+  Nem todo original aceita transform. O `magic-kingdom.png` (11502×1942, 22,3
+  megapixels) devolve HTTP 422 / "ERROR 9516: error during decoding" no
+  `/cdn-cgi/image` — o arquivo cru serve normalmente, mas o resizer não o
+  decodifica. Sem este fallback o logo simplesmente não apareceria.
+
+  A causa raiz é o arquivo, não o código: precisa ser reencodado no R2 (issue
+  separada, mesmo bloqueio de acesso ao bucket da #1333). Até lá o fallback
+  vale para qualquer transform que falhe, não só este.
+*/
+const handleLogoTransformError =
+  (logo: string) =>
+  (event: SyntheticEvent<HTMLImageElement>): void => {
+    const img = event.currentTarget;
+    const raw = getMediaUrl(logo);
+    // Guarda contra loop: se o próprio original falhar, não tenta de novo.
+    if (img.src !== raw) img.src = raw;
+  };
 
 interface ParkCardData {
   image: string;
@@ -28,8 +64,18 @@ function ParkCard({ image, alt, logo, logoAlt, logoStyle, logoWidth, logoHeight,
   return (
     <div className="park-card">
       <div className="park-image-frame">
+        {/*
+          Sem `height` na chamada de propósito: com (600, 400) o ratio 1,5 não
+          casa com nenhum preset dentro da tolerância de 0,08 e caía no fallback
+          `content` 1200×675 — para um frame de 220px de altura. Sem height cai
+          em `inline-sm` 800 `scale-down`.
+
+          Trocar `cover` por `scale-down` não muda o enquadramento visível: o
+          `.park-image-frame img` já aplica `object-fit: cover` com altura fixa,
+          então o recorte é do CSS, não do transform.
+        */}
         <img
-          src={optimizeRemoteImageUrl(image, 600, 400)}
+          src={optimizeRemoteImageUrl(image, 660)}
           alt={alt}
           width="600"
           height="400"
@@ -39,7 +85,11 @@ function ParkCard({ image, alt, logo, logoAlt, logoStyle, logoWidth, logoHeight,
       <img
         className="park-logo-title"
         style={logoStyle}
-        src={getMediaUrl(logo)}
+        // Os PNG passavam crus pelo getMediaUrl, sem transform nenhuma — é onde
+        // vivia o magic-kingdom.png de 11502×1942 e 243 KB para um slot de
+        // 200×55. SVG segue cru: transform raster não economiza em vetor.
+        src={isVector(logo) ? getMediaUrl(logo) : optimizeRemoteImageUrl(logo, 200)}
+        onError={isVector(logo) ? undefined : handleLogoTransformError(logo)}
         alt={logoAlt}
         width={logoWidth}
         height={logoHeight}
