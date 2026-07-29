@@ -1,0 +1,9 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [
+      "pages/landings/orlando.css"
+    ],
+    "ignoreValues": []
+  }
+}

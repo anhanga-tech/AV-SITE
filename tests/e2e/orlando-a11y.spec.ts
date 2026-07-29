@@ -88,16 +88,14 @@ test.describe('/orlando — acessibilidade', () => {
     await page.getByRole('heading', { level: 1 }).waitFor();
 
     // O escopo `.landing-orlando` termina no <OrlandoApp />: o backlink do topo
-    // e os controles do bloco de SEO são irmãos na mesma rota e ficavam com o
-    // foco padrão do browser (achado do review da PR #1351).
-    // Os cinco controles que a mudança tocou — não três: um guard parcial
-    // deixaria dois regredirem sem o teste acusar.
+    // e o CTA do bloco de SEO são irmãos na mesma rota e ficavam com o foco
+    // padrão do browser (achado do review da PR #1351).
+    // A #1328 removeu os outros três controles deste bloco (Beto Carrero, blog,
+    // Visit Orlando externo): tiravam o visitante do funil bem no ponto de
+    // maior intenção de conversão. Restam só os dois que continuam na página.
     const controles = [
       page.getByRole('link', { name: /Voltar para o site principal/i }),
       page.getByRole('button', { name: 'Falar com especialista' }),
-      page.getByRole('link', { name: 'Ver pacote Beto Carrero' }),
-      page.getByRole('link', { name: 'Ler dicas no blog' }),
-      page.getByRole('link', { name: 'Guia Oficial Visit Orlando' }),
     ];
 
     for (const controle of controles) {
@@ -147,5 +145,47 @@ test.describe('/orlando — acessibilidade', () => {
     expect(shadow, `faltou a sombra dura da colagem — veio "${shadow}"`).toMatch(
       /(?<!inset[^,]*)\b4px 4px\b/,
     );
+  });
+
+  // Companion do teste acima, para a #1328: a aba do FAQ também tem sombra
+  // hard própria (`.faq-tab`) e caiu na mesma regra genérica de foco sem a
+  // composição — perderia o relevo exatamente como .logo e .main-btn já
+  // perderam antes da #1329.
+  test('o relevo da aba do FAQ sobrevive ao foco por teclado', async ({ page }) => {
+    await page.goto('/orlando/');
+    await page.getByRole('heading', { level: 1 }).waitFor();
+
+    const tab = page.getByRole('button', { name: 'Qual a melhor época para viajar para Orlando?' });
+    await tab.focus();
+    await page.keyboard.press('Shift+Tab');
+    await page.keyboard.press('Tab');
+    await expect(tab).toBeFocused();
+
+    const shadow = await tab.evaluate((el) => getComputedStyle(el).boxShadow);
+    expect(shadow, 'faltou a borda rosa de foco').toContain('inset');
+    expect(shadow, `faltou a sombra dura da aba — veio "${shadow}"`).toMatch(
+      /(?<!inset[^,]*)\b4px 4px\b/,
+    );
+  });
+
+  // Review do Codex na #1352: o painel fechado (`grid-template-rows: 0fr` +
+  // overflow hidden) some visualmente, mas continuava na árvore de
+  // acessibilidade — um leitor de tela em modo de navegação por virtual
+  // cursor conseguia ler a resposta de uma pergunta "fechada", tornando
+  // `aria-expanded="false"` enganoso.
+  test('a resposta fechada do FAQ sai da árvore de acessibilidade', async ({ page }) => {
+    await page.goto('/orlando/');
+    await page.getByRole('heading', { level: 1 }).waitFor();
+
+    // O primeiro item vem aberto por padrão — testa o segundo, que começa fechado.
+    const segundaAba = page.getByRole('button', { name: 'Preciso de visto americano para viajar para Orlando?' });
+    await expect(segundaAba).toHaveAttribute('aria-expanded', 'false');
+
+    const painel = page.locator('#faq-panel-1');
+    await expect(painel).toHaveAttribute('aria-hidden', 'true');
+
+    await segundaAba.click();
+    await expect(segundaAba).toHaveAttribute('aria-expanded', 'true');
+    await expect(painel).toHaveAttribute('aria-hidden', 'false');
   });
 });
