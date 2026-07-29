@@ -68,7 +68,6 @@
 .landing-orlando [tabindex]:focus-visible {
     outline: 3px solid var(--text-dark);
     outline-offset: 3px;
-    border-radius: 2px;
 }
 
 /* SVG Grain Filter */
