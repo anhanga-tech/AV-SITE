@@ -34,7 +34,7 @@ const isVector = (path: string): boolean => path.toLowerCase().endsWith('.svg');
   separada, mesmo bloqueio de acesso ao bucket da #1333). Até lá o fallback
   vale para qualquer transform que falhe, não só este.
 */
-const handleLogoTransformError =
+export const handleLogoTransformError =
   (logo: string) =>
   (event: SyntheticEvent<HTMLImageElement>): void => {
     const img = event.currentTarget;

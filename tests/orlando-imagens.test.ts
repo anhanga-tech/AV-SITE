@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
 import { optimizeImageUrl, selectImagePreset } from '../lib/media-url.ts';
+import { getMediaUrl } from '../data/mediaConfig.ts';
+import { handleLogoTransformError } from '../components/landings/orlando/OrlandoParksGallery.tsx';
 
 /*
   Guards da issue #1326 — dimensionamento das imagens da /orlando.
@@ -101,4 +103,44 @@ test('o fallback de transform quebrado continua ligado nos logos', async () => {
     // magic-kingdom.png (11502×1942) devolve HTTP 422 no resizer da Cloudflare.
     // Sem o onError, o logo mais proeminente da página sumiria.
     assert.match(source, /onError=\{isVector\(logo\)\s*\?\s*undefined\s*:\s*handleLogoTransformError\(logo\)\}/);
+});
+
+/*
+  Os testes acima provam que o onError está LIGADO. Estes provam que ele
+  FUNCIONA — distinção que o review da PR #1347 (Codex, P2) apontou: o e2e roda
+  contra o dev server sem `VITE_MEDIA_ENABLE_TRANSFORMS`, então o logo é
+  servido cru, o HTTP 422 nunca acontece e o handler jamais é exercitado.
+  Ficaria verde com o fallback implementado errado.
+*/
+
+const LOGO = 'images/orlando/logos/magic-kingdom.png';
+
+function eventoDeErroFalso(srcAtual: string) {
+    const img = { src: srcAtual };
+    return { currentTarget: img, img };
+}
+
+test('o fallback troca a URL transformada pelo original', () => {
+    const transformada =
+        'https://media.anhanga.tur.br/cdn-cgi/image/format=auto,width=800/' + LOGO;
+    const { currentTarget, img } = eventoDeErroFalso(transformada);
+
+    handleLogoTransformError(LOGO)(
+        { currentTarget } as unknown as Parameters<ReturnType<typeof handleLogoTransformError>>[0],
+    );
+
+    assert.equal(img.src, getMediaUrl(LOGO));
+    assert.ok(!img.src.includes('/cdn-cgi/image/'), 'o fallback não pode apontar para o transform');
+});
+
+test('o fallback não entra em loop quando o próprio original falha', () => {
+    const original = getMediaUrl(LOGO);
+    const { currentTarget, img } = eventoDeErroFalso(original);
+
+    handleLogoTransformError(LOGO)(
+        { currentTarget } as unknown as Parameters<ReturnType<typeof handleLogoTransformError>>[0],
+    );
+
+    // Sem a guarda, reatribuir o mesmo src dispara onError de novo, em loop.
+    assert.equal(img.src, original);
 });

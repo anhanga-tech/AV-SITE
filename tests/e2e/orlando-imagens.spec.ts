@@ -22,8 +22,14 @@ test('/orlando — nenhuma imagem fica quebrada', async ({ page }) => {
   });
   await page.waitForLoadState('networkidle');
 
-  // Cobre o fallback de transform: o magic-kingdom.png devolve HTTP 422 no
-  // resizer da Cloudflare, e sem o onError o logo sumiria da página.
+  // ATENÇÃO: isto NÃO cobre o fallback de transform. Este teste roda contra o
+  // dev server, onde `VITE_MEDIA_ENABLE_TRANSFORMS` está desligado, então o
+  // logo é servido cru, o HTTP 422 do resizer nunca acontece e o
+  // `handleLogoTransformError` jamais é exercitado — ficaria verde com o
+  // fallback implementado errado (achado do review da PR #1347).
+  // Quem cobre o comportamento do handler é `tests/orlando-imagens.test.ts`.
+  // O que este teste prova é o básico que só o browser mostra: que a página
+  // não termina com imagem quebrada na tela.
   const broken = await page.evaluate(() =>
     [...document.querySelectorAll('.landing-orlando img')]
       .filter((el) => {
