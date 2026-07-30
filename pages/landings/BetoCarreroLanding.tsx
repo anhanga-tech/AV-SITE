@@ -2,30 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import BetoCarreroApp from '../../components/landings/beto-carrero/BetoCarreroApp';
 import { Seo } from '../../components/Seo';
-import { LandingFAQ } from '../../components/LandingFAQ';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../../components/schemas/FAQPageSchema';
 import { ServiceSchema } from '../../components/schemas/ServiceSchema';
 import { openContactModal } from '../../utils/contactForm';
-
-const BETO_FAQ_ITEMS = [
-  {
-    question: 'Quanto custa em média um pacote para o Beto Carrero?',
-    answer: 'O valor varia conforme a temporada e o tipo de hospedagem, mas pacotes personalizados que incluem hotel próximo e ingressos costumam começar em torno de R$ 1.200 a R$ 1.800 por pessoa, dependendo da origem e duração.'
-  },
-  {
-    question: 'Qual a idade recomendada para visitar o parque?',
-    answer: 'O Beto Carrero World possui atrações para todas as idades. Desde a área temática da Hot Wheels e Madagascar para os pequenos, até montanhas-russas radicais como a FireWhip para os mais velhos. É um destino perfeito para famílias com crianças de todas as faixas etárias.'
-  },
-  {
-    question: 'Como funciona o estacionamento no Beto Carrero?',
-    answer: 'O parque oferece um amplo estacionamento oficial pago e seguro. Para quem quer mais comodidade, nossos pacotes podem incluir transfers privativos ou coletivos saindo direto do hotel, eliminando preocupações com trânsito e vagas.'
-  },
-  {
-    question: 'Qual a duração ideal para viajar ao Beto Carrero?',
-    answer: 'Para aproveitar o parque com conforto e conhecer as principais atrações, recomendamos roteiros de 3 a 4 dias, permitindo pelo menos 2 dias inteiros dentro do parque.'
-  }
-];
+import { BETO_FAQ_ITEMS } from '../../components/landings/beto-carrero/betoFaqItems';
 
 const BetoCarreroLanding: React.FC = () => {
   return (
@@ -74,7 +55,6 @@ const BetoCarreroLanding: React.FC = () => {
       />
 
       <BetoCarreroApp />
-      <LandingFAQ items={BETO_FAQ_ITEMS} />
       <section className="bg-brand-surface border-t border-brand-cyan/10 py-14">
         <div className="container mx-auto px-6 max-w-5xl">
           <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">Pacote Beto Carrero para viajar com tranquilidade</h2>

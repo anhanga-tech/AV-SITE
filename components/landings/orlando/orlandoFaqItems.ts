@@ -1,9 +1,6 @@
-export interface OrlandoFaqItem {
-  question: string;
-  answer: string;
-}
+import type { FAQItem } from '../shared/useFaqAccordion';
 
-export const ORLANDO_FAQ_ITEMS: OrlandoFaqItem[] = [
+export const ORLANDO_FAQ_ITEMS: FAQItem[] = [
   {
     question: 'Qual a melhor época para viajar para Orlando?',
     answer: 'Para quem busca economia e parques menos cheios, os meses de maio, setembro e final de outubro são excelentes. Se o foco for clima agradável e eventos sazonais, novembro e dezembro oferecem a magia das festas, embora com maior movimento.'

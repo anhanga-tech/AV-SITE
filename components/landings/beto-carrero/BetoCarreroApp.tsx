@@ -5,11 +5,11 @@ import Solution from './Solution';
 import Attractions from './Attractions';
 import Features from './Features';
 import Testimonials from './Testimonials';
-import Faq from './Faq';
 import Footer from './Footer';
 import Button from './Button';
 import { Menu, X } from 'lucide-react';
 import { getBetoAssetUrl } from './assetPath';
+import BetoCarreroFaq from './BetoCarreroFaq';
 
 const SITE_URL = 'https://www.anhanga.tur.br';
 
@@ -201,7 +201,7 @@ const App: React.FC = () => {
         <div id="attractions" className="scroll-mt-32 md:scroll-mt-48"><Attractions /></div>
         <Features />
         <div id="testimonials" className="scroll-mt-32 md:scroll-mt-48"><Testimonials /></div>
-        <div id="faq" className="scroll-mt-32 md:scroll-mt-48"><Faq /></div>
+        <div id="faq" className="scroll-mt-32 md:scroll-mt-48"><BetoCarreroFaq /></div>
       </main>
 
       <Footer />

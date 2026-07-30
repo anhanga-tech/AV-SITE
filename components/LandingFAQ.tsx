@@ -1,10 +1,6 @@
-import React, { useState, memo, useCallback } from 'react';
+import React, { memo } from 'react';
 import { ChevronDown } from 'lucide-react';
-
-interface FAQItem {
-    question: string;
-    answer: string | React.ReactNode;
-}
+import { useFaqAccordion, type FAQItem, type FaqAccordionItemProps } from './landings/shared/useFaqAccordion';
 
 interface LandingFAQProps {
     items: FAQItem[];
@@ -24,15 +20,13 @@ interface LandingFAQProps {
   - Hover do título em anhanga-blue (6.5:1 sobre branco): o cyan anterior
     media 2.8:1.
 */
-const FAQItemComponent = memo(({ question, answer, isOpen, idx, onToggle }: FAQItem & { isOpen: boolean; idx: number; onToggle: (idx: number) => void }) => {
-    const toggleFaqItem = useCallback(() => onToggle(idx), [idx, onToggle]);
+const FAQItemComponent = memo(({ question, answer, isOpen, buttonProps, panelProps }: FAQItem & FaqAccordionItemProps) => {
     return (
         <div className="border-b border-zinc-200 last:border-0">
             <button
                 type="button"
                 className="w-full py-6 flex justify-between items-center gap-4 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action group"
-                onClick={toggleFaqItem}
-                aria-expanded={isOpen}
+                {...buttonProps}
             >
                 <h3 className="text-xl font-bold text-anhanga-dark group-hover:text-anhanga-blue transition-colors">
                     {question}
@@ -50,10 +44,11 @@ const FAQItemComponent = memo(({ question, answer, isOpen, idx, onToggle }: FAQI
                 className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none ${
                     isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
                 }`}
+                {...panelProps}
             >
                 <div className="overflow-hidden">
                     <div className="pb-8 text-zinc-600 text-lg leading-relaxed max-w-[65ch]">
-                        {typeof answer === 'string' ? <p>{answer}</p> : answer}
+                        <p>{answer}</p>
                     </div>
                 </div>
             </div>
@@ -68,14 +63,7 @@ export const LandingFAQ: React.FC<LandingFAQProps> = ({
     title = "Dúvidas Frequentes",
     subtitle = "Tire suas dúvidas sobre o planejamento da sua viagem."
 }) => {
-    const [openIndex, setOpenIndex] = useState<number | null>(0);
-
-    const handleToggle = useCallback((idx: number) => {
-        setOpenIndex(prev => prev === idx ? null : idx);
-        import('../utils/haptics')
-            .then(m => m.triggerHaptic('light'))
-            .catch(() => {});
-    }, []);
+    const accordionItems = useFaqAccordion(items);
 
     return (
         <section className="py-20 bg-white">
@@ -94,9 +82,7 @@ export const LandingFAQ: React.FC<LandingFAQProps> = ({
                         <FAQItemComponent
                             key={item.question}
                             {...item}
-                            isOpen={openIndex === idx}
-                            idx={idx}
-                            onToggle={handleToggle}
+                            {...accordionItems[idx]}
                         />
                     ))}
                 </div>
@@ -104,3 +90,5 @@ export const LandingFAQ: React.FC<LandingFAQProps> = ({
         </section>
     );
 };
+
+export type { FAQItem };

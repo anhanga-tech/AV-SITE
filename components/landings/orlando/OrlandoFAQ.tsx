@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useCallback } from "react";
+import React from "react";
 import { ChevronDown } from "lucide-react";
 import { ORLANDO_FAQ_ITEMS } from "./orlandoFaqItems";
+import { useFaqAccordion } from "../shared/useFaqAccordion";
 
 interface WashiTapeProps {
   className?: string;
@@ -22,14 +23,7 @@ const TAB_ACCENTS = ["tab-yellow", "tab-pink", "tab-blue", "tab-green"];
 const TAB_ROTATIONS = ["-1.5deg", "1deg", "-1deg", "1.5deg"];
 
 export function OrlandoFAQ() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
-
-  const handleToggle = useCallback((idx: number) => {
-    setOpenIndex((prev) => (prev === idx ? null : idx));
-    import("../../../utils/haptics")
-      .then((m) => m.triggerHaptic("light"))
-      .catch(() => {});
-  }, []);
+  const accordionItems = useFaqAccordion(ORLANDO_FAQ_ITEMS);
 
   return (
     <section className="faq-section" id="faq">
@@ -50,19 +44,14 @@ export function OrlandoFAQ() {
 
         <ul className="faq-list">
           {ORLANDO_FAQ_ITEMS.map((item, idx) => {
-            const isOpen = openIndex === idx;
-            const panelId = `faq-panel-${idx}`;
-            const tabId = `faq-tab-${idx}`;
+            const { isOpen, buttonProps, panelProps } = accordionItems[idx];
             return (
               <li className="faq-item" key={item.question}>
                 <button
                   type="button"
-                  id={tabId}
                   className={`faq-tab ${TAB_ACCENTS[idx % TAB_ACCENTS.length]}`}
                   style={{ "--r": TAB_ROTATIONS[idx % TAB_ROTATIONS.length] } as React.CSSProperties}
-                  aria-expanded={isOpen}
-                  aria-controls={panelId}
-                  onClick={() => handleToggle(idx)}
+                  {...buttonProps}
                 >
                   <span className="faq-tab-text">{item.question}</span>
                   <ChevronDown
@@ -72,11 +61,8 @@ export function OrlandoFAQ() {
                   />
                 </button>
                 <div
-                  id={panelId}
-                  role="region"
-                  aria-labelledby={tabId}
-                  aria-hidden={!isOpen}
                   className={`faq-panel ${isOpen ? "is-open" : ""}`}
+                  {...panelProps}
                 >
                   <div className="faq-panel-inner">
                     <p className="faq-answer">{item.answer}</p>

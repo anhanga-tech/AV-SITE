@@ -7,11 +7,6 @@ export interface Testimonial {
   avatar: string;
 }
 
-export interface FAQItem {
-  question: string;
-  answer: string;
-}
-
 export interface Feature {
   icon: React.ReactNode;
   title: string;
