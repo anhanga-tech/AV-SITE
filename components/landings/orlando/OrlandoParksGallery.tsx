@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { CSSProperties } from 'react';
-import { getMediaUrl, optimizeRemoteImageUrl } from "../../../data/mediaConfig";
+import { useId, useState } from "react";
+import { ChevronDown } from "lucide-react";
+import { optimizeRemoteImageUrl } from "../../../data/mediaConfig";
 import { openContactModal } from "../../../utils/contactForm";
-import { handleLogoTransformError } from "./logoFallback";
 
 /*
   Por que não há `srcSet` aqui: `selectImagePreset` (lib/media-url.ts) normaliza
@@ -19,21 +19,12 @@ import { handleLogoTransformError } from "./logoFallback";
   desktop e 237px no celular, então mesmo em DPR 3 o alvo fica abaixo de 800.
 */
 
-/*
-  Vetor não passa por transform raster — redimensionar um SVG não economiza
-  byte nenhum e o `/cdn-cgi/image` pode rasterizá-lo. 3 dos 12 logos são SVG.
-*/
-const isVector = (path: string): boolean => path.toLowerCase().endsWith('.svg');
-
 interface ParkCardData {
+  name: string;
   image: string;
   alt: string;
-  logo: string;
-  logoAlt: string;
-  logoStyle?: CSSProperties;
-  logoWidth: number;
-  logoHeight: number;
   description: string;
+  recommendedFor?: string;
 }
 
 interface ParkGroupData {
@@ -42,7 +33,7 @@ interface ParkGroupData {
   parks: ParkCardData[];
 }
 
-function ParkCard({ image, alt, logo, logoAlt, logoStyle, logoWidth, logoHeight, description }: ParkCardData) {
+function ParkCard({ name, image, alt, description, recommendedFor }: ParkCardData) {
   return (
     <div className="park-card">
       <div className="park-image-frame">
@@ -64,79 +55,70 @@ function ParkCard({ image, alt, logo, logoAlt, logoStyle, logoWidth, logoHeight,
           loading="lazy"
         />
       </div>
-      <img
-        className="park-logo-title"
-        style={logoStyle}
-        // Os PNG passavam crus pelo getMediaUrl, sem transform nenhuma — é onde
-        // vivia o magic-kingdom.png de 11502×1942 e 243 KB para um slot de
-        // 200×55. SVG segue cru: transform raster não economiza em vetor.
-        //
-        // O `200` não define o tamanho pedido: como no caso da foto acima,
-        // `selectImagePreset` colapsa qualquer largura <= 800 no preset
-        // `inline-sm` de 800px. Mudar este número não muda byte nenhum enquanto
-        // ficar dentro dessa faixa — inclusive para os logos do grupo Universal,
-        // que o `logoStyle` exibe a até 280px e o preset de 800 já cobre.
-        src={isVector(logo) ? getMediaUrl(logo) : optimizeRemoteImageUrl(logo, 200)}
-        onError={isVector(logo) ? undefined : handleLogoTransformError(logo)}
-        alt={logoAlt}
-        width={logoWidth}
-        height={logoHeight}
-        loading="lazy"
-      />
+      <h3>{name}</h3>
+      {recommendedFor && <p className="park-recommended">Ideal para: {recommendedFor}</p>}
       <p>{description}</p>
     </div>
   );
 }
 
-const PARK_GROUPS: ParkGroupData[] = [
+// Curadoria da issue #1330: 4 parques em destaque, um de cada frente que a
+// Anhangá recomenda primeiro, em vez dos 12 lado a lado sem hierarquia.
+const FEATURED_PARKS: ParkCardData[] = [
+  {
+    name: "Magic Kingdom",
+    image: "images/orlando/parks/magic-kingdom.jpg",
+    alt: "Magic Kingdom",
+    recommendedFor: "primeira viagem em família",
+    description: "Onde a fantasia é lei. O castelo icônico, fogos inesquecíveis e a magia que define Orlando.",
+  },
+  {
+    name: "Hollywood Studios",
+    image: "images/orlando/parks/hollywood-studios.jpg",
+    alt: "Hollywood Studios",
+    recommendedFor: "fãs de Star Wars e cinema",
+    description: "Luz, câmera, ação! Da saga Star Wars ao quintal de Toy Story: você é o protagonista.",
+  },
+  {
+    name: "Islands of Adventure",
+    image: "images/orlando/parks/islands-of-adventure.jpg",
+    alt: "Islands of Adventure",
+    recommendedFor: "quem busca adrenalina",
+    description: "Aventura nível hard. Voe de moto com Hagrid, escape de dinossauros e sinta a fúria do Hulk.",
+  },
+  {
+    name: "Epic Universe",
+    image: "images/orlando/parks/epic-universe.jpg",
+    alt: "Epic Universe",
+    recommendedFor: "quem quer o parque mais novo de Orlando",
+    description: "5 mundos, 1 destino. De Super Nintendo World a Monstros Clássicos: o portal se abriu.",
+  },
+];
+
+// Os outros 8 parques ficam recolhidos atrás de "Ver todos os parques" —
+// continuam indexáveis (o painel só é escondido via CSS, não desmontado),
+// só saem da hierarquia visual principal.
+const OTHER_PARK_GROUPS: ParkGroupData[] = [
   {
     label: "Walt Disney World",
     className: "disney-group",
     parks: [
       {
-        image: "images/orlando/parks/magic-kingdom.jpg",
-        alt: "Magic Kingdom",
-        logo: "images/orlando/logos/magic-kingdom.png",
-        logoAlt: "Magic Kingdom Logo",
-        logoWidth: 120,
-        logoHeight: 40,
-        description: "Onde a fantasia é lei. O castelo icônico, fogos inesquecíveis e a magia que define Orlando.",
-      },
-      {
+        name: "Epcot",
         image: "images/orlando/parks/epcot.jpg",
         alt: "Epcot",
-        logo: "images/orlando/logos/epcot.png",
-        logoAlt: "Epcot Logo",
-        logoStyle: { maxWidth: "120px", maxHeight: "33px" },
-        logoWidth: 120,
-        logoHeight: 33,
         description: "Volta ao mundo em um dia. Coma em Paris, beba no Japão e voe para o futuro.",
       },
       {
-        image: "images/orlando/parks/hollywood-studios.jpg",
-        alt: "Hollywood Studios",
-        logo: "images/orlando/logos/hollywood-studios.svg",
-        logoAlt: "Hollywood Studios Logo",
-        logoWidth: 120,
-        logoHeight: 40,
-        description: "Luz, câmera, ação! Da saga Star Wars ao quintal de Toy Story: você é o protagonista.",
-      },
-      {
+        name: "Animal Kingdom",
         image: "images/orlando/parks/animal-kingdom.jpg",
         alt: "Animal Kingdom",
-        logo: "images/orlando/logos/animal-kingdom.svg",
-        logoAlt: "Animal Kingdom Logo",
-        logoWidth: 120,
-        logoHeight: 40,
         description: "A natureza ruge. Safáris reais, montanhas flutuantes em Pandora e expedições selvagens.",
       },
       {
+        name: "Typhoon Lagoon",
         image: "images/orlando/parks/typhoon-lagoon.jpg",
         alt: "Typhoon Lagoon",
-        logo: "images/orlando/logos/typhoon-lagoon.png",
-        logoAlt: "Typhoon Lagoon Logo",
-        logoWidth: 120,
-        logoHeight: 40,
         description: "Tsunamis de diversão. Encare ondas gigantes ou relaxe no rio lento deste paraíso tropical.",
       },
     ],
@@ -146,43 +128,15 @@ const PARK_GROUPS: ParkGroupData[] = [
     className: "universal-group",
     parks: [
       {
+        name: "Universal Studios",
         image: "images/orlando/universal-studios-orlando.jpg",
         alt: "Universal Studios Orlando",
-        logo: "images/orlando/logos/universal-studios.png",
-        logoAlt: "Universal Studios Logo",
-        logoStyle: { maxHeight: "77px", maxWidth: "280px" },
-        logoWidth: 280,
-        logoHeight: 77,
         description: "Entre no filme. Fuja do banco de Gringotts, brinque com os Minions e viva o cinema.",
       },
       {
-        image: "images/orlando/parks/islands-of-adventure.jpg",
-        alt: "Islands of Adventure",
-        logo: "images/orlando/logos/islands-of-adventure.png",
-        logoAlt: "Islands of Adventure Logo",
-        logoStyle: { maxHeight: "77px", maxWidth: "280px" },
-        logoWidth: 280,
-        logoHeight: 77,
-        description: "Aventura nível hard. Voe de moto com Hagrid, escape de dinossauros e sinta a fúria do Hulk.",
-      },
-      {
-        image: "images/orlando/parks/epic-universe.jpg",
-        alt: "Epic Universe",
-        logo: "images/orlando/logos/epic-universe.png",
-        logoAlt: "Epic Universe Logo",
-        logoStyle: { maxHeight: "77px", maxWidth: "280px" },
-        logoWidth: 280,
-        logoHeight: 77,
-        description: "5 mundos, 1 destino. De Super Nintendo World a Monstros Clássicos: o portal se abriu.",
-      },
-      {
+        name: "Volcano Bay",
         image: "images/orlando/parks/volcano-bay.jpg",
         alt: "Volcano Bay",
-        logo: "images/orlando/logos/volcano-bay.png",
-        logoAlt: "Volcano Bay Logo",
-        logoStyle: { maxHeight: "77px", maxWidth: "280px" },
-        logoWidth: 280,
-        logoHeight: 77,
         description: "Praia e adrenalina. Despenque do vulcão Krakatau ou apenas relaxe na areia. O TapuTapu cuida da fila.",
       },
     ],
@@ -192,30 +146,21 @@ const PARK_GROUPS: ParkGroupData[] = [
     className: "other-group",
     parks: [
       {
+        name: "SeaWorld",
         image: "images/orlando/parks/seaworld.jpg",
         alt: "SeaWorld",
-        logo: "images/orlando/logos/seaworld.png",
-        logoAlt: "SeaWorld Logo",
-        logoWidth: 120,
-        logoHeight: 40,
         description: "Coasters insanas. Acelere na Pipeline e na Mako, depois recupere o fôlego admirando a vida marinha.",
       },
       {
+        name: "Discovery Cove",
         image: "images/orlando/parks/discovery-cove.jpg",
         alt: "Discovery Cove",
-        logo: "images/orlando/logos/discovery-cove.png",
-        logoAlt: "Discovery Cove Logo",
-        logoWidth: 120,
-        logoHeight: 40,
         description: "Seu dia de VIP. All-inclusive de luxo: nade com golfinhos e esqueça do mundo lá fora.",
       },
       {
+        name: "Kennedy Space Center",
         image: "images/orlando/parks/kennedy-space-center.jpg",
         alt: "Kennedy Space Center",
-        logo: "images/orlando/logos/kennedy-space-center.svg",
-        logoAlt: "Kennedy Space Center Logo",
-        logoWidth: 120,
-        logoHeight: 40,
         description: "3... 2... 1... Decolar! Foguetes reais da NASA, pedras lunares e a história do universo.",
       },
     ],
@@ -223,6 +168,10 @@ const PARK_GROUPS: ParkGroupData[] = [
 ];
 
 export function OrlandoParksGallery() {
+  const [showAll, setShowAll] = useState(false);
+  const instanceId = useId();
+  const panelId = `${instanceId}-all-parks`;
+
   return (
     <section className="parks-gallery" id="parks">
       <h2 className="section-title">
@@ -230,18 +179,49 @@ export function OrlandoParksGallery() {
         <span className="highlight-blue">Imperdíveis</span>
       </h2>
 
-      {PARK_GROUPS.map((group) => (
-        <div key={group.label} className={`complex-group ${group.className}`}>
-          <div className="complex-label">
-            <span>{group.label}</span>
-          </div>
-          <div className="parks-grid">
-            {group.parks.map((park) => (
-              <ParkCard key={park.alt} {...park} />
+      <div className="parks-grid featured-parks-grid">
+        {FEATURED_PARKS.map((park) => (
+          <ParkCard key={park.name} {...park} />
+        ))}
+      </div>
+
+      <div className="parks-toggle-wrapper">
+        <button
+          type="button"
+          className="parks-toggle-btn"
+          aria-expanded={showAll}
+          aria-controls={panelId}
+          onClick={() => setShowAll((prev) => !prev)}
+        >
+          {showAll ? "Ver menos parques" : "Ver todos os 12 parques"}
+          <ChevronDown
+            className={`parks-toggle-chevron ${showAll ? "is-open" : ""}`}
+            aria-hidden="true"
+            size={20}
+          />
+        </button>
+
+        <div
+          id={panelId}
+          className={`parks-toggle-panel ${showAll ? "is-open" : ""}`}
+          aria-hidden={!showAll}
+        >
+          <div className="parks-toggle-panel-inner">
+            {OTHER_PARK_GROUPS.map((group) => (
+              <div key={group.label} className={`complex-group ${group.className}`}>
+                <div className="complex-label">
+                  <span>{group.label}</span>
+                </div>
+                <div className="parks-grid">
+                  {group.parks.map((park) => (
+                    <ParkCard key={park.name} {...park} />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </div>
-      ))}
+      </div>
 
       <div className="gallery-cta">
         <button
