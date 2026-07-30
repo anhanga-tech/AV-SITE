@@ -181,7 +181,12 @@ test.describe('/orlando — acessibilidade', () => {
     const segundaAba = page.getByRole('button', { name: 'Preciso de visto americano para viajar para Orlando?' });
     await expect(segundaAba).toHaveAttribute('aria-expanded', 'false');
 
-    const painel = page.locator('#faq-panel-1');
+    // useFaqAccordion.ts prefixa os ids com useId() (review do Codex na #1363)
+    // — resolve o painel via aria-controls em vez de um id fixo, e usa
+    // [id="..."] porque useId() gera ":" no valor, que quebra como seletor
+    // CSS de id sem escapar.
+    const panelId = await segundaAba.getAttribute('aria-controls');
+    const painel = page.locator(`[id="${panelId}"]`);
     await expect(painel).toHaveAttribute('aria-hidden', 'true');
 
     await segundaAba.click();

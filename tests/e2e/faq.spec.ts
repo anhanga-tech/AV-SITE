@@ -59,23 +59,32 @@ test.describe('Landing Page FAQ Suite', () => {
     hook compartilhado, a amarração ARIA vem de um lugar só — este teste prova
     isso para uma página que usa a pele padrão (Melhor Idade) e uma que usa a
     pele fun-yellow própria (Beto Carrero — BetoCarreroFaq.tsx).
+
+    Seleciona a aba pelo texto da pergunta e resolve o painel via
+    aria-controls, em vez de um id fixo: useFaqAccordion.ts prefixa os ids
+    com useId() (review do Codex na #1363) para não colidir se uma página
+    futura montar dois accordions ao mesmo tempo — um id fixo aqui quebraria
+    a cada mudança no prefixo gerado.
   */
   const landingFaqPages = [
-    { path: '/melhor-idade', title: 'Dúvidas Frequentes' },
-    { path: '/beto-carrero', title: 'Dúvidas? Relaxa.' },
+    { path: '/melhor-idade', secondQuestion: 'A agência oferece acompanhamento durante a viagem?' },
+    { path: '/beto-carrero', secondQuestion: 'Qual a idade recomendada para visitar o parque?' },
   ];
 
-  for (const { path, title } of landingFaqPages) {
+  for (const { path, secondQuestion } of landingFaqPages) {
     test(`a resposta fechada do FAQ sai da árvore de acessibilidade em ${path}`, async ({ page }) => {
       await page.goto(path);
-      await page.getByRole('heading', { name: title }).waitFor();
 
       // O primeiro item vem aberto por padrão — testa o segundo, que começa fechado.
-      const painelFechado = page.locator('#faq-panel-1');
-      await expect(painelFechado).toHaveAttribute('aria-hidden', 'true');
-
-      const abaFechada = page.locator('#faq-tab-1');
+      const abaFechada = page.getByRole('button', { name: secondQuestion });
       await expect(abaFechada).toHaveAttribute('aria-expanded', 'false');
+
+      // useId() gera ids com ":" (ex.: ":r0:-faq-panel-1"), que quebram como
+      // seletor CSS de id sem escapar — [id="..."] trata o valor como string
+      // literal, sem esse problema.
+      const panelId = await abaFechada.getAttribute('aria-controls');
+      const painelFechado = page.locator(`[id="${panelId}"]`);
+      await expect(painelFechado).toHaveAttribute('aria-hidden', 'true');
 
       await abaFechada.click();
       await expect(painelFechado).toHaveAttribute('aria-hidden', 'false');

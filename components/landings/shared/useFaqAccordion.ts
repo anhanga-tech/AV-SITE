@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useId, useState } from 'react';
 import type { AriaAttributes, ButtonHTMLAttributes, HTMLAttributes } from 'react';
 
 export interface FAQItem {
@@ -23,6 +23,10 @@ export interface FaqAccordionItemProps {
 */
 export function useFaqAccordion(items: FAQItem[]): FaqAccordionItemProps[] {
     const [openIndex, setOpenIndex] = useState<number | null>(0);
+    // Escopa os ids por instância do hook — sem isso, duas páginas (ou duas
+    // seções de FAQ na mesma página) colidiriam em `faq-tab-0`/`faq-panel-0`
+    // e o aria-controls/aria-labelledby de uma apontaria para o painel da outra.
+    const instanceId = useId();
 
     const handleToggle = useCallback((idx: number) => {
         setOpenIndex((prev) => (prev === idx ? null : idx));
@@ -33,8 +37,8 @@ export function useFaqAccordion(items: FAQItem[]): FaqAccordionItemProps[] {
 
     return items.map((_, idx) => {
         const isOpen = openIndex === idx;
-        const buttonId = `faq-tab-${idx}`;
-        const panelId = `faq-panel-${idx}`;
+        const buttonId = `${instanceId}-faq-tab-${idx}`;
+        const panelId = `${instanceId}-faq-panel-${idx}`;
 
         return {
             isOpen,
