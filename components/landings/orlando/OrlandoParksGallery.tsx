@@ -167,6 +167,10 @@ const OTHER_PARK_GROUPS: ParkGroupData[] = [
   },
 ];
 
+const TOTAL_PARKS_COUNT =
+  FEATURED_PARKS.length +
+  OTHER_PARK_GROUPS.reduce((total, group) => total + group.parks.length, 0);
+
 export function OrlandoParksGallery() {
   const [showAll, setShowAll] = useState(false);
   const instanceId = useId();
@@ -193,7 +197,7 @@ export function OrlandoParksGallery() {
           aria-controls={panelId}
           onClick={() => setShowAll((prev) => !prev)}
         >
-          {showAll ? "Ver menos parques" : "Ver todos os 12 parques"}
+          {showAll ? "Ver menos parques" : `Ver todos os ${TOTAL_PARKS_COUNT} parques`}
           <ChevronDown
             className={`parks-toggle-chevron ${showAll ? "is-open" : ""}`}
             aria-hidden="true"

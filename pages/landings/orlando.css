@@ -769,7 +769,10 @@
     font-size: 0.8rem;
     font-weight: 700;
     text-transform: uppercase;
-    color: var(--accent-pink);
+    /* --accent-pink (#ff6b9d) só rende ~2.68:1 sobre branco — abaixo do AA de
+       4.5:1. --accent-pink-ink é a variante já usada em texto no resto do
+       arquivo (ex.: linhas 184, 257, 918) por causa exatamente disso. */
+    color: var(--accent-pink-ink);
     flex-grow: 0;
     margin-bottom: 0.5rem;
 }
@@ -832,10 +835,14 @@
 .landing-orlando .parks-toggle-panel.is-open {
     grid-template-rows: 1fr;
     opacity: 1;
-    margin-top: 2.5rem;
 }
 
 .landing-orlando .parks-toggle-panel-inner {
+    /* Espaçamento fixo, não condicional a `.is-open`: o overflow:hidden do
+       pai recolhe o conteúdo (margem incluída) junto com a altura animada.
+       Um margin-top só no `.is-open` (como estava antes) fica fora da lista
+       de `transition` do painel e salta instantâneo enquanto a altura anima. */
+    margin-top: 2.5rem;
     overflow: hidden;
 }
 
