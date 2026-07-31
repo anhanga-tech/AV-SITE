@@ -81,8 +81,13 @@ export function pushConsultoriaBookingCreatedDataLayerEvent(uid: string): void {
   });
 }
 
+// No fallback (embed bloqueado/lento/fora do ar), a navegação sai fora do
+// embed — o comando `modal` com o `metadata[...]` nunca chega a rodar. Sem
+// isto, a atribuição capturada se perderia justo nas reservas que passam
+// pelo caminho de fallback (achado de review, PR #1369).
 function navigateToBooking(): void {
-  window.location.href = CONSULTORIA_BOOKING_URL;
+  const attribution = new URLSearchParams(buildAttributionMetadataConfig()).toString();
+  window.location.href = attribution ? `${CONSULTORIA_BOOKING_URL}?${attribution}` : CONSULTORIA_BOOKING_URL;
 }
 
 // Loader oficial do Cal.com (o IIFE do snippet element-click), encapsulado para
