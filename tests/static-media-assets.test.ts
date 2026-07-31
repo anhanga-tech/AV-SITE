@@ -142,7 +142,9 @@ test('orlando landing should not hotlink static images from partner websites', a
   );
   assert.match(orlandoHero, /images\/orlando\/cards\/.+\.(jpg|jpeg|webp)/);
   assert.match(orlandoParksGallery, /images\/orlando\/parks\/.+\.(jpg|jpeg|webp)/);
-  assert.match(orlandoParksGallery, /images\/orlando\/logos\/.+\.(png|svg|webp)/);
+  // Os logotipos de Disney/Universal saíram da página na issue #1330 (implicação
+  // de marca registrada sem autorização de uso) — nome do parque virou <h3> em
+  // texto, sem imagem de logo nenhuma para exigir aqui.
 });
 
 test('festival landings should use managed static imagery', async () => {

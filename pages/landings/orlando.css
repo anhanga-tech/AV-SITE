@@ -757,24 +757,93 @@
     text-align: center;
 }
 
-.landing-orlando .park-logo-title {
-    max-width: 200px;
-    max-height: 55px;
-    /* Constraining height aligns them visually */
-    width: auto;
-    height: auto;
-    margin-bottom: 1rem;
-    display: block;
-    align-self: center;
-    object-fit: contain;
-    object-position: center;
-}
-
 .landing-orlando .park-card p {
     font-size: 0.95rem;
     color: #444;
     line-height: 1.5;
     flex-grow: 1;
+}
+
+.landing-orlando .park-recommended {
+    font-family: "Space Mono", monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    /* --accent-pink (#ff6b9d) só rende ~2.68:1 sobre branco — abaixo do AA de
+       4.5:1. --accent-pink-ink é a variante já usada em texto no resto do
+       arquivo (ex.: linhas 184, 257, 918) por causa exatamente disso. */
+    color: var(--accent-pink-ink);
+    flex-grow: 0;
+    margin-bottom: 0.5rem;
+}
+
+/* Curadoria da issue #1330: 4 parques em destaque antes dos 12, sem o
+   tema de cor por complexo — aqui a hierarquia é "recomendado", não grupo. */
+.landing-orlando .featured-parks-grid {
+    margin-bottom: 2.5rem;
+}
+
+.landing-orlando .parks-toggle-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.landing-orlando .parks-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: "Space Mono", monospace;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    color: var(--text-dark);
+    background: #fff;
+    border: 2px solid var(--text-dark);
+    box-shadow: 4px 4px 0 var(--text-dark);
+    padding: 0.9rem 1.5rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.landing-orlando .parks-toggle-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--text-dark);
+}
+
+.landing-orlando .parks-toggle-chevron {
+    transition: transform 0.3s ease;
+}
+
+.landing-orlando .parks-toggle-chevron.is-open {
+    transform: rotate(180deg);
+}
+
+/* Mesma técnica de grid-template-rows do faq-panel: anima a altura real do
+   conteúdo em vez de um max-height fixo, que distorceria a curva de tempo
+   com um número mágico, e mantém o conteúdo na árvore de acessibilidade
+   controlado por aria-hidden em vez de display:none. */
+.landing-orlando .parks-toggle-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    width: 100%;
+    transition: grid-template-rows 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.landing-orlando .parks-toggle-panel.is-open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+}
+
+.landing-orlando .parks-toggle-panel-inner {
+    /* Espaçamento fixo, não condicional a `.is-open`: o overflow:hidden do
+       pai recolhe o conteúdo (margem incluída) junto com a altura animada.
+       Um margin-top só no `.is-open` (como estava antes) fica fora da lista
+       de `transition` do painel e salta instantâneo enquanto a altura anima. */
+    margin-top: 2.5rem;
+    overflow: hidden;
 }
 
 .landing-orlando .gallery-cta {

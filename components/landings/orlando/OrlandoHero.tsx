@@ -226,7 +226,7 @@ export function OrlandoHero() {
 
           <Badge
             className="badge-1"
-            text="Melhor Preço Garantido"
+            text="Roteiro Dia a Dia"
             rotation="15deg"
           />
           <Badge
