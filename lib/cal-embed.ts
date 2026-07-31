@@ -8,6 +8,8 @@
 //
 // Ver project-consultoria-modelo-pago (memória) e a PR do embed.
 
+import { getTrackingDataObject } from '../utils/whatsapp';
+
 const CAL_LINK = 'anhanga-viagens/consultoria';
 const CAL_NAMESPACE = 'consultoria';
 const CAL_ORIGIN = 'https://app.cal.com';
@@ -45,8 +47,47 @@ declare global {
 let initialized = false;
 let scriptState: 'idle' | 'loading' | 'loaded' | 'failed' = 'idle';
 
+// Shape do evento `bookingSuccessfulV2` do embed (https://cal.com/help/embedding/embed-events).
+// Só os campos que este módulo usa; o Cal.com envia mais (title, startTime etc.).
+interface CalBookingSuccessfulEvent {
+  detail?: {
+    data?: {
+      uid?: unknown;
+    };
+  };
+}
+
+// Marca "reserva criada" no dataLayer, não "pagamento concluído" — o embed não
+// emite um evento de pagamento (issue #1302). event_id é o uid do booking do
+// Cal.com sem transformação: mesma chave que o server-side verá quando #1297
+// ligar o webhook BOOKING_PAID ao purchase-dispatch, permitindo dedup por
+// event_id entre o evento de funil (aqui) e o Purchase real (server-side).
+export function pushConsultoriaBookingCreatedDataLayerEvent(uid: string): void {
+  if (typeof window === 'undefined' || !window.dataLayer) {
+    return;
+  }
+
+  window.dataLayer.push({
+    event: 'consultoria_booking_created',
+    event_id: uid,
+    page_location: window.location.href,
+  });
+
+  window.dataLayer.push({
+    event: 'form_submission',
+    form_type: 'consultoria_booking',
+    form_id: uid,
+    page_location: window.location.href,
+  });
+}
+
+// No fallback (embed bloqueado/lento/fora do ar), a navegação sai fora do
+// embed — o comando `modal` com o `metadata[...]` nunca chega a rodar. Sem
+// isto, a atribuição capturada se perderia justo nas reservas que passam
+// pelo caminho de fallback (achado de review, PR #1369).
 function navigateToBooking(): void {
-  window.location.href = CONSULTORIA_BOOKING_URL;
+  const attribution = new URLSearchParams(buildAttributionMetadataConfig()).toString();
+  window.location.href = attribution ? `${CONSULTORIA_BOOKING_URL}?${attribution}` : CONSULTORIA_BOOKING_URL;
 }
 
 // Loader oficial do Cal.com (o IIFE do snippet element-click), encapsulado para
@@ -86,7 +127,10 @@ function ensureInitialized(): void {
   // Este primeiro Cal(...) é o que injeta o <script> do embed.js no head.
   Cal('init', CAL_NAMESPACE, { origin: CAL_ORIGIN });
 
-  // Encaminha query params da URL (ex.: UTMs no primeiro acesso) para o booking.
+  // Pré-preenche campos NOMEADOS do formulário (nome, e-mail etc.) a partir de
+  // query params com o mesmo identificador — NÃO é o mecanismo de atribuição.
+  // UTMs/click IDs vão por `metadata[chave]` (ver buildAttributionMetadataConfig),
+  // que o Cal.com grava na coluna metadata do booking e replica nos webhooks.
   Cal.config = Cal.config || {};
   Cal.config.forwardQueryParams = true;
 
@@ -97,6 +141,18 @@ function ensureInitialized(): void {
     },
     hideEventTypeDetails: false,
     layout: 'month_view',
+  });
+
+  // Dispara o evento de funil (issue #1302) assim que o embed confirma a
+  // reserva — no domínio do site, sessão do usuário, ligado ao sGTM.
+  Cal.ns?.[CAL_NAMESPACE]('on', {
+    action: 'bookingSuccessfulV2',
+    callback: (event: CalBookingSuccessfulEvent) => {
+      const uid = event?.detail?.data?.uid;
+      if (typeof uid === 'string' && uid) {
+        pushConsultoriaBookingCreatedDataLayerEvent(uid);
+      }
+    },
   });
 
   // Fallback de carregamento: o clique já deu preventDefault, então sem isto um
@@ -110,13 +166,35 @@ function ensureInitialized(): void {
   initialized = true;
 }
 
+// Converte o tracking já capturado por utils/whatsapp (UTMs, click IDs, GA4
+// cid/sid) em entradas `metadata[chave]` do embed. O Cal.com grava isso na
+// coluna metadata do booking e replica em payload.metadata nos webhooks
+// (BOOKING_CREATED e, na mesma reserva, BOOKING_PAID) — fecha a atribuição até
+// o purchase-dispatch (issue #1297). Ver cal.com/help/embedding/prefill-
+// booking-form-embed. Não usa forwardQueryParams: aquele mecanismo só
+// pré-preenche campos nomeados do formulário, não grava metadata arbitrário.
+export function buildAttributionMetadataConfig(): Record<string, string> {
+  const tracking = getTrackingDataObject();
+  if (!tracking) return {};
+
+  const metadataConfig: Record<string, string> = {};
+  for (const [key, value] of Object.entries(tracking)) {
+    if (value) metadataConfig[`metadata[${key}]`] = value;
+  }
+  return metadataConfig;
+}
+
 // Abre o modal de agendamento do Cal.com. Só deve ser chamado a partir de uma
 // interação do usuário no browser (onClick) — nunca em render/SSR.
 export function openConsultoriaBooking(): void {
   ensureInitialized();
   window.Cal?.ns?.[CAL_NAMESPACE]('modal', {
     calLink: CAL_LINK,
-    config: { layout: 'month_view', theme: 'auto' },
+    config: {
+      layout: 'month_view',
+      theme: 'auto',
+      ...buildAttributionMetadataConfig(),
+    },
   });
 
   // Backstop: se o embed.js não tiver carregado a tempo, navega para a página
