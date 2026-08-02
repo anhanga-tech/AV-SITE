@@ -100,7 +100,7 @@ export function CruiseHero(): React.ReactElement {
           custom={0}
           className="text-sm font-semibold text-anhanga-blue mb-4 tracking-wide uppercase"
         >
-          Cruzeiros · Brasil e internacionais
+          Cruzeiros · Temporada 2026/2027
         </m.p>
         <m.h1
           variants={fadeUp}
@@ -163,7 +163,7 @@ export function CruiseOffersSection({
           className="mb-10"
         >
           <h2 id="ofertas-titulo" className="text-3xl md:text-4xl font-black text-anhanga-dark mb-3">
-            Seleção da temporada
+            Seleção da temporada 2026/2027
           </h2>
           <p className="text-zinc-600 text-lg max-w-2xl">
             Poucas saídas, escolhidas a dedo. Cada uma vem com o porquê de estar aqui — e um especialista para fechar a sua.
