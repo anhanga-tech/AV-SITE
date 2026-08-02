@@ -25,6 +25,7 @@ const ParquesBrasil = lazy(() => import('./pages/ParquesBrasil'));
 const ExclusaoDados = lazy(() => import('./pages/ExclusaoDados'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const BetoCarreroLanding = lazy(() => import('./pages/landings/BetoCarreroLanding'));
+const HopiHariLanding = lazy(() => import('./pages/landings/HopiHariLanding'));
 const LollapaloozaLanding = lazy(() => import('./pages/landings/LollapaloozaLanding'));
 const OrlandoLanding = lazy(() => import('./pages/landings/OrlandoLanding'));
 const MelhorIdadeLanding = lazy(() => import('./pages/landings/MelhorIdadeLanding'));
@@ -53,6 +54,7 @@ const STANDALONE_ROUTES = ['/links'];
 // e dependem dele.
 const LANDING_PAGE_ROUTES = [
   '/beto-carrero',
+  '/hopi-hari',
   '/lollapalooza',
   '/orlando',
   '/melhor-idade',
@@ -125,6 +127,7 @@ const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClient
       <Suspense fallback={<LandingRouteFallback />}>
         <Routes>
           <Route path="/beto-carrero" element={<BetoCarreroLanding />} />
+          <Route path="/hopi-hari" element={<HopiHariLanding />} />
           <Route path="/lollapalooza" element={<LollapaloozaLanding />} />
           <Route path="/lollapalooza-2026" element={<Navigate to="/lollapalooza" replace />} />
           <Route path="/orlando" element={<OrlandoLanding />} />
