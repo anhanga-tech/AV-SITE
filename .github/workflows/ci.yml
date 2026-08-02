@@ -4,8 +4,12 @@ permissions:
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  # Sem filtro de `branches`: dispara em PRs contra qualquer base, não só `main`.
+  # Necessário para stacked PRs (gh-stack) — uma PR de camada superior tem como
+  # base a branch de baixo, não `main`, e o filtro anterior deixava essas PRs
+  # sem o check `Build / Test` (obrigatório no branch protection), presas sem
+  # conseguir satisfazer o required check.
+  pull_request: {}
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
