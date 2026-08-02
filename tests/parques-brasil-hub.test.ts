@@ -1,7 +1,11 @@
+import React from 'react';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { renderToStaticMarkup } from 'react-dom/server';
 
+import { OrganizationSchema } from '../components/schemas/OrganizationSchema';
+import { createHeadManager, HeadContext } from '../lib/head';
 import { BASE_PRERENDER_ROUTES } from '../lib/prerender-routes.js';
 import { STATIC_SITEMAP_ENTRIES } from '../lib/site-routes.js';
 import {
@@ -25,23 +29,50 @@ test('o hub está registrado como rota estática e é prerenderizado', () => {
   assert.ok(BASE_PRERENDER_ROUTES.includes(HUB_ROUTE), `${HUB_ROUTE} não entra no prerender`);
 });
 
-test('só parques com credenciamento declarado são marcados como credenciados', async () => {
-  // O OrganizationSchema é a declaração pública de credenciamento da agência.
-  // Marcar um parque como `credenciado` sem constar lá seria prometer emissão
-  // oficial de ingresso que a Anhangá não pode entregar.
-  const organizationSchema = await readRepoFile('components/schemas/OrganizationSchema.tsx');
-
-  for (const park of CREDENTIALED_PARKS) {
-    assert.ok(
-      organizationSchema.includes(`"name": "${park.name}"`),
-      `${park.name} está como credenciado mas não consta no OrganizationSchema`,
-    );
-  }
-
+test('só parques com credenciamento declarado são marcados como credenciados', () => {
+  // A lista é a fonte de verdade do credenciamento público da agência.
   assert.deepEqual(
     CREDENTIALED_PARKS.map((park) => park.name).sort(),
     ['Beto Carrero World', 'Hopi Hari'],
   );
+});
+
+test('OrganizationSchema deriva memberOf da lista de parques credenciados', () => {
+  const additionalPark = {
+    ...CREDENTIALED_PARKS[0],
+    name: 'Parque Credenciado de Teste',
+  };
+  CREDENTIALED_PARKS.push(additionalPark);
+
+  try {
+    const headManager = createHeadManager();
+    renderToStaticMarkup(
+      React.createElement(
+        HeadContext.Provider,
+        { value: headManager },
+        React.createElement(OrganizationSchema),
+      ),
+    );
+
+    const organizationTag = headManager
+      .getTags()
+      .find((tag) => tag.key === 'script:ld-json:organization');
+    assert.ok(organizationTag?.innerHTML, 'OrganizationSchema deve emitir JSON-LD');
+
+    const organizationData = JSON.parse(organizationTag.innerHTML) as {
+      memberOf?: Array<Record<string, string>>;
+    };
+    assert.deepEqual(
+      organizationData.memberOf,
+      CREDENTIALED_PARKS.map((park) => ({
+        '@type': 'Organization',
+        name: park.name,
+        description: 'Agente Credenciado',
+      })),
+    );
+  } finally {
+    CREDENTIALED_PARKS.pop();
+  }
 });
 
 test('parque sem página própria não declara href', () => {
