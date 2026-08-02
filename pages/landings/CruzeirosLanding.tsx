@@ -49,7 +49,7 @@ const FAQ_ITEMS = [
   },
   {
     question: 'Quando começa a temporada de cruzeiros 2026/2027 no Brasil?',
-    answer: 'A temporada brasileira 2026/2027 vai de dezembro de 2026 a abril de 2027, com os navios baseados em Santos e no Rio de Janeiro antes de voltar para o Hemisfério Norte. Reservar cedo garante mais opções de cabine nessas saídas.'
+    answer: 'As saídas da temporada brasileira 2026/2027 vão de janeiro a março de 2027, embarcando em Santos. As datas mudam conforme os armadores confirmam a programação. Veja a seleção acima ou fale com um especialista para as saídas mais recentes.'
   }
 ];
 
