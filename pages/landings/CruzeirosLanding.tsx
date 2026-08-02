@@ -33,7 +33,7 @@ const FAQ_ITEMS = [
   },
   {
     question: 'Vocês trabalham só com saídas do Brasil?',
-    answer: 'Não. Temos cruzeiros saindo de Santos e do Rio de Janeiro na temporada brasileira, e também roteiros internacionais — Mediterrâneo, Caribe e outros. A seleção acima muda conforme a temporada e a disponibilidade dos armadores.'
+    answer: 'Não. Temos cruzeiros saindo de Santos e do Rio de Janeiro na temporada brasileira 2026/2027, e também roteiros internacionais — Mediterrâneo, Caribe e outros. A seleção acima muda conforme a temporada e a disponibilidade dos armadores.'
   },
   {
     question: 'Cabine interna ou com varanda?',
@@ -46,6 +46,10 @@ const FAQ_ITEMS = [
   {
     question: 'As ofertas do site têm preço fechado?',
     answer: 'As ofertas mostram navio, roteiro, porto de saída e período — o valor depende de cabine, número de passageiros e extras, e a gente fecha isso na conversa, sem taxa de curadoria.'
+  },
+  {
+    question: 'Quando começa a temporada de cruzeiros 2026/2027 no Brasil?',
+    answer: 'As saídas da temporada brasileira 2026/2027 vão de janeiro a março de 2027, embarcando em Santos. As datas mudam conforme os armadores confirmam a programação. Veja a seleção acima ou fale com um especialista para as saídas mais recentes.'
   }
 ];
 
@@ -65,14 +69,14 @@ const CruzeirosLanding: React.FC = () => {
       <MotionConfig reducedMotion="user">
         <div data-cruzeiros-landing className="bg-anhanga-light min-h-screen font-sans">
           <Seo
-            title="Cruzeiros — Ofertas e Curadoria | Anhangá Viagens"
-            description="Ofertas selecionadas de cruzeiros no Brasil e internacionais, com curadoria consultiva para escolher navio, cabine e roteiro certos antes de fechar."
+            title="Cruzeiros Temporada 2026/2027 | Anhangá Viagens"
+            description="Ofertas de cruzeiros da temporada 2026/2027, saídas do Brasil e roteiros internacionais, com curadoria para acertar navio, cabine e data antes de fechar."
             canonical="https://www.anhanga.tur.br/cruzeiros/"
             noHreflang
           />
           <ServiceSchema
             name="Cruzeiros — Ofertas e Curadoria"
-            description="Seleção de cruzeiros no Brasil e internacionais com atendimento consultivo para escolher navio, cabine, roteiro e datas ideais. Para casais, famílias e primeira viagem."
+            description="Seleção de cruzeiros da temporada 2026/2027 no Brasil e internacionais, com atendimento consultivo para escolher navio, cabine, roteiro e datas ideais. Para casais, famílias e primeira viagem."
             serviceUrl="https://www.anhanga.tur.br/cruzeiros/"
             serviceType="Cruzeiros"
             areaServed="Brasil"
