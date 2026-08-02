@@ -62,6 +62,7 @@ export const PARKS: Park[] = [
       'Adolescente, adulto e criança grande que já encara brinquedo radical. Para quem tem filho pequeno, rende menos que os outros daqui.',
     days: '1 dia resolve',
     when: 'Dia de semana fora de férias escolares. A diferença de fila é grande.',
+    href: '/hopi-hari',
   },
   {
     slug: 'thermas-dos-laranjais',

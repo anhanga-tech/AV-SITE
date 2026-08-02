@@ -91,6 +91,23 @@ test('a filha declara o hub como pai no breadcrumb', async () => {
   );
 });
 
+test('hopi-hari declara o hub como pai no breadcrumb', async () => {
+  const hopiHari = await readRepoFile('pages/landings/HopiHariLanding.tsx');
+
+  assert.match(
+    hopiHari,
+    /name: 'Parques no Brasil',\s*item: 'https:\/\/www\.anhanga\.tur\.br\/parques-brasil\/'/,
+    'HopiHariLanding deve listar o hub como item do BreadcrumbSchema',
+  );
+
+  const hubPosition = hopiHari.indexOf("name: 'Parques no Brasil'");
+  const childPosition = hopiHari.indexOf("name: 'Pacote Hopi Hari'");
+  assert.ok(
+    hubPosition > 0 && hubPosition < childPosition,
+    'o hub precisa vir antes da própria página na ordem do breadcrumb',
+  );
+});
+
 test('o FAQ não promete credenciamento nos parques aquáticos', () => {
   const waterParkNames = PARKS.filter((park) => park.kind === 'Parque aquático').map(
     (park) => park.name,
