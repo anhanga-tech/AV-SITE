@@ -1,6 +1,7 @@
 import React from 'react';
 import { StructuredData } from './StructuredData';
 import { BRAND_LOGO_BLUE_URL } from '../../lib/media-assets';
+import { CREDENTIALED_PARKS } from '../parques-brasil/constants';
 
 interface AggregateRatingProps {
   ratingValue: number;
@@ -46,18 +47,11 @@ export const OrganizationSchema: React.FC<OrganizationSchemaProps> = ({ aggregat
       "availableLanguage": "pt-BR",
       "areaServed": "BR"
     },
-    "memberOf": [
-      {
-        "@type": "Organization",
-        "name": "Beto Carrero World",
-        "description": "Agente Credenciado"
-      },
-      {
-        "@type": "Organization",
-        "name": "Hopi Hari",
-        "description": "Agente Credenciado"
-      }
-    ],
+    "memberOf": CREDENTIALED_PARKS.map((park) => ({
+      "@type": "Organization",
+      "name": park.name,
+      "description": "Agente Credenciado"
+    })),
     "areaServed": [
       { "@type": "Place", "name": "Orlando, Estados Unidos" },
       { "@type": "Place", "name": "Brasil (Festivais e Experiências)" },
