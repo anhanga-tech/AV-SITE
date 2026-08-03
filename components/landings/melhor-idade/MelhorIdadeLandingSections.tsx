@@ -373,6 +373,12 @@ export function MelhorIdadeFinalCta() {
         </button>
         <div className="flex flex-wrap justify-center gap-3 mt-10">
           <Link
+            to="/melhor-idade/pacotes-pastore/"
+            className="min-h-[44px] inline-flex items-center px-5 py-3 rounded-full bg-white/10 border border-white/25 text-white font-semibold hover:bg-white/20 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          >
+            Pacotes em Grupo (Pastore)
+          </Link>
+          <Link
             to="/cruzeiros/"
             className="min-h-[44px] inline-flex items-center px-5 py-3 rounded-full bg-white/10 border border-white/25 text-white font-semibold hover:bg-white/20 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           >
