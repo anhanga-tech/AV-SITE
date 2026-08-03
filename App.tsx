@@ -29,6 +29,7 @@ const HopiHariLanding = lazy(() => import('./pages/landings/HopiHariLanding'));
 const LollapaloozaLanding = lazy(() => import('./pages/landings/LollapaloozaLanding'));
 const OrlandoLanding = lazy(() => import('./pages/landings/OrlandoLanding'));
 const MelhorIdadeLanding = lazy(() => import('./pages/landings/MelhorIdadeLanding'));
+const MelhorIdadePacotesLanding = lazy(() => import('./pages/landings/MelhorIdadePacotesLanding'));
 const CorporativoLanding = lazy(() => import('./pages/landings/CorporativoLanding'));
 const ConsultoriaDeViagemLanding = lazy(() => import('./pages/landings/ConsultoriaDeViagemLanding'));
 
@@ -58,6 +59,7 @@ const LANDING_PAGE_ROUTES = [
   '/lollapalooza',
   '/orlando',
   '/melhor-idade',
+  '/melhor-idade/pacotes-pastore',
   '/corporativo',
   '/consultoria-de-viagem',
   '/cruzeiros',
@@ -132,6 +134,7 @@ const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClient
           <Route path="/lollapalooza-2026" element={<Navigate to="/lollapalooza" replace />} />
           <Route path="/orlando" element={<OrlandoLanding />} />
           <Route path="/melhor-idade" element={<MelhorIdadeLanding />} />
+          <Route path="/melhor-idade/pacotes-pastore" element={<MelhorIdadePacotesLanding />} />
           <Route path="/corporativo" element={<CorporativoLanding />} />
           <Route path="/brazil-promotion-day" element={<Navigate to="/corporativo" replace />} />
           <Route path="/consultoria-de-viagem" element={<ConsultoriaDeViagemLanding />} />
