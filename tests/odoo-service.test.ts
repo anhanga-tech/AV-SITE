@@ -434,3 +434,57 @@ test('openOdooSession — normalizes upstream HTTP failures to ODOO_ERROR:<statu
         (e: unknown) => e instanceof Error && e.message.startsWith('ODOO_ERROR:503:'),
     );
 });
+
+// Security: the detail carried by ODOO_ERROR is untrusted and unbounded (raw
+// HTTP body, or a JSON-RPC fault that echoes back client-supplied field values).
+// Not every consumer truncates before logging — lib/odoo-submit-handler.ts logs
+// `error.message` verbatim on a campaign-resolve failure, and logger forwards to
+// Sentry — so the cap must hold at the throw site.
+const OVERSIZED_DETAIL_LENGTH = 50_000;
+
+test('odooError — caps an oversized upstream HTTP error body', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    const huge = 'x'.repeat(OVERSIZED_DETAIL_LENGTH);
+    global.fetch = createOdooMock({ failStatus: 500, failDetail: huge }).fetch;
+
+    await assert.rejects(
+        () => openOdooSession(config()),
+        (e: unknown) => {
+            assert.ok(e instanceof Error);
+            assert.ok(e.message.startsWith('ODOO_ERROR:500:'));
+            assert.ok(e.message.length < 1000, `message should be capped, got ${e.message.length} chars`);
+            assert.ok(e.message.endsWith('… [truncated]'));
+            return true;
+        },
+    );
+});
+
+test('odooError — caps an oversized JSON-RPC fault message', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    const huge = 'y'.repeat(OVERSIZED_DETAIL_LENGTH);
+    global.fetch = (async () => new Response(
+        JSON.stringify({ jsonrpc: '2.0', id: 1, error: { data: { message: huge } } }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+    )) as typeof fetch;
+
+    await assert.rejects(
+        () => openOdooSession(config()),
+        (e: unknown) => {
+            assert.ok(e instanceof Error);
+            assert.ok(e.message.startsWith('ODOO_ERROR:502:'));
+            assert.ok(e.message.length < 1000, `message should be capped, got ${e.message.length} chars`);
+            assert.ok(e.message.endsWith('… [truncated]'));
+            return true;
+        },
+    );
+});
+
+test('odooError — leaves a short detail intact', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    global.fetch = createOdooMock({ failStatus: 502, failDetail: 'bad gateway' }).fetch;
+
+    await assert.rejects(
+        () => openOdooSession(config()),
+        (e: unknown) => e instanceof Error && e.message === 'ODOO_ERROR:502:bad gateway',
+    );
+});
