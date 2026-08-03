@@ -19,6 +19,7 @@
  */
 import { withLeadIdempotencyLock } from '../lib/odoo-lead-idempotency';
 import { IDEMPOTENCY_KEY_LABEL } from '../lib/odoo-lead-mapping';
+import { truncateProviderDetail } from '../lib/conversions/provider-detail';
 
 const PER_CALL_TIMEOUT_MS = 3000;
 const TOTAL_DEADLINE_MS = 8000;
@@ -40,9 +41,24 @@ export function getOdooConfig(): OdooConfig | null {
     return { url, db, login, apiKey };
 }
 
+/**
+ * Single choke point for every `ODOO_ERROR:<status>:<detail>` this module throws.
+ *
+ * The detail is untrusted and unbounded: it is either the raw HTTP error body,
+ * an Odoo JSON-RPC fault message (which echoes back the offending field values
+ * from the create/write dict — i.e. client-supplied lead content), or an
+ * arbitrary thrown value. Not every consumer truncates before logging — e.g.
+ * the `ODOO_CAMPAIGN_RESOLVE` warn in lib/odoo-submit-handler.ts logs
+ * `error.message` verbatim, and `logger` forwards to Sentry — so a hostile or
+ * misbehaving upstream could flood observability sinks through one submit.
+ * Capping here bounds the blast radius for all of them at once.
+ *
+ * See docs/standards/security.md — "Truncate large upstream error details
+ * before storing or logging them."
+ */
 function odooError(status: number, detail: unknown): Error {
     const text = detail instanceof Error ? detail.message : typeof detail === 'string' ? detail : JSON.stringify(detail);
-    return new Error(`ODOO_ERROR:${status}:${text ?? ''}`);
+    return new Error(`ODOO_ERROR:${status}:${truncateProviderDetail(text ?? '')}`);
 }
 
 interface JsonRpcResult<T> {

@@ -20,6 +20,22 @@ export const MAX_PROVIDER_DETAIL_LENGTH = 300;
 const TRUNCATION_SUFFIX = '… [truncated]';
 
 /**
+ * Caps an already-read provider error detail at {@link MAX_PROVIDER_DETAIL_LENGTH}.
+ * Use this when the detail does not come from a `Response` body — e.g. a
+ * JSON-RPC fault message (`services/odoo.ts`), where the untrusted, unbounded
+ * string arrives inside a parsed payload rather than as raw text.
+ */
+export function truncateProviderDetail(
+  detail: string,
+  maxLength: number = MAX_PROVIDER_DETAIL_LENGTH,
+): string {
+  if (detail.length <= maxLength) {
+    return detail;
+  }
+  return `${detail.slice(0, maxLength)}${TRUNCATION_SUFFIX}`;
+}
+
+/**
  * Fetches the response body as text (never throws) and truncates it to
  * {@link MAX_PROVIDER_DETAIL_LENGTH}. Returns an empty string when the body
  * cannot be read.
@@ -29,8 +45,5 @@ export async function readTruncatedProviderDetail(
   maxLength: number = MAX_PROVIDER_DETAIL_LENGTH,
 ): Promise<string> {
   const detail = await response.text().catch(() => '');
-  if (detail.length <= maxLength) {
-    return detail;
-  }
-  return `${detail.slice(0, maxLength)}${TRUNCATION_SUFFIX}`;
+  return truncateProviderDetail(detail, maxLength);
 }
