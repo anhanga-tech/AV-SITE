@@ -64,7 +64,7 @@ export function PastorePacotesHero(): React.ReactElement {
           custom={1}
           className="text-4xl md:text-6xl font-black text-anhanga-dark mb-6 leading-[1.1]"
         >
-          Os pacotes em grupo que estão abertos agora
+          Pacotes em grupo do catálogo atual da Pastore
         </m.h1>
         <m.p
           variants={fadeUp}
@@ -97,11 +97,42 @@ interface PastorePacotesListProps {
   secondaryPackages: PastorePackage[];
 }
 
+// Quando o catálogo (data/pastorePackages.ts) fica sem nenhum pacote ativo —
+// todos venceram e a lista ainda não foi reposta — a página não pode ficar
+// muda: hero, sitemap e CTA final continuam publicados prometendo pacotes que
+// não aparecem. Mostra um estado explícito em vez de esconder a seção inteira.
+function PastorePacotesEmptyState(): React.ReactElement {
+  return (
+    <section className="py-16 bg-white" aria-labelledby="pacotes-titulo">
+      <div className="max-w-3xl mx-auto px-6 text-center">
+        <h2 id="pacotes-titulo" className="text-3xl md:text-4xl font-black text-anhanga-dark mb-3">
+          Catálogo em atualização
+        </h2>
+        <p className="text-slate-600 text-lg mb-8">
+          A seleção desta temporada acabou de fechar e ainda estamos atualizando com os próximos
+          pacotes da Pastore Turismo. Fale com um especialista para saber o que abre em seguida.
+        </p>
+        <Button
+          variant="action"
+          size="lg"
+          onClick={() => openContactModal(CONTACT_SOURCE)}
+          className="btn-whatsapp btn-specialist"
+          rightIcon={<ArrowRight className="size-5" aria-hidden="true" />}
+          aria-label="Falar com um especialista sobre os próximos pacotes da Pastore Turismo"
+          data-tracking="pacotes-vazio-pastore"
+        >
+          Falar com um Especialista
+        </Button>
+      </div>
+    </section>
+  );
+}
+
 export function PastorePacotesList({
   featuredPackage,
   secondaryPackages,
-}: PastorePacotesListProps): React.ReactElement | null {
-  if (!featuredPackage && secondaryPackages.length === 0) return null;
+}: PastorePacotesListProps): React.ReactElement {
+  if (!featuredPackage && secondaryPackages.length === 0) return <PastorePacotesEmptyState />;
 
   // `lg:grid-cols-3` deixa o último card sozinho numa linha nova sempre que a
   // contagem % 3 === 1 — mesmo ajuste documentado em CruzeirosLandingSections.
