@@ -44,7 +44,7 @@
     "globe.gl": "^2.46.1",
     "leaflet": "1.9.4",
     "lucide-react": "^1.27.0",
-    "postcss": "^8.5.22",
+    "postcss": "^8.5.23",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-markdown": "^10.1.0",
