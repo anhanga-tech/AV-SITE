@@ -102,7 +102,11 @@ async function sendToOdoo(input: OdooLeadInput): Promise<void> {
     // Trade-off: the resolve now also runs when the partner upsert goes on to
     // fail, so a failed submit can leave behind a utm.campaign row the serial
     // version wouldn't have created. That row is exactly the one the next
-    // successful submit for the same campaign would create anyway.
+    // successful submit for the same campaign would create anyway. In practice
+    // it often won't even be written: on that path the promise is never awaited
+    // and is tied neither to ctx.waitUntil nor to the response, so the Workers
+    // isolate may be torn down before the RPC lands. That is fine precisely
+    // because this call is enrichment — never put work you depend on here.
     const campaignIdPromise = campaignName
         ? session.resolveCampaignId(campaignName).catch((error: unknown) => {
             logger.warn('ODOO_CAMPAIGN_RESOLVE', {
