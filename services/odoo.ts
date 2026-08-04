@@ -9,10 +9,11 @@
  *
  * Auth flow: `common.authenticate` → uid, then `object.execute_kw` for ORM calls.
  * Module-level state does not persist across requests on Workers, so each submit
- * re-authenticates. A lead submit makes up to 5 sequential round-trips
- * (auth → partner search → partner write/create → campaign find-or-create →
- * lead create); a shared deadline bounds the worst case so an upstream stall
- * never hangs the form.
+ * re-authenticates. A lead submit chains auth → partner search → partner
+ * write/create → lead create; the campaign find-or-create runs *concurrently*
+ * with the partner upsert rather than after it, since it only needs the uid
+ * (see lib/odoo-submit-handler.ts). A shared deadline bounds the worst case so
+ * an upstream stall never hangs the form.
  *
  * Errors are normalized to `ODOO_ERROR:<status>:<detail>` so the submit-handler
  * factory classifies them uniformly (see lib/odoo-submit-handler.ts).
