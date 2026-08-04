@@ -221,6 +221,52 @@ test('submit-lead maps corporate empresa/cargo to crm.lead partner_name/function
     assert.equal(lead.function, 'Diretora de Pessoas');
 });
 
+// --- Odoo round-trip concurrency --------------------------------------------
+
+test('submit-lead resolves the utm.campaign concurrently with the partner upsert', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    const mock = createOdooMock({ newPartnerId: 101, leadId: 555, newCampaignId: 900 });
+    global.fetch = mock.fetch;
+
+    const response = await handler(buildRequest(buildLeadPayloadFixture()));
+    assert.equal(response.status, 201);
+
+    const indexOfCall = (model: string, method: string) =>
+        mock.calls.findIndex((c) => c.model === model && c.method === method);
+
+    // The campaign lookup never reads partnerId, so it must already be in flight
+    // by the time the partner dedup search resolves — i.e. it is dispatched
+    // before the res.partner write lands, not queued behind it. Serializing the
+    // two again would push this index after the partner create and fail here.
+    const campaignSearch = indexOfCall('utm.campaign', 'search_read');
+    const partnerCreate = indexOfCall('res.partner', 'create');
+    assert.ok(campaignSearch >= 0, 'expected a utm.campaign lookup for utm_campaign=rio');
+    assert.ok(partnerCreate >= 0, 'expected a res.partner create');
+    assert.ok(
+        campaignSearch < partnerCreate,
+        'utm.campaign lookup must overlap the partner upsert, not queue behind it',
+    );
+
+    // Concurrency must not change the result the lead is built with.
+    assert.equal(mock.leadFields()!.campaign_id, 900);
+});
+
+test('submit-lead still creates the lead when the utm.campaign resolve fails', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    // Both the create and the two recovery searches miss → resolveCampaignId throws.
+    const mock = createOdooMock({ newPartnerId: 101, leadId: 555, campaignCreateShouldFail: true });
+    global.fetch = mock.fetch;
+
+    const response = await handler(buildRequest(buildLeadPayloadFixture()));
+
+    // Campaign resolution is enrichment: its failure must not cost the lead.
+    assert.equal(response.status, 201);
+    assert.equal(mock.createdLead(), true);
+    assert.equal(mock.leadFields()!.campaign_id, undefined);
+});
+
 // --- idempotency (issue #1136) ----------------------------------------------
 
 test('submit-lead — a retry with the same event_id does not create a second crm.lead opportunity', async (t) => {
