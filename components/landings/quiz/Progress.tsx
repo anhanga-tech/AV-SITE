@@ -14,7 +14,14 @@ export function Progress({ current, total }: { current: number; total: number })
                     : `${current}/${total}`
                 }
             </div>
-            <progress className="quiz-progress-bar" value={current} max={total}>
+            {/* A barra precisa do próprio nome acessível: o texto ao lado vira
+                "Na metade!" nos milestones, então "3/7" some do que a AT lê. */}
+            <progress
+                className="quiz-progress-bar"
+                value={current}
+                max={total}
+                aria-label={`Pergunta ${current} de ${total}`}
+            >
                 {Math.round(progress * 100)}%
             </progress>
         </div>
