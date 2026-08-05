@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 import type { QuizQuestion } from '../../../data/quiz';
 import { Progress } from './Progress';
 
@@ -15,6 +15,7 @@ interface QuestionScreenProps {
 export function QuestionScreen({ q, qIndex, total, value, onChange, onNext, onBack }: QuestionScreenProps) {
     const selected: string[] = value ?? [];
     const [pendingId, setPendingId] = useState<string | null>(null);
+    const footMetaId = useId();
     const advanceTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // Timer cleanup on unmount (state resets via key={q.id} on the render site)
@@ -79,6 +80,10 @@ export function QuestionScreen({ q, qIndex, total, value, onChange, onNext, onBa
                                 pendingId === opt.id ? 'is-confirming' : '',
                             ].join(' ').trim()}
                             onClick={() => !pendingId && toggle(opt.id)}
+                            // O estado de escolha vivia só na classe `is-selected` e no
+                            // ✓ `aria-hidden` — quem usa leitor de tela marcava opções
+                            // sem nenhum retorno de que estavam marcadas (WCAG 4.1.2).
+                            aria-pressed={isSelected(opt.id)}
                             disabled={!q.multi && pendingId !== null && pendingId !== opt.id}
                             style={{ ['--opt-i' as string]: i }}
                         >
@@ -97,12 +102,17 @@ export function QuestionScreen({ q, qIndex, total, value, onChange, onNext, onBa
                             className="quiz-btn quiz-btn-primary"
                             disabled={selected.length === 0}
                             onClick={onNext}
+                            aria-describedby={footMetaId}
                         >
                             Próxima
                             <span className="quiz-arrow">→</span>
                         </button>
-                        <span className="quiz-q-foot-meta">
-                            {selected.length === 1 ? '1 escolhido' : `${selected.length} escolhidos`}
+                        {/* "0 escolhidos" não explicava por que o botão estava apagado.
+                            Sem seleção o texto vira instrução; com seleção, contador. */}
+                        <span id={footMetaId} className="quiz-q-foot-meta" aria-live="polite">
+                            {selected.length === 0
+                                ? 'Escolha ao menos uma opção'
+                                : selected.length === 1 ? '1 escolhido' : `${selected.length} escolhidos`}
                         </span>
                     </div>
                 )}
