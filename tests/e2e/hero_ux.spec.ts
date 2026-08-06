@@ -85,4 +85,34 @@ test.describe('Hero UX and Accessibility', () => {
     await page.getByRole('button', { name: 'Férias / Lazer' }).click();
     await expect(tripTypeField).toContainText('Férias / Lazer');
   });
+
+  test('should offer five accessible AI research links below the hero form', async ({ page }) => {
+    const aiResearch = page.getByRole('group', { name: 'Pesquisar sobre a Anhangá com uma IA' });
+    await expect(aiResearch).toBeVisible();
+
+    for (const assistant of ['ChatGPT', 'Gemini', 'Claude', 'Perplexity', 'Grok']) {
+      const link = aiResearch.getByRole('link', { name: new RegExp(`Perguntar no ${assistant}`) });
+      await expect(link).toBeVisible();
+      await expect(link.locator('img')).toHaveAttribute('alt', assistant);
+      await expect(link.locator('img')).toHaveAttribute('src', /api\.iconify\.design/);
+      await expect(link).not.toContainText(assistant);
+      await expect(link).toHaveAttribute('target', '_blank');
+      await expect(link).toHaveAttribute('rel', /noopener/);
+      if (assistant === 'Gemini') {
+        const href = await link.getAttribute('href');
+        expect(href).toBeTruthy();
+
+        const geminiUrl = new URL(href!);
+        expect(geminiUrl.origin).toBe('https://www.google.com');
+        expect(geminiUrl.pathname).toBe('/search');
+        expect(geminiUrl.searchParams.get('udm')).toBe('50');
+        expect(geminiUrl.searchParams.get('source')).toBe('searchlabs');
+        expect(geminiUrl.searchParams.get('q')).toContain(
+          'O que você sabe sobre a Anhangá Viagens?',
+        );
+      } else {
+        await expect(link).toHaveAttribute('href', /%C3%81nhang%C3%A1|Anhang%C3%A1/);
+      }
+    }
+  });
 });
