@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect, useMemo, memo } from 'react';
 import { m } from 'framer-motion';
 import { HERO_VIDEOS, optimizeRemoteImageUrl } from '../data/mediaConfig';
-import { QUICK_FEATURES } from '../data/destinations';
 import { NOISE_TEXTURE_URL } from '../lib/static-assets';
 import SearchForm from './SearchForm';
 import MobileHeroForm from './MobileHeroForm';
+import AIResearchBar from './AIResearchBar';
 
 const noiseTextureStyle = {
   backgroundImage: `url("${NOISE_TEXTURE_URL}")`,
@@ -197,28 +197,7 @@ const Hero: React.FC = memo(() => {
             Sem compromisso • Retorno humano em até 2h úteis
           </p>
 
-          {/* Quick Features - Staggered Spring */}
-          <m.div
-            className="mt-10 flex flex-wrap justify-center gap-6"
-            initial="hidden"
-            animate="visible"
-            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1, delayChildren: 0.7 } } }}
-          >
-            {QUICK_FEATURES.map((feat) => (
-              <m.div
-                key={feat.text}
-                variants={{
-                  hidden: { opacity: 0, y: 16, scale: 0.9 },
-                  visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 400, damping: 20 } }
-                }}
-                className="flex items-center gap-2 text-white/90 font-bold text-sm bg-white/10 px-4 py-2 rounded-full backdrop-blur-md border border-white/10 hover:bg-white/20 transition duration-300 cursor-default"
-                whileHover={{ scale: 1.05, transition: { type: 'spring', stiffness: 400, damping: 15 } }}
-              >
-                <feat.icon className="size-4 text-yellow-300" />
-                {feat.text}
-              </m.div>
-            ))}
-          </m.div>
+          <AIResearchBar />
         </div>
       </div>
 
