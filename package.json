@@ -29,12 +29,12 @@
     "images:optimize": "tsx scripts/optimize-r2-images.ts"
   },
   "dependencies": {
-    "@google/genai": "^2.13.0",
+    "@google/genai": "^2.14.0",
     "@mdx-js/react": "^3.1.1",
     "@mdx-js/rollup": "^3.1.1",
     "@phosphor-icons/react": "^2.1.10",
     "@sentry/cloudflare": "^10.68.0",
-    "@sentry/react": "^10.68.0",
+    "@sentry/react": "^10.69.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@tailwindcss/typography": "^0.5.20",
     "@upstash/redis": "^1.38.0",
@@ -44,7 +44,7 @@
     "globe.gl": "^2.46.1",
     "leaflet": "1.9.4",
     "lucide-react": "^1.27.0",
-    "postcss": "^8.5.24",
+    "postcss": "^8.5.25",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-markdown": "^10.1.0",
@@ -54,7 +54,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@aws-sdk/client-s3": "^3.1097.0",
+    "@aws-sdk/client-s3": "^3.1098.0",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.62.0",
     "@semantic-release/commit-analyzer": "13.0.1",
