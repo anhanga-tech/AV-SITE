@@ -26,6 +26,7 @@ export function requestsMarkdown(accept: string | null): boolean {
 export function isUnsupportedDiscoveryPath(pathname: string): boolean {
     const path = normalizeAgentPath(pathname);
 
+    // The Cloudflare Agent Readiness scan probes this unsupported discovery path.
     if (path === '/auth.md') return true;
     if (!path.startsWith('/.well-known/')) return false;
 

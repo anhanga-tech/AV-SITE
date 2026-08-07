@@ -8,6 +8,7 @@ import {
 interface PagesContext {
   request: Request;
   next: () => Promise<Response>;
+  env: Record<string, string>;
 }
 
 function notFoundResponse(): Response {
@@ -32,7 +33,8 @@ async function markdownResponseFor(request: Request): Promise<Response> {
   }));
 }
 
-export const onRequest = async ({ request, next }: PagesContext): Promise<Response> => {
+export const onRequest = async ({ request, next, env }: PagesContext): Promise<Response> => {
+  Object.assign(process.env, env);
   const pathname = new URL(request.url).pathname;
 
   if (isUnsupportedDiscoveryPath(pathname)) {

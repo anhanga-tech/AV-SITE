@@ -38,6 +38,7 @@ test('agent-readiness middleware serves the home page as Markdown when requested
             headers: { Accept: 'text/markdown' },
         }),
         next: async () => new Response('<html>fallback</html>', { status: 200 }),
+        env: {},
     });
 
     assert.equal(response.status, 200);
@@ -49,6 +50,7 @@ test('agent-readiness middleware returns 404 for unsupported discovery documents
     const response = await agentReadinessMiddleware({
         request: new Request('https://www.anhanga.tur.br/.well-known/agent-card.json'),
         next: async () => new Response('<html>fallback</html>', { status: 200 }),
+        env: {},
     });
 
     assert.equal(response.status, 404);
@@ -62,8 +64,34 @@ test('agent-readiness middleware preserves normal HTML requests', async () => {
             headers: { Accept: 'text/html' },
         }),
         next: async () => new Response('<html>fallback</html>', { status: 200 }),
+        env: {},
     });
 
     assert.equal(response.status, 200);
     assert.equal(await response.text(), '<html>fallback</html>');
+});
+
+test('agent-readiness middleware forwards Pages bindings before delegating to Markdown', async () => {
+    const previousValue = process.env.AGENT_READINESS_TEST_ENV;
+
+    try {
+        delete process.env.AGENT_READINESS_TEST_ENV;
+
+        const response = await agentReadinessMiddleware({
+            request: new Request('https://www.anhanga.tur.br/', {
+                headers: { Accept: 'text/markdown' },
+            }),
+            next: async () => new Response('<html>fallback</html>', { status: 200 }),
+            env: { AGENT_READINESS_TEST_ENV: 'forwarded' },
+        });
+
+        assert.equal(response.status, 200);
+        assert.equal(process.env.AGENT_READINESS_TEST_ENV, 'forwarded');
+    } finally {
+        if (previousValue === undefined) {
+            delete process.env.AGENT_READINESS_TEST_ENV;
+        } else {
+            process.env.AGENT_READINESS_TEST_ENV = previousValue;
+        }
+    }
 });
