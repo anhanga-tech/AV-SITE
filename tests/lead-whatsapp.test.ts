@@ -158,6 +158,92 @@ test('getTrackingDataObject should capture referral ref from URL params', () => 
     restoreBrowserGlobals();
 });
 
+test('getTrackingDataObject should mark tracking_data Secure on HTTPS and SameSite=Lax', () => {
+    const cookieWrites: string[] = [];
+    const mockWindow: MockWindow & { location: { protocol: string } } = {
+        location: {
+            protocol: 'https:',
+            search: '?utm_source=security-test',
+            hash: '',
+            href: 'https://www.anhanga.tur.br/?utm_source=security-test',
+        },
+        dataLayer: [],
+    };
+
+    Object.defineProperty(globalThis, 'window', {
+        configurable: true,
+        value: mockWindow,
+    });
+    Object.defineProperty(globalThis, 'document', {
+        configurable: true,
+        value: {
+            readyState: 'complete',
+            get cookie() {
+                return '';
+            },
+            set cookie(value: string) {
+                cookieWrites.push(value);
+            },
+        },
+    });
+    Object.defineProperty(globalThis, 'sessionStorage', {
+        configurable: true,
+        value: createSessionStorage(),
+    });
+
+    getTrackingDataObject();
+
+    const trackingCookie = cookieWrites.find((value) => value.startsWith('tracking_data='));
+    assert.ok(trackingCookie, 'tracking_data should be persisted as a cookie');
+    assert.match(trackingCookie, /;SameSite=Lax(?:;|$)/);
+    assert.match(trackingCookie, /;Secure(?:;|$)/);
+
+    restoreBrowserGlobals();
+});
+
+test('getTrackingDataObject should omit Secure for local HTTP while retaining SameSite=Lax', () => {
+    const cookieWrites: string[] = [];
+    const mockWindow: MockWindow & { location: { protocol: string } } = {
+        location: {
+            protocol: 'http:',
+            search: '?utm_source=local-test',
+            hash: '',
+            href: 'http://localhost:4175/?utm_source=local-test',
+        },
+        dataLayer: [],
+    };
+
+    Object.defineProperty(globalThis, 'window', {
+        configurable: true,
+        value: mockWindow,
+    });
+    Object.defineProperty(globalThis, 'document', {
+        configurable: true,
+        value: {
+            readyState: 'complete',
+            get cookie() {
+                return '';
+            },
+            set cookie(value: string) {
+                cookieWrites.push(value);
+            },
+        },
+    });
+    Object.defineProperty(globalThis, 'sessionStorage', {
+        configurable: true,
+        value: createSessionStorage(),
+    });
+
+    getTrackingDataObject();
+
+    const trackingCookie = cookieWrites.find((value) => value.startsWith('tracking_data='));
+    assert.ok(trackingCookie, 'tracking_data should be persisted as a cookie');
+    assert.match(trackingCookie, /;SameSite=Lax(?:;|$)/);
+    assert.doesNotMatch(trackingCookie, /;Secure(?:;|$)/);
+
+    restoreBrowserGlobals();
+});
+
 test('pushGenerateLeadDataLayerEvent should use provided formType for form_submission event', () => {
     const mockWindow: MockWindow = {
         location: {
