@@ -32,7 +32,25 @@ const FIXTURE_DATA = {
   ],
 };
 
+const EMPTY_DATA = {
+  placeId: 'ChIJtest123',
+  averageRating: 0,
+  totalReviews: 0,
+  lastFetched: '2026-05-31T12:00:00Z',
+  reviews: [],
+};
+
 test.describe('Testimonials — seed data (empty)', () => {
+  test.beforeAll(() => {
+    copyFileSync(REVIEWS_PATH, BACKUP_PATH);
+    writeFileSync(REVIEWS_PATH, JSON.stringify(EMPTY_DATA, null, 2) + '\n');
+  });
+
+  test.afterAll(() => {
+    copyFileSync(BACKUP_PATH, REVIEWS_PATH);
+    try { unlinkSync(BACKUP_PATH); } catch { /* backup already removed */ }
+  });
+
   test('renders fallback manual testimonials without summary bar', async ({ page }) => {
     await page.goto('/');
     await page.evaluate(() => window.scrollBy(0, 3000));
