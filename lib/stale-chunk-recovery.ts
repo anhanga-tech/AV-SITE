@@ -17,6 +17,15 @@ export function isStaleChunkErrorMessage(message: string | null | undefined): bo
     return !!message && STALE_CHUNK_MESSAGE_PATTERN.test(message);
 }
 
+// Sentry tag set on the deliberate report below. lib/sentry-client.ts's
+// beforeSend checks for it and lets the event through unconditionally,
+// *before* running isStaleChunkMessage — the report's own Error necessarily
+// still mentions the original stale-chunk wording (for a readable message),
+// so the ordinary message-pattern filter would otherwise self-filter this
+// exact signal right back out.
+export const STALE_CHUNK_EXHAUSTED_TAG_KEY = 'stale_chunk_exhausted';
+export const STALE_CHUNK_EXHAUSTED_TAG_VALUE = 'true';
+
 // Not every browser's failure message embeds the failing asset's URL (e.g.
 // the bare "Importing a module script failed"), so the message alone can't
 // always distinguish one deploy's failure from another's. The entry script
@@ -61,10 +70,18 @@ function readAttempts(key: string): number | null {
 // swallows render-time chunk errors without reporting them at all, and
 // (see handleStaleChunkPreloadError below) we deliberately don't suppress
 // or observe Vite's own re-thrown error either.
+//
+// Tagged with STALE_CHUNK_EXHAUSTED_TAG_KEY so lib/sentry-client.ts's
+// beforeSend lets it through unconditionally — its message necessarily still
+// contains the original stale-chunk wording, which the ordinary
+// message-pattern filter would otherwise drop right back out.
 function reportUnrecoveredStaleChunk(message: string | null | undefined): void {
+    const originalMessage = message || 'Unknown stale-chunk failure (no message, or sessionStorage unavailable)';
+
     captureLoggerError(
-        'Stale-chunk reload did not recover the app',
-        new Error(message || 'Unknown stale-chunk failure (no message, or sessionStorage unavailable)')
+        `Stale-chunk reload did not recover the app: ${originalMessage}`,
+        undefined,
+        { [STALE_CHUNK_EXHAUSTED_TAG_KEY]: STALE_CHUNK_EXHAUSTED_TAG_VALUE }
     );
 }
 

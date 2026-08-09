@@ -2,8 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-import { isStaleChunkMessage } from '../lib/sentry-client';
+import { isStaleChunkMessage, sentryBeforeSend } from '../lib/sentry-client';
 import { resetErrorTrackerForTests, setErrorTrackerForTests } from '../lib/error-tracking';
+import { STALE_CHUNK_EXHAUSTED_TAG_KEY, STALE_CHUNK_EXHAUSTED_TAG_VALUE } from '../lib/stale-chunk-recovery';
+import type { ErrorEvent as SentryErrorEvent } from '@sentry/react';
 
 async function readProjectFile(path: string): Promise<string> {
     return await readFile(new URL(`../${path}`, import.meta.url), 'utf8');
@@ -50,6 +52,7 @@ test('client drops stale-chunk noise unconditionally, relying on stale-chunk-rec
     assert.match(entrySource, /handleStaleChunkPreloadError/);
     assert.match(recoverySource, /Unable to preload CSS for/);
     assert.match(sentrySource, /isStaleChunkMessage\(exceptions\)\) return null/);
+    assert.match(sentrySource, /STALE_CHUNK_EXHAUSTED_TAG_KEY/);
 });
 
 test('isStaleChunkMessage recognizes Chromium and Firefox stale-chunk wording, not unrelated errors', () => {
@@ -74,6 +77,34 @@ test('isStaleChunkMessage recognizes Chromium and Firefox stale-chunk wording, n
 
     assert.equal(isStaleChunkMessage(undefined), false);
     assert.equal(isStaleChunkMessage([{}]), false);
+});
+
+test('sentryBeforeSend drops an ordinary (untagged) stale-chunk exception', () => {
+    const event = {
+        type: undefined,
+        exception: { values: [{ value: STALE_ASSET_MESSAGE }] },
+    } as SentryErrorEvent;
+
+    assert.equal(sentryBeforeSend(event), null);
+});
+
+test('sentryBeforeSend lets a tagged exhausted-budget report through even though its message still matches the stale-chunk pattern', () => {
+    // Mirrors exactly what reportUnrecoveredStaleChunk (lib/stale-chunk-recovery.ts)
+    // produces: an Error whose message embeds the original stale-chunk wording
+    // (for readability) plus the bypass tag. A prior version of this fix built
+    // this report without the tag, and isStaleChunkMessage silently dropped it
+    // right back out — this test exercises the real beforeSend pipeline
+    // end-to-end rather than a stubbed error tracker, which can't catch that
+    // class of self-filtering bug.
+    const event = {
+        type: undefined,
+        tags: { [STALE_CHUNK_EXHAUSTED_TAG_KEY]: STALE_CHUNK_EXHAUSTED_TAG_VALUE },
+        exception: {
+            values: [{ value: `Stale-chunk reload did not recover the app: ${STALE_ASSET_MESSAGE}` }],
+        },
+    } as SentryErrorEvent;
+
+    assert.equal(sentryBeforeSend(event), event);
 });
 
 const STALE_ASSET_MESSAGE = 'Failed to fetch dynamically imported module: https://anhanga.tur.br/assets/Blog-a1b2c3.js';
@@ -114,8 +145,8 @@ function restoreWindow(): void {
 test('handleStaleChunkPreloadError reloads once for a failing asset, then reports (without reloading again) if it recurs', async () => {
     const { handleStaleChunkPreloadError } = await import('../lib/stale-chunk-recovery');
     const state = stubWindow();
-    const reported: unknown[] = [];
-    setErrorTrackerForTests((error) => { reported.push(error); });
+    const reported: Array<{ error: unknown; context: unknown }> = [];
+    setErrorTrackerForTests((error, context) => { reported.push({ error, context }); });
 
     try {
         handleStaleChunkPreloadError({ payload: new Error(STALE_ASSET_MESSAGE) });
@@ -129,7 +160,14 @@ test('handleStaleChunkPreloadError reloads once for a failing asset, then report
         handleStaleChunkPreloadError({ payload: new Error(STALE_ASSET_MESSAGE) });
         assert.equal(state.reloadCalls, 1, 'must not reload again once the budget is spent');
         assert.equal(reported.length, 1, 'must report once the budget is spent');
-        assert.match((reported[0] as Error).message, /Blog-a1b2c3\.js/);
+        assert.match((reported[0].error as Error).message, /Blog-a1b2c3\.js/);
+
+        // The report must carry the bypass tag — this is what lets it survive
+        // sentryBeforeSend's message-pattern filter in production (see the
+        // 'sentryBeforeSend lets a tagged exhausted-budget report through'
+        // test below); a report without it would silently self-filter.
+        const context = reported[0].context as { tags?: Record<string, string> };
+        assert.equal(context.tags?.[STALE_CHUNK_EXHAUSTED_TAG_KEY], STALE_CHUNK_EXHAUSTED_TAG_VALUE);
     } finally {
         restoreWindow();
         resetErrorTrackerForTests();
