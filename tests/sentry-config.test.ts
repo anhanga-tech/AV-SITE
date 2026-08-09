@@ -36,6 +36,17 @@ test('client initializes Sentry before React mounts and filters browser extensio
     assert.match(sentrySource, /extension:\/\//);
 });
 
+test('client filters stale-chunk noise already recovered by the preload-error reload', async () => {
+    const [entrySource, sentrySource] = await Promise.all([
+        readProjectFile('index.tsx'),
+        readProjectFile('lib/sentry-client.ts'),
+    ]);
+
+    assert.match(entrySource, /vite:preloadError/);
+    assert.match(sentrySource, /Unable to preload CSS for/);
+    assert.match(sentrySource, /isStaleChunkMessage\(exceptions\)\) return null/);
+});
+
 test('Cloudflare Pages middleware initializes Sentry from request environment', async () => {
     const middlewareSource = await readProjectFile('functions/_middleware.ts');
 

@@ -21,6 +21,16 @@ function isBrowserExtensionMessage(values: Array<{ value?: string }> | undefined
     );
 }
 
+// Fires when a browser holds a pre-deploy bundle and tries to fetch a
+// content-hashed chunk/CSS file that a newer deploy has already replaced.
+// The `vite:preloadError` listener in index.tsx already reloads the page to
+// recover, so this is expected noise rather than an actionable bug.
+function isStaleChunkMessage(values: Array<{ value?: string }> | undefined): boolean {
+    return !!values?.some(({ value }) =>
+        !!value && /Unable to preload CSS for|Failed to fetch dynamically imported module|Importing a module script failed/i.test(value)
+    );
+}
+
 export function initClientErrorTracking(): void {
     const dsn = import.meta.env.VITE_SENTRY_DSN;
 
@@ -44,6 +54,7 @@ export function initClientErrorTracking(): void {
 
             if (frames.some(isBrowserExtensionFrame)) return null;
             if (isBrowserExtensionMessage(exceptions)) return null;
+            if (isStaleChunkMessage(exceptions)) return null;
 
             return event;
         },
