@@ -2,10 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-import { isStaleChunkMessage, sentryBeforeSend } from '../lib/sentry-client';
+import { isStaleChunkMessage, sentryBeforeSend, sentryBeforeSendLog } from '../lib/sentry-client';
 import { resetErrorTrackerForTests, setErrorTrackerForTests } from '../lib/error-tracking';
 import { STALE_CHUNK_EXHAUSTED_TAG_KEY, STALE_CHUNK_EXHAUSTED_TAG_VALUE } from '../lib/stale-chunk-recovery';
 import type { ErrorEvent as SentryErrorEvent } from '@sentry/react';
+
+type SentryLog = Parameters<typeof sentryBeforeSendLog>[0];
 
 async function readProjectFile(path: string): Promise<string> {
     return await readFile(new URL(`../${path}`, import.meta.url), 'utf8');
@@ -53,6 +55,7 @@ test('client drops stale-chunk noise unconditionally, relying on stale-chunk-rec
     assert.match(recoverySource, /Unable to preload CSS for/);
     assert.match(sentrySource, /isStaleChunkMessage\(exceptions\)\) return null/);
     assert.match(sentrySource, /STALE_CHUNK_EXHAUSTED_TAG_KEY/);
+    assert.match(sentrySource, /beforeSendLog: sentryBeforeSendLog/);
 });
 
 test('isStaleChunkMessage recognizes Chromium and Firefox stale-chunk wording, not unrelated errors', () => {
@@ -105,6 +108,18 @@ test('sentryBeforeSend lets a tagged exhausted-budget report through even though
     } as SentryErrorEvent;
 
     assert.equal(sentryBeforeSend(event), event);
+});
+
+test('sentryBeforeSendLog drops stale-chunk console noise from the separate Logs pipeline', () => {
+    // React logs every error a boundary catches (ChunkErrorBoundary included)
+    // to console.error by default, and consoleLoggingIntegration forwards
+    // that through Sentry Logs — a separate pipeline from beforeSend's
+    // exception events, so it needs its own filter.
+    const staleLog = { message: STALE_ASSET_MESSAGE } as SentryLog;
+    const unrelatedLog = { message: 'user clicked checkout' } as SentryLog;
+
+    assert.equal(sentryBeforeSendLog(staleLog), null);
+    assert.equal(sentryBeforeSendLog(unrelatedLog), unrelatedLog);
 });
 
 const STALE_ASSET_MESSAGE = 'Failed to fetch dynamically imported module: https://anhanga.tur.br/assets/Blog-a1b2c3.js';

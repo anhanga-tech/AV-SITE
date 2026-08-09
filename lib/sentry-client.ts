@@ -64,6 +64,17 @@ export function sentryBeforeSend(event: Sentry.ErrorEvent): Sentry.ErrorEvent | 
     return event;
 }
 
+// `beforeSend` above only filters error/exception events. React logs every
+// error a boundary catches (ChunkErrorBoundary included) to `console.error`
+// by default, and `consoleLoggingIntegration` below forwards console output
+// through Sentry's separate Logs pipeline — so without this hook, the same
+// stale-chunk noise `beforeSend` drops would still show up there.
+export function sentryBeforeSendLog(log: Sentry.Log): Sentry.Log | null {
+    if (isStaleChunkErrorMessage(String(log.message))) return null;
+
+    return log;
+}
+
 export function initClientErrorTracking(): void {
     const dsn = import.meta.env.VITE_SENTRY_DSN;
 
@@ -80,6 +91,7 @@ export function initClientErrorTracking(): void {
         ],
         tracePropagationTargets: ['localhost', /^https:\/\/(?:www\.)?anhanga\.tur\.br\/api/],
         beforeSend: sentryBeforeSend,
+        beforeSendLog: sentryBeforeSendLog,
     });
 
     setErrorTracker(Sentry.captureException);
