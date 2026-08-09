@@ -47,7 +47,7 @@ class ChunkErrorBoundary extends React.Component<Props, State> {
     // both, and they must not each reload independently. If the budget is
     // already spent, this falls through to the fallback UI below instead of
     // reloading (or looping) again.
-    attemptStaleChunkBoundaryReload();
+    attemptStaleChunkBoundaryReload(error);
   }
 
   render() {

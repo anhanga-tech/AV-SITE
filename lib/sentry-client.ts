@@ -26,10 +26,15 @@ function isBrowserExtensionMessage(values: Array<{ value?: string }> | undefined
 // content-hashed chunk/CSS file that a newer deploy has already replaced.
 // The `vite:preloadError` listener in index.tsx reloads the page once to
 // recover, so this is expected noise — unless that reload budget is already
-// spent (see `hasExhaustedStaleChunkReloads`), in which case the deploy is
-// genuinely broken and the event should reach Sentry instead of being dropped.
+// spent for this specific failing asset (see `hasExhaustedStaleChunkReloads`),
+// in which case the deploy is genuinely broken and the event should reach
+// Sentry instead of being dropped.
 export function isStaleChunkMessage(values: Array<{ value?: string }> | undefined): boolean {
-    return !!values?.some(({ value }) => isStaleChunkErrorMessage(value));
+    return !!findStaleChunkMessage(values);
+}
+
+function findStaleChunkMessage(values: Array<{ value?: string }> | undefined): string | undefined {
+    return values?.map((exception) => exception.value).find(isStaleChunkErrorMessage);
 }
 
 export function initClientErrorTracking(): void {
@@ -55,7 +60,9 @@ export function initClientErrorTracking(): void {
 
             if (frames.some(isBrowserExtensionFrame)) return null;
             if (isBrowserExtensionMessage(exceptions)) return null;
-            if (isStaleChunkMessage(exceptions) && !hasExhaustedStaleChunkReloads()) return null;
+
+            const staleChunkMessage = findStaleChunkMessage(exceptions);
+            if (staleChunkMessage && !hasExhaustedStaleChunkReloads(staleChunkMessage)) return null;
 
             return event;
         },

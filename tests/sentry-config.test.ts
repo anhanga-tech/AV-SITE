@@ -48,7 +48,7 @@ test('client filters stale-chunk noise only while the preload-error reload budge
     assert.match(entrySource, /vite:preloadError/);
     assert.match(entrySource, /handleStaleChunkPreloadError/);
     assert.match(recoverySource, /Unable to preload CSS for/);
-    assert.match(sentrySource, /isStaleChunkMessage\(exceptions\) && !hasExhaustedStaleChunkReloads\(\)\) return null/);
+    assert.match(sentrySource, /!hasExhaustedStaleChunkReloads\(staleChunkMessage\)\) return null/);
 });
 
 test('isStaleChunkMessage recognizes Chromium and Firefox stale-chunk wording, not unrelated errors', () => {
@@ -100,29 +100,62 @@ function restoreWindow(): void {
     delete (globalThis as { window?: unknown }).window;
 }
 
+const STALE_ASSET_MESSAGE = 'Failed to fetch dynamically imported module: https://anhanga.tur.br/assets/Blog-a1b2c3.js';
+const OTHER_DEPLOY_ASSET_MESSAGE = 'Failed to fetch dynamically imported module: https://anhanga.tur.br/assets/Blog-z9y8x7.js';
+
 test('handleStaleChunkPreloadError reloads (and prevents the default re-throw) only on the first, recoverable failure', async () => {
     const { handleStaleChunkPreloadError, hasExhaustedStaleChunkReloads } = await import('../lib/stale-chunk-recovery');
     const state = stubWindow();
 
     try {
-        assert.equal(hasExhaustedStaleChunkReloads(), false, 'budget should start unspent');
+        assert.equal(hasExhaustedStaleChunkReloads(STALE_ASSET_MESSAGE), false, 'budget should start unspent');
 
         let prevented = false;
-        handleStaleChunkPreloadError({ preventDefault: () => { prevented = true; } });
+        handleStaleChunkPreloadError({
+            payload: new Error(STALE_ASSET_MESSAGE),
+            preventDefault: () => { prevented = true; },
+        });
 
         assert.equal(prevented, true, 'must call preventDefault() so Vite does not re-throw the recoverable error');
         assert.equal(state.reloadCalls, 1);
 
-        // Second failure in the same session: budget is spent, so this must be
-        // treated as a real incident — no reload, and the error is left to
-        // propagate (preventDefault NOT called) so it reaches Sentry.
-        assert.equal(hasExhaustedStaleChunkReloads(), true);
+        // Second failure for the SAME failing asset: budget is spent, so this
+        // must be treated as a real incident — no reload, and the error is
+        // left to propagate (preventDefault NOT called) so it reaches Sentry.
+        assert.equal(hasExhaustedStaleChunkReloads(STALE_ASSET_MESSAGE), true);
 
         let preventedAgain = false;
-        handleStaleChunkPreloadError({ preventDefault: () => { preventedAgain = true; } });
+        handleStaleChunkPreloadError({
+            payload: new Error(STALE_ASSET_MESSAGE),
+            preventDefault: () => { preventedAgain = true; },
+        });
 
         assert.equal(preventedAgain, false, 'must not suppress the error once the reload budget is spent');
         assert.equal(state.reloadCalls, 1, 'must not reload again once the budget is spent');
+    } finally {
+        restoreWindow();
+    }
+});
+
+test('a different deploy\'s failing asset gets its own reload budget in the same tab session', async () => {
+    const { handleStaleChunkPreloadError, hasExhaustedStaleChunkReloads } = await import('../lib/stale-chunk-recovery');
+    const state = stubWindow();
+
+    try {
+        handleStaleChunkPreloadError({ payload: new Error(STALE_ASSET_MESSAGE), preventDefault: () => {} });
+        assert.equal(hasExhaustedStaleChunkReloads(STALE_ASSET_MESSAGE), true);
+
+        // A long-lived tab spans a second deploy: a different content-hashed
+        // asset now fails. It must still get its own reload rather than being
+        // treated as exhausted by the earlier, unrelated failure.
+        let preventedForNewDeploy = false;
+        handleStaleChunkPreloadError({
+            payload: new Error(OTHER_DEPLOY_ASSET_MESSAGE),
+            preventDefault: () => { preventedForNewDeploy = true; },
+        });
+
+        assert.equal(preventedForNewDeploy, true, 'a new deploy\'s distinct failure must still get a reload');
+        assert.equal(state.reloadCalls, 2);
     } finally {
         restoreWindow();
     }
@@ -139,10 +172,13 @@ test('stale-chunk reload recovery fails safe toward "exhausted" when sessionStor
     };
 
     try {
-        assert.equal(hasExhaustedStaleChunkReloads(), true);
+        assert.equal(hasExhaustedStaleChunkReloads(STALE_ASSET_MESSAGE), true);
 
         let prevented = false;
-        handleStaleChunkPreloadError({ preventDefault: () => { prevented = true; } });
+        handleStaleChunkPreloadError({
+            payload: new Error(STALE_ASSET_MESSAGE),
+            preventDefault: () => { prevented = true; },
+        });
         assert.equal(prevented, false, 'must not reload (or swallow the error) when attempts cannot be tracked');
     } finally {
         restoreWindow();
@@ -161,19 +197,19 @@ test('ChunkErrorBoundary shares its reload budget and message patterns with the 
 });
 
 test('the vite:preloadError listener and ChunkErrorBoundary cannot each reload independently for one failure', async () => {
-    const { handleStaleChunkPreloadError } = await import('../lib/stale-chunk-recovery');
-    const { attemptStaleChunkBoundaryReload } = await import('../lib/stale-chunk-recovery');
+    const { handleStaleChunkPreloadError, attemptStaleChunkBoundaryReload } = await import('../lib/stale-chunk-recovery');
     const state = stubWindow();
 
     try {
-        // The vite:preloadError listener reloads first and consumes the budget...
-        handleStaleChunkPreloadError({ preventDefault: () => {} });
+        // The vite:preloadError listener reloads first and consumes the budget
+        // for this specific failing asset...
+        handleStaleChunkPreloadError({ payload: new Error(STALE_ASSET_MESSAGE), preventDefault: () => {} });
         assert.equal(state.reloadCalls, 1);
 
-        // ...so if the same failure also reaches ChunkErrorBoundary afterward
+        // ...so if the SAME failure also reaches ChunkErrorBoundary afterward
         // (e.g. preventDefault() didn't fully suppress it), the boundary must
-        // see the budget already spent and must NOT reload a second time.
-        const boundaryReloaded = attemptStaleChunkBoundaryReload();
+        // see that asset's budget already spent and must NOT reload again.
+        const boundaryReloaded = attemptStaleChunkBoundaryReload(new Error(STALE_ASSET_MESSAGE));
 
         assert.equal(boundaryReloaded, false);
         assert.equal(state.reloadCalls, 1, 'a single failure must not trigger two reloads');

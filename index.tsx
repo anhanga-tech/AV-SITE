@@ -7,9 +7,9 @@ import { shouldHydratePrerenderedRoute } from './lib/hydration';
 import { initClientErrorTracking } from './lib/sentry-client';
 import { handleStaleChunkPreloadError } from './lib/stale-chunk-recovery';
 
-// Reload (once per session) on stale-cache preload failures so the browser
-// fetches the latest HTML + hashed assets.
-window.addEventListener('vite:preloadError', (event) => {
+// Reload (once per failing asset) on stale-cache preload failures so the
+// browser fetches the latest HTML + hashed assets.
+window.addEventListener('vite:preloadError', (event: Event & { payload?: unknown }) => {
   handleStaleChunkPreloadError(event);
 });
 
