@@ -45,7 +45,7 @@ test('client filters stale-chunk noise only while the preload-error reload budge
     ]);
 
     assert.match(entrySource, /vite:preloadError/);
-    assert.match(entrySource, /attemptStaleChunkReload/);
+    assert.match(entrySource, /handleStaleChunkPreloadError/);
     assert.match(sentrySource, /Unable to preload CSS for/);
     assert.match(sentrySource, /isStaleChunkMessage\(exceptions\) && !hasExhaustedStaleChunkReloads\(\)\) return null/);
 });
@@ -74,15 +74,78 @@ test('isStaleChunkMessage recognizes Chromium and Firefox stale-chunk wording, n
     assert.equal(isStaleChunkMessage([{}]), false);
 });
 
-test('stale-chunk reload recovery is bounded so a genuinely broken deploy still reaches Sentry', async () => {
-    const recoverySource = await readProjectFile('lib/stale-chunk-recovery.ts');
+function stubWindow(): { reloadCalls: number } {
+    const store = new Map<string, string>();
+    const state = { reloadCalls: 0 };
 
-    assert.match(recoverySource, /MAX_RELOAD_ATTEMPTS = 1/);
-    assert.match(recoverySource, /export function attemptStaleChunkReload/);
-    assert.match(recoverySource, /export function hasExhaustedStaleChunkReloads/);
-    // Storage failures (e.g. private browsing) must fail safe toward "exhausted",
-    // not toward an unbounded reload loop.
-    assert.match(recoverySource, /attempts === null \|\| attempts >= MAX_RELOAD_ATTEMPTS/);
+    (globalThis as { window?: unknown }).window = {
+        sessionStorage: {
+            getItem: (key: string) => store.get(key) ?? null,
+            setItem: (key: string, value: string) => {
+                store.set(key, value);
+            },
+        },
+        location: {
+            reload: () => {
+                state.reloadCalls += 1;
+            },
+        },
+    };
+
+    return state;
+}
+
+function restoreWindow(): void {
+    delete (globalThis as { window?: unknown }).window;
+}
+
+test('handleStaleChunkPreloadError reloads (and prevents the default re-throw) only on the first, recoverable failure', async () => {
+    const { handleStaleChunkPreloadError, hasExhaustedStaleChunkReloads } = await import('../lib/stale-chunk-recovery');
+    const state = stubWindow();
+
+    try {
+        assert.equal(hasExhaustedStaleChunkReloads(), false, 'budget should start unspent');
+
+        let prevented = false;
+        handleStaleChunkPreloadError({ preventDefault: () => { prevented = true; } });
+
+        assert.equal(prevented, true, 'must call preventDefault() so Vite does not re-throw the recoverable error');
+        assert.equal(state.reloadCalls, 1);
+
+        // Second failure in the same session: budget is spent, so this must be
+        // treated as a real incident — no reload, and the error is left to
+        // propagate (preventDefault NOT called) so it reaches Sentry.
+        assert.equal(hasExhaustedStaleChunkReloads(), true);
+
+        let preventedAgain = false;
+        handleStaleChunkPreloadError({ preventDefault: () => { preventedAgain = true; } });
+
+        assert.equal(preventedAgain, false, 'must not suppress the error once the reload budget is spent');
+        assert.equal(state.reloadCalls, 1, 'must not reload again once the budget is spent');
+    } finally {
+        restoreWindow();
+    }
+});
+
+test('stale-chunk reload recovery fails safe toward "exhausted" when sessionStorage is unavailable', async () => {
+    const { handleStaleChunkPreloadError, hasExhaustedStaleChunkReloads } = await import('../lib/stale-chunk-recovery');
+
+    (globalThis as { window?: unknown }).window = {
+        sessionStorage: {
+            getItem: () => { throw new Error('SecurityError: storage disabled'); },
+        },
+        location: { reload: () => { throw new Error('must not be called'); } },
+    };
+
+    try {
+        assert.equal(hasExhaustedStaleChunkReloads(), true);
+
+        let prevented = false;
+        handleStaleChunkPreloadError({ preventDefault: () => { prevented = true; } });
+        assert.equal(prevented, false, 'must not reload (or swallow the error) when attempts cannot be tracked');
+    } finally {
+        restoreWindow();
+    }
 });
 
 test('Cloudflare Pages middleware initializes Sentry from request environment', async () => {

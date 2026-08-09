@@ -16,7 +16,13 @@ function readAttempts(): number | null {
 // newer deploy replaced the hashed asset the stale bundle requested, so one
 // reload should fetch the current build. Past that budget, the deploy itself
 // is assumed broken rather than stale, so no further reloads are attempted.
-export function attemptStaleChunkReload(): void {
+//
+// Vite re-throws the original preload error once `vite:preloadError`
+// listeners return, unless a listener calls `event.preventDefault()` — so
+// preventDefault() must be called precisely when (and only when) a reload is
+// actually attempted here. Otherwise the very failure this function recovers
+// from still propagates as an unhandled rejection straight to Sentry.
+export function handleStaleChunkPreloadError(event: { preventDefault(): void }): void {
     const attempts = readAttempts();
     if (attempts === null || attempts >= MAX_RELOAD_ATTEMPTS) return;
 
@@ -26,6 +32,7 @@ export function attemptStaleChunkReload(): void {
         return;
     }
 
+    event.preventDefault();
     window.location.reload();
 }
 
