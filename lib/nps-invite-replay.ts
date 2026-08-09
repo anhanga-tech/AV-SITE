@@ -55,7 +55,8 @@ export async function consumeNpsInviteOnce(jti: string, ttlSeconds: number): Pro
 
     if (!redis) {
         if (isEdgeRuntime()) {
-            logger.warn('NPS_INVITE_REPLAY: Redis unavailable on edge runtime; single-use guard is a no-op', { jti });
+            logger.error('NPS_INVITE_REPLAY: Redis unavailable on edge runtime; denying invitation consumption', { jti });
+            return false;
         }
         if (inMemoryConsumed.has(key)) return false;
         inMemoryConsumed.add(key);
