@@ -28,9 +28,9 @@ function isBrowserExtensionMessage(values: Array<{ value?: string }> | undefined
 // recover, so this is expected noise — unless that reload budget is already
 // spent (see `hasExhaustedStaleChunkReloads`), in which case the deploy is
 // genuinely broken and the event should reach Sentry instead of being dropped.
-function isStaleChunkMessage(values: Array<{ value?: string }> | undefined): boolean {
+export function isStaleChunkMessage(values: Array<{ value?: string }> | undefined): boolean {
     return !!values?.some(({ value }) =>
-        !!value && /Unable to preload CSS for|Failed to fetch dynamically imported module|Importing a module script failed/i.test(value)
+        !!value && /Unable to preload CSS for|Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module/i.test(value)
     );
 }
 

@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
+import { isStaleChunkMessage } from '../lib/sentry-client';
+
 async function readProjectFile(path: string): Promise<string> {
     return await readFile(new URL(`../${path}`, import.meta.url), 'utf8');
 }
@@ -46,6 +48,30 @@ test('client filters stale-chunk noise only while the preload-error reload budge
     assert.match(entrySource, /attemptStaleChunkReload/);
     assert.match(sentrySource, /Unable to preload CSS for/);
     assert.match(sentrySource, /isStaleChunkMessage\(exceptions\) && !hasExhaustedStaleChunkReloads\(\)\) return null/);
+});
+
+test('isStaleChunkMessage recognizes Chromium and Firefox stale-chunk wording, not unrelated errors', () => {
+    const chromiumCases = [
+        'Failed to fetch dynamically imported module: https://anhanga.tur.br/assets/Blog-a1b2c3.js',
+        'Unable to preload CSS for /assets/App-d4e5f6.css',
+        'Importing a module script failed',
+    ];
+    const firefoxCase = 'error loading dynamically imported module: https://anhanga.tur.br/assets/Blog-a1b2c3.js';
+    const unrelatedCases = [
+        'TypeError: Cannot read properties of undefined (reading \'map\')',
+        'Network request failed',
+    ];
+
+    for (const value of [...chromiumCases, firefoxCase]) {
+        assert.equal(isStaleChunkMessage([{ value }]), true, `expected match for: ${value}`);
+    }
+
+    for (const value of unrelatedCases) {
+        assert.equal(isStaleChunkMessage([{ value }]), false, `expected no match for: ${value}`);
+    }
+
+    assert.equal(isStaleChunkMessage(undefined), false);
+    assert.equal(isStaleChunkMessage([{}]), false);
 });
 
 test('stale-chunk reload recovery is bounded so a genuinely broken deploy still reaches Sentry', async () => {
