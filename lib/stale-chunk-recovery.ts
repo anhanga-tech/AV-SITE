@@ -63,6 +63,18 @@ function readAttempts(key: string): number | null {
     }
 }
 
+// Set synchronously the moment THIS page load triggers a reload — reset to
+// false on every fresh page load (it's plain module state, which a reload
+// wipes). Distinguishes "budget just consumed and a reload is in flight" from
+// "budget already exhausted before this page load even started" (i.e. the
+// SAME failure survived a real reload and recurred): `location.reload()`
+// schedules navigation but doesn't stop the current script from running, so
+// Vite's re-thrown rejection can still reach ChunkErrorBoundary — and read
+// the budget as spent — before that navigation actually completes. Without
+// this, that in-flight case would report a false "did not recover" for the
+// exact recoverable failure this module exists to handle quietly.
+let reloadTriggeredThisPageLoad = false;
+
 // Reports a stale-chunk failure that we are NOT silently auto-recovering
 // (reload budget spent, or sessionStorage unavailable so it can't be
 // tracked). We report this directly rather than relying on the underlying
@@ -103,6 +115,7 @@ function attemptBoundedReload(message: string | null | undefined): boolean {
     if (attempts !== null && attempts < MAX_RELOAD_ATTEMPTS) {
         try {
             window.sessionStorage.setItem(key, String(attempts + 1));
+            reloadTriggeredThisPageLoad = true;
             window.location.reload();
             return true;
         } catch {
@@ -111,7 +124,15 @@ function attemptBoundedReload(message: string | null | undefined): boolean {
         }
     }
 
-    reportUnrecoveredStaleChunk(message);
+    // A reload triggered earlier in THIS page load already covers this
+    // occurrence — see reloadTriggeredThisPageLoad above. Only report when
+    // that's not the case: either this page load's budget was already spent
+    // before it started (a real, persisted repeat failure), or the storage
+    // write above failed.
+    if (!reloadTriggeredThisPageLoad) {
+        reportUnrecoveredStaleChunk(message);
+    }
+
     return false;
 }
 
@@ -146,4 +167,12 @@ export function handleStaleChunkPreloadError(event: { payload?: unknown }): void
 // of reloading (or looping) again.
 export function attemptStaleChunkBoundaryReload(error: Error): boolean {
     return attemptBoundedReload(error?.message);
+}
+
+// Simulates a fresh page load's module state for tests — real page loads
+// reset reloadTriggeredThisPageLoad for free (a reload wipes all JS state);
+// a test process importing this module once for its whole run cannot rely
+// on that, so it needs an explicit reset between scenarios instead.
+export function resetStaleChunkRecoveryForTests(): void {
+    reloadTriggeredThisPageLoad = false;
 }

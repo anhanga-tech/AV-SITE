@@ -158,7 +158,8 @@ function restoreWindow(): void {
 }
 
 test('handleStaleChunkPreloadError reloads once for a failing asset, then reports (without reloading again) if it recurs', async () => {
-    const { handleStaleChunkPreloadError } = await import('../lib/stale-chunk-recovery');
+    const { handleStaleChunkPreloadError, resetStaleChunkRecoveryForTests } = await import('../lib/stale-chunk-recovery');
+    resetStaleChunkRecoveryForTests();
     const state = stubWindow();
     const reported: Array<{ error: unknown; context: unknown }> = [];
     setErrorTrackerForTests((error, context) => { reported.push({ error, context }); });
@@ -168,10 +169,14 @@ test('handleStaleChunkPreloadError reloads once for a failing asset, then report
         assert.equal(state.reloadCalls, 1);
         assert.equal(reported.length, 0, 'must not report while still within the reload budget');
 
-        // Same build, same failing asset, failing again: treated as a real
-        // incident. We report it ourselves rather than relying on the
-        // underlying JS exception reaching Sentry on its own (it may not —
-        // see lib/stale-chunk-recovery.ts).
+        // The first reload's navigation completes — a fresh page load, whose
+        // module state resets even though the sessionStorage budget persists.
+        resetStaleChunkRecoveryForTests();
+
+        // Same build, same failing asset, failing again on the new page:
+        // treated as a real incident. We report it ourselves rather than
+        // relying on the underlying JS exception reaching Sentry on its own
+        // (it may not — see lib/stale-chunk-recovery.ts).
         handleStaleChunkPreloadError({ payload: new Error(STALE_ASSET_MESSAGE) });
         assert.equal(state.reloadCalls, 1, 'must not reload again once the budget is spent');
         assert.equal(reported.length, 1, 'must report once the budget is spent');
@@ -190,7 +195,8 @@ test('handleStaleChunkPreloadError reloads once for a failing asset, then report
 });
 
 test('a different deploy\'s failing asset gets its own reload budget in the same tab session', async () => {
-    const { handleStaleChunkPreloadError } = await import('../lib/stale-chunk-recovery');
+    const { handleStaleChunkPreloadError, resetStaleChunkRecoveryForTests } = await import('../lib/stale-chunk-recovery');
+    resetStaleChunkRecoveryForTests();
     const state = stubWindow();
     const reported: unknown[] = [];
     setErrorTrackerForTests((error) => { reported.push(error); });
@@ -201,7 +207,10 @@ test('a different deploy\'s failing asset gets its own reload budget in the same
 
         // A long-lived tab spans a second deploy: a different content-hashed
         // asset now fails. It must still get its own reload rather than being
-        // treated as exhausted by the earlier, unrelated failure.
+        // treated as exhausted by the earlier, unrelated failure. The first
+        // reload's navigation would have actually completed by now (a fresh
+        // page load), so simulate that module-state reset explicitly.
+        resetStaleChunkRecoveryForTests();
         handleStaleChunkPreloadError({ payload: new Error(OTHER_DEPLOY_ASSET_MESSAGE) });
 
         assert.equal(state.reloadCalls, 2, 'a new deploy\'s distinct failure must still get a reload');
@@ -213,7 +222,8 @@ test('a different deploy\'s failing asset gets its own reload budget in the same
 });
 
 test('a different build gets its own reload budget even for a message with no embedded URL', async () => {
-    const { handleStaleChunkPreloadError } = await import('../lib/stale-chunk-recovery');
+    const { handleStaleChunkPreloadError, resetStaleChunkRecoveryForTests } = await import('../lib/stale-chunk-recovery');
+    resetStaleChunkRecoveryForTests();
     const state = stubWindow('https://anhanga.tur.br/assets/index-BUILD1.js');
     const reported: unknown[] = [];
     setErrorTrackerForTests((error) => { reported.push(error); });
@@ -225,7 +235,9 @@ test('a different build gets its own reload budget even for a message with no em
         // The reload lands on a NEW deploy (different content-hashed entry
         // script), which then also hits the exact same URL-less message.
         // Keying purely by message text would collide here; the build
-        // fingerprint must disambiguate it.
+        // fingerprint must disambiguate it. Simulate the fresh page load's
+        // module-state reset that a real reload's navigation would produce.
+        resetStaleChunkRecoveryForTests();
         state.buildSrc = 'https://anhanga.tur.br/assets/index-BUILD2.js';
         handleStaleChunkPreloadError({ payload: new Error(BARE_MESSAGE_NO_URL) });
 
@@ -238,7 +250,8 @@ test('a different build gets its own reload budget even for a message with no em
 });
 
 test('stale-chunk recovery reports (without reloading) when sessionStorage is unavailable', async () => {
-    const { handleStaleChunkPreloadError } = await import('../lib/stale-chunk-recovery');
+    const { handleStaleChunkPreloadError, resetStaleChunkRecoveryForTests } = await import('../lib/stale-chunk-recovery');
+    resetStaleChunkRecoveryForTests();
     const reported: unknown[] = [];
     setErrorTrackerForTests((error) => { reported.push(error); });
 
@@ -270,10 +283,13 @@ test('ChunkErrorBoundary shares its reload budget and message patterns with the 
     assert.doesNotMatch(boundarySource, /sessionStorage/);
 });
 
-test('the vite:preloadError listener and ChunkErrorBoundary cannot each reload independently for one failure', async () => {
-    const { handleStaleChunkPreloadError, attemptStaleChunkBoundaryReload } = await import('../lib/stale-chunk-recovery');
+test('the vite:preloadError listener and ChunkErrorBoundary cannot each reload independently for one failure, and no false incident is reported', async () => {
+    const { handleStaleChunkPreloadError, attemptStaleChunkBoundaryReload, resetStaleChunkRecoveryForTests } =
+        await import('../lib/stale-chunk-recovery');
+    resetStaleChunkRecoveryForTests();
     const state = stubWindow();
-    setErrorTrackerForTests(() => undefined);
+    const reported: unknown[] = [];
+    setErrorTrackerForTests((error) => { reported.push(error); });
 
     try {
         // The vite:preloadError listener reloads first and consumes the budget
@@ -283,12 +299,49 @@ test('the vite:preloadError listener and ChunkErrorBoundary cannot each reload i
 
         // ...so if the SAME failure also reaches ChunkErrorBoundary afterward
         // (e.g. via the render-time throw that the listener deliberately lets
-        // propagate), the boundary must see that asset's budget already spent
-        // and must NOT reload again.
+        // propagate) *before the reload's navigation actually completes* —
+        // location.reload() doesn't halt the current script — the boundary
+        // must see that asset's budget already spent and must NOT reload
+        // again. Crucially, it also must NOT report a false "did not
+        // recover" incident: recovery is still genuinely underway, just not
+        // finished navigating yet.
         const boundaryReloaded = attemptStaleChunkBoundaryReload(new Error(STALE_ASSET_MESSAGE));
 
         assert.equal(boundaryReloaded, false);
         assert.equal(state.reloadCalls, 1, 'a single failure must not trigger two reloads');
+        assert.equal(reported.length, 0, 'must not report a false incident while the in-flight reload has not finished navigating yet');
+    } finally {
+        restoreWindow();
+        resetErrorTrackerForTests();
+    }
+});
+
+test('a failure that survives a completed reload (a fresh page load) is still reported as a genuine incident', async () => {
+    const { handleStaleChunkPreloadError, attemptStaleChunkBoundaryReload, resetStaleChunkRecoveryForTests } =
+        await import('../lib/stale-chunk-recovery');
+    resetStaleChunkRecoveryForTests();
+    const state = stubWindow();
+    const reported: unknown[] = [];
+    setErrorTrackerForTests((error) => { reported.push(error); });
+
+    try {
+        // First page load: the listener reloads once for this failing asset.
+        handleStaleChunkPreloadError({ payload: new Error(STALE_ASSET_MESSAGE) });
+        assert.equal(state.reloadCalls, 1);
+
+        // The reload's navigation completes — a genuinely fresh page load,
+        // distinct from the in-flight case above. sessionStorage (and so the
+        // budget) persists across it; module state does not.
+        resetStaleChunkRecoveryForTests();
+
+        // The same asset fails again on the new page: the deploy is
+        // genuinely broken, not just stale. This must be reported, not
+        // silently swallowed as though a reload were still pending.
+        const boundaryReloaded = attemptStaleChunkBoundaryReload(new Error(STALE_ASSET_MESSAGE));
+
+        assert.equal(boundaryReloaded, false);
+        assert.equal(state.reloadCalls, 1, 'must not reload a second time for the same asset');
+        assert.equal(reported.length, 1, 'a failure persisting across a completed reload must be reported');
     } finally {
         restoreWindow();
         resetErrorTrackerForTests();
