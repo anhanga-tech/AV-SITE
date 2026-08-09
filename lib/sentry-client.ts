@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/react';
 
 import { setErrorTracker } from './error-tracking';
+import { hasExhaustedStaleChunkReloads } from './stale-chunk-recovery';
 
 function isBrowserExtensionFrame(frame: { filename?: string }): boolean {
     const filename = frame.filename ?? '';
@@ -23,8 +24,10 @@ function isBrowserExtensionMessage(values: Array<{ value?: string }> | undefined
 
 // Fires when a browser holds a pre-deploy bundle and tries to fetch a
 // content-hashed chunk/CSS file that a newer deploy has already replaced.
-// The `vite:preloadError` listener in index.tsx already reloads the page to
-// recover, so this is expected noise rather than an actionable bug.
+// The `vite:preloadError` listener in index.tsx reloads the page once to
+// recover, so this is expected noise — unless that reload budget is already
+// spent (see `hasExhaustedStaleChunkReloads`), in which case the deploy is
+// genuinely broken and the event should reach Sentry instead of being dropped.
 function isStaleChunkMessage(values: Array<{ value?: string }> | undefined): boolean {
     return !!values?.some(({ value }) =>
         !!value && /Unable to preload CSS for|Failed to fetch dynamically imported module|Importing a module script failed/i.test(value)
@@ -54,7 +57,7 @@ export function initClientErrorTracking(): void {
 
             if (frames.some(isBrowserExtensionFrame)) return null;
             if (isBrowserExtensionMessage(exceptions)) return null;
-            if (isStaleChunkMessage(exceptions)) return null;
+            if (isStaleChunkMessage(exceptions) && !hasExhaustedStaleChunkReloads()) return null;
 
             return event;
         },

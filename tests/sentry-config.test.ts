@@ -36,15 +36,27 @@ test('client initializes Sentry before React mounts and filters browser extensio
     assert.match(sentrySource, /extension:\/\//);
 });
 
-test('client filters stale-chunk noise already recovered by the preload-error reload', async () => {
+test('client filters stale-chunk noise only while the preload-error reload budget remains', async () => {
     const [entrySource, sentrySource] = await Promise.all([
         readProjectFile('index.tsx'),
         readProjectFile('lib/sentry-client.ts'),
     ]);
 
     assert.match(entrySource, /vite:preloadError/);
+    assert.match(entrySource, /attemptStaleChunkReload/);
     assert.match(sentrySource, /Unable to preload CSS for/);
-    assert.match(sentrySource, /isStaleChunkMessage\(exceptions\)\) return null/);
+    assert.match(sentrySource, /isStaleChunkMessage\(exceptions\) && !hasExhaustedStaleChunkReloads\(\)\) return null/);
+});
+
+test('stale-chunk reload recovery is bounded so a genuinely broken deploy still reaches Sentry', async () => {
+    const recoverySource = await readProjectFile('lib/stale-chunk-recovery.ts');
+
+    assert.match(recoverySource, /MAX_RELOAD_ATTEMPTS = 1/);
+    assert.match(recoverySource, /export function attemptStaleChunkReload/);
+    assert.match(recoverySource, /export function hasExhaustedStaleChunkReloads/);
+    // Storage failures (e.g. private browsing) must fail safe toward "exhausted",
+    // not toward an unbounded reload loop.
+    assert.match(recoverySource, /attempts === null \|\| attempts >= MAX_RELOAD_ATTEMPTS/);
 });
 
 test('Cloudflare Pages middleware initializes Sentry from request environment', async () => {
