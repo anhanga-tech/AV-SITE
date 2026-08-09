@@ -348,6 +348,41 @@ test('a failure that survives a completed reload (a fresh page load) is still re
     }
 });
 
+test('an already-exhausted failure reaching both the listener and ChunkErrorBoundary is reported once, not twice', async () => {
+    const { handleStaleChunkPreloadError, attemptStaleChunkBoundaryReload, resetStaleChunkRecoveryForTests } =
+        await import('../lib/stale-chunk-recovery');
+    resetStaleChunkRecoveryForTests();
+    const state = stubWindow();
+    const reported: unknown[] = [];
+    setErrorTrackerForTests((error) => { reported.push(error); });
+
+    try {
+        // First page load spends the budget for this asset...
+        handleStaleChunkPreloadError({ payload: new Error(STALE_ASSET_MESSAGE) });
+        assert.equal(state.reloadCalls, 1);
+
+        // ...that reload's navigation completes (a fresh page load; the
+        // sessionStorage budget persists, module state doesn't), and the
+        // SAME asset fails again — a genuine, already-exhausted incident.
+        resetStaleChunkRecoveryForTests();
+        handleStaleChunkPreloadError({ payload: new Error(STALE_ASSET_MESSAGE) });
+        assert.equal(reported.length, 1, 'the listener must report the already-exhausted failure');
+
+        // Without preventDefault(), Vite's re-thrown rejection also reaches
+        // ChunkErrorBoundary (via React re-rendering the failed lazy
+        // component) for this exact same occurrence, still within the same
+        // page load as the listener's report above.
+        const boundaryReloaded = attemptStaleChunkBoundaryReload(new Error(STALE_ASSET_MESSAGE));
+
+        assert.equal(boundaryReloaded, false);
+        assert.equal(state.reloadCalls, 1, 'must not reload again for an already-exhausted asset');
+        assert.equal(reported.length, 1, 'the boundary must not report the same already-handled occurrence a second time');
+    } finally {
+        restoreWindow();
+        resetErrorTrackerForTests();
+    }
+});
+
 test('Cloudflare Pages middleware initializes Sentry from request environment', async () => {
     const middlewareSource = await readProjectFile('functions/_middleware.ts');
 

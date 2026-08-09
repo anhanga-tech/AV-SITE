@@ -63,17 +63,20 @@ function readAttempts(key: string): number | null {
     }
 }
 
-// Set synchronously the moment THIS page load triggers a reload — reset to
-// false on every fresh page load (it's plain module state, which a reload
-// wipes). Distinguishes "budget just consumed and a reload is in flight" from
-// "budget already exhausted before this page load even started" (i.e. the
-// SAME failure survived a real reload and recurred): `location.reload()`
-// schedules navigation but doesn't stop the current script from running, so
-// Vite's re-thrown rejection can still reach ChunkErrorBoundary — and read
-// the budget as spent — before that navigation actually completes. Without
-// this, that in-flight case would report a false "did not recover" for the
-// exact recoverable failure this module exists to handle quietly.
-let reloadTriggeredThisPageLoad = false;
+// Keys (see storageKeyFor) already acted on earlier in THIS page load —
+// reset per page load for free (it's plain module state, which a reload
+// wipes; resetStaleChunkRecoveryForTests simulates that in tests). Both the
+// vite:preloadError listener and ChunkErrorBoundary can react to the very
+// same failure: `location.reload()` schedules navigation but doesn't stop
+// the current script from running, so Vite's re-thrown rejection can still
+// reach the boundary — and read the same (build, message) budget — before
+// that navigation actually completes. Without this, that second reaction
+// would either attempt a second, redundant reload, or — when the budget was
+// already exhausted — report a duplicate "did not recover" incident for the
+// exact same occurrence the other call site just reported (or a false one,
+// if what it just consumed was actually an in-flight, still-recoverable
+// reload rather than a genuine repeat).
+const handledKeysThisPageLoad = new Set<string>();
 
 // Reports a stale-chunk failure that we are NOT silently auto-recovering
 // (reload budget spent, or sessionStorage unavailable so it can't be
@@ -110,12 +113,17 @@ function reportUnrecoveredStaleChunk(message: string | null | undefined): void {
 // failure triggers two uncoordinated reloads instead of one.
 function attemptBoundedReload(message: string | null | undefined): boolean {
     const key = storageKeyFor(message);
+
+    // Already reloaded for, or already reported, this exact (build, message)
+    // failure earlier in THIS page load — see handledKeysThisPageLoad above.
+    if (handledKeysThisPageLoad.has(key)) return false;
+
     const attempts = readAttempts(key);
 
     if (attempts !== null && attempts < MAX_RELOAD_ATTEMPTS) {
         try {
             window.sessionStorage.setItem(key, String(attempts + 1));
-            reloadTriggeredThisPageLoad = true;
+            handledKeysThisPageLoad.add(key);
             window.location.reload();
             return true;
         } catch {
@@ -124,15 +132,8 @@ function attemptBoundedReload(message: string | null | undefined): boolean {
         }
     }
 
-    // A reload triggered earlier in THIS page load already covers this
-    // occurrence — see reloadTriggeredThisPageLoad above. Only report when
-    // that's not the case: either this page load's budget was already spent
-    // before it started (a real, persisted repeat failure), or the storage
-    // write above failed.
-    if (!reloadTriggeredThisPageLoad) {
-        reportUnrecoveredStaleChunk(message);
-    }
-
+    handledKeysThisPageLoad.add(key);
+    reportUnrecoveredStaleChunk(message);
     return false;
 }
 
@@ -170,9 +171,9 @@ export function attemptStaleChunkBoundaryReload(error: Error): boolean {
 }
 
 // Simulates a fresh page load's module state for tests — real page loads
-// reset reloadTriggeredThisPageLoad for free (a reload wipes all JS state);
-// a test process importing this module once for its whole run cannot rely
-// on that, so it needs an explicit reset between scenarios instead.
+// reset handledKeysThisPageLoad for free (a reload wipes all JS state); a
+// test process importing this module once for its whole run cannot rely on
+// that, so it needs an explicit reset between scenarios instead.
 export function resetStaleChunkRecoveryForTests(): void {
-    reloadTriggeredThisPageLoad = false;
+    handledKeysThisPageLoad.clear();
 }
