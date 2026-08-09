@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/react';
 
 import { setErrorTracker } from './error-tracking';
-import { hasExhaustedStaleChunkReloads } from './stale-chunk-recovery';
+import { hasExhaustedStaleChunkReloads, isStaleChunkErrorMessage } from './stale-chunk-recovery';
 
 function isBrowserExtensionFrame(frame: { filename?: string }): boolean {
     const filename = frame.filename ?? '';
@@ -29,9 +29,7 @@ function isBrowserExtensionMessage(values: Array<{ value?: string }> | undefined
 // spent (see `hasExhaustedStaleChunkReloads`), in which case the deploy is
 // genuinely broken and the event should reach Sentry instead of being dropped.
 export function isStaleChunkMessage(values: Array<{ value?: string }> | undefined): boolean {
-    return !!values?.some(({ value }) =>
-        !!value && /Unable to preload CSS for|Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module/i.test(value)
-    );
+    return !!values?.some(({ value }) => isStaleChunkErrorMessage(value));
 }
 
 export function initClientErrorTracking(): void {

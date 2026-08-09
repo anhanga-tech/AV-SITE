@@ -39,14 +39,15 @@ test('client initializes Sentry before React mounts and filters browser extensio
 });
 
 test('client filters stale-chunk noise only while the preload-error reload budget remains', async () => {
-    const [entrySource, sentrySource] = await Promise.all([
+    const [entrySource, sentrySource, recoverySource] = await Promise.all([
         readProjectFile('index.tsx'),
         readProjectFile('lib/sentry-client.ts'),
+        readProjectFile('lib/stale-chunk-recovery.ts'),
     ]);
 
     assert.match(entrySource, /vite:preloadError/);
     assert.match(entrySource, /handleStaleChunkPreloadError/);
-    assert.match(sentrySource, /Unable to preload CSS for/);
+    assert.match(recoverySource, /Unable to preload CSS for/);
     assert.match(sentrySource, /isStaleChunkMessage\(exceptions\) && !hasExhaustedStaleChunkReloads\(\)\) return null/);
 });
 
@@ -143,6 +144,39 @@ test('stale-chunk reload recovery fails safe toward "exhausted" when sessionStor
         let prevented = false;
         handleStaleChunkPreloadError({ preventDefault: () => { prevented = true; } });
         assert.equal(prevented, false, 'must not reload (or swallow the error) when attempts cannot be tracked');
+    } finally {
+        restoreWindow();
+    }
+});
+
+test('ChunkErrorBoundary shares its reload budget and message patterns with the preload-error listener', async () => {
+    const boundarySource = await readProjectFile('components/ChunkErrorBoundary.tsx');
+
+    assert.match(boundarySource, /from ['"]\.\.\/lib\/stale-chunk-recovery['"]/);
+    assert.match(boundarySource, /attemptStaleChunkBoundaryReload/);
+    assert.match(boundarySource, /isStaleChunkErrorMessage\(error\?\.message\)/);
+    // The boundary must not keep its own independent reload-tracking flag —
+    // that's exactly the uncoordinated-double-reload bug this consolidation fixes.
+    assert.doesNotMatch(boundarySource, /sessionStorage/);
+});
+
+test('the vite:preloadError listener and ChunkErrorBoundary cannot each reload independently for one failure', async () => {
+    const { handleStaleChunkPreloadError } = await import('../lib/stale-chunk-recovery');
+    const { attemptStaleChunkBoundaryReload } = await import('../lib/stale-chunk-recovery');
+    const state = stubWindow();
+
+    try {
+        // The vite:preloadError listener reloads first and consumes the budget...
+        handleStaleChunkPreloadError({ preventDefault: () => {} });
+        assert.equal(state.reloadCalls, 1);
+
+        // ...so if the same failure also reaches ChunkErrorBoundary afterward
+        // (e.g. preventDefault() didn't fully suppress it), the boundary must
+        // see the budget already spent and must NOT reload a second time.
+        const boundaryReloaded = attemptStaleChunkBoundaryReload();
+
+        assert.equal(boundaryReloaded, false);
+        assert.equal(state.reloadCalls, 1, 'a single failure must not trigger two reloads');
     } finally {
         restoreWindow();
     }
