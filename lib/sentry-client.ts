@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/react';
 
 import { setErrorTracker } from './error-tracking';
-import { hasExhaustedStaleChunkReloads, isStaleChunkErrorMessage } from './stale-chunk-recovery';
+import { isStaleChunkErrorMessage } from './stale-chunk-recovery';
 
 function isBrowserExtensionFrame(frame: { filename?: string }): boolean {
     const filename = frame.filename ?? '';
@@ -24,17 +24,14 @@ function isBrowserExtensionMessage(values: Array<{ value?: string }> | undefined
 
 // Fires when a browser holds a pre-deploy bundle and tries to fetch a
 // content-hashed chunk/CSS file that a newer deploy has already replaced.
-// The `vite:preloadError` listener in index.tsx reloads the page once to
-// recover, so this is expected noise — unless that reload budget is already
-// spent for this specific failing asset (see `hasExhaustedStaleChunkReloads`),
-// in which case the deploy is genuinely broken and the event should reach
-// Sentry instead of being dropped.
+// The `vite:preloadError` listener in index.tsx (lib/stale-chunk-recovery.ts)
+// already reloads once to recover, and reports the failure itself if that
+// reload doesn't fix it — so this filter can drop the message unconditionally
+// rather than trying to distinguish "recoverable" from "genuinely broken"
+// here too. See handleStaleChunkPreloadError for why the underlying
+// exception isn't a reliable signal to gate on.
 export function isStaleChunkMessage(values: Array<{ value?: string }> | undefined): boolean {
-    return !!findStaleChunkMessage(values);
-}
-
-function findStaleChunkMessage(values: Array<{ value?: string }> | undefined): string | undefined {
-    return values?.map((exception) => exception.value).find(isStaleChunkErrorMessage);
+    return !!values?.some((exception) => isStaleChunkErrorMessage(exception.value));
 }
 
 export function initClientErrorTracking(): void {
@@ -60,9 +57,7 @@ export function initClientErrorTracking(): void {
 
             if (frames.some(isBrowserExtensionFrame)) return null;
             if (isBrowserExtensionMessage(exceptions)) return null;
-
-            const staleChunkMessage = findStaleChunkMessage(exceptions);
-            if (staleChunkMessage && !hasExhaustedStaleChunkReloads(staleChunkMessage)) return null;
+            if (isStaleChunkMessage(exceptions)) return null;
 
             return event;
         },

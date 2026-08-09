@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
 import { isStaleChunkMessage } from '../lib/sentry-client';
+import { resetErrorTrackerForTests, setErrorTrackerForTests } from '../lib/error-tracking';
 
 async function readProjectFile(path: string): Promise<string> {
     return await readFile(new URL(`../${path}`, import.meta.url), 'utf8');
@@ -38,7 +39,7 @@ test('client initializes Sentry before React mounts and filters browser extensio
     assert.match(sentrySource, /extension:\/\//);
 });
 
-test('client filters stale-chunk noise only while the preload-error reload budget remains', async () => {
+test('client drops stale-chunk noise unconditionally, relying on stale-chunk-recovery to report genuine incidents itself', async () => {
     const [entrySource, sentrySource, recoverySource] = await Promise.all([
         readProjectFile('index.tsx'),
         readProjectFile('lib/sentry-client.ts'),
@@ -48,7 +49,7 @@ test('client filters stale-chunk noise only while the preload-error reload budge
     assert.match(entrySource, /vite:preloadError/);
     assert.match(entrySource, /handleStaleChunkPreloadError/);
     assert.match(recoverySource, /Unable to preload CSS for/);
-    assert.match(sentrySource, /!hasExhaustedStaleChunkReloads\(staleChunkMessage\)\) return null/);
+    assert.match(sentrySource, /isStaleChunkMessage\(exceptions\)\) return null/);
 });
 
 test('isStaleChunkMessage recognizes Chromium and Firefox stale-chunk wording, not unrelated errors', () => {
@@ -75,11 +76,21 @@ test('isStaleChunkMessage recognizes Chromium and Firefox stale-chunk wording, n
     assert.equal(isStaleChunkMessage([{}]), false);
 });
 
-function stubWindow(): { reloadCalls: number } {
+const STALE_ASSET_MESSAGE = 'Failed to fetch dynamically imported module: https://anhanga.tur.br/assets/Blog-a1b2c3.js';
+const OTHER_DEPLOY_ASSET_MESSAGE = 'Failed to fetch dynamically imported module: https://anhanga.tur.br/assets/Blog-z9y8x7.js';
+const BARE_MESSAGE_NO_URL = 'Importing a module script failed';
+
+function stubWindow(initialBuildSrc = 'https://anhanga.tur.br/assets/index-BUILD1.js'): {
+    reloadCalls: number;
+    buildSrc: string;
+} {
     const store = new Map<string, string>();
-    const state = { reloadCalls: 0 };
+    const state = { reloadCalls: 0, buildSrc: initialBuildSrc };
 
     (globalThis as { window?: unknown }).window = {
+        document: {
+            querySelector: () => ({ src: state.buildSrc }),
+        },
         sessionStorage: {
             getItem: (key: string) => store.get(key) ?? null,
             setItem: (key: string, value: string) => {
@@ -100,71 +111,86 @@ function restoreWindow(): void {
     delete (globalThis as { window?: unknown }).window;
 }
 
-const STALE_ASSET_MESSAGE = 'Failed to fetch dynamically imported module: https://anhanga.tur.br/assets/Blog-a1b2c3.js';
-const OTHER_DEPLOY_ASSET_MESSAGE = 'Failed to fetch dynamically imported module: https://anhanga.tur.br/assets/Blog-z9y8x7.js';
-
-test('handleStaleChunkPreloadError reloads (and prevents the default re-throw) only on the first, recoverable failure', async () => {
-    const { handleStaleChunkPreloadError, hasExhaustedStaleChunkReloads } = await import('../lib/stale-chunk-recovery');
+test('handleStaleChunkPreloadError reloads once for a failing asset, then reports (without reloading again) if it recurs', async () => {
+    const { handleStaleChunkPreloadError } = await import('../lib/stale-chunk-recovery');
     const state = stubWindow();
+    const reported: unknown[] = [];
+    setErrorTrackerForTests((error) => { reported.push(error); });
 
     try {
-        assert.equal(hasExhaustedStaleChunkReloads(STALE_ASSET_MESSAGE), false, 'budget should start unspent');
-
-        let prevented = false;
-        handleStaleChunkPreloadError({
-            payload: new Error(STALE_ASSET_MESSAGE),
-            preventDefault: () => { prevented = true; },
-        });
-
-        assert.equal(prevented, true, 'must call preventDefault() so Vite does not re-throw the recoverable error');
+        handleStaleChunkPreloadError({ payload: new Error(STALE_ASSET_MESSAGE) });
         assert.equal(state.reloadCalls, 1);
+        assert.equal(reported.length, 0, 'must not report while still within the reload budget');
 
-        // Second failure for the SAME failing asset: budget is spent, so this
-        // must be treated as a real incident — no reload, and the error is
-        // left to propagate (preventDefault NOT called) so it reaches Sentry.
-        assert.equal(hasExhaustedStaleChunkReloads(STALE_ASSET_MESSAGE), true);
-
-        let preventedAgain = false;
-        handleStaleChunkPreloadError({
-            payload: new Error(STALE_ASSET_MESSAGE),
-            preventDefault: () => { preventedAgain = true; },
-        });
-
-        assert.equal(preventedAgain, false, 'must not suppress the error once the reload budget is spent');
+        // Same build, same failing asset, failing again: treated as a real
+        // incident. We report it ourselves rather than relying on the
+        // underlying JS exception reaching Sentry on its own (it may not —
+        // see lib/stale-chunk-recovery.ts).
+        handleStaleChunkPreloadError({ payload: new Error(STALE_ASSET_MESSAGE) });
         assert.equal(state.reloadCalls, 1, 'must not reload again once the budget is spent');
+        assert.equal(reported.length, 1, 'must report once the budget is spent');
+        assert.match((reported[0] as Error).message, /Blog-a1b2c3\.js/);
     } finally {
         restoreWindow();
+        resetErrorTrackerForTests();
     }
 });
 
 test('a different deploy\'s failing asset gets its own reload budget in the same tab session', async () => {
-    const { handleStaleChunkPreloadError, hasExhaustedStaleChunkReloads } = await import('../lib/stale-chunk-recovery');
+    const { handleStaleChunkPreloadError } = await import('../lib/stale-chunk-recovery');
     const state = stubWindow();
+    const reported: unknown[] = [];
+    setErrorTrackerForTests((error) => { reported.push(error); });
 
     try {
-        handleStaleChunkPreloadError({ payload: new Error(STALE_ASSET_MESSAGE), preventDefault: () => {} });
-        assert.equal(hasExhaustedStaleChunkReloads(STALE_ASSET_MESSAGE), true);
+        handleStaleChunkPreloadError({ payload: new Error(STALE_ASSET_MESSAGE) });
+        assert.equal(state.reloadCalls, 1);
 
         // A long-lived tab spans a second deploy: a different content-hashed
         // asset now fails. It must still get its own reload rather than being
         // treated as exhausted by the earlier, unrelated failure.
-        let preventedForNewDeploy = false;
-        handleStaleChunkPreloadError({
-            payload: new Error(OTHER_DEPLOY_ASSET_MESSAGE),
-            preventDefault: () => { preventedForNewDeploy = true; },
-        });
+        handleStaleChunkPreloadError({ payload: new Error(OTHER_DEPLOY_ASSET_MESSAGE) });
 
-        assert.equal(preventedForNewDeploy, true, 'a new deploy\'s distinct failure must still get a reload');
-        assert.equal(state.reloadCalls, 2);
+        assert.equal(state.reloadCalls, 2, 'a new deploy\'s distinct failure must still get a reload');
+        assert.equal(reported.length, 0);
     } finally {
         restoreWindow();
+        resetErrorTrackerForTests();
     }
 });
 
-test('stale-chunk reload recovery fails safe toward "exhausted" when sessionStorage is unavailable', async () => {
-    const { handleStaleChunkPreloadError, hasExhaustedStaleChunkReloads } = await import('../lib/stale-chunk-recovery');
+test('a different build gets its own reload budget even for a message with no embedded URL', async () => {
+    const { handleStaleChunkPreloadError } = await import('../lib/stale-chunk-recovery');
+    const state = stubWindow('https://anhanga.tur.br/assets/index-BUILD1.js');
+    const reported: unknown[] = [];
+    setErrorTrackerForTests((error) => { reported.push(error); });
+
+    try {
+        handleStaleChunkPreloadError({ payload: new Error(BARE_MESSAGE_NO_URL) });
+        assert.equal(state.reloadCalls, 1);
+
+        // The reload lands on a NEW deploy (different content-hashed entry
+        // script), which then also hits the exact same URL-less message.
+        // Keying purely by message text would collide here; the build
+        // fingerprint must disambiguate it.
+        state.buildSrc = 'https://anhanga.tur.br/assets/index-BUILD2.js';
+        handleStaleChunkPreloadError({ payload: new Error(BARE_MESSAGE_NO_URL) });
+
+        assert.equal(state.reloadCalls, 2, 'a new build must still get its own reload despite the identical message');
+        assert.equal(reported.length, 0);
+    } finally {
+        restoreWindow();
+        resetErrorTrackerForTests();
+    }
+});
+
+test('stale-chunk recovery reports (without reloading) when sessionStorage is unavailable', async () => {
+    const { handleStaleChunkPreloadError } = await import('../lib/stale-chunk-recovery');
+    const reported: unknown[] = [];
+    setErrorTrackerForTests((error) => { reported.push(error); });
 
     (globalThis as { window?: unknown }).window = {
+        document: { querySelector: () => ({ src: 'https://anhanga.tur.br/assets/index-BUILD1.js' }) },
         sessionStorage: {
             getItem: () => { throw new Error('SecurityError: storage disabled'); },
         },
@@ -172,16 +198,11 @@ test('stale-chunk reload recovery fails safe toward "exhausted" when sessionStor
     };
 
     try {
-        assert.equal(hasExhaustedStaleChunkReloads(STALE_ASSET_MESSAGE), true);
-
-        let prevented = false;
-        handleStaleChunkPreloadError({
-            payload: new Error(STALE_ASSET_MESSAGE),
-            preventDefault: () => { prevented = true; },
-        });
-        assert.equal(prevented, false, 'must not reload (or swallow the error) when attempts cannot be tracked');
+        handleStaleChunkPreloadError({ payload: new Error(STALE_ASSET_MESSAGE) });
+        assert.equal(reported.length, 1, 'must report immediately when the budget cannot be tracked at all');
     } finally {
         restoreWindow();
+        resetErrorTrackerForTests();
     }
 });
 
@@ -199,22 +220,25 @@ test('ChunkErrorBoundary shares its reload budget and message patterns with the 
 test('the vite:preloadError listener and ChunkErrorBoundary cannot each reload independently for one failure', async () => {
     const { handleStaleChunkPreloadError, attemptStaleChunkBoundaryReload } = await import('../lib/stale-chunk-recovery');
     const state = stubWindow();
+    setErrorTrackerForTests(() => undefined);
 
     try {
         // The vite:preloadError listener reloads first and consumes the budget
         // for this specific failing asset...
-        handleStaleChunkPreloadError({ payload: new Error(STALE_ASSET_MESSAGE), preventDefault: () => {} });
+        handleStaleChunkPreloadError({ payload: new Error(STALE_ASSET_MESSAGE) });
         assert.equal(state.reloadCalls, 1);
 
         // ...so if the SAME failure also reaches ChunkErrorBoundary afterward
-        // (e.g. preventDefault() didn't fully suppress it), the boundary must
-        // see that asset's budget already spent and must NOT reload again.
+        // (e.g. via the render-time throw that the listener deliberately lets
+        // propagate), the boundary must see that asset's budget already spent
+        // and must NOT reload again.
         const boundaryReloaded = attemptStaleChunkBoundaryReload(new Error(STALE_ASSET_MESSAGE));
 
         assert.equal(boundaryReloaded, false);
         assert.equal(state.reloadCalls, 1, 'a single failure must not trigger two reloads');
     } finally {
         restoreWindow();
+        resetErrorTrackerForTests();
     }
 });
 

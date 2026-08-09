@@ -8,7 +8,9 @@ import { initClientErrorTracking } from './lib/sentry-client';
 import { handleStaleChunkPreloadError } from './lib/stale-chunk-recovery';
 
 // Reload (once per failing asset) on stale-cache preload failures so the
-// browser fetches the latest HTML + hashed assets.
+// browser fetches the latest HTML + hashed assets. See
+// lib/stale-chunk-recovery.ts for why this deliberately never calls
+// event.preventDefault().
 window.addEventListener('vite:preloadError', (event: Event & { payload?: unknown }) => {
   handleStaleChunkPreloadError(event);
 });
