@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/cloudflare';
 
-import { clearErrorTracker, setErrorTracker } from '../lib/error-tracking';
+import { clearErrorTracker, scrubEventUrls, setErrorTracker } from '../lib/error-tracking';
 
 interface CloudflareEnv {
   SENTRY_DSN?: string;
@@ -21,6 +21,10 @@ export const onRequest = Sentry.sentryPagesPlugin<CloudflareEnv>((context) => {
     environment: context.env.SENTRY_ENVIRONMENT || 'production',
     tracesSampleRate: 0.1,
     enableLogs: true,
+    // Sampled request transactions report `request.url` verbatim — that URL can
+    // carry a credential (the signed `/nps?token=…` invite). See scrubEventUrls.
+    beforeSend: scrubEventUrls,
+    beforeSendTransaction: scrubEventUrls,
     integrations: [
       Sentry.consoleLoggingIntegration({ levels: ['log', 'warn', 'error'] }),
     ],

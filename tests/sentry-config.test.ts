@@ -2,8 +2,18 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-import { isStaleChunkMessage, sentryBeforeSend, sentryBeforeSendLog } from '../lib/sentry-client';
-import { resetErrorTrackerForTests, setErrorTrackerForTests } from '../lib/error-tracking';
+import {
+    isStaleChunkMessage,
+    sentryBeforeBreadcrumb,
+    sentryBeforeSend,
+    sentryBeforeSendLog,
+} from '../lib/sentry-client';
+import {
+    resetErrorTrackerForTests,
+    scrubEventUrls,
+    scrubSensitiveUrl,
+    setErrorTrackerForTests,
+} from '../lib/error-tracking';
 import { STALE_CHUNK_EXHAUSTED_TAG_KEY, STALE_CHUNK_EXHAUSTED_TAG_VALUE } from '../lib/stale-chunk-recovery';
 import type { ErrorEvent as SentryErrorEvent } from '@sentry/react';
 
@@ -400,4 +410,91 @@ test('shared error tracking module stays runtime-agnostic for browser bundles', 
 
     assert.doesNotMatch(errorTrackingSource, /process\.env/);
     assert.match(loggerSource, /from ['"]\.\/error-tracking['"]/);
+});
+
+// --- Credential leakage through telemetry URLs (CWE-532) -------------------
+// The signed NPS invite link (`/nps?token=…`, lib/nps-invite.ts) is a bearer
+// credential: it authorizes writing a score/comment onto a customer's Odoo
+// `res.partner`. Sentry attaches the raw URL to errors AND to every sampled
+// transaction, so it must never reach the wire unredacted.
+
+test('scrubSensitiveUrl redacts credential-bearing query params but keeps attribution', () => {
+    const scrubbed = scrubSensitiveUrl(
+        'https://www.anhanga.tur.br/nps?firstname=Ana&token=abc.def&utm_source=email&gclid=xyz',
+    );
+
+    assert.doesNotMatch(scrubbed, /abc\.def/);
+    assert.match(scrubbed, /token=\[redacted\]/);
+    // Attribution params must survive or Sentry URLs stop being useful.
+    assert.match(scrubbed, /utm_source=email/);
+    assert.match(scrubbed, /gclid=xyz/);
+    assert.match(scrubbed, /firstname=Ana/);
+});
+
+test('scrubSensitiveUrl leaves clean URLs untouched and never throws on malformed input', () => {
+    const clean = 'https://www.anhanga.tur.br/blog/vistos?page=2#faq';
+    assert.equal(scrubSensitiveUrl(clean), clean);
+    assert.equal(scrubSensitiveUrl('/nps'), '/nps');
+    // A malformed percent-escape must not blow up the beforeSend hook.
+    assert.equal(scrubSensitiveUrl('/nps?token=%E0%A4%A'), '/nps?token=[redacted]');
+    // The fragment must be preserved verbatim after the scrubbed query.
+    assert.equal(scrubSensitiveUrl('/nps?token=abc#thanks'), '/nps?token=[redacted]#thanks');
+});
+
+test('scrubEventUrls redacts the request URL on errors and transactions', () => {
+    const event = {
+        request: { url: 'https://www.anhanga.tur.br/nps?token=secret-invite' },
+        contexts: { trace: { data: { 'url.full': 'https://www.anhanga.tur.br/nps?token=secret-invite' } } },
+    };
+
+    const scrubbed = scrubEventUrls(event);
+
+    assert.equal(scrubbed.request.url, 'https://www.anhanga.tur.br/nps?token=[redacted]');
+    assert.equal(
+        scrubbed.contexts.trace.data['url.full'],
+        'https://www.anhanga.tur.br/nps?token=[redacted]',
+    );
+});
+
+test('sentryBeforeSend scrubs the request URL of events it keeps', () => {
+    const event = {
+        request: { url: 'https://www.anhanga.tur.br/nps?token=secret-invite' },
+        exception: { values: [{ value: 'Boom' }] },
+    } as unknown as SentryErrorEvent;
+
+    const kept = sentryBeforeSend(event);
+
+    assert.ok(kept, 'a genuine error must still be reported');
+    assert.equal(kept.request?.url, 'https://www.anhanga.tur.br/nps?token=[redacted]');
+});
+
+test('sentryBeforeBreadcrumb scrubs navigation and fetch breadcrumb URLs', () => {
+    const navigation = sentryBeforeBreadcrumb({
+        category: 'navigation',
+        data: { from: '/nps?token=one', to: '/nps?token=two' },
+    });
+
+    assert.equal(navigation.data?.from, '/nps?token=[redacted]');
+    assert.equal(navigation.data?.to, '/nps?token=[redacted]');
+
+    const untouched = { category: 'ui.click', data: { url: '/blog' } };
+    assert.equal(sentryBeforeBreadcrumb(untouched), untouched, 'clean breadcrumbs must not be re-allocated');
+});
+
+test('both Sentry entry points scrub URLs on errors, transactions and breadcrumbs', async () => {
+    const [clientSource, middlewareSource] = await Promise.all([
+        readProjectFile('lib/sentry-client.ts'),
+        readProjectFile('functions/_middleware.ts'),
+    ]);
+
+    // Both SDKs sample 10% of traffic into transactions, which carry request.url
+    // even with no error — beforeSend alone is not enough.
+    assert.match(clientSource, /beforeSendTransaction:\s*scrubEventUrls/);
+    assert.match(clientSource, /beforeBreadcrumb:\s*sentryBeforeBreadcrumb/);
+    assert.match(middlewareSource, /beforeSend:\s*scrubEventUrls/);
+    assert.match(middlewareSource, /beforeSendTransaction:\s*scrubEventUrls/);
+
+    // The Pages middleware must reach the scrubber without pulling @sentry/react
+    // into the Worker bundle.
+    assert.doesNotMatch(middlewareSource, /from ['"]\.\.\/lib\/sentry-client['"]/);
 });
