@@ -5,10 +5,14 @@ import './src/index.css';
 import App from './App';
 import { shouldHydratePrerenderedRoute } from './lib/hydration';
 import { initClientErrorTracking } from './lib/sentry-client';
+import { handleStaleChunkPreloadError } from './lib/stale-chunk-recovery';
 
-// Reload on stale-cache preload failures so the browser fetches the latest HTML + hashed assets.
-window.addEventListener('vite:preloadError', () => {
-  window.location.reload();
+// Reload (once per failing asset) on stale-cache preload failures so the
+// browser fetches the latest HTML + hashed assets. See
+// lib/stale-chunk-recovery.ts for why this deliberately never calls
+// event.preventDefault().
+window.addEventListener('vite:preloadError', (event: Event & { payload?: unknown }) => {
+  handleStaleChunkPreloadError(event);
 });
 
 initClientErrorTracking();

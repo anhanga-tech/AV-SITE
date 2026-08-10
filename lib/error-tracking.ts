@@ -1,5 +1,6 @@
 export type ErrorCaptureContext = {
     extra: Record<string, unknown>;
+    tags?: Record<string, string>;
 };
 
 type ErrorTracker = (error: unknown, context?: ErrorCaptureContext) => string | void;
@@ -53,7 +54,7 @@ export function sanitizeForErrorTracking(value: unknown, depth = 0): unknown {
     return value;
 }
 
-export function captureLoggerError(message: string, data?: unknown): void {
+export function captureLoggerError(message: string, data?: unknown, tags?: Record<string, string>): void {
     if (errorTracker === noopErrorTracker) return;
 
     const error = data instanceof Error ? data : new Error(message);
@@ -63,7 +64,7 @@ export function captureLoggerError(message: string, data?: unknown): void {
         extra.data = sanitizeForErrorTracking(data);
     }
 
-    errorTracker(error, { extra });
+    errorTracker(error, tags ? { extra, tags } : { extra });
 }
 
 export function setErrorTracker(tracker: ErrorTracker): void {

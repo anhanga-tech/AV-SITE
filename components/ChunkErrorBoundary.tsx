@@ -1,6 +1,6 @@
 import React from 'react';
 
-const RELOAD_FLAG = 'chunk_reload_attempted';
+import { attemptStaleChunkBoundaryReload, isStaleChunkErrorMessage } from '../lib/stale-chunk-recovery';
 
 interface Props {
   children: React.ReactNode;
@@ -36,29 +36,18 @@ class ChunkErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error) {
-    const isChunkError =
-      error?.message?.includes('Failed to fetch dynamically imported module') ||
-      error?.message?.includes('Importing a module script failed') ||
-      error?.name === 'ChunkLoadError';
+    const isChunkError = isStaleChunkErrorMessage(error?.message) || error?.name === 'ChunkLoadError';
 
     if (!isChunkError) {
       throw error;
     }
 
-    const alreadyRetried = sessionStorage.getItem(RELOAD_FLAG) === 'true';
-
-    if (!alreadyRetried) {
-      sessionStorage.setItem(RELOAD_FLAG, 'true');
-      window.location.reload();
-    } else {
-      sessionStorage.removeItem(RELOAD_FLAG);
-    }
-  }
-
-  componentDidMount() {
-    if (!this.state.hasError) {
-      sessionStorage.removeItem(RELOAD_FLAG);
-    }
+    // Shares its reload budget with the `vite:preloadError` listener in
+    // index.tsx (lib/stale-chunk-recovery.ts) — the same failure can reach
+    // both, and they must not each reload independently. If the budget is
+    // already spent, this falls through to the fallback UI below instead of
+    // reloading (or looping) again.
+    attemptStaleChunkBoundaryReload(error);
   }
 
   render() {
