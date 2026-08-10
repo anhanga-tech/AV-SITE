@@ -40,3 +40,26 @@ test('releaseNpsInvite on a jti that was never consumed is a harmless no-op', as
     await releaseNpsInvite(jti);
     assert.equal(await consumeNpsInviteOnce(jti, 60), true);
 });
+
+test('consumeNpsInviteOnce fails closed on edge when Redis is unavailable', async (t) => {
+    const previous = {
+        CF_PAGES: process.env.CF_PAGES,
+        VERCEL_ENV: process.env.VERCEL_ENV,
+        UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
+        UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
+    };
+
+    process.env.CF_PAGES = '1';
+    delete process.env.VERCEL_ENV;
+    delete process.env.UPSTASH_REDIS_REST_URL;
+    delete process.env.UPSTASH_REDIS_REST_TOKEN;
+
+    t.after(() => {
+        for (const [name, value] of Object.entries(previous)) {
+            if (value === undefined) delete process.env[name];
+            else process.env[name] = value;
+        }
+    });
+
+    assert.equal(await consumeNpsInviteOnce(`jti-edge-no-redis-${uid()}`, 60), false);
+});
