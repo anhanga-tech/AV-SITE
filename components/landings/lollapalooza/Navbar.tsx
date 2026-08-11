@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Menu, X, MessageCircle } from 'lucide-react';
 import { NAVIGATION_LINKS } from './constants';
 import { WAITLIST_SECTION_ID } from './constants';
 import { BRAND_LOGO_BLUE_URL } from '../../../lib/media-assets';
+import { useScrolled } from '../../Header/useScrolled';
 
 const SITE_URL = 'https://www.anhanga.tur.br';
 
@@ -12,15 +13,9 @@ const SITE_URL = 'https://www.anhanga.tur.br';
  */
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // rAF-throttled scroll hook (shared with Header/BackToTop) instead of an
+  // unthrottled listener that called setState on every native scroll event.
+  const scrolled = useScrolled(50);
 
   const logoUrl = BRAND_LOGO_BLUE_URL;
 
