@@ -2,6 +2,51 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
+    "title": "Como Saber Quanto Investir na Sua Viagem dos Sonhos (Sem Surpresas no Cartão)",
+    "excerpt": "O orçamento da viagem não começa no preço da passagem. Aprenda a separar custos obrigatórios, escolhas de conforto e uma reserva para voltar sem susto na fatura.",
+    "date": "2026-08-11",
+    "author": "felipe-william",
+    "category": "Planejamento",
+    "image": "https://media.anhanga.tur.br/images/blog/quanto-custa-viagem-disney-2026.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Planejamento de viagem",
+    "tags": [
+      "planejamento",
+      "orcamento-viagem",
+      "quanto-investir",
+      "viagem-dos-sonhos",
+      "financas-de-viagem",
+      "dicas-de-viagem"
+    ],
+    "seoTitle": "Quanto Investir na Viagem: Como Calcular",
+    "seoDescription": "Veja como calcular quanto investir na sua viagem dos sonhos: custos obrigatórios, conforto, alimentação, documentação, reserva e parcelas sem susto no cartão.",
+    "faq": [
+      {
+        "question": "Como saber quanto investir em uma viagem?",
+        "answer": "Some transporte, hospedagem, alimentação, passeios, documentação, seguro, deslocamentos e bagagem. Depois acrescente uma reserva de 10% a 15% para variação de preço e imprevistos. O valor final depende mais das escolhas de duração, época e conforto do que do destino isoladamente."
+      },
+      {
+        "question": "Quanto devo reservar para imprevistos em uma viagem?",
+        "answer": "Uma reserva de 10% a 15% do orçamento é uma boa referência para a maioria das viagens. Em viagens internacionais ou com muitas conexões, vale ficar mais perto de 15%, especialmente se o orçamento não comporta uma emergência sem usar o cartão."
+      },
+      {
+        "question": "É melhor pagar a viagem à vista ou parcelar?",
+        "answer": "Depende do desconto, dos juros e do seu fluxo de caixa. O parcelamento só é saudável quando as parcelas cabem no orçamento mensal e a viagem estará quitada antes do embarque. Nunca conte com uma renda futura incerta para pagar uma viagem já marcada."
+      },
+      {
+        "question": "Qual é o maior erro ao montar um orçamento de viagem?",
+        "answer": "Considerar apenas passagem e hotel. Alimentação, transfers, bagagem, ingressos, seguro, câmbio, estacionamento, taxas e compras podem mudar bastante o total. O segundo erro é não separar o dinheiro da viagem das despesas normais da casa."
+      },
+      {
+        "question": "Uma agência ajuda a descobrir quanto investir na viagem?",
+        "answer": "Ajuda a transformar um desejo em um cenário possível. Uma consultoria compara datas, conexões, hospedagens e passeios de acordo com o perfil do viajante, mostra o que muda quando o orçamento sobe ou desce e evita pagar por itens que não serão aproveitados."
+      }
+    ],
+    "slug": "quanto-investir-viagem-dos-sonhos",
+    "readingTime": "8 min de leitura"
+  },
+  {
     "title": "Viagem Solo Depois dos 50: Por Que Cada Vez Mais Gente Está Viajando Sozinha",
     "excerpt": "Viajar sozinho depois dos 50 deixou de ser exceção. Veja por que está crescendo, como fica a questão de segurança e companhia, e por que cruzeiro costuma ser o formato mais fácil para começar.",
     "date": "2026-08-11",
