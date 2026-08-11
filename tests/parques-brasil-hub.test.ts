@@ -1,13 +1,13 @@
 import React from 'react';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 import { OrganizationSchema } from '../components/schemas/OrganizationSchema';
 import { createHeadManager, HeadContext } from '../lib/head';
 import { BASE_PRERENDER_ROUTES } from '../lib/prerender-routes.js';
 import { STATIC_SITEMAP_ENTRIES } from '../lib/site-routes.js';
+import { render } from '../ssr.tsx';
 import {
   BOOKABLE_PARKS,
   CREDENTIALED_PARKS,
@@ -16,9 +16,24 @@ import {
 } from '../components/parques-brasil/constants.ts';
 
 const HUB_ROUTE = '/parques-brasil';
+const NOT_FOUND_MARKER = 'data-testid="not-found-section"';
 
-async function readRepoFile(relativePath: string): Promise<string> {
-  return readFile(new URL(`../${relativePath}`, import.meta.url), 'utf8');
+interface BreadcrumbListItem {
+  name: string;
+  item: string;
+}
+
+// `render()` (ssr.tsx) compõe a árvore real da rota — Head tags incluem o JSON-LD
+// emitido por StructuredData, marcado com `data-av-head="script:ld-json:<id>"`
+// (lib/head.tsx). Extrair daqui prova o que a página realmente produz, em vez de
+// regex sobre o texto-fonte do componente.
+function extractBreadcrumbList(headHtml: string): BreadcrumbListItem[] {
+  const match = headHtml.match(
+    /<script[^>]*data-av-head="script:ld-json:breadcrumb"[^>]*>(.*?)<\/script>/s,
+  );
+  assert.ok(match, 'headHtml deve conter o script JSON-LD do breadcrumb');
+  const data = JSON.parse(match[1]) as { itemListElement: Array<{ name: string; item: string }> };
+  return data.itemListElement.map(({ name, item }) => ({ name, item }));
 }
 
 test('o hub está registrado como rota estática e é prerenderizado', () => {
@@ -75,18 +90,16 @@ test('OrganizationSchema deriva memberOf da lista de parques credenciados', () =
   }
 });
 
-test('parque sem página própria não declara href', () => {
+test('parque sem página própria não declara href', async () => {
   const routedParks = PARKS.filter((park) => park.href);
-  const appSource = () => readRepoFile('App.tsx');
 
-  return appSource().then((source) => {
-    for (const park of routedParks) {
-      assert.ok(
-        source.includes(`path="${park.href}"`),
-        `${park.name} aponta para ${park.href}, que não é uma rota registrada`,
-      );
-    }
-  });
+  for (const park of routedParks) {
+    const { appHtml } = await render(park.href as string);
+    assert.ok(
+      !appHtml.includes(NOT_FOUND_MARKER),
+      `${park.name} aponta para ${park.href}, que não é uma rota registrada (renderizou NotFound)`,
+    );
+  }
 });
 
 test('parque em obras fica fora da comparação e do que se vende', () => {
@@ -102,39 +115,39 @@ test('parque em obras fica fora da comparação e do que se vende', () => {
 });
 
 test('a filha declara o hub como pai no breadcrumb', async () => {
-  const betoCarrero = await readRepoFile('pages/landings/BetoCarreroLanding.tsx');
+  const { headHtml } = await render('/beto-carrero');
+  const items = extractBreadcrumbList(headHtml);
 
-  // Casa nome e URL no mesmo item do breadcrumb, em vez de procurar a URL solta
-  // no arquivo: prova que o hub entrou como degrau da hierarquia, não que a
-  // string existe em algum lugar. (Um `.includes()` de URL também aciona
-  // js/incomplete-url-substring-sanitization no CodeQL.)
-  assert.match(
-    betoCarrero,
-    /name: 'Parques no Brasil',\s*item: 'https:\/\/www\.anhanga\.tur\.br\/parques-brasil\/'/,
+  const hubItem = items.find((item) => item.name === 'Parques no Brasil');
+  const hubIndex = items.findIndex((item) => item.name === 'Parques no Brasil');
+  const childIndex = items.findIndex((item) => item.name === 'Pacote Beto Carrero');
+
+  assert.equal(
+    hubItem?.item,
+    'https://www.anhanga.tur.br/parques-brasil/',
     'BetoCarreroLanding deve listar o hub como item do BreadcrumbSchema',
   );
-
-  const hubPosition = betoCarrero.indexOf("name: 'Parques no Brasil'");
-  const childPosition = betoCarrero.indexOf("name: 'Pacote Beto Carrero'");
   assert.ok(
-    hubPosition > 0 && hubPosition < childPosition,
+    hubIndex !== -1 && hubIndex < childIndex,
     'o hub precisa vir antes da própria página na ordem do breadcrumb',
   );
 });
 
 test('hopi-hari declara o hub como pai no breadcrumb', async () => {
-  const hopiHari = await readRepoFile('pages/landings/HopiHariLanding.tsx');
+  const { headHtml } = await render('/hopi-hari');
+  const items = extractBreadcrumbList(headHtml);
 
-  assert.match(
-    hopiHari,
-    /name: 'Parques no Brasil',\s*item: 'https:\/\/www\.anhanga\.tur\.br\/parques-brasil\/'/,
+  const hubItem = items.find((item) => item.name === 'Parques no Brasil');
+  const hubIndex = items.findIndex((item) => item.name === 'Parques no Brasil');
+  const childIndex = items.findIndex((item) => item.name === 'Pacote Hopi Hari');
+
+  assert.equal(
+    hubItem?.item,
+    'https://www.anhanga.tur.br/parques-brasil/',
     'HopiHariLanding deve listar o hub como item do BreadcrumbSchema',
   );
-
-  const hubPosition = hopiHari.indexOf("name: 'Parques no Brasil'");
-  const childPosition = hopiHari.indexOf("name: 'Pacote Hopi Hari'");
   assert.ok(
-    hubPosition > 0 && hubPosition < childPosition,
+    hubIndex !== -1 && hubIndex < childIndex,
     'o hub precisa vir antes da própria página na ordem do breadcrumb',
   );
 });
