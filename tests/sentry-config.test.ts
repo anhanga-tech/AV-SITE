@@ -579,3 +579,35 @@ test('scrubSensitiveUrl matches percent-encoded parameter names', () => {
     // A malformed escape must fall back to the raw spelling instead of throwing.
     assert.equal(scrubSensitiveUrl('/nps?%E0%A4%A=1&token=x'), '/nps?%E0%A4%A=1&token=[redacted]');
 });
+
+test('scrubEventUrls redacts the Referer header, which carries the full same-origin URL', () => {
+    // Referrer-Policy: strict-origin-when-cross-origin (public/_headers) strips
+    // the path only CROSS-origin. NpsPage posts to the same-origin
+    // /api/submit-nps from /nps?token=…, so that request's Referer carries the
+    // live invite credential — and requestdata.js includes headers by default,
+    // stripping only cookie/IP headers.
+    const event = scrubEventUrls({
+        request: {
+            url: 'https://www.anhanga.tur.br/api/submit-nps',
+            headers: {
+                referer: 'https://www.anhanga.tur.br/nps?token=secret-invite',
+                'user-agent': 'Mozilla/5.0',
+            },
+        },
+    });
+
+    assert.equal(event.request.headers.referer, 'https://www.anhanga.tur.br/nps?token=[redacted]');
+    assert.equal(event.request.headers['user-agent'], 'Mozilla/5.0', 'non-URL headers must be left alone');
+});
+
+test('scrubUrlBag redacts headers namespaced as span attributes', () => {
+    // httpHeadersToSpanAttributes emits `http.request.header.<name>`.
+    const event = scrubEventUrls({
+        spans: [{ data: { 'http.request.header.referer': 'https://www.anhanga.tur.br/nps?token=secret' } }],
+    });
+
+    assert.equal(
+        event.spans[0].data['http.request.header.referer'],
+        'https://www.anhanga.tur.br/nps?token=[redacted]',
+    );
+});

@@ -136,12 +136,25 @@ export function scrubQueryParams(query: QueryParamsLike): QueryParamsLike {
 // Keys under which a Sentry SDK stores a raw URL: navigation breadcrumbs use
 // `from`/`to`, fetch/xhr breadcrumbs use `url`, and tracing spans use the
 // OpenTelemetry `url.full` / `http.url` attributes.
-const URL_DATA_KEYS = ['from', 'to', 'url', 'url.full', 'http.url'] as const;
+const URL_DATA_KEYS: readonly string[] = ['from', 'to', 'url', 'url.full', 'http.url'];
+
+// Headers whose value is a full URL, so they carry the referring page's query
+// string. `Referrer-Policy: strict-origin-when-cross-origin` (public/_headers)
+// strips the path only CROSS-origin — a same-origin request still sends the
+// full URL. `NpsPage` posts to `/api/submit-nps` from `/nps?token=…`, so that
+// request's `Referer` carries the invite credential.
+const URL_HEADER_NAMES = new Set(['referer', 'referrer']);
+
+function isUrlDataKey(key: string): boolean {
+    if (URL_DATA_KEYS.includes(key)) return true;
+    // Span attributes namespace headers as `http.request.header.referer`.
+    return URL_HEADER_NAMES.has(key.slice(key.lastIndexOf('.') + 1).toLowerCase());
+}
 
 /** Structural subset of a Sentry event — keeps this module free of an SDK import
  *  so the Cloudflare Pages middleware and the browser bundle can share it. */
 type UrlBearingEvent = {
-    request?: { url?: string; query_string?: QueryParamsLike };
+    request?: { url?: string; query_string?: QueryParamsLike; headers?: Record<string, string> };
     contexts?: { trace?: { data?: Record<string, unknown> } };
     spans?: Array<{ data?: Record<string, unknown> }>;
 };
@@ -150,9 +163,8 @@ export function scrubUrlBag<T extends Record<string, unknown>>(bag: T | undefine
     if (!bag) return bag;
 
     let scrubbed: T | undefined;
-    for (const key of URL_DATA_KEYS) {
-        const value = bag[key];
-        if (typeof value !== 'string') continue;
+    for (const [key, value] of Object.entries(bag)) {
+        if (typeof value !== 'string' || !isUrlDataKey(key)) continue;
         const safe = scrubSensitiveUrl(value);
         if (safe === value) continue;
         scrubbed ??= { ...bag };
@@ -160,6 +172,24 @@ export function scrubUrlBag<T extends Record<string, unknown>>(bag: T | undefine
     }
 
     return scrubbed ?? bag;
+}
+
+/** Redacts URL-bearing request headers (see URL_HEADER_NAMES). */
+function scrubRequestHeaders(
+    headers: Record<string, string> | undefined,
+): Record<string, string> | undefined {
+    if (!headers) return headers;
+
+    let scrubbed: Record<string, string> | undefined;
+    for (const [name, value] of Object.entries(headers)) {
+        if (typeof value !== 'string' || !URL_HEADER_NAMES.has(name.toLowerCase())) continue;
+        const safe = scrubSensitiveUrl(value);
+        if (safe === value) continue;
+        scrubbed ??= { ...headers };
+        scrubbed[name] = safe;
+    }
+
+    return scrubbed ?? headers;
 }
 
 /**
@@ -178,6 +208,9 @@ export function scrubEventUrls<T extends UrlBearingEvent>(event: T): T {
             // same URL but stores it as its own field. Redacting only `url` would
             // leave the credential fully intact on the server path.
             ...(request.query_string ? { query_string: scrubQueryParams(request.query_string) } : {}),
+            // Headers ride along too: `requestdata.js` includes them by default
+            // and strips only `cookie`/IP headers, never `referer`.
+            ...(request.headers ? { headers: scrubRequestHeaders(request.headers) } : {}),
         };
     }
 
