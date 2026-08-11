@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/react';
 
-import { setErrorTracker } from './error-tracking';
+import { scrubBreadcrumbUrls, scrubEventUrls, setErrorTracker } from './error-tracking';
 import {
     isStaleChunkErrorMessage,
     STALE_CHUNK_EXHAUSTED_TAG_KEY,
@@ -38,11 +38,17 @@ export function isStaleChunkMessage(values: Array<{ value?: string }> | undefine
     return !!values?.some((exception) => isStaleChunkErrorMessage(exception.value));
 }
 
+export function sentryBeforeBreadcrumb(breadcrumb: Sentry.Breadcrumb): Sentry.Breadcrumb {
+    return scrubBreadcrumbUrls(breadcrumb);
+}
+
 // Exported standalone (rather than left inline in Sentry.init below) so it
 // can be exercised directly in tests against constructed event objects,
 // instead of only through a stubbed error tracker — a stubbed tracker can't
 // catch a bug where this function itself drops the event.
 export function sentryBeforeSend(event: Sentry.ErrorEvent): Sentry.ErrorEvent | null {
+    scrubEventUrls(event);
+
     // A deliberate report from lib/stale-chunk-recovery.ts once its reload
     // budget is exhausted — its message necessarily still contains the
     // stale-chunk wording (for readability), which isStaleChunkMessage below
@@ -91,6 +97,8 @@ export function initClientErrorTracking(): void {
         ],
         tracePropagationTargets: ['localhost', /^https:\/\/(?:www\.)?anhanga\.tur\.br\/api/],
         beforeSend: sentryBeforeSend,
+        beforeSendTransaction: scrubEventUrls,
+        beforeBreadcrumb: sentryBeforeBreadcrumb,
         beforeSendLog: sentryBeforeSendLog,
     });
 

@@ -2,8 +2,20 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-import { isStaleChunkMessage, sentryBeforeSend, sentryBeforeSendLog } from '../lib/sentry-client';
-import { resetErrorTrackerForTests, setErrorTrackerForTests } from '../lib/error-tracking';
+import {
+    isStaleChunkMessage,
+    sentryBeforeBreadcrumb,
+    sentryBeforeSend,
+    sentryBeforeSendLog,
+} from '../lib/sentry-client';
+import {
+    resetErrorTrackerForTests,
+    sanitizeForErrorTracking,
+    scrubEventUrls,
+    scrubQueryParams,
+    scrubSensitiveUrl,
+    setErrorTrackerForTests,
+} from '../lib/error-tracking';
 import { STALE_CHUNK_EXHAUSTED_TAG_KEY, STALE_CHUNK_EXHAUSTED_TAG_VALUE } from '../lib/stale-chunk-recovery';
 import type { ErrorEvent as SentryErrorEvent } from '@sentry/react';
 
@@ -400,4 +412,202 @@ test('shared error tracking module stays runtime-agnostic for browser bundles', 
 
     assert.doesNotMatch(errorTrackingSource, /process\.env/);
     assert.match(loggerSource, /from ['"]\.\/error-tracking['"]/);
+});
+
+// --- Credential leakage through telemetry URLs (CWE-532) -------------------
+// The signed NPS invite link (`/nps?token=…`, lib/nps-invite.ts) is a bearer
+// credential: it authorizes writing a score/comment onto a customer's Odoo
+// `res.partner`. Sentry attaches the raw URL to errors AND to every sampled
+// transaction, so it must never reach the wire unredacted.
+
+test('scrubSensitiveUrl redacts credential-bearing query params but keeps attribution', () => {
+    const scrubbed = scrubSensitiveUrl(
+        'https://www.anhanga.tur.br/nps?firstname=Ana&token=abc.def&utm_source=email&gclid=xyz',
+    );
+
+    assert.doesNotMatch(scrubbed, /abc\.def/);
+    assert.match(scrubbed, /token=\[redacted\]/);
+    // Attribution params must survive or Sentry URLs stop being useful.
+    assert.match(scrubbed, /utm_source=email/);
+    assert.match(scrubbed, /gclid=xyz/);
+    assert.match(scrubbed, /firstname=Ana/);
+});
+
+test('scrubSensitiveUrl leaves clean URLs untouched and never throws on malformed input', () => {
+    const clean = 'https://www.anhanga.tur.br/blog/vistos?page=2#faq';
+    assert.equal(scrubSensitiveUrl(clean), clean);
+    assert.equal(scrubSensitiveUrl('/nps'), '/nps');
+    // A malformed percent-escape must not blow up the beforeSend hook.
+    assert.equal(scrubSensitiveUrl('/nps?token=%E0%A4%A'), '/nps?token=[redacted]');
+    // The fragment must be preserved verbatim after the scrubbed query.
+    assert.equal(scrubSensitiveUrl('/nps?token=abc#thanks'), '/nps?token=[redacted]#thanks');
+});
+
+test('scrubEventUrls redacts the request URL on errors and transactions', () => {
+    const event = {
+        request: { url: 'https://www.anhanga.tur.br/nps?token=secret-invite' },
+        contexts: { trace: { data: { 'url.full': 'https://www.anhanga.tur.br/nps?token=secret-invite' } } },
+    };
+
+    const scrubbed = scrubEventUrls(event);
+
+    assert.equal(scrubbed.request.url, 'https://www.anhanga.tur.br/nps?token=[redacted]');
+    assert.equal(
+        scrubbed.contexts.trace.data['url.full'],
+        'https://www.anhanga.tur.br/nps?token=[redacted]',
+    );
+});
+
+test('sentryBeforeSend scrubs the request URL of events it keeps', () => {
+    const event = {
+        request: { url: 'https://www.anhanga.tur.br/nps?token=secret-invite' },
+        exception: { values: [{ value: 'Boom' }] },
+    } as unknown as SentryErrorEvent;
+
+    const kept = sentryBeforeSend(event);
+
+    assert.ok(kept, 'a genuine error must still be reported');
+    assert.equal(kept.request?.url, 'https://www.anhanga.tur.br/nps?token=[redacted]');
+});
+
+test('sentryBeforeBreadcrumb scrubs navigation and fetch breadcrumb URLs', () => {
+    const navigation = sentryBeforeBreadcrumb({
+        category: 'navigation',
+        data: { from: '/nps?token=one', to: '/nps?token=two' },
+    });
+
+    assert.equal(navigation.data?.from, '/nps?token=[redacted]');
+    assert.equal(navigation.data?.to, '/nps?token=[redacted]');
+
+    const untouched = { category: 'ui.click', data: { url: '/blog' } };
+    assert.equal(sentryBeforeBreadcrumb(untouched), untouched, 'clean breadcrumbs must not be re-allocated');
+});
+
+test('both Sentry entry points scrub URLs on errors, transactions and breadcrumbs', async () => {
+    const [clientSource, middlewareSource] = await Promise.all([
+        readProjectFile('lib/sentry-client.ts'),
+        readProjectFile('functions/_middleware.ts'),
+    ]);
+
+    // Both SDKs sample 10% of traffic into transactions, which carry request.url
+    // even with no error — beforeSend alone is not enough.
+    assert.match(clientSource, /beforeSendTransaction:\s*scrubEventUrls/);
+    assert.match(clientSource, /beforeBreadcrumb:\s*sentryBeforeBreadcrumb/);
+    assert.match(middlewareSource, /beforeSend:\s*scrubEventUrls/);
+    assert.match(middlewareSource, /beforeSendTransaction:\s*scrubEventUrls/);
+    // The middleware needs all three too: the Workers runtime auto-instruments
+    // outbound fetch breadcrumbs. Asserting this only on the client is what let
+    // the missing hook slip through review the first time.
+    assert.match(middlewareSource, /beforeBreadcrumb:\s*scrubBreadcrumbUrls/);
+
+    // The Pages middleware must reach the scrubber without pulling @sentry/react
+    // into the Worker bundle.
+    assert.doesNotMatch(middlewareSource, /from ['"]\.\.\/lib\/sentry-client['"]/);
+});
+
+// --- Gaps found in review of the first cut of this fix ---------------------
+
+test('scrubEventUrls redacts request.query_string, which the Cloudflare SDK fills separately from request.url', () => {
+    // @sentry/cloudflare builds event.request via winterCGRequestToRequestData,
+    // which sets `query_string` from the same URL but as its own field. Scrubbing
+    // only `url` left the token fully intact on the server path.
+    const event = scrubEventUrls({
+        request: {
+            url: 'https://www.anhanga.tur.br/nps?token=secret-invite',
+            query_string: 'firstname=Ana&token=secret-invite',
+        },
+    });
+
+    assert.equal(event.request.url, 'https://www.anhanga.tur.br/nps?token=[redacted]');
+    assert.equal(event.request.query_string, 'firstname=Ana&token=[redacted]');
+});
+
+test('scrubQueryParams handles all three shapes Sentry may use for query_string', () => {
+    assert.equal(scrubQueryParams('a=1&token=x'), 'a=1&token=[redacted]');
+    assert.deepEqual(scrubQueryParams({ utm_source: 'email', token: 'x' }), {
+        utm_source: 'email',
+        token: '[redacted]',
+    });
+    assert.deepEqual(scrubQueryParams([['gclid', 'g'], ['token', 'x']]), [
+        ['gclid', 'g'],
+        ['token', '[redacted]'],
+    ]);
+});
+
+test('scrubEventUrls redacts child span attributes, not just the root trace context', () => {
+    // A sampled transaction carries instrumented outbound fetches as child spans.
+    // The GA4 Measurement Protocol requires api_secret in the query string
+    // (lib/conversions/google.ts), so that secret rides in a span URL by design.
+    const event = scrubEventUrls({
+        spans: [
+            { data: { 'url.full': 'https://www.google-analytics.com/mp/collect?measurement_id=G-X&api_secret=live-secret' } },
+            { data: { 'http.method': 'POST' } },
+        ],
+    });
+
+    assert.equal(
+        event.spans[0].data['url.full'],
+        'https://www.google-analytics.com/mp/collect?measurement_id=G-X&api_secret=[redacted]',
+    );
+    assert.equal(event.spans[1].data['http.method'], 'POST', 'non-URL span attributes must be left alone');
+});
+
+test('scrubSensitiveUrl redacts the OAuth authorization code and state', () => {
+    // api/auth/callback.ts receives ?code=&state= on every login. The code is
+    // exchangeable for a repo,user-scoped GitHub token until it is spent, and
+    // neither name is matched by the payload-key pattern.
+    const scrubbed = scrubSensitiveUrl('https://www.anhanga.tur.br/api/auth/callback?code=live-code&state=csrf');
+
+    assert.equal(scrubbed, 'https://www.anhanga.tur.br/api/auth/callback?code=[redacted]&state=[redacted]');
+});
+
+test('code and state stay readable in structured log payloads', () => {
+    // The URL-only list must NOT leak into sanitizeForErrorTracking: nearly every
+    // JSON response in this repo carries a `code` field, and redacting it there
+    // would erase the error taxonomy.
+    const sanitized = sanitizeForErrorTracking({ code: 'VALIDATION_ERROR', state: 'form', token: 'abc' }) as Record<string, unknown>;
+
+    assert.equal(sanitized.code, 'VALIDATION_ERROR');
+    assert.equal(sanitized.state, 'form');
+    assert.equal(sanitized.token, '[redacted]');
+});
+
+test('scrubSensitiveUrl matches percent-encoded parameter names', () => {
+    // URLSearchParams.get('token') decodes %74oken, so the page still reads the
+    // credential — matching only the raw spelling would let it through.
+    assert.equal(scrubSensitiveUrl('/nps?%74oken=secret'), '/nps?%74oken=[redacted]');
+    // A malformed escape must fall back to the raw spelling instead of throwing.
+    assert.equal(scrubSensitiveUrl('/nps?%E0%A4%A=1&token=x'), '/nps?%E0%A4%A=1&token=[redacted]');
+});
+
+test('scrubEventUrls redacts the Referer header, which carries the full same-origin URL', () => {
+    // Referrer-Policy: strict-origin-when-cross-origin (public/_headers) strips
+    // the path only CROSS-origin. NpsPage posts to the same-origin
+    // /api/submit-nps from /nps?token=…, so that request's Referer carries the
+    // live invite credential — and requestdata.js includes headers by default,
+    // stripping only cookie/IP headers.
+    const event = scrubEventUrls({
+        request: {
+            url: 'https://www.anhanga.tur.br/api/submit-nps',
+            headers: {
+                referer: 'https://www.anhanga.tur.br/nps?token=secret-invite',
+                'user-agent': 'Mozilla/5.0',
+            },
+        },
+    });
+
+    assert.equal(event.request.headers.referer, 'https://www.anhanga.tur.br/nps?token=[redacted]');
+    assert.equal(event.request.headers['user-agent'], 'Mozilla/5.0', 'non-URL headers must be left alone');
+});
+
+test('scrubUrlBag redacts headers namespaced as span attributes', () => {
+    // httpHeadersToSpanAttributes emits `http.request.header.<name>`.
+    const event = scrubEventUrls({
+        spans: [{ data: { 'http.request.header.referer': 'https://www.anhanga.tur.br/nps?token=secret' } }],
+    });
+
+    assert.equal(
+        event.spans[0].data['http.request.header.referer'],
+        'https://www.anhanga.tur.br/nps?token=[redacted]',
+    );
 });
