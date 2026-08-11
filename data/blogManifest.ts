@@ -19,7 +19,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "financas-de-viagem",
       "dicas-de-viagem"
     ],
-    "seoTitle": "Quanto Investir em uma Viagem? Como Calcular",
+    "seoTitle": "Quanto Investir na Viagem: Como Calcular",
     "seoDescription": "Veja como calcular quanto investir na sua viagem dos sonhos: custos obrigatórios, conforto, alimentação, documentação, reserva e parcelas sem susto no cartão.",
     "faq": [
       {
