@@ -1,6 +1,11 @@
 import * as Sentry from '@sentry/cloudflare';
 
-import { clearErrorTracker, scrubEventUrls, setErrorTracker } from '../lib/error-tracking';
+import {
+  clearErrorTracker,
+  scrubBreadcrumbUrls,
+  scrubEventUrls,
+  setErrorTracker,
+} from '../lib/error-tracking';
 
 interface CloudflareEnv {
   SENTRY_DSN?: string;
@@ -25,6 +30,9 @@ export const onRequest = Sentry.sentryPagesPlugin<CloudflareEnv>((context) => {
     // carry a credential (the signed `/nps?token=…` invite). See scrubEventUrls.
     beforeSend: scrubEventUrls,
     beforeSendTransaction: scrubEventUrls,
+    // The Workers runtime auto-instruments outbound `fetch` breadcrumbs for
+    // Odoo/Gemini/HubSpot calls, so this side needs the same URL scrubbing.
+    beforeBreadcrumb: scrubBreadcrumbUrls,
     integrations: [
       Sentry.consoleLoggingIntegration({ levels: ['log', 'warn', 'error'] }),
     ],

@@ -10,7 +10,9 @@ import {
 } from '../lib/sentry-client';
 import {
     resetErrorTrackerForTests,
+    sanitizeForErrorTracking,
     scrubEventUrls,
+    scrubQueryParams,
     scrubSensitiveUrl,
     setErrorTrackerForTests,
 } from '../lib/error-tracking';
@@ -493,8 +495,87 @@ test('both Sentry entry points scrub URLs on errors, transactions and breadcrumb
     assert.match(clientSource, /beforeBreadcrumb:\s*sentryBeforeBreadcrumb/);
     assert.match(middlewareSource, /beforeSend:\s*scrubEventUrls/);
     assert.match(middlewareSource, /beforeSendTransaction:\s*scrubEventUrls/);
+    // The middleware needs all three too: the Workers runtime auto-instruments
+    // outbound fetch breadcrumbs. Asserting this only on the client is what let
+    // the missing hook slip through review the first time.
+    assert.match(middlewareSource, /beforeBreadcrumb:\s*scrubBreadcrumbUrls/);
 
     // The Pages middleware must reach the scrubber without pulling @sentry/react
     // into the Worker bundle.
     assert.doesNotMatch(middlewareSource, /from ['"]\.\.\/lib\/sentry-client['"]/);
+});
+
+// --- Gaps found in review of the first cut of this fix ---------------------
+
+test('scrubEventUrls redacts request.query_string, which the Cloudflare SDK fills separately from request.url', () => {
+    // @sentry/cloudflare builds event.request via winterCGRequestToRequestData,
+    // which sets `query_string` from the same URL but as its own field. Scrubbing
+    // only `url` left the token fully intact on the server path.
+    const event = scrubEventUrls({
+        request: {
+            url: 'https://www.anhanga.tur.br/nps?token=secret-invite',
+            query_string: 'firstname=Ana&token=secret-invite',
+        },
+    });
+
+    assert.equal(event.request.url, 'https://www.anhanga.tur.br/nps?token=[redacted]');
+    assert.equal(event.request.query_string, 'firstname=Ana&token=[redacted]');
+});
+
+test('scrubQueryParams handles all three shapes Sentry may use for query_string', () => {
+    assert.equal(scrubQueryParams('a=1&token=x'), 'a=1&token=[redacted]');
+    assert.deepEqual(scrubQueryParams({ utm_source: 'email', token: 'x' }), {
+        utm_source: 'email',
+        token: '[redacted]',
+    });
+    assert.deepEqual(scrubQueryParams([['gclid', 'g'], ['token', 'x']]), [
+        ['gclid', 'g'],
+        ['token', '[redacted]'],
+    ]);
+});
+
+test('scrubEventUrls redacts child span attributes, not just the root trace context', () => {
+    // A sampled transaction carries instrumented outbound fetches as child spans.
+    // The GA4 Measurement Protocol requires api_secret in the query string
+    // (lib/conversions/google.ts), so that secret rides in a span URL by design.
+    const event = scrubEventUrls({
+        spans: [
+            { data: { 'url.full': 'https://www.google-analytics.com/mp/collect?measurement_id=G-X&api_secret=live-secret' } },
+            { data: { 'http.method': 'POST' } },
+        ],
+    });
+
+    assert.equal(
+        event.spans[0].data['url.full'],
+        'https://www.google-analytics.com/mp/collect?measurement_id=G-X&api_secret=[redacted]',
+    );
+    assert.equal(event.spans[1].data['http.method'], 'POST', 'non-URL span attributes must be left alone');
+});
+
+test('scrubSensitiveUrl redacts the OAuth authorization code and state', () => {
+    // api/auth/callback.ts receives ?code=&state= on every login. The code is
+    // exchangeable for a repo,user-scoped GitHub token until it is spent, and
+    // neither name is matched by the payload-key pattern.
+    const scrubbed = scrubSensitiveUrl('https://www.anhanga.tur.br/api/auth/callback?code=live-code&state=csrf');
+
+    assert.equal(scrubbed, 'https://www.anhanga.tur.br/api/auth/callback?code=[redacted]&state=[redacted]');
+});
+
+test('code and state stay readable in structured log payloads', () => {
+    // The URL-only list must NOT leak into sanitizeForErrorTracking: nearly every
+    // JSON response in this repo carries a `code` field, and redacting it there
+    // would erase the error taxonomy.
+    const sanitized = sanitizeForErrorTracking({ code: 'VALIDATION_ERROR', state: 'form', token: 'abc' }) as Record<string, unknown>;
+
+    assert.equal(sanitized.code, 'VALIDATION_ERROR');
+    assert.equal(sanitized.state, 'form');
+    assert.equal(sanitized.token, '[redacted]');
+});
+
+test('scrubSensitiveUrl matches percent-encoded parameter names', () => {
+    // URLSearchParams.get('token') decodes %74oken, so the page still reads the
+    // credential — matching only the raw spelling would let it through.
+    assert.equal(scrubSensitiveUrl('/nps?%74oken=secret'), '/nps?%74oken=[redacted]');
+    // A malformed escape must fall back to the raw spelling instead of throwing.
+    assert.equal(scrubSensitiveUrl('/nps?%E0%A4%A=1&token=x'), '/nps?%E0%A4%A=1&token=[redacted]');
 });

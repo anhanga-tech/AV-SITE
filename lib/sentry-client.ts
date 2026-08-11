@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/react';
 
-import { scrubEventUrls, scrubUrlBag, setErrorTracker } from './error-tracking';
+import { scrubBreadcrumbUrls, scrubEventUrls, setErrorTracker } from './error-tracking';
 import {
     isStaleChunkErrorMessage,
     STALE_CHUNK_EXHAUSTED_TAG_KEY,
@@ -39,8 +39,7 @@ export function isStaleChunkMessage(values: Array<{ value?: string }> | undefine
 }
 
 export function sentryBeforeBreadcrumb(breadcrumb: Sentry.Breadcrumb): Sentry.Breadcrumb {
-    const scrubbed = scrubUrlBag(breadcrumb.data);
-    return scrubbed === breadcrumb.data ? breadcrumb : { ...breadcrumb, data: scrubbed };
+    return scrubBreadcrumbUrls(breadcrumb);
 }
 
 // Exported standalone (rather than left inline in Sentry.init below) so it
