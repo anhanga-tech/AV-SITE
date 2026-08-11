@@ -81,8 +81,13 @@ test('parque sem página própria não declara href', () => {
 
   return appSource().then((source) => {
     for (const park of routedParks) {
+      // Aceita tanto `<Route path="...">` (JSX literal) quanto `path: '...'`
+      // (entrada do registro único LANDING_PAGES) — App.tsx deriva as rotas
+      // de landing desse array em vez de declarar cada <Route> à mão.
+      const declaredAsJsxRoute = source.includes(`path="${park.href}"`);
+      const declaredAsRegistryEntry = source.includes(`path: '${park.href}'`);
       assert.ok(
-        source.includes(`path="${park.href}"`),
+        declaredAsJsxRoute || declaredAsRegistryEntry,
         `${park.name} aponta para ${park.href}, que não é uma rota registrada`,
       );
     }
