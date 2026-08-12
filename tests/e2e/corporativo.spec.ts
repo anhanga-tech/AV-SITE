@@ -69,6 +69,10 @@ test.describe('Corporativo Landing Page', () => {
 
     await landing.expectError('Informe seu nome.');
     await expect(page.getByText('Aceite obrigatório')).toHaveCount(0);
+
+    // O erro precisa estar associado ao input via aria-describedby para leitores de tela.
+    await expect(landing.firstNameInput).toHaveAttribute('aria-describedby', 'firstName-error');
+    await expect(page.locator('#firstName-error')).toHaveText('Informe seu nome.');
   });
 
   test('should block submit when LGPD consent is not accepted', async ({ page }) => {
