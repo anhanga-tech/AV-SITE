@@ -15,9 +15,9 @@ function fieldClass(hasError: boolean): string {
     return `${INPUT_CLASS} ${hasError ? 'border-red-400' : 'border-zinc-200'}`;
 }
 
-function FieldError({ show, message }: { show: boolean; message?: string }) {
+function FieldError({ id, show, message }: { id: string; show: boolean; message?: string }) {
     if (!show || !message) return null;
-    return <span className="mt-1 block text-xs font-semibold text-red-500" role="alert">{message}</span>;
+    return <span id={id} className="mt-1 block text-xs font-semibold text-red-500" role="alert">{message}</span>;
 }
 
 export function CorpFormFields({ form, onField, errorField, errorMessage }: CorpFormFieldsProps) {
@@ -39,9 +39,10 @@ export function CorpFormFields({ form, onField, errorField, errorMessage }: Corp
                         onChange={onField('firstName')}
                         required
                         aria-invalid={isError('firstName') || undefined}
+                        aria-describedby={isError('firstName') ? 'firstName-error' : undefined}
                         className={fieldClass(isError('firstName'))}
                     />
-                    <FieldError show={isError('firstName')} message={errorMessage} />
+                    <FieldError id="firstName-error" show={isError('firstName')} message={errorMessage} />
                 </div>
                 <div>
                     <label htmlFor="lastName" className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">
@@ -56,9 +57,10 @@ export function CorpFormFields({ form, onField, errorField, errorMessage }: Corp
                         onChange={onField('lastName')}
                         required
                         aria-invalid={isError('lastName') || undefined}
+                        aria-describedby={isError('lastName') ? 'lastName-error' : undefined}
                         className={fieldClass(isError('lastName'))}
                     />
-                    <FieldError show={isError('lastName')} message={errorMessage} />
+                    <FieldError id="lastName-error" show={isError('lastName')} message={errorMessage} />
                 </div>
             </div>
 
@@ -75,9 +77,10 @@ export function CorpFormFields({ form, onField, errorField, errorMessage }: Corp
                     onChange={onField('email')}
                     required
                     aria-invalid={isError('email') || undefined}
+                    aria-describedby={isError('email') ? 'email-error' : undefined}
                     className={fieldClass(isError('email'))}
                 />
-                <FieldError show={isError('email')} message={errorMessage} />
+                <FieldError id="email-error" show={isError('email')} message={errorMessage} />
             </div>
 
             <div>
@@ -93,9 +96,10 @@ export function CorpFormFields({ form, onField, errorField, errorMessage }: Corp
                     onChange={onField('whatsapp')}
                     required
                     aria-invalid={isError('whatsapp') || undefined}
+                    aria-describedby={isError('whatsapp') ? 'whatsapp-error' : undefined}
                     className={fieldClass(isError('whatsapp'))}
                 />
-                <FieldError show={isError('whatsapp')} message={errorMessage} />
+                <FieldError id="whatsapp-error" show={isError('whatsapp')} message={errorMessage} />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
