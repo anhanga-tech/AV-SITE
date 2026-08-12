@@ -45,27 +45,32 @@ const LandingRouteFallback: React.FC = () => <div className="min-h-screen bg-whi
 // ContactModal, nem BackToTop. Esses FABs cobririam o conteúdo curado e os selos de confiança.
 const STANDALONE_ROUTES = ['/links'];
 
-// Landing pages de campanha (ver "Routing" no CLAUDE.md — mesma lista das rotas registradas
-// abaixo em AppLayout): já não renderizam Header/Footer, e o AIChat e o BackToTop também
-// ficam de fora aqui. Cada uma tem seu próprio CTA de conversão; um segundo overlay
-// flutuante competindo com ele dilui "um CTA dominante por tela" (PRODUCT.md) — e o FAB
-// de "voltar ao topo" cobria conteúdo (FAQ, cards, CNPJ) na zona do polegar em mobile,
-// exatamente o imóvel que o critique de /consultoria-de-viagem reservou à conversão.
-// ContactModal continua montado — os CTAs dessas landings disparam openContactModal()
-// e dependem dele.
-const LANDING_PAGE_ROUTES = [
-  '/beto-carrero',
-  '/hopi-hari',
-  '/lollapalooza',
-  '/orlando',
-  '/melhor-idade',
-  '/melhor-idade/pacotes-pastore',
-  '/corporativo',
-  '/consultoria-de-viagem',
-  '/cruzeiros',
-  '/nps',
-  '/quiz',
+// Landing pages de campanha (ver "Routing" no CLAUDE.md): já não renderizam Header/Footer,
+// e o AIChat e o BackToTop também ficam de fora aqui. Cada uma tem seu próprio CTA de
+// conversão; um segundo overlay flutuante competindo com ele dilui "um CTA dominante por
+// tela" (PRODUCT.md) — e o FAB de "voltar ao topo" cobria conteúdo (FAQ, cards, CNPJ) na
+// zona do polegar em mobile, exatamente o imóvel que o critique de /consultoria-de-viagem
+// reservou à conversão. ContactModal continua montado — os CTAs dessas landings disparam
+// openContactModal() e dependem dele.
+//
+// Fonte única: as rotas registradas em AppLayout (ver abaixo) são derivadas deste array,
+// então cadastrar uma landing aqui basta para ela também renderizar — nenhuma segunda
+// lista para manter sincronizada manualmente.
+const LANDING_PAGES: { path: string; element: React.ReactElement }[] = [
+  { path: '/beto-carrero', element: <BetoCarreroLanding /> },
+  { path: '/hopi-hari', element: <HopiHariLanding /> },
+  { path: '/lollapalooza', element: <LollapaloozaLanding /> },
+  { path: '/orlando', element: <OrlandoLanding /> },
+  { path: '/melhor-idade', element: <MelhorIdadeLanding /> },
+  { path: '/melhor-idade/pacotes-pastore', element: <MelhorIdadePacotesLanding /> },
+  { path: '/corporativo', element: <CorporativoLanding /> },
+  { path: '/consultoria-de-viagem', element: <ConsultoriaDeViagemLanding /> },
+  { path: '/cruzeiros', element: <CruzeirosLanding /> },
+  { path: '/nps', element: <NpsPage /> },
+  { path: '/quiz', element: <QuizAnhangaLanding /> },
 ];
+
+const LANDING_PAGE_ROUTES = LANDING_PAGES.map(({ path }) => path);
 
 const ClientFeatures: React.FC = () => {
   const { pathname } = useLocation();
@@ -128,21 +133,13 @@ const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClient
       <ChunkErrorBoundary>
       <Suspense fallback={<LandingRouteFallback />}>
         <Routes>
-          <Route path="/beto-carrero" element={<BetoCarreroLanding />} />
-          <Route path="/hopi-hari" element={<HopiHariLanding />} />
-          <Route path="/lollapalooza" element={<LollapaloozaLanding />} />
+          {LANDING_PAGES.map(({ path, element }) => (
+            <Route key={path} path={path} element={element} />
+          ))}
           <Route path="/lollapalooza-2026" element={<Navigate to="/lollapalooza" replace />} />
-          <Route path="/orlando" element={<OrlandoLanding />} />
-          <Route path="/melhor-idade" element={<MelhorIdadeLanding />} />
-          <Route path="/melhor-idade/pacotes-pastore" element={<MelhorIdadePacotesLanding />} />
-          <Route path="/corporativo" element={<CorporativoLanding />} />
           <Route path="/brazil-promotion-day" element={<Navigate to="/corporativo" replace />} />
-          <Route path="/consultoria-de-viagem" element={<ConsultoriaDeViagemLanding />} />
           <Route path="/viagens-para-executivos" element={<Navigate to="/corporativo" replace />} />
-          <Route path="/cruzeiros" element={<CruzeirosLanding />} />
           <Route path="/curadoria-cruzeiros-brasil" element={<Navigate to="/cruzeiros" replace />} />
-          <Route path="/nps" element={<NpsPage />} />
-          <Route path="/quiz" element={<QuizAnhangaLanding />} />
           <Route path="/links" element={<LinksPage />} />
           <Route path="/*" element={<MainSiteShell />} />
         </Routes>
