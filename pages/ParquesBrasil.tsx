@@ -3,7 +3,7 @@ import { Seo } from '../components/Seo';
 import { LandingFAQ } from '../components/LandingFAQ';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../components/schemas/FAQPageSchema';
-import { StructuredData } from '../components/schemas/StructuredData';
+import { ItemListSchema } from '../components/schemas/ItemListSchema';
 import {
   ComparisonSection,
   CredentialedSection,
@@ -20,35 +20,6 @@ const PAGE_URL = 'https://www.anhanga.tur.br/parques-brasil/';
 
 const WHATSAPP_MESSAGE =
   'Olá! Estou escolhendo um parque no Brasil para viajar com a família e queria ajuda para decidir.';
-
-/*
-  ItemList em vez de Service: a página não vende um serviço só — ela lista
-  cinco destinos comparáveis. `TouristAttraction` por item é o tipo que
-  motores de resposta usam para montar comparação de destino.
-*/
-const parksItemList = {
-  '@context': 'https://schema.org',
-  '@type': 'ItemList',
-  name: 'Parques do Brasil atendidos pela Anhangá Viagens',
-  itemListOrder: 'https://schema.org/ItemListUnordered',
-  numberOfItems: BOOKABLE_PARKS.length,
-  itemListElement: BOOKABLE_PARKS.map((park, index) => ({
-    '@type': 'ListItem',
-    position: index + 1,
-    item: {
-      '@type': 'TouristAttraction',
-      name: park.name,
-      description: park.claim,
-      address: {
-        '@type': 'PostalAddress',
-        addressLocality: park.city,
-        addressRegion: park.state,
-        addressCountry: 'BR',
-      },
-      ...(park.href ? { url: `https://www.anhanga.tur.br${park.href}/` } : {}),
-    },
-  })),
-};
 
 const ParquesBrasil: React.FC = () => {
   const whatsappUrl = useWhatsAppLink(WHATSAPP_MESSAGE);
@@ -71,7 +42,17 @@ const ParquesBrasil: React.FC = () => {
         ]}
       />
       <FAQPageSchema items={PARQUES_FAQ_ITEMS} />
-      <StructuredData id="parques-itemlist" data={parksItemList} />
+      <ItemListSchema
+        id="parques-itemlist"
+        name="Parques do Brasil atendidos pela Anhangá Viagens"
+        items={BOOKABLE_PARKS.map(({ name, claim: description, city, state, href }) => ({
+          name,
+          description,
+          city,
+          state,
+          href,
+        }))}
+      />
 
       <ParquesHero />
       <CredentialedSection />

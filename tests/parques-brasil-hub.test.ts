@@ -23,6 +23,26 @@ interface BreadcrumbListItem {
   item: string;
 }
 
+interface ItemListSchemaData {
+  '@type': string;
+  name: string;
+  numberOfItems: number;
+  itemListElement: Array<{
+    position: number;
+    item: {
+      '@type': string;
+      name: string;
+      description: string;
+      address: {
+        addressLocality: string;
+        addressRegion: string;
+        addressCountry: string;
+      };
+      url?: string;
+    };
+  }>;
+}
+
 // `render()` (ssr.tsx) compõe a árvore real da rota — Head tags incluem o JSON-LD
 // emitido por StructuredData, marcado com `data-av-head="script:ld-json:<id>"`
 // (lib/head.tsx). Extrair daqui prova o que a página realmente produz, em vez de
@@ -34,6 +54,14 @@ function extractBreadcrumbList(headHtml: string): BreadcrumbListItem[] {
   assert.ok(match, 'headHtml deve conter o script JSON-LD do breadcrumb');
   const data = JSON.parse(match[1]) as { itemListElement: Array<{ name: string; item: string }> };
   return data.itemListElement.map(({ name, item }) => ({ name, item }));
+}
+
+function extractItemList(headHtml: string): ItemListSchemaData {
+  const match = headHtml.match(
+    /<script[^>]*data-av-head="script:ld-json:parques-itemlist"[^>]*>(.*?)<\/script>/s,
+  );
+  assert.ok(match, 'headHtml deve conter o script JSON-LD do ItemList');
+  return JSON.parse(match[1]) as ItemListSchemaData;
 }
 
 test('o hub está registrado como rota estática e é prerenderizado', () => {
@@ -112,6 +140,33 @@ test('parque em obras fica fora da comparação e do que se vende', () => {
       `${park.name} ainda não abriu e não pode entrar na tabela comparativa`,
     );
   }
+});
+
+test('o hub emite um ItemList com os destinos comparáveis', async () => {
+  const { headHtml } = await render(HUB_ROUTE);
+  const itemList = extractItemList(headHtml);
+
+  assert.equal(itemList['@type'], 'ItemList');
+  assert.equal(itemList.name, 'Parques do Brasil atendidos pela Anhangá Viagens');
+  assert.equal(itemList.numberOfItems, BOOKABLE_PARKS.length);
+  assert.deepEqual(
+    itemList.itemListElement.map(({ position, item }) => ({
+      position,
+      name: item.name,
+      description: item.description,
+      city: item.address.addressLocality,
+      state: item.address.addressRegion,
+      url: item.url,
+    })),
+    BOOKABLE_PARKS.map((park, index) => ({
+      position: index + 1,
+      name: park.name,
+      description: park.claim,
+      city: park.city,
+      state: park.state,
+      url: park.href ? `https://www.anhanga.tur.br${park.href}/` : undefined,
+    })),
+  );
 });
 
 test('a filha declara o hub como pai no breadcrumb', async () => {
