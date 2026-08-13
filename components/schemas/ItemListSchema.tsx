@@ -13,7 +13,7 @@ export interface ItemListSchemaItem {
 
 interface ItemListSchemaProps {
   items: ItemListSchemaItem[];
-  id?: string;
+  id: string;
   name?: string;
 }
 
@@ -28,7 +28,7 @@ const toAbsoluteUrl = (href: string): string => {
 
 export const ItemListSchema: React.FC<ItemListSchemaProps> = ({
   items,
-  id = 'item-list',
+  id,
   name = 'Destinos atendidos pela Anhangá Viagens',
 }) => {
   const schemaData: Record<string, unknown> = {
