@@ -1133,9 +1133,9 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
     "title": "Os melhores destinos do Brasil para viajar em 2026",
     "seoTitle": "Melhores Destinos do Brasil em 2026",
-    "excerpt": "Do Nordeste ao Pantanal: os destinos brasileiros que mais valem em 2026 para quem quer praia, natureza ou cidade — com custos reais e melhor época para ir.",
+    "excerpt": "Do Nordeste ao Pantanal: destinos brasileiros para praia, natureza ou cidade em 2026 — com guia de verão, inverno, custos e melhor época para ir.",
     "date": "2026-04-29",
-    "dateModified": "2026-07-20",
+    "dateModified": "2026-08-15",
     "author": "queila-oliveira",
     "category": "Destinos",
     "image": "https://media.anhanga.tur.br/images/destinations/natal.jpg",
@@ -1147,7 +1147,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "nordeste",
       "sul",
       "melhores-destinos",
-      "viagem-nacional"
+      "viagem-nacional",
+      "verão",
+      "inverno",
+      "melhor-época"
     ],
     "faq": [
       {
@@ -1165,10 +1168,26 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       {
         "question": "Qual destino do Brasil é melhor para quem busca aventura mais radical?",
         "answer": "Monte Roraima (RR) é um dos mais radicais do país — são cinco a seis dias de trilha até a tepui que faz fronteira com Venezuela e Guiana, com guia indígena obrigatório."
+      },
+      {
+        "question": "Qual é o melhor destino do Brasil para viajar no verão?",
+        "answer": "Depende do tipo de verão que você quer. Para praia e estrutura, Maceió, Porto de Galinhas e São Miguel dos Milagres são boas referências. Para água doce e natureza, Bonito funciona muito bem. A data exata importa: chuva, lotação e preço mudam bastante entre dezembro, janeiro, fevereiro e março."
+      },
+      {
+        "question": "Qual é o melhor destino do Brasil para viajar no inverno?",
+        "answer": "Para frio e gastronomia, Gramado e a Serra Gaúcha são escolhas clássicas, assim como Monte Verde e a Serra da Mantiqueira. Para trilhas e clima mais seco, Bonito, Chapada dos Veadeiros e Jalapão costumam fazer mais sentido. Julho é alta temporada em vários destinos, então o custo e a disponibilidade precisam entrar na decisão."
+      },
+      {
+        "question": "É mais barato viajar no verão ou no inverno?",
+        "answer": "Não existe uma regra única. O verão concentra férias escolares, Réveillon e Carnaval; o inverno encarece destinos de frio e as férias de julho. Para equilibrar preço, clima e disponibilidade, março a maio e setembro a novembro costumam oferecer mais flexibilidade — sempre conferindo o comportamento climático do destino escolhido."
+      },
+      {
+        "question": "Como escolher um destino quando posso viajar em qualquer estação?",
+        "answer": "Comece pelo que você quer sentir na viagem: praia, frio, trilha, água, cidade ou gastronomia. Depois cruze esse perfil com a época disponível, o orçamento e o tempo de deslocamento. A melhor escolha raramente é um ranking fixo; é a que combina clima, ritmo e logística com o seu momento."
       }
     ],
     "slug": "melhores-destinos-brasil-2026",
-    "readingTime": "6 min de leitura"
+    "readingTime": "9 min de leitura"
   },
   {
     "title": "Europa 2026: ETIAS, câmbio e custos reais",
