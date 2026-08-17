@@ -9,9 +9,14 @@ import { validateHubSpotSignature } from '../lib/hubspot-validation.js';
 import { getDeal, getAssociatedContactId, getContact } from '../services/hubspot.js';
 import { logger } from '../lib/logger.js';
 import { HubSpotWebhookPayloadSchema, type HubSpotWebhookEvent } from '../lib/schemas/hubspot-webhook.js';
+import { checkRateLimit } from '../lib/rate-limit.js';
+import { getClientIP } from '../lib/network.js';
 
-function buildJsonResponse(body: Record<string, unknown>, status: number): Response {
-  return new Response(JSON.stringify(body), { status });
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const RATE_LIMIT_MAX_REQUESTS = 30;
+
+function buildJsonResponse(body: Record<string, unknown>, status: number, headers: Record<string, string> = {}): Response {
+  return new Response(JSON.stringify(body), { status, headers });
 }
 
 function getWebhookConfig(): { webhookSecret: string; hubspotToken: string } | null {
@@ -155,6 +160,25 @@ export default async function handler(request: Request): Promise<Response> {
 
   if (!isValid) {
     return buildJsonResponse({ error: 'Invalid signature' }, 401);
+  }
+
+  // Rate limit after signature verification (not before) so an unauthenticated
+  // caller can't exhaust the shared rate-limit quota with forged requests; this
+  // still bounds the per-event downstream calls to HubSpot/Google/Meta below.
+  const clientIP = getClientIP(request);
+  const rateLimit = await checkRateLimit(clientIP, {
+    limit: RATE_LIMIT_MAX_REQUESTS,
+    windowMs: RATE_LIMIT_WINDOW_MS,
+    prefix: 'ratelimit:hubspot-webhook',
+  });
+
+  if (!rateLimit.allowed) {
+    logger.warn('HUBSPOT_WEBHOOK: rate limit exceeded', { clientIP });
+    return buildJsonResponse(
+      { error: 'Too many requests' },
+      429,
+      { 'Retry-After': String(Math.ceil(rateLimit.resetIn / 1000)) },
+    );
   }
 
   const events = await parseWebhookEvents(body);
