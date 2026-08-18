@@ -112,11 +112,15 @@ test('blog imagery should use the managed media origin', async () => {
 });
 
 test('orlando landing should not hotlink static images from partner websites', async () => {
-  const [orlandoHero, orlandoParksGallery] = await Promise.all([
+  const [orlandoHero, orlandoParksGallery, orlandoParksData] = await Promise.all([
     readRepoFile('components/landings/orlando/OrlandoHero.tsx'),
     readRepoFile('components/landings/orlando/OrlandoParksGallery.tsx'),
+    // Os dados dos parques (paths de imagem) vivem separados do componente
+    // desde a issue #1362, pra não misturar export de componente com dados
+    // no mesmo módulo (Fast Refresh do Vite trata isso como full reload).
+    readRepoFile('components/landings/orlando/orlandoParksData.ts'),
   ]);
-  const orlandoApp = orlandoHero + orlandoParksGallery;
+  const orlandoApp = orlandoHero + orlandoParksGallery + orlandoParksData;
 
   assertMissingHosts(
     orlandoApp,
@@ -141,7 +145,7 @@ test('orlando landing should not hotlink static images from partner websites', a
     'components/landings/orlando/',
   );
   assert.match(orlandoHero, /images\/orlando\/cards\/.+\.(jpg|jpeg|webp)/);
-  assert.match(orlandoParksGallery, /images\/orlando\/parks\/.+\.(jpg|jpeg|webp)/);
+  assert.match(orlandoParksData, /images\/orlando\/parks\/.+\.(jpg|jpeg|webp)/);
   // Os logotipos de Disney/Universal saíram da página na issue #1330 (implicação
   // de marca registrada sem autorização de uso) — nome do parque virou <h3> em
   // texto, sem imagem de logo nenhuma para exigir aqui.

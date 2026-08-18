@@ -15,6 +15,7 @@ Make behavior changes safe by choosing the smallest meaningful automated test fi
 
 - Add or update automated tests for every behavior change. If behavior changes and no automated test changes, explain why.
 - Put pure logic, validation, normalization, and provider-shaping tests in `tests/*.test.ts` using `node:test` and `assert/strict`.
+- For an isolated component's rendered DOM behavior (what shows up, what attribute a toggle sets) that doesn't need a full route composition or real browser accessibility semantics, use the third tier: `node:test` + happy-dom + `@testing-library/react` (`import './helpers/dom-setup.ts';` first, then `render()`/`fireEvent`, with `afterEach(cleanup)`). See `docs/standards/dom-testing-tier-decision.md` for the jsdom-vs-happy-dom rationale, measured CI-time impact, and what this tier does *not* replace (route composition already goes through `ssr.tsx` without any DOM in memory — `tests/parques-brasil-hub.test.ts` is the model; real accessibility-tree assertions still belong in Playwright). Don't reach for this tier as a default — most of the suite is pure logic and doesn't need a DOM at all.
 - Use Playwright for browser-visible flows when the change crosses the UI and network boundary or affects critical conversion paths.
 - Mock outbound provider calls and browser route traffic in tests. Do not hit live Gemini, HubSpot, Meta, or GA endpoints from automated tests.
 - Test observable behavior, public outputs, and response contracts. Do not anchor tests to internal implementation details unless there is no stable external seam.
@@ -57,6 +58,7 @@ Make behavior changes safe by choosing the smallest meaningful automated test fi
 - `tests/api-generate-normalization.test.ts` covers AI response shaping and safety guardrails at the server boundary.
 - `tests/e2e/chatbot-lead-submit.spec.ts` covers a full browser flow where chat output, lead submission, and WhatsApp handoff must stay aligned.
 - `tests/e2e/destructive.spec.ts` is a good model for security-sensitive browser regression coverage.
+- `tests/orlando-imagens.test.ts` is the model for the third tier: real component rendering via happy-dom + `@testing-library/react` instead of regex over a component's source text.
 
 ## Exceptions
 
