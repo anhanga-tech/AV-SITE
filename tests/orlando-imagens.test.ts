@@ -7,7 +7,8 @@ import { readFile } from 'node:fs/promises';
 import { render, cleanup, fireEvent } from '@testing-library/react';
 
 import { selectImagePreset } from '../lib/media-url.ts';
-import { ALL_PARK_NAMES, OrlandoParksGallery } from '../components/landings/orlando/OrlandoParksGallery.tsx';
+import { OrlandoParksGallery } from '../components/landings/orlando/OrlandoParksGallery.tsx';
+import { ALL_PARK_NAMES } from '../components/landings/orlando/orlandoParksData.ts';
 
 /*
   Guards da issue #1326 — dimensionamento das imagens da /orlando.
