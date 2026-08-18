@@ -15,6 +15,11 @@ import AIResearchBar from '../components/AIResearchBar.tsx';
   ver docs/standards/dom-testing-tier-decision.md) e disparam `click` em
   cada link, que é o mesmo evento que o navegador despacha tanto para clique
   de mouse quanto para ativação por teclado (Enter) num <a>.
+
+  O último teste cobre a reutilização de `currentPageLocation()`
+  (utils/formAnalytics.ts) para redigir e-mail/telefone/nome que estejam na
+  própria query string da home — a home é acessível com esses parâmetros,
+  e `page_location` não pode vazar PII para o GA4.
 */
 
 type DataLayerEvent = Record<string, unknown>;
@@ -65,4 +70,22 @@ test('o payload identifica placement=hero e page_location, sem prompt nem query 
   assert.doesNotMatch(serialized, /Anhang[aá] Viagens\?/);
   assert.doesNotMatch(serialized, /planejar uma viagem/i);
   assert.doesNotMatch(serialized, /[?&]q=/);
+});
+
+test('redige e-mail/telefone/nome presentes na query da página atual em page_location', () => {
+  const originalHref = window.location.href;
+  window.location.href = 'https://www.anhanga.tur.br/?email=ana@example.com&utm_source=ig';
+
+  try {
+    const { getByRole } = render(React.createElement(AIResearchBar));
+    fireEvent.click(getByRole('link', { name: /gemini/i }));
+
+    const [event] = (window.dataLayer as DataLayerEvent[]).filter(
+      (e) => e.event === 'ai_research_click',
+    );
+
+    assert.equal(event.page_location, 'https://www.anhanga.tur.br/?email=redacted&utm_source=ig');
+  } finally {
+    window.location.href = originalHref;
+  }
 });

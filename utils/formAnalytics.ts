@@ -42,7 +42,8 @@ const SENSITIVE_QUERY_KEYS = /(?:email|mail|phone|telefone|whatsapp|name|nome|so
 const EMAIL_PATTERN = /[^\s@]+@[^\s@]+\.[^\s@]+/;
 const PHONE_PATTERN = /\+?\d[\d\s().-]{7,}\d/;
 
-function currentPageLocation(): string | undefined {
+/** Página atual com chaves de query sensíveis (e-mail/telefone/nome) redigidas antes de ir pro dataLayer. */
+export function currentPageLocation(): string | undefined {
   if (typeof window === 'undefined') return undefined;
 
   try {
