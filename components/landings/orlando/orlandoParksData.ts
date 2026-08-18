@@ -1,7 +1,9 @@
 /*
   Dados dos parques da galeria /orlando, separados do componente
-  (OrlandoParksGallery.tsx) para não violar a regra `only-export-components`
-  do Fast Refresh — um arquivo de componente só pode exportar componentes.
+  (OrlandoParksGallery.tsx) para não misturar export de componente com dados
+  no mesmo módulo — o Fast Refresh do Vite trata isso como full reload
+  daquele módulo (react-doctor sinaliza isso como `only-export-components`,
+  mas não é uma regra de ESLint configurada neste repo).
 */
 
 export interface ParkCardData {

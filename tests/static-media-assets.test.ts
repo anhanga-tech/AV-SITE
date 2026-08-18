@@ -116,8 +116,8 @@ test('orlando landing should not hotlink static images from partner websites', a
     readRepoFile('components/landings/orlando/OrlandoHero.tsx'),
     readRepoFile('components/landings/orlando/OrlandoParksGallery.tsx'),
     // Os dados dos parques (paths de imagem) vivem separados do componente
-    // desde a issue #1362 — só arquivo de componente pode exportar
-    // componentes (regra `only-export-components` do Fast Refresh).
+    // desde a issue #1362, pra não misturar export de componente com dados
+    // no mesmo módulo (Fast Refresh do Vite trata isso como full reload).
     readRepoFile('components/landings/orlando/orlandoParksData.ts'),
   ]);
   const orlandoApp = orlandoHero + orlandoParksGallery + orlandoParksData;
