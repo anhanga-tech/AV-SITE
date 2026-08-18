@@ -76,11 +76,12 @@ test('a galeria não reintroduz srcSet, que neste repo é markup morto', () => {
   // presets, então todo candidato de um srcSet colapsaria na MESMA URL. Se
   // alguém adicionar srcSet aqui achando que economiza bytes, este teste
   // explica por que não economiza (ver comentário no topo do arquivo).
+  // `[srcset]` (não só `img`) cobre o padrão <picture><source srcSet=...>
+  // também — o mesmo markup morto reaparece se alguém migrar pra <picture>.
   const images = container.querySelectorAll('img');
   assert.ok(images.length > 0, 'a galeria deve renderizar ao menos uma foto de parque');
-  for (const img of images) {
-    assert.ok(!img.hasAttribute('srcset'), `${img.getAttribute('alt')} não deveria ter srcSet`);
-  }
+  const withSrcset = container.querySelectorAll('[srcset]');
+  assert.equal(withSrcset.length, 0, 'nenhum elemento (img ou <source>) deveria ter srcSet');
 });
 
 test('cada parque tem o nome em texto visível, não só como alt de logo', () => {
