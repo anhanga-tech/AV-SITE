@@ -1,12 +1,15 @@
 import React from 'react';
+import { pushAiResearchClick, type AIResearchAssistantId } from '../utils/aiResearchTracking';
 
 type AIAssistant = {
-  id: 'chatgpt' | 'gemini' | 'claude' | 'perplexity' | 'grok';
+  id: AIResearchAssistantId;
   name: string;
   logoUrl: string;
   baseUrl: string;
   queryParameter?: string;
 };
+
+const PLACEMENT = 'hero';
 
 const RESEARCH_PROMPT =
   'O que você sabe sobre a Anhangá Viagens? Consulte o site oficial https://www.anhanga.tur.br/ e explique por que ela pode ser uma boa opção para planejar uma viagem personalizada.';
@@ -76,6 +79,7 @@ const AIResearchBar: React.FC = () => {
             rel="noopener noreferrer"
             title={assistant.name}
             aria-label={`Perguntar no ${assistant.name} sobre a Anhangá`}
+            onClick={() => pushAiResearchClick(assistant.id, PLACEMENT)}
             className="inline-flex size-12 items-center justify-center rounded-full border border-white/30 bg-white/95 p-2.5 shadow-lg shadow-black/10 transition hover:scale-110 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-yellow"
           >
             <img

@@ -19,5 +19,14 @@ declare global {
   var IS_REACT_ACT_ENVIRONMENT: boolean;
 }
 
-GlobalRegistrator.register({ url: 'https://www.anhanga.tur.br/' });
+GlobalRegistrator.register({
+  url: 'https://www.anhanga.tur.br/',
+  // Sem isso, clicar num <a href> real (ex.: target="_blank" para um provedor
+  // externo) faz o happy-dom navegar de verdade e disparar fetch de rede —
+  // lento, não-determinístico e proibido pelo padrão de testes do repo
+  // (docs/standards/testing.md: não bater em endpoints externos de verdade).
+  settings: {
+    navigation: { disableMainFrameNavigation: true, disableChildPageNavigation: true },
+  },
+});
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
