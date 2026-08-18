@@ -70,7 +70,19 @@ export function OrlandoHero() {
       });
     };
 
-    const handleMouseMove = (e: MouseEvent) => {
+    // mousemove fires far more often than the screen refreshes (some mice/
+    // trackpads poll well above 60Hz), so applying the DOM read (:hover
+    // matching forces a style recalc) and writes synchronously on every
+    // event causes redundant work and can jank the main thread. Batch to
+    // at most one update per animation frame, same pattern as useScrolled.
+    let ticking = false;
+    let pendingEvent: MouseEvent | null = null;
+
+    const applyParallax = () => {
+      ticking = false;
+      const e = pendingEvent;
+      if (!e) return;
+
       // O reset global de motion (src/index.css) zera animation-duration e
       // transition-duration com !important, mas não alcança um transform
       // inline aplicado por JS: o movimento acontecia mesmo com a preferência
@@ -94,6 +106,14 @@ export function OrlandoHero() {
           card.style.transform = `translate(${x * speed}px, ${y * speed}px) rotate(${rotation}deg)`;
         }
       });
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      pendingEvent = e;
+      if (!ticking) {
+        ticking = true;
+        window.requestAnimationFrame(applyParallax);
+      }
     };
 
     window.addEventListener("mousemove", handleMouseMove);
