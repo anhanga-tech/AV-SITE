@@ -294,3 +294,47 @@ test('hubspot-webhook should send purchase conversion to Meta and derive fbc fro
   );
   assert.ok(!warns.some(message => message.includes('Conversion tracking incomplete')));
 });
+
+test('hubspot-webhook should rate limit repeated requests from the same client', async (t) => {
+  const clientIp = `203.0.113.${Math.floor(Math.random() * 200) + 1}`;
+
+  t.after(() => {
+    global.fetch = originalFetch;
+    console.warn = originalConsoleWarn;
+    restoreEnv();
+  });
+
+  const secret = 'test-secret';
+  process.env.HUBSPOT_WEBHOOK_SECRET = secret;
+  process.env.HUBSPOT_TOKEN = 'test-token';
+  delete process.env.UPSTASH_REDIS_REST_URL;
+  delete process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  console.warn = (() => {}) as typeof console.warn;
+  global.fetch = (async () => new Response(JSON.stringify({}), { status: 200 })) as typeof fetch;
+
+  const body = JSON.stringify([]);
+
+  let response: Response | undefined;
+  for (let index = 0; index < 31; index += 1) {
+    const timestamp = Date.now().toString();
+    const signature = await signRequest(body, timestamp, secret);
+    response = await handler(new Request('http://localhost/api/hubspot-webhook', {
+      method: 'POST',
+      headers: {
+        'X-HubSpot-Signature-v3': signature,
+        'X-HubSpot-Request-Timestamp': timestamp,
+        'Content-Type': 'application/json',
+        'x-real-ip': clientIp,
+      },
+      body,
+    }));
+  }
+
+  assert.ok(response);
+  assert.equal(response!.status, 429);
+
+  const data = await response!.json() as Record<string, unknown>;
+  assert.equal(data.error, 'Too many requests');
+  assert.ok(response!.headers.get('Retry-After'));
+});
