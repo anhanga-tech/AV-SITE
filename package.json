@@ -75,7 +75,6 @@
     "gh-pages": "^6.3.0",
     "globals": "^17.9.0",
     "gray-matter": "^4.0.3",
-    "happy-dom": "^20.11.2",
     "react-doctor": "^0.9.11",
     "rollup-plugin-visualizer": "^7.0.1",
     "semantic-release": "25.0.9",
