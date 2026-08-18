@@ -4,7 +4,7 @@ import React from 'react';
 import test, { afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { render, cleanup } from '@testing-library/react';
+import { render, cleanup, fireEvent } from '@testing-library/react';
 
 import { selectImagePreset } from '../lib/media-url.ts';
 import { OrlandoParksGallery } from '../components/landings/orlando/OrlandoParksGallery.tsx';
@@ -83,12 +83,23 @@ test('a galeria não reintroduz srcSet, que neste repo é markup morto', () => {
 });
 
 test('cada parque tem o nome em texto visível, não só como alt de logo', () => {
-  const { container } = render(React.createElement(OrlandoParksGallery));
+  const { container, getByRole } = render(React.createElement(OrlandoParksGallery));
 
-  const headingNames = Array.from(container.querySelectorAll('h3')).map((el) => el.textContent);
-  assert.ok(
-    headingNames.includes('Magic Kingdom'),
-    'o nome do parque precisa aparecer como <h3> visível — issue #1330',
-  );
-  assert.ok(headingNames.length > 0, 'a galeria deve ter ao menos um <h3> de parque');
+  // abre "ver todos" pra expor também os cards recolhidos por padrão — sem
+  // isso só os 4 destaques (FEATURED_PARKS) entram na checagem.
+  fireEvent.click(getByRole('button', { name: /ver todos os \d+ parques/i }));
+
+  const cards = container.querySelectorAll('.park-card');
+  assert.ok(cards.length > 1, 'a galeria deve renderizar múltiplos parques');
+
+  // Checar TODO card, não um nome específico: a regressão real é o
+  // <h3>{name}</h3> do template de ParkCard virar `alt` de imagem para
+  // qualquer parque, não só para o primeiro — issue #1330.
+  for (const card of cards) {
+    const heading = card.querySelector('h3');
+    assert.ok(
+      heading?.textContent?.trim(),
+      'todo park-card precisa de um <h3> com o nome do parque visível — issue #1330',
+    );
+  }
 });
