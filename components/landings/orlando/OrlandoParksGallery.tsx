@@ -171,6 +171,14 @@ const TOTAL_PARKS_COUNT =
   FEATURED_PARKS.length +
   OTHER_PARK_GROUPS.reduce((total, group) => total + group.parks.length, 0);
 
+// Exportado só para teste (tests/orlando-imagens.test.ts): fonte única dos
+// nomes esperados, pra não duplicar a lista de parques no teste e deixá-la
+// dessincronizar quando um parque for adicionado/removido/renomeado aqui.
+export const ALL_PARK_NAMES: string[] = [
+  ...FEATURED_PARKS.map((park) => park.name),
+  ...OTHER_PARK_GROUPS.flatMap((group) => group.parks.map((park) => park.name)),
+];
+
 export function OrlandoParksGallery() {
   const [showAll, setShowAll] = useState(false);
   const instanceId = useId();

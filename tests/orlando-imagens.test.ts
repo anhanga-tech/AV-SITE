@@ -7,7 +7,7 @@ import { readFile } from 'node:fs/promises';
 import { render, cleanup, fireEvent } from '@testing-library/react';
 
 import { selectImagePreset } from '../lib/media-url.ts';
-import { OrlandoParksGallery } from '../components/landings/orlando/OrlandoParksGallery.tsx';
+import { ALL_PARK_NAMES, OrlandoParksGallery } from '../components/landings/orlando/OrlandoParksGallery.tsx';
 
 /*
   Guards da issue #1326 — dimensionamento das imagens da /orlando.
@@ -92,14 +92,15 @@ test('cada parque tem o nome em texto visível, não só como alt de logo', () =
   const cards = container.querySelectorAll('.park-card');
   assert.ok(cards.length > 1, 'a galeria deve renderizar múltiplos parques');
 
-  // Checar TODO card, não um nome específico: a regressão real é o
-  // <h3>{name}</h3> do template de ParkCard virar `alt` de imagem para
-  // qualquer parque, não só para o primeiro — issue #1330.
-  for (const card of cards) {
-    const heading = card.querySelector('h3');
-    assert.ok(
-      heading?.textContent?.trim(),
-      'todo park-card precisa de um <h3> com o nome do parque visível — issue #1330',
-    );
-  }
+  // Checar TODO card contra o nome real, não só presença de texto: um <h3>
+  // genérico ("Conheça o parque") passaria num check de "não vazio" mas
+  // ainda seria a regressão da issue #1330 (nome só como alt de imagem).
+  // ALL_PARK_NAMES vem do próprio componente — nenhuma lista duplicada aqui
+  // para dessincronizar quando um parque for adicionado/renomeado.
+  const headingNames = Array.from(cards).map((card) => card.querySelector('h3')?.textContent?.trim());
+  assert.deepEqual(
+    [...headingNames].sort(),
+    [...ALL_PARK_NAMES].sort(),
+    'cada park-card precisa exibir o nome real do parque em <h3> — issue #1330',
+  );
 });
