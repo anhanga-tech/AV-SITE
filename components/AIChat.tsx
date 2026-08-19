@@ -185,6 +185,8 @@ const AIChat: React.FC = memo(() => {
                     focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-vibrant/30
                     ${isOrlandoPage ? 'orlando-chat-glow' : ''}`}
         aria-label="Abrir assistente virtual"
+        aria-hidden={isOpen}
+        tabIndex={isOpen ? -1 : 0}
       >
         <div className="relative flex items-center justify-center">
           <ChatCircleDots className="size-7" weight="fill" />

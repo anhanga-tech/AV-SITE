@@ -32,6 +32,8 @@ const BackToTop: React.FC = memo(() => {
       type="button"
       onClick={scrollToTop}
       aria-label="Voltar ao topo"
+      aria-hidden={!isVisible}
+      tabIndex={isVisible ? 0 : -1}
       className={`
         fixed bottom-[calc(6rem+var(--cookie-banner-h,0px))] right-4 sm:bottom-[calc(8rem+var(--cookie-banner-h,0px))] sm:right-8 z-[9980]
         p-3 rounded-2xl bg-white text-anhanga-action border-2 border-anhanga-action/20

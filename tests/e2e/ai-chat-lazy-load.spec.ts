@@ -74,6 +74,15 @@ test.describe('AI chat lazy loading', () => {
     await expect(aiChat.openBtn).toBeFocused();
   });
 
+  test('removes the trigger button from the tab order while the chat is open', async ({ page }) => {
+    await page.goto('/');
+    const aiChat = new AIChat(page);
+    await aiChat.open();
+
+    await expect(aiChat.openBtn).toHaveAttribute('aria-hidden', 'true');
+    await expect(aiChat.openBtn).toHaveAttribute('tabindex', '-1');
+  });
+
   test('recovers after a chunk-load failure once the retry succeeds', async ({ page }) => {
     let firstAttempt = true;
     await page.route(PANEL_MODULE_PATTERN, async (route) => {
