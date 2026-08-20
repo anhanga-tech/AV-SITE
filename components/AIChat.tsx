@@ -174,7 +174,16 @@ const AIChat: React.FC = memo(() => {
       {/* Floating Toggle Button */}
       <button
         type="button"
-        onClick={() => openChatDrawer()}
+        onClick={(event) => {
+          openChatDrawer();
+          // Move focus off the trigger before the re-render makes it aria-hidden —
+          // otherwise it stays document.activeElement while excluded from the
+          // accessibility tree, an invalid ARIA state, until AIChatPanel finishes
+          // loading and takes focus itself. openChatDrawer() already captured this
+          // button into triggerRef above, so blurring here doesn't affect focus
+          // restoration on close.
+          event.currentTarget.blur();
+        }}
         className={`fixed ${isOpen ? 'translate-y-32 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
                     bottom-[calc(1rem+var(--cookie-banner-h,0px))] right-4 sm:bottom-[calc(1.5rem+var(--cookie-banner-h,0px))] sm:right-6 z-[9990]
                     flex items-center justify-center gap-3

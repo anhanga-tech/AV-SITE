@@ -3,7 +3,7 @@ import './helpers/dom-setup.ts';
 import React from 'react';
 import test, { afterEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { render, cleanup, act } from '@testing-library/react';
+import { render, cleanup, act, fireEvent } from '@testing-library/react';
 
 import BackToTop from '../components/ui/BackToTop.tsx';
 
@@ -42,4 +42,25 @@ test('re-enters the tab order once scrolling makes it visible', async () => {
   assert.ok(button);
   assert.equal(button.getAttribute('aria-hidden'), 'false');
   assert.equal(button.getAttribute('tabindex'), '0');
+});
+
+test('moves focus off the button on click, before it can become aria-hidden mid-scroll', async () => {
+  const { container } = render(React.createElement(BackToTop));
+
+  Object.defineProperty(window, 'scrollY', { value: 500, configurable: true });
+  await act(async () => {
+    window.dispatchEvent(new Event('scroll'));
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+  });
+
+  const button = container.querySelector('button[aria-label="Voltar ao topo"]');
+  assert.ok(button instanceof HTMLElement);
+  button.focus();
+  assert.equal(document.activeElement, button);
+
+  fireEvent.click(button);
+
+  // aria-hidden must never be applied while the element is still focused (invalid
+  // ARIA state) — proves the click handler moves focus away before that can happen.
+  assert.notEqual(document.activeElement, button);
 });
