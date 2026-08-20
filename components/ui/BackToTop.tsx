@@ -15,7 +15,12 @@ import { useScrolled } from '../Header/useScrolled';
 const BackToTop: React.FC = memo(() => {
   const isVisible = useScrolled(400);
 
-  const scrollToTop = useCallback(() => {
+  const scrollToTop = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    // Move focus off the button before the scroll crosses the visibility threshold —
+    // otherwise it becomes aria-hidden while still document.activeElement, which is
+    // an invalid ARIA state (aria-hidden is disallowed on a focused element).
+    event.currentTarget.blur();
+
     window.scrollTo({
       top: 0,
       behavior: 'smooth',
@@ -32,6 +37,8 @@ const BackToTop: React.FC = memo(() => {
       type="button"
       onClick={scrollToTop}
       aria-label="Voltar ao topo"
+      aria-hidden={!isVisible}
+      tabIndex={isVisible ? 0 : -1}
       className={`
         fixed bottom-[calc(6rem+var(--cookie-banner-h,0px))] right-4 sm:bottom-[calc(8rem+var(--cookie-banner-h,0px))] sm:right-8 z-[9980]
         p-3 rounded-2xl bg-white text-anhanga-action border-2 border-anhanga-action/20

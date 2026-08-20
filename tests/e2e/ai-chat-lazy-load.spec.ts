@@ -74,6 +74,33 @@ test.describe('AI chat lazy loading', () => {
     await expect(aiChat.openBtn).toBeFocused();
   });
 
+  test('removes the trigger button from the tab order while the chat is open', async ({ page }) => {
+    await page.goto('/');
+    const aiChat = new AIChat(page);
+    await aiChat.open();
+
+    await expect(aiChat.openBtn).toHaveAttribute('aria-hidden', 'true');
+    await expect(aiChat.openBtn).toHaveAttribute('tabindex', '-1');
+  });
+
+  test('moves focus off the trigger immediately on activation, before the panel finishes loading', async ({ page }) => {
+    // aria-hidden must never land on the currently focused element (invalid ARIA
+    // state) — the trigger applies aria-hidden as soon as isOpen flips, well before
+    // AIChatPanel's lazy chunk resolves and the dialog takes focus itself.
+    await page.route(/AIChatPanel/, async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      await route.continue();
+    });
+
+    await page.goto('/');
+    const aiChat = new AIChat(page);
+
+    await aiChat.openBtn.focus();
+    await page.keyboard.press('Enter');
+
+    await expect(aiChat.openBtn).not.toBeFocused();
+  });
+
   test('recovers after a chunk-load failure once the retry succeeds', async ({ page }) => {
     let firstAttempt = true;
     await page.route(PANEL_MODULE_PATTERN, async (route) => {
