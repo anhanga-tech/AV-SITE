@@ -1,17 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { WhatsappLogo, Compass, Globe, ShieldCheck, SimCard, type Icon } from '@phosphor-icons/react';
 import { getWhatsAppLink } from '../../utils/whatsapp';
 import { withTrackingParams, pushLinksPageClick } from '../../utils/linksTracking';
 import type { LinkItem } from '../../data/linksPage';
-
-const ICON_MAP: Record<string, Icon> = {
-    WhatsappLogo,
-    Compass,
-    Globe,
-    ShieldCheck,
-    SimCard,
-};
+import { ICON_MAP } from './linkIcons';
 
 interface LinkButtonProps {
     item: LinkItem;
