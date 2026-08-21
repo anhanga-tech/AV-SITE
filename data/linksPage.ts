@@ -33,6 +33,11 @@ export interface LinksPageConfig {
 }
 
 // ⚙️ EDITÁVEL: troque banner e links aqui sem mexer em componente.
+//
+// Sobre `whatsappMessage`: as mensagens terminam num rótulo com dois-pontos para que a pessoa
+// complete o que falta ainda no campo de digitação — é o que chega ao atendimento já qualificado,
+// em vez de um "oi" seco. Não termine com espaço à direita: `buildWhatsAppLink` aplica `.trim()`
+// na mensagem, então o espaço não sobrevive até o WhatsApp.
 export const linksPageConfig: LinksPageConfig = {
     banner: {
         // Desligado: o quiz já aparece como link "Planejar minha viagem" abaixo, então o banner
@@ -45,7 +50,11 @@ export const linksPageConfig: LinksPageConfig = {
         href: '/quiz',
     },
     links: [
-        { id: 'whatsapp', label: 'Falar no WhatsApp', sublabel: 'Atendimento humano e rápido', type: 'whatsapp', whatsappMessage: 'Olá! Vim pelo Instagram e gostaria de falar com a Anhangá Viagens.', icon: 'WhatsappLogo', visible: true, highlight: true },
+        { id: 'whatsapp', label: 'Falar no WhatsApp', sublabel: 'Atendimento humano e rápido', type: 'whatsapp', whatsappMessage: 'Olá! Vim pelo Instagram e quero planejar uma viagem. Meu destino:', icon: 'WhatsappLogo', visible: true, highlight: true },
+    // Par com o quiz logo abaixo: o quiz atende quem ainda está explorando (ToFu — vira só
+    // `res.partner`), este atende quem já decidiu. Por isso a mensagem é estruturada aqui e
+    // conversacional no botão amarelo: quem clica aqui se declarou pronto a passar os dados.
+    { id: 'orcamento', label: 'Quero um orçamento', sublabel: 'Já tenho destino e datas', type: 'whatsapp', whatsappMessage: 'Olá! Vim pelo Instagram e quero um orçamento.\n\nDestino:\nDatas:\nPessoas:', icon: 'CalendarCheck', visible: true },
         { id: 'quiz', label: 'Planejar minha viagem', sublabel: 'Quiz de perfil de viagem', type: 'internal', href: '/quiz', icon: 'Compass', visible: true },
         { id: 'site', label: 'Site oficial', type: 'internal', href: '/', icon: 'Globe', visible: true },
         { id: 'seguro-viagem', label: 'Seguro viagem', sublabel: 'Cotação com nosso parceiro', type: 'external', href: 'https://go.nuvembr.com/anhanga_seguroviagem', icon: 'ShieldCheck', visible: true },

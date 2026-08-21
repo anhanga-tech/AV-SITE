@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { linksPageConfig, type LinkItem } from '../data/linksPage.ts';
+import { isSupportedIcon } from '../components/links/LinkButton.tsx';
 
 test('ids dos links são únicos', () => {
     const ids = linksPageConfig.links.map((l) => l.id);
@@ -38,5 +39,20 @@ test('todo link tem label e visible booleano', () => {
     for (const link of linksPageConfig.links as LinkItem[]) {
         assert.ok(link.label.trim().length > 0, `${link.id} sem label`);
         assert.equal(typeof link.visible, 'boolean');
+    }
+});
+
+test('mensagens de whatsapp não terminam em espaço', () => {
+    // `buildWhatsAppLink` aplica `.trim()`, então um espaço à direita some antes de chegar ao
+    // WhatsApp. Escrever a mensagem contando com ele daria "Meu destino:Noronha" na prática.
+    for (const link of linksPageConfig.links.filter((l) => l.type === 'whatsapp')) {
+        const message = link.whatsappMessage ?? '';
+        assert.equal(message, message.trimEnd(), `${link.id} tem espaço à direita`);
+    }
+});
+
+test('todo icon declarado existe no ICON_MAP do LinkButton', () => {
+    for (const link of linksPageConfig.links.filter((l) => l.icon)) {
+        assert.ok(isSupportedIcon(link.icon as string), `${link.id} usa icon inexistente: ${link.icon}`);
     }
 });
