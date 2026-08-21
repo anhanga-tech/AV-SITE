@@ -1,24 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { WhatsappLogo, Compass, Globe, ShieldCheck, SimCard, CalendarCheck, type Icon } from '@phosphor-icons/react';
 import { getWhatsAppLink } from '../../utils/whatsapp';
 import { withTrackingParams, pushLinksPageClick } from '../../utils/linksTracking';
 import type { LinkItem } from '../../data/linksPage';
-
-const ICON_MAP: Record<string, Icon> = {
-    WhatsappLogo,
-    Compass,
-    Globe,
-    ShieldCheck,
-    SimCard,
-    CalendarCheck,
-};
-
-// Um `icon` fora do mapa falha em silêncio: o botão perde o ícone e, com ele, o tier pesado que
-// `isPrimaryLink` concede. Exportado para que os dados sejam validados em teste, não em produção.
-export function isSupportedIcon(name: string): boolean {
-    return Object.hasOwn(ICON_MAP, name);
-}
+import { ICON_MAP } from './linkIcons';
 
 interface LinkButtonProps {
     item: LinkItem;
