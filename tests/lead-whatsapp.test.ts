@@ -75,7 +75,7 @@ function createSessionStorage(): MockSessionStorage {
     };
 }
 
-test('buildLeadWhatsAppUrl should include origin, destination, dates, baggage and tracking ref', () => {
+test('buildLeadWhatsAppUrl should include lead details but never the tracking identifiers', () => {
     const mockWindow: MockWindow = {
         location: {
             search: '?utm_source=google&utm_medium=cpc&gclid=test-gclid',
@@ -121,9 +121,12 @@ test('buildLeadWhatsAppUrl should include origin, destination, dates, baggage an
     assert.match(message, /Destino: Orlando, Flórida/);
     assert.match(message, /Datas: Julho de 2026/);
     assert.match(message, /Bagagem: 1 mala despachada/);
-    assert.match(message, /Dados: .*utm_source=google/);
-    assert.match(message, /Dados: .*utm_medium=cpc/);
-    assert.match(message, /Dados: .*gclid=test-gclid/);
+
+    // O tracking capturado nesta fixture (utm_source=google, gclid=test-gclid) segue para o
+    // Odoo via /api/submit-lead; ele não pode aparecer na mensagem, que a pessoa envia pelo
+    // WhatsApp. Ver docs/compliance/ripd-legitimo-interesse.md §3.1 "Limite de propagação".
+    assert.doesNotMatch(message, /Dados:/);
+    assert.doesNotMatch(message, /utm_source|utm_medium|gclid/);
 
     restoreBrowserGlobals();
 });
