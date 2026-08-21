@@ -57,7 +57,6 @@ export function WhatsAppUpgrade({ profileName, mainDestName, firstName, baseWaUr
     const waUrl = isValid && submitted
         ? getWhatsAppLink(
             `Oi! Sou ${firstName}. Descobri no Quiz da Anhangá que meu perfil é ${profileName} e meu próximo destino pode ser ${mainDestName}. Bora planejar essa viagem?`,
-            { appendTrackingRef: true },
           )
         : baseWaUrl;
 

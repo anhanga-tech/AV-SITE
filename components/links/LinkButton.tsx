@@ -67,7 +67,7 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ item, className: extraCl
     );
 
     if (item.type === 'whatsapp') {
-        const href = getWhatsAppLink(item.whatsappMessage ?? '', { appendTrackingRef: true });
+        const href = getWhatsAppLink(item.whatsappMessage ?? '');
         return (
             <a href={href} target="_blank" rel="noopener noreferrer" className={className}
                data-testid={`link-${item.id}`} onClick={() => pushLinksPageClick(item, href)}>

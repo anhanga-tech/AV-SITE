@@ -156,7 +156,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
             const whatsappMessage =
                 options.message
                 ?? `Olá! Meu nome é ${validation.normalized.firstName}. Gostaria de saber mais sobre viagens.`;
-            const whatsappUrl = getWhatsAppLink(whatsappMessage, { appendTrackingRef: true });
+            const whatsappUrl = getWhatsAppLink(whatsappMessage);
 
             if (action === 'whatsapp') {
                 pushFormAnalyticsEvent({

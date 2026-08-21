@@ -260,7 +260,7 @@ export default function QuizAnhangaLanding() {
 
         const firstName = form.nome.trim().split(/\s+/)[0] || 'Viajante';
         const waMsg = `Oi! Sou ${firstName}. Descobri no Quiz da Anhangá que meu perfil é ${profile.name} e meu próximo destino pode ser ${mainDest.name}. Bora planejar essa viagem?`;
-        const waUrl = getWhatsAppLink(waMsg, { appendTrackingRef: true });
+        const waUrl = getWhatsAppLink(waMsg);
 
         dispatch({ type: 'SUBMIT_RESULT', leadForm: form, profileKey: pKey, baseWaUrl: waUrl });
         go({ kind: 'result' });

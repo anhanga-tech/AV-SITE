@@ -108,7 +108,7 @@ test('useWhatsAppLink does not capture tracking during render', () => {
         dataLayer.length = 0;
 
         const Harness: React.FC = () => {
-            useWhatsAppLink('Mensagem', { appendTrackingRef: true });
+            useWhatsAppLink('Mensagem');
             return null;
         };
 

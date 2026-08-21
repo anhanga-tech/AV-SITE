@@ -7,7 +7,7 @@
  * in memory + sessionStorage + cookie to ensure data is available after URL changes.
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 const TRACKING_PARAMS = [
     'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
@@ -21,10 +21,6 @@ const STORAGE_KEY = 'anhanga_tracking_data';
 const WHATSAPP_NUMBER = '5511955021519';
 // Cookie name for GA4 session (dynamic based on measurement ID suffix)
 const GA4_SESSION_COOKIE = '_ga_QDBT5PM4KP';
-
-export interface WhatsAppLinkOptions {
-    appendTrackingRef?: boolean;
-}
 
 export type TrackingData = Record<string, string>;
 
@@ -270,63 +266,30 @@ export const getTrackingDataObject = (): TrackingData | null => {
     return null;
 };
 
-const getTrackingRef = (): string | null => {
-    const tracking = getTrackingDataObject();
-    if (!tracking) return null;
-
-    const serialized = serializeTrackingData(tracking);
-    return serialized.length > 0 ? serialized : null;
-};
-
-const getCachedTrackingRef = (): string | null => {
-    if (!cachedTrackingObject) return null;
-
-    const serialized = serializeTrackingData(cachedTrackingObject);
-    return serialized.length > 0 ? serialized : null;
-};
-
-const buildWhatsAppLink = (message: string, ref: string | null): string => {
-    let finalMessage = message;
-    finalMessage = finalMessage.split(' || Dados:')[0].split(' [ref:')[0].trim();
-
-    if (ref) {
-        finalMessage += ` || Dados: ${ref}`;
-    }
+// Identifiers (cid/sid/gclid/fbclid) must never ride in the message body: the user would
+// send them as WhatsApp content, putting them under Meta's retention instead of the 30-day
+// window declared in docs/compliance/ripd-legitimo-interesse.md. The form handlers already
+// deliver the same tracking to Odoo via /api/submit-*. The suffix stripping stays as a guard
+// for messages persisted before this change.
+const buildWhatsAppLink = (message: string): string => {
+    const finalMessage = message.split(' || Dados:')[0].split(' [ref:')[0].trim();
 
     return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(finalMessage)}`;
 };
 
-export const getWhatsAppLink = (message: string, options: WhatsAppLinkOptions = {}): string => {
-    const { appendTrackingRef = false } = options;
-    const ref = appendTrackingRef ? getTrackingRef() : null;
-    return buildWhatsAppLink(message, ref);
-};
+export const getWhatsAppLink = (message: string): string => buildWhatsAppLink(message);
 
-export const useWhatsAppLink = (message: string, options: WhatsAppLinkOptions = {}): string => {
-    const { appendTrackingRef } = options;
-    // GA4 client/session cookies are often set slightly after mount, so we re-capture
-    // tracking ~1s later and bump this version to force a recompute of the link. The
-    // URL itself is derived (not effect-synced state), so it also stays current when
-    // `message`/`appendTrackingRef` change across renders.
-    const [trackingVersion, setTrackingVersion] = useState(0);
-
+export const useWhatsAppLink = (message: string): string => {
+    // GA4 sets its client/session cookies slightly after gtag boots, so re-capture ~1s after
+    // mount. The link no longer depends on tracking, but this keeps the cookie/sessionStorage
+    // snapshot fresh for the form submissions that carry it to Odoo.
     useEffect(() => {
-        // Fire exactly once ~1s after mount: the timer only re-captures GA cookies and
-        // bumps the version — it reads neither `message` nor `appendTrackingRef`, so an
-        // empty dep array is correct and avoids restarting the timer on prop changes.
         const timer = setTimeout(() => {
             captureTrackingDataObject();
-            setTrackingVersion((v) => v + 1);
         }, 1000);
 
         return () => clearTimeout(timer);
     }, []);
 
-    return useMemo(
-        // Render only formats the latest cached snapshot. Tracking capture and its
-        // cookie/sessionStorage/dataLayer side effects stay outside render.
-        () => buildWhatsAppLink(message, appendTrackingRef ? getCachedTrackingRef() : null),
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- trackingVersion is a deliberate recompute trigger, not read inside the callback
-        [message, appendTrackingRef, trackingVersion],
-    );
+    return useMemo(() => buildWhatsAppLink(message), [message]);
 };

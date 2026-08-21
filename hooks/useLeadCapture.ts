@@ -126,7 +126,7 @@ export function buildLeadWhatsAppMessage(lead: LeadDraft): string {
 }
 
 export function buildLeadWhatsAppUrl(lead: LeadDraft): string {
-    return getWhatsAppLink(buildLeadWhatsAppMessage(lead), { appendTrackingRef: true });
+    return getWhatsAppLink(buildLeadWhatsAppMessage(lead));
 }
 
 function resolveSubmitLeadEndpoint(): string {
