@@ -4,7 +4,7 @@ import { CorpContactInfo } from './CorpContactInfo';
 import { CorpContactForm } from './CorpContactForm';
 
 export function CorpContactSection() {
-    const whatsappUrl = useWhatsAppLink(WHATSAPP_MESSAGE, { appendTrackingRef: true });
+    const whatsappUrl = useWhatsAppLink(WHATSAPP_MESSAGE);
 
     return (
         <section id="contato" className="py-24 bg-brand-surface relative overflow-hidden">

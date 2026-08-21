@@ -44,17 +44,10 @@ test('getWhatsAppLink trims trailing whitespace after stripping suffix', () => {
     assert.equal(decoded, 'Mensagem');
 });
 
-test('getWhatsAppLink with appendTrackingRef=false (default) does not append tracking data', () => {
+test('getWhatsAppLink never appends tracking data to the message', () => {
     const url = getWhatsAppLink('Mensagem simples');
     const decoded = decodeMessageFrom(url);
-    assert.ok(!decoded.includes('|| Dados:'));
-});
-
-test('getWhatsAppLink with appendTrackingRef=true but no tracking available omits Dados suffix', () => {
-    // In Node.js, window is undefined — no tracking data can be captured
-    const url = getWhatsAppLink('Mensagem', { appendTrackingRef: true });
-    const decoded = decodeMessageFrom(url);
-    assert.equal(decoded, 'Mensagem');
+    assert.equal(decoded, 'Mensagem simples');
     assert.ok(!decoded.includes('|| Dados:'));
 });
 
@@ -73,4 +66,53 @@ test('getWhatsAppLink handles message with special characters', () => {
 test('getTrackingDataObject returns null in Node.js environment (no window)', () => {
     const result = getTrackingDataObject();
     assert.equal(result, null);
+});
+
+// Regression: identifiers (cid/sid/gclid/fbclid) used to be appended to the message body, which
+// meant the user sent them as WhatsApp content — outside the retention declared in the RIPD.
+// They reach Odoo through /api/submit-* instead. This asserts the message stays clean even when
+// tracking data is available to capture.
+test('getWhatsAppLink omits identifiers even when tracking data is available', () => {
+    const originalWindow = Object.getOwnPropertyDescriptor(globalThis, 'window');
+    const originalDocument = Object.getOwnPropertyDescriptor(globalThis, 'document');
+    const originalSessionStorage = Object.getOwnPropertyDescriptor(globalThis, 'sessionStorage');
+
+    Object.defineProperty(globalThis, 'window', {
+        configurable: true,
+        value: {
+            dataLayer: [],
+            location: {
+                search: '?utm_source=instagram&gclid=Cj0KTEST',
+                hash: '',
+                href: 'https://example.com/?utm_source=instagram&gclid=Cj0KTEST',
+            },
+        },
+    });
+    Object.defineProperty(globalThis, 'document', {
+        configurable: true,
+        value: { cookie: '_ga=GA1.1.1234567890.1699887766' },
+    });
+    Object.defineProperty(globalThis, 'sessionStorage', {
+        configurable: true,
+        value: { getItem: () => null, setItem: () => {} },
+    });
+
+    try {
+        // Proves the fixture is real: this data is captured and does reach the Odoo payloads.
+        const tracking = getTrackingDataObject();
+        assert.equal(tracking?.gclid, 'Cj0KTEST');
+
+        const decoded = decodeMessageFrom(getWhatsAppLink('Quero planejar uma viagem'));
+        assert.equal(decoded, 'Quero planejar uma viagem');
+        for (const identifier of ['gclid', 'Cj0KTEST', 'cid', '1234567890', '|| Dados:', '[ref:']) {
+            assert.ok(!decoded.includes(identifier), `mensagem não deve conter "${identifier}"`);
+        }
+    } finally {
+        if (originalWindow) Object.defineProperty(globalThis, 'window', originalWindow);
+        else Reflect.deleteProperty(globalThis, 'window');
+        if (originalDocument) Object.defineProperty(globalThis, 'document', originalDocument);
+        else Reflect.deleteProperty(globalThis, 'document');
+        if (originalSessionStorage) Object.defineProperty(globalThis, 'sessionStorage', originalSessionStorage);
+        else Reflect.deleteProperty(globalThis, 'sessionStorage');
+    }
 });

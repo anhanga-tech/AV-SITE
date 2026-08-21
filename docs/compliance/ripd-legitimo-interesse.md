@@ -9,9 +9,9 @@
 | **Endereço** | Av. Dom Pedro I, 773, Vila Monumento, São Paulo-SP, CEP 01552-001 |
 | **Encarregado (DPO)** | Felipe William Rodrigues Silva |
 | **E-mail DPO** | privacidade@anhanga.tur.br |
-| **Versão** | 1.6 |
+| **Versão** | 1.7 |
 | **Data de elaboração** | 02/06/2026 |
-| **Última revisão** | 23/07/2026 |
+| **Última revisão** | 20/08/2026 |
 | **Próxima revisão** | 03/06/2027 |
 | **Status** | Rascunho — pendente de revisão jurídica e aprovação do DPO |
 
@@ -116,6 +116,7 @@ Sem essa análise, decisões de investimento em tráfego pago seriam baseadas em
 | **Operadores** | Anhangá Turismo (armazenamento first-party); Stape OÜ/sGTM (repasse de conversões ao Google Ads, Meta CAPI e TikTok Events API; destinos de marketing somente após consentimento) |
 | **Retenção** | 30 dias (cookie `tracking_data`); duração da sessão (`sessionStorage`) |
 | **Transferência internacional** | Click IDs permanecem first-party antes do consentimento. Após opt-in de marketing, sinais necessários podem ser enviados ao Google, Meta e TikTok pelo sGTM e pelos pixels consentidos, conforme a finalidade de atribuição/conversão. |
+| **Limite de propagação** | Os identificadores **não** são incluídos no corpo das mensagens de WhatsApp pré-preenchidas (`wa.me?text=`). Chegam ao CRM apenas pelos handlers `/api/submit-*`, que os gravam no Odoo junto ao restante do formulário. |
 
 > **Arquitetura híbrida (issue #1261):** UTMs e click IDs são armazenados first-party para atribuição. GA4 continua via sGTM sob a premissa de legítimo interesse do projeto. Meta e TikTok permanecem bloqueados antes do consentimento e após recusa; depois do opt-in, os pixels podem medir PageView/Lead no navegador e as conversões server-side seguem por Meta CAPI e TikTok Events API.
 
@@ -343,6 +344,7 @@ O balancing test favorece o legítimo interesse nas Atividades 1, 2 e 3. A Ativi
 | 1.4 | 04/06/2026 | Pendência #10 concluída: e-mail de notificação LGPD enviado à base via Mautic (ID 24, 04/06/2026 10h00); janela de 15 dias iniciada; primeiro upload de customer match liberado a partir de 19/06/2026 |
 | 1.5 | 07/07/2026 | Auditoria do banner de cookies: nota sobre registro client-side do consentimento (risco aceito, §1); `<noscript>` do GTM removido do site (furava o Consent Mode para usuários sem JS) |
 | 1.6 | 23/07/2026 | Atividade 2 alinhada à arquitetura híbrida consent-gated: Meta/TikTok bloqueados antes do opt-in; destinos server-side e salvaguardas de matching atualizados; base legal e conclusão preservadas |
+| 1.7 | 20/08/2026 | Atividade 2: identificadores deixam de ser anexados ao corpo das mensagens de WhatsApp (`\|\| Dados:` removido de `utils/whatsapp.ts`), que os colocava sob retenção da Meta em vez da janela de 30 dias declarada; linha "Limite de propagação" adicionada |
 
 ---
 

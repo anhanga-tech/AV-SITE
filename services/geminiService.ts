@@ -120,7 +120,7 @@ function buildBudgetLink(handoff: GenerateHandoff): ChatResponse['budgetLink'] {
     destination: handoff.destination,
     dates: handoff.dates,
     baggagePreference: handoff.baggagePreference,
-    url: getWhatsAppLink(buildBudgetMessage(handoff), { appendTrackingRef: false }),
+    url: getWhatsAppLink(buildBudgetMessage(handoff)),
     bantSummary: handoff.bantSummary,
     iataCode: handoff.iataCode,
   };

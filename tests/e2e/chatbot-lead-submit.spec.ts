@@ -100,9 +100,12 @@ test.describe('Chatbot lead handoff', () => {
     const openedUrl = await page.evaluate(() => window.__openedUrls?.[0] ?? '');
     expect(decodeURIComponent(openedUrl)).toContain('wa.me/5511955021519');
     expect(decodeURIComponent(openedUrl)).toContain('Origem: São Paulo, SP');
-    expect(decodeURIComponent(openedUrl)).toContain('Dados: utm_source=google');
-    expect(decodeURIComponent(openedUrl)).toContain('gclid=test-gclid');
     expect(decodeURIComponent(openedUrl)).not.toContain('+5511988314487');
+    // O tracking desta sessão vai para o Odoo no payload de /api/submit-lead (asserções de
+    // `payload.utms` / `payload.tracking` abaixo) e não pode viajar como conteúdo da mensagem
+    // — ver docs/compliance/ripd-legitimo-interesse.md §3.1 "Limite de propagação".
+    expect(decodeURIComponent(openedUrl)).not.toContain('Dados:');
+    expect(decodeURIComponent(openedUrl)).not.toContain('gclid=test-gclid');
 
     const payload = submitPayload as unknown as Record<string, unknown>;
     expect(payload.firstName).toBe('Felipe');
