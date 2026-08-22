@@ -14,7 +14,15 @@ export function trackTraks(name: string, props?: TraksProps): void {
         return;
     }
 
-    window.traks(name, props);
+    // Falha do provedor externo jamais pode quebrar o fluxo do produto
+    // (ex.: abrir WhatsApp/submeter lead depois de um pushGenerateLead...).
+    try {
+        window.traks(name, props);
+    } catch (error) {
+        if (typeof console !== 'undefined') {
+            console.error('Traks tracking failed', error);
+        }
+    }
 }
 
 /** Path atual (sem query/hash) para props de baixa cardinalidade. */
@@ -27,7 +35,25 @@ function currentPathname(): string {
 }
 
 /**
- * Delegação global de cliques em links de WhatsApp (wa.me / api.whatsapp.com).
+ * Links de WhatsApp que representam CONTATO com a agência (wa.me direto ou
+ * /send?phone=). Links de COMPARTILHAR conteúdo (api.whatsapp.com/send apenas
+ * com ?text=, ver utils/share.ts) NÃO são conversão e ficam de fora.
+ */
+function isAgencyWhatsAppHref(rawHref: string): boolean {
+    try {
+        const url = new URL(rawHref, window.location.href);
+        if (url.hostname === 'wa.me') return true;
+        if (url.hostname === 'api.whatsapp.com' && url.pathname === '/send') {
+            return url.searchParams.has('phone');
+        }
+        return false;
+    } catch {
+        return false;
+    }
+}
+
+/**
+ * Delegação global de cliques em links de WhatsApp de contato.
  * Um único listener cobre todos os CTAs presentes e futuros, sem tocar em cada
  * componente. Instale uma vez (index.tsx); é idempotente.
  */
@@ -37,15 +63,6 @@ export function installTraksWhatsAppClickListener(): void {
     if (typeof window === 'undefined' || whatsAppListenerInstalled) return;
     whatsAppListenerInstalled = true;
 
-    const isWhatsAppHref = (rawHref: string): boolean => {
-        try {
-            const url = new URL(rawHref, window.location.href);
-            return url.hostname === 'wa.me' || url.hostname === 'api.whatsapp.com';
-        } catch {
-            return false;
-        }
-    };
-
     document.addEventListener('click', (event) => {
         // Duck typing em vez de instanceof Element: cobre iframes/JSDOM/fakes e
         // suporta open in new tab (command/ctrl/middle-click), onde a navegação acontece igual.
@@ -53,8 +70,17 @@ export function installTraksWhatsAppClickListener(): void {
         if (!target || typeof target.closest !== 'function') return;
         const anchor = target.closest('a[href]') as { getAttribute?: (name: string) => string | null } | null;
 
-        if (!anchor || !isWhatsAppHref(anchor.getAttribute?.('href') ?? '')) return;
+        if (!anchor || !isAgencyWhatsAppHref(anchor.getAttribute?.('href') ?? '')) return;
 
         trackTraks('whatsapp_click', { location: currentPathname() });
     }, { passive: true });
+}
+
+/**
+ * Handoffs programáticos de WhatsApp (window.open em ChatLeadForm/useContactForm)
+ * não passam por clique em <a>, então precisam sinal explícito. Chame no ponto
+ * em que a janela do WhatsApp é aberta.
+ */
+export function trackTraksWhatsAppHandoff(): void {
+    trackTraks('whatsapp_click', { location: currentPathname() });
 }

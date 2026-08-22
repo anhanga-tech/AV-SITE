@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { trackTraks } from '../utils/traks';
 
 import { Seo } from '../components/Seo';
 import { BlogPostContent } from '../components/blog/BlogPostContent';
@@ -49,6 +50,8 @@ const BlogPost: React.FC = () => {
     }, [slug]);
 
     if (!post) {
+        // Blog inexistente é 404 para o usuário: alimenta a mesma métrica do Traks.
+        trackTraks('page_not_found');
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-brand-surface">
                 <h2 className="text-4xl font-black text-brand-dark mb-4 text-center px-6">Ops! Artigo não encontrado.</h2>
