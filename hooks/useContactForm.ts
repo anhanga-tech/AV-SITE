@@ -14,6 +14,7 @@ import type { LeadTracking } from '../types/leadCapture';
 import type { ContactModalOptions } from '../utils/contactForm';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
 import { pushGenerateLeadConversionEvent } from '../utils/generate-lead-analytics';
+import { trackTraksWhatsAppHandoff } from '../utils/traks';
 
 const EMPTY_FIELDS: ContactFormFields = {
     firstName: '',
@@ -166,6 +167,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
                     destination: action,
                 });
                 window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+                trackTraksWhatsAppHandoff();
             }
 
             // The UI dropped the separate sobrenome input (ContactModal/CtaBody now

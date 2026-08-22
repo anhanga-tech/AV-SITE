@@ -10,6 +10,7 @@ import {
   type LeadFinalizeResult,
 } from '../lib/chat-lead-form-logic';
 import { triggerHaptic } from '../utils/haptics';
+import { trackTraksWhatsAppHandoff } from '../utils/traks';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
 import { isFieldCompleteForAnalytics } from '../lib/form-v1-validation';
 import { ChatLeadFormFields } from './chat-lead-form/ChatLeadFormFields';
@@ -127,6 +128,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
       destination,
     });
     openWhatsAppWindow(getWhatsAppUrl(buildDirectWhatsAppPayload()));
+    trackTraksWhatsAppHandoff();
   };
 
   const submitLeadForm = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -194,6 +196,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
       destination,
     });
     openWhatsAppWindow(getWhatsAppUrl(payload));
+    trackTraksWhatsAppHandoff();
 
     // Submit lead data in the background — user is already heading to WhatsApp
     try {

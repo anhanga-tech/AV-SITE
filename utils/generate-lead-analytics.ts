@@ -1,4 +1,5 @@
 import type { LeadTracking, LeadUtms } from '../types/leadCapture';
+import { trackTraks, currentPathname as currentTraksPathname } from './traks';
 
 interface GenerateLeadConversionEvent {
     eventId?: string;
@@ -27,4 +28,9 @@ export function pushGenerateLeadConversionEvent({
         ga_client_id: tracking?.cid,
         ga_session_id: tracking?.sid,
     });
+
+    // Traks (cookieless): conversão sem dados do lead. `destination` aqui é texto
+    // livre digitado pelo usuário (ver cleanValue em useLeadCapture) — NÃO vai
+    // para provedor externo. O pathname da rota dá o bucket de origem.
+    trackTraks('quote_request', { location: currentTraksPathname() });
 }
