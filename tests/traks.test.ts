@@ -22,7 +22,7 @@ const anchor = (href: string): FakeAnchor => {
 /** DOM mínimo (window + document) para exercitar os utilitários sem jsdom. */
 function setupFakeDom(options: { href?: string } = {}) {
     const traksCalls: Array<{ name: string; props?: Record<string, unknown> }> = [];
-    let clickHandler: ((event: unknown) => void) | null = null;
+    const handlers: Record<string, (event: unknown) => void> = {};
 
     const win = {
         location: new URL(options.href ?? 'https://www.anhanga.tur.br/orlando/'),
@@ -39,8 +39,8 @@ function setupFakeDom(options: { href?: string } = {}) {
     const realDocument = globalThis.document;
     (globalThis as { window?: unknown }).window = win;
     (globalThis as { document?: unknown }).document = {
-        addEventListener(_type: string, handler: (event: unknown) => void) {
-            clickHandler = handler;
+        addEventListener(type: string, handler: (event: unknown) => void) {
+            handlers[type] = handler;
         },
     };
 
@@ -48,8 +48,8 @@ function setupFakeDom(options: { href?: string } = {}) {
         win,
         traksCalls,
         dataLayer: win.dataLayer,
-        click(target: unknown) {
-            clickHandler?.({ target });
+        click(target: unknown, type = 'click') {
+            handlers[type]?.({ target, type });
         },
         cleanup() {
             (globalThis as { window?: unknown }).window = realWindow;
@@ -107,36 +107,42 @@ test('trackTraks engole exceção do provedor sem quebrar o fluxo chamador', () 
 
 // ─── listener global de WhatsApp ─────────────────────────────────────────────
 
-test('listener: dispara em wa.me/api.whatsapp.com com phone, ignora share e outros; idempotente', () => {
+test('listener: auxclick (botão do meio) conta como clique no WhatsApp', () => {
+    // ÚNICO teste de listener: a instalação aqui registra os handlers neste
+    // DOM fake e a flag de módulo persiste para todo o processo (idempotência
+    // real — em produção só se instala uma vez por página).
     const env = setupFakeDom({ href: 'https://www.anhanga.tur.br/orlando/' });
     try {
-        // Instalação múltipla registra o handler apenas uma vez.
         installTraksWhatsAppClickListener();
-        installTraksWhatsAppClickListener();
-        installTraksWhatsAppClickListener();
+        installTraksWhatsAppClickListener(); // idempotente
 
-        env.click(anchor('https://wa.me/5511955021519?text=oi'));
+        // Botão do meio dispara `auxclick`, não `click`.
+        env.click(anchor('https://wa.me/5511955021519'), 'auxclick');
         assert.equal(env.traksCalls.length, 1);
-        assert.equal(env.traksCalls[0].name, 'whatsapp_click');
         assert.deepEqual(env.traksCalls[0].props, { location: '/orlando/' });
+
+        // Clique normal em wa.me.
+        env.click(anchor('https://wa.me/5511955021519?text=oi'));
+        assert.equal(env.traksCalls.length, 2);
+        assert.equal(env.traksCalls[1].name, 'whatsapp_click');
 
         // api.whatsapp.com COM phone = contato da agência.
         env.click(anchor('https://api.whatsapp.com/send?phone=5511955021519&text=oi'));
-        assert.equal(env.traksCalls.length, 2);
+        assert.equal(env.traksCalls.length, 3);
 
         // api.whatsapp.com só com text = botão de COMPARTILHAR (não é conversão).
         env.click(anchor('https://api.whatsapp.com/send?text=mira%20isso%20https://x.com'));
-        assert.equal(env.traksCalls.length, 2);
+        assert.equal(env.traksCalls.length, 3);
 
         // Links internos e de outras redes ficam de fora.
         env.click(anchor('https://www.anhanga.tur.br/blog'));
         env.click(anchor('/orlando/'));
         env.click(anchor('https://twitter.com/intent/tweet?text=oi'));
-        assert.equal(env.traksCalls.length, 2);
+        assert.equal(env.traksCalls.length, 3);
 
         // Hrefs protocol-relative (//wa.me) também são contato.
         env.click(anchor('//wa.me/5511955021519'));
-        assert.equal(env.traksCalls.length, 3);
+        assert.equal(env.traksCalls.length, 4);
     } finally {
         env.cleanup();
     }

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { trackTraks } from '../utils/traks';
@@ -49,9 +49,17 @@ const BlogPost: React.FC = () => {
         window.scrollTo(0, 0);
     }, [slug]);
 
+    // 404 de blog: um único evento por slug inexistente (guard evita re-emitir
+    // em re-renders e navegações repetidas ao mesmo slug).
+    const lastMissingTraksSlug = useRef<string | null>(null);
+    useEffect(() => {
+        if (!post && slug && lastMissingTraksSlug.current !== slug) {
+            lastMissingTraksSlug.current = slug;
+            trackTraks('page_not_found');
+        }
+    }, [post, slug]);
+
     if (!post) {
-        // Blog inexistente é 404 para o usuário: alimenta a mesma métrica do Traks.
-        trackTraks('page_not_found');
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-brand-surface">
                 <h2 className="text-4xl font-black text-brand-dark mb-4 text-center px-6">Ops! Artigo não encontrado.</h2>

@@ -196,6 +196,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
       destination,
     });
     openWhatsAppWindow(getWhatsAppUrl(payload));
+    trackTraksWhatsAppHandoff();
 
     // Submit lead data in the background — user is already heading to WhatsApp
     try {

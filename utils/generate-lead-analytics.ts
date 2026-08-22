@@ -1,15 +1,5 @@
 import type { LeadTracking, LeadUtms } from '../types/leadCapture';
-import { trackTraks } from './traks';
-
-/** Pathname atual sem query/hash — prop de baixa cardinalidade, sem PII. */
-function currentTraksPathname(): string {
-    if (typeof window === 'undefined') return '';
-    try {
-        return new URL(window.location.href).pathname;
-    } catch {
-        return '/';
-    }
-}
+import { trackTraks, currentPathname as currentTraksPathname } from './traks';
 
 interface GenerateLeadConversionEvent {
     eventId?: string;

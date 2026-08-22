@@ -26,7 +26,7 @@ export function trackTraks(name: string, props?: TraksProps): void {
 }
 
 /** Path atual (sem query/hash) para props de baixa cardinalidade. */
-function currentPathname(): string {
+export function currentPathname(): string {
     try {
         return new URL(window.location.href).pathname;
     } catch {
@@ -63,9 +63,10 @@ export function installTraksWhatsAppClickListener(): void {
     if (typeof window === 'undefined' || whatsAppListenerInstalled) return;
     whatsAppListenerInstalled = true;
 
-    document.addEventListener('click', (event) => {
-        // Duck typing em vez de instanceof Element: cobre iframes/JSDOM/fakes e
-        // suporta open in new tab (command/ctrl/middle-click), onde a navegação acontece igual.
+    const handleActivation = (event: MouseEvent) => {
+        // Duck typing em vez de instanceof Element: cobre iframes/JSDOM/fakes.
+        // `auxclick` cobre botão do meio (open in new tab), que não dispara `click`.
+        if (event.type !== 'click' && event.type !== 'auxclick') return;
         const target = event.target as { closest?: unknown } | null;
         if (!target || typeof target.closest !== 'function') return;
         const anchor = target.closest('a[href]') as { getAttribute?: (name: string) => string | null } | null;
@@ -73,7 +74,10 @@ export function installTraksWhatsAppClickListener(): void {
         if (!anchor || !isAgencyWhatsAppHref(anchor.getAttribute?.('href') ?? '')) return;
 
         trackTraks('whatsapp_click', { location: currentPathname() });
-    }, { passive: true });
+    };
+
+    document.addEventListener('click', handleActivation, { passive: true });
+    document.addEventListener('auxclick', handleActivation, { passive: true });
 }
 
 /**
