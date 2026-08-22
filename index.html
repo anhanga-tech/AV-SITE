@@ -76,8 +76,22 @@
     window.traks = window.traks || function () {
       (window.traks.q = window.traks.q || []).push(arguments);
     };
+    // Não carregar o coletor do Traks em ambientes não-produtivos (dev local +
+    // Playwright/CI em 127.0.0.1) — mesmo gate de host do GTM/Mautic mais abaixo:
+    // sem isso, cliques/submits de teste poluem quote_request/whatsapp_click/
+    // page_not_found de produção. O stub acima continua definido para não
+    // quebrar trackTraks() — os eventos só ficam enfileirados em window.traks.q
+    // sem nunca serem enviados.
+    (function () {
+      var h = location.hostname;
+      if (h === 'localhost' || h === '127.0.0.1' || h === '[::1]' || h === '::1' || h === '0.0.0.0' || h.endsWith('.local') || h.endsWith('.test')) return;
+      var script = document.createElement('script');
+      script.defer = true;
+      script.setAttribute('data-site', 'pb_live_y0tnugik6s7s2b0iy73w5aim');
+      script.src = 'https://analytics-collect.anhanga.tur.br/t.js';
+      document.head.appendChild(script);
+    })();
   </script>
-  <script defer data-site="pb_live_y0tnugik6s7s2b0iy73w5aim" src="https://analytics-collect.anhanga.tur.br/t.js"></script>
 
 </head>
 

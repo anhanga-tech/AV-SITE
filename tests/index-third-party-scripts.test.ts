@@ -149,6 +149,39 @@ test('loadGtm tem gate de host para não poluir o GA4 de produção em dev/CI', 
   assert.ok(gateIndex < injectIndex, 'o gate de host deve preceder a injeção do GTM');
 });
 
+test('Traks tem gate de host para não poluir os goals de conversão em dev/CI', () => {
+  const headHtml = getHeadHtml(indexHtml);
+
+  // O stub de fila (window.traks = window.traks || function...) precisa continuar
+  // definido incondicionalmente — trackTraks() em toda a app depende dele existir
+  // mesmo quando o coletor não carrega (eventos só ficam enfileirados, sem envio).
+  assert.match(headHtml, /window\.traks\s*=\s*window\.traks\s*\|\|\s*function/, 'stub de fila do Traks deve continuar definido');
+
+  // O <script src="...t.js"> não pode ser um tag estático incondicional — precisa
+  // ser injetado programaticamente, atrás do mesmo gate de host do GTM/Mautic.
+  assert.doesNotMatch(
+    headHtml,
+    /<script[^>]*src="https:\/\/analytics-collect\.anhanga\.tur\.br\/t\.js"/i,
+    'o coletor do Traks não deve ser um <script> estático incondicional',
+  );
+  assert.match(headHtml, /analytics-collect\.anhanga\.tur\.br\/t\.js/, 'a URL do coletor deve continuar presente (injeção condicional)');
+
+  const gateIndex = headHtml.indexOf('location.hostname');
+  const trakerScriptIndex = headHtml.indexOf('analytics-collect.anhanga.tur.br/t.js');
+  assert.ok(gateIndex > -1 && trakerScriptIndex > -1, 'gate de host e injeção do coletor devem existir');
+  assert.ok(gateIndex < trakerScriptIndex, 'o gate de host deve preceder a injeção do coletor do Traks');
+
+  // Mesma cobertura de hosts do gate do GTM (localhost/127.0.0.1/loopback IPv6/Docker/.local/.test).
+  const gateToScriptSlice = headHtml.slice(gateIndex, trakerScriptIndex);
+  assert.match(gateToScriptSlice, /'localhost'/, 'gate deve cobrir localhost');
+  assert.match(gateToScriptSlice, /'127\.0\.0\.1'/, 'gate deve cobrir 127.0.0.1');
+  assert.match(gateToScriptSlice, /'\[::1\]'/, 'gate deve cobrir o loopback IPv6 [::1]');
+  assert.match(gateToScriptSlice, /'::1'/, 'gate deve cobrir o loopback IPv6 ::1');
+  assert.match(gateToScriptSlice, /'0\.0\.0\.0'/, 'gate deve cobrir 0.0.0.0 (Docker/CI)');
+  assert.match(gateToScriptSlice, /\.endsWith\('\.local'\)/, 'gate deve cobrir hosts .local');
+  assert.match(gateToScriptSlice, /\.endsWith\('\.test'\)/, 'gate deve cobrir hosts .test');
+});
+
 test('loadMautic tem gate de consentimento LGPD', () => {
   const loadMauticMatch = indexHtml.match(/var loadMautic\s*=\s*function\s*\(\)\s*\{([\s\S]*?)};/);
   assert.ok(loadMauticMatch, 'loadMautic deve estar definida');
