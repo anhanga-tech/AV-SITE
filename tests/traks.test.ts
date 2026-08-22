@@ -48,8 +48,8 @@ function setupFakeDom(options: { href?: string } = {}) {
         win,
         traksCalls,
         dataLayer: win.dataLayer,
-        click(target: unknown, type = 'click') {
-            handlers[type]?.({ target, type });
+        click(target: unknown, type = 'click', button = 0) {
+            handlers[type]?.({ target, type, button });
         },
         cleanup() {
             (globalThis as { window?: unknown }).window = realWindow;
@@ -116,10 +116,14 @@ test('listener: auxclick (botão do meio) conta como clique no WhatsApp', () => 
         installTraksWhatsAppClickListener();
         installTraksWhatsAppClickListener(); // idempotente
 
-        // Botão do meio dispara `auxclick`, não `click`.
-        env.click(anchor('https://wa.me/5511955021519'), 'auxclick');
+        // Botão do meio dispara `auxclick` com button=1; right-click (button=2)
+        // também é auxclick mas não navega — não conta.
+        env.click(anchor('https://wa.me/5511955021519'), 'auxclick', 1);
         assert.equal(env.traksCalls.length, 1);
         assert.deepEqual(env.traksCalls[0].props, { location: '/orlando/' });
+
+        env.click(anchor('https://wa.me/5511955021519'), 'auxclick', 2);
+        assert.equal(env.traksCalls.length, 1);
 
         // Clique normal em wa.me.
         env.click(anchor('https://wa.me/5511955021519?text=oi'));

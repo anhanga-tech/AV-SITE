@@ -65,8 +65,9 @@ export function installTraksWhatsAppClickListener(): void {
 
     const handleActivation = (event: MouseEvent) => {
         // Duck typing em vez de instanceof Element: cobre iframes/JSDOM/fakes.
-        // `auxclick` cobre botão do meio (open in new tab), que não dispara `click`.
-        if (event.type !== 'click' && event.type !== 'auxclick') return;
+        // `auxclick` só interessa no botão do meio (open in new tab); right-click
+        // também dispara auxclick mas não navega — não é conversão.
+        if (event.type === 'auxclick' && event.button !== 1) return;
         const target = event.target as { closest?: unknown } | null;
         if (!target || typeof target.closest !== 'function') return;
         const anchor = target.closest('a[href]') as { getAttribute?: (name: string) => string | null } | null;
