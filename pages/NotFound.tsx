@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { MapPin, Home as HomeIcon, Compass, BookOpen, ArrowLeft } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { Seo } from '../components/Seo';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { getBlogHomeUrl } from '../utils/blog';
-import { useEffect } from 'react';
 import { trackTraks } from '../utils/traks';
 
 const SITE_URL = 'https://www.anhanga.tur.br';
