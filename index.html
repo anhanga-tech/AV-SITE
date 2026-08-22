@@ -76,8 +76,39 @@
     window.traks = window.traks || function () {
       (window.traks.q = window.traks.q || []).push(arguments);
     };
+    // Não carregar o coletor do Traks em ambientes não-produtivos (dev local +
+    // Playwright/CI em 127.0.0.1) — mesmo gate de host do GTM/Mautic mais abaixo:
+    // sem isso, cliques/submits de teste poluem quote_request/whatsapp_click/
+    // page_not_found de produção. O stub acima continua definido para não
+    // quebrar trackTraks() — os eventos só ficam enfileirados em window.traks.q
+    // sem nunca serem enviados.
+    (function () {
+      var h = location.hostname;
+      if (h === 'localhost' || h === '127.0.0.1' || h === '[::1]' || h === '::1' || h === '0.0.0.0' || h.endsWith('.local') || h.endsWith('.test')) return;
+      var injectTraks = function () {
+        var script = document.createElement('script');
+        // async = false (não .defer, que scripts criados via createElement ignoram)
+        // dá execução em ordem, mas sozinho não replica a garantia de defer de
+        // esperar o parse do documento terminar — por isso o gate de
+        // DOMContentLoaded abaixo, que é o que efetivamente restaura o
+        // comportamento da tag estática original (<script defer>).
+        script.async = false;
+        script.setAttribute('data-site', 'pb_live_y0tnugik6s7s2b0iy73w5aim');
+        script.src = 'https://analytics-collect.anhanga.tur.br/t.js';
+        document.head.appendChild(script);
+      };
+      // Este bloco roda no topo do <head>, durante o parse — document.readyState
+      // ainda é 'loading' aqui. Esperar DOMContentLoaded (que só dispara depois do
+      // parse completo) garante que o coletor não injete no meio do parsing, igual
+      // a <script defer> fazia. Se por algum motivo já estiver 'interactive'/
+      // 'complete' quando este código rodar, o parse já terminou — injeta direto.
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', injectTraks, { once: true });
+      } else {
+        injectTraks();
+      }
+    })();
   </script>
-  <script defer data-site="pb_live_y0tnugik6s7s2b0iy73w5aim" src="https://analytics-collect.anhanga.tur.br/t.js"></script>
 
 </head>
 
