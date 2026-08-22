@@ -568,6 +568,9 @@ test('submit-nps enforces rate limit after 3 requests from the same IP', async (
     assert.equal(body4.code, 'RATE_LIMIT_EXCEEDED');
     assert.ok(r4.headers.get('Retry-After'), 'Retry-After header should be set');
     assert.ok(r4.headers.get('X-RateLimit-Remaining'), 'X-RateLimit-Remaining header should be set');
+    assert.equal(r4.headers.get('RateLimit-Limit'), '3', 'RateLimit-Limit must reflect the configured max');
+    assert.equal(r4.headers.get('RateLimit-Remaining'), '0', 'RateLimit-Remaining must be 0 once exhausted');
+    assert.ok(r4.headers.get('RateLimit-Reset'), 'RateLimit-Reset header should be set');
 });
 
 test('submit-nps enforces rate-limit even for invalid payloads (DoS protection)', async (t) => {

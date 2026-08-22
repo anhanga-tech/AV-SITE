@@ -15,7 +15,7 @@
  * historical reasons (pre cut-over, every form posted to n8n); `ODOO_ERROR:...`
  * is matched the same way via the `errorPattern` option each handler supplies.
  */
-import { buildCorsHeaders, buildJsonResponse, createRequestId, getClientIP } from './network';
+import { buildCorsHeaders, buildJsonResponse, buildRateLimitHeaders, createRequestId, getClientIP } from './network';
 import { checkRateLimit } from './rate-limit';
 import { detectBot } from './bot-detection';
 import { logger } from './logger';
@@ -217,6 +217,7 @@ function buildRateLimitDenial<TData, TPayload>(
         {
             ...corsHeaders,
             'Retry-After': String(retryAfterSeconds),
+            ...buildRateLimitHeaders(rateLimit, options.rateLimit.max),
             'X-RateLimit-Remaining': String(rateLimit.remaining),
             'X-RateLimit-Reset': String(Math.ceil((Date.now() + rateLimit.resetIn) / 1000)),
         },

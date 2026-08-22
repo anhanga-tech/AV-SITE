@@ -18,6 +18,17 @@ test('api/markdown should return 200 for valid home path', async () => {
     assert.equal(res.headers.get('Content-Type'), 'text/markdown; charset=utf-8');
 });
 
+test('api/markdown sets RateLimit-* headers so agents can self-throttle', async () => {
+    const req = new Request('http://localhost/api/markdown?path=/', {
+        headers: { 'x-real-ip': `9.9.${Math.floor(Math.random() * 254) + 1}.1` },
+    });
+    const res = await handler(req);
+    assert.equal(res.status, 200);
+    assert.equal(res.headers.get('RateLimit-Limit'), '20');
+    assert.ok(res.headers.get('RateLimit-Remaining'), 'RateLimit-Remaining must be set');
+    assert.ok(res.headers.get('RateLimit-Reset'), 'RateLimit-Reset must be set');
+});
+
 test('api/markdown serves the blog index with links to every post', async () => {
     const req = new Request('http://localhost/api/markdown?path=/blog/');
     const res = await handler(req);
@@ -66,4 +77,7 @@ test('api/markdown should enforce rate limiting', async () => {
     const res = await handler(req());
     assert.equal(res.status, 429);
     assert.ok(res.headers.get('Retry-After'));
+    assert.equal(res.headers.get('RateLimit-Limit'), '20');
+    assert.equal(res.headers.get('RateLimit-Remaining'), '0');
+    assert.ok(res.headers.get('RateLimit-Reset'));
 });

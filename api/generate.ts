@@ -1,6 +1,6 @@
 import type { ContentListUnion } from '@google/genai';
 import { checkRateLimit } from '../lib/rate-limit';
-import { buildCorsHeaders, getClientIP } from '../lib/network';
+import { buildCorsHeaders, buildRateLimitHeaders as buildStandardRateLimitHeaders, getClientIP } from '../lib/network';
 import { logger } from '../lib/logger';
 import { budgetTool } from '../lib/ai/tools';
 import { SYSTEM_INSTRUCTION } from '../lib/ai/prompt';
@@ -161,6 +161,7 @@ function buildMethodNotAllowedResponse(corsHeaders: Record<string, string>): Res
 
 function buildRateLimitHeaders(rateLimit: { resetIn: number; remaining: number }): Record<string, string> {
     return {
+        ...buildStandardRateLimitHeaders(rateLimit, RATE_LIMIT_MAX_REQUESTS),
         'X-RateLimit-Remaining': String(rateLimit.remaining),
         'X-RateLimit-Reset': String(Math.ceil(rateLimit.resetIn / 1000)),
     };
@@ -198,8 +199,7 @@ async function getRateLimitState(
         retryAfter: Math.ceil(rateLimit.resetIn / 1000)
     }, 429, {
         'Retry-After': String(Math.ceil(rateLimit.resetIn / 1000)),
-        'X-RateLimit-Remaining': '0',
-        'X-RateLimit-Reset': String(Math.ceil(rateLimit.resetIn / 1000)),
+        ...buildRateLimitHeaders({ ...rateLimit, remaining: 0 }),
         ...corsHeaders
     });
 }

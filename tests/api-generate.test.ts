@@ -152,6 +152,9 @@ test('generate handler returns 429 after exceeding rate limit', async (t) => {
     assert.match(body.error, /Muitas requisições/i);
     assert.ok(limited.headers.get('Retry-After'), 'Retry-After header must be set');
     assert.ok(limited.headers.get('X-RateLimit-Remaining'), 'X-RateLimit-Remaining must be set');
+    assert.equal(limited.headers.get('RateLimit-Limit'), '10', 'RateLimit-Limit must reflect the configured max');
+    assert.equal(limited.headers.get('RateLimit-Remaining'), '0', 'RateLimit-Remaining must be 0 once exhausted');
+    assert.ok(limited.headers.get('RateLimit-Reset'), 'RateLimit-Reset header must be set');
 });
 
 // ─── Config error ────────────────────────────────────────────────────────────

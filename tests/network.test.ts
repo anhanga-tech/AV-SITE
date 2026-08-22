@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildCorsHeaders, buildJsonResponse, getClientIP } from '../lib/network.ts';
+import { buildCorsHeaders, buildJsonResponse, buildRateLimitHeaders, getClientIP } from '../lib/network.ts';
 
 test('getClientIP uses Cloudflare connecting IP before spoofable headers', () => {
     const request = new Request('https://example.com/api/generate', {
@@ -113,4 +113,25 @@ test('buildJsonResponse handles a null body without throwing', async () => {
 test('buildJsonResponse merges corsHeaders', async () => {
     const response = buildJsonResponse({ ok: true }, 200, { 'Access-Control-Allow-Origin': 'https://example.com' });
     assert.equal(response.headers.get('Access-Control-Allow-Origin'), 'https://example.com');
+});
+
+test('buildRateLimitHeaders returns the IETF draft RateLimit-* header names', () => {
+    const headers = buildRateLimitHeaders({ remaining: 7, resetIn: 12_500 }, 10);
+    assert.deepEqual(headers, {
+        'RateLimit-Limit': '10',
+        'RateLimit-Remaining': '7',
+        'RateLimit-Reset': '13',
+    });
+});
+
+test('buildRateLimitHeaders clamps a negative remaining to zero', () => {
+    const headers = buildRateLimitHeaders({ remaining: -1, resetIn: 1000 }, 10);
+    assert.equal(headers['RateLimit-Remaining'], '0');
+});
+
+test('buildCorsHeaders exposes RateLimit-* headers to browser clients', () => {
+    const headers = buildCorsHeaders();
+    assert.match(headers['Access-Control-Expose-Headers'], /\bRateLimit-Limit\b/);
+    assert.match(headers['Access-Control-Expose-Headers'], /\bRateLimit-Remaining\b/);
+    assert.match(headers['Access-Control-Expose-Headers'], /\bRateLimit-Reset\b/);
 });

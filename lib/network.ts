@@ -49,7 +49,25 @@ export function buildCorsHeaders(allowedOrigin?: string): Record<string, string>
         'Access-Control-Allow-Origin': resolveAllowedOrigin(allowedOrigin || process.env.ALLOWED_ORIGIN),
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Expose-Headers': 'X-RateLimit-Remaining, X-RateLimit-Reset, X-Request-Id',
+        'Access-Control-Expose-Headers':
+            'RateLimit-Limit, RateLimit-Remaining, RateLimit-Reset, X-RateLimit-Remaining, X-RateLimit-Reset, X-Request-Id',
+    };
+}
+
+/**
+ * Builds standard rate-limit response headers (IETF draft-ietf-httpapi-ratelimit-headers
+ * convention: unprefixed `RateLimit-*`) so callers — including AI agents — can self-throttle.
+ * Kept alongside the legacy `X-RateLimit-*` headers some handlers already emit, for compatibility.
+ */
+export function buildRateLimitHeaders(
+    rateLimit: { remaining: number; resetIn: number },
+    limit: number,
+): Record<string, string> {
+    const resetSeconds = String(Math.ceil(rateLimit.resetIn / 1000));
+    return {
+        'RateLimit-Limit': String(limit),
+        'RateLimit-Remaining': String(Math.max(0, rateLimit.remaining)),
+        'RateLimit-Reset': resetSeconds,
     };
 }
 
