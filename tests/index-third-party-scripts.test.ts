@@ -171,15 +171,28 @@ test('Traks tem gate de host para não poluir os goals de conversão em dev/CI',
   assert.ok(gateIndex > -1 && trakerScriptIndex > -1, 'gate de host e injeção do coletor devem existir');
   assert.ok(gateIndex < trakerScriptIndex, 'o gate de host deve preceder a injeção do coletor do Traks');
 
-  // Mesma cobertura de hosts do gate do GTM (localhost/127.0.0.1/loopback IPv6/Docker/.local/.test).
-  const gateToScriptSlice = headHtml.slice(gateIndex, trakerScriptIndex);
+  // Slice até o fim da IIFE (não só até a URL) — o gate de DOMContentLoaded vem
+  // depois da definição de injectTraks, que é onde a URL do coletor aparece.
+  const iifeEndIndex = headHtml.indexOf('})();', trakerScriptIndex) + '})();'.length;
+  assert.ok(iifeEndIndex > trakerScriptIndex, 'a IIFE do gate do Traks deve se fechar depois da URL do coletor');
+  const gateToScriptSlice = headHtml.slice(gateIndex, iifeEndIndex);
 
   // .defer não tem efeito em scripts inseridos via createElement — só async = false
-  // restaura a execução não-bloqueante/em-ordem que a tag estática <script defer>
-  // original tinha. Sem isso o script vira async de fato e pode interromper o
-  // parser do documento (regressão de TBT, mesma classe do issue #1259).
+  // restaura a execução em ordem que a tag estática <script defer> original tinha.
   assert.doesNotMatch(gateToScriptSlice, /\.defer\s*=\s*true/, 'não deve usar .defer em script criado via createElement');
   assert.match(gateToScriptSlice, /\.async\s*=\s*false/, 'deve usar script.async = false para execução em ordem');
+
+  // async = false sozinho não replica a garantia de defer de esperar o parse do
+  // documento terminar (só ordena execução relativa a outros scripts em-ordem) —
+  // por isso a injeção precisa ficar atrás de um gate de DOMContentLoaded, que só
+  // dispara depois do parse completo (regressão de TBT/LCP apontada em review,
+  // mesma classe do issue #1259).
+  assert.match(gateToScriptSlice, /document\.readyState\s*===\s*'loading'/, 'deve checar document.readyState antes de injetar');
+  assert.match(gateToScriptSlice, /addEventListener\(\s*'DOMContentLoaded'/, 'deve esperar DOMContentLoaded quando o parse ainda está em andamento');
+  const domContentLoadedIndex = gateToScriptSlice.search(/addEventListener\(\s*'DOMContentLoaded'/);
+  const injectFnIndex = gateToScriptSlice.indexOf('var injectTraks');
+  assert.ok(injectFnIndex > -1 && domContentLoadedIndex > -1, 'função de injeção e gate de DOMContentLoaded devem existir');
+  assert.ok(injectFnIndex < domContentLoadedIndex, 'a função de injeção deve ser definida antes de ser agendada no gate');
 
   assert.match(gateToScriptSlice, /'localhost'/, 'gate deve cobrir localhost');
   assert.match(gateToScriptSlice, /'127\.0\.0\.1'/, 'gate deve cobrir 127.0.0.1');
