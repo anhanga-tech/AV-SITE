@@ -86,7 +86,12 @@
       var h = location.hostname;
       if (h === 'localhost' || h === '127.0.0.1' || h === '[::1]' || h === '::1' || h === '0.0.0.0' || h.endsWith('.local') || h.endsWith('.test')) return;
       var script = document.createElement('script');
-      script.defer = true;
+      // .defer não tem efeito em scripts inseridos via createElement (só o parser
+      // HTML respeita defer/async em tags estáticas) — dinamicamente, o default é
+      // comportamento async, que pode interromper o parser do documento. async =
+      // false restaura a execução não-bloqueante e em ordem que a tag estática
+      // original (<script defer>) tinha.
+      script.async = false;
       script.setAttribute('data-site', 'pb_live_y0tnugik6s7s2b0iy73w5aim');
       script.src = 'https://analytics-collect.anhanga.tur.br/t.js';
       document.head.appendChild(script);

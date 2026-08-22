@@ -173,6 +173,14 @@ test('Traks tem gate de host para não poluir os goals de conversão em dev/CI',
 
   // Mesma cobertura de hosts do gate do GTM (localhost/127.0.0.1/loopback IPv6/Docker/.local/.test).
   const gateToScriptSlice = headHtml.slice(gateIndex, trakerScriptIndex);
+
+  // .defer não tem efeito em scripts inseridos via createElement — só async = false
+  // restaura a execução não-bloqueante/em-ordem que a tag estática <script defer>
+  // original tinha. Sem isso o script vira async de fato e pode interromper o
+  // parser do documento (regressão de TBT, mesma classe do issue #1259).
+  assert.doesNotMatch(gateToScriptSlice, /\.defer\s*=\s*true/, 'não deve usar .defer em script criado via createElement');
+  assert.match(gateToScriptSlice, /\.async\s*=\s*false/, 'deve usar script.async = false para execução em ordem');
+
   assert.match(gateToScriptSlice, /'localhost'/, 'gate deve cobrir localhost');
   assert.match(gateToScriptSlice, /'127\.0\.0\.1'/, 'gate deve cobrir 127.0.0.1');
   assert.match(gateToScriptSlice, /'\[::1\]'/, 'gate deve cobrir o loopback IPv6 [::1]');
