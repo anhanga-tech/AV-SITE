@@ -18,12 +18,25 @@ test('api/markdown should return 200 for valid home path', async () => {
     assert.equal(res.headers.get('Content-Type'), 'text/markdown; charset=utf-8');
 });
 
-test('api/markdown sets RateLimit-* headers so agents can self-throttle', async () => {
+test('api/markdown omits RateLimit-* on the publicly cached 200 path (avoids leaking one client\'s quota to another via shared caches)', async () => {
     const req = new Request('http://localhost/api/markdown?path=/', {
         headers: { 'x-real-ip': `9.9.${Math.floor(Math.random() * 254) + 1}.1` },
     });
     const res = await handler(req);
     assert.equal(res.status, 200);
+    assert.match(res.headers.get('Cache-Control') ?? '', /public/);
+    assert.equal(res.headers.get('RateLimit-Limit'), null);
+    assert.equal(res.headers.get('RateLimit-Remaining'), null);
+    assert.equal(res.headers.get('RateLimit-Reset'), null);
+});
+
+test('api/markdown sets RateLimit-* headers on the non-cached 404 path', async () => {
+    const req = new Request('http://localhost/api/markdown?path=/blog/post-que-nao-existe', {
+        headers: { 'x-real-ip': `9.10.${Math.floor(Math.random() * 254) + 1}.1` },
+    });
+    const res = await handler(req);
+    assert.equal(res.status, 404);
+    assert.match(res.headers.get('Cache-Control') ?? '', /no-store/);
     assert.equal(res.headers.get('RateLimit-Limit'), '20');
     assert.ok(res.headers.get('RateLimit-Remaining'), 'RateLimit-Remaining must be set');
     assert.ok(res.headers.get('RateLimit-Reset'), 'RateLimit-Reset must be set');

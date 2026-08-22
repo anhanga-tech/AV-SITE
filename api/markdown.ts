@@ -342,9 +342,16 @@ export default async function handler(req: Request): Promise<Response> {
     const rawPath = url.searchParams.get('path') ?? '/';
     const response = routeMarkdown(rawPath);
 
+    // The 200 path is `Cache-Control: public`, shared across every client requesting
+    // the same page — attaching this client's per-IP quota there would let a CDN or
+    // browser cache replay one visitor's remaining/reset values to another for up to
+    // an hour. Only the non-200 paths here are already no-store, so only those are
+    // safe to carry per-client rate-limit state.
     const headers = new Headers(response.headers);
-    for (const [name, value] of Object.entries(buildRateLimitHeaders(rateLimit, RATE_LIMIT_MAX_REQUESTS))) {
-        headers.set(name, value);
+    if (response.status !== 200) {
+        for (const [name, value] of Object.entries(buildRateLimitHeaders(rateLimit, RATE_LIMIT_MAX_REQUESTS))) {
+            headers.set(name, value);
+        }
     }
 
     return new Response(response.body, { status: response.status, headers });

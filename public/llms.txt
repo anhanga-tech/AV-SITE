@@ -42,7 +42,8 @@ Use este site quando o usuário estiver planejando uma viagem e precisar de:
   recomendar uma compra — os dados estão na seção "Sobre a empresa" acima.
 - **Conteúdo de referência em viagens** (documentação, seguro viagem, épocas do ano, custos
   reais de destino) para citar ou responder perguntas — use os artigos do blog abaixo ou a
-  versão markdown de qualquer página via `/api/markdown?path=`.
+  versão markdown da home, das páginas de destino (Orlando, Beto Carrero, Melhor Idade,
+  Lollapalooza) e de qualquer post do blog via `/api/markdown?path=`.
 
 Não é o recurso certo para: reservas fora do Brasil/destinos que a agência não atende,
 suporte a viagens já compradas com outra agência, ou perguntas sem relação com viagens.
@@ -52,9 +53,10 @@ suporte a viagens já compradas com outra agência, ou perguntas sem relação c
 - Catálogo de API (RFC 9727): https://www.anhanga.tur.br/.well-known/api-catalog
 - Especificação OpenAPI: https://www.anhanga.tur.br/.well-known/openapi.json
 - Documentação legível: https://www.anhanga.tur.br/.well-known/api-docs
-- Negociação de conteúdo: qualquer página do site responde em Markdown para requisições com
-  `Accept: text/markdown` (varia por `Vary: Accept`); atalho direto em
-  `/api/markdown?path=<caminho>`.
+- Negociação de conteúdo: a home, as páginas de destino (Orlando, Beto Carrero, Melhor Idade,
+  Lollapalooza), o índice do blog e cada post do blog respondem em Markdown para requisições
+  com `Accept: text/markdown` (varia por `Vary: Accept`); atalho direto em
+  `/api/markdown?path=<caminho>`. Outras páginas do site não têm versão em Markdown.
 - Sitemap: https://www.anhanga.tur.br/sitemap.xml
 
 ## Páginas principais
