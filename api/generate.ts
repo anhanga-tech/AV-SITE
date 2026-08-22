@@ -599,18 +599,26 @@ export default async function handler(request: Request) {
         return buildMethodNotAllowedResponse(corsHeaders);
     }
 
+    // Once the rate-limit check passes, every subsequent response — success or
+    // failure (config error, invalid payload, Gemini failure) — should carry the
+    // checked quota so agents can self-throttle before an eventual 429, not just
+    // learn about it once already denied.
+    let responseHeaders = corsHeaders;
+
     try {
         const rateLimitState = await getRateLimitState(request, corsHeaders);
         if (rateLimitState instanceof Response) return rateLimitState;
 
+        responseHeaders = { ...corsHeaders, ...buildRateLimitHeaders(rateLimitState.rateLimit) };
+
         const providerConfig = resolveGeminiProviderConfig();
         if (providerConfig.ok === false) {
-            return buildConfigErrorResponse(providerConfig, corsHeaders);
+            return buildConfigErrorResponse(providerConfig, responseHeaders);
         }
 
         logProviderStatus(providerConfig);
 
-        const contents = await parseGenerateContents(request, corsHeaders);
+        const contents = await parseGenerateContents(request, responseHeaders);
         if (contents instanceof Response) return contents;
 
         const clientOptions = buildGeminiClientOptions(providerConfig);
@@ -622,15 +630,8 @@ export default async function handler(request: Request) {
             clientOptions,
         });
 
-        return buildJsonResponse(
-            successBody,
-            200,
-            {
-                ...buildRateLimitHeaders(rateLimitState.rateLimit),
-                ...corsHeaders,
-            },
-        );
+        return buildJsonResponse(successBody, 200, responseHeaders);
     } catch (error: unknown) {
-        return buildGeminiErrorResponse(error, corsHeaders);
+        return buildGeminiErrorResponse(error, responseHeaders);
     }
 }

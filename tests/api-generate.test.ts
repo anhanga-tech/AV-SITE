@@ -170,6 +170,22 @@ test('generate handler returns 500 SERVER_CONFIG_ERROR when GEMINI_API_KEY is mi
 
     assert.equal(response.status, 500);
     assert.equal(body.code, 'SERVER_CONFIG_ERROR');
+    assert.equal(response.headers.get('RateLimit-Limit'), '10', 'the rate-limit check already ran, so quota should be visible even on a config error');
+    assert.ok(response.headers.get('RateLimit-Remaining'));
+});
+
+test('generate handler sets RateLimit-* headers on a 400 VALIDATION_ERROR (the bucket was already consumed)', async (t) => {
+    t.after(restoreEnv);
+
+    process.env.GEMINI_API_KEY = 'test-key';
+    delete process.env.AI_GATEWAY_ENABLED;
+
+    const response = await handler(buildPostRequest({ contents: [] }));
+
+    assert.equal(response.status, 400);
+    assert.equal(response.headers.get('RateLimit-Limit'), '10');
+    assert.ok(response.headers.get('RateLimit-Remaining'));
+    assert.ok(response.headers.get('RateLimit-Reset'));
 });
 
 // ─── Gemini error mapping (via buildGeminiErrorResponse) ─────────────────────
