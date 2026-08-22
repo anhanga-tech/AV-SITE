@@ -162,10 +162,27 @@ For now, track the gap as:
 |---|---|---|
 | WAF custom rules for `/api/*` | Not available on current plan | Revisit after plan upgrade |
 | Dashboard rate limiting for write/API paths | Not available on current plan | Revisit after plan upgrade; app-level rate limits still live in code where implemented |
-| Bot Fight Mode / AI bot controls | Dashboard recommendation from Security Insights export | Verify manually before enabling; watch Cloudflare Security Events after activation |
+| Bot Fight Mode / AI bot controls | Resolved 2026-08-22 | See below |
 
 The Security Insights CSV is evidence of Cloudflare recommendations, not proof that
 the controls are enabled. Treat each row as a review queue item.
+
+### AI crawler access (Bot Fight Mode)
+
+Bot Fight Mode (Security → Settings) is enabled for the zone and was found to be
+challenging known AI crawlers (GPTBot, ClaudeBot, ChatGPT-User, PerplexityBot,
+Google-Extended, Applebot-Extended, DeepSeekBot, Claude-User, Claude-SearchBot,
+OAI-SearchBot), which was the root cause of a 6/100 score on an external agent-readiness
+scan (is-agentic.com) — the scanner's crawler couldn't get past the challenge to
+evaluate anything else. `AI Crawl Control → Security` already had "Block AI training
+bots" set to allow, so that setting was not the cause.
+
+Fixed with a WAF custom rule (`Security → Security rules → Custom rules`, named
+"Allow AI crawlers (skip Bot Fight Mode)") that matches those user agents and applies
+action **Skip → All Super Bot Fight Mode Rules**, leaving Bot Fight Mode active for
+everything else. Verified via `curl -A "<bot-name>" https://www.anhanga.tur.br/`
+(and the apex-domain redirect) returning `200` with `cf-cache-status: DYNAMIC` and no
+`cf-mitigated` header, for both `anhanga.tur.br` and `www.anhanga.tur.br`.
 
 ## Speed Brain and Web Analytics
 
