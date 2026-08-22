@@ -1,5 +1,6 @@
 import React from 'react';
 import { MapPin, Home as HomeIcon, Compass, BookOpen, ArrowLeft } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import { Seo } from '../components/Seo';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { getBlogHomeUrl } from '../utils/blog';
@@ -11,9 +12,13 @@ const SITE_URL = 'https://www.anhanga.tur.br';
 const NotFound: React.FC = () => {
   // Traks: rota 404 é renderizada pela SPA, então o sinal vem daqui
   // (o snippet do <head> é único para todas as rotas — não dá para usar data-404).
+  // Depende de pathname (não []): a rota wildcard reaproveita a mesma instância
+  // de NotFound entre navegações client-side para dois 404s distintos, então um
+  // efeito só-no-mount perderia o segundo.
+  const { pathname } = useLocation();
   useEffect(() => {
     trackTraks('page_not_found');
-  }, []);
+  }, [pathname]);
 
   return (
     <>

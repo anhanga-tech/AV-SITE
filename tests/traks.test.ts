@@ -4,6 +4,7 @@ import { pushGenerateLeadConversionEvent } from '../utils/generate-lead-analytic
 import {
     trackTraks,
     installTraksWhatsAppClickListener,
+    nextBlogNotFoundTraksSlug,
 } from '../utils/traks.ts';
 
 interface FakeAnchor {
@@ -174,4 +175,46 @@ test('pushGenerateLeadConversionEvent dispara quote_request no Traks com pathnam
     } finally {
         env.cleanup();
     }
+});
+
+// ─── nextBlogNotFoundTraksSlug (guard de pages/BlogPost.tsx) ────────────────
+
+test('nextBlogNotFoundTraksSlug: rastreia um slug inválido novo', () => {
+    assert.deepEqual(nextBlogNotFoundTraksSlug(false, 'inexistente', null), {
+        shouldTrack: true,
+        nextLastTrackedSlug: 'inexistente',
+    });
+});
+
+test('nextBlogNotFoundTraksSlug: não duplica o mesmo slug inválido em re-render', () => {
+    assert.deepEqual(nextBlogNotFoundTraksSlug(false, 'inexistente', 'inexistente'), {
+        shouldTrack: false,
+        nextLastTrackedSlug: 'inexistente',
+    });
+});
+
+test('nextBlogNotFoundTraksSlug: rastreia de novo ao trocar para outro slug inválido', () => {
+    assert.deepEqual(nextBlogNotFoundTraksSlug(false, 'outro-slug', 'inexistente'), {
+        shouldTrack: true,
+        nextLastTrackedSlug: 'outro-slug',
+    });
+});
+
+test('nextBlogNotFoundTraksSlug: limpa o guard quando um post válido é visto', () => {
+    assert.deepEqual(nextBlogNotFoundTraksSlug(true, 'post-real', 'inexistente'), {
+        shouldTrack: false,
+        nextLastTrackedSlug: null,
+    });
+});
+
+test('nextBlogNotFoundTraksSlug: revisitar o mesmo slug inválido depois de um post válido rastreia de novo', () => {
+    // Sequência real: /blog/missing (404) -> /blog/post-real (válido) -> /blog/missing (404 de novo)
+    const first = nextBlogNotFoundTraksSlug(false, 'missing', null);
+    assert.equal(first.shouldTrack, true);
+
+    const afterValidPost = nextBlogNotFoundTraksSlug(true, 'post-real', first.nextLastTrackedSlug);
+    assert.equal(afterValidPost.nextLastTrackedSlug, null);
+
+    const revisit = nextBlogNotFoundTraksSlug(false, 'missing', afterValidPost.nextLastTrackedSlug);
+    assert.deepEqual(revisit, { shouldTrack: true, nextLastTrackedSlug: 'missing' });
 });

@@ -89,3 +89,29 @@ export function installTraksWhatsAppClickListener(): void {
 export function trackTraksWhatsAppHandoff(): void {
     trackTraks('whatsapp_click', { location: currentPathname() });
 }
+
+/**
+ * Decide se um 404 de post deve emitir `page_not_found`, dado o slug atual
+ * de rota e o último slug já rastreado (guard local, tipicamente um `useRef`).
+ * Extraído de `pages/BlogPost.tsx` para ser testável isoladamente: esse
+ * componente usa `import.meta.glob` (macro do Vite), então não pode ser
+ * montado fora de um build Vite/browser em testes `node:test`.
+ *
+ * Emite uma vez por slug inválido, mas esquece o guard assim que um post
+ * válido é visto — sem isso, revisitar o mesmo slug inválido depois de
+ * navegar por um post real (a rota `/blog/:slug` reaproveita a mesma
+ * instância do componente) nunca reemitiria o evento.
+ */
+export function nextBlogNotFoundTraksSlug(
+    hasPost: boolean,
+    slug: string | undefined,
+    lastTrackedSlug: string | null,
+): { shouldTrack: boolean; nextLastTrackedSlug: string | null } {
+    if (hasPost) {
+        return { shouldTrack: false, nextLastTrackedSlug: null };
+    }
+    if (slug && lastTrackedSlug !== slug) {
+        return { shouldTrack: true, nextLastTrackedSlug: slug };
+    }
+    return { shouldTrack: false, nextLastTrackedSlug: lastTrackedSlug };
+}

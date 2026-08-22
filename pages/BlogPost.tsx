@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { trackTraks } from '../utils/traks';
+import { trackTraks, nextBlogNotFoundTraksSlug } from '../utils/traks';
 
 import { Seo } from '../components/Seo';
 import { BlogPostContent } from '../components/blog/BlogPostContent';
@@ -50,11 +50,18 @@ const BlogPost: React.FC = () => {
     }, [slug]);
 
     // 404 de blog: um único evento por slug inexistente (guard evita re-emitir
-    // em re-renders e navegações repetidas ao mesmo slug).
+    // em re-renders e navegações repetidas ao mesmo slug). Decisão isolada em
+    // nextBlogNotFoundTraksSlug (utils/traks.ts) para cobertura de teste —
+    // este componente usa import.meta.glob e não pode ser montado em node:test.
     const lastMissingTraksSlug = useRef<string | null>(null);
     useEffect(() => {
-        if (!post && slug && lastMissingTraksSlug.current !== slug) {
-            lastMissingTraksSlug.current = slug;
+        const { shouldTrack, nextLastTrackedSlug } = nextBlogNotFoundTraksSlug(
+            Boolean(post),
+            slug,
+            lastMissingTraksSlug.current,
+        );
+        lastMissingTraksSlug.current = nextLastTrackedSlug;
+        if (shouldTrack) {
             trackTraks('page_not_found');
         }
     }, [post, slug]);
