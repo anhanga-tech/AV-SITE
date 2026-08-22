@@ -1,6 +1,6 @@
 import type { ContentListUnion } from '@google/genai';
 import { checkRateLimit } from '../lib/rate-limit';
-import { buildCorsHeaders, getClientIP } from '../lib/network';
+import { buildCorsHeaders, buildRateLimitHeaders as buildStandardRateLimitHeaders, getClientIP } from '../lib/network';
 import { logger } from '../lib/logger';
 import { budgetTool } from '../lib/ai/tools';
 import { SYSTEM_INSTRUCTION } from '../lib/ai/prompt';
@@ -161,6 +161,7 @@ function buildMethodNotAllowedResponse(corsHeaders: Record<string, string>): Res
 
 function buildRateLimitHeaders(rateLimit: { resetIn: number; remaining: number }): Record<string, string> {
     return {
+        ...buildStandardRateLimitHeaders(rateLimit, RATE_LIMIT_MAX_REQUESTS),
         'X-RateLimit-Remaining': String(rateLimit.remaining),
         'X-RateLimit-Reset': String(Math.ceil(rateLimit.resetIn / 1000)),
     };
@@ -198,8 +199,7 @@ async function getRateLimitState(
         retryAfter: Math.ceil(rateLimit.resetIn / 1000)
     }, 429, {
         'Retry-After': String(Math.ceil(rateLimit.resetIn / 1000)),
-        'X-RateLimit-Remaining': '0',
-        'X-RateLimit-Reset': String(Math.ceil(rateLimit.resetIn / 1000)),
+        ...buildRateLimitHeaders({ ...rateLimit, remaining: 0 }),
         ...corsHeaders
     });
 }
@@ -599,18 +599,26 @@ export default async function handler(request: Request) {
         return buildMethodNotAllowedResponse(corsHeaders);
     }
 
+    // Once the rate-limit check passes, every subsequent response — success or
+    // failure (config error, invalid payload, Gemini failure) — should carry the
+    // checked quota so agents can self-throttle before an eventual 429, not just
+    // learn about it once already denied.
+    let responseHeaders = corsHeaders;
+
     try {
         const rateLimitState = await getRateLimitState(request, corsHeaders);
         if (rateLimitState instanceof Response) return rateLimitState;
 
+        responseHeaders = { ...corsHeaders, ...buildRateLimitHeaders(rateLimitState.rateLimit) };
+
         const providerConfig = resolveGeminiProviderConfig();
         if (providerConfig.ok === false) {
-            return buildConfigErrorResponse(providerConfig, corsHeaders);
+            return buildConfigErrorResponse(providerConfig, responseHeaders);
         }
 
         logProviderStatus(providerConfig);
 
-        const contents = await parseGenerateContents(request, corsHeaders);
+        const contents = await parseGenerateContents(request, responseHeaders);
         if (contents instanceof Response) return contents;
 
         const clientOptions = buildGeminiClientOptions(providerConfig);
@@ -622,15 +630,8 @@ export default async function handler(request: Request) {
             clientOptions,
         });
 
-        return buildJsonResponse(
-            successBody,
-            200,
-            {
-                ...buildRateLimitHeaders(rateLimitState.rateLimit),
-                ...corsHeaders,
-            },
-        );
+        return buildJsonResponse(successBody, 200, responseHeaders);
     } catch (error: unknown) {
-        return buildGeminiErrorResponse(error, corsHeaders);
+        return buildGeminiErrorResponse(error, responseHeaders);
     }
 }
