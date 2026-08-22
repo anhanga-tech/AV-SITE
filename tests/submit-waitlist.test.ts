@@ -117,6 +117,23 @@ test('submit-waitlist maps Odoo failures to ODOO_ERROR', async (t) => {
     assert.equal(response.status, 503);
     assert.equal(payload.code, 'ODOO_ERROR');
     assert.equal(payload.error, 'Erro ao enviar inscrição na lista de espera.');
+    assert.equal(response.headers.get('RateLimit-Limit'), '5', 'the bucket was already consumed for this request, so quota should still be visible on a dispatch failure');
+});
+
+test('submit-waitlist sets RateLimit-* headers on a 400 VALIDATION_ERROR (the bucket was already consumed)', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    global.fetch = createOdooMock().fetch;
+
+    const response = await handler(buildRequest(
+        { name: 'Ana Maria', email: 'not-an-email', sourcePage: '/lollapalooza', utms: {}, tracking: {} },
+        { headers: { 'x-real-ip': '127.0.0.146' } },
+    ));
+
+    assert.equal(response.status, 400);
+    assert.equal(response.headers.get('RateLimit-Limit'), '5');
+    assert.equal(response.headers.get('RateLimit-Remaining'), '4');
+    assert.ok(response.headers.get('RateLimit-Reset'));
 });
 
 test('classifySubmitWaitlistError preserves unexpected internal failures', () => {
