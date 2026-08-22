@@ -55,6 +55,19 @@ test('submit-waitlist returns SERVER_CONFIG_ERROR before parsing when Odoo confi
     assert.equal(payload.error, 'Integração de waitlist indisponível no momento.');
 });
 
+test('submit-waitlist sets RateLimit-* headers on a successful response', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    const mock = createOdooMock();
+    global.fetch = mock.fetch;
+
+    const response = await handler(buildRequest(buildDirtyWaitlistPayload(), { headers: { 'x-real-ip': '127.0.0.42' } }));
+    assert.equal(response.status, 201);
+    assert.equal(response.headers.get('RateLimit-Limit'), '5', 'RateLimit-Limit must reflect the configured max');
+    assert.equal(response.headers.get('RateLimit-Remaining'), '4', 'RateLimit-Remaining must reflect this request');
+    assert.ok(response.headers.get('RateLimit-Reset'), 'RateLimit-Reset header should be set');
+});
+
 test('submit-waitlist upserts a sanitized res.partner and creates NO crm.lead', async (t) => {
     t.after(restore);
     setOdooEnv();

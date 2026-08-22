@@ -296,6 +296,11 @@ export function createSubmitHandler<TData, TPayload = unknown>(
             return buildRateLimitDenial(env, clientIp, rateLimit);
         }
 
+        // Merged into the 200 responses below so agents can see remaining quota
+        // before they're ever rate-limited, not just after (matches api/generate.ts
+        // and api/markdown.ts, the other two RateLimit-* call sites).
+        const successHeaders = { ...corsHeaders, ...buildRateLimitHeaders(rateLimit, options.rateLimit.max) };
+
         let rawBody: unknown;
         try {
             rawBody = await request.json();
@@ -322,7 +327,7 @@ export function createSubmitHandler<TData, TPayload = unknown>(
                     ...(options.success.message ? { message: options.success.message } : {}),
                 },
                 options.success.status,
-                corsHeaders,
+                successHeaders,
             );
         }
 
@@ -364,7 +369,7 @@ export function createSubmitHandler<TData, TPayload = unknown>(
                 ...(options.success.message ? { message: options.success.message } : {}),
             },
             options.success.status,
-            corsHeaders,
+            successHeaders,
         );
     };
 }
