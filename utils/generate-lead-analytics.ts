@@ -1,4 +1,5 @@
 import type { LeadTracking, LeadUtms } from '../types/leadCapture';
+import { trackTraks } from './traks';
 
 interface GenerateLeadConversionEvent {
     eventId?: string;
@@ -27,4 +28,7 @@ export function pushGenerateLeadConversionEvent({
         ga_client_id: tracking?.cid,
         ga_session_id: tracking?.sid,
     });
+
+    // Traks (cookieless): mesma conversão, destino em baixa cardinalidade.
+    trackTraks('quote_request', { destination });
 }

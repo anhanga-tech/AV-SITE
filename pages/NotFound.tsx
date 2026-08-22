@@ -3,10 +3,18 @@ import { MapPin, Home as HomeIcon, Compass, BookOpen, ArrowLeft } from 'lucide-r
 import { Seo } from '../components/Seo';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { getBlogHomeUrl } from '../utils/blog';
+import { useEffect } from 'react';
+import { trackTraks } from '../utils/traks';
 
 const SITE_URL = 'https://www.anhanga.tur.br';
 
 const NotFound: React.FC = () => {
+  // Traks: rota 404 é renderizada pela SPA, então o sinal vem daqui
+  // (o snippet do <head> é único para todas as rotas — não dá para usar data-404).
+  useEffect(() => {
+    trackTraks('page_not_found');
+  }, []);
+
   return (
     <>
       <Seo

@@ -5,6 +5,7 @@ import './src/index.css';
 import App from './App';
 import { shouldHydratePrerenderedRoute } from './lib/hydration';
 import { initClientErrorTracking } from './lib/sentry-client';
+import { installTraksWhatsAppClickListener } from './utils/traks';
 import { handleStaleChunkPreloadError } from './lib/stale-chunk-recovery';
 
 // Reload (once per failing asset) on stale-cache preload failures so the
@@ -16,6 +17,7 @@ window.addEventListener('vite:preloadError', (event: Event & { payload?: unknown
 });
 
 initClientErrorTracking();
+installTraksWhatsAppClickListener();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
