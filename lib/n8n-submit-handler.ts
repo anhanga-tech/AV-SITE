@@ -15,7 +15,7 @@
  * historical reasons (pre cut-over, every form posted to n8n); `ODOO_ERROR:...`
  * is matched the same way via the `errorPattern` option each handler supplies.
  */
-import { buildCorsHeaders, buildJsonResponse, createRequestId, getClientIP } from './network';
+import { buildCorsHeaders, buildJsonResponse, buildRateLimitHeaders, createRequestId, getClientIP } from './network';
 import { checkRateLimit } from './rate-limit';
 import { detectBot } from './bot-detection';
 import { logger } from './logger';
@@ -217,6 +217,7 @@ function buildRateLimitDenial<TData, TPayload>(
         {
             ...corsHeaders,
             'Retry-After': String(retryAfterSeconds),
+            ...buildRateLimitHeaders(rateLimit, options.rateLimit.max),
             'X-RateLimit-Remaining': String(rateLimit.remaining),
             'X-RateLimit-Reset': String(Math.ceil((Date.now() + rateLimit.resetIn) / 1000)),
         },
@@ -228,8 +229,9 @@ function buildWebhookErrorResponse<TData, TPayload>(
     env: RequestEnv<TData, TPayload>,
     data: TData,
     error: unknown,
+    responseHeaders: Record<string, string>,
 ): Response {
-    const { options, requestId, corsHeaders } = env;
+    const { options, requestId } = env;
     const classification = options.dispatch.classifyError(error);
     const errorLogFields = options.onError?.({ data, requestId, classification }) ?? {};
 
@@ -245,7 +247,7 @@ function buildWebhookErrorResponse<TData, TPayload>(
     return buildJsonResponse(
         { ok: false, requestId, code: classification.code, error: classification.error },
         classification.status,
-        corsHeaders,
+        responseHeaders,
     );
 }
 
@@ -295,6 +297,12 @@ export function createSubmitHandler<TData, TPayload = unknown>(
             return buildRateLimitDenial(env, clientIp, rateLimit);
         }
 
+        // Merged into every response below this point — the bucket is already
+        // consumed by the checkRateLimit() call above, so success and failure
+        // alike should let the caller see remaining quota (matches api/generate.ts
+        // and api/markdown.ts, the other two RateLimit-* call sites).
+        const responseHeaders = { ...corsHeaders, ...buildRateLimitHeaders(rateLimit, options.rateLimit.max) };
+
         let rawBody: unknown;
         try {
             rawBody = await request.json();
@@ -302,7 +310,7 @@ export function createSubmitHandler<TData, TPayload = unknown>(
             return buildJsonResponse(
                 { ok: false, requestId, code: 'VALIDATION_ERROR', error: options.parse.invalidJsonError },
                 400,
-                corsHeaders,
+                responseHeaders,
             );
         }
 
@@ -321,7 +329,7 @@ export function createSubmitHandler<TData, TPayload = unknown>(
                     ...(options.success.message ? { message: options.success.message } : {}),
                 },
                 options.success.status,
-                corsHeaders,
+                responseHeaders,
             );
         }
 
@@ -330,7 +338,7 @@ export function createSubmitHandler<TData, TPayload = unknown>(
             return buildJsonResponse(
                 { ok: false, requestId, code: 'VALIDATION_ERROR', error: validation.error },
                 400,
-                corsHeaders,
+                responseHeaders,
             );
         }
 
@@ -351,7 +359,7 @@ export function createSubmitHandler<TData, TPayload = unknown>(
             await options.dispatch.send(requestId, payload);
         } catch (error: unknown) {
             await options.onSendFailure?.(data, requestId);
-            return buildWebhookErrorResponse(env, data, error);
+            return buildWebhookErrorResponse(env, data, error, responseHeaders);
         }
 
         logger.info(options.logScope, { requestId, stage: 'done' });
@@ -363,7 +371,7 @@ export function createSubmitHandler<TData, TPayload = unknown>(
                 ...(options.success.message ? { message: options.success.message } : {}),
             },
             options.success.status,
-            corsHeaders,
+            responseHeaders,
         );
     };
 }
