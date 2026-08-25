@@ -90,6 +90,25 @@ test('reserveWhatsAppWindow retorna um handoff inerte quando o popup é bloquead
     );
 });
 
+test('reserveWhatsAppWindow retorna um objeto distinto a cada chamada mesmo quando o popup é bloqueado', () => {
+    // Chamadores comparam handoffs por identidade (ex.:
+    // `activeHandoffRef.current !== whatsappHandoff`) para saber se uma
+    // reserva específica já foi cancelada por outra coisa. Um singleton
+    // compartilhado faria duas reservas bloqueadas não relacionadas
+    // compararem como iguais, deixando a limpeza de uma submissão cancelar
+    // o handoff ainda ativo de outra (ex.: reset() + reenvio do modal de
+    // contato antes da primeira resposta chegar).
+    withWindowOpen(
+        () => null,
+        () => {
+            const first = reserveWhatsAppWindow();
+            const second = reserveWhatsAppWindow();
+
+            assert.notStrictEqual(first, second, 'cada reserva deve retornar um objeto próprio, não um singleton');
+        },
+    );
+});
+
 test('reserveWhatsAppWindow fecha a aba e não navega quando o navegador rejeita zerar `opener`', () => {
     // Alguns navegadores tornam `opener` somente-leitura. Sem conseguir
     // confirmar o isolamento que `noopener` garantiria, o handoff não pode

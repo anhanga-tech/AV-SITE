@@ -309,9 +309,11 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
       const handoffWasAbandoned = activeHandoffRef.current !== whatsappHandoff;
       const opened = whatsappHandoff.open(whatsappLink);
       if (!handoffWasAbandoned) {
-        if (!opened) {
-          setWhatsappUrl(whatsappLink);
-        }
+        // Populate the fallback link even when the tab opened successfully:
+        // hasSucceeded permanently disables the form, so a visitor switching
+        // back from WhatsApp needs a usable confirmation state, not a
+        // silently locked form with no indication anything happened.
+        setWhatsappUrl(whatsappLink);
         pushFormAnalyticsEvent({
           event: 'whatsapp_opened',
           formType: 'ai_chatbot_lead',

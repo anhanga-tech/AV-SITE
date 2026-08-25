@@ -13,10 +13,17 @@ export interface WhatsAppHandoff {
     cancel(): void;
 }
 
-const NOOP_HANDOFF: WhatsAppHandoff = {
-    open: () => false,
-    cancel: () => {},
-};
+// A fresh object per call, not a shared singleton: callers compare handoffs
+// by identity (e.g. `activeHandoffRef.current !== whatsappHandoff`) to tell
+// whether a specific reservation was already cancelled by something else. A
+// singleton would make two unrelated blocked reservations compare equal,
+// letting one submission's cleanup clear another's still-active handoff.
+function createNoopHandoff(): WhatsAppHandoff {
+    return {
+        open: () => false,
+        cancel: () => {},
+    };
+}
 
 /**
  * Reserves a blank browser tab synchronously — call this from inside a click
@@ -31,7 +38,7 @@ const NOOP_HANDOFF: WhatsAppHandoff = {
  * reserved tab, or `.cancel()` to close it if the request failed.
  */
 export function reserveWhatsAppWindow(): WhatsAppHandoff {
-    if (typeof window === 'undefined') return NOOP_HANDOFF;
+    if (typeof window === 'undefined') return createNoopHandoff();
 
     let handle: Window | null;
     try {
@@ -40,7 +47,7 @@ export function reserveWhatsAppWindow(): WhatsAppHandoff {
         handle = null;
     }
 
-    if (!handle) return NOOP_HANDOFF;
+    if (!handle) return createNoopHandoff();
 
     try {
         // Sever the opener relationship the same way passing 'noopener' to a
@@ -58,7 +65,7 @@ export function reserveWhatsAppWindow(): WhatsAppHandoff {
         } catch {
             // ignore
         }
-        return NOOP_HANDOFF;
+        return createNoopHandoff();
     }
 
     try {

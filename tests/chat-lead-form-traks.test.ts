@@ -104,6 +104,62 @@ test('submit validado do ChatLeadForm emite whatsapp_click no Traks', async () =
     }
 });
 
+test('mantém um link de fallback do WhatsApp visível mesmo depois de abrir a aba com sucesso (hasSucceeded trava o resto do form)', async () => {
+    cleanup();
+    // Com a aba aberta automaticamente (opened === true) e sem `notice` do
+    // CRM, nem `whatsappUrl` nem `notice` eram populados antes — mas
+    // `hasSucceeded` já trava permanentemente os campos e botões. Um
+    // visitante que volta da aba do WhatsApp para o site via alt-tab via um
+    // formulário travado sem nenhuma confirmação ou caminho de continuação.
+    const previousOpen = window.open;
+    Object.defineProperty(window, 'open', {
+        configurable: true,
+        value: () => ({
+            closed: false,
+            close() {},
+            location: { href: '' },
+            opener: 'writable',
+        }),
+    });
+
+    try {
+        const { container, getByRole } = render(React.createElement(ChatLeadForm, makeProps()));
+        const set = (id: string, value: string) => {
+            const input = container.querySelector(`#${id}`);
+            if (!input) throw new Error(`input não encontrado: #${id}`);
+            fireEvent.input(input, { target: { value } });
+        };
+        set('lead-first-name', 'Fulano');
+        set('lead-last-name', 'de Tal');
+        set('lead-email', 'fulano@test.com');
+        set('lead-whatsapp', '11999998888');
+        const lgpd = container.querySelector('input[type="checkbox"]');
+        if (lgpd) fireEvent.click(lgpd);
+
+        const submitButton = Array.from(container.querySelectorAll('button'))
+            .find((b) => b.textContent?.includes('Salvar e abrir WhatsApp'));
+        assert.ok(submitButton, 'botão "Salvar e abrir WhatsApp" deve existir');
+
+        await act(async () => {
+            fireEvent.click(submitButton);
+            await Promise.resolve();
+            await Promise.resolve();
+        });
+
+        assert.equal(
+            getByRole('link', { name: 'Abrir WhatsApp' }).getAttribute('href'),
+            'https://wa.me/5511955021519?text=test',
+            'o link de fallback deve continuar disponível mesmo com a navegação automática já tendo ocorrido',
+        );
+    } finally {
+        Object.defineProperty(window, 'open', {
+            configurable: true,
+            value: previousOpen,
+        });
+        cleanup();
+    }
+});
+
 test('caminho direto abre o modal de lead e não abre o WhatsApp sem salvar', () => {
     const previousOpen = window.open;
     const modalDetails: Array<{ source?: string; destination?: string; message?: string }> = [];
