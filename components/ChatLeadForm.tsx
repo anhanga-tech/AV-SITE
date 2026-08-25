@@ -11,7 +11,7 @@ import {
 import { triggerHaptic } from '../utils/haptics';
 import { trackTraksWhatsAppHandoff } from '../utils/traks';
 import { openContactModal } from '../utils/contactForm';
-import { reserveWhatsAppWindow } from '../utils/whatsappHandoff';
+import { reserveWhatsAppWindow, type WhatsAppHandoff } from '../utils/whatsappHandoff';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
 import { isFieldCompleteForAnalytics } from '../lib/form-v1-validation';
 import { ChatLeadFormFields } from './chat-lead-form/ChatLeadFormFields';
@@ -63,6 +63,11 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
   const isProcessingRef = React.useRef(false);
   const eventIdRef = useRef<string | null>(null);
   const isOpenRef = useRef(isOpen);
+  // Tracks the WhatsApp tab reserved by the in-flight submission (if any) so
+  // the unmount cleanup below can close it immediately — a route change that
+  // unmounts the whole chat (App.tsx removes <AIChat> on some landing pages)
+  // wouldn't otherwise cancel a still-pending request's reserved tab.
+  const activeHandoffRef = useRef<WhatsAppHandoff | null>(null);
   const startedRef = useRef(false);
   const completedFields = useRef<Set<string> | null>(null);
   const firstNameRef = useRef<HTMLInputElement>(null);
@@ -92,6 +97,13 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
       isOpenRef.current = false;
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    return () => {
+      activeHandoffRef.current?.cancel();
+      activeHandoffRef.current = null;
+    };
+  }, []);
 
   useEffect(() => {
     const firstError = Object.keys(fieldErrors)[0] as keyof FieldErrors | undefined;
@@ -218,6 +230,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
     // visitor to WhatsApp: the previous fire-and-forget order could open
     // WhatsApp while silently losing the lead.
     const whatsappHandoff = reserveWhatsAppWindow();
+    activeHandoffRef.current = whatsappHandoff;
 
     try {
       const result = await onFinalizeLead(submitPayload);
@@ -245,6 +258,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
       pushGenerateLeadDataLayerEvent(submitPayload);
       eventIdRef.current = null;
       setHasSucceeded(true);
+      const whatsappLink = getWhatsAppUrl(payload);
 
       if (!isOpenRef.current) {
         // The visitor closed the chat drawer while this request was in
@@ -252,11 +266,17 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
         // toggles), so this continuation would otherwise still run and hand
         // off to WhatsApp after an explicit dismissal — cancel just the
         // navigation, the lead itself is already saved and reported above.
+        // Still expose the WhatsApp link as a fallback: if the visitor
+        // reopens the drawer, they'd otherwise see a disabled form with no
+        // indication the lead was saved and no way to continue.
         whatsappHandoff.cancel();
+        setWhatsappUrl(whatsappLink);
+        if (result.notice) {
+          setNotice(result.notice);
+        }
         return;
       }
 
-      const whatsappLink = getWhatsAppUrl(payload);
       const opened = whatsappHandoff.open(whatsappLink);
       if (!opened) {
         setWhatsappUrl(whatsappLink);
@@ -300,6 +320,9 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
       setLocalError('Não foi possível salvar seu contato. Tente novamente.');
       console.warn('Background lead submission threw:', error);
     } finally {
+      if (activeHandoffRef.current === whatsappHandoff) {
+        activeHandoffRef.current = null;
+      }
       setIsLocallySubmitting(false);
       isProcessingRef.current = false;
     }
@@ -326,6 +349,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
           countryCode={countryCode}
           acceptedLGPD={acceptedLGPD}
           fieldErrors={fieldErrors}
+          disabled={isSubmittingLead || isLocallySubmitting || hasSucceeded}
           onFirstNameChange={(value) => { setFirstName(value); trackField('firstName', value); invalidateRetryKey(); }}
           onLastNameChange={(value) => { setLastName(value); trackField('lastName', value); invalidateRetryKey(); }}
           onEmailChange={(value) => { setEmail(value); trackField('email', value); invalidateRetryKey(); }}

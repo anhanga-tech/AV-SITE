@@ -10,6 +10,7 @@ type TextFieldProps = {
   onChange: (value: string) => void;
   inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];
   inputRef?: React.Ref<HTMLInputElement>;
+  disabled?: boolean;
 };
 
 export function TextField({
@@ -22,6 +23,7 @@ export function TextField({
   onChange,
   inputMode,
   inputRef,
+  disabled,
 }: TextFieldProps) {
   const errorId = `${id}-error`;
   return (
@@ -37,9 +39,10 @@ export function TextField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
+        disabled={disabled}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
-        className={`w-full bg-white border ${error ? 'border-red-500' : 'border-zinc-200'} rounded-xl px-4 py-3 text-sm text-zinc-700 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition shadow-sm`}
+        className={`w-full bg-white border ${error ? 'border-red-500' : 'border-zinc-200'} rounded-xl px-4 py-3 text-sm text-zinc-700 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition shadow-sm disabled:cursor-not-allowed disabled:opacity-60`}
       />
       {error && <span id={errorId} role="alert" className="text-[10px] text-red-500 font-bold ml-1 uppercase">{error}</span>}
     </div>

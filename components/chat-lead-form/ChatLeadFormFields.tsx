@@ -18,6 +18,8 @@ interface ChatLeadFormFieldsProps {
   onCountryCodeChange: (value: string) => void;
   onLgpdChange: (value: boolean) => void;
   fieldRefs?: Partial<Record<keyof FieldErrors, React.Ref<HTMLInputElement>>>;
+  /** Disables every field — while a submission is in flight, edits would silently apply to data that was already captured in the pending request's payload. */
+  disabled?: boolean;
 }
 
 export function ChatLeadFormFields({
@@ -35,6 +37,7 @@ export function ChatLeadFormFields({
   onCountryCodeChange,
   onLgpdChange,
   fieldRefs,
+  disabled,
 }: ChatLeadFormFieldsProps) {
   return (
     <div className="space-y-3 mb-5">
@@ -47,6 +50,7 @@ export function ChatLeadFormFields({
         error={fieldErrors.firstName}
         onChange={onFirstNameChange}
         inputRef={fieldRefs?.firstName}
+        disabled={disabled}
       />
 
       <TextField
@@ -58,6 +62,7 @@ export function ChatLeadFormFields({
         error={fieldErrors.lastName}
         onChange={onLastNameChange}
         inputRef={fieldRefs?.lastName}
+        disabled={disabled}
       />
 
       <TextField
@@ -69,6 +74,7 @@ export function ChatLeadFormFields({
         error={fieldErrors.email}
         onChange={onEmailChange}
         inputRef={fieldRefs?.email}
+        disabled={disabled}
       />
 
       <div className="space-y-1">
@@ -78,7 +84,8 @@ export function ChatLeadFormFields({
             id="lead-country-code"
             value={countryCode}
             onChange={(e) => onCountryCodeChange(e.target.value)}
-            className="w-[112px] shrink-0 bg-white border border-zinc-200 rounded-xl p-3 text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition shadow-sm"
+            disabled={disabled}
+            className="w-[112px] shrink-0 bg-white border border-zinc-200 rounded-xl p-3 text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-brand-vibrant/30 focus:border-brand-vibrant transition shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
           >
             <option value="+55">+55 BR</option>
             <option value="+1">+1 US/CA</option>
@@ -94,6 +101,7 @@ export function ChatLeadFormFields({
             error={fieldErrors.whatsapp}
             onChange={onWhatsappChange}
             inputRef={fieldRefs?.whatsapp}
+            disabled={disabled}
           />
         </div>
       </div>
@@ -105,9 +113,10 @@ export function ChatLeadFormFields({
               type="checkbox"
               checked={acceptedLGPD}
               onChange={(e) => onLgpdChange(e.target.checked)}
+              disabled={disabled}
               aria-invalid={fieldErrors.lgpd ? true : undefined}
               aria-describedby={fieldErrors.lgpd ? 'lead-lgpd-error' : undefined}
-              className="peer size-4 cursor-pointer appearance-none rounded border border-zinc-300 bg-white checked:bg-brand-vibrant checked:border-brand-vibrant transition focus:ring-2 focus:ring-brand-vibrant/20"
+              className="peer size-4 cursor-pointer appearance-none rounded border border-zinc-300 bg-white checked:bg-brand-vibrant checked:border-brand-vibrant transition focus:ring-2 focus:ring-brand-vibrant/20 disabled:cursor-not-allowed disabled:opacity-60"
             />
             <CheckCircle2 className="absolute size-3 text-white opacity-0 peer-checked:opacity-100 left-0.5 pointer-events-none transition-opacity" />
           </div>

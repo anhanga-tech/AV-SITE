@@ -407,16 +407,22 @@ test('fechar o drawer do chat durante o envio pendente cancela o handoff mas ain
     const previousOpen = window.open;
     Object.defineProperty(window, 'open', {
         configurable: true,
-        value: () => ({
-            closed: false,
-            close() { closedCount += 1; },
-            location: { set href(v: string) { navigatedTo = v; } },
-            opener: null,
-        }),
+        value: () => {
+            let closed = false;
+            return {
+                get closed() { return closed; },
+                close() {
+                    closed = true;
+                    closedCount += 1;
+                },
+                location: { set href(v: string) { navigatedTo = v; } },
+                opener: null,
+            };
+        },
     });
 
     try {
-        const { container, rerender } = render(React.createElement(ChatLeadForm, props));
+        const { container, rerender, getByRole } = render(React.createElement(ChatLeadForm, props));
         const set = (id: string, value: string) => {
             const input = container.querySelector(`#${id}`);
             if (!input) throw new Error(`input não encontrado: #${id}`);
@@ -455,6 +461,12 @@ test('fechar o drawer do chat durante o envio pendente cancela o handoff mas ain
             (entry) => entry && typeof entry === 'object' && 'event' in entry && entry.event === 'generate_lead',
         );
         assert.equal(generateLeadEvents.length, 1, 'generate_lead deve disparar mesmo com o drawer fechado');
+        // Reabrindo o drawer, o visitante precisa ver que o lead foi salvo e
+        // ter como continuar — não um formulário travado sem explicação.
+        assert.equal(
+            getByRole('link', { name: 'Abrir WhatsApp' }).getAttribute('href'),
+            'https://wa.me/5511955021519?text=test',
+        );
     } finally {
         Object.defineProperty(window, 'open', {
             configurable: true,
@@ -479,12 +491,18 @@ test('reabrir o drawer não desfaz uma dispensa ocorrida durante o envio pendent
     const previousOpen = window.open;
     Object.defineProperty(window, 'open', {
         configurable: true,
-        value: () => ({
-            closed: false,
-            close() { closedCount += 1; },
-            location: { set href(v: string) { navigatedTo = v; } },
-            opener: null,
-        }),
+        value: () => {
+            let closed = false;
+            return {
+                get closed() { return closed; },
+                close() {
+                    closed = true;
+                    closedCount += 1;
+                },
+                location: { set href(v: string) { navigatedTo = v; } },
+                opener: null,
+            };
+        },
     });
 
     try {
@@ -538,12 +556,18 @@ test('ChatLeadForm fecha a aba reservada se onFinalizeLead lançar exceção (n�
     const previousOpen = window.open;
     Object.defineProperty(window, 'open', {
         configurable: true,
-        value: () => ({
-            closed: false,
-            close() { closedCount += 1; },
-            location: { set href(v: string) { navigatedTo = v; } },
-            opener: null,
-        }),
+        value: () => {
+            let closed = false;
+            return {
+                get closed() { return closed; },
+                close() {
+                    closed = true;
+                    closedCount += 1;
+                },
+                location: { set href(v: string) { navigatedTo = v; } },
+                opener: null,
+            };
+        },
     });
 
     const props: React.ComponentProps<typeof ChatLeadForm> = {
@@ -583,6 +607,119 @@ test('ChatLeadForm fecha a aba reservada se onFinalizeLead lançar exceção (n�
             getByRole('alert').textContent,
             'Não foi possível salvar seu contato. Tente novamente.',
         );
+    } finally {
+        Object.defineProperty(window, 'open', {
+            configurable: true,
+            value: previousOpen,
+        });
+        cleanup();
+    }
+});
+
+test('campos do ChatLeadForm ficam desabilitados durante o envio (edição não pode ficar presa depois do sucesso)', async () => {
+    cleanup();
+    let resolveFinalize: ((result: LeadFinalizeResult) => void) | null = null;
+    const props: React.ComponentProps<typeof ChatLeadForm> = {
+        ...makeProps(),
+        onFinalizeLead: () => new Promise<LeadFinalizeResult>((resolve) => { resolveFinalize = resolve; }),
+    };
+
+    const { container } = render(React.createElement(ChatLeadForm, props));
+    const set = (id: string, value: string) => {
+        const input = container.querySelector(`#${id}`);
+        if (!input) throw new Error(`input não encontrado: #${id}`);
+        fireEvent.input(input, { target: { value } });
+    };
+    set('lead-first-name', 'Fulano');
+    set('lead-last-name', 'de Tal');
+    set('lead-email', 'fulano@test.com');
+    set('lead-whatsapp', '11999998888');
+    const lgpd = container.querySelector('input[type="checkbox"]');
+    if (lgpd) fireEvent.click(lgpd);
+
+    const submitButton = Array.from(container.querySelectorAll('button'))
+        .find((button) => button.textContent?.includes('Salvar e abrir WhatsApp'));
+    assert.ok(submitButton, 'botão "Salvar e abrir WhatsApp" deve existir');
+
+    fireEvent.click(submitButton);
+    await Promise.resolve();
+    assert.ok(resolveFinalize, 'onFinalizeLead deve ter sido chamado e estar pendente');
+
+    const firstNameInput = container.querySelector('#lead-first-name') as HTMLInputElement;
+    assert.equal(firstNameInput.disabled, true, 'campos devem ficar desabilitados enquanto o envio está pendente');
+
+    await act(async () => {
+        resolveFinalize?.({ ok: true });
+        await Promise.resolve();
+        await Promise.resolve();
+    });
+
+    assert.equal(firstNameInput.disabled, true, 'campos continuam desabilitados após o sucesso (evita editar dados já enviados)');
+    cleanup();
+});
+
+test('desmontar o ChatLeadForm durante o envio pendente fecha a aba reservada', async () => {
+    cleanup();
+    let resolveFinalize: ((result: LeadFinalizeResult) => void) | null = null;
+    const props: React.ComponentProps<typeof ChatLeadForm> = {
+        ...makeProps(),
+        onFinalizeLead: () => new Promise<LeadFinalizeResult>((resolve) => { resolveFinalize = resolve; }),
+    };
+
+    let closedCount = 0;
+    let navigatedTo: string | null = null;
+    const previousOpen = window.open;
+    Object.defineProperty(window, 'open', {
+        configurable: true,
+        value: () => {
+            let closed = false;
+            return {
+                get closed() { return closed; },
+                close() {
+                    closed = true;
+                    closedCount += 1;
+                },
+                location: { set href(v: string) { navigatedTo = v; } },
+                opener: null,
+            };
+        },
+    });
+
+    try {
+        const { container, unmount } = render(React.createElement(ChatLeadForm, props));
+        const set = (id: string, value: string) => {
+            const input = container.querySelector(`#${id}`);
+            if (!input) throw new Error(`input não encontrado: #${id}`);
+            fireEvent.input(input, { target: { value } });
+        };
+        set('lead-first-name', 'Fulano');
+        set('lead-last-name', 'de Tal');
+        set('lead-email', 'fulano@test.com');
+        set('lead-whatsapp', '11999998888');
+        const lgpd = container.querySelector('input[type="checkbox"]');
+        if (lgpd) fireEvent.click(lgpd);
+
+        const submitButton = Array.from(container.querySelectorAll('button'))
+            .find((button) => button.textContent?.includes('Salvar e abrir WhatsApp'));
+        assert.ok(submitButton, 'botão "Salvar e abrir WhatsApp" deve existir');
+
+        fireEvent.click(submitButton);
+        await Promise.resolve();
+        assert.ok(resolveFinalize, 'onFinalizeLead deve ter sido chamado e estar pendente');
+
+        // Visitor navigates away entirely — e.g. to a landing route where
+        // App.tsx doesn't render <AIChat> — unmounting the whole chat while
+        // the CRM request is still pending.
+        unmount();
+
+        await act(async () => {
+            resolveFinalize?.({ ok: true });
+            await Promise.resolve();
+            await Promise.resolve();
+        });
+
+        assert.equal(navigatedTo, null, 'não deve navegar para o WhatsApp depois do componente desmontar');
+        assert.equal(closedCount, 1, 'a aba reservada deve ser fechada no unmount, não deixada em branco');
     } finally {
         Object.defineProperty(window, 'open', {
             configurable: true,
