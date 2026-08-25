@@ -104,13 +104,17 @@ test('submit validado do ChatLeadForm emite whatsapp_click no Traks', async () =
     }
 });
 
-test('mantém um link de fallback do WhatsApp visível mesmo depois de abrir a aba com sucesso (hasSucceeded trava o resto do form)', async () => {
+test('mostra uma confirmação em texto (sem link clicável) depois de abrir a aba com sucesso, para não contar whatsapp_click duas vezes', async () => {
     cleanup();
     // Com a aba aberta automaticamente (opened === true) e sem `notice` do
     // CRM, nem `whatsappUrl` nem `notice` eram populados antes — mas
     // `hasSucceeded` já trava permanentemente os campos e botões. Um
     // visitante que volta da aba do WhatsApp para o site via alt-tab via um
     // formulário travado sem nenhuma confirmação ou caminho de continuação.
+    // A confirmação precisa ser em texto, não um link clicável: um clique
+    // num `<a href="wa.me/...">` redundante seria contado de novo pelo
+    // listener global em utils/traks.ts, duplicando a conversão que
+    // trackTraksWhatsAppHandoff() já reportou para essa mesma navegação.
     const previousOpen = window.open;
     Object.defineProperty(window, 'open', {
         configurable: true,
@@ -123,7 +127,7 @@ test('mantém um link de fallback do WhatsApp visível mesmo depois de abrir a a
     });
 
     try {
-        const { container, getByRole } = render(React.createElement(ChatLeadForm, makeProps()));
+        const { container, queryByRole, getByText } = render(React.createElement(ChatLeadForm, makeProps()));
         const set = (id: string, value: string) => {
             const input = container.querySelector(`#${id}`);
             if (!input) throw new Error(`input não encontrado: #${id}`);
@@ -146,10 +150,14 @@ test('mantém um link de fallback do WhatsApp visível mesmo depois de abrir a a
             await Promise.resolve();
         });
 
+        assert.ok(
+            getByText('Você já foi redirecionado para o WhatsApp em outra aba.'),
+            'deve mostrar uma confirmação explicando o que aconteceu',
+        );
         assert.equal(
-            getByRole('link', { name: 'Abrir WhatsApp' }).getAttribute('href'),
-            'https://wa.me/5511955021519?text=test',
-            'o link de fallback deve continuar disponível mesmo com a navegação automática já tendo ocorrido',
+            queryByRole('link', { name: 'Abrir WhatsApp' }),
+            null,
+            'não deve renderizar um link clicável para wa.me quando a navegação automática já ocorreu',
         );
     } finally {
         Object.defineProperty(window, 'open', {

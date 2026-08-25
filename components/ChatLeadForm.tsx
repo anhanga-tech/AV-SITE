@@ -309,11 +309,19 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
       const handoffWasAbandoned = activeHandoffRef.current !== whatsappHandoff;
       const opened = whatsappHandoff.open(whatsappLink);
       if (!handoffWasAbandoned) {
-        // Populate the fallback link even when the tab opened successfully:
-        // hasSucceeded permanently disables the form, so a visitor switching
-        // back from WhatsApp needs a usable confirmation state, not a
-        // silently locked form with no indication anything happened.
-        setWhatsappUrl(whatsappLink);
+        if (opened) {
+          // hasSucceeded permanently disables the form, so a visitor
+          // switching back from WhatsApp needs a usable confirmation
+          // state, not a silently locked form with no explanation. A
+          // plain-text notice (not a link) is deliberate: rendering the
+          // same wa.me link here too would let a click on it double-count
+          // via the global click listener in utils/traks.ts, since
+          // trackTraksWhatsAppHandoff() below already reports this exact
+          // handoff.
+          setNotice('Você já foi redirecionado para o WhatsApp em outra aba.');
+        } else {
+          setWhatsappUrl(whatsappLink);
+        }
         pushFormAnalyticsEvent({
           event: 'whatsapp_opened',
           formType: 'ai_chatbot_lead',
