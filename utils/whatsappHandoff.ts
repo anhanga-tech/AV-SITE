@@ -61,6 +61,21 @@ export function reserveWhatsAppWindow(): WhatsAppHandoff {
         return NOOP_HANDOFF;
     }
 
+    try {
+        // Match the noreferrer behavior the previous window.open(url, '_blank',
+        // 'noopener,noreferrer') call had — opener=null alone only blocks the
+        // reverse-tabnabbing vector, not the Referer header WhatsApp would
+        // otherwise receive on the eventual navigation. The reserved tab
+        // starts on about:blank, same-origin, so its document is writable here.
+        const meta = handle.document.createElement('meta');
+        meta.name = 'referrer';
+        meta.content = 'no-referrer';
+        handle.document.head.appendChild(meta);
+    } catch {
+        // Best-effort: losing the referrer strip is a smaller regression than
+        // losing the WhatsApp handoff entirely, so don't abort on failure.
+    }
+
     return {
         open(url: string): boolean {
             if (!handle || handle.closed) return false;

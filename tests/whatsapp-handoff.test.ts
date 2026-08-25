@@ -42,6 +42,41 @@ test('reserveWhatsAppWindow navega a aba reservada quando window.open retorna um
     );
 });
 
+test('reserveWhatsAppWindow injeta <meta name="referrer" content="no-referrer"> na aba reservada, replicando o `noreferrer` do window.open direto anterior', () => {
+    // `handle.opener = null` só bloqueia o vetor de reverse-tabnabbing — não
+    // impede o header `Referer` de ser enviado ao WhatsApp na navegação
+    // posterior, o que o `window.open(url, '_blank', 'noopener,noreferrer')'
+    // anterior evitava. A aba reservada começa em about:blank (mesma
+    // origem), então seu document é gravável aqui.
+    const appended: Array<{ name: string; content: string }> = [];
+    withWindowOpen(
+        () => ({
+            closed: false,
+            close() {},
+            location: { set href(_v: string) {} },
+            opener: 'writable',
+            document: {
+                createElement(tag: string) {
+                    assert.equal(tag, 'meta');
+                    return { name: '', content: '' } as { name: string; content: string };
+                },
+                head: {
+                    appendChild(meta: { name: string; content: string }) {
+                        appended.push(meta);
+                    },
+                },
+            },
+        }),
+        () => {
+            reserveWhatsAppWindow();
+
+            assert.equal(appended.length, 1, 'deve injetar exatamente uma meta tag de referrer');
+            assert.equal(appended[0].name, 'referrer');
+            assert.equal(appended[0].content, 'no-referrer');
+        },
+    );
+});
+
 test('reserveWhatsAppWindow retorna um handoff inerte quando o popup é bloqueado (window.open retorna null)', () => {
     withWindowOpen(
         () => null,
