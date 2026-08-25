@@ -190,7 +190,6 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
           destination,
         });
         setLocalError('Não foi possível salvar seu contato. Tente novamente.');
-        eventIdRef.current = null;
         console.warn('Background lead submission failed:', { error: result.error, requestId: result.requestId });
       } else {
         const whatsappLink = getWhatsAppUrl(payload);

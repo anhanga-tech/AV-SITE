@@ -123,3 +123,45 @@ test('useContactForm expõe link de fallback quando o popup do WhatsApp é bloqu
         cleanup();
     }
 });
+
+test('useContactForm preserva eventId ao repetir após erro 5xx ambíguo', async () => {
+    cleanup();
+    const previousFetch = globalThis.fetch;
+    const requestBodies: Array<{ eventId?: string }> = [];
+    let attempt = 0;
+    globalThis.fetch = (async (_input, init) => {
+        requestBodies.push(JSON.parse(String(init?.body)) as { eventId?: string });
+        attempt += 1;
+        const ok = attempt > 1;
+        return new Response(JSON.stringify(ok
+            ? { ok: true, odooLeadId: 'test-1' }
+            : { ok: false, code: 'ODOO_ERROR', error: 'odoo upstream failed' }), {
+            status: ok ? 200 : 502,
+            headers: { 'Content-Type': 'application/json' },
+        });
+    }) as typeof fetch;
+
+    try {
+        const { getByTestId } = render(React.createElement(Harness));
+        act(() => {
+            fireEvent.click(getByTestId('fill'));
+        });
+        await act(async () => {
+            fireEvent.click(getByTestId('submit-whatsapp'));
+            await Promise.resolve();
+            await Promise.resolve();
+        });
+        await act(async () => {
+            fireEvent.click(getByTestId('submit-whatsapp'));
+            await Promise.resolve();
+            await Promise.resolve();
+        });
+
+        assert.equal(requestBodies.length, 2);
+        assert.ok(requestBodies[0].eventId);
+        assert.equal(requestBodies[0].eventId, requestBodies[1].eventId);
+    } finally {
+        globalThis.fetch = previousFetch;
+        cleanup();
+    }
+});

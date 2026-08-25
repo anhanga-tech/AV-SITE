@@ -199,7 +199,8 @@ export function useContactForm(options: ContactModalOptions = {}) {
 
                 if (!response.ok || !data.ok) {
                     const errData = data as Extract<SubmitContactResponse, { ok: false }>;
-                    eventIdRef.current = null;
+                    const retryableFailure = !response.ok && response.status >= 500;
+                    if (!retryableFailure) eventIdRef.current = null;
                     if (action === 'whatsapp') {
                         console.warn('[submit-contact] tracking failed:', errData.code);
                         pushFormAnalyticsEvent({

@@ -6,6 +6,8 @@ import assert from 'node:assert/strict';
 import { render, fireEvent, act, cleanup } from '@testing-library/react';
 
 import { ChatLeadForm } from '../components/ChatLeadForm.tsx';
+import type { LeadFinalizeResult } from '../lib/chat-lead-form-logic.ts';
+import type { SubmitLeadRequest } from '../types/leadCapture.ts';
 
 /*
   Teste de integração do handoff programático de WhatsApp (reviews P2):
@@ -163,4 +165,57 @@ test('popup bloqueado exibe link de fallback no ChatLeadForm após salvar o lead
         });
         cleanup();
     }
+});
+
+test('ChatLeadForm preserva eventId ao repetir após falha ambígua do CRM', async () => {
+    cleanup();
+    const eventIds: string[] = [];
+    let attempt = 0;
+    const props: React.ComponentProps<typeof ChatLeadForm> = {
+        ...makeProps(),
+        prepareLeadSubmitPayload: (_payload, eventId): SubmitLeadRequest => {
+            eventIds.push(eventId);
+            return {} as SubmitLeadRequest;
+        },
+        onFinalizeLead: async (): Promise<LeadFinalizeResult> => {
+            attempt += 1;
+            return attempt === 1
+                ? { ok: false, error: 'odoo upstream failed', requestId: 'req-1' }
+                : { ok: true };
+        },
+    };
+
+    const { container } = render(React.createElement(ChatLeadForm, props));
+    const set = (id: string, value: string) => {
+        const input = container.querySelector(`#${id}`);
+        if (!input) throw new Error(`input não encontrado: #${id}`);
+        fireEvent.input(input, { target: { value } });
+    };
+    set('lead-first-name', 'Fulano');
+    set('lead-last-name', 'de Tal');
+    set('lead-email', 'fulano@test.com');
+    set('lead-whatsapp', '11999998888');
+    const lgpd = container.querySelector('input[type="checkbox"]');
+    if (lgpd) fireEvent.click(lgpd);
+
+    const submitButton = () => {
+        const button = Array.from(container.querySelectorAll('button'))
+            .find((candidate) => candidate.textContent?.includes('Salvar e abrir WhatsApp'));
+        if (!button) throw new Error('botão "Salvar e abrir WhatsApp" não encontrado');
+        return button;
+    };
+    await act(async () => {
+        fireEvent.click(submitButton());
+        await Promise.resolve();
+        await Promise.resolve();
+    });
+    await act(async () => {
+        fireEvent.click(submitButton());
+        await Promise.resolve();
+        await Promise.resolve();
+    });
+
+    assert.equal(eventIds.length, 2);
+    assert.equal(eventIds[0], eventIds[1]);
+    cleanup();
 });
