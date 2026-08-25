@@ -55,6 +55,11 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
   const [notice, setNotice] = useState<string | null>(null);
   const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
   const [isLocallySubmitting, setIsLocallySubmitting] = useState(false);
+  // Once a submission succeeds, block further ones: the form stays visible
+  // (so the fallback link and any notice remain readable) but re-clicking
+  // "Salvar e abrir WhatsApp" would otherwise send the same lead again with
+  // a fresh event_id, creating a duplicate CRM opportunity.
+  const [hasSucceeded, setHasSucceeded] = useState(false);
   const isProcessingRef = React.useRef(false);
   const eventIdRef = useRef<string | null>(null);
   const isOpenRef = useRef(isOpen);
@@ -125,7 +130,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
   };
 
   const openLeadModal = () => {
-    if (isSubmittingLead || isLocallySubmitting || isProcessingRef.current) return;
+    if (isSubmittingLead || isLocallySubmitting || isProcessingRef.current || hasSucceeded) return;
     void triggerHaptic('light');
     const modalOptions = {
       source: 'chatbot-direct',
@@ -136,7 +141,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
   };
 
   const submitLeadForm = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (isSubmittingLead || isLocallySubmitting || isProcessingRef.current) return;
+    if (isSubmittingLead || isLocallySubmitting || isProcessingRef.current || hasSucceeded) return;
     e.preventDefault();
     isProcessingRef.current = true;
     setIsLocallySubmitting(true);
@@ -209,6 +214,13 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
         // toggles), so this continuation would otherwise still run and hand
         // off to WhatsApp after an explicit dismissal — discard it instead.
         whatsappHandoff.cancel();
+        if (result.ok) {
+          // The CRM write already succeeded server-side even though we're
+          // discarding the UI update — don't let a reopened drawer resubmit
+          // the same lead and create a duplicate.
+          eventIdRef.current = null;
+          setHasSucceeded(true);
+        }
         return;
       }
 
@@ -230,17 +242,25 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
         // preserved event_id.
         pushGenerateLeadDataLayerEvent(submitPayload);
         const whatsappLink = getWhatsAppUrl(payload);
-        if (!whatsappHandoff.open(whatsappLink)) {
+        const opened = whatsappHandoff.open(whatsappLink);
+        if (!opened) {
           setWhatsappUrl(whatsappLink);
         }
         eventIdRef.current = null;
+        setHasSucceeded(true);
         pushFormAnalyticsEvent({
           event: 'whatsapp_opened',
           formType: 'ai_chatbot_lead',
           formId: 'chat-lead-form',
           destination,
         });
-        trackTraksWhatsAppHandoff();
+        // Only when the tab actually navigated — when it falls back to the
+        // rendered link instead, the global `<a href="wa.me/...">` click
+        // listener (utils/traks.ts) already tracks it if/when the visitor
+        // clicks it, so tracking it here too would double-count the handoff.
+        if (opened) {
+          trackTraksWhatsAppHandoff();
+        }
         pushFormAnalyticsEvent({
           event: 'submit_success',
           formType: 'ai_chatbot_lead',
@@ -296,6 +316,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
 
         <ChatLeadFormActions
           isSubmitting={isSubmittingLead || isLocallySubmitting}
+          disabled={hasSucceeded}
           onSubmit={(e) => void submitLeadForm(e)}
           onOpenLeadModal={openLeadModal}
         />

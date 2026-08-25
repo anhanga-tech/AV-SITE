@@ -121,7 +121,7 @@ test('caminho direto abre o modal de lead e não abre o WhatsApp sem salvar', ()
     }
 });
 
-test('popup bloqueado exibe link de fallback no ChatLeadForm após salvar o lead', async () => {
+test('popup bloqueado exibe link de fallback no ChatLeadForm após salvar o lead, sem contar whatsapp_click duas vezes', async () => {
     cleanup();
     const previousOpen = window.open;
     Object.defineProperty(window, 'open', {
@@ -130,34 +130,42 @@ test('popup bloqueado exibe link de fallback no ChatLeadForm após salvar o lead
     });
 
     try {
-        const { container, getByRole } = render(React.createElement(ChatLeadForm, makeProps()));
-        const set = (id: string, value: string) => {
-            const input = container.querySelector(`#${id}`);
-            if (!input) throw new Error(`input não encontrado: #${id}`);
-            fireEvent.input(input, { target: { value } });
-        };
+        await withTraksStub(async (calls) => {
+            const { container, getByRole } = render(React.createElement(ChatLeadForm, makeProps()));
+            const set = (id: string, value: string) => {
+                const input = container.querySelector(`#${id}`);
+                if (!input) throw new Error(`input não encontrado: #${id}`);
+                fireEvent.input(input, { target: { value } });
+            };
 
-        set('lead-first-name', 'Fulano');
-        set('lead-last-name', 'de Tal');
-        set('lead-email', 'fulano@test.com');
-        set('lead-whatsapp', '11999998888');
-        const lgpd = container.querySelector('input[type="checkbox"]');
-        if (lgpd) fireEvent.click(lgpd);
+            set('lead-first-name', 'Fulano');
+            set('lead-last-name', 'de Tal');
+            set('lead-email', 'fulano@test.com');
+            set('lead-whatsapp', '11999998888');
+            const lgpd = container.querySelector('input[type="checkbox"]');
+            if (lgpd) fireEvent.click(lgpd);
 
-        const submitButton = Array.from(container.querySelectorAll('button'))
-            .find((button) => button.textContent?.includes('Salvar e abrir WhatsApp'));
-        assert.ok(submitButton, 'botão "Salvar e abrir WhatsApp" deve existir');
+            const submitButton = Array.from(container.querySelectorAll('button'))
+                .find((button) => button.textContent?.includes('Salvar e abrir WhatsApp'));
+            assert.ok(submitButton, 'botão "Salvar e abrir WhatsApp" deve existir');
 
-        await act(async () => {
-            fireEvent.click(submitButton);
-            await Promise.resolve();
-            await Promise.resolve();
+            await act(async () => {
+                fireEvent.click(submitButton);
+                await Promise.resolve();
+                await Promise.resolve();
+            });
+
+            assert.equal(
+                getByRole('link', { name: 'Abrir WhatsApp' }).getAttribute('href'),
+                'https://wa.me/5511955021519?text=test',
+            );
+            // O popup nunca navegou de fato — o listener global de cliques em
+            // <a href="wa.me/..."> (utils/traks.ts) é quem deve contar o clique,
+            // se o visitante usar o link de fallback. Contar aqui também
+            // duplicaria a conversão.
+            const handoffs = calls.filter((c) => c.name === 'whatsapp_click');
+            assert.equal(handoffs.length, 0, 'whatsapp_click não deve ser emitido quando o popup é bloqueado');
         });
-
-        assert.equal(
-            getByRole('link', { name: 'Abrir WhatsApp' }).getAttribute('href'),
-            'https://wa.me/5511955021519?text=test',
-        );
     } finally {
         Object.defineProperty(window, 'open', {
             configurable: true,
@@ -165,6 +173,53 @@ test('popup bloqueado exibe link de fallback no ChatLeadForm após salvar o lead
         });
         cleanup();
     }
+});
+
+test('ChatLeadForm bloqueia reenvio depois de confirmado (evita lead duplicado)', async () => {
+    cleanup();
+    let finalizeCalls = 0;
+    const props: React.ComponentProps<typeof ChatLeadForm> = {
+        ...makeProps(),
+        onFinalizeLead: async (): Promise<LeadFinalizeResult> => {
+            finalizeCalls += 1;
+            return { ok: true };
+        },
+    };
+
+    const { container } = render(React.createElement(ChatLeadForm, props));
+    const set = (id: string, value: string) => {
+        const input = container.querySelector(`#${id}`);
+        if (!input) throw new Error(`input não encontrado: #${id}`);
+        fireEvent.input(input, { target: { value } });
+    };
+    set('lead-first-name', 'Fulano');
+    set('lead-last-name', 'de Tal');
+    set('lead-email', 'fulano@test.com');
+    set('lead-whatsapp', '11999998888');
+    const lgpd = container.querySelector('input[type="checkbox"]');
+    if (lgpd) fireEvent.click(lgpd);
+
+    const submitButton = () => {
+        const button = Array.from(container.querySelectorAll('button'))
+            .find((candidate) => candidate.textContent?.includes('Salvar e abrir WhatsApp'));
+        if (!button) throw new Error('botão "Salvar e abrir WhatsApp" não encontrado');
+        return button;
+    };
+
+    await act(async () => {
+        fireEvent.click(submitButton());
+        await Promise.resolve();
+        await Promise.resolve();
+    });
+    assert.equal(finalizeCalls, 1);
+    assert.equal(submitButton().hasAttribute('disabled'), true, 'botão deve ficar desabilitado após o sucesso');
+
+    // Um segundo clique (ex.: o visitante ignora o link de fallback e clica
+    // de novo no botão principal) não pode reenviar o mesmo lead.
+    fireEvent.click(submitButton());
+    await Promise.resolve();
+    assert.equal(finalizeCalls, 1, 'onFinalizeLead não deve ser chamado de novo após o sucesso');
+    cleanup();
 });
 
 test('ChatLeadForm preserva eventId ao repetir após falha ambígua do CRM', async () => {

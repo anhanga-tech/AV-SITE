@@ -259,7 +259,14 @@ export function useContactForm(options: ContactModalOptions = {}) {
                         formId,
                         destination: action,
                     });
-                    trackTraksWhatsAppHandoff();
+                    // Only when the tab actually navigated — when it falls back to
+                    // the rendered link instead, the global `<a href="wa.me/...">`
+                    // click listener (utils/traks.ts) already tracks it if/when the
+                    // visitor clicks it, so tracking it here too would double-count
+                    // the handoff.
+                    if (opened) {
+                        trackTraksWhatsAppHandoff();
+                    }
                 }
 
                 pushContactDataLayerEvent(

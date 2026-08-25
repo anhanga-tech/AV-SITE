@@ -95,7 +95,7 @@ test('useContactForm submit("whatsapp") emite whatsapp_click no Traks', async ()
     });
 });
 
-test('useContactForm expõe link de fallback quando o popup do WhatsApp é bloqueado', async () => {
+test('useContactForm expõe link de fallback quando o popup do WhatsApp é bloqueado, sem contar whatsapp_click duas vezes', async () => {
     cleanup();
     const previousOpen = window.open;
     Object.defineProperty(window, 'open', {
@@ -104,22 +104,30 @@ test('useContactForm expõe link de fallback quando o popup do WhatsApp é bloqu
     });
 
     try {
-        await withFetchStub(async () => {
-            const { getByTestId } = render(React.createElement(Harness));
+        await withTraksStub(async (calls) => {
+            await withFetchStub(async () => {
+                const { getByTestId } = render(React.createElement(Harness));
 
-            act(() => {
-                fireEvent.click(getByTestId('fill'));
-            });
-            await act(async () => {
-                fireEvent.click(getByTestId('submit-whatsapp'));
-                await Promise.resolve();
-                await Promise.resolve();
-            });
+                act(() => {
+                    fireEvent.click(getByTestId('fill'));
+                });
+                await act(async () => {
+                    fireEvent.click(getByTestId('submit-whatsapp'));
+                    await Promise.resolve();
+                    await Promise.resolve();
+                });
 
-            assert.equal(
-                getByTestId('whatsapp-fallback').getAttribute('href'),
-                'https://wa.me/5511955021519?text=Ol%C3%A1!%20Meu%20nome%20%C3%A9%20Fulano.%20Gostaria%20de%20saber%20mais%20sobre%20viagens.',
-            );
+                assert.equal(
+                    getByTestId('whatsapp-fallback').getAttribute('href'),
+                    'https://wa.me/5511955021519?text=Ol%C3%A1!%20Meu%20nome%20%C3%A9%20Fulano.%20Gostaria%20de%20saber%20mais%20sobre%20viagens.',
+                );
+                // O popup nunca navegou de fato — o listener global de cliques em
+                // <a href="wa.me/..."> (utils/traks.ts) é quem deve contar o
+                // clique, se o visitante usar o link de fallback. Contar aqui
+                // também duplicaria a conversão.
+                const handoffs = calls.filter((c) => c.name === 'whatsapp_click');
+                assert.equal(handoffs.length, 0, 'whatsapp_click não deve ser emitido quando o popup é bloqueado');
+            });
         });
     } finally {
         Object.defineProperty(window, 'open', {
