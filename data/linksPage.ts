@@ -34,6 +34,13 @@ export interface LinksPageConfig {
 
 // ⚙️ EDITÁVEL: troque banner e links aqui sem mexer em componente.
 //
+// Sobre `{origem}`: o marcador é trocado em runtime por `applyOriginToMessage`
+// (utils/linksTracking.ts) pela origem real vinda de `utm_source` — "Vim pelo TikTok.",
+// "Vim pelo Google." — com a bio do Instagram como padrão quando não há UTM. Escrever a
+// origem fixa aqui fazia a mensagem afirmar algo falso para quem chega de outra bio, e a
+// origem real não chegava ao atendimento nem ao CRM. Não remova o marcador: há teste que
+// falha se uma mensagem voltar a fixar a origem.
+//
 // Sobre `whatsappMessage`: as mensagens terminam num rótulo com dois-pontos para que a pessoa
 // complete o que falta ainda no campo de digitação — é o que chega ao atendimento já qualificado,
 // em vez de um "oi" seco. Não termine com espaço à direita: `buildWhatsAppLink` aplica `.trim()`
@@ -50,15 +57,15 @@ export const linksPageConfig: LinksPageConfig = {
         href: '/quiz',
     },
     links: [
-        { id: 'whatsapp', label: 'Falar no WhatsApp', sublabel: 'Atendimento humano e rápido', type: 'whatsapp', whatsappMessage: 'Olá! Vim pelo Instagram e quero planejar uma viagem. Meu destino:', icon: 'WhatsappLogo', visible: true, highlight: true },
+        { id: 'whatsapp', label: 'Falar no WhatsApp', sublabel: 'Atendimento humano e rápido', type: 'whatsapp', whatsappMessage: 'Olá!{origem} Quero planejar uma viagem. Meu destino:', icon: 'WhatsappLogo', visible: true, highlight: true },
         // Par com o quiz logo abaixo: o quiz atende quem ainda está explorando (ToFu — vira só
         // `res.partner`), este atende quem já decidiu. Por isso a mensagem é estruturada aqui e
         // conversacional no botão amarelo: quem clica aqui se declarou pronto a passar os dados.
-        { id: 'orcamento', label: 'Quero um orçamento', sublabel: 'Já tenho destino e datas', type: 'whatsapp', whatsappMessage: 'Olá! Vim pelo Instagram e quero um orçamento.\n\nDestino:\nDatas:\nPessoas:', icon: 'CalendarCheck', visible: true },
+        { id: 'orcamento', label: 'Quero um orçamento', sublabel: 'Já tenho destino e datas', type: 'whatsapp', whatsappMessage: 'Olá!{origem} Quero um orçamento.\n\nDestino:\nDatas:\nPessoas:', icon: 'CalendarCheck', visible: true },
         { id: 'quiz', label: 'Planejar minha viagem', sublabel: 'Quiz de perfil de viagem', type: 'internal', href: '/quiz', icon: 'Compass', visible: true },
         { id: 'site', label: 'Site oficial', type: 'internal', href: '/', icon: 'Globe', visible: true },
         { id: 'seguro-viagem', label: 'Seguro viagem', sublabel: 'Cotação com nosso parceiro', type: 'external', href: 'https://go.nuvembr.com/anhanga_seguroviagem', icon: 'ShieldCheck', visible: true },
-        { id: 'chip-esim', label: 'Chip / eSIM internacional', sublabel: 'Tire dúvidas no WhatsApp', type: 'whatsapp', whatsappMessage: 'Olá! Vim pelo Instagram e quero informações sobre chip / eSIM internacional para minha viagem.', icon: 'SimCard', visible: true },
+        { id: 'chip-esim', label: 'Chip / eSIM internacional', sublabel: 'Tire dúvidas no WhatsApp', type: 'whatsapp', whatsappMessage: 'Olá!{origem} Quero informações sobre chip / eSIM internacional para minha viagem.', icon: 'SimCard', visible: true },
         { id: 'orlando', label: 'Orlando', type: 'internal', href: '/orlando', visible: true },
         { id: 'beto-carrero', label: 'Beto Carrero', type: 'internal', href: '/beto-carrero', visible: true },
         { id: 'melhor-idade', label: 'Viagens Melhor Idade', type: 'internal', href: '/melhor-idade', visible: true },

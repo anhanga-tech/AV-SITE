@@ -4,6 +4,7 @@ import { pathToFileURL } from 'node:url';
 import { build } from 'vite';
 import { fileURLToPath } from 'node:url';
 import { buildPrerenderRoutes } from '../lib/prerender-routes.js';
+import { normalizeRoute, stripHomeOnlyPreloads, validateHtml } from '../lib/prerender-html.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,38 +15,15 @@ const SSR_ENTRY = path.resolve(__dirname, '../ssr.tsx');
 const INDEX_FILE = path.join(DIST_DIR, 'index.html');
 const BLOG_DIR = path.resolve(__dirname, '../content/blog');
 
-const REQUIRED_PATTERNS = [
-  { label: 'title', pattern: /<title\b[^>]*>[\s\S]*?<\/title>/i },
-  { label: 'meta description', pattern: /<meta\b[^>]*name="description"[^>]*content="[^"]+"/i },
-  { label: 'canonical', pattern: /<link\b[^>]*rel="canonical"[^>]*href="https:\/\/www\.anhanga\.tur\.br\/[^"?#]*"/i },
-  { label: 'Open Graph', pattern: /<meta\b[^>]*property="og:title"[^>]*content="[^"]+"/i },
-  { label: 'Twitter card', pattern: /<meta\b[^>]*name="twitter:title"[^>]*content="[^"]+"/i },
-  { label: 'JSON-LD schema', pattern: /<script\b[^>]*type="application\/ld\+json"[^>]*>[\s\S]*?<\/script>/i }
-];
 const MANAGED_TEMPLATE_HEAD_TAG_PATTERNS = [
   /<title\b[^>]*data-av-head="[^"]+"[^>]*>[\s\S]*?<\/title>\s*/gi,
   /<meta\b[^>]*data-av-head="[^"]+"[^>]*\/?>\s*/gi,
   /<link\b[^>]*data-av-head="[^"]+"[^>]*\/?>\s*/gi
 ];
-const UNIQUE_TAG_PATTERNS = [
-  { label: 'title', pattern: /<title\b[^>]*>/gi },
-  { label: 'meta description', pattern: /<meta\b[^>]*name="description"[^>]*>/gi },
-  { label: 'canonical', pattern: /<link\b[^>]*rel="canonical"[^>]*>/gi },
-  { label: 'og:title', pattern: /<meta\b[^>]*property="og:title"[^>]*>/gi },
-  { label: 'og:description', pattern: /<meta\b[^>]*property="og:description"[^>]*>/gi },
-  { label: 'og:image', pattern: /<meta\b[^>]*property="og:image"[^>]*>/gi },
-  { label: 'og:type', pattern: /<meta\b[^>]*property="og:type"[^>]*>/gi },
-  { label: 'og:url', pattern: /<meta\b[^>]*property="og:url"[^>]*>/gi },
-  { label: 'twitter:card', pattern: /<meta\b[^>]*name="twitter:card"[^>]*>/gi },
-  { label: 'twitter:title', pattern: /<meta\b[^>]*name="twitter:title"[^>]*>/gi },
-  { label: 'twitter:description', pattern: /<meta\b[^>]*name="twitter:description"[^>]*>/gi },
-  { label: 'twitter:image', pattern: /<meta\b[^>]*name="twitter:image"[^>]*>/gi }
-];
 
 const routeToOutputPath = (route) =>
   route === '/' ? path.join(DIST_DIR, 'index.html') : path.join(DIST_DIR, route.slice(1), 'index.html');
 
-const normalizeRoute = (route) => (route === '/' ? '/' : route.replace(/\/+$/, ''));
 const escapeHtmlAttribute = (value) =>
   value.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
 
@@ -81,28 +59,12 @@ const stripManagedHeadTags = (template) => {
 };
 
 const injectRenderedHtml = (template, appHtml, headHtml, route) => {
-  const withManagedHeadRemoved = stripManagedHeadTags(template);
+  const withManagedHeadRemoved = stripHomeOnlyPreloads(stripManagedHeadTags(template), route);
   const withRoot = withManagedHeadRemoved.replace('<div id="root"></div>', `<div id="root">${appHtml}</div>`);
   const withHead = withRoot.replace('</head>', `${headHtml}\n</head>`);
   return ensurePrerenderMarker(withHead, route);
 };
 
-const countMatches = (html, pattern) => Array.from(html.matchAll(pattern)).length;
-
-const validateHtml = (route, html) => {
-  for (const requirement of REQUIRED_PATTERNS) {
-    if (!requirement.pattern.test(html)) {
-      throw new Error(`Missing ${requirement.label} in prerendered output for route "${route}"`);
-    }
-  }
-
-  for (const tag of UNIQUE_TAG_PATTERNS) {
-    const matchCount = countMatches(html, tag.pattern);
-    if (matchCount !== 1) {
-      throw new Error(`Expected exactly 1 ${tag.label} tag in prerendered output for route "${route}", found ${matchCount}`);
-    }
-  }
-};
 
 const removeDirectory = (directoryPath) => {
   if (fs.existsSync(directoryPath)) {

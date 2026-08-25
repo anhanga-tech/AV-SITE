@@ -76,3 +76,56 @@ test('botão WhatsApp aponta para wa.me com texto', async ({ page }) => {
     expect(href).toContain('wa.me/5511955021519');
     expect(href).toContain('text=');
 });
+
+// Mede o que a auditoria só conseguia argumentar: com `truncate` (`white-space: nowrap`) o
+// rótulo era cortado com reticências, o que é perda de conteúdo — WCAG 1.4.4 Resize Text.
+// `scrollWidth > clientWidth` é exatamente a condição de corte.
+async function rotulosCortados(page: import('@playwright/test').Page): Promise<string[]> {
+    return page.$$eval('[data-testid="link-label"]', (nodes) =>
+        nodes
+            .filter((n) => n.scrollWidth > n.clientWidth + 1)
+            .map((n) => n.textContent ?? ''),
+    );
+}
+
+test('nenhum rótulo é cortado a 320px', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 844 });
+    await page.goto('/links');
+    await expect(page.getByTestId('link-chip-esim')).toBeVisible();
+    expect(await rotulosCortados(page)).toEqual([]);
+
+    // E a página não pode rolar na horizontal nesse viewport.
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+});
+
+test('nenhum rótulo é cortado com zoom de texto a 200%', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 844 });
+    await page.goto('/links');
+    // Zoom só de texto: dobra o rem, que é o que os tamanhos da página usam.
+    await page.addStyleTag({ content: 'html { font-size: 200% !important; }' });
+    await expect(page.getByTestId('link-chip-esim')).toBeVisible();
+    expect(await rotulosCortados(page)).toEqual([]);
+});
+
+// O banner de cookies é fixo no rodapé (z-10000). Sem reservar a altura dele, ele cobria
+// Cadastur/nota do Google — a prova de confiança da agência — para todo visitante novo.
+test('o banner de cookies não cobre os selos de confiança', async ({ page }) => {
+    // Mesmo padrão de cookie-consent.spec.ts: limpa o consentimento pré-setado no
+    // storageState do playwright.config.ts para que o banner realmente apareça.
+    await page.addInitScript((key) => {
+        localStorage.removeItem(key);
+        localStorage.removeItem(key + '_meta');
+    }, 'anhanga_cookie_consent');
+    await page.goto('/links');
+
+    const banner = page.getByRole('dialog', { name: 'Preferências de cookies' });
+    await expect(banner).toBeVisible();
+
+    await page.getByText('ANHANGA TURISMO LTDA').scrollIntoViewIfNeeded();
+    const selos = await page.getByText('ANHANGA TURISMO LTDA').boundingBox();
+    const caixaBanner = await banner.boundingBox();
+    expect(selos).not.toBeNull();
+    expect(caixaBanner).not.toBeNull();
+    expect(selos!.y + selos!.height).toBeLessThanOrEqual(caixaBanner!.y);
+});
