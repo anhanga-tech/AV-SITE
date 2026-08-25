@@ -90,6 +90,11 @@ export function useContactForm(options: ContactModalOptions = {}) {
             setFieldsState((prev) => ({ ...prev, [key]: value }));
             setError(null);
             setFieldErrors((prev) => (key in prev ? { ...prev, [key]: undefined } : prev));
+            // Any edit after a failed submit invalidates the retry key preserved
+            // for that failure — otherwise a retry could resend corrected data
+            // under the stale event_id, and the Odoo dedup would return the
+            // already-created lead without applying the edit.
+            eventIdRef.current = null;
 
             if (!hasStarted.current) {
                 hasStarted.current = true;

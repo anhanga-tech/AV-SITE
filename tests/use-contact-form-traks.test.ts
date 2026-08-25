@@ -63,6 +63,12 @@ function Harness() {
                 void submit('whatsapp');
             },
         }),
+        React.createElement('button', {
+            'data-testid': 'edit-name',
+            onClick: () => {
+                setField('firstName', 'Cicrano');
+            },
+        }),
         submitted && whatsappUrl
             ? React.createElement('a', { 'data-testid': 'whatsapp-fallback', href: whatsappUrl }, 'Abrir WhatsApp')
             : null,
@@ -160,6 +166,59 @@ test('useContactForm preserva eventId ao repetir após erro 5xx ambíguo', async
         assert.equal(requestBodies.length, 2);
         assert.ok(requestBodies[0].eventId);
         assert.equal(requestBodies[0].eventId, requestBodies[1].eventId);
+    } finally {
+        globalThis.fetch = previousFetch;
+        cleanup();
+    }
+});
+
+test('useContactForm gera novo eventId se um campo for editado após falha (não reenvia dados corrigidos com id antigo)', async () => {
+    cleanup();
+    const previousFetch = globalThis.fetch;
+    const requestBodies: Array<{ eventId?: string }> = [];
+    let attempt = 0;
+    globalThis.fetch = (async (_input, init) => {
+        requestBodies.push(JSON.parse(String(init?.body)) as { eventId?: string });
+        attempt += 1;
+        const ok = attempt > 1;
+        return new Response(JSON.stringify(ok
+            ? { ok: true, odooLeadId: 'test-1' }
+            : { ok: false, code: 'ODOO_ERROR', error: 'odoo upstream failed' }), {
+            status: ok ? 200 : 502,
+            headers: { 'Content-Type': 'application/json' },
+        });
+    }) as typeof fetch;
+
+    try {
+        const { getByTestId } = render(React.createElement(Harness));
+        act(() => {
+            fireEvent.click(getByTestId('fill'));
+        });
+        await act(async () => {
+            fireEvent.click(getByTestId('submit-whatsapp'));
+            await Promise.resolve();
+            await Promise.resolve();
+        });
+
+        // Visitor corrects a field after the failed attempt — the retained
+        // retry key must not be reused for the changed data.
+        act(() => {
+            fireEvent.click(getByTestId('edit-name'));
+        });
+
+        await act(async () => {
+            fireEvent.click(getByTestId('submit-whatsapp'));
+            await Promise.resolve();
+            await Promise.resolve();
+        });
+
+        assert.equal(requestBodies.length, 2);
+        assert.ok(requestBodies[0].eventId);
+        assert.notEqual(
+            requestBodies[0].eventId,
+            requestBodies[1].eventId,
+            'editar um campo após a falha deve gerar um novo eventId',
+        );
     } finally {
         globalThis.fetch = previousFetch;
         cleanup();

@@ -219,3 +219,183 @@ test('ChatLeadForm preserva eventId ao repetir após falha ambígua do CRM', asy
     assert.equal(eventIds[0], eventIds[1]);
     cleanup();
 });
+
+test('ChatLeadForm gera novo eventId se um campo for editado após falha (não reenvia dados corrigidos com id antigo)', async () => {
+    cleanup();
+    const eventIds: string[] = [];
+    let attempt = 0;
+    const props: React.ComponentProps<typeof ChatLeadForm> = {
+        ...makeProps(),
+        prepareLeadSubmitPayload: (_payload, eventId): SubmitLeadRequest => {
+            eventIds.push(eventId);
+            return {} as SubmitLeadRequest;
+        },
+        onFinalizeLead: async (): Promise<LeadFinalizeResult> => {
+            attempt += 1;
+            return attempt === 1
+                ? { ok: false, error: 'odoo upstream failed', requestId: 'req-1' }
+                : { ok: true };
+        },
+    };
+
+    const { container } = render(React.createElement(ChatLeadForm, props));
+    const set = (id: string, value: string) => {
+        const input = container.querySelector(`#${id}`);
+        if (!input) throw new Error(`input não encontrado: #${id}`);
+        fireEvent.input(input, { target: { value } });
+    };
+    set('lead-first-name', 'Fulano');
+    set('lead-last-name', 'de Tal');
+    set('lead-email', 'fulano@test.com');
+    set('lead-whatsapp', '11999998888');
+    const lgpd = container.querySelector('input[type="checkbox"]');
+    if (lgpd) fireEvent.click(lgpd);
+
+    const submitButton = () => {
+        const button = Array.from(container.querySelectorAll('button'))
+            .find((candidate) => candidate.textContent?.includes('Salvar e abrir WhatsApp'));
+        if (!button) throw new Error('botão "Salvar e abrir WhatsApp" não encontrado');
+        return button;
+    };
+    await act(async () => {
+        fireEvent.click(submitButton());
+        await Promise.resolve();
+        await Promise.resolve();
+    });
+
+    // Visitor corrects the phone number after the failed attempt.
+    set('lead-whatsapp', '11988887777');
+
+    await act(async () => {
+        fireEvent.click(submitButton());
+        await Promise.resolve();
+        await Promise.resolve();
+    });
+
+    assert.equal(eventIds.length, 2);
+    assert.notEqual(eventIds[0], eventIds[1], 'editar um campo após a falha deve gerar um novo eventId');
+    cleanup();
+});
+
+test('generate_lead só é disparado após confirmação do CRM, uma única vez mesmo com retry', async () => {
+    cleanup();
+    const previousDataLayer = window.dataLayer;
+    window.dataLayer = [];
+    let attempt = 0;
+    const props: React.ComponentProps<typeof ChatLeadForm> = {
+        ...makeProps(),
+        onFinalizeLead: async (): Promise<LeadFinalizeResult> => {
+            attempt += 1;
+            return attempt === 1
+                ? { ok: false, error: 'odoo upstream failed', requestId: 'req-1' }
+                : { ok: true };
+        },
+    };
+
+    try {
+        const { container } = render(React.createElement(ChatLeadForm, props));
+        const set = (id: string, value: string) => {
+            const input = container.querySelector(`#${id}`);
+            if (!input) throw new Error(`input não encontrado: #${id}`);
+            fireEvent.input(input, { target: { value } });
+        };
+        set('lead-first-name', 'Fulano');
+        set('lead-last-name', 'de Tal');
+        set('lead-email', 'fulano@test.com');
+        set('lead-whatsapp', '11999998888');
+        const lgpd = container.querySelector('input[type="checkbox"]');
+        if (lgpd) fireEvent.click(lgpd);
+
+        const submitButton = () => {
+            const button = Array.from(container.querySelectorAll('button'))
+                .find((candidate) => candidate.textContent?.includes('Salvar e abrir WhatsApp'));
+            if (!button) throw new Error('botão "Salvar e abrir WhatsApp" não encontrado');
+            return button;
+        };
+        const generateLeadEvents = () =>
+            (window.dataLayer ?? []).filter(
+                (entry) => entry && typeof entry === 'object' && 'event' in entry && entry.event === 'generate_lead',
+            );
+
+        await act(async () => {
+            fireEvent.click(submitButton());
+            await Promise.resolve();
+            await Promise.resolve();
+        });
+        assert.equal(generateLeadEvents().length, 0, 'não deve reportar conversão numa submissão que falhou');
+
+        await act(async () => {
+            fireEvent.click(submitButton());
+            await Promise.resolve();
+            await Promise.resolve();
+        });
+        assert.equal(generateLeadEvents().length, 1, 'deve reportar a conversão uma única vez, após o retry bem-sucedido');
+    } finally {
+        window.dataLayer = previousDataLayer;
+        cleanup();
+    }
+});
+
+test('fechar o drawer do chat durante o envio pendente cancela o handoff (não abre WhatsApp)', async () => {
+    cleanup();
+    let resolveFinalize: ((result: LeadFinalizeResult) => void) | null = null;
+    const props: React.ComponentProps<typeof ChatLeadForm> = {
+        ...makeProps(),
+        isOpen: true,
+        onFinalizeLead: () => new Promise<LeadFinalizeResult>((resolve) => { resolveFinalize = resolve; }),
+    };
+
+    let closedCount = 0;
+    let navigatedTo: string | null = null;
+    const previousOpen = window.open;
+    Object.defineProperty(window, 'open', {
+        configurable: true,
+        value: () => ({
+            closed: false,
+            close() { closedCount += 1; },
+            location: { set href(v: string) { navigatedTo = v; } },
+            opener: null,
+        }),
+    });
+
+    try {
+        const { container, rerender } = render(React.createElement(ChatLeadForm, props));
+        const set = (id: string, value: string) => {
+            const input = container.querySelector(`#${id}`);
+            if (!input) throw new Error(`input não encontrado: #${id}`);
+            fireEvent.input(input, { target: { value } });
+        };
+        set('lead-first-name', 'Fulano');
+        set('lead-last-name', 'de Tal');
+        set('lead-email', 'fulano@test.com');
+        set('lead-whatsapp', '11999998888');
+        const lgpd = container.querySelector('input[type="checkbox"]');
+        if (lgpd) fireEvent.click(lgpd);
+
+        const submitButton = Array.from(container.querySelectorAll('button'))
+            .find((button) => button.textContent?.includes('Salvar e abrir WhatsApp'));
+        assert.ok(submitButton, 'botão "Salvar e abrir WhatsApp" deve existir');
+
+        fireEvent.click(submitButton);
+        await Promise.resolve();
+        assert.ok(resolveFinalize, 'onFinalizeLead deve ter sido chamado e estar pendente');
+
+        // Visitor closes the chat drawer while the CRM request is still in flight.
+        rerender(React.createElement(ChatLeadForm, { ...props, isOpen: false }));
+
+        await act(async () => {
+            resolveFinalize?.({ ok: true });
+            await Promise.resolve();
+            await Promise.resolve();
+        });
+
+        assert.equal(navigatedTo, null, 'não deve navegar para o WhatsApp depois do dismiss');
+        assert.equal(closedCount, 1, 'a aba reservada deve ser fechada, não deixada em branco');
+    } finally {
+        Object.defineProperty(window, 'open', {
+            configurable: true,
+            value: previousOpen,
+        });
+        cleanup();
+    }
+});

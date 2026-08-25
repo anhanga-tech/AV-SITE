@@ -24,6 +24,8 @@ interface ChatLeadFormProps {
   destination?: string;
   defaultBantSummary?: string;
   whatsappMessage?: string;
+  /** Whether the chat drawer is currently open — used to cancel a pending handoff if the visitor closes it mid-submit. */
+  isOpen?: boolean;
   getWhatsAppUrl: (payload: LeadFinalizePayload) => string;
   prepareLeadSubmitPayload: (payload: LeadFinalizePayload, eventId: string) => SubmitLeadRequest;
   isSubmittingLead: boolean;
@@ -34,6 +36,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
   destination,
   defaultBantSummary,
   whatsappMessage,
+  isOpen = true,
   getWhatsAppUrl,
   prepareLeadSubmitPayload,
   isSubmittingLead,
@@ -54,6 +57,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
   const [isLocallySubmitting, setIsLocallySubmitting] = useState(false);
   const isProcessingRef = React.useRef(false);
   const eventIdRef = useRef<string | null>(null);
+  const isOpenRef = useRef(isOpen);
   const startedRef = useRef(false);
   const completedFields = useRef<Set<string> | null>(null);
   const firstNameRef = useRef<HTMLInputElement>(null);
@@ -69,6 +73,10 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
       destination,
     });
   }, [destination]);
+
+  useEffect(() => {
+    isOpenRef.current = isOpen;
+  }, [isOpen]);
 
   useEffect(() => {
     const firstError = Object.keys(fieldErrors)[0] as keyof FieldErrors | undefined;
@@ -107,6 +115,14 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
       });
     }
   }
+
+  // Any field the visitor edits after a failed submit invalidates the retry
+  // key preserved for that failure — otherwise a retry could resend corrected
+  // data under the stale event_id, and the Odoo dedup would return the
+  // already-created lead without applying the edit.
+  const invalidateRetryKey = () => {
+    eventIdRef.current = null;
+  };
 
   const openLeadModal = () => {
     if (isSubmittingLead || isLocallySubmitting || isProcessingRef.current) return;
@@ -176,7 +192,6 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
       ...prepareLeadSubmitPayload(payload, eventId),
       marketingOptIn,
     };
-    pushGenerateLeadDataLayerEvent(submitPayload);
 
     // Reserve the tab synchronously — before the `await` below — so Safari
     // still treats the navigation as a direct result of this click (see
@@ -187,6 +202,16 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
 
     try {
       const result = await onFinalizeLead(submitPayload);
+
+      if (!isOpenRef.current) {
+        // The visitor closed the chat drawer while this request was in
+        // flight. AIChatPanel stays mounted (only its `isOpen` prop
+        // toggles), so this continuation would otherwise still run and hand
+        // off to WhatsApp after an explicit dismissal — discard it instead.
+        whatsappHandoff.cancel();
+        return;
+      }
+
       if (!result.ok) {
         whatsappHandoff.cancel();
         pushFormAnalyticsEvent({
@@ -199,6 +224,11 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
         setLocalError('Não foi possível salvar seu contato. Tente novamente.');
         console.warn('Background lead submission failed:', { error: result.error, requestId: result.requestId });
       } else {
+        // Fired only on confirmed success — pushing it before the CRM write
+        // resolves would report failed submissions as conversions, and firing
+        // it on every attempt would double-count a retry that reuses the same
+        // preserved event_id.
+        pushGenerateLeadDataLayerEvent(submitPayload);
         const whatsappLink = getWhatsAppUrl(payload);
         if (!whatsappHandoff.open(whatsappLink)) {
           setWhatsappUrl(whatsappLink);
@@ -248,12 +278,12 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
           countryCode={countryCode}
           acceptedLGPD={acceptedLGPD}
           fieldErrors={fieldErrors}
-          onFirstNameChange={(value) => { setFirstName(value); trackField('firstName', value); }}
-          onLastNameChange={(value) => { setLastName(value); trackField('lastName', value); }}
-          onEmailChange={(value) => { setEmail(value); trackField('email', value); }}
-          onWhatsappChange={(value) => { setWhatsapp(value); trackField('whatsapp', value); }}
-          onCountryCodeChange={setCountryCode}
-          onLgpdChange={(value) => { setAcceptedLGPD(value); trackField('lgpd', value); }}
+          onFirstNameChange={(value) => { setFirstName(value); trackField('firstName', value); invalidateRetryKey(); }}
+          onLastNameChange={(value) => { setLastName(value); trackField('lastName', value); invalidateRetryKey(); }}
+          onEmailChange={(value) => { setEmail(value); trackField('email', value); invalidateRetryKey(); }}
+          onWhatsappChange={(value) => { setWhatsapp(value); trackField('whatsapp', value); invalidateRetryKey(); }}
+          onCountryCodeChange={(value) => { setCountryCode(value); invalidateRetryKey(); }}
+          onLgpdChange={(value) => { setAcceptedLGPD(value); trackField('lgpd', value); invalidateRetryKey(); }}
           fieldRefs={{
             firstName: firstNameRef,
             lastName: lastNameRef,

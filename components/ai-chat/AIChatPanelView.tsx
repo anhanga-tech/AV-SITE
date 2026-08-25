@@ -33,6 +33,8 @@ interface AIChatPanelViewProps {
   dialogRef: React.RefObject<HTMLDialogElement | null>;
   messagesEndRef: React.RefObject<HTMLDivElement | null>;
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
+  /** Whether the drawer is visually open — threaded down to ChatLeadForm so it can cancel a pending handoff on close. */
+  isOpen: boolean;
   messages: ChatMessage[];
   lastModelIndex: number;
   liveAnnouncement: string;
@@ -167,6 +169,7 @@ function ChatPanelHeader({ onClose }: Pick<AIChatPanelViewProps, 'onClose'>) {
 
 type ChatMessageListProps = Pick<AIChatPanelViewProps,
   | 'messagesEndRef'
+  | 'isOpen'
   | 'messages'
   | 'lastModelIndex'
   | 'liveAnnouncement'
@@ -180,6 +183,7 @@ type ChatMessageListProps = Pick<AIChatPanelViewProps,
 
 function ChatMessageList({
   messagesEndRef,
+  isOpen,
   messages,
   lastModelIndex,
   liveAnnouncement,
@@ -229,6 +233,7 @@ function ChatMessageList({
                       destination={msg.actionData?.destination}
                       defaultBantSummary={msg.actionData?.bantSummary}
                       whatsappMessage={msg.actionData?.whatsappMessage}
+                      isOpen={isOpen}
                       getWhatsAppUrl={getLeadWhatsAppUrl}
                       prepareLeadSubmitPayload={prepareLeadSubmitPayload}
                       onFinalizeLead={finalizeLead}
@@ -341,6 +346,7 @@ export function AIChatPanelView({
   dialogRef,
   messagesEndRef,
   inputRef,
+  isOpen,
   messages,
   lastModelIndex,
   liveAnnouncement,
@@ -364,6 +370,7 @@ export function AIChatPanelView({
       <ChatPanelHeader onClose={onClose} />
       <ChatMessageList
         messagesEndRef={messagesEndRef}
+        isOpen={isOpen}
         messages={messages}
         lastModelIndex={lastModelIndex}
         liveAnnouncement={liveAnnouncement}

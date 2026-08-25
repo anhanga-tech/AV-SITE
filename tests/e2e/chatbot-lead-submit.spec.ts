@@ -203,15 +203,14 @@ test.describe('Chatbot lead handoff', () => {
     // The lead form ("Link Gerado") remains rendered after the failed submission.
     await expect(page.getByText('Link Gerado')).toBeVisible();
 
-    await expect
-      .poll(() =>
-        page.evaluate(() =>
-          (window.dataLayer || []).find((entry) =>
-            entry && typeof entry === 'object' && 'event' in entry && entry.event === 'generate_lead'
-          ) || null
-        )
-      )
-      .not.toBeNull();
+    // A failed submission must not report a conversion — generate_lead only
+    // fires once the CRM write is confirmed.
+    const generateLeadEvent = await page.evaluate(() =>
+      (window.dataLayer || []).find((entry) =>
+        entry && typeof entry === 'object' && 'event' in entry && entry.event === 'generate_lead'
+      ) || null
+    );
+    expect(generateLeadEvent).toBeNull();
 
     const payload2 = submitPayload as unknown as Record<string, unknown>;
     expect(typeof payload2.event_id).toBe('string');

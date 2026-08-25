@@ -343,6 +343,7 @@ const AIChatPanel: React.FC<AIChatPanelProps> = memo(({
       dialogRef={dialogRef}
       messagesEndRef={messagesEndRef}
       inputRef={inputRef}
+      isOpen={isOpen}
       messages={messages}
       lastModelIndex={lastModelIndex}
       liveAnnouncement={liveAnnouncement}
