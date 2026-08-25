@@ -1,11 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { AIChat } from './pages/AIChat';
-
-declare global {
-  interface Window {
-    __openedUrls?: string[];
-  }
-}
+import { stubWhatsAppWindow } from './helpers/whatsappWindowStub';
 
 async function acceptLgpd(page: import('@playwright/test').Page) {
   await page.locator('input[type="checkbox"]').first().evaluate((element) => {
@@ -21,17 +16,7 @@ test.describe('Chatbot lead handoff', () => {
     let submitRequestCount = 0;
     let submitPayload: Record<string, unknown> | null = null;
 
-    await page.addInitScript(() => {
-      window.__openedUrls = [];
-
-      Object.defineProperty(window, 'open', {
-        configurable: true,
-        value: (url?: string | URL) => {
-          window.__openedUrls?.push(String(url || ''));
-          return {} as Window;
-        },
-      });
-    });
+    await stubWhatsAppWindow(page);
 
     await page.route('**/api/generate', route =>
       route.fulfill({
@@ -86,7 +71,7 @@ test.describe('Chatbot lead handoff', () => {
 
     await expect(page.getByText('Salvando…')).toBeVisible();
     await expect.poll(() => submitRequestCount).toBe(1);
-    await expect.poll(() => page.evaluate(() => window.__openedUrls?.length ?? 0)).toBe(1);
+    await expect.poll(() => page.evaluate(() => window.__whatsappUrls?.length ?? 0)).toBe(1);
     await expect
       .poll(() =>
         page.evaluate(() =>
@@ -97,7 +82,7 @@ test.describe('Chatbot lead handoff', () => {
       )
       .not.toBeNull();
 
-    const openedUrl = await page.evaluate(() => window.__openedUrls?.[0] ?? '');
+    const openedUrl = await page.evaluate(() => window.__whatsappUrls?.[0] ?? '');
     expect(decodeURIComponent(openedUrl)).toContain('wa.me/5511955021519');
     expect(decodeURIComponent(openedUrl)).toContain('Origem: São Paulo, SP');
     expect(decodeURIComponent(openedUrl)).not.toContain('+5511988314487');
@@ -157,17 +142,7 @@ test.describe('Chatbot lead handoff', () => {
     let submitRequestCount = 0;
     let submitPayload: Record<string, unknown> | null = null;
 
-    await page.addInitScript(() => {
-      window.__openedUrls = [];
-
-      Object.defineProperty(window, 'open', {
-        configurable: true,
-        value: (url?: string | URL) => {
-          window.__openedUrls?.push(String(url || ''));
-          return {} as Window;
-        },
-      });
-    });
+    await stubWhatsAppWindow(page);
 
     await page.route('**/api/generate', route =>
       route.fulfill({
@@ -220,7 +195,9 @@ test.describe('Chatbot lead handoff', () => {
 
     // Lead submission must complete before opening WhatsApp.
     await expect.poll(() => submitRequestCount).toBe(1);
-    await expect.poll(() => page.evaluate(() => window.__openedUrls?.length ?? 0)).toBe(0);
+    await expect.poll(() => page.evaluate(() => window.__whatsappUrls?.length ?? 0)).toBe(0);
+    // The tab reserved synchronously on click must be closed, not left blank.
+    await expect.poll(() => page.evaluate(() => window.__whatsappWindowClosed ?? 0)).toBe(1);
     await expect(page.getByRole('alert')).toHaveText('Não foi possível salvar seu contato. Tente novamente.');
 
     // The lead form ("Link Gerado") remains rendered after the failed submission.

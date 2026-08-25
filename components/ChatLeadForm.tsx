@@ -11,6 +11,7 @@ import {
 import { triggerHaptic } from '../utils/haptics';
 import { trackTraksWhatsAppHandoff } from '../utils/traks';
 import { openContactModal } from '../utils/contactForm';
+import { reserveWhatsAppWindow } from '../utils/whatsappHandoff';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
 import { isFieldCompleteForAnalytics } from '../lib/form-v1-validation';
 import { ChatLeadFormFields } from './chat-lead-form/ChatLeadFormFields';
@@ -177,11 +178,17 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
     };
     pushGenerateLeadDataLayerEvent(submitPayload);
 
-    // Confirm the CRM write before handing the visitor to WhatsApp. The previous
-    // fire-and-forget order could open WhatsApp while silently losing the lead.
+    // Reserve the tab synchronously — before the `await` below — so Safari
+    // still treats the navigation as a direct result of this click (see
+    // utils/whatsappHandoff.ts). Confirm the CRM write before handing the
+    // visitor to WhatsApp: the previous fire-and-forget order could open
+    // WhatsApp while silently losing the lead.
+    const whatsappHandoff = reserveWhatsAppWindow();
+
     try {
       const result = await onFinalizeLead(submitPayload);
       if (!result.ok) {
+        whatsappHandoff.cancel();
         pushFormAnalyticsEvent({
           event: 'submit_failure',
           formType: 'ai_chatbot_lead',
@@ -193,13 +200,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
         console.warn('Background lead submission failed:', { error: result.error, requestId: result.requestId });
       } else {
         const whatsappLink = getWhatsAppUrl(payload);
-        let whatsappWindow: Window | null = null;
-        try {
-          whatsappWindow = window.open(whatsappLink, '_blank', 'noopener,noreferrer');
-        } catch {
-          whatsappWindow = null;
-        }
-        if (!whatsappWindow) {
+        if (!whatsappHandoff.open(whatsappLink)) {
           setWhatsappUrl(whatsappLink);
         }
         eventIdRef.current = null;

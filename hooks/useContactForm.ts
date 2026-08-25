@@ -15,6 +15,7 @@ import type { ContactModalOptions } from '../utils/contactForm';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
 import { pushGenerateLeadConversionEvent } from '../utils/generate-lead-analytics';
 import { trackTraksWhatsAppHandoff } from '../utils/traks';
+import { reserveWhatsAppWindow } from '../utils/whatsappHandoff';
 
 const EMPTY_FIELDS: ContactFormFields = {
     firstName: '',
@@ -168,6 +169,10 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 options.message
                 ?? `Olá! Meu nome é ${validation.normalized.firstName}. Gostaria de saber mais sobre viagens.`;
             const whatsappLink = getWhatsAppLink(whatsappMessage);
+            // Reserve the tab synchronously — before the network round-trip
+            // below — so Safari still treats the navigation as a direct
+            // result of this click (see utils/whatsappHandoff.ts).
+            const whatsappHandoff = action === 'whatsapp' ? reserveWhatsAppWindow() : null;
 
             // The UI dropped the separate sobrenome input (ContactModal/CtaBody now
             // ask for the full name in `firstName`), so split it here to keep the
@@ -195,9 +200,13 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 });
 
                 const data = (await response.json()) as SubmitContactResponse;
-                if (submissionTokenRef.current !== submissionToken) return;
+                if (submissionTokenRef.current !== submissionToken) {
+                    whatsappHandoff?.cancel();
+                    return;
+                }
 
                 if (!response.ok || !data.ok) {
+                    whatsappHandoff?.cancel();
                     const errData = data as Extract<SubmitContactResponse, { ok: false }>;
                     const retryableFailure = !response.ok && response.status >= 500;
                     if (!retryableFailure) eventIdRef.current = null;
@@ -226,18 +235,13 @@ export function useContactForm(options: ContactModalOptions = {}) {
 
                 if (action === 'whatsapp') {
                     // CRM confirmation comes first. Opening WhatsApp before this
-                    // request made it possible to lose the lead silently. If a
-                    // browser blocks the asynchronous popup, keep the URL as an
+                    // request made it possible to lose the lead silently. The tab
+                    // itself was already reserved synchronously above; if it never
+                    // opened (blocked) or can't be navigated, keep the URL as an
                     // explicit fallback link in the success state.
-                    const whatsappWindow = (() => {
-                        try {
-                            return window.open(whatsappLink, '_blank', 'noopener,noreferrer');
-                        } catch {
-                            return null;
-                        }
-                    })();
+                    const opened = whatsappHandoff?.open(whatsappLink) ?? false;
 
-                    if (!whatsappWindow) {
+                    if (!opened) {
                         setWhatsappUrl(whatsappLink);
                     }
 
@@ -271,6 +275,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 setSubmitted(true);
                 eventIdRef.current = null;
             } catch {
+                whatsappHandoff?.cancel();
                 if (submissionTokenRef.current !== submissionToken) return;
                 if (action === 'whatsapp') {
                     console.warn('[submit-contact] fetch failed before opening WhatsApp');
