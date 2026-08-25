@@ -73,3 +73,17 @@ test('a origem do link curto /indica usa a preposição certa', () => {
     const out = applyOriginToMessage('Olá!{origem} Quero um orçamento.', '?utm_source=indicacao&utm_medium=whatsapp');
     assert.equal(out, 'Olá! Vim por indicação. Quero um orçamento.');
 });
+
+// Regressão (Codex review, PR #1507): /links é prerenderizada e o mesmo HTML estático serve
+// toda query string. Cravar o padrão "Instagram" nele faz quem abre /links/?utm_source=indicacao
+// e clica antes de hidratar mandar uma origem falsa. `null` = origem desconhecida = omitir.
+test('origem desconhecida (pré-hidratação) omite a frase em vez de cravar o padrão', () => {
+    assert.equal(resolveOriginClause(null), '');
+    assert.equal(applyOriginToMessage('Olá!{origem} Quero um orçamento.', null), 'Olá! Quero um orçamento.');
+});
+
+test('a distinção entre null e string vazia é preservada', () => {
+    // '' = visitante real sem UTM -> padrão Instagram. null = ainda não sabemos -> omitir.
+    assert.equal(resolveOriginClause(''), ' Vim pelo Instagram.');
+    assert.equal(resolveOriginClause(null), '');
+});

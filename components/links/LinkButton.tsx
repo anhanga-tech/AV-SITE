@@ -8,12 +8,14 @@ import { ICON_MAP } from './linkIcons';
 interface LinkButtonProps {
     item: LinkItem;
     /**
-     * Query de rastreio já resolvida pelo LinksPage. Vem vazia no primeiro render (SSR e
-     * hidratação) e é preenchida depois da montagem — /links é prerenderizada, então ler
-     * `window.location.search` durante o render faria o HTML do servidor divergir do
-     * cliente em todo `href`.
+     * Query de rastreio já resolvida pelo LinksPage, ou `null` enquanto ela é desconhecida
+     * (HTML prerenderizado, antes da hidratação). `null` faz a mensagem do WhatsApp omitir
+     * a origem em vez de cravar o padrão — ver `resolveOriginClause`. Os UTMs dos links
+     * internos entram na hidratação; um clique antes disso perde a query, mas
+     * `utils/whatsapp.ts` já persistiu os UTMs em sessionStorage e cookie no import, então
+     * a página de destino recupera a atribuição.
      */
-    search: string;
+    search: string | null;
     /** classes extra (ex.: margem de ritmo na fronteira entre tiers) */
     className?: string;
 }
@@ -94,7 +96,7 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className:
         );
     }
 
-    const to = withTrackingParams(item.href ?? '/', search);
+    const to = withTrackingParams(item.href ?? '/', search ?? '');
     return (
         <Link to={to} className={className} data-testid={`link-${item.id}`}
               onClick={() => pushLinksPageClick(item, to)}>

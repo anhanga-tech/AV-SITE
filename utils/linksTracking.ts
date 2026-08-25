@@ -70,12 +70,22 @@ export const ORIGIN_TOKEN = '{origem}';
 
 /**
  * Resolve a frase de origem a partir da `utm_source` da URL.
- * @returns ` Vim pelo TikTok.` (com espaço à esquerda) ou string vazia se a origem for
- * declarada mas desconhecida — dizer "Instagram" ali seria afirmar algo falso.
+ *
+ * @param search query atual, ou `null` quando ela ainda é desconhecida — o HTML
+ * prerenderizado de /links, antes da hidratação. `null` **omite** a origem em vez de cair
+ * no padrão: o mesmo HTML estático é servido para toda query string, então qualquer origem
+ * afirmada ali estaria errada para alguém. Quem abre `/links/?utm_source=indicacao` e
+ * clica antes de hidratar (ou com JS desligado) receberia "Vim pelo Instagram." — falso.
+ * Sem `window.location` como fallback implícito de propósito: o tipo obriga quem chama a
+ * decidir se já sabe a origem.
+ *
+ * @returns ` Vim pelo TikTok.` (com espaço à esquerda), ou string vazia quando a origem é
+ * desconhecida ou está fora do allowlist — nos dois casos, afirmar algo seria mentir.
  */
-export function resolveOriginClause(search?: string): string {
-    const currentSearch = search ?? (typeof window !== 'undefined' ? window.location.search : '');
-    const source = new URLSearchParams(currentSearch).get('utm_source');
+export function resolveOriginClause(search: string | null): string {
+    if (search === null) return '';
+
+    const source = new URLSearchParams(search).get('utm_source');
 
     if (!source) return ` Vim ${DEFAULT_ORIGIN_LABEL}.`;
 
@@ -88,7 +98,7 @@ export function resolveOriginClause(search?: string): string {
  * `'Olá!{origem} Quero...'`: com origem vira `'Olá! Vim pelo TikTok. Quero...'`, sem
  * origem vira `'Olá! Quero...'` — o espaço que segue o marcador serve aos dois casos.
  */
-export function applyOriginToMessage(message: string, search?: string): string {
+export function applyOriginToMessage(message: string, search: string | null): string {
     if (!message.includes(ORIGIN_TOKEN)) return message;
     return message.split(ORIGIN_TOKEN).join(resolveOriginClause(search));
 }

@@ -8,15 +8,21 @@ import LinkButton, { isPrimaryLink } from '../components/links/LinkButton';
 import TrustSeals from '../components/links/TrustSeals';
 
 // A query da URL é estado externo ao React. /links é prerenderizada (lib/prerender-routes.js),
-// então o snapshot de servidor é vazio e o do cliente só entra depois da hidratação — sem isso,
-// ler `window.location.search` durante o render faria o HTML do servidor divergir do primeiro
-// render do cliente em todo `href`. Os UTMs entram no passe seguinte, antes de qualquer clique.
+// então ler `window.location.search` durante o render faria o HTML do servidor divergir do
+// primeiro render do cliente em todo `href`.
+//
+// O snapshot de servidor é `null` — "origem ainda desconhecida" —, e não string vazia. A
+// diferença importa: `''` significa "visitante sem UTM", que resolve para o padrão Instagram.
+// Como o mesmo HTML estático é servido para toda query string, cravar esse padrão nele faria
+// quem abre `/links/?utm_source=indicacao` e clica antes de hidratar mandar "Vim pelo
+// Instagram." — falso. Com `null` o HTML prerenderizado não afirma origem nenhuma, e a
+// hidratação preenche a verdadeira.
 const subscribeToLocation = (onStoreChange: () => void) => {
     window.addEventListener('popstate', onStoreChange);
     return () => window.removeEventListener('popstate', onStoreChange);
 };
-const getSearchSnapshot = () => window.location.search;
-const getServerSearchSnapshot = () => '';
+const getSearchSnapshot = (): string | null => window.location.search;
+const getServerSearchSnapshot = (): string | null => null;
 
 const LinksPage: React.FC = () => {
     const search = useSyncExternalStore(subscribeToLocation, getSearchSnapshot, getServerSearchSnapshot);
@@ -56,7 +62,7 @@ const LinksPage: React.FC = () => {
 
                     {banner.visible ? (
                         <Link
-                            to={withTrackingParams(banner.href, search)}
+                            to={withTrackingParams(banner.href, search ?? '')}
                             className="mt-8 w-full rounded-2xl bg-anhanga-yellow/15 p-5 text-center ring-1 ring-anhanga-yellow/40 transition-colors hover:bg-anhanga-yellow/25"
                             data-testid="links-banner"
                         >
