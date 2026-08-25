@@ -89,8 +89,13 @@ export function resolveOriginClause(search: string | null): string {
 
     if (!source) return ` Vim ${DEFAULT_ORIGIN_LABEL}.`;
 
-    const label = ORIGIN_LABELS[source.trim().toLowerCase()];
-    return label ? ` Vim ${label}.` : '';
+    // `Object.hasOwn` e não lookup direto: `ORIGIN_LABELS` é objeto literal, então chaves
+    // herdadas do protótipo resolvem para valores truthy e furam o allowlist. Depois do
+    // `.toLowerCase()` sobram `constructor` e `__proto__` (as demais viram `tostring`,
+    // `valueof`... e não atingem o protótipo), que produziriam "Vim function Object() {
+    // [native code] }." na mensagem. Mesmo idioma de `isSupportedIcon` em linkIcons.ts.
+    const key = source.trim().toLowerCase();
+    return Object.hasOwn(ORIGIN_LABELS, key) ? ` Vim ${ORIGIN_LABELS[key]}.` : '';
 }
 
 /**

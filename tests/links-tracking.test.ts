@@ -87,3 +87,14 @@ test('a distinção entre null e string vazia é preservada', () => {
     assert.equal(resolveOriginClause(''), ' Vim pelo Instagram.');
     assert.equal(resolveOriginClause(null), '');
 });
+
+// Regressão (claude[bot] review, PR #1507): ORIGIN_LABELS é objeto literal, então um lookup
+// direto resolvia chaves herdadas do protótipo para valores truthy e furava o allowlist.
+// `constructor` e `__proto__` são os que sobrevivem ao `.toLowerCase()`.
+test('chaves de Object.prototype não furam o allowlist de origem', () => {
+    for (const chave of ['constructor', '__proto__', 'toString', 'hasOwnProperty', 'valueOf']) {
+        const out = applyOriginToMessage('Olá!{origem} Quero um orçamento.', `?utm_source=${chave}`);
+        assert.equal(out, 'Olá! Quero um orçamento.', `${chave} furou o allowlist`);
+        assert.doesNotMatch(out, /\[object|native code|function/, `${chave} vazou objeto na mensagem`);
+    }
+});
