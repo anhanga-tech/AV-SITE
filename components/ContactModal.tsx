@@ -17,7 +17,7 @@ const ContactModal: React.FC = () => {
     const closeButtonRef = useRef<HTMLButtonElement>(null);
     const previousBodyOverflow = useRef<string>('');
 
-    const { fields, setField, canAttemptSubmit, isSubmitting, error, fieldErrors, submitted, lastAction, submit, reset, honeypotProps } =
+    const { fields, setField, canAttemptSubmit, isSubmitting, error, fieldErrors, submitted, lastAction, whatsappUrl, submit, reset, honeypotProps } =
         useContactForm(options);
 
     const close = useCallback(() => {
@@ -138,8 +138,20 @@ const ContactModal: React.FC = () => {
                             <p className="text-sm text-zinc-500">
                                 {lastAction === 'callback'
                                     ? 'Nossa equipe chama você em breve pelo WhatsApp.'
-                                    : 'Abrimos o WhatsApp para você continuar com a nossa equipe.'}
+                                    : whatsappUrl
+                                        ? 'Seu contato foi salvo. O navegador bloqueou a abertura automática do WhatsApp.'
+                                        : 'Abrimos o WhatsApp para você continuar com a nossa equipe.'}
                             </p>
+                            {lastAction === 'whatsapp' && whatsappUrl ? (
+                                <a
+                                    href={whatsappUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-full rounded-xl bg-anhanga-whatsapp py-3 text-center text-sm font-black text-anhanga-dark transition hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
+                                >
+                                    Abrir WhatsApp
+                                </a>
+                            ) : null}
                         </output>
                         <button
                             ref={closeButtonRef}

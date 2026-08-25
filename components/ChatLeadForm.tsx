@@ -2,7 +2,6 @@ import React, { memo, useEffect, useRef, useState } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { createLeadEventId, pushGenerateLeadDataLayerEvent } from '../hooks/useLeadCapture';
 import type { SubmitLeadRequest } from '../types/leadCapture';
-import { normalizeWhatsappNumber } from '../lib/lead-logic';
 import {
   validateLeadForm,
   type FieldErrors,
@@ -11,6 +10,7 @@ import {
 } from '../lib/chat-lead-form-logic';
 import { triggerHaptic } from '../utils/haptics';
 import { trackTraksWhatsAppHandoff } from '../utils/traks';
+import { openContactModal } from '../utils/contactForm';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
 import { isFieldCompleteForAnalytics } from '../lib/form-v1-validation';
 import { ChatLeadFormFields } from './chat-lead-form/ChatLeadFormFields';
@@ -110,25 +110,12 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
     }
   }
 
-  const buildDirectWhatsAppPayload = (): LeadFinalizePayload => ({
-    firstName: firstName.trim() || 'Viajante',
-    lastName: lastName.trim(),
-    email: email.trim().toLowerCase(),
-    whatsapp: normalizeWhatsappNumber(whatsapp, countryCode) ?? '',
-    bantSummary: defaultBantSummary || 'Não informado',
-    destination: destination?.trim() || 'roteiro personalizado',
-  });
-
-  const openDirectWhatsApp = () => {
+  const openLeadModal = () => {
     void triggerHaptic('light');
-    pushFormAnalyticsEvent({
-      event: 'whatsapp_opened',
-      formType: 'ai_chatbot_direct_whatsapp',
-      formId: 'chat-lead-direct-whatsapp',
+    openContactModal({
+      source: 'chatbot-direct',
       destination,
     });
-    openWhatsAppWindow(getWhatsAppUrl(buildDirectWhatsAppPayload()));
-    trackTraksWhatsAppHandoff();
   };
 
   const submitLeadForm = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -188,17 +175,8 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
     };
     pushGenerateLeadDataLayerEvent(submitPayload);
 
-    // Open WhatsApp synchronously in the click handler to prevent popup blockers on mobile/Safari
-    pushFormAnalyticsEvent({
-      event: 'whatsapp_opened',
-      formType: 'ai_chatbot_lead',
-      formId: 'chat-lead-form',
-      destination,
-    });
-    openWhatsAppWindow(getWhatsAppUrl(payload));
-    trackTraksWhatsAppHandoff();
-
-    // Submit lead data in the background — user is already heading to WhatsApp
+    // Confirm the CRM write before handing the visitor to WhatsApp. The previous
+    // fire-and-forget order could open WhatsApp while silently losing the lead.
     try {
       const result = await onFinalizeLead(submitPayload);
       if (!result.ok) {
@@ -209,8 +187,17 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
           errorType: result.error ? 'api' : 'unknown',
           destination,
         });
+        setLocalError('Não foi possível salvar seu contato. Tente novamente.');
         console.warn('Background lead submission failed:', { error: result.error, requestId: result.requestId });
       } else {
+        pushFormAnalyticsEvent({
+          event: 'whatsapp_opened',
+          formType: 'ai_chatbot_lead',
+          formId: 'chat-lead-form',
+          destination,
+        });
+        openWhatsAppWindow(getWhatsAppUrl(payload));
+        trackTraksWhatsAppHandoff();
         pushFormAnalyticsEvent({
           event: 'submit_success',
           formType: 'ai_chatbot_lead',
@@ -267,7 +254,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
         <ChatLeadFormActions
           isSubmitting={isSubmittingLead || isLocallySubmitting}
           onSubmit={(e) => void submitLeadForm(e)}
-          onOpenDirectWhatsApp={openDirectWhatsApp}
+          onOpenLeadModal={openLeadModal}
         />
       </div>
     </div>

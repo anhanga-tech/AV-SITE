@@ -4,10 +4,10 @@ import { ExternalLink, Loader2 } from 'lucide-react';
 interface ChatLeadFormActionsProps {
   isSubmitting: boolean;
   onSubmit: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  onOpenDirectWhatsApp: () => void;
+  onOpenLeadModal: () => void;
 }
 
-export function ChatLeadFormActions({ isSubmitting, onSubmit, onOpenDirectWhatsApp }: ChatLeadFormActionsProps) {
+export function ChatLeadFormActions({ isSubmitting, onSubmit, onOpenLeadModal }: ChatLeadFormActionsProps) {
   return (
     <>
       <button
@@ -30,10 +30,10 @@ export function ChatLeadFormActions({ isSubmitting, onSubmit, onOpenDirectWhatsA
       </button>
       <button
         type="button"
-        onClick={onOpenDirectWhatsApp}
+        onClick={onOpenLeadModal}
         className="mt-3 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-bold text-zinc-700 transition hover:border-brand-vibrant hover:text-brand-vibrant focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-vibrant/30"
       >
-        Ir direto para o WhatsApp
+        Preencher contato e continuar
       </button>
     </>
   );

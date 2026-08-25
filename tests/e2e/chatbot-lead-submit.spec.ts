@@ -153,7 +153,7 @@ test.describe('Chatbot lead handoff', () => {
     });
   });
 
-  test('should open WhatsApp immediately even when lead submit fails in the background', async ({ page }) => {
+  test('should not open WhatsApp when lead submit fails', async ({ page }) => {
     let submitRequestCount = 0;
     let submitPayload: Record<string, unknown> | null = null;
 
@@ -218,21 +218,12 @@ test.describe('Chatbot lead handoff', () => {
 
     await page.getByRole('button', { name: 'Salvar e abrir WhatsApp' }).click();
 
-    // WhatsApp must open immediately (before lead submission completes) —
-    // this is the core guarantee of the fire-and-forget design.
-    await expect.poll(() => page.evaluate(() => window.__openedUrls?.length ?? 0)).toBe(1);
-    const openedUrl = await page.evaluate(() => window.__openedUrls?.[0] ?? '');
-    expect(decodeURIComponent(openedUrl)).toContain('wa.me/');
-    expect(decodeURIComponent(openedUrl)).not.toContain('+5511988314487');
-
-    // Lead submission happened in the background
+    // Lead submission must complete before opening WhatsApp.
     await expect.poll(() => submitRequestCount).toBe(1);
+    await expect.poll(() => page.evaluate(() => window.__openedUrls?.length ?? 0)).toBe(0);
+    await expect(page.getByRole('alert')).toHaveText('Não foi possível salvar seu contato. Tente novamente.');
 
-    // No UI error alert — upstream errors are silently logged to console
-    await expect(page.getByRole('alert')).not.toBeVisible();
-
-    // The lead form ("Link Gerado") is still rendered (popup opened in a new tab,
-    // window.open mock returns a truthy object so location.assign is not triggered)
+    // The lead form ("Link Gerado") remains rendered after the failed submission.
     await expect(page.getByText('Link Gerado')).toBeVisible();
 
     await expect
@@ -245,18 +236,8 @@ test.describe('Chatbot lead handoff', () => {
       )
       .not.toBeNull();
 
-    const generateLeadEvent = await page.evaluate(() =>
-      (window.dataLayer || []).find((entry) =>
-        entry && typeof entry === 'object' && 'event' in entry && entry.event === 'generate_lead'
-      ) || null
-    );
     const payload2 = submitPayload as unknown as Record<string, unknown>;
     expect(typeof payload2.event_id).toBe('string');
-    expect(generateLeadEvent).toMatchObject({
-      event: 'generate_lead',
-      event_id: payload2.event_id,
-      destination: 'Orlando, Flórida',
-    });
   });
 
   test('clicking the privacy policy link does not toggle the LGPD checkbox', async ({ page, context }) => {

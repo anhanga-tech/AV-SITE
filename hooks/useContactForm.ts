@@ -77,6 +77,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
     const [fieldErrors, setFieldErrors] = useState<ContactFormFieldErrors>({});
     const [submitted, setSubmitted] = useState(false);
     const [lastAction, setLastAction] = useState<'whatsapp' | 'callback' | null>(null);
+    const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
 
     const canAttemptSubmit = Boolean(fields.firstName.trim() && fields.whatsapp.trim());
     const formId = options.source ?? 'contact-modal';
@@ -118,6 +119,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
         setFieldErrors({});
         setSubmitted(false);
         setLastAction(null);
+        setWhatsappUrl(null);
         hasStarted.current = false;
         completedFields.current = null;
     }, []);
@@ -145,6 +147,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
             setIsSubmitting(true);
             setError(null);
             setFieldErrors({});
+            setWhatsappUrl(null);
             pushFormAnalyticsEvent({
                 event: 'submit_attempt',
                 formType: 'contact_modal',
@@ -158,17 +161,6 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 options.message
                 ?? `Olá! Meu nome é ${validation.normalized.firstName}. Gostaria de saber mais sobre viagens.`;
             const whatsappUrl = getWhatsAppLink(whatsappMessage);
-
-            if (action === 'whatsapp') {
-                pushFormAnalyticsEvent({
-                    event: 'whatsapp_opened',
-                    formType: 'contact_modal',
-                    formId,
-                    destination: action,
-                });
-                window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-                trackTraksWhatsAppHandoff();
-            }
 
             // The UI dropped the separate sobrenome input (ContactModal/CtaBody now
             // ask for the full name in `firstName`), so split it here to keep the
@@ -208,8 +200,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
                             errorType: errData.code,
                             destination: action,
                         });
-                        setLastAction(action);
-                        setSubmitted(true);
+                        setError(errData.error || 'Não foi possível registrar seu contato. Tente novamente.');
                     } else {
                         setError(errData.error || 'Não foi possível enviar. Tente novamente.');
                         pushFormAnalyticsEvent({
@@ -221,6 +212,32 @@ export function useContactForm(options: ContactModalOptions = {}) {
                         });
                     }
                     return;
+                }
+
+                if (action === 'whatsapp') {
+                    // CRM confirmation comes first. Opening WhatsApp before this
+                    // request made it possible to lose the lead silently. If a
+                    // browser blocks the asynchronous popup, keep the URL as an
+                    // explicit fallback link in the success state.
+                    const whatsappWindow = (() => {
+                        try {
+                            return window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+                        } catch {
+                            return null;
+                        }
+                    })();
+
+                    if (whatsappWindow) {
+                        pushFormAnalyticsEvent({
+                            event: 'whatsapp_opened',
+                            formType: 'contact_modal',
+                            formId,
+                            destination: action,
+                        });
+                        trackTraksWhatsAppHandoff();
+                    } else {
+                        setWhatsappUrl(whatsappUrl);
+                    }
                 }
 
                 pushContactDataLayerEvent(
@@ -241,7 +258,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 setSubmitted(true);
             } catch {
                 if (action === 'whatsapp') {
-                    console.warn('[submit-contact] fetch failed after opening WhatsApp');
+                    console.warn('[submit-contact] fetch failed before opening WhatsApp');
                     pushFormAnalyticsEvent({
                         event: 'submit_failure',
                         formType: 'contact_modal',
@@ -249,8 +266,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
                         errorType: 'network',
                         destination: action,
                     });
-                    setLastAction(action);
-                    setSubmitted(true);
+                    setError('Não foi possível registrar seu contato. Tente novamente.');
                 } else {
                     setError('Erro de conexão. Verifique sua internet e tente novamente.');
                     pushFormAnalyticsEvent({
@@ -269,5 +285,5 @@ export function useContactForm(options: ContactModalOptions = {}) {
         [fields, options.destination, options.message, options.source, getAntiBotFields, formId],
     );
 
-    return { fields, setField, canAttemptSubmit, isSubmitting, error, fieldErrors, submitted, lastAction, submit, reset, honeypotProps };
+    return { fields, setField, canAttemptSubmit, isSubmitting, error, fieldErrors, submitted, lastAction, whatsappUrl, submit, reset, honeypotProps };
 }

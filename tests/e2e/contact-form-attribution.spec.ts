@@ -132,7 +132,7 @@ test.describe('Contact form attribution payload', () => {
     });
   });
 
-  test('WhatsApp handoff still opens even when the CRM tracking request fails', async ({ page }) => {
+  test('WhatsApp handoff does not open when the CRM tracking request fails', async ({ page }) => {
     await stubWindowOpen(page);
     await page.route('**/api/submit-contact', (route) =>
       route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ ok: false, error: 'boom' }) }),
@@ -147,12 +147,9 @@ test.describe('Contact form attribution payload', () => {
     await page.locator('#contact-whatsapp').fill('11977776666');
     await page.getByRole('button', { name: /^abrir whatsapp agora$/i }).click();
 
-    // The WhatsApp tab opens regardless of whether the background CRM tracking call
-    // succeeds — the visitor's path to a human must never depend on Odoo being up.
-    await expect.poll(() => page.evaluate(() => window.__whatsappOpens?.length ?? 0)).toBeGreaterThan(0);
-    const [openedUrl] = await page.evaluate(() => window.__whatsappOpens?.[0] ?? []);
-    expect(String(openedUrl)).toContain('wa.me');
-
-    await expect(dialog.getByText(/abrimos o whatsapp/i)).toBeVisible();
+    // CRM confirmation must precede the WhatsApp handoff. A failed write must
+    // remain visible in the form instead of becoming a silent lost lead.
+    await expect.poll(() => page.evaluate(() => window.__whatsappOpens?.length ?? 0)).toBe(0);
+    await expect(dialog.getByRole('alert')).toHaveText('boom');
   });
 });

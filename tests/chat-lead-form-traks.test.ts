@@ -75,3 +75,39 @@ test('submit validado do ChatLeadForm emite whatsapp_click no Traks', async () =
         assert.ok(handoffs.length >= 1, 'whatsapp_click deve ser emitido no submit validado');
     });
 });
+
+test('caminho direto abre o modal de lead e não abre o WhatsApp sem salvar', () => {
+    const previousOpen = window.open;
+    const modalDetails: Array<{ source?: string; destination?: string }> = [];
+    let whatsappOpenCalls = 0;
+    const onModalOpen = (event: Event) => {
+        modalDetails.push((event as CustomEvent<{ source?: string; destination?: string }>).detail);
+    };
+
+    Object.defineProperty(window, 'open', {
+        configurable: true,
+        value: () => {
+            whatsappOpenCalls += 1;
+            return ({}) as Window;
+        },
+    });
+    window.addEventListener('open-contact-modal', onModalOpen);
+
+    try {
+        const { container } = render(React.createElement(ChatLeadForm, makeProps()));
+        const directButton = Array.from(container.querySelectorAll('button'))
+            .find((button) => button.textContent?.includes('Preencher contato e continuar'));
+        assert.ok(directButton, 'botão alternativo deve existir');
+
+        fireEvent.click(directButton);
+
+        assert.deepEqual(modalDetails, [{ source: 'chatbot-direct', destination: 'Orlando' }]);
+        assert.equal(whatsappOpenCalls, 0, 'o caminho alternativo não pode abrir o WhatsApp antes do modal');
+    } finally {
+        window.removeEventListener('open-contact-modal', onModalOpen);
+        Object.defineProperty(window, 'open', {
+            configurable: true,
+            value: previousOpen,
+        });
+    }
+});
