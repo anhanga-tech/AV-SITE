@@ -47,8 +47,18 @@ export function reserveWhatsAppWindow(): WhatsAppHandoff {
         // direct window.open(url, ..., 'noopener') call would.
         handle.opener = null;
     } catch {
-        // Some browsers make `opener` read-only — the tab still works, it
-        // just keeps a reference back to us until it navigates away.
+        // A browser that rejects this assignment gives no way to confirm the
+        // isolation `noopener` would have provided — navigating the tab
+        // anyway would let the WhatsApp page (or a redirect in its chain)
+        // keep a `window.opener` reference back to this site. Don't hand off
+        // through a tab that can't be isolated; the caller falls back to
+        // rendering the URL as a plain link instead.
+        try {
+            handle.close();
+        } catch {
+            // ignore
+        }
+        return NOOP_HANDOFF;
     }
 
     return {

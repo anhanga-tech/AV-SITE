@@ -82,23 +82,46 @@ function Harness() {
 }
 
 test('useContactForm submit("whatsapp") emite whatsapp_click no Traks', async () => {
-    await withTraksStub(async (calls) => {
-        await withFetchStub(async () => {
-            const { getByTestId } = render(React.createElement(Harness));
-
-            act(() => {
-                fireEvent.click(getByTestId('fill'));
-            });
-            await act(async () => {
-                fireEvent.click(getByTestId('submit-whatsapp'));
-                await Promise.resolve();
-                await Promise.resolve();
-            });
-
-            const handoffs = calls.filter((c) => c.name === 'whatsapp_click');
-            assert.ok(handoffs.length >= 1, 'whatsapp_click deve ser emitido no submit("whatsapp")');
-        });
+    // happy-dom's window.open() exposes `opener` as a getter-only accessor,
+    // which throws on assignment in strict-mode ESM — unlike real browsers,
+    // where `window.opener = null` is a spec-defined no-throw setter. Mock a
+    // plain object here so the test exercises the "real browser" path rather
+    // than that DOM-emulation gap.
+    const previousOpen = window.open;
+    Object.defineProperty(window, 'open', {
+        configurable: true,
+        value: () => ({
+            closed: false,
+            close() {},
+            location: { href: '' },
+            opener: 'writable',
+        }),
     });
+
+    try {
+        await withTraksStub(async (calls) => {
+            await withFetchStub(async () => {
+                const { getByTestId } = render(React.createElement(Harness));
+
+                act(() => {
+                    fireEvent.click(getByTestId('fill'));
+                });
+                await act(async () => {
+                    fireEvent.click(getByTestId('submit-whatsapp'));
+                    await Promise.resolve();
+                    await Promise.resolve();
+                });
+
+                const handoffs = calls.filter((c) => c.name === 'whatsapp_click');
+                assert.ok(handoffs.length >= 1, 'whatsapp_click deve ser emitido no submit("whatsapp")');
+            });
+        });
+    } finally {
+        Object.defineProperty(window, 'open', {
+            configurable: true,
+            value: previousOpen,
+        });
+    }
 });
 
 test('useContactForm expõe link de fallback quando o popup do WhatsApp é bloqueado, sem contar whatsapp_click duas vezes', async () => {

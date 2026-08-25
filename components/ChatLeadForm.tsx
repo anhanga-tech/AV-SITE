@@ -274,6 +274,14 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
         if (result.notice) {
           setNotice(result.notice);
         }
+        // The submission itself is confirmed successful — count it in form
+        // analytics too, not just the generate_lead conversion above.
+        pushFormAnalyticsEvent({
+          event: 'submit_success',
+          formType: 'ai_chatbot_lead',
+          formId: 'chat-lead-form',
+          destination,
+        });
         return;
       }
 

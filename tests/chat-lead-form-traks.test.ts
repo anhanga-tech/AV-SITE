@@ -49,36 +49,59 @@ function makeProps() {
 }
 
 test('submit validado do ChatLeadForm emite whatsapp_click no Traks', async () => {
-    await withTraksStub(async (calls) => {
-        const { container } = render(React.createElement(ChatLeadForm, makeProps()));
-
-        // Preenche campos obrigatórios pelos inputs reais do form.
-        const set = (id: string, value: string) => {
-            const input = container.querySelector(`#${id}`);
-            if (!input) throw new Error(`input não encontrado: #${id}`);
-            fireEvent.input(input, { target: { value } });
-        };
-        set('lead-first-name', 'Fulano');
-        set('lead-last-name', 'de Tal');
-        set('lead-email', 'fulano@test.com');
-        set('lead-whatsapp', '11999998888');
-
-        // Aceita LGPD se existir checkbox.
-        const lgpd = container.querySelector('input[type="checkbox"]');
-        if (lgpd) fireEvent.click(lgpd);
-
-        const submitButton = Array.from(container.querySelectorAll('button'))
-            .find((b) => b.textContent?.includes('Salvar e abrir WhatsApp'));
-        assert.ok(submitButton, 'botão "Salvar e abrir WhatsApp" deve existir');
-
-        await act(async () => {
-            fireEvent.click(submitButton);
-            await Promise.resolve();
-            await Promise.resolve();
-        });
-        const handoffs = calls.filter((c) => c.name === 'whatsapp_click');
-        assert.ok(handoffs.length >= 1, 'whatsapp_click deve ser emitido no submit validado');
+    // happy-dom's window.open() exposes `opener` as a getter-only accessor,
+    // which throws on assignment in strict-mode ESM — unlike real browsers,
+    // where `window.opener = null` is a spec-defined no-throw setter. Mock a
+    // plain object here so the test exercises the "real browser" path rather
+    // than that DOM-emulation gap.
+    const previousOpen = window.open;
+    Object.defineProperty(window, 'open', {
+        configurable: true,
+        value: () => ({
+            closed: false,
+            close() {},
+            location: { href: '' },
+            opener: 'writable',
+        }),
     });
+
+    try {
+        await withTraksStub(async (calls) => {
+            const { container } = render(React.createElement(ChatLeadForm, makeProps()));
+
+            // Preenche campos obrigatórios pelos inputs reais do form.
+            const set = (id: string, value: string) => {
+                const input = container.querySelector(`#${id}`);
+                if (!input) throw new Error(`input não encontrado: #${id}`);
+                fireEvent.input(input, { target: { value } });
+            };
+            set('lead-first-name', 'Fulano');
+            set('lead-last-name', 'de Tal');
+            set('lead-email', 'fulano@test.com');
+            set('lead-whatsapp', '11999998888');
+
+            // Aceita LGPD se existir checkbox.
+            const lgpd = container.querySelector('input[type="checkbox"]');
+            if (lgpd) fireEvent.click(lgpd);
+
+            const submitButton = Array.from(container.querySelectorAll('button'))
+                .find((b) => b.textContent?.includes('Salvar e abrir WhatsApp'));
+            assert.ok(submitButton, 'botão "Salvar e abrir WhatsApp" deve existir');
+
+            await act(async () => {
+                fireEvent.click(submitButton);
+                await Promise.resolve();
+                await Promise.resolve();
+            });
+            const handoffs = calls.filter((c) => c.name === 'whatsapp_click');
+            assert.ok(handoffs.length >= 1, 'whatsapp_click deve ser emitido no submit validado');
+        });
+    } finally {
+        Object.defineProperty(window, 'open', {
+            configurable: true,
+            value: previousOpen,
+        });
+    }
 });
 
 test('caminho direto abre o modal de lead e não abre o WhatsApp sem salvar', () => {
@@ -461,6 +484,10 @@ test('fechar o drawer do chat durante o envio pendente cancela o handoff mas ain
             (entry) => entry && typeof entry === 'object' && 'event' in entry && entry.event === 'generate_lead',
         );
         assert.equal(generateLeadEvents.length, 1, 'generate_lead deve disparar mesmo com o drawer fechado');
+        const submitSuccessEvents = (window.dataLayer ?? []).filter(
+            (entry) => entry && typeof entry === 'object' && 'event' in entry && entry.event === 'submit_success',
+        );
+        assert.equal(submitSuccessEvents.length, 1, 'submit_success deve disparar mesmo com o drawer fechado');
         // Reabrindo o drawer, o visitante precisa ver que o lead foi salvo e
         // ter como continuar — não um formulário travado sem explicação.
         assert.equal(
