@@ -27,6 +27,14 @@ const MANAGED_TEMPLATE_HEAD_TAG_PATTERNS = [
   /<meta\b[^>]*data-av-head="[^"]+"[^>]*\/?>\s*/gi,
   /<link\b[^>]*data-av-head="[^"]+"[^>]*\/?>\s*/gi
 ];
+// Recursos marcados como exclusivos da home no template. O prerender emite o mesmo
+// index.html para toda rota, então sem esse strip o preload do hero da Home dispararia
+// também em rotas que nunca renderizam o Hero: /links, a página de bio, baixava o
+// candidato de 1200w em `fetchpriority="high"` competindo com o próprio JS.
+// A justificativa mora aqui, e não num comentário do index.html, porque comentário de
+// HTML é servido ao browser em toda resposta — este arquivo não.
+const HOME_ONLY_PRELOAD_PATTERN = /<link\b[^>]*data-av-preload="home-hero"[^>]*>\s*/gi;
+
 const UNIQUE_TAG_PATTERNS = [
   { label: 'title', pattern: /<title\b[^>]*>/gi },
   { label: 'meta description', pattern: /<meta\b[^>]*name="description"[^>]*>/gi },
@@ -80,8 +88,11 @@ const stripManagedHeadTags = (template) => {
   return strippedTemplate;
 };
 
+const stripHomeOnlyPreloads = (template, route) =>
+  normalizeRoute(route) === '/' ? template : template.replace(HOME_ONLY_PRELOAD_PATTERN, '');
+
 const injectRenderedHtml = (template, appHtml, headHtml, route) => {
-  const withManagedHeadRemoved = stripManagedHeadTags(template);
+  const withManagedHeadRemoved = stripHomeOnlyPreloads(stripManagedHeadTags(template), route);
   const withRoot = withManagedHeadRemoved.replace('<div id="root"></div>', `<div id="root">${appHtml}</div>`);
   const withHead = withRoot.replace('</head>', `${headHtml}\n</head>`);
   return ensurePrerenderMarker(withHead, route);
@@ -89,8 +100,17 @@ const injectRenderedHtml = (template, appHtml, headHtml, route) => {
 
 const countMatches = (html, pattern) => Array.from(html.matchAll(pattern)).length;
 
+const NOINDEX_META_PATTERN = /<meta\b[^>]*name="robots"[^>]*content="[^"]*noindex[^"]*"/i;
+
 const validateHtml = (route, html) => {
+  // Dado estruturado numa página `noindex` não tem consumidor: exigi-lo só forçaria
+  // schema decorativo. Todo o resto do contrato de head continua valendo.
+  const isNoindex = NOINDEX_META_PATTERN.test(html);
+
   for (const requirement of REQUIRED_PATTERNS) {
+    if (isNoindex && requirement.label === 'JSON-LD schema') {
+      continue;
+    }
     if (!requirement.pattern.test(html)) {
       throw new Error(`Missing ${requirement.label} in prerendered output for route "${route}"`);
     }

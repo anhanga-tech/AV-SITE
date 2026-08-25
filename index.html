@@ -54,8 +54,9 @@
 
   <!-- Preload LCP Image — responsive srcset so mobile fetches a smaller image.
        Dimensions match Cloudflare preset outputs (960x540, 1200x675, 1280x720)
-       so the preload URL is identical to what Hero.tsx srcSet generates. -->
-  <link rel="preload" as="image" fetchpriority="high"
+       so the preload URL is identical to what Hero.tsx srcSet generates.
+       Home-only — see HOME_ONLY_PRELOAD_PATTERN in scripts/prerender.mjs. -->
+  <link rel="preload" as="image" fetchpriority="high" data-av-preload="home-hero"
     imagesrcset="
       https://media.anhanga.tur.br/cdn-cgi/image/format=webp,quality=85,metadata=none,fit=cover,width=960,height=540/images/hero/rio-poster.jpg    960w,
       https://media.anhanga.tur.br/cdn-cgi/image/format=webp,quality=85,metadata=none,fit=cover,width=1200,height=675/images/hero/rio-poster.jpg  1200w,
