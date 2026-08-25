@@ -57,15 +57,15 @@ export const linksPageConfig: LinksPageConfig = {
         href: '/quiz',
     },
     links: [
-        { id: 'whatsapp', label: 'Falar no WhatsApp', sublabel: 'Atendimento humano e rápido', type: 'whatsapp', whatsappMessage: 'Olá!{origem} Quero planejar uma viagem. Meu destino:', icon: 'WhatsappLogo', visible: true, highlight: true },
+        { id: 'whatsapp', label: 'Falar com um especialista no WhatsApp', sublabel: 'Já sei o destino e quero planejar', type: 'whatsapp', whatsappMessage: 'Olá!{origem} Quero planejar uma viagem. Meu destino:', icon: 'WhatsappLogo', visible: true, highlight: true },
         // Par com o quiz logo abaixo: o quiz atende quem ainda está explorando (ToFu — vira só
         // `res.partner`), este atende quem já decidiu. Por isso a mensagem é estruturada aqui e
         // conversacional no botão amarelo: quem clica aqui se declarou pronto a passar os dados.
         { id: 'orcamento', label: 'Quero um orçamento', sublabel: 'Já tenho destino e datas', type: 'whatsapp', whatsappMessage: 'Olá!{origem} Quero um orçamento.\n\nDestino:\nDatas:\nPessoas:', icon: 'CalendarCheck', visible: true },
         { id: 'quiz', label: 'Planejar minha viagem', sublabel: 'Quiz de perfil de viagem', type: 'internal', href: '/quiz', icon: 'Compass', visible: true },
         { id: 'site', label: 'Site oficial', type: 'internal', href: '/', icon: 'Globe', visible: true },
-        { id: 'seguro-viagem', label: 'Seguro viagem', sublabel: 'Cotação com nosso parceiro', type: 'external', href: 'https://go.nuvembr.com/anhanga_seguroviagem', icon: 'ShieldCheck', visible: true },
-        { id: 'chip-esim', label: 'Chip / eSIM internacional', sublabel: 'Tire dúvidas no WhatsApp', type: 'whatsapp', whatsappMessage: 'Olá!{origem} Quero informações sobre chip / eSIM internacional para minha viagem.', icon: 'SimCard', visible: true },
+        { id: 'seguro-viagem', label: 'Calcular meu seguro viagem', sublabel: 'Cotação online com nosso parceiro', type: 'external', href: 'https://go.nuvembr.com/anhanga_seguroviagem', icon: 'ShieldCheck', visible: true },
+        { id: 'chip-esim', label: 'Comprar chip / eSIM internacional', sublabel: 'Compra e atendimento pelo WhatsApp', type: 'whatsapp', whatsappMessage: 'Olá!{origem} Quero comprar um chip / eSIM internacional para minha viagem.', icon: 'SimCard', visible: true },
         { id: 'orlando', label: 'Orlando', type: 'internal', href: '/orlando', visible: true },
         { id: 'beto-carrero', label: 'Beto Carrero', type: 'internal', href: '/beto-carrero', visible: true },
         { id: 'melhor-idade', label: 'Viagens Melhor Idade', type: 'internal', href: '/melhor-idade', visible: true },
