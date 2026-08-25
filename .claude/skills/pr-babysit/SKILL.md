@@ -1,13 +1,18 @@
 ---
 name: pr-babysit
-description: Monitora uma PR até ficar pronta para o merge humano — CI, reviews do gemini-code-assist e merge conflicts — usando Monitor em background. Use quando o usuário pedir para monitorar, acompanhar ou "babysit" uma PR ("continuar monitorando a PR #N", "acompanha até o CI passar", "avisa quando a PR estiver pronta"), ou logo após criar uma PR que precisa de acompanhamento até o merge.
+description: Monitora uma PR até ficar pronta para o merge humano — CI, reviews dos bots e merge conflicts — usando Monitor em background. Use quando o usuário pedir para monitorar, acompanhar ou "babysit" uma PR ("continuar monitorando a PR #N", "acompanha até o CI passar", "avisa quando a PR estiver pronta"), ou logo após criar uma PR que precisa de acompanhamento até o merge.
 ---
 
 # PR Babysit
 
 Acompanha uma PR do repositório até o estado **"pronta para merge"** e então **para**. O merge é sempre humano (squash) — esta skill nunca executa `gh pr merge`.
 
-Uma PR está pronta quando, simultaneamente: (1) todos os checks verdes, (2) nenhum comentário de review não tratado (inclusive do `gemini-code-assist`, que chega *depois* do CI verde), (3) `mergeable` sem conflitos.
+Uma PR está pronta quando, simultaneamente: (1) todos os checks verdes, (2) nenhum comentário de review não tratado (inclusive dos bots, que chegam *depois* do CI verde), (3) `mergeable` sem conflitos.
+
+**Quem revisa:** `chatgpt-codex-connector[bot]` e `claude[bot]`. O `gemini-code-assist` foi
+substituído pelo Codex e não comenta mais neste repositório — não espere por ele nem o
+procure nas respostas da API. Ambos os bots deixam comentários *inline*, ou seja, abrem
+review threads, que é exatamente o que o `required_conversation_resolution` abaixo cobra.
 
 **Atenção:** este repo tem `required_conversation_resolution` ativo no branch protection da `main`, mesmo com `required_approving_review_count: 0`. Isso significa que uma thread de review **não resolvida** deixa `mergeStateStatus` em `BLOCKED` mesmo com todo CI verde e sem exigência de aprovação — responder ao comentário (reply) **não resolve a thread**. Resolver é sempre um passo GraphQL separado (ver passo 5).
 
@@ -48,7 +53,7 @@ Uma PR está pronta quando, simultaneamente: (1) todos os checks verdes, (2) nen
 
 4. **Evento `CI_FAIL`:** `gh run view <id> --log-failed` para o log, corrigir na branch, commit + push, voltar ao passo 3.
 
-5. **Evento `NEW_REVIEW_COMMENT` / reviews pendentes:** ler cada comentário (`.../pulls/N/comments` e `.../pulls/N/reviews`). Seguir a skill `receiving-code-review`: avaliar tecnicamente antes de aplicar — **nem todo apontamento do bot é válido**. O `gemini-code-assist` já deu falso positivo (reclamou que arquivos não tinham sido atualizados quando já estavam corretos no próprio commit analisado — provável artefato de olhar hunks isolados do diff). Antes de aceitar uma reclamação, conferir contra o conteúdo real: `git show <commit>:<arquivo>`.
+5. **Evento `NEW_REVIEW_COMMENT` / reviews pendentes:** ler cada comentário (`.../pulls/N/comments` e `.../pulls/N/reviews`). Seguir a skill `receiving-code-review`: avaliar tecnicamente antes de aplicar — **nem todo apontamento do bot é válido**. Falso positivo já aconteceu aqui, com mais de um bot: o `gemini-code-assist` reclamou de arquivos não atualizados que estavam corretos **no próprio commit analisado**, e o `claude[bot]` reapontou na #1507 um achado já corrigido nesse mesmo commit — provável artefato de olhar hunks isolados do diff. Não há caso observado com o Codex até agora, o que não o isenta: trate o padrão como possível em qualquer bot. O sinal típico é um comentário que se refere a um commit anterior ao revisado, ou que cita identificador que já não existe no arquivo. Antes de aceitar uma reclamação, conferir contra o conteúdo real: `git show <commit>:<arquivo>`.
 
    Para cada thread, depois de tratá-la (aplicando o fix legítimo ou respondendo com justificativa para os dispensados via `gh api .../comments/<id>/replies`), **resolver a thread via GraphQL** — reply sozinho não conta para `required_conversation_resolution`:
 
@@ -71,7 +76,7 @@ Uma PR está pronta quando, simultaneamente: (1) todos os checks verdes, (2) nen
 
 6. **Evento `MERGE_CONFLICT`:** `git fetch origin && git merge origin/main`, resolver, push, voltar ao passo 3.
 
-7. **Evento `ALL_GREEN`:** conferir uma última vez reviews e mergeable (o gemini pode ter comentado no intervalo). Checar `gh pr view N --json mergeable,mergeStateStatus` — se `mergeStateStatus` vier `BLOCKED` mesmo com checks verdes e sem conflito, é quase sempre `required_conversation_resolution` com alguma thread aberta: rodar a query GraphQL do passo 5 para achar threads com `isResolved: false` e resolvê-las. Só declarar pronto quando `mergeStateStatus` for `CLEAN`. Se tudo limpo: enviar PushNotification "PR #N pronta para seu merge" (se disponível), resumir para o usuário o que foi tratado no ciclo (fixes de CI, reviews aplicados/dispensados, threads resolvidas) e **encerrar**. Não mergear, não perguntar "posso mergear?".
+7. **Evento `ALL_GREEN`:** conferir uma última vez reviews e mergeable (os bots podem ter comentado no intervalo). Checar `gh pr view N --json mergeable,mergeStateStatus` — se `mergeStateStatus` vier `BLOCKED` mesmo com checks verdes e sem conflito, é quase sempre `required_conversation_resolution` com alguma thread aberta: rodar a query GraphQL do passo 5 para achar threads com `isResolved: false` e resolvê-las. Só declarar pronto quando `mergeStateStatus` for `CLEAN`. Se tudo limpo: enviar PushNotification "PR #N pronta para seu merge" (se disponível), resumir para o usuário o que foi tratado no ciclo (fixes de CI, reviews aplicados/dispensados, threads resolvidas) e **encerrar**. Não mergear, não perguntar "posso mergear?".
 
 ## Regras
 
