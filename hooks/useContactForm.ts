@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef } from 'react';
+import { useCallback, useState, useRef, useEffect } from 'react';
 import { useAntiBot } from './useAntiBot';
 import { cleanString, splitFullName } from '../lib/lead-logic';
 import {
@@ -15,6 +15,7 @@ import type { ContactModalOptions } from '../utils/contactForm';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
 import { pushGenerateLeadConversionEvent } from '../utils/generate-lead-analytics';
 import { trackTraksWhatsAppHandoff } from '../utils/traks';
+import { reserveWhatsAppWindow, type WhatsAppHandoff } from '../utils/whatsappHandoff';
 
 const EMPTY_FIELDS: ContactFormFields = {
     firstName: '',
@@ -71,21 +72,45 @@ export function useContactForm(options: ContactModalOptions = {}) {
     const [fields, setFieldsState] = useState<ContactFormFields>(EMPTY_FIELDS);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const isLocallySubmitting = useRef(false);
+    const submissionTokenRef = useRef(0);
+    const eventIdRef = useRef<string | null>(null);
+    // Tracks the WhatsApp tab reserved by the in-flight submission (if any) so
+    // `reset()` can close it immediately on dismissal, instead of waiting for
+    // a slow or hung `/api/submit-contact` request to eventually settle.
+    const activeHandoffRef = useRef<WhatsAppHandoff | null>(null);
     const hasStarted = useRef(false);
     const completedFields = useRef<Set<keyof ContactFormFields> | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [fieldErrors, setFieldErrors] = useState<ContactFormFieldErrors>({});
     const [submitted, setSubmitted] = useState(false);
     const [lastAction, setLastAction] = useState<'whatsapp' | 'callback' | null>(null);
+    const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
 
     const canAttemptSubmit = Boolean(fields.firstName.trim() && fields.whatsapp.trim());
     const formId = options.source ?? 'contact-modal';
+
+    // `reset()` (called on modal close) already cancels a pending handoff,
+    // but a consumer like CtaBody can also unmount outright — e.g. SPA
+    // navigation away from the homepage while /api/submit-contact is still
+    // pending — without ever calling reset(). Without this, the reserved
+    // tab would stay open until that detached request eventually settles.
+    useEffect(() => {
+        return () => {
+            activeHandoffRef.current?.cancel();
+            activeHandoffRef.current = null;
+        };
+    }, []);
 
     const setField = useCallback(
         (key: keyof ContactFormFields, value: string | boolean) => {
             setFieldsState((prev) => ({ ...prev, [key]: value }));
             setError(null);
             setFieldErrors((prev) => (key in prev ? { ...prev, [key]: undefined } : prev));
+            // Any edit after a failed submit invalidates the retry key preserved
+            // for that failure — otherwise a retry could resend corrected data
+            // under the stale event_id, and the Odoo dedup would return the
+            // already-created lead without applying the edit.
+            eventIdRef.current = null;
 
             if (!hasStarted.current) {
                 hasStarted.current = true;
@@ -112,12 +137,18 @@ export function useContactForm(options: ContactModalOptions = {}) {
     );
 
     const reset = useCallback(() => {
+        activeHandoffRef.current?.cancel();
+        activeHandoffRef.current = null;
+        submissionTokenRef.current += 1;
+        eventIdRef.current = null;
+        isLocallySubmitting.current = false;
         setFieldsState(EMPTY_FIELDS);
         setIsSubmitting(false);
         setError(null);
         setFieldErrors({});
         setSubmitted(false);
         setLastAction(null);
+        setWhatsappUrl(null);
         hasStarted.current = false;
         completedFields.current = null;
     }, []);
@@ -142,9 +173,11 @@ export function useContactForm(options: ContactModalOptions = {}) {
             }
 
             isLocallySubmitting.current = true;
+            const submissionToken = ++submissionTokenRef.current;
             setIsSubmitting(true);
             setError(null);
             setFieldErrors({});
+            setWhatsappUrl(null);
             pushFormAnalyticsEvent({
                 event: 'submit_attempt',
                 formType: 'contact_modal',
@@ -152,23 +185,29 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 destination: action,
             });
 
-            const eventId = createLeadEventId();
+            const eventId = eventIdRef.current ?? createLeadEventId();
+            eventIdRef.current = eventId;
             const { tracking, utms } = collectTracking();
             const whatsappMessage =
                 options.message
                 ?? `Olá! Meu nome é ${validation.normalized.firstName}. Gostaria de saber mais sobre viagens.`;
-            const whatsappUrl = getWhatsAppLink(whatsappMessage);
-
-            if (action === 'whatsapp') {
-                pushFormAnalyticsEvent({
-                    event: 'whatsapp_opened',
-                    formType: 'contact_modal',
-                    formId,
-                    destination: action,
-                });
-                window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-                trackTraksWhatsAppHandoff();
+            const whatsappLink = getWhatsAppLink(whatsappMessage);
+            // Reserve the tab synchronously — before the network round-trip
+            // below — so Safari still treats the navigation as a direct
+            // result of this click (see utils/whatsappHandoff.ts).
+            const whatsappHandoff = action === 'whatsapp' ? reserveWhatsAppWindow() : null;
+            if (whatsappHandoff) {
+                activeHandoffRef.current = whatsappHandoff;
             }
+            // reset() or the unmount cleanup above may already have cancelled
+            // and cleared `activeHandoffRef` by the time this continuation
+            // resumes after the `await` below — guard so this function's own
+            // cancel calls don't redundantly close an already-closed handle.
+            const cancelActiveHandoff = () => {
+                if (!whatsappHandoff || activeHandoffRef.current !== whatsappHandoff) return;
+                activeHandoffRef.current = null;
+                whatsappHandoff.cancel();
+            };
 
             // The UI dropped the separate sobrenome input (ContactModal/CtaBody now
             // ask for the full name in `firstName`), so split it here to keep the
@@ -196,9 +235,16 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 });
 
                 const data = (await response.json()) as SubmitContactResponse;
+                if (submissionTokenRef.current !== submissionToken) {
+                    cancelActiveHandoff();
+                    return;
+                }
 
                 if (!response.ok || !data.ok) {
+                    cancelActiveHandoff();
                     const errData = data as Extract<SubmitContactResponse, { ok: false }>;
+                    const retryableFailure = !response.ok && response.status >= 500;
+                    if (!retryableFailure) eventIdRef.current = null;
                     if (action === 'whatsapp') {
                         console.warn('[submit-contact] tracking failed:', errData.code);
                         pushFormAnalyticsEvent({
@@ -208,8 +254,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
                             errorType: errData.code,
                             destination: action,
                         });
-                        setLastAction(action);
-                        setSubmitted(true);
+                        setError(errData.error || 'Não foi possível registrar seu contato. Tente novamente.');
                     } else {
                         setError(errData.error || 'Não foi possível enviar. Tente novamente.');
                         pushFormAnalyticsEvent({
@@ -221,6 +266,46 @@ export function useContactForm(options: ContactModalOptions = {}) {
                         });
                     }
                     return;
+                }
+
+                if (action === 'whatsapp') {
+                    // If the consumer unmounted mid-flight (e.g. SPA navigation
+                    // away from CtaBody before this request settled), the
+                    // unmount cleanup already cancelled and cleared
+                    // activeHandoffRef — distinct from the reset()/stale-token
+                    // case above, which is caught by the submissionToken check.
+                    const handoffWasAbandoned = activeHandoffRef.current !== whatsappHandoff;
+
+                    // CRM confirmation comes first. Opening WhatsApp before this
+                    // request made it possible to lose the lead silently. The tab
+                    // itself was already reserved synchronously above; if it never
+                    // opened (blocked) or can't be navigated, keep the URL as an
+                    // explicit fallback link in the success state.
+                    const opened = whatsappHandoff?.open(whatsappLink) ?? false;
+
+                    if (!handoffWasAbandoned) {
+                        if (!opened) {
+                            setWhatsappUrl(whatsappLink);
+                        }
+
+                        // The lead is confirmed at this point. Record the handoff
+                        // even when the browser blocks the popup, because the
+                        // success state exposes the same WhatsApp URL as a link.
+                        pushFormAnalyticsEvent({
+                            event: 'whatsapp_opened',
+                            formType: 'contact_modal',
+                            formId,
+                            destination: action,
+                        });
+                        // Only when the tab actually navigated — when it falls back to
+                        // the rendered link instead, the global `<a href="wa.me/...">`
+                        // click listener (utils/traks.ts) already tracks it if/when the
+                        // visitor clicks it, so tracking it here too would double-count
+                        // the handoff.
+                        if (opened) {
+                            trackTraksWhatsAppHandoff();
+                        }
+                    }
                 }
 
                 pushContactDataLayerEvent(
@@ -239,9 +324,12 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 });
                 setLastAction(action);
                 setSubmitted(true);
+                eventIdRef.current = null;
             } catch {
+                cancelActiveHandoff();
+                if (submissionTokenRef.current !== submissionToken) return;
                 if (action === 'whatsapp') {
-                    console.warn('[submit-contact] fetch failed after opening WhatsApp');
+                    console.warn('[submit-contact] fetch failed before opening WhatsApp');
                     pushFormAnalyticsEvent({
                         event: 'submit_failure',
                         formType: 'contact_modal',
@@ -249,8 +337,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
                         errorType: 'network',
                         destination: action,
                     });
-                    setLastAction(action);
-                    setSubmitted(true);
+                    setError('Não foi possível registrar seu contato. Tente novamente.');
                 } else {
                     setError('Erro de conexão. Verifique sua internet e tente novamente.');
                     pushFormAnalyticsEvent({
@@ -262,12 +349,17 @@ export function useContactForm(options: ContactModalOptions = {}) {
                     });
                 }
             } finally {
-                setIsSubmitting(false);
-                isLocallySubmitting.current = false;
+                if (activeHandoffRef.current === whatsappHandoff) {
+                    activeHandoffRef.current = null;
+                }
+                if (submissionTokenRef.current === submissionToken) {
+                    setIsSubmitting(false);
+                    isLocallySubmitting.current = false;
+                }
             }
         },
         [fields, options.destination, options.message, options.source, getAntiBotFields, formId],
     );
 
-    return { fields, setField, canAttemptSubmit, isSubmitting, error, fieldErrors, submitted, lastAction, submit, reset, honeypotProps };
+    return { fields, setField, canAttemptSubmit, isSubmitting, error, fieldErrors, submitted, lastAction, whatsappUrl, submit, reset, honeypotProps };
 }

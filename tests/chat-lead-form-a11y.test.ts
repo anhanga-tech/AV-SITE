@@ -75,7 +75,7 @@ test('validateLeadForm — sem aceite de LGPD a submissão é bloqueada', () => 
   }
 });
 
-test('ChatLeadForm oferece caminho direto para WhatsApp sem salvar lead', () => {
+test('ChatLeadForm oferece caminho alternativo que abre o modal de lead', () => {
   const html = renderToStaticMarkup(
     React.createElement(ChatLeadForm, {
       destination: 'Orlando',
@@ -102,7 +102,7 @@ test('ChatLeadForm oferece caminho direto para WhatsApp sem salvar lead', () => 
     }),
   );
 
-  assert.match(html, /Ir direto para o WhatsApp/);
+  assert.match(html, /Preencher contato e continuar/);
 });
 
 test('ChatLeadForm não duplica o <label> do campo WhatsApp (regressão: TextField já renderiza o seu)', () => {

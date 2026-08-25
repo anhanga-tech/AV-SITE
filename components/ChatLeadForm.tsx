@@ -2,7 +2,6 @@ import React, { memo, useEffect, useRef, useState } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { createLeadEventId, pushGenerateLeadDataLayerEvent } from '../hooks/useLeadCapture';
 import type { SubmitLeadRequest } from '../types/leadCapture';
-import { normalizeWhatsappNumber } from '../lib/lead-logic';
 import {
   validateLeadForm,
   type FieldErrors,
@@ -11,6 +10,8 @@ import {
 } from '../lib/chat-lead-form-logic';
 import { triggerHaptic } from '../utils/haptics';
 import { trackTraksWhatsAppHandoff } from '../utils/traks';
+import { openContactModal } from '../utils/contactForm';
+import { reserveWhatsAppWindow, type WhatsAppHandoff } from '../utils/whatsappHandoff';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
 import { isFieldCompleteForAnalytics } from '../lib/form-v1-validation';
 import { ChatLeadFormFields } from './chat-lead-form/ChatLeadFormFields';
@@ -22,22 +23,20 @@ export { TextField } from './chat-lead-form/TextField';
 interface ChatLeadFormProps {
   destination?: string;
   defaultBantSummary?: string;
+  whatsappMessage?: string;
+  /** Whether the chat drawer is currently open — used to cancel a pending handoff if the visitor closes it mid-submit. */
+  isOpen?: boolean;
   getWhatsAppUrl: (payload: LeadFinalizePayload) => string;
   prepareLeadSubmitPayload: (payload: LeadFinalizePayload, eventId: string) => SubmitLeadRequest;
   isSubmittingLead: boolean;
   onFinalizeLead: (payload: SubmitLeadRequest) => Promise<LeadFinalizeResult>;
 }
 
-function openWhatsAppWindow(url: string): void {
-  const popup = window.open(url, '_blank', 'noopener,noreferrer');
-  if (!popup) {
-    window.location.assign(url);
-  }
-}
-
 const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
   destination,
   defaultBantSummary,
+  whatsappMessage,
+  isOpen = true,
   getWhatsAppUrl,
   prepareLeadSubmitPayload,
   isSubmittingLead,
@@ -54,8 +53,21 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
 
   const [localError, setLocalError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
   const [isLocallySubmitting, setIsLocallySubmitting] = useState(false);
+  // Once a submission succeeds, block further ones: the form stays visible
+  // (so the fallback link and any notice remain readable) but re-clicking
+  // "Salvar e abrir WhatsApp" would otherwise send the same lead again with
+  // a fresh event_id, creating a duplicate CRM opportunity.
+  const [hasSucceeded, setHasSucceeded] = useState(false);
   const isProcessingRef = React.useRef(false);
+  const eventIdRef = useRef<string | null>(null);
+  const isOpenRef = useRef(isOpen);
+  // Tracks the WhatsApp tab reserved by the in-flight submission (if any) so
+  // the unmount cleanup below can close it immediately — a route change that
+  // unmounts the whole chat (App.tsx removes <AIChat> on some landing pages)
+  // wouldn't otherwise cancel a still-pending request's reserved tab.
+  const activeHandoffRef = useRef<WhatsAppHandoff | null>(null);
   const startedRef = useRef(false);
   const completedFields = useRef<Set<string> | null>(null);
   const firstNameRef = useRef<HTMLInputElement>(null);
@@ -71,6 +83,34 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
       destination,
     });
   }, [destination]);
+
+  useEffect(() => {
+    // One-way latch: only the transition to closed is recorded here. If the
+    // drawer closes while a submission is pending and the visitor reopens it
+    // (the always-mounted trigger allows that) before the CRM responds, the
+    // dismissal must still stick for that in-flight request — reopening
+    // shouldn't silently un-cancel a handoff the visitor already dismissed.
+    // `submitLeadForm` re-latches this to `true` at the start of each new
+    // attempt, when the drawer is necessarily open (the button is only
+    // reachable then).
+    if (!isOpen) {
+      isOpenRef.current = false;
+      // Closing the drawer doesn't unmount ChatLeadForm (only the dialog
+      // hides), so the unmount cleanup below wouldn't run here — cancel any
+      // tab reserved by a still-pending submission right away instead of
+      // waiting for that request to eventually settle, which could leave a
+      // blank tab open indefinitely if it's slow or hangs.
+      activeHandoffRef.current?.cancel();
+      activeHandoffRef.current = null;
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    return () => {
+      activeHandoffRef.current?.cancel();
+      activeHandoffRef.current = null;
+    };
+  }, []);
 
   useEffect(() => {
     const firstError = Object.keys(fieldErrors)[0] as keyof FieldErrors | undefined;
@@ -110,34 +150,37 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
     }
   }
 
-  const buildDirectWhatsAppPayload = (): LeadFinalizePayload => ({
-    firstName: firstName.trim() || 'Viajante',
-    lastName: lastName.trim(),
-    email: email.trim().toLowerCase(),
-    whatsapp: normalizeWhatsappNumber(whatsapp, countryCode) ?? '',
-    bantSummary: defaultBantSummary || 'Não informado',
-    destination: destination?.trim() || 'roteiro personalizado',
-  });
+  // Any field the visitor edits after a failed submit invalidates the retry
+  // key preserved for that failure — otherwise a retry could resend corrected
+  // data under the stale event_id, and the Odoo dedup would return the
+  // already-created lead without applying the edit.
+  const invalidateRetryKey = () => {
+    eventIdRef.current = null;
+  };
 
-  const openDirectWhatsApp = () => {
+  const openLeadModal = () => {
+    if (isSubmittingLead || isLocallySubmitting || isProcessingRef.current || hasSucceeded) return;
     void triggerHaptic('light');
-    pushFormAnalyticsEvent({
-      event: 'whatsapp_opened',
-      formType: 'ai_chatbot_direct_whatsapp',
-      formId: 'chat-lead-direct-whatsapp',
+    const modalOptions = {
+      source: 'chatbot-direct',
       destination,
-    });
-    openWhatsAppWindow(getWhatsAppUrl(buildDirectWhatsAppPayload()));
-    trackTraksWhatsAppHandoff();
+      ...(whatsappMessage ? { message: whatsappMessage } : {}),
+    };
+    openContactModal(modalOptions);
   };
 
   const submitLeadForm = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (isSubmittingLead || isLocallySubmitting || isProcessingRef.current) return;
+    if (isSubmittingLead || isLocallySubmitting || isProcessingRef.current || hasSucceeded) return;
     e.preventDefault();
     isProcessingRef.current = true;
+    // Re-latch: the button is only reachable while the drawer is open, so a
+    // new attempt always starts from "open". A close mid-flight during this
+    // specific attempt is what should stick (see the effect above).
+    isOpenRef.current = true;
     setIsLocallySubmitting(true);
     setLocalError(null);
     setNotice(null);
+    setWhatsappUrl(null);
     setFieldErrors({});
     pushFormAnalyticsEvent({
       event: 'submit_attempt',
@@ -179,29 +222,38 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
 
     void triggerHaptic('medium');
 
-    const eventId = createLeadEventId();
+    const eventId = eventIdRef.current ?? createLeadEventId();
+    eventIdRef.current = eventId;
     // Forward the LGPD/marketing consent so the handler sets x_lgpd_consent on
     // the Odoo res.partner; prepareLeadSubmitPayload only maps draft + tracking.
     const submitPayload: SubmitLeadRequest = {
       ...prepareLeadSubmitPayload(payload, eventId),
       marketingOptIn,
     };
-    pushGenerateLeadDataLayerEvent(submitPayload);
 
-    // Open WhatsApp synchronously in the click handler to prevent popup blockers on mobile/Safari
-    pushFormAnalyticsEvent({
-      event: 'whatsapp_opened',
-      formType: 'ai_chatbot_lead',
-      formId: 'chat-lead-form',
-      destination,
-    });
-    openWhatsAppWindow(getWhatsAppUrl(payload));
-    trackTraksWhatsAppHandoff();
+    // Reserve the tab synchronously — before the `await` below — so Safari
+    // still treats the navigation as a direct result of this click (see
+    // utils/whatsappHandoff.ts). Confirm the CRM write before handing the
+    // visitor to WhatsApp: the previous fire-and-forget order could open
+    // WhatsApp while silently losing the lead.
+    const whatsappHandoff = reserveWhatsAppWindow();
+    activeHandoffRef.current = whatsappHandoff;
 
-    // Submit lead data in the background — user is already heading to WhatsApp
+    // The isOpen-close effect above may already have cancelled and cleared
+    // `activeHandoffRef` by the time this continuation resumes after an
+    // `await` — guard so this function's own cancel calls don't redundantly
+    // close an already-closed handle.
+    const cancelActiveHandoff = () => {
+      if (activeHandoffRef.current !== whatsappHandoff) return;
+      activeHandoffRef.current = null;
+      whatsappHandoff.cancel();
+    };
+
     try {
       const result = await onFinalizeLead(submitPayload);
+
       if (!result.ok) {
+        cancelActiveHandoff();
         pushFormAnalyticsEvent({
           event: 'submit_failure',
           formType: 'ai_chatbot_lead',
@@ -209,19 +261,110 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
           errorType: result.error ? 'api' : 'unknown',
           destination,
         });
+        setLocalError('Não foi possível salvar seu contato. Tente novamente.');
         console.warn('Background lead submission failed:', { error: result.error, requestId: result.requestId });
-      } else {
+        return;
+      }
+
+      // The CRM write is confirmed at this point — report the conversion and
+      // clear the retry key regardless of whether the drawer is still open.
+      // Fired only on confirmed success — pushing it before the CRM write
+      // resolves would report failed submissions as conversions, and firing
+      // it on every attempt would double-count a retry that reuses the same
+      // preserved event_id.
+      pushGenerateLeadDataLayerEvent(submitPayload);
+      eventIdRef.current = null;
+      setHasSucceeded(true);
+      const whatsappLink = getWhatsAppUrl(payload);
+
+      if (!isOpenRef.current) {
+        // The visitor closed the chat drawer while this request was in
+        // flight. AIChatPanel stays mounted (only its `isOpen` prop
+        // toggles), so this continuation would otherwise still run and hand
+        // off to WhatsApp after an explicit dismissal — cancel just the
+        // navigation, the lead itself is already saved and reported above.
+        // Still expose the WhatsApp link as a fallback: if the visitor
+        // reopens the drawer, they'd otherwise see a disabled form with no
+        // indication the lead was saved and no way to continue.
+        cancelActiveHandoff();
+        setWhatsappUrl(whatsappLink);
+        if (result.notice) {
+          setNotice(result.notice);
+        }
+        // The submission itself is confirmed successful — count it in form
+        // analytics too, not just the generate_lead conversion above.
         pushFormAnalyticsEvent({
           event: 'submit_success',
           formType: 'ai_chatbot_lead',
           formId: 'chat-lead-form',
           destination,
         });
-        if (result.notice) {
-          setNotice(result.notice);
+        return;
+      }
+
+      // If the component unmounted mid-flight (e.g. SPA navigation to a
+      // landing route without <AIChat>) while the drawer was still open,
+      // the unmount cleanup already cancelled and cleared activeHandoffRef
+      // — distinct from the drawer-closed case above, which returns early.
+      const handoffWasAbandoned = activeHandoffRef.current !== whatsappHandoff;
+      const opened = whatsappHandoff.open(whatsappLink);
+      if (!handoffWasAbandoned) {
+        if (opened) {
+          // hasSucceeded permanently disables the form, so a visitor
+          // switching back from WhatsApp needs a usable confirmation
+          // state, not a silently locked form with no explanation. A
+          // plain-text notice (not a link) is deliberate: rendering the
+          // same wa.me link here too would let a click on it double-count
+          // via the global click listener in utils/traks.ts, since
+          // trackTraksWhatsAppHandoff() below already reports this exact
+          // handoff.
+          setNotice('Você já foi redirecionado para o WhatsApp em outra aba.');
+        } else {
+          setWhatsappUrl(whatsappLink);
+        }
+        pushFormAnalyticsEvent({
+          event: 'whatsapp_opened',
+          formType: 'ai_chatbot_lead',
+          formId: 'chat-lead-form',
+          destination,
+        });
+        // Only when the tab actually navigated — when it falls back to the
+        // rendered link instead, the global `<a href="wa.me/...">` click
+        // listener (utils/traks.ts) already tracks it if/when the visitor
+        // clicks it, so tracking it here too would double-count the handoff.
+        if (opened) {
+          trackTraksWhatsAppHandoff();
         }
       }
+      pushFormAnalyticsEvent({
+        event: 'submit_success',
+        formType: 'ai_chatbot_lead',
+        formId: 'chat-lead-form',
+        destination,
+      });
+      if (result.notice) {
+        setNotice(result.notice);
+      }
+    } catch (error) {
+      // onFinalizeLead is currently expected to always resolve (never
+      // reject) — but nothing in its type contract guarantees that for
+      // future callers. Without this, a thrown error would skip every
+      // `whatsappHandoff.cancel()` call above, leaking the reserved blank
+      // tab. Mirrors the catch block in hooks/useContactForm.ts's submit().
+      cancelActiveHandoff();
+      pushFormAnalyticsEvent({
+        event: 'submit_failure',
+        formType: 'ai_chatbot_lead',
+        formId: 'chat-lead-form',
+        errorType: 'unknown',
+        destination,
+      });
+      setLocalError('Não foi possível salvar seu contato. Tente novamente.');
+      console.warn('Background lead submission threw:', error);
     } finally {
+      if (activeHandoffRef.current === whatsappHandoff) {
+        activeHandoffRef.current = null;
+      }
       setIsLocallySubmitting(false);
       isProcessingRef.current = false;
     }
@@ -248,12 +391,13 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
           countryCode={countryCode}
           acceptedLGPD={acceptedLGPD}
           fieldErrors={fieldErrors}
-          onFirstNameChange={(value) => { setFirstName(value); trackField('firstName', value); }}
-          onLastNameChange={(value) => { setLastName(value); trackField('lastName', value); }}
-          onEmailChange={(value) => { setEmail(value); trackField('email', value); }}
-          onWhatsappChange={(value) => { setWhatsapp(value); trackField('whatsapp', value); }}
-          onCountryCodeChange={setCountryCode}
-          onLgpdChange={(value) => { setAcceptedLGPD(value); trackField('lgpd', value); }}
+          disabled={isSubmittingLead || isLocallySubmitting || hasSucceeded}
+          onFirstNameChange={(value) => { setFirstName(value); trackField('firstName', value); invalidateRetryKey(); }}
+          onLastNameChange={(value) => { setLastName(value); trackField('lastName', value); invalidateRetryKey(); }}
+          onEmailChange={(value) => { setEmail(value); trackField('email', value); invalidateRetryKey(); }}
+          onWhatsappChange={(value) => { setWhatsapp(value); trackField('whatsapp', value); invalidateRetryKey(); }}
+          onCountryCodeChange={(value) => { setCountryCode(value); invalidateRetryKey(); }}
+          onLgpdChange={(value) => { setAcceptedLGPD(value); trackField('lgpd', value); invalidateRetryKey(); }}
           fieldRefs={{
             firstName: firstNameRef,
             lastName: lastNameRef,
@@ -262,12 +406,13 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
           }}
         />
 
-        <ChatLeadFormFeedback localError={localError} notice={notice} />
+        <ChatLeadFormFeedback localError={localError} notice={notice} whatsappUrl={whatsappUrl} />
 
         <ChatLeadFormActions
           isSubmitting={isSubmittingLead || isLocallySubmitting}
+          disabled={hasSucceeded}
           onSubmit={(e) => void submitLeadForm(e)}
-          onOpenDirectWhatsApp={openDirectWhatsApp}
+          onOpenLeadModal={openLeadModal}
         />
       </div>
     </div>

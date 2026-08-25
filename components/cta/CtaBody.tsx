@@ -9,7 +9,7 @@ const FIELD_CLASSNAME =
 
 export function CtaBody() {
   const [formOpen, setFormOpen] = useState(false);
-  const { fields, setField, canAttemptSubmit, isSubmitting, error, fieldErrors, submitted, lastAction, submit, honeypotProps } =
+  const { fields, setField, canAttemptSubmit, isSubmitting, error, fieldErrors, submitted, lastAction, whatsappUrl, submit, honeypotProps } =
     useContactForm({ source: 'cta-homepage' });
 
   if (submitted && formOpen) {
@@ -19,8 +19,20 @@ export function CtaBody() {
             <CheckCircle className="size-5" weight="fill" />
           {lastAction === 'callback'
             ? 'Recebemos! Nossa equipe chama você em breve.'
-            : 'Recebemos! Abrimos o WhatsApp para continuar por lá.'}
+            : whatsappUrl
+              ? 'Seu contato foi salvo. O navegador bloqueou a abertura automática do WhatsApp.'
+              : 'Recebemos! Abrimos o WhatsApp para continuar por lá.'}
           </p>
+          {lastAction === 'whatsapp' && whatsappUrl ? (
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full rounded-xl bg-[#25D366] py-3 text-center text-sm font-black text-white transition hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-vibrant"
+            >
+              Abrir WhatsApp
+            </a>
+          ) : null}
       </output>
     );
   }

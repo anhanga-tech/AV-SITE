@@ -1,11 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { AIChat } from './pages/AIChat';
-
-declare global {
-  interface Window {
-    __openedUrls?: string[];
-  }
-}
+import { stubWhatsAppWindow } from './helpers/whatsappWindowStub';
 
 async function acceptLgpd(page: import('@playwright/test').Page) {
   await page.locator('input[type="checkbox"]').first().evaluate((element) => {
@@ -21,17 +16,7 @@ test.describe('Chatbot lead handoff', () => {
     let submitRequestCount = 0;
     let submitPayload: Record<string, unknown> | null = null;
 
-    await page.addInitScript(() => {
-      window.__openedUrls = [];
-
-      Object.defineProperty(window, 'open', {
-        configurable: true,
-        value: (url?: string | URL) => {
-          window.__openedUrls?.push(String(url || ''));
-          return {} as Window;
-        },
-      });
-    });
+    await stubWhatsAppWindow(page);
 
     await page.route('**/api/generate', route =>
       route.fulfill({
@@ -86,7 +71,7 @@ test.describe('Chatbot lead handoff', () => {
 
     await expect(page.getByText('Salvando…')).toBeVisible();
     await expect.poll(() => submitRequestCount).toBe(1);
-    await expect.poll(() => page.evaluate(() => window.__openedUrls?.length ?? 0)).toBe(1);
+    await expect.poll(() => page.evaluate(() => window.__whatsappUrls?.length ?? 0)).toBe(1);
     await expect
       .poll(() =>
         page.evaluate(() =>
@@ -97,7 +82,7 @@ test.describe('Chatbot lead handoff', () => {
       )
       .not.toBeNull();
 
-    const openedUrl = await page.evaluate(() => window.__openedUrls?.[0] ?? '');
+    const openedUrl = await page.evaluate(() => window.__whatsappUrls?.[0] ?? '');
     expect(decodeURIComponent(openedUrl)).toContain('wa.me/5511955021519');
     expect(decodeURIComponent(openedUrl)).toContain('Origem: São Paulo, SP');
     expect(decodeURIComponent(openedUrl)).not.toContain('+5511988314487');
@@ -153,21 +138,11 @@ test.describe('Chatbot lead handoff', () => {
     });
   });
 
-  test('should open WhatsApp immediately even when lead submit fails in the background', async ({ page }) => {
+  test('should not open WhatsApp when lead submit fails', async ({ page }) => {
     let submitRequestCount = 0;
     let submitPayload: Record<string, unknown> | null = null;
 
-    await page.addInitScript(() => {
-      window.__openedUrls = [];
-
-      Object.defineProperty(window, 'open', {
-        configurable: true,
-        value: (url?: string | URL) => {
-          window.__openedUrls?.push(String(url || ''));
-          return {} as Window;
-        },
-      });
-    });
+    await stubWhatsAppWindow(page);
 
     await page.route('**/api/generate', route =>
       route.fulfill({
@@ -218,45 +193,27 @@ test.describe('Chatbot lead handoff', () => {
 
     await page.getByRole('button', { name: 'Salvar e abrir WhatsApp' }).click();
 
-    // WhatsApp must open immediately (before lead submission completes) —
-    // this is the core guarantee of the fire-and-forget design.
-    await expect.poll(() => page.evaluate(() => window.__openedUrls?.length ?? 0)).toBe(1);
-    const openedUrl = await page.evaluate(() => window.__openedUrls?.[0] ?? '');
-    expect(decodeURIComponent(openedUrl)).toContain('wa.me/');
-    expect(decodeURIComponent(openedUrl)).not.toContain('+5511988314487');
-
-    // Lead submission happened in the background
+    // Lead submission must complete before opening WhatsApp.
     await expect.poll(() => submitRequestCount).toBe(1);
+    await expect.poll(() => page.evaluate(() => window.__whatsappUrls?.length ?? 0)).toBe(0);
+    // The tab reserved synchronously on click must be closed, not left blank.
+    await expect.poll(() => page.evaluate(() => window.__whatsappWindowClosed ?? 0)).toBe(1);
+    await expect(page.getByRole('alert')).toHaveText('Não foi possível salvar seu contato. Tente novamente.');
 
-    // No UI error alert — upstream errors are silently logged to console
-    await expect(page.getByRole('alert')).not.toBeVisible();
-
-    // The lead form ("Link Gerado") is still rendered (popup opened in a new tab,
-    // window.open mock returns a truthy object so location.assign is not triggered)
+    // The lead form ("Link Gerado") remains rendered after the failed submission.
     await expect(page.getByText('Link Gerado')).toBeVisible();
 
-    await expect
-      .poll(() =>
-        page.evaluate(() =>
-          (window.dataLayer || []).find((entry) =>
-            entry && typeof entry === 'object' && 'event' in entry && entry.event === 'generate_lead'
-          ) || null
-        )
-      )
-      .not.toBeNull();
-
+    // A failed submission must not report a conversion — generate_lead only
+    // fires once the CRM write is confirmed.
     const generateLeadEvent = await page.evaluate(() =>
       (window.dataLayer || []).find((entry) =>
         entry && typeof entry === 'object' && 'event' in entry && entry.event === 'generate_lead'
       ) || null
     );
+    expect(generateLeadEvent).toBeNull();
+
     const payload2 = submitPayload as unknown as Record<string, unknown>;
     expect(typeof payload2.event_id).toBe('string');
-    expect(generateLeadEvent).toMatchObject({
-      event: 'generate_lead',
-      event_id: payload2.event_id,
-      destination: 'Orlando, Flórida',
-    });
   });
 
   test('clicking the privacy policy link does not toggle the LGPD checkbox', async ({ page, context }) => {

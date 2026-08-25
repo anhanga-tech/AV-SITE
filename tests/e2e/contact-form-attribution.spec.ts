@@ -1,4 +1,5 @@
 import { expect, test, type Page, type Route } from '@playwright/test';
+import { stubWhatsAppWindow } from './helpers/whatsappWindowStub';
 
 /**
  * Boundary-level coverage for the contact form's request contract (issue #1141).
@@ -7,25 +8,6 @@ import { expect, test, type Page, type Route } from '@playwright/test';
  * the normalized attribution + identity payload the Odoo CRM mapping depends on
  * (`lib/odoo-lead-mapping.ts`'s `leadInputFromSubmitContact`).
  */
-
-declare global {
-  interface Window {
-    __whatsappOpens?: unknown[][];
-  }
-}
-
-async function stubWindowOpen(page: Page) {
-  await page.addInitScript(() => {
-    window.__whatsappOpens = [];
-    Object.defineProperty(window, 'open', {
-      configurable: true,
-      value: (...args: unknown[]) => {
-        window.__whatsappOpens?.push(args);
-        return null;
-      },
-    });
-  });
-}
 
 function captureSubmitContact(page: Page): Promise<Record<string, unknown>> {
   return new Promise((resolve) => {
@@ -132,8 +114,8 @@ test.describe('Contact form attribution payload', () => {
     });
   });
 
-  test('WhatsApp handoff still opens even when the CRM tracking request fails', async ({ page }) => {
-    await stubWindowOpen(page);
+  test('WhatsApp handoff does not open when the CRM tracking request fails', async ({ page }) => {
+    await stubWhatsAppWindow(page);
     await page.route('**/api/submit-contact', (route) =>
       route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ ok: false, error: 'boom' }) }),
     );
@@ -147,12 +129,12 @@ test.describe('Contact form attribution payload', () => {
     await page.locator('#contact-whatsapp').fill('11977776666');
     await page.getByRole('button', { name: /^abrir whatsapp agora$/i }).click();
 
-    // The WhatsApp tab opens regardless of whether the background CRM tracking call
-    // succeeds — the visitor's path to a human must never depend on Odoo being up.
-    await expect.poll(() => page.evaluate(() => window.__whatsappOpens?.length ?? 0)).toBeGreaterThan(0);
-    const [openedUrl] = await page.evaluate(() => window.__whatsappOpens?.[0] ?? []);
-    expect(String(openedUrl)).toContain('wa.me');
-
-    await expect(dialog.getByText(/abrimos o whatsapp/i)).toBeVisible();
+    // CRM confirmation must precede the WhatsApp handoff. A failed write must
+    // remain visible in the form instead of becoming a silent lost lead. The
+    // tab reserved synchronously on click must never navigate to WhatsApp...
+    await expect.poll(() => page.evaluate(() => window.__whatsappUrls?.length ?? 0)).toBe(0);
+    // ...and must be closed instead of left behind as a blank tab.
+    await expect.poll(() => page.evaluate(() => window.__whatsappWindowClosed ?? 0)).toBe(1);
+    await expect(dialog.getByRole('alert')).toHaveText('boom');
   });
 });
