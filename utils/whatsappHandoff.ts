@@ -68,6 +68,14 @@ export function reserveWhatsAppWindow(): WhatsAppHandoff {
                 handle.location.href = url;
                 return true;
             } catch {
+                // The tab can't be navigated — close it instead of leaving
+                // it orphaned as a blank tab; the caller falls back to
+                // rendering `url` as a plain link.
+                try {
+                    handle.close();
+                } catch {
+                    // ignore
+                }
                 return false;
             }
         },

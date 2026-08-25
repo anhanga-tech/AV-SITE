@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef } from 'react';
+import { useCallback, useState, useRef, useEffect } from 'react';
 import { useAntiBot } from './useAntiBot';
 import { cleanString, splitFullName } from '../lib/lead-logic';
 import {
@@ -88,6 +88,18 @@ export function useContactForm(options: ContactModalOptions = {}) {
 
     const canAttemptSubmit = Boolean(fields.firstName.trim() && fields.whatsapp.trim());
     const formId = options.source ?? 'contact-modal';
+
+    // `reset()` (called on modal close) already cancels a pending handoff,
+    // but a consumer like CtaBody can also unmount outright — e.g. SPA
+    // navigation away from the homepage while /api/submit-contact is still
+    // pending — without ever calling reset(). Without this, the reserved
+    // tab would stay open until that detached request eventually settles.
+    useEffect(() => {
+        return () => {
+            activeHandoffRef.current?.cancel();
+            activeHandoffRef.current = null;
+        };
+    }, []);
 
     const setField = useCallback(
         (key: keyof ContactFormFields, value: string | boolean) => {
@@ -187,6 +199,15 @@ export function useContactForm(options: ContactModalOptions = {}) {
             if (whatsappHandoff) {
                 activeHandoffRef.current = whatsappHandoff;
             }
+            // reset() or the unmount cleanup above may already have cancelled
+            // and cleared `activeHandoffRef` by the time this continuation
+            // resumes after the `await` below — guard so this function's own
+            // cancel calls don't redundantly close an already-closed handle.
+            const cancelActiveHandoff = () => {
+                if (!whatsappHandoff || activeHandoffRef.current !== whatsappHandoff) return;
+                activeHandoffRef.current = null;
+                whatsappHandoff.cancel();
+            };
 
             // The UI dropped the separate sobrenome input (ContactModal/CtaBody now
             // ask for the full name in `firstName`), so split it here to keep the
@@ -215,12 +236,12 @@ export function useContactForm(options: ContactModalOptions = {}) {
 
                 const data = (await response.json()) as SubmitContactResponse;
                 if (submissionTokenRef.current !== submissionToken) {
-                    whatsappHandoff?.cancel();
+                    cancelActiveHandoff();
                     return;
                 }
 
                 if (!response.ok || !data.ok) {
-                    whatsappHandoff?.cancel();
+                    cancelActiveHandoff();
                     const errData = data as Extract<SubmitContactResponse, { ok: false }>;
                     const retryableFailure = !response.ok && response.status >= 500;
                     if (!retryableFailure) eventIdRef.current = null;
@@ -296,7 +317,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 setSubmitted(true);
                 eventIdRef.current = null;
             } catch {
-                whatsappHandoff?.cancel();
+                cancelActiveHandoff();
                 if (submissionTokenRef.current !== submissionToken) return;
                 if (action === 'whatsapp') {
                     console.warn('[submit-contact] fetch failed before opening WhatsApp');

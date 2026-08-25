@@ -84,3 +84,28 @@ test('reserveWhatsAppWindow fecha a aba e não navega quando o navegador rejeita
         },
     );
 });
+
+test('reserveWhatsAppWindow fecha a aba quando a navegação em si lança (não deixa uma aba órfã em branco)', () => {
+    let closedCount = 0;
+    withWindowOpen(
+        () => ({
+            closed: false,
+            close() { closedCount += 1; },
+            get location() {
+                return {
+                    set href(_v: string) {
+                        throw new Error('não foi possível navegar esta aba');
+                    },
+                };
+            },
+            opener: 'writable',
+        }),
+        () => {
+            const handoff = reserveWhatsAppWindow();
+            const opened = handoff.open('https://wa.me/5511955021519?text=test');
+
+            assert.equal(opened, false, 'open() deve retornar false quando a navegação lança');
+            assert.equal(closedCount, 1, 'a aba deve ser fechada em vez de deixada em branco quando não pode navegar');
+        },
+    );
+});

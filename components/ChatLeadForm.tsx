@@ -95,6 +95,13 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
     // reachable then).
     if (!isOpen) {
       isOpenRef.current = false;
+      // Closing the drawer doesn't unmount ChatLeadForm (only the dialog
+      // hides), so the unmount cleanup below wouldn't run here — cancel any
+      // tab reserved by a still-pending submission right away instead of
+      // waiting for that request to eventually settle, which could leave a
+      // blank tab open indefinitely if it's slow or hangs.
+      activeHandoffRef.current?.cancel();
+      activeHandoffRef.current = null;
     }
   }, [isOpen]);
 
@@ -232,11 +239,21 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
     const whatsappHandoff = reserveWhatsAppWindow();
     activeHandoffRef.current = whatsappHandoff;
 
+    // The isOpen-close effect above may already have cancelled and cleared
+    // `activeHandoffRef` by the time this continuation resumes after an
+    // `await` — guard so this function's own cancel calls don't redundantly
+    // close an already-closed handle.
+    const cancelActiveHandoff = () => {
+      if (activeHandoffRef.current !== whatsappHandoff) return;
+      activeHandoffRef.current = null;
+      whatsappHandoff.cancel();
+    };
+
     try {
       const result = await onFinalizeLead(submitPayload);
 
       if (!result.ok) {
-        whatsappHandoff.cancel();
+        cancelActiveHandoff();
         pushFormAnalyticsEvent({
           event: 'submit_failure',
           formType: 'ai_chatbot_lead',
@@ -269,7 +286,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
         // Still expose the WhatsApp link as a fallback: if the visitor
         // reopens the drawer, they'd otherwise see a disabled form with no
         // indication the lead was saved and no way to continue.
-        whatsappHandoff.cancel();
+        cancelActiveHandoff();
         setWhatsappUrl(whatsappLink);
         if (result.notice) {
           setNotice(result.notice);
@@ -317,7 +334,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
       // future callers. Without this, a thrown error would skip every
       // `whatsappHandoff.cancel()` call above, leaking the reserved blank
       // tab. Mirrors the catch block in hooks/useContactForm.ts's submit().
-      whatsappHandoff.cancel();
+      cancelActiveHandoff();
       pushFormAnalyticsEvent({
         event: 'submit_failure',
         formType: 'ai_chatbot_lead',

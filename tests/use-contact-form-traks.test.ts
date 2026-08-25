@@ -309,3 +309,50 @@ test('useContactForm reset() fecha a aba reservada imediatamente, sem esperar a 
         cleanup();
     }
 });
+
+test('desmontar o componente que usa useContactForm fecha a aba reservada (ex.: navegação SPA para fora da home)', async () => {
+    cleanup();
+    const previousFetch = globalThis.fetch;
+    let closedCount = 0;
+    let navigatedTo: string | null = null;
+    const previousOpen = window.open;
+    Object.defineProperty(window, 'open', {
+        configurable: true,
+        value: () => ({
+            closed: false,
+            close() { closedCount += 1; },
+            location: { set href(v: string) { navigatedTo = v; } },
+            opener: null,
+        }),
+    });
+    // Requisição travada — só assim dá pra provar que o cancelamento não
+    // depende do fetch eventualmente terminar.
+    globalThis.fetch = (() => new Promise(() => { /* never resolves */ })) as typeof fetch;
+
+    try {
+        const { getByTestId, unmount } = render(React.createElement(Harness));
+        act(() => {
+            fireEvent.click(getByTestId('fill'));
+        });
+        act(() => {
+            fireEvent.click(getByTestId('submit-whatsapp'));
+        });
+        await Promise.resolve();
+
+        assert.equal(closedCount, 0, 'a aba ainda não deve ter sido fechada enquanto a requisição está pendente');
+
+        // Visitor navigates away via SPA routing (e.g. CtaBody's page
+        // unmounts) without ever calling reset() explicitly.
+        unmount();
+
+        assert.equal(navigatedTo, null, 'nunca deve navegar para o WhatsApp de uma submissão abandonada');
+        assert.equal(closedCount, 1, 'o unmount deve fechar a aba reservada, sem esperar o fetch travado');
+    } finally {
+        globalThis.fetch = previousFetch;
+        Object.defineProperty(window, 'open', {
+            configurable: true,
+            value: previousOpen,
+        });
+        cleanup();
+    }
+});

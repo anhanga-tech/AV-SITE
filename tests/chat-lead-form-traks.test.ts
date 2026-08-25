@@ -504,6 +504,81 @@ test('fechar o drawer do chat durante o envio pendente cancela o handoff mas ain
     }
 });
 
+test('fechar o drawer cancela a aba reservada imediatamente, sem esperar a resposta do CRM', async () => {
+    cleanup();
+    let resolveFinalize: ((result: LeadFinalizeResult) => void) | null = null;
+    const props: React.ComponentProps<typeof ChatLeadForm> = {
+        ...makeProps(),
+        isOpen: true,
+        onFinalizeLead: () => new Promise<LeadFinalizeResult>((resolve) => { resolveFinalize = resolve; }),
+    };
+
+    let closedCount = 0;
+    let navigatedTo: string | null = null;
+    const previousOpen = window.open;
+    Object.defineProperty(window, 'open', {
+        configurable: true,
+        value: () => {
+            let closed = false;
+            return {
+                get closed() { return closed; },
+                close() {
+                    closed = true;
+                    closedCount += 1;
+                },
+                location: { set href(v: string) { navigatedTo = v; } },
+                opener: null,
+            };
+        },
+    });
+
+    try {
+        const { container, rerender } = render(React.createElement(ChatLeadForm, props));
+        const set = (id: string, value: string) => {
+            const input = container.querySelector(`#${id}`);
+            if (!input) throw new Error(`input não encontrado: #${id}`);
+            fireEvent.input(input, { target: { value } });
+        };
+        set('lead-first-name', 'Fulano');
+        set('lead-last-name', 'de Tal');
+        set('lead-email', 'fulano@test.com');
+        set('lead-whatsapp', '11999998888');
+        const lgpd = container.querySelector('input[type="checkbox"]');
+        if (lgpd) fireEvent.click(lgpd);
+
+        const submitButton = Array.from(container.querySelectorAll('button'))
+            .find((button) => button.textContent?.includes('Salvar e abrir WhatsApp'));
+        assert.ok(submitButton, 'botão "Salvar e abrir WhatsApp" deve existir');
+
+        fireEvent.click(submitButton);
+        await Promise.resolve();
+        assert.ok(resolveFinalize, 'onFinalizeLead deve ter sido chamado e estar pendente');
+
+        // Visitor closes the drawer — the CRM request is still pending and
+        // could be slow or hung. The tab must close right away, not wait
+        // for that request to eventually settle.
+        rerender(React.createElement(ChatLeadForm, { ...props, isOpen: false }));
+
+        assert.equal(closedCount, 1, 'a aba deve ser fechada assim que o drawer fecha, antes da resposta do CRM');
+        assert.equal(navigatedTo, null);
+
+        // The request eventually resolving afterward must not reopen/renavigate anything.
+        await act(async () => {
+            resolveFinalize?.({ ok: true });
+            await Promise.resolve();
+            await Promise.resolve();
+        });
+        assert.equal(closedCount, 1, 'não deve tentar fechar/reservar de novo quando a resposta chega depois');
+        assert.equal(navigatedTo, null);
+    } finally {
+        Object.defineProperty(window, 'open', {
+            configurable: true,
+            value: previousOpen,
+        });
+        cleanup();
+    }
+});
+
 test('reabrir o drawer não desfaz uma dispensa ocorrida durante o envio pendente', async () => {
     cleanup();
     let resolveFinalize: ((result: LeadFinalizeResult) => void) | null = null;
