@@ -31,7 +31,8 @@ export function ChatLeadFormActions({ isSubmitting, onSubmit, onOpenLeadModal }:
       <button
         type="button"
         onClick={onOpenLeadModal}
-        className="mt-3 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-bold text-zinc-700 transition hover:border-brand-vibrant hover:text-brand-vibrant focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-vibrant/30"
+        disabled={isSubmitting}
+        className="mt-3 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-bold text-zinc-700 transition hover:border-brand-vibrant hover:text-brand-vibrant disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-vibrant/30"
       >
         Preencher contato e continuar
       </button>

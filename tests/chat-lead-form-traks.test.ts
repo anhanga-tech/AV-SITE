@@ -3,7 +3,7 @@ import './helpers/dom-setup.ts';
 import React from 'react';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, act, cleanup } from '@testing-library/react';
 
 import { ChatLeadForm } from '../components/ChatLeadForm.tsx';
 
@@ -38,6 +38,7 @@ const okFinalize = async () => ({ ok: true as const, odooLeadId: 'test-1' });
 function makeProps() {
     return {
         destination: 'Orlando',
+        whatsappMessage: 'Olá! Contexto do chatbot.',
         getWhatsAppUrl: () => 'https://wa.me/5511955021519?text=test',
         prepareLeadSubmitPayload: (() => ({})) as unknown as React.ComponentProps<typeof ChatLeadForm>['prepareLeadSubmitPayload'],
         isSubmittingLead: false,
@@ -68,9 +69,11 @@ test('submit validado do ChatLeadForm emite whatsapp_click no Traks', async () =
             .find((b) => b.textContent?.includes('Salvar e abrir WhatsApp'));
         assert.ok(submitButton, 'botão "Salvar e abrir WhatsApp" deve existir');
 
-        fireEvent.click(submitButton);
-        // O handoff é síncrono no click handler (antes do await do finalize).
-        await Promise.resolve();
+        await act(async () => {
+            fireEvent.click(submitButton);
+            await Promise.resolve();
+            await Promise.resolve();
+        });
         const handoffs = calls.filter((c) => c.name === 'whatsapp_click');
         assert.ok(handoffs.length >= 1, 'whatsapp_click deve ser emitido no submit validado');
     });
@@ -78,10 +81,10 @@ test('submit validado do ChatLeadForm emite whatsapp_click no Traks', async () =
 
 test('caminho direto abre o modal de lead e não abre o WhatsApp sem salvar', () => {
     const previousOpen = window.open;
-    const modalDetails: Array<{ source?: string; destination?: string }> = [];
+    const modalDetails: Array<{ source?: string; destination?: string; message?: string }> = [];
     let whatsappOpenCalls = 0;
     const onModalOpen = (event: Event) => {
-        modalDetails.push((event as CustomEvent<{ source?: string; destination?: string }>).detail);
+        modalDetails.push((event as CustomEvent<{ source?: string; destination?: string; message?: string }>).detail);
     };
 
     Object.defineProperty(window, 'open', {
@@ -101,7 +104,11 @@ test('caminho direto abre o modal de lead e não abre o WhatsApp sem salvar', ()
 
         fireEvent.click(directButton);
 
-        assert.deepEqual(modalDetails, [{ source: 'chatbot-direct', destination: 'Orlando' }]);
+        assert.deepEqual(modalDetails, [{
+            source: 'chatbot-direct',
+            destination: 'Orlando',
+            message: 'Olá! Contexto do chatbot.',
+        }]);
         assert.equal(whatsappOpenCalls, 0, 'o caminho alternativo não pode abrir o WhatsApp antes do modal');
     } finally {
         window.removeEventListener('open-contact-modal', onModalOpen);
@@ -109,5 +116,51 @@ test('caminho direto abre o modal de lead e não abre o WhatsApp sem salvar', ()
             configurable: true,
             value: previousOpen,
         });
+    }
+});
+
+test('popup bloqueado exibe link de fallback no ChatLeadForm após salvar o lead', async () => {
+    cleanup();
+    const previousOpen = window.open;
+    Object.defineProperty(window, 'open', {
+        configurable: true,
+        value: () => null,
+    });
+
+    try {
+        const { container, getByRole } = render(React.createElement(ChatLeadForm, makeProps()));
+        const set = (id: string, value: string) => {
+            const input = container.querySelector(`#${id}`);
+            if (!input) throw new Error(`input não encontrado: #${id}`);
+            fireEvent.input(input, { target: { value } });
+        };
+
+        set('lead-first-name', 'Fulano');
+        set('lead-last-name', 'de Tal');
+        set('lead-email', 'fulano@test.com');
+        set('lead-whatsapp', '11999998888');
+        const lgpd = container.querySelector('input[type="checkbox"]');
+        if (lgpd) fireEvent.click(lgpd);
+
+        const submitButton = Array.from(container.querySelectorAll('button'))
+            .find((button) => button.textContent?.includes('Salvar e abrir WhatsApp'));
+        assert.ok(submitButton, 'botão "Salvar e abrir WhatsApp" deve existir');
+
+        await act(async () => {
+            fireEvent.click(submitButton);
+            await Promise.resolve();
+            await Promise.resolve();
+        });
+
+        assert.equal(
+            getByRole('link', { name: 'Abrir WhatsApp' }).getAttribute('href'),
+            'https://wa.me/5511955021519?text=test',
+        );
+    } finally {
+        Object.defineProperty(window, 'open', {
+            configurable: true,
+            value: previousOpen,
+        });
+        cleanup();
     }
 });

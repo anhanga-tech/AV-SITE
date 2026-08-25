@@ -71,6 +71,8 @@ export function useContactForm(options: ContactModalOptions = {}) {
     const [fields, setFieldsState] = useState<ContactFormFields>(EMPTY_FIELDS);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const isLocallySubmitting = useRef(false);
+    const submissionTokenRef = useRef(0);
+    const eventIdRef = useRef<string | null>(null);
     const hasStarted = useRef(false);
     const completedFields = useRef<Set<keyof ContactFormFields> | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -113,6 +115,9 @@ export function useContactForm(options: ContactModalOptions = {}) {
     );
 
     const reset = useCallback(() => {
+        submissionTokenRef.current += 1;
+        eventIdRef.current = null;
+        isLocallySubmitting.current = false;
         setFieldsState(EMPTY_FIELDS);
         setIsSubmitting(false);
         setError(null);
@@ -144,6 +149,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
             }
 
             isLocallySubmitting.current = true;
+            const submissionToken = ++submissionTokenRef.current;
             setIsSubmitting(true);
             setError(null);
             setFieldErrors({});
@@ -155,12 +161,13 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 destination: action,
             });
 
-            const eventId = createLeadEventId();
+            const eventId = eventIdRef.current ?? createLeadEventId();
+            eventIdRef.current = eventId;
             const { tracking, utms } = collectTracking();
             const whatsappMessage =
                 options.message
                 ?? `Olá! Meu nome é ${validation.normalized.firstName}. Gostaria de saber mais sobre viagens.`;
-            const whatsappUrl = getWhatsAppLink(whatsappMessage);
+            const whatsappLink = getWhatsAppLink(whatsappMessage);
 
             // The UI dropped the separate sobrenome input (ContactModal/CtaBody now
             // ask for the full name in `firstName`), so split it here to keep the
@@ -188,9 +195,11 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 });
 
                 const data = (await response.json()) as SubmitContactResponse;
+                if (submissionTokenRef.current !== submissionToken) return;
 
                 if (!response.ok || !data.ok) {
                     const errData = data as Extract<SubmitContactResponse, { ok: false }>;
+                    eventIdRef.current = null;
                     if (action === 'whatsapp') {
                         console.warn('[submit-contact] tracking failed:', errData.code);
                         pushFormAnalyticsEvent({
@@ -221,14 +230,14 @@ export function useContactForm(options: ContactModalOptions = {}) {
                     // explicit fallback link in the success state.
                     const whatsappWindow = (() => {
                         try {
-                            return window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+                            return window.open(whatsappLink, '_blank', 'noopener,noreferrer');
                         } catch {
                             return null;
                         }
                     })();
 
                     if (!whatsappWindow) {
-                        setWhatsappUrl(whatsappUrl);
+                        setWhatsappUrl(whatsappLink);
                     }
 
                     // The lead is confirmed at this point. Record the handoff
@@ -259,7 +268,9 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 });
                 setLastAction(action);
                 setSubmitted(true);
+                eventIdRef.current = null;
             } catch {
+                if (submissionTokenRef.current !== submissionToken) return;
                 if (action === 'whatsapp') {
                     console.warn('[submit-contact] fetch failed before opening WhatsApp');
                     pushFormAnalyticsEvent({
@@ -281,8 +292,10 @@ export function useContactForm(options: ContactModalOptions = {}) {
                     });
                 }
             } finally {
-                setIsSubmitting(false);
-                isLocallySubmitting.current = false;
+                if (submissionTokenRef.current === submissionToken) {
+                    setIsSubmitting(false);
+                    isLocallySubmitting.current = false;
+                }
             }
         },
         [fields, options.destination, options.message, options.source, getAntiBotFields, formId],

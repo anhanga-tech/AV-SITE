@@ -3,7 +3,7 @@ import './helpers/dom-setup.ts';
 import React from 'react';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { render, fireEvent, act } from '@testing-library/react';
+import { render, fireEvent, act, cleanup } from '@testing-library/react';
 
 import { useContactForm } from '../hooks/useContactForm.ts';
 
@@ -46,7 +46,7 @@ function withFetchStub(run: () => Promise<void> | void) {
 }
 
 function Harness() {
-    const { setField, submit } = useContactForm({ source: 'test-harness' });
+    const { setField, submit, submitted, whatsappUrl } = useContactForm({ source: 'test-harness' });
     return React.createElement(
         'div',
         null,
@@ -63,6 +63,9 @@ function Harness() {
                 void submit('whatsapp');
             },
         }),
+        submitted && whatsappUrl
+            ? React.createElement('a', { 'data-testid': 'whatsapp-fallback', href: whatsappUrl }, 'Abrir WhatsApp')
+            : null,
     );
 }
 
@@ -84,4 +87,39 @@ test('useContactForm submit("whatsapp") emite whatsapp_click no Traks', async ()
             assert.ok(handoffs.length >= 1, 'whatsapp_click deve ser emitido no submit("whatsapp")');
         });
     });
+});
+
+test('useContactForm expõe link de fallback quando o popup do WhatsApp é bloqueado', async () => {
+    cleanup();
+    const previousOpen = window.open;
+    Object.defineProperty(window, 'open', {
+        configurable: true,
+        value: () => null,
+    });
+
+    try {
+        await withFetchStub(async () => {
+            const { getByTestId } = render(React.createElement(Harness));
+
+            act(() => {
+                fireEvent.click(getByTestId('fill'));
+            });
+            await act(async () => {
+                fireEvent.click(getByTestId('submit-whatsapp'));
+                await Promise.resolve();
+                await Promise.resolve();
+            });
+
+            assert.equal(
+                getByTestId('whatsapp-fallback').getAttribute('href'),
+                'https://wa.me/5511955021519?text=Ol%C3%A1!%20Meu%20nome%20%C3%A9%20Fulano.%20Gostaria%20de%20saber%20mais%20sobre%20viagens.',
+            );
+        });
+    } finally {
+        Object.defineProperty(window, 'open', {
+            configurable: true,
+            value: previousOpen,
+        });
+        cleanup();
+    }
 });

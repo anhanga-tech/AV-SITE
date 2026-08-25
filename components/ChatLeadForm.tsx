@@ -22,22 +22,17 @@ export { TextField } from './chat-lead-form/TextField';
 interface ChatLeadFormProps {
   destination?: string;
   defaultBantSummary?: string;
+  whatsappMessage?: string;
   getWhatsAppUrl: (payload: LeadFinalizePayload) => string;
   prepareLeadSubmitPayload: (payload: LeadFinalizePayload, eventId: string) => SubmitLeadRequest;
   isSubmittingLead: boolean;
   onFinalizeLead: (payload: SubmitLeadRequest) => Promise<LeadFinalizeResult>;
 }
 
-function openWhatsAppWindow(url: string): void {
-  const popup = window.open(url, '_blank', 'noopener,noreferrer');
-  if (!popup) {
-    window.location.assign(url);
-  }
-}
-
 const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
   destination,
   defaultBantSummary,
+  whatsappMessage,
   getWhatsAppUrl,
   prepareLeadSubmitPayload,
   isSubmittingLead,
@@ -54,8 +49,10 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
 
   const [localError, setLocalError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
   const [isLocallySubmitting, setIsLocallySubmitting] = useState(false);
   const isProcessingRef = React.useRef(false);
+  const eventIdRef = useRef<string | null>(null);
   const startedRef = useRef(false);
   const completedFields = useRef<Set<string> | null>(null);
   const firstNameRef = useRef<HTMLInputElement>(null);
@@ -111,11 +108,14 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
   }
 
   const openLeadModal = () => {
+    if (isSubmittingLead || isLocallySubmitting || isProcessingRef.current) return;
     void triggerHaptic('light');
-    openContactModal({
+    const modalOptions = {
       source: 'chatbot-direct',
       destination,
-    });
+      ...(whatsappMessage ? { message: whatsappMessage } : {}),
+    };
+    openContactModal(modalOptions);
   };
 
   const submitLeadForm = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -125,6 +125,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
     setIsLocallySubmitting(true);
     setLocalError(null);
     setNotice(null);
+    setWhatsappUrl(null);
     setFieldErrors({});
     pushFormAnalyticsEvent({
       event: 'submit_attempt',
@@ -166,7 +167,8 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
 
     void triggerHaptic('medium');
 
-    const eventId = createLeadEventId();
+    const eventId = eventIdRef.current ?? createLeadEventId();
+    eventIdRef.current = eventId;
     // Forward the LGPD/marketing consent so the handler sets x_lgpd_consent on
     // the Odoo res.partner; prepareLeadSubmitPayload only maps draft + tracking.
     const submitPayload: SubmitLeadRequest = {
@@ -188,15 +190,26 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
           destination,
         });
         setLocalError('Não foi possível salvar seu contato. Tente novamente.');
+        eventIdRef.current = null;
         console.warn('Background lead submission failed:', { error: result.error, requestId: result.requestId });
       } else {
+        const whatsappLink = getWhatsAppUrl(payload);
+        let whatsappWindow: Window | null = null;
+        try {
+          whatsappWindow = window.open(whatsappLink, '_blank', 'noopener,noreferrer');
+        } catch {
+          whatsappWindow = null;
+        }
+        if (!whatsappWindow) {
+          setWhatsappUrl(whatsappLink);
+        }
+        eventIdRef.current = null;
         pushFormAnalyticsEvent({
           event: 'whatsapp_opened',
           formType: 'ai_chatbot_lead',
           formId: 'chat-lead-form',
           destination,
         });
-        openWhatsAppWindow(getWhatsAppUrl(payload));
         trackTraksWhatsAppHandoff();
         pushFormAnalyticsEvent({
           event: 'submit_success',
@@ -249,7 +262,7 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
           }}
         />
 
-        <ChatLeadFormFeedback localError={localError} notice={notice} />
+        <ChatLeadFormFeedback localError={localError} notice={notice} whatsappUrl={whatsappUrl} />
 
         <ChatLeadFormActions
           isSubmitting={isSubmittingLead || isLocallySubmitting}

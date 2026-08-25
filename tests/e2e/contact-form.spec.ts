@@ -170,7 +170,8 @@ test.describe('Contact form modal', () => {
     await page.locator('#contact-whatsapp').press('Enter');
 
     await expect(page.getByText(/recebemos seu contato/i)).toBeVisible();
-    await expect(page.getByText('Abrimos o WhatsApp para você continuar com a nossa equipe.')).toBeVisible();
+    await expect(page.getByText('Seu contato foi salvo. O navegador bloqueou a abertura automática do WhatsApp.')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Abrir WhatsApp' })).toHaveAttribute('href', /wa\.me/);
 
     const generateLeadEvents = await page.evaluate(() =>
       window.dataLayer?.filter((entry) => entry.event === 'generate_lead') ?? [],
@@ -208,7 +209,8 @@ test.describe('Contact form modal', () => {
     await page.locator('#contact-whatsapp').fill('11987654321');
     await page.locator('#contact-whatsapp').press('Enter');
 
-    await expect(page.getByText('Abrimos o WhatsApp para você continuar com a nossa equipe.')).toBeVisible();
+    await expect(page.getByText('Não foi possível enviar. Tente novamente.')).toBeVisible();
+    await expect(page.getByText('Recebemos seu contato!')).not.toBeVisible();
     const generateLeadEvents = await page.evaluate(() =>
       window.dataLayer?.filter((entry) => entry.event === 'generate_lead') ?? [],
     );

@@ -8,7 +8,7 @@ import React, {
   useState,
 } from 'react';
 import { getTravelAdvice } from '../services/geminiService';
-import { useLeadCapture, type SubmitLeadHookResult } from '../hooks/useLeadCapture';
+import { buildLeadWhatsAppMessage, useLeadCapture, type SubmitLeadHookResult } from '../hooks/useLeadCapture';
 import type { LeadFinalizePayload, LeadFinalizeResult } from '../lib/chat-lead-form-logic';
 import type { SubmitLeadRequest } from '../types/leadCapture';
 import { triggerHaptic } from '../utils/haptics';
@@ -275,8 +275,19 @@ const AIChatPanel: React.FC<AIChatPanelProps> = memo(({
         actionData: {
           destination: response.budgetLink!.destination,
           bantSummary: response.budgetLink!.bantSummary,
-          iataCode: response.budgetLink!.iataCode
-        }
+          iataCode: response.budgetLink!.iataCode,
+          whatsappMessage: buildLeadWhatsAppMessage({
+            firstName: '',
+            lastName: '',
+            email: '',
+            whatsapp: '',
+            bantSummary: response.budgetLink!.bantSummary,
+            origin: response.budgetLink!.origin,
+            destination: response.budgetLink!.destination,
+            dates: response.budgetLink!.dates,
+            baggagePreference: response.budgetLink!.baggagePreference || '',
+          }),
+        },
       });
     }
 

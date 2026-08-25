@@ -25,6 +25,7 @@ export interface ChatMessage {
     destination: string;
     bantSummary: string;
     iataCode?: string;
+    whatsappMessage?: string;
   };
 }
 
@@ -227,6 +228,7 @@ function ChatMessageList({
                     <ChatLeadForm
                       destination={msg.actionData?.destination}
                       defaultBantSummary={msg.actionData?.bantSummary}
+                      whatsappMessage={msg.actionData?.whatsappMessage}
                       getWhatsAppUrl={getLeadWhatsAppUrl}
                       prepareLeadSubmitPayload={prepareLeadSubmitPayload}
                       onFinalizeLead={finalizeLead}
