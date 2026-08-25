@@ -129,7 +129,7 @@ test('Cloudflare redirects should expose the /indica short link with NPS referra
     assert.equal(status, '302', '/indica must use a temporary 302 redirect');
 
     const url = new URL(target, 'https://www.anhanga.tur.br');
-    assert.equal(url.pathname, '/', '/indica must redirect to the home route');
+    assert.equal(url.pathname, '/links/', '/indica must redirect to the links route');
     assert.equal(url.searchParams.get('utm_source'), 'indicacao');
     assert.equal(url.searchParams.get('utm_medium'), 'whatsapp');
     assert.equal(url.searchParams.get('utm_campaign'), 'nps_promotor');

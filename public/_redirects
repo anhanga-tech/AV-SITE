@@ -23,8 +23,8 @@
 
 # Link curto de indicação (e-mail #14 NPS promotor → WhatsApp share)
 # 302 (temporário) para permitir ajustar os UTMs depois sem cache de 301.
-/indica    /?utm_source=indicacao&utm_medium=whatsapp&utm_campaign=nps_promotor    302
-/indica/   /?utm_source=indicacao&utm_medium=whatsapp&utm_campaign=nps_promotor    302
+/indica    /links/?utm_source=indicacao&utm_medium=whatsapp&utm_campaign=nps_promotor    302
+/indica/   /links/?utm_source=indicacao&utm_medium=whatsapp&utm_campaign=nps_promotor    302
 
 # Exclusão de dados trailing-slash normalisation
 /exclusao-de-dados  /exclusao-de-dados/  301
