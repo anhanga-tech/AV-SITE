@@ -227,17 +227,20 @@ export function useContactForm(options: ContactModalOptions = {}) {
                         }
                     })();
 
-                    if (whatsappWindow) {
-                        pushFormAnalyticsEvent({
-                            event: 'whatsapp_opened',
-                            formType: 'contact_modal',
-                            formId,
-                            destination: action,
-                        });
-                        trackTraksWhatsAppHandoff();
-                    } else {
+                    if (!whatsappWindow) {
                         setWhatsappUrl(whatsappUrl);
                     }
+
+                    // The lead is confirmed at this point. Record the handoff
+                    // even when the browser blocks the popup, because the
+                    // success state exposes the same WhatsApp URL as a link.
+                    pushFormAnalyticsEvent({
+                        event: 'whatsapp_opened',
+                        formType: 'contact_modal',
+                        formId,
+                        destination: action,
+                    });
+                    trackTraksWhatsAppHandoff();
                 }
 
                 pushContactDataLayerEvent(
