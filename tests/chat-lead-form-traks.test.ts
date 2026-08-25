@@ -391,8 +391,10 @@ test('generate_lead só é disparado após confirmação do CRM, uma única vez 
     }
 });
 
-test('fechar o drawer do chat durante o envio pendente cancela o handoff (não abre WhatsApp)', async () => {
+test('fechar o drawer do chat durante o envio pendente cancela o handoff mas ainda reporta a conversão confirmada', async () => {
     cleanup();
+    const previousDataLayer = window.dataLayer;
+    window.dataLayer = [];
     let resolveFinalize: ((result: LeadFinalizeResult) => void) | null = null;
     const props: React.ComponentProps<typeof ChatLeadForm> = {
         ...makeProps(),
@@ -445,6 +447,80 @@ test('fechar o drawer do chat durante o envio pendente cancela o handoff (não a
         });
 
         assert.equal(navigatedTo, null, 'não deve navegar para o WhatsApp depois do dismiss');
+        assert.equal(closedCount, 1, 'a aba reservada deve ser fechada, não deixada em branco');
+        // O lead foi confirmado pelo CRM de verdade — a conversão não pode
+        // desaparecer do dataLayer só porque o drawer foi fechado antes da
+        // resposta chegar.
+        const generateLeadEvents = (window.dataLayer ?? []).filter(
+            (entry) => entry && typeof entry === 'object' && 'event' in entry && entry.event === 'generate_lead',
+        );
+        assert.equal(generateLeadEvents.length, 1, 'generate_lead deve disparar mesmo com o drawer fechado');
+    } finally {
+        Object.defineProperty(window, 'open', {
+            configurable: true,
+            value: previousOpen,
+        });
+        window.dataLayer = previousDataLayer;
+        cleanup();
+    }
+});
+
+test('reabrir o drawer não desfaz uma dispensa ocorrida durante o envio pendente', async () => {
+    cleanup();
+    let resolveFinalize: ((result: LeadFinalizeResult) => void) | null = null;
+    const props: React.ComponentProps<typeof ChatLeadForm> = {
+        ...makeProps(),
+        isOpen: true,
+        onFinalizeLead: () => new Promise<LeadFinalizeResult>((resolve) => { resolveFinalize = resolve; }),
+    };
+
+    let closedCount = 0;
+    let navigatedTo: string | null = null;
+    const previousOpen = window.open;
+    Object.defineProperty(window, 'open', {
+        configurable: true,
+        value: () => ({
+            closed: false,
+            close() { closedCount += 1; },
+            location: { set href(v: string) { navigatedTo = v; } },
+            opener: null,
+        }),
+    });
+
+    try {
+        const { container, rerender } = render(React.createElement(ChatLeadForm, props));
+        const set = (id: string, value: string) => {
+            const input = container.querySelector(`#${id}`);
+            if (!input) throw new Error(`input não encontrado: #${id}`);
+            fireEvent.input(input, { target: { value } });
+        };
+        set('lead-first-name', 'Fulano');
+        set('lead-last-name', 'de Tal');
+        set('lead-email', 'fulano@test.com');
+        set('lead-whatsapp', '11999998888');
+        const lgpd = container.querySelector('input[type="checkbox"]');
+        if (lgpd) fireEvent.click(lgpd);
+
+        const submitButton = Array.from(container.querySelectorAll('button'))
+            .find((button) => button.textContent?.includes('Salvar e abrir WhatsApp'));
+        assert.ok(submitButton, 'botão "Salvar e abrir WhatsApp" deve existir');
+
+        fireEvent.click(submitButton);
+        await Promise.resolve();
+        assert.ok(resolveFinalize, 'onFinalizeLead deve ter sido chamado e estar pendente');
+
+        // Visitor closes the drawer, then reopens it — via the always-mounted
+        // trigger — before the CRM request resolves.
+        rerender(React.createElement(ChatLeadForm, { ...props, isOpen: false }));
+        rerender(React.createElement(ChatLeadForm, { ...props, isOpen: true }));
+
+        await act(async () => {
+            resolveFinalize?.({ ok: true });
+            await Promise.resolve();
+            await Promise.resolve();
+        });
+
+        assert.equal(navigatedTo, null, 'a dispensa durante o envio deve continuar valendo mesmo reabrindo o drawer');
         assert.equal(closedCount, 1, 'a aba reservada deve ser fechada, não deixada em branco');
     } finally {
         Object.defineProperty(window, 'open', {

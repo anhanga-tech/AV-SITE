@@ -46,7 +46,7 @@ function withFetchStub(run: () => Promise<void> | void) {
 }
 
 function Harness() {
-    const { setField, submit, submitted, whatsappUrl } = useContactForm({ source: 'test-harness' });
+    const { setField, submit, reset, submitted, whatsappUrl } = useContactForm({ source: 'test-harness' });
     return React.createElement(
         'div',
         null,
@@ -67,6 +67,12 @@ function Harness() {
             'data-testid': 'edit-name',
             onClick: () => {
                 setField('firstName', 'Cicrano');
+            },
+        }),
+        React.createElement('button', {
+            'data-testid': 'reset',
+            onClick: () => {
+                reset();
             },
         }),
         submitted && whatsappUrl
@@ -229,6 +235,54 @@ test('useContactForm gera novo eventId se um campo for editado após falha (não
         );
     } finally {
         globalThis.fetch = previousFetch;
+        cleanup();
+    }
+});
+
+test('useContactForm reset() fecha a aba reservada imediatamente, sem esperar a requisição pendente terminar', async () => {
+    cleanup();
+    const previousFetch = globalThis.fetch;
+    let closedCount = 0;
+    let navigatedTo: string | null = null;
+    const previousOpen = window.open;
+    Object.defineProperty(window, 'open', {
+        configurable: true,
+        value: () => ({
+            closed: false,
+            close() { closedCount += 1; },
+            location: { set href(v: string) { navigatedTo = v; } },
+            opener: null,
+        }),
+    });
+    // Simula uma requisição travada (nunca resolve) — só assim dá pra provar
+    // que o cancelamento não depende do fetch eventualmente terminar.
+    globalThis.fetch = (() => new Promise(() => { /* never resolves */ })) as typeof fetch;
+
+    try {
+        const { getByTestId } = render(React.createElement(Harness));
+        act(() => {
+            fireEvent.click(getByTestId('fill'));
+        });
+        act(() => {
+            fireEvent.click(getByTestId('submit-whatsapp'));
+        });
+        await Promise.resolve();
+
+        assert.equal(closedCount, 0, 'a aba ainda não deve ter sido fechada enquanto a requisição está pendente');
+
+        // Visitor closes the modal while /api/submit-contact is still hanging.
+        act(() => {
+            fireEvent.click(getByTestId('reset'));
+        });
+
+        assert.equal(navigatedTo, null, 'nunca deve navegar para o WhatsApp de uma submissão descartada');
+        assert.equal(closedCount, 1, 'reset() deve fechar a aba reservada imediatamente, sem esperar o fetch travado');
+    } finally {
+        globalThis.fetch = previousFetch;
+        Object.defineProperty(window, 'open', {
+            configurable: true,
+            value: previousOpen,
+        });
         cleanup();
     }
 });

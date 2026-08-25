@@ -80,7 +80,17 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
   }, [destination]);
 
   useEffect(() => {
-    isOpenRef.current = isOpen;
+    // One-way latch: only the transition to closed is recorded here. If the
+    // drawer closes while a submission is pending and the visitor reopens it
+    // (the always-mounted trigger allows that) before the CRM responds, the
+    // dismissal must still stick for that in-flight request — reopening
+    // shouldn't silently un-cancel a handoff the visitor already dismissed.
+    // `submitLeadForm` re-latches this to `true` at the start of each new
+    // attempt, when the drawer is necessarily open (the button is only
+    // reachable then).
+    if (!isOpen) {
+      isOpenRef.current = false;
+    }
   }, [isOpen]);
 
   useEffect(() => {
@@ -144,6 +154,10 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
     if (isSubmittingLead || isLocallySubmitting || isProcessingRef.current || hasSucceeded) return;
     e.preventDefault();
     isProcessingRef.current = true;
+    // Re-latch: the button is only reachable while the drawer is open, so a
+    // new attempt always starts from "open". A close mid-flight during this
+    // specific attempt is what should stick (see the effect above).
+    isOpenRef.current = true;
     setIsLocallySubmitting(true);
     setLocalError(null);
     setNotice(null);
@@ -208,22 +222,6 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
     try {
       const result = await onFinalizeLead(submitPayload);
 
-      if (!isOpenRef.current) {
-        // The visitor closed the chat drawer while this request was in
-        // flight. AIChatPanel stays mounted (only its `isOpen` prop
-        // toggles), so this continuation would otherwise still run and hand
-        // off to WhatsApp after an explicit dismissal — discard it instead.
-        whatsappHandoff.cancel();
-        if (result.ok) {
-          // The CRM write already succeeded server-side even though we're
-          // discarding the UI update — don't let a reopened drawer resubmit
-          // the same lead and create a duplicate.
-          eventIdRef.current = null;
-          setHasSucceeded(true);
-        }
-        return;
-      }
-
       if (!result.ok) {
         whatsappHandoff.cancel();
         pushFormAnalyticsEvent({
@@ -235,41 +233,55 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
         });
         setLocalError('Não foi possível salvar seu contato. Tente novamente.');
         console.warn('Background lead submission failed:', { error: result.error, requestId: result.requestId });
-      } else {
-        // Fired only on confirmed success — pushing it before the CRM write
-        // resolves would report failed submissions as conversions, and firing
-        // it on every attempt would double-count a retry that reuses the same
-        // preserved event_id.
-        pushGenerateLeadDataLayerEvent(submitPayload);
-        const whatsappLink = getWhatsAppUrl(payload);
-        const opened = whatsappHandoff.open(whatsappLink);
-        if (!opened) {
-          setWhatsappUrl(whatsappLink);
-        }
-        eventIdRef.current = null;
-        setHasSucceeded(true);
-        pushFormAnalyticsEvent({
-          event: 'whatsapp_opened',
-          formType: 'ai_chatbot_lead',
-          formId: 'chat-lead-form',
-          destination,
-        });
-        // Only when the tab actually navigated — when it falls back to the
-        // rendered link instead, the global `<a href="wa.me/...">` click
-        // listener (utils/traks.ts) already tracks it if/when the visitor
-        // clicks it, so tracking it here too would double-count the handoff.
-        if (opened) {
-          trackTraksWhatsAppHandoff();
-        }
-        pushFormAnalyticsEvent({
-          event: 'submit_success',
-          formType: 'ai_chatbot_lead',
-          formId: 'chat-lead-form',
-          destination,
-        });
-        if (result.notice) {
-          setNotice(result.notice);
-        }
+        return;
+      }
+
+      // The CRM write is confirmed at this point — report the conversion and
+      // clear the retry key regardless of whether the drawer is still open.
+      // Fired only on confirmed success — pushing it before the CRM write
+      // resolves would report failed submissions as conversions, and firing
+      // it on every attempt would double-count a retry that reuses the same
+      // preserved event_id.
+      pushGenerateLeadDataLayerEvent(submitPayload);
+      eventIdRef.current = null;
+      setHasSucceeded(true);
+
+      if (!isOpenRef.current) {
+        // The visitor closed the chat drawer while this request was in
+        // flight. AIChatPanel stays mounted (only its `isOpen` prop
+        // toggles), so this continuation would otherwise still run and hand
+        // off to WhatsApp after an explicit dismissal — cancel just the
+        // navigation, the lead itself is already saved and reported above.
+        whatsappHandoff.cancel();
+        return;
+      }
+
+      const whatsappLink = getWhatsAppUrl(payload);
+      const opened = whatsappHandoff.open(whatsappLink);
+      if (!opened) {
+        setWhatsappUrl(whatsappLink);
+      }
+      pushFormAnalyticsEvent({
+        event: 'whatsapp_opened',
+        formType: 'ai_chatbot_lead',
+        formId: 'chat-lead-form',
+        destination,
+      });
+      // Only when the tab actually navigated — when it falls back to the
+      // rendered link instead, the global `<a href="wa.me/...">` click
+      // listener (utils/traks.ts) already tracks it if/when the visitor
+      // clicks it, so tracking it here too would double-count the handoff.
+      if (opened) {
+        trackTraksWhatsAppHandoff();
+      }
+      pushFormAnalyticsEvent({
+        event: 'submit_success',
+        formType: 'ai_chatbot_lead',
+        formId: 'chat-lead-form',
+        destination,
+      });
+      if (result.notice) {
+        setNotice(result.notice);
       }
     } catch (error) {
       // onFinalizeLead is currently expected to always resolve (never

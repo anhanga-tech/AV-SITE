@@ -15,7 +15,7 @@ import type { ContactModalOptions } from '../utils/contactForm';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
 import { pushGenerateLeadConversionEvent } from '../utils/generate-lead-analytics';
 import { trackTraksWhatsAppHandoff } from '../utils/traks';
-import { reserveWhatsAppWindow } from '../utils/whatsappHandoff';
+import { reserveWhatsAppWindow, type WhatsAppHandoff } from '../utils/whatsappHandoff';
 
 const EMPTY_FIELDS: ContactFormFields = {
     firstName: '',
@@ -74,6 +74,10 @@ export function useContactForm(options: ContactModalOptions = {}) {
     const isLocallySubmitting = useRef(false);
     const submissionTokenRef = useRef(0);
     const eventIdRef = useRef<string | null>(null);
+    // Tracks the WhatsApp tab reserved by the in-flight submission (if any) so
+    // `reset()` can close it immediately on dismissal, instead of waiting for
+    // a slow or hung `/api/submit-contact` request to eventually settle.
+    const activeHandoffRef = useRef<WhatsAppHandoff | null>(null);
     const hasStarted = useRef(false);
     const completedFields = useRef<Set<keyof ContactFormFields> | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -121,6 +125,8 @@ export function useContactForm(options: ContactModalOptions = {}) {
     );
 
     const reset = useCallback(() => {
+        activeHandoffRef.current?.cancel();
+        activeHandoffRef.current = null;
         submissionTokenRef.current += 1;
         eventIdRef.current = null;
         isLocallySubmitting.current = false;
@@ -178,6 +184,9 @@ export function useContactForm(options: ContactModalOptions = {}) {
             // below — so Safari still treats the navigation as a direct
             // result of this click (see utils/whatsappHandoff.ts).
             const whatsappHandoff = action === 'whatsapp' ? reserveWhatsAppWindow() : null;
+            if (whatsappHandoff) {
+                activeHandoffRef.current = whatsappHandoff;
+            }
 
             // The UI dropped the separate sobrenome input (ContactModal/CtaBody now
             // ask for the full name in `firstName`), so split it here to keep the
@@ -310,6 +319,9 @@ export function useContactForm(options: ContactModalOptions = {}) {
                     });
                 }
             } finally {
+                if (activeHandoffRef.current === whatsappHandoff) {
+                    activeHandoffRef.current = null;
+                }
                 if (submissionTokenRef.current === submissionToken) {
                     setIsSubmitting(false);
                     isLocallySubmitting.current = false;
