@@ -454,3 +454,64 @@ test('fechar o drawer do chat durante o envio pendente cancela o handoff (não a
         cleanup();
     }
 });
+
+test('ChatLeadForm fecha a aba reservada se onFinalizeLead lançar exceção (não deixa aba em branco)', async () => {
+    cleanup();
+    let closedCount = 0;
+    let navigatedTo: string | null = null;
+    const previousOpen = window.open;
+    Object.defineProperty(window, 'open', {
+        configurable: true,
+        value: () => ({
+            closed: false,
+            close() { closedCount += 1; },
+            location: { set href(v: string) { navigatedTo = v; } },
+            opener: null,
+        }),
+    });
+
+    const props: React.ComponentProps<typeof ChatLeadForm> = {
+        ...makeProps(),
+        onFinalizeLead: async (): Promise<LeadFinalizeResult> => {
+            throw new Error('rejeição inesperada');
+        },
+    };
+
+    try {
+        const { container, getByRole } = render(React.createElement(ChatLeadForm, props));
+        const set = (id: string, value: string) => {
+            const input = container.querySelector(`#${id}`);
+            if (!input) throw new Error(`input não encontrado: #${id}`);
+            fireEvent.input(input, { target: { value } });
+        };
+        set('lead-first-name', 'Fulano');
+        set('lead-last-name', 'de Tal');
+        set('lead-email', 'fulano@test.com');
+        set('lead-whatsapp', '11999998888');
+        const lgpd = container.querySelector('input[type="checkbox"]');
+        if (lgpd) fireEvent.click(lgpd);
+
+        const submitButton = Array.from(container.querySelectorAll('button'))
+            .find((button) => button.textContent?.includes('Salvar e abrir WhatsApp'));
+        assert.ok(submitButton, 'botão "Salvar e abrir WhatsApp" deve existir');
+
+        await act(async () => {
+            fireEvent.click(submitButton);
+            await Promise.resolve();
+            await Promise.resolve();
+        });
+
+        assert.equal(navigatedTo, null, 'não deve navegar para o WhatsApp quando onFinalizeLead lança');
+        assert.equal(closedCount, 1, 'a aba reservada deve ser fechada, não deixada em branco');
+        assert.equal(
+            getByRole('alert').textContent,
+            'Não foi possível salvar seu contato. Tente novamente.',
+        );
+    } finally {
+        Object.defineProperty(window, 'open', {
+            configurable: true,
+            value: previousOpen,
+        });
+        cleanup();
+    }
+});

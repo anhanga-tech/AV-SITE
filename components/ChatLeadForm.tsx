@@ -271,6 +271,22 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
           setNotice(result.notice);
         }
       }
+    } catch (error) {
+      // onFinalizeLead is currently expected to always resolve (never
+      // reject) — but nothing in its type contract guarantees that for
+      // future callers. Without this, a thrown error would skip every
+      // `whatsappHandoff.cancel()` call above, leaking the reserved blank
+      // tab. Mirrors the catch block in hooks/useContactForm.ts's submit().
+      whatsappHandoff.cancel();
+      pushFormAnalyticsEvent({
+        event: 'submit_failure',
+        formType: 'ai_chatbot_lead',
+        formId: 'chat-lead-form',
+        errorType: 'unknown',
+        destination,
+      });
+      setLocalError('Não foi possível salvar seu contato. Tente novamente.');
+      console.warn('Background lead submission threw:', error);
     } finally {
       setIsLocallySubmitting(false);
       isProcessingRef.current = false;
