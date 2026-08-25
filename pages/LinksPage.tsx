@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useSyncExternalStore } from 'react';
 import { Link } from 'react-router-dom';
 import { Seo } from '../components/Seo';
 import { BRAND_LOGO_WHITE_URL } from '../lib/media-assets';
@@ -7,7 +7,20 @@ import { withTrackingParams, pushLinksPageView } from '../utils/linksTracking';
 import LinkButton, { isPrimaryLink } from '../components/links/LinkButton';
 import TrustSeals from '../components/links/TrustSeals';
 
+// A query da URL é estado externo ao React. /links é prerenderizada (lib/prerender-routes.js),
+// então o snapshot de servidor é vazio e o do cliente só entra depois da hidratação — sem isso,
+// ler `window.location.search` durante o render faria o HTML do servidor divergir do primeiro
+// render do cliente em todo `href`. Os UTMs entram no passe seguinte, antes de qualquer clique.
+const subscribeToLocation = (onStoreChange: () => void) => {
+    window.addEventListener('popstate', onStoreChange);
+    return () => window.removeEventListener('popstate', onStoreChange);
+};
+const getSearchSnapshot = () => window.location.search;
+const getServerSearchSnapshot = () => '';
+
 const LinksPage: React.FC = () => {
+    const search = useSyncExternalStore(subscribeToLocation, getSearchSnapshot, getServerSearchSnapshot);
+
     useEffect(() => {
         pushLinksPageView();
     }, []);
@@ -24,8 +37,15 @@ const LinksPage: React.FC = () => {
                 robots="noindex, follow"
                 noHreflang
             />
-            <main className="min-h-screen bg-gradient-to-b from-anhanga-darkBlue via-anhanga-action to-anhanga-darkBlue px-5 py-10 font-sans">
+            {/* Ardósia Profunda chapada: o contexto dark canônico do DESIGN.md. O gradiente
+                anterior deixava o contraste dos selos dependente da altura da página — numa
+                janela alta eles caíam na faixa de Céu Vivo e o branco descia a ~4:1 — e
+                flertava com a anti-referência "gradientes de tech" do PRODUCT.md.
+                O padding inferior reserva a altura do banner de cookies (--cookie-banner-h,
+                exposto por CookieConsentBanner) para que ele não cubra os selos de confiança. */}
+            <main className="min-h-screen bg-anhanga-dark px-[20px] pt-10 pb-[calc(2.5rem+var(--cookie-banner-h,0px))] font-sans">
                 <div className="mx-auto flex w-full max-w-md flex-col items-center">
+                    <h1 className="sr-only">Anhangá Viagens — links</h1>
                     <img
                         src={BRAND_LOGO_WHITE_URL}
                         alt="Anhangá Viagens"
@@ -36,7 +56,7 @@ const LinksPage: React.FC = () => {
 
                     {banner.visible ? (
                         <Link
-                            to={withTrackingParams(banner.href)}
+                            to={withTrackingParams(banner.href, search)}
                             className="mt-8 w-full rounded-2xl bg-anhanga-yellow/15 p-5 text-center ring-1 ring-anhanga-yellow/40 transition-colors hover:bg-anhanga-yellow/25"
                             data-testid="links-banner"
                         >
@@ -55,7 +75,7 @@ const LinksPage: React.FC = () => {
                             const previous = index > 0 ? visibleLinks[index - 1] : undefined;
                             const startsDestinations = Boolean(previous && isPrimaryLink(previous) && !isPrimaryLink(link));
                             return (
-                                <LinkButton key={link.id} item={link} className={startsDestinations ? 'mt-3' : undefined} />
+                                <LinkButton key={link.id} item={link} search={search} className={startsDestinations ? 'mt-3' : undefined} />
                             );
                         })}
                     </nav>

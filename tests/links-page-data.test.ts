@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { linksPageConfig, type LinkItem } from '../data/linksPage.ts';
 import { isSupportedIcon } from '../components/links/linkIcons.ts';
+import { ORIGIN_TOKEN, applyOriginToMessage } from '../utils/linksTracking.ts';
 import { getWhatsAppLink, getTrackingDataObject } from '../utils/whatsapp.ts';
 
 test('ids dos links são únicos', () => {
@@ -90,8 +91,9 @@ test('a mensagem termina no prompt editável mesmo com tracking na sessão', () 
         assert.equal(getTrackingDataObject()?.gclid, 'Cj0KTEST', 'fixture precisa ter tracking real');
 
         for (const link of linksPageConfig.links.filter((l) => l.type === 'whatsapp')) {
-            const decoded = decodeURIComponent(getWhatsAppLink(link.whatsappMessage ?? '').split('?text=')[1] ?? '');
-            assert.equal(decoded, link.whatsappMessage, `${link.id}: algo foi anexado depois do prompt`);
+            const resolved = applyOriginToMessage(link.whatsappMessage ?? '', '?utm_source=instagram');
+            const decoded = decodeURIComponent(getWhatsAppLink(resolved).split('?text=')[1] ?? '');
+            assert.equal(decoded, resolved, `${link.id}: algo foi anexado depois do prompt`);
         }
     } finally {
         if (originalWindow) Object.defineProperty(globalThis, 'window', originalWindow);
@@ -100,5 +102,31 @@ test('a mensagem termina no prompt editável mesmo com tracking na sessão', () 
         else Reflect.deleteProperty(globalThis, 'document');
         if (originalSessionStorage) Object.defineProperty(globalThis, 'sessionStorage', originalSessionStorage);
         else Reflect.deleteProperty(globalThis, 'sessionStorage');
+    }
+});
+
+// A "Regra do Âmbar" do DESIGN.md reserva o Âmbar Vivo a 1 elemento por tela, e o amarelo
+// da página é justamente o CTA dominante. `data/linksPage.ts` é marcado ⚙️ EDITÁVEL para
+// quem não é engenheiro, então o invariante precisa falhar no CI e não no olho de alguém.
+test('no máximo um link amarelo visível (Regra do Âmbar)', () => {
+    const destacados = linksPageConfig.links.filter((l) => l.visible && l.highlight);
+    assert.ok(destacados.length <= 1, `${destacados.length} links com highlight: ${destacados.map((l) => l.id).join(', ')}`);
+});
+
+test('banner e link destacado não coexistem (Regra do Âmbar)', () => {
+    const temLinkDestacado = linksPageConfig.links.some((l) => l.visible && l.highlight);
+    assert.ok(
+        !(linksPageConfig.banner.visible && temLinkDestacado),
+        'banner e link com highlight ligados ao mesmo tempo colocam dois amarelos na 1ª dobra',
+    );
+});
+
+// /links é alcançável de qualquer bio, não só do Instagram. Fixar a origem na mensagem faz
+// a copy afirmar algo falso e descarta a origem real antes do atendimento e do CRM.
+test('mensagens de whatsapp usam o marcador de origem em vez de fixá-la', () => {
+    for (const link of linksPageConfig.links.filter((l) => l.type === 'whatsapp')) {
+        const message = link.whatsappMessage ?? '';
+        assert.ok(message.includes(ORIGIN_TOKEN), `${link.id} não usa ${ORIGIN_TOKEN}`);
+        assert.doesNotMatch(message, /Vim pel[oa]\s/i, `${link.id} fixa a origem no texto`);
     }
 });
