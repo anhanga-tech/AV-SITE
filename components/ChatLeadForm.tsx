@@ -302,22 +302,29 @@ const ChatLeadFormBase: React.FC<ChatLeadFormProps> = ({
         return;
       }
 
+      // If the component unmounted mid-flight (e.g. SPA navigation to a
+      // landing route without <AIChat>) while the drawer was still open,
+      // the unmount cleanup already cancelled and cleared activeHandoffRef
+      // — distinct from the drawer-closed case above, which returns early.
+      const handoffWasAbandoned = activeHandoffRef.current !== whatsappHandoff;
       const opened = whatsappHandoff.open(whatsappLink);
-      if (!opened) {
-        setWhatsappUrl(whatsappLink);
-      }
-      pushFormAnalyticsEvent({
-        event: 'whatsapp_opened',
-        formType: 'ai_chatbot_lead',
-        formId: 'chat-lead-form',
-        destination,
-      });
-      // Only when the tab actually navigated — when it falls back to the
-      // rendered link instead, the global `<a href="wa.me/...">` click
-      // listener (utils/traks.ts) already tracks it if/when the visitor
-      // clicks it, so tracking it here too would double-count the handoff.
-      if (opened) {
-        trackTraksWhatsAppHandoff();
+      if (!handoffWasAbandoned) {
+        if (!opened) {
+          setWhatsappUrl(whatsappLink);
+        }
+        pushFormAnalyticsEvent({
+          event: 'whatsapp_opened',
+          formType: 'ai_chatbot_lead',
+          formId: 'chat-lead-form',
+          destination,
+        });
+        // Only when the tab actually navigated — when it falls back to the
+        // rendered link instead, the global `<a href="wa.me/...">` click
+        // listener (utils/traks.ts) already tracks it if/when the visitor
+        // clicks it, so tracking it here too would double-count the handoff.
+        if (opened) {
+          trackTraksWhatsAppHandoff();
+        }
       }
       pushFormAnalyticsEvent({
         event: 'submit_success',

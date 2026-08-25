@@ -269,6 +269,13 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 }
 
                 if (action === 'whatsapp') {
+                    // If the consumer unmounted mid-flight (e.g. SPA navigation
+                    // away from CtaBody before this request settled), the
+                    // unmount cleanup already cancelled and cleared
+                    // activeHandoffRef — distinct from the reset()/stale-token
+                    // case above, which is caught by the submissionToken check.
+                    const handoffWasAbandoned = activeHandoffRef.current !== whatsappHandoff;
+
                     // CRM confirmation comes first. Opening WhatsApp before this
                     // request made it possible to lose the lead silently. The tab
                     // itself was already reserved synchronously above; if it never
@@ -276,26 +283,28 @@ export function useContactForm(options: ContactModalOptions = {}) {
                     // explicit fallback link in the success state.
                     const opened = whatsappHandoff?.open(whatsappLink) ?? false;
 
-                    if (!opened) {
-                        setWhatsappUrl(whatsappLink);
-                    }
+                    if (!handoffWasAbandoned) {
+                        if (!opened) {
+                            setWhatsappUrl(whatsappLink);
+                        }
 
-                    // The lead is confirmed at this point. Record the handoff
-                    // even when the browser blocks the popup, because the
-                    // success state exposes the same WhatsApp URL as a link.
-                    pushFormAnalyticsEvent({
-                        event: 'whatsapp_opened',
-                        formType: 'contact_modal',
-                        formId,
-                        destination: action,
-                    });
-                    // Only when the tab actually navigated — when it falls back to
-                    // the rendered link instead, the global `<a href="wa.me/...">`
-                    // click listener (utils/traks.ts) already tracks it if/when the
-                    // visitor clicks it, so tracking it here too would double-count
-                    // the handoff.
-                    if (opened) {
-                        trackTraksWhatsAppHandoff();
+                        // The lead is confirmed at this point. Record the handoff
+                        // even when the browser blocks the popup, because the
+                        // success state exposes the same WhatsApp URL as a link.
+                        pushFormAnalyticsEvent({
+                            event: 'whatsapp_opened',
+                            formType: 'contact_modal',
+                            formId,
+                            destination: action,
+                        });
+                        // Only when the tab actually navigated — when it falls back to
+                        // the rendered link instead, the global `<a href="wa.me/...">`
+                        // click listener (utils/traks.ts) already tracks it if/when the
+                        // visitor clicks it, so tracking it here too would double-count
+                        // the handoff.
+                        if (opened) {
+                            trackTraksWhatsAppHandoff();
+                        }
                     }
                 }
 

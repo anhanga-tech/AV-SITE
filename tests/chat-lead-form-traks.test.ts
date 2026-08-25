@@ -762,6 +762,8 @@ test('campos do ChatLeadForm ficam desabilitados durante o envio (edição não 
 
 test('desmontar o ChatLeadForm durante o envio pendente fecha a aba reservada', async () => {
     cleanup();
+    const previousDataLayer = window.dataLayer;
+    window.dataLayer = [];
     let resolveFinalize: ((result: LeadFinalizeResult) => void) | null = null;
     const props: React.ComponentProps<typeof ChatLeadForm> = {
         ...makeProps(),
@@ -822,11 +824,33 @@ test('desmontar o ChatLeadForm durante o envio pendente fecha a aba reservada', 
 
         assert.equal(navigatedTo, null, 'não deve navegar para o WhatsApp depois do componente desmontar');
         assert.equal(closedCount, 1, 'a aba reservada deve ser fechada no unmount, não deixada em branco');
+        // A conversão é real (o CRM confirmou) e deve continuar sendo
+        // reportada mesmo com o componente desmontado — mas o evento de
+        // handoff do WhatsApp não deve disparar para um "sucesso" que
+        // ninguém vai ver nem navegar (não há mais UI para mostrar o link
+        // de fallback).
+        const generateLeadEvents = (window.dataLayer ?? []).filter(
+            (entry) => entry && typeof entry === 'object' && 'event' in entry && entry.event === 'generate_lead',
+        );
+        assert.equal(generateLeadEvents.length, 1, 'generate_lead deve disparar mesmo com o componente desmontado');
+        const submitSuccessEvents = (window.dataLayer ?? []).filter(
+            (entry) => entry && typeof entry === 'object' && 'event' in entry && entry.event === 'submit_success',
+        );
+        assert.equal(submitSuccessEvents.length, 1, 'submit_success deve disparar mesmo com o componente desmontado');
+        const whatsappOpenedEvents = (window.dataLayer ?? []).filter(
+            (entry) => entry && typeof entry === 'object' && 'event' in entry && entry.event === 'whatsapp_opened',
+        );
+        assert.equal(
+            whatsappOpenedEvents.length,
+            0,
+            'whatsapp_opened não deve disparar para um handoff já abandonado pelo unmount',
+        );
     } finally {
         Object.defineProperty(window, 'open', {
             configurable: true,
             value: previousOpen,
         });
+        window.dataLayer = previousDataLayer;
         cleanup();
     }
 });

@@ -356,3 +356,77 @@ test('desmontar o componente que usa useContactForm fecha a aba reservada (ex.: 
         cleanup();
     }
 });
+
+test('desmontar durante um envio de whatsapp que depois é bem-sucedido reporta a conversão mas não whatsapp_opened', async () => {
+    cleanup();
+    const previousFetch = globalThis.fetch;
+    const previousDataLayer = window.dataLayer;
+    window.dataLayer = [];
+    let closedCount = 0;
+    let navigatedTo: string | null = null;
+    const previousOpen = window.open;
+    Object.defineProperty(window, 'open', {
+        configurable: true,
+        value: () => {
+            let closed = false;
+            return {
+                get closed() { return closed; },
+                close() { closed = true; closedCount += 1; },
+                location: { set href(v: string) { navigatedTo = v; } },
+                opener: null,
+            };
+        },
+    });
+    let resolveFetch: ((value: Response) => void) | null = null;
+    globalThis.fetch = (() => new Promise<Response>((resolve) => { resolveFetch = resolve; })) as typeof fetch;
+
+    try {
+        const { getByTestId, unmount } = render(React.createElement(Harness));
+        act(() => {
+            fireEvent.click(getByTestId('fill'));
+        });
+        act(() => {
+            fireEvent.click(getByTestId('submit-whatsapp'));
+        });
+        await Promise.resolve();
+        assert.ok(resolveFetch, 'fetch deve ter sido chamado e estar pendente');
+
+        // Visitor navigates away via SPA routing before the request settles.
+        unmount();
+        assert.equal(closedCount, 1, 'o unmount deve fechar a aba reservada imediatamente');
+
+        // The CRM request eventually resolves successfully anyway — the lead
+        // is real and must still be reported as a conversion, but there is
+        // no one left to hand off to WhatsApp or see a fallback link.
+        await act(async () => {
+            resolveFetch?.(new Response(JSON.stringify({ ok: true, odooLeadId: 'test-1' }), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+            }));
+            await Promise.resolve();
+            await Promise.resolve();
+        });
+
+        assert.equal(navigatedTo, null, 'nunca deve navegar para o WhatsApp de uma submissão abandonada');
+        const submitSuccessEvents = (window.dataLayer ?? []).filter(
+            (entry) => entry && typeof entry === 'object' && 'event' in entry && entry.event === 'submit_success',
+        );
+        assert.equal(submitSuccessEvents.length, 1, 'submit_success deve disparar mesmo com o componente desmontado');
+        const whatsappOpenedEvents = (window.dataLayer ?? []).filter(
+            (entry) => entry && typeof entry === 'object' && 'event' in entry && entry.event === 'whatsapp_opened',
+        );
+        assert.equal(
+            whatsappOpenedEvents.length,
+            0,
+            'whatsapp_opened não deve disparar para um handoff já abandonado pelo unmount',
+        );
+    } finally {
+        globalThis.fetch = previousFetch;
+        Object.defineProperty(window, 'open', {
+            configurable: true,
+            value: previousOpen,
+        });
+        window.dataLayer = previousDataLayer;
+        cleanup();
+    }
+});
