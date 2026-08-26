@@ -4,11 +4,26 @@ export const PLAYWRIGHT_HOST = process.env.PLAYWRIGHT_HOST ?? '127.0.0.1';
 export const PLAYWRIGHT_PORT = Number(process.env.PLAYWRIGHT_PORT ?? '3100');
 export const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? `http://${PLAYWRIGHT_HOST}:${PLAYWRIGHT_PORT}`;
 
-const PRODUCTION_HOSTNAMES = new Set(['anhanga.tur.br', 'www.anhanga.tur.br']);
+const PRODUCTION_HOSTNAMES = new Set([
+  'anhanga.tur.br',
+  'www.anhanga.tur.br',
+  'beto.anhanga.tur.br',
+]);
+const LOCAL_PLAYWRIGHT_HOSTNAMES = new Set([
+  'localhost',
+  '127.0.0.1',
+  '::1',
+  '[::1]',
+  '0.0.0.0',
+]);
+
+function normalizeHostname(hostname: string): string {
+  return hostname.toLowerCase().replace(/\.+$/, '');
+}
 
 export function isProductionPlaywrightBaseUrl(rawUrl: string): boolean {
   try {
-    return PRODUCTION_HOSTNAMES.has(new URL(rawUrl).hostname.toLowerCase());
+    return PRODUCTION_HOSTNAMES.has(normalizeHostname(new URL(rawUrl).hostname));
   } catch {
     return false;
   }
@@ -25,7 +40,14 @@ export function assertSafePlaywrightBaseUrl(rawUrl: string): void {
   if (isProductionPlaywrightBaseUrl(rawUrl)) {
     throw new Error(
       `Refusing to run Playwright tests against production (${parsedUrl.origin}). `
-      + 'Use a local PLAYWRIGHT_BASE_URL or an explicitly isolated preview host.',
+      + 'Use a local PLAYWRIGHT_BASE_URL.',
+    );
+  }
+
+  if (!LOCAL_PLAYWRIGHT_HOSTNAMES.has(normalizeHostname(parsedUrl.hostname))) {
+    throw new Error(
+      `Refusing to run Playwright tests against a non-local base URL (${parsedUrl.origin}). `
+      + 'Tests must use localhost or a loopback address so every browser engine stays isolated from production tracking.',
     );
   }
 }
@@ -77,8 +99,8 @@ export default defineConfig({
       ],
     },
     // Block third-party tracking during tests — prevents test data from polluting production
-    // CRMs and the production GA4 property (generate_lead via GTM/sGTM). Belt-and-suspenders
-    // alongside the localhost gate in index.html's loadGtm.
+    // CRMs and analytics. The base URL guard above also rejects external previews, which keeps
+    // this Chromium resolver defense from being the only protection for Firefox/WebKit.
     launchOptions: {
       args: [
         `--host-resolver-rules=${PLAYWRIGHT_TRACKING_RESOLVER_RULES}`,

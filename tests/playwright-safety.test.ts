@@ -9,7 +9,9 @@ import {
 
 test('identifies both production site hostnames regardless of protocol or port', () => {
   assert.equal(isProductionPlaywrightBaseUrl('https://www.anhanga.tur.br/'), true);
+  assert.equal(isProductionPlaywrightBaseUrl('https://www.anhanga.tur.br./'), true);
   assert.equal(isProductionPlaywrightBaseUrl('http://anhanga.tur.br:4173/'), true);
+  assert.equal(isProductionPlaywrightBaseUrl('https://beto.anhanga.tur.br/'), true);
   assert.equal(isProductionPlaywrightBaseUrl('https://preview.anhanga.tur.br/'), false);
   assert.equal(isProductionPlaywrightBaseUrl('http://127.0.0.1:3100/'), false);
   assert.equal(isProductionPlaywrightBaseUrl('https://www.anhanga.tur.br.example/'), false);
@@ -21,6 +23,11 @@ test('refuses an E2E base URL that targets production', () => {
     /Refusing to run Playwright tests against production/,
   );
   assert.doesNotThrow(() => assertSafePlaywrightBaseUrl('http://127.0.0.1:3100/'));
+  assert.doesNotThrow(() => assertSafePlaywrightBaseUrl('http://[::1]:3100/'));
+  assert.throws(
+    () => assertSafePlaywrightBaseUrl('https://preview.example.test/'),
+    /Refusing to run Playwright tests against a non-local base URL/,
+  );
 });
 
 test('resolver rules block Traks and the configured third-party tracking hosts', () => {
