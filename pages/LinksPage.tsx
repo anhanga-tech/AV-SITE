@@ -112,9 +112,9 @@ const LinksPage: React.FC = () => {
                     <img
                         src={BRAND_LOGO_WHITE_URL}
                         alt="Anhangá Viagens"
-                        width={180}
-                        height={48}
-                        className="h-12 w-auto object-contain"
+                        width={185}
+                        height={96}
+                        className="h-16 w-auto object-contain"
                     />
 
                     <section className="mt-8 w-full" aria-labelledby="links-intent-heading">
@@ -133,7 +133,7 @@ const LinksPage: React.FC = () => {
                                         href={intentLinks.destinos.destination}
                                         data-testid="intent-destinos"
                                         onClick={() => pushLinksPageClick(intentLinks.destinos, intentLinks.destinos.destination)}
-                                        className={`flex min-w-0 min-h-[4.5rem] items-center gap-4 rounded-2xl bg-white/10 px-5 py-4 text-left text-white/90 ring-1 ring-white/20 transition-colors hover:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-anhanga-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-anhanga-dark${soleIntentCardSpanClass}`}
+                                        className={`flex min-w-0 min-h-[4.5rem] items-center gap-4 rounded-2xl bg-white/10 px-5 py-4 text-left text-white/90 ring-1 ring-white/20 transition-colors hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action${soleIntentCardSpanClass}`}
                                     >
                                         <Compass size={24} weight="fill" aria-hidden="true" className="shrink-0" />
                                         <span className="flex min-w-0 flex-col break-words">
@@ -147,7 +147,7 @@ const LinksPage: React.FC = () => {
                                         href={intentLinks.produtos.destination}
                                         data-testid="intent-produtos"
                                         onClick={() => pushLinksPageClick(intentLinks.produtos, intentLinks.produtos.destination)}
-                                        className={`flex min-w-0 min-h-[4.5rem] items-center gap-4 rounded-2xl bg-white/10 px-5 py-4 text-left text-white/90 ring-1 ring-white/20 transition-colors hover:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-anhanga-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-anhanga-dark${soleIntentCardSpanClass}`}
+                                        className={`flex min-w-0 min-h-[4.5rem] items-center gap-4 rounded-2xl bg-white/10 px-5 py-4 text-left text-white/90 ring-1 ring-white/20 transition-colors hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action${soleIntentCardSpanClass}`}
                                     >
                                         <ShieldCheck size={24} weight="fill" aria-hidden="true" className="shrink-0" />
                                         <span className="flex min-w-0 flex-col break-words">
@@ -196,7 +196,7 @@ const LinksPage: React.FC = () => {
                             ) : null}
                             {visibleMoreDestinationLinks.length > 0 ? (
                                 <details className="mt-3 rounded-2xl bg-white/5 ring-1 ring-white/15">
-                                    <summary className="cursor-pointer px-5 py-4 text-sm font-semibold text-white/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-anhanga-yellow">
+                                    <summary className="cursor-pointer px-5 py-4 text-sm font-semibold text-white/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
                                         Ver mais páginas de viagem
                                     </summary>
                                     <nav aria-label="Mais páginas de viagem" className="flex flex-col gap-3 px-3 pb-3">
