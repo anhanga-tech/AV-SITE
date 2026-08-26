@@ -73,14 +73,14 @@ export const linksPageConfig: LinksPageConfig = {
         { id: 'site', label: 'Site oficial', type: 'internal', href: '/', icon: 'Globe', visible: true },
         { id: 'seguro-viagem', label: 'Calcular meu seguro viagem', sublabel: 'Cotação online com nosso parceiro', type: 'external', href: 'https://go.nuvembr.com/anhanga_seguroviagem', icon: 'ShieldCheck', visible: true },
         { id: 'chip-esim', label: 'Comprar chip / eSIM internacional', sublabel: 'Compra e atendimento pelo WhatsApp', type: 'whatsapp', whatsappMessage: 'Olá!{origem} Quero comprar um chip / eSIM internacional para minha viagem.', icon: 'SimCard', visible: true },
-        { id: 'orlando', label: 'Orlando', type: 'internal', href: '/orlando', visible: true },
-        { id: 'beto-carrero', label: 'Beto Carrero', type: 'internal', href: '/beto-carrero', visible: true },
-        { id: 'melhor-idade', label: 'Viagens Melhor Idade', type: 'internal', href: '/melhor-idade', visible: true },
+        { id: 'orlando', label: 'Orlando', sublabel: 'Parques, magia e roteiro sob medida', type: 'internal', href: '/orlando', icon: 'Sparkle', visible: true },
+        { id: 'beto-carrero', label: 'Beto Carrero', sublabel: 'Adrenalina e diversão em família', type: 'internal', href: '/beto-carrero', icon: 'Confetti', visible: true },
+        { id: 'melhor-idade', label: 'Viagens Melhor Idade', sublabel: 'Viagens pensadas para o seu ritmo', type: 'internal', href: '/melhor-idade', icon: 'SunHorizon', visible: true },
         { id: 'consultoria-de-viagem', label: 'Consultoria de Viagem', type: 'internal', href: '/consultoria-de-viagem', visible: true },
         { id: 'corporativo', label: 'Viagens Corporativas', type: 'internal', href: '/corporativo', visible: true },
         // `id` preservado apesar da URL ter mudado para /cruzeiros: ele vira data-testid e vai
         // ao dataLayer via pushLinksPageClick — renomear quebraria a série histórica de cliques.
-        { id: 'curadoria-cruzeiros-brasil', label: 'Cruzeiros pelo Brasil', type: 'internal', href: '/cruzeiros', visible: true },
+        { id: 'curadoria-cruzeiros-brasil', label: 'Cruzeiros pelo Brasil', sublabel: 'Navegue pelo litoral com curadoria', type: 'internal', href: '/cruzeiros', icon: 'Anchor', visible: true },
         { id: 'lollapalooza', label: 'Lollapalooza', type: 'internal', href: '/lollapalooza', visible: true },
     ],
 };
