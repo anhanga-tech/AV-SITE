@@ -59,8 +59,14 @@ function tierClasses(item: LinkItem): string {
 // um `href` ausente em produção ainda cai num link seguro (`#`/`/`) em vez de derrubar a página
 // inteira por um item — mas em dev o erro deve aparecer no console assim que o item é editado,
 // não só quando os testes de `tests/links-page-data.test.ts` rodarem.
+//
+// `import.meta.env` precisa do guard `typeof import.meta !== 'undefined'` (mesmo padrão de
+// `data/mediaConfig.ts:39-41`): sob `tsx --test` (runner de `pnpm test:regression`), `import.meta`
+// existe mas `.env` é `undefined` — acessar `.DEV` direto lança TypeError em qualquer teste que
+// monte LinkButton com um item sem href.
 function warnMissingHref(item: LinkItem, fallback: string): void {
-    if (import.meta.env.DEV) {
+    const isDev = typeof import.meta !== 'undefined' && import.meta.env?.DEV;
+    if (isDev) {
         console.error(`[LinkButton] item "${item.id}" (type "${item.type}") está sem href — caindo para "${fallback}". Configure href em data/linksPage.ts.`);
     }
 }
