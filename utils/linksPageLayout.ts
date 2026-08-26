@@ -1,0 +1,57 @@
+import type { LinkItem } from '../data/linksPage';
+
+export const FEATURED_DESTINATION_IDS = ['orlando', 'beto-carrero', 'curadoria-cruzeiros-brasil', 'melhor-idade'] as const;
+export const MORE_DESTINATION_IDS = ['consultoria-de-viagem', 'corporativo', 'lollapalooza'] as const;
+export const PRODUCT_LINK_IDS = ['seguro-viagem', 'chip-esim'] as const;
+
+export interface LinksPageVisibility {
+    hasPrimaryDestinations: boolean;
+    hasVisibleDestinations: boolean;
+    hasVisibleContact: boolean;
+    hasVisibleOtherLinks: boolean;
+}
+
+// Links sem uma categoria explícita continuam visíveis no fallback de "Outros acessos".
+// Isso preserva o contrato editável de data/linksPage.ts: uma nova entrada visible: true não
+// desaparece silenciosamente só porque ainda não foi promovida para uma seção de destaque.
+const EXPLICITLY_RENDERED_LINK_IDS = new Set<string>([
+    'whatsapp',
+    'orcamento',
+    'quiz',
+    'site',
+    ...PRODUCT_LINK_IDS,
+    ...FEATURED_DESTINATION_IDS,
+    ...MORE_DESTINATION_IDS,
+]);
+
+export function getVisibleLinksForIds(links: readonly LinkItem[], ids: readonly string[]): LinkItem[] {
+    const visibleLinksById = new Map<string, LinkItem>();
+    for (const link of links) {
+        if (link.visible) visibleLinksById.set(link.id, link);
+    }
+
+    return ids.flatMap((id) => {
+        const link = visibleLinksById.get(id);
+        return link ? [link] : [];
+    });
+}
+
+export function getLinksPageVisibility(links: readonly LinkItem[]): LinksPageVisibility {
+    const visibleLinks = links.filter((link) => link.visible);
+    const visibleLinkIds = new Set(visibleLinks.map((link) => link.id));
+    const hasPrimaryDestinations =
+        visibleLinkIds.has('quiz') || getVisibleLinksForIds(visibleLinks, FEATURED_DESTINATION_IDS).length > 0;
+    const hasVisibleDestinations =
+        hasPrimaryDestinations || getVisibleLinksForIds(visibleLinks, MORE_DESTINATION_IDS).length > 0;
+
+    return {
+        hasPrimaryDestinations,
+        hasVisibleDestinations,
+        hasVisibleContact: visibleLinkIds.has('orcamento'),
+        hasVisibleOtherLinks: visibleLinkIds.has('site') || getUnassignedVisibleLinks(visibleLinks).length > 0,
+    };
+}
+
+export function getUnassignedVisibleLinks(links: readonly LinkItem[]): LinkItem[] {
+    return links.filter((link) => link.visible && !EXPLICITLY_RENDERED_LINK_IDS.has(link.id));
+}

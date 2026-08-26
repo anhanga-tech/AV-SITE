@@ -118,7 +118,7 @@ export function pushLinksPageView(): void {
 }
 
 /** Evento GA4 por clique de botão. */
-export function pushLinksPageClick(item: LinkItem, destination: string): void {
+export function pushLinksPageClick(item: Pick<LinkItem, 'id' | 'type'>, destination: string): void {
     if (typeof window === 'undefined') return;
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({

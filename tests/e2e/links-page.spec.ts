@@ -19,6 +19,39 @@ test('renderiza a página /links com logo, botões e selos', async ({ page }) =>
     await expect(page.getByTestId('links-banner')).toHaveCount(0);
 });
 
+test('orienta o visitante entre contato, destinos e produtos comerciais', async ({ page }) => {
+    await page.goto('/links');
+
+    await expect(page.getByRole('heading', { name: 'Qual é o próximo passo da sua viagem?' })).toBeVisible();
+    await expect(page.getByTestId('link-whatsapp')).toHaveAttribute('href', /wa\.me/);
+    await expect(page.getByTestId('intent-destinos')).toHaveAttribute('href', '#destinos');
+    await expect(page.getByTestId('intent-produtos')).toHaveAttribute('href', '#preparar');
+    await expect(page.getByRole('heading', { name: 'Conheça destinos e ideias' })).toBeVisible();
+    await expect(page.getByTestId('link-seguro-viagem')).toContainText('Calcular meu seguro viagem');
+    await expect(page.getByTestId('link-chip-esim')).toContainText('Comprar chip / eSIM internacional');
+});
+
+test('atalhos de intenção registram o clique no dataLayer', async ({ page }) => {
+    await page.goto('/links');
+
+    await page.getByTestId('intent-destinos').click();
+    await page.getByTestId('intent-produtos').click();
+    await page.waitForFunction(() => {
+        const events = (window as unknown as { dataLayer?: Array<{ event?: string; label?: string }> }).dataLayer ?? [];
+        return events.filter((event) => event.event === 'links_page_click').length >= 2;
+    });
+
+    const intentClicks = await page.evaluate(() =>
+        (window as unknown as { dataLayer: Array<Record<string, string>> }).dataLayer.filter(
+            (event) => event.event === 'links_page_click' && event.label?.startsWith('intent-'),
+        ),
+    );
+    expect(intentClicks).toEqual(expect.arrayContaining([
+        { event: 'links_page_click', label: 'intent-destinos', link_type: 'internal', destination: '#destinos' },
+        { event: 'links_page_click', label: 'intent-produtos', link_type: 'internal', destination: '#preparar' },
+    ]));
+});
+
 test('links_page_view é empurrado no dataLayer no load', async ({ page }) => {
     await page.goto('/links');
     await page.waitForFunction(() =>
@@ -104,8 +137,12 @@ test('nenhum rótulo é cortado com zoom de texto a 200%', async ({ page }) => {
     await page.goto('/links');
     // Zoom só de texto: dobra o rem, que é o que os tamanhos da página usam.
     await page.addStyleTag({ content: 'html { font-size: 200% !important; }' });
+    await expect(page.getByTestId('intent-destinos')).toBeVisible();
     await expect(page.getByTestId('link-chip-esim')).toBeVisible();
     expect(await rotulosCortados(page)).toEqual([]);
+
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
 });
 
 // O banner de cookies é fixo no rodapé (z-10000). Sem reservar a altura dele, ele cobria

@@ -1,10 +1,19 @@
 import React, { useEffect, useSyncExternalStore } from 'react';
 import { Link } from 'react-router-dom';
+import { Compass, ShieldCheck } from '@phosphor-icons/react';
 import { Seo } from '../components/Seo';
 import { BRAND_LOGO_WHITE_URL } from '../lib/media-assets';
 import { linksPageConfig } from '../data/linksPage';
-import { withTrackingParams, pushLinksPageView } from '../utils/linksTracking';
-import LinkButton, { isPrimaryLink } from '../components/links/LinkButton';
+import { withTrackingParams, pushLinksPageView, pushLinksPageClick } from '../utils/linksTracking';
+import {
+    FEATURED_DESTINATION_IDS,
+    MORE_DESTINATION_IDS,
+    PRODUCT_LINK_IDS,
+    getUnassignedVisibleLinks,
+    getLinksPageVisibility,
+    getVisibleLinksForIds,
+} from '../utils/linksPageLayout';
+import LinkButton from '../components/links/LinkButton';
 import TrustSeals from '../components/links/TrustSeals';
 
 // A query da URL é estado externo ao React. /links é prerenderizada (lib/prerender-routes.js),
@@ -23,6 +32,10 @@ const subscribeToLocation = (onStoreChange: () => void) => {
 };
 const getSearchSnapshot = (): string | null => window.location.search;
 const getServerSearchSnapshot = (): string | null => null;
+const intentLinks = {
+    destinos: { id: 'intent-destinos', type: 'internal' as const, destination: '#destinos' },
+    produtos: { id: 'intent-produtos', type: 'internal' as const, destination: '#preparar' },
+};
 
 const LinksPage: React.FC = () => {
     const search = useSyncExternalStore(subscribeToLocation, getSearchSnapshot, getServerSearchSnapshot);
@@ -33,6 +46,22 @@ const LinksPage: React.FC = () => {
 
     const { banner, links } = linksPageConfig;
     const visibleLinks = links.filter((link) => link.visible);
+    const visibleFeaturedDestinationLinks = getVisibleLinksForIds(visibleLinks, FEATURED_DESTINATION_IDS);
+    const visibleMoreDestinationLinks = getVisibleLinksForIds(visibleLinks, MORE_DESTINATION_IDS);
+    const visibleProductLinks = getVisibleLinksForIds(visibleLinks, PRODUCT_LINK_IDS);
+    const unassignedVisibleLinks = getUnassignedVisibleLinks(visibleLinks);
+    const linkById = new Map(visibleLinks.map((link) => [link.id, link]));
+    const { hasPrimaryDestinations, hasVisibleDestinations, hasVisibleContact, hasVisibleOtherLinks } = getLinksPageVisibility(links);
+    const productIntentDescription = visibleProductLinks.length === PRODUCT_LINK_IDS.length
+        ? 'Seguro e chip / eSIM'
+        : visibleProductLinks.map((link) => link.label).join(' e ');
+    const productSectionDescription = visibleProductLinks.length === 1
+        ? 'Resolva um detalhe importante antes de embarcar.'
+        : 'Resolva dois detalhes importantes antes de embarcar.';
+    const renderLink = (id: string, className?: string) => {
+        const item = linkById.get(id);
+        return item ? <LinkButton key={id} item={item} search={search} className={className} /> : null;
+    };
 
     return (
         <>
@@ -50,8 +79,7 @@ const LinksPage: React.FC = () => {
                 O padding inferior reserva a altura do banner de cookies (--cookie-banner-h,
                 exposto por CookieConsentBanner) para que ele não cubra os selos de confiança. */}
             <main className="min-h-screen bg-anhanga-dark px-[20px] pt-10 pb-[calc(2.5rem+var(--cookie-banner-h,0px))] font-sans">
-                <div className="mx-auto flex w-full max-w-md flex-col items-center">
-                    <h1 className="sr-only">Anhangá Viagens — links</h1>
+                <div className="mx-auto flex w-full max-w-lg flex-col items-center">
                     <img
                         src={BRAND_LOGO_WHITE_URL}
                         alt="Anhangá Viagens"
@@ -59,6 +87,49 @@ const LinksPage: React.FC = () => {
                         height={48}
                         className="h-12 w-auto object-contain"
                     />
+
+                    <section className="mt-8 w-full" aria-labelledby="links-intent-heading">
+                        <h1 id="links-intent-heading" className="text-center text-2xl font-black leading-tight text-white">
+                            Qual é o próximo passo da sua viagem?
+                        </h1>
+                        <p className="mx-auto mt-3 max-w-[34ch] text-center text-sm leading-6 text-white/75">
+                            Escolha por onde começar. A gente pode conversar agora ou ajudar você a pesquisar primeiro.
+                        </p>
+
+                        <div className="mt-6 flex w-full flex-col gap-3">
+                            {renderLink('whatsapp')}
+                            <div className="grid gap-3 sm:grid-cols-2">
+                                {hasVisibleDestinations ? (
+                                    <a
+                                        href={intentLinks.destinos.destination}
+                                        data-testid="intent-destinos"
+                                        onClick={() => pushLinksPageClick(intentLinks.destinos, intentLinks.destinos.destination)}
+                                        className="flex min-w-0 min-h-[4.5rem] items-center gap-4 rounded-2xl bg-white/10 px-5 py-4 text-left text-white ring-1 ring-white/20 transition-colors hover:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-anhanga-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-anhanga-dark"
+                                    >
+                                        <Compass size={24} weight="fill" aria-hidden="true" className="shrink-0" />
+                                        <span className="flex min-w-0 flex-col break-words">
+                                            <span className="font-bold">Ainda estou escolhendo</span>
+                                            <span className="mt-1 text-xs text-white/75">Conhecer destinos e ideias</span>
+                                        </span>
+                                    </a>
+                                ) : null}
+                                {visibleProductLinks.length > 0 ? (
+                                    <a
+                                        href={intentLinks.produtos.destination}
+                                        data-testid="intent-produtos"
+                                        onClick={() => pushLinksPageClick(intentLinks.produtos, intentLinks.produtos.destination)}
+                                        className="flex min-w-0 min-h-[4.5rem] items-center gap-4 rounded-2xl bg-white/10 px-5 py-4 text-left text-white ring-1 ring-white/20 transition-colors hover:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-anhanga-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-anhanga-dark"
+                                    >
+                                        <ShieldCheck size={24} weight="fill" aria-hidden="true" className="shrink-0" />
+                                        <span className="flex min-w-0 flex-col break-words">
+                                            <span className="font-bold">Quero preparar a viagem</span>
+                                            <span className="mt-1 text-xs text-white/75">{productIntentDescription}</span>
+                                        </span>
+                                    </a>
+                                ) : null}
+                            </div>
+                        </div>
+                    </section>
 
                     {banner.visible ? (
                         <Link
@@ -74,17 +145,64 @@ const LinksPage: React.FC = () => {
                         </Link>
                     ) : null}
 
-                    <nav aria-label="Links Anhangá Viagens" className="mt-8 flex w-full flex-col gap-3">
-                        {visibleLinks.map((link, index) => {
-                            // Quebra de ritmo na fronteira ações → destinos: um respiro a mais
-                            // marca a mudança de tier sem precisar de divisor ou rótulo.
-                            const previous = index > 0 ? visibleLinks[index - 1] : undefined;
-                            const startsDestinations = Boolean(previous && isPrimaryLink(previous) && !isPrimaryLink(link));
-                            return (
-                                <LinkButton key={link.id} item={link} search={search} className={startsDestinations ? 'mt-3' : undefined} />
-                            );
-                        })}
-                    </nav>
+                    {hasVisibleContact ? (
+                        <section id="contato" className="mt-10 w-full scroll-mt-6" aria-labelledby="contact-heading">
+                            <h2 id="contact-heading" className="text-lg font-black text-white">Já tem destino e datas?</h2>
+                            <p className="mt-1 text-sm leading-6 text-white/70">Envie os detalhes e receba um orçamento para a sua viagem.</p>
+                            <div className="mt-4">{renderLink('orcamento')}</div>
+                        </section>
+                    ) : null}
+
+                    {hasVisibleDestinations ? (
+                        <section id="destinos" className="mt-10 w-full scroll-mt-6" aria-labelledby="destinations-heading">
+                            <h2 id="destinations-heading" className="text-lg font-black text-white">Conheça destinos e ideias</h2>
+                            <p className="mt-1 text-sm leading-6 text-white/70">Veja algumas possibilidades antes de decidir como quer viajar.</p>
+                            {hasPrimaryDestinations ? (
+                                <nav aria-label="Destinos e ideias de viagem" className="mt-4 flex w-full flex-col gap-3">
+                                    {renderLink('quiz')}
+                                    {visibleFeaturedDestinationLinks.map((item) => (
+                                        <LinkButton key={item.id} item={item} search={search} />
+                                    ))}
+                                </nav>
+                            ) : null}
+                            {visibleMoreDestinationLinks.length > 0 ? (
+                                <details className="mt-3 rounded-2xl bg-white/5 ring-1 ring-white/15">
+                                    <summary className="cursor-pointer px-5 py-4 text-sm font-semibold text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-anhanga-yellow">
+                                        Ver mais páginas de viagem
+                                    </summary>
+                                    <nav aria-label="Mais páginas de viagem" className="flex flex-col gap-3 px-3 pb-3">
+                                        {visibleMoreDestinationLinks.map((item) => (
+                                            <LinkButton key={item.id} item={item} search={search} />
+                                        ))}
+                                    </nav>
+                                </details>
+                            ) : null}
+                        </section>
+                    ) : null}
+
+                    {visibleProductLinks.length > 0 ? (
+                        <section id="preparar" className="mt-10 w-full scroll-mt-6" aria-labelledby="prepare-heading">
+                            <h2 id="prepare-heading" className="text-lg font-black text-white">Prepare sua viagem</h2>
+                            <p className="mt-1 text-sm leading-6 text-white/70">{productSectionDescription}</p>
+                            <nav aria-label="Produtos para preparar a viagem" className="mt-4 flex w-full flex-col gap-3">
+                                {visibleProductLinks.map((item) => (
+                                    <LinkButton key={item.id} item={item} search={search} />
+                                ))}
+                            </nav>
+                        </section>
+                    ) : null}
+
+                    {hasVisibleOtherLinks ? (
+                        <section className="mt-10 w-full" aria-labelledby="other-links-heading">
+                            <h2 id="other-links-heading" className="text-lg font-black text-white">Outros acessos</h2>
+                            <nav aria-label="Outros acessos" className="mt-4 flex flex-col gap-3">
+                                {renderLink('site')}
+                                {unassignedVisibleLinks.map((item) => (
+                                    <LinkButton key={item.id} item={item} search={search} />
+                                ))}
+                            </nav>
+                        </section>
+                    ) : null}
 
                     <TrustSeals />
                 </div>
