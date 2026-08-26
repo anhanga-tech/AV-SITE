@@ -171,6 +171,15 @@ test('no máximo um link amarelo visível (Regra do Âmbar)', () => {
     assert.ok(destacados.length <= 1, `${destacados.length} links com highlight: ${destacados.map((l) => l.id).join(', ')}`);
 });
 
+// LinkButton reserva o tier hard-shadow (`highlight`/`primary`) à ação de maior intenção —
+// PRODUCT.md: "peso físico só onde se age... reservados aos pontos de ação". Espalhar esse tier
+// pela pilha inteira (o que `isPrimaryLink` fazia antes, usando ícone/sublabel como proxy) apaga
+// o sinal de qual ação é dominante. Ver crítica de /links de 2026-08-26.
+test('poucos links usam o tier de peso físico (highlight + primary)', () => {
+    const pesados = linksPageConfig.links.filter((l) => l.visible && (l.highlight || l.primary));
+    assert.ok(pesados.length <= 2, `${pesados.length} links com peso físico: ${pesados.map((l) => l.id).join(', ')}`);
+});
+
 test('banner e link destacado não coexistem (Regra do Âmbar)', () => {
     const temLinkDestacado = linksPageConfig.links.some((l) => l.visible && l.highlight);
     assert.ok(
