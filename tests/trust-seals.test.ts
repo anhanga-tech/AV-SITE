@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { formatReviewCountLabel } from '../components/links/TrustSeals.tsx';
+import { formatReviewCountLabel } from '../components/links/reviewFormatting.ts';
 
 test('formatReviewCountLabel omite a contagem quando totalReviews é 0', () => {
     assert.equal(formatReviewCountLabel(0), null);
