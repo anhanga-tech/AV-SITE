@@ -5,14 +5,19 @@ import type { GoogleReviewsData } from '../../types/reviews';
 const CADASTUR = '37.036.732/0001-41';
 const googleReviews = googleReviewsRaw as GoogleReviewsData;
 
+// Extraída para ser testável em isolamento sem mockar o import estático de
+// `data/googleReviews.json` — o repo evita `node:test`'s `mock.module` porque exigiria a flag
+// `--experimental-test-module-mocks` em todo `test:regression` (ver tests/orlando-imagens.test.ts).
+// Sem contagem quando `totalReviews` é 0/ausente: "Nota 5.0 · 0 avaliações" soa pior que omitir
+// o número, e o dado já nasce assim quando o fetch não encontrou avaliações públicas.
+export function formatReviewCountLabel(totalReviews: number): string | null {
+    if (totalReviews <= 0) return null;
+    return `${totalReviews} avaliaç${totalReviews === 1 ? 'ão' : 'ões'}`;
+}
+
 export const TrustSeals: React.FC = () => {
     const rating = googleReviews.averageRating ? googleReviews.averageRating.toFixed(1) : '5.0';
-    // Sem contagem quando `totalReviews` é 0/ausente: "Nota 5.0 · 0 avaliações" soa pior que
-    // omitir o número, e o dado já nasce assim quando o fetch não encontrou avaliações públicas.
-    const totalReviews = googleReviews.totalReviews ?? 0;
-    const reviewCountLabel = totalReviews > 0
-        ? `${totalReviews} avaliaç${totalReviews === 1 ? 'ão' : 'ões'}`
-        : null;
+    const reviewCountLabel = formatReviewCountLabel(googleReviews.totalReviews ?? 0);
 
     return (
         // `text-white/90` e não branco pleno: a Regra do Branco Rebaixado do DESIGN.md vale em
