@@ -1,5 +1,11 @@
 # Product
 
+<!-- impeccable:product-schema 1 -->
+
+## Platform
+
+web
+
 ## Register
 
 brand
@@ -18,6 +24,20 @@ O trabalho a ser feito: sair da incerteza ("será que vale? em quem confiar?") e
 A Anhangá Viagens é uma agência boutique brasileira onde **cada roteiro nasce de uma conversa**. O site é a primeira impressão dessa promessa: vitrine de destinos, blog de turismo, landing pages de campanha e um chatbot com IA que qualifica e encaminha leads para atendimento humano.
 
 Existe para transformar tráfego frio em conversa quente — provando, pelo próprio design, que do outro lado há gente que conhece os clientes pelo nome e seleciona com critério. Sucesso é o visitante sentir "essa agência me entende" antes de falar com qualquer pessoa, e converter em lead qualificado (chatbot, formulário, WhatsApp) sem fricção corporativa.
+
+## Positioning
+
+A curadoria por conversa é o que a Anhangá promete e uma OTA de comparação de preço não consegue copiar de verdade: cada lead passa por qualificação BANT (Necessidade, Autoridade, Orçamento, Prazo) num chatbot com IA que faz apenas uma pergunta por vez e decide entre gerar um link de orçamento ou encaminhar para atendimento humano — nunca uma grade de preços genérica. É a mecânica de curadoria (conversa → qualificação → roteiro sob medida), não apenas o discurso de marca, que separa a Anhangá do catálogo transacional descrito nas anti-referências.
+
+## Capabilities and Constraints
+
+- Touchpoints confirmados que alimentam o mesmo CRM (Odoo): chatbot de qualificação (Gemini), formulário de contato rápido, quiz de perfil do viajante, lista de espera de eventos, e pesquisa NPS pós-viagem.
+- O chatbot impõe uma pergunta por resposta e faz handoff para atendimento humano em reservas com menos de 30 dias, em vez de gerar link de orçamento automaticamente — reservas de última hora não seguem o fluxo self-service.
+- Blog editorial com publicação agendada (posts com data futura ficam ocultos até a data programada); conteúdo editável via CMS (Decap) por pessoas não técnicas.
+- Landing pages de campanha (ex.: Beto Carrero, Lollapalooza, Orlando, Melhor Idade, Corporativo, Cruzeiros) usam um layout dedicado, sem cabeçalho/rodapé/chatbot do site principal — foco total no CTA do evento.
+- Todo CTA de WhatsApp carrega os parâmetros de rastreamento de campanha (UTM e click IDs) coletados na sessão.
+- Restrição confirmada: conformidade com a LGPD no opt-in de marketing; o chatbot recusa qualificar leads de determinadas geografias bloqueadas.
+- Constraint em aberto: hoje não há coleta nem exibição de depoimentos/avaliações reais de clientes no site (ver Evidence on Hand).
 
 ## Brand Personality
 
@@ -39,6 +59,10 @@ A Anhangá explicitamente **não** deve parecer:
 - **Luxo frio e impessoal** — resort 5 estrelas sem alma (dourado, serif, distância). A Anhangá é boutique e refinada, mas o calor da conversa vem antes do prestígio.
 
 Anti-padrões já codificados no DESIGN.md: formulário corporativo frio, cinza neutro sem tint, fonte do sistema, espaçamento mecânico uniforme, gradient text, side-stripe borders, cards idênticos em grade repetida.
+
+## Evidence on Hand
+
+Não há depoimentos, estudos de caso, prêmios ou menções de imprensa reais documentados até o momento. Trabalhos futuros de design não devem inventar avaliações de clientes, números de atendimentos, selos ou prêmios fictícios — qualquer prova social deve esperar por evidência real fornecida pelo negócio.
 
 ## Design Principles
 
