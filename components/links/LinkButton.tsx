@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getWhatsAppLink } from '../../utils/whatsapp';
 import { withTrackingParams, applyOriginToMessage, pushLinksPageClick } from '../../utils/linksTracking';
@@ -69,6 +69,15 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className:
     const className = `${baseClasses} ${tierClasses(item)}${extraClassName ? ` ${extraClassName}` : ''}`;
     const IconComponent = item.icon ? ICON_MAP[item.icon] : undefined;
 
+    // Efeito, não chamada direta no corpo do render: `console.error` é efeito colateral, e
+    // chamá-lo durante o render viola a pureza que docs/standards/code-style.md exige — e
+    // duplica o aviso sob `React.StrictMode` (index.tsx usa StrictMode, que invoca o corpo do
+    // componente duas vezes em dev). Ver review do claude[bot] na PR #1519.
+    useEffect(() => {
+        if (item.type === 'external' && !item.href) warnMissingHref(item, '#');
+        if (item.type === 'internal' && !item.href) warnMissingHref(item, '/');
+    }, [item]);
+
     const content = (
         <>
             <span className="flex w-[24px] shrink-0 items-center justify-center" aria-hidden="true">
@@ -97,7 +106,6 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className:
     }
 
     if (item.type === 'external') {
-        if (!item.href) warnMissingHref(item, '#');
         const href = item.href ?? '#';
         return (
             <a href={href} target="_blank" rel="noopener noreferrer" className={className}
@@ -107,7 +115,6 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className:
         );
     }
 
-    if (!item.href) warnMissingHref(item, '/');
     const to = withTrackingParams(item.href ?? '/', search ?? '');
     return (
         <Link to={to} className={className} data-testid={`link-${item.id}`}
