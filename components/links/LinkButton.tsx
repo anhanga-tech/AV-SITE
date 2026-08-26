@@ -29,7 +29,7 @@ interface LinkButtonProps {
 // fica parado e o texto cresce para dentro do espaço. Os valores são idênticos aos de
 // `px-5`/`gap-4`/`w-6` no zoom padrão — e px é a unidade que o DESIGN.md usa em spacing.
 const baseClasses =
-    'flex w-full items-center gap-[16px] rounded-2xl px-[20px] text-left font-semibold transition-[transform,box-shadow] duration-150 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-anhanga-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-anhanga-dark';
+    'flex w-full items-center gap-[16px] rounded-2xl px-[20px] text-left font-semibold transition-[transform,box-shadow] duration-150 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action';
 
 // Press-down físico (assinatura "O Diário de Bordo"): rest → hover → active, como um carimbo.
 // Reservado à ação de maior intenção (WhatsApp + orçamento) — PRODUCT.md: "peso físico só onde
@@ -53,6 +53,16 @@ function tierClasses(item: LinkItem): string {
         return `min-h-[4.5rem] py-4 text-base bg-white text-anhanga-darkBlue ${pressPrimary}`;
     }
     return `min-h-[3.25rem] py-3 text-base bg-white/90 text-anhanga-darkBlue ${pressQuiet}`;
+}
+
+// `data/linksPage.ts` é ⚙️ EDITÁVEL para quem não é engenheiro (comentário no próprio arquivo);
+// um `href` ausente em produção ainda cai num link seguro (`#`/`/`) em vez de derrubar a página
+// inteira por um item — mas em dev o erro deve aparecer no console assim que o item é editado,
+// não só quando os testes de `tests/links-page-data.test.ts` rodarem.
+function warnMissingHref(item: LinkItem, fallback: string): void {
+    if (import.meta.env.DEV) {
+        console.error(`[LinkButton] item "${item.id}" (type "${item.type}") está sem href — caindo para "${fallback}". Configure href em data/linksPage.ts.`);
+    }
 }
 
 export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className: extraClassName }) => {
@@ -87,6 +97,7 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className:
     }
 
     if (item.type === 'external') {
+        if (!item.href) warnMissingHref(item, '#');
         const href = item.href ?? '#';
         return (
             <a href={href} target="_blank" rel="noopener noreferrer" className={className}
@@ -96,6 +107,7 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className:
         );
     }
 
+    if (!item.href) warnMissingHref(item, '/');
     const to = withTrackingParams(item.href ?? '/', search ?? '');
     return (
         <Link to={to} className={className} data-testid={`link-${item.id}`}
