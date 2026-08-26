@@ -5,7 +5,13 @@ import { Seo } from '../components/Seo';
 import { BRAND_LOGO_WHITE_URL } from '../lib/media-assets';
 import { linksPageConfig } from '../data/linksPage';
 import { withTrackingParams, pushLinksPageView, pushLinksPageClick } from '../utils/linksTracking';
-import { FEATURED_DESTINATION_IDS, MORE_DESTINATION_IDS, getUnassignedVisibleLinks } from '../utils/linksPageLayout';
+import {
+    FEATURED_DESTINATION_IDS,
+    MORE_DESTINATION_IDS,
+    PRODUCT_LINK_IDS,
+    getUnassignedVisibleLinks,
+    getVisibleLinksForIds,
+} from '../utils/linksPageLayout';
 import LinkButton from '../components/links/LinkButton';
 import TrustSeals from '../components/links/TrustSeals';
 
@@ -39,6 +45,7 @@ const LinksPage: React.FC = () => {
 
     const { banner, links } = linksPageConfig;
     const visibleLinks = links.filter((link) => link.visible);
+    const visibleProductLinks = getVisibleLinksForIds(visibleLinks, PRODUCT_LINK_IDS);
     const unassignedVisibleLinks = getUnassignedVisibleLinks(visibleLinks);
     const linkById = new Map(visibleLinks.map((link) => [link.id, link]));
     const renderLink = (id: string, className?: string) => {
@@ -86,26 +93,28 @@ const LinksPage: React.FC = () => {
                                     href={intentLinks.destinos.destination}
                                     data-testid="intent-destinos"
                                     onClick={() => pushLinksPageClick(intentLinks.destinos, intentLinks.destinos.destination)}
-                                    className="flex min-h-[4.5rem] items-center gap-4 rounded-2xl bg-white/10 px-5 py-4 text-left text-white ring-1 ring-white/20 transition-colors hover:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-anhanga-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-anhanga-dark"
+                                    className="flex min-w-0 min-h-[4.5rem] items-center gap-4 rounded-2xl bg-white/10 px-5 py-4 text-left text-white ring-1 ring-white/20 transition-colors hover:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-anhanga-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-anhanga-dark"
                                 >
-                                    <Compass size={24} weight="fill" aria-hidden="true" />
-                                    <span className="flex flex-col">
+                                    <Compass size={24} weight="fill" aria-hidden="true" className="shrink-0" />
+                                    <span className="flex min-w-0 flex-col break-words">
                                         <span className="font-bold">Ainda estou escolhendo</span>
                                         <span className="mt-1 text-xs text-white/75">Conhecer destinos e ideias</span>
                                     </span>
                                 </a>
-                                <a
-                                    href={intentLinks.produtos.destination}
-                                    data-testid="intent-produtos"
-                                    onClick={() => pushLinksPageClick(intentLinks.produtos, intentLinks.produtos.destination)}
-                                    className="flex min-h-[4.5rem] items-center gap-4 rounded-2xl bg-white/10 px-5 py-4 text-left text-white ring-1 ring-white/20 transition-colors hover:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-anhanga-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-anhanga-dark"
-                                >
-                                    <ShieldCheck size={24} weight="fill" aria-hidden="true" />
-                                    <span className="flex flex-col">
-                                        <span className="font-bold">Quero preparar a viagem</span>
-                                        <span className="mt-1 text-xs text-white/75">Seguro e chip / eSIM</span>
-                                    </span>
-                                </a>
+                                {visibleProductLinks.length > 0 ? (
+                                    <a
+                                        href={intentLinks.produtos.destination}
+                                        data-testid="intent-produtos"
+                                        onClick={() => pushLinksPageClick(intentLinks.produtos, intentLinks.produtos.destination)}
+                                        className="flex min-w-0 min-h-[4.5rem] items-center gap-4 rounded-2xl bg-white/10 px-5 py-4 text-left text-white ring-1 ring-white/20 transition-colors hover:bg-white/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-anhanga-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-anhanga-dark"
+                                    >
+                                        <ShieldCheck size={24} weight="fill" aria-hidden="true" className="shrink-0" />
+                                        <span className="flex min-w-0 flex-col break-words">
+                                            <span className="font-bold">Quero preparar a viagem</span>
+                                            <span className="mt-1 text-xs text-white/75">Seguro e chip / eSIM</span>
+                                        </span>
+                                    </a>
+                                ) : null}
                             </div>
                         </div>
                     </section>
@@ -147,14 +156,17 @@ const LinksPage: React.FC = () => {
                         </details>
                     </section>
 
-                    <section id="preparar" className="mt-10 w-full scroll-mt-6" aria-labelledby="prepare-heading">
-                        <h2 id="prepare-heading" className="text-lg font-black text-white">Prepare sua viagem</h2>
-                        <p className="mt-1 text-sm leading-6 text-white/70">Resolva dois detalhes importantes antes de embarcar.</p>
-                        <nav aria-label="Produtos para preparar a viagem" className="mt-4 flex w-full flex-col gap-3">
-                            {renderLink('seguro-viagem')}
-                            {renderLink('chip-esim')}
-                        </nav>
-                    </section>
+                    {visibleProductLinks.length > 0 ? (
+                        <section id="preparar" className="mt-10 w-full scroll-mt-6" aria-labelledby="prepare-heading">
+                            <h2 id="prepare-heading" className="text-lg font-black text-white">Prepare sua viagem</h2>
+                            <p className="mt-1 text-sm leading-6 text-white/70">Resolva dois detalhes importantes antes de embarcar.</p>
+                            <nav aria-label="Produtos para preparar a viagem" className="mt-4 flex w-full flex-col gap-3">
+                                {visibleProductLinks.map((item) => (
+                                    <LinkButton key={item.id} item={item} search={search} />
+                                ))}
+                            </nav>
+                        </section>
+                    ) : null}
 
                     <section className="mt-10 w-full" aria-labelledby="other-links-heading">
                         <h2 id="other-links-heading" className="text-lg font-black text-white">Outros acessos</h2>

@@ -137,8 +137,12 @@ test('nenhum rótulo é cortado com zoom de texto a 200%', async ({ page }) => {
     await page.goto('/links');
     // Zoom só de texto: dobra o rem, que é o que os tamanhos da página usam.
     await page.addStyleTag({ content: 'html { font-size: 200% !important; }' });
+    await expect(page.getByTestId('intent-destinos')).toBeVisible();
     await expect(page.getByTestId('link-chip-esim')).toBeVisible();
     expect(await rotulosCortados(page)).toEqual([]);
+
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
 });
 
 // O banner de cookies é fixo no rodapé (z-10000). Sem reservar a altura dele, ele cobria
