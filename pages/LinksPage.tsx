@@ -12,6 +12,8 @@ import {
     getUnassignedVisibleLinks,
     getLinksPageVisibility,
     getVisibleLinksForIds,
+    getSoleIntentCardSpanClass,
+    resolveSelectedIntent,
 } from '../utils/linksPageLayout';
 import LinkButton from '../components/links/LinkButton';
 import TrustSeals from '../components/links/TrustSeals';
@@ -50,14 +52,13 @@ const intentLinks = {
     produtos: { id: 'intent-produtos', type: 'internal' as const, destination: '#preparar' },
 };
 
+// Pura (só depende do parâmetro): fica fora do componente para não ser recriada a cada render.
+const sectionHeadingClass = (deemphasized: boolean) =>
+    deemphasized ? 'text-base font-bold text-white/60' : 'text-lg font-black text-white/90';
+
 const LinksPage: React.FC = () => {
     const search = useSyncExternalStore(subscribeToLocation, getSearchSnapshot, getServerSearchSnapshot);
     const hash = useSyncExternalStore(subscribeToHash, getHashSnapshot, getServerHashSnapshot);
-    const selectedIntent = hash === intentLinks.destinos.destination
-        ? 'destinos'
-        : hash === intentLinks.produtos.destination
-            ? 'preparar'
-            : null;
 
     useEffect(() => {
         pushLinksPageView();
@@ -72,14 +73,12 @@ const LinksPage: React.FC = () => {
     const linkById = new Map(visibleLinks.map((link) => [link.id, link]));
     const { hasPrimaryDestinations, hasVisibleDestinations, hasVisibleContact, hasVisibleOtherLinks } = getLinksPageVisibility(links);
     const hasProductIntent = visibleProductLinks.length > 0;
-    // Quando só um card de intenção existe, ele ocupa a linha inteira do grid em vez de deixar
-    // uma coluna vazia — o outro ramo simplesmente não é uma escolha disponível.
-    const soleIntentCardSpanClass = hasVisibleDestinations && hasProductIntent ? '' : ' sm:col-span-2';
+    const soleIntentCardSpanClass = getSoleIntentCardSpanClass(hasVisibleDestinations, hasProductIntent);
     // Depois que a pessoa escolhe uma porta (#destinos ou #preparar), a outra seção continua
-    // visível e a um toque de distância — só perde peso tipográfico, nunca conteúdo. Ver
-    // subscribeToHash acima.
-    const sectionHeadingClass = (deemphasized: boolean) =>
-        deemphasized ? 'text-base font-bold text-white/60' : 'text-lg font-black text-white/90';
+    // visível e a um toque de distância — só perde peso tipográfico, nunca conteúdo. Uma hash
+    // apontando para um ramo que não existe na config atual não conta como escolha real — ver
+    // resolveSelectedIntent.
+    const selectedIntent = resolveSelectedIntent(hash, hasVisibleDestinations, hasProductIntent);
     const destinosSectionClass = `mt-10 w-full scroll-mt-6${selectedIntent === 'preparar' ? ' border-t border-white/10 pt-6' : ''}`;
     const preparoSectionClass = `mt-10 w-full scroll-mt-6${selectedIntent === 'destinos' ? ' border-t border-white/10 pt-6' : ''}`;
     const productIntentDescription = visibleProductLinks.length === PRODUCT_LINK_IDS.length

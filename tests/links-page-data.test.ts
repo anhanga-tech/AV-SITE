@@ -10,6 +10,8 @@ import {
     getLinksPageVisibility,
     getUnassignedVisibleLinks,
     getVisibleLinksForIds,
+    getSoleIntentCardSpanClass,
+    resolveSelectedIntent,
 } from '../utils/linksPageLayout.ts';
 import { getWhatsAppLink, getTrackingDataObject } from '../utils/whatsapp.ts';
 
@@ -100,6 +102,27 @@ test('seções sem links visíveis ficam desativadas', () => {
         hasVisibleContact: false,
         hasVisibleOtherLinks: false,
     });
+});
+
+// Regressão (claude[bot] review, PR #1515): esse branch só roda quando um dos dois ramos de
+// intenção não existe — a config atual de data/linksPage.ts sempre deixa os dois visíveis, então
+// sem este teste direto na função pura ele nunca é exercido.
+test('card de intenção único ocupa a linha inteira do grid', () => {
+    assert.equal(getSoleIntentCardSpanClass(true, true), '');
+    assert.equal(getSoleIntentCardSpanClass(true, false), ' sm:col-span-2');
+    assert.equal(getSoleIntentCardSpanClass(false, true), ' sm:col-span-2');
+    assert.equal(getSoleIntentCardSpanClass(false, false), ' sm:col-span-2');
+});
+
+// Regressão (Codex review, PR #1515): uma hash apontando para um ramo indisponível na config
+// atual (ex.: link antigo para #preparar depois que todos os produtos ficaram ocultos) não pode
+// virar uma "escolha" — não existe seção "não escolhida" para rebaixar quando só uma existe.
+test('hash de um ramo de intenção indisponível não conta como escolha', () => {
+    assert.equal(resolveSelectedIntent('#destinos', true, true), 'destinos');
+    assert.equal(resolveSelectedIntent('#preparar', true, true), 'preparar');
+    assert.equal(resolveSelectedIntent('#preparar', true, false), null, 'ramo de produtos indisponível');
+    assert.equal(resolveSelectedIntent('#destinos', false, true), null, 'ramo de destinos indisponível');
+    assert.equal(resolveSelectedIntent('', true, true), null);
 });
 
 test('mensagens de whatsapp não terminam em espaço', () => {
