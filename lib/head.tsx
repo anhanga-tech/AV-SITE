@@ -128,8 +128,7 @@ export const useHeadTags = (tags: HeadTag[]): null => {
       return undefined;
     }
 
-    const parsedTags: HeadTag[] = JSON.parse(serializedTags);
-    const elements = parsedTags.map(applyHeadTag);
+    const elements = tags.map(applyHeadTag);
 
     return () => {
       for (const element of elements) {
@@ -138,6 +137,7 @@ export const useHeadTags = (tags: HeadTag[]): null => {
         }
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- serializedTags is the content-equality key (tags is a fresh array identity every render, so using it directly here would defeat the whole point of the effect only re-running on real content changes)
   }, [serializedTags]);
 
   return null;
