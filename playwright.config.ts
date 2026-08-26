@@ -1,10 +1,57 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const PLAYWRIGHT_HOST = process.env.PLAYWRIGHT_HOST ?? '127.0.0.1';
-const PLAYWRIGHT_PORT = Number(process.env.PLAYWRIGHT_PORT ?? '3100');
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? `http://${PLAYWRIGHT_HOST}:${PLAYWRIGHT_PORT}`;
+export const PLAYWRIGHT_HOST = process.env.PLAYWRIGHT_HOST ?? '127.0.0.1';
+export const PLAYWRIGHT_PORT = Number(process.env.PLAYWRIGHT_PORT ?? '3100');
+export const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? `http://${PLAYWRIGHT_HOST}:${PLAYWRIGHT_PORT}`;
+
+const PRODUCTION_HOSTNAMES = new Set(['anhanga.tur.br', 'www.anhanga.tur.br']);
+
+export function isProductionPlaywrightBaseUrl(rawUrl: string): boolean {
+  try {
+    return PRODUCTION_HOSTNAMES.has(new URL(rawUrl).hostname.toLowerCase());
+  } catch {
+    return false;
+  }
+}
+
+export function assertSafePlaywrightBaseUrl(rawUrl: string): void {
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(rawUrl);
+  } catch {
+    throw new Error(`PLAYWRIGHT_BASE_URL must be an absolute URL; received ${rawUrl}`);
+  }
+
+  if (isProductionPlaywrightBaseUrl(rawUrl)) {
+    throw new Error(
+      `Refusing to run Playwright tests against production (${parsedUrl.origin}). `
+      + 'Use a local PLAYWRIGHT_BASE_URL or an explicitly isolated preview host.',
+    );
+  }
+}
+
+assertSafePlaywrightBaseUrl(BASE_URL);
+
 const WEB_SERVER_COMMAND = process.env.PLAYWRIGHT_WEB_SERVER_COMMAND
   ?? `VITE_DEV_HOST=${PLAYWRIGHT_HOST} VITE_DEV_PORT=${PLAYWRIGHT_PORT} VITE_DEV_STRICT_PORT=true pnpm dev`;
+
+export const PLAYWRIGHT_TRACKING_RESOLVER_RULES = [
+  'MAP analytics-collect.anhanga.tur.br ~NOTFOUND',
+  'MAP mkt.anhanga.tur.br ~NOTFOUND',
+  'MAP load.sst.anhanga.tur.br ~NOTFOUND',
+  'MAP sst.anhanga.tur.br ~NOTFOUND',
+  'MAP *.googletagmanager.com ~NOTFOUND',
+  'MAP *.google-analytics.com ~NOTFOUND',
+  'MAP *.analytics.google.com ~NOTFOUND',
+  'MAP *.hubspot.com ~NOTFOUND',
+  'MAP *.hsforms.com ~NOTFOUND',
+  'MAP *.hsforms.net ~NOTFOUND',
+  'MAP *.hscollectedforms.net ~NOTFOUND',
+  'MAP *.hs-scripts.com ~NOTFOUND',
+  'MAP *.hs-analytics.net ~NOTFOUND',
+  'MAP *.hs-banner.com ~NOTFOUND',
+  'MAP *.usemessages.com ~NOTFOUND',
+].join(', ');
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -34,20 +81,7 @@ export default defineConfig({
     // alongside the localhost gate in index.html's loadGtm.
     launchOptions: {
       args: [
-        '--host-resolver-rules='
-        + 'MAP mkt.anhanga.tur.br ~NOTFOUND, '
-        + 'MAP load.sst.anhanga.tur.br ~NOTFOUND, '
-        + 'MAP *.googletagmanager.com ~NOTFOUND, '
-        + 'MAP *.google-analytics.com ~NOTFOUND, '
-        + 'MAP *.analytics.google.com ~NOTFOUND, '
-        + 'MAP *.hubspot.com ~NOTFOUND, '
-        + 'MAP *.hsforms.com ~NOTFOUND, '
-        + 'MAP *.hsforms.net ~NOTFOUND, '
-        + 'MAP *.hscollectedforms.net ~NOTFOUND, '
-        + 'MAP *.hs-scripts.com ~NOTFOUND, '
-        + 'MAP *.hs-analytics.net ~NOTFOUND, '
-        + 'MAP *.hs-banner.com ~NOTFOUND, '
-        + 'MAP *.usemessages.com ~NOTFOUND',
+        `--host-resolver-rules=${PLAYWRIGHT_TRACKING_RESOLVER_RULES}`,
       ],
     },
   },
