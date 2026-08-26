@@ -7,6 +7,12 @@ const googleReviews = googleReviewsRaw as GoogleReviewsData;
 
 export const TrustSeals: React.FC = () => {
     const rating = googleReviews.averageRating ? googleReviews.averageRating.toFixed(1) : '5.0';
+    // Sem contagem quando `totalReviews` é 0/ausente: "Nota 5.0 · 0 avaliações" soa pior que
+    // omitir o número, e o dado já nasce assim quando o fetch não encontrou avaliações públicas.
+    const totalReviews = googleReviews.totalReviews ?? 0;
+    const reviewCountLabel = totalReviews > 0
+        ? `${totalReviews} avaliaç${totalReviews === 1 ? 'ão' : 'ões'}`
+        : null;
 
     return (
         // `text-white/90` e não branco pleno: a Regra do Branco Rebaixado do DESIGN.md vale em
@@ -20,7 +26,7 @@ export const TrustSeals: React.FC = () => {
                     Cadastur {CADASTUR}
                 </a>
                 <span aria-hidden="true">·</span>
-                <span>Nota {rating} no Google</span>
+                <span>Nota {rating}{reviewCountLabel ? ` · ${reviewCountLabel}` : ''} no Google</span>
             </div>
             <p className="mt-1 text-white/85">ANHANGA TURISMO LTDA</p>
         </footer>
