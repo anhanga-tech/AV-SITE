@@ -16,6 +16,13 @@ export interface LinkItem {
     visible: boolean;
     /** CTA destacado (ex.: WhatsApp em amarelo) */
     highlight?: boolean;
+    /**
+     * Ação de maior intenção fora do highlight (ex.: orçamento). Ganha o tier branco com
+     * hard-shadow do LinkButton — reservado a poucos itens por design ("peso físico só onde
+     * se age"). Não confundir com ter ícone/sublabel: a maioria dos links tem os dois e
+     * continua no tier quieto (`shadow-float`, sem offset direcional).
+     */
+    primary?: boolean;
 }
 
 export interface BannerConfig {
@@ -61,7 +68,7 @@ export const linksPageConfig: LinksPageConfig = {
         // Par com o quiz logo abaixo: o quiz atende quem ainda está explorando (ToFu — vira só
         // `res.partner`), este atende quem já decidiu. Por isso a mensagem é estruturada aqui e
         // conversacional no botão amarelo: quem clica aqui se declarou pronto a passar os dados.
-        { id: 'orcamento', label: 'Quero um orçamento', sublabel: 'Já tenho destino e datas', type: 'whatsapp', whatsappMessage: 'Olá!{origem} Quero um orçamento.\n\nDestino:\nDatas:\nPessoas:', icon: 'CalendarCheck', visible: true },
+        { id: 'orcamento', label: 'Quero um orçamento', sublabel: 'Já tenho destino e datas', type: 'whatsapp', whatsappMessage: 'Olá!{origem} Quero um orçamento.\n\nDestino:\nDatas:\nPessoas:', icon: 'CalendarCheck', visible: true, primary: true },
         { id: 'quiz', label: 'Planejar minha viagem', sublabel: 'Quiz de perfil de viagem', type: 'internal', href: '/quiz', icon: 'Compass', visible: true },
         { id: 'site', label: 'Site oficial', type: 'internal', href: '/', icon: 'Globe', visible: true },
         { id: 'seguro-viagem', label: 'Calcular meu seguro viagem', sublabel: 'Cotação online com nosso parceiro', type: 'external', href: 'https://go.nuvembr.com/anhanga_seguroviagem', icon: 'ShieldCheck', visible: true },

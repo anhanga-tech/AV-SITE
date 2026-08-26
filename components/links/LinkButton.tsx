@@ -20,12 +20,6 @@ interface LinkButtonProps {
     className?: string;
 }
 
-// Tier de peso: ações (WhatsApp/quiz/utilidades — com ícone ou sublabel) ganham peso físico cheio;
-// destinos "secos" ficam mais leves. Exportado para o LinksPage marcar a quebra de ritmo entre tiers.
-export function isPrimaryLink(item: LinkItem): boolean {
-    return Boolean(item.highlight) || Boolean(item.icon) || Boolean(item.sublabel);
-}
-
 // Slot de ícone com largura fixa garante que todos os rótulos alinhem na mesma coluna,
 // com ou sem ícone — o que evita o efeito "ziguezague" de bordas esquerdas desiguais.
 //
@@ -38,21 +32,27 @@ const baseClasses =
     'flex w-full items-center gap-[16px] rounded-2xl px-[20px] text-left font-semibold transition-[transform,box-shadow] duration-150 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-anhanga-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-anhanga-dark';
 
 // Press-down físico (assinatura "O Diário de Bordo"): rest → hover → active, como um carimbo.
+// Reservado à ação de maior intenção (WhatsApp + orçamento) — PRODUCT.md: "peso físico só onde
+// se age... reservados aos pontos de ação". Um hard-shadow espalhado pela pilha inteira apaga
+// o sinal de que ali existe UMA ação dominante.
 const pressPrimary =
     'shadow-hard hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0_0_rgba(15,23,42,1)] active:translate-x-1 active:translate-y-1 active:shadow-none';
-const pressSecondary =
-    'shadow-[2px_2px_0_0_rgba(15,23,42,0.5)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0_0_rgba(15,23,42,0.5)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none';
+// Links de navegação/produto (destinos, quiz, site, seguro-viagem, chip/eSIM): elevação
+// ambiente (`shadow-float`, o token do DESIGN.md para superfícies em repouso), sem offset
+// direcional — continuam clicáveis, mas sem competir com o carimbo do tier primary.
+const pressQuiet = 'shadow-float transition-shadow duration-150 ease-out hover:shadow-float-lg';
 
-// Dois níveis de peso quebram a monotonia da pilha: ações (WhatsApp/quiz/utilidades) com
-// peso físico cheio; destinos "secos" ficam mais leves e compactos, como uma lista de apoio.
+// Dois níveis de peso quebram a monotonia da pilha: a ação de maior intenção (`highlight` ou
+// `primary`) ganha peso físico cheio; todo o resto — inclusive links com ícone/sublabel — fica
+// no tier quieto. Ícone e sublabel são metadados de conteúdo, não proxy de prioridade.
 function tierClasses(item: LinkItem): string {
     if (item.highlight) {
         return `min-h-[4.5rem] py-4 text-base bg-anhanga-yellow text-anhanga-darkBlue ${pressPrimary}`;
     }
-    if (isPrimaryLink(item)) {
+    if (item.primary) {
         return `min-h-[4.5rem] py-4 text-base bg-white text-anhanga-darkBlue ${pressPrimary}`;
     }
-    return `min-h-[3.25rem] py-3 text-base bg-white/90 text-anhanga-darkBlue ${pressSecondary}`;
+    return `min-h-[3.25rem] py-3 text-base bg-white/90 text-anhanga-darkBlue ${pressQuiet}`;
 }
 
 export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className: extraClassName }) => {

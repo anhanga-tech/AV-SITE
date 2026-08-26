@@ -55,3 +55,24 @@ export function getLinksPageVisibility(links: readonly LinkItem[]): LinksPageVis
 export function getUnassignedVisibleLinks(links: readonly LinkItem[]): LinkItem[] {
     return links.filter((link) => link.visible && !EXPLICITLY_RENDERED_LINK_IDS.has(link.id));
 }
+
+// Quando só um card de intenção existe, ele ocupa a linha inteira do grid em vez de deixar
+// uma coluna vazia — o outro ramo simplesmente não é uma escolha disponível.
+export function getSoleIntentCardSpanClass(hasVisibleDestinations: boolean, hasProductIntent: boolean): string {
+    return hasVisibleDestinations && hasProductIntent ? '' : ' sm:col-span-2';
+}
+
+export type SelectedIntent = 'destinos' | 'preparar' | null;
+
+// Uma hash apontando para um ramo que não existe na config atual (ex.: link antigo/compartilhado
+// para #preparar quando todos os produtos estão ocultos) não conta como escolha real — não há
+// seção "não escolhida" para rebaixar quando só uma existe.
+export function resolveSelectedIntent(
+    hash: string,
+    hasVisibleDestinations: boolean,
+    hasProductIntent: boolean,
+): SelectedIntent {
+    if (hash === '#destinos' && hasVisibleDestinations) return 'destinos';
+    if (hash === '#preparar' && hasProductIntent) return 'preparar';
+    return null;
+}

@@ -11,8 +11,9 @@ export const ICON_MAP: Record<string, Icon> = {
     CalendarCheck,
 };
 
-// Um `icon` fora do mapa falha em silêncio: o botão perde o ícone e, com ele, o tier pesado que
-// `isPrimaryLink` concede. Validado em teste sobre os dados, não em produção.
+// Um `icon` fora do mapa falha em silêncio: o botão perde o ícone, mas mantém seu tier (definido
+// por `highlight`/`primary` em LinkButton.tsx, não pelo ícone). Validado em teste sobre os dados,
+// não em produção.
 export function isSupportedIcon(name: string): boolean {
     return Object.hasOwn(ICON_MAP, name);
 }

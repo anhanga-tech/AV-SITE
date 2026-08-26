@@ -81,6 +81,32 @@ test('clique dispara links_page_click com o label correto', async ({ page }) => 
     expect(clicks.some((c) => c.label === 'orlando')).toBe(true);
 });
 
+// Corrige o diagnóstico da crítica de 2026-08-26: escolher uma porta de intenção rebaixava
+// zero conteúdo — as duas seções continuavam com peso idêntico. Agora a seção não escolhida
+// perde peso tipográfico (sem sumir, sem custar Controle do Usuário) enquanto a escolhida
+// mantém o peso cheio.
+test('escolher uma porta de intenção rebaixa visualmente a seção não escolhida, sem escondê-la', async ({ page }) => {
+    await page.goto('/links');
+
+    const destinosHeading = page.getByRole('heading', { name: 'Conheça destinos e ideias' });
+    const preparoHeading = page.getByRole('heading', { name: 'Prepare sua viagem' });
+
+    await expect(destinosHeading).toHaveClass(/font-black/);
+    await expect(preparoHeading).toHaveClass(/font-black/);
+
+    await page.getByTestId('intent-produtos').click();
+
+    await expect(destinosHeading).toHaveClass(/font-bold/);
+    await expect(destinosHeading).toBeVisible();
+    await expect(preparoHeading).toHaveClass(/font-black/);
+
+    await page.getByTestId('intent-destinos').click();
+
+    await expect(preparoHeading).toHaveClass(/font-bold/);
+    await expect(preparoHeading).toBeVisible();
+    await expect(destinosHeading).toHaveClass(/font-black/);
+});
+
 test('não renderiza overlays flutuantes (AIChat / BackToTop) na página standalone', async ({ page }) => {
     await page.goto('/links');
     await expect(page.getByTestId('link-whatsapp')).toBeVisible();

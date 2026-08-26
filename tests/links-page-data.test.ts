@@ -10,6 +10,8 @@ import {
     getLinksPageVisibility,
     getUnassignedVisibleLinks,
     getVisibleLinksForIds,
+    getSoleIntentCardSpanClass,
+    resolveSelectedIntent,
 } from '../utils/linksPageLayout.ts';
 import { getWhatsAppLink, getTrackingDataObject } from '../utils/whatsapp.ts';
 
@@ -102,6 +104,27 @@ test('seções sem links visíveis ficam desativadas', () => {
     });
 });
 
+// Regressão (claude[bot] review, PR #1515): esse branch só roda quando um dos dois ramos de
+// intenção não existe — a config atual de data/linksPage.ts sempre deixa os dois visíveis, então
+// sem este teste direto na função pura ele nunca é exercido.
+test('card de intenção único ocupa a linha inteira do grid', () => {
+    assert.equal(getSoleIntentCardSpanClass(true, true), '');
+    assert.equal(getSoleIntentCardSpanClass(true, false), ' sm:col-span-2');
+    assert.equal(getSoleIntentCardSpanClass(false, true), ' sm:col-span-2');
+    assert.equal(getSoleIntentCardSpanClass(false, false), ' sm:col-span-2');
+});
+
+// Regressão (Codex review, PR #1515): uma hash apontando para um ramo indisponível na config
+// atual (ex.: link antigo para #preparar depois que todos os produtos ficaram ocultos) não pode
+// virar uma "escolha" — não existe seção "não escolhida" para rebaixar quando só uma existe.
+test('hash de um ramo de intenção indisponível não conta como escolha', () => {
+    assert.equal(resolveSelectedIntent('#destinos', true, true), 'destinos');
+    assert.equal(resolveSelectedIntent('#preparar', true, true), 'preparar');
+    assert.equal(resolveSelectedIntent('#preparar', true, false), null, 'ramo de produtos indisponível');
+    assert.equal(resolveSelectedIntent('#destinos', false, true), null, 'ramo de destinos indisponível');
+    assert.equal(resolveSelectedIntent('', true, true), null);
+});
+
 test('mensagens de whatsapp não terminam em espaço', () => {
     // `buildWhatsAppLink` aplica `.trim()`, então um espaço à direita some antes de chegar ao
     // WhatsApp. Escrever a mensagem contando com ele daria "Meu destino:Noronha" na prática.
@@ -169,6 +192,15 @@ test('a mensagem termina no prompt editável mesmo com tracking na sessão', () 
 test('no máximo um link amarelo visível (Regra do Âmbar)', () => {
     const destacados = linksPageConfig.links.filter((l) => l.visible && l.highlight);
     assert.ok(destacados.length <= 1, `${destacados.length} links com highlight: ${destacados.map((l) => l.id).join(', ')}`);
+});
+
+// LinkButton reserva o tier hard-shadow (`highlight`/`primary`) à ação de maior intenção —
+// PRODUCT.md: "peso físico só onde se age... reservados aos pontos de ação". Espalhar esse tier
+// pela pilha inteira (o que `isPrimaryLink` fazia antes, usando ícone/sublabel como proxy) apaga
+// o sinal de qual ação é dominante. Ver crítica de /links de 2026-08-26.
+test('poucos links usam o tier de peso físico (highlight + primary)', () => {
+    const pesados = linksPageConfig.links.filter((l) => l.visible && (l.highlight || l.primary));
+    assert.ok(pesados.length <= 2, `${pesados.length} links com peso físico: ${pesados.map((l) => l.id).join(', ')}`);
 });
 
 test('banner e link destacado não coexistem (Regra do Âmbar)', () => {
