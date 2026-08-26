@@ -36,6 +36,12 @@ export function FormField({
     <div>
       <label htmlFor={id} className={LABEL_CLASSNAME}>
         {label}
+        {required ? (
+          <span className="text-red-500" aria-hidden="true">
+            {' '}
+            *
+          </span>
+        ) : null}
       </label>
       <input
         ref={inputRef}
