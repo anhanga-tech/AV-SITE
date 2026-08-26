@@ -18,7 +18,10 @@ const EXPLICITLY_RENDERED_LINK_IDS = new Set<string>([
 ]);
 
 export function getVisibleLinksForIds(links: readonly LinkItem[], ids: readonly string[]): LinkItem[] {
-    const visibleLinksById = new Map(links.filter((link) => link.visible).map((link) => [link.id, link]));
+    const visibleLinksById = new Map<string, LinkItem>();
+    for (const link of links) {
+        if (link.visible) visibleLinksById.set(link.id, link);
+    }
 
     return ids.flatMap((id) => {
         const link = visibleLinksById.get(id);
