@@ -39,6 +39,19 @@ test.describe('Cookie Consent Banner (CMP)', () => {
     expect(acceptClass).toEqual(declineClass);
   });
 
+  test('botões "Aceitar" e "Recusar" cumprem o piso de touch target de 44px', async ({ page }) => {
+    await page.goto('/');
+    const accept = page.getByRole('button', { name: 'Aceitar' });
+    const decline = page.getByRole('button', { name: 'Recusar' });
+
+    const acceptBox = await accept.boundingBox();
+    const declineBox = await decline.boundingBox();
+    expect(acceptBox).not.toBeNull();
+    expect(declineBox).not.toBeNull();
+    expect(acceptBox!.height).toBeGreaterThanOrEqual(44);
+    expect(declineBox!.height).toBeGreaterThanOrEqual(44);
+  });
+
   // --- Aceitar ---
 
   test('clicar "Aceitar" fecha o banner e salva "marketing" no localStorage', async ({ page }) => {
