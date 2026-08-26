@@ -55,7 +55,7 @@ export function CtaBody() {
 
         <FormField
           id="cta-firstName"
-          label="Nome *"
+          label="Nome"
           autoComplete="name"
           value={fields.firstName}
           onChange={(value) => setField('firstName', value)}
@@ -67,7 +67,7 @@ export function CtaBody() {
 
         <FormField
           id="cta-whatsapp"
-          label="WhatsApp *"
+          label="WhatsApp"
           type="tel"
           value={fields.whatsapp}
           onChange={(value) => setField('whatsapp', value)}

@@ -176,7 +176,7 @@ const ContactModal: React.FC = () => {
                         <FormField
                             inputRef={firstFieldRef}
                             id="contact-firstName"
-                            label="Nome *"
+                            label="Nome"
                             autoComplete="name"
                             value={fields.firstName}
                             onChange={(value) => setField('firstName', value)}
@@ -188,7 +188,7 @@ const ContactModal: React.FC = () => {
 
                         <FormField
                             id="contact-whatsapp"
-                            label="WhatsApp *"
+                            label="WhatsApp"
                             type="tel"
                             autoComplete="tel"
                             value={fields.whatsapp}
