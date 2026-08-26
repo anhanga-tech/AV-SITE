@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getWhatsAppLink } from '../../utils/whatsapp';
 import { withTrackingParams, applyOriginToMessage, pushLinksPageClick } from '../../utils/linksTracking';
@@ -29,7 +29,7 @@ interface LinkButtonProps {
 // fica parado e o texto cresce para dentro do espaço. Os valores são idênticos aos de
 // `px-5`/`gap-4`/`w-6` no zoom padrão — e px é a unidade que o DESIGN.md usa em spacing.
 const baseClasses =
-    'flex w-full items-center gap-[16px] rounded-2xl px-[20px] text-left font-semibold transition-[transform,box-shadow] duration-150 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-anhanga-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-anhanga-dark';
+    'flex w-full items-center gap-[16px] rounded-2xl px-[20px] text-left font-semibold transition-[transform,box-shadow] duration-150 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action';
 
 // Press-down físico (assinatura "O Diário de Bordo"): rest → hover → active, como um carimbo.
 // Reservado à ação de maior intenção (WhatsApp + orçamento) — PRODUCT.md: "peso físico só onde
@@ -55,9 +55,34 @@ function tierClasses(item: LinkItem): string {
     return `min-h-[3.25rem] py-3 text-base bg-white/90 text-anhanga-darkBlue ${pressQuiet}`;
 }
 
+// `data/linksPage.ts` é ⚙️ EDITÁVEL para quem não é engenheiro (comentário no próprio arquivo);
+// um `href` ausente em produção ainda cai num link seguro (`#`/`/`) em vez de derrubar a página
+// inteira por um item — mas em dev o erro deve aparecer no console assim que o item é editado,
+// não só quando os testes de `tests/links-page-data.test.ts` rodarem.
+//
+// `import.meta.env` precisa do guard `typeof import.meta !== 'undefined'` (mesmo padrão de
+// `data/mediaConfig.ts:39-41`): sob `tsx --test` (runner de `pnpm test:regression`), `import.meta`
+// existe mas `.env` é `undefined` — acessar `.DEV` direto lança TypeError em qualquer teste que
+// monte LinkButton com um item sem href.
+function warnMissingHref(item: LinkItem, fallback: string): void {
+    const isDev = typeof import.meta !== 'undefined' && import.meta.env?.DEV;
+    if (isDev) {
+        console.error(`[LinkButton] item "${item.id}" (type "${item.type}") está sem href — caindo para "${fallback}". Configure href em data/linksPage.ts.`);
+    }
+}
+
 export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className: extraClassName }) => {
     const className = `${baseClasses} ${tierClasses(item)}${extraClassName ? ` ${extraClassName}` : ''}`;
     const IconComponent = item.icon ? ICON_MAP[item.icon] : undefined;
+
+    // Efeito, não chamada direta no corpo do render: `console.error` é efeito colateral, e
+    // chamá-lo durante o render viola a pureza que docs/standards/code-style.md exige — e
+    // duplica o aviso sob `React.StrictMode` (index.tsx usa StrictMode, que invoca o corpo do
+    // componente duas vezes em dev). Ver review do claude[bot] na PR #1519.
+    useEffect(() => {
+        if (item.type === 'external' && !item.href) warnMissingHref(item, '#');
+        if (item.type === 'internal' && !item.href) warnMissingHref(item, '/');
+    }, [item]);
 
     const content = (
         <>

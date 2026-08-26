@@ -1,12 +1,14 @@
 import React from 'react';
 import googleReviewsRaw from '../../data/googleReviews.json';
 import type { GoogleReviewsData } from '../../types/reviews';
+import { formatReviewCountLabel } from './reviewFormatting';
 
 const CADASTUR = '37.036.732/0001-41';
 const googleReviews = googleReviewsRaw as GoogleReviewsData;
 
 export const TrustSeals: React.FC = () => {
     const rating = googleReviews.averageRating ? googleReviews.averageRating.toFixed(1) : '5.0';
+    const reviewCountLabel = formatReviewCountLabel(googleReviews.totalReviews ?? 0);
 
     return (
         // `text-white/90` e não branco pleno: a Regra do Branco Rebaixado do DESIGN.md vale em
@@ -20,7 +22,7 @@ export const TrustSeals: React.FC = () => {
                     Cadastur {CADASTUR}
                 </a>
                 <span aria-hidden="true">·</span>
-                <span>Nota {rating} no Google</span>
+                <span>Nota {rating}{reviewCountLabel ? ` · ${reviewCountLabel}` : ''} no Google</span>
             </div>
             <p className="mt-1 text-white/85">ANHANGA TURISMO LTDA</p>
         </footer>
