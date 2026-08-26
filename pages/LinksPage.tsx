@@ -5,6 +5,7 @@ import { Seo } from '../components/Seo';
 import { BRAND_LOGO_WHITE_URL } from '../lib/media-assets';
 import { linksPageConfig } from '../data/linksPage';
 import { withTrackingParams, pushLinksPageView, pushLinksPageClick } from '../utils/linksTracking';
+import { FEATURED_DESTINATION_IDS, MORE_DESTINATION_IDS, getUnassignedVisibleLinks } from '../utils/linksPageLayout';
 import LinkButton from '../components/links/LinkButton';
 import TrustSeals from '../components/links/TrustSeals';
 
@@ -24,8 +25,6 @@ const subscribeToLocation = (onStoreChange: () => void) => {
 };
 const getSearchSnapshot = (): string | null => window.location.search;
 const getServerSearchSnapshot = (): string | null => null;
-const featuredDestinationIds = ['orlando', 'beto-carrero', 'curadoria-cruzeiros-brasil', 'melhor-idade'];
-const moreDestinationIds = ['consultoria-de-viagem', 'corporativo', 'lollapalooza'];
 const intentLinks = {
     destinos: { id: 'intent-destinos', type: 'internal' as const, destination: '#destinos' },
     produtos: { id: 'intent-produtos', type: 'internal' as const, destination: '#preparar' },
@@ -40,6 +39,7 @@ const LinksPage: React.FC = () => {
 
     const { banner, links } = linksPageConfig;
     const visibleLinks = links.filter((link) => link.visible);
+    const unassignedVisibleLinks = getUnassignedVisibleLinks(visibleLinks);
     const linkById = new Map(visibleLinks.map((link) => [link.id, link]));
     const renderLink = (id: string, className?: string) => {
         const item = linkById.get(id);
@@ -135,14 +135,14 @@ const LinksPage: React.FC = () => {
                         <p className="mt-1 text-sm leading-6 text-white/70">Veja algumas possibilidades antes de decidir como quer viajar.</p>
                         <nav aria-label="Destinos e ideias de viagem" className="mt-4 flex w-full flex-col gap-3">
                             {renderLink('quiz')}
-                            {featuredDestinationIds.map((id) => renderLink(id))}
+                            {FEATURED_DESTINATION_IDS.map((id) => renderLink(id))}
                         </nav>
                         <details className="mt-3 rounded-2xl bg-white/5 ring-1 ring-white/15">
                             <summary className="cursor-pointer px-5 py-4 text-sm font-semibold text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-anhanga-yellow">
                                 Ver mais páginas de viagem
                             </summary>
                             <nav aria-label="Mais páginas de viagem" className="flex flex-col gap-3 px-3 pb-3">
-                                {moreDestinationIds.map((id) => renderLink(id))}
+                                {MORE_DESTINATION_IDS.map((id) => renderLink(id))}
                             </nav>
                         </details>
                     </section>
@@ -158,7 +158,12 @@ const LinksPage: React.FC = () => {
 
                     <section className="mt-10 w-full" aria-labelledby="other-links-heading">
                         <h2 id="other-links-heading" className="text-lg font-black text-white">Outros acessos</h2>
-                        <nav aria-label="Outros acessos" className="mt-4">{renderLink('site')}</nav>
+                        <nav aria-label="Outros acessos" className="mt-4 flex flex-col gap-3">
+                            {renderLink('site')}
+                            {unassignedVisibleLinks.map((item) => (
+                                <LinkButton key={item.id} item={item} search={search} />
+                            ))}
+                        </nav>
                     </section>
 
                     <TrustSeals />
