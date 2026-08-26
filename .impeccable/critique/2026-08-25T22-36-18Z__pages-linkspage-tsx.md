@@ -28,9 +28,9 @@ slug: pages-linkspage-tsx
 
 ## Veredito de especificidade
 
-**Parcialmente específico.** A rota tem pele Anhangá — ardósia profunda, um CTA âmbar, Poppins, sombras táteis e uma shell standalone — mas ainda não tem um ponto de vista Anhangá. A composição logo + pilha de botões + destinos + rodapé legal poderia pertencer a quase qualquer agência de viagens. O título visível está ausente; o único `h1` é `sr-only` em [pages/LinksPage.tsx:54](/Users/felipewilliams/.codex/worktrees/1983/AV-SITE/pages/LinksPage.tsx:54), apesar de o produto prometer uma conversa pessoal ([PRODUCT.md:24](/Users/felipewilliams/.codex/worktrees/1983/AV-SITE/PRODUCT.md:24)).
+**Parcialmente específico.** A rota tem pele Anhangá — ardósia profunda, um CTA âmbar, Poppins, sombras táteis e uma shell standalone — mas ainda não tem um ponto de vista Anhangá. A composição logo + pilha de botões + destinos + rodapé legal poderia pertencer a quase qualquer agência de viagens. O título visível está ausente; o único `h1` é `sr-only` em [pages/LinksPage.tsx:54](pages/LinksPage.tsx:54), apesar de o produto prometer uma conversa pessoal ([PRODUCT.md:24](PRODUCT.md:24)).
 
-O detector CLI, executado exatamente uma vez sobre [pages/LinksPage.tsx](/Users/felipewilliams/.codex/worktrees/1983/AV-SITE/pages/LinksPage.tsx), retornou `[]` com exit code 0. Na inspeção do navegador, o overlay encontrou `line-length`, `flat-type-hierarchy` e `layout-transition`: o primeiro é um provável falso positivo no parágrafo global do cookie banner ([components/CookieConsentBanner.tsx:54](/Users/felipewilliams/.codex/worktrees/1983/AV-SITE/components/CookieConsentBanner.tsx:54)); o terceiro veio de CSS global usado em outras landings, não da rota; `flat-type-hierarchy` é válido para os tamanhos renderizados de 12, 14 e 16px. A injeção mutável funcionou, `window.impeccableScan` esteve disponível e foram produzidos dois overlays visuais e um label na aba `[Human]`.
+O detector CLI, executado exatamente uma vez sobre [pages/LinksPage.tsx](pages/LinksPage.tsx), retornou `[]` com exit code 0. Na inspeção do navegador, o overlay encontrou `line-length`, `flat-type-hierarchy` e `layout-transition`: o primeiro é um provável falso positivo no parágrafo global do cookie banner ([components/CookieConsentBanner.tsx:54](components/CookieConsentBanner.tsx:54)); o terceiro veio de CSS global usado em outras landings, não da rota; `flat-type-hierarchy` é válido para os tamanhos renderizados de 12, 14 e 16px. A injeção mutável funcionou, `window.impeccableScan` esteve disponível e foram produzidos dois overlays visuais e um label na aba `[Human]`.
 
 ## Impressão geral
 
@@ -38,13 +38,13 @@ A página é legível e tecnicamente disciplinada, mas emocionalmente anônima e
 
 ## O que está funcionando
 
-- A escada de conversão é compreensível: “Falar no WhatsApp”, “Quero um orçamento” e “Planejar minha viagem” atendem níveis diferentes de prontidão ([data/linksPage.ts:59](/Users/felipewilliams/.codex/worktrees/1983/AV-SITE/data/linksPage.ts:59)).
-- O feedback tátil é consistente: links primários têm press-down, foco visível e alturas generosas para mobile ([components/links/LinkButton.tsx:40](/Users/felipewilliams/.codex/worktrees/1983/AV-SITE/components/links/LinkButton.tsx:40)).
-- A rota standalone remove AI chat e Back to Top concorrentes, preservando o foco no conteúdo ([App.tsx:44](/Users/felipewilliams/.codex/worktrees/1983/AV-SITE/App.tsx:44)).
+- A escada de conversão é compreensível: “Falar no WhatsApp”, “Quero um orçamento” e “Planejar minha viagem” atendem níveis diferentes de prontidão ([data/linksPage.ts:59](data/linksPage.ts:59)).
+- O feedback tátil é consistente: links primários têm press-down, foco visível e alturas generosas para mobile ([components/links/LinkButton.tsx:40](components/links/LinkButton.tsx:40)).
+- A rota standalone remove AI chat e Back to Top concorrentes, preservando o foco no conteúdo ([App.tsx:44](App.tsx:44)).
 
 ## Carga cognitiva
 
-**6/8 falhas — carga alta.** Falham foco único, chunking, agrupamento semântico, hierarquia visual, uma decisão por vez, escolhas mínimas e progressive disclosure. Passa apenas em working memory: os labels ficam visíveis e não exigem lembrar uma etapa anterior. A navegação expõe 13 escolhas e a transição entre ações e destinos é apenas uma margem extra ([pages/LinksPage.tsx:77](/Users/felipewilliams/.codex/worktrees/1983/AV-SITE/pages/LinksPage.tsx:77)). Além disso, `isPrimaryLink` usa presença de ícone/sublabel como proxy de prioridade ([components/links/LinkButton.tsx:23](/Users/felipewilliams/.codex/worktrees/1983/AV-SITE/components/links/LinkButton.tsx:23)).
+**6/8 falhas — carga alta.** Falham foco único, chunking, agrupamento semântico, hierarquia visual, uma decisão por vez, escolhas mínimas e progressive disclosure. Passa apenas em working memory: os labels ficam visíveis e não exigem lembrar uma etapa anterior. A navegação expõe 13 escolhas e a transição entre ações e destinos é apenas uma margem extra ([pages/LinksPage.tsx:77](pages/LinksPage.tsx:77)). Além disso, `isPrimaryLink` usa presença de ícone/sublabel como proxy de prioridade ([components/links/LinkButton.tsx:23](components/links/LinkButton.tsx:23)).
 
 ## Jornada emocional
 
@@ -57,7 +57,7 @@ A página é legível e tecnicamente disciplinada, mas emocionalmente anônima e
 
 ### [P1] Falta uma promessa visível e um hand-off humano
 
-**Por que importa:** tráfego social frio precisa entender em segundos o que a Anhangá faz e o que ocorre depois do clique. Hoje a sequência visível é apenas logo → botões; não há convite em segunda pessoa nem orientação ([pages/LinksPage.tsx:52](/Users/felipewilliams/.codex/worktrees/1983/AV-SITE/pages/LinksPage.tsx:52)).
+**Por que importa:** tráfego social frio precisa entender em segundos o que a Anhangá faz e o que ocorre depois do clique. Hoje a sequência visível é apenas logo → botões; não há convite em segunda pessoa nem orientação ([pages/LinksPage.tsx:52](pages/LinksPage.tsx:52)).
 
 **Correção:** inserir uma promessa factual de uma linha sob o logo e uma orientação de prontidão, por exemplo “Já sabe o destino?” versus “Ainda está escolhendo?”. Não transformar isso em outro bloco de marketing.
 
@@ -73,15 +73,15 @@ A página é legível e tecnicamente disciplinada, mas emocionalmente anônima e
 
 ### [P1] O cookie banner cobre destinos acionáveis no primeiro acesso
 
-**Por que importa:** em 390×844, o diálogo fixo cobre links inferiores enquanto o visitante ainda está explorando. O padding inferior reserva espaço para o rodapé, mas não impede a sobreposição na viewport ([pages/LinksPage.tsx:46](/Users/felipewilliams/.codex/worktrees/1983/AV-SITE/pages/LinksPage.tsx:46), [components/CookieConsentBanner.tsx:45](/Users/felipewilliams/.codex/worktrees/1983/AV-SITE/components/CookieConsentBanner.tsx:45)).
+**Por que importa:** em 390×844, o diálogo fixo cobre links inferiores enquanto o visitante ainda está explorando. O padding inferior reserva espaço para o rodapé, mas não impede a sobreposição na viewport ([pages/LinksPage.tsx:46](pages/LinksPage.tsx:46), [components/CookieConsentBanner.tsx:45](components/CookieConsentBanner.tsx:45)).
 
-**Correção:** usar consentimento mobile mais compacto ou em fluxo/sticky sem cobrir targets; garantir também 44px para os controles do próprio banner ([components/CookieConsentBanner.tsx:65](/Users/felipewilliams/.codex/worktrees/1983/AV-SITE/components/CookieConsentBanner.tsx:65)).
+**Correção:** usar consentimento mobile mais compacto ou em fluxo/sticky sem cobrir targets; garantir também 44px para os controles do próprio banner ([components/CookieConsentBanner.tsx:65](components/CookieConsentBanner.tsx:65)).
 
 **Comando sugerido:** `$impeccable adapt`
 
 ### [P2] A prova de confiança chega tarde e informa pouco
 
-**Por que importa:** Cadastur e a nota do Google aparecem só depois de toda a lista. “Nota 5.0 no Google” não traz número de avaliações nem link direto para a fonte, funcionando mais como rodapé que como tranquilização ([components/links/TrustSeals.tsx:14](/Users/felipewilliams/.codex/worktrees/1983/AV-SITE/components/links/TrustSeals.tsx:14)).
+**Por que importa:** Cadastur e a nota do Google aparecem só depois de toda a lista. “Nota 5.0 no Google” não traz número de avaliações nem link direto para a fonte, funcionando mais como rodapé que como tranquilização ([components/links/TrustSeals.tsx:14](components/links/TrustSeals.tsx:14)).
 
 **Correção:** mover um único sinal de confiança, factual e compacto, para perto do grupo de ações. Incluir contagem/fonte se estiver disponível e manter a razão social no final.
 
@@ -98,10 +98,10 @@ A página é legível e tecnicamente disciplinada, mas emocionalmente anônima e
 
 ### Riley — stress tester
 
-- WhatsApp e parceiro abrem nova aba, enquanto rotas internas permanecem na SPA; a diferença não é explicitada ([components/links/LinkButton.tsx:79](/Users/felipewilliams/.codex/worktrees/1983/AV-SITE/components/links/LinkButton.tsx:79)).
+- WhatsApp e parceiro abrem nova aba, enquanto rotas internas permanecem na SPA; a diferença não é explicitada ([components/links/LinkButton.tsx:79](components/links/LinkButton.tsx:79)).
 - “Seguro viagem” parece um destino Anhangá, embora seja hand-off de terceiro.
 - Não existe recuperação visível se um destino externo falhar.
-- Se todos os itens forem ocultados, `visibleLinks` pode deixar uma navegação vazia sem estado alternativo ([pages/LinksPage.tsx:34](/Users/felipewilliams/.codex/worktrees/1983/AV-SITE/pages/LinksPage.tsx:34)).
+- Se todos os itens forem ocultados, `visibleLinks` pode deixar uma navegação vazia sem estado alternativo ([pages/LinksPage.tsx:34](pages/LinksPage.tsx:34)).
 
 ### Casey — usuário mobile distraído
 
@@ -112,12 +112,12 @@ A página é legível e tecnicamente disciplinada, mas emocionalmente anônima e
 
 ## Observações menores
 
-- Destinos continuam usando sombras offset, fazendo a lista parecer coleção de botões, não índice curado; isso tensiona a regra de reservar peso físico para ações significativas ([DESIGN.md:171](/Users/felipewilliams/.codex/worktrees/1983/AV-SITE/DESIGN.md:171)).
+- Destinos continuam usando sombras offset, fazendo a lista parecer coleção de botões, não índice curado; isso tensiona a regra de reservar peso físico para ações significativas ([DESIGN.md:171](DESIGN.md:171)).
 - O logo não é link; “Site oficial” é o único retorno claro à home.
 - `TrustSeals` dá 44px ao Cadastur, mas os controles do cookie não explicitam o mesmo piso.
 - Os ícones são decorativos e os labels visíveis fornecem nomes acessíveis.
 - Não há `h2` ou rótulos de seção visíveis, piorando a separação visual e semântica.
-- A regra do âmbar está respeitada: o banner do quiz está desligado e o amarelo fica principalmente no WhatsApp ([data/linksPage.ts:49](/Users/felipewilliams/.codex/worktrees/1983/AV-SITE/data/linksPage.ts:49)).
+- A regra do âmbar está respeitada: o banner do quiz está desligado e o amarelo fica principalmente no WhatsApp ([data/linksPage.ts:49](data/linksPage.ts:49)).
 
 ## Perguntas para destravar uma solução melhor
 

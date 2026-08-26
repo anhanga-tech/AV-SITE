@@ -3,7 +3,14 @@ import assert from 'node:assert/strict';
 import { linksPageConfig, type LinkItem } from '../data/linksPage.ts';
 import { isSupportedIcon } from '../components/links/linkIcons.ts';
 import { ORIGIN_TOKEN, applyOriginToMessage } from '../utils/linksTracking.ts';
-import { getUnassignedVisibleLinks, getVisibleLinksForIds, PRODUCT_LINK_IDS } from '../utils/linksPageLayout.ts';
+import {
+    FEATURED_DESTINATION_IDS,
+    MORE_DESTINATION_IDS,
+    PRODUCT_LINK_IDS,
+    getLinksPageVisibility,
+    getUnassignedVisibleLinks,
+    getVisibleLinksForIds,
+} from '../utils/linksPageLayout.ts';
 import { getWhatsAppLink, getTrackingDataObject } from '../utils/whatsapp.ts';
 
 test('ids dos links são únicos', () => {
@@ -76,6 +83,23 @@ test('atalho de produtos não encontra links ocultos', () => {
     }));
 
     assert.deepEqual(getVisibleLinksForIds(hiddenProducts, PRODUCT_LINK_IDS), []);
+});
+
+test('seções sem links visíveis ficam desativadas', () => {
+    const hiddenSectionLinks: LinkItem[] = ['orcamento', 'quiz', 'site', ...FEATURED_DESTINATION_IDS, ...MORE_DESTINATION_IDS].map((id) => ({
+        id,
+        label: id,
+        type: 'internal',
+        href: `/${id}`,
+        visible: false,
+    }));
+
+    assert.deepEqual(getLinksPageVisibility(hiddenSectionLinks), {
+        hasPrimaryDestinations: false,
+        hasVisibleDestinations: false,
+        hasVisibleContact: false,
+        hasVisibleOtherLinks: false,
+    });
 });
 
 test('mensagens de whatsapp não terminam em espaço', () => {

@@ -4,6 +4,13 @@ export const FEATURED_DESTINATION_IDS = ['orlando', 'beto-carrero', 'curadoria-c
 export const MORE_DESTINATION_IDS = ['consultoria-de-viagem', 'corporativo', 'lollapalooza'] as const;
 export const PRODUCT_LINK_IDS = ['seguro-viagem', 'chip-esim'] as const;
 
+export interface LinksPageVisibility {
+    hasPrimaryDestinations: boolean;
+    hasVisibleDestinations: boolean;
+    hasVisibleContact: boolean;
+    hasVisibleOtherLinks: boolean;
+}
+
 // Links sem uma categoria explícita continuam visíveis no fallback de "Outros acessos".
 // Isso preserva o contrato editável de data/linksPage.ts: uma nova entrada visible: true não
 // desaparece silenciosamente só porque ainda não foi promovida para uma seção de destaque.
@@ -27,6 +34,22 @@ export function getVisibleLinksForIds(links: readonly LinkItem[], ids: readonly 
         const link = visibleLinksById.get(id);
         return link ? [link] : [];
     });
+}
+
+export function getLinksPageVisibility(links: readonly LinkItem[]): LinksPageVisibility {
+    const visibleLinks = links.filter((link) => link.visible);
+    const visibleLinkIds = new Set(visibleLinks.map((link) => link.id));
+    const hasPrimaryDestinations =
+        visibleLinkIds.has('quiz') || getVisibleLinksForIds(visibleLinks, FEATURED_DESTINATION_IDS).length > 0;
+    const hasVisibleDestinations =
+        hasPrimaryDestinations || getVisibleLinksForIds(visibleLinks, MORE_DESTINATION_IDS).length > 0;
+
+    return {
+        hasPrimaryDestinations,
+        hasVisibleDestinations,
+        hasVisibleContact: visibleLinkIds.has('orcamento'),
+        hasVisibleOtherLinks: visibleLinkIds.has('site') || getUnassignedVisibleLinks(visibleLinks).length > 0,
+    };
 }
 
 export function getUnassignedVisibleLinks(links: readonly LinkItem[]): LinkItem[] {

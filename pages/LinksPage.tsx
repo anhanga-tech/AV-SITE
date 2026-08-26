@@ -10,6 +10,7 @@ import {
     MORE_DESTINATION_IDS,
     PRODUCT_LINK_IDS,
     getUnassignedVisibleLinks,
+    getLinksPageVisibility,
     getVisibleLinksForIds,
 } from '../utils/linksPageLayout';
 import LinkButton from '../components/links/LinkButton';
@@ -50,10 +51,13 @@ const LinksPage: React.FC = () => {
     const visibleProductLinks = getVisibleLinksForIds(visibleLinks, PRODUCT_LINK_IDS);
     const unassignedVisibleLinks = getUnassignedVisibleLinks(visibleLinks);
     const linkById = new Map(visibleLinks.map((link) => [link.id, link]));
-    const hasPrimaryDestinations = linkById.has('quiz') || visibleFeaturedDestinationLinks.length > 0;
-    const hasVisibleDestinations = hasPrimaryDestinations || visibleMoreDestinationLinks.length > 0;
-    const hasVisibleContact = linkById.has('orcamento');
-    const hasVisibleOtherLinks = linkById.has('site') || unassignedVisibleLinks.length > 0;
+    const { hasPrimaryDestinations, hasVisibleDestinations, hasVisibleContact, hasVisibleOtherLinks } = getLinksPageVisibility(links);
+    const productIntentDescription = visibleProductLinks.length === PRODUCT_LINK_IDS.length
+        ? 'Seguro e chip / eSIM'
+        : visibleProductLinks.map((link) => link.label).join(' e ');
+    const productSectionDescription = visibleProductLinks.length === 1
+        ? 'Resolva um detalhe importante antes de embarcar.'
+        : 'Resolva dois detalhes importantes antes de embarcar.';
     const renderLink = (id: string, className?: string) => {
         const item = linkById.get(id);
         return item ? <LinkButton key={id} item={item} search={search} className={className} /> : null;
@@ -119,7 +123,7 @@ const LinksPage: React.FC = () => {
                                         <ShieldCheck size={24} weight="fill" aria-hidden="true" className="shrink-0" />
                                         <span className="flex min-w-0 flex-col break-words">
                                             <span className="font-bold">Quero preparar a viagem</span>
-                                            <span className="mt-1 text-xs text-white/75">Seguro e chip / eSIM</span>
+                                            <span className="mt-1 text-xs text-white/75">{productIntentDescription}</span>
                                         </span>
                                     </a>
                                 ) : null}
@@ -179,7 +183,7 @@ const LinksPage: React.FC = () => {
                     {visibleProductLinks.length > 0 ? (
                         <section id="preparar" className="mt-10 w-full scroll-mt-6" aria-labelledby="prepare-heading">
                             <h2 id="prepare-heading" className="text-lg font-black text-white">Prepare sua viagem</h2>
-                            <p className="mt-1 text-sm leading-6 text-white/70">Resolva dois detalhes importantes antes de embarcar.</p>
+                            <p className="mt-1 text-sm leading-6 text-white/70">{productSectionDescription}</p>
                             <nav aria-label="Produtos para preparar a viagem" className="mt-4 flex w-full flex-col gap-3">
                                 {visibleProductLinks.map((item) => (
                                     <LinkButton key={item.id} item={item} search={search} />
