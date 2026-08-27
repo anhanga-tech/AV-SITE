@@ -76,11 +76,13 @@ export const linksPageConfig: LinksPageConfig = {
         { id: 'orlando', label: 'Orlando', sublabel: 'Parques, magia e roteiro sob medida', type: 'internal', href: '/orlando', icon: 'Sparkle', visible: true },
         { id: 'beto-carrero', label: 'Beto Carrero', sublabel: 'Adrenalina e diversão em família', type: 'internal', href: '/beto-carrero', icon: 'Confetti', visible: true },
         { id: 'melhor-idade', label: 'Viagens Melhor Idade', sublabel: 'Viagens pensadas para o seu ritmo', type: 'internal', href: '/melhor-idade', icon: 'SunHorizon', visible: true },
-        { id: 'consultoria-de-viagem', label: 'Consultoria de Viagem', type: 'internal', href: '/consultoria-de-viagem', visible: true },
-        { id: 'corporativo', label: 'Viagens Corporativas', type: 'internal', href: '/corporativo', visible: true },
+        { id: 'consultoria-de-viagem', label: 'Consultoria de Viagem', sublabel: 'Um especialista monta o roteiro por você', type: 'internal', href: '/consultoria-de-viagem', icon: 'Handshake', visible: true },
+        { id: 'corporativo', label: 'Viagens Corporativas', sublabel: 'Eventos e viagens para a sua empresa', type: 'internal', href: '/corporativo', icon: 'Briefcase', visible: true },
         // `id` preservado apesar da URL ter mudado para /cruzeiros: ele vira data-testid e vai
         // ao dataLayer via pushLinksPageClick — renomear quebraria a série histórica de cliques.
         { id: 'curadoria-cruzeiros-brasil', label: 'Cruzeiros pelo Brasil', sublabel: 'Navegue pelo litoral com curadoria', type: 'internal', href: '/cruzeiros', icon: 'Anchor', visible: true },
-        { id: 'lollapalooza', label: 'Lollapalooza', type: 'internal', href: '/lollapalooza', visible: true },
+        // Sublabel reflete o estado real da campanha (2026 esgotado, ver
+        // pages/landings/LollapaloozaLanding.tsx) — não prometer pacote disponível.
+        { id: 'lollapalooza', label: 'Lollapalooza', sublabel: 'Lista de espera para a edição 2027', type: 'internal', href: '/lollapalooza', icon: 'MusicNotes', visible: true },
     ],
 };
