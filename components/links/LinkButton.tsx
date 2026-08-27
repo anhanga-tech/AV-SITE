@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { ArrowSquareOut } from '@phosphor-icons/react';
 import { getWhatsAppLink } from '../../utils/whatsapp';
 import { withTrackingParams, applyOriginToMessage, pushLinksPageClick } from '../../utils/linksTracking';
 import type { LinkItem } from '../../data/linksPage';
@@ -84,7 +85,12 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className:
         if (item.type === 'internal' && !item.href) warnMissingHref(item, '/');
     }, [item]);
 
-    const content = (
+    // `whatsapp`/`external` saem do site (app do WhatsApp ou domínio de terceiro); `internal`
+    // navega dentro da própria SPA. Sem esse sinal os três tipos renderizavam pixel-idênticos —
+    // quem tocava em "Calcular meu seguro viagem" caía sem aviso em go.nuvembr.com, indistinguível
+    // de um link quebrado. O glifo é decorativo (`aria-hidden`); quem depende de leitor de tela
+    // recebe o aviso pelo texto `sr-only` embutido no nome acessível do link.
+    const content = (opensInNewTab: boolean) => (
         <>
             <span className="flex w-[24px] shrink-0 items-center justify-center" aria-hidden="true">
                 {IconComponent ? <IconComponent size={22} weight="fill" /> : null}
@@ -98,6 +104,14 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className:
                     <span className="text-xs font-normal text-anhanga-darkBlue/80">{item.sublabel}</span>
                 ) : null}
             </span>
+            {opensInNewTab ? (
+                <>
+                    <span className="sr-only"> (abre em nova aba)</span>
+                    <span className="flex shrink-0 items-center" aria-hidden="true">
+                        <ArrowSquareOut size={16} weight="bold" className="text-anhanga-darkBlue/60" />
+                    </span>
+                </>
+            ) : null}
         </>
     );
 
@@ -106,7 +120,7 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className:
         return (
             <a href={href} target="_blank" rel="noopener noreferrer" className={className}
                data-testid={`link-${item.id}`} onClick={() => pushLinksPageClick(item, href)}>
-                {content}
+                {content(true)}
             </a>
         );
     }
@@ -116,7 +130,7 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className:
         return (
             <a href={href} target="_blank" rel="noopener noreferrer" className={className}
                data-testid={`link-${item.id}`} onClick={() => pushLinksPageClick(item, href)}>
-                {content}
+                {content(true)}
             </a>
         );
     }
@@ -125,7 +139,7 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className:
     return (
         <Link to={to} className={className} data-testid={`link-${item.id}`}
               onClick={() => pushLinksPageClick(item, to)}>
-            {content}
+            {content(false)}
         </Link>
     );
 };

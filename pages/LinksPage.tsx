@@ -71,7 +71,12 @@ const LinksPage: React.FC = () => {
     const visibleProductLinks = getVisibleLinksForIds(visibleLinks, PRODUCT_LINK_IDS);
     const unassignedVisibleLinks = getUnassignedVisibleLinks(visibleLinks);
     const linkById = new Map(visibleLinks.map((link) => [link.id, link]));
-    const { hasPrimaryDestinations, hasVisibleDestinations, hasVisibleContact, hasVisibleOtherLinks } = getLinksPageVisibility(links);
+    // Separado da lista de destinos em seu próprio <nav>: antes os dois viviam na mesma pilha
+    // (quiz + 4 destinos = 5 escolhas simultâneas, acima do limite de carga cognitiva de 4 por
+    // grupo — ver crítica de /links de 2026-08-27). O quiz é uma ferramenta ("me ajude a decidir"),
+    // não um destino; separá-lo em outro grupo reduz o chunk de decisão real sem cortar destino.
+    const hasQuiz = linkById.has('quiz');
+    const { hasVisibleDestinations, hasVisibleContact, hasVisibleOtherLinks } = getLinksPageVisibility(links);
     const hasProductIntent = visibleProductLinks.length > 0;
     const soleIntentCardSpanClass = getSoleIntentCardSpanClass(hasVisibleDestinations, hasProductIntent);
     // Depois que a pessoa escolhe uma porta (#destinos ou #preparar), a outra seção continua
@@ -186,9 +191,16 @@ const LinksPage: React.FC = () => {
                         <section id="destinos" className={destinosSectionClass} aria-labelledby="destinations-heading">
                             <h2 id="destinations-heading" className={sectionHeadingClass(selectedIntent === 'preparar')}>Conheça destinos e ideias</h2>
                             <p className="mt-1 text-sm leading-6 text-white/70">Veja algumas possibilidades antes de decidir como quer viajar.</p>
-                            {hasPrimaryDestinations ? (
-                                <nav aria-label="Destinos e ideias de viagem" className="mt-4 flex w-full flex-col gap-3">
+                            {hasQuiz ? (
+                                <nav aria-label="Quiz de perfil de viagem" className="mt-4 flex w-full flex-col gap-3">
                                     {renderLink('quiz')}
+                                </nav>
+                            ) : null}
+                            {visibleFeaturedDestinationLinks.length > 0 ? (
+                                <nav
+                                    aria-label="Destinos em destaque"
+                                    className={`flex w-full flex-col gap-3${hasQuiz ? ' mt-6' : ' mt-4'}`}
+                                >
                                     {visibleFeaturedDestinationLinks.map((item) => (
                                         <LinkButton key={item.id} item={item} search={search} />
                                     ))}
