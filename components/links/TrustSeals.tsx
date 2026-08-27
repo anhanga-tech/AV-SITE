@@ -1,7 +1,10 @@
 import React from 'react';
+import { Heart } from '@phosphor-icons/react';
 import googleReviewsRaw from '../../data/googleReviews.json';
 import type { GoogleReviewsData } from '../../types/reviews';
 import { formatReviewCountLabel } from './reviewFormatting';
+import { ANHANGA_TECH_LOGO_URL } from '../../lib/media-assets';
+import { useFooterRuntimeMetadata } from '../../lib/footer-runtime';
 
 const CADASTUR = '37.036.732/0001-41';
 const googleReviews = googleReviewsRaw as GoogleReviewsData;
@@ -9,6 +12,10 @@ const googleReviews = googleReviewsRaw as GoogleReviewsData;
 export const TrustSeals: React.FC = () => {
     const rating = googleReviews.averageRating ? googleReviews.averageRating.toFixed(1) : '5.0';
     const reviewCountLabel = formatReviewCountLabel(googleReviews.totalReviews ?? 0);
+    // Mesmo crédito e mesmo padrão do rodapé do site principal (components/Footer.tsx) — o
+    // ano é preenchido só depois de montar para manter o HTML pré-renderizado desta rota
+    // determinístico (ver useFooterRuntimeMetadata).
+    const runtimeMetadata = useFooterRuntimeMetadata();
 
     return (
         // Peak-end rule (crítica de /links de 2026-08-27, P2): o rodapé é o último conteúdo da
@@ -35,6 +42,12 @@ export const TrustSeals: React.FC = () => {
                     <span>Nota {rating}{reviewCountLabel ? ` · ${reviewCountLabel}` : ''} no Google</span>
                 </div>
                 <p className="mt-1 text-white/60">ANHANGA TURISMO LTDA</p>
+                <p className="mt-1 text-white/60">
+                    Feito com <Heart className="inline-block size-3 text-red-500" weight="fill" aria-hidden="true" /> pela{' '}
+                    <img src={ANHANGA_TECH_LOGO_URL} alt="Anhangá.tech" width={80} height={16} loading="lazy"
+                         className="inline-block h-4 w-auto mx-1 align-sub" />
+                    {runtimeMetadata ? ` · ${runtimeMetadata.currentYear}` : null}
+                </p>
             </div>
         </footer>
     );

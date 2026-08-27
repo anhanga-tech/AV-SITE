@@ -40,3 +40,11 @@ test('TrustSeals não usa mais o hover âmbar no link do Cadastur', () => {
     assert.ok(cadasturLink, 'link do Cadastur não encontrado');
     assert.doesNotMatch(cadasturLink!.className, /anhanga-yellow/);
 });
+
+test('TrustSeals credita a Anhangá.tech, no mesmo padrão do rodapé do site principal', () => {
+    const { container } = render(React.createElement(TrustSeals));
+    assert.match(container.textContent ?? '', /Feito com/);
+    const logo = container.querySelector('img[alt="Anhangá.tech"]');
+    assert.ok(logo, 'logo da Anhangá.tech não encontrada');
+    assert.match(logo!.getAttribute('src') ?? '', /anhanga-tech\.svg$/);
+});
