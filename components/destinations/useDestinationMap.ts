@@ -42,12 +42,7 @@ function ensureMarkerStyles() {
             }
             .leaflet-tooltip-top.custom-dest-tooltip::before { border-top-color: #ffffff !important; }
 
-            /* MAP TILE STYLING - CartoDB Voyager (Clean, No strong borders) */
-            .leaflet-tile-pane {
-                /* High saturation to keep it fun, contrast for clarity */
-                filter: contrast(1.05) saturate(1.2);
-            }
-            /* Background matches Voyager water color */
+            /* MAP TILE STYLING - OpenStreetMap standard tiles are saturated enough on their own */
             .leaflet-container { background: #FAFAFA; font-family: 'Poppins', sans-serif; }
 
             /* Hide Default Zoom Controls to replace with custom stickers */
