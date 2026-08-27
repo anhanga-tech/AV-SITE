@@ -81,6 +81,8 @@ export const linksPageConfig: LinksPageConfig = {
         // `id` preservado apesar da URL ter mudado para /cruzeiros: ele vira data-testid e vai
         // ao dataLayer via pushLinksPageClick — renomear quebraria a série histórica de cliques.
         { id: 'curadoria-cruzeiros-brasil', label: 'Cruzeiros pelo Brasil', sublabel: 'Navegue pelo litoral com curadoria', type: 'internal', href: '/cruzeiros', icon: 'Anchor', visible: true },
-        { id: 'lollapalooza', label: 'Lollapalooza', sublabel: 'Ingresso, hospedagem e logística resolvidos', type: 'internal', href: '/lollapalooza', icon: 'MusicNotes', visible: true },
+        // Sublabel reflete o estado real da campanha (2026 esgotado, ver
+        // pages/landings/LollapaloozaLanding.tsx) — não prometer pacote disponível.
+        { id: 'lollapalooza', label: 'Lollapalooza', sublabel: 'Lista de espera para a edição 2027', type: 'internal', href: '/lollapalooza', icon: 'MusicNotes', visible: true },
     ],
 };
