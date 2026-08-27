@@ -4,7 +4,7 @@ test('VenueMap survives SPA unmount and remount without Leaflet lifecycle errors
   const pageErrors: string[] = [];
   page.on('pageerror', error => pageErrors.push(error.message));
 
-  await page.route('https://*.basemaps.cartocdn.com/**', route => route.abort());
+  await page.route('https://*.tile.openstreetmap.org/**', route => route.abort());
   await page.goto('/lollapalooza');
 
   const map = page.locator('section.leaflet-container[aria-label="Mapa interativo com pontos de interesse"]');
