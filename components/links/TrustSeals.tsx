@@ -52,7 +52,11 @@ export const TrustSeals: React.FC = () => {
                     <span className="inline-flex items-center gap-1">
                         Feito com <Heart className="size-3 text-red-500" weight="fill" aria-hidden="true" /> pela
                     </span>
-                    <img src={ANHANGA_TECH_LOGO_URL} alt="Anhangá.tech" width={80} height={12} loading="lazy" className="h-3 w-auto" />
+                    {/* Proporção real do logo é ~5:1 (Footer.tsx:122 usa width=80 height=16 para h-4);
+                        aqui a altura CSS é h-3 (12px), então width precisa ser 60, não 80, senão o
+                        navegador reserva o espaço errado pré-load e reflowa quando a imagem chega
+                        (review claude[bot] na PR #1536). */}
+                    <img src={ANHANGA_TECH_LOGO_URL} alt="Anhangá.tech" width={60} height={12} loading="lazy" className="h-3 w-auto" />
                     {runtimeMetadata ? <span>· {runtimeMetadata.currentYear}</span> : null}
                     <span className="h-px w-6 bg-white/15" aria-hidden="true" />
                 </div>
