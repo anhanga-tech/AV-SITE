@@ -42,12 +42,7 @@ function ensureMarkerStyles() {
             }
             .leaflet-tooltip-top.custom-dest-tooltip::before { border-top-color: #ffffff !important; }
 
-            /* MAP TILE STYLING - CartoDB Voyager (Clean, No strong borders) */
-            .leaflet-tile-pane {
-                /* High saturation to keep it fun, contrast for clarity */
-                filter: contrast(1.05) saturate(1.2);
-            }
-            /* Background matches Voyager water color */
+            /* MAP TILE STYLING - OpenStreetMap standard tiles are saturated enough on their own */
             .leaflet-container { background: #FAFAFA; font-family: 'Poppins', sans-serif; }
 
             /* Hide Default Zoom Controls to replace with custom stickers */
@@ -125,9 +120,9 @@ export function useDestinationMap(
         mapInstance.current = map;
         markersLayerRef.current = markersLayer;
 
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-            maxZoom: 20
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 19
         }).addTo(map);
 
         return () => {
