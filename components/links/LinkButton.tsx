@@ -21,6 +21,15 @@ interface LinkButtonProps {
     search: string | null;
     /** classes extra (ex.: margem de ritmo na fronteira entre tiers) */
     className?: string;
+    /**
+     * Emblema circular Safira Profunda ao redor do ícone — reservado aos 4 destinos em
+     * destaque (LinksPage.tsx) para sinalizar "isto é curadoria", não a lista inteira.
+     * Sem tocar no vocabulário de sombra: hard shadow continua exclusiva de highlight/primary
+     * (ver `tierClasses`). Safira Profunda é a cor documentada em DESIGN.md para "superfícies
+     * que precisam de peso de marca sem a leveza do Céu Vivo" — o uso de badge é exatamente
+     * esse caso, não uma cor inventada para a ocasião.
+     */
+    iconBadge?: boolean;
 }
 
 // Slot de ícone com largura fixa garante que todos os rótulos alinhem na mesma coluna,
@@ -74,7 +83,7 @@ function warnMissingHref(item: LinkItem, fallback: string): void {
     }
 }
 
-export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className: extraClassName }) => {
+export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className: extraClassName, iconBadge }) => {
     const className = `${baseClasses} ${tierClasses(item)}${extraClassName ? ` ${extraClassName}` : ''}`;
     const IconComponent = item.icon ? ICON_MAP[item.icon] : undefined;
 
@@ -94,8 +103,17 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className:
     // recebe o aviso pelo texto `sr-only` embutido no nome acessível do link.
     const content = (opensInNewTab: boolean) => (
         <>
-            <span className="flex w-[24px] shrink-0 items-center justify-center" aria-hidden="true">
-                {IconComponent ? <IconComponent size={22} weight="fill" /> : null}
+            <span
+                className={
+                    iconBadge
+                        ? 'flex w-[36px] h-[36px] shrink-0 items-center justify-center rounded-full bg-anhanga-blue/10'
+                        : 'flex w-[24px] shrink-0 items-center justify-center'
+                }
+                aria-hidden="true"
+            >
+                {IconComponent ? (
+                    <IconComponent size={iconBadge ? 20 : 22} weight="fill" className={iconBadge ? 'text-anhanga-blue' : undefined} />
+                ) : null}
             </span>
             <span className="flex min-w-0 flex-1 flex-col">
                 {/* Sem `truncate`: `white-space: nowrap` cortava o rótulo com reticências em

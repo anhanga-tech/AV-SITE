@@ -214,7 +214,7 @@ const LinksPage: React.FC = () => {
                                     className={`flex w-full flex-col gap-3${hasQuiz ? ' mt-6' : ' mt-4'}`}
                                 >
                                     {visibleFeaturedDestinationLinks.map((item) => (
-                                        <LinkButton key={item.id} item={item} search={search} />
+                                        <LinkButton key={item.id} item={item} search={search} iconBadge />
                                     ))}
                                 </nav>
                             ) : null}
