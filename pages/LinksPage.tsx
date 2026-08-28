@@ -17,6 +17,12 @@ import {
 } from '../utils/linksPageLayout';
 import LinkButton from '../components/links/LinkButton';
 import TrustSeals from '../components/links/TrustSeals';
+// /links está em STANDALONE_ROUTES (App.tsx) — nenhum overlay flutuante é montado ali (AIChat,
+// BackToTop, ContactModal) porque cobririam o conteúdo curado e os selos de confiança. Mas os
+// links tipo `whatsapp` do LinkButton disparam `openContactModal()`, que é só um CustomEvent —
+// sem um ouvinte montado nesta rota, o evento seria um no-op silencioso. Montamos a instância
+// aqui, só para este clique sob demanda; ela não aparece sozinha, ao contrário dos FABs.
+import ContactModal from '../components/ContactModal';
 
 // A query da URL é estado externo ao React. /links é prerenderizada (lib/prerender-routes.js),
 // então ler `window.location.search` durante o render faria o HTML do servidor divergir do
@@ -248,6 +254,7 @@ const LinksPage: React.FC = () => {
                     <TrustSeals />
                 </div>
             </main>
+            <ContactModal />
         </>
     );
 };

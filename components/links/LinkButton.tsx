@@ -4,6 +4,7 @@ import { ArrowSquareOut } from '@phosphor-icons/react';
 import { getWhatsAppLink } from '../../utils/whatsapp';
 import { withTrackingParams, applyOriginToMessage, pushLinksPageClick } from '../../utils/linksTracking';
 import { openConsultoriaBooking, CONSULTORIA_BOOKING_URL } from '../../lib/cal-embed';
+import { openContactModal } from '../../utils/contactForm';
 import type { LinkItem } from '../../data/linksPage';
 import { ICON_MAP } from './linkIcons';
 
@@ -117,11 +118,23 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className:
     );
 
     if (item.type === 'whatsapp') {
-        const href = getWhatsAppLink(applyOriginToMessage(item.whatsappMessage ?? '', search));
+        // Mesmo padrão do Header/CorpHero/Lollapalooza: o clique abre o ContactModal (nome +
+        // WhatsApp + e-mail → grava no CRM via /api/submit-contact → só então abre o WhatsApp,
+        // com a mensagem estruturada deste item como pré-preenchimento). `href` real para
+        // progressive enhancement (sem JS, cai direto no link de WhatsApp de hoje) —
+        // `target="_blank"` só importa nesse caminho, já que o onClick sempre faz preventDefault.
+        // `content(false)`: o comportamento normal (com JS) é abrir um modal, não uma nova aba.
+        const message = applyOriginToMessage(item.whatsappMessage ?? '', search);
+        const href = getWhatsAppLink(message);
         return (
             <a href={href} target="_blank" rel="noopener noreferrer" className={className}
-               data-testid={`link-${item.id}`} onClick={() => pushLinksPageClick(item, href)}>
-                {content(true)}
+               data-testid={`link-${item.id}`}
+               onClick={(e) => {
+                   e.preventDefault();
+                   openContactModal({ source: `links-${item.id}`, message });
+                   pushLinksPageClick(item, href);
+               }}>
+                {content(false)}
             </a>
         );
     }

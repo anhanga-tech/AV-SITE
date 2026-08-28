@@ -3,7 +3,7 @@ import './helpers/dom-setup.ts';
 import React from 'react';
 import test, { afterEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { render, cleanup } from '@testing-library/react';
+import { render, cleanup, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 import { LinkButton } from '../components/links/LinkButton.tsx';
@@ -24,13 +24,41 @@ function renderLinkButton(item: LinkItem) {
     );
 }
 
-test('link whatsapp anuncia "abre em nova aba" e mostra o ícone de saída', () => {
+/*
+  P: "O botão de whatsapp precisaria abrir um modal para preencher os dados do lead. Como é
+  nas demais páginas" — o clique agora abre o ContactModal (mesmo padrão de Header/CorpHero/
+  Lollapalooza) em vez de navegar direto para o WhatsApp. Não é mais "abre em nova aba": o
+  comportamento normal (com JS) é abrir um modal na própria página.
+*/
+test('link whatsapp não anuncia "abre em nova aba" (o comportamento normal agora é abrir um modal)', () => {
     const item: LinkItem = { id: 'wa', label: 'Falar no WhatsApp', type: 'whatsapp', whatsappMessage: 'Olá', visible: true };
     const { container } = renderLinkButton(item);
     const link = container.querySelector('a[data-testid="link-wa"]');
     assert.ok(link, 'link não encontrado');
-    assert.match(link!.textContent ?? '', /abre em nova aba/);
-    assert.ok(container.querySelector('svg'), 'ícone de saída não renderizado');
+    assert.doesNotMatch(link!.textContent ?? '', /abre em nova aba/);
+});
+
+test('link whatsapp mantém href real de wa.me (progressive enhancement) mas dispara openContactModal no clique', () => {
+    const item: LinkItem = { id: 'wa', label: 'Falar no WhatsApp', type: 'whatsapp', whatsappMessage: 'Olá!{origem} Quero planejar uma viagem.', visible: true };
+    const { container } = renderLinkButton(item);
+    const link = container.querySelector('a[data-testid="link-wa"]') as HTMLAnchorElement | null;
+    assert.ok(link, 'link não encontrado');
+    assert.match(link!.getAttribute('href') ?? '', /^https:\/\/wa\.me\//, 'sem JS/prerender o link ainda precisa funcionar como WhatsApp direto');
+
+    let detail: unknown = null;
+    const handler = (e: Event) => { detail = (e as CustomEvent).detail; };
+    window.addEventListener('open-contact-modal', handler);
+
+    try {
+        fireEvent.click(link!);
+    } finally {
+        window.removeEventListener('open-contact-modal', handler);
+    }
+
+    assert.deepEqual(detail, {
+        source: 'links-wa',
+        message: 'Olá! Quero planejar uma viagem.',
+    });
 });
 
 test('link external anuncia "abre em nova aba"', () => {
