@@ -129,11 +129,100 @@ test('não renderiza overlays flutuantes (AIChat / BackToTop) na página standal
     await expect(page.getByRole('button', { name: 'Voltar ao topo' })).toHaveCount(0);
 });
 
-test('botão WhatsApp aponta para wa.me com texto', async ({ page }) => {
+test('botão WhatsApp mantém href real de wa.me (progressive enhancement)', async ({ page }) => {
     await page.goto('/links');
     const href = await page.getByTestId('link-whatsapp').getAttribute('href');
     expect(href).toContain('wa.me/5511955021519');
     expect(href).toContain('text=');
+});
+
+// P: "O botão de whatsapp precisaria abrir um modal para preencher os dados do lead. Como é
+// nas demais páginas" — mesmo padrão de tests/e2e/contact-form.spec.ts: mocka /api/submit-contact
+// e window.open (evita abrir aba real durante o teste) para exercitar o fluxo ponta a ponta.
+// Escopo: os dois links tipo whatsapp de /links (`whatsapp` e `chip-esim`) passam pelo modal.
+async function mockSubmitContact(page: import('@playwright/test').Page) {
+    const requests: import('../../types/contactCapture').SubmitContactRequest[] = [];
+    await page.route('**/api/submit-contact', (route) => {
+        requests.push(route.request().postDataJSON());
+        return route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ ok: true, requestId: 'req_links_e2e' }),
+        });
+    });
+    return requests;
+}
+
+test('botões de WhatsApp abrem o ContactModal em vez de navegar direto', async ({ page }) => {
+    await mockSubmitContact(page);
+    await page.addInitScript(() => {
+        Object.defineProperty(window, 'open', { configurable: true, value: () => null });
+    });
+    await page.goto('/links');
+
+    const dialog = page.getByRole('dialog', { name: 'Fale com um consultor' });
+
+    await page.getByTestId('link-whatsapp').click();
+    await expect(dialog).toBeVisible();
+    await expect(page.locator('#contact-firstName')).toBeFocused();
+    await page.getByRole('button', { name: 'Fechar' }).click();
+    await expect(dialog).toBeHidden();
+
+    await page.getByTestId('link-chip-esim').click();
+    await expect(dialog).toBeVisible();
+});
+
+test('envia o lead pelo modal (CRM primeiro) e só então abre o WhatsApp com a mensagem do item', async ({ page }) => {
+    const requests = await mockSubmitContact(page);
+    await page.addInitScript(() => {
+        Object.defineProperty(window, 'open', { configurable: true, value: () => null });
+    });
+    await page.goto('/links');
+
+    await page.getByTestId('link-whatsapp').click();
+    await page.locator('#contact-firstName').fill('Maria');
+    await page.locator('#contact-whatsapp').fill('11987654321');
+    await page.getByRole('button', { name: /^abrir whatsapp agora$/i }).click();
+
+    await expect(page.getByText(/recebemos seu contato/i)).toBeVisible();
+    expect(requests).toHaveLength(1);
+    expect(requests[0].source).toBe('links-whatsapp');
+    expect(requests[0].firstName).toBe('Maria');
+});
+
+// Review chatgpt-codex-connector[bot] (P1) na PR #1536: o href continua sendo wa.me (fallback de
+// progressive enhancement), então public/utm-tracking.js casaria em `a[href*="wa.me"]` e contaria
+// "abriu o formulário" como "chegou no WhatsApp" — data-no-whatsapp-cta evita essa inflação.
+test('links tipo whatsapp optam fora da métrica whatsapp_cta_click (o clique abre um formulário, não o WhatsApp)', async ({ page }) => {
+    await page.goto('/links');
+    await expect(page.locator('[data-testid="link-whatsapp"][data-no-whatsapp-cta]')).toHaveCount(1);
+    await expect(page.locator('[data-testid="link-chip-esim"][data-no-whatsapp-cta]')).toHaveCount(1);
+});
+
+// Mesmo padrão de landing-consultoria-content.spec.ts: o botão "Agendar consultoria" trocou
+// o pedido de orçamento via WhatsApp por agendamento pago no Cal.com (mesmo mecanismo da
+// landing /consultoria-de-viagem, ver lib/cal-embed.ts).
+test('botão "Agendar consultoria" linka para o Cal.com e opta fora do specialist_cta_click', async ({ page }) => {
+    await page.goto('/links');
+    const cta = page.getByTestId('link-agendar-consultoria');
+    await cta.scrollIntoViewIfNeeded();
+    await expect(cta).toHaveAttribute('href', 'https://cal.com/anhanga-viagens/consultoria');
+    // "Agendar consultoria" casaria no heurístico textual de isSpecialistCtaText
+    // (public/utm-tracking.js) — o opt-out evita um falso specialist_cta_click.
+    await expect(page.locator('[data-testid="link-agendar-consultoria"][data-no-specialist-cta]')).toHaveCount(1);
+});
+
+test('botão "Agendar consultoria" cai no fallback de navegação se o embed do Cal.com falhar', async ({ page }) => {
+    // Aborta app.cal.com (embed) e intercepta cal.com/anhanga-viagens (destino do fallback) —
+    // nenhuma request externa real, teste hermético.
+    await page.route('https://app.cal.com/**', (route) => route.abort());
+    await page.route('https://cal.com/anhanga-viagens/**', (route) =>
+        route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><title>cal</title>' }),
+    );
+    await page.goto('/links');
+
+    await page.getByTestId('link-agendar-consultoria').click();
+    await page.waitForURL('https://cal.com/anhanga-viagens/consultoria', { timeout: 8000 });
 });
 
 // Mede o que a auditoria só conseguia argumentar: com `truncate` (`white-space: nowrap`) o

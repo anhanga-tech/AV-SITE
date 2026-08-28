@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { ArrowSquareOut } from '@phosphor-icons/react';
 import { getWhatsAppLink } from '../../utils/whatsapp';
 import { withTrackingParams, applyOriginToMessage, pushLinksPageClick } from '../../utils/linksTracking';
+import { openConsultoriaBooking, CONSULTORIA_BOOKING_URL } from '../../lib/cal-embed';
+import { openContactModal } from '../../utils/contactForm';
 import type { LinkItem } from '../../data/linksPage';
 import { ICON_MAP } from './linkIcons';
 
@@ -116,11 +118,28 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className:
     );
 
     if (item.type === 'whatsapp') {
-        const href = getWhatsAppLink(applyOriginToMessage(item.whatsappMessage ?? '', search));
+        // Mesmo padrão do Header/CorpHero/Lollapalooza: o clique abre o ContactModal (nome +
+        // WhatsApp + e-mail → grava no CRM via /api/submit-contact → só então abre o WhatsApp,
+        // com a mensagem estruturada deste item como pré-preenchimento). `href` real para
+        // progressive enhancement (sem JS, cai direto no link de WhatsApp de hoje) —
+        // `target="_blank"` só importa nesse caminho, já que o onClick sempre faz preventDefault.
+        // `content(false)`: o comportamento normal (com JS) é abrir um modal, não uma nova aba.
+        // `data-no-whatsapp-cta`: o href continua sendo wa.me (fallback), então
+        // public/utm-tracking.js casaria em `a[href*="wa.me"]` e contaria "abriu o formulário"
+        // como "chegou no WhatsApp" — o handoff real só acontece depois do envio bem-sucedido
+        // (hooks/useContactForm.ts). Review chatgpt-codex-connector[bot] na PR #1536.
+        const message = applyOriginToMessage(item.whatsappMessage ?? '', search);
+        const href = getWhatsAppLink(message);
         return (
             <a href={href} target="_blank" rel="noopener noreferrer" className={className}
-               data-testid={`link-${item.id}`} onClick={() => pushLinksPageClick(item, href)}>
-                {content(true)}
+               data-testid={`link-${item.id}`}
+               data-no-whatsapp-cta
+               onClick={(e) => {
+                   e.preventDefault();
+                   openContactModal({ source: `links-${item.id}`, message });
+                   pushLinksPageClick(item, href);
+               }}>
+                {content(false)}
             </a>
         );
     }
@@ -131,6 +150,26 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className:
             <a href={href} target="_blank" rel="noopener noreferrer" className={className}
                data-testid={`link-${item.id}`} onClick={() => pushLinksPageClick(item, href)}>
                 {content(true)}
+            </a>
+        );
+    }
+
+    if (item.type === 'cal-modal') {
+        // Mesmo mecanismo da landing /consultoria-de-viagem (lib/cal-embed.ts): `href` real para
+        // progressive enhancement (sem JS/prerender é um link funcional para o Cal.com), onClick
+        // com preventDefault abre o modal por cima da página. Sem `target="_blank"` — o modal
+        // abre na própria aba; só o fallback de falha do embed navega para longe, na mesma aba.
+        // `data-no-specialist-cta`: "Agendar consultoria" casaria no heurístico textual de
+        // isSpecialistCtaText (public/utm-tracking.js) e disparia um falso specialist_cta_click.
+        return (
+            <a href={CONSULTORIA_BOOKING_URL} className={className} data-testid={`link-${item.id}`}
+               data-no-specialist-cta
+               onClick={(e) => {
+                   e.preventDefault();
+                   openConsultoriaBooking();
+                   pushLinksPageClick(item, CONSULTORIA_BOOKING_URL);
+               }}>
+                {content(false)}
             </a>
         );
     }

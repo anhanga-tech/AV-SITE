@@ -16,7 +16,7 @@ export interface LinksPageVisibility {
 // desaparece silenciosamente só porque ainda não foi promovida para uma seção de destaque.
 const EXPLICITLY_RENDERED_LINK_IDS = new Set<string>([
     'whatsapp',
-    'orcamento',
+    'agendar-consultoria',
     'quiz',
     'site',
     ...PRODUCT_LINK_IDS,
@@ -47,7 +47,7 @@ export function getLinksPageVisibility(links: readonly LinkItem[]): LinksPageVis
     return {
         hasPrimaryDestinations,
         hasVisibleDestinations,
-        hasVisibleContact: visibleLinkIds.has('orcamento'),
+        hasVisibleContact: visibleLinkIds.has('agendar-consultoria'),
         hasVisibleOtherLinks: visibleLinkIds.has('site') || getUnassignedVisibleLinks(visibleLinks).length > 0,
     };
 }

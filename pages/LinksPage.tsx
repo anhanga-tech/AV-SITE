@@ -17,6 +17,12 @@ import {
 } from '../utils/linksPageLayout';
 import LinkButton from '../components/links/LinkButton';
 import TrustSeals from '../components/links/TrustSeals';
+// /links está em STANDALONE_ROUTES (App.tsx) — nenhum overlay flutuante é montado ali (AIChat,
+// BackToTop, ContactModal) porque cobririam o conteúdo curado e os selos de confiança. Mas os
+// links tipo `whatsapp` do LinkButton disparam `openContactModal()`, que é só um CustomEvent —
+// sem um ouvinte montado nesta rota, o evento seria um no-op silencioso. Montamos a instância
+// aqui, só para este clique sob demanda; ela não aparece sozinha, ao contrário dos FABs.
+import ContactModal from '../components/ContactModal';
 
 // A query da URL é estado externo ao React. /links é prerenderizada (lib/prerender-routes.js),
 // então ler `window.location.search` durante o render faria o HTML do servidor divergir do
@@ -181,9 +187,15 @@ const LinksPage: React.FC = () => {
 
                     {hasVisibleContact ? (
                         <section id="contato" className="mt-10 w-full scroll-mt-6" aria-labelledby="contact-heading">
-                            <h2 id="contact-heading" className="text-lg font-black text-white/90">Já tem destino e datas?</h2>
-                            <p className="mt-1 text-sm leading-6 text-white/70">Envie os detalhes e receba um orçamento para a sua viagem.</p>
-                            <div className="mt-4">{renderLink('orcamento')}</div>
+                            {/* "Diagnóstico", não "consultoria completa": a sessão de R$ 250 é o
+                                diagnóstico + plano por escrito (50 min); a consultoria completa
+                                (roteiro executado) é orçada à parte e só recebe o valor da sessão
+                                como abatimento se a pessoa seguir com ela — ver FAQ de
+                                pages/landings/ConsultoriaDeViagemLanding.tsx. Review
+                                chatgpt-codex-connector[bot] na PR #1536. */}
+                            <h2 id="contact-heading" className="text-lg font-black text-white/90">Quer um diagnóstico completo da sua viagem?</h2>
+                            <p className="mt-1 text-sm leading-6 text-white/70">Uma sessão paga de 50 minutos para diagnosticar sua viagem e sair com um plano por escrito.</p>
+                            <div className="mt-4">{renderLink('agendar-consultoria')}</div>
                         </section>
                     ) : null}
 
@@ -248,6 +260,7 @@ const LinksPage: React.FC = () => {
                     <TrustSeals />
                 </div>
             </main>
+            <ContactModal />
         </>
     );
 };

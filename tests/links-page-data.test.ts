@@ -38,6 +38,15 @@ test('todo link internal tem href relativo (começa com /)', () => {
     }
 });
 
+// O destino de um link cal-modal é fixo (CONSULTORIA_BOOKING_URL, lib/cal-embed.ts), não vem da
+// config — declarar href/whatsappMessage aqui seria campo morto que ninguém lê.
+test('todo link cal-modal não declara href nem whatsappMessage', () => {
+    for (const link of linksPageConfig.links.filter((l) => l.type === 'cal-modal')) {
+        assert.equal(link.href, undefined, `${link.id} não deveria ter href`);
+        assert.equal(link.whatsappMessage, undefined, `${link.id} não deveria ter whatsappMessage`);
+    }
+});
+
 test('banner visível está bem-formado', () => {
     const { banner } = linksPageConfig;
     if (banner.visible) {
@@ -88,7 +97,7 @@ test('atalho de produtos não encontra links ocultos', () => {
 });
 
 test('seções sem links visíveis ficam desativadas', () => {
-    const hiddenSectionLinks: LinkItem[] = ['orcamento', 'quiz', 'site', ...FEATURED_DESTINATION_IDS, ...MORE_DESTINATION_IDS].map((id) => ({
+    const hiddenSectionLinks: LinkItem[] = ['agendar-consultoria', 'quiz', 'site', ...FEATURED_DESTINATION_IDS, ...MORE_DESTINATION_IDS].map((id) => ({
         id,
         label: id,
         type: 'internal',
