@@ -187,7 +187,13 @@ const LinksPage: React.FC = () => {
 
                     {hasVisibleContact ? (
                         <section id="contato" className="mt-10 w-full scroll-mt-6" aria-labelledby="contact-heading">
-                            <h2 id="contact-heading" className="text-lg font-black text-white/90">Quer uma consultoria completa?</h2>
+                            {/* "Diagnóstico", não "consultoria completa": a sessão de R$ 250 é o
+                                diagnóstico + plano por escrito (50 min); a consultoria completa
+                                (roteiro executado) é orçada à parte e só recebe o valor da sessão
+                                como abatimento se a pessoa seguir com ela — ver FAQ de
+                                pages/landings/ConsultoriaDeViagemLanding.tsx. Review
+                                chatgpt-codex-connector[bot] na PR #1536. */}
+                            <h2 id="contact-heading" className="text-lg font-black text-white/90">Quer um diagnóstico completo da sua viagem?</h2>
                             <p className="mt-1 text-sm leading-6 text-white/70">Uma sessão paga de 50 minutos para diagnosticar sua viagem e sair com um plano por escrito.</p>
                             <div className="mt-4">{renderLink('agendar-consultoria')}</div>
                         </section>

@@ -190,6 +190,15 @@ test('envia o lead pelo modal (CRM primeiro) e só então abre o WhatsApp com a 
     expect(requests[0].firstName).toBe('Maria');
 });
 
+// Review chatgpt-codex-connector[bot] (P1) na PR #1536: o href continua sendo wa.me (fallback de
+// progressive enhancement), então public/utm-tracking.js casaria em `a[href*="wa.me"]` e contaria
+// "abriu o formulário" como "chegou no WhatsApp" — data-no-whatsapp-cta evita essa inflação.
+test('links tipo whatsapp optam fora da métrica whatsapp_cta_click (o clique abre um formulário, não o WhatsApp)', async ({ page }) => {
+    await page.goto('/links');
+    await expect(page.locator('[data-testid="link-whatsapp"][data-no-whatsapp-cta]')).toHaveCount(1);
+    await expect(page.locator('[data-testid="link-chip-esim"][data-no-whatsapp-cta]')).toHaveCount(1);
+});
+
 // Mesmo padrão de landing-consultoria-content.spec.ts: o botão "Agendar consultoria" trocou
 // o pedido de orçamento via WhatsApp por agendamento pago no Cal.com (mesmo mecanismo da
 // landing /consultoria-de-viagem, ver lib/cal-embed.ts).

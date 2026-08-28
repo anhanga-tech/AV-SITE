@@ -124,11 +124,16 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className:
         // progressive enhancement (sem JS, cai direto no link de WhatsApp de hoje) —
         // `target="_blank"` só importa nesse caminho, já que o onClick sempre faz preventDefault.
         // `content(false)`: o comportamento normal (com JS) é abrir um modal, não uma nova aba.
+        // `data-no-whatsapp-cta`: o href continua sendo wa.me (fallback), então
+        // public/utm-tracking.js casaria em `a[href*="wa.me"]` e contaria "abriu o formulário"
+        // como "chegou no WhatsApp" — o handoff real só acontece depois do envio bem-sucedido
+        // (hooks/useContactForm.ts). Review chatgpt-codex-connector[bot] na PR #1536.
         const message = applyOriginToMessage(item.whatsappMessage ?? '', search);
         const href = getWhatsAppLink(message);
         return (
             <a href={href} target="_blank" rel="noopener noreferrer" className={className}
                data-testid={`link-${item.id}`}
+               data-no-whatsapp-cta
                onClick={(e) => {
                    e.preventDefault();
                    openContactModal({ source: `links-${item.id}`, message });

@@ -97,6 +97,14 @@
     }
 
     function trackWhatsAppClick(target) {
+        // Opt-out explícito: CTAs marcados data-no-whatsapp-cta (ex.: os links tipo whatsapp de
+        // /links, que mantêm href=wa.me só como fallback de progressive enhancement — o clique de
+        // verdade abre o ContactModal via openContactModal(), não navega pro WhatsApp na hora).
+        // Sem isso, whatsapp_cta_click contaria "abriu o formulário" como "chegou no WhatsApp",
+        // inflando a métrica mesmo quando a pessoa fecha o modal ou falha a validação — o handoff
+        // real já é rastreado depois do envio bem-sucedido em hooks/useContactForm.ts.
+        if (target.closest('[data-no-whatsapp-cta]')) return;
+
         const whatsappButton = getWhatsAppButton(target);
         if (!whatsappButton) return;
 
