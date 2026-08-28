@@ -48,3 +48,14 @@ test('link internal não anuncia "abre em nova aba"', () => {
     assert.ok(link, 'link não encontrado');
     assert.doesNotMatch(link!.textContent ?? '', /abre em nova aba/);
 });
+
+test('link cal-modal aponta para o Cal.com, opta fora do specialist_cta_click e não anuncia "abre em nova aba"', () => {
+    const item: LinkItem = { id: 'agendar-consultoria', label: 'Agendar consultoria de viagem', type: 'cal-modal', visible: true };
+    const { container } = renderLinkButton(item);
+    const link = container.querySelector('a[data-testid="link-agendar-consultoria"]');
+    assert.ok(link, 'link não encontrado');
+    assert.equal(link!.getAttribute('href'), 'https://cal.com/anhanga-viagens/consultoria');
+    assert.ok(link!.hasAttribute('data-no-specialist-cta'), 'falta data-no-specialist-cta (o texto casaria no heurístico "consultoria" de public/utm-tracking.js)');
+    assert.equal(link!.getAttribute('target'), null, 'não deve abrir em nova aba — o modal abre por cima da própria página');
+    assert.doesNotMatch(link!.textContent ?? '', /abre em nova aba/);
+});

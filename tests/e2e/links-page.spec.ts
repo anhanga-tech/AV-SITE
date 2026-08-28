@@ -136,6 +136,32 @@ test('botão WhatsApp aponta para wa.me com texto', async ({ page }) => {
     expect(href).toContain('text=');
 });
 
+// Mesmo padrão de landing-consultoria-content.spec.ts: o botão "Agendar consultoria" trocou
+// o pedido de orçamento via WhatsApp por agendamento pago no Cal.com (mesmo mecanismo da
+// landing /consultoria-de-viagem, ver lib/cal-embed.ts).
+test('botão "Agendar consultoria" linka para o Cal.com e opta fora do specialist_cta_click', async ({ page }) => {
+    await page.goto('/links');
+    const cta = page.getByTestId('link-agendar-consultoria');
+    await cta.scrollIntoViewIfNeeded();
+    await expect(cta).toHaveAttribute('href', 'https://cal.com/anhanga-viagens/consultoria');
+    // "Agendar consultoria" casaria no heurístico textual de isSpecialistCtaText
+    // (public/utm-tracking.js) — o opt-out evita um falso specialist_cta_click.
+    await expect(page.locator('[data-testid="link-agendar-consultoria"][data-no-specialist-cta]')).toHaveCount(1);
+});
+
+test('botão "Agendar consultoria" cai no fallback de navegação se o embed do Cal.com falhar', async ({ page }) => {
+    // Aborta app.cal.com (embed) e intercepta cal.com/anhanga-viagens (destino do fallback) —
+    // nenhuma request externa real, teste hermético.
+    await page.route('https://app.cal.com/**', (route) => route.abort());
+    await page.route('https://cal.com/anhanga-viagens/**', (route) =>
+        route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><title>cal</title>' }),
+    );
+    await page.goto('/links');
+
+    await page.getByTestId('link-agendar-consultoria').click();
+    await page.waitForURL('https://cal.com/anhanga-viagens/consultoria', { timeout: 8000 });
+});
+
 // Mede o que a auditoria só conseguia argumentar: com `truncate` (`white-space: nowrap`) o
 // rótulo era cortado com reticências, o que é perda de conteúdo — WCAG 1.4.4 Resize Text.
 // `scrollWidth > clientWidth` é exatamente a condição de corte.

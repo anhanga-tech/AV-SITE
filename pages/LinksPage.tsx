@@ -181,9 +181,9 @@ const LinksPage: React.FC = () => {
 
                     {hasVisibleContact ? (
                         <section id="contato" className="mt-10 w-full scroll-mt-6" aria-labelledby="contact-heading">
-                            <h2 id="contact-heading" className="text-lg font-black text-white/90">Já tem destino e datas?</h2>
-                            <p className="mt-1 text-sm leading-6 text-white/70">Envie os detalhes e receba um orçamento para a sua viagem.</p>
-                            <div className="mt-4">{renderLink('orcamento')}</div>
+                            <h2 id="contact-heading" className="text-lg font-black text-white/90">Quer uma consultoria completa?</h2>
+                            <p className="mt-1 text-sm leading-6 text-white/70">Uma sessão paga de 50 minutos para diagnosticar sua viagem e sair com um plano por escrito.</p>
+                            <div className="mt-4">{renderLink('agendar-consultoria')}</div>
                         </section>
                     ) : null}
 

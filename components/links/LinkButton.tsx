@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowSquareOut } from '@phosphor-icons/react';
 import { getWhatsAppLink } from '../../utils/whatsapp';
 import { withTrackingParams, applyOriginToMessage, pushLinksPageClick } from '../../utils/linksTracking';
+import { openConsultoriaBooking, CONSULTORIA_BOOKING_URL } from '../../lib/cal-embed';
 import type { LinkItem } from '../../data/linksPage';
 import { ICON_MAP } from './linkIcons';
 
@@ -131,6 +132,26 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className:
             <a href={href} target="_blank" rel="noopener noreferrer" className={className}
                data-testid={`link-${item.id}`} onClick={() => pushLinksPageClick(item, href)}>
                 {content(true)}
+            </a>
+        );
+    }
+
+    if (item.type === 'cal-modal') {
+        // Mesmo mecanismo da landing /consultoria-de-viagem (lib/cal-embed.ts): `href` real para
+        // progressive enhancement (sem JS/prerender é um link funcional para o Cal.com), onClick
+        // com preventDefault abre o modal por cima da página. Sem `target="_blank"` — o modal
+        // abre na própria aba; só o fallback de falha do embed navega para longe, na mesma aba.
+        // `data-no-specialist-cta`: "Agendar consultoria" casaria no heurístico textual de
+        // isSpecialistCtaText (public/utm-tracking.js) e disparia um falso specialist_cta_click.
+        return (
+            <a href={CONSULTORIA_BOOKING_URL} className={className} data-testid={`link-${item.id}`}
+               data-no-specialist-cta
+               onClick={(e) => {
+                   e.preventDefault();
+                   openConsultoriaBooking();
+                   pushLinksPageClick(item, CONSULTORIA_BOOKING_URL);
+               }}>
+                {content(false)}
             </a>
         );
     }
