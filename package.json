@@ -41,7 +41,7 @@
     "@vitejs/plugin-react": "^6.1.0",
     "autoprefixer": "^10.5.4",
     "framer-motion": "^13.1.1",
-    "globe.gl": "^2.46.1",
+    "globe.gl": "^2.46.2",
     "leaflet": "1.9.4",
     "lucide-react": "^1.33.0",
     "postcss": "^8.5.26",
