@@ -366,6 +366,15 @@ test.describe('Cookie Consent Banner (CMP)', () => {
       page.getByRole('button', { name: 'Recusar' }).click(),
     ]);
 
+    // framenavigated dispara no commit da navegação, antes do <script> síncrono do
+    // index.html (que faz a sincronização inicial pós-reload) necessariamente ter
+    // rodado — sem esperar por isso, a leitura abaixo pode competir com esse script
+    // e ler o array vazio de forma intermitente (achado de review).
+    await page.waitForFunction(() => {
+      const testWindow = window as unknown as { __zarazConsentCalls?: Record<string, boolean>[] };
+      return Boolean(testWindow.__zarazConsentCalls && testWindow.__zarazConsentCalls.length > 0);
+    });
+
     expect(await getZarazConsentCalls(page)).toEqual([{ marketing: false }]);
   });
 });
