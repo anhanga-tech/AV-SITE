@@ -175,7 +175,13 @@ Não há mapeamento automático de evento custom → standard event — foi prec
 
 Disparado `generate_lead` sintético com `zaraz.debug()` ativo. Confirmado no Meta Events Manager → Test Events: evento `Lead`, status `Processado`, `Fonte da ação: website`/`Servidor` — confirma CAPI de verdade (sem pixel client-side). `Chaves de dados do usuário` mostra `fbp`/`fbc`/IP/User-Agent enriquecidos automaticamente pela tool, como previsto no spike.
 
-**Lacuna aberta, não bloqueante:** o `event_id` que mandamos (`task4-test-...`) não chegou na tool — o Meta mostrou um ID numérico aleatório (o fallback do componente, confirmado no código-fonte lido no spike: `payload.event_id || ... || random`). O parâmetro custom recebido foi só `__includeClient: true`; `destination`/UTMs/`event_id` não apareceram como campos. Para a arquitetura CAPI-only isso não importa (não há pixel client-side pra dedupar contra), mas se no futuro for necessário correlacionar o Lead do Meta com o registro no Odoo, essa lacuna precisa ser resolvida — decisão consciente de não investigar agora.
+**Lacuna do `event_id` — investigada e corrigida (01/09/2026).** O `event_id` inicialmente não chegava na tool (Meta caía no fallback aleatório do componente). Causa raiz, achada inspecionando a request real pra `/cdn-cgi/zaraz/t`: o toggle **"Include Event Properties"** não manda só as chaves da chamada `zaraz.track()` atual — ele repassa o **objeto acumulado do `dataLayer`**, que funde chaves de pushes anteriores na mesma sessão (ex.: um evento carregou `form_type`/`form_id` de um `form_submission` completamente diferente, mais `gtm.start`/client_id do bootstrap do GTM). O Zaraz está replicando fielmente a semântica real do `dataLayer` do GTM (cada push funde num objeto persistente, não substitui) — não é bug do Zaraz, mas o toggle "pegar tudo" é mais largo do que uma tag GTM manual, que normalmente lê variáveis específicas, não o blob inteiro.
+
+**Correção aplicada:** desligado "Include Event Properties" na action `Meta - Lead`; adicionado campo individual **"Event ID"** via **"+ Add Field"**, mapeado a uma variable **"Event Property: event_id"** (não "Event Name", usada no trigger). Revalidado: `Identificação do evento` no Meta agora bate exatamente com o `event_id` que mandamos, sem parâmetros espúrios.
+
+**Relevante pra Task 5 (TikTok) e qualquer tool futura:** evitar o toggle "Include Event Properties" (ou equivalente) por padrão — mapear campos individuais explicitamente via "Event Property: <nome>" em vez de confiar no blob acumulado do dataLayer.
+
+**Incidente de segurança durante a investigação:** um print da tela "Tool Settings" foi compartilhado no chat com o **Conversion API Access Token completo em texto puro**. Token revogado e substituído imediatamente pelo usuário assim que identificado. Reforça a regra do plano: nunca printar telas com token visível, nem a Tool Settings (só a tela de configuração da action, que não expõe credenciais).
 
 Revalidado depois de desligar Pageviews/Events: só `Lead` aparece nos Test Events, confirmando o escopo corrigido. **Lembrete:** remover o Test Event Code do campo da tool antes de qualquer publicação — não é código pra ficar em produção.
 
@@ -194,7 +200,10 @@ Revalidado depois de desligar Pageviews/Events: só `Lead` aparece nos Test Even
 
 Pixel Code e access token: usuário digita direto. Gate: purpose `marketing`.
 
-**Lição da Task 4:** ao adicionar a tool, checar imediatamente se ela vem com "Automated actions" (Pageviews/Events) ligadas por padrão — no Meta isso reenviava todo `zaraz.track()` do site, bem além do escopo pretendido. Desligar qualquer automated action antes de criar a custom action do `generate_lead`.
+**Lições da Task 4:**
+- Ao adicionar a tool, checar imediatamente se ela vem com "Automated actions" (Pageviews/Events) ligadas por padrão — no Meta isso reenviava todo `zaraz.track()` do site, bem além do escopo pretendido. Desligar qualquer automated action antes de criar a custom action do `generate_lead`.
+- **Não usar o toggle "Include Event Properties"** (ou equivalente) na action — ele repassa o objeto acumulado do `dataLayer` inteiro (chaves de eventos anteriores misturadas), não só a chamada atual. Mapear campos individuais explicitamente (ex.: Event ID via "+ Add Field" → "Event Property: event_id").
+- Nunca printar a tela "Tool Settings" da tool (Pixel ID/Access Token ficam visíveis) — só a tela de configuração da action/trigger, que não expõe credenciais.
 
 - [ ] **Step 2: Mapear `generate_lead` pro standard event equivalente**
 
