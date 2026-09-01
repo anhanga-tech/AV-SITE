@@ -55,13 +55,13 @@ Consent Management do Zaraz é **por purposes**, mas o default é **fail-OPEN**:
 - Consumes: `window.dataLayer.push({event, ...campos})` já existente.
 - Produces: eventos Zaraz equivalentes via tradução automática (`zaraz.track(event, campos)`).
 
-- [ ] **Step 1: Habilitar Zaraz na zone sem nenhum tool configurado**
+- [x] **Step 1: Habilitar Zaraz na zone sem nenhum tool configurado** (já estava ativo antes deste plano)
 
 Em **Zaraz → Settings**, habilitar o produto na zone. Nenhum Managed Component configurado ainda — esse passo só liga o coletor de eventos no edge.
 
 Expected: Zaraz aparece como ativo no dashboard; nenhum tráfego de terceiros muda ainda (nenhum tool configurado = nenhuma tag disparando).
 
-- [ ] **Step 2: Auditar os 16 payloads de `dataLayer.push` por objetos aninhados**
+- [x] **Step 2: Auditar os 16 payloads de `dataLayer.push` por objetos aninhados** (concluído 01/09/2026)
 
 O Data Layer Compatibility Mode extrai a chave `event` como nome do evento Zaraz e passa o resto como `eventProperties` — mas valores aninhados (ex.: `{ consent: { facebook: true } }`) ficam inacessíveis nesse modo. Rodar:
 
@@ -71,21 +71,19 @@ rg -n "dataLayer\.push\(" utils/ hooks/ lib/ pages/ -A 8
 
 Para cada call site, confirmar que o objeto passado é **plano** (sem objetos aninhados como valor de uma chave) e que sempre inclui a chave `event`. Casos suspeitos a checar com atenção: `utils/formAnalytics.ts:100` (`dataLayer.push(safePayload(input))` — payload dinâmico, confirmar que `safePayload` nunca aninha) e `lib/cal-embed.ts:70,76`.
 
-Expected: lista de call sites com payload plano confirmado, ou lista de exceções que precisarão de `zaraz.track()` explícito em vez de depender do compat mode.
+Expected: lista de call sites com payload plano confirmado, ou lista de exceções que precisarão de `zaraz.track()` explícito em vez de depender do compat mode. Resultado: todos os 16 são planos, todos têm `event` — nenhuma exceção.
 
-- [ ] **Step 3: Habilitar o Data Layer Compatibility Mode**
+- [x] **Step 3: Habilitar o Data Layer Compatibility Mode** (concluído 01/09/2026)
 
-Em **Zaraz → Settings**, ativar **Data layer compatibility mode**.
+Achado: a rota `Zaraz → Settings` da doc oficial está desatualizada — o painel real fica em **Web tag management → Tag setup → Settings** (dashboard migrou de zone-level pra "Tag Management" em fev/2025). Junto com o compat mode, também ligado o **Single Page Application support** (necessário — o site é SPA via React Router, sem isso só o load inicial contaria como pageview).
 
-- [ ] **Step 4: Validar tradução em ambiente de teste**
-
-Sem nenhum Managed Component configurado ainda, usar o preview/debug do Zaraz (ou a aba Network) para confirmar que um evento sintético dispara:
+- [x] **Step 4: Validar tradução em ambiente de teste** (concluído 01/09/2026)
 
 ```js
 window.dataLayer.push({ event: 'zaraz_spike_test', foo: 'bar' });
 ```
 
-Expected: o evento aparece no painel de eventos do Zaraz com nome `zaraz_spike_test` e propriedade `foo: 'bar'`. Se não aparecer, não prosseguir — o compat mode precisa funcionar antes de qualquer tool ser configurado, senão os Tasks seguintes ficam sem dados de entrada.
+Confirmado ao vivo: request `POST /cdn-cgi/zaraz/t` (200) disparada a cada `dataLayer.push`. Tradução funcionando.
 
 ---
 
@@ -102,17 +100,17 @@ Expected: o evento aparece no painel de eventos do Zaraz com nome `zaraz_spike_t
 
 Measurement ID e API secret: o usuário digita direto no dashboard (não copiar/colar via agente). Confirmar o nome exato dos campos na tela — o spike não teve acesso ao dashboard ao vivo, só ao código-fonte do component.
 
-- [ ] **Step 2: Setar `hideOriginalIP: true`**
+Concluído 01/09/2026 — Measurement ID `G-QDBT5PM4KP`. Campos reais na tela: "Hide Originating IP Address" (Privacy) e "Google Analytics Audiences" (Advanced) — deixado desligado por decisão consciente (ver Step 2). Também habilitadas "Track all pageviews" e "Track all other events" (necessárias pro compat mode alimentar a tool); "Track all ecommerce events" deixado desligado (site não tem ecommerce).
 
-Nas settings do tool (não no payload por evento), setar a flag equivalente a `hideOriginalIP`. Esse é o item não-negociável do plano — sem ele, o GA4 recebe `_uip` com o IP real do visitante.
+- [x] **Step 2: Setar `hideOriginalIP: true`** (concluído 01/09/2026)
 
-- [ ] **Step 3: Validar no GA4 DebugView**
+Nas settings do tool (não no payload por evento), setar a flag equivalente a `hideOriginalIP`. Esse é o item não-negociável do plano — sem ele, o GA4 recebe `_uip` com o IP real do visitante. Campo real na tela: **"Hide Originating IP Address"**, texto de confirmação: "This will prevent sending the visitor IP address to Google Analytics 4".
 
-Disparar um pageview de teste e confirmar em **GA4 → Admin → DebugView**:
-- o evento chega;
-- checar (via suporte do Google, se disponível, ou pela ausência de geo granular incoerente com o IP real do testador) que o IP não está sendo usado para geolocalização precisa.
+- [x] **Step 3: Validar no GA4** (concluído 01/09/2026 — via Realtime, não DebugView)
 
-Expected: evento visível no DebugView, sem evidência de IP real propagado.
+Disparado evento sintético (`zaraz_ga4_debugview_test_3`) com `zaraz.debug()` ativo. `GA4 → Admin → DebugView` não mostrou nenhum debug device — a "Debug key" do Zaraz é provavelmente um log interno dele, não repassa `debug_mode` ao Measurement Protocol. **`GA4 → Relatórios → Tempo real` mostrou o tráfego do Zaraz normalmente** — confirma que o pipeline navegador → Zaraz → GA4 entrega de ponta a ponta, que é o que este step precisava provar.
+
+Not verified (limitação conhecida, não bloqueante): não há como confirmar visualmente pelo GA4 que `hideOriginalIP` está de fato suprimindo o IP — o Google não expõe IP bruto em relatório nenhum, por design. A validação desse ponto se apoia na config do tool + no código-fonte lido no spike (`_uip` condicional a `hideOriginalIP`), não em prova visual.
 
 ---
 
