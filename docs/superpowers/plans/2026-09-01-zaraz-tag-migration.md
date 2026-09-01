@@ -18,7 +18,7 @@ Consent Management do Zaraz é **por purposes**, mas o default é **fail-OPEN**:
 
 ## Global Constraints
 
-- Rollout em paralelo — o Stape/GTM continuam ativos em produção até o Zaraz estar validado; nunca remover os dois ao mesmo tempo sem uma janela de comparação.
+- ~~Rollout em paralelo — o Stape/GTM continuam ativos em produção até o Zaraz estar validado; nunca remover os dois ao mesmo tempo sem uma janela de comparação.~~ **Superada em 01/09/2026** (achado de review, chatgpt-codex-connector[bot]): esta constraint pressupunha Stape ativo pra comparar. A própria Stape já tinha desativado o container antes deste plano existir (ver Goal) — nunca houve como cumprir literalmente. Tasks 1-5 foram validadas individualmente (Zaraz Realtime/Test Events por tool, não uma comparação de volume agregado com o Stape), Task 6 foi pulada por decisão do usuário, e a Task 7 (corte) prosseguiu sem essa janela. A evidência de "pronto pra cortar" substituta é a soma das validações individuais das Tasks 1-5, documentadas em cada uma.
 - `lib/conversions/{google,meta}.ts` e `api/purchase-dispatch.ts` ficam fora de escopo — não tocar.
 - Nenhum access token (Meta, TikTok, GA4 API secret) pode entrar no Git, no chat, em screenshots ou em comentários de issue/PR. O usuário digita os tokens direto no dashboard Zaraz; o agente não seleciona, copia nem lê esses valores.
 - **CAPI-only confirmado com o usuário (2026-09-01)**: não recriar pixel client-side Meta/TikTok via tool "Custom HTML". Se isso mudar depois, é uma decisão nova, não um ajuste deste plano.
@@ -274,12 +274,23 @@ pnpm run build
 
 - [x] **Step 4: Atualizar RIPD e docs** (concluído 01/09/2026 — "desativar/cancelar a conta Stape" não se aplica, a própria Stape já desativou)
 
-RIPD bumped pra **v1.9**: Stape substituído por Cloudflare Zaraz nas Atividades 1 e 2 (incluindo o DPA — Cloudflare já é processor via hospedagem, pendente só confirmar cobertura explícita do Zaraz com o DPO); Atividade 4 (Customer Match) marcada como **inativa** (já dependia do Mautic removido na v1.8, agora também do Stape); pendências #1 e #4 marcadas obsoletas. `README.md` atualizado. `docs/performance-third-party-scripts.md` e `.env.example` **não** mencionavam Stape/sGTM (checado, nada a mudar).
+RIPD bumped pra **v1.9**: Stape substituído por Cloudflare Zaraz nas Atividades 1 e 2 (DPA com a Cloudflare marcado como **pendente de confirmação**, não implementado — achado de review, ver abaixo); Atividade 4 (Customer Match) marcada como **inativa** (já dependia do Mautic removido na v1.8, agora também do Stape); pendências #1 e #4 marcadas obsoletas. `README.md` atualizado. `.env.example` não mencionava Stape/sGTM (checado, nada a mudar).
+
+**Correção (achado de review, chatgpt-codex-connector[bot]):** a checagem original de `docs/performance-third-party-scripts.md` (buscando literalmente "stape"/"sgtm") deu falso negativo — o arquivo não cita essas palavras, mas descrevia o loader do GTM como se ainda existisse (`GTM-T2KGS86G`, validação via "GTM Preview"). Reescrito pra registrar a remoção do GTM como superseding note e trocar os passos de validação por Zaraz/Meta/TikTok Events Manager.
 
 **Achados extras na política de privacidade** (fora do escopo original deste step, mas encontrados ao corrigir as menções à Stape):
 - `PrivacySection4MetodosColeta.tsx` citava "Meta Pixel (Facebook) para remarketing" como cookie/tecnologia client-side — **desatualizado desde as Tasks 4-5** (arquitetura é CAPI-only, sem pixel client-side). Corrigido.
 - `PrivacySection6Compartilhamento.tsx` **nunca listava o TikTok** como destinatário de dados, apesar do TikTok Events API já estar em produção desde o plano de jul/2026 (`2026-07-23-sgtm-hybrid-consent.md`) — anterior a esta migração. Corrigido (TikTok Pte. Ltd. adicionado). Vale o DPO revisar essa adição.
 - `PrivacySection5FinalidadesBases.tsx` (Customer Match) atualizada pra refletir que a finalidade está inativa, sem atribuir a função de upload à Cloudflare (que não faz upload em lote).
+
+**Segunda rodada de review (chatgpt-codex-connector[bot], 7 achados, todos confirmados e corrigidos):**
+1. `PrivacySection4MetodosColeta.tsx` usava `**negrito**` em Markdown dentro de JSX — renderiza como asteriscos literais pro usuário, não negrito. Trocado por `<strong>`.
+2. `docs/performance-third-party-scripts.md` — a checagem original (buscar "stape"/"sgtm") deu falso negativo; o arquivo descrevia o loader do GTM como se ainda existisse. Reescrito com nota de superseding e passos de validação atualizados pro Zaraz.
+3. RIPD: checkbox `[x]` marcava a cobertura do DPA da Cloudflare como implementada enquanto o próprio texto dizia "pendente confirmar" — inconsistente. Trocado pra `[ ]` nas duas ocorrências (Atividades 1 e 2); a linha de Transferência internacional também não presume mais cobertura.
+4. RIPD: a frase "arquitetura de anonimização/filtragem é preservada" contradizia o achado (linha abaixo) de que o Zaraz não tem scrubber de PII equivalente ao da Stape e ~15 eventos não foram auditados. Qualificada — só a supressão de IP é confirmada, a mitigação de PII é estrutural (nenhum evento carrega PII por design), não uma ferramenta.
+5. **RIPD, achado mais substancial:** a nota de risco aceito do §1 (registro de consentimento só em `localStorage`) dependia da premissa "sem tratamento server-side associado" — que deixou de ser verdade com Meta/TikTok CAPI-only (a escolha de marketing agora aciona chamada server-side real pro Meta/TikTok). Adicionada nota de atualização reconhecendo isso e marcando como pendência do DPO reavaliar se o risco aceito em v1.5 ainda é proporcional.
+6. `PrivacySection3Categorias.tsx` (seção 3.4) e `PrivacySection6Compartilhamento.tsx` continuavam descrevendo Customer Match como finalidade ativa, inconsistente com a seção 5.5 que a marca como inativa (achado anterior). Ambas atualizadas pra "atualmente inativo".
+7. Global Constraint "Rollout em paralelo — Stape/GTM continuam ativos" nunca foi formalmente superada, mesmo com a Task 6 pulada e a Task 7 concluída sem essa janela. Marcada como superada, com nota explicando a evidência substituta (validações individuais das Tasks 1-5).
 
 - [ ] **Step 5: Monitorar por 3–7 dias pós-corte** — pendente, só possível depois do merge e deploy em produção.
 

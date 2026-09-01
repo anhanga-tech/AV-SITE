@@ -20,7 +20,7 @@ export function PrivacySection4MetodosColeta() {
                             <li>Google Ads para publicidade direcionada</li>
                         </ul>
                     </li>
-                    <li><strong>Rastreamento server-side via Cloudflare Zaraz:</strong> eventos de navegação e conversão são processados por um servidor intermediário (Cloudflare, já responsável pela hospedagem do site), onde o endereço IP é suprimido antes do envio ao Google Analytics. Publicidade direcionada e remarketing no Meta (Facebook/Instagram) e no TikTok são medidos **exclusivamente nesse servidor intermediário** — nenhum pixel de rastreamento do Meta ou do TikTok é carregado no navegador do titular, e essas medições só ocorrem após consentimento de marketing.</li>
+                    <li><strong>Rastreamento server-side via Cloudflare Zaraz:</strong> eventos de navegação e conversão são processados por um servidor intermediário (Cloudflare, já responsável pela hospedagem do site), onde o endereço IP é suprimido antes do envio ao Google Analytics. Publicidade direcionada e remarketing no Meta (Facebook/Instagram) e no TikTok são medidos <strong>exclusivamente nesse servidor intermediário</strong> — nenhum pixel de rastreamento do Meta ou do TikTok é carregado no navegador do titular, e essas medições só ocorrem após consentimento de marketing.</li>
                     <li><strong>Ferramentas de terceiros integradas:</strong>
                         <ul className="list-disc pl-6 mt-1">
                             <li>Instagram para engajamento em redes sociais</li>
