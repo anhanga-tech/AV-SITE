@@ -14,7 +14,7 @@ Keep API handlers under `api/` consistent in structure, validation order, respon
 ## REQUIRED
 
 - Validate method and request shape before business logic or outbound calls.
-- Validate and normalize untrusted input before any side effect such as HubSpot writes, AI calls, list updates, note creation, or conversion tracking.
+- Validate and normalize untrusted input before any side effect such as AI calls, list updates, note creation, or conversion tracking.
 - Reuse shared helpers for cross-cutting concerns when they already exist:
   - `lib/network.ts` for CORS and client IP extraction
   - `lib/rate-limit.ts` for abuse control
@@ -62,7 +62,6 @@ Keep API handlers under `api/` consistent in structure, validation order, respon
 
 - `api/submit-lead.ts` shows a strong pattern for structured responses, request IDs, rate limiting, and staged provider orchestration.
 - `api/generate.ts` shows a readable split between input parsing, rate limiting, model response handling, and client-safe error mapping.
-- `api/hubspot-webhook.ts` shows why trust checks must happen before business processing.
 - `lib/network.ts` is the preferred place for shared CORS and IP extraction instead of duplicating header logic in handlers.
 
 ## Exceptions

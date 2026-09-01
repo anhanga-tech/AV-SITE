@@ -31,7 +31,7 @@ export const onRequest = Sentry.sentryPagesPlugin<CloudflareEnv>((context) => {
     beforeSend: scrubEventUrls,
     beforeSendTransaction: scrubEventUrls,
     // The Workers runtime auto-instruments outbound `fetch` breadcrumbs for
-    // Odoo/Gemini/HubSpot calls, so this side needs the same URL scrubbing.
+    // Odoo/Gemini calls, so this side needs the same URL scrubbing.
     beforeBreadcrumb: scrubBreadcrumbUrls,
     integrations: [
       Sentry.consoleLoggingIntegration({ levels: ['log', 'warn', 'error'] }),

@@ -41,7 +41,7 @@ Site institucional da **Anhangá Viagens**, uma agência de viagens boutique bra
 
 **Fluxo do chatbot:** `AIChat.tsx` → `services/geminiService.ts` → `api/generate.ts`, que valida a entrada, aplica rate limit, chama o Gemini com o prompt de `lib/ai/`, extrai a tool call de orçamento quando a qualificação BANT está completa e roda o handoff em `lib/ai/handoff.ts`.
 
-**Fluxo de leads:** `hooks/useLeadCapture.ts` → `api/submit-lead.ts` (valida + normaliza via `lib/lead-logic.ts` e schemas Zod) → `services/odoo.ts` (JSON-RPC) → `res.partner` + `crm.lead` no Odoo. Os outros 4 formulários (contato, quiz, waitlist, NPS) seguem o mesmo padrão via `createOdooSubmitHandler`; quiz/waitlist/NPS só criam `res.partner` (sem oportunidade). HubSpot e Salesforce são legado — HubSpot mantém só o webhook inbound de deals Closed-Won, Salesforce está aposentado.
+**Fluxo de leads:** `hooks/useLeadCapture.ts` → `api/submit-lead.ts` (valida + normaliza via `lib/lead-logic.ts` e schemas Zod) → `services/odoo.ts` (JSON-RPC) → `res.partner` + `crm.lead` no Odoo. Os outros 4 formulários (contato, quiz, waitlist, NPS) seguem o mesmo padrão via `createOdooSubmitHandler`; quiz/waitlist/NPS só criam `res.partner` (sem oportunidade). HubSpot e Salesforce foram aposentados — nenhum dos dois processa mais dados de leads.
 
 **Build:** os scripts de `scripts/` geram o manifest do blog, sitemap e feeds; o Vite empacota; e `scripts/prerender.mjs` renderiza cada rota em HTML estático.
 
@@ -112,7 +112,7 @@ lib/          Helpers server-side (44 arquivos)
   ai/         Config do Gemini, prompt BANT, tools, handoff
   schemas/    Validadores Zod por endpoint
   conversions/  Helpers de pixels Google + Meta
-services/     Integrações de provider (gemini, odoo, hubspot [legado])
+services/     Integrações de provider (gemini, odoo)
 hooks/        Hooks de formulário (useLeadCapture, useContactForm, ...)
 components/   UI React (118) — /ui, /schemas, /landings, /blog
 pages/        Componentes de rota (19) — /landings para eventos

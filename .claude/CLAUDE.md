@@ -47,7 +47,7 @@ GEMINI_API_KEY=           # Google Gemini API key
 GEMINI_MODEL=             # Optional override (default: gemini-3.1-flash-lite)
 
 # CRM ativo: Odoo (External API JSON-RPC) — ver bloco ODOO_* abaixo.
-# Os 5 formulários (lead/contato/quiz/waitlist/nps) postam direto no Odoo. Salesforce e HubSpot são legado.
+# Os 5 formulários (lead/contato/quiz/waitlist/nps) postam direto no Odoo. Salesforce e HubSpot foram aposentados.
 
 # Odoo — CRM ativo (required in prod): intake dos 5 formulários via JSON-RPC
 ODOO_URL=                     # https://anhanga.odoo.com
@@ -78,10 +78,6 @@ AI_GATEWAY_ENABLED=       # Route Gemini through Cloudflare AI Gateway
 AI_GATEWAY_BYOK_ALIAS=    # AI Gateway Provider Key alias (BYOK); makes GEMINI_API_KEY optional
 ALLOWED_ORIGIN=           # CORS allowed origin (default: https://www.anhanga.tur.br)
 DEBUG=                    # Enable verbose server logs
-
-# Legacy (somente webhook de deals Closed-Won — não usar para leads novos)
-HUBSPOT_TOKEN=            # Private app token
-HUBSPOT_WEBHOOK_SECRET=   # HMAC secret para validar payloads do HubSpot webhook
 ```
 
 ## Architecture
@@ -103,7 +99,7 @@ Two layout tiers, resolved at the top-level `Routes`:
   /ai         Gemini config, BANT prompt, tool definitions, handoff logic
   /schemas    Zod validators for each API endpoint
   /conversions  Google + Meta pixel helpers
-/services     Client/server provider integrations (geminiService, odoo, hubspot)
+/services     Client/server provider integrations (geminiService, odoo)
 /hooks        React form hooks (useLeadCapture, useContactForm, useQuizCapture, useWaitlistCapture)
 /components   React UI; /ui for primitives, /schemas for JSON-LD, /landings for event pages, /blog for post layout
 /pages        Route components; /landings for standalone event pages
@@ -126,7 +122,6 @@ Handlers rodam como Cloudflare Pages Functions (via `functions/`). O campo `expo
 | `submit-waitlist.ts` | Event waitlist → Odoo `res.partner` (ToFu, sem oportunidade) |
 | `submit-nps.ts` | Post-trip NPS form → Odoo `res.partner` (`x_nps_score` + nota; sem oportunidade). Requer convite assinado (`token`, `lib/nps-invite.ts`) — identidade nunca vem do corpo da requisição |
 | `submit-quiz.ts` | Travel quiz results → Odoo `res.partner` (ToFu, sem oportunidade) |
-| `hubspot-webhook.ts` | Inbound HubSpot "Closed-Won" deal events |
 | `purchase-dispatch.ts` | Receives n8n purchase events; validates `N8N_WEBHOOK_SECRET` |
 | `auth.ts` / `auth/callback.ts` | GitHub OAuth for Decap CMS `/admin` |
 | `health.ts` | Health check |

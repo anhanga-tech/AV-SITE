@@ -32,7 +32,7 @@ O relatório cobre **quatro atividades de tratamento** identificadas:
 
 **Nota sobre a Atividade 4 (v1.3):** O Customer Match tem base legal em **consentimento** (Art. 7º, I), e não em legítimo interesse. É incluído neste RIPD porque envolve compartilhamento de dados pessoais (ainda que hasheados) com plataformas internacionais para finalidade de perfilamento — perfil de alto risco que a ANPD pode exigir documentação de impacto independentemente da base legal (Art. 38).
 
-Atividades baseadas em **consentimento** de baixo risco — como cookies de publicidade cross-site, remarketing avançado, Mautic e HubSpot tracking passivo — são geridas pelo mecanismo de consentimento de cookies e **não estão no escopo deste RIPD**.
+Atividades baseadas em **consentimento** de baixo risco — como cookies de publicidade cross-site e remarketing avançado — são geridas pelo mecanismo de consentimento de cookies e **não estão no escopo deste RIPD**.
 
 **Nota sobre o registro do consentimento de cookies (v1.5):** A escolha do titular no banner de cookies é registrada exclusivamente no navegador do próprio titular (`localStorage`, chave `anhanga_cookie_consent_meta`, com data/hora e versão do schema do registro). O texto do aviso não é versionado no registro em si; como a copy do banner é versionada em código, o texto vigente em qualquer data é reconstituível pelo histórico do repositório a partir do timestamp gravado. Não há registro server-side dessa escolha — se o titular limpar o armazenamento local ou trocar de dispositivo, o controlador não dispõe de prova individual do aceite (Art. 8º, §2º). **Risco aceito** pela seguinte ponderação: (i) o consentimento de cookies rege apenas o carregamento de scripts de marketing no navegador, sem tratamento server-side associado; (ii) a arquitetura *fail-closed* — sem registro local, os scripts de marketing simplesmente não carregam — faz com que a ausência de prova coincida com a ausência de tratamento; (iii) registrar cada escolha em servidor criaria novo tratamento de dados (IP/identificador + escolha) desproporcional à finalidade. Consentimentos com efeito server-side (opt-in de marketing nos formulários) **são** registrados no CRM Odoo (campo `x_lgpd_consent`).
 
@@ -166,7 +166,8 @@ Sem atribuição, é impossível saber se R$ 10.000 gastos em tráfego pago gera
 - [x] Dados pessoais usados para matching são hasheados (SHA-256) antes do repasse ao Google Ads e Meta CAPI; a TikTok Events API não recebe e-mail ou telefone nesta fase
 - [x] Opt-out disponível via banner (issue #782)
 - [x] DPA assinado com Stape OÜ
-- [x] **Implementado (issue #782):** `initializeTracking()` opera sob legítimo interesse; banner de cookies bloqueia Mautic e HubSpot; direito de oposição ao tratamento por interesse legítimo disponível via `privacidade@anhanga.tur.br` e documentado em `/politica-privacidade#cookies`
+- [x] **Implementado (issue #782):** `initializeTracking()` opera sob legítimo interesse; direito de oposição ao tratamento por interesse legítimo disponível via `privacidade@anhanga.tur.br` e documentado em `/politica-privacidade#cookies`
+- [x] **Atualizado (set/2026):** Mautic e HubSpot foram descontinuados — não há mais operador a bloquear via banner de cookies nesta atividade (ver v1.8)
 - [ ] **Pendente:** validar hashing de e-mail/telefone nas tags Enhanced Conversions e Meta CAPI no sGTM
 
 ---
@@ -179,7 +180,7 @@ Sem atribuição, é impossível saber se R$ 10.000 gastos em tráfego pago gera
 |---|---|
 | **Dados tratados** | Nome, sobrenome, e-mail, WhatsApp, destino de viagem, resumo BANT (Budget/Autoridade/Necessidade/Timeline fornecidos voluntariamente no chatbot) |
 | **Titulares** | Usuários que completam o fluxo de qualificação no chatbot e submetem o formulário de lead |
-| **Operadores** | Odoo S.A. (CRM ativo — `res.partner` + `crm.lead` via JSON-RPC, cut-over concluído em jun/2026). HubSpot, Inc. permanece apenas como destino do webhook legado de deals Closed-Won (não recebe mais os dados deste formulário). Salesforce, Inc. foi aposentado — não processa mais dados de leads. |
+| **Operadores** | Odoo S.A. (CRM ativo — `res.partner` + `crm.lead` via JSON-RPC, cut-over concluído em jun/2026). HubSpot, Inc. e Salesforce, Inc. foram aposentados — nenhum dos dois processa mais dados de leads (o webhook legado de deals Closed-Won do HubSpot foi removido do código em set/2026). |
 | **Retenção** | 5 anos após última interação (conforme Política de Privacidade seção 7.1) |
 | **Transferência internacional** | A confirmar com o DPO — depende da região de hospedagem da instância Odoo Online contratada; verificar em Configurações → Informações técnicas antes de atualizar este RIPD |
 
@@ -345,6 +346,7 @@ O balancing test favorece o legítimo interesse nas Atividades 1, 2 e 3. A Ativi
 | 1.5 | 07/07/2026 | Auditoria do banner de cookies: nota sobre registro client-side do consentimento (risco aceito, §1); `<noscript>` do GTM removido do site (furava o Consent Mode para usuários sem JS) |
 | 1.6 | 23/07/2026 | Atividade 2 alinhada à arquitetura híbrida consent-gated: Meta/TikTok bloqueados antes do opt-in; destinos server-side e salvaguardas de matching atualizados; base legal e conclusão preservadas |
 | 1.7 | 20/08/2026 | Atividade 2: identificadores deixam de ser anexados ao corpo das mensagens de WhatsApp (`\|\| Dados:` removido de `utils/whatsapp.ts`), que os colocava sob retenção da Meta em vez da janela de 30 dias declarada; linha "Limite de propagação" adicionada |
+| 1.8 | 01/09/2026 | HubSpot e Mautic descontinuados: webhook legado de deals Closed-Won (`api/hubspot-webhook.ts` + módulos associados) removido do código; Mautic (automação de marketing self-hosted) desligado. Atividades 2 e 3 e a Política de Privacidade atualizadas para refletir a redução de operadores — redução de superfície, sem mudança de finalidade nem novo tratamento. HubSpot e Mautic (Estados Unidos e infraestrutura própria, respectivamente) deixam de constar como operadores/subprocessadores. |
 
 ---
 

@@ -67,10 +67,6 @@ const ExclusaoDados = () => (
                                         <td className="py-2">Salesforce CRM (o processamento das mensagens pelo Google Gemini é transitório e não fica armazenado por nós)</td>
                                     </tr>
                                     <tr>
-                                        <td className="py-2 pr-4">Contato e histórico de comunicações de marketing</td>
-                                        <td className="py-2">Mautic (automação de marketing)</td>
-                                    </tr>
-                                    <tr>
                                         <td className="py-2 pr-4">Dados de rastreamento (UTM, clique em anúncios) associados ao seu perfil</td>
                                         <td className="py-2">Google Analytics 4 / GTM</td>
                                     </tr>
