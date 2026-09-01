@@ -307,7 +307,7 @@ test('ponte assina addAnhangaConsentListener pra propagar a purpose de marketing
   // não numa chamada inline dentro dos listeners de DOM — assim ela também cobre uma
   // visita de retorno com consentimento já persistido, não só o clique em si (os
   // listeners de DOM são { once: true }).
-  const syncStart = indexHtml.indexOf('window.addAnhangaConsentListener(function (choice)');
+  const syncStart = indexHtml.indexOf('var pendingZarazMarketing = null;');
   const marketingListenerStart = indexHtml.indexOf("window.addEventListener('anhanga:marketing-consent'");
   assert.ok(syncStart > -1, 'assinatura da ponte pro Zaraz deve existir');
   assert.ok(syncStart < marketingListenerStart, 'assinatura deve ser registrada antes dos listeners de DOM');
