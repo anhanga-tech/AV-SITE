@@ -188,16 +188,6 @@ test.describe('Cookie Consent Banner (CMP)', () => {
     expect(hasDataLayer).toBe(true);
   });
 
-  test('recusar impede carregamento do Mautic', async ({ page }) => {
-    await page.goto('/');
-    await page.getByRole('button', { name: 'Recusar' }).click();
-
-    // Aguardar possíveis triggers de scroll/idle
-    await page.waitForTimeout(500);
-    const hasMautic = await page.evaluate(() => 'MauticTrackingObject' in window);
-    expect(hasMautic).toBe(false);
-  });
-
   // --- Convivência com elementos flutuantes e ordem do DOM ---
 
   test('banner visível define --cookie-banner-h no <html>; escolher limpa o offset', async ({ page }) => {
@@ -283,7 +273,7 @@ test.describe('Cookie Consent Banner (CMP)', () => {
     expect(value).toBe('marketing');
   });
 
-  test('revogação: aceitar → gerenciar → recusar dispara reload e bloqueia Mautic', async ({ page }) => {
+  test('revogação: aceitar → gerenciar → recusar dispara reload', async ({ page }) => {
     // Timeout maior apenas para este teste — envolve um reload completo de página
     test.setTimeout(20000);
 
@@ -307,49 +297,7 @@ test.describe('Cookie Consent Banner (CMP)', () => {
     const value = await page.evaluate((key) => localStorage.getItem(key), CHOICE_KEY);
     expect(value).toBe('essential');
 
-    // Mautic não deve ter carregado
-    const hasMautic = await page.evaluate(() => 'MauticTrackingObject' in window);
-    expect(hasMautic).toBe(false);
-
     // Banner não deve reaparecer
     await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).not.toBeVisible();
-  });
-
-  // --- Aceitar com Mautic ---
-
-  test('aceitar carrega Mautic', async ({ page, baseURL }) => {
-    // loadMautic() (index.html) retorna cedo em hosts locais — localhost, 127.0.0.1,
-    // .local e .test — então mtc.js nunca é solicitado nesses hosts. O webServer do
-    // Playwright roda em 127.0.0.1 por padrão (local e CI), logo o skip precisa
-    // depender do host real, não só de process.env.CI. A lógica de despacho e a gate
-    // de consentimento já são cobertas por consent.test.ts e index-third-party-scripts.test.ts.
-    let host = '127.0.0.1';
-    if (baseURL) {
-      try {
-        host = new URL(baseURL).hostname;
-      } catch {
-        // baseURL sem protocolo (ex.: sobrescrito via CLI) — usa o valor cru,
-        // que ainda casa com os sufixos .local/.test do gate abaixo.
-        host = baseURL;
-      }
-    }
-    const isMauticGatedHost =
-      host === 'localhost' || host === '127.0.0.1' || host.endsWith('.local') || host.endsWith('.test');
-    test.skip(isMauticGatedHost, `loadMautic retorna cedo em ${host} — coberto por testes unitários`);
-
-    // Interceptar o script do Mautic para confirmar que foi solicitado
-    let mauticRequested = false;
-    await page.route('**/mtc.js', async (route) => {
-      mauticRequested = true;
-      await route.fulfill({ status: 200, body: 'window.MauticTrackingObject="mt";' });
-    });
-
-    await page.goto('/');
-    await page.getByRole('button', { name: 'Aceitar' }).click();
-
-    // Dar tempo para scripts lazy carregarem
-    await page.waitForTimeout(300);
-
-    expect(mauticRequested).toBe(true);
   });
 });

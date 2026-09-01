@@ -22,7 +22,6 @@ export function PrivacySection4MetodosColeta() {
                         </ul>
                     </li>
                     <li><strong>Rastreamento server-side via Stape:</strong> eventos de navegação e conversão são transmitidos do browser para um servidor intermediário (provido pela Stape OÜ, empresa sediada na Estônia, com servidores hospedados no Brasil), onde o endereço IP é removido e dados pessoais são anonimizados antes de serem encaminhados ao Google e Meta. Essa camada reduz a exposição de dados pessoais em comparação ao rastreamento client-side convencional.</li>
-                    <li><strong>Mautic (ferramenta própria):</strong> plataforma de automação de marketing e newsletters operada em infraestrutura da própria Anhangá Turismo, carregada somente após consentimento</li>
                     <li><strong>Ferramentas de terceiros integradas:</strong>
                         <ul className="list-disc pl-6 mt-1">
                             <li>Instagram para engajamento em redes sociais</li>

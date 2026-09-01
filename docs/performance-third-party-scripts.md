@@ -10,8 +10,8 @@ GitHub issue #413 asked for an investigation and controlled change for blocking 
 | --- | --- | --- | --- |
 | Google Tag Manager `GTM-T2KGS86G` | Inline bootstrap in `<head>`, then async external script | `dataLayer` bootstrap before the React entrypoint; GTM external script after interaction, idle timeout, or conversion intent | Keep GTM, but remove it from the render-critical head path |
 | `/utm-tracking.js` | Deferred by the analytics loader | Still deferred by the analytics loader, after GTM is queued | Keep, because WhatsApp attribution depends on it |
-| HubSpot `js.hs-scripts.com/50895604.js` | Loaded after conversion intent, deep scroll, contact section proximity, or long dwell | Same | Keep delayed |
-| Mautic `mkt.anhanga.tur.br/mtc.js` | Injected immediately from the end of `<body>` | Deferred through the analytics loader | Delay, because it is not required for first paint |
+| HubSpot `js.hs-scripts.com/50895604.js` | Loaded after conversion intent, deep scroll, contact section proximity, or long dwell | Removed entirely — HubSpot decommissioned (set/2026) | N/A |
+| Mautic `mkt.anhanga.tur.br/mtc.js` | Injected immediately from the end of `<body>` | Removed entirely — Mautic decommissioned (set/2026) | N/A |
 
 ## Objective Measurement
 
@@ -36,7 +36,6 @@ Recommended production validation:
    - `specialist_cta_click`
    - `generate_lead`
    - `form_submission`
-4. In HubSpot, submit a test lead and confirm contact/deal attribution fields still receive UTM and click ID data.
 
 ## Accepted Trade-Off
 

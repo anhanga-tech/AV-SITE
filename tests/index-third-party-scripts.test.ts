@@ -158,7 +158,7 @@ test('Traks tem gate de host para não poluir os goals de conversão em dev/CI',
   assert.match(headHtml, /window\.traks\s*=\s*window\.traks\s*\|\|\s*function/, 'stub de fila do Traks deve continuar definido');
 
   // O <script src="...t.js"> não pode ser um tag estático incondicional — precisa
-  // ser injetado programaticamente, atrás do mesmo gate de host do GTM/Mautic.
+  // ser injetado programaticamente, atrás do mesmo gate de host do GTM.
   assert.doesNotMatch(
     headHtml,
     /<script[^>]*src="https:\/\/analytics-collect\.anhanga\.tur\.br\/t\.js"/i,
@@ -203,11 +203,10 @@ test('Traks tem gate de host para não poluir os goals de conversão em dev/CI',
   assert.match(gateToScriptSlice, /\.endsWith\('\.test'\)/, 'gate deve cobrir hosts .test');
 });
 
-test('loadMautic tem gate de consentimento LGPD', () => {
-  const loadMauticMatch = indexHtml.match(/var loadMautic\s*=\s*function\s*\(\)\s*\{([\s\S]*?)};/);
-  assert.ok(loadMauticMatch, 'loadMautic deve estar definida');
-  const body = loadMauticMatch[1];
-  assert.match(body, /_consentChoice\s*!==\s*'marketing'/, 'loadMautic deve ter gate de consentimento');
+test('index.html não carrega scripts do Mautic (ferramenta descontinuada)', () => {
+  assert.doesNotMatch(indexHtml, /mtc\.js/i, 'script do Mautic não deve ser injetado');
+  assert.doesNotMatch(indexHtml, /loadMautic/i, 'loader do Mautic não deve existir');
+  assert.doesNotMatch(indexHtml, /MauticTrackingObject/i, 'objeto de rastreamento do Mautic não deve existir');
 });
 
 test('index.html difere terceiros sem atraso fixo de ~12s que fixa TTI no lab (issue #1259)', () => {

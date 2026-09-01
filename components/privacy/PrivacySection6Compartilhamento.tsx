@@ -13,7 +13,6 @@ export function PrivacySection6Compartilhamento() {
                     <li><strong>ONER Travel</strong> (serviços especializados em turismo)</li>
                     <li><strong>Outros prestadores de serviços</strong> devidamente contratados</li>
                 </ul>
-                <p>A plataforma de automação de marketing (Mautic) é operada em infraestrutura própria da Anhangá Turismo; os dados nela tratados não são compartilhados com terceiros.</p>
 
                 <h3 className="font-merriweather font-semibold">6.2 Garantias Contratuais</h3>
                 <p>Todos os compartilhamentos são regidos por contratos específicos que asseguram:</p>
