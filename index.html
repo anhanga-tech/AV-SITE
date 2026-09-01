@@ -157,6 +157,65 @@
         anhanga_marketing_consent: _consentChoice === 'marketing'
       });
 
+      // Zaraz é fail-open por padrão (tool sem purpose dispara sem gate) — a
+      // purpose 'marketing' só existe pra gatear Meta/TikTok quando essas tools
+      // forem adicionadas (Tasks 4/5 do plano de migração). GA4 não tem purpose
+      // de propósito, pra preservar o comportamento atual de legítimo interesse.
+      //
+      // Assina a ponte em vez de chamar o Zaraz direto dentro dos listeners de
+      // aceite/revogação: addAnhangaConsentListener já invoca o callback com o
+      // estado atual no registro (cobre quem já tinha consentido em visita
+      // anterior) e de novo a cada mudança futura — os listeners de DOM abaixo
+      // são { once: true }, então uma chamada direta ali só cobriria o clique
+      // em si, nunca uma visita de retorno com consentimento já persistido.
+      var pendingZarazMarketing = null;
+      // "true" precisa dizer "nada pendente pro Zaraz agora", não só "chegou a enviar
+      // alguma vez" — por isso os dois `return` abaixo são separados. Um único `||`
+      // combinando "nada pendente" com "zaraz não está pronto" faz os dois casos
+      // devolverem `false` do mesmo jeito, e reloadAfterZarazFlush (mais abaixo) não
+      // consegue diferenciar "já sincronizado, pode recarregar" de "ainda esperando o
+      // zaraz.js carregar" — no caminho comum (zaraz já carregado antes da revogação),
+      // isso forçava a esperar o teto inteiro de ~1,2s à toa (achado de review).
+      var flushZarazConsent = function () {
+        if (pendingZarazMarketing === null) return true;
+        if (!window.zaraz || !window.zaraz.consent) return false;
+        window.zaraz.consent.set({ marketing: pendingZarazMarketing });
+        pendingZarazMarketing = null;
+        return true;
+      };
+      window.addAnhangaConsentListener(function (choice) {
+        pendingZarazMarketing = choice === 'marketing';
+        if (flushZarazConsent()) return;
+        // zaraz.js carrega assíncrono — se ainda não chegou no momento do clique,
+        // tenta de novo por até 10s em vez de descartar o consentimento em silêncio.
+        var attempts = 0;
+        var retryTimer = setInterval(function () {
+          attempts += 1;
+          if (flushZarazConsent() || attempts >= 20) clearInterval(retryTimer);
+        }, 500);
+      });
+
+      // A revogação recarrega a página logo em seguida — um reload síncrono destruiria
+      // este documento antes do retryTimer acima ter qualquer chance de rodar, e o Zaraz
+      // reaplicaria o 'marketing: true' persistido da visita anterior na página recarregada
+      // até essa ponte corrigir de novo. Adia o reload por até ~1,2s dando chance ao flush
+      // acontecer primeiro; não trava a UI por mais que isso — passado o teto, recarrega de
+      // qualquer forma (o risco residual é o mesmo já aceito no resto desta ponte).
+      var reloadAfterZarazFlush = function () {
+        if (flushZarazConsent()) {
+          window.location.reload();
+          return;
+        }
+        var attempts = 0;
+        var waitTimer = setInterval(function () {
+          attempts += 1;
+          if (flushZarazConsent() || attempts >= 6) {
+            clearInterval(waitTimer);
+            window.location.reload();
+          }
+        }, 200);
+      };
+
       var injectScript = function (src, options) {
         var script = document.createElement('script');
         script.src = src;
@@ -244,7 +303,7 @@
         window.dataLayer.push({
           anhanga_marketing_consent: false
         });
-        window.location.reload();
+        reloadAfterZarazFlush();
       }, { once: true });
     })();
   </script>

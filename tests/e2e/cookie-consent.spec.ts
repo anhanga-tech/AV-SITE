@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
 const CHOICE_KEY = 'anhanga_cookie_consent';
 
@@ -299,5 +299,82 @@ test.describe('Cookie Consent Banner (CMP)', () => {
 
     // Banner não deve reaparecer
     await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).not.toBeVisible();
+  });
+
+  // --- Ponte de consentimento com o Zaraz ---
+
+  // window.zaraz só existe em produção (script real do Cloudflare); o stub abaixo
+  // simula a API real (window.zaraz.consent.set) pra capturar a chamada sem
+  // depender do zaraz.js de verdade, que não roda no dev server do Playwright.
+  async function stubZarazConsent(page: Page): Promise<void> {
+    await page.addInitScript(() => {
+      type ConsentPurposes = Record<string, boolean>;
+      type TestWindow = Window & {
+        zaraz: { consent: { set: (purposes: ConsentPurposes) => void } };
+        __zarazConsentCalls: ConsentPurposes[];
+      };
+      const testWindow = window as unknown as TestWindow;
+      testWindow.__zarazConsentCalls = [];
+      testWindow.zaraz = {
+        consent: {
+          set: (purposes) => testWindow.__zarazConsentCalls.push(purposes),
+        },
+      };
+    });
+  }
+
+  async function getZarazConsentCalls(page: Page): Promise<Record<string, boolean>[]> {
+    return page.evaluate(() => (window as unknown as { __zarazConsentCalls: Record<string, boolean>[] }).__zarazConsentCalls);
+  }
+
+  test('carregamento sem escolha prévia já sincroniza marketing:false com o Zaraz', async ({ page }) => {
+    // addAnhangaConsentListener invoca o assinante imediatamente no registro, com o
+    // estado atual (_consentChoice é null aqui) — cobre visitas cujo consentimento
+    // já foi decidido antes desta carga, sem depender de um clique nesta sessão.
+    await stubZarazConsent(page);
+    await page.goto('/');
+
+    expect(await getZarazConsentCalls(page)).toEqual([{ marketing: false }]);
+  });
+
+  test('aceitar propaga a purpose marketing pro Zaraz', async ({ page }) => {
+    await stubZarazConsent(page);
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Aceitar' }).click();
+
+    // [0] é a sincronização inicial (sem escolha ainda); [1] é o clique em Aceitar.
+    expect(await getZarazConsentCalls(page)).toEqual([{ marketing: false }, { marketing: true }]);
+  });
+
+  test('revogar (aceitar → gerenciar → recusar) resulta em marketing:false pro Zaraz após o reload', async ({ page }) => {
+    // O listener de revogação só dispara quando a escolha anterior era 'marketing'
+    // (lib/consent.ts) — "Recusar" na primeira visita não emite nenhum evento, então
+    // este teste precisa passar por aceitar primeiro. A leitura acontece depois do
+    // reload (não antes) pra evitar competir com a navegação: o addInitScript reroda
+    // na página recarregada e a sincronização inicial já reflete 'essential' salvo no
+    // localStorage, que é o estado que realmente importa provar.
+    test.setTimeout(20000);
+    await stubZarazConsent(page);
+
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Aceitar' }).click();
+    await page.getByRole('button', { name: 'Gerenciar cookies' }).click();
+    await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).toBeVisible();
+
+    await Promise.all([
+      page.waitForEvent('framenavigated'),
+      page.getByRole('button', { name: 'Recusar' }).click(),
+    ]);
+
+    // framenavigated dispara no commit da navegação, antes do <script> síncrono do
+    // index.html (que faz a sincronização inicial pós-reload) necessariamente ter
+    // rodado — sem esperar por isso, a leitura abaixo pode competir com esse script
+    // e ler o array vazio de forma intermitente (achado de review).
+    await page.waitForFunction(() => {
+      const testWindow = window as unknown as { __zarazConsentCalls?: Record<string, boolean>[] };
+      return Boolean(testWindow.__zarazConsentCalls && testWindow.__zarazConsentCalls.length > 0);
+    });
+
+    expect(await getZarazConsentCalls(page)).toEqual([{ marketing: false }]);
   });
 });

@@ -27,6 +27,7 @@ Consent Management do Zaraz é **por purposes**, mas o default é **fail-OPEN**:
 - Google Ads Customer Match (RIPD Atividade 4) já depende de segmento Mautic, que foi removido do código em 01/09/2026 (PR #1564) — esse fluxo já está órfão **independente** desta migração. Fora de escopo aqui; registrar como achado separado (issue própria), não misturar com o corte do Stape.
 - Antes de qualquer evento real de teste, disparar um evento sintético primeiro. Lead real exige confirmação explícita do usuário porque cria registro no Odoo.
 - Rollback: se qualquer critério de validação falhar, manter Stape ativo e não prosseguir para o corte (Task 7).
+- **Achado da Task 1 (01/09/2026):** o **Google Tag Gateway** (produto separado do Zaraz — proxy first-party do `gtag.js`/GTM real, roda no navegador) estava **ativo** na zone `anhanga.tur.br`, configurado pro mesmo container `GTM-T2KGS86G` que o Stape carrega. Config antiga, não fazia parte de nenhum plano documentado. Causava rejeição do cookie `_ga_QDBT5PM4KP` por domínio inválido (lógica de cálculo de domínio do próprio Google, não do Zaraz) e potencialmente hits duplicados no GA4 (Tag Gateway + Stape rodando em paralelo, sem ninguém ter decidido isso). Desligado em 01/09/2026 com autorização do usuário. Se o volume de eventos no GA4 mudar visivelmente na Task 6 (paralelo), essa desativação é a causa mais provável — não um problema do Zaraz.
 
 ---
 
@@ -54,13 +55,13 @@ Consent Management do Zaraz é **por purposes**, mas o default é **fail-OPEN**:
 - Consumes: `window.dataLayer.push({event, ...campos})` já existente.
 - Produces: eventos Zaraz equivalentes via tradução automática (`zaraz.track(event, campos)`).
 
-- [ ] **Step 1: Habilitar Zaraz na zone sem nenhum tool configurado**
+- [x] **Step 1: Habilitar Zaraz na zone sem nenhum tool configurado** (já estava ativo antes deste plano)
 
 Em **Zaraz → Settings**, habilitar o produto na zone. Nenhum Managed Component configurado ainda — esse passo só liga o coletor de eventos no edge.
 
 Expected: Zaraz aparece como ativo no dashboard; nenhum tráfego de terceiros muda ainda (nenhum tool configurado = nenhuma tag disparando).
 
-- [ ] **Step 2: Auditar os 16 payloads de `dataLayer.push` por objetos aninhados**
+- [x] **Step 2: Auditar os 16 payloads de `dataLayer.push` por objetos aninhados** (concluído 01/09/2026)
 
 O Data Layer Compatibility Mode extrai a chave `event` como nome do evento Zaraz e passa o resto como `eventProperties` — mas valores aninhados (ex.: `{ consent: { facebook: true } }`) ficam inacessíveis nesse modo. Rodar:
 
@@ -70,21 +71,19 @@ rg -n "dataLayer\.push\(" utils/ hooks/ lib/ pages/ -A 8
 
 Para cada call site, confirmar que o objeto passado é **plano** (sem objetos aninhados como valor de uma chave) e que sempre inclui a chave `event`. Casos suspeitos a checar com atenção: `utils/formAnalytics.ts:100` (`dataLayer.push(safePayload(input))` — payload dinâmico, confirmar que `safePayload` nunca aninha) e `lib/cal-embed.ts:70,76`.
 
-Expected: lista de call sites com payload plano confirmado, ou lista de exceções que precisarão de `zaraz.track()` explícito em vez de depender do compat mode.
+Expected: lista de call sites com payload plano confirmado, ou lista de exceções que precisarão de `zaraz.track()` explícito em vez de depender do compat mode. Resultado: todos os 16 são planos, todos têm `event` — nenhuma exceção.
 
-- [ ] **Step 3: Habilitar o Data Layer Compatibility Mode**
+- [x] **Step 3: Habilitar o Data Layer Compatibility Mode** (concluído 01/09/2026)
 
-Em **Zaraz → Settings**, ativar **Data layer compatibility mode**.
+Achado: a rota `Zaraz → Settings` da doc oficial está desatualizada — o painel real fica em **Web tag management → Tag setup → Settings** (dashboard migrou de zone-level pra "Tag Management" em fev/2025). Junto com o compat mode, também ligado o **Single Page Application support** (necessário — o site é SPA via React Router, sem isso só o load inicial contaria como pageview).
 
-- [ ] **Step 4: Validar tradução em ambiente de teste**
-
-Sem nenhum Managed Component configurado ainda, usar o preview/debug do Zaraz (ou a aba Network) para confirmar que um evento sintético dispara:
+- [x] **Step 4: Validar tradução em ambiente de teste** (concluído 01/09/2026)
 
 ```js
 window.dataLayer.push({ event: 'zaraz_spike_test', foo: 'bar' });
 ```
 
-Expected: o evento aparece no painel de eventos do Zaraz com nome `zaraz_spike_test` e propriedade `foo: 'bar'`. Se não aparecer, não prosseguir — o compat mode precisa funcionar antes de qualquer tool ser configurado, senão os Tasks seguintes ficam sem dados de entrada.
+Confirmado ao vivo: request `POST /cdn-cgi/zaraz/t` (200) disparada a cada `dataLayer.push`. Tradução funcionando.
 
 ---
 
@@ -101,17 +100,17 @@ Expected: o evento aparece no painel de eventos do Zaraz com nome `zaraz_spike_t
 
 Measurement ID e API secret: o usuário digita direto no dashboard (não copiar/colar via agente). Confirmar o nome exato dos campos na tela — o spike não teve acesso ao dashboard ao vivo, só ao código-fonte do component.
 
-- [ ] **Step 2: Setar `hideOriginalIP: true`**
+Concluído 01/09/2026 — Measurement ID `G-QDBT5PM4KP`. Campos reais na tela: "Hide Originating IP Address" (Privacy) e "Google Analytics Audiences" (Advanced) — deixado desligado por decisão consciente (ver Step 2). Também habilitadas "Track all pageviews" e "Track all other events" (necessárias pro compat mode alimentar a tool); "Track all ecommerce events" deixado desligado (site não tem ecommerce).
 
-Nas settings do tool (não no payload por evento), setar a flag equivalente a `hideOriginalIP`. Esse é o item não-negociável do plano — sem ele, o GA4 recebe `_uip` com o IP real do visitante.
+- [x] **Step 2: Setar `hideOriginalIP: true`** (concluído 01/09/2026)
 
-- [ ] **Step 3: Validar no GA4 DebugView**
+Nas settings do tool (não no payload por evento), setar a flag equivalente a `hideOriginalIP`. Esse é o item não-negociável do plano — sem ele, o GA4 recebe `_uip` com o IP real do visitante. Campo real na tela: **"Hide Originating IP Address"**, texto de confirmação: "This will prevent sending the visitor IP address to Google Analytics 4".
 
-Disparar um pageview de teste e confirmar em **GA4 → Admin → DebugView**:
-- o evento chega;
-- checar (via suporte do Google, se disponível, ou pela ausência de geo granular incoerente com o IP real do testador) que o IP não está sendo usado para geolocalização precisa.
+- [x] **Step 3: Validar no GA4** (concluído 01/09/2026 — via Realtime, não DebugView)
 
-Expected: evento visível no DebugView, sem evidência de IP real propagado.
+Disparado evento sintético (`zaraz_ga4_debugview_test_3`) com `zaraz.debug()` ativo. `GA4 → Admin → DebugView` não mostrou nenhum debug device — a "Debug key" do Zaraz é provavelmente um log interno dele, não repassa `debug_mode` ao Measurement Protocol. **`GA4 → Relatórios → Tempo real` mostrou o tráfego do Zaraz normalmente** — confirma que o pipeline navegador → Zaraz → GA4 entrega de ponta a ponta, que é o que este step precisava provar.
+
+Not verified (limitação conhecida, não bloqueante): não há como confirmar visualmente pelo GA4 que `hideOriginalIP` está de fato suprimindo o IP — o Google não expõe IP bruto em relatório nenhum, por design. A validação desse ponto se apoia na config do tool + no código-fonte lido no spike (`_uip` condicional a `hideOriginalIP`), não em prova visual.
 
 ---
 
@@ -126,19 +125,21 @@ Expected: evento visível no DebugView, sem evidência de IP real propagado.
 - Consumes: `window.addAnhangaConsentListener`, eventos DOM `anhanga:marketing-consent` / `anhanga:revoke-consent` (já existentes, ver `[[mautic-hubspot-removal]]` para o estado atual do arquivo).
 - Produces: `zaraz.consent.set()` chamado com o mesmo estado que hoje alimenta `updateConsentState` do GTM.
 
-- [ ] **Step 1: Criar as purposes no dashboard**
+- [x] **Step 1: Criar as purposes no dashboard** (concluído 01/09/2026 — revisado do original)
 
-Duas purposes: `analytics` (GA4) e `marketing` (Meta + TikTok). **Confirmar que os três tools estão de fato atribuídos** — um tool sem purpose dispara sem gate (fail-open), diferente do GTM.
+**Correção ao texto original deste step:** só a purpose `marketing` foi criada (Meta + TikTok, Tasks 4/5). O GA4 **não** ganhou purpose — hoje ele dispara mesmo com "Recusar" (legítimo interesse, ver teste `recusar não bloqueia GTM/analytics`); no Zaraz, tool sem purpose dispara sem gate (fail-open), que é exatamente esse comportamento. Dar ao GA4 uma purpose "analytics" restringiria a coleta em relação a hoje — não era o objetivo.
 
-- [ ] **Step 2: Adicionar o segundo assinante da ponte de consentimento em `index.html`**
+- [x] **Step 2: Adicionar o segundo assinante da ponte de consentimento em `index.html`** (concluído 01/09/2026)
 
-Dentro do listener já existente em `anhanga:marketing-consent` (ver `notifyConsentListeners('marketing')`), adicionar a chamada equivalente à Consent API do Zaraz (`zaraz.consent.set({ marketing: true })` ou `zaraz.consent.setAll(true)`, confirmar a API exata na doc/dashboard). Mesma coisa no listener de `anhanga:revoke-consent`, com `false`.
+API confirmada (lida em `github.com/imviidx/fake-cloudflare-zaraz-consent`, mock que espelha a API real — a doc oficial da Cloudflare não documenta a assinatura): `window.zaraz.consent.set({ purposeId: boolean, ... })`, aceita objeto com múltiplas purposes.
 
-Manter o `updateConsentState`/`gtag` existentes intactos nesta fase — os dois sistemas de consentimento coexistem durante o paralelo (Task 6).
+**Atualizado (revisão de PR, fedce64):** a primeira versão (commit `dc03997`) chamava `window.zaraz.consent.set()` inline dentro dos listeners de DOM `{ once: true }`, com uma guarda defensiva `if (window.zaraz && window.zaraz.consent)`. Review (`chatgpt-codex-connector[bot]`) apontou que isso descarta o consentimento em silêncio se o `zaraz.js` (assíncrono) ainda não tiver carregado no momento do clique — sem retry, e o listener só dispara uma vez. Também nunca sincronizava consentimento já persistido de uma visita anterior. Corrigido: a sincronização agora vive numa assinatura de `window.addAnhangaConsentListener` (dispara imediatamente com o estado atual no registro, e de novo a cada mudança futura), com retry via `setInterval` de até 10s se o Zaraz ainda não estiver pronto. Os listeners de DOM não chamam mais o Zaraz diretamente.
 
-- [ ] **Step 3: Teste estático — Zaraz consent API chamada nos dois listeners**
+`updateConsentState`/`gtag` não existiam mais no `index.html` atual (o arquivo já tinha evoluído desde o plano de jul/2026) — não havia nada a manter em paralelo além do `dataLayer.push` existente.
 
-Seguir o padrão de `tests/index-third-party-scripts.test.ts` (ver testes existentes para `anhanga:marketing-consent`/`anhanga:revoke-consent`): adicionar asserções que confirmam a chamada à API de consentimento do Zaraz dentro de cada listener, na mesma ordem relativa que as chamadas existentes (`notifyConsentListeners` antes, `dataLayer.push` depois — a chamada Zaraz deve ficar entre os dois ou documentar por que a ordem escolhida é segura).
+- [x] **Step 3: Teste estático — Zaraz consent API chamada nos dois listeners** (concluído 01/09/2026, ajustado em fedce64/8f4cc01)
+
+Adicionado em `tests/index-third-party-scripts.test.ts` (assinatura registrada antes dos listeners de DOM, com os quatro elementos do bloco: mapeamento do `choice`, guarda de prontidão, chamada a `consent.set`, retry via `setInterval`; mais um teste separado confirmando que os listeners de DOM não chamam `window.zaraz` diretamente) e em `tests/e2e/cookie-consent.spec.ts` (stub de `window.zaraz.consent.set` via `addInitScript`, já que `window.zaraz` só existe em produção — não roda no dev server do Playwright; 3 testes: sincronização no load sem escolha prévia, aceite, e revogação via aceitar→gerenciar→recusar). **Playwright não executado** neste sandbox (sem Node); os testes `node:test` rodaram no CI e pegaram um bug real de slice num deles (corrigido em 8f4cc01) — revisão manual sozinha não é suficiente, o CI é a rede de segurança real aqui.
 
 - [ ] **Step 4: Teste — nenhum tool de marketing sem purpose**
 
