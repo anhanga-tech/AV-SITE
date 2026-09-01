@@ -82,13 +82,11 @@ async function readParsedPosts(
   const filenames = await readdir(blogDir);
 
   return Promise.all(
-    filenames
-      .filter((filename) => filename.endsWith('.mdx') && !filename.startsWith('_'))
-      .map(async (filename) => {
-        const filepath = path.join(blogDir, filename);
-        const rawContent = await readFile(filepath, 'utf8');
-        return { filepath, parsed: matter(rawContent) };
-      })
+    filenames.flatMap((filename) => {
+      if (!filename.endsWith('.mdx') || filename.startsWith('_')) return [];
+      const filepath = path.join(blogDir, filename);
+      return [readFile(filepath, 'utf8').then((rawContent) => ({ filepath, parsed: matter(rawContent) }))];
+    })
   );
 }
 
