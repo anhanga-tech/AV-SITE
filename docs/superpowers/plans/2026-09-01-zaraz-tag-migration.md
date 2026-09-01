@@ -125,19 +125,19 @@ Not verified (limitação conhecida, não bloqueante): não há como confirmar v
 - Consumes: `window.addAnhangaConsentListener`, eventos DOM `anhanga:marketing-consent` / `anhanga:revoke-consent` (já existentes, ver `[[mautic-hubspot-removal]]` para o estado atual do arquivo).
 - Produces: `zaraz.consent.set()` chamado com o mesmo estado que hoje alimenta `updateConsentState` do GTM.
 
-- [ ] **Step 1: Criar as purposes no dashboard**
+- [x] **Step 1: Criar as purposes no dashboard** (concluído 01/09/2026 — revisado do original)
 
-Duas purposes: `analytics` (GA4) e `marketing` (Meta + TikTok). **Confirmar que os três tools estão de fato atribuídos** — um tool sem purpose dispara sem gate (fail-open), diferente do GTM.
+**Correção ao texto original deste step:** só a purpose `marketing` foi criada (Meta + TikTok, Tasks 4/5). O GA4 **não** ganhou purpose — hoje ele dispara mesmo com "Recusar" (legítimo interesse, ver teste `recusar não bloqueia GTM/analytics`); no Zaraz, tool sem purpose dispara sem gate (fail-open), que é exatamente esse comportamento. Dar ao GA4 uma purpose "analytics" restringiria a coleta em relação a hoje — não era o objetivo.
 
-- [ ] **Step 2: Adicionar o segundo assinante da ponte de consentimento em `index.html`**
+- [x] **Step 2: Adicionar o segundo assinante da ponte de consentimento em `index.html`** (concluído 01/09/2026)
 
-Dentro do listener já existente em `anhanga:marketing-consent` (ver `notifyConsentListeners('marketing')`), adicionar a chamada equivalente à Consent API do Zaraz (`zaraz.consent.set({ marketing: true })` ou `zaraz.consent.setAll(true)`, confirmar a API exata na doc/dashboard). Mesma coisa no listener de `anhanga:revoke-consent`, com `false`.
+API confirmada (lida em `github.com/imviidx/fake-cloudflare-zaraz-consent`, mock que espelha a API real — a doc oficial da Cloudflare não documenta a assinatura): `window.zaraz.consent.set({ purposeId: boolean, ... })`, aceita objeto com múltiplas purposes. Implementado com guarda defensiva (`if (window.zaraz && window.zaraz.consent)`) já que o script do Zaraz carrega assíncrono e pode não estar pronto no momento do clique.
 
-Manter o `updateConsentState`/`gtag` existentes intactos nesta fase — os dois sistemas de consentimento coexistem durante o paralelo (Task 6).
+`updateConsentState`/`gtag` não existiam mais no `index.html` atual (o arquivo já tinha evoluído desde o plano de jul/2026) — não havia nada a manter em paralelo além do `dataLayer.push` existente.
 
-- [ ] **Step 3: Teste estático — Zaraz consent API chamada nos dois listeners**
+- [x] **Step 3: Teste estático — Zaraz consent API chamada nos dois listeners** (concluído 01/09/2026)
 
-Seguir o padrão de `tests/index-third-party-scripts.test.ts` (ver testes existentes para `anhanga:marketing-consent`/`anhanga:revoke-consent`): adicionar asserções que confirmam a chamada à API de consentimento do Zaraz dentro de cada listener, na mesma ordem relativa que as chamadas existentes (`notifyConsentListeners` antes, `dataLayer.push` depois — a chamada Zaraz deve ficar entre os dois ou documentar por que a ordem escolhida é segura).
+Adicionado em `tests/index-third-party-scripts.test.ts` (assinatura + ordem: Zaraz antes de `notifyConsentListeners`) e em `tests/e2e/cookie-consent.spec.ts` (stub de `window.zaraz.consent.set` via `addInitScript`, já que `window.zaraz` só existe em produção — não roda no dev server do Playwright). **Não executado** neste sandbox (sem Node) — revisão manual só.
 
 - [ ] **Step 4: Teste — nenhum tool de marketing sem purpose**
 

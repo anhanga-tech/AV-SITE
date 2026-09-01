@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
 const CHOICE_KEY = 'anhanga_cookie_consent';
 
@@ -299,5 +299,47 @@ test.describe('Cookie Consent Banner (CMP)', () => {
 
     // Banner não deve reaparecer
     await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).not.toBeVisible();
+  });
+
+  // --- Ponte de consentimento com o Zaraz ---
+
+  // window.zaraz só existe em produção (script real do Cloudflare); o stub abaixo
+  // simula a API real (window.zaraz.consent.set) pra capturar a chamada sem
+  // depender do zaraz.js de verdade, que não roda no dev server do Playwright.
+  async function stubZarazConsent(page: Page): Promise<void> {
+    await page.addInitScript(() => {
+      type ConsentPurposes = Record<string, boolean>;
+      type TestWindow = Window & {
+        zaraz: { consent: { set: (purposes: ConsentPurposes) => void } };
+        __zarazConsentCalls: ConsentPurposes[];
+      };
+      const testWindow = window as unknown as TestWindow;
+      testWindow.__zarazConsentCalls = [];
+      testWindow.zaraz = {
+        consent: {
+          set: (purposes) => testWindow.__zarazConsentCalls.push(purposes),
+        },
+      };
+    });
+  }
+
+  async function getZarazConsentCalls(page: Page): Promise<Record<string, boolean>[]> {
+    return page.evaluate(() => (window as unknown as { __zarazConsentCalls: Record<string, boolean>[] }).__zarazConsentCalls);
+  }
+
+  test('aceitar propaga a purpose marketing pro Zaraz', async ({ page }) => {
+    await stubZarazConsent(page);
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Aceitar' }).click();
+
+    expect(await getZarazConsentCalls(page)).toEqual([{ marketing: true }]);
+  });
+
+  test('recusar propaga a purpose marketing como false pro Zaraz', async ({ page }) => {
+    await stubZarazConsent(page);
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Recusar' }).click();
+
+    expect(await getZarazConsentCalls(page)).toEqual([{ marketing: false }]);
   });
 });

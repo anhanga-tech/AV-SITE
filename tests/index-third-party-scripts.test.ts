@@ -302,6 +302,36 @@ test('revogação notifica denied antes do reload', () => {
   assert.ok(reloadIndex > deniedIndex);
 });
 
+test('aceite e revogação propagam a purpose de marketing pro Zaraz, com guarda defensiva', () => {
+  const acceptStart = indexHtml.indexOf("window.addEventListener('anhanga:marketing-consent'");
+  const revokeStart = indexHtml.indexOf("window.addEventListener('anhanga:revoke-consent'");
+  const acceptBlock = indexHtml.slice(acceptStart, revokeStart);
+  const revokeBlock = indexHtml.slice(revokeStart);
+
+  assert.match(
+    acceptBlock,
+    /window\.zaraz\s*&&\s*window\.zaraz\.consent/,
+    'chamada ao Zaraz deve ser guardada — zaraz.js pode não ter carregado ainda quando o usuário aceita'
+  );
+  assert.match(
+    acceptBlock,
+    /window\.zaraz\.consent\.set\(\{\s*marketing:\s*true\s*\}\)/,
+    'aceite deve conceder a purpose marketing pro Zaraz'
+  );
+  assert.match(
+    revokeBlock,
+    /window\.zaraz\.consent\.set\(\{\s*marketing:\s*false\s*\}\)/,
+    'revogação deve negar a purpose marketing pro Zaraz'
+  );
+
+  const zarazSetIndex = acceptBlock.indexOf('window.zaraz.consent.set');
+  const notifyIndex = acceptBlock.indexOf("notifyConsentListeners('marketing')");
+  assert.ok(
+    zarazSetIndex > -1 && zarazSetIndex < notifyIndex,
+    'o Zaraz deve ser notificado antes dos assinantes internos da ponte'
+  );
+});
+
 test('index.html tem listener anhanga:revoke-consent com reload', () => {
   assert.match(indexHtml, /anhanga:revoke-consent/, 'listener de revogação deve estar presente');
   const revokeIdx = indexHtml.indexOf('anhanga:revoke-consent');
