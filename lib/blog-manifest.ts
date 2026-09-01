@@ -72,24 +72,40 @@ function toPostMeta(filepath: string, parsed: ReturnType<typeof matter>): PostMe
   };
 }
 
+// Single readdir + readFile + gray-matter pass over the blog directory, shared by
+// every function below. Parsing frontmatter (YAML) is the expensive part of this
+// step, so callers that need both the manifest and the markdown export must reuse
+// one pass instead of each re-reading and re-parsing every post from disk.
+async function readParsedPosts(
+  blogDir: string
+): Promise<Array<{ filepath: string; parsed: ReturnType<typeof matter> }>> {
+  const filenames = await readdir(blogDir);
+
+  return Promise.all(
+    filenames
+      .filter((filename) => filename.endsWith('.mdx') && !filename.startsWith('_'))
+      .map(async (filename) => {
+        const filepath = path.join(blogDir, filename);
+        const rawContent = await readFile(filepath, 'utf8');
+        return { filepath, parsed: matter(rawContent) };
+      })
+  );
+}
+
+function sortPostMeta(posts: PostMeta[]): PostMeta[] {
+  return [...posts].sort((a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug));
+}
+
 export async function collectBlogPostMeta(
   blogDir: string,
   options: BlogScheduleOptions = {}
 ): Promise<PostMeta[]> {
   const { hideFuture = shouldHideFuturePosts(), today = todayInSaoPaulo() } = options;
-  const filenames = await readdir(blogDir);
-
-  const posts = await Promise.all(
-    filenames.flatMap((filename) => {
-      if (!filename.endsWith('.mdx') || filename.startsWith('_')) return [];
-      const filepath = path.join(blogDir, filename);
-      return [readFile(filepath, 'utf8').then((rawContent) => toPostMeta(filepath, matter(rawContent)))];
-    })
-  );
-
+  const entries = await readParsedPosts(blogDir);
+  const posts = entries.map(({ filepath, parsed }) => toPostMeta(filepath, parsed));
   const published = hideFuture ? posts.filter((post) => !isFuturePost(post.date, today)) : posts;
 
-  return published.sort((a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug));
+  return sortPostMeta(published);
 }
 
 function serializeBlogPostMeta(posts: PostMeta[]): string {
@@ -97,21 +113,6 @@ function serializeBlogPostMeta(posts: PostMeta[]): string {
 
 export const BLOG_POST_MANIFEST: PostMeta[] = ${JSON.stringify(posts, null, 2)};
 `;
-}
-
-export async function writeBlogManifest(
-  blogDir: string,
-  outputFile: string,
-  options: BlogScheduleOptions = {}
-): Promise<PostMeta[]> {
-  const [posts] = await Promise.all([
-    collectBlogPostMeta(blogDir, options),
-    mkdir(path.dirname(outputFile), { recursive: true }),
-  ]);
-
-  await writeFile(outputFile, serializeBlogPostMeta(posts), 'utf8');
-
-  return posts;
 }
 
 // Versão markdown dos posts para consumo por LLMs/agentes via /api/markdown.
@@ -132,40 +133,72 @@ function toPostMarkdown(meta: PostMeta, content: string): string {
   return `${header}\n${content.trim()}\n`;
 }
 
+function serializeBlogPostMarkdown(entries: Record<string, string>): string {
+  return `// Gerado por scripts/generate-blog-manifest.ts — não editar manualmente.
+export const BLOG_POST_MARKDOWN: Record<string, string> = ${JSON.stringify(entries, null, 2)};
+`;
+}
+
+function buildMarkdownEntries(
+  published: Array<{ meta: PostMeta; content: string }>
+): Record<string, string> {
+  return Object.fromEntries(
+    published.map(({ meta, content }) => [meta.slug, toPostMarkdown(meta, content)] as const)
+  );
+}
+
 export async function writeBlogMarkdown(
   blogDir: string,
   outputFile: string,
   options: BlogScheduleOptions = {}
 ): Promise<number> {
   const { hideFuture = shouldHideFuturePosts(), today = todayInSaoPaulo() } = options;
-  const filenames = await readdir(blogDir);
+  const entries = await readParsedPosts(blogDir);
+  const posts = entries.map(({ filepath, parsed }) => ({
+    meta: toPostMeta(filepath, parsed),
+    content: parsed.content,
+  }));
+  const published = hideFuture ? posts.filter(({ meta }) => !isFuturePost(meta.date, today)) : posts;
 
-  const posts = await Promise.all(
-    filenames
-      .filter((filename) => filename.endsWith('.mdx') && !filename.startsWith('_'))
-      .sort()
-      .map(async (filename) => {
-        const filepath = path.join(blogDir, filename);
-        const rawContent = await readFile(filepath, 'utf8');
-        const parsed = matter(rawContent);
-        return [toPostMeta(filepath, parsed), parsed.content] as const;
-      })
-  );
-
-  const published = hideFuture ? posts.filter(([meta]) => !isFuturePost(meta.date, today)) : posts;
-
-  const entries: Record<string, string> = Object.fromEntries(
-    published.map(([meta, content]) => [meta.slug, toPostMarkdown(meta, content)] as const)
-  );
+  const markdownEntries = buildMarkdownEntries(published);
 
   await mkdir(path.dirname(outputFile), { recursive: true });
-  await writeFile(
-    outputFile,
-    `// Gerado por scripts/generate-blog-manifest.ts — não editar manualmente.
-export const BLOG_POST_MARKDOWN: Record<string, string> = ${JSON.stringify(entries, null, 2)};
-`,
-    'utf8'
-  );
+  await writeFile(outputFile, serializeBlogPostMarkdown(markdownEntries), 'utf8');
 
-  return Object.keys(entries).length;
+  return Object.keys(markdownEntries).length;
+}
+
+// Generates both build artifacts (manifest + markdown export) from a single parse
+// pass. scripts/generate-blog-manifest.ts uses this so the two outputs share one
+// readdir/readFile/matter pass over the posts instead of each parsing every post's
+// frontmatter separately — this step runs before every `pnpm dev`, `pnpm build`,
+// `pnpm typecheck` and `pnpm test:regression`. writeBlogMarkdown stays as-is for
+// standalone/test use.
+export async function writeBlogArtifacts(
+  blogDir: string,
+  manifestOutputFile: string,
+  markdownOutputFile: string,
+  options: BlogScheduleOptions = {}
+): Promise<{ posts: PostMeta[]; markdownCount: number }> {
+  const { hideFuture = shouldHideFuturePosts(), today = todayInSaoPaulo() } = options;
+  const entries = await readParsedPosts(blogDir);
+  const posts = entries.map(({ filepath, parsed }) => ({
+    meta: toPostMeta(filepath, parsed),
+    content: parsed.content,
+  }));
+  const published = hideFuture ? posts.filter(({ meta }) => !isFuturePost(meta.date, today)) : posts;
+
+  const manifestPosts = sortPostMeta(published.map(({ meta }) => meta));
+  const markdownEntries = buildMarkdownEntries(published);
+
+  await Promise.all([
+    mkdir(path.dirname(manifestOutputFile), { recursive: true }),
+    mkdir(path.dirname(markdownOutputFile), { recursive: true }),
+  ]);
+  await Promise.all([
+    writeFile(manifestOutputFile, serializeBlogPostMeta(manifestPosts), 'utf8'),
+    writeFile(markdownOutputFile, serializeBlogPostMarkdown(markdownEntries), 'utf8'),
+  ]);
+
+  return { posts: manifestPosts, markdownCount: Object.keys(markdownEntries).length };
 }
