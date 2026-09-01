@@ -187,6 +187,27 @@
         }, 500);
       });
 
+      // A revogação recarrega a página logo em seguida — um reload síncrono destruiria
+      // este documento antes do retryTimer acima ter qualquer chance de rodar, e o Zaraz
+      // reaplicaria o 'marketing: true' persistido da visita anterior na página recarregada
+      // até essa ponte corrigir de novo. Adia o reload por até ~1,2s dando chance ao flush
+      // acontecer primeiro; não trava a UI por mais que isso — passado o teto, recarrega de
+      // qualquer forma (o risco residual é o mesmo já aceito no resto desta ponte).
+      var reloadAfterZarazFlush = function () {
+        if (flushZarazConsent()) {
+          window.location.reload();
+          return;
+        }
+        var attempts = 0;
+        var waitTimer = setInterval(function () {
+          attempts += 1;
+          if (flushZarazConsent() || attempts >= 6) {
+            clearInterval(waitTimer);
+            window.location.reload();
+          }
+        }, 200);
+      };
+
       var injectScript = function (src, options) {
         var script = document.createElement('script');
         script.src = src;
@@ -274,7 +295,7 @@
         window.dataLayer.push({
           anhanga_marketing_consent: false
         });
-        window.location.reload();
+        reloadAfterZarazFlush();
       }, { once: true });
     })();
   </script>

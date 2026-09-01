@@ -295,11 +295,28 @@ test('revogação notifica denied antes do reload', () => {
   const revokeBlock = indexHtml.slice(revokeStart);
   const notifyIndex = revokeBlock.indexOf("notifyConsentListeners('essential')");
   const deniedIndex = revokeBlock.indexOf('anhanga_marketing_consent: false');
-  const reloadIndex = revokeBlock.indexOf('window.location.reload()');
+  const reloadIndex = revokeBlock.indexOf('reloadAfterZarazFlush()');
 
   assert.ok(notifyIndex > -1);
   assert.ok(deniedIndex > notifyIndex);
-  assert.ok(reloadIndex > deniedIndex);
+  assert.ok(reloadIndex > deniedIndex, 'revogação deve delegar o reload pra reloadAfterZarazFlush, não recarregar direto');
+});
+
+test('reloadAfterZarazFlush espera o flush do Zaraz antes de recarregar (com teto curto)', () => {
+  // Achado de review (chatgpt-codex-connector[bot]): reload síncrono destruiria o
+  // documento antes do retry de 10s da assinatura da ponte ter qualquer chance de
+  // rodar, deixando o Zaraz reaplicar o 'marketing: true' persistido da visita
+  // anterior na página recarregada. reloadAfterZarazFlush precisa tentar o flush
+  // primeiro e, se falhar, esperar um pouco (não os 10s inteiros — travaria a UI).
+  const fnStart = indexHtml.indexOf('var reloadAfterZarazFlush = function () {');
+  const domListenersStart = indexHtml.indexOf("window.addEventListener('anhanga:marketing-consent'");
+  assert.ok(fnStart > -1, 'reloadAfterZarazFlush deve existir');
+  assert.ok(fnStart < domListenersStart, 'deve ser definida antes dos listeners de DOM que a usam');
+
+  const fnBlock = indexHtml.slice(fnStart, domListenersStart);
+  assert.match(fnBlock, /if\s*\(flushZarazConsent\(\)\)\s*\{\s*window\.location\.reload\(\);/, 'deve recarregar direto se o flush já tiver sucesso na hora');
+  assert.match(fnBlock, /setInterval\(/, 'deve reter e tentar de novo por um teto curto se o flush falhar na hora');
+  assert.match(fnBlock, /window\.location\.reload\(\);\s*\}\s*\},\s*200\)/, 'deve recarregar de qualquer forma depois do teto — não pode travar a revogação indefinidamente');
 });
 
 test('ponte assina addAnhangaConsentListener pra propagar a purpose de marketing pro Zaraz', () => {
@@ -348,6 +365,6 @@ test('DOM listeners de aceite/revogação não chamam o Zaraz diretamente (deleg
 test('index.html tem listener anhanga:revoke-consent com reload', () => {
   assert.match(indexHtml, /anhanga:revoke-consent/, 'listener de revogação deve estar presente');
   const revokeIdx = indexHtml.indexOf('anhanga:revoke-consent');
-  const reloadIdx = indexHtml.indexOf('window.location.reload()', revokeIdx);
-  assert.ok(reloadIdx > revokeIdx, 'reload deve ocorrer após revoke-consent');
+  const reloadIdx = indexHtml.indexOf('reloadAfterZarazFlush()', revokeIdx);
+  assert.ok(reloadIdx > revokeIdx, 'reload (via reloadAfterZarazFlush) deve ocorrer após revoke-consent');
 });
