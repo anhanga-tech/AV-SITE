@@ -327,18 +327,44 @@ test.describe('Cookie Consent Banner (CMP)', () => {
     return page.evaluate(() => (window as unknown as { __zarazConsentCalls: Record<string, boolean>[] }).__zarazConsentCalls);
   }
 
+  test('carregamento sem escolha prévia já sincroniza marketing:false com o Zaraz', async ({ page }) => {
+    // addAnhangaConsentListener invoca o assinante imediatamente no registro, com o
+    // estado atual (_consentChoice é null aqui) — cobre visitas cujo consentimento
+    // já foi decidido antes desta carga, sem depender de um clique nesta sessão.
+    await stubZarazConsent(page);
+    await page.goto('/');
+
+    expect(await getZarazConsentCalls(page)).toEqual([{ marketing: false }]);
+  });
+
   test('aceitar propaga a purpose marketing pro Zaraz', async ({ page }) => {
     await stubZarazConsent(page);
     await page.goto('/');
     await page.getByRole('button', { name: 'Aceitar' }).click();
 
-    expect(await getZarazConsentCalls(page)).toEqual([{ marketing: true }]);
+    // [0] é a sincronização inicial (sem escolha ainda); [1] é o clique em Aceitar.
+    expect(await getZarazConsentCalls(page)).toEqual([{ marketing: false }, { marketing: true }]);
   });
 
-  test('recusar propaga a purpose marketing como false pro Zaraz', async ({ page }) => {
+  test('revogar (aceitar → gerenciar → recusar) resulta em marketing:false pro Zaraz após o reload', async ({ page }) => {
+    // O listener de revogação só dispara quando a escolha anterior era 'marketing'
+    // (lib/consent.ts) — "Recusar" na primeira visita não emite nenhum evento, então
+    // este teste precisa passar por aceitar primeiro. A leitura acontece depois do
+    // reload (não antes) pra evitar competir com a navegação: o addInitScript reroda
+    // na página recarregada e a sincronização inicial já reflete 'essential' salvo no
+    // localStorage, que é o estado que realmente importa provar.
+    test.setTimeout(20000);
     await stubZarazConsent(page);
+
     await page.goto('/');
-    await page.getByRole('button', { name: 'Recusar' }).click();
+    await page.getByRole('button', { name: 'Aceitar' }).click();
+    await page.getByRole('button', { name: 'Gerenciar cookies' }).click();
+    await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).toBeVisible();
+
+    await Promise.all([
+      page.waitForEvent('framenavigated'),
+      page.getByRole('button', { name: 'Recusar' }).click(),
+    ]);
 
     expect(await getZarazConsentCalls(page)).toEqual([{ marketing: false }]);
   });

@@ -157,6 +157,36 @@
         anhanga_marketing_consent: _consentChoice === 'marketing'
       });
 
+      // Zaraz é fail-open por padrão (tool sem purpose dispara sem gate) — a
+      // purpose 'marketing' só existe pra gatear Meta/TikTok quando essas tools
+      // forem adicionadas (Tasks 4/5 do plano de migração). GA4 não tem purpose
+      // de propósito, pra preservar o comportamento atual de legítimo interesse.
+      //
+      // Assina a ponte em vez de chamar o Zaraz direto dentro dos listeners de
+      // aceite/revogação: addAnhangaConsentListener já invoca o callback com o
+      // estado atual no registro (cobre quem já tinha consentido em visita
+      // anterior) e de novo a cada mudança futura — os listeners de DOM abaixo
+      // são { once: true }, então uma chamada direta ali só cobriria o clique
+      // em si, nunca uma visita de retorno com consentimento já persistido.
+      var pendingZarazMarketing = null;
+      var flushZarazConsent = function () {
+        if (pendingZarazMarketing === null || !window.zaraz || !window.zaraz.consent) return false;
+        window.zaraz.consent.set({ marketing: pendingZarazMarketing });
+        pendingZarazMarketing = null;
+        return true;
+      };
+      window.addAnhangaConsentListener(function (choice) {
+        pendingZarazMarketing = choice === 'marketing';
+        if (flushZarazConsent()) return;
+        // zaraz.js carrega assíncrono — se ainda não chegou no momento do clique,
+        // tenta de novo por até 10s em vez de descartar o consentimento em silêncio.
+        var attempts = 0;
+        var retryTimer = setInterval(function () {
+          attempts += 1;
+          if (flushZarazConsent() || attempts >= 20) clearInterval(retryTimer);
+        }, 500);
+      });
+
       var injectScript = function (src, options) {
         var script = document.createElement('script');
         script.src = src;
@@ -231,13 +261,6 @@
 
       window.addEventListener('anhanga:marketing-consent', function () {
         _consentChoice = 'marketing';
-        // Zaraz é fail-open por padrão (tool sem purpose dispara sem gate) — a
-        // purpose 'marketing' só existe pra gatear Meta/TikTok quando essas tools
-        // forem adicionadas (Tasks 4/5 do plano de migração). GA4 não tem purpose
-        // de propósito, pra preservar o comportamento atual de legítimo interesse.
-        if (window.zaraz && window.zaraz.consent) {
-          window.zaraz.consent.set({ marketing: true });
-        }
         notifyConsentListeners('marketing');
         window.dataLayer.push({
           event: 'marketing_consent_granted',
@@ -247,9 +270,6 @@
 
       window.addEventListener('anhanga:revoke-consent', function () {
         _consentChoice = 'essential';
-        if (window.zaraz && window.zaraz.consent) {
-          window.zaraz.consent.set({ marketing: false });
-        }
         notifyConsentListeners('essential');
         window.dataLayer.push({
           anhanga_marketing_consent: false
