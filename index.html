@@ -131,7 +131,6 @@
       var analyticsLoaded = false;
       var gtmLoaded = false;
       var utmLoaded = false;
-      var mauticLoaded = false;
       var consentListeners = [];
 
       var callConsentListener = function (callback, choice) {
@@ -173,8 +172,7 @@
         gtmLoaded = true;
         // Não carregar GTM em ambientes não-produtivos (dev local + Playwright/CI em 127.0.0.1).
         // Sem este gate, submits de teste disparam generate_lead -> GTM -> GA4 de produção e
-        // poluem o sinal de conversão (treina o Smart Bidding com tráfego de bot). Espelha o
-        // gate de host do loadMautic.
+        // poluem o sinal de conversão (treina o Smart Bidding com tráfego de bot).
         var h = location.hostname;
         if (h === 'localhost' || h === '127.0.0.1' || h === '[::1]' || h === '::1' || h === '0.0.0.0' || h.endsWith('.local') || h.endsWith('.test')) return;
         window.dataLayer.push({
@@ -184,26 +182,12 @@
         injectScript('https://load.sst.anhanga.tur.br/60oxrlttgl.js?56lu7e=BQNJMzg%2FVTteLDMnVEQ%2FSRpaRlpdVBwBUQYaHA0cHw5CEwEGQhAK');
       };
 
-      var loadMautic = function () {
-        if (_consentChoice !== 'marketing') return;
-        if (mauticLoaded) return;
-        mauticLoaded = true;
-        var h = location.hostname;
-        if (h === 'localhost' || h === '127.0.0.1' || h.endsWith('.local') || h.endsWith('.test')) return;
-        (function(w,d,t,u,n,a,m){w['MauticTrackingObject']=n;
-            w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)},a=d.createElement(t),
-            m=d.getElementsByTagName(t)[0];a.async=1;a.src=u;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','https://mkt.anhanga.tur.br/mtc.js','mt');
-        mt('send', 'pageview');
-      };
-
       var absoluteFallbackTimer = null;
       var loadAnalytics = function () {
         if (analyticsLoaded) return;
         analyticsLoaded = true;
         if (absoluteFallbackTimer !== null) clearTimeout(absoluteFallbackTimer);
         loadGtm();
-        loadMautic();
         if (!utmLoaded) {
           utmLoaded = true;
           injectScript('/utm-tracking.js', { defer: true });
@@ -247,7 +231,6 @@
 
       window.addEventListener('anhanga:marketing-consent', function () {
         _consentChoice = 'marketing';
-        loadMautic();
         notifyConsentListeners('marketing');
         window.dataLayer.push({
           event: 'marketing_consent_granted',
