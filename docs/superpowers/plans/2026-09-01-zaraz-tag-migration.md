@@ -26,7 +26,7 @@ Consent Management do Zaraz é **por purposes**, mas o default é **fail-OPEN**:
 - Toda tag de marketing (Meta, TikTok) precisa de purpose de consentimento explícita no Zaraz antes de qualquer publicação — auditar isso é um passo obrigatório, não op­cional, dado o default fail-open.
 - Google Ads Customer Match (RIPD Atividade 4) já depende de segmento Mautic, que foi removido do código em 01/09/2026 (PR #1564) — esse fluxo já está órfão **independente** desta migração. Fora de escopo aqui; registrar como achado separado (issue própria), não misturar com o corte do Stape.
 - Antes de qualquer evento real de teste, disparar um evento sintético primeiro. Lead real exige confirmação explícita do usuário porque cria registro no Odoo.
-- Rollback: se qualquer critério de validação falhar, manter Stape ativo e não prosseguir para o corte (Task 7).
+- Rollback (revisado 01/09/2026): a estratégia original ("manter Stape ativo") não é mais possível — a própria Stape já desativou o container em 31/08/2026 antes deste plano existir. Rollback real, se necessário, seria reverter os commits do corte (Task 7) e aceitar um período sem nenhum tag-manager até reconfigurar; não há mais um sistema paralelo vivo pra recair.
 - **Achado da Task 1 (01/09/2026):** o **Google Tag Gateway** (produto separado do Zaraz — proxy first-party do `gtag.js`/GTM real, roda no navegador) estava **ativo** na zone `anhanga.tur.br`, configurado pro mesmo container `GTM-T2KGS86G` que o Stape carrega. Config antiga, não fazia parte de nenhum plano documentado. Causava rejeição do cookie `_ga_QDBT5PM4KP` por domínio inválido (lógica de cálculo de domínio do próprio Google, não do Zaraz) e potencialmente hits duplicados no GA4 (Tag Gateway + Stape rodando em paralelo, sem ninguém ter decidido isso). Desligado em 01/09/2026 com autorização do usuário. Se o volume de eventos no GA4 mudar visivelmente na Task 6 (paralelo), essa desativação é a causa mais provável — não um problema do Zaraz.
 
 ---
@@ -212,7 +212,9 @@ Disparado `generate_lead` sintético. Confirmado no TikTok Events Manager → Te
 
 ---
 
-### Task 6: Rodar em paralelo com o Stape e comparar
+### Task 6: Rodar em paralelo com o Stape e comparar — **PULADA (01/09/2026)**
+
+O Stape já estava desativado desde 31/08/2026 (a própria Stape desligou o container por exceder o plano gratuito — motivo original desta migração, ver início do plano). Sem Stape ativo, não há com o que rodar em paralelo nem baseline simultânea pra comparar — os 4 steps abaixo pressupõem os dois sistemas rodando ao mesmo tempo, o que não é mais possível. Pulado direto pra Task 7 por decisão do usuário. Os steps ficam registrados como referência, não como trabalho pendente.
 
 **Files:**
 - Observe: GA4, Meta Events Manager, TikTok Events Manager (Zaraz vs. Stape)
@@ -249,18 +251,18 @@ Critério de sucesso: contagens de evento em paridade razoável, nenhum vazament
 - Modify: `docs/performance-third-party-scripts.md`, `README.md`, `.claude/CLAUDE.md`, `.env.example` (referências a Stape/sGTM)
 
 **Interfaces:**
-- Consumes: decisão go do Task 6.
+- Consumes: decisão do usuário de pular a Task 6 (Stape já desativado, sem baseline pra comparar).
 - Produces: `index.html` sem nenhuma dependência do Stape.
 
-- [ ] **Step 1: Remover o loader do Stape de `index.html`**
+- [x] **Step 1: Remover o loader do Stape de `index.html`** (concluído 01/09/2026)
 
-Seguir o mesmo padrão usado pra remover o loader do Mautic (ver `[[mautic-hubspot-removal]]`): remover `loadGtm`, a variável `gtmLoaded` e a chamada em `loadAnalytics`. Confirmar se algum outro ponto do arquivo referencia `sst.anhanga.tur.br`/`load.sst.anhanga.tur.br` (dns-prefetch no `<head>`) e remover também.
+Removidos: variável `gtmLoaded`, função `loadGtm` inteira (incluindo o `window.dataLayer.push({'gtm.start':...})` interno) e sua chamada em `loadAnalytics`; os dois `<link rel="dns-prefetch">` pra `load.sst.anhanga.tur.br`/`sst.anhanga.tur.br` no `<head>`. `injectScript` foi mantida — ainda é usada pelo `utm-tracking.js`.
 
-- [ ] **Step 2: Atualizar os testes estáticos**
+- [x] **Step 2: Atualizar os testes estáticos** (concluído 01/09/2026)
 
-`tests/index-third-party-scripts.test.ts` tem testes que hoje **exigem** presença de `load.sst.anhanga.tur.br`/`sst.anhanga.tur.br` (dns-prefetch, ausência de preconnect ocioso). Inverter essas asserções ou removê-las, e adicionar um teste `doesNotMatch` equivalente ao que foi feito pro Mautic/HubSpot.
+`tests/index-third-party-scripts.test.ts`: substituído o teste que exigia o loader do Stape por um `doesNotMatch` (padrão Mautic/HubSpot) checando `gtmLoaded`/`loadGtm`/`sst.anhanga.tur.br`/`'gtm.start'`; removidos os dois testes que verificavam comportamento específico do `loadGtm` (gate de host) e do preconnect/dns-prefetch dos hosts sGTM (não fazem mais sentido, o host não é mais referenciado). `playwright.config.ts`/`tests/playwright-safety.test.ts` mantidos como estavam — os `MAP ... ~NOTFOUND` dos hosts do Stape ficam como defesa em profundidade, mesmo padrão adotado pro HubSpot na remoção de set/2026.
 
-- [ ] **Step 3: Rodar a suíte completa**
+- [ ] **Step 3: Rodar a suíte completa** — **não executado neste sandbox (sem Node)**, só revisão manual linha a linha. Rodar antes do merge:
 
 ```bash
 pnpm test:regression
@@ -270,15 +272,16 @@ pnpm lint:changed
 pnpm run build
 ```
 
-Expected: todos os comandos com exit code 0.
+- [x] **Step 4: Atualizar RIPD e docs** (concluído 01/09/2026 — "desativar/cancelar a conta Stape" não se aplica, a própria Stape já desativou)
 
-- [ ] **Step 4: Atualizar RIPD, docs e desativar/cancelar o Stape**
+RIPD bumped pra **v1.9**: Stape substituído por Cloudflare Zaraz nas Atividades 1 e 2 (incluindo o DPA — Cloudflare já é processor via hospedagem, pendente só confirmar cobertura explícita do Zaraz com o DPO); Atividade 4 (Customer Match) marcada como **inativa** (já dependia do Mautic removido na v1.8, agora também do Stape); pendências #1 e #4 marcadas obsoletas. `README.md` atualizado. `docs/performance-third-party-scripts.md` e `.env.example` **não** mencionavam Stape/sGTM (checado, nada a mudar).
 
-Nova versão do RIPD trocando Stape OÜ por Cloudflare como operador de tag-management (mesmo padrão da v1.8 que removeu HubSpot/Mautic). Atualizar `docs/performance-third-party-scripts.md`, `README.md`, `.claude/CLAUDE.md`, `.env.example` onde mencionam Stape/sGTM. Cancelar/desativar a conta Stape só depois do deploy confirmado em produção.
+**Achados extras na política de privacidade** (fora do escopo original deste step, mas encontrados ao corrigir as menções à Stape):
+- `PrivacySection4MetodosColeta.tsx` citava "Meta Pixel (Facebook) para remarketing" como cookie/tecnologia client-side — **desatualizado desde as Tasks 4-5** (arquitetura é CAPI-only, sem pixel client-side). Corrigido.
+- `PrivacySection6Compartilhamento.tsx` **nunca listava o TikTok** como destinatário de dados, apesar do TikTok Events API já estar em produção desde o plano de jul/2026 (`2026-07-23-sgtm-hybrid-consent.md`) — anterior a esta migração. Corrigido (TikTok Pte. Ltd. adicionado). Vale o DPO revisar essa adição.
+- `PrivacySection5FinalidadesBases.tsx` (Customer Match) atualizada pra refletir que a finalidade está inativa, sem atribuir a função de upload à Cloudflare (que não faz upload em lote).
 
-- [ ] **Step 5: Monitorar por 3–7 dias pós-corte**
-
-Mesmo checklist da Task 6 Step 3, agora sem o Stape como comparação — confirmar que os números do Zaraz sozinho continuam estáveis (sem o paralelo, não há mais baseline simultânea).
+- [ ] **Step 5: Monitorar por 3–7 dias pós-corte** — pendente, só possível depois do merge e deploy em produção.
 
 ---
 

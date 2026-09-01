@@ -20,9 +20,10 @@ export function PrivacySection5FinalidadesBases() {
                     <strong>Base Legal:</strong> Consentimento do titular</p>
 
                 <h3 className="font-merriweather font-semibold">5.5 Customer Match e Públicos Personalizados</h3>
-                <p><strong>Finalidade:</strong> Criação de públicos personalizados no Google Ads e Meta Ads a partir de e-mails e telefones de clientes que consentiram com comunicações de marketing, para exibição de anúncios relevantes e exclusão de clientes ativos de campanhas de prospecção<br />
+                <p><strong>Status:</strong> Finalidade atualmente inativa — nenhum envio está ocorrendo. Descrita aqui para transparência sobre o uso já avaliado e para o caso de retomada futura.<br />
+                    <strong>Finalidade:</strong> Criação de públicos personalizados no Google Ads e Meta Ads a partir de e-mails e telefones de clientes que consentiram com comunicações de marketing, para exibição de anúncios relevantes e exclusão de clientes ativos de campanhas de prospecção<br />
                     <strong>Base Legal:</strong> Consentimento específico do titular (Art. 7º, I, LGPD)<br />
-                    <strong>Salvaguarda:</strong> Os dados são transmitidos exclusivamente em formato de hash unidirecional (SHA-256) via servidor intermediário (Stape OÜ). As plataformas utilizam os dados apenas para correspondência de audiência e não para outros fins.</p>
+                    <strong>Salvaguarda:</strong> Caso reativada, os dados seriam transmitidos exclusivamente em formato de hash unidirecional (SHA-256). As plataformas utilizam os dados apenas para correspondência de audiência e não para outros fins.</p>
 
                 <h3 className="font-merriweather font-semibold">5.6 Assistente Virtual de Viagens (Inteligência Artificial)</h3>
                 <p><strong>Finalidade:</strong> Prestar atendimento automatizado, entender as necessidades da viagem e preparar orçamentos personalizados a pedido do titular. As mensagens trocadas com o assistente são processadas pelo serviço Google Gemini (Google LLC) e as informações de planejamento da viagem podem ser registradas em nosso CRM para continuidade do atendimento por um consultor humano<br />
