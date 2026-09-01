@@ -131,13 +131,15 @@ Not verified (limitação conhecida, não bloqueante): não há como confirmar v
 
 - [x] **Step 2: Adicionar o segundo assinante da ponte de consentimento em `index.html`** (concluído 01/09/2026)
 
-API confirmada (lida em `github.com/imviidx/fake-cloudflare-zaraz-consent`, mock que espelha a API real — a doc oficial da Cloudflare não documenta a assinatura): `window.zaraz.consent.set({ purposeId: boolean, ... })`, aceita objeto com múltiplas purposes. Implementado com guarda defensiva (`if (window.zaraz && window.zaraz.consent)`) já que o script do Zaraz carrega assíncrono e pode não estar pronto no momento do clique.
+API confirmada (lida em `github.com/imviidx/fake-cloudflare-zaraz-consent`, mock que espelha a API real — a doc oficial da Cloudflare não documenta a assinatura): `window.zaraz.consent.set({ purposeId: boolean, ... })`, aceita objeto com múltiplas purposes.
+
+**Atualizado (revisão de PR, fedce64):** a primeira versão (commit `dc03997`) chamava `window.zaraz.consent.set()` inline dentro dos listeners de DOM `{ once: true }`, com uma guarda defensiva `if (window.zaraz && window.zaraz.consent)`. Review (`chatgpt-codex-connector[bot]`) apontou que isso descarta o consentimento em silêncio se o `zaraz.js` (assíncrono) ainda não tiver carregado no momento do clique — sem retry, e o listener só dispara uma vez. Também nunca sincronizava consentimento já persistido de uma visita anterior. Corrigido: a sincronização agora vive numa assinatura de `window.addAnhangaConsentListener` (dispara imediatamente com o estado atual no registro, e de novo a cada mudança futura), com retry via `setInterval` de até 10s se o Zaraz ainda não estiver pronto. Os listeners de DOM não chamam mais o Zaraz diretamente.
 
 `updateConsentState`/`gtag` não existiam mais no `index.html` atual (o arquivo já tinha evoluído desde o plano de jul/2026) — não havia nada a manter em paralelo além do `dataLayer.push` existente.
 
-- [x] **Step 3: Teste estático — Zaraz consent API chamada nos dois listeners** (concluído 01/09/2026)
+- [x] **Step 3: Teste estático — Zaraz consent API chamada nos dois listeners** (concluído 01/09/2026, ajustado em fedce64/8f4cc01)
 
-Adicionado em `tests/index-third-party-scripts.test.ts` (assinatura + ordem: Zaraz antes de `notifyConsentListeners`) e em `tests/e2e/cookie-consent.spec.ts` (stub de `window.zaraz.consent.set` via `addInitScript`, já que `window.zaraz` só existe em produção — não roda no dev server do Playwright). **Não executado** neste sandbox (sem Node) — revisão manual só.
+Adicionado em `tests/index-third-party-scripts.test.ts` (assinatura registrada antes dos listeners de DOM, com os quatro elementos do bloco: mapeamento do `choice`, guarda de prontidão, chamada a `consent.set`, retry via `setInterval`; mais um teste separado confirmando que os listeners de DOM não chamam `window.zaraz` diretamente) e em `tests/e2e/cookie-consent.spec.ts` (stub de `window.zaraz.consent.set` via `addInitScript`, já que `window.zaraz` só existe em produção — não roda no dev server do Playwright; 3 testes: sincronização no load sem escolha prévia, aceite, e revogação via aceitar→gerenciar→recusar). **Playwright não executado** neste sandbox (sem Node); os testes `node:test` rodaram no CI e pegaram um bug real de slice num deles (corrigido em 8f4cc01) — revisão manual sozinha não é suficiente, o CI é a rede de segurança real aqui.
 
 - [ ] **Step 4: Teste — nenhum tool de marketing sem purpose**
 
