@@ -196,22 +196,19 @@ Revalidado depois de desligar Pageviews/Events: só `Lead` aparece nos Test Even
 - Consumes: mesmo evento `generate_lead`.
 - Produces: chamada server-side a `business-api.tiktok.com/.../event/track/`.
 
-- [ ] **Step 1: Adicionar o tool TikTok**
+- [x] **Step 1: Adicionar o tool TikTok** (concluído 01/09/2026)
 
-Pixel Code e access token: usuário digita direto. Gate: purpose `marketing`.
+Pixel Code e access token: usuário digitou direto (token gerado no TikTok Events Manager). Gate: purpose `marketing`, atribuída na aba Consent. As lições da Task 4 foram aplicadas de cara desta vez:
+- O wizard de setup já mostra "Track all pageviews"/"Track all other events"/"Track all ecommerce events" na etapa **Actions** — os dois primeiros vieram ligados por padrão (mesmo padrão do Meta) e foram desligados antes de salvar.
+- Nenhum print da tela de credenciais foi feito desta vez.
 
-**Lições da Task 4:**
-- Ao adicionar a tool, checar imediatamente se ela vem com "Automated actions" (Pageviews/Events) ligadas por padrão — no Meta isso reenviava todo `zaraz.track()` do site, bem além do escopo pretendido. Desligar qualquer automated action antes de criar a custom action do `generate_lead`.
-- **Não usar o toggle "Include Event Properties"** (ou equivalente) na action — ele repassa o objeto acumulado do `dataLayer` inteiro (chaves de eventos anteriores misturadas), não só a chamada atual. Mapear campos individuais explicitamente (ex.: Event ID via "+ Add Field" → "Event Property: event_id").
-- Nunca printar a tela "Tool Settings" da tool (Pixel ID/Access Token ficam visíveis) — só a tela de configuração da action/trigger, que não expõe credenciais.
+- [x] **Step 2: Mapear `generate_lead` pro standard event equivalente** (concluído 01/09/2026)
 
-- [ ] **Step 2: Mapear `generate_lead` pro standard event equivalente**
+O trigger `generate_lead` criado na Task 4 foi **reaproveitado** diretamente (triggers são um recurso compartilhado entre tools, não por-tool). Custom action `TikTok - Leads`: Action Type `Standard Event` → **`SubmitForm`** (não `Contact` — `SubmitForm` é a categoria de geração de leads do TikTok Ads, `Contact` é para o usuário iniciar contato diretamente, ex. clicar pra ligar). `event_id` mapeado individualmente via variable "Event Property: event_id" desde o início — sem passar pelo toggle "include all" que causou o bug no Meta.
 
-Mesma ressalva da Task 4 — confirmar mapeamento no dashboard, e que não há PII adicional sendo enviada além do que já existe hoje.
+- [x] **Step 3: Validar payload no TikTok Events Manager** (concluído 01/09/2026)
 
-- [ ] **Step 3: Validar payload no TikTok Events Manager**
-
-Mesmo processo da Task 4 Step 4, usando o Test Event Code do TikTok.
+Disparado `generate_lead` sintético. Confirmado no TikTok Events Manager → Test Events: evento **"Enviar formulário"** (nome de exibição de `SubmitForm`, `Código: Lead` internamente), `Método de conexão: Servidor`, `Método de configuração: Código personalizado`, `event_id` batendo exatamente com o enviado, sem PII. Validação correta já na primeira tentativa — nenhum dos dois problemas do Meta (automated actions, blob acumulado) se repetiu, confirmando que as lições realmente generalizam pra outras tools do Zaraz.
 
 ---
 
