@@ -157,23 +157,27 @@ Não há como testar isso via `node:test` contra o dashboard Zaraz diretamente. 
 - Consumes: evento `generate_lead` (via compat mode) com `event_id`, `destination`, UTMs.
 - Produces: chamada server-side a `graph.facebook.com/.../events` com `em/ph/fn/ln` hasheados quando disponíveis.
 
-- [ ] **Step 1: Adicionar o tool "Facebook Pixel"**
+- [x] **Step 1: Adicionar o tool "Facebook Pixel"** (concluído 01/09/2026)
 
-Pixel ID e access token: usuário digita direto no dashboard. Gate: purpose `marketing` (Task 3).
+Pixel ID e access token: usuário digitou direto no dashboard. Gate: purpose `marketing` (Task 3), atribuída na aba **Consent** (não é uma config do tool em si).
 
-- [ ] **Step 2: Mapear `generate_lead` pro standard event `Lead`**
+**Achado importante:** ao adicionar a tool, o Zaraz liga por padrão duas "Automated actions" — **Pageviews** e **Events** (mesmo padrão visto no GA4 na Task 2). Diferente do GA4, aqui isso é sério: "Events" reenvia **todo** `zaraz.track()` do site (os ~16 eventos mapeados na Task 1 — formulários, quiz, waitlist, cliques da página de links, etc.) pro Meta como evento genérico, e "Pageviews" manda `PageView` em toda visita. Isso expande a coleta bem além do escopo desta task (só `generate_lead` → `Lead`) e contraria o resto desta migração. **As duas foram desligadas** — só a custom action `Meta - Lead` (Step 2) fica ativa. Conferir o mesmo em qualquer tool nova adicionada daqui pra frente, incluindo a TikTok (Task 5).
 
-Confirmar no dashboard como o tool mapeia nomes de evento custom pra standard events do Meta (`Lead`). Se não houver mapeamento automático, pode ser necessário ajustar o nome do evento na origem (`utils/generate-lead-analytics.ts`) ou usar uma configuração do tool — decidir com base no que o dashboard expõe, não assumir.
+- [x] **Step 2: Mapear `generate_lead` pro standard event `Lead`** (concluído 01/09/2026)
 
-- [ ] **Step 3: Confirmar quais campos de PII o evento `generate_lead` hoje carrega**
+Não há mapeamento automático de evento custom → standard event — foi preciso criar manualmente: **Custom actions → Create action**, Action Type `Event`, campo obrigatório **Facebook Event Name** = `Lead`. O trigger não é escolhido por nome de evento direto — precisou de um trigger novo (**Triggers → Create Trigger**) com Match Rule usando a variable de sistema **"Event Name"** (dentro de Web API, ao lado de "Event Property: ..." — não confundir os dois) `Equals` `generate_lead`. **"Include Event Properties"** ligado.
 
-`pushGenerateLeadConversionEvent` não envia `email`/`phone`/`nome` hoje — só `destination`, UTMs e `ga_client_id`/`ga_session_id`. Isso significa **sem PII pro Advanced Matching hoje**, então o hashing SHA-256 do tool não tem o que hashear neste evento específico. Documentar essa lacuna: se o objetivo é paridade de match quality com a Meta CAPI tag do GTM server (que usava outro pipeline de dados — ver Task 5 do plano `2026-07-23-sgtm-hybrid-consent.md`, que também não adicionava email/telefone manualmente na primeira fase), então CAPI-only aqui já reflete o que existia antes. Não expandir o payload nesta migração — é fora de escopo (mudaria o que é coletado, não só onde é enviado).
+- [x] **Step 3: Confirmar quais campos de PII o evento `generate_lead` hoje carrega** (concluído 01/09/2026, sem mudança de código)
 
-- [ ] **Step 4: Validar payload no Zaraz Preview/Debug**
+`pushGenerateLeadConversionEvent` não envia `email`/`phone`/`nome` hoje — só `destination`, UTMs e `ga_client_id`/`ga_session_id`. Isso significa **sem PII pro Advanced Matching hoje**, então o hashing SHA-256 do tool não tem o que hashear neste evento específico. Não expandir o payload nesta migração — é fora de escopo (mudaria o que é coletado, não só onde é enviado).
 
-Disparar um `generate_lead` sintético (mesmo padrão do plano anterior: `event_id` claramente marcado como teste) e confirmar no Meta Events Manager (Test Events, com Test Event Code temporário) que o evento `Lead` chega server-side.
+- [x] **Step 4: Validar payload no Zaraz Preview/Debug** (concluído 01/09/2026)
 
-Expected: evento visível no Events Manager, sem PII inesperada, sem token exposto em nenhum log/print.
+Disparado `generate_lead` sintético com `zaraz.debug()` ativo. Confirmado no Meta Events Manager → Test Events: evento `Lead`, status `Processado`, `Fonte da ação: website`/`Servidor` — confirma CAPI de verdade (sem pixel client-side). `Chaves de dados do usuário` mostra `fbp`/`fbc`/IP/User-Agent enriquecidos automaticamente pela tool, como previsto no spike.
+
+**Lacuna aberta, não bloqueante:** o `event_id` que mandamos (`task4-test-...`) não chegou na tool — o Meta mostrou um ID numérico aleatório (o fallback do componente, confirmado no código-fonte lido no spike: `payload.event_id || ... || random`). O parâmetro custom recebido foi só `__includeClient: true`; `destination`/UTMs/`event_id` não apareceram como campos. Para a arquitetura CAPI-only isso não importa (não há pixel client-side pra dedupar contra), mas se no futuro for necessário correlacionar o Lead do Meta com o registro no Odoo, essa lacuna precisa ser resolvida — decisão consciente de não investigar agora.
+
+Revalidado depois de desligar Pageviews/Events: só `Lead` aparece nos Test Events, confirmando o escopo corrigido. **Lembrete:** remover o Test Event Code do campo da tool antes de qualquer publicação — não é código pra ficar em produção.
 
 ---
 
@@ -189,6 +193,8 @@ Expected: evento visível no Events Manager, sem PII inesperada, sem token expos
 - [ ] **Step 1: Adicionar o tool TikTok**
 
 Pixel Code e access token: usuário digita direto. Gate: purpose `marketing`.
+
+**Lição da Task 4:** ao adicionar a tool, checar imediatamente se ela vem com "Automated actions" (Pageviews/Events) ligadas por padrão — no Meta isso reenviava todo `zaraz.track()` do site, bem além do escopo pretendido. Desligar qualquer automated action antes de criar a custom action do `generate_lead`.
 
 - [ ] **Step 2: Mapear `generate_lead` pro standard event equivalente**
 
