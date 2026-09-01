@@ -43,7 +43,7 @@
     "framer-motion": "^13.1.1",
     "globe.gl": "^2.46.2",
     "leaflet": "1.9.4",
-    "lucide-react": "^1.33.0",
+    "lucide-react": "^1.34.0",
     "postcss": "^8.5.26",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
