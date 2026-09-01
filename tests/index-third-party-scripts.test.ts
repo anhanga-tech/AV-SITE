@@ -319,6 +319,30 @@ test('reloadAfterZarazFlush espera o flush do Zaraz antes de recarregar (com tet
   assert.match(fnBlock, /window\.location\.reload\(\);\s*\}\s*\},\s*200\)/, 'deve recarregar de qualquer forma depois do teto — não pode travar a revogação indefinidamente');
 });
 
+test('flushZarazConsent distingue "nada pendente" de "zaraz não está pronto"', () => {
+  // Achado de review (claude[bot] + chatgpt-codex-connector[bot]): um único `||`
+  // combinando as duas condições faz "já sincronizado" e "ainda não pronto" devolverem
+  // `false` do mesmo jeito. No fluxo de revogação, notifyConsentListeners já dispara a
+  // assinatura da ponte e flusha com sucesso quando o zaraz.js já tinha carregado (caso
+  // comum) — sem essa distinção, reloadAfterZarazFlush não reconhece o flush como
+  // concluído e espera o teto inteiro de ~1,2s à toa antes de recarregar.
+  const fnStart = indexHtml.indexOf('var flushZarazConsent = function () {');
+  const fnEnd = indexHtml.indexOf("window.addAnhangaConsentListener(function (choice)");
+  assert.ok(fnStart > -1 && fnStart < fnEnd, 'flushZarazConsent deve existir antes da assinatura que a usa');
+
+  const fnBlock = indexHtml.slice(fnStart, fnEnd);
+  assert.match(
+    fnBlock,
+    /if\s*\(pendingZarazMarketing\s*===\s*null\)\s*return\s*true;/,
+    'nada pendente deve retornar true imediatamente, sem checar se o zaraz.js carregou'
+  );
+  assert.match(
+    fnBlock,
+    /if\s*\(!window\.zaraz\s*\|\|\s*!window\.zaraz\.consent\)\s*return\s*false;/,
+    'só chega a checar prontidão do zaraz.js quando existe algo pendente pra enviar'
+  );
+});
+
 test('ponte assina addAnhangaConsentListener pra propagar a purpose de marketing pro Zaraz', () => {
   // A sincronização vive numa assinatura da própria ponte (addAnhangaConsentListener),
   // não numa chamada inline dentro dos listeners de DOM — assim ela também cobre uma

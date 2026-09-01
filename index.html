@@ -169,8 +169,16 @@
       // são { once: true }, então uma chamada direta ali só cobriria o clique
       // em si, nunca uma visita de retorno com consentimento já persistido.
       var pendingZarazMarketing = null;
+      // "true" precisa dizer "nada pendente pro Zaraz agora", não só "chegou a enviar
+      // alguma vez" — por isso os dois `return` abaixo são separados. Um único `||`
+      // combinando "nada pendente" com "zaraz não está pronto" faz os dois casos
+      // devolverem `false` do mesmo jeito, e reloadAfterZarazFlush (mais abaixo) não
+      // consegue diferenciar "já sincronizado, pode recarregar" de "ainda esperando o
+      // zaraz.js carregar" — no caminho comum (zaraz já carregado antes da revogação),
+      // isso forçava a esperar o teto inteiro de ~1,2s à toa (achado de review).
       var flushZarazConsent = function () {
-        if (pendingZarazMarketing === null || !window.zaraz || !window.zaraz.consent) return false;
+        if (pendingZarazMarketing === null) return true;
+        if (!window.zaraz || !window.zaraz.consent) return false;
         window.zaraz.consent.set({ marketing: pendingZarazMarketing });
         pendingZarazMarketing = null;
         return true;
