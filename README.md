@@ -12,7 +12,7 @@ Site institucional da **Anhangá Viagens**, uma agência de viagens boutique bra
 - **🤖 Chat com IA Gemini:** Assistente de viagens que responde dúvidas, sugere roteiros e conduz uma qualificação BANT (Need, Authority, Budget, Timeline) com handoff para atendimento humano em reservas de curto prazo.
 - **🎯 Captura de Leads Inteligente:** Leads do chatbot e dos formulários fluem direto para o **Odoo** (CRM ativo, via JSON-RPC), com atribuição de UTMs/click IDs preservada.
 - **🏝️ Landing Pages Especializadas:** Páginas de alta conversão sem o shell do site (Orlando, Beto Carrero, Lollapalooza, Melhor Idade, Corporativo, Cruzeiros, NPS, Quiz).
-- **📊 Rastreamento e Performance:** GTM/sGTM (Stape) com persistência de UTMs/GCLID e conversões server-side (Meta CAPI) com deduplicação por `event_id`.
+- **📊 Rastreamento e Performance:** Cloudflare Zaraz (GA4, Meta CAPI, TikTok Events API) com persistência de UTMs/GCLID e conversões server-side CAPI-only.
 - **📝 Blog de Viagens:** Posts em MDX, manifest gerado no build e CMS headless (Decap) em `/admin` via OAuth do GitHub.
 - **📈 SEO de Alta Performance:** Prerender estático por rota, metadados dinâmicos SSR-safe e componentes Schema.org (LocalBusiness, FAQ, Breadcrumb).
 - **🗺️ Mapas Interativos:** Visualização geográfica de destinos e hotéis com Leaflet.

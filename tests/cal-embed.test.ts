@@ -98,17 +98,26 @@ test('pushConsultoriaBookingCreatedDataLayerEvent pushes a funnel event and a un
 // módulo (cachedTrackingObject) que sobrevive entre testes deste arquivo (o
 // runner do node:test isola por arquivo, não por teste). Este caso "vazio"
 // roda ANTES do caso populado abaixo para não herdar o cache que ele preenche.
-test('buildAttributionMetadataConfig returns an empty object when there is no tracking data to propagate', () => {
+//
+// getGA4ClientId() sempre retorna um cid (próprio, gerado na hora, quando não
+// há cookie _ga legado — ver utils/whatsapp.ts), então "sem tracking data" já
+// não produz mais {} puro: sobra sempre metadata[cid]. O valor é não-determinístico
+// (timestamp + random), então é extraído e validado por formato à parte do deepEqual.
+test('buildAttributionMetadataConfig only includes the own GA4 client id when there is no other tracking data to propagate', () => {
   withMockBrowserEnv('', () => {
-    assert.deepEqual(buildAttributionMetadataConfig(), {});
+    const { 'metadata[cid]': cid, ...rest } = buildAttributionMetadataConfig();
+
+    assert.match(cid ?? '', /^\d+\.\d+$/, 'metadata[cid] deve seguir o formato número.timestamp');
+    assert.deepEqual(rest, {});
   });
 });
 
 test('buildAttributionMetadataConfig maps captured UTMs/click IDs into Cal.com metadata[key] config entries', () => {
   withMockBrowserEnv('?utm_source=google&utm_medium=cpc&utm_campaign=consultoria&gclid=test-gclid', () => {
-    const config = buildAttributionMetadataConfig();
+    const { 'metadata[cid]': cid, ...rest } = buildAttributionMetadataConfig();
 
-    assert.deepEqual(config, {
+    assert.match(cid ?? '', /^\d+\.\d+$/, 'metadata[cid] deve seguir o formato número.timestamp');
+    assert.deepEqual(rest, {
       'metadata[utm_source]': 'google',
       'metadata[utm_medium]': 'cpc',
       'metadata[utm_campaign]': 'consultoria',
