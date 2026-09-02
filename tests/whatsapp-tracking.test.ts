@@ -126,7 +126,10 @@ test('getTrackingDataObject gera um cid próprio quando não existe cookie _ga (
     const originalDocument = Object.getOwnPropertyDescriptor(globalThis, 'document');
     const originalSessionStorage = Object.getOwnPropertyDescriptor(globalThis, 'sessionStorage');
 
-    let cookieJar = '';
+    // Jar real (chave -> valor), não uma única string: captureTrackingDataObject grava
+    // dois cookies distintos (anhanga_ga_cid e tracking_data) na mesma chamada, e um
+    // mock de slot único faz o segundo write sobrescrever o primeiro antes da asserção.
+    const cookieJar: Record<string, string> = {};
     Object.defineProperty(globalThis, 'window', {
         configurable: true,
         value: {
@@ -137,11 +140,14 @@ test('getTrackingDataObject gera um cid próprio quando não existe cookie _ga (
     Object.defineProperty(globalThis, 'document', {
         configurable: true,
         value: {
-            get cookie() { return cookieJar; },
+            get cookie() {
+                return Object.entries(cookieJar).map(([name, value]) => `${name}=${value}`).join('; ');
+            },
             set cookie(value: string) {
-                // Mock simplificado: um cookie por vez basta pra este teste (só escrevemos o
-                // cid próprio, nunca havia nenhum outro cookie setado antes dele).
-                cookieJar = value.split(';')[0];
+                const [pair] = value.split(';');
+                const separatorIndex = pair.indexOf('=');
+                if (separatorIndex <= 0) return;
+                cookieJar[pair.slice(0, separatorIndex)] = pair.slice(separatorIndex + 1);
             },
         },
     });
@@ -154,7 +160,7 @@ test('getTrackingDataObject gera um cid próprio quando não existe cookie _ga (
         const tracking = getTrackingDataObject();
         assert.ok(tracking?.cid, 'cid deve ser gerado mesmo sem cookie _ga');
         assert.match(tracking!.cid, /^\d+\.\d+$/, 'cid gerado deve seguir o formato número.timestamp');
-        assert.ok(cookieJar.startsWith('anhanga_ga_cid='), 'o cid gerado deve ser persistido em cookie próprio');
+        assert.ok('anhanga_ga_cid' in cookieJar, 'o cid gerado deve ser persistido em cookie próprio');
     } finally {
         if (originalWindow) Object.defineProperty(globalThis, 'window', originalWindow);
         else Reflect.deleteProperty(globalThis, 'window');

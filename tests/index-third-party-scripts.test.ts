@@ -57,16 +57,15 @@ test('index.html não carrega mais o Stape/GTM (Stape desativado — corte pro Z
   assert.ok(utmInjectIndex > -1, 'UTM tracking loader should still be present');
 });
 
-test('index.html keeps the global gtag wrapper used by the deferred UTM tracker', () => {
-  assert.match(
-    indexHtml,
-    /function\s+gtag\s*\(\)\s*\{\s*dataLayer\.push\(arguments\);\s*\}/,
-    'the UTM tracker needs a global gtag wrapper to query the GA4 client_id',
-  );
-  assert.match(
+test('index.html não define mais o wrapper gtag (nada mais chama gtag() desde o corte pro Zaraz)', () => {
+  // O wrapper existia só pra utm-tracking.js chamar gtag('get', ..., 'client_id', ...);
+  // essa chamada foi removida (getGACid agora gera seu próprio cid — ver
+  // tests/whatsapp-tracking.test.ts), então o stub virou código morto.
+  assert.doesNotMatch(indexHtml, /function\s+gtag\s*\(\)/, 'wrapper gtag morto não deve mais existir');
+  assert.doesNotMatch(
     utmTrackingScript,
-    /gtag\(\s*['"]get['"]\s*,\s*GA4_MEASUREMENT_ID\s*,\s*['"]client_id['"]/,
-    'the deferred UTM tracker should continue querying the GA4 client_id through gtag',
+    /gtag\(\s*['"]get['"]/,
+    'o UTM tracker não deve mais depender de gtag para o client_id do GA4',
   );
 });
 

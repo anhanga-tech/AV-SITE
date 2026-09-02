@@ -304,9 +304,9 @@ const buildWhatsAppLink = (message: string): string => {
 export const getWhatsAppLink = (message: string): string => buildWhatsAppLink(message);
 
 export const useWhatsAppLink = (message: string): string => {
-    // GA4 sets its client/session cookies slightly after gtag boots, so re-capture ~1s after
-    // mount. The link no longer depends on tracking, but this keeps the cookie/sessionStorage
-    // snapshot fresh for the form submissions that carry it to Odoo.
+    // The GA4 session cookie (_ga_QDBT5PM4KP) is set by Zaraz slightly after mount, so
+    // re-capture ~1s after. The link no longer depends on tracking, but this keeps the
+    // cookie/sessionStorage snapshot fresh for the form submissions that carry it to Odoo.
     useEffect(() => {
         const timer = setTimeout(() => {
             captureTrackingDataObject();
