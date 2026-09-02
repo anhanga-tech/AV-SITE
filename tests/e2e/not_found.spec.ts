@@ -40,8 +40,10 @@ test.describe('404 Page', () => {
 
   test('should navigate back to home from 404 page', async ({ page }) => {
     await page.goto('/404-test');
-    // Verify the home link points to the correct absolute URL without navigating away from the test server
+    // Relativo de propósito (não aponta pra produção) — clicar nele em dev/teste
+    // local nunca sai do host atual, mesmo que algum teste futuro clique de verdade
+    // em vez de só checar o atributo.
     const homeLink = page.getByTestId('not-found-section').getByRole('link', { name: 'Página Inicial' });
-    await expect(homeLink).toHaveAttribute('href', 'https://www.anhanga.tur.br/');
+    await expect(homeLink).toHaveAttribute('href', '/');
   });
 });

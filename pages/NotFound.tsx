@@ -55,7 +55,7 @@ const NotFound: React.FC = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
             <a
-              href={`${SITE_URL}/`}
+              href="/"
               className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition duration-300 group"
             >
               <div className="size-12 rounded-2xl bg-brand-light flex items-center justify-center text-brand-cyan group-hover:bg-brand-cyan group-hover:text-white transition-colors">
@@ -81,7 +81,7 @@ const NotFound: React.FC = () => {
             </a>
 
             <a
-              href={`${SITE_URL}/orlando/`}
+              href="/orlando/"
               className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition duration-300 group"
             >
               <div className="size-12 rounded-2xl bg-brand-light flex items-center justify-center text-brand-cyan group-hover:bg-brand-cyan group-hover:text-white transition-colors">
@@ -96,7 +96,7 @@ const NotFound: React.FC = () => {
             {/* Last 2 cards centered in their own row */}
             <div className="sm:col-span-2 lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4 lg:max-w-2xl lg:mx-auto w-full">
               <a
-                href={`${SITE_URL}/beto-carrero/`}
+                href="/beto-carrero/"
                 className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition duration-300 group"
               >
                 <div className="size-12 rounded-2xl bg-brand-light flex items-center justify-center text-brand-cyan group-hover:bg-brand-cyan group-hover:text-white transition-colors">
@@ -109,7 +109,7 @@ const NotFound: React.FC = () => {
               </a>
 
               <a
-                href={`${SITE_URL}/lollapalooza/`}
+                href="/lollapalooza/"
                 className="flex items-center gap-4 p-6 bg-white rounded-3xl border-2 border-transparent hover:border-brand-cyan shadow-sm hover:shadow-xl transition duration-300 group"
               >
                 <div className="size-12 rounded-2xl bg-brand-light flex items-center justify-center text-brand-cyan group-hover:bg-brand-cyan group-hover:text-white transition-colors">
@@ -124,7 +124,7 @@ const NotFound: React.FC = () => {
           </div>
 
           <a
-            href={`${SITE_URL}/`}
+            href="/"
             className="inline-flex items-center gap-2 text-brand-cyan font-bold hover:gap-4 transition-[gap,color] duration-300"
           >
             <ArrowLeft className="size-5" />
