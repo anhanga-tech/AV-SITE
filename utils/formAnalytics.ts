@@ -1,3 +1,5 @@
+import { EMAIL_PATTERN, PHONE_PATTERN, isSafeTrackingValue } from './piiRedaction';
+
 export type FormAnalyticsEventName =
   | 'form_view'
   | 'form_start'
@@ -39,8 +41,6 @@ const SAFE_FIELD_NAMES = new Set([
 ]);
 
 const SENSITIVE_QUERY_KEYS = /(?:email|mail|phone|telefone|whatsapp|name|nome|sobrenome|firstname|lastname)/i;
-const EMAIL_PATTERN = /[^\s@]+@[^\s@]+\.[^\s@]+/;
-const PHONE_PATTERN = /\+?\d[\d\s().-]{7,}\d/;
 
 /** Página atual com chaves de query sensíveis (e-mail/telefone/nome) redigidas antes de ir pro dataLayer. */
 export function currentPageLocation(): string | undefined {
@@ -49,7 +49,13 @@ export function currentPageLocation(): string | undefined {
   try {
     const url = new URL(window.location.href);
     for (const key of Array.from(url.searchParams.keys())) {
-      if (SENSITIVE_QUERY_KEYS.test(key)) {
+      const value = url.searchParams.get(key);
+      // SENSITIVE_QUERY_KEYS só cobre nomes de parâmetro que parecem sensíveis — um
+      // ?utm_content=alice@example.com passa incólume porque "utm_content" não bate
+      // nesse regex, mesmo com um e-mail de verdade no valor (achado de review,
+      // chatgpt-codex-connector[bot]). Checar o valor com isSafeTrackingValue cobre
+      // esse caso independente do nome do parâmetro.
+      if (SENSITIVE_QUERY_KEYS.test(key) || (value !== null && !isSafeTrackingValue(value))) {
         url.searchParams.set(key, 'redacted');
       }
     }
@@ -62,10 +68,6 @@ export function currentPageLocation(): string | undefined {
       .replace(new RegExp(EMAIL_PATTERN, 'g'), 'redacted')
       .replace(new RegExp(PHONE_PATTERN, 'g'), 'redacted');
   }
-}
-
-function isSafeDestination(value: string): boolean {
-  return !EMAIL_PATTERN.test(value) && !PHONE_PATTERN.test(value);
 }
 
 function safePayload(input: FormAnalyticsEvent): Record<string, string> {
@@ -83,7 +85,7 @@ function safePayload(input: FormAnalyticsEvent): Record<string, string> {
     payload.error_type = input.errorType;
   }
 
-  if (input.destination && isSafeDestination(input.destination)) {
+  if (input.destination && isSafeTrackingValue(input.destination)) {
     payload.destination = input.destination;
   }
 

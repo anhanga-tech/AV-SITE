@@ -75,6 +75,40 @@ test('pushFormAnalyticsEvent redige todos os e-mails/telefones no fallback de UR
   assert.doesNotMatch(pageLocation, /\d{5,}/, 'nenhum telefone deve sobrar');
 });
 
+// Regressão (achado de review, chatgpt-codex-connector[bot], P1): SENSITIVE_QUERY_KEYS só
+// redige um parâmetro quando o NOME parece sensível (email/phone/name/...) — um e-mail real
+// dentro de um parâmetro com nome "inocente" como utm_content passava incólume pro
+// page_location, que vai pro dataLayer sem scrubbing via Zaraz. currentPageLocation precisa
+// checar o VALOR também, não só o nome da chave.
+test('pushFormAnalyticsEvent redige o valor de query params com formato de PII mesmo com nome de chave "inocente"', () => {
+  const pushed: unknown[] = [];
+  const previousWindow = globalThis.window;
+  Object.defineProperty(globalThis, 'window', {
+    value: {
+      location: { href: 'https://www.anhanga.tur.br/?utm_content=alice@example.com&utm_source=google' },
+      dataLayer: { push: (event: unknown) => pushed.push(event) },
+    },
+    configurable: true,
+  });
+
+  try {
+    pushFormAnalyticsEvent({
+      event: 'form_view',
+      formType: 'quiz_lead',
+      formId: 'quiz-anhanga',
+    });
+  } finally {
+    Object.defineProperty(globalThis, 'window', {
+      value: previousWindow,
+      configurable: true,
+    });
+  }
+
+  const pageLocation = (pushed[0] as Record<string, string>).page_location;
+  assert.doesNotMatch(pageLocation, /alice@example\.com/, 'e-mail em parâmetro não-sensível deve ser redigido');
+  assert.match(pageLocation, /utm_source=google/, 'parâmetro seguro não deve ser afetado');
+});
+
 test('pushFormAnalyticsEvent ignores unknown field names and sensitive destinations', () => {
   const pushed: unknown[] = [];
   const previousWindow = globalThis.window;

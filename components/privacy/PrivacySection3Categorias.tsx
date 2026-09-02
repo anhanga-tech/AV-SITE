@@ -34,7 +34,7 @@ export function PrivacySection3Categorias() {
                     <li>Histórico de cliques em anúncios e links</li>
                     <li>Preferências manifestadas</li>
                     <li>Dados coletados através de cookies e tecnologias similares</li>
-                    <li>E-mail e telefone pseudonimizados por meio de hash unidirecional (SHA-256) para criação de públicos personalizados (customer match) no Google Ads e Meta Ads, exclusivamente para titulares que consentiram com comunicações de marketing</li>
+                    <li>E-mail e telefone pseudonimizados por meio de hash unidirecional (SHA-256) para criação de públicos personalizados (customer match) no Google Ads e Meta Ads, exclusivamente para titulares que consentiram com comunicações de marketing — <strong>finalidade atualmente inativa</strong>, nenhum envio está ocorrendo (ver seção 5.5)</li>
                 </ul>
                 <h3 className="font-merriweather font-semibold">3.5 Dados de Crianças e Adolescentes</h3>
                 <p>

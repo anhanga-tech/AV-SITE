@@ -18,7 +18,7 @@ Consent Management do Zaraz é **por purposes**, mas o default é **fail-OPEN**:
 
 ## Global Constraints
 
-- Rollout em paralelo — o Stape/GTM continuam ativos em produção até o Zaraz estar validado; nunca remover os dois ao mesmo tempo sem uma janela de comparação.
+- ~~Rollout em paralelo — o Stape/GTM continuam ativos em produção até o Zaraz estar validado; nunca remover os dois ao mesmo tempo sem uma janela de comparação.~~ **Superada em 01/09/2026** (achado de review, chatgpt-codex-connector[bot]): esta constraint pressupunha Stape ativo pra comparar. A própria Stape já tinha desativado o container antes deste plano existir (ver Goal) — nunca houve como cumprir literalmente. Tasks 1-5 foram validadas individualmente (Zaraz Realtime/Test Events por tool, não uma comparação de volume agregado com o Stape), Task 6 foi pulada por decisão do usuário, e a Task 7 (corte) prosseguiu sem essa janela. A evidência de "pronto pra cortar" substituta é a soma das validações individuais das Tasks 1-5, documentadas em cada uma.
 - `lib/conversions/{google,meta}.ts` e `api/purchase-dispatch.ts` ficam fora de escopo — não tocar.
 - Nenhum access token (Meta, TikTok, GA4 API secret) pode entrar no Git, no chat, em screenshots ou em comentários de issue/PR. O usuário digita os tokens direto no dashboard Zaraz; o agente não seleciona, copia nem lê esses valores.
 - **CAPI-only confirmado com o usuário (2026-09-01)**: não recriar pixel client-side Meta/TikTok via tool "Custom HTML". Se isso mudar depois, é uma decisão nova, não um ajuste deste plano.
@@ -26,7 +26,7 @@ Consent Management do Zaraz é **por purposes**, mas o default é **fail-OPEN**:
 - Toda tag de marketing (Meta, TikTok) precisa de purpose de consentimento explícita no Zaraz antes de qualquer publicação — auditar isso é um passo obrigatório, não op­cional, dado o default fail-open.
 - Google Ads Customer Match (RIPD Atividade 4) já depende de segmento Mautic, que foi removido do código em 01/09/2026 (PR #1564) — esse fluxo já está órfão **independente** desta migração. Fora de escopo aqui; registrar como achado separado (issue própria), não misturar com o corte do Stape.
 - Antes de qualquer evento real de teste, disparar um evento sintético primeiro. Lead real exige confirmação explícita do usuário porque cria registro no Odoo.
-- Rollback: se qualquer critério de validação falhar, manter Stape ativo e não prosseguir para o corte (Task 7).
+- Rollback (revisado 01/09/2026): a estratégia original ("manter Stape ativo") não é mais possível — a própria Stape já desativou o container em 31/08/2026 antes deste plano existir. Rollback real, se necessário, seria reverter os commits do corte (Task 7) e aceitar um período sem nenhum tag-manager até reconfigurar; não há mais um sistema paralelo vivo pra recair.
 - **Achado da Task 1 (01/09/2026):** o **Google Tag Gateway** (produto separado do Zaraz — proxy first-party do `gtag.js`/GTM real, roda no navegador) estava **ativo** na zone `anhanga.tur.br`, configurado pro mesmo container `GTM-T2KGS86G` que o Stape carrega. Config antiga, não fazia parte de nenhum plano documentado. Causava rejeição do cookie `_ga_QDBT5PM4KP` por domínio inválido (lógica de cálculo de domínio do próprio Google, não do Zaraz) e potencialmente hits duplicados no GA4 (Tag Gateway + Stape rodando em paralelo, sem ninguém ter decidido isso). Desligado em 01/09/2026 com autorização do usuário. Se o volume de eventos no GA4 mudar visivelmente na Task 6 (paralelo), essa desativação é a causa mais provável — não um problema do Zaraz.
 
 ---
@@ -157,23 +157,33 @@ Não há como testar isso via `node:test` contra o dashboard Zaraz diretamente. 
 - Consumes: evento `generate_lead` (via compat mode) com `event_id`, `destination`, UTMs.
 - Produces: chamada server-side a `graph.facebook.com/.../events` com `em/ph/fn/ln` hasheados quando disponíveis.
 
-- [ ] **Step 1: Adicionar o tool "Facebook Pixel"**
+- [x] **Step 1: Adicionar o tool "Facebook Pixel"** (concluído 01/09/2026)
 
-Pixel ID e access token: usuário digita direto no dashboard. Gate: purpose `marketing` (Task 3).
+Pixel ID e access token: usuário digitou direto no dashboard. Gate: purpose `marketing` (Task 3), atribuída na aba **Consent** (não é uma config do tool em si).
 
-- [ ] **Step 2: Mapear `generate_lead` pro standard event `Lead`**
+**Achado importante:** ao adicionar a tool, o Zaraz liga por padrão duas "Automated actions" — **Pageviews** e **Events** (mesmo padrão visto no GA4 na Task 2). Diferente do GA4, aqui isso é sério: "Events" reenvia **todo** `zaraz.track()` do site (os ~16 eventos mapeados na Task 1 — formulários, quiz, waitlist, cliques da página de links, etc.) pro Meta como evento genérico, e "Pageviews" manda `PageView` em toda visita. Isso expande a coleta bem além do escopo desta task (só `generate_lead` → `Lead`) e contraria o resto desta migração. **As duas foram desligadas** — só a custom action `Meta - Lead` (Step 2) fica ativa. Conferir o mesmo em qualquer tool nova adicionada daqui pra frente, incluindo a TikTok (Task 5).
 
-Confirmar no dashboard como o tool mapeia nomes de evento custom pra standard events do Meta (`Lead`). Se não houver mapeamento automático, pode ser necessário ajustar o nome do evento na origem (`utils/generate-lead-analytics.ts`) ou usar uma configuração do tool — decidir com base no que o dashboard expõe, não assumir.
+- [x] **Step 2: Mapear `generate_lead` pro standard event `Lead`** (concluído 01/09/2026)
 
-- [ ] **Step 3: Confirmar quais campos de PII o evento `generate_lead` hoje carrega**
+Não há mapeamento automático de evento custom → standard event — foi preciso criar manualmente: **Custom actions → Create action**, Action Type `Event`, campo obrigatório **Facebook Event Name** = `Lead`. O trigger não é escolhido por nome de evento direto — precisou de um trigger novo (**Triggers → Create Trigger**) com Match Rule usando a variable de sistema **"Event Name"** (dentro de Web API, ao lado de "Event Property: ..." — não confundir os dois) `Equals` `generate_lead`. **"Include Event Properties"** ligado.
 
-`pushGenerateLeadConversionEvent` não envia `email`/`phone`/`nome` hoje — só `destination`, UTMs e `ga_client_id`/`ga_session_id`. Isso significa **sem PII pro Advanced Matching hoje**, então o hashing SHA-256 do tool não tem o que hashear neste evento específico. Documentar essa lacuna: se o objetivo é paridade de match quality com a Meta CAPI tag do GTM server (que usava outro pipeline de dados — ver Task 5 do plano `2026-07-23-sgtm-hybrid-consent.md`, que também não adicionava email/telefone manualmente na primeira fase), então CAPI-only aqui já reflete o que existia antes. Não expandir o payload nesta migração — é fora de escopo (mudaria o que é coletado, não só onde é enviado).
+- [x] **Step 3: Confirmar quais campos de PII o evento `generate_lead` hoje carrega** (concluído 01/09/2026, sem mudança de código)
 
-- [ ] **Step 4: Validar payload no Zaraz Preview/Debug**
+`pushGenerateLeadConversionEvent` não envia `email`/`phone`/`nome` hoje — só `destination`, UTMs e `ga_client_id`/`ga_session_id`. Isso significa **sem PII pro Advanced Matching hoje**, então o hashing SHA-256 do tool não tem o que hashear neste evento específico. Não expandir o payload nesta migração — é fora de escopo (mudaria o que é coletado, não só onde é enviado).
 
-Disparar um `generate_lead` sintético (mesmo padrão do plano anterior: `event_id` claramente marcado como teste) e confirmar no Meta Events Manager (Test Events, com Test Event Code temporário) que o evento `Lead` chega server-side.
+- [x] **Step 4: Validar payload no Zaraz Preview/Debug** (concluído 01/09/2026)
 
-Expected: evento visível no Events Manager, sem PII inesperada, sem token exposto em nenhum log/print.
+Disparado `generate_lead` sintético com `zaraz.debug()` ativo. Confirmado no Meta Events Manager → Test Events: evento `Lead`, status `Processado`, `Fonte da ação: website`/`Servidor` — confirma CAPI de verdade (sem pixel client-side). `Chaves de dados do usuário` mostra `fbp`/`fbc`/IP/User-Agent enriquecidos automaticamente pela tool, como previsto no spike.
+
+**Lacuna do `event_id` — investigada e corrigida (01/09/2026).** O `event_id` inicialmente não chegava na tool (Meta caía no fallback aleatório do componente). Causa raiz, achada inspecionando a request real pra `/cdn-cgi/zaraz/t`: o toggle **"Include Event Properties"** não manda só as chaves da chamada `zaraz.track()` atual — ele repassa o **objeto acumulado do `dataLayer`**, que funde chaves de pushes anteriores na mesma sessão (ex.: um evento carregou `form_type`/`form_id` de um `form_submission` completamente diferente, mais `gtm.start`/client_id do bootstrap do GTM). O Zaraz está replicando fielmente a semântica real do `dataLayer` do GTM (cada push funde num objeto persistente, não substitui) — não é bug do Zaraz, mas o toggle "pegar tudo" é mais largo do que uma tag GTM manual, que normalmente lê variáveis específicas, não o blob inteiro.
+
+**Correção aplicada:** desligado "Include Event Properties" na action `Meta - Lead`; adicionado campo individual **"Event ID"** via **"+ Add Field"**, mapeado a uma variable **"Event Property: event_id"** (não "Event Name", usada no trigger). Revalidado: `Identificação do evento` no Meta agora bate exatamente com o `event_id` que mandamos, sem parâmetros espúrios.
+
+**Relevante pra Task 5 (TikTok) e qualquer tool futura:** evitar o toggle "Include Event Properties" (ou equivalente) por padrão — mapear campos individuais explicitamente via "Event Property: <nome>" em vez de confiar no blob acumulado do dataLayer.
+
+**Incidente de segurança durante a investigação:** um print da tela "Tool Settings" foi compartilhado no chat com o **Conversion API Access Token completo em texto puro**. Token revogado e substituído imediatamente pelo usuário assim que identificado. Reforça a regra do plano: nunca printar telas com token visível, nem a Tool Settings (só a tela de configuração da action, que não expõe credenciais).
+
+Revalidado depois de desligar Pageviews/Events: só `Lead` aparece nos Test Events, confirmando o escopo corrigido. **Lembrete:** remover o Test Event Code do campo da tool antes de qualquer publicação — não é código pra ficar em produção.
 
 ---
 
@@ -186,21 +196,25 @@ Expected: evento visível no Events Manager, sem PII inesperada, sem token expos
 - Consumes: mesmo evento `generate_lead`.
 - Produces: chamada server-side a `business-api.tiktok.com/.../event/track/`.
 
-- [ ] **Step 1: Adicionar o tool TikTok**
+- [x] **Step 1: Adicionar o tool TikTok** (concluído 01/09/2026)
 
-Pixel Code e access token: usuário digita direto. Gate: purpose `marketing`.
+Pixel Code e access token: usuário digitou direto (token gerado no TikTok Events Manager). Gate: purpose `marketing`, atribuída na aba Consent. As lições da Task 4 foram aplicadas de cara desta vez:
+- O wizard de setup já mostra "Track all pageviews"/"Track all other events"/"Track all ecommerce events" na etapa **Actions** — os dois primeiros vieram ligados por padrão (mesmo padrão do Meta) e foram desligados antes de salvar.
+- Nenhum print da tela de credenciais foi feito desta vez.
 
-- [ ] **Step 2: Mapear `generate_lead` pro standard event equivalente**
+- [x] **Step 2: Mapear `generate_lead` pro standard event equivalente** (concluído 01/09/2026)
 
-Mesma ressalva da Task 4 — confirmar mapeamento no dashboard, e que não há PII adicional sendo enviada além do que já existe hoje.
+O trigger `generate_lead` criado na Task 4 foi **reaproveitado** diretamente (triggers são um recurso compartilhado entre tools, não por-tool). Custom action `TikTok - Leads`: Action Type `Standard Event` → **`SubmitForm`** (não `Contact` — `SubmitForm` é a categoria de geração de leads do TikTok Ads, `Contact` é para o usuário iniciar contato diretamente, ex. clicar pra ligar). `event_id` mapeado individualmente via variable "Event Property: event_id" desde o início — sem passar pelo toggle "include all" que causou o bug no Meta.
 
-- [ ] **Step 3: Validar payload no TikTok Events Manager**
+- [x] **Step 3: Validar payload no TikTok Events Manager** (concluído 01/09/2026)
 
-Mesmo processo da Task 4 Step 4, usando o Test Event Code do TikTok.
+Disparado `generate_lead` sintético. Confirmado no TikTok Events Manager → Test Events: evento **"Enviar formulário"** (nome de exibição de `SubmitForm`, `Código: Lead` internamente), `Método de conexão: Servidor`, `Método de configuração: Código personalizado`, `event_id` batendo exatamente com o enviado, sem PII. Validação correta já na primeira tentativa — nenhum dos dois problemas do Meta (automated actions, blob acumulado) se repetiu, confirmando que as lições realmente generalizam pra outras tools do Zaraz.
 
 ---
 
-### Task 6: Rodar em paralelo com o Stape e comparar
+### Task 6: Rodar em paralelo com o Stape e comparar — **PULADA (01/09/2026)**
+
+O Stape já estava desativado desde 31/08/2026 (a própria Stape desligou o container por exceder o plano gratuito — motivo original desta migração, ver início do plano). Sem Stape ativo, não há com o que rodar em paralelo nem baseline simultânea pra comparar — os 4 steps abaixo pressupõem os dois sistemas rodando ao mesmo tempo, o que não é mais possível. Pulado direto pra Task 7 por decisão do usuário. Os steps ficam registrados como referência, não como trabalho pendente.
 
 **Files:**
 - Observe: GA4, Meta Events Manager, TikTok Events Manager (Zaraz vs. Stape)
@@ -237,18 +251,25 @@ Critério de sucesso: contagens de evento em paridade razoável, nenhum vazament
 - Modify: `docs/performance-third-party-scripts.md`, `README.md`, `.claude/CLAUDE.md`, `.env.example` (referências a Stape/sGTM)
 
 **Interfaces:**
-- Consumes: decisão go do Task 6.
+- Consumes: decisão do usuário de pular a Task 6 (Stape já desativado, sem baseline pra comparar).
 - Produces: `index.html` sem nenhuma dependência do Stape.
 
-- [ ] **Step 1: Remover o loader do Stape de `index.html`**
+- [x] **Step 1: Remover o loader do Stape de `index.html`** (concluído 01/09/2026)
 
-Seguir o mesmo padrão usado pra remover o loader do Mautic (ver `[[mautic-hubspot-removal]]`): remover `loadGtm`, a variável `gtmLoaded` e a chamada em `loadAnalytics`. Confirmar se algum outro ponto do arquivo referencia `sst.anhanga.tur.br`/`load.sst.anhanga.tur.br` (dns-prefetch no `<head>`) e remover também.
+Removidos: variável `gtmLoaded`, função `loadGtm` inteira (incluindo o `window.dataLayer.push({'gtm.start':...})` interno) e sua chamada em `loadAnalytics`; os dois `<link rel="dns-prefetch">` pra `load.sst.anhanga.tur.br`/`sst.anhanga.tur.br` no `<head>`. `injectScript` foi mantida — ainda é usada pelo `utm-tracking.js`.
 
-- [ ] **Step 2: Atualizar os testes estáticos**
+- [x] **Step 2: Atualizar os testes estáticos** (concluído 01/09/2026)
 
-`tests/index-third-party-scripts.test.ts` tem testes que hoje **exigem** presença de `load.sst.anhanga.tur.br`/`sst.anhanga.tur.br` (dns-prefetch, ausência de preconnect ocioso). Inverter essas asserções ou removê-las, e adicionar um teste `doesNotMatch` equivalente ao que foi feito pro Mautic/HubSpot.
+`tests/index-third-party-scripts.test.ts`: substituído o teste que exigia o loader do Stape por um `doesNotMatch` (padrão Mautic/HubSpot) checando `gtmLoaded`/`loadGtm`/`sst.anhanga.tur.br`/`'gtm.start'`; removidos os dois testes que verificavam comportamento específico do `loadGtm` (gate de host) e do preconnect/dns-prefetch dos hosts sGTM (não fazem mais sentido, o host não é mais referenciado). `playwright.config.ts`/`tests/playwright-safety.test.ts` mantidos como estavam — os `MAP ... ~NOTFOUND` dos hosts do Stape ficam como defesa em profundidade, mesmo padrão adotado pro HubSpot na remoção de set/2026.
 
-- [ ] **Step 3: Rodar a suíte completa**
+- [x] **Step 3: Rodar a suíte completa** (executado localmente em 02/09/2026 com Node 18.19.1 e Web Crypto experimental; o projeto declara Node >=24):
+
+  - Testes focados da PR: **66/66 passaram** (`chat-lead-form-traks`, `generate-lead-analytics`, `whatsapp-tracking`, `index-third-party-scripts`).
+  - Suíte completa: **1.134/1.137 passaram**; os 3 restantes são falhas fora do escopo desta PR em `consent`, `optimize-r2-images` e `playwright-safety` sob o fallback npm/Node 18. Revalidar no Node 24 da CI.
+  - ESLint direto nos arquivos TS/TSX alterados: passou. `git diff --check` e `node --check public/utm-tracking.js`: passaram.
+  - `pnpm typecheck`/build e React Doctor não foram reproduzidos neste runtime: o Node local é incompatível com as versões atuais; o check React Doctor já existente na PR passou com score 100/100.
+
+Rodar no ambiente oficial antes do merge:
 
 ```bash
 pnpm test:regression
@@ -258,15 +279,68 @@ pnpm lint:changed
 pnpm run build
 ```
 
-Expected: todos os comandos com exit code 0.
+- [x] **Step 4: Atualizar RIPD e docs** (concluído 01/09/2026 — "desativar/cancelar a conta Stape" não se aplica, a própria Stape já desativou)
 
-- [ ] **Step 4: Atualizar RIPD, docs e desativar/cancelar o Stape**
+RIPD bumped pra **v1.9**: Stape substituído por Cloudflare Zaraz nas Atividades 1 e 2 (DPA com a Cloudflare marcado como **pendente de confirmação**, não implementado — achado de review, ver abaixo); Atividade 4 (Customer Match) marcada como **inativa** (já dependia do Mautic removido na v1.8, agora também do Stape); pendências #1 e #4 marcadas obsoletas. `README.md` atualizado. `.env.example` não mencionava Stape/sGTM (checado, nada a mudar).
 
-Nova versão do RIPD trocando Stape OÜ por Cloudflare como operador de tag-management (mesmo padrão da v1.8 que removeu HubSpot/Mautic). Atualizar `docs/performance-third-party-scripts.md`, `README.md`, `.claude/CLAUDE.md`, `.env.example` onde mencionam Stape/sGTM. Cancelar/desativar a conta Stape só depois do deploy confirmado em produção.
+**Correção (achado de review, chatgpt-codex-connector[bot]):** a checagem original de `docs/performance-third-party-scripts.md` (buscando literalmente "stape"/"sgtm") deu falso negativo — o arquivo não cita essas palavras, mas descrevia o loader do GTM como se ainda existisse (`GTM-T2KGS86G`, validação via "GTM Preview"). Reescrito pra registrar a remoção do GTM como superseding note e trocar os passos de validação por Zaraz/Meta/TikTok Events Manager.
 
-- [ ] **Step 5: Monitorar por 3–7 dias pós-corte**
+**Achados extras na política de privacidade** (fora do escopo original deste step, mas encontrados ao corrigir as menções à Stape):
+- `PrivacySection4MetodosColeta.tsx` citava "Meta Pixel (Facebook) para remarketing" como cookie/tecnologia client-side — **desatualizado desde as Tasks 4-5** (arquitetura é CAPI-only, sem pixel client-side). Corrigido.
+- `PrivacySection6Compartilhamento.tsx` **nunca listava o TikTok** como destinatário de dados, apesar do TikTok Events API já estar em produção desde o plano de jul/2026 (`2026-07-23-sgtm-hybrid-consent.md`) — anterior a esta migração. Corrigido (TikTok Pte. Ltd. adicionado). Vale o DPO revisar essa adição.
+- `PrivacySection5FinalidadesBases.tsx` (Customer Match) atualizada pra refletir que a finalidade está inativa, sem atribuir a função de upload à Cloudflare (que não faz upload em lote).
 
-Mesmo checklist da Task 6 Step 3, agora sem o Stape como comparação — confirmar que os números do Zaraz sozinho continuam estáveis (sem o paralelo, não há mais baseline simultânea).
+**Segunda rodada de review (chatgpt-codex-connector[bot], 7 achados, todos confirmados e corrigidos):**
+1. `PrivacySection4MetodosColeta.tsx` usava `**negrito**` em Markdown dentro de JSX — renderiza como asteriscos literais pro usuário, não negrito. Trocado por `<strong>`.
+2. `docs/performance-third-party-scripts.md` — a checagem original (buscar "stape"/"sgtm") deu falso negativo; o arquivo descrevia o loader do GTM como se ainda existisse. Reescrito com nota de superseding e passos de validação atualizados pro Zaraz.
+3. RIPD: checkbox `[x]` marcava a cobertura do DPA da Cloudflare como implementada enquanto o próprio texto dizia "pendente confirmar" — inconsistente. Trocado pra `[ ]` nas duas ocorrências (Atividades 1 e 2); a linha de Transferência internacional também não presume mais cobertura.
+4. RIPD: a frase "arquitetura de anonimização/filtragem é preservada" contradizia o achado (linha abaixo) de que o Zaraz não tem scrubber de PII equivalente ao da Stape e ~15 eventos não foram auditados. Qualificada — só a supressão de IP é confirmada, a mitigação de PII é estrutural (nenhum evento carrega PII por design), não uma ferramenta.
+5. **RIPD, achado mais substancial:** a nota de risco aceito do §1 (registro de consentimento só em `localStorage`) dependia da premissa "sem tratamento server-side associado" — que deixou de ser verdade com Meta/TikTok CAPI-only (a escolha de marketing agora aciona chamada server-side real pro Meta/TikTok). Adicionada nota de atualização reconhecendo isso e marcando como pendência do DPO reavaliar se o risco aceito em v1.5 ainda é proporcional.
+6. `PrivacySection3Categorias.tsx` (seção 3.4) e `PrivacySection6Compartilhamento.tsx` continuavam descrevendo Customer Match como finalidade ativa, inconsistente com a seção 5.5 que a marca como inativa (achado anterior). Ambas atualizadas pra "atualmente inativo".
+7. Global Constraint "Rollout em paralelo — Stape/GTM continuam ativos" nunca foi formalmente superada, mesmo com a Task 6 pulada e a Task 7 concluída sem essa janela. Marcada como superada, com nota explicando a evidência substituta (validações individuais das Tasks 1-5).
+
+**Terceira rodada de review (chatgpt-codex-connector[bot], 2 achados P1, ambos confirmados no código real e corrigidos):**
+1. **`ga_client_id` quebrado pra visitantes novos.** `public/utm-tracking.js` e `utils/whatsapp.ts` dependiam de `gtag('get', ..., 'client_id', callback)` ou de ler o cookie `_ga` do Google pra obter o client ID do GA4 — mas nada carrega o `gtag.js` real desde que o loader do GTM foi removido (e já não carregava desde 31/08, quando a própria Stape desativou o container). Um visitante sem o cookie `_ga` legado nunca teria `ga_client_id`, quebrando a correlação de conversão no GA4 (e a futura integração de conversões offline Odoo→GA4, ver `docs/product/odoo-ads-conversion-decision.md`). Corrigido: as duas funções agora geram e persistem um ID próprio (cookie `anhanga_ga_cid`, formato `número.timestamp` igual ao `_ga`) quando não existe nenhum cookie do Google — decoupled de qualquer script do Google rodar. Teste de regressão adicionado em `tests/whatsapp-tracking.test.ts`.
+2. **Vetor real de vazamento de PII via UTM.** `utils/whatsapp.ts` aceitava qualquer valor de UTM/`hsa_*` da URL sem validação e espalhava tudo no evento `tracking_data_captured`, que o Zaraz encaminha ao GA4 sem scrubbing — um link como `?utm_content=email@exemplo.com` vazaria PII pro GA4. Isso contradizia a afirmação da rodada anterior de que "nenhum evento carrega PII por design". Corrigido: extraído `utils/piiRedaction.ts` (reaproveitando os padrões de e-mail/telefone que já existiam em `utils/formAnalytics.ts`, em vez de duplicar) e usado em `utils/whatsapp.ts` pra rejeitar valores com formato de e-mail/telefone antes de aceitá-los como tracking. RIPD atualizado (2.6) marcando esse item como corrigido, com ressalva de que não é um scrubber genérico — só cobre o vetor identificado.
+
+**Quarta rodada de review (ambos os bots, 02/09/2026 — 5 achados confirmados e corrigidos, 1 stale, 1 pendência real em aberto):**
+1. **P1 (claude[bot]) — bypass de duplo URL-encoding no fix de PII acima.** `isSafeTrackingValue` validava o valor já decodificado uma vez por `URLSearchParams`, mas `appendDecodedTrackingValue` decodificava de novo antes de gravar — um valor como `?utm_content=%2565mail%2540example.com` passava no check ("%65mail%40example.com", sem "@" literal) e só virava e-mail de verdade no segundo decode, já aprovado. Corrigido: removido o segundo decode (redundante — `URLSearchParams` já decodifica por completo).
+2. **P1 (chatgpt-codex-connector[bot]) — segundo coletor sem filtro.** `public/utm-tracking.js` grava na mesma `sessionStorage` key (`anhanga_tracking_data`) que `mergeStoredTrackingData` lê de volta sem revalidar — um caminho paralelo que ignorava o filtro de PII adicionado na rodada anterior. Corrigido centralizando a revalidação em `mergeStoredTrackingData` (não duplicando a regra num script estático sem bundler).
+3. **P2 (chatgpt-codex-connector[bot]) — falsos positivos no filtro de telefone.** `PHONE_PATTERN` sozinho casa qualquer sequência longa de dígitos, descartando IDs de campanha e datas ISO puramente numéricos (`utm_campaign=1234567890`, `2026-09-01`) como se fossem telefone. Corrigido com `looksLikePhoneNumber` (exige "+" ou separador de formatação; exclui datas ISO).
+4. **P2 (ambos os bots) — RIPD chamava o GA client id de "anonimizado".** Ele é gravado em `x_ga_client_id` no mesmo registro `crm.lead`/`res.partner` que tem e-mail/telefone, especificamente pra correlação cross-sistema — é pseudonimizado, não anônimo. Reescrita a §2.1/2.3.
+5. **Stale (chatgpt-codex-connector[bot]) — "teste de gtag ainda quebrado".** Achado citava o commit `ac92d2d`, mas esse mesmo commit já tinha removido a asserção antiga — confirmado via `git show ac92d2d:tests/index-third-party-scripts.test.ts`. Provável leitura do diff cumulativo antes do commit terminar de aplicar. Nenhuma mudança necessária.
+6. **P1 (chatgpt-codex-connector[bot]) — investigado ao vivo (browser conectado, 02/09/2026), PENDENTE como tarefa própria, fora do escopo desta PR.** O `anhanga_ga_cid` que geramos é um ID totalmente nosso, desconectado do client_id real que o Zaraz usa nos hits GA4. Cadeia de investigação:
+   - Fonte do Managed Component GA4 (`github.com/managed-components/google-analytics-4/src/requestBuilder.ts:101-107`): o Zaraz já gera e persiste seu próprio client_id via `client.set('ga4', cid, {scope:'infinite'})` — mas honra `payload.cid` se essa propriedade vier no evento, sobrescrevendo o auto-gerado nesse hit específico.
+   - Testado em produção: `document.cookie` fica **completamente vazio** mesmo depois de hits reais do Zaraz confirmados via rede (`/cdn-cgi/zaraz/t`, 200) — os cookies que `client.set()` cria são **HttpOnly**, ilegíveis por qualquer JS de página. Ler o cookie real (a ideia original) é impossível, não é questão de achar o nome certo.
+   - Testado `window.zaraz.set('cid', valor, {scope:'page'})` + `zaraz.track()`: o valor **aparece** no payload que o GA4 recebe (`"cid":"debug-cid-..."` confirmado via patch de `fetch`/`sendBeacon`). O mecanismo de injeção funciona.
+   - Mas: o script do Zaraz (`cdn-cgi/zaraz/s.js`) é injetado dinamicamente por script (não está no HTML bruto — confirmado via `curl` com UA de navegador real, 0 ocorrências; `performance.getEntriesByType('resource')` mostra `initiatorType: "script"`, carregando só ~2.15s após a navegação) — quem injeta esse loader não é código nosso (`grep` no repo não acha nada), é a própria plataforma Cloudflare. O Pageview automático do Zaraz dispara nesse boot, antes do nosso script deferido (por design, pra proteger TBT) rodar — nosso `zaraz.set('cid',...)` chegaria tarde pro Pageview automático, só valeria pros eventos customizados que disparamos depois.
+   - **Achado extra que muda o desenho do fix:** `utils/generate-lead-analytics.ts:28` já envia esse identificador como `ga_client_id` (nome customizado), não como `cid`. O Managed Component só reconhece literalmente `payload.cid` pra sobrescrever o client_id do Measurement Protocol — `ga_client_id` vira só mais um parâmetro customizado do evento no GA4, não unifica a sessão. Corrigir isso exige decidir quais eventos devem carregar `cid` (todos? só `generate_lead`?), renomear/mapear o campo, e validar de novo no GA4 DebugView — desenho de tarefa nova, não um ajuste pontual.
+   - **Decisão (02/09/2026):** não forçar essa correção nesta PR já grande — vira item de plano próprio, com validação passo a passo como as Tasks 1-5 tiveram, em vez de um fix apressado que poderia parecer correto sem realmente unificar a sessão GA4.
+
+**Quinta rodada de review (ambos os bots, 02/09/2026 — 3 achados novos reais e corrigidos, 1 finding de doc corrigido, 3 stale confirmados):**
+1. **P1/P2 (ambos os bots) — bug introduzido pelo fix da 4ª rodada: `fbc` derrubado e regenerado a cada captura.** `mergeStoredTrackingData` (fix de `fa07b67`) revalidava **todas** as chaves restauradas do storage com `isSafeTrackingValue`, incluindo `cid`/`sid`/`fbc`/`fbp` — que nunca vêm de input de URL. O formato do `fbc` (`fb.1.<timestamp>.<fbclid>`) casa em `PHONE_PATTERN` (dígito+ponto+dígitos), então era descartado a cada `captureTrackingDataObject()` e recriado com `Date.now()` novo (só regenera quando `!trackingData.fbc`), perdendo o timestamp do clique original e prejudicando dedup no Meta CAPI. Corrigido: `isUntrustedTrackingKey` restringe a revalidação só às chaves que também passam por `mergeUrlTrackingData` (`TRACKING_PARAMS`/`hsa_*`) — `mergeRestoredTrackingData` compartilhada entre `mergeStoredTrackingData` e o novo `mergeCookieTrackingData` (achado 3 abaixo).
+2. **P1/P2 (ambos os bots) — falso negativo no fix de telefone da 4ª rodada.** Exigir "+"/separador fechou o falso positivo de IDs numéricos, mas abriu um falso negativo: um celular brasileiro digitado sem formatação (`11987654321`, 11 dígitos) passava incólume. Corrigido com `looksLikeBareBrazilianMobileNumber` (DDD 11-99 + terceiro dígito "9" de celular) — sinal específico o bastante pra não recuperar o falso positivo do `GOOGLE_ADS_CONVERSION_ID` do próprio projeto (`17331979537`, terceiro dígito "3").
+3. **P2 (chatgpt-codex-connector[bot]) — atribuição do cookie de 30 dias perdida numa aba nova.** Como `cid` é sempre truthy desde a 3ª rodada, `captureTrackingDataObject()` nunca mais caía no fallback `getCookieTrackingData()` — um visitante numa aba/sessão nova (sessionStorage vazio, sem UTM na URL) tinha o cookie `tracking_data` de 30 dias sobrescrito só com `{cid}`, perdendo toda atribuição anterior. Corrigido com `mergeCookieTrackingData`, que restaura o cookie (com a mesma validação restrita do achado 1) antes do sessionStorage/URL.
+4. **P2 (chatgpt-codex-connector[bot]) — data de "última atualização" da política de privacidade desatualizada.** `pages/Privacy.tsx` ainda mostrava 10/06/2026 apesar das seções reescritas nesta PR (Meta CAPI-only, TikTok adicionado, Customer Match inativo). Atualizado pra 02/09/2026.
+5. **Stale, confirmado via timestamp (3 achados citando o commit `ac92d2d`, criados às 00:30-00:31 UTC — antes de `fa07b67`, commitado às 00:41:52 UTC):** o bypass de duplo-encoding, o segundo coletor sem filtro, e os falsos positivos de `PHONE_PATTERN` em IDs numéricos já tinham sido corrigidos por `fa07b67`. Confirmado com timestamps de commit, sem mudança necessária.
+
+Teste de regressão adicionado pros 3 achados novos em `tests/whatsapp-tracking.test.ts`, incluindo uma guarda explícita pro `GOOGLE_ADS_CONVERSION_ID` do achado 2 não voltar a ser um falso positivo.
+
+**Sexta rodada de review (ambos os bots, 02/09/2026 — 2 achados novos reais e corrigidos, 2 duplicatas das mesmas correções acima):**
+1. **P1 (chatgpt-codex-connector[bot]) — `page_location` de eventos de form analytics vazava PII em parâmetros com nome inócuo.** `currentPageLocation` (`utils/formAnalytics.ts`) só redigia um parâmetro de query quando o NOME parecia sensível (`SENSITIVE_QUERY_KEYS`); um `?utm_content=alice@example.com` (nome "inocente", valor com e-mail) passava incólume no `page_location` de **todo** evento de form analytics, sem o scrubber que a Stape oferecia. Corrigido: checa também o valor com `isSafeTrackingValue`, independente do nome do parâmetro.
+2. **P1 (chatgpt-codex-connector[bot]) — a afirmação "`generate_lead` confirmado sem PII" (Task 4, RIPD) estava incompleta.** `pushGenerateLeadConversionEvent` (`utils/generate-lead-analytics.ts`) espalhava o campo `destination` — texto livre digitado pelo usuário, que pode conter um e-mail/telefone colado por conta própria — sem nenhum filtro, direto pro dataLayer que o Zaraz encaminha ao GA4. Corrigido com `isSafeTrackingValue`, mesmo padrão dos achados anteriores. RIPD (2.6 e a tabela de pendências) atualizado pra não presumir mais o evento como "confirmado sem PII" sem essa correção.
+3. **Duplicatas confirmadas:** o falso negativo de celular sem formatação (achado 2 da 5ª rodada) e a data desatualizada da política (achado 4 da 5ª rodada) foram relevantados por `claude[bot]` em `b649f39`/revisões seguintes antes de `274fdee` corrigir os dois — mesma correção, sem trabalho adicional.
+
+Teste de regressão adicionado em `tests/form-analytics.test.ts` (valor de PII com nome de chave inócuo) e novo arquivo `tests/generate-lead-analytics.test.ts` (destination com e-mail/telefone omitido, demais campos preservados).
+
+**Correções pós-CI/review (02/09/2026):**
+1. `destination` passou a ser opcional no evento `generate_lead`; o filtro agora omite o campo quando ausente, sem lançar exceção nos fluxos que recebem payload parcial. A tipagem de UTMs também aceita campos parciais, refletindo o payload real.
+2. O cookie `tracking_data` passou a usar JSON, preservando vírgulas dentro de valores de campanha; o parser legado continua aceito para cookies de deployments anteriores. A leitura de `sessionStorage` agora aceita somente valores string não vazios e revalida PII.
+3. A política de privacidade e o RIPD passaram a declarar a retenção de até 2 anos do `anhanga_ga_cid`, sua natureza pseudonimizada e a possível associação ao CRM; a pendência de validação jurídica/DPO permanece explícita.
+4. O coletor estático passou a enviar `page_location` sem query string/hash, evitando PII em eventos de clique; uma asserção estática impede o retorno da URL crua.
+5. Testes adicionados para `destination` ausente, cookie JSON com vírgula e valores não textuais no `sessionStorage`.
+
+- [ ] **Step 5: Monitorar por 3–7 dias pós-corte** — pendente, só possível depois do merge e deploy em produção.
 
 ---
 

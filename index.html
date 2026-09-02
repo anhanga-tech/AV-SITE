@@ -41,13 +41,6 @@
   <link rel="preconnect" href="https://media.anhanga.tur.br" crossorigin>
   <link rel="dns-prefetch" href="https://media.anhanga.tur.br">
 
-  <!-- Stape sGTM — apenas dns-prefetch (barato): o loader difere os scripts de terceiros para
-       depois do LCP, então um preconnect mantido aberto no load só desperdiça uma conexão e é
-       apontado como "pré-conexão não usada" pelo Lighthouse (issue #1259). A conexão real é
-       estabelecida quando o loader dispara, com o DNS já resolvido. -->
-  <link rel="dns-prefetch" href="https://load.sst.anhanga.tur.br">
-  <link rel="dns-prefetch" href="https://sst.anhanga.tur.br">
-
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -118,18 +111,12 @@
        do Consent Mode (setados via JS) e a SPA não renderiza sem JS de qualquer forma. -->
   <div id="root"></div>
   <script>window.dataLayer = window.dataLayer || [];</script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    // Required by the deferred UTM tracker to query the GA4 client_id.
-    function gtag() { dataLayer.push(arguments); }
-  </script>
   <script type="module" src="/index.tsx"></script>
   <!-- Defer third-party scripts to protect mobile TBT -->
   <script>
     (function () {
       var _consentChoice = (function () { try { return localStorage.getItem('anhanga_cookie_consent'); } catch (e) { return null; } })();
       var analyticsLoaded = false;
-      var gtmLoaded = false;
       var utmLoaded = false;
       var consentListeners = [];
 
@@ -226,27 +213,11 @@
         document.body.appendChild(script);
       };
 
-      var loadGtm = function () {
-        if (gtmLoaded) return;
-        gtmLoaded = true;
-        // Não carregar GTM em ambientes não-produtivos (dev local + Playwright/CI em 127.0.0.1).
-        // Sem este gate, submits de teste disparam generate_lead -> GTM -> GA4 de produção e
-        // poluem o sinal de conversão (treina o Smart Bidding com tráfego de bot).
-        var h = location.hostname;
-        if (h === 'localhost' || h === '127.0.0.1' || h === '[::1]' || h === '::1' || h === '0.0.0.0' || h.endsWith('.local') || h.endsWith('.test')) return;
-        window.dataLayer.push({
-          'gtm.start': new Date().getTime(),
-          event: 'gtm.js'
-        });
-        injectScript('https://load.sst.anhanga.tur.br/60oxrlttgl.js?56lu7e=BQNJMzg%2FVTteLDMnVEQ%2FSRpaRlpdVBwBUQYaHA0cHw5CEwEGQhAK');
-      };
-
       var absoluteFallbackTimer = null;
       var loadAnalytics = function () {
         if (analyticsLoaded) return;
         analyticsLoaded = true;
         if (absoluteFallbackTimer !== null) clearTimeout(absoluteFallbackTimer);
-        loadGtm();
         if (!utmLoaded) {
           utmLoaded = true;
           injectScript('/utm-tracking.js', { defer: true });
