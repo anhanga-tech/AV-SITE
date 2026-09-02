@@ -303,24 +303,41 @@ test.describe('Cookie Consent Banner (CMP)', () => {
 
   // --- Ponte de consentimento com o Zaraz ---
 
+  // ID de purpose fake usado só neste stub — index.html nunca deve ver o literal
+  // "marketing" chegar em zaraz.consent.set() (achado de produção: o Zaraz só aceita
+  // o ID gerado, não o nome). Os testes abaixo verificam contra este ID, não contra
+  // "marketing", pra continuar cobrindo a resolução dinâmica de resolveMarketingPurposeId.
+  const MARKETING_PURPOSE_ID = 'test-marketing-purpose-id';
+
   // window.zaraz só existe em produção (script real do Cloudflare); o stub abaixo
-  // simula a API real (window.zaraz.consent.set) pra capturar a chamada sem
-  // depender do zaraz.js de verdade, que não roda no dev server do Playwright.
+  // simula a API real (window.zaraz.consent.set + .purposes) pra capturar a chamada
+  // sem depender do zaraz.js de verdade, que não roda no dev server do Playwright.
   async function stubZarazConsent(page: Page): Promise<void> {
-    await page.addInitScript(() => {
+    await page.addInitScript((purposeId) => {
       type ConsentPurposes = Record<string, boolean>;
       type TestWindow = Window & {
-        zaraz: { consent: { set: (purposes: ConsentPurposes) => void } };
+        zaraz: {
+          consent: {
+            purposes: Record<string, { name: { en: string; pt: string } }>;
+            set: (purposes: ConsentPurposes) => void;
+          };
+        };
         __zarazConsentCalls: ConsentPurposes[];
       };
       const testWindow = window as unknown as TestWindow;
       testWindow.__zarazConsentCalls = [];
       testWindow.zaraz = {
         consent: {
+          // Shape confirmado em produção 02/09/2026: purposes é um objeto por ID com
+          // name localizado ({en, pt}) — resolveMarketingPurposeId() em index.html
+          // depende disso pra achar o ID a partir do nome "marketing".
+          purposes: {
+            [purposeId]: { name: { en: 'marketing', pt: 'marketing' } },
+          },
           set: (purposes) => testWindow.__zarazConsentCalls.push(purposes),
         },
       };
-    });
+    }, MARKETING_PURPOSE_ID);
   }
 
   async function getZarazConsentCalls(page: Page): Promise<Record<string, boolean>[]> {
@@ -334,7 +351,7 @@ test.describe('Cookie Consent Banner (CMP)', () => {
     await stubZarazConsent(page);
     await page.goto('/');
 
-    expect(await getZarazConsentCalls(page)).toEqual([{ marketing: false }]);
+    expect(await getZarazConsentCalls(page)).toEqual([{ [MARKETING_PURPOSE_ID]: false }]);
   });
 
   test('aceitar propaga a purpose marketing pro Zaraz', async ({ page }) => {
@@ -343,7 +360,10 @@ test.describe('Cookie Consent Banner (CMP)', () => {
     await page.getByRole('button', { name: 'Aceitar' }).click();
 
     // [0] é a sincronização inicial (sem escolha ainda); [1] é o clique em Aceitar.
-    expect(await getZarazConsentCalls(page)).toEqual([{ marketing: false }, { marketing: true }]);
+    expect(await getZarazConsentCalls(page)).toEqual([
+      { [MARKETING_PURPOSE_ID]: false },
+      { [MARKETING_PURPOSE_ID]: true },
+    ]);
   });
 
   test('revogar (aceitar → gerenciar → recusar) resulta em marketing:false pro Zaraz após o reload', async ({ page }) => {
@@ -375,6 +395,6 @@ test.describe('Cookie Consent Banner (CMP)', () => {
       return Boolean(testWindow.__zarazConsentCalls && testWindow.__zarazConsentCalls.length > 0);
     });
 
-    expect(await getZarazConsentCalls(page)).toEqual([{ marketing: false }]);
+    expect(await getZarazConsentCalls(page)).toEqual([{ [MARKETING_PURPOSE_ID]: false }]);
   });
 });

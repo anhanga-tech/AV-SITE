@@ -335,8 +335,18 @@ test('ponte assina addAnhangaConsentListener pra propagar a purpose de marketing
   );
   assert.match(
     syncBlock,
-    /window\.zaraz\.consent\.set\(\{\s*marketing:\s*pendingZarazMarketing\s*\}\)/,
-    'flush deve chamar consent.set com a purpose marketing pendente'
+    /var purposeId = resolveMarketingPurposeId\(\);/,
+    'flush deve resolver o ID da purpose em runtime — o Zaraz não aceita o nome como chave de consent.set()'
+  );
+  assert.match(
+    syncBlock,
+    /payload\[purposeId\] = pendingZarazMarketing;/,
+    'flush deve montar o payload com o ID resolvido, não com o literal "marketing"'
+  );
+  assert.doesNotMatch(
+    syncBlock,
+    /window\.zaraz\.consent\.set\(\{\s*marketing:/,
+    'consent.set nunca deve receber o nome "marketing" como chave — o Zaraz espera o ID gerado da purpose (achado em produção: lança "Unknown purpose id: marketing")'
   );
   assert.match(
     syncBlock,
