@@ -95,7 +95,10 @@ test('CTA pago cai no fallback de navegação se o embed do Cal.com falhar', asy
   await page.goto('/consultoria-de-viagem');
 
   await page.locator('[data-tracking="hero-consultoria-viagem"]').click();
-  await page.waitForURL('https://cal.com/anhanga-viagens/consultoria', { timeout: 8000 });
+  // Regex, não string exata: o fallback (lib/cal-embed.ts) anexa `?metadata[cid]=...`
+  // quando há atribuição capturada (UTMs/click IDs) — uma string fixa nunca bate e o
+  // teste sempre estoura o timeout, mascarando qualquer regressão real no fallback.
+  await page.waitForURL(/^https:\/\/cal\.com\/anhanga-viagens\/consultoria(\?.*)?$/, { timeout: 8000 });
 });
 
 test('CTAs carregam a classificação de tracking correta (specialist vs. opt-out)', async ({ page }) => {
