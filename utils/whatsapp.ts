@@ -154,20 +154,47 @@ function appendTrackingValue(trackingData: TrackingData, key: string, value: str
     trackingData[key] = value;
 }
 
+function isUntrustedTrackingKey(key: string): boolean {
+    return TRACKING_PARAMS.includes(key) || key.startsWith(HSA_PREFIX);
+}
+
+// cid/sid/fbc/fbp nunca vêm de um parâmetro de URL — são gerados internamente (cookie
+// próprio ou API do navegador) e nunca precisam do filtro de PII. Validar essas chaves
+// também quebrava fbc: seu formato (fb.1.<timestamp>.<fbclid>) casa em PHONE_PATTERN
+// (dígito+ponto+dígitos), então era descartado a cada captura e regenerado com um
+// Date.now() novo, perdendo o timestamp do clique original e prejudicando dedup no Meta
+// CAPI (achado de review, claude[bot] + chatgpt-codex-connector[bot]).
+function mergeRestoredTrackingData(trackingData: TrackingData, parsed: TrackingData): void {
+    for (const [key, value] of Object.entries(parsed)) {
+        if (isUntrustedTrackingKey(key) && !isSafeTrackingValue(value)) continue;
+        trackingData[key] = value;
+    }
+}
+
+// O cookie de 30 dias (COOKIE_NAME) é a única persistência que sobrevive entre sessões/
+// abas — sessionStorage não. Sem isso, um visitante que voltasse numa aba nova (sem UTM
+// na URL, sessionStorage vazio) perdia toda a atribuição anterior: como cid agora é
+// sempre truthy (getGA4ClientId sempre gera um), captureTrackingDataObject nunca mais
+// caía no fallback getCookieTrackingData() e sobrescrevia o cookie só com {cid: ...}
+// (achado de review, chatgpt-codex-connector[bot]).
+function mergeCookieTrackingData(trackingData: TrackingData): void {
+    const cookieData = getCookie(COOKIE_NAME);
+    if (!cookieData) return;
+
+    mergeRestoredTrackingData(trackingData, parseTrackingDataString(cookieData));
+}
+
 function mergeStoredTrackingData(trackingData: TrackingData): void {
     try {
         const stored = sessionStorage.getItem(STORAGE_KEY);
         if (!stored) return;
 
-        const parsed = JSON.parse(stored) as TrackingData;
         // public/utm-tracking.js grava na mesma chave (anhanga_tracking_data) sem passar
         // pelo isSafeTrackingValue de mergeUrlTrackingData — reaplicar o filtro aqui, no
         // único ponto onde qualquer origem armazenada converge antes do dataLayer, cobre
         // esse segundo coletor sem duplicar a regra em dois arquivos (achado de review,
         // chatgpt-codex-connector[bot]: "validate on every storage read/write").
-        for (const [key, value] of Object.entries(parsed)) {
-            if (isSafeTrackingValue(value)) trackingData[key] = value;
-        }
+        mergeRestoredTrackingData(trackingData, JSON.parse(stored) as TrackingData);
     } catch {
         // Ignore storage failures
     }
@@ -256,6 +283,7 @@ const captureTrackingDataObject = (): TrackingData | null => {
     const trackingData: TrackingData = {};
     const urlParams = new URLSearchParams(getSearchStringFromLocation());
 
+    mergeCookieTrackingData(trackingData);
     mergeStoredTrackingData(trackingData);
     const foundInUrl = mergeUrlTrackingData(trackingData, urlParams);
     const { cid, sid } = mergeAnalyticsTrackingData(trackingData);

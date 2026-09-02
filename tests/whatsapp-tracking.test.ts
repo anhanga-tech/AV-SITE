@@ -277,3 +277,88 @@ test('getTrackingDataObject revalida PII vinda de sessionStorage (segundo coleto
         },
     );
 });
+
+// Regressão (achado de review, ambos os bots, P1/P2 — bug introduzido pelo fix acima): o fbc
+// (fb.1.<timestamp>.<fbclid>) restaurado do storage batia em PHONE_PATTERN (dígito+ponto+dígitos)
+// e era descartado a cada captura, sendo regenerado com Date.now() novo — perdendo o timestamp
+// do clique original e prejudicando dedup no Meta CAPI. cid/sid/fbc/fbp não vêm de URL e não
+// devem passar pelo filtro de PII (só utm_*/hsa_* vêm de input não confiável).
+test('getTrackingDataObject preserva fbc vindo do storage (não é PII, não deve ser revalidado como telefone)', () => {
+    const storedFbc = 'fb.1.1735689600000.IwAR_test_fbclid_value';
+    withTrackingEnv(
+        { storedTrackingData: { fbclid: 'IwAR_test_fbclid_value', fbc: storedFbc } },
+        (getTracking) => {
+            const tracking = getTracking();
+            assert.equal(tracking?.fbc, storedFbc, 'fbc restaurado do storage não deve ser descartado nem regenerado');
+        },
+    );
+});
+
+// Regressão (achado de review, chatgpt-codex-connector[bot] P1 + claude[bot] P2): exigir "+"/
+// separador fechou o falso positivo de IDs numéricos, mas abriu um falso negativo — um celular
+// brasileiro digitado sem formatação (11 dígitos, DDD válido, prefixo "9") passava incólume.
+test('getTrackingDataObject descarta celular brasileiro sem formatação (11 dígitos, DDD + prefixo 9)', () => {
+    withTrackingEnv({ search: '?utm_content=11987654321' }, (getTracking) => {
+        const tracking = getTracking();
+        assert.equal(tracking?.utm_content, undefined, 'celular sem formatação deve ser descartado como telefone');
+    });
+});
+
+// Guarda de regressão: a heurística de celular brasileiro (DDD 11-99 + terceiro dígito "9") não
+// pode voltar a derrubar o ID de 11 dígitos real do próprio projeto (AW-17331979537 sem o
+// prefixo "AW-" tem terceiro dígito "3", não "9").
+test('getTrackingDataObject preserva ID de conversão de 11 dígitos que não tem formato de celular', () => {
+    withTrackingEnv({ search: '?utm_content=17331979537' }, (getTracking) => {
+        const tracking = getTracking();
+        assert.equal(tracking?.utm_content, '17331979537', 'ID de 11 dígitos sem terceiro dígito 9 não é celular');
+    });
+});
+
+// Regressão (achado de review, chatgpt-codex-connector[bot], P2 — bug introduzido pelo fix de
+// ga_client_id): como cid agora é sempre truthy, captureTrackingDataObject nunca mais caía no
+// fallback getCookieTrackingData() — um visitante que voltasse numa aba nova (sessionStorage
+// vazio, sem UTM na URL) tinha o cookie de 30 dias sobrescrito só com {cid}, perdendo toda a
+// atribuição anterior. mergeCookieTrackingData precisa restaurar o cookie antes desse ponto.
+test('getTrackingDataObject preserva atribuição do cookie de 30 dias numa aba nova (sessionStorage vazio)', () => {
+    const originalWindow = Object.getOwnPropertyDescriptor(globalThis, 'window');
+    const originalDocument = Object.getOwnPropertyDescriptor(globalThis, 'document');
+    const originalSessionStorage = Object.getOwnPropertyDescriptor(globalThis, 'sessionStorage');
+
+    let cookieJar = 'tracking_data=utm_source%3Dgoogle%2C%20utm_campaign%3Dpromo';
+    Object.defineProperty(globalThis, 'window', {
+        configurable: true,
+        value: { dataLayer: [], location: { search: '', hash: '', href: 'https://example.com/' } },
+    });
+    Object.defineProperty(globalThis, 'document', {
+        configurable: true,
+        value: {
+            get cookie() { return cookieJar; },
+            set cookie(value: string) {
+                const [pair] = value.split(';');
+                const separatorIndex = pair.indexOf('=');
+                if (separatorIndex <= 0) return;
+                const name = pair.slice(0, separatorIndex);
+                const rest = cookieJar.split('; ').filter((c) => c && !c.startsWith(`${name}=`));
+                rest.push(pair);
+                cookieJar = rest.join('; ');
+            },
+        },
+    });
+    Object.defineProperty(globalThis, 'sessionStorage', {
+        configurable: true,
+        value: { getItem: () => null, setItem: () => {} },
+    });
+
+    try {
+        const tracking = getTrackingDataObject();
+        assert.equal(tracking?.utm_source, 'google', 'atribuição do cookie de 30 dias deve sobreviver numa aba nova');
+        assert.equal(tracking?.utm_campaign, 'promo', 'atribuição do cookie de 30 dias deve sobreviver numa aba nova');
+    } finally {
+        if (originalWindow) Object.defineProperty(globalThis, 'window', originalWindow);
+        else Reflect.deleteProperty(globalThis, 'window');
+        if (originalDocument) Object.defineProperty(globalThis, 'document', originalDocument);
+        else Reflect.deleteProperty(globalThis, 'document');
+        if (originalSessionStorage) Object.defineProperty(globalThis, 'sessionStorage', originalSessionStorage);
+        else Reflect.deleteProperty(globalThis, 'sessionStorage');
+    }
+});
