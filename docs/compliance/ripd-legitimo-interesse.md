@@ -48,7 +48,7 @@ Atividades baseadas em **consentimento** de baixo risco — como cookies de publ
 
 | Campo | Detalhe |
 |---|---|
-| **Dados tratados** | Pageviews, eventos de clique, tempo de sessão, scroll depth, origem do tráfego, tipo de dispositivo/navegador; GA4 Client ID anonimizado |
+| **Dados tratados** | Pageviews, eventos de clique, tempo de sessão, scroll depth, origem do tráfego, tipo de dispositivo/navegador; GA4 Client ID anonimizado — **atualizado 01/09/2026 (achado de review):** como nenhum script do Google roda mais no navegador (Stape/GTM removidos), o site gera e persiste seu próprio identificador first-party (cookie `anhanga_ga_cid`, 2 anos, mesmo formato do antigo `_ga`) quando esse cookie não existe, evitando que visitantes novos fiquem sem client ID e quebrem a correlação de conversão no GA4 |
 | **Titulares** | Visitantes do site `www.anhanga.tur.br` |
 | **Operadores** | Cloudflare, Inc. (Zaraz — server-side tagging; já processor da Anhangá via Cloudflare Pages) → Google LLC (Google Analytics 4, EUA) |
 | **Arquitetura** | Browser → Cloudflare Zaraz (edge) com supressão de IP (`hideOriginalIP` na tool GA4, validado — Task 2) → GA4 (Google, EUA) |
@@ -104,7 +104,8 @@ Sem essa análise, decisões de investimento em tráfego pago seriam baseadas em
 - [x] DPA assinado com Google LLC
 - [ ] **Pendente:** confirmar com o DPO se o DPA já existente com a Cloudflare (processor de hospedagem) cobre explicitamente o uso do Zaraz, ou se é necessário aditivo/DPA específico — não tratar como coberto até essa confirmação
 - [ ] **Pendente:** auditar se algum evento rastreado hoje carrega PII (e-mail/telefone) sem necessidade — o evento `generate_lead` foi confirmado sem PII (Task 4), os demais ~15 eventos do site não foram auditados individualmente para este RIPD
-- [ ] **Pendente (reavaliar):** o Stape tinha um recurso explícito de PII scrubbing nos request logs; o Zaraz não tem um scrubber equivalente conhecido — mitigado hoje pelo fato de nenhum evento client-side carregar PII por design, mas vale confirmar antes de qualquer novo evento ser adicionado ao dataLayer
+- [x] **Corrigido (01/09/2026, achado de review):** `utils/whatsapp.ts` aceitava qualquer valor de UTM/`hsa_*` da URL sem validação e espalhava tudo no evento `tracking_data_captured`, que o Zaraz encaminha ao GA4 sem scrubbing (o Stape tinha esse scrubber, o Zaraz não tem equivalente conhecido) — um link malicioso com e-mail/telefone num parâmetro UTM vazaria PII pro GA4. Corrigido: valores com formato de e-mail/telefone são rejeitados antes de entrar no tracking (`utils/piiRedaction.ts`, reaproveitado de `utils/formAnalytics.ts`)
+- [ ] **Pendente:** essa validação cobre o vetor concreto identificado (parâmetros de URL), mas não é um scrubber genérico como o da Stape — outros campos ou fontes de dado adicionados no futuro precisam da mesma checagem manual, não há uma rede de segurança automática
 
 ---
 

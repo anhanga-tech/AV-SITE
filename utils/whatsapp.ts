@@ -8,6 +8,7 @@
  */
 
 import { useEffect, useMemo } from 'react';
+import { isSafeTrackingValue } from './piiRedaction';
 
 const TRACKING_PARAMS = [
     'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
@@ -51,10 +52,27 @@ const getCookie = (name: string): string | null => {
     return null;
 };
 
+// Cookie próprio (não o _ga do Google) usado como fallback pro client_id do GA4.
+// Nada carrega o gtag.js real do Google desde a migração pro Zaraz (Stape/GTM
+// removidos) — sem isso, um visitante novo nunca teria o cookie _ga legado e
+// ga_client_id ficaria sempre vazio no generate_lead, quebrando a correlação de
+// conversão no GA4 (achado de review). Reutiliza o mesmo nome/formato usado em
+// public/utm-tracking.js pra não gerar dois IDs diferentes pro mesmo visitante.
+const OWN_CID_COOKIE = 'anhanga_ga_cid';
+
+const getOrCreateOwnClientId = (): string => {
+    const existing = getCookie(OWN_CID_COOKIE);
+    if (existing) return existing;
+
+    const cid = `${Math.floor(Math.random() * 2147483647)}.${Math.floor(Date.now() / 1000)}`;
+    setCookie(OWN_CID_COOKIE, cid, 730);
+    return cid;
+};
+
 const getGA4ClientId = (): string | null => {
     if (typeof document === 'undefined') return null;
     const match = document.cookie.match(/_ga=GA1\.\d+\.(\d+\.\d+)/);
-    return match ? match[1] : null;
+    return match ? match[1] : getOrCreateOwnClientId();
 };
 
 const getGA4SessionId = (): string | null => {
@@ -147,18 +165,24 @@ function mergeStoredTrackingData(trackingData: TrackingData): void {
 }
 
 function mergeUrlTrackingData(trackingData: TrackingData, urlParams: URLSearchParams): boolean {
+    // Parâmetros de tracking vêm de uma URL não confiável (qualquer um pode montar um link
+    // com ?utm_content=email@exemplo.com) e este objeto é espalhado inteiro num evento
+    // dataLayer (tracking_data_captured) que o Zaraz encaminha pro GA4 sem scrubbing de PII
+    // (achado de review — o Stape tinha esse scrubber, o Zaraz não tem equivalente
+    // conhecido). isSafeTrackingValue rejeita qualquer valor com formato de e-mail/telefone
+    // antes de aceitar, independente do nome do parâmetro.
     let foundInUrl = false;
 
     TRACKING_PARAMS.forEach((param) => {
         const value = urlParams.get(param);
-        if (!value) return;
+        if (!value || !isSafeTrackingValue(value)) return;
 
         appendDecodedTrackingValue(trackingData, param, value);
         foundInUrl = true;
     });
 
     urlParams.forEach((value, key) => {
-        if (!key.startsWith(HSA_PREFIX)) return;
+        if (!key.startsWith(HSA_PREFIX) || !isSafeTrackingValue(value)) return;
 
         appendDecodedTrackingValue(trackingData, key, value);
         foundInUrl = true;

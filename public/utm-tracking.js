@@ -4,33 +4,36 @@
  * v2.2 - Added sessionStorage persistence and specialist CTA tracking
  */
 (function () {
-    const GA4_MEASUREMENT_ID = 'G-QDBT5PM4KP';
     const SESSION_STORAGE_KEY = 'anhanga_tracking_data';
     const TRACKING_PARAMS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid', 'ttclid', 'wbraid', 'gbraid', 'msclkid'];
 
-    // Captura o Client ID do GA4 de forma robusta
+    // Nada carrega o gtag.js real do Google desde a migração pro Zaraz (Stape/GTM
+    // removidos) — gtag() aqui é só o stub que empurra pro dataLayer, então
+    // gtag('get', ..., 'client_id', callback) nunca chama o callback de verdade.
+    // Sem isso, visitantes sem cookie _ga legado (todo visitante novo daqui pra
+    // frente) nunca teriam ga_client_id, quebrando a correlação de conversão no
+    // GA4 (achado de review). getGACid agora gera e persiste seu próprio ID
+    // quando não existe nenhum, em vez de depender de um script do Google que
+    // não roda mais.
     function getGACid(callback) {
-        let done = false;
-        const finish = (cid) => { if (!done) { done = true; callback(cid); } };
-
-        const timeout = setTimeout(() => finish(getCookieCid()), 2000);
-
-        if (typeof gtag === 'function') {
-            try {
-                gtag('get', GA4_MEASUREMENT_ID, 'client_id', (cid) => {
-                    clearTimeout(timeout);
-                    finish(cid || getCookieCid());
-                });
-            } catch { clearTimeout(timeout); finish(getCookieCid()); }
-        } else {
-            clearTimeout(timeout);
-            finish(getCookieCid());
-        }
+        callback(getCookieCid() || getOrCreateOwnCid());
     }
 
     function getCookieCid() {
         const m = document.cookie.match(/_ga=GA1\.\d+\.(\d+\.\d+)/);
         return m ? m[1] : null;
+    }
+
+    const OWN_CID_COOKIE = 'anhanga_ga_cid';
+
+    function getOrCreateOwnCid() {
+        const existing = document.cookie.match(new RegExp(OWN_CID_COOKIE + '=([^;]+)'));
+        if (existing) return existing[1];
+
+        const cid = Math.floor(Math.random() * 2147483647) + '.' + Math.floor(Date.now() / 1000);
+        const expires = new Date(Date.now() + 730 * 24 * 60 * 60 * 1000).toUTCString();
+        document.cookie = OWN_CID_COOKIE + '=' + cid + '; expires=' + expires + '; path=/; SameSite=Lax';
+        return cid;
     }
 
     function readStoredTracking() {

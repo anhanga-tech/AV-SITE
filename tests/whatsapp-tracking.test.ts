@@ -116,3 +116,51 @@ test('getWhatsAppLink omits identifiers even when tracking data is available', (
         else Reflect.deleteProperty(globalThis, 'sessionStorage');
     }
 });
+
+// Regressão (achado de review, chatgpt-codex-connector[bot]): nada carrega o gtag.js real do
+// Google desde a migração pro Zaraz (Stape/GTM removidos), então um visitante sem o cookie
+// _ga legado nunca teria ga_client_id — quebrando a correlação de conversão no GA4. Confirma
+// que getGA4ClientId gera e persiste seu próprio ID quando não existe nenhum _ga.
+test('getTrackingDataObject gera um cid próprio quando não existe cookie _ga (visitante novo)', () => {
+    const originalWindow = Object.getOwnPropertyDescriptor(globalThis, 'window');
+    const originalDocument = Object.getOwnPropertyDescriptor(globalThis, 'document');
+    const originalSessionStorage = Object.getOwnPropertyDescriptor(globalThis, 'sessionStorage');
+
+    let cookieJar = '';
+    Object.defineProperty(globalThis, 'window', {
+        configurable: true,
+        value: {
+            dataLayer: [],
+            location: { search: '', hash: '', href: 'https://example.com/' },
+        },
+    });
+    Object.defineProperty(globalThis, 'document', {
+        configurable: true,
+        value: {
+            get cookie() { return cookieJar; },
+            set cookie(value: string) {
+                // Mock simplificado: um cookie por vez basta pra este teste (só escrevemos o
+                // cid próprio, nunca havia nenhum outro cookie setado antes dele).
+                cookieJar = value.split(';')[0];
+            },
+        },
+    });
+    Object.defineProperty(globalThis, 'sessionStorage', {
+        configurable: true,
+        value: { getItem: () => null, setItem: () => {} },
+    });
+
+    try {
+        const tracking = getTrackingDataObject();
+        assert.ok(tracking?.cid, 'cid deve ser gerado mesmo sem cookie _ga');
+        assert.match(tracking!.cid, /^\d+\.\d+$/, 'cid gerado deve seguir o formato número.timestamp');
+        assert.ok(cookieJar.startsWith('anhanga_ga_cid='), 'o cid gerado deve ser persistido em cookie próprio');
+    } finally {
+        if (originalWindow) Object.defineProperty(globalThis, 'window', originalWindow);
+        else Reflect.deleteProperty(globalThis, 'window');
+        if (originalDocument) Object.defineProperty(globalThis, 'document', originalDocument);
+        else Reflect.deleteProperty(globalThis, 'document');
+        if (originalSessionStorage) Object.defineProperty(globalThis, 'sessionStorage', originalSessionStorage);
+        else Reflect.deleteProperty(globalThis, 'sessionStorage');
+    }
+});
