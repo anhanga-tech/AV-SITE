@@ -100,6 +100,21 @@ const getFbp = (): string | null => {
 function parseTrackingDataString(dataString: string): TrackingData {
     const parsed: TrackingData = {};
 
+    // New cookies use JSON so commas (and other delimiters) inside campaign values
+    // remain part of the value. Keep the legacy parser below so attribution cookies
+    // written by older deployments continue to work after the cutover.
+    try {
+        const decoded = JSON.parse(dataString) as unknown;
+        if (decoded && typeof decoded === 'object' && !Array.isArray(decoded)) {
+            for (const [key, value] of Object.entries(decoded)) {
+                if (key && typeof value === 'string' && value) parsed[key] = value;
+            }
+            return parsed;
+        }
+    } catch {
+        // Fall through to the legacy comma-delimited format.
+    }
+
     for (const segment of dataString.split(',')) {
         const entry = segment.trim();
         if (!entry) continue;
@@ -116,9 +131,7 @@ function parseTrackingDataString(dataString: string): TrackingData {
 }
 
 function serializeTrackingData(data: TrackingData): string {
-    return Object.entries(data)
-        .flatMap(([key, value]) => key && value ? [`${key}=${value}`] : [])
-        .join(', ');
+    return JSON.stringify(data);
 }
 
 function getSearchStringFromLocation(): string {
@@ -164,8 +177,9 @@ function isUntrustedTrackingKey(key: string): boolean {
 // (dígito+ponto+dígitos), então era descartado a cada captura e regenerado com um
 // Date.now() novo, perdendo o timestamp do clique original e prejudicando dedup no Meta
 // CAPI (achado de review, claude[bot] + chatgpt-codex-connector[bot]).
-function mergeRestoredTrackingData(trackingData: TrackingData, parsed: TrackingData): void {
+function mergeRestoredTrackingData(trackingData: TrackingData, parsed: Record<string, unknown>): void {
     for (const [key, value] of Object.entries(parsed)) {
+        if (typeof value !== 'string' || !value) continue;
         if (isUntrustedTrackingKey(key) && !isSafeTrackingValue(value)) continue;
         trackingData[key] = value;
     }
@@ -194,7 +208,9 @@ function mergeStoredTrackingData(trackingData: TrackingData): void {
         // único ponto onde qualquer origem armazenada converge antes do dataLayer, cobre
         // esse segundo coletor sem duplicar a regra em dois arquivos (achado de review,
         // chatgpt-codex-connector[bot]: "validate on every storage read/write").
-        mergeRestoredTrackingData(trackingData, JSON.parse(stored) as TrackingData);
+        const parsed = JSON.parse(stored) as unknown;
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return;
+        mergeRestoredTrackingData(trackingData, parsed as Record<string, unknown>);
     } catch {
         // Ignore storage failures
     }

@@ -7,7 +7,8 @@ export function PrivacySection7Armazenamento() {
                 <ul className="list-disc pl-6 space-y-1">
                     <li><strong>Dados de contato e relacionamento:</strong> 5 (cinco) anos após a última interação</li>
                     <li><strong>Dados de navegação (analytics):</strong> até 14 (quatorze) meses, conforme a configuração de retenção do Google Analytics 4</li>
-                    <li><strong>Cookies:</strong> conforme configurações do navegador e políticas específicas de cada tecnologia</li>
+                    <li><strong>Cookie de atribuição:</strong> o cookie próprio <code>anhanga_ga_cid</code>, quando criado, pode permanecer por até 2 (dois) anos; o identificador é pseudonimizado e pode ser registrado no CRM quando o titular envia um formulário</li>
+                    <li><strong>Cookie de campanha:</strong> o cookie <code>tracking_data</code> permanece por até 30 (trinta) dias</li>
                 </ul>
                 <h3 className="font-merriweather font-semibold">7.2 Critérios para Retenção</h3>
                 <p>Os períodos de retenção baseiam-se em:</p>

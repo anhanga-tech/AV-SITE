@@ -86,6 +86,21 @@
         window.dataLayer.push(payload);
     }
 
+    // Never send the raw URL in click events: query strings and hashes can contain
+    // PII even when their parameter names look harmless. Form analytics uses the
+    // richer redaction helper in utils/formAnalytics.ts; this static collector keeps
+    // the safer minimal location because it cannot import the TypeScript helper.
+    function getSafePageLocation() {
+        try {
+            const url = new URL(window.location.href);
+            url.search = '';
+            url.hash = '';
+            return url.toString();
+        } catch {
+            return window.location.origin + window.location.pathname;
+        }
+    }
+
     function getElementText(element, fallback) {
         if (!element) return fallback;
         return (element.innerText || element.textContent || '').trim() || fallback;
@@ -120,7 +135,7 @@
             event_label: whatsappButton.getAttribute('href') || 'unknown_whatsapp_link',
             button_text: buttonText,
             cta_id: trackingId,
-            page_location: window.location.href
+            page_location: getSafePageLocation()
         });
     }
 
@@ -164,7 +179,7 @@
             event_category: 'engagement',
             event_label: buttonText || 'Specialist CTA',
             cta_id: trackingId,
-            page_location: window.location.href
+            page_location: getSafePageLocation()
         });
     }
 

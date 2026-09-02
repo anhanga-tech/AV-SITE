@@ -74,13 +74,25 @@ test('pushGenerateLeadConversionEvent still pushes the other fields when destina
     });
 });
 
+test('pushGenerateLeadConversionEvent tolerates a missing destination', () => {
+    withMockWindow((pushed) => {
+        pushGenerateLeadConversionEvent({
+            eventId: 'lead-5',
+            utms: { utm_source: 'google' },
+        });
+
+        assert.equal(pushed[0].event, 'generate_lead');
+        assert.ok(!('destination' in pushed[0]));
+    });
+});
+
 test('pushGenerateLeadConversionEvent is a no-op without window.dataLayer', () => {
     const previousWindow = globalThis.window;
     Object.defineProperty(globalThis, 'window', { value: undefined, configurable: true });
 
     try {
         assert.doesNotThrow(() => {
-            pushGenerateLeadConversionEvent({ eventId: 'lead-5', destination: 'Quero viajar' });
+            pushGenerateLeadConversionEvent({ eventId: 'lead-6', destination: 'Quero viajar' });
         });
     } finally {
         Object.defineProperty(globalThis, 'window', { value: previousWindow, configurable: true });

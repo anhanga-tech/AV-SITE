@@ -11,7 +11,7 @@
 | **E-mail DPO** | privacidade@anhanga.tur.br |
 | **Versão** | 1.9 |
 | **Data de elaboração** | 02/06/2026 |
-| **Última revisão** | 01/09/2026 |
+| **Última revisão** | 02/09/2026 |
 | **Próxima revisão** | 03/06/2027 |
 | **Status** | Rascunho — pendente de revisão jurídica e aprovação do DPO |
 
@@ -48,11 +48,11 @@ Atividades baseadas em **consentimento** de baixo risco — como cookies de publ
 
 | Campo | Detalhe |
 |---|---|
-| **Dados tratados** | Pageviews, eventos de clique, tempo de sessão, scroll depth, origem do tráfego, tipo de dispositivo/navegador; GA4 Client ID **pseudonimizado, não anônimo — corrigido 02/09/2026 (achado de review, chatgpt-codex-connector[bot] + claude[bot]):** como nenhum script do Google roda mais no navegador (Stape/GTM removidos), o site gera e persiste seu próprio identificador first-party (cookie `anhanga_ga_cid`, 2 anos, mesmo formato do antigo `_ga`) quando esse cookie não existe, evitando que visitantes novos fiquem sem client ID e quebrem a correlação de conversão no GA4. Esse cid é gravado em `x_ga_client_id` no mesmo registro `crm.lead`/`res.partner` que contém e-mail e telefone do lead (`lib/odoo-lead-mapping.ts`) especificamente para correlação cross-sistema CRM ↔ GA4 — é um identificador pseudonimizado persistente, não um dado anônimo |
+| **Dados tratados** | Pageviews, eventos de clique, tempo de sessão, scroll depth, origem do tráfego, tipo de dispositivo/navegador; identificador de atribuição pseudonimizado, não anônimo. **Atualização de 02/09/2026 (achado de review, chatgpt-codex-connector[bot] + claude[bot]):** como nenhum script do Google roda mais no navegador (Stape/GTM removidos), o site gera e persiste seu próprio identificador first-party (cookie `anhanga_ga_cid`, 2 anos, mesmo formato do antigo `_ga`) quando esse cookie não existe. Esse cid é enviado como propriedade `ga_client_id` nos eventos próprios, pode ser gravado em `x_ga_client_id` no mesmo registro `crm.lead`/`res.partner` que contém e-mail e telefone do lead (`lib/odoo-lead-mapping.ts`) e é, portanto, um identificador pseudonimizado persistente. A correspondência desse cid com o client ID interno gerado pelo Zaraz/GA4 ainda não foi confirmada e está registrada como follow-up técnico no plano de migração. |
 | **Titulares** | Visitantes do site `www.anhanga.tur.br` |
 | **Operadores** | Cloudflare, Inc. (Zaraz — server-side tagging; já processor da Anhangá via Cloudflare Pages) → Google LLC (Google Analytics 4, EUA) |
 | **Arquitetura** | Browser → Cloudflare Zaraz (edge) com supressão de IP (`hideOriginalIP` na tool GA4, validado — Task 2) → GA4 (Google, EUA) |
-| **Retenção** | 14 meses (configuração a aplicar no painel GA4) |
+| **Retenção** | Eventos armazenados no GA4: 14 meses (configuração aplicada no painel); cookie `anhanga_ga_cid`: até 2 anos; quando o cid é registrado no CRM, aplica-se a retenção da Atividade 3 |
 | **Transferência internacional** | Sim — dados chegam ao Google LLC com IP suprimido pelo Zaraz. DPA com Google mantido; **cobertura do DPA já existente com a Cloudflare (processor de hospedagem) sobre o uso do Zaraz ainda não confirmada com o DPO** — não presumir coberto até confirmação ou aditivo (ver 2.6) |
 
 ### 2.2 Interesse legítimo identificado
@@ -78,19 +78,19 @@ Sem essa análise, decisões de investimento em tráfego pago seriam baseadas em
 
 | Fator | Avaliação |
 |---|---|
-| Natureza dos dados | Comportamental, não sensível, sem identificação direta |
+| Natureza dos dados | Comportamental, não sensível, sem identificação direta no evento; o identificador pseudonimizado pode ser associado internamente ao CRM quando há envio de formulário |
 | Expectativa razoável do titular | Visitar um site institucional implica algum nível de análise de tráfego — expectativa razoável |
 | Impacto sobre o titular | Baixo — dados não são usados para decisões individuais nem para discriminação |
 | Relação entre controlador e titular | Potencial cliente que acessou o site voluntariamente |
-| Salvaguardas implementadas | Supressão de IP via Cloudflare Zaraz (`hideOriginalIP`); opt-out via banner de cookies; dados não vinculados a identidade real |
+| Salvaguardas implementadas | Supressão de IP via Cloudflare Zaraz (`hideOriginalIP`); opt-out via banner de cookies; identificador pseudonimizado sem dados cadastrais diretos no evento; vínculo interno restrito ao CRM quando necessário para atribuição |
 
-**Conclusão:** O interesse legítimo da empresa prevalece com folga. Com o Zaraz intermediando e suprimindo o IP, o impacto sobre o titular é **mínimo** — o Google não recebe dados identificáveis. A expectativa de tratamento é razoável e as salvaguardas são robustas.
+**Conclusão:** A avaliação permanece favorável ao interesse legítimo, mas não se baseia em anonimização: o identificador é pseudonimizado e pode ser associado internamente ao CRM após o envio de um formulário. Com o Zaraz intermediando e suprimindo o IP, não há nome, e-mail ou telefone no evento analítico por design; o risco é reduzido, mas não nulo, e a correlação com o client ID interno do Zaraz/GA4 continua pendente de validação técnica.
 
 ### 2.5 Riscos identificados
 
 | Risco | Probabilidade | Impacto | Mitigação |
 |---|---|---|---|
-| Re-identificação via cruzamento de dados | Muito Baixa | Baixo | IP suprimido pelo Zaraz antes de chegar ao Google; sem vinculação a identidade |
+| Re-identificação via cruzamento de dados | Baixa | Médio | IP suprimido pelo Zaraz antes de chegar ao Google; o cid pode ser associado ao cadastro no CRM quando há lead, portanto a avaliação não presume ausência de vínculo |
 | Falha de segurança na Cloudflare | Baixa | Médio | Cloudflare já é processor da Anhangá (hospedagem); dados em trânsito no edge, sem armazenamento persistente no Zaraz |
 | Falha de segurança na Google LLC | Baixa | Baixo | Dados chegam já com IP suprimido; DPA com Google; monitorar comunicados de incidente |
 | Uso de dados pelo Google para fins próprios | Baixa | Mínimo para o titular | `hideOriginalIP` impede repasse do IP real; dados já com valor de re-identificação reduzido |
@@ -100,7 +100,7 @@ Sem essa análise, decisões de investimento em tráfego pago seriam baseadas em
 
 - [x] Supressão de IP configurada na tool GA4 do Zaraz (`hideOriginalIP`) antes do repasse ao GA4 — validado 01/09/2026
 - [x] Opt-out disponível via banner de consentimento de cookies (issue #782)
-- [x] Retenção de 14 meses configurada no painel GA4
+- [x] Retenção de 14 meses configurada no painel GA4; retenção do cookie próprio `anhanga_ga_cid` documentada em até 2 anos
 - [x] DPA assinado com Google LLC
 - [ ] **Pendente:** confirmar com o DPO se o DPA já existente com a Cloudflare (processor de hospedagem) cobre explicitamente o uso do Zaraz, ou se é necessário aditivo/DPA específico — não tratar como coberto até essa confirmação
 - [ ] **Pendente:** auditar se algum evento rastreado hoje carrega PII (e-mail/telefone) sem necessidade — os ~15 eventos do site além dos já auditados (ver itens abaixo) não foram auditados individualmente para este RIPD
@@ -116,10 +116,10 @@ Sem essa análise, decisões de investimento em tráfego pago seriam baseadas em
 
 | Campo | Detalhe |
 |---|---|
-| **Dados tratados** | Parâmetros UTM (`utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`), GA4 Client ID/Session ID; click IDs (`gclid`, `fbclid`, `msclkid`, `ttclid`) armazenados em cookie first-party `tracking_data` (30 dias) e `sessionStorage` |
+| **Dados tratados** | Parâmetros UTM (`utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`), identificador de atribuição/Session ID; click IDs (`gclid`, `fbclid`, `msclkid`, `ttclid`) armazenados em cookie first-party `tracking_data` (30 dias), cookie `anhanga_ga_cid` (até 2 anos) e `sessionStorage` |
 | **Titulares** | Visitantes do site que chegam via campanhas de mídia paga ou orgânica |
 | **Operadores** | Anhangá Turismo (armazenamento first-party); Cloudflare, Inc. (Zaraz — repasse de conversões ao Google Ads, Meta CAPI e TikTok Events API; destinos de marketing somente após consentimento) |
-| **Retenção** | 30 dias (cookie `tracking_data`); duração da sessão (`sessionStorage`) |
+| **Retenção** | 30 dias (cookie `tracking_data`); até 2 anos (cookie `anhanga_ga_cid`); duração da sessão (`sessionStorage`); quando o cid é registrado no CRM, aplica-se a retenção da Atividade 3 |
 | **Transferência internacional** | Click IDs permanecem first-party antes do consentimento. Após opt-in de marketing, sinais necessários podem ser enviados ao Google, Meta e TikTok pelo Zaraz, conforme a finalidade de atribuição/conversão. |
 | **Limite de propagação** | Os identificadores **não** são incluídos no corpo das mensagens de WhatsApp pré-preenchidas (`wa.me?text=`). Chegam ao CRM apenas pelos handlers `/api/submit-*`, que os gravam no Odoo junto ao restante do formulário. |
 
@@ -148,10 +148,10 @@ Sem atribuição, é impossível saber se R$ 10.000 gastos em tráfego pago gera
 
 | Fator | Avaliação |
 |---|---|
-| Natureza dos dados | Técnico/comportamental; não sensível; não identifica diretamente o indivíduo |
+| Natureza dos dados | Técnico/comportamental; não sensível; não identifica diretamente o indivíduo no evento, mas o cid pode ser associado internamente ao CRM após o envio de um formulário |
 | Expectativa razoável do titular | Usuários que clicam em anúncios pagos têm expectativa razoável de que o anunciante mede o resultado |
 | Impacto sobre o titular | Antes do opt-in, os identificadores permanecem first-party e não há script/beacon Meta ou TikTok — e, com a arquitetura CAPI-only, nunca há pixel de terceiros injetado no navegador, nem mesmo após consentimento. Após consentimento, as APIs server-side (Meta CAPI, TikTok Events API) recebem somente os sinais necessários às finalidades informadas. |
-| Salvaguardas | Cookie first-party; expiração de 30 dias; opt-in para marketing; gate via Zaraz Consent Management (purpose `marketing`); nenhuma re-identificação fora das plataformas autorizadas. |
+| Salvaguardas | Cookies first-party com retenção limitada; opt-in para marketing; gate via Zaraz Consent Management (purpose `marketing`); correlação interna restrita ao CRM e compartilhamento com plataformas de marketing somente após consentimento. |
 
 **Conclusão:** Interesse legítimo prevalece com clareza. O impacto sobre o titular é mínimo e a expectativa de rastreamento de conversão é padrão em qualquer site comercial.
 
@@ -159,7 +159,7 @@ Sem atribuição, é impossível saber se R$ 10.000 gastos em tráfego pago gera
 
 | Risco | Probabilidade | Impacto | Mitigação |
 |---|---|---|---|
-| Acesso não autorizado ao cookie `tracking_data` | Baixa | Baixo | Dados não sensíveis; cookie first-party; sem credenciais ou PII direto |
+| Acesso não autorizado aos cookies de atribuição | Baixa | Baixo a médio | Dados técnicos e identificadores pseudonimizados; cookies first-party; o `anhanga_ga_cid` pode ser associado ao CRM quando há lead e deve seguir os controles de acesso aplicáveis |
 | Coleta de click IDs antes do consentimento (client-side) | Baixa (pós issues #782/#1261) | Baixo | `initializeTracking()` armazena atribuição first-party sob a premissa documentada de legítimo interesse; Zaraz bloqueia Meta/TikTok até a purpose `marketing` ser concedida; titular pode exercer oposição via `privacidade@anhanga.tur.br` |
 | Hashing incorreto no componente Meta/TikTok do Zaraz (dados pessoais não hasheados) | Baixa | Médio | Hashing SHA-256 é automático nos Managed Components do Zaraz (código-fonte auditado no spike de 01/09/2026); `generate_lead` hoje não carrega e-mail/telefone, então não há PII pra hashear neste evento — reavaliar se um evento com PII for adicionado no futuro |
 
@@ -321,7 +321,7 @@ O balancing test favorece o legítimo interesse nas Atividades 1, 2 e 3. A Ativi
 |---|---|---|---|---|
 | 1 | ~~Implantar e configurar Stape.io (sGTM)~~ | Dev | 30 dias | ⚠️ Obsoleto (v1.9) — Stape desativado 31/08/2026, substituído pelo Zaraz |
 | 2 | Validar ausência de PII nos eventos rastreados pelo Zaraz (equivalente ao antigo item de request logs do sGTM) | Dev + Felipe (DPO) | 30 dias | Parcial — vetores concretos corrigidos em `generate_lead`/`tracking_data_captured`/`page_location` (ver 2.6); demais eventos não auditados individualmente |
-| 3 | Reduzir retenção GA4 para 14 meses no painel | Felipe (DPO) | 30 dias | Pendente |
+| 3 | ~~Reduzir retenção GA4 para 14 meses no painel~~ | Felipe (DPO) | 30 dias | ✅ Concluído em 01/09/2026; cookie `anhanga_ga_cid` permanece documentado separadamente por até 2 anos |
 | 4 | ~~Assinar DPA com Stape OÜ~~ | Felipe (DPO) | 30 dias | ⚠️ Obsoleto (v1.9) — confirmar com o DPO se o DPA já existente com a Cloudflare (processor de hospedagem) cobre o uso do Zaraz |
 | 5 | Implementar banner de cookies condicionando `initializeTracking()` | Dev | Issue #782 | ✅ Concluído |
 | 6 | Assinar DPA com Odoo S.A. (item atualizado — CRM ativo desde o cut-over de jun/2026; Salesforce foi aposentado) | Gestão / Jurídico | 60 dias | Pendente |

@@ -87,6 +87,13 @@ test('UTM tracker respeita o opt-out data-no-specialist-cta antes de disparar sp
   );
 });
 
+test('UTM tracker não envia query string ou hash crus em page_location', () => {
+  assert.match(utmTrackingScript, /function getSafePageLocation\(\)/);
+  assert.doesNotMatch(utmTrackingScript, /page_location:\s*window\.location\.href/);
+  assert.match(utmTrackingScript, /url\.search\s*=\s*['"]['"]/);
+  assert.match(utmTrackingScript, /url\.hash\s*=\s*['"]['"]/);
+});
+
 test('index.html loads only the required Poppins font weights', () => {
   const fontUrls = [...indexHtml.matchAll(/href="([^"]*fonts\.googleapis\.com\/css2[^"]*)"/g)]
     .map((match) => match[1])

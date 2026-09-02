@@ -4,8 +4,8 @@ import { trackTraks, currentPathname as currentTraksPathname } from './traks';
 
 interface GenerateLeadConversionEvent {
     eventId?: string;
-    destination: string;
-    utms?: Pick<LeadUtms, 'utm_source' | 'utm_medium' | 'utm_campaign'>;
+    destination?: string;
+    utms?: Partial<Pick<LeadUtms, 'utm_source' | 'utm_medium' | 'utm_campaign'>>;
     tracking?: Pick<LeadTracking, 'cid' | 'sid'>;
 }
 
@@ -26,7 +26,7 @@ export function pushGenerateLeadConversionEvent({
     window.dataLayer.push({
         event: 'generate_lead',
         event_id: eventId,
-        ...(isSafeTrackingValue(destination) ? { destination } : {}),
+        ...(destination !== undefined && isSafeTrackingValue(destination) ? { destination } : {}),
         utm_source: utms?.utm_source,
         utm_medium: utms?.utm_medium,
         utm_campaign: utms?.utm_campaign,

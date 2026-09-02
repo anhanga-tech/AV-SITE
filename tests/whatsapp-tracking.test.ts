@@ -172,7 +172,7 @@ test('getTrackingDataObject gera um cid próprio quando não existe cookie _ga (
 });
 
 function withTrackingEnv(
-    opts: { search?: string; storedTrackingData?: Record<string, string> },
+    opts: { search?: string; storedTrackingData?: Record<string, unknown>; cookieData?: string },
     run: (getTracking: () => ReturnType<typeof getTrackingDataObject>) => void,
 ): void {
     const originalWindow = Object.getOwnPropertyDescriptor(globalThis, 'window');
@@ -191,7 +191,7 @@ function withTrackingEnv(
     });
     Object.defineProperty(globalThis, 'document', {
         configurable: true,
-        value: { cookie: '' },
+        value: { cookie: opts.cookieData ? `tracking_data=${encodeURIComponent(opts.cookieData)}` : '' },
     });
     Object.defineProperty(globalThis, 'sessionStorage', {
         configurable: true,
@@ -274,6 +274,18 @@ test('getTrackingDataObject revalida PII vinda de sessionStorage (segundo coleto
                 undefined,
                 'e-mail gravado no storage por outro coletor deve ser descartado na leitura',
             );
+        },
+    );
+});
+
+test('getTrackingDataObject ignora valores não textuais vindos de sessionStorage', () => {
+    withTrackingEnv(
+        { storedTrackingData: { utm_source: 123, cid: null, utm_campaign: 'promo' } },
+        (getTracking) => {
+            const tracking = getTracking();
+            assert.equal(tracking?.utm_source, undefined);
+            assert.match(tracking?.cid ?? '', /^\d+\.\d+$/, 'cid inválido no storage deve ser substituído por um cid próprio');
+            assert.equal(tracking?.utm_campaign, 'promo');
         },
     );
 });
@@ -361,4 +373,19 @@ test('getTrackingDataObject preserva atribuição do cookie de 30 dias numa aba 
         if (originalSessionStorage) Object.defineProperty(globalThis, 'sessionStorage', originalSessionStorage);
         else Reflect.deleteProperty(globalThis, 'sessionStorage');
     }
+});
+
+// Regressão (achado de review, chatgpt-codex-connector[bot], P2): o formato legado
+// separado por vírgulas truncava valores válidos como "summer,retargeting" e podia
+// interpretar trechos do valor como novos campos. O formato JSON precisa preservar
+// esses valores sem perder compatibilidade com o cookie legado testado acima.
+test('getTrackingDataObject preserva vírgulas em valores do cookie de atribuição', () => {
+    withTrackingEnv(
+        { cookieData: JSON.stringify({ utm_source: 'google', utm_campaign: 'summer,retargeting' }) },
+        (getTracking) => {
+            const tracking = getTracking();
+            assert.equal(tracking?.utm_source, 'google');
+            assert.equal(tracking?.utm_campaign, 'summer,retargeting');
+        },
+    );
 });

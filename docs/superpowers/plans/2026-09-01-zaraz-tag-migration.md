@@ -262,7 +262,14 @@ Removidos: variável `gtmLoaded`, função `loadGtm` inteira (incluindo o `windo
 
 `tests/index-third-party-scripts.test.ts`: substituído o teste que exigia o loader do Stape por um `doesNotMatch` (padrão Mautic/HubSpot) checando `gtmLoaded`/`loadGtm`/`sst.anhanga.tur.br`/`'gtm.start'`; removidos os dois testes que verificavam comportamento específico do `loadGtm` (gate de host) e do preconnect/dns-prefetch dos hosts sGTM (não fazem mais sentido, o host não é mais referenciado). `playwright.config.ts`/`tests/playwright-safety.test.ts` mantidos como estavam — os `MAP ... ~NOTFOUND` dos hosts do Stape ficam como defesa em profundidade, mesmo padrão adotado pro HubSpot na remoção de set/2026.
 
-- [ ] **Step 3: Rodar a suíte completa** — **não executado neste sandbox (sem Node)**, só revisão manual linha a linha. Rodar antes do merge:
+- [x] **Step 3: Rodar a suíte completa** (executado localmente em 02/09/2026 com Node 18.19.1 e Web Crypto experimental; o projeto declara Node >=24):
+
+  - Testes focados da PR: **66/66 passaram** (`chat-lead-form-traks`, `generate-lead-analytics`, `whatsapp-tracking`, `index-third-party-scripts`).
+  - Suíte completa: **1.134/1.137 passaram**; os 3 restantes são falhas fora do escopo desta PR em `consent`, `optimize-r2-images` e `playwright-safety` sob o fallback npm/Node 18. Revalidar no Node 24 da CI.
+  - ESLint direto nos arquivos TS/TSX alterados: passou. `git diff --check` e `node --check public/utm-tracking.js`: passaram.
+  - `pnpm typecheck`/build e React Doctor não foram reproduzidos neste runtime: o Node local é incompatível com as versões atuais; o check React Doctor já existente na PR passou com score 100/100.
+
+Rodar no ambiente oficial antes do merge:
 
 ```bash
 pnpm test:regression
@@ -325,6 +332,13 @@ Teste de regressão adicionado pros 3 achados novos em `tests/whatsapp-tracking.
 3. **Duplicatas confirmadas:** o falso negativo de celular sem formatação (achado 2 da 5ª rodada) e a data desatualizada da política (achado 4 da 5ª rodada) foram relevantados por `claude[bot]` em `b649f39`/revisões seguintes antes de `274fdee` corrigir os dois — mesma correção, sem trabalho adicional.
 
 Teste de regressão adicionado em `tests/form-analytics.test.ts` (valor de PII com nome de chave inócuo) e novo arquivo `tests/generate-lead-analytics.test.ts` (destination com e-mail/telefone omitido, demais campos preservados).
+
+**Correções pós-CI/review (02/09/2026):**
+1. `destination` passou a ser opcional no evento `generate_lead`; o filtro agora omite o campo quando ausente, sem lançar exceção nos fluxos que recebem payload parcial. A tipagem de UTMs também aceita campos parciais, refletindo o payload real.
+2. O cookie `tracking_data` passou a usar JSON, preservando vírgulas dentro de valores de campanha; o parser legado continua aceito para cookies de deployments anteriores. A leitura de `sessionStorage` agora aceita somente valores string não vazios e revalida PII.
+3. A política de privacidade e o RIPD passaram a declarar a retenção de até 2 anos do `anhanga_ga_cid`, sua natureza pseudonimizada e a possível associação ao CRM; a pendência de validação jurídica/DPO permanece explícita.
+4. O coletor estático passou a enviar `page_location` sem query string/hash, evitando PII em eventos de clique; uma asserção estática impede o retorno da URL crua.
+5. Testes adicionados para `destination` ausente, cookie JSON com vírgula e valores não textuais no `sessionStorage`.
 
 - [ ] **Step 5: Monitorar por 3–7 dias pós-corte** — pendente, só possível depois do merge e deploy em produção.
 
