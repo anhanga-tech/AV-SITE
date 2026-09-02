@@ -49,7 +49,13 @@ export function currentPageLocation(): string | undefined {
   try {
     const url = new URL(window.location.href);
     for (const key of Array.from(url.searchParams.keys())) {
-      if (SENSITIVE_QUERY_KEYS.test(key)) {
+      const value = url.searchParams.get(key);
+      // SENSITIVE_QUERY_KEYS só cobre nomes de parâmetro que parecem sensíveis — um
+      // ?utm_content=alice@example.com passa incólume porque "utm_content" não bate
+      // nesse regex, mesmo com um e-mail de verdade no valor (achado de review,
+      // chatgpt-codex-connector[bot]). Checar o valor com isSafeTrackingValue cobre
+      // esse caso independente do nome do parâmetro.
+      if (SENSITIVE_QUERY_KEYS.test(key) || (value !== null && !isSafeTrackingValue(value))) {
         url.searchParams.set(key, 'redacted');
       }
     }

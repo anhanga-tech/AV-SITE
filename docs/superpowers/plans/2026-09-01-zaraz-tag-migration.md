@@ -319,6 +319,13 @@ RIPD bumped pra **v1.9**: Stape substituído por Cloudflare Zaraz nas Atividades
 
 Teste de regressão adicionado pros 3 achados novos em `tests/whatsapp-tracking.test.ts`, incluindo uma guarda explícita pro `GOOGLE_ADS_CONVERSION_ID` do achado 2 não voltar a ser um falso positivo.
 
+**Sexta rodada de review (ambos os bots, 02/09/2026 — 2 achados novos reais e corrigidos, 2 duplicatas das mesmas correções acima):**
+1. **P1 (chatgpt-codex-connector[bot]) — `page_location` de eventos de form analytics vazava PII em parâmetros com nome inócuo.** `currentPageLocation` (`utils/formAnalytics.ts`) só redigia um parâmetro de query quando o NOME parecia sensível (`SENSITIVE_QUERY_KEYS`); um `?utm_content=alice@example.com` (nome "inocente", valor com e-mail) passava incólume no `page_location` de **todo** evento de form analytics, sem o scrubber que a Stape oferecia. Corrigido: checa também o valor com `isSafeTrackingValue`, independente do nome do parâmetro.
+2. **P1 (chatgpt-codex-connector[bot]) — a afirmação "`generate_lead` confirmado sem PII" (Task 4, RIPD) estava incompleta.** `pushGenerateLeadConversionEvent` (`utils/generate-lead-analytics.ts`) espalhava o campo `destination` — texto livre digitado pelo usuário, que pode conter um e-mail/telefone colado por conta própria — sem nenhum filtro, direto pro dataLayer que o Zaraz encaminha ao GA4. Corrigido com `isSafeTrackingValue`, mesmo padrão dos achados anteriores. RIPD (2.6 e a tabela de pendências) atualizado pra não presumir mais o evento como "confirmado sem PII" sem essa correção.
+3. **Duplicatas confirmadas:** o falso negativo de celular sem formatação (achado 2 da 5ª rodada) e a data desatualizada da política (achado 4 da 5ª rodada) foram relevantados por `claude[bot]` em `b649f39`/revisões seguintes antes de `274fdee` corrigir os dois — mesma correção, sem trabalho adicional.
+
+Teste de regressão adicionado em `tests/form-analytics.test.ts` (valor de PII com nome de chave inócuo) e novo arquivo `tests/generate-lead-analytics.test.ts` (destination com e-mail/telefone omitido, demais campos preservados).
+
 - [ ] **Step 5: Monitorar por 3–7 dias pós-corte** — pendente, só possível depois do merge e deploy em produção.
 
 ---

@@ -103,9 +103,10 @@ Sem essa análise, decisões de investimento em tráfego pago seriam baseadas em
 - [x] Retenção de 14 meses configurada no painel GA4
 - [x] DPA assinado com Google LLC
 - [ ] **Pendente:** confirmar com o DPO se o DPA já existente com a Cloudflare (processor de hospedagem) cobre explicitamente o uso do Zaraz, ou se é necessário aditivo/DPA específico — não tratar como coberto até essa confirmação
-- [ ] **Pendente:** auditar se algum evento rastreado hoje carrega PII (e-mail/telefone) sem necessidade — o evento `generate_lead` foi confirmado sem PII (Task 4), os demais ~15 eventos do site não foram auditados individualmente para este RIPD
+- [ ] **Pendente:** auditar se algum evento rastreado hoje carrega PII (e-mail/telefone) sem necessidade — os ~15 eventos do site além dos já auditados (ver itens abaixo) não foram auditados individualmente para este RIPD
 - [x] **Corrigido (01/09/2026, achado de review):** `utils/whatsapp.ts` aceitava qualquer valor de UTM/`hsa_*` da URL sem validação e espalhava tudo no evento `tracking_data_captured`, que o Zaraz encaminha ao GA4 sem scrubbing (o Stape tinha esse scrubber, o Zaraz não tem equivalente conhecido) — um link malicioso com e-mail/telefone num parâmetro UTM vazaria PII pro GA4. Corrigido: valores com formato de e-mail/telefone são rejeitados antes de entrar no tracking (`utils/piiRedaction.ts`, reaproveitado de `utils/formAnalytics.ts`)
-- [ ] **Pendente:** essa validação cobre o vetor concreto identificado (parâmetros de URL), mas não é um scrubber genérico como o da Stape — outros campos ou fontes de dado adicionados no futuro precisam da mesma checagem manual, não há uma rede de segurança automática
+- [x] **Corrigido (02/09/2026, achado de review, chatgpt-codex-connector[bot]):** a afirmação de que `generate_lead` foi "confirmado sem PII" (Task 4) estava incompleta — `pushGenerateLeadConversionEvent` (`utils/generate-lead-analytics.ts`) espalhava o campo `destination` (texto livre digitado pelo usuário, que pode conter um e-mail/telefone colado por conta própria) sem nenhum filtro. Corrigido com `isSafeTrackingValue`, mesmo padrão do item acima. Na mesma rodada, `currentPageLocation` (`utils/formAnalytics.ts`) só redigia parâmetros de query cujo NOME parecia sensível — um `?utm_content=alice@example.com` (nome inócuo, valor com PII) passava incólume no `page_location` de todo evento de form analytics. Corrigido pra checar também o valor.
+- [ ] **Pendente:** essas validações cobrem os vetores concretos identificados (parâmetros de URL, campo de destino livre, page_location), mas não são um scrubber genérico como o da Stape — outros campos ou fontes de dado adicionados no futuro precisam da mesma checagem manual, não há uma rede de segurança automática
 
 ---
 
@@ -319,7 +320,7 @@ O balancing test favorece o legítimo interesse nas Atividades 1, 2 e 3. A Ativi
 | # | Ação | Responsável | Prazo sugerido | Status |
 |---|---|---|---|---|
 | 1 | ~~Implantar e configurar Stape.io (sGTM)~~ | Dev | 30 dias | ⚠️ Obsoleto (v1.9) — Stape desativado 31/08/2026, substituído pelo Zaraz |
-| 2 | Validar ausência de PII nos eventos rastreados pelo Zaraz (equivalente ao antigo item de request logs do sGTM) | Dev + Felipe (DPO) | 30 dias | Parcial — `generate_lead` confirmado sem PII (Task 4); demais eventos não auditados individualmente |
+| 2 | Validar ausência de PII nos eventos rastreados pelo Zaraz (equivalente ao antigo item de request logs do sGTM) | Dev + Felipe (DPO) | 30 dias | Parcial — vetores concretos corrigidos em `generate_lead`/`tracking_data_captured`/`page_location` (ver 2.6); demais eventos não auditados individualmente |
 | 3 | Reduzir retenção GA4 para 14 meses no painel | Felipe (DPO) | 30 dias | Pendente |
 | 4 | ~~Assinar DPA com Stape OÜ~~ | Felipe (DPO) | 30 dias | ⚠️ Obsoleto (v1.9) — confirmar com o DPO se o DPA já existente com a Cloudflare (processor de hospedagem) cobre o uso do Zaraz |
 | 5 | Implementar banner de cookies condicionando `initializeTracking()` | Dev | Issue #782 | ✅ Concluído |
