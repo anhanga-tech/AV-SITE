@@ -62,11 +62,6 @@ test('index.html não define mais o wrapper gtag (nada mais chama gtag() desde o
   // essa chamada foi removida (getGACid agora gera seu próprio cid — ver
   // tests/whatsapp-tracking.test.ts), então o stub virou código morto.
   assert.doesNotMatch(indexHtml, /function\s+gtag\s*\(\)/, 'wrapper gtag morto não deve mais existir');
-  assert.doesNotMatch(
-    utmTrackingScript,
-    /gtag\(\s*['"]get['"]/,
-    'o UTM tracker não deve mais depender de gtag para o client_id do GA4',
-  );
 });
 
 test('UTM tracker respeita o opt-out data-no-specialist-cta antes de disparar specialist_cta_click', () => {
