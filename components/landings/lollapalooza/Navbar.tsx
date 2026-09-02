@@ -5,8 +5,6 @@ import { WAITLIST_SECTION_ID } from './constants';
 import { BRAND_LOGO_BLUE_URL } from '../../../lib/media-assets';
 import { useScrolled } from '../../Header/useScrolled';
 
-const SITE_URL = 'https://www.anhanga.tur.br';
-
 /**
  * Navbar com links de WhatsApp incluindo parâmetros de tracking.
  * Usa getWhatsAppLink() para capturar automaticamente UTMs, gclid, fbclid, ttclid, cid.
@@ -23,7 +21,7 @@ const Navbar: React.FC = () => {
     <nav className={`fixed w-full z-50 transition-[padding,background-color,box-shadow] duration-300 ${scrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'}`} aria-label="Menu principal">
       <div className="container mx-auto px-4 flex justify-between items-center">
         {/* Logo */}
-        <a href={`${SITE_URL}/`} className="flex items-center" aria-label="Anhangá Viagens - Página Inicial">
+        <a href="/" className="flex items-center" aria-label="Anhangá Viagens - Página Inicial">
           <img
             src={logoUrl}
             alt="Anhangá Viagens"

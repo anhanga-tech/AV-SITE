@@ -2,7 +2,7 @@ import React, { useCallback, useId, useRef, useState } from 'react';
 import { CaretDown } from '@phosphor-icons/react';
 import { getBlogHomeUrl } from '@/utils/blog';
 
-import { NAV_LINKS, SITE_URL, type HeaderSubLink } from './headerConfig';
+import { NAV_LINKS, type HeaderSubLink } from './headerConfig';
 
 type NavClickHandler = (event: React.MouseEvent<HTMLAnchorElement>, targetId: string) => void;
 
@@ -31,7 +31,7 @@ function isPageLink(href: string) {
 }
 
 function buildSectionHref(href: string, isHome: boolean) {
-  return isHome ? `#${href}` : `${SITE_URL}/#${href}`;
+  return isHome ? `#${href}` : `/#${href}`;
 }
 
 // O submenu abria apenas por `group-hover`/`focus-within`. Como o painel fica
@@ -93,7 +93,7 @@ function NavDropdown({ link, isHome, navTextClass, onNavClick }: NavDropdownProp
         <div className="rounded-md border border-zinc-100 bg-white py-2 shadow-lg">
           {link.subLinks.map((subLink) => {
             const href = isPageLink(subLink.href)
-              ? `${SITE_URL}${subLink.href}`
+              ? subLink.href
               : buildSectionHref(subLink.href, isHome);
 
             return (
@@ -183,7 +183,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({
         if (link.subLinks) {
           return link.subLinks.map((subLink) => {
             const href = isPageLink(subLink.href)
-              ? `${SITE_URL}${subLink.href}`
+              ? subLink.href
               : buildSectionHref(subLink.href, isHome);
 
             return (

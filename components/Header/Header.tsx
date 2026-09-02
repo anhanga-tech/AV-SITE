@@ -3,7 +3,6 @@ import { useLocation } from 'react-router-dom';
 import { List, X, Phone } from '@phosphor-icons/react';
 import { openContactModal } from '../../utils/contactForm';
 import { DesktopNavigation, MobileNavigationMenu } from './HeaderNavigation';
-import { SITE_URL } from './headerConfig';
 import { BRAND_LOGO_BLUE_URL, BRAND_LOGO_WHITE_URL } from '../../lib/media-assets';
 import { useScrolled } from './useScrolled';
 import { useHeaderStyles } from './useHeaderStyles';
@@ -83,7 +82,7 @@ const Header: React.FC = () => {
       </a>
       <div className="container mx-auto px-6 flex justify-between items-center">
         <a
-          href={`${SITE_URL}/`}
+          href="/"
           className="flex items-center gap-2 group rounded-lg p-1 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2"
           aria-label="Anhangá Viagens - Ir para o topo"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
@@ -109,7 +108,7 @@ const Header: React.FC = () => {
 
           <div className="hidden md:block">
             <a
-              href={isHome ? '#contato' : `${SITE_URL}/#contato`}
+              href={isHome ? '#contato' : '/#contato'}
               aria-label="Fale Conosco"
               data-testid="desktop-fale-conosco-btn"
               data-tracking="navbar-desktop"

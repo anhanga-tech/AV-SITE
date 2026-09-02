@@ -4,24 +4,22 @@ import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { getAllPosts } from '../lib/mdx';
 import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 
-const SITE_URL = 'https://www.anhanga.tur.br';
-
 const CORE_LINKS = [
-  { to: `${SITE_URL}/`, label: 'Agência de Viagens em São Paulo' },
-  { to: `${SITE_URL}/sobre/`, label: 'Sobre a Anhangá Viagens' },
+  { to: '/', label: 'Agência de Viagens em São Paulo' },
+  { to: '/sobre/', label: 'Sobre a Anhangá Viagens' },
   { to: getBlogHomeUrl(), label: 'Blog de Viagens e Roteiros', external: true },
-  { to: `${SITE_URL}/orlando/`, label: 'Pacotes para Orlando' },
-  { to: `${SITE_URL}/parques-brasil/`, label: 'Parques do Brasil: qual escolher' },
-  { to: `${SITE_URL}/beto-carrero/`, label: 'Pacote Beto Carrero' },
-  { to: `${SITE_URL}/melhor-idade/`, label: 'Viagens para Melhor Idade' },
-  { to: `${SITE_URL}/lollapalooza/`, label: 'Lollapalooza Brasil' },
-  { to: `${SITE_URL}/consultoria-de-viagem/`, label: 'Consultoria de Viagem Personalizada' },
-  { to: `${SITE_URL}/cruzeiros/`, label: 'Cruzeiros pelo Brasil' },
-  { to: `${SITE_URL}/corporativo/`, label: 'Viagens Corporativas' },
-  { to: `${SITE_URL}/quiz/`, label: 'Quiz: Descubra Seu Destino Ideal' },
-  { to: `${SITE_URL}/termos-de-uso/`, label: 'Termos de Uso' },
-  { to: `${SITE_URL}/politica-privacidade/`, label: 'Política de Privacidade' },
-  { to: `${SITE_URL}/exclusao-de-dados/`, label: 'Exclusão de Dados' }
+  { to: '/orlando/', label: 'Pacotes para Orlando' },
+  { to: '/parques-brasil/', label: 'Parques do Brasil: qual escolher' },
+  { to: '/beto-carrero/', label: 'Pacote Beto Carrero' },
+  { to: '/melhor-idade/', label: 'Viagens para Melhor Idade' },
+  { to: '/lollapalooza/', label: 'Lollapalooza Brasil' },
+  { to: '/consultoria-de-viagem/', label: 'Consultoria de Viagem Personalizada' },
+  { to: '/cruzeiros/', label: 'Cruzeiros pelo Brasil' },
+  { to: '/corporativo/', label: 'Viagens Corporativas' },
+  { to: '/quiz/', label: 'Quiz: Descubra Seu Destino Ideal' },
+  { to: '/termos-de-uso/', label: 'Termos de Uso' },
+  { to: '/politica-privacidade/', label: 'Política de Privacidade' },
+  { to: '/exclusao-de-dados/', label: 'Exclusão de Dados' }
 ];
 
 const SiteMap: React.FC = () => {

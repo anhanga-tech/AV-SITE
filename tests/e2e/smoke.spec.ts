@@ -92,10 +92,11 @@ test.describe('Smoke Suite', () => {
 
     const href = await contactLink.getAttribute('href');
 
-    // Memory 27 says: Header component uses a conditional href that prepends
-    // the absolute SITE_URL when isHome is false.
-    // So we expect it to be an absolute URL or at least start with /
-    expect(href).toMatch(/^https?:\/\/.*\/#contato$/);
+    // Relativo de propósito (achado de review no PR #1572): este link não tem
+    // preventDefault fora da home, então antes navegava de verdade pra produção
+    // a cada rodada deste teste no CI — clicando abaixo. Absoluto era exatamente
+    // o vazamento local→produção que aquele PR eliminou.
+    expect(href).toBe('/#contato');
 
     await contactLink.click();
 
