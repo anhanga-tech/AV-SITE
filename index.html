@@ -162,12 +162,16 @@
       // hardcodar. Resolve o ID em runtime batendo o nome contra
       // window.zaraz.consent.purposes (achado em produção 02/09/2026: consent.set({marketing:true})
       // lançava "Unknown purpose id: marketing" — Meta/TikTok nunca recebiam o consentimento).
+      // Shape de `name` confirmado direto em produção (não documentado pela Cloudflare):
+      // objeto localizado `{ en, pt }`. Mantém um fallback pra string simples caso o
+      // dashboard mude isso um dia — mais barato que reintroduzir a mesma falha silenciosa.
       var resolveMarketingPurposeId = function () {
         var purposes = window.zaraz.consent.purposes;
         if (!purposes) return null;
         for (var id in purposes) {
           if (!Object.prototype.hasOwnProperty.call(purposes, id)) continue;
           var name = purposes[id] && purposes[id].name;
+          if (name === MARKETING_PURPOSE_NAME) return id;
           if (name && (name.en === MARKETING_PURPOSE_NAME || name.pt === MARKETING_PURPOSE_NAME)) return id;
         }
         return null;
@@ -198,7 +202,15 @@
         var attempts = 0;
         var retryTimer = setInterval(function () {
           attempts += 1;
-          if (flushZarazConsent() || attempts >= 20) clearInterval(retryTimer);
+          var flushed = flushZarazConsent();
+          if (flushed || attempts >= 20) {
+            clearInterval(retryTimer);
+            // Esgotar sem sucesso aqui é silencioso por natureza (não há exceção pra
+            // callConsentListener capturar) — sem este log, uma regressão no matching de
+            // resolveMarketingPurposeId (purpose renomeada, shape de `name` mudou) passaria
+            // despercebida, que é exatamente a classe de bug que esta ponte existe pra evitar.
+            if (!flushed) console.error('Anhangá consent bridge: esgotou os retries sem sincronizar consentimento com o Zaraz (purpose "marketing" não encontrada, ou zaraz.js nunca carregou)');
+          }
         }, 500);
       });
 
@@ -216,8 +228,10 @@
         var attempts = 0;
         var waitTimer = setInterval(function () {
           attempts += 1;
-          if (flushZarazConsent() || attempts >= 6) {
+          var flushed = flushZarazConsent();
+          if (flushed || attempts >= 6) {
             clearInterval(waitTimer);
+            if (!flushed) console.error('Anhangá consent bridge: recarregando sem sincronizar a revogação com o Zaraz (mesmo motivo do retry de aceite, ver flushZarazConsent)');
             window.location.reload();
           }
         }, 200);
