@@ -48,7 +48,7 @@ Atividades baseadas em **consentimento** de baixo risco — como cookies de publ
 
 | Campo | Detalhe |
 |---|---|
-| **Dados tratados** | Pageviews, eventos de clique, tempo de sessão, scroll depth, origem do tráfego, tipo de dispositivo/navegador; GA4 Client ID anonimizado — **atualizado 01/09/2026 (achado de review):** como nenhum script do Google roda mais no navegador (Stape/GTM removidos), o site gera e persiste seu próprio identificador first-party (cookie `anhanga_ga_cid`, 2 anos, mesmo formato do antigo `_ga`) quando esse cookie não existe, evitando que visitantes novos fiquem sem client ID e quebrem a correlação de conversão no GA4 |
+| **Dados tratados** | Pageviews, eventos de clique, tempo de sessão, scroll depth, origem do tráfego, tipo de dispositivo/navegador; GA4 Client ID **pseudonimizado, não anônimo — corrigido 02/09/2026 (achado de review, chatgpt-codex-connector[bot] + claude[bot]):** como nenhum script do Google roda mais no navegador (Stape/GTM removidos), o site gera e persiste seu próprio identificador first-party (cookie `anhanga_ga_cid`, 2 anos, mesmo formato do antigo `_ga`) quando esse cookie não existe, evitando que visitantes novos fiquem sem client ID e quebrem a correlação de conversão no GA4. Esse cid é gravado em `x_ga_client_id` no mesmo registro `crm.lead`/`res.partner` que contém e-mail e telefone do lead (`lib/odoo-lead-mapping.ts`) especificamente para correlação cross-sistema CRM ↔ GA4 — é um identificador pseudonimizado persistente, não um dado anônimo |
 | **Titulares** | Visitantes do site `www.anhanga.tur.br` |
 | **Operadores** | Cloudflare, Inc. (Zaraz — server-side tagging; já processor da Anhangá via Cloudflare Pages) → Google LLC (Google Analytics 4, EUA) |
 | **Arquitetura** | Browser → Cloudflare Zaraz (edge) com supressão de IP (`hideOriginalIP` na tool GA4, validado — Task 2) → GA4 (Google, EUA) |
@@ -70,7 +70,7 @@ Sem essa análise, decisões de investimento em tráfego pago seriam baseadas em
 
 **É necessário?** Sim. Não existe alternativa igualmente eficaz que não envolva algum nível de coleta de dados de navegação.
 
-**É proporcional?** Sim. Com a adoção do Cloudflare Zaraz, o IP é suprimido (`hideOriginalIP`) **antes** do dado chegar ao Google. O GA4 recebe apenas eventos comportamentais anonimizados, sem identificador pessoal direto.
+**É proporcional?** Sim. Com a adoção do Cloudflare Zaraz, o IP é suprimido (`hideOriginalIP`) **antes** do dado chegar ao Google. O GA4 recebe eventos comportamentais associados a um identificador pseudonimizado (GA Client ID, ver 2.1), não a um identificador pessoal direto (nome, e-mail, telefone) — a supressão de IP reduz o risco de re-identificação por endereço, mas não torna o Client ID anônimo.
 
 **Poderia ser alcançado de forma menos invasiva?** A retenção foi reduzida de 26 para **14 meses**, suficiente para análises de tendência anuais sem manter dados além do necessário.
 

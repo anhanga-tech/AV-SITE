@@ -170,3 +170,110 @@ test('getTrackingDataObject gera um cid próprio quando não existe cookie _ga (
         else Reflect.deleteProperty(globalThis, 'sessionStorage');
     }
 });
+
+function withTrackingEnv(
+    opts: { search?: string; storedTrackingData?: Record<string, string> },
+    run: (getTracking: () => ReturnType<typeof getTrackingDataObject>) => void,
+): void {
+    const originalWindow = Object.getOwnPropertyDescriptor(globalThis, 'window');
+    const originalDocument = Object.getOwnPropertyDescriptor(globalThis, 'document');
+    const originalSessionStorage = Object.getOwnPropertyDescriptor(globalThis, 'sessionStorage');
+
+    const search = opts.search ?? '';
+    const storedTrackingData = opts.storedTrackingData ?? null;
+
+    Object.defineProperty(globalThis, 'window', {
+        configurable: true,
+        value: {
+            dataLayer: [],
+            location: { search, hash: '', href: `https://example.com/${search}` },
+        },
+    });
+    Object.defineProperty(globalThis, 'document', {
+        configurable: true,
+        value: { cookie: '' },
+    });
+    Object.defineProperty(globalThis, 'sessionStorage', {
+        configurable: true,
+        value: {
+            getItem: (key: string) =>
+                key === 'anhanga_tracking_data' && storedTrackingData ? JSON.stringify(storedTrackingData) : null,
+            setItem: () => {},
+        },
+    });
+
+    try {
+        run(getTrackingDataObject);
+    } finally {
+        if (originalWindow) Object.defineProperty(globalThis, 'window', originalWindow);
+        else Reflect.deleteProperty(globalThis, 'window');
+        if (originalDocument) Object.defineProperty(globalThis, 'document', originalDocument);
+        else Reflect.deleteProperty(globalThis, 'document');
+        if (originalSessionStorage) Object.defineProperty(globalThis, 'sessionStorage', originalSessionStorage);
+        else Reflect.deleteProperty(globalThis, 'sessionStorage');
+    }
+}
+
+// Regressão (achado de review, claude[bot] + chatgpt-codex-connector[bot]): mergeUrlTrackingData
+// rejeita utm_*/hsa_* com formato de e-mail/telefone antes deste PR não tinha cobertura própria
+// — só a rejeição de identificadores no corpo do WhatsApp era testada, não a rejeição em si.
+test('getTrackingDataObject descarta utm_content/hsa_* com formato de e-mail ou telefone', () => {
+    withTrackingEnv(
+        { search: '?utm_source=google&utm_content=alice%40example.com&hsa_acc=%2B5511999999999' },
+        (getTracking) => {
+            const tracking = getTracking();
+            assert.equal(tracking?.utm_source, 'google', 'parâmetro seguro deve ser mantido');
+            assert.equal(tracking?.utm_content, undefined, 'e-mail em utm_content não deve ser capturado');
+            assert.equal(tracking?.hsa_acc, undefined, 'telefone em hsa_* não deve ser capturado');
+        },
+    );
+});
+
+// Regressão (achado de review, claude[bot], P1): isSafeTrackingValue rodava sobre o valor
+// já decodificado uma vez por URLSearchParams, mas appendDecodedTrackingValue (removida)
+// decodificava de novo antes de gravar — um e-mail com duplo encoding passava incólume
+// pelo check e só virava e-mail de verdade no segundo decode, depois de já aprovado.
+// URLSearchParams já decodifica uma vez; ?utm_content=%2565mail%2540example.com chega em
+// urlParams.get() como '%65mail%40example.com' (sem "@" literal, passa no EMAIL_PATTERN).
+// O bug era decodificar de novo depois do check; a correção é não decodificar mais — o
+// valor gravado fica como o texto ainda parcialmente encodado, nunca vira e-mail de verdade.
+test('getTrackingDataObject não decodifica utm_content de novo após o filtro de PII (fecha o bypass de duplo encoding)', () => {
+    withTrackingEnv({ search: '?utm_content=%2565mail%2540example.com' }, (getTracking) => {
+        const tracking = getTracking();
+        assert.equal(tracking?.utm_content, '%65mail%40example.com');
+        assert.notEqual(tracking?.utm_content, 'email@example.com', 'não deve virar e-mail de verdade');
+    });
+});
+
+// Regressão (achado de review, chatgpt-codex-connector[bot], P2): PHONE_PATTERN sozinho casa
+// qualquer sequência longa de dígitos, então IDs de campanha e datas puramente numéricos eram
+// descartados como se fossem telefone.
+test('getTrackingDataObject preserva utm_campaign numérico e datas ISO (não são telefone)', () => {
+    withTrackingEnv(
+        { search: '?utm_campaign=1234567890&utm_content=2026-09-01' },
+        (getTracking) => {
+            const tracking = getTracking();
+            assert.equal(tracking?.utm_campaign, '1234567890', 'ID numérico de campanha não deve ser descartado');
+            assert.equal(tracking?.utm_content, '2026-09-01', 'data ISO não deve ser descartada como telefone');
+        },
+    );
+});
+
+// Regressão (achado de review, chatgpt-codex-connector[bot], P1): public/utm-tracking.js grava
+// na mesma sessionStorage key (anhanga_tracking_data) sem aplicar isSafeTrackingValue — um
+// segundo coletor que bypassa o filtro adicionado a mergeUrlTrackingData. mergeStoredTrackingData
+// precisa revalidar no momento da leitura, já que não dá pra garantir que todo escritor filtre.
+test('getTrackingDataObject revalida PII vinda de sessionStorage (segundo coletor sem filtro)', () => {
+    withTrackingEnv(
+        { storedTrackingData: { utm_source: 'google', utm_content: 'alice@example.com' } },
+        (getTracking) => {
+            const tracking = getTracking();
+            assert.equal(tracking?.utm_source, 'google', 'valor seguro vindo do storage deve ser mantido');
+            assert.equal(
+                tracking?.utm_content,
+                undefined,
+                'e-mail gravado no storage por outro coletor deve ser descartado na leitura',
+            );
+        },
+    );
+});

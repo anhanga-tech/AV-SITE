@@ -144,12 +144,14 @@ function getSearchStringFromLocation(): string {
     return searchString;
 }
 
-function appendDecodedTrackingValue(trackingData: TrackingData, key: string, value: string): void {
-    try {
-        trackingData[key] = decodeURIComponent(value);
-    } catch {
-        trackingData[key] = value;
-    }
+// value já vem decodificado de URLSearchParams.get()/forEach() (que aplica um decode
+// percent-encoding completo por spec). Rodar decodeURIComponent de novo aqui abria um
+// bypass do isSafeTrackingValue acima: um valor duplamente encodado (ex.:
+// ?utm_content=%2565mail%2540example.com) passa no check com o texto ainda parcialmente
+// encodado ("%65mail%40example.com", sem "@" literal) e só vira e-mail de verdade num
+// segundo decode — que rodava aqui, depois do check (achado de review, claude[bot]).
+function appendTrackingValue(trackingData: TrackingData, key: string, value: string): void {
+    trackingData[key] = value;
 }
 
 function mergeStoredTrackingData(trackingData: TrackingData): void {
@@ -158,7 +160,14 @@ function mergeStoredTrackingData(trackingData: TrackingData): void {
         if (!stored) return;
 
         const parsed = JSON.parse(stored) as TrackingData;
-        Object.assign(trackingData, parsed);
+        // public/utm-tracking.js grava na mesma chave (anhanga_tracking_data) sem passar
+        // pelo isSafeTrackingValue de mergeUrlTrackingData — reaplicar o filtro aqui, no
+        // único ponto onde qualquer origem armazenada converge antes do dataLayer, cobre
+        // esse segundo coletor sem duplicar a regra em dois arquivos (achado de review,
+        // chatgpt-codex-connector[bot]: "validate on every storage read/write").
+        for (const [key, value] of Object.entries(parsed)) {
+            if (isSafeTrackingValue(value)) trackingData[key] = value;
+        }
     } catch {
         // Ignore storage failures
     }
@@ -177,14 +186,14 @@ function mergeUrlTrackingData(trackingData: TrackingData, urlParams: URLSearchPa
         const value = urlParams.get(param);
         if (!value || !isSafeTrackingValue(value)) return;
 
-        appendDecodedTrackingValue(trackingData, param, value);
+        appendTrackingValue(trackingData, param, value);
         foundInUrl = true;
     });
 
     urlParams.forEach((value, key) => {
         if (!key.startsWith(HSA_PREFIX) || !isSafeTrackingValue(value)) return;
 
-        appendDecodedTrackingValue(trackingData, key, value);
+        appendTrackingValue(trackingData, key, value);
         foundInUrl = true;
     });
 
