@@ -102,8 +102,8 @@ importers:
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.9.1(jiti@2.7.0))
       '@happy-dom/global-registrator':
-        specifier: ^20.11.6
-        version: 20.11.6
+        specifier: ^20.11.8
+        version: 20.11.8
       '@playwright/test':
         specifier: ^1.62.1
         version: 1.62.1
@@ -672,8 +672,8 @@ packages:
   '@hapi/topo@5.1.0':
     resolution: {integrity: sha512-foQZKJig7Ob0BMAYBfcJk8d77QtOe7Wo4ox7ff1lQYoNNAb6jwcY1ncdoy2e9wQZzvNy7ODZCYJkK8kzmcAnAg==}
 
-  '@happy-dom/global-registrator@20.11.6':
-    resolution: {integrity: sha512-ZQ47qUTeNbGhHkCGExJ1oZhruoxKRaxO44RgFETl3T4c1rRxIBlAOnM3SAH4XHu7Ue2owJXP+jOx1vOuKuxcSg==}
+  '@happy-dom/global-registrator@20.11.8':
+    resolution: {integrity: sha512-lkgRN26nWeYCsoron3bup+egcmpUTV3VsLS/d4rDyo/hwKivUIl8mkLtuk+sVaIdPZUpGFzcdOpt/1CPaW5Bpg==}
     engines: {node: '>=20.0.0'}
 
   '@humanfs/core@0.19.2':
@@ -3459,8 +3459,8 @@ packages:
     engines: {node: '>=0.4.7'}
     hasBin: true
 
-  happy-dom@20.11.6:
-    resolution: {integrity: sha512-Hldbg8AdAa5a5oDcZpjqnGitp7JB0hqWmfv/8qr+kft4vzSD8BHsbdRfzYvL/0QcbKcURC/yyoygbeDQarPvYg==}
+  happy-dom@20.11.8:
+    resolution: {integrity: sha512-TeAoM8pTDKNVcP5z3MptRTb7UH9q126GrjTFOgormgA19tmT30JTiIxb1CVXs7xljpItypUp/yHSPFD4QRHMsQ==}
     engines: {node: '>=20.0.0'}
 
   has-bigints@1.1.0:
@@ -6425,10 +6425,10 @@ snapshots:
     dependencies:
       '@hapi/hoek': 9.3.0
 
-  '@happy-dom/global-registrator@20.11.6':
+  '@happy-dom/global-registrator@20.11.8':
     dependencies:
       '@types/node': 26.3.0
-      happy-dom: 20.11.6
+      happy-dom: 20.11.8
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -9136,7 +9136,7 @@ snapshots:
     optionalDependencies:
       uglify-js: 3.19.3
 
-  happy-dom@20.11.6:
+  happy-dom@20.11.8:
     dependencies:
       '@types/node': 26.3.0
       '@types/whatwg-mimetype': 3.0.2
