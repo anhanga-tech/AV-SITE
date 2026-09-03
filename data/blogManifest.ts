@@ -2,6 +2,214 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
+    "title": "Epic Universe em Orlando: vale a pena em 2026?",
+    "excerpt": "O Epic Universe já mudou a divisão de dias em Orlando. Veja o que o parque entrega, para quem vale a pena e como encaixar a visita sem sacrificar Disney ou Universal.",
+    "date": "2026-09-22",
+    "author": "queila-oliveira",
+    "category": "Dicas de Expert",
+    "image": "https://media.anhanga.tur.br/images/blog/disney-tropical-americas-animal-kingdom.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Orlando",
+    "tags": [
+      "epic-universe",
+      "universal",
+      "orlando",
+      "super-nintendo-world",
+      "harry-potter",
+      "parques-tematicos",
+      "planejamento"
+    ],
+    "seoTitle": "Epic Universe em Orlando: vale a pena?",
+    "seoDescription": "Epic Universe em Orlando: entenda as áreas, para quem o parque vale a pena e como incluir a visita no roteiro com Disney e Universal em 2026.",
+    "faq": [
+      {
+        "question": "O Epic Universe já está aberto em Orlando?",
+        "answer": "Sim. O Epic Universe já faz parte do Universal Orlando Resort. A disponibilidade de ingressos, horários, atrações e eventuais exigências de data depende do produto comprado e do calendário oficial."
+      },
+      {
+        "question": "O Epic Universe substitui o Universal Studios ou o Islands of Adventure?",
+        "answer": "Não. É um parque adicional, com áreas e atrações próprias. A escolha entre visitar um, dois ou os três parques da Universal depende do tempo, do orçamento e das franquias prioritárias para o grupo."
+      },
+      {
+        "question": "Quantos dias preciso para conhecer o Epic Universe?",
+        "answer": "Reserve um dia inteiro se o parque for prioridade. Tentar encaixá-lo como meio período aumenta o risco de perder atrações, explorar as áreas com pressa e depender de filas menores do que as encontradas no dia."
+      },
+      {
+        "question": "O Epic Universe vale a pena para crianças pequenas?",
+        "answer": "Depende das alturas mínimas, das atrações escolhidas e do interesse da criança pelas áreas temáticas. Super Nintendo World pode atrair várias idades, mas o roteiro deve incluir pausas e não tratar o parque como obrigatório para toda família."
+      }
+    ],
+    "slug": "epic-universe-orlando-2026-vale-a-pena",
+    "readingTime": "7 min de leitura"
+  },
+  {
+    "title": "Quantos dias ficar em Orlando? Roteiro de 5 a 14 dias",
+    "excerpt": "Cinco dias podem bastar para uma primeira visita enxuta. Com 7, 10 ou 14 dias, o roteiro muda. Veja como distribuir parques, descanso e compras em Orlando.",
+    "date": "2026-09-15",
+    "author": "felipe-william",
+    "category": "Planejamento",
+    "image": "https://media.anhanga.tur.br/images/blog/quanto-custa-viagem-disney-2026.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Orlando",
+    "tags": [
+      "orlando",
+      "roteiro",
+      "quantos-dias",
+      "disney",
+      "universal",
+      "planejamento",
+      "viagem-em-familia"
+    ],
+    "seoTitle": "Quantos dias ficar em Orlando? Guia 2026",
+    "seoDescription": "Veja quantos dias ficar em Orlando para fazer Disney, Universal e Epic Universe sem transformar a viagem em uma corrida. Roteiros de 5 a 14 dias.",
+    "faq": [
+      {
+        "question": "Quantos dias são suficientes para conhecer Orlando?",
+        "answer": "Cinco dias permitem uma viagem enxuta, com escolhas claras. Para combinar os quatro parques da Disney com Universal e Epic Universe sem correr, 10 dias de viagem costumam dar mais espaço. O número ideal depende dos parques prioritários, da idade do grupo e de quantos dias sem parque a família quer ter."
+      },
+      {
+        "question": "Dá para fazer Disney e Universal em 7 dias?",
+        "answer": "Dá, mas o roteiro precisa ser seletivo. Uma divisão possível é quatro dias Disney e dois dias Universal, deixando um dia para descanso, compras ou chegada. Incluir os três parques temáticos da Universal em apenas dois dias exige aceitar que algumas atrações ficarão de fora."
+      },
+      {
+        "question": "Quantos dias de descanso colocar em Orlando?",
+        "answer": "Para famílias com crianças, um dia sem parque a cada dois ou três dias intensos costuma ser mais realista do que marcar parque em todos os dias. O descanso pode incluir piscina, compras leves, Disney Springs ou apenas uma manhã sem despertador."
+      },
+      {
+        "question": "Vale ficar 14 dias em Orlando?",
+        "answer": "Vale para quem quer combinar Disney, Universal, Epic Universe, parques aquáticos, compras e dias livres sem encadear tudo. Não é obrigatório visitar todos os parques; a viagem longa só faz sentido se o grupo realmente aproveitar o ritmo mais folgado."
+      }
+    ],
+    "slug": "quantos-dias-ficar-em-orlando-2026-roteiros",
+    "readingTime": "8 min de leitura"
+  },
+  {
+    "title": "Oktoberfest Blumenau 2026: guia para planejar a viagem",
+    "excerpt": "A Oktoberfest Blumenau 2026 acontece de 7 a 25 de outubro. Veja como escolher os dias, onde ficar, comprar ingresso e organizar o transporte.",
+    "date": "2026-09-10",
+    "author": "queila-oliveira",
+    "category": "Festivais",
+    "image": "https://media.anhanga.tur.br/images/destinations/gramado.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Oktoberfest Blumenau",
+    "tags": [
+      "oktoberfest",
+      "blumenau",
+      "santa-catarina",
+      "festivais",
+      "viagem",
+      "cultura"
+    ],
+    "seoTitle": "Oktoberfest Blumenau 2026: guia",
+    "seoDescription": "Oktoberfest Blumenau 2026: datas, escolha dos dias, hospedagem, ingressos, desfiles e cuidados para organizar a viagem.",
+    "faq": [
+      {
+        "question": "Quando acontece a Oktoberfest Blumenau 2026?",
+        "answer": "A 41ª edição acontece de 7 a 25 de outubro de 2026, no Parque Vila Germânica, em Blumenau, Santa Catarina."
+      },
+      {
+        "question": "A Oktoberfest Blumenau é só para quem gosta de cerveja?",
+        "answer": "Não. A festa também tem música, gastronomia, desfiles e manifestações da cultura germânica. O melhor dia depende do tipo de programação que você quer acompanhar."
+      },
+      {
+        "question": "Onde ficar para a Oktoberfest Blumenau?",
+        "answer": "Ficar em Blumenau reduz a dependência de deslocamentos longos depois da festa. Se a hospedagem estiver em outra cidade do Vale do Itajaí, confirme transporte de ida e volta antes de comprar o ingresso."
+      },
+      {
+        "question": "Crianças podem ir à Oktoberfest Blumenau?",
+        "answer": "O evento é para todas as idades, mas as regras de entrada e acompanhamento de menores devem ser conferidas na página oficial antes da viagem."
+      }
+    ],
+    "slug": "oktoberfest-blumenau-2026-guia-viagem",
+    "readingTime": "7 min de leitura"
+  },
+  {
+    "title": "Onde ficar em Orlando: qual região escolher",
+    "excerpt": "A melhor região para ficar em Orlando depende dos parques, do transporte e do ritmo da família. Compare Disney, Universal, International Drive e Kissimmee.",
+    "date": "2026-09-08",
+    "author": "felipe-william",
+    "category": "Planejamento",
+    "image": "https://media.anhanga.tur.br/images/blog/como-planejar-viagem-orlando-sob-medida.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Orlando",
+    "tags": [
+      "orlando",
+      "onde-ficar",
+      "hospedagem",
+      "disney",
+      "universal",
+      "planejamento",
+      "viagem-em-familia"
+    ],
+    "seoTitle": "Onde ficar em Orlando: qual região?",
+    "seoDescription": "Disney, Universal, International Drive ou Kissimmee? Compare localização, transporte e benefícios para escolher onde ficar em Orlando.",
+    "faq": [
+      {
+        "question": "Qual é a melhor região para ficar em Orlando?",
+        "answer": "Não existe uma região melhor para todo mundo. Quem fará principalmente Disney tende a ganhar tempo ficando em Lake Buena Vista ou em um hotel Disney. Quem prioriza Universal pode preferir um hotel do complexo ou uma área próxima. Para combinar os dois parques e controlar o orçamento, International Drive costuma ser um meio-termo prático."
+      },
+      {
+        "question": "É melhor ficar dentro da Disney ou fora?",
+        "answer": "Ficar dentro da Disney custa mais em muitos períodos, mas inclui transporte interno e dá acesso à entrada antecipada de 30 minutos para hóspedes elegíveis. Fora do complexo, a diária pode ser menor e o quarto maior, mas é preciso considerar carro, estacionamento ou transfer na conta."
+      },
+      {
+        "question": "Kissimmee é longe dos parques?",
+        "answer": "Depende do endereço. Kissimmee é uma área extensa: alguns hotéis ficam convenientes para a Disney, enquanto outros aumentam bastante o deslocamento até Universal e Epic Universe. Não escolha apenas pelo nome da cidade; confira o endereço e o trajeto até os parques que realmente entrarão no roteiro."
+      },
+      {
+        "question": "International Drive vale a pena para uma família?",
+        "answer": "Pode valer, especialmente para quem combinará Disney e Universal ou quer restaurantes, lojas e atrações por perto. A experiência muda muito de um hotel para outro, então verifique transporte, estacionamento, café da manhã, tamanho do quarto e taxas antes de comparar diárias."
+      }
+    ],
+    "slug": "onde-ficar-em-orlando-disney-universal-international-drive",
+    "readingTime": "8 min de leitura"
+  },
+  {
+    "title": "Rock in Rio 2026: guia para planejar sua viagem ao Rio",
+    "excerpt": "Vai ao Rock in Rio 2026? Veja datas, local, ingresso digital, hospedagem e como organizar a viagem sem deixar a logística para a última hora.",
+    "date": "2026-09-04",
+    "author": "felipe-william",
+    "category": "Festivais",
+    "image": "https://media.anhanga.tur.br/images/destinations/rio-de-janeiro.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Rock in Rio",
+    "tags": [
+      "rock-in-rio",
+      "rio-de-janeiro",
+      "festivais",
+      "musica",
+      "viagem",
+      "planejamento"
+    ],
+    "seoTitle": "Rock in Rio 2026: guia de viagem",
+    "seoDescription": "Rock in Rio 2026: confira datas, local, ingresso digital, hospedagem e os cuidados para organizar sua viagem ao Rio de Janeiro.",
+    "faq": [
+      {
+        "question": "Quando acontece o Rock in Rio 2026?",
+        "answer": "A edição brasileira acontece nos dias 4, 5, 6, 7, 11, 12 e 13 de setembro de 2026, na Cidade do Rock, no Parque Olímpico, na Barra da Tijuca, Rio de Janeiro."
+      },
+      {
+        "question": "O ingresso do Rock in Rio 2026 é digital?",
+        "answer": "Sim. O ingresso é digital e deve ser acessado pelo aplicativo Quentro, conforme as orientações oficiais. O QR Code é atualizado e não basta levar uma captura de tela ou impressão."
+      },
+      {
+        "question": "Onde ficar para ir ao Rock in Rio?",
+        "answer": "A Barra da Tijuca simplifica o deslocamento até o Parque Olímpico, mas pode ter diárias mais altas nos dias do festival. Hospedar-se em outras regiões do Rio pode funcionar, desde que o grupo organize o retorno e siga as orientações oficiais de transporte."
+      },
+      {
+        "question": "Quantos dias ficar no Rio para o Rock in Rio?",
+        "answer": "Para um único dia de festival, duas ou três noites costumam dar margem para chegada, evento e retorno. Quem vai a dois ou mais dias deve considerar uma hospedagem de quatro noites ou mais, conforme os horários dos shows e a origem do voo ou ônibus."
+      }
+    ],
+    "slug": "rock-in-rio-2026-guia-viagem-rio",
+    "readingTime": "7 min de leitura"
+  },
+  {
     "title": "Como Saber Quanto Investir na Sua Viagem dos Sonhos (Sem Surpresas no Cartão)",
     "excerpt": "O orçamento da viagem não começa no preço da passagem. Aprenda a separar custos obrigatórios, escolhas de conforto e uma reserva para voltar sem susto na fatura.",
     "date": "2026-08-11",
