@@ -170,7 +170,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   },
   {
     "title": "Rock in Rio 2026: checklist para quem vai ao festival",
-    "excerpt": "Já vai ao Rock in Rio 2026? Confira o Quentro, o ingresso do dia, a hospedagem e o transporte de volta para aproveitar os dias restantes do festival.",
+    "excerpt": "Checklist do Rock in Rio de 4 a 13 de setembro de 2026: ingresso no Quentro, documentos, hospedagem e transporte de volta da Cidade do Rock.",
     "date": "2026-09-05",
     "author": "felipe-william",
     "category": "Festivais",
@@ -187,7 +187,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "planejamento"
     ],
     "seoTitle": "Rock in Rio 2026: checklist do festival",
-    "seoDescription": "Vai aos dias restantes do Rock in Rio 2026? Confira ingresso no Quentro, documentos, hospedagem e transporte de volta antes de sair para a Cidade do Rock.",
+    "seoDescription": "Rock in Rio, de 4 a 13 de setembro de 2026: checklist de ingresso no Quentro, documentos, hospedagem e transporte para a Cidade do Rock.",
     "faq": [
       {
         "question": "Quando acontece o Rock in Rio 2026?",
