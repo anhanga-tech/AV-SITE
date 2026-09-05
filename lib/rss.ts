@@ -7,7 +7,7 @@ function toRfc822(isoDate: string): string {
   return new Date(`${isoDate}T12:00:00Z`).toUTCString();
 }
 
-export function renderRssFeed(posts: PostMeta[]): string {
+export function renderRssFeed(posts: PostMeta[], buildDate: Date = new Date()): string {
   const items = posts.map((post) => {
     const link = `${SITE_ORIGIN}/blog/${post.slug}/`;
     return [
@@ -31,7 +31,7 @@ export function renderRssFeed(posts: PostMeta[]): string {
     '    <description>Guias práticos de viagem para brasileiros: destinos, documentação, seguros, festivais, parques e roteiros personalizados.</description>',
     '    <language>pt-BR</language>',
     `    <atom:link href="${SITE_ORIGIN}/feed.xml" rel="self" type="application/rss+xml"/>`,
-    `    <lastBuildDate>${posts.length ? toRfc822(posts[0].dateModified ?? posts[0].date) : new Date().toUTCString()}</lastBuildDate>`,
+    `    <lastBuildDate>${buildDate.toUTCString()}</lastBuildDate>`,
     ...items,
     '  </channel>',
     '</rss>',

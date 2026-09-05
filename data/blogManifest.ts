@@ -3,7 +3,7 @@ import type { PostMeta } from '../types/blog';
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
     "title": "Epic Universe em Orlando: vale a pena em 2026?",
-    "excerpt": "O Epic Universe já mudou a divisão de dias em Orlando. Veja o que o parque entrega, para quem vale a pena e como encaixar a visita sem sacrificar Disney ou Universal.",
+    "excerpt": "Epic Universe em Orlando: veja para quem vale a pena, o que o parque oferece e como encaixar a visita no roteiro com Disney e Universal.",
     "date": "2026-09-22",
     "author": "queila-oliveira",
     "category": "Dicas de Expert",
