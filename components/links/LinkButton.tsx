@@ -1,7 +1,10 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { ArrowSquareOut } from '@phosphor-icons/react';
 import { getWhatsAppLink } from '../../utils/whatsapp';
 import { withTrackingParams, applyOriginToMessage, pushLinksPageClick } from '../../utils/linksTracking';
+import { openConsultoriaBooking, CONSULTORIA_BOOKING_URL } from '../../lib/cal-embed';
+import { openContactModal } from '../../utils/contactForm';
 import type { LinkItem } from '../../data/linksPage';
 import { ICON_MAP } from './linkIcons';
 
@@ -18,6 +21,15 @@ interface LinkButtonProps {
     search: string | null;
     /** classes extra (ex.: margem de ritmo na fronteira entre tiers) */
     className?: string;
+    /**
+     * Emblema circular Safira Profunda ao redor do ícone — reservado aos 4 destinos em
+     * destaque (LinksPage.tsx) para sinalizar "isto é curadoria", não a lista inteira.
+     * Sem tocar no vocabulário de sombra: hard shadow continua exclusiva de highlight/primary
+     * (ver `tierClasses`). Safira Profunda é a cor documentada em DESIGN.md para "superfícies
+     * que precisam de peso de marca sem a leveza do Céu Vivo" — o uso de badge é exatamente
+     * esse caso, não uma cor inventada para a ocasião.
+     */
+    iconBadge?: boolean;
 }
 
 // Slot de ícone com largura fixa garante que todos os rótulos alinhem na mesma coluna,
@@ -71,7 +83,7 @@ function warnMissingHref(item: LinkItem, fallback: string): void {
     }
 }
 
-export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className: extraClassName }) => {
+export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className: extraClassName, iconBadge }) => {
     const className = `${baseClasses} ${tierClasses(item)}${extraClassName ? ` ${extraClassName}` : ''}`;
     const IconComponent = item.icon ? ICON_MAP[item.icon] : undefined;
 
@@ -84,10 +96,24 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className:
         if (item.type === 'internal' && !item.href) warnMissingHref(item, '/');
     }, [item]);
 
-    const content = (
+    // `whatsapp`/`external` saem do site (app do WhatsApp ou domínio de terceiro); `internal`
+    // navega dentro da própria SPA. Sem esse sinal os três tipos renderizavam pixel-idênticos —
+    // quem tocava em "Calcular meu seguro viagem" caía sem aviso em go.nuvembr.com, indistinguível
+    // de um link quebrado. O glifo é decorativo (`aria-hidden`); quem depende de leitor de tela
+    // recebe o aviso pelo texto `sr-only` embutido no nome acessível do link.
+    const content = (opensInNewTab: boolean) => (
         <>
-            <span className="flex w-[24px] shrink-0 items-center justify-center" aria-hidden="true">
-                {IconComponent ? <IconComponent size={22} weight="fill" /> : null}
+            <span
+                className={
+                    iconBadge
+                        ? 'flex w-[36px] h-[36px] shrink-0 items-center justify-center rounded-full bg-anhanga-blue/10'
+                        : 'flex w-[24px] shrink-0 items-center justify-center'
+                }
+                aria-hidden="true"
+            >
+                {IconComponent ? (
+                    <IconComponent size={iconBadge ? 20 : 22} weight="fill" className={iconBadge ? 'text-anhanga-blue' : undefined} />
+                ) : null}
             </span>
             <span className="flex min-w-0 flex-1 flex-col">
                 {/* Sem `truncate`: `white-space: nowrap` cortava o rótulo com reticências em
@@ -98,15 +124,40 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className:
                     <span className="text-xs font-normal text-anhanga-darkBlue/80">{item.sublabel}</span>
                 ) : null}
             </span>
+            {opensInNewTab ? (
+                <>
+                    <span className="sr-only"> (abre em nova aba)</span>
+                    <span className="flex shrink-0 items-center" aria-hidden="true">
+                        <ArrowSquareOut size={16} weight="bold" className="text-anhanga-darkBlue/60" />
+                    </span>
+                </>
+            ) : null}
         </>
     );
 
     if (item.type === 'whatsapp') {
-        const href = getWhatsAppLink(applyOriginToMessage(item.whatsappMessage ?? '', search));
+        // Mesmo padrão do Header/CorpHero/Lollapalooza: o clique abre o ContactModal (nome +
+        // WhatsApp + e-mail → grava no CRM via /api/submit-contact → só então abre o WhatsApp,
+        // com a mensagem estruturada deste item como pré-preenchimento). `href` real para
+        // progressive enhancement (sem JS, cai direto no link de WhatsApp de hoje) —
+        // `target="_blank"` só importa nesse caminho, já que o onClick sempre faz preventDefault.
+        // `content(false)`: o comportamento normal (com JS) é abrir um modal, não uma nova aba.
+        // `data-no-whatsapp-cta`: o href continua sendo wa.me (fallback), então
+        // public/utm-tracking.js casaria em `a[href*="wa.me"]` e contaria "abriu o formulário"
+        // como "chegou no WhatsApp" — o handoff real só acontece depois do envio bem-sucedido
+        // (hooks/useContactForm.ts). Review chatgpt-codex-connector[bot] na PR #1536.
+        const message = applyOriginToMessage(item.whatsappMessage ?? '', search);
+        const href = getWhatsAppLink(message);
         return (
             <a href={href} target="_blank" rel="noopener noreferrer" className={className}
-               data-testid={`link-${item.id}`} onClick={() => pushLinksPageClick(item, href)}>
-                {content}
+               data-testid={`link-${item.id}`}
+               data-no-whatsapp-cta
+               onClick={(e) => {
+                   e.preventDefault();
+                   openContactModal({ source: `links-${item.id}`, message });
+                   pushLinksPageClick(item, href);
+               }}>
+                {content(false)}
             </a>
         );
     }
@@ -116,7 +167,27 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className:
         return (
             <a href={href} target="_blank" rel="noopener noreferrer" className={className}
                data-testid={`link-${item.id}`} onClick={() => pushLinksPageClick(item, href)}>
-                {content}
+                {content(true)}
+            </a>
+        );
+    }
+
+    if (item.type === 'cal-modal') {
+        // Mesmo mecanismo da landing /consultoria-de-viagem (lib/cal-embed.ts): `href` real para
+        // progressive enhancement (sem JS/prerender é um link funcional para o Cal.com), onClick
+        // com preventDefault abre o modal por cima da página. Sem `target="_blank"` — o modal
+        // abre na própria aba; só o fallback de falha do embed navega para longe, na mesma aba.
+        // `data-no-specialist-cta`: "Agendar consultoria" casaria no heurístico textual de
+        // isSpecialistCtaText (public/utm-tracking.js) e disparia um falso specialist_cta_click.
+        return (
+            <a href={CONSULTORIA_BOOKING_URL} className={className} data-testid={`link-${item.id}`}
+               data-no-specialist-cta
+               onClick={(e) => {
+                   e.preventDefault();
+                   openConsultoriaBooking();
+                   pushLinksPageClick(item, CONSULTORIA_BOOKING_URL);
+               }}>
+                {content(false)}
             </a>
         );
     }
@@ -125,7 +196,7 @@ export const LinkButton: React.FC<LinkButtonProps> = ({ item, search, className:
     return (
         <Link to={to} className={className} data-testid={`link-${item.id}`}
               onClick={() => pushLinksPageClick(item, to)}>
-            {content}
+            {content(false)}
         </Link>
     );
 };

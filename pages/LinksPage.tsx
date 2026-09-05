@@ -17,6 +17,12 @@ import {
 } from '../utils/linksPageLayout';
 import LinkButton from '../components/links/LinkButton';
 import TrustSeals from '../components/links/TrustSeals';
+// /links está em STANDALONE_ROUTES (App.tsx) — nenhum overlay flutuante é montado ali (AIChat,
+// BackToTop, ContactModal) porque cobririam o conteúdo curado e os selos de confiança. Mas os
+// links tipo `whatsapp` do LinkButton disparam `openContactModal()`, que é só um CustomEvent —
+// sem um ouvinte montado nesta rota, o evento seria um no-op silencioso. Montamos a instância
+// aqui, só para este clique sob demanda; ela não aparece sozinha, ao contrário dos FABs.
+import ContactModal from '../components/ContactModal';
 
 // A query da URL é estado externo ao React. /links é prerenderizada (lib/prerender-routes.js),
 // então ler `window.location.search` durante o render faria o HTML do servidor divergir do
@@ -71,7 +77,12 @@ const LinksPage: React.FC = () => {
     const visibleProductLinks = getVisibleLinksForIds(visibleLinks, PRODUCT_LINK_IDS);
     const unassignedVisibleLinks = getUnassignedVisibleLinks(visibleLinks);
     const linkById = new Map(visibleLinks.map((link) => [link.id, link]));
-    const { hasPrimaryDestinations, hasVisibleDestinations, hasVisibleContact, hasVisibleOtherLinks } = getLinksPageVisibility(links);
+    // Separado da lista de destinos em seu próprio <nav>: antes os dois viviam na mesma pilha
+    // (quiz + 4 destinos = 5 escolhas simultâneas, acima do limite de carga cognitiva de 4 por
+    // grupo — ver crítica de /links de 2026-08-27). O quiz é uma ferramenta ("me ajude a decidir"),
+    // não um destino; separá-lo em outro grupo reduz o chunk de decisão real sem cortar destino.
+    const hasQuiz = linkById.has('quiz');
+    const { hasVisibleDestinations, hasVisibleContact, hasVisibleOtherLinks } = getLinksPageVisibility(links);
     const hasProductIntent = visibleProductLinks.length > 0;
     const soleIntentCardSpanClass = getSoleIntentCardSpanClass(hasVisibleDestinations, hasProductIntent);
     // Depois que a pessoa escolhe uma porta (#destinos ou #preparar), a outra seção continua
@@ -176,9 +187,15 @@ const LinksPage: React.FC = () => {
 
                     {hasVisibleContact ? (
                         <section id="contato" className="mt-10 w-full scroll-mt-6" aria-labelledby="contact-heading">
-                            <h2 id="contact-heading" className="text-lg font-black text-white/90">Já tem destino e datas?</h2>
-                            <p className="mt-1 text-sm leading-6 text-white/70">Envie os detalhes e receba um orçamento para a sua viagem.</p>
-                            <div className="mt-4">{renderLink('orcamento')}</div>
+                            {/* "Diagnóstico", não "consultoria completa": a sessão de R$ 250 é o
+                                diagnóstico + plano por escrito (50 min); a consultoria completa
+                                (roteiro executado) é orçada à parte e só recebe o valor da sessão
+                                como abatimento se a pessoa seguir com ela — ver FAQ de
+                                pages/landings/ConsultoriaDeViagemLanding.tsx. Review
+                                chatgpt-codex-connector[bot] na PR #1536. */}
+                            <h2 id="contact-heading" className="text-lg font-black text-white/90">Quer um diagnóstico completo da sua viagem?</h2>
+                            <p className="mt-1 text-sm leading-6 text-white/70">Uma sessão paga de 50 minutos para diagnosticar sua viagem e sair com um plano por escrito.</p>
+                            <div className="mt-4">{renderLink('agendar-consultoria')}</div>
                         </section>
                     ) : null}
 
@@ -186,11 +203,18 @@ const LinksPage: React.FC = () => {
                         <section id="destinos" className={destinosSectionClass} aria-labelledby="destinations-heading">
                             <h2 id="destinations-heading" className={sectionHeadingClass(selectedIntent === 'preparar')}>Conheça destinos e ideias</h2>
                             <p className="mt-1 text-sm leading-6 text-white/70">Veja algumas possibilidades antes de decidir como quer viajar.</p>
-                            {hasPrimaryDestinations ? (
-                                <nav aria-label="Destinos e ideias de viagem" className="mt-4 flex w-full flex-col gap-3">
+                            {hasQuiz ? (
+                                <nav aria-label="Quiz de perfil de viagem" className="mt-4 flex w-full flex-col gap-3">
                                     {renderLink('quiz')}
+                                </nav>
+                            ) : null}
+                            {visibleFeaturedDestinationLinks.length > 0 ? (
+                                <nav
+                                    aria-label="Destinos em destaque"
+                                    className={`flex w-full flex-col gap-3${hasQuiz ? ' mt-6' : ' mt-4'}`}
+                                >
                                     {visibleFeaturedDestinationLinks.map((item) => (
-                                        <LinkButton key={item.id} item={item} search={search} />
+                                        <LinkButton key={item.id} item={item} search={search} iconBadge />
                                     ))}
                                 </nav>
                             ) : null}
@@ -236,6 +260,7 @@ const LinksPage: React.FC = () => {
                     <TrustSeals />
                 </div>
             </main>
+            <ContactModal />
         </>
     );
 };

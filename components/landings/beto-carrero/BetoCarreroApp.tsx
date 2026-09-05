@@ -11,8 +11,6 @@ import { Menu, X } from 'lucide-react';
 import { getBetoAssetUrl } from './assetPath';
 import BetoCarreroFaq from './BetoCarreroFaq';
 
-const SITE_URL = 'https://www.anhanga.tur.br';
-
 const NAV_LINKS = [
   { name: 'O Perrengue', href: '#problem' },
   { name: 'A Solução', href: '#solution' },
@@ -109,7 +107,7 @@ const App: React.FC = () => {
 
           {/* Logo Area */}
           <a
-            href={`${SITE_URL}/`}
+            href="/"
             onClick={() => {
               window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
               handleLinkClick();

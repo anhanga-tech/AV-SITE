@@ -8,6 +8,7 @@
  */
 
 import { useEffect, useMemo } from 'react';
+import { isSafeTrackingValue } from './piiRedaction';
 
 const TRACKING_PARAMS = [
     'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
@@ -51,10 +52,27 @@ const getCookie = (name: string): string | null => {
     return null;
 };
 
+// Cookie próprio (não o _ga do Google) usado como fallback pro client_id do GA4.
+// Nada carrega o gtag.js real do Google desde a migração pro Zaraz (Stape/GTM
+// removidos) — sem isso, um visitante novo nunca teria o cookie _ga legado e
+// ga_client_id ficaria sempre vazio no generate_lead, quebrando a correlação de
+// conversão no GA4 (achado de review). Reutiliza o mesmo nome/formato usado em
+// public/utm-tracking.js pra não gerar dois IDs diferentes pro mesmo visitante.
+const OWN_CID_COOKIE = 'anhanga_ga_cid';
+
+const getOrCreateOwnClientId = (): string => {
+    const existing = getCookie(OWN_CID_COOKIE);
+    if (existing) return existing;
+
+    const cid = `${Math.floor(Math.random() * 2147483647)}.${Math.floor(Date.now() / 1000)}`;
+    setCookie(OWN_CID_COOKIE, cid, 730);
+    return cid;
+};
+
 const getGA4ClientId = (): string | null => {
     if (typeof document === 'undefined') return null;
     const match = document.cookie.match(/_ga=GA1\.\d+\.(\d+\.\d+)/);
-    return match ? match[1] : null;
+    return match ? match[1] : getOrCreateOwnClientId();
 };
 
 const getGA4SessionId = (): string | null => {
@@ -82,6 +100,21 @@ const getFbp = (): string | null => {
 function parseTrackingDataString(dataString: string): TrackingData {
     const parsed: TrackingData = {};
 
+    // New cookies use JSON so commas (and other delimiters) inside campaign values
+    // remain part of the value. Keep the legacy parser below so attribution cookies
+    // written by older deployments continue to work after the cutover.
+    try {
+        const decoded = JSON.parse(dataString) as unknown;
+        if (decoded && typeof decoded === 'object' && !Array.isArray(decoded)) {
+            for (const [key, value] of Object.entries(decoded)) {
+                if (key && typeof value === 'string' && value) parsed[key] = value;
+            }
+            return parsed;
+        }
+    } catch {
+        // Fall through to the legacy comma-delimited format.
+    }
+
     for (const segment of dataString.split(',')) {
         const entry = segment.trim();
         if (!entry) continue;
@@ -98,9 +131,7 @@ function parseTrackingDataString(dataString: string): TrackingData {
 }
 
 function serializeTrackingData(data: TrackingData): string {
-    return Object.entries(data)
-        .flatMap(([key, value]) => key && value ? [`${key}=${value}`] : [])
-        .join(', ');
+    return JSON.stringify(data);
 }
 
 function getSearchStringFromLocation(): string {
@@ -126,12 +157,45 @@ function getSearchStringFromLocation(): string {
     return searchString;
 }
 
-function appendDecodedTrackingValue(trackingData: TrackingData, key: string, value: string): void {
-    try {
-        trackingData[key] = decodeURIComponent(value);
-    } catch {
+// value já vem decodificado de URLSearchParams.get()/forEach() (que aplica um decode
+// percent-encoding completo por spec). Rodar decodeURIComponent de novo aqui abria um
+// bypass do isSafeTrackingValue acima: um valor duplamente encodado (ex.:
+// ?utm_content=%2565mail%2540example.com) passa no check com o texto ainda parcialmente
+// encodado ("%65mail%40example.com", sem "@" literal) e só vira e-mail de verdade num
+// segundo decode — que rodava aqui, depois do check (achado de review, claude[bot]).
+function appendTrackingValue(trackingData: TrackingData, key: string, value: string): void {
+    trackingData[key] = value;
+}
+
+function isUntrustedTrackingKey(key: string): boolean {
+    return TRACKING_PARAMS.includes(key) || key.startsWith(HSA_PREFIX);
+}
+
+// cid/sid/fbc/fbp nunca vêm de um parâmetro de URL — são gerados internamente (cookie
+// próprio ou API do navegador) e nunca precisam do filtro de PII. Validar essas chaves
+// também quebrava fbc: seu formato (fb.1.<timestamp>.<fbclid>) casa em PHONE_PATTERN
+// (dígito+ponto+dígitos), então era descartado a cada captura e regenerado com um
+// Date.now() novo, perdendo o timestamp do clique original e prejudicando dedup no Meta
+// CAPI (achado de review, claude[bot] + chatgpt-codex-connector[bot]).
+function mergeRestoredTrackingData(trackingData: TrackingData, parsed: Record<string, unknown>): void {
+    for (const [key, value] of Object.entries(parsed)) {
+        if (typeof value !== 'string' || !value) continue;
+        if (isUntrustedTrackingKey(key) && !isSafeTrackingValue(value)) continue;
         trackingData[key] = value;
     }
+}
+
+// O cookie de 30 dias (COOKIE_NAME) é a única persistência que sobrevive entre sessões/
+// abas — sessionStorage não. Sem isso, um visitante que voltasse numa aba nova (sem UTM
+// na URL, sessionStorage vazio) perdia toda a atribuição anterior: como cid agora é
+// sempre truthy (getGA4ClientId sempre gera um), captureTrackingDataObject nunca mais
+// caía no fallback getCookieTrackingData() e sobrescrevia o cookie só com {cid: ...}
+// (achado de review, chatgpt-codex-connector[bot]).
+function mergeCookieTrackingData(trackingData: TrackingData): void {
+    const cookieData = getCookie(COOKIE_NAME);
+    if (!cookieData) return;
+
+    mergeRestoredTrackingData(trackingData, parseTrackingDataString(cookieData));
 }
 
 function mergeStoredTrackingData(trackingData: TrackingData): void {
@@ -139,28 +203,40 @@ function mergeStoredTrackingData(trackingData: TrackingData): void {
         const stored = sessionStorage.getItem(STORAGE_KEY);
         if (!stored) return;
 
-        const parsed = JSON.parse(stored) as TrackingData;
-        Object.assign(trackingData, parsed);
+        // public/utm-tracking.js grava na mesma chave (anhanga_tracking_data) sem passar
+        // pelo isSafeTrackingValue de mergeUrlTrackingData — reaplicar o filtro aqui, no
+        // único ponto onde qualquer origem armazenada converge antes do dataLayer, cobre
+        // esse segundo coletor sem duplicar a regra em dois arquivos (achado de review,
+        // chatgpt-codex-connector[bot]: "validate on every storage read/write").
+        const parsed = JSON.parse(stored) as unknown;
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return;
+        mergeRestoredTrackingData(trackingData, parsed as Record<string, unknown>);
     } catch {
         // Ignore storage failures
     }
 }
 
 function mergeUrlTrackingData(trackingData: TrackingData, urlParams: URLSearchParams): boolean {
+    // Parâmetros de tracking vêm de uma URL não confiável (qualquer um pode montar um link
+    // com ?utm_content=email@exemplo.com) e este objeto é espalhado inteiro num evento
+    // dataLayer (tracking_data_captured) que o Zaraz encaminha pro GA4 sem scrubbing de PII
+    // (achado de review — o Stape tinha esse scrubber, o Zaraz não tem equivalente
+    // conhecido). isSafeTrackingValue rejeita qualquer valor com formato de e-mail/telefone
+    // antes de aceitar, independente do nome do parâmetro.
     let foundInUrl = false;
 
     TRACKING_PARAMS.forEach((param) => {
         const value = urlParams.get(param);
-        if (!value) return;
+        if (!value || !isSafeTrackingValue(value)) return;
 
-        appendDecodedTrackingValue(trackingData, param, value);
+        appendTrackingValue(trackingData, param, value);
         foundInUrl = true;
     });
 
     urlParams.forEach((value, key) => {
-        if (!key.startsWith(HSA_PREFIX)) return;
+        if (!key.startsWith(HSA_PREFIX) || !isSafeTrackingValue(value)) return;
 
-        appendDecodedTrackingValue(trackingData, key, value);
+        appendTrackingValue(trackingData, key, value);
         foundInUrl = true;
     });
 
@@ -223,6 +299,7 @@ const captureTrackingDataObject = (): TrackingData | null => {
     const trackingData: TrackingData = {};
     const urlParams = new URLSearchParams(getSearchStringFromLocation());
 
+    mergeCookieTrackingData(trackingData);
     mergeStoredTrackingData(trackingData);
     const foundInUrl = mergeUrlTrackingData(trackingData, urlParams);
     const { cid, sid } = mergeAnalyticsTrackingData(trackingData);
@@ -280,9 +357,9 @@ const buildWhatsAppLink = (message: string): string => {
 export const getWhatsAppLink = (message: string): string => buildWhatsAppLink(message);
 
 export const useWhatsAppLink = (message: string): string => {
-    // GA4 sets its client/session cookies slightly after gtag boots, so re-capture ~1s after
-    // mount. The link no longer depends on tracking, but this keeps the cookie/sessionStorage
-    // snapshot fresh for the form submissions that carry it to Odoo.
+    // The GA4 session cookie (_ga_QDBT5PM4KP) is set by Zaraz slightly after mount, so
+    // re-capture ~1s after. The link no longer depends on tracking, but this keeps the
+    // cookie/sessionStorage snapshot fresh for the form submissions that carry it to Odoo.
     useEffect(() => {
         const timer = setTimeout(() => {
             captureTrackingDataObject();

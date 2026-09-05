@@ -33,6 +33,7 @@ function DestinationsHeader({ activeFilter, onFilterChange }: DestinationsHeader
                         key={filter}
                         type="button"
                         onClick={() => onFilterChange(filter)}
+                        aria-pressed={activeFilter === filter}
                         className={`px-5 py-2 rounded-lg text-sm font-bold border-2 transition whitespace-nowrap flex-shrink-0 shadow-[3px_3px_0px_rgba(0,0,0,0.1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] ${activeFilter === filter
                             ? 'bg-brand-dark text-white border-brand-dark transform -rotate-1'
                             : 'bg-white text-zinc-600 border-zinc-100 hover:border-brand-vibrant hover:text-brand-vibrant'

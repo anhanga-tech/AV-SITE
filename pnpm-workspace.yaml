@@ -33,12 +33,14 @@ overrides:
   # Dependabot #45 (moderate): GHSA-h67p-54hq-rp68 — DoS quadrático em merge
   # keys do js-yaml via aliases repetidos. Transitivo build/dev-time via
   # gray-matter (scripts/blog-manifest) e bundlesize2 > cosmiconfig@5 — ambos
-  # na linha 3.x, que usa a API yaml.safeLoad. O backport js-yaml@3.15.0
-  # (dist-tag v3-legacy, publicado 2026-06-26, cooldown de 7 dias vencido em
-  # 2026-07-03) corrige na própria linha 3.x e preserva safeLoad.
+  # na linha 3.x, que usa a API yaml.safeLoad.
+  # pnpm audit (high): CVE-2026-59870 — DoS quadrático adicional na resolução
+  # de `!!omap` (fix não retroportado para 3.15.0). js-yaml@3.15.1 (dist-tag
+  # v3-legacy, publicado 2026-07-31, cooldown de 7 dias vencido em 2026-08-07)
+  # corrige as duas falhas na própria linha 3.x e preserva safeLoad.
   # Override escopado a "@3" de propósito: um override global rebaixaria a
   # árvore js-yaml@4.2.0 (cosmiconfig@9), que já está corrigida e usa a API v4.
-  "js-yaml@3": "^3.15.0"
+  "js-yaml@3": "^3.15.1"
   # Issue #1138 (high): @ungap/structured-clone < 1.3.1 tem resolução CWE-502
   # depreciada. Transitivo via mdast-util-to-hast (react-markdown, caminho do
   # chatbot, e @mdx-js/mdx, caminho do blog). 1.3.2 corrige; override escopado
@@ -70,6 +72,14 @@ overrides:
   # em 2026-08-14) corrige; só existe a linha 3.x na árvore, então o
   # override global não rebaixa nada.
   nanoid: "^3.3.18"
+  # pnpm audit (high): GHSA-mh99-v99m-4gvg + GHSA-rgw5-rvv9-x895 — DoS por
+  # expansão de chaves não limitada em brace-expansion < 1.1.18 (a segunda
+  # falha contorna a mitigação da primeira). Transitivo dev-only via
+  # eslint-plugin-jsx-a11y > minimatch@3 (linha 1.x). brace-expansion@1.1.18
+  # (publicado 2026-07-30, cooldown de 7 dias vencido em 2026-08-06) corrige
+  # ambas; escopado a "@1" porque a árvore também tem brace-expansion@5.x
+  # (já corrigida) em outro caminho de dependência.
+  "brace-expansion@1": "^1.1.18"
 
 legacyPeerDeps: true
 nodeLinker: hoisted

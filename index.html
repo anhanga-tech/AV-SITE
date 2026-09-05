@@ -41,13 +41,6 @@
   <link rel="preconnect" href="https://media.anhanga.tur.br" crossorigin>
   <link rel="dns-prefetch" href="https://media.anhanga.tur.br">
 
-  <!-- Stape sGTM — apenas dns-prefetch (barato): o loader difere os scripts de terceiros para
-       depois do LCP, então um preconnect mantido aberto no load só desperdiça uma conexão e é
-       apontado como "pré-conexão não usada" pelo Lighthouse (issue #1259). A conexão real é
-       estabelecida quando o loader dispara, com o DNS já resolvido. -->
-  <link rel="dns-prefetch" href="https://load.sst.anhanga.tur.br">
-  <link rel="dns-prefetch" href="https://sst.anhanga.tur.br">
-
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -118,20 +111,13 @@
        do Consent Mode (setados via JS) e a SPA não renderiza sem JS de qualquer forma. -->
   <div id="root"></div>
   <script>window.dataLayer = window.dataLayer || [];</script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    // Required by the deferred UTM tracker to query the GA4 client_id.
-    function gtag() { dataLayer.push(arguments); }
-  </script>
   <script type="module" src="/index.tsx"></script>
   <!-- Defer third-party scripts to protect mobile TBT -->
   <script>
     (function () {
       var _consentChoice = (function () { try { return localStorage.getItem('anhanga_cookie_consent'); } catch (e) { return null; } })();
       var analyticsLoaded = false;
-      var gtmLoaded = false;
       var utmLoaded = false;
-      var mauticLoaded = false;
       var consentListeners = [];
 
       var callConsentListener = function (callback, choice) {
@@ -158,6 +144,99 @@
         anhanga_marketing_consent: _consentChoice === 'marketing'
       });
 
+      // Zaraz é fail-open por padrão (tool sem purpose dispara sem gate) — a
+      // purpose 'marketing' só existe pra gatear Meta/TikTok quando essas tools
+      // forem adicionadas (Tasks 4/5 do plano de migração). GA4 não tem purpose
+      // de propósito, pra preservar o comportamento atual de legítimo interesse.
+      //
+      // Assina a ponte em vez de chamar o Zaraz direto dentro dos listeners de
+      // aceite/revogação: addAnhangaConsentListener já invoca o callback com o
+      // estado atual no registro (cobre quem já tinha consentido em visita
+      // anterior) e de novo a cada mudança futura — os listeners de DOM abaixo
+      // são { once: true }, então uma chamada direta ali só cobriria o clique
+      // em si, nunca uma visita de retorno com consentimento já persistido.
+      var pendingZarazMarketing = null;
+      var MARKETING_PURPOSE_NAME = 'marketing';
+      // consent.set() do Zaraz não aceita o nome da purpose como chave — só o ID gerado
+      // internamente na criação (ex.: "IVva"), que varia por ambiente e não dá pra
+      // hardcodar. Resolve o ID em runtime batendo o nome contra
+      // window.zaraz.consent.purposes (achado em produção 02/09/2026: consent.set({marketing:true})
+      // lançava "Unknown purpose id: marketing" — Meta/TikTok nunca recebiam o consentimento).
+      // Shape de `name` confirmado direto em produção (não documentado pela Cloudflare):
+      // objeto localizado `{ en, pt }`. Mantém um fallback pra string simples caso o
+      // dashboard mude isso um dia — mais barato que reintroduzir a mesma falha silenciosa.
+      var resolveMarketingPurposeId = function () {
+        var purposes = window.zaraz.consent.purposes;
+        if (!purposes) return null;
+        for (var id in purposes) {
+          if (!Object.prototype.hasOwnProperty.call(purposes, id)) continue;
+          var name = purposes[id] && purposes[id].name;
+          if (name === MARKETING_PURPOSE_NAME) return id;
+          if (name && (name.en === MARKETING_PURPOSE_NAME || name.pt === MARKETING_PURPOSE_NAME)) return id;
+        }
+        return null;
+      };
+      // "true" precisa dizer "nada pendente pro Zaraz agora", não só "chegou a enviar
+      // alguma vez" — por isso os dois `return` abaixo são separados. Um único `||`
+      // combinando "nada pendente" com "zaraz não está pronto" faz os dois casos
+      // devolverem `false` do mesmo jeito, e reloadAfterZarazFlush (mais abaixo) não
+      // consegue diferenciar "já sincronizado, pode recarregar" de "ainda esperando o
+      // zaraz.js carregar" — no caminho comum (zaraz já carregado antes da revogação),
+      // isso forçava a esperar o teto inteiro de ~1,2s à toa (achado de review).
+      var flushZarazConsent = function () {
+        if (pendingZarazMarketing === null) return true;
+        if (!window.zaraz || !window.zaraz.consent) return false;
+        var purposeId = resolveMarketingPurposeId();
+        if (!purposeId) return false;
+        var payload = {};
+        payload[purposeId] = pendingZarazMarketing;
+        window.zaraz.consent.set(payload);
+        pendingZarazMarketing = null;
+        return true;
+      };
+      window.addAnhangaConsentListener(function (choice) {
+        pendingZarazMarketing = choice === 'marketing';
+        if (flushZarazConsent()) return;
+        // zaraz.js carrega assíncrono — se ainda não chegou no momento do clique,
+        // tenta de novo por até 10s em vez de descartar o consentimento em silêncio.
+        var attempts = 0;
+        var retryTimer = setInterval(function () {
+          attempts += 1;
+          var flushed = flushZarazConsent();
+          if (flushed || attempts >= 20) {
+            clearInterval(retryTimer);
+            // Esgotar sem sucesso aqui é silencioso por natureza (não há exceção pra
+            // callConsentListener capturar) — sem este log, uma regressão no matching de
+            // resolveMarketingPurposeId (purpose renomeada, shape de `name` mudou) passaria
+            // despercebida, que é exatamente a classe de bug que esta ponte existe pra evitar.
+            if (!flushed) console.error('Anhangá consent bridge: esgotou os retries sem sincronizar consentimento com o Zaraz (purpose "marketing" não encontrada, ou zaraz.js nunca carregou)');
+          }
+        }, 500);
+      });
+
+      // A revogação recarrega a página logo em seguida — um reload síncrono destruiria
+      // este documento antes do retryTimer acima ter qualquer chance de rodar, e o Zaraz
+      // reaplicaria o 'marketing: true' persistido da visita anterior na página recarregada
+      // até essa ponte corrigir de novo. Adia o reload por até ~1,2s dando chance ao flush
+      // acontecer primeiro; não trava a UI por mais que isso — passado o teto, recarrega de
+      // qualquer forma (o risco residual é o mesmo já aceito no resto desta ponte).
+      var reloadAfterZarazFlush = function () {
+        if (flushZarazConsent()) {
+          window.location.reload();
+          return;
+        }
+        var attempts = 0;
+        var waitTimer = setInterval(function () {
+          attempts += 1;
+          var flushed = flushZarazConsent();
+          if (flushed || attempts >= 6) {
+            clearInterval(waitTimer);
+            if (!flushed) console.error('Anhangá consent bridge: recarregando sem sincronizar a revogação com o Zaraz (mesmo motivo do retry de aceite, ver flushZarazConsent)');
+            window.location.reload();
+          }
+        }, 200);
+      };
+
       var injectScript = function (src, options) {
         var script = document.createElement('script');
         script.src = src;
@@ -168,42 +247,11 @@
         document.body.appendChild(script);
       };
 
-      var loadGtm = function () {
-        if (gtmLoaded) return;
-        gtmLoaded = true;
-        // Não carregar GTM em ambientes não-produtivos (dev local + Playwright/CI em 127.0.0.1).
-        // Sem este gate, submits de teste disparam generate_lead -> GTM -> GA4 de produção e
-        // poluem o sinal de conversão (treina o Smart Bidding com tráfego de bot). Espelha o
-        // gate de host do loadMautic.
-        var h = location.hostname;
-        if (h === 'localhost' || h === '127.0.0.1' || h === '[::1]' || h === '::1' || h === '0.0.0.0' || h.endsWith('.local') || h.endsWith('.test')) return;
-        window.dataLayer.push({
-          'gtm.start': new Date().getTime(),
-          event: 'gtm.js'
-        });
-        injectScript('https://load.sst.anhanga.tur.br/60oxrlttgl.js?56lu7e=BQNJMzg%2FVTteLDMnVEQ%2FSRpaRlpdVBwBUQYaHA0cHw5CEwEGQhAK');
-      };
-
-      var loadMautic = function () {
-        if (_consentChoice !== 'marketing') return;
-        if (mauticLoaded) return;
-        mauticLoaded = true;
-        var h = location.hostname;
-        if (h === 'localhost' || h === '127.0.0.1' || h.endsWith('.local') || h.endsWith('.test')) return;
-        (function(w,d,t,u,n,a,m){w['MauticTrackingObject']=n;
-            w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)},a=d.createElement(t),
-            m=d.getElementsByTagName(t)[0];a.async=1;a.src=u;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','https://mkt.anhanga.tur.br/mtc.js','mt');
-        mt('send', 'pageview');
-      };
-
       var absoluteFallbackTimer = null;
       var loadAnalytics = function () {
         if (analyticsLoaded) return;
         analyticsLoaded = true;
         if (absoluteFallbackTimer !== null) clearTimeout(absoluteFallbackTimer);
-        loadGtm();
-        loadMautic();
         if (!utmLoaded) {
           utmLoaded = true;
           injectScript('/utm-tracking.js', { defer: true });
@@ -247,7 +295,6 @@
 
       window.addEventListener('anhanga:marketing-consent', function () {
         _consentChoice = 'marketing';
-        loadMautic();
         notifyConsentListeners('marketing');
         window.dataLayer.push({
           event: 'marketing_consent_granted',
@@ -261,7 +308,7 @@
         window.dataLayer.push({
           anhanga_marketing_consent: false
         });
-        window.location.reload();
+        reloadAfterZarazFlush();
       }, { once: true });
     })();
   </script>

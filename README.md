@@ -12,7 +12,7 @@ Site institucional da **Anhangá Viagens**, uma agência de viagens boutique bra
 - **🤖 Chat com IA Gemini:** Assistente de viagens que responde dúvidas, sugere roteiros e conduz uma qualificação BANT (Need, Authority, Budget, Timeline) com handoff para atendimento humano em reservas de curto prazo.
 - **🎯 Captura de Leads Inteligente:** Leads do chatbot e dos formulários fluem direto para o **Odoo** (CRM ativo, via JSON-RPC), com atribuição de UTMs/click IDs preservada.
 - **🏝️ Landing Pages Especializadas:** Páginas de alta conversão sem o shell do site (Orlando, Beto Carrero, Lollapalooza, Melhor Idade, Corporativo, Cruzeiros, NPS, Quiz).
-- **📊 Rastreamento e Performance:** GTM/sGTM (Stape) com persistência de UTMs/GCLID e conversões server-side (Meta CAPI) com deduplicação por `event_id`.
+- **📊 Rastreamento e Performance:** Cloudflare Zaraz (GA4, Meta CAPI, TikTok Events API) com persistência de UTMs/GCLID e conversões server-side CAPI-only.
 - **📝 Blog de Viagens:** Posts em MDX, manifest gerado no build e CMS headless (Decap) em `/admin` via OAuth do GitHub.
 - **📈 SEO de Alta Performance:** Prerender estático por rota, metadados dinâmicos SSR-safe e componentes Schema.org (LocalBusiness, FAQ, Breadcrumb).
 - **🗺️ Mapas Interativos:** Visualização geográfica de destinos e hotéis com Leaflet.
@@ -41,7 +41,7 @@ Site institucional da **Anhangá Viagens**, uma agência de viagens boutique bra
 
 **Fluxo do chatbot:** `AIChat.tsx` → `services/geminiService.ts` → `api/generate.ts`, que valida a entrada, aplica rate limit, chama o Gemini com o prompt de `lib/ai/`, extrai a tool call de orçamento quando a qualificação BANT está completa e roda o handoff em `lib/ai/handoff.ts`.
 
-**Fluxo de leads:** `hooks/useLeadCapture.ts` → `api/submit-lead.ts` (valida + normaliza via `lib/lead-logic.ts` e schemas Zod) → `services/odoo.ts` (JSON-RPC) → `res.partner` + `crm.lead` no Odoo. Os outros 4 formulários (contato, quiz, waitlist, NPS) seguem o mesmo padrão via `createOdooSubmitHandler`; quiz/waitlist/NPS só criam `res.partner` (sem oportunidade). HubSpot e Salesforce são legado — HubSpot mantém só o webhook inbound de deals Closed-Won, Salesforce está aposentado.
+**Fluxo de leads:** `hooks/useLeadCapture.ts` → `api/submit-lead.ts` (valida + normaliza via `lib/lead-logic.ts` e schemas Zod) → `services/odoo.ts` (JSON-RPC) → `res.partner` + `crm.lead` no Odoo. Os outros 4 formulários (contato, quiz, waitlist, NPS) seguem o mesmo padrão via `createOdooSubmitHandler`; quiz/waitlist/NPS só criam `res.partner` (sem oportunidade). HubSpot e Salesforce foram aposentados — nenhum dos dois processa mais dados de leads.
 
 **Build:** os scripts de `scripts/` geram o manifest do blog, sitemap e feeds; o Vite empacota; e `scripts/prerender.mjs` renderiza cada rota em HTML estático.
 
@@ -112,7 +112,7 @@ lib/          Helpers server-side (44 arquivos)
   ai/         Config do Gemini, prompt BANT, tools, handoff
   schemas/    Validadores Zod por endpoint
   conversions/  Helpers de pixels Google + Meta
-services/     Integrações de provider (gemini, odoo, hubspot [legado])
+services/     Integrações de provider (gemini, odoo)
 hooks/        Hooks de formulário (useLeadCapture, useContactForm, ...)
 components/   UI React (118) — /ui, /schemas, /landings, /blog
 pages/        Componentes de rota (19) — /landings para eventos

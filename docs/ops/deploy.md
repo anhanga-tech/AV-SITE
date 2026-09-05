@@ -57,9 +57,8 @@ Consulte `.env.example` para a lista completa com descrições. Grupos principai
 - **Rate Limiting** (required in prod): `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`
 - **Decap CMS OAuth** (required in prod): `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`
 - **Meta CAPI** (optional): `META_PIXEL_ID`, `META_ACCESS_TOKEN`
-- **Legado HubSpot** (somente webhook Closed-Won, não usado para leads novos): `HUBSPOT_TOKEN`, `HUBSPOT_WEBHOOK_SECRET`
 
-**Retiradas do checklist (não lidas por nenhum handler após o cut-over para Odoo):** `N8N_SUBMIT_CONTACT_WEBHOOK_URL`, `NPS_WEBHOOK_URL`. Remova-as do dashboard do Cloudflare Pages se ainda estiverem configuradas.
+**Retiradas do checklist (não lidas por nenhum handler após o cut-over para Odoo):** `N8N_SUBMIT_CONTACT_WEBHOOK_URL`, `NPS_WEBHOOK_URL`. **Retiradas (set/2026 — webhook HubSpot removido):** `HUBSPOT_TOKEN`, `HUBSPOT_WEBHOOK_SECRET`. Remova-as do dashboard do Cloudflare Pages se ainda estiverem configuradas.
 
 ## Troubleshooting
 

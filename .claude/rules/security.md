@@ -10,7 +10,7 @@ Reduce avoidable security risk in a site that handles AI chat, lead capture, web
 - Shared validation and normalization code
 - Browser code that sends user input or tracking data
 - Pages or components that render HTML strings
-- Provider integrations with Gemini, HubSpot, Meta, GA, Redis, or similar services
+- Provider integrations with Gemini, Meta, GA, Redis, or similar services
 
 ## REQUIRED
 
@@ -54,9 +54,9 @@ Reduce avoidable security risk in a site that handles AI chat, lead capture, web
 ## Examples
 
 - `lib/lead-logic.ts` is the model for boundary sanitization and safe normalization of lead-related inputs.
-- `lib/hubspot-validation.ts` is the model for webhook signature verification before processing.
+- `lib/nps-invite.ts` is the model for HMAC-based signature verification before processing.
 - `api/generate.ts` shows why model output must be normalized and filtered before handoff behavior is exposed to users.
-- `tests/e2e/destructive.spec.ts` and `tests/hubspot-validation.test.ts` are the kinds of regression tests expected for security-sensitive behavior.
+- `tests/e2e/destructive.spec.ts` and `tests/nps-invite.test.ts` are the kinds of regression tests expected for security-sensitive behavior.
 - Static legal content that uses controlled HTML in `pages/Privacy.tsx` or `pages/Terms.tsx` is acceptable only because the content is repo-managed rather than user supplied.
 
 ## Exceptions

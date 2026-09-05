@@ -10,8 +10,8 @@ const TRUNCATED_VALUE = '[truncated]';
 // Any log data (console output + captured errors) flows through here on its way
 // to Sentry, so this is the last-line net for the secrets/PII the security
 // standard says must never be logged. Kept broad on purpose: `api[-_]?key` also
-// catches `apiKey`, and `signature` covers webhook signatures (HubSpot, NPS
-// invite HMAC) — both are named in docs/standards/security.md but were not
+// catches `apiKey`, and `signature` covers webhook signatures (NPS invite
+// HMAC) — both are named in docs/standards/security.md but were not
 // previously redacted.
 const SENSITIVE_KEY_PATTERN = /(?:api[-_]?key|authorization|bearer|cookie|credential|email|mail|password|phone|secret|senha|signature|token|telefone|whatsapp)/i;
 

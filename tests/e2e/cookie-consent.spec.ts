@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
 const CHOICE_KEY = 'anhanga_cookie_consent';
 
@@ -188,16 +188,6 @@ test.describe('Cookie Consent Banner (CMP)', () => {
     expect(hasDataLayer).toBe(true);
   });
 
-  test('recusar impede carregamento do Mautic', async ({ page }) => {
-    await page.goto('/');
-    await page.getByRole('button', { name: 'Recusar' }).click();
-
-    // Aguardar possíveis triggers de scroll/idle
-    await page.waitForTimeout(500);
-    const hasMautic = await page.evaluate(() => 'MauticTrackingObject' in window);
-    expect(hasMautic).toBe(false);
-  });
-
   // --- Convivência com elementos flutuantes e ordem do DOM ---
 
   test('banner visível define --cookie-banner-h no <html>; escolher limpa o offset', async ({ page }) => {
@@ -283,7 +273,7 @@ test.describe('Cookie Consent Banner (CMP)', () => {
     expect(value).toBe('marketing');
   });
 
-  test('revogação: aceitar → gerenciar → recusar dispara reload e bloqueia Mautic', async ({ page }) => {
+  test('revogação: aceitar → gerenciar → recusar dispara reload', async ({ page }) => {
     // Timeout maior apenas para este teste — envolve um reload completo de página
     test.setTimeout(20000);
 
@@ -307,49 +297,104 @@ test.describe('Cookie Consent Banner (CMP)', () => {
     const value = await page.evaluate((key) => localStorage.getItem(key), CHOICE_KEY);
     expect(value).toBe('essential');
 
-    // Mautic não deve ter carregado
-    const hasMautic = await page.evaluate(() => 'MauticTrackingObject' in window);
-    expect(hasMautic).toBe(false);
-
     // Banner não deve reaparecer
     await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).not.toBeVisible();
   });
 
-  // --- Aceitar com Mautic ---
+  // --- Ponte de consentimento com o Zaraz ---
 
-  test('aceitar carrega Mautic', async ({ page, baseURL }) => {
-    // loadMautic() (index.html) retorna cedo em hosts locais — localhost, 127.0.0.1,
-    // .local e .test — então mtc.js nunca é solicitado nesses hosts. O webServer do
-    // Playwright roda em 127.0.0.1 por padrão (local e CI), logo o skip precisa
-    // depender do host real, não só de process.env.CI. A lógica de despacho e a gate
-    // de consentimento já são cobertas por consent.test.ts e index-third-party-scripts.test.ts.
-    let host = '127.0.0.1';
-    if (baseURL) {
-      try {
-        host = new URL(baseURL).hostname;
-      } catch {
-        // baseURL sem protocolo (ex.: sobrescrito via CLI) — usa o valor cru,
-        // que ainda casa com os sufixos .local/.test do gate abaixo.
-        host = baseURL;
-      }
-    }
-    const isMauticGatedHost =
-      host === 'localhost' || host === '127.0.0.1' || host.endsWith('.local') || host.endsWith('.test');
-    test.skip(isMauticGatedHost, `loadMautic retorna cedo em ${host} — coberto por testes unitários`);
+  // ID de purpose fake usado só neste stub — index.html nunca deve ver o literal
+  // "marketing" chegar em zaraz.consent.set() (achado de produção: o Zaraz só aceita
+  // o ID gerado, não o nome). Os testes abaixo verificam contra este ID, não contra
+  // "marketing", pra continuar cobrindo a resolução dinâmica de resolveMarketingPurposeId.
+  const MARKETING_PURPOSE_ID = 'test-marketing-purpose-id';
 
-    // Interceptar o script do Mautic para confirmar que foi solicitado
-    let mauticRequested = false;
-    await page.route('**/mtc.js', async (route) => {
-      mauticRequested = true;
-      await route.fulfill({ status: 200, body: 'window.MauticTrackingObject="mt";' });
-    });
+  // window.zaraz só existe em produção (script real do Cloudflare); o stub abaixo
+  // simula a API real (window.zaraz.consent.set + .purposes) pra capturar a chamada
+  // sem depender do zaraz.js de verdade, que não roda no dev server do Playwright.
+  async function stubZarazConsent(page: Page): Promise<void> {
+    await page.addInitScript((purposeId) => {
+      type ConsentPurposes = Record<string, boolean>;
+      type TestWindow = Window & {
+        zaraz: {
+          consent: {
+            purposes: Record<string, { name: { en: string; pt: string } }>;
+            set: (purposes: ConsentPurposes) => void;
+          };
+        };
+        __zarazConsentCalls: ConsentPurposes[];
+      };
+      const testWindow = window as unknown as TestWindow;
+      testWindow.__zarazConsentCalls = [];
+      testWindow.zaraz = {
+        consent: {
+          // Shape confirmado em produção 02/09/2026: purposes é um objeto por ID com
+          // name localizado ({en, pt}) — resolveMarketingPurposeId() em index.html
+          // depende disso pra achar o ID a partir do nome "marketing".
+          purposes: {
+            [purposeId]: { name: { en: 'marketing', pt: 'marketing' } },
+          },
+          set: (purposes) => testWindow.__zarazConsentCalls.push(purposes),
+        },
+      };
+    }, MARKETING_PURPOSE_ID);
+  }
 
+  async function getZarazConsentCalls(page: Page): Promise<Record<string, boolean>[]> {
+    return page.evaluate(() => (window as unknown as { __zarazConsentCalls: Record<string, boolean>[] }).__zarazConsentCalls);
+  }
+
+  test('carregamento sem escolha prévia já sincroniza marketing:false com o Zaraz', async ({ page }) => {
+    // addAnhangaConsentListener invoca o assinante imediatamente no registro, com o
+    // estado atual (_consentChoice é null aqui) — cobre visitas cujo consentimento
+    // já foi decidido antes desta carga, sem depender de um clique nesta sessão.
+    await stubZarazConsent(page);
+    await page.goto('/');
+
+    expect(await getZarazConsentCalls(page)).toEqual([{ [MARKETING_PURPOSE_ID]: false }]);
+  });
+
+  test('aceitar propaga a purpose marketing pro Zaraz', async ({ page }) => {
+    await stubZarazConsent(page);
     await page.goto('/');
     await page.getByRole('button', { name: 'Aceitar' }).click();
 
-    // Dar tempo para scripts lazy carregarem
-    await page.waitForTimeout(300);
+    // [0] é a sincronização inicial (sem escolha ainda); [1] é o clique em Aceitar.
+    expect(await getZarazConsentCalls(page)).toEqual([
+      { [MARKETING_PURPOSE_ID]: false },
+      { [MARKETING_PURPOSE_ID]: true },
+    ]);
+  });
 
-    expect(mauticRequested).toBe(true);
+  test('revogar (aceitar → gerenciar → recusar) resulta em marketing:false pro Zaraz após o reload', async ({ page }) => {
+    // O listener de revogação só dispara quando a escolha anterior era 'marketing'
+    // (lib/consent.ts) — "Recusar" na primeira visita não emite nenhum evento, então
+    // este teste precisa passar por aceitar primeiro. A leitura acontece depois do
+    // reload (não antes) pra evitar competir com a navegação: o addInitScript reroda
+    // na página recarregada e a sincronização inicial já reflete 'essential' salvo no
+    // localStorage, que é o estado que realmente importa provar.
+    test.setTimeout(20000);
+    await stubZarazConsent(page);
+
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Aceitar' }).click();
+    await page.getByRole('button', { name: 'Gerenciar cookies' }).click();
+    await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).toBeVisible();
+
+    await Promise.all([
+      page.waitForEvent('framenavigated'),
+      page.getByRole('button', { name: 'Recusar' }).click(),
+    ]);
+
+    // framenavigated dispara no commit da navegação, antes do <script> síncrono do
+    // index.html (que faz a sincronização inicial pós-reload) necessariamente ter
+    // rodado — sem esperar por isso, a leitura abaixo pode competir com esse script
+    // e ler o array vazio de forma intermitente (achado de review).
+    await page.waitForFunction(() => {
+      const testWindow = window as unknown as { __zarazConsentCalls?: Record<string, boolean>[] };
+      return Boolean(testWindow.__zarazConsentCalls && testWindow.__zarazConsentCalls.length > 0);
+    });
+
+    expect(await getZarazConsentCalls(page)).toEqual([{ [MARKETING_PURPOSE_ID]: false }]);
   });
 });

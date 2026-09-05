@@ -7,8 +7,9 @@
  * the response, and a hostile or misbehaving upstream can return an arbitrarily
  * large body. Passing that straight into `logger.error` (which forwards to
  * Sentry) or into the `error` field we return — which callers such as
- * `api/hubspot-webhook.ts` join into a log line — would let a single response
- * flood observability sinks. Truncating here keeps that blast radius bounded.
+ * `api/purchase-dispatch.ts` join into a log line — would let a single
+ * response flood observability sinks. Truncating here keeps that blast
+ * radius bounded.
  *
  * See docs/standards/security.md — "Truncate large upstream error details
  * before storing or logging them."

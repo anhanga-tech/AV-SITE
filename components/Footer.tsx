@@ -12,8 +12,6 @@ import { triggerResetBanner } from '@/lib/consent';
 import { useFooterRuntimeMetadata } from '../lib/footer-runtime';
 import { ANHANGA_TECH_LOGO_URL, BRAND_LOGO_WHITE_URL } from '../lib/media-assets';
 
-const SITE_URL = 'https://www.anhanga.tur.br';
-
 const Footer: React.FC = () => {
     const runtimeMetadata = useFooterRuntimeMetadata();
 
@@ -33,7 +31,7 @@ const Footer: React.FC = () => {
                     {/* Brand */}
                     <div className="md:col-span-2">
                         <a
-                            href={`${SITE_URL}/`}
+                            href="/"
                             className="inline-block mb-6 rounded-lg focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-cyan focus-visible:ring-offset-4"
                             aria-label="Anhangá Viagens - Home"
                         >
@@ -55,22 +53,22 @@ const Footer: React.FC = () => {
                     <div>
                         <h3 className="font-bold text-white mb-6 uppercase tracking-wider text-xs">Menu</h3>
                         <ul className="space-y-3 font-medium">
-                            <li><a href={`${SITE_URL}/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Agência de Viagens em São Paulo</a></li>
-                            <li><a href={`${SITE_URL}/sobre/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Sobre a Anhangá</a></li>
+                            <li><a href="/" className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Agência de Viagens em São Paulo</a></li>
+                            <li><a href="/sobre/" className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Sobre a Anhangá</a></li>
                             <li><a href={getBlogHomeUrl()} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Blog de Viagens e Roteiros</a></li>
-                            <li><a href={`${SITE_URL}/orlando/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Pacotes para Orlando</a></li>
-                            <li><a href={`${SITE_URL}/parques-brasil/`} className="hover:text-anhanga-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-anhanga-action focus-visible:ring-offset-2 rounded px-1 -mx-1">Parques do Brasil</a></li>
-                            <li><a href={`${SITE_URL}/beto-carrero/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Pacote Beto Carrero</a></li>
-                            <li><a href={`${SITE_URL}/lollapalooza/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Lollapalooza Brasil</a></li>
-                            <li><a href={`${SITE_URL}/melhor-idade/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Pacotes Melhor Idade 50+</a></li>
-                            <li><a href={`${SITE_URL}/consultoria-de-viagem/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Consultoria de Viagem</a></li>
-                            <li><a href={`${SITE_URL}/cruzeiros/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Cruzeiros pelo Brasil</a></li>
-                            <li><a href={`${SITE_URL}/corporativo/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Viagens Corporativas</a></li>
-                            <li><a href={`${SITE_URL}/quiz/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Quiz de Destinos</a></li>
-                            <li><a href={`${SITE_URL}/mapa-do-site/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Mapa do Site</a></li>
-                            <li><a href={`${SITE_URL}/termos-de-uso/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Termos de Uso</a></li>
-                            <li><a href={`${SITE_URL}/politica-privacidade/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Política de Privacidade</a></li>
-                            <li><a href={`${SITE_URL}/exclusao-de-dados/`} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Exclusão de Dados</a></li>
+                            <li><a href="/orlando/" className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Pacotes para Orlando</a></li>
+                            <li><a href="/parques-brasil/" className="hover:text-anhanga-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-anhanga-action focus-visible:ring-offset-2 rounded px-1 -mx-1">Parques do Brasil</a></li>
+                            <li><a href="/beto-carrero/" className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Pacote Beto Carrero</a></li>
+                            <li><a href="/lollapalooza/" className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Lollapalooza Brasil</a></li>
+                            <li><a href="/melhor-idade/" className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Pacotes Melhor Idade 50+</a></li>
+                            <li><a href="/consultoria-de-viagem/" className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Consultoria de Viagem</a></li>
+                            <li><a href="/cruzeiros/" className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Cruzeiros pelo Brasil</a></li>
+                            <li><a href="/corporativo/" className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Viagens Corporativas</a></li>
+                            <li><a href="/quiz/" className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Quiz de Destinos</a></li>
+                            <li><a href="/mapa-do-site/" className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Mapa do Site</a></li>
+                            <li><a href="/termos-de-uso/" className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Termos de Uso</a></li>
+                            <li><a href="/politica-privacidade/" className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Política de Privacidade</a></li>
+                            <li><a href="/exclusao-de-dados/" className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Exclusão de Dados</a></li>
                         </ul>
                     </div>
 

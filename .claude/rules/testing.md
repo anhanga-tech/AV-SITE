@@ -16,7 +16,7 @@ Make behavior changes safe by choosing the smallest meaningful automated test fi
 - Add or update automated tests for every behavior change. If behavior changes and no automated test changes, explain why.
 - Put pure logic, validation, normalization, and provider-shaping tests in `tests/*.test.ts` using `node:test` and `assert/strict`.
 - Use Playwright for browser-visible flows when the change crosses the UI and network boundary or affects critical conversion paths.
-- Mock outbound provider calls and browser route traffic in tests. Do not hit live Gemini, HubSpot, Meta, or GA endpoints from automated tests.
+- Mock outbound provider calls and browser route traffic in tests. Do not hit live Gemini, Meta, or GA endpoints from automated tests.
 - Test observable behavior, public outputs, and response contracts. Do not anchor tests to internal implementation details unless there is no stable external seam.
 - Add a regression test for every bug fix that has a clear reproducible failure mode.
 - Keep tests deterministic:

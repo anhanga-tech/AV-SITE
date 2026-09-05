@@ -4,7 +4,7 @@ test('Destinations map keeps marker selection working after SPA remount', async 
   const pageErrors: string[] = [];
   page.on('pageerror', error => pageErrors.push(error.message));
 
-  await page.route('https://*.basemaps.cartocdn.com/**', route => route.abort());
+  await page.route('https://tile.openstreetmap.org/**', route => route.abort());
   await page.goto('/');
   await page.evaluate(() => window.dispatchEvent(new Event('scroll')));
   await page.locator('div#destinos').scrollIntoViewIfNeeded();
@@ -62,4 +62,22 @@ test('Destinations map keeps marker selection working after SPA remount', async 
   await expect(dialog.getByRole('heading', { name: 'Orlando' })).toBeVisible();
 
   expect(pageErrors.filter(message => /Map container is already initialized|Map container is being reused|_leaflet_pos|leaflet/i.test(message))).toEqual([]);
+});
+
+test('Destinations filter pills expose their selected state via aria-pressed', async ({ page }) => {
+  await page.route('https://tile.openstreetmap.org/**', route => route.abort());
+  await page.goto('/');
+  await page.locator('div#destinos').scrollIntoViewIfNeeded();
+
+  const destinations = page.locator('section#destinos');
+  const allFilter = destinations.getByRole('button', { name: 'Todos' });
+  const europeFilter = destinations.getByRole('button', { name: 'Europa' });
+
+  await expect(allFilter).toHaveAttribute('aria-pressed', 'true');
+  await expect(europeFilter).toHaveAttribute('aria-pressed', 'false');
+
+  await europeFilter.click();
+
+  await expect(europeFilter).toHaveAttribute('aria-pressed', 'true');
+  await expect(allFilter).toHaveAttribute('aria-pressed', 'false');
 });

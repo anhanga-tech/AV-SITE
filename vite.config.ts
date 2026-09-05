@@ -21,7 +21,6 @@ const DEV_API_ROUTES: Record<string, () => Promise<{ default: ApiHandler }>> = {
   '/api/health': () => import('./api/health.ts'),
   '/api/submit-lead': () => import('./api/submit-lead.ts'),
   '/api/submit-waitlist': () => import('./api/submit-waitlist.ts'),
-  '/api/hubspot-webhook': () => import('./api/hubspot-webhook.ts'),
   '/api/submit-nps': () => import('./api/submit-nps.ts'),
 };
 

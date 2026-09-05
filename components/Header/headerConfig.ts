@@ -22,5 +22,3 @@ export const NAV_LINKS: HeaderLink[] = [
   },
   { name: 'Contato', href: 'contato' },
 ];
-
-export const SITE_URL = 'https://www.anhanga.tur.br';

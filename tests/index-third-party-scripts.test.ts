@@ -43,29 +43,25 @@ test('index.html initializes dataLayer before the React entrypoint runs', () => 
   assert.ok(dataLayerIndex < entrypointIndex, 'dataLayer should exist before app code can push conversion events');
 });
 
-test('index.html lazy-loads GTM through the deferred analytics loader', () => {
-  const loadGtmIndex = indexHtml.indexOf('loadGtm();');
-  const utmInjectIndex = indexHtml.indexOf("injectScript('/utm-tracking.js'");
+test('index.html não carrega mais o Stape/GTM (Stape desativado — corte pro Zaraz, Task 7)', () => {
+  // Stape foi desativado pela própria Stape (excedeu o plano gratuito) em 31/08/2026,
+  // o que motivou a migração pro Zaraz. GA4/Meta/TikTok agora rodam via Zaraz
+  // (docs/superpowers/plans/2026-09-01-zaraz-tag-migration.md); nenhum código deste
+  // arquivo deve mais referenciar o loader do Stape/GTM.
+  assert.doesNotMatch(indexHtml, /var\s+gtmLoaded/i, 'variável do loader do Stape/GTM não deve existir');
+  assert.doesNotMatch(indexHtml, /loadGtm/i, 'loader do Stape/GTM não deve existir');
+  assert.doesNotMatch(indexHtml, /sst\.anhanga\.tur\.br/i, 'domínio do Stape não deve ser referenciado');
+  assert.doesNotMatch(indexHtml, /'gtm\.start'/i, 'bootstrap do GTM não deve mais ser empurrado pro dataLayer');
 
-  assert.match(indexHtml, /var\s+gtmLoaded\s*=\s*false/i);
-  assert.match(indexHtml, /'gtm\.start'\s*:\s*new Date\(\)\.getTime\(\)/i);
-  assert.match(indexHtml, /https:\/\/load\.sst\.anhanga\.tur\.br\//i);
-  assert.ok(loadGtmIndex > -1, 'GTM loader should be called from the analytics trigger');
+  const utmInjectIndex = indexHtml.indexOf("injectScript('/utm-tracking.js'");
   assert.ok(utmInjectIndex > -1, 'UTM tracking loader should still be present');
-  assert.ok(loadGtmIndex < utmInjectIndex, 'GTM should be queued before UTM reads GA client data');
 });
 
-test('index.html keeps the global gtag wrapper used by the deferred UTM tracker', () => {
-  assert.match(
-    indexHtml,
-    /function\s+gtag\s*\(\)\s*\{\s*dataLayer\.push\(arguments\);\s*\}/,
-    'the UTM tracker needs a global gtag wrapper to query the GA4 client_id',
-  );
-  assert.match(
-    utmTrackingScript,
-    /gtag\(\s*['"]get['"]\s*,\s*GA4_MEASUREMENT_ID\s*,\s*['"]client_id['"]/,
-    'the deferred UTM tracker should continue querying the GA4 client_id through gtag',
-  );
+test('index.html não define mais o wrapper gtag (nada mais chama gtag() desde o corte pro Zaraz)', () => {
+  // O wrapper existia só pra utm-tracking.js chamar gtag('get', ..., 'client_id', ...);
+  // essa chamada foi removida (getGACid agora gera seu próprio cid — ver
+  // tests/whatsapp-tracking.test.ts), então o stub virou código morto.
+  assert.doesNotMatch(indexHtml, /function\s+gtag\s*\(\)/, 'wrapper gtag morto não deve mais existir');
 });
 
 test('UTM tracker respeita o opt-out data-no-specialist-cta antes de disparar specialist_cta_click', () => {
@@ -89,6 +85,13 @@ test('UTM tracker respeita o opt-out data-no-specialist-cta antes de disparar sp
     guardIndex < callIndex,
     'o opt-out deve vir antes da classificação por texto/atributo',
   );
+});
+
+test('UTM tracker não envia query string ou hash crus em page_location', () => {
+  assert.match(utmTrackingScript, /function getSafePageLocation\(\)/);
+  assert.doesNotMatch(utmTrackingScript, /page_location:\s*window\.location\.href/);
+  assert.match(utmTrackingScript, /url\.search\s*=\s*['"]['"]/);
+  assert.match(utmTrackingScript, /url\.hash\s*=\s*['"]['"]/);
 });
 
 test('index.html loads only the required Poppins font weights', () => {
@@ -126,29 +129,6 @@ test('index.html delega os defaults de consentimento ao Consent Bridge do GTM', 
   );
 });
 
-test('loadGtm tem gate de host para não poluir o GA4 de produção em dev/CI', () => {
-  const loadGtmMatch = indexHtml.match(/var loadGtm\s*=\s*function\s*\(\)\s*\{([\s\S]*?)};/);
-  assert.ok(loadGtmMatch, 'loadGtm deve estar definida');
-  const body = loadGtmMatch[1];
-
-  // O gate de host deve bloquear localhost/127.0.0.1/.local/.test, onde o Playwright/CI roda.
-  // Sem isto, generate_lead de testes vaza para o GA4 de produção (gatilho G0 do plano 360).
-  assert.match(body, /location\.hostname/, 'loadGtm deve checar location.hostname');
-  assert.match(body, /'localhost'/, 'gate deve cobrir localhost');
-  assert.match(body, /'127\.0\.0\.1'/, 'gate deve cobrir 127.0.0.1');
-  assert.match(body, /'\[::1\]'/, 'gate deve cobrir o loopback IPv6 [::1]');
-  assert.match(body, /'::1'/, 'gate deve cobrir o loopback IPv6 ::1');
-  assert.match(body, /'0\.0\.0\.0'/, 'gate deve cobrir 0.0.0.0 (Docker/CI)');
-  assert.match(body, /\.endsWith\('\.local'\)/, 'gate deve cobrir hosts .local');
-  assert.match(body, /\.endsWith\('\.test'\)/, 'gate deve cobrir hosts .test');
-
-  // O return do gate precisa vir ANTES da injeção do loader do GTM/sGTM.
-  const gateIndex = body.indexOf('location.hostname');
-  const injectIndex = body.indexOf('load.sst.anhanga.tur.br');
-  assert.ok(gateIndex > -1 && injectIndex > -1, 'gate e injeção devem existir em loadGtm');
-  assert.ok(gateIndex < injectIndex, 'o gate de host deve preceder a injeção do GTM');
-});
-
 test('Traks tem gate de host para não poluir os goals de conversão em dev/CI', () => {
   const headHtml = getHeadHtml(indexHtml);
 
@@ -158,7 +138,7 @@ test('Traks tem gate de host para não poluir os goals de conversão em dev/CI',
   assert.match(headHtml, /window\.traks\s*=\s*window\.traks\s*\|\|\s*function/, 'stub de fila do Traks deve continuar definido');
 
   // O <script src="...t.js"> não pode ser um tag estático incondicional — precisa
-  // ser injetado programaticamente, atrás do mesmo gate de host do GTM/Mautic.
+  // ser injetado programaticamente, atrás do mesmo gate de host do GTM.
   assert.doesNotMatch(
     headHtml,
     /<script[^>]*src="https:\/\/analytics-collect\.anhanga\.tur\.br\/t\.js"/i,
@@ -203,11 +183,10 @@ test('Traks tem gate de host para não poluir os goals de conversão em dev/CI',
   assert.match(gateToScriptSlice, /\.endsWith\('\.test'\)/, 'gate deve cobrir hosts .test');
 });
 
-test('loadMautic tem gate de consentimento LGPD', () => {
-  const loadMauticMatch = indexHtml.match(/var loadMautic\s*=\s*function\s*\(\)\s*\{([\s\S]*?)};/);
-  assert.ok(loadMauticMatch, 'loadMautic deve estar definida');
-  const body = loadMauticMatch[1];
-  assert.match(body, /_consentChoice\s*!==\s*'marketing'/, 'loadMautic deve ter gate de consentimento');
+test('index.html não carrega scripts do Mautic (ferramenta descontinuada)', () => {
+  assert.doesNotMatch(indexHtml, /mtc\.js/i, 'script do Mautic não deve ser injetado');
+  assert.doesNotMatch(indexHtml, /loadMautic/i, 'loader do Mautic não deve existir');
+  assert.doesNotMatch(indexHtml, /MauticTrackingObject/i, 'objeto de rastreamento do Mautic não deve existir');
 });
 
 test('index.html difere terceiros sem atraso fixo de ~12s que fixa TTI no lab (issue #1259)', () => {
@@ -234,17 +213,6 @@ test('index.html mantém teto absoluto de analytics independente do evento load'
   const loadAnalyticsMatch = indexHtml.match(/var loadAnalytics\s*=\s*function\s*\(\)\s*\{([\s\S]*?)\n\s{6}\};/);
   assert.ok(loadAnalyticsMatch, 'loadAnalytics deve estar definida');
   assert.match(loadAnalyticsMatch[1], /clearTimeout\(absoluteFallbackTimer\)/, 'clearTimeout deve estar dentro de loadAnalytics');
-});
-
-test('index.html não abre preconnect ocioso para os hosts sGTM (pré-conexão não usada)', () => {
-  const headHtml = getHeadHtml(indexHtml);
-  // Os hosts sGTM só são contatados quando o loader difere dispara (após o LCP). Um preconnect
-  // mantido aberto no load é apontado como "pré-conexão não usada" pelo Lighthouse (issue #1259).
-  assert.doesNotMatch(headHtml, /rel="preconnect"[^>]*sst\.anhanga\.tur\.br/, 'sst não deve usar preconnect');
-  assert.doesNotMatch(headHtml, /sst\.anhanga\.tur\.br[^>]*rel="preconnect"/, 'sst não deve usar preconnect (ordem invertida)');
-  // dns-prefetch (barato) deve permanecer para os dois hosts.
-  assert.match(headHtml, /rel="dns-prefetch"\s+href="https:\/\/load\.sst\.anhanga\.tur\.br"/, 'dns-prefetch de load.sst deve permanecer');
-  assert.match(headHtml, /rel="dns-prefetch"\s+href="https:\/\/sst\.anhanga\.tur\.br"/, 'dns-prefetch de sst deve permanecer');
 });
 
 test('index.html mantém no máximo 4 preconnects no head (guia de performance)', () => {
@@ -296,16 +264,110 @@ test('revogação notifica denied antes do reload', () => {
   const revokeBlock = indexHtml.slice(revokeStart);
   const notifyIndex = revokeBlock.indexOf("notifyConsentListeners('essential')");
   const deniedIndex = revokeBlock.indexOf('anhanga_marketing_consent: false');
-  const reloadIndex = revokeBlock.indexOf('window.location.reload()');
+  const reloadIndex = revokeBlock.indexOf('reloadAfterZarazFlush()');
 
   assert.ok(notifyIndex > -1);
   assert.ok(deniedIndex > notifyIndex);
-  assert.ok(reloadIndex > deniedIndex);
+  assert.ok(reloadIndex > deniedIndex, 'revogação deve delegar o reload pra reloadAfterZarazFlush, não recarregar direto');
+});
+
+test('reloadAfterZarazFlush espera o flush do Zaraz antes de recarregar (com teto curto)', () => {
+  // Achado de review (chatgpt-codex-connector[bot]): reload síncrono destruiria o
+  // documento antes do retry de 10s da assinatura da ponte ter qualquer chance de
+  // rodar, deixando o Zaraz reaplicar o 'marketing: true' persistido da visita
+  // anterior na página recarregada. reloadAfterZarazFlush precisa tentar o flush
+  // primeiro e, se falhar, esperar um pouco (não os 10s inteiros — travaria a UI).
+  const fnStart = indexHtml.indexOf('var reloadAfterZarazFlush = function () {');
+  const domListenersStart = indexHtml.indexOf("window.addEventListener('anhanga:marketing-consent'");
+  assert.ok(fnStart > -1, 'reloadAfterZarazFlush deve existir');
+  assert.ok(fnStart < domListenersStart, 'deve ser definida antes dos listeners de DOM que a usam');
+
+  const fnBlock = indexHtml.slice(fnStart, domListenersStart);
+  assert.match(fnBlock, /if\s*\(flushZarazConsent\(\)\)\s*\{\s*window\.location\.reload\(\);/, 'deve recarregar direto se o flush já tiver sucesso na hora');
+  assert.match(fnBlock, /setInterval\(/, 'deve reter e tentar de novo por um teto curto se o flush falhar na hora');
+  assert.match(fnBlock, /window\.location\.reload\(\);\s*\}\s*\},\s*200\)/, 'deve recarregar de qualquer forma depois do teto — não pode travar a revogação indefinidamente');
+});
+
+test('flushZarazConsent distingue "nada pendente" de "zaraz não está pronto"', () => {
+  // Achado de review (claude[bot] + chatgpt-codex-connector[bot]): um único `||`
+  // combinando as duas condições faz "já sincronizado" e "ainda não pronto" devolverem
+  // `false` do mesmo jeito. No fluxo de revogação, notifyConsentListeners já dispara a
+  // assinatura da ponte e flusha com sucesso quando o zaraz.js já tinha carregado (caso
+  // comum) — sem essa distinção, reloadAfterZarazFlush não reconhece o flush como
+  // concluído e espera o teto inteiro de ~1,2s à toa antes de recarregar.
+  const fnStart = indexHtml.indexOf('var flushZarazConsent = function () {');
+  const fnEnd = indexHtml.indexOf("window.addAnhangaConsentListener(function (choice)");
+  assert.ok(fnStart > -1 && fnStart < fnEnd, 'flushZarazConsent deve existir antes da assinatura que a usa');
+
+  const fnBlock = indexHtml.slice(fnStart, fnEnd);
+  assert.match(
+    fnBlock,
+    /if\s*\(pendingZarazMarketing\s*===\s*null\)\s*return\s*true;/,
+    'nada pendente deve retornar true imediatamente, sem checar se o zaraz.js carregou'
+  );
+  assert.match(
+    fnBlock,
+    /if\s*\(!window\.zaraz\s*\|\|\s*!window\.zaraz\.consent\)\s*return\s*false;/,
+    'só chega a checar prontidão do zaraz.js quando existe algo pendente pra enviar'
+  );
+});
+
+test('ponte assina addAnhangaConsentListener pra propagar a purpose de marketing pro Zaraz', () => {
+  // A sincronização vive numa assinatura da própria ponte (addAnhangaConsentListener),
+  // não numa chamada inline dentro dos listeners de DOM — assim ela também cobre uma
+  // visita de retorno com consentimento já persistido, não só o clique em si (os
+  // listeners de DOM são { once: true }).
+  const syncStart = indexHtml.indexOf('var pendingZarazMarketing = null;');
+  const marketingListenerStart = indexHtml.indexOf("window.addEventListener('anhanga:marketing-consent'");
+  assert.ok(syncStart > -1, 'assinatura da ponte pro Zaraz deve existir');
+  assert.ok(syncStart < marketingListenerStart, 'assinatura deve ser registrada antes dos listeners de DOM');
+
+  const syncBlock = indexHtml.slice(syncStart, marketingListenerStart);
+  assert.match(
+    syncBlock,
+    /pendingZarazMarketing\s*=\s*choice\s*===\s*'marketing'/,
+    'callback deve mapear o choice pra um boolean da purpose marketing'
+  );
+  assert.match(
+    syncBlock,
+    /!window\.zaraz\s*\|\|\s*!window\.zaraz\.consent/,
+    'flush deve verificar se o zaraz.js já carregou antes de chamar consent.set'
+  );
+  assert.match(
+    syncBlock,
+    /var purposeId = resolveMarketingPurposeId\(\);/,
+    'flush deve resolver o ID da purpose em runtime — o Zaraz não aceita o nome como chave de consent.set()'
+  );
+  assert.match(
+    syncBlock,
+    /payload\[purposeId\] = pendingZarazMarketing;/,
+    'flush deve montar o payload com o ID resolvido, não com o literal "marketing"'
+  );
+  assert.doesNotMatch(
+    syncBlock,
+    /window\.zaraz\.consent\.set\(\{\s*marketing:/,
+    'consent.set nunca deve receber o nome "marketing" como chave — o Zaraz espera o ID gerado da purpose (achado em produção: lança "Unknown purpose id: marketing")'
+  );
+  assert.match(
+    syncBlock,
+    /setInterval\(/,
+    'deve reter e tentar de novo se o zaraz.js ainda não tiver carregado no momento do clique — não pode descartar o consentimento em silêncio'
+  );
+});
+
+test('DOM listeners de aceite/revogação não chamam o Zaraz diretamente (delegam pra ponte)', () => {
+  const acceptStart = indexHtml.indexOf("window.addEventListener('anhanga:marketing-consent'");
+  const revokeStart = indexHtml.indexOf("window.addEventListener('anhanga:revoke-consent'");
+  const acceptBlock = indexHtml.slice(acceptStart, revokeStart);
+  const revokeBlock = indexHtml.slice(revokeStart);
+
+  assert.doesNotMatch(acceptBlock, /window\.zaraz/, 'listener de aceite não deve chamar o Zaraz direto — a assinatura da ponte já cobre isso');
+  assert.doesNotMatch(revokeBlock, /window\.zaraz/, 'listener de revogação não deve chamar o Zaraz direto — a assinatura da ponte já cobre isso');
 });
 
 test('index.html tem listener anhanga:revoke-consent com reload', () => {
   assert.match(indexHtml, /anhanga:revoke-consent/, 'listener de revogação deve estar presente');
   const revokeIdx = indexHtml.indexOf('anhanga:revoke-consent');
-  const reloadIdx = indexHtml.indexOf('window.location.reload()', revokeIdx);
-  assert.ok(reloadIdx > revokeIdx, 'reload deve ocorrer após revoke-consent');
+  const reloadIdx = indexHtml.indexOf('reloadAfterZarazFlush()', revokeIdx);
+  assert.ok(reloadIdx > revokeIdx, 'reload (via reloadAfterZarazFlush) deve ocorrer após revoke-consent');
 });

@@ -76,16 +76,13 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (com motivo) | REJECTED (com 
   rara de UX, validação de state continua correta; custo (M) > benefício.
 - Validação de formato de click IDs em `api/purchase-dispatch.ts`: falha
   silenciosa no provedor, sem impacto de segurança.
-- Cast/`JSON.parse` em `api/hubspot-webhook.ts`: seguro hoje (try-catch cobre);
-  módulo é legado.
 - `console.error` em `api/auth/callback.ts:85`: vazamento de informação já
   semi-pública; trocar por logger quando o arquivo for tocado por outro motivo.
 - Refactor do `SearchForm.tsx` (1005 linhas): debt real, mas L de esforço com
   risco MED e sem bug ativo — não priorizado nesta rodada.
-- Limpeza dos 7 arquivos HubSpot-only (`api/hubspot-webhook.ts`,
-  `services/hubspot.ts`, `lib/hubspot-validation.ts` + 4 testes): depende de
-  decisão de negócio (deals Closed-Won ainda passam por lá); planejar quando a
-  migração de tracking de deals para Salesforce for confirmada.
+- Limpeza dos arquivos HubSpot-only: feita (set/2026) junto com a
+  descontinuação do Mautic — HubSpot e Salesforce confirmados como não
+  usados; ver `docs/compliance/ripd-legitimo-interesse.md` v1.8.
 - Footer Orlando com ano hardcoded: cosmético; corrigir quando tocar no arquivo.
 - Script `verify` unificado / cache de Chrome no CI / `dev:cms` com concurrently:
   ganhos pequenos de DX; fazer oportunisticamente.
