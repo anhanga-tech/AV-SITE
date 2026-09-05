@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { AIChat } from './pages/AIChat';
+import { fileURLToPath } from 'node:url';
+
+const HOME_SCREENSHOT_STYLE = fileURLToPath(new URL('./fixtures/home-screenshot.css', import.meta.url));
 
 // Tag @visual: as baselines são geradas no CI (Linux). O antialiasing de fontes
 // difere por plataforma (e até entre máquinas macOS), então rodar localmente
@@ -17,6 +20,10 @@ test.describe('Visual Regression Suite', { tag: '@visual' }, () => {
     await expect(page).toHaveScreenshot('home-page.png', {
       fullPage: true,
       mask: [page.locator('.dynamic-blog-content')],
+      // A máscara esconde os posts, mas não estabiliza sua altura: títulos e
+      // excertos novos deslocam todo o rodapé. Reserve a altura da região
+      // mascarada nas baselines desktop/mobile; o estilo só vale na captura.
+      stylePath: HOME_SCREENSHOT_STYLE,
       maxDiffPixelRatio: 0.05,
     });
   });

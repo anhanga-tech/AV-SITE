@@ -7,7 +7,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "date": "2026-09-22",
     "author": "queila-oliveira",
     "category": "Dicas de Expert",
-    "image": "https://media.anhanga.tur.br/images/blog/disney-tropical-americas-animal-kingdom.jpg",
+    "image": "https://media.anhanga.tur.br/images/blog/epic-universe-orlando-2026.jpg",
     "featured": false,
     "showChatCTA": true,
     "chatCTADestination": "Orlando",
@@ -41,7 +41,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       }
     ],
     "slug": "epic-universe-orlando-2026-vale-a-pena",
-    "readingTime": "7 min de leitura"
+    "readingTime": "8 min de leitura"
   },
   {
     "title": "Quantos dias ficar em Orlando? Roteiro de 5 a 14 dias",
@@ -49,7 +49,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "date": "2026-09-15",
     "author": "felipe-william",
     "category": "Planejamento",
-    "image": "https://media.anhanga.tur.br/images/blog/quanto-custa-viagem-disney-2026.jpg",
+    "image": "https://media.anhanga.tur.br/images/blog/quantos-dias-ficar-em-orlando.jpg",
     "featured": false,
     "showChatCTA": true,
     "chatCTADestination": "Orlando",
@@ -71,7 +71,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "Dá para fazer Disney e Universal em 7 dias?",
-        "answer": "Dá, mas o roteiro precisa ser seletivo. Uma divisão possível é quatro dias Disney e dois dias Universal, deixando um dia para descanso, compras ou chegada. Incluir os três parques temáticos da Universal em apenas dois dias exige aceitar que algumas atrações ficarão de fora."
+        "answer": "Dá, mas o roteiro precisa ser seletivo. Uma divisão possível é dois dias Disney, dois dias Universal, um dia de descanso e dois dias para chegada e retorno. Para visitar os quatro parques Disney e os três parques temáticos da Universal, aumente a duração da viagem."
       },
       {
         "question": "Quantos dias de descanso colocar em Orlando?",
@@ -91,7 +91,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "date": "2026-09-10",
     "author": "queila-oliveira",
     "category": "Festivais",
-    "image": "https://media.anhanga.tur.br/images/destinations/gramado.jpg",
+    "image": "https://media.anhanga.tur.br/images/blog/oktoberfest-blumenau-2026.jpg",
     "featured": false,
     "showChatCTA": true,
     "chatCTADestination": "Oktoberfest Blumenau",
@@ -132,7 +132,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "date": "2026-09-08",
     "author": "felipe-william",
     "category": "Planejamento",
-    "image": "https://media.anhanga.tur.br/images/blog/como-planejar-viagem-orlando-sob-medida.jpg",
+    "image": "https://media.anhanga.tur.br/images/blog/onde-ficar-em-orlando.jpg",
     "featured": false,
     "showChatCTA": true,
     "chatCTADestination": "Orlando",
@@ -169,12 +169,12 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "8 min de leitura"
   },
   {
-    "title": "Rock in Rio 2026: guia para planejar sua viagem ao Rio",
-    "excerpt": "Vai ao Rock in Rio 2026? Veja datas, local, ingresso digital, hospedagem e como organizar a viagem sem deixar a logística para a última hora.",
-    "date": "2026-09-04",
+    "title": "Rock in Rio 2026: checklist para quem vai ao festival",
+    "excerpt": "Já vai ao Rock in Rio 2026? Confira o Quentro, o ingresso do dia, a hospedagem e o transporte de volta para aproveitar os dias restantes do festival.",
+    "date": "2026-09-05",
     "author": "felipe-william",
     "category": "Festivais",
-    "image": "https://media.anhanga.tur.br/images/destinations/rio-de-janeiro.jpg",
+    "image": "https://media.anhanga.tur.br/images/blog/rock-in-rio-2026.jpg",
     "featured": false,
     "showChatCTA": true,
     "chatCTADestination": "Rock in Rio",
@@ -186,8 +186,8 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "viagem",
       "planejamento"
     ],
-    "seoTitle": "Rock in Rio 2026: guia de viagem",
-    "seoDescription": "Rock in Rio 2026: confira datas, local, ingresso digital, hospedagem e os cuidados para organizar sua viagem ao Rio de Janeiro.",
+    "seoTitle": "Rock in Rio 2026: checklist do festival",
+    "seoDescription": "Vai aos dias restantes do Rock in Rio 2026? Confira ingresso no Quentro, documentos, hospedagem e transporte de volta antes de sair para a Cidade do Rock.",
     "faq": [
       {
         "question": "Quando acontece o Rock in Rio 2026?",

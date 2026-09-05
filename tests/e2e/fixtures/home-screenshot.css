@@ -1,0 +1,14 @@
+/* Only used by the home screenshot assertion. Blog content is already masked;
+   preserve its baseline footprint so editorial changes do not shift the footer.
+   These heights match the existing Desktop Chrome / Pixel 5 reference images. */
+.dynamic-blog-content {
+  height: 1709px !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+@media (max-width: 767px) {
+  .dynamic-blog-content {
+    height: 3103px !important;
+  }
+}
