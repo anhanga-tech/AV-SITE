@@ -3,17 +3,32 @@ import { LazyMotion, domAnimation } from 'framer-motion';
 import { BrowserRouter, MemoryRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import Header from './components/Header/Header';
 import Footer from './components/Footer';
-import AIChat from './components/AIChat';
 import ContactModal from './components/ContactModal';
 import { ClientOnly } from './components/ClientOnly';
 import ChunkErrorBoundary from './components/ChunkErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
-import BackToTop from './components/ui/BackToTop';
-import CookieConsentBanner from './components/CookieConsentBanner';
 import { HeadContext, type HeadManager } from './lib/head';
 
 // Pages
 import Home from './pages/Home';
+
+// Overlays de cliente puro que nunca renderizam durante SSR (ver `includeClientFeatures` e
+// `ClientOnly` abaixo), então torná-los lazy não arrisca o HTML prerenderizado de nenhuma
+// rota — diferente de Header/Footer/Home, que o `ssr.tsx` precisa resolver de forma síncrona
+// (ver comentário em `ssr.tsx`). lazy() move o código deles para fora do chunk de entrada, que
+// hoje é baixado por toda rota (incl. `/links` e as landings), mesmo as que nunca os montam.
+// ContactModal NÃO entra aqui apesar de se qualificar por esse critério: toda rota já precisa
+// dele hoje (ClientFeatures o monta incondicionalmente, e `pages/LinksPage.tsx` importa sua
+// própria instância direto) — não haveria bytes a poupar. Torná-lo lazy só trocaria esse
+// "grátis" por um risco real: seus CTAs abrem o modal via `window.dispatchEvent` num
+// `CustomEvent('open-contact-modal')` (utils/contactForm.ts) que o componente escuta a partir
+// do próprio mount — um clique rápido (o CTA "Fale Conosco" do Header é visível assim que a
+// página carrega) antes do chunk resolver perderia o evento (comprovado com o CTA do Header
+// em tests/e2e/contact-form.spec.ts — falhou lazy, sem consumidor para reemitir o evento).
+const AIChat = lazy(() => import('./components/AIChat'));
+const BackToTop = lazy(() => import('./components/ui/BackToTop'));
+const CookieConsentBanner = lazy(() => import('./components/CookieConsentBanner'));
+
 const BlogList = lazy(() => import('./pages/BlogList'));
 const BlogPost = lazy(() => import('./pages/BlogPost'));
 const BlogRedirect = lazy(() => import('./pages/BlogRedirect'));
@@ -82,9 +97,11 @@ const ClientFeatures: React.FC = () => {
   const isLandingRoute = LANDING_PAGE_ROUTES.includes(normalizedPath);
   return (
     <ClientOnly>
-      {isLandingRoute ? null : <AIChat />}
-      <ContactModal />
-      {isLandingRoute ? null : <BackToTop />}
+      <Suspense fallback={null}>
+        {isLandingRoute ? null : <AIChat />}
+        <ContactModal />
+        {isLandingRoute ? null : <BackToTop />}
+      </Suspense>
     </ClientOnly>
   );
 };
@@ -127,7 +144,9 @@ const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClient
       {/* Primeiro na ordem do DOM: usuários de teclado/leitor de tela alcançam as
           preferências de cookies sem atravessar a página inteira (visual segue fixed no rodapé) */}
       <ClientOnly>
-        <CookieConsentBanner />
+        <Suspense fallback={null}>
+          <CookieConsentBanner />
+        </Suspense>
       </ClientOnly>
       <ScrollToTop />
       <ChunkErrorBoundary>

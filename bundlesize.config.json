@@ -2,15 +2,15 @@
   "files": [
     {
       "path": "dist/assets/react-vendor-*.js",
-      "maxSize": "400 kB"
+      "maxSize": "130 kB"
     },
     {
       "path": "dist/assets/index-*.js",
-      "maxSize": "360 kB"
+      "maxSize": "120 kB"
     },
     {
       "path": "dist/assets/AIChatPanel-*.js",
-      "maxSize": "80 kB"
+      "maxSize": "55 kB"
     }
   ]
 }

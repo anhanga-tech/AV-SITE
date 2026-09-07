@@ -30,6 +30,40 @@ function renderApp(url: string, headManager: HeadManager): React.ReactElement {
   );
 }
 
+// `/` está preso ao caminho síncrono (`renderToString`) desde a #582 ("Fix home prerender
+// CLS"). Causa raiz, confirmada via `git log -S isHomeRoute -- ssr.tsx` + o teste que a PR
+// adicionou (tests/hydration.test.ts): `pages/Home.tsx` embrulha suas seções abaixo da dobra
+// (Destinations/Testimonials/CallToAction) em `lazy()` + `<Suspense>` próprios. Quando `/`
+// passava por `renderStreamingHtml` (que usa `onAllReady`, ou seja, só chama `pipe()` depois
+// que TODO Suspense já resolveu), o HTML gerado ainda assim continha o mecanismo de streaming
+// fora de ordem do React — fallback inicial + blocos ocultos (`hidden id="S:n"`) com o script
+// de swap que injeta o conteúdo real depois. `onAllReady` só atrasa o `pipe()`; não reescreve
+// essa estrutura de dois estágios, porque ela é decidida durante o render, não no envio. No
+// browser isso é dois paints: o fallback (`min-h-[900px]` etc.) pinta primeiro, o script de
+// swap troca pelo conteúdo real depois — e como o Footer vem logo abaixo dessas seções no
+// MainSiteShell, esse swap empurrava o Footer, reportado em CLS de campo real.
+//
+// `renderToString` evita esse mecanismo por completo (não tem conceito de streaming fora de
+// ordem), ao custo de nunca resolver `lazy()` — por isso o `dist/index.html` de hoje mostra
+// `<section class="min-h-[900px] ..."></section>` vazio onde Destinations deveria estar
+// (confirmado inspecionando o build; content real só chega via hidratação client-side).
+// Essa perda de conteúdo abaixo da dobra no HTML estático já é uma troca aceita — não
+// introduzida por esta issue.
+//
+// Consequência prática para #1513: QUALQUER novo Suspense boundary na árvore de `/` reabre o
+// mesmo risco, não só tornar o `Home` de cima em si `lazy()`. Header e Footer são renderizados
+// incondicionalmente dentro do mesmo `MainSiteShell` que envolve `Home` — torná-los `lazy()`
+// exigiria mover `/` para `renderStreamingHtml` de novo, reproduzindo o bug de CLS de campo
+// que a #582 corrigiu (ou perdendo Header/Footer do HTML estático da home, pior ainda: eles
+// são navegação/rodapé, não conteúdo secundário abaixo da dobra). Por isso, nesta PR, Header e
+// Footer continuam import estático em App.tsx — só os componentes que a SSR já pula
+// incondicionalmente (AIChat, ContactModal, BackToTop, CookieConsentBanner — todos atrás de
+// `includeClientFeatures`/`ClientOnly`, nunca renderizados no servidor) viraram `lazy()`. Se
+// alguém quiser desbloquear Header/Footer/Home lazy no futuro, o caminho é resolver esse
+// mecanismo de streaming (ex.: "aquecer" os `lazy()` da árvore de `/` com um render de
+// streaming descartável antes do `renderToString` final, para que `React.lazy` os devolva já
+// resolvidos e nunca suspenda) — não tentado aqui por ser uma mudança de arquitetura no
+// prerender da página mais importante do site, sem cobertura de teste ainda para validar.
 function isHomeRoute(url: string): boolean {
   const pathname = url.split(QUERY_HASH_REGEX)[0];
   return pathname.replace(TRAILING_SLASH_REGEX, '') === '';
