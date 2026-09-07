@@ -56,9 +56,10 @@ function renderApp(url: string, headManager: HeadManager): React.ReactElement {
 // exigiria mover `/` para `renderStreamingHtml` de novo, reproduzindo o bug de CLS de campo
 // que a #582 corrigiu (ou perdendo Header/Footer do HTML estático da home, pior ainda: eles
 // são navegação/rodapé, não conteúdo secundário abaixo da dobra). Por isso, nesta PR, Header e
-// Footer continuam import estático em App.tsx — só os componentes que a SSR já pula
-// incondicionalmente (AIChat, ContactModal, BackToTop, CookieConsentBanner — todos atrás de
-// `includeClientFeatures`/`ClientOnly`, nunca renderizados no servidor) viraram `lazy()`. Se
+// Footer continuam import estático em App.tsx — só os overlays client-only que a SSR já pula
+// incondicionalmente (AIChat, BackToTop, CookieConsentBanner; ContactModal permanece estático
+// — ver comentário em App.tsx — todos atrás de `includeClientFeatures`/`ClientOnly`, nunca
+// renderizados no servidor) viraram `lazy()`. Se
 // alguém quiser desbloquear Header/Footer/Home lazy no futuro, o caminho é resolver esse
 // mecanismo de streaming (ex.: "aquecer" os `lazy()` da árvore de `/` com um render de
 // streaming descartável antes do `renderToString` final, para que `React.lazy` os devolva já
