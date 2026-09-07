@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { GLOBE_EARTH_NIGHT_TEXTURE_URL } from '@/lib/media-assets';
 import { prefersReducedMotion } from '../shared/motion';
 
@@ -31,7 +31,23 @@ const POINTS = [
     ...DESTINATIONS.map(d => ({ ...d, isHub: false })),
 ];
 
+// Match the hero's lg:block breakpoint. CSS visibility alone does not prevent
+// the WebGL module and its texture from downloading on smaller screens.
+const DESKTOP_QUERY = '(min-width: 1024px)';
+const subscribeDesktop = (onChange: () => void) => {
+    const query = window.matchMedia(DESKTOP_QUERY);
+    query.addEventListener('change', onChange);
+    return () => query.removeEventListener('change', onChange);
+};
+const isDesktop = () => window.matchMedia(DESKTOP_QUERY).matches;
+const serverSnapshot = () => false;
+
 export function CorpGlobe() {
+    const visible = useSyncExternalStore(subscribeDesktop, isDesktop, serverSnapshot);
+    return visible ? <DesktopGlobe /> : null;
+}
+
+function DesktopGlobe() {
     const containerRef = useRef<HTMLDivElement>(null);
     const [loadFailed, setLoadFailed] = useState(false);
 
@@ -106,6 +122,7 @@ export function CorpGlobe() {
                 try {
                     motionQuery?.removeEventListener?.('change', onMotionChange);
                     resizeObserver.disconnect();
+                    globe.pauseAnimation();
                     const r = globe.renderer();
                     if (r) {
                         r.dispose();
