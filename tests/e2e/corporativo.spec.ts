@@ -14,10 +14,16 @@ import { CorporativoPage } from './pages/CorporativoPage';
 const GLOBE_MODULE_ROUTE = /globe(\.|__)gl/;
 const GLOBE_STUB_MODULE = `
   export default function Globe() {
+    window.__corpGlobeLifecycle = window.__corpGlobeLifecycle || [];
+    window.__corpGlobeLifecycle.push('created');
     const api = new Proxy(function () {}, {
       get(_target, prop) {
         if (prop === 'renderer') return () => null;
         if (prop === 'controls') return () => ({});
+        if (prop === 'pauseAnimation') return () => {
+          window.__corpGlobeLifecycle.push('paused');
+          return api;
+        };
         return () => api;
       },
       apply() { return api; },
@@ -40,6 +46,46 @@ async function stubCorpGlobe(page: import('@playwright/test').Page) {
 test.describe('Corporativo Landing Page', () => {
   test.beforeEach(async ({ page }) => {
     await stubCorpGlobe(page);
+  });
+
+  test('should only load the globe on desktop and stop it when the viewport shrinks', async ({ page }) => {
+    const globeRequests: string[] = [];
+    page.on('request', request => {
+      if (GLOBE_MODULE_ROUTE.test(request.url()) || request.url().includes('earth-night')) {
+        globeRequests.push(request.url());
+      }
+    });
+    const lifecycle = () => page.evaluate(() =>
+      (window as Window & { __corpGlobeLifecycle?: string[] }).__corpGlobeLifecycle ?? []
+    );
+
+    await page.setViewportSize({ width: 412, height: 823 });
+    await new CorporativoPage(page).goto();
+    // Wait for hydration, not just the prerendered heading, before asserting
+    // that the asynchronous globe import never started.
+    await expect.poll(() => page.evaluate(() =>
+      (window.dataLayer || []).some(event =>
+        event && typeof event === 'object' && 'event' in event && event.event === 'landing_view'
+      )
+    )).toBe(true);
+    await page.setViewportSize({ width: 1023, height: 823 });
+    await page.waitForTimeout(500);
+    expect(globeRequests).toEqual([]);
+    expect(await lifecycle()).toEqual([]);
+
+    await page.setViewportSize({ width: 1024, height: 823 });
+    await expect.poll(async () => (await lifecycle()).includes('created')).toBe(true);
+    expect(globeRequests.some(url => GLOBE_MODULE_ROUTE.test(url))).toBe(true);
+    const beforeShrink = await lifecycle();
+
+    await page.setViewportSize({ width: 412, height: 823 });
+    await expect.poll(async () => (await lifecycle()).filter(event => event === 'paused').length)
+      .toBeGreaterThan(beforeShrink.filter(event => event === 'paused').length);
+
+    const beforeExpand = await lifecycle();
+    await page.setViewportSize({ width: 1280, height: 823 });
+    await expect.poll(async () => (await lifecycle()).filter(event => event === 'created').length)
+      .toBeGreaterThan(beforeExpand.filter(event => event === 'created').length);
   });
 
   test('should push correct dataLayer event on landing view', async ({ page }) => {
