@@ -23,12 +23,15 @@ Object.defineProperty(globalThis, 'dispatchEvent', {
 });
 
 // Importar APÓS configurar os mocks (execução de módulo ocorre no import)
-const { getConsent, setConsent, triggerResetBanner } = await import('../lib/consent.ts');
+const { getConsent, registerConsentBannerListener, setConsent, triggerResetBanner } = await import('../lib/consent.ts');
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- helper de teste para estado de módulo
+const { _resetConsentListenerStateForTests } = await import('../lib/consent.ts') as any;
 
 // --- Helpers ---
 function clearAll() {
   store = {};
   eventsFired.length = 0;
+  _resetConsentListenerStateForTests();
 }
 
 // --- Testes ---
@@ -123,9 +126,20 @@ describe('setConsent("essential") — revogação (anterior era "marketing")', (
 describe('triggerResetBanner()', () => {
   beforeEach(clearAll);
 
-  test('dispara anhanga:reset-consent', () => {
+  test('dispara anhanga:reset-consent quando o banner está montado', () => {
+    // Com o CookieConsentBanner lazy, o listener de reset só existe após o chunk montar —
+    // registerConsentBannerListener() é chamado no useEffect do banner e drena intents.
+    registerConsentBannerListener();
     triggerResetBanner();
     assert.ok(eventsFired.includes('anhanga:reset-consent'));
+  });
+
+  test('bufferiza o reset antes de o banner montar e drena no registro', () => {
+    // Listener ainda não registrado (chunk lazy baixando): o intent não se perde.
+    triggerResetBanner();
+    assert.ok(!eventsFired.includes('anhanga:reset-consent'), 'não dispara antes de montar');
+    registerConsentBannerListener();
+    assert.ok(eventsFired.includes('anhanga:reset-consent'), 'drena na montagem');
   });
 
   test('não altera o localStorage', () => {
