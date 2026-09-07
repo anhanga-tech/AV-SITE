@@ -1,7 +1,7 @@
 import path from 'node:path';
 import matter from 'gray-matter';
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
-import type { BlogPostFrontmatter, PostMeta } from '../types/blog';
+import type { BlogPostFrontmatter, HomeTeaserPost, PostMeta } from '../types/blog';
 import { resolveMediaUrl } from './media-url.ts';
 import { isFuturePost, shouldHideFuturePosts, todayInSaoPaulo } from './blog-schedule.js';
 
@@ -113,6 +113,35 @@ export const BLOG_POST_MANIFEST: PostMeta[] = ${JSON.stringify(posts, null, 2)};
 `;
 }
 
+// components/Blog.tsx (teaser da home) só usa os N posts mais recentes — manter esse
+// número em sincronia com o `.slice(0, N)` de lá. Ele é o consumidor único deste arquivo.
+const HOME_TEASER_POST_COUNT = 4;
+
+function toHomeTeaserPost(post: PostMeta): HomeTeaserPost {
+  return {
+    slug: post.slug,
+    title: post.title,
+    excerpt: post.excerpt,
+    date: post.date,
+    category: post.category,
+    author: post.author,
+    image: post.image,
+    ...(post.featured ? { featured: true as const } : {}),
+  };
+}
+
+function serializeHomeTeaserPosts(posts: PostMeta[]): string {
+  const teaserPosts = posts.slice(0, HOME_TEASER_POST_COUNT).map(toHomeTeaserPost);
+
+  return `// Gerado por scripts/generate-blog-manifest.ts — não editar manualmente.
+// Subconjunto de data/blogManifest.ts (só os ${HOME_TEASER_POST_COUNT} posts mais recentes,
+// só os campos que components/Blog.tsx renderiza) — ver HomeTeaserPost em types/blog.ts.
+import type { HomeTeaserPost } from '../types/blog';
+
+export const HOME_TEASER_POSTS: HomeTeaserPost[] = ${JSON.stringify(teaserPosts, null, 2)};
+`;
+}
+
 // Versão markdown dos posts para consumo por LLMs/agentes via /api/markdown.
 // Gerada em módulo separado do manifest para não inflar o bundle do cliente —
 // apenas a edge function importa este arquivo.
@@ -176,6 +205,7 @@ export async function writeBlogArtifacts(
   blogDir: string,
   manifestOutputFile: string,
   markdownOutputFile: string,
+  homeTeaserOutputFile: string,
   options: BlogScheduleOptions = {}
 ): Promise<{ posts: PostMeta[]; markdownCount: number }> {
   const { hideFuture = shouldHideFuturePosts(), today = todayInSaoPaulo() } = options;
@@ -192,10 +222,12 @@ export async function writeBlogArtifacts(
   await Promise.all([
     mkdir(path.dirname(manifestOutputFile), { recursive: true }),
     mkdir(path.dirname(markdownOutputFile), { recursive: true }),
+    mkdir(path.dirname(homeTeaserOutputFile), { recursive: true }),
   ]);
   await Promise.all([
     writeFile(manifestOutputFile, serializeBlogPostMeta(manifestPosts), 'utf8'),
     writeFile(markdownOutputFile, serializeBlogPostMarkdown(markdownEntries), 'utf8'),
+    writeFile(homeTeaserOutputFile, serializeHomeTeaserPosts(manifestPosts), 'utf8'),
   ]);
 
   return { posts: manifestPosts, markdownCount: Object.keys(markdownEntries).length };

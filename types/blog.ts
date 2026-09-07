@@ -26,3 +26,12 @@ export type PostMeta = Omit<BlogPostFrontmatter, 'tags'> & {
   slug: string;        // derivado do filename, ex: "dicas-disney-2026"
   readingTime: string; // ex: "4 min de leitura"
 };
+
+// Subconjunto de PostMeta para o teaser da home (components/Blog.tsx): só os campos que
+// aquele card renderiza. O manifesto completo (com faq[], tags[], etc. dos 40 posts) fica
+// fora do bundle da home — que é renderizada de forma síncrona em ssr.tsx e paga o custo de
+// qualquer import estático — porque a home só precisa dos N posts mais recentes.
+export type HomeTeaserPost = Pick<
+  PostMeta,
+  'slug' | 'title' | 'excerpt' | 'date' | 'category' | 'author' | 'image' | 'featured'
+>;
