@@ -2,6 +2,7 @@ import React, { Suspense, lazy, memo, useCallback, useEffect, useRef, useState }
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ChatCircleDots, CircleNotch } from '@phosphor-icons/react';
 import ChunkErrorBoundary from './ChunkErrorBoundary';
+import { registerAiChatToggleListener } from '../utils/aiChat';
 import { triggerHaptic } from '../utils/haptics';
 
 const AIChatPanel = lazy(() => import('./AIChatPanel'));
@@ -86,6 +87,11 @@ const AIChat: React.FC = memo(() => {
   }, []);
 
   useEffect(() => {
+    // AIChat montou (chunk lazy carregado): habilita dispatch direto e drena qualquer
+    // intent de `toggle-ai-chat` ocorrido antes (ver registerAiChatToggleListener em
+    // utils/aiChat.ts — a corrida do MobileHeroForm com o chunk ainda baixando).
+    registerAiChatToggleListener();
+
     const handleToggle = (event: Event) => {
       const customEvent = event as CustomEvent;
       openChatDrawer(false);

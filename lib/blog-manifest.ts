@@ -113,8 +113,8 @@ export const BLOG_POST_MANIFEST: PostMeta[] = ${JSON.stringify(posts, null, 2)};
 `;
 }
 
-// components/Blog.tsx (teaser da home) só usa os N posts mais recentes — manter esse
-// número em sincronia com o `.slice(0, N)` de lá. Ele é o consumidor único deste arquivo.
+// components/Blog.tsx (teaser da home) é o consumidor único deste arquivo e renderiza
+// exatamente HOME_TEASER_POST_COUNT posts — o corte acontece aqui, na geração.
 const HOME_TEASER_POST_COUNT = 4;
 
 function toHomeTeaserPost(post: PostMeta): HomeTeaserPost {

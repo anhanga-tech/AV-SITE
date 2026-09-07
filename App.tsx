@@ -97,11 +97,24 @@ const ClientFeatures: React.FC = () => {
   const isLandingRoute = LANDING_PAGE_ROUTES.includes(normalizedPath);
   return (
     <ClientOnly>
-      <Suspense fallback={null}>
-        {isLandingRoute ? null : <AIChat />}
-        <ContactModal />
-        {isLandingRoute ? null : <BackToTop />}
-      </Suspense>
+      {/*
+        Um <Suspense> por overlay lazy, NUNCA compartilhado com ContactModal:
+        o React só commita um boundary quando TODOS os filhos suspensos resolvem,
+        então ContactModal (estático, listener `open-contact-modal` precisa montar
+        cedo) ficaria refém do fetch dos chunks de AIChat/BackToTop — exatamente o
+        atraso que o comentário acima diz ter evitado ao deixá-lo fora do lazy().
+      */}
+      {isLandingRoute ? null : (
+        <Suspense fallback={null}>
+          <AIChat />
+        </Suspense>
+      )}
+      <ContactModal />
+      {isLandingRoute ? null : (
+        <Suspense fallback={null}>
+          <BackToTop />
+        </Suspense>
+      )}
     </ClientOnly>
   );
 };
