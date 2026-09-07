@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
 
 export function useScrolled(threshold = 20): boolean {
-    const [isScrolled, setIsScrolled] = useState(false);
+    // Lazy initializer: lê a posição atual na primeira render (BackToTop monta lazy e o
+    // usuário pode já estar rolado além do threshold sem um scroll event futuro — sem isso
+    // o controle ficaria oculto até o próximo scroll). Client-only: window existe aqui.
+    const [isScrolled, setIsScrolled] = useState(() => window.scrollY > threshold);
 
     useEffect(() => {
-        // Inicializa da posição atual: se o componente montou lazy (BackToTop), o usuário
-        // pode já estar rolado além do threshold sem um scroll event futuro — sem isso o
-        // controle ficaria oculto até o próximo scroll.
-        setIsScrolled(window.scrollY > threshold);
-
         let ticking = false;
         const handleScroll = () => {
             if (!ticking) {
