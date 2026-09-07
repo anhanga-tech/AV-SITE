@@ -6,13 +6,16 @@ const CookieConsentBanner: React.FC = () => {
   const bannerRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    // Banner montou (chunk lazy carregado): habilita dispatch direto e drena qualquer
-    // reset ocorrido antes (ver registerConsentBannerListener em lib/consent.ts — a corrida
-    // do "Gerenciar cookies" no footer com o chunk ainda baixando).
-    registerConsentBannerListener();
-
     const handleReset = () => setVisible(true);
     window.addEventListener('anhanga:reset-consent', handleReset);
+
+    // Banner montou (chunk lazy carregado): habilita dispatch direto e drena qualquer
+    // reset ocorrido antes (ver registerConsentBannerListener em lib/consent.ts — a corrida
+    // do "Gerenciar cookies" no footer com o chunk ainda baixando). Deve vir DEPOIS do
+    // addEventListener acima: um bufferedResetBanner drenado aqui dispara o evento e o
+    // handleReset precisa já estar registrado para o banner abrir.
+    registerConsentBannerListener();
+
     return () => window.removeEventListener('anhanga:reset-consent', handleReset);
   }, []);
 
