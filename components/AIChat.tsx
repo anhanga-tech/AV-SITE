@@ -87,11 +87,6 @@ const AIChat: React.FC = memo(() => {
   }, []);
 
   useEffect(() => {
-    // AIChat montou (chunk lazy carregado): habilita dispatch direto e drena qualquer
-    // intent de `toggle-ai-chat` ocorrido antes (ver registerAiChatToggleListener em
-    // utils/aiChat.ts — a corrida do MobileHeroForm com o chunk ainda baixando).
-    registerAiChatToggleListener();
-
     const handleToggle = (event: Event) => {
       const customEvent = event as CustomEvent;
       openChatDrawer(false);
@@ -101,6 +96,13 @@ const AIChat: React.FC = memo(() => {
       }
     };
     window.addEventListener('toggle-ai-chat', handleToggle);
+
+    // Habilita dispatch direto e drena qualquer intent de `toggle-ai-chat` ocorrido antes
+    // (ver registerAiChatToggleListener em utils/aiChat.ts — a corrida do MobileHeroForm
+    // com o chunk ainda baixando). Deve vir DEPOIS do addEventListener acima: um
+    // bufferedOpen drenado aqui dispara o evento e o handleToggle precisa já estar
+    // registrado para o chat abrir.
+    registerAiChatToggleListener();
 
     // Deep-link support — open chat and optionally pre-fill a destination message
     const CHAT_URL_PARAM = 'chat';

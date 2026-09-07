@@ -97,24 +97,26 @@ const ClientFeatures: React.FC = () => {
   const isLandingRoute = LANDING_PAGE_ROUTES.includes(normalizedPath);
   return (
     <ClientOnly>
-      {/*
-        Um <Suspense> por overlay lazy, NUNCA compartilhado com ContactModal:
-        o React só commita um boundary quando TODOS os filhos suspensos resolvem,
-        então ContactModal (estático, listener `open-contact-modal` precisa montar
-        cedo) ficaria refém do fetch dos chunks de AIChat/BackToTop — exatamente o
-        atraso que o comentário acima diz ter evitado ao deixá-lo fora do lazy().
-      */}
-      {isLandingRoute ? null : (
-        <Suspense fallback={null}>
-          <AIChat />
-        </Suspense>
-      )}
-      <ContactModal />
-      {isLandingRoute ? null : (
-        <Suspense fallback={null}>
-          <BackToTop />
-        </Suspense>
-      )}
+      <ChunkErrorBoundary fallback={null}>
+        {/*
+          Um <Suspense> por overlay lazy, NUNCA compartilhado com ContactModal:
+          o React só commita um boundary quando TODOS os filhos suspensos resolvem,
+          então ContactModal (estático, listener `open-contact-modal` precisa montar
+          cedo) ficaria refém do fetch dos chunks de AIChat/BackToTop — exatamente o
+          atraso que o comentário acima diz ter evitado ao deixá-lo fora do lazy().
+        */}
+        {isLandingRoute ? null : (
+          <Suspense fallback={null}>
+            <AIChat />
+          </Suspense>
+        )}
+        <ContactModal />
+        {isLandingRoute ? null : (
+          <Suspense fallback={null}>
+            <BackToTop />
+          </Suspense>
+        )}
+      </ChunkErrorBoundary>
     </ClientOnly>
   );
 };
@@ -157,9 +159,11 @@ const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClient
       {/* Primeiro na ordem do DOM: usuários de teclado/leitor de tela alcançam as
           preferências de cookies sem atravessar a página inteira (visual segue fixed no rodapé) */}
       <ClientOnly>
-        <Suspense fallback={null}>
-          <CookieConsentBanner />
-        </Suspense>
+        <ChunkErrorBoundary>
+          <Suspense fallback={null}>
+            <CookieConsentBanner />
+          </Suspense>
+        </ChunkErrorBoundary>
       </ClientOnly>
       <ScrollToTop />
       <ChunkErrorBoundary>
