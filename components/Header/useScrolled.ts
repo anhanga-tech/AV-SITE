@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 
 export function useScrolled(threshold = 20): boolean {
-    // Lazy initializer: lê a posição atual na primeira render (BackToTop monta lazy e o
+    // Lazy initializer: lê a posição atual na primeira render. BackToTop monta lazy e o
     // usuário pode já estar rolado além do threshold sem um scroll event futuro — sem isso
-    // o controle ficaria oculto até o próximo scroll). Client-only: window existe aqui.
-    const [isScrolled, setIsScrolled] = useState(() => window.scrollY > threshold);
+    // o controle ficaria oculto até o próximo scroll. Guard de SSR: window não existe no
+    // servidor (renderToString da home passa por useScrolled via Header).
+    const [isScrolled, setIsScrolled] = useState(
+        () => typeof window !== 'undefined' && window.scrollY > threshold
+    );
 
     useEffect(() => {
         let ticking = false;
