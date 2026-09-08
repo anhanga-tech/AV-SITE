@@ -7,6 +7,7 @@ import { shouldHydratePrerenderedRoute } from './lib/hydration';
 import { initClientErrorTracking } from './lib/sentry-client';
 import { installTraksWhatsAppClickListener } from './utils/traks';
 import { handleStaleChunkPreloadError } from './lib/stale-chunk-recovery';
+import { preloadBlogPostMdxForUrl } from './lib/blog-mdx';
 
 // Reload (once per failing asset) on stale-cache preload failures so the
 // browser fetches the latest HTML + hashed assets. See
@@ -32,22 +33,36 @@ const canHydrate =
   hasPrerenderedMarkup &&
   shouldHydratePrerenderedRoute(prerenderedRoute, window.location.pathname);
 
-if (canHydrate) {
-  ReactDOM.hydrateRoot(
-    rootElement,
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  );
-} else {
-  if (hasPrerenderedMarkup) {
-    rootElement.replaceChildren();
-  }
+async function bootstrap(appRoot: HTMLElement): Promise<void> {
+  // Kick off the article chunk download without blocking the first paint of
+  // interactivity: prerendered header/navigation/controls hydrate immediately.
+  // On a prerendered blog route the body is already in the server HTML, so the
+  // route's Suspense boundary keeps it visible until this resolves; on SPA
+  // navigation the boundary waits on the per-article chunk.
+  preloadBlogPostMdxForUrl(window.location.href).catch(() => {
+    // A failed preload is not fatal: the route's Suspense boundary surfaces the
+    // error and vite:preloadError covers the stale-chunk reload case.
+  });
 
-  const root = ReactDOM.createRoot(rootElement);
-  root.render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  );
+  if (canHydrate) {
+    ReactDOM.hydrateRoot(
+      appRoot,
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    );
+  } else {
+    if (hasPrerenderedMarkup) {
+      appRoot.replaceChildren();
+    }
+
+    const root = ReactDOM.createRoot(appRoot);
+    root.render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    );
+  }
 }
+
+void bootstrap(rootElement);

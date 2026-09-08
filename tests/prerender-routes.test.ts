@@ -30,6 +30,24 @@ test('buildPrerenderRoutes includes blog index and blog post routes from MDX fil
   }
 });
 
+test('buildPrerenderRoutes ignora MDX com slug fora da gramática aceita', async () => {
+  const blogDir = await mkdtemp(path.join(os.tmpdir(), 'prerender-routes-'));
+
+  try {
+    await writeFile(path.join(blogDir, 'post-alpha.mdx'), '---\n---\n', 'utf8');
+    await writeFile(path.join(blogDir, 'foo_bar.mdx'), '---\n---\n', 'utf8');
+    await writeFile(path.join(blogDir, 'foo.bar.mdx'), '---\n---\n', 'utf8');
+
+    const routes = await buildPrerenderRoutes(blogDir);
+
+    assert.ok(routes.includes('/blog/post-alpha'));
+    assert.equal(routes.some((route) => route.includes('foo_bar')), false);
+    assert.equal(routes.some((route) => route.includes('foo.bar')), false);
+  } finally {
+    await rm(blogDir, { recursive: true, force: true });
+  }
+});
+
 test('base prerender routes cover the indexable static sitemap routes', () => {
   assert.ok(BASE_PRERENDER_ROUTES.includes('/'));
   assert.ok(BASE_PRERENDER_ROUTES.includes('/blog'));

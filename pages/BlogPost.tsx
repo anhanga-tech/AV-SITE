@@ -11,6 +11,7 @@ import { BlogPostSchemas } from '../components/blog/BlogPostSchemas';
 import { BlogPostSidebar } from '../components/blog/BlogPostSidebar';
 import { AUTHORS } from '../data/blogData';
 import { getAllPosts, type PostMeta } from '../lib/mdx';
+import { readBlogPostMdx } from '../lib/blog-mdx';
 import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 
 function isValidSlug(value: unknown): value is string {
@@ -20,22 +21,6 @@ function isValidSlug(value: unknown): value is string {
 
 // Carregado no nível do módulo para o Vite processar em build time
 const allMdxPosts = getAllPosts();
-
-// eager: true resolve todos os módulos MDX em build time, no nível do módulo — sem
-// React.lazy/Suspense, o conteúdo do post fica disponível de forma síncrona durante o
-// SSR (renderToPipeableStream nunca aguarda um Suspense boundary suspenso: sem esse
-// eager, o corpo real do post caía num streaming fora de ordem, resolvido só por JS
-// no cliente — ver issue #1249). BlogPost já é uma rota lazy-carregada em App.tsx, então
-// empacotar os ~29 posts juntos não afeta o bundle inicial da aplicação.
-const mdxModuleMap = import.meta.glob<{ default: React.ComponentType }>(
-    '/content/blog/*.mdx',
-    { eager: true }
-);
-
-function getMdxComponent(slug: string): React.ComponentType | null {
-    const key = `/content/blog/${slug}.mdx`;
-    return mdxModuleMap[key]?.default ?? null;
-}
 
 const BlogPost: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -102,7 +87,7 @@ const BlogPost: React.FC = () => {
         .slice(0, 2)
         .map(entry => entry.post);
 
-    const MdxContent = getMdxComponent(slug!);
+    const MdxContent = readBlogPostMdx(slug!);
 
     return (
         <article className="min-h-screen bg-brand-surface">

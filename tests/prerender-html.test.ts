@@ -73,3 +73,25 @@ test('isNoindexHtml reconhece noindex em qualquer combinação de diretivas', ()
   assert.equal(isNoindexHtml('<meta name="robots" content="index, follow">'), false);
   assert.equal(isNoindexHtml('<meta name="description" content="noindex aparece no texto">'), false);
 });
+
+test('validateHtml exige o corpo completo do artigo na rota de blog', () => {
+  const route = '/blog/artigo-de-teste';
+  const html = `${headHtml()}<main data-blog-post-body="artigo-de-teste"><p>Corpo</p></main>`;
+
+  assert.doesNotThrow(() => validateHtml(route, html));
+  assert.throws(
+    () => validateHtml(route, headHtml()),
+    /Missing complete blog post body/,
+  );
+  assert.throws(
+    () => validateHtml(route, `${headHtml()}<main data-blog-post-body="outro-artigo"></main>`),
+    /Missing complete blog post body/,
+  );
+});
+
+test('validateHtml ignora rotas de blog com slug fora da gramática aceita', () => {
+  // Slugs com caracteres fora de [a-zA-Z0-9-] não são rotas de post geradas
+  // pelo prerender; não devem exigir validação de corpo.
+  assert.doesNotThrow(() => validateHtml('/blog/foo_bar', headHtml()));
+  assert.doesNotThrow(() => validateHtml('/blog/foo.bar', headHtml()));
+});

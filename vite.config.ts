@@ -270,6 +270,10 @@ export default defineConfig(({ mode, isSsrBuild }) => {
       minify: 'esbuild',
       rollupOptions: {
         output: {
+          chunkFileNames: (chunkInfo) =>
+            chunkInfo.facadeModuleId?.includes('/content/blog/')
+              ? 'assets/blog/[name]-[hash].js'
+              : 'assets/[name]-[hash].js',
           manualChunks: isSsrBuild ? undefined : (id: string) => {
             if (id.includes('/node_modules/react/') || id.includes('/node_modules/react-dom/') || id.includes('/node_modules/react-router-dom/')) {
               return 'react-vendor';
