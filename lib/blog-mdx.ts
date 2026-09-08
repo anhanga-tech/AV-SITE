@@ -5,6 +5,7 @@ type MdxModule = { default: React.ComponentType };
 const mdxLoaders = import.meta.glob<MdxModule>('/content/blog/*.mdx');
 const loadedModules = new Map<string, MdxModule>();
 const pendingModules = new Map<string, Promise<MdxModule>>();
+const failedModules = new Set<string>();
 
 function moduleKey(slug: string): string {
   return `/content/blog/${slug}.mdx`;
@@ -35,6 +36,9 @@ export function preloadBlogPostMdx(slug: string): Promise<MdxModule | null> {
     })
     .catch((error: unknown) => {
       pendingModules.delete(key);
+      // Cache the rejection so Suspense does not retry a chunk that is known to
+      // be unavailable, and rethrow so the route's error boundary can recover.
+      failedModules.add(key);
       throw error;
     });
   pendingModules.set(key, request);
@@ -55,6 +59,12 @@ export function readBlogPostMdx(slug: string): React.ComponentType | null {
   const key = moduleKey(slug);
   const loaded = loadedModules.get(key);
   if (loaded) return loaded.default;
+  if (failedModules.has(key)) {
+    // The chunk already rejected once (stale-cache reload exhausted or a
+    // persistent failure): surface the failure instead of throwing a new
+    // promise that keeps the route in its Suspense fallback forever.
+    throw new Error(`Failed to load blog post chunk for "${slug}"`);
+  }
   if (!mdxLoaders[key]) return null;
 
   throw preloadBlogPostMdx(slug);
