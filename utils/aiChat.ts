@@ -23,6 +23,14 @@ export function registerAiChatToggleListener(): void {
   }
 }
 
+// Chamado no cleanup do AIChat (desmontagem): o flag precisa voltar a false quando o
+// componente some (ex.: navegação para uma landing desmonta o ClientFeatures). Se ficasse
+// true, um openAiChat() após o remount — mas antes do novo listener anexar — despacharia
+// direto e se perderia, em vez de bufferizar.
+export function unregisterAiChatToggleListener(): void {
+  aiChatListenerRegistered = false;
+}
+
 export function openAiChat(options: OpenAiChatOptions = {}): void {
   if (typeof window === 'undefined') {
     return;
