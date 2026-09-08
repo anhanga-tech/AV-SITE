@@ -2,7 +2,7 @@ import React, { Suspense, lazy, memo, useCallback, useEffect, useRef, useState }
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ChatCircleDots, CircleNotch } from '@phosphor-icons/react';
 import ChunkErrorBoundary from './ChunkErrorBoundary';
-import { registerAiChatToggleListener } from '../utils/aiChat';
+import { registerAiChatToggleListener, unregisterAiChatToggleListener } from '../utils/aiChat';
 import { triggerHaptic } from '../utils/haptics';
 
 const AIChatPanel = lazy(() => import('./AIChatPanel'));
@@ -143,7 +143,13 @@ const AIChat: React.FC = memo(() => {
       void navigate(newPath, { replace: true });
     }
 
-    return () => window.removeEventListener('toggle-ai-chat', handleToggle);
+    return () => {
+      window.removeEventListener('toggle-ai-chat', handleToggle);
+      // Flag de módulo volta a false: ao desmontar (ex.: navegação para landing), um
+      // openAiChat() antes do próximo remount deve bufferizar, não despachar para lugar
+      // nenhum (ver unregisterAiChatToggleListener em utils/aiChat.ts).
+      unregisterAiChatToggleListener();
+    };
   }, [location, navigate, openChatDrawer]);
 
   // Deep-link handling (chat=1, m/message, destino)
