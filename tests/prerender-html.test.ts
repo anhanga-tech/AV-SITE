@@ -88,3 +88,10 @@ test('validateHtml exige o corpo completo do artigo na rota de blog', () => {
     /Missing complete blog post body/,
   );
 });
+
+test('validateHtml ignora rotas de blog com slug fora da gramática aceita', () => {
+  // Slugs com caracteres fora de [a-zA-Z0-9-] não são rotas de post geradas
+  // pelo prerender; não devem exigir validação de corpo.
+  assert.doesNotThrow(() => validateHtml('/blog/foo_bar', headHtml()));
+  assert.doesNotThrow(() => validateHtml('/blog/foo.bar', headHtml()));
+});

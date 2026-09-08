@@ -36,7 +36,15 @@ const canHydrate =
 async function bootstrap(appRoot: HTMLElement): Promise<void> {
   // Match the SSR cache state before hydrating. Only this route's MDX chunk is
   // requested; subsequent blog navigation is handled by the route Suspense boundary.
-  await preloadBlogPostMdxForUrl(window.location.href);
+  // If this chunk fails to load (stale cache, network blip), the vite:preloadError
+  // listener above triggers a one-time reload; falling through here would leave the
+  // root without hydrateRoot/createRoot, so keep the app bootable regardless.
+  try {
+    await preloadBlogPostMdxForUrl(window.location.href);
+  } catch {
+    // The blog body will load via the route's Suspense boundary on client render.
+    // Do not block bootstrapping the app on a single chunk.
+  }
 
   if (canHydrate) {
     ReactDOM.hydrateRoot(
