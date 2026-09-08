@@ -4,7 +4,8 @@ import {
     type N8nErrorClassification,
 } from '../lib/n8n-submit-handler';
 import { createOdooSubmitHandler } from '../lib/odoo-submit-handler';
-import { maskEmail, maskName, maskPhone, validatePayload } from '../lib/lead-logic';
+import { maskEmail, maskName, maskPhone } from '../lib/lead-logic';
+import { validatePayload } from '../lib/lead-validation';
 import { leadInputFromSubmitLead } from '../lib/odoo-lead-mapping';
 
 const ODOO_ERROR_PATTERN = /^ODOO_ERROR:(\d+):(.*)$/s;
