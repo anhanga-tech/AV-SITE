@@ -50,7 +50,7 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
 
             {MdxContent ? (
                 <MDXProvider components={mdxComponents}>
-                    <div className="
+                    <div data-blog-post-body={post.slug} className="
                         prose md:prose-lg max-w-none
                         prose-headings:font-sans prose-headings:font-black prose-headings:tracking-tight prose-headings:text-brand-dark
                         prose-p:font-serif prose-p:text-zinc-600 prose-p:leading-relaxed prose-p:mb-6
