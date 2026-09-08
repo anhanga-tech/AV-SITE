@@ -22,6 +22,12 @@ export class AIChat {
   }
 
   async open() {
+    // AIChat is lazy() (App.tsx) and never renders during SSR, so right after page.goto()
+    // its trigger button may not have mounted yet — wait for it to attach before the
+    // idempotent-guard isVisible() check below, which stays a plain (non-auto-waiting) read
+    // since it's telling "already open" (button faded to opacity-0) apart from "not open yet".
+    await this.openBtn.waitFor({ state: 'attached' });
+
     // The drawer uses a <dialog> that animates via translateX. Check the open button
     // visibility (it becomes opacity-0 when the drawer is open) as the reliable signal.
     if (await this.openBtn.isVisible()) {

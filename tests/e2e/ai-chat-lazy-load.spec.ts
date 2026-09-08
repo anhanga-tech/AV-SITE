@@ -43,6 +43,10 @@ test.describe('AI chat lazy loading', () => {
     await page.goto('/');
     const aiChat = new AIChat(page);
 
+    // AIChat is lazy() — its `toggle-ai-chat` listener only attaches once the chunk mounts,
+    // so wait for the trigger button (a mount signal) before dispatching the custom event.
+    await aiChat.openBtn.waitFor({ state: 'attached' });
+
     await page.evaluate(() => {
       window.dispatchEvent(new CustomEvent('toggle-ai-chat', { detail: { message: 'Quero ir para Lisboa' } }));
     });

@@ -8,8 +8,15 @@ const rootDir = path.resolve(__dirname, '..');
 const blogDir = path.join(rootDir, 'content', 'blog');
 const outputFile = path.join(rootDir, 'data', 'blogManifest.ts');
 const markdownOutputFile = path.join(rootDir, 'data', 'blogMarkdown.ts');
+const homeTeaserOutputFile = path.join(rootDir, 'data', 'blogManifestHomeTeaser.ts');
 
-const { posts, markdownCount } = await writeBlogArtifacts(blogDir, outputFile, markdownOutputFile);
+const { posts, markdownCount } = await writeBlogArtifacts(
+  blogDir,
+  outputFile,
+  markdownOutputFile,
+  homeTeaserOutputFile
+);
 
 console.log(`✓ Generated blog manifest with ${posts.length} posts at data/blogManifest.ts`);
 console.log(`✓ Generated blog markdown module with ${markdownCount} posts at data/blogMarkdown.ts`);
+console.log(`✓ Generated home teaser manifest at data/blogManifestHomeTeaser.ts`);

@@ -3,17 +3,32 @@ import { LazyMotion, domAnimation } from 'framer-motion';
 import { BrowserRouter, MemoryRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import Header from './components/Header/Header';
 import Footer from './components/Footer';
-import AIChat from './components/AIChat';
 import ContactModal from './components/ContactModal';
 import { ClientOnly } from './components/ClientOnly';
 import ChunkErrorBoundary from './components/ChunkErrorBoundary';
 import ScrollToTop from './components/ScrollToTop';
-import BackToTop from './components/ui/BackToTop';
-import CookieConsentBanner from './components/CookieConsentBanner';
 import { HeadContext, type HeadManager } from './lib/head';
 
 // Pages
 import Home from './pages/Home';
+
+// Overlays de cliente puro que nunca renderizam durante SSR (ver `includeClientFeatures` e
+// `ClientOnly` abaixo), então torná-los lazy não arrisca o HTML prerenderizado de nenhuma
+// rota — diferente de Header/Footer/Home, que o `ssr.tsx` precisa resolver de forma síncrona
+// (ver comentário em `ssr.tsx`). lazy() move o código deles para fora do chunk de entrada, que
+// hoje é baixado por toda rota (incl. `/links` e as landings), mesmo as que nunca os montam.
+// ContactModal NÃO entra aqui apesar de se qualificar por esse critério: toda rota já precisa
+// dele hoje (ClientFeatures o monta incondicionalmente, e `pages/LinksPage.tsx` importa sua
+// própria instância direto) — não haveria bytes a poupar. Torná-lo lazy só trocaria esse
+// "grátis" por um risco real: seus CTAs abrem o modal via `window.dispatchEvent` num
+// `CustomEvent('open-contact-modal')` (utils/contactForm.ts) que o componente escuta a partir
+// do próprio mount — um clique rápido (o CTA "Fale Conosco" do Header é visível assim que a
+// página carrega) antes do chunk resolver perderia o evento (comprovado com o CTA do Header
+// em tests/e2e/contact-form.spec.ts — falhou lazy, sem consumidor para reemitir o evento).
+const AIChat = lazy(() => import('./components/AIChat'));
+const BackToTop = lazy(() => import('./components/ui/BackToTop'));
+const CookieConsentBanner = lazy(() => import('./components/CookieConsentBanner'));
+
 const BlogList = lazy(() => import('./pages/BlogList'));
 const BlogPost = lazy(() => import('./pages/BlogPost'));
 const BlogRedirect = lazy(() => import('./pages/BlogRedirect'));
@@ -72,6 +87,20 @@ const LANDING_PAGES: { path: string; element: React.ReactElement }[] = [
 
 const LANDING_PAGE_ROUTES = LANDING_PAGES.map(({ path }) => path);
 
+// Aliases de redirect (URL antiga de campanha continua válida e redireciona para a canônica).
+// Fonte única: os <Navigate> no AppLayout são derivados deste array — cadastrar um alias aqui
+// basta para ele redirecionar E ficar fora dos overlays (ClientFeatures retorna null: numa
+// rota que redireciona em milissegundos não faz sentido disparar o fetch dos chunks de
+// AIChat/BackToTop).
+const REDIRECT_ALIASES: { path: string; to: string }[] = [
+  { path: '/lollapalooza-2026', to: '/lollapalooza' },
+  { path: '/brazil-promotion-day', to: '/corporativo' },
+  { path: '/viagens-para-executivos', to: '/corporativo' },
+  { path: '/curadoria-cruzeiros-brasil', to: '/cruzeiros' },
+];
+
+const REDIRECT_ALIAS_ROUTES = REDIRECT_ALIASES.map(({ path }) => path);
+
 const ClientFeatures: React.FC = () => {
   const { pathname } = useLocation();
   // Normaliza trailing slash e caixa antes de comparar: o React Router casa a rota com ou sem
@@ -79,12 +108,31 @@ const ClientFeatures: React.FC = () => {
   // preserva ambos — sem normalizar, os overlays vazariam em /links/ ou /LINKS.
   const normalizedPath = (pathname === '/' ? '/' : pathname.replace(/\/$/, '')).toLowerCase();
   if (STANDALONE_ROUTES.includes(normalizedPath)) return null;
+  if (REDIRECT_ALIAS_ROUTES.includes(normalizedPath)) return null;
   const isLandingRoute = LANDING_PAGE_ROUTES.includes(normalizedPath);
   return (
     <ClientOnly>
-      {isLandingRoute ? null : <AIChat />}
+      {/*
+        ContactModal fica FORA dos ChunkErrorBoundary/Suspense dos overlays lazy: é um
+        import estático cujo listener `open-contact-modal` precisa montar cedo (CTA do
+        Header). Se AIChat/BackToTop falharem ou suspenderem, o modal não pode ser
+        arrastado junto.
+      */}
       <ContactModal />
-      {isLandingRoute ? null : <BackToTop />}
+      {isLandingRoute ? null : (
+        <ChunkErrorBoundary fallback={null}>
+          <Suspense fallback={null}>
+            <AIChat />
+          </Suspense>
+        </ChunkErrorBoundary>
+      )}
+      {isLandingRoute ? null : (
+        <ChunkErrorBoundary fallback={null}>
+          <Suspense fallback={null}>
+            <BackToTop />
+          </Suspense>
+        </ChunkErrorBoundary>
+      )}
     </ClientOnly>
   );
 };
@@ -127,7 +175,11 @@ const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClient
       {/* Primeiro na ordem do DOM: usuários de teclado/leitor de tela alcançam as
           preferências de cookies sem atravessar a página inteira (visual segue fixed no rodapé) */}
       <ClientOnly>
-        <CookieConsentBanner />
+        <ChunkErrorBoundary fallback={null}>
+          <Suspense fallback={null}>
+            <CookieConsentBanner />
+          </Suspense>
+        </ChunkErrorBoundary>
       </ClientOnly>
       <ScrollToTop />
       <ChunkErrorBoundary>
@@ -136,10 +188,9 @@ const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClient
           {LANDING_PAGES.map(({ path, element }) => (
             <Route key={path} path={path} element={element} />
           ))}
-          <Route path="/lollapalooza-2026" element={<Navigate to="/lollapalooza" replace />} />
-          <Route path="/brazil-promotion-day" element={<Navigate to="/corporativo" replace />} />
-          <Route path="/viagens-para-executivos" element={<Navigate to="/corporativo" replace />} />
-          <Route path="/curadoria-cruzeiros-brasil" element={<Navigate to="/cruzeiros" replace />} />
+          {REDIRECT_ALIASES.map(({ path, to }) => (
+            <Route key={path} path={path} element={<Navigate to={to} replace />} />
+          ))}
           <Route path="/links" element={<LinksPage />} />
           <Route path="/*" element={<MainSiteShell />} />
         </Routes>

@@ -19,6 +19,7 @@ export default tseslint.config(
       'node_modules/**',
       'data/blogManifest.ts',
       'data/blogMarkdown.ts',
+      'data/blogManifestHomeTeaser.ts',
       'public/**',
       '.worktrees/**',
       '.claude/**',

@@ -2,6 +2,7 @@ import React, { Suspense, lazy, memo, useCallback, useEffect, useRef, useState }
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ChatCircleDots, CircleNotch } from '@phosphor-icons/react';
 import ChunkErrorBoundary from './ChunkErrorBoundary';
+import { registerAiChatToggleListener } from '../utils/aiChat';
 import { triggerHaptic } from '../utils/haptics';
 
 const AIChatPanel = lazy(() => import('./AIChatPanel'));
@@ -95,6 +96,13 @@ const AIChat: React.FC = memo(() => {
       }
     };
     window.addEventListener('toggle-ai-chat', handleToggle);
+
+    // Habilita dispatch direto e drena qualquer intent de `toggle-ai-chat` ocorrido antes
+    // (ver registerAiChatToggleListener em utils/aiChat.ts — a corrida do MobileHeroForm
+    // com o chunk ainda baixando). Deve vir DEPOIS do addEventListener acima: um
+    // bufferedOpen drenado aqui dispara o evento e o handleToggle precisa já estar
+    // registrado para o chat abrir.
+    registerAiChatToggleListener();
 
     // Deep-link support — open chat and optionally pre-fill a destination message
     const CHAT_URL_PARAM = 'chat';

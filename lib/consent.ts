@@ -33,7 +33,31 @@ export function setConsent(choice: ConsentChoice): void {
 
 export function triggerResetBanner(): void {
   // NÃO toca o localStorage — preserva valor anterior para detecção de transição em setConsent()
+  // O CookieConsentBanner é lazy() (App.tsx): se o listener de reset ainda não montou (chunk
+  // baixando), o clique do footer se perderia. Bufferiza e drena na montagem via
+  // registerConsentBannerListener().
+  if (!consentBannerListenerRegistered) {
+    bufferedResetBanner = true;
+    return;
+  }
   dispatch(new Event('anhanga:reset-consent'));
+}
+
+let consentBannerListenerRegistered = false;
+let bufferedResetBanner = false;
+
+export function registerConsentBannerListener(): void {
+  consentBannerListenerRegistered = true;
+  if (bufferedResetBanner) {
+    bufferedResetBanner = false;
+    dispatch(new Event('anhanga:reset-consent'));
+  }
+}
+
+// Apenas para testes (tests/consent.test.ts): reseta o estado de módulo entre testes.
+export function _resetConsentListenerStateForTests(): void {
+  consentBannerListenerRegistered = false;
+  bufferedResetBanner = false;
 }
 
 function dispatch(event: Event): void {

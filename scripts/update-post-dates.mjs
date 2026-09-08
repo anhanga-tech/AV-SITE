@@ -84,6 +84,6 @@ if (updated || processAll) {
   run('node', ['--experimental-strip-types', 'scripts/generate-blog-manifest.ts'], { stdio: 'inherit' });
 
   if (!processAll) {
-    run('git', ['add', 'data/blogManifest.ts']);
+    run('git', ['add', 'data/blogManifest.ts', 'data/blogManifestHomeTeaser.ts']);
   }
 }

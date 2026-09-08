@@ -1,14 +1,17 @@
 import React, { memo } from 'react';
 import { Calendar, ArrowRight, BookOpen, Sparkles } from 'lucide-react';
-import { getAllPosts } from '../lib/mdx';
+// Teaser dedicado (só os N posts mais recentes, campos mínimos) em vez de getAllPosts() —
+// a home é renderizada de forma síncrona (ver ssr.tsx) e paga o custo de qualquer import
+// estático; o manifesto completo (data/blogManifest.ts) inclui faq[]/tags[] de todos os
+// posts e só é necessário em BlogList/BlogPost, que já são lazy(). Ver lib/blog-manifest.ts.
+import { HOME_TEASER_POSTS } from '../data/blogManifestHomeTeaser';
 import { AUTHORS } from '../data/blogData';
 import { SocialShare } from './SocialShare';
 import { getBlogHomeUrl, getBlogPostUrl, formatDate } from '../utils/blog';
 import { getCategoryColor } from '../utils/categoryColors';
 import { LazyImage } from './ui/LazyImage';
 
-const allPosts = getAllPosts();
-const displayPosts = allPosts.slice(0, 4);
+const displayPosts = HOME_TEASER_POSTS;
 const featuredPost = displayPosts.find(p => p.featured) ?? displayPosts[0];
 const gridPosts = featuredPost
     ? displayPosts.filter(p => p.slug !== featuredPost.slug).slice(0, 3)
