@@ -87,6 +87,20 @@ const LANDING_PAGES: { path: string; element: React.ReactElement }[] = [
 
 const LANDING_PAGE_ROUTES = LANDING_PAGES.map(({ path }) => path);
 
+// Aliases de redirect (URL antiga de campanha continua válida e redireciona para a canônica).
+// Fonte única: os <Navigate> no AppLayout são derivados deste array — cadastrar um alias aqui
+// basta para ele redirecionar E ficar fora dos overlays (ClientFeatures retorna null: numa
+// rota que redireciona em milissegundos não faz sentido disparar o fetch dos chunks de
+// AIChat/BackToTop).
+const REDIRECT_ALIASES: { path: string; to: string }[] = [
+  { path: '/lollapalooza-2026', to: '/lollapalooza' },
+  { path: '/brazil-promotion-day', to: '/corporativo' },
+  { path: '/viagens-para-executivos', to: '/corporativo' },
+  { path: '/curadoria-cruzeiros-brasil', to: '/cruzeiros' },
+];
+
+const REDIRECT_ALIAS_ROUTES = REDIRECT_ALIASES.map(({ path }) => path);
+
 const ClientFeatures: React.FC = () => {
   const { pathname } = useLocation();
   // Normaliza trailing slash e caixa antes de comparar: o React Router casa a rota com ou sem
@@ -94,29 +108,31 @@ const ClientFeatures: React.FC = () => {
   // preserva ambos — sem normalizar, os overlays vazariam em /links/ ou /LINKS.
   const normalizedPath = (pathname === '/' ? '/' : pathname.replace(/\/$/, '')).toLowerCase();
   if (STANDALONE_ROUTES.includes(normalizedPath)) return null;
+  if (REDIRECT_ALIAS_ROUTES.includes(normalizedPath)) return null;
   const isLandingRoute = LANDING_PAGE_ROUTES.includes(normalizedPath);
   return (
     <ClientOnly>
-      <ChunkErrorBoundary fallback={null}>
-        {/*
-          Um <Suspense> por overlay lazy, NUNCA compartilhado com ContactModal:
-          o React só commita um boundary quando TODOS os filhos suspensos resolvem,
-          então ContactModal (estático, listener `open-contact-modal` precisa montar
-          cedo) ficaria refém do fetch dos chunks de AIChat/BackToTop — exatamente o
-          atraso que o comentário acima diz ter evitado ao deixá-lo fora do lazy().
-        */}
-        {isLandingRoute ? null : (
+      {/*
+        ContactModal fica FORA dos ChunkErrorBoundary/Suspense dos overlays lazy: é um
+        import estático cujo listener `open-contact-modal` precisa montar cedo (CTA do
+        Header). Se AIChat/BackToTop falharem ou suspenderem, o modal não pode ser
+        arrastado junto.
+      */}
+      <ContactModal />
+      {isLandingRoute ? null : (
+        <ChunkErrorBoundary fallback={null}>
           <Suspense fallback={null}>
             <AIChat />
           </Suspense>
-        )}
-        <ContactModal />
-        {isLandingRoute ? null : (
+        </ChunkErrorBoundary>
+      )}
+      {isLandingRoute ? null : (
+        <ChunkErrorBoundary fallback={null}>
           <Suspense fallback={null}>
             <BackToTop />
           </Suspense>
-        )}
-      </ChunkErrorBoundary>
+        </ChunkErrorBoundary>
+      )}
     </ClientOnly>
   );
 };
@@ -159,7 +175,7 @@ const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClient
       {/* Primeiro na ordem do DOM: usuários de teclado/leitor de tela alcançam as
           preferências de cookies sem atravessar a página inteira (visual segue fixed no rodapé) */}
       <ClientOnly>
-        <ChunkErrorBoundary>
+        <ChunkErrorBoundary fallback={null}>
           <Suspense fallback={null}>
             <CookieConsentBanner />
           </Suspense>
@@ -172,10 +188,9 @@ const AppLayout: React.FC<{ includeClientFeatures: boolean }> = ({ includeClient
           {LANDING_PAGES.map(({ path, element }) => (
             <Route key={path} path={path} element={element} />
           ))}
-          <Route path="/lollapalooza-2026" element={<Navigate to="/lollapalooza" replace />} />
-          <Route path="/brazil-promotion-day" element={<Navigate to="/corporativo" replace />} />
-          <Route path="/viagens-para-executivos" element={<Navigate to="/corporativo" replace />} />
-          <Route path="/curadoria-cruzeiros-brasil" element={<Navigate to="/cruzeiros" replace />} />
+          {REDIRECT_ALIASES.map(({ path, to }) => (
+            <Route key={path} path={path} element={<Navigate to={to} replace />} />
+          ))}
           <Route path="/links" element={<LinksPage />} />
           <Route path="/*" element={<MainSiteShell />} />
         </Routes>

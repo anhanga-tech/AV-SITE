@@ -52,7 +52,10 @@ class ChunkErrorBoundary extends React.Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
-      if (this.props.fallback) return this.props.fallback;
+      // `!== undefined` (não `truthy`): fallback={null} é um fallback VÁLIDO de widget
+      // ("some silenciosamente") — com `if (this.props.fallback)` o null caía no fallback
+      // padrão full-page e quebrava o layout de overlays fixos.
+      if (this.props.fallback !== undefined) return this.props.fallback;
 
       return (
         <section className="min-h-[40vh] flex flex-col items-center justify-center gap-4 bg-white px-4 text-center">
