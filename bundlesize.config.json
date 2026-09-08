@@ -11,6 +11,16 @@
     {
       "path": "dist/assets/AIChatPanel-*.js",
       "maxSize": "55 kB"
+    },
+    {
+      "path": "dist/assets/BlogPost-*.js",
+      "maxSize": "7 kB",
+      "compression": "gzip"
+    },
+    {
+      "path": "dist/assets/blog/*.js",
+      "maxSize": "8 kB",
+      "compression": "gzip"
     }
   ]
 }

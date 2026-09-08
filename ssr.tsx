@@ -140,6 +140,13 @@ async function renderStreamingHtml(url: string, headManager: HeadManager): Promi
 }
 
 export async function render(url: string): Promise<RenderResult> {
+  // renderToPipeableStream must start with the requested article already in memory.
+  // Otherwise its Suspense payload can be emitted after surrounding content (#1249).
+  const pathname = new URL(url, 'https://prerender.local').pathname;
+  if (/^\/blog\/[a-zA-Z0-9-]+\/?$/.test(pathname)) {
+    const { preloadBlogPostMdxForUrl } = await import('./lib/blog-mdx');
+    await preloadBlogPostMdxForUrl(url);
+  }
   const headManager = createHeadManager();
   const appHtml = isHomeRoute(url)
     ? renderToString(renderApp(url, headManager))
