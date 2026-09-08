@@ -18,9 +18,9 @@ const noiseTextureStyle = {
  * animations and video playback logic from redundant reconciliation.
  */
 const Hero: React.FC = memo(() => {
-  // PERFORMANCE: Use the first video by default to match the LCP preload in index.html.
-  // Randomization is moved to a useEffect to avoid hydration mismatch and LCP degradation.
-  const [backgroundVideo, setBackgroundVideo] = useState(HERO_VIDEOS[0]);
+  // Keep Rio stable through hydration and video activation to reuse the home preload.
+  // Mount-time randomization would download a second poster, including on mobile.
+  const backgroundVideo = HERO_VIDEOS[0];
   const [shouldRenderVideo, setShouldRenderVideo] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const optimizedPoster = useMemo(
@@ -44,13 +44,6 @@ const Hero: React.FC = memo(() => {
 
   // Defer video loading on mobile / save-data and wait for user intent.
   useEffect(() => {
-    // Randomize background after mount for subsequent visits/interactions,
-    // but keep it stable for the initial paint to protect LCP.
-    const randomIndex = Math.floor(Math.random() * HERO_VIDEOS.length);
-    if (randomIndex !== 0) {
-      setBackgroundVideo(HERO_VIDEOS[randomIndex]);
-    }
-
     if (typeof window === 'undefined') return;
 
     const isSmallScreen = window.matchMedia('(max-width: 1023px)').matches;

@@ -77,8 +77,8 @@ export const PLAYWRIGHT_TRACKING_RESOLVER_RULES = [
 
 export default defineConfig({
   testDir: './tests/e2e',
-  // This suite requires built HTML and runs with playwright.prerender.config.ts.
-  testIgnore: '**/blog-mdx-loading.spec.ts',
+  // These suites require built HTML and run with playwright.prerender.config.ts.
+  testIgnore: ['**/blog-mdx-loading.spec.ts', '**/hero-media.spec.ts'],
   // Disable fullyParallel as it seems to cause resource contention and timeouts in some environments
   fullyParallel: false,
   forbidOnly: !!process.env.CI,

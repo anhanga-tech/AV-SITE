@@ -37,7 +37,10 @@ jobs:
       run: pnpm exec playwright test
     - name: Build prerendered site
       run: pnpm build
-    - name: Test blog prerender, hydration and chunk recovery
+      env:
+        # Match production media URLs and the responsive home hero preload.
+        VITE_MEDIA_ENABLE_TRANSFORMS: 'true'
+    - name: Test prerender, hero media, hydration and chunk recovery
       run: pnpm exec playwright test --config playwright.prerender.config.ts
     - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       if: always()
