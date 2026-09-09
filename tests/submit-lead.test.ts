@@ -42,7 +42,7 @@ function buildLeadPayloadFixture() {
     };
 }
 
-// --- validatePayload (lib/lead-logic) — unchanged by the Odoo cut-over --------
+// --- validatePayload (lib/lead-validation) — unchanged by the Odoo cut-over --------
 
 test('validatePayload should reject payloads with an invalid email format', () => {
     const result = validatePayload({
