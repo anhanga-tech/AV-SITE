@@ -26,6 +26,7 @@
     "update:dates": "node scripts/update-post-dates.mjs --all",
     "doctor": "react-doctor",
     "generate:feeds": "tsx scripts/generate-feeds.ts",
+    "fonts:build": "node scripts/build-fonts.mjs",
     "images:optimize": "tsx scripts/optimize-r2-images.ts"
   },
   "dependencies": {
@@ -79,6 +80,7 @@
     "rollup-plugin-visualizer": "^7.1.1",
     "semantic-release": "25.0.9",
     "sharp": "^0.35.4",
+    "subset-font": "^2.7.0",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.13",
     "typescript": "npm:@typescript/typescript6@~6.0.2",

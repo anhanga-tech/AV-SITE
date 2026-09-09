@@ -99,7 +99,10 @@
   --av-weight-bold:    700;
   --av-weight-xbold:   900;
   /* Note: Poppins is loaded with 400/600/700/900 only.
-     Avoid 500 (medium) and 800 (extrabold) — they'll fall back to the nearest weight. */
+     Avoid 500 (medium) and 800 (extrabold) — they'll fall back to the nearest weight.
+     This file imports from Google Fonts because it is a standalone preview opened
+     straight in a browser; production self-hosts the same weights from src/fonts.css
+     (see docs/design/fonts-inventory.md). */
 
   --av-leading-tight:   1.1;
   --av-leading-snug:    1.25;
