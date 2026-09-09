@@ -14,6 +14,16 @@ export interface OptimizeImageUrlOptions {
     width?: number;
     height?: number;
     format?: 'auto' | 'avif' | 'webp';
+    /**
+     * Cloudflare `quality`, 1-100. Defaults to {@link DEFAULT_QUALITY}.
+     *
+     * Deliberately a per-call decision rather than a property of the preset:
+     * presets are keyed by dimensions alone, so the blog cover and the home
+     * hero poster share the 16:9 tiers. Lowering a preset's quality would move
+     * both at once — the caller that measured the tradeoff is the one that
+     * should own it (issue #1602).
+     */
+    quality?: number;
 }
 
 const RATIO_TOLERANCE = 0.08;
@@ -53,6 +63,16 @@ function isCloseToRatio(actual: number, expected: number): boolean {
     return Math.abs(actual - expected) <= RATIO_TOLERANCE;
 }
 
+// Returned by two branches (the 16:9 mid tier and the catch-all). A factory
+// rather than a shared const so callers can never mutate the other branch's
+// preset through the object they got back.
+const contentPreset = (): ImagePreset => ({
+    id: 'content',
+    width: 1200,
+    height: 675,
+    fit: 'cover',
+});
+
 export function selectImagePreset(width: number = 1200, height?: number): ImagePreset {
     if (!height) {
         return width <= 800
@@ -64,9 +84,26 @@ export function selectImagePreset(width: number = 1200, height?: number): ImageP
     const largestDimension = Math.max(width, height);
 
     if (isCloseToRatio(ratio, 1)) {
-        return largestDimension <= 256
-            ? { id: 'avatar', width: 256, height: 256, fit: 'cover' }
-            : { id: 'square', width: 640, height: 640, fit: 'cover' };
+        if (largestDimension <= 256) {
+            return { id: 'avatar', width: 256, height: 256, fit: 'cover' };
+        }
+
+        // Sticker-sized squares (Orlando hero cards, rendered at most 356px wide
+        // on mobile) used to jump straight to the 640px preset and download ~4x
+        // the pixels they display. 512px still covers 356 CSS px at DPR 1.75.
+        if (largestDimension <= 512) {
+            return { id: 'square-md', width: 512, height: 512, fit: 'cover' };
+        }
+
+        return { id: 'square', width: 640, height: 640, fit: 'cover' };
+    }
+
+    // Portrait crop for tall boxes (the blog cover on phones). Without it a 3:4
+    // request fell through to the landscape `content` fallback, so a 412x560
+    // hero got a 1200x675 image scaled up to cover — heavier AND softer than a
+    // crop that matches the box.
+    if (isCloseToRatio(ratio, 3 / 4)) {
+        return { id: 'portrait', width: 720, height: 960, fit: 'cover' };
     }
 
     if (isCloseToRatio(ratio, 16 / 10)) {
@@ -83,13 +120,26 @@ export function selectImagePreset(width: number = 1200, height?: number): ImageP
         }
 
         if (width <= 1200) {
-            return { id: 'content', width: 1200, height: 675, fit: 'cover' };
+            return contentPreset();
         }
 
         return { id: 'hero', width: 1280, height: 720, fit: 'cover' };
     }
 
-    return { id: 'content', width: 1200, height: 675, fit: 'cover' };
+    return contentPreset();
+}
+
+/**
+ * Clamps to the range Cloudflare accepts and rejects anything non-numeric, so a
+ * bad caller degrades to the default instead of emitting an invalid transform
+ * URL (which the resizer answers with a 400, i.e. a broken image).
+ */
+function normalizeQuality(quality?: number): number {
+    if (typeof quality !== 'number' || !Number.isFinite(quality)) {
+        return DEFAULT_QUALITY;
+    }
+
+    return Math.min(100, Math.max(1, Math.round(quality)));
 }
 
 export function buildCloudflareImageUrl(
@@ -97,11 +147,12 @@ export function buildCloudflareImageUrl(
     transformZoneUrl: string,
     preset: ImagePreset,
     format: 'auto' | 'avif' | 'webp' = 'auto',
+    quality?: number,
 ): string {
     const normalizedZone = stripTrailingSlash(transformZoneUrl);
     const params = [
         `format=${format}`,
-        `quality=${DEFAULT_QUALITY}`,
+        `quality=${normalizeQuality(quality)}`,
         'metadata=none',
         `fit=${preset.fit}`,
         `width=${preset.width}`,
@@ -169,5 +220,11 @@ export function optimizeImageUrl(rawUrl: string, options: OptimizeImageUrlOption
     }
 
     const preset = selectImagePreset(options.width, options.height);
-    return buildCloudflareImageUrl(sourcePath, options.transformZoneUrl, preset, options.format ?? 'auto');
+    return buildCloudflareImageUrl(
+        sourcePath,
+        options.transformZoneUrl,
+        preset,
+        options.format ?? 'auto',
+        options.quality,
+    );
 }

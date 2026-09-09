@@ -277,7 +277,10 @@ test('remaining runtime media dependencies should use managed Cloudflare assets'
     ['transparenttextures.com'],
     'pages/landings/orlando.css',
   );
-  assert.match(orlandoCss, /https:\/\/media\.anhanga\.tur\.br\/images\/textures\/felt\.(png|webp)/);
+  // Aceita a URL crua e a servida pelo resizer da mesma zona
+  // (`/cdn-cgi/image/<opções>/images/textures/felt.png`, issue #1602). O que
+  // este guard protege é a origem do arquivo, não o caminho de entrega.
+  assert.match(orlandoCss, /https:\/\/media\.anhanga\.tur\.br\/(cdn-cgi\/image\/[^/]+\/)?images\/textures\/felt\.(png|webp)/);
 
   assertMissingHosts(
     lollapaloozaHero,

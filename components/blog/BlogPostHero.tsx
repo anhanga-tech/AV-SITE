@@ -6,6 +6,21 @@ import { optimizeRemoteImageUrl } from '../../data/mediaConfig';
 import { getCategoryColor } from '../../utils/categoryColors';
 import { formatDate } from '../../utils/blog';
 
+/**
+ * Phones only. Matches Tailwind's `sm` boundary: above it the hero is wide
+ * enough for the 16:9 crop to cover without upscaling.
+ */
+const MOBILE_HERO_MEDIA = '(max-width: 640px)';
+
+/**
+ * Só a capa do artigo. Medido no Rock in Rio (issue #1602): 1200x675 em AVIF
+ * caiu de 218.912 para 155.559 bytes (-29%) sem diferença visível sob o
+ * gradiente que escurece o hero. Fica aqui, e não no preset, porque os degraus
+ * 16:9 são compartilhados com o pôster da home — mexer no preset moveria os
+ * dois de uma vez.
+ */
+const HERO_QUALITY = 72;
+
 interface BlogPostHeroProps {
     post: PostMeta;
     authorName: string;
@@ -17,14 +32,29 @@ export const BlogPostHero: React.FC<BlogPostHeroProps> = ({ post, authorName }) 
             data-testid="blog-post-hero"
             className="relative min-h-[560px] w-full overflow-hidden md:min-h-[620px] lg:min-h-[680px]"
         >
-            <img
-                src={optimizeRemoteImageUrl(post.image, 1200, 675)}
-                alt={post.title}
-                width="1200"
-                height="675"
-                className="absolute inset-0 h-full w-full object-cover"
-                fetchPriority="high"
-            />
+            <picture>
+                {/*
+                    Art direction, not just a smaller variant. The hero box is
+                    taller than it is wide on phones (412x560 at the default
+                    min-h), so a 16:9 cover crop had to be scaled up to fill it:
+                    the browser painted ~1 image pixel per CSS pixel on a DPR
+                    1.75 screen — the heaviest file on the page AND the softest
+                    result. The 3:4 crop matches the box, so it lands at exactly
+                    1.75 image px per CSS px while weighing less. Issue #1602.
+                */}
+                <source
+                    media={MOBILE_HERO_MEDIA}
+                    srcSet={optimizeRemoteImageUrl(post.image, 720, 960, undefined, HERO_QUALITY)}
+                />
+                <img
+                    src={optimizeRemoteImageUrl(post.image, 1200, 675, undefined, HERO_QUALITY)}
+                    alt={post.title}
+                    width="1200"
+                    height="675"
+                    className="absolute inset-0 h-full w-full object-cover"
+                    fetchPriority="high"
+                />
+            </picture>
             <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/40 to-transparent opacity-90"></div>
 
             <div className="absolute inset-0 flex items-end pb-14 pt-36 md:pb-16 md:pt-40 lg:pb-20 lg:pt-44">

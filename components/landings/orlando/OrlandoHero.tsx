@@ -11,6 +11,15 @@ import { openContactModal } from "../../../utils/contactForm";
 
 const LOGO_URL = BRAND_LOGO_BLUE_URL;
 
+/**
+ * Os três cartões do hero são decoração — chegam na tela com no máximo 356px de
+ * largura e ainda passam por `filter: sepia(.1) contrast(1.05)`. A 512px, q78
+ * derruba o conjunto de 169.444 para 109.342 bytes (-35%) sem diferença visível
+ * (issue #1602). Explícito aqui, e não no preset quadrado, para não arrastar
+ * junto os outros usos do mesmo degrau.
+ */
+const CARD_QUALITY = 78;
+
 // --- Helper Components ---
 
 interface WashiTapeProps {
@@ -193,6 +202,8 @@ export function OrlandoHero() {
               "images/orlando/cards/seaworld-pipeline.jpg",
               300,
               300,
+              undefined,
+              CARD_QUALITY,
             )}
             imgAlt="Rollercoaster"
             label="ADRENALINA 100%"
@@ -216,6 +227,8 @@ export function OrlandoHero() {
               "images/orlando/cards/magic-castle.jpg",
               300,
               300,
+              undefined,
+              CARD_QUALITY,
             )}
             imgAlt="Magic Kingdom style"
             label="O CASTELO É NOSSO"
@@ -239,6 +252,8 @@ export function OrlandoHero() {
               "images/orlando/cards/summer-vibes.jpg",
               300,
               300,
+              undefined,
+              CARD_QUALITY,
             )}
             imgAlt="Palm Trees"
             label="SUMMER VIBES ONLY"
