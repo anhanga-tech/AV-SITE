@@ -80,6 +80,16 @@ overrides:
   # ambas; escopado a "@1" porque a árvore também tem brace-expansion@5.x
   # (já corrigida) em outro caminho de dependência.
   "brace-expansion@1": "^1.1.18"
+  # pnpm audit (high): GHSA-c83g-rgw3-j3cx (crescimento de memória não
+  # limitado via resultados de query distintos, sem eviction de cache) +
+  # GHSA-73wf-gq98-2v4g (crash / escrita em prototype não capturada via
+  # browserslist-stats.json não confiável) — browserslist <= 4.28.6.
+  # Transitivo build-time via autoprefixer (dependência direta, pipeline
+  # Tailwind/PostCSS) e @babel/core (dev, via eslint-plugin-react-hooks >
+  # react-doctor). 4.28.7 corrige ambas; usamos ^4.28.7 (não pin exato) para
+  # deixar minimumReleaseAge escolher a mais recente já fora do cooldown de
+  # 7 dias.
+  browserslist: "^4.28.7"
 
 legacyPeerDeps: true
 nodeLinker: hoisted
