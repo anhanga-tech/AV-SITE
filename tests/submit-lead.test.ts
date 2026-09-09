@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import handler, { classifySubmitLeadError } from '../api/submit-lead.ts';
-import { validatePayload } from '../lib/lead-logic.ts';
+import { validatePayload } from '../lib/lead-validation.ts';
 import { createOdooMock, setOdooEnv, clearOdooEnv } from './odoo-mock.ts';
 import { HONEYPOT_FIELD, ELAPSED_TIME_FIELD } from '../lib/bot-detection.ts';
 
@@ -42,7 +42,7 @@ function buildLeadPayloadFixture() {
     };
 }
 
-// --- validatePayload (lib/lead-logic) — unchanged by the Odoo cut-over --------
+// --- validatePayload (lib/lead-validation) — unchanged by the Odoo cut-over --------
 
 test('validatePayload should reject payloads with an invalid email format', () => {
     const result = validatePayload({
