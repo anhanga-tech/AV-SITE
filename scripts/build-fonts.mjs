@@ -15,11 +15,21 @@
 //     ali a tabela é irrelevante em bytes.
 //   - Mesma origem elimina a request de CSS em fonts.googleapis.com e os dois
 //     preconnects; o CSS com os @font-face já viaja no bundle que o head carrega.
+//
+// Renomeação: o Merriweather é distribuído "with Reserved Font Name", e o que este
+// script produz é uma Modified Version no sentido da OFL (subsetar é modificar,
+// OFL-FAQ 2.6; remover `kern` e instanciar os eixos quebra a Functional Equivalence
+// que a FAQ 2.7/2.8 exigiria para manter o RFN). Por isso as faces derivadas dele
+// saem como "Anhanga Serif", no CSS e na tabela `name` dos WOFF2, preservando
+// copyright e licença nos metadados. O Poppins não declara RFN e mantém o nome.
 
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import subsetFont from 'subset-font';
+import { compress } from 'wawoff2';
+
+import { renameSfnt } from './sfnt-rename.mjs';
 
 const GOOGLE_FONTS_RAW = 'https://raw.githubusercontent.com/google/fonts/main/ofl';
 const OUT_DIR = path.resolve(import.meta.dirname, '..', 'src', 'fonts');
@@ -41,24 +51,46 @@ const WITHOUT_KERN = WITH_KERN.filter((feature) => feature !== 'kern');
 // pinar, o subset variável do Merriweather volta a passar de 160 KiB.
 const MERRIWEATHER_AXES = (weight) => ({ wght: weight, wdth: 100, opsz: 18 });
 
+// A família derivada do Merriweather. Nome próprio porque o original tem RFN — ver
+// o cabeçalho e scripts/sfnt-rename.mjs.
+const SERIF_FAMILY = 'Anhanga Serif';
+
+const PROVENANCE =
+  'Subconjunto de Merriweather (SIL OFL 1.1), instanciado e reduzido por scripts/build-fonts.mjs ' +
+  'para anhanga.tur.br. Renomeado porque "Merriweather" e Reserved Font Name.';
+
+/** Os nameIds primários que a OFL cobre: família (1), subfamília (2), identificador
+ *  único (3), nome completo (4), nome PostScript (6) e descrição (10). */
+const serifNames = (subfamily, postScriptSuffix) => ({
+  1: SERIF_FAMILY,
+  2: subfamily,
+  3: `${SERIF_FAMILY} ${subfamily}`,
+  4: `${SERIF_FAMILY} ${subfamily}`,
+  6: `AnhangaSerif-${postScriptSuffix}`,
+  10: PROVENANCE,
+});
+
 const FACES = [
   {
     file: 'merriweather/Merriweather[opsz,wdth,wght].ttf',
     output: 'merriweather-400',
     axes: MERRIWEATHER_AXES(400),
     keepFeatures: WITHOUT_KERN,
+    rename: serifNames('Regular', 'Regular'),
   },
   {
     file: 'merriweather/Merriweather[opsz,wdth,wght].ttf',
     output: 'merriweather-700',
     axes: MERRIWEATHER_AXES(700),
     keepFeatures: WITHOUT_KERN,
+    rename: serifNames('Bold', 'Bold'),
   },
   {
     file: 'merriweather/Merriweather-Italic[opsz,wdth,wght].ttf',
     output: 'merriweather-400-italic',
     axes: MERRIWEATHER_AXES(400),
     keepFeatures: WITHOUT_KERN,
+    rename: serifNames('Italic', 'Italic'),
   },
   { file: 'poppins/Poppins-Regular.ttf', output: 'poppins-400', keepFeatures: WITH_KERN },
   { file: 'poppins/Poppins-SemiBold.ttf', output: 'poppins-600', keepFeatures: WITH_KERN },
@@ -111,10 +143,19 @@ async function main() {
     const buffer = fs.readFileSync(source);
 
     for (const [subset, spec] of Object.entries(SUBSETS)) {
-      const options = { targetFormat: 'woff2', keepFeatures: face.keepFeatures };
+      // Subseta para SFNT (não direto para WOFF2) porque a renomeação precisa mexer
+      // na tabela `name` antes da compressão. `preserveNameIds` segura copyright,
+      // licença e URL da licença, que o harfbuzz descartaria.
+      const options = {
+        targetFormat: 'sfnt',
+        keepFeatures: face.keepFeatures,
+        preserveNameIds: [0, 7, 13, 14],
+      };
       if (face.axes) options.variationAxes = face.axes;
 
-      const result = await subsetFont(buffer, expandUnicodeRange(spec), options);
+      const sfnt = await subsetFont(buffer, expandUnicodeRange(spec), options);
+      const named = face.rename ? renameSfnt(sfnt, face.rename) : sfnt;
+      const result = Buffer.from(await compress(named));
       const name = `${face.output}-${subset}.woff2`;
       fs.writeFileSync(path.join(OUT_DIR, name), result);
       total += result.length;

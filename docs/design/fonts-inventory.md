@@ -11,6 +11,10 @@ Poppins e Merriweather deixaram de vir do `fonts.googleapis.com` e passaram a se
 com hash de conteúdo — ou seja, já cobertas pelo `Cache-Control: immutable` de
 `public/_headers`.
 
+No CSS a família serifada se chama **`Anhanga Serif`**, não `Merriweather` — é
+exigência de licença, não escolha de marca. Ver
+[Renomear o serifado é exigência da OFL](#renomear-o-serifado-é-exigência-da-ofl).
+
 As landings de evento (`/orlando`, `/lollapalooza`, `/beto-carrero`) continuam
 carregando as famílias próprias delas pelo Google Fonts — ver
 [Por que as landings ficaram de fora](#por-que-as-landings-ficaram-de-fora).
@@ -23,10 +27,10 @@ requisições de fonte (arquivos + o CSS do Google Fonts). "Antes" é o `main` d
 
 | Rota | Antes | Depois | Δ | Origens de terceiro |
 |---|---|---|---|---|
-| `/` (home) | ~93 KiB (82 de fonte + 11,6 do CSS) | **45,9 KiB** | −51% | 2 → 0 |
-| `/blog/<post>` | ~188 KiB (176 + 11,6) | **66,6 KiB** | −65% | 2 → 0 |
-| `/quiz` | ~93 KiB | **38,4 KiB** | −59% | 2 → 0 |
-| `/orlando` | ~104 KiB | **91,2 KiB** | −12% | 2 → 2 (só Outfit/Space Mono) |
+| `/` (home) | ~93 KiB (82 de fonte + 11,6 do CSS) | **46,6 KiB** | −50% | 2 → 0 |
+| `/blog/<post>` | ~188 KiB (176 + 11,6) | **67,7 KiB** | −64% | 2 → 0 |
+| `/quiz` | ~93 KiB | **39,0 KiB** | −58% | 2 → 0 |
+| `/orlando` | ~104 KiB | **93,2 KiB** | −10% | 2 → 2 (só Outfit/Space Mono) |
 
 O artigo era o pior caso e virou o melhor ganho, como a issue pedia.
 
@@ -44,12 +48,17 @@ nome próprio estrangeiro e nunca chega na maioria das sessões.
 | Poppins | 600 | normal | 7,7 KiB | 4,9 KiB | `font-semibold` |
 | Poppins | 700 | normal | 7,5 KiB | 4,8 KiB | `font-bold` |
 | Poppins | 900 | normal | 7,3 KiB | 4,6 KiB | `font-black` e os `h1`/`h2` `font-extrabold` (800 resolve para 900) |
-| Merriweather | 400 | normal | 14,2 KiB | 28,6 KiB | corpo editorial do blog (`prose-p:font-serif`) |
-| Merriweather | 700 | normal | 14,2 KiB | 28,7 KiB | `<strong>` dentro do texto serifado do MDX |
-| Merriweather | 400 | italic | 15,9 KiB | 30,6 KiB | citações e depoimentos (`font-serif italic`) |
+| Anhanga Serif (Merriweather) | 400 | normal | 14,4 KiB | 28,9 KiB | corpo editorial do blog (`prose-p:font-serif`) |
+| Anhanga Serif (Merriweather) | 700 | normal | 14,5 KiB | 28,9 KiB | `<strong>` dentro do texto serifado do MDX |
+| Anhanga Serif (Merriweather) | 400 | italic | 16,1 KiB | 30,8 KiB | citações e depoimentos (`font-serif italic`) |
 
 Não há peso 500/800 declarado: `font-medium` cai em 400 e `font-extrabold` em 900,
 que é como o site já renderizava quando as fontes vinham do Google.
+
+Dentro de cada par, **`latin-ext` é declarado antes de `latin`**. Os dois conjuntos se
+sobrepõem em `U+0304`, `U+0308` e `U+0329`, e o CSS resolve faces equivalentes na ordem
+inversa da declaração: com `latin` por último, essas combining marks usam o arquivo
+menor em vez de puxar o `latin-ext`. É a mesma ordem que o Google Fonts emite.
 
 ### Famílias por landing (ainda no Google Fonts)
 
@@ -66,6 +75,32 @@ regras `font-weight: 500/600` de `pages/landings/orlando.css` não tinham face
 correspondente e caíam na de 400. Como o Outfit é variável e o Google serve o mesmo
 arquivo para todos os pesos declarados, a correção custou zero byte.
 
+## Renomear o serifado é exigência da OFL
+
+`src/fonts/OFL-Merriweather.txt` declara `Reserved Font Name "Merriweather"`. A
+cláusula 3 da SIL OFL proíbe uma Modified Version de usar o RFN como nome primário, e a
+OFL-FAQ é direta sobre o que se aplica aqui:
+
+- **2.6** — subsetar um webfont *é* modificação, e "would not normally allow the use of RFNs".
+- **2.7/2.8** — manter o RFN só é aceitável preservando *Functional Equivalence*, o que
+  exige o inventário completo de caracteres e **nenhuma remoção de tabelas OpenType**.
+  Nós servimos apenas `latin`/`latin-ext`, removemos `kern` e instanciamos os eixos
+  variáveis: falhamos nos dois critérios, sem chance de discussão.
+
+Por isso `scripts/build-fonts.mjs` reescreve a tabela `name` das faces derivadas
+(`scripts/sfnt-rename.mjs`) para **`Anhanga Serif`**, nos nameIds que a licença chama de
+nome primário — família (1), identificador único (3), nome completo (4) e PostScript
+(6). Copyright (0), licença (13) e URL da licença (14) são preservados, e o nameId 10
+registra a procedência, como a FAQ 2.8 pede. `tests/self-hosted-fonts.test.ts` verifica
+tudo isso direto nos WOFF2 versionados.
+
+Efeito colateral corrigido de quebra: o arquivo instanciado vinha do harfbuzz chamado
+"Merriweather Light" — o eixo `wght` tem 300 como padrão, e o instanciador não atualiza
+o nome. O nome interno já estava errado, além de não-conforme.
+
+**Poppins não declara RFN** (o cabeçalho do `OFL-Poppins.txt` não tem a cláusula), então
+mantém o nome original e nenhuma referência a `font-sans` no código precisou mudar.
+
 ## As três descobertas que orientaram a decisão
 
 **1. Trocar de peso não muda nada em fonte variável.** Merriweather, Outfit, Fredoka e
@@ -79,7 +114,7 @@ inócua — o que pesa é o arquivo variável inteiro.
 padrão do eixo, e o corpo do blog), o mesmo subconjunto `latin` cai para 43,7 KiB.
 
 **3. `kern` responde por ~30 KiB de cada face do Merriweather.** Descartando a tabela,
-`latin` vai de 43,7 KiB para 14,2 KiB. Renderizando o mesmo parágrafo em português a
+`latin` vai de 43,7 KiB para 14,4 KiB. Renderizando o mesmo parágrafo em português a
 18px no Chromium, com e sem `kern`, a largura do texto muda **0,85%** e as capturas são
 indistinguíveis — a família já tem sidebearings bem ajustados. É a única feature
 OpenType descartada, e só nessa família: no Poppins a tabela `kern` não muda o tamanho
@@ -121,9 +156,11 @@ destino de mídia paga com meta de LCP, vale abrir issue própria e reaproveitar
 pnpm fonts:build   # baixa os TTFs oficiais, gera src/fonts/*.woff2 e imprime os tamanhos
 ```
 
-Commite a saída. O contrato (faces esperadas, existência dos arquivos, ausência de
-órfãos, `font-display`, orçamento de bytes por família) é verificado por
-`tests/self-hosted-fonts.test.ts`; que o `index.html` não volte a falar com o Google
+Commite a saída. O contrato é verificado por `tests/self-hosted-fonts.test.ts`: faces esperadas com um
+arquivo por subconjunto, ordem `latin-ext` antes de `latin`, existência dos arquivos,
+ausência de órfãos, `font-display`, orçamento de bytes por família e — lendo a tabela
+`name` dos WOFF2 — ausência de Reserved Font Name nos campos primários com copyright e
+licença preservados; que o `index.html` não volte a falar com o Google
 Fonts é verificado por `tests/index-third-party-scripts.test.ts`.
 
 O `docs/design/brand-system/colors_and_type.css` continua importando do Google Fonts de

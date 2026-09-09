@@ -49,7 +49,9 @@ export default {
             },
             fontFamily: {
                 sans: ['Poppins', 'sans-serif'],
-                serif: ['Merriweather', 'serif'], // Fonte editorial para o blog
+                // 'Anhanga Serif' É o Merriweather, renomeado por exigência da OFL
+                // (Reserved Font Name) ao ser subsetado — ver src/fonts.css.
+                serif: ['Anhanga Serif', 'Georgia', 'serif'], // Fonte editorial para o blog
                 display: ['Poppins', 'sans-serif'], // Headings principais (Poppins 900)
             },
             boxShadow: {
