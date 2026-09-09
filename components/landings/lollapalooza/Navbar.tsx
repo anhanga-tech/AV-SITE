@@ -73,7 +73,7 @@ const Navbar: React.FC = () => {
             <a
               key={link.name}
               href={link.href}
-              className="text-anhanga-darkBlue font-bold text-lg focus:outline-none focus:text-anhanga-yellow"
+              className="text-anhanga-darkBlue font-bold text-lg rounded-sm px-2 focus:outline-none focus:ring-2 focus:ring-anhanga-darkBlue"
               onClick={() => setIsOpen(false)}
             >
               {link.name}
