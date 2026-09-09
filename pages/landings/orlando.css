@@ -49,9 +49,18 @@
     /* Véu creme sobre a textura: o feltro cru é cinza médio e derrubava todos
        os pares de contraste da página de uma vez. O grão continua legível e a
        superfície volta a ser papel, não feltro. */
+    /* O PNG cru pesa 131.898 bytes. Servido pelo resizer da zona de mídia ele
+       sai em AVIF a 24.903 (-81%) e em WebP a 101.854 (-23%) — o `format=auto`
+       negocia pelo Accept, o mesmo que o navegador manda ao buscar imagem de
+       CSS. `width=400` (e não 500, o nativo) é deliberado: em 500 o resizer não
+       tem o que reduzir e devolve o PNG original para quem não aceita AVIF.
+       O `background-size` devolve o ladrilho ao passo nativo de 500x466, então
+       a escala do grão na tela é a mesma de antes — o que muda é só o peso.
+       Issue #1602. */
     background-image:
         linear-gradient(rgba(253, 252, 245, 0.82), rgba(253, 252, 245, 0.82)),
-        url("https://media.anhanga.tur.br/images/textures/felt.png");
+        url("https://media.anhanga.tur.br/cdn-cgi/image/format=auto,quality=75,metadata=none,fit=scale-down,width=400/images/textures/felt.png");
+    background-size: auto, 500px 466px;
 }
 
 /*

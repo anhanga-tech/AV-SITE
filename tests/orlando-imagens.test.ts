@@ -112,3 +112,73 @@ test('cada parque tem o nome em texto visível, não só como alt de logo', () =
     'cada park-card precisa exibir o nome real do parque em <h3> — issue #1330',
   );
 });
+
+/*
+  Guard da issue #1602 — peso da textura de fundo.
+
+  O `felt.png` cru pesa 131.898 bytes e é o recurso mais pesado da /orlando
+  depois dos cartões. Servido pelo resizer da própria zona de mídia ele sai em
+  AVIF a 24.903 bytes. Duas armadilhas ficam travadas aqui porque nenhuma delas
+  aparece na tela — as duas só se manifestam no peso baixado:
+
+  1. `width` precisa ser MENOR que os 500px nativos: em 500 o resizer conclui
+     que não há o que reduzir e devolve o PNG original para quem não aceita
+     AVIF (verificado contra a zona de produção).
+  2. `background-size` precisa devolver o ladrilho ao passo nativo, senão o
+     grão encolhe 20% junto com a imagem — mudança visual não pedida.
+*/
+test('a textura de fundo é servida pelo resizer, com o ladrilho no passo nativo', async () => {
+  const css = await readFile(new URL('../pages/landings/orlando.css', import.meta.url), 'utf8');
+
+  const transform = css.match(
+    /https:\/\/media\.anhanga\.tur\.br\/cdn-cgi\/image\/([^/]+)\/images\/textures\/felt\.png/,
+  );
+  assert.ok(transform, 'a textura precisa passar pelo /cdn-cgi/image da zona de mídia');
+
+  const options = transform[1];
+  assert.match(options, /format=auto/, 'format=auto é o que negocia AVIF/WebP pelo Accept');
+
+  const width = options.match(/width=(\d+)/);
+  assert.ok(width, 'a transformação precisa declarar uma largura');
+  assert.ok(
+    Number(width[1]) < 500,
+    `width=${width?.[1]} não reduz nada: o original tem 500px e o resizer devolveria o PNG cru`,
+  );
+
+  assert.match(
+    css,
+    /background-size:\s*auto,\s*500px 466px/,
+    'sem background-size o ladrilho encolhe junto com a imagem',
+  );
+});
+
+/*
+  Guard da issue #1602 — peso dos três cartões do hero.
+
+  Eles pediam o preset quadrado de 640px para renderizar no máximo 356px de
+  largura (mobile, 90% de um cartão de 380px). O degrau de 512px ainda cobre
+  esses 356 CSS px a DPR 1,75. Como no teste de preset acima, o que precisa
+  ficar travado é o ARGUMENTO: a URL renderizada é idêntica neste processo.
+*/
+test('os cartões do hero pedem o degrau de 512px e a qualidade de decoração', async () => {
+  const source = await readFile(
+    new URL('../components/landings/orlando/OrlandoHero.tsx', import.meta.url),
+    'utf8',
+  );
+
+  const constante = source.match(/const CARD_QUALITY = (\d+);/);
+  assert.ok(constante, 'os cartões precisam declarar sua própria qualidade');
+  assert.ok(
+    Number(constante[1]) < 85,
+    `CARD_QUALITY=${constante?.[1]} não reduz nada: 85 já é o padrão compartilhado`,
+  );
+
+  const chamadas = [...source.matchAll(/optimizeRemoteImageUrl\(\s*"images\/orlando\/cards\/[^"]+",\s*(\d+),\s*(\d+),[^)]*\)/g)];
+  assert.equal(chamadas.length, 3, 'a colagem do hero tem três cartões');
+
+  for (const [chamada, largura, altura] of chamadas) {
+    const preset = selectImagePreset(Number(largura), Number(altura));
+    assert.equal(preset.width, 512, `o cartão caiu no preset de ${preset.width}px, não no de 512`);
+    assert.match(chamada, /CARD_QUALITY/, `cartão sem a qualidade reduzida: ${chamada}`);
+  }
+});

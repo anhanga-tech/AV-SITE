@@ -222,6 +222,63 @@ test('optimizeImageUrl should propagate format=webp into the Cloudflare transfor
     );
 });
 
+test('selectImagePreset should keep sticker-sized squares below the 640px tier', () => {
+    // The Orlando hero cards render at most 356px wide (mobile, 90% of a 380px
+    // card) and used to download the 640px square regardless.
+    assert.deepEqual(selectImagePreset(300, 300), {
+        id: 'square-md',
+        width: 512,
+        height: 512,
+        fit: 'cover',
+    });
+
+    // The 640px tier still exists for anything genuinely bigger.
+    assert.deepEqual(selectImagePreset(600, 600), {
+        id: 'square',
+        width: 640,
+        height: 640,
+        fit: 'cover',
+    });
+});
+
+test('selectImagePreset should serve a portrait crop for 3:4 requests', () => {
+    // Before this preset a 3:4 request matched no ratio branch and fell through
+    // to the landscape `content` fallback, so a tall hero box got a 1200x675
+    // image upscaled to cover it.
+    assert.deepEqual(selectImagePreset(720, 960), {
+        id: 'portrait',
+        width: 720,
+        height: 960,
+        fit: 'cover',
+    });
+});
+
+test('quality is a per-call override, so one caller cannot move another', () => {
+    // The blog cover and the home hero poster share the 16:9 tiers. The cover
+    // asks for 72; the request that does not ask keeps the shared default, and
+    // that is the whole point of keeping quality off the preset (issue #1602).
+    const base = {
+        mediaBaseUrl: 'https://media.anhanga.tur.br',
+        transformZoneUrl: 'https://media.anhanga.tur.br',
+        enableTransforms: true,
+        width: 1200,
+        height: 675,
+    };
+
+    assert.match(optimizeImageUrl('images/blog/cover.jpg', { ...base, quality: 72 }), /quality=72,/);
+    assert.match(optimizeImageUrl('images/hero/rio-poster.jpg', base), /quality=85,/);
+});
+
+test('an out-of-range or non-numeric quality degrades to the default instead of a broken URL', () => {
+    const build = (quality?: number) =>
+        buildCloudflareImageUrl('/images/blog/cover.jpg', 'https://media.anhanga.tur.br', selectImagePreset(1200, 675), 'auto', quality);
+
+    assert.match(build(0), /quality=1,/);
+    assert.match(build(500), /quality=100,/);
+    assert.match(build(Number.NaN), /quality=85,/);
+    assert.match(build(), /quality=85,/);
+});
+
 // Regression for issue #673: preload widths in index.html must match the URLs
 // that Hero.tsx generates for its posterSrcSet. If the preset snap logic changes
 // or Hero.tsx requests different dimensions, the preload URLs must be updated too.

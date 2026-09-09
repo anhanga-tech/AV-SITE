@@ -119,6 +119,7 @@ export const optimizeRemoteImageUrl = (
     width: number = 1200,
     height?: number,
     format?: 'auto' | 'avif' | 'webp',
+    quality?: number,
 ): string => {
     const { mediaBaseUrl, transformZoneUrl, enableTransforms } = getMediaRuntimeConfig();
     return optimizeImageUrl(rawUrl, {
@@ -128,6 +129,7 @@ export const optimizeRemoteImageUrl = (
         width,
         height,
         format,
+        quality,
     });
 };
 
