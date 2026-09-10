@@ -302,10 +302,11 @@ Measured on production with the same browser-`Accept` `curl` as the before captu
 | | Before | After |
 |---|---|---|
 | Beacon `<script>` tags | 2 | **1** (`fcec1bea…`, versioned, `"spa":2`) |
-| Beacon script downloads | 2 × ~10,1 KiB gzip | **1 × ~10,1 KiB gzip** |
+| Beacon script downloads | 2 × ~10.1 KiB gzip | **1 × ~10.1 KiB gzip** |
 | Collection endpoint | `cloudflareinsights.com/cdn-cgi/rum` | **`www.anhanga.tur.br/cdn-cgi/rum`** |
 
-Net: **−1 request, −~10,1 KiB** per navigation, telemetry preserved.
+Net: **−1 request, −~10.1 KiB** per navigation, collection still firing (see the
+verification status below).
 
 The endpoint change is the independent confirmation that the surviving beacon is the
 zone one. Per the [Web Analytics FAQ](https://developers.cloudflare.com/web-analytics/faq/),
@@ -320,7 +321,16 @@ internal subdomains despite listing only `anhanga.tur.br` as its hostname. (`mkt
 2026-05-23 baseline no longer describes this zone — unrelated to this change, but relevant
 when comparing against those numbers.)
 
-Not verified: whether `"spa":2` actually emits soft-navigation events. A synthetic
+**Verification status.** The Decision above sets two criteria. Criterion (1), exactly one
+beacon in the served HTML, is confirmed by the captures above. Criterion (2), the 24 h
+dashboard confirmation that page views and Core Web Vitals keep arriving for
+`www.anhanga.tur.br`, is **still pending** — the change landed on 2026-09-10 and the
+window has not elapsed. What *is* observed is the transport: the beacon fires
+`POST www.anhanga.tur.br/cdn-cgi/rum` on load and on `pagehide`. That proves the beacon
+is sending, not that the zone site is recording and charting it. Treat "telemetry
+preserved" as provisional until the dashboard is checked.
+
+Also not verified: whether `"spa":2` actually emits soft-navigation events. A synthetic
 `pushState` + `popstate` made the router change route without producing an additional
 `/cdn-cgi/rum` request, which may be beacon batching or an artifact of the synthetic
 navigation. The flag is declared in the tag; event-level SPA coverage was not observed.
