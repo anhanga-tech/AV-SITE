@@ -37,7 +37,7 @@
 
   --av-font-display:  'Poppins', ui-sans-serif, system-ui, sans-serif;
   --av-font-body:     'Poppins', ui-sans-serif, system-ui, sans-serif;
-  --av-font-serif:    'Merriweather', Georgia, serif;
+  --av-font-serif:    'Anhanga Serif', Georgia, serif; /* Merriweather renomeado — ver src/fonts.css */
   --av-font-mono:     ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, monospace;
 
   --av-ease-spring: cubic-bezier(0.16, 1, 0.3, 1);

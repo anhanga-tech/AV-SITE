@@ -40,11 +40,15 @@ const OrlandoLanding: React.FC = () => {
         </div>
       </div>
 
-      {/* React 19 native resource hints */}
+      {/* React 19 native resource hints.
+          Outfit é fonte variável no Google Fonts: os cinco pesos abaixo apontam para o
+          MESMO arquivo, então declarar 500 e 600 não custa byte nenhum — e sem eles as
+          regras `font-weight: 500/600` de orlando.css caíam na face 400 e renderizavam
+          em peso errado. Inventário de fontes por rota: docs/design/fonts-inventory.md. */}
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link
-        href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@400;700;900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@400;500;600;700;900&display=swap"
         rel="stylesheet"
       />
 

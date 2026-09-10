@@ -5,7 +5,7 @@ import { normalizeRoute, isNoindexHtml, stripHomeOnlyPreloads, validateHtml } fr
 const HERO_PRELOAD =
   '<link rel="preload" as="image" fetchpriority="high" data-av-preload="home-hero" imagesrcset="https://media.anhanga.tur.br/x.jpg 1200w" imagesizes="100vw" type="image/webp">';
 
-const OUTRO_PRELOAD = '<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins">';
+const OUTRO_PRELOAD = '<link rel="preload" as="image" href="https://media.anhanga.tur.br/images/exemplo.jpg">';
 
 const TEMPLATE = `<html><head>${HERO_PRELOAD}\n${OUTRO_PRELOAD}</head><body></body></html>`;
 

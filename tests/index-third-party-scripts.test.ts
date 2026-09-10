@@ -94,19 +94,20 @@ test('UTM tracker não envia query string ou hash crus em page_location', () => 
   assert.match(utmTrackingScript, /url\.hash\s*=\s*['"]['"]/);
 });
 
-test('index.html loads only the required Poppins font weights', () => {
-  const fontUrls = [...indexHtml.matchAll(/href="([^"]*fonts\.googleapis\.com\/css2[^"]*)"/g)]
-    .map((match) => match[1])
-    .filter((url) => url.includes('family=Poppins'));
+test('index.html não carrega mais fontes de terceiros (issue #1603)', () => {
+  // Poppins e Merriweather passaram a ser auto-hospedadas em src/fonts.css. O
+  // contrato das faces (famílias, pesos, subconjuntos, orçamento de bytes) vive em
+  // tests/self-hosted-fonts.test.ts; aqui só garantimos que o head não volte a
+  // abrir conexão com fonts.googleapis.com/fonts.gstatic.com.
+  const headHtml = getHeadHtml(indexHtml);
 
-  assert.equal(fontUrls.length, 3, 'preload, stylesheet, and noscript font URLs should stay aligned');
-
-  for (const url of fontUrls) {
-    assert.match(url, /family=Poppins:wght@400;600;700;900(?:&|$)/);
-    assert.doesNotMatch(url, /Poppins:wght@[^"]*800/);
-  }
+  assert.doesNotMatch(headHtml, /fonts\.googleapis\.com/);
+  assert.doesNotMatch(headHtml, /fonts\.gstatic\.com/);
 });
 
+// O CSS do brand system é um preview standalone aberto direto no browser, fora do
+// bundle do site — por isso continua importando do Google Fonts. O que ele precisa
+// documentar é o conjunto de pesos que a produção realmente serve.
 test('design system documents the production Poppins font weights', () => {
   const importUrl = designSystemCss.match(/@import url\('([^']*fonts\.googleapis\.com\/css2[^']*)'\);/)?.[1];
 
