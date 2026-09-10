@@ -207,8 +207,8 @@ edge injections owned by the Cloudflare dashboard.
 
 | Script tag in the served HTML | Token | Injected by | SPA-aware |
 |---|---|---|---|
-| `<script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "93a3a04071d84513891917540e8c2003"}'>`, wrapped in `<!-- Cloudflare Pages Analytics -->` comments | `93a3a040…` | **Pages project** `av-site` → Settings → Web Analytics toggle | No (`data-cf-beacon` has no `spa` flag — initial document only) |
-| `<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd…" data-cf-beacon='{"version":"2024.11.0","token":"fcec1beac54e47dcb652a96d6b155992","r":1,"spa":2}'>` | `fcec1bea…` | **Zone** `anhanga.tur.br` → Web Analytics (RUM auto-injection) | Yes (`"spa":2` — reports client-side route changes) |
+| `<script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "93a3a040…"}'>`, wrapped in `<!-- Cloudflare Pages Analytics -->` comments | `93a3a040…` | **Pages project** `av-site` → Settings → Web Analytics toggle | No (`data-cf-beacon` has no `spa` flag — initial document only) |
+| `<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd…" data-cf-beacon='{"version":"2024.11.0","token":"fcec1bea…","r":1,"spa":2}'>` | `fcec1bea…` | **Zone** `anhanga.tur.br` → Web Analytics (RUM auto-injection) | Yes (`"spa":2` — reports client-side route changes) |
 
 Both URLs return the same beacon build (`etag: W/"2026.9.1"`, ~10.1 KiB gzipped each),
 but the versioned and unversioned paths are separate cache entries, so the browser
