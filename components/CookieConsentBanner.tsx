@@ -1,6 +1,14 @@
 import { useEffect, useRef, useSyncExternalStore } from 'react';
 import { type ConsentChoice, getConsent, registerConsentBannerListener, setConsent } from '@/lib/consent';
 
+declare global {
+  interface Window {
+    // Definida pela ponte de clique pré-hidratação em index.html. Ausente quando o documento
+    // não veio desse template (ex.: testes que montam o componente isolado).
+    __anhangaConsentHandoff?: () => string | null;
+  }
+}
+
 // Visibilidade do banner como store externa em vez de estado local (#1605).
 //
 // O banner agora é renderizado no HTML pré-renderizado, então o primeiro render do cliente
@@ -68,6 +76,23 @@ const handleAccept = (): void => handleChoice('marketing');
 
 const handleDecline = (): void => handleChoice('essential');
 
+// Drena o clique que a ponte pré-hidratação de index.html anotou. O banner fica visível a
+// partir do primeiro paint, muito antes dos onClick do React existirem; a ponte anota a
+// escolha e esconde o banner, e é aqui que ela vira consentimento de verdade (setConsent).
+const drainPreHydrationChoice = (): void => {
+  const handoff = window.__anhangaConsentHandoff;
+  if (typeof handoff !== 'function') return;
+  const choice = handoff();
+  if (choice === 'marketing' || choice === 'essential') handleChoice(choice);
+};
+
+// Apenas para testes (tests/cookie-banner-prehydration.test.ts): o estado de visibilidade é de
+// módulo — mesmo padrão de _resetConsentListenerStateForTests em lib/consent.ts.
+export function _resetBannerVisibilityStateForTests(): void {
+  resetRequested = false;
+  dismissed = false;
+}
+
 const CookieConsentBanner: React.FC = () => {
   const visible = useSyncExternalStore(
     subscribeToBannerVisibility,
@@ -77,6 +102,10 @@ const CookieConsentBanner: React.FC = () => {
   const bannerRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
+    // Antes de qualquer outra coisa: um clique em Aceitar/Recusar que tenha caído na janela
+    // pré-hidratação já decidiu o consentimento, e o drain abaixo não pode reabrir o banner.
+    drainPreHydrationChoice();
+
     // Banner montou (hidratação concluída): habilita dispatch direto e drena qualquer
     // reset ocorrido antes (ver registerConsentBannerListener em lib/consent.ts — a corrida
     // do "Gerenciar cookies" no footer pré-renderizado, clicável antes da hidratação). A
@@ -140,6 +169,7 @@ const CookieConsentBanner: React.FC = () => {
           <button
             type="button"
             onClick={handleDecline}
+            data-consent-choice="essential"
             className="flex min-h-11 items-center justify-center px-4 text-sm font-medium text-zinc-300 border border-white/20 rounded-lg hover:border-white/40 hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
           >
             Recusar
@@ -147,6 +177,7 @@ const CookieConsentBanner: React.FC = () => {
           <button
             type="button"
             onClick={handleAccept}
+            data-consent-choice="marketing"
             className="flex min-h-11 items-center justify-center px-4 text-sm font-medium text-zinc-300 border border-white/20 rounded-lg hover:border-white/40 hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
           >
             Aceitar

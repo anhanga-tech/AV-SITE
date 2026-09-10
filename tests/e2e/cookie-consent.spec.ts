@@ -239,10 +239,16 @@ test.describe('Cookie Consent Banner (CMP)', () => {
     // Modo privado / storage cheio: setConsent() engole a falha de escrita de propósito.
     // A visibilidade não pode depender de reler a escolha, senão o overlay fixo fica
     // impossível de dispensar justamente para quem não consegue persistir nada.
+    // Só o localStorage falha: `Storage.prototype` é compartilhado com o sessionStorage, e
+    // derrubá-lo inteiro quebraria o init script de limpeza do beforeEach (que usa
+    // sessionStorage) caso a ordem dos init scripts mudasse.
     await page.addInitScript(() => {
-      const proto = Object.getPrototypeOf(window.localStorage) as Storage;
-      proto.setItem = () => {
-        throw new DOMException('QuotaExceededError', 'QuotaExceededError');
+      const originalSetItem = Storage.prototype.setItem;
+      Storage.prototype.setItem = function patchedSetItem(key: string, value: string) {
+        if (this === window.localStorage) {
+          throw new DOMException('QuotaExceededError', 'QuotaExceededError');
+        }
+        return originalSetItem.call(this, key, value);
       };
     });
 

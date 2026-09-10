@@ -91,6 +91,24 @@ test('index.html esconde o banner antes do paint só para quem já escolheu', ()
   );
 });
 
+test('index.html reserva --cookie-banner-h antes da hidratação', () => {
+  // O banner aparece ~1 s antes de o efeito que mede a altura rodar. Sem reservar nesse
+  // intervalo, quem consome a variável (o padding inferior de pages/LinksPage.tsx, os FABs)
+  // fica coberto pelo banner fixo e ganha o espaço — deslocando — só depois da hidratação.
+  const reservationIndex = indexHtml.search(
+    /getElementById\('cookie-consent-banner'\)[\s\S]{0,400}?setProperty\(\s*'--cookie-banner-h'/
+  );
+  const rootIndex = indexHtml.indexOf('<div id="root">');
+  const entrypointIndex = indexHtml.indexOf('<script type="module" src="/index.tsx"></script>');
+
+  assert.notEqual(reservationIndex, -1, 'a medição pré-hidratação deveria existir');
+  assert.ok(rootIndex < reservationIndex, 'precisa rodar depois do markup do banner');
+  assert.ok(
+    reservationIndex < entrypointIndex,
+    'precisa rodar antes do entrypoint React, senão não cobre a janela pré-hidratação'
+  );
+});
+
 test('o gate de pré-paint roda antes do entrypoint React', () => {
   // Regex em vez de string literal: casar a indentação exata do bloco faria uma
   // reformatação inofensiva de index.html derrubar este teste sem mudança de comportamento.
