@@ -54,6 +54,15 @@
   <style>
     html[data-cookie-consent="set"] #cookie-consent-banner { display: none; }
   </style>
+  <noscript>
+    <!-- Sem JS o HTML pré-renderizado ainda pinta, mas nem os handlers do React nem a ponte
+         de clique acima existem: o banner viraria um dialog fixo com Aceitar/Recusar inertes,
+         e o gate de escolha persistida também não roda (todo mundo o veria, inclusive quem já
+         decidiu). Antes da #1605 o ClientOnly simplesmente não o renderizava nesse ambiente. -->
+    <style>
+      #cookie-consent-banner { display: none; }
+    </style>
+  </noscript>
   <script>
     (function () {
       var choice = null;
@@ -82,6 +91,11 @@
         if (!target) return;
         pendingChoice = target.getAttribute('data-consent-choice');
         document.documentElement.setAttribute('data-cookie-consent', 'set');
+        // Zera junto com o gate: a reserva de altura mais abaixo já preencheu
+        // --cookie-banner-h, e mantê-la até a hidratação deixaria uma faixa vazia do tamanho
+        // do banner no rodapé de quem consome a variável (pages/LinksPage.tsx) pelo resto da
+        // janela pré-hidratação, com o banner já escondido.
+        document.documentElement.style.setProperty('--cookie-banner-h', '0px');
       };
       document.addEventListener('click', onPreHydrationClick, true);
 

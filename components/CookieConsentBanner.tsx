@@ -1,97 +1,14 @@
 import { useEffect, useRef, useSyncExternalStore } from 'react';
-import { type ConsentChoice, getConsent, registerConsentBannerListener, setConsent } from '@/lib/consent';
-
-declare global {
-  interface Window {
-    // Definida pela ponte de clique pré-hidratação em index.html. Ausente quando o documento
-    // não veio desse template (ex.: testes que montam o componente isolado).
-    __anhangaConsentHandoff?: () => string | null;
-  }
-}
-
-// Visibilidade do banner como store externa em vez de estado local (#1605).
-//
-// O banner agora é renderizado no HTML pré-renderizado, então o primeiro render do cliente
-// precisa produzir exatamente o mesmo markup — ler o localStorage ali quebraria a hidratação.
-// `useSyncExternalStore` resolve isso pela porta da frente: durante a hidratação o React usa
-// `getServerSnapshot` (sempre "mostrar"), e só depois passa a usar `getSnapshot`, que consulta
-// a escolha real. Quem já escolheu não vê flash nesse intervalo porque o par script+style
-// inline do <head> (ver index.html) esconde o banner antes do primeiro paint.
-let resetRequested = false;
-// `dismissed` não é redundante com o localStorage: `setConsent` engole falhas de escrita
-// (modo privado, storage cheio) de propósito, então só a memória garante que Aceitar/Recusar
-// fecham o banner. Sem ela, a leitura de volta continuaria `null` e o overlay fixo ficaria
-// impossível de dispensar exatamente para quem não consegue persistir a escolha.
-let dismissed = false;
-const storeListeners = new Set<() => void>();
-
-const notifyStore = (): void => {
-  for (const listener of storeListeners) listener();
-};
-
-// Enquanto `data-cookie-consent="set"` estiver no <html>, a regra inline do <head> esconde o
-// banner. Liberar o gate devolve a visibilidade ao React, que passa a ser a única fonte de
-// verdade a partir daí.
-const releasePrepaintGate = (): void => {
-  document.documentElement.removeAttribute('data-cookie-consent');
-};
-
-const subscribeToBannerVisibility = (onStoreChange: () => void): (() => void) => {
-  storeListeners.add(onStoreChange);
-  const handleReset = () => {
-    resetRequested = true;
-    dismissed = false;
-    // Todo reset libera o gate, não só o caminho em que o banner passou por um render
-    // invisível antes. O drain de um reset bufferizado (registerConsentBannerListener, em
-    // lib/consent.ts) pode acontecer no mesmo commit da hidratação, antes de o React chegar
-    // a renderizar `visible=false` — aí o efeito de baixo nunca roda e a regra inline
-    // continuaria escondendo um banner logicamente reaberto.
-    releasePrepaintGate();
-    onStoreChange();
-  };
-  window.addEventListener('anhanga:reset-consent', handleReset);
-  return () => {
-    storeListeners.delete(onStoreChange);
-    window.removeEventListener('anhanga:reset-consent', handleReset);
-  };
-};
-
-// `resetRequested` cobre o "Gerenciar cookies" do rodapé: a escolha continua no localStorage
-// (lib/consent.ts não a apaga de propósito), então só a flag distingue "reabrir" de "já decidiu".
-const getBannerVisibility = (): boolean => {
-  if (resetRequested) return true;
-  if (dismissed) return false;
-  return getConsent() === null;
-};
-const getServerBannerVisibility = (): boolean => true;
-
-const handleChoice = (choice: ConsentChoice): void => {
-  setConsent(choice);
-  dismissed = true;
-  resetRequested = false;
-  notifyStore();
-};
-
-const handleAccept = (): void => handleChoice('marketing');
-
-const handleDecline = (): void => handleChoice('essential');
-
-// Drena o clique que a ponte pré-hidratação de index.html anotou. O banner fica visível a
-// partir do primeiro paint, muito antes dos onClick do React existirem; a ponte anota a
-// escolha e esconde o banner, e é aqui que ela vira consentimento de verdade (setConsent).
-const drainPreHydrationChoice = (): void => {
-  const handoff = window.__anhangaConsentHandoff;
-  if (typeof handoff !== 'function') return;
-  const choice = handoff();
-  if (choice === 'marketing' || choice === 'essential') handleChoice(choice);
-};
-
-// Apenas para testes (tests/cookie-banner-prehydration.test.ts): o estado de visibilidade é de
-// módulo — mesmo padrão de _resetConsentListenerStateForTests em lib/consent.ts.
-export function _resetBannerVisibilityStateForTests(): void {
-  resetRequested = false;
-  dismissed = false;
-}
+import { registerConsentBannerListener } from '@/lib/consent';
+import {
+  acceptConsent,
+  declineConsent,
+  drainPreHydrationChoice,
+  getBannerVisibility,
+  getServerBannerVisibility,
+  releasePrepaintGate,
+  subscribeToBannerVisibility,
+} from '@/lib/cookie-banner-visibility';
 
 const CookieConsentBanner: React.FC = () => {
   const visible = useSyncExternalStore(
@@ -168,7 +85,7 @@ const CookieConsentBanner: React.FC = () => {
               este banner fixo no rodapé tanto quanto para qualquer outro controle do site. */}
           <button
             type="button"
-            onClick={handleDecline}
+            onClick={declineConsent}
             data-consent-choice="essential"
             className="flex min-h-11 items-center justify-center px-4 text-sm font-medium text-zinc-300 border border-white/20 rounded-lg hover:border-white/40 hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
           >
@@ -176,7 +93,7 @@ const CookieConsentBanner: React.FC = () => {
           </button>
           <button
             type="button"
-            onClick={handleAccept}
+            onClick={acceptConsent}
             data-consent-choice="marketing"
             className="flex min-h-11 items-center justify-center px-4 text-sm font-medium text-zinc-300 border border-white/20 rounded-lg hover:border-white/40 hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
           >

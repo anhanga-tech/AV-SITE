@@ -109,6 +109,23 @@ test('index.html reserva --cookie-banner-h antes da hidratação', () => {
   );
 });
 
+test('sem JavaScript o banner não é renderizado como diálogo inerte', () => {
+  // O HTML pré-renderizado pinta sem JS, mas nem os handlers do React nem a ponte de clique
+  // existem nesse ambiente — e o gate de escolha persistida também não roda. Antes da #1605 o
+  // ClientOnly simplesmente não renderizava o banner aqui.
+  const noscript = indexHtml.match(/<noscript>([\s\S]*?)<\/noscript>/i);
+  assert.ok(noscript, 'index.html deveria ter um bloco noscript');
+  assert.match(noscript[1], /#cookie-consent-banner\s*\{\s*display:\s*none;\s*\}/);
+});
+
+test('o clique pré-hidratação zera a altura reservada junto com o gate', () => {
+  // Sem isso, a faixa reservada para o banner continuaria no rodapé de quem consome
+  // --cookie-banner-h até a hidratação, com o banner já escondido.
+  const bridge = indexHtml.match(/var onPreHydrationClick = function[\s\S]*?\n\s*\};/);
+  assert.ok(bridge, 'a ponte de clique pré-hidratação deveria existir');
+  assert.match(bridge[0], /setProperty\(\s*'--cookie-banner-h',\s*'0px'\s*\)/);
+});
+
 test('o gate de pré-paint roda antes do entrypoint React', () => {
   // Regex em vez de string literal: casar a indentação exata do bloco faria uma
   // reformatação inofensiva de index.html derrubar este teste sem mudança de comportamento.

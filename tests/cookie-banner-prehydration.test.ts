@@ -8,7 +8,8 @@ import path from 'node:path';
 import { render, cleanup, act } from '@testing-library/react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
-import CookieConsentBanner, { _resetBannerVisibilityStateForTests } from '../components/CookieConsentBanner.tsx';
+import CookieConsentBanner from '../components/CookieConsentBanner.tsx';
+import { _resetBannerVisibilityStateForTests } from '../lib/cookie-banner-visibility.ts';
 import { getConsent } from '../lib/consent.ts';
 
 /*
