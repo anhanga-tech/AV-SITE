@@ -188,6 +188,102 @@ test.describe('Cookie Consent Banner (CMP)', () => {
     expect(hasDataLayer).toBe(true);
   });
 
+  // --- Apresentação determinística (#1605) ---
+
+  test('quem já escolheu não vê o banner em nenhum frame (sem flash)', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Aceitar' }).click();
+
+    // O banner é renderizado no HTML/primeiro render independentemente da escolha —
+    // o gate de pré-paint do index.html é quem o esconde. Amostrar a visibilidade a
+    // cada frame desde antes do primeiro paint prova que ele nunca chega a aparecer.
+    await page.addInitScript(() => {
+      const testWindow = window as unknown as { __bannerEverVisible: boolean };
+      testWindow.__bannerEverVisible = false;
+      const sample = () => {
+        const banner = document.querySelector('#cookie-consent-banner');
+        if (banner && banner.getClientRects().length > 0) testWindow.__bannerEverVisible = true;
+        requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    });
+
+    await page.reload();
+    await expect(page.getByRole('button', { name: 'Gerenciar cookies' })).toBeVisible();
+
+    const everVisible = await page.evaluate(
+      () => (window as unknown as { __bannerEverVisible: boolean }).__bannerEverVisible
+    );
+    expect(everVisible).toBe(false);
+  });
+
+  test('o gate de pré-paint devolve o controle ao React depois da hidratação', async ({ page }) => {
+    await page.goto('/');
+    // Sem escolha: o gate marca "unset" e o banner aparece normalmente.
+    await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).toBeVisible();
+
+    await page.getByRole('button', { name: 'Aceitar' }).click();
+    await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).not.toBeVisible();
+
+    // Com o banner fechado, o atributo sai do <html>: se ficasse como "set", a regra
+    // inline esconderia o banner reaberto pelo "Gerenciar cookies".
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.hasAttribute('data-cookie-consent')))
+      .toBe(false);
+
+    await page.getByRole('button', { name: 'Gerenciar cookies' }).click();
+    await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).toBeVisible();
+  });
+
+  test('Aceitar fecha o banner mesmo quando o localStorage recusa a escrita', async ({ page }) => {
+    // Modo privado / storage cheio: setConsent() engole a falha de escrita de propósito.
+    // A visibilidade não pode depender de reler a escolha, senão o overlay fixo fica
+    // impossível de dispensar justamente para quem não consegue persistir nada.
+    // Só o localStorage falha: `Storage.prototype` é compartilhado com o sessionStorage, e
+    // derrubá-lo inteiro quebraria o init script de limpeza do beforeEach (que usa
+    // sessionStorage) caso a ordem dos init scripts mudasse.
+    await page.addInitScript(() => {
+      const originalSetItem = Storage.prototype.setItem;
+      Storage.prototype.setItem = function patchedSetItem(key: string, value: string) {
+        if (this === window.localStorage) {
+          throw new DOMException('QuotaExceededError', 'QuotaExceededError');
+        }
+        return originalSetItem.call(this, key, value);
+      };
+    });
+
+    await page.goto('/');
+    await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).toBeVisible();
+
+    await page.getByRole('button', { name: 'Aceitar' }).click();
+    await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).not.toBeVisible();
+
+    const stored = await page.evaluate((key) => localStorage.getItem(key), CHOICE_KEY);
+    expect(stored).toBeNull();
+  });
+
+  test('um reset reabre o banner mesmo com o gate de pré-paint ainda ativo', async ({ page }) => {
+    // Reproduz a consequência observável da corrida de montagem: um reset bufferizado
+    // drenado no mesmo commit da hidratação nunca passa por um render `visible=false`, então
+    // `data-cookie-consent="set"` continuaria no <html> e a regra inline esconderia o banner
+    // reaberto. A corrida em si não é reproduzível a partir do harness (depende da ordem dos
+    // efeitos de montagem), então o atributo é recolocado à mão para deixar a página no
+    // mesmo estado; o que se prova aqui é o invariante do fix: todo reset libera o gate.
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Aceitar' }).click();
+    await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).not.toBeVisible();
+
+    await page.evaluate(() =>
+      document.documentElement.setAttribute('data-cookie-consent', 'set')
+    );
+
+    await page.getByRole('button', { name: 'Gerenciar cookies' }).click();
+    await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).toBeVisible();
+    expect(
+      await page.evaluate(() => document.documentElement.hasAttribute('data-cookie-consent'))
+    ).toBe(false);
+  });
+
   // --- Convivência com elementos flutuantes e ordem do DOM ---
 
   test('banner visível define --cookie-banner-h no <html>; escolher limpa o offset', async ({ page }) => {
@@ -232,8 +328,6 @@ test.describe('Cookie Consent Banner (CMP)', () => {
 
   test('banner precede o conteúdo das rotas na ordem do DOM (acessibilidade de teclado)', async ({ page }) => {
     await page.goto('/');
-    // Banner só monta após a hidratação (ClientOnly) — sem esta espera o
-    // querySelector abaixo corre contra o mount e falha por timing
     await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).toBeVisible();
     const dialogPrecedesMain = await page.evaluate(() => {
       const dialog = document.querySelector('dialog[aria-label="Preferências de cookies"]');

@@ -1,23 +1,43 @@
-import { useEffect, useRef, useState } from 'react';
-import { getConsent, registerConsentBannerListener, setConsent } from '@/lib/consent';
+import { useEffect, useRef, useSyncExternalStore } from 'react';
+import { registerConsentBannerListener } from '@/lib/consent';
+import {
+  acceptConsent,
+  declineConsent,
+  drainPreHydrationChoice,
+  getBannerVisibility,
+  getServerBannerVisibility,
+  releasePrepaintGate,
+  subscribeToBannerVisibility,
+} from '@/lib/cookie-banner-visibility';
 
 const CookieConsentBanner: React.FC = () => {
-  const [visible, setVisible] = useState(() => getConsent() === null);
+  const visible = useSyncExternalStore(
+    subscribeToBannerVisibility,
+    getBannerVisibility,
+    getServerBannerVisibility
+  );
   const bannerRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    const handleReset = () => setVisible(true);
-    window.addEventListener('anhanga:reset-consent', handleReset);
+    // Antes de qualquer outra coisa: um clique em Aceitar/Recusar que tenha caído na janela
+    // pré-hidratação já decidiu o consentimento, e o drain abaixo não pode reabrir o banner.
+    drainPreHydrationChoice();
 
-    // Banner montou (chunk lazy carregado): habilita dispatch direto e drena qualquer
+    // Banner montou (hidratação concluída): habilita dispatch direto e drena qualquer
     // reset ocorrido antes (ver registerConsentBannerListener em lib/consent.ts — a corrida
-    // do "Gerenciar cookies" no footer com o chunk ainda baixando). Deve vir DEPOIS do
-    // addEventListener acima: um bufferedResetBanner drenado aqui dispara o evento e o
-    // handleReset precisa já estar registrado para o banner abrir.
+    // do "Gerenciar cookies" no footer pré-renderizado, clicável antes da hidratação). A
+    // assinatura de `useSyncExternalStore` é declarada acima deste efeito, então já está
+    // ativa quando o drain dispara o evento — sem isso o banner não reabriria.
     registerConsentBannerListener();
-
-    return () => window.removeEventListener('anhanga:reset-consent', handleReset);
   }, []);
+
+  // Devolve o controle da visibilidade ao React assim que o banner sai da tela: enquanto
+  // `data-cookie-consent="set"` estiver no <html>, a regra inline do <head> esconderia o
+  // banner mesmo depois de "Gerenciar cookies" reabri-lo. Remover só quando `visible` já é
+  // false garante que a troca aconteça atrás de um render sem banner — sem janela de flash.
+  useEffect(() => {
+    if (!visible) releasePrepaintGate();
+  }, [visible]);
 
   // Expõe a altura do banner em --cookie-banner-h para elementos flutuantes
   // (ex.: botão do AIChat) se deslocarem e não ficarem cobertos pelo banner.
@@ -40,19 +60,10 @@ const CookieConsentBanner: React.FC = () => {
 
   if (!visible) return null;
 
-  const handleAccept = () => {
-    setConsent('marketing');
-    setVisible(false);
-  };
-
-  const handleDecline = () => {
-    setConsent('essential');
-    setVisible(false);
-  };
-
   return (
     <dialog
       ref={bannerRef}
+      id="cookie-consent-banner"
       open
       aria-label="Preferências de cookies"
       className="fixed bottom-0 left-0 right-0 z-[10000] m-0 w-full max-w-none border-0 p-0 bg-anhanga-dark border-t border-white/10 shadow-lg"
@@ -74,14 +85,16 @@ const CookieConsentBanner: React.FC = () => {
               este banner fixo no rodapé tanto quanto para qualquer outro controle do site. */}
           <button
             type="button"
-            onClick={handleDecline}
+            onClick={declineConsent}
+            data-consent-choice="essential"
             className="flex min-h-11 items-center justify-center px-4 text-sm font-medium text-zinc-300 border border-white/20 rounded-lg hover:border-white/40 hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
           >
             Recusar
           </button>
           <button
             type="button"
-            onClick={handleAccept}
+            onClick={acceptConsent}
+            data-consent-choice="marketing"
             className="flex min-h-11 items-center justify-center px-4 text-sm font-medium text-zinc-300 border border-white/20 rounded-lg hover:border-white/40 hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
           >
             Aceitar

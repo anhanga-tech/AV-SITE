@@ -36,6 +36,79 @@
   <link rel="apple-touch-icon" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!--
+    Apresentação determinística do banner de cookies (#1605).
+
+    O banner é renderizado no HTML pré-renderizado e no primeiro render do cliente
+    SEM ler o localStorage (leitura durante o render quebraria a hidratação), então
+    quem já escolheu veria um flash até o efeito de montagem esconder o banner.
+    Este bloco resolve isso ANTES do primeiro paint: o script marca a escolha
+    persistida no <html> e a regra abaixo esconde o banner nesse caso.
+
+    Precisa ficar aqui no <head>, inline, e não no CSS do bundle: em dev o Vite
+    injeta o CSS via JS (depois do paint) e a regra chegaria tarde demais.
+    Depois da hidratação o React assume o controle e remove o atributo
+    (ver components/CookieConsentBanner.tsx) — a partir daí só o estado decide,
+    o que mantém o "Gerenciar cookies" do rodapé funcionando.
+  -->
+  <style>
+    html[data-cookie-consent="set"] #cookie-consent-banner { display: none; }
+  </style>
+  <noscript>
+    <!-- Sem JS o HTML pré-renderizado ainda pinta, mas nem os handlers do React nem a ponte
+         de clique acima existem: o banner viraria um dialog fixo com Aceitar/Recusar inertes,
+         e o gate de escolha persistida também não roda (todo mundo o veria, inclusive quem já
+         decidiu). Antes da #1605 o ClientOnly simplesmente não o renderizava nesse ambiente. -->
+    <style>
+      #cookie-consent-banner { display: none; }
+    </style>
+  </noscript>
+  <script>
+    (function () {
+      var choice = null;
+      try { choice = localStorage.getItem('anhanga_cookie_consent'); } catch (e) { }
+      document.documentElement.setAttribute(
+        'data-cookie-consent',
+        choice === 'marketing' || choice === 'essential' ? 'set' : 'unset'
+      );
+
+      // Ponte de clique pré-hidratação. O banner agora é visível a partir do primeiro paint,
+      // mas os onClick do React só existem depois que o chunk de entrada baixa e hidrata —
+      // medido em ~2,8 s numa landing sob 4x CPU / ~1,6 Mbps. Sem esta ponte, um toque em
+      // Aceitar/Recusar nessa janela sumiria em silêncio (React não replica eventos anteriores
+      // à hidratação). Aqui o clique só é ANOTADO e o banner é escondido na hora para dar
+      // retorno visual; quem persiste a escolha continua sendo o setConsent() de lib/consent.ts,
+      // chamado pelo componente ao montar (drena via __anhangaConsentHandoff). Deliberadamente
+      // não gravamos consentimento daqui: se a pessoa sair antes da hidratação, nada é
+      // registrado — o default seguro é "sem consentimento de marketing".
+      var pendingChoice = null;
+      var handoffPending = true;
+      var onPreHydrationClick = function (event) {
+        if (!handoffPending) return;
+        var target = event.target && event.target.closest
+          ? event.target.closest('#cookie-consent-banner [data-consent-choice]')
+          : null;
+        if (!target) return;
+        pendingChoice = target.getAttribute('data-consent-choice');
+        document.documentElement.setAttribute('data-cookie-consent', 'set');
+        // Zera junto com o gate: a reserva de altura mais abaixo já preencheu
+        // --cookie-banner-h, e mantê-la até a hidratação deixaria uma faixa vazia do tamanho
+        // do banner no rodapé de quem consome a variável (pages/LinksPage.tsx) pelo resto da
+        // janela pré-hidratação, com o banner já escondido.
+        document.documentElement.style.setProperty('--cookie-banner-h', '0px');
+      };
+      document.addEventListener('click', onPreHydrationClick, true);
+
+      window.__anhangaConsentHandoff = function () {
+        handoffPending = false;
+        document.removeEventListener('click', onPreHydrationClick, true);
+        var drained = pendingChoice;
+        pendingChoice = null;
+        return drained;
+      };
+    })();
+  </script>
+
   <!-- Media CDN -->
   <link rel="preconnect" href="https://media.anhanga.tur.br" crossorigin>
   <link rel="dns-prefetch" href="https://media.anhanga.tur.br">
@@ -97,6 +170,23 @@
   <!-- GTM noscript removido (auditoria LGPD jul/2026): carregava tags sem os defaults
        do Consent Mode (setados via JS) e a SPA não renderiza sem JS de qualquer forma. -->
   <div id="root"></div>
+  <script>
+    // Reserva a altura do banner pré-renderizado antes da hidratação. `--cookie-banner-h` é
+    // consumida por elementos que precisam se afastar do banner fixo (o padding inferior de
+    // pages/LinksPage.tsx, os FABs de AIChat/BackToTop); até a #1605 o banner só aparecia
+    // junto com o efeito que preenche a variável, agora ele aparece ~1 s antes — sem esta
+    // medição o conteúdo ficaria coberto nesse intervalo e ganharia espaço (deslocando) só
+    // depois. Roda aqui, após o markup do banner e com o CSS do <head> já aplicado (folhas de
+    // estilo bloqueiam a execução de scripts), então offsetHeight já é o valor final; o
+    // ResizeObserver do componente assume as mudanças posteriores. Banner escondido pelo gate
+    // mede 0 e não escreve nada.
+    (function () {
+      var banner = document.getElementById('cookie-consent-banner');
+      if (!banner) return;
+      var height = banner.offsetHeight;
+      if (height > 0) document.documentElement.style.setProperty('--cookie-banner-h', height + 'px');
+    })();
+  </script>
   <script>window.dataLayer = window.dataLayer || [];</script>
   <script type="module" src="/index.tsx"></script>
   <!-- Defer third-party scripts to protect mobile TBT -->
