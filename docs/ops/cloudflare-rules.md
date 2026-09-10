@@ -21,7 +21,7 @@ Related evidence:
 | Path redirects that do not depend on hostname | `public/_redirects` | `tests/cloudflare-config.test.ts` |
 | Host-based redirects and cross-host canonicalization | Cloudflare dashboard Redirect Rules | `curl -sSI https://anhanga.tur.br/` and `curl -sSI http://www.anhanga.tur.br/` |
 | Media/video cache behavior | Cloudflare dashboard Cache Rules, documented in `docs/ops/cloudflare-cache-rules.md` | Repeated GET requests with `Range` headers; do not rely on HEAD for cache population |
-| Speed Brain and Web Analytics | Cloudflare dashboard | Response header `speculation-rules` and Cloudflare Web Analytics UI |
+| Speed Brain and Web Analytics | Cloudflare dashboard (Pages project toggle **and** zone RUM — see [Duplicated Web Analytics beacon](#duplicated-web-analytics-beacon-investigated-2026-09-09-issue-1604)) | Response header `speculation-rules`, Cloudflare Web Analytics UI, and `curl` with a browser `Accept` header |
 | WAF and rate-limit rules | Cloudflare dashboard; paid-plan feature for this zone | Record as unavailable or unverified until the plan supports it |
 | SSL/TLS and HSTS decisions | Cloudflare dashboard plus `public/_headers` | `curl -sSI https://www.anhanga.tur.br/` and Cloudflare SSL/TLS UI |
 
@@ -196,6 +196,96 @@ Cloudflare Web Analytics is dashboard-owned. The baseline from 2026-05-23 found 
 zone-level Core Web Vitals were dominated by internal subdomains, not by
 `www.anhanga.tur.br`. Do not use aggregate zone metrics as proof of public-site
 improvement without a host or route filter.
+
+### Duplicated Web Analytics beacon (investigated 2026-09-09, issue #1604)
+
+Production serves **two independent Cloudflare Web Analytics beacons** on the same
+navigation, with two different site tokens. Neither is injected by this repository —
+`grep -rn cloudflareinsights` over the source tree returns nothing, and neither script
+appears in `index.html`, in `scripts/prerender.mjs` output, or in `functions/`. Both are
+edge injections owned by the Cloudflare dashboard.
+
+| Script tag in the served HTML | Token | Injected by | SPA-aware |
+|---|---|---|---|
+| `<script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "93a3a04071d84513891917540e8c2003"}'>`, wrapped in `<!-- Cloudflare Pages Analytics -->` comments | `93a3a040…` | **Pages project** `av-site` → Settings → Web Analytics toggle | No (`data-cf-beacon` has no `spa` flag — initial document only) |
+| `<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd…" data-cf-beacon='{"version":"2024.11.0","token":"fcec1beac54e47dcb652a96d6b155992","r":1,"spa":2}'>` | `fcec1bea…` | **Zone** `anhanga.tur.br` → Web Analytics (RUM auto-injection) | Yes (`"spa":2` — reports client-side route changes) |
+
+Both URLs return the same beacon build (`etag: W/"2026.9.1"`, ~10.1 KiB gzipped each),
+but the versioned and unversioned paths are separate cache entries, so the browser
+downloads the payload twice: **2 requests / ~20.2 KiB instead of 1 / ~10.1 KiB**.
+
+#### How to reproduce
+
+The zone-level injection only happens for requests that look like a browser navigation.
+A bare `curl` **misses it** and shows a single beacon — that is a false negative, not a
+fix. Always send a full browser `Accept` header:
+
+```bash
+curl -sS https://www.anhanga.tur.br/ \
+  -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36' \
+  -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8' \
+  --compressed | grep -o '<script[^>]*cloudflareinsights[^>]*>'
+```
+
+In-browser confirmation (both scripts execute, both report to `/cdn-cgi/rum`):
+
+```js
+[...document.querySelectorAll('script[src*="cloudflareinsights"]')]
+  .map((s) => ({ src: s.src, beacon: s.getAttribute('data-cf-beacon') }));
+performance.getEntriesByType('resource').filter((r) => /cdn-cgi\/rum/.test(r.name));
+```
+
+#### Evidence captured before any change (2026-09-09, `https://www.anhanga.tur.br/`)
+
+- Two `<script>` tags for `static.cloudflareinsights.com/beacon.min.js`, distinct tokens.
+- Both fetched by the browser (`PerformanceResourceTiming`, `initiatorType: "script"`).
+- Cross-origin without `Timing-Allow-Origin`, so `transferSize` reads `0` in the browser;
+  wire size measured directly instead: `curl --compressed` returns 10 125 B and 10 114 B.
+- `POST https://cloudflareinsights.com/cdn-cgi/rum` observed on load and again on
+  `pagehide` — the collection endpoint is shared, so the duplication is in the payload
+  volume and in the split of the dataset across two Web Analytics sites, not in a second
+  endpoint.
+
+#### Decision
+
+**Keep the zone-level beacon (`fcec1bea…`); disable the Pages project one (`93a3a040…`).**
+
+Rationale, in order of weight:
+
+1. The zone beacon is the one the recorded history comes from.
+   [`docs/baselines/cloudflare-2026-05-23.md`](../baselines/cloudflare-2026-05-23.md)
+   reports Web Analytics data containing `n8n.`, `mkt.` and `cal.` subdomains. The Pages
+   beacon can only ever run on the `av-site` Pages project, so a view showing those
+   subdomains must be the zone-scoped site. Disabling the zone beacon would orphan that
+   dataset.
+2. Only the zone beacon carries `"spa":2`. This site is a client-side-routed React SPA
+   (`App.tsx`), so the Pages beacon reports the initial document only and undercounts
+   every in-app navigation.
+3. The Pages toggle is a single switch with a trivial rollback (see below).
+
+If the token actually being read in the dashboard turns out to be `93a3a040…`, invert
+the decision — but then also accept the loss of SPA route reporting, or re-enable the
+zone RUM with `spa` before turning the zone one off.
+
+#### How to apply, verify and roll back
+
+- **Apply:** Cloudflare dashboard → Workers & Pages → `av-site` → Settings → *Web
+  Analytics* → disable. This is a dashboard-only change; nothing in this repo deploys it.
+- **Verify:** re-run the `curl` above and confirm exactly one beacon remains, and that it
+  is the versioned `fcec1bea…` one. Then confirm in Web Analytics (zone site, filtered to
+  `www.anhanga.tur.br`) that page views and Core Web Vitals keep arriving for at least
+  24 h.
+- **Roll back:** re-enable the same toggle. The Pages token is regenerated by Cloudflare
+  on re-enable, so historical data under `93a3a040…` may not be recoverable — this is a
+  reason to prefer removing the Pages one only after the verification window above.
+
+#### Explicitly out of scope
+
+The same navigation also loads `/cdn-cgi/challenge-platform/scripts/jsd/main.js`
+(Bot Fight Mode), `/cdn-cgi/scripts/…/email-decode.min.js` (Email Address Obfuscation)
+and `/cdn-cgi/zaraz/s.js` (Zaraz). None of them is a Web Analytics beacon and none was
+touched. Per issue #1604, anti-bot protection, Zaraz and unrelated trackers must not be
+disabled on the assumption that they are part of this duplication.
 
 ## SSL/TLS and HSTS decisions
 

@@ -268,3 +268,24 @@ test('Cloudflare splat redirect ordering guard should handle non-blog splats', (
 
   assert.equal(hasExactRedirectAfterFirstSplat(redirects), true);
 });
+
+// Issue #1604: production served two Cloudflare Web Analytics beacons at once, both
+// injected at the edge (Pages project toggle + zone RUM), never from this repo. The fix
+// lives in the Cloudflare dashboard and cannot be asserted here without hitting
+// production, which `docs/standards/testing.md` forbids. What this guard *can* do is
+// keep the repo from becoming a third injection point: any beacon added to the shipped
+// HTML shell would stack on top of whatever the edge already injects.
+test('the HTML shell should not inject a Cloudflare Web Analytics beacon', async () => {
+  const shell = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+
+  assert.doesNotMatch(
+    shell,
+    /cloudflareinsights\.com/i,
+    'the Web Analytics beacon is edge-injected and dashboard-owned — see docs/ops/cloudflare-rules.md',
+  );
+  assert.doesNotMatch(
+    shell,
+    /data-cf-beacon/i,
+    'do not hand-roll a data-cf-beacon script tag in the HTML shell',
+  );
+});
