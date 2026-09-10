@@ -33,9 +33,9 @@ export function setConsent(choice: ConsentChoice): void {
 
 export function triggerResetBanner(): void {
   // NÃO toca o localStorage — preserva valor anterior para detecção de transição em setConsent()
-  // O CookieConsentBanner é lazy() (App.tsx): se o listener de reset ainda não montou (chunk
-  // baixando), o clique do footer se perderia. Bufferiza e drena na montagem via
-  // registerConsentBannerListener().
+  // O rodapé é pré-renderizado e clicável antes da hidratação: se o listener de reset do
+  // CookieConsentBanner ainda não montou, o clique se perderia. Bufferiza e drena na montagem
+  // via registerConsentBannerListener().
   if (!consentBannerListenerRegistered) {
     bufferedResetBanner = true;
     return;

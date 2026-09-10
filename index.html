@@ -36,6 +36,35 @@
   <link rel="apple-touch-icon" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!--
+    Apresentação determinística do banner de cookies (#1605).
+
+    O banner é renderizado no HTML pré-renderizado e no primeiro render do cliente
+    SEM ler o localStorage (leitura durante o render quebraria a hidratação), então
+    quem já escolheu veria um flash até o efeito de montagem esconder o banner.
+    Este bloco resolve isso ANTES do primeiro paint: o script marca a escolha
+    persistida no <html> e a regra abaixo esconde o banner nesse caso.
+
+    Precisa ficar aqui no <head>, inline, e não no CSS do bundle: em dev o Vite
+    injeta o CSS via JS (depois do paint) e a regra chegaria tarde demais.
+    Depois da hidratação o React assume o controle e remove o atributo
+    (ver components/CookieConsentBanner.tsx) — a partir daí só o estado decide,
+    o que mantém o "Gerenciar cookies" do rodapé funcionando.
+  -->
+  <style>
+    html[data-cookie-consent="set"] #cookie-consent-banner { display: none; }
+  </style>
+  <script>
+    (function () {
+      var choice = null;
+      try { choice = localStorage.getItem('anhanga_cookie_consent'); } catch (e) { }
+      document.documentElement.setAttribute(
+        'data-cookie-consent',
+        choice === 'marketing' || choice === 'essential' ? 'set' : 'unset'
+      );
+    })();
+  </script>
+
   <!-- Media CDN -->
   <link rel="preconnect" href="https://media.anhanga.tur.br" crossorigin>
   <link rel="dns-prefetch" href="https://media.anhanga.tur.br">

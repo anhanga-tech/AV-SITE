@@ -188,6 +188,53 @@ test.describe('Cookie Consent Banner (CMP)', () => {
     expect(hasDataLayer).toBe(true);
   });
 
+  // --- Apresentação determinística (#1605) ---
+
+  test('quem já escolheu não vê o banner em nenhum frame (sem flash)', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Aceitar' }).click();
+
+    // O banner é renderizado no HTML/primeiro render independentemente da escolha —
+    // o gate de pré-paint do index.html é quem o esconde. Amostrar a visibilidade a
+    // cada frame desde antes do primeiro paint prova que ele nunca chega a aparecer.
+    await page.addInitScript(() => {
+      const testWindow = window as unknown as { __bannerEverVisible: boolean };
+      testWindow.__bannerEverVisible = false;
+      const sample = () => {
+        const banner = document.querySelector('#cookie-consent-banner');
+        if (banner && banner.getClientRects().length > 0) testWindow.__bannerEverVisible = true;
+        requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    });
+
+    await page.reload();
+    await expect(page.getByRole('button', { name: 'Gerenciar cookies' })).toBeVisible();
+
+    const everVisible = await page.evaluate(
+      () => (window as unknown as { __bannerEverVisible: boolean }).__bannerEverVisible
+    );
+    expect(everVisible).toBe(false);
+  });
+
+  test('o gate de pré-paint devolve o controle ao React depois da hidratação', async ({ page }) => {
+    await page.goto('/');
+    // Sem escolha: o gate marca "unset" e o banner aparece normalmente.
+    await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).toBeVisible();
+
+    await page.getByRole('button', { name: 'Aceitar' }).click();
+    await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).not.toBeVisible();
+
+    // Com o banner fechado, o atributo sai do <html>: se ficasse como "set", a regra
+    // inline esconderia o banner reaberto pelo "Gerenciar cookies".
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.hasAttribute('data-cookie-consent')))
+      .toBe(false);
+
+    await page.getByRole('button', { name: 'Gerenciar cookies' }).click();
+    await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).toBeVisible();
+  });
+
   // --- Convivência com elementos flutuantes e ordem do DOM ---
 
   test('banner visível define --cookie-banner-h no <html>; escolher limpa o offset', async ({ page }) => {
@@ -232,8 +279,6 @@ test.describe('Cookie Consent Banner (CMP)', () => {
 
   test('banner precede o conteúdo das rotas na ordem do DOM (acessibilidade de teclado)', async ({ page }) => {
     await page.goto('/');
-    // Banner só monta após a hidratação (ClientOnly) — sem esta espera o
-    // querySelector abaixo corre contra o mount e falha por timing
     await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).toBeVisible();
     const dialogPrecedesMain = await page.evaluate(() => {
       const dialog = document.querySelector('dialog[aria-label="Preferências de cookies"]');

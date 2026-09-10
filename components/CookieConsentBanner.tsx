@@ -1,23 +1,63 @@
-import { useEffect, useRef, useState } from 'react';
-import { getConsent, registerConsentBannerListener, setConsent } from '@/lib/consent';
+import { useEffect, useRef, useSyncExternalStore } from 'react';
+import { type ConsentChoice, getConsent, registerConsentBannerListener, setConsent } from '@/lib/consent';
+
+// Visibilidade do banner como store externa em vez de estado local (#1605).
+//
+// O banner agora é renderizado no HTML pré-renderizado, então o primeiro render do cliente
+// precisa produzir exatamente o mesmo markup — ler o localStorage ali quebraria a hidratação.
+// `useSyncExternalStore` resolve isso pela porta da frente: durante a hidratação o React usa
+// `getServerSnapshot` (sempre "mostrar"), e só depois passa a usar `getSnapshot`, que consulta
+// a escolha real. Quem já escolheu não vê flash nesse intervalo porque o par script+style
+// inline do <head> (ver index.html) esconde o banner antes do primeiro paint.
+let resetRequested = false;
+const storeListeners = new Set<() => void>();
+
+const notifyStore = (): void => {
+  for (const listener of storeListeners) listener();
+};
+
+const subscribeToBannerVisibility = (onStoreChange: () => void): (() => void) => {
+  storeListeners.add(onStoreChange);
+  const handleReset = () => {
+    resetRequested = true;
+    onStoreChange();
+  };
+  window.addEventListener('anhanga:reset-consent', handleReset);
+  return () => {
+    storeListeners.delete(onStoreChange);
+    window.removeEventListener('anhanga:reset-consent', handleReset);
+  };
+};
+
+// `resetRequested` cobre o "Gerenciar cookies" do rodapé: a escolha continua no localStorage
+// (lib/consent.ts não a apaga de propósito), então só a flag distingue "reabrir" de "já decidiu".
+const getBannerVisibility = (): boolean => resetRequested || getConsent() === null;
+const getServerBannerVisibility = (): boolean => true;
 
 const CookieConsentBanner: React.FC = () => {
-  const [visible, setVisible] = useState(() => getConsent() === null);
+  const visible = useSyncExternalStore(
+    subscribeToBannerVisibility,
+    getBannerVisibility,
+    getServerBannerVisibility
+  );
   const bannerRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    const handleReset = () => setVisible(true);
-    window.addEventListener('anhanga:reset-consent', handleReset);
-
-    // Banner montou (chunk lazy carregado): habilita dispatch direto e drena qualquer
+    // Banner montou (hidratação concluída): habilita dispatch direto e drena qualquer
     // reset ocorrido antes (ver registerConsentBannerListener em lib/consent.ts — a corrida
-    // do "Gerenciar cookies" no footer com o chunk ainda baixando). Deve vir DEPOIS do
-    // addEventListener acima: um bufferedResetBanner drenado aqui dispara o evento e o
-    // handleReset precisa já estar registrado para o banner abrir.
+    // do "Gerenciar cookies" no footer pré-renderizado, clicável antes da hidratação). A
+    // assinatura de `useSyncExternalStore` é declarada acima deste efeito, então já está
+    // ativa quando o drain dispara o evento — sem isso o banner não reabriria.
     registerConsentBannerListener();
-
-    return () => window.removeEventListener('anhanga:reset-consent', handleReset);
   }, []);
+
+  // Devolve o controle da visibilidade ao React assim que o banner sai da tela: enquanto
+  // `data-cookie-consent="set"` estiver no <html>, a regra inline do <head> esconderia o
+  // banner mesmo depois de "Gerenciar cookies" reabri-lo. Remover só quando `visible` já é
+  // false garante que a troca aconteça atrás de um render sem banner — sem janela de flash.
+  useEffect(() => {
+    if (!visible) document.documentElement.removeAttribute('data-cookie-consent');
+  }, [visible]);
 
   // Expõe a altura do banner em --cookie-banner-h para elementos flutuantes
   // (ex.: botão do AIChat) se deslocarem e não ficarem cobertos pelo banner.
@@ -40,19 +80,20 @@ const CookieConsentBanner: React.FC = () => {
 
   if (!visible) return null;
 
-  const handleAccept = () => {
-    setConsent('marketing');
-    setVisible(false);
+  const handleChoice = (choice: ConsentChoice) => {
+    setConsent(choice);
+    resetRequested = false;
+    notifyStore();
   };
 
-  const handleDecline = () => {
-    setConsent('essential');
-    setVisible(false);
-  };
+  const handleAccept = () => handleChoice('marketing');
+
+  const handleDecline = () => handleChoice('essential');
 
   return (
     <dialog
       ref={bannerRef}
+      id="cookie-consent-banner"
       open
       aria-label="Preferências de cookies"
       className="fixed bottom-0 left-0 right-0 z-[10000] m-0 w-full max-w-none border-0 p-0 bg-anhanga-dark border-t border-white/10 shadow-lg"
