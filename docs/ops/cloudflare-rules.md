@@ -316,8 +316,9 @@ site reported to the latter — the Pages snippet — and now reports first-part
 Checked on `/`, `/orlando/`, `/blog/` and `/cruzeiros/`: one beacon each, always token
 `fcec1bea…`. `n8n.anhanga.tur.br` also serves one beacon, confirming the zone entry covers
 internal subdomains despite listing only `anhanga.tur.br` as its hostname. (`mkt.` and
-`cal.` no longer resolve in DNS, so the 2026-05-23 baseline's subdomain mix is stale —
-unrelated to this change.)
+`cal.` were deliberately decommissioned and no longer resolve, so the subdomain mix in the
+2026-05-23 baseline no longer describes this zone — unrelated to this change, but relevant
+when comparing against those numbers.)
 
 Not verified: whether `"spa":2` actually emits soft-navigation events. A synthetic
 `pushState` + `popstate` made the router change route without producing an additional

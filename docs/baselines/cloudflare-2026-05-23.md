@@ -61,6 +61,8 @@ Não há dados de impacto ainda (requer RUM com volume suficiente para comparar 
 Fonte: Cloudflare Web Analytics · filtro `Site is in anhanga.tur.br` · 2026-05-16 a 2026-05-23 · bots excluídos.
 
 > **Atenção — escopo dos dados:** O Web Analytics está configurado para o zone `anhanga.tur.br` inteiro. As URLs com maior volume de sessões neste período são ferramentas internas (`n8n.anhanga.tur.br`, `mkt.anhanga.tur.br`, `cal.anhanga.tur.br`). O site público `www.anhanga.tur.br` **não aparece no top 5 de nenhuma métrica**, indicando volume de tráfego real insuficiente para dados por rota. As métricas abaixo representam o aggregado do zone e são dominadas pelo tráfego interno.
+>
+> **Atualização (2026-09-10):** `mkt.anhanga.tur.br` e `cal.anhanga.tur.br` foram desativados desde então e não resolvem mais. A composição de tráfego citada aqui não descreve mais o zone — não compare os números deste baseline com coletas atuais sem levar isso em conta. Ver [`docs/ops/cloudflare-rules.md`](../ops/cloudflare-rules.md#speed-brain-and-web-analytics).
 
 ### LCP (Largest Contentful Paint) — zone aggregado
 
