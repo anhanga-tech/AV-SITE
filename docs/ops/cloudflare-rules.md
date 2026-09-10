@@ -269,12 +269,26 @@ zone RUM with `spa` before turning the zone one off.
 
 #### How to apply, verify and roll back
 
-- **Apply:** Cloudflare dashboard → Workers & Pages → `av-site` → Settings → *Web
-  Analytics* → disable. This is a dashboard-only change; nothing in this repo deploys it.
-- **Verify:** re-run the `curl` above and confirm exactly one beacon remains, and that it
-  is the versioned `fcec1bea…` one. Then confirm in Web Analytics (zone site, filtered to
-  `www.anhanga.tur.br`) that page views and Core Web Vitals keep arriving for at least
-  24 h.
+- **Apply (done 2026-09-09):** the two controls live in *different* places, which is the
+  main reason this took a while to find:
+  - Zone beacon — account → **Analytics & Logs → Web Analytics** → `anhanga.tur.br` →
+    *Manage site* → **Real User Measurements (RUM)**. Set to *Enable, excluding visitor
+    data in the EU*. The site entry lists its hostname as `anhanga.tur.br`, but it does
+    cover `www.` and the internal subdomains — verified by capturing this beacon on
+    `www.anhanga.tur.br` before the change.
+  - Pages beacon — **Workers & Pages → `av-site` → Metrics tab → scroll to the bottom** →
+    *Web Analytics* card → **Disable**. It is *not* under Settings, and not on the
+    account Web Analytics list: that list shows this entry (hostnames
+    `av-site-8ex.pages.dev, www.anhanga.tur.br`) with the message "Manage this site using
+    Cloudflare Pages, where it was created" and offers no toggle of its own.
+- **Propagation gotcha:** disabling the Pages beacon reports "Changes will take effect on
+  the next deployment". The zone beacon re-appears immediately (edge injection), but the
+  Pages `<script>` stays in the served HTML until `av-site` is redeployed. Measuring right
+  after the toggle still shows two beacons — that is propagation, not a failed change.
+- **Verify (pending the next `av-site` deployment):** re-run the `curl` above and confirm
+  exactly one beacon remains, and that it is the versioned `fcec1bea…` one. Then confirm
+  in Web Analytics (zone site, filtered to `www.anhanga.tur.br`) that page views and Core
+  Web Vitals keep arriving for at least 24 h.
 - **Roll back:** re-enable the same toggle. Treat the data collected under `93a3a040…`
   as non-recoverable — a re-enabled Pages project may be issued a new site token, and
   that was not verified here. This is why the verification window above should run
