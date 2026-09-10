@@ -92,7 +92,9 @@ test('index.html esconde o banner antes do paint só para quem já escolheu', ()
 });
 
 test('o gate de pré-paint roda antes do entrypoint React', () => {
-  const gateIndex = indexHtml.indexOf("setAttribute(\n        'data-cookie-consent'");
+  // Regex em vez de string literal: casar a indentação exata do bloco faria uma
+  // reformatação inofensiva de index.html derrubar este teste sem mudança de comportamento.
+  const gateIndex = indexHtml.search(/setAttribute\(\s*'data-cookie-consent'/);
   const entrypointIndex = indexHtml.indexOf('<script type="module" src="/index.tsx"></script>');
 
   assert.notEqual(gateIndex, -1, 'gate de consentimento deveria existir');

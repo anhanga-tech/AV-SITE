@@ -10,16 +10,35 @@ import { type ConsentChoice, getConsent, registerConsentBannerListener, setConse
 // a escolha real. Quem já escolheu não vê flash nesse intervalo porque o par script+style
 // inline do <head> (ver index.html) esconde o banner antes do primeiro paint.
 let resetRequested = false;
+// `dismissed` não é redundante com o localStorage: `setConsent` engole falhas de escrita
+// (modo privado, storage cheio) de propósito, então só a memória garante que Aceitar/Recusar
+// fecham o banner. Sem ela, a leitura de volta continuaria `null` e o overlay fixo ficaria
+// impossível de dispensar exatamente para quem não consegue persistir a escolha.
+let dismissed = false;
 const storeListeners = new Set<() => void>();
 
 const notifyStore = (): void => {
   for (const listener of storeListeners) listener();
 };
 
+// Enquanto `data-cookie-consent="set"` estiver no <html>, a regra inline do <head> esconde o
+// banner. Liberar o gate devolve a visibilidade ao React, que passa a ser a única fonte de
+// verdade a partir daí.
+const releasePrepaintGate = (): void => {
+  document.documentElement.removeAttribute('data-cookie-consent');
+};
+
 const subscribeToBannerVisibility = (onStoreChange: () => void): (() => void) => {
   storeListeners.add(onStoreChange);
   const handleReset = () => {
     resetRequested = true;
+    dismissed = false;
+    // Todo reset libera o gate, não só o caminho em que o banner passou por um render
+    // invisível antes. O drain de um reset bufferizado (registerConsentBannerListener, em
+    // lib/consent.ts) pode acontecer no mesmo commit da hidratação, antes de o React chegar
+    // a renderizar `visible=false` — aí o efeito de baixo nunca roda e a regra inline
+    // continuaria escondendo um banner logicamente reaberto.
+    releasePrepaintGate();
     onStoreChange();
   };
   window.addEventListener('anhanga:reset-consent', handleReset);
@@ -31,8 +50,23 @@ const subscribeToBannerVisibility = (onStoreChange: () => void): (() => void) =>
 
 // `resetRequested` cobre o "Gerenciar cookies" do rodapé: a escolha continua no localStorage
 // (lib/consent.ts não a apaga de propósito), então só a flag distingue "reabrir" de "já decidiu".
-const getBannerVisibility = (): boolean => resetRequested || getConsent() === null;
+const getBannerVisibility = (): boolean => {
+  if (resetRequested) return true;
+  if (dismissed) return false;
+  return getConsent() === null;
+};
 const getServerBannerVisibility = (): boolean => true;
+
+const handleChoice = (choice: ConsentChoice): void => {
+  setConsent(choice);
+  dismissed = true;
+  resetRequested = false;
+  notifyStore();
+};
+
+const handleAccept = (): void => handleChoice('marketing');
+
+const handleDecline = (): void => handleChoice('essential');
 
 const CookieConsentBanner: React.FC = () => {
   const visible = useSyncExternalStore(
@@ -56,7 +90,7 @@ const CookieConsentBanner: React.FC = () => {
   // banner mesmo depois de "Gerenciar cookies" reabri-lo. Remover só quando `visible` já é
   // false garante que a troca aconteça atrás de um render sem banner — sem janela de flash.
   useEffect(() => {
-    if (!visible) document.documentElement.removeAttribute('data-cookie-consent');
+    if (!visible) releasePrepaintGate();
   }, [visible]);
 
   // Expõe a altura do banner em --cookie-banner-h para elementos flutuantes
@@ -79,16 +113,6 @@ const CookieConsentBanner: React.FC = () => {
   }, [visible]);
 
   if (!visible) return null;
-
-  const handleChoice = (choice: ConsentChoice) => {
-    setConsent(choice);
-    resetRequested = false;
-    notifyStore();
-  };
-
-  const handleAccept = () => handleChoice('marketing');
-
-  const handleDecline = () => handleChoice('essential');
 
   return (
     <dialog
