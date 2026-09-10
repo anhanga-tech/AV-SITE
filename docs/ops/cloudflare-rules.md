@@ -294,6 +294,36 @@ zone RUM with `spa` before turning the zone one off.
   that was not verified here. This is why the verification window above should run
   before, not after, the Pages beacon is considered gone for good.
 
+#### Evidence after the change (2026-09-10, post-deploy `58c039b`)
+
+The Pages beacon left the served HTML on the first `av-site` deployment after the toggle.
+Measured on production with the same browser-`Accept` `curl` as the before capture:
+
+| | Before | After |
+|---|---|---|
+| Beacon `<script>` tags | 2 | **1** (`fcec1bea…`, versioned, `"spa":2`) |
+| Beacon script downloads | 2 × ~10,1 KiB gzip | **1 × ~10,1 KiB gzip** |
+| Collection endpoint | `cloudflareinsights.com/cdn-cgi/rum` | **`www.anhanga.tur.br/cdn-cgi/rum`** |
+
+Net: **−1 request, −~10,1 KiB** per navigation, telemetry preserved.
+
+The endpoint change is the independent confirmation that the surviving beacon is the
+zone one. Per the [Web Analytics FAQ](https://developers.cloudflare.com/web-analytics/faq/),
+automatic (proxied) setup reports to your own domain's `/cdn-cgi/rum`, while a manually
+installed snippet reports to `cloudflareinsights.com/cdn-cgi/rum`. Before the change the
+site reported to the latter — the Pages snippet — and now reports first-party.
+
+Checked on `/`, `/orlando/`, `/blog/` and `/cruzeiros/`: one beacon each, always token
+`fcec1bea…`. `n8n.anhanga.tur.br` also serves one beacon, confirming the zone entry covers
+internal subdomains despite listing only `anhanga.tur.br` as its hostname. (`mkt.` and
+`cal.` no longer resolve in DNS, so the 2026-05-23 baseline's subdomain mix is stale —
+unrelated to this change.)
+
+Not verified: whether `"spa":2` actually emits soft-navigation events. A synthetic
+`pushState` + `popstate` made the router change route without producing an additional
+`/cdn-cgi/rum` request, which may be beacon batching or an artifact of the synthetic
+navigation. The flag is declared in the tag; event-level SPA coverage was not observed.
+
 #### Explicitly out of scope
 
 The same navigation also loads `/cdn-cgi/challenge-platform/scripts/jsd/main.js`
