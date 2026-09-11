@@ -92,7 +92,7 @@ A voz é a mesma em todo lugar; o que muda é a intensidade.
 |---|---|---|
 | Home e páginas institucionais | caloroso e confiante | Frase completa, sem gíria nem emoji. |
 | Landings de evento | mais solto, com a energia do público | Pode ter humor e referência do nicho. Um CTA dominante por tela. |
-| Chat (assistente da Anhangá) | conversa de consultor | Uma pergunta por resposta. Nunca parecer formulário. Assume que é IA e lembra que um consultor de verdade assume o orçamento. A voz do chat vive no bloco `VOICE` de `lib/ai/prompt.ts`. |
+| Chat (Guia Anhangá) | conversa de consultor | Uma pergunta por resposta. Nunca parecer formulário. Assume que é IA e lembra que um consultor de verdade assume o orçamento. A voz do chat vive no bloco `VOICE` de `lib/ai/prompt.ts`. Nome: "Guia Anhangá", sempre com "Assistente virtual" ao lado. "Guia" é uma função, não uma pessoa; nunca dar ao bot nome de gente. |
 | WhatsApp | o mais próximo e pessoal | Nome do cliente, frases curtas, um emoji no máximo. |
 | E-mail | caloroso e organizado | Abre pelo nome, termina com o próximo passo claro. |
 | Formulários | guia gentil | Rótulo claro, placeholder com exemplo real ("Ex.: Orlando, Paris"). Explica por que pede dado sensível. |
@@ -148,7 +148,6 @@ A voz é a mesma em todo lugar; o que muda é a intensidade.
 
 Pontos em que o que está no ar hoje diverge deste guia. Resolver em PRs próprias.
 
-- **Cabeçalho do chat** (`components/ai-chat/AIChatPanelView.tsx`): "Hub Anhangá" / "Assistente Online" soa como produto de tecnologia, não como conversa. A saudação já se apresenta como "assistente da Anhangá"; o cabeçalho deveria acompanhar.
 - **Title Case em CTAs e títulos** (ex.: "Quero Meu Pacote no WhatsApp", "Quiz: Descubra Seu Destino Ideal").
 - **Mensagens de erro genéricas** (ex.: "Ocorreu um erro inesperado. Tente novamente.") sem oferecer o WhatsApp como saída.
 - **Saudação "Oie! Vamos conversar?"**: fica no limite do "informal demais" para páginas que não são de evento.

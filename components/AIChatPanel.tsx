@@ -62,7 +62,7 @@ const AIChatPanel: React.FC<AIChatPanelProps> = memo(({
 }) => {
   const onConsumePendingEvent = useEffectEvent(onConsumePending);
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { id: 'init', role: 'model', text: 'Olá! Aqui é o assistente da Anhangá 🧭\n\nA gente monta sua viagem sob medida, sem pacote engessado. Eu te ajudo a desenhar a ideia e um consultor de verdade assume o orçamento.\n\nPra onde você está com vontade de ir? Pode ser um destino certo ou só uma vontade.\n\n_Ao conversar comigo, você concorda com nossa [Política de Privacidade](/politica-privacidade/)._' }
+    { id: 'init', role: 'model', text: 'Olá! Aqui é o Guia Anhangá 🧭\n\nA gente monta sua viagem sob medida, sem pacote engessado. Eu te ajudo a desenhar a ideia e um consultor de verdade assume o orçamento.\n\nPra onde você está com vontade de ir? Pode ser um destino certo ou só uma ideia.\n\n_Ao conversar comigo, você concorda com nossa [Política de Privacidade](/politica-privacidade/)._' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);

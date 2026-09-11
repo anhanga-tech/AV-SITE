@@ -63,6 +63,6 @@ export class AIChat {
   }
 
   async expectOnlineStatus() {
-    await expect(this.chatDialog.getByText('Assistente Online')).toBeVisible();
+    await expect(this.chatDialog.getByText('Assistente virtual')).toBeVisible();
   }
 }

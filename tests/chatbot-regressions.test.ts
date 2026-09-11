@@ -225,6 +225,7 @@ test('system prompt should define out-of-scope handling', () => {
 // Guia de voz (docs/marketing/guia-de-voz.md): o chat fala como a Anhangá,
 // não como "especialista premium elegante" (anti-referência de luxo frio).
 test('system prompt should carry the Anhangá voice', () => {
+    assert.match(SYSTEM_INSTRUCTION, /Você é o Guia Anhangá, assistente virtual/);
     assert.match(SYSTEM_INSTRUCTION, /VOICE/);
     assert.match(SYSTEM_INSTRUCTION, /Humano .*Artesanal .*Acompanhado/);
     assert.match(SYSTEM_INSTRUCTION, /Trate o cliente por "você" \(singular\) e a agência por "a gente"/);
