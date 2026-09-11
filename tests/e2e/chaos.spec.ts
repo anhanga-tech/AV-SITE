@@ -22,7 +22,7 @@ test.describe('Chaos & Unhappy Path Suite', () => {
     await aiChat.sendMessage('Quero viajar para o Japão');
 
     // Verify UI shows error message
-    await aiChat.expectMessageContaining('Tivemos um problema técnico interno');
+    await aiChat.expectMessageContaining('Tivemos um problema técnico do nosso lado');
   });
 
   test('should handle slow network simulation during chat', async ({ page }) => {

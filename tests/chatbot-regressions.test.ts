@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { detectBlockedDestination } from '../lib/ai/validation.ts';
+import { buildSafetyMessage, detectBlockedDestination } from '../lib/ai/validation.ts';
 import { SYSTEM_INSTRUCTION } from '../lib/ai/prompt.ts';
 
 // ─── Role alternation invariant ───────────────────────────────────────────────
@@ -220,4 +220,24 @@ test('system prompt should prefer structured JSON line for chips', () => {
 test('system prompt should define out-of-scope handling', () => {
     assert.match(SYSTEM_INSTRUCTION, /OUT_OF_SCOPE/);
     assert.match(SYSTEM_INSTRUCTION, /Não é jurídico, médico, financeiro/);
+});
+
+// Guia de voz (docs/marketing/guia-de-voz.md): o chat fala como a Anhangá,
+// não como "especialista premium elegante" (anti-referência de luxo frio).
+test('system prompt should carry the Anhangá voice', () => {
+    assert.match(SYSTEM_INSTRUCTION, /VOICE/);
+    assert.match(SYSTEM_INSTRUCTION, /Humano .*Artesanal .*Acompanhado/);
+    assert.match(SYSTEM_INSTRUCTION, /Trate o cliente por "você" \(singular\) e a agência por "a gente"/);
+    assert.match(SYSTEM_INSTRUCTION, /Você é uma IA\. Não finja ser humano/);
+    assert.doesNotMatch(SYSTEM_INSTRUCTION, /premium consultivo|elegante/);
+});
+
+test('safety refusals should stay warm without empty superlatives or emoji', () => {
+    for (const category of ['war', 'sanctions', 'instability'] as const) {
+        const message = buildSafetyMessage({ category, country: 'País X' });
+        assert.match(message, /País X/);
+        assert.match(message, /perfil parecido/);
+        assert.doesNotMatch(message, /incríve/i);
+        assert.doesNotMatch(message, /\p{Extended_Pictographic}/u);
+    }
 });

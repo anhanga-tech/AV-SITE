@@ -105,14 +105,14 @@ export function detectBlockedDestination(destinationText: string): SafetyBlock |
 
 export function buildSafetyMessage(block: SafetyBlock): string {
     if (block.category === 'war') {
-        return `No momento, a Anhangá não opera roteiros para ${block.country} por alertas de segurança e conflitos ativos. Nossa prioridade é sua integridade. Se quiser, te sugiro alternativas seguras com perfil parecido.`;
+        return `No momento, a Anhangá não opera roteiros para ${block.country} por alertas de segurança e conflitos ativos. Sua segurança vem primeiro. Se quiser, te sugiro destinos com perfil parecido.`;
     }
 
     if (block.category === 'sanctions') {
-        return `No momento, não recomendamos ${block.country} por restrições operacionais relevantes (pagamentos, voos e infraestrutura). Posso te sugerir destinos equivalentes com melhor previsibilidade.`;
+        return `No momento, não recomendamos ${block.country} por restrições operacionais relevantes (pagamentos, voos e infraestrutura). Posso te sugerir destinos com perfil parecido e mais previsibilidade.`;
     }
 
-    return `No momento, recomendamos cautela para ${block.country} devido à instabilidade local. Posso te apresentar alternativas incríveis com melhor segurança para sua viagem.`;
+    return `No momento, recomendamos cautela para ${block.country} devido à instabilidade local. Posso te sugerir destinos com perfil parecido e mais segurança pra sua viagem.`;
 }
 
 export function buildRefinementMessage(missing: string[]): string {

@@ -62,7 +62,7 @@ const AIChatPanel: React.FC<AIChatPanelProps> = memo(({
 }) => {
   const onConsumePendingEvent = useEffectEvent(onConsumePending);
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { id: 'init', role: 'model', text: 'Olá! Sou seu guia Anhangá 🧭.\n\nPosso te ajudar com:\n- Roteiros exclusivos\n- Dúvidas sobre o destino\n- **Orçamento personalizado**\n\nVamos começar?\n\n_Ao conversar comigo, você concorda com nossa [Política de Privacidade](/politica-privacidade/)._' }
+    { id: 'init', role: 'model', text: 'Olá! Aqui é o assistente da Anhangá 🧭\n\nA gente monta sua viagem sob medida, sem pacote engessado. Eu te ajudo a desenhar a ideia e um consultor de verdade assume o orçamento.\n\nPra onde você está com vontade de ir? Pode ser um destino certo ou só uma vontade.\n\n_Ao conversar comigo, você concorda com nossa [Política de Privacidade](/politica-privacidade/)._' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -237,7 +237,7 @@ const AIChatPanel: React.FC<AIChatPanelProps> = memo(({
         {
           id: generateMessageId(),
           role: 'model' as const,
-          text: '⚙️ Tivemos um problema técnico. Por favor, tente novamente em alguns instantes.',
+          text: 'Tivemos um problema técnico do nosso lado. Pode tentar de novo em alguns instantes?',
         },
       ]);
       return;
