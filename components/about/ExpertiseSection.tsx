@@ -6,13 +6,13 @@ import { fadeUp } from './aboutMotion';
 const EXPERTISE_ITEMS = [
   {
     icon: Users,
-    title: 'Atendimento Humano',
+    title: 'Atendimento humano',
     desc: 'O chat com IA no site faz a triagem inicial, mas quem desenha seu roteiro é sempre um especialista humano.',
     color: 'bg-anhanga-action/10 text-anhanga-action',
   },
   {
     icon: Sparkles,
-    title: 'Curadoria Premium',
+    title: 'Curadoria premium',
     desc: 'Selecionamos hotéis e experiências que fogem do óbvio, garantindo que sua viagem seja única.',
     color: 'bg-anhanga-blue/10 text-anhanga-blue',
   },

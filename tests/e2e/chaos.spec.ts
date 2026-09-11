@@ -90,7 +90,11 @@ test.describe('Chaos & Unhappy Path Suite', () => {
 
     await landing.submit();
 
-    await landing.expectError('Internal Server Error');
+    // O texto cru do upstream não chega à tela (docs/standards/security.md):
+    // mensagem fixa no tom da marca + WhatsApp como saída.
+    await landing.expectError('Tivemos um problema do nosso lado');
+    await expect(landing.errorAlert).not.toContainText('Internal Server Error');
+    await expect(landing.errorAlert.getByRole('link', { name: 'Falar com a gente no WhatsApp' })).toBeVisible();
   });
 
   test('should handle network timeout in corporativo form', async ({ page }) => {

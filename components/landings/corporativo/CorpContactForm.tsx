@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { m } from 'framer-motion';
-import { AirplaneTilt, PaperPlaneTilt, SpinnerGap } from '@phosphor-icons/react';
+import { AirplaneTilt, PaperPlaneTilt, SpinnerGap, WhatsappLogo } from '@phosphor-icons/react';
 import { useLeadCapture, createLeadEventId } from '@/hooks/useLeadCapture';
 import { useCorpFormReducer, validateCorpForm } from './useCorpFormReducer';
 import { buildCorporateLeadDraft } from './CorpLeadDraft';
@@ -10,6 +10,11 @@ import { CorpSuccessState } from './CorpSuccessState';
 import { fadeUp } from './constants';
 import { pushFormAnalyticsEvent } from '@/utils/formAnalytics';
 import { isFieldCompleteForAnalytics } from '@/lib/form-v1-validation';
+
+// Falha de envio (API ou rede) é problema nosso, não do cliente: mensagem fixa
+// no tom da marca + WhatsApp como saída (docs/marketing/guia-de-voz.md). O texto
+// cru do upstream/rede nunca chega à tela.
+const SUBMIT_FAILURE_MESSAGE = 'Tivemos um problema do nosso lado ao enviar seus dados. Tente de novo em instantes ou, se preferir, fale com a gente direto no WhatsApp.';
 
 interface CorpContactFormProps {
     whatsappUrl: string;
@@ -125,10 +130,7 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
                     errorType: result.code,
                     destination: 'Corporativo',
                 });
-                dispatch({
-                    type: 'submit-error',
-                    message: result.error || 'Ocorreu um erro ao enviar. Tente novamente.',
-                });
+                dispatch({ type: 'submit-error', message: SUBMIT_FAILURE_MESSAGE });
                 isSubmittingRef.current = false;
             }
         } catch {
@@ -139,13 +141,15 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
                 errorType: 'unexpected',
                 destination: 'Corporativo',
             });
-            dispatch({ type: 'submit-error', message: 'Ocorreu um erro inesperado. Tente novamente.' });
+            dispatch({ type: 'submit-error', message: SUBMIT_FAILURE_MESSAGE });
             isSubmittingRef.current = false;
         }
     }
 
     const showError = state.phase === 'error' && state.message && (!state.field || state.field === 'lgpd');
     const lgpdError = state.phase === 'error' && state.field === 'lgpd';
+    // Erros de validação sempre trazem `field`; sem ele, foi o envio que falhou.
+    const submitFailed = state.phase === 'error' && !state.field;
     const busy = state.phase === 'submitting' || isSubmitting;
 
     return (
@@ -185,9 +189,22 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
                         />
 
                         {showError && (
-                            <p className="text-red-500 text-xs font-medium" role="alert">
-                                {state.message}
-                            </p>
+                            <div className="text-red-500 text-xs font-medium" role="alert">
+                                <p>{state.message}</p>
+                                {submitFailed && (
+                                    <a
+                                        href={whatsappUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="btn-whatsapp btn-specialist inline-flex items-center gap-1.5 mt-2 min-h-11 text-sm font-bold text-anhanga-dark underline underline-offset-4 hover:text-anhanga-action focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
+                                        data-contact-intent
+                                        data-tracking="error-corporativo"
+                                    >
+                                        <WhatsappLogo className="size-4" weight="fill" />
+                                        Falar com a gente no WhatsApp
+                                    </a>
+                                )}
+                            </div>
                         )}
 
                         <button

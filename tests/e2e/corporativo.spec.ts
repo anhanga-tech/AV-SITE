@@ -148,9 +148,42 @@ test.describe('Corporativo Landing Page', () => {
     await landing.submit();
 
     await landing.expectError('Você deve aceitar os termos para continuar.');
+    // Erro de validação é do cliente: o fallback de WhatsApp é só para falha de envio.
+    await expect(landing.errorAlert.getByRole('link', { name: /WhatsApp/ })).toHaveCount(0);
 
     await page.waitForTimeout(300);
     expect(corpRequests).toEqual([]);
+  });
+
+  test('should offer WhatsApp fallback without leaking upstream error when submit fails', async ({ page }) => {
+    await page.route('**/api/submit-lead', async route => {
+      await route.fulfill({
+        status: 502,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: false, code: 'ODOO_ERROR', error: 'upstream detail xyz' }),
+      });
+    });
+
+    const landing = new CorporativoPage(page);
+    await landing.goto();
+    await landing.fillForm({
+      firstName: 'Falha',
+      lastName: 'Envio',
+      email: 'falha@empresa.com.br',
+      whatsapp: '(11) 98831-4487',
+      empresa: 'Empresa Teste LTDA',
+      cargo: 'QA',
+    });
+
+    await landing.submit();
+
+    await landing.expectError('Tivemos um problema do nosso lado');
+    await expect(landing.errorAlert).not.toContainText('upstream detail xyz');
+    const fallback = landing.errorAlert.getByRole('link', { name: 'Falar com a gente no WhatsApp' });
+    await expect(fallback).toBeVisible();
+    await expect(fallback).toHaveAttribute('href', /wa\.me|whatsapp/);
+    // Mesmo funil de contato dos outros CTAs corporativos: conta como specialist_cta_click.
+    await expect(fallback).toHaveClass(/\bbtn-specialist\b/);
   });
 
   test('should capture corporate lead and trigger dataLayer events', async ({ page }) => {

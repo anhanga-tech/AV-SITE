@@ -29,7 +29,7 @@ export const FAQ_SCHEMA_ITEMS: FAQSchemaItem[] = [
   {
     question: 'Como funciona o processo? É complicado?',
     answer:
-      '4 passos simples. 1. Oie! Vamos conversar? — você começa pelo chat, conta seus sonhos e informa quanto quer investir. 2. Desenhando o Sonho — nossos especialistas criam um roteiro dia a dia personalizado. 3. Burocracia? Deixa com a gente — emitimos voos, hotéis e passeios e parcelamos. 4. Fui! Partiu Viajar — você recebe os vouchers organizados e a gente fica de plantão 24h.',
+      '4 passos simples. 1. Vamos conversar? — você começa pelo chat, conta seus sonhos e informa quanto quer investir. 2. Desenhando o sonho — nossos especialistas criam um roteiro dia a dia personalizado. 3. Burocracia? Deixa com a gente — emitimos voos, hotéis e passeios e parcelamos. 4. Fui! Partiu viajar — você recebe os vouchers organizados e a gente fica de plantão 24h.',
   },
   {
     question: 'Como funciona a página do Lollapalooza Brasil na Anhangá?',
