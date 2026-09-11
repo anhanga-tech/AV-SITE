@@ -8,11 +8,11 @@
 |---|---|
 | **Controlador (exportador)** | Anhangá Turismo Ltda. — CNPJ 37.036.732/0001-41 |
 | **Encarregado (DPO)** | Felipe William Rodrigues Silva — privacidade@anhanga.tur.br |
-| **Versão** | 0.1 |
+| **Versão** | 0.2 |
 | **Data de elaboração** | 11/09/2026 |
 | **Status** | Rascunho — levantamento técnico feito a partir do código; evidências contratuais e revisão jurídica **pendentes** |
 | **Issue** | [#1542](https://github.com/anhanga-tech/AV-SITE/issues/1542) (achados LGPD-04 e LGPD-05 da auditoria de 28/08/2026) |
-| **Documentos relacionados** | [`ripd-legitimo-interesse.md`](./ripd-legitimo-interesse.md) · Política de Privacidade (`components/privacy/`, seções 5, 6 e 10) · `pages/ExclusaoDados.tsx` |
+| **Documentos relacionados** | [`ripd-legitimo-interesse.md`](./ripd-legitimo-interesse.md) · Política de Privacidade (`components/privacy/`, seções 5 a 8 e 10) · `pages/ExclusaoDados.tsx` |
 
 ---
 
@@ -55,7 +55,7 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 |---|---|
 | **Importador** | Google LLC (EUA) |
 | **Serviços em uso** | Gemini API via Google AI Studio (`lib/ai/gemini-config.ts`, provider `google-ai-studio` no AI Gateway); GA4 e Google Ads via Zaraz (`hideOriginalIP`); Google Fonts carregado direto do Google nas landings `BetoCarreroLanding`, `LollapaloozaLanding` e `OrlandoLanding` |
-| **Dados** | Gemini: texto das conversas do chatbot (pode conter nome, datas, destino, orçamento). GA4/Ads: eventos de navegação com identificador pseudonimizado (`anhanga_ga_cid`), IP suprimido. Fonts: IP e user agent do visitante das 3 landings (requisição direta do navegador) |
+| **Dados** | Gemini: texto das conversas do chatbot (pode conter nome, datas, destino, orçamento). GA4/Ads: eventos de navegação com identificador pseudonimizado (`anhanga_ga_cid`), IP suprimido; no fluxo Odoo → GA4 (`/api/purchase-dispatch` → `lib/conversions/google.ts`, Measurement Protocol) vão `client_id`, `session_id`, `gclid`, destino, valor e `transaction_id` do negócio ganho. Fonts: IP e user agent do visitante das 3 landings (requisição direta do navegador) |
 | **Finalidade** | Atendimento automatizado (chatbot), mensuração, publicidade; renderização de fontes |
 | **Duração** | GA4: 14 meses (painel). Gemini: `a confirmar` — depende do nível da conta (os termos do nível gratuito do AI Studio permitem uso do conteúdo para melhoria de produto; o nível pago não) |
 | **País/região** | EUA / infraestrutura global — `política do fornecedor` |
@@ -82,8 +82,8 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 | Campo | Detalhe |
 |---|---|
 | **Importador** | Meta Platforms, Inc. (EUA) / Meta Platforms Ireland Ltd.; TikTok Pte. Ltd. (Singapura) |
-| **Serviços em uso** | Conversions API (Meta) e Events API (TikTok) disparadas pelo Zaraz **somente após consentimento de marketing** (sem pixel no navegador); `lib/conversions/meta.ts` (`graph.facebook.com`) para o loop Odoo → Meta, hoje atrás de flag |
-| **Dados** | Eventos de conversão, identificadores de clique (fbclid/ttclid), dados técnicos do navegador; Customer Match **inativo** |
+| **Serviços em uso** | (a) Conversions API (Meta) e Events API (TikTok) disparadas pelo Zaraz **somente após consentimento de marketing** (sem pixel no navegador). (b) Loop Odoo → Meta: `/api/purchase-dispatch` → `lib/conversions/meta.ts` (`graph.facebook.com`), acionado por webhook do n8n quando um negócio é ganho. O kill switch `PURCHASE_DISPATCH_ENABLED` vem **ligado por padrão** (`api/purchase-dispatch.ts`); se o fluxo está de fato ativo depende do workflow no n8n — `a confirmar` |
+| **Dados** | (a) Eventos de conversão, identificadores de clique (fbclid/ttclid), dados técnicos do navegador. (b) **E-mail, telefone, nome e sobrenome em hash SHA-256**, `fbp`/`fbc`, **IP e user agent em claro** (exigência da CAPI), destino e valor da compra — `código` (`lib/conversions/meta.ts`). Esse envio é independente do Customer Match (seção 5.5 da política, que segue **inativo**) e **não está descrito na política pública** — se o fluxo (b) estiver ativo, a política precisa declará-lo, com finalidade e base legal |
 | **Finalidade** | Mensuração e otimização de campanhas pagas |
 | **País/região** | EUA / Singapura e infraestrutura global — `política do fornecedor` |
 | **Suboperadores** | `a confirmar` |
@@ -96,7 +96,7 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 |---|---|
 | **Importador** | Odoo S.A. (Bélgica) |
 | **Serviços em uso** | Odoo Online — recebe os 5 formulários do site via JSON-RPC (`services/odoo.ts`) |
-| **Dados** | Nome, e-mail, telefone, perfil de viagem/BANT, UTMs e click IDs, `x_ga_client_id`, consentimento LGPD, nota NPS |
+| **Dados** | Nome, e-mail, telefone, perfil de viagem/BANT, UTMs e click IDs, `x_ga_client_id`, consentimento LGPD, nota NPS e **respostas livres do NPS** (motivo da nota e destaque da viagem, gravados no campo `comment` do parceiro — `lib/odoo-lead-mapping.ts`), que podem conter dados pessoais adicionais |
 | **Finalidade** | Gestão comercial de leads e relacionamento |
 | **Duração** | 5 anos após a última interação (política, seção 7.1) — aprovação da tabela de retenção em #1544 |
 | **País/região** | O IP do banco resolve para OVH em Montréal, Canadá — `indício técnico`. Região do datacenter do banco — `a confirmar` no painel da assinatura Odoo |
@@ -126,9 +126,9 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 |---|---|
 | **Importador** | Functional Software, Inc. (EUA) |
 | **Serviços em uso** | Sentry no navegador (`lib/sentry-client.ts`) e nas Functions (`functions/_middleware.ts`), 10% de amostragem de transações, logs de console |
-| **Dados** | Stack traces, URL (credenciais do convite NPS removidas por `scrubEventUrls`), user agent, logs estruturados (o logger mascara PII — `lib/logger.ts`). **IP:** o SDK não liga `sendDefaultPii`, mas o Sentry infere o IP da requisição de ingestão a menos que a opção "Prevent Storing of IP Addresses" esteja ativa no projeto — `a confirmar` |
+| **Dados** | Stack traces, URL (credenciais do convite NPS removidas por `scrubEventUrls`), user agent, logs estruturados (o logger mascara PII — `lib/logger.ts`). **IP:** o SDK não liga `sendDefaultPii`, mas o Sentry infere o IP da requisição de ingestão a menos que a opção "Prevent Storing of IP Addresses" esteja ativa no projeto — `a confirmar`. Além disso, quando o Upstash falha, `lib/rate-limit.ts` registra `clientIP` em `logger.error`, e o `SENSITIVE_KEY_PATTERN` de `lib/error-tracking.ts` não cobre campos de IP: o **IP em claro chega ao Sentry como atributo de log**, independentemente daquela opção — `código`. Correção em [#1642](https://github.com/anhanga-tech/AV-SITE/issues/1642) |
 | **Finalidade** | Detecção e correção de falhas |
-| **Duração** | Retenção do plano Sentry — `a confirmar` |
+| **Duração** | Retenção do plano Sentry — `a confirmar`; definir na tabela de retenção (#1544) antes de publicar prazo na política |
 | **País/região** | Região da organização (US ou DE) — `a confirmar` pelo host de ingestão do DSN (o DSN não está no repositório) |
 | **Mecanismo art. 33** | `não verificado`. Arquivar o Sentry DPA |
 | **Evidência** | — |
@@ -139,13 +139,24 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 |---|---|
 | **Importador** | Cal.com, Inc. (EUA) |
 | **Serviços em uso** | Embed de agendamento na landing `/consultoria-de-viagem` e na página de links (`lib/cal-embed.ts`) |
-| **Dados** | Nome, e-mail, notas e horário informados pelo titular no agendamento; IP/UA ao carregar o embed |
-| **Finalidade** | Agendar a consultoria de viagem |
+| **Dados** | Nome, e-mail, notas e horário informados pelo titular no agendamento; IP/UA ao carregar o embed; **metadados de atribuição** gravados no booking e repassados nos webhooks: identificador pseudonimizado `anhanga_ga_cid` (sempre) e, quando existirem, UTMs e click IDs como `gclid` — `código` (`lib/cal-embed.ts`, `buildAttributionMetadataConfig`) |
+| **Finalidade** | Agendar a consultoria de viagem e atribuir o agendamento à campanha de origem |
+| **Duração** | Retenção dos bookings e metadados na conta Cal.com — `a confirmar`; definir na tabela de retenção (#1544) |
 | **País/região** | EUA — `política do fornecedor`; região da conta — `a confirmar` |
 | **Mecanismo art. 33** | `não verificado`. Arquivar o Cal.com DPA |
 | **Evidência** | — |
 
-### 2.9 Fora do escopo desta matriz (sem fluxo de dados pelo site)
+### 2.9 Conteúdo de terceiros carregado no navegador
+
+Requisições feitas direto pelo navegador do visitante, fora do consentimento de cookies. Cada uma revela ao terceiro pelo menos o IP e o user agent — o mesmo caso do Google Fonts (2.2, [#1641](https://github.com/anhanga-tech/AV-SITE/issues/1641)). Em rigor são destinatários independentes (controladores dos próprios logs de acesso), não operadores contratados; ficam na matriz porque a política precisa informá-los (art. 9º, V).
+
+| Destinatário | Onde | Código | País — fonte | Alternativa |
+|---|---|---|---|---|
+| OpenStreetMap Foundation | Mapas das páginas de destinos e da landing Lollapalooza (tiles) | `components/destinations/useDestinationMap.ts`, `components/landings/lollapalooza/VenueMap.tsx` | Reino Unido — `política do fornecedor` | Carregar o mapa só após interação, ou servir tiles por proxy próprio |
+| Iconify | 5 logos da barra de pesquisa com IA na página inicial | `components/AIResearchBar.tsx` | `a confirmar` | Versionar os SVGs no repositório |
+| Spotify AB | Player de playlist na landing Lollapalooza | `components/landings/lollapalooza/LineupSection.tsx` | Suécia — `política do fornecedor` | Carregar o iframe só após clique (facade) |
+
+### 2.10 Fora do escopo desta matriz (sem fluxo de dados pelo site)
 
 | Fornecedor | Motivo |
 |---|---|
@@ -184,7 +195,7 @@ Na coluna **Evidência** de cada fornecedor, registrar o caminho e a versão/dat
 |---|---|---|
 | Matriz preenchida e revisada fornecedor por fornecedor | Inventário técnico preenchido (seção 2) | Revisão fornecedor por fornecedor pelo DPO |
 | Evidências contratuais armazenadas com acesso controlado e referenciadas | Estrutura definida (seção 4) | Baixar/arquivar os DPAs e preencher a coluna **Evidência** |
-| Países, regiões, suboperadores e mecanismo legal confirmados | Só indícios técnicos e políticas públicas | Odoo: região do banco. Upstash: primário + réplicas. Sentry: região da organização e opção de IP. Cloudflare: cobertura do DPA sobre Zaraz/AI Gateway/R2 e local do armazenamento do Traks. Gemini: nível da conta (gratuito × pago). Listas de suboperadores de todos |
+| Países, regiões, suboperadores e mecanismo legal confirmados | Só indícios técnicos e políticas públicas. Também pendente: confirmar se o loop Odoo → Meta/GA4 (`/api/purchase-dispatch`) está ativo — se estiver, declarar na política (2.4) | Odoo: região do banco. Upstash: primário + réplicas. Sentry: região da organização e opção de IP. Cloudflare: cobertura do DPA sobre Zaraz/AI Gateway/R2 e local do armazenamento do Traks. Gemini: nível da conta (gratuito × pago). Listas de suboperadores de todos |
 | Revisão do encarregado/assessoria jurídica registrada | — | Registrar data, responsável e parecer nesta tabela de metadados (campo **Status**) |
 | Política pública consistente com as evidências | Afirmações não comprovadas removidas da seção 10; operadores faltantes incluídos na seção 6.1; finalidade de segurança/estabilidade declarada na seção 5.8 (base legal proposta: legítimo interesse — validar com o DPO e incluir no RIPD); página `/exclusao-dados` atualizada de Salesforce/GTM para Odoo/Zaraz | Reescrever a seção 10 citando o mecanismo concreto quando as evidências chegarem |
 
@@ -192,4 +203,5 @@ Na coluna **Evidência** de cada fornecedor, registrar o caminho e a versão/dat
 
 | Versão | Data | Alteração |
 |---|---|---|
+| 0.2 | 11/09/2026 | Achados do review da PR #1640: conteúdo de terceiros no navegador (2.9), dados do loop Odoo → Meta/GA4, respostas livres do NPS no Odoo, metadados de atribuição no Cal.com, IP em claro nos logs enviados ao Sentry |
 | 0.1 | 11/09/2026 | Levantamento inicial a partir do código e de verificações técnicas (DNS/IP). Os arquivos citados pela issue (`docs/privacy/transferencias-internacionais.md`, `docs/audits/lgpd-site-2026-08-28.md`) não existem no repositório — este documento substitui o "modelo inicial" |

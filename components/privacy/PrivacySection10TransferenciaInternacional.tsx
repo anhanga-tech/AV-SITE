@@ -13,8 +13,8 @@ export function PrivacySection10TransferenciaInternacional() {
                     <li>Monitoramento de erros, prevenção de abuso e agendamento</li>
                 </ul>
                 <h3 className="font-merriweather font-semibold">10.2 Garantias</h3>
-                <p>As transferências internacionais devem estar amparadas em uma das hipóteses do art. 33 da LGPD, como cláusulas contratuais de proteção de dados firmadas com os fornecedores. A Anhangá Turismo mantém um inventário dos fornecedores, dos países de destino e do mecanismo adotado em cada caso.</p>
-                <p>O titular pode solicitar essas informações ao Encarregado pelo e-mail{" "}
+                <p>As transferências internacionais devem estar amparadas em uma das hipóteses do art. 33 da LGPD. A Anhangá Turismo está consolidando o inventário dos fornecedores, dos países de destino e do mecanismo aplicável a cada um, com a revisão dos respectivos instrumentos contratuais.</p>
+                <p>O titular pode solicitar ao Encarregado as informações disponíveis sobre essas transferências pelo e-mail{" "}
                     <a href="mailto:privacidade@anhanga.tur.br" className="text-primary underline">privacidade@anhanga.tur.br</a>.</p>
             </div>
         </section>

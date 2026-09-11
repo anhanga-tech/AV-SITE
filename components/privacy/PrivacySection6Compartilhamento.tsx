@@ -14,12 +14,13 @@ export function PrivacySection6Compartilhamento() {
                     <li><strong>Upstash, Inc.</strong> (prevenção de abuso — controle temporário de volume de requisições por endereço IP)</li>
                     <li><strong>Functional Software, Inc. (Sentry)</strong> (monitoramento de erros e estabilidade do website)</li>
                     <li><strong>Cal.com, Inc.</strong> (agendamento de consultorias, quando o titular marca um horário pelo website)</li>
+                    <li><strong>Provedores de conteúdo incorporado</strong> (recebem o endereço IP e dados técnicos do navegador ao exibir o conteúdo: mapas da <strong>OpenStreetMap Foundation</strong> nas páginas de destinos; ícones do serviço <strong>Iconify</strong> na página inicial; player da <strong>Spotify AB</strong> na página do Lollapalooza)</li>
                     <li><strong>ONER Travel</strong> (serviços especializados em turismo)</li>
                     <li><strong>Outros prestadores de serviços</strong> devidamente contratados</li>
                 </ul>
 
                 <h3 className="font-merriweather font-semibold">6.2 Garantias Contratuais</h3>
-                <p>Todos os compartilhamentos são regidos por contratos específicos que asseguram:</p>
+                <p>Os compartilhamentos com prestadores de serviços devem ser regidos por instrumentos contratuais que assegurem:</p>
                 <ul className="list-disc pl-6 space-y-1">
                     <li>Conformidade com a LGPD e demais normas aplicáveis de proteção de dados</li>
                     <li>Implementação de medidas de segurança adequadas</li>

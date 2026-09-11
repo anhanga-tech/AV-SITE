@@ -25,6 +25,10 @@ const ACTIVE_OPERATORS = [
   'Upstash, Inc.',
   'Functional Software, Inc.',
   'Cal.com, Inc.',
+  // Conteúdo de terceiros carregado no navegador (seção 2.9 da matriz).
+  'OpenStreetMap Foundation',
+  'Iconify',
+  'Spotify AB',
 ];
 
 test('seção 6.1 da política lista todos os operadores ativos da matriz', () => {
