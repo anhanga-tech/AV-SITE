@@ -4,7 +4,7 @@ export function PrivacySection10TransferenciaInternacional() {
             <h2 className="text-xl md:text-2xl font-merriweather font-semibold">10. Transferência Internacional de Dados</h2>
             <div className="space-y-2 font-inter text-muted-foreground">
                 <h3 className="font-merriweather font-semibold">10.1 Âmbito das Transferências</h3>
-                <p>Parte dos prestadores listados na Seção 6.1 tem sede ou infraestrutura fora do Brasil, principalmente nos Estados Unidos. Por isso, dados pessoais podem ser transferidos para outros países no contexto de:</p>
+                <p>Parte dos prestadores listados na Seção 6.1 são empresas sediadas no exterior, em sua maioria nos Estados Unidos, e podem tratar dados pessoais fora do Brasil. Por isso, podem ocorrer transferências internacionais no contexto de:</p>
                 <ul className="list-disc pl-6 space-y-1">
                     <li>Hospedagem do website e serviços de nuvem</li>
                     <li>Atendimento pelo assistente virtual de viagens</li>
