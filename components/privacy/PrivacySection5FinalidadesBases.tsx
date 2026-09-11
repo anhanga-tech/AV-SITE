@@ -32,6 +32,10 @@ export function PrivacySection5FinalidadesBases() {
                 <h3 className="font-merriweather font-semibold">5.7 Cumprimento de Obrigações Legais</h3>
                 <p><strong>Finalidade:</strong> Atendimento a determinações legais, regulamentares ou de autoridades competentes<br />
                     <strong>Base Legal:</strong> Cumprimento de obrigação legal ou regulatória</p>
+
+                <h3 className="font-merriweather font-semibold">5.8 Segurança e Estabilidade do Website</h3>
+                <p><strong>Finalidade:</strong> Prevenir abuso e envio automatizado de formulários (controle temporário de volume de requisições por endereço IP) e detectar e corrigir falhas técnicas do website<br />
+                    <strong>Base Legal:</strong> Legítimo interesse da controladora (Art. 7º, IX, LGPD)</p>
             </div>
         </section>
     );

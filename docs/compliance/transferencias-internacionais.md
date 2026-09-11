@@ -12,7 +12,7 @@
 | **Data de elaboração** | 11/09/2026 |
 | **Status** | Rascunho — levantamento técnico feito a partir do código; evidências contratuais e revisão jurídica **pendentes** |
 | **Issue** | [#1542](https://github.com/anhanga-tech/AV-SITE/issues/1542) (achados LGPD-04 e LGPD-05 da auditoria de 28/08/2026) |
-| **Documentos relacionados** | [`ripd-legitimo-interesse.md`](./ripd-legitimo-interesse.md) · Política de Privacidade (`components/privacy/`, seções 6 e 10) |
+| **Documentos relacionados** | [`ripd-legitimo-interesse.md`](./ripd-legitimo-interesse.md) · Política de Privacidade (`components/privacy/`, seções 5, 6 e 10) · `pages/ExclusaoDados.tsx` |
 
 ---
 
@@ -43,7 +43,7 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 | **Serviços em uso** | Pages + Pages Functions (site e `api/*`), Zaraz (tags server-side), R2 (`media.anhanga.tur.br`), AI Gateway (proxy das chamadas ao Gemini), Worker de coleta do Traks (ver 2.3) |
 | **Dados** | IP e cabeçalhos de toda requisição; corpo dos formulários (lead, contato, quiz, waitlist, NPS) em trânsito pelas Functions; conversa do chatbot em trânsito pelo AI Gateway; eventos de navegação/conversão via Zaraz |
 | **Finalidade** | Hospedagem, entrega, segurança, mensuração e intermediação server-side de conversões |
-| **Duração** | Contínua enquanto houver contrato. AI Gateway configurado **sem** persistir prompt/resposta (`cf-aig-collect-log-payload: false`, `docs/ops/ai-gateway-operations.md`) — `código` |
+| **Duração** | Contínua enquanto houver contrato. AI Gateway configurado **sem** persistir prompt/resposta (cabeçalho `cf-aig-collect-log-payload: false` enviado em `lib/ai/gemini-config.ts`) — `código` |
 | **País/região** | Rede global (processamento no PoP mais próximo; requisições brasileiras observadas em GRU) — `indício técnico`. Região de armazenamento de R2/D1/logs — `a confirmar` |
 | **Suboperadores** | `a confirmar` — lista pública de subprocessadores da Cloudflare, versão vigente a arquivar |
 | **Mecanismo art. 33** | `não verificado`. Confirmar se o DPA da Cloudflare aceito na conta cobre Zaraz e AI Gateway (pendência já aberta no RIPD, Atividade 1) e se incorpora as cláusulas-padrão da Res. CD/ANPD nº 19/2024 |
@@ -186,7 +186,7 @@ Na coluna **Evidência** de cada fornecedor, registrar o caminho e a versão/dat
 | Evidências contratuais armazenadas com acesso controlado e referenciadas | Estrutura definida (seção 4) | Baixar/arquivar os DPAs e preencher a coluna **Evidência** |
 | Países, regiões, suboperadores e mecanismo legal confirmados | Só indícios técnicos e políticas públicas | Odoo: região do banco. Upstash: primário + réplicas. Sentry: região da organização e opção de IP. Cloudflare: cobertura do DPA sobre Zaraz/AI Gateway/R2 e local do armazenamento do Traks. Gemini: nível da conta (gratuito × pago). Listas de suboperadores de todos |
 | Revisão do encarregado/assessoria jurídica registrada | — | Registrar data, responsável e parecer nesta tabela de metadados (campo **Status**) |
-| Política pública consistente com as evidências | Afirmações não comprovadas removidas da seção 10; operadores faltantes incluídos na seção 6.1 (PR desta versão) | Reescrever a seção 10 citando o mecanismo concreto quando as evidências chegarem |
+| Política pública consistente com as evidências | Afirmações não comprovadas removidas da seção 10; operadores faltantes incluídos na seção 6.1; finalidade de segurança/estabilidade declarada na seção 5.8 (base legal proposta: legítimo interesse — validar com o DPO e incluir no RIPD); página `/exclusao-dados` atualizada de Salesforce/GTM para Odoo/Zaraz | Reescrever a seção 10 citando o mecanismo concreto quando as evidências chegarem |
 
 ## 6. Histórico
 

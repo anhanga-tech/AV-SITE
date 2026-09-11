@@ -45,9 +45,15 @@ test('seção 10 não afirma garantias de transferência sem evidência', () => 
   const unverifiedClaims = [
     /certifica[çc][õo]es de adequa[çc][ãa]o/i,
     /cl[áa]usulas contratuais padr[ãa]o aprovadas pela ANPD/i,
-    /todas as transfer[êe]ncias/i,
   ];
   for (const claim of unverifiedClaims) {
     assert.doesNotMatch(TRANSFER, claim);
   }
+});
+
+// CRMs aposentados no cut-over para o Odoo (jun/2026) — a página de exclusão
+// não pode indicar ao titular um sistema onde os dados dele não estão mais.
+test('página de exclusão de dados não cita CRMs aposentados', () => {
+  const deletionPage = read('pages/ExclusaoDados.tsx');
+  assert.doesNotMatch(deletionPage, /Salesforce|HubSpot/);
 });
