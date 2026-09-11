@@ -63,7 +63,7 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 | **Mecanismo art. 33** | `não verificado`. Arquivar: Google Ads Data Processing Terms / Data Processing Addendum aceito no GA4 e no Ads; termos da Gemini API com o nível de faturamento vigente |
 | **Evidência** | — |
 
-> **Achado:** Google Fonts nas 3 landings transfere IP ao Google sem passar pelo consentimento de cookies. `scripts/build-fonts.mjs` já faz self-hosting das fontes do site principal — estender às landings elimina essa transferência. Tratar em issue própria.
+> **Achado:** Google Fonts nas 3 landings transfere IP ao Google sem passar pelo consentimento de cookies. `scripts/build-fonts.mjs` já faz self-hosting das fontes do site principal — estender às landings elimina essa transferência — [#1641](https://github.com/anhanga-tech/AV-SITE/issues/1641).
 
 ### 2.3 Traks (software de analytics self-hosted)
 
@@ -118,7 +118,7 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 | **Mecanismo art. 33** | `não verificado`. Se todas as réplicas ficarem no Brasil, pode não haver transferência de armazenamento; ainda assim há um importador estrangeiro (Upstash, Inc.) com acesso |
 | **Evidência** | — |
 
-> **Oportunidade de minimização:** fazer hash (HMAC) do IP antes de montar a chave tira o dado pessoal em claro do Upstash sem mudar o comportamento do rate limit. Tratar em issue própria.
+> **Oportunidade de minimização:** fazer hash (HMAC) do IP antes de montar a chave tira o dado pessoal em claro do Upstash sem mudar o comportamento do rate limit — [#1642](https://github.com/anhanga-tech/AV-SITE/issues/1642).
 
 ### 2.7 Functional Software, Inc. (Sentry) — monitoramento de erros
 
