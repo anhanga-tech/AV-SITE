@@ -33,7 +33,7 @@ interface GenerateApiResponse {
   retryAfter?: number;
 }
 
-const INVALID_HANDOFF_MESSAGE = 'Tive um problema ao concluir seu orçamento agora. Por favor, tente novamente em alguns instantes para gerar seu atendimento corretamente.';
+const INVALID_HANDOFF_MESSAGE = 'Tive um problema pra concluir seu orçamento agora. Pode tentar de novo em alguns instantes?';
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -52,7 +52,7 @@ function getErrorName(error: unknown): string {
 }
 
 const buildFallbackContactMarkdown = (): string => {
-  return 'Se preferir, fale conosco no WhatsApp com a equipe da Anhangá.';
+  return 'Se preferir, fale com a gente no WhatsApp.';
 };
 
 const withContactFallback = (message: string): string => {
@@ -66,19 +66,19 @@ const buildContactFallbackResponse = (message: string): ChatResponse => ({
 const buildServerErrorResponse = (status: number, errorData: GenerateApiResponse): ChatResponse | null => {
   if (status === 429) {
     return buildContactFallbackResponse(
-      `⏳ Você enviou muitas mensagens. Por favor, aguarde ${errorData.retryAfter || 60} segundos e tente novamente.`
+      `Você mandou muitas mensagens em pouco tempo. Me dá ${errorData.retryAfter || 60} segundos e a gente continua de onde parou.`
     );
   }
 
   if (status === 401 || status === 403) {
     return buildContactFallbackResponse(
-      '⚠️ O chat está com um problema de configuração no servidor. Nossa equipe já precisa revisar isso.'
+      'O chat está com um problema de configuração do nosso lado.'
     );
   }
 
   if (status === 503) {
     return buildContactFallbackResponse(
-      '🕐 Nosso serviço de IA está temporariamente indisponível no momento.'
+      'O chat está fora do ar por alguns instantes.'
     );
   }
 
@@ -87,12 +87,12 @@ const buildServerErrorResponse = (status: number, errorData: GenerateApiResponse
   logger.error('[GeminiService] Server error', { code: errorData.code, error: errorData.error });
   if (errorData.code === 'SERVER_CONFIG_ERROR' || errorData.code === 'GEMINI_MODEL_ERROR') {
     return buildContactFallbackResponse(
-      '⚠️ O chat está com um problema de configuração no servidor. Nossa equipe já precisa revisar isso.'
+      'O chat está com um problema de configuração do nosso lado.'
     );
   }
 
   return buildContactFallbackResponse(
-    '⚙️ Tivemos um problema técnico interno. Por favor, tente novamente em alguns instantes.'
+    'Tivemos um problema técnico do nosso lado. Pode tentar de novo em alguns instantes?'
   );
 };
 
@@ -180,24 +180,24 @@ function buildUnexpectedServiceError(error: unknown): ChatResponse {
 
   if (errorMessage.includes('API key missing') || errorMessage.includes('invalid')) {
     return buildContactFallbackResponse(
-      '⚠️ O chat está com um problema de configuração no servidor. Nossa equipe já precisa revisar isso.'
+      'O chat está com um problema de configuração do nosso lado.'
     );
   }
 
   if (errorMessage.includes('Failed to fetch') || errorName === 'TypeError') {
     return buildContactFallbackResponse(
-      '🔌 Não foi possível conectar ao servidor. Verifique sua conexão com a internet ou tente novamente em alguns instantes.'
+      'Não consegui me conectar ao servidor. Confira sua conexão ou tente de novo em alguns instantes.'
     );
   }
 
   if (errorMessage.includes('Serviço temporariamente indisponível')) {
     return buildContactFallbackResponse(
-      '🕐 Nosso serviço está temporariamente indisponível. Por favor, tente novamente em breve.'
+      'O chat está fora do ar por alguns instantes. Tente de novo em breve.'
     );
   }
 
   return buildContactFallbackResponse(
-    '⚙️ Tivemos um problema técnico interno. Por favor, tente novamente em alguns instantes.'
+    'Tivemos um problema técnico do nosso lado. Pode tentar de novo em alguns instantes?'
   );
 }
 
