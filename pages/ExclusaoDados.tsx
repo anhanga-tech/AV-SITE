@@ -5,6 +5,7 @@ import { WebPageSchema } from "@/components/schemas/WebPageSchema";
 const CANONICAL = "https://www.anhanga.tur.br/exclusao-de-dados/";
 const DESCRIPTION = "Instruções para solicitar a exclusão de dados pessoais junto à Anhangá Turismo, conforme a LGPD (Lei nº 13.709/2018).";
 const UPDATED = "11 de setembro de 2026";
+const UPDATED_ISO = "2026-09-11";
 
 const ExclusaoDados = () => (
     <>
@@ -119,7 +120,7 @@ const ExclusaoDados = () => (
                 </section>
             </article>
         </div>
-        <WebPageSchema name="Exclusão de Dados Pessoais - Anhangá Turismo" url={CANONICAL} description={DESCRIPTION} dateModified="2026-06-10" />
+        <WebPageSchema name="Exclusão de Dados Pessoais - Anhangá Turismo" url={CANONICAL} description={DESCRIPTION} dateModified={UPDATED_ISO} />
     </>
 );
 
