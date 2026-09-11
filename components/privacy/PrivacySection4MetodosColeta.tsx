@@ -21,6 +21,7 @@ export function PrivacySection4MetodosColeta() {
                         </ul>
                     </li>
                     <li><strong>Rastreamento server-side via Cloudflare Zaraz:</strong> eventos de navegação e conversão são processados por um servidor intermediário (Cloudflare, já responsável pela hospedagem do site), onde o endereço IP é suprimido antes do envio ao Google Analytics. Publicidade direcionada e remarketing no Meta (Facebook/Instagram) e no TikTok são medidos <strong>exclusivamente nesse servidor intermediário</strong> — nenhum pixel de rastreamento do Meta ou do TikTok é carregado no navegador do titular, e essas medições só ocorrem após consentimento de marketing.</li>
+                    <li><strong>Métricas próprias de audiência, sem cookies:</strong> caminho da página visitada, página de origem, parâmetros de campanha (UTM), eventos de conversão e um identificador de sessão aleatório que dura 30 (trinta) minutos e fica somente na aba do navegador. Esses dados são processados em infraestrutura da Cloudflare contratada pela controladora, com base no legítimo interesse descrito na Seção 5.3.</li>
                     <li><strong>Ferramentas de terceiros integradas:</strong>
                         <ul className="list-disc pl-6 mt-1">
                             <li>Instagram para engajamento em redes sociais</li>

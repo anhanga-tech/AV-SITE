@@ -13,6 +13,7 @@ export function PrivacySection8DireitosTitulares() {
                     <li><strong>Eliminação:</strong> Eliminação dos dados tratados com base no consentimento;</li>
                     <li><strong>Informação:</strong> Informação sobre entidades com as quais os dados foram compartilhados;</li>
                     <li><strong>Revogação do Consentimento:</strong> Revogação do consentimento a qualquer momento;</li>
+                    <li><strong>Oposição:</strong> Oposição ao tratamento realizado com base em legítimo interesse — como o tratamento analítico (Seção 9.4) e o de segurança e estabilidade do website (Seção 5.8) —, em caso de descumprimento da LGPD (Art. 18, § 2º);</li>
                     <li><strong>Revisão:</strong> Revisão de decisões automatizadas.</li>
                 </ul>
                 <h3 className="font-merriweather font-semibold">8.2 Exercício dos Direitos</h3>

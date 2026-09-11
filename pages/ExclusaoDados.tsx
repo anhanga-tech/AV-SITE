@@ -4,7 +4,8 @@ import { WebPageSchema } from "@/components/schemas/WebPageSchema";
 
 const CANONICAL = "https://www.anhanga.tur.br/exclusao-de-dados/";
 const DESCRIPTION = "Instruções para solicitar a exclusão de dados pessoais junto à Anhangá Turismo, conforme a LGPD (Lei nº 13.709/2018).";
-const UPDATED = "10 de junho de 2026";
+const UPDATED = "11 de setembro de 2026";
+const UPDATED_ISO = "2026-09-11";
 
 const ExclusaoDados = () => (
     <>
@@ -60,15 +61,19 @@ const ExclusaoDados = () => (
                                 <tbody className="divide-y divide-border">
                                     <tr>
                                         <td className="py-2 pr-4">Nome, e-mail e telefone coletados pelo chatbot ou formulários</td>
-                                        <td className="py-2">Salesforce CRM</td>
+                                        <td className="py-2">Odoo CRM</td>
                                     </tr>
                                     <tr>
                                         <td className="py-2 pr-4">Resumo da conversa com nosso assistente de IA e dados de qualificação da viagem registrados no atendimento</td>
-                                        <td className="py-2">Salesforce CRM (o processamento das mensagens pelo Google Gemini é transitório e não fica armazenado por nós)</td>
+                                        <td className="py-2">Odoo CRM. As mensagens também são processadas pelo Google Gemini (Google LLC), e a eventual retenção delas pelo Google segue os termos desse fornecedor</td>
                                     </tr>
                                     <tr>
                                         <td className="py-2 pr-4">Dados de rastreamento (UTM, clique em anúncios) associados ao seu perfil</td>
-                                        <td className="py-2">Google Analytics 4 / GTM</td>
+                                        <td className="py-2">Google Analytics 4 (via Cloudflare Zaraz) e Odoo CRM</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="py-2 pr-4">Nome, e-mail, observações, horário e dados de campanha de consultorias agendadas pelo website</td>
+                                        <td className="py-2">Cal.com (excluídos pela nossa equipe na conta de agendamento)</td>
                                     </tr>
                                     <tr>
                                         <td className="py-2 pr-4">Cookies de identificação persistentes</td>
@@ -119,7 +124,7 @@ const ExclusaoDados = () => (
                 </section>
             </article>
         </div>
-        <WebPageSchema name="Exclusão de Dados Pessoais - Anhangá Turismo" url={CANONICAL} description={DESCRIPTION} dateModified="2026-06-10" />
+        <WebPageSchema name="Exclusão de Dados Pessoais - Anhangá Turismo" url={CANONICAL} description={DESCRIPTION} dateModified={UPDATED_ISO} />
     </>
 );
 
