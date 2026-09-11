@@ -11,6 +11,9 @@ export function PrivacySection6Compartilhamento() {
                     <li><strong>TikTok Pte. Ltd.</strong> (publicidade e remarketing — TikTok Ads)</li>
                     <li><strong>Cloudflare, Inc.</strong> (hospedagem do site e gerenciamento de tags server-side via Cloudflare Zaraz — responsável pela supressão de IP antes do envio ao Google Analytics e pelo envio server-side das conversões ao Meta e ao TikTok, sem carregar pixel de rastreamento no navegador do titular)</li>
                     <li><strong>Odoo S.A.</strong> (CRM de vendas — registro e gestão de leads comerciais)</li>
+                    <li><strong>Upstash, Inc.</strong> (prevenção de abuso — controle temporário de volume de requisições por endereço IP)</li>
+                    <li><strong>Functional Software, Inc. (Sentry)</strong> (monitoramento de erros e estabilidade do website)</li>
+                    <li><strong>Cal.com, Inc.</strong> (agendamento de consultorias, quando o titular marca um horário pelo website)</li>
                     <li><strong>ONER Travel</strong> (serviços especializados em turismo)</li>
                     <li><strong>Outros prestadores de serviços</strong> devidamente contratados</li>
                 </ul>
