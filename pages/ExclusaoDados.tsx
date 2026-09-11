@@ -65,11 +65,15 @@ const ExclusaoDados = () => (
                                     </tr>
                                     <tr>
                                         <td className="py-2 pr-4">Resumo da conversa com nosso assistente de IA e dados de qualificação da viagem registrados no atendimento</td>
-                                        <td className="py-2">Odoo CRM (o processamento das mensagens pelo Google Gemini é transitório e não fica armazenado por nós)</td>
+                                        <td className="py-2">Odoo CRM. As mensagens também são processadas pelo Google Gemini (Google LLC), e a eventual retenção delas pelo Google segue os termos desse fornecedor</td>
                                     </tr>
                                     <tr>
                                         <td className="py-2 pr-4">Dados de rastreamento (UTM, clique em anúncios) associados ao seu perfil</td>
                                         <td className="py-2">Google Analytics 4 (via Cloudflare Zaraz) e Odoo CRM</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="py-2 pr-4">Nome, e-mail, observações, horário e dados de campanha de consultorias agendadas pelo website</td>
+                                        <td className="py-2">Cal.com (excluídos pela nossa equipe na conta de agendamento)</td>
                                     </tr>
                                     <tr>
                                         <td className="py-2 pr-4">Cookies de identificação persistentes</td>

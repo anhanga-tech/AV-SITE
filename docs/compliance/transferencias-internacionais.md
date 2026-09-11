@@ -8,7 +8,7 @@
 |---|---|
 | **Controlador (exportador)** | Anhangá Turismo Ltda. — CNPJ 37.036.732/0001-41 |
 | **Encarregado (DPO)** | Felipe William Rodrigues Silva — privacidade@anhanga.tur.br |
-| **Versão** | 0.2 |
+| **Versão** | 0.3 |
 | **Data de elaboração** | 11/09/2026 |
 | **Status** | Rascunho — levantamento técnico feito a partir do código; evidências contratuais e revisão jurídica **pendentes** |
 | **Issue** | [#1542](https://github.com/anhanga-tech/AV-SITE/issues/1542) (achados LGPD-04 e LGPD-05 da auditoria de 28/08/2026) |
@@ -70,7 +70,7 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 | Campo | Detalhe |
 |---|---|
 | **Importador** | Hipótese: nenhum importador novo — o coletor responde como `traks-collect` em `analytics-collect.anhanga.tur.br` (servido pela Cloudflare) e o Traks se descreve como "self-hosted on Cloudflare, your data in your own account". Se confirmado, o operador é a Cloudflare (2.1) e o Traks é só software — `indício técnico` + `política do fornecedor` |
-| **Dados** | Pageviews (caminho, referrer, largura de tela, UTMs), eventos de conversão, identificador de sessão aleatório em `sessionStorage` (30 min). Sem cookies — `código` (`index.html`, `utils/traks.ts`) |
+| **Dados** | Pageviews (caminho, referrer, largura de tela, UTMs), eventos de conversão, identificador de sessão aleatório em `sessionStorage` (30 min). Sem cookies e sem gate de consentimento — o bloqueio de cookies não impede a coleta — `código` (`index.html`, `utils/traks.ts`). Declarado na política, seção 4.2; oposição por e-mail ao Encarregado (seção 9.4) |
 | **Finalidade** | Mensuração própria de conversões |
 | **País/região** | `a confirmar` — região do banco (D1/Analytics Engine) onde o Worker grava |
 | **Mecanismo art. 33** | Herda o da Cloudflare, se a hipótese se confirmar |
@@ -96,7 +96,7 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 |---|---|
 | **Importador** | Odoo S.A. (Bélgica) |
 | **Serviços em uso** | Odoo Online — recebe os 5 formulários do site via JSON-RPC (`services/odoo.ts`) |
-| **Dados** | Nome, e-mail, telefone, perfil de viagem/BANT, UTMs e click IDs, `x_ga_client_id`, consentimento LGPD, nota NPS e **respostas livres do NPS** (motivo da nota e destaque da viagem, gravados no campo `comment` do parceiro — `lib/odoo-lead-mapping.ts`), que podem conter dados pessoais adicionais |
+| **Dados** | Nome, e-mail, telefone, perfil de viagem/BANT, **empresa, cargo e indicação** do formulário corporativo (`partner_name`, `function` e descrição do `crm.lead` — `lib/odoo-lead-mapping.ts`), UTMs e click IDs, `x_ga_client_id`, consentimento LGPD, nota NPS e **respostas livres do NPS** (motivo da nota e destaque da viagem, gravados no campo `comment` do parceiro — `lib/odoo-lead-mapping.ts`), que podem conter dados pessoais adicionais |
 | **Finalidade** | Gestão comercial de leads e relacionamento |
 | **Duração** | 5 anos após a última interação (política, seção 7.1) — aprovação da tabela de retenção em #1544 |
 | **País/região** | O IP do banco resolve para OVH em Montréal, Canadá — `indício técnico`. Região do datacenter do banco — `a confirmar` no painel da assinatura Odoo |
@@ -110,9 +110,9 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 |---|---|
 | **Importador** | Upstash, Inc. (EUA) |
 | **Serviços em uso** | Redis REST para rate limit dos endpoints de API (`lib/rate-limit.ts`) |
-| **Dados** | **IP do cliente em claro** como parte da chave (`<prefixo>:<ip>`) e um contador — `código` |
+| **Dados** | **IP do cliente em claro** como parte da chave (`<prefixo>:<ip>`) e um contador — `código`. Registro de uso único do convite de NPS (`nps:invite:used:<jti>`, identificador do convite assinado, sem dados de contato) — `código` (`lib/nps-invite-replay.ts`, `api/submit-nps.ts`) |
 | **Finalidade** | Prevenção de abuso (segurança) |
-| **Duração** | TTL igual à janela do rate limit (minutos) — `código` |
+| **Duração** | Rate limit: TTL igual à janela, no máximo 10 minutos. Convite de NPS: até o vencimento do convite, no máximo 30 dias (`lib/nps-invite.ts`) — `código` |
 | **País/região** | Banco global com primário em São Paulo (sa-east-1) — `indício técnico`. Um banco global replica para outras regiões: lista de réplicas — `a confirmar` no console |
 | **Suboperadores** | AWS — `a confirmar` |
 | **Mecanismo art. 33** | `não verificado`. Se todas as réplicas ficarem no Brasil, pode não haver transferência de armazenamento; ainda assim há um importador estrangeiro (Upstash, Inc.) com acesso |
@@ -161,6 +161,7 @@ Requisições feitas direto pelo navegador do visitante, fora do consentimento d
 | Fornecedor | Motivo |
 |---|---|
 | ONER Travel | Citado na política (seção 6.1), mas sem integração no código do site. Se houver transferência internacional no fluxo operacional (fora do site), registrar no ROPA (#1547) |
+| Decap CMS (via `unpkg.com`) e GitHub, Inc. | `/admin` carrega o Decap CMS de `unpkg.com` e autentica por OAuth no GitHub (`public/admin/index.html`, `api/auth.ts`). Só editores da própria agência usam — não trata dados de clientes nem de visitantes. Registrar no ROPA como tratamento de dados de colaboradores (#1547) |
 | WhatsApp (Meta) | O site só abre `wa.me` com parâmetros de rastreio; a conversa acontece no app do titular com o WhatsApp Business da agência — registrar no ROPA como canal de atendimento (#1547) |
 
 ## 3. Fornecedores aposentados
@@ -203,5 +204,6 @@ Na coluna **Evidência** de cada fornecedor, registrar o caminho e a versão/dat
 
 | Versão | Data | Alteração |
 |---|---|---|
+| 0.3 | 11/09/2026 | Segunda rodada de review: Traks declarado na política, registro de convite NPS no Upstash, empresa/cargo/indicação no Odoo, Cal.com na página de exclusão, CMS fora do escopo |
 | 0.2 | 11/09/2026 | Achados do review da PR #1640: conteúdo de terceiros no navegador (2.9), dados do loop Odoo → Meta/GA4, respostas livres do NPS no Odoo, metadados de atribuição no Cal.com, IP em claro nos logs enviados ao Sentry |
 | 0.1 | 11/09/2026 | Levantamento inicial a partir do código e de verificações técnicas (DNS/IP). Os arquivos citados pela issue (`docs/privacy/transferencias-internacionais.md`, `docs/audits/lgpd-site-2026-08-28.md`) não existem no repositório — este documento substitui o "modelo inicial" |

@@ -8,6 +8,7 @@ export function PrivacySection3Categorias() {
                     <li>Nome completo</li>
                     <li>Endereço de correio eletrônico</li>
                     <li>Número de telefone</li>
+                    <li>Empresa, cargo e indicação, quando informados no formulário corporativo</li>
                     <li>Dados fornecidos voluntariamente através de formulários de contato</li>
                 </ul>
                 <h3 className="font-merriweather font-semibold">3.2 Dados de Planejamento de Viagem (Assistente Virtual)</h3>
