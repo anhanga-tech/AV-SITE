@@ -55,9 +55,10 @@ test('seção 10 não afirma garantias de transferência sem evidência', () => 
   }
 });
 
-// CRMs aposentados no cut-over para o Odoo (jun/2026) — a página de exclusão
-// não pode indicar ao titular um sistema onde os dados dele não estão mais.
-test('página de exclusão de dados não cita CRMs aposentados', () => {
+// Sistemas aposentados — CRMs no cut-over para o Odoo (jun/2026), GTM na migração
+// para o Zaraz (set/2026). A página de exclusão não pode indicar ao titular um
+// sistema onde os dados dele não estão mais.
+test('página de exclusão de dados não cita sistemas aposentados', () => {
   const deletionPage = read('pages/ExclusaoDados.tsx');
-  assert.doesNotMatch(deletionPage, /Salesforce|HubSpot/);
+  assert.doesNotMatch(deletionPage, /Salesforce|HubSpot|\bGTM\b|Google Tag Manager/);
 });
