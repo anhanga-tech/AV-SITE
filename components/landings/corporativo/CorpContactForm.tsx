@@ -196,7 +196,7 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
                                         href={whatsappUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="btn-whatsapp inline-flex items-center gap-1.5 mt-2 min-h-11 text-sm font-bold text-anhanga-dark underline underline-offset-4 hover:text-anhanga-action focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
+                                        className="btn-whatsapp btn-specialist inline-flex items-center gap-1.5 mt-2 min-h-11 text-sm font-bold text-anhanga-dark underline underline-offset-4 hover:text-anhanga-action focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
                                         data-contact-intent
                                         data-tracking="error-corporativo"
                                     >

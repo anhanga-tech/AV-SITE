@@ -182,6 +182,8 @@ test.describe('Corporativo Landing Page', () => {
     const fallback = landing.errorAlert.getByRole('link', { name: 'Falar com a gente no WhatsApp' });
     await expect(fallback).toBeVisible();
     await expect(fallback).toHaveAttribute('href', /wa\.me|whatsapp/);
+    // Mesmo funil de contato dos outros CTAs corporativos: conta como specialist_cta_click.
+    await expect(fallback).toHaveClass(/\bbtn-specialist\b/);
   });
 
   test('should capture corporate lead and trigger dataLayer events', async ({ page }) => {
