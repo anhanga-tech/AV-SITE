@@ -6,21 +6,21 @@ import { Feature } from './types';
 const features: Feature[] = [
   {
     icon: <Clock size={48} className="text-fun-dark transition-transform duration-700 ease-in-out group-hover:rotate-[360deg]" />,
-    title: "Menos Tempo Perdido",
+    title: "Menos tempo perdido",
     description: "Nada de comparar mil opções. A gente já te entrega a melhor combinação de voo e estadia.",
     color: "bg-fun-yellow",
     tooltipText: "Agilidade Total"
   },
   {
     icon: <Smile size={48} className="text-white group-hover:animate-pulse" />,
-    title: "Mais Diversão",
+    title: "Mais diversão",
     description: "Casais, famílias e grupos. Você aproveita cada momento sem se preocupar com logística.",
     color: "bg-fun-pink",
     tooltipText: "Zero Estresse"
   },
   {
     icon: <Wallet size={48} className="text-white transition-transform duration-300 group-hover:scale-125 group-hover:-rotate-12" />,
-    title: "Pacote que faz Sentido",
+    title: "Pacote que faz sentido",
     description: "Tudo junto sai mais fácil, mais claro e geralmente mais econômico do que comprar picado.",
     color: "bg-fun-green",
     tooltipText: "Economia Inteligente"

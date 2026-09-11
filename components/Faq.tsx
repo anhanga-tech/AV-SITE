@@ -148,7 +148,7 @@ const FAQS = [
             <div>
                 <strong className="block mb-3">4 passos simples:</strong>
                 <ol className="list-decimal pl-5 space-y-3">
-                    <li className="pl-1"><strong className="text-brand-dark">Oie! Vamos conversar?</strong> <br /> Você começa pelo chat, conta seus sonhos e informa quanto quer investir</li>
+                    <li className="pl-1"><strong className="text-brand-dark">Vamos conversar?</strong> <br /> Você começa pelo chat, conta seus sonhos e informa quanto quer investir</li>
                     <li className="pl-1"><strong className="text-brand-dark">Desenhando o Sonho</strong> <br /> Nossos especialistas criam um roteiro dia-a-dia personalizado</li>
                     <li className="pl-1"><strong className="text-brand-dark">Burocracia? Deixa com a gente</strong> <br /> Emitimos voos, hotéis, passeios e parcelamos</li>
                     <li className="pl-1"><strong className="text-brand-dark">Fui! Partiu Viajar</strong> <br /> Você recebe vouchers organizados. A gente fica de plantão 24h</li>

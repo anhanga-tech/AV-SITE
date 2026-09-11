@@ -149,6 +149,6 @@ A voz é a mesma em todo lugar; o que muda é a intensidade.
 Pontos em que o que está no ar hoje diverge deste guia. Resolver em PRs próprias.
 
 - **Persona do chatbot** (`lib/ai/prompt.ts`). Está descrita como "especialista premium consultivo: elegante", o que puxa para o luxo frio que `PRODUCT.md` lista como anti-referência. Os pilares Humano, Artesanal e Acompanhado não aparecem no prompt. Mudar o prompt é mudança de comportamento e pede ajuste nos testes do gerador.
-- **Title Case em CTAs e títulos** (ex.: "Quero Meu Pacote no WhatsApp", "Quiz: Descubra Seu Destino Ideal").
-- **Mensagens de erro genéricas** (ex.: "Ocorreu um erro inesperado. Tente novamente.") sem oferecer o WhatsApp como saída.
-- **Saudação "Oie! Vamos conversar?"**: fica no limite do "informal demais" para páginas que não são de evento.
+- **Title Case em meta titles de SEO** (ex.: "Consultoria de Viagem com Especialista", "Blog de Viagens e Dicas Práticas"). Os textos visíveis já foram corrigidos; os títulos de `<Seo>` ficaram de fora porque mexem em SEO e pedem revisão própria. Nomes de documentos jurídicos ("Termos de Uso", "Política de Privacidade") e de programas ("Melhor Idade", "Lista de Espera Lolla 2027") seguem com maiúscula de propósito.
+- **Rótulos que também são valores** (`TRIP_OPTIONS` e `BUDGET_TIERS` em `data/destinations.tsx`, ex.: "Lua de Mel", "Super Luxo"). São comparados por texto no formulário de busca, então mudar a capitalização exige migrar os valores.
+- **Emoji como ilustração** no "Como funciona" (`components/HowItWorks.tsx`: ✈️, 🏝️), contra a regra de não usar emoji como ícone.
