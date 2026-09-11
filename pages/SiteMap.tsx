@@ -5,18 +5,18 @@ import { getAllPosts } from '../lib/mdx';
 import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 
 const CORE_LINKS = [
-  { to: '/', label: 'Agência de Viagens em São Paulo' },
+  { to: '/', label: 'Agência de viagens em São Paulo' },
   { to: '/sobre/', label: 'Sobre a Anhangá Viagens' },
-  { to: getBlogHomeUrl(), label: 'Blog de Viagens e Roteiros', external: true },
+  { to: getBlogHomeUrl(), label: 'Blog de viagens e roteiros', external: true },
   { to: '/orlando/', label: 'Pacotes para Orlando' },
   { to: '/parques-brasil/', label: 'Parques do Brasil: qual escolher' },
   { to: '/beto-carrero/', label: 'Pacote Beto Carrero' },
   { to: '/melhor-idade/', label: 'Viagens para Melhor Idade' },
   { to: '/lollapalooza/', label: 'Lollapalooza Brasil' },
-  { to: '/consultoria-de-viagem/', label: 'Consultoria de Viagem Personalizada' },
+  { to: '/consultoria-de-viagem/', label: 'Consultoria de viagem personalizada' },
   { to: '/cruzeiros/', label: 'Cruzeiros pelo Brasil' },
-  { to: '/corporativo/', label: 'Viagens Corporativas' },
-  { to: '/quiz/', label: 'Quiz: Descubra Seu Destino Ideal' },
+  { to: '/corporativo/', label: 'Viagens corporativas' },
+  { to: '/quiz/', label: 'Quiz: descubra seu destino ideal' },
   { to: '/termos-de-uso/', label: 'Termos de Uso' },
   { to: '/politica-privacidade/', label: 'Política de Privacidade' },
   { to: '/exclusao-de-dados/', label: 'Exclusão de Dados' }
