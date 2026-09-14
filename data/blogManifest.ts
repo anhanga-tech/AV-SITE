@@ -742,7 +742,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   },
   {
     "title": "Jalapão: Roteiro de 7 Dias, Custos Reais e a Melhor Época para Ir",
-    "excerpt": "Na seca (maio a setembro, com pico em julho), os fervedouros do Jalapão estão no melhor momento. Roteiro de 7 dias, custos reais e por que ir antes que o destino mude.",
+    "excerpt": "Na seca (maio a setembro, com pico em julho), os fervedouros do Jalapão estão no melhor momento. Roteiro de 7 dias, custos reais e por que ir agora.",
     "date": "2026-07-04",
     "dateModified": "2026-09-14",
     "author": "felipe-william",
