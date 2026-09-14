@@ -8,7 +8,7 @@
 |---|---|
 | **Controlador (exportador)** | Anhangá Turismo Ltda. — CNPJ 37.036.732/0001-41 |
 | **Encarregado (DPO)** | Felipe William Rodrigues Silva — privacidade@anhanga.tur.br |
-| **Versão** | 0.6 |
+| **Versão** | 0.7 |
 | **Data de elaboração** | 11/09/2026 |
 | **Última revisão** | 14/09/2026 |
 | **Status** | Rascunho — levantamento técnico feito a partir do código; evidências contratuais e revisão jurídica **pendentes** |
@@ -42,7 +42,7 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 |---|---|
 | **Importador** | Cloudflare, Inc. (EUA) |
 | **Serviços em uso** | Pages + Pages Functions (site e `api/*`), Zaraz (tags server-side), R2 (`media.anhanga.tur.br`), AI Gateway (proxy das chamadas ao Gemini), Worker de coleta do Traks (ver 2.3), **Web Analytics (beacon RUM de zona)** — ativo após a mudança de 10/09/2026, servido pelo próprio domínio e disparando `POST /cdn-cgi/rum` no carregamento e no `pagehide` (`docs/ops/cloudflare-rules.md`) |
-| **Dados** | IP e cabeçalhos de toda requisição; corpo dos formulários (lead, contato, quiz, waitlist, NPS) em trânsito pelas Functions; conversa do chatbot em trânsito pelo AI Gateway; eventos de navegação/conversão via Zaraz. **Web Analytics (RUM):** página visitada, referrer, dados técnicos do navegador e métricas de Core Web Vitals, sem cookie e sem identificador que persista entre visitas — coleta que ocorre **fora do aviso de cookies**, no mesmo caso do Traks (2.3) — `código`/`indício técnico` |
+| **Dados** | IP e cabeçalhos de toda requisição; corpo dos formulários (lead, contato, quiz, waitlist, NPS) em trânsito pelas Functions; **no R2, as fotos de perfil dos autores dos depoimentos do Google** (`reviews/<id do review>.jpg`, enviadas por `scripts/fetch-google-reviews.ts` e servidas publicamente pelo CDN) — não existe rotina de exclusão desses objetos, então uma foto permanece no bucket mesmo depois de o depoimento sair do site — `código`; conversa do chatbot em trânsito pelo AI Gateway; eventos de navegação/conversão via Zaraz. **Web Analytics (RUM):** página visitada, referrer, dados técnicos do navegador e métricas de Core Web Vitals, sem cookie e sem identificador que persista entre visitas — coleta que ocorre **fora do aviso de cookies**, no mesmo caso do Traks (2.3) — `código`/`indício técnico` |
 | **Finalidade** | Hospedagem, entrega, segurança, mensuração e intermediação server-side de conversões |
 | **Duração** | Contínua enquanto houver contrato. AI Gateway configurado **sem** persistir prompt/resposta (cabeçalho `cf-aig-collect-log-payload: false` enviado em `lib/ai/gemini-config.ts`) — `código` |
 | **País/região** | Rede global (processamento no PoP mais próximo; requisições brasileiras observadas em GRU) — `indício técnico`. Região de armazenamento de R2/D1/logs — `a confirmar` |
@@ -63,6 +63,8 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 | **Suboperadores** | `a confirmar` |
 | **Mecanismo art. 33** | `não verificado`. Arquivar: Google Ads Data Processing Terms / Data Processing Addendum aceito no GA4 e no Ads; termos da Gemini API com o nível de faturamento vigente |
 | **Evidência** | — |
+
+> **Achado (P1):** o link de convite do NPS (`/nps?token=…`) leva na query uma credencial que autoriza escrita no registro do cliente no Odoo e um payload `base64url` reversível com e-mail e nome. `pages/NpsPage.tsx` não remove o token da URL, e o Pageview automático do Zaraz envia a URL com query ao GA4 — então credencial e identificadores chegam ao `page_location`. O caminho do Sentry já está protegido por `scrubEventUrls`; este não — [#1666](https://github.com/anhanga-tech/AV-SITE/issues/1666).
 
 > **Achado:** Google Fonts nas 3 landings transfere IP ao Google sem passar pelo consentimento de cookies. `scripts/build-fonts.mjs` já faz self-hosting das fontes do site principal — estender às landings elimina essa transferência — [#1641](https://github.com/anhanga-tech/AV-SITE/issues/1641).
 
@@ -187,7 +189,7 @@ Requisições feitas direto pelo navegador do visitante, fora do consentimento d
 | **Mecanismo art. 33** | `não verificado`. Arquivar o GitHub DPA (Data Protection Agreement dos termos corporativos) |
 | **Evidência** | — |
 
-> **Achado:** um pedido de exclusão de um autor de review não é atendível por completo enquanto o nome e o texto estiverem no histórico do Git de um repositório público — remover o arquivo não apaga os commits anteriores. Avaliar mover os depoimentos para fora do repositório (R2, que já serve a mídia, ou busca em tempo de build sem commit) antes de tratar um pedido desse tipo — [#1664](https://github.com/anhanga-tech/AV-SITE/issues/1664).
+> **Achado:** um pedido de exclusão de um autor de review não é atendível por completo enquanto o nome e o texto estiverem no histórico do Git de um repositório público — remover o arquivo não apaga os commits anteriores. A foto de perfil do autor, copiada para o R2 (2.1), também não tem rotina de exclusão. Avaliar mover os depoimentos para fora do repositório (R2, que já serve a mídia, ou busca em tempo de build sem commit) e criar a rotina de remoção do objeto antes de tratar um pedido desse tipo — [#1664](https://github.com/anhanga-tech/AV-SITE/issues/1664).
 
 ### 2.12 Outscraper — coleta dos depoimentos do Google
 
@@ -254,6 +256,7 @@ Na coluna **Evidência** de cada fornecedor, registrar o caminho e a versão/dat
 
 | Versão | Data | Alteração |
 |---|---|---|
+| 0.7 | 14/09/2026 | Quinta rodada de review da PR #1640: fotos de perfil dos depoimentos no R2 inventariadas (2.1) e incluídas no achado de exclusão (2.11); achado P1 da credencial do convite NPS na query string enviada ao GA4 ([#1666](https://github.com/anhanga-tech/AV-SITE/issues/1666)); Meta e TikTok e a foto do depoimento incluídos na página de exclusão; atividade 5.9 (publicação de depoimentos) criada na política |
 | 0.6 | 14/09/2026 | Pendências dos achados convertidas em issues rastreáveis: #1661 (handoff de WhatsApp), #1662 (texto livre nos logs do Sentry), #1663 (opt-out do tratamento analítico), #1664 (depoimentos no histórico do Git) e #1665 (RIPD da seção 5.8) |
 | 0.5 | 14/09/2026 | Quarta rodada de review da PR #1640: Outscraper inventariada como coletora dos depoimentos (2.12); IP em claro no Sentry reclassificado como caminho rotineiro de rate limit, não exceção de falha do Upstash (2.7); Google Fonts e depoimentos declarados na política; Bélgica incluída nos destinos da 10.1; pendência do RIPD para a base legal da 5.8 |
 | 0.4 | 14/09/2026 | Terceira rodada de review da PR #1640: WhatsApp sai de "fora do escopo" e ganha inventário próprio (2.10) pelos campos do titular na URL do handoff; os dois identificadores de cliente do GA4 separados (2.2); lock de idempotência do Odoo registrado no Upstash (2.6); mascaramento do logger qualificado como filtro por nome de campo (2.7); beacon do Cloudflare Web Analytics inventariado (2.1); publicação automática dos reviews do Google pelo GitHub inventariada (2.11) |

@@ -69,7 +69,7 @@ const ExclusaoDados = () => (
                                     </tr>
                                     <tr>
                                         <td className="py-2 pr-4">Dados de rastreamento (UTM, clique em anúncios) associados ao seu perfil</td>
-                                        <td className="py-2">Google Analytics 4 (via Cloudflare Zaraz) e Odoo CRM. A exclusão no Google Analytics é feita pelo painel da ferramenta, que também descarta esses eventos automaticamente após 14 meses</td>
+                                        <td className="py-2">Google Analytics 4 (via Cloudflare Zaraz) e Odoo CRM. A exclusão no Google Analytics é feita pelo painel da ferramenta, que também descarta esses eventos automaticamente após 14 meses. Se você havia consentido com cookies de marketing, a conversão também foi enviada ao Meta e ao TikTok — nesses casos solicitamos a exclusão pelos canais de titular de cada plataforma e informamos o retorno, já que a remoção depende delas</td>
                                     </tr>
                                     <tr>
                                         <td className="py-2 pr-4">Nome, e-mail, observações, horário e dados de campanha de consultorias agendadas pelo website</td>
@@ -80,8 +80,8 @@ const ExclusaoDados = () => (
                                         <td className="py-2">Navegador do usuário (instrução de remoção enviada)</td>
                                     </tr>
                                     <tr>
-                                        <td className="py-2 pr-4">Depoimento publicado por você no nosso perfil do Google (nome, nota, data e texto), quando exibido no nosso website</td>
-                                        <td className="py-2">Cópia no código do website, hospedado no GitHub — ver a ressalva abaixo</td>
+                                        <td className="py-2 pr-4">Depoimento publicado por você no nosso perfil do Google (nome, nota, data, texto e foto de perfil), quando exibido no nosso website</td>
+                                        <td className="py-2">Cópia no código do website, hospedado no GitHub, e a foto no nosso armazenamento de mídia (Cloudflare R2) — ver a ressalva abaixo</td>
                                     </tr>
                                     <tr>
                                         <td className="py-2 pr-4">Registros de erro do website que eventualmente contenham o que você digitou em um formulário (por exemplo, o destino pesquisado) e o endereço IP da requisição</td>
@@ -98,15 +98,17 @@ const ExclusaoDados = () => (
                         </p>
                         <p>
                             Uma ressalva de transparência: o servidor intermediário que envia os eventos ao Google
-                            Analytics cria um identificador próprio, guardado em cookie que nenhum código da página
-                            consegue ler. Ele não é associado ao seu cadastro e é tratado pela exclusão no painel do
-                            Google Analytics e pelo descarte automático citado acima, não pela remoção dos cookies do
-                            seu navegador.
+                            Analytics cria um identificador próprio, guardado num cookie que nenhum código da página
+                            consegue ler. Ele não é associado ao seu cadastro. Para removê-lo por completo, são dois
+                            passos: limpar os cookies e os dados do site no seu navegador apaga a cópia que está no seu
+                            dispositivo, e a exclusão no painel do Google Analytics — somada ao descarte automático
+                            citado acima — trata os registros já enviados.
                         </p>
                         <p>
                             Outra ressalva, sobre depoimentos: retiramos o seu depoimento do website e da versão atual
-                            do código, mas o texto e o nome permanecem no histórico de versões do repositório, que é
-                            público — apagar esse histórico não é possível sem reescrever todo o projeto. Estamos
+                            do código, e apagamos a foto de perfil do nosso armazenamento de mídia, mas o texto e o nome
+                            permanecem no histórico de versões do repositório, que é público — apagar esse histórico não
+                            é possível sem reescrever todo o projeto. Estamos
                             mudando a forma como esses depoimentos são armazenados justamente para remover essa
                             limitação. Se esse ponto for decisivo para você, escreva ao nosso Encarregado: avaliamos
                             caso a caso o que é tecnicamente possível e informamos o resultado. Lembramos ainda que o
