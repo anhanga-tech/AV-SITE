@@ -107,11 +107,11 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "faq": [
       {
         "question": "Preciso de visto para ir à Europa depois dos 60?",
-        "answer": "Brasileiro não precisa de visto para turismo de até 90 dias no Espaço Schengen, independentemente da idade. O ETIAS, uma autorização eletrônica online, ainda não está em funcionamento: a previsão é começar no último trimestre de 2026, com período de transição de cerca de seis meses."
+        "answer": "Brasileiro não precisa de visto para turismo no Espaço Schengen, independentemente da idade — a estadia é limitada a 90 dias em cada período de 180. O ETIAS, uma autorização eletrônica online, ainda não está em funcionamento: a previsão é começar no último trimestre de 2026, com período de transição de cerca de seis meses. Para maiores de 70, o pedido é gratuito."
       },
       {
         "question": "Seguro-viagem para quem tem mais de 60 anos custa mais caro?",
-        "answer": "Custa mais porque a idade entra no cálculo de risco, mas a diferença importante é outra: muitos seguros padrão limitam ou excluem condições preexistentes. O essencial é declarar tudo na contratação e conferir a cobertura, não o preço."
+        "answer": "Custa mais porque a idade entra no cálculo de risco, mas a diferença importante é outra: a cobertura para condições preexistentes varia entre planos — alguns cobrem a urgência aguda até o limite contratado, outros limitam ou excluem. O essencial é declarar tudo na contratação e conferir a cobertura, não o preço."
       },
       {
         "question": "Quantos dias é ideal para a primeira viagem à Europa?",
@@ -127,7 +127,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       }
     ],
     "slug": "primeira-viagem-internacional-depois-dos-60",
-    "readingTime": "6 min de leitura"
+    "readingTime": "7 min de leitura"
   },
   {
     "title": "Oktoberfest Blumenau 2026: guia para planejar a viagem",
