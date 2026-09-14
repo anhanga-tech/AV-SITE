@@ -27,7 +27,7 @@ export function PrivacySection9Cookies() {
                 </ul>
                 <h3 className="font-merriweather font-semibold">9.4 Direito de Oposição ao Tratamento Analítico</h3>
                 <p>Nos termos do Art. 18, § 2º, da LGPD, o titular pode opor-se ao tratamento de dados analíticos realizado com base em legítimo interesse. Para exercer esse direito, envie solicitação ao nosso Encarregado pelo e-mail{" "}
-                    <a href="mailto:privacidade@anhanga.tur.br" className="text-primary underline">privacidade@anhanga.tur.br</a>, ou utilize as configurações de bloqueio de cookies do seu navegador, que impedem a coleta analítica neste website.</p>
+                    <a href="mailto:privacidade@anhanga.tur.br" className="text-primary underline">privacidade@anhanga.tur.br</a>, que também atende à oposição às métricas próprias sem cookies descritas na Seção 4.2. O bloqueio de cookies no navegador impede a persistência dos identificadores analíticos, mas não interrompe, por si só, o envio dos eventos ao Google Analytics — feito pelo servidor intermediário descrito na Seção 4.2 — nem a coleta das métricas próprias, que não dependem de cookie. Recebido o pedido de oposição, o Encarregado providencia a exclusão dos registros analíticos já associados ao titular e informa o resultado. Não dispomos hoje de um mecanismo automático que interrompa essa coleta em visitas futuras a partir do navegador; estamos implementando esse controle e, até lá, o pedido é tratado manualmente a cada solicitação.</p>
             </div>
         </section>
     );

@@ -32,6 +32,14 @@ export function PrivacySection5FinalidadesBases() {
                 <h3 className="font-merriweather font-semibold">5.7 Cumprimento de Obrigações Legais</h3>
                 <p><strong>Finalidade:</strong> Atendimento a determinações legais, regulamentares ou de autoridades competentes<br />
                     <strong>Base Legal:</strong> Cumprimento de obrigação legal ou regulatória</p>
+
+                <h3 className="font-merriweather font-semibold">5.8 Segurança e Estabilidade do Website</h3>
+                <p><strong>Finalidade:</strong> Prevenir abuso e envio automatizado de formulários (controle temporário de volume de requisições por endereço IP) e detectar e corrigir falhas técnicas do website<br />
+                    <strong>Base Legal:</strong> Legítimo interesse da controladora (Art. 7º, IX, LGPD)</p>
+
+                <h3 className="font-merriweather font-semibold">5.9 Publicação de Depoimentos de Clientes</h3>
+                <p><strong>Finalidade:</strong> Exibir no website as avaliações que clientes publicaram no nosso perfil do Google, incluindo nome do autor, nota, data, texto da avaliação e foto de perfil<br />
+                    <strong>Base Legal:</strong> Legítimo interesse da controladora (Art. 7º, IX, LGPD) — demonstração da qualidade do serviço a partir de avaliações que o próprio titular tornou públicas, com direito de oposição garantido (ver Seção 8.1)</p>
             </div>
         </section>
     );

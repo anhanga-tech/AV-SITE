@@ -741,9 +741,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "6 min de leitura"
   },
   {
-    "title": "Jalapão em Julho: Roteiro, Custos e Por Que Ir Antes Que Vire Mainstream",
-    "excerpt": "Em julho, os fervedouros do Jalapão estão no melhor momento do ano. Roteiro de 7 dias, custos reais e por que ir antes que o destino mude.",
+    "title": "Jalapão: Roteiro de 7 Dias, Custos Reais e a Melhor Época para Ir",
+    "excerpt": "Na seca (maio a setembro, com pico em julho), os fervedouros do Jalapão estão no melhor momento. Roteiro de 7 dias, custos reais e por que ir agora.",
     "date": "2026-07-04",
+    "dateModified": "2026-09-14",
     "author": "felipe-william",
     "category": "Destinos",
     "image": "https://media.anhanga.tur.br/images/blog/jalapao-julho-roteiro-custos.jpg",
@@ -759,7 +760,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "roteiros-nacionais"
     ],
     "seoTitle": "Jalapão em Julho: Roteiro e Custos",
-    "seoDescription": "Roteiro completo de 7 dias no Jalapão em julho com custos reais, fervedouros, dunas e por que ir agora antes que o destino mude. Guia atualizado 2026.",
+    "seoDescription": "Roteiro de 7 dias no Jalapão na seca (julho é o pico): custos reais, fervedouros, dunas e por que ir agora, antes que o destino vire mainstream.",
     "faq": [
       {
         "question": "Precisa de guia para visitar o Jalapão?",
@@ -1518,7 +1519,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "seoTitle": "Guia de Sobrevivência em Festivais",
     "excerpt": "Estratégias práticas, dicas de alimentação e o kit essencial para aproveitar seu festival de música sem se esgotar no meio do dia.",
     "date": "2026-01-24",
-    "dateModified": "2026-07-16",
+    "dateModified": "2026-09-14",
     "author": "felipe-william",
     "category": "Festivais",
     "image": "https://media.anhanga.tur.br/images/blog/guia-festivais.jpg",
@@ -1548,10 +1549,14 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       {
         "question": "Vale a pena chegar cedo em um festival?",
         "answer": "Sim, principalmente para garantir lugares melhores em shows muito disputados. Chegar cedo também ajuda a se localizar no mapa do evento antes que fique lotado."
+      },
+      {
+        "question": "Quando é o Lollapalooza Brasil 2027?",
+        "answer": "A 14ª edição acontece nos dias 19, 20 e 21 de março de 2027, de novo no Autódromo de Interlagos, em São Paulo. As datas foram anunciadas com bastante antecedência, o que dá tempo de planejar voo e hospedagem antes da alta temporada."
       }
     ],
     "slug": "guia-definitivo-sobrevivencia-festivais",
-    "readingTime": "3 min de leitura"
+    "readingTime": "4 min de leitura"
   },
   {
     "title": "5 segredos da Disney que ninguém conta",
