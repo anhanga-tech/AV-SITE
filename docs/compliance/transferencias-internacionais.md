@@ -8,7 +8,7 @@
 |---|---|
 | **Controlador (exportador)** | Anhangá Turismo Ltda. — CNPJ 37.036.732/0001-41 |
 | **Encarregado (DPO)** | Felipe William Rodrigues Silva — privacidade@anhanga.tur.br |
-| **Versão** | 0.7 |
+| **Versão** | 0.9 |
 | **Data de elaboração** | 11/09/2026 |
 | **Última revisão** | 14/09/2026 |
 | **Status** | Rascunho — levantamento técnico feito a partir do código; evidências contratuais e revisão jurídica **pendentes** |
@@ -55,8 +55,8 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 | Campo | Detalhe |
 |---|---|
 | **Importador** | Google LLC (EUA) |
-| **Serviços em uso** | Gemini API via Google AI Studio (`lib/ai/gemini-config.ts`, provider `google-ai-studio` no AI Gateway); GA4 e Google Ads via Zaraz (`hideOriginalIP`); Google Fonts carregado direto do Google nas landings `BetoCarreroLanding`, `LollapaloozaLanding` e `OrlandoLanding` |
-| **Dados** | Gemini: texto das conversas do chatbot (pode conter nome, datas, destino, orçamento). GA4/Ads: eventos de navegação com identificador pseudonimizado, IP suprimido. **São dois identificadores distintos:** (a) o `client_id` do protocolo, gerado e persistido pelo próprio Zaraz em cookie `HttpOnly` — ilegível por JavaScript de página e já presente no Pageview automático, antes de qualquer código nosso rodar; (b) o cookie próprio `anhanga_ga_cid`, enviado apenas em eventos customizados como propriedade `ga_client_id` (`utils/generate-lead-analytics.ts`), que o Managed Component **não** reconhece como `cid` — logo não unifica a sessão GA4 e é o único dos dois que também é gravado no CRM. Consequência para direitos do titular: um pedido de exclusão alcança o `anhanga_ga_cid` (navegador e CRM), mas o identificador do Zaraz só pode ser tratado pela exclusão de dados no painel do GA4 — `código` + `docs/superpowers/plans/2026-09-01-zaraz-tag-migration.md`; no fluxo Odoo → GA4 (`/api/purchase-dispatch` → `lib/conversions/google.ts`, Measurement Protocol) vão `client_id`, `session_id`, `gclid`, destino, valor e `transaction_id` do negócio ganho. Fonts: IP e user agent do visitante das 3 landings (requisição direta do navegador) |
+| **Serviços em uso** | Gemini API via Google AI Studio (`lib/ai/gemini-config.ts`, provider `google-ai-studio` no AI Gateway); GA4 via Zaraz (`hideOriginalIP`) — a única tool do Google configurada no Zaraz hoje (`docs/superpowers/plans/2026-09-01-zaraz-tag-migration.md`). **Google Ads: previsto, ainda não implementado pelo Zaraz** — o `GOOGLE_ADS_CONVERSION_ID` (`AW-…`) está no `wrangler.toml` mas nenhum código o lê, e a propagação de conversões do GA4 para o Ads depende do link de contas e da marcação de conversão no painel, ambos `a confirmar` (`docs/product/odoo-ads-conversion-decision.md`). O Google Ads já recebe dados como plataforma de campanha (os cliques que trazem `gclid`/`wbraid`/`gbraid`); o que não existe hoje é o envio de conversões por esta via. Google Fonts carregado direto do Google nas landings `BetoCarreroLanding`, `LollapaloozaLanding` e `OrlandoLanding` |
+| **Dados** | Gemini: texto das conversas do chatbot (pode conter nome, datas, destino, orçamento). GA4/Ads: eventos de navegação com identificador pseudonimizado, IP suprimido. **São dois identificadores distintos:** (a) o `client_id` do protocolo, gerado e persistido pelo próprio Zaraz em cookie `HttpOnly` — ilegível por JavaScript de página e já presente no Pageview automático, antes de qualquer código nosso rodar; (b) o cookie próprio `anhanga_ga_cid`, enviado apenas em eventos customizados como propriedade `ga_client_id` (`utils/generate-lead-analytics.ts`), que o Managed Component **não** reconhece como `cid` — logo não unifica a sessão GA4 e é o único dos dois que também é gravado no CRM. Consequência para direitos do titular: um pedido de exclusão alcança o `anhanga_ga_cid` (navegador e CRM), mas o identificador do Zaraz só pode ser tratado pela exclusão de dados no painel do GA4 — `código` + `docs/superpowers/plans/2026-09-01-zaraz-tag-migration.md`; além dos eventos de navegação, os eventos customizados levam **dados de interesse de viagem declarados pelo titular**, ligados aos identificadores persistentes: `destination` (texto livre digitado no formulário, filtrado por `isSafeTrackingValue` contra e-mail/telefone mas não contra outros dados) no `generate_lead` (`utils/generate-lead-analytics.ts`) e o perfil de viajante derivado (`quiz_profile`, `quiz_profile_name`) no `quiz_lead` (`hooks/useQuizCapture.ts`) — `código`. No fluxo Odoo → GA4 (`/api/purchase-dispatch` → `lib/conversions/google.ts`, Measurement Protocol) vão `client_id`, `session_id`, `gclid`, destino, valor e `transaction_id` do negócio ganho. Fonts: IP e user agent do visitante das 3 landings (requisição direta do navegador) |
 | **Finalidade** | Atendimento automatizado (chatbot), mensuração, publicidade; renderização de fontes |
 | **Duração** | GA4: 14 meses (painel). Gemini: `a confirmar` — depende do nível da conta (os termos do nível gratuito do AI Studio permitem uso do conteúdo para melhoria de produto; o nível pago não) |
 | **País/região** | EUA / infraestrutura global — `política do fornecedor` |
@@ -75,6 +75,7 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 | **Importador** | Hipótese: nenhum importador novo — o coletor responde como `traks-collect` em `analytics-collect.anhanga.tur.br` (servido pela Cloudflare) e o Traks se descreve como "self-hosted on Cloudflare, your data in your own account". Se confirmado, o operador é a Cloudflare (2.1) e o Traks é só software — `indício técnico` + `política do fornecedor` |
 | **Dados** | Pageviews (caminho, referrer, largura de tela, UTMs), eventos de conversão, identificador de sessão aleatório em `sessionStorage` (30 min). Sem cookies e sem gate de consentimento — o bloqueio de cookies não impede a coleta — `código` (`index.html`, `utils/traks.ts`). Declarado na política, seção 4.2; oposição por e-mail ao Encarregado (seção 9.4) |
 | **Finalidade** | Mensuração própria de conversões |
+| **Duração** | `a confirmar` no painel do Traks. Os 30 minutos citados acima são só do identificador de sessão no `sessionStorage` do navegador — não dizem nada sobre quanto tempo os pageviews, UTMs e eventos ficam no armazenamento do Worker. A seção 7.1 da política publica 14 meses **com base no GA4**, prazo que não se aplica a este conjunto: definir o próprio na tabela de retenção (#1544) antes de publicá-lo |
 | **País/região** | `a confirmar` — região do banco (D1/Analytics Engine) onde o Worker grava |
 | **Mecanismo art. 33** | Herda o da Cloudflare, se a hipótese se confirmar |
 | **Evidência** | — |
@@ -159,6 +160,17 @@ Requisições feitas direto pelo navegador do visitante, fora do consentimento d
 | Iconify | 5 logos da barra de pesquisa com IA na página inicial | `components/AIResearchBar.tsx` | `a confirmar` | Versionar os SVGs no repositório |
 | Spotify AB | Player de playlist na landing Lollapalooza | `components/landings/lollapalooza/LineupSection.tsx` | Suécia — `política do fornecedor` | Carregar o iframe só após clique (facade) |
 
+Campos de transferência dos três, no formato das entradas de operador — preenchidos na medida do que dá para afirmar:
+
+| Campo | Detalhe |
+|---|---|
+| **Dados** | IP e user agent do visitante, mais o `Referer` da página e a URL do recurso pedido (que revela qual página/destino ele está vendo) — `indício técnico` |
+| **Finalidade** | Exibir o mapa, os ícones e o player |
+| **Duração** | Retenção dos logs de acesso de cada destinatário — `a confirmar` nas políticas públicas; não temos controle nem acesso a esses registros |
+| **Suboperadores** | `a confirmar` — CDNs próprias de cada um |
+| **Mecanismo art. 33** | `não verificado`. Como são controladores independentes (não operadores contratados), não há DPA a arquivar: a hipótese aplicável é o art. 33, IX (transferência necessária à execução de política pública) — inaplicável — ou o consentimento/legítimo interesse do art. 7º combinado com a informação ao titular do art. 9º, V, que é o que a seção 6.1 da política faz. A via que elimina a questão é a mitigação da última coluna |
+| **Evidência** | — |
+
 ### 2.10 WhatsApp (Meta Platforms) — handoff do chatbot e CTAs
 
 | Campo | Detalhe |
@@ -210,7 +222,7 @@ Requisições feitas direto pelo navegador do visitante, fora do consentimento d
 | Fornecedor | Motivo |
 |---|---|
 | ONER Travel | Citado na política (seção 6.1), mas sem integração no código do site. Se houver transferência internacional no fluxo operacional (fora do site), registrar no ROPA (#1547) |
-| Decap CMS (via `unpkg.com`) | `/admin` carrega o Decap CMS de `unpkg.com` (`public/admin/index.html`). Só editores da própria agência usam — não trata dados de clientes nem de visitantes. Registrar no ROPA como tratamento de dados de colaboradores (#1547) |
+| Decap CMS (via `unpkg.com`) | `/admin` carrega o Decap CMS de `unpkg.com` (`public/admin/index.html`), o que revela a esse destinatário o IP e o user agent **do editor** — mesmo caso técnico da seção 2.9. Fica fora desta matriz porque ela cobre os dados de clientes e visitantes do site, e `/admin` é usado só por colaboradores da própria agência; não porque não haja fluxo. Registrar no ROPA como tratamento de dados de colaboradores (#1547) |
 
 ## 3. Fornecedores aposentados
 
@@ -240,12 +252,14 @@ Na coluna **Evidência** de cada fornecedor, registrar o caminho e a versão/dat
 
 ## 5. Pendências — mapa para os critérios de aceite da #1542
 
+O que depende de acesso a painéis, contas e contratos — e portanto não sai da leitura do código — está consolidado em **[#1667](https://github.com/anhanga-tech/AV-SITE/issues/1667)**: os 30 campos `a confirmar` da seção 2, o arquivamento dos DPAs e a revisão do Encarregado fornecedor por fornecedor.
+
 | Critério de aceite | Estado nesta versão | O que falta |
 |---|---|---|
-| Matriz preenchida e revisada fornecedor por fornecedor | Inventário técnico preenchido (seção 2) | Revisão fornecedor por fornecedor pelo DPO |
-| Evidências contratuais armazenadas com acesso controlado e referenciadas | Estrutura definida (seção 4) | Baixar/arquivar os DPAs e preencher a coluna **Evidência** |
-| Países, regiões, suboperadores e mecanismo legal confirmados | Só indícios técnicos e políticas públicas. Também pendente: confirmar se o loop Odoo → Meta/GA4 (`/api/purchase-dispatch`) está ativo — se estiver, declarar na política (2.4) | Odoo: região do banco. Upstash: primário + réplicas. Sentry: região da organização e opção de IP. Cloudflare: cobertura do DPA sobre Zaraz/AI Gateway/R2 e local do armazenamento do Traks. Gemini: nível da conta (gratuito × pago). Listas de suboperadores de todos |
-| Revisão do encarregado/assessoria jurídica registrada | — | Registrar data, responsável e parecer nesta tabela de metadados (campo **Status**) |
+| Matriz preenchida e revisada fornecedor por fornecedor | Inventário técnico preenchido (seção 2) | Revisão fornecedor por fornecedor pelo DPO — [#1667](https://github.com/anhanga-tech/AV-SITE/issues/1667) |
+| Evidências contratuais armazenadas com acesso controlado e referenciadas | Estrutura definida (seção 4) | Baixar/arquivar os DPAs e preencher a coluna **Evidência** — [#1667](https://github.com/anhanga-tech/AV-SITE/issues/1667) |
+| Países, regiões, suboperadores e mecanismo legal confirmados | Só indícios técnicos e políticas públicas. Também pendente: confirmar se o loop Odoo → Meta/GA4 (`/api/purchase-dispatch`) está ativo — se estiver, declarar na política (2.4) | Odoo: região do banco. Upstash: primário + réplicas. Sentry: região da organização e opção de IP. Cloudflare: cobertura do DPA sobre Zaraz/AI Gateway/R2 e local do armazenamento do Traks. Gemini: nível da conta (gratuito × pago). Listas de suboperadores de todos — [#1667](https://github.com/anhanga-tech/AV-SITE/issues/1667) |
+| Revisão do encarregado/assessoria jurídica registrada | — | Registrar data, responsável e parecer nesta tabela de metadados (campo **Status**) — [#1667](https://github.com/anhanga-tech/AV-SITE/issues/1667) |
 | Legítimo interesse da seção 5.8 avaliado e registrado | Base legal decidida pelo Encarregado em 14/09/2026 e publicada na seção 5.8; o RIPD (`ripd-legitimo-interesse.md`) ainda não traz a atividade de segurança/estabilidade | Rodar e registrar no RIPD o teste de legítimo interesse (finalidade, necessidade, balanceamento e salvaguardas) para a prevenção de abuso por IP e o monitoramento de erros — [#1665](https://github.com/anhanga-tech/AV-SITE/issues/1665) |
 | Minimização das transferências identificadas | Issues abertas para todos os achados: Google Fonts ([#1641](https://github.com/anhanga-tech/AV-SITE/issues/1641)), IP em claro no Upstash/Sentry ([#1642](https://github.com/anhanga-tech/AV-SITE/issues/1642)), handoff de WhatsApp ([#1661](https://github.com/anhanga-tech/AV-SITE/issues/1661)) e texto livre nos logs do Sentry ([#1662](https://github.com/anhanga-tech/AV-SITE/issues/1662)) | Implementar as correções |
 | Oposição ao tratamento analítico efetivamente aplicável | A política informa o canal de oposição (9.4) e o Encarregado trata o pedido manualmente | Não há mecanismo durável que faça o Traks e o Zaraz pararem de coletar em visitas futuras do mesmo titular: o Traks é injetado em todo host de produção (`index.html`) e o GA4 roda sem purpose no Zaraz. Opt-out persistente honrado pelos dois coletores em [#1663](https://github.com/anhanga-tech/AV-SITE/issues/1663) |
@@ -256,6 +270,8 @@ Na coluna **Evidência** de cada fornecedor, registrar o caminho e a versão/dat
 
 | Versão | Data | Alteração |
 |---|---|---|
+| 0.9 | 14/09/2026 | Pendências que dependem de confirmação externa consolidadas na [#1667](https://github.com/anhanga-tech/AV-SITE/issues/1667) (30 campos `a confirmar`, DPAs e revisão do Encarregado), encerrando o escopo desta PR no levantamento técnico |
+| 0.8 | 14/09/2026 | Sexta rodada de review da PR #1640: Google Ads reclassificado como previsto, não ativo pelo Zaraz (2.2); preferências de viagem enviadas ao GA4 inventariadas (2.2); campo `Duração` criado para o Traks (2.3); campos de transferência dos destinatários independentes preenchidos (2.9); escopo da exclusão do Decap CMS explicitado (2.13) |
 | 0.7 | 14/09/2026 | Quinta rodada de review da PR #1640: fotos de perfil dos depoimentos no R2 inventariadas (2.1) e incluídas no achado de exclusão (2.11); achado P1 da credencial do convite NPS na query string enviada ao GA4 ([#1666](https://github.com/anhanga-tech/AV-SITE/issues/1666)); Meta e TikTok e a foto do depoimento incluídos na página de exclusão; atividade 5.9 (publicação de depoimentos) criada na política |
 | 0.6 | 14/09/2026 | Pendências dos achados convertidas em issues rastreáveis: #1661 (handoff de WhatsApp), #1662 (texto livre nos logs do Sentry), #1663 (opt-out do tratamento analítico), #1664 (depoimentos no histórico do Git) e #1665 (RIPD da seção 5.8) |
 | 0.5 | 14/09/2026 | Quarta rodada de review da PR #1640: Outscraper inventariada como coletora dos depoimentos (2.12); IP em claro no Sentry reclassificado como caminho rotineiro de rate limit, não exceção de falha do Upstash (2.7); Google Fonts e depoimentos declarados na política; Bélgica incluída nos destinos da 10.1; pendência do RIPD para a base legal da 5.8 |

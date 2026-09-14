@@ -68,7 +68,7 @@ const ExclusaoDados = () => (
                                         <td className="py-2">Odoo CRM. As mensagens também são processadas pelo Google Gemini (Google LLC), e a eventual retenção delas pelo Google segue os termos desse fornecedor</td>
                                     </tr>
                                     <tr>
-                                        <td className="py-2 pr-4">Dados de rastreamento (UTM, clique em anúncios) associados ao seu perfil</td>
+                                        <td className="py-2 pr-4">Dados de rastreamento (UTM, clique em anúncios) e as preferências de viagem que você informou — o destino digitado no formulário e o perfil de viajante do quiz —, associados ao seu perfil</td>
                                         <td className="py-2">Google Analytics 4 (via Cloudflare Zaraz) e Odoo CRM. A exclusão no Google Analytics é feita pelo painel da ferramenta, que também descarta esses eventos automaticamente após 14 meses. Se você havia consentido com cookies de marketing, a conversão também foi enviada ao Meta e ao TikTok — nesses casos solicitamos a exclusão pelos canais de titular de cada plataforma e informamos o retorno, já que a remoção depende delas</td>
                                     </tr>
                                     <tr>
