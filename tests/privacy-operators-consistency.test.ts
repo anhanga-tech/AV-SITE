@@ -27,6 +27,8 @@ const ACTIVE_OPERATORS = [
   'Cal.com, Inc.',
   // Handoff do chatbot e CTAs de WhatsApp (seção 2.10 da matriz).
   'WhatsApp Ireland Ltd.',
+  // Repositório, OAuth do CMS e publicação dos depoimentos (seção 2.11 da matriz).
+  'GitHub, Inc.',
   // Conteúdo de terceiros carregado no navegador (seção 2.9 da matriz).
   'OpenStreetMap Foundation',
   'Iconify',

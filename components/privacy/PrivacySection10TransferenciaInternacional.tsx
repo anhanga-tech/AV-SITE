@@ -4,13 +4,15 @@ export function PrivacySection10TransferenciaInternacional() {
             <h2 className="text-xl md:text-2xl font-merriweather font-semibold">10. Transferência Internacional de Dados</h2>
             <div className="space-y-2 font-inter text-muted-foreground">
                 <h3 className="font-merriweather font-semibold">10.1 Âmbito das Transferências</h3>
-                <p>Parte dos prestadores listados na Seção 6.1 são empresas sediadas no exterior, em sua maioria nos Estados Unidos, e podem tratar dados pessoais fora do Brasil. Por isso, podem ocorrer transferências internacionais no contexto de:</p>
+                <p>Parte dos prestadores listados na Seção 6.1 são empresas sediadas no exterior — em sua maioria nos Estados Unidos, além da Irlanda (WhatsApp), do Reino Unido, da Suécia e de Singapura — e podem tratar dados pessoais fora do Brasil, inclusive em infraestrutura distribuída globalmente. Por isso, podem ocorrer transferências internacionais no contexto de:</p>
                 <ul className="list-disc pl-6 space-y-1">
                     <li>Hospedagem do website e serviços de nuvem</li>
                     <li>Atendimento pelo assistente virtual de viagens</li>
                     <li>Ferramentas de analytics e marketing digital</li>
                     <li>Gestão de relacionamento com clientes (CRM)</li>
                     <li>Monitoramento de erros, prevenção de abuso e agendamento</li>
+                    <li>Continuidade do atendimento por WhatsApp: ao clicar em nossos botões de WhatsApp, o link abre a conversa com uma mensagem já preenchida — no encaminhamento do assistente virtual, com o e-mail informado e os dados da viagem pesquisada —, o que transmite esses dados à Meta antes de a conversa começar. Execução do atendimento solicitado pelo titular (Art. 7º, V, LGPD)</li>
+                    <li>Hospedagem do código do website e publicação dos depoimentos de clientes</li>
                 </ul>
                 <h3 className="font-merriweather font-semibold">10.2 Garantias</h3>
                 <p>As transferências internacionais devem estar amparadas em uma das hipóteses do art. 33 da LGPD. A Anhangá Turismo está consolidando o inventário dos fornecedores, dos países de destino e do mecanismo aplicável a cada um, com a revisão dos respectivos instrumentos contratuais.</p>

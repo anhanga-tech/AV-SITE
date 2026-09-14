@@ -4,8 +4,8 @@ import { WebPageSchema } from "@/components/schemas/WebPageSchema";
 
 const CANONICAL = "https://www.anhanga.tur.br/exclusao-de-dados/";
 const DESCRIPTION = "Instruções para solicitar a exclusão de dados pessoais junto à Anhangá Turismo, conforme a LGPD (Lei nº 13.709/2018).";
-const UPDATED = "11 de setembro de 2026";
-const UPDATED_ISO = "2026-09-11";
+const UPDATED = "14 de setembro de 2026";
+const UPDATED_ISO = "2026-09-14";
 
 const ExclusaoDados = () => (
     <>
@@ -69,7 +69,7 @@ const ExclusaoDados = () => (
                                     </tr>
                                     <tr>
                                         <td className="py-2 pr-4">Dados de rastreamento (UTM, clique em anúncios) associados ao seu perfil</td>
-                                        <td className="py-2">Google Analytics 4 (via Cloudflare Zaraz) e Odoo CRM</td>
+                                        <td className="py-2">Google Analytics 4 (via Cloudflare Zaraz) e Odoo CRM. A exclusão no Google Analytics é feita pelo painel da ferramenta, que também descarta esses eventos automaticamente após 14 meses</td>
                                     </tr>
                                     <tr>
                                         <td className="py-2 pr-4">Nome, e-mail, observações, horário e dados de campanha de consultorias agendadas pelo website</td>
@@ -79,6 +79,10 @@ const ExclusaoDados = () => (
                                         <td className="py-2 pr-4">Cookies de identificação persistentes</td>
                                         <td className="py-2">Navegador do usuário (instrução de remoção enviada)</td>
                                     </tr>
+                                    <tr>
+                                        <td className="py-2 pr-4">Registros de erro do website que eventualmente contenham o que você digitou em um formulário (por exemplo, o destino pesquisado) e o endereço IP da requisição</td>
+                                        <td className="py-2">Sentry (Functional Software, Inc.), quando houver registro associado à sua solicitação</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -87,6 +91,13 @@ const ExclusaoDados = () => (
                             dos sistemas de CRM que usávamos até então, ainda em processo de encerramento: seus
                             dados são localizados e removidos nelas da mesma forma, e a conclusão é informada na
                             resposta ao seu pedido.
+                        </p>
+                        <p>
+                            Uma ressalva de transparência: o servidor intermediário que envia os eventos ao Google
+                            Analytics cria um identificador próprio, guardado em cookie que nenhum código da página
+                            consegue ler. Ele não é associado ao seu cadastro e é tratado pela exclusão no painel do
+                            Google Analytics e pelo descarte automático citado acima, não pela remoção dos cookies do
+                            seu navegador.
                         </p>
                     </div>
                 </section>

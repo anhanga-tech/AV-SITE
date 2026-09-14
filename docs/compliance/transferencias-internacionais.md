@@ -8,8 +8,9 @@
 |---|---|
 | **Controlador (exportador)** | Anhangá Turismo Ltda. — CNPJ 37.036.732/0001-41 |
 | **Encarregado (DPO)** | Felipe William Rodrigues Silva — privacidade@anhanga.tur.br |
-| **Versão** | 0.3 |
+| **Versão** | 0.4 |
 | **Data de elaboração** | 11/09/2026 |
+| **Última revisão** | 14/09/2026 |
 | **Status** | Rascunho — levantamento técnico feito a partir do código; evidências contratuais e revisão jurídica **pendentes** |
 | **Issue** | [#1542](https://github.com/anhanga-tech/AV-SITE/issues/1542) (achados LGPD-04 e LGPD-05 da auditoria de 28/08/2026) |
 | **Documentos relacionados** | [`ripd-legitimo-interesse.md`](./ripd-legitimo-interesse.md) · Política de Privacidade (`components/privacy/`, seções 5 a 8 e 10) · `pages/ExclusaoDados.tsx` |
@@ -40,8 +41,8 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 | Campo | Detalhe |
 |---|---|
 | **Importador** | Cloudflare, Inc. (EUA) |
-| **Serviços em uso** | Pages + Pages Functions (site e `api/*`), Zaraz (tags server-side), R2 (`media.anhanga.tur.br`), AI Gateway (proxy das chamadas ao Gemini), Worker de coleta do Traks (ver 2.3) |
-| **Dados** | IP e cabeçalhos de toda requisição; corpo dos formulários (lead, contato, quiz, waitlist, NPS) em trânsito pelas Functions; conversa do chatbot em trânsito pelo AI Gateway; eventos de navegação/conversão via Zaraz |
+| **Serviços em uso** | Pages + Pages Functions (site e `api/*`), Zaraz (tags server-side), R2 (`media.anhanga.tur.br`), AI Gateway (proxy das chamadas ao Gemini), Worker de coleta do Traks (ver 2.3), **Web Analytics (beacon RUM de zona)** — ativo após a mudança de 10/09/2026, servido pelo próprio domínio e disparando `POST /cdn-cgi/rum` no carregamento e no `pagehide` (`docs/ops/cloudflare-rules.md`) |
+| **Dados** | IP e cabeçalhos de toda requisição; corpo dos formulários (lead, contato, quiz, waitlist, NPS) em trânsito pelas Functions; conversa do chatbot em trânsito pelo AI Gateway; eventos de navegação/conversão via Zaraz. **Web Analytics (RUM):** página visitada, referrer, dados técnicos do navegador e métricas de Core Web Vitals, sem cookie e sem identificador que persista entre visitas — coleta que ocorre **fora do aviso de cookies**, no mesmo caso do Traks (2.3) — `código`/`indício técnico` |
 | **Finalidade** | Hospedagem, entrega, segurança, mensuração e intermediação server-side de conversões |
 | **Duração** | Contínua enquanto houver contrato. AI Gateway configurado **sem** persistir prompt/resposta (cabeçalho `cf-aig-collect-log-payload: false` enviado em `lib/ai/gemini-config.ts`) — `código` |
 | **País/região** | Rede global (processamento no PoP mais próximo; requisições brasileiras observadas em GRU) — `indício técnico`. Região de armazenamento de R2/D1/logs — `a confirmar` |
@@ -172,12 +173,28 @@ Requisições feitas direto pelo navegador do visitante, fora do consentimento d
 
 > **Achado:** a mensagem pré-preenchida do handoff leva o e-mail e o roteiro do titular na URL, transferindo dado pessoal à Meta mesmo que a conversa nunca seja iniciada. Minimizar — por exemplo, um identificador de atendimento em vez dos campos em claro, já que o lead está no CRM — reduz a transferência sem perder o contexto do atendente. Abrir issue de minimização (pendência da seção 5).
 
-### 2.11 Fora do escopo desta matriz (sem fluxo de dados pelo site)
+### 2.11 GitHub, Inc. — repositório, OAuth do CMS e publicação dos depoimentos
+
+| Campo | Detalhe |
+|---|---|
+| **Importador** | GitHub, Inc. (EUA), subsidiária da Microsoft |
+| **Serviços em uso** | Hospedagem do repositório e CI; OAuth do Decap CMS (`api/auth.ts`); workflow agendado `refresh-reviews.yml`, que busca os reviews do Google e abre PR com o resultado |
+| **Dados** | Dados de colaboradores (contas dos editores no OAuth). **Depoimentos do Google:** `data/googleReviews.json` contém nome do autor, identificador estável do review, nota, data e o texto livre do depoimento — enviado como artefato do workflow e **commitado no repositório, que é público** (`.github/workflows/refresh-reviews.yml`) — `código`. São dados que o próprio titular publicou no Google Maps, mas a cópia versionada é tratamento nosso |
+| **Finalidade** | Desenvolvimento e operação do site; exibição dos depoimentos na página inicial |
+| **Duração** | Artefato do workflow: 1 dia (`retention-days: 1`). Cópia no repositório: indefinida — permanece no histórico do Git mesmo após remoção do arquivo — `código` |
+| **País/região** | EUA / infraestrutura global — `política do fornecedor` |
+| **Suboperadores** | `a confirmar` |
+| **Mecanismo art. 33** | `não verificado`. Arquivar o GitHub DPA (Data Protection Agreement dos termos corporativos) |
+| **Evidência** | — |
+
+> **Achado:** um pedido de exclusão de um autor de review não é atendível por completo enquanto o nome e o texto estiverem no histórico do Git de um repositório público — remover o arquivo não apaga os commits anteriores. Avaliar mover os depoimentos para fora do repositório (R2, que já serve a mídia, ou busca em tempo de build sem commit) antes de tratar um pedido desse tipo. Pendência na seção 5.
+
+### 2.12 Fora do escopo desta matriz (sem fluxo de dados pelo site)
 
 | Fornecedor | Motivo |
 |---|---|
 | ONER Travel | Citado na política (seção 6.1), mas sem integração no código do site. Se houver transferência internacional no fluxo operacional (fora do site), registrar no ROPA (#1547) |
-| Decap CMS (via `unpkg.com`) e GitHub, Inc. | `/admin` carrega o Decap CMS de `unpkg.com` e autentica por OAuth no GitHub (`public/admin/index.html`, `api/auth.ts`). Só editores da própria agência usam — não trata dados de clientes nem de visitantes. Registrar no ROPA como tratamento de dados de colaboradores (#1547) |
+| Decap CMS (via `unpkg.com`) | `/admin` carrega o Decap CMS de `unpkg.com` (`public/admin/index.html`). Só editores da própria agência usam — não trata dados de clientes nem de visitantes. Registrar no ROPA como tratamento de dados de colaboradores (#1547) |
 
 ## 3. Fornecedores aposentados
 
@@ -214,13 +231,15 @@ Na coluna **Evidência** de cada fornecedor, registrar o caminho e a versão/dat
 | Países, regiões, suboperadores e mecanismo legal confirmados | Só indícios técnicos e políticas públicas. Também pendente: confirmar se o loop Odoo → Meta/GA4 (`/api/purchase-dispatch`) está ativo — se estiver, declarar na política (2.4) | Odoo: região do banco. Upstash: primário + réplicas. Sentry: região da organização e opção de IP. Cloudflare: cobertura do DPA sobre Zaraz/AI Gateway/R2 e local do armazenamento do Traks. Gemini: nível da conta (gratuito × pago). Listas de suboperadores de todos |
 | Revisão do encarregado/assessoria jurídica registrada | — | Registrar data, responsável e parecer nesta tabela de metadados (campo **Status**) |
 | Minimização das transferências identificadas | Issues abertas para Google Fonts (#1641) e IP em claro no Upstash/Sentry (#1642) | Abrir issue para o handoff de WhatsApp (e-mail e roteiro do titular na URL `wa.me`, seção 2.10) e para o texto livre não redigido nos logs enviados ao Sentry (`destination`/UTMs, seção 2.7) |
+| Oposição ao tratamento analítico efetivamente aplicável | A política informa o canal de oposição (9.4) e o Encarregado trata o pedido manualmente | Não há mecanismo durável que faça o Traks e o Zaraz pararem de coletar em visitas futuras do mesmo titular: o Traks é injetado em todo host de produção (`index.html`) e o GA4 roda sem purpose no Zaraz. Abrir issue para um opt-out persistente honrado pelos dois coletores |
+| Exclusão dos depoimentos publicados pelo workflow | — | O nome e o texto dos reviews ficam no histórico do Git de um repositório público (2.11); definir onde passarão a viver antes de um pedido de exclusão de autor de review |
 | Política pública consistente com as evidências | Afirmações não comprovadas removidas da seção 10; operadores faltantes incluídos na seção 6.1; finalidade de segurança/estabilidade declarada na seção 5.8 (base legal proposta: legítimo interesse — validar com o DPO e incluir no RIPD); página `/exclusao-dados` atualizada de Salesforce/GTM para Odoo/Zaraz | Reescrever a seção 10 citando o mecanismo concreto quando as evidências chegarem |
 
 ## 6. Histórico
 
 | Versão | Data | Alteração |
 |---|---|---|
+| 0.4 | 14/09/2026 | Terceira rodada de review da PR #1640: WhatsApp sai de "fora do escopo" e ganha inventário próprio (2.10) pelos campos do titular na URL do handoff; os dois identificadores de cliente do GA4 separados (2.2); lock de idempotência do Odoo registrado no Upstash (2.6); mascaramento do logger qualificado como filtro por nome de campo (2.7); beacon do Cloudflare Web Analytics inventariado (2.1); publicação automática dos reviews do Google pelo GitHub inventariada (2.11) |
 | 0.3 | 11/09/2026 | Segunda rodada de review: Traks declarado na política, registro de convite NPS no Upstash, empresa/cargo/indicação no Odoo, Cal.com na página de exclusão, CMS fora do escopo |
 | 0.2 | 11/09/2026 | Achados do review da PR #1640: conteúdo de terceiros no navegador (2.9), dados do loop Odoo → Meta/GA4, respostas livres do NPS no Odoo, metadados de atribuição no Cal.com, IP em claro nos logs enviados ao Sentry |
-| 0.3 | 14/09/2026 | Segunda rodada de review da PR #1640: WhatsApp sai de "fora do escopo" e ganha inventário próprio (2.10) por causa dos campos do titular na URL do handoff; os dois identificadores de cliente do GA4 separados (2.2); lock de idempotência do Odoo registrado no Upstash (2.6); mascaramento do logger qualificado como filtro por nome de campo (2.7) |
 | 0.1 | 11/09/2026 | Levantamento inicial a partir do código e de verificações técnicas (DNS/IP). Os arquivos citados pela issue (`docs/privacy/transferencias-internacionais.md`, `docs/audits/lgpd-site-2026-08-28.md`) não existem no repositório — este documento substitui o "modelo inicial" |
