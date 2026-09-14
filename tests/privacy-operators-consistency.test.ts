@@ -13,39 +13,111 @@ const read = (rel: string) => fs.readFileSync(path.resolve(ROOT, rel), 'utf8');
 
 const SHARING = read('components/privacy/PrivacySection6Compartilhamento.tsx');
 const TRANSFER = read('components/privacy/PrivacySection10TransferenciaInternacional.tsx');
+const MATRIX = read('docs/compliance/transferencias-internacionais.md');
 
-// Um por seção "2.x" da matriz. Ao adicionar ou aposentar um operador na matriz,
-// atualize esta lista e a seção 6.1 no mesmo PR.
-const ACTIVE_OPERATORS = [
-  'Cloudflare, Inc.',
-  'Google LLC',
-  'Meta Platforms, Inc.',
-  'TikTok Pte. Ltd.',
-  'Odoo S.A.',
-  'Upstash, Inc.',
-  'Functional Software, Inc.',
-  'Cal.com, Inc.',
-  // Handoff do chatbot e CTAs de WhatsApp (seção 2.10 da matriz).
-  'WhatsApp Ireland Ltd.',
-  // Repositório, OAuth do CMS e publicação dos depoimentos (seção 2.11 da matriz).
-  'GitHub, Inc.',
-  // Coleta dos depoimentos do Google (seção 2.12 da matriz).
-  'Outscraper',
-  // Conteúdo de terceiros carregado no navegador (seção 2.9 da matriz).
-  'OpenStreetMap Foundation',
-  'Iconify',
-  'Spotify AB',
-];
+// A lista de operadores é DERIVADA da matriz, não mantida à mão. Uma terceira
+// cópia manual deixava os dois testes verdes quando um operador entrava só na
+// matriz, que é o oposto do invariante prometido (achado de review,
+// chatgpt-codex-connector[bot]).
+//
+// Só a seção 2 conta: um `MATRIX.includes(nome)` cru casaria também com a seção 3
+// (fornecedores aposentados) e com o histórico, então um operador *removido* da
+// matriz continuaria "presente" pela própria menção da aposentadoria.
+function activeMatrixSection(): string {
+  const start = MATRIX.indexOf('## 2. Matriz de operadores ativos');
+  const end = MATRIX.indexOf('## 3. Fornecedores aposentados');
+  assert.ok(start >= 0 && end > start, 'seções 2 e 3 da matriz não localizadas — o parser precisa ser revisto');
+  return MATRIX.slice(start, end);
+}
+
+/** Subseções `### 2.x` que descrevem fluxo sem nomear um fornecedor próprio. */
+const NON_OPERATOR_HEADINGS = /^(Conteúdo de terceiros|Fora do escopo)/;
+
+/**
+ * Entradas da matriz que não são destinatários a declarar na seção 6.1, com o
+ * motivo. Uma entrada nova na matriz que não esteja aqui **precisa** aparecer na
+ * política, ou o teste falha — é isso que garante o invariante.
+ */
+const NOT_A_RECIPIENT: Record<string, string> = {
+  'Traks (software de analytics self-hosted)':
+    'software rodando na conta Cloudflare da própria controladora (seção 2.3): o operador é a Cloudflare, já declarada',
+};
+
+/**
+ * Nome usado na matriz -> nome(s) esperado(s) na seção 6.1, quando os dois
+ * diferem. A matriz usa o nome do grupo ou do serviço; a política precisa da
+ * entidade. Alias ausente = teste falha apontando o nome extraído, então
+ * esquecer de mapear é ruidoso, nunca silencioso.
+ */
+const POLICY_ALIASES: Record<string, string[]> = {
+  'Meta Platforms, Inc. e TikTok Pte. Ltd.': ['Meta Platforms, Inc.', 'TikTok Pte. Ltd.'],
+  'WhatsApp (Meta Platforms)': ['WhatsApp Ireland Ltd.'],
+  'Functional Software, Inc. (Sentry)': ['Functional Software, Inc.'],
+  'unpkg (Cloudflare)': ['unpkg'],
+};
+
+function policyNamesFor(matrixName: string): string[] {
+  return POLICY_ALIASES[matrixName] ?? [matrixName];
+}
+
+/** Operadores com título próprio: `### 2.x <Nome> — <escopo>`. */
+function operatorsFromHeadings(): string[] {
+  const names: string[] = [];
+  for (const [, title] of activeMatrixSection().matchAll(/^### 2\.\d+ (.+)$/gm)) {
+    if (NON_OPERATOR_HEADINGS.test(title)) continue;
+    // O travessão separa o nome do escopo: "Google LLC — Gemini, GA4, …".
+    names.push(title.split('—')[0].trim());
+  }
+  return names;
+}
+
+/**
+ * Destinatários da tabela da seção 2.9 (requisições diretas do navegador), que
+ * não têm título próprio. Lê a primeira coluna das linhas de dados.
+ */
+function browserRecipients(): string[] {
+  const section = activeMatrixSection();
+  const start = section.indexOf('### 2.9 ');
+  const end = section.indexOf('### 2.10 ');
+  assert.ok(start >= 0 && end > start, 'seção 2.9 da matriz não localizada — o parser precisa ser revisto');
+  const table = section.slice(start, end);
+  const names: string[] = [];
+  for (const [, cell] of table.matchAll(/^\| ([^|]+?) \|/gm)) {
+    const name = cell.trim();
+    // Cabeçalhos, separadores e a tabela de campos que segue a dos destinatários.
+    if (!name || /^(Destinatário|Fornecedor|Campo|-+|:?-+:?)$/.test(name)) continue;
+    if (name.startsWith('**')) continue;
+    names.push(name);
+  }
+  return names;
+}
+
+const MATRIX_ENTRIES = [...operatorsFromHeadings(), ...browserRecipients()];
+const ACTIVE_OPERATORS = MATRIX_ENTRIES.filter((name) => !(name in NOT_A_RECIPIENT)).flatMap(policyNamesFor);
+
+test('o parser encontra os operadores declarados na matriz', () => {
+  // Sem isto, uma renomeação de seção ou mudança de formato da tabela faria os
+  // testes abaixo virarem no-op silencioso em vez de falhar.
+  assert.ok(
+    MATRIX_ENTRIES.length >= 12,
+    `o parser extraiu só ${MATRIX_ENTRIES.length} entradas da seção 2 — o formato mudou?`
+  );
+  for (const name of MATRIX_ENTRIES) {
+    assert.ok(name.length > 2 && !name.includes('|'), `nome suspeito extraído da matriz: "${name}"`);
+  }
+});
 
 test('seção 6.1 da política lista todos os operadores ativos da matriz', () => {
   const missing = ACTIVE_OPERATORS.filter((name) => !SHARING.includes(name));
   assert.deepEqual(missing, [], `operadores ausentes da seção 6.1: ${missing.join(', ')}`);
 });
 
-test('matriz de transferências internacionais cobre os mesmos operadores', () => {
-  const matrix = read('docs/compliance/transferencias-internacionais.md');
-  const missing = ACTIVE_OPERATORS.filter((name) => !matrix.includes(name));
-  assert.deepEqual(missing, [], `operadores ausentes da matriz: ${missing.join(', ')}`);
+test('todo alias e exclusão aponta para um nome que a matriz realmente usa', () => {
+  // Órfão indica que a matriz renomeou a entrada e o mapa ficou para trás.
+  const orphans = Object.keys(POLICY_ALIASES).filter((name) => !MATRIX_ENTRIES.includes(name));
+  assert.deepEqual(orphans, [], `aliases sem entrada correspondente na matriz: ${orphans.join(', ')}`);
+  const stale = Object.keys(NOT_A_RECIPIENT).filter((name) => !MATRIX_ENTRIES.includes(name));
+  assert.deepEqual(stale, [], `exclusões sem entrada na matriz: ${stale.join(', ')}`);
 });
 
 // Afirmações removidas por falta de evidência. Só devem voltar à política quando a

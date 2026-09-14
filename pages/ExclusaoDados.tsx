@@ -106,9 +106,11 @@ const ExclusaoDados = () => (
                         </p>
                         <p>
                             Outra ressalva, sobre depoimentos: retiramos o seu depoimento do website e da versão atual
-                            do código, e apagamos a foto de perfil do nosso armazenamento de mídia, mas o texto e o nome
-                            permanecem no histórico de versões do repositório, que é público — apagar esse histórico não
-                            é possível sem reescrever todo o projeto. Estamos
+                            do código, mas duas cópias exigem tratamento manual e podem levar mais tempo — o texto e o
+                            nome permanecem no histórico de versões do repositório, que é público, e apagar esse
+                            histórico não é possível sem reescrever todo o projeto; a foto de perfil fica no nosso
+                            armazenamento de mídia até ser removida a pedido, porque ainda não temos rotina automática
+                            para isso. Estamos
                             mudando a forma como esses depoimentos são armazenados justamente para remover essa
                             limitação. Se esse ponto for decisivo para você, escreva ao nosso Encarregado: avaliamos
                             caso a caso o que é tecnicamente possível e informamos o resultado. Lembramos ainda que o

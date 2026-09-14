@@ -8,7 +8,7 @@
 |---|---|
 | **Controlador (exportador)** | Anhangá Turismo Ltda. — CNPJ 37.036.732/0001-41 |
 | **Encarregado (DPO)** | Felipe William Rodrigues Silva — privacidade@anhanga.tur.br |
-| **Versão** | 0.9 |
+| **Versão** | 0.10 |
 | **Data de elaboração** | 11/09/2026 |
 | **Última revisão** | 14/09/2026 |
 | **Status** | Rascunho — levantamento técnico feito a partir do código; evidências contratuais e revisão jurídica **pendentes** |
@@ -130,7 +130,7 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 |---|---|
 | **Importador** | Functional Software, Inc. (EUA) |
 | **Serviços em uso** | Sentry no navegador (`lib/sentry-client.ts`) e nas Functions (`functions/_middleware.ts`), 10% de amostragem de transações, logs de console |
-| **Dados** | Stack traces, URL (credenciais do convite NPS removidas por `scrubEventUrls`), user agent, logs estruturados. **O mascaramento do logger é por nome de campo, não por conteúdo:** `sanitizeForErrorTracking` (`lib/error-tracking.ts`) só redige chaves que casam com `SENSITIVE_KEY_PATTERN` (e-mail, telefone, token, cookie, senha, assinatura etc.) e deixa em claro o valor de qualquer outra chave. Campos de texto livre preenchidos pelo titular chegam ao Sentry sem redação — por exemplo `destination` e os UTMs nos payloads de sucesso e de erro de `api/submit-lead.ts`, que carregam o que a pessoa digitou no formulário — `código`. Correção em [#1662](https://github.com/anhanga-tech/AV-SITE/issues/1662). **IP:** o SDK não liga `sendDefaultPii`, mas o Sentry infere o IP da requisição de ingestão a menos que a opção "Prevent Storing of IP Addresses" esteja ativa no projeto — `a confirmar`. Além disso, o `SENSITIVE_KEY_PATTERN` de `lib/error-tracking.ts` não cobre campos de IP e a integração de console do Sentry captura `log`, `warn` e `error` (`functions/_middleware.ts`), então o **IP em claro chega ao Sentry como atributo de log** independentemente daquela opção, por dois caminhos — `código`: (a) **rotineiro**, sempre que qualquer um dos formulários bate no rate limit, `lib/n8n-submit-handler.ts` registra `clientIp` em `logger.warn` (estágio `rate_limited`) — ou seja, tráfego 429 comum, não só incidente; (b) quando o Upstash falha, `lib/rate-limit.ts` registra `clientIP` em `logger.error`. Correção em [#1642](https://github.com/anhanga-tech/AV-SITE/issues/1642) |
+| **Dados** | Stack traces, URL (credenciais do convite NPS removidas por `scrubEventUrls`), user agent, logs estruturados. **O mascaramento do logger é por nome de campo, não por conteúdo:** `sanitizeForErrorTracking` (`lib/error-tracking.ts`) só redige chaves que casam com `SENSITIVE_KEY_PATTERN` (e-mail, telefone, token, cookie, senha, assinatura etc.) e deixa em claro o valor de qualquer outra chave. Campos de texto livre preenchidos pelo titular chegam ao Sentry sem redação — por exemplo `destination` e os UTMs nos payloads de sucesso e de erro de `api/submit-lead.ts`, que carregam o que a pessoa digitou no formulário — `código`. Correção em [#1662](https://github.com/anhanga-tech/AV-SITE/issues/1662). **IP:** o SDK não liga `sendDefaultPii`, mas o Sentry infere o IP da requisição de ingestão a menos que a opção "Prevent Storing of IP Addresses" esteja ativa no projeto — `a confirmar`. Além disso, o `SENSITIVE_KEY_PATTERN` de `lib/error-tracking.ts` não cobre campos de IP e a integração de console do Sentry captura `log`, `warn` e `error` (`functions/_middleware.ts`), então o **IP em claro chega ao Sentry como atributo de log** independentemente daquela opção, por dois caminhos — `código`: (a) **rotineiro**, sempre que qualquer endpoint bate no rate limit — os 5 formulários e o `purchase-dispatch` via `lib/n8n-submit-handler.ts` (estágio `rate_limited`), o chatbot em `api/generate.ts` (escopo `RATE_LIMIT`) e o `api/markdown.ts` (escopo `RATE_LIMIT:markdown`) registram `clientIP` em `logger.warn` — ou seja, tráfego 429 comum de todos os endpoints públicos, não só de formulário e não só incidente; (b) quando o Upstash falha, `lib/rate-limit.ts` registra `clientIP` em `logger.error`. Correção em [#1642](https://github.com/anhanga-tech/AV-SITE/issues/1642) |
 | **Finalidade** | Detecção e correção de falhas |
 | **Duração** | Retenção do plano Sentry — `a confirmar`; definir na tabela de retenção (#1544) antes de publicar prazo na política |
 | **País/região** | Região da organização (US ou DE) — `a confirmar` pelo host de ingestão do DSN (o DSN não está no repositório) |
@@ -159,6 +159,7 @@ Requisições feitas direto pelo navegador do visitante, fora do consentimento d
 | OpenStreetMap Foundation | Mapas das páginas de destinos e da landing Lollapalooza (tiles) | `components/destinations/useDestinationMap.ts`, `components/landings/lollapalooza/VenueMap.tsx` | Reino Unido — `política do fornecedor` | Carregar o mapa só após interação, ou servir tiles por proxy próprio |
 | Iconify | 5 logos da barra de pesquisa com IA na página inicial | `components/AIResearchBar.tsx` | `a confirmar` | Versionar os SVGs no repositório |
 | Spotify AB | Player de playlist na landing Lollapalooza | `components/landings/lollapalooza/LineupSection.tsx` | Suécia — `política do fornecedor` | Carregar o iframe só após clique (facade) |
+| unpkg (Cloudflare) | Bundle do Decap CMS em `/admin/` — rota **publicamente acessível**: qualquer visitante ou robô que a abra baixa o script antes de qualquer autenticação, então não é fluxo só de colaborador. O `X-Robots-Tag: noindex` de `public/_headers` desestimula indexação, não é controle de acesso | `public/admin/index.html` | `a confirmar` | Versionar o bundle do CMS no repositório (elimina a requisição), ou colocar a rota atrás de autenticação na borda |
 
 Campos de transferência dos três, no formato das entradas de operador — preenchidos na medida do que dá para afirmar:
 
@@ -222,7 +223,7 @@ Campos de transferência dos três, no formato das entradas de operador — pree
 | Fornecedor | Motivo |
 |---|---|
 | ONER Travel | Citado na política (seção 6.1), mas sem integração no código do site. Se houver transferência internacional no fluxo operacional (fora do site), registrar no ROPA (#1547) |
-| Decap CMS (via `unpkg.com`) | `/admin` carrega o Decap CMS de `unpkg.com` (`public/admin/index.html`), o que revela a esse destinatário o IP e o user agent **do editor** — mesmo caso técnico da seção 2.9. Fica fora desta matriz porque ela cobre os dados de clientes e visitantes do site, e `/admin` é usado só por colaboradores da própria agência; não porque não haja fluxo. Registrar no ROPA como tratamento de dados de colaboradores (#1547) |
+| GitHub OAuth do Decap CMS | O login de `/admin` autentica por OAuth no GitHub (`api/auth.ts`) — dados de conta de colaboradores, não de clientes nem de visitantes. Registrar no ROPA (#1547). O GitHub como destinatário de dados de clientes está na 2.11; o carregamento do bundle do CMS, na 2.9 |
 
 ## 3. Fornecedores aposentados
 
@@ -270,6 +271,7 @@ O que depende de acesso a painéis, contas e contratos — e portanto não sai d
 
 | Versão | Data | Alteração |
 |---|---|---|
+| 0.10 | 14/09/2026 | Sétima rodada de review da PR #1640: IP em claro no Sentry ampliado para todos os endpoints com rate limit, não só os formulários (2.7); `unpkg` movido para os destinatários carregados no navegador (2.9), porque `/admin/` é rota pública; página de exclusão deixa de prometer exclusão automática da foto do depoimento; teste de consistência passa a derivar os operadores da própria matriz |
 | 0.9 | 14/09/2026 | Pendências que dependem de confirmação externa consolidadas na [#1667](https://github.com/anhanga-tech/AV-SITE/issues/1667) (30 campos `a confirmar`, DPAs e revisão do Encarregado), encerrando o escopo desta PR no levantamento técnico |
 | 0.8 | 14/09/2026 | Sexta rodada de review da PR #1640: Google Ads reclassificado como previsto, não ativo pelo Zaraz (2.2); preferências de viagem enviadas ao GA4 inventariadas (2.2); campo `Duração` criado para o Traks (2.3); campos de transferência dos destinatários independentes preenchidos (2.9); escopo da exclusão do Decap CMS explicitado (2.13) |
 | 0.7 | 14/09/2026 | Quinta rodada de review da PR #1640: fotos de perfil dos depoimentos no R2 inventariadas (2.1) e incluídas no achado de exclusão (2.11); achado P1 da credencial do convite NPS na query string enviada ao GA4 ([#1666](https://github.com/anhanga-tech/AV-SITE/issues/1666)); Meta e TikTok e a foto do depoimento incluídos na página de exclusão; atividade 5.9 (publicação de depoimentos) criada na política |
