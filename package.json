@@ -38,7 +38,7 @@
     "@sentry/react": "^10.73.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@tailwindcss/typography": "^0.5.20",
-    "@upstash/redis": "^1.38.3",
+    "@upstash/redis": "^1.38.4",
     "@vitejs/plugin-react": "^6.1.1",
     "autoprefixer": "^10.5.5",
     "framer-motion": "^13.2.0",
