@@ -790,7 +790,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Documentos para Viajar com Criança ao Exterior: Guia Completo 2026",
     "excerpt": "Passaporte, autorização de viagem, certidão de nascimento: saiba o que levar ao viajar com menor de 18 anos para fora do Brasil de acordo com cada cenário.",
     "date": "2026-06-30",
-    "dateModified": "2026-07-07",
+    "dateModified": "2026-09-14",
     "author": "felipe-william",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/documentos-viajar-crianca-exterior.jpg",
@@ -841,7 +841,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "ETIAS 2026: O Que Mudou para Brasileiros na Europa (Perguntas e Respostas)",
     "excerpt": "A Europa exigirá autorização eletrônica de brasileiros a partir do fim de 2026. Entenda o que é o ETIAS, quanto custa, como pedir e o que muda na fronteira.",
     "date": "2026-06-23",
-    "dateModified": "2026-07-07",
+    "dateModified": "2026-09-14",
     "author": "felipe-william",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/etias-2026-brasileiros-europa.jpg",
@@ -935,7 +935,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Seguro viagem internacional: quando é obrigatório, quando vale a pena e quanto custa em 2026",
     "excerpt": "Saiba em quais países o seguro viagem é obrigatório, quanto custa por dia, qual cobertura contratar e os erros comuns que podem arruinar suas férias.",
     "date": "2026-06-10",
-    "dateModified": "2026-07-17",
+    "dateModified": "2026-09-14",
     "author": "queila-oliveira",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/seguro-viagem-2026.jpg",
@@ -1402,7 +1402,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Europa 2026: ETIAS, câmbio e custos reais",
     "excerpt": "O que mudou para viajar à Europa em 2026, quanto custa, quais países combinar e como montar um roteiro que realmente funciona saindo do Brasil.",
     "date": "2026-04-29",
-    "dateModified": "2026-07-04",
+    "dateModified": "2026-09-14",
     "author": "felipe-william",
     "category": "Destinos",
     "image": "https://media.anhanga.tur.br/images/destinations/lisboa.jpg",
@@ -1419,11 +1419,11 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "faq": [
       {
         "question": "Preciso de visto para viajar para a Europa em 2026?",
-        "answer": "Não. Brasileiros não precisam de visto para estadias de turismo de até 90 dias no Espaço Schengen — mas a partir do último trimestre de 2026 será preciso solicitar o ETIAS, uma autorização eletrônica (não é visto)."
+        "answer": "Não. Brasileiros não precisam de visto para turismo no Espaço Schengen: até 90 dias em cada período de 180 dias. O ETIAS, uma autorização eletrônica (não é visto), ainda não está em funcionamento: a previsão é começar no último trimestre de 2026, com período de transição de cerca de seis meses."
       },
       {
         "question": "Quanto custa o seguro viagem obrigatório para a Europa?",
-        "answer": "O seguro viagem com cobertura mínima de 30.000 euros é obrigatório para entrar no Espaço Schengen — não é opcional, e qualquer emergência médica na Europa custa caro sem ele."
+        "answer": "Para quem precisa de visto Schengen, a cobertura mínima de 30.000 euros é exigência do próprio pedido de visto. Brasileiro isento de visto não apresenta apólice na imigração — mas viajar sem seguro é assumir o risco de uma emergência médica cara, então tratamos como item básico do planejamento."
       },
       {
         "question": "Quantos países dá para combinar num roteiro de 15 dias pela Europa?",
