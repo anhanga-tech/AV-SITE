@@ -80,6 +80,10 @@ const ExclusaoDados = () => (
                                         <td className="py-2">Navegador do usuário (instrução de remoção enviada)</td>
                                     </tr>
                                     <tr>
+                                        <td className="py-2 pr-4">Depoimento publicado por você no nosso perfil do Google (nome, nota, data e texto), quando exibido no nosso website</td>
+                                        <td className="py-2">Cópia no código do website, hospedado no GitHub — ver a ressalva abaixo</td>
+                                    </tr>
+                                    <tr>
                                         <td className="py-2 pr-4">Registros de erro do website que eventualmente contenham o que você digitou em um formulário (por exemplo, o destino pesquisado) e o endereço IP da requisição</td>
                                         <td className="py-2">Sentry (Functional Software, Inc.), quando houver registro associado à sua solicitação</td>
                                     </tr>
@@ -98,6 +102,15 @@ const ExclusaoDados = () => (
                             consegue ler. Ele não é associado ao seu cadastro e é tratado pela exclusão no painel do
                             Google Analytics e pelo descarte automático citado acima, não pela remoção dos cookies do
                             seu navegador.
+                        </p>
+                        <p>
+                            Outra ressalva, sobre depoimentos: retiramos o seu depoimento do website e da versão atual
+                            do código, mas o texto e o nome permanecem no histórico de versões do repositório, que é
+                            público — apagar esse histórico não é possível sem reescrever todo o projeto. Estamos
+                            mudando a forma como esses depoimentos são armazenados justamente para remover essa
+                            limitação. Se esse ponto for decisivo para você, escreva ao nosso Encarregado: avaliamos
+                            caso a caso o que é tecnicamente possível e informamos o resultado. Lembramos ainda que o
+                            depoimento original continua publicado no Google enquanto você não o remover por lá.
                         </p>
                     </div>
                 </section>

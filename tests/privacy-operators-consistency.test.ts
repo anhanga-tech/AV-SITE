@@ -29,6 +29,8 @@ const ACTIVE_OPERATORS = [
   'WhatsApp Ireland Ltd.',
   // Repositório, OAuth do CMS e publicação dos depoimentos (seção 2.11 da matriz).
   'GitHub, Inc.',
+  // Coleta dos depoimentos do Google (seção 2.12 da matriz).
+  'Outscraper',
   // Conteúdo de terceiros carregado no navegador (seção 2.9 da matriz).
   'OpenStreetMap Foundation',
   'Iconify',

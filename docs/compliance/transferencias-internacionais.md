@@ -8,7 +8,7 @@
 |---|---|
 | **Controlador (exportador)** | Anhangá Turismo Ltda. — CNPJ 37.036.732/0001-41 |
 | **Encarregado (DPO)** | Felipe William Rodrigues Silva — privacidade@anhanga.tur.br |
-| **Versão** | 0.4 |
+| **Versão** | 0.5 |
 | **Data de elaboração** | 11/09/2026 |
 | **Última revisão** | 14/09/2026 |
 | **Status** | Rascunho — levantamento técnico feito a partir do código; evidências contratuais e revisão jurídica **pendentes** |
@@ -127,7 +127,7 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 |---|---|
 | **Importador** | Functional Software, Inc. (EUA) |
 | **Serviços em uso** | Sentry no navegador (`lib/sentry-client.ts`) e nas Functions (`functions/_middleware.ts`), 10% de amostragem de transações, logs de console |
-| **Dados** | Stack traces, URL (credenciais do convite NPS removidas por `scrubEventUrls`), user agent, logs estruturados. **O mascaramento do logger é por nome de campo, não por conteúdo:** `sanitizeForErrorTracking` (`lib/error-tracking.ts`) só redige chaves que casam com `SENSITIVE_KEY_PATTERN` (e-mail, telefone, token, cookie, senha, assinatura etc.) e deixa em claro o valor de qualquer outra chave. Campos de texto livre preenchidos pelo titular chegam ao Sentry sem redação — por exemplo `destination` e os UTMs nos payloads de sucesso e de erro de `api/submit-lead.ts`, que carregam o que a pessoa digitou no formulário — `código`. **IP:** o SDK não liga `sendDefaultPii`, mas o Sentry infere o IP da requisição de ingestão a menos que a opção "Prevent Storing of IP Addresses" esteja ativa no projeto — `a confirmar`. Além disso, quando o Upstash falha, `lib/rate-limit.ts` registra `clientIP` em `logger.error`, e o `SENSITIVE_KEY_PATTERN` de `lib/error-tracking.ts` não cobre campos de IP: o **IP em claro chega ao Sentry como atributo de log**, independentemente daquela opção — `código`. Correção em [#1642](https://github.com/anhanga-tech/AV-SITE/issues/1642) |
+| **Dados** | Stack traces, URL (credenciais do convite NPS removidas por `scrubEventUrls`), user agent, logs estruturados. **O mascaramento do logger é por nome de campo, não por conteúdo:** `sanitizeForErrorTracking` (`lib/error-tracking.ts`) só redige chaves que casam com `SENSITIVE_KEY_PATTERN` (e-mail, telefone, token, cookie, senha, assinatura etc.) e deixa em claro o valor de qualquer outra chave. Campos de texto livre preenchidos pelo titular chegam ao Sentry sem redação — por exemplo `destination` e os UTMs nos payloads de sucesso e de erro de `api/submit-lead.ts`, que carregam o que a pessoa digitou no formulário — `código`. **IP:** o SDK não liga `sendDefaultPii`, mas o Sentry infere o IP da requisição de ingestão a menos que a opção "Prevent Storing of IP Addresses" esteja ativa no projeto — `a confirmar`. Além disso, o `SENSITIVE_KEY_PATTERN` de `lib/error-tracking.ts` não cobre campos de IP e a integração de console do Sentry captura `log`, `warn` e `error` (`functions/_middleware.ts`), então o **IP em claro chega ao Sentry como atributo de log** independentemente daquela opção, por dois caminhos — `código`: (a) **rotineiro**, sempre que qualquer um dos formulários bate no rate limit, `lib/n8n-submit-handler.ts` registra `clientIp` em `logger.warn` (estágio `rate_limited`) — ou seja, tráfego 429 comum, não só incidente; (b) quando o Upstash falha, `lib/rate-limit.ts` registra `clientIP` em `logger.error`. Correção em [#1642](https://github.com/anhanga-tech/AV-SITE/issues/1642) |
 | **Finalidade** | Detecção e correção de falhas |
 | **Duração** | Retenção do plano Sentry — `a confirmar`; definir na tabela de retenção (#1544) antes de publicar prazo na política |
 | **País/região** | Região da organização (US ou DE) — `a confirmar` pelo host de ingestão do DSN (o DSN não está no repositório) |
@@ -189,7 +189,21 @@ Requisições feitas direto pelo navegador do visitante, fora do consentimento d
 
 > **Achado:** um pedido de exclusão de um autor de review não é atendível por completo enquanto o nome e o texto estiverem no histórico do Git de um repositório público — remover o arquivo não apaga os commits anteriores. Avaliar mover os depoimentos para fora do repositório (R2, que já serve a mídia, ou busca em tempo de build sem commit) antes de tratar um pedido desse tipo. Pendência na seção 5.
 
-### 2.12 Fora do escopo desta matriz (sem fluxo de dados pelo site)
+### 2.12 Outscraper — coleta dos depoimentos do Google
+
+| Campo | Detalhe |
+|---|---|
+| **Importador** | Outscraper — `a confirmar` a razão social e a sede |
+| **Serviços em uso** | API `api.app.outscraper.com/maps/reviews-v3`, chamada pelo workflow agendado `refresh-reviews.yml` (`scripts/fetch-google-reviews.ts`) para coletar os reviews do perfil da agência no Google Maps |
+| **Dados** | Retorna nome do autor, identificador estável do review, nota, data, texto livre do depoimento e URL da foto de perfil — `código`. É o fornecedor que **coleta** os dados que depois são commitados no repositório (ver 2.11) |
+| **Finalidade** | Obter os depoimentos exibidos na página inicial |
+| **Duração** | Retenção dos resultados do job na conta Outscraper — `a confirmar` |
+| **País/região** | `a confirmar` |
+| **Suboperadores** | `a confirmar` |
+| **Mecanismo art. 33** | `não verificado`. Arquivar os termos/DPA da Outscraper |
+| **Evidência** | — |
+
+### 2.13 Fora do escopo desta matriz (sem fluxo de dados pelo site)
 
 | Fornecedor | Motivo |
 |---|---|
@@ -230,15 +244,17 @@ Na coluna **Evidência** de cada fornecedor, registrar o caminho e a versão/dat
 | Evidências contratuais armazenadas com acesso controlado e referenciadas | Estrutura definida (seção 4) | Baixar/arquivar os DPAs e preencher a coluna **Evidência** |
 | Países, regiões, suboperadores e mecanismo legal confirmados | Só indícios técnicos e políticas públicas. Também pendente: confirmar se o loop Odoo → Meta/GA4 (`/api/purchase-dispatch`) está ativo — se estiver, declarar na política (2.4) | Odoo: região do banco. Upstash: primário + réplicas. Sentry: região da organização e opção de IP. Cloudflare: cobertura do DPA sobre Zaraz/AI Gateway/R2 e local do armazenamento do Traks. Gemini: nível da conta (gratuito × pago). Listas de suboperadores de todos |
 | Revisão do encarregado/assessoria jurídica registrada | — | Registrar data, responsável e parecer nesta tabela de metadados (campo **Status**) |
+| Legítimo interesse da seção 5.8 avaliado e registrado | Base legal decidida pelo Encarregado em 14/09/2026 e publicada na seção 5.8; o RIPD (`ripd-legitimo-interesse.md`) ainda não traz a atividade de segurança/estabilidade | Rodar e registrar no RIPD o teste de legítimo interesse (finalidade, necessidade, balanceamento e salvaguardas) para a prevenção de abuso por IP e o monitoramento de erros — tarefa própria, fora desta PR |
 | Minimização das transferências identificadas | Issues abertas para Google Fonts (#1641) e IP em claro no Upstash/Sentry (#1642) | Abrir issue para o handoff de WhatsApp (e-mail e roteiro do titular na URL `wa.me`, seção 2.10) e para o texto livre não redigido nos logs enviados ao Sentry (`destination`/UTMs, seção 2.7) |
 | Oposição ao tratamento analítico efetivamente aplicável | A política informa o canal de oposição (9.4) e o Encarregado trata o pedido manualmente | Não há mecanismo durável que faça o Traks e o Zaraz pararem de coletar em visitas futuras do mesmo titular: o Traks é injetado em todo host de produção (`index.html`) e o GA4 roda sem purpose no Zaraz. Abrir issue para um opt-out persistente honrado pelos dois coletores |
 | Exclusão dos depoimentos publicados pelo workflow | — | O nome e o texto dos reviews ficam no histórico do Git de um repositório público (2.11); definir onde passarão a viver antes de um pedido de exclusão de autor de review |
-| Política pública consistente com as evidências | Afirmações não comprovadas removidas da seção 10; operadores faltantes incluídos na seção 6.1; finalidade de segurança/estabilidade declarada na seção 5.8 (base legal proposta: legítimo interesse — validar com o DPO e incluir no RIPD); página `/exclusao-dados` atualizada de Salesforce/GTM para Odoo/Zaraz | Reescrever a seção 10 citando o mecanismo concreto quando as evidências chegarem |
+| Política pública consistente com as evidências | Afirmações não comprovadas removidas da seção 10; operadores faltantes incluídos na seção 6.1; finalidade de segurança/estabilidade declarada na seção 5.8 com base no legítimo interesse (Art. 7º, IX), decisão do Encarregado em 14/09/2026 — o registro da avaliação no RIPD segue pendente; página `/exclusao-dados` atualizada de Salesforce/GTM para Odoo/Zaraz | Reescrever a seção 10 citando o mecanismo concreto quando as evidências chegarem |
 
 ## 6. Histórico
 
 | Versão | Data | Alteração |
 |---|---|---|
+| 0.5 | 14/09/2026 | Quarta rodada de review da PR #1640: Outscraper inventariada como coletora dos depoimentos (2.12); IP em claro no Sentry reclassificado como caminho rotineiro de rate limit, não exceção de falha do Upstash (2.7); Google Fonts e depoimentos declarados na política; Bélgica incluída nos destinos da 10.1; pendência do RIPD para a base legal da 5.8 |
 | 0.4 | 14/09/2026 | Terceira rodada de review da PR #1640: WhatsApp sai de "fora do escopo" e ganha inventário próprio (2.10) pelos campos do titular na URL do handoff; os dois identificadores de cliente do GA4 separados (2.2); lock de idempotência do Odoo registrado no Upstash (2.6); mascaramento do logger qualificado como filtro por nome de campo (2.7); beacon do Cloudflare Web Analytics inventariado (2.1); publicação automática dos reviews do Google pelo GitHub inventariada (2.11) |
 | 0.3 | 11/09/2026 | Segunda rodada de review: Traks declarado na política, registro de convite NPS no Upstash, empresa/cargo/indicação no Odoo, Cal.com na página de exclusão, CMS fora do escopo |
 | 0.2 | 11/09/2026 | Achados do review da PR #1640: conteúdo de terceiros no navegador (2.9), dados do loop Odoo → Meta/GA4, respostas livres do NPS no Odoo, metadados de atribuição no Cal.com, IP em claro nos logs enviados ao Sentry |
