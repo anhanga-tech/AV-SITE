@@ -107,7 +107,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "faq": [
       {
         "question": "Preciso de visto para ir à Europa depois dos 60?",
-        "answer": "Brasileiro não precisa de visto para turismo de até 90 dias no Espaço Schengen, independentemente da idade. A partir do final de 2026, será preciso o ETIAS, uma autorização eletrônica feita online antes do embarque."
+        "answer": "Brasileiro não precisa de visto para turismo de até 90 dias no Espaço Schengen, independentemente da idade. O ETIAS, uma autorização eletrônica online, ainda não está em funcionamento: a previsão é começar no último trimestre de 2026, com período de transição de cerca de seis meses."
       },
       {
         "question": "Seguro-viagem para quem tem mais de 60 anos custa mais caro?",
