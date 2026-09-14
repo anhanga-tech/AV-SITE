@@ -40,7 +40,7 @@
     "@tailwindcss/typography": "^0.5.20",
     "@upstash/redis": "^1.38.3",
     "@vitejs/plugin-react": "^6.1.1",
-    "autoprefixer": "^10.5.4",
+    "autoprefixer": "^10.5.5",
     "framer-motion": "^13.2.0",
     "globe.gl": "^2.46.2",
     "leaflet": "1.9.4",
