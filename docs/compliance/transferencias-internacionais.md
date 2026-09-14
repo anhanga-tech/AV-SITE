@@ -55,7 +55,7 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 |---|---|
 | **Importador** | Google LLC (EUA) |
 | **Serviços em uso** | Gemini API via Google AI Studio (`lib/ai/gemini-config.ts`, provider `google-ai-studio` no AI Gateway); GA4 e Google Ads via Zaraz (`hideOriginalIP`); Google Fonts carregado direto do Google nas landings `BetoCarreroLanding`, `LollapaloozaLanding` e `OrlandoLanding` |
-| **Dados** | Gemini: texto das conversas do chatbot (pode conter nome, datas, destino, orçamento). GA4/Ads: eventos de navegação com identificador pseudonimizado (`anhanga_ga_cid`), IP suprimido; no fluxo Odoo → GA4 (`/api/purchase-dispatch` → `lib/conversions/google.ts`, Measurement Protocol) vão `client_id`, `session_id`, `gclid`, destino, valor e `transaction_id` do negócio ganho. Fonts: IP e user agent do visitante das 3 landings (requisição direta do navegador) |
+| **Dados** | Gemini: texto das conversas do chatbot (pode conter nome, datas, destino, orçamento). GA4/Ads: eventos de navegação com identificador pseudonimizado, IP suprimido. **São dois identificadores distintos:** (a) o `client_id` do protocolo, gerado e persistido pelo próprio Zaraz em cookie `HttpOnly` — ilegível por JavaScript de página e já presente no Pageview automático, antes de qualquer código nosso rodar; (b) o cookie próprio `anhanga_ga_cid`, enviado apenas em eventos customizados como propriedade `ga_client_id` (`utils/generate-lead-analytics.ts`), que o Managed Component **não** reconhece como `cid` — logo não unifica a sessão GA4 e é o único dos dois que também é gravado no CRM. Consequência para direitos do titular: um pedido de exclusão alcança o `anhanga_ga_cid` (navegador e CRM), mas o identificador do Zaraz só pode ser tratado pela exclusão de dados no painel do GA4 — `código` + `docs/superpowers/plans/2026-09-01-zaraz-tag-migration.md`; no fluxo Odoo → GA4 (`/api/purchase-dispatch` → `lib/conversions/google.ts`, Measurement Protocol) vão `client_id`, `session_id`, `gclid`, destino, valor e `transaction_id` do negócio ganho. Fonts: IP e user agent do visitante das 3 landings (requisição direta do navegador) |
 | **Finalidade** | Atendimento automatizado (chatbot), mensuração, publicidade; renderização de fontes |
 | **Duração** | GA4: 14 meses (painel). Gemini: `a confirmar` — depende do nível da conta (os termos do nível gratuito do AI Studio permitem uso do conteúdo para melhoria de produto; o nível pago não) |
 | **País/região** | EUA / infraestrutura global — `política do fornecedor` |
@@ -109,10 +109,10 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 | Campo | Detalhe |
 |---|---|
 | **Importador** | Upstash, Inc. (EUA) |
-| **Serviços em uso** | Redis REST para rate limit dos endpoints de API (`lib/rate-limit.ts`) |
-| **Dados** | **IP do cliente em claro** como parte da chave (`<prefixo>:<ip>`) e um contador — `código`. Registro de uso único do convite de NPS (`nps:invite:used:<jti>`, identificador do convite assinado, sem dados de contato) — `código` (`lib/nps-invite-replay.ts`, `api/submit-nps.ts`) |
-| **Finalidade** | Prevenção de abuso (segurança) |
-| **Duração** | Rate limit: TTL igual à janela, no máximo 10 minutos. Convite de NPS: até o vencimento do convite, no máximo 30 dias (`lib/nps-invite.ts`) — `código` |
+| **Serviços em uso** | Redis REST para rate limit dos endpoints de API (`lib/rate-limit.ts`), controle de replay do convite de NPS (`lib/nps-invite-replay.ts`) e lock de idempotência das submissões que criam lead/parceiro no Odoo (`lib/odoo-lead-idempotency.ts`) |
+| **Dados** | **IP do cliente em claro** como parte da chave (`<prefixo>:<ip>`) e um contador — `código`. Registro de uso único do convite de NPS (`nps:invite:used:<jti>`, identificador do convite assinado, sem dados de contato) — `código` (`lib/nps-invite-replay.ts`, `api/submit-nps.ts`). Lock de concorrência de toda submissão que gera lead no Odoo (`odoo:lead:lock:<chave>`): a chave é o `event_id` gerado no navegador ou, na ausência dele, um resumo SHA-256 derivado de e-mail, telefone, destino, resumo BANT e nome (`lib/odoo-submit-handler.ts`) — dado pseudonimizado, gravado sem valor associado — `código` |
+| **Finalidade** | Prevenção de abuso (segurança); prevenção de registros duplicados no CRM (integridade) |
+| **Duração** | Rate limit: TTL igual à janela, no máximo 10 minutos. Convite de NPS: até o vencimento do convite, no máximo 30 dias (`lib/nps-invite.ts`). Lock de idempotência: TTL de 15 segundos, apagado ao fim da submissão — `código` |
 | **País/região** | Banco global com primário em São Paulo (sa-east-1) — `indício técnico`. Um banco global replica para outras regiões: lista de réplicas — `a confirmar` no console |
 | **Suboperadores** | AWS — `a confirmar` |
 | **Mecanismo art. 33** | `não verificado`. Se todas as réplicas ficarem no Brasil, pode não haver transferência de armazenamento; ainda assim há um importador estrangeiro (Upstash, Inc.) com acesso |
@@ -126,7 +126,7 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 |---|---|
 | **Importador** | Functional Software, Inc. (EUA) |
 | **Serviços em uso** | Sentry no navegador (`lib/sentry-client.ts`) e nas Functions (`functions/_middleware.ts`), 10% de amostragem de transações, logs de console |
-| **Dados** | Stack traces, URL (credenciais do convite NPS removidas por `scrubEventUrls`), user agent, logs estruturados (o logger mascara PII — `lib/logger.ts`). **IP:** o SDK não liga `sendDefaultPii`, mas o Sentry infere o IP da requisição de ingestão a menos que a opção "Prevent Storing of IP Addresses" esteja ativa no projeto — `a confirmar`. Além disso, quando o Upstash falha, `lib/rate-limit.ts` registra `clientIP` em `logger.error`, e o `SENSITIVE_KEY_PATTERN` de `lib/error-tracking.ts` não cobre campos de IP: o **IP em claro chega ao Sentry como atributo de log**, independentemente daquela opção — `código`. Correção em [#1642](https://github.com/anhanga-tech/AV-SITE/issues/1642) |
+| **Dados** | Stack traces, URL (credenciais do convite NPS removidas por `scrubEventUrls`), user agent, logs estruturados. **O mascaramento do logger é por nome de campo, não por conteúdo:** `sanitizeForErrorTracking` (`lib/error-tracking.ts`) só redige chaves que casam com `SENSITIVE_KEY_PATTERN` (e-mail, telefone, token, cookie, senha, assinatura etc.) e deixa em claro o valor de qualquer outra chave. Campos de texto livre preenchidos pelo titular chegam ao Sentry sem redação — por exemplo `destination` e os UTMs nos payloads de sucesso e de erro de `api/submit-lead.ts`, que carregam o que a pessoa digitou no formulário — `código`. **IP:** o SDK não liga `sendDefaultPii`, mas o Sentry infere o IP da requisição de ingestão a menos que a opção "Prevent Storing of IP Addresses" esteja ativa no projeto — `a confirmar`. Além disso, quando o Upstash falha, `lib/rate-limit.ts` registra `clientIP` em `logger.error`, e o `SENSITIVE_KEY_PATTERN` de `lib/error-tracking.ts` não cobre campos de IP: o **IP em claro chega ao Sentry como atributo de log**, independentemente daquela opção — `código`. Correção em [#1642](https://github.com/anhanga-tech/AV-SITE/issues/1642) |
 | **Finalidade** | Detecção e correção de falhas |
 | **Duração** | Retenção do plano Sentry — `a confirmar`; definir na tabela de retenção (#1544) antes de publicar prazo na política |
 | **País/região** | Região da organização (US ou DE) — `a confirmar` pelo host de ingestão do DSN (o DSN não está no repositório) |
@@ -156,13 +156,28 @@ Requisições feitas direto pelo navegador do visitante, fora do consentimento d
 | Iconify | 5 logos da barra de pesquisa com IA na página inicial | `components/AIResearchBar.tsx` | `a confirmar` | Versionar os SVGs no repositório |
 | Spotify AB | Player de playlist na landing Lollapalooza | `components/landings/lollapalooza/LineupSection.tsx` | Suécia — `política do fornecedor` | Carregar o iframe só após clique (facade) |
 
-### 2.10 Fora do escopo desta matriz (sem fluxo de dados pelo site)
+### 2.10 WhatsApp (Meta Platforms) — handoff do chatbot e CTAs
+
+| Campo | Detalhe |
+|---|---|
+| **Importador** | WhatsApp Ireland Ltd. / Meta Platforms, Inc. (EUA) |
+| **Serviços em uso** | Links `wa.me` nos CTAs de WhatsApp e no handoff do chatbot (`utils/whatsapp.ts`, `hooks/useLeadCapture.ts`, `components/ChatLeadForm.tsx`) |
+| **Dados** | CTAs comuns: parâmetros de campanha e identificadores de clique no texto da mensagem, mais IP e user agent da requisição. **Handoff do chatbot:** `buildLeadWhatsAppMessage` monta a mensagem pré-preenchida com **e-mail, origem, destino, datas da viagem e preferência de bagagem** do titular, e `ChatLeadForm` navega a aba para essa URL após o envio do formulário — a Meta recebe esses campos na própria requisição HTTP, **antes** de o titular apertar "enviar" na conversa — `código` (`hooks/useLeadCapture.ts`) |
+| **Finalidade** | Continuidade do atendimento humano; atribuição de campanha |
+| **Duração** | Retenção da conta WhatsApp Business da agência e da Meta — `a confirmar`; definir na tabela de retenção (#1544) |
+| **País/região** | Irlanda / EUA e infraestrutura global — `política do fornecedor` |
+| **Suboperadores** | `a confirmar` |
+| **Mecanismo art. 33** | `não verificado`. Arquivar os termos do WhatsApp Business |
+| **Evidência** | — |
+
+> **Achado:** a mensagem pré-preenchida do handoff leva o e-mail e o roteiro do titular na URL, transferindo dado pessoal à Meta mesmo que a conversa nunca seja iniciada. Minimizar — por exemplo, um identificador de atendimento em vez dos campos em claro, já que o lead está no CRM — reduz a transferência sem perder o contexto do atendente. Abrir issue de minimização (pendência da seção 5).
+
+### 2.11 Fora do escopo desta matriz (sem fluxo de dados pelo site)
 
 | Fornecedor | Motivo |
 |---|---|
 | ONER Travel | Citado na política (seção 6.1), mas sem integração no código do site. Se houver transferência internacional no fluxo operacional (fora do site), registrar no ROPA (#1547) |
 | Decap CMS (via `unpkg.com`) e GitHub, Inc. | `/admin` carrega o Decap CMS de `unpkg.com` e autentica por OAuth no GitHub (`public/admin/index.html`, `api/auth.ts`). Só editores da própria agência usam — não trata dados de clientes nem de visitantes. Registrar no ROPA como tratamento de dados de colaboradores (#1547) |
-| WhatsApp (Meta) | O site só abre `wa.me` com parâmetros de rastreio; a conversa acontece no app do titular com o WhatsApp Business da agência — registrar no ROPA como canal de atendimento (#1547) |
 
 ## 3. Fornecedores aposentados
 
@@ -198,6 +213,7 @@ Na coluna **Evidência** de cada fornecedor, registrar o caminho e a versão/dat
 | Evidências contratuais armazenadas com acesso controlado e referenciadas | Estrutura definida (seção 4) | Baixar/arquivar os DPAs e preencher a coluna **Evidência** |
 | Países, regiões, suboperadores e mecanismo legal confirmados | Só indícios técnicos e políticas públicas. Também pendente: confirmar se o loop Odoo → Meta/GA4 (`/api/purchase-dispatch`) está ativo — se estiver, declarar na política (2.4) | Odoo: região do banco. Upstash: primário + réplicas. Sentry: região da organização e opção de IP. Cloudflare: cobertura do DPA sobre Zaraz/AI Gateway/R2 e local do armazenamento do Traks. Gemini: nível da conta (gratuito × pago). Listas de suboperadores de todos |
 | Revisão do encarregado/assessoria jurídica registrada | — | Registrar data, responsável e parecer nesta tabela de metadados (campo **Status**) |
+| Minimização das transferências identificadas | Issues abertas para Google Fonts (#1641) e IP em claro no Upstash/Sentry (#1642) | Abrir issue para o handoff de WhatsApp (e-mail e roteiro do titular na URL `wa.me`, seção 2.10) e para o texto livre não redigido nos logs enviados ao Sentry (`destination`/UTMs, seção 2.7) |
 | Política pública consistente com as evidências | Afirmações não comprovadas removidas da seção 10; operadores faltantes incluídos na seção 6.1; finalidade de segurança/estabilidade declarada na seção 5.8 (base legal proposta: legítimo interesse — validar com o DPO e incluir no RIPD); página `/exclusao-dados` atualizada de Salesforce/GTM para Odoo/Zaraz | Reescrever a seção 10 citando o mecanismo concreto quando as evidências chegarem |
 
 ## 6. Histórico
@@ -206,4 +222,5 @@ Na coluna **Evidência** de cada fornecedor, registrar o caminho e a versão/dat
 |---|---|---|
 | 0.3 | 11/09/2026 | Segunda rodada de review: Traks declarado na política, registro de convite NPS no Upstash, empresa/cargo/indicação no Odoo, Cal.com na página de exclusão, CMS fora do escopo |
 | 0.2 | 11/09/2026 | Achados do review da PR #1640: conteúdo de terceiros no navegador (2.9), dados do loop Odoo → Meta/GA4, respostas livres do NPS no Odoo, metadados de atribuição no Cal.com, IP em claro nos logs enviados ao Sentry |
+| 0.3 | 14/09/2026 | Segunda rodada de review da PR #1640: WhatsApp sai de "fora do escopo" e ganha inventário próprio (2.10) por causa dos campos do titular na URL do handoff; os dois identificadores de cliente do GA4 separados (2.2); lock de idempotência do Odoo registrado no Upstash (2.6); mascaramento do logger qualificado como filtro por nome de campo (2.7) |
 | 0.1 | 11/09/2026 | Levantamento inicial a partir do código e de verificações técnicas (DNS/IP). Os arquivos citados pela issue (`docs/privacy/transferencias-internacionais.md`, `docs/audits/lgpd-site-2026-08-28.md`) não existem no repositório — este documento substitui o "modelo inicial" |

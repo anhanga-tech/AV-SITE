@@ -25,6 +25,8 @@ const ACTIVE_OPERATORS = [
   'Upstash, Inc.',
   'Functional Software, Inc.',
   'Cal.com, Inc.',
+  // Handoff do chatbot e CTAs de WhatsApp (seção 2.10 da matriz).
+  'WhatsApp Ireland Ltd.',
   // Conteúdo de terceiros carregado no navegador (seção 2.9 da matriz).
   'OpenStreetMap Foundation',
   'Iconify',

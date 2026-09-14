@@ -15,6 +15,7 @@ export function PrivacySection6Compartilhamento() {
                     <li><strong>Functional Software, Inc. (Sentry)</strong> (monitoramento de erros e estabilidade do website)</li>
                     <li><strong>Cal.com, Inc.</strong> (agendamento de consultorias, quando o titular marca um horário pelo website)</li>
                     <li><strong>Provedores de conteúdo incorporado</strong> (recebem o endereço IP e dados técnicos do navegador ao exibir o conteúdo: mapas da <strong>OpenStreetMap Foundation</strong> nas páginas de destinos; ícones do serviço <strong>Iconify</strong> na página inicial; player da <strong>Spotify AB</strong> na página do Lollapalooza)</li>
+                    <li><strong>WhatsApp Ireland Ltd.</strong> / <strong>Meta Platforms, Inc.</strong> (continuidade do atendimento por WhatsApp: ao clicar em um de nossos botões de WhatsApp, o link já leva a mensagem pré-preenchida — que, no encaminhamento do assistente virtual, inclui o e-mail informado e os dados da viagem pesquisada —, além do endereço IP e dados técnicos do navegador)</li>
                     <li><strong>ONER Travel</strong> (serviços especializados em turismo)</li>
                     <li><strong>Outros prestadores de serviços</strong> devidamente contratados</li>
                 </ul>

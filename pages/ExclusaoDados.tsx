@@ -82,6 +82,12 @@ const ExclusaoDados = () => (
                                 </tbody>
                             </table>
                         </div>
+                        <p>
+                            Se o seu atendimento ocorreu antes de junho de 2026, a busca alcança também as bases
+                            dos sistemas de CRM que usávamos até então, ainda em processo de encerramento: seus
+                            dados são localizados e removidos nelas da mesma forma, e a conclusão é informada na
+                            resposta ao seu pedido.
+                        </p>
                     </div>
                 </section>
 
