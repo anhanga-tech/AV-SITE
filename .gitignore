@@ -55,6 +55,8 @@ seo-audit-*.md
 content-calendar-*.md
 brand-review-*.md
 brand-profile.json
+docs/marketing/legendas-redes-sociais.md
+docs/marketing/feedback-agencia-*.md
 
 # SEO crawl exports / audit dumps (business data — local only)
 # Anchored to repo root — do not drop the leading slash, "SEO/" alone also

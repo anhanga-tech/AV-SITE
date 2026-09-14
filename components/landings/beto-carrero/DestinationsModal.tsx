@@ -113,7 +113,7 @@ export function DestinationsModal({ isOpen, onClose }: DestinationsModalProps) {
         {/* Footer CTA */}
         <div className="text-center mt-8 pt-6 border-t-2 border-dashed border-gray-300">
           <Button
-            text="Montar Roteiro no Zap"
+            text="Montar roteiro no Zap"
             variant="secondary"
             fullWidth={true}
             onClick={onClose}

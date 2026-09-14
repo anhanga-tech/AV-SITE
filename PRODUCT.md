@@ -49,6 +49,8 @@ Voz na segunda pessoa, calorosa, nunca informal demais nem corporativa. Três pa
 
 Emoções a evocar: confiança ("estou em boas mãos"), pertencimento ("falam comigo, não com uma massa"), antecipação calorosa da viagem. Nunca: urgência manipulativa, frieza de comparador, distância de luxo impessoal.
 
+Aplicação prática da voz (gramática, vocabulário, canais, situações delicadas, checklist): [`docs/marketing/guia-de-voz.md`](docs/marketing/guia-de-voz.md).
+
 ## Anti-references
 
 A Anhangá explicitamente **não** deve parecer:

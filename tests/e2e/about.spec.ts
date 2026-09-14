@@ -20,8 +20,8 @@ test.describe('Sobre Page E-E-A-T Verification', () => {
     await expect(page.getByRole('heading', { name: 'Nossa História' })).toBeVisible();
 
     // Check for Expertise/Differentiators
-    await expect(page.locator('text=Atendimento Humano')).toBeVisible();
-    await expect(page.locator('text=Curadoria Premium')).toBeVisible();
+    await expect(page.locator('text=Atendimento humano')).toBeVisible();
+    await expect(page.locator('text=Curadoria premium')).toBeVisible();
 
     // Check for Schema tags (Organization)
     const schema = await page.locator('script[type="application/ld+json"][data-av-head="script:ld-json:organization"]').first().innerHTML();

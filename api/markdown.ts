@@ -70,10 +70,10 @@ Agência especializada em roteiros 100% personalizados para destinos nacionais e
 
 ## Como funciona (4 passos)
 
-1. **Oie! Vamos conversar?** — Você nos conta seus sonhos e orçamento via chatbot IA
-2. **Desenhando o Sonho** — Especialistas criam um roteiro dia a dia personalizado
+1. **Vamos conversar?** — Você nos conta seus sonhos e orçamento via chatbot IA
+2. **Desenhando o sonho** — Especialistas criam um roteiro dia a dia personalizado
 3. **Burocracia? Deixa com a gente** — Emitimos voos, hotéis e passeios, parcelamos
-4. **Fui! Partiu Viajar** — Você recebe os vouchers organizados com suporte de plantão 24h
+4. **Fui! Partiu viajar** — Você recebe os vouchers organizados com suporte de plantão 24h
 
 ## Perguntas Frequentes
 

@@ -139,7 +139,7 @@ test('chatbot should block unsafe textual handoff without structured payload', a
     const response = await getTravelAdvice([{ role: 'user', text: 'teste' }]);
 
     assert.equal(response.budgetLink, undefined);
-    assert.match(response.text || '', /problema ao concluir seu orçamento agora/i);
+    assert.match(response.text || '', /problema pra concluir seu orçamento agora/i);
     assert.doesNotMatch(response.text || '', /wa\.me/i);
 });
 
@@ -158,8 +158,8 @@ test('chatbot should show non-clickable fallback when server returns 500', async
 
     const response = await getTravelAdvice([{ role: 'user', text: 'teste' }]);
 
-    assert.match(response.text || '', /Tivemos um problema técnico interno/);
-    assert.match(response.text || '', /fale conosco no WhatsApp/i);
+    assert.match(response.text || '', /Tivemos um problema técnico do nosso lado/);
+    assert.match(response.text || '', /fale com a gente no WhatsApp/i);
     assert.doesNotMatch(response.text || '', /wa\.me/i);
 });
 
@@ -178,8 +178,8 @@ test('chatbot should explain config error without clickable WhatsApp CTA when se
 
     const response = await getTravelAdvice([{ role: 'user', text: 'teste' }]);
 
-    assert.match(response.text || '', /problema de configuração no servidor/);
-    assert.match(response.text || '', /fale conosco no WhatsApp/i);
+    assert.match(response.text || '', /problema de configuração do nosso lado/);
+    assert.match(response.text || '', /fale com a gente no WhatsApp/i);
     assert.doesNotMatch(response.text || '', /wa\.me/i);
 });
 
@@ -196,7 +196,31 @@ test('chatbot should return fallback text when API succeeds without usable conte
     const response = await getTravelAdvice([{ role: 'user', text: 'teste' }]);
 
     assert.match(response.text || '', /Não consegui gerar uma resposta agora/);
-    assert.match(response.text || '', /fale conosco no WhatsApp/i);
+    assert.match(response.text || '', /fale com a gente no WhatsApp/i);
     assert.doesNotMatch(response.text || '', /wa\.me/i);
     assert.equal(response.budgetLink, undefined);
+});
+
+// Guia de voz: erro é problema nosso, sem emoji e sempre com o WhatsApp como saída.
+test('chatbot error fallbacks should use brand voice without emoji', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+    });
+
+    const scenarios: Array<() => Promise<Response>> = [
+        async () => new Response(JSON.stringify({ code: 'RATE_LIMITED', retryAfter: 30 }), { status: 429, headers: { 'Content-Type': 'application/json' } }),
+        async () => new Response(JSON.stringify({ code: 'UNAVAILABLE' }), { status: 503, headers: { 'Content-Type': 'application/json' } }),
+        async () => new Response(JSON.stringify({ code: 'SERVER_CONFIG_ERROR' }), { status: 500, headers: { 'Content-Type': 'application/json' } }),
+        async () => new Response(JSON.stringify({ code: 'GEMINI_INTERNAL_ERROR' }), { status: 500, headers: { 'Content-Type': 'application/json' } }),
+        async () => { throw new TypeError('Failed to fetch'); },
+    ];
+
+    for (const scenario of scenarios) {
+        global.fetch = scenario;
+        const response = await getTravelAdvice([{ role: 'user', text: 'teste' }]);
+        const text = response.text || '';
+        assert.doesNotMatch(text, /\p{Extended_Pictographic}/u, text);
+        assert.match(text, /fale com a gente no WhatsApp/i, text);
+        assert.doesNotMatch(text, /fale conosco|Por favor/i, text);
+    }
 });

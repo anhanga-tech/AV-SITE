@@ -88,7 +88,7 @@ const BetoCarreroFaq: React.FC = () => {
 
               <div className="transform hover:scale-105 transition-transform duration-300">
                 <Button
-                  text="Montar Meu Pacote Agora"
+                  text="Montar meu pacote agora"
                   variant="primary"
                   tooltip="É rápido e sem compromisso"
                   className="text-xl px-10 py-5"

@@ -142,7 +142,7 @@ function ChatPanelHeader({ onClose }: Pick<AIChatPanelViewProps, 'onClose'>) {
         </div>
         <div>
           <h2 id="ai-chat-title" className="font-extrabold text-lg text-brand-dark tracking-tight leading-none">
-            Hub Anhangá
+            Guia Anhangá
           </h2>
           <div className="flex items-center gap-1.5 mt-1 opacity-80">
             <span className="relative flex size-2">
@@ -150,7 +150,7 @@ function ChatPanelHeader({ onClose }: Pick<AIChatPanelViewProps, 'onClose'>) {
               <span className="relative inline-flex rounded-full size-2 bg-green-400"></span>
             </span>
             <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
-              Assistente Online
+              Assistente virtual
             </span>
           </div>
         </div>

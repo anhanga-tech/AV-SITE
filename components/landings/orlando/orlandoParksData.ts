@@ -100,7 +100,7 @@ export const OTHER_PARK_GROUPS: ParkGroupData[] = [
     ],
   },
   {
-    label: "Outras Aventuras",
+    label: "Outras aventuras",
     className: "other-group",
     parks: [
       {

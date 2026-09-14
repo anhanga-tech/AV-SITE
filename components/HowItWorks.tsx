@@ -20,7 +20,7 @@ const STEPS = [
   {
     id: 1,
     icon: <ChatCircleDots className="size-8 text-white" weight="fill" />,
-    title: "Oie! Vamos conversar?",
+    title: "Vamos conversar?",
     desc: "Nada de formulários chatos. A gente bate um papo no WhatsApp para entender seus sonhos e quanto você quer investir.",
     color: "bg-brand-yellow",
     lightColor: "bg-yellow-50",
@@ -31,7 +31,7 @@ const STEPS = [
   {
     id: 2,
     icon: <PaintBrushBroad className="size-8 text-white" weight="fill" />,
-    title: "Desenhando o Sonho",
+    title: "Desenhando o sonho",
     desc: "Nossos especialistas criam um roteiro dia-a-dia só seu. Ajustamos cada detalhe até você dizer: 'É isso!'",
     color: "bg-brand-cyan",
     lightColor: "bg-sky-50",
@@ -58,7 +58,7 @@ const STEPS = [
   {
     id: 4,
     icon: <AirplaneTilt className="size-8 text-white" weight="fill" />,
-    title: "Fui! Partiu Viajar",
+    title: "Fui! Partiu viajar",
     desc: "Agora é só fazer as malas! E se precisar de algo lá longe? Nosso time fica de plantão 24h por você.",
     color: "bg-green-500",
     lightColor: "bg-green-50",

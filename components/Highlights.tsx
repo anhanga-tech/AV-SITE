@@ -38,7 +38,7 @@ interface HighlightItem {
 const HIGHLIGHTS: HighlightItem[] = [
     {
         icon: UserCircleCheck,
-        title: "Concierge Humano",
+        title: "Concierge humano",
         description: "Você começa pelo chat e nossa equipe humana continua com orientação de verdade.",
         bg: "bg-orange-100",
         accent: "border-orange-200",
@@ -47,7 +47,7 @@ const HIGHLIGHTS: HighlightItem[] = [
     },
     {
         icon: Sparkle,
-        title: "Roteiros à Mão",
+        title: "Roteiros à mão",
         description: "Desenhamos cada dia da viagem do zero, só pra você.",
         bg: "bg-emerald-100",
         accent: "border-emerald-200",
@@ -56,7 +56,7 @@ const HIGHLIGHTS: HighlightItem[] = [
     },
     {
         icon: ClipboardText,
-        title: "Zero Burocracia",
+        title: "Zero burocracia",
         description: "Vistos, formulários e chatices? Deixa com a gente.",
         bg: "bg-blue-100",
         accent: "border-blue-200",
@@ -65,7 +65,7 @@ const HIGHLIGHTS: HighlightItem[] = [
     },
     {
         icon: Compass,
-        title: "Achados Secretos",
+        title: "Achados secretos",
         description: "Lugares autênticos que não estão na primeira página do Google.",
         bg: "bg-emerald-100",
         accent: "border-emerald-200",
