@@ -6,17 +6,24 @@ export function PrivacySection6Compartilhamento() {
                 <h3 className="font-merriweather font-semibold">6.1 Parceiros e Prestadores de Serviços</h3>
                 <p>A Anhangá Turismo pode compartilhar dados pessoais com terceiros autorizados, incluindo:</p>
                 <ul className="list-disc pl-6 space-y-1">
-                    <li><strong>Google LLC</strong> (analytics e publicidade — Google Ads e GA4; processamento das conversas do assistente virtual de viagens — Google Gemini; customer match previsto mas <strong>atualmente inativo</strong>, ver seção 5.5)</li>
+                    <li><strong>Google LLC</strong> (analytics e publicidade — Google Ads e GA4; processamento das conversas do assistente virtual de viagens — Google Gemini; fornecimento das fontes tipográficas de três de nossas páginas promocionais, que são carregadas diretamente do Google pelo navegador e, por isso, revelam a ele o endereço IP e os dados técnicos do navegador ao abrir essas páginas; customer match previsto mas <strong>atualmente inativo</strong>, ver seção 5.5)</li>
                     <li><strong>Meta Platforms, Inc.</strong> (publicidade e remarketing — Facebook/Instagram Ads; customer match previsto mas <strong>atualmente inativo</strong>, ver seção 5.5)</li>
                     <li><strong>TikTok Pte. Ltd.</strong> (publicidade e remarketing — TikTok Ads)</li>
                     <li><strong>Cloudflare, Inc.</strong> (hospedagem do site e gerenciamento de tags server-side via Cloudflare Zaraz — responsável pela supressão de IP antes do envio ao Google Analytics e pelo envio server-side das conversões ao Meta e ao TikTok, sem carregar pixel de rastreamento no navegador do titular)</li>
                     <li><strong>Odoo S.A.</strong> (CRM de vendas — registro e gestão de leads comerciais)</li>
+                    <li><strong>Upstash, Inc.</strong> (prevenção de abuso — controle temporário de volume de requisições por endereço IP)</li>
+                    <li><strong>Functional Software, Inc. (Sentry)</strong> (monitoramento de erros e estabilidade do website)</li>
+                    <li><strong>Cal.com, Inc.</strong> (agendamento de consultorias, quando o titular marca um horário pelo website)</li>
+                    <li><strong>Provedores de conteúdo incorporado</strong> (recebem o endereço IP e dados técnicos do navegador ao exibir o conteúdo: mapas da <strong>OpenStreetMap Foundation</strong> nas páginas de destinos; ícones do serviço <strong>Iconify</strong> na página inicial; player da <strong>Spotify AB</strong> na página do Lollapalooza; biblioteca do editor de conteúdo servida pelo <strong>unpkg</strong> na área administrativa <code>/admin/</code>, que é publicamente acessível)</li>
+                    <li><strong>Outscraper</strong> (coleta dos depoimentos públicos publicados por clientes no nosso perfil do Google — nome do autor, nota, data, texto do depoimento e foto de perfil)</li>
+                    <li><strong>GitHub, Inc.</strong> (hospedagem do código do website; publicação automática dos depoimentos de clientes obtidos no Google — nome do autor, nota, data e texto do depoimento — no repositório do projeto)</li>
+                    <li><strong>WhatsApp Ireland Ltd.</strong> / <strong>Meta Platforms, Inc.</strong> (continuidade do atendimento por WhatsApp: ao clicar em um de nossos botões de WhatsApp, o link já leva a mensagem pré-preenchida — que, no encaminhamento do assistente virtual, inclui o e-mail informado e os dados da viagem pesquisada —, além do endereço IP e dados técnicos do navegador)</li>
                     <li><strong>ONER Travel</strong> (serviços especializados em turismo)</li>
                     <li><strong>Outros prestadores de serviços</strong> devidamente contratados</li>
                 </ul>
 
                 <h3 className="font-merriweather font-semibold">6.2 Garantias Contratuais</h3>
-                <p>Todos os compartilhamentos são regidos por contratos específicos que asseguram:</p>
+                <p>Os compartilhamentos com prestadores de serviços devem ser regidos por instrumentos contratuais que assegurem:</p>
                 <ul className="list-disc pl-6 space-y-1">
                     <li>Conformidade com a LGPD e demais normas aplicáveis de proteção de dados</li>
                     <li>Implementação de medidas de segurança adequadas</li>
