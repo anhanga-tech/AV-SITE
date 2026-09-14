@@ -111,7 +111,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "Seguro-viagem para quem tem mais de 60 anos custa mais caro?",
-        "answer": "Custa mais porque a idade entra no cálculo de risco, mas a diferença importante é outra: a cobertura para condições preexistentes varia entre planos — alguns cobrem a urgência aguda até o limite contratado, outros limitam ou excluem. O essencial é declarar tudo na contratação e conferir a cobertura, não o preço."
+        "answer": "Custa mais porque a idade entra no cálculo de risco. Pela regra da SUSEP (Circular 667/2022), doenças preexistentes declaradas não podem ser excluídas da cobertura: a urgência ligada à sua condição é coberta até o limite contratado. O essencial é declarar tudo na contratação e conferir o teto do plano, não o preço."
       },
       {
         "question": "Quantos dias é ideal para a primeira viagem à Europa?",
@@ -119,7 +119,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "Posso levar meus remédios de uso contínuo para a Europa?",
-        "answer": "Pode, e deve levar na bagagem de mão, na embalagem original com bula. Medicamentos controlados pedem declaração ou receita médica com o nome genérico. Leve estoque para a viagem inteira mais alguns dias de folga."
+        "answer": "Pode, e deve levar na bagagem de mão, na embalagem original com bula. Medicamentos controlados podem exigir certificado, tradução ou autorização prévia: confirme com o consulado do destino e dos países de conexão, e leve receita médica com o nome genérico. Leve estoque para a viagem inteira mais alguns dias de folga."
       },
       {
         "question": "Vale a pena contratar uma agência para a primeira viagem internacional?",
