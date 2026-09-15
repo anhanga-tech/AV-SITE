@@ -28,9 +28,13 @@ interface SocialShareProps {
     minimal?: boolean;
 }
 
-export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, className = "", minimal = false }) => {
+// PERFORMANCE: memoized because every list/grid caller (BlogList, Blog,
+// DestinationsView) renders one instance per visible card with primitive-only
+// props (strings/booleans), so a parent re-render (e.g. BlogList's search
+// keystroke) no longer forces every already-mounted share widget through its
+// render + getSocialShareLinks work when its own url/title/excerpt are unchanged.
+export const SocialShare = React.memo<SocialShareProps>(({ url, title, excerpt, className = "", minimal = false }) => {
     const [copied, setCopied] = useState(false);
-    const links = getSocialShareLinks(url, title);
 
     const handleNativeShare = async () => {
         import('../utils/haptics')
@@ -98,6 +102,12 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
             </div>
         );
     }
+
+    // Computed only for the full (non-minimal) layout below, which is the sole
+    // consumer of `links` — the minimal branch above already returned, and every
+    // list/grid usage of SocialShare (BlogList, Blog, BlogPostContent's header)
+    // passes minimal, so this used to run on every card render for nothing.
+    const links = getSocialShareLinks(url, title);
 
     return (
         <div className={`flex flex-wrap items-center gap-3 ${className}`}>
@@ -191,4 +201,6 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, excerpt, c
             </div>
         </div>
     );
-};
+});
+
+SocialShare.displayName = 'SocialShare';
