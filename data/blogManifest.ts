@@ -78,7 +78,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "Costa Diadema ou Costa Serena: qual escolher?",
-        "answer": "O Diadema embarca em Santos e Itajaí, com roteiros de 3 a 7 noites, e é a opção mais prática para quem está em São Paulo, Santa Catarina e arredores. O Serena, reformado, sai do Rio e tem roteiros de 8 e 9 noites com mais dias de navegação. Para primeira viagem de navio, os dois funcionam bem."
+        "answer": "O Diadema embarca em Santos e Itajaí, com roteiros de 2 a 7 noites, e é a opção mais prática para quem está em São Paulo, Santa Catarina e arredores. O Serena, reformado, sai do Rio e tem roteiros de 8 e 9 noites com mais dias de navegação. Para primeira viagem de navio, os dois funcionam bem."
       },
       {
         "question": "Preciso de passaporte para cruzeiro para Buenos Aires e Montevidéu?",
