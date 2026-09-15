@@ -23,6 +23,15 @@ export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
     "image": "https://media.anhanga.tur.br/images/blog/quantos-dias-ficar-em-orlando.jpg"
   },
   {
+    "slug": "primeira-viagem-internacional-depois-dos-60",
+    "title": "Primeira viagem internacional depois dos 60: o que ninguém te conta",
+    "excerpt": "A primeira viagem internacional depois dos 60 não é difícil, é diferente. Seguro, ritmo, remédios e o que planejar antes de atravessar o oceano.",
+    "date": "2026-09-14",
+    "category": "Melhor Idade",
+    "author": "felipe-william",
+    "image": "https://media.anhanga.tur.br/images/destinations/lisboa.jpg"
+  },
+  {
     "slug": "oktoberfest-blumenau-2026-guia-viagem",
     "title": "Oktoberfest Blumenau 2026: guia para planejar a viagem",
     "excerpt": "A Oktoberfest Blumenau 2026 acontece de 7 a 25 de outubro. Veja como escolher os dias, onde ficar, comprar ingresso e organizar o transporte.",
@@ -30,14 +39,5 @@ export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
     "category": "Festivais",
     "author": "queila-oliveira",
     "image": "https://media.anhanga.tur.br/images/blog/oktoberfest-blumenau-2026.jpg"
-  },
-  {
-    "slug": "onde-ficar-em-orlando-disney-universal-international-drive",
-    "title": "Onde ficar em Orlando: qual região escolher",
-    "excerpt": "A melhor região para ficar em Orlando depende dos parques, do transporte e do ritmo da família. Compare Disney, Universal, International Drive e Kissimmee.",
-    "date": "2026-09-08",
-    "category": "Planejamento",
-    "author": "felipe-william",
-    "image": "https://media.anhanga.tur.br/images/blog/onde-ficar-em-orlando.jpg"
   }
 ];

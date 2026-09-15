@@ -86,6 +86,51 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "8 min de leitura"
   },
   {
+    "title": "Primeira viagem internacional depois dos 60: o que ninguém te conta",
+    "excerpt": "A primeira viagem internacional depois dos 60 não é difícil, é diferente. Seguro, ritmo, remédios e o que planejar antes de atravessar o oceano.",
+    "date": "2026-09-14",
+    "dateModified": "2026-09-15",
+    "author": "felipe-william",
+    "category": "Melhor Idade",
+    "image": "https://media.anhanga.tur.br/images/destinations/lisboa.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Melhor Idade",
+    "tags": [
+      "melhor-idade",
+      "primeira-viagem",
+      "europa",
+      "planejamento",
+      "internacional"
+    ],
+    "seoTitle": "Primeira viagem internacional após os 60",
+    "seoDescription": "Primeira viagem internacional depois dos 60: seguro com cobertura real, remédios, ritmo de roteiro, Europa sem susto e o que ninguém te conta antes do embarque.",
+    "faq": [
+      {
+        "question": "Preciso de visto para ir à Europa depois dos 60?",
+        "answer": "Brasileiro não precisa de visto para turismo no Espaço Schengen, independentemente da idade — a estadia é limitada a 90 dias em cada período de 180. O ETIAS, uma autorização eletrônica online, ainda não está em funcionamento: a previsão é começar no último trimestre de 2026, com período de transição de cerca de seis meses. Para maiores de 70, o pedido é gratuito."
+      },
+      {
+        "question": "Seguro-viagem para quem tem mais de 60 anos custa mais caro?",
+        "answer": "Custa mais porque a idade entra no cálculo de risco. Pela Circular SUSEP 667/2022, a cobertura mínima de despesas médicas cobre a estabilização de crises de urgência ou emergência até o limite contratado — não o tratamento contínuo da condição. E doença preexistente só fica de fora com acordo expresso, com declaração na DPS e identificação clara na apólice. Na prática: declare tudo e confira o teto do plano."
+      },
+      {
+        "question": "Quantos dias é ideal para a primeira viagem à Europa?",
+        "answer": "Para a primeira vez, de 10 a 14 dias com um ou dois países no máximo. Menos que isso e a viagem vira corrida; mais que isso cansa. Um dia de folga a cada três ou quatro dias de roteiro faz diferença real."
+      },
+      {
+        "question": "Posso levar meus remédios de uso contínuo para a Europa?",
+        "answer": "Pode, e deve levar na bagagem de mão, na embalagem original com bula. Medicamentos controlados podem exigir certificado, tradução ou autorização prévia: confirme com o consulado do destino e dos países de conexão, e leve receita médica com o nome genérico. Leve estoque para a viagem inteira mais alguns dias de folga."
+      },
+      {
+        "question": "Vale a pena contratar uma agência para a primeira viagem internacional?",
+        "answer": "Para a primeira vez, geralmente vale: seguro adequado, conexões com folga, hotel bem localizado e um roteiro com ritmo realista resolvem os erros mais caros. Quem prefere decidir cada detalhe pode ir por conta, mas com planejamento antecipado."
+      }
+    ],
+    "slug": "primeira-viagem-internacional-depois-dos-60",
+    "readingTime": "7 min de leitura"
+  },
+  {
     "title": "Oktoberfest Blumenau 2026: guia para planejar a viagem",
     "excerpt": "A Oktoberfest Blumenau 2026 acontece de 7 a 25 de outubro. Veja como escolher os dias, onde ficar, comprar ingresso e organizar o transporte.",
     "date": "2026-09-10",
