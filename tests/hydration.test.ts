@@ -54,6 +54,28 @@ test('shouldHydratePrerenderedRoute only hydrates when the prerendered route mat
   assert.equal(shouldHydratePrerenderedRoute(null, '/blog'), false);
 });
 
+/*
+  O 404 custom é o único artefato servido para um path que não é o dele: o Cloudflare Pages
+  entrega `dist/404.html` em QUALQUER URL sem asset, então o marcador `/404` nunca casa com
+  o pathname. Sem a exceção, `index.tsx` trata o markup como "de outra rota" e chama
+  `replaceChildren()` — medido em Chromium: o conteúdo do 404 aparecia aos 177ms, sumia por
+  ~300ms e voltava aos 576ms. Com a exceção, não some mais.
+*/
+test('shouldHydratePrerenderedRoute hidrata o 404 custom em qualquer path desconhecido', () => {
+  assert.equal(shouldHydratePrerenderedRoute('/404', '/rota-que-nao-existe'), true);
+  assert.equal(shouldHydratePrerenderedRoute('/404', '/blog/post-inexistente/'), true);
+  assert.equal(shouldHydratePrerenderedRoute('/404', '/'), true);
+  // Barra final não muda a decisão, igual às demais rotas.
+  assert.equal(shouldHydratePrerenderedRoute('/404/', '/qualquer-coisa'), true);
+});
+
+test('a exceção do 404 não afrouxa a checagem das demais rotas', () => {
+  // Guarda contra um "contém /404" ou prefixo frouxo: só o marcador exato abre exceção.
+  assert.equal(shouldHydratePrerenderedRoute('/blog/404', '/outra-rota'), false);
+  assert.equal(shouldHydratePrerenderedRoute('/404-pagina', '/outra-rota'), false);
+  assert.equal(shouldHydratePrerenderedRoute('/', '/rota-que-nao-existe'), false);
+});
+
 test('ClientOnly omits children during the initial render', () => {
   assert.equal(renderClientOnly(), '');
 });
