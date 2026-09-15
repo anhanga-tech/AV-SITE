@@ -70,7 +70,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "Quanto custa um cruzeiro da Costa na temporada 2026/2027?",
-        "answer": "Em setembro de 2026, os preços por pessoa em cabine interna começavam em torno de R$1.467 nos trechos curtos de 2 noites e R$2.079 nos minicruzeiros de 3 noites. Os roteiros Prata de 7 noites partiam de R$4.124, e os 8 a 9 noites do Serena, do Rio, de R$7.242. Tarifas são dinâmicas e sobem conforme a cabine esgota."
+        "answer": "Em setembro de 2026, cotávamos por pessoa em cabine interna dupla: a partir de R$1.293 no trecho de 2 noites entre Santos e Itajaí, R$2.626 nos minicruzeiros de 4 noites com Ilhabela, R$4.838 nos roteiros Prata de 7 noites e R$6.858 no Serena de 9 noites saindo do Rio. Taxas inclusas; tarifas são dinâmicas e sobem conforme a cabine esgota."
       },
       {
         "question": "Qual a diferença entre as tarifas Economy, My Cruise e All Inclusive da Costa?",
