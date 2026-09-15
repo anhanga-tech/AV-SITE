@@ -21,6 +21,15 @@
 /curadoria-cruzeiros-brasil    /cruzeiros/    301
 /curadoria-cruzeiros-brasil/   /cruzeiros/    301
 
+# Viagens para executivos → Corporativo
+# Alias que só existia client-side (REDIRECT_ALIASES em App.tsx) e dependia do fallback de
+# SPA para chegar ao React. Com `dist/404.html` presente o Pages desliga esse fallback, então
+# o redirect passa a viver na borda — como os três aliases acima. O <Navigate> em App.tsx
+# continua, cobrindo a navegação client-side dentro do app.
+# Destino COM barra pelo mesmo motivo dos blocos acima.
+/viagens-para-executivos    /corporativo/    301
+/viagens-para-executivos/   /corporativo/    301
+
 # Link curto de indicação (e-mail #14 NPS promotor → WhatsApp share)
 # 302 (temporário) para permitir ajustar os UTMs depois sem cache de 301.
 /indica    /links/?utm_source=indicacao&utm_medium=whatsapp&utm_campaign=nps_promotor    302
@@ -38,3 +47,15 @@
 /.well-known/api-catalog    /api/api-catalog    302
 /.well-known/api-docs       /api/api-docs       302
 /.well-known/openapi.json   /api/openapi        302
+
+# Blog antigo → blog atual
+# pages/BlogRedirect.tsx fazia isso com window.location.replace, o que só funcionava por
+# causa do fallback de SPA (e devolvia 200 ao crawler, sem passar sinal de link). Na borda
+# vira 301 de verdade. O splat preserva o slug: /old-blog/foo → /blog/foo/.
+#
+# Fica no FIM do arquivo de propósito: no _redirects vale a primeira regra que casa, então
+# qualquer regra exata abaixo de um splat seria sombreada — invariante guardado por
+# tests/cloudflare-config.test.ts ("splat redirects should come after exact redirects").
+/old-blog           /blog/         301
+/old-blog/          /blog/         301
+/old-blog/*         /blog/:splat/  301
