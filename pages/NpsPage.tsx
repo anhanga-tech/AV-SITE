@@ -1,5 +1,5 @@
 import type { FormEvent } from 'react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useSyncExternalStore } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { BRAND_LOGO_WHITE_URL } from '../lib/media-assets';
 import { NpsTextarea } from '../components/nps/NpsTextarea';
@@ -12,6 +12,30 @@ import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
 import { isFieldCompleteForAnalytics, validateNpsFormFields, type NpsFormFieldErrors } from '../lib/form-v1-validation';
 
 type PageState = 'form' | 'thank-promoter' | 'thank-other';
+
+/*
+  "Já estamos no cliente?" como fonte externa, não como estado sincronizado por efeito.
+
+  O prerender de /nps roda sem query string (scripts/prerender.mjs renderiza a rota crua),
+  então `token` é sempre vazio lá. Sem este gate o HTML estático nasceria com o bloco
+  "Link inválido" — e quem abre /nps/?token=... com link VÁLIDO veria justamente essa
+  mensagem até o React assumir (o marcador `/nps` casa com o pathname, então a página
+  hidrata de verdade).
+
+  `useSyncExternalStore` em vez de `useState` + `useEffect`: o efeito só roda DEPOIS do
+  primeiro paint, então a casca neutra chegaria a aparecer para o respondente (apontado
+  pelo React Doctor, regras `rendering-hydration-no-flicker` e `no-initialize-state`, e
+  pelo lint `react-hooks/set-state-in-effect`). Com o snapshot de servidor separado, o
+  React usa `false` durante a hidratação — casando com o HTML estático — e passa para
+  `true` ao concluí-la, sem esperar o paint.
+
+  `subscribe` é um no-op com referência estável (fora do componente): o valor nunca muda
+  depois da hidratação, então não há a que reagir, e uma função nova a cada render faria
+  o React reassinar à toa.
+*/
+const subscribeToNothing = () => () => {};
+const getIsClientSnapshot = () => true;
+const getIsServerSnapshot = () => false;
 
 const PAGE_STYLES = `
   .nps-cta {
@@ -80,21 +104,16 @@ export default function NpsPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [fieldErrors, setFieldErrors] = useState<NpsFormFieldErrors>({});
   const [year] = useState(() => new Date().getFullYear());
-  // O prerender de /nps roda sem query string (scripts/prerender.mjs renderiza a rota crua),
-  // então `token` é sempre vazio lá. Sem este gate o HTML estático nasceria com o bloco
-  // "Link inválido" — e quem abre /nps/?token=... com link VÁLIDO veria justamente essa
-  // mensagem até o React hidratar (o marcador `/nps` casa com o pathname, então a página
-  // hidrata e a divergência só se resolve quando o chunk lazy chega). `mounted` começa
-  // `false` no servidor e no primeiro render do cliente, então a hidratação casa; o efeito
-  // abaixo libera o conteúdo real logo em seguida, já com a query lida.
-  const [mounted, setMounted] = useState(false);
+  // Ver subscribeToNothing acima: `false` no servidor e durante a hidratação, `true` assim
+  // que ela conclui — sem passar por um paint com a casca neutra.
+  const mounted = useSyncExternalStore(
+    subscribeToNothing,
+    getIsClientSnapshot,
+    getIsServerSnapshot
+  );
   const { getAntiBotFields, honeypotProps } = useAntiBot();
   const startedRef = useRef(false);
   const completedFields = useRef<Set<string> | null>(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     const prev = document.title;
