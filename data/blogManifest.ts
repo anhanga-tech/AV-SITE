@@ -45,7 +45,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
   },
   {
     "title": "Cruzeiros Costa Brasileira 2026/2027: rotas, datas e preços",
-    "excerpt": "A temporada da Costa no Brasil tem dois navios, três portos de embarque e roteiros de 3 a 9 noites. As rotas, as datas e o que cada faixa de preço inclui.",
+    "excerpt": "A temporada da Costa no Brasil tem dois navios, três portos de embarque e roteiros de 2 a 9 noites. As rotas, as datas e o que cada faixa de preço inclui.",
     "date": "2026-09-15",
     "dateModified": "2026-09-15",
     "author": "felipe-william",
@@ -62,7 +62,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "melhor-idade"
     ],
     "seoTitle": "Cruzeiros Costa Brasil 2026/2027",
-    "seoDescription": "Temporada Costa 2026/2027 no Brasil: Diadema sai de Santos e Itajaí, Serena do Rio. Rotas de 3 a 9 noites, datas, preços a partir de e o que cada tarifa inclui.",
+    "seoDescription": "Temporada Costa 2026/2027 no Brasil: Diadema sai de Santos e Itajaí, Serena do Rio. Rotas de 2 a 9 noites, datas, preços por pessoa e o que cada tarifa inclui.",
     "faq": [
       {
         "question": "Quando começa a temporada de cruzeiros da Costa no Brasil em 2026/2027?",
@@ -82,7 +82,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "Preciso de passaporte para cruzeiro para Buenos Aires e Montevidéu?",
-        "answer": "Brasileiro pode entrar na Argentina e no Uruguai com a carteira de identidade (RG) em bom estado, sem passaporte. Mas quem viaja de navio com escalas internacionais faz bem em levar o passaporte se tiver, porque simplifica o desembarque em porto e evita discussão na bagagem de mão."
+        "answer": "Brasileiro pode entrar na Argentina e no Uruguai com a carteira de identidade (RG) expedida há menos de 10 anos e em bom estado. RG mais antigo não é aceito no embarque internacional: nesse caso, leve o passaporte, que também simplifica o desembarque nos portos."
       }
     ],
     "slug": "cruzeiros-costa-brasileira-2026-2027",
