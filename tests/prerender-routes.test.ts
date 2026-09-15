@@ -89,31 +89,69 @@ test('/404 é prerenderizada e fica fora do sitemap', () => {
 // responder 404 de verdade — foi o caso de /nps, /old-blog e /viagens-para-executivos, que
 // viviam só do fallback.
 //
-// Escopo: os arrays LANDING_PAGES e REDIRECT_ALIASES (`path: '...'`), que são justamente as
-// duas listas que crescem quando entra campanha nova. As rotas em JSX do MainSiteShell
-// (`path="..."`) ficam de fora porque já são cobertas pelo sitemap — exceto o catch-all,
-// que é o próprio 404.
-test('toda landing e alias de App.tsx é prerenderizada ou resolvida na borda', async () => {
+// Cobre as duas sintaxes de rota do App.tsx, porque as duas já produziram regressão:
+// `path: '...'` dos arrays LANDING_PAGES/REDIRECT_ALIASES (que cresce a cada campanha) e
+// `path="..."` do JSX do MainSiteShell — onde moram /old-blog e /old-blog/:slug, que NÃO
+// estão no sitemap nem no prerender (são rotas de redirect, não indexáveis). Uma versão
+// anterior deste guard só olhava a sintaxe de objeto e deixava /old-blog de fora: passava
+// porque o _redirects tinha sido editado à mão, não porque o teste garantia.
+//
+// Rota com parâmetro (`/blog/:slug`) é validada pelo prefixo estático: vale se houver um
+// splat na borda cobrindo o prefixo (`/old-blog/*`) ou ao menos uma rota concreta
+// prerenderizada sob ele (os posts de `/blog/<slug>`). Os catch-alls (`*`, `/*`) ficam de
+// fora: são o próprio 404.
+test('toda rota de App.tsx é prerenderizada ou resolvida na borda', async () => {
   const [appSource, redirectsSource] = await Promise.all([
     readFile(path.join(process.cwd(), 'App.tsx'), 'utf8'),
     readFile(path.join(process.cwd(), 'public/_redirects'), 'utf8')
   ]);
 
-  const rotasDeclaradas = Array.from(appSource.matchAll(/path:\s*'(\/[^']*)'/g), (m) => m[1]);
+  const semBarraFinal = (rota: string) => (rota === '/' ? '/' : rota.replace(/\/+$/, ''));
+
+  // As duas sintaxes: `path: '/x'` (arrays) e `path="/x"` (JSX).
+  const rotasDeclaradas = [
+    ...Array.from(appSource.matchAll(/path:\s*'(\/[^']*)'/g), (m) => m[1]),
+    ...Array.from(appSource.matchAll(/path="(\/[^"]*)"/g), (m) => m[1])
+  ].filter((rota) => rota !== '/*');
+
   assert.ok(rotasDeclaradas.length > 0, 'nenhuma rota extraída de App.tsx — regex desatualizada?');
+  for (const esperada of ['/old-blog', '/old-blog/:slug', '/nps', '/viagens-para-executivos']) {
+    assert.ok(
+      rotasDeclaradas.includes(esperada),
+      `${esperada} não foi extraída de App.tsx — as regex pararam de casar a sintaxe dela`
+    );
+  }
 
-  const origensNaBorda = new Set(
-    redirectsSource
-      .split('\n')
-      .map((linha) => linha.trim())
-      .filter((linha) => linha && !linha.startsWith('#'))
-      .map((linha) => linha.split(/\s+/)[0].replace(/\/$/, ''))
-  );
+  const linhasDeRedirect = redirectsSource
+    .split('\n')
+    .map((linha) => linha.trim())
+    .filter((linha) => linha && !linha.startsWith('#'))
+    .map((linha) => linha.split(/\s+/)[0]);
 
-  const prerenderizadas = new Set(BASE_PRERENDER_ROUTES);
+  const origensNaBorda = new Set(linhasDeRedirect.map(semBarraFinal));
+  const prefixosDeSplat = linhasDeRedirect
+    .filter((origem) => origem.endsWith('/*'))
+    .map((origem) => origem.slice(0, -2));
+
+  const prerenderizadas = new Set(BASE_PRERENDER_ROUTES.map(semBarraFinal));
+  const rotasDeBlog = await buildPrerenderRoutes(path.join(process.cwd(), 'content/blog'));
 
   for (const rota of rotasDeclaradas) {
-    const normalizada = rota.replace(/\/$/, '');
+    const normalizada = semBarraFinal(rota);
+
+    if (normalizada.includes('/:')) {
+      const prefixo = semBarraFinal(normalizada.slice(0, normalizada.indexOf('/:')));
+      const cobertaPorSplat = prefixosDeSplat.includes(prefixo);
+      const temFilhaPrerenderizada = rotasDeBlog.some(
+        (candidata) => semBarraFinal(candidata).startsWith(`${prefixo}/`)
+      );
+      assert.ok(
+        cobertaPorSplat || temFilhaPrerenderizada,
+        `${rota} é dinâmica e o prefixo ${prefixo} não tem splat na borda nem filha prerenderizada: responderia 404 em navegação direta`
+      );
+      continue;
+    }
+
     assert.ok(
       prerenderizadas.has(normalizada) || origensNaBorda.has(normalizada),
       `${rota} não é prerenderizada nem redirecionada na borda: responderia 404 em navegação direta`
