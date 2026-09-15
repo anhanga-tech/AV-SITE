@@ -980,7 +980,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       }
     ],
     "slug": "seguro-viagem-internacional-2026",
-    "readingTime": "8 min de leitura"
+    "readingTime": "9 min de leitura"
   },
   {
     "title": "Férias de Julho 2026: 10 Destinos Para Reservar nos Próximos 15 Dias",
