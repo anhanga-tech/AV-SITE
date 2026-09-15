@@ -34,9 +34,33 @@ export function shouldHydratePrerenderedRoute(
     return false;
   }
 
-  if (normalizeRoute(prerenderedRoute) === NOT_FOUND_PRERENDER_MARKER) {
+  if (isNotFoundPrerenderMarker(prerenderedRoute)) {
     return true;
   }
 
   return normalizeRoute(prerenderedRoute) === normalizeRoute(currentPath);
+}
+
+/**
+ * `true` quando o HTML servido é o 404 custom (`dist/404.html`).
+ *
+ * Usado por index.tsx para decidir se uma divergência de hidratação naquela página é
+ * esperada. Ela é o único artefato servido para paths que não são o dele, e um deles
+ * diverge de propósito: uma URL que só difere de uma rota real na caixa (`/Sobre`) recebe
+ * o 404 da borda, mas o React Router — que casa rota sem diferenciar caixa — renderiza a
+ * página real. Medido em Chromium contra o build servido pelo runtime do Pages:
+ *
+ *   /Sobre                → React error #418 (hydration mismatch)
+ *   /rota-que-nao-existe  → nenhum erro; o catch-all casa o mesmo markup do 404
+ *
+ * Sem tratar esse caso, o `onRecoverableError` default do `hydrateRoot` faz `console.error`,
+ * que `lib/sentry-client.ts` encaminha (`consoleLoggingIntegration`) — ou seja, cada visita
+ * a uma URL com caixa trocada viraria ruído no Sentry. A supressão vale só enquanto o
+ * marcador for o do 404; em qualquer outra rota o comportamento default continua intacto.
+ */
+export function isNotFoundPrerenderMarker(
+  prerenderedRoute: string | null | undefined
+): boolean {
+  return Boolean(prerenderedRoute) &&
+    normalizeRoute(prerenderedRoute as string) === NOT_FOUND_PRERENDER_MARKER;
 }

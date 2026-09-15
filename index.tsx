@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './src/index.css';
 import App from './App';
-import { shouldHydratePrerenderedRoute } from './lib/hydration';
+import { isNotFoundPrerenderMarker, shouldHydratePrerenderedRoute } from './lib/hydration';
 import { initClientErrorTracking } from './lib/sentry-client';
 import { installTraksWhatsAppClickListener } from './utils/traks';
 import { handleStaleChunkPreloadError } from './lib/stale-chunk-recovery';
@@ -49,7 +49,17 @@ async function bootstrap(appRoot: HTMLElement): Promise<void> {
       appRoot,
       <React.StrictMode>
         <App />
-      </React.StrictMode>
+      </React.StrictMode>,
+      // No 404 custom, uma divergência de hidratação é esperada e benigna: a página é
+      // servida para qualquer path sem asset, e uma URL que só difere na caixa (/Sobre)
+      // recebe esse HTML enquanto o React Router renderiza a página real. Sem isto, o
+      // `onRecoverableError` default faz console.error, que lib/sentry-client.ts encaminha
+      // — ruído no Sentry a cada visita dessas. Ver isNotFoundPrerenderMarker para a
+      // medição que motivou o tratamento. Fora do 404 o comportamento default fica intacto,
+      // então divergência em rota normal continua aparecendo.
+      isNotFoundPrerenderMarker(prerenderedRoute)
+        ? { onRecoverableError: () => {} }
+        : undefined
     );
   } else {
     if (hasPrerenderedMarkup) {
