@@ -89,6 +89,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Primeira viagem internacional depois dos 60: o que ninguém te conta",
     "excerpt": "A primeira viagem internacional depois dos 60 não é difícil, é diferente. Seguro, ritmo, remédios e o que planejar antes de atravessar o oceano.",
     "date": "2026-09-14",
+    "dateModified": "2026-09-15",
     "author": "felipe-william",
     "category": "Melhor Idade",
     "image": "https://media.anhanga.tur.br/images/destinations/lisboa.jpg",
@@ -111,7 +112,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "Seguro-viagem para quem tem mais de 60 anos custa mais caro?",
-        "answer": "Custa mais porque a idade entra no cálculo de risco. Pela regra da SUSEP (Circular 667/2022), doenças preexistentes declaradas não podem ser excluídas da cobertura: a urgência ligada à sua condição é coberta até o limite contratado. O essencial é declarar tudo na contratação e conferir o teto do plano, não o preço."
+        "answer": "Custa mais porque a idade entra no cálculo de risco. Pela Circular SUSEP 667/2022, a cobertura mínima de despesas médicas cobre a estabilização de crises de urgência ou emergência até o limite contratado — não o tratamento contínuo da condição. E doença preexistente só fica de fora com acordo expresso, com declaração na DPS e identificação clara na apólice. Na prática: declare tudo e confira o teto do plano."
       },
       {
         "question": "Quantos dias é ideal para a primeira viagem à Europa?",
