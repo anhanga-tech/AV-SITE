@@ -1005,7 +1005,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "faq": [
       {
         "question": "Seguro viagem é obrigatório para quais países?",
-        "answer": "Para quem pede visto Schengen (Europa), o seguro com cobertura mínima de 30.000 euros é exigência do pedido. Para brasileiros isentos de visto, a regra de entrada depende do destino: a França, por exemplo, pode pedir o comprovante na fronteira. Cuba, Equador, Venezuela, Emirados Árabes, Catar, Israel e outros também exigem seguro. O Uruguai não exige desde 2023, mas recomendamos a cobertura. Para Estados Unidos, Canadá e grande parte da Ásia, ela também é recomendada pelo alto custo médico."
+        "answer": "Para quem pede visto Schengen (Europa), o seguro com cobertura mínima de 30.000 euros é exigência do pedido. Para brasileiros isentos de visto, a regra de entrada depende do destino: a França, por exemplo, pode pedir o comprovante na fronteira. Cuba, Equador, Venezuela, Emirados Árabes, Israel e outros também exigem seguro. No Catar, ele é recomendado para a entrada sem visto por até 30 dias e obrigatório ao estender a estadia ou quando a viagem exige visto prévio. O Uruguai não exige desde 2023, mas recomendamos a cobertura."
       },
       {
         "question": "Quanto custa um seguro viagem internacional em 2026?",
