@@ -3,7 +3,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { build } from 'vite';
 import { fileURLToPath } from 'node:url';
-import { buildPrerenderRoutes } from '../lib/prerender-routes.js';
+import { NOT_FOUND_ROUTE, buildPrerenderRoutes } from '../lib/prerender-routes.js';
 import { normalizeRoute, stripHomeOnlyPreloads, validateHtml } from '../lib/prerender-html.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -21,8 +21,14 @@ const MANAGED_TEMPLATE_HEAD_TAG_PATTERNS = [
   /<link\b[^>]*data-av-head="[^"]+"[^>]*\/?>\s*/gi
 ];
 
-const routeToOutputPath = (route) =>
-  route === '/' ? path.join(DIST_DIR, 'index.html') : path.join(DIST_DIR, route.slice(1), 'index.html');
+// O 404 é o único que foge de `<rota>/index.html`: o Cloudflare Pages só reconhece o
+// arquivo solto `404.html` na raiz do output. Gravá-lo como `404/index.html` não serviria
+// de nada — o Pages continuaria sem 404 custom e seguiria no fallback de SPA, devolvendo a
+// home com 200 para qualquer URL inexistente (o soft 404 que esta rota corrige).
+const routeToOutputPath = (route) => {
+  if (route === NOT_FOUND_ROUTE) return path.join(DIST_DIR, '404.html');
+  return route === '/' ? path.join(DIST_DIR, 'index.html') : path.join(DIST_DIR, route.slice(1), 'index.html');
+};
 
 const escapeHtmlAttribute = (value) =>
   value.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
