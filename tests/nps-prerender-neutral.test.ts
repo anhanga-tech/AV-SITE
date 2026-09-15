@@ -52,6 +52,23 @@ test('a casca prerenderizada de /nps também não traz o formulário', () => {
   assert.equal(html.includes('<form'), false, 'a casca não pode trazer o formulário de NPS');
 });
 
+/*
+  Mesmo invariante que tests/hydration.test.ts guarda para o Footer compartilhado: o ano
+  não pode entrar no HTML estático. O artefato é reconstruído no máximo uma vez por dia,
+  então na virada do ano o markup assado diverge do relógio do cliente — e essa divergência
+  cai FORA da supressão do 404 (o marcador aqui é /nps), virando erro de hidratação real
+  que desfaz a casca neutra justamente para quem tem convite válido.
+*/
+test('a casca prerenderizada de /nps não assa o ano no HTML estático', () => {
+  const html = renderSemQuery();
+
+  assert.doesNotMatch(
+    html,
+    /20\d\d/,
+    'nenhum ano pode aparecer na casca estática: ele muda na virada e quebra a hidratação'
+  );
+});
+
 test('a casca prerenderizada de /nps mantém o enquadramento da página', () => {
   const html = renderSemQuery();
 

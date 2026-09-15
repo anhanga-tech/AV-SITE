@@ -103,6 +103,13 @@ export default function NpsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [fieldErrors, setFieldErrors] = useState<NpsFormFieldErrors>({});
+  // O ano fica fora do HTML estático, mesmo padrão do Footer compartilhado
+  // (components/Footer.tsx, guardado por tests/hydration.test.ts): desde que /nps é
+  // prerenderizada, um ano assado no artefato diverge do relógio do cliente na virada do
+  // ano — e, como o artefato é reconstruído no máximo uma vez por dia, a janela vai da
+  // última build de 31/12 até a primeira de 01/01, mais o deslocamento UTC−3 de quem está
+  // no Brasil. Essa divergência cairia fora da supressão do 404 (o marcador aqui é /nps),
+  // virando erro de hidratação real e desfazendo a casca neutra para todo convite válido.
   const [year] = useState(() => new Date().getFullYear());
   // Ver subscribeToNothing acima: `false` no servidor e durante a hidratação, `true` assim
   // que ela conclui — sem passar por um paint com a casca neutra.
@@ -372,7 +379,7 @@ export default function NpsPage() {
         </main>
 
         <footer className="py-6 text-center text-xs text-slate-600">
-          &copy; {year} Anhangá Viagens. Todos os direitos reservados.
+          &copy;{mounted ? ` ${year}` : ''} Anhangá Viagens. Todos os direitos reservados.
         </footer>
       </div>
     </>

@@ -18,11 +18,21 @@ function normalizeRoute(route: string): string {
   conteúdo do 404 aparecia aos 177ms, SUMIA por ~300ms e voltava aos 576ms (com CPU 6x
   lenta: some por ~230ms). Um flicker — pior que o atraso simples de antes da rota existir.
 
-  Hidratar é seguro porque o React Router casa o path desconhecido com o mesmo catch-all
-  que gerou este HTML, então a árvore renderizada bate com o markup. A exceção é uma URL
-  que só difere de uma rota real na caixa (`/Sobre`): o Pages serve o 404, mas o Router
-  casa a página real. Aí a hidratação diverge e o React re-renderiza no cliente — ou seja,
-  exatamente o comportamento que já havia sem esta exceção, sem piora.
+  O markup casa quando o path cai no catch-all do React Router, que é o que gerou este HTML
+  — o caso comum de URL inexistente. Nem todo path servido pelo 404 cai nele, porém, e
+  nesses a hidratação diverge de propósito (medido em Chromium contra o build servido pelo
+  runtime do Pages):
+
+    /rota-que-nao-existe    catch-all → casa o markup, hidrata limpo
+    /Sobre                  o Router casa rota sem diferenciar caixa → renderiza Sobre
+    /blog/post-inexistente  casa `/blog/:slug`, não o catch-all → BlogPost renderiza o
+                            próprio "Artigo não encontrado"
+
+  Nos dois últimos o React descarta o markup e re-renderiza no cliente — mesmo resultado
+  visível que havia antes desta exceção, e a página certa aparece nos três casos. O que
+  muda é que a divergência passa a ser reportada; por isso index.tsx silencia o
+  `onRecoverableError` SÓ sob este marcador (ver isNotFoundPrerenderMarker). Em troca, o
+  caso comum para de perder o markup — era um flicker de ~300ms, medido.
 */
 const NOT_FOUND_PRERENDER_MARKER = '/404';
 
