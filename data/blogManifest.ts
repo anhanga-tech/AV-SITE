@@ -935,7 +935,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Seguro viagem internacional: quando é obrigatório, quando vale a pena e quanto custa em 2026",
     "excerpt": "Saiba em quais países o seguro viagem é obrigatório, quanto custa por dia, qual cobertura contratar e os erros comuns que podem arruinar suas férias.",
     "date": "2026-06-10",
-    "dateModified": "2026-09-14",
+    "dateModified": "2026-09-15",
     "author": "queila-oliveira",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/seguro-viagem-2026.jpg",
@@ -960,7 +960,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "faq": [
       {
         "question": "Seguro viagem é obrigatório para quais países?",
-        "answer": "É obrigatório em todos os 29 países do Espaço Schengen (Europa), Cuba, Equador, Uruguai, Venezuela, Emirados Árabes, Catar, Israel e outros. Para Estados Unidos, Canadá e Ásia não é obrigatório, mas é altamente recomendado pelo alto custo médico."
+        "answer": "Para quem pede visto Schengen (Europa), o seguro com cobertura mínima de 30.000 euros é exigência do pedido; brasileiro em turismo é isento de visto e não apresenta apólice na imigração, então tratamos como recomendação forte. Cuba, Equador, Uruguai, Venezuela, Emirados Árabes, Catar, Israel e outros exigem seguro de quem entra. Para Estados Unidos, Canadá e Ásia não é obrigatório, mas é altamente recomendado pelo alto custo médico."
       },
       {
         "question": "Quanto custa um seguro viagem internacional em 2026?",
