@@ -14,6 +14,15 @@ export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
     "image": "https://media.anhanga.tur.br/images/blog/epic-universe-orlando-2026.jpg"
   },
   {
+    "slug": "cruzeiros-costa-brasileira-2026-2027",
+    "title": "Cruzeiros Costa Brasileira 2026/2027: rotas, datas e preços",
+    "excerpt": "A temporada da Costa no Brasil tem dois navios, três portos de embarque e roteiros de 2 a 9 noites. As rotas, as datas e o que cada faixa de preço inclui.",
+    "date": "2026-09-15",
+    "category": "Cruzeiros",
+    "author": "felipe-william",
+    "image": "https://media.anhanga.tur.br/images/destinations/natal.jpg"
+  },
+  {
     "slug": "quantos-dias-ficar-em-orlando-2026-roteiros",
     "title": "Quantos dias ficar em Orlando? Roteiro de 5 a 14 dias",
     "excerpt": "Cinco dias podem bastar para uma primeira visita enxuta. Com 7, 10 ou 14 dias, o roteiro muda. Veja como distribuir parques, descanso e compras em Orlando.",
@@ -30,14 +39,5 @@ export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
     "category": "Melhor Idade",
     "author": "felipe-william",
     "image": "https://media.anhanga.tur.br/images/destinations/lisboa.jpg"
-  },
-  {
-    "slug": "oktoberfest-blumenau-2026-guia-viagem",
-    "title": "Oktoberfest Blumenau 2026: guia para planejar a viagem",
-    "excerpt": "A Oktoberfest Blumenau 2026 acontece de 7 a 25 de outubro. Veja como escolher os dias, onde ficar, comprar ingresso e organizar o transporte.",
-    "date": "2026-09-10",
-    "category": "Festivais",
-    "author": "queila-oliveira",
-    "image": "https://media.anhanga.tur.br/images/blog/oktoberfest-blumenau-2026.jpg"
   }
 ];

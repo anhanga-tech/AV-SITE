@@ -44,6 +44,51 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "8 min de leitura"
   },
   {
+    "title": "Cruzeiros Costa Brasileira 2026/2027: rotas, datas e preços",
+    "excerpt": "A temporada da Costa no Brasil tem dois navios, três portos de embarque e roteiros de 2 a 9 noites. As rotas, as datas e o que cada faixa de preço inclui.",
+    "date": "2026-09-15",
+    "dateModified": "2026-09-15",
+    "author": "felipe-william",
+    "category": "Cruzeiros",
+    "image": "https://media.anhanga.tur.br/images/destinations/natal.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Cruzeiros",
+    "tags": [
+      "cruzeiros",
+      "costa",
+      "brasil-2027",
+      "escapista",
+      "melhor-idade"
+    ],
+    "seoTitle": "Cruzeiros Costa Brasil 2026/2027",
+    "seoDescription": "Temporada Costa 2026/2027 no Brasil: Diadema sai de Santos e Itajaí, Serena do Rio. Rotas de 2 a 9 noites, datas, preços por pessoa e o que cada tarifa inclui.",
+    "faq": [
+      {
+        "question": "Quando começa a temporada de cruzeiros da Costa no Brasil em 2026/2027?",
+        "answer": "A temporada vai de novembro de 2026 a abril de 2027. O Costa Diadema começa em novembro, com saídas de Santos e Itajaí. O Costa Serena, reformado, chega em dezembro e opera pelo Rio de Janeiro até abril, quando faz a travessia de volta à Europa."
+      },
+      {
+        "question": "Quanto custa um cruzeiro da Costa na temporada 2026/2027?",
+        "answer": "Em setembro de 2026, cotávamos por pessoa em cabine interna dupla: a partir de R$1.293 no trecho de 2 noites entre Santos e Itajaí, R$2.626 nos minicruzeiros de 4 noites com Ilhabela, R$4.838 nos roteiros Prata de 7 noites e R$6.858 no Serena de 9 noites saindo do Rio. Taxas inclusas; tarifas são dinâmicas e sobem conforme a cabine esgota."
+      },
+      {
+        "question": "Qual a diferença entre as tarifas Economy, My Cruise e All Inclusive da Costa?",
+        "answer": "A Economy é a mais barata e vem com cabine garantida, sem escolher número. A My Cruise permite escolher a cabine. A All Inclusive inclui o pacote de bebidas My Drinks (ou My Drinks Plus nas suítes). As três podem ser parceladas em até 12x sem juros."
+      },
+      {
+        "question": "Costa Diadema ou Costa Serena: qual escolher?",
+        "answer": "O Diadema embarca em Santos e Itajaí, com roteiros de 2 a 7 noites, e é a opção mais prática para quem está em São Paulo, Santa Catarina e arredores. O Serena, reformado, sai do Rio e tem roteiros de 8 e 9 noites com mais dias de navegação. Para primeira viagem de navio, os dois funcionam bem."
+      },
+      {
+        "question": "Preciso de passaporte para cruzeiro para Buenos Aires e Montevidéu?",
+        "answer": "Brasileiro pode entrar na Argentina e no Uruguai com a carteira de identidade (RG) expedida há menos de 10 anos e em bom estado. RG mais antigo não é aceito no embarque internacional: nesse caso, leve o passaporte, que também simplifica o desembarque nos portos."
+      }
+    ],
+    "slug": "cruzeiros-costa-brasileira-2026-2027",
+    "readingTime": "7 min de leitura"
+  },
+  {
     "title": "Quantos dias ficar em Orlando? Roteiro de 5 a 14 dias",
     "excerpt": "Cinco dias podem bastar para uma primeira visita enxuta. Com 7, 10 ou 14 dias, o roteiro muda. Veja como distribuir parques, descanso e compras em Orlando.",
     "date": "2026-09-15",
