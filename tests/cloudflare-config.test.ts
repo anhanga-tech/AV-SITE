@@ -233,11 +233,14 @@ test('Cloudflare Pages headers should set a defense-in-depth Content-Security-Po
   assert.ok(csp, 'Content-Security-Policy header must be present in /* block');
 
   // These restrictive directives close real attack surface (base-tag injection,
-  // plugin-based content, clickjacking) without constraining where scripts,
-  // styles, images, or XHR/fetch may load from.
+  // plugin-based content, clickjacking, cross-origin form exfiltration) without
+  // constraining where scripts, styles, images, or XHR/fetch may load from. All
+  // forms on the site submit via fetch/XHR, not native form actions, so
+  // form-action 'self' is non-breaking.
   assert.match(csp, /\bbase-uri 'self'/, 'base-uri must be locked to self');
   assert.match(csp, /\bobject-src 'none'/, 'object-src must be none');
   assert.match(csp, /\bframe-ancestors 'none'/, 'frame-ancestors must be none');
+  assert.match(csp, /\bform-action 'self'/, "form-action must be locked to 'self'");
 });
 
 test('Cloudflare Pages CSP should stay non-breaking until a source allowlist is audited', async () => {
