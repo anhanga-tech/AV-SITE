@@ -80,9 +80,21 @@ export default function NpsPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [fieldErrors, setFieldErrors] = useState<NpsFormFieldErrors>({});
   const [year] = useState(() => new Date().getFullYear());
+  // O prerender de /nps roda sem query string (scripts/prerender.mjs renderiza a rota crua),
+  // então `token` é sempre vazio lá. Sem este gate o HTML estático nasceria com o bloco
+  // "Link inválido" — e quem abre /nps/?token=... com link VÁLIDO veria justamente essa
+  // mensagem até o React hidratar (o marcador `/nps` casa com o pathname, então a página
+  // hidrata e a divergência só se resolve quando o chunk lazy chega). `mounted` começa
+  // `false` no servidor e no primeiro render do cliente, então a hidratação casa; o efeito
+  // abaixo libera o conteúdo real logo em seguida, já com a query lida.
+  const [mounted, setMounted] = useState(false);
   const { getAntiBotFields, honeypotProps } = useAntiBot();
   const startedRef = useRef(false);
   const completedFields = useRef<Set<string> | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const prev = document.title;
@@ -209,7 +221,7 @@ export default function NpsPage() {
         <main className="flex-1 flex flex-col items-center px-6 pb-16 pt-8">
           <div className="w-full max-w-lg">
 
-            {!token && (
+            {mounted && !token && (
               <div className="nps-thank-card text-center">
                 <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3">Link inválido</h1>
                 <p className="text-base text-slate-400 leading-7">
@@ -218,7 +230,7 @@ export default function NpsPage() {
               </div>
             )}
 
-            {token && pageState === 'form' && (
+            {mounted && token && pageState === 'form' && (
               <form onSubmit={(e) => void handleSubmit(e)} noValidate>
                 {/* Honeypot: hidden from humans, blind form-fillers populate it. */}
                 <input {...honeypotProps} />

@@ -1,22 +1,34 @@
+import './helpers/dom-setup.ts';
+
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import React from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
+import { render, cleanup } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import NpsPage from '../pages/NpsPage.tsx';
 
+// Identity (firstname/email) is bound server-side to the signed invitation
+// token (issue #1137) — the page never collects them as free text.
+//
+// Montagem real (happy-dom + testing-library) em vez de renderToStaticMarkup: desde que
+// /nps passou a ser prerenderizada, o corpo que depende da query só aparece após o mount
+// (ver o gate de `mounted` em pages/NpsPage.tsx e tests/nps-prerender-neutral.test.ts).
+// Um renderizador de servidor nunca roda efeitos, então continuaria medindo a casca
+// estática e não o que o respondente de fato vê.
 function renderNpsPage(path: string): string {
-  return renderToStaticMarkup(
+  const { container } = render(
     React.createElement(
       MemoryRouter,
       { initialEntries: [path] },
       React.createElement(NpsPage)
     )
   );
+  return container.innerHTML;
 }
 
-// Identity (firstname/email) is bound server-side to the signed invitation
-// token (issue #1137) — the page never collects them as free text.
+test.afterEach(() => {
+  cleanup();
+});
 
 test('NpsPage shows an invalid-link state and no form when the token is missing', () => {
   const html = renderNpsPage('/nps?firstname=Ana');

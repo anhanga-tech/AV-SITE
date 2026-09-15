@@ -108,10 +108,12 @@ test('toda rota de App.tsx é prerenderizada ou resolvida na borda', async () =>
 
   const semBarraFinal = (rota: string) => (rota === '/' ? '/' : rota.replace(/\/+$/, ''));
 
-  // As duas sintaxes: `path: '/x'` (arrays) e `path="/x"` (JSX).
+  // As duas sintaxes: `path: '/x'` (arrays) e `path="/x"` (JSX). Aspas simples E duplas em
+  // ambas — o repo não tem regra de lint de aspas (eslint.config.js), então `path: "/x"` e
+  // `path='/x'` são igualmente válidos e uma rota escrita assim escaparia do guard.
   const rotasDeclaradas = [
-    ...Array.from(appSource.matchAll(/path:\s*'(\/[^']*)'/g), (m) => m[1]),
-    ...Array.from(appSource.matchAll(/path="(\/[^"]*)"/g), (m) => m[1])
+    ...Array.from(appSource.matchAll(/path:\s*(['"])(\/[^'"]*)\1/g), (m) => m[2]),
+    ...Array.from(appSource.matchAll(/path\s*=\s*(['"])(\/[^'"]*)\1/g), (m) => m[2])
   ].filter((rota) => rota !== '/*');
 
   assert.ok(rotasDeclaradas.length > 0, 'nenhuma rota extraída de App.tsx — regex desatualizada?');
