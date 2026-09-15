@@ -4,7 +4,8 @@ import { WebPageSchema } from "@/components/schemas/WebPageSchema";
 
 const CANONICAL = "https://www.anhanga.tur.br/exclusao-de-dados/";
 const DESCRIPTION = "Instruções para solicitar a exclusão de dados pessoais junto à Anhangá Turismo, conforme a LGPD (Lei nº 13.709/2018).";
-const UPDATED = "10 de junho de 2026";
+const UPDATED = "14 de setembro de 2026";
+const UPDATED_ISO = "2026-09-14";
 
 const ExclusaoDados = () => (
     <>
@@ -60,23 +61,61 @@ const ExclusaoDados = () => (
                                 <tbody className="divide-y divide-border">
                                     <tr>
                                         <td className="py-2 pr-4">Nome, e-mail e telefone coletados pelo chatbot ou formulários</td>
-                                        <td className="py-2">Salesforce CRM</td>
+                                        <td className="py-2">Odoo CRM</td>
                                     </tr>
                                     <tr>
                                         <td className="py-2 pr-4">Resumo da conversa com nosso assistente de IA e dados de qualificação da viagem registrados no atendimento</td>
-                                        <td className="py-2">Salesforce CRM (o processamento das mensagens pelo Google Gemini é transitório e não fica armazenado por nós)</td>
+                                        <td className="py-2">Odoo CRM. As mensagens também são processadas pelo Google Gemini (Google LLC), e a eventual retenção delas pelo Google segue os termos desse fornecedor</td>
                                     </tr>
                                     <tr>
-                                        <td className="py-2 pr-4">Dados de rastreamento (UTM, clique em anúncios) associados ao seu perfil</td>
-                                        <td className="py-2">Google Analytics 4 / GTM</td>
+                                        <td className="py-2 pr-4">Dados de rastreamento (UTM, clique em anúncios) e as preferências de viagem que você informou — o destino digitado no formulário e o perfil de viajante do quiz —, associados ao seu perfil</td>
+                                        <td className="py-2">Google Analytics 4 (via Cloudflare Zaraz) e Odoo CRM. A exclusão no Google Analytics é feita pelo painel da ferramenta, que também descarta esses eventos automaticamente após 14 meses. Se você havia consentido com cookies de marketing, a conversão também foi enviada ao Meta e ao TikTok — nesses casos solicitamos a exclusão pelos canais de titular de cada plataforma e informamos o retorno, já que a remoção depende delas</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="py-2 pr-4">Nome, e-mail, observações, horário e dados de campanha de consultorias agendadas pelo website</td>
+                                        <td className="py-2">Cal.com (excluídos pela nossa equipe na conta de agendamento)</td>
                                     </tr>
                                     <tr>
                                         <td className="py-2 pr-4">Cookies de identificação persistentes</td>
                                         <td className="py-2">Navegador do usuário (instrução de remoção enviada)</td>
                                     </tr>
+                                    <tr>
+                                        <td className="py-2 pr-4">Depoimento publicado por você no nosso perfil do Google (nome, nota, data, texto e foto de perfil), quando exibido no nosso website</td>
+                                        <td className="py-2">Cópia no código do website, hospedado no GitHub, e a foto no nosso armazenamento de mídia (Cloudflare R2) — ver a ressalva abaixo</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="py-2 pr-4">Registros de erro do website que eventualmente contenham o que você digitou em um formulário (por exemplo, o destino pesquisado) e o endereço IP da requisição</td>
+                                        <td className="py-2">Sentry (Functional Software, Inc.), quando houver registro associado à sua solicitação</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
+                        <p>
+                            Se o seu atendimento ocorreu antes de junho de 2026, a busca alcança também as bases
+                            dos sistemas de CRM que usávamos até então, ainda em processo de encerramento: seus
+                            dados são localizados e removidos nelas da mesma forma, e a conclusão é informada na
+                            resposta ao seu pedido.
+                        </p>
+                        <p>
+                            Uma ressalva de transparência: o servidor intermediário que envia os eventos ao Google
+                            Analytics cria um identificador próprio, guardado num cookie que nenhum código da página
+                            consegue ler. Ele não é associado ao seu cadastro. Para removê-lo por completo, são dois
+                            passos: limpar os cookies e os dados do site no seu navegador apaga a cópia que está no seu
+                            dispositivo, e a exclusão no painel do Google Analytics — somada ao descarte automático
+                            citado acima — trata os registros já enviados.
+                        </p>
+                        <p>
+                            Outra ressalva, sobre depoimentos: retiramos o seu depoimento do website e da versão atual
+                            do código, mas duas cópias exigem tratamento manual e podem levar mais tempo — o texto e o
+                            nome permanecem no histórico de versões do repositório, que é público, e apagar esse
+                            histórico não é possível sem reescrever todo o projeto; a foto de perfil fica no nosso
+                            armazenamento de mídia até ser removida a pedido, porque ainda não temos rotina automática
+                            para isso. Estamos
+                            mudando a forma como esses depoimentos são armazenados justamente para remover essa
+                            limitação. Se esse ponto for decisivo para você, escreva ao nosso Encarregado: avaliamos
+                            caso a caso o que é tecnicamente possível e informamos o resultado. Lembramos ainda que o
+                            depoimento original continua publicado no Google enquanto você não o remover por lá.
+                        </p>
                     </div>
                 </section>
 
@@ -119,7 +158,7 @@ const ExclusaoDados = () => (
                 </section>
             </article>
         </div>
-        <WebPageSchema name="Exclusão de Dados Pessoais - Anhangá Turismo" url={CANONICAL} description={DESCRIPTION} dateModified="2026-06-10" />
+        <WebPageSchema name="Exclusão de Dados Pessoais - Anhangá Turismo" url={CANONICAL} description={DESCRIPTION} dateModified={UPDATED_ISO} />
     </>
 );
 

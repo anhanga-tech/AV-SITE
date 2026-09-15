@@ -86,6 +86,51 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "8 min de leitura"
   },
   {
+    "title": "Primeira viagem internacional depois dos 60: o que ninguém te conta",
+    "excerpt": "A primeira viagem internacional depois dos 60 não é difícil, é diferente. Seguro, ritmo, remédios e o que planejar antes de atravessar o oceano.",
+    "date": "2026-09-14",
+    "dateModified": "2026-09-15",
+    "author": "felipe-william",
+    "category": "Melhor Idade",
+    "image": "https://media.anhanga.tur.br/images/destinations/lisboa.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Melhor Idade",
+    "tags": [
+      "melhor-idade",
+      "primeira-viagem",
+      "europa",
+      "planejamento",
+      "internacional"
+    ],
+    "seoTitle": "Primeira viagem internacional após os 60",
+    "seoDescription": "Primeira viagem internacional depois dos 60: seguro com cobertura real, remédios, ritmo de roteiro, Europa sem susto e o que ninguém te conta antes do embarque.",
+    "faq": [
+      {
+        "question": "Preciso de visto para ir à Europa depois dos 60?",
+        "answer": "Brasileiro não precisa de visto para turismo no Espaço Schengen, independentemente da idade — a estadia é limitada a 90 dias em cada período de 180. O ETIAS, uma autorização eletrônica online, ainda não está em funcionamento: a previsão é começar no último trimestre de 2026, com período de transição de pelo menos seis meses. Para maiores de 70, o pedido é gratuito."
+      },
+      {
+        "question": "Seguro-viagem para quem tem mais de 60 anos custa mais caro?",
+        "answer": "Custa mais porque a idade entra no cálculo de risco. Pela Circular SUSEP 667/2022, a cobertura mínima de despesas médicas cobre a estabilização de crises de urgência ou emergência até o limite contratado — não o tratamento contínuo da condição. E doença preexistente só fica de fora com acordo expresso, com declaração na DPS e identificação clara na apólice. Na prática: declare tudo e confira o teto do plano."
+      },
+      {
+        "question": "Quantos dias é ideal para a primeira viagem à Europa?",
+        "answer": "Para a primeira vez, de 10 a 14 dias com um ou dois países no máximo. Menos que isso e a viagem vira corrida; mais que isso cansa. Um dia de folga a cada três ou quatro dias de roteiro faz diferença real."
+      },
+      {
+        "question": "Posso levar meus remédios de uso contínuo para a Europa?",
+        "answer": "Pode, e deve levar na bagagem de mão, na embalagem original com bula. Medicamentos controlados podem exigir certificado, tradução ou autorização prévia: confirme com o consulado do destino e dos países de conexão, e leve receita médica com o nome genérico. Leve estoque para a viagem inteira mais alguns dias de folga."
+      },
+      {
+        "question": "Vale a pena contratar uma agência para a primeira viagem internacional?",
+        "answer": "Para a primeira vez, geralmente vale: seguro adequado, conexões com folga, hotel bem localizado e um roteiro com ritmo realista resolvem os erros mais caros. Quem prefere decidir cada detalhe pode ir por conta, mas com planejamento antecipado."
+      }
+    ],
+    "slug": "primeira-viagem-internacional-depois-dos-60",
+    "readingTime": "7 min de leitura"
+  },
+  {
     "title": "Oktoberfest Blumenau 2026: guia para planejar a viagem",
     "excerpt": "A Oktoberfest Blumenau 2026 acontece de 7 a 25 de outubro. Veja como escolher os dias, onde ficar, comprar ingresso e organizar o transporte.",
     "date": "2026-09-10",
@@ -741,9 +786,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "6 min de leitura"
   },
   {
-    "title": "Jalapão em Julho: Roteiro, Custos e Por Que Ir Antes Que Vire Mainstream",
-    "excerpt": "Em julho, os fervedouros do Jalapão estão no melhor momento do ano. Roteiro de 7 dias, custos reais e por que ir antes que o destino mude.",
+    "title": "Jalapão: Roteiro de 7 Dias, Custos Reais e a Melhor Época para Ir",
+    "excerpt": "Na seca (maio a setembro, com pico em julho), os fervedouros do Jalapão estão no melhor momento. Roteiro de 7 dias, custos reais e por que ir agora.",
     "date": "2026-07-04",
+    "dateModified": "2026-09-14",
     "author": "felipe-william",
     "category": "Destinos",
     "image": "https://media.anhanga.tur.br/images/blog/jalapao-julho-roteiro-custos.jpg",
@@ -759,7 +805,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       "roteiros-nacionais"
     ],
     "seoTitle": "Jalapão em Julho: Roteiro e Custos",
-    "seoDescription": "Roteiro completo de 7 dias no Jalapão em julho com custos reais, fervedouros, dunas e por que ir agora antes que o destino mude. Guia atualizado 2026.",
+    "seoDescription": "Roteiro de 7 dias no Jalapão na seca (julho é o pico): custos reais, fervedouros, dunas e por que ir agora, antes que o destino vire mainstream.",
     "faq": [
       {
         "question": "Precisa de guia para visitar o Jalapão?",
@@ -789,7 +835,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Documentos para Viajar com Criança ao Exterior: Guia Completo 2026",
     "excerpt": "Passaporte, autorização de viagem, certidão de nascimento: saiba o que levar ao viajar com menor de 18 anos para fora do Brasil de acordo com cada cenário.",
     "date": "2026-06-30",
-    "dateModified": "2026-07-07",
+    "dateModified": "2026-09-15",
     "author": "felipe-william",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/documentos-viajar-crianca-exterior.jpg",
@@ -840,7 +886,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "ETIAS 2026: O Que Mudou para Brasileiros na Europa (Perguntas e Respostas)",
     "excerpt": "A Europa exigirá autorização eletrônica de brasileiros a partir do fim de 2026. Entenda o que é o ETIAS, quanto custa, como pedir e o que muda na fronteira.",
     "date": "2026-06-23",
-    "dateModified": "2026-07-07",
+    "dateModified": "2026-09-15",
     "author": "felipe-william",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/etias-2026-brasileiros-europa.jpg",
@@ -863,7 +909,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "Quando exatamente o ETIAS começa a ser obrigatório para brasileiros?",
-        "answer": "A previsão oficial é o último trimestre de 2026 (outubro a dezembro). A data exata não foi divulgada pela Comissão Europeia. Após o lançamento, haverá um período de graça de 6 meses antes de a entrada ser recusada sem o ETIAS."
+        "answer": "A previsão oficial é o último trimestre de 2026 (outubro a dezembro), mas a data exata não foi divulgada. Após o lançamento, haverá pelo menos seis meses de transição, quando a falta do ETIAS não impedirá a entrada se os demais requisitos forem cumpridos. Depois virão pelo menos seis meses de graça: a autorização será exigida, com exceção da primeira entrada do viajante desde o fim da transição."
       },
       {
         "question": "Quanto custa o ETIAS em 2026?",
@@ -934,7 +980,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Seguro viagem internacional: quando é obrigatório, quando vale a pena e quanto custa em 2026",
     "excerpt": "Saiba em quais países o seguro viagem é obrigatório, quanto custa por dia, qual cobertura contratar e os erros comuns que podem arruinar suas férias.",
     "date": "2026-06-10",
-    "dateModified": "2026-07-17",
+    "dateModified": "2026-09-15",
     "author": "queila-oliveira",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/seguro-viagem-2026.jpg",
@@ -959,7 +1005,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "faq": [
       {
         "question": "Seguro viagem é obrigatório para quais países?",
-        "answer": "É obrigatório em todos os 29 países do Espaço Schengen (Europa), Cuba, Equador, Uruguai, Venezuela, Emirados Árabes, Catar, Israel e outros. Para Estados Unidos, Canadá e Ásia não é obrigatório, mas é altamente recomendado pelo alto custo médico."
+        "answer": "Para quem pede visto Schengen (Europa), o seguro com cobertura mínima de 30.000 euros é exigência do pedido. Para brasileiros isentos de visto, a regra de entrada depende do destino: a França, por exemplo, pode pedir o comprovante na fronteira. Cuba, Equador, Venezuela, Emirados Árabes, Israel e outros também exigem seguro. No Catar, ele é recomendado para a entrada sem visto por até 30 dias e obrigatório ao estender a estadia ou quando a viagem exige visto prévio. O Uruguai não exige desde 2023, mas recomendamos a cobertura."
       },
       {
         "question": "Quanto custa um seguro viagem internacional em 2026?",
@@ -975,11 +1021,11 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "O ETIAS substitui o seguro viagem na Europa?",
-        "answer": "Não. O ETIAS é uma autorização eletrônica de viagem que será obrigatória a partir do final de 2026 para entrar no Espaço Schengen. Ele não substitui o seguro viagem. Você vai precisar dos dois documentos para embarcar."
+        "answer": "Não. O ETIAS é uma autorização eletrônica com lançamento previsto para o último trimestre de 2026; a data exata ainda não foi divulgada. Depois haverá pelo menos seis meses de transição e pelo menos mais seis meses de graça, com regras diferentes. O seguro é um documento separado e sua exigência de entrada depende do destino."
       }
     ],
     "slug": "seguro-viagem-internacional-2026",
-    "readingTime": "8 min de leitura"
+    "readingTime": "9 min de leitura"
   },
   {
     "title": "Férias de Julho 2026: 10 Destinos Para Reservar nos Próximos 15 Dias",
@@ -1401,7 +1447,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Europa 2026: ETIAS, câmbio e custos reais",
     "excerpt": "O que mudou para viajar à Europa em 2026, quanto custa, quais países combinar e como montar um roteiro que realmente funciona saindo do Brasil.",
     "date": "2026-04-29",
-    "dateModified": "2026-07-04",
+    "dateModified": "2026-09-15",
     "author": "felipe-william",
     "category": "Destinos",
     "image": "https://media.anhanga.tur.br/images/destinations/lisboa.jpg",
@@ -1418,11 +1464,11 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "faq": [
       {
         "question": "Preciso de visto para viajar para a Europa em 2026?",
-        "answer": "Não. Brasileiros não precisam de visto para estadias de turismo de até 90 dias no Espaço Schengen — mas a partir do último trimestre de 2026 será preciso solicitar o ETIAS, uma autorização eletrônica (não é visto)."
+        "answer": "Não. Brasileiros não precisam de visto para turismo no Espaço Schengen: até 90 dias em cada período de 180 dias. O ETIAS, uma autorização eletrônica (não é visto), ainda não está em funcionamento: a previsão é começar no último trimestre de 2026, com período de transição de pelo menos seis meses."
       },
       {
-        "question": "Quanto custa o seguro viagem obrigatório para a Europa?",
-        "answer": "O seguro viagem com cobertura mínima de 30.000 euros é obrigatório para entrar no Espaço Schengen — não é opcional, e qualquer emergência médica na Europa custa caro sem ele."
+        "question": "Quanto custa o seguro viagem para a Europa?",
+        "answer": "Para quem precisa de visto Schengen, a cobertura mínima de 30.000 euros é exigência do próprio pedido. Para brasileiros isentos, as regras de entrada variam conforme o destino — a França, por exemplo, pode pedir o comprovante na fronteira. Viajar sem seguro também é assumir o risco de uma emergência médica cara, então tratamos como item básico do planejamento."
       },
       {
         "question": "Quantos países dá para combinar num roteiro de 15 dias pela Europa?",
@@ -1518,7 +1564,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "seoTitle": "Guia de Sobrevivência em Festivais",
     "excerpt": "Estratégias práticas, dicas de alimentação e o kit essencial para aproveitar seu festival de música sem se esgotar no meio do dia.",
     "date": "2026-01-24",
-    "dateModified": "2026-07-16",
+    "dateModified": "2026-09-14",
     "author": "felipe-william",
     "category": "Festivais",
     "image": "https://media.anhanga.tur.br/images/blog/guia-festivais.jpg",
@@ -1548,10 +1594,14 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       {
         "question": "Vale a pena chegar cedo em um festival?",
         "answer": "Sim, principalmente para garantir lugares melhores em shows muito disputados. Chegar cedo também ajuda a se localizar no mapa do evento antes que fique lotado."
+      },
+      {
+        "question": "Quando é o Lollapalooza Brasil 2027?",
+        "answer": "A 14ª edição acontece nos dias 19, 20 e 21 de março de 2027, de novo no Autódromo de Interlagos, em São Paulo. As datas foram anunciadas com bastante antecedência, o que dá tempo de planejar voo e hospedagem antes da alta temporada."
       }
     ],
     "slug": "guia-definitivo-sobrevivencia-festivais",
-    "readingTime": "3 min de leitura"
+    "readingTime": "4 min de leitura"
   },
   {
     "title": "5 segredos da Disney que ninguém conta",

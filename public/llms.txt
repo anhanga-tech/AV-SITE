@@ -76,6 +76,7 @@ Versão markdown de qualquer página: https://www.anhanga.tur.br/api/markdown?pa
 
 - [Epic Universe em Orlando: vale a pena em 2026?](https://www.anhanga.tur.br/blog/epic-universe-orlando-2026-vale-a-pena/) (2026-09-22)
 - [Quantos dias ficar em Orlando? Roteiro de 5 a 14 dias](https://www.anhanga.tur.br/blog/quantos-dias-ficar-em-orlando-2026-roteiros/) (2026-09-15)
+- [Primeira viagem internacional depois dos 60: o que ninguém te conta](https://www.anhanga.tur.br/blog/primeira-viagem-internacional-depois-dos-60/) (2026-09-14)
 - [Oktoberfest Blumenau 2026: guia para planejar a viagem](https://www.anhanga.tur.br/blog/oktoberfest-blumenau-2026-guia-viagem/) (2026-09-10)
 - [Onde ficar em Orlando: qual região escolher](https://www.anhanga.tur.br/blog/onde-ficar-em-orlando-disney-universal-international-drive/) (2026-09-08)
 - [Rock in Rio 2026: checklist para quem vai ao festival](https://www.anhanga.tur.br/blog/rock-in-rio-2026-guia-viagem-rio/) (2026-09-05)
@@ -91,7 +92,7 @@ Versão markdown de qualquer página: https://www.anhanga.tur.br/api/markdown?pa
 - [Melhor Época para Viajar para Orlando: Guia por Perfil de Viajante](https://www.anhanga.tur.br/blog/melhor-epoca-viajar-orlando-guia-perfil-viajante/) (2026-07-10)
 - [Cancún, Punta Cana ou Aruba para Lua de Mel? Comparação Honesta](https://www.anhanga.tur.br/blog/cancun-punta-cana-aruba-lua-de-mel/) (2026-07-04)
 - [Disney vs Beto Carrero: Qual Escolher para Crianças de 4 a 10 Anos?](https://www.anhanga.tur.br/blog/disney-ou-beto-carrero/) (2026-07-04)
-- [Jalapão em Julho: Roteiro, Custos e Por Que Ir Antes Que Vire Mainstream](https://www.anhanga.tur.br/blog/jalapao-julho-roteiro-custos/) (2026-07-04)
+- [Jalapão: Roteiro de 7 Dias, Custos Reais e a Melhor Época para Ir](https://www.anhanga.tur.br/blog/jalapao-julho-roteiro-custos/) (2026-07-04)
 - [Documentos para Viajar com Criança ao Exterior: Guia Completo 2026](https://www.anhanga.tur.br/blog/documentos-para-viajar-com-crianca/) (2026-06-30)
 - [ETIAS 2026: O Que Mudou para Brasileiros na Europa (Perguntas e Respostas)](https://www.anhanga.tur.br/blog/etias-2026-brasileiros-europa/) (2026-06-23)
 - [Agência de Viagens ou Por Conta Própria? O Que Vale Mais — e Quando](https://www.anhanga.tur.br/blog/agencia-de-viagens-ou-por-conta-propria/) (2026-06-16)
