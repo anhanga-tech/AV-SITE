@@ -28,12 +28,20 @@ interface SocialShareProps {
     minimal?: boolean;
 }
 
-// PERFORMANCE: memoized because every list/grid caller (BlogList, Blog,
-// DestinationsView) renders one instance per visible card with primitive-only
-// props (strings/booleans), so a parent re-render (e.g. BlogList's search
-// keystroke) no longer forces every already-mounted share widget through its
-// render + getSocialShareLinks work when its own url/title/excerpt are unchanged.
-export const SocialShare = React.memo<SocialShareProps>(({ url, title, excerpt, className = "", minimal = false }) => {
+interface ShareVariantProps {
+    url: string;
+    title: string;
+    excerpt?: string;
+    className?: string;
+}
+
+/**
+ * Shared state/handlers for both share layouts — extracted into a hook so
+ * `SocialShareMinimal` and `SocialShareFull` stay simple enough for
+ * react-doctor's complexity check (each used to live as one branch inside a
+ * single component with both layouts' JSX and logic combined).
+ */
+function useSocialShareActions(url: string, title: string, excerpt?: string) {
     const [copied, setCopied] = useState(false);
 
     const handleNativeShare = async () => {
@@ -65,48 +73,51 @@ export const SocialShare = React.memo<SocialShareProps>(({ url, title, excerpt, 
             .catch(() => {});
     };
 
-    if (minimal) {
-        return (
-            <div className={`flex items-center gap-1 ${className}`}>
-                <output aria-live="polite" aria-atomic="true" className="sr-only">
-                    {copied ? 'Link copiado com sucesso' : ''}
-                </output>
-                <button
-                    type="button"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        void handleNativeShare();
-                    }}
-                    onMouseEnter={prefetchHaptics}
-                    className="min-h-12 min-w-12 flex items-center justify-center bg-white/80 hover:bg-brand-cyan hover:text-white text-zinc-600 rounded-full transition shadow-sm border border-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-cyan"
-                    title="Compartilhar"
-                    aria-label="Compartilhar"
-                >
-                    <Share2 className="size-4" />
-                </button>
-                <button
-                    type="button"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleCopy();
-                    }}
-                    onMouseEnter={prefetchHaptics}
-                    className={`min-h-12 min-w-12 flex items-center justify-center rounded-full transition shadow-sm border focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${copied ? 'bg-green-700 text-white border-green-800 focus-visible:ring-green-700' : 'bg-white/80 text-zinc-600 border-zinc-100 hover:bg-zinc-100 focus-visible:ring-zinc-400'}`}
-                    title={copied ? "Link copiado!" : "Copiar link"}
-                    aria-label={copied ? "Link copiado com sucesso" : "Copiar link"}
-                >
-                    {copied ? <Check className="size-4" /> : <LinkIcon className="size-4" />}
-                </button>
-            </div>
-        );
-    }
+    return { copied, handleNativeShare, handleCopy };
+}
 
-    // Computed only for the full (non-minimal) layout below, which is the sole
-    // consumer of `links` — the minimal branch above already returned, and every
-    // list/grid usage of SocialShare (BlogList, Blog, BlogPostContent's header)
-    // passes minimal, so this used to run on every card render for nothing.
+function SocialShareMinimal({ url, title, excerpt, className = "" }: ShareVariantProps) {
+    const { copied, handleNativeShare, handleCopy } = useSocialShareActions(url, title, excerpt);
+
+    return (
+        <div className={`flex items-center gap-1 ${className}`}>
+            <output aria-live="polite" aria-atomic="true" className="sr-only">
+                {copied ? 'Link copiado com sucesso' : ''}
+            </output>
+            <button
+                type="button"
+                onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    void handleNativeShare();
+                }}
+                onMouseEnter={prefetchHaptics}
+                className="min-h-12 min-w-12 flex items-center justify-center bg-white/80 hover:bg-brand-cyan hover:text-white text-zinc-600 rounded-full transition shadow-sm border border-zinc-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-cyan"
+                title="Compartilhar"
+                aria-label="Compartilhar"
+            >
+                <Share2 className="size-4" />
+            </button>
+            <button
+                type="button"
+                onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleCopy();
+                }}
+                onMouseEnter={prefetchHaptics}
+                className={`min-h-12 min-w-12 flex items-center justify-center rounded-full transition shadow-sm border focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${copied ? 'bg-green-700 text-white border-green-800 focus-visible:ring-green-700' : 'bg-white/80 text-zinc-600 border-zinc-100 hover:bg-zinc-100 focus-visible:ring-zinc-400'}`}
+                title={copied ? "Link copiado!" : "Copiar link"}
+                aria-label={copied ? "Link copiado com sucesso" : "Copiar link"}
+            >
+                {copied ? <Check className="size-4" /> : <LinkIcon className="size-4" />}
+            </button>
+        </div>
+    );
+}
+
+function SocialShareFull({ url, title, excerpt, className = "" }: ShareVariantProps) {
+    const { copied, handleNativeShare, handleCopy } = useSocialShareActions(url, title, excerpt);
     const links = getSocialShareLinks(url, title);
 
     return (
@@ -201,6 +212,17 @@ export const SocialShare = React.memo<SocialShareProps>(({ url, title, excerpt, 
             </div>
         </div>
     );
+}
+
+// PERFORMANCE: memoized because every list/grid caller (BlogList, Blog,
+// DestinationsView) renders one instance per visible card with primitive-only
+// props (strings/booleans), so a parent re-render (e.g. BlogList's search
+// keystroke) no longer forces every already-mounted share widget through its
+// render + variant logic when its own url/title/excerpt are unchanged.
+export const SocialShare = React.memo<SocialShareProps>(({ url, title, excerpt, className = "", minimal = false }) => {
+    return minimal
+        ? <SocialShareMinimal url={url} title={title} excerpt={excerpt} className={className} />
+        : <SocialShareFull url={url} title={title} excerpt={excerpt} className={className} />;
 });
 
 SocialShare.displayName = 'SocialShare';
