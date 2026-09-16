@@ -41,17 +41,23 @@ test('nenhum dos workflows faz checkout do código da PR', async () => {
   }
 });
 
-test('auto-merge cobre apenas semver-patch e semver-minor', async () => {
+// Isola o bloco YAML de um step pelo seu conteúdo. Asserção sobre o arquivo
+// inteiro não serve aqui: um step de merge incondicional convivendo com outro
+// step gated passaria, que é exatamente o furo que este teste existe pra pegar.
+function stepContaining(workflow: string, needle: string): string {
+  const steps = workflow.split(/^ {6}- /m).slice(1);
+  const match = steps.filter((step) => step.includes(needle));
+  assert.equal(match.length, 1, `esperava exatamente um step contendo ${needle}`);
+  return match[0];
+}
+
+test('o próprio step de merge é gated em semver-patch e semver-minor', async () => {
   const workflow = await readFile(MERGE, 'utf8');
+  const mergeStep = stepContaining(workflow, 'gh pr merge --auto');
 
-  const mergeStep = workflow.slice(workflow.indexOf('gh pr merge'));
-  assert.ok(mergeStep.length > 0, 'esperava um passo de `gh pr merge`');
-
-  const gate = workflow
-    .split(/\r?\n/)
-    .find((line) => line.includes('steps.metadata.outputs.update-type'));
-  assert.ok(gate, 'o passo de merge precisa ser condicionado ao update-type do fetch-metadata');
-
+  const gate = mergeStep.split(/\r?\n/).find((line) => /^\s*if:/.test(line));
+  assert.ok(gate, 'o step de merge precisa ter um `if:` próprio');
+  assert.match(gate, /steps\.metadata\.outputs\.update-type/);
   assert.match(gate, /'version-update:semver-patch'/);
   assert.match(gate, /'version-update:semver-minor'/);
   assert.doesNotMatch(
