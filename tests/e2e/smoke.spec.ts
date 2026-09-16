@@ -61,6 +61,19 @@ test.describe('Smoke Suite', () => {
     await expect(page.locator('#mobile-menu')).toBeVisible();
   });
 
+  test('should close mobile menu with Escape and return focus to the toggle button', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'This test is for mobile only');
+    await page.goto('/');
+    const homePage = new HomePage(page);
+    await homePage.openMobileMenu();
+    await expect(page.locator('#mobile-menu')).toBeVisible();
+
+    await page.keyboard.press('Escape');
+
+    await expect(page.locator('#mobile-menu')).toBeHidden();
+    await expect(homePage.mobileMenuBtn).toBeFocused();
+  });
+
   test('should open contact modal from landing pages CTAs', async ({ page }) => {
     // Orlando
     await page.goto('/orlando');

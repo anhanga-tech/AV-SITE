@@ -1,4 +1,4 @@
-import React, { useCallback, useId, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { CaretDown } from '@phosphor-icons/react';
 import { getBlogHomeUrl } from '@/utils/blog';
 
@@ -22,7 +22,7 @@ interface NavDropdownProps extends SharedNavigationProps {
 
 interface MobileNavigationMenuProps extends SharedNavigationProps {
   isOpen: boolean;
-  onCloseMenu: () => void;
+  onCloseMenu: (refocusTrigger?: boolean) => void;
   contactButton: React.ReactNode;
 }
 
@@ -170,6 +170,17 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({
   onNavClick,
   contactButton,
 }: MobileNavigationMenuProps) {
+  // Global listener (not onKeyDown on the panel) so Escape closes the menu regardless of
+  // which descendant currently has focus, without making the wrapper div itself interactive.
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onCloseMenu(true);
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onCloseMenu]);
+
   // The element must always be present in the DOM so that the mobile toggle button's
   // aria-controls="mobile-menu" attribute always references a valid element.
   // Visibility is controlled via the hidden attribute instead of conditional rendering.
@@ -226,7 +237,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({
       <a
         href={getBlogHomeUrl()}
         className="text-zinc-700 font-medium py-3 border-b border-zinc-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-vibrant focus-visible:outline-offset-1 rounded"
-        onClick={onCloseMenu}
+        onClick={() => onCloseMenu()}
       >
         Blog de Viagens
       </a>
