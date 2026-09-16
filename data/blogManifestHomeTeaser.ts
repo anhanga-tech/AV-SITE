@@ -16,7 +16,7 @@ export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
   {
     "slug": "cruzeiros-costa-brasileira-2026-2027",
     "title": "Cruzeiros Costa Brasileira 2026/2027: rotas, datas e preços",
-    "excerpt": "A temporada da Costa no Brasil tem dois navios, três portos de embarque e roteiros de 2 a 9 noites. As rotas, as datas e o que cada faixa de preço inclui.",
+    "excerpt": "A temporada da Costa no Brasil tem dois navios, três portos de embarque e roteiros regulares de 2 a 9 noites. As rotas, as datas e o que cada faixa de preço inclui.",
     "date": "2026-09-15",
     "category": "Cruzeiros",
     "author": "felipe-william",
