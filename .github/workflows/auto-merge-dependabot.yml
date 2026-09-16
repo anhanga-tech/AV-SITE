@@ -1,0 +1,33 @@
+name: Auto merge Dependabot PRs
+
+on: pull_request_target
+
+permissions: {}
+
+# Liga o auto-merge nativo do GitHub em PRs do Dependabot de patch/minor. O merge
+# só acontece quando os required checks da `main` passam — este job não faz merge
+# direto. Major bumps ficam de fora, para revisão humana.
+#
+# Nota operacional: a `main` tem `required_conversation_resolution`, então uma
+# review thread aberta por bot segura o auto-merge até alguém resolver. É um
+# fallback seguro (a PR fica parada em vez de mergear sem olhar), não um bug.
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    if: github.actor == 'dependabot[bot]' && github.event.pull_request.user.login == 'dependabot[bot]'
+    steps:
+      - id: metadata
+        # Pinado em SHA: roda em `pull_request_target` com `contents: write`.
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
+
+      - name: Enable auto-merge for patch and minor updates
+        if: steps.metadata.outputs.update-type == 'version-update:semver-patch' || steps.metadata.outputs.update-type == 'version-update:semver-minor'
+        # `PR_URL` via env, nunca interpolado direto no shell — ver
+        # tests/workflow-command-injection-guard.test.ts.
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
