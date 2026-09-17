@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { HomePage } from './pages/HomePage';
+import { AIChat } from './pages/AIChat';
 
 test.describe('Smoke Suite', () => {
   test('should load home page and verify key elements', async ({ page, isMobile }) => {
@@ -58,6 +59,44 @@ test.describe('Smoke Suite', () => {
     const homePage = new HomePage(page);
     await expect(homePage.mobileMenuBtn).toBeVisible();
     await homePage.openMobileMenu();
+    await expect(page.locator('#mobile-menu')).toBeVisible();
+  });
+
+  test('should close mobile menu with Escape and return focus to the toggle button', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'This test is for mobile only');
+    await page.goto('/');
+    const homePage = new HomePage(page);
+    await homePage.openMobileMenu();
+    await expect(page.locator('#mobile-menu')).toBeVisible();
+
+    // Move focus off the toggle button and into the menu first — otherwise the toggle would
+    // already be focused from the click above, and the toBeFocused() assertion below would
+    // pass even if Escape never actually restored focus to it.
+    await page.locator('#mobile-menu a').first().focus();
+
+    await page.keyboard.press('Escape');
+
+    await expect(page.locator('#mobile-menu')).toBeHidden();
+    await expect(homePage.mobileMenuBtn).toBeFocused();
+  });
+
+  test('should only close the AI chat dialog on Escape when it is open over the mobile menu', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'This test is for mobile only');
+    await page.goto('/');
+    const homePage = new HomePage(page);
+    const aiChat = new AIChat(page);
+
+    // The floating AI chat trigger sits above the header, so it stays reachable even with the
+    // mobile menu open underneath it — leaving both "open" at once.
+    await homePage.openMobileMenu();
+    await aiChat.open();
+    await aiChat.expectVisible();
+
+    await page.keyboard.press('Escape');
+
+    // Escape should only dismiss the topmost layer (the chat dialog, via its native `cancel`
+    // handler) — the mobile menu underneath must not also close from the same keypress.
+    await aiChat.expectHidden();
     await expect(page.locator('#mobile-menu')).toBeVisible();
   });
 
