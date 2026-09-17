@@ -176,7 +176,14 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onEscapeEvent();
+      if (event.key !== 'Escape') return;
+      // A native <dialog> opened via showModal() (AI chat, contact modal, destination modal)
+      // floats above this menu and owns its own Escape-to-close (the browser's `cancel` event) —
+      // if we also closed the menu, one Escape press would dismiss both layers at once and
+      // silently refocus the hidden toggle button behind whichever dialog is still open.
+      // `:modal` only matches showModal() dialogs, not the cookie banner's plain `open` dialog.
+      if (document.querySelector('dialog:modal')) return;
+      onEscapeEvent();
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
