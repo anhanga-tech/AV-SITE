@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { List, X, Phone } from '@phosphor-icons/react';
 import { openContactModal } from '../../utils/contactForm';
@@ -9,6 +9,7 @@ import { useHeaderStyles } from './useHeaderStyles';
 
 const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const mobileToggleRef = useRef<HTMLButtonElement>(null);
 
   const location = useLocation();
   const isHome = location.pathname === '/';
@@ -52,8 +53,11 @@ const Header: React.FC = () => {
     setIsMobileMenuOpen(prev => !prev);
   }, []);
 
-  const closeMobileMenu = useCallback(() => {
+  // refocusTrigger mirrors NavDropdown's close() below: Escape should return focus to the
+  // toggle button it came from, while a nav-link click just closes without stealing focus.
+  const closeMobileMenu = useCallback((refocusTrigger = false) => {
     setIsMobileMenuOpen(false);
+    if (refocusTrigger) mobileToggleRef.current?.focus();
   }, []);
 
   const mobileContactButton = useMemo(() => (
@@ -122,6 +126,7 @@ const Header: React.FC = () => {
 
           <button
             type="button"
+            ref={mobileToggleRef}
             className={`md:hidden p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-yellow transition-colors duration-500 ${mobileToggleClass}`}
             onClick={toggleMobileMenu}
             aria-label={isMobileMenuOpen ? "Fechar menu" : "Abrir menu"}
