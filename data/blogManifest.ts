@@ -47,7 +47,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Cruzeiros Costa Brasileira 2026/2027: rotas, datas e preços",
     "excerpt": "A temporada da Costa no Brasil tem dois navios, três portos de embarque e roteiros regulares de 2 a 9 noites. As rotas, as datas e o que cada faixa de preço inclui.",
     "date": "2026-09-15",
-    "dateModified": "2026-09-16",
+    "dateModified": "2026-09-17",
     "author": "felipe-william",
     "category": "Cruzeiros",
     "image": "https://media.anhanga.tur.br/images/destinations/natal.jpg",
@@ -86,7 +86,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       }
     ],
     "slug": "cruzeiros-costa-brasileira-2026-2027",
-    "readingTime": "7 min de leitura"
+    "readingTime": "8 min de leitura"
   },
   {
     "title": "Quantos dias ficar em Orlando? Roteiro de 5 a 14 dias",
