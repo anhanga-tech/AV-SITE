@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useEffectEvent, useId, useRef, useState } from 'react';
 import { CaretDown } from '@phosphor-icons/react';
 import { getBlogHomeUrl } from '@/utils/blog';
 
@@ -172,14 +172,15 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({
 }: MobileNavigationMenuProps) {
   // Global listener (not onKeyDown on the panel) so Escape closes the menu regardless of
   // which descendant currently has focus, without making the wrapper div itself interactive.
+  const onEscapeEvent = useEffectEvent(() => onCloseMenu(true));
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onCloseMenu(true);
+      if (event.key === 'Escape') onEscapeEvent();
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onCloseMenu]);
+  }, [isOpen]);
 
   // The element must always be present in the DOM so that the mobile toggle button's
   // aria-controls="mobile-menu" attribute always references a valid element.
