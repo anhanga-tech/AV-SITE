@@ -13,7 +13,7 @@
 | **Última revisão** | 14/09/2026 |
 | **Status** | Rascunho — levantamento técnico feito a partir do código; evidências contratuais e revisão jurídica **pendentes** |
 | **Issue** | [#1542](https://github.com/anhanga-tech/AV-SITE/issues/1542) (achados LGPD-04 e LGPD-05 da auditoria de 28/08/2026) |
-| **Documentos relacionados** | [`ripd-legitimo-interesse.md`](./ripd-legitimo-interesse.md) · Política de Privacidade (`components/privacy/`, seções 5 a 8 e 10) · `pages/ExclusaoDados.tsx` |
+| **Documentos relacionados** | [`ripd-legitimo-interesse.md`](./ripd-legitimo-interesse.md) · [`direitos-dos-titulares.md`](./direitos-dos-titulares.md) · Política de Privacidade (`components/privacy/`, seções 5 a 8 e 10) · `pages/ExclusaoDados.tsx` |
 
 ---
 
