@@ -170,6 +170,7 @@ A matriz de operadores em [`transferencias-internacionais.md`](./transferencias-
 | OpenStreetMap, Iconify, Spotify e unpkg | I | N | I | I | N | S | I | C | N | N | Registrar que são destinatários independentes e indicar mitigação; não prometer ação em conta da Anhangá. |
 | Stape, GTM, Mautic, Salesforce e HubSpot aposentados | C/P | N | P | P | N | S | S | C | C | P | Acionar somente para localizar histórico e confirmar exclusão/retention após cut-over. Se houver histórico de decisão, escalar ao Encarregado. |
 | Backups, exports e cópias manuais | S | C | C | C | N | S | S | C | C | N | Inventário de cópia, data, dono, imutabilidade, prazo de expiração e plano de eliminação. |
+
 ### 5.1 Dados usados na busca
 
 Usar apenas os identificadores necessários e normalizar antes da consulta:
