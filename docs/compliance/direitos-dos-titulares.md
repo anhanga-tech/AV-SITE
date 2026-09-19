@@ -26,11 +26,13 @@ O procedimento está **pronto para aprovação**, mas não se deve marcar a apro
 | BLO | Anonimização, bloqueio ou eliminação por excesso, desnecessidade ou desconformidade | Medida proporcional, com justificativa e propagação aos destinatários quando aplicável. |
 | POR | Portabilidade | Tratamento da requisição conforme regulamentação da ANPD, formato disponível e segredos comercial/industrial. |
 | SHA | Informação sobre compartilhamentos | Lista dos destinatários identificados, finalidade e limitações de controle sobre terceiros independentes. |
+| INF | Informação sobre a possibilidade de não fornecer consentimento | Explicação clara sobre se o consentimento é necessário e as consequências da negativa, antes ou durante a coleta. |
+| ELI | Eliminação | Remoção dos dados tratados com consentimento, salvo hipótese de conservação do art. 16, ou medida de anonimização, bloqueio ou eliminação por excesso/desconformidade. |
 | REV | Revogação do consentimento | Interrupção da finalidade baseada em consentimento, sem invalidar tratamentos com outra base legal. |
 | OPO | Oposição | Avaliação do tratamento sem consentimento e interrupção quando cabível, especialmente para analytics e marketing. |
 | DEC | Revisão de decisão automatizada | Encaminhamento ao Encarregado; o site não deve declarar que uma decisão foi automatizada sem evidência. |
 
-**Eliminação** pode aparecer como `BLO` quando o fundamento for excesso/desconformidade e como `REV`/`ACE` quando o pedido se referir a dados tratados com consentimento. Registrar o enquadramento exato no caso.
+`ELI` é sempre o código da eliminação solicitada para dados tratados com consentimento; `BLO` cobre anonimização, bloqueio ou eliminação por excesso, desnecessidade ou desconformidade; `REV` cobre somente a retirada do consentimento e a interrupção da finalidade correspondente. Registrar o enquadramento exato no caso.
 
 ## 2. Papéis e responsabilidades
 
@@ -53,11 +55,13 @@ Cada pedido recebe um identificador no formato `DT-AAAA-NNNN` (por exemplo, `DT-
 
 ### Etapa 0 — Receber e preservar
 
-1. Monitorar `privacidade@anhanga.tur.br` em dias úteis.
-2. Criar o protocolo no registro restrito no mesmo dia, copiando somente o mínimo necessário.
+1. Manter resposta automática e fila de triagem para `privacidade@anhanga.tur.br`, com cobertura de plantão ou encaminhamento para o próximo dia útil fora do horário comercial. A mensagem automática não deve confirmar a existência de cadastro nem pedir documentos por e-mail.
+2. Preservar o timestamp original do servidor de e-mail (`received_at`) e criar o protocolo no registro restrito no mesmo dia útil de triagem, copiando somente o mínimo necessário. Fora do horário comercial, `received_at` permanece a data/hora original; nunca substituí-lo pela data de processamento.
 3. Guardar a mensagem original no repositório restrito; não replicar seu conteúdo em comentários, GitHub, Slack ou planilhas públicas.
 4. Se o pedido chegar por outro canal, responder apenas com o canal oficial e encaminhar a mensagem sem discutir o cadastro.
 5. Se houver indício de incidente, fraude ou exposição de dados, marcar `INCIDENTE-POTENCIAL`, preservar a evidência e envolver Segurança e o Encarregado imediatamente. Não esperar o prazo do pedido para tratar o incidente.
+
+A fila deve impedir que uma mensagem recebida fora do horário comercial fique sem dono: o plantão registra o caso imediatamente, ou a automação encaminha para a fila do próximo dia útil com alerta ao responsável. Em ambos os caminhos, o prazo é calculado a partir de `received_at`, não do horário em que alguém abriu a mensagem.
 
 ### Etapa 1 — Classificar
 
@@ -80,7 +84,7 @@ O objetivo é evitar entregar ou apagar dados da pessoa errada sem coletar uma n
 | Acesso, portabilidade, eliminação ou revogação com alteração relevante | Código de uso único para canal já cadastrado e conferência de dois atributos não sensíveis já conhecidos; escalar divergência ao Encarregado. | Não pedir senha, cartão completo, biometria ou documento integral por e-mail. |
 | Ausência de canal confiável, alto risco ou representante | O Encarregado define verificação adicional e o meio seguro. Para representante, exigir prova de poderes limitada ao necessário. | Se documento for indispensável, pedir versão com campos desnecessários ocultados, restringir acesso e apagar a cópia após a decisão documentada. |
 
-Se a verificação falhar, usar o [template de verificação](#9-2-template-de-verificação) e não confirmar a existência, ausência ou conteúdo de dados além do indispensável para explicar o próximo passo.
+Se a verificação falhar, usar o [template de verificação](#92-template-de-verificação) e não confirmar a existência, ausência ou conteúdo de dados além do indispensável para explicar o próximo passo.
 
 ### Etapa 3 — Pesquisar
 
@@ -126,7 +130,8 @@ Os prazos abaixo são a regra operacional até revisão do Encarregado ou nova r
 
 | Marco | Prazo operacional | Ação e evidência |
 |---|---:|---|
-| Registro e protocolo | Mesmo dia útil | `received_at`, `case_id`, canal e classificação. |
+| Recebimento e timestamp | Imediato pela caixa de e-mail | Preservar o timestamp original do servidor como `received_at`, mesmo fora do horário comercial. |
+| Registro e protocolo | Mesmo dia útil de triagem | `received_at`, `case_id`, canal e classificação; nunca substituir `received_at` pela data de processamento. |
 | Pedido de esclarecimento/verificação | Até 2 dias úteis | Template enviado e data de retorno controlada. |
 | Acionamento dos sistemas/operadores | Até 2 dias úteis após verificação suficiente | Uma tarefa por sistema, com responsável e vencimento. |
 | Confirmação/acesso em formato simplificado | Imediato, quando possível | Registrar a resposta e o meio seguro. |
@@ -141,27 +146,28 @@ Se o pedido chegar incompleto, registrar a data original, a lacuna e a data da s
 
 ## 5. Matriz sistema × ação
 
-Legenda: **S** = executar/consultar; **C** = condicional, depende de escopo, base legal ou capacidade do fornecedor; **I** = informar/encaminhar, sem controle direto; **N** = não se aplica ao fluxo conhecido; **P** = pendência que precisa de confirmação externa. Cada célula deve gerar tarefa ou justificativa no caso.
+Legenda: **S** = executar/consultar; **C** = condicional, depende de escopo, base legal ou capacidade do fornecedor; **I** = informar/encaminhar, sem controle direto; **N** = não se aplica ao fluxo conhecido; **P** = pendência que precisa de confirmação externa. `ELI` é eliminação por consentimento; `INF` é informação sobre a possibilidade de não consentir e suas consequências; `DEC` é revisão de decisão unicamente automatizada. Cada célula deve gerar tarefa ou justificativa no caso.
 
-| Sistema, operador ou repositório | CONF/ACE | COR | BLO/eliminação | POR | SHA | OPO | REV | Evidência mínima |
-|---|---|---|---|---|---|---|---|---|
-| Site, Pages/Functions e formulários | S | S | C | C | S | S | S | Consulta por identificadores, resultado de cada endpoint e confirmação de filas/logs. |
-| Odoo CRM (`res.partner`/`crm.lead`) | S | S | S/C | C | S | S | S | IDs de parceiro/lead, campos tratados, alteração/eliminação e data. Reter só exceções justificadas. |
-| Cloudflare Pages, Functions, R2 e logs | S | C | S/C | N | S | C | N | Busca em logs/R2; para fotos de reviews, registrar objeto e resultado. Região/retenção conforme evidência disponível. |
-| Cloudflare Zaraz, Web Analytics e Traks | C | N | C | N | S | S | C | Consulta/solicitação no painel; registrar ausência de identificador, opt-out e operador acionado. |
-| Google GA4/Ads e identificadores (`client_id`, `anhanga_ga_cid`) | C | N | C | N | S | S | C | Solicitação e resposta do painel/fornecedor; separar o cookie próprio do identificador do Zaraz. |
-| Google Gemini / AI Gateway | C | N | C | N | S | C | N | Verificar se prompt/resposta foram persistidos; não presumir retenção quando o gateway estiver sem log de payload. |
-| Meta CAPI / TikTok Events API | C | N | C | N | S | S | C | Identificar eventos enviados e ticket de exclusão/opt-out, inclusive fluxo Odoo → conversão se estiver ativo. |
-| Upstash Redis | C | N | S por TTL/C | N | S | C | N | Chaves derivadas, TTL, exclusão da chave e justificativa de hashes que não permitem correção. |
-| Sentry | C | N | C | N | S | C | N | Busca por evento/atributo, solicitação de remoção e retenção da organização; não copiar stack trace para o caso. |
-| Cal.com | S | C | C | C | S | S | C | Booking, notas e metadados de atribuição; confirmação do mecanismo do fornecedor. |
-| WhatsApp/Meta e handoff | I/C | C | C | N | S | S | S/C | Identificar campos encaminhados e orientar ação na conta; registrar limite de controle sobre mensagens já recebidas. |
-| GitHub e histórico público de reviews | S | C | C/P | N | S | C | N | Review/commit/artefato e limitação de remoção do histórico; escalar decisão ao Encarregado. |
-| Outscraper | C | N | C | N | S | C | N | Solicitação ao fornecedor e confirmação da retenção da coleta. |
-| OpenStreetMap, Iconify, Spotify e unpkg | I | N | I | N | S | C | N | Registrar que são destinatários independentes e indicar mitigação; não prometer ação em conta da Anhangá. |
-| Stape, GTM, Mautic, Salesforce, HubSpot e n8n aposentados | C/P | N | P | N | S | C | C | Acionar somente para localizar histórico e confirmar exclusão/retention após cut-over. |
-| Backups, exports e cópias manuais | S | C | C | N | S | C | C | Inventário de cópia, data, dono, imutabilidade, prazo de expiração e plano de eliminação. |
+A matriz de operadores em [`transferencias-internacionais.md`](./transferencias-internacionais.md) é a fonte canônica de nomes e status. Esta tabela é a projeção operacional sistema × ação: qualquer mudança de operador deve atualizar os dois documentos no mesmo PR. Para `DEC = C`, registrar a entrada que alimentou a decisão, regra/modelo ou fornecedor envolvido, impacto sobre o titular, revisão humana e resposta do Encarregado. Em especial, pedidos sobre Gemini/AI Gateway devem verificar se houve persistência de prompt/resposta ou se a decisão foi apenas uma sugestão do chatbot; não presumir decisão automatizada sem evidência.
 
+| Sistema, operador ou repositório | CONF/ACE | COR | BLO | ELI | POR | SHA | INF | OPO | REV | DEC | Evidência mínima |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Site, Pages/Functions e formulários | S | S | C | C | C | S | S | S | S | C | Consulta por identificadores, resultado de cada endpoint e confirmação de filas/logs. Para DEC, registrar entrada, regra/modelo, impacto, revisão humana e resposta do Encarregado. |
+| Odoo CRM (`res.partner`/`crm.lead`) | S | S | S/C | S/C | C | S | S | S | S | C | IDs de parceiro/lead, campos tratados, alteração/eliminação e data. Reter só exceções justificadas. Para DEC, registrar entrada, regra/modelo, impacto, revisão humana e resposta do Encarregado. |
+| Cloudflare Pages, Functions, R2 e logs | S | C | S/C | C | N | S | S | C | N | N | Busca em logs/R2; para fotos de reviews, registrar objeto e resultado. Região/retenção conforme evidência disponível. |
+| Cloudflare Zaraz, Web Analytics e Traks | C | N | C | C | N | S | S | S | C | N | Consulta/solicitação no painel; registrar ausência de identificador, opt-out e operador acionado. |
+| Google GA4/Ads e identificadores (`client_id`, `anhanga_ga_cid`) | C | N | C | C | N | S | S | S | C | N | Solicitação e resposta do painel/fornecedor; separar o cookie próprio do identificador do Zaraz. |
+| Google Gemini / AI Gateway | C | N | C | C | N | S | C | C | N | C | Verificar se prompt/resposta foram persistidos; não presumir retenção quando o gateway estiver sem log de payload. Para DEC, registrar entrada, regra/modelo, impacto, revisão humana e resposta do Encarregado. |
+| Meta CAPI / TikTok Events API | C | N | C | C | N | S | S | S | C | C | Identificar eventos enviados e ticket de exclusão/opt-out, inclusive fluxo Odoo → conversão se estiver ativo. Para DEC, confirmar se o fornecedor apenas otimiza mídia ou toma decisão unicamente automatizada sobre o titular. |
+| Upstash Redis | C | N | S por TTL/C | C | N | S | S | C | N | N | Chaves derivadas, TTL, exclusão da chave e justificativa de hashes que não permitem correção. |
+| Sentry | C | N | C | C | N | S | S | C | N | N | Busca por evento/atributo, solicitação de remoção e retenção da organização; não copiar stack trace para o caso. |
+| Cal.com | S | C | C | C | C | S | S | S | C | N | Booking, notas e metadados de atribuição; confirmação do mecanismo do fornecedor. |
+| WhatsApp/Meta e handoff | I/C | C | C | C | N | S | S | S | S/C | N | Identificar campos encaminhados e orientar ação na conta; registrar limite de controle sobre mensagens já recebidas. |
+| GitHub e histórico público de reviews | S | C | C/P | C/P | N | S | S | C | N | N | Review/commit/artefato e limitação de remoção do histórico; escalar decisão ao Encarregado. |
+| Outscraper | C | N | C | C | N | S | S | C | N | N | Solicitação ao fornecedor e confirmação da retenção da coleta. |
+| OpenStreetMap, Iconify, Spotify e unpkg | I | N | I | I | N | S | I | C | N | N | Registrar que são destinatários independentes e indicar mitigação; não prometer ação em conta da Anhangá. |
+| Stape, GTM, Mautic, Salesforce, HubSpot e n8n aposentados | C/P | N | P | P | N | S | S | C | C | P | Acionar somente para localizar histórico e confirmar exclusão/retention após cut-over. Se houver histórico de decisão, escalar ao Encarregado. |
+| Backups, exports e cópias manuais | S | C | C | C | N | S | S | C | C | N | Inventário de cópia, data, dono, imutabilidade, prazo de expiração e plano de eliminação. |
 ### 5.1 Dados usados na busca
 
 Usar apenas os identificadores necessários e normalizar antes da consulta:
@@ -240,7 +246,7 @@ O registro operacional restrito deve ter estes campos. Valores pessoais ficam no
 |---|---:|---|
 | `case_id` | Sim | `DT-AAAA-NNNN`, imutável. |
 | `received_at` / canal | Sim | Data/hora e origem; guardar a mensagem original em local restrito. |
-| `rights` / escopo | Sim | Códigos `CONF`, `ACE`, `COR`, `BLO`, `POR`, `SHA`, `OPO`, `REV`, `DEC`. |
+| `rights` / escopo | Sim | Códigos `CONF`, `ACE`, `COR`, `BLO`, `ELI`, `POR`, `SHA`, `INF`, `OPO`, `REV`, `DEC`. |
 | `identity_status` / método | Sim | Pendente, aprovado ou recusado; método proporcional, sem guardar documento integral. |
 | `owner` / revisor | Sim | Responsável pelo caso e quem revisou a decisão. |
 | `due_at` / alertas | Sim | Prazo legal ou alvo interno, com histórico de alertas. |
@@ -294,10 +300,11 @@ Olá, [nome].
 
 Sobre o pedido de [direito], concluímos:
 
-- **Resultado:** [atendido / parcialmente atendido / não localizado / não atendido com justificativa].
-- **Sistemas consultados:** [lista ou referência segura].
-- **Dados e finalidades encontradas:** [descrição mínima, sem dados de terceiros].
-- **Medidas executadas:** [correção, eliminação, bloqueio, oposição, revogação, informação ou nenhuma].
+- **Resultado:** [atendido / parcialmente atendido / declaração de inexistência após todas as buscas aplicáveis / não atendido com justificativa].
+- **Sistemas consultados:** [lista ou referência segura, com status e evidência de cada tarefa].
+- **Origem, finalidades e critérios:** [origem dos dados, finalidades e critérios utilizados, sem dados de terceiros].
+- **Declaração de existência:** [há tratamento/registro e ele é descrito acima / não há registro após todas as buscas aplicáveis].
+- **Medidas executadas:** [correção, eliminação, bloqueio, oposição, revogação, informação sobre consentimento ou nenhuma].
 - **Destinatários notificados:** [lista, quando aplicável], em [data].
 - **Retenção:** [não há / categoria, finalidade, base ou obrigação, prazo/evento de término].
 - **Limitações:** [operador pendente, backup imutável, terceiro independente, histórico público ou outra razão].
@@ -332,9 +339,11 @@ O exercício de mesa valida o protocolo, a matriz, os templates e o controle de 
 
 ### 10.1 Critérios de aprovação do teste externo
 
-- [ ] O pedido chega ao canal oficial e gera protocolo no mesmo dia.
+- [ ] O pedido chega ao canal oficial, preserva o timestamp original e gera protocolo no mesmo dia de triagem.
 - [ ] A verificação proporcional impede resposta a pessoa não autorizada.
-- [ ] A busca encontra ou declara não localizado em todos os sistemas aplicáveis.
+- [ ] Cada tarefa aplicável registra status (`feito`, `não localizado`, `não aplicável`, `aguardando operador` ou `impossível`) e evidência.
+- [ ] `não localizado` só é usado após a busca completa; `aguardando operador` e `impossível` registram motivo, próximo passo e escalonamento.
+- [ ] O caso não pode ser encerrado enquanto houver tarefa `aguardando operador` ou `impossível` sem decisão do Encarregado.
 - [ ] O prazo aparece no registro e dispara os alertas configurados.
 - [ ] A correção no Odoo é propagada aos destinatários aplicáveis.
 - [ ] Oposição e revogação interrompem a finalidade correspondente sem apagar tratamento sustentado por outra base legal.
@@ -370,6 +379,6 @@ Pendências que não podem ser concluídas apenas no repositório: aprovação f
 - [LGPD — Lei nº 13.709/2018, texto compilado no Planalto](https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709compilado.htm), especialmente arts. 18, 19, 20 e 46.
 - [ANPD — Perguntas frequentes, item 5.9 sobre prazo de atendimento](https://www.gov.br/anpd/pt-br/acesso-a-informacao/perguntas-frequentes).
 - [ANPD — Titular de dados e petição/denúncia](https://www.gov.br/anpd/pt-br/canais_atendimento/cidadao-titular-de-dados/denuncia-peticao-de-titular-referente-lgpd).
-- [`docs/compliance/transferencias-internacionais.md`](../compliance/transferencias-internacionais.md) — matriz técnica de operadores, transferências e fornecedores aposentados.
+- [`transferencias-internacionais.md`](./transferencias-internacionais.md) — matriz técnica de operadores, transferências e fornecedores aposentados.
 - [`components/privacy/PrivacySection8DireitosTitulares.tsx`](../../components/privacy/PrivacySection8DireitosTitulares.tsx) — direitos e canal atualmente publicados.
-- [`docs/compliance/ripd-legitimo-interesse.md`](../compliance/ripd-legitimo-interesse.md) — bases, retenções e salvaguardas documentadas.
+- [`ripd-legitimo-interesse.md`](./ripd-legitimo-interesse.md) — bases, retenções e salvaguardas documentadas.
