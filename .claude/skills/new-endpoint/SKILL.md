@@ -48,7 +48,7 @@ Create or update each of these:
 
 ## 4. Test
 
-Write `tests/<name>.test.ts` with `node:test`, modelled on the matching test for the base handler (e.g. `tests/submit-waitlist.test.ts`). Mock every outbound call. For Odoo, use `tests/odoo-mock.ts` (`createOdooMock`, `setOdooEnv`, `clearOdooEnv`). Give each request a random `x-real-ip` so rate-limit state doesn't leak between tests. Cover every row of the template's Response Contract:
+Write `tests/<name>.test.ts` with `node:test`, modelled on the matching test for the base handler (e.g. `tests/submit-waitlist.test.ts`). Mock every outbound call. For Odoo, use `tests/odoo-mock.ts` (`createOdooMock`, `setOdooEnv`, `clearOdooEnv`). Give each test case its own `x-real-ip` so rate-limit state doesn't leak between tests. Inside the rate-limit test, reuse one fixed IP for every request so the limit is actually reached (see `sharedIP` in `tests/submit-waitlist.test.ts`). Cover every row of the template's Response Contract:
 
 - method gate, plus the CORS preflight for any endpoint browsers call cross-origin
 - missing config → the config error comes back **before** any fetch
