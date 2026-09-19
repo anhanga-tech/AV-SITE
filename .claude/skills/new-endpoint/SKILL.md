@@ -66,7 +66,7 @@ For public endpoints, extend `tests/api-catalog.test.ts` so the new path appears
 
 Run `pnpm typecheck`, `pnpm test:regression`, and `pnpm lint:changed`. If the endpoint backs a browser-visible flow, also run the relevant `pnpm test:e2e` spec.
 
-If the `security-lgpd-reviewer` agent is available, run it on the diff and fix or rebut what it finds.
+Run the built-in `security-review` skill on the diff. If the endpoint handles personal data, also check the flow against the `lgpd-brasil` skill (data minimization, consent, legal basis). Fix or rebut each finding.
 
 - [ ] All commands green, output quoted in your summary.
 
