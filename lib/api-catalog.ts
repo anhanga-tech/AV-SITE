@@ -249,6 +249,102 @@ const API_ENDPOINTS: readonly ApiEndpointDefinition[] = [
             '500': buildJsonResponse('Server or upstream integration failure.', ERROR_RESPONSE_SCHEMA),
         },
     },
+    {
+        anchor: `${SITE_ORIGIN}/api/submit-contact`,
+        method: 'post',
+        summary: 'Submit a quick contact request',
+        description: 'Accepts the site-wide quick contact form and records the contact and a sales opportunity in the CRM.',
+        requestBody: {
+            required: true,
+            content: {
+                'application/json': {
+                    schema: {
+                        type: 'object',
+                        required: ['firstName', 'whatsapp'],
+                        properties: {
+                            firstName: { type: 'string', maxLength: 100 },
+                            lastName: { type: 'string', maxLength: 100 },
+                            whatsapp: { type: 'string' },
+                            email: { type: 'string', format: 'email' },
+                            emailOptIn: { type: 'boolean' },
+                            source: { type: 'string', maxLength: 128 },
+                            destination: { type: 'string', maxLength: 255 },
+                            eventId: { type: 'string', maxLength: 128 },
+                            utms: {
+                                type: 'object',
+                                additionalProperties: true,
+                            },
+                            tracking: {
+                                type: 'object',
+                                additionalProperties: true,
+                            },
+                        },
+                        additionalProperties: true,
+                    },
+                },
+            },
+        },
+        responses: {
+            '200': buildJsonResponse('Contact request accepted.', SUBMIT_SUCCESS_SCHEMA),
+            '400': buildJsonResponse('Invalid contact payload.', ERROR_RESPONSE_SCHEMA),
+            '429': buildJsonResponse('Rate limit exceeded.', ERROR_RESPONSE_SCHEMA),
+            '502': buildJsonResponse('CRM integration failure.', ERROR_RESPONSE_SCHEMA),
+            '503': buildJsonResponse('CRM integration not configured.', ERROR_RESPONSE_SCHEMA),
+            '504': buildJsonResponse('CRM integration timeout.', ERROR_RESPONSE_SCHEMA),
+            '500': buildJsonResponse('Internal server failure.', ERROR_RESPONSE_SCHEMA),
+        },
+    },
+    {
+        anchor: `${SITE_ORIGIN}/api/submit-quiz`,
+        method: 'post',
+        summary: 'Submit a travel quiz result',
+        description: 'Accepts a completed travel-profile quiz and records the traveller profile in the CRM.',
+        requestBody: {
+            required: true,
+            content: {
+                'application/json': {
+                    schema: {
+                        type: 'object',
+                        required: ['firstName', 'email', 'profileKey', 'profileName', 'bantSummary'],
+                        properties: {
+                            firstName: { type: 'string', maxLength: 100 },
+                            lastName: { type: 'string', maxLength: 100 },
+                            email: { type: 'string', format: 'email' },
+                            whatsapp: { type: 'string' },
+                            profileKey: { type: 'string', maxLength: 50 },
+                            profileName: { type: 'string', maxLength: 100 },
+                            bantSummary: { type: 'string', maxLength: 1000 },
+                            destinos: {
+                                type: 'array',
+                                maxItems: 10,
+                                items: { type: 'string', maxLength: 50 },
+                            },
+                            sourcePage: { type: 'string', maxLength: 255 },
+                            skipped: { type: 'boolean' },
+                            newsletterOptIn: { type: 'boolean' },
+                            utms: {
+                                type: 'object',
+                                additionalProperties: true,
+                            },
+                            tracking: {
+                                type: 'object',
+                                additionalProperties: true,
+                            },
+                        },
+                        additionalProperties: true,
+                    },
+                },
+            },
+        },
+        responses: {
+            '200': buildJsonResponse('Quiz result accepted.', SUBMIT_SUCCESS_SCHEMA),
+            '400': buildJsonResponse('Invalid quiz payload.', ERROR_RESPONSE_SCHEMA),
+            '429': buildJsonResponse('Rate limit exceeded.', ERROR_RESPONSE_SCHEMA),
+            '502': buildJsonResponse('CRM integration failure.', ERROR_RESPONSE_SCHEMA),
+            '503': buildJsonResponse('CRM integration not configured.', ERROR_RESPONSE_SCHEMA),
+            '500': buildJsonResponse('Internal server failure.', ERROR_RESPONSE_SCHEMA),
+        },
+    },
 ];
 
 function buildLinkHeader(): string {
@@ -417,6 +513,14 @@ Accepts first-party waitlist registrations for campaign-specific landing pages.
 ### POST /api/submit-nps
 
 Accepts post-trip Net Promoter Score submissions from returning travellers.
+
+### POST /api/submit-contact
+
+Accepts the site-wide quick contact form (name and WhatsApp) and opens a sales opportunity.
+
+### POST /api/submit-quiz
+
+Accepts completed travel-profile quiz results from the first-party quiz page.
 
 ### GET /api/health
 

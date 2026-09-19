@@ -22,6 +22,8 @@ const DEV_API_ROUTES: Record<string, () => Promise<{ default: ApiHandler }>> = {
   '/api/submit-lead': () => import('./api/submit-lead.ts'),
   '/api/submit-waitlist': () => import('./api/submit-waitlist.ts'),
   '/api/submit-nps': () => import('./api/submit-nps.ts'),
+  '/api/submit-contact': () => import('./api/submit-contact.ts'),
+  '/api/submit-quiz': () => import('./api/submit-quiz.ts'),
 };
 
 const METHODS_WITH_BODY = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
