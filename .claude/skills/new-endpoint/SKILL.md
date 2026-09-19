@@ -36,7 +36,7 @@ Anything outside the shared factory follows the order in `api-conventions.md`, r
 
 Create or update each of these:
 
-1. `lib/schemas/<name>.ts` — the Zod schema for the request body. Put normalization in `lib/` (use `cleanString`, `normalizeNullable` etc. from `lib/lead-logic.ts`).
+1. `lib/schemas/<name>.ts` — the Zod schema for the request body. With `createOdooSubmitHandler`, wrap it in the `validate:` function (`safeParse` → `{ ok, data | error }`), as `api/submit-nps.ts` does. `submit-waitlist` and `submit-contact` predate this and validate by hand: copy their structure, not their validation. Put normalization in `lib/` (use `cleanString`, `normalizeNullable` etc. from `lib/lead-logic.ts`).
 2. `api/<name>.ts` — the handler, with a default export `(req: Request) => Promise<Response>`.
 3. `functions/api/<name>.ts` — the Cloudflare Pages adapter. Copy `functions/api/health.ts` exactly, changing only the import path. Pages routes by file path.
 4. `vite.config.ts` → `DEV_API_ROUTES` — add `'/api/<name>': () => import('./api/<name>.ts')`.
