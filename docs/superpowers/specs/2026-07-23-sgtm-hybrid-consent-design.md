@@ -1,7 +1,7 @@
 # Design: Tracking híbrido com consentimento no GTM/sGTM
 
 - **Data:** 2026-07-23
-- **Issue:** [#1261](https://github.com/felipewilliam2/AV-SITE/issues/1261)
+- **Issue:** [#1261](https://github.com/anhanga-tech/AV-SITE/issues/1261)
 - **Status:** Aprovado — plano de implementação pronto
 - **Containers:** web e server identificados somente no inventário operacional local
 - **Premissa de consentimento vigente no projeto:** analytics por legítimo

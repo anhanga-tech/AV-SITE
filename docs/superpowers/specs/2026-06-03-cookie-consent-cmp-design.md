@@ -1,7 +1,7 @@
 # Design: Banner de Consentimento de Cookies (CMP)
 
 **Data:** 2026-06-03
-**Issue:** [#782](https://github.com/felipewilliam2/AV-SITE/issues/782)
+**Issue:** [#782](https://github.com/anhanga-tech/AV-SITE/issues/782)
 **Status:** Aprovado — aguardando implementação
 **Base legal:** LGPD Art. 7º, I (consentimento — marketing) e Art. 7º, IX (legítimo interesse — analytics/UTM)
 **Referência regulatória:** Resolução CD/ANPD nº 15/2024; RIPD v1.1 (`docs/compliance/ripd-legitimo-interesse.md`)
