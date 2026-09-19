@@ -110,7 +110,7 @@ Ao corrigir, anonimizar, bloquear ou eliminar dados que tenham sido compartilhad
 
 ### Etapa 5 — Responder com segurança
 
-- Enviar a resposta somente depois da verificação aprovada.
+- Enviar a resposta somente depois da verificação aprovada ou marcada como `não exigida`, sempre limitada ao que é seguro para aquele status.
 - Usar link autenticado ou arquivo criptografado com expiração; enviar a senha por canal separado. Quando o titular pedir papel, combinar entrega e identificação de forma segura.
 - Nunca incluir no e-mail dados de outro titular, lista de clientes, tokens, credenciais, segredos comerciais ou conteúdo integral de logs sem necessidade.
 - Explicar o que foi encontrado, o que foi feito, o que não foi feito, a base da retenção e os próximos passos.
@@ -148,7 +148,7 @@ Se o pedido chegar incompleto, registrar a data original, a lacuna e a data da s
 
 Legenda: **S** = executar/consultar; **C** = condicional, depende de escopo, base legal ou capacidade do fornecedor; **I** = informar/encaminhar, sem controle direto; **N** = não se aplica ao fluxo conhecido; **P** = pendência que precisa de confirmação externa. `ELI` é eliminação por consentimento; `INF` é informação sobre a possibilidade de não consentir e suas consequências; `DEC` é revisão de decisão unicamente automatizada. Cada célula deve gerar tarefa ou justificativa no caso.
 
-A matriz de operadores em [`transferencias-internacionais.md`](./transferencias-internacionais.md) é a fonte canônica de nomes e status. Esta tabela é a projeção operacional sistema × ação: qualquer mudança de operador deve atualizar os dois documentos no mesmo PR. Para `DEC = C`, registrar a entrada que alimentou a decisão, regra/modelo ou fornecedor envolvido, impacto sobre o titular, revisão humana e resposta do Encarregado. Em especial, pedidos sobre Gemini/AI Gateway devem verificar se houve persistência de prompt/resposta ou se a decisão foi apenas uma sugestão do chatbot; não presumir decisão automatizada sem evidência.
+A matriz de operadores em [`transferencias-internacionais.md`](./transferencias-internacionais.md) é a fonte canônica de nomes e status. Esta tabela é a projeção operacional sistema × ação: qualquer mudança de operador deve atualizar os dois documentos no mesmo PR. As linhas condicionais de ONER Travel e do webhook atual de n8n ficam explícitas aqui porque representam fluxos operacionais fora ou além do inventário ativo do site. Para `DEC = C`, registrar a entrada que alimentou a decisão, regra/modelo ou fornecedor envolvido, impacto sobre o titular, revisão humana e resposta do Encarregado. Em especial, pedidos sobre Gemini/AI Gateway devem verificar se houve persistência de prompt/resposta ou se a decisão foi apenas uma sugestão do chatbot; não presumir decisão automatizada sem evidência.
 
 | Sistema, operador ou repositório | CONF/ACE | COR | BLO | ELI | POR | SHA | INF | OPO | REV | DEC | Evidência mínima |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -162,11 +162,13 @@ A matriz de operadores em [`transferencias-internacionais.md`](./transferencias-
 | Upstash Redis | C | N | S por TTL/C | C | N | S | S | C | N | N | Chaves derivadas, TTL, exclusão da chave e justificativa de hashes que não permitem correção. |
 | Sentry | C | N | C | C | N | S | S | C | N | N | Busca por evento/atributo, solicitação de remoção e retenção da organização; não copiar stack trace para o caso. |
 | Cal.com | S | C | C | C | C | S | S | S | C | N | Booking, notas e metadados de atribuição; confirmação do mecanismo do fornecedor. |
+| n8n `purchase-dispatch` (webhook atual, condicional) | C | C | C | C | C | S | S | C | C | N | Webhook e logs do fluxo Odoo → conversão; confirmar se o workflow está ativo e registrar `não aplicável` com evidência quando não estiver. |
+| ONER Travel (reservas, condicional fora do site) | C | C | C | C | C | S | S | C | C | N | Buscar reserva/simulação e contrato aplicável; se não houver fluxo para o titular, registrar `não aplicável` e a evidência da busca. |
 | WhatsApp/Meta e handoff | I/C | C | C | C | N | S | S | S | S/C | N | Identificar campos encaminhados e orientar ação na conta; registrar limite de controle sobre mensagens já recebidas. |
 | GitHub e histórico público de reviews | S | C | C/P | C/P | N | S | S | C | N | N | Review/commit/artefato e limitação de remoção do histórico; escalar decisão ao Encarregado. |
 | Outscraper | C | N | C | C | N | S | S | C | N | N | Solicitação ao fornecedor e confirmação da retenção da coleta. |
 | OpenStreetMap, Iconify, Spotify e unpkg | I | N | I | I | N | S | I | C | N | N | Registrar que são destinatários independentes e indicar mitigação; não prometer ação em conta da Anhangá. |
-| Stape, GTM, Mautic, Salesforce, HubSpot e n8n aposentados | C/P | N | P | P | N | S | S | C | C | P | Acionar somente para localizar histórico e confirmar exclusão/retention após cut-over. Se houver histórico de decisão, escalar ao Encarregado. |
+| Stape, GTM, Mautic, Salesforce e HubSpot aposentados | C/P | N | P | P | N | S | S | C | C | P | Acionar somente para localizar histórico e confirmar exclusão/retention após cut-over. Se houver histórico de decisão, escalar ao Encarregado. |
 | Backups, exports e cópias manuais | S | C | C | C | N | S | S | C | C | N | Inventário de cópia, data, dono, imutabilidade, prazo de expiração e plano de eliminação. |
 ### 5.1 Dados usados na busca
 
@@ -193,6 +195,7 @@ Copiar esta lista para cada caso e marcar `feito`, `não localizado`, `não apli
 - [ ] R2: mídia, especialmente fotos de reviews e objetos derivados.
 - [ ] Cookies/identificadores first-party, apenas quando o pedido fornecer o identificador ou houver vínculo documentado.
 - [ ] GitHub: arquivo atual, artefatos de workflow e histórico público quando o pedido envolver review publicado.
+- [ ] Para remoção de review: adicionar o ID em `data/reviewsBlocklist.json` antes de encerrar, remover cópias atuais no Git/R2 quando aplicável e verificar que o próximo refresh não repõe o conteúdo.
 - [ ] Exports, planilhas, downloads locais, caixas compartilhadas e cópias manuais autorizadas.
 
 ### 6.2 Operadores ativos
@@ -203,6 +206,8 @@ Copiar esta lista para cada caso e marcar `feito`, `não localizado`, `não apli
 - [ ] Meta/WhatsApp e TikTok.
 - [ ] Upstash, Sentry e Cal.com.
 - [ ] GitHub e Outscraper.
+- [ ] n8n `purchase-dispatch`: verificar se o webhook/workflow atual está ativo; se não estiver, registrar `não aplicável` com a evidência consultada.
+- [ ] ONER Travel: tarefa condicional para reservas/simulações fora do site; registrar `não aplicável` quando não houver fluxo para o titular.
 - [ ] Conteúdo de terceiros: OpenStreetMap, Iconify, Spotify e unpkg, apenas para informação/limite de controle.
 
 ### 6.3 Operadores aposentados e backups
@@ -210,7 +215,7 @@ Copiar esta lista para cada caso e marcar `feito`, `não localizado`, `não apli
 - [ ] Stape e Google Tag Manager.
 - [ ] Mautic.
 - [ ] Salesforce e HubSpot.
-- [ ] n8n, se houver histórico fora do webhook atual.
+- [ ] n8n: histórico de intake de formulários anterior ao cut-over, separado do webhook atual de `purchase-dispatch`.
 - [ ] Backups do site, CRM, R2, operadores e caixas de e-mail.
 - [ ] Cópias imutáveis: registrar a data de expiração e a eliminação no ciclo normal; não restaurar nem manter uma cópia extra para atender ao pedido.
 
@@ -247,11 +252,11 @@ O registro operacional restrito deve ter estes campos. Valores pessoais ficam no
 | `case_id` | Sim | `DT-AAAA-NNNN`, imutável. |
 | `received_at` / canal | Sim | Data/hora e origem; guardar a mensagem original em local restrito. |
 | `rights` / escopo | Sim | Códigos `CONF`, `ACE`, `COR`, `BLO`, `ELI`, `POR`, `SHA`, `INF`, `OPO`, `REV`, `DEC`. |
-| `identity_status` / método | Sim | Pendente, aprovado ou recusado; método proporcional, sem guardar documento integral. |
+| `identity_status` / método | Sim | `não exigida`, pendente, aprovado ou recusado; registrar o motivo da dispensa e o método proporcional, sem guardar documento integral. |
 | `owner` / revisor | Sim | Responsável pelo caso e quem revisou a decisão. |
 | `due_at` / alertas | Sim | Prazo legal ou alvo interno, com histórico de alertas. |
 | `systems_checked` | Sim | Cada sistema/operador da matriz e resultado. |
-| `actions` / `operator_tickets` | Sim | Alteração, exclusão, opt-out, ticket, executor e horário. |
+| `actions` / `operator_tickets` | Sim | Alteração, eliminação, bloqueio, revogação, informação, opt-out, ticket, executor e horário. |
 | `retention_decision` | Condicional | Categoria retida, motivo, base/obrigação, prazo/evento e aprovador. |
 | `shared_recipients_notified` | Condicional | Destinatário, data, medida, resultado e motivo se impossível/desproporcional. |
 | `response_sent_at` / meio seguro | Sim | Entrega, expiração do link e falha/reenvio. |
@@ -281,8 +286,8 @@ Para proteger seus dados, ainda precisamos [confirmar sua identidade / esclarece
 O canal oficial para acompanhamento é `privacidade@anhanga.tur.br`. Pedidos de confirmação e acesso terão resposta imediata em formato simplificado quando possível ou em declaração completa em até 15 dias corridos contados do requerimento. Para os demais pedidos, adotaremos providência imediata quando possível e informaremos qualquer impedimento ou pendência.
 
 Atenciosamente,
-[responsável pelo caso]
-Encarregado — Anhangá Turismo
+[responsável pelo caso ou Encarregado, conforme `identity_status` e regra de aprovação]
+Anhangá Turismo — Canal de Privacidade
 
 ### 9.2 Template de verificação
 
@@ -305,7 +310,8 @@ Sobre o pedido de [direito], concluímos:
 - **Origem, finalidades e critérios:** [origem dos dados, finalidades e critérios utilizados, sem dados de terceiros].
 - **Declaração de existência:** [há tratamento/registro e ele é descrito acima / não há registro após todas as buscas aplicáveis].
 - **Medidas executadas:** [correção, eliminação, bloqueio, oposição, revogação, informação sobre consentimento ou nenhuma].
-- **Destinatários notificados:** [lista, quando aplicável], em [data].
+- **Entidades públicas ou privadas com as quais houve compartilhamento:** [lista e finalidade, ou declaração de que não houve compartilhamento identificado].
+- **Destinatários notificados após a medida:** [lista, quando aplicável], em [data].
 - **Retenção:** [não há / categoria, finalidade, base ou obrigação, prazo/evento de término].
 - **Limitações:** [operador pendente, backup imutável, terceiro independente, histórico público ou outra razão].
 
@@ -335,7 +341,7 @@ Atenciosamente,
 
 O exercício anonimizado e sem efeitos em produção está arquivado em [`exercicio-mesa-direitos-dos-titulares-2026-09.md`](./exercicio-mesa-direitos-dos-titulares-2026-09.md). Ele percorre cinco cenários: acesso, correção, oposição, revogação e exclusão.
 
-O exercício de mesa valida o protocolo, a matriz, os templates e o controle de prazo. Ele **não substitui** a execução ponta a ponta com contas de teste dos operadores. Os testes externos devem usar titular sintético, endereço `example.invalid` ou sandbox equivalente e nenhuma pessoa real.
+O exercício de mesa valida o protocolo, a matriz, os templates e o controle de prazo. Ele **não substitui** a execução ponta a ponta com contas de teste dos operadores. Para exercitar verificação, entrega segura e resposta, os testes externos devem usar uma caixa de e-mail controlada pela equipe ou um mail sandbox que permita envio e recebimento. `example.invalid` só pode ser usado em testes de intake que não dependam de receber código ou resposta; não é suficiente para o teste ponta a ponta.
 
 ### 10.1 Critérios de aprovação do teste externo
 

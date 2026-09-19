@@ -15,6 +15,7 @@ Este registro usa somente IDs sintéticos. Não é uma confirmação de que qual
 - **Sistemas simulados:** site/formulários, Odoo, Cloudflare, analytics, operadores de conversão, Sentry, R2/GitHub e backups.
 - **Método:** leitura guiada do procedimento, preenchimento de protocolo sintético, execução de decisões simuladas e conferência dos critérios de encerramento.
 - **Regra de segurança:** nenhum dado pessoal real, credencial, ticket externo ou alteração de produção foi utilizado.
+- **Teste ponta a ponta futuro:** usar uma caixa de e-mail controlada ou mail sandbox com envio e recebimento; `example.invalid` não serve para validar código de verificação ou resposta segura.
 
 ## 2. Casos simulados
 
