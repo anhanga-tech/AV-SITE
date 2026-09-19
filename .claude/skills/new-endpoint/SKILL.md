@@ -25,10 +25,10 @@ Pick the closest existing handler and copy its structure, not just its style:
 |---|---|
 | is a form that writes to Odoo (`res.partner` / `crm.lead`) | `createOdooSubmitHandler` (`lib/odoo-submit-handler.ts`); copy `api/submit-waitlist.ts` (partner-only) or `api/submit-contact.ts` (with a lead) |
 | needs a signed token or an extra secret | `api/submit-nps.ts` (`checkExtraConfig`, `lib/nps-invite.ts`) |
-| receives a webhook | `api/purchase-dispatch.ts` (HMAC via `timingSafeEqual`, checked before the payload is parsed) |
-| is read-only / discovery | `api/health.ts` |
+| receives a webhook | `api/purchase-dispatch.ts`: a shared-secret header (`X-Webhook-Secret`) compared with `timingSafeEqual` before the payload is parsed. This authenticates the caller but gives no payload integrity or replay protection. If the sender signs payloads, verify the HMAC over the raw body instead, following the HMAC-SHA256 pattern in `lib/nps-invite.ts`. |
+| is read-only / discovery | `api/health.ts`: same-origin `GET`/`HEAD` only, no CORS. If browsers must call it cross-origin, also answer `OPTIONS` and override `Access-Control-Allow-Methods`, since `buildCorsHeaders()` hard-codes `POST, OPTIONS`. |
 
-Anything outside the shared factory follows the order in `api-conventions.md`, reusing `lib/network.ts` (`buildCorsHeaders`, `getClientIP`, `createRequestId`, `buildJsonResponse`, `buildJsonError`), `lib/rate-limit.ts`, and `lib/logger.ts`. For Odoo field mapping, add a pure adapter in `lib/odoo-lead-mapping.ts`; don't build the payload inside the handler.
+Anything outside the shared factory follows the order in `api-conventions.md`, reusing `lib/network.ts` (`buildCorsHeaders`, `getClientIP`, `createRequestId`, `buildJsonResponse`, `buildJsonError`), `lib/rate-limit.ts`, and `lib/logger.ts`. Be exact about the trust mechanism in the step 1 plan: shared-secret auth and HMAC signature verification are different controls. For Odoo field mapping, add a pure adapter in `lib/odoo-lead-mapping.ts`; don't build the payload inside the handler.
 
 - [ ] Handler shape chosen, reason stated.
 
@@ -50,7 +50,7 @@ Create or update each of these:
 
 Write `tests/<name>.test.ts` with `node:test`, modelled on the matching test for the base handler (e.g. `tests/submit-waitlist.test.ts`). Mock every outbound call. For Odoo, use `tests/odoo-mock.ts` (`createOdooMock`, `setOdooEnv`, `clearOdooEnv`). Give each request a random `x-real-ip` so rate-limit state doesn't leak between tests. Cover every row of the template's Response Contract:
 
-- method gate and CORS preflight
+- method gate, plus the CORS preflight for any endpoint browsers call cross-origin
 - missing config → the config error comes back **before** any fetch
 - invalid JSON / schema failure → 400 with a stable `code`
 - rate limit → 429 with `RateLimit-*` headers
