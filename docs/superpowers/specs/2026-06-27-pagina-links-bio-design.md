@@ -1,6 +1,6 @@
 # Página de Links na Bio (`/links`)
 
-Issue: [#956](https://github.com/felipewilliam2/AV-SITE/issues/956) — *Página própria de links na bio (/links) com rastreio first-party + Pixel*
+Issue: [#956](https://github.com/anhanga-tech/AV-SITE/issues/956) — *Página própria de links na bio (/links) com rastreio first-party + Pixel*
 
 ## Objetivo
 

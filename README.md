@@ -1,5 +1,5 @@
 [![React Doctor](https://www.react.doctor/share/badge?p=anhanga-viagens&s=92&e=1&w=33&f=23)](https://www.react.doctor/share?p=anhanga-viagens&s=92&e=1&w=33&f=23)
-![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/felipewilliam2/AV-SITE)
+![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/anhanga-tech/AV-SITE)
 
 
 ## Anhangá Viagens — Site Institucional
@@ -59,7 +59,7 @@ Site institucional da **Anhangá Viagens**, uma agência de viagens boutique bra
 ## 📦 Instalação
 
 ```bash
-git clone https://github.com/felipewilliam2/AV-SITE.git
+git clone https://github.com/anhanga-tech/AV-SITE.git
 cd AV-SITE
 pnpm install
 cp .env.example .env   # preencha GEMINI_API_KEY (mínimo para o chatbot rodar localmente)

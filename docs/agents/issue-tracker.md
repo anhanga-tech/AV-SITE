@@ -1,6 +1,6 @@
 # Issue tracker: GitHub
 
-Issues for this repository live in GitHub under `felipewilliam2/AV-SITE`. Use
+Issues for this repository live in GitHub under `anhanga-tech/AV-SITE`. Use
 the `gh` CLI for issue operations and infer the repository from the configured
 Git remote when possible.
 

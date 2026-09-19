@@ -2,7 +2,7 @@
 
 Data da medição: **2026-05-23 05:03 UTC** (02:03 BRT)  
 PoP respondendo: **GRU** (Guarulhos, São Paulo)  
-Sprint: Cloudflare Optimization Sprint · Issue [#619](https://github.com/felipewilliam2/AV-SITE/issues/619)
+Sprint: Cloudflare Optimization Sprint · Issue [#619](https://github.com/anhanga-tech/AV-SITE/issues/619)
 
 ---
 
