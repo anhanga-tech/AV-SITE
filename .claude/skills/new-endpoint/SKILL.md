@@ -24,11 +24,12 @@ Pick the closest existing handler and copy its structure, not just its style:
 | The endpoint… | Base it on |
 |---|---|
 | is a form that writes to Odoo (`res.partner` / `crm.lead`) | `createOdooSubmitHandler` (`lib/odoo-submit-handler.ts`); copy `api/submit-waitlist.ts` (partner-only) or `api/submit-contact.ts` (with a lead) |
-| needs a signed token or an extra secret | `api/submit-nps.ts` (`checkExtraConfig`, `lib/nps-invite.ts`) |
+| is an Odoo form that needs a signed token or an extra secret | `api/submit-nps.ts` (`checkExtraConfig`, `lib/nps-invite.ts`) |
+| needs a signed token but doesn't write to Odoo | a hand-written handler that calls `verifyNpsInviteToken` / the HMAC pattern in `lib/nps-invite.ts` directly. Copying `submit-nps` would pull in the Odoo factory, which requires Odoo config and writes a partner. |
 | receives a webhook | `api/purchase-dispatch.ts`: a shared-secret header (`X-Webhook-Secret`) compared with `timingSafeEqual` before the payload is parsed. This authenticates the caller but gives no payload integrity or replay protection. If the sender signs payloads, verify the HMAC over the raw body instead, following the HMAC-SHA256 pattern in `lib/nps-invite.ts`. |
 | is read-only / discovery | `api/health.ts`: same-origin `GET`/`HEAD` only, no CORS. If browsers must call it cross-origin, also answer `OPTIONS` and override `Access-Control-Allow-Methods`, since `buildCorsHeaders()` hard-codes `POST, OPTIONS`. |
 
-Anything outside the shared factory follows the order in `api-conventions.md`, reusing `lib/network.ts` (`buildCorsHeaders`, `getClientIP`, `createRequestId`, `buildJsonResponse`, `buildJsonError`), `lib/rate-limit.ts`, and `lib/logger.ts`. Be exact about the trust mechanism in the step 1 plan: shared-secret auth and HMAC signature verification are different controls. For Odoo field mapping, add a pure adapter in `lib/odoo-lead-mapping.ts`; don't build the payload inside the handler.
+Anything outside the shared factory follows the order in `api-conventions.md`, reusing `lib/network.ts` (`buildCorsHeaders`, `getClientIP`, `createRequestId`, `buildJsonResponse`), `lib/rate-limit.ts`, and `lib/logger.ts`. Build every response, errors included, with `buildJsonResponse({ ok, code, error, requestId }, status, corsHeaders)`, so it carries the standard shape, CORS headers and `X-Request-Id`. Be exact about the trust mechanism in the step 1 plan: shared-secret auth and HMAC signature verification are different controls. For Odoo field mapping, add a pure adapter in `lib/odoo-lead-mapping.ts`; don't build the payload inside the handler.
 
 - [ ] Handler shape chosen, reason stated.
 
@@ -41,7 +42,9 @@ Create or update each of these:
 3. `functions/api/<name>.ts` — the Cloudflare Pages adapter. Copy `functions/api/health.ts` exactly, changing only the import path. Pages routes by file path.
 4. `vite.config.ts` → `DEV_API_ROUTES` — add `'/api/<name>': () => import('./api/<name>.ts')`.
 5. `lib/api-catalog.ts`, for public endpoints only — add an `API_ENDPOINTS` entry (this feeds both the RFC 9727 catalog and OpenAPI), plus a `### METHOD /api/<name>` section in `buildApiDocs()`. Leave out internal-only webhooks, and say so in the PR.
-6. New env vars go in `.env.example` and in the Environment Variables block of `.claude/CLAUDE.md`. Read them only at the handler's config-check boundary.
+6. New env vars go in `.env.example` and in the Environment Variables block of `.claude/CLAUDE.md`. Read them only at the handler's config-check boundary. Provision them for production too:
+   - non-secret values go in both `[vars]` and `[env.production.vars]` in `wrangler.toml`
+   - secrets are set in the Cloudflare Pages dashboard; list each one in the PR as a required deploy step
 7. `.claude/CLAUDE.md` → the API Handlers table — add a row.
 
 - [ ] All seven items done, or marked N/A with a reason.
@@ -64,9 +67,9 @@ For public endpoints, extend `tests/api-catalog.test.ts` so the new path appears
 
 ## 5. Verify
 
-Run `pnpm typecheck`, `pnpm test:regression`, and `pnpm lint:changed`. If the endpoint backs a browser-visible flow, also run the relevant `pnpm test:e2e` spec.
+First run the built-in `security-review` skill on the diff. If the endpoint handles personal data, also check the flow against the `lgpd-brasil` skill (data minimization, consent, legal basis). Fix or rebut each finding.
 
-Run the built-in `security-review` skill on the diff. If the endpoint handles personal data, also check the flow against the `lgpd-brasil` skill (data minimization, consent, legal basis). Fix or rebut each finding.
+Then run `pnpm typecheck`, `pnpm test:regression`, and `pnpm lint:changed`. If the endpoint backs a browser-visible flow, also run the relevant `pnpm test:e2e` spec. Any edit after this point means running them again.
 
 - [ ] All commands green, output quoted in your summary.
 
