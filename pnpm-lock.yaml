@@ -171,7 +171,7 @@ importers:
         specifier: 25.0.9
         version: 25.0.9(@typescript/typescript6@6.0.2)
       sharp:
-        specifier: ^0.35.4
+        specifier: ^0.35.3
         version: 0.35.4(@types/node@26.5.1)
       subset-font:
         specifier: ^2.7.0
