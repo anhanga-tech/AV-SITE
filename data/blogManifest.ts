@@ -2,6 +2,51 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
+    "title": "Disney ou Universal em Orlando: qual escolher?",
+    "excerpt": "Disney ou Universal em Orlando? Compare o ritmo, as atrações, a idade das crianças, o custo da fila rápida e o tipo de viagem que cada complexo entrega.",
+    "date": "2026-09-22",
+    "author": "felipe-william",
+    "category": "Planejamento",
+    "image": "https://media.anhanga.tur.br/images/blog/onde-ficar-em-orlando.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Orlando",
+    "tags": [
+      "orlando",
+      "disney",
+      "universal",
+      "parques-tematicos",
+      "viagem-em-familia",
+      "planejamento"
+    ],
+    "seoTitle": "Disney ou Universal em Orlando?",
+    "seoDescription": "Disney ou Universal em Orlando? Compare atrações, idade das crianças, ritmo, filas rápidas e hospedagem para escolher o complexo certo.",
+    "faq": [
+      {
+        "question": "Disney ou Universal é melhor para crianças pequenas?",
+        "answer": "Para crianças pequenas, a Disney costuma oferecer mais atrações sem altura mínima, personagens e experiências distribuídas pelos quatro parques. A Universal também funciona, especialmente para famílias que gostam de Harry Potter, dinossauros e atrações mais intensas, mas a altura mínima elimina mais brinquedos para os menores."
+      },
+      {
+        "question": "Dá para fazer Disney e Universal na mesma viagem?",
+        "answer": "Dá, mas não é uma disputa que você precisa resolver em uma única viagem. Uma semana curta pede escolha: Disney para uma primeira viagem com crianças pequenas ou Universal para uma família que prioriza atrações de filmes e adrenalina. Com 10 dias ou mais, os dois complexos cabem com descanso."
+      },
+      {
+        "question": "Qual é mais barato: Disney ou Universal?",
+        "answer": "Não existe um vencedor fixo. O valor depende de datas, número de parques, ingressos, hospedagem, alimentação e fila rápida. Universal pode render mais por dia para quem usa o Express, especialmente em hotel que inclui o benefício. Disney exige comparar ingresso, Lightning Lane e a quantidade de parques que realmente entra no roteiro."
+      },
+      {
+        "question": "Vale a pena comprar Express Pass na Universal?",
+        "answer": "Pode valer em dias cheios ou para quem tem poucos dias. O Express Pass reduz a espera em atrações participantes, mas tem preço variável e não substitui o ingresso. Em alguns hotéis Premier da Universal, o Express Unlimited para atrações participantes de Universal Studios Florida e Islands of Adventure já está incluído para hóspedes elegíveis."
+      },
+      {
+        "question": "Qual complexo escolher para uma viagem de cinco dias?",
+        "answer": "Escolha Disney se a família quer uma primeira experiência com personagens, atrações para várias idades e quatro parques diferentes. Escolha Universal se a prioridade é Harry Potter, montanhas-russas, Jurassic World, Minions e um roteiro mais concentrado. Tentar fazer os dois em cinco dias costuma deixar os dois pela metade."
+      }
+    ],
+    "slug": "disney-ou-universal-orlando-qual-escolher",
+    "readingTime": "8 min de leitura"
+  },
+  {
     "title": "Epic Universe em Orlando: vale a pena em 2026?",
     "excerpt": "Epic Universe em Orlando: veja para quem vale a pena, o que o parque oferece e como encaixar a visita no roteiro com Disney e Universal.",
     "date": "2026-09-22",
@@ -265,6 +310,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Onde ficar em Orlando: qual região escolher",
     "excerpt": "A melhor região para ficar em Orlando depende dos parques, do transporte e do ritmo da família. Compare Disney, Universal, International Drive e Kissimmee.",
     "date": "2026-09-08",
+    "dateModified": "2026-09-22",
     "author": "felipe-william",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/onde-ficar-em-orlando.jpg",
