@@ -11,6 +11,11 @@ export interface BlogPostFrontmatter {
   author: string;          // chave do objeto AUTHORS em blogData.ts
   category: string;
   image: string;           // URL absoluta da imagem de capa
+  imageCreditStatus?: 'confirmed' | 'unknown';
+  imageCredit?: string;
+  imageSource?: string;
+  imageLicense?: string;
+  imageAdaptation?: string;
   featured?: boolean;      // se true, aparece em destaque no BlogList
   showChatCTA?: boolean;   // se true, renderiza <ChatCTA /> ao final do post via BlogPost.tsx
   chatCTADestination?: string; // destino opcional para personalizar o ChatCTA (ex: "Orlando", "Maldivas")
