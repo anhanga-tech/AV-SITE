@@ -19,7 +19,8 @@ const CORE_LINKS = [
   { to: '/quiz/', label: 'Quiz: descubra seu destino ideal' },
   { to: '/termos-de-uso/', label: 'Termos de Uso' },
   { to: '/politica-privacidade/', label: 'Política de Privacidade' },
-  { to: '/exclusao-de-dados/', label: 'Exclusão de Dados' }
+  { to: '/exclusao-de-dados/', label: 'Exclusão de Dados' },
+  { to: '/creditos-de-imagens/', label: 'Créditos de Imagens' }
 ];
 
 const SiteMap: React.FC = () => {

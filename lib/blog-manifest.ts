@@ -152,18 +152,23 @@ export const HOME_TEASER_POSTS: HomeTeaserPost[] = ${JSON.stringify(teaserPosts,
 // Gerada em módulo separado do manifest para não inflar o bundle do cliente —
 // apenas a edge function importa este arquivo.
 function toPostMarkdown(meta: PostMeta, content: string): string {
-  const header = [
-    `# ${meta.title}`,
-    '',
-    `**Publicado em:** ${meta.date}${meta.dateModified ? ` (atualizado em ${meta.dateModified})` : ''}`,
-    `**Categoria:** ${meta.category}`,
-    `**URL:** https://www.anhanga.tur.br/blog/${meta.slug}/`,
-    '',
-    meta.excerpt,
-    '',
-  ].join('\n');
+    const creditLine = meta.imageCreditStatus === 'confirmed' && meta.imageCredit
+        ? `Crédito da capa: ${meta.imageCredit}${meta.imageSource ? ` (${meta.imageSource})` : ''}${meta.imageLicense ? ` — ${meta.imageLicense}${meta.imageLicenseUrl ? `: ${meta.imageLicenseUrl}` : ''}` : ''}${meta.imageAdaptation ? ` · ${meta.imageAdaptation}` : ''}`
+        : null;
 
-  return `${header}\n${content.trim()}\n`;
+    const header = [
+        `# ${meta.title}`,
+        '',
+        `**Publicado em:** ${meta.date}${meta.dateModified ? ` (atualizado em ${meta.dateModified})` : ''}`,
+        `**Categoria:** ${meta.category}`,
+        `**URL:** https://www.anhanga.tur.br/blog/${meta.slug}/`,
+        ...(creditLine ? ['', creditLine] : []),
+        '',
+        meta.excerpt,
+        '',
+    ].join('\n');
+
+    return `${header}\n${content.trim()}\n`;
 }
 
 function serializeBlogPostMarkdown(entries: Record<string, string>): string {
