@@ -795,6 +795,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Melhor Época para Viajar para Orlando: Guia por Perfil de Viajante",
     "excerpt": "Não existe uma única melhor época para Orlando — existe a melhor época para o seu perfil de viagem. Veja como calor, multidão e preço mudam ao longo do ano.",
     "date": "2026-07-10",
+    "dateModified": "2026-09-22",
     "author": "queila-oliveira",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/melhor-epoca-viajar-orlando-guia-perfil-viajante.jpg",
