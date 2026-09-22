@@ -82,7 +82,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "Onde ficam os Baby Care Centers na Disney?",
-        "answer": "Existe um Baby Care Center em cada um dos quatro parques, com sala de amamentação, trocador, microondas e banheiro infantil. É o ponto de apoio para resolver soneca, troca de fralda ou uma pausa do calor sem sair do parque."
+        "answer": "Existe um Baby Care Center em cada um dos quatro parques, com sala de amamentação, trocador, microondas e banheiro infantil. O [mapa oficial dos Baby Care Centers](https://disneyworld.disney.go.com/guest-services/baby-care-centers/) mostra onde fica cada unidade; abra o mapa antes de entrar no parque."
       }
     ],
     "slug": "roteiro-disney-5-dias-com-criancas",
