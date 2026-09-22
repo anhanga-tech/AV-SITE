@@ -66,11 +66,11 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "faq": [
       {
         "question": "Quais atrações da Disney uma criança de 4 anos consegue andar?",
-        "answer": "A maior parte do Magic Kingdom não tem restrição de altura: it's a small world, Jungle Cruise, Peter Pan's Flight, Pirates of the Caribbean, Haunted Mansion e o carrossel, por exemplo. Em compensação, atrações como Space Mountain (112 cm), TRON Lightcycle (122 cm) e Seven Dwarfs Mine Train (97 cm) ficam fora do alcance de uma criança de 4 anos na maioria dos casos."
+        "answer": "A maior parte do Magic Kingdom não tem restrição de altura: it's a small world, Jungle Cruise, Peter Pan's Flight, Pirates of the Caribbean, Haunted Mansion e o carrossel, por exemplo. Uma criança de 4 anos pode já alcançar atrações de 97 cm, como Seven Dwarfs Mine Train, mas as de 102 cm para cima costumam ficar fora do roteiro dela. Space Mountain exige 112 cm e TRON Lightcycle, 122 cm."
       },
       {
         "question": "O que é o Rider Switch e como funciona?",
-        "answer": "É o serviço que permite que um adulto ande numa atração com restrição de altura enquanto o outro fica com a criança pequena, e depois troquem sem pegar fila duas vezes. Basta avisar o funcionário na entrada da atração antes de entrar na fila."
+        "answer": "É o serviço que permite que um adulto ande numa atração com restrição de altura enquanto o outro fica com a criança pequena, e depois troquem usando a entrada indicada pela equipe, geralmente a fila Lightning Lane. Isso evita repetir a fila de espera comum, mas ainda pode haver espera. Basta avisar o funcionário na entrada da atração antes de entrar na fila."
       },
       {
         "question": "Vale a pena comprar o Lightning Lane com crianças pequenas?",
