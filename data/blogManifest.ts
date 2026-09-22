@@ -44,6 +44,51 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "8 min de leitura"
   },
   {
+    "title": "Roteiro Disney em 5 dias com crianças de 4 a 8 anos: o que vale e o que evitar",
+    "excerpt": "Roteiro de 5 dias na Disney pensado para crianças de 4 a 8 anos: qual parque visitar em cada dia, quais atrações pular pela altura e onde encaixar o descanso.",
+    "date": "2026-09-22",
+    "author": "felipe-william",
+    "category": "Planejamento",
+    "image": "https://media.anhanga.tur.br/images/blog/quantos-dias-ficar-em-orlando.jpg",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Orlando",
+    "tags": [
+      "orlando",
+      "disney",
+      "roteiro",
+      "viagem-em-familia",
+      "criancas",
+      "planejamento"
+    ],
+    "seoTitle": "Roteiro Disney 5 Dias com Crianças",
+    "seoDescription": "Roteiro de 5 dias na Disney para famílias com crianças de 4 a 8 anos: qual parque em cada dia, quais atrações a altura barra e onde descansar.",
+    "faq": [
+      {
+        "question": "Quais atrações da Disney uma criança de 4 anos consegue andar?",
+        "answer": "A maior parte do Magic Kingdom não tem restrição de altura: it's a small world, Jungle Cruise, Peter Pan's Flight, Pirates of the Caribbean, Haunted Mansion e o carrossel, por exemplo. Em compensação, atrações como Space Mountain (112 cm), TRON Lightcycle (122 cm) e Seven Dwarfs Mine Train (97 cm) ficam fora do alcance de uma criança de 4 anos na maioria dos casos."
+      },
+      {
+        "question": "O que é o Rider Switch e como funciona?",
+        "answer": "É o serviço que permite que um adulto ande numa atração com restrição de altura enquanto o outro fica com a criança pequena, e depois troquem sem pegar fila duas vezes. Basta avisar o funcionário na entrada da atração antes de entrar na fila."
+      },
+      {
+        "question": "Vale a pena comprar o Lightning Lane com crianças pequenas?",
+        "answer": "Depende do parque e da época. Para o Magic Kingdom em dia cheio, costuma valer nas atrações mais disputadas de criança pequena, como Seven Dwarfs Mine Train e Peter Pan's Flight, que enchem cedo. Para o restante do roteiro, com criança de 4 a 8 anos que ainda faz sesta ou cansa à tarde, o ganho de tempo é menor porque o dia de parque já costuma ser mais curto."
+      },
+      {
+        "question": "5 dias de parque são suficientes com crianças pequenas?",
+        "answer": "Dá para cobrir os quatro parques com folga, mas o ritmo muda: um dia inteiro corrido custa mais caro em choro e cansaço do que em dinheiro. Reservar meio período em vez de dia cheio no Animal Kingdom e no Epcot, e guardar o Magic Kingdom para o dia mais longo, costuma funcionar melhor do que tentar aproveitar os quatro parques por igual."
+      },
+      {
+        "question": "Onde ficam os Baby Care Centers na Disney?",
+        "answer": "Existe um Baby Care Center em cada um dos quatro parques, com sala de amamentação, trocador, microondas e banheiro infantil. É o ponto de apoio para resolver soneca, troca de fralda ou uma pausa do calor sem sair do parque."
+      }
+    ],
+    "slug": "roteiro-disney-5-dias-com-criancas",
+    "readingTime": "8 min de leitura"
+  },
+  {
     "title": "Cruzeiros Costa Brasileira 2026/2027: rotas, datas e preços",
     "excerpt": "A temporada da Costa no Brasil tem dois navios, três portos de embarque e roteiros regulares de 2 a 9 noites. As rotas, as datas e o que cada faixa de preço inclui.",
     "date": "2026-09-15",
@@ -658,6 +703,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Como Planejar uma Viagem para Orlando Sob Medida: o Guia Completo",
     "excerpt": "Orlando não é só Disney. É passaporte, visto, escolha de parques, hospedagem e um orçamento que muda conforme cada decisão. Veja como planejar sem se perder.",
     "date": "2026-07-10",
+    "dateModified": "2026-09-22",
     "author": "felipe-william",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/como-planejar-viagem-orlando-sob-medida.jpg",
@@ -697,7 +743,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       }
     ],
     "slug": "como-planejar-viagem-orlando-sob-medida",
-    "readingTime": "4 min de leitura"
+    "readingTime": "5 min de leitura"
   },
   {
     "title": "Melhor Época para Viajar para Orlando: Guia por Perfil de Viajante",
