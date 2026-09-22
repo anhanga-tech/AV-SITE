@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import handler from '../api/markdown.ts';
+import handler, { memoize0 } from '../api/markdown.ts';
 
 test('api/markdown should return 400 for path too long', async () => {
     const longPath = 'a'.repeat(513);
@@ -73,6 +73,26 @@ test('api/markdown returns 404 for slugs matching object prototype properties', 
         const res = await handler(req);
         assert.equal(res.status, 404, `expected 404 for prototype-like slug "${slug}"`);
     }
+});
+
+test('memoize0 caches a builder result instead of recomputing it on every call', () => {
+    // Backs the page builders in api/markdown.ts (homePage, blogIndexPage, etc.):
+    // their output is a pure function of module-scope constants, so repeat requests
+    // for the same static page should reuse one cached string rather than rebuilding
+    // the array map + template concatenation from scratch every time.
+    let buildCount = 0;
+    const cached = memoize0(() => {
+        buildCount++;
+        return { value: buildCount };
+    });
+
+    const first = cached();
+    const second = cached();
+    const third = cached();
+
+    assert.equal(buildCount, 1, 'the builder must run only once');
+    assert.equal(first, second, 'repeat calls must return the same cached object');
+    assert.equal(second, third, 'repeat calls must return the same cached object');
 });
 
 test('api/markdown should enforce rate limiting', async () => {
