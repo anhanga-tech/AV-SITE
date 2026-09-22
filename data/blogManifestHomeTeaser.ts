@@ -11,7 +11,13 @@ export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
     "date": "2026-09-22",
     "category": "Planejamento",
     "author": "felipe-william",
-    "image": "https://media.anhanga.tur.br/images/blog/onde-ficar-em-orlando.jpg"
+    "image": "https://media.anhanga.tur.br/images/blog/onde-ficar-em-orlando.jpg",
+    "imageCreditStatus": "confirmed",
+    "imageCredit": "Nielsoncaetanosalmeron / Wikimedia Commons",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Embassy_Suites_by_Hilton_Orlando_International_Drive_Convention_Center_-_exterior_view.jpg",
+    "imageLicense": "CC BY 4.0",
+    "imageLicenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "imageAdaptation": "Recorte adaptado à capa"
   },
   {
     "slug": "epic-universe-orlando-2026-vale-a-pena",
@@ -20,7 +26,13 @@ export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
     "date": "2026-09-22",
     "category": "Dicas de Expert",
     "author": "queila-oliveira",
-    "image": "https://media.anhanga.tur.br/images/blog/epic-universe-orlando-2026.jpg"
+    "image": "https://media.anhanga.tur.br/images/blog/epic-universe-orlando-2026.jpg",
+    "imageCreditStatus": "confirmed",
+    "imageCredit": "CANthony0125 / Wikimedia Commons",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:UEU_Entrance.jpg",
+    "imageLicense": "Domínio público (PD-self)",
+    "imageLicenseUrl": "https://commons.wikimedia.org/wiki/File:UEU_Entrance.jpg",
+    "imageAdaptation": "Recorte adaptado à capa"
   },
   {
     "slug": "roteiro-disney-5-dias-com-criancas",
@@ -29,7 +41,13 @@ export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
     "date": "2026-09-22",
     "category": "Planejamento",
     "author": "felipe-william",
-    "image": "https://media.anhanga.tur.br/images/blog/quantos-dias-ficar-em-orlando.jpg"
+    "image": "https://media.anhanga.tur.br/images/blog/quantos-dias-ficar-em-orlando.jpg",
+    "imageCreditStatus": "confirmed",
+    "imageCredit": "Kiran891 / Wikimedia Commons",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:ICON_Park_green_overview.jpg",
+    "imageLicense": "CC BY-SA 4.0",
+    "imageLicenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "imageAdaptation": "Recorte adaptado à capa"
   },
   {
     "slug": "cruzeiros-costa-brasileira-2026-2027",
@@ -38,6 +56,7 @@ export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
     "date": "2026-09-15",
     "category": "Cruzeiros",
     "author": "felipe-william",
-    "image": "https://media.anhanga.tur.br/images/destinations/natal.jpg"
+    "image": "https://media.anhanga.tur.br/images/destinations/natal.jpg",
+    "imageCreditStatus": "unknown"
   }
 ];

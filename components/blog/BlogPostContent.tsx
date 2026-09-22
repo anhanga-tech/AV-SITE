@@ -103,6 +103,9 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
                                     </span>
                                 </div>
                             </div>
+                            <div className="px-4 -mt-1">
+                                <BlogImageCredit post={related} compact />
+                            </div>
                             <div className="p-4">
                                 <h5 className="font-bold text-zinc-800 leading-tight group-hover:text-brand-cyan transition-colors text-base mb-2">
                                     {related.title}

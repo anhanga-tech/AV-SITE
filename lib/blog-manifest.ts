@@ -127,6 +127,12 @@ function toHomeTeaserPost(post: PostMeta): HomeTeaserPost {
     author: post.author,
     image: post.image,
     ...(post.featured ? { featured: true as const } : {}),
+    ...(post.imageCreditStatus ? { imageCreditStatus: post.imageCreditStatus } : {}),
+    ...(post.imageCredit ? { imageCredit: post.imageCredit } : {}),
+    ...(post.imageSource ? { imageSource: post.imageSource } : {}),
+    ...(post.imageLicense ? { imageLicense: post.imageLicense } : {}),
+    ...(post.imageLicenseUrl ? { imageLicenseUrl: post.imageLicenseUrl } : {}),
+    ...(post.imageAdaptation ? { imageAdaptation: post.imageAdaptation } : {}),
   };
 }
 
