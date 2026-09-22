@@ -86,7 +86,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       }
     ],
     "slug": "roteiro-disney-5-dias-com-criancas",
-    "readingTime": "8 min de leitura"
+    "readingTime": "9 min de leitura"
   },
   {
     "title": "Cruzeiros Costa Brasileira 2026/2027: rotas, datas e preços",
