@@ -27,8 +27,28 @@ function markdownResponse(body: string, status = 200): Response {
     });
 }
 
+// PERFORMANCE: every page builder below is a pure function of module-scope
+// constants (FAQ_SCHEMA_ITEMS, BLOG_POST_MANIFEST, SITE_BASE) — its output never
+// varies between requests within a deployment. This endpoint exists specifically
+// for LLM/agent/crawler consumption (see comment below), so the same handful of
+// paths get hit repeatedly by bots re-reading the same static pages. Without
+// caching, every request re-ran the array map + ~90-line template concatenation
+// from scratch. `memoize0` caches each builder's return value after the first
+// call so repeat requests just return the cached string.
+export function memoize0<T>(build: () => T): () => T {
+    let cached: T | undefined;
+    let hasCached = false;
+    return () => {
+        if (!hasCached) {
+            cached = build();
+            hasCached = true;
+        }
+        return cached as T;
+    };
+}
+
 // Content duplicated from JSX components intentionally — separate Markdown source for LLM/agent consumption
-function homePage(): string {
+const homePage = memoize0((): string => {
     const faqSection = FAQ_SCHEMA_ITEMS.map(
         ({ question, answer }) => `### ${question}\n\n${answer}`
     ).join('\n\n');
@@ -86,9 +106,9 @@ ${faqSection}
 - Orlando / Disney / Universal: ${SITE_BASE}/orlando
 - Turismo Melhor Idade (50+): ${SITE_BASE}/melhor-idade
 `;
-}
+});
 
-function lollapaloozaPage(): string {
+const lollapaloozaPage = memoize0((): string => {
     return `# Lollapalooza Brasil — Anhangá Viagens
 
 **URL:** ${SITE_BASE}/lollapalooza
@@ -120,9 +140,9 @@ As regiões com acesso facilitado à Linha 9 - Esmeralda, além de bairros como 
 
 Sim. A lista de espera serve justamente para identificar quem quer prioridade quando retomarmos orçamento, hospedagem e operação para a próxima edição do Lollapalooza.
 `;
-}
+});
 
-function betoCarreroPage(): string {
+const betoCarreroPage = memoize0((): string => {
     return `# Pacote Beto Carrero World — Anhangá Viagens
 
 **URL:** ${SITE_BASE}/beto-carrero
@@ -166,9 +186,9 @@ O parque oferece um amplo estacionamento oficial pago e seguro. Para quem quer m
 
 Para aproveitar o parque com conforto e conhecer as principais atrações, recomendamos roteiros de 3 a 4 dias, permitindo pelo menos 2 dias inteiros dentro do parque.
 `;
-}
+});
 
-function orlandoPage(): string {
+const orlandoPage = memoize0((): string => {
     return `# Pacotes para Orlando — Anhangá Viagens
 
 **URL:** ${SITE_BASE}/orlando
@@ -210,9 +230,9 @@ Com certeza. Entregamos um roteiro personalizado dia a dia, indicando quais parq
 
 Para conseguir visitar os principais parques da Disney e Universal com calma, recomendamos uma estadia de 10 a 14 dias. Isso permite intercalar dias intensos de parque com dias de descanso ou compras.
 `;
-}
+});
 
-function melhorIdadePage(): string {
+const melhorIdadePage = memoize0((): string => {
     return `# Turismo 50+ / Melhor Idade — Anhangá Viagens
 
 **URL:** ${SITE_BASE}/melhor-idade
@@ -257,9 +277,9 @@ Destinos como Portugal, Itália (especialmente Toscana), Gramado no Brasil, e cr
 
 Realizamos uma conversa detalhada para entender preferências de mobilidade, restrições alimentares e interesses culturais. A partir disso, desenhamos um roteiro que respeita o seu tempo e prioriza sua segurança.
 `;
-}
+});
 
-function blogIndexPage(): string {
+const blogIndexPage = memoize0((): string => {
     const postList = BLOG_POST_MANIFEST.map(
         (post) =>
             `- [${post.title}](${SITE_BASE}/blog/${post.slug}/) — ${post.date}\n  ${post.excerpt}`
@@ -275,7 +295,7 @@ Guias práticos de viagem escritos pela equipe da Anhangá Viagens: destinos, do
 
 ${postList}
 `;
-}
+});
 
 function routeMarkdown(rawPath: string): Response {
     if (rawPath.length > 512) {
