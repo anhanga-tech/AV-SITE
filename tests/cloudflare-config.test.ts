@@ -223,6 +223,26 @@ test('Cloudflare Pages HSTS should not include subdomains until subdomain invent
   assert.doesNotMatch(hsts, /includesubdomains/i, 'includeSubDomains must not be set until beto.anhanga.tur.br HTTPS status is confirmed');
 });
 
+test('Cloudflare Pages headers should lock down unused browser device/sensor APIs via Permissions-Policy', async () => {
+  const headers = await readFile(new URL('../public/_headers', import.meta.url), 'utf8');
+  const blocks = collectHeadersBlocks(headers);
+  const globalHeaders = blocks.get('/*');
+
+  assert.ok(globalHeaders, 'global /* block must exist');
+  const policy = globalHeaders.get('Permissions-Policy');
+  assert.ok(policy, 'Permissions-Policy header must be present in /* block');
+
+  // The site never calls the WebUSB/Bluetooth/Serial/HID/MIDI/motion-sensor
+  // APIs (confirmed via grep for navigator.usb/bluetooth/serial/hid/midi and
+  // DeviceMotion/DeviceOrientation). Denying them at the top-level document
+  // closes off abuse of those APIs by any future injected/compromised script,
+  // independent of the CSP frame-ancestors block (which only stops framing,
+  // not what a script running on the page itself can call).
+  for (const feature of ['usb', 'bluetooth', 'midi', 'serial', 'hid', 'magnetometer', 'gyroscope', 'accelerometer', 'xr-spatial-tracking']) {
+    assert.match(policy, new RegExp(`\\b${feature}=\\(\\)`), `${feature} must be denied via Permissions-Policy`);
+  }
+});
+
 test('Cloudflare Pages headers should set a defense-in-depth Content-Security-Policy', async () => {
   const headers = await readFile(new URL('../public/_headers', import.meta.url), 'utf8');
   const blocks = collectHeadersBlocks(headers);
