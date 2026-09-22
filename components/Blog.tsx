@@ -55,29 +55,31 @@ const Blog: React.FC = memo(() => {
                             <div className="bg-brand-surface rounded-[2.5rem] p-6 md:p-8 border-4 border-zinc-100 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] flex flex-col md:flex-row gap-8 items-center transition-transform duration-300 hover:scale-[1.01]">
 
                                 {/* Featured Image */}
-                                <div className="w-full md:w-1/2 relative">
-                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-brand-cyan/20 backdrop-blur-sm border-l border-r border-white/60 -rotate-2 shadow-sm z-20"></div>
-                                    <div className="rounded-2xl overflow-hidden aspect-video border-2 border-white shadow-md">
-                                        <LazyImage
-                                            src={featuredPost.image}
-                                            alt={featuredPost.title}
-                                            width={960}
-                                            height={540}
-                                            className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
-                                        />
+                                <div className="w-full md:w-1/2">
+                                    <div className="relative">
+                                        <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-brand-cyan/20 backdrop-blur-sm border-l border-r border-white/60 -rotate-2 shadow-sm z-20"></div>
+                                        <div className="rounded-2xl overflow-hidden aspect-video border-2 border-white shadow-md">
+                                            <LazyImage
+                                                src={featuredPost.image}
+                                                alt={featuredPost.title}
+                                                width={960}
+                                                height={540}
+                                                className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
+                                            />
+                                        </div>
+                                        <div className="absolute bottom-4 left-4 bg-white px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider text-brand-dark shadow-sm">
+                                            Destaque da Semana
+                                        </div>
+                                        <div className="absolute bottom-4 right-4 z-30">
+                                            <SocialShare
+                                                minimal
+                                                url={getBlogPostUrl(featuredPost.slug)}
+                                                title={featuredPost.title}
+                                                excerpt={featuredPost.excerpt}
+                                            />
+                                        </div>
                                     </div>
                                     <BlogImageCredit post={featuredPost} compact />
-                                    <div className="absolute bottom-4 left-4 bg-white px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider text-brand-dark shadow-sm">
-                                        Destaque da Semana
-                                    </div>
-                                    <div className="absolute bottom-4 right-4 z-30">
-                                        <SocialShare
-                                            minimal
-                                            url={getBlogPostUrl(featuredPost.slug)}
-                                            title={featuredPost.title}
-                                            excerpt={featuredPost.excerpt}
-                                        />
-                                    </div>
                                 </div>
 
                                 {/* Featured Content */}

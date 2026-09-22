@@ -53,7 +53,8 @@ collections:
       - label: Status do crédito da imagem
         name: imageCreditStatus
         widget: select
-        default: unknown
+        default: confirmed
+        hint: Posts novos precisam de crédito confirmado (autor, fonte, licença e adaptação). "Origem em verificação" é reservado ao acervo legado.
         options:
           - { label: Crédito confirmado, value: confirmed }
           - { label: Origem em verificação, value: unknown }

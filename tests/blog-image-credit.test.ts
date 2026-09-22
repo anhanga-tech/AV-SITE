@@ -56,15 +56,27 @@ function frontmatter(text: string): string {
     return match[1];
 }
 
-// Retorna undefined quando o valor está ausente ou é vazio/"". Assim `imageCredit: ""`
-// não conta como preenchido (a `.` do regex anterior casava com as aspas vazias).
+// Retorna undefined quando o valor está ausente, vazio/"", ou é um *null* YAML
+// (`null`, `Null`, `NULL`, `~`). Gray-matter parseia esses escalares como null,
+// então `imageCredit: null` não pode contar como preenchido.
 function fieldValue(fm: string, field: string): string | undefined {
     const match = fm.match(new RegExp(`^${field}:\\s*(.+)$`, 'm'));
     if (!match) return undefined;
     const raw = match[1].trim();
-    const unquoted = raw.replace(/^["']|["']$/g, '').trim();
-    return unquoted === '' ? undefined : raw;
+    const quoted = raw.match(/^(["'])([\s\S]*)\1$/);
+    const core = quoted ? quoted[2].trim() : raw;
+    if (core === '' || /^(null|Null|NULL|~)$/.test(core)) return undefined;
+    return raw;
 }
+
+test('fieldValue rejeita YAML null e strings vazias', () => {
+    for (const nullValue of ['null', 'Null', 'NULL', '~']) {
+        assert.equal(fieldValue(`imageCredit: ${nullValue}`, 'imageCredit'), undefined, `deve rejeitar \`${nullValue}\``);
+    }
+    assert.equal(fieldValue('imageCredit: ""', 'imageCredit'), undefined);
+    assert.equal(fieldValue("imageCredit: ''", 'imageCredit'), undefined);
+    assert.equal(fieldValue('imageCredit: "Vitor Pamplona"', 'imageCredit'), '"Vitor Pamplona"');
+});
 
 test('cada capa do blog tem status de crédito documentado', () => {
     const posts = fs.readdirSync(BLOG_DIR).filter(name => name.endsWith('.mdx')).sort();
