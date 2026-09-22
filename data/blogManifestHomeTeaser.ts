@@ -14,6 +14,15 @@ export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
     "image": "https://media.anhanga.tur.br/images/blog/epic-universe-orlando-2026.jpg"
   },
   {
+    "slug": "roteiro-disney-5-dias-com-criancas",
+    "title": "Roteiro Disney em 5 dias com crianças de 4 a 8 anos: o que vale e o que evitar",
+    "excerpt": "Roteiro de 5 dias na Disney pensado para crianças de 4 a 8 anos: qual parque visitar em cada dia, quais atrações pular pela altura e onde encaixar o descanso.",
+    "date": "2026-09-22",
+    "category": "Planejamento",
+    "author": "felipe-william",
+    "image": "https://media.anhanga.tur.br/images/blog/quantos-dias-ficar-em-orlando.jpg"
+  },
+  {
     "slug": "cruzeiros-costa-brasileira-2026-2027",
     "title": "Cruzeiros Costa Brasileira 2026/2027: rotas, datas e preços",
     "excerpt": "A temporada da Costa no Brasil tem dois navios, três portos de embarque e roteiros regulares de 2 a 9 noites. As rotas, as datas e o que cada faixa de preço inclui.",
@@ -30,14 +39,5 @@ export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
     "category": "Planejamento",
     "author": "felipe-william",
     "image": "https://media.anhanga.tur.br/images/blog/quantos-dias-ficar-em-orlando.jpg"
-  },
-  {
-    "slug": "primeira-viagem-internacional-depois-dos-60",
-    "title": "Primeira viagem internacional depois dos 60: o que ninguém te conta",
-    "excerpt": "A primeira viagem internacional depois dos 60 não é difícil, é diferente. Seguro, ritmo, remédios e o que planejar antes de atravessar o oceano.",
-    "date": "2026-09-14",
-    "category": "Melhor Idade",
-    "author": "felipe-william",
-    "image": "https://media.anhanga.tur.br/images/destinations/lisboa.jpg"
   }
 ];
