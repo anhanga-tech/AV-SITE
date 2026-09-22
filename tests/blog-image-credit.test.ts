@@ -23,7 +23,7 @@ test('cada capa do blog tem status de crédito documentado', () => {
     assert.ok(status, `${filename}: imageCreditStatus must be confirmed or unknown`);
 
     if (status === 'confirmed') {
-      for (const field of ['imageCredit', 'imageSource', 'imageLicense', 'imageAdaptation']) {
+      for (const field of ['imageCredit', 'imageSource', 'imageLicense', 'imageLicenseUrl', 'imageAdaptation']) {
         assert.match(fm, new RegExp(`^${field}:\\s*.+$`, 'm'), `${filename}: confirmed image must have ${field}`);
       }
     }

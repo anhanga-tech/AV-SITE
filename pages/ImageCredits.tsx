@@ -20,7 +20,7 @@ const ImageCredits = () => (
             url={CANONICAL}
             dateModified={UPDATED_ISO}
         />
-        <main className="container mx-auto px-4 py-10">
+        <div className="container mx-auto px-4 py-10">
             <header className="mb-8 text-center">
                 <h1 className="text-3xl font-merriweather font-bold md:text-4xl">Créditos de imagens</h1>
                 <p className="mt-2 text-sm text-muted-foreground md:text-base">Última atualização: {UPDATED}</p>
@@ -63,7 +63,7 @@ const ImageCredits = () => (
                     </p>
                 </section>
             </article>
-        </main>
+        </div>
     </>
 );
 

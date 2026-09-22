@@ -15,6 +15,7 @@ export interface BlogPostFrontmatter {
   imageCredit?: string;
   imageSource?: string;
   imageLicense?: string;
+  imageLicenseUrl?: string;
   imageAdaptation?: string;
   featured?: boolean;      // se true, aparece em destaque no BlogList
   showChatCTA?: boolean;   // se true, renderiza <ChatCTA /> ao final do post via BlogPost.tsx
@@ -38,5 +39,6 @@ export type PostMeta = Omit<BlogPostFrontmatter, 'tags'> & {
 // qualquer import estático — porque a home só precisa dos N posts mais recentes.
 export type HomeTeaserPost = Pick<
   PostMeta,
-  'slug' | 'title' | 'excerpt' | 'date' | 'category' | 'author' | 'image' | 'featured'
+  'slug' | 'title' | 'excerpt' | 'date' | 'category' | 'author' | 'image' | 'featured' |
+  'imageCreditStatus' | 'imageCredit' | 'imageSource' | 'imageLicense' | 'imageAdaptation' | 'imageLicenseUrl'
 >;

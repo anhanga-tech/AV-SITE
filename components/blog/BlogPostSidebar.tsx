@@ -5,6 +5,7 @@ import { getBlogPostUrl } from '../../utils/blog';
 import { optimizeRemoteImageUrl } from '../../data/mediaConfig';
 import { getCategoryColor } from '../../utils/categoryColors';
 import { openContactModal } from '../../utils/contactForm';
+import { BlogImageCredit } from './BlogImageCredit';
 
 interface BlogPostSidebarProps {
     author: {
@@ -60,6 +61,7 @@ export const BlogPostSidebar: React.FC<BlogPostSidebarProps> = ({ author, author
                             <div className="size-24 rounded-2xl overflow-hidden shrink-0 border border-zinc-100 shadow-sm relative">
                                 <img src={optimizeRemoteImageUrl(related.image, 200, 200)} alt={related.title} width="200" height="200" loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                             </div>
+                            <BlogImageCredit post={related} compact />
                             <div className="flex flex-col h-full justify-center">
                                 <div className="mb-2">
                                     <span className={`inline-block text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border ${getCategoryColor(related.category)} bg-opacity-50`}>

@@ -50,6 +50,18 @@ collections:
           - { label: Romance, value: Romance }
           - { label: Sazonal, value: Sazonal }
       - { label: Imagem de capa, name: image, widget: image, required: true }
+      - label: Status do crédito da imagem
+        name: imageCreditStatus
+        widget: select
+        default: unknown
+        options:
+          - { label: Crédito confirmado, value: confirmed }
+          - { label: Origem em verificação, value: unknown }
+      - { label: Crédito da imagem, name: imageCredit, widget: string, required: false }
+      - { label: Fonte original da imagem, name: imageSource, widget: string, required: false }
+      - { label: Licença da imagem, name: imageLicense, widget: string, required: false }
+      - { label: URL da licença, name: imageLicenseUrl, widget: string, required: false }
+      - { label: Adaptação aplicada, name: imageAdaptation, widget: string, required: false }
       - { label: Destaque, name: featured, widget: boolean, required: false, default: false }
       - { label: Mostrar CTA do Chat, name: showChatCTA, widget: boolean, required: false, default: true }
       - { label: Destino do Chat CTA, name: chatCTADestination, widget: string, required: false }

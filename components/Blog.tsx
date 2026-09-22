@@ -10,6 +10,7 @@ import { SocialShare } from './SocialShare';
 import { getBlogHomeUrl, getBlogPostUrl, formatDate } from '../utils/blog';
 import { getCategoryColor } from '../utils/categoryColors';
 import { LazyImage } from './ui/LazyImage';
+import { BlogImageCredit } from './blog/BlogImageCredit';
 
 const displayPosts = HOME_TEASER_POSTS;
 const featuredPost = displayPosts.find(p => p.featured) ?? displayPosts[0];
@@ -65,6 +66,7 @@ const Blog: React.FC = memo(() => {
                                             className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
                                         />
                                     </div>
+                                    <BlogImageCredit post={featuredPost} compact />
                                     <div className="absolute bottom-4 left-4 bg-white px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider text-brand-dark shadow-sm">
                                         Destaque da Semana
                                     </div>
@@ -140,6 +142,7 @@ const Blog: React.FC = memo(() => {
                                         excerpt={post.excerpt}
                                     />
                                 </div>
+                                <BlogImageCredit post={post} compact />
                             </div>
 
                             {/* Content */}

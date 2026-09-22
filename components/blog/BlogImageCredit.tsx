@@ -4,11 +4,14 @@ import type { PostMeta } from '../../types/blog';
 
 interface BlogImageCreditProps {
     post: PostMeta;
+    compact?: boolean;
 }
 
-export const BlogImageCredit: React.FC<BlogImageCreditProps> = ({ post }) => {
+export const BlogImageCredit: React.FC<BlogImageCreditProps> = ({ post, compact = false }) => {
     if (post.imageCreditStatus === 'unknown') {
-        return (
+        return compact ? (
+            <p className="mt-2 text-[10px] font-semibold leading-tight text-zinc-500">Crédito da imagem em verificação</p>
+        ) : (
             <aside
                 className="mb-8 flex gap-3 rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-600"
                 aria-label="Aviso sobre o crédito da imagem"
@@ -29,10 +32,25 @@ export const BlogImageCredit: React.FC<BlogImageCreditProps> = ({ post }) => {
     }
 
     if (post.imageCreditStatus === 'confirmed' && post.imageCredit) {
+        if (compact) {
+            return (
+                <p className="mt-2 text-[10px] font-semibold leading-tight text-zinc-500">
+                    Foto: {post.imageCredit} · Licença: {post.imageLicense}
+                    {post.imageSource ? ` · Fonte: ${post.imageSource}` : ''}
+                    {post.imageAdaptation ? ` · ${post.imageAdaptation}` : ''}
+                </p>
+            );
+        }
+
         return (
             <p className="mb-8 text-xs leading-relaxed text-zinc-500">
                 Crédito da capa: {post.imageSource ? <a href={post.imageSource} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">{post.imageCredit}</a> : post.imageCredit}
-                {post.imageLicense ? ` · ${post.imageLicense}` : ''}
+                {post.imageLicense ? (
+                    <>
+                        {' · '}
+                        {post.imageLicenseUrl ? <a href={post.imageLicenseUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">{post.imageLicense}</a> : post.imageLicense}
+                    </>
+                ) : null}
                 {post.imageAdaptation ? ` · ${post.imageAdaptation}` : ''}
             </p>
         );
