@@ -9,43 +9,30 @@ on:
     types: [opened, assigned]
   pull_request_review:
     types: [submitted]
-  pull_request:
-    types: [opened, synchronize, ready_for_review]
 
 jobs:
   claude:
-    # Security: Restrict to trusted users only (OWNER, MEMBER, COLLABORATOR).
-    # This prevents untrusted/external GitHub users from invoking Claude automation
-    # via @claude mentions on public repositories. Fixes: acl-check (HIGH severity).
     if: |
-      (
-        github.event.sender.login == github.repository_owner ||
-        contains(fromJson('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association) ||
-        contains(fromJson('["OWNER","MEMBER","COLLABORATOR"]'), github.event.review.author_association) ||
-        contains(fromJson('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association)
-      ) &&
-      (
-        (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
-        (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-        (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
-        (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
-      )
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      pull-requests: write
-      issues: write
+      contents: read
+      pull-requests: read
+      issues: read
+      id-token: write
       actions: read # Required for Claude to read CI results on PRs
-      id-token: write # Required to exchange an OIDC token for the claude[bot] GitHub App token
     steps:
       - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
       - name: Run Claude Code
         id: claude
-        uses: anthropics/claude-code-action@7b0b255830a1fab6e602658672acad11c12d841d # v1.0.226
+        uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
@@ -59,68 +46,5 @@ jobs:
           # Optional: Add claude_args to customize behavior and configuration
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
-          # claude_args: '--allowed-tools Bash(gh pr:*)'
+          # claude_args: '--allowed-tools Bash(gh pr *)'
 
-  claude-review:
-    # Substitui o Gemini Code Assist (descontinuado) como reviewer automático de PR.
-    # Restrito a autores confiáveis e a PRs não-draft para não gastar créditos à toa.
-    if: |
-      github.event_name == 'pull_request' &&
-      github.event.pull_request.draft == false &&
-      (
-        github.event.pull_request.user.login == github.repository_owner ||
-        contains(fromJson('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association)
-      )
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: read
-      actions: read
-      id-token: write # Required to exchange an OIDC token for the claude[bot] GitHub App token
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 1
-
-      - name: Run Claude Code Review
-        uses: anthropics/claude-code-action@7b0b255830a1fab6e602658672acad11c12d841d # v1.0.226
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-
-          additional_permissions: |
-            actions: read
-
-          # Força modo "tag" com comment tracking. Sem isso, o `prompt` abaixo
-          # ativa o modo "agent", que não instala nenhuma ferramenta de escrita
-          # no GitHub por padrão — a review rodava com sucesso mas não postava
-          # nada visível na PR (issue #1087).
-          track_progress: true
-
-          # Uma review consolidada por push, não um comentário novo a cada commit
-          use_sticky_comment: true
-          # Filtra comentários de teste/sonda antes de postar inline
-          classify_inline_comments: true
-
-          prompt: |
-            Revise este pull request como reviewer automático deste repositório.
-
-            Leia primeiro os padrões do projeto antes de avaliar o diff:
-            - docs/standards/code-style.md, linting.md, testing.md, api-conventions.md, security.md
-            - .claude/rules/ (mesmas regras, aplicadas via CLAUDE.md)
-
-            Foque em, nesta ordem de prioridade:
-            1. Bugs de correção, regressões e edge cases não tratados
-            2. Riscos de segurança: validação/sanitização de input, secrets, verificação de webhooks, rate limiting
-            3. Violação de convenções documentadas (ex.: lógica de handler fora de api/, helpers duplicados em vez de reuso de lib/ e services/, resposta fora do formato { ok, code?, error?, data? })
-            4. Mudança de comportamento sem teste automatizado correspondente (docs/standards/testing.md)
-
-            Não repita o que já é coberto por CI (`pnpm test:regression`, `pnpm typecheck`, `pnpm build`, `pnpm test:size`) nem pelo lint automático (`pnpm lint:changed`, que já roda em CI e cobre exatamente: `react-hooks/rules-of-hooks`, `@typescript-eslint/no-floating-promises`/`no-misused-promises`, e o conjunto recomendado de `jsx-a11y` — ver docs/standards/linting.md para o que está e o que NÃO está coberto). Fora desse escopo — nomenclatura, organização de imports, agrupamento de classes Tailwind, qualidade de comentários — não existe ferramenta automática hoje; comente normalmente quando for um problema real, não assuma que "o lint pega". Poste um resumo curto e comentários inline apenas onde houver um problema real e acionável — prefira silêncio a ruído.
-
-            Para cada achado específico e acionável (bug, risco de segurança, convenção violada), use `create_inline_comment` ancorado na linha exata — não descreva o achado só em prosa no resumo. Reserve o resumo (sticky comment) para visão geral, contexto entre achados e itens que não têm uma linha específica para ancorar (ex.: padrão repetido em vários arquivos). Um achado por comentário inline, mesmo quando o diff tem muitos arquivos.
-
-            Você não tem acesso a Bash além de comandos git de plumbing (add/commit/rm) e não tem `gh` disponível. Não tente instalar dependências, nem rodar lint/typecheck/build/testes — isso já roda no CI e você não tem permissão para executá-los. Revise usando apenas Read/Grep/Glob no checkout e reporte via comentário/inline comment.
-
-          claude_args: |
-            --max-turns 45
