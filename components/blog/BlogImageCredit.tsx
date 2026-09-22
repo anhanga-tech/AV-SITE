@@ -48,8 +48,6 @@ function ConfirmedCredit({ post, compact }: { post: ImageCreditFields; compact: 
         return (
             <p className="mt-2 text-[10px] font-semibold leading-tight text-zinc-500">
                 Foto: {post.imageCredit} · Licença: {post.imageLicense}
-                {post.imageSource ? ` · Fonte: ${post.imageSource}` : ''}
-                {post.imageAdaptation ? ` · ${post.imageAdaptation}` : ''}
             </p>
         );
     }

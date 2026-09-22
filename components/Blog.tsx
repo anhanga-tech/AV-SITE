@@ -142,8 +142,8 @@ const Blog: React.FC = memo(() => {
                                         excerpt={post.excerpt}
                                     />
                                 </div>
-                                <BlogImageCredit post={post} compact />
                             </div>
+                            <BlogImageCredit post={post} compact />
 
                             {/* Content */}
                             <div className="flex-1 flex flex-col">
