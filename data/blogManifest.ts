@@ -310,6 +310,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Onde ficar em Orlando: qual região escolher",
     "excerpt": "A melhor região para ficar em Orlando depende dos parques, do transporte e do ritmo da família. Compare Disney, Universal, International Drive e Kissimmee.",
     "date": "2026-09-08",
+    "dateModified": "2026-09-22",
     "author": "felipe-william",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/onde-ficar-em-orlando.jpg",
