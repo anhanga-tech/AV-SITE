@@ -136,6 +136,16 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.anhanga.tur.br/blog/disney-ou-universal-orlando-qual-escolher/</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/onde-ficar-em-orlando.jpg</image:loc>
+      <image:caption>Disney ou Universal em Orlando: qual escolher?</image:caption>
+    </image:image>
+  </url>
+  <url>
     <loc>https://www.anhanga.tur.br/blog/epic-universe-orlando-2026-vale-a-pena/</loc>
     <lastmod>2026-09-22</lastmod>
     <changefreq>monthly</changefreq>

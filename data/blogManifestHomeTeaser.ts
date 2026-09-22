@@ -5,6 +5,15 @@ import type { HomeTeaserPost } from '../types/blog';
 
 export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
   {
+    "slug": "disney-ou-universal-orlando-qual-escolher",
+    "title": "Disney ou Universal em Orlando: qual escolher?",
+    "excerpt": "Disney ou Universal em Orlando? Compare o ritmo, as atrações, a idade das crianças, o custo da fila rápida e o tipo de viagem que cada complexo entrega.",
+    "date": "2026-09-22",
+    "category": "Planejamento",
+    "author": "felipe-william",
+    "image": "https://media.anhanga.tur.br/images/blog/onde-ficar-em-orlando.jpg"
+  },
+  {
     "slug": "epic-universe-orlando-2026-vale-a-pena",
     "title": "Epic Universe em Orlando: vale a pena em 2026?",
     "excerpt": "Epic Universe em Orlando: veja para quem vale a pena, o que o parque oferece e como encaixar a visita no roteiro com Disney e Universal.",
@@ -30,14 +39,5 @@ export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
     "category": "Cruzeiros",
     "author": "felipe-william",
     "image": "https://media.anhanga.tur.br/images/destinations/natal.jpg"
-  },
-  {
-    "slug": "quantos-dias-ficar-em-orlando-2026-roteiros",
-    "title": "Quantos dias ficar em Orlando? Roteiro de 5 a 14 dias",
-    "excerpt": "Cinco dias podem bastar para uma primeira visita enxuta. Com 7, 10 ou 14 dias, o roteiro muda. Veja como distribuir parques, descanso e compras em Orlando.",
-    "date": "2026-09-15",
-    "category": "Planejamento",
-    "author": "felipe-william",
-    "image": "https://media.anhanga.tur.br/images/blog/quantos-dias-ficar-em-orlando.jpg"
   }
 ];

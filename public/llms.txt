@@ -74,6 +74,7 @@ suporte a viagens já compradas com outra agência, ou perguntas sem relação c
 Feed RSS: https://www.anhanga.tur.br/feed.xml
 Versão markdown de qualquer página: https://www.anhanga.tur.br/api/markdown?path=/blog/{slug}/
 
+- [Disney ou Universal em Orlando: qual escolher?](https://www.anhanga.tur.br/blog/disney-ou-universal-orlando-qual-escolher/) (2026-09-22)
 - [Epic Universe em Orlando: vale a pena em 2026?](https://www.anhanga.tur.br/blog/epic-universe-orlando-2026-vale-a-pena/) (2026-09-22)
 - [Roteiro Disney em 5 dias com crianças de 4 a 8 anos: o que vale e o que evitar](https://www.anhanga.tur.br/blog/roteiro-disney-5-dias-com-criancas/) (2026-09-22)
 - [Cruzeiros Costa Brasileira 2026/2027: rotas, datas e preços](https://www.anhanga.tur.br/blog/cruzeiros-costa-brasileira-2026-2027/) (2026-09-15)
