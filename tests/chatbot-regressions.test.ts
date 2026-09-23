@@ -175,7 +175,7 @@ test('system prompt should include prompt injection hardening rules', () => {
 test('system prompt should enforce one-question-at-a-time behavior', () => {
     assert.match(
         SYSTEM_INSTRUCTION,
-        /NUNCA faça duas perguntas na mesma resposta/,
+        /Faça uma pergunta por resposta/,
     );
     assert.match(
         SYSTEM_INSTRUCTION,

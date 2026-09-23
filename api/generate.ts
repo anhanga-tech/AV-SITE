@@ -32,7 +32,6 @@ const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
 const RATE_LIMIT_MAX_REQUESTS = 10; // Max 10 requests per minute per IP
 const GEMINI_3_DEFAULT_TEMPERATURE = 1.0;
 const LEGACY_DEFAULT_TEMPERATURE = 0.7;
-const HANDOFF_REPAIR_TEMPERATURE = 0.1;
 const HANDOFF_READY_MESSAGE = 'Perfeito. Seu pré-atendimento está pronto. Preencha seus dados abaixo para continuar com nossa equipe.';
 const HANDOFF_REPAIR_SYSTEM_INSTRUCTION = `${SYSTEM_INSTRUCTION}
 
@@ -467,7 +466,6 @@ async function repairTextualHandoff(
         ? await options.repairModelResponse(repairContents)
         : await requestModelResponse(getRepairClientOptions(options), options.modelName, repairContents, {
             systemInstruction: HANDOFF_REPAIR_SYSTEM_INSTRUCTION,
-            temperature: HANDOFF_REPAIR_TEMPERATURE,
         });
 
     const repairRawOutput = extractModelOutput(repairResponse);
