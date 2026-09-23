@@ -9,9 +9,7 @@ Acompanha uma PR do repositório até o estado **"pronta para merge"** e então 
 
 Uma PR está pronta quando, simultaneamente: (1) todos os checks verdes, (2) nenhum comentário de review não tratado (inclusive dos bots, que chegam *depois* do CI verde), (3) `mergeable` sem conflitos.
 
-**Quem revisa:** `chatgpt-codex-connector[bot]` e `claude[bot]`. O `gemini-code-assist` foi
-substituído pelo Codex e não comenta mais neste repositório — não espere por ele nem o
-procure nas respostas da API. Ambos os bots deixam comentários *inline*, ou seja, abrem
+**Quem revisa:** `chatgpt-codex-connector[bot]` e `claude[bot]`. Ambos os bots deixam comentários *inline*, ou seja, abrem
 review threads, que é exatamente o que o `required_conversation_resolution` abaixo cobra.
 
 **Atenção:** este repo tem `required_conversation_resolution` ativo no branch protection da `main`, mesmo com `required_approving_review_count: 0`. Isso significa que uma thread de review **não resolvida** deixa `mergeStateStatus` em `BLOCKED` mesmo com todo CI verde e sem exigência de aprovação — responder ao comentário (reply) **não resolve a thread**. Resolver é sempre um passo GraphQL separado (ver passo 5).
@@ -53,7 +51,7 @@ review threads, que é exatamente o que o `required_conversation_resolution` aba
 
 4. **Evento `CI_FAIL`:** `gh run view <id> --log-failed` para o log, corrigir na branch, commit + push, voltar ao passo 3.
 
-5. **Evento `NEW_REVIEW_COMMENT` / reviews pendentes:** ler cada comentário (`.../pulls/N/comments` e `.../pulls/N/reviews`). Seguir a skill `receiving-code-review`: avaliar tecnicamente antes de aplicar — **nem todo apontamento do bot é válido**. Falso positivo já aconteceu aqui, com mais de um bot: o `gemini-code-assist` reclamou de arquivos não atualizados que estavam corretos **no próprio commit analisado**, e o `claude[bot]` reapontou na #1507 um achado já corrigido nesse mesmo commit — provável artefato de olhar hunks isolados do diff. Não há caso observado com o Codex até agora, o que não o isenta: trate o padrão como possível em qualquer bot. O sinal típico é um comentário que se refere a um commit anterior ao revisado, ou que cita identificador que já não existe no arquivo. Antes de aceitar uma reclamação, conferir contra o conteúdo real: `git show <commit>:<arquivo>`.
+5. **Evento `NEW_REVIEW_COMMENT` / reviews pendentes:** ler cada comentário (`.../pulls/N/comments` e `.../pulls/N/reviews`). Avaliar tecnicamente antes de aplicar — **nem todo apontamento do bot é válido**: qualquer bot pode reapontar algo que já está correto **no próprio commit analisado**, provavelmente por olhar hunks isolados do diff. O sinal típico é um comentário que se refere a um commit anterior ao revisado, ou que cita identificador que já não existe no arquivo. Antes de aceitar uma reclamação, conferir contra o conteúdo real: `git show <commit>:<arquivo>`.
 
    Para cada thread, depois de tratá-la (aplicando o fix legítimo ou respondendo com justificativa para os dispensados via `gh api .../comments/<id>/replies`), **resolver a thread via GraphQL** — reply sozinho não conta para `required_conversation_resolution`:
 

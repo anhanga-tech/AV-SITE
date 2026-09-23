@@ -106,7 +106,7 @@ Two layout tiers, resolved at the top-level `Routes`:
 /utils        Browser utilities (whatsapp UTM tracking, share, blog helpers)
 /data         Static data and generated manifests
 /scripts      Build-time generators (blog manifest, sitemap, prerender, reviews fetch)
-/tests        Node:test regression tests (65+ files) + Playwright e2e under /tests/e2e
+/tests        Node:test regression tests + Playwright e2e under /tests/e2e
 /docs/standards  Engineering source of truth — read before making changes
 ```
 
@@ -200,7 +200,7 @@ Build chunks: `react-vendor`, `ai-vendor`, `leaflet-vendor` (manual split in `vi
 
 ## Testing
 
-**Regression tests** (`tests/*.test.ts`, 65+ files): Node built-in `node:test` runner via `tsx`. Cover API handler contracts, validation logic, lib helpers, schema compliance, and security hardening. Run with `pnpm test:regression` or individually with `tsx --test tests/<file>.test.ts`.
+**Regression tests** (`tests/*.test.ts`): Node built-in `node:test` runner via `tsx`. Cover API handler contracts, validation logic, lib helpers, schema compliance, and security hardening. Run with `pnpm test:regression` or individually with `tsx --test tests/<file>.test.ts`.
 
 **E2E tests** (`tests/e2e/*.spec.ts`): Playwright. Cover browser flows: chatbot lead submit, visual regression, destructive/security scenarios. Run with `pnpm test:e2e`.
 
@@ -249,9 +249,9 @@ GitHub Flow — continuous deployment, no `develop` branch.
 
 - **Merge é sempre humano** (squash via GitHub). O agente nunca executa `gh pr merge` nem considera a tarefa concluída no merge — o estado final do agente é "PR pronta para merge".
 - Única exceção: PRs do **Dependabot** de patch/minor têm auto-merge ligado por `.github/workflows/auto-merge-dependabot.yml` (squash, após os required checks). Major bumps continuam manuais. A regra acima segue valendo integralmente para o agente — ele nunca executa `gh pr merge` em PR nenhuma, inclusive as do Dependabot.
-- Uma PR só está **pronta** quando: checks verdes **+** reviews dos bots tratados **+** sem merge conflicts. Os bots de review são `chatgpt-codex-connector[bot]` e `claude[bot]` — o `gemini-code-assist` foi substituído pelo Codex e não comenta mais aqui. Após o CI passar, sempre buscar reviews pendentes: `gh api repos/anhanga-tech/AV-SITE/pulls/<N>/comments` e `.../pulls/<N>/reviews`. Reviews chegam *depois* do CI verde — não declarar a PR pronta sem checar.
+- Uma PR só está **pronta** quando: checks verdes **+** reviews dos bots tratados **+** sem merge conflicts. Os bots de review são `chatgpt-codex-connector[bot]` e `claude[bot]`. Após o CI passar, sempre buscar reviews pendentes: `gh api repos/anhanga-tech/AV-SITE/pulls/<N>/comments` e `.../pulls/<N>/reviews`. Reviews chegam *depois* do CI verde — não declarar a PR pronta sem checar.
 - Ambos os bots comentam *inline*, o que abre review threads. A `main` tem `required_conversation_resolution`: responder ao comentário **não** resolve a thread, e uma thread aberta deixa `mergeStateStatus` em `BLOCKED` mesmo com tudo verde. Resolver é um passo GraphQL separado (`resolveReviewThread`).
-- Nem todo apontamento de bot é válido: o `claude[bot]` já reapontou coisa que já estava correta **no próprio commit analisado** (e o `gemini-code-assist` fazia o mesmo antes da troca). Não há caso observado com o Codex, o que não o isenta — o padrão é possível em qualquer bot. Conferir contra o conteúdo real (`git show <commit>:<arquivo>`) antes de aceitar.
+- Nem todo apontamento de bot é válido: qualquer bot pode reapontar algo que já está correto **no próprio commit analisado**. Conferir contra o conteúdo real (`git show <commit>:<arquivo>`) antes de aceitar.
 - CodeQL usa default setup e pode aparecer como "skipping"/neutral — **não é falha** (`gh pr checks` retorna exit code 8 nesse caso; ignorar esse exit).
 - Para poll de CI/reviews, usar a ferramenta **Monitor** em background — nunca `sleep` em foreground (bloqueado pelo sandbox). Para acompanhamento contínuo até a PR ficar pronta, usar a skill `pr-babysit`.
 - Presets de custo (salvo pedido contrário do usuário): issue rotineira/fix pontual → effort low/medium; feature ou refactor multi-arquivo → medium/high; review de segurança ou debugging difícil → high.
