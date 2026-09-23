@@ -10,6 +10,7 @@ import { getCategoryColor } from '../utils/categoryColors';
 import { Seo } from '../components/Seo';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { openContactModal } from '../utils/contactForm';
+import { BlogImageCredit } from '../components/blog/BlogImageCredit';
 
 /**
  * BlogList Page - Optimized with CSS hover
@@ -145,6 +146,7 @@ const BlogList: React.FC = () => {
                                         />
                                     </div>
                                 </div>
+                                <BlogImageCredit post={post} compact />
 
                                 {/* Content */}
                                 <div className="flex-1 flex flex-col">

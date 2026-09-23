@@ -43,6 +43,7 @@ const About = lazy(() => import('./pages/About'));
 const SiteMap = lazy(() => import('./pages/SiteMap'));
 const ParquesBrasil = lazy(() => import('./pages/ParquesBrasil'));
 const ExclusaoDados = lazy(() => import('./pages/ExclusaoDados'));
+const ImageCredits = lazy(() => import('./pages/ImageCredits'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const BetoCarreroLanding = lazy(() => import('./pages/landings/BetoCarreroLanding'));
 const HopiHariLanding = lazy(() => import('./pages/landings/HopiHariLanding'));
@@ -158,6 +159,7 @@ const MainSiteShell: React.FC = () => {
             <Route path="/termos-de-uso" element={<Terms />} />
             <Route path="/politica-privacidade" element={<Privacy />} />
             <Route path="/exclusao-de-dados" element={<ExclusaoDados />} />
+            <Route path="/creditos-de-imagens" element={<ImageCredits />} />
             <Route path="/sobre" element={<About />} />
             {/* Hub de conteúdo, não landing de campanha: fica no MainSiteShell
                 para herdar Header, Footer e navegação interna — é por onde a
