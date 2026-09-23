@@ -44,28 +44,15 @@ function UnknownNotice({ compact }: { compact: boolean }) {
 }
 
 function ConfirmedCredit({ post, compact }: { post: ImageCreditFields; compact: boolean }) {
+    // O modo compacto vive dentro de cards que já são <a> (teaser da home, relacionados,
+    // sidebar, lista do blog). <a> aninhado é HTML inválido e quebra a hidratação do
+    // prerender (React #418), então aqui o crédito é só texto; os links de fonte e
+    // licença ficam no crédito completo da página do post.
     if (compact) {
-        const author = post.imageSource ? (
-            <a href={post.imageSource} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
-                {post.imageCredit}
-                <span className="sr-only"> (abre em nova aba)</span>
-            </a>
-        ) : post.imageCredit;
-
         return (
             <p className="mt-2 text-[10px] font-semibold leading-snug text-zinc-500 break-words">
-                Foto: {author}
-                {post.imageLicense ? (
-                    <>
-                        {' · '}
-                        {post.imageLicenseUrl ? (
-                            <a href={post.imageLicenseUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
-                                {post.imageLicense}
-                                <span className="sr-only"> (abre em nova aba)</span>
-                            </a>
-                        ) : post.imageLicense}
-                    </>
-                ) : null}
+                Foto: {post.imageCredit}
+                {post.imageLicense ? ` · ${post.imageLicense}` : ''}
                 {post.imageAdaptation ? ` · ${post.imageAdaptation}` : ''}
             </p>
         );

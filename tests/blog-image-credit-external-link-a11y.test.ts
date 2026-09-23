@@ -12,8 +12,11 @@ import { BlogImageCredit } from '../components/blog/BlogImageCredit.tsx';
   (`target="_blank"`) mas, diferente do resto do repo (ver LinkButton.tsx),
   não avisavam disso no nome acessível — quem usa leitor de tela era levado
   para fora do site sem aviso. Cobre o padrão `sr-only "(abre em nova aba)"`
-  já estabelecido em components/links/LinkButton.tsx, nos dois variants
-  (compact e full) e nos dois links (crédito e licença).
+  já estabelecido em components/links/LinkButton.tsx.
+
+  Só o crédito completo (não-compact) tem links: o compacto vive dentro de
+  cards que já são <a> e não pode aninhar outro <a> (ver
+  tests/blog-image-credit-compact.test.ts) — por isso só ele é coberto aqui.
 */
 
 afterEach(cleanup);
@@ -40,10 +43,5 @@ function assertLinksWarnAboutNewTab(container: HTMLElement) {
 
 test('BlogImageCredit (full) avisa que os links de crédito abrem em nova aba', () => {
     const { container } = render(React.createElement(BlogImageCredit, { post: CONFIRMED_POST }));
-    assertLinksWarnAboutNewTab(container);
-});
-
-test('BlogImageCredit (compact) avisa que os links de crédito abrem em nova aba', () => {
-    const { container } = render(React.createElement(BlogImageCredit, { post: CONFIRMED_POST, compact: true }));
     assertLinksWarnAboutNewTab(container);
 });
