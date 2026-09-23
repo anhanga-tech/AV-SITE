@@ -45,9 +45,26 @@ function UnknownNotice({ compact }: { compact: boolean }) {
 
 function ConfirmedCredit({ post, compact }: { post: ImageCreditFields; compact: boolean }) {
     if (compact) {
+        const author = post.imageSource ? (
+            <a href={post.imageSource} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
+                {post.imageCredit}
+            </a>
+        ) : post.imageCredit;
+
         return (
-            <p className="mt-2 text-[10px] font-semibold leading-tight text-zinc-500">
-                Foto: {post.imageCredit} · Licença: {post.imageLicense}
+            <p className="mt-2 text-[10px] font-semibold leading-snug text-zinc-500 break-words">
+                Foto: {author}
+                {post.imageLicense ? (
+                    <>
+                        {' · '}
+                        {post.imageLicenseUrl ? (
+                            <a href={post.imageLicenseUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
+                                {post.imageLicense}
+                            </a>
+                        ) : post.imageLicense}
+                    </>
+                ) : null}
+                {post.imageAdaptation ? ` · ${post.imageAdaptation}` : ''}
             </p>
         );
     }
