@@ -2,7 +2,7 @@ import { Type, type FunctionDeclaration } from "@google/genai";
 
 export const budgetTool: FunctionDeclaration = {
     name: "generate_budget_link",
-    description: "Registra o pré-atendimento estruturado do orçamento e abre para o cliente o formulário de contato com a equipe da Anhangá. Use quando o cliente concordou em seguir com o orçamento e os campos obrigatórios estão preenchidos (ou marcados 'a definir' após uma tentativa). Não use para destinos bloqueados, para embarque em menos de 30 dias (esses casos vão para atendimento humano) nem para destino nos EUA antes de confirmar o status do visto. O servidor valida os argumentos: se faltar campo obrigatório ou o destino estiver bloqueado, o handoff não acontece e o cliente recebe uma pergunta pedindo o dado faltante.",
+    description: "Registra o pré-atendimento estruturado do orçamento e abre para o cliente o formulário de contato com a equipe da Anhangá. Use quando o cliente concordou em seguir com o orçamento e os campos obrigatórios estão preenchidos (ou marcados 'a definir' após uma tentativa). Também é o caminho para encaminhar ao consultor humano, inclusive em embarque com menos de 30 dias. Não use para destinos bloqueados nem para destino nos EUA antes de confirmar o status do visto. O servidor valida os argumentos: se faltar campo obrigatório ou o destino estiver bloqueado, o handoff não acontece e o cliente recebe uma pergunta pedindo o dado faltante.",
     parameters: {
         type: Type.OBJECT,
         properties: {
