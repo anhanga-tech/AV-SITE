@@ -48,6 +48,7 @@ function ConfirmedCredit({ post, compact }: { post: ImageCreditFields; compact: 
         const author = post.imageSource ? (
             <a href={post.imageSource} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
                 {post.imageCredit}
+                <span className="sr-only"> (abre em nova aba)</span>
             </a>
         ) : post.imageCredit;
 
@@ -60,6 +61,7 @@ function ConfirmedCredit({ post, compact }: { post: ImageCreditFields; compact: 
                         {post.imageLicenseUrl ? (
                             <a href={post.imageLicenseUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
                                 {post.imageLicense}
+                                <span className="sr-only"> (abre em nova aba)</span>
                             </a>
                         ) : post.imageLicense}
                     </>
@@ -71,11 +73,21 @@ function ConfirmedCredit({ post, compact }: { post: ImageCreditFields; compact: 
 
     return (
         <p className="mb-8 text-xs leading-relaxed text-zinc-500">
-            Crédito da capa: {post.imageSource ? <a href={post.imageSource} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">{post.imageCredit}</a> : post.imageCredit}
+            Crédito da capa: {post.imageSource ? (
+                <a href={post.imageSource} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
+                    {post.imageCredit}
+                    <span className="sr-only"> (abre em nova aba)</span>
+                </a>
+            ) : post.imageCredit}
             {post.imageLicense ? (
                 <>
                     {' · '}
-                    {post.imageLicenseUrl ? <a href={post.imageLicenseUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">{post.imageLicense}</a> : post.imageLicense}
+                    {post.imageLicenseUrl ? (
+                        <a href={post.imageLicenseUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
+                            {post.imageLicense}
+                            <span className="sr-only"> (abre em nova aba)</span>
+                        </a>
+                    ) : post.imageLicense}
                 </>
             ) : null}
             {post.imageAdaptation ? ` · ${post.imageAdaptation}` : ''}
