@@ -4,6 +4,7 @@ import { BLOG_POST_MARKDOWN } from '../data/blogMarkdown';
 import { checkRateLimit } from '../lib/rate-limit';
 import { getClientIP, buildRateLimitHeaders } from '../lib/network';
 import { logger } from '../lib/logger';
+import { memoize0 } from '../lib/memoize';
 
 const SITE_BASE = 'https://www.anhanga.tur.br';
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
@@ -31,21 +32,10 @@ function markdownResponse(body: string, status = 200): Response {
 // constants (FAQ_SCHEMA_ITEMS, BLOG_POST_MANIFEST, SITE_BASE) — its output never
 // varies between requests within a deployment. This endpoint exists specifically
 // for LLM/agent/crawler consumption (see comment below), so the same handful of
-// paths get hit repeatedly by bots re-reading the same static pages. Without
-// caching, every request re-ran the array map + ~90-line template concatenation
-// from scratch. `memoize0` caches each builder's return value after the first
-// call so repeat requests just return the cached string.
-export function memoize0<T>(build: () => T): () => T {
-    let cached: T | undefined;
-    let hasCached = false;
-    return () => {
-        if (!hasCached) {
-            cached = build();
-            hasCached = true;
-        }
-        return cached as T;
-    };
-}
+// paths get hit repeatedly by bots re-reading the same static pages. `memoize0`
+// (lib/memoize.ts) caches each builder's return value after the first call so
+// repeat requests just return the cached string instead of re-running the
+// array map + ~90-line template concatenation from scratch.
 
 // Content duplicated from JSX components intentionally — separate Markdown source for LLM/agent consumption
 const homePage = memoize0((): string => {
