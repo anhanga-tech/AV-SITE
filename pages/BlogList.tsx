@@ -92,7 +92,7 @@ const BlogList: React.FC = () => {
                             placeholder="Buscar por título ou categoria..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full px-6 py-4 rounded-full border-2 border-zinc-200 focus:border-brand-cyan focus:outline-none shadow-sm pl-12 text-zinc-700 font-medium transition"
+                            className="w-full px-6 py-4 rounded-full border-2 border-zinc-200 focus:border-brand-cyan focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-cyan/30 shadow-sm pl-12 text-zinc-700 font-medium transition"
                         />
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 size-5" />
                     </div>
