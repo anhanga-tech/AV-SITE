@@ -42,7 +42,7 @@ importers:
         version: 2.1.10(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@sentry/cloudflare':
         specifier: ^10.75.2
-        version: 10.75.2(wrangler@4.136.3(@types/node@26.6.2))
+        version: 10.75.2(wrangler@4.137.0(@types/node@26.6.2))
       '@sentry/react':
         specifier: ^10.75.2
         version: 10.75.2(react@19.3.0)
@@ -195,8 +195,8 @@ importers:
         specifier: ^2.0.1
         version: 2.0.1
       wrangler:
-        specifier: ^4.136.3
-        version: 4.136.3(@types/node@26.6.2)
+        specifier: ^4.137.0
+        version: 4.137.0(@types/node@26.6.2)
 
 packages:
 
@@ -5791,8 +5791,8 @@ packages:
     engines: {node: '>=16'}
     hasBin: true
 
-  wrangler@4.136.3:
-    resolution: {integrity: sha512-L1bS8BI9xoEk3RRr5XoZn5q5k1jCRo8+37ZEEab/jsUFzE1Ea2sIBAbmP1CdwSeD6mZYmnUtR6xpi9esHIl6GA==}
+  wrangler@4.137.0:
+    resolution: {integrity: sha512-vq2JmxkvwOjnsMUejQwd89/EK6u1d20OMlGUVVmb55gVi2zSBKp2rvmxUiPqrSEntK8NwzpTF3DQ/S2I9/TLsg==}
     engines: {node: '>=22.0.0'}
     hasBin: true
     peerDependencies:
@@ -7174,14 +7174,14 @@ snapshots:
       '@sentry/replay': 10.75.2
       '@sentry/replay-canvas': 10.75.2
 
-  '@sentry/cloudflare@10.75.2(wrangler@4.136.3(@types/node@26.6.2))':
+  '@sentry/cloudflare@10.75.2(wrangler@4.137.0(@types/node@26.6.2))':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@sentry/core': 10.75.2
       '@sentry/server-utils': 10.75.2
       magic-string: 0.30.21
     optionalDependencies:
-      wrangler: 4.136.3(@types/node@26.6.2)
+      wrangler: 4.137.0(@types/node@26.6.2)
 
   '@sentry/conventions@0.16.0': {}
 
@@ -11874,7 +11874,7 @@ snapshots:
       '@cloudflare/workerd-linux-arm64': 1.20260921.1
       '@cloudflare/workerd-windows-64': 1.20260921.1
 
-  wrangler@4.136.3(@types/node@26.6.2):
+  wrangler@4.137.0(@types/node@26.6.2):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.5.0
       '@cloudflare/unenv-preset': 2.16.2(unenv@2.0.0-rc.24)(workerd@1.20260921.1)
