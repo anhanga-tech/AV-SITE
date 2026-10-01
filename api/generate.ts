@@ -33,6 +33,12 @@ const RATE_LIMIT_MAX_REQUESTS = 10; // Max 10 requests per minute per IP
 const GEMINI_3_DEFAULT_TEMPERATURE = 1.0;
 const LEGACY_DEFAULT_TEMPERATURE = 0.7;
 const HANDOFF_READY_MESSAGE = 'Perfeito. Seu pré-atendimento está pronto. Preencha seus dados abaixo para continuar com nossa equipe.';
+// Server-side fallback for when a textual-handoff repair attempt still carries an
+// invalid CTA (e.g. a bare "wa.me/..." mention with no URL scheme, which
+// stripUnsafeWhatsAppLinks does not remove). Mirrors the client-side
+// INVALID_HANDOFF_MESSAGE in services/geminiService.ts so the API never exposes
+// unsanitized model output to callers that bypass that client-only safety net.
+const HANDOFF_REPAIR_UNSAFE_FALLBACK_MESSAGE = 'Tive um problema para concluir seu atendimento agora. Pode reformular sua última mensagem?';
 const HANDOFF_REPAIR_SYSTEM_INSTRUCTION = `${SYSTEM_INSTRUCTION}
 
 HANDOFF_REPAIR_POLICY
@@ -494,6 +500,22 @@ async function repairTextualHandoff(
         repairResponseId: repairResponse.responseId,
         missing: repairValidation?.missing || [],
     });
+
+    // The repair pass can itself still carry an invalid CTA (e.g. a bare
+    // "wa.me/..." mention with no URL scheme, which stripUnsafeWhatsAppLinks
+    // does not remove). stripUnsafeWhatsAppLinks alone is not sufficient here —
+    // re-run the same detector used above so an unsanitized handoff never
+    // reaches the response, regardless of which client called this endpoint.
+    if (detectInvalidTextualHandoffSignal(repairNormalizedOutput.responseText)) {
+        logger.warn('SERVER: handoff repair still unsafe, returning fallback message', {
+            responseId: response.responseId,
+            repairResponseId: repairResponse.responseId,
+        });
+
+        return {
+            text: HANDOFF_REPAIR_UNSAFE_FALLBACK_MESSAGE,
+        };
+    }
 
     const { text, chips } = extractChipsFromText(stripUnsafeWhatsAppLinks(repairNormalizedOutput.responseText));
 

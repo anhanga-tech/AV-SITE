@@ -234,6 +234,33 @@ test('buildGenerateSuccessBody should fall back to refinement when textual hando
     assert.doesNotMatch(body.text, /wa\.me/i);
 });
 
+test('buildGenerateSuccessBody should fall back to a safe message when the repair itself still carries a bare WhatsApp mention', async () => {
+    // stripUnsafeWhatsAppLinks only strips wa.me/api.whatsapp.com URLs that carry
+    // an http(s):// scheme. A repaired response that mentions the bare domain
+    // (no scheme) must still be caught, otherwise the API would return an
+    // unsanitized WhatsApp CTA to any caller that doesn't go through the
+    // client-side safety net in services/geminiService.ts.
+    const body = await buildGenerateSuccessBody(
+        {
+            responseId: 'resp-bare-wa',
+            text: 'Clique aqui para receber seu orçamento personalizado: https://wa.me/5511999999999',
+        },
+        {
+            apiKey: 'test-key',
+            modelName: 'test-model',
+            contents: [{ role: 'user', parts: [{ text: 'Quero orçamento.' }] }],
+            repairModelResponse: async () => ({
+                responseId: 'resp-repair-bare',
+                text: 'Sem problemas, fale comigo por wa.me/5511999999999 que eu te ajudo direto por lá.',
+            }),
+        },
+    );
+
+    assert.equal(body.handoff, undefined);
+    assert.doesNotMatch(body.text, /wa\.me/i);
+    assert.equal(body.chips, undefined);
+});
+
 test('buildGenerateSuccessBody should require provider client options for unmocked textual handoff repair', async () => {
     await assert.rejects(
         buildGenerateSuccessBody(
