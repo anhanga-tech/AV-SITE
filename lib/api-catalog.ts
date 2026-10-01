@@ -1,3 +1,5 @@
+import { memoize0 } from './memoize';
+
 const SITE_ORIGIN = 'https://www.anhanga.tur.br';
 const API_CATALOG_PATH = '/.well-known/api-catalog';
 const API_DOCS_PATH = '/.well-known/api-docs';
@@ -384,14 +386,19 @@ export function buildMarkdownHeaders(): HeadersInit {
     return buildBaseHeaders('text/markdown; charset=utf-8');
 }
 
-export function buildApiCatalogDocument(): {
+// PERFORMANCE: pure function of module-scope API_ENDPOINTS — output never
+// varies between requests. Memoized because these RFC 9727 discovery
+// documents are the kind of endpoint bots/crawlers/agents re-fetch
+// repeatedly (see api/api-catalog.ts), so caching avoids rebuilding the
+// same array map on every request.
+export const buildApiCatalogDocument = memoize0((): {
     linkset: Array<{
         anchor: string;
         'service-desc': Array<{ href: string; type: string }>;
         'service-doc': Array<{ href: string; type: string }>;
         status: Array<{ href: string; type: string }>;
     }>;
-} {
+} => {
     return {
         linkset: API_ENDPOINTS.map(({ anchor }) => ({
             anchor,
@@ -415,7 +422,7 @@ export function buildApiCatalogDocument(): {
             ],
         })),
     };
-}
+});
 
 export function buildOpenApiPaths(endpoints: readonly ApiEndpointDefinition[]): Record<string, Record<string, unknown>> {
     const paths: Record<string, Record<string, unknown>> = {};
@@ -436,7 +443,10 @@ export function buildOpenApiPaths(endpoints: readonly ApiEndpointDefinition[]): 
     return paths;
 }
 
-export function buildOpenApiDocument(): Record<string, unknown> {
+// PERFORMANCE: same rationale as buildApiCatalogDocument above — pure
+// function of module-scope constants, memoized to avoid rebuilding this
+// (large) schema object graph on every repeat crawler request.
+export const buildOpenApiDocument = memoize0((): Record<string, unknown> => {
     const paths = buildOpenApiPaths(API_ENDPOINTS);
 
     paths[HEALTH_PATH] = {
@@ -483,9 +493,12 @@ export function buildOpenApiDocument(): Record<string, unknown> {
         ],
         paths,
     };
-}
+});
 
-export function buildApiDocs(): string {
+// PERFORMANCE: same rationale as buildApiCatalogDocument above — pure
+// template string, memoized to avoid re-formatting it on every repeat
+// crawler request.
+export const buildApiDocs = memoize0((): string => {
     return `# Anhangá Viagens Public API
 
 Automated discovery surface for the public website APIs, published via RFC 9727.
@@ -526,7 +539,7 @@ Accepts completed travel-profile quiz results from the first-party quiz page.
 
 Returns a simple JSON status document used by the API catalog \`status\` relation.
 `;
-}
+});
 
 export function buildHealthDocument(): { status: string; service: string } {
     return {
