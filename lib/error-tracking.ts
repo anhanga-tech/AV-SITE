@@ -302,7 +302,7 @@ export const SENTRY_DATA_COLLECTION: {
     cookies: boolean;
     httpHeaders: { request: { deny: string[] }; response: { deny: string[] } };
     httpBodies: never[];
-    urlQueryParams: { deny: string[] };
+    urlQueryParams: boolean;
     genAI: { inputs: boolean; outputs: boolean };
     databaseQueryData: boolean;
     queues: boolean;
@@ -315,9 +315,13 @@ export const SENTRY_DATA_COLLECTION: {
         response: { deny: [...V10_HEADER_DENYLIST] },
     },
     httpBodies: [],
-    // The SDK's built-in denylist already covers token/secret/key/auth; these
-    // add the OAuth callback params (see SENSITIVE_URL_PARAM_PATTERN).
-    urlQueryParams: { deny: [...V10_HEADER_DENYLIST, 'code', 'state'] },
+    // `true` is the v10 default: the SDK still masks its built-in sensitive
+    // names (token/secret/key/auth/…). Do NOT add a `deny` list here — the SDK
+    // matches by *substring*, so `code` would also mask `promo_code` and the
+    // header fragments would mask `via=`, breaking the "attribution params
+    // survive" guarantee of scrubSensitiveUrl. The OAuth `code`/`state` are
+    // matched exactly by our own hooks (SENSITIVE_URL_PARAM_PATTERN).
+    urlQueryParams: true,
     genAI: { inputs: false, outputs: false },
     databaseQueryData: false,
     queues: false,

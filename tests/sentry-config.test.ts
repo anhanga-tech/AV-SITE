@@ -693,7 +693,7 @@ test('the real v11 SDK runs beforeSendSpan and no credential reaches the transpo
         name: 'GET /nps?token=live-invite',
         attributes: {
             'sentry.segment.name.source': 'url',
-            'url.full': 'https://www.anhanga.tur.br/nps?token=live-invite',
+            'url.full': 'https://www.anhanga.tur.br/nps?token=live-invite&utm_source=email&via=partner&promo_code=VERAO',
             'url.query': '?code=oauth-code&state=csrf',
         },
     }, () => {
@@ -710,6 +710,10 @@ test('the real v11 SDK runs beforeSendSpan and no credential reaches the transpo
     for (const secret of ['live-invite', 'oauth-code', 'csrf', 'ga4-secret']) {
         assert.ok(!wire.includes(secret), `"${secret}" leaked to the Sentry transport`);
     }
+    // Attribution params must survive both the SDK filter and our hook.
+    for (const kept of ['utm_source=email', 'via=partner', 'promo_code=VERAO']) {
+        assert.ok(wire.includes(kept), `attribution param "${kept}" was redacted`);
+    }
 });
 
 test('SENTRY_DATA_COLLECTION pins the v10 defaults instead of the permissive v11 ones', () => {
@@ -721,6 +725,8 @@ test('SENTRY_DATA_COLLECTION pins the v10 defaults instead of the permissive v11
     assert.equal(SENTRY_DATA_COLLECTION.databaseQueryData, false);
     assert.deepEqual(SENTRY_DATA_COLLECTION.genAI, { inputs: false, outputs: false });
     assert.ok(SENTRY_DATA_COLLECTION.httpHeaders.request.deny.includes('referer'));
-    assert.ok(SENTRY_DATA_COLLECTION.urlQueryParams.deny.includes('code'));
-    assert.ok(SENTRY_DATA_COLLECTION.urlQueryParams.deny.includes('state'));
+    // No custom query denylist: the SDK matches `deny` terms by substring, so
+    // `code` would also mask `promo_code` and header fragments would mask
+    // `via=`. OAuth code/state are handled exactly by scrubSpanUrls instead.
+    assert.equal(SENTRY_DATA_COLLECTION.urlQueryParams, true);
 });
