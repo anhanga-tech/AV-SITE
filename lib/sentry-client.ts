@@ -1,6 +1,12 @@
 import * as Sentry from '@sentry/react';
 
-import { scrubBreadcrumbUrls, scrubEventUrls, setErrorTracker } from './error-tracking';
+import {
+    scrubBreadcrumbUrls,
+    scrubEventUrls,
+    scrubSpanUrls,
+    SENTRY_DATA_COLLECTION,
+    setErrorTracker,
+} from './error-tracking';
 import {
     isStaleChunkErrorMessage,
     STALE_CHUNK_EXHAUSTED_TAG_KEY,
@@ -90,14 +96,19 @@ export function initClientErrorTracking(): void {
         dsn,
         environment: import.meta.env.MODE,
         tracesSampleRate: 0.1,
-        enableLogs: true,
+        // SDK v11: logs are enabled by consoleLoggingIntegration itself
+        // (`enableLogs` was removed). See SENTRY_DATA_COLLECTION for why the
+        // v10 collection defaults are pinned explicitly.
+        dataCollection: SENTRY_DATA_COLLECTION,
         integrations: [
             Sentry.browserTracingIntegration(),
             Sentry.consoleLoggingIntegration({ levels: ['log', 'warn', 'error'] }),
         ],
         tracePropagationTargets: ['localhost', /^https:\/\/(?:www\.)?anhanga\.tur\.br\/api/],
         beforeSend: sentryBeforeSend,
-        beforeSendTransaction: scrubEventUrls,
+        // SDK v11 streams spans by default and never calls
+        // `beforeSendTransaction` — span URLs must be scrubbed here instead.
+        beforeSendSpan: scrubSpanUrls,
         beforeBreadcrumb: sentryBeforeBreadcrumb,
         beforeSendLog: sentryBeforeSendLog,
     });
