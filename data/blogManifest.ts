@@ -2,6 +2,59 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
+    "title": "Lua de mel na Europa: Lisboa ou Paris para quem não quer só museus",
+    "excerpt": "Lisboa ou Paris na lua de mel? Comparamos clima, ritmo, passeios fora dos museus e custos escondidos, com um roteiro que junta as duas cidades.",
+    "date": "2026-10-02",
+    "dateModified": "2026-10-02",
+    "author": "felipe-william",
+    "category": "Romance",
+    "image": "https://media.anhanga.tur.br/images/blog/lua-de-mel-europa-lisboa-ou-paris.jpg",
+    "imageCreditStatus": "confirmed",
+    "imageCredit": "Marcus Holland-Moritz (mhx) / Wikimedia Commons",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Lisbon_Sunset_(16542598054).jpg",
+    "imageLicense": "CC BY-SA 2.0",
+    "imageLicenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "imageAdaptation": "Recorte adaptado à capa · pôr do sol visto do Miradouro da Senhora do Monte, Lisboa, 2015",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Europa",
+    "tags": [
+      "lua-de-mel",
+      "europa",
+      "lisboa",
+      "paris",
+      "portugal",
+      "franca",
+      "romance"
+    ],
+    "seoTitle": "Lua de mel na Europa: Lisboa ou Paris?",
+    "seoDescription": "Lua de mel na Europa sem maratona de museu. Lisboa ou Paris por perfil de casal, melhor época, passeios de um dia e um roteiro de 9 noites.",
+    "faq": [
+      {
+        "question": "Lisboa ou Paris: qual é melhor para lua de mel?",
+        "answer": "Depende do ritmo do casal. Lisboa é mais tranquila, mais barata no dia a dia e tem mar perto, com Sintra e Cascais a cerca de 40 minutos de trem. Paris tem mais intensidade: jantares, bairros para caminhar e passeios de um dia como Champagne e Giverny. Se der para ter 9 noites ou mais, as duas cabem na mesma viagem."
+      },
+      {
+        "question": "Qual a melhor época para lua de mel em Lisboa e Paris?",
+        "answer": "De maio a junho e de setembro a outubro, quando o tempo está ameno nas duas cidades e há menos fila do que no verão europeu. Para ver os jardins de Monet em Giverny, vá entre abril e o fim de outubro: o local fecha de novembro a março."
+      },
+      {
+        "question": "Quantos dias são necessários para Lisboa e Paris na mesma viagem?",
+        "answer": "A partir de 9 noites: 4 em Lisboa e 5 em Paris. O voo entre as duas cidades leva cerca de duas horas e meia. Com menos de 9 noites, a gente recomenda escolher uma cidade só."
+      },
+      {
+        "question": "Brasileiro precisa de visto para lua de mel na Europa?",
+        "answer": "Não. Brasileiros entram sem visto no Espaço Schengen, que inclui Portugal e França, para estadias de até 90 dias em cada período de 180. O ETIAS, autorização eletrônica de 20 euros, tem início previsto pela União Europeia para o último trimestre de 2026 e ainda não está recebendo pedidos."
+      },
+      {
+        "question": "Existe taxa turística em Lisboa e Paris?",
+        "answer": "Sim, à parte da diária. Em Lisboa, quem cobra é o alojamento; em Paris, pode ser o alojamento ou a plataforma de reserva. Em Lisboa são 4 euros por pessoa por noite, até 7 noites. Em Paris, o valor de 2026 depende da categoria do hotel: num 4 estrelas, por exemplo, são 8,45 euros por adulto por noite, já com as taxas adicionais."
+      }
+    ],
+    "slug": "lua-de-mel-europa-lisboa-ou-paris",
+    "readingTime": "9 min de leitura"
+  },
+  {
     "title": "Disney ou Universal em Orlando: qual escolher?",
     "excerpt": "Disney ou Universal em Orlando? Compare o ritmo, as atrações, a idade das crianças, o custo da fila rápida e o tipo de viagem que cada complexo entrega.",
     "date": "2026-09-22",
@@ -1304,10 +1357,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "11 min de leitura"
   },
   {
-    "title": "Viagem Corporativa para Pequenas Empresas: Guia Completo",
-    "excerpt": "O que é viagem corporativa, quais são os 4 tipos e quando vale contratar uma agência. Guia prático para micro e pequenas empresas no Brasil.",
+    "title": "Viagem corporativa para pequenas empresas: incentivo, MICE e workation",
+    "excerpt": "Os 4 tipos de viagem corporativa, o que significa MICE, como premiar com viagem sem gerar encargo e o que checar antes de um workation.",
     "date": "2026-06-02",
-    "dateModified": "2026-09-22",
+    "dateModified": "2026-10-02",
     "author": "felipe-william",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/viagem-corp.jpg",
@@ -1317,27 +1370,30 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "tags": [
       "viagens-corporativas",
       "pequenas-empresas",
+      "viagem-de-incentivo",
+      "mice",
+      "workation",
       "planejamento",
       "brasil"
     ],
-    "seoTitle": "Viagem Corporativa: Guia para PMEs",
-    "seoDescription": "O que é viagem corporativa, quais são os 4 tipos e quando vale contratar uma agência. Guia prático para micro e pequenas empresas no Brasil.",
+    "seoTitle": "Viagem corporativa e incentivo para PMEs",
+    "seoDescription": "Guia de viagem corporativa para pequenas empresas, com viagem de incentivo sem encargo, o que é MICE, workation e quando vale contratar uma agência.",
     "faq": [
       {
-        "question": "O que é viagem corporativa?",
-        "answer": "É qualquer deslocamento profissional pago pela empresa: reunião, treinamento, evento ou premiação de funcionários."
+        "question": "O que é viagem corporativa e o que significa MICE?",
+        "answer": "Viagem corporativa é qualquer deslocamento profissional pago pela empresa. MICE é a sigla em inglês que o mercado usa para as viagens ligadas a reuniões, incentivos, congressos e feiras (Meetings, Incentives, Conferences and Exhibitions)."
       },
       {
-        "question": "Qual a diferença entre viagem de incentivo e viagem a trabalho?",
-        "answer": "Viagem a trabalho tem objetivo operacional: reunião, feira, treinamento. Viagem de incentivo é um prêmio por desempenho para quem bate meta. Os dois são viagens corporativas, mas com propósitos bem diferentes."
+        "question": "Viagem de incentivo entra no salário ou gera INSS?",
+        "answer": "Não, se for prêmio de verdade. Pelo art. 457 da CLT, o prêmio pode ser dado em bens, serviços ou dinheiro e não gera encargo trabalhista nem previdenciário. Segundo a Solução de Consulta Cosit nº 10/2026, a regra vale só para empregados (não para sócios), o prêmio não pode decorrer de contrato ou convenção coletiva e a empresa precisa provar qual era a meta e quanto ela foi superada. Confirme o enquadramento com o seu contador."
+      },
+      {
+        "question": "O funcionário pode fazer workation no exterior?",
+        "answer": "Pela CLT, o empregado contratado no Brasil que opta por trabalhar remotamente de fora do país continua sob a lei brasileira. Se é a empresa que manda o funcionário trabalhar no exterior, a situação pode ser outra (transferência, regida pela Lei 7.064/1982), e vale falar com o advogado trabalhista. A dúvida está no país de destino: na Europa, a entrada sem visto cobre turismo e reuniões de negócios, mas não atividade remunerada, e cada país trata o trabalho remoto de um jeito. Consulte o consulado antes de fechar."
       },
       {
         "question": "Pequenas empresas precisam de uma agência de viagens corporativas?",
         "answer": "Depende da frequência e da complexidade. Empresas que viajam com regularidade, que precisam de nota no CNPJ ou que organizam viagens em grupo costumam economizar tempo e dinheiro contratando uma agência."
-      },
-      {
-        "question": "Como funciona o faturamento de viagem corporativa no CNPJ?",
-        "answer": "A agência emite a nota fiscal diretamente para o CNPJ da empresa. Isso elimina o processo de reembolso pessoal e facilita a contabilidade."
       },
       {
         "question": "Quanto custa contratar uma agência de viagens corporativas?",
@@ -1345,7 +1401,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       }
     ],
     "slug": "viagem-corporativa-para-pequenas-empresas-guia-completo",
-    "readingTime": "6 min de leitura"
+    "readingTime": "13 min de leitura"
   },
   {
     "title": "Copa do Mundo 2026: guia das cidades-sede além do futebol",

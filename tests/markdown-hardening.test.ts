@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import handler, { memoize0 } from '../api/markdown.ts';
+import handler from '../api/markdown.ts';
+import { memoize0 } from '../lib/memoize.ts';
 
 test('api/markdown should return 400 for path too long', async () => {
     const longPath = 'a'.repeat(513);
