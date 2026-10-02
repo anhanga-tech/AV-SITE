@@ -1304,10 +1304,10 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "11 min de leitura"
   },
   {
-    "title": "Viagem Corporativa para Pequenas Empresas: Guia Completo",
-    "excerpt": "O que é viagem corporativa, quais são os 4 tipos e quando vale contratar uma agência. Guia prático para micro e pequenas empresas no Brasil.",
+    "title": "Viagem corporativa para pequenas empresas: incentivo, MICE e workation",
+    "excerpt": "Os 4 tipos de viagem corporativa, o que significa MICE, como premiar com viagem sem gerar encargo e o que checar antes de um workation.",
     "date": "2026-06-02",
-    "dateModified": "2026-09-22",
+    "dateModified": "2026-10-02",
     "author": "felipe-william",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/viagem-corp.jpg",
@@ -1317,27 +1317,30 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "tags": [
       "viagens-corporativas",
       "pequenas-empresas",
+      "viagem-de-incentivo",
+      "mice",
+      "workation",
       "planejamento",
       "brasil"
     ],
-    "seoTitle": "Viagem Corporativa: Guia para PMEs",
-    "seoDescription": "O que é viagem corporativa, quais são os 4 tipos e quando vale contratar uma agência. Guia prático para micro e pequenas empresas no Brasil.",
+    "seoTitle": "Viagem corporativa e incentivo para PMEs",
+    "seoDescription": "Guia de viagem corporativa para pequenas empresas, com viagem de incentivo sem encargo, o que é MICE, workation e quando vale contratar uma agência.",
     "faq": [
       {
-        "question": "O que é viagem corporativa?",
-        "answer": "É qualquer deslocamento profissional pago pela empresa: reunião, treinamento, evento ou premiação de funcionários."
+        "question": "O que é viagem corporativa e o que significa MICE?",
+        "answer": "Viagem corporativa é qualquer deslocamento profissional pago pela empresa. MICE é a sigla em inglês que o mercado usa para as viagens ligadas a reuniões, incentivos, congressos e feiras (Meetings, Incentives, Conferences and Exhibitions)."
       },
       {
-        "question": "Qual a diferença entre viagem de incentivo e viagem a trabalho?",
-        "answer": "Viagem a trabalho tem objetivo operacional: reunião, feira, treinamento. Viagem de incentivo é um prêmio por desempenho para quem bate meta. Os dois são viagens corporativas, mas com propósitos bem diferentes."
+        "question": "Viagem de incentivo entra no salário ou gera INSS?",
+        "answer": "Não, se for prêmio de verdade. Pelo art. 457 da CLT, o prêmio pode ser dado em bens, serviços ou dinheiro e não gera encargo trabalhista nem previdenciário. Segundo a Solução de Consulta Cosit nº 10/2026, a regra vale só para empregados (não para sócios), o prêmio não pode decorrer de contrato ou convenção coletiva e a empresa precisa provar qual era a meta e quanto ela foi superada. Confirme o enquadramento com o seu contador."
+      },
+      {
+        "question": "O funcionário pode fazer workation no exterior?",
+        "answer": "Pela CLT, o empregado contratado no Brasil que opta por trabalhar remotamente de fora do país continua sob a lei brasileira. Se é a empresa que manda o funcionário trabalhar no exterior, a situação pode ser outra (transferência, regida pela Lei 7.064/1982), e vale falar com o advogado trabalhista. A dúvida está no país de destino: na Europa, a entrada sem visto cobre turismo e reuniões de negócios, mas não atividade remunerada, e cada país trata o trabalho remoto de um jeito. Consulte o consulado antes de fechar."
       },
       {
         "question": "Pequenas empresas precisam de uma agência de viagens corporativas?",
         "answer": "Depende da frequência e da complexidade. Empresas que viajam com regularidade, que precisam de nota no CNPJ ou que organizam viagens em grupo costumam economizar tempo e dinheiro contratando uma agência."
-      },
-      {
-        "question": "Como funciona o faturamento de viagem corporativa no CNPJ?",
-        "answer": "A agência emite a nota fiscal diretamente para o CNPJ da empresa. Isso elimina o processo de reembolso pessoal e facilita a contabilidade."
       },
       {
         "question": "Quanto custa contratar uma agência de viagens corporativas?",
@@ -1345,7 +1348,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       }
     ],
     "slug": "viagem-corporativa-para-pequenas-empresas-guia-completo",
-    "readingTime": "6 min de leitura"
+    "readingTime": "13 min de leitura"
   },
   {
     "title": "Copa do Mundo 2026: guia das cidades-sede além do futebol",
