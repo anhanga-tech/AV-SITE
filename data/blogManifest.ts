@@ -1336,7 +1336,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "O funcionário pode fazer workation no exterior?",
-        "answer": "Pela CLT, o empregado contratado no Brasil que trabalha remotamente de fora do país continua sob a lei brasileira. A dúvida está no país de destino: na Europa, a entrada sem visto cobre turismo e reuniões de negócios, mas não atividade remunerada, e cada país trata o trabalho remoto de um jeito. Consulte o consulado antes de fechar."
+        "answer": "Pela CLT, o empregado contratado no Brasil que opta por trabalhar remotamente de fora do país continua sob a lei brasileira. Se é a empresa que manda o funcionário trabalhar no exterior, a situação pode ser outra (transferência, regida pela Lei 7.064/1982), e vale falar com o advogado trabalhista. A dúvida está no país de destino: na Europa, a entrada sem visto cobre turismo e reuniões de negócios, mas não atividade remunerada, e cada país trata o trabalho remoto de um jeito. Consulte o consulado antes de fechar."
       },
       {
         "question": "Pequenas empresas precisam de uma agência de viagens corporativas?",
