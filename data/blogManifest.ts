@@ -2,6 +2,59 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
+    "title": "Lua de mel na Europa: Lisboa ou Paris para quem não quer só museus",
+    "excerpt": "Lisboa ou Paris na lua de mel? Comparamos clima, ritmo, passeios fora dos museus e custos escondidos, com um roteiro que junta as duas cidades.",
+    "date": "2026-10-02",
+    "dateModified": "2026-10-02",
+    "author": "felipe-william",
+    "category": "Romance",
+    "image": "https://media.anhanga.tur.br/images/blog/lua-de-mel-europa-lisboa-ou-paris.jpg",
+    "imageCreditStatus": "confirmed",
+    "imageCredit": "Marcus Holland-Moritz (mhx) / Wikimedia Commons",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Lisbon_Sunset_(16542598054).jpg",
+    "imageLicense": "CC BY-SA 2.0",
+    "imageLicenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "imageAdaptation": "Recorte adaptado à capa · pôr do sol visto do Miradouro da Senhora do Monte, Lisboa, 2015",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Europa",
+    "tags": [
+      "lua-de-mel",
+      "europa",
+      "lisboa",
+      "paris",
+      "portugal",
+      "franca",
+      "romance"
+    ],
+    "seoTitle": "Lua de mel na Europa: Lisboa ou Paris?",
+    "seoDescription": "Lua de mel na Europa sem maratona de museu. Lisboa ou Paris por perfil de casal, melhor época, passeios de um dia e um roteiro de 9 noites.",
+    "faq": [
+      {
+        "question": "Lisboa ou Paris: qual é melhor para lua de mel?",
+        "answer": "Depende do ritmo do casal. Lisboa é mais tranquila, mais barata no dia a dia e tem mar perto, com Sintra e Cascais a cerca de 40 minutos de trem. Paris tem mais intensidade: jantares, bairros para caminhar e passeios de um dia como Champagne e Giverny. Se der para ter 9 noites ou mais, as duas cabem na mesma viagem."
+      },
+      {
+        "question": "Qual a melhor época para lua de mel em Lisboa e Paris?",
+        "answer": "De maio a junho e de setembro a outubro, quando o tempo está ameno nas duas cidades e há menos fila do que no verão europeu. Para ver os jardins de Monet em Giverny, vá entre abril e o fim de outubro: o local fecha de novembro a março."
+      },
+      {
+        "question": "Quantos dias são necessários para Lisboa e Paris na mesma viagem?",
+        "answer": "A partir de 9 noites: 4 em Lisboa e 5 em Paris. O voo entre as duas cidades leva cerca de duas horas e meia. Com menos de 9 noites, a gente recomenda escolher uma cidade só."
+      },
+      {
+        "question": "Brasileiro precisa de visto para lua de mel na Europa?",
+        "answer": "Não. Brasileiros entram sem visto no Espaço Schengen, que inclui Portugal e França, para estadias de até 90 dias em cada período de 180. O ETIAS, autorização eletrônica de 20 euros, tem início previsto pela União Europeia para o último trimestre de 2026 e ainda não está recebendo pedidos."
+      },
+      {
+        "question": "Existe taxa turística em Lisboa e Paris?",
+        "answer": "Sim, à parte da diária. Em Lisboa, quem cobra é o alojamento; em Paris, pode ser o alojamento ou a plataforma de reserva. Em Lisboa são 4 euros por pessoa por noite, até 7 noites. Em Paris, o valor de 2026 depende da categoria do hotel: num 4 estrelas, por exemplo, são 8,45 euros por adulto por noite, já com as taxas adicionais."
+      }
+    ],
+    "slug": "lua-de-mel-europa-lisboa-ou-paris",
+    "readingTime": "9 min de leitura"
+  },
+  {
     "title": "Disney ou Universal em Orlando: qual escolher?",
     "excerpt": "Disney ou Universal em Orlando? Compare o ritmo, as atrações, a idade das crianças, o custo da fila rápida e o tipo de viagem que cada complexo entrega.",
     "date": "2026-09-22",

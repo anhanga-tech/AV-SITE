@@ -5,6 +5,21 @@ import type { HomeTeaserPost } from '../types/blog';
 
 export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
   {
+    "slug": "lua-de-mel-europa-lisboa-ou-paris",
+    "title": "Lua de mel na Europa: Lisboa ou Paris para quem não quer só museus",
+    "excerpt": "Lisboa ou Paris na lua de mel? Comparamos clima, ritmo, passeios fora dos museus e custos escondidos, com um roteiro que junta as duas cidades.",
+    "date": "2026-10-02",
+    "category": "Romance",
+    "author": "felipe-william",
+    "image": "https://media.anhanga.tur.br/images/blog/lua-de-mel-europa-lisboa-ou-paris.jpg",
+    "imageCreditStatus": "confirmed",
+    "imageCredit": "Marcus Holland-Moritz (mhx) / Wikimedia Commons",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Lisbon_Sunset_(16542598054).jpg",
+    "imageLicense": "CC BY-SA 2.0",
+    "imageLicenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "imageAdaptation": "Recorte adaptado à capa · pôr do sol visto do Miradouro da Senhora do Monte, Lisboa, 2015"
+  },
+  {
     "slug": "disney-ou-universal-orlando-qual-escolher",
     "title": "Disney ou Universal em Orlando: qual escolher?",
     "excerpt": "Disney ou Universal em Orlando? Compare o ritmo, as atrações, a idade das crianças, o custo da fila rápida e o tipo de viagem que cada complexo entrega.",
@@ -48,15 +63,5 @@ export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
     "imageLicense": "CC BY-SA 4.0",
     "imageLicenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
     "imageAdaptation": "Recorte adaptado à capa"
-  },
-  {
-    "slug": "cruzeiros-costa-brasileira-2026-2027",
-    "title": "Cruzeiros Costa Brasileira 2026/2027: rotas, datas e preços",
-    "excerpt": "A temporada da Costa no Brasil tem dois navios, três portos de embarque e roteiros regulares de 2 a 9 noites. As rotas, as datas e o que cada faixa de preço inclui.",
-    "date": "2026-09-15",
-    "category": "Cruzeiros",
-    "author": "felipe-william",
-    "image": "https://media.anhanga.tur.br/images/destinations/natal.jpg",
-    "imageCreditStatus": "unknown"
   }
 ];
