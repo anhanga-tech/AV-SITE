@@ -48,7 +48,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "Existe taxa turística em Lisboa e Paris?",
-        "answer": "Sim, cobrada no hotel. Em Lisboa são 4 euros por pessoa por noite, até 7 noites. Em Paris, o valor de 2026 depende da categoria do hotel: num 4 estrelas, por exemplo, são 8,45 euros por adulto por noite, já com as taxas adicionais."
+        "answer": "Sim, à parte da diária. Em Lisboa, quem cobra é o alojamento; em Paris, pode ser o alojamento ou a plataforma de reserva. Em Lisboa são 4 euros por pessoa por noite, até 7 noites. Em Paris, o valor de 2026 depende da categoria do hotel: num 4 estrelas, por exemplo, são 8,45 euros por adulto por noite, já com as taxas adicionais."
       }
     ],
     "slug": "lua-de-mel-europa-lisboa-ou-paris",
