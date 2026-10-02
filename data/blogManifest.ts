@@ -40,7 +40,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "Quantos dias são necessários para Lisboa e Paris na mesma viagem?",
-        "answer": "A partir de 9 noites: 4 em Lisboa e 5 em Paris. O voo entre as duas cidades leva cerca de duas horas e meia. Com menos de 7 noites, a gente recomenda escolher uma cidade só."
+        "answer": "A partir de 9 noites: 4 em Lisboa e 5 em Paris. O voo entre as duas cidades leva cerca de duas horas e meia. Com menos de 9 noites, a gente recomenda escolher uma cidade só."
       },
       {
         "question": "Brasileiro precisa de visto para lua de mel na Europa?",
