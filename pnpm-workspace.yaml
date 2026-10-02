@@ -66,7 +66,11 @@ overrides:
   # de fast-uri e a WHATWG URL nativa do Node (fetch/undici), risco de SSRF.
   # Transitivo via ajv (react-doctor > conf > ajv-formats), só dev. 3.1.4
   # corrige; override escopado a "@3" porque só existe a linha 3.x na árvore.
-  "fast-uri@3": "^3.1.4"
+  # pnpm audit (moderate): GHSA-hrr3-gc8f-f4qj — fast-uri < 3.1.8 normaliza
+  # host de forma inconsistente para octetos percent-encoded, mesma árvore
+  # dev-only acima. 3.1.8 (publicado 2026-09-15, cooldown vencido em
+  # 2026-09-22) corrige.
+  "fast-uri@3": "^3.1.8"
   # pnpm audit (low): GHSA-v422-hmwv-36x6 — body-parser < 1.20.6 desabilita
   # silenciosamente o enforcement de tamanho quando recebe um `limit` inválido
   # (DoS). Transitivo dev-only via decap-server > express@4 > body-parser
@@ -87,7 +91,19 @@ overrides:
   # (publicado 2026-07-30, cooldown de 7 dias vencido em 2026-08-06) corrige
   # ambas; escopado a "@1" porque a árvore também tem brace-expansion@5.x
   # (já corrigida) em outro caminho de dependência.
-  "brace-expansion@1": "^1.1.18"
+  # pnpm audit (high): GHSA-qhr7-859c-m2p7 (<1.1.20), GHSA-6j4f-fj2g-mc7p
+  # (<1.1.19) e GHSA-q2hr-2g5m-vwhr (<1.1.21) — três novos DoS por expansão
+  # de chaves/recursão não limitada na própria linha 1.x, publicados depois
+  # do pin acima. brace-expansion@1.1.21 (publicado 2026-09-14, cooldown de
+  # 7 dias vencido em 2026-09-21) corrige as três.
+  "brace-expansion@1": "^1.1.21"
+  # pnpm audit (high/moderate): mesmos três GHSAs acima, versão da linha 5.x
+  # consumida por eslint (minimatch@10 > brace-expansion@5, caminho
+  # @eslint/config-array e eslint core) e por bundlesize2 > glob > minimatch.
+  # brace-expansion@5.0.12 (publicado 2026-09-14, cooldown vencido em
+  # 2026-09-21) corrige; escopado a "@5" pelo mesmo motivo do pin acima — a
+  # árvore tem as duas majors em caminhos de dependência diferentes.
+  "brace-expansion@5": "^5.0.12"
   # pnpm audit (high): GHSA-c83g-rgw3-j3cx (crescimento de memória não
   # limitado via resultados de query distintos, sem eviction de cache) +
   # GHSA-73wf-gq98-2v4g (crash / escrita em prototype não capturada via
