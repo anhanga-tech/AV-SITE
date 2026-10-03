@@ -152,7 +152,7 @@ test('orlando landing should not hotlink static images from partner websites', a
 });
 
 test('festival landings should use managed static imagery', async () => {
-  const [hero, packageFeatures, lineup, venueMap, venueMapData, whyUs, betoTestimonials] =
+  const [hero, packageFeatures, lineup, venueMap, venueMapData, whyUs] =
     await Promise.all([
       readRepoFile('components/landings/lollapalooza/Hero.tsx'),
       readRepoFile('components/landings/lollapalooza/PackageFeatures.tsx'),
@@ -160,7 +160,6 @@ test('festival landings should use managed static imagery', async () => {
       readRepoFile('components/landings/lollapalooza/VenueMap.tsx'),
       readRepoFile('components/landings/lollapalooza/venueMapData.ts'),
       readRepoFile('components/landings/lollapalooza/WhyUs.tsx'),
-      readRepoFile('components/landings/beto-carrero/Testimonials.tsx'),
     ]);
 
   assertMissingHosts(
@@ -210,12 +209,6 @@ test('festival landings should use managed static imagery', async () => {
   );
   assert.match(whyUs, /images\/lollapalooza\/why-us\/.+\.(jpg|jpeg|webp)/);
 
-  assertMissingHosts(
-    betoTestimonials,
-    ['picsum.photos'],
-    'components/landings/beto-carrero/Testimonials.tsx',
-  );
-  assert.match(betoTestimonials, /images\/beto-carrero\/testimonials\/.+\.(jpg|jpeg|webp)/);
 });
 
 test('home decorative textures should not hotlink grain overlays from third-party hosts', async () => {

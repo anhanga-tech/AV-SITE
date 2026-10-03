@@ -4,7 +4,6 @@ import Problem from './Problem';
 import Solution from './Solution';
 import Attractions from './Attractions';
 import Features from './Features';
-import Testimonials from './Testimonials';
 import Footer from './Footer';
 import Button from './Button';
 import { Menu, X } from 'lucide-react';
@@ -15,7 +14,6 @@ const NAV_LINKS = [
   { name: 'O Perrengue', href: '#problem' },
   { name: 'A Solução', href: '#solution' },
   { name: 'Atrações', href: '#attractions' },
-  { name: 'Depoimentos', href: '#testimonials' },
   { name: 'Dúvidas', href: '#faq' },
 ];
 
@@ -198,7 +196,6 @@ const App: React.FC = () => {
         <div id="solution" className="scroll-mt-32 md:scroll-mt-48"><Solution /></div>
         <div id="attractions" className="scroll-mt-32 md:scroll-mt-48"><Attractions /></div>
         <Features />
-        <div id="testimonials" className="scroll-mt-32 md:scroll-mt-48"><Testimonials /></div>
         <div id="faq" className="scroll-mt-32 md:scroll-mt-48"><BetoCarreroFaq /></div>
       </main>
 
