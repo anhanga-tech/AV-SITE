@@ -14,8 +14,16 @@ import {
     scrubEventUrls,
     scrubQueryParams,
     scrubSensitiveUrl,
+    scrubSpanUrls,
+    SENTRY_DATA_COLLECTION,
     setErrorTrackerForTests,
 } from '../lib/error-tracking';
+import {
+    BrowserClient,
+    createTransport,
+    setCurrentClient,
+    startSpan,
+} from '@sentry/react';
 import { STALE_CHUNK_EXHAUSTED_TAG_KEY, STALE_CHUNK_EXHAUSTED_TAG_VALUE } from '../lib/stale-chunk-recovery';
 import type { ErrorEvent as SentryErrorEvent } from '@sentry/react';
 
@@ -489,12 +497,24 @@ test('both Sentry entry points scrub URLs on errors, transactions and breadcrumb
         readProjectFile('functions/_middleware.ts'),
     ]);
 
-    // Both SDKs sample 10% of traffic into transactions, which carry request.url
-    // even with no error — beforeSend alone is not enough.
-    assert.match(clientSource, /beforeSendTransaction:\s*scrubEventUrls/);
+    // Both SDKs sample 10% of traffic into spans, which carry the request URL
+    // even with no error — beforeSend alone is not enough. SDK v11 streams spans
+    // and never invokes `beforeSendTransaction`, so the span hook is the one
+    // that matters (the behavioral test below proves it runs).
+    assert.match(clientSource, /beforeSendSpan:\s*scrubSpanUrls/);
     assert.match(clientSource, /beforeBreadcrumb:\s*sentryBeforeBreadcrumb/);
     assert.match(middlewareSource, /beforeSend:\s*scrubEventUrls/);
-    assert.match(middlewareSource, /beforeSendTransaction:\s*scrubEventUrls/);
+    assert.match(middlewareSource, /beforeSendSpan:\s*scrubSpanUrls/);
+    // A no-op hook must not sit there looking like protection.
+    assert.doesNotMatch(clientSource, /beforeSendTransaction\s*:/);
+    assert.doesNotMatch(middlewareSource, /beforeSendTransaction\s*:/);
+    // v11 removed `enableLogs`; a stale one type-checks on the middleware
+    // (callback return) and would hide a real migration gap.
+    assert.doesNotMatch(clientSource, /enableLogs\s*:/);
+    assert.doesNotMatch(middlewareSource, /enableLogs\s*:/);
+    // Without an explicit dataCollection, v11 collects request bodies/cookies.
+    assert.match(clientSource, /dataCollection:\s*SENTRY_DATA_COLLECTION/);
+    assert.match(middlewareSource, /dataCollection:\s*SENTRY_DATA_COLLECTION/);
     // The middleware needs all three too: the Workers runtime auto-instruments
     // outbound fetch breadcrumbs. Asserting this only on the client is what let
     // the missing hook slip through review the first time.
@@ -610,4 +630,103 @@ test('scrubUrlBag redacts headers namespaced as span attributes', () => {
         event.spans[0].data['http.request.header.referer'],
         'https://www.anhanga.tur.br/nps?token=[redacted]',
     );
+});
+
+// --- SDK v11 span streaming ------------------------------------------------
+// v11 defaults to `traceLifecycle: 'stream'`: spans are sent one by one and
+// `beforeSendTransaction` is never invoked. The v10 scrubber stayed wired to
+// that dead hook through the @sentry/cloudflare bump, and the source-regex test
+// above kept passing. These tests exercise the hook that actually runs.
+
+test('scrubSpanUrls redacts span name, URL attributes, query attributes and the segment name', () => {
+    const span = scrubSpanUrls({
+        name: 'GET /nps?token=secret-invite',
+        attributes: {
+            'url.full': 'https://www.anhanga.tur.br/nps?token=secret-invite&utm_source=email',
+            'url.query': '?code=oauth-code&state=csrf&gclid=g',
+            'http.query': 'token=secret-invite',
+            'http.request.header.referer': 'https://www.anhanga.tur.br/nps?token=secret-invite',
+            'sentry.segment.name': 'GET /nps?token=secret-invite',
+            'http.request.method': 'GET',
+        },
+    });
+
+    assert.equal(span.name, 'GET /nps?token=[redacted]');
+    assert.equal(span.attributes['url.full'], 'https://www.anhanga.tur.br/nps?token=[redacted]&utm_source=email');
+    assert.equal(span.attributes['url.query'], '?code=[redacted]&state=[redacted]&gclid=g');
+    assert.equal(span.attributes['http.query'], 'token=[redacted]');
+    assert.equal(span.attributes['http.request.header.referer'], 'https://www.anhanga.tur.br/nps?token=[redacted]');
+    assert.equal(span.attributes['sentry.segment.name'], 'GET /nps?token=[redacted]');
+    assert.equal(span.attributes['http.request.method'], 'GET', 'non-URL attributes must be left alone');
+});
+
+test('scrubSpanUrls returns the same object for a clean span (beforeSendSpan cannot drop spans)', () => {
+    const clean = { name: 'GET /blog', attributes: { 'url.full': 'https://www.anhanga.tur.br/blog?page=2' } };
+    assert.equal(scrubSpanUrls(clean), clean);
+});
+
+test('the real v11 SDK runs beforeSendSpan and no credential reaches the transport', async () => {
+    const envelopes: string[] = [];
+    let hookCalls = 0;
+    const client = new BrowserClient({
+        dsn: 'https://public@o0.ingest.sentry.io/0',
+        tracesSampleRate: 1,
+        integrations: [],
+        stackParser: () => [],
+        dataCollection: SENTRY_DATA_COLLECTION,
+        beforeSendSpan: (span) => {
+            hookCalls += 1;
+            return scrubSpanUrls(span);
+        },
+        transport: (options) => createTransport(options, async (request) => {
+            envelopes.push(typeof request.body === 'string' ? request.body : new TextDecoder().decode(request.body));
+            return { statusCode: 200 };
+        }),
+    });
+    setCurrentClient(client);
+    client.init();
+
+    // `sentry.segment.name.source: 'url'` mirrors what the SDK's HTTP/pageload
+    // instrumentation sets; it keeps the span name out of the envelope's DSC
+    // `transaction` header, which beforeSendSpan cannot reach.
+    startSpan({
+        name: 'GET /nps?token=live-invite',
+        attributes: {
+            'sentry.segment.name.source': 'url',
+            'url.full': 'https://www.anhanga.tur.br/nps?token=live-invite&utm_source=email&via=partner&promo_code=VERAO',
+            'url.query': '?code=oauth-code&state=csrf',
+        },
+    }, () => {
+        startSpan({
+            name: 'POST www.google-analytics.com',
+            attributes: { 'url.full': 'https://www.google-analytics.com/mp/collect?api_secret=ga4-secret' },
+        }, () => undefined);
+    });
+    await client.flush(2000);
+
+    const wire = envelopes.join('\n');
+    assert.ok(hookCalls >= 2, `beforeSendSpan must run for every span under v11 (ran ${hookCalls}x)`);
+    assert.match(wire, /"type":"span"/, 'the spans must actually have been sent');
+    for (const secret of ['live-invite', 'oauth-code', 'csrf', 'ga4-secret']) {
+        assert.ok(!wire.includes(secret), `"${secret}" leaked to the Sentry transport`);
+    }
+    // Attribution params must survive both the SDK filter and our hook.
+    for (const kept of ['utm_source=email', 'via=partner', 'promo_code=VERAO']) {
+        assert.ok(wire.includes(kept), `attribution param "${kept}" was redacted`);
+    }
+});
+
+test('SENTRY_DATA_COLLECTION pins the v10 defaults instead of the permissive v11 ones', () => {
+    // v11 collects cookies, all HTTP bodies and user info when dataCollection is
+    // unset; on the Pages middleware that includes lead-form PII.
+    assert.equal(SENTRY_DATA_COLLECTION.userInfo, false);
+    assert.equal(SENTRY_DATA_COLLECTION.cookies, false);
+    assert.deepEqual(SENTRY_DATA_COLLECTION.httpBodies, []);
+    assert.equal(SENTRY_DATA_COLLECTION.databaseQueryData, false);
+    assert.deepEqual(SENTRY_DATA_COLLECTION.genAI, { inputs: false, outputs: false });
+    assert.ok(SENTRY_DATA_COLLECTION.httpHeaders.request.deny.includes('referer'));
+    // No custom query denylist: the SDK matches `deny` terms by substring, so
+    // `code` would also mask `promo_code` and header fragments would mask
+    // `via=`. OAuth code/state are handled exactly by scrubSpanUrls instead.
+    assert.equal(SENTRY_DATA_COLLECTION.urlQueryParams, true);
 });

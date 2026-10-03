@@ -232,6 +232,102 @@ export function scrubEventUrls<T extends UrlBearingEvent>(event: T): T {
     return event;
 }
 
+// Span attributes whose value is a bare query string (no `?`), not a full URL.
+const QUERY_ATTRIBUTE_KEYS = new Set(['url.query', 'http.query']);
+const SEGMENT_NAME_ATTRIBUTE = 'sentry.segment.name';
+
+/** Structural subset of the SDK v11 `StreamedSpanJSON` — see UrlBearingEvent. */
+type UrlBearingSpan = {
+    name: string;
+    attributes: Record<string, unknown>;
+};
+
+/**
+ * `beforeSendSpan` scrubber for SDK v11 span streaming (the default
+ * `traceLifecycle: 'stream'`), where `beforeSendTransaction` is never invoked.
+ * Each span is sent on its own, so URLs ride in `attributes` (`url.full`,
+ * `url.query`, `http.request.header.referer`) and, for some spans, in `name`.
+ *
+ * The SDK's own `dataCollection.urlQueryParams` filter already masks names
+ * containing `token`/`secret`/`key`, but not the OAuth `code`/`state`
+ * (SENSITIVE_URL_PARAM_PATTERN) — so this stays the authoritative net.
+ * `beforeSendSpan` cannot drop a span, so this must always return one.
+ */
+export function scrubSpanUrls<T extends UrlBearingSpan>(span: T): T {
+    const name = scrubSensitiveUrl(span.name);
+    let attributes = scrubUrlBag(span.attributes) ?? span.attributes;
+
+    // Every span repeats its segment's name as `sentry.segment.name`, copied
+    // from the segment *before* this hook runs on it — scrubbing only `name`
+    // would leave the raw segment name on all of its children.
+    const segmentName = attributes[SEGMENT_NAME_ATTRIBUTE];
+    if (typeof segmentName === 'string') {
+        const safe = scrubSensitiveUrl(segmentName);
+        if (safe !== segmentName) {
+            attributes = attributes === span.attributes ? { ...attributes } : attributes;
+            attributes[SEGMENT_NAME_ATTRIBUTE] = safe;
+        }
+    }
+
+    for (const key of QUERY_ATTRIBUTE_KEYS) {
+        const value = attributes[key];
+        if (typeof value !== 'string') continue;
+        // Attributes may arrive with or without the leading `?`.
+        const prefix = value.startsWith('?') ? '?' : '';
+        const safe = `${prefix}${scrubQueryParams(value.slice(prefix.length)) as string}`;
+        if (safe === value) continue;
+        attributes = attributes === span.attributes ? { ...attributes } : attributes;
+        attributes[key] = safe;
+    }
+
+    if (name === span.name && attributes === span.attributes) return span;
+    return { ...span, name, attributes };
+}
+
+/**
+ * Explicit SDK v11 `dataCollection`, pinned to the v10 default.
+ *
+ * v11 replaced `sendDefaultPii` with `dataCollection` and made the *unset*
+ * default permissive: cookies, request/response bodies and user info are all
+ * collected. On the Pages middleware that would include lead-form bodies
+ * (name, phone, e-mail). Widening any of this is a deliberate, reviewed
+ * decision — not something an SDK bump should do silently.
+ *
+ * Typed structurally (no SDK import) so both entry points can share it.
+ */
+const V10_HEADER_DENYLIST = ['forwarded', '-ip', 'remote-', 'via', '-user'];
+
+export const SENTRY_DATA_COLLECTION: {
+    userInfo: boolean;
+    cookies: boolean;
+    httpHeaders: { request: { deny: string[] }; response: { deny: string[] } };
+    httpBodies: never[];
+    urlQueryParams: boolean;
+    genAI: { inputs: boolean; outputs: boolean };
+    databaseQueryData: boolean;
+    queues: boolean;
+    graphQL: { document: boolean; variables: boolean };
+} = {
+    userInfo: false,
+    cookies: false,
+    httpHeaders: {
+        request: { deny: [...V10_HEADER_DENYLIST, 'referer'] },
+        response: { deny: [...V10_HEADER_DENYLIST] },
+    },
+    httpBodies: [],
+    // `true` is the v10 default: the SDK still masks its built-in sensitive
+    // names (token/secret/key/auth/…). Do NOT add a `deny` list here — the SDK
+    // matches by *substring*, so `code` would also mask `promo_code` and the
+    // header fragments would mask `via=`, breaking the "attribution params
+    // survive" guarantee of scrubSensitiveUrl. The OAuth `code`/`state` are
+    // matched exactly by our own hooks (SENSITIVE_URL_PARAM_PATTERN).
+    urlQueryParams: true,
+    genAI: { inputs: false, outputs: false },
+    databaseQueryData: false,
+    queues: false,
+    graphQL: { document: false, variables: false },
+};
+
 /** Breadcrumb scrubber shaped structurally so the Worker bundle can use it
  *  without importing the browser SDK's `Breadcrumb` type. */
 export function scrubBreadcrumbUrls<T extends { data?: Record<string, unknown> }>(breadcrumb: T): T {
