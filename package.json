@@ -79,7 +79,7 @@
     "react-doctor": "^0.9.14",
     "rollup-plugin-visualizer": "^7.1.1",
     "semantic-release": "25.0.9",
-    "sharp": "^0.35.4",
+    "sharp": "^0.35.5",
     "subset-font": "^2.9.0",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.15",
