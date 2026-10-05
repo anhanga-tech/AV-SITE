@@ -263,6 +263,23 @@ test('Cloudflare Pages headers should set a defense-in-depth Content-Security-Po
   assert.match(csp, /\bform-action 'self'/, "form-action must be locked to 'self'");
 });
 
+test('Cloudflare Pages headers should isolate cross-origin window references via Cross-Origin-Opener-Policy', async () => {
+  const headers = await readFile(new URL('../public/_headers', import.meta.url), 'utf8');
+  const blocks = collectHeadersBlocks(headers);
+  const globalHeaders = blocks.get('/*');
+
+  assert.ok(globalHeaders, 'global /* block must exist');
+  // `same-origin` (not `same-origin-allow-popups`) is safe here: the Decap CMS
+  // OAuth handshake (api/auth/callback.ts) only relies on `window.opener`
+  // between two documents on this same origin, and the WhatsApp tab handoff
+  // (utils/whatsappHandoff.ts) already severs `opener` itself before any
+  // cross-origin navigation — neither depends on a cross-origin opener
+  // reference surviving. This closes the cross-origin-opener side channel
+  // (reverse tabnabbing, Spectre-style XS-Leaks via a shared browsing context
+  // group) without touching either flow.
+  assert.equal(globalHeaders.get('Cross-Origin-Opener-Policy'), 'same-origin');
+});
+
 test('Cloudflare Pages CSP should stay non-breaking until a source allowlist is audited', async () => {
   const headers = await readFile(new URL('../public/_headers', import.meta.url), 'utf8');
   const blocks = collectHeadersBlocks(headers);
