@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useId, useState } from "react";
+import { memo, useId, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { optimizeRemoteImageUrl } from "../../../data/mediaConfig";
 import { openContactModal } from "../../../utils/contactForm";
@@ -20,7 +20,12 @@ import { FEATURED_PARKS, OTHER_PARK_GROUPS, TOTAL_PARKS_COUNT, type ParkCardData
   desktop e 237px no celular, então mesmo em DPR 3 o alvo fica abaixo de 800.
 */
 
-function ParkCard({ name, image, alt, description, recommendedFor }: ParkCardData) {
+// PERFORMANCE WIN: memoized because `OrlandoParksGallery`'s `showAll` toggle
+// re-renders the whole tree (the collapsed panel is CSS-hidden, not unmounted,
+// per the comment on OTHER_PARK_GROUPS below) but every card's props are
+// static data that never changes — React.memo skips reconciling all 13 cards
+// (and re-running the expensive `optimizeRemoteImageUrl`) on every toggle click.
+const ParkCard = memo(function ParkCard({ name, image, alt, description, recommendedFor }: ParkCardData) {
   return (
     <div className="park-card">
       <div className="park-image-frame">
@@ -47,7 +52,7 @@ function ParkCard({ name, image, alt, description, recommendedFor }: ParkCardDat
       <p>{description}</p>
     </div>
   );
-}
+});
 
 export function OrlandoParksGallery() {
   const [showAll, setShowAll] = useState(false);
