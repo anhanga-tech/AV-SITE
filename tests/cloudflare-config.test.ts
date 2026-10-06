@@ -29,6 +29,33 @@ function collectTomlVarsSection(source: string, sectionName: string): Map<string
   return vars;
 }
 
+/**
+ * Raw (unparsed) lines per path block, preserving `! HeaderName` removal
+ * directives that `collectHeadersBlocks` below drops (its `key: value` regex
+ * has no match for a line with no colon, so it silently ignores them —
+ * fine for every other test here, but wrong for asserting a removal).
+ */
+function collectHeadersBlockLines(source: string): Map<string, string[]> {
+  const blocks = new Map<string, string[]>();
+  let currentPath: string | undefined;
+
+  for (const rawLine of source.split(/\r?\n/)) {
+    if (!rawLine.trim()) continue;
+    if (rawLine.trim().startsWith('#')) continue;
+
+    if (!rawLine.startsWith(' ') && !rawLine.startsWith('\t')) {
+      currentPath = rawLine.trim();
+      if (!blocks.has(currentPath)) blocks.set(currentPath, []);
+      continue;
+    }
+
+    if (!currentPath) continue;
+    blocks.get(currentPath)?.push(rawLine.trim());
+  }
+
+  return blocks;
+}
+
 function collectHeadersBlocks(source: string): Map<string, Map<string, string>> {
   const blocks = new Map<string, Map<string, string>>();
   let currentPath: string | undefined;
@@ -261,6 +288,66 @@ test('Cloudflare Pages headers should set a defense-in-depth Content-Security-Po
   assert.match(csp, /\bobject-src 'none'/, 'object-src must be none');
   assert.match(csp, /\bframe-ancestors 'none'/, 'frame-ancestors must be none');
   assert.match(csp, /\bform-action 'self'/, "form-action must be locked to 'self'");
+});
+
+test('Cloudflare Pages headers should isolate cross-origin window references via Cross-Origin-Opener-Policy', async () => {
+  const headers = await readFile(new URL('../public/_headers', import.meta.url), 'utf8');
+  const blocks = collectHeadersBlocks(headers);
+  const globalHeaders = blocks.get('/*');
+
+  assert.ok(globalHeaders, 'global /* block must exist');
+  // The WhatsApp tab handoff (utils/whatsappHandoff.ts) already severs
+  // `opener` itself before any cross-origin navigation, so it never depends
+  // on a cross-origin opener reference surviving — `same-origin` is safe for
+  // that flow. The Decap CMS OAuth handshake is a different story: its popup
+  // *does* navigate cross-origin (to github.com) mid-flow, so it needs an
+  // explicit exemption from this global policy — see the next test. This
+  // still closes the cross-origin-opener side channel (reverse tabnabbing,
+  // Spectre-style XS-Leaks via a shared browsing context group) for every
+  // other page.
+  assert.equal(globalHeaders.get('Cross-Origin-Opener-Policy'), 'same-origin');
+});
+
+test('Cloudflare Pages headers should exempt the Decap CMS OAuth popup flow from Cross-Origin-Opener-Policy', async () => {
+  const headers = await readFile(new URL('../public/_headers', import.meta.url), 'utf8');
+  const blockLines = collectHeadersBlockLines(headers);
+
+  // The OAuth popup Decap CMS opens from `/admin` (a static asset, so
+  // public/_headers applies to it) navigates cross-origin to
+  // github.com/login/oauth/authorize (api/auth.ts) before GitHub redirects it
+  // back to api/auth/callback.ts, which replies to the opener via
+  // `window.opener.postMessage(...)`. api/auth.ts and api/auth/callback.ts are
+  // Cloudflare Pages *Functions*, and Cloudflare's own docs confirm
+  // `_headers` rules are never applied to Function responses — only to
+  // static assets — so those two routes stay at the implicit `unsafe-none`
+  // default regardless of what this file says, and don't need (or get) an
+  // entry here. `/admin` is the one static route in this flow, and the
+  // global `same-origin` COOP above would permanently sever its popup's
+  // `window.opener` reference the moment the popup leaves this origin — once
+  // severed, a browsing context group can never rejoin, even once the popup
+  // returns to a same-origin Function response — so the callback would
+  // always hit its `!window.opener` fallback branch and the CMS login would
+  // hang forever waiting for a reply that never arrives.
+  //
+  // Cloudflare joins repeated header values with a comma rather than letting
+  // a more specific path override a less specific one (confirmed against
+  // Cloudflare's own docs), so re-declaring a different
+  // Cross-Origin-Opener-Policy value on `/admin` would not work — it would
+  // produce an invalid `same-origin, unsafe-none` header instead of
+  // overriding it. `! Cross-Origin-Opener-Policy` removes the inherited
+  // header outright, restoring the implicit `unsafe-none` default (matching
+  // what the callback Function already gets) on exactly the static paths
+  // this flow touches.
+  const exemptPaths = ['/admin', '/admin/', '/admin/*'];
+
+  for (const path of exemptPaths) {
+    const lines = blockLines.get(path);
+    assert.ok(lines, `${path} block must exist in public/_headers`);
+    assert.ok(
+      lines.includes('! Cross-Origin-Opener-Policy'),
+      `${path} must remove the inherited Cross-Origin-Opener-Policy header so the Decap CMS OAuth popup handshake keeps working`,
+    );
+  }
 });
 
 test('Cloudflare Pages CSP should stay non-breaking until a source allowlist is audited', async () => {
