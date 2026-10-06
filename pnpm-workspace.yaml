@@ -123,6 +123,39 @@ overrides:
   # mantém a mesma API. ^17.13.6 deixa minimumReleaseAge escolher a mais
   # recente já fora do cooldown de 7 dias.
   "@hapi/joi": "npm:joi@^17.13.6"
+  # pnpm audit (critical): GHSA-x6jw-m9v5-85vh — guard de operações inseguras
+  # do simple-git >=3.15.0 <4.0.1 não bloqueia config de comando de trailer.
+  # pnpm audit (high): GHSA-g4wm-2vf7-vfgr (execução de comando via config
+  # git não bloqueada) + GHSA-858h-whjf-mvg5 (bypass do plugin
+  # unsafe-operations via abreviação de long-option) — simple-git <= 3.36.0.
+  # pnpm audit (critical): GHSA-v5rq-49vh-5v5c — @simple-git/argv-parser
+  # < 2.0.1 omite a env var VISUAL da checagem de editor inseguro.
+  # Transitivo dev-only via decap-server > simple-git (proxy local do Decap
+  # CMS, `pnpm cms:proxy`). decap-server@3.11.3 declara simple-git ^3.0.0,
+  # mas não existe 3.x >= 3.36.1 (a linha 3.x parou em 3.36.0) — o fix só
+  # existe na 4.x. simple-git@4.0.2 (publicado 2026-09-26, cooldown de 7
+  # dias vencido em 2026-10-03) corrige as três e já fixa
+  # @simple-git/argv-parser@2.0.1, então o argv-parser não precisa de
+  # override próprio. É um major bump forçado sobre decap-server (nem o
+  # 3.11.3-beta.1 sobe o range). Validado: `pnpm cms:proxy` roda no modo
+  # padrão MODE=fs, que só carrega o simple-git sem invocá-lo — info,
+  # entriesByFolder, persistEntry, getEntry e deleteFile funcionam.
+  # LIMITAÇÃO CONHECIDA: MODE=git (não usado neste repo) quebra no startup
+  # com "(0, l.default) is not a function" — o CJS da 4.x exporta um objeto
+  # sem `default`, e o bundle do decap-server chama o default do módulo.
+  # Remover este override quando o decap-server declarar simple-git ^4.
+  # Escopado a "@3" para remapear só o range ^3 que decap-server pede.
+  "simple-git@3": "^4.0.2"
+  # pnpm audit (moderate): GHSA-rj75-hqrm-r3gf — complexidade quadrática no
+  # parse de seletores planos permite exaustão de CPU em
+  # postcss-selector-parser < 7.1.6. Transitivo build-time via
+  # @tailwindcss/typography@0.5.20, que fixa a versão exata 6.0.10 (a linha
+  # 6.x não recebeu backport). 7.1.6 (publicado 2026-09-03, cooldown vencido
+  # em 2026-09-10) corrige; é major bump forçado, mas o plugin só usa
+  # parser().astSync e a travessia de nodes, API estável na 7.x — o CSS
+  # gerado pelo build ficou idêntico. Escopado a "@6" porque é a única major
+  # na árvore e o consumidor pede 6.x.
+  "postcss-selector-parser@6": "^7.1.6"
 
 legacyPeerDeps: true
 nodeLinker: hoisted
