@@ -1,13 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { SubmitNpsBodySchema } from '../lib/schemas/submit-nps.ts';
+import { NpsInviteTokenSchema, SubmitNpsBodySchema } from '../lib/schemas/submit-nps.ts';
 
 // Identity (firstname/email) is no longer part of the wire-format body —
 // it's derived server-side from the verified invitation token (issue #1137).
 // See tests/submit-nps.test.ts for token verification and tests/nps-invite.test.ts
-// for the signing/verification module itself.
+// for the signing/verification module itself. The token isn't in the body
+// either — it travels in the HttpOnly invite cookie (issue #1666) and is
+// shape-checked on its own by NpsInviteTokenSchema.
 const VALID = {
-    token: 'opaque-signed-token-value',
     score: 9,
     reason: 'Ótimo atendimento',
     highlight: 'A viagem ao Japão',
@@ -57,20 +58,25 @@ test('rejeita score como string', () => {
     assert.equal(result.success, false);
 });
 
-test('rejeita token ausente', () => {
-    const { token: _t, ...without } = VALID;
-    const result = SubmitNpsBodySchema.safeParse(without);
-    assert.equal(result.success, false);
+test('o corpo não carrega o token: um token enviado no body é descartado', () => {
+    const result = SubmitNpsBodySchema.safeParse({ ...VALID, token: 'opaque-signed-token-value' });
+    assert.equal(result.success, true);
+    if (result.success) {
+        assert.equal('token' in result.data, false);
+    }
 });
 
-test('rejeita token vazio', () => {
-    const result = SubmitNpsBodySchema.safeParse({ ...VALID, token: '' });
-    assert.equal(result.success, false);
+test('token do cookie: aceita valor opaco', () => {
+    assert.equal(NpsInviteTokenSchema.safeParse('opaque.signed-token').success, true);
 });
 
-test('rejeita token acima de 4096 chars', () => {
-    const result = SubmitNpsBodySchema.safeParse({ ...VALID, token: 'a'.repeat(4097) });
-    assert.equal(result.success, false);
+test('token do cookie: rejeita vazio ou só espaços', () => {
+    assert.equal(NpsInviteTokenSchema.safeParse('').success, false);
+    assert.equal(NpsInviteTokenSchema.safeParse('   ').success, false);
+});
+
+test('token do cookie: rejeita acima de 4096 chars', () => {
+    assert.equal(NpsInviteTokenSchema.safeParse('a'.repeat(4097)).success, false);
 });
 
 test('aceita reason vazia e normaliza para string vazia', () => {

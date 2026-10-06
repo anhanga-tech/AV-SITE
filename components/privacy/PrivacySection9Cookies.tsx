@@ -13,7 +13,7 @@ export function PrivacySection9Cookies() {
                 </ul>
                 <h3 className="font-merriweather font-semibold">9.2 Categorias de Cookies e Bases Legais</h3>
                 <ul className="list-disc pl-6 space-y-1">
-                    <li><strong>Essenciais:</strong> Necessários para o funcionamento básico do website. Não dependem de consentimento</li>
+                    <li><strong>Essenciais:</strong> Necessários para o funcionamento básico do website. Não dependem de consentimento. Inclui os cookies <code>nps_invite</code> e <code>nps_invite_name</code>, criados apenas quando o cliente abre o link de avaliação pós-viagem: guardam o convite e o primeiro nome usado na saudação, para que esses dados não fiquem no endereço da página, e são apagados ao enviar a avaliação ou em até 2 (duas) horas</li>
                     <li><strong>Funcionais:</strong> Melhoram a funcionalidade e personalização</li>
                     <li><strong>Analíticos:</strong> Coletam eventos de uso do website com remoção de IP no servidor intermediário (ver Seção 4.2) e identificadores pseudonimizados. Quando não existe um cookie legado do Google, podemos criar o cookie próprio <code>anhanga_ga_cid</code>, com duração de até 2 (dois) anos; se o titular enviar um formulário, esse identificador pode ser registrado junto ao cadastro no CRM para atribuição e correlação operacional. Tratados com base no <strong>legítimo interesse</strong> da controladora (Art. 7º, IX, LGPD), com direito de oposição garantido (ver Seção 9.4)</li>
                     <li><strong>Atribuição de campanhas:</strong> O cookie próprio <code>tracking_data</code> armazena parâmetros de campanha por até 30 (trinta) dias para mensuração de conversões</li>

@@ -4,6 +4,7 @@ import {
   normalizeAgentPath,
   requestsMarkdown,
 } from '../lib/agent-readiness';
+import { handleNpsInviteRequest } from '../lib/nps-invite-redirect';
 
 interface PagesContext {
   request: Request;
@@ -39,6 +40,13 @@ export const onRequest = async ({ request, next, env }: PagesContext): Promise<R
 
   if (isUnsupportedDiscoveryPath(pathname)) {
     return notFoundResponse();
+  }
+
+  // Must answer before the static /nps/ HTML (and the Zaraz Pageview it
+  // boots) ever sees the invite token in the URL — issue #1666.
+  const npsInviteRedirect = await handleNpsInviteRequest(request);
+  if (npsInviteRedirect) {
+    return npsInviteRedirect;
   }
 
   if (request.method !== 'GET' || !requestsMarkdown(request.headers.get('Accept'))) {

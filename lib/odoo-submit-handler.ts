@@ -31,7 +31,7 @@ export interface CreateOdooSubmitHandlerOptions<TData> {
     rateLimit: CreateSubmitHandlerOptions<TData, OdooLeadInput>['rateLimit'];
     parse: { invalidJsonError: string };
     methodNotAllowedError: string;
-    validate: (rawBody: unknown) => MaybeAsyncValidationResult<TData>;
+    validate: (rawBody: unknown, request: Request) => MaybeAsyncValidationResult<TData>;
     /** Per-form adapter: validated data → normalized Odoo input. */
     buildInput: (data: TData) => OdooLeadInput;
     success: { status: number; message?: string };

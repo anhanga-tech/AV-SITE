@@ -6,10 +6,11 @@ import {
 } from '../lib/n8n-submit-handler';
 import { createOdooSubmitHandler } from '../lib/odoo-submit-handler';
 import { leadInputFromSubmitNps } from '../lib/odoo-lead-mapping';
-import { SubmitNpsBodySchema, type SubmitNpsRequest } from '../lib/schemas/submit-nps';
+import { NpsInviteTokenSchema, SubmitNpsBodySchema, type SubmitNpsRequest } from '../lib/schemas/submit-nps';
 import { cleanString } from '../lib/lead-logic';
 import { getNpsInviteSecret, verifyNpsInviteToken } from '../lib/nps-invite';
 import { consumeNpsInviteOnce, releaseNpsInvite } from '../lib/nps-invite-replay';
+import { buildClearedNpsInviteCookies, NPS_INVITE_TOKEN_COOKIE, readCookie } from '../lib/nps-invite-cookie';
 import { logger } from '../lib/logger';
 import { z } from 'zod';
 
@@ -19,12 +20,12 @@ const ODOO_ERROR_PATTERN = /^ODOO_ERROR:(\d+):(.*)$/s;
 // "tampered" to the caller would help an attacker probe the invitation
 // scheme (issue #1137). A real customer just needs to know to ask for a new link.
 const INVALID_INVITE_ERROR = 'Link de avaliação inválido ou expirado. Solicite um novo link.';
+const MISSING_INVITE_ERROR = 'Link de avaliação ausente ou inválido.';
 const INVITE_EMAIL_SCHEMA = z.email().max(254);
 
 function mapNpsZodError(error: z.ZodError): string {
     const issue = error.issues[0];
     const path = issue?.path[0];
-    if (path === 'token') return 'Link de avaliação ausente ou inválido.';
     if (path === 'score') return 'Nota deve ser um número inteiro entre 0 e 10.';
     if (path === 'reason') return 'O motivo da nota é obrigatório (máximo 2000 caracteres).';
     if (path === 'highlight') return 'Momento marcante deve ter no máximo 2000 caracteres.';
@@ -34,17 +35,26 @@ function mapNpsZodError(error: z.ZodError): string {
 /**
  * Verifies the signed NPS invitation before trusting any identity: signature,
  * expiry, and single-use replay (issue #1137). Identity (firstname/email) is
- * read from the verified payload, never from the request body.
+ * read from the verified payload, never from the request body. The token is
+ * read only from the invite cookie — a `token` in the body is ignored, so the
+ * page never has a reason to hold the credential (issue #1666).
  */
-async function validateNpsSubmission(rawBody: unknown): Promise<ValidationResult<SubmitNpsRequest>> {
+async function validateNpsSubmission(rawBody: unknown, request: Request): Promise<ValidationResult<SubmitNpsRequest>> {
     const parsed = SubmitNpsBodySchema.safeParse(rawBody);
     if (!parsed.success) {
         return { ok: false, error: mapNpsZodError(parsed.error) };
     }
 
+    const tokenParsed = NpsInviteTokenSchema.safeParse(
+        readCookie(request.headers.get('cookie'), NPS_INVITE_TOKEN_COOKIE) ?? '',
+    );
+    if (!tokenParsed.success) {
+        return { ok: false, error: MISSING_INVITE_ERROR };
+    }
+
     // checkExtraConfig (below) already guarantees this is set before validate runs.
     const secret = getNpsInviteSecret()!;
-    const verification = await verifyNpsInviteToken(parsed.data.token, secret);
+    const verification = await verifyNpsInviteToken(tokenParsed.data, secret);
     if (!verification.valid) {
         logger.warn('SUBMIT_NPS: invitation rejected', { reason: verification.reason });
         return { ok: false, error: INVALID_INVITE_ERROR };
@@ -100,7 +110,7 @@ export function classifySubmitNpsError(error: unknown): N8nErrorClassification {
     return classifyN8nSubmitError(error, NPS_ERROR_OPTIONS);
 }
 
-export default createOdooSubmitHandler({
+const submitNpsHandler = createOdooSubmitHandler({
     logScope: 'SUBMIT_NPS',
     config: {
         missingStatus: 500,
@@ -130,3 +140,19 @@ export default createOdooSubmitHandler({
         await releaseNpsInvite(data.jti);
     },
 });
+
+/**
+ * On success the invite is spent (single-use), so drop both cookies: the
+ * readable first-name cookie is PII with no further purpose, and a reload
+ * should show "link inválido" rather than a form the server will refuse.
+ */
+export default async function handler(request: Request): Promise<Response> {
+    const response = await submitNpsHandler(request);
+    if (response.status === 201) {
+        const secure = new URL(request.url).protocol === 'https:';
+        for (const cookie of buildClearedNpsInviteCookies(secure)) {
+            response.headers.append('Set-Cookie', cookie);
+        }
+    }
+    return response;
+}

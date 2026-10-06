@@ -34,20 +34,31 @@ function nextClientIp(): string {
     return `127.${(requestCounter >> 16) & 0xff}.${(requestCounter >> 8) & 0xff}.${requestCounter & 0xff}`;
 }
 
+// O token do convite viaja no cookie HttpOnly `nps_invite`, não no corpo (issue #1666).
+// Os testes descrevem a submissão como `{ token, score, ... }` por legibilidade; este
+// helper move o `token` para o cabeçalho Cookie, como o navegador faria.
 function buildRequest(
     body: Record<string, unknown> | string,
-    init?: { headers?: Record<string, string>; method?: string },
+    init?: { headers?: Record<string, string>; method?: string; url?: string },
 ): Request {
     const method = init?.method ?? 'POST';
+    let payload: Record<string, unknown> | string = body;
+    const cookieHeaders: Record<string, string> = {};
+    if (typeof body !== 'string' && 'token' in body) {
+        const { token, ...rest } = body;
+        payload = rest;
+        cookieHeaders.Cookie = `nps_invite=${encodeURIComponent(String(token))}`;
+    }
 
-    return new Request('http://localhost/api/submit-nps', {
+    return new Request(init?.url ?? 'http://localhost/api/submit-nps', {
         method,
         headers: {
             'Content-Type': 'application/json',
             'x-real-ip': nextClientIp(),
+            ...cookieHeaders,
             ...init?.headers,
         },
-        body: method === 'OPTIONS' || method === 'GET' ? undefined : typeof body === 'string' ? body : JSON.stringify(body),
+        body: method === 'OPTIONS' || method === 'GET' ? undefined : typeof payload === 'string' ? payload : JSON.stringify(payload),
     });
 }
 
@@ -145,6 +156,55 @@ test('submit-nps returns 400 for missing token', async (t) => {
 
     assert.equal(response.status, 400);
     assert.equal(json.code, 'VALIDATION_ERROR');
+});
+
+test('submit-nps ignores a token sent in the body — the credential is only read from the cookie', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    setNpsInviteEnv();
+    const mock = createOdooMock();
+    global.fetch = mock.fetch;
+
+    const response = await handler(new Request('http://localhost/api/submit-nps', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-real-ip': nextClientIp() },
+        body: JSON.stringify(await validBody()),
+    }));
+    const json = await response.json() as Record<string, unknown>;
+
+    assert.equal(response.status, 400);
+    assert.equal(json.code, 'VALIDATION_ERROR');
+    assert.equal(mock.partnerFields(), undefined, 'no Odoo write without the invite cookie');
+});
+
+test('submit-nps clears both invite cookies once the invite is spent', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    setNpsInviteEnv();
+    global.fetch = createOdooMock().fetch;
+
+    const response = await handler(buildRequest(await validBody(), { url: 'https://www.anhanga.tur.br/api/submit-nps' }));
+    assert.equal(response.status, 201);
+
+    const cookies = response.headers.getSetCookie();
+    const tokenCookie = cookies.find((c) => c.startsWith('nps_invite='));
+    const nameCookie = cookies.find((c) => c.startsWith('nps_invite_name='));
+    assert.match(tokenCookie ?? '', /Max-Age=0/);
+    assert.match(tokenCookie ?? '', /Path=\/api\/submit-nps/);
+    assert.match(tokenCookie ?? '', /Secure/);
+    assert.match(nameCookie ?? '', /Max-Age=0/);
+    assert.match(nameCookie ?? '', /Path=\/nps/);
+});
+
+test('submit-nps keeps the invite cookies when the submission fails, so the customer can retry', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    setNpsInviteEnv();
+    global.fetch = createOdooMock().fetch;
+
+    const response = await handler(buildRequest(await validBody({ score: 11 })));
+    assert.equal(response.status, 400);
+    assert.deepEqual(response.headers.getSetCookie(), []);
 });
 
 test('submit-nps returns 400 for score below 0', async (t) => {
@@ -543,14 +603,7 @@ test('submit-nps enforces rate limit after 3 requests from the same IP', async (
     const uniqueIp = `10.${Math.floor(Math.random() * 254) + 1}.${Math.floor(Math.random() * 254) + 1}.1`;
 
     async function buildRateLimitRequest() {
-        return new Request('http://localhost/api/submit-nps', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-real-ip': uniqueIp,
-            },
-            body: JSON.stringify(await validBody()),
-        });
+        return buildRequest(await validBody(), { headers: { 'x-real-ip': uniqueIp } });
     }
 
     const r1 = await handler(await buildRateLimitRequest());
@@ -581,15 +634,8 @@ test('submit-nps enforces rate-limit even for invalid payloads (DoS protection)'
 
     const uniqueIp = `10.${Math.floor(Math.random() * 254) + 1}.${Math.floor(Math.random() * 254) + 1}.4`;
 
-    async function buildFixedRequest(body: unknown, valid: boolean) {
-        return new Request('http://localhost/api/submit-nps', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-real-ip': uniqueIp,
-            },
-            body: JSON.stringify(valid ? await validBody() : body),
-        });
+    async function buildFixedRequest(body: Record<string, unknown>, valid: boolean) {
+        return buildRequest(valid ? await validBody() : body, { headers: { 'x-real-ip': uniqueIp } });
     }
 
     // 3 invalid requests should consume the bucket (limit is 3)
@@ -599,6 +645,6 @@ test('submit-nps enforces rate-limit even for invalid payloads (DoS protection)'
     }
 
     // 4th request should be rate limited, even if it would be valid
-    const limitResponse = await handler(await buildFixedRequest(null, true));
+    const limitResponse = await handler(await buildFixedRequest({}, true));
     assert.equal(limitResponse.status, 429, 'should be rate limited after 3 invalid attempts');
 });

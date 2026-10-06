@@ -1,6 +1,5 @@
 import type { FormEvent } from 'react';
 import { useState, useEffect, useRef, useSyncExternalStore } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { BRAND_LOGO_WHITE_URL } from '../lib/media-assets';
 import { NpsTextarea } from '../components/nps/NpsTextarea';
 import { NpsScoreSelector } from '../components/nps/NpsScoreSelector';
@@ -9,6 +8,7 @@ import { NpsThankOther } from '../components/nps/NpsThankOther';
 import { Seo } from '../components/Seo';
 import { useAntiBot } from '../hooks/useAntiBot';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
+import { NPS_INVITE_NAME_COOKIE, readCookie } from '../lib/nps-invite-cookie';
 import { isFieldCompleteForAnalytics, validateNpsFormFields, type NpsFormFieldErrors } from '../lib/form-v1-validation';
 
 type PageState = 'form' | 'thank-promoter' | 'thank-other';
@@ -16,9 +16,9 @@ type PageState = 'form' | 'thank-promoter' | 'thank-other';
 /*
   "Já estamos no cliente?" como fonte externa, não como estado sincronizado por efeito.
 
-  O prerender de /nps roda sem query string (scripts/prerender.mjs renderiza a rota crua),
-  então `token` é sempre vazio lá. Sem este gate o HTML estático nasceria com o bloco
-  "Link inválido" — e quem abre /nps/?token=... com link VÁLIDO veria justamente essa
+  O prerender de /nps roda sem cookies (scripts/prerender.mjs renderiza a rota crua),
+  então lá nunca há convite. Sem este gate o HTML estático nasceria com o bloco
+  "Link inválido" — e quem chega a /nps/ com convite VÁLIDO veria justamente essa
   mensagem até o React assumir (o marcador `/nps` casa com o pathname, então a página
   hidrata de verdade).
 
@@ -36,6 +36,17 @@ type PageState = 'form' | 'thank-promoter' | 'thank-other';
 const subscribeToNothing = () => () => {};
 const getIsClientSnapshot = () => true;
 const getIsServerSnapshot = () => false;
+
+/*
+  O convite não vem mais da URL (issue #1666): a borda troca `?token=` por cookies e
+  redireciona para /nps/ limpo antes de o Zaraz disparar o Pageview (ver
+  lib/nps-invite-redirect.ts). O token fica num cookie HttpOnly que esta página nem
+  consegue ler; o que chega aqui é só o primeiro nome do convite verificado, e a presença
+  desse cookie é o sinal de "há convite". `null` = sem convite; `''` = convite sem nome.
+  Mesmo gate do `mounted`: no servidor e na hidratação vale `null`, casando com a casca.
+*/
+const getInviteNameSnapshot = () => readCookie(document.cookie, NPS_INVITE_NAME_COOKIE);
+const getServerInviteNameSnapshot = () => null;
 
 const PAGE_STYLES = `
   .nps-cta {
@@ -89,18 +100,25 @@ const PAGE_STYLES = `
 `;
 
 export default function NpsPage() {
-  const [params] = useSearchParams();
   // Identity is bound server-side to the signed invitation token (issue
   // #1137) — `firstname` here is display-only (the greeting) and never sent
-  // to the API; the token is the only thing that proves who is answering.
-  const firstname = params.get('firstname')?.trim() ?? '';
-  const token = params.get('token')?.trim() ?? '';
+  // to the API; the token cookie is the only thing that proves who is answering.
+  const inviteName = useSyncExternalStore(
+    subscribeToNothing,
+    getInviteNameSnapshot,
+    getServerInviteNameSnapshot
+  );
+  const hasInvite = inviteName !== null;
+  const firstname = inviteName?.trim() ?? '';
 
   const [score, setScore] = useState<number | null>(null);
   const [reason, setReason] = useState('');
   const [highlight, setHighlight] = useState('');
   const [pageState, setPageState] = useState<PageState>('form');
   const [submitting, setSubmitting] = useState(false);
+  // O sucesso apaga os cookies do convite (já gasto), então o nome do agradecimento é
+  // guardado no envio — o snapshot do cookie volta a `null` no render seguinte.
+  const [thanksName, setThanksName] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [fieldErrors, setFieldErrors] = useState<NpsFormFieldErrors>({});
   // O ano fica fora do HTML estático, mesmo padrão do Footer compartilhado
@@ -186,8 +204,8 @@ export default function NpsPage() {
       const res = await fetch('/api/submit-nps', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        // O token vai no cookie HttpOnly `nps_invite` (same-origin, enviado pelo navegador).
         body: JSON.stringify({
-          token,
           score: validation.normalized.score,
           reason: reason.trim(),
           highlight: highlight.trim(),
@@ -207,6 +225,7 @@ export default function NpsPage() {
         formType: 'nps',
         formId: 'post-trip-nps',
       });
+      setThanksName(firstname);
       setPageState(validation.normalized.score >= 9 ? 'thank-promoter' : 'thank-other');
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : 'Erro inesperado. Tente novamente.');
@@ -247,16 +266,17 @@ export default function NpsPage() {
         <main className="flex-1 flex flex-col items-center px-6 pb-16 pt-8">
           <div className="w-full max-w-lg">
 
-            {mounted && !token && (
+            {mounted && !hasInvite && pageState === 'form' && (
               <div className="nps-thank-card text-center">
                 <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3">Link inválido</h1>
                 <p className="text-base text-slate-400 leading-7">
-                  Este link de avaliação não é válido ou já expirou. Solicite um novo link à nossa equipe.
+                  Este link de avaliação não é válido ou já expirou. Abra novamente o link do e-mail
+                  ou solicite um novo à nossa equipe.
                 </p>
               </div>
             )}
 
-            {mounted && token && pageState === 'form' && (
+            {mounted && hasInvite && pageState === 'form' && (
               <form onSubmit={(e) => void handleSubmit(e)} noValidate>
                 {/* Honeypot: hidden from humans, blind form-fillers populate it. */}
                 <input {...honeypotProps} />
@@ -369,10 +389,10 @@ export default function NpsPage() {
             )}
 
             {pageState === 'thank-promoter' && (
-              <NpsThankPromoter firstname={firstname} />
+              <NpsThankPromoter firstname={thanksName} />
             )}
             {pageState === 'thank-other' && (
-              <NpsThankOther firstname={firstname} />
+              <NpsThankOther firstname={thanksName} />
             )}
 
           </div>

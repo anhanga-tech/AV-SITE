@@ -15,7 +15,7 @@ import NpsPage from '../pages/NpsPage.tsx';
 // (ver o gate de `mounted` em pages/NpsPage.tsx e tests/nps-prerender-neutral.test.ts).
 // Um renderizador de servidor nunca roda efeitos, então continuaria medindo a casca
 // estática e não o que o respondente de fato vê.
-function renderNpsPage(path: string): string {
+function renderNpsPage(path = '/nps/'): string {
   const { container } = render(
     React.createElement(
       MemoryRouter,
@@ -26,27 +26,51 @@ function renderNpsPage(path: string): string {
   return container.innerHTML;
 }
 
+// O convite chega como cookie, não na URL (issue #1666): a borda guarda o token num
+// cookie HttpOnly e deixa para a página só o primeiro nome verificado, em `nps_invite_name`.
+function setInviteNameCookie(value: string) {
+  document.cookie = `nps_invite_name=${encodeURIComponent(value)}`;
+}
+
 test.afterEach(() => {
   cleanup();
+  document.cookie = 'nps_invite_name=; Max-Age=0';
 });
 
-test('NpsPage shows an invalid-link state and no form when the token is missing', () => {
-  const html = renderNpsPage('/nps?firstname=Ana');
+test('NpsPage shows an invalid-link state and no form when there is no invite cookie', () => {
+  const html = renderNpsPage();
 
   assert.match(html, /Link inválido/);
   assert.doesNotMatch(html, /id="nps-reason"/);
 });
 
-test('NpsPage renders the score form when a token is present, with no identity inputs', () => {
+test('NpsPage ignores token/firstname in the URL — the edge strips them before the page loads', () => {
   const html = renderNpsPage('/nps?firstname=Ana&token=some-signed-token');
+
+  assert.match(html, /Link inválido/);
+  assert.doesNotMatch(html, /Ana/);
+});
+
+test('NpsPage renders the score form when an invite cookie is present, with no identity inputs', () => {
+  setInviteNameCookie('Ana');
+  const html = renderNpsPage();
 
   assert.doesNotMatch(html, /id="nps-firstname"/);
   assert.doesNotMatch(html, /id="nps-email"/);
   assert.match(html, /id="nps-reason"/);
 });
 
-test('NpsPage greets by the display-only firstname param without trusting it as identity', () => {
-  const html = renderNpsPage('/nps?firstname=Ana&token=some-signed-token');
+test('NpsPage greets by the verified first name from the invite cookie', () => {
+  setInviteNameCookie('Ana');
+  const html = renderNpsPage();
 
   assert.match(html, /Olá, Ana!/);
+});
+
+test('NpsPage still renders the form for an invite without a name', () => {
+  setInviteNameCookie('');
+  const html = renderNpsPage();
+
+  assert.match(html, /Olá!/);
+  assert.match(html, /id="nps-reason"/);
 });

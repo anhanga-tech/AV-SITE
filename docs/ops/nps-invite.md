@@ -20,6 +20,50 @@ identity from the verified token, never from the request body.
   side effect, then uses the token's `email`/`firstname` — the request body
   only ever carries `score`/`reason`/`highlight`.
 
+## The token never stays in the URL (issue #1666)
+
+The token is a bearer credential **and** reversible PII (the payload is
+`base64url` JSON with the e-mail and first name, not encrypted). Zaraz's
+automatic Pageview fires before any page code runs and sends the page URL —
+query string included — to GA4 as `page_location`; the Cloudflare Web
+Analytics beacon and Traks also record the page. A client-side
+`history.replaceState` would be too late.
+
+So the edge handles the link before any HTML is served:
+
+1. `functions/[[path]].ts` → `lib/nps-invite-redirect.ts` intercepts
+   `GET /nps?token=…` (also strips the legacy `firstname`/`email` params).
+2. It verifies the token (signature + expiry, not replay) and answers
+   **303 → `/nps/`** with the query removed (UTMs are kept), `Cache-Control:
+   no-store` and `Referrer-Policy: no-referrer`. A redirect has no HTML, so no
+   tag runs on it, and the next page's `document.referrer` is the mail client,
+   not the tokenized URL.
+3. The same response sets two cookies (`lib/nps-invite-cookie.ts`), both
+   `SameSite=Strict`, `Secure` on HTTPS, `Max-Age` = 2h capped at the invite's
+   expiry:
+   - `nps_invite` — the token, `HttpOnly`, `Path=/api/submit-nps`. Page JS and
+     tag scripts can't read it; it is only sent to the submit endpoint.
+   - `nps_invite_name` — the first name **from the verified payload**, readable
+     by the page for the greeting, `Path=/nps`. Its presence is how the page
+     tells "has invite" from "invalid link".
+4. `/api/submit-nps` reads the token **only** from the `nps_invite` cookie (a
+   `token` in the body is ignored) and clears both cookies on success.
+
+An invalid or expired link still redirects to a clean `/nps/`, clearing any
+previous invite cookies, and the page shows "Link inválido". Reopening the
+e-mail link after the 2h cookie window re-issues the cookies while the invite
+itself is still valid.
+
+`pnpm dev` mirrors the redirect through a Vite plugin (`vite.config.ts`,
+`npsInviteDevPlugin`), so local testing and the e2e suite exercise the same flow.
+
+What remains: the edge still receives the tokenized URL on that first request
+— that is the hosting itself (Cloudflare, operator 2.1 of the transfer
+matrix), and the Sentry request URL is scrubbed by `scrubEventUrls`. Making the
+token opaque (random id, e-mail/name only server-side) would also stop it being
+reversible PII for anyone who sees the link (e.g. the e-mail provider); not done
+yet because it needs server-side invite storage.
+
 ## Generating a link
 
 Run once a trip is completed (manually, or wired into whatever ops workflow
@@ -32,11 +76,12 @@ pnpm tsx scripts/generate-nps-invite.ts --email cliente@example.com --firstname 
 Prints the token and a ready-to-send URL, e.g.:
 
 ```
-https://www.anhanga.tur.br/nps?token=<token>&firstname=Ana
+https://www.anhanga.tur.br/nps?token=<token>
 ```
 
-`firstname` in the URL is display-only (the page's greeting) — it is never
-trusted as identity; only the verified token payload is.
+Don't add `firstname` (or anything else identifying) to the link: the greeting
+name comes from the verified token payload, and the edge strips identity params
+from the URL anyway.
 
 ## Distribution
 
