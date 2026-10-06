@@ -5,6 +5,7 @@ import { NpsTextarea } from '../components/nps/NpsTextarea';
 import { NpsScoreSelector } from '../components/nps/NpsScoreSelector';
 import { NpsThankPromoter } from '../components/nps/NpsThankPromoter';
 import { NpsThankOther } from '../components/nps/NpsThankOther';
+import { NpsInvalidLink } from '../components/nps/NpsInvalidLink';
 import { Seo } from '../components/Seo';
 import { useAntiBot } from '../hooks/useAntiBot';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
@@ -266,15 +267,7 @@ export default function NpsPage() {
         <main className="flex-1 flex flex-col items-center px-6 pb-16 pt-8">
           <div className="w-full max-w-lg">
 
-            {mounted && !hasInvite && pageState === 'form' && (
-              <div className="nps-thank-card text-center">
-                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3">Link inválido</h1>
-                <p className="text-base text-slate-400 leading-7">
-                  Este link de avaliação não é válido ou já expirou. Abra novamente o link do e-mail
-                  ou solicite um novo à nossa equipe.
-                </p>
-              </div>
-            )}
+            {mounted && !hasInvite && pageState === 'form' && <NpsInvalidLink />}
 
             {mounted && hasInvite && pageState === 'form' && (
               <form onSubmit={(e) => void handleSubmit(e)} noValidate>
