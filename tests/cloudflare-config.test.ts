@@ -312,25 +312,33 @@ test('Cloudflare Pages headers should exempt the Decap CMS OAuth popup flow from
   const headers = await readFile(new URL('../public/_headers', import.meta.url), 'utf8');
   const blockLines = collectHeadersBlockLines(headers);
 
-  // The OAuth popup Decap CMS opens from `/admin` navigates cross-origin to
+  // The OAuth popup Decap CMS opens from `/admin` (a static asset, so
+  // public/_headers applies to it) navigates cross-origin to
   // github.com/login/oauth/authorize (api/auth.ts) before GitHub redirects it
   // back to api/auth/callback.ts, which replies to the opener via
-  // `window.opener.postMessage(...)`. The global `same-origin` COOP above
-  // would permanently sever that `window.opener` reference the moment the
-  // popup leaves this origin — once severed, a browsing context group can
-  // never rejoin, even once the popup returns to a same-origin page — so the
-  // callback would always hit its `!window.opener` fallback branch and the
-  // CMS login would hang forever waiting for a reply that never arrives.
+  // `window.opener.postMessage(...)`. api/auth.ts and api/auth/callback.ts are
+  // Cloudflare Pages *Functions*, and Cloudflare's own docs confirm
+  // `_headers` rules are never applied to Function responses — only to
+  // static assets — so those two routes stay at the implicit `unsafe-none`
+  // default regardless of what this file says, and don't need (or get) an
+  // entry here. `/admin` is the one static route in this flow, and the
+  // global `same-origin` COOP above would permanently sever its popup's
+  // `window.opener` reference the moment the popup leaves this origin — once
+  // severed, a browsing context group can never rejoin, even once the popup
+  // returns to a same-origin Function response — so the callback would
+  // always hit its `!window.opener` fallback branch and the CMS login would
+  // hang forever waiting for a reply that never arrives.
   //
   // Cloudflare joins repeated header values with a comma rather than letting
   // a more specific path override a less specific one (confirmed against
   // Cloudflare's own docs), so re-declaring a different
-  // Cross-Origin-Opener-Policy value on these paths would not work — it
-  // would produce an invalid `same-origin, unsafe-none` header instead of
+  // Cross-Origin-Opener-Policy value on `/admin` would not work — it would
+  // produce an invalid `same-origin, unsafe-none` header instead of
   // overriding it. `! Cross-Origin-Opener-Policy` removes the inherited
-  // header outright, restoring the implicit `unsafe-none` default (the exact
-  // pre-existing behavior) on exactly the paths this flow touches.
-  const exemptPaths = ['/admin', '/admin/', '/admin/*', '/api/auth', '/api/auth/callback'];
+  // header outright, restoring the implicit `unsafe-none` default (matching
+  // what the callback Function already gets) on exactly the static paths
+  // this flow touches.
+  const exemptPaths = ['/admin', '/admin/', '/admin/*'];
 
   for (const path of exemptPaths) {
     const lines = blockLines.get(path);

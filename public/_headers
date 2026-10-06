@@ -22,12 +22,6 @@
 /admin/
   ! Cross-Origin-Opener-Policy
 
-/api/auth
-  ! Cross-Origin-Opener-Policy
-
-/api/auth/callback
-  ! Cross-Origin-Opener-Policy
-
 /nps
   X-Robots-Tag: noindex, nofollow
 
