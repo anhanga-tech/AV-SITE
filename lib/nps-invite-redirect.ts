@@ -3,7 +3,8 @@
  * reaches the HTML. The request is answered here with a 303 to a clean
  * `/nps/` that sets the invite cookies (see lib/nps-invite-cookie.ts), so
  * Zaraz's automatic Pageview, the Cloudflare Web Analytics beacon and Traks
- * only ever see the bare path. A redirect response carries no HTML, so no
+ * never see the token or the respondent's identity (campaign params such as
+ * `utm_*` are kept). A redirect response carries no HTML, so no
  * tag runs on it; and after a redirect `document.referrer` is the page that
  * linked here (the mail client), not the URL with the token.
  */
