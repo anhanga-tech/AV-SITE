@@ -137,8 +137,10 @@ export function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting, initial
                             onChange={(e) => update('nome', e.target.value)}
                             className={errors.nome ? 'has-error' : ''}
                             autoComplete="given-name"
+                            aria-invalid={errors.nome ? true : undefined}
+                            aria-describedby={errors.nome ? 'quiz-nome-error' : undefined}
                         />
-                        {errors.nome && <span className="quiz-err">{errors.nome}</span>}
+                        {errors.nome && <span id="quiz-nome-error" className="quiz-err" role="alert">{errors.nome}</span>}
                     </div>
 
                     <div className="quiz-field">
@@ -151,8 +153,10 @@ export function PreLeadScreen({ profile, onSubmit, onBack, isSubmitting, initial
                             onChange={(e) => update('email', e.target.value)}
                             className={errors.email ? 'has-error' : ''}
                             autoComplete="email"
+                            aria-invalid={errors.email ? true : undefined}
+                            aria-describedby={errors.email ? 'quiz-email-error' : undefined}
                         />
-                        {errors.email && <span className="quiz-err">{errors.email}</span>}
+                        {errors.email && <span id="quiz-email-error" className="quiz-err" role="alert">{errors.email}</span>}
                     </div>
 
                     <label className="quiz-check">
