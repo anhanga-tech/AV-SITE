@@ -36,7 +36,17 @@ function nextClientIp(): string {
 
 // O token do convite viaja no cookie HttpOnly `nps_invite`, não no corpo (issue #1666).
 // Os testes descrevem a submissão como `{ token, score, ... }` por legibilidade; este
-// helper move o `token` para o cabeçalho Cookie, como o navegador faria.
+// helper move o `token` para o cabeçalho Cookie, como o navegador faria, e — se o teste
+// não informar outro — preenche `inviteRef` com o `jti` do próprio token, como a página
+// faz a partir do cookie `nps_invite_info`.
+function jtiOf(token: string): string {
+    try {
+        return JSON.parse(Buffer.from(token.split('.')[0], 'base64url').toString('utf8')).jti ?? 'no-jti';
+    } catch {
+        return 'no-jti';
+    }
+}
+
 function buildRequest(
     body: Record<string, unknown> | string,
     init?: { headers?: Record<string, string>; method?: string; url?: string },
@@ -46,7 +56,7 @@ function buildRequest(
     const cookieHeaders: Record<string, string> = {};
     if (typeof body !== 'string' && 'token' in body) {
         const { token, ...rest } = body;
-        payload = rest;
+        payload = { inviteRef: jtiOf(String(token)), ...rest };
         cookieHeaders.Cookie = `nps_invite=${encodeURIComponent(String(token))}`;
     }
 
@@ -168,7 +178,8 @@ test('submit-nps ignores a token sent in the body — the credential is only rea
     const response = await handler(new Request('http://localhost/api/submit-nps', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-real-ip': nextClientIp() },
-        body: JSON.stringify(await validBody()),
+        // Everything a valid submission carries — except the cookie.
+        body: JSON.stringify(await validBody().then((body) => ({ ...body, inviteRef: jtiOf(body.token) }))),
     }));
     const json = await response.json() as Record<string, unknown>;
 
@@ -188,12 +199,50 @@ test('submit-nps clears both invite cookies once the invite is spent', async (t)
 
     const cookies = response.headers.getSetCookie();
     const tokenCookie = cookies.find((c) => c.startsWith('nps_invite='));
-    const nameCookie = cookies.find((c) => c.startsWith('nps_invite_name='));
+    const infoCookie = cookies.find((c) => c.startsWith('nps_invite_info='));
     assert.match(tokenCookie ?? '', /Max-Age=0/);
     assert.match(tokenCookie ?? '', /Path=\/api\/submit-nps/);
     assert.match(tokenCookie ?? '', /Secure/);
-    assert.match(nameCookie ?? '', /Max-Age=0/);
-    assert.match(nameCookie ?? '', /Path=\/nps/);
+    assert.match(infoCookie ?? '', /Max-Age=0/);
+    assert.match(infoCookie ?? '', /Path=\/nps/);
+});
+
+test('submit-nps refuses an invite cookie that belongs to another invite opened later in the same browser', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    setNpsInviteEnv();
+    const mock = createOdooMock();
+    global.fetch = mock.fetch;
+
+    // Tab A showed Ana's invite; then Bia's link was opened in the same browser and
+    // overwrote the cookie. Tab A's answers must not land on Bia's record.
+    const anaToken = await buildToken({ email: 'ana@example.com', firstname: 'Ana' });
+    const biaToken = await buildToken({ email: 'bia@example.com', firstname: 'Bia' });
+    const fromTabA = await handler(buildRequest({ token: biaToken, inviteRef: jtiOf(anaToken), score: 3, reason: '', highlight: '' }));
+    const json = await fromTabA.json() as Record<string, unknown>;
+
+    assert.equal(fromTabA.status, 400);
+    assert.match(String(json.error), /Outro link de avaliação/);
+    assert.equal(mock.partnerFields(), undefined, 'nothing written to the other customer');
+
+    // Bia's own invite was not burned by the refused attempt.
+    const fromTabB = await handler(buildRequest({ token: biaToken, score: 10, reason: '', highlight: '' }));
+    assert.equal(fromTabB.status, 201);
+});
+
+test('submit-nps keeps the invite cookies on the bot-decoy 201, which records nothing', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    setNpsInviteEnv();
+    const mock = createOdooMock();
+    global.fetch = mock.fetch;
+
+    // Submitted under the 2.5s timing threshold: answered with a decoy 201 before validation.
+    const response = await handler(buildRequest(await validBody({ elapsedMs: 500 })));
+
+    assert.equal(response.status, 201);
+    assert.equal(mock.partnerFields(), undefined, 'the decoy path writes nothing');
+    assert.deepEqual(response.headers.getSetCookie(), [], 'the customer must still be able to retry');
 });
 
 test('submit-nps keeps the invite cookies when the submission fails, so the customer can retry', async (t) => {

@@ -9,6 +9,10 @@ import { cleanString } from '../lead-logic';
 export const NpsInviteTokenSchema = z.string().trim().min(1).max(4096);
 
 export const SubmitNpsBodySchema = z.object({
+    // The invite `jti` the page saw at load (`nps_invite_info`). Not a
+    // credential: it binds this form to the invite whose cookie authorizes it,
+    // so a second invite opened in the same browser can't receive these answers.
+    inviteRef: z.string().trim().min(1).max(100),
     score:     z.number().int().min(0).max(10),
     reason:    z.string().trim().max(2000).default('').transform(cleanString),
     highlight: z.string().trim().max(2000).default('').transform(cleanString),

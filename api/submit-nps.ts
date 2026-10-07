@@ -21,11 +21,22 @@ const ODOO_ERROR_PATTERN = /^ODOO_ERROR:(\d+):(.*)$/s;
 // scheme (issue #1137). A real customer just needs to know to ask for a new link.
 const INVALID_INVITE_ERROR = 'Link de avaliação inválido ou expirado. Solicite um novo link.';
 const MISSING_INVITE_ERROR = 'Link de avaliação ausente ou inválido.';
+const SWITCHED_INVITE_ERROR =
+    'Outro link de avaliação foi aberto neste navegador depois deste. Abra novamente o link do seu e-mail para enviar.';
+
+/**
+ * Requests whose invite was verified and consumed. A 201 alone doesn't prove
+ * that: the shared handler answers bot hits (honeypot, fill under 2.5s) with a
+ * decoy 201 before validation, and clearing the cookies then would leave a
+ * fast human with a thank-you, no recorded rating and no way to retry.
+ */
+const consumedInviteRequests = new WeakSet<Request>();
 const INVITE_EMAIL_SCHEMA = z.email().max(254);
 
 function mapNpsZodError(error: z.ZodError): string {
     const issue = error.issues[0];
     const path = issue?.path[0];
+    if (path === 'inviteRef') return MISSING_INVITE_ERROR;
     if (path === 'score') return 'Nota deve ser um número inteiro entre 0 e 10.';
     if (path === 'reason') return 'O motivo da nota é obrigatório (máximo 2000 caracteres).';
     if (path === 'highlight') return 'Momento marcante deve ter no máximo 2000 caracteres.';
@@ -61,6 +72,10 @@ async function validateNpsSubmission(rawBody: unknown, request: Request): Promis
     }
 
     const { payload } = verification;
+    if (parsed.data.inviteRef !== payload.jti) {
+        logger.warn('SUBMIT_NPS: invite cookie belongs to another invite opened later');
+        return { ok: false, error: SWITCHED_INVITE_ERROR };
+    }
     const remainingTtlSeconds = Math.max(1, Math.floor((payload.exp - Date.now()) / 1000));
     const firstUse = await consumeNpsInviteOnce(payload.jti, remainingTtlSeconds);
     if (!firstUse) {
@@ -84,6 +99,8 @@ async function validateNpsSubmission(rawBody: unknown, request: Request): Promis
     if (!emailParsed.success) {
         return { ok: false, error: INVALID_INVITE_ERROR };
     }
+
+    consumedInviteRequests.add(request);
 
     return {
         ok: true,
@@ -142,13 +159,15 @@ const submitNpsHandler = createOdooSubmitHandler({
 });
 
 /**
- * On success the invite is spent (single-use), so drop both cookies: the
- * readable first-name cookie is PII with no further purpose, and a reload
- * should show "link inválido" rather than a form the server will refuse.
+ * Once the invite is spent (single-use), drop both cookies: the readable
+ * cookie carries the first name with no further purpose, and a reload should
+ * show "link inválido" rather than a form the server will refuse. Only a 201
+ * for a consumed invite counts — see consumedInviteRequests. A failed Odoo
+ * write releases the invite and answers 5xx, so it keeps the cookies too.
  */
 export default async function handler(request: Request): Promise<Response> {
     const response = await submitNpsHandler(request);
-    if (response.status === 201) {
+    if (response.status === 201 && consumedInviteRequests.has(request)) {
         const secure = new URL(request.url).protocol === 'https:';
         for (const cookie of buildClearedNpsInviteCookies(secure)) {
             response.headers.append('Set-Cookie', cookie);

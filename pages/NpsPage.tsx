@@ -9,7 +9,7 @@ import { NpsInvalidLink } from '../components/nps/NpsInvalidLink';
 import { Seo } from '../components/Seo';
 import { useAntiBot } from '../hooks/useAntiBot';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
-import { NPS_INVITE_NAME_COOKIE, readCookie } from '../lib/nps-invite-cookie';
+import { NPS_INVITE_INFO_COOKIE, parseNpsInviteInfo, readCookie, type NpsInviteInfo } from '../lib/nps-invite-cookie';
 import { isFieldCompleteForAnalytics, validateNpsFormFields, type NpsFormFieldErrors } from '../lib/form-v1-validation';
 
 type PageState = 'form' | 'thank-promoter' | 'thank-other';
@@ -42,12 +42,22 @@ const getIsServerSnapshot = () => false;
   O convite não vem mais da URL (issue #1666): a borda troca `?token=` por cookies e
   redireciona para /nps/ limpo antes de o Zaraz disparar o Pageview (ver
   lib/nps-invite-redirect.ts). O token fica num cookie HttpOnly que esta página nem
-  consegue ler; o que chega aqui é só o primeiro nome do convite verificado, e a presença
-  desse cookie é o sinal de "há convite". `null` = sem convite; `''` = convite sem nome.
-  Mesmo gate do `mounted`: no servidor e na hidratação vale `null`, casando com a casca.
+  consegue ler; o que chega aqui é o `nps_invite_info` (primeiro nome + `ref` do convite),
+  e a presença dele é o sinal de "há convite". Mesmo gate do `mounted`: no servidor e na
+  hidratação vale `null`, casando com a casca.
+
+  A leitura é congelada na primeira vez, por montagem: se outro convite for aberto neste
+  navegador, o cookie muda, mas esta aba continua enviando o `ref` do convite que ela
+  mostrou — e o servidor recusa em vez de gravar as respostas no cadastro errado.
 */
-const getInviteNameSnapshot = () => readCookie(document.cookie, NPS_INVITE_NAME_COOKIE);
-const getServerInviteNameSnapshot = () => null;
+function createInviteSnapshot(): () => NpsInviteInfo | null {
+  let info: NpsInviteInfo | null | undefined;
+  return () => {
+    if (info === undefined) info = parseNpsInviteInfo(readCookie(document.cookie, NPS_INVITE_INFO_COOKIE));
+    return info;
+  };
+}
+const getServerInviteSnapshot = () => null;
 
 const PAGE_STYLES = `
   .nps-cta {
@@ -104,22 +114,16 @@ export default function NpsPage() {
   // Identity is bound server-side to the signed invitation token (issue
   // #1137) — `firstname` here is display-only (the greeting) and never sent
   // to the API; the token cookie is the only thing that proves who is answering.
-  const inviteName = useSyncExternalStore(
-    subscribeToNothing,
-    getInviteNameSnapshot,
-    getServerInviteNameSnapshot
-  );
-  const hasInvite = inviteName !== null;
-  const firstname = inviteName?.trim() ?? '';
+  const [getInviteSnapshot] = useState(createInviteSnapshot);
+  const invite = useSyncExternalStore(subscribeToNothing, getInviteSnapshot, getServerInviteSnapshot);
+  const hasInvite = invite !== null;
+  const firstname = invite?.name.trim() ?? '';
 
   const [score, setScore] = useState<number | null>(null);
   const [reason, setReason] = useState('');
   const [highlight, setHighlight] = useState('');
   const [pageState, setPageState] = useState<PageState>('form');
   const [submitting, setSubmitting] = useState(false);
-  // O sucesso apaga os cookies do convite (já gasto), então o nome do agradecimento é
-  // guardado no envio — o snapshot do cookie volta a `null` no render seguinte.
-  const [thanksName, setThanksName] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [fieldErrors, setFieldErrors] = useState<NpsFormFieldErrors>({});
   // O ano fica fora do HTML estático, mesmo padrão do Footer compartilhado
@@ -207,6 +211,7 @@ export default function NpsPage() {
         headers: { 'Content-Type': 'application/json' },
         // O token vai no cookie HttpOnly `nps_invite` (same-origin, enviado pelo navegador).
         body: JSON.stringify({
+          inviteRef: invite?.ref ?? '',
           score: validation.normalized.score,
           reason: reason.trim(),
           highlight: highlight.trim(),
@@ -226,7 +231,6 @@ export default function NpsPage() {
         formType: 'nps',
         formId: 'post-trip-nps',
       });
-      setThanksName(firstname);
       setPageState(validation.normalized.score >= 9 ? 'thank-promoter' : 'thank-other');
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : 'Erro inesperado. Tente novamente.');
@@ -382,10 +386,10 @@ export default function NpsPage() {
             )}
 
             {pageState === 'thank-promoter' && (
-              <NpsThankPromoter firstname={thanksName} />
+              <NpsThankPromoter firstname={firstname} />
             )}
             {pageState === 'thank-other' && (
-              <NpsThankOther firstname={thanksName} />
+              <NpsThankOther firstname={firstname} />
             )}
 
           </div>

@@ -13,18 +13,23 @@
  *  - `nps_invite`: the token. `HttpOnly` (page JS and tag scripts can't read
  *    it), `SameSite=Strict` (a cross-site page can't submit on the
  *    customer's behalf), `Path=/api/submit-nps` (sent nowhere else).
- *  - `nps_invite_name`: the first name from the verified payload, readable by
- *    the page for the greeting. Its presence is also how the page tells "has
- *    an invite" from "invalid link". `Path=/nps`, same lifetime.
+ *  - `nps_invite_info`: readable by the page, `Path=/nps`, same lifetime. JSON
+ *    with the first name from the verified payload (the greeting) and the
+ *    invite's `jti` as `ref`. Its presence is how the page tells "has an
+ *    invite" from "invalid link". The page freezes `ref` at load and sends it
+ *    with the submission: opening a second invite in the same browser
+ *    overwrites `nps_invite`, and without that check the first tab's answers
+ *    would be written to the second customer's record. `jti` is a random
+ *    UUID — not a credential (the signature is) and not personal data.
  *
  * Shared by the edge redirect, the submit handler and the page, so it must
  * stay free of server-only imports.
  */
 
 export const NPS_INVITE_TOKEN_COOKIE = 'nps_invite';
-export const NPS_INVITE_NAME_COOKIE = 'nps_invite_name';
+export const NPS_INVITE_INFO_COOKIE = 'nps_invite_info';
 export const NPS_INVITE_TOKEN_COOKIE_PATH = '/api/submit-nps';
-export const NPS_INVITE_NAME_COOKIE_PATH = '/nps';
+export const NPS_INVITE_INFO_COOKIE_PATH = '/nps';
 
 /**
  * Long enough to fill the form after opening the e-mail, short enough that a
@@ -53,8 +58,14 @@ function serializeCookie(name: string, value: string, options: CookieOptions): s
     return parts.join('; ');
 }
 
+export interface NpsInviteInfo {
+    /** The invite's `jti`; empty when the edge couldn't verify the token. */
+    ref: string;
+    name: string;
+}
+
 export function buildNpsInviteCookies(
-    params: { token: string; firstname: string; maxAgeSeconds: number },
+    params: { token: string; info: NpsInviteInfo; maxAgeSeconds: number },
     secure: boolean,
 ): string[] {
     return [
@@ -64,8 +75,8 @@ export function buildNpsInviteCookies(
             httpOnly: true,
             secure,
         }),
-        serializeCookie(NPS_INVITE_NAME_COOKIE, params.firstname, {
-            path: NPS_INVITE_NAME_COOKIE_PATH,
+        serializeCookie(NPS_INVITE_INFO_COOKIE, JSON.stringify(params.info), {
+            path: NPS_INVITE_INFO_COOKIE_PATH,
             maxAgeSeconds: params.maxAgeSeconds,
             httpOnly: false,
             secure,
@@ -74,7 +85,7 @@ export function buildNpsInviteCookies(
 }
 
 export function buildClearedNpsInviteCookies(secure: boolean): string[] {
-    return buildNpsInviteCookies({ token: '', firstname: '', maxAgeSeconds: 0 }, secure);
+    return buildNpsInviteCookies({ token: '', info: { ref: '', name: '' }, maxAgeSeconds: 0 }, secure);
 }
 
 /** Reads one cookie from a `Cookie` header or `document.cookie` string. */
@@ -91,4 +102,18 @@ export function readCookie(cookieHeader: string | null | undefined, name: string
         }
     }
     return null;
+}
+
+/** Parses `nps_invite_info`; `null` when absent or not the shape the edge writes. */
+export function parseNpsInviteInfo(value: string | null): NpsInviteInfo | null {
+    if (value === null) return null;
+    try {
+        const parsed: unknown = JSON.parse(value);
+        if (!parsed || typeof parsed !== 'object') return null;
+        const { ref, name } = parsed as Record<string, unknown>;
+        if (typeof ref !== 'string' || typeof name !== 'string') return null;
+        return { ref, name };
+    } catch {
+        return null;
+    }
 }

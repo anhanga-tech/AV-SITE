@@ -43,11 +43,20 @@ So the edge handles the link before any HTML is served:
    expiry:
    - `nps_invite` — the token, `HttpOnly`, `Path=/api/submit-nps`. Page JS and
      tag scripts can't read it; it is only sent to the submit endpoint.
-   - `nps_invite_name` — the first name **from the verified payload**, readable
-     by the page for the greeting, `Path=/nps`. Its presence is how the page
-     tells "has invite" from "invalid link".
+   - `nps_invite_info` — JSON with the first name **from the verified payload**
+     (the greeting) and the invite's `jti` as `ref`, readable by the page,
+     `Path=/nps`. Its presence is how the page tells "has invite" from
+     "invalid link".
 4. `/api/submit-nps` reads the token **only** from the `nps_invite` cookie (a
-   `token` in the body is ignored) and clears both cookies on success.
+   `token` in the body is ignored). The body carries `inviteRef`, the `ref` the
+   page read **when it loaded**; it must match the token's `jti`. Opening a
+   second invite in the same browser overwrites the `nps_invite` cookie, and
+   without that check the first tab's answers would be written to the second
+   customer's record — the server refuses instead, without spending either
+   invite.
+5. Both cookies are cleared only after a submission that really consumed the
+   invite. The bot-decoy `201` (honeypot, or a submit under 2.5s) records
+   nothing and keeps them, so the customer can retry.
 
 An invalid or expired link still redirects to a clean `/nps/`, clearing any
 previous invite cookies, and the page shows "Link inválido". Reopening the

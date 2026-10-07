@@ -27,14 +27,14 @@ function renderNpsPage(path = '/nps/'): string {
 }
 
 // O convite chega como cookie, não na URL (issue #1666): a borda guarda o token num
-// cookie HttpOnly e deixa para a página só o primeiro nome verificado, em `nps_invite_name`.
-function setInviteNameCookie(value: string) {
-  document.cookie = `nps_invite_name=${encodeURIComponent(value)}`;
+// cookie HttpOnly e deixa para a página só `nps_invite_info` (primeiro nome + ref).
+function setInviteInfoCookie(name: string, ref = 'invite-ref-1') {
+  document.cookie = `nps_invite_info=${encodeURIComponent(JSON.stringify({ ref, name }))}`;
 }
 
 test.afterEach(() => {
   cleanup();
-  document.cookie = 'nps_invite_name=; Max-Age=0';
+  document.cookie = 'nps_invite_info=; Max-Age=0';
 });
 
 test('NpsPage shows an invalid-link state and no form when there is no invite cookie', () => {
@@ -52,7 +52,7 @@ test('NpsPage ignores token/firstname in the URL — the edge strips them before
 });
 
 test('NpsPage renders the score form when an invite cookie is present, with no identity inputs', () => {
-  setInviteNameCookie('Ana');
+  setInviteInfoCookie('Ana');
   const html = renderNpsPage();
 
   assert.doesNotMatch(html, /id="nps-firstname"/);
@@ -61,14 +61,14 @@ test('NpsPage renders the score form when an invite cookie is present, with no i
 });
 
 test('NpsPage greets by the verified first name from the invite cookie', () => {
-  setInviteNameCookie('Ana');
+  setInviteInfoCookie('Ana');
   const html = renderNpsPage();
 
   assert.match(html, /Olá, Ana!/);
 });
 
 test('NpsPage still renders the form for an invite without a name', () => {
-  setInviteNameCookie('');
+  setInviteInfoCookie('');
   const html = renderNpsPage();
 
   assert.match(html, /Olá!/);

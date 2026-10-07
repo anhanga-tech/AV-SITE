@@ -9,6 +9,7 @@ import { NpsInviteTokenSchema, SubmitNpsBodySchema } from '../lib/schemas/submit
 // either — it travels in the HttpOnly invite cookie (issue #1666) and is
 // shape-checked on its own by NpsInviteTokenSchema.
 const VALID = {
+    inviteRef: '6f1c2a9e-0000-4000-8000-000000000000',
     score: 9,
     reason: 'Ótimo atendimento',
     highlight: 'A viagem ao Japão',
@@ -64,6 +65,12 @@ test('o corpo não carrega o token: um token enviado no body é descartado', () 
     if (result.success) {
         assert.equal('token' in result.data, false);
     }
+});
+
+test('rejeita inviteRef ausente ou vazio', () => {
+    const { inviteRef: _r, ...without } = VALID;
+    assert.equal(SubmitNpsBodySchema.safeParse(without).success, false);
+    assert.equal(SubmitNpsBodySchema.safeParse({ ...VALID, inviteRef: '' }).success, false);
 });
 
 test('token do cookie: aceita valor opaco', () => {

@@ -52,14 +52,16 @@ async function resolveInviteCookies(token: string, secure: boolean): Promise<str
         // that message instead of a misleading "invalid link".
         logger.warn('NPS_INVITE_REDIRECT: NPS_INVITE_SECRET missing, invite not verified');
         return buildNpsInviteCookies(
-            { token, firstname: '', maxAgeSeconds: NPS_INVITE_COOKIE_MAX_AGE_SECONDS },
+            { token, info: { ref: '', name: '' }, maxAgeSeconds: NPS_INVITE_COOKIE_MAX_AGE_SECONDS },
             secure,
         );
     }
 
+    // No log on rejection: this is a public, un-rate-limited route, and warn
+    // output reaches Sentry — a stream of `/nps?token=junk` would flood it.
+    // Rejections that matter are logged by /api/submit-nps, behind its rate limit.
     const verification = await verifyNpsInviteToken(token, secret);
     if (!verification.valid) {
-        logger.warn('NPS_INVITE_REDIRECT: invitation rejected', { reason: verification.reason });
         return buildClearedNpsInviteCookies(secure);
     }
 
@@ -67,7 +69,7 @@ async function resolveInviteCookies(token: string, secure: boolean): Promise<str
     return buildNpsInviteCookies(
         {
             token,
-            firstname: verification.payload.firstname.trim(),
+            info: { ref: verification.payload.jti, name: verification.payload.firstname.trim() },
             maxAgeSeconds: Math.min(NPS_INVITE_COOKIE_MAX_AGE_SECONDS, remainingSeconds),
         },
         secure,

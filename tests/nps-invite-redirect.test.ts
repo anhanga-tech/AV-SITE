@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { handleNpsInviteRequest, isNpsInviteRequest } from '../lib/nps-invite-redirect.ts';
 import { createNpsInviteToken } from '../lib/nps-invite.ts';
-import { readCookie } from '../lib/nps-invite-cookie.ts';
+import { parseNpsInviteInfo, readCookie } from '../lib/nps-invite-cookie.ts';
 
 // Issue #1666: the invite token is a bearer credential AND reversible PII
 // (base64url JSON with e-mail + first name). Zaraz's automatic Pageview ships
@@ -72,14 +72,18 @@ test('the token moves to an HttpOnly, SameSite=Strict cookie scoped to the submi
     assert.match(attrs, /Max-Age=7200/);
 });
 
+function payloadJti(token: string): string {
+    return JSON.parse(Buffer.from(token.split('.')[0], 'base64url').toString('utf8')).jti;
+}
+
 test('the greeting name comes from the verified payload, not from the firstname param', async (t) => {
     withSecret(t);
     const token = await validToken();
 
     const response = (await handleNpsInviteRequest(new Request(`${ORIGIN}/nps?token=${token}&firstname=Hacker`)))!;
 
-    assert.equal(cookieValue(response, 'nps_invite_name'), 'Maria');
-    const attrs = cookieAttributes(response, 'nps_invite_name');
+    assert.deepEqual(parseNpsInviteInfo(cookieValue(response, 'nps_invite_info')), { ref: payloadJti(token), name: 'Maria' });
+    const attrs = cookieAttributes(response, 'nps_invite_info');
     assert.doesNotMatch(attrs, /HttpOnly/, 'the page reads this one for the greeting');
     assert.match(attrs, /Path=\/nps(;|$)/);
 });
@@ -104,7 +108,7 @@ test('a tampered, expired or malformed invite still redirects clean but clears t
         assert.equal(response.status, 303);
         assert.equal(response.headers.get('Location'), '/nps/');
         assert.match(cookieAttributes(response, 'nps_invite'), /Max-Age=0/);
-        assert.match(cookieAttributes(response, 'nps_invite_name'), /Max-Age=0/);
+        assert.match(cookieAttributes(response, 'nps_invite_info'), /Max-Age=0/);
     }
 });
 
@@ -131,7 +135,7 @@ test('without NPS_INVITE_SECRET the token is still taken off the URL', async () 
 
     assert.equal(response.headers.get('Location'), '/nps/');
     assert.equal(cookieValue(response, 'nps_invite'), 'abc.def');
-    assert.equal(cookieValue(response, 'nps_invite_name'), '');
+    assert.deepEqual(parseNpsInviteInfo(cookieValue(response, 'nps_invite_info')), { ref: '', name: '' });
 });
 
 test('plain-HTTP local dev drops the Secure flag so the browser keeps the cookies', async (t) => {

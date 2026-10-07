@@ -33,6 +33,7 @@ export interface ApiEndpointDefinition {
     method: string;
     summary: string;
     description: string;
+    parameters?: JsonSchema[];
     requestBody?: OpenApiRequestBody;
     responses: Record<string, OpenApiResponseDefinition>;
 }
@@ -223,17 +224,25 @@ const API_ENDPOINTS: readonly ApiEndpointDefinition[] = [
         anchor: `${SITE_ORIGIN}/api/submit-nps`,
         method: 'post',
         summary: 'Submit a post-trip NPS rating',
-        description: 'Accepts a Net Promoter Score submission from a returning traveller and forwards the sanitized payload to the configured downstream webhook.',
+        description: 'Accepts a Net Promoter Score submission from a traveller holding a signed invitation and records it on their CRM contact. The invitation travels in the HttpOnly `nps_invite` cookie set when the invite link is opened, never in the body; identity is taken from that verified invitation. `inviteRef` must match the invitation in the cookie.',
+        parameters: [
+            {
+                name: 'nps_invite',
+                in: 'cookie',
+                required: true,
+                description: 'Signed, single-use invitation token, set by the `/nps?token=` redirect.',
+                schema: { type: 'string', maxLength: 4096 },
+            },
+        ],
         requestBody: {
             required: true,
             content: {
                 'application/json': {
                     schema: {
                         type: 'object',
-                        required: ['firstname', 'email', 'score'],
+                        required: ['inviteRef', 'score'],
                         properties: {
-                            firstname: { type: 'string' },
-                            email: { type: 'string', format: 'email' },
+                            inviteRef: { type: 'string', maxLength: 100 },
                             score: { type: 'integer', minimum: 0, maximum: 10 },
                             reason: { type: 'string', maxLength: 2000 },
                             highlight: { type: 'string', maxLength: 2000 },
@@ -247,7 +256,7 @@ const API_ENDPOINTS: readonly ApiEndpointDefinition[] = [
             '201': buildJsonResponse('NPS submission accepted.', SUBMIT_SUCCESS_SCHEMA),
             '400': buildJsonResponse('Invalid NPS payload.', ERROR_RESPONSE_SCHEMA),
             '429': buildJsonResponse('Rate limit exceeded.', ERROR_RESPONSE_SCHEMA),
-            '502': buildJsonResponse('Downstream webhook failure.', ERROR_RESPONSE_SCHEMA),
+            '502': buildJsonResponse('CRM integration failure.', ERROR_RESPONSE_SCHEMA),
             '500': buildJsonResponse('Server or upstream integration failure.', ERROR_RESPONSE_SCHEMA),
         },
     },
@@ -434,6 +443,7 @@ export function buildOpenApiPaths(endpoints: readonly ApiEndpointDefinition[]): 
             [endpoint.method]: {
                 summary: endpoint.summary,
                 description: endpoint.description,
+                ...(endpoint.parameters ? { parameters: endpoint.parameters } : {}),
                 requestBody: endpoint.requestBody,
                 responses: endpoint.responses,
             },
@@ -525,7 +535,7 @@ Accepts first-party waitlist registrations for campaign-specific landing pages.
 
 ### POST /api/submit-nps
 
-Accepts post-trip Net Promoter Score submissions from returning travellers.
+Accepts post-trip Net Promoter Score submissions from travellers holding a signed invitation (HttpOnly \`nps_invite\` cookie).
 
 ### POST /api/submit-contact
 
