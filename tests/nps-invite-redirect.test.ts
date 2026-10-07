@@ -146,10 +146,21 @@ test('plain-HTTP local dev drops the Secure flag so the browser keeps the cookie
     assert.doesNotMatch(cookieAttributes(response, 'nps_invite'), /Secure/);
 });
 
+test('path casing and trailing slashes do not bypass the redirect', async (t) => {
+    withSecret(t);
+    const token = await validToken();
+    for (const path of ['/NPS', '/Nps/', '/nps//', '/nps/index.html']) {
+        const response = await handleNpsInviteRequest(new Request(`${ORIGIN}${path}?token=${token}`));
+        assert.equal(response?.status, 303, `${path} must redirect`);
+        assert.equal(response?.headers.get('Location'), '/nps/');
+    }
+});
+
 test('requests that are not an invite link pass through untouched', () => {
     assert.equal(isNpsInviteRequest(new Request(`${ORIGIN}/nps/`)), false);
     assert.equal(isNpsInviteRequest(new Request(`${ORIGIN}/nps/?utm_source=email`)), false);
     assert.equal(isNpsInviteRequest(new Request(`${ORIGIN}/blog/?token=x`)), false);
+    assert.equal(isNpsInviteRequest(new Request(`${ORIGIN}/npsx?token=x`)), false);
     assert.equal(isNpsInviteRequest(new Request(`${ORIGIN}/nps?token=x`, { method: 'POST' })), false);
     assert.equal(isNpsInviteRequest(new Request(`${ORIGIN}/nps?token=x`, { method: 'HEAD' })), true);
 });

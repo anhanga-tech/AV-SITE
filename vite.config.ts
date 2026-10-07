@@ -163,7 +163,8 @@ function npsInviteDevPlugin() {
     configureServer(server: { middlewares: { use: (handler: (req: IncomingMessage, res: ServerResponse, next: (error?: Error) => void) => void | Promise<void>) => void } }) {
       server.middlewares.use(async (req, res, next) => {
         const pathname = new URL(req.url || '/', 'http://vite.local').pathname;
-        if (pathname !== '/nps' && pathname !== '/nps/') {
+        // Cheap prefilter; handleNpsInviteRequest does the exact (case-insensitive) match.
+        if (!pathname.toLowerCase().startsWith('/nps')) {
           next();
           return;
         }

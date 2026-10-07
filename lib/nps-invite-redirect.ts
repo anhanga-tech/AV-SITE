@@ -16,7 +16,7 @@ import {
 import { getNpsInviteSecret, verifyNpsInviteToken } from './nps-invite';
 import { logger } from './logger';
 
-const NPS_PATHS = new Set(['/nps', '/nps/']);
+const NPS_PATHS = new Set(['/nps', '/nps/index.html']);
 const NPS_CLEAN_PATH = '/nps/';
 const MAX_TOKEN_LENGTH = 4096;
 
@@ -30,7 +30,11 @@ const SENSITIVE_PARAMS = ['token', 'firstname', 'email'] as const;
 export function isNpsInviteRequest(request: Request): boolean {
     if (request.method !== 'GET' && request.method !== 'HEAD') return false;
     const url = new URL(request.url);
-    if (!NPS_PATHS.has(url.pathname)) return false;
+    // Normalized like App.tsx's ClientFeatures: React Router matches routes
+    // case-insensitively and with or without trailing slash, and the 404 HTML
+    // that `/NPS?token=…` falls back to boots Zaraz just the same.
+    const pathname = url.pathname.toLowerCase().replace(/\/+$/, '') || '/';
+    if (!NPS_PATHS.has(pathname)) return false;
     return SENSITIVE_PARAMS.some((param) => url.searchParams.has(param));
 }
 
