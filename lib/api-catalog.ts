@@ -33,7 +33,6 @@ export interface ApiEndpointDefinition {
     method: string;
     summary: string;
     description: string;
-    parameters?: JsonSchema[];
     requestBody?: OpenApiRequestBody;
     responses: Record<string, OpenApiResponseDefinition>;
 }
@@ -224,16 +223,7 @@ const API_ENDPOINTS: readonly ApiEndpointDefinition[] = [
         anchor: `${SITE_ORIGIN}/api/submit-nps`,
         method: 'post',
         summary: 'Submit a post-trip NPS rating',
-        description: 'Accepts a Net Promoter Score submission from a traveller holding a signed invitation and records it on their CRM contact. Opening the invite link sets the invitation in an HttpOnly `nps_invite_<ref>` cookie and redirects to `/nps/?i=<ref>`; the body\'s `inviteRef` is that `ref` and selects the cookie. The token never travels in the body, and identity is taken from the verified invitation.',
-        parameters: [
-            {
-                name: 'nps_invite_<inviteRef>',
-                in: 'cookie',
-                required: true,
-                description: 'Signed, single-use invitation token, set by the `/nps?token=` redirect. The cookie name carries the `inviteRef` from the body.',
-                schema: { type: 'string', maxLength: 4096 },
-            },
-        ],
+        description: 'Accepts a Net Promoter Score submission from a traveller holding a signed invitation and records it on their CRM contact. Browser-only: opening the invite link sets the invitation in an HttpOnly cookie named `nps_invite_<ref>` and redirects to `/nps/?i=<ref>`; the body\'s `inviteRef` is that `ref`, and the request must carry the matching cookie. The cookie name is per invite, so it is not declared as a fixed OpenAPI cookie parameter. The token never travels in the body, and identity is taken from the verified invitation.',
         requestBody: {
             required: true,
             content: {
@@ -443,7 +433,6 @@ export function buildOpenApiPaths(endpoints: readonly ApiEndpointDefinition[]): 
             [endpoint.method]: {
                 summary: endpoint.summary,
                 description: endpoint.description,
-                ...(endpoint.parameters ? { parameters: endpoint.parameters } : {}),
                 requestBody: endpoint.requestBody,
                 responses: endpoint.responses,
             },

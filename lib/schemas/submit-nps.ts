@@ -4,8 +4,8 @@ import { cleanString } from '../lead-logic';
 // Wire-format body: identity (firstname/email) is never trusted from the
 // request — it is read from the verified, signed invitation token instead
 // (issue #1137). The token itself is not in the body either: it arrives in the
-// HttpOnly `nps_invite` cookie the edge set when it stripped it from the URL
-// (issue #1666, lib/nps-invite-cookie.ts). See api/submit-nps.ts.
+// HttpOnly `nps_invite_<inviteRef>` cookie the edge set when it stripped it from
+// the URL (issue #1666, lib/nps-invite-cookie.ts). See api/submit-nps.ts.
 export const NpsInviteTokenSchema = z.string().trim().min(1).max(4096);
 
 export const SubmitNpsBodySchema = z.object({
