@@ -2,8 +2,8 @@ import { expect, test, type Request } from '@playwright/test';
 
 // The invite link is `/nps?token=…`. The token is a bearer credential and
 // reversible PII, so the edge (lib/nps-invite-redirect.ts, mirrored by the
-// Vite dev plugin) must swap it for cookies and land on a clean /nps/ before
-// any analytics tag sees the URL — issue #1666.
+// Vite dev plugin) must swap it for cookies and land on a clean /nps/?i=<ref>
+// before any analytics tag sees the URL — issue #1666.
 const FAKE_TOKEN = 'fake-signed-token';
 
 function leaksInvite(request: Request): boolean {
@@ -55,8 +55,10 @@ test.describe('NPS form', () => {
 
     await page.goto(`/nps?firstname=Ana&token=${FAKE_TOKEN}`);
 
-    await expect(page).toHaveURL(/\/nps\/$/);
+    // The clean URL carries only the random tab ref that names this invite's cookies.
+    await expect(page).toHaveURL(/\/nps\/\?i=[a-f0-9]{32}$/);
     expect(page.url()).not.toContain(FAKE_TOKEN);
+    const tabRef = new URL(page.url()).searchParams.get('i');
     await expect(page.locator('#nps-firstname')).toHaveCount(0);
     await expect(page.locator('#nps-email')).toHaveCount(0);
     // The dev server has no NPS_INVITE_SECRET to verify the fake token, so there
@@ -67,7 +69,8 @@ test.describe('NPS form', () => {
     await page.getByRole('button', { name: /^Enviar avaliação$/i }).click();
 
     await expect(page.getByText(/Enviar avaliação/i)).toHaveCount(0);
-    expect(submittedCookie).toContain(`nps_invite=${FAKE_TOKEN}`);
+    expect(submittedCookie).toContain(`nps_invite_${tabRef}=${FAKE_TOKEN}`);
+    expect(submittedBody?.inviteRef).toBe(tabRef);
     expect(submittedBody?.score).toBe(10);
     expect(submittedBody).not.toHaveProperty('token');
     expect(submittedBody).not.toHaveProperty('firstname');

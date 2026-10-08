@@ -10,7 +10,7 @@ import { NpsInviteTokenSchema, SubmitNpsBodySchema, type SubmitNpsRequest } from
 import { cleanString } from '../lib/lead-logic';
 import { getNpsInviteSecret, verifyNpsInviteToken } from '../lib/nps-invite';
 import { consumeNpsInviteOnce, releaseNpsInvite } from '../lib/nps-invite-replay';
-import { buildClearedNpsInviteCookies, NPS_INVITE_TOKEN_COOKIE, readCookie } from '../lib/nps-invite-cookie';
+import { buildClearedNpsInviteCookies, npsInviteTokenCookieName, readCookie } from '../lib/nps-invite-cookie';
 import { logger } from '../lib/logger';
 import { z } from 'zod';
 
@@ -21,16 +21,15 @@ const ODOO_ERROR_PATTERN = /^ODOO_ERROR:(\d+):(.*)$/s;
 // scheme (issue #1137). A real customer just needs to know to ask for a new link.
 const INVALID_INVITE_ERROR = 'Link de avaliação inválido ou expirado. Solicite um novo link.';
 const MISSING_INVITE_ERROR = 'Link de avaliação ausente ou inválido.';
-const SWITCHED_INVITE_ERROR =
-    'Outro link de avaliação foi aberto neste navegador depois deste. Abra novamente o link do seu e-mail para enviar.';
 
 /**
- * Requests whose invite was verified and consumed. A 201 alone doesn't prove
- * that: the shared handler answers bot hits (honeypot, fill under 2.5s) with a
- * decoy 201 before validation, and clearing the cookies then would leave a
- * fast human with a thank-you, no recorded rating and no way to retry.
+ * Requests whose invite was verified and consumed, mapped to their tab ref. A
+ * 201 alone doesn't prove that: the shared handler answers bot hits
+ * (honeypot, fill under 2.5s) with a decoy 201 before validation, and
+ * clearing the cookies then would leave a fast human with a thank-you, no
+ * recorded rating and no way to retry.
  */
-const consumedInviteRequests = new WeakSet<Request>();
+const consumedInviteRefs = new WeakMap<Request, string>();
 const INVITE_EMAIL_SCHEMA = z.email().max(254);
 
 function mapNpsZodError(error: z.ZodError): string {
@@ -48,7 +47,9 @@ function mapNpsZodError(error: z.ZodError): string {
  * expiry, and single-use replay (issue #1137). Identity (firstname/email) is
  * read from the verified payload, never from the request body. The token is
  * read only from the invite cookie — a `token` in the body is ignored, so the
- * page never has a reason to hold the credential (issue #1666).
+ * page never has a reason to hold the credential (issue #1666). The body's
+ * `inviteRef` is the tab ref from the page URL; it picks which invite cookie
+ * this form belongs to, so several invites open in one browser never mix.
  */
 async function validateNpsSubmission(rawBody: unknown, request: Request): Promise<ValidationResult<SubmitNpsRequest>> {
     const parsed = SubmitNpsBodySchema.safeParse(rawBody);
@@ -57,7 +58,7 @@ async function validateNpsSubmission(rawBody: unknown, request: Request): Promis
     }
 
     const tokenParsed = NpsInviteTokenSchema.safeParse(
-        readCookie(request.headers.get('cookie'), NPS_INVITE_TOKEN_COOKIE) ?? '',
+        readCookie(request.headers.get('cookie'), npsInviteTokenCookieName(parsed.data.inviteRef)) ?? '',
     );
     if (!tokenParsed.success) {
         return { ok: false, error: MISSING_INVITE_ERROR };
@@ -72,10 +73,6 @@ async function validateNpsSubmission(rawBody: unknown, request: Request): Promis
     }
 
     const { payload } = verification;
-    if (parsed.data.inviteRef !== payload.jti) {
-        logger.warn('SUBMIT_NPS: invite cookie belongs to another invite opened later');
-        return { ok: false, error: SWITCHED_INVITE_ERROR };
-    }
     const remainingTtlSeconds = Math.max(1, Math.floor((payload.exp - Date.now()) / 1000));
     const firstUse = await consumeNpsInviteOnce(payload.jti, remainingTtlSeconds);
     if (!firstUse) {
@@ -100,7 +97,7 @@ async function validateNpsSubmission(rawBody: unknown, request: Request): Promis
         return { ok: false, error: INVALID_INVITE_ERROR };
     }
 
-    consumedInviteRequests.add(request);
+    consumedInviteRefs.set(request, parsed.data.inviteRef);
 
     return {
         ok: true,
@@ -159,7 +156,7 @@ const submitNpsHandler = createOdooSubmitHandler({
 });
 
 /**
- * Once the invite is spent (single-use), drop both cookies: the readable
+ * Once the invite is spent (single-use), drop that tab's cookie pair: the readable
  * cookie carries the first name with no further purpose, and a reload should
  * show "link inválido" rather than a form the server will refuse. Only a 201
  * for a consumed invite counts — see consumedInviteRequests. A failed Odoo
@@ -167,9 +164,10 @@ const submitNpsHandler = createOdooSubmitHandler({
  */
 export default async function handler(request: Request): Promise<Response> {
     const response = await submitNpsHandler(request);
-    if (response.status === 201 && consumedInviteRequests.has(request)) {
+    const consumedRef = consumedInviteRefs.get(request);
+    if (response.status === 201 && consumedRef) {
         const secure = new URL(request.url).protocol === 'https:';
-        for (const cookie of buildClearedNpsInviteCookies(secure)) {
+        for (const cookie of buildClearedNpsInviteCookies(consumedRef, secure)) {
             response.headers.append('Set-Cookie', cookie);
         }
     }

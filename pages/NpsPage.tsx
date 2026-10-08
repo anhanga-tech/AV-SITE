@@ -9,7 +9,7 @@ import { NpsInvalidLink } from '../components/nps/NpsInvalidLink';
 import { Seo } from '../components/Seo';
 import { useAntiBot } from '../hooks/useAntiBot';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
-import { NPS_INVITE_INFO_COOKIE, parseNpsInviteInfo, readCookie, type NpsInviteInfo } from '../lib/nps-invite-cookie';
+import { isNpsInviteRef, NPS_INVITE_REF_PARAM, npsInviteInfoCookieName, parseNpsInviteInfo, readCookie } from '../lib/nps-invite-cookie';
 import { isFieldCompleteForAnalytics, validateNpsFormFields, type NpsFormFieldErrors } from '../lib/form-v1-validation';
 
 type PageState = 'form' | 'thank-promoter' | 'thank-other';
@@ -40,21 +40,33 @@ const getIsServerSnapshot = () => false;
 
 /*
   O convite não vem mais da URL (issue #1666): a borda troca `?token=` por cookies e
-  redireciona para /nps/ limpo antes de o Zaraz disparar o Pageview (ver
-  lib/nps-invite-redirect.ts). O token fica num cookie HttpOnly que esta página nem
-  consegue ler; o que chega aqui é o `nps_invite_info` (primeiro nome + `ref` do convite),
-  e a presença dele é o sinal de "há convite". Mesmo gate do `mounted`: no servidor e na
-  hidratação vale `null`, casando com a casca.
-
-  A leitura é congelada na primeira vez, por montagem: se outro convite for aberto neste
-  navegador, o cookie muda, mas esta aba continua enviando o `ref` do convite que ela
-  mostrou — e o servidor recusa em vez de gravar as respostas no cadastro errado.
+  redireciona para /nps/?i=<ref> antes de o Zaraz disparar o Pageview (ver
+  lib/nps-invite-redirect.ts). `ref` é aleatório, gerado a cada redirect, e dá nome ao par
+  de cookies deste convite. O token fica no cookie HttpOnly, que esta página nem consegue
+  ler; o que chega aqui é `nps_invite_info_<ref>` (o primeiro nome), e a presença dele é o
+  sinal de "há convite". Como o `ref` vem da URL desta aba, dois convites abertos no mesmo
+  navegador — mesmo ao mesmo tempo — nunca trocam de cadastro. Mesmo gate do `mounted`: no
+  servidor e na hidratação vale `null`, casando com a casca.
 */
-function createInviteSnapshot(): () => NpsInviteInfo | null {
-  let info: NpsInviteInfo | null | undefined;
+interface PageInvite {
+  ref: string;
+  name: string;
+}
+
+function readPageInvite(): PageInvite | null {
+  const ref = new URLSearchParams(window.location.search).get(NPS_INVITE_REF_PARAM);
+  if (!isNpsInviteRef(ref)) return null;
+  const info = parseNpsInviteInfo(readCookie(document.cookie, npsInviteInfoCookieName(ref)));
+  return info ? { ref, name: info.name } : null;
+}
+
+// Congelado na primeira leitura, por montagem: o sucesso apaga os cookies, e o
+// agradecimento ainda precisa do nome.
+function createInviteSnapshot(): () => PageInvite | null {
+  let invite: PageInvite | null | undefined;
   return () => {
-    if (info === undefined) info = parseNpsInviteInfo(readCookie(document.cookie, NPS_INVITE_INFO_COOKIE));
-    return info;
+    if (invite === undefined) invite = readPageInvite();
+    return invite;
   };
 }
 const getServerInviteSnapshot = () => null;
@@ -209,7 +221,7 @@ export default function NpsPage() {
       const res = await fetch('/api/submit-nps', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // O token vai no cookie HttpOnly `nps_invite` (same-origin, enviado pelo navegador).
+        // O token vai no cookie HttpOnly `nps_invite_<ref>` (same-origin, enviado pelo navegador).
         body: JSON.stringify({
           inviteRef: invite?.ref ?? '',
           score: validation.normalized.score,

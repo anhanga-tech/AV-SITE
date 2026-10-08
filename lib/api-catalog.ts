@@ -224,13 +224,13 @@ const API_ENDPOINTS: readonly ApiEndpointDefinition[] = [
         anchor: `${SITE_ORIGIN}/api/submit-nps`,
         method: 'post',
         summary: 'Submit a post-trip NPS rating',
-        description: 'Accepts a Net Promoter Score submission from a traveller holding a signed invitation and records it on their CRM contact. The invitation travels in the HttpOnly `nps_invite` cookie set when the invite link is opened, never in the body; identity is taken from that verified invitation. `inviteRef` must match the invitation in the cookie.',
+        description: 'Accepts a Net Promoter Score submission from a traveller holding a signed invitation and records it on their CRM contact. Opening the invite link sets the invitation in an HttpOnly `nps_invite_<ref>` cookie and redirects to `/nps/?i=<ref>`; the body\'s `inviteRef` is that `ref` and selects the cookie. The token never travels in the body, and identity is taken from the verified invitation.',
         parameters: [
             {
-                name: 'nps_invite',
+                name: 'nps_invite_<inviteRef>',
                 in: 'cookie',
                 required: true,
-                description: 'Signed, single-use invitation token, set by the `/nps?token=` redirect.',
+                description: 'Signed, single-use invitation token, set by the `/nps?token=` redirect. The cookie name carries the `inviteRef` from the body.',
                 schema: { type: 'string', maxLength: 4096 },
             },
         ],
@@ -242,7 +242,7 @@ const API_ENDPOINTS: readonly ApiEndpointDefinition[] = [
                         type: 'object',
                         required: ['inviteRef', 'score'],
                         properties: {
-                            inviteRef: { type: 'string', maxLength: 100 },
+                            inviteRef: { type: 'string', pattern: '^[a-f0-9]{32}$' },
                             score: { type: 'integer', minimum: 0, maximum: 10 },
                             reason: { type: 'string', maxLength: 2000 },
                             highlight: { type: 'string', maxLength: 2000 },
@@ -535,7 +535,7 @@ Accepts first-party waitlist registrations for campaign-specific landing pages.
 
 ### POST /api/submit-nps
 
-Accepts post-trip Net Promoter Score submissions from travellers holding a signed invitation (HttpOnly \`nps_invite\` cookie).
+Accepts post-trip Net Promoter Score submissions from travellers holding a signed invitation (HttpOnly \`nps_invite_<ref>\` cookie).
 
 ### POST /api/submit-contact
 

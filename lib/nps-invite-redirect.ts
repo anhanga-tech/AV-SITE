@@ -1,17 +1,18 @@
 /**
  * Edge handoff for the NPS invite link (issue #1666): `/nps?token=…` never
  * reaches the HTML. The request is answered here with a 303 to a clean
- * `/nps/` that sets the invite cookies (see lib/nps-invite-cookie.ts), so
- * Zaraz's automatic Pageview, the Cloudflare Web Analytics beacon and Traks
- * never see the token or the respondent's identity (campaign params such as
- * `utm_*` are kept). A redirect response carries no HTML, so no
- * tag runs on it; and after a redirect `document.referrer` is the page that
+ * `/nps/?i=<tab ref>` that sets the invite cookies under that ref (see
+ * lib/nps-invite-cookie.ts), so Zaraz's automatic Pageview, the Cloudflare Web
+ * Analytics beacon and Traks never see the token or the respondent's identity
+ * (campaign params such as `utm_*` are kept; the tab ref is random). A
+ * redirect response carries no HTML, so no tag runs on it; and after a redirect `document.referrer` is the page that
  * linked here (the mail client), not the URL with the token.
  */
 import {
-    buildClearedNpsInviteCookies,
     buildNpsInviteCookies,
+    createNpsInviteRef,
     NPS_INVITE_COOKIE_MAX_AGE_SECONDS,
+    NPS_INVITE_REF_PARAM,
 } from './nps-invite-cookie';
 import { getNpsInviteSecret, verifyNpsInviteToken } from './nps-invite';
 import { logger } from './logger';
@@ -38,17 +39,32 @@ export function isNpsInviteRequest(request: Request): boolean {
     return SENSITIVE_PARAMS.some((param) => url.searchParams.has(param));
 }
 
-function buildCleanLocation(url: URL): string {
+/**
+ * The clean target. `ref`, when present, is the tab ref naming this redirect's
+ * cookie pair; an incoming `i` is dropped so a forwarded `/nps/?i=…` link can't
+ * point a new invite at someone else's cookies.
+ */
+function buildCleanLocation(url: URL, ref: string | null): string {
     const clean = new URLSearchParams(url.searchParams);
     for (const param of SENSITIVE_PARAMS) clean.delete(param);
+    clean.delete(NPS_INVITE_REF_PARAM);
+    if (ref) clean.set(NPS_INVITE_REF_PARAM, ref);
     const query = clean.toString();
     return query ? `${NPS_CLEAN_PATH}?${query}` : NPS_CLEAN_PATH;
 }
 
-async function resolveInviteCookies(token: string, secure: boolean): Promise<string[]> {
-    if (!token || token.length > MAX_TOKEN_LENGTH) {
-        return buildClearedNpsInviteCookies(secure);
-    }
+/**
+ * The cookie pair for this invite, or `null` when there is no usable token. An
+ * invalid link sets nothing and clears nothing: each invite lives under its own
+ * tab ref, so a bad or token-less link must not touch another invite the
+ * customer opened in another tab.
+ */
+async function resolveInviteCookies(
+    token: string,
+    ref: string,
+    secure: boolean,
+): Promise<string[] | null> {
+    if (!token || token.length > MAX_TOKEN_LENGTH) return null;
 
     const secret = getNpsInviteSecret();
     if (!secret) {
@@ -57,7 +73,7 @@ async function resolveInviteCookies(token: string, secure: boolean): Promise<str
         // that message instead of a misleading "invalid link".
         logger.warn('NPS_INVITE_REDIRECT: NPS_INVITE_SECRET missing, invite not verified');
         return buildNpsInviteCookies(
-            { token, info: { ref: '', name: '' }, maxAgeSeconds: NPS_INVITE_COOKIE_MAX_AGE_SECONDS },
+            { ref, token, info: { name: '' }, maxAgeSeconds: NPS_INVITE_COOKIE_MAX_AGE_SECONDS },
             secure,
         );
     }
@@ -66,15 +82,14 @@ async function resolveInviteCookies(token: string, secure: boolean): Promise<str
     // output reaches Sentry — a stream of `/nps?token=junk` would flood it.
     // Rejections that matter are logged by /api/submit-nps, behind its rate limit.
     const verification = await verifyNpsInviteToken(token, secret);
-    if (!verification.valid) {
-        return buildClearedNpsInviteCookies(secure);
-    }
+    if (!verification.valid) return null;
 
     const remainingSeconds = Math.floor((verification.payload.exp - Date.now()) / 1000);
     return buildNpsInviteCookies(
         {
+            ref,
             token,
-            info: { ref: verification.payload.jti, name: verification.payload.firstname.trim() },
+            info: { name: verification.payload.firstname.trim() },
             maxAgeSeconds: Math.min(NPS_INVITE_COOKIE_MAX_AGE_SECONDS, remainingSeconds),
         },
         secure,
@@ -87,15 +102,16 @@ export async function handleNpsInviteRequest(request: Request): Promise<Response
 
     const url = new URL(request.url);
     const token = url.searchParams.get('token')?.trim() ?? '';
-    const cookies = await resolveInviteCookies(token, url.protocol === 'https:');
+    const ref = createNpsInviteRef();
+    const cookies = await resolveInviteCookies(token, ref, url.protocol === 'https:');
 
     const headers = new Headers({
-        Location: buildCleanLocation(url),
+        Location: buildCleanLocation(url, cookies ? ref : null),
         'Cache-Control': 'no-store',
         'Referrer-Policy': 'no-referrer',
         'X-Robots-Tag': 'noindex, nofollow',
     });
-    for (const cookie of cookies) headers.append('Set-Cookie', cookie);
+    for (const cookie of cookies ?? []) headers.append('Set-Cookie', cookie);
 
     return new Response(null, { status: 303, headers });
 }

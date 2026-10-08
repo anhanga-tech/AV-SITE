@@ -20,13 +20,18 @@ function withSecret(t: { after: (fn: () => void) => void }) {
     });
 }
 
-async function validToken(overrides?: { expiresInMs?: number }) {
+async function validToken(overrides?: { firstname?: string; expiresInMs?: number }) {
     return createNpsInviteToken({ email: 'maria@example.com', firstname: 'Maria', ...overrides }, SECRET);
 }
 
 function decodedPayloadEmail(token: string): string {
     const [payload] = token.split('.');
     return JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')).email;
+}
+
+/** The tab ref the redirect put in the clean URL (`/nps/?i=…`), or null. */
+function refOf(response: Response): string | null {
+    return new URL(response.headers.get('Location') ?? '', ORIGIN).searchParams.get('i');
 }
 
 function cookieValue(response: Response, name: string): string | null {
@@ -38,33 +43,38 @@ function cookieAttributes(response: Response, name: string): string {
     return response.headers.getSetCookie().find((c) => c.startsWith(`${name}=`)) ?? '';
 }
 
+async function redirectFor(path: string): Promise<Response> {
+    const response = await handleNpsInviteRequest(new Request(`${ORIGIN}${path}`));
+    assert.ok(response, `${path} must be handled`);
+    return response;
+}
+
 test('a valid invite link redirects to a clean /nps/ with no token, name or e-mail in the Location', async (t) => {
     withSecret(t);
     const token = await validToken();
 
-    const response = await handleNpsInviteRequest(
-        new Request(`${ORIGIN}/nps?token=${encodeURIComponent(token)}&firstname=Maria`),
-    );
+    const response = await redirectFor(`/nps?token=${encodeURIComponent(token)}&firstname=Maria`);
 
-    assert.ok(response);
     assert.equal(response.status, 303);
     const location = response.headers.get('Location') ?? '';
-    assert.equal(location, '/nps/');
+    assert.match(location, /^\/nps\/\?i=[a-f0-9]{32}$/);
     assert.equal(location.includes(token.split('.')[0]), false);
     assert.equal(location.includes(decodedPayloadEmail(token)), false);
+    assert.equal(location.includes('Maria'), false);
     assert.equal(response.headers.get('Cache-Control'), 'no-store');
     assert.equal(response.headers.get('Referrer-Policy'), 'no-referrer');
     assert.equal(await response.text(), '', 'a redirect body has no HTML, so no tag can run on it');
 });
 
-test('the token moves to an HttpOnly, SameSite=Strict cookie scoped to the submit endpoint', async (t) => {
+test('the token moves to an HttpOnly, SameSite=Strict cookie named after the tab ref, scoped to the submit endpoint', async (t) => {
     withSecret(t);
     const token = await validToken();
 
-    const response = (await handleNpsInviteRequest(new Request(`${ORIGIN}/nps/?token=${token}`)))!;
+    const response = await redirectFor(`/nps/?token=${token}`);
+    const ref = refOf(response)!;
 
-    assert.equal(cookieValue(response, 'nps_invite'), token);
-    const attrs = cookieAttributes(response, 'nps_invite');
+    assert.equal(cookieValue(response, `nps_invite_${ref}`), token);
+    const attrs = cookieAttributes(response, `nps_invite_${ref}`);
     assert.match(attrs, /HttpOnly/);
     assert.match(attrs, /SameSite=Strict/);
     assert.match(attrs, /Secure/);
@@ -72,70 +82,77 @@ test('the token moves to an HttpOnly, SameSite=Strict cookie scoped to the submi
     assert.match(attrs, /Max-Age=7200/);
 });
 
-function payloadJti(token: string): string {
-    return JSON.parse(Buffer.from(token.split('.')[0], 'base64url').toString('utf8')).jti;
-}
-
 test('the greeting name comes from the verified payload, not from the firstname param', async (t) => {
     withSecret(t);
     const token = await validToken();
 
-    const response = (await handleNpsInviteRequest(new Request(`${ORIGIN}/nps?token=${token}&firstname=Hacker`)))!;
+    const response = await redirectFor(`/nps?token=${token}&firstname=Hacker`);
+    const ref = refOf(response)!;
 
-    assert.deepEqual(parseNpsInviteInfo(cookieValue(response, 'nps_invite_info')), { ref: payloadJti(token), name: 'Maria' });
-    const attrs = cookieAttributes(response, 'nps_invite_info');
+    assert.deepEqual(parseNpsInviteInfo(cookieValue(response, `nps_invite_info_${ref}`)), { name: 'Maria' });
+    const attrs = cookieAttributes(response, `nps_invite_info_${ref}`);
     assert.doesNotMatch(attrs, /HttpOnly/, 'the page reads this one for the greeting');
     assert.match(attrs, /Path=\/nps(;|$)/);
 });
 
+test('two invites opened in the same browser get separate cookie pairs, so neither overwrites the other', async (t) => {
+    withSecret(t);
+    const ana = await redirectFor(`/nps?token=${await validToken({ firstname: 'Ana' })}`);
+    const bia = await redirectFor(`/nps?token=${await validToken({ firstname: 'Bia' })}`);
+    const anaRef = refOf(ana)!;
+    const biaRef = refOf(bia)!;
+
+    assert.notEqual(anaRef, biaRef);
+    assert.equal(bia.headers.getSetCookie().some((c) => c.includes(anaRef)), false, "Bia's redirect never touches Ana's cookies");
+    assert.deepEqual(parseNpsInviteInfo(cookieValue(ana, `nps_invite_info_${anaRef}`)), { name: 'Ana' });
+    assert.deepEqual(parseNpsInviteInfo(cookieValue(bia, `nps_invite_info_${biaRef}`)), { name: 'Bia' });
+});
+
+test('an incoming i param is replaced, so a forwarded clean URL cannot steer a new invite', async (t) => {
+    withSecret(t);
+    const forwardedRef = 'a'.repeat(32);
+    const response = await redirectFor(`/nps?i=${forwardedRef}&token=${await validToken()}`);
+
+    assert.notEqual(refOf(response), forwardedRef);
+    assert.equal(response.headers.getSetCookie().some((c) => c.includes(forwardedRef)), false);
+});
+
 test('cookie lifetime never outlives the invite itself', async (t) => {
     withSecret(t);
-    const token = await validToken({ expiresInMs: 10 * 60 * 1000 });
-
-    const response = (await handleNpsInviteRequest(new Request(`${ORIGIN}/nps?token=${token}`)))!;
-    const maxAge = Number(/Max-Age=(\d+)/.exec(cookieAttributes(response, 'nps_invite'))?.[1]);
+    const response = await redirectFor(`/nps?token=${await validToken({ expiresInMs: 10 * 60 * 1000 })}`);
+    const maxAge = Number(/Max-Age=(\d+)/.exec(cookieAttributes(response, `nps_invite_${refOf(response)}`))?.[1]);
 
     assert.ok(maxAge > 0 && maxAge <= 600, `expected Max-Age ≤ 600, got ${maxAge}`);
 });
 
-test('a tampered, expired or malformed invite still redirects clean but clears the cookies', async (t) => {
+test('a tampered, expired, malformed or missing token redirects clean and sets no cookies, leaving other invites alone', async (t) => {
     withSecret(t);
     const forged = await createNpsInviteToken({ email: 'x@example.com', firstname: 'X' }, 'wrong-secret');
     const expired = await validToken({ expiresInMs: -1000 });
 
-    for (const token of [forged, expired, 'not-a-token', '']) {
-        const response = (await handleNpsInviteRequest(new Request(`${ORIGIN}/nps?token=${encodeURIComponent(token)}`)))!;
+    for (const query of [`token=${forged}`, `token=${expired}`, 'token=not-a-token', 'token=', 'firstname=Ana&email=ana@example.com']) {
+        const response = await redirectFor(`/nps?${query}`);
         assert.equal(response.status, 303);
-        assert.equal(response.headers.get('Location'), '/nps/');
-        assert.match(cookieAttributes(response, 'nps_invite'), /Max-Age=0/);
-        assert.match(cookieAttributes(response, 'nps_invite_info'), /Max-Age=0/);
+        assert.equal(response.headers.get('Location'), '/nps/', query);
+        assert.deepEqual(response.headers.getSetCookie(), [], `${query} must not set or clear cookies`);
     }
-});
-
-test('legacy identity params without a token are stripped too', async (t) => {
-    withSecret(t);
-    const response = (await handleNpsInviteRequest(new Request(`${ORIGIN}/nps?firstname=Ana&email=ana@example.com`)))!;
-
-    assert.equal(response.headers.get('Location'), '/nps/');
 });
 
 test('non-identifying params such as UTMs survive the redirect', async (t) => {
     withSecret(t);
-    const token = await validToken();
-    const response = (await handleNpsInviteRequest(
-        new Request(`${ORIGIN}/nps?utm_source=email&token=${token}&utm_campaign=nps`),
-    ))!;
+    const response = await redirectFor(`/nps?utm_source=email&token=${await validToken()}&utm_campaign=nps`);
 
-    assert.equal(response.headers.get('Location'), '/nps/?utm_source=email&utm_campaign=nps');
+    assert.match(response.headers.get('Location') ?? '', /^\/nps\/\?utm_source=email&utm_campaign=nps&i=[a-f0-9]{32}$/);
 });
 
 test('without NPS_INVITE_SECRET the token is still taken off the URL', async () => {
     delete process.env.NPS_INVITE_SECRET;
-    const response = (await handleNpsInviteRequest(new Request(`${ORIGIN}/nps?token=abc.def`)))!;
+    const response = await redirectFor('/nps?token=abc.def');
+    const ref = refOf(response)!;
 
-    assert.equal(response.headers.get('Location'), '/nps/');
-    assert.equal(cookieValue(response, 'nps_invite'), 'abc.def');
-    assert.deepEqual(parseNpsInviteInfo(cookieValue(response, 'nps_invite_info')), { ref: '', name: '' });
+    assert.match(response.headers.get('Location') ?? '', /^\/nps\/\?i=[a-f0-9]{32}$/);
+    assert.equal(cookieValue(response, `nps_invite_${ref}`), 'abc.def');
+    assert.deepEqual(parseNpsInviteInfo(cookieValue(response, `nps_invite_info_${ref}`)), { name: '' });
 });
 
 test('plain-HTTP local dev drops the Secure flag so the browser keeps the cookies', async (t) => {
@@ -143,21 +160,22 @@ test('plain-HTTP local dev drops the Secure flag so the browser keeps the cookie
     const token = await validToken();
     const response = (await handleNpsInviteRequest(new Request(`http://127.0.0.1:3000/nps?token=${token}`)))!;
 
-    assert.doesNotMatch(cookieAttributes(response, 'nps_invite'), /Secure/);
+    assert.doesNotMatch(cookieAttributes(response, `nps_invite_${refOf(response)}`), /Secure/);
 });
 
 test('path casing and trailing slashes do not bypass the redirect', async (t) => {
     withSecret(t);
     const token = await validToken();
     for (const path of ['/NPS', '/Nps/', '/nps//', '/nps/index.html']) {
-        const response = await handleNpsInviteRequest(new Request(`${ORIGIN}${path}?token=${token}`));
-        assert.equal(response?.status, 303, `${path} must redirect`);
-        assert.equal(response?.headers.get('Location'), '/nps/');
+        const response = await redirectFor(`${path}?token=${token}`);
+        assert.equal(response.status, 303, `${path} must redirect`);
+        assert.match(response.headers.get('Location') ?? '', /^\/nps\/\?i=[a-f0-9]{32}$/, path);
     }
 });
 
 test('requests that are not an invite link pass through untouched', () => {
     assert.equal(isNpsInviteRequest(new Request(`${ORIGIN}/nps/`)), false);
+    assert.equal(isNpsInviteRequest(new Request(`${ORIGIN}/nps/?i=${'a'.repeat(32)}`)), false);
     assert.equal(isNpsInviteRequest(new Request(`${ORIGIN}/nps/?utm_source=email`)), false);
     assert.equal(isNpsInviteRequest(new Request(`${ORIGIN}/blog/?token=x`)), false);
     assert.equal(isNpsInviteRequest(new Request(`${ORIGIN}/npsx?token=x`)), false);

@@ -34,31 +34,31 @@ function nextClientIp(): string {
     return `127.${(requestCounter >> 16) & 0xff}.${(requestCounter >> 8) & 0xff}.${requestCounter & 0xff}`;
 }
 
-// O token do convite viaja no cookie HttpOnly `nps_invite`, não no corpo (issue #1666).
+// O token do convite viaja no cookie HttpOnly `nps_invite_<ref>`, não no corpo (issue #1666).
 // Os testes descrevem a submissão como `{ token, score, ... }` por legibilidade; este
-// helper move o `token` para o cabeçalho Cookie, como o navegador faria, e — se o teste
-// não informar outro — preenche `inviteRef` com o `jti` do próprio token, como a página
-// faz a partir do cookie `nps_invite_info`.
-function jtiOf(token: string): string {
-    try {
-        return JSON.parse(Buffer.from(token.split('.')[0], 'base64url').toString('utf8')).jti ?? 'no-jti';
-    } catch {
-        return 'no-jti';
-    }
+// helper faz o que o redirect e o navegador fariam: sorteia um `ref` de aba (a menos que o
+// teste informe `inviteRef`), põe o token no cookie com esse nome e o `ref` no corpo.
+// `cookies` acrescenta outros pares, para simular vários convites no mesmo navegador.
+function newRef(): string {
+    return crypto.randomUUID().replace(/-/g, '');
 }
 
 function buildRequest(
     body: Record<string, unknown> | string,
-    init?: { headers?: Record<string, string>; method?: string; url?: string },
+    init?: { headers?: Record<string, string>; method?: string; url?: string; cookies?: Record<string, string> },
 ): Request {
     const method = init?.method ?? 'POST';
     let payload: Record<string, unknown> | string = body;
-    const cookieHeaders: Record<string, string> = {};
+    const jar: Record<string, string> = { ...init?.cookies };
     if (typeof body !== 'string' && 'token' in body) {
         const { token, ...rest } = body;
-        payload = { inviteRef: jtiOf(String(token)), ...rest };
-        cookieHeaders.Cookie = `nps_invite=${encodeURIComponent(String(token))}`;
+        const ref = typeof rest.inviteRef === 'string' ? rest.inviteRef : newRef();
+        payload = { ...rest, inviteRef: ref };
+        jar[`nps_invite_${ref}`] = String(token);
     }
+    const cookieHeaders: Record<string, string> = Object.keys(jar).length
+        ? { Cookie: Object.entries(jar).map(([name, value]) => `${name}=${encodeURIComponent(value)}`).join('; ') }
+        : {};
 
     return new Request(init?.url ?? 'http://localhost/api/submit-nps', {
         method,
@@ -179,7 +179,7 @@ test('submit-nps ignores a token sent in the body — the credential is only rea
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-real-ip': nextClientIp() },
         // Everything a valid submission carries — except the cookie.
-        body: JSON.stringify(await validBody().then((body) => ({ ...body, inviteRef: jtiOf(body.token) }))),
+        body: JSON.stringify({ ...(await validBody()), inviteRef: newRef() }),
     }));
     const json = await response.json() as Record<string, unknown>;
 
@@ -194,12 +194,14 @@ test('submit-nps clears both invite cookies once the invite is spent', async (t)
     setNpsInviteEnv();
     global.fetch = createOdooMock().fetch;
 
-    const response = await handler(buildRequest(await validBody(), { url: 'https://www.anhanga.tur.br/api/submit-nps' }));
+    const ref = newRef();
+    const response = await handler(buildRequest(await validBody({ inviteRef: ref }), { url: 'https://www.anhanga.tur.br/api/submit-nps' }));
     assert.equal(response.status, 201);
 
     const cookies = response.headers.getSetCookie();
-    const tokenCookie = cookies.find((c) => c.startsWith('nps_invite='));
-    const infoCookie = cookies.find((c) => c.startsWith('nps_invite_info='));
+    const tokenCookie = cookies.find((c) => c.startsWith(`nps_invite_${ref}=`));
+    const infoCookie = cookies.find((c) => c.startsWith(`nps_invite_info_${ref}=`));
+    assert.equal(cookies.length, 2, "only this tab's pair is cleared");
     assert.match(tokenCookie ?? '', /Max-Age=0/);
     assert.match(tokenCookie ?? '', /Path=\/api\/submit-nps/);
     assert.match(tokenCookie ?? '', /Secure/);
@@ -207,27 +209,45 @@ test('submit-nps clears both invite cookies once the invite is spent', async (t)
     assert.match(infoCookie ?? '', /Path=\/nps/);
 });
 
-test('submit-nps refuses an invite cookie that belongs to another invite opened later in the same browser', async (t) => {
+test('submit-nps sends each tab to its own invite when several are open in the same browser', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    setNpsInviteEnv();
+
+    // Both invites were opened in the same browser, so both cookie pairs are in the jar.
+    const anaRef = newRef();
+    const biaRef = newRef();
+    const jar = {
+        [`nps_invite_${anaRef}`]: await buildToken({ email: 'ana@example.com', firstname: 'Ana' }),
+        [`nps_invite_${biaRef}`]: await buildToken({ email: 'bia@example.com', firstname: 'Bia' }),
+    };
+
+    const anaMock = createOdooMock();
+    global.fetch = anaMock.fetch;
+    const fromAnaTab = await handler(buildRequest({ inviteRef: anaRef, score: 3, reason: '', highlight: '' }, { cookies: jar }));
+    assert.equal(fromAnaTab.status, 201);
+    assert.equal(anaMock.partnerFields()?.email, 'ana@example.com');
+
+    const biaMock = createOdooMock();
+    global.fetch = biaMock.fetch;
+    const fromBiaTab = await handler(buildRequest({ inviteRef: biaRef, score: 10, reason: '', highlight: '' }, { cookies: jar }));
+    assert.equal(fromBiaTab.status, 201);
+    assert.equal(biaMock.partnerFields()?.email, 'bia@example.com');
+});
+
+test('submit-nps rejects a malformed or unknown tab ref', async (t) => {
     t.after(restore);
     setOdooEnv();
     setNpsInviteEnv();
     const mock = createOdooMock();
     global.fetch = mock.fetch;
+    const jar = { [`nps_invite_${newRef()}`]: await buildToken() };
 
-    // Tab A showed Ana's invite; then Bia's link was opened in the same browser and
-    // overwrote the cookie. Tab A's answers must not land on Bia's record.
-    const anaToken = await buildToken({ email: 'ana@example.com', firstname: 'Ana' });
-    const biaToken = await buildToken({ email: 'bia@example.com', firstname: 'Bia' });
-    const fromTabA = await handler(buildRequest({ token: biaToken, inviteRef: jtiOf(anaToken), score: 3, reason: '', highlight: '' }));
-    const json = await fromTabA.json() as Record<string, unknown>;
-
-    assert.equal(fromTabA.status, 400);
-    assert.match(String(json.error), /Outro link de avaliação/);
-    assert.equal(mock.partnerFields(), undefined, 'nothing written to the other customer');
-
-    // Bia's own invite was not burned by the refused attempt.
-    const fromTabB = await handler(buildRequest({ token: biaToken, score: 10, reason: '', highlight: '' }));
-    assert.equal(fromTabB.status, 201);
+    for (const inviteRef of ['not-a-ref', newRef()]) {
+        const response = await handler(buildRequest({ inviteRef, score: 9, reason: '', highlight: '' }, { cookies: jar }));
+        assert.equal(response.status, 400, inviteRef);
+    }
+    assert.equal(mock.partnerFields(), undefined);
 });
 
 test('submit-nps keeps the invite cookies on the bot-decoy 201, which records nothing', async (t) => {
