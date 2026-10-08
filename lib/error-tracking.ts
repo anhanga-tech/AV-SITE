@@ -64,6 +64,9 @@ export function sanitizeForErrorTracking(value: unknown, depth = 0): unknown {
  * writing to a customer's CRM record, and Sentry attaches the raw
  * `event.request.url` to every error AND to every sampled transaction
  * (`tracesSampleRate: 0.1` on both the browser and the Pages middleware).
+ * Since issue #1666 the edge answers `/nps?token=…` with a redirect to a clean
+ * `/nps/` (lib/nps-invite-redirect.ts), but that first request still reaches
+ * the Pages middleware with the token in its URL — so this stays necessary.
  *
  * Only the parameter *name* is matched, so attribution params
  * (gclid/fbclid/utm_*) survive and Sentry URLs stay useful.
@@ -141,8 +144,9 @@ const URL_DATA_KEYS: readonly string[] = ['from', 'to', 'url', 'url.full', 'http
 // Headers whose value is a full URL, so they carry the referring page's query
 // string. `Referrer-Policy: strict-origin-when-cross-origin` (public/_headers)
 // strips the path only CROSS-origin — a same-origin request still sends the
-// full URL. `NpsPage` posts to `/api/submit-nps` from `/nps?token=…`, so that
-// request's `Referer` carries the invite credential.
+// full URL. Before issue #1666 `NpsPage` posted to `/api/submit-nps` from
+// `/nps?token=…`, so that request's `Referer` carried the invite credential;
+// the page now loads on a clean `/nps/`, and this stays as defense in depth.
 const URL_HEADER_NAMES = new Set(['referer', 'referrer']);
 
 function isUrlDataKey(key: string): boolean {

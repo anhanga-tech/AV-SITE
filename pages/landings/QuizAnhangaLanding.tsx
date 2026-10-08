@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useReducer, useRef } from 'react';
+import { useMemo, useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { Seo } from '../../components/Seo';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { useQuizCapture } from '../../hooks/useQuizCapture';
@@ -7,6 +7,7 @@ import { getWhatsAppLink } from '../../utils/whatsapp';
 import { pushFormAnalyticsEvent } from '../../utils/formAnalytics';
 import { matchProfile, type ProfileKey } from '../../lib/quiz-scoring';
 import { deriveQuizLeadName } from '../../lib/quiz-logic';
+import { clearQuizPrefillCookie, readQuizPrefillCookie, type QuizPrefill } from '../../lib/quiz-prefill-cookie';
 import {
     selectMainDestination,
     selectInspirationDestinations,
@@ -24,23 +25,18 @@ import { PreLeadScreen } from '../../components/landings/quiz/PreLeadScreen';
 import { ResultScreen } from '../../components/landings/quiz/ResultScreen';
 import './quiz-anhanga.css';
 
-/** Lê parâmetros de URL para pré-popular o quiz com dados de leads existentes.
- *  ?email=foo@bar.com&nome=João&sobrenome=Silva&skip=true
+/** Pré-preenchimento vindo de links de e-mail (`/quiz?email=&nome=&sobrenome=&skip=true`).
+ *  A borda (`lib/quiz-prefill-redirect.ts`) tira esses dados da URL antes de o
+ *  HTML carregar — senão o Pageview automático do Zaraz os levaria ao GA4 — e
+ *  os entrega no cookie `quiz_prefill`, lido uma vez aqui e apagado em seguida.
  *  Quando skip=true, o stage 'lead' é omitido e o webhook inclui skipped:true.
  */
-function useQuizUrlParams() {
-    return useMemo(() => {
-        if (typeof window === 'undefined') {
-            return { email: '', nome: '', sobrenome: '', skip: false };
-        }
-
-        const p = new URLSearchParams(window.location.search);
-        const email = p.get('email') ?? '';
-        const nome = p.get('nome') ?? '';
-        const sobrenome = p.get('sobrenome') ?? '';
-        const skip = p.get('skip') === 'true' && email.length > 0;
-        return { email, nome, sobrenome, skip };
+function useQuizPrefill(): QuizPrefill {
+    const [prefill] = useState(readQuizPrefillCookie);
+    useEffect(() => {
+        clearQuizPrefillCookie();
     }, []);
+    return prefill;
 }
 
 /* ==========================================================================
@@ -200,7 +196,7 @@ function buildQuizSubmitInput(
 }
 
 export default function QuizAnhangaLanding() {
-    const urlParams = useQuizUrlParams();
+    const prefill = useQuizPrefill();
     const [state, dispatch] = useReducer(quizReducer, QUIZ_INITIAL_STATE);
     const { stage, direction, answers, leadForm, profileKey, baseWaUrl, submitFailed } = state;
     const { submitQuiz, isSubmitting, honeypotProps } = useQuizCapture();
@@ -211,11 +207,11 @@ export default function QuizAnhangaLanding() {
     // duplicate leads in the CRM.
     const submittingRef = useRef(false);
 
-    // Pré-preenche o PreLeadScreen quando a URL traz dados mas o form não é
+    // Pré-preenche o PreLeadScreen quando o link de e-mail traz dados mas o form não é
     // pulado (skip ausente/false). O `aceite` segue de fora: opt-in explícito.
     const leadInitialValues = useMemo<Partial<LeadForm>>(
-        () => ({ nome: urlParams.nome, sobrenome: urlParams.sobrenome, email: urlParams.email }),
-        [urlParams.nome, urlParams.sobrenome, urlParams.email],
+        () => ({ nome: prefill.nome, sobrenome: prefill.sobrenome, email: prefill.email }),
+        [prefill.nome, prefill.sobrenome, prefill.email],
     );
 
     const go = useCallback((next: Stage, dir: 'forward' | 'back' = 'forward') => {
@@ -231,10 +227,10 @@ export default function QuizAnhangaLanding() {
 
     function nextQ(currentIndex: number) {
         if (currentIndex + 1 >= QUIZ_QUESTIONS.length) {
-            if (urlParams.skip) {
+            if (prefill.skip) {
                 // Lead já conhecido — pula formulário e dispara diretamente
                 void handleLeadSubmit(
-                    { nome: urlParams.nome, sobrenome: urlParams.sobrenome, email: urlParams.email, aceite: true },
+                    { nome: prefill.nome, sobrenome: prefill.sobrenome, email: prefill.email, aceite: true },
                     true,
                 );
             } else {
@@ -293,10 +289,10 @@ export default function QuizAnhangaLanding() {
     const handlePhoneSubmit = useCallback((phone: string) => {
         if (!leadForm || !profileKey) return;
         void submitQuiz(
-            buildQuizSubmitInput(leadForm, profileKey, answers, { skipped: urlParams.skip, whatsapp: phone }),
+            buildQuizSubmitInput(leadForm, profileKey, answers, { skipped: prefill.skip, whatsapp: phone }),
             { trackConversion: false },
         );
-    }, [leadForm, profileKey, answers, urlParams.skip, submitQuiz]);
+    }, [leadForm, profileKey, answers, prefill.skip, submitQuiz]);
 
     function restart() {
         dispatch({ type: 'RESTART' });

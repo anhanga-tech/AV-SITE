@@ -1,14 +1,15 @@
 import type { FormEvent } from 'react';
 import { useState, useEffect, useRef, useSyncExternalStore } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { BRAND_LOGO_WHITE_URL } from '../lib/media-assets';
 import { NpsTextarea } from '../components/nps/NpsTextarea';
 import { NpsScoreSelector } from '../components/nps/NpsScoreSelector';
 import { NpsThankPromoter } from '../components/nps/NpsThankPromoter';
 import { NpsThankOther } from '../components/nps/NpsThankOther';
+import { NpsInvalidLink } from '../components/nps/NpsInvalidLink';
 import { Seo } from '../components/Seo';
 import { useAntiBot } from '../hooks/useAntiBot';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
+import { isNpsInviteRef, NPS_INVITE_REF_PARAM, npsInviteInfoCookieName, parseNpsInviteInfo, readCookie } from '../lib/nps-invite-cookie';
 import { isFieldCompleteForAnalytics, validateNpsFormFields, type NpsFormFieldErrors } from '../lib/form-v1-validation';
 
 type PageState = 'form' | 'thank-promoter' | 'thank-other';
@@ -16,9 +17,9 @@ type PageState = 'form' | 'thank-promoter' | 'thank-other';
 /*
   "Já estamos no cliente?" como fonte externa, não como estado sincronizado por efeito.
 
-  O prerender de /nps roda sem query string (scripts/prerender.mjs renderiza a rota crua),
-  então `token` é sempre vazio lá. Sem este gate o HTML estático nasceria com o bloco
-  "Link inválido" — e quem abre /nps/?token=... com link VÁLIDO veria justamente essa
+  O prerender de /nps roda sem cookies (scripts/prerender.mjs renderiza a rota crua),
+  então lá nunca há convite. Sem este gate o HTML estático nasceria com o bloco
+  "Link inválido" — e quem chega a /nps/ com convite VÁLIDO veria justamente essa
   mensagem até o React assumir (o marcador `/nps` casa com o pathname, então a página
   hidrata de verdade).
 
@@ -36,6 +37,39 @@ type PageState = 'form' | 'thank-promoter' | 'thank-other';
 const subscribeToNothing = () => () => {};
 const getIsClientSnapshot = () => true;
 const getIsServerSnapshot = () => false;
+
+/*
+  O convite não vem mais da URL (issue #1666): a borda troca `?token=` por cookies e
+  redireciona para /nps/?i=<ref> antes de o Zaraz disparar o Pageview (ver
+  lib/nps-invite-redirect.ts). `ref` é aleatório, gerado a cada redirect, e dá nome ao par
+  de cookies deste convite. O token fica no cookie HttpOnly, que esta página nem consegue
+  ler; o que chega aqui é `nps_invite_info_<ref>` (o primeiro nome), e a presença dele é o
+  sinal de "há convite". Como o `ref` vem da URL desta aba, dois convites abertos no mesmo
+  navegador — mesmo ao mesmo tempo — nunca trocam de cadastro. Mesmo gate do `mounted`: no
+  servidor e na hidratação vale `null`, casando com a casca.
+*/
+interface PageInvite {
+  ref: string;
+  name: string;
+}
+
+function readPageInvite(): PageInvite | null {
+  const ref = new URLSearchParams(window.location.search).get(NPS_INVITE_REF_PARAM);
+  if (!isNpsInviteRef(ref)) return null;
+  const info = parseNpsInviteInfo(readCookie(document.cookie, npsInviteInfoCookieName(ref)));
+  return info ? { ref, name: info.name } : null;
+}
+
+// Congelado na primeira leitura, por montagem: o sucesso apaga os cookies, e o
+// agradecimento ainda precisa do nome.
+function createInviteSnapshot(): () => PageInvite | null {
+  let invite: PageInvite | null | undefined;
+  return () => {
+    if (invite === undefined) invite = readPageInvite();
+    return invite;
+  };
+}
+const getServerInviteSnapshot = () => null;
 
 const PAGE_STYLES = `
   .nps-cta {
@@ -89,12 +123,13 @@ const PAGE_STYLES = `
 `;
 
 export default function NpsPage() {
-  const [params] = useSearchParams();
   // Identity is bound server-side to the signed invitation token (issue
   // #1137) — `firstname` here is display-only (the greeting) and never sent
-  // to the API; the token is the only thing that proves who is answering.
-  const firstname = params.get('firstname')?.trim() ?? '';
-  const token = params.get('token')?.trim() ?? '';
+  // to the API; the token cookie is the only thing that proves who is answering.
+  const [getInviteSnapshot] = useState(createInviteSnapshot);
+  const invite = useSyncExternalStore(subscribeToNothing, getInviteSnapshot, getServerInviteSnapshot);
+  const hasInvite = invite !== null;
+  const firstname = invite?.name.trim() ?? '';
 
   const [score, setScore] = useState<number | null>(null);
   const [reason, setReason] = useState('');
@@ -186,8 +221,9 @@ export default function NpsPage() {
       const res = await fetch('/api/submit-nps', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        // O token vai no cookie HttpOnly `nps_invite_<ref>` (same-origin, enviado pelo navegador).
         body: JSON.stringify({
-          token,
+          inviteRef: invite?.ref ?? '',
           score: validation.normalized.score,
           reason: reason.trim(),
           highlight: highlight.trim(),
@@ -247,16 +283,9 @@ export default function NpsPage() {
         <main className="flex-1 flex flex-col items-center px-6 pb-16 pt-8">
           <div className="w-full max-w-lg">
 
-            {mounted && !token && (
-              <div className="nps-thank-card text-center">
-                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3">Link inválido</h1>
-                <p className="text-base text-slate-400 leading-7">
-                  Este link de avaliação não é válido ou já expirou. Solicite um novo link à nossa equipe.
-                </p>
-              </div>
-            )}
+            {mounted && !hasInvite && pageState === 'form' && <NpsInvalidLink />}
 
-            {mounted && token && pageState === 'form' && (
+            {mounted && hasInvite && pageState === 'form' && (
               <form onSubmit={(e) => void handleSubmit(e)} noValidate>
                 {/* Honeypot: hidden from humans, blind form-fillers populate it. */}
                 <input {...honeypotProps} />

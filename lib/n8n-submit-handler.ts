@@ -150,8 +150,12 @@ export interface CreateSubmitHandlerOptions<TData, TPayload = unknown> {
     };
     /** Client-facing message for the 405 method gate. */
     methodNotAllowedError: string;
-    /** Validates and normalizes the raw body into the typed payload data. */
-    validate: (rawBody: unknown) => MaybeAsyncValidationResult<TData>;
+    /**
+     * Validates and normalizes the raw body into the typed payload data. The
+     * request is passed for inputs that deliberately don't travel in the body
+     * (the NPS invite cookie — issue #1666).
+     */
+    validate: (rawBody: unknown, request: Request) => MaybeAsyncValidationResult<TData>;
     /** Provider plug-in (n8n or Odoo). */
     dispatch: SubmitDispatch<TData, TPayload>;
     success: {
@@ -333,7 +337,7 @@ export function createSubmitHandler<TData, TPayload = unknown>(
             );
         }
 
-        const validation = await options.validate(rawBody);
+        const validation = await options.validate(rawBody, request);
         if (!validation.ok) {
             return buildJsonResponse(
                 { ok: false, requestId, code: 'VALIDATION_ERROR', error: validation.error },
