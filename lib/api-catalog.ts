@@ -223,17 +223,16 @@ const API_ENDPOINTS: readonly ApiEndpointDefinition[] = [
         anchor: `${SITE_ORIGIN}/api/submit-nps`,
         method: 'post',
         summary: 'Submit a post-trip NPS rating',
-        description: 'Accepts a Net Promoter Score submission from a returning traveller and forwards the sanitized payload to the configured downstream webhook.',
+        description: 'Accepts a Net Promoter Score submission from a traveller holding a signed invitation and records it on their CRM contact. Browser-only: opening the invite link sets the invitation in an HttpOnly cookie named `nps_invite_<ref>` and redirects to `/nps/?i=<ref>`; the body\'s `inviteRef` is that `ref`, and the request must carry the matching cookie. The cookie name is per invite, so it is not declared as a fixed OpenAPI cookie parameter. The token never travels in the body, and identity is taken from the verified invitation.',
         requestBody: {
             required: true,
             content: {
                 'application/json': {
                     schema: {
                         type: 'object',
-                        required: ['firstname', 'email', 'score'],
+                        required: ['inviteRef', 'score'],
                         properties: {
-                            firstname: { type: 'string' },
-                            email: { type: 'string', format: 'email' },
+                            inviteRef: { type: 'string', pattern: '^[a-f0-9]{32}$' },
                             score: { type: 'integer', minimum: 0, maximum: 10 },
                             reason: { type: 'string', maxLength: 2000 },
                             highlight: { type: 'string', maxLength: 2000 },
@@ -247,7 +246,7 @@ const API_ENDPOINTS: readonly ApiEndpointDefinition[] = [
             '201': buildJsonResponse('NPS submission accepted.', SUBMIT_SUCCESS_SCHEMA),
             '400': buildJsonResponse('Invalid NPS payload.', ERROR_RESPONSE_SCHEMA),
             '429': buildJsonResponse('Rate limit exceeded.', ERROR_RESPONSE_SCHEMA),
-            '502': buildJsonResponse('Downstream webhook failure.', ERROR_RESPONSE_SCHEMA),
+            '502': buildJsonResponse('CRM integration failure.', ERROR_RESPONSE_SCHEMA),
             '500': buildJsonResponse('Server or upstream integration failure.', ERROR_RESPONSE_SCHEMA),
         },
     },
@@ -525,7 +524,7 @@ Accepts first-party waitlist registrations for campaign-specific landing pages.
 
 ### POST /api/submit-nps
 
-Accepts post-trip Net Promoter Score submissions from returning travellers.
+Accepts post-trip Net Promoter Score submissions from travellers holding a signed invitation (HttpOnly \`nps_invite_<ref>\` cookie).
 
 ### POST /api/submit-contact
 

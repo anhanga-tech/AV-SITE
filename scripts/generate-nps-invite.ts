@@ -59,8 +59,9 @@ async function main(): Promise<void> {
   }
   const token = await createNpsInviteToken({ email, firstname, expiresInMs }, secret);
   const url = new URL('/nps', SITE_URL);
+  // Only the token: the edge swaps it for cookies before the page loads (issue #1666),
+  // and the greeting name comes from the verified payload — never add PII to the URL.
   url.searchParams.set('token', token);
-  url.searchParams.set('firstname', firstname);
 
   console.log(`Token: ${token}`);
   console.log(`Link:  ${url.toString()}`);

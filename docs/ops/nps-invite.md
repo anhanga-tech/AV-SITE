@@ -20,6 +20,63 @@ identity from the verified token, never from the request body.
   side effect, then uses the token's `email`/`firstname` — the request body
   only ever carries `score`/`reason`/`highlight`.
 
+## The token never stays in the URL (issue #1666)
+
+The token is a bearer credential **and** reversible PII (the payload is
+`base64url` JSON with the e-mail and first name, not encrypted). Zaraz's
+automatic Pageview fires before any page code runs and sends the page URL —
+query string included — to GA4 as `page_location`; the Cloudflare Web
+Analytics beacon and Traks also record the page. A client-side
+`history.replaceState` would be too late.
+
+So the edge handles the link before any HTML is served:
+
+1. `functions/[[path]].ts` → `lib/nps-invite-redirect.ts` intercepts
+   `GET /nps?token=…` (also strips the legacy `firstname`/`email` params).
+2. It verifies the token (signature + expiry, not replay), draws a fresh
+   random **tab ref** and answers **303 → `/nps/?i=<ref>`**: `token`,
+   `firstname` and `email` removed, UTMs kept, `Cache-Control: no-store`,
+   `Referrer-Policy: no-referrer`. A redirect has no HTML, so no tag runs on
+   it, and the next page's `document.referrer` is the mail client, not the
+   tokenized URL. The ref is random per redirect and tied to nothing outside
+   that browser, so seeing it in analytics identifies no one.
+3. The same response sets a cookie pair named after the ref
+   (`lib/nps-invite-cookie.ts`), both `SameSite=Strict`, `Secure` on HTTPS,
+   `Max-Age` = 2h capped at the invite's expiry:
+   - `nps_invite_<ref>` — the token, `HttpOnly`, `Path=/api/submit-nps`. Page
+     JS and tag scripts can't read it; it is only sent to the submit endpoint.
+   - `nps_invite_info_<ref>` — JSON with the first name **from the verified
+     payload** (the greeting), readable by the page, `Path=/nps`. Its presence
+     is how the page tells "has invite" from "invalid link".
+4. The page reads the ref from its own URL and sends it as `inviteRef`;
+   `/api/submit-nps` reads the token **only** from `nps_invite_<inviteRef>` (a
+   `token` in the body is ignored). Because each invite lives under its own
+   ref, several invites opened in one browser — even at the same moment —
+   never mix: each tab writes to its own customer's record. An earlier
+   version used one fixed cookie name, and the last redirect could overwrite
+   the invite of a tab that hadn't loaded yet.
+5. The pair is cleared only after a submission that really consumed the
+   invite. The bot-decoy `201` (honeypot, or a submit under 2.5s) records
+   nothing and keeps it, so the customer can retry.
+
+An invalid, expired or token-less link redirects to a plain `/nps/` without
+setting or clearing any cookie (other invites open in the browser are left
+alone), and the page shows "Link inválido". So does `/nps/` without a valid
+`i`. Reopening the e-mail link re-issues a new pair while the invite itself is
+valid. Reopening it **after** submitting still shows the form — the redirect
+doesn't check replay — and the submit then answers "link inválido ou
+expirado".
+
+`pnpm dev` mirrors the redirect through a Vite plugin (`vite.config.ts`,
+`npsInviteDevPlugin`), so local testing and the e2e suite exercise the same flow.
+
+What remains: the edge still receives the tokenized URL on that first request
+— that is the hosting itself (Cloudflare, operator 2.1 of the transfer
+matrix), and the Sentry request URL is scrubbed by `scrubEventUrls`. Making the
+token opaque (random id, e-mail/name only server-side) would also stop it being
+reversible PII for anyone who sees the link (e.g. the e-mail provider); not done
+yet because it needs server-side invite storage.
+
 ## Generating a link
 
 Run once a trip is completed (manually, or wired into whatever ops workflow
@@ -32,11 +89,12 @@ pnpm tsx scripts/generate-nps-invite.ts --email cliente@example.com --firstname 
 Prints the token and a ready-to-send URL, e.g.:
 
 ```
-https://www.anhanga.tur.br/nps?token=<token>&firstname=Ana
+https://www.anhanga.tur.br/nps?token=<token>
 ```
 
-`firstname` in the URL is display-only (the page's greeting) — it is never
-trusted as identity; only the verified token payload is.
+Don't add `firstname` (or anything else identifying) to the link: the greeting
+name comes from the verified token payload, and the edge strips identity params
+from the URL anyway.
 
 ## Distribution
 
