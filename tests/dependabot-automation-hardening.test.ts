@@ -2,10 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-// Cobertura dos dois workflows privilegiados que reagem a PRs do Dependabot.
-// Ambos rodam em `pull_request_target` — ou seja, com token de escrita no
-// contexto do repositório base — e o de merge tem `contents: write`, que é o
-// que efetivamente coloca código em produção via `main`.
+// Cobertura do workflow privilegiado que reage a PRs do Dependabot
+// (auto-merge). Ele roda em `pull_request_target` — ou seja, com token de
+// escrita no contexto do repositório base — e tem `contents: write`, que é o
+// que efetivamente coloca código em produção via `main`. (O auto-approve foi
+// removido em 39eca4a: nunca funcionou e não é necessário.)
 //
 // Os invariantes travados aqui são os que, se afrouxados, transformariam um PR
 // de terceiro em merge automático:
@@ -14,31 +15,26 @@ import { readFile } from 'node:fs/promises';
 //   3. nenhum passo faz checkout do código da PR (o token privilegiado nunca
 //      encosta em código não revisado).
 
-const APPROVE = new URL('../.github/workflows/auto-approve-dependabot.yml', import.meta.url);
 const MERGE = new URL('../.github/workflows/auto-merge-dependabot.yml', import.meta.url);
 
 const DEPENDABOT_GUARD =
   "github.actor == 'dependabot[bot]' && github.event.pull_request.user.login == 'dependabot[bot]'";
 
-test('ambos os workflows exigem Dependabot como ator e como autor da PR', async () => {
-  for (const url of [APPROVE, MERGE]) {
-    const workflow = await readFile(url, 'utf8');
-    assert.ok(
-      workflow.includes(`if: ${DEPENDABOT_GUARD}`),
-      `${url.pathname} deve gatilhar só para o Dependabot (ator + autor da PR)`,
-    );
-  }
+test('o auto-merge exige Dependabot como ator e como autor da PR', async () => {
+  const workflow = await readFile(MERGE, 'utf8');
+  assert.ok(
+    workflow.includes(`if: ${DEPENDABOT_GUARD}`),
+    'o auto-merge deve gatilhar só para o Dependabot (ator + autor da PR)',
+  );
 });
 
-test('nenhum dos workflows faz checkout do código da PR', async () => {
-  for (const url of [APPROVE, MERGE]) {
-    const workflow = await readFile(url, 'utf8');
-    assert.doesNotMatch(
-      workflow,
-      /uses:\s*actions\/checkout/,
-      `${url.pathname} roda em pull_request_target: um checkout traria código não revisado para um job privilegiado`,
-    );
-  }
+test('o auto-merge não faz checkout do código da PR', async () => {
+  const workflow = await readFile(MERGE, 'utf8');
+  assert.doesNotMatch(
+    workflow,
+    /uses:\s*actions\/checkout/,
+    'roda em pull_request_target: um checkout traria código não revisado para um job privilegiado',
+  );
 });
 
 // Isola o bloco YAML de um step pelo seu conteúdo. Asserção sobre o arquivo
