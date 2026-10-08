@@ -154,32 +154,36 @@ function apiDevPlugin() {
   };
 }
 
-// Mirrors functions/[[path]].ts: the NPS invite token is swapped for cookies
-// before the /nps HTML loads (issue #1666), so dev and e2e exercise the same flow.
-function npsInviteDevPlugin() {
+// Mirrors functions/[[path]].ts: the NPS invite token (issue #1666) and the
+// /quiz pre-fill are swapped for cookies before the page HTML loads, so dev and
+// e2e exercise the same flow.
+function edgeRedirectsDevPlugin() {
   return {
-    name: 'nps-invite-dev-plugin',
+    name: 'edge-redirects-dev-plugin',
     apply: 'serve' as const,
     configureServer(server: { middlewares: { use: (handler: (req: IncomingMessage, res: ServerResponse, next: (error?: Error) => void) => void | Promise<void>) => void } }) {
       server.middlewares.use(async (req, res, next) => {
-        const pathname = new URL(req.url || '/', 'http://vite.local').pathname;
-        // Cheap prefilter; handleNpsInviteRequest does the exact (case-insensitive) match.
-        if (!pathname.toLowerCase().startsWith('/nps')) {
+        const pathname = new URL(req.url || '/', 'http://vite.local').pathname.toLowerCase();
+        // Cheap prefilter; the handlers do the exact (case-insensitive) match.
+        if (!pathname.startsWith('/nps') && !pathname.startsWith('/quiz')) {
           next();
           return;
         }
 
         try {
-          const { handleNpsInviteRequest } = await import('./lib/nps-invite-redirect.ts');
+          const [{ handleNpsInviteRequest }, { handleQuizPrefillRequest }] = await Promise.all([
+            import('./lib/nps-invite-redirect.ts'),
+            import('./lib/quiz-prefill-redirect.ts'),
+          ]);
           const request = await toWebRequest(req, `http://${req.headers.host || 'localhost:3000'}`);
-          const response = await handleNpsInviteRequest(request);
+          const response = (await handleNpsInviteRequest(request)) ?? handleQuizPrefillRequest(request);
           if (!response) {
             next();
             return;
           }
           await sendWebResponse(response, res);
         } catch (error) {
-          next(error instanceof Error ? error : new Error('Failed to handle the NPS invite in Vite dev'));
+          next(error instanceof Error ? error : new Error('Failed to handle an edge redirect in Vite dev'));
         }
       });
     },
@@ -292,7 +296,7 @@ export default defineConfig(({ mode, isSsrBuild }) => {
       },
       react({ include: /\.(jsx|tsx|mdx)$/ }),
       adminHtmlDevPlugin(),
-      npsInviteDevPlugin(),
+      edgeRedirectsDevPlugin(),
       apiDevPlugin(),
       ...(visualizerPlugin ? [visualizerPlugin] : []),
     ],

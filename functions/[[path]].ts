@@ -5,6 +5,7 @@ import {
   requestsMarkdown,
 } from '../lib/agent-readiness';
 import { handleNpsInviteRequest } from '../lib/nps-invite-redirect';
+import { handleQuizPrefillRequest } from '../lib/quiz-prefill-redirect';
 
 interface PagesContext {
   request: Request;
@@ -47,6 +48,12 @@ export const onRequest = async ({ request, next, env }: PagesContext): Promise<R
   const npsInviteRedirect = await handleNpsInviteRequest(request);
   if (npsInviteRedirect) {
     return npsInviteRedirect;
+  }
+
+  // Same for the /quiz pre-fill: e-mail and name leave the URL before the HTML loads.
+  const quizPrefillRedirect = handleQuizPrefillRequest(request);
+  if (quizPrefillRedirect) {
+    return quizPrefillRedirect;
   }
 
   if (request.method !== 'GET' || !requestsMarkdown(request.headers.get('Accept'))) {

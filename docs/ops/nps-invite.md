@@ -68,7 +68,7 @@ doesn't check replay — and the submit then answers "link inválido ou
 expirado".
 
 `pnpm dev` mirrors the redirect through a Vite plugin (`vite.config.ts`,
-`npsInviteDevPlugin`), so local testing and the e2e suite exercise the same flow.
+`edgeRedirectsDevPlugin`), so local testing and the e2e suite exercise the same flow.
 
 What remains: the edge still receives the tokenized URL on that first request
 — that is the hosting itself (Cloudflare, operator 2.1 of the transfer
