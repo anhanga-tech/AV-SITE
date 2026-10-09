@@ -1,9 +1,17 @@
 {
   "placeId": "ChIJ65P6-_G9oycRruws5FfoRDs",
   "averageRating": 5,
-  "totalReviews": 3,
-  "lastFetched": "2026-07-09T17:04:47.948Z",
+  "totalReviews": 4,
+  "lastFetched": "2026-10-09T14:36:42.952Z",
   "reviews": [
+    {
+      "id": "Ci9DQUlRQUNvZENodHljRjlvT2taV1luSXpORkpMUVZNelNHSXpkRGM0WTJaU1FsRRAB",
+      "authorName": "Agda Galvão",
+      "rating": 5,
+      "text": "Viajei para Paris com a Anhangá e fiquei muito satisfeita com a experiência! Quero destacar o profissionalismo e a dedicação da equipe, que fizeram toda a diferença nessa viagem tão especial. É muito bom contar com profissionais em quem podemos confiar. Ficam meu agradecimento e minha recomendação!",
+      "date": "2026-10-02",
+      "photoUrl": ""
+    },
     {
       "id": "Ci9DQUlRQUNvZENodHljRjlvT2tKVlVXeFVZelphUzE5b01IZ3pUMWRRYUdSZmRtYxAB",
       "authorName": "Biern Formu",
