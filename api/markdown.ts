@@ -337,7 +337,7 @@ export default async function handler(req: Request): Promise<Response> {
     });
 
     if (!rateLimit.allowed) {
-        logger.warn('RATE_LIMIT:markdown', { clientIP });
+        logger.warn('RATE_LIMIT:markdown', { subjectKey: rateLimit.subjectKey });
         return new Response('Muitas requisições. Tente novamente em breve.', {
             status: 429,
             headers: {

@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { checkRateLimit } from '../lib/rate-limit.ts';
+import { checkRateLimit, type RateLimitRedis } from '../lib/rate-limit.ts';
+import { setErrorTrackerForTests, resetErrorTrackerForTests } from '../lib/error-tracking.ts';
 
 function uid(): string {
     return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -138,6 +139,7 @@ function useEdgeRuntime(t: { after: (fn: () => void) => void }): void {
 test('edge runtime: denies when Redis is not configured (safe-fail)', async (t) => {
     useEdgeRuntime(t);
     useInMemoryFallback(t);
+    useRateLimitSecret(t, 'test-rate-limit-secret');
 
     const result = await checkRateLimit(`edge-${uid()}`, {
         limit: 100,
@@ -153,6 +155,7 @@ test('edge runtime: denies when Redis is not configured (safe-fail)', async (t) 
 test('edge runtime: in-memory fallback is not used (safe-fail preserves deny across calls)', async (t) => {
     useEdgeRuntime(t);
     useInMemoryFallback(t);
+    useRateLimitSecret(t, 'test-rate-limit-secret');
 
     const ip = `edge-multi-${uid()}`;
     const prefix = `test-rl-edge-multi-${uid()}`;
@@ -220,4 +223,167 @@ test('in-memory store GC runs when size exceeds 2000 and cleans expired entries'
 
     assert.equal(result.allowed, true);
     assert.equal(result.remaining, 4);
+});
+
+// --- Pseudonymous storage key (issue #1642) ---
+
+function useRateLimitSecret(t: { after: (fn: () => void) => void }, secret: string | undefined): void {
+    const saved = process.env.RATE_LIMIT_KEY_SECRET;
+    if (secret === undefined) delete process.env.RATE_LIMIT_KEY_SECRET;
+    else process.env.RATE_LIMIT_KEY_SECRET = secret;
+    t.after(() => {
+        if (saved === undefined) delete process.env.RATE_LIMIT_KEY_SECRET;
+        else process.env.RATE_LIMIT_KEY_SECRET = saved;
+    });
+}
+
+interface FakeRedis {
+    client: RateLimitRedis;
+    incrKeys: string[];
+    incrCalls: number;
+}
+
+function createFakeRedis(options?: { failExec?: boolean }): FakeRedis {
+    const counts = new Map<string, { count: number; ttl: number }>();
+    const incrKeys: string[] = [];
+    const client: RateLimitRedis = {
+        pipeline() {
+            const ops: Array<() => number> = [];
+            return {
+                incr(key: string) {
+                    incrKeys.push(key);
+                    const entry = counts.get(key) ?? { count: 0, ttl: -1 };
+                    entry.count += 1;
+                    counts.set(key, entry);
+                    ops.push(() => entry.count);
+                },
+                ttl(key: string) {
+                    ops.push(() => counts.get(key)?.ttl ?? -1);
+                },
+                async exec() {
+                    if (options?.failExec) throw new Error('redis unavailable');
+                    return ops.map((op) => op());
+                },
+            };
+        },
+        async expire(key: string, seconds: number) {
+            const entry = counts.get(key);
+            if (entry) entry.ttl = seconds;
+            return 1;
+        },
+    };
+    return {
+        client,
+        incrKeys,
+        get incrCalls() {
+            return incrKeys.length;
+        },
+    };
+}
+
+test('redis key is an HMAC of the IP, stable per client, and distinct across clients', async (t) => {
+    useRateLimitSecret(t, 'test-rate-limit-secret');
+    const redis = createFakeRedis();
+    const prefix = `test-rl-hmac-${uid()}`;
+    const ipA = `203.0.113.${uid()}`;
+    const ipB = `198.51.100.${uid()}`;
+
+    const first = await checkRateLimit(ipA, { limit: 5, windowMs: 60_000, prefix }, redis.client);
+    const second = await checkRateLimit(ipA, { limit: 5, windowMs: 60_000, prefix }, redis.client);
+    const other = await checkRateLimit(ipB, { limit: 5, windowMs: 60_000, prefix }, redis.client);
+
+    assert.equal(redis.incrKeys.length, 3);
+    assert.equal(redis.incrKeys[0], redis.incrKeys[1], 'the same IP must reuse the same Redis key');
+    assert.notEqual(redis.incrKeys[0], redis.incrKeys[2], 'different IPs must not share a Redis key');
+    for (const key of redis.incrKeys) {
+        assert.equal(key.includes(ipA), false, `Redis key must not contain ${ipA}`);
+        assert.equal(key.includes(ipB), false, `Redis key must not contain ${ipB}`);
+        assert.match(key, new RegExp(`^${prefix}:[0-9a-f]{32}$`));
+    }
+    assert.equal(first.subjectKey, second.subjectKey);
+    assert.notEqual(first.subjectKey, other.subjectKey);
+    assert.equal(redis.incrKeys[0], `${prefix}:${first.subjectKey}`);
+});
+
+test('redis counters still enforce the limit after the IP is pseudonymized', async (t) => {
+    useRateLimitSecret(t, 'test-rate-limit-secret');
+    const redis = createFakeRedis();
+    const ip = `203.0.113.${uid()}`;
+    const prefix = `test-rl-hmac-limit-${uid()}`;
+
+    const first = await checkRateLimit(ip, { limit: 2, windowMs: 60_000, prefix }, redis.client);
+    const second = await checkRateLimit(ip, { limit: 2, windowMs: 60_000, prefix }, redis.client);
+    const third = await checkRateLimit(ip, { limit: 2, windowMs: 60_000, prefix }, redis.client);
+
+    assert.equal(first.allowed, true);
+    assert.equal(first.remaining, 1);
+    assert.equal(second.allowed, true);
+    assert.equal(second.remaining, 0);
+    assert.equal(third.allowed, false);
+    assert.equal(third.remaining, 0);
+    assert.equal(redis.incrKeys.every((key) => key === redis.incrKeys[0]), true);
+});
+
+test('subject key changes when RATE_LIMIT_KEY_SECRET changes', async (t) => {
+    const ip = `203.0.113.${uid()}`;
+    const prefix = `test-rl-secret-rotation-${uid()}`;
+
+    useRateLimitSecret(t, 'secret-a');
+    const withA = await checkRateLimit(ip, { limit: 5, windowMs: 60_000, prefix });
+    process.env.RATE_LIMIT_KEY_SECRET = 'secret-b';
+    const withB = await checkRateLimit(ip, { limit: 5, windowMs: 60_000, prefix });
+
+    assert.notEqual(withA.subjectKey, withB.subjectKey);
+    assert.match(withA.subjectKey ?? '', /^[0-9a-f]{32}$/);
+    assert.match(withB.subjectKey ?? '', /^[0-9a-f]{32}$/);
+});
+
+test('edge runtime without RATE_LIMIT_KEY_SECRET denies before touching Redis and does not log the IP', async (t) => {
+    useEdgeRuntime(t);
+    useRateLimitSecret(t, undefined);
+    const redis = createFakeRedis();
+    const ip = `203.0.113.${uid()}`;
+    const prefix = `test-rl-missing-secret-${uid()}`;
+    const reports: unknown[] = [];
+
+    setErrorTrackerForTests((_error, context) => {
+        reports.push(context);
+    });
+    t.after(() => resetErrorTrackerForTests());
+
+    const result = await checkRateLimit(ip, { limit: 5, windowMs: 60_000, prefix }, redis.client);
+
+    assert.equal(result.allowed, false);
+    assert.equal(result.serviceUnavailable, true);
+    assert.equal(result.subjectKey, undefined);
+    assert.equal(redis.incrCalls, 0, 'Redis must not be written when the key secret is missing');
+
+    const serialized = JSON.stringify(reports);
+    assert.equal(serialized.includes(ip), false);
+    assert.match(serialized, /RATE_LIMIT_KEY_SECRET/);
+    assert.match(serialized, new RegExp(prefix));
+});
+
+test('edge runtime Redis errors log the subject key and not the plaintext IP', async (t) => {
+    useEdgeRuntime(t);
+    useRateLimitSecret(t, 'test-rate-limit-secret');
+    const redis = createFakeRedis({ failExec: true });
+    const ip = `198.51.100.${uid()}`;
+    const prefix = `test-rl-redis-error-log-${uid()}`;
+    const reports: unknown[] = [];
+
+    setErrorTrackerForTests((_error, context) => {
+        reports.push(context);
+    });
+    t.after(() => resetErrorTrackerForTests());
+
+    const result = await checkRateLimit(ip, { limit: 5, windowMs: 60_000, prefix }, redis.client);
+
+    assert.equal(result.allowed, false);
+    assert.equal(result.serviceUnavailable, true);
+    assert.match(result.subjectKey ?? '', /^[0-9a-f]{32}$/);
+
+    const serialized = JSON.stringify(reports);
+    assert.equal(serialized.includes(ip), false);
+    assert.equal(serialized.includes(result.subjectKey ?? 'missing-subject-key'), true);
 });
