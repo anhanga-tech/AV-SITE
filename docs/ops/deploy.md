@@ -27,6 +27,7 @@ O Cloudflare AI Gateway é opcional e controlado por feature flag. Use para moni
 ### Antes do Deploy:
 
 - [ ] Configure todas as variáveis de ambiente no dashboard do Cloudflare Pages (Settings → Environment Variables). Consulte `.env.example` para a lista completa.
+- [ ] `RATE_LIMIT_KEY_SECRET` presente em **Preview e Production** antes de publicar a pseudonimização do IP (PR #1828). Gere com `openssl rand -base64 32` e não commite o valor. Sem ele, `/api/generate` e os formulários respondem 503; `/api/auth`, `/api/auth/callback` e `/api/markdown` respondem 429.
 - [ ] Se usar AI Gateway, configure `AI_GATEWAY_ENABLED=true`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_AI_GATEWAY_ID` e `CLOUDFLARE_AI_GATEWAY_TOKEN`
 - [ ] Teste o build localmente: `pnpm build && pnpm preview`
 - [ ] Verifique se todas as rotas funcionam corretamente
@@ -54,11 +55,15 @@ Consulte `.env.example` para a lista completa com descrições. Grupos principai
 - **Gemini AI** (required): `GEMINI_API_KEY`
 - **Odoo** (required in prod): `ODOO_URL`, `ODOO_DB`, `ODOO_LOGIN`, `ODOO_API_KEY` — CRM ativo; os 5 formulários (lead/contato/quiz/waitlist/nps) postam direto via JSON-RPC
 - **n8n Webhook** (required in prod): `N8N_WEBHOOK_SECRET` — restrito a `purchase-dispatch` (inbound); não é mais usado para intake de formulários
-- **Rate Limiting** (required in prod): `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `RATE_LIMIT_KEY_SECRET` (HMAC do IP na chave; sem ele em produção o rate limit responde 503 em vez de gravar o IP em claro — configurar no Pages antes do deploy, Preview e Production)
+- **Rate Limiting** (required in prod): `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `RATE_LIMIT_KEY_SECRET` (HMAC do IP na chave; ver o checklist acima e a rotação abaixo)
 - **Decap CMS OAuth** (required in prod): `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`
 - **Meta CAPI** (optional): `META_PIXEL_ID`, `META_ACCESS_TOKEN`
 
 **Retiradas do checklist (não lidas por nenhum handler após o cut-over para Odoo):** `N8N_SUBMIT_CONTACT_WEBHOOK_URL`, `NPS_WEBHOOK_URL`. **Retiradas (set/2026 — webhook HubSpot removido):** `HUBSPOT_TOKEN`, `HUBSPOT_WEBHOOK_SECRET`. Remova-as do dashboard do Cloudflare Pages se ainda estiverem configuradas.
+
+### Rotação de `RATE_LIMIT_KEY_SECRET`
+
+A chave no Redis é o prefixo do endpoint mais o HMAC do IP com esse secret. Trocar o valor faz as chaves antigas deixarem de ser encontradas, e os contadores recomeçam do zero. Quem estava bloqueado volta a passar até estourar o limite de novo. Não há migração nem dado pessoal para apagar. Troque Preview e Production juntos quando o secret puder ter vazado.
 
 ## Troubleshooting
 
