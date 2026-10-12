@@ -201,7 +201,7 @@ export default async function handler(req: Request): Promise<Response> {
     });
 
     if (!rateLimit.allowed) {
-        logger.warn('AUTH_CALLBACK: rate limit exceeded', { clientIP });
+        logger.warn('AUTH_CALLBACK: rate limit exceeded', { subjectKey: rateLimit.subjectKey });
         return buildPostMessageHtml('error', 'Too many requests. Please try again later.', 429);
     }
 

@@ -11,7 +11,7 @@ import { createLeadEventId } from './useLeadCapture';
 import { extractUtms, normalizeLeadTracking } from '../lib/tracking-normalization';
 import type { ContactFormFields, SubmitContactRequest, SubmitContactResponse } from '../types/contactCapture';
 import type { LeadTracking } from '../types/leadCapture';
-import type { ContactModalOptions } from '../utils/contactForm';
+import { appendTripDetailsToMessage, type ContactModalOptions } from '../utils/contactForm';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
 import { pushGenerateLeadConversionEvent } from '../utils/generate-lead-analytics';
 import { trackTraksWhatsAppHandoff } from '../utils/traks';
@@ -23,6 +23,8 @@ const EMPTY_FIELDS: ContactFormFields = {
     whatsapp: '',
     email: '',
     emailOptIn: false,
+    childrenAges: '',
+    tripDays: '',
 };
 
 function collectTracking(): { tracking: LeadTracking; utms: SubmitContactRequest['utms'] } {
@@ -188,9 +190,15 @@ export function useContactForm(options: ContactModalOptions = {}) {
             const eventId = eventIdRef.current ?? createLeadEventId();
             eventIdRef.current = eventId;
             const { tracking, utms } = collectTracking();
-            const whatsappMessage =
+            // Só lidos quando o modal os exibiu — evita mandar resto de estado de
+            // um CTA anterior que pedia esses campos.
+            const childrenAges = options.askTripDetails ? fields.childrenAges.trim() : '';
+            const tripDays = options.askTripDetails ? fields.tripDays.trim() : '';
+            const whatsappMessage = appendTripDetailsToMessage(
                 options.message
-                ?? `Olá! Meu nome é ${validation.normalized.firstName}. Gostaria de saber mais sobre viagens.`;
+                ?? `Olá! Meu nome é ${validation.normalized.firstName}. Gostaria de saber mais sobre viagens.`,
+                { childrenAges, tripDays },
+            );
             const whatsappLink = getWhatsAppLink(whatsappMessage);
             // Reserve the tab synchronously — before the network round-trip
             // below — so Safari still treats the navigation as a direct
@@ -221,6 +229,8 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 emailOptIn: fields.emailOptIn,
                 source: options.source,
                 destination: options.destination,
+                childrenAges: childrenAges || undefined,
+                tripDays: tripDays || undefined,
                 eventId,
                 utms,
                 tracking,
@@ -358,7 +368,7 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 }
             }
         },
-        [fields, options.destination, options.message, options.source, getAntiBotFields, formId],
+        [fields, options.askTripDetails, options.destination, options.message, options.source, getAntiBotFields, formId],
     );
 
     return { fields, setField, canAttemptSubmit, isSubmitting, error, fieldErrors, submitted, lastAction, whatsappUrl, submit, reset, honeypotProps };

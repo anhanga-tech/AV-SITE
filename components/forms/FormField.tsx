@@ -13,6 +13,7 @@ interface FormFieldProps {
   placeholder?: string;
   autoComplete?: string;
   required?: boolean;
+  maxLength?: number;
   inputClassName: string;
   inputRef?: Ref<HTMLInputElement>;
 }
@@ -27,6 +28,7 @@ export function FormField({
   placeholder,
   autoComplete,
   required,
+  maxLength,
   inputClassName,
   inputRef,
 }: FormFieldProps) {
@@ -51,6 +53,7 @@ export function FormField({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         required={required}
+        maxLength={maxLength}
         className={inputClassName}
         placeholder={placeholder}
         aria-invalid={error ? true : undefined}
