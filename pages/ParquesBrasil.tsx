@@ -13,7 +13,7 @@ import {
   UpcomingSection,
 } from '../components/parques-brasil/ParquesBrasilSections';
 import { BOOKABLE_PARKS, PARQUES_FAQ_ITEMS } from '../components/parques-brasil/constants';
-import { openContactModal } from '../utils/contactForm';
+import { openParquesContact } from '../components/parques-brasil/contact';
 import { useWhatsAppLink } from '../utils/whatsapp';
 
 const PAGE_URL = 'https://www.anhanga.tur.br/parques-brasil/';
@@ -25,7 +25,7 @@ const ParquesBrasil: React.FC = () => {
   const whatsappUrl = useWhatsAppLink(WHATSAPP_MESSAGE);
 
   const handleCtaClick = useCallback(() => {
-    openContactModal({ source: 'parques-brasil' });
+    openParquesContact();
   }, []);
 
   return (
