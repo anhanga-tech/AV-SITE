@@ -15,6 +15,19 @@
 
 export type ParkTier = 'credenciado' | 'pacote' | 'emBreve';
 
+/*
+  Só entra foto com direito de uso confirmado (banco de imagens do parque para
+  agentes, foto própria ou de cliente com autorização, ou licença aberta com
+  crédito). Sem `image`, o ParkPhoto desenha o placeholder da marca — trocar um
+  pelo outro é preencher este campo, nada mais.
+*/
+export interface ParkImage {
+  src: string;
+  alt: string;
+  /** Autoria/licença, quando a fonte exige crédito visível. */
+  credit?: string;
+}
+
 export interface Park {
   slug: string;
   name: string;
@@ -31,6 +44,9 @@ export interface Park {
   /** Melhor época, em termos de fila e clima. */
   when: string;
   href?: string;
+  image?: ParkImage;
+  /** O diferencial em poucas palavras, com ícone, na lista dos aquáticos. */
+  highlight?: string;
 }
 
 export const PARKS: Park[] = [
@@ -77,6 +93,7 @@ export const PARKS: Park[] = [
       'Família que quer piscina o dia inteiro sem depender do sol aparecer.',
     days: '2 a 3 dias',
     when: 'O ano todo. É o único parque aquático daqui que não perde a graça em julho.',
+    highlight: 'Água termal natural',
   },
   {
     slug: 'beach-park',
@@ -91,6 +108,7 @@ export const PARKS: Park[] = [
       'Quem quer parque e praia na mesma viagem sem trocar de cidade nem pegar estrada.',
     days: '4 a 5 dias',
     when: 'Julho a janeiro pega o período de menos chuva no litoral do Ceará.',
+    highlight: 'Parque e praia no mesmo lugar',
   },
   {
     slug: 'hot-park',
@@ -105,6 +123,7 @@ export const PARKS: Park[] = [
       'Casal ou família que topa combinar parque com descanso — a região vive de resort e águas termais.',
     days: '3 a 4 dias',
     when: 'Maio a setembro, a seca goiana. Chove pouco e a água quente compensa a noite fria.',
+    highlight: 'Água termal e resort',
   },
   {
     slug: 'cacau-park',
@@ -127,6 +146,9 @@ export const UPCOMING_PARKS = PARKS.filter((park) => park.tier === 'emBreve');
 
 /** Parques vendáveis hoje — o Cacau Park fica de fora da comparação. */
 export const BOOKABLE_PARKS = PARKS.filter((park) => park.tier !== 'emBreve');
+
+/** Os três do mosaico do hero: um temático e dois aquáticos de regiões diferentes. */
+export const HERO_PARK_SLUGS = ['beto-carrero', 'thermas-dos-laranjais', 'beach-park'] as const;
 
 export const PARQUES_FAQ_ITEMS = [
   {

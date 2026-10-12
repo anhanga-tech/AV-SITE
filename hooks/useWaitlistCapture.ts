@@ -41,7 +41,27 @@ function buildSubmitWaitlistError(
     };
 }
 
-function pushWaitlistSignupDataLayerEvent(payload: SubmitWaitlistRequest): void {
+/*
+  Rótulos que vão para o dataLayer. O default é o da primeira lista (Lollapalooza)
+  e continua valendo para ela sem mudança; outras listas passam os seus para não
+  contarem no GA4 como cadastro do Lolla.
+*/
+export interface WaitlistAnalyticsLabels {
+    destination: string;
+    interestYear: string;
+    formId: string;
+}
+
+const DEFAULT_ANALYTICS_LABELS: WaitlistAnalyticsLabels = {
+    destination: 'Lollapalooza Brasil',
+    interestYear: '2027',
+    formId: 'lolla_waitlist_2027',
+};
+
+export function pushWaitlistSignupDataLayerEvent(
+    payload: SubmitWaitlistRequest,
+    labels: WaitlistAnalyticsLabels = DEFAULT_ANALYTICS_LABELS,
+): void {
     if (typeof window === 'undefined' || !window.dataLayer) {
         return;
     }
@@ -49,8 +69,8 @@ function pushWaitlistSignupDataLayerEvent(payload: SubmitWaitlistRequest): void 
     // 1. Internal waitlist event
     window.dataLayer.push({
         event: 'waitlist_signup',
-        destination: 'Lollapalooza Brasil',
-        interest_year: '2027',
+        destination: labels.destination,
+        interest_year: labels.interestYear,
         source_page: payload.sourcePage,
         utm_source: payload.utms.utm_source,
         utm_medium: payload.utms.utm_medium,
@@ -64,12 +84,12 @@ function pushWaitlistSignupDataLayerEvent(payload: SubmitWaitlistRequest): void 
     window.dataLayer.push({
         event: 'form_submission',
         form_type: 'waitlist',
-        form_id: 'lolla_waitlist_2027',
+        form_id: labels.formId,
         page_location: window.location.href,
     });
 }
 
-export function useWaitlistCapture() {
+export function useWaitlistCapture(labels: WaitlistAnalyticsLabels = DEFAULT_ANALYTICS_LABELS) {
     const { getAntiBotFields, honeypotProps } = useAntiBot();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const isLocallySubmitting = useRef(false);
@@ -120,7 +140,7 @@ export function useWaitlistCapture() {
                 return failure;
             }
 
-            pushWaitlistSignupDataLayerEvent(payload);
+            pushWaitlistSignupDataLayerEvent(payload, labels);
 
             return {
                 ok: true,
@@ -143,7 +163,7 @@ export function useWaitlistCapture() {
             setIsSubmitting(false);
             isLocallySubmitting.current = false;
         }
-    }, [refreshTrackingState, getAntiBotFields]);
+    }, [refreshTrackingState, getAntiBotFields, labels]);
 
     return {
         tracking: trackingState.tracking,

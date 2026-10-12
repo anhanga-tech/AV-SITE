@@ -62,13 +62,31 @@ test.describe('layout do hub /parques-brasil', () => {
     }
   });
 
-  test('a tabela comparativa rola sozinha em vez de estourar a página', async ({ page }) => {
+  test('no celular a comparação vira cards, sem tabela nem overflow', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 568 });
+    await page.goto('/parques-brasil/');
+
+    // A tabela pedia rolagem lateral de 44rem no celular; abaixo de md ela
+    // sai e cada parque vira um card.
+    const cards = page.getByRole('list', { name: 'Comparação entre os parques' });
+    await cards.scrollIntoViewIfNeeded();
+    await expect(cards).toBeVisible();
+    await expect(page.locator('table')).toBeHidden();
+
+    const hasHorizontalOverflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+    );
+    expect(hasHorizontalOverflow).toBe(false);
+  });
+
+  test('a partir do tablet a tabela volta e rola sozinha', async ({ page }) => {
+    await page.setViewportSize({ width: 768, height: 1024 });
     await page.goto('/parques-brasil/');
 
     const table = page.locator('table');
     await table.scrollIntoViewIfNeeded();
     await expect(table).toBeVisible();
+    await expect(page.getByRole('list', { name: 'Comparação entre os parques' })).toBeHidden();
 
     const wrapperOverflowX = await table.evaluate(
       (el) => getComputedStyle(el.parentElement as HTMLElement).overflowX,
