@@ -1,16 +1,24 @@
 {
   "placeId": "ChIJ65P6-_G9oycRruws5FfoRDs",
   "averageRating": 5,
-  "totalReviews": 3,
-  "lastFetched": "2026-07-09T17:04:47.948Z",
+  "totalReviews": 4,
+  "lastFetched": "2026-10-12T03:06:36.348Z",
   "reviews": [
+    {
+      "id": "Ci9DQUlRQUNvZENodHljRjlvT2taV1luSXpORkpMUVZNelNHSXpkRGM0WTJaU1FsRRAB",
+      "authorName": "Agda Galvão",
+      "rating": 5,
+      "text": "Viajei para Paris com a Anhangá e fiquei muito satisfeita com a experiência! Quero destacar o profissionalismo e a dedicação da equipe, que fizeram toda a diferença nessa viagem tão especial. É muito bom contar com profissionais em quem podemos confiar. Ficam meu agradecimento e minha recomendação!",
+      "date": "2026-10-02",
+      "photoUrl": "https://media.anhanga.tur.br/reviews/Ci9DQUlRQUNvZENodHljRjlvT2taV1luSXpORkpMUVZNelNHSXpkRGM0WTJaU1FsRRAB.jpg"
+    },
     {
       "id": "Ci9DQUlRQUNvZENodHljRjlvT2tKVlVXeFVZelphUzE5b01IZ3pUMWRRYUdSZmRtYxAB",
       "authorName": "Biern Formu",
       "rating": 5,
       "text": "Atendimento impecável, do inicio ao fim. Fui recebido com atenção, não me mostraram apenas valores, me deram dicas, excelentes dicas de viagem e do destino que eu buscava.",
       "date": "2026-07-09",
-      "photoUrl": ""
+      "photoUrl": "https://media.anhanga.tur.br/reviews/Ci9DQUlRQUNvZENodHljRjlvT2tKVlVXeFVZelphUzE5b01IZ3pUMWRRYUdSZmRtYxAB.jpg"
     },
     {
       "id": "Ci9DQUlRQUNvZENodHljRjlvT25JMVpVeFFORWR6VWxrdFVrcHpWSE5xY2xGQ00yYxAB",
@@ -18,7 +26,7 @@
       "rating": 5,
       "text": "Gostaria de tornar público a experiência incrível que vivi do início ao fim com essa agência. Desde o primeiro contato, senti um acolhimento e atendimento diferente e especial. Atenciosos e preocupados com os detalhes, eles fizeram toda a diferença no atendimento e na entrega da viagem. Foi tudo perfeito! Foram dias incríveis e recebi todo o suporte necessário. Valeu cada centavo. Não viajo mais sem vocês! Parabéns, sucesso, vida longa e até a próxima viagem!!",
       "date": "2025-08-08",
-      "photoUrl": ""
+      "photoUrl": "https://media.anhanga.tur.br/reviews/Ci9DQUlRQUNvZENodHljRjlvT25JMVpVeFFORWR6VWxrdFVrcHpWSE5xY2xGQ00yYxAB.jpg"
     },
     {
       "id": "Ci9DQUlRQUNvZENodHljRjlvT2pGRlVHUkJiazFNT0ZKMGJta3laVXREY3pKMVJsRRAB",
@@ -26,7 +34,7 @@
       "rating": 5,
       "text": "Roteiro especializado , suporte humanizado , valor justo .",
       "date": "2025-08-06",
-      "photoUrl": ""
+      "photoUrl": "https://media.anhanga.tur.br/reviews/Ci9DQUlRQUNvZENodHljRjlvT2pGRlVHUkJiazFNT0ZKMGJta3laVXREY3pKMVJsRRAB.jpg"
     }
   ]
 }

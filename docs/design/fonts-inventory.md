@@ -15,9 +15,9 @@ No CSS a família serifada se chama **`Anhanga Serif`**, não `Merriweather` —
 exigência de licença, não escolha de marca. Ver
 [Renomear o serifado é exigência da OFL](#renomear-o-serifado-é-exigência-da-ofl).
 
-As landings de evento (`/orlando`, `/lollapalooza`, `/beto-carrero`) continuam
-carregando as famílias próprias delas pelo Google Fonts — ver
-[Por que as landings ficaram de fora](#por-que-as-landings-ficaram-de-fora).
+Desde a #1641, as landings também usam fontes locais. Outfit e Space Mono têm
+CSS próprio importado pelas páginas lazy-loaded, sem entrar no CSS global.
+Beto Carrero usa Poppins; os links de Fredoka/Nunito estavam sem uso e foram removidos.
 
 ## Resultado medido
 
@@ -60,20 +60,27 @@ sobrepõem em `U+0304`, `U+0308` e `U+0329`, e o CSS resolve faces equivalentes 
 inversa da declaração: com `latin` por último, essas combining marks usam o arquivo
 menor em vez de puxar o `latin-ext`. É a mesma ordem que o Google Fonts emite.
 
-### Famílias por landing (ainda no Google Fonts)
+### Famílias por landing (auto-hospedadas, #1641)
 
-| Rota | Família | Pesos pedidos | Bytes baixados (latin) |
+| Rota | Família | Pesos | Arquivos `latin` / `latin-ext` |
 |---|---|---|---|
-| `/orlando` | Outfit (variável) | 400;500;600;700;900 | 31,5 KiB — **um** arquivo para todos os pesos |
-| `/orlando` | Space Mono (estática) | 400;700 | 16,1 + 16,3 KiB (baixa `latin-ext` também) |
-| `/lollapalooza` | Outfit (variável) | 300;400;600;700;900 | 31,5 KiB |
-| `/beto-carrero` | Fredoka (variável) | 300;400;600;700 | 29,0 KiB |
-| `/beto-carrero` | Nunito (variável) | 400;600;700;800 | 38,2 KiB |
+| `/orlando` | Outfit (variável) | 300–900 (inclui 400/500/600/700/900 usados na rota) | 35,4 / 15,8 KiB |
+| `/orlando` | Space Mono (estática) | 400;700 | 14,4 + 14,5 / 14,1 + 14,2 KiB |
+| `/lollapalooza` | Outfit (variável, compartilhada com Orlando) | 300–900 | 35,4 / 15,8 KiB |
+| `/beto-carrero` | Poppins (global) | 400;600;700;900 | tabela global acima |
 
-Os pesos 500 e 600 do Outfit foram acrescentados em `/orlando` nesta mudança: as
-regras `font-weight: 500/600` de `pages/landings/orlando.css` não tinham face
-correspondente e caíam na de 400. Como o Outfit é variável e o Google serve o mesmo
-arquivo para todos os pesos declarados, a correção custou zero byte.
+`src/fonts/outfit.css` e `src/fonts/space-mono.css` apontam para WOFF2 em
+`src/fonts/landings/`. Preservam `kern`, ligaduras e acentuação, com
+`font-display: swap` e `latin-ext` antes de `latin`. O Vite emite os assets com hash;
+a home não importa esses CSS nem baixa os WOFF2 das landings. Outfit mantém o eixo
+`wght` de 300 a 900 em um arquivo por subconjunto, cobrindo os pesos das duas rotas.
+
+As OFL de Outfit e Space Mono não declaram Reserved Font Name no cabeçalho;
+os nomes originais são mantidos e os avisos de copyright/licença preservados nos
+metadados. As licenças acompanham os binários em `src/fonts/landings/OFL-*.txt`.
+Fredoka/Nunito não são usadas pelo código atual de Beto Carrero (que usa
+`font-sans`/`font-display`, ambas Poppins); não geramos faces sem uso nem alteramos
+sua tipografia.
 
 ## Renomear o serifado é exigência da OFL
 
@@ -140,20 +147,17 @@ comportamento de swap é o mesmo de antes e a fonte chega mais cedo). Casar mét
 fallback é um ajuste independente, com risco próprio de errar os números; fica como
 oportunidade futura, medindo CLS antes e depois.
 
-## Por que as landings ficaram de fora
+## Histórico das landings
 
-Auto-hospedar Outfit + Space Mono levaria `/orlando` de 76,4 KiB de terceiro para
-~65,7 KiB locais: o ganho real ali é **conexão, não byte** (duas origens a menos), e
-custaria mais cinco binários versionados e três landings tocadas. O blog, que era o
-caso apontado na issue, já foi resolvido. Se `/orlando` e `/lollapalooza` virarem
-destino de mídia paga com meta de LCP, vale abrir issue própria e reaproveitar o mesmo
-`scripts/build-fonts.mjs` — ele já aceita qualquer família do repositório
-`google/fonts`.
+As medições de setembro acima antecedem a #1641, quando as landings ainda abriam
+conexões com o Google Fonts. A migração de outubro elimina essas duas origens;
+a tabela de famílias por landing registra os assets locais atuais.
 
 ## Como regerar os arquivos
 
 ```bash
-pnpm fonts:build   # baixa os TTFs oficiais, gera src/fonts/*.woff2 e imprime os tamanhos
+pnpm fonts:build              # gera fontes globais e de landing
+pnpm fonts:build --landings   # gera só src/fonts/landings/, sem alterar as globais
 ```
 
 Commite a saída. O contrato é verificado por `tests/self-hosted-fonts.test.ts`: faces esperadas com um
@@ -165,3 +169,21 @@ Fonts é verificado por `tests/index-third-party-scripts.test.ts`.
 
 O `docs/design/brand-system/colors_and_type.css` continua importando do Google Fonts de
 propósito: é um preview standalone, aberto direto no browser e fora do bundle do site.
+
+`tests/landing-fonts.test.ts` impede Google Fonts em `pages/` e `components/`,
+verifica os binários, as licenças e os metadados das faces de landing.
+`tests/e2e/landing-fonts.spec.ts` observa requests e carregamento em desktop/mobile,
+incluindo a ausência de downloads dessas famílias na home.
+
+## Validação da #1641 (11/10/2026)
+
+Chromium local, em 1440×900 e 390×900: comparação manual da tipografia das três
+landings com os TTFs oficiais de Outfit/Space Mono usados para gerar os subsets,
+carregados como faces de referência. As famílias e quebras de linha foram
+preservadas. Beto Carrero mantém as faces globais de Poppins. A comparação isolou
+as fontes, bloqueando mídia externa; não valida essas imagens nem os estados
+animados do conteúdo. A CSP atual só restringe `base-uri`, `object-src`,
+`frame-ancestors` e `form-action`, sem exceções de fontes Google a remover.
+
+Os oito testes de carregamento passaram em desktop/mobile tanto no dev server
+quanto no preview do build, incluindo o guard de downloads na home.

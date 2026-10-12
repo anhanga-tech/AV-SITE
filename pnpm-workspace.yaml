@@ -156,6 +156,12 @@ overrides:
   # gerado pelo build ficou idêntico. Escopado a "@6" porque é a única major
   # na árvore e o consumidor pede 6.x.
   "postcss-selector-parser@6": "^7.1.6"
+  # pnpm audit (high): GHSA-68fv-2mgg-jv7q — source-map-js < 1.2.2 allows
+  # event-loop DoS via crafted indexed source-map section offsets.
+  # Transitive build-time via @tailwindcss/postcss, postcss (direct dep) and
+  # react-doctor > magicast. 1.2.2 (published 2026-09-30, cooldown vencido
+  # em 2026-10-07) corrige; único major na árvore, sem downgrade.
+  source-map-js: "^1.2.2"
 
 legacyPeerDeps: true
 nodeLinker: hoisted
