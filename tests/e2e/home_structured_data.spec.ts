@@ -1,4 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+const googleReviews = JSON.parse(
+  readFileSync(resolve(import.meta.dirname, '../../data/googleReviews.json'), 'utf8')
+) as { averageRating: number; totalReviews: number };
 
 function parseStructuredData(rawJson: string): Record<string, unknown> {
   return JSON.parse(rawJson);
@@ -60,7 +66,8 @@ test.describe('Home structured data', () => {
     const rating = orgSchema.aggregateRating as Record<string, unknown>;
     expect(rating).toBeDefined();
     expect(rating['@type']).toBe('AggregateRating');
-    expect(rating['ratingValue']).toBe(5);
-    expect(rating['reviewCount']).toBe(3);
+    // Derivado do dado para não quebrar a cada refresh semanal de reviews.
+    expect(rating['ratingValue']).toBe(googleReviews.averageRating);
+    expect(rating['reviewCount']).toBe(googleReviews.totalReviews);
   });
 });
