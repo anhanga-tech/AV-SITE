@@ -1,4 +1,5 @@
 import React from 'react';
+import '../../src/fonts/outfit.css';
 import { Link } from 'react-router-dom';
 import { Seo } from '../../components/Seo';
 import { LandingFAQ } from '../../components/LandingFAQ';
@@ -60,14 +61,6 @@ const LollapaloozaLanding: React.FC = () => {
           </Link>
         </div>
       </div>
-
-      {/* React 19 native resource hints */}
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap"
-        rel="stylesheet"
-      />
 
       <LollapaloozaApp />
       <LandingFAQ items={LOLLAPALOOZA_FAQ_ITEMS} />

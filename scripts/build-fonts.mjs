@@ -70,7 +70,7 @@ const serifNames = (subfamily, postScriptSuffix) => ({
   10: PROVENANCE,
 });
 
-const FACES = [
+const CORE_FACES = [
   {
     file: 'merriweather/Merriweather[opsz,wdth,wght].ttf',
     output: 'merriweather-400',
@@ -98,10 +98,32 @@ const FACES = [
   { file: 'poppins/Poppins-Black.ttf', output: 'poppins-900', keepFeatures: WITH_KERN },
 ];
 
-const LICENSES = [
+const CORE_LICENSES = [
   { file: 'merriweather/OFL.txt', output: 'OFL-Merriweather.txt' },
   { file: 'poppins/OFL.txt', output: 'OFL-Poppins.txt' },
 ];
+
+// As landings são lazy-loaded: suas faces e licenças ficam separadas das globais.
+// Estas duas famílias não declaram Reserved Font Name no cabeçalho da OFL.
+const LANDING_FACES = [
+  {
+    file: 'outfit/Outfit[wght].ttf',
+    output: 'landings/outfit-300-900',
+    axes: { wght: { min: 300, max: 900 } },
+    keepFeatures: WITH_KERN,
+  },
+  { file: 'spacemono/SpaceMono-Regular.ttf', output: 'landings/space-mono-400', keepFeatures: WITH_KERN },
+  { file: 'spacemono/SpaceMono-Bold.ttf', output: 'landings/space-mono-700', keepFeatures: WITH_KERN },
+];
+const LANDING_LICENSES = [
+  { file: 'outfit/OFL.txt', output: 'landings/OFL-Outfit.txt' },
+  { file: 'spacemono/OFL.txt', output: 'landings/OFL-SpaceMono.txt' },
+];
+
+// Permite atualizar só as landings sem regerar as fontes globais já versionadas.
+const landingsOnly = process.argv.includes('--landings');
+const FACES = landingsOnly ? LANDING_FACES : [...CORE_FACES, ...LANDING_FACES];
+const LICENSES = landingsOnly ? LANDING_LICENSES : [...CORE_LICENSES, ...LANDING_LICENSES];
 
 /** Expande uma lista de unicode-ranges CSS na string de caracteres que o subsetter espera. */
 function expandUnicodeRange(spec) {
@@ -128,7 +150,7 @@ async function download(remotePath, destination) {
 
 async function main() {
   const cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'anhanga-fonts-'));
-  fs.mkdirSync(OUT_DIR, { recursive: true });
+  fs.mkdirSync(path.join(OUT_DIR, 'landings'), { recursive: true });
 
   for (const { file, output } of LICENSES) {
     const source = path.join(cacheDir, output);
