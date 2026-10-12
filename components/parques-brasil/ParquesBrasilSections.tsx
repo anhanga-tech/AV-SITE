@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, BadgeCheck, CalendarClock, Clock, HardHat } from 'lucide-react';
+import { ArrowRight, MapPin, BadgeCheck, CalendarClock, Clock, HardHat } from 'lucide-react';
 import {
   BOOKABLE_PARKS,
   CREDENTIALED_PARKS,
@@ -8,6 +8,7 @@ import {
   UPCOMING_PARKS,
   type Park,
 } from './constants';
+import { openParquesContact } from './contact';
 
 /*
   Hierarquia visual deliberada (DESIGN.md proíbe cards idênticos em grade):
@@ -15,7 +16,8 @@ import {
     a Anhangá emite ingresso oficial;
   - aquáticos: lista horizontal compacta, peso menor;
   - Cacau Park: faixa escura de antecipação, sem CTA (não há o que vender).
-  O Âmbar Vivo aparece uma única vez na página inteira: no CTA final.
+  O Âmbar Vivo aparece uma única vez na página inteira: no CTA final. Os CTAs
+  do hero e dos cards ficam em escuro/contorno/link para não competir com ele.
 */
 
 interface SectionProps {
@@ -43,8 +45,25 @@ export const ParquesHero: React.FC = () => (
         ano importam mais do que qualquer ranking. Abaixo está o que separa um do outro —
         e onde a gente emite ingresso oficial.
       </p>
+      {/* Quem já chega decidido não precisa rolar seis seções até o CTA final. */}
+      <button
+        type="button"
+        onClick={() => openParquesContact()}
+        className="mt-8 inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-anhanga-dark px-6 py-3 font-semibold text-white transition-transform duration-150 ease-out hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action sm:w-auto"
+      >
+        Quero ajuda para escolher
+        <ArrowRight className="size-4" aria-hidden="true" />
+      </button>
     </div>
   </section>
+);
+
+// O nome do parque vai em sr-only: na lista, cinco botões "Pedir orçamento"
+// idênticos seriam indistinguíveis para leitor de tela.
+const ParkQuoteLabel: React.FC<{ park: Park }> = ({ park }) => (
+  <>
+    Pedir orçamento<span className="sr-only"> do {park.name}</span>
+  </>
 );
 
 const CredentialedPark: React.FC<{ park: Park; index: number }> = ({ park, index }) => (
@@ -91,14 +110,23 @@ const CredentialedPark: React.FC<{ park: Park; index: number }> = ({ park, index
       </div>
     </dl>
 
-    {park.href ? (
-      <Link
-        to={park.href}
-        className="mt-7 inline-flex min-h-[44px] items-center rounded-xl bg-anhanga-dark px-6 py-3 font-semibold text-white transition-transform duration-150 ease-out hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
+    <div className="mt-7 flex flex-wrap gap-3">
+      {park.href ? (
+        <Link
+          to={park.href}
+          className="inline-flex min-h-[44px] items-center rounded-xl bg-anhanga-dark px-6 py-3 font-semibold text-white transition-transform duration-150 ease-out hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
+        >
+          Ver pacotes do {park.name}
+        </Link>
+      ) : null}
+      <button
+        type="button"
+        onClick={() => openParquesContact(park)}
+        className="inline-flex min-h-[44px] items-center rounded-xl border-2 border-anhanga-dark px-6 py-3 font-semibold text-anhanga-dark transition-colors duration-150 ease-out hover:bg-anhanga-dark hover:text-white motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
       >
-        Ver pacotes do {park.name}
-      </Link>
-    ) : null}
+        <ParkQuoteLabel park={park} />
+      </button>
+    </div>
   </article>
 );
 
@@ -163,6 +191,15 @@ export const PackageSection: React.FC = () => (
                 {park.when}
               </span>
             </div>
+            {/* Peso de link, não de botão: a lista é a seção "menor" da página. */}
+            <button
+              type="button"
+              onClick={() => openParquesContact(park)}
+              className="mt-4 inline-flex min-h-[44px] items-center gap-1.5 rounded-lg font-semibold text-anhanga-action transition-colors hover:text-anhanga-actionDark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
+            >
+              <ParkQuoteLabel park={park} />
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </button>
           </li>
         ))}
       </ul>
