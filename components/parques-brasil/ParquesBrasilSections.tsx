@@ -46,7 +46,7 @@ export const ParquesHero: React.FC = () => (
         <p className="font-display text-xs font-black uppercase tracking-[0.1em] text-anhanga-actionDark">
           Parques do Brasil
         </p>
-        <h1 className="mt-4 font-display text-4xl sm:text-5xl lg:text-6xl font-black leading-[0.95] tracking-tight text-anhanga-dark">
+        <h1 className="mt-4 font-display text-4xl sm:text-5xl font-black leading-[0.95] tracking-tight text-anhanga-dark">
           Cinco parques, e só um serve para a sua família
         </h1>
         <p className="mt-6 text-lg leading-relaxed text-zinc-700 max-w-[65ch]">
