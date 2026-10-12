@@ -1,4 +1,4 @@
-import { WhatsappLogo, Compass, Globe, ShieldCheck, SimCard, CalendarCheck, Sparkle, Confetti, SunHorizon, Anchor, Handshake, Briefcase, MusicNotes, type Icon } from '@phosphor-icons/react';
+import { WhatsappLogo, Compass, Globe, ShieldCheck, SimCard, CalendarCheck, Sparkle, Confetti, SunHorizon, Anchor, Handshake, Briefcase, MusicNotes, Tag, type Icon } from '@phosphor-icons/react';
 
 // Mora fora de LinkButton.tsx para manter aquele arquivo exportando só o componente — exports
 // não-componente quebram o Fast Refresh (react-doctor/only-export-components).
@@ -16,6 +16,7 @@ export const ICON_MAP: Record<string, Icon> = {
     Handshake,
     Briefcase,
     MusicNotes,
+    Tag,
 };
 
 // Um `icon` fora do mapa falha em silêncio: o botão perde o ícone, mas mantém seu tier (definido

@@ -9,6 +9,7 @@ import remarkGfm from 'remark-gfm';
 import { DEFAULT_GEMINI_MODEL } from './lib/ai/constants.ts';
 import { stripYamlFrontmatter } from './lib/mdx-frontmatter.ts';
 import { logger } from './lib/logger.ts';
+import { todayInSaoPaulo } from './lib/blog-schedule.js';
 
 type ApiHandler = (request: Request) => Promise<Response> | Response;
 
@@ -301,7 +302,10 @@ export default defineConfig(({ mode, isSsrBuild }) => {
       ...(visualizerPlugin ? [visualizerPlugin] : []),
     ],
     define: {
-      'process.env.GEMINI_MODEL': JSON.stringify(geminiModel)
+      'process.env.GEMINI_MODEL': JSON.stringify(geminiModel),
+      // Data do build em São Paulo: o filtro de validade de /achados (lib/achados.ts) usa a
+      // mesma data no HTML prerenderizado e no bundle do cliente, sem divergir na hidratação.
+      __BUILD_DATE_SP__: JSON.stringify(todayInSaoPaulo())
     },
     resolve: {
       alias: {

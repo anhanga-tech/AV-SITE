@@ -18,6 +18,7 @@ const EXPLICITLY_RENDERED_LINK_IDS = new Set<string>([
     'whatsapp',
     'agendar-consultoria',
     'quiz',
+    'achados',
     'site',
     ...PRODUCT_LINK_IDS,
     ...FEATURED_DESTINATION_IDS,

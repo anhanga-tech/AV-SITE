@@ -73,6 +73,9 @@ export const linksPageConfig: LinksPageConfig = {
         // pago na mesma série de dados quebraria a leitura histórica do funil.
         { id: 'agendar-consultoria', label: 'Agendar consultoria de viagem', sublabel: 'Sessão paga de 50 min · R$ 250', type: 'cal-modal', icon: 'CalendarCheck', visible: true, primary: true },
         { id: 'quiz', label: 'Planejar minha viagem', sublabel: 'Quiz de perfil de viagem', type: 'internal', href: '/quiz', icon: 'Compass', visible: true },
+        // Só aparece enquanto houver oferta válida em content/achados.json — LinksPage.tsx esconde
+        // o link quando a lista ativa está vazia, para a bio nunca levar a uma página sem achado.
+        { id: 'achados', label: 'Achados da quinzena', sublabel: 'Ofertas escolhidas a dedo, por pouco tempo', type: 'internal', href: '/achados', icon: 'Tag', visible: true },
         { id: 'site', label: 'Site oficial', type: 'internal', href: '/', icon: 'Globe', visible: true },
         { id: 'seguro-viagem', label: 'Calcular meu seguro viagem', sublabel: 'Cotação online com nosso parceiro', type: 'external', href: 'https://go.nuvembr.com/anhanga_seguroviagem', icon: 'ShieldCheck', visible: true },
         { id: 'chip-esim', label: 'Comprar chip / eSIM internacional', sublabel: 'Compra e atendimento pelo WhatsApp', type: 'whatsapp', whatsappMessage: 'Olá!{origem} Quero comprar um chip / eSIM internacional para minha viagem.', icon: 'SimCard', visible: true },

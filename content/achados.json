@@ -1,0 +1,25 @@
+{
+  "achados": [
+    {
+      "id": "msc-criancas-dezembro",
+      "titulo": "Cruzeiro em família nas férias de dezembro",
+      "destino": "Costa brasileira",
+      "fornecedor": "MSC Cruzeiros",
+      "porQueVale": "Na promoção de Dia das Crianças da MSC, o 3º e o 4º hóspedes menores de 18 anos não pagam a tarifa marítima. Para uma família com dois filhos, é uma boa porta de entrada para testar cruzeiro antes de pensar em roteiros maiores.",
+      "preco": "A partir de R$ 8.598 para 2 adultos + 2 crianças (MSC Virtuosa, 3 noites, Maceió–Santos, saída 09/12/2026)",
+      "condicoes": "Saídas selecionadas da temporada 2026/27. Crianças pagam taxas portuárias e de serviço. As crianças precisam estar na reserva desde o início. Não vale para grupos.",
+      "validoAte": "2026-10-29",
+      "mensagemWhatsapp": "Olá! Vi o achado do cruzeiro MSC em família para dezembro e quero saber mais. Somos:"
+    },
+    {
+      "id": "australis-patagonia-2x1",
+      "titulo": "Patagônia de navio, pagando por um",
+      "destino": "Patagônia (Chile e Argentina)",
+      "fornecedor": "Cruceros Australis",
+      "porQueVale": "A Australis navega pelos fiordes da Terra do Fogo em barcos pequenos, com desembarques que um navio grande não faz. No 2x1, o segundo adulto não paga e cada adulto pagante leva uma criança de até 12 anos sem custo.",
+      "condicoes": "Saídas de Punta Arenas em 04/11, 26/12 e 30/12/2026 e de Ushuaia em 18/12, 22/12 e 26/12/2026. Reserva e pagamento total até 30/10/2026.",
+      "validoAte": "2026-10-30",
+      "mensagemWhatsapp": "Olá! Vi o achado do cruzeiro Australis na Patagônia (2x1) e quero saber mais. Data que me interessa:"
+    }
+  ]
+}

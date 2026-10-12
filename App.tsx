@@ -42,6 +42,7 @@ const Privacy = lazy(() => import('./pages/Privacy'));
 const About = lazy(() => import('./pages/About'));
 const SiteMap = lazy(() => import('./pages/SiteMap'));
 const ParquesBrasil = lazy(() => import('./pages/ParquesBrasil'));
+const Achados = lazy(() => import('./pages/Achados'));
 const ExclusaoDados = lazy(() => import('./pages/ExclusaoDados'));
 const ImageCredits = lazy(() => import('./pages/ImageCredits'));
 const NotFound = lazy(() => import('./pages/NotFound'));
@@ -165,6 +166,7 @@ const MainSiteShell: React.FC = () => {
                 para herdar Header, Footer e navegação interna — é por onde a
                 busca orgânica chega e distribui para /beto-carrero. */}
             <Route path="/parques-brasil" element={<ParquesBrasil />} />
+            <Route path="/achados" element={<Achados />} />
             <Route path="/mapa-do-site" element={<SiteMap />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
