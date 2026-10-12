@@ -4,6 +4,7 @@ import { pathToFileURL } from 'node:url';
 import { build } from 'vite';
 import { fileURLToPath } from 'node:url';
 import { NOT_FOUND_ROUTE, buildPrerenderRoutes } from '../lib/prerender-routes.js';
+import { BUILD_DATE_ENV, BUILD_DATE_FILENAME } from '../lib/build-date.js';
 import { normalizeRoute, stripHomeOnlyPreloads, validateHtml } from '../lib/prerender-html.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -110,6 +111,13 @@ async function prerender() {
   }
 
   console.log('Starting SSR prerender...');
+
+  // Mesma data de referência do bundle do cliente (lib/build-date.js); o arquivo não vai ao deploy.
+  const buildDateFile = path.join(DIST_DIR, BUILD_DATE_FILENAME);
+  if (fs.existsSync(buildDateFile)) {
+    process.env[BUILD_DATE_ENV] = fs.readFileSync(buildDateFile, 'utf8').trim();
+    fs.rmSync(buildDateFile);
+  }
 
   const template = fs.readFileSync(INDEX_FILE, 'utf8');
   const serverModule = await buildSsrBundle();

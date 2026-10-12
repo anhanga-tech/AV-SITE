@@ -113,6 +113,25 @@ test('seções sem links visíveis ficam desativadas', () => {
     });
 });
 
+// Regressão (chatgpt-codex-connector[bot] review, PR #1832): o atalho de achados mora na seção de
+// destinos; com quiz e destinos ocultos, a seção precisa continuar visível para ele aparecer.
+test('achados ativos mantêm a seção de destinos visível mesmo sem outros destinos', () => {
+    const links: LinkItem[] = [
+        ...['quiz', ...FEATURED_DESTINATION_IDS, ...MORE_DESTINATION_IDS].map((id) => ({
+            id,
+            label: id,
+            type: 'internal' as const,
+            href: `/${id}`,
+            visible: false,
+        })),
+        { id: 'achados', label: 'Achados', type: 'internal', href: '/achados', visible: true },
+    ];
+
+    assert.equal(getLinksPageVisibility(links, true).hasVisibleDestinations, true);
+    assert.equal(getLinksPageVisibility(links, false).hasVisibleDestinations, false);
+    assert.deepEqual(getUnassignedVisibleLinks(links), []);
+});
+
 // Regressão (claude[bot] review, PR #1515): esse branch só roda quando um dos dois ramos de
 // intenção não existe — a config atual de data/linksPage.ts sempre deixa os dois visíveis, então
 // sem este teste direto na função pura ele nunca é exercido.

@@ -89,7 +89,7 @@ const LinksPage: React.FC = () => {
     // não um destino; separá-lo em outro grupo reduz o chunk de decisão real sem cortar destino.
     const hasQuiz = linkById.has('quiz');
     const hasAchados = HAS_ACTIVE_ACHADOS && linkById.has('achados');
-    const { hasVisibleDestinations, hasVisibleContact, hasVisibleOtherLinks } = getLinksPageVisibility(links);
+    const { hasVisibleDestinations, hasVisibleContact, hasVisibleOtherLinks } = getLinksPageVisibility(links, HAS_ACTIVE_ACHADOS);
     const hasProductIntent = visibleProductLinks.length > 0;
     const soleIntentCardSpanClass = getSoleIntentCardSpanClass(hasVisibleDestinations, hasProductIntent);
     // Depois que a pessoa escolhe uma porta (#destinos ou #preparar), a outra seção continua

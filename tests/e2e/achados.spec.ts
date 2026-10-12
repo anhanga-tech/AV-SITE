@@ -3,7 +3,9 @@ import { test, expect, type Page } from '@playwright/test';
 test.use({ viewport: { width: 390, height: 844 } }); // mobile-first: o tráfego vem do Instagram
 
 // Os achados vencem por data (lib/achados.ts) e o servidor de teste usa a data de hoje, então
-// os testes cobrem os dois estados possíveis em vez de presumir que há oferta no ar.
+// os testes cobrem os dois estados possíveis em vez de presumir que há oferta no ar. O seletor
+// casa tanto o CTA de um card (`achados-<id>`) quanto o do estado vazio (`achados-vazio`):
+// os dois passam pelo ContactModal, então o fluxo de lead é exercido com ou sem oferta ativa.
 const CTA_SELECTOR = '[data-tracking^="achados-"]';
 
 async function mockSubmitContact(page: Page) {
