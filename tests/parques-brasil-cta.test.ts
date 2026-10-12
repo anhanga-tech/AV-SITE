@@ -8,6 +8,7 @@ import { MemoryRouter } from 'react-router-dom';
 
 import ParquesBrasil from '../pages/ParquesBrasil.tsx';
 import { BOOKABLE_PARKS, UPCOMING_PARKS } from '../components/parques-brasil/constants.ts';
+import { parquesContactOptions } from '../components/parques-brasil/contact.ts';
 
 /*
   O único CTA de lead do hub ficava no fim, depois de seis seções. Cobre que o
@@ -39,7 +40,7 @@ test('o hero abre o modal de contato sem parque pré-escolhido', () => {
   renderHub();
   const heroCta = screen.getByRole('button', { name: 'Quero ajuda para escolher' });
 
-  assert.deepEqual(clickAndCaptureModalDetail(heroCta), { source: 'parques-brasil' });
+  assert.deepEqual(clickAndCaptureModalDetail(heroCta), parquesContactOptions());
 });
 
 test('cada parque vendável tem um CTA que abre o modal com o nome do parque', () => {
@@ -47,9 +48,11 @@ test('cada parque vendável tem um CTA que abre o modal com o nome do parque', (
 
   for (const park of BOOKABLE_PARKS) {
     const cta = screen.getByRole('button', { name: `Pedir orçamento do ${park.name}` });
+    const detail = clickAndCaptureModalDetail(cta) as { destination?: string };
+    assert.match(detail.destination ?? '', new RegExp(park.name));
     assert.deepEqual(
-      clickAndCaptureModalDetail(cta),
-      { source: 'parques-brasil', destination: park.name },
+      detail,
+      parquesContactOptions(park),
       `CTA de ${park.name} deveria levar o parque ao modal`,
     );
   }
@@ -69,9 +72,9 @@ test('parque em obras não ganha CTA de orçamento', () => {
   }
 });
 
-test('o CTA final continua abrindo o modal genérico', () => {
+test('o CTA final abre o modal sem parque escolhido', () => {
   renderHub();
   const finalCta = screen.getByRole('button', { name: 'Falar com um consultor' });
 
-  assert.deepEqual(clickAndCaptureModalDetail(finalCta), { source: 'parques-brasil' });
+  assert.deepEqual(clickAndCaptureModalDetail(finalCta), parquesContactOptions());
 });

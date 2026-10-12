@@ -13,16 +13,13 @@ import {
   UpcomingSection,
 } from '../components/parques-brasil/ParquesBrasilSections';
 import { BOOKABLE_PARKS, PARQUES_FAQ_ITEMS } from '../components/parques-brasil/constants';
-import { openParquesContact } from '../components/parques-brasil/contact';
+import { UNDECIDED_WHATSAPP_MESSAGE, openParquesContact } from '../components/parques-brasil/contact';
 import { useWhatsAppLink } from '../utils/whatsapp';
 
 const PAGE_URL = 'https://www.anhanga.tur.br/parques-brasil/';
 
-const WHATSAPP_MESSAGE =
-  'Olá! Estou escolhendo um parque no Brasil para viajar com a família e queria ajuda para decidir.';
-
 const ParquesBrasil: React.FC = () => {
-  const whatsappUrl = useWhatsAppLink(WHATSAPP_MESSAGE);
+  const whatsappUrl = useWhatsAppLink(UNDECIDED_WHATSAPP_MESSAGE);
 
   const handleCtaClick = useCallback(() => {
     openParquesContact();

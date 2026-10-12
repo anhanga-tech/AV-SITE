@@ -69,6 +69,9 @@ export interface OdooLeadInput {
     /** "Destino de Interesse" tags (res.partner.category) → category_id. */
     destinationTagIds?: RegionTagId[];
     destination?: string | null;
+    /** Contato aberto com `askTripDetails` (ex.: hub de parques) — só descrição, sem campo Studio. */
+    childrenAges?: string | null;
+    tripDays?: string | null;
     bantSummary?: string | null;
     /** Which on-site CTA opened the form (e.g. 'header', 'blog-sidebar') — visibility only, not a UTM source. */
     ctaSource?: string | null;
@@ -165,6 +168,8 @@ function buildDescriptionHtml(input: OdooLeadInput, idempotencyKey?: string): st
 
     push('BANT', input.bantSummary);
     push('Destino', input.destination);
+    push('Idade das crianças', input.childrenAges);
+    push('Dias disponíveis', input.tripDays);
     push('Origem (CTA)', input.ctaSource);
     push('Indicado por', input.referred);
     push('Empresa', input.empresa);
@@ -284,6 +289,8 @@ export function leadInputFromSubmitContact(data: SubmitContactRequest): OdooLead
         marketingOptIn: data.emailOptIn === true,
         destination: data.destination ?? null,
         destinationTagIds: resolveRegionTagsFromText(data.destination ?? null),
+        childrenAges: data.childrenAges ?? null,
+        tripDays: data.tripDays ?? null,
         ctaSource: data.source ?? null,
         eventId: data.eventId ?? null,
         utms: data.utms,

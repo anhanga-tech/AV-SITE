@@ -147,7 +147,7 @@ test.describe('layout do hub /parques-brasil', () => {
 
     const dialog = page.getByRole('dialog', { name: 'Fale com um consultor' });
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByText('Beach Park', { exact: true })).toBeVisible();
+    await expect(dialog.getByText('Parques do Brasil · Beach Park', { exact: true })).toBeVisible();
   });
 
   test('o hero tem CTA visível na primeira dobra do mobile', async ({ page }) => {

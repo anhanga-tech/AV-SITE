@@ -8,6 +8,9 @@ import { FormField } from './forms/FormField';
 const FIELD_CLASSNAME =
     'w-full rounded-xl border-2 border-zinc-200 px-3 py-2.5 text-sm font-medium text-zinc-800 outline-none transition-colors placeholder-zinc-400 focus:border-anhanga-action focus-visible:ring-2 focus-visible:ring-anhanga-action';
 
+// Mesmo teto aplicado em api/submit-contact.ts.
+const TRIP_DETAIL_MAX_LENGTH = 60;
+
 const ContactModal: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [options, setOptions] = useState<ContactModalOptions>({});
@@ -198,6 +201,31 @@ const ContactModal: React.FC = () => {
                             placeholder="(11) 90000-0000"
                             error={fieldErrors.whatsapp}
                         />
+
+                        {/* Só para CTAs cuja copy promete responder com base nisso
+                            (hub /parques-brasil). Opcionais: não podem custar o lead. */}
+                        {options.askTripDetails ? (
+                            <div className="grid grid-cols-2 gap-3">
+                                <FormField
+                                    id="contact-childrenAges"
+                                    label="Idade das crianças"
+                                    value={fields.childrenAges}
+                                    onChange={(value) => setField('childrenAges', value)}
+                                    maxLength={TRIP_DETAIL_MAX_LENGTH}
+                                    inputClassName={FIELD_CLASSNAME}
+                                    placeholder="ex: 4 e 9 anos"
+                                />
+                                <FormField
+                                    id="contact-tripDays"
+                                    label="Quantos dias"
+                                    value={fields.tripDays}
+                                    onChange={(value) => setField('tripDays', value)}
+                                    maxLength={TRIP_DETAIL_MAX_LENGTH}
+                                    inputClassName={FIELD_CLASSNAME}
+                                    placeholder="ex: 4 dias"
+                                />
+                            </div>
+                        ) : null}
 
                         <FormField
                             id="contact-email"
