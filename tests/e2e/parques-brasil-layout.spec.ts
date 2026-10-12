@@ -136,4 +136,27 @@ test.describe('layout do hub /parques-brasil', () => {
 
     expect(undersized).toEqual([]);
   });
+
+  test('o CTA de um parque abre o modal já dizendo qual parque', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 568 });
+    await page.goto('/parques-brasil/');
+
+    // Nome acessível medido no Chromium real: o sr-only precisa compor
+    // "Pedir orçamento do <parque>", senão os cinco botões ficam iguais.
+    await page.getByRole('button', { name: 'Pedir orçamento do Beach Park' }).click();
+
+    const dialog = page.getByRole('dialog', { name: 'Fale com um consultor' });
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByText('Beach Park', { exact: true })).toBeVisible();
+  });
+
+  test('o hero tem CTA visível na primeira dobra do mobile', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('/parques-brasil/');
+
+    const heroCta = page.getByRole('button', { name: 'Quero ajuda para escolher' });
+    await expect(heroCta).toBeInViewport();
+    await heroCta.click();
+    await expect(page.getByRole('dialog', { name: 'Fale com um consultor' })).toBeVisible();
+  });
 });
