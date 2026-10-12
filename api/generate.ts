@@ -188,7 +188,7 @@ async function getRateLimitState(
     }
 
     if (rateLimit.serviceUnavailable) {
-        logger.error('RATE_LIMIT', { clientIP, stage: 'service_unavailable' });
+        logger.error('RATE_LIMIT', { subjectKey: rateLimit.subjectKey, stage: 'service_unavailable' });
         return buildJsonResponse({
             code: 'SERVICE_UNAVAILABLE',
             error: 'Serviço temporariamente indisponível. Tente novamente em instantes.',
@@ -196,7 +196,7 @@ async function getRateLimitState(
     }
 
     logger.warn('RATE_LIMIT', {
-        clientIP,
+        subjectKey: rateLimit.subjectKey,
         retryAfterSeconds: Math.ceil(rateLimit.resetIn / 1000),
     });
     return buildJsonResponse({

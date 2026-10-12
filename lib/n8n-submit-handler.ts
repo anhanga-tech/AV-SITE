@@ -186,13 +186,12 @@ interface RequestEnv<TData, TPayload> {
 /** Builds the 503/429 denial response (with logging) for an exhausted bucket. */
 function buildRateLimitDenial<TData, TPayload>(
     env: RequestEnv<TData, TPayload>,
-    clientIp: string,
     rateLimit: Awaited<ReturnType<typeof checkRateLimit>>,
 ): Response {
     const { options, requestId, corsHeaders } = env;
 
     if (rateLimit.serviceUnavailable) {
-        logger.error(options.logScope, { requestId, stage: 'service_unavailable', clientIp });
+        logger.error(options.logScope, { requestId, stage: 'service_unavailable', subjectKey: rateLimit.subjectKey });
         return buildJsonResponse(
             { ok: false, requestId, code: 'SERVICE_UNAVAILABLE', error: 'Serviço temporariamente indisponível. Tente novamente em instantes.' },
             503,
@@ -204,7 +203,7 @@ function buildRateLimitDenial<TData, TPayload>(
     logger.warn(options.logScope, {
         requestId,
         stage: 'rate_limited',
-        clientIp,
+        subjectKey: rateLimit.subjectKey,
         remaining: rateLimit.remaining,
         retryAfterSeconds,
     });
@@ -298,7 +297,7 @@ export function createSubmitHandler<TData, TPayload = unknown>(
         });
 
         if (!rateLimit.allowed) {
-            return buildRateLimitDenial(env, clientIp, rateLimit);
+            return buildRateLimitDenial(env, rateLimit);
         }
 
         // Merged into every response below this point — the bucket is already

@@ -64,8 +64,14 @@ test('auth: config check runs before rate limiting (missing client id -> 500)', 
 
 test('auth: returns 429 once the request limit is exceeded', async () => {
     setOAuthEnv();
+    const ip = '203.0.113.77';
+    const warned: string[] = [];
+    const originalWarn = console.warn;
+    console.warn = (...args: unknown[]) => {
+        warned.push(args.map((arg) => (typeof arg === 'string' ? arg : JSON.stringify(arg))).join(' '));
+        originalWarn.apply(console, args);
+    };
     try {
-        const ip = '10.0.0.2';
         // Limit is 5 requests per window.
         for (let i = 0; i < 5; i += 1) {
             const ok = await authHandler(authRequest(ip));
@@ -75,7 +81,12 @@ test('auth: returns 429 once the request limit is exceeded', async () => {
         assert.equal(blocked.status, 429);
         const body = await blocked.json();
         assert.equal(body.error, 'RATE_LIMIT_EXCEEDED');
+        const rateLimitLog = warned.find((line) => line.includes('rate limit exceeded'));
+        assert.ok(rateLimitLog, 'rate-limit denial should be logged');
+        assert.equal(rateLimitLog.includes(ip), false, 'rate-limit log must not contain the plaintext IP');
+        assert.match(rateLimitLog, /subjectKey/);
     } finally {
+        console.warn = originalWarn;
         restoreEnv();
     }
 });

@@ -64,6 +64,7 @@ NPS_INVITE_SECRET=            # HMAC-SHA256 key (lib/nps-invite.ts) — ver docs
 # Rate limiting (required in prod — module-level state resets per request on Cloudflare)
 UPSTASH_REDIS_REST_URL=
 UPSTASH_REDIS_REST_TOKEN=
+RATE_LIMIT_KEY_SECRET=        # HMAC-SHA256 do IP na chave do Redis (lib/rate-limit.ts). Sem isso em produção o rate limit nega a requisição em vez de gravar o IP em claro. Em dev local, um fallback determinístico cobre a ausência.
 
 # Decap CMS OAuth (required in prod)
 GITHUB_CLIENT_ID=

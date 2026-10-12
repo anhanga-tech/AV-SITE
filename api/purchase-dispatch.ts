@@ -334,7 +334,7 @@ async function enforceRateLimit(request: Request, requestId: string): Promise<Re
   }
 
   if (rateLimit.serviceUnavailable) {
-    emitConversionLog('error', requestId, 'service_unavailable', { clientIP });
+    emitConversionLog('error', requestId, 'service_unavailable', { subjectKey: rateLimit.subjectKey });
     return buildJsonResponse(
       { ok: false, requestId, error: 'Serviço temporariamente indisponível. Tente novamente em instantes.' },
       503,
@@ -342,7 +342,7 @@ async function enforceRateLimit(request: Request, requestId: string): Promise<Re
   }
 
   emitConversionLog('warn', requestId, 'rate_limited', {
-    clientIP,
+    subjectKey: rateLimit.subjectKey,
     remaining: rateLimit.remaining,
     retryAfterSeconds: Math.ceil(rateLimit.resetIn / 1000),
   });

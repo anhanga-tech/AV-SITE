@@ -38,7 +38,7 @@ export default async function handler(req: Request): Promise<Response> {
     });
 
     if (!rateLimit.allowed) {
-        logger.warn('AUTH: rate limit exceeded', { clientIP });
+        logger.warn('AUTH: rate limit exceeded', { subjectKey: rateLimit.subjectKey });
         return buildJsonError(429, 'RATE_LIMIT_EXCEEDED', 'Too many requests. Please try again later.');
     }
 

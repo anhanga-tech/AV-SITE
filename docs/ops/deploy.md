@@ -54,7 +54,7 @@ Consulte `.env.example` para a lista completa com descrições. Grupos principai
 - **Gemini AI** (required): `GEMINI_API_KEY`
 - **Odoo** (required in prod): `ODOO_URL`, `ODOO_DB`, `ODOO_LOGIN`, `ODOO_API_KEY` — CRM ativo; os 5 formulários (lead/contato/quiz/waitlist/nps) postam direto via JSON-RPC
 - **n8n Webhook** (required in prod): `N8N_WEBHOOK_SECRET` — restrito a `purchase-dispatch` (inbound); não é mais usado para intake de formulários
-- **Rate Limiting** (required in prod): `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`
+- **Rate Limiting** (required in prod): `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `RATE_LIMIT_KEY_SECRET` (HMAC do IP na chave; sem ele em produção o rate limit responde 503 em vez de gravar o IP em claro — configurar no Pages antes do deploy, Preview e Production)
 - **Decap CMS OAuth** (required in prod): `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`
 - **Meta CAPI** (optional): `META_PIXEL_ID`, `META_ACCESS_TOKEN`
 
