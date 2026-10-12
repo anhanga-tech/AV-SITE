@@ -17,6 +17,8 @@ import {
 } from '../utils/linksPageLayout';
 import LinkButton from '../components/links/LinkButton';
 import TrustSeals from '../components/links/TrustSeals';
+import { getActiveAchados, getAchadosReferenceDate, type Achado } from '../lib/achados';
+import achadosContent from '../content/achados.json';
 // /links está em STANDALONE_ROUTES (App.tsx) — nenhum overlay flutuante é montado ali (AIChat,
 // BackToTop, ContactModal) porque cobririam o conteúdo curado e os selos de confiança. Mas os
 // links tipo `whatsapp` do LinkButton disparam `openContactModal()`, que é só um CustomEvent —
@@ -53,6 +55,10 @@ const subscribeToHash = (onStoreChange: () => void) => {
 const getHashSnapshot = (): string => window.location.hash;
 const getServerHashSnapshot = (): string => '';
 
+// Mesma data de referência de pages/Achados.tsx (a do build): o link e a página concordam
+// sobre haver achado no ar, inclusive no HTML prerenderizado.
+const HAS_ACTIVE_ACHADOS = getActiveAchados(achadosContent.achados as Achado[], getAchadosReferenceDate()).length > 0;
+
 const intentLinks = {
     destinos: { id: 'intent-destinos', type: 'internal' as const, destination: '#destinos' },
     produtos: { id: 'intent-produtos', type: 'internal' as const, destination: '#preparar' },
@@ -82,7 +88,8 @@ const LinksPage: React.FC = () => {
     // grupo — ver crítica de /links de 2026-08-27). O quiz é uma ferramenta ("me ajude a decidir"),
     // não um destino; separá-lo em outro grupo reduz o chunk de decisão real sem cortar destino.
     const hasQuiz = linkById.has('quiz');
-    const { hasVisibleDestinations, hasVisibleContact, hasVisibleOtherLinks } = getLinksPageVisibility(links);
+    const hasAchados = HAS_ACTIVE_ACHADOS && linkById.has('achados');
+    const { hasVisibleDestinations, hasVisibleContact, hasVisibleOtherLinks } = getLinksPageVisibility(links, HAS_ACTIVE_ACHADOS);
     const hasProductIntent = visibleProductLinks.length > 0;
     const soleIntentCardSpanClass = getSoleIntentCardSpanClass(hasVisibleDestinations, hasProductIntent);
     // Depois que a pessoa escolhe uma porta (#destinos ou #preparar), a outra seção continua
@@ -208,10 +215,18 @@ const LinksPage: React.FC = () => {
                                     {renderLink('quiz')}
                                 </nav>
                             ) : null}
+                            {hasAchados ? (
+                                <nav
+                                    aria-label="Ofertas por tempo limitado"
+                                    className={`flex w-full flex-col gap-3${hasQuiz ? ' mt-3' : ' mt-4'}`}
+                                >
+                                    {renderLink('achados')}
+                                </nav>
+                            ) : null}
                             {visibleFeaturedDestinationLinks.length > 0 ? (
                                 <nav
                                     aria-label="Destinos em destaque"
-                                    className={`flex w-full flex-col gap-3${hasQuiz ? ' mt-6' : ' mt-4'}`}
+                                    className={`flex w-full flex-col gap-3${hasQuiz || hasAchados ? ' mt-6' : ' mt-4'}`}
                                 >
                                     {visibleFeaturedDestinationLinks.map((item) => (
                                         <LinkButton key={item.id} item={item} search={search} iconBadge />

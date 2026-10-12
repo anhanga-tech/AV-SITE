@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { readFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, loadEnv } from 'vite';
@@ -9,6 +9,7 @@ import remarkGfm from 'remark-gfm';
 import { DEFAULT_GEMINI_MODEL } from './lib/ai/constants.ts';
 import { stripYamlFrontmatter } from './lib/mdx-frontmatter.ts';
 import { logger } from './lib/logger.ts';
+import { BUILD_DATE_FILENAME, resolveBuildDate } from './lib/build-date.js';
 
 type ApiHandler = (request: Request) => Promise<Response> | Response;
 
@@ -244,6 +245,8 @@ export default defineConfig(({ mode, isSsrBuild }) => {
   // O segundo parâmetro '.' significa o diretório atual (raiz do projeto)
   // O terceiro parâmetro '' significa carregar TODAS as variáveis (não apenas VITE_*)
   const env = loadEnv(mode, '.', '');
+  // Herdada do build do cliente quando o prerender roda o build SSR (lib/build-date.js).
+  const buildDateSp = resolveBuildDate(process.env);
 
   // Também verificar process.env diretamente (importante para Vercel/Netlify)
   // Isso garante que variáveis públicas/configuracionais sejam capturadas sem expor secrets no bundle
@@ -295,13 +298,25 @@ export default defineConfig(({ mode, isSsrBuild }) => {
         }),
       },
       react({ include: /\.(jsx|tsx|mdx)$/ }),
+      {
+        // Repassa a data do build do cliente ao build SSR do prerender (lib/build-date.js).
+        name: 'av-build-date',
+        apply: 'build',
+        async writeBundle(outputOptions) {
+          if (isSsrBuild || !outputOptions.dir) return;
+          await writeFile(path.join(outputOptions.dir, BUILD_DATE_FILENAME), buildDateSp, 'utf8');
+        },
+      },
       adminHtmlDevPlugin(),
       edgeRedirectsDevPlugin(),
       apiDevPlugin(),
       ...(visualizerPlugin ? [visualizerPlugin] : []),
     ],
     define: {
-      'process.env.GEMINI_MODEL': JSON.stringify(geminiModel)
+      'process.env.GEMINI_MODEL': JSON.stringify(geminiModel),
+      // Data do build em São Paulo: o filtro de validade de /achados (lib/achados.ts) usa a
+      // mesma data no HTML prerenderizado e no bundle do cliente, sem divergir na hidratação.
+      __BUILD_DATE_SP__: JSON.stringify(buildDateSp)
     },
     resolve: {
       alias: {

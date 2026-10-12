@@ -18,6 +18,7 @@ const EXPLICITLY_RENDERED_LINK_IDS = new Set<string>([
     'whatsapp',
     'agendar-consultoria',
     'quiz',
+    'achados',
     'site',
     ...PRODUCT_LINK_IDS,
     ...FEATURED_DESTINATION_IDS,
@@ -36,13 +37,19 @@ export function getVisibleLinksForIds(links: readonly LinkItem[], ids: readonly 
     });
 }
 
-export function getLinksPageVisibility(links: readonly LinkItem[]): LinksPageVisibility {
+// `hasActiveAchados` vem de fora porque depende da data de referência (lib/achados.ts), não
+// de data/linksPage.ts: o atalho de achados mora na seção de destinos e, sem contar aqui,
+// sumiria junto com ela quando quiz e destinos estivessem todos ocultos — e também não cairia
+// no fallback, já que está em EXPLICITLY_RENDERED_LINK_IDS.
+export function getLinksPageVisibility(links: readonly LinkItem[], hasActiveAchados = false): LinksPageVisibility {
     const visibleLinks = links.filter((link) => link.visible);
     const visibleLinkIds = new Set(visibleLinks.map((link) => link.id));
     const hasPrimaryDestinations =
         visibleLinkIds.has('quiz') || getVisibleLinksForIds(visibleLinks, FEATURED_DESTINATION_IDS).length > 0;
     const hasVisibleDestinations =
-        hasPrimaryDestinations || getVisibleLinksForIds(visibleLinks, MORE_DESTINATION_IDS).length > 0;
+        hasPrimaryDestinations ||
+        getVisibleLinksForIds(visibleLinks, MORE_DESTINATION_IDS).length > 0 ||
+        (hasActiveAchados && visibleLinkIds.has('achados'));
 
     return {
         hasPrimaryDestinations,

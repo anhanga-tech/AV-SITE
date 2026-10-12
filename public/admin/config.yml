@@ -70,3 +70,47 @@ collections:
       - { label: Título SEO, name: seoTitle, widget: string, required: false }
       - { label: Descrição SEO, name: seoDescription, widget: text, required: false }
       - { label: Conteúdo, name: body, widget: markdown }
+  - name: achados
+    label: Achados da quinzena
+    editor:
+      preview: false
+    files:
+      - name: achados
+        label: Ofertas da página /achados
+        file: content/achados.json
+        format: json
+        fields:
+          - label: Ofertas
+            name: achados
+            widget: list
+            summary: '{{fields.titulo}} (até {{fields.validoAte}})'
+            hint: 'A página mostra no máximo 3 ofertas, as de prazo mais curto primeiro. Cada uma sai do ar sozinha no dia seguinte a "Reservas até". Confira se o preço é o de venda ao público antes de publicar.'
+            fields:
+              - label: Identificador
+                name: id
+                widget: string
+                hint: 'Só letras minúsculas, números e hífen. Exemplo: msc-dezembro'
+                pattern: ['^[a-z0-9-]+$', 'Use só letras minúsculas, números e hífen']
+              - { label: Título, name: titulo, widget: string }
+              - { label: Destino, name: destino, widget: string }
+              - { label: Fornecedor, name: fornecedor, widget: string }
+              - label: Por que vale
+                name: porQueVale
+                widget: text
+                hint: 'A opinião da Anhangá: por que a oferta vale e para quem.'
+              - label: Preço
+                name: preco
+                widget: string
+                required: false
+                hint: 'Exatamente como a operadora divulgou, começando por "A partir de". Deixe vazio se não houver preço.'
+              - { label: Condições, name: condicoes, widget: text }
+              - label: Reservas até
+                name: validoAte
+                widget: datetime
+                format: YYYY-MM-DD
+                date_format: YYYY-MM-DD
+                time_format: false
+              - label: Mensagem do WhatsApp
+                name: mensagemWhatsapp
+                widget: string
+                hint: 'Cite o nome do achado para o atendimento saber de qual oferta a pessoa veio.'
