@@ -75,6 +75,37 @@ test('returns 200 and creates a partner + crm.lead on valid request', async () =
     assert.match(String(lead.name), /Orlando/);
 });
 
+test('writes children ages and trip days to the crm.lead description, sanitized and capped', async () => {
+    setOdooEnv();
+    const mock = createOdooMock();
+    global.fetch = mock.fetch;
+
+    const res = await handler(buildRequest(validBody({
+        destination: 'Parques do Brasil · Beach Park',
+        childrenAges: '<b>4</b> e 9',
+        tripDays: 'x'.repeat(200),
+    })));
+    assert.equal(res.status, 200);
+
+    const lead = mock.leadFields()!;
+    assert.equal(lead.x_destino, 'Parques do Brasil · Beach Park');
+    const description = String(lead.description);
+    assert.match(description, /<li>Idade das crianças: &lt;b&gt;4&lt;\/b&gt; e 9<\/li>/);
+    assert.match(description, new RegExp(`<li>Dias disponíveis: x{60}</li>`));
+});
+
+test('omits trip detail lines when they are blank', async () => {
+    setOdooEnv();
+    const mock = createOdooMock();
+    global.fetch = mock.fetch;
+
+    const res = await handler(buildRequest(validBody({ childrenAges: '   ', tripDays: 42 })));
+    assert.equal(res.status, 200);
+
+    const description = String(mock.leadFields()!.description ?? '');
+    assert.doesNotMatch(description, /Idade das crianças|Dias disponíveis/);
+});
+
 test('sets campaign_id on the crm.lead when utm_campaign is present', async () => {
     setOdooEnv();
     const mock = createOdooMock({ existingCampaignId: 9 });

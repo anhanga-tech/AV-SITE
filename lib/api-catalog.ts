@@ -270,6 +270,8 @@ const API_ENDPOINTS: readonly ApiEndpointDefinition[] = [
                             emailOptIn: { type: 'boolean' },
                             source: { type: 'string', maxLength: 128 },
                             destination: { type: 'string', maxLength: 255 },
+                            childrenAges: { type: 'string', maxLength: 60 },
+                            tripDays: { type: 'string', maxLength: 60 },
                             eventId: { type: 'string', maxLength: 128 },
                             utms: {
                                 type: 'object',

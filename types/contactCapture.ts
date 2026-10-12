@@ -6,6 +6,9 @@ export interface ContactFormFields {
     whatsapp: string;
     email: string;
     emailOptIn: boolean;
+    /** Opcional, só pedido quando o CTA abre o modal com `askTripDetails`. */
+    childrenAges: string;
+    tripDays: string;
 }
 
 export interface SubmitContactRequest {
@@ -16,6 +19,10 @@ export interface SubmitContactRequest {
     emailOptIn: boolean;
     source?: string;
     destination?: string;
+    /** Texto livre ("4 e 9 anos") — vai para a descrição da oportunidade. */
+    childrenAges?: string;
+    /** Texto livre ("4 dias", "um feriado") — vai para a descrição da oportunidade. */
+    tripDays?: string;
     eventId?: string;
     utms: LeadUtms;
     tracking?: LeadTracking;

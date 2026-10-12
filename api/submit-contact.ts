@@ -12,6 +12,8 @@ import { createOdooSubmitHandler } from '../lib/odoo-submit-handler';
 import { leadInputFromSubmitContact } from '../lib/odoo-lead-mapping';
 
 const CONTACT_VALIDATION_ERROR = 'Nome e WhatsApp são obrigatórios.';
+// Mesmo teto do maxLength dos inputs no ContactModal.
+const TRIP_DETAIL_MAX_LENGTH = 60;
 
 function validateContactRequest(body: unknown): ValidationResult<SubmitContactRequest> {
     if (!body || typeof body !== 'object') return { ok: false, error: CONTACT_VALIDATION_ERROR };
@@ -38,6 +40,8 @@ function validateContactRequest(body: unknown): ValidationResult<SubmitContactRe
             emailOptIn: Boolean(raw.emailOptIn),
             source: normalizeNullable(raw.source, 128) ?? undefined,
             destination: normalizeNullable(raw.destination, 255) ?? undefined,
+            childrenAges: normalizeNullable(raw.childrenAges, TRIP_DETAIL_MAX_LENGTH) ?? undefined,
+            tripDays: normalizeNullable(raw.tripDays, TRIP_DETAIL_MAX_LENGTH) ?? undefined,
             eventId: normalizeNullable(raw.eventId, 128) ?? undefined,
             utms,
             tracking,
