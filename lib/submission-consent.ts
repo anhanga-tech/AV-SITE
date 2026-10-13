@@ -85,8 +85,10 @@ async function adsMeasurementGranted(receipt: AttributionConsentReceipt | null |
 }
 
 export async function prepareSubmissionConsent(input: OdooLeadInput): Promise<SubmissionConsent> {
-    const email = await emailDecision(input);
-    const adsGranted = await adsMeasurementGranted(input.attributionConsent, input.email);
+    const [email, adsGranted] = await Promise.all([
+        emailDecision(input),
+        adsMeasurementGranted(input.attributionConsent, input.email),
+    ]);
     const gated = adsGranted ? input : stripMarketingAttribution(input);
     return {
         input: { ...gated, marketingOptIn: email.granted },
