@@ -186,7 +186,7 @@ export const CacauWaitlist: React.FC = () => {
           <p className="mt-2 text-xs leading-relaxed text-white/55">
             Usamos seu nome e e-mail para avisar quando o Cacau Park abrir a venda. A caixa
             acima é opcional. Veja a{' '}
-            <a href="/politica-privacidade/" className="underline underline-offset-4 hover:text-white/90">
+            <a href="/politica-privacidade/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-white/90">
               Política de Privacidade
             </a>
             .
