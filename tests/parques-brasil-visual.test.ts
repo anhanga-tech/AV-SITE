@@ -75,6 +75,26 @@ test('a comparação é só a tabela, sem uma segunda versão em cards para o mo
   assert.equal(screen.queryByRole('list', { name: 'Comparação entre os parques' }), null);
 });
 
+test('sem a tabela no celular, cada parque vendável ainda mostra a melhor época no próprio card', () => {
+  const { container } = render(React.createElement(MemoryRouter, null, React.createElement(ParquesBrasil)));
+  const outsideTable = Array.from(container.querySelectorAll('article, li'))
+    .map((node) => node.textContent ?? '')
+    .join(' ');
+  for (const park of BOOKABLE_PARKS) {
+    assert.ok(outsideTable.includes(park.when), `${park.name} sem época fora da tabela`);
+  }
+});
+
+test('lista do Cacau Park: funil completo de view, start e field_complete', () => {
+  const events = captureDataLayer(() => {
+    render(React.createElement(CacauWaitlist));
+    fireEvent.change(screen.getByLabelText('Nome'), { target: { value: 'Ana Souza' } });
+    fireEvent.change(screen.getByLabelText('Nome'), { target: { value: 'Ana Souza B' } });
+  });
+  const names = events.filter((event) => event.form_id === 'cacau-park-waitlist').map((event) => event.event);
+  assert.deepEqual(names, ['form_view', 'form_start', 'field_complete']);
+});
+
 test('card credenciado: orçamento é o botão, a página do parque é link de texto', () => {
   render(React.createElement(MemoryRouter, null, React.createElement(ParquesBrasil)));
   const link = screen.getByRole('link', { name: 'Conhecer a página do Beto Carrero World' });

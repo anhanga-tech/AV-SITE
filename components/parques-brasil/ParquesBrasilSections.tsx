@@ -138,6 +138,13 @@ const CredentialedPark: React.FC<{ park: Park; index: number }> = ({ park, index
           </dt>
           <dd className="mt-1.5 text-base text-zinc-700">{park.days}</dd>
         </div>
+        {/* No celular a tabela comparativa some; a época tem de estar aqui. */}
+        <div>
+          <dt className="font-display text-xs font-black uppercase tracking-[0.1em] text-zinc-500">
+            Melhor época
+          </dt>
+          <dd className="mt-1.5 text-base leading-relaxed text-zinc-700">{park.when}</dd>
+        </div>
       </dl>
 
       {/* Uma ação com peso de botão por card: o orçamento, que é o que gera
