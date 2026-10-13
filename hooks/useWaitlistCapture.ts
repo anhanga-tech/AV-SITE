@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import { useAntiBot } from './useAntiBot';
 import { cleanString } from '../lib/lead-logic';
 import { getTrackingDataObject } from '../utils/whatsapp';
+import { currentPageLocation } from '../utils/formAnalytics';
 import { extractUtms, normalizeLeadTracking } from '../lib/tracking-normalization';
 import type { LeadTracking, LeadUtms } from '../types/leadCapture';
 import type { SubmitWaitlistRequest, SubmitWaitlistResponse } from '../types/waitlist';
@@ -41,7 +42,27 @@ function buildSubmitWaitlistError(
     };
 }
 
-function pushWaitlistSignupDataLayerEvent(payload: SubmitWaitlistRequest): void {
+/*
+  Rótulos que vão para o dataLayer. O default é o da primeira lista (Lollapalooza)
+  e continua valendo para ela sem mudança; outras listas passam os seus para não
+  contarem no GA4 como cadastro do Lolla.
+*/
+export interface WaitlistAnalyticsLabels {
+    destination: string;
+    interestYear: string;
+    formId: string;
+}
+
+const DEFAULT_ANALYTICS_LABELS: WaitlistAnalyticsLabels = {
+    destination: 'Lollapalooza Brasil',
+    interestYear: '2027',
+    formId: 'lolla_waitlist_2027',
+};
+
+export function pushWaitlistSignupDataLayerEvent(
+    payload: SubmitWaitlistRequest,
+    labels: WaitlistAnalyticsLabels = DEFAULT_ANALYTICS_LABELS,
+): void {
     if (typeof window === 'undefined' || !window.dataLayer) {
         return;
     }
@@ -49,27 +70,27 @@ function pushWaitlistSignupDataLayerEvent(payload: SubmitWaitlistRequest): void 
     // 1. Internal waitlist event
     window.dataLayer.push({
         event: 'waitlist_signup',
-        destination: 'Lollapalooza Brasil',
-        interest_year: '2027',
+        destination: labels.destination,
+        interest_year: labels.interestYear,
         source_page: payload.sourcePage,
         utm_source: payload.utms.utm_source,
         utm_medium: payload.utms.utm_medium,
         utm_campaign: payload.utms.utm_campaign,
         ga_client_id: payload.tracking?.cid,
         ga_session_id: payload.tracking?.sid,
-        page_location: window.location.href,
+        page_location: currentPageLocation(),
     });
 
     // 2. Unified form submission event
     window.dataLayer.push({
         event: 'form_submission',
         form_type: 'waitlist',
-        form_id: 'lolla_waitlist_2027',
-        page_location: window.location.href,
+        form_id: labels.formId,
+        page_location: currentPageLocation(),
     });
 }
 
-export function useWaitlistCapture() {
+export function useWaitlistCapture(labels: WaitlistAnalyticsLabels = DEFAULT_ANALYTICS_LABELS) {
     const { getAntiBotFields, honeypotProps } = useAntiBot();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const isLocallySubmitting = useRef(false);
@@ -120,7 +141,7 @@ export function useWaitlistCapture() {
                 return failure;
             }
 
-            pushWaitlistSignupDataLayerEvent(payload);
+            pushWaitlistSignupDataLayerEvent(payload, labels);
 
             return {
                 ok: true,
@@ -143,7 +164,7 @@ export function useWaitlistCapture() {
             setIsSubmitting(false);
             isLocallySubmitting.current = false;
         }
-    }, [refreshTrackingState, getAntiBotFields]);
+    }, [refreshTrackingState, getAntiBotFields, labels]);
 
     return {
         tracking: trackingState.tracking,

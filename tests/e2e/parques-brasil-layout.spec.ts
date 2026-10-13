@@ -62,8 +62,23 @@ test.describe('layout do hub /parques-brasil', () => {
     }
   });
 
-  test('a tabela comparativa rola sozinha em vez de estourar a página', async ({ page }) => {
+  test('no celular a comparação sai, sem overflow lateral', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 568 });
+    await page.goto('/parques-brasil/');
+
+    // Os cards de parque já mostram cidade, dias e época no celular; a
+    // comparação repetia tudo e a tabela pedia rolagem lateral de 44rem.
+    await expect(page.getByRole('heading', { name: 'Os cinco lado a lado' })).toBeHidden();
+    await expect(page.locator('table')).toBeHidden();
+
+    const hasHorizontalOverflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+    );
+    expect(hasHorizontalOverflow).toBe(false);
+  });
+
+  test('a partir do tablet a tabela volta e rola sozinha', async ({ page }) => {
+    await page.setViewportSize({ width: 768, height: 1024 });
     await page.goto('/parques-brasil/');
 
     const table = page.locator('table');
