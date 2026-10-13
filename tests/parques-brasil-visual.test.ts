@@ -46,6 +46,15 @@ test('com foto, o parque mostra a imagem com alt e o crédito', () => {
   assert.ok(screen.getByText('Foto: Fulano / CC BY'));
 });
 
+test('no mosaico, o crédito fica no topo e não disputa o rodapé com o nome do parque', () => {
+  const image = { src: 'https://media.anhanga.tur.br/x.webp', alt: 'x', credit: 'Foto: Fulano / Unsplash' };
+  const { container, rerender } = render(React.createElement(ParkPhoto, { park: { ...BETO, image }, showName: true }));
+  assert.match(container.querySelector('figcaption')!.className, /\btop-1\.5\b/);
+
+  rerender(React.createElement(ParkPhoto, { park: { ...BETO, image } }));
+  assert.match(container.querySelector('figcaption')!.className, /\bbottom-1\b/);
+});
+
 test('o mosaico do hero só usa parques que já têm foto', () => {
   for (const slug of HERO_PARK_SLUGS) {
     const park = PARKS.find((item) => item.slug === slug);

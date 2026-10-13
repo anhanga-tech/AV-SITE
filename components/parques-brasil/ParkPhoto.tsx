@@ -49,7 +49,13 @@ export const ParkPhoto: React.FC<ParkPhotoProps> = ({ park, className = '', show
         />
         {nameTag}
         {park.image.credit ? (
-          <figcaption className="absolute bottom-1 right-2 text-[10px] text-white/80 [text-shadow:0_1px_2px_rgba(15,23,42,0.8)]">
+          // Com o nome do parque no rodapé (mosaico do hero), o crédito sobe
+          // para o topo: nos tiles de ~130px do celular os dois se sobrepunham.
+          <figcaption
+            className={`absolute right-2 max-w-[calc(100%-1rem)] text-right text-[10px] text-white/80 [text-shadow:0_1px_2px_rgba(15,23,42,0.8)] ${
+              showName ? 'top-1.5' : 'bottom-1'
+            }`}
+          >
             {park.image.credit}
           </figcaption>
         ) : null}
