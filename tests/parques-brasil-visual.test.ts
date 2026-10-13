@@ -9,7 +9,7 @@ import { MemoryRouter } from 'react-router-dom';
 import ParquesBrasil from '../pages/ParquesBrasil.tsx';
 import { ParkPhoto } from '../components/parques-brasil/ParkPhoto.tsx';
 import { CACAU_WAITLIST_SOURCE, CacauWaitlist } from '../components/parques-brasil/CacauWaitlist.tsx';
-import { BOOKABLE_PARKS, PARKS } from '../components/parques-brasil/constants.ts';
+import { BOOKABLE_PARKS, HERO_PARK_SLUGS, PARKS } from '../components/parques-brasil/constants.ts';
 import { pushWaitlistSignupDataLayerEvent } from '../hooks/useWaitlistCapture.ts';
 import type { SubmitWaitlistRequest } from '../types/waitlist.ts';
 
@@ -44,6 +44,25 @@ test('com foto, o parque mostra a imagem com alt e o crédito', () => {
   assert.equal(img.getAttribute('src'), 'https://media.anhanga.tur.br/x.webp');
   assert.equal(img.getAttribute('loading'), 'lazy');
   assert.ok(screen.getByText('Foto: Fulano / CC BY'));
+});
+
+test('o mosaico do hero só usa parques que já têm foto', () => {
+  for (const slug of HERO_PARK_SLUGS) {
+    const park = PARKS.find((item) => item.slug === slug);
+    assert.ok(park?.image, `${slug} está no hero sem foto`);
+  }
+});
+
+test('toda foto de parque diz de onde veio e quem fez', () => {
+  for (const park of PARKS) {
+    if (!park.image) continue;
+    assert.match(park.image.source ?? '', /^https:\/\//, `${park.slug} sem página de origem`);
+    assert.ok(park.image.credit, `${park.slug} sem crédito`);
+    // Licença CC exige o nome da licença junto do crédito.
+    if (!park.image.source?.includes('unsplash.com')) {
+      assert.match(park.image.credit, /CC BY/, `${park.slug} sem a licença no crédito`);
+    }
+  }
 });
 
 test('a comparação é só a tabela, sem uma segunda versão em cards para o mobile', () => {
@@ -87,6 +106,30 @@ test('lista do Cacau Park: sem nome e e-mail, não envia e aponta os campos', as
   } finally {
     globalThis.fetch = originalFetch;
   }
+});
+
+test('lista do Cacau Park: validação barrada vira field_error no dataLayer', () => {
+  const events = captureDataLayer(() => {
+    render(React.createElement(CacauWaitlist));
+    fireEvent.click(screen.getByRole('button', { name: 'Me avise' }));
+  });
+  const fieldError = events.find((event) => event.event === 'field_error');
+  assert.ok(fieldError, 'field_error deveria ser enviado');
+  assert.equal(fieldError.form_id, 'cacau-park-waitlist');
+  assert.equal(fieldError.field_name, 'name');
+});
+
+test('lista do Cacau Park: corrigir o campo tira o erro dele na hora', async () => {
+  render(React.createElement(CacauWaitlist));
+  fireEvent.click(screen.getByRole('button', { name: 'Me avise' }));
+  await waitFor(() => assert.ok(screen.getByText('Informe seu nome completo.')));
+
+  fireEvent.change(screen.getByLabelText('Nome'), { target: { value: 'Ana Souza' } });
+
+  assert.equal(screen.queryByText('Informe seu nome completo.'), null);
+  assert.equal(screen.getByLabelText('Nome').getAttribute('aria-invalid'), null);
+  // O outro campo continua apontado até ser corrigido.
+  assert.ok(screen.getByText('Informe seu e-mail.'));
 });
 
 test('lista do Cacau Park: envia com a origem do Cacau e confirma', async () => {
@@ -141,6 +184,19 @@ test('lista do Cacau Park: falha de rede vira mensagem em português, não o err
     assert.equal(screen.queryByText('Failed to fetch'), null);
   } finally {
     globalThis.fetch = originalFetch;
+  }
+});
+
+test('dataLayer da waitlist: e-mail na query da página não vai para o analytics', () => {
+  const previousUrl = window.location.href;
+  window.history.replaceState(null, '', '/parques-brasil/?email=ana@exemplo.com');
+  try {
+    const events = captureDataLayer(() => pushWaitlistSignupDataLayerEvent(PAYLOAD));
+    for (const event of events) {
+      assert.doesNotMatch(String(event.page_location), /ana@exemplo\.com/);
+    }
+  } finally {
+    window.history.replaceState(null, '', previousUrl);
   }
 });
 

@@ -26,6 +26,8 @@ export interface ParkImage {
   alt: string;
   /** Autoria/licença, quando a fonte exige crédito visível. */
   credit?: string;
+  /** Página de origem da foto: onde conferir autoria e licença de novo. */
+  source?: string;
 }
 
 export interface Park {
@@ -63,6 +65,12 @@ export const PARKS: Park[] = [
       'Família com filhos de idades diferentes. Enquanto um encara a FireWhip, o outro fica na área da Madagascar — e ninguém passa o dia esperando.',
     days: '2 dias inteiros de parque, 3 a 4 de roteiro',
     when: 'Evite janeiro e julho se puder. Mesmo parque, metade da fila.',
+    image: {
+      src: 'https://images.unsplash.com/photo-1724359420700-e63db252813c?w=1200&q=75&auto=format&fit=crop',
+      alt: 'Montanha-russa do Beto Carrero World, em Penha (SC)',
+      credit: 'Foto: Pietra K. / Unsplash',
+      source: 'https://unsplash.com/photos/cKKX0uq5DKs',
+    },
     href: '/beto-carrero',
   },
   {
@@ -78,6 +86,12 @@ export const PARKS: Park[] = [
       'Adolescente, adulto e criança grande que já encara brinquedo radical. Para quem tem filho pequeno, rende menos que os outros daqui.',
     days: '1 dia resolve',
     when: 'Dia de semana fora de férias escolares. A diferença de fila é grande.',
+    image: {
+      src: 'https://images.unsplash.com/photo-1751229765354-88bdbbdabb7d?w=1200&q=75&auto=format&fit=crop',
+      alt: 'Montanha-russa de madeira do Hopi Hari, em Vinhedo (SP)',
+      credit: 'Foto: Blond Fox / Unsplash',
+      source: 'https://unsplash.com/photos/vONaJDxcI3c',
+    },
     href: '/hopi-hari',
   },
   {
@@ -108,6 +122,13 @@ export const PARKS: Park[] = [
       'Quem quer parque e praia na mesma viagem sem trocar de cidade nem pegar estrada.',
     days: '4 a 5 dias',
     when: 'Julho a janeiro pega o período de menos chuva no litoral do Ceará.',
+    // CC BY-SA 3.0: o crédito com a licença precisa ficar visível.
+    image: {
+      src: 'https://images.coasterpedia.net/9/9a/Insano_%28Beach_Park_%28Brazil%29%29_2008_02.jpg',
+      alt: 'Tobogã Insano, no Beach Park, em Aquiraz (CE)',
+      credit: 'Foto: Paulo JC Nogueira / CC BY-SA 3.0',
+      source: 'https://coasterpedia.net/wiki/File:Insano_(Beach_Park_(Brazil))_2008_02.jpg',
+    },
     highlight: 'Parque e praia no mesmo lugar',
   },
   {
@@ -148,7 +169,7 @@ export const UPCOMING_PARKS = PARKS.filter((park) => park.tier === 'emBreve');
 export const BOOKABLE_PARKS = PARKS.filter((park) => park.tier !== 'emBreve');
 
 /** Os três do mosaico do hero: um temático e dois aquáticos de regiões diferentes. */
-export const HERO_PARK_SLUGS = ['beto-carrero', 'thermas-dos-laranjais', 'beach-park'] as const;
+export const HERO_PARK_SLUGS = ['beto-carrero', 'hopi-hari', 'beach-park'] as const;
 
 export const PARQUES_FAQ_ITEMS = [
   {
