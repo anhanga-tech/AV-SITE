@@ -43,7 +43,20 @@ export const CacauWaitlist: React.FC = () => {
 
     const validation = validateWaitlistFormFields({ name, email });
     setFieldErrors(validation.errors);
-    if (!validation.valid) return;
+    if (!validation.valid) {
+      // Sem este evento, a tentativa barrada na validação aparece no funil
+      // como abandono.
+      const firstErrorField = Object.keys(validation.errors)[0];
+      pushFormAnalyticsEvent({
+        event: 'field_error',
+        formType: 'waitlist',
+        formId: FORM_ID,
+        fieldName: firstErrorField,
+        errorType: firstErrorField ?? 'validation',
+        destination: 'Cacau Park',
+      });
+      return;
+    }
 
     const result = await submitWaitlist({
       name: validation.normalized.name,
@@ -99,7 +112,10 @@ export const CacauWaitlist: React.FC = () => {
                 type="text"
                 autoComplete="name"
                 value={name}
-                onChange={(event) => setName(event.target.value)}
+                onChange={(event) => {
+                  setName(event.target.value);
+                  setFieldErrors((current) => ({ ...current, name: undefined }));
+                }}
                 aria-invalid={fieldErrors.name ? true : undefined}
                 aria-describedby={fieldErrors.name ? 'cacau-waitlist-name-error' : undefined}
                 className={inputClass}
@@ -115,7 +131,10 @@ export const CacauWaitlist: React.FC = () => {
                 autoComplete="email"
                 inputMode="email"
                 value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                  setFieldErrors((current) => ({ ...current, email: undefined }));
+                }}
                 aria-invalid={fieldErrors.email ? true : undefined}
                 aria-describedby={fieldErrors.email ? 'cacau-waitlist-email-error' : undefined}
                 className={inputClass}

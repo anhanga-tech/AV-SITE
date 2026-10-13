@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import { useAntiBot } from './useAntiBot';
 import { cleanString } from '../lib/lead-logic';
 import { getTrackingDataObject } from '../utils/whatsapp';
+import { currentPageLocation } from '../utils/formAnalytics';
 import { extractUtms, normalizeLeadTracking } from '../lib/tracking-normalization';
 import type { LeadTracking, LeadUtms } from '../types/leadCapture';
 import type { SubmitWaitlistRequest, SubmitWaitlistResponse } from '../types/waitlist';
@@ -77,7 +78,7 @@ export function pushWaitlistSignupDataLayerEvent(
         utm_campaign: payload.utms.utm_campaign,
         ga_client_id: payload.tracking?.cid,
         ga_session_id: payload.tracking?.sid,
-        page_location: window.location.href,
+        page_location: currentPageLocation(),
     });
 
     // 2. Unified form submission event
@@ -85,7 +86,7 @@ export function pushWaitlistSignupDataLayerEvent(
         event: 'form_submission',
         form_type: 'waitlist',
         form_id: labels.formId,
-        page_location: window.location.href,
+        page_location: currentPageLocation(),
     });
 }
 
