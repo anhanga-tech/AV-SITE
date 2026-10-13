@@ -21,6 +21,13 @@ export type ParkTier = 'credenciado' | 'pacote' | 'emBreve';
   crédito). Sem `image`, o ParkPhoto desenha o placeholder da marca — trocar um
   pelo outro é preencher este campo, nada mais.
 */
+/*
+  As fotos ficam no nosso R2, mesmo as de licença aberta: carregar direto do
+  Unsplash ou da Coasterpedia mandaria IP e user-agent do visitante a hosts que
+  não estão na política de privacidade nem no inventário de transferências.
+*/
+export const PARK_PHOTO_BASE = 'https://media.anhanga.tur.br/images/parques';
+
 export interface ParkImage {
   src: string;
   alt: string;
@@ -68,7 +75,7 @@ export const PARKS: Park[] = [
     days: '2 dias inteiros de parque, 3 a 4 de roteiro',
     when: 'Evite janeiro e julho se puder. Mesmo parque, metade da fila.',
     image: {
-      src: 'https://images.unsplash.com/photo-1724359420700-e63db252813c?w=1200&q=75&auto=format&fit=crop',
+      src: `${PARK_PHOTO_BASE}/beto-carrero.jpg`,
       alt: 'Montanha-russa do Beto Carrero World, em Penha (SC)',
       credit: 'Foto: Pietra K. / Unsplash',
       source: 'https://unsplash.com/photos/cKKX0uq5DKs',
@@ -90,7 +97,7 @@ export const PARKS: Park[] = [
     days: '1 dia resolve',
     when: 'Dia de semana fora de férias escolares. A diferença de fila é grande.',
     image: {
-      src: 'https://images.unsplash.com/photo-1751229765354-88bdbbdabb7d?w=1200&q=75&auto=format&fit=crop',
+      src: `${PARK_PHOTO_BASE}/hopi-hari.jpg`,
       alt: 'Montanha-russa de madeira do Hopi Hari, em Vinhedo (SP)',
       credit: 'Foto: Blond Fox / Unsplash',
       source: 'https://unsplash.com/photos/vONaJDxcI3c',
@@ -129,7 +136,7 @@ export const PARKS: Park[] = [
     // CC BY-SA 3.0: crédito visível na foto e, em PhotoCredits, link para a
     // origem e para a licença, avisando do recorte.
     image: {
-      src: 'https://images.coasterpedia.net/9/9a/Insano_%28Beach_Park_%28Brazil%29%29_2008_02.jpg',
+      src: `${PARK_PHOTO_BASE}/beach-park.jpg`,
       alt: 'Tobogã Insano, no Beach Park, em Aquiraz (CE)',
       credit: 'Foto: Paulo JC Nogueira / CC BY-SA 3.0',
       source: 'https://coasterpedia.net/wiki/File:Insano_(Beach_Park_(Brazil))_2008_02.jpg',

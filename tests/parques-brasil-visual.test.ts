@@ -74,6 +74,15 @@ test('toda foto de parque diz de onde veio e quem fez', () => {
   }
 });
 
+test('toda foto de parque sai do nosso domínio de mídia, não de um host de terceiro', () => {
+  // Host de terceiro recebe IP e user-agent do visitante sem estar na política
+  // de privacidade (LGPD). Crédito e link de origem continuam apontando para lá.
+  for (const park of PARKS) {
+    if (!park.image) continue;
+    assert.equal(new URL(park.image.src).host, 'media.anhanga.tur.br', `${park.slug} carrega de fora`);
+  }
+});
+
 test('foto CC BY-SA tem link para a origem e para a licença, avisando do recorte', () => {
   render(React.createElement(MemoryRouter, null, React.createElement(ParquesBrasil)));
   const credits = screen.getByRole('region', { name: 'Créditos das fotos' });
