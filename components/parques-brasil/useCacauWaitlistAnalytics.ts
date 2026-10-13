@@ -28,18 +28,23 @@ export function useCacauWaitlistAnalytics() {
     track('form_view');
   }, [track]);
 
+  // Primeira interação, seja num campo ou direto no botão: sem isso, quem
+  // clica "Me avise" antes de digitar gera tentativa sem início no funil.
+  const markStarted = useCallback(() => {
+    if (started.current) return;
+    started.current = true;
+    track('form_start');
+  }, [track]);
+
   const trackField = useCallback(
     (fieldName: CacauField, value: string | boolean) => {
-      if (!started.current) {
-        started.current = true;
-        track('form_start');
-      }
+      markStarted();
       if (completed.current.has(fieldName) || !isFieldCompleteForAnalytics(fieldName, value)) return;
       completed.current.add(fieldName);
       track('field_complete', { fieldName });
     },
-    [track],
+    [markStarted, track],
   );
 
-  return { track, trackField };
+  return { track, trackField, markStarted };
 }

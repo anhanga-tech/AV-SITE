@@ -65,7 +65,7 @@ const ErrorLine: React.FC<{ id?: string; message?: string | null }> = ({ id, mes
 
 export const CacauWaitlist: React.FC = () => {
   const { submitWaitlist, isSubmitting, honeypotProps } = useWaitlistCapture(ANALYTICS_LABELS);
-  const { track, trackField } = useCacauWaitlistAnalytics();
+  const { track, trackField, markStarted } = useCacauWaitlistAnalytics();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [optIn, setOptIn] = useState(false);
@@ -83,6 +83,7 @@ export const CacauWaitlist: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setFormError(null);
+    markStarted();
     track('submit_attempt');
 
     const validation = validateWaitlistFormFields({ name, email });

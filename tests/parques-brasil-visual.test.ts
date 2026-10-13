@@ -168,6 +168,15 @@ test('lista do Cacau Park: validação barrada vira field_error no dataLayer', (
   assert.equal(fieldError.field_name, 'name');
 });
 
+test('lista do Cacau Park: clicar direto no botão também conta como início', () => {
+  const events = captureDataLayer(() => {
+    render(React.createElement(CacauWaitlist));
+    fireEvent.click(screen.getByRole('button', { name: 'Me avise' }));
+  });
+  const names = events.filter((event) => event.form_id === 'cacau-park-waitlist').map((event) => event.event);
+  assert.deepEqual(names, ['form_view', 'form_start', 'submit_attempt', 'field_error']);
+});
+
 test('lista do Cacau Park: corrigir o campo tira o erro dele na hora', async () => {
   render(React.createElement(CacauWaitlist));
   fireEvent.click(screen.getByRole('button', { name: 'Me avise' }));
