@@ -65,6 +65,26 @@ test('toda foto de parque diz de onde veio e quem fez', () => {
   }
 });
 
+test('foto CC BY-SA tem link para a origem e para a licença, avisando do recorte', () => {
+  render(React.createElement(MemoryRouter, null, React.createElement(ParquesBrasil)));
+  const credits = screen.getByRole('region', { name: 'Créditos das fotos' });
+  const beach = PARKS.find((park) => park.slug === 'beach-park')!;
+  const links = Array.from(credits.querySelectorAll('a')).map((a) => a.getAttribute('href'));
+
+  assert.ok(links.includes(beach.image!.source!), 'falta link para a foto original');
+  assert.ok(links.includes(beach.image!.license!.url), 'falta link para a licença');
+  assert.match(credits.textContent ?? '', /Paulo JC Nogueira, foto recortada/);
+});
+
+test('no hero só a primeira foto carrega com prioridade', () => {
+  const { container } = render(React.createElement(MemoryRouter, null, React.createElement(ParquesBrasil)));
+  const heroImages = Array.from(container.querySelectorAll('section')[0].querySelectorAll('img'));
+  assert.deepEqual(
+    heroImages.map((img) => img.getAttribute('loading')),
+    ['eager', 'lazy', 'lazy'],
+  );
+});
+
 test('a comparação é só a tabela, sem uma segunda versão em cards para o mobile', () => {
   render(React.createElement(MemoryRouter, null, React.createElement(ParquesBrasil)));
   const table = screen.getByRole('table');

@@ -74,7 +74,9 @@ export const ParquesHero: React.FC = () => (
             key={park.slug}
             park={park}
             showName
-            eager
+            // Só o tile grande é candidato a LCP no desktop; no celular o
+            // mosaico fica abaixo do CTA e os outros esperam a rolagem.
+            eager={index === 0}
             className={`rounded-2xl ${index === 0 ? 'row-span-2' : ''}`}
           />
         ))}
@@ -379,3 +381,38 @@ export const ParquesCta: React.FC<SectionProps> = ({ onCtaClick, whatsappUrl }) 
     </div>
   </section>
 );
+
+/*
+  Atribuição completa das fotos de terceiros. A legenda sobre a foto é curta
+  por espaço; CC BY-SA pede também link para a origem e para a licença, e a
+  foto aparece recortada (object-cover), o que conta como adaptação.
+*/
+export const PhotoCredits: React.FC = () => {
+  const credited = PARKS.filter((park) => park.image?.source && park.image.license);
+  if (credited.length === 0) return null;
+
+  return (
+    <section aria-labelledby="parques-photo-credits" className="bg-white pb-10">
+      <div className="container mx-auto max-w-5xl border-t border-zinc-100 px-6 pt-6">
+        <h2 id="parques-photo-credits" className="font-display text-xs font-bold text-zinc-500">
+          Créditos das fotos
+        </h2>
+        <ul className="mt-2 text-xs text-zinc-500">
+          {credited.map(({ slug, name, image }) => (
+            <li key={slug} className="flex flex-wrap items-center gap-x-2">
+              <span>
+                {name}: {image?.license?.author}, foto recortada.
+              </span>
+              <a href={image?.source} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center underline underline-offset-2 hover:text-anhanga-actionDark">
+                Original
+              </a>
+              <a href={image?.license?.url} target="_blank" rel="noopener noreferrer license" className="inline-flex min-h-[44px] items-center underline underline-offset-2 hover:text-anhanga-actionDark">
+                {image?.license?.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+};

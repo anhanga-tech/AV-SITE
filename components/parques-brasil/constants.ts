@@ -28,6 +28,8 @@ export interface ParkImage {
   credit?: string;
   /** Página de origem da foto: onde conferir autoria e licença de novo. */
   source?: string;
+  /** Licença com link: CC BY/BY-SA exige o link na atribuição (ver PhotoCredits). */
+  license?: { name: string; url: string; author: string };
 }
 
 export interface Park {
@@ -70,6 +72,7 @@ export const PARKS: Park[] = [
       alt: 'Montanha-russa do Beto Carrero World, em Penha (SC)',
       credit: 'Foto: Pietra K. / Unsplash',
       source: 'https://unsplash.com/photos/cKKX0uq5DKs',
+      license: { name: 'Licença Unsplash', url: 'https://unsplash.com/license', author: 'Pietra K.' },
     },
     href: '/beto-carrero',
   },
@@ -91,6 +94,7 @@ export const PARKS: Park[] = [
       alt: 'Montanha-russa de madeira do Hopi Hari, em Vinhedo (SP)',
       credit: 'Foto: Blond Fox / Unsplash',
       source: 'https://unsplash.com/photos/vONaJDxcI3c',
+      license: { name: 'Licença Unsplash', url: 'https://unsplash.com/license', author: 'Blond Fox' },
     },
     href: '/hopi-hari',
   },
@@ -122,12 +126,18 @@ export const PARKS: Park[] = [
       'Quem quer parque e praia na mesma viagem sem trocar de cidade nem pegar estrada.',
     days: '4 a 5 dias',
     when: 'Julho a janeiro pega o período de menos chuva no litoral do Ceará.',
-    // CC BY-SA 3.0: o crédito com a licença precisa ficar visível.
+    // CC BY-SA 3.0: crédito visível na foto e, em PhotoCredits, link para a
+    // origem e para a licença, avisando do recorte.
     image: {
       src: 'https://images.coasterpedia.net/9/9a/Insano_%28Beach_Park_%28Brazil%29%29_2008_02.jpg',
       alt: 'Tobogã Insano, no Beach Park, em Aquiraz (CE)',
       credit: 'Foto: Paulo JC Nogueira / CC BY-SA 3.0',
       source: 'https://coasterpedia.net/wiki/File:Insano_(Beach_Park_(Brazil))_2008_02.jpg',
+      license: {
+        name: 'CC BY-SA 3.0',
+        url: 'https://creativecommons.org/licenses/by-sa/3.0/deed.pt',
+        author: 'Paulo JC Nogueira',
+      },
     },
     highlight: 'Parque e praia no mesmo lugar',
   },

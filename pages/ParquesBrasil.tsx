@@ -9,6 +9,7 @@ import {
   CredentialedSection,
   PackageSection,
   ParquesCta,
+  PhotoCredits,
   ParquesHero,
   UpcomingSection,
 } from '../components/parques-brasil/ParquesBrasilSections';
@@ -66,6 +67,7 @@ const ParquesBrasil: React.FC = () => {
       />
 
       <ParquesCta onCtaClick={handleCtaClick} whatsappUrl={whatsappUrl} />
+      <PhotoCredits />
     </>
   );
 };
