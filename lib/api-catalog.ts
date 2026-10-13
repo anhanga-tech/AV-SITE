@@ -348,6 +348,40 @@ const API_ENDPOINTS: readonly ApiEndpointDefinition[] = [
             '500': buildJsonResponse('Internal server failure.', ERROR_RESPONSE_SCHEMA),
         },
     },
+    {
+        anchor: `${SITE_ORIGIN}/api/consent`,
+        method: 'post',
+        summary: 'Record or revoke a consent decision',
+        description: 'Append-only LGPD consent ledger. Ads measurement can be granted or revoked. Email marketing can only be revoked here; the grant happens on a form submission. The response does not reveal whether an email exists in the CRM.',
+        requestBody: {
+            required: true,
+            content: {
+                'application/json': {
+                    schema: {
+                        type: 'object',
+                        required: ['purpose', 'action', 'origin', 'eventId'],
+                        properties: {
+                            purpose: { type: 'string', enum: ['ads_measurement', 'email_marketing'] },
+                            action: { type: 'string', enum: ['grant', 'revoke'] },
+                            origin: { type: 'string', maxLength: 40 },
+                            eventId: { type: 'string', minLength: 8, maxLength: 80 },
+                            subjectKey: { type: 'string', maxLength: 80 },
+                            email: { type: 'string', format: 'email', maxLength: 254 },
+                            occurredAt: { type: 'string', maxLength: 40 },
+                        },
+                        additionalProperties: true,
+                    },
+                },
+            },
+        },
+        responses: {
+            '201': buildJsonResponse('Consent event recorded.', SUBMIT_SUCCESS_SCHEMA),
+            '400': buildJsonResponse('Invalid consent payload.', ERROR_RESPONSE_SCHEMA),
+            '429': buildJsonResponse('Rate limit exceeded.', ERROR_RESPONSE_SCHEMA),
+            '503': buildJsonResponse('Consent ledger unavailable.', ERROR_RESPONSE_SCHEMA),
+            '500': buildJsonResponse('Internal server failure.', ERROR_RESPONSE_SCHEMA),
+        },
+    },
 ];
 
 function buildLinkHeader(): string {
@@ -535,6 +569,10 @@ Accepts the site-wide quick contact form (name and WhatsApp) and opens a sales o
 ### POST /api/submit-quiz
 
 Accepts completed travel-profile quiz results from the first-party quiz page.
+
+### POST /api/consent
+
+Records an ads-measurement grant or revocation, and email-marketing revocation, in the append-only consent ledger.
 
 ### GET /api/health
 

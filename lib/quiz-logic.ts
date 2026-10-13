@@ -1,4 +1,5 @@
 import { cleanString, isValidEmail, normalizeNullable, normalizeTracking, normalizeUtms, normalizeWhatsappNumber, splitFullName } from './lead-logic';
+import { readAttributionConsent } from './submission-consent';
 import type { SubmitQuizRequest } from '../types/quiz';
 
 /** Derives firstName/lastName from the quiz form via {@link splitFullName},
@@ -69,6 +70,7 @@ export function validateQuizPayload(
             newsletterOptIn,
             utms,
             tracking,
+            attributionConsent: readAttributionConsent(raw.attributionConsent),
         },
     };
 }

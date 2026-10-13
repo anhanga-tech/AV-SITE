@@ -1,8 +1,28 @@
+import { ADS_NOTICE_VERSION } from './consent-notices';
+
 const CHOICE_KEY = 'anhanga_cookie_consent';
 const META_KEY = 'anhanga_cookie_consent_meta';
+const SUBJECT_KEY = 'anhanga_consent_subject';
 const SCHEMA_VERSION = '1';
 
 export type ConsentChoice = 'marketing' | 'essential';
+
+export interface ConsentMeta {
+  choice: ConsentChoice;
+  timestamp: string;
+  version: string;
+  registered?: boolean;
+  eventId?: string | null;
+  subjectKey?: string | null;
+  noticeVersion?: string;
+  purpose?: string;
+  origin?: string;
+}
+
+export interface AdsConsentReceipt {
+  eventId: string;
+  subjectKey: string;
+}
 
 export function getConsent(): ConsentChoice | null {
   try {
@@ -13,21 +33,95 @@ export function getConsent(): ConsentChoice | null {
   }
 }
 
+export function readConsentMeta(): ConsentMeta | null {
+  try {
+    const raw = localStorage.getItem(META_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as ConsentMeta;
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Medição publicitária só vale com recibo do ledger, não com a escolha local sozinha. */
+export function hasRegisteredAdsConsent(): boolean {
+  const meta = readConsentMeta();
+  return getConsent() === 'marketing' && meta?.registered === true && Boolean(meta.eventId) && Boolean(meta.subjectKey);
+}
+
+export function readAdsConsentReceipt(): AdsConsentReceipt | null {
+  if (!hasRegisteredAdsConsent()) return null;
+  const meta = readConsentMeta();
+  if (!meta?.eventId || !meta.subjectKey) return null;
+  return { eventId: meta.eventId, subjectKey: meta.subjectKey };
+}
+
+export function getOrCreateConsentSubject(): string {
+  try {
+    const existing = localStorage.getItem(SUBJECT_KEY);
+    if (existing && /^anon:[0-9a-f-]{36}$/i.test(existing)) return existing;
+    const created = `anon:${crypto.randomUUID()}`;
+    localStorage.setItem(SUBJECT_KEY, created);
+    return created;
+  } catch {
+    return `anon:${crypto.randomUUID()}`;
+  }
+}
+
 export function setConsent(choice: ConsentChoice): void {
   try {
     const previous = localStorage.getItem(CHOICE_KEY);
     localStorage.setItem(CHOICE_KEY, choice);
-    localStorage.setItem(
-      META_KEY,
-      JSON.stringify({ choice, timestamp: new Date().toISOString(), version: SCHEMA_VERSION })
-    );
-    if (choice === 'marketing') {
-      dispatch(new CustomEvent('anhanga:marketing-consent'));
-    } else if (previous === 'marketing') {
+    const meta: ConsentMeta = {
+      choice,
+      timestamp: new Date().toISOString(),
+      version: SCHEMA_VERSION,
+      registered: false,
+      purpose: choice === 'marketing' ? 'ads_measurement' : 'essential',
+      origin: 'cookie_banner',
+    };
+    localStorage.setItem(META_KEY, JSON.stringify(meta));
+    // O evento que libera Zaraz e a captura de click IDs só sai depois do
+    // recibo do servidor (markConsentRegistered). Sem isso o aceite local
+    // disparava marketing antes de existir prova.
+    if (choice === 'essential' && previous === 'marketing') {
       dispatch(new Event('anhanga:revoke-consent'));
     }
   } catch {
     // localStorage indisponível (modo privado, storage cheio)
+  }
+}
+
+export function markConsentRegistered(receipt: AdsConsentReceipt): void {
+  try {
+    const meta: ConsentMeta = {
+      choice: 'marketing',
+      timestamp: new Date().toISOString(),
+      version: SCHEMA_VERSION,
+      registered: true,
+      eventId: receipt.eventId,
+      subjectKey: receipt.subjectKey,
+      noticeVersion: ADS_NOTICE_VERSION,
+      purpose: 'ads_measurement',
+      origin: 'cookie_banner',
+    };
+    localStorage.setItem(CHOICE_KEY, 'marketing');
+    localStorage.setItem(META_KEY, JSON.stringify(meta));
+    dispatch(new CustomEvent('anhanga:marketing-consent'));
+  } catch {
+    // sem storage não há recibo local — o servidor pode ter gravado, mas este
+    // navegador não consegue provar a escolha na próxima visita.
+  }
+}
+
+export function clearUnregisteredMarketing(): void {
+  try {
+    if (hasRegisteredAdsConsent()) return;
+    localStorage.removeItem(CHOICE_KEY);
+    localStorage.removeItem(META_KEY);
+  } catch {
+    // storage indisponível
   }
 }
 

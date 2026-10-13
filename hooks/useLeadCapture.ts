@@ -4,6 +4,7 @@ import { getTrackingDataObject, getWhatsAppLink } from '../utils/whatsapp';
 import type { LeadTracking, LeadUtms, SubmitLeadRequest } from '../types/leadCapture';
 import { cleanString, normalizeWhatsappNumber } from '../lib/lead-logic';
 import { extractUtms, normalizeLeadTracking } from '../lib/tracking-normalization';
+import { readAdsConsentReceipt } from '../lib/consent';
 import { pushGenerateLeadConversionEvent } from '../utils/generate-lead-analytics';
 
 export interface LeadDraft {
@@ -172,6 +173,7 @@ export function buildSubmitLeadPayload(
             ...latestTracking,
             ...latestUtms,
         },
+        attributionConsent: readAdsConsentReceipt(),
     };
     const empresa = cleanValue(merged.empresa);
     const cargo = cleanValue(merged.cargo);

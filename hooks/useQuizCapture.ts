@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { useAntiBot } from './useAntiBot';
 import { getTrackingDataObject } from '../utils/whatsapp';
 import { extractUtms, normalizeLeadTracking } from '../lib/tracking-normalization';
+import { readAdsConsentReceipt } from '../lib/consent';
 import type { LeadTracking, LeadUtms } from '../types/leadCapture';
 import type { SubmitQuizRequest, SubmitQuizResponse } from '../types/quiz';
 
@@ -65,6 +66,7 @@ export function useQuizCapture() {
             sourcePage: typeof window !== 'undefined' ? window.location.pathname : '/quiz',
             utms: latest.utms,
             tracking: latest.tracking,
+            attributionConsent: readAdsConsentReceipt(),
         };
 
         try {

@@ -17,6 +17,7 @@ import {
     type MaybeAsyncValidationResult,
 } from './n8n-submit-handler';
 import { buildLeadFields, buildPartnerFields, type OdooLeadInput } from './odoo-lead-mapping';
+import { prepareSubmissionConsent } from './submission-consent';
 import { getOdooConfig, openOdooSession } from '../services/odoo';
 import { logger } from './logger';
 
@@ -78,12 +79,19 @@ async function sendToOdoo(input: OdooLeadInput): Promise<void> {
     const config = getOdooConfig();
     if (!config) throw new Error('ODOO_ERROR:503:Odoo config missing');
 
-    const session = await openOdooSession(config);
+    // A sessão Odoo e o ledger não dependem um do outro. Abrir os dois juntos
+    // evita uma ida extra antes do upsert. Se a autenticação falhar, o grant
+    // de e-mail que já tiver sido gravado continua válido no retry (mesmo id).
+    const [session, consent] = await Promise.all([
+        openOdooSession(config),
+        prepareSubmissionConsent(input),
+    ]);
+    const gated = consent.input;
 
     // utm_campaign is highly variable (one per ad campaign), unlike the fixed
     // source/medium table, so it's resolved against Odoo's native utm.campaign
     // model (find-or-create) instead of a hardcoded id.
-    const campaignName = input.createsLead ? input.utms.utm_campaign?.trim() : undefined;
+    const campaignName = gated.createsLead ? gated.utms.utm_campaign?.trim() : undefined;
     // PERFORMANCE: resolveCampaignId only needs the session uid — it never reads
     // partnerId — so it rides alongside the partner upsert instead of queueing
     // behind it. Each Odoo Cloud JSON-RPC costs a full round trip from the Worker,
@@ -118,14 +126,25 @@ async function sendToOdoo(input: OdooLeadInput): Promise<void> {
         })
         : undefined;
 
-    const partnerId = await session.upsertPartner(buildPartnerFields(input), {
-        preserveName: input.preserveName,
+    const partnerId = await session.upsertPartner(buildPartnerFields(gated), {
+        preserveName: gated.preserveName,
     });
 
-    if (input.createsLead) {
-        const idempotencyKey = await resolveIdempotencyKey(input);
+    if (consent.enforceEmailRevoke) {
+        try {
+            await session.writePartnerConsent(partnerId, false);
+        } catch (error) {
+            logger.warn('CONSENT_SYNC', {
+                stage: 'email_revoke_failed',
+                detail: error instanceof Error ? error.message : 'unknown',
+            });
+        }
+    }
+
+    if (gated.createsLead) {
+        const idempotencyKey = await resolveIdempotencyKey(gated);
         const includeConversionFields = process.env.ODOO_CONVERSION_FIELDS_ENABLED === 'true';
-        const leadFields = buildLeadFields(input, partnerId, idempotencyKey, { includeConversionFields });
+        const leadFields = buildLeadFields(gated, partnerId, idempotencyKey, { includeConversionFields });
         const campaignId = await campaignIdPromise;
         if (campaignId !== undefined) leadFields.campaign_id = campaignId;
         await session.createLead(leadFields, idempotencyKey);

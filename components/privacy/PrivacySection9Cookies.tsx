@@ -1,3 +1,5 @@
+import { EmailMarketingRevoke } from "./EmailMarketingRevoke";
+
 export function PrivacySection9Cookies() {
     return (
         <section id="cookies" className="space-y-2">
@@ -16,7 +18,7 @@ export function PrivacySection9Cookies() {
                     <li><strong>Essenciais:</strong> Necessários para o funcionamento básico do website. Não dependem de consentimento. Inclui os cookies <code>nps_invite_*</code> e <code>nps_invite_info_*</code>, criados apenas quando o cliente abre o link de avaliação pós-viagem: guardam o convite e o primeiro nome usado na saudação, sob um identificador aleatório de cada aba, para que esses dados não fiquem no endereço da página, e são apagados ao enviar a avaliação ou em até 2 (duas) horas. Inclui também o cookie <code>quiz_prefill</code>, criado apenas quando o visitante abre o Quiz de Destinos por um link nosso de e-mail que já traz nome e e-mail: guarda esses dados para pré-preencher o formulário sem deixá-los no endereço da página, e é apagado assim que a página o lê ou em até 30 (trinta) minutos</li>
                     <li><strong>Funcionais:</strong> Melhoram a funcionalidade e personalização</li>
                     <li><strong>Analíticos:</strong> Coletam eventos de uso do website com remoção de IP no servidor intermediário (ver Seção 4.2) e identificadores pseudonimizados. Quando não existe um cookie legado do Google, podemos criar o cookie próprio <code>anhanga_ga_cid</code>, com duração de até 2 (dois) anos; se o titular enviar um formulário, esse identificador pode ser registrado junto ao cadastro no CRM para atribuição e correlação operacional. Tratados com base no <strong>legítimo interesse</strong> da controladora (Art. 7º, IX, LGPD), com direito de oposição garantido (ver Seção 9.4)</li>
-                    <li><strong>Atribuição de campanhas:</strong> O cookie próprio <code>tracking_data</code> armazena parâmetros de campanha por até 30 (trinta) dias para mensuração de conversões</li>
+                    <li><strong>Atribuição de campanhas:</strong> O cookie próprio <code>tracking_data</code> só guarda parâmetros de campanha (UTM, <code>gclid</code>, <code>fbclid</code> e equivalentes) depois que o consentimento de medição publicitária é registrado no nosso ledger. A recusa ou a revogação apaga esses parâmetros do cookie e do armazenamento da sessão. O identificador analítico <code>anhanga_ga_cid</code> pode continuar no mesmo cookie, porque a mensuração de audiência segue em legítimo interesse</li>
                     <li><strong>Publicitários e de marketing:</strong> Utilizados para publicidade direcionada, remarketing e automação de marketing. Carregados <strong>somente após o consentimento</strong> do titular, manifestado no aviso de cookies (Art. 7º, I, LGPD)</li>
                 </ul>
                 <h3 className="font-merriweather font-semibold">9.3 Gestão e Revogação do Consentimento</h3>
@@ -24,7 +26,9 @@ export function PrivacySection9Cookies() {
                 <ul className="list-disc pl-6 space-y-1">
                     <li>Pelo link <strong>"Gerenciar cookies"</strong>, disponível no rodapé de todas as páginas do website, que reabre o aviso de preferências. Ao recusar, os cookies de marketing deixam de ser carregados imediatamente</li>
                     <li>Pelas configurações do navegador, que permitem bloquear ou excluir cookies</li>
+                    <li>Pelo formulário abaixo, para revogar o recebimento de comunicações de marketing no e-mail informado. O pedido é registrado mesmo que não confirmemos se esse endereço está na base</li>
                 </ul>
+                <EmailMarketingRevoke />
                 <h3 className="font-merriweather font-semibold">9.4 Direito de Oposição ao Tratamento Analítico</h3>
                 <p>Nos termos do Art. 18, § 2º, da LGPD, o titular pode opor-se ao tratamento de dados analíticos realizado com base em legítimo interesse. Para exercer esse direito, envie solicitação ao nosso Encarregado pelo e-mail{" "}
                     <a href="mailto:privacidade@anhanga.tur.br" className="text-primary underline">privacidade@anhanga.tur.br</a>, que também atende à oposição às métricas próprias sem cookies descritas na Seção 4.2. O bloqueio de cookies no navegador impede a persistência dos identificadores analíticos, mas não interrompe, por si só, o envio dos eventos ao Google Analytics — feito pelo servidor intermediário descrito na Seção 4.2 — nem a coleta das métricas próprias, que não dependem de cookie. Recebido o pedido de oposição, o Encarregado providencia a exclusão dos registros analíticos já associados ao titular e informa o resultado. Não dispomos hoje de um mecanismo automático que interrompa essa coleta em visitas futuras a partir do navegador; estamos implementando esse controle e, até lá, o pedido é tratado manualmente a cada solicitação.</p>

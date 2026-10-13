@@ -96,6 +96,7 @@ test('getWhatsAppLink omits identifiers even when tracking data is available', (
         configurable: true,
         value: { getItem: () => null, setItem: () => {} },
     });
+    const restoreAdsConsent = installAdsConsent(true);
 
     try {
         // Proves the fixture is real: this data is captured and does reach the Odoo payloads.
@@ -108,6 +109,7 @@ test('getWhatsAppLink omits identifiers even when tracking data is available', (
             assert.ok(!decoded.includes(identifier), `mensagem não deve conter "${identifier}"`);
         }
     } finally {
+        restoreAdsConsent();
         if (originalWindow) Object.defineProperty(globalThis, 'window', originalWindow);
         else Reflect.deleteProperty(globalThis, 'window');
         if (originalDocument) Object.defineProperty(globalThis, 'document', originalDocument);
@@ -171,13 +173,40 @@ test('getTrackingDataObject gera um cid próprio quando não existe cookie _ga (
     }
 });
 
+function installAdsConsent(granted: boolean): () => void {
+    const previous = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+    const store: Record<string, string> = {};
+    if (granted) {
+        store.anhanga_cookie_consent = 'marketing';
+        store.anhanga_cookie_consent_meta = JSON.stringify({
+            registered: true,
+            eventId: 'evt-test',
+            subjectKey: 'anon:00000000-0000-4000-8000-000000000001',
+            choice: 'marketing',
+        });
+    }
+    Object.defineProperty(globalThis, 'localStorage', {
+        configurable: true,
+        value: {
+            getItem: (key: string) => store[key] ?? null,
+            setItem: (key: string, value: string) => { store[key] = value; },
+            removeItem: (key: string) => { delete store[key]; },
+        },
+    });
+    return () => {
+        if (previous) Object.defineProperty(globalThis, 'localStorage', previous);
+        else Reflect.deleteProperty(globalThis, 'localStorage');
+    };
+}
+
 function withTrackingEnv(
-    opts: { search?: string; storedTrackingData?: Record<string, unknown>; cookieData?: string },
+    opts: { search?: string; storedTrackingData?: Record<string, unknown>; cookieData?: string; adsConsent?: boolean },
     run: (getTracking: () => ReturnType<typeof getTrackingDataObject>) => void,
 ): void {
     const originalWindow = Object.getOwnPropertyDescriptor(globalThis, 'window');
     const originalDocument = Object.getOwnPropertyDescriptor(globalThis, 'document');
     const originalSessionStorage = Object.getOwnPropertyDescriptor(globalThis, 'sessionStorage');
+    const restoreAdsConsent = installAdsConsent(opts.adsConsent !== false);
 
     const search = opts.search ?? '';
     const storedTrackingData = opts.storedTrackingData ?? null;
@@ -205,6 +234,7 @@ function withTrackingEnv(
     try {
         run(getTrackingDataObject);
     } finally {
+        restoreAdsConsent();
         if (originalWindow) Object.defineProperty(globalThis, 'window', originalWindow);
         else Reflect.deleteProperty(globalThis, 'window');
         if (originalDocument) Object.defineProperty(globalThis, 'document', originalDocument);
@@ -360,12 +390,14 @@ test('getTrackingDataObject preserva atribuição do cookie de 30 dias numa aba 
         configurable: true,
         value: { getItem: () => null, setItem: () => {} },
     });
+    const restoreAdsConsent = installAdsConsent(true);
 
     try {
         const tracking = getTrackingDataObject();
         assert.equal(tracking?.utm_source, 'google', 'atribuição do cookie de 30 dias deve sobreviver numa aba nova');
         assert.equal(tracking?.utm_campaign, 'promo', 'atribuição do cookie de 30 dias deve sobreviver numa aba nova');
     } finally {
+        restoreAdsConsent();
         if (originalWindow) Object.defineProperty(globalThis, 'window', originalWindow);
         else Reflect.deleteProperty(globalThis, 'window');
         if (originalDocument) Object.defineProperty(globalThis, 'document', originalDocument);
@@ -373,6 +405,18 @@ test('getTrackingDataObject preserva atribuição do cookie de 30 dias numa aba 
         if (originalSessionStorage) Object.defineProperty(globalThis, 'sessionStorage', originalSessionStorage);
         else Reflect.deleteProperty(globalThis, 'sessionStorage');
     }
+});
+
+test('getTrackingDataObject descarta gclid e UTM sem recibo de medição e mantém o cid analítico', () => {
+    withTrackingEnv(
+        { search: '?utm_source=google&gclid=Cj0KTEST', adsConsent: false },
+        (getTracking) => {
+            const tracking = getTracking();
+            assert.equal(tracking?.utm_source, undefined);
+            assert.equal(tracking?.gclid, undefined);
+            assert.match(tracking?.cid ?? '', /^\d+\.\d+$/);
+        },
+    );
 });
 
 // Regressão (achado de review, chatgpt-codex-connector[bot], P2): o formato legado

@@ -12,7 +12,7 @@
  * IDs (`source_id`/`medium_id`/`stage_id`/`team_id`) are fixed records of the
  * `anhanga` instance, validated via MCP against the contract's §3 table.
  */
-import type { LeadTracking, LeadUtms, SubmitLeadRequest } from '../types/leadCapture';
+import type { AttributionConsentReceipt, LeadTracking, LeadUtms, SubmitLeadRequest } from '../types/leadCapture';
 import type { SubmitContactRequest } from '../types/contactCapture';
 import type { SubmitQuizRequest } from '../types/quiz';
 import type { SubmitWaitlistRequest } from '../types/waitlist';
@@ -81,6 +81,8 @@ export interface OdooLeadInput {
     eventId?: string | null;
     utms: LeadUtms;
     tracking?: LeadTracking;
+    /** Recibo de medição (gclid/fbclid/UTM). Ausente → o handler zera esses campos. */
+    attributionConsent?: AttributionConsentReceipt | null;
     originSignal: OriginSignal;
     /** Free-text context for partner-only forms (quiz/waitlist/nps) — no crm.lead. */
     contextNote?: string | null;
@@ -124,8 +126,9 @@ function fullName(firstName: string, lastName: string): string {
 
 /**
  * Builds the `res.partner` create/write dict. Only includes fields with content:
- * `x_lgpd_consent` is written only when opting in (we never revoke consent on an
- * update), and `x_perfil_do_viajante` only for a recognized quiz profile.
+ * `x_lgpd_consent` is set true only on a registered email grant. Revocation does
+ * not go through this fill-if-blank path (`writePartnerConsent` forces false).
+ * `x_perfil_do_viajante` is written only for a recognized quiz profile.
  * `category_id` uses link commands `(4, id)` so tags are added without removing
  * any existing ones on a deduped partner. Intake partners get the Lead tag
  * (Fase 0) plus any resolved "Destino de Interesse" tags — except NPS, whose
@@ -274,6 +277,7 @@ export function leadInputFromSubmitLead(data: SubmitLeadRequest): OdooLeadInput 
         eventId: data.event_id ?? null,
         utms: data.utms,
         tracking: data.tracking,
+        attributionConsent: data.attributionConsent ?? null,
         originSignal: referred ? 'referral' : null,
     };
 }
@@ -295,6 +299,7 @@ export function leadInputFromSubmitContact(data: SubmitContactRequest): OdooLead
         eventId: data.eventId ?? null,
         utms: data.utms,
         tracking: data.tracking,
+        attributionConsent: data.attributionConsent ?? null,
         originSignal: null,
     };
 }
@@ -325,6 +330,7 @@ export function leadInputFromSubmitQuiz(data: SubmitQuizRequest): OdooLeadInput 
         destinationTagIds: resolveQuizDestinoTags(data.destinos),
         utms: data.utms,
         tracking: data.tracking,
+        attributionConsent: data.attributionConsent ?? null,
         originSignal: 'quiz',
         contextNote,
     };
@@ -387,6 +393,7 @@ export function leadInputFromSubmitWaitlist(data: SubmitWaitlistRequest): OdooLe
         marketingOptIn: data.emailOptIn === true,
         utms: data.utms,
         tracking: data.tracking,
+        attributionConsent: data.attributionConsent ?? null,
         originSignal: null,
         contextNote,
     };
