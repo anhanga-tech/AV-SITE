@@ -28,6 +28,7 @@ const {
   getConsent,
   hasRegisteredAdsConsent,
   markConsentRegistered,
+  readAdsConsentReceipt,
   registerConsentBannerListener,
   setConsent,
   triggerResetBanner,
@@ -99,6 +100,19 @@ describe('setConsent("marketing")', () => {
 
   test('não dispara anhanga:revoke-consent', () => {
     setConsent('marketing');
+    assert.ok(!eventsFired.includes('anhanga:revoke-consent'));
+  });
+
+  test('reaceitar marketing conserva o recibo já registrado', () => {
+    const receipt = {
+      eventId: 'ads_evt_keep_01',
+      subjectKey: 'anon:00000000-0000-4000-8000-000000000099',
+    };
+    markConsentRegistered(receipt);
+    eventsFired.length = 0;
+    setConsent('marketing');
+    assert.equal(hasRegisteredAdsConsent(), true);
+    assert.deepEqual(readAdsConsentReceipt(), receipt);
     assert.ok(!eventsFired.includes('anhanga:revoke-consent'));
   });
 });

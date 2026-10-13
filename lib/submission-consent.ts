@@ -18,12 +18,18 @@ export interface SubmissionConsent {
     enforceEmailRevoke: boolean;
 }
 
+/**
+ * Lead e contato mandam um eventId por tentativa (estável no retry daquela
+ * tentativa). Quiz e waitlist não mandam: um id derivado do e-mail repetia o
+ * grant antigo e a revogação nunca saía. Sem id válido, cada envio ganha um
+ * id opaco — e o e-mail não entra na chave.
+ */
 function emailEventId(input: OdooLeadInput): string {
-    const material = input.eventId?.trim()
-        || `${input.formType}:${input.email ?? ''}:${input.destination ?? ''}:${input.bantSummary ?? ''}`;
+    const provided = input.eventId?.trim() ?? '';
+    const material = isConsentEventId(provided) ? provided : crypto.randomUUID();
     const safe = material.replace(/[^\w:.-]/g, '_').slice(0, 60);
     const id = `em_${input.formType}_${safe}`;
-    return id.length >= 8 ? id : `em_${input.formType}_missing`;
+    return isConsentEventId(id) ? id : `em_${input.formType}_${Date.now()}`;
 }
 
 export function readAttributionConsent(raw: unknown): AttributionConsentReceipt | null {
@@ -36,10 +42,17 @@ export function readAttributionConsent(raw: unknown): AttributionConsentReceipt 
 }
 
 async function emailDecision(input: OdooLeadInput): Promise<{ granted: boolean; revoked: boolean }> {
-    if (!input.marketingOptIn || !input.email) return { granted: false, revoked: false };
+    if (!input.email) return { granted: false, revoked: false };
     try {
         const subjectKey = await emailSubjectKey(input.email);
         const store = getConsentStore();
+        // Checkbox desmarcado não é revogação: qualquer um reenviaria o
+        // formulário e apagaria o opt-in. Mas se a revogação já está no
+        // ledger e o write no Odoo ficou pendente, este envio repete o write.
+        if (!input.marketingOptIn) {
+            const events = await store.readSubject(subjectKey);
+            return { granted: false, revoked: effectiveAction(events, 'email_marketing') === 'revoke' };
+        }
         const outcome = await store.append({
             id: emailEventId(input),
             subjectKey,

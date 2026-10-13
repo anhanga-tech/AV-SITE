@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { validateQuizPayload, deriveQuizLeadName } from '../lib/quiz-logic.ts';
 import quizHandler from '../api/submit-quiz.ts';
+import { effectiveAction } from '../lib/consent-ledger.ts';
+import { emailSubjectKey, getConsentStore } from '../lib/consent-store.ts';
 import { createOdooMock, setOdooEnv, clearOdooEnv } from './odoo-mock.ts';
 
 const BASE_PAYLOAD = {
@@ -147,6 +149,61 @@ test('submit-quiz upserts a partner with x_perfil_do_viajante and creates NO crm
     assert.equal(partner.email, 'maria@example.com');
     assert.equal(partner.x_perfil_do_viajante, 'escapista');
     assert.equal(partner.x_lgpd_consent, true);
+});
+
+test('submit-quiz restores email consent on a new opt-in after revocation', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    setOdooEnv();
+    const email = 'quiz-restore-optin@example.com';
+    const body = { ...BASE_PAYLOAD, email, newsletterOptIn: true };
+    global.fetch = createOdooMock({ newPartnerId: 210 }).fetch;
+
+    assert.equal((await quizHandler(buildRequest(body))).status, 200);
+    const subjectKey = await emailSubjectKey(email);
+    await getConsentStore().append({
+        id: 'emrev_quiz_handler_restore',
+        subjectKey,
+        purpose: 'email_marketing',
+        action: 'revoke',
+        noticeVersion: '2026-10-13',
+        origin: 'privacy_page',
+        occurredAt: new Date().toISOString(),
+    });
+
+    const mock = createOdooMock({ newPartnerId: 211 });
+    global.fetch = mock.fetch;
+    assert.equal((await quizHandler(buildRequest(body))).status, 200);
+    assert.equal(mock.partnerFields()!.x_lgpd_consent, true);
+    const events = await getConsentStore().readSubject(subjectKey);
+    assert.equal(effectiveAction(events, 'email_marketing'), 'grant');
+    assert.equal(events.filter((event) => event.action === 'grant').length, 2);
+});
+
+test('submit-quiz repeats a recorded email revoke when the checkbox is off', async (t) => {
+    t.after(() => { global.fetch = originalFetch; clearOdooEnv(); });
+    setOdooEnv();
+    const mock = createOdooMock({ newPartnerId: 212 });
+    global.fetch = mock.fetch;
+    const email = 'quiz-revoke-resubmit@example.com';
+    const subjectKey = await emailSubjectKey(email);
+    await getConsentStore().append({
+        id: 'emrev_quiz_handler_resubmit',
+        subjectKey,
+        purpose: 'email_marketing',
+        action: 'revoke',
+        noticeVersion: '2026-10-13',
+        origin: 'privacy_page',
+        occurredAt: '2026-10-13T12:00:00.000Z',
+    });
+
+    const res = await quizHandler(buildRequest({ ...BASE_PAYLOAD, email, newsletterOptIn: false }));
+    assert.equal(res.status, 200);
+    const consentWrite = mock.calls.find((call) =>
+        call.model === 'res.partner'
+        && call.method === 'write'
+        && JSON.stringify(call.args).includes('"x_lgpd_consent":false'),
+    );
+    assert.ok(consentWrite);
 });
 
 test('submit-quiz maps Odoo failures to ODOO_ERROR', async (t) => {

@@ -122,6 +122,115 @@ test('email revocation stays recorded when the Odoo write fails and does not say
     }
 });
 
+test('a future occurredAt is clamped to server time and loses to a later act', async () => {
+    const email = 'future-revoke@example.com';
+    const before = Date.now();
+    const response = await handler(post({
+        purpose: 'email_marketing',
+        action: 'revoke',
+        origin: 'privacy_page',
+        eventId: 'emrev_future_clamp',
+        email,
+        occurredAt: '9999-01-01T00:00:00.000Z',
+    }));
+    assert.equal(response.status, 201);
+
+    const subjectKey = await emailSubjectKey(email);
+    const revoked = await getConsentStore().readSubject(subjectKey);
+    assert.equal(revoked.length, 1);
+    const revokeAt = Date.parse(revoked[0]?.occurredAt ?? '');
+    assert.ok(revokeAt >= before - 1000);
+    assert.ok(revokeAt <= Date.now() + 1000);
+    assert.equal(revoked[0]?.occurredAt.startsWith('9999'), false);
+
+    await getConsentStore().append({
+        id: 'em_quiz_after_clamped_revoke',
+        subjectKey,
+        purpose: 'email_marketing',
+        action: 'grant',
+        noticeVersion: '2026-10-13',
+        origin: 'quiz',
+        occurredAt: new Date(Date.now() + 5000).toISOString(),
+    });
+    const events = await getConsentStore().readSubject(subjectKey);
+    assert.equal(effectiveAction(events, 'email_marketing'), 'grant');
+});
+
+test('a future ads grant does not outrank a later refusal', async () => {
+    const subject = 'anon:66666666-6666-4666-8666-666666666666';
+    const grant = await handler(post({
+        purpose: 'ads_measurement',
+        action: 'grant',
+        origin: 'cookie_banner',
+        eventId: 'ads_future_grant_01',
+        subjectKey: subject,
+        occurredAt: '9999-06-01T00:00:00.000Z',
+    }));
+    const revoke = await handler(post({
+        purpose: 'ads_measurement',
+        action: 'revoke',
+        origin: 'cookie_banner',
+        eventId: 'ads_later_refuse_01',
+        subjectKey: subject,
+    }));
+    assert.equal(grant.status, 201);
+    assert.equal(revoke.status, 201);
+    const payload = await revoke.json() as { effective: string; registered: boolean };
+    assert.equal(payload.effective, 'revoke');
+    assert.equal(payload.registered, false);
+});
+
+test('a past occurredAt stays the act time', async () => {
+    const subject = 'anon:77777777-7777-4777-8777-777777777777';
+    const occurredAt = '2026-10-13T10:00:00.000Z';
+    const response = await handler(post({
+        purpose: 'ads_measurement',
+        action: 'grant',
+        origin: 'cookie_banner',
+        eventId: 'ads_past_stamp_01',
+        subjectKey: subject,
+        occurredAt,
+    }));
+    assert.equal(response.status, 201);
+    const events = await getConsentStore().readSubject(subject);
+    assert.equal(events[0]?.occurredAt, occurredAt);
+});
+
+test('an older email revoke does not clear Odoo while the ledger stays granted', async () => {
+    const email = 'older-revoke-no-write@example.com';
+    setOdooEnv();
+    const mock = createOdooMock({ existingPartnerId: 88 });
+    global.fetch = mock.fetch;
+    try {
+        const subjectKey = await emailSubjectKey(email);
+        await getConsentStore().append({
+            id: 'em_lead_newer_than_revoke',
+            subjectKey,
+            purpose: 'email_marketing',
+            action: 'grant',
+            noticeVersion: '2026-10-13',
+            origin: 'lead',
+            occurredAt: new Date().toISOString(),
+        });
+        const response = await handler(post({
+            purpose: 'email_marketing',
+            action: 'revoke',
+            origin: 'privacy_page',
+            eventId: 'emrev_older_than_grant',
+            email,
+            occurredAt: '2020-01-01T00:00:00.000Z',
+        }));
+        assert.equal(response.status, 201);
+        const payload = await response.json() as { effective: string };
+        assert.equal(payload.effective, 'grant');
+        const wroteConsent = mock.calls.some((call) => call.model === 'res.partner' && call.method === 'write');
+        assert.equal(wroteConsent, false);
+    } finally {
+        global.fetch = originalFetch;
+        clearOdooEnv();
+    }
+});
+
 test('replaying an older email grant does not restore a revocation', async () => {
     const email = 'replay-email@example.com';
     const grant = {

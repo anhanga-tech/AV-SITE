@@ -9,8 +9,8 @@ import { render, cleanup, act } from '@testing-library/react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 import CookieConsentBanner from '../components/CookieConsentBanner.tsx';
-import { _resetBannerVisibilityStateForTests } from '../lib/cookie-banner-visibility.ts';
-import { getConsent } from '../lib/consent.ts';
+import { _resetBannerVisibilityStateForTests, acceptConsent, getBannerVisibility } from '../lib/cookie-banner-visibility.ts';
+import { getConsent, hasRegisteredAdsConsent, markConsentRegistered, readAdsConsentReceipt } from '../lib/consent.ts';
 
 /*
   #1605: o banner passou a ser visível a partir do primeiro paint, muito antes de os onClick
@@ -93,4 +93,22 @@ test('o handoff é drenado uma única vez, antes de qualquer reset bufferizado',
 
   assert.equal(calls, 1);
   assert.equal(getConsent(), 'essential');
+});
+
+test('reaceitar marketing com o ledger fora do ar conserva o recibo anterior', async () => {
+  const receipt = {
+    eventId: 'ads_evt_keep_banner',
+    subjectKey: 'anon:12121212-1212-4121-8121-121212121212',
+  };
+  markConsentRegistered(receipt);
+  globalThis.fetch = async () => {
+    throw new Error('offline');
+  };
+
+  acceptConsent();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
+  assert.deepEqual(readAdsConsentReceipt(), receipt);
+  assert.equal(hasRegisteredAdsConsent(), true);
+  assert.equal(getBannerVisibility(), false);
 });

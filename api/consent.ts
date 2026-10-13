@@ -71,9 +71,7 @@ export default async function handler(request: Request): Promise<Response> {
         return json({ ok: false, requestId, code: 'VALIDATION_ERROR', error: 'O opt-in de e-mail só é registrado no formulário.' }, 400, requestId, cors);
     }
 
-    const occurredAt = body.occurredAt && !Number.isNaN(Date.parse(body.occurredAt))
-        ? new Date(body.occurredAt).toISOString()
-        : new Date().toISOString();
+    const occurredAt = resolveOccurredAt(body.occurredAt);
 
     try {
         const prepared = await resolveSubject(body);
@@ -94,7 +92,7 @@ export default async function handler(request: Request): Promise<Response> {
         const effective = effectiveAction(outcome.events, body.purpose);
 
         let sync: 'recorded' | 'pending' | 'skipped' = 'skipped';
-        if (body.purpose === 'email_marketing' && body.action === 'revoke' && prepared.email) {
+        if (body.purpose === 'email_marketing' && body.action === 'revoke' && prepared.email && effective === 'revoke') {
             sync = await revokeEmailAtOdoo(prepared.email);
         }
 
@@ -128,6 +126,20 @@ export default async function handler(request: Request): Promise<Response> {
         });
         return json({ ok: false, requestId, code: 'INTERNAL_ERROR', error: 'Não foi possível registrar o consentimento.' }, 500, requestId, cors);
     }
+}
+
+/**
+ * O cliente pode mandar o instante do clique, mas não um futuro. Um
+ * `occurredAt` à frente do relógio do servidor ganharia de todo ato
+ * posterior (os formulários carimbam com a hora do servidor). Passado
+ * continua valendo: um ato atrasado não fura a fila.
+ */
+function resolveOccurredAt(raw: string | undefined, now: Date = new Date()): string {
+    const serverNow = now.toISOString();
+    if (!raw) return serverNow;
+    const parsed = Date.parse(raw);
+    if (Number.isNaN(parsed) || parsed > now.getTime()) return serverNow;
+    return new Date(parsed).toISOString();
 }
 
 async function resolveSubject(body: {

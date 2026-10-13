@@ -72,6 +72,19 @@ export function getOrCreateConsentSubject(): string {
 export function setConsent(choice: ConsentChoice): void {
   try {
     const previous = localStorage.getItem(CHOICE_KEY);
+    const previousMeta = readConsentMeta();
+    // Reaceitar marketing (Gerenciar cookies → Aceitar) não pode apagar um
+    // recibo que o ledger já confirmou. O POST novo ainda corre; se falhar,
+    // a medição continua com a prova anterior.
+    if (
+      choice === 'marketing'
+      && previous === 'marketing'
+      && previousMeta?.registered === true
+      && previousMeta.eventId
+      && previousMeta.subjectKey
+    ) {
+      return;
+    }
     localStorage.setItem(CHOICE_KEY, choice);
     const meta: ConsentMeta = {
       choice,

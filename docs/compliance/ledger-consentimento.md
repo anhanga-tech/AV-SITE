@@ -24,6 +24,10 @@ id, subjectKey, purpose, action, noticeVersion, origin, occurredAt, recordedAt
 - O texto do aviso fica em `lib/consent-notices.ts`, versão `2026-10-13`. O evento guarda a versão, não o texto inteiro.
 - O mesmo `id` é replay: não duplica e não muda o carimbo original.
 - Um grant com `occurredAt` anterior a uma revogação entra no histórico e não restaura o consentimento. Um grant novo, com ato mais recente, restaura.
+- Lead e contato reutilizam o `eventId` da tentativa, então o retry daquele envio é replay. Quiz e waitlist não mandam id: cada envio recebe um id opaco novo, sem o e-mail na chave. Reenviar o checkbox depois da revogação restaura.
+- `POST /api/consent` guarda um `occurredAt` no passado e troca qualquer valor no futuro (ou inválido) pelo relógio do servidor. O write no Odoo da revogação de e-mail só acontece quando o estado efetivo ficou `revoke`.
+- Desmarcar o checkbox não cria revogação. Se o ledger já está em `revoke`, o envio seguinte pede de novo `x_lgpd_consent = false`, para um write que ficou pendente.
+- Reaceitar marketing no banner não apaga um recibo já registrado. Se o grant novo falha, a medição continua com a prova anterior.
 
 ## Sujeito e armazenamento
 
