@@ -77,6 +77,7 @@ export const ParquesHero: React.FC = () => (
             // Só o tile grande é candidato a LCP no desktop; no celular o
             // mosaico fica abaixo do CTA e os outros esperam a rolagem.
             eager={index === 0}
+            maxWidth={index === 0 ? 800 : 480}
             className={`rounded-2xl ${index === 0 ? 'row-span-2' : ''}`}
           />
         ))}
@@ -101,7 +102,7 @@ const CredentialedPark: React.FC<{ park: Park; index: number }> = ({ park, index
   >
     {/* Mesma altura nos dois cards, de propósito: com proporção fixa a foto do
         card largo ficaria mais alta e derrubaria o título dele. */}
-    <ParkPhoto park={park} className="h-48 sm:h-56" />
+    <ParkPhoto park={park} maxWidth={1200} className="h-48 sm:h-56" />
     <div className="p-6 sm:p-8">
       {/* Badge e local em linhas próprias, não lado a lado: no card estreito o
           par quebrava e derrubava o título 20px abaixo do card vizinho, o que
@@ -224,7 +225,7 @@ export const PackageSection: React.FC = () => (
       <ul className="mt-10 divide-y divide-zinc-200/80">
         {PACKAGE_PARKS.map((park) => (
           <li key={park.slug} className="flex flex-col gap-5 py-7 first:pt-0 last:pb-0 sm:flex-row">
-            <ParkPhoto park={park} className="h-36 w-full shrink-0 rounded-xl sm:h-32 sm:w-44" />
+            <ParkPhoto park={park} maxWidth={640} className="h-36 w-full shrink-0 rounded-xl sm:h-32 sm:w-44" />
             <div className="min-w-0">
               <h3 className="font-display text-xl font-bold text-anhanga-dark">{park.name}</h3>
               <p className="mt-3 text-base leading-relaxed text-zinc-700 max-w-[65ch]">
