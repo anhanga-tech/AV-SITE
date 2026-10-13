@@ -140,22 +140,26 @@ const CredentialedPark: React.FC<{ park: Park; index: number }> = ({ park, index
         </div>
       </dl>
 
-      <div className="mt-7 flex flex-wrap gap-3">
-        {park.href ? (
-          <Link
-            to={park.href}
-            className="inline-flex min-h-[44px] items-center rounded-xl bg-anhanga-dark px-6 py-3 font-semibold text-white transition-transform duration-150 ease-out hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
-          >
-            Ver pacotes do {park.name}
-          </Link>
-        ) : null}
+      {/* Uma ação com peso de botão por card: o orçamento, que é o que gera
+          lead aqui. A landing do parque fica como link de texto; com dois
+          botões empilhados, quem chega pela primeira vez não sabia qual apertar. */}
+      <div className="mt-7 flex flex-col items-start gap-2">
         <button
           type="button"
           onClick={() => openParquesContact(park)}
-          className="inline-flex min-h-[44px] items-center rounded-xl border-2 border-anhanga-dark px-6 py-3 font-semibold text-anhanga-dark transition-colors duration-150 ease-out hover:bg-anhanga-dark hover:text-white motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
+          className="inline-flex min-h-[44px] items-center rounded-xl bg-anhanga-dark px-6 py-3 font-semibold text-white transition-transform duration-150 ease-out hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
         >
           <ParkQuoteLabel park={park} />
         </button>
+        {park.href ? (
+          <Link
+            to={park.href}
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg font-semibold text-anhanga-action transition-colors hover:text-anhanga-actionDark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
+          >
+            Conhecer a página do {park.name}
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        ) : null}
       </div>
     </div>
   </article>
@@ -261,8 +265,12 @@ export const PackageSection: React.FC = () => (
   </section>
 );
 
+// Só a partir de md. No celular os cards de parque logo acima já mostram
+// cidade, dias e época, um embaixo do outro; repetir os cinco em formato de
+// comparação somava ~1.900px de rolagem sem informação nova, e a tabela
+// pedia rolagem lateral de 44rem.
 export const ComparisonSection: React.FC = () => (
-  <section className="bg-white py-16 sm:py-24">
+  <section className="hidden bg-white py-16 sm:py-24 md:block">
     <div className="container mx-auto px-6 max-w-5xl">
       <h2 className="font-display text-3xl sm:text-4xl font-extrabold leading-tight text-anhanga-dark">
         Os cinco lado a lado
@@ -271,29 +279,7 @@ export const ComparisonSection: React.FC = () => (
         A comparação que costuma decidir a viagem numa conversa de WhatsApp.
       </p>
 
-      {/* Mobile: um card por parque. A tabela pedia rolagem lateral de 44rem
-          no celular, onde está a maior parte do tráfego. */}
-      <ul className="mt-8 space-y-4 md:hidden" aria-label="Comparação entre os parques">
-        {BOOKABLE_PARKS.map((park) => (
-          <li key={park.slug} className="rounded-2xl border border-zinc-200 p-5">
-            <h3 className="font-display text-lg font-bold text-anhanga-dark">{park.name}</h3>
-            <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
-              <dt className="text-zinc-500">Tipo</dt>
-              <dd className="m-0 text-zinc-700">{park.kind}</dd>
-              <dt className="text-zinc-500">Onde</dt>
-              <dd className="m-0 text-zinc-700">
-                {park.city}, {park.state}
-              </dd>
-              <dt className="text-zinc-500">Dias</dt>
-              <dd className="m-0 text-zinc-700">{park.days}</dd>
-              <dt className="text-zinc-500">Época</dt>
-              <dd className="m-0 text-zinc-700">{park.when}</dd>
-            </dl>
-          </li>
-        ))}
-      </ul>
-
-      <div className="mt-8 hidden overflow-x-auto md:block">
+      <div className="mt-8 overflow-x-auto">
         <table className="w-full min-w-[44rem] border-collapse text-left">
           <caption className="sr-only">
             Comparação entre os parques do Brasil: tipo, localização, perfil de público,

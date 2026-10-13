@@ -15,7 +15,7 @@ import type { SubmitWaitlistRequest } from '../types/waitlist.ts';
 
 /*
   Cobre a primeira leva visual do hub /parques-brasil: foto ou placeholder por
-  parque, comparação em cards para o mobile, e a lista de espera do Cacau Park
+  parque, comparação só a partir do tablet, um CTA forte por card credenciado, e a lista de espera do Cacau Park
   (única seção que não captava contato). A lista reusa /api/submit-waitlist; o
   que importa aqui é que chegue com a origem do Cacau e não conte como Lolla.
 */
@@ -46,15 +46,22 @@ test('com foto, o parque mostra a imagem com alt e o crédito', () => {
   assert.ok(screen.getByText('Foto: Fulano / CC BY'));
 });
 
-test('cada parque vendável aparece na comparação em cards e na tabela', () => {
+test('a comparação é só a tabela, sem uma segunda versão em cards para o mobile', () => {
   render(React.createElement(MemoryRouter, null, React.createElement(ParquesBrasil)));
-  const cards = screen.getByRole('list', { name: 'Comparação entre os parques' });
   const table = screen.getByRole('table');
 
   for (const park of BOOKABLE_PARKS) {
-    assert.ok(cards.textContent?.includes(park.name), `${park.name} faltando nos cards`);
     assert.ok(table.textContent?.includes(park.name), `${park.name} faltando na tabela`);
   }
+  assert.equal(screen.queryByRole('list', { name: 'Comparação entre os parques' }), null);
+});
+
+test('card credenciado: orçamento é o botão, a página do parque é link de texto', () => {
+  render(React.createElement(MemoryRouter, null, React.createElement(ParquesBrasil)));
+  const link = screen.getByRole('link', { name: 'Conhecer a página do Beto Carrero World' });
+  assert.equal(link.getAttribute('href'), BETO.href);
+  assert.ok(screen.getByRole('button', { name: 'Pedir orçamento do Beto Carrero World' }));
+  assert.equal(screen.queryByText(/Ver pacotes do/), null);
 });
 
 test('o hub mostra a lista de espera do Cacau Park', () => {
@@ -101,13 +108,37 @@ test('lista do Cacau Park: envia com a origem do Cacau e confirma', async () => 
     fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: 'Ana@Exemplo.com' } });
     fireEvent.click(screen.getByRole('button', { name: 'Me avise' }));
 
-    await waitFor(() => assert.ok(screen.getByRole('status')));
+    await waitFor(() => assert.match(screen.getByRole('status').textContent ?? '', /Pronto/));
     assert.equal(sentUrl, '/api/submit-waitlist');
     assert.equal(sentBody.sourcePage, CACAU_WAITLIST_SOURCE);
     assert.equal(sentBody.email, 'ana@exemplo.com');
     assert.equal(sentBody.name, 'Ana Souza');
     // Opt-in de marketing é opcional e começa desmarcado.
     assert.equal(sentBody.emailOptIn, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('lista do Cacau Park: a região de status já existe antes do envio', () => {
+  render(React.createElement(CacauWaitlist));
+  assert.equal(screen.getByRole('status').textContent, '');
+});
+
+test('lista do Cacau Park: falha de rede vira mensagem em português, não o erro do navegador', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = (async () => {
+    throw new TypeError('Failed to fetch');
+  }) as typeof fetch;
+
+  try {
+    render(React.createElement(CacauWaitlist));
+    fireEvent.change(screen.getByLabelText('Nome'), { target: { value: 'Ana Souza' } });
+    fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: 'ana@exemplo.com' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Me avise' }));
+
+    await waitFor(() => assert.ok(screen.getByText(/Não conseguimos enviar agora/)));
+    assert.equal(screen.queryByText('Failed to fetch'), null);
   } finally {
     globalThis.fetch = originalFetch;
   }
