@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { AIChat } from './pages/AIChat';
+import { seedRegisteredAdsConsent } from './helpers/seedAdsConsent';
 import { stubWhatsAppWindow } from './helpers/whatsappWindowStub';
 
 async function acceptLgpd(page: import('@playwright/test').Page) {
@@ -56,6 +57,7 @@ test.describe('Chatbot lead handoff', () => {
 
     const aiChat = new AIChat(page);
 
+    await seedRegisteredAdsConsent(page);
     await page.goto('/?utm_source=google&utm_medium=cpc&gclid=test-gclid');
     await aiChat.open();
     await aiChat.sendMessage('Quero uma viagem para Orlando');

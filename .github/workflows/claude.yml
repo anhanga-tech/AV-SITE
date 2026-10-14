@@ -92,6 +92,10 @@ jobs:
           additional_permissions: |
             actions: read
 
+          # PRs do Cursor Cloud Agent chegam como cursor[bot]. A action recusa
+          # bot fora desta lista e o check fica vermelho antes da review.
+          allowed_bots: cursor
+
           # Força modo "tag" com comment tracking. Sem isso, o `prompt` abaixo
           # ativa o modo "agent", que não instala nenhuma ferramenta de escrita
           # no GitHub por padrão — a review rodava com sucesso mas não postava
