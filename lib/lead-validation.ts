@@ -8,6 +8,7 @@ import {
     normalizeUtms,
     normalizeWhatsappNumber,
 } from './lead-logic';
+import { readAttributionConsent } from './submission-consent';
 
 // Zod-backed validation, split out of lib/lead-logic.ts so the client bundle
 // (which imports lead-logic.ts's sanitization helpers via useContactForm,
@@ -84,6 +85,7 @@ export function validatePayload(payload: unknown): { valid: true; data: SubmitLe
             marketingOptIn: raw.marketingOptIn === true,
             utms,
             tracking,
+            attributionConsent: readAttributionConsent(raw.attributionConsent),
         },
     };
 }

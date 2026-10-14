@@ -195,6 +195,24 @@ test('a mensagem termina no prompt editável mesmo com tracking na sessão', () 
         configurable: true,
         value: { getItem: () => null, setItem: () => {} },
     });
+    const previousLocalStorage = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+    const consentStore: Record<string, string> = {
+        anhanga_cookie_consent: 'marketing',
+        anhanga_cookie_consent_meta: JSON.stringify({
+            registered: true,
+            eventId: 'evt-test',
+            subjectKey: 'anon:00000000-0000-4000-8000-000000000001',
+            choice: 'marketing',
+        }),
+    };
+    Object.defineProperty(globalThis, 'localStorage', {
+        configurable: true,
+        value: {
+            getItem: (key: string) => consentStore[key] ?? null,
+            setItem: (key: string, value: string) => { consentStore[key] = value; },
+            removeItem: (key: string) => { delete consentStore[key]; },
+        },
+    });
 
     try {
         assert.equal(getTrackingDataObject()?.gclid, 'Cj0KTEST', 'fixture precisa ter tracking real');
@@ -205,6 +223,8 @@ test('a mensagem termina no prompt editável mesmo com tracking na sessão', () 
             assert.equal(decoded, resolved, `${link.id}: algo foi anexado depois do prompt`);
         }
     } finally {
+        if (previousLocalStorage) Object.defineProperty(globalThis, 'localStorage', previousLocalStorage);
+        else Reflect.deleteProperty(globalThis, 'localStorage');
         if (originalWindow) Object.defineProperty(globalThis, 'window', originalWindow);
         else Reflect.deleteProperty(globalThis, 'window');
         if (originalDocument) Object.defineProperty(globalThis, 'document', originalDocument);

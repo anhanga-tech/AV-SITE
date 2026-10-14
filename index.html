@@ -66,10 +66,21 @@
   <script>
     (function () {
       var choice = null;
-      try { choice = localStorage.getItem('anhanga_cookie_consent'); } catch (e) { }
+      var adsRegistered = false;
+      try {
+        choice = localStorage.getItem('anhanga_cookie_consent');
+        if (choice === 'marketing') {
+          var rawMeta = localStorage.getItem('anhanga_cookie_consent_meta');
+          var meta = rawMeta ? JSON.parse(rawMeta) : null;
+          adsRegistered = !!(meta && meta.registered === true);
+        }
+      } catch (e) { }
+      // "marketing" sem recibo do ledger volta a mostrar o banner: a escolha
+      // local sozinha não prova o consentimento (issues #1543/#1545).
+      var consentGate = choice === 'essential' || (choice === 'marketing' && adsRegistered);
       document.documentElement.setAttribute(
         'data-cookie-consent',
-        choice === 'marketing' || choice === 'essential' ? 'set' : 'unset'
+        consentGate ? 'set' : 'unset'
       );
 
       // Ponte de clique pré-hidratação. O banner agora é visível a partir do primeiro paint,
@@ -126,6 +137,46 @@
     imagesizes="100vw"
     type="image/webp">
 
+  <script>
+    // Antes do Traks (e de qualquer coletor que leia location.search): sem
+    // recibo de medição, tira gclid/fbclid/UTM da URL e guarda só em memória.
+    // O flush para cookie/sessionStorage acontece depois de anhanga:marketing-consent.
+    (function () {
+      var NAMED = {
+        utm_source: 1, utm_medium: 1, utm_campaign: 1, utm_term: 1, utm_content: 1,
+        gclid: 1, fbclid: 1, ttclid: 1, wbraid: 1, gbraid: 1, msclkid: 1, fbc: 1, fbp: 1
+      };
+      function isMarketing(key) {
+        return Object.prototype.hasOwnProperty.call(NAMED, key) || key.indexOf('hsa_') === 0;
+      }
+      function adsRegistered() {
+        try {
+          if (localStorage.getItem('anhanga_cookie_consent') !== 'marketing') return false;
+          var raw = localStorage.getItem('anhanga_cookie_consent_meta');
+          var meta = raw ? JSON.parse(raw) : null;
+          return !!(meta && meta.registered === true && meta.eventId && meta.subjectKey);
+        } catch (e) {
+          return false;
+        }
+      }
+      if (adsRegistered()) return;
+      try {
+        var url = new URL(window.location.href);
+        var pending = {};
+        var keys = [];
+        url.searchParams.forEach(function (value, key) {
+          if (!value || !isMarketing(key)) return;
+          pending[key] = value;
+          keys.push(key);
+        });
+        if (!keys.length) return;
+        keys.forEach(function (key) { url.searchParams.delete(key); });
+        window.__anhangaPendingAttribution = pending;
+        var next = url.pathname + url.search + url.hash;
+        history.replaceState(history.state, '', next);
+      } catch (e) {}
+    })();
+  </script>
   <script>
     window.traks = window.traks || function () {
       (window.traks.q = window.traks.q || []).push(arguments);
@@ -192,7 +243,15 @@
   <!-- Defer third-party scripts to protect mobile TBT -->
   <script>
     (function () {
-      var _consentChoice = (function () { try { return localStorage.getItem('anhanga_cookie_consent'); } catch (e) { return null; } })();
+      var _consentChoice = (function () {
+        try {
+          var choice = localStorage.getItem('anhanga_cookie_consent');
+          if (choice !== 'marketing') return choice;
+          var raw = localStorage.getItem('anhanga_cookie_consent_meta');
+          var meta = raw ? JSON.parse(raw) : null;
+          return meta && meta.registered === true ? 'marketing' : null;
+        } catch (e) { return null; }
+      })();
       var analyticsLoaded = false;
       var utmLoaded = false;
       var consentListeners = [];

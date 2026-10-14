@@ -51,6 +51,42 @@
         } catch {}
     }
 
+    function hasRegisteredAdsConsent() {
+        try {
+            if (localStorage.getItem('anhanga_cookie_consent') !== 'marketing') return false;
+            const raw = localStorage.getItem('anhanga_cookie_consent_meta');
+            const meta = raw ? JSON.parse(raw) : null;
+            return Boolean(meta && meta.registered === true);
+        } catch {
+            return false;
+        }
+    }
+
+    const MARKETING_KEY_SET = new Set(TRACKING_PARAMS);
+
+    function isMarketingKey(key) {
+        return MARKETING_KEY_SET.has(key) || key === 'fbc' || key === 'fbp' || key.indexOf('hsa_') === 0;
+    }
+
+    function dropMarketing(tracking) {
+        Object.keys(tracking).forEach((key) => {
+            if (isMarketingKey(key)) delete tracking[key];
+        });
+    }
+
+    function mergePendingAttribution(tracking) {
+        const pending = window.__anhangaPendingAttribution;
+        if (!pending || typeof pending !== 'object') return false;
+        let found = false;
+        Object.keys(pending).forEach((key) => {
+            const value = pending[key];
+            if (!value || !isMarketingKey(key)) return;
+            tracking[key] = value;
+            found = true;
+        });
+        return found;
+    }
+
     function mergeUrlTracking(urlParams, tracking) {
         let foundInUrl = false;
 
@@ -194,12 +230,22 @@
     function initWhatsAppTracking() {
         const urlParams = new URLSearchParams(window.location.search);
         const tracking = readStoredTracking();
-        const foundInUrl = mergeUrlTracking(urlParams, tracking);
+        const allowed = hasRegisteredAdsConsent();
+        if (!allowed) dropMarketing(tracking);
+        const foundInUrl = allowed && mergeUrlTracking(urlParams, tracking);
+        const foundPending = allowed && mergePendingAttribution(tracking);
 
-        if (foundInUrl) persistTracking(tracking);
-        ensureFacebookClickTracking(tracking);
+        if (foundInUrl || foundPending || !allowed) persistTracking(tracking);
+        if (allowed) ensureFacebookClickTracking(tracking);
         enrichTrackingWithCid(tracking);
     }
+
+    window.addEventListener('anhanga:marketing-consent', initWhatsAppTracking);
+    window.addEventListener('anhanga:revoke-consent', function () {
+        const tracking = readStoredTracking();
+        dropMarketing(tracking);
+        persistTracking(tracking);
+    });
 
     // --- EVENT DELEGATION LOGIC ---
     document.body.addEventListener('click', handleBodyClick, { capture: true });

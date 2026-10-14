@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import handler, { classifySubmitWaitlistError } from '../api/submit-waitlist.ts';
+import { effectiveAction } from '../lib/consent-ledger.ts';
+import { emailSubjectKey, getConsentStore } from '../lib/consent-store.ts';
 import { createOdooMock, setOdooEnv, clearOdooEnv } from './odoo-mock.ts';
 
 const originalFetch = global.fetch;
@@ -87,6 +89,35 @@ test('submit-waitlist upserts a sanitized res.partner and creates NO crm.lead', 
     assert.equal(partner.email, 'ana@example.com');
     // The checkbox copy is a marketing opt-in → x_lgpd_consent.
     assert.equal(partner.x_lgpd_consent, true);
+});
+
+test('submit-waitlist restores email consent on a new opt-in after revocation', async (t) => {
+    t.after(restore);
+    setOdooEnv();
+    const email = 'waitlist-restore-optin@example.com';
+    const body = { ...buildDirtyWaitlistPayload(), email, emailOptIn: true };
+    global.fetch = createOdooMock({ newPartnerId: 310 }).fetch;
+    assert.equal((await handler(buildRequest(body, { headers: { 'x-real-ip': '127.0.0.61' } }))).status, 201);
+
+    const subjectKey = await emailSubjectKey(email);
+    await getConsentStore().append({
+        id: 'emrev_waitlist_handler_restore',
+        subjectKey,
+        purpose: 'email_marketing',
+        action: 'revoke',
+        noticeVersion: '2026-10-13',
+        origin: 'privacy_page',
+        occurredAt: new Date().toISOString(),
+    });
+
+    const mock = createOdooMock({ newPartnerId: 311 });
+    global.fetch = mock.fetch;
+    const response = await handler(buildRequest(body, { headers: { 'x-real-ip': '127.0.0.62' } }));
+    assert.equal(response.status, 201);
+    assert.equal(mock.partnerFields()!.x_lgpd_consent, true);
+    const events = await getConsentStore().readSubject(subjectKey);
+    assert.equal(effectiveAction(events, 'email_marketing'), 'grant');
+    assert.equal(events.filter((event) => event.action === 'grant').length, 2);
 });
 
 test('submit-waitlist enforces rate-limit even for invalid payloads', async (t) => {

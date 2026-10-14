@@ -1,4 +1,5 @@
 import { expect, test, type Page, type Request } from '@playwright/test';
+import { seedRegisteredAdsConsent } from './helpers/seedAdsConsent';
 
 // E-mail links pre-fill the quiz with `/quiz?email=&nome=&sobrenome=&skip=true`.
 // Zaraz's automatic Pageview ships the page URL to GA4 before any page code
@@ -45,6 +46,10 @@ async function answerAllQuestions(page: Page) {
 }
 
 test.describe('Quiz — pré-preenchimento por link de e-mail', () => {
+    test.beforeEach(async ({ page }) => {
+        await seedRegisteredAdsConsent(page);
+    });
+
     test('tira e-mail e nome da URL e ainda pré-preenche o formulário', async ({ page }) => {
         const leaking = watchForLeaks(page);
 

@@ -1,4 +1,4 @@
-import type { LeadTracking, LeadUtms } from './leadCapture';
+import type { AttributionConsentReceipt, LeadTracking, LeadUtms } from './leadCapture';
 
 export interface SubmitWaitlistRequest {
     name: string;
@@ -8,6 +8,7 @@ export interface SubmitWaitlistRequest {
     emailOptIn?: boolean;
     utms: LeadUtms;
     tracking?: LeadTracking;
+    attributionConsent?: AttributionConsentReceipt | null;
 }
 
 interface SubmitWaitlistSuccess {

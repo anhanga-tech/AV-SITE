@@ -47,6 +47,9 @@ export const SubmitLeadBodySchema = z.object({
     cargo:       z.string().max(255).optional(),
     referred:    z.string().max(255).optional(),
     marketingOptIn: z.boolean().optional(),
+    // Forma inválida vira "sem recibo" em readAttributionConsent — não pode
+    // derrubar o lead inteiro.
+    attributionConsent: z.unknown().optional(),
     utms:        LeadUtmsSchema,
     tracking:    LeadTrackingSchema,
 });

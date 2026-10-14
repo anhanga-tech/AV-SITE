@@ -9,9 +9,9 @@
 | **Endereço** | Av. Dom Pedro I, 773, Vila Monumento, São Paulo-SP, CEP 01552-001 |
 | **Encarregado (DPO)** | Felipe William Rodrigues Silva |
 | **E-mail DPO** | privacidade@anhanga.tur.br |
-| **Versão** | 1.9 |
+| **Versão** | 1.10 |
 | **Data de elaboração** | 02/06/2026 |
-| **Última revisão** | 02/09/2026 |
+| **Última revisão** | 13/10/2026 |
 | **Próxima revisão** | 03/06/2027 |
 | **Status** | Rascunho — pendente de revisão jurídica e aprovação do DPO |
 
@@ -116,14 +116,16 @@ Sem essa análise, decisões de investimento em tráfego pago seriam baseadas em
 
 | Campo | Detalhe |
 |---|---|
-| **Dados tratados** | Parâmetros UTM (`utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`), identificador de atribuição/Session ID; click IDs (`gclid`, `fbclid`, `msclkid`, `ttclid`) armazenados em cookie first-party `tracking_data` (30 dias), cookie `anhanga_ga_cid` (até 2 anos) e `sessionStorage` |
+| **Dados tratados** | Parâmetros UTM e click IDs (`gclid`, `fbclid`, `msclkid`, `ttclid`, `hsa_*`) no cookie `tracking_data` e no `sessionStorage`, somente depois do consentimento de medição. Cookie analítico `anhanga_ga_cid` (até 2 anos) em legítimo interesse |
 | **Titulares** | Visitantes do site que chegam via campanhas de mídia paga ou orgânica |
 | **Operadores** | Anhangá Turismo (armazenamento first-party); Cloudflare, Inc. (Zaraz — repasse de conversões ao Google Ads, Meta CAPI e TikTok Events API; destinos de marketing somente após consentimento) |
 | **Retenção** | 30 dias (cookie `tracking_data`); até 2 anos (cookie `anhanga_ga_cid`); duração da sessão (`sessionStorage`); quando o cid é registrado no CRM, aplica-se a retenção da Atividade 3 |
-| **Transferência internacional** | Click IDs permanecem first-party antes do consentimento. Após opt-in de marketing, sinais necessários podem ser enviados ao Google, Meta e TikTok pelo Zaraz, conforme a finalidade de atribuição/conversão. |
-| **Limite de propagação** | Os identificadores **não** são incluídos no corpo das mensagens de WhatsApp pré-preenchidas (`wa.me?text=`). Chegam ao CRM apenas pelos handlers `/api/submit-*`, que os gravam no Odoo junto ao restante do formulário. |
+| **Transferência internacional** | Click IDs e UTMs só são persistidos e enviados ao CRM depois de consentimento de medição registrado (v1.10). Após esse registro, sinais necessários podem ser enviados ao Google, Meta e TikTok pelo Zaraz. |
+| **Limite de propagação** | Os identificadores **não** são incluídos no corpo das mensagens de WhatsApp pré-preenchidas (`wa.me?text=`). Chegam ao CRM pelos handlers `/api/submit-*` somente quando o recibo de medição ainda é um grant. |
 
-> **Arquitetura atualizada (v1.9, 01/09/2026 — substitui a híbrida da issue #1261):** UTMs e click IDs são armazenados first-party para atribuição. GA4 continua sob a premissa de legítimo interesse do projeto, agora via Zaraz. Meta e TikTok permanecem bloqueados antes do consentimento e após recusa (purpose `marketing` no Zaraz, ver Task 3 do plano de migração); depois do opt-in, as conversões seguem **exclusivamente server-side** por Meta CAPI e TikTok Events API — **nenhum pixel de terceiros é injetado no navegador** (mudança em relação à arquitetura híbrida anterior, que media PageView/Lead também no navegador). Isso reduz a pegada de rastreamento client-side sem alterar a finalidade nem os destinatários já declarados.
+> **Correção (v1.10, 13/10/2026 — issues #1543 e #1545):** UTMs e click IDs deixam de ser armazenados antes do consentimento. `initializeTracking()` só grava `gclid`, `fbclid`, UTM, `hsa_*` e os identificadores equivalentes depois de um grant de `ads_measurement` no ledger. Sem esse recibo, esses parâmetros saem da URL antes do Traks e não seguem para o Odoo. O `ref` de indicação e o `anhanga_ga_cid` continuam: o primeiro é referência first-party, o segundo é analítico. GA4, Traks, Cloudflare Web Analytics e Sentry seguem em legítimo interesse.
+>
+> **Arquitetura atualizada (v1.9, 01/09/2026 — substitui a híbrida da issue #1261):** GA4 continua sob a premissa de legítimo interesse do projeto, agora via Zaraz. Meta e TikTok permanecem bloqueados antes do consentimento e após recusa (purpose `marketing` no Zaraz, ver Task 3 do plano de migração); depois do opt-in, as conversões seguem **exclusivamente server-side** por Meta CAPI e TikTok Events API — **nenhum pixel de terceiros é injetado no navegador** (mudança em relação à arquitetura híbrida anterior, que media PageView/Lead também no navegador). Isso reduz a pegada de rastreamento client-side sem alterar a finalidade nem os destinatários já declarados.
 
 ### 3.2 Interesse legítimo identificado
 
@@ -160,7 +162,7 @@ Sem atribuição, é impossível saber se R$ 10.000 gastos em tráfego pago gera
 | Risco | Probabilidade | Impacto | Mitigação |
 |---|---|---|---|
 | Acesso não autorizado aos cookies de atribuição | Baixa | Baixo a médio | Dados técnicos e identificadores pseudonimizados; cookies first-party; o `anhanga_ga_cid` pode ser associado ao CRM quando há lead e deve seguir os controles de acesso aplicáveis |
-| Coleta de click IDs antes do consentimento (client-side) | Baixa (pós issues #782/#1261) | Baixo | `initializeTracking()` armazena atribuição first-party sob a premissa documentada de legítimo interesse; Zaraz bloqueia Meta/TikTok até a purpose `marketing` ser concedida; titular pode exercer oposição via `privacidade@anhanga.tur.br` |
+| Coleta de click IDs antes do consentimento (client-side) | Baixa (v1.10) | Baixo | Sem grant registrado, a URL é limpa antes do Traks e `initializeTracking()` descarta UTM/click IDs; Zaraz só recebe a purpose `marketing` depois do recibo; oposição analítica segue em `privacidade@anhanga.tur.br` |
 | Hashing incorreto no componente Meta/TikTok do Zaraz (dados pessoais não hasheados) | Baixa | Médio | Hashing SHA-256 é automático nos Managed Components do Zaraz (código-fonte auditado no spike de 01/09/2026); `generate_lead` hoje não carrega e-mail/telefone, então não há PII pra hashear neste evento — reavaliar se um evento com PII for adicionado no futuro |
 
 ### 3.6 Salvaguardas implementadas
@@ -171,7 +173,7 @@ Sem atribuição, é impossível saber se R$ 10.000 gastos em tráfego pago gera
 - [x] Dados pessoais usados para matching são hasheados (SHA-256) automaticamente pelos Managed Components do Zaraz quando presentes; hoje `generate_lead` não carrega e-mail/telefone
 - [x] Opt-out disponível via banner (issue #782)
 - [ ] **Pendente:** confirmar com o DPO se o DPA já existente com a Cloudflare (processor de hospedagem) cobre explicitamente o uso do Zaraz, ou se é necessário aditivo/DPA específico — não tratar como coberto até essa confirmação
-- [x] **Implementado (issue #782):** `initializeTracking()` opera sob legítimo interesse; direito de oposição ao tratamento por interesse legítimo disponível via `privacidade@anhanga.tur.br` e documentado em `/politica-privacidade#cookies`
+- [x] **Implementado (issue #782, corrigido na v1.10):** o identificador analítico segue em legítimo interesse; UTM e click IDs passaram a depender de consentimento registrado. Oposição ao tratamento analítico em `privacidade@anhanga.tur.br`, documentada em `/politica-privacidade#cookies`
 - [x] **Atualizado (set/2026):** Mautic e HubSpot foram descontinuados — não há mais operador a bloquear via banner de cookies nesta atividade (ver v1.8)
 - [x] **Atualizado (01/09/2026, v1.9):** Stape substituído pelo Cloudflare Zaraz; Meta/TikTok migrados de arquitetura híbrida (pixel + CAPI) para CAPI-only
 
@@ -355,6 +357,7 @@ O balancing test favorece o legítimo interesse nas Atividades 1, 2 e 3. A Ativi
 | 1.7 | 20/08/2026 | Atividade 2: identificadores deixam de ser anexados ao corpo das mensagens de WhatsApp (`\|\| Dados:` removido de `utils/whatsapp.ts`), que os colocava sob retenção da Meta em vez da janela de 30 dias declarada; linha "Limite de propagação" adicionada |
 | 1.8 | 01/09/2026 | HubSpot e Mautic descontinuados: webhook legado de deals Closed-Won (`api/hubspot-webhook.ts` + módulos associados) removido do código; Mautic (automação de marketing self-hosted) desligado. Atividades 2 e 3 e a Política de Privacidade atualizadas para refletir a redução de operadores — redução de superfície, sem mudança de finalidade nem novo tratamento. HubSpot e Mautic (Estados Unidos e infraestrutura própria, respectivamente) deixam de constar como operadores/subprocessadores. |
 | 1.9 | 01/09/2026 | Stape.io desativado pela própria Stape (31/08/2026, limite do plano gratuito) — substituído pelo **Cloudflare Zaraz** como plataforma de server-side tagging nas Atividades 1 e 2. Cloudflare já é processor da Anhangá (hospedagem via Pages), reduzindo a introdução de subprocessador novo. Mudança de arquitetura relevante: Meta e TikTok passam de híbrido (pixel + CAPI) para **CAPI-only** — nenhum pixel de terceiros é mais injetado no navegador do usuário. Atividade 4 (Customer Match) marcada como **inativa**: já dependia do Mautic (removido na v1.8) e agora também do Stape (removido nesta versão) como intermediário de upload — nenhum upload está ocorrendo. Pendências #1 e #4 marcadas obsoletas; novo item de auditoria de PII por evento adicionado (#2, parcial). |
+| 1.10 | 13/10/2026 | Atividade 2: UTM e click IDs deixam de ser tratados sob legítimo interesse. Captura e envio ao CRM exigem grant de `ads_measurement` no ledger (issues #1543 e #1545). GA4, Traks, Web Analytics e Sentry permanecem em legítimo interesse. |
 
 ---
 

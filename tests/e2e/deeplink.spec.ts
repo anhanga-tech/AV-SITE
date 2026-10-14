@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { seedRegisteredAdsConsent } from './helpers/seedAdsConsent';
 import { AIChat } from './pages/AIChat';
 
 test.describe('Deep-link Chat Support', () => {
@@ -51,6 +52,7 @@ test.describe('Deep-link Chat Support', () => {
   });
 
   test('should preserve UTM parameters when cleaning deep-link params', async ({ page }) => {
+    await seedRegisteredAdsConsent(page);
     const customMsg = 'Quero viajar para o Japão';
     await page.goto(`/?chat=1&m=${encodeURIComponent(customMsg)}&utm_source=instagram&utm_campaign=summer`);
 

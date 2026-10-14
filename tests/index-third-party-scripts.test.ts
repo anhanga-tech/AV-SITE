@@ -87,6 +87,13 @@ test('UTM tracker respeita o opt-out data-no-specialist-cta antes de disparar sp
   );
 });
 
+test('UTM tracker só persiste parâmetros de campanha com recibo de medição', () => {
+  assert.match(utmTrackingScript, /function hasRegisteredAdsConsent\(\)/);
+  assert.match(utmTrackingScript, /anhanga_cookie_consent_meta/);
+  assert.match(utmTrackingScript, /if \(!allowed\) dropMarketing\(tracking\)/);
+  assert.match(utmTrackingScript, /anhanga:revoke-consent/);
+});
+
 test('UTM tracker não envia query string ou hash crus em page_location', () => {
   assert.match(utmTrackingScript, /function getSafePageLocation\(\)/);
   assert.doesNotMatch(utmTrackingScript, /page_location:\s*window\.location\.href/);
@@ -128,6 +135,16 @@ test('index.html delega os defaults de consentimento ao Consent Bridge do GTM', 
     /gtag\(\s*['"]consent['"]/,
     'o Consent Bridge deve ser a única fonte dos comandos de consentimento',
   );
+});
+
+test('index.html tira identificadores de campanha da URL antes de agendar o Traks', () => {
+  const headHtml = getHeadHtml(indexHtml);
+  const stripIndex = headHtml.indexOf('window.__anhangaPendingAttribution');
+  const traksIndex = headHtml.indexOf('analytics-collect.anhanga.tur.br/t.js');
+  assert.ok(stripIndex > -1, 'o stash em memória da query de campanha deve existir');
+  assert.ok(traksIndex > -1, 'o coletor do Traks deve continuar presente');
+  assert.ok(stripIndex < traksIndex, 'a query de campanha sai da URL antes do Traks ser injetado');
+  assert.match(headHtml, /history\.replaceState/);
 });
 
 test('Traks tem gate de host para não poluir os goals de conversão em dev/CI', () => {
