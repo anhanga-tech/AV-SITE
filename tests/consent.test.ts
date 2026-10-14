@@ -23,16 +23,9 @@ Object.defineProperty(globalThis, 'dispatchEvent', {
 });
 
 // Importar APÓS configurar os mocks (execução de módulo ocorre no import)
-const {
-  _resetConsentListenerStateForTests,
-  getConsent,
-  hasRegisteredAdsConsent,
-  markConsentRegistered,
-  readAdsConsentReceipt,
-  registerConsentBannerListener,
-  setConsent,
-  triggerResetBanner,
-} = await import('../lib/consent.ts');
+const { getConsent, registerConsentBannerListener, setConsent, triggerResetBanner } = await import('../lib/consent.ts');
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- helper de teste para estado de módulo
+const { _resetConsentListenerStateForTests } = await import('../lib/consent.ts') as any;
 
 // --- Helpers ---
 function clearAll() {
@@ -82,37 +75,13 @@ describe('setConsent("marketing")', () => {
     assert.doesNotThrow(() => new Date(meta.timestamp));
   });
 
-  test('não dispara anhanga:marketing-consent antes do recibo do ledger', () => {
+  test('dispara anhanga:marketing-consent', () => {
     setConsent('marketing');
-    assert.ok(!eventsFired.includes('anhanga:marketing-consent'));
-    assert.equal(hasRegisteredAdsConsent(), false);
-  });
-
-  test('markConsentRegistered grava o recibo e dispara anhanga:marketing-consent', () => {
-    markConsentRegistered({
-      eventId: 'ads_evt_test_01',
-      subjectKey: 'anon:00000000-0000-4000-8000-000000000001',
-    });
     assert.ok(eventsFired.includes('anhanga:marketing-consent'));
-    assert.equal(hasRegisteredAdsConsent(), true);
-    assert.equal(getConsent(), 'marketing');
   });
 
   test('não dispara anhanga:revoke-consent', () => {
     setConsent('marketing');
-    assert.ok(!eventsFired.includes('anhanga:revoke-consent'));
-  });
-
-  test('reaceitar marketing conserva o recibo já registrado', () => {
-    const receipt = {
-      eventId: 'ads_evt_keep_01',
-      subjectKey: 'anon:00000000-0000-4000-8000-000000000099',
-    };
-    markConsentRegistered(receipt);
-    eventsFired.length = 0;
-    setConsent('marketing');
-    assert.equal(hasRegisteredAdsConsent(), true);
-    assert.deepEqual(readAdsConsentReceipt(), receipt);
     assert.ok(!eventsFired.includes('anhanga:revoke-consent'));
   });
 });

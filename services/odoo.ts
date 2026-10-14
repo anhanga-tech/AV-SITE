@@ -193,14 +193,6 @@ export interface OdooSession {
     createLead: (fields: Record<string, unknown>, idempotencyKey?: string) => Promise<number>;
     /** Finds a `utm.campaign` by exact name, creating one if none matches. */
     resolveCampaignId: (name: string) => Promise<number>;
-    /**
-     * Forces `x_lgpd_consent` even when the partner already has a value.
-     * The public upsert refuses that overwrite (issue #1021); revogação é a
-     * exceção, e só o ledger — não o corpo do formulário — chega aqui.
-     */
-    writePartnerConsent: (partnerId: number, granted: boolean) => Promise<void>;
-    /** Lookup only — does not create a partner. */
-    findPartnerIdByEmail: (email: string) => Promise<number | null>;
 }
 
 export async function openOdooSession(config: OdooConfig): Promise<OdooSession> {
@@ -298,30 +290,6 @@ export async function openOdooSession(config: OdooConfig): Promise<OdooSession> 
                 if (existingId) return existingId;
                 return executeKw<number>(config, uid, 'crm.lead', 'create', [fields], deadline);
             });
-        },
-        async findPartnerIdByEmail(email) {
-            const trimmed = email.trim();
-            if (!trimmed) return null;
-            const rows = await executeKw<{ id: number }[]>(
-                config,
-                uid,
-                'res.partner',
-                'search_read',
-                [[['email', '=', trimmed]], ['id']],
-                deadline,
-                { limit: 1 },
-            );
-            return rows[0]?.id ?? null;
-        },
-        async writePartnerConsent(partnerId, granted) {
-            await executeKw<boolean>(
-                config,
-                uid,
-                'res.partner',
-                'write',
-                [[partnerId], { x_lgpd_consent: granted }],
-                deadline,
-            );
         },
         async resolveCampaignId(name) {
             const trimmed = name.trim();

@@ -20,24 +20,6 @@ function buildRequest(body: Record<string, unknown>, opts?: { method?: string; i
     });
 }
 
-const ADS_SUBJECT = 'anon:33333333-3333-4333-8333-333333333333';
-const ADS_EVENT = 'ads_submit_contact_fixture';
-
-async function withAdsReceipt<T extends Record<string, unknown>>(body: T) {
-    const { getConsentStore } = await import('../lib/consent-store.ts');
-    const { ADS_NOTICE_VERSION } = await import('../lib/consent-notices.ts');
-    await getConsentStore().append({
-        id: ADS_EVENT,
-        subjectKey: ADS_SUBJECT,
-        purpose: 'ads_measurement',
-        action: 'grant',
-        noticeVersion: ADS_NOTICE_VERSION,
-        origin: 'cookie_banner',
-        occurredAt: '2026-10-13T12:00:00.000Z',
-    });
-    return { ...body, attributionConsent: { eventId: ADS_EVENT, subjectKey: ADS_SUBJECT } };
-}
-
 function validBody(overrides?: Record<string, unknown>) {
     return {
         firstName: 'Maria',
@@ -80,12 +62,7 @@ test('returns 200 and creates a partner + crm.lead on valid request', async () =
     const mock = createOdooMock();
     global.fetch = mock.fetch;
 
-    const res = await handler(buildRequest(validBody({
-        source: 'header',
-        destination: 'Orlando',
-        email: 'maria-contato@example.com',
-        emailOptIn: true,
-    })));
+    const res = await handler(buildRequest(validBody({ source: 'header', destination: 'Orlando', emailOptIn: true })));
     assert.equal(res.status, 200);
 
     assert.ok(mock.createdLead());
@@ -134,9 +111,9 @@ test('sets campaign_id on the crm.lead when utm_campaign is present', async () =
     const mock = createOdooMock({ existingCampaignId: 9 });
     global.fetch = mock.fetch;
 
-    const res = await handler(buildRequest(await withAdsReceipt(validBody({
+    const res = await handler(buildRequest(validBody({
         utms: { utm_source: 'google', utm_medium: 'cpc', utm_campaign: 'verao2026' },
-    }))));
+    })));
     assert.equal(res.status, 200);
 
     const lead = mock.leadFields()!;
@@ -148,9 +125,9 @@ test('still creates the lead when campaign resolution fails (non-essential enric
     const mock = createOdooMock({ existingCampaignId: null, campaignCreateShouldFail: true });
     global.fetch = mock.fetch;
 
-    const res = await handler(buildRequest(await withAdsReceipt(validBody({
+    const res = await handler(buildRequest(validBody({
         utms: { utm_source: 'google', utm_medium: 'cpc', utm_campaign: 'verao2026' },
-    }))));
+    })));
     assert.equal(res.status, 200);
 
     assert.ok(mock.createdLead(), 'the lead must still be created despite the campaign_id failure');

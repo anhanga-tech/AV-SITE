@@ -8,9 +8,9 @@
 |---|---|
 | **Controlador (exportador)** | Anhangá Turismo Ltda. — CNPJ 37.036.732/0001-41 |
 | **Encarregado (DPO)** | Felipe William Rodrigues Silva — privacidade@anhanga.tur.br |
-| **Versão** | 0.15 |
+| **Versão** | 0.14 |
 | **Data de elaboração** | 11/09/2026 |
-| **Última revisão** | 13/10/2026 |
+| **Última revisão** | 12/10/2026 |
 | **Status** | Rascunho — levantamento técnico feito a partir do código; evidências contratuais e revisão jurídica **pendentes** |
 | **Issue** | [#1542](https://github.com/anhanga-tech/AV-SITE/issues/1542) (achados LGPD-04 e LGPD-05 da auditoria de 28/08/2026) |
 | **Documentos relacionados** | [`ripd-legitimo-interesse.md`](./ripd-legitimo-interesse.md) · [`direitos-dos-titulares.md`](./direitos-dos-titulares.md) · Política de Privacidade (`components/privacy/`, seções 5 a 8 e 10) · `pages/ExclusaoDados.tsx` |
@@ -75,7 +75,7 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 | Campo | Detalhe |
 |---|---|
 | **Importador** | Hipótese: nenhum importador novo — o coletor responde como `traks-collect` em `analytics-collect.anhanga.tur.br` (servido pela Cloudflare) e o Traks se descreve como "self-hosted on Cloudflare, your data in your own account". Se confirmado, o operador é a Cloudflare (2.1) e o Traks é só software — `indício técnico` + `política do fornecedor` |
-| **Dados** | Pageviews (caminho, referrer, largura de tela), eventos de conversão, identificador de sessão aleatório em `sessionStorage` (30 min). Sem cookies e sem gate de consentimento para o script em si — o bloqueio de cookies não impede a coleta analítica — `código` (`index.html`, `utils/traks.ts`). Desde 13/10/2026, se não houver consentimento de medição registrado, `index.html` remove UTM e click IDs da URL com `history.replaceState` antes de agendar o `t.js`, então o coletor não observa esses parâmetros na query. O script analítico continua a carregar (legítimo interesse). Declarado na política, seção 4.2; oposição por e-mail ao Encarregado (seção 9.4) |
+| **Dados** | Pageviews (caminho, referrer, largura de tela, UTMs), eventos de conversão, identificador de sessão aleatório em `sessionStorage` (30 min). Sem cookies e sem gate de consentimento — o bloqueio de cookies não impede a coleta — `código` (`index.html`, `utils/traks.ts`). Declarado na política, seção 4.2; oposição por e-mail ao Encarregado (seção 9.4) |
 | **Finalidade** | Mensuração própria de conversões |
 | **Duração** | `a confirmar` no painel do Traks. Os 30 minutos citados acima são só do identificador de sessão no `sessionStorage` do navegador — não dizem nada sobre quanto tempo os pageviews, UTMs e eventos ficam no armazenamento do Worker. A seção 7.1 da política publica 14 meses **com base no GA4**, prazo que não se aplica a este conjunto: definir o próprio na tabela de retenção (#1544) antes de publicá-lo |
 | **País/região** | `a confirmar` — região do banco (D1/Analytics Engine) onde o Worker grava |
@@ -271,7 +271,6 @@ O que depende de acesso a painéis, contas e contratos — e portanto não sai d
 
 | Versão | Data | Alteração |
 |---|---|---|
-| 0.15 | 13/10/2026 | Traks (2.3): UTM e click IDs saem da URL antes do coletor quando não há consentimento de medição registrado (issues #1543 e #1545). O script analítico segue carregando por legítimo interesse |
 | 0.14 | 12/10/2026 | IP do rate limit pseudonimizado com HMAC antes do Upstash e dos logs enviados ao Sentry (2.6, 2.7, [#1642](https://github.com/anhanga-tech/AV-SITE/issues/1642)); removida a oportunidade de minimização da 2.6. O log de sucesso do OAuth permanece com IP em claro — [#1831](https://github.com/anhanga-tech/AV-SITE/issues/1831) |
 | 0.13 | 11/10/2026 | Fontes das landings auto-hospedadas (#1641), links sem uso removidos de Beto Carrero; Google Fonts sai dos serviços ativos (2.2) e da política (6.1) |
 | 0.12 | 08/10/2026 | PII na query string de `/quiz` corrigida: e-mail e nome saem da URL por redirect na borda e passam ao cookie `quiz_prefill` antes do Pageview do Zaraz (2.2) |

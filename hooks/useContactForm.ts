@@ -9,7 +9,6 @@ import {
 import { getTrackingDataObject, getWhatsAppLink } from '../utils/whatsapp';
 import { createLeadEventId } from './useLeadCapture';
 import { extractUtms, normalizeLeadTracking } from '../lib/tracking-normalization';
-import { readAdsConsentReceipt } from '../lib/consent';
 import type { ContactFormFields, SubmitContactRequest, SubmitContactResponse } from '../types/contactCapture';
 import type { LeadTracking } from '../types/leadCapture';
 import { appendTripDetailsToMessage, type ContactModalOptions } from '../utils/contactForm';
@@ -235,7 +234,6 @@ export function useContactForm(options: ContactModalOptions = {}) {
                 eventId,
                 utms,
                 tracking,
-                attributionConsent: readAdsConsentReceipt(),
             };
 
             try {

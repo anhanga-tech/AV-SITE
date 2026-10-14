@@ -1,4 +1,4 @@
-import type { AttributionConsentReceipt, LeadTracking, LeadUtms } from './leadCapture';
+import type { LeadTracking, LeadUtms } from './leadCapture';
 
 export interface ContactFormFields {
     firstName: string;
@@ -26,7 +26,6 @@ export interface SubmitContactRequest {
     eventId?: string;
     utms: LeadUtms;
     tracking?: LeadTracking;
-    attributionConsent?: AttributionConsentReceipt | null;
 }
 
 export type SubmitContactErrorCode =

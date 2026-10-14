@@ -27,27 +27,6 @@ function buildRequest(body: Record<string, unknown>, init?: { headers?: Record<s
     });
 }
 
-const ADS_SUBJECT = 'anon:11111111-1111-4111-8111-111111111111';
-const ADS_EVENT = 'ads_submit_lead_fixture';
-
-async function withAdsReceipt<T extends Record<string, unknown>>(body: T) {
-    const { getConsentStore } = await import('../lib/consent-store.ts');
-    const { ADS_NOTICE_VERSION } = await import('../lib/consent-notices.ts');
-    await getConsentStore().append({
-        id: ADS_EVENT,
-        subjectKey: ADS_SUBJECT,
-        purpose: 'ads_measurement',
-        action: 'grant',
-        noticeVersion: ADS_NOTICE_VERSION,
-        origin: 'cookie_banner',
-        occurredAt: '2026-10-13T12:00:00.000Z',
-    });
-    return {
-        ...body,
-        attributionConsent: { eventId: ADS_EVENT, subjectKey: ADS_SUBJECT },
-    };
-}
-
 function buildLeadPayloadFixture() {
     return {
         firstName: 'Felipe',
@@ -218,74 +197,9 @@ test('submit-lead upserts a partner and creates a linked crm.lead opportunity', 
     assert.equal(lead.partner_id, 101);
     assert.equal(lead.type, 'opportunity');
     assert.equal(lead.email_from, 'felipe@example.com');
-    assert.equal(lead.source_id, 15); // sem recibo de medição, UTM/gclid não entram
-    assert.equal(lead.medium_id, 8);
-    assert.doesNotMatch(String(lead.description), /gclid-1/);
-    assert.match(String(lead.name), /^Lead Site — Felipe William \(Rio de Janeiro\)$/);
-});
-
-test('submit-lead keeps google/cpc and gclid when the ads receipt is still a grant', async (t) => {
-    t.after(restore);
-    setOdooEnv();
-    const mock = createOdooMock({ newPartnerId: 101, leadId: 555 });
-    global.fetch = mock.fetch;
-
-    const response = await handler(buildRequest(await withAdsReceipt(buildLeadPayloadFixture())));
-    assert.equal(response.status, 201);
-
-    const lead = mock.leadFields()!;
-    assert.equal(lead.source_id, 17);
+    assert.equal(lead.source_id, 17); // google + cpc → Google Ads
     assert.equal(lead.medium_id, 7);
-    assert.match(String(lead.description), /gclid-1/);
-});
-
-test('submit-lead omits the email flag and click ids when the consent ledger is down', async (t) => {
-    t.after(restore);
-    setOdooEnv();
-    const mock = createOdooMock({ newPartnerId: 101, leadId: 555 });
-    global.fetch = mock.fetch;
-    process.env.CONSENT_LEDGER_FORCE_FAIL = '1';
-
-    try {
-        const response = await handler(buildRequest(buildLeadPayloadFixture()));
-        assert.equal(response.status, 201);
-        assert.equal(mock.partnerFields()!.x_lgpd_consent, undefined);
-        assert.doesNotMatch(String(mock.leadFields()!.description), /gclid-1/);
-    } finally {
-        delete process.env.CONSENT_LEDGER_FORCE_FAIL;
-    }
-});
-
-test('submit-lead does not write x_gclid when the conversion flag is on without an ads receipt', async (t) => {
-    t.after(restore);
-    setOdooEnv();
-    const mock = createOdooMock({ newPartnerId: 101, leadId: 555 });
-    global.fetch = mock.fetch;
-    process.env.ODOO_CONVERSION_FIELDS_ENABLED = 'true';
-
-    try {
-        const response = await handler(buildRequest(buildLeadPayloadFixture()));
-        assert.equal(response.status, 201);
-        assert.equal(mock.leadFields()!.x_gclid, undefined);
-    } finally {
-        delete process.env.ODOO_CONVERSION_FIELDS_ENABLED;
-    }
-});
-
-test('submit-lead writes x_gclid only when the conversion flag and a live ads grant are both present', async (t) => {
-    t.after(restore);
-    setOdooEnv();
-    const mock = createOdooMock({ newPartnerId: 101, leadId: 555 });
-    global.fetch = mock.fetch;
-    process.env.ODOO_CONVERSION_FIELDS_ENABLED = 'true';
-
-    try {
-        const response = await handler(buildRequest(await withAdsReceipt(buildLeadPayloadFixture())));
-        assert.equal(response.status, 201);
-        assert.equal(mock.leadFields()!.x_gclid, 'gclid-1');
-    } finally {
-        delete process.env.ODOO_CONVERSION_FIELDS_ENABLED;
-    }
+    assert.match(String(lead.name), /^Lead Site — Felipe William \(Rio de Janeiro\)$/);
 });
 
 test('submit-lead maps corporate empresa/cargo to crm.lead partner_name/function', async (t) => {
@@ -315,7 +229,7 @@ test('submit-lead resolves the utm.campaign concurrently with the partner upsert
     const mock = createOdooMock({ newPartnerId: 101, leadId: 555, newCampaignId: 900 });
     global.fetch = mock.fetch;
 
-    const response = await handler(buildRequest(await withAdsReceipt(buildLeadPayloadFixture())));
+    const response = await handler(buildRequest(buildLeadPayloadFixture()));
     assert.equal(response.status, 201);
 
     const indexOfCall = (model: string, method: string) =>
@@ -345,7 +259,7 @@ test('submit-lead still creates the lead when the utm.campaign resolve fails', a
     const mock = createOdooMock({ newPartnerId: 101, leadId: 555, campaignCreateShouldFail: true });
     global.fetch = mock.fetch;
 
-    const response = await handler(buildRequest(await withAdsReceipt(buildLeadPayloadFixture())));
+    const response = await handler(buildRequest(buildLeadPayloadFixture()));
 
     // Campaign resolution is enrichment: its failure must not cost the lead.
     assert.equal(response.status, 201);

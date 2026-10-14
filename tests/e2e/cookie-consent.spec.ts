@@ -2,38 +2,11 @@ import { test, expect, type Page } from '@playwright/test';
 
 const CHOICE_KEY = 'anhanga_cookie_consent';
 
-async function waitForRegisteredAdsConsent(page: Page): Promise<void> {
-  await expect.poll(() => page.evaluate(() => {
-    try {
-      const raw = localStorage.getItem('anhanga_cookie_consent_meta');
-      return Boolean(raw && JSON.parse(raw).registered === true);
-    } catch {
-      return false;
-    }
-  })).toBe(true);
-}
-
 test.describe('Cookie Consent Banner (CMP)', () => {
   // Timeout por teste: suficiente para navegações lentas, mas falha rápido em hangs
   test.setTimeout(15000);
 
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/consent', async (route) => {
-      const body = route.request().postDataJSON() as { action?: string; subjectKey?: string; eventId?: string } | null;
-      const revoked = body?.action === 'revoke';
-      await route.fulfill({
-        status: 201,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          ok: true,
-          eventId: body?.eventId,
-          subjectKey: body?.subjectKey,
-          effective: revoked ? 'revoke' : 'grant',
-          registered: !revoked,
-        }),
-      });
-    });
-
     // Limpa o consentimento apenas na primeira navegação do teste.
     // A flag de sessionStorage impede que reloads dentro do mesmo teste
     // apaguem o consentimento salvo pelo clique (sessionStorage sobrevive a reloads).
@@ -93,7 +66,6 @@ test.describe('Cookie Consent Banner (CMP)', () => {
   test('após aceitar, recarregar não mostra o banner', async ({ page }) => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Aceitar' }).click();
-    await waitForRegisteredAdsConsent(page);
     await page.reload();
     await expect(page.getByRole('dialog', { name: 'Preferências de cookies' })).not.toBeVisible();
   });
@@ -155,12 +127,6 @@ test.describe('Cookie Consent Banner (CMP)', () => {
     });
 
     await page.getByRole('button', { name: 'Aceitar' }).click();
-    await expect.poll(() => page.evaluate(() => {
-      type DataLayerEntry = { event?: string };
-      return (window as unknown as { dataLayer: DataLayerEntry[] }).dataLayer.some(
-        (entry) => entry.event === 'marketing_consent_granted',
-      );
-    })).toBe(true);
 
     const result = await page.evaluate(() => {
       type DataLayerEntry = { event?: string; anhanga_marketing_consent?: boolean };
@@ -227,7 +193,6 @@ test.describe('Cookie Consent Banner (CMP)', () => {
   test('quem já escolheu não vê o banner em nenhum frame (sem flash)', async ({ page }) => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Aceitar' }).click();
-    await waitForRegisteredAdsConsent(page);
 
     // O banner é renderizado no HTML/primeiro render independentemente da escolha —
     // o gate de pré-paint do index.html é quem o esconde. Amostrar a visibilidade a
@@ -487,7 +452,9 @@ test.describe('Cookie Consent Banner (CMP)', () => {
     await stubZarazConsent(page);
     await page.goto('/');
     await page.getByRole('button', { name: 'Aceitar' }).click();
-    await expect.poll(() => getZarazConsentCalls(page)).toEqual([
+
+    // [0] é a sincronização inicial (sem escolha ainda); [1] é o clique em Aceitar.
+    expect(await getZarazConsentCalls(page)).toEqual([
       { [MARKETING_PURPOSE_ID]: false },
       { [MARKETING_PURPOSE_ID]: true },
     ]);

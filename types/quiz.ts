@@ -1,4 +1,4 @@
-import type { AttributionConsentReceipt, LeadTracking, LeadUtms } from './leadCapture';
+import type { LeadTracking, LeadUtms } from './leadCapture';
 
 export interface SubmitQuizRequest {
     firstName: string;
@@ -14,7 +14,6 @@ export interface SubmitQuizRequest {
     newsletterOptIn?: boolean;
     utms: LeadUtms;
     tracking?: LeadTracking;
-    attributionConsent?: AttributionConsentReceipt | null;
 }
 
 interface SubmitQuizSuccess {

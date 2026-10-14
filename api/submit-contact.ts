@@ -10,7 +10,6 @@ import {
 import { type ValidationResult } from '../lib/n8n-submit-handler';
 import { createOdooSubmitHandler } from '../lib/odoo-submit-handler';
 import { leadInputFromSubmitContact } from '../lib/odoo-lead-mapping';
-import { readAttributionConsent } from '../lib/submission-consent';
 
 const CONTACT_VALIDATION_ERROR = 'Nome e WhatsApp são obrigatórios.';
 // Mesmo teto do maxLength dos inputs no ContactModal.
@@ -46,7 +45,6 @@ function validateContactRequest(body: unknown): ValidationResult<SubmitContactRe
             eventId: normalizeNullable(raw.eventId, 128) ?? undefined,
             utms,
             tracking,
-            attributionConsent: readAttributionConsent(raw.attributionConsent),
         },
     };
 }

@@ -4,24 +4,13 @@
 // componente: precisa sobreviver a remontagens e ser tocado pela ponte de clique
 // pré-hidratação de index.html. Manter isso num arquivo .tsx também obrigaria o componente
 // a exportar não-componentes, o que atrapalha o Fast Refresh.
-import {
-  type ConsentChoice,
-  clearUnregisteredMarketing,
-  getConsent,
-  getOrCreateConsentSubject,
-  hasRegisteredAdsConsent,
-  markConsentRegistered,
-  setConsent,
-} from './consent';
-import { registerAdsConsent } from './consent-registration';
+import { type ConsentChoice, getConsent, setConsent } from './consent';
 
 declare global {
   interface Window {
     // Definida pela ponte de clique pré-hidratação em index.html. Ausente quando o documento
     // não veio desse template (ex.: testes que montam o componente isolado).
     __anhangaConsentHandoff?: () => string | null;
-    /** Query de campanha retirada da URL antes dos coletores, até o recibo chegar. */
-    __anhangaPendingAttribution?: Record<string, string>;
   }
 }
 
@@ -77,44 +66,15 @@ export const subscribeToBannerVisibility = (onStoreChange: () => void): (() => v
 export const getBannerVisibility = (): boolean => {
   if (resetRequested) return true;
   if (dismissed) return false;
-  if (getConsent() === 'essential') return false;
-  if (hasRegisteredAdsConsent()) return false;
-  // Escolha "marketing" antiga, sem recibo do ledger, volta a perguntar.
-  return true;
+  return getConsent() === null;
 };
 export const getServerBannerVisibility = (): boolean => true;
 
-let consentEpoch = 0;
-
 const handleChoice = (choice: ConsentChoice): void => {
-  const epoch = ++consentEpoch;
-  const occurredAt = new Date().toISOString();
-  const subjectKey = getOrCreateConsentSubject();
   setConsent(choice);
   dismissed = true;
   resetRequested = false;
   notifyStore();
-
-  if (choice === 'marketing') {
-    void registerAdsConsent({ action: 'grant', subjectKey, occurredAt }).then((receipt) => {
-      if (epoch !== consentEpoch) return;
-      if (!receipt) {
-        // Storage gravou "marketing" mas o ledger não confirmou: reabre.
-        // Se o storage nem aceitou a escrita, getConsent() segue null e o
-        // banner permanece fechado pelo flag `dismissed` (modo privado).
-        if (getConsent() === 'marketing') {
-          clearUnregisteredMarketing();
-          dismissed = false;
-          notifyStore();
-        }
-        return;
-      }
-      markConsentRegistered(receipt);
-    });
-    return;
-  }
-
-  void registerAdsConsent({ action: 'revoke', subjectKey, occurredAt });
 };
 
 export const acceptConsent = (): void => handleChoice('marketing');
@@ -136,6 +96,5 @@ export const drainPreHydrationChoice = (): void => {
 export function _resetBannerVisibilityStateForTests(): void {
   resetRequested = false;
   dismissed = false;
-  consentEpoch += 1;
 }
 

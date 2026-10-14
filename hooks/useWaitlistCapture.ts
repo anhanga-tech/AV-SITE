@@ -4,7 +4,6 @@ import { cleanString } from '../lib/lead-logic';
 import { getTrackingDataObject } from '../utils/whatsapp';
 import { currentPageLocation } from '../utils/formAnalytics';
 import { extractUtms, normalizeLeadTracking } from '../lib/tracking-normalization';
-import { readAdsConsentReceipt } from '../lib/consent';
 import type { LeadTracking, LeadUtms } from '../types/leadCapture';
 import type { SubmitWaitlistRequest, SubmitWaitlistResponse } from '../types/waitlist';
 
@@ -123,7 +122,6 @@ export function useWaitlistCapture(labels: WaitlistAnalyticsLabels = DEFAULT_ANA
             sourcePage: cleanString(input.sourcePage),
             tracking,
             utms,
-            attributionConsent: readAdsConsentReceipt(),
         };
 
         try {

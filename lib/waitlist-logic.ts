@@ -1,5 +1,4 @@
 import { isValidEmail, normalizeNullable, normalizeTracking, normalizeUtms } from './lead-logic';
-import { readAttributionConsent } from './submission-consent';
 import type { SubmitWaitlistRequest } from '../types/waitlist';
 
 export function validateWaitlistPayload(
@@ -36,7 +35,6 @@ export function validateWaitlistPayload(
             emailOptIn: raw.emailOptIn === true,
             utms,
             tracking,
-            attributionConsent: readAttributionConsent(raw.attributionConsent),
         },
     };
 }

@@ -25,12 +25,6 @@ export interface LeadTracking {
     extras?: Record<string, string>;
 }
 
-/** Recibo do ledger para a purpose ads_measurement. Sem ele o servidor descarta click IDs e UTMs. */
-export interface AttributionConsentReceipt {
-    eventId: string;
-    subjectKey: string;
-}
-
 export interface SubmitLeadRequest {
     firstName: string;
     lastName: string;
@@ -46,5 +40,4 @@ export interface SubmitLeadRequest {
     referred?: string;
     /** E-mail-marketing opt-in → Odoo x_lgpd_consent. */
     marketingOptIn?: boolean;
-    attributionConsent?: AttributionConsentReceipt | null;
 }
