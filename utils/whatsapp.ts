@@ -9,6 +9,7 @@
 
 import { useEffect, useMemo } from 'react';
 import { isSafeTrackingValue } from './piiRedaction';
+import { hasRegisteredAdsConsent } from '../lib/consent';
 
 const TRACKING_PARAMS = [
     'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
@@ -17,6 +18,31 @@ const TRACKING_PARAMS = [
 ];
 // Microsoft Ads (hsa_*) parameters are captured dynamically
 const HSA_PREFIX = 'hsa_';
+const MARKETING_KEYS = new Set([
+    'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
+    'gclid', 'fbclid', 'ttclid', 'wbraid', 'gbraid', 'msclkid', 'fbc', 'fbp',
+]);
+
+function isMarketingKey(key: string): boolean {
+    return MARKETING_KEYS.has(key) || key.startsWith(HSA_PREFIX);
+}
+
+function dropUnconsentedMarketing(trackingData: TrackingData): void {
+    if (hasRegisteredAdsConsent()) return;
+    for (const key of Object.keys(trackingData)) {
+        if (isMarketingKey(key)) delete trackingData[key];
+    }
+}
+
+function mergePendingAttribution(trackingData: TrackingData): void {
+    if (typeof window === 'undefined' || !hasRegisteredAdsConsent()) return;
+    const pending = window.__anhangaPendingAttribution;
+    if (!pending) return;
+    for (const [key, value] of Object.entries(pending)) {
+        if (!value || !isMarketingKey(key) || !isSafeTrackingValue(value)) continue;
+        trackingData[key] = value;
+    }
+}
 const COOKIE_NAME = 'tracking_data';
 const STORAGE_KEY = 'anhanga_tracking_data';
 const WHATSAPP_NUMBER = '5511955021519';
@@ -250,6 +276,8 @@ function mergeAnalyticsTrackingData(trackingData: TrackingData): { cid: string |
     const sid = getGA4SessionId();
     if (sid) trackingData.sid = sid;
 
+    if (!hasRegisteredAdsConsent()) return { cid, sid };
+
     if (trackingData.fbclid && !trackingData.fbc) {
         trackingData.fbc = `fb.1.${Date.now()}.${trackingData.fbclid}`;
     }
@@ -302,7 +330,9 @@ const captureTrackingDataObject = (): TrackingData | null => {
     mergeCookieTrackingData(trackingData);
     mergeStoredTrackingData(trackingData);
     const foundInUrl = mergeUrlTrackingData(trackingData, urlParams);
+    mergePendingAttribution(trackingData);
     const { cid, sid } = mergeAnalyticsTrackingData(trackingData);
+    dropUnconsentedMarketing(trackingData);
 
     if (foundInUrl || cid || sid || Object.keys(trackingData).length > 0) {
         return persistTrackingData(trackingData);
@@ -331,6 +361,15 @@ const initializeTracking = () => {
 };
 
 initializeTracking();
+
+if (typeof window !== 'undefined') {
+    window.addEventListener('anhanga:marketing-consent', () => {
+        captureTrackingDataObject();
+    });
+    window.addEventListener('anhanga:revoke-consent', () => {
+        captureTrackingDataObject();
+    });
+}
 
 export const getTrackingDataObject = (): TrackingData | null => {
     const latest = captureTrackingDataObject();

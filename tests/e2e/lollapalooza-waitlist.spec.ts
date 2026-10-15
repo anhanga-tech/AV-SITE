@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { seedRegisteredAdsConsent } from './helpers/seedAdsConsent';
 
 test.describe('Lollapalooza evergreen landing waitlist', () => {
   test('should redirect the legacy year route to the evergreen route', async ({ page }) => {
@@ -23,6 +24,7 @@ test.describe('Lollapalooza evergreen landing waitlist', () => {
       });
     });
 
+    await seedRegisteredAdsConsent(page);
     await page.goto('/lollapalooza?utm_source=google&utm_medium=cpc&gclid=test-gclid');
 
     await page.getByRole('link', { name: /entrar na lista de espera/i }).first().click();

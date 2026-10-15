@@ -7,6 +7,7 @@ export { PrivacySection6Compartilhamento } from "./PrivacySection6Compartilhamen
 export { PrivacySection7Armazenamento } from "./PrivacySection7Armazenamento";
 export { PrivacySection8DireitosTitulares } from "./PrivacySection8DireitosTitulares";
 export { PrivacySection9Cookies } from "./PrivacySection9Cookies";
+export { EmailMarketingRevoke } from "./EmailMarketingRevoke";
 export { PrivacySection10TransferenciaInternacional } from "./PrivacySection10TransferenciaInternacional";
 export { PrivacySection11Seguranca } from "./PrivacySection11Seguranca";
 export { PrivacySection12Encarregado } from "./PrivacySection12Encarregado";

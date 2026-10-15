@@ -42,6 +42,7 @@ test('api-catalog should return application/linkset+json with required RFC 9727 
             'https://www.anhanga.tur.br/api/submit-nps',
             'https://www.anhanga.tur.br/api/submit-contact',
             'https://www.anhanga.tur.br/api/submit-quiz',
+            'https://www.anhanga.tur.br/api/consent',
         ],
     );
 
@@ -103,6 +104,7 @@ test('openapi handler should publish the machine-readable API description used b
     assert.ok(payload.paths?.['/api/submit-nps']);
     assert.ok(payload.paths?.['/api/submit-contact']);
     assert.ok(payload.paths?.['/api/submit-quiz']);
+    assert.ok(payload.paths?.['/api/consent']);
     assert.ok(payload.paths?.['/api/health']);
 
     const generatePath = payload.paths?.['/api/generate'] as {

@@ -24,6 +24,24 @@ function withMockBrowserEnv(search: string, run: () => void): void {
   const previousWindow = globalThis.window;
   const previousDocument = globalThis.document;
   const previousSessionStorage = globalThis.sessionStorage;
+  const previousLocalStorage = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+  const consentStore: Record<string, string> = {
+    anhanga_cookie_consent: 'marketing',
+    anhanga_cookie_consent_meta: JSON.stringify({
+      registered: true,
+      eventId: 'evt-test',
+      subjectKey: 'anon:00000000-0000-4000-8000-000000000001',
+      choice: 'marketing',
+    }),
+  };
+  Object.defineProperty(globalThis, 'localStorage', {
+    configurable: true,
+    value: {
+      getItem: (key: string) => consentStore[key] ?? null,
+      setItem: (key: string, value: string) => { consentStore[key] = value; },
+      removeItem: (key: string) => { delete consentStore[key]; },
+    },
+  });
 
   Object.defineProperty(globalThis, 'window', {
     configurable: true,
@@ -48,6 +66,8 @@ function withMockBrowserEnv(search: string, run: () => void): void {
   try {
     run();
   } finally {
+    if (previousLocalStorage) Object.defineProperty(globalThis, 'localStorage', previousLocalStorage);
+    else Reflect.deleteProperty(globalThis, 'localStorage');
     Object.defineProperty(globalThis, 'window', { configurable: true, value: previousWindow });
     Object.defineProperty(globalThis, 'document', { configurable: true, value: previousDocument });
     Object.defineProperty(globalThis, 'sessionStorage', { configurable: true, value: previousSessionStorage });

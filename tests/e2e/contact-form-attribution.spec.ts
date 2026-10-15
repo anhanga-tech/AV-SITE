@@ -1,4 +1,5 @@
 import { expect, test, type Page, type Route } from '@playwright/test';
+import { seedRegisteredAdsConsent } from './helpers/seedAdsConsent';
 import { stubWhatsAppWindow } from './helpers/whatsappWindowStub';
 
 /**
@@ -24,6 +25,10 @@ function captureSubmitContact(page: Page): Promise<Record<string, unknown>> {
 }
 
 test.describe('Contact form attribution payload', () => {
+  test.beforeEach(async ({ page }) => {
+    await seedRegisteredAdsConsent(page);
+  });
+
   test('modal entry point sends the full UTM/click-id/source payload with the name split', async ({ page }) => {
     const payloadPromise = captureSubmitContact(page);
 
