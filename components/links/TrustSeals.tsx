@@ -33,6 +33,7 @@ export const TrustSeals: React.FC = () => {
                         <a href="https://cadastur.turismo.gov.br/hotsite/" target="_blank" rel="noopener noreferrer"
                            className="inline-flex min-h-11 items-center underline underline-offset-2 hover:text-anhanga-action transition-colors">
                             Cadastur {CADASTUR}
+                            <span className="sr-only"> (abre em nova aba)</span>
                         </a>
                         <span aria-hidden="true">·</span>
                         <span>Nota {rating}{reviewCountLabel ? ` · ${reviewCountLabel}` : ''} no Google</span>
