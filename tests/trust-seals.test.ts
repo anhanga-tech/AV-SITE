@@ -41,6 +41,18 @@ test('TrustSeals não usa mais o hover âmbar no link do Cadastur', () => {
     assert.doesNotMatch(cadasturLink!.className, /anhanga-yellow/);
 });
 
+/*
+  O link do Cadastur abre em nova aba (`target="_blank"`) sem nenhuma interceptação por JS —
+  diferente do padrão `sr-only "(abre em nova aba)"` já estabelecido em LinkButton.tsx e
+  BlogImageCredit.tsx. Quem usa leitor de tela era levado para fora do site sem aviso.
+*/
+test('TrustSeals avisa que o link do Cadastur abre em nova aba', () => {
+    const { container } = render(React.createElement(TrustSeals));
+    const cadasturLink = container.querySelector('a[href="https://cadastur.turismo.gov.br/hotsite/"]');
+    assert.ok(cadasturLink, 'link do Cadastur não encontrado');
+    assert.match(cadasturLink!.textContent ?? '', /\(abre em nova aba\)/);
+});
+
 test('TrustSeals credita a Anhangá.tech, no mesmo padrão do rodapé do site principal', () => {
     const { container } = render(React.createElement(TrustSeals));
     assert.match(container.textContent ?? '', /Feito com/);
