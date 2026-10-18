@@ -1,5 +1,6 @@
 import React from 'react';
 import { Castle, Droplets, RollerCoaster, TreePalm, Waves, type LucideIcon } from 'lucide-react';
+import { optimizeRemoteImageUrl } from '../../data/mediaConfig';
 import type { Park } from './constants';
 
 /*
@@ -28,9 +29,17 @@ interface ParkPhotoProps {
   showName?: boolean;
   /** Prioriza o carregamento (acima da dobra). */
   eager?: boolean;
+  /**
+   * Maior largura que esta foto chega a ocupar na tela (px), para o CDN
+   * (`optimizeRemoteImageUrl`) baixar nesse tamanho em vez do JPG original do
+   * R2 inteiro. Sem crop forçado (sem `height`): o pedido é `fit=scale-down`,
+   * então nunca estica nem corta errado — na pior hipótese baixa maior do que
+   * precisa. Omitir cai no padrão de 1200px do helper.
+   */
+  maxWidth?: number;
 }
 
-export const ParkPhoto: React.FC<ParkPhotoProps> = ({ park, className = '', showName = false, eager = false }) => {
+export const ParkPhoto: React.FC<ParkPhotoProps> = ({ park, className = '', showName = false, eager = false, maxWidth }) => {
   const nameTag = showName ? (
     <span className="absolute bottom-3 left-3 rounded-lg bg-anhanga-dark/70 px-2.5 py-1 font-display text-xs font-bold text-white/90">
       {park.name}
@@ -41,7 +50,7 @@ export const ParkPhoto: React.FC<ParkPhotoProps> = ({ park, className = '', show
     return (
       <figure className={`relative m-0 overflow-hidden bg-anhanga-light ${className}`}>
         <img
-          src={park.image.src}
+          src={optimizeRemoteImageUrl(park.image.src, maxWidth)}
           alt={park.image.alt}
           loading={eager ? 'eager' : 'lazy'}
           decoding="async"
