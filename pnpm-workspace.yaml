@@ -162,6 +162,17 @@ overrides:
   # react-doctor > magicast. 1.2.2 (published 2026-09-30, cooldown vencido
   # em 2026-10-07) corrige; único major na árvore, sem downgrade.
   source-map-js: "^1.2.2"
+  # pnpm audit (critical): GHSA-8r5x-fm3f-whwj (AST type confusion em
+  # compile, bypass de CVE-2026-33937) + GHSA-p8wg-vrv2-v86f (JS injection
+  # via own-property-check bypass) — handlebars <= 4.7.9. Transitivo
+  # dev-only via @semantic-release/commit-analyzer e
+  # @semantic-release/github > semantic-release > conventional-changelog-writer
+  # (gerador de changelog da pipeline de release, não entra no bundle da
+  # app). handlebars@4.7.10 (publicado 2026-10-05, cooldown de 7 dias
+  # vencido em 2026-10-12) corrige ambas, mais a moderada
+  # GHSA-xw65-4hp5-5hc7 (templates pré-compilados embutidos de forma
+  # insegura); único major na árvore, sem downgrade.
+  handlebars: "^4.7.10"
 
 legacyPeerDeps: true
 nodeLinker: hoisted
