@@ -487,7 +487,7 @@ export const buildOpenApiDocument = memoize0((): Record<string, unknown> => {
     paths[HEALTH_PATH] = {
         get: {
             summary: 'Read service health',
-            description: 'Returns a simple status document used by the RFC 9727 status relation in the API catalog.',
+            description: 'Checks required rate-limit configuration on managed runtimes. Does not probe Redis connectivity or other providers.',
             responses: {
                 '200': {
                     description: 'Healthy status payload.',
@@ -510,6 +510,15 @@ export const buildOpenApiDocument = memoize0((): Record<string, unknown> => {
                         },
                     },
                 },
+                '503': buildJsonResponse('Required rate-limit configuration is missing.', {
+                    type: 'object',
+                    required: ['status', 'service'],
+                    properties: {
+                        status: { type: 'string', const: 'unavailable' },
+                        service: { type: 'string' },
+                    },
+                    additionalProperties: false,
+                }),
             },
         },
     };
@@ -576,7 +585,7 @@ Records an ads-measurement grant or revocation, and email-marketing revocation, 
 
 ### GET /api/health
 
-Returns a simple JSON status document used by the API catalog \`status\` relation.
+Returns 200 when required rate-limit configuration is present, or 503 when it is missing on a managed runtime. Responses are not cached. This check does not probe Redis connectivity or other providers.
 `;
 });
 
