@@ -78,7 +78,9 @@ test('a stale ads grant does not restore a newer revocation', async () => {
     assert.equal(payload.registered, false);
 });
 
-test('email revocation stays recorded when the Odoo write fails and does not say the address exists', async () => {
+test('email revocation stays recorded when the Odoo write fails and does not say the address exists', async (t) => {
+    // A public correlation ID may contain the same digits as the Odoo partner ID.
+    t.mock.method(crypto, 'randomUUID', () => '77000000-0000-4000-8000-000000000000');
     const email = 'revoke-odoo-fail@example.com';
     setOdooEnv();
     const mock = createOdooMock({ existingPartnerId: 77 });
@@ -107,12 +109,15 @@ test('email revocation stays recorded when the Odoo write fails and does not say
         }));
         assert.equal(response.status, 201);
         const payload = await response.json() as Record<string, unknown>;
-        assert.equal(payload.ok, true);
-        assert.equal(payload.effective, 'revoke');
-        assert.equal('odooSync' in payload, false);
-        assert.equal(JSON.stringify(payload).includes('77'), false);
-
         const subjectKey = await emailSubjectKey(email);
+        assert.deepEqual(payload, {
+            ok: true,
+            requestId: '77000000-0000-4000-8000-000000000000',
+            eventId: 'emrev_odoo_write_fail',
+            subjectKey,
+            effective: 'revoke',
+            registered: false,
+        });
         const events = await getConsentStore().readSubject(subjectKey);
         assert.equal(effectiveAction(events, 'email_marketing'), 'revoke');
         assert.equal(writeAttempted, true);
