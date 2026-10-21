@@ -98,6 +98,25 @@ Deploy primário em **Cloudflare Pages**. Vercel e Netlify são legados (configs
 3. Configure os secrets em Settings → Environment Variables (`GEMINI_API_KEY`, Odoo, n8n, Upstash Redis, GitHub OAuth — ver `.env.example`).
 4. Deploy automático a cada push em `main`.
 
+**Configuração obrigatória de rate limiting:** configure `UPSTASH_REDIS_REST_URL`,
+`UPSTASH_REDIS_REST_TOKEN` e `RATE_LIMIT_KEY_SECRET` como variáveis server-side no
+Cloudflare Pages, em **Production e Preview**. URL/token vêm do banco Upstash;
+gere uma chave aleatória para `RATE_LIMIT_KEY_SECRET` (por exemplo, `openssl rand -hex 32`).
+Não use prefixo `VITE_` nem coloque os valores no repositório. Faça um novo deploy
+após alterar a configuração. Sem essas variáveis, `/api/submit-contact` e
+`/api/consent` recusam requisições com **503**; nessas duas rotas, **429** indica
+cota excedida. OAuth (`/api/auth` e `/api/auth/callback`) e `/api/markdown` ainda
+retornam **429** também quando o limitador está indisponível.
+
+Após cada deploy, execute `curl --fail --silent --show-error https://www.anhanga.tur.br/api/health`
+(para Preview, use a URL daquele deploy). O endpoint aceita GET/HEAD, não usa cache
+e retorna **503** se alguma dessas variáveis estiver ausente ou vazia no runtime
+gerenciado; os logs `HEALTH`, estágio `rate_limit_config_missing`, listam somente
+os nomes ausentes. Um monitor HTTP pode alertar quando esse endpoint não retornar
+200. O check verifica presença de configuração, sem testar credenciais,
+conectividade Redis ou disponibilidade do Odoo. Desenvolvimento local continua
+permitindo o fallback em memória.
+
 `pnpm deploy` publica uma versão **estática (sem API)** no GitHub Pages, usado apenas para previews/mirror.
 
 
