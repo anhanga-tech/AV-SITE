@@ -103,8 +103,10 @@ Deploy primário em **Cloudflare Pages**. Vercel e Netlify são legados (configs
 Cloudflare Pages, em **Production e Preview**. URL/token vêm do banco Upstash;
 gere uma chave aleatória para `RATE_LIMIT_KEY_SECRET` (por exemplo, `openssl rand -hex 32`).
 Não use prefixo `VITE_` nem coloque os valores no repositório. Faça um novo deploy
-após alterar a configuração. Sem essas variáveis, contato, consentimento e outros
-endpoints protegidos recusam requisições com **503**; **429** indica cota excedida.
+após alterar a configuração. Sem essas variáveis, `/api/submit-contact` e
+`/api/consent` recusam requisições com **503**; nessas duas rotas, **429** indica
+cota excedida. OAuth (`/api/auth` e `/api/auth/callback`) e `/api/markdown` ainda
+retornam **429** também quando o limitador está indisponível.
 
 Após cada deploy, execute `curl --fail --silent --show-error https://www.anhanga.tur.br/api/health`
 (para Preview, use a URL daquele deploy). O endpoint aceita GET/HEAD, não usa cache
