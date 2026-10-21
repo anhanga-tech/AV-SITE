@@ -44,7 +44,7 @@
     "framer-motion": "14.1.0",
     "globe.gl": "^2.46.2",
     "leaflet": "1.9.4",
-    "lucide-react": "^1.56.0",
+    "lucide-react": "^1.57.0",
     "postcss": "^8.5.30",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
