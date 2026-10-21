@@ -86,10 +86,20 @@ async function buildMetaUserData(payload: MetaConversionPayload, nowMs: number):
   const clientIpAddress = normalizeString(payload.clientIpAddress);
   const clientUserAgent = normalizeString(payload.clientUserAgent);
 
-  if (email) userData.em = [await sha256(email)];
-  if (firstName) userData.fn = [await sha256(firstName)];
-  if (lastName) userData.ln = [await sha256(lastName)];
-  if (phone) userData.ph = [await sha256(phone)];
+  // The four hashes are independent, so run them concurrently instead of
+  // awaiting each in turn — halves this function's wall-clock time on the
+  // common case (email + phone) since every sha256() call already awaits
+  // its own crypto.subtle.digest() round trip.
+  const [emailHash, firstNameHash, lastNameHash, phoneHash] = await Promise.all([
+    email ? sha256(email) : undefined,
+    firstName ? sha256(firstName) : undefined,
+    lastName ? sha256(lastName) : undefined,
+    phone ? sha256(phone) : undefined,
+  ]);
+  if (emailHash) userData.em = [emailHash];
+  if (firstNameHash) userData.fn = [firstNameHash];
+  if (lastNameHash) userData.ln = [lastNameHash];
+  if (phoneHash) userData.ph = [phoneHash];
   if (fbp) userData.fbp = fbp;
   if (fbc) userData.fbc = fbc;
   if (clientIpAddress) userData.client_ip_address = clientIpAddress;
