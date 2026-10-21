@@ -51,7 +51,10 @@ export default async function handler(request: Request): Promise<Response> {
     if (!rate.allowed) {
         const status = rate.serviceUnavailable ? 503 : 429;
         const code = rate.serviceUnavailable ? 'SERVICE_UNAVAILABLE' : 'RATE_LIMIT_EXCEEDED';
-        return json({ ok: false, requestId, code, error: 'Muitas tentativas. Tente novamente em breve.' }, status, requestId, cors);
+        const error = rate.serviceUnavailable
+            ? 'Serviço temporariamente indisponível. Tente novamente em instantes.'
+            : 'Muitas tentativas. Tente novamente em breve.';
+        return json({ ok: false, requestId, code, error }, status, requestId, cors);
     }
 
     let raw: unknown;
