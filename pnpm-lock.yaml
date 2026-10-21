@@ -34,8 +34,8 @@ importers:
   .:
     dependencies:
       '@google/genai':
-        specifier: ^2.29.0
-        version: 2.29.0
+        specifier: ^2.29.1
+        version: 2.29.1
       '@mdx-js/react':
         specifier: ^3.1.1
         version: 3.1.1(@types/react@19.3.0)(react@19.3.0)
@@ -646,8 +646,8 @@ packages:
     resolution: {integrity: sha512-IkO+/KEUvwbVpiURZg+P7zF74z5Jxe0UgJxVni+RtoHQ6IZieXaO02kmadomap/q+l6bc/jdPGGqTjhuZnuz1Q==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
-  '@google/genai@2.29.0':
-    resolution: {integrity: sha512-jrgU07sEkMFX/K/gtEydDx+SH7NDbY5hdg8eLwDtfqHcJqPhsH68btd9QPrN7KqkrlURzSk49wVQYMKVJRy2Hw==}
+  '@google/genai@2.29.1':
+    resolution: {integrity: sha512-keU+JsY11fT4ykdFA6Q8iQHBgOAAVssFLxPtXRjCIEr5Zt2GzE75c22bBmq87XbhgtpuKaObnSgsrG60rj0ZMA==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@modelcontextprotocol/sdk': ^1.25.2
@@ -1007,6 +1007,7 @@ packages:
   '@opentelemetry/sdk-trace-base@2.12.0':
     resolution: {integrity: sha512-JOERgZCxRM06FEJ5kEWxlSRChah6MmXDx3KwCruqEv/iEyLkTokCSemf2y1w8oIHtfrr8EVTpzebq/31vn2Cpg==}
     engines: {node: ^18.19.0 || >=20.6.0}
+    deprecated: Use @opentelemetry/sdk-trace package
     peerDependencies:
       '@opentelemetry/api': '>=1.3.0 <1.10.0'
 
@@ -6392,7 +6393,7 @@ snapshots:
       '@eslint/core': 1.2.1
       levn: 0.4.1
 
-  '@google/genai@2.29.0':
+  '@google/genai@2.29.1':
     dependencies:
       google-auth-library: 10.9.1
       p-retry: 4.6.2
