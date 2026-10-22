@@ -159,10 +159,12 @@ Uma proposta guarda **ou** `redirectUrl` (redirect rastreado) **ou** `content` (
 
 1. O token sai da query bruta do link; o `companyCode` sai do próprio token (base64 de `RCA | <reserva> | <hash>`).
 2. `services/infotravel.ts` faz os mesmos dois GETs públicos que a página da operadora faz, sem login: `main.getBooking` (`{token, clientUrl}`) e `main.getHotel` (`{companyCode, hotelKey}`), em `https://premium.infotravel.com.br/orcamento-web/api/trpc/…?batch=1&input=…`. Host fixo, prazo total de 6 s.
-3. `lib/infotravel-normalize.ts` monta o JSON normalizado e confere: um pacote, um quarto, tudo em BRL, `status: QUOTATION`, nenhuma categoria que a página não mostra (seguro, carro, trem…) e **total = soma de todos os preços ao centavo** (inclui o ajuste de comissão, que nunca aparece).
+3. `lib/infotravel-normalize.ts` monta o JSON normalizado e confere: um pacote, um quarto, tudo em BRL, `status: QUOTATION`, nenhuma categoria que a página não mostra (seguro, carro, trem, cruzeiro… no pacote ou na raiz da reserva) e **total = soma de todos os preços ao centavo** (inclui o ajuste de comissão, que nunca aparece).
 4. `fromInfotravelNormalized` (P9) gera o conteúdo, e a proposta é salva como página.
 
-Qualquer falha cai no **redirect rastreado** para o mesmo link (P2). A resposta traz `mode: "page" | "redirect"` e, no redirect, `fallbackReason`: `pages_disabled`, `invalid_token`, `timeout`, `http_error`, `unexpected_response`, `unexpected_shape`, `unsupported_quotation`, `total_mismatch` ou `invalid_content`.
+Qualquer falha cai no **redirect rastreado** para o mesmo link (P2). A resposta traz `mode: "page" | "redirect"` e, no redirect, `fallbackReason`: `pages_disabled`, `invalid_token`, `timeout`, `http_error`, `unexpected_response`, `unexpected_shape`, `unsupported_quotation`, `total_mismatch`, `quotation_expired` ou `invalid_content`.
+
+Se a cotação informar `expirationDate`, a página nunca vale além dela: a validade é o menor entre o pedido (padrão 15 dias) e o prazo da operadora, e uma cotação já vencida cai no redirect.
 
 Nunca copiados da cotação: `contact`/`user` (o agente), `client` (a agência, com CNPJ), `unit` (unidade RCA), localizadores, `textDoc` (formas de pagamento da operadora), observações do fornecedor (telefone de plantão) e logos.
 

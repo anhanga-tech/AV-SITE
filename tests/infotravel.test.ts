@@ -166,6 +166,7 @@ test('a quotation the page can\'t represent faithfully is refused', () => {
     refused(variant({ bookingInsurances: [{ fares: [] }] }), 'unsupported_quotation');
     // A category this code has never heard of is refused too, even at no cost.
     refused(variant({ bookingVipLounges: [{ fares: [] }] }), 'unsupported_quotation');
+    refused({ ...BOOKING, bookingCruises: [{ fares: [] }] }, 'unsupported_quotation');
     assert.doesNotThrow(() => normalizeInfotravelQuotation({ booking: variant({ bookingCruises: [], bookingVipLounges: null }), hotel: HOTEL }));
     refused(variant({}, { status: 'CONFIRMED' }), 'unsupported_quotation');
     refused(variant({ bookingHotels: [{ ...pack.bookingHotels[0], rooms: [pack.bookingHotels[0].rooms[0], pack.bookingHotels[0].rooms[0]] }] }), 'unsupported_quotation');
@@ -212,6 +213,19 @@ test('an Infotravel link becomes a page proposal with the customer\'s first name
     assert.ok(html.includes('R$ 6.633,45'));
     assert.ok(!html.includes('Paula') && !html.includes('Souza'));
     assert.doesNotMatch(html, FORBIDDEN);
+});
+
+test('the page never outlives the operator\'s quotation deadline', async (t) => {
+    const { deps, clock } = setup(t);
+    const lapsesIn = (ms: number) => trpc({ ...BOOKING, expirationDate: new Date(clock.now + ms).toISOString() });
+
+    const soon = await (await handleCreateProposal(create(INFOTRAVEL_BODY), { ...deps, infotravel: { fetch: operatorApi({ booking: () => lapsesIn(2 * 86_400_000) }).fetch } })).json();
+    assert.equal(soon.data.mode, 'page');
+    assert.equal(soon.data.expiresAt, new Date(clock.now + 2 * 86_400_000).toISOString());
+
+    const gone = await (await handleCreateProposal(create(INFOTRAVEL_BODY), { ...deps, infotravel: { fetch: operatorApi({ booking: () => lapsesIn(-60_000) }).fetch } })).json();
+    assert.equal(gone.data.mode, 'redirect');
+    assert.equal(gone.data.fallbackReason, 'quotation_expired');
 });
 
 test('pages stay off until enabled (#1925): the link falls back to the tracked redirect', async (t) => {

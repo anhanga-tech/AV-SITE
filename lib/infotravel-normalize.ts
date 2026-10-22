@@ -43,14 +43,19 @@ const place = z.object({ code: z.string(), city: z.object({ name: z.string() }) 
 // can't slip through.
 const SUPPORTED_CATEGORIES = new Set(['bookingHotels', 'bookingFlights', 'bookingTours', 'bookingTickets', 'bookingTransfers']);
 
-function hasUnsupportedCategory(rawPackage: unknown): boolean {
-    if (!rawPackage || typeof rawPackage !== 'object') return true;
-    return Object.entries(rawPackage).some(([key, value]) =>
-        /^booking[A-Z]/.test(key) && !SUPPORTED_CATEGORIES.has(key) && Array.isArray(value) && value.length > 0);
+function hasUnsupportedCategory(rawObject: unknown, allowed: ReadonlySet<string>): boolean {
+    if (!rawObject || typeof rawObject !== 'object') return true;
+    return Object.entries(rawObject).some(([key, value]) =>
+        /^booking[A-Z]/.test(key) && !allowed.has(key) && Array.isArray(value) && value.length > 0);
 }
+
+// At the booking root only the packages may carry products.
+const ROOT_CATEGORIES = new Set(['bookingPackages']);
 
 const bookingSchema = z.object({
     status: z.string(),
+    // When the operator says when the quotation lapses, the page can't outlive it.
+    expirationDate: z.string().nullish(),
     bookingAmount: z.object({ currency: z.string(), amount: z.number() }),
     bookingPackages: z.array(z.object({
         fares: fares.nullish(),
@@ -175,7 +180,9 @@ export function normalizeInfotravelQuotation(raw: { booking: unknown; hotel: unk
     }
     const [pack] = booking.bookingPackages;
     const rawPackage = (raw.booking as { bookingPackages: unknown[] }).bookingPackages[0];
-    if (hasUnsupportedCategory(rawPackage)) throw new InfotravelNormalizeError('unsupported_quotation');
+    if (hasUnsupportedCategory(raw.booking, ROOT_CATEGORIES) || hasUnsupportedCategory(rawPackage, SUPPORTED_CATEGORIES)) {
+        throw new InfotravelNormalizeError('unsupported_quotation');
+    }
     const hotels = pack.bookingHotels ?? [];
     const flightGroups = pack.bookingFlights ?? [];
     if (hotels.length > 1 || flightGroups.length > 1 || hotels.some((item) => item.rooms.length !== 1)) {
@@ -274,5 +281,6 @@ export function normalizeInfotravelQuotation(raw: { booking: unknown; hotel: unk
             })),
         ],
         total: { amount: booking.bookingAmount.amount, currency: booking.bookingAmount.currency },
+        validade: booking.expirationDate ?? null,
     };
 }

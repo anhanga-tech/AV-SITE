@@ -62,7 +62,7 @@ const BodySchema = z.discriminatedUnion('type', [
 ]);
 
 type FallbackReason = 'pages_disabled' | 'invalid_token' | 'timeout' | 'http_error' | 'unexpected_response'
-    | 'unexpected_shape' | 'unsupported_quotation' | 'total_mismatch' | 'invalid_content';
+    | 'unexpected_shape' | 'unsupported_quotation' | 'total_mismatch' | 'quotation_expired' | 'invalid_content';
 
 /** Default off until the privacy policy covers proposal pages (#1925). */
 function arePagesEnabled(): boolean {
@@ -73,12 +73,19 @@ function arePagesEnabled(): boolean {
 async function buildInfotravelContent(
     link: string,
     firstName: string | undefined,
+    now: number,
     deps: InfotravelDeps,
-): Promise<{ content: ProposalContent } | { fallbackReason: FallbackReason }> {
+): Promise<{ content: ProposalContent; quotationExpiresAt?: number } | { fallbackReason: FallbackReason }> {
     if (!arePagesEnabled()) return { fallbackReason: 'pages_disabled' };
     try {
         const quotation = await fetchInfotravelQuotation(link, deps);
-        return { content: fromInfotravelNormalized(normalizeInfotravelQuotation(quotation), { firstName }) };
+        const normalized = normalizeInfotravelQuotation(quotation);
+        const expiration = typeof normalized.validade === 'string' ? Date.parse(normalized.validade) : Number.NaN;
+        if (!Number.isNaN(expiration) && expiration <= now) return { fallbackReason: 'quotation_expired' };
+        return {
+            content: fromInfotravelNormalized(normalized, { firstName }),
+            quotationExpiresAt: Number.isNaN(expiration) ? undefined : expiration,
+        };
     } catch (error) {
         if (error instanceof InfotravelError || error instanceof InfotravelNormalizeError) return { fallbackReason: error.reason };
         // Class only: the message can carry the link (and its token) or quotation data.
@@ -197,8 +204,15 @@ export async function handleCreateProposal(request: Request, deps: CreateProposa
     }
 
     // The link as the bot sent it is what the operator's own page sends as `clientUrl`.
-    const built = body.type === 'infotravel' ? await buildInfotravelContent(body.redirectUrl, body.firstName, deps.infotravel ?? {}) : null;
+    const now = (deps.now ?? Date.now)();
+    const built = body.type === 'infotravel' ? await buildInfotravelContent(body.redirectUrl, body.firstName, now, deps.infotravel ?? {}) : null;
     const content = built && 'content' in built ? built.content : undefined;
+    // The page never says "válida até" past the operator's own quotation deadline.
+    const requestedSeconds = (body.validityDays ?? MAX_VALIDITY_DAYS) * 24 * 60 * 60;
+    const quotationExpiresAt = built && 'content' in built ? built.quotationExpiresAt : undefined;
+    const validitySeconds = quotationExpiresAt === undefined
+        ? requestedSeconds
+        : Math.min(requestedSeconds, Math.floor((quotationExpiresAt - now) / 1000));
     const fallbackReason = built && 'fallbackReason' in built ? built.fallbackReason : undefined;
     const mode = content ? 'page' : 'redirect';
 
@@ -208,7 +222,7 @@ export async function handleCreateProposal(request: Request, deps: CreateProposa
             {
                 ...(content ? { content } : { redirectUrl }),
                 leadId: body.leadId,
-                validitySeconds: (body.validityDays ?? MAX_VALIDITY_DAYS) * 24 * 60 * 60,
+                validitySeconds,
             },
             deps,
         );
