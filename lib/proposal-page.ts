@@ -15,7 +15,8 @@
  */
 import { isLinkPreviewRequest, isPrefetchRequest } from './link-preview-agents';
 import { recordProposalOpen, type ProposalOpensRedis } from './proposal-opens';
-import { notifyProposalOpen, type ProposalWebhookDeps } from './proposal-webhook';
+import { buildProposalOpenedNote, postProposalNote, type ProposalOdooNotesDeps } from './proposal-odoo-notes';
+import { notifyProposalOpen, shouldNotifyProposalOpen, type ProposalWebhookDeps } from './proposal-webhook';
 import { isProposalPreviewRequest } from './proposal-preview';
 import { loadProposal } from './proposal-store';
 
@@ -152,13 +153,21 @@ export interface ProposalPageDeps {
     /** The Pages context's `waitUntil`: records the open after the response is sent. */
     waitUntil?: (promise: Promise<unknown>) => void;
     webhook?: ProposalWebhookDeps;
+    odoo?: ProposalOdooNotesDeps;
 }
 
-/** Records the open, then tells the sales bot when it is due (#1900). Never rejects. */
+/**
+ * Records the open; when it is a relevant one (first, or 30+ minutes after
+ * the previous), tells the sales bot (#1900) and notes it on the Odoo lead
+ * (#1904), side by side. Never rejects.
+ */
 async function recordAndNotify(request: Request, id: string, leadId: number | undefined, deps: ProposalPageDeps): Promise<void> {
     const recorded = await recordProposalOpen(request, id, deps);
-    if (!recorded) return;
-    await notifyProposalOpen({ id, leadId, ...recorded }, { now: deps.now, ...deps.webhook });
+    if (!recorded || !shouldNotifyProposalOpen(recorded.previousOpenAt, recorded.openedAt)) return;
+    await Promise.all([
+        notifyProposalOpen({ id, leadId, ...recorded }, { now: deps.now, ...deps.webhook }),
+        postProposalNote(leadId, buildProposalOpenedNote(recorded), deps.odoo),
+    ]);
 }
 
 export async function handleProposalRequest(

@@ -21,6 +21,7 @@ import { checkRateLimit } from '../lib/rate-limit';
 import { logger } from '../lib/logger';
 import { createProposalPreviewSignature, getProposalPreviewSecret, PROPOSAL_PREVIEW_PARAM } from '../lib/proposal-preview';
 import { parseAllowedRedirectUrl } from '../lib/proposal-redirect';
+import { buildProposalSentNote, postProposalNote, type ProposalOdooNotesDeps } from '../lib/proposal-odoo-notes';
 import { PROPOSAL_VALIDITY_SECONDS, saveProposal, type ProposalStoreDeps } from '../lib/proposal-store';
 import { timingSafeEqual } from '../lib/security';
 
@@ -80,7 +81,11 @@ async function readJson(request: Request): Promise<{ ok: true; value: unknown } 
     }
 }
 
-export async function handleCreateProposal(request: Request, deps: ProposalStoreDeps = {}): Promise<Response> {
+export interface CreateProposalDeps extends ProposalStoreDeps {
+    odoo?: ProposalOdooNotesDeps;
+}
+
+export async function handleCreateProposal(request: Request, deps: CreateProposalDeps = {}): Promise<Response> {
     const requestId = createRequestId();
 
     if (request.method !== 'POST') {
@@ -165,8 +170,10 @@ export async function handleCreateProposal(request: Request, deps: ProposalStore
     const url = `${PROPOSAL_BASE_URL}/${saved.id}`;
     const signature = await createProposalPreviewSignature(saved.id, previewSecret);
     const previewUrl = `${url}?${PROPOSAL_PREVIEW_PARAM}=${signature}`;
+    // The proposal exists either way: a CRM failure is reported, not fatal (#1904).
+    const crmNote = await postProposalNote(body.leadId, buildProposalSentNote({ url, expiresAt: saved.expiresAt }), deps.odoo);
 
-    logger.info('CREATE_PROPOSAL', { requestId, stage: 'created', type: body.type });
+    logger.info('CREATE_PROPOSAL', { requestId, stage: 'created', type: body.type, crmNote });
 
     return json({
         ok: true,
@@ -176,6 +183,7 @@ export async function handleCreateProposal(request: Request, deps: ProposalStore
             url,
             previewUrl,
             expiresAt: new Date(saved.expiresAt).toISOString(),
+            crmNote,
         },
     }, 201, requestId);
 }
