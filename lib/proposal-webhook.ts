@@ -1,0 +1,202 @@
+/**
+ * Signed webhook to the sales bot when a customer opens a proposal (#1900,
+ * epic #1894). The bot (Clara, decision D3) drafts the follow-up for Felipe;
+ * nothing reaches the customer without his explicit OK (#1903).
+ *
+ * Sent on the first open and on a reopen 30 minutes or more after the
+ * previous one. Internal previews, link previews and prefetches never record
+ * an open (lib/proposal-page.ts), so they never reach this module.
+ *
+ * Request: POST JSON with
+ * - `X-Anhanga-Timestamp`: unix seconds;
+ * - `X-Anhanga-Signature`: `v1=` + hex HMAC-SHA256 of `<timestamp>.<raw body>`
+ *   under PROPOSAL_WEBHOOK_SECRET (verify with `verifyProposalWebhook`);
+ * - `X-Anhanga-Event-Id`: same as `eventId` in the body; a retry repeats it,
+ *   so the receiver deduplicates on it.
+ *
+ * The payload carries no proposal id or URL: the id opens the proposal and,
+ * on a redirect, leads to the operator's booking token. `proposalRef` is a
+ * one-way hash of the id that whoever created the proposal can recompute
+ * (`createProposalRef`), and `leadId` says whose proposal it is.
+ *
+ * Never log the webhook URL (it may embed a token), the id or the lead id.
+ */
+import { logger } from './logger';
+import { timingSafeEqual } from './security';
+
+export const PROPOSAL_REOPEN_NOTIFY_GAP_MS = 30 * 60 * 1000;
+export const PROPOSAL_WEBHOOK_SIGNATURE_TOLERANCE_SECONDS = 5 * 60;
+const PROPOSAL_REF_CONTEXT = 'proposta-ref:v1';
+const PROPOSAL_REF_HEX_LENGTH = 32;
+const SIGNATURE_VERSION = 'v1';
+// Worst case 3 × 5 s plus 1 s + 3 s of backoff, inside the ~30 s Cloudflare
+// keeps a `waitUntil` alive after the response.
+const ATTEMPT_TIMEOUT_MS = 5_000;
+const RETRY_DELAYS_MS = [1_000, 3_000];
+
+export interface ProposalOpenedPayload {
+    event: 'proposal.opened';
+    eventId: string;
+    proposalRef: string;
+    leadId: number;
+    openCount: number;
+    isFirstOpen: boolean;
+    openedAt: string;
+    previousOpenAt: string | null;
+}
+
+export interface ProposalWebhookDeps {
+    fetch?: typeof fetch;
+    sleep?: (ms: number) => Promise<void>;
+}
+
+export interface ProposalOpenNotice {
+    id: string;
+    leadId?: number;
+    count: number;
+    previousOpenAt: number | null;
+    openedAt: number;
+}
+
+function toHex(bytes: ArrayBuffer): string {
+    return Array.from(new Uint8Array(bytes), (byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+async function hmacSha256Hex(secret: string, message: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey('raw', encoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+    return toHex(await crypto.subtle.sign('HMAC', key, encoder.encode(message)));
+}
+
+function getWebhookConfig(): { url: string; secret: string } | null {
+    const url = process.env.PROPOSAL_WEBHOOK_URL?.trim();
+    const secret = process.env.PROPOSAL_WEBHOOK_SECRET?.trim();
+    if (!url || !secret) return null;
+    try {
+        return new URL(url).protocol === 'https:' ? { url, secret } : null;
+    } catch {
+        return null;
+    }
+}
+
+/** One-way reference to a proposal: the id can't be recovered from it. */
+export async function createProposalRef(id: string): Promise<string> {
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${PROPOSAL_REF_CONTEXT}:${id}`));
+    return toHex(digest).slice(0, PROPOSAL_REF_HEX_LENGTH);
+}
+
+/** First open, or a reopen at least 30 minutes after the previous one. */
+export function shouldNotifyProposalOpen(previousOpenAt: number | null, openedAt: number): boolean {
+    return previousOpenAt === null || openedAt - previousOpenAt >= PROPOSAL_REOPEN_NOTIFY_GAP_MS;
+}
+
+export async function signProposalWebhook(secret: string, timestamp: number, body: string): Promise<string> {
+    return `${SIGNATURE_VERSION}=${await hmacSha256Hex(secret, `${timestamp}.${body}`)}`;
+}
+
+/**
+ * Receiver-side check: a valid signature of this exact body, with a
+ * timestamp no more than five minutes from `now`.
+ */
+export async function verifyProposalWebhook(input: {
+    body: string;
+    timestamp: string | null;
+    signature: string | null;
+    secret: string;
+    now?: number;
+}): Promise<boolean> {
+    if (!input.timestamp || !input.signature || !/^\d{1,12}$/.test(input.timestamp)) return false;
+    const timestamp = Number(input.timestamp);
+    const nowSeconds = Math.floor((input.now ?? Date.now()) / 1000);
+    if (Math.abs(nowSeconds - timestamp) > PROPOSAL_WEBHOOK_SIGNATURE_TOLERANCE_SECONDS) return false;
+    return timingSafeEqual(await signProposalWebhook(input.secret, timestamp, input.body), input.signature);
+}
+
+function isRetryable(status: number): boolean {
+    return status === 429 || status >= 500;
+}
+
+function defaultSleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function deliver(
+    config: { url: string; secret: string },
+    payload: ProposalOpenedPayload,
+    openedAt: number,
+    deps: ProposalWebhookDeps,
+): Promise<void> {
+    const fetchImpl = deps.fetch ?? fetch;
+    const sleep = deps.sleep ?? defaultSleep;
+    const body = JSON.stringify(payload);
+    const timestamp = Math.floor(openedAt / 1000);
+    const headers = {
+        'Content-Type': 'application/json',
+        'X-Anhanga-Timestamp': String(timestamp),
+        'X-Anhanga-Signature': await signProposalWebhook(config.secret, timestamp, body),
+        'X-Anhanga-Event-Id': payload.eventId,
+    };
+
+    const attempts = RETRY_DELAYS_MS.length + 1;
+    let outcome: { status?: number; errorName?: string } = {};
+    for (let attempt = 1; attempt <= attempts; attempt += 1) {
+        try {
+            const response = await fetchImpl(config.url, {
+                method: 'POST',
+                headers,
+                body,
+                redirect: 'manual',
+                signal: AbortSignal.timeout(ATTEMPT_TIMEOUT_MS),
+            });
+            if (response.ok) {
+                logger.info('PROPOSAL_WEBHOOK', { stage: 'delivered', attempt, openCount: payload.openCount });
+                return;
+            }
+            outcome = { status: response.status };
+            if (!isRetryable(response.status)) break;
+        } catch (error) {
+            outcome = { errorName: error instanceof Error ? error.name : typeof error };
+        }
+        if (attempt < attempts) await sleep(RETRY_DELAYS_MS[attempt - 1]);
+    }
+    logger.error('PROPOSAL_WEBHOOK', { stage: 'failed', openCount: payload.openCount, ...outcome });
+}
+
+/**
+ * Notifies the bot about a recorded open when it is due. Never throws: runs
+ * inside the page's `waitUntil`, after the customer already has the response.
+ */
+export async function notifyProposalOpen(notice: ProposalOpenNotice, deps: ProposalWebhookDeps = {}): Promise<void> {
+    try {
+        if (!shouldNotifyProposalOpen(notice.previousOpenAt, notice.openedAt)) return;
+
+        const config = getWebhookConfig();
+        if (!config) {
+            logger.warn('PROPOSAL_WEBHOOK', { stage: 'not_configured' });
+            return;
+        }
+        if (notice.leadId === undefined) {
+            logger.warn('PROPOSAL_WEBHOOK', { stage: 'skipped_without_lead' });
+            return;
+        }
+
+        const proposalRef = await createProposalRef(notice.id);
+        const payload: ProposalOpenedPayload = {
+            event: 'proposal.opened',
+            // The count comes from an atomic RPUSH: racing opens get distinct ids.
+            eventId: `${proposalRef}:${notice.count}`,
+            proposalRef,
+            leadId: notice.leadId,
+            openCount: notice.count,
+            isFirstOpen: notice.count === 1,
+            openedAt: new Date(notice.openedAt).toISOString(),
+            previousOpenAt: notice.previousOpenAt === null ? null : new Date(notice.previousOpenAt).toISOString(),
+        };
+        await deliver(config, payload, notice.openedAt, deps);
+    } catch (error) {
+        logger.error('PROPOSAL_WEBHOOK', {
+            stage: 'unexpected',
+            errorName: error instanceof Error ? error.name : typeof error,
+        });
+    }
+}

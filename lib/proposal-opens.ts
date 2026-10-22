@@ -39,6 +39,13 @@ export interface ProposalOpenEvent {
     ipHash?: string;
 }
 
+/** A recorded open: the new count, its instant, and the previous open's (null on the first). */
+export interface RecordedProposalOpen {
+    count: number;
+    openedAt: number;
+    previousOpenAt: number | null;
+}
+
 export interface ProposalOpensDeps {
     redis?: ProposalOpensRedis | null;
     now?: () => number;
@@ -123,15 +130,31 @@ async function buildProposalOpenEvent(
     return event;
 }
 
+/** The `at` of a stored event, raw JSON string or Upstash's auto-deserialized object. */
+function storedEventTime(value: unknown): number | null {
+    let event = value;
+    if (typeof event === 'string') {
+        try {
+            event = JSON.parse(event);
+        } catch {
+            return null;
+        }
+    }
+    if (!event || typeof event !== 'object') return null;
+    const at = Date.parse(String((event as { at?: unknown }).at));
+    return Number.isNaN(at) ? null : at;
+}
+
 /**
- * Appends one open and returns the new open count, or `null` when it could
- * not be recorded. Never throws: a counting failure must not break the page.
+ * Appends one open and returns the new count with the previous open's time,
+ * or `null` when it could not be recorded. Never throws: a counting failure
+ * must not break the page.
  */
 export async function recordProposalOpen(
     request: Request,
     id: string,
     deps: ProposalOpensDeps = {},
-): Promise<number | null> {
+): Promise<RecordedProposalOpen | null> {
     try {
         const redis = deps.redis !== undefined ? deps.redis : await getRedisClient();
         if (!redis) return null;
@@ -140,12 +163,16 @@ export async function recordProposalOpen(
         const event = await buildProposalOpenEvent(request, id, redis, now);
         const key = opensKey(id);
         // One transaction: an append whose TTL write failed would keep the
-        // list past the 90 days, since nothing else expires it.
+        // list past the 90 days, since nothing else expires it. Reading the
+        // last event inside it gives each open its own predecessor, even
+        // when two opens race.
         const transaction = redis.multi();
+        transaction.lindex(key, -1);
         transaction.rpush(key, JSON.stringify(event));
         transaction.expire(key, PROPOSAL_OPENS_RETENTION_SECONDS, 'NX');
-        const [count] = await transaction.exec();
-        return typeof count === 'number' ? count : null;
+        const [previous, count] = await transaction.exec();
+        if (typeof count !== 'number') return null;
+        return { count, openedAt: now, previousOpenAt: storedEventTime(previous) };
     } catch (error) {
         // Name only: Upstash error messages carry the command, i.e. the key with the id.
         logger.error('PROPOSAL_OPENS: failed to record open', {
