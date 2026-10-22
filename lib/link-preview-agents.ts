@@ -48,7 +48,6 @@ const PREVIEW_AGENT_PATTERN = new RegExp(
         'APIs-Google',
         'FeedFetcher-Google',
         'Google-Safety',
-        'Google-Read-Aloud',
         // PageSpeed Insights / Lighthouse audits.
         'Chrome-Lighthouse',
         // Other crawlers.
@@ -73,8 +72,8 @@ const PREVIEW_AGENT_PATTERN = new RegExp(
 /**
  * True for a browser fetching the page speculatively — Chrome speculation
  * rules and omnibox prediction (`Sec-Purpose: prefetch`, `…;prerender`),
- * legacy `Purpose: prefetch`, Safari's `X-Purpose: preview` and Firefox's
- * `X-Moz: prefetch`. Nobody is reading the page yet.
+ * legacy `Purpose: prefetch` and Firefox's `X-Moz: prefetch`. Nobody is
+ * reading the page yet, and a later navigation will.
  */
 export function isPrefetchRequest(request: Request): boolean {
     const purpose = [
@@ -83,12 +82,14 @@ export function isPrefetchRequest(request: Request): boolean {
         request.headers.get('x-purpose'),
         request.headers.get('x-moz'),
     ].join(' ');
-    return /\b(?:prefetch|prerender|preview)\b/i.test(purpose);
+    return /\b(?:prefetch|prerender)\b/i.test(purpose);
 }
 
 /** True when the request is not a person opening the link in a browser. */
 export function isLinkPreviewRequest(request: Request): boolean {
     if (request.method === 'HEAD') return true;
+    // Safari's page preview: shown as is, may be all the person ever sees.
+    if (/\bpreview\b/i.test(request.headers.get('x-purpose') ?? '')) return true;
     const userAgent = request.headers.get('user-agent')?.trim() ?? '';
     // Browsers always send a User-Agent; its absence means a script.
     if (!userAgent) return true;

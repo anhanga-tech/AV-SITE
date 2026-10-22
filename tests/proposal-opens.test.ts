@@ -29,6 +29,8 @@ const UA = {
     snapchatInApp: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Snapchat/13.12.0.36 (like Safari/8618.2.12.10.4, panda)',
     viberInApp: 'Mozilla/5.0 (Linux; Android 14; SM-A546B Build/UP1A.231005.007; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.0.0 Mobile Safari/537.36 Viber/24.9.0.0',
     instagramInApp: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Instagram 354.0.0.30.98 (iPhone15,2; iOS 18_1; pt_BR; pt; scale=3.00; 1179x2556; 660893810)',
+    // Google Read Aloud fetches on the customer's request (Codex review, #1919).
+    readAloud: 'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36 Google-Read-Aloud',
     facebookInApp: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 [FBAN/FBIOS;FBAV/487.0.0.41.109;FBBV/662847301;FBDV/iPhone15,2;FBMD/iPhone;FBSN/iOS;FBSV/18.1;FBSS/3;FBID/phone;FBLC/pt_BR;FBOP/5;FBRV/0]',
 };
 
@@ -42,7 +44,6 @@ const PREVIEW_AGENTS = {
     snapchat: 'Mozilla/5.0 (compatible; Snap URL Preview Service; bot; snapchat; +https://developers.snap.com/robots)',
     mastodon: 'Mastodon/4.3.0 (http.rb/5.2.0; +https://mastodon.social/)',
     bluesky: 'Mozilla/5.0 (compatible; Bluesky Cardyb/1.1; +mailto:support@bsky.app)',
-    readAloud: 'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36 Google-Read-Aloud',
     lighthouse: 'Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36 Chrome-Lighthouse',
     curl: 'curl/8.5.0',
 };
@@ -302,7 +303,6 @@ test('a browser prefetch is refused, so the real navigation is the request that 
         { 'sec-purpose': 'prefetch;prerender' },
         { 'sec-purpose': 'prefetch;anonymous-client-ip' },
         { purpose: 'prefetch' },
-        { 'x-purpose': 'preview' },
         { 'x-moz': 'prefetch' },
     ];
     for (const headers of speculativeFetches) {
@@ -316,6 +316,18 @@ test('a browser prefetch is refused, so the real navigation is the request that 
 
     await handleProposalRequest(open(id, { userAgent: UA.desktop }), id, deps);
     assert.equal(listOf(opensKey(id)).length, 1);
+});
+
+test('a Safari page preview gets the Anhangá page without counting', async () => {
+    // X-Purpose: preview renders a preview the person may never open further,
+    // so it is served (not refused like a prefetch) and still not counted.
+    const { deps, listOf } = setup();
+    const { id } = await saveProposal({}, deps);
+
+    const response = await handleProposalRequest(prefetch(id, { 'x-purpose': 'preview' }), id, deps);
+
+    assert.equal(response.status, 200);
+    assert.equal(listOf(opensKey(id)).length, 0);
 });
 
 test('a prefetch of a redirect proposal never receives the operator link', async () => {
