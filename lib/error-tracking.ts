@@ -108,15 +108,6 @@ function scrubQueryPairs(query: string): string {
         .join('&');
 }
 
-/**
- * Path segments that are themselves a credential. The proposal link
- * (`/proposta/<id>`, issue #1894) has no token in its query: the random id IS
- * the bearer secret that opens the page, and Sentry reports the path in
- * `request.url`, the span name, `url.path` and the error's `transaction`.
- * Case-insensitive, and any character of `/proposta/` may arrive
- * percent-encoded (`%2F`, `/%70roposta/`): a spelling the route would never
- * serve still carries the id in the URL, so it is redacted rather than leaked.
- */
 function percentEncodableChar(char: string): string {
     const encodings = new Set([char.toLowerCase(), char.toUpperCase()].map(
         (variant) => `%${variant.charCodeAt(0).toString(16)}`,
@@ -125,8 +116,19 @@ function percentEncodableChar(char: string): string {
     return `(?:${literal}|${[...encodings].join('|')})`;
 }
 
+/**
+ * Path segments that are themselves a credential. The proposal link
+ * (`/proposta/<id>`, issue #1894) has no token in its query: the random id IS
+ * the bearer secret that opens the page, and Sentry reports the path in
+ * `request.url`, the span name, `url.path` and the error's `transaction`.
+ * Case-insensitive, any character of `/proposta/` may arrive percent-encoded
+ * (`%2F`, `/%70roposta/`) and the separator may repeat (`/proposta//<id>`): a
+ * spelling the route would never serve still carries the id in the URL, so it
+ * is redacted rather than leaked. Double encoding (`%2570roposta`) is not
+ * matched; it would take a second decode for anything to read it as the route.
+ */
 const SENSITIVE_PATH_PATTERN = new RegExp(
-    `(${[...'/proposta/'].map(percentEncodableChar).join('')})[^/?#\\s]+`,
+    `(${[...'/proposta'].map(percentEncodableChar).join('')}${percentEncodableChar('/')}+)[^/?#\\s]+`,
     'gi',
 );
 
