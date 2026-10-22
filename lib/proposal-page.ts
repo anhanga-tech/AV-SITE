@@ -194,6 +194,7 @@ export async function handleProposalRequest(
     // write and the webhook finish — so the 302 isn't held back by either.
     const recording = recordAndNotify(request, id, leadId, deps);
     if (deps.waitUntil) deps.waitUntil(recording);
+    // Without waitUntil (tests, local dev) the response waits for the webhook too.
     else await recording;
 
     return redirectUrl ? redirectResponse(redirectUrl) : htmlResponse('active', request.method);

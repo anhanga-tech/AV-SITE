@@ -120,6 +120,7 @@ X-Anhanga-Event-Id: <proposalRef>:<openCount>
 - `proposalRef`: SHA-256 de `proposta-ref:v1:<id>`, primeiros 32 hex (`createProposalRef`). Não revela o id; quem criou a proposta (e tem o id) recalcula para correlacionar. O payload não leva o id nem o link: o id abre a proposta, e no redirect leva ao token da reserva.
 - `openedAt`/`previousOpenAt` em UTC; o receptor converte para o horário de SP.
 - `openCount` é a contagem total de aberturas, inclusive as que não geraram aviso.
+- `previousOpenAt` pode vir `null` com `isFirstOpen: false` quando a abertura anterior não pôde ser lida: na dúvida, o site avisa. O receptor deve aceitar essa combinação.
 - **Idempotência:** `eventId` (repetido no header) é o mesmo em todas as tentativas do mesmo aviso, e distinto entre aberturas (vem do `RPUSH` atômico). O receptor deve ignorar um `eventId` já processado.
 
 **Verificação no receptor** (obrigatória): recalcular `v1=` + HMAC-SHA256 hex de `` `${timestamp}.${corpoBruto}` `` com o secret, comparar em tempo constante, e recusar timestamp a mais de 5 minutos do relógio. Em TypeScript, `verifyProposalWebhook` de `lib/proposal-webhook.ts` faz isso. Use o corpo bruto, antes de qualquer parse.
