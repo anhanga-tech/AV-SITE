@@ -33,13 +33,13 @@ const MAX_BODY_BYTES = 8_192;
 // No CORS headers on purpose: no page may call this.
 const RESPONSE_HEADERS = { 'Cache-Control': 'no-store' };
 
-const BodySchema = z.object({
+const BodySchema = z.strictObject({
     type: z.literal('redirect'),
     redirectUrl: z.string().min(1).max(4096),
     leadId: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
     // D5: links are valid for 15 days; the bot may shorten that, never extend it.
     validityDays: z.number().int().min(1).max(MAX_VALIDITY_DAYS).optional(),
-}).strict();
+});
 
 type ErrorCode =
     | 'METHOD_NOT_ALLOWED'
@@ -73,7 +73,7 @@ function isAuthorized(request: Request, secret: string): boolean {
 async function readJson(request: Request): Promise<{ ok: true; value: unknown } | { ok: false }> {
     try {
         const text = await request.text();
-        if (text.length > MAX_BODY_BYTES) return { ok: false };
+        if (new TextEncoder().encode(text).length > MAX_BODY_BYTES) return { ok: false };
         return { ok: true, value: JSON.parse(text) };
     } catch {
         return { ok: false };
