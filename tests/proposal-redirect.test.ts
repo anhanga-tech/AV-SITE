@@ -130,6 +130,24 @@ test('a chat link preview gets the Anhangá page, never the operator link, and c
     assert.equal(listOf(opensKey(id)).length, 0);
 });
 
+test('HEAD on a redirect proposal is answered like a preview fetcher: 200, no operator link', async () => {
+    // Deliberate (Codex review on #1911): GET already varies by requester, and
+    // unfurlers often probe with HEAD first; a Location here would hand the
+    // booking token to exactly the preview servers the 200 page protects it from.
+    const { deps, listOf } = setup();
+    const { id } = await saveProposal({ redirectUrl: OPERATOR_LINK }, deps);
+
+    const response = await handleProposalRequest(
+        new Request(`${ORIGIN}/proposta/${id}`, { method: 'HEAD', headers: { 'user-agent': IPHONE } }),
+        id,
+        deps,
+    );
+
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get('Location'), null);
+    assert.equal(listOf(opensKey(id)).length, 0);
+});
+
 test('the internal preview follows the redirect without counting', async (t) => {
     process.env.PROPOSAL_PREVIEW_SECRET = PREVIEW_SECRET;
     t.after(() => {
