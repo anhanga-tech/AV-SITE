@@ -49,7 +49,7 @@ O conteúdo some no instante em que o link expira. O tombstone existe só para r
 
 ## Redirect rastreado
 
-Uma proposta criada com `redirectUrl` (fallback quando não há adaptador da operadora ou a extração falha) grava a abertura e só então responde **302** para o link da operadora.
+Uma proposta criada com `redirectUrl` (fallback quando não há adaptador da operadora ou a extração falha) responde **302** para o link da operadora e grava a abertura em `waitUntil`, como na página: o redirect não espera o Redis, e o runtime mantém a gravação viva até terminar (decisão do Felipe, 22/10/2026).
 
 - Só passam links `https` de operadoras na allowlist de `lib/proposal-redirect.ts` (hoje: `premium.infotravel.com.br`, caminho `/orcamento-web/`), sem usuário/senha nem porta. O link da Infotravel sai sempre com `shouldShowPay=false` (decisão D7: sem botão de pagamento da operadora); o token é preservado byte a byte. A checagem roda ao salvar e de novo em cada leitura: um registro com host fora da lista responde 503, sem redirecionar.
 - Incluir uma operadora é mudança de código revisada (a lista não vem de configuração).

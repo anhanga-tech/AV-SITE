@@ -11,7 +11,7 @@
  *
  * Each customer GET of an active proposal is recorded (lib/proposal-opens.ts,
  * #1897). Link previews and the signed internal preview are not. A redirect
- * proposal (#1896) answers 302 to the operator's page once the open is stored.
+ * proposal (#1896) answers 302 to the operator's page.
  */
 import { isLinkPreviewRequest } from './link-preview-agents';
 import { recordProposalOpen, type ProposalOpensRedis } from './proposal-opens';
@@ -174,14 +174,11 @@ export async function handleProposalRequest(
         return redirectUrl ? redirectResponse(redirectUrl) : htmlResponse('active', request.method, true);
     }
 
+    // After the response via waitUntil, which keeps the isolate alive until the
+    // write finishes — so the 302 isn't held back by the Redis round trips.
     const recording = recordProposalOpen(request, id, deps);
-    if (redirectUrl) {
-        // Recorded before answering: with the 302 the customer leaves for the operator's site.
-        await recording;
-        return redirectResponse(redirectUrl);
-    }
     if (deps.waitUntil) deps.waitUntil(recording);
     else await recording;
 
-    return htmlResponse('active', request.method);
+    return redirectUrl ? redirectResponse(redirectUrl) : htmlResponse('active', request.method);
 }

@@ -88,7 +88,7 @@ test('a proposal can only be saved with an allowed redirect URL', async () => {
     assert.ok(id);
 });
 
-test('opening an Infotravel redirect proposal records the open, then answers 302 to the operator', async () => {
+test('opening an Infotravel redirect proposal answers 302 to the operator and records the open', async () => {
     const { deps, listOf } = setup();
     // Saved as the operator generated it; sent with the payment button off.
     const { id } = await saveProposal({ redirectUrl: OPERATOR_LINK }, deps);
@@ -98,8 +98,10 @@ test('opening an Infotravel redirect proposal records the open, then answers 302
 
     assert.equal(response.status, 302);
     assert.equal(response.headers.get('Location'), INFOTRAVEL_URL);
-    // Already stored when the response exists — not left to waitUntil.
-    assert.equal(deferred.length, 0);
+    // Recorded after the response (Felipe's call): the 302 doesn't wait on Redis,
+    // and waitUntil keeps the write alive until it lands.
+    assert.equal(deferred.length, 1);
+    await Promise.all(deferred);
     assert.equal(listOf(opensKey(id)).length, 1);
 });
 
