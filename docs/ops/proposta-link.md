@@ -35,7 +35,8 @@ O conteúdo some no instante em que o link expira. O tombstone existe só para r
 **Não contam:**
 
 - HEAD e requests sem User-Agent.
-- Prévias e robôs (`lib/link-preview-agents.ts`): WhatsApp, iMessage (`facebookexternalhit … Twitterbot`), Facebook, Slack, Telegram, Discord, LinkedIn, Google e outros crawlers, bibliotecas HTTP e Chrome headless.
+- Prévias e robôs (`lib/link-preview-agents.ts`): WhatsApp, iMessage (`facebookexternalhit … Twitterbot`), Facebook, Slack, Telegram, Discord, LinkedIn, Mastodon, Bluesky, Google e outros crawlers, Lighthouse, bibliotecas HTTP e Chrome headless.
+- Prefetch e prerender do navegador (`Sec-Purpose`/`Purpose: prefetch`, `X-Moz: prefetch`). Esses pedidos são **recusados com 503**, não servidos: assim o navegador descarta o pré-carregamento e a navegação real chega ao servidor, conta a abertura e recebe o 302 de um redirect. Servir o prefetch com 200 faria o navegador mostrar a cópia guardada depois, sem a abertura nunca ser contada. A prévia de página do Safari (`X-Purpose: preview`) é tratada como prévia de link: recebe a página da Anhangá e não conta. O Google Read Aloud é acionado pelo próprio cliente e conta como abertura.
 - O link de prévia interna (abaixo).
 - Propostas expiradas ou inexistentes.
 

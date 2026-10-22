@@ -13,7 +13,7 @@
  * #1897). Link previews and the signed internal preview are not. A redirect
  * proposal (#1896) answers 302 to the operator's page.
  */
-import { isLinkPreviewRequest } from './link-preview-agents';
+import { isLinkPreviewRequest, isPrefetchRequest } from './link-preview-agents';
 import { recordProposalOpen, type ProposalOpensRedis } from './proposal-opens';
 import { isProposalPreviewRequest } from './proposal-preview';
 import { loadProposal } from './proposal-store';
@@ -159,6 +159,13 @@ export async function handleProposalRequest(
 ): Promise<Response> {
     if (request.method !== 'GET' && request.method !== 'HEAD') {
         return new Response(null, { status: 405, headers: { ...SECURITY_HEADERS, Allow: 'GET, HEAD' } });
+    }
+
+    // Refused rather than served uncounted: a non-2xx makes the browser drop
+    // the speculative fetch, so the real navigation reaches us — and is the
+    // request that counts the open and gets the 302 of a redirect proposal.
+    if (isPrefetchRequest(request)) {
+        return new Response(null, { status: 503, headers: { ...SECURITY_HEADERS, 'Retry-After': '0' } });
     }
 
     const lookup = await loadProposal(id, deps);
