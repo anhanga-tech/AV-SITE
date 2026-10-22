@@ -44,7 +44,7 @@ const photoUrl = z.string().max(500).refine(isAllowedProposalPhoto);
 
 export const proposalContentSchema = z.strictObject({
     // First word only (D6), whatever the caller sends.
-    firstName: text(60).transform((name) => name.split(/\s+/)[0]).optional(),
+    firstName: z.string().trim().min(1).max(300).transform((name) => name.split(/\s+/)[0]).pipe(text(60)).optional(),
     destination: text(120),
     travelers: z.strictObject({
         adults: z.number().int().min(1).max(20),
@@ -76,7 +76,8 @@ export const proposalContentSchema = z.strictObject({
         departure: localDateTime,
         arrival: localDateTime,
         duration: z.string().regex(/^\d{1,2}:\d{2}$/).optional(),
-        stops: z.number().int().min(0).max(5),
+        // Absent when the operator doesn't say: never shown as a direct flight.
+        stops: z.number().int().min(0).max(5).optional(),
         fareFamily: text(40).optional(),
     })).max(12),
     transfers: z.array(z.strictObject({
@@ -93,7 +94,10 @@ export const proposalContentSchema = z.strictObject({
         amount: z.number().positive().max(10_000_000),
         currency: z.literal('BRL'),
     }),
-});
+}).refine(
+    (content) => Boolean(content.hotel) || content.flights.length + content.transfers.length + content.extras.length > 0,
+    { message: 'a proposal page needs at least one included item' },
+);
 
 export type ProposalContent = z.output<typeof proposalContentSchema>;
 export type ProposalContentInput = z.input<typeof proposalContentSchema>;

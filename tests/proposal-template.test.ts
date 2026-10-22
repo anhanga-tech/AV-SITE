@@ -245,6 +245,26 @@ test('the refundability is shown when the operator sends no cancellation text', 
     assert.ok(html.includes('Tarifa não reembolsável'));
 });
 
+test('partial data never turns into a false claim', () => {
+    const value = content();
+    const [outbound, inbound] = value.flights;
+
+    // Unknown stops: no "Voo direto".
+    const unknownStops = fromInfotravelNormalized({ ...NORMALIZED, voos: NORMALIZED.voos.map((voo: object) => ({ ...voo, stopsCount: null })) });
+    assert.ok(!render(unknownStops).includes('Voo direto'));
+
+    // Flights only: the year still shows, from the flights.
+    const { hotel: _hotel, ...withoutHotel } = value;
+    assert.ok(render({ ...withoutHotel, flights: [outbound, inbound] }).includes('10/03/2027 a 13/03/2027 · 2 adultos'));
+
+    // Nothing included: refused.
+    assert.equal(proposalContentSchema.safeParse({ ...withoutHotel, flights: [], transfers: [], extras: [] }).success, false);
+
+    // A long full name still yields the first name.
+    const longName = fromInfotravelNormalized(NORMALIZED, { firstName: `Ana ${'Beatriz Cavalcanti de Albuquerque '.repeat(3)}` });
+    assert.equal(longName.firstName, 'Ana');
+});
+
 test('children are counted from the passengers beyond the adults, without storing ages', () => {
     const family = fromInfotravelNormalized({ ...NORMALIZED, passageiros: { adultos: 2, idades: [40, 38, 7] } });
 

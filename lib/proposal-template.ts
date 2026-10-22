@@ -141,7 +141,7 @@ function flightsSection(flights: ProposalContent['flights']): string {
         const departure = flightMoment(flight.departure);
         const arrival = flightMoment(flight.arrival);
         const details = [
-            flight.stops === 0 ? 'Voo direto' : plural(flight.stops, 'parada', 'paradas'),
+            flight.stops === undefined ? '' : flight.stops === 0 ? 'Voo direto' : plural(flight.stops, 'parada', 'paradas'),
             flight.duration ? formatDuration(flight.duration) : '',
             flight.fareFamily ? `Tarifa ${flight.fareFamily}` : '',
         ].filter(Boolean);
@@ -168,6 +168,16 @@ ${extra.date ? `<p class="label">${formatDay(extra.date)}</p>` : ''}<p class="it
 ${extra.description ? `<details><summary>Detalhes</summary><p>${escapeHtml(extra.description)}</p></details>` : ''}
 </div>`);
     return `<section aria-labelledby="extras"><h2 id="extras">Passeios e ingressos</h2>${cards.join('')}</section>`;
+}
+
+/** `06/12/2026 a 09/12/2026 · `, from the stay or, without one, from the flights. */
+function travelPeriod(content: ProposalContent): string {
+    const { hotel, flights } = content;
+    if (hotel) return `${formatDay(hotel.room.checkin)} a ${formatDay(hotel.room.checkout)} · `;
+    if (flights.length === 0) return '';
+    const first = formatDay(flights[0].departure.slice(0, 10));
+    const last = formatDay(flights[flights.length - 1].departure.slice(0, 10));
+    return first === last ? `${first} · ` : `${first} a ${last} · `;
 }
 
 function includedSummary(content: ProposalContent): string[] {
@@ -226,7 +236,7 @@ export function renderProposalContent(
 ): string {
     const { hotel } = content;
     const greeting = content.firstName ? `${content.firstName}, sua viagem para ${content.destination}` : `Sua viagem para ${content.destination}`;
-    const period = hotel ? `${formatDay(hotel.room.checkin)} a ${formatDay(hotel.room.checkout)} · ` : '';
+    const period = travelPeriod(content);
     const heroPhoto = hotel?.photos[0];
     const validUntil = formatValidUntil(options.expiresAt);
     const cta = whatsappUrl(`Olá! Vi minha proposta para ${content.destination} e quero conversar.`);

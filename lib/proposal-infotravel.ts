@@ -123,7 +123,7 @@ export function fromInfotravelNormalized(input: unknown, options: { firstName?: 
             departure: flight.departure,
             arrival: flight.arrival,
             duration: clean(flight.duration),
-            stops: flight.stopsCount ?? 0,
+            stops: flight.stopsCount ?? undefined,
             fareFamily: clean(flight.tarifa),
         })),
         transfers: (source.transfers ?? []).map((transfer) => ({
