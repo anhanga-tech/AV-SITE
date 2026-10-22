@@ -77,8 +77,9 @@ export function sanitizeForErrorTracking(value: unknown, depth = 0): unknown {
 // (`{ ok: false, code: 'VALIDATION_ERROR' }`), so redacting it there would erase
 // the error taxonomy. In a URL, `code`/`state` are the GitHub OAuth callback's
 // authorization code and CSRF state (api/auth/callback.ts) — the code is
-// exchangeable for a `repo,user`-scoped token until it is spent.
-const SENSITIVE_URL_PARAM_PATTERN = /^(?:code|state)$/i;
+// exchangeable for a `repo,user`-scoped token until it is spent. `previa` is the
+// signed internal-preview link of a proposal (lib/proposal-preview.ts).
+const SENSITIVE_URL_PARAM_PATTERN = /^(?:code|state|previa)$/i;
 
 function isSensitiveParamName(rawKey: string): boolean {
     // A percent-encoded name still reaches the app decoded — `?%74oken=` is read

@@ -12,6 +12,8 @@ import {
     saveProposal,
     type ProposalRedis,
 } from '../lib/proposal-store.ts';
+import type { ProposalOpensRedis } from '../lib/proposal-opens.ts';
+import { createFakeProposalRedis } from './helpers/fake-proposal-redis.ts';
 
 // Issue #1895: `/proposta/<id>` is a private, expiring page whose random id is
 // the only credential. Valid 15 days (D5); after that 410 with a WhatsApp CTA.
@@ -19,39 +21,20 @@ import {
 const ORIGIN = 'https://www.anhanga.tur.br';
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-/**
- * In-memory Redis with TTLs on an injected clock. Reads go through JSON.parse
- * like Upstash's default automatic deserialization, so a record written as a
- * JSON string comes back as an object and a numeric string as a number.
- */
-function createFakeRedis(clock: { now: number }) {
-    const store = new Map<string, { value: string; expiresAt: number }>();
-    const read = (key: string): unknown => {
-        const entry = store.get(key);
-        if (!entry || entry.expiresAt <= clock.now) return null;
-        try {
-            return JSON.parse(entry.value);
-        } catch {
-            return entry.value;
-        }
-    };
-    const redis: ProposalRedis = {
-        async set(key: string, value: string, opts: { nx?: true; ex: number }) {
-            if (opts.nx && read(key) !== null) return null;
-            store.set(key, { value, expiresAt: clock.now + opts.ex * 1000 });
-            return 'OK';
-        },
-        async mget(...keys) {
-            return keys.map(read);
+/** For paths that never reach an active proposal, so never record an open. */
+function lookupOnly(redis: ProposalRedis): ProposalOpensRedis {
+    return {
+        ...redis,
+        multi: () => {
+            throw new Error('unexpected open recorded');
         },
     };
-    return { redis, store };
 }
 
 function setup() {
     const clock = { now: Date.UTC(2026, 9, 22, 12) };
-    const { redis, store } = createFakeRedis(clock);
-    return { clock, redis, store, deps: { redis, now: () => clock.now } };
+    const { redis } = createFakeProposalRedis(clock);
+    return { clock, redis, deps: { redis, now: () => clock.now } };
 }
 
 function request(id: string, method = 'GET'): Request {
@@ -138,7 +121,7 @@ test('an unknown id answers 404 and a malformed id never reaches Redis', async (
             return keys.map(() => null);
         },
     };
-    const malformed = await handleProposalRequest(request('nope'), 'nope', { redis: counting });
+    const malformed = await handleProposalRequest(request('nope'), 'nope', { redis: lookupOnly(counting) });
     assert.equal(malformed.status, 404);
     assert.equal(reads, 0);
 });
@@ -154,7 +137,7 @@ test('Redis missing or failing answers 503, not a misleading 404', async () => {
             throw new Error('upstash down');
         },
     };
-    const failed = await handleProposalRequest(request(id), id, { redis: failing });
+    const failed = await handleProposalRequest(request(id), id, { redis: lookupOnly(failing) });
     assert.equal(failed.status, 503);
     assert.equal(failed.headers.get('X-Robots-Tag'), 'noindex, nofollow');
 });
@@ -186,7 +169,7 @@ test('a corrupt stored record answers 503 instead of rendering it', async () => 
         set: async () => 'OK',
         mget: async () => [{ v: 1, createdAt: 'yesterday' }, null],
     };
-    assert.equal((await handleProposalRequest(request(id), id, { redis: corrupt })).status, 503);
+    assert.equal((await handleProposalRequest(request(id), id, { redis: lookupOnly(corrupt) })).status, 503);
 });
 
 test('a record stored as a raw JSON string (no auto-deserialization) is still read', async () => {
@@ -227,7 +210,8 @@ test('the page sets its own security headers and a CSP that runs no script', asy
 
 test('the Pages Function routes /proposta/:id to the handler', async () => {
     const source = await readFile(new URL('../functions/proposta/[id].ts', import.meta.url), 'utf8');
-    assert.match(source, /handleProposalRequest\(request, id\)/);
+    assert.match(source, /handleProposalRequest\(context\.request, id,/);
+    assert.match(source, /context\.waitUntil\(promise\)/);
 });
 
 test('every robots.txt group that can crawl the site disallows /proposta/', async () => {
