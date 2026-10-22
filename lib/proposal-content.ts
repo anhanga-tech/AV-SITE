@@ -75,11 +75,11 @@ export const proposalContentSchema = z.strictObject({
         to: text(120),
         departure: localDateTime,
         arrival: localDateTime,
-        duration: z.string().regex(/^\d{1,2}:\d{2}$/).optional(),
+        duration: z.string().regex(/^\d{1,2}:[0-5]\d$/).optional(),
         // Absent when the operator doesn't say: never shown as a direct flight.
         stops: z.number().int().min(0).max(5).optional(),
         fareFamily: text(40).optional(),
-    })).max(12),
+    }).refine((flight) => Date.parse(flight.arrival) > Date.parse(flight.departure), { message: 'arrival must be after departure' })).max(12),
     transfers: z.array(z.strictObject({
         name: text(200),
         provider: text(120).optional(),

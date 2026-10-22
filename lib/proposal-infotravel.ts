@@ -19,7 +19,9 @@ const textList = z.array(z.string()).nullish();
 
 const normalizedSchema = z.object({
     destino: z.string(),
-    passageiros: z.object({ adultos: z.number(), idades: z.array(z.number()).nullish() }),
+    // Every traveler's age: without it the children can't be counted.
+    passageiros: z.object({ adultos: z.number(), idades: z.array(z.number()) })
+        .refine((passageiros) => passageiros.idades.length >= passageiros.adultos),
     hotel: z.object({
         nome: z.string(),
         estrelas: z.number().nullish(),
@@ -88,7 +90,10 @@ function list(values: string[] | null | undefined): string[] {
 export function fromInfotravelNormalized(input: unknown, options: { firstName?: string } = {}): ProposalContent {
     const source = normalizedSchema.parse(input);
     const { hotel, quarto } = source;
-    const travelersCount = source.passageiros.idades?.length ?? source.passageiros.adultos;
+    // A hotel without its room (or the reverse) would drop the stay from the
+    // page while the total still includes it: refuse, so the caller falls back.
+    if (Boolean(hotel) !== Boolean(quarto)) throw new Error('PROPOSAL_INFOTRAVEL: hotel and room must come together');
+    const travelersCount = source.passageiros.idades.length;
 
     return proposalContentSchema.parse({
         firstName: clean(options.firstName),

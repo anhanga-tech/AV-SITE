@@ -261,6 +261,14 @@ test('partial data never turns into a false claim', () => {
     const earlyFlight = { ...outbound, departure: '2027-03-09T23:30:00-03:00', arrival: '2027-03-10T07:05:00-03:00' };
     assert.ok(render({ ...value, flights: [earlyFlight, inbound] }).includes('09/03/2027 a 13/03/2027 · 2 adultos'));
 
+    // Impossible or incomplete data: refused instead of rendered.
+    assert.equal(proposalContentSchema.safeParse({ ...value, flights: [{ ...outbound, arrival: '2027-03-10T17:40:00-03:00' }] }).success, false);
+    assert.equal(proposalContentSchema.safeParse({ ...value, flights: [{ ...outbound, duration: '01:75' }] }).success, false);
+    assert.throws(() => fromInfotravelNormalized({ ...NORMALIZED, quarto: null }), /hotel and room/);
+    assert.throws(() => fromInfotravelNormalized({ ...NORMALIZED, hotel: null }), /hotel and room/);
+    assert.throws(() => fromInfotravelNormalized({ ...NORMALIZED, passageiros: { adultos: 2, idades: null } }));
+    assert.throws(() => fromInfotravelNormalized({ ...NORMALIZED, passageiros: { adultos: 2, idades: [30] } }));
+
     // Nothing included: refused.
     assert.equal(proposalContentSchema.safeParse({ ...withoutHotel, flights: [], transfers: [], extras: [] }).success, false);
 
