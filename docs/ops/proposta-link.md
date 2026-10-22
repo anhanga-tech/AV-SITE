@@ -142,9 +142,10 @@ Nota interna (`mail.mt_note`) no chatter do `crm.lead` do `leadId`, via `service
 
 Uma proposta guarda **ou** `redirectUrl` (redirect rastreado) **ou** `content` (página). O conteúdo segue `lib/proposal-content.ts`, revalidado a cada leitura, e é renderizado por `lib/proposal-template.ts`, sem JavaScript.
 
-- **O schema é uma allowlist.** Não há campo para valor por item, comissão, `booking_id`, idades, fornecedor, logo da companhia aérea ou formas de pagamento da operadora. Assim, D2 (só o total) e a regra de não expor dados da RCA valem por construção.
+- **O schema é uma allowlist.** Não há campo para valor por item, comissão, `booking_id`, idades, logo da companhia aérea ou formas de pagamento da operadora. Assim, D2 (só o total) e a regra de não expor dados da RCA valem por construção.
 - **Primeiro nome (D6):** `firstName` guarda só a primeira palavra.
 - **Fotos (D4):** ficam nos servidores da operadora, só em `https` e só de `media.staticontent.com` e `media.infotravel.com.br`. A CSP libera exatamente esses hosts em `img-src`, e `Referrer-Policy: no-referrer` impede que eles recebam a URL da proposta.
+- **Fornecedor local:** o traslado mostra uma linha discreta "Operado por …" (decisão do Felipe, 22/10/2026). Descrições da operadora podem citar o fornecedor.
 - **Condições:** texto fixo da Anhangá ("Valores sujeitos a disponibilidade… fale com a gente pelo WhatsApp"), nunca o da operadora (D7). As regras de cancelamento de cada item aparecem junto do item.
 - **Datas:** diárias (`2027-03-10T00:00:00`) são tratadas como dia de calendário, e horários de voo como hora local do aeroporto. Nenhuma das duas passa por fuso horário, então não "voltam um dia" no servidor.
 - **Prévias de link** (WhatsApp etc.) continuam recebendo a página genérica, sem nome, hotel ou preço. A prévia interna (`?previa=`) mostra a página completa com o aviso.

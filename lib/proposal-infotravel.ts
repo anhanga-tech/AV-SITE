@@ -5,7 +5,7 @@
  *
  * A projection: only fields the page may show are read. Everything else in
  * the normalized JSON — booking id, per-item values, the commission
- * adjustment, passenger ages, suppliers, airline logos on the operator's
+ * adjustment, passenger ages, airline logos on the operator's
  * domain and the operator's payment terms — is never copied.
  */
 import { z } from 'zod';
@@ -49,7 +49,7 @@ const normalizedSchema = z.object({
         origem: z.string(),
         destino: z.string(),
     })).nullish(),
-    transfers: z.array(z.object({ nome: z.string(), cancelamento: textList })).nullish(),
+    transfers: z.array(z.object({ nome: z.string(), fornecedor: optionalText, cancelamento: textList })).nullish(),
     extras: z.array(z.object({ nome: z.string(), data: optionalText, descricao: optionalText })).nullish(),
     total: z.object({ amount: z.number(), currency: z.string() }),
 });
@@ -128,6 +128,7 @@ export function fromInfotravelNormalized(input: unknown, options: { firstName?: 
         })),
         transfers: (source.transfers ?? []).map((transfer) => ({
             name: transfer.nome,
+            provider: clean(transfer.fornecedor),
             cancellation: list(transfer.cancelamento),
         })),
         extras: (source.extras ?? []).map((extra) => ({

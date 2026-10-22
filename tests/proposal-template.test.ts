@@ -83,12 +83,15 @@ test('only the first name, the total and what is included reach the page (D2, D6
     for (const value of ['2316', '2.316', '3097', '3.097', '517,01', '517.01', '204,08', '204.08', '345,73', '345.73', '152,85', '152.85']) {
         assert.ok(!html.includes(value), `item value leaked: ${value}`);
     }
-    // Nothing about the operator, its agency unit or the supplier; no booking id or ages.
-    assert.doesNotMatch(html, /\bRCA\b|rcaturismo|Santander|CNPJ|VIP MAR|9900001|QUOTATION/i);
+    // Nothing about the operator or its agency unit; no booking id or ages.
+    assert.doesNotMatch(html, /\bRCA\b|rcaturismo|Santander|CNPJ|9900001|QUOTATION/i);
+    // The transfer's local supplier is named once, discreetly, in fine print.
+    assert.equal(html.match(/VIP MAR/g)?.length, 1);
+    assert.ok(html.includes('<p class="fine">Operado por VIP MAR TURISMO &amp; RECEPTIVO</p>'));
     const stored = JSON.stringify(content());
     // No key for any of them, so nothing about them can be stored.
-    assert.doesNotMatch(stored, /"(?:idades|booking_id|ajuste_comissao|valor|voos_valor|fornecedor|logo|condicoes)"/);
-    assert.doesNotMatch(stored, /9900001|Santander|rcaturismo|VIP MAR/i);
+    assert.doesNotMatch(stored, /"(?:idades|booking_id|ajuste_comissao|valor|voos_valor|logo|condicoes)"/);
+    assert.doesNotMatch(stored, /9900001|Santander|rcaturismo/i);
 });
 
 test('the conditions are the Anhangá\'s own, never the operator\'s payment terms (D7)', () => {

@@ -6,8 +6,9 @@
  * - D2: only the total. There is no field for a per-item price, so neither
  *   an item value nor the commission it would reveal can be stored;
  * - D6: only the first name (`firstName` keeps the first word);
- * - no operator internals: no booking id, agent, CNPJ, supplier or the
- *   operator's payment terms (the page shows the Anhangá's own conditions);
+ * - no operator internals: no booking id, agent, CNPJ or the operator's
+ *   payment terms (the page shows the Anhangá's own conditions). The local
+ *   supplier of a transfer may be named, discreetly (Felipe, 22/10/2026);
  * - D4: photos stay on the operator's servers, but only https URLs on the
  *   hosts below, which the page's CSP also allows.
  *
@@ -80,6 +81,7 @@ export const proposalContentSchema = z.strictObject({
     })).max(12),
     transfers: z.array(z.strictObject({
         name: text(200),
+        provider: text(120).optional(),
         cancellation: z.array(text(400)).max(10),
     })).max(10),
     extras: z.array(z.strictObject({

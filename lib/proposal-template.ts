@@ -157,7 +157,7 @@ function flightsSection(flights: ProposalContent['flights']): string {
 
 function transfersSection(transfers: ProposalContent['transfers']): string {
     if (transfers.length === 0) return '';
-    const cards = transfers.map((transfer) => `<div class="card"><p class="item-title">${escapeHtml(transfer.name)}</p>${list(transfer.cancellation, 'fine')}</div>`);
+    const cards = transfers.map((transfer) => `<div class="card"><p class="item-title">${escapeHtml(transfer.name)}</p>${transfer.provider ? `<p class="fine">Operado por ${escapeHtml(transfer.provider)}</p>` : ''}${list(transfer.cancellation, 'fine')}</div>`);
     return `<section aria-labelledby="traslados"><h2 id="traslados">Traslados</h2>${cards.join('')}</section>`;
 }
 
