@@ -4,12 +4,22 @@ import { logger } from './logger';
 export interface RedisClientLike {
     pipeline(): { incr(key: string): void; ttl(key: string): void; exec(): Promise<unknown[]> };
     expire(key: string, seconds: number): Promise<unknown>;
+    /** MULTI/EXEC: the queued commands go in one request and apply together. */
+    multi(): RedisTransactionLike;
     set(key: string, value: string, opts: { nx: true; ex: number }): Promise<string | null>;
     set(key: string, value: string, opts: { ex: number }): Promise<string | null>;
     // Upstash deserializes JSON on read by default: a value stored as a JSON
     // string comes back parsed (object, number), not as the string written.
     mget(...keys: string[]): Promise<unknown[]>;
     del(key: string): Promise<unknown>;
+}
+
+/** The queued-command subset of an Upstash `multi()` transaction. */
+export interface RedisTransactionLike {
+    rpush(key: string, ...values: string[]): unknown;
+    // `NX`: only set a TTL when the key has none (fixes it at the first write).
+    expire(key: string, seconds: number, option?: 'NX'): unknown;
+    exec(): Promise<unknown[]>;
 }
 
 // True when running inside a managed serverless edge runtime where module-level

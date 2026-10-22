@@ -4,10 +4,15 @@ interface CFCtx {
   request: Request;
   env: Record<string, string>;
   params: { id?: string | string[] };
+  waitUntil: (promise: Promise<unknown>) => void;
 }
 
-export const onRequest = async ({ request, env, params }: CFCtx): Promise<Response> => {
-  Object.assign(process.env, env);
-  const id = typeof params.id === 'string' ? params.id : '';
-  return handleProposalRequest(request, id);
+export const onRequest = async (context: CFCtx): Promise<Response> => {
+  Object.assign(process.env, context.env);
+  const id = typeof context.params.id === 'string' ? context.params.id : '';
+  // Called through the context: a detached `waitUntil` loses its receiver
+  // and throws "Illegal invocation" on Workers.
+  return handleProposalRequest(context.request, id, {
+    waitUntil: (promise) => context.waitUntil(promise),
+  });
 };

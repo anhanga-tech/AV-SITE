@@ -61,6 +61,9 @@ N8N_WEBHOOK_SECRET=           # Shared HMAC secret validado por /api/purchase-di
 # NPS Invitation (required in prod): assina/verifica o link de convite de /api/submit-nps
 NPS_INVITE_SECRET=            # HMAC-SHA256 key (lib/nps-invite.ts) — ver docs/ops/nps-invite.md
 
+# Proposal preview (required in prod): link interno /proposta/<id>?previa=… que não conta abertura
+PROPOSAL_PREVIEW_SECRET=      # HMAC-SHA256 key (lib/proposal-preview.ts) — ver docs/ops/proposta-link.md
+
 # Rate limiting (required in prod — module-level state resets per request on Cloudflare)
 UPSTASH_REDIS_REST_URL=
 UPSTASH_REDIS_REST_TOKEN=

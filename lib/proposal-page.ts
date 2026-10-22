@@ -8,8 +8,14 @@
  *
  * The visual proposal template is #1901 (P9) and the tracked redirect is #1896
  * (P2); until then an active proposal renders a short holding page.
+ *
+ * Each customer GET of an active proposal is recorded (lib/proposal-opens.ts,
+ * #1897). Link previews and the signed internal preview are not.
  */
-import { loadProposal, type ProposalStoreDeps } from './proposal-store';
+import { isLinkPreviewRequest } from './link-preview-agents';
+import { recordProposalOpen, type ProposalOpensRedis } from './proposal-opens';
+import { isProposalPreviewRequest } from './proposal-preview';
+import { loadProposal } from './proposal-store';
 
 // Same number as utils/whatsapp.ts, which can't be imported here (it pulls React).
 const WHATSAPP_NUMBER = '5511955021519';
@@ -93,11 +99,14 @@ p{margin:0 0 28px;color:#475569}
 .cta{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 24px;border-radius:16px;font-weight:700;color:#0f172a;text-decoration:none;background:#FFD600;box-shadow:4px 4px 0 0 #0f172a;transition:transform .15s,box-shadow .15s}
 .cta:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 0 #0f172a;background:#E5C000}
 .cta:active{transform:translate(4px,4px);box-shadow:none}
+.notice{margin:0 0 20px;padding:8px 12px;border-radius:8px;font-size:.875rem;font-weight:600;color:#0f172a;background:#e0f2fe}
 .cta:focus-visible{outline:3px solid #0ea5e9;outline-offset:3px}
 @media (prefers-reduced-motion:reduce){.cta{transition:none}}
 `;
 
-function renderPage(content: PageContent): string {
+const INTERNAL_PREVIEW_NOTICE = 'Prévia interna: esta visita não conta como abertura do cliente.';
+
+function renderPage(content: PageContent, internalPreview: boolean): string {
     const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(content.whatsappText)}`;
     return `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -111,7 +120,7 @@ function renderPage(content: PageContent): string {
 </head>
 <body>
 <main>
-<p class="brand">Anhangá Viagens</p>
+${internalPreview ? `<p class="notice" role="note">${escapeHtml(INTERNAL_PREVIEW_NOTICE)}</p>\n` : ''}<p class="brand">Anhangá Viagens</p>
 <h1>${escapeHtml(content.heading)}</h1>
 <p>${escapeHtml(content.message)}</p>
 <a class="cta" href="${escapeHtml(whatsappUrl)}" rel="noopener noreferrer" target="_blank">Falar no WhatsApp</a>
@@ -120,20 +129,39 @@ function renderPage(content: PageContent): string {
 </html>`;
 }
 
-function htmlResponse(kind: PageKind, method: string): Response {
-    const body = method === 'HEAD' ? null : renderPage(PAGES[kind]);
+function htmlResponse(kind: PageKind, method: string, internalPreview = false): Response {
+    const body = method === 'HEAD' ? null : renderPage(PAGES[kind], internalPreview);
     return new Response(body, { status: STATUS_BY_PAGE[kind], headers: SECURITY_HEADERS });
+}
+
+export interface ProposalPageDeps {
+    redis?: ProposalOpensRedis | null;
+    now?: () => number;
+    /** The Pages context's `waitUntil`: records the open after the response is sent. */
+    waitUntil?: (promise: Promise<unknown>) => void;
 }
 
 export async function handleProposalRequest(
     request: Request,
     id: string,
-    deps: ProposalStoreDeps = {},
+    deps: ProposalPageDeps = {},
 ): Promise<Response> {
     if (request.method !== 'GET' && request.method !== 'HEAD') {
         return new Response(null, { status: 405, headers: { ...SECURITY_HEADERS, Allow: 'GET, HEAD' } });
     }
 
     const lookup = await loadProposal(id, deps);
-    return htmlResponse(lookup.status, request.method);
+    if (lookup.status !== 'active') return htmlResponse(lookup.status, request.method);
+
+    if (await isProposalPreviewRequest(request, id)) {
+        return htmlResponse('active', request.method, true);
+    }
+
+    if (!isLinkPreviewRequest(request)) {
+        const recording = recordProposalOpen(request, id, deps);
+        if (deps.waitUntil) deps.waitUntil(recording);
+        else await recording;
+    }
+
+    return htmlResponse('active', request.method);
 }
