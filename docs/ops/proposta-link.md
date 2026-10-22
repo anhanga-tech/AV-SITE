@@ -135,6 +135,7 @@ Nota interna (`mail.mt_note`) no chatter do `crm.lead` do `leadId`, via `service
 - **A cada abertura relevante** (as mesmas que disparam o webhook: 1ª e reaberturas 30+ min depois): `Proposta aberta em dd/mm/aaaa às hh:mm (horário de São Paulo), Nª vez`, onde N é a contagem total de aberturas. Sem IP, cidade ou aparelho.
 - **Nota, não mensagem:** `mail.mt_note` não manda e-mail aos seguidores do lead, então nada chega ao cliente.
 - **Nunca quebra:** sem `ODOO_*` configurado, a nota é pulada; se o Odoo falhar, a proposta é criada mesmo assim (a resposta do endpoint traz `crmNote: "recorded" | "skipped" | "failed"`) e a página abre normalmente (a nota roda em `waitUntil`, ao lado do webhook). Falha fica no log `PROPOSAL_ODOO_NOTE` só com o status HTTP, porque a mensagem de erro do Odoo pode repetir o texto da nota.
+- **`crmNote: "failed"` na criação:** a proposta existe e o link funciona, mas a Clara não vai achá-lo no lead (ela lê o link da nota de envio). Quem chamou o endpoint deve avisar o Felipe ou registrar a nota à mão no lead com o `url` devolvido; não recriar a proposta (geraria um segundo link). O deadline do Odoo (8 s, autenticação incluída) limita a espera do bot.
 - Sem atividade de follow-up agendada para a Clara (opcional na issue): o webhook já cumpre esse papel.
 
 ## Headers
