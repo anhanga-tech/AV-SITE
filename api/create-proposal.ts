@@ -73,7 +73,6 @@ function arePagesEnabled(): boolean {
 async function buildInfotravelContent(
     link: string,
     firstName: string | undefined,
-    now: number,
     deps: InfotravelDeps,
 ): Promise<{ content: ProposalContent; quotationExpiresAt?: number } | { fallbackReason: FallbackReason }> {
     if (!arePagesEnabled()) return { fallbackReason: 'pages_disabled' };
@@ -81,7 +80,6 @@ async function buildInfotravelContent(
         const quotation = await fetchInfotravelQuotation(link, deps);
         const normalized = normalizeInfotravelQuotation(quotation);
         const expiration = typeof normalized.validade === 'string' ? Date.parse(normalized.validade) : Number.NaN;
-        if (!Number.isNaN(expiration) && expiration <= now) return { fallbackReason: 'quotation_expired' };
         return {
             content: fromInfotravelNormalized(normalized, { firstName }),
             quotationExpiresAt: Number.isNaN(expiration) ? undefined : expiration,
@@ -204,16 +202,17 @@ export async function handleCreateProposal(request: Request, deps: CreateProposa
     }
 
     // The link as the bot sent it is what the operator's own page sends as `clientUrl`.
+    const built = body.type === 'infotravel' ? await buildInfotravelContent(body.redirectUrl, body.firstName, deps.infotravel ?? {}) : null;
+    // Measured after the operator calls, on the clock saveProposal uses: the
+    // page never says "válida até" past the operator's own quotation deadline.
     const now = (deps.now ?? Date.now)();
-    const built = body.type === 'infotravel' ? await buildInfotravelContent(body.redirectUrl, body.firstName, now, deps.infotravel ?? {}) : null;
-    const content = built && 'content' in built ? built.content : undefined;
-    // The page never says "válida até" past the operator's own quotation deadline.
     const requestedSeconds = (body.validityDays ?? MAX_VALIDITY_DAYS) * 24 * 60 * 60;
     const quotationExpiresAt = built && 'content' in built ? built.quotationExpiresAt : undefined;
-    const validitySeconds = quotationExpiresAt === undefined
-        ? requestedSeconds
-        : Math.min(requestedSeconds, Math.floor((quotationExpiresAt - now) / 1000));
-    const fallbackReason = built && 'fallbackReason' in built ? built.fallbackReason : undefined;
+    const remainingSeconds = quotationExpiresAt === undefined ? requestedSeconds : Math.floor((quotationExpiresAt - now) / 1000);
+    const expired = remainingSeconds < 1;
+    const content = built && 'content' in built && !expired ? built.content : undefined;
+    const validitySeconds = content ? Math.min(requestedSeconds, remainingSeconds) : requestedSeconds;
+    const fallbackReason = built && 'fallbackReason' in built ? built.fallbackReason : expired && built ? 'quotation_expired' : undefined;
     const mode = content ? 'page' : 'redirect';
 
     let saved: { id: string; expiresAt: number };
