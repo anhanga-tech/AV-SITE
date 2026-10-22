@@ -63,6 +63,7 @@ NPS_INVITE_SECRET=            # HMAC-SHA256 key (lib/nps-invite.ts) — ver docs
 
 # Proposal preview (required in prod): link interno /proposta/<id>?previa=… que não conta abertura
 PROPOSAL_PREVIEW_SECRET=      # HMAC-SHA256 key (lib/proposal-preview.ts) — ver docs/ops/proposta-link.md
+PROPOSAL_API_SECRET=          # Bearer do bot comercial em /api/create-proposal — ver docs/ops/proposta-link.md
 
 # Rate limiting (required in prod — module-level state resets per request on Cloudflare)
 UPSTASH_REDIS_REST_URL=
@@ -127,6 +128,7 @@ Handlers rodam como Cloudflare Pages Functions (via `functions/`). O campo `expo
 | `submit-nps.ts` | Post-trip NPS form → Odoo `res.partner` (`x_nps_score` + nota; sem oportunidade). Requer convite assinado (`token`, `lib/nps-invite.ts`) — identidade nunca vem do corpo da requisição |
 | `submit-quiz.ts` | Travel quiz results → Odoo `res.partner` (ToFu, sem oportunidade) |
 | `purchase-dispatch.ts` | Receives n8n purchase events; validates `N8N_WEBHOOK_SECRET` |
+| `create-proposal.ts` | Internal: sales bot creates a `/proposta/<id>` link (Bearer `PROPOSAL_API_SECRET`); returns the customer and signed preview links |
 | `auth.ts` / `auth/callback.ts` | GitHub OAuth for Decap CMS `/admin` |
 | `health.ts` | Health check |
 | `markdown.ts` | Serves blog content as Markdown (content negotiation) |

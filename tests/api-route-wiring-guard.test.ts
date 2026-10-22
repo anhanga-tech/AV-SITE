@@ -13,6 +13,7 @@ const DEV_ROUTE_EXCEPTIONS: Record<string, string> = {
     auth: 'Decap CMS OAuth; local CMS editing uses `pnpm cms:proxy` instead',
     'auth/callback': 'Decap CMS OAuth; local CMS editing uses `pnpm cms:proxy` instead',
     'purchase-dispatch': 'inbound n8n webhook; never called by the browser',
+    'create-proposal': 'internal endpoint for the sales bot; never called by the browser',
 };
 
 // Discovery endpoints are served under /.well-known/ rather than /api/.
