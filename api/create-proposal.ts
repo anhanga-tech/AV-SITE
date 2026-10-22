@@ -62,7 +62,7 @@ const BodySchema = z.discriminatedUnion('type', [
 ]);
 
 type FallbackReason = 'pages_disabled' | 'invalid_token' | 'timeout' | 'http_error' | 'unexpected_response'
-    | 'unexpected_shape' | 'unsupported_quotation' | 'total_mismatch' | 'quotation_expired' | 'invalid_content';
+    | 'unexpected_shape' | 'unsupported_quotation' | 'total_mismatch' | 'invalid_content';
 
 /** Default off until the privacy policy covers proposal pages (#1925). */
 function arePagesEnabled(): boolean {
@@ -103,6 +103,7 @@ type ErrorCode =
     | 'SERVICE_UNAVAILABLE'
     | 'VALIDATION_ERROR'
     | 'REDIRECT_NOT_ALLOWED'
+    | 'QUOTATION_EXPIRED'
     | 'STORE_UNAVAILABLE';
 
 function json(body: Record<string, unknown>, status: number, requestId: string, headers: Record<string, string> = {}): Response {
@@ -209,10 +210,15 @@ export async function handleCreateProposal(request: Request, deps: CreateProposa
     const requestedSeconds = (body.validityDays ?? MAX_VALIDITY_DAYS) * 24 * 60 * 60;
     const quotationExpiresAt = built && 'content' in built ? built.quotationExpiresAt : undefined;
     const remainingSeconds = quotationExpiresAt === undefined ? requestedSeconds : Math.floor((quotationExpiresAt - now) / 1000);
-    const expired = remainingSeconds < 1;
-    const content = built && 'content' in built && !expired ? built.content : undefined;
-    const validitySeconds = content ? Math.min(requestedSeconds, remainingSeconds) : requestedSeconds;
-    const fallbackReason = built && 'fallbackReason' in built ? built.fallbackReason : expired && built ? 'quotation_expired' : undefined;
+    if (remainingSeconds < 1) {
+        // A redirect would keep the operator's booking token live past the
+        // quotation itself (#1925): the bot needs a new quotation instead.
+        logger.warn('CREATE_PROPOSAL', { requestId, stage: 'quotation_expired' });
+        return fail(requestId, 409, 'QUOTATION_EXPIRED', 'A cotação da operadora já venceu.');
+    }
+    const content = built && 'content' in built ? built.content : undefined;
+    const validitySeconds = Math.min(requestedSeconds, remainingSeconds);
+    const fallbackReason = built && 'fallbackReason' in built ? built.fallbackReason : undefined;
     const mode = content ? 'page' : 'redirect';
 
     let saved: { id: string; expiresAt: number };

@@ -337,7 +337,7 @@ A **exibição** da proposta tem base em procedimentos preliminares a contrato, 
 
 **É proporcional?** Sim. O registro não guarda o IP, só um hash com sal que deixa de ser vinculável em até 2 dias; localização em nível de cidade; tipo de aparelho em três categorias, sem user agent completo. O aviso ao assistente leva só identificadores e horários.
 
-**Poderia ser menos invasivo?** A localização aproximada poderia ser dispensada. É mantida porque ajuda o consultor a reconhecer um link repassado, e nunca sai do registro para o aviso.
+**Poderia ser menos invasivo?** Sim, hoje. Nenhum fluxo consome país, cidade, tipo de aparelho ou o hash do IP: só a contagem e os horários seguem para o Odoo e para o assistente (`lib/proposal-page.ts`). A finalidade declarada (distinguir reabertura do cliente de link repassado) só se sustenta se esses campos forem mostrados ao consultor, por exemplo no aviso da P7 ([#1903](https://github.com/anhanga-tech/AV-SITE/issues/1903)). **Decisão pendente do Encarregado antes da vigência:** parar de coletar esses campos ou expô-los ao consultor.
 
 ### 6.4 Balancing test
 
@@ -370,6 +370,7 @@ A **exibição** da proposta tem base em procedimentos preliminares a contrato, 
 - [x] Aviso no rodapé da página com link para a política
 - [ ] **Pendente:** aprovação deste texto e da seção 5.10 da política pelo Encarregado (#1925)
 - [ ] **Pendente:** confirmar retenção e suboperadores do Cursor (matriz 2.14)
+- [ ] **Pendente:** país, cidade, aparelho e hash do IP sem consumidor hoje (ver 6.3): remover a coleta ou mostrar ao consultor
 - [ ] **Pendente:** avaliar um aviso curto na mensagem de WhatsApp que envia o link, para informar antes da primeira abertura
 
 ---
