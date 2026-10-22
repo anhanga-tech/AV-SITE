@@ -10,7 +10,8 @@
  * (P2); until then an active proposal renders a short holding page.
  *
  * Each customer GET of an active proposal is recorded (lib/proposal-opens.ts,
- * #1897). Link previews and the signed internal preview are not.
+ * #1897). Link previews and the signed internal preview are not. A redirect
+ * proposal (#1896) answers 302 to the operator's page.
  */
 import { isLinkPreviewRequest } from './link-preview-agents';
 import { recordProposalOpen, type ProposalOpensRedis } from './proposal-opens';
@@ -134,6 +135,16 @@ function htmlResponse(kind: PageKind, method: string, internalPreview = false): 
     return new Response(body, { status: STATUS_BY_PAGE[kind], headers: SECURITY_HEADERS });
 }
 
+/**
+ * Tracked redirect to the operator's page (#1896). `redirectUrl` was checked
+ * against the allowlist when loaded (lib/proposal-store.ts). `no-referrer`
+ * keeps the proposal URL, and so its id, out of the operator's logs.
+ */
+function redirectResponse(redirectUrl: string): Response {
+    const { 'Content-Type': _contentType, ...headers } = SECURITY_HEADERS;
+    return new Response(null, { status: 302, headers: { ...headers, Location: redirectUrl } });
+}
+
 export interface ProposalPageDeps {
     redis?: ProposalOpensRedis | null;
     now?: () => number;
@@ -152,16 +163,22 @@ export async function handleProposalRequest(
 
     const lookup = await loadProposal(id, deps);
     if (lookup.status !== 'active') return htmlResponse(lookup.status, request.method);
+    const { redirectUrl } = lookup.proposal;
+
+    // Link previews get the Anhangá page even on a redirect proposal: the chat
+    // card stays ours and the operator link (a booking credential) is never
+    // handed to the preview servers.
+    if (isLinkPreviewRequest(request)) return htmlResponse('active', request.method);
 
     if (await isProposalPreviewRequest(request, id)) {
-        return htmlResponse('active', request.method, true);
+        return redirectUrl ? redirectResponse(redirectUrl) : htmlResponse('active', request.method, true);
     }
 
-    if (!isLinkPreviewRequest(request)) {
-        const recording = recordProposalOpen(request, id, deps);
-        if (deps.waitUntil) deps.waitUntil(recording);
-        else await recording;
-    }
+    // After the response via waitUntil, which keeps the isolate alive until the
+    // write finishes — so the 302 isn't held back by the Redis round trips.
+    const recording = recordProposalOpen(request, id, deps);
+    if (deps.waitUntil) deps.waitUntil(recording);
+    else await recording;
 
-    return htmlResponse('active', request.method);
+    return redirectUrl ? redirectResponse(redirectUrl) : htmlResponse('active', request.method);
 }
