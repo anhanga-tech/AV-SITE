@@ -1,6 +1,6 @@
 # Link de proposta (`/proposta/<id>`)
 
-Épico [#1894](https://github.com/anhanga-tech/AV-SITE/issues/1894). Este documento cobre a rota (P1, #1895), o scrub no Sentry (P4, #1898) o registro de aberturas (P3, #1897), o redirect rastreado (P2, #1896), o endpoint interno de criação (P5, #1899), o webhook de abertura (P6, #1900), as notas no Odoo (P8, #1904) e a página da proposta (P9, #1901). As próximas fases acrescentam aqui o que mudarem.
+Épico [#1894](https://github.com/anhanga-tech/AV-SITE/issues/1894). Este documento cobre a rota (P1, #1895), o scrub no Sentry (P4, #1898) o registro de aberturas (P3, #1897), o redirect rastreado (P2, #1896), o endpoint interno de criação (P5, #1899), o webhook de abertura (P6, #1900), as notas no Odoo (P8, #1904), a página da proposta (P9, #1901) e o adaptador Infotravel (P11, #1906). As próximas fases acrescentam aqui o que mudarem.
 
 ## O que existe
 
@@ -71,10 +71,11 @@ Content-Type: application/json
 { "type": "redirect", "redirectUrl": "<link da operadora>", "leadId": 1234, "validityDays": 15 }
 ```
 
-- `type`: na fase 1, só `redirect`. As propostas aérea (P10, #1905) e da Infotravel extraída (P11, #1906) entram com os respectivos templates.
+- `type`: `redirect` (redirect rastreado) ou `infotravel` (página montada a partir da cotação; ver "Adaptador Infotravel"). A proposta aérea (P10, #1905) entra depois.
 - `redirectUrl`: link de operadora na allowlist (ver "Redirect rastreado"); fora dela, 400 `REDIRECT_NOT_ALLOWED`.
 - `leadId`: id do `crm.lead` no Odoo, gravado no registro para o webhook de abertura (P6, #1900).
 - `validityDays`: opcional, de 1 a 15 (padrão 15, decisão D5). O bot pode encurtar, nunca estender.
+- `firstName` (só em `infotravel`): nome do cliente, enviado pelo bot. A página mostra só a primeira palavra (D6). O contato da cotação é o agente, nunca o cliente.
 - Campos extras são recusados (400 `VALIDATION_ERROR`).
 
 Resposta 201:
@@ -151,6 +152,25 @@ Uma proposta guarda **ou** `redirectUrl` (redirect rastreado) **ou** `content` (
 - **Prévias de link** (WhatsApp etc.) continuam recebendo a página genérica, sem nome, hotel ou preço. A prévia interna (`?previa=`) mostra a página completa com o aviso.
 - **Rodapé:** aviso de que a abertura é registrada (data, hora, cidade aproximada, aparelho), com link para `/politica-privacidade`.
 - **Conversão:** `fromInfotravelNormalized` (`lib/proposal-infotravel.ts`) transforma o JSON normalizado da Infotravel (`main.getBooking` + `main.getHotel`) nesse conteúdo. O adaptador que gera o normalizado a partir da API é a P11 (#1906). O fixture em `tests/fixtures/` é a cotação de teste com o roteiro deslocado e números fictícios. Os arquivos brutos da API têm dados reais do cliente e não entram no repositório.
+
+## Adaptador Infotravel (P11)
+
+`type: "infotravel"` com o link do orçamento em `redirectUrl` (`https://premium.infotravel.com.br/orcamento-web/pt/link?token=…`):
+
+1. O token sai da query bruta do link; o `companyCode` sai do próprio token (base64 de `RCA | <reserva> | <hash>`).
+2. `services/infotravel.ts` faz os mesmos dois GETs públicos que a página da operadora faz, sem login: `main.getBooking` (`{token, clientUrl}`) e `main.getHotel` (`{companyCode, hotelKey}`), em `https://premium.infotravel.com.br/orcamento-web/api/trpc/…?batch=1&input=…`. Host fixo, prazo total de 6 s.
+3. `lib/infotravel-normalize.ts` monta o JSON normalizado e confere: um pacote, um quarto, tudo em BRL, `status: QUOTATION`, nenhuma categoria que a página não mostra (seguro, carro, trem…) e **total = soma de todos os preços ao centavo** (inclui o ajuste de comissão, que nunca aparece).
+4. `fromInfotravelNormalized` (P9) gera o conteúdo, e a proposta é salva como página.
+
+Qualquer falha cai no **redirect rastreado** para o mesmo link (P2). A resposta traz `mode: "page" | "redirect"` e, no redirect, `fallbackReason`: `pages_disabled`, `invalid_token`, `timeout`, `http_error`, `unexpected_response`, `unexpected_shape`, `unsupported_quotation`, `total_mismatch` ou `invalid_content`.
+
+Nunca copiados da cotação: `contact`/`user` (o agente), `client` (a agência, com CNPJ), `unit` (unidade RCA), localizadores, `textDoc` (formas de pagamento da operadora), observações do fornecedor (telefone de plantão) e logos.
+
+**Liga/desliga:** `PROPOSAL_PAGES_ENABLED=true` libera as páginas. **Padrão desligado**: até a política de privacidade cobrir a página da proposta (#1925), todo `infotravel` vira redirect com `fallbackReason: "pages_disabled"`.
+
+O token vai duas vezes na URL da API (`input`): ele nunca é logado, e o parâmetro `input` é redigido no Sentry (`lib/error-tracking.ts`).
+
+O endpoint é síncrono: até 6 s na operadora + até 8 s no Odoo. O timeout do bot deve ser de pelo menos 20 s.
 
 ## Headers
 

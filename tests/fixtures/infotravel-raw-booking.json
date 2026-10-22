@@ -1,0 +1,388 @@
+[
+  {
+    "result": {
+      "data": {
+        "json": {
+          "id": 9900001,
+          "status": "QUOTATION",
+          "type": "HOTEL_FLIGHT_PACKAGE",
+          "contact": {
+            "name": "Agente Ficticio da Silva",
+            "email": "agente.ficticio@example.test",
+            "telephone": "1100000000",
+            "areaCode": "11"
+          },
+          "createdAt": "2027-01-20T10:00:00-03:00",
+          "bookingAmount": {
+            "currency": "BRL",
+            "amount": 6633.45
+          },
+          "client": {
+            "id": 990001,
+            "name": "AGENCIA FICTICIA",
+            "email": "contato@agencia.example.test",
+            "documents": [
+              {
+                "type": "CNPJ",
+                "number": "00.000.000/0001-91"
+              }
+            ]
+          },
+          "user": {
+            "id": 990002,
+            "name": "Agente Ficticio da Silva",
+            "email": "agente.ficticio@example.test",
+            "telephones": [
+              "11999990000"
+            ]
+          },
+          "unit": {
+            "id": 2,
+            "name": "RCA TOURS - UNIDADE FICTICIA"
+          },
+          "bookingPackages": [
+            {
+              "id": 990003,
+              "fares": [
+                {
+                  "type": "RAV_COMMISSION",
+                  "price": {
+                    "currency": "BRL",
+                    "amount": 152.85,
+                    "exchange": 1
+                  },
+                  "discount": false,
+                  "description": "Ajuste comissão"
+                }
+              ],
+              "bookingHotels": [
+                {
+                  "status": "QUOTATION",
+                  "hotel": {
+                    "id": 990004,
+                    "keyDetail": "RklDVElDSU8jMDAjMDAwMDAw",
+                    "name": "Reserva Praia Hotel - Balneário Camboriú"
+                  },
+                  "rooms": [
+                    {
+                      "roomType": {
+                        "code": "1",
+                        "name": "Suíte   com Vista ao Mar"
+                      },
+                      "fares": [
+                        {
+                          "type": "FARE",
+                          "price": {
+                            "currency": "BRL",
+                            "amount": 2316.23,
+                            "exchange": 1
+                          },
+                          "discount": false
+                        }
+                      ],
+                      "boardType": {
+                        "name": "Café da manhã com buffet incluido"
+                      },
+                      "cancellationPolicies": {
+                        "refundable": false,
+                        "penalties": [
+                          {
+                            "name": "Politica de cancelamento",
+                            "description": "Tarifa não reembolsável",
+                            "price": {
+                              "currency": "BRL",
+                              "amount": 1702.43
+                            }
+                          }
+                        ]
+                      },
+                      "checkIn": "2027-03-10T00:00:00",
+                      "checkOut": "2027-03-13T00:00:00",
+                      "names": [
+                        {
+                          "age": 34,
+                          "type": "ADT",
+                          "roomNumber": 1
+                        },
+                        {
+                          "age": 31,
+                          "type": "ADT",
+                          "roomNumber": 1
+                        }
+                      ]
+                    }
+                  ],
+                  "locators": [
+                    {
+                      "code": "9900005",
+                      "type": "INTERNAL"
+                    }
+                  ],
+                  "provider": "HOTELDO"
+                }
+              ],
+              "bookingFlights": [
+                {
+                  "status": "QUOTATION",
+                  "names": [
+                    {
+                      "age": 34,
+                      "type": "ADT",
+                      "roomNumber": 1
+                    },
+                    {
+                      "age": 31,
+                      "type": "ADT",
+                      "roomNumber": 1
+                    }
+                  ],
+                  "fares": [
+                    {
+                      "type": "FARE",
+                      "price": {
+                        "currency": "BRL",
+                        "amount": 2872.13,
+                        "exchange": 1
+                      },
+                      "discount": false
+                    },
+                    {
+                      "type": "BOARDING_RATE",
+                      "price": {
+                        "currency": "BRL",
+                        "amount": 124.28,
+                        "exchange": 1
+                      },
+                      "discount": false,
+                      "description": "Taxa conector"
+                    },
+                    {
+                      "type": "BOARDING_RATE",
+                      "price": {
+                        "currency": "BRL",
+                        "amount": 101.14,
+                        "exchange": 1
+                      },
+                      "discount": false,
+                      "description": "Taxa conector"
+                    }
+                  ],
+                  "flights": [
+                    {
+                      "airline": {
+                        "code": "LA",
+                        "name": "Latam",
+                        "logo": "https://reservasonline.rcaturismo.com.br/infotravel/resources/images/ciaaerea/LA.png"
+                      },
+                      "fareFlight": {
+                        "description": "LIGHT"
+                      },
+                      "origin": {
+                        "code": "CGH",
+                        "airportName": "CONGONHAS AIRPORT",
+                        "city": {
+                          "name": "São Paulo"
+                        }
+                      },
+                      "destination": {
+                        "code": "NVT",
+                        "airportName": "NAVEGANTES AIRPORT",
+                        "city": {
+                          "name": "Navegantes"
+                        }
+                      },
+                      "departure": "2027-03-10T18:35:00-03:00",
+                      "arrival": "2027-03-10T19:40:00-03:00",
+                      "number": "9101",
+                      "duration": "01:05",
+                      "stopsCount": 0
+                    },
+                    {
+                      "airline": {
+                        "code": "LA",
+                        "name": "Latam",
+                        "logo": "https://reservasonline.rcaturismo.com.br/infotravel/resources/images/ciaaerea/LA.png"
+                      },
+                      "fareFlight": {
+                        "description": "LIGHT"
+                      },
+                      "origin": {
+                        "code": "NVT",
+                        "airportName": "NAVEGANTES AIRPORT",
+                        "city": {
+                          "name": "Navegantes"
+                        }
+                      },
+                      "destination": {
+                        "code": "GRU",
+                        "airportName": "GUARULHOS AIRPORT",
+                        "city": {
+                          "name": "São Paulo"
+                        }
+                      },
+                      "departure": "2027-03-13T10:10:00-03:00",
+                      "arrival": "2027-03-13T11:25:00-03:00",
+                      "number": "9102",
+                      "duration": "01:15",
+                      "stopsCount": 0
+                    }
+                  ]
+                }
+              ],
+              "bookingTours": [
+                {
+                  "status": "QUOTATION",
+                  "provider": "LOCALTRIP",
+                  "fares": [
+                    {
+                      "type": "FARE",
+                      "price": {
+                        "currency": "BRL",
+                        "amount": 204.08,
+                        "exchange": 1
+                      },
+                      "discount": false
+                    }
+                  ],
+                  "names": [
+                    {
+                      "age": 34,
+                      "type": "ADT",
+                      "roomNumber": 1
+                    },
+                    {
+                      "age": 31,
+                      "type": "ADT",
+                      "roomNumber": 1
+                    }
+                  ],
+                  "tour": {
+                    "provider": "VIP MAR TURISMO & RECEPTIVO",
+                    "name": "PASSEIO AO BETO CARRERO WORLD (sem ingresso)",
+                    "date": "2027-03-11T00:00:00",
+                    "description": "<p class=\"ql-align-justify\"><strong>Um dos maiores parques</strong> da Am&eacute;rica Latina.</p><p>Ap&oacute;s o &uacute;ltimo show, traslado ao hotel &amp; fim.</p>",
+                    "observation": "Plantão fictício 47 9 00000000",
+                    "providerDetail": {
+                      "id": 990006,
+                      "name": "VIP MAR TURISMO & RECEPTIVO"
+                    }
+                  },
+                  "locators": [
+                    {
+                      "code": "9900007",
+                      "type": "INTERNAL"
+                    }
+                  ]
+                }
+              ],
+              "bookingTickets": [
+                {
+                  "status": "QUOTATION",
+                  "provider": "BETO CARRERO",
+                  "fares": [
+                    {
+                      "type": "FARE",
+                      "price": {
+                        "currency": "BRL",
+                        "amount": 345.73,
+                        "exchange": 1
+                      },
+                      "discount": false
+                    }
+                  ],
+                  "names": [
+                    {
+                      "age": 34,
+                      "type": "ADT",
+                      "roomNumber": 1
+                    },
+                    {
+                      "age": 31,
+                      "type": "ADT",
+                      "roomNumber": 1
+                    }
+                  ],
+                  "ticket": {
+                    "name": "P. 01 DIA ANTECIPADO - 2º Lote",
+                    "start": "2027-03-11T00:00:00-03:00",
+                    "description": "PASSAPORTE ACESSO - Válido por 1 dia."
+                  },
+                  "locators": [
+                    {
+                      "code": "9900008",
+                      "type": "INTERNAL"
+                    }
+                  ]
+                }
+              ],
+              "bookingTransfers": [
+                {
+                  "status": "QUOTATION",
+                  "provider": "LOCALTRIP",
+                  "fares": [
+                    {
+                      "type": "FARE",
+                      "price": {
+                        "currency": "BRL",
+                        "amount": 517.01,
+                        "exchange": 1
+                      },
+                      "discount": false
+                    }
+                  ],
+                  "names": [
+                    {
+                      "age": 34,
+                      "type": "ADT",
+                      "roomNumber": 1
+                    },
+                    {
+                      "age": 31,
+                      "type": "ADT",
+                      "roomNumber": 1
+                    }
+                  ],
+                  "transfer": {
+                    "provider": "VIP MAR TURISMO & RECEPTIVO",
+                    "name": "Traslado IDA (IN) + RETORNO (OUT) Aeroporto Navegantes (NVT) | Balneário Camboriú",
+                    "type": "ROUND_TRIP"
+                  },
+                  "cancellationPolicies": {
+                    "refundable": true,
+                    "penalties": [
+                      {
+                        "name": "CANCELAMENTO",
+                        "description": "CANCELAMENTO\nA partir de 08/03/2027 às 00:00:00 será cobrado BRL 380,00 de penalização.",
+                        "price": {
+                          "currency": "BRL",
+                          "amount": 380
+                        }
+                      }
+                    ]
+                  },
+                  "locators": [
+                    {
+                      "code": "9900009",
+                      "type": "INTERNAL"
+                    }
+                  ]
+                }
+              ],
+              "bookingBusList": null,
+              "bookingInsurances": null,
+              "bookingServicePackages": null,
+              "bookingServiceOthers": null,
+              "bookingVehicles": null,
+              "bookingCircuits": null,
+              "bookingExperiences": null,
+              "bookingChips": null,
+              "bookingTrains": null
+            }
+          ],
+          "textDoc": "<div>Formas de Pagamento - RCA Parcelado: Financiamento em até 10 vezes no boleto Santander.</div>",
+          "localTrip": false
+        }
+      }
+    }
+  }
+]

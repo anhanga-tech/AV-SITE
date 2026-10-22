@@ -64,6 +64,7 @@ NPS_INVITE_SECRET=            # HMAC-SHA256 key (lib/nps-invite.ts) — ver docs
 # Proposal preview (required in prod): link interno /proposta/<id>?previa=… que não conta abertura
 PROPOSAL_PREVIEW_SECRET=      # HMAC-SHA256 key (lib/proposal-preview.ts) — ver docs/ops/proposta-link.md
 PROPOSAL_API_SECRET=          # Bearer do bot comercial em /api/create-proposal — ver docs/ops/proposta-link.md
+PROPOSAL_PAGES_ENABLED=       # 'true' libera propostas com página (type infotravel); padrão desligado até a #1925
 PROPOSAL_WEBHOOK_URL=         # Receptor (https) do aviso de abertura de proposta (lib/proposal-webhook.ts)
 PROPOSAL_WEBHOOK_SECRET=      # HMAC-SHA256 do aviso de abertura; o mesmo valor no receptor
 
