@@ -9,6 +9,7 @@ import {
     createProposalRef,
     notifyProposalOpen,
     PROPOSAL_REOPEN_NOTIFY_GAP_MS,
+    signProposalWebhook,
     verifyProposalWebhook,
     type ProposalOpenedPayload,
     type ProposalWebhookEnvelope,
@@ -306,6 +307,11 @@ test('the receiver rejects a tampered payload, a stale ts or another secret', as
     assert.equal(await verify({ body: { ...envelope, ts: String(envelope.ts) } }), null);
     assert.equal(await verify({ body: { payload: envelope.payload } }), null);
     assert.equal(await verify({ body: 'not json' }), null);
+    // A correctly signed text that isn't a proposal.opened payload is still refused.
+    for (const payload of ['{}', 'not json', JSON.stringify({ ...JSON.parse(envelope.payload), leadId: '1' })]) {
+        const signed = { payload, ts: envelope.ts, signature: await signProposalWebhook(WEBHOOK_SECRET, envelope.ts, payload) };
+        assert.equal(await verify({ body: signed }), null, payload);
+    }
     assert.equal(await verify({ body: null }), null);
 });
 

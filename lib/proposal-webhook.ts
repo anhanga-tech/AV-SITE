@@ -26,6 +26,8 @@
  *
  * Never log the webhook URL, the key, the id or the lead id.
  */
+import { z } from 'zod';
+
 import { logger } from './logger';
 import { timingSafeEqual } from './security';
 
@@ -40,16 +42,18 @@ const USER_AGENT = 'Anhanga-Proposal-Webhook/1';
 const ATTEMPT_TIMEOUT_MS = 5_000;
 const RETRY_DELAYS_MS = [1_000, 3_000];
 
-export interface ProposalOpenedPayload {
-    event: 'proposal.opened';
-    eventId: string;
-    proposalRef: string;
-    leadId: number;
-    openCount: number;
-    isFirstOpen: boolean;
-    openedAt: string;
-    previousOpenAt: string | null;
-}
+const proposalOpenedPayloadSchema = z.strictObject({
+    event: z.literal('proposal.opened'),
+    eventId: z.string().regex(/^[0-9a-f]{32}:\d+$/),
+    proposalRef: z.string().regex(/^[0-9a-f]{32}$/),
+    leadId: z.number().int().positive(),
+    openCount: z.number().int().positive(),
+    isFirstOpen: z.boolean(),
+    openedAt: z.iso.datetime(),
+    previousOpenAt: z.iso.datetime().nullable(),
+});
+
+export type ProposalOpenedPayload = z.infer<typeof proposalOpenedPayloadSchema>;
 
 /** The body sent to the receiver: the signed payload text and its signature. */
 export interface ProposalWebhookEnvelope {
@@ -118,7 +122,8 @@ export async function signProposalWebhook(secret: string, timestamp: number, pay
 /**
  * Receiver-side check of the envelope (raw JSON text or already parsed): a
  * valid signature of this exact payload text, with a `ts` no more than five
- * minutes from `now`. Returns the parsed payload, or null.
+ * minutes from `now`, and a payload of the expected shape. Returns the
+ * parsed payload, or null.
  */
 export async function verifyProposalWebhook(input: {
     body: unknown;
@@ -140,11 +145,14 @@ export async function verifyProposalWebhook(input: {
     const nowSeconds = Math.floor((input.now ?? Date.now()) / 1000);
     if (Math.abs(nowSeconds - timestamp) > PROPOSAL_WEBHOOK_SIGNATURE_TOLERANCE_SECONDS) return null;
     if (!timingSafeEqual(await signProposalWebhook(input.secret, timestamp, payload), signature)) return null;
+    let parsed: unknown;
     try {
-        return JSON.parse(payload) as ProposalOpenedPayload;
+        parsed = JSON.parse(payload);
     } catch {
         return null;
     }
+    const result = proposalOpenedPayloadSchema.safeParse(parsed);
+    return result.success ? result.data : null;
 }
 
 function isRetryable(status: number): boolean {

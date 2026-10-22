@@ -115,7 +115,7 @@ Content-Type: application/json
 User-Agent: Anhanga-Proposal-Webhook/1
 Authorization: Bearer <PROPOSAL_WEBHOOK_KEY>
 
-{ "payload": "<o JSON abaixo, como texto>", "signature": "v1=<hex HMAC-SHA256 de \"<ts>.<payload>\">", "ts": 1792683000 }
+{ "payload": "<o JSON abaixo, como texto>", "signature": "v1=<hex HMAC-SHA256 de \"<ts>.<payload>\">", "ts": 1792693800 }
 ```
 
 `payload`, depois do parse:
@@ -138,7 +138,7 @@ Authorization: Bearer <PROPOSAL_WEBHOOK_KEY>
 3. Recusar `ts` a mais de 5 minutos do relógio.
 4. Só então fazer o parse de `payload` e ignorar um `eventId` já processado.
 
-Em TypeScript, `verifyProposalWebhook` de `lib/proposal-webhook.ts` faz os passos 1 a 3 e devolve o payload (ou `null`).
+Em TypeScript, `verifyProposalWebhook` de `lib/proposal-webhook.ts` faz os passos 1 a 3, confere o formato do payload e devolve o payload (ou `null`).
 
 **Configurar no Cloudflare Pages** (Production e Preview):
 - `PROPOSAL_WEBHOOK_URL`: o endereço do gatilho da automação da Clara (`https`, sem query string).
