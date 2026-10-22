@@ -163,7 +163,7 @@ Requisições feitas direto pelo navegador do visitante, fora do consentimento d
 | media.staticontent.com | Fotos de hotéis na página de proposta, como acima | `lib/proposal-template.ts`, `lib/proposal-page.ts` | `a confirmar` — responsável pelo domínio não identificado | Idem |
 | unpkg (Cloudflare) | Bundle do Decap CMS em `/admin/` — rota **publicamente acessível**: qualquer visitante ou robô que a abra baixa o script antes de qualquer autenticação, então não é fluxo só de colaborador. O `X-Robots-Tag: noindex` de `public/_headers` desestimula indexação, não é controle de acesso | `public/admin/index.html` | `a confirmar` | Versionar o bundle do CMS no repositório (elimina a requisição), ou colocar a rota atrás de autenticação na borda |
 
-Campos de transferência dos três, no formato das entradas de operador — preenchidos na medida do que dá para afirmar:
+Campos de transferência dos destinatários da tabela acima, no formato das entradas de operador — preenchidos na medida do que dá para afirmar:
 
 | Campo | Detalhe |
 |---|---|
@@ -233,7 +233,7 @@ Campos de transferência dos três, no formato das entradas de operador — pree
 |---|---|
 | **Importador** | Anysphere, Inc. (EUA), que opera a plataforma Cursor |
 | **Serviços em uso** | Automação do Cursor que roda o assistente comercial (Clara). O site faz `POST` no gatilho da automação a cada abertura que gera aviso (`lib/proposal-webhook.ts`, #1900) |
-| **Dados** | Envelope assinado com `leadId` do Odoo, `proposalRef` (hash do id, sem o id), `openCount`, `isFirstOpen`, `openedAt` e `previousOpenAt`. Sem o link, o id, os dados da viagem ou dados de contato — `código`. O assistente também lê o lead no Odoo para preparar o rascunho de retorno — fluxo fora do site, `a confirmar` o escopo do acesso |
+| **Dados** | Envelope assinado com `leadId` do Odoo, `proposalRef` (hash do id, sem o id), `openCount`, `isFirstOpen`, `openedAt` e `previousOpenAt`. Sem o link, o id, os dados da viagem ou dados de contato — `código`. **Fora do envelope:** o assistente lê o lead no Odoo para preparar o rascunho de retorno, e ali estão a nota "Proposta enviada" com o link do cliente e os dados de contato do lead. A Anysphere, portanto, tem acesso a esses dados pela leitura do CRM — escopo exato da leitura `a confirmar`; restringir a uma lista de campos permitidos |
 | **Finalidade** | Preparar o rascunho de retorno comercial para revisão de um consultor; nenhuma mensagem sai ao cliente sem aprovação humana (#1903) |
 | **Duração** | Retenção dos registros de execução da automação no Cursor — `a confirmar` |
 | **País/região** | EUA — `a confirmar` |
@@ -287,7 +287,7 @@ O que depende de acesso a painéis, contas e contratos — e portanto não sai d
 
 | Versão | Data | Alteração |
 |---|---|---|
-| 0.16 | 22/10/2026 | Link de proposta (#1894, #1925): notas no Odoo (2.5), proposta (página ou link da operadora no redirect) e aberturas no Upstash (2.6), fotos de hotéis carregadas dos domínios da operadora (2.9) e Anysphere, Inc. (Cursor) como operador do assistente comercial (2.14) |
+| 0.16 | 22/10/2026 | Link de proposta (#1894, #1925): notas no Odoo (2.5), proposta (página ou link da operadora no redirect) e aberturas no Upstash (2.6), fotos de hotéis carregadas de domínios externos — um da Infotravel, outro com responsável a identificar (2.9) e Anysphere, Inc. (Cursor) como operador do assistente comercial (2.14) |
 | 0.15 | 13/10/2026 | Traks (2.3): UTM e click IDs saem da URL antes do coletor quando não há consentimento de medição registrado (issues #1543 e #1545). O script analítico segue carregando por legítimo interesse |
 | 0.14 | 12/10/2026 | IP do rate limit pseudonimizado com HMAC antes do Upstash e dos logs enviados ao Sentry (2.6, 2.7, [#1642](https://github.com/anhanga-tech/AV-SITE/issues/1642)); removida a oportunidade de minimização da 2.6. O log de sucesso do OAuth permanece com IP em claro — [#1831](https://github.com/anhanga-tech/AV-SITE/issues/1831) |
 | 0.13 | 11/10/2026 | Fontes das landings auto-hospedadas (#1641), links sem uso removidos de Beto Carrero; Google Fonts sai dos serviços ativos (2.2) e da política (6.1) |
