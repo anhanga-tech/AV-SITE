@@ -122,6 +122,19 @@ test('the raw IP is never stored, only a hash with a salt that changes every day
     for (const [, entry] of salts) assert.ok(entry.expiresAt - clock.now <= 2 * DAY_MS, 'salts are deleted within 2 days');
 });
 
+test('the same network opening two proposals on the same day gets unrelated hashes', async () => {
+    const { deps, listOf } = setup();
+    const { id } = await saveProposal({}, deps);
+    const { id: otherId } = await saveProposal({}, deps);
+
+    await handleProposalRequest(open(id, { userAgent: UA.iphone }), id, deps);
+    await handleProposalRequest(open(otherId, { userAgent: UA.iphone }), otherId, deps);
+
+    const [first] = listOf(opensKey(id)) as Array<{ ipHash: string }>;
+    const [second] = listOf(opensKey(otherId)) as Array<{ ipHash: string }>;
+    assert.notEqual(first.ipHash, second.ipHash);
+});
+
 test('opens are kept at most 90 days from the first one; reopening does not extend it', async () => {
     const { clock, deps, listTtlMs } = setup();
     const { id } = await saveProposal({}, deps);

@@ -29,7 +29,7 @@ O conteúdo some no instante em que o link expira. O tombstone existe só para r
 
 - `at` em UTC; quem exibe converte para o horário de São Paulo.
 - País e cidade aproximados vêm do `request.cf` da Cloudflare. Coordenadas e CEP não são gravados.
-- O IP nunca é gravado. O `ipHash` usa um sal aleatório que muda a cada dia (UTC) e é apagado em até 2 dias; depois disso o hash não pode mais ser ligado a um IP, nem por quem tem os segredos. No mesmo dia, a mesma rede gera o mesmo hash, o que basta para separar "o cliente reabriu" de "outra pessoa abriu".
+- O IP nunca é gravado. O `ipHash` usa um sal aleatório que muda a cada dia (UTC) e é apagado em até 2 dias; depois disso o hash não pode mais ser ligado a um IP, nem por quem tem os segredos. O hash também leva o id da proposta: no mesmo dia, a mesma rede gera o mesmo hash dentro de uma proposta (o que separa "o cliente reabriu" de "outra pessoa abriu"), mas hashes sem relação entre propostas diferentes.
 - A gravação roda em `waitUntil`, depois da resposta. Falha de gravação não quebra a página e é registrada só pelo nome do erro.
 
 **Não contam:**

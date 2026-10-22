@@ -93,16 +93,19 @@ async function dailySalt(redis: ProposalOpensRedis, now: number): Promise<string
     return typeof winner === 'string' && winner ? winner : null;
 }
 
-async function hashIp(request: Request, redis: ProposalOpensRedis, now: number): Promise<string | undefined> {
+// The id is part of the hash so one network opening two proposals on the same
+// day gets unrelated hashes: the log never links one customer's proposals.
+async function hashIp(request: Request, id: string, redis: ProposalOpensRedis, now: number): Promise<string | undefined> {
     const ip = getClientIP(request);
     if (!ip || ip === 'unknown') return undefined;
     const salt = await dailySalt(redis, now);
     if (!salt) return undefined;
-    return (await sha256Hex(`${salt}:${ip}`)).slice(0, IP_HASH_HEX_LENGTH);
+    return (await sha256Hex(`${salt}:${id}:${ip}`)).slice(0, IP_HASH_HEX_LENGTH);
 }
 
-export async function buildProposalOpenEvent(
+async function buildProposalOpenEvent(
     request: Request,
+    id: string,
     redis: ProposalOpensRedis,
     now: number,
 ): Promise<ProposalOpenEvent> {
@@ -113,7 +116,7 @@ export async function buildProposalOpenEvent(
     };
     const country = geoField(geo?.country);
     const city = geoField(geo?.city);
-    const ipHash = await hashIp(request, redis, now);
+    const ipHash = await hashIp(request, id, redis, now);
     if (country) event.country = country;
     if (city) event.city = city;
     if (ipHash) event.ipHash = ipHash;
@@ -134,7 +137,7 @@ export async function recordProposalOpen(
         if (!redis) return null;
 
         const now = (deps.now ?? Date.now)();
-        const event = await buildProposalOpenEvent(request, redis, now);
+        const event = await buildProposalOpenEvent(request, id, redis, now);
         const key = opensKey(id);
         // One transaction: an append whose TTL write failed would keep the
         // list past the 90 days, since nothing else expires it.
