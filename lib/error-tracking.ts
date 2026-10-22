@@ -113,10 +113,22 @@ function scrubQueryPairs(query: string): string {
  * (`/proposta/<id>`, issue #1894) has no token in its query: the random id IS
  * the bearer secret that opens the page, and Sentry reports the path in
  * `request.url`, the span name, `url.path` and the error's `transaction`.
- * Case-insensitive, and the `/` may arrive percent-encoded (`%2F`), so a
- * spelling the route would never serve is still redacted rather than leaked.
+ * Case-insensitive, and any character of `/proposta/` may arrive
+ * percent-encoded (`%2F`, `/%70roposta/`): a spelling the route would never
+ * serve still carries the id in the URL, so it is redacted rather than leaked.
  */
-const SENSITIVE_PATH_PATTERN = /((?:\/|%2f)proposta(?:\/|%2f))[^/?#\s]+/gi;
+function percentEncodableChar(char: string): string {
+    const encodings = new Set([char.toLowerCase(), char.toUpperCase()].map(
+        (variant) => `%${variant.charCodeAt(0).toString(16)}`,
+    ));
+    const literal = char === '/' ? '\\/' : char;
+    return `(?:${literal}|${[...encodings].join('|')})`;
+}
+
+const SENSITIVE_PATH_PATTERN = new RegExp(
+    `(${[...'/proposta/'].map(percentEncodableChar).join('')})[^/?#\\s]+`,
+    'gi',
+);
 
 function scrubSensitivePath(value: string): string {
     return value.replace(SENSITIVE_PATH_PATTERN, `$1${REDACTED_VALUE}`);

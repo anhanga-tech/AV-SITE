@@ -672,6 +672,8 @@ test('scrubSensitiveUrl redacts the proposal id in the path, keeping attribution
     assert.equal(scrubSensitiveUrl(`/proposta/${PROPOSAL_ID}/`), '/proposta/[redacted]/');
     assert.equal(scrubSensitiveUrl(`GET /PROPOSTA/${PROPOSAL_ID}`), 'GET /PROPOSTA/[redacted]');
     assert.equal(scrubSensitiveUrl(`/proposta%2F${PROPOSAL_ID}`), '/proposta%2F[redacted]');
+    assert.equal(scrubSensitiveUrl(`/%70roposta/${PROPOSAL_ID}`), '/%70roposta/[redacted]');
+    assert.equal(scrubSensitiveUrl(`%2F%50ROPOST%61%2f${PROPOSAL_ID}`), '%2F%50ROPOST%61%2f[redacted]');
     // A path credential and a query credential in the same URL are both redacted.
     assert.equal(
         scrubSensitiveUrl(`/proposta/${PROPOSAL_ID}?token=abc`),
