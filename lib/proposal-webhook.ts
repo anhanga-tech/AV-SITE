@@ -7,21 +7,24 @@
  * previous one. Internal previews, link previews and prefetches never record
  * an open (lib/proposal-page.ts), so they never reach this module.
  *
- * Request: POST JSON with
- * - `X-Anhanga-Timestamp`: unix seconds of the send (not of the open, which is
- *   `openedAt` in the body), so the receiver's 5-minute window holds even if
- *   delivery is ever deferred;
- * - `X-Anhanga-Signature`: `v1=` + hex HMAC-SHA256 of `<timestamp>.<raw body>`
- *   under PROPOSAL_WEBHOOK_SECRET (verify with `verifyProposalWebhook`);
- * - `X-Anhanga-Event-Id`: same as `eventId` in the body; a retry repeats it,
- *   so the receiver deduplicates on it.
+ * Request: POST JSON to PROPOSAL_WEBHOOK_URL with
+ * `Authorization: Bearer PROPOSAL_WEBHOOK_KEY` (the receiver's own key) and an
+ * envelope body `{"payload": "<JSON text>", "signature": "v1=<hex>", "ts": <unix s>}`.
+ * The receiver (a Clara automation) only sees the body, `content-type` and
+ * `user-agent`, so the signature travels inside the body:
+ * - `ts`: unix seconds of the send (not of the open, which is `openedAt` in
+ *   the payload), so the receiver's 5-minute window holds even if delivery is
+ *   ever deferred;
+ * - `signature`: `v1=` + hex HMAC-SHA256 of `<ts>.<payload>` under
+ *   PROPOSAL_WEBHOOK_SECRET (verify with `verifyProposalWebhook`);
+ * - `payload.eventId`: a retry repeats it, so the receiver deduplicates on it.
  *
  * The payload carries no proposal id or URL: the id opens the proposal and,
  * on a redirect, leads to the operator's booking token. `proposalRef` is a
  * one-way hash of the id that whoever created the proposal can recompute
  * (`createProposalRef`), and `leadId` says whose proposal it is.
  *
- * Never log the webhook URL (it may embed a token), the id or the lead id.
+ * Never log the webhook URL, the key, the id or the lead id.
  */
 import { logger } from './logger';
 import { timingSafeEqual } from './security';
@@ -31,6 +34,7 @@ export const PROPOSAL_WEBHOOK_SIGNATURE_TOLERANCE_SECONDS = 5 * 60;
 const PROPOSAL_REF_CONTEXT = 'proposta-ref:v1';
 const PROPOSAL_REF_HEX_LENGTH = 32;
 const SIGNATURE_VERSION = 'v1';
+const USER_AGENT = 'Anhanga-Proposal-Webhook/1';
 // Worst case 3 × 5 s plus 1 s + 3 s of backoff, inside the ~30 s Cloudflare
 // keeps a `waitUntil` alive after the response.
 const ATTEMPT_TIMEOUT_MS = 5_000;
@@ -45,6 +49,19 @@ export interface ProposalOpenedPayload {
     isFirstOpen: boolean;
     openedAt: string;
     previousOpenAt: string | null;
+}
+
+/** The body sent to the receiver: the signed payload text and its signature. */
+export interface ProposalWebhookEnvelope {
+    payload: string;
+    signature: string;
+    ts: number;
+}
+
+interface WebhookConfig {
+    url: string;
+    key: string;
+    secret: string;
 }
 
 export interface ProposalWebhookDeps {
@@ -71,12 +88,13 @@ async function hmacSha256Hex(secret: string, message: string): Promise<string> {
     return toHex(await crypto.subtle.sign('HMAC', key, encoder.encode(message)));
 }
 
-function getWebhookConfig(): { url: string; secret: string } | null {
+function getWebhookConfig(): WebhookConfig | null {
     const url = process.env.PROPOSAL_WEBHOOK_URL?.trim();
+    const key = process.env.PROPOSAL_WEBHOOK_KEY?.trim();
     const secret = process.env.PROPOSAL_WEBHOOK_SECRET?.trim();
-    if (!url || !secret) return null;
+    if (!url || !key || !secret) return null;
     try {
-        return new URL(url).protocol === 'https:' ? { url, secret } : null;
+        return new URL(url).protocol === 'https:' ? { url, key, secret } : null;
     } catch {
         return null;
     }
@@ -93,26 +111,40 @@ export function shouldNotifyProposalOpen(previousOpenAt: number | null, openedAt
     return previousOpenAt === null || openedAt - previousOpenAt >= PROPOSAL_REOPEN_NOTIFY_GAP_MS;
 }
 
-export async function signProposalWebhook(secret: string, timestamp: number, body: string): Promise<string> {
-    return `${SIGNATURE_VERSION}=${await hmacSha256Hex(secret, `${timestamp}.${body}`)}`;
+export async function signProposalWebhook(secret: string, timestamp: number, payload: string): Promise<string> {
+    return `${SIGNATURE_VERSION}=${await hmacSha256Hex(secret, `${timestamp}.${payload}`)}`;
 }
 
 /**
- * Receiver-side check: a valid signature of this exact body, with a
- * timestamp no more than five minutes from `now`.
+ * Receiver-side check of the envelope (raw JSON text or already parsed): a
+ * valid signature of this exact payload text, with a `ts` no more than five
+ * minutes from `now`. Returns the parsed payload, or null.
  */
 export async function verifyProposalWebhook(input: {
-    body: string;
-    timestamp: string | null;
-    signature: string | null;
+    body: unknown;
     secret: string;
     now?: number;
-}): Promise<boolean> {
-    if (!input.timestamp || !input.signature || !/^\d{1,12}$/.test(input.timestamp)) return false;
-    const timestamp = Number(input.timestamp);
+}): Promise<ProposalOpenedPayload | null> {
+    let envelope: unknown = input.body;
+    if (typeof envelope === 'string') {
+        try {
+            envelope = JSON.parse(envelope);
+        } catch {
+            return null;
+        }
+    }
+    if (typeof envelope !== 'object' || envelope === null) return null;
+    const { payload, signature, ts } = envelope as Partial<Record<keyof ProposalWebhookEnvelope, unknown>>;
+    if (typeof payload !== 'string' || typeof signature !== 'string' || !Number.isSafeInteger(ts)) return null;
+    const timestamp = ts as number;
     const nowSeconds = Math.floor((input.now ?? Date.now()) / 1000);
-    if (Math.abs(nowSeconds - timestamp) > PROPOSAL_WEBHOOK_SIGNATURE_TOLERANCE_SECONDS) return false;
-    return timingSafeEqual(await signProposalWebhook(input.secret, timestamp, input.body), input.signature);
+    if (Math.abs(nowSeconds - timestamp) > PROPOSAL_WEBHOOK_SIGNATURE_TOLERANCE_SECONDS) return null;
+    if (!timingSafeEqual(await signProposalWebhook(input.secret, timestamp, payload), signature)) return null;
+    try {
+        return JSON.parse(payload) as ProposalOpenedPayload;
+    } catch {
+        return null;
+    }
 }
 
 function isRetryable(status: number): boolean {
@@ -124,19 +156,24 @@ function defaultSleep(ms: number): Promise<void> {
 }
 
 async function deliver(
-    config: { url: string; secret: string },
+    config: WebhookConfig,
     payload: ProposalOpenedPayload,
     deps: ProposalWebhookDeps,
 ): Promise<void> {
     const fetchImpl = deps.fetch ?? fetch;
     const sleep = deps.sleep ?? defaultSleep;
-    const body = JSON.stringify(payload);
-    const timestamp = Math.floor((deps.now ?? Date.now)() / 1000);
+    const payloadText = JSON.stringify(payload);
+    const ts = Math.floor((deps.now ?? Date.now)() / 1000);
+    const envelope: ProposalWebhookEnvelope = {
+        payload: payloadText,
+        signature: await signProposalWebhook(config.secret, ts, payloadText),
+        ts,
+    };
+    const body = JSON.stringify(envelope);
     const headers = {
         'Content-Type': 'application/json',
-        'X-Anhanga-Timestamp': String(timestamp),
-        'X-Anhanga-Signature': await signProposalWebhook(config.secret, timestamp, body),
-        'X-Anhanga-Event-Id': payload.eventId,
+        'User-Agent': USER_AGENT,
+        Authorization: `Bearer ${config.key}`,
     };
 
     const attempts = RETRY_DELAYS_MS.length + 1;

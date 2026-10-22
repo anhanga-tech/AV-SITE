@@ -105,28 +105,45 @@ Quando o cliente abre a proposta, o site avisa o bot comercial (Clara, decisão 
 
 - **Quando:** na 1ª abertura e em cada reabertura com 30 minutos ou mais desde a abertura anterior. Prévia interna (`?previa=`), prévias de link, prefetch e HEAD não contam abertura e, por isso, nunca disparam o webhook.
 - **Como:** em `waitUntil`, depois da resposta ao cliente: o aviso nunca atrasa nem quebra a página. Até 3 tentativas (5 s cada, espera de 1 s e 3 s) em erro de rede, 5xx ou 429. Um 4xx não é repetido. Sem fila durável: se as 3 falharem, o aviso se perde (fica o log `PROPOSAL_WEBHOOK` `failed`) e a abertura continua gravada no Redis.
-- **Pula sem chamar:** sem `PROPOSAL_WEBHOOK_URL` ou `PROPOSAL_WEBHOOK_SECRET`, URL que não seja `https`, ou proposta sem `leadId`.
+- **Pula sem chamar:** sem `PROPOSAL_WEBHOOK_URL`, `PROPOSAL_WEBHOOK_KEY` ou `PROPOSAL_WEBHOOK_SECRET`, URL que não seja `https`, ou proposta sem `leadId`.
+
+O receptor é uma automação da Clara: ela só recebe o corpo, o `content-type` e o `user-agent`. Por isso a assinatura vai **dentro do corpo**, num envelope; nenhum cabeçalho `X-*` chegaria até ela.
 
 ```http
 POST <PROPOSAL_WEBHOOK_URL>
 Content-Type: application/json
-X-Anhanga-Timestamp: 1792683000
-X-Anhanga-Signature: v1=<hex HMAC-SHA256 de "<timestamp>.<corpo bruto>">
-X-Anhanga-Event-Id: <proposalRef>:<openCount>
+User-Agent: Anhanga-Proposal-Webhook/1
+Authorization: Bearer <PROPOSAL_WEBHOOK_KEY>
 
+{ "payload": "<o JSON abaixo, como texto>", "signature": "v1=<hex HMAC-SHA256 de \"<ts>.<payload>\">", "ts": 1792683000 }
+```
+
+`payload`, depois do parse:
+
+```json
 { "event": "proposal.opened", "eventId": "<proposalRef>:2", "proposalRef": "<32 hex>", "leadId": 1234,
   "openCount": 2, "isFirstOpen": false, "openedAt": "2026-10-22T18:30:00.000Z", "previousOpenAt": "2026-10-22T15:30:00.000Z" }
 ```
 
+- `ts`: segundos unix do envio (não da abertura, que é `openedAt`). Entra na assinatura, então não pode ser trocado sem invalidá-la.
 - `proposalRef`: SHA-256 de `proposta-ref:v1:<id>`, primeiros 32 hex (`createProposalRef`). Não revela o id; quem criou a proposta (e tem o id) recalcula para correlacionar. O payload não leva o id nem o link: o id abre a proposta, e no redirect leva ao token da reserva.
 - `openedAt`/`previousOpenAt` em UTC; o receptor converte para o horário de SP.
 - `openCount` é a contagem total de aberturas, inclusive as que não geraram aviso.
 - `previousOpenAt` pode vir `null` com `isFirstOpen: false` quando a abertura anterior não pôde ser lida: na dúvida, o site avisa. O receptor deve aceitar essa combinação.
-- **Idempotência:** `eventId` (repetido no header) é o mesmo em todas as tentativas do mesmo aviso, e distinto entre aberturas (vem do `RPUSH` atômico). O receptor deve ignorar um `eventId` já processado.
+- **Idempotência:** `eventId` é o mesmo em todas as tentativas do mesmo aviso, e distinto entre aberturas (vem do `RPUSH` atômico). O receptor deve ignorar um `eventId` já processado.
 
-**Verificação no receptor** (obrigatória): recalcular `v1=` + HMAC-SHA256 hex de `` `${timestamp}.${corpoBruto}` `` com o secret, comparar em tempo constante, e recusar timestamp a mais de 5 minutos do relógio. Em TypeScript, `verifyProposalWebhook` de `lib/proposal-webhook.ts` faz isso. Use o corpo bruto, antes de qualquer parse.
+**Verificação no receptor** (obrigatória), antes de usar qualquer campo:
+1. Recalcular `v1=` + HMAC-SHA256 hex de `` `${ts}.${payload}` ``, com o `payload` **exatamente como texto**, sem parse e sem reformatar, e o `PROPOSAL_WEBHOOK_SECRET`.
+2. Comparar com `signature` em tempo constante.
+3. Recusar `ts` a mais de 5 minutos do relógio.
+4. Só então fazer o parse de `payload` e ignorar um `eventId` já processado.
 
-**Configurar no Cloudflare Pages** (Production e Preview): `PROPOSAL_WEBHOOK_URL` (endpoint da Clara, `https`) e `PROPOSAL_WEBHOOK_SECRET` (`openssl rand -hex 32`, o mesmo valor no receptor). A autenticação é o HMAC: a URL não deve carregar segredo no caminho, porque URLs de saída podem aparecer em breadcrumbs do Sentry.
+Em TypeScript, `verifyProposalWebhook` de `lib/proposal-webhook.ts` faz os passos 1 a 3 e devolve o payload (ou `null`).
+
+**Configurar no Cloudflare Pages** (Production e Preview):
+- `PROPOSAL_WEBHOOK_URL`: o endereço do gatilho da automação da Clara (`https`, sem query string).
+- `PROPOSAL_WEBHOOK_KEY`: a chave de envio que o painel da automação mostra. Vai no `Authorization: Bearer`. Só autentica no receptor; não prova que o aviso veio do site.
+- `PROPOSAL_WEBHOOK_SECRET`: `openssl rand -hex 32`, o mesmo valor guardado como segredo da Clara. É o que prova a origem.
 
 ## Notas no Odoo (P8)
 
