@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /proposta/
 Disallow: /admin/
 Disallow: /login/
 Disallow: /register/
@@ -26,6 +27,7 @@ User-agent: Amazonbot
 User-agent: Meta-ExternalAgent
 Allow: /
 Disallow: /api/
+Disallow: /proposta/
 Disallow: /admin/
 Disallow: /login/
 Disallow: /register/
@@ -50,6 +52,8 @@ User-agent: PetalBot
 User-agent: Baiduspider
 User-agent: YandexBot
 Crawl-delay: 2
+# Crawlers obey only their most specific group, so private paths repeat here.
+Disallow: /proposta/
 
 Sitemap: https://www.anhanga.tur.br/sitemap.xml
 
