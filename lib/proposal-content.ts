@@ -20,7 +20,10 @@ const MAX_PHOTOS = 40;
 
 const text = (max: number) => z.string().trim().min(1).max(max);
 // Calendar day with no time zone, `YYYY-MM-DD` (a hotel night, an excursion day).
-const calendarDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+const calendarDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine((day) => {
+    const parsed = new Date(`${day}T00:00:00Z`);
+    return !Number.isNaN(parsed.getTime()) && parsed.toISOString().startsWith(day);
+});
 // Local wall-clock time at the airport, with its offset: `2026-12-06T18:35:00-03:00`.
 const localDateTime = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?(?:Z|[+-]\d{2}:\d{2})$/);
 
@@ -60,7 +63,7 @@ export const proposalContentSchema = z.strictObject({
             checkout: calendarDate,
             refundable: z.boolean().optional(),
             cancellation: z.array(text(400)).max(10),
-        }),
+        }).refine((room) => room.checkout > room.checkin, { message: 'checkout must be after checkin' }),
     }).optional(),
     flights: z.array(z.strictObject({
         airline: text(80),

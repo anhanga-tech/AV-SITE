@@ -64,7 +64,7 @@ test('the Infotravel test quotation renders hotel, flights, transfer, extras and
         'Latam 9101',
         '18:35',
         '19:40',
-        'Voo direto · 01h05min · Tarifa LIGHT',
+        'Voo direto · 1h05min · Tarifa LIGHT',
         'Traslado IDA (IN) + RETORNO (OUT) Aeroporto Navegantes (NVT) | Balneário Camboriú',
         'PASSEIO AO BETO CARRERO WORLD',
         'Comodidades do hotel (62)',
@@ -201,6 +201,19 @@ test('a proposal is either a page or a redirect, and invalid content is refused'
         saveProposal({ content: { ...content(), total: { amount: 10, currency: 'USD' } } as unknown as ProposalContentInput }, deps),
         /content failed validation/,
     );
+});
+
+test('an impossible or inverted stay is refused before it reaches a page', () => {
+    const value = content();
+    assert.ok(value.hotel);
+    const withRoom = (room: Partial<typeof value.hotel.room>) =>
+        proposalContentSchema.safeParse({ ...value, hotel: { ...value.hotel, room: { ...value.hotel?.room, ...room } } }).success;
+
+    assert.equal(withRoom({}), true);
+    assert.equal(withRoom({ checkin: '2027-13-45' }), false);
+    assert.equal(withRoom({ checkout: '2027-02-30' }), false);
+    assert.equal(withRoom({ checkout: '2027-03-10' }), false);
+    assert.equal(withRoom({ checkout: '2027-03-09' }), false);
 });
 
 test('children are counted from the passengers beyond the adults, without storing ages', () => {

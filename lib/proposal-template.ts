@@ -22,6 +22,7 @@ const PRIVACY_NOTICE = 'Para acompanhar sua proposta, registramos quando esta p�
 const INTERNAL_PREVIEW_NOTICE = 'Prévia interna: esta visita não conta como abertura do cliente.';
 
 const BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+const SAO_PAULO_DATE = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', year: 'numeric' });
 
 export function escapeHtml(value: string): string {
     return value
@@ -46,6 +47,13 @@ function nightsBetween(checkin: string, checkout: string): number {
 function flightMoment(value: string): { day: string; time: string } {
     const [, month, date, hour, minute] = /^\d{4}-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(value) ?? [];
     return { day: `${date}/${month}`, time: `${hour}:${minute}` };
+}
+
+/** `01:05` → `1h05min`, `02:00` → `2h`. */
+function formatDuration(value: string): string {
+    const [hours, minutes] = value.split(':').map(Number);
+    if (hours === 0) return `${minutes}min`;
+    return minutes === 0 ? `${hours}h` : `${hours}h${String(minutes).padStart(2, '0')}min`;
 }
 
 function plural(count: number, one: string, many: string): string {
@@ -98,6 +106,8 @@ ${hotel.amenities.length ? `<details><summary>Comodidades do hotel (${hotel.amen
 
 function flightsSection(flights: ProposalContent['flights']): string {
     if (flights.length === 0) return '';
+    // Two flights are read as outbound and return: the shape the operator
+    // quotes today. A one-way trip with a connection needs a leg field (#1905, #1906).
     const legLabel = (index: number) => {
         if (flights.length === 2) return index === 0 ? 'Ida' : 'Volta';
         return `Trecho ${index + 1}`;
@@ -107,7 +117,7 @@ function flightsSection(flights: ProposalContent['flights']): string {
         const arrival = flightMoment(flight.arrival);
         const details = [
             flight.stops === 0 ? 'Voo direto' : plural(flight.stops, 'parada', 'paradas'),
-            flight.duration ? `${flight.duration.replace(':', 'h')}min` : '',
+            flight.duration ? formatDuration(flight.duration) : '',
             flight.fareFamily ? `Tarifa ${flight.fareFamily}` : '',
         ].filter(Boolean);
         return `<div class="card">
@@ -193,7 +203,7 @@ export function renderProposalContent(
     const greeting = content.firstName ? `${content.firstName}, sua viagem para ${content.destination}` : `Sua viagem para ${content.destination}`;
     const period = hotel ? `${formatDay(hotel.room.checkin)} a ${formatDay(hotel.room.checkout)} · ` : '';
     const heroPhoto = hotel?.photos[0];
-    const validUntil = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', year: 'numeric' }).format(options.expiresAt);
+    const validUntil = SAO_PAULO_DATE.format(options.expiresAt);
     const cta = whatsappUrl(`Olá! Vi minha proposta para ${content.destination} e quero conversar.`);
 
     return `<!DOCTYPE html>
