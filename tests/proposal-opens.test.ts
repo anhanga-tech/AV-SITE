@@ -40,6 +40,10 @@ const PREVIEW_AGENTS = {
     telegram: 'TelegramBot (like TwitterBot)',
     google: 'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
     snapchat: 'Mozilla/5.0 (compatible; Snap URL Preview Service; bot; snapchat; +https://developers.snap.com/robots)',
+    mastodon: 'Mastodon/4.3.0 (http.rb/5.2.0; +https://mastodon.social/)',
+    bluesky: 'Mozilla/5.0 (compatible; Bluesky Cardyb/1.1; +mailto:support@bsky.app)',
+    readAloud: 'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36 Google-Read-Aloud',
+    lighthouse: 'Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36 Chrome-Lighthouse',
     curl: 'curl/8.5.0',
 };
 
@@ -59,6 +63,12 @@ function open(
     const request = new Request(`${ORIGIN}/proposta/${id}${options.query ?? ''}`, { method: options.method ?? 'GET', headers });
     if (options.cf) Object.defineProperty(request, 'cf', { value: options.cf });
     return request;
+}
+
+function prefetch(id: string, headers: Record<string, string>): Request {
+    return new Request(`${ORIGIN}/proposta/${id}`, {
+        headers: { 'user-agent': UA.desktop, 'cf-connecting-ip': CUSTOMER_IP, ...headers },
+    });
 }
 
 function withPreviewSecret(t: { after: (fn: () => void) => void }) {
@@ -281,6 +291,45 @@ test('with waitUntil the open is recorded after the response, not before it', as
     assert.equal(pending.length, 1);
     await Promise.all(pending);
     assert.equal(listOf(opensKey(id)).length, 1);
+});
+
+test('a browser prefetch is refused, so the real navigation is the request that counts', async () => {
+    const { deps, listOf } = setup();
+    const { id } = await saveProposal({}, deps);
+
+    const speculativeFetches: Record<string, string>[] = [
+        { 'sec-purpose': 'prefetch' },
+        { 'sec-purpose': 'prefetch;prerender' },
+        { 'sec-purpose': 'prefetch;anonymous-client-ip' },
+        { purpose: 'prefetch' },
+        { 'x-purpose': 'preview' },
+        { 'x-moz': 'prefetch' },
+    ];
+    for (const headers of speculativeFetches) {
+        const response = await handleProposalRequest(prefetch(id, headers), id, deps);
+        // Non-2xx: the browser discards the speculative fetch instead of
+        // showing it later from memory, which would never reach the server.
+        assert.equal(response.status, 503, JSON.stringify(headers));
+        assert.equal(response.headers.get('Cache-Control'), 'private, no-store');
+    }
+    assert.equal(listOf(opensKey(id)).length, 0);
+
+    await handleProposalRequest(open(id, { userAgent: UA.desktop }), id, deps);
+    assert.equal(listOf(opensKey(id)).length, 1);
+});
+
+test('a prefetch of a redirect proposal never receives the operator link', async () => {
+    const { deps } = setup();
+    const token = Buffer.from(`RCA | 1234567 | ${'0'.repeat(32)}`).toString('base64');
+    const { id } = await saveProposal(
+        { redirectUrl: `https://premium.infotravel.com.br/orcamento-web/pt/link?token=${token}` },
+        deps,
+    );
+
+    const response = await handleProposalRequest(prefetch(id, { 'sec-purpose': 'prefetch' }), id, deps);
+
+    assert.equal(response.status, 503);
+    assert.equal(response.headers.get('Location'), null);
 });
 
 test('the preview signature never reaches Sentry', () => {
