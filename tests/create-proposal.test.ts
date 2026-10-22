@@ -224,6 +224,14 @@ test('malformed bodies and types not yet supported are refused', async (t) => {
 
 test('the endpoint is rate limited per client', async (t) => {
     withSecrets(t);
+    // Keep the limiter in memory: never send test traffic to a real Upstash.
+    const upstash = { url: process.env.UPSTASH_REDIS_REST_URL, token: process.env.UPSTASH_REDIS_REST_TOKEN };
+    delete process.env.UPSTASH_REDIS_REST_URL;
+    delete process.env.UPSTASH_REDIS_REST_TOKEN;
+    t.after(() => {
+        if (upstash.url !== undefined) process.env.UPSTASH_REDIS_REST_URL = upstash.url;
+        if (upstash.token !== undefined) process.env.UPSTASH_REDIS_REST_TOKEN = upstash.token;
+    });
     const { deps } = setup();
     const ip = '203.0.113.77';
 
