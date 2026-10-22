@@ -201,6 +201,11 @@ export interface OdooSession {
     writePartnerConsent: (partnerId: number, granted: boolean) => Promise<void>;
     /** Lookup only — does not create a partner. */
     findPartnerIdByEmail: (email: string) => Promise<number | null>;
+    /**
+     * Internal note in the lead's chatter (`mail.mt_note`): visible to the
+     * team, never e-mailed to followers — so it can't reach the customer.
+     */
+    postLeadNote: (leadId: number, body: string) => Promise<void>;
 }
 
 export async function openOdooSession(config: OdooConfig): Promise<OdooSession> {
@@ -312,6 +317,17 @@ export async function openOdooSession(config: OdooConfig): Promise<OdooSession> 
                 { limit: 1 },
             );
             return rows[0]?.id ?? null;
+        },
+        async postLeadNote(leadId, body) {
+            await executeKw<unknown>(
+                config,
+                uid,
+                'crm.lead',
+                'message_post',
+                [[leadId]],
+                deadline,
+                { body, message_type: 'comment', subtype_xmlid: 'mail.mt_note' },
+            );
         },
         async writePartnerConsent(partnerId, granted) {
             await executeKw<boolean>(

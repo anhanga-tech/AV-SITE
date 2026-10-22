@@ -1,6 +1,6 @@
 # Link de proposta (`/proposta/<id>`)
 
-Épico [#1894](https://github.com/anhanga-tech/AV-SITE/issues/1894). Este documento cobre a rota (P1, #1895), o scrub no Sentry (P4, #1898) o registro de aberturas (P3, #1897), o redirect rastreado (P2, #1896), o endpoint interno de criação (P5, #1899) e o webhook de abertura (P6, #1900). As próximas fases acrescentam aqui o que mudarem.
+Épico [#1894](https://github.com/anhanga-tech/AV-SITE/issues/1894). Este documento cobre a rota (P1, #1895), o scrub no Sentry (P4, #1898) o registro de aberturas (P3, #1897), o redirect rastreado (P2, #1896), o endpoint interno de criação (P5, #1899), o webhook de abertura (P6, #1900) e as notas no Odoo (P8, #1904). As próximas fases acrescentam aqui o que mudarem.
 
 ## O que existe
 
@@ -126,6 +126,17 @@ X-Anhanga-Event-Id: <proposalRef>:<openCount>
 **Verificação no receptor** (obrigatória): recalcular `v1=` + HMAC-SHA256 hex de `` `${timestamp}.${corpoBruto}` `` com o secret, comparar em tempo constante, e recusar timestamp a mais de 5 minutos do relógio. Em TypeScript, `verifyProposalWebhook` de `lib/proposal-webhook.ts` faz isso. Use o corpo bruto, antes de qualquer parse.
 
 **Configurar no Cloudflare Pages** (Production e Preview): `PROPOSAL_WEBHOOK_URL` (endpoint da Clara, `https`) e `PROPOSAL_WEBHOOK_SECRET` (`openssl rand -hex 32`, o mesmo valor no receptor). A autenticação é o HMAC: a URL não deve carregar segredo no caminho, porque URLs de saída podem aparecer em breadcrumbs do Sentry.
+
+## Notas no Odoo (P8)
+
+Nota interna (`mail.mt_note`) no chatter do `crm.lead` do `leadId`, via `services/odoo.ts` (`postLeadNote`). Código em `lib/proposal-odoo-notes.ts`.
+
+- **Ao criar:** `Proposta enviada: https://www.anhanga.tur.br/proposta/<id> (válida até dd/mm/aaaa)`. Só o link do cliente: nem o de prévia nem o da operadora. É daqui que a Clara pega o link; ele não vai no webhook.
+- **A cada abertura relevante** (as mesmas que disparam o webhook: 1ª e reaberturas 30+ min depois): `Proposta aberta em dd/mm/aaaa às hh:mm (horário de São Paulo), Nª vez`, onde N é a contagem total de aberturas. Sem IP, cidade ou aparelho.
+- **Nota, não mensagem:** `mail.mt_note` não manda e-mail aos seguidores do lead, então nada chega ao cliente.
+- **Nunca quebra:** sem `ODOO_*` configurado, a nota é pulada; se o Odoo falhar, a proposta é criada mesmo assim (a resposta do endpoint traz `crmNote: "recorded" | "skipped" | "failed"`) e a página abre normalmente (a nota roda em `waitUntil`, ao lado do webhook). Falha fica no log `PROPOSAL_ODOO_NOTE` só com o status HTTP, porque a mensagem de erro do Odoo pode repetir o texto da nota.
+- **`crmNote: "failed"` na criação:** a proposta existe e o link funciona, mas a Clara não vai achá-lo no lead (ela lê o link da nota de envio). Quem chamou o endpoint deve avisar o Felipe ou registrar a nota à mão no lead com o `url` devolvido; não recriar a proposta (geraria um segundo link). O deadline do Odoo (8 s, autenticação incluída) limita a espera do bot.
+- Sem atividade de follow-up agendada para a Clara (opcional na issue): o webhook já cumpre esse papel.
 
 ## Headers
 
