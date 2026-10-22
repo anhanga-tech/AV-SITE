@@ -37,17 +37,17 @@ const penalties = z.object({
 const person = z.object({ age: z.number().int().min(0).max(120), type: z.string() });
 const place = z.object({ code: z.string(), city: z.object({ name: z.string() }) });
 
-const UNSUPPORTED_CATEGORIES = [
-    'bookingBusList',
-    'bookingInsurances',
-    'bookingServicePackages',
-    'bookingServiceOthers',
-    'bookingVehicles',
-    'bookingCircuits',
-    'bookingExperiences',
-    'bookingChips',
-    'bookingTrains',
-] as const;
+// The product categories the page shows. Any other `booking*` array with
+// items (insurance, car, cruise, VIP lounge, one added later…) is refused,
+// read from the raw payload so a category this code doesn't know about
+// can't slip through.
+const SUPPORTED_CATEGORIES = new Set(['bookingHotels', 'bookingFlights', 'bookingTours', 'bookingTickets', 'bookingTransfers']);
+
+function hasUnsupportedCategory(rawPackage: unknown): boolean {
+    if (!rawPackage || typeof rawPackage !== 'object') return true;
+    return Object.entries(rawPackage).some(([key, value]) =>
+        /^booking[A-Z]/.test(key) && !SUPPORTED_CATEGORIES.has(key) && Array.isArray(value) && value.length > 0);
+}
 
 const bookingSchema = z.object({
     status: z.string(),
@@ -102,7 +102,6 @@ const bookingSchema = z.object({
             transfer: z.object({ name: z.string(), provider: z.string().nullish() }),
             cancellationPolicies: penalties,
         })).nullish(),
-        ...Object.fromEntries(UNSUPPORTED_CATEGORIES.map((category) => [category, z.array(z.unknown()).nullish()])),
     })),
 });
 
@@ -175,10 +174,8 @@ export function normalizeInfotravelQuotation(raw: { booking: unknown; hotel: unk
         throw new InfotravelNormalizeError('unsupported_quotation');
     }
     const [pack] = booking.bookingPackages;
-    const packRecord = pack as Record<string, unknown>;
-    if (UNSUPPORTED_CATEGORIES.some((category) => Array.isArray(packRecord[category]) && (packRecord[category] as unknown[]).length > 0)) {
-        throw new InfotravelNormalizeError('unsupported_quotation');
-    }
+    const rawPackage = (raw.booking as { bookingPackages: unknown[] }).bookingPackages[0];
+    if (hasUnsupportedCategory(rawPackage)) throw new InfotravelNormalizeError('unsupported_quotation');
     const hotels = pack.bookingHotels ?? [];
     const flightGroups = pack.bookingFlights ?? [];
     if (hotels.length > 1 || flightGroups.length > 1 || hotels.some((item) => item.rooms.length !== 1)) {

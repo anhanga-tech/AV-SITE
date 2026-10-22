@@ -158,6 +158,9 @@ test('a quotation the page can\'t represent faithfully is refused', () => {
     refused(variant({}, { bookingAmount: { currency: 'BRL', amount: 6633.46 } }), 'total_mismatch');
     refused(variant({ fares: [] }), 'total_mismatch');
     refused(variant({ bookingInsurances: [{ fares: [] }] }), 'unsupported_quotation');
+    // A category this code has never heard of is refused too, even at no cost.
+    refused(variant({ bookingVipLounges: [{ fares: [] }] }), 'unsupported_quotation');
+    assert.doesNotThrow(() => normalizeInfotravelQuotation({ booking: variant({ bookingCruises: [], bookingVipLounges: null }), hotel: HOTEL }));
     refused(variant({}, { status: 'CONFIRMED' }), 'unsupported_quotation');
     refused(variant({ bookingHotels: [{ ...pack.bookingHotels[0], rooms: [pack.bookingHotels[0].rooms[0], pack.bookingHotels[0].rooms[0]] }] }), 'unsupported_quotation');
     refused(variant({ fares: [{ type: 'RAV_COMMISSION', price: { currency: 'USD', amount: 152.85, exchange: 5.1 } }] }), 'unsupported_quotation');
