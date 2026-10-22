@@ -18,7 +18,7 @@ const GALLERY_PHOTOS = 9;
 // The operator's payment terms never reach the page (D7: the deal is closed
 // with the Anhangá); this is the Anhangá's own wording.
 const CONDITIONS_TEXT = 'Valores sujeitos a disponibilidade e a alteração até a confirmação da reserva. Para fechar ou tirar dúvidas, fale com a gente pelo WhatsApp.';
-const PRIVACY_NOTICE = 'Para acompanhar sua proposta, registramos quando esta página é aberta: data, hora, cidade aproximada e tipo de aparelho. Não guardamos seu IP.';
+const PRIVACY_NOTICE = 'Para acompanhar sua proposta, registramos quando esta página é aberta: data, hora, país e cidade aproximados, tipo de aparelho e um código derivado do IP, que deixa de ter relação com ele em até 2 dias. O IP em si não é guardado.';
 const INTERNAL_PREVIEW_NOTICE = 'Prévia interna: esta visita não conta como abertura do cliente.';
 
 const BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });

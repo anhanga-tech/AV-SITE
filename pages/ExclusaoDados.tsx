@@ -76,6 +76,10 @@ const ExclusaoDados = () => (
                                         <td className="py-2">Cal.com (excluídos pela nossa equipe na conta de agendamento)</td>
                                     </tr>
                                     <tr>
+                                        <td className="py-2 pr-4">Link de proposta comercial: conteúdo da proposta e registro das aberturas (data, hora, local aproximado, tipo de aparelho e código derivado do IP)</td>
+                                        <td className="py-2">Upstash (apagados sozinhos em até 15 e 90 dias, respectivamente, ou antes, a pedido) e as notas de envio e de abertura no Odoo CRM</td>
+                                    </tr>
+                                    <tr>
                                         <td className="py-2 pr-4">Cookies de identificação persistentes</td>
                                         <td className="py-2">Navegador do usuário (instrução de remoção enviada)</td>
                                     </tr>
