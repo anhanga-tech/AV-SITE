@@ -17,6 +17,7 @@
 import { z } from 'zod';
 
 import { logger } from './logger';
+import { parseAllowedRedirectUrl } from './proposal-redirect';
 import { getRedisClient, type RedisClientLike } from './redis-client';
 
 const ID_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -44,6 +45,9 @@ const proposalRecordSchema = z.object({
     v: z.literal(1),
     createdAt: z.number().int().nonnegative(),
     expiresAt: z.number().int().positive(),
+    // Present on a tracked-redirect proposal (#1896). Re-checked against the
+    // allowlist on every read, so a stored URL can never become an open redirect.
+    redirectUrl: z.string().refine((value) => parseAllowedRedirectUrl(value) === value).optional(),
 });
 
 export type ProposalRecord = z.infer<typeof proposalRecordSchema>;
@@ -99,7 +103,7 @@ function parseStoredJson(value: unknown): unknown {
  * maps that to its own error response.
  */
 export async function saveProposal(
-    options: { validitySeconds?: number } = {},
+    options: { validitySeconds?: number; redirectUrl?: string } = {},
     deps: ProposalStoreDeps = {},
 ): Promise<{ id: string; expiresAt: number }> {
     const redis = await resolveRedis(deps);
@@ -110,9 +114,16 @@ export async function saveProposal(
         throw new Error('PROPOSAL_STORE: validitySeconds must be a positive integer');
     }
 
+    let redirectUrl: string | undefined;
+    if (options.redirectUrl !== undefined) {
+        redirectUrl = parseAllowedRedirectUrl(options.redirectUrl) ?? undefined;
+        if (!redirectUrl) throw new Error('PROPOSAL_STORE: redirectUrl is not an allowed operator link');
+    }
+
     const now = (deps.now ?? Date.now)();
     const id = createProposalId();
     const record: ProposalRecord = { v: 1, createdAt: now, expiresAt: now + validitySeconds * 1000 };
+    if (redirectUrl) record.redirectUrl = redirectUrl;
 
     // Tombstone first: if the record write then fails, the leftover tombstone
     // only makes a never-shared id answer 410, never exposes content.

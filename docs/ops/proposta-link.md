@@ -1,12 +1,12 @@
 # Link de proposta (`/proposta/<id>`)
 
-Épico [#1894](https://github.com/anhanga-tech/AV-SITE/issues/1894). Este documento cobre a rota (P1, #1895), o scrub no Sentry (P4, #1898) e o registro de aberturas (P3, #1897). As próximas fases acrescentam aqui o que mudarem.
+Épico [#1894](https://github.com/anhanga-tech/AV-SITE/issues/1894). Este documento cobre a rota (P1, #1895), o scrub no Sentry (P4, #1898) o registro de aberturas (P3, #1897) e o redirect rastreado (P2, #1896). As próximas fases acrescentam aqui o que mudarem.
 
 ## O que existe
 
 - `functions/proposta/[id].ts` → `lib/proposal-page.ts` (resposta HTML) → `lib/proposal-store.ts` (Upstash Redis).
 - O id tem 16 caracteres base62 gerados com `crypto.getRandomValues`. Ele é a única credencial da página: quem tem o link vê a proposta.
-- Respostas: 200 ativa, 410 expirada, 404 inexistente ou id malformado (sem consultar o Redis), 503 quando o Redis falta ou falha, 405 para métodos que não sejam GET/HEAD.
+- Respostas: 200 ativa (302 se for redirect), 410 expirada, 404 inexistente ou id malformado (sem consultar o Redis), 503 quando o Redis falta ou falha, 405 para métodos que não sejam GET/HEAD.
 
 ## Chaves no Redis
 
@@ -46,6 +46,17 @@ O conteúdo some no instante em que o link expira. O tombstone existe só para r
 `/proposta/<id>?previa=<assinatura>` mostra a mesma página com o aviso "Prévia interna" e não conta abertura. A assinatura é o HMAC-SHA256 do id com `PROPOSAL_PREVIEW_SECRET` (`lib/proposal-preview.ts`), gerada pelo endpoint de criação (P5, #1899). Assinatura inválida, de outra proposta ou sem o secret configurado: a visita conta normalmente. O parâmetro `previa` é redigido no Sentry.
 
 **Configurar no Cloudflare Pages:** `PROPOSAL_PREVIEW_SECRET` (gerar com `openssl rand -hex 32`), em Production e Preview.
+
+## Redirect rastreado
+
+Uma proposta criada com `redirectUrl` (fallback quando não há adaptador da operadora ou a extração falha) grava a abertura e só então responde **302** para o link da operadora.
+
+- Só passam links `https` de operadoras na allowlist de `lib/proposal-redirect.ts` (hoje: `premium.infotravel.com.br`, caminho `/orcamento-web/`), sem usuário/senha nem porta. O link da Infotravel sai sempre com `shouldShowPay=false` (decisão D7: sem botão de pagamento da operadora); o token é preservado byte a byte. A checagem roda ao salvar e de novo em cada leitura: um registro com host fora da lista responde 503, sem redirecionar.
+- Incluir uma operadora é mudança de código revisada (a lista não vem de configuração).
+- `Referrer-Policy: no-referrer` no 302: a operadora não recebe a URL da proposta (e o id).
+- Prévias de link (WhatsApp etc.) recebem a página da Anhangá, não o 302. O card fica com a nossa marca e o link da operadora, que carrega o token da reserva, não é entregue aos servidores de prévia.
+- O link de prévia interna (`?previa=`) segue o 302 sem contar abertura.
+- O link da operadora é credencial da reserva: nunca registrar em log.
 
 ## Headers
 
