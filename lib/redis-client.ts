@@ -1,10 +1,14 @@
 import { logger } from './logger';
 
-/** Subset of the Upstash Redis client surface used across `lib/` (rate limiting, idempotency locks). */
+/** Subset of the Upstash Redis client surface used across `lib/` (rate limiting, idempotency locks, proposals). */
 export interface RedisClientLike {
     pipeline(): { incr(key: string): void; ttl(key: string): void; exec(): Promise<unknown[]> };
     expire(key: string, seconds: number): Promise<unknown>;
     set(key: string, value: string, opts: { nx: true; ex: number }): Promise<string | null>;
+    set(key: string, value: string, opts: { ex: number }): Promise<string | null>;
+    // Upstash deserializes JSON on read by default: a value stored as a JSON
+    // string comes back parsed (object, number), not as the string written.
+    mget(...keys: string[]): Promise<unknown[]>;
     del(key: string): Promise<unknown>;
 }
 
