@@ -7,9 +7,12 @@
  * link, so the endpoint refuses to run without PROPOSAL_PREVIEW_SECRET rather
  * than hand out a preview link that would count as a customer open.
  *
- * Phase 1 accepts only `type: 'redirect'` (tracked redirect to an allowlisted
- * operator link). Air and operator-extracted proposals arrive with their page
- * templates (#1905, #1906).
+ * Types:
+ * - `redirect`: tracked redirect to an allowlisted operator link (#1896);
+ * - `infotravel`: reads the Infotravel quotation behind the link and stores a
+ *   page (#1906). Any failure — API down, unexpected data, a total that doesn't
+ *   add up — or pages switched off (PROPOSAL_PAGES_ENABLED) falls back to the
+ *   tracked redirect for the same link; `mode` and `fallbackReason` say which.
  *
  * Never log the body, the id, the lead id or the operator URL: the URL holds
  * the booking token and the id opens the proposal.
@@ -21,7 +24,11 @@ import { checkRateLimit } from '../lib/rate-limit';
 import { logger } from '../lib/logger';
 import { createProposalPreviewSignature, getProposalPreviewSecret, PROPOSAL_PREVIEW_PARAM } from '../lib/proposal-preview';
 import { parseAllowedRedirectUrl } from '../lib/proposal-redirect';
+import { InfotravelNormalizeError, normalizeInfotravelQuotation } from '../lib/infotravel-normalize';
 import { buildProposalSentNote, postProposalNote, type ProposalOdooNotesDeps } from '../lib/proposal-odoo-notes';
+import type { ProposalContent } from '../lib/proposal-content';
+import { fromInfotravelNormalized } from '../lib/proposal-infotravel';
+import { fetchInfotravelQuotation, InfotravelError, type InfotravelDeps } from '../services/infotravel';
 import { PROPOSAL_VALIDITY_SECONDS, saveProposal, type ProposalStoreDeps } from '../lib/proposal-store';
 import { timingSafeEqual } from '../lib/security';
 
@@ -34,13 +41,59 @@ const MAX_BODY_BYTES = 8_192;
 // No CORS headers on purpose: no page may call this.
 const RESPONSE_HEADERS = { 'Cache-Control': 'no-store' };
 
-const BodySchema = z.strictObject({
-    type: z.literal('redirect'),
+const INFOTRAVEL_HOST = 'premium.infotravel.com.br';
+
+const commonFields = {
     redirectUrl: z.string().min(1).max(4096),
     leadId: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
     // D5: links are valid for 15 days; the bot may shorten that, never extend it.
     validityDays: z.number().int().min(1).max(MAX_VALIDITY_DAYS).optional(),
-});
+};
+
+const BodySchema = z.discriminatedUnion('type', [
+    z.strictObject({ type: z.literal('redirect'), ...commonFields }),
+    z.strictObject({
+        type: z.literal('infotravel'),
+        ...commonFields,
+        // The customer's name comes from the bot only: the quotation's contact
+        // is the agent. The page keeps just the first word (D6).
+        firstName: z.string().trim().min(1).max(300).optional(),
+    }),
+]);
+
+type FallbackReason = 'pages_disabled' | 'invalid_token' | 'timeout' | 'http_error' | 'unexpected_response'
+    | 'unexpected_shape' | 'unsupported_quotation' | 'total_mismatch' | 'quotation_expired' | 'invalid_content';
+
+/** Default off until the privacy policy covers proposal pages (#1925). */
+function arePagesEnabled(): boolean {
+    return process.env.PROPOSAL_PAGES_ENABLED?.trim().toLowerCase() === 'true';
+}
+
+/** The Infotravel quotation as page content, or why it falls back to the redirect. */
+async function buildInfotravelContent(
+    link: string,
+    firstName: string | undefined,
+    deps: InfotravelDeps,
+): Promise<{ content: ProposalContent; quotationExpiresAt?: number } | { fallbackReason: FallbackReason }> {
+    if (!arePagesEnabled()) return { fallbackReason: 'pages_disabled' };
+    try {
+        const quotation = await fetchInfotravelQuotation(link, deps);
+        const normalized = normalizeInfotravelQuotation(quotation);
+        const expiration = typeof normalized.validade === 'string' ? Date.parse(normalized.validade) : Number.NaN;
+        return {
+            content: fromInfotravelNormalized(normalized, { firstName }),
+            quotationExpiresAt: Number.isNaN(expiration) ? undefined : expiration,
+        };
+    } catch (error) {
+        if (error instanceof InfotravelError || error instanceof InfotravelNormalizeError) return { fallbackReason: error.reason };
+        // Class only: the message can carry the link (and its token) or quotation data.
+        logger.error('CREATE_PROPOSAL', {
+            stage: 'infotravel_content_failed',
+            errorName: error instanceof Error ? error.name : typeof error,
+        });
+        return { fallbackReason: 'invalid_content' };
+    }
+}
 
 type ErrorCode =
     | 'METHOD_NOT_ALLOWED'
@@ -83,6 +136,7 @@ async function readJson(request: Request): Promise<{ ok: true; value: unknown } 
 
 export interface CreateProposalDeps extends ProposalStoreDeps {
     odoo?: ProposalOdooNotesDeps;
+    infotravel?: InfotravelDeps;
 }
 
 export async function handleCreateProposal(request: Request, deps: CreateProposalDeps = {}): Promise<Response> {
@@ -142,18 +196,32 @@ export async function handleCreateProposal(request: Request, deps: CreateProposa
     const body = parsed.data;
     // Checked here so anything saveProposal throws afterwards is storage.
     const redirectUrl = parseAllowedRedirectUrl(body.redirectUrl);
-    if (!redirectUrl) {
+    if (!redirectUrl || (body.type === 'infotravel' && new URL(redirectUrl).hostname !== INFOTRAVEL_HOST)) {
         logger.warn('CREATE_PROPOSAL', { requestId, stage: 'redirect_not_allowed' });
         return fail(requestId, 400, 'REDIRECT_NOT_ALLOWED', 'Link da operadora não permitido.');
     }
+
+    // The link as the bot sent it is what the operator's own page sends as `clientUrl`.
+    const built = body.type === 'infotravel' ? await buildInfotravelContent(body.redirectUrl, body.firstName, deps.infotravel ?? {}) : null;
+    // Measured after the operator calls, on the clock saveProposal uses: the
+    // page never says "válida até" past the operator's own quotation deadline.
+    const now = (deps.now ?? Date.now)();
+    const requestedSeconds = (body.validityDays ?? MAX_VALIDITY_DAYS) * 24 * 60 * 60;
+    const quotationExpiresAt = built && 'content' in built ? built.quotationExpiresAt : undefined;
+    const remainingSeconds = quotationExpiresAt === undefined ? requestedSeconds : Math.floor((quotationExpiresAt - now) / 1000);
+    const expired = remainingSeconds < 1;
+    const content = built && 'content' in built && !expired ? built.content : undefined;
+    const validitySeconds = content ? Math.min(requestedSeconds, remainingSeconds) : requestedSeconds;
+    const fallbackReason = built && 'fallbackReason' in built ? built.fallbackReason : expired && built ? 'quotation_expired' : undefined;
+    const mode = content ? 'page' : 'redirect';
 
     let saved: { id: string; expiresAt: number };
     try {
         saved = await saveProposal(
             {
-                redirectUrl,
+                ...(content ? { content } : { redirectUrl }),
                 leadId: body.leadId,
-                validitySeconds: (body.validityDays ?? MAX_VALIDITY_DAYS) * 24 * 60 * 60,
+                validitySeconds,
             },
             deps,
         );
@@ -173,7 +241,7 @@ export async function handleCreateProposal(request: Request, deps: CreateProposa
     // The proposal exists either way: a CRM failure is reported, not fatal (#1904).
     const crmNote = await postProposalNote(body.leadId, buildProposalSentNote({ url, expiresAt: saved.expiresAt }), deps.odoo);
 
-    logger.info('CREATE_PROPOSAL', { requestId, stage: 'created', type: body.type, crmNote });
+    logger.info('CREATE_PROPOSAL', { requestId, stage: 'created', type: body.type, mode, fallbackReason, crmNote });
 
     return json({
         ok: true,
@@ -183,6 +251,8 @@ export async function handleCreateProposal(request: Request, deps: CreateProposa
             url,
             previewUrl,
             expiresAt: new Date(saved.expiresAt).toISOString(),
+            mode,
+            ...(fallbackReason ? { fallbackReason } : {}),
             crmNote,
         },
     }, 201, requestId);

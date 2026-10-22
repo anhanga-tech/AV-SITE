@@ -1,0 +1,100 @@
+[
+  {
+    "result": {
+      "data": {
+        "json": {
+          "hotel": {
+            "id": 990004,
+            "name": "Reserva Praia Hotel - Balneário Camboriú",
+            "description": "O Reserva Praia Hotel - Balneário Camboriú está localizado em Balneário Camboriú. Possui piscina climatizada com borda infinita e vista panorâmica para a praia, Wi-Fi gratuito nas áreas comuns e sauna.Você precisa saber: Acessível para pessoas com mobilidade reduzida Animais de estimação não permitidosA hospedagem serve diariamente o café da manhã, o qual se oferece no restaurante. Também dispõe de bar. Os funcionários da propriedade proporcionarão serviço de quarto.Entre os serviços da propriedade estão estacionamento gratuito com área específica para recarga de carros elétricos, salão de jogos, salão de jogos infantil e recepção 24 horas. Os hóspedes também podem desfrutar de uma piscina infantil.",
+            "address": {
+              "zipcode": "88334-000",
+              "address": "Rod Lap Rodesindo Pavan, 4480",
+              "city": {
+                "name": "Balneario Camboriu",
+                "country": {
+                  "code": "BR",
+                  "name": "Brasil"
+                }
+              }
+            },
+            "stars": 4,
+            "type": "HOTEL",
+            "checkInTime": "15:00 - ",
+            "checkOutTime": "12:00",
+            "images": [
+              {
+                "large": "http://media.staticontent.com/media/pictures/0d3853ac-26ba-4b89-b2b3-041d8670fef2",
+                "medium": "http://media.staticontent.com/media/pictures/0d3853ac-26ba-4b89-b2b3-041d8670fef2",
+                "small": "http://media.staticontent.com/media/pictures/0d3853ac-26ba-4b89-b2b3-041d8670fef2"
+              },
+              {
+                "large": "http://media.staticontent.com/media/pictures/8dfaf114-12be-40c0-b293-0f07166bb27b",
+                "medium": "http://media.staticontent.com/media/pictures/8dfaf114-12be-40c0-b293-0f07166bb27b",
+                "small": "http://media.staticontent.com/media/pictures/8dfaf114-12be-40c0-b293-0f07166bb27b"
+              },
+              {
+                "large": "http://media.staticontent.com/media/pictures/65d0071e-931c-4a54-a27a-07371af05742",
+                "medium": "http://media.staticontent.com/media/pictures/65d0071e-931c-4a54-a27a-07371af05742",
+                "small": "http://media.staticontent.com/media/pictures/65d0071e-931c-4a54-a27a-07371af05742"
+              },
+              {
+                "large": "http://media.staticontent.com/media/pictures/8ff4ec45-3584-4907-967a-24eef2b7b45f",
+                "medium": "http://media.staticontent.com/media/pictures/8ff4ec45-3584-4907-967a-24eef2b7b45f",
+                "small": "http://media.staticontent.com/media/pictures/8ff4ec45-3584-4907-967a-24eef2b7b45f"
+              },
+              {
+                "large": "http://media.staticontent.com/media/pictures/25e4b6c8-bca9-4b29-9f83-150d19827333",
+                "medium": "http://media.staticontent.com/media/pictures/25e4b6c8-bca9-4b29-9f83-150d19827333",
+                "small": "http://media.staticontent.com/media/pictures/25e4b6c8-bca9-4b29-9f83-150d19827333"
+              },
+              {
+                "large": "http://media.staticontent.com/media/pictures/8e3de6ea-66a7-488c-8b6f-774b72e38539",
+                "medium": "http://media.staticontent.com/media/pictures/8e3de6ea-66a7-488c-8b6f-774b72e38539",
+                "small": "http://media.staticontent.com/media/pictures/8e3de6ea-66a7-488c-8b6f-774b72e38539"
+              }
+            ],
+            "facilities": [
+              {
+                "items": [
+                  {
+                    "id": 0,
+                    "name": "Ar condicionado em zonas comuns"
+                  },
+                  {
+                    "id": 1,
+                    "name": "Detetor de incêndios"
+                  },
+                  {
+                    "id": 2,
+                    "name": "Recepção 24 h por dia"
+                  },
+                  {
+                    "id": 3,
+                    "name": "Elevador"
+                  },
+                  {
+                    "id": 4,
+                    "name": "Jardim"
+                  },
+                  {
+                    "id": 5,
+                    "name": "Terraço"
+                  },
+                  {
+                    "id": 6,
+                    "name": "Serviço de quartos"
+                  },
+                  {
+                    "id": 7,
+                    "name": "Acessível a cadeiras de rodas"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+]
