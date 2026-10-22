@@ -68,7 +68,8 @@ test('the Infotravel test quotation renders hotel, flights, transfer, extras and
         'Traslado IDA (IN) + RETORNO (OUT) Aeroporto Navegantes (NVT) | Balneário Camboriú',
         'PASSEIO AO BETO CARRERO WORLD',
         'Comodidades do hotel (62)',
-        'Proposta válida até 04/02/2027',
+        // The exact cutoff (12:00 in São Paulo), not just the day.
+        'Proposta válida até 04/02/2027 às 12:00',
     ]) {
         assert.ok(html.includes(expected), `missing: ${expected}`);
     }
@@ -214,6 +215,31 @@ test('an impossible or inverted stay is refused before it reaches a page', () =>
     assert.equal(withRoom({ checkout: '2027-02-30' }), false);
     assert.equal(withRoom({ checkout: '2027-03-10' }), false);
     assert.equal(withRoom({ checkout: '2027-03-09' }), false);
+});
+
+test('flights: real round trips only, overnight arrivals dated, impossible times refused', () => {
+    const value = content();
+    const [outbound, inbound] = value.flights;
+
+    const oneWay = render({ ...value, flights: [outbound, { ...inbound, from: 'Navegantes (NVT)', to: 'Porto Alegre (POA)' }] });
+    assert.ok(oneWay.includes('Trecho 1') && oneWay.includes('Trecho 2'));
+    assert.ok(!oneWay.includes('Volta') && !oneWay.includes('Voos de ida e volta'));
+
+    const overnight = render({ ...value, flights: [{ ...outbound, departure: '2027-03-10T23:50:00-03:00', arrival: '2027-03-11T08:10:00+01:00' }] });
+    assert.match(overnight, /08:10 <small>\(chega 11\/03\)<\/small>/);
+
+    for (const departure of ['2027-02-31T10:00:00-03:00', '2027-03-10T25:00:00-03:00', '2027-03-10T10:61:00-03:00']) {
+        assert.equal(proposalContentSchema.safeParse({ ...value, flights: [{ ...outbound, departure }] }).success, false, departure);
+    }
+});
+
+test('the refundability is shown when the operator sends no cancellation text', () => {
+    const value = content();
+    assert.ok(value.hotel);
+
+    const html = render({ ...value, hotel: { ...value.hotel, room: { ...value.hotel.room, cancellation: [], refundable: false } } });
+
+    assert.ok(html.includes('Tarifa não reembolsável'));
 });
 
 test('children are counted from the passengers beyond the adults, without storing ages', () => {

@@ -22,7 +22,21 @@ const PRIVACY_NOTICE = 'Para acompanhar sua proposta, registramos quando esta p�
 const INTERNAL_PREVIEW_NOTICE = 'Prévia interna: esta visita não conta como abertura do cliente.';
 
 const BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
-const SAO_PAULO_DATE = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', year: 'numeric' });
+const SAO_PAULO_DATE_TIME = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+});
+
+/** The exact cutoff, not just the day: the link stops working at this minute. */
+function formatValidUntil(ms: number): string {
+    const parts = Object.fromEntries(SAO_PAULO_DATE_TIME.formatToParts(ms).map((part) => [part.type, part.value]));
+    return `${parts.day}/${parts.month}/${parts.year} às ${parts.hour}:${parts.minute}`;
+}
 
 export function escapeHtml(value: string): string {
     return value
@@ -96,7 +110,7 @@ ${hotel.address ? `<p class="muted">${escapeHtml(hotel.address)}</p>` : ''}
 <p class="item-title">${escapeHtml(room.type)}</p>
 ${room.board ? `<p>${escapeHtml(room.board)}</p>` : ''}
 <p class="muted">${times.join('<br>')}</p>
-${list(room.cancellation, 'fine')}
+${list(room.cancellation.length || room.refundable === undefined ? room.cancellation : [room.refundable ? 'Tarifa reembolsável' : 'Tarifa não reembolsável'], 'fine')}
 </div>
 ${hotel.description ? `<p>${escapeHtml(hotel.description)}</p>` : ''}
 ${gallery.length ? `<div class="gallery">${gallery.map((photo) => `<img src="${escapeHtml(photo)}" alt="" loading="lazy" decoding="async">`).join('')}</div>` : ''}
@@ -104,12 +118,23 @@ ${hotel.amenities.length ? `<details><summary>Comodidades do hotel (${hotel.amen
 </section>`;
 }
 
+/** `São Paulo (CGH)` → `são paulo`: São Paulo out of CGH and back into GRU is still a return. */
+function city(place: string): string {
+    return place.replace(/\(.*\)/, '').trim().toLocaleLowerCase('pt-BR');
+}
+
+/** Two flights that leave from where the other one lands: outbound and return. */
+function isRoundTrip(flights: ProposalContent['flights']): boolean {
+    if (flights.length !== 2) return false;
+    const [outbound, inbound] = flights;
+    return city(outbound.from) === city(inbound.to) && city(outbound.to) === city(inbound.from);
+}
+
 function flightsSection(flights: ProposalContent['flights']): string {
     if (flights.length === 0) return '';
-    // Two flights are read as outbound and return: the shape the operator
-    // quotes today. A one-way trip with a connection needs a leg field (#1905, #1906).
+    const roundTrip = isRoundTrip(flights);
     const legLabel = (index: number) => {
-        if (flights.length === 2) return index === 0 ? 'Ida' : 'Volta';
+        if (roundTrip) return index === 0 ? 'Ida' : 'Volta';
         return `Trecho ${index + 1}`;
     };
     const cards = flights.map((flight, index) => {
@@ -123,7 +148,7 @@ function flightsSection(flights: ProposalContent['flights']): string {
         return `<div class="card">
 <p class="label">${legLabel(index)} · ${departure.day}</p>
 <p class="item-title">${escapeHtml(flight.airline)} ${escapeHtml(flight.number)}</p>
-<p class="route"><span>${departure.time}<br><small>${escapeHtml(flight.from)}</small></span><span aria-hidden="true">→</span><span>${arrival.time}<br><small>${escapeHtml(flight.to)}</small></span></p>
+<p class="route"><span>${departure.time}<br><small>${escapeHtml(flight.from)}</small></span><span aria-hidden="true">→</span><span>${arrival.time}${arrival.day === departure.day ? '' : ` <small>(chega ${arrival.day})</small>`}<br><small>${escapeHtml(flight.to)}</small></span></p>
 <p class="muted">${escapeHtml(details.join(' · '))}</p>
 </div>`;
     });
@@ -148,7 +173,7 @@ ${extra.description ? `<details><summary>Detalhes</summary><p>${escapeHtml(extra
 function includedSummary(content: ProposalContent): string[] {
     const items: string[] = [];
     if (content.hotel) items.push(`Hospedagem por ${plural(nightsBetween(content.hotel.room.checkin, content.hotel.room.checkout), 'noite', 'noites')}`);
-    if (content.flights.length) items.push(content.flights.length === 2 ? 'Voos de ida e volta' : plural(content.flights.length, 'voo', 'voos'));
+    if (content.flights.length) items.push(isRoundTrip(content.flights) ? 'Voos de ida e volta' : plural(content.flights.length, 'voo', 'voos'));
     if (content.transfers.length) items.push(plural(content.transfers.length, 'traslado', 'traslados'));
     if (content.extras.length) items.push(plural(content.extras.length, 'passeio ou ingresso', 'passeios e ingressos'));
     return items;
@@ -203,7 +228,7 @@ export function renderProposalContent(
     const greeting = content.firstName ? `${content.firstName}, sua viagem para ${content.destination}` : `Sua viagem para ${content.destination}`;
     const period = hotel ? `${formatDay(hotel.room.checkin)} a ${formatDay(hotel.room.checkout)} · ` : '';
     const heroPhoto = hotel?.photos[0];
-    const validUntil = SAO_PAULO_DATE.format(options.expiresAt);
+    const validUntil = formatValidUntil(options.expiresAt);
     const cta = whatsappUrl(`Olá! Vi minha proposta para ${content.destination} e quero conversar.`);
 
     return `<!DOCTYPE html>
