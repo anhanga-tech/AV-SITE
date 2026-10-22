@@ -9,16 +9,20 @@ import {
     createProposalRef,
     notifyProposalOpen,
     PROPOSAL_REOPEN_NOTIFY_GAP_MS,
+    signProposalWebhook,
     verifyProposalWebhook,
     type ProposalOpenedPayload,
+    type ProposalWebhookEnvelope,
 } from '../lib/proposal-webhook.ts';
 import { createFakeProposalRedis } from './helpers/fake-proposal-redis.ts';
 
 // Issue #1900: a signed webhook tells the sales bot (Clara) that a customer
 // opened the proposal — on the first open and on reopens 30+ minutes apart.
+// The Clara automation only receives the body, so the signature rides in it.
 
 const ORIGIN = 'https://www.anhanga.tur.br';
 const WEBHOOK_URL = 'https://hooks.example.test/clara/proposta';
+const WEBHOOK_KEY = 'test-proposal-webhook-key';
 const WEBHOOK_SECRET = 'test-proposal-webhook-secret';
 const PREVIEW_SECRET = 'test-proposal-preview-secret';
 const LEAD_ID = 987654321;
@@ -47,6 +51,7 @@ function withEnv(t: { after: (fn: () => void) => void }, env: Record<string, str
 function withWebhook(t: { after: (fn: () => void) => void }, env: Record<string, string | undefined> = {}) {
     withEnv(t, {
         PROPOSAL_WEBHOOK_URL: WEBHOOK_URL,
+        PROPOSAL_WEBHOOK_KEY: WEBHOOK_KEY,
         PROPOSAL_WEBHOOK_SECRET: WEBHOOK_SECRET,
         PROPOSAL_PREVIEW_SECRET: PREVIEW_SECRET,
         ...env,
@@ -89,11 +94,15 @@ function open(id: string, options: { userAgent?: string; query?: string; method?
     });
 }
 
-function payloadOf(delivery: Delivery): ProposalOpenedPayload {
+function envelopeOf(delivery: Delivery): ProposalWebhookEnvelope {
     return JSON.parse(delivery.body);
 }
 
-test('the first open sends a signed webhook with the lead, the count and the time', async (t) => {
+function payloadOf(delivery: Delivery): ProposalOpenedPayload {
+    return JSON.parse(envelopeOf(delivery).payload);
+}
+
+test('the first open sends a signed envelope with the lead, the count and the time', async (t) => {
     withWebhook(t);
     const { deps, deliveries, settle, clock } = setup();
     const { id } = await saveProposal({ redirectUrl: OPERATOR_LINK, leadId: LEAD_ID }, deps);
@@ -117,17 +126,25 @@ test('the first open sends a signed webhook with the lead, the count and the tim
         openedAt: new Date(clock.now).toISOString(),
         previousOpenAt: null,
     });
-    assert.equal(delivery.headers['x-anhanga-event-id'], payload.eventId);
-    assert.equal(
-        await verifyProposalWebhook({
-            body: delivery.body,
-            timestamp: delivery.headers['x-anhanga-timestamp'],
-            signature: delivery.headers['x-anhanga-signature'],
-            secret: WEBHOOK_SECRET,
-            now: clock.now,
-        }),
-        true,
-    );
+    assert.deepEqual(Object.keys(envelopeOf(delivery)).sort(), ['payload', 'signature', 'ts']);
+    assert.equal(envelopeOf(delivery).ts, clock.now / 1000);
+    assert.deepEqual(await verifyProposalWebhook({ body: delivery.body, secret: WEBHOOK_SECRET, now: clock.now }), payload);
+});
+
+test('the request authenticates to the receiver with its key, and carries no signature header', async (t) => {
+    withWebhook(t);
+    const { deps, deliveries, settle } = setup();
+    const { id } = await saveProposal({ leadId: LEAD_ID }, deps);
+
+    await handleProposalRequest(open(id), id, deps);
+    await settle();
+
+    const [{ headers }] = deliveries;
+    assert.equal(headers.authorization, `Bearer ${WEBHOOK_KEY}`);
+    assert.equal(headers['content-type'], 'application/json');
+    assert.match(headers['user-agent'], /^Anhanga-Proposal-Webhook\//);
+    assert.ok(!Object.keys(headers).some((name) => name.startsWith('x-')), 'only the body reaches the automation');
+    assert.ok(!deliveries[0].body.includes(WEBHOOK_KEY));
 });
 
 test('the webhook carries neither the proposal id nor the operator link', async (t) => {
@@ -195,7 +212,7 @@ test('a failing receiver is retried with the same event id, after the page was s
 
     assert.equal(deliveries.length, 3);
     assert.equal(new Set(deliveries.map((delivery) => delivery.body)).size, 1);
-    assert.equal(new Set(deliveries.map((delivery) => delivery.headers['x-anhanga-event-id'])).size, 1);
+    assert.equal(new Set(deliveries.map((delivery) => payloadOf(delivery).eventId)).size, 1);
     assert.deepEqual(sleeps, [1_000, 3_000]);
     assert.equal(listOf(opensKey(id)).length, 1);
 });
@@ -219,7 +236,7 @@ test('a receiver that keeps failing gives up after three attempts without breaki
     assert.equal(listOf(opensKey(id)).length, 1);
     const output = logged.join('\n');
     assert.match(output, /PROPOSAL_WEBHOOK/);
-    for (const secret of [id, String(LEAD_ID), 'hooks.example.test', await createProposalRef(id)]) {
+    for (const secret of [id, String(LEAD_ID), 'hooks.example.test', WEBHOOK_KEY, await createProposalRef(id)]) {
         assert.ok(!output.includes(secret), `logs must not contain ${secret}`);
     }
 });
@@ -238,6 +255,7 @@ test('a client error from the receiver is not retried', async (t) => {
 test('nothing is sent without a configured https webhook, or for a proposal without a lead', async (t) => {
     for (const env of [
         { PROPOSAL_WEBHOOK_URL: undefined },
+        { PROPOSAL_WEBHOOK_KEY: undefined },
         { PROPOSAL_WEBHOOK_SECRET: undefined },
         { PROPOSAL_WEBHOOK_URL: 'http://hooks.example.test/clara' },
         { PROPOSAL_WEBHOOK_URL: 'not a url' },
@@ -267,26 +285,37 @@ test('nothing is sent without a configured https webhook, or for a proposal with
     });
 });
 
-test('the receiver rejects a tampered body, a stale timestamp or another secret', async (t) => {
+test('the receiver rejects a tampered payload, a stale ts or another secret', async (t) => {
     withWebhook(t);
     const { deps, deliveries, settle, clock } = setup();
     const { id } = await saveProposal({ leadId: LEAD_ID }, deps);
     await handleProposalRequest(open(id), id, deps);
     await settle();
-    const [{ body, headers }] = deliveries;
-    const valid = { body, timestamp: headers['x-anhanga-timestamp'], signature: headers['x-anhanga-signature'], secret: WEBHOOK_SECRET, now: clock.now };
+    const [{ body }] = deliveries;
+    const envelope = JSON.parse(body) as ProposalWebhookEnvelope;
+    const verify = (overrides: { body?: unknown; secret?: string; now?: number } = {}) =>
+        verifyProposalWebhook({ body, secret: WEBHOOK_SECRET, now: clock.now, ...overrides });
 
-    assert.equal(await verifyProposalWebhook(valid), true);
-    assert.equal(await verifyProposalWebhook({ ...valid, body: body.replace(String(LEAD_ID), '1') }), false);
-    assert.equal(await verifyProposalWebhook({ ...valid, secret: `${WEBHOOK_SECRET}x` }), false);
-    assert.equal(await verifyProposalWebhook({ ...valid, now: clock.now + 6 * 60_000 }), false);
-    assert.equal(await verifyProposalWebhook({ ...valid, now: clock.now - 6 * 60_000 }), false);
-    assert.equal(await verifyProposalWebhook({ ...valid, timestamp: null }), false);
-    assert.equal(await verifyProposalWebhook({ ...valid, signature: 'v1=' }), false);
-    assert.equal(await verifyProposalWebhook({ ...valid, timestamp: '1e9' }), false);
+    assert.equal((await verify())?.leadId, LEAD_ID);
+    assert.equal((await verify({ body: envelope }))?.leadId, LEAD_ID, 'an already parsed body verifies too');
+    assert.equal(await verify({ body: { ...envelope, payload: envelope.payload.replace(String(LEAD_ID), '1') } }), null);
+    assert.equal(await verify({ body: { ...envelope, ts: envelope.ts + 1 } }), null, 'ts is signed');
+    assert.equal(await verify({ secret: `${WEBHOOK_SECRET}x` }), null);
+    assert.equal(await verify({ now: clock.now + 6 * 60_000 }), null);
+    assert.equal(await verify({ now: clock.now - 6 * 60_000 }), null);
+    assert.equal(await verify({ body: { ...envelope, signature: 'v1=' } }), null);
+    assert.equal(await verify({ body: { ...envelope, ts: String(envelope.ts) } }), null);
+    assert.equal(await verify({ body: { payload: envelope.payload } }), null);
+    assert.equal(await verify({ body: 'not json' }), null);
+    // A correctly signed text that isn't a proposal.opened payload is still refused.
+    for (const payload of ['{}', 'not json', JSON.stringify({ ...JSON.parse(envelope.payload), leadId: '1' })]) {
+        const signed = { payload, ts: envelope.ts, signature: await signProposalWebhook(WEBHOOK_SECRET, envelope.ts, payload) };
+        assert.equal(await verify({ body: signed }), null, payload);
+    }
+    assert.equal(await verify({ body: null }), null);
 });
 
-test('the signature timestamp is the send time, so a late delivery still verifies', async (t) => {
+test('the signed ts is the send time, so a late delivery still verifies', async (t) => {
     withWebhook(t);
     const deliveries: Delivery[] = [];
     const openedAt = Date.UTC(2026, 9, 22, 15, 30);
@@ -303,13 +332,10 @@ test('the signature timestamp is the send time, so a late delivery still verifie
         },
     );
 
-    const [{ body, headers }] = deliveries;
-    assert.equal(headers['x-anhanga-timestamp'], String(sentAt / 1000));
-    assert.equal(payloadOf(deliveries[0]).openedAt, new Date(openedAt).toISOString());
-    assert.equal(
-        await verifyProposalWebhook({ body, timestamp: headers['x-anhanga-timestamp'], signature: headers['x-anhanga-signature'], secret: WEBHOOK_SECRET, now: sentAt }),
-        true,
-    );
+    const [delivery] = deliveries;
+    assert.equal(envelopeOf(delivery).ts, sentAt / 1000);
+    assert.equal(payloadOf(delivery).openedAt, new Date(openedAt).toISOString());
+    assert.notEqual(await verifyProposalWebhook({ body: delivery.body, secret: WEBHOOK_SECRET, now: sentAt }), null);
 });
 
 test('the proposal reference is stable for whoever holds the id, and does not reveal it', async () => {

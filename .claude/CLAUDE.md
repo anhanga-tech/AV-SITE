@@ -66,7 +66,8 @@ PROPOSAL_PREVIEW_SECRET=      # HMAC-SHA256 key (lib/proposal-preview.ts) — ve
 PROPOSAL_API_SECRET=          # Bearer do bot comercial em /api/create-proposal — ver docs/ops/proposta-link.md
 PROPOSAL_PAGES_ENABLED=       # 'true' libera propostas com página (type infotravel); padrão desligado até a #1925
 PROPOSAL_WEBHOOK_URL=         # Receptor (https) do aviso de abertura de proposta (lib/proposal-webhook.ts)
-PROPOSAL_WEBHOOK_SECRET=      # HMAC-SHA256 do aviso de abertura; o mesmo valor no receptor
+PROPOSAL_WEBHOOK_KEY=         # Bearer da automação receptora (chave de envio do painel da Clara)
+PROPOSAL_WEBHOOK_SECRET=      # HMAC-SHA256 do envelope do aviso de abertura; o mesmo valor no receptor
 
 # Rate limiting (required in prod — module-level state resets per request on Cloudflare)
 UPSTASH_REDIS_REST_URL=
