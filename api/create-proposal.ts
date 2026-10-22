@@ -81,6 +81,11 @@ async function buildInfotravelContent(
         return { content: fromInfotravelNormalized(normalizeInfotravelQuotation(quotation), { firstName }) };
     } catch (error) {
         if (error instanceof InfotravelError || error instanceof InfotravelNormalizeError) return { fallbackReason: error.reason };
+        // Class only: the message can carry the link (and its token) or quotation data.
+        logger.error('CREATE_PROPOSAL', {
+            stage: 'infotravel_content_failed',
+            errorName: error instanceof Error ? error.name : typeof error,
+        });
         return { fallbackReason: 'invalid_content' };
     }
 }

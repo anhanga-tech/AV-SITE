@@ -81,6 +81,12 @@ function setup(t: { after: (fn: () => void) => void }, pagesEnabled = true) {
     return { clock, ...fake, deps: { redis: fake.redis, now: () => clock.now } };
 }
 
+function withFirstFlight(changes: Record<string, unknown>) {
+    const pack = BOOKING.bookingPackages[0];
+    const group = pack.bookingFlights[0];
+    return { ...BOOKING, bookingPackages: [{ ...pack, bookingFlights: [{ ...group, flights: [{ ...group.flights[0], ...changes }, ...group.flights.slice(1)] }] }] };
+}
+
 const INFOTRAVEL_BODY = { type: 'infotravel', redirectUrl: LINK, leadId: 987654321, firstName: 'Ana Paula Souza' };
 
 test('the token is read from the raw query, base64 padding and plus signs intact', () => {
@@ -225,6 +231,8 @@ test('any extraction failure falls back to the tracked redirect for the same lin
         [{ booking: () => new Response(null, { status: 403 }) }, 'http_error'],
         [{ hotel: () => Response.json({ unexpected: true }) }, 'unexpected_response'],
         [{ booking: () => trpc({ ...BOOKING, bookingAmount: { currency: 'BRL', amount: 1 } }) }, 'total_mismatch'],
+        // Passes the operator checks but not the page schema (arrival before departure).
+        [{ booking: () => trpc(withFirstFlight({ arrival: '2027-03-10T17:00:00-03:00' })) }, 'invalid_content'],
     ];
     for (const [routes, reason] of cases) {
         const { data } = await (await handleCreateProposal(create(INFOTRAVEL_BODY), { ...deps, infotravel: { fetch: operatorApi(routes).fetch } })).json();
@@ -248,6 +256,8 @@ test('the booking token never reaches the logs, and the tRPC input is redacted i
 
     await handleCreateProposal(create(INFOTRAVEL_BODY), { ...deps, infotravel: { fetch: operatorApi().fetch } });
     await handleCreateProposal(create(INFOTRAVEL_BODY), { ...deps, infotravel: { fetch: operatorApi({ booking: () => new Response(null, { status: 500 }) }).fetch } });
+    await handleCreateProposal(create(INFOTRAVEL_BODY), { ...deps, infotravel: { fetch: operatorApi({ booking: () => trpc(withFirstFlight({ arrival: '2027-03-10T17:00:00-03:00' })) }).fetch } });
+    assert.match(logged.join('\n'), /infotravel_content_failed.*ZodError/);
 
     const output = logged.join('\n');
     assert.match(output, /CREATE_PROPOSAL/);
