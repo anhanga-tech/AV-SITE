@@ -170,13 +170,20 @@ ${extra.description ? `<details><summary>Detalhes</summary><p>${escapeHtml(extra
     return `<section aria-labelledby="extras"><h2 id="extras">Passeios e ingressos</h2>${cards.join('')}</section>`;
 }
 
-/** `06/12/2026 a 09/12/2026 · `, from the stay or, without one, from the flights. */
+/**
+ * `06/12/2026 a 09/12/2026 · `: the whole trip, from the earliest to the
+ * latest day of the stay, every flight's departure and arrival, and the
+ * dated extras. `YYYY-MM-DD` strings sort chronologically.
+ */
 function travelPeriod(content: ProposalContent): string {
-    const { hotel, flights } = content;
-    if (hotel) return `${formatDay(hotel.room.checkin)} a ${formatDay(hotel.room.checkout)} · `;
-    if (flights.length === 0) return '';
-    const first = formatDay(flights[0].departure.slice(0, 10));
-    const last = formatDay(flights[flights.length - 1].departure.slice(0, 10));
+    const days = [
+        ...(content.hotel ? [content.hotel.room.checkin, content.hotel.room.checkout] : []),
+        ...content.flights.flatMap((flight) => [flight.departure.slice(0, 10), flight.arrival.slice(0, 10)]),
+        ...content.extras.flatMap((extra) => (extra.date ? [extra.date] : [])),
+    ].sort();
+    if (days.length === 0) return '';
+    const first = formatDay(days[0]);
+    const last = formatDay(days[days.length - 1]);
     return first === last ? `${first} · ` : `${first} a ${last} · `;
 }
 

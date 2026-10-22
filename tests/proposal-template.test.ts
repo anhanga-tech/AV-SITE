@@ -257,6 +257,10 @@ test('partial data never turns into a false claim', () => {
     const { hotel: _hotel, ...withoutHotel } = value;
     assert.ok(render({ ...withoutHotel, flights: [outbound, inbound] }).includes('10/03/2027 a 13/03/2027 · 2 adultos'));
 
+    // The whole trip: an overnight flight the day before check-in widens the period.
+    const earlyFlight = { ...outbound, departure: '2027-03-09T23:30:00-03:00', arrival: '2027-03-10T07:05:00-03:00' };
+    assert.ok(render({ ...value, flights: [earlyFlight, inbound] }).includes('09/03/2027 a 13/03/2027 · 2 adultos'));
+
     // Nothing included: refused.
     assert.equal(proposalContentSchema.safeParse({ ...withoutHotel, flights: [], transfers: [], extras: [] }).success, false);
 
