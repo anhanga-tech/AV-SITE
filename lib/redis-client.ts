@@ -16,6 +16,7 @@ export interface RedisClientLike {
 
 /** The queued-command subset of an Upstash `multi()` transaction. */
 export interface RedisTransactionLike {
+    lindex(key: string, index: number): unknown;
     rpush(key: string, ...values: string[]): unknown;
     // `NX`: only set a TTL when the key has none (fixes it at the first write).
     expire(key: string, seconds: number, option?: 'NX'): unknown;

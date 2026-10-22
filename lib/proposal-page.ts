@@ -15,6 +15,7 @@
  */
 import { isLinkPreviewRequest, isPrefetchRequest } from './link-preview-agents';
 import { recordProposalOpen, type ProposalOpensRedis } from './proposal-opens';
+import { notifyProposalOpen, type ProposalWebhookDeps } from './proposal-webhook';
 import { isProposalPreviewRequest } from './proposal-preview';
 import { loadProposal } from './proposal-store';
 
@@ -150,6 +151,14 @@ export interface ProposalPageDeps {
     now?: () => number;
     /** The Pages context's `waitUntil`: records the open after the response is sent. */
     waitUntil?: (promise: Promise<unknown>) => void;
+    webhook?: ProposalWebhookDeps;
+}
+
+/** Records the open, then tells the sales bot when it is due (#1900). Never rejects. */
+async function recordAndNotify(request: Request, id: string, leadId: number | undefined, deps: ProposalPageDeps): Promise<void> {
+    const recorded = await recordProposalOpen(request, id, deps);
+    if (!recorded) return;
+    await notifyProposalOpen({ id, leadId, ...recorded }, { now: deps.now, ...deps.webhook });
 }
 
 export async function handleProposalRequest(
@@ -170,7 +179,7 @@ export async function handleProposalRequest(
 
     const lookup = await loadProposal(id, deps);
     if (lookup.status !== 'active') return htmlResponse(lookup.status, request.method);
-    const { redirectUrl } = lookup.proposal;
+    const { redirectUrl, leadId } = lookup.proposal;
 
     // Link previews get the Anhangá page even on a redirect proposal: the chat
     // card stays ours and the operator link (a booking credential) is never
@@ -182,9 +191,10 @@ export async function handleProposalRequest(
     }
 
     // After the response via waitUntil, which keeps the isolate alive until the
-    // write finishes — so the 302 isn't held back by the Redis round trips.
-    const recording = recordProposalOpen(request, id, deps);
+    // write and the webhook finish — so the 302 isn't held back by either.
+    const recording = recordAndNotify(request, id, leadId, deps);
     if (deps.waitUntil) deps.waitUntil(recording);
+    // Without waitUntil (tests, local dev) the response waits for the webhook too.
     else await recording;
 
     return redirectUrl ? redirectResponse(redirectUrl) : htmlResponse('active', request.method);

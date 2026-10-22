@@ -240,6 +240,7 @@ test('a recording failure still serves the page and never logs the id', async (t
     const failing: ProposalOpensRedis = {
         ...redis,
         multi: () => ({
+            lindex: () => undefined,
             rpush: () => undefined,
             expire: () => undefined,
             exec: async () => {
@@ -264,6 +265,7 @@ test('the append and its 90-day TTL are one transaction, so a list never lives w
         multi: () => {
             const transaction = redis.multi();
             return {
+                lindex: (...args) => (calls.push('lindex'), transaction.lindex(...args)),
                 rpush: (...args) => (calls.push('rpush'), transaction.rpush(...args)),
                 expire: (...args) => (calls.push('expire'), transaction.expire(...args)),
                 exec: () => (calls.push('exec'), transaction.exec()),
@@ -273,7 +275,7 @@ test('the append and its 90-day TTL are one transaction, so a list never lives w
 
     await handleProposalRequest(open(id, { userAgent: UA.iphone }), id, { ...deps, redis: tracing });
 
-    assert.deepEqual(calls, ['rpush', 'expire', 'exec']);
+    assert.deepEqual(calls, ['lindex', 'rpush', 'expire', 'exec']);
     assert.equal(listOf(opensKey(id)).length, 1);
     assert.equal(listTtlMs(opensKey(id)), PROPOSAL_OPENS_RETENTION_SECONDS * 1000);
 });

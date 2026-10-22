@@ -44,6 +44,16 @@ export function createFakeProposalRedis(clock: { now: number }) {
                     });
                     return transaction;
                 },
+                lindex(key: string, index: number) {
+                    queue.push(() => {
+                        const values = live(lists.get(key))?.values ?? [];
+                        const value = values.at(index);
+                        if (value === undefined) return null;
+                        // Upstash auto-deserializes JSON, like read() above.
+                        return JSON.parse(value);
+                    });
+                    return transaction;
+                },
                 expire(key: string, seconds: number, option?: 'NX') {
                     queue.push(() => {
                         const entry = live(lists.get(key));

@@ -1,6 +1,6 @@
 # Link de proposta (`/proposta/<id>`)
 
-Épico [#1894](https://github.com/anhanga-tech/AV-SITE/issues/1894). Este documento cobre a rota (P1, #1895), o scrub no Sentry (P4, #1898) o registro de aberturas (P3, #1897), o redirect rastreado (P2, #1896) e o endpoint interno de criação (P5, #1899). As próximas fases acrescentam aqui o que mudarem.
+Épico [#1894](https://github.com/anhanga-tech/AV-SITE/issues/1894). Este documento cobre a rota (P1, #1895), o scrub no Sentry (P4, #1898) o registro de aberturas (P3, #1897), o redirect rastreado (P2, #1896), o endpoint interno de criação (P5, #1899) e o webhook de abertura (P6, #1900). As próximas fases acrescentam aqui o que mudarem.
 
 ## O que existe
 
@@ -97,6 +97,35 @@ Resposta 201:
 **Configurar no Cloudflare Pages:** `PROPOSAL_API_SECRET` (gerar com `openssl rand -hex 32`), em Production e Preview, e o mesmo valor no bot. Sem ele, o endpoint responde 500 e não cria nada.
 
 Os logs (`CREATE_PROPOSAL`) trazem só `requestId`, etapa e tipo. Nunca o corpo, o id, o `leadId` ou o link da operadora; em erro de validação, só o caminho dos campos.
+
+## Webhook de abertura (P6)
+
+Quando o cliente abre a proposta, o site avisa o bot comercial (Clara, decisão D3) para preparar o follow-up. Nenhuma mensagem vai ao cliente sem o OK do Felipe (#1903). Código em `lib/proposal-webhook.ts`.
+
+- **Quando:** na 1ª abertura e em cada reabertura com 30 minutos ou mais desde a abertura anterior. Prévia interna (`?previa=`), prévias de link, prefetch e HEAD não contam abertura e, por isso, nunca disparam o webhook.
+- **Como:** em `waitUntil`, depois da resposta ao cliente: o aviso nunca atrasa nem quebra a página. Até 3 tentativas (5 s cada, espera de 1 s e 3 s) em erro de rede, 5xx ou 429. Um 4xx não é repetido. Sem fila durável: se as 3 falharem, o aviso se perde (fica o log `PROPOSAL_WEBHOOK` `failed`) e a abertura continua gravada no Redis.
+- **Pula sem chamar:** sem `PROPOSAL_WEBHOOK_URL` ou `PROPOSAL_WEBHOOK_SECRET`, URL que não seja `https`, ou proposta sem `leadId`.
+
+```http
+POST <PROPOSAL_WEBHOOK_URL>
+Content-Type: application/json
+X-Anhanga-Timestamp: 1792683000
+X-Anhanga-Signature: v1=<hex HMAC-SHA256 de "<timestamp>.<corpo bruto>">
+X-Anhanga-Event-Id: <proposalRef>:<openCount>
+
+{ "event": "proposal.opened", "eventId": "<proposalRef>:2", "proposalRef": "<32 hex>", "leadId": 1234,
+  "openCount": 2, "isFirstOpen": false, "openedAt": "2026-10-22T18:30:00.000Z", "previousOpenAt": "2026-10-22T15:30:00.000Z" }
+```
+
+- `proposalRef`: SHA-256 de `proposta-ref:v1:<id>`, primeiros 32 hex (`createProposalRef`). Não revela o id; quem criou a proposta (e tem o id) recalcula para correlacionar. O payload não leva o id nem o link: o id abre a proposta, e no redirect leva ao token da reserva.
+- `openedAt`/`previousOpenAt` em UTC; o receptor converte para o horário de SP.
+- `openCount` é a contagem total de aberturas, inclusive as que não geraram aviso.
+- `previousOpenAt` pode vir `null` com `isFirstOpen: false` quando a abertura anterior não pôde ser lida: na dúvida, o site avisa. O receptor deve aceitar essa combinação.
+- **Idempotência:** `eventId` (repetido no header) é o mesmo em todas as tentativas do mesmo aviso, e distinto entre aberturas (vem do `RPUSH` atômico). O receptor deve ignorar um `eventId` já processado.
+
+**Verificação no receptor** (obrigatória): recalcular `v1=` + HMAC-SHA256 hex de `` `${timestamp}.${corpoBruto}` `` com o secret, comparar em tempo constante, e recusar timestamp a mais de 5 minutos do relógio. Em TypeScript, `verifyProposalWebhook` de `lib/proposal-webhook.ts` faz isso. Use o corpo bruto, antes de qualquer parse.
+
+**Configurar no Cloudflare Pages** (Production e Preview): `PROPOSAL_WEBHOOK_URL` (endpoint da Clara, `https`) e `PROPOSAL_WEBHOOK_SECRET` (`openssl rand -hex 32`, o mesmo valor no receptor). A autenticação é o HMAC: a URL não deve carregar segredo no caminho, porque URLs de saída podem aparecer em breadcrumbs do Sentry.
 
 ## Headers
 
