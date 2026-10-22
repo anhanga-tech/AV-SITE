@@ -660,6 +660,92 @@ test('scrubSpanUrls redacts span name, URL attributes, query attributes and the 
     assert.equal(span.attributes['http.request.method'], 'GET', 'non-URL attributes must be left alone');
 });
 
+// The proposal id is a path credential (issue #1898): `/proposta/<id>` opens the
+// customer's proposal, so it must never reach Sentry in any spelling.
+const PROPOSAL_ID = 'Ab12Cd34Ef56Gh78';
+
+test('scrubSensitiveUrl redacts the proposal id in the path, keeping attribution and fragment', () => {
+    assert.equal(
+        scrubSensitiveUrl(`https://www.anhanga.tur.br/proposta/${PROPOSAL_ID}?utm_source=whatsapp#total`),
+        'https://www.anhanga.tur.br/proposta/[redacted]?utm_source=whatsapp#total',
+    );
+    assert.equal(scrubSensitiveUrl(`/proposta/${PROPOSAL_ID}/`), '/proposta/[redacted]/');
+    assert.equal(scrubSensitiveUrl(`GET /PROPOSTA/${PROPOSAL_ID}`), 'GET /PROPOSTA/[redacted]');
+    assert.equal(scrubSensitiveUrl(`/proposta%2F${PROPOSAL_ID}`), '/proposta%2F[redacted]');
+    // A path credential and a query credential in the same URL are both redacted.
+    assert.equal(
+        scrubSensitiveUrl(`/proposta/${PROPOSAL_ID}?token=abc`),
+        '/proposta/[redacted]?token=[redacted]',
+    );
+    // Scrubbing is idempotent: hooks may run more than once on the same value.
+    assert.equal(scrubSensitiveUrl('/proposta/[redacted]'), '/proposta/[redacted]');
+});
+
+test('scrubSensitiveUrl leaves look-alike paths untouched', () => {
+    for (const clean of ['/proposta', '/proposta/', '/propostas/2026', '/blog/minha-proposta/roteiro']) {
+        assert.equal(scrubSensitiveUrl(clean), clean);
+    }
+});
+
+test('scrubEventUrls redacts the proposal id from an error event, including its transaction name', () => {
+    const url = `https://www.anhanga.tur.br/proposta/${PROPOSAL_ID}`;
+    const scrubbed = scrubEventUrls({
+        transaction: `GET /proposta/${PROPOSAL_ID}`,
+        request: { url, headers: { Referer: url } },
+        contexts: { trace: { data: { 'url.full': url, 'url.path': `/proposta/${PROPOSAL_ID}`, 'http.target': `/proposta/${PROPOSAL_ID}` } } },
+    });
+
+    assert.ok(!JSON.stringify(scrubbed).includes(PROPOSAL_ID), JSON.stringify(scrubbed));
+    assert.equal(scrubbed.transaction, 'GET /proposta/[redacted]');
+});
+
+test('the real v11 SDK never sends the proposal id from a Cloudflare request span', async () => {
+    const envelopes: string[] = [];
+    const client = new BrowserClient({
+        dsn: 'https://public@o0.ingest.sentry.io/0',
+        tracesSampleRate: 1,
+        integrations: [],
+        stackParser: () => [],
+        dataCollection: SENTRY_DATA_COLLECTION,
+        beforeSend: scrubEventUrls,
+        beforeSendSpan: scrubSpanUrls,
+        transport: (options) => createTransport(options, async (request) => {
+            envelopes.push(typeof request.body === 'string' ? request.body : new TextDecoder().decode(request.body));
+            return { statusCode: 200 };
+        }),
+    });
+    setCurrentClient(client);
+    client.init();
+
+    // Name and attributes exactly as `@sentry/core`'s
+    // getHttpSpanDetailsFromUrlObject builds them for the Pages request span
+    // (captured from SDK 11.7.0; `@sentry/core` isn't a direct dependency).
+    const url = `https://www.anhanga.tur.br/proposta/${PROPOSAL_ID}?utm_source=whatsapp`;
+    startSpan({
+        name: `GET /proposta/${PROPOSAL_ID}`,
+        attributes: {
+            'sentry.origin': 'auto.http.cloudflare',
+            'http.request.method': 'GET',
+            'url.full': url,
+            'url.query': 'utm_source=whatsapp',
+            'url.path': `/proposta/${PROPOSAL_ID}`,
+            'url.scheme': 'https:',
+            'server.address': 'www.anhanga.tur.br',
+            'sentry.segment.name.source': 'url',
+        },
+    }, () => {
+        client.captureException(new Error('proposal render failed'));
+    });
+    await client.flush(2000);
+
+    const wire = envelopes.join('\n');
+    assert.match(wire, /"type":"span"/, 'the span must actually have been sent');
+    assert.match(wire, /"type":"event"/, 'the error must actually have been sent');
+    assert.ok(!wire.includes(PROPOSAL_ID), 'the proposal id leaked to the Sentry transport');
+    assert.ok(wire.includes('/proposta/[redacted]'), 'the redacted path should still be readable');
+    assert.ok(wire.includes('utm_source=whatsapp'), 'attribution params must survive');
+});
+
 test('scrubSpanUrls returns the same object for a clean span (beforeSendSpan cannot drop spans)', () => {
     const clean = { name: 'GET /blog', attributes: { 'url.full': 'https://www.anhanga.tur.br/blog?page=2' } };
     assert.equal(scrubSpanUrls(clean), clean);

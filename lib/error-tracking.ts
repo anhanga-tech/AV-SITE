@@ -108,7 +108,22 @@ function scrubQueryPairs(query: string): string {
         .join('&');
 }
 
-export function scrubSensitiveUrl(url: string): string {
+/**
+ * Path segments that are themselves a credential. The proposal link
+ * (`/proposta/<id>`, issue #1894) has no token in its query: the random id IS
+ * the bearer secret that opens the page, and Sentry reports the path in
+ * `request.url`, the span name, `url.path` and the error's `transaction`.
+ * Case-insensitive, and the `/` may arrive percent-encoded (`%2F`), so a
+ * spelling the route would never serve is still redacted rather than leaked.
+ */
+const SENSITIVE_PATH_PATTERN = /((?:\/|%2f)proposta(?:\/|%2f))[^/?#\s]+/gi;
+
+function scrubSensitivePath(value: string): string {
+    return value.replace(SENSITIVE_PATH_PATTERN, `$1${REDACTED_VALUE}`);
+}
+
+export function scrubSensitiveUrl(rawUrl: string): string {
+    const url = scrubSensitivePath(rawUrl);
     const queryStart = url.indexOf('?');
     if (queryStart < 0) return url;
 
@@ -138,8 +153,10 @@ export function scrubQueryParams(query: QueryParamsLike): QueryParamsLike {
 
 // Keys under which a Sentry SDK stores a raw URL: navigation breadcrumbs use
 // `from`/`to`, fetch/xhr breadcrumbs use `url`, and tracing spans use the
-// OpenTelemetry `url.full` / `http.url` attributes.
-const URL_DATA_KEYS: readonly string[] = ['from', 'to', 'url', 'url.full', 'http.url'];
+// OpenTelemetry `url.full` / `http.url` attributes. `url.path` (set by the
+// Cloudflare request span) and the legacy `http.target` carry only the path,
+// which matters for path credentials (SENSITIVE_PATH_PATTERN).
+const URL_DATA_KEYS: readonly string[] = ['from', 'to', 'url', 'url.full', 'http.url', 'url.path', 'http.target'];
 
 // Headers whose value is a full URL, so they carry the referring page's query
 // string. `Referrer-Policy: strict-origin-when-cross-origin` (public/_headers)
@@ -158,6 +175,7 @@ function isUrlDataKey(key: string): boolean {
 /** Structural subset of a Sentry event — keeps this module free of an SDK import
  *  so the Cloudflare Pages middleware and the browser bundle can share it. */
 type UrlBearingEvent = {
+    transaction?: string;
     request?: { url?: string; query_string?: QueryParamsLike; headers?: Record<string, string> };
     contexts?: { trace?: { data?: Record<string, unknown> } };
     spans?: Array<{ data?: Record<string, unknown> }>;
@@ -202,6 +220,12 @@ function scrubRequestHeaders(
  * reports `request.url` even when nothing went wrong.
  */
 export function scrubEventUrls<T extends UrlBearingEvent>(event: T): T {
+    // An error raised inside a request span is named after that span
+    // (`GET /proposta/<id>`), so the path rides here as well as in `request.url`.
+    if (event.transaction) {
+        event.transaction = scrubSensitiveUrl(event.transaction);
+    }
+
     const request = event.request;
     if (request) {
         event.request = {
