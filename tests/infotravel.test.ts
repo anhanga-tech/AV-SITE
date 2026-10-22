@@ -126,6 +126,12 @@ test('API failures are typed, never echoing the upstream body', async () => {
             return true;
         });
     }
+    const stalledBody = new Response(new ReadableStream({
+        start(controller) {
+            controller.error(new DOMException('The operation timed out.', 'TimeoutError'));
+        },
+    }), { status: 200 });
+    await assert.rejects(fetchInfotravelQuotation(LINK, { fetch: operatorApi({ booking: () => stalledBody }).fetch }), { reason: 'timeout' });
     let now = 0;
     await assert.rejects(
         fetchInfotravelQuotation(LINK, { fetch: operatorApi({ booking: () => ((now += 7000), trpc(BOOKING)) }).fetch, now: () => now }),
@@ -157,6 +163,14 @@ test('a quotation the page can\'t represent faithfully is refused', () => {
     refused(variant({ fares: [{ type: 'RAV_COMMISSION', price: { currency: 'USD', amount: 152.85, exchange: 5.1 } }] }), 'unsupported_quotation');
     refused({ ...BOOKING, bookingPackages: [pack, pack] }, 'unsupported_quotation');
     assert.throws(() => normalizeInfotravelQuotation({ booking: BOOKING, hotel: null }), { reason: 'unexpected_shape' });
+
+    // Every item still quoted; one party for stay and flights; no empty flight group.
+    refused(variant({ bookingTours: [{ ...pack.bookingTours[0], status: 'CANCELLED' }] }), 'unsupported_quotation');
+    refused(variant({ bookingFlights: [{ ...pack.bookingFlights[0], names: [pack.bookingFlights[0].names[0]] }] }), 'unsupported_quotation');
+    refused(variant({ bookingFlights: [{ ...pack.bookingFlights[0], flights: [] }] }), 'unexpected_shape');
+    // Same party in another order is fine.
+    const reordered = variant({ bookingFlights: [{ ...pack.bookingFlights[0], names: [...pack.bookingFlights[0].names].reverse() }] });
+    assert.doesNotThrow(() => normalizeInfotravelQuotation({ booking: reordered, hotel: HOTEL }));
 });
 
 test('operator HTML becomes plain text', () => {

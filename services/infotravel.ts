@@ -106,8 +106,10 @@ async function callProcedure(
     let body: unknown;
     try {
         body = await response.json();
-    } catch {
-        throw new InfotravelError('unexpected_response');
+    } catch (error) {
+        // The deadline can also hit while the body is still streaming.
+        const timedOut = error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError');
+        throw new InfotravelError(timedOut ? 'timeout' : 'unexpected_response');
     }
     const parsed = trpcSuccessSchema.safeParse(body);
     if (!parsed.success) throw new InfotravelError('unexpected_response');

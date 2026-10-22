@@ -55,6 +55,7 @@ const bookingSchema = z.object({
     bookingPackages: z.array(z.object({
         fares: fares.nullish(),
         bookingHotels: z.array(z.object({
+            status: z.string(),
             rooms: z.array(z.object({
                 roomType: z.object({ name: z.string() }),
                 boardType: z.object({ name: z.string() }).nullish(),
@@ -66,8 +67,10 @@ const bookingSchema = z.object({
             })),
         })).nullish(),
         bookingFlights: z.array(z.object({
+            status: z.string(),
             names: z.array(person),
             fares,
+            // A group with no flight would keep its fares in the total but show nothing.
             flights: z.array(z.object({
                 airline: z.object({ name: z.string() }),
                 fareFlight: z.object({ description: z.string().nullish() }).nullish(),
@@ -78,19 +81,22 @@ const bookingSchema = z.object({
                 number: z.union([z.string(), z.number()]),
                 duration: z.string().nullish(),
                 stopsCount: z.number().nullish(),
-            })),
+            })).min(1),
         })).nullish(),
         bookingTours: z.array(z.object({
+            status: z.string(),
             fares,
             names: z.array(person).nullish(),
             tour: z.object({ name: z.string(), date: z.string().nullish(), description: z.string().nullish() }),
         })).nullish(),
         bookingTickets: z.array(z.object({
+            status: z.string(),
             fares,
             names: z.array(person).nullish(),
             ticket: z.object({ name: z.string(), start: z.string().nullish(), description: z.string().nullish() }),
         })).nullish(),
         bookingTransfers: z.array(z.object({
+            status: z.string(),
             fares,
             names: z.array(person).nullish(),
             transfer: z.object({ name: z.string(), provider: z.string().nullish() }),
@@ -151,6 +157,11 @@ function penaltyTexts(policies: z.infer<typeof penalties>): string[] {
     return (policies?.penalties ?? []).map((penalty) => htmlToText(penalty.description)).filter((text): text is string => Boolean(text));
 }
 
+/** Order-independent signature of a party: `ADT:31,ADT:34`. */
+function partyKey(people: Array<z.infer<typeof person>>): string {
+    return people.map((traveler) => `${traveler.type}:${traveler.age}`).sort().join(',');
+}
+
 function placeLabel(value: z.infer<typeof place>): string {
     return `${value.city.name} (${value.code})`;
 }
@@ -171,6 +182,15 @@ export function normalizeInfotravelQuotation(raw: { booking: unknown; hotel: unk
     const hotels = pack.bookingHotels ?? [];
     const flightGroups = pack.bookingFlights ?? [];
     if (hotels.length > 1 || flightGroups.length > 1 || hotels.some((item) => item.rooms.length !== 1)) {
+        throw new InfotravelNormalizeError('unsupported_quotation');
+    }
+    // Every item still quoted: a cancelled or unavailable one would stay in the total.
+    const items = [...hotels, ...flightGroups, ...(pack.bookingTours ?? []), ...(pack.bookingTickets ?? []), ...(pack.bookingTransfers ?? [])];
+    if (items.some((item) => item.status !== 'QUOTATION')) throw new InfotravelNormalizeError('unsupported_quotation');
+    // The page says who the total is for: the stay and the flights must be for the same party.
+    const roomTravelers = hotels[0]?.rooms[0]?.names;
+    const flightTravelers = flightGroups[0]?.names;
+    if (roomTravelers && flightTravelers && partyKey(roomTravelers) !== partyKey(flightTravelers)) {
         throw new InfotravelNormalizeError('unsupported_quotation');
     }
 
