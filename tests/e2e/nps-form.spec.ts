@@ -65,8 +65,14 @@ test.describe('NPS form', () => {
     // is no verified name — and the `firstname` param is never trusted for it.
     await expect(page.getByRole('heading', { name: 'Olá!' })).toBeVisible();
 
+    const submitButton = page.getByRole('button', { name: /^Enviar avaliação$/i });
+    await expect(submitButton).toBeDisabled();
+    await expect(page.getByText('Escolha uma nota para enviar')).toBeVisible();
+
     await page.getByRole('button', { name: /^Nota 10/ }).click();
-    await page.getByRole('button', { name: /^Enviar avaliação$/i }).click();
+    await expect(submitButton).toBeEnabled();
+    await expect(page.getByText('Escolha uma nota para enviar')).toHaveCount(0);
+    await submitButton.click();
 
     await expect(page.getByText(/Enviar avaliação/i)).toHaveCount(0);
     expect(submittedCookie).toContain(`nps_invite_${tabRef}=${FAKE_TOKEN}`);

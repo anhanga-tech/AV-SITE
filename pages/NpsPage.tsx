@@ -371,6 +371,7 @@ export default function NpsPage() {
                 <button
                   type="submit"
                   disabled={!submitEnabled}
+                  aria-describedby="nps-submit-hint"
                   className={[
                     'w-full py-4 text-sm font-extrabold uppercase tracking-[0.1em] rounded-xl',
                     'border-2 transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none',
@@ -394,6 +395,10 @@ export default function NpsPage() {
                     </span>
                   ) : 'Enviar avaliação'}
                 </button>
+                {/* Botão nasce desabilitado sem nota; o texto é a instrução, não só o estado desabilitado. */}
+                <p id="nps-submit-hint" className="mt-2.5 text-xs text-center text-slate-500" aria-live="polite">
+                  {score === null && !submitting ? 'Escolha uma nota para enviar' : ' '}
+                </p>
               </form>
             )}
 
