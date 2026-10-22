@@ -1,6 +1,6 @@
 # Link de proposta (`/proposta/<id>`)
 
-Épico [#1894](https://github.com/anhanga-tech/AV-SITE/issues/1894). Este documento cobre a rota (P1, #1895), o scrub no Sentry (P4, #1898) o registro de aberturas (P3, #1897) e o redirect rastreado (P2, #1896). As próximas fases acrescentam aqui o que mudarem.
+Épico [#1894](https://github.com/anhanga-tech/AV-SITE/issues/1894). Este documento cobre a rota (P1, #1895), o scrub no Sentry (P4, #1898) o registro de aberturas (P3, #1897), o redirect rastreado (P2, #1896) e o endpoint interno de criação (P5, #1899). As próximas fases acrescentam aqui o que mudarem.
 
 ## O que existe
 
@@ -58,6 +58,45 @@ Uma proposta criada com `redirectUrl` (fallback quando não há adaptador da ope
 - Prévias de link (WhatsApp etc.) recebem a página da Anhangá, não o 302. O card fica com a nossa marca e o link da operadora, que carrega o token da reserva, não é entregue aos servidores de prévia.
 - O link de prévia interna (`?previa=`) segue o 302 sem contar abertura.
 - O link da operadora é credencial da reserva: nunca registrar em log.
+
+## Criar uma proposta (P5)
+
+`POST /api/create-proposal` é chamado pelo bot comercial, nunca pelo navegador (sem CORS). Código em `api/create-proposal.ts`.
+
+```http
+POST /api/create-proposal
+Authorization: Bearer <PROPOSAL_API_SECRET>
+Content-Type: application/json
+
+{ "type": "redirect", "redirectUrl": "<link da operadora>", "leadId": 1234, "validityDays": 15 }
+```
+
+- `type`: na fase 1, só `redirect`. As propostas aérea (P10, #1905) e da Infotravel extraída (P11, #1906) entram com os respectivos templates.
+- `redirectUrl`: link de operadora na allowlist (ver "Redirect rastreado"); fora dela, 400 `REDIRECT_NOT_ALLOWED`.
+- `leadId`: id do `crm.lead` no Odoo, gravado no registro para o webhook de abertura (P6, #1900).
+- `validityDays`: opcional, de 1 a 15 (padrão 15, decisão D5). O bot pode encurtar, nunca estender.
+- Campos extras são recusados (400 `VALIDATION_ERROR`).
+
+Resposta 201:
+
+```json
+{ "ok": true, "requestId": "…", "data": { "id": "…", "url": "https://www.anhanga.tur.br/proposta/<id>", "previewUrl": "https://www.anhanga.tur.br/proposta/<id>?previa=…", "expiresAt": "2026-11-06T15:30:00.000Z" } }
+```
+
+`url` vai para o cliente; `previewUrl` é para conferência interna e não conta abertura. Os dois apontam sempre para produção, mesmo quando o pedido chega num deploy de preview.
+
+| Status | `code` | Quando |
+|---|---|---|
+| 401 | `UNAUTHORIZED` | `Authorization: Bearer` ausente ou errado |
+| 405 | `METHOD_NOT_ALLOWED` | Método diferente de POST |
+| 400 | `VALIDATION_ERROR` / `REDIRECT_NOT_ALLOWED` | Corpo inválido / link fora da allowlist |
+| 429 | `RATE_LIMIT_EXCEEDED` | Mais de 30 pedidos por minuto do mesmo IP |
+| 500 | `CONFIG_ERROR` | Falta `PROPOSAL_API_SECRET` ou `PROPOSAL_PREVIEW_SECRET` (nada é gravado) |
+| 503 | `STORE_UNAVAILABLE` / `SERVICE_UNAVAILABLE` | Redis fora (gravação ou rate limit) |
+
+**Configurar no Cloudflare Pages:** `PROPOSAL_API_SECRET` (gerar com `openssl rand -hex 32`), em Production e Preview, e o mesmo valor no bot. Sem ele, o endpoint responde 500 e não cria nada.
+
+Os logs (`CREATE_PROPOSAL`) trazem só `requestId`, etapa e tipo. Nunca o corpo, o id, o `leadId` ou o link da operadora; em erro de validação, só o caminho dos campos.
 
 ## Headers
 

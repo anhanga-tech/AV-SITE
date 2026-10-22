@@ -48,6 +48,8 @@ const proposalRecordSchema = z.object({
     // Present on a tracked-redirect proposal (#1896). Re-checked against the
     // allowlist on every read, so a stored URL can never become an open redirect.
     redirectUrl: z.string().refine((value) => parseAllowedRedirectUrl(value) === value).optional(),
+    // Odoo `crm.lead` id, so an open can be tied back to its lead (#1900).
+    leadId: z.number().int().positive().optional(),
 });
 
 export type ProposalRecord = z.infer<typeof proposalRecordSchema>;
@@ -103,7 +105,7 @@ function parseStoredJson(value: unknown): unknown {
  * maps that to its own error response.
  */
 export async function saveProposal(
-    options: { validitySeconds?: number; redirectUrl?: string } = {},
+    options: { validitySeconds?: number; redirectUrl?: string; leadId?: number } = {},
     deps: ProposalStoreDeps = {},
 ): Promise<{ id: string; expiresAt: number }> {
     const redis = await resolveRedis(deps);
@@ -119,11 +121,15 @@ export async function saveProposal(
         redirectUrl = parseAllowedRedirectUrl(options.redirectUrl) ?? undefined;
         if (!redirectUrl) throw new Error('PROPOSAL_STORE: redirectUrl is not an allowed operator link');
     }
+    if (options.leadId !== undefined && !(Number.isSafeInteger(options.leadId) && options.leadId > 0)) {
+        throw new Error('PROPOSAL_STORE: leadId must be a positive integer');
+    }
 
     const now = (deps.now ?? Date.now)();
     const id = createProposalId();
     const record: ProposalRecord = { v: 1, createdAt: now, expiresAt: now + validitySeconds * 1000 };
     if (redirectUrl) record.redirectUrl = redirectUrl;
+    if (options.leadId !== undefined) record.leadId = options.leadId;
 
     // Tombstone first: if the record write then fails, the leftover tombstone
     // only makes a never-shared id answer 410, never exposes content.
