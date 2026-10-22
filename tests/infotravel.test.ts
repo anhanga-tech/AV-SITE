@@ -168,6 +168,8 @@ test('a quotation the page can\'t represent faithfully is refused', () => {
     refused(variant({ bookingTours: [{ ...pack.bookingTours[0], status: 'CANCELLED' }] }), 'unsupported_quotation');
     refused(variant({ bookingFlights: [{ ...pack.bookingFlights[0], names: [pack.bookingFlights[0].names[0]] }] }), 'unsupported_quotation');
     refused(variant({ bookingFlights: [{ ...pack.bookingFlights[0], flights: [] }] }), 'unexpected_shape');
+    refused(variant({ bookingTours: [{ ...pack.bookingTours[0], names: [pack.bookingTours[0].names[0]] }] }), 'unsupported_quotation');
+    refused(variant({ bookingTransfers: [{ ...pack.bookingTransfers[0], names: [{ age: 8, type: 'CHD' }, ...pack.bookingTransfers[0].names] }] }), 'unsupported_quotation');
     // Same party in another order is fine.
     const reordered = variant({ bookingFlights: [{ ...pack.bookingFlights[0], names: [...pack.bookingFlights[0].names].reverse() }] });
     assert.doesNotThrow(() => normalizeInfotravelQuotation({ booking: reordered, hotel: HOTEL }));

@@ -187,12 +187,14 @@ export function normalizeInfotravelQuotation(raw: { booking: unknown; hotel: unk
     // Every item still quoted: a cancelled or unavailable one would stay in the total.
     const items = [...hotels, ...flightGroups, ...(pack.bookingTours ?? []), ...(pack.bookingTickets ?? []), ...(pack.bookingTransfers ?? [])];
     if (items.some((item) => item.status !== 'QUOTATION')) throw new InfotravelNormalizeError('unsupported_quotation');
-    // The page says who the total is for: the stay and the flights must be for the same party.
-    const roomTravelers = hotels[0]?.rooms[0]?.names;
-    const flightTravelers = flightGroups[0]?.names;
-    if (roomTravelers && flightTravelers && partyKey(roomTravelers) !== partyKey(flightTravelers)) {
-        throw new InfotravelNormalizeError('unsupported_quotation');
-    }
+    // The page says the total and everything included are for one party:
+    // every priced item that names its travelers must name the same ones.
+    const parties = [
+        hotels[0]?.rooms[0]?.names,
+        flightGroups[0]?.names,
+        ...[...(pack.bookingTours ?? []), ...(pack.bookingTickets ?? []), ...(pack.bookingTransfers ?? [])].map((item) => item.names),
+    ].filter((names): names is Array<z.infer<typeof person>> => Boolean(names && names.length > 0)).map(partyKey);
+    if (new Set(parties).size > 1) throw new InfotravelNormalizeError('unsupported_quotation');
 
     // Every price in the quotation, the commission adjustment included: the
     // page shows only the total, so it must be the sum of exactly these items.
