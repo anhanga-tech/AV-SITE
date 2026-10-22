@@ -8,7 +8,9 @@
  * an open (lib/proposal-page.ts), so they never reach this module.
  *
  * Request: POST JSON with
- * - `X-Anhanga-Timestamp`: unix seconds;
+ * - `X-Anhanga-Timestamp`: unix seconds of the send (not of the open, which is
+ *   `openedAt` in the body), so the receiver's 5-minute window holds even if
+ *   delivery is ever deferred;
  * - `X-Anhanga-Signature`: `v1=` + hex HMAC-SHA256 of `<timestamp>.<raw body>`
  *   under PROPOSAL_WEBHOOK_SECRET (verify with `verifyProposalWebhook`);
  * - `X-Anhanga-Event-Id`: same as `eventId` in the body; a retry repeats it,
@@ -47,6 +49,7 @@ export interface ProposalOpenedPayload {
 
 export interface ProposalWebhookDeps {
     fetch?: typeof fetch;
+    now?: () => number;
     sleep?: (ms: number) => Promise<void>;
 }
 
@@ -123,13 +126,12 @@ function defaultSleep(ms: number): Promise<void> {
 async function deliver(
     config: { url: string; secret: string },
     payload: ProposalOpenedPayload,
-    openedAt: number,
     deps: ProposalWebhookDeps,
 ): Promise<void> {
     const fetchImpl = deps.fetch ?? fetch;
     const sleep = deps.sleep ?? defaultSleep;
     const body = JSON.stringify(payload);
-    const timestamp = Math.floor(openedAt / 1000);
+    const timestamp = Math.floor((deps.now ?? Date.now)() / 1000);
     const headers = {
         'Content-Type': 'application/json',
         'X-Anhanga-Timestamp': String(timestamp),
@@ -172,7 +174,7 @@ export async function notifyProposalOpen(notice: ProposalOpenNotice, deps: Propo
 
         const config = getWebhookConfig();
         if (!config) {
-            logger.warn('PROPOSAL_WEBHOOK', { stage: 'not_configured' });
+            logger.info('PROPOSAL_WEBHOOK', { stage: 'not_configured' });
             return;
         }
         if (notice.leadId === undefined) {
@@ -192,7 +194,7 @@ export async function notifyProposalOpen(notice: ProposalOpenNotice, deps: Propo
             openedAt: new Date(notice.openedAt).toISOString(),
             previousOpenAt: notice.previousOpenAt === null ? null : new Date(notice.previousOpenAt).toISOString(),
         };
-        await deliver(config, payload, notice.openedAt, deps);
+        await deliver(config, payload, deps);
     } catch (error) {
         logger.error('PROPOSAL_WEBHOOK', {
             stage: 'unexpected',

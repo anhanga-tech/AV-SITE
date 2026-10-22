@@ -158,7 +158,7 @@ export interface ProposalPageDeps {
 async function recordAndNotify(request: Request, id: string, leadId: number | undefined, deps: ProposalPageDeps): Promise<void> {
     const recorded = await recordProposalOpen(request, id, deps);
     if (!recorded) return;
-    await notifyProposalOpen({ id, leadId, ...recorded }, deps.webhook);
+    await notifyProposalOpen({ id, leadId, ...recorded }, { now: deps.now, ...deps.webhook });
 }
 
 export async function handleProposalRequest(

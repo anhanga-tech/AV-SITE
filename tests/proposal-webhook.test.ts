@@ -7,6 +7,7 @@ import { createProposalPreviewSignature } from '../lib/proposal-preview.ts';
 import { saveProposal } from '../lib/proposal-store.ts';
 import {
     createProposalRef,
+    notifyProposalOpen,
     PROPOSAL_REOPEN_NOTIFY_GAP_MS,
     verifyProposalWebhook,
     type ProposalOpenedPayload,
@@ -283,6 +284,32 @@ test('the receiver rejects a tampered body, a stale timestamp or another secret'
     assert.equal(await verifyProposalWebhook({ ...valid, timestamp: null }), false);
     assert.equal(await verifyProposalWebhook({ ...valid, signature: 'v1=' }), false);
     assert.equal(await verifyProposalWebhook({ ...valid, timestamp: '1e9' }), false);
+});
+
+test('the signature timestamp is the send time, so a late delivery still verifies', async (t) => {
+    withWebhook(t);
+    const deliveries: Delivery[] = [];
+    const openedAt = Date.UTC(2026, 9, 22, 15, 30);
+    const sentAt = openedAt + 20 * 60_000;
+
+    await notifyProposalOpen(
+        { id: 'Ab12Cd34Ef56Gh78', leadId: LEAD_ID, count: 1, previousOpenAt: null, openedAt },
+        {
+            now: () => sentAt,
+            fetch: (async (url: string, init: RequestInit) => {
+                deliveries.push({ url, body: String(init.body), headers: Object.fromEntries(new Headers(init.headers).entries()) });
+                return new Response(null, { status: 200 });
+            }) as typeof fetch,
+        },
+    );
+
+    const [{ body, headers }] = deliveries;
+    assert.equal(headers['x-anhanga-timestamp'], String(sentAt / 1000));
+    assert.equal(payloadOf(deliveries[0]).openedAt, new Date(openedAt).toISOString());
+    assert.equal(
+        await verifyProposalWebhook({ body, timestamp: headers['x-anhanga-timestamp'], signature: headers['x-anhanga-signature'], secret: WEBHOOK_SECRET, now: sentAt }),
+        true,
+    );
 });
 
 test('the proposal reference is stable for whoever holds the id, and does not reveal it', async () => {
