@@ -1,0 +1,202 @@
+{
+  "fonte": "Infotravel (RCA Tours)",
+  "booking_id": 9900001,
+  "status": "QUOTATION",
+  "criado_em": "2027-01-20T10:00:00-03:00",
+  "passageiros": {
+    "adultos": 2,
+    "idades": [
+      34,
+      31
+    ]
+  },
+  "destino": "Balneario Camboriu",
+  "hotel": {
+    "nome": "Reserva Praia Hotel - Balneário Camboriú",
+    "estrelas": 4,
+    "endereco": "Rod Lap Rodesindo Pavan, 4480",
+    "coords": {
+      "latitude": -27.009469985961914,
+      "longitude": -48.58047103881836
+    },
+    "descricao": "O Reserva Praia Hotel - Balneário Camboriú está localizado em Balneário Camboriú. Possui piscina climatizada com borda infinita e vista panorâmica para a praia, Wi-Fi gratuito nas áreas comuns e sauna.Você precisa saber: Acessível para pessoas com mobilidade reduzida Animais de estimação não permitidosA hospedagem serve diariamente o café da manhã, o qual se oferece no restaurante. Também dispõe de bar. Os funcionários da propriedade proporcionarão serviço de quarto.Entre os serviços da propriedade estão estacionamento gratuito com área específica para recarga de carros elétricos, salão de jogos, salão de jogos infantil e recepção 24 horas. Os hóspedes também podem desfrutar de uma piscina infantil.",
+    "checkin_hora": "15:00 - ",
+    "checkout_hora": "12:00",
+    "comodidades": [
+      "Ar condicionado em zonas comuns",
+      "Detetor de incêndios",
+      "Recepção 24 h por dia",
+      "Elevador",
+      "Jardim",
+      "Terraço",
+      "Serviço de quartos",
+      "Acessível a cadeiras de rodas",
+      "Estacionamento",
+      "Ginásio",
+      "Estacionamento vigiado",
+      "Equipa multilingue",
+      "Vigilância 24 h por dia",
+      "Wi-Fi",
+      "Bar",
+      "Restaurante",
+      "Área não fumante",
+      "Área fumante",
+      "Ar condicionado",
+      "Sala de pequeno-almoço",
+      "Sala de reuniões",
+      "Pub",
+      "Sala de jogos",
+      "Sala de televisão",
+      "Espreguiçadeiras",
+      "Chapéus-de-sol",
+      "Sauna",
+      "Estabelecimento para não fumadores",
+      "Bilhar",
+      "Recepção 24 horas",
+      "Estacionamento Gratuito",
+      "Piscina",
+      "Bar de Piscina",
+      "Espaço Kids",
+      "Parque Infantil",
+      "Berço disponivel a pedido",
+      "Aceita os principais cartões de crédito",
+      "Restaurante Público",
+      "Prática de surfe/bodyboard nas proximidades",
+      "Trilhas para caminhada/ciclismo nas proximidades",
+      "TV em áreas comuns",
+      "Sala de jogos/videogames",
+      "Café da manhã incluído",
+      "Piscina infantil",
+      "Sauna seca",
+      "Não é permitido fumar nesta propriedade",
+      "Guarda-sóis",
+      "Assistência para passeios/bilhetes",
+      "Wi-Fi grátis",
+      "Estacionamento grátis sem manobrista",
+      "Todos os dias",
+      "Depósito de bagagens",
+      "Espreguiçadeiras (praia)",
+      "Espreguiçadeiras (piscina)",
+      "Toalhas de praia",
+      "Buffet de café da manhã incluído",
+      "Aceita animais de serviço",
+      "Isenção de taxas/restrições para cães-guia",
+      "Shopping center no local",
+      "Pacotes para pedidos de casamento/românticos disponíveis",
+      "Brinquedos infantis",
+      "Acessível para cadeira de rodas (pode haver limitações)"
+    ],
+    "fotos": [
+      "http://media.staticontent.com/media/pictures/0d3853ac-26ba-4b89-b2b3-041d8670fef2",
+      "http://media.staticontent.com/media/pictures/8dfaf114-12be-40c0-b293-0f07166bb27b",
+      "http://media.staticontent.com/media/pictures/65d0071e-931c-4a54-a27a-07371af05742",
+      "http://media.staticontent.com/media/pictures/8ff4ec45-3584-4907-967a-24eef2b7b45f",
+      "http://media.staticontent.com/media/pictures/25e4b6c8-bca9-4b29-9f83-150d19827333",
+      "http://media.staticontent.com/media/pictures/8e3de6ea-66a7-488c-8b6f-774b72e38539",
+      "http://media.staticontent.com/media/pictures/d70a7d01-b35f-48a2-832f-f32cb3346ef2",
+      "http://media.staticontent.com/media/pictures/567d99f0-362c-4d5e-b72f-a3576d02c340",
+      "http://media.staticontent.com/media/pictures/1899b4b8-218a-4e13-9aa5-d76cf49ca783",
+      "http://media.staticontent.com/media/pictures/b1c8cfb0-036a-467f-be7d-f75cf555f31f",
+      "http://media.staticontent.com/media/pictures/794c43ba-d6d8-423a-898f-c2e57714deb6",
+      "http://media.staticontent.com/media/pictures/c8bcfada-8a74-4688-b6fb-9d6375b8ad44",
+      "http://media.staticontent.com/media/pictures/02270fde-dba1-45fd-a6d7-9a40f72e046e",
+      "http://media.staticontent.com/media/pictures/07b52e87-966b-4cb5-a475-f49c71fc857c",
+      "http://media.staticontent.com/media/pictures/03cdecab-44fb-4f73-91d6-ab916352b9e7",
+      "http://media.staticontent.com/media/pictures/9a10b915-a326-4c55-94a9-c237ffc91f31",
+      "http://media.staticontent.com/media/pictures/e63e2079-fa03-44b8-b2ee-994a2ccddb08",
+      "http://media.staticontent.com/media/pictures/4dd54158-a131-4ed7-843d-5dfd4674046c",
+      "http://media.staticontent.com/media/pictures/52f69ab3-93ac-46fd-a244-f6b9719a0e5f",
+      "http://media.staticontent.com/media/pictures/9bd82f7f-b088-44a7-9d2f-32a130edc5be",
+      "http://media.staticontent.com/media/pictures/83fffa11-9f05-4688-aaf4-7a338bb8660c",
+      "http://media.staticontent.com/media/pictures/0fdd6095-b483-4aa9-9d7c-281ab4f8f5fd",
+      "http://media.staticontent.com/media/pictures/7e074b78-7162-4f11-be90-f070fb69da22",
+      "http://media.staticontent.com/media/pictures/587f6f79-fe32-47e2-8732-bdd0587f7a7f",
+      "http://media.staticontent.com/media/pictures/86455e42-c2f0-423f-a78e-64e2987b3997",
+      "http://media.staticontent.com/media/pictures/6e33b59d-7cbb-4930-b343-49f830383d01",
+      "http://media.staticontent.com/media/pictures/f26e0268-e358-4b11-b02e-408eee7a5e0e",
+      "http://media.staticontent.com/media/pictures/e2111c3c-6a61-4a66-bbb4-70ebf023550c",
+      "http://media.staticontent.com/media/pictures/2abc12a4-f3e3-46ca-a637-802cc5a31bf3",
+      "http://media.staticontent.com/media/pictures/124a912a-c4c8-42cc-83e9-d3e808bbb906",
+      "http://media.staticontent.com/media/pictures/4d73e7ce-b2dd-4385-88e0-aadff3560564",
+      "http://media.staticontent.com/media/pictures/8cd495bd-04b6-4738-b908-a9c1d57db37e",
+      "http://media.staticontent.com/media/pictures/2fdbba84-77b5-4f75-95d2-037552e94810",
+      "http://media.staticontent.com/media/pictures/2814cbd2-4ae4-49aa-958a-9acac6705002",
+      "http://media.staticontent.com/media/pictures/68e08541-96a2-447c-a4d5-e03688b261f9",
+      "http://media.staticontent.com/media/pictures/d0d2550a-596d-4f89-ac79-28993ae081ff",
+      "http://media.staticontent.com/media/pictures/7d988cdb-dc6b-4f01-8b78-2a8c36b18e34"
+    ]
+  },
+  "quarto": {
+    "tipo": "Suíte com Vista ao Mar",
+    "regime": "Café da manhã com buffet incluido",
+    "checkin": "2027-03-10T00:00:00",
+    "checkout": "2027-03-13T00:00:00",
+    "valor": 2316.23,
+    "reembolsavel": false,
+    "cancelamento": [
+      "Tarifa não reembolsável"
+    ],
+    "fotos_quarto": []
+  },
+  "voos": [
+    {
+      "number": "9101",
+      "departure": "2027-03-10T18:35:00-03:00",
+      "arrival": "2027-03-10T19:40:00-03:00",
+      "duration": "01:05",
+      "stopsCount": 0,
+      "cia": "Latam",
+      "logo": "https://reservasonline.rcaturismo.com.br/infotravel/resources/images/ciaaerea/LA.png",
+      "tarifa": "LIGHT",
+      "origem": "São Paulo (CGH)",
+      "destino": "Navegantes (NVT)"
+    },
+    {
+      "number": "9102",
+      "departure": "2027-03-13T10:10:00-03:00",
+      "arrival": "2027-03-13T11:25:00-03:00",
+      "duration": "01:15",
+      "stopsCount": 0,
+      "cia": "Latam",
+      "logo": "https://reservasonline.rcaturismo.com.br/infotravel/resources/images/ciaaerea/LA.png",
+      "tarifa": "LIGHT",
+      "origem": "Navegantes (NVT)",
+      "destino": "São Paulo (GRU)"
+    }
+  ],
+  "voos_valor": 3097.55,
+  "transfers": [
+    {
+      "nome": "Traslado IDA (IN) + RETORNO (OUT) Aeroporto Navegantes (NVT) | Balneário Camboriú",
+      "fornecedor": "VIP MAR TURISMO & RECEPTIVO",
+      "tipo": "ROUND_TRIP",
+      "valor": 517.01,
+      "cancelamento": [
+        "CANCELAMENTO A partir de 08/03/2027 às 00:00:00 será cobrado BRL 380,00 de penalização."
+      ],
+      "foto": "https://media.infotravel.com.br/image/upload/c_thumb,h_225,w_375/6A1E6D8F97A8BFDED0135639C2AC8FDA.jpg"
+    }
+  ],
+  "total": {
+    "currency": "BRL",
+    "amount": 6633.45
+  },
+  "condicoes": "Formas de Pagamento - RCA Parcelado: • Financiamento em até 10 vezes iguais nos cartões de crédito ou boleto Santander. Formas de Pagamento - RCA à vista: • Através de PIX. Importante: - Para qualquer cotação ou reserva internacional, informamos que os preços expressos em REAIS, serão recalculados no ato da reserva. - Tarifas mencionadas sujeitas a alteração sem prévio aviso, e lugares sujeitos a disponibilidade no momento da reserva. - A informação de impostos e/ou taxas locais será informada excluivamente no ato da reserva.",
+  "validade": null,
+  "extras": [
+    {
+      "tipo": "passeio",
+      "nome": "PASSEIO AO BETO CARRERO WORLD (sem ingresso) - Saindo dos hotéis de Balneário Camboriú",
+      "data": "2027-03-11T00:00:00",
+      "descricao": "Um dos maiores parques temáticos da América Latina e entre os melhores do mundo, o Parque Beto Carrero World é a certeza de um dia com muita diversão e adrenalina para toda a família. Conta com shows e brinquedos além de uma completa estrutura de restaurantes e lanchonetes, lojas, segurança e apoio de equipe especializada. Tudo para que seu dia seja realmente inesquecível. A Vipmar oferece traslados diários com segurança e tranquilidade para que você e sua família possam se divertir sem preocupações. Após o último show, traslado ao hotel. Observação: Se você adquire ingressos com nossa empresa",
+      "valor": 204.08
+    },
+    {
+      "tipo": "ingresso",
+      "nome": "P. 01 DIA ANTECIPADO - 2º Lote",
+      "descricao": "PASSAPORTE ACESSO - • Adquira o Passaporte de Entrada com pelo menos 01 dia de antecedência a data da visita para obter um valor diferenciado.• Sujeito a alteração sem aviso prévio.• Este passaporte não libera Gratuidade.• Quantidades de lote limitada, a cada novo lote o valor sofre reajuste sem aviso prévio;• Promoção não cumulativa com demais promoções e descontos.• Criança até 01 anos e 11 meses não paga o passaporte de acesso mediante a apresentação da identidade ou certidão de nascimento original.**EM CASO DE NO-SHOW PRODUTO NÃO REEMBOLSÁVEL!** - Validade: 10/03/2027",
+      "valor": 345.73
+    }
+  ],
+  "ajuste_comissao": 152.85
+}

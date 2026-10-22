@@ -6,8 +6,9 @@
  * which also keeps Cloudflare-injected tags (Zaraz Pageview, Web Analytics
  * beacon) from running and shipping the URL — the id is the credential.
  *
- * The visual proposal template is #1901 (P9) and the tracked redirect is #1896
- * (P2); until then an active proposal renders a short holding page.
+ * An active proposal renders its page (lib/proposal-template.ts, #1901) or,
+ * for a tracked redirect (#1896), answers 302 to the operator. One with
+ * neither renders a short holding page.
  *
  * Each customer GET of an active proposal is recorded (lib/proposal-opens.ts,
  * #1897). Link previews and the signed internal preview are not. A redirect
@@ -18,10 +19,13 @@ import { recordProposalOpen, type ProposalOpensRedis } from './proposal-opens';
 import { buildProposalOpenedNote, postProposalNote, type ProposalOdooNotesDeps } from './proposal-odoo-notes';
 import { notifyProposalOpen, shouldNotifyProposalOpen, type ProposalWebhookDeps } from './proposal-webhook';
 import { isProposalPreviewRequest } from './proposal-preview';
-import { loadProposal } from './proposal-store';
+import { loadProposal, type ProposalRecord } from './proposal-store';
+import { PROPOSAL_PHOTO_HOSTS } from './proposal-content';
+import { escapeHtml, renderProposalContent, WHATSAPP_NUMBER } from './proposal-template';
 
-// Same number as utils/whatsapp.ts, which can't be imported here (it pulls React).
-const WHATSAPP_NUMBER = '5511955021519';
+// D4: hotel photos load from the operator's servers (lib/proposal-content.ts).
+// `no-referrer` keeps the proposal URL, and so its id, out of their logs.
+const IMG_SRC = ["'self'", ...PROPOSAL_PHOTO_HOSTS.map((host) => `https://${host}`)].join(' ');
 
 const SECURITY_HEADERS: Readonly<Record<string, string>> = {
     'Content-Type': 'text/html; charset=utf-8',
@@ -29,7 +33,7 @@ const SECURITY_HEADERS: Readonly<Record<string, string>> = {
     'Referrer-Policy': 'no-referrer',
     'X-Robots-Tag': 'noindex, nofollow',
     'Content-Security-Policy':
-        "default-src 'none'; style-src 'unsafe-inline'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+        `default-src 'none'; style-src 'unsafe-inline'; img-src ${IMG_SRC}; base-uri 'none'; form-action 'none'; frame-ancestors 'none'`,
     'X-Content-Type-Options': 'nosniff',
     'X-Frame-Options': 'DENY',
     'Cross-Origin-Opener-Policy': 'same-origin',
@@ -81,15 +85,6 @@ const STATUS_BY_PAGE: Record<PageKind, number> = {
     unavailable: 503,
 };
 
-function escapeHtml(value: string): string {
-    return value
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
-
 // Palette and button treatment from DESIGN.md: Ardósia Profunda text,
 // Névoa de Amanhecer background, a single Âmbar Vivo CTA with the hard shadow.
 const STYLES = `
@@ -135,6 +130,13 @@ ${internalPreview ? `<p class="notice" role="note">${escapeHtml(INTERNAL_PREVIEW
 function htmlResponse(kind: PageKind, method: string, internalPreview = false): Response {
     const body = method === 'HEAD' ? null : renderPage(PAGES[kind], internalPreview);
     return new Response(body, { status: STATUS_BY_PAGE[kind], headers: SECURITY_HEADERS });
+}
+
+/** The proposal page, or the holding page for a proposal stored without content. */
+function proposalResponse(proposal: ProposalRecord, method: string, internalPreview = false): Response {
+    if (!proposal.content) return htmlResponse('active', method, internalPreview);
+    const body = method === 'HEAD' ? null : renderProposalContent(proposal.content, { expiresAt: proposal.expiresAt, internalPreview });
+    return new Response(body, { status: 200, headers: SECURITY_HEADERS });
 }
 
 /**
@@ -188,15 +190,16 @@ export async function handleProposalRequest(
 
     const lookup = await loadProposal(id, deps);
     if (lookup.status !== 'active') return htmlResponse(lookup.status, request.method);
-    const { redirectUrl, leadId } = lookup.proposal;
+    const { proposal } = lookup;
+    const { redirectUrl, leadId } = proposal;
 
-    // Link previews get the Anhangá page even on a redirect proposal: the chat
-    // card stays ours and the operator link (a booking credential) is never
-    // handed to the preview servers.
+    // Link previews get the generic Anhangá page: the chat card stays ours, and
+    // neither the operator link (a booking credential) nor the proposal's
+    // content (first name, hotel, price) is handed to the preview servers.
     if (isLinkPreviewRequest(request)) return htmlResponse('active', request.method);
 
     if (await isProposalPreviewRequest(request, id)) {
-        return redirectUrl ? redirectResponse(redirectUrl) : htmlResponse('active', request.method, true);
+        return redirectUrl ? redirectResponse(redirectUrl) : proposalResponse(proposal, request.method, true);
     }
 
     // After the response via waitUntil, which keeps the isolate alive until the
@@ -206,5 +209,5 @@ export async function handleProposalRequest(
     // Without waitUntil (tests, local dev) the response waits for the webhook too.
     else await recording;
 
-    return redirectUrl ? redirectResponse(redirectUrl) : htmlResponse('active', request.method);
+    return redirectUrl ? redirectResponse(redirectUrl) : proposalResponse(proposal, request.method);
 }

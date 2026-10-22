@@ -1,6 +1,6 @@
 # Link de proposta (`/proposta/<id>`)
 
-Épico [#1894](https://github.com/anhanga-tech/AV-SITE/issues/1894). Este documento cobre a rota (P1, #1895), o scrub no Sentry (P4, #1898) o registro de aberturas (P3, #1897), o redirect rastreado (P2, #1896), o endpoint interno de criação (P5, #1899), o webhook de abertura (P6, #1900) e as notas no Odoo (P8, #1904). As próximas fases acrescentam aqui o que mudarem.
+Épico [#1894](https://github.com/anhanga-tech/AV-SITE/issues/1894). Este documento cobre a rota (P1, #1895), o scrub no Sentry (P4, #1898) o registro de aberturas (P3, #1897), o redirect rastreado (P2, #1896), o endpoint interno de criação (P5, #1899), o webhook de abertura (P6, #1900), as notas no Odoo (P8, #1904) e a página da proposta (P9, #1901). As próximas fases acrescentam aqui o que mudarem.
 
 ## O que existe
 
@@ -137,6 +137,20 @@ Nota interna (`mail.mt_note`) no chatter do `crm.lead` do `leadId`, via `service
 - **Nunca quebra:** sem `ODOO_*` configurado, a nota é pulada; se o Odoo falhar, a proposta é criada mesmo assim (a resposta do endpoint traz `crmNote: "recorded" | "skipped" | "failed"`) e a página abre normalmente (a nota roda em `waitUntil`, ao lado do webhook). Falha fica no log `PROPOSAL_ODOO_NOTE` só com o status HTTP, porque a mensagem de erro do Odoo pode repetir o texto da nota.
 - **`crmNote: "failed"` na criação:** a proposta existe e o link funciona, mas a Clara não vai achá-lo no lead (ela lê o link da nota de envio). Quem chamou o endpoint deve avisar o Felipe ou registrar a nota à mão no lead com o `url` devolvido; não recriar a proposta (geraria um segundo link). O deadline do Odoo (8 s, autenticação incluída) limita a espera do bot.
 - Sem atividade de follow-up agendada para a Clara (opcional na issue): o webhook já cumpre esse papel.
+
+## Página da proposta (P9)
+
+Uma proposta guarda **ou** `redirectUrl` (redirect rastreado) **ou** `content` (página). O conteúdo segue `lib/proposal-content.ts`, revalidado a cada leitura, e é renderizado por `lib/proposal-template.ts`, sem JavaScript.
+
+- **O schema é uma allowlist.** Não há campo para valor por item, comissão, `booking_id`, idades, logo da companhia aérea ou formas de pagamento da operadora. Assim, D2 (só o total) e a regra de não expor dados da RCA valem por construção.
+- **Primeiro nome (D6):** `firstName` guarda só a primeira palavra.
+- **Fotos (D4):** ficam nos servidores da operadora, só em `https` e só de `media.staticontent.com` e `media.infotravel.com.br`. A CSP libera exatamente esses hosts em `img-src`, e `Referrer-Policy: no-referrer` impede que eles recebam a URL da proposta.
+- **Fornecedor local:** o traslado mostra uma linha discreta "Operado por …" (decisão do Felipe, 22/10/2026). Descrições da operadora podem citar o fornecedor.
+- **Condições:** texto fixo da Anhangá ("Valores sujeitos a disponibilidade… fale com a gente pelo WhatsApp"), nunca o da operadora (D7). As regras de cancelamento de cada item aparecem junto do item.
+- **Datas:** diárias (`2027-03-10T00:00:00`) são tratadas como dia de calendário, e horários de voo como hora local do aeroporto. Nenhuma das duas passa por fuso horário, então não "voltam um dia" no servidor.
+- **Prévias de link** (WhatsApp etc.) continuam recebendo a página genérica, sem nome, hotel ou preço. A prévia interna (`?previa=`) mostra a página completa com o aviso.
+- **Rodapé:** aviso de que a abertura é registrada (data, hora, cidade aproximada, aparelho), com link para `/politica-privacidade`.
+- **Conversão:** `fromInfotravelNormalized` (`lib/proposal-infotravel.ts`) transforma o JSON normalizado da Infotravel (`main.getBooking` + `main.getHotel`) nesse conteúdo. O adaptador que gera o normalizado a partir da API é a P11 (#1906). O fixture em `tests/fixtures/` é a cotação de teste com o roteiro deslocado e números fictícios. Os arquivos brutos da API têm dados reais do cliente e não entram no repositório.
 
 ## Headers
 

@@ -17,6 +17,7 @@
 import { z } from 'zod';
 
 import { logger } from './logger';
+import { proposalContentSchema, type ProposalContentInput } from './proposal-content';
 import { parseAllowedRedirectUrl } from './proposal-redirect';
 import { getRedisClient, type RedisClientLike } from './redis-client';
 
@@ -50,7 +51,9 @@ const proposalRecordSchema = z.object({
     redirectUrl: z.string().refine((value) => parseAllowedRedirectUrl(value) === value).optional(),
     // Odoo `crm.lead` id, so an open can be tied back to its lead (#1900).
     leadId: z.number().int().positive().optional(),
-});
+    // The page content (#1901). A proposal is either a redirect or a page.
+    content: proposalContentSchema.optional(),
+}).refine((record) => !(record.redirectUrl && record.content), { message: 'redirectUrl and content are exclusive' });
 
 export type ProposalRecord = z.infer<typeof proposalRecordSchema>;
 
@@ -105,7 +108,7 @@ function parseStoredJson(value: unknown): unknown {
  * maps that to its own error response.
  */
 export async function saveProposal(
-    options: { validitySeconds?: number; redirectUrl?: string; leadId?: number } = {},
+    options: { validitySeconds?: number; redirectUrl?: string; leadId?: number; content?: ProposalContentInput } = {},
     deps: ProposalStoreDeps = {},
 ): Promise<{ id: string; expiresAt: number }> {
     const redis = await resolveRedis(deps);
@@ -121,6 +124,11 @@ export async function saveProposal(
         redirectUrl = parseAllowedRedirectUrl(options.redirectUrl) ?? undefined;
         if (!redirectUrl) throw new Error('PROPOSAL_STORE: redirectUrl is not an allowed operator link');
     }
+    if (redirectUrl && options.content !== undefined) {
+        throw new Error('PROPOSAL_STORE: a proposal is either a redirect or a page');
+    }
+    const content = options.content === undefined ? undefined : proposalContentSchema.safeParse(options.content);
+    if (content && !content.success) throw new Error('PROPOSAL_STORE: content failed validation');
     if (options.leadId !== undefined && !(Number.isSafeInteger(options.leadId) && options.leadId > 0)) {
         throw new Error('PROPOSAL_STORE: leadId must be a positive integer');
     }
@@ -130,6 +138,7 @@ export async function saveProposal(
     const record: ProposalRecord = { v: 1, createdAt: now, expiresAt: now + validitySeconds * 1000 };
     if (redirectUrl) record.redirectUrl = redirectUrl;
     if (options.leadId !== undefined) record.leadId = options.leadId;
+    if (content?.success) record.content = content.data;
 
     // Tombstone first: if the record write then fails, the leftover tombstone
     // only makes a never-shared id answer 410, never exposes content.
