@@ -358,7 +358,7 @@ A **exibição** da proposta tem base em procedimentos preliminares a contrato, 
 | Contato insistente a partir das aberturas | Baixa | Médio | Aviso só na 1ª abertura e em reaberturas com 30 min ou mais de intervalo; nenhuma mensagem sai sem aprovação de um consultor |
 | Aviso forjado ao assistente | Baixa | Baixo | Envelope assinado com HMAC-SHA256 e janela de 5 min; o assistente recusa assinatura inválida |
 | Retenção no Cursor além do necessário | `a confirmar` | Baixo | Payload mínimo, sem link nem contato. Confirmar a retenção dos registros de execução |
-| Dados do lead (nome, destino, datas, link) tratados pelo Grok Bot e por provedores de modelo nos EUA sem DPA (plano individual) | Baixa | Médio | Privacy Mode ligado (sem treino); leitura do Odoo limitada aos campos do retorno (instrução da Clara; permissões pendentes); aviso só ao Felipe. Decisão sobre plano com DPA pendente |
+| Dados do lead (nome, destino, datas, link) tratados pelo Grok Bot nos EUA e por provedores de modelo em outras regiões, sem DPA nem mecanismo do art. 33 (plano individual) | Média | Médio | Privacy Mode ligado (sem treino); aviso só ao Felipe. **Pendentes:** limite de campos nas permissões do Odoo (hoje a credencial da Clara alcança mais campos que os do retorno) e mecanismo de transferência válido ou suspensão (6.6) |
 
 ### 6.6 Salvaguardas implementadas
 
@@ -372,7 +372,7 @@ A **exibição** da proposta tem base em procedimentos preliminares a contrato, 
 - [x] Seção 5.10 da política aprovada pelo Encarregado e publicada (#1929, 22/10/2026)
 - [x] Suboperadores do assistente identificados: Grok Bot nos EUA, modelos da xAI ou de outros provedores da Anysphere, Privacy Mode ligado (matriz 2.14)
 - [ ] **Pendente:** confirmar a retenção dos registros de execução e do chat no Grok Bot
-- [ ] **Pendente (decisão do Encarregado):** a conta é de plano individual, sem DPA com a Anysphere (matriz 2.14). Migrar para um plano de time com DPA ou aceitar o risco registrado
+- [ ] **Pendente (Encarregado):** a conta é de plano individual, sem DPA com a Anysphere e sem mecanismo do art. 33 verificado (matriz 2.14). Estabelecer um mecanismo válido (por exemplo, plano de time com DPA que incorpore as cláusulas-padrão da Resolução CD/ANPD 19/2024) ou suspender a leitura de dados do lead pelo assistente; aceitar o risco não supre o mecanismo
 - [ ] **Decidido, configuração pendente na Clara (23/10/2026):** aviso curto na mensagem de WhatsApp que envia o link, para informar antes da primeira abertura; indispensável no modo redirect, que não mostra rodapé. Texto em `docs/ops/proposta-link.md`
 - [ ] **Decidido, configuração pendente na Clara (23/10/2026):** restringir a leitura do Odoo pelo assistente a uma lista de campos, nas permissões do usuário ou da chave de API que ele usa. A lista sai do que o rascunho de fato usa
 
