@@ -177,11 +177,13 @@ test('a reopen notifies only 30 minutes or more after the previous open', async 
     await handleProposalRequest(open(id), id, deps);
     await settle();
 
-    assert.deepEqual(deliveries.map((delivery) => payloadOf(delivery).openCount), [1, 4]);
-    const reopen = payloadOf(deliveries[1]);
+    // The opens are recorded in parallel (waitUntil), so deliveries can arrive in any order.
+    const [first, reopen] = deliveries.map(payloadOf).sort((a, b) => a.openCount - b.openCount);
+    assert.deepEqual([first.openCount, reopen.openCount], [1, 4]);
+    assert.equal(deliveries.length, 2);
     assert.equal(reopen.isFirstOpen, false);
     assert.equal(reopen.previousOpenAt, new Date(previous).toISOString());
-    assert.notEqual(reopen.eventId, payloadOf(deliveries[0]).eventId);
+    assert.notEqual(reopen.eventId, first.eventId);
 });
 
 test('internal previews, link previews, prefetches and HEAD never send a webhook', async (t) => {
