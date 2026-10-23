@@ -1,6 +1,6 @@
 # Link de proposta (`/proposta/<id>`)
 
-Épico [#1894](https://github.com/anhanga-tech/AV-SITE/issues/1894). Este documento cobre a rota (P1, #1895), o scrub no Sentry (P4, #1898) o registro de aberturas (P3, #1897), o redirect rastreado (P2, #1896), o endpoint interno de criação (P5, #1899), o webhook de abertura (P6, #1900), as notas no Odoo (P8, #1904), a página da proposta (P9, #1901) e o adaptador Infotravel (P11, #1906). As próximas fases acrescentam aqui o que mudarem.
+Épico [#1894](https://github.com/anhanga-tech/AV-SITE/issues/1894). Este documento cobre a rota (P1, #1895), o scrub no Sentry (P4, #1898) o registro de aberturas (P3, #1897), o redirect rastreado (P2, #1896), o endpoint interno de criação (P5, #1899), o webhook de abertura (P6, #1900), o aviso ao Felipe (P7, #1903), as notas no Odoo (P8, #1904), a página da proposta (P9, #1901) e o adaptador Infotravel (P11, #1906). As próximas fases acrescentam aqui o que mudarem.
 
 ## O que existe
 
@@ -145,12 +145,18 @@ Em TypeScript, `verifyProposalWebhook` de `lib/proposal-webhook.ts` faz os passo
 - `PROPOSAL_WEBHOOK_KEY`: a chave de envio que o painel da automação mostra. Vai no `Authorization: Bearer`. Só autentica no receptor; não prova que o aviso veio do site.
 - `PROPOSAL_WEBHOOK_SECRET`: `openssl rand -hex 32`, o mesmo valor guardado como segredo da Clara. É o que prova a origem.
 
-## Medidas de privacidade a configurar na Clara
+## Aviso ao Felipe (P7)
 
-Decididas pelo Encarregado em 23/10/2026 (RIPD, Atividade 5). Ficam fora deste repositório e estão **pendentes de configuração**. A política (seção 5.10) só passa a descrevê-las depois que estiverem em uso.
+A Clara é um agente do Grok Bot (Anysphere/Cursor); a rotina dela é o receptor do webhook. Ao receber um aviso válido, ela lê o lead no Odoo e escreve ao Felipe, no chat do Grok Bot: quem abriu, quantas vezes, a hora (horário de São Paulo), a oportunidade e um rascunho curto de retorno, usando só o link da nota "Proposta enviada". Aviso com assinatura inválida, `ts` fora da janela ou sem segredo é descartado em silêncio. Nada vai ao cliente nem ao CRM sem o OK do Felipe no chat. O lead 60 ("TESTE proposta-link (Otto)") é de teste: aviso marcado como teste, sem rascunho.
+
+Instrução da rotina mantida no painel da Clara, fora deste repositório. Aceite (#1903) pelos testes de 22/10/2026 no lead 60: abertura às 22:47 avisada às 22:48 (horário de São Paulo), com a assinatura conferida, e marcada como teste, sem rascunho.
+
+## Medidas de privacidade pendentes
+
+Decididas pelo Encarregado em 23/10/2026 (RIPD, Atividade 5). Ficam fora deste repositório. A política (seção 5.10) só passa a descrevê-las depois que estiverem em uso.
 
 - **Leitura do Odoo por lista de campos.** A Clara (Anysphere/Cursor) lê o lead para preparar o retorno. O limite deve ficar nas permissões do usuário ou da chave de API do Odoo que ela usa (grupos e regras de acesso), não só nas instruções da rotina. A lista sai do que o rascunho de fato usa: perguntar à Clara quais campos ela lê.
-- **Aviso no WhatsApp.** No modo redirect o cliente nunca vê o rodapé da página. Por isso, a mensagem que leva o link (qualquer modo) inclui uma linha como: _"Ao abrir o link, registramos só a data e a hora, para acompanhar sua proposta. Saiba mais: www.anhanga.tur.br/politica-privacidade#link-de-proposta"_.
+- **Aviso na mensagem de envio.** No modo redirect o cliente nunca vê o rodapé da página. O Felipe envia o link ao cliente pessoalmente, e a mensagem (qualquer modo) inclui uma linha como: _"Ao abrir o link, registramos só a data e a hora, para acompanhar sua proposta. Saiba mais: www.anhanga.tur.br/politica-privacidade#link-de-proposta"_.
 
 ## Notas no Odoo (P8)
 
