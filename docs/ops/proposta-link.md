@@ -147,9 +147,9 @@ Em TypeScript, `verifyProposalWebhook` de `lib/proposal-webhook.ts` faz os passo
 
 ## Aviso ao Felipe (P7)
 
-A Clara é um agente do Grok Bot (Anysphere/Cursor); a rotina dela é o receptor do webhook. Ao receber um aviso válido, ela lê o lead no Odoo e escreve ao Felipe, no chat do Grok Bot: quem abriu, quantas vezes, a hora (horário de São Paulo), a oportunidade e um rascunho curto de retorno, usando só o link da nota "Proposta enviada". Aviso com assinatura inválida, `ts` fora da janela ou sem segredo é descartado em silêncio. Nada vai ao cliente nem ao CRM sem o OK do Felipe no chat. O lead 60 ("TESTE proposta-link (Otto)") é de teste: aviso marcado como teste, sem rascunho.
+A Clara é um agente do Grok Bot (Anysphere/Cursor); a rotina dela é o receptor do webhook. Ao receber um aviso válido, ela lê o lead no Odoo e escreve ao Felipe, no chat do Grok Bot: o lead ligado ao link (o aviso não identifica quem abriu, que pode ser alguém a quem o cliente repassou o link), quantas vezes foi aberto, a hora (horário de São Paulo), a oportunidade e um rascunho curto de retorno, usando só o link da nota "Proposta enviada". Aviso com assinatura inválida, `ts` fora da janela ou sem segredo é descartado em silêncio. A Clara não envia nada ao cliente nem escreve no CRM sem o OK do Felipe no chat. A nota automática de abertura no Odoo (P8) é do site, não da Clara, e não depende desse OK. O lead 60 ("TESTE proposta-link (Otto)") é de teste: aviso marcado como teste, sem rascunho.
 
-Instrução da rotina mantida no painel da Clara, fora deste repositório. Aceite (#1903) pelos testes de 22/10/2026 no lead 60: abertura às 22:47 avisada às 22:48 (horário de São Paulo), com a assinatura conferida, e marcada como teste, sem rascunho.
+Instrução da rotina mantida no painel da Clara, fora deste repositório. Aceite (#1903) pelos testes de 22/10/2026 no lead 60: abertura às 22:47 avisada às 22:48 (horário de São Paulo), com a assinatura conferida, e marcada como teste, sem rascunho. O rascunho para um lead real não foi exercitado: o Felipe dispensou esse teste em 23/10/2026, e ele fica comprovado no primeiro uso real.
 
 ## Medidas de privacidade pendentes
 
