@@ -8,7 +8,7 @@
 |---|---|
 | **Controlador (exportador)** | Anhangá Turismo Ltda. — CNPJ 37.036.732/0001-41 |
 | **Encarregado (DPO)** | Felipe William Rodrigues Silva — privacidade@anhanga.tur.br |
-| **Versão** | 0.17 |
+| **Versão** | 0.18 |
 | **Data de elaboração** | 11/09/2026 |
 | **Última revisão** | 23/10/2026 |
 | **Status** | Rascunho — levantamento técnico feito a partir do código; evidências contratuais e revisão jurídica **pendentes** |
@@ -227,18 +227,18 @@ Campos de transferência dos destinatários da tabela acima, no formato das entr
 | ONER Travel | Citado na política (seção 6.1), mas sem integração no código do site. Se houver transferência internacional no fluxo operacional (fora do site), registrar no ROPA (#1547) |
 | GitHub OAuth do Decap CMS | O login de `/admin` autentica por OAuth no GitHub (`api/auth.ts`) — dados de conta de colaboradores, não de clientes nem de visitantes. Registrar no ROPA (#1547). O GitHub como destinatário de dados de clientes está na 2.11; o carregamento do bundle do CMS, na 2.9 |
 
-### 2.14 Anysphere, Inc. — assistente comercial (Cursor)
+### 2.14 Anysphere, Inc. — assistente comercial (Cursor / Grok Bot)
 
 | Campo | Detalhe |
 |---|---|
-| **Importador** | Anysphere, Inc. (EUA), que opera a plataforma Cursor |
-| **Serviços em uso** | Automação do Cursor que roda o assistente comercial (Clara). O site faz `POST` no gatilho da automação a cada abertura que gera aviso (`lib/proposal-webhook.ts`, #1900) |
+| **Importador** | Anysphere, Inc. (EUA), que opera o Cursor e dá o acesso ao Grok Bot (produto da xAI distribuído com o Cursor) — `doc pública` (x.ai/legal/x-subscription-terms-of-service) |
+| **Serviços em uso** | A Clara é um agente do Grok Bot; o gatilho é uma automação ("rotina") do Cursor. O aviso ao Felipe, com nome, estágio, destino, datas e o link da nota "Proposta enviada", é entregue no chat do próprio Grok Bot, sem outro canal (Felipe, 23/10/2026). O site faz `POST` no gatilho da automação a cada abertura que gera aviso (`lib/proposal-webhook.ts`, #1900) |
 | **Dados** | Envelope assinado com `leadId` do Odoo, `proposalRef` (hash do id, sem o id), `openCount`, `isFirstOpen`, `openedAt` e `previousOpenAt`. Sem o link, o id, os dados da viagem ou dados de contato — `código`. **Fora do envelope:** o assistente lê o lead no Odoo para preparar o rascunho de retorno, e ali estão a nota "Proposta enviada" com o link do cliente e os dados de contato do lead. A Anysphere, portanto, tem acesso a esses dados pela leitura do CRM — escopo exato da leitura `a confirmar`. Restrição a uma lista de campos permitidos decidida em 23/10/2026, a configurar nas permissões do Odoo usadas pela Clara (`docs/ops/proposta-link.md`) |
 | **Finalidade** | Preparar o rascunho de retorno comercial para revisão de um consultor; nenhuma mensagem sai ao cliente sem aprovação humana (#1903) |
 | **Duração** | Retenção dos registros de execução da automação no Cursor — `a confirmar` |
-| **País/região** | EUA — `a confirmar` |
-| **Suboperadores** | Provedores de modelo de IA usados pela automação — `a confirmar` na lista de suboperadores do DPA do Cursor |
-| **Mecanismo art. 33** | `não verificado`. O Cursor publica um Data Processing Addendum (cursor.com/terms/dpa); arquivar a versão aplicável à conta |
+| **País/região** | EUA: os computadores do Grok Bot rodam nos EUA, e a residência de dados só nos EUA do Cursor não se aplica ao Grok Bot por padrão — `doc pública` (cursor.com/docs/grok-bot/security-faq). Os provedores de modelo podem processar em outras regiões: a lista de suboperadores (trust.cursor.com/subprocessors) indica, entre outras, UE, Canadá, Reino Unido, Singapura e Emirados Árabes — `não verificado` (página dinâmica, não lida diretamente); a documentação do Grok Bot não diz onde os modelos processam |
+| **Suboperadores** | Cada pedido vai a um modelo da xAI ou de outro provedor da lista de suboperadores da Anysphere; a lista de modelos permitidos do time não se aplica ao Grok Bot — `doc pública` (cursor.com/docs/grok-bot/security). Privacy Mode ligado na conta (Felipe, 23/10/2026): nem a Anysphere nem os provedores de modelo, xAI incluída, treinam com os dados. O Grok Bot exige armazenamento de dados e não roda no Privacy Mode legado |
+| **Mecanismo art. 33** | `não verificado`. **Achado:** a conta é de plano individual (Felipe, 23/10/2026), e o DPA do Cursor (cursor.com/terms/dpa) não vale para planos individuais; vale só a política de privacidade da Anysphere (cursor.com/help/security-and-privacy/privacy). Sem DPA, não há cláusulas-padrão (Resolução CD/ANPD 19/2024) nem outro mecanismo do art. 33 verificado para este fluxo, cuja base é legítimo interesse (o art. 33, IX não se aplica). **Pendente:** estabelecer um mecanismo válido (por exemplo, plano de time com DPA que incorpore as cláusulas-padrão da ANPD) ou suspender a leitura de dados do lead pelo assistente. Aceitar o risco não supre o mecanismo |
 | **Evidência** | — |
 
 ## 3. Fornecedores aposentados
@@ -287,6 +287,7 @@ O que depende de acesso a painéis, contas e contratos — e portanto não sai d
 
 | Versão | Data | Alteração |
 |---|---|---|
+| 0.18 | 23/10/2026 | Assistente comercial (2.14): Clara roda no Grok Bot; EUA e suboperadores (xAI e outros provedores de modelo) confirmados em documentação pública; Privacy Mode ligado; plano individual sem DPA registrado como achado |
 | 0.17 | 23/10/2026 | Link de proposta: aberturas reduzidas ao instante, sem país, cidade, aparelho, hash do IP nem sal diário (2.6); lista de campos do Odoo para o assistente decidida, configuração pendente (2.14) |
 | 0.16 | 22/10/2026 | Link de proposta (#1894, #1925): notas no Odoo (2.5), proposta (página ou link da operadora no redirect) e aberturas no Upstash (2.6), fotos de hotéis carregadas de domínios externos — um da Infotravel, outro com responsável a identificar (2.9) e Anysphere, Inc. (Cursor) como operador do assistente comercial (2.14) |
 | 0.15 | 13/10/2026 | Traks (2.3): UTM e click IDs saem da URL antes do coletor quando não há consentimento de medição registrado (issues #1543 e #1545). O script analítico segue carregando por legítimo interesse |

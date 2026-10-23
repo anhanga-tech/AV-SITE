@@ -77,7 +77,7 @@ const ExclusaoDados = () => (
                                     </tr>
                                     <tr>
                                         <td className="py-2 pr-4">Link de proposta comercial: conteúdo da proposta e registro das aberturas (data e hora)</td>
-                                        <td className="py-2">Upstash (apagados sozinhos em até 15 e 90 dias, respectivamente, ou antes, a pedido) e as notas de envio e de abertura no Odoo CRM. Os avisos de abertura enviados ao nosso assistente comercial na plataforma Cursor (Anysphere, Inc.) — número do atendimento, código da proposta e horários — ficam nos registros dessa plataforma; solicitamos a exclusão e informamos o retorno, já que a remoção depende dela</td>
+                                        <td className="py-2">Upstash (apagados sozinhos em até 15 e 90 dias, respectivamente, ou antes, a pedido) e as notas de envio e de abertura no Odoo CRM. No nosso assistente comercial, nas plataformas Cursor e Grok Bot (Anysphere, Inc.), ficam os avisos de abertura (número do atendimento, código da proposta e horários) e as mensagens que ele prepara para a nossa equipe, com seu nome, destino, datas da viagem, link da proposta e rascunho de retorno; apagamos essas conversas, solicitamos à plataforma a exclusão do que ficar nos registros dela e informamos o retorno, já que essa parte da remoção depende dela</td>
                                     </tr>
                                     <tr>
                                         <td className="py-2 pr-4">Cookies de identificação persistentes</td>

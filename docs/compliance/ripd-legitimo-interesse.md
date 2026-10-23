@@ -9,7 +9,7 @@
 | **Endereço** | Av. Dom Pedro I, 773, Vila Monumento, São Paulo-SP, CEP 01552-001 |
 | **Encarregado (DPO)** | Felipe William Rodrigues Silva |
 | **E-mail DPO** | privacidade@anhanga.tur.br |
-| **Versão** | 1.13 |
+| **Versão** | 1.14 |
 | **Data de elaboração** | 02/06/2026 |
 | **Última revisão** | 23/10/2026 |
 | **Próxima revisão** | 03/06/2027 |
@@ -321,7 +321,7 @@ A **exibição** da proposta tem base em procedimentos preliminares a contrato, 
 | **Dados tratados** | Por abertura: só o instante (UTC) — `lib/proposal-opens.ts`. País, cidade, tipo de aparelho e hash do IP eram coletados até a v1.11 e saíram por minimização (ver 6.3). Derivados: contagem de aberturas e horários, que vão para a nota no Odoo e para o aviso ao assistente |
 | **Titulares** | Clientes que receberam um link de proposta e o abriram. Terceiros que abram um link repassado pelo cliente também são registrados, sem identificação |
 | **Não registrado** | Prévias de link de aplicativos de mensagem, prefetch, `HEAD` e a prévia interna da equipe (`?previa=`) — `lib/proposal-page.ts` |
-| **Operadores** | Upstash, Inc. (registro), Odoo S.A. (nota no `crm.lead`), Anysphere, Inc. — Cursor (automação do assistente comercial: o aviso leva só `leadId`, `proposalRef`, contagem e horários, mas o assistente depois lê o lead no Odoo, inclusive a nota com o link e os dados de contato) |
+| **Operadores** | Upstash, Inc. (registro), Odoo S.A. (nota no `crm.lead`), Anysphere, Inc. — Cursor e Grok Bot, com modelos da xAI ou de outros provedores contratados por ela, sem treino com os dados (Privacy Mode ligado) (automação do assistente comercial: o aviso leva só `leadId`, `proposalRef`, contagem e horários, mas o assistente depois lê o lead no Odoo, inclusive a nota com o link e os dados de contato) |
 | **Retenção** | Aberturas: 90 dias a partir da primeira abertura. Notas no Odoo: prazo dos dados de relacionamento (5 anos, política 7.1). Aviso no Cursor: `a confirmar` |
 | **Transferência internacional** | Anysphere, Inc. (EUA) — ver matriz de operadores, 2.14 |
 
@@ -358,6 +358,7 @@ A **exibição** da proposta tem base em procedimentos preliminares a contrato, 
 | Contato insistente a partir das aberturas | Baixa | Médio | Aviso só na 1ª abertura e em reaberturas com 30 min ou mais de intervalo; nenhuma mensagem sai sem aprovação de um consultor |
 | Aviso forjado ao assistente | Baixa | Baixo | Envelope assinado com HMAC-SHA256 e janela de 5 min; o assistente recusa assinatura inválida |
 | Retenção no Cursor além do necessário | `a confirmar` | Baixo | Payload mínimo, sem link nem contato. Confirmar a retenção dos registros de execução |
+| Dados do lead (nome, destino, datas, link) tratados pelo Grok Bot nos EUA e por provedores de modelo em outras regiões, sem DPA nem mecanismo do art. 33 (plano individual) | Média | Médio | Privacy Mode ligado (sem treino); aviso só ao Felipe. **Pendentes:** limite de campos nas permissões do Odoo (hoje a credencial da Clara alcança mais campos que os do retorno) e mecanismo de transferência válido ou suspensão (6.6) |
 
 ### 6.6 Salvaguardas implementadas
 
@@ -369,7 +370,9 @@ A **exibição** da proposta tem base em procedimentos preliminares a contrato, 
 - [x] Logs sem id, `leadId`, link da operadora ou URL do webhook
 - [x] Aviso no rodapé da página com link para a política
 - [x] Seção 5.10 da política aprovada pelo Encarregado e publicada (#1929, 22/10/2026)
-- [ ] **Pendente:** confirmar retenção e suboperadores do Cursor (matriz 2.14)
+- [x] Suboperadores do assistente identificados: Grok Bot nos EUA, modelos da xAI ou de outros provedores da Anysphere, Privacy Mode ligado (matriz 2.14)
+- [ ] **Pendente:** confirmar a retenção dos registros de execução e do chat no Grok Bot
+- [ ] **Pendente (Encarregado):** a conta é de plano individual, sem DPA com a Anysphere e sem mecanismo do art. 33 verificado (matriz 2.14). Estabelecer um mecanismo válido (por exemplo, plano de time com DPA que incorpore as cláusulas-padrão da Resolução CD/ANPD 19/2024) ou suspender a leitura de dados do lead pelo assistente; aceitar o risco não supre o mecanismo
 - [ ] **Decidido, configuração pendente na Clara (23/10/2026):** aviso curto na mensagem de WhatsApp que envia o link, para informar antes da primeira abertura; indispensável no modo redirect, que não mostra rodapé. Texto em `docs/ops/proposta-link.md`
 - [ ] **Decidido, configuração pendente na Clara (23/10/2026):** restringir a leitura do Odoo pelo assistente a uma lista de campos, nas permissões do usuário ou da chave de API que ele usa. A lista sai do que o rascunho de fato usa
 
@@ -429,6 +432,7 @@ O balancing test favorece o legítimo interesse nas Atividades 1, 2, 3 e 5. A At
 | 1.11 | 22/10/2026 | Atividade 5 adicionada: registro de aberturas do link de proposta e aviso ao assistente comercial (#1894, #1925); conclusão renumerada para a seção 7 e histórico para a 8. |
 | 1.12 | 23/10/2026 | Atividade 5: registro de aberturas reduzido ao instante (país, cidade, aparelho e hash do IP removidos por minimização; limpeza dos registros anteriores e dos sais pendente até a execução do script); seção 5.10 aprovada e publicada (#1929); lista de campos do Odoo e aviso no WhatsApp decididos, com configuração pendente na Clara |
 | 1.13 | 23/10/2026 | Atividade 5: limpeza dos registros de abertura anteriores à minimização concluída e conferida (7 aberturas reduzidas, 2 sais apagados, 0 ilegíveis) |
+| 1.14 | 23/10/2026 | Atividade 5: assistente comercial roda no Grok Bot (Anysphere), com modelos da xAI ou de outros provedores e Privacy Mode ligado; plano individual sem DPA registrado como decisão pendente |
 
 ---
 
