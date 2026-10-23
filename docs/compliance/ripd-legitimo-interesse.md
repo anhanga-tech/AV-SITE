@@ -9,7 +9,7 @@
 | **Endereço** | Av. Dom Pedro I, 773, Vila Monumento, São Paulo-SP, CEP 01552-001 |
 | **Encarregado (DPO)** | Felipe William Rodrigues Silva |
 | **E-mail DPO** | privacidade@anhanga.tur.br |
-| **Versão** | 1.14 |
+| **Versão** | 1.15 |
 | **Data de elaboração** | 02/06/2026 |
 | **Última revisão** | 23/10/2026 |
 | **Próxima revisão** | 03/06/2027 |
@@ -373,7 +373,7 @@ A **exibição** da proposta tem base em procedimentos preliminares a contrato, 
 - [x] Suboperadores do assistente identificados: Grok Bot nos EUA, modelos da xAI ou de outros provedores da Anysphere, Privacy Mode ligado (matriz 2.14)
 - [ ] **Pendente:** confirmar a retenção dos registros de execução e do chat no Grok Bot
 - [ ] **Pendente (Encarregado):** a conta é de plano individual, sem DPA com a Anysphere e sem mecanismo do art. 33 verificado (matriz 2.14). Estabelecer um mecanismo válido (por exemplo, plano de time com DPA que incorpore as cláusulas-padrão da Resolução CD/ANPD 19/2024) ou suspender a leitura de dados do lead pelo assistente; aceitar o risco não supre o mecanismo
-- [ ] **Decidido, configuração pendente na Clara (23/10/2026):** aviso curto na mensagem de WhatsApp que envia o link, para informar antes da primeira abertura; indispensável no modo redirect, que não mostra rodapé. Texto em `docs/ops/proposta-link.md`
+- [ ] **Decidido, a adotar pelo Felipe, que envia o link ao cliente (23/10/2026):** aviso curto na mensagem que envia o link, para informar antes da primeira abertura; indispensável no modo redirect, que não mostra rodapé. Texto em `docs/ops/proposta-link.md`
 - [ ] **Decidido, configuração pendente na Clara (23/10/2026):** restringir a leitura do Odoo pelo assistente a uma lista de campos, nas permissões do usuário ou da chave de API que ele usa. A lista sai do que o rascunho de fato usa
 
 ---
@@ -433,6 +433,7 @@ O balancing test favorece o legítimo interesse nas Atividades 1, 2, 3 e 5. A At
 | 1.12 | 23/10/2026 | Atividade 5: registro de aberturas reduzido ao instante (país, cidade, aparelho e hash do IP removidos por minimização; limpeza dos registros anteriores e dos sais pendente até a execução do script); seção 5.10 aprovada e publicada (#1929); lista de campos do Odoo e aviso no WhatsApp decididos, com configuração pendente na Clara |
 | 1.13 | 23/10/2026 | Atividade 5: limpeza dos registros de abertura anteriores à minimização concluída e conferida (7 aberturas reduzidas, 2 sais apagados, 0 ilegíveis) |
 | 1.14 | 23/10/2026 | Atividade 5: assistente comercial roda no Grok Bot (Anysphere), com modelos da xAI ou de outros provedores e Privacy Mode ligado; plano individual sem DPA registrado como decisão pendente |
+| 1.15 | 23/10/2026 | Atividade 5: o aviso de privacidade antes da primeira abertura fica na mensagem de envio do Felipe, que manda o link ao cliente, e não no assistente |
 
 ---
 
