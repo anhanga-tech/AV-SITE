@@ -9,8 +9,10 @@
 # do Redis.
 #
 # Setup (uma vez): secrets UPSTASH_REDIS_REST_URL e
-# UPSTASH_REDIS_REST_AUDIT_TOKEN, um token ACL que só pode SCAN e TTL (o token
-# somente leitura do Upstash não roda SCAN). Ver docs/ops/proposta-link.md.
+# UPSTASH_REDIS_REST_READONLY_TOKEN (token somente leitura do console do
+# Upstash). Ele roda SCAN e TTL e tem escrita negada (conferido em
+# 23/10/2026, apesar de a doc do Upstash dizer que não roda SCAN). Ver
+# docs/ops/proposta-link.md.
 name: Proposal Retention Audit
 
 on:
@@ -40,5 +42,5 @@ jobs:
       - name: Audita a retenção
         env:
           UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
-          UPSTASH_REDIS_REST_AUDIT_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_AUDIT_TOKEN }}
+          UPSTASH_REDIS_REST_READONLY_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_READONLY_TOKEN }}
         run: node scripts/audit-proposal-retention.ts
