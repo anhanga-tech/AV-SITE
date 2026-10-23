@@ -26,10 +26,11 @@ export type RetentionCheck = 'ok' | 'gone' | 'no_ttl' | 'over_limit' | 'unknown_
 
 /** `ttlSeconds` is Redis `TTL`: -1 without expiry, -2 already gone. */
 export function checkProposalKeyRetention(key: string, ttlSeconds: number): RetentionCheck {
+    // Gone first: a key that expired between SCAN and TTL, known or not, no longer exists.
+    if (ttlSeconds === -2) return 'gone';
     const prefix = key.split(':', 2).join(':');
     const limit = PROPOSAL_RETENTION_LIMITS[prefix];
     if (limit === undefined || key.length <= prefix.length + 1) return 'unknown_key';
-    if (ttlSeconds === -2) return 'gone';
     if (ttlSeconds < 0) return 'no_ttl';
     return ttlSeconds > limit ? 'over_limit' : 'ok';
 }

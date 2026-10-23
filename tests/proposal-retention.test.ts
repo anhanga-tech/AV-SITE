@@ -31,8 +31,9 @@ test('a key past its limit or without a TTL fails', () => {
     assert.equal(checkProposalKeyRetention(`proposta:exp:${ID}`, -1), 'no_ttl');
 });
 
-test('a key that vanished between SCAN and TTL is not a violation', () => {
+test('a key that vanished between SCAN and TTL is not a violation, even with an unknown prefix', () => {
     assert.equal(checkProposalKeyRetention(`proposta:rec:${ID}`, -2), 'gone');
+    assert.equal(checkProposalKeyRetention('proposta:sal:2026-10-22', -2), 'gone');
 });
 
 test('keys outside the known prefixes fail, including the retired IP salt', () => {

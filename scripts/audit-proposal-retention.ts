@@ -6,17 +6,18 @@
  *
  *   node scripts/audit-proposal-retention.ts
  *
- * Needs UPSTASH_REDIS_REST_URL and a token: UPSTASH_REDIS_REST_READONLY_TOKEN
- * (preferred; SCAN and TTL only) or UPSTASH_REDIS_REST_TOKEN.
+ * Needs UPSTASH_REDIS_REST_URL and a token: UPSTASH_REDIS_REST_AUDIT_TOKEN
+ * (preferred: an ACL token allowed only SCAN and TTL; Upstash's read-only
+ * token can't run SCAN) or UPSTASH_REDIS_REST_TOKEN.
  * Prints counts only: key names carry the proposal id, a credential.
  */
 import { checkProposalKeyRetention, type RetentionCheck } from '../lib/proposal-retention.ts';
 
 const url = process.env.UPSTASH_REDIS_REST_URL?.trim();
-const token = (process.env.UPSTASH_REDIS_REST_READONLY_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN)?.trim();
+const token = (process.env.UPSTASH_REDIS_REST_AUDIT_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN)?.trim();
 
 if (!url || !token) {
-  console.error('UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_READONLY_TOKEN (or UPSTASH_REDIS_REST_TOKEN) are required.');
+  console.error('UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_AUDIT_TOKEN (or UPSTASH_REDIS_REST_TOKEN) are required.');
   process.exit(1);
 }
 
