@@ -11,7 +11,7 @@
 | **E-mail DPO** | privacidade@anhanga.tur.br |
 | **Versão** | 1.12 |
 | **Data de elaboração** | 02/06/2026 |
-| **Última revisão** | 22/10/2026 |
+| **Última revisão** | 23/10/2026 |
 | **Próxima revisão** | 03/06/2027 |
 | **Status** | Rascunho — pendente de revisão jurídica e aprovação do DPO |
 
