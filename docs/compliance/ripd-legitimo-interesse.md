@@ -336,7 +336,7 @@ A **exibição** da proposta tem base em procedimentos preliminares a contrato, 
 
 **É proporcional?** Sim. Cada abertura guarda só o instante: sem IP (nem hash dele), localização, aparelho ou user agent. O aviso ao assistente leva só identificadores e horários.
 
-**Poderia ser menos invasivo?** Não sem perder a finalidade: a contagem e os horários são o que a nota no Odoo e o aviso usam. Até a v1.11 também se coletavam país, cidade, tipo de aparelho e um hash do IP, que nenhum fluxo consumia. Em 23/10/2026 o Encarregado decidiu parar de coletá-los; a finalidade "distinguir reabertura do cliente de link repassado" saiu com eles. Os registros anteriores foram reduzidos ao instante e os sais diários apagados. Um campo novo só volta junto com a funcionalidade que o usa e com a revisão desta avaliação.
+**Poderia ser menos invasivo?** Não sem perder a finalidade: a contagem e os horários são o que a nota no Odoo e o aviso usam. Até a v1.11 também se coletavam país, cidade, tipo de aparelho e um hash do IP, que nenhum fluxo consumia. Em 23/10/2026 o Encarregado decidiu parar de coletá-los; a finalidade "distinguir reabertura do cliente de link repassado" saiu com eles. Os registros gravados antes disso serão reduzidos ao instante, e os sais diários apagados, por uma limpeza única depois do deploy (ver 6.6). Um campo novo só volta com a funcionalidade que o usa e com a revisão desta avaliação.
 
 ### 6.4 Balancing test
 
@@ -362,6 +362,7 @@ A **exibição** da proposta tem base em procedimentos preliminares a contrato, 
 ### 6.6 Salvaguardas implementadas
 
 - [x] Cada abertura guarda só o instante: sem IP, hash de IP, localização ou aparelho (`lib/proposal-opens.ts`, v1.12)
+- [ ] **Pendente:** limpeza única dos registros anteriores (`scripts/minimize-proposal-opens.ts --apply`, depois do deploy), concluída só com `unreadable` igual a 0 numa nova execução de conferência
 - [x] Prévias de link, prefetch e prévia interna não contam abertura (`lib/proposal-page.ts`)
 - [x] Expiração automática por TTL: proposta em até 15 dias, aberturas em 90 dias
 - [x] Aviso ao assistente só com `leadId`, `proposalRef` (hash do id, que não abre a proposta), contagem e horários: sem o link, o id ou dados de contato; assinado (`lib/proposal-webhook.ts`)
@@ -426,7 +427,7 @@ O balancing test favorece o legítimo interesse nas Atividades 1, 2, 3 e 5. A At
 | 1.9 | 01/09/2026 | Stape.io desativado pela própria Stape (31/08/2026, limite do plano gratuito) — substituído pelo **Cloudflare Zaraz** como plataforma de server-side tagging nas Atividades 1 e 2. Cloudflare já é processor da Anhangá (hospedagem via Pages), reduzindo a introdução de subprocessador novo. Mudança de arquitetura relevante: Meta e TikTok passam de híbrido (pixel + CAPI) para **CAPI-only** — nenhum pixel de terceiros é mais injetado no navegador do usuário. Atividade 4 (Customer Match) marcada como **inativa**: já dependia do Mautic (removido na v1.8) e agora também do Stape (removido nesta versão) como intermediário de upload — nenhum upload está ocorrendo. Pendências #1 e #4 marcadas obsoletas; novo item de auditoria de PII por evento adicionado (#2, parcial). |
 | 1.10 | 13/10/2026 | Atividade 2: UTM e click IDs deixam de ser tratados sob legítimo interesse. Captura e envio ao CRM exigem grant de `ads_measurement` no ledger (issues #1543 e #1545). GA4, Traks, Web Analytics e Sentry permanecem em legítimo interesse. |
 | 1.11 | 22/10/2026 | Atividade 5 adicionada: registro de aberturas do link de proposta e aviso ao assistente comercial (#1894, #1925); conclusão renumerada para a seção 7 e histórico para a 8. |
-| 1.12 | 23/10/2026 | Atividade 5: registro de aberturas reduzido ao instante (país, cidade, aparelho e hash do IP removidos por minimização, registros anteriores reduzidos e sais apagados); seção 5.10 aprovada e publicada (#1929); lista de campos do Odoo e aviso no WhatsApp decididos, com configuração pendente na Clara |
+| 1.12 | 23/10/2026 | Atividade 5: registro de aberturas reduzido ao instante (país, cidade, aparelho e hash do IP removidos por minimização; limpeza dos registros anteriores e dos sais pendente até a execução do script); seção 5.10 aprovada e publicada (#1929); lista de campos do Odoo e aviso no WhatsApp decididos, com configuração pendente na Clara |
 
 ---
 
