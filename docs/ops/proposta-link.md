@@ -1,6 +1,6 @@
 # Link de proposta (`/proposta/<id>`)
 
-Épico [#1894](https://github.com/anhanga-tech/AV-SITE/issues/1894). Este documento cobre a rota (P1, #1895), o scrub no Sentry (P4, #1898) o registro de aberturas (P3, #1897), o redirect rastreado (P2, #1896), o endpoint interno de criação (P5, #1899), o webhook de abertura (P6, #1900), o aviso ao Felipe (P7, #1903), as notas no Odoo (P8, #1904), a página da proposta (P9, #1901) e o adaptador Infotravel (P11, #1906). As próximas fases acrescentam aqui o que mudarem.
+Épico [#1894](https://github.com/anhanga-tech/AV-SITE/issues/1894). Este documento cobre a rota (P1, #1895), o scrub no Sentry (P4, #1898) o registro de aberturas (P3, #1897), o redirect rastreado (P2, #1896), a auditoria de retenção (P12, #1902), o endpoint interno de criação (P5, #1899), o webhook de abertura (P6, #1900), o aviso ao Felipe (P7, #1903), as notas no Odoo (P8, #1904), a página da proposta (P9, #1901) e o adaptador Infotravel (P11, #1906). As próximas fases acrescentam aqui o que mudarem.
 
 ## O que existe
 
@@ -17,6 +17,8 @@
 | `proposta:abr:<id>` | Lista de aberturas, um JSON por abertura | 90 dias a partir da 1ª abertura (D5), fixado com `EXPIRE NX` |
 
 O conteúdo some no instante em que o link expira. O tombstone existe só para responder 410 ("Proposta expirada", com botão de WhatsApp) em vez de 404. Depois da carência, o id responde 404 como qualquer id desconhecido. Os TTLs fazem o expurgo; não há rotina de limpeza para estas chaves.
+
+**Auditoria diária (P12, #1902).** `.github/workflows/proposal-retention-audit.yml` roda às 06:30 (São Paulo) e executa `node scripts/audit-proposal-retention.ts`. O job falha se alguma chave `proposta:*` estiver sem TTL, com TTL acima do limite (`proposta:rec` 15 dias, `proposta:exp` 45, `proposta:abr` 90; `lib/proposal-retention.ts`) ou com prefixo desconhecido, como um `proposta:sal` que tenha sobrado. A saída traz só contagens por prefixo, sem nomes de chave. O job roda com `node` puro, sem `pnpm install`, então nenhum código de terceiros roda ao lado do token. Secrets do repositório: `UPSTASH_REDIS_REST_URL` e `UPSTASH_REDIS_REST_READONLY_TOKEN`, o token somente leitura do console do Upstash, porque a auditoria só usa `SCAN` e `TTL`. Se falhar: ver qual contagem acusou, achar a chave pelo console do Upstash e aplicar `EXPIRE` ou apagá-la, sem copiar o id para issues ou logs.
 
 ## Aberturas
 

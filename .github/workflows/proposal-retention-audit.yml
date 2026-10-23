@@ -1,0 +1,44 @@
+# Auditoria diária de retenção das chaves do link de proposta (P12, #1902).
+# Os TTLs gravados pelo site fazem o expurgo (decisão D5); este job só prova
+# que nenhuma chave `proposta:*` está sem TTL, acima do limite ou com prefixo
+# desconhecido. Falha o job se alguma estiver, e imprime só contagens: o nome
+# da chave tem o id da proposta, que é credencial.
+#
+# Roda o script com `node` puro (Node 24 executa TypeScript sem build), sem
+# `pnpm install`: nenhum código de terceiros roda no job que recebe o token
+# do Redis.
+#
+# Setup (uma vez): secrets UPSTASH_REDIS_REST_URL e
+# UPSTASH_REDIS_REST_READONLY_TOKEN (token somente leitura do console do
+# Upstash: a auditoria só usa SCAN e TTL).
+name: Proposal Retention Audit
+
+on:
+  schedule:
+    - cron: "30 9 * * *" # 06:30 America/Sao_Paulo (UTC-3)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Retenção das chaves proposta:* (D5)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+
+      - name: Audita a retenção
+        env:
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_READONLY_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_READONLY_TOKEN }}
+        run: node scripts/audit-proposal-retention.ts
