@@ -8,9 +8,11 @@
 # `pnpm install`: nenhum código de terceiros roda no job que recebe o token
 # do Redis.
 #
-# Setup (uma vez): secrets UPSTASH_REDIS_REST_URL e
-# UPSTASH_REDIS_REST_READONLY_TOKEN (token somente leitura do console do
-# Upstash). Ele roda SCAN e TTL e tem escrita negada (conferido em
+# Os secrets ficam no environment `proposta-retencao`, que só aceita a
+# branch main: um workflow disparado de outro branch (inclusive pelo
+# workflow_dispatch) não recebe o token. Setup (uma vez): secrets
+# UPSTASH_REDIS_REST_URL e UPSTASH_REDIS_REST_READONLY_TOKEN nesse environment
+# (token somente leitura do console do Upstash). Ele roda SCAN e TTL e tem escrita negada (conferido em
 # 23/10/2026, apesar de a doc do Upstash dizer que não roda SCAN). Ver
 # docs/ops/proposta-link.md.
 name: Proposal Retention Audit
@@ -28,6 +30,7 @@ jobs:
     name: Retenção das chaves proposta:* (D5)
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    environment: proposta-retencao
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
