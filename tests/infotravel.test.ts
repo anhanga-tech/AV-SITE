@@ -223,15 +223,16 @@ test('the page never outlives the operator\'s quotation deadline', async (t) => 
     assert.equal(soon.data.mode, 'page');
     assert.equal(soon.data.expiresAt, new Date(clock.now + 2 * 86_400_000).toISOString());
 
-    const gone = await (await handleCreateProposal(create(INFOTRAVEL_BODY), { ...deps, infotravel: { fetch: operatorApi({ booking: () => lapsesIn(-60_000) }).fetch } })).json();
-    assert.equal(gone.data.mode, 'redirect');
-    assert.equal(gone.data.fallbackReason, 'quotation_expired');
+    // #1925: no redirect fallback either, which would keep the booking token live for 15 days.
+    const goneResponse = await handleCreateProposal(create(INFOTRAVEL_BODY), { ...deps, infotravel: { fetch: operatorApi({ booking: () => lapsesIn(-60_000) }).fetch } });
+    assert.equal(goneResponse.status, 409);
+    assert.equal((await goneResponse.json()).code, 'QUOTATION_EXPIRED');
 
     // Lapsing while the operator is being read: measured on the post-fetch clock.
     // The quotation is still valid before the call (+4 s) but not after it (the call takes 5 s).
     const slow = operatorApi({ booking: () => ((clock.now += 5_000), lapsesIn(-1_000)) });
-    const late = await (await handleCreateProposal(create(INFOTRAVEL_BODY), { ...deps, infotravel: { fetch: slow.fetch } })).json();
-    assert.equal(late.data.fallbackReason, 'quotation_expired');
+    const late = await handleCreateProposal(create(INFOTRAVEL_BODY), { ...deps, infotravel: { fetch: slow.fetch } });
+    assert.equal(late.status, 409);
 });
 
 test('pages stay off until enabled (#1925): the link falls back to the tracked redirect', async (t) => {

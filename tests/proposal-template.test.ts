@@ -151,6 +151,9 @@ test('the page has no script and a privacy notice linking to the policy', () => 
 
     assert.doesNotMatch(html, /<script/i);
     assert.match(html, /registramos quando esta página é aberta/);
+    // #1925: the notice must match the policy — a hash derived from the IP is stored.
+    assert.match(html, /código derivado do IP/);
+    assert.doesNotMatch(html, /Não guardamos seu IP/);
     assert.match(html, /href="https:\/\/www\.anhanga\.tur\.br\/politica-privacidade"/);
 });
 

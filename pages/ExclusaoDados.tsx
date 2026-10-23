@@ -4,8 +4,8 @@ import { WebPageSchema } from "@/components/schemas/WebPageSchema";
 
 const CANONICAL = "https://www.anhanga.tur.br/exclusao-de-dados/";
 const DESCRIPTION = "Instruções para solicitar a exclusão de dados pessoais junto à Anhangá Turismo, conforme a LGPD (Lei nº 13.709/2018).";
-const UPDATED = "14 de setembro de 2026";
-const UPDATED_ISO = "2026-09-14";
+const UPDATED = "22 de outubro de 2026";
+const UPDATED_ISO = "2026-10-22";
 
 const ExclusaoDados = () => (
     <>
@@ -74,6 +74,10 @@ const ExclusaoDados = () => (
                                     <tr>
                                         <td className="py-2 pr-4">Nome, e-mail, observações, horário e dados de campanha de consultorias agendadas pelo website</td>
                                         <td className="py-2">Cal.com (excluídos pela nossa equipe na conta de agendamento)</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="py-2 pr-4">Link de proposta comercial: conteúdo da proposta e registro das aberturas (data, hora, local aproximado, tipo de aparelho e código derivado do IP)</td>
+                                        <td className="py-2">Upstash (apagados sozinhos em até 15 e 90 dias, respectivamente, ou antes, a pedido) e as notas de envio e de abertura no Odoo CRM. Os avisos de abertura enviados ao nosso assistente comercial na plataforma Cursor (Anysphere, Inc.) — número do atendimento, código da proposta e horários — ficam nos registros dessa plataforma; solicitamos a exclusão e informamos o retorno, já que a remoção depende dela</td>
                                     </tr>
                                     <tr>
                                         <td className="py-2 pr-4">Cookies de identificação persistentes</td>

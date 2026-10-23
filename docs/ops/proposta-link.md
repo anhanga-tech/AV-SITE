@@ -91,6 +91,7 @@ Resposta 201:
 | 401 | `UNAUTHORIZED` | `Authorization: Bearer` ausente ou errado |
 | 405 | `METHOD_NOT_ALLOWED` | Método diferente de POST |
 | 400 | `VALIDATION_ERROR` / `REDIRECT_NOT_ALLOWED` | Corpo inválido / link fora da allowlist |
+| 409 | `QUOTATION_EXPIRED` | `type: "infotravel"` e a operadora diz que a cotação já venceu (nada é gravado): pedir cotação nova |
 | 429 | `RATE_LIMIT_EXCEEDED` | Mais de 30 pedidos por minuto do mesmo IP |
 | 500 | `CONFIG_ERROR` | Falta `PROPOSAL_API_SECRET` ou `PROPOSAL_PREVIEW_SECRET` (nada é gravado) |
 | 503 | `STORE_UNAVAILABLE` / `SERVICE_UNAVAILABLE` | Redis fora (gravação ou rate limit) |
@@ -167,7 +168,7 @@ Uma proposta guarda **ou** `redirectUrl` (redirect rastreado) **ou** `content` (
 - **Condições:** texto fixo da Anhangá ("Valores sujeitos a disponibilidade… fale com a gente pelo WhatsApp"), nunca o da operadora (D7). As regras de cancelamento de cada item aparecem junto do item.
 - **Datas:** diárias (`2027-03-10T00:00:00`) são tratadas como dia de calendário, e horários de voo como hora local do aeroporto. Nenhuma das duas passa por fuso horário, então não "voltam um dia" no servidor.
 - **Prévias de link** (WhatsApp etc.) continuam recebendo a página genérica, sem nome, hotel ou preço. A prévia interna (`?previa=`) mostra a página completa com o aviso.
-- **Rodapé:** aviso de que a abertura é registrada (data, hora, cidade aproximada, aparelho), com link para `/politica-privacidade`.
+- **Rodapé:** aviso de que a abertura é registrada (data, hora, país e cidade aproximados, aparelho e código derivado do IP), com link para `/politica-privacidade` (seção 5.10).
 - **Conversão:** `fromInfotravelNormalized` (`lib/proposal-infotravel.ts`) transforma o JSON normalizado da Infotravel (`main.getBooking` + `main.getHotel`) nesse conteúdo. O adaptador que gera o normalizado a partir da API é a P11 (#1906). O fixture em `tests/fixtures/` é a cotação de teste com o roteiro deslocado e números fictícios. Os arquivos brutos da API têm dados reais do cliente e não entram no repositório.
 
 ## Adaptador Infotravel (P11)
@@ -179,9 +180,9 @@ Uma proposta guarda **ou** `redirectUrl` (redirect rastreado) **ou** `content` (
 3. `lib/infotravel-normalize.ts` monta o JSON normalizado e confere: um pacote, um quarto, tudo em BRL, `status: QUOTATION`, nenhuma categoria que a página não mostra (seguro, carro, trem, cruzeiro… no pacote ou na raiz da reserva) e **total = soma de todos os preços ao centavo** (inclui o ajuste de comissão, que nunca aparece).
 4. `fromInfotravelNormalized` (P9) gera o conteúdo, e a proposta é salva como página.
 
-Qualquer falha cai no **redirect rastreado** para o mesmo link (P2). A resposta traz `mode: "page" | "redirect"` e, no redirect, `fallbackReason`: `pages_disabled`, `invalid_token`, `timeout`, `http_error`, `unexpected_response`, `unexpected_shape`, `unsupported_quotation`, `total_mismatch`, `quotation_expired` ou `invalid_content`.
+Qualquer falha cai no **redirect rastreado** para o mesmo link (P2). A resposta traz `mode: "page" | "redirect"` e, no redirect, `fallbackReason`: `pages_disabled`, `invalid_token`, `timeout`, `http_error`, `unexpected_response`, `unexpected_shape`, `unsupported_quotation`, `total_mismatch` ou `invalid_content`.
 
-Se a cotação informar `expirationDate`, a página nunca vale além dela: a validade é o menor entre o pedido (padrão 15 dias) e o prazo da operadora, e uma cotação já vencida cai no redirect.
+Se a cotação informar `expirationDate`, a página nunca vale além dela: a validade é o menor entre o pedido (padrão 15 dias) e o prazo da operadora. Uma cotação já vencida é recusada com 409 `QUOTATION_EXPIRED`, sem redirect: o redirect manteria o token da reserva ativo por 15 dias depois do fim da cotação (#1925).
 
 Nunca copiados da cotação: `contact`/`user` (o agente), `client` (a agência, com CNPJ), `unit` (unidade RCA), localizadores, `textDoc` (formas de pagamento da operadora), observações do fornecedor (telefone de plantão) e logos.
 

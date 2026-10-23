@@ -8,9 +8,9 @@
 |---|---|
 | **Controlador (exportador)** | Anhangá Turismo Ltda. — CNPJ 37.036.732/0001-41 |
 | **Encarregado (DPO)** | Felipe William Rodrigues Silva — privacidade@anhanga.tur.br |
-| **Versão** | 0.15 |
+| **Versão** | 0.16 |
 | **Data de elaboração** | 11/09/2026 |
-| **Última revisão** | 13/10/2026 |
+| **Última revisão** | 22/10/2026 |
 | **Status** | Rascunho — levantamento técnico feito a partir do código; evidências contratuais e revisão jurídica **pendentes** |
 | **Issue** | [#1542](https://github.com/anhanga-tech/AV-SITE/issues/1542) (achados LGPD-04 e LGPD-05 da auditoria de 28/08/2026) |
 | **Documentos relacionados** | [`ripd-legitimo-interesse.md`](./ripd-legitimo-interesse.md) · [`direitos-dos-titulares.md`](./direitos-dos-titulares.md) · Política de Privacidade (`components/privacy/`, seções 5 a 8 e 10) · `pages/ExclusaoDados.tsx` |
@@ -101,8 +101,8 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 | Campo | Detalhe |
 |---|---|
 | **Importador** | Odoo S.A. (Bélgica) |
-| **Serviços em uso** | Odoo Online — recebe os 5 formulários do site via JSON-RPC (`services/odoo.ts`) |
-| **Dados** | Nome, e-mail, telefone, perfil de viagem/BANT, **empresa, cargo e indicação** do formulário corporativo (`partner_name`, `function` e descrição do `crm.lead` — `lib/odoo-lead-mapping.ts`), UTMs e click IDs, `x_ga_client_id`, consentimento LGPD, nota NPS e **respostas livres do NPS** (motivo da nota e destaque da viagem, gravados no campo `comment` do parceiro — `lib/odoo-lead-mapping.ts`), que podem conter dados pessoais adicionais |
+| **Serviços em uso** | Odoo Online — recebe os 5 formulários do site via JSON-RPC (`services/odoo.ts`) e as notas internas do link de proposta no `crm.lead` (`lib/proposal-odoo-notes.ts`) |
+| **Dados** | Nome, e-mail, telefone, perfil de viagem/BANT, **empresa, cargo e indicação** do formulário corporativo (`partner_name`, `function` e descrição do `crm.lead` — `lib/odoo-lead-mapping.ts`), UTMs e click IDs, `x_ga_client_id`, consentimento LGPD, nota NPS e **respostas livres do NPS** (motivo da nota e destaque da viagem, gravados no campo `comment` do parceiro — `lib/odoo-lead-mapping.ts`), que podem conter dados pessoais adicionais. Link de proposta (#1894): nota "Proposta enviada" com o link do cliente e a validade, e nota "Proposta aberta" com data, hora e número da abertura — `código` |
 | **Finalidade** | Gestão comercial de leads e relacionamento |
 | **Duração** | 5 anos após a última interação (política, seção 7.1) — aprovação da tabela de retenção em #1544 |
 | **País/região** | O IP do banco resolve para OVH em Montréal, Canadá — `indício técnico`. Região do datacenter do banco — `a confirmar` no painel da assinatura Odoo |
@@ -115,10 +115,10 @@ Exportador em todas as linhas: Anhangá Turismo Ltda. (Brasil).
 | Campo | Detalhe |
 |---|---|
 | **Importador** | Upstash, Inc. (EUA) |
-| **Serviços em uso** | Redis REST para rate limit dos endpoints de API (`lib/rate-limit.ts`), controle de replay do convite de NPS (`lib/nps-invite-replay.ts`) e lock de idempotência das submissões que criam lead/parceiro no Odoo (`lib/odoo-lead-idempotency.ts`) |
-| **Dados** | Chave de rate limit pseudonimizada (`<prefixo>:<subjectKey>`, HMAC-SHA-256 do IP com `RATE_LIMIT_KEY_SECRET`, truncada; o IP em claro não é gravado) e um contador — `código` (`lib/rate-limit.ts`). Registro de uso único do convite de NPS (`nps:invite:used:<jti>`, identificador do convite assinado, sem dados de contato) — `código` (`lib/nps-invite-replay.ts`, `api/submit-nps.ts`). Lock de concorrência de toda submissão que gera lead no Odoo (`odoo:lead:lock:<chave>`): a chave é o `event_id` gerado no navegador ou, na ausência dele, um resumo SHA-256 derivado de e-mail, telefone, destino, resumo BANT e nome (`lib/odoo-submit-handler.ts`) — dado pseudonimizado, gravado sem valor associado — `código` |
-| **Finalidade** | Prevenção de abuso (segurança); prevenção de registros duplicados no CRM (integridade) |
-| **Duração** | Rate limit: TTL igual à janela, no máximo 10 minutos. Convite de NPS: até o vencimento do convite, no máximo 30 dias (`lib/nps-invite.ts`). Lock de idempotência: TTL de 15 segundos, apagado ao fim da submissão — `código` |
+| **Serviços em uso** | Redis REST para rate limit dos endpoints de API (`lib/rate-limit.ts`), controle de replay do convite de NPS (`lib/nps-invite-replay.ts`) e lock de idempotência das submissões que criam lead/parceiro no Odoo (`lib/odoo-lead-idempotency.ts`). Link de proposta (#1894): registro da proposta (`lib/proposal-store.ts`) e das aberturas (`lib/proposal-opens.ts`) |
+| **Dados** | Chave de rate limit pseudonimizada (`<prefixo>:<subjectKey>`, HMAC-SHA-256 do IP com `RATE_LIMIT_KEY_SECRET`, truncada; o IP em claro não é gravado) e um contador — `código` (`lib/rate-limit.ts`). Registro de uso único do convite de NPS (`nps:invite:used:<jti>`, identificador do convite assinado, sem dados de contato) — `código` (`lib/nps-invite-replay.ts`, `api/submit-nps.ts`). Lock de concorrência de toda submissão que gera lead no Odoo (`odoo:lead:lock:<chave>`): a chave é o `event_id` gerado no navegador ou, na ausência dele, um resumo SHA-256 derivado de e-mail, telefone, destino, resumo BANT e nome (`lib/odoo-submit-handler.ts`) — dado pseudonimizado, gravado sem valor associado — `código`. Proposta (`proposta:rec:<id>`): no modo página, primeiro nome do cliente, número de adultos e de crianças, roteiro, itens e valor total obtidos da operadora, `leadId` do Odoo; no modo redirect, o link da operadora (`premium.infotravel.com.br`, com o token de acesso ao orçamento) e o `leadId`; marcador de vencimento (`proposta:exp:<id>`) só com a data de expiração. Aberturas (`proposta:abr:<id>`): instante UTC, país e cidade do Cloudflare, tipo de aparelho e hash do IP (SHA-256 truncado de sal diário + id + IP); sal diário (`proposta:sal:<data>`) — `código` |
+| **Finalidade** | Prevenção de abuso (segurança); prevenção de registros duplicados no CRM (integridade); exibição e acompanhamento do link de proposta (atendimento comercial) |
+| **Duração** | Rate limit: TTL igual à janela, no máximo 10 minutos. Convite de NPS: até o vencimento do convite, no máximo 30 dias (`lib/nps-invite.ts`). Lock de idempotência: TTL de 15 segundos, apagado ao fim da submissão. Proposta: TTL igual à validade, no máximo 15 dias; marcador de vencimento: validade + 30 dias. Aberturas: 90 dias contados da primeira abertura (`EXPIRE NX`). Sal diário: 2 dias, depois dos quais o hash não pode mais ser ligado a um IP — `código` |
 | **País/região** | Banco global com primário em São Paulo (sa-east-1) — `indício técnico`. Um banco global replica para outras regiões: lista de réplicas — `a confirmar` no console |
 | **Suboperadores** | AWS — `a confirmar` |
 | **Mecanismo art. 33** | `não verificado`. Se todas as réplicas ficarem no Brasil, pode não haver transferência de armazenamento; ainda assim há um importador estrangeiro (Upstash, Inc.) com acesso |
@@ -159,14 +159,16 @@ Requisições feitas direto pelo navegador do visitante, fora do consentimento d
 | OpenStreetMap Foundation | Mapas das páginas de destinos e da landing Lollapalooza (tiles) | `components/destinations/useDestinationMap.ts`, `components/landings/lollapalooza/VenueMap.tsx` | Reino Unido — `política do fornecedor` | Carregar o mapa só após interação, ou servir tiles por proxy próprio |
 | Iconify | 5 logos da barra de pesquisa com IA na página inicial | `components/AIResearchBar.tsx` | `a confirmar` | Versionar os SVGs no repositório |
 | Spotify AB | Player de playlist na landing Lollapalooza | `components/landings/lollapalooza/LineupSection.tsx` | Suécia — `política do fornecedor` | Carregar o iframe só após clique (facade) |
+| media.infotravel.com.br | Fotos de hotéis na página de proposta `/proposta/<id>` (URLs vindas da cotação da operadora; permitido no CSP `img-src`) | `lib/proposal-template.ts`, `lib/proposal-page.ts` | `a confirmar` — domínio da Infotravel (sistema de cotação da operadora) | Copiar as fotos para o R2 próprio ao criar a proposta |
+| media.staticontent.com | Fotos de hotéis na página de proposta, como acima | `lib/proposal-template.ts`, `lib/proposal-page.ts` | `a confirmar` — responsável pelo domínio não identificado | Idem |
 | unpkg (Cloudflare) | Bundle do Decap CMS em `/admin/` — rota **publicamente acessível**: qualquer visitante ou robô que a abra baixa o script antes de qualquer autenticação, então não é fluxo só de colaborador. O `X-Robots-Tag: noindex` de `public/_headers` desestimula indexação, não é controle de acesso | `public/admin/index.html` | `a confirmar` | Versionar o bundle do CMS no repositório (elimina a requisição), ou colocar a rota atrás de autenticação na borda |
 
-Campos de transferência dos três, no formato das entradas de operador — preenchidos na medida do que dá para afirmar:
+Campos de transferência dos destinatários da tabela acima, no formato das entradas de operador — preenchidos na medida do que dá para afirmar:
 
 | Campo | Detalhe |
 |---|---|
-| **Dados** | IP e user agent do visitante, mais o `Referer` da página e a URL do recurso pedido (que revela qual página/destino ele está vendo) — `indício técnico` |
-| **Finalidade** | Exibir o mapa, os ícones e o player |
+| **Dados** | IP e user agent do visitante, mais o `Referer` da página e a URL do recurso pedido (que revela qual página/destino ele está vendo) — `indício técnico`. Exceção: as páginas de proposta respondem com `Referrer-Policy: no-referrer` (`lib/proposal-page.ts`), então os dois domínios de fotos de hotéis recebem só IP, user agent e a URL da foto, sem o endereço da proposta — `código` |
+| **Finalidade** | Exibir o mapa, os ícones, o player e as fotos de hotéis da proposta |
 | **Duração** | Retenção dos logs de acesso de cada destinatário — `a confirmar` nas políticas públicas; não temos controle nem acesso a esses registros |
 | **Suboperadores** | `a confirmar` — CDNs próprias de cada um |
 | **Mecanismo art. 33** | `não verificado`. Como são controladores independentes (não operadores contratados), não há DPA a arquivar: a hipótese aplicável é o art. 33, IX (transferência necessária à execução de política pública) — inaplicável — ou o consentimento/legítimo interesse do art. 7º combinado com a informação ao titular do art. 9º, V, que é o que a seção 6.1 da política faz. A via que elimina a questão é a mitigação da última coluna |
@@ -225,6 +227,20 @@ Campos de transferência dos três, no formato das entradas de operador — pree
 | ONER Travel | Citado na política (seção 6.1), mas sem integração no código do site. Se houver transferência internacional no fluxo operacional (fora do site), registrar no ROPA (#1547) |
 | GitHub OAuth do Decap CMS | O login de `/admin` autentica por OAuth no GitHub (`api/auth.ts`) — dados de conta de colaboradores, não de clientes nem de visitantes. Registrar no ROPA (#1547). O GitHub como destinatário de dados de clientes está na 2.11; o carregamento do bundle do CMS, na 2.9 |
 
+### 2.14 Anysphere, Inc. — assistente comercial (Cursor)
+
+| Campo | Detalhe |
+|---|---|
+| **Importador** | Anysphere, Inc. (EUA), que opera a plataforma Cursor |
+| **Serviços em uso** | Automação do Cursor que roda o assistente comercial (Clara). O site faz `POST` no gatilho da automação a cada abertura que gera aviso (`lib/proposal-webhook.ts`, #1900) |
+| **Dados** | Envelope assinado com `leadId` do Odoo, `proposalRef` (hash do id, sem o id), `openCount`, `isFirstOpen`, `openedAt` e `previousOpenAt`. Sem o link, o id, os dados da viagem ou dados de contato — `código`. **Fora do envelope:** o assistente lê o lead no Odoo para preparar o rascunho de retorno, e ali estão a nota "Proposta enviada" com o link do cliente e os dados de contato do lead. A Anysphere, portanto, tem acesso a esses dados pela leitura do CRM — escopo exato da leitura `a confirmar`; restringir a uma lista de campos permitidos |
+| **Finalidade** | Preparar o rascunho de retorno comercial para revisão de um consultor; nenhuma mensagem sai ao cliente sem aprovação humana (#1903) |
+| **Duração** | Retenção dos registros de execução da automação no Cursor — `a confirmar` |
+| **País/região** | EUA — `a confirmar` |
+| **Suboperadores** | Provedores de modelo de IA usados pela automação — `a confirmar` na lista de suboperadores do DPA do Cursor |
+| **Mecanismo art. 33** | `não verificado`. O Cursor publica um Data Processing Addendum (cursor.com/terms/dpa); arquivar a versão aplicável à conta |
+| **Evidência** | — |
+
 ## 3. Fornecedores aposentados
 
 Registrados porque houve transferência no passado e podem aparecer em pedidos de titulares (art. 18, VII).
@@ -271,6 +287,7 @@ O que depende de acesso a painéis, contas e contratos — e portanto não sai d
 
 | Versão | Data | Alteração |
 |---|---|---|
+| 0.16 | 22/10/2026 | Link de proposta (#1894, #1925): notas no Odoo (2.5), proposta (página ou link da operadora no redirect) e aberturas no Upstash (2.6), fotos de hotéis carregadas de domínios externos — um da Infotravel, outro com responsável a identificar (2.9) e Anysphere, Inc. (Cursor) como operador do assistente comercial (2.14) |
 | 0.15 | 13/10/2026 | Traks (2.3): UTM e click IDs saem da URL antes do coletor quando não há consentimento de medição registrado (issues #1543 e #1545). O script analítico segue carregando por legítimo interesse |
 | 0.14 | 12/10/2026 | IP do rate limit pseudonimizado com HMAC antes do Upstash e dos logs enviados ao Sentry (2.6, 2.7, [#1642](https://github.com/anhanga-tech/AV-SITE/issues/1642)); removida a oportunidade de minimização da 2.6. O log de sucesso do OAuth permanece com IP em claro — [#1831](https://github.com/anhanga-tech/AV-SITE/issues/1831) |
 | 0.13 | 11/10/2026 | Fontes das landings auto-hospedadas (#1641), links sem uso removidos de Beto Carrero; Google Fonts sai dos serviços ativos (2.2) e da política (6.1) |

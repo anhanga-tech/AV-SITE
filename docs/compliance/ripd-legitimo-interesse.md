@@ -9,9 +9,9 @@
 | **Endereço** | Av. Dom Pedro I, 773, Vila Monumento, São Paulo-SP, CEP 01552-001 |
 | **Encarregado (DPO)** | Felipe William Rodrigues Silva |
 | **E-mail DPO** | privacidade@anhanga.tur.br |
-| **Versão** | 1.10 |
+| **Versão** | 1.11 |
 | **Data de elaboração** | 02/06/2026 |
-| **Última revisão** | 13/10/2026 |
+| **Última revisão** | 22/10/2026 |
 | **Próxima revisão** | 03/06/2027 |
 | **Status** | Rascunho — pendente de revisão jurídica e aprovação do DPO |
 
@@ -21,12 +21,13 @@
 
 Este relatório documenta a avaliação de impacto sobre as atividades de tratamento de dados pessoais realizadas pela **Anhangá Turismo Ltda.** com fundamento em **legítimo interesse** (Art. 7º, IX da LGPD), conforme exigido pelo Art. 38 da mesma Lei e pelas orientações da Autoridade Nacional de Proteção de Dados (ANPD).
 
-O relatório cobre **quatro atividades de tratamento** identificadas:
+O relatório cobre **cinco atividades de tratamento** identificadas:
 
 1. Análise comportamental agregada via Google Analytics 4 (GA4)
 2. Atribuição UTM e click IDs para mensuração de campanhas de tráfego pago
 3. Armazenamento de histórico de qualificação BANT no CRM para atendimento ao cliente
 4. Customer Match — criação de públicos personalizados no Google Ads e Meta Ads
+5. Registro de aberturas do link de proposta comercial e aviso ao assistente comercial
 
 **Decisão arquitetural relevante (v1.1, substituída na v1.9):** A Anhangá Turismo adotou o **Stape.io** como plataforma de server-side tagging (sGTM gerenciado, servidores hospedados no Brasil). Todo o rastreamento de analytics e conversões passava pelo container server-side antes de chegar às plataformas de terceiros (Google, Meta).
 
@@ -307,15 +308,83 @@ Contatos com `newsletterOptIn: false` ou com flag "Do Not Contact" no Mautic **n
 
 ---
 
-## 6. Conclusão geral e aprovação
+## 6. Atividade 5 — Registro de aberturas do link de proposta comercial
 
-As quatro atividades de tratamento avaliadas são:
+Épico [#1894](https://github.com/anhanga-tech/AV-SITE/issues/1894), issue [#1925](https://github.com/anhanga-tech/AV-SITE/issues/1925). Política de Privacidade, seção 5.10.
+
+A **exibição** da proposta tem base em procedimentos preliminares a contrato, a pedido do titular (Art. 7º, V): o cliente pediu o orçamento e recebe o link. Esta atividade avalia só o que vai além disso: **registrar as aberturas** e **avisar o assistente comercial**, com base em legítimo interesse.
+
+### 6.1 Descrição do tratamento
+
+| Campo | Detalhe |
+|---|---|
+| **Dados tratados** | Por abertura: instante (UTC), país e cidade aproximados (metadados do Cloudflare), tipo de aparelho (celular, tablet ou computador) e hash do IP (SHA-256 de sal diário + id da proposta + IP, truncado em 16 hex) — `lib/proposal-opens.ts`. Derivados: contagem de aberturas e horários, que vão para a nota no Odoo e para o aviso ao assistente |
+| **Titulares** | Clientes que receberam um link de proposta e o abriram. Terceiros que abram um link repassado pelo cliente também são registrados, sem identificação |
+| **Não registrado** | Prévias de link de aplicativos de mensagem, prefetch, `HEAD` e a prévia interna da equipe (`?previa=`) — `lib/proposal-page.ts` |
+| **Operadores** | Upstash, Inc. (registro), Odoo S.A. (nota no `crm.lead`), Anysphere, Inc. — Cursor (automação do assistente comercial: o aviso leva só `leadId`, `proposalRef`, contagem e horários, mas o assistente depois lê o lead no Odoo, inclusive a nota com o link e os dados de contato) |
+| **Retenção** | Aberturas: 90 dias a partir da primeira abertura. Sal diário: 2 dias, depois dos quais nenhum hash pode ser ligado a um IP, nem por quem tem todos os segredos. Notas no Odoo: prazo dos dados de relacionamento (5 anos, política 7.1). Aviso no Cursor: `a confirmar` |
+| **Transferência internacional** | Anysphere, Inc. (EUA) — ver matriz de operadores, 2.14 |
+
+### 6.2 Interesse legítimo identificado
+
+- Saber se a proposta foi vista, para dar o retorno no momento em que ele é útil ao cliente, e não antes nem tarde demais
+- Evitar cobranças de retorno a quem ainda não abriu a proposta
+- Distinguir uma reabertura do próprio cliente de um link repassado, sem identificar quem abriu
+
+### 6.3 Teste de necessidade e proporcionalidade
+
+**É necessário?** Sim. Sem o registro, a única forma de saber se a proposta foi vista é perguntar ao cliente, o que gera mais contatos, não menos.
+
+**É proporcional?** Sim. O registro não guarda o IP, só um hash com sal que deixa de ser vinculável em até 2 dias; localização em nível de cidade; tipo de aparelho em três categorias, sem user agent completo. O aviso ao assistente leva só identificadores e horários.
+
+**Poderia ser menos invasivo?** Sim, hoje. Nenhum fluxo consome país, cidade, tipo de aparelho ou o hash do IP: só a contagem e os horários seguem para o Odoo e para o assistente (`lib/proposal-page.ts`). A finalidade declarada (distinguir reabertura do cliente de link repassado) só se sustenta se esses campos forem mostrados ao consultor, por exemplo no aviso da P7 ([#1903](https://github.com/anhanga-tech/AV-SITE/issues/1903)). **Decisão pendente do Encarregado antes da vigência:** parar de coletar esses campos ou expô-los ao consultor.
+
+### 6.4 Balancing test
+
+| Fator | Avaliação |
+|---|---|
+| Natureza dos dados | Metadados de acesso, pseudonimizados; não sensíveis |
+| Expectativa razoável do titular | O cliente pediu a proposta e espera retorno da agência. O registro é informado no rodapé da própria página e na política, seção 5.10. **Ponto de atenção:** a primeira abertura é registrada antes de o cliente ler o rodapé, e no modo redirect o cliente nunca vê o rodapé: vai direto para a página da operadora |
+| Impacto sobre o titular | Baixo. Nenhuma decisão automatizada: o assistente só prepara um rascunho, e um consultor decide se e como contatar (#1903). Não há perfilamento além da própria proposta |
+| Iniciativa do titular | Alta — o titular pediu o orçamento |
+| Salvaguardas | Ver 6.6 |
+
+**Conclusão:** Interesse legítimo prevalece, condicionado às salvaguardas abaixo e à revisão humana de todo contato.
+
+### 6.5 Riscos identificados
+
+| Risco | Probabilidade | Impacto | Mitigação |
+|---|---|---|---|
+| Link repassado ou vazado expõe a proposta (primeiro nome, roteiro, valor) | Média | Baixo | Id aleatório de 16 caracteres (cerca de 95 bits); validade de até 15 dias; página `noindex`, sem documentos nem contatos; só o primeiro nome |
+| Contato insistente a partir das aberturas | Baixa | Médio | Aviso só na 1ª abertura e em reaberturas com 30 min ou mais de intervalo; nenhuma mensagem sai sem aprovação de um consultor |
+| Aviso forjado ao assistente | Baixa | Baixo | Envelope assinado com HMAC-SHA256 e janela de 5 min; o assistente recusa assinatura inválida |
+| Retenção no Cursor além do necessário | `a confirmar` | Baixo | Payload mínimo, sem link nem contato. Confirmar a retenção dos registros de execução |
+
+### 6.6 Salvaguardas implementadas
+
+- [x] IP nunca gravado; hash com sal diário apagado em até 2 dias (`lib/proposal-opens.ts`)
+- [x] Prévias de link, prefetch e prévia interna não contam abertura (`lib/proposal-page.ts`)
+- [x] Expiração automática por TTL: proposta em até 15 dias, aberturas em 90 dias
+- [x] Aviso ao assistente só com `leadId`, `proposalRef` (hash do id, que não abre a proposta), contagem e horários: sem o link, o id ou dados de contato; assinado (`lib/proposal-webhook.ts`)
+- [x] Logs sem id, `leadId`, link da operadora ou URL do webhook
+- [x] Aviso no rodapé da página com link para a política
+- [ ] **Pendente:** aprovação deste texto e da seção 5.10 da política pelo Encarregado (#1925)
+- [ ] **Pendente:** confirmar retenção e suboperadores do Cursor (matriz 2.14)
+- [ ] **Pendente:** país, cidade, aparelho e hash do IP sem consumidor hoje (ver 6.3): remover a coleta ou mostrar ao consultor
+- [ ] **Pendente:** aviso curto na mensagem de WhatsApp que envia o link, para informar antes da primeira abertura; indispensável no modo redirect, que não mostra rodapé
+- [ ] **Pendente:** definir os campos do Odoo que o assistente pode ler e restringir a leitura a eles
+
+---
+
+## 7. Conclusão geral e aprovação
+
+As cinco atividades de tratamento avaliadas são:
 
 1. **Proporcionais** — limitadas ao mínimo necessário para as finalidades declaradas
 2. **Necessárias** — não há alternativas igualmente eficazes com menor impacto
 3. **Balanceadas / Consentidas** — o impacto sobre os titulares é baixo ou moderado, com salvaguardas adequadas e opt-out disponível
 
-O balancing test favorece o legítimo interesse nas Atividades 1, 2 e 3. A Atividade 4 é baseada em consentimento específico do titular com segmentação obrigatória de opt-in antes de qualquer upload.
+O balancing test favorece o legítimo interesse nas Atividades 1, 2, 3 e 5. A Atividade 4 é baseada em consentimento específico do titular com segmentação obrigatória de opt-in antes de qualquer upload.
 
 ### Pendências antes da vigência do RIPD
 
@@ -343,7 +412,7 @@ O balancing test favorece o legítimo interesse nas Atividades 1, 2 e 3. A Ativi
 
 ---
 
-## 7. Histórico de versões
+## 8. Histórico de versões
 
 | Versão | Data | Alterações |
 |---|---|---|
@@ -358,6 +427,7 @@ O balancing test favorece o legítimo interesse nas Atividades 1, 2 e 3. A Ativi
 | 1.8 | 01/09/2026 | HubSpot e Mautic descontinuados: webhook legado de deals Closed-Won (`api/hubspot-webhook.ts` + módulos associados) removido do código; Mautic (automação de marketing self-hosted) desligado. Atividades 2 e 3 e a Política de Privacidade atualizadas para refletir a redução de operadores — redução de superfície, sem mudança de finalidade nem novo tratamento. HubSpot e Mautic (Estados Unidos e infraestrutura própria, respectivamente) deixam de constar como operadores/subprocessadores. |
 | 1.9 | 01/09/2026 | Stape.io desativado pela própria Stape (31/08/2026, limite do plano gratuito) — substituído pelo **Cloudflare Zaraz** como plataforma de server-side tagging nas Atividades 1 e 2. Cloudflare já é processor da Anhangá (hospedagem via Pages), reduzindo a introdução de subprocessador novo. Mudança de arquitetura relevante: Meta e TikTok passam de híbrido (pixel + CAPI) para **CAPI-only** — nenhum pixel de terceiros é mais injetado no navegador do usuário. Atividade 4 (Customer Match) marcada como **inativa**: já dependia do Mautic (removido na v1.8) e agora também do Stape (removido nesta versão) como intermediário de upload — nenhum upload está ocorrendo. Pendências #1 e #4 marcadas obsoletas; novo item de auditoria de PII por evento adicionado (#2, parcial). |
 | 1.10 | 13/10/2026 | Atividade 2: UTM e click IDs deixam de ser tratados sob legítimo interesse. Captura e envio ao CRM exigem grant de `ads_measurement` no ledger (issues #1543 e #1545). GA4, Traks, Web Analytics e Sentry permanecem em legítimo interesse. |
+| 1.11 | 22/10/2026 | Atividade 5 adicionada: registro de aberturas do link de proposta e aviso ao assistente comercial (#1894, #1925); conclusão renumerada para a seção 7 e histórico para a 8. |
 
 ---
 
