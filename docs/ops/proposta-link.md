@@ -28,7 +28,7 @@ O conteúdo some no instante em que o link expira. O tombstone existe só para r
 
 - `at` em UTC; quem exibe converte para o horário de São Paulo.
 - Só o instante. País, cidade, aparelho e hash do IP eram gravados na primeira versão, mas nada os lia; saíram por minimização (LGPD Art. 6º, III, decisão de 23/10/2026). Um campo novo só volta junto com a funcionalidade que o usa, e com a política (seção 5.10) e o rodapé da página atualizados.
-- Limpeza única dos registros antigos: feita em 23/10/2026, depois do deploy da minimização (7 aberturas em 6 propostas reduzidas a `{"at"}`, TTL mantido; 2 `proposta:sal:*` apagados; conferência com 0 a reduzir e 0 ilegíveis). O script de uso único saiu do repositório depois disso; está no histórico do git (#1930).
+- Limpeza única dos registros antigos: feita em 23/10/2026, depois do deploy da minimização (7 aberturas em 6 propostas reduzidas a objetos só com o campo `at`, TTL mantido; 2 `proposta:sal:*` apagados; conferência com 0 a reduzir e 0 ilegíveis). O script de uso único saiu do repositório depois disso; está no histórico do git (#1930).
 - A gravação roda em `waitUntil`, depois da resposta. Falha de gravação não quebra a página e é registrada só pelo nome do erro.
 
 **Não contam:**
