@@ -150,10 +150,9 @@ test('the page has no script and a privacy notice linking to the policy', () => 
     const html = render();
 
     assert.doesNotMatch(html, /<script/i);
+    // The notice must match what lib/proposal-opens.ts stores: the instant only.
     assert.match(html, /registramos quando esta página é aberta/);
-    // #1925: the notice must match the policy — a hash derived from the IP is stored.
-    assert.match(html, /código derivado do IP/);
-    assert.doesNotMatch(html, /Não guardamos seu IP/);
+    assert.match(html, /O registro guarda só a data e a hora: não inclui seu IP, sua localização nem dados do seu aparelho/);
     assert.match(html, /href="https:\/\/www\.anhanga\.tur\.br\/politica-privacidade"/);
 });
 
