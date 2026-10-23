@@ -4,14 +4,13 @@ import assert from 'node:assert/strict';
 import { scrubSensitiveUrl } from '../lib/error-tracking.ts';
 import { isLinkPreviewRequest } from '../lib/link-preview-agents.ts';
 import { handleProposalRequest } from '../lib/proposal-page.ts';
-import { classifyDevice, opensKey, PROPOSAL_OPENS_RETENTION_SECONDS, type ProposalOpensRedis } from '../lib/proposal-opens.ts';
+import { opensKey, PROPOSAL_OPENS_RETENTION_SECONDS, type ProposalOpensRedis } from '../lib/proposal-opens.ts';
 import { createProposalPreviewSignature } from '../lib/proposal-preview.ts';
 import { saveProposal } from '../lib/proposal-store.ts';
 import { createFakeProposalRedis } from './helpers/fake-proposal-redis.ts';
 
-// Issue #1897: each customer open of /proposta/<id> is recorded (UTC instant,
-// count, approximate place, device, IP only as a salted hash); link previews
-// and the signed internal preview are not.
+// Issue #1897: each customer open of /proposta/<id> is recorded (UTC instant
+// and count only); link previews and the signed internal preview are not.
 
 const ORIGIN = 'https://www.anhanga.tur.br';
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -20,9 +19,6 @@ const CUSTOMER_IP = '203.0.113.42';
 
 const UA = {
     iphone: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.1 Mobile/15E148 Safari/604.1',
-    androidPhone: 'Mozilla/5.0 (Linux; Android 14; SM-S918B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36',
-    androidTablet: 'Mozilla/5.0 (Linux; Android 13; SM-X710) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
-    ipad: 'Mozilla/5.0 (iPad; CPU OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1',
     desktop: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
     cubot: 'Mozilla/5.0 (Linux; Android 12; CUBOT KINGKONG 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36',
     // In-app browsers carry the app name, but a person is reading the page.
@@ -90,8 +86,8 @@ test('opening on a phone counts 1 and reopening increments', async () => {
     assert.equal(listOf(opensKey(id)).length, 2);
 });
 
-test('an open records the UTC instant, approximate place and device', async () => {
-    const { deps, listOf } = setup();
+test('an open records only its UTC instant: no place, device or IP', async () => {
+    const { deps, listOf, strings } = setup();
     const { id } = await saveProposal({}, deps);
 
     await handleProposalRequest(
@@ -101,49 +97,11 @@ test('an open records the UTC instant, approximate place and device', async () =
     );
 
     const [event] = listOf(opensKey(id)) as Array<Record<string, unknown>>;
-    assert.equal(event.at, '2026-10-22T15:30:00.000Z');
-    assert.equal(event.device, 'mobile');
-    assert.equal(event.country, 'BR');
-    assert.equal(event.city, 'São Paulo');
-    assert.match(String(event.ipHash), /^[0-9a-f]{16}$/);
-    // Only the approved fields: no coordinates, postal code or raw IP.
-    assert.deepEqual(Object.keys(event).sort(), ['at', 'city', 'country', 'device', 'ipHash']);
-});
-
-test('the raw IP is never stored, only a hash with a salt that changes every day', async () => {
-    const { clock, deps, listOf, strings } = setup();
-    const { id } = await saveProposal({}, deps);
-
-    await handleProposalRequest(open(id, { userAgent: UA.iphone }), id, deps);
-    await handleProposalRequest(open(id, { userAgent: UA.iphone }), id, deps);
-    await handleProposalRequest(open(id, { userAgent: UA.desktop, ip: '198.51.100.7' }), id, deps);
-    clock.now += DAY_MS;
-    await handleProposalRequest(open(id, { userAgent: UA.iphone }), id, deps);
-
-    const events = listOf(opensKey(id)) as Array<{ ipHash: string }>;
-    assert.ok(!JSON.stringify(events).includes(CUSTOMER_IP));
-    for (const entry of strings.values()) assert.ok(!entry.value.includes(CUSTOMER_IP));
-
-    assert.equal(events[0].ipHash, events[1].ipHash, 'same network, same day: same hash');
-    assert.notEqual(events[0].ipHash, events[2].ipHash, 'another network: another hash');
-    assert.notEqual(events[0].ipHash, events[3].ipHash, 'next day: new salt, unlinkable hash');
-
-    const salts = [...strings.entries()].filter(([key]) => key.startsWith('proposta:sal:'));
-    assert.equal(salts.length, 2);
-    for (const [, entry] of salts) assert.ok(entry.expiresAt - clock.now <= 2 * DAY_MS, 'salts are deleted within 2 days');
-});
-
-test('the same network opening two proposals on the same day gets unrelated hashes', async () => {
-    const { deps, listOf } = setup();
-    const { id } = await saveProposal({}, deps);
-    const { id: otherId } = await saveProposal({}, deps);
-
-    await handleProposalRequest(open(id, { userAgent: UA.iphone }), id, deps);
-    await handleProposalRequest(open(otherId, { userAgent: UA.iphone }), otherId, deps);
-
-    const [first] = listOf(opensKey(id)) as Array<{ ipHash: string }>;
-    const [second] = listOf(opensKey(otherId)) as Array<{ ipHash: string }>;
-    assert.notEqual(first.ipHash, second.ipHash);
+    assert.deepEqual(event, { at: '2026-10-22T15:30:00.000Z' });
+    const stored = JSON.stringify([...strings.entries()]);
+    assert.ok(!stored.includes(CUSTOMER_IP));
+    assert.ok(!stored.includes('São Paulo'));
+    assert.ok(![...strings.keys()].some((key) => key.startsWith('proposta:sal:')), 'no IP salt is created');
 });
 
 test('opens are kept at most 90 days from the first one; reopening does not extend it', async () => {
@@ -177,14 +135,6 @@ test('real browsers are not mistaken for previews, including phone brands contai
     for (const userAgent of Object.values(UA)) {
         assert.equal(isLinkPreviewRequest(open('x', { userAgent })), false, userAgent);
     }
-});
-
-test('device type distinguishes phones, tablets and desktops', () => {
-    assert.equal(classifyDevice(UA.iphone), 'mobile');
-    assert.equal(classifyDevice(UA.androidPhone), 'mobile');
-    assert.equal(classifyDevice(UA.androidTablet), 'tablet');
-    assert.equal(classifyDevice(UA.ipad), 'tablet');
-    assert.equal(classifyDevice(UA.desktop), 'desktop');
 });
 
 test('the signed internal preview shows the page with a notice and never counts', async (t) => {

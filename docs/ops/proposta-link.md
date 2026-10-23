@@ -15,7 +15,6 @@
 | `proposta:rec:<id>` | Registro da proposta (JSON) | 15 dias (validade, decisão D5) |
 | `proposta:exp:<id>` | Só o instante de expiração (tombstone) | 15 dias + 30 dias de carência |
 | `proposta:abr:<id>` | Lista de aberturas, um JSON por abertura | 90 dias a partir da 1ª abertura (D5), fixado com `EXPIRE NX` |
-| `proposta:sal:<AAAA-MM-DD>` | Sal aleatório do dia para o hash de IP | 2 dias |
 
 O conteúdo some no instante em que o link expira. O tombstone existe só para responder 410 ("Proposta expirada", com botão de WhatsApp) em vez de 404. Depois da carência, o id responde 404 como qualquer id desconhecido. Os TTLs fazem o expurgo; não há rotina de limpeza para estas chaves.
 
@@ -24,12 +23,12 @@ O conteúdo some no instante em que o link expira. O tombstone existe só para r
 `lib/proposal-opens.ts` grava cada GET de cliente numa proposta ativa. O tamanho da lista é a contagem.
 
 ```json
-{"at":"2026-10-22T15:30:00.000Z","device":"mobile","country":"BR","city":"São Paulo","ipHash":"3f9c0a1b2c3d4e5f"}
+{"at":"2026-10-22T15:30:00.000Z"}
 ```
 
 - `at` em UTC; quem exibe converte para o horário de São Paulo.
-- País e cidade aproximados vêm do `request.cf` da Cloudflare. Coordenadas e CEP não são gravados.
-- O IP nunca é gravado. O `ipHash` usa um sal aleatório que muda a cada dia (UTC) e é apagado em até 2 dias; depois disso o hash não pode mais ser ligado a um IP, nem por quem tem os segredos. O hash também leva o id da proposta: no mesmo dia, a mesma rede gera o mesmo hash dentro de uma proposta (o que separa "o cliente reabriu" de "outra pessoa abriu"), mas hashes sem relação entre propostas diferentes.
+- Só o instante. País, cidade, aparelho e hash do IP eram gravados na primeira versão, mas nada os lia; saíram por minimização (LGPD Art. 6º, III, decisão de 23/10/2026). Um campo novo só volta junto com a funcionalidade que o usa, e com a política (seção 5.10) e o rodapé da página atualizados.
+- Limpeza única dos registros antigos: depois do deploy, `pnpm tsx scripts/minimize-proposal-opens.ts` (só conta) e, conferido, `--apply`. Reduz cada abertura gravada a `{"at"}` sem mexer no TTL e apaga os `proposta:sal:*`. Imprime só contagens.
 - A gravação roda em `waitUntil`, depois da resposta. Falha de gravação não quebra a página e é registrada só pelo nome do erro.
 
 **Não contam:**
@@ -146,6 +145,13 @@ Em TypeScript, `verifyProposalWebhook` de `lib/proposal-webhook.ts` faz os passo
 - `PROPOSAL_WEBHOOK_KEY`: a chave de envio que o painel da automação mostra. Vai no `Authorization: Bearer`. Só autentica no receptor; não prova que o aviso veio do site.
 - `PROPOSAL_WEBHOOK_SECRET`: `openssl rand -hex 32`, o mesmo valor guardado como segredo da Clara. É o que prova a origem.
 
+## Medidas de privacidade a configurar na Clara
+
+Decididas pelo Encarregado em 23/10/2026 (RIPD, Atividade 5). Ficam fora deste repositório e estão **pendentes de configuração**. A política (seção 5.10) só passa a descrevê-las depois que estiverem em uso.
+
+- **Leitura do Odoo por lista de campos.** A Clara (Anysphere/Cursor) lê o lead para preparar o retorno. O limite deve ficar nas permissões do usuário ou da chave de API do Odoo que ela usa (grupos e regras de acesso), não só nas instruções da rotina. A lista sai do que o rascunho de fato usa: perguntar à Clara quais campos ela lê.
+- **Aviso no WhatsApp.** No modo redirect o cliente nunca vê o rodapé da página. Por isso, a mensagem que leva o link (qualquer modo) inclui uma linha como: _"Ao abrir o link, registramos só a data e a hora, para acompanhar sua proposta. Saiba mais: www.anhanga.tur.br/politica-privacidade#link-de-proposta"_.
+
 ## Notas no Odoo (P8)
 
 Nota interna (`mail.mt_note`) no chatter do `crm.lead` do `leadId`, via `services/odoo.ts` (`postLeadNote`). Código em `lib/proposal-odoo-notes.ts`.
@@ -168,7 +174,7 @@ Uma proposta guarda **ou** `redirectUrl` (redirect rastreado) **ou** `content` (
 - **Condições:** texto fixo da Anhangá ("Valores sujeitos a disponibilidade… fale com a gente pelo WhatsApp"), nunca o da operadora (D7). As regras de cancelamento de cada item aparecem junto do item.
 - **Datas:** diárias (`2027-03-10T00:00:00`) são tratadas como dia de calendário, e horários de voo como hora local do aeroporto. Nenhuma das duas passa por fuso horário, então não "voltam um dia" no servidor.
 - **Prévias de link** (WhatsApp etc.) continuam recebendo a página genérica, sem nome, hotel ou preço. A prévia interna (`?previa=`) mostra a página completa com o aviso.
-- **Rodapé:** aviso de que a abertura é registrada (data, hora, país e cidade aproximados, aparelho e código derivado do IP), com link para `/politica-privacidade` (seção 5.10).
+- **Rodapé:** aviso de que a abertura é registrada só com data e hora (sem IP, localização ou aparelho), com link para `/politica-privacidade` (seção 5.10).
 - **Conversão:** `fromInfotravelNormalized` (`lib/proposal-infotravel.ts`) transforma o JSON normalizado da Infotravel (`main.getBooking` + `main.getHotel`) nesse conteúdo. O adaptador que gera o normalizado a partir da API é a P11 (#1906). O fixture em `tests/fixtures/` é a cotação de teste com o roteiro deslocado e números fictícios. Os arquivos brutos da API têm dados reais do cliente e não entram no repositório.
 
 ## Adaptador Infotravel (P11)
@@ -186,7 +192,7 @@ Se a cotação informar `expirationDate`, a página nunca vale além dela: a val
 
 Nunca copiados da cotação: `contact`/`user` (o agente), `client` (a agência, com CNPJ), `unit` (unidade RCA), localizadores, `textDoc` (formas de pagamento da operadora), observações do fornecedor (telefone de plantão) e logos.
 
-**Liga/desliga:** `PROPOSAL_PAGES_ENABLED=true` libera as páginas. **Padrão desligado**: até a política de privacidade cobrir a página da proposta (#1925), todo `infotravel` vira redirect com `fallbackReason: "pages_disabled"`.
+**Liga/desliga:** `PROPOSAL_PAGES_ENABLED=true` libera as páginas; sem ela, todo `infotravel` vira redirect com `fallbackReason: "pages_disabled"`. Ligada em produção em 23/10/2026, depois que a política passou a cobrir a página (#1925).
 
 O token vai duas vezes na URL da API (`input`): ele nunca é logado, e o parâmetro `input` é redigido no Sentry (`lib/error-tracking.ts`).
 

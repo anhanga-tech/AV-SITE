@@ -163,8 +163,8 @@ export interface ProposalPageDeps {
  * the previous), tells the sales bot (#1900) and notes it on the Odoo lead
  * (#1904), side by side. Never rejects.
  */
-async function recordAndNotify(request: Request, id: string, leadId: number | undefined, deps: ProposalPageDeps): Promise<void> {
-    const recorded = await recordProposalOpen(request, id, deps);
+async function recordAndNotify(id: string, leadId: number | undefined, deps: ProposalPageDeps): Promise<void> {
+    const recorded = await recordProposalOpen(id, deps);
     if (!recorded || !shouldNotifyProposalOpen(recorded.previousOpenAt, recorded.openedAt)) return;
     await Promise.all([
         notifyProposalOpen({ id, leadId, ...recorded }, { now: deps.now, ...deps.webhook }),
@@ -204,7 +204,7 @@ export async function handleProposalRequest(
 
     // After the response via waitUntil, which keeps the isolate alive until the
     // write and the webhook finish — so the 302 isn't held back by either.
-    const recording = recordAndNotify(request, id, leadId, deps);
+    const recording = recordAndNotify(id, leadId, deps);
     if (deps.waitUntil) deps.waitUntil(recording);
     // Without waitUntil (tests, local dev) the response waits for the webhook too.
     else await recording;
