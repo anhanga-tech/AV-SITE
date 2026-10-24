@@ -48,7 +48,8 @@ const quotationSchema = z.object({
                 chegada: text,
                 duracao: z.string().optional(),
             })).min(1),
-            preco: z.partialRecord(z.enum(CURRENCIES), price),
+            // At least one price: a missing currency is converted from the first one.
+            preco: z.partialRecord(z.enum(CURRENCIES), price).refine((prices) => Object.keys(prices).length > 0),
         })).min(1),
     })).min(1),
 });
@@ -121,7 +122,8 @@ function legPrice(
 
 function exchangeNote(quotation: z.output<typeof quotationSchema>, approximate: boolean): string | undefined {
     const rate = quotation.cambio?.USD;
-    if (!rate || !(quotation.moedas ?? ['BRL']).includes('USD')) return undefined;
+    // A converted total always gets the note, even when only reais are shown.
+    if (!rate || (!approximate && !(quotation.moedas ?? ['BRL']).includes('USD'))) return undefined;
     // The skill's `ref_cambio`: the rate's date, or the quotation's.
     const day = quotation.cambio?.data || quotation.data_cotacao;
     const reference = `câmbio ${day ? `de ${day} ` : ''}(US$ 1,00 = R$ ${rate.toFixed(4).replace('.', ',')})`;

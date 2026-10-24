@@ -83,6 +83,26 @@ test('a quotation shown only in reais has no dollar amount', () => {
     assert.ok('content' in result);
     assert.equal(result.content.total.usd, undefined);
     assert.equal(result.content.total.amount, 10741.74);
+    // The outbound leg is priced in dollars: the conversion is still explained.
+    assert.ok(result.content.notes?.some((note) => note.startsWith('Valores convertidos pelo câmbio')));
+});
+
+test('a leg without any price is refused as an invalid quotation, not a crash', async (t) => {
+    const noPrice = structuredClone(QUOTATION);
+    noPrice.opcoes[0].trechos[0].preco = {};
+    assert.deepEqual(fromAereoQuotation(noPrice, { option: 1 }), { error: 'invalid_quotation' });
+
+    const { deps } = setup(t);
+    const response = await handleCreateProposal(create({ ...AEREO_BODY, quotation: noPrice }), deps);
+    assert.equal(response.status, 400);
+    assert.equal((await response.json()).reason, 'invalid_quotation');
+});
+
+test('the most remarks the skill allows still fit on the page', () => {
+    const many = { ...QUOTATION, observacoes: Array.from({ length: 8 }, (_, index) => `Observação ${index + 1}.`) };
+    const result = fromAereoQuotation(many, { option: 1 });
+    assert.ok('content' in result, JSON.stringify(result));
+    assert.equal(result.content.notes?.length, 11);
 });
 
 test('converting a leg without the exchange rate is refused, not guessed', () => {

@@ -114,7 +114,8 @@ export const proposalContentSchema = z.strictObject({
         note: text(300).optional(),
     }),
     // "Bom saber": the Anhangá's own remarks, never the operator's terms (D7).
-    notes: z.array(text(400)).max(10).optional(),
+    // Up to 8 of the quotation's remarks plus the local-time, exchange and total notes.
+    notes: z.array(text(400)).max(12).optional(),
 }).refine(
     (content) => Boolean(content.hotel) || content.flights.length + content.transfers.length + content.extras.length > 0,
     { message: 'a proposal page needs at least one included item' },
