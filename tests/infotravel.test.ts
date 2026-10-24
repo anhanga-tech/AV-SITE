@@ -254,6 +254,8 @@ test('any extraction failure falls back to the tracked redirect for the same lin
         [{ booking: () => trpc({ ...BOOKING, bookingAmount: { currency: 'BRL', amount: 1 } }) }, 'total_mismatch'],
         // Passes the operator checks but not the page schema (arrival before departure).
         [{ booking: () => trpc(withFirstFlight({ arrival: '2027-03-10T17:00:00-03:00' })) }, 'invalid_content'],
+        // A time without offset can't be checked against the departure (#1905 made the offset optional for air quotes).
+        [{ booking: () => trpc(withFirstFlight({ arrival: '2027-03-10T17:00:00' })) }, 'invalid_content'],
     ];
     for (const [routes, reason] of cases) {
         const { data } = await (await handleCreateProposal(create(INFOTRAVEL_BODY), { ...deps, infotravel: { fetch: operatorApi(routes).fetch } })).json();

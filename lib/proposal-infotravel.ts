@@ -13,6 +13,7 @@ import { z } from 'zod';
 import { isAllowedProposalPhoto, proposalContentSchema, type ProposalContent } from './proposal-content';
 
 const MAX_PHOTOS = 24;
+const WITH_OFFSET = /(?:Z|[+-]\d{2}:\d{2})$/;
 
 const optionalText = z.string().nullish();
 const textList = z.array(z.string()).nullish();
@@ -42,8 +43,10 @@ const normalizedSchema = z.object({
     }).nullish(),
     voos: z.array(z.object({
         number: z.union([z.string(), z.number()]),
-        departure: z.string(),
-        arrival: z.string(),
+        // The operator always gives the offset; without it the page schema
+        // couldn't check that the arrival follows the departure.
+        departure: z.string().regex(WITH_OFFSET),
+        arrival: z.string().regex(WITH_OFFSET),
         duration: optionalText,
         stopsCount: z.number().nullish(),
         cia: z.string(),

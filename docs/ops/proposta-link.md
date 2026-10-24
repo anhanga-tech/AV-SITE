@@ -1,6 +1,6 @@
 # Link de proposta (`/proposta/<id>`)
 
-Épico [#1894](https://github.com/anhanga-tech/AV-SITE/issues/1894). Este documento cobre a rota (P1, #1895), o scrub no Sentry (P4, #1898) o registro de aberturas (P3, #1897), o redirect rastreado (P2, #1896), a auditoria de retenção (P12, #1902), o endpoint interno de criação (P5, #1899), o webhook de abertura (P6, #1900), o aviso ao Felipe (P7, #1903), as notas no Odoo (P8, #1904), a página da proposta (P9, #1901) e o adaptador Infotravel (P11, #1906). As próximas fases acrescentam aqui o que mudarem.
+Épico [#1894](https://github.com/anhanga-tech/AV-SITE/issues/1894). Este documento cobre a rota (P1, #1895), o scrub no Sentry (P4, #1898) o registro de aberturas (P3, #1897), o redirect rastreado (P2, #1896), a auditoria de retenção (P12, #1902), o endpoint interno de criação (P5, #1899), o webhook de abertura (P6, #1900), o aviso ao Felipe (P7, #1903), as notas no Odoo (P8, #1904), a página da proposta (P9, #1901) e o adaptador Infotravel (P11, #1906) e a proposta aérea (P10, #1905). As próximas fases acrescentam aqui o que mudarem.
 
 ## O que existe
 
@@ -72,11 +72,11 @@ Content-Type: application/json
 { "type": "redirect", "redirectUrl": "<link da operadora>", "leadId": 1234, "validityDays": 15 }
 ```
 
-- `type`: `redirect` (redirect rastreado) ou `infotravel` (página montada a partir da cotação; ver "Adaptador Infotravel"). A proposta aérea (P10, #1905) entra depois.
-- `redirectUrl`: link de operadora na allowlist (ver "Redirect rastreado"); fora dela, 400 `REDIRECT_NOT_ALLOWED`.
+- `type`: `redirect` (redirect rastreado), `infotravel` (página montada a partir da cotação; ver "Adaptador Infotravel") ou `aereo` (página da cotação aérea da skill; ver "Proposta aérea (P10)").
+- `redirectUrl` (`redirect` e `infotravel`): link de operadora na allowlist (ver "Redirect rastreado"); fora dela, 400 `REDIRECT_NOT_ALLOWED`.
 - `leadId`: id do `crm.lead` no Odoo, gravado no registro para o webhook de abertura (P6, #1900).
 - `validityDays`: opcional, de 1 a 15 (padrão 15, decisão D5). O bot pode encurtar, nunca estender.
-- `firstName` (só em `infotravel`): nome do cliente, enviado pelo bot. A página mostra só a primeira palavra (D6). O contato da cotação é o agente, nunca o cliente.
+- `firstName` (`infotravel` e `aereo`): nome do cliente, enviado pelo bot. A página mostra só a primeira palavra (D6). O contato da cotação é o agente, nunca o cliente.
 - Campos extras são recusados (400 `VALIDATION_ERROR`).
 
 Resposta 201:
@@ -92,10 +92,12 @@ Resposta 201:
 | 401 | `UNAUTHORIZED` | `Authorization: Bearer` ausente ou errado |
 | 405 | `METHOD_NOT_ALLOWED` | Método diferente de POST |
 | 400 | `VALIDATION_ERROR` / `REDIRECT_NOT_ALLOWED` | Corpo inválido / link fora da allowlist |
+| 400 | `INVALID_QUOTATION` | `type: "aereo"` e a cotação não serve; `reason` diz o motivo (ver "Proposta aérea (P10)") |
 | 409 | `QUOTATION_EXPIRED` | `type: "infotravel"` e a operadora diz que a cotação já venceu (nada é gravado): pedir cotação nova |
 | 429 | `RATE_LIMIT_EXCEEDED` | Mais de 30 pedidos por minuto do mesmo IP |
 | 500 | `CONFIG_ERROR` | Falta `PROPOSAL_API_SECRET` ou `PROPOSAL_PREVIEW_SECRET` (nada é gravado) |
 | 503 | `STORE_UNAVAILABLE` / `SERVICE_UNAVAILABLE` | Redis fora (gravação ou rate limit) |
+| 503 | `PAGES_DISABLED` | `type: "aereo"` com `PROPOSAL_PAGES_ENABLED` desligado: não há link de operadora para redirecionar |
 
 **Configurar no Cloudflare Pages:** `PROPOSAL_API_SECRET` (gerar com `openssl rand -hex 32`), em Production e Preview, e o mesmo valor no bot. Sem ele, o endpoint responde 500 e não cria nada.
 
@@ -184,6 +186,41 @@ Uma proposta guarda **ou** `redirectUrl` (redirect rastreado) **ou** `content` (
 - **Prévias de link** (WhatsApp etc.) continuam recebendo a página genérica, sem nome, hotel ou preço. A prévia interna (`?previa=`) mostra a página completa com o aviso.
 - **Rodapé:** aviso de que a abertura é registrada só com data e hora (sem IP, localização ou aparelho), com link para `/politica-privacidade` (seção 5.10).
 - **Conversão:** `fromInfotravelNormalized` (`lib/proposal-infotravel.ts`) transforma o JSON normalizado da Infotravel (`main.getBooking` + `main.getHotel`) nesse conteúdo. O adaptador que gera o normalizado a partir da API é a P11 (#1906). O fixture em `tests/fixtures/` é a cotação de teste com o roteiro deslocado e números fictícios. Os arquivos brutos da API têm dados reais do cliente e não entram no repositório.
+
+## Proposta aérea (P10)
+
+O Felipe roda a skill `cotacao-aerea-anhanga` sobre o PDF ou o print da consolidadora, escolhe a opção e passa o JSON da skill ao Otto. O Otto cria o link com `type: "aereo"`. Código em `lib/proposal-aereo.ts`.
+
+```http
+POST /api/create-proposal
+Authorization: Bearer <PROPOSAL_API_SECRET>
+Content-Type: application/json
+
+{ "type": "aereo", "leadId": 1234, "firstName": "Ana", "option": 1, "quotation": { …JSON da skill, como está… } }
+```
+
+- `quotation`: o JSON da skill sem edição (`titulo`, `passageiros`, `moedas`, `cambio`, `observacoes`, `opcoes[].trechos[].voos[]`…). Exemplo inventado em `tests/fixtures/cotacao-aerea.json`.
+- `option`: número da opção escolhida, a partir de 1, como a skill numera. Obrigatório quando há mais de uma. Um link por opção: as outras nunca são gravadas.
+- `validityDays`: de 1 a 3 (padrão 3; tarifa aérea muda rápido, decisão do Felipe de 24/10/2026).
+- Até 32 KB de corpo.
+
+**O que vai para a página:** título como destino; passageiros contados (adultos, crianças e bebês; idades entre parênteses são descartadas); cada voo com o rótulo do trecho (Ida, Volta…), cia, número, horários locais, duração e bagagem; o total; o "Bom saber" (fuso local, `observacoes`, nota do câmbio e `total_obs`); e, junto do preço, "O valor final é confirmado no momento da reserva: tarifas aéreas mudam sem aviso prévio."
+
+**Nunca copiado (D2):** `remuneracao` (RAV, Fee, DU), o preço de cada trecho, as `nota` dos trechos e as outras opções. A validação descarta campos desconhecidos antes de qualquer gravação.
+
+**Total igual ao da skill.** Mesma conta do `gerar_proposta.py`: o preço de cada trecho é arredondado em cada moeda; a moeda que falta no trecho é convertida pelo `cambio` (R$ por US$) e marcada como aproximada (`*`); o total é a soma. Com `moedas: ["USD", "BRL"]`, a página mostra dólar em destaque e reais embaixo; com `["BRL"]`, só reais.
+
+**Erros (`400 INVALID_QUOTATION`, campo `reason`):**
+
+| `reason` | Quando |
+|---|---|
+| `invalid_quotation` | JSON fora do formato da skill |
+| `option_required` / `option_not_found` | Várias opções sem `option`, ou número que não existe |
+| `invalid_travelers` | `passageiros` fora do padrão "2 adultos + 1 criança + 1 bebê" ou sem adulto |
+| `missing_exchange_rate` | Trecho sem a moeda pedida e sem `cambio` para converter |
+| `invalid_content` | Dados que a página recusa (horário inválido, texto longo demais…) |
+
+Os logs trazem só o `reason`, nunca valores da cotação.
 
 ## Adaptador Infotravel (P11)
 

@@ -25,10 +25,13 @@ const calendarDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine((day) => {
     const parsed = new Date(`${day}T00:00:00Z`);
     return !Number.isNaN(parsed.getTime()) && parsed.toISOString().startsWith(day);
 });
-// Local wall-clock time at the airport, with its offset: `2026-12-06T18:35:00-03:00`.
+// Local wall-clock time at the airport: `2026-12-06T18:35:00-03:00`. The
+// offset is optional: the air quotation skill (#1905) gives local times only.
 const localDateTime = z.string()
-    .regex(/^(\d{4}-\d{2}-\d{2})T([01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?(?:Z|[+-]\d{2}:\d{2})$/)
+    .regex(/^(\d{4}-\d{2}-\d{2})T([01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?(?:Z|[+-]\d{2}:\d{2})?$/)
     .refine((value) => calendarDate.safeParse(value.slice(0, 10)).success);
+
+const hasOffset = (value: string) => /(?:Z|[+-]\d{2}:\d{2})$/.test(value);
 
 export function isAllowedProposalPhoto(value: string): boolean {
     try {
@@ -49,6 +52,8 @@ export const proposalContentSchema = z.strictObject({
     travelers: z.strictObject({
         adults: z.number().int().min(1).max(20),
         children: z.number().int().min(0).max(20),
+        // Lap infants, counted apart from children in air quotations (#1905).
+        infants: z.number().int().min(0).max(20).optional(),
     }),
     hotel: z.strictObject({
         name: text(160),
@@ -79,7 +84,14 @@ export const proposalContentSchema = z.strictObject({
         // Absent when the operator doesn't say: never shown as a direct flight.
         stops: z.number().int().min(0).max(5).optional(),
         fareFamily: text(40).optional(),
-    }).refine((flight) => Date.parse(flight.arrival) > Date.parse(flight.departure), { message: 'arrival must be after departure' })).max(12),
+        // The quotation's own leg name ("Ida", "Volta", "Doméstico") and baggage.
+        leg: text(40).optional(),
+        baggage: text(160).optional(),
+    }).refine(
+        // Comparable only with both offsets: local times in two time zones aren't.
+        (flight) => !hasOffset(flight.departure) || !hasOffset(flight.arrival) || Date.parse(flight.arrival) > Date.parse(flight.departure),
+        { message: 'arrival must be after departure' },
+    )).max(12),
     transfers: z.array(z.strictObject({
         name: text(200),
         provider: text(120).optional(),
@@ -93,7 +105,17 @@ export const proposalContentSchema = z.strictObject({
     total: z.strictObject({
         amount: z.number().positive().max(10_000_000),
         currency: z.literal('BRL'),
+        // A customer abroad sees dollars too, first when `primary` (#1905).
+        usd: z.strictObject({
+            amount: z.number().positive().max(10_000_000),
+            primary: z.boolean(),
+        }).optional(),
+        // Shown with the price: e.g. that an air fare is only final when booked.
+        note: text(300).optional(),
     }),
+    // "Bom saber": the Anhangá's own remarks, never the operator's terms (D7).
+    // Up to 8 of the quotation's remarks plus the local-time, exchange and total notes.
+    notes: z.array(text(400)).max(12).optional(),
 }).refine(
     (content) => Boolean(content.hotel) || content.flights.length + content.transfers.length + content.extras.length > 0,
     { message: 'a proposal page needs at least one included item' },

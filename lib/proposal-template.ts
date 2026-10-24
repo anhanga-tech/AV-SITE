@@ -22,6 +22,7 @@ const PRIVACY_NOTICE = 'Para acompanhar sua proposta, registramos quando esta p�
 const INTERNAL_PREVIEW_NOTICE = 'Prévia interna: esta visita não conta como abertura do cliente.';
 
 const BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+const USD = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'USD' });
 const SAO_PAULO_DATE_TIME = new Intl.DateTimeFormat('pt-BR', {
     timeZone: 'America/Sao_Paulo',
     day: '2-digit',
@@ -77,7 +78,8 @@ function plural(count: number, one: string, many: string): string {
 function travelersLabel(travelers: ProposalContent['travelers']): string {
     const parts = [plural(travelers.adults, 'adulto', 'adultos')];
     if (travelers.children > 0) parts.push(plural(travelers.children, 'criança', 'crianças'));
-    return parts.join(' e ');
+    if (travelers.infants) parts.push(plural(travelers.infants, 'bebê', 'bebês'));
+    return parts.length > 2 ? `${parts.slice(0, -1).join(', ')} e ${parts[parts.length - 1]}` : parts.join(' e ');
 }
 
 function whatsappUrl(text: string): string {
@@ -123,8 +125,10 @@ function city(place: string): string {
     return place.replace(/\(.*\)/, '').trim().toLocaleLowerCase('pt-BR');
 }
 
-/** Two flights that leave from where the other one lands: outbound and return. */
+/** Two flights that leave from where the other one lands, or legs named Ida and Volta. */
 function isRoundTrip(flights: ProposalContent['flights']): boolean {
+    const legs = [...new Set(flights.map((flight) => flight.leg?.toLocaleLowerCase('pt-BR')))];
+    if (legs.length === 2 && legs[0] === 'ida' && legs[1] === 'volta') return true;
     if (flights.length !== 2) return false;
     const [outbound, inbound] = flights;
     return city(outbound.from) === city(inbound.to) && city(outbound.to) === city(inbound.from);
@@ -134,6 +138,8 @@ function flightsSection(flights: ProposalContent['flights']): string {
     if (flights.length === 0) return '';
     const roundTrip = isRoundTrip(flights);
     const legLabel = (index: number) => {
+        const named = flights[index].leg;
+        if (named) return escapeHtml(named);
         if (roundTrip) return index === 0 ? 'Ida' : 'Volta';
         return `Trecho ${index + 1}`;
     };
@@ -144,6 +150,7 @@ function flightsSection(flights: ProposalContent['flights']): string {
             flight.stops === undefined ? '' : flight.stops === 0 ? 'Voo direto' : plural(flight.stops, 'parada', 'paradas'),
             flight.duration ? formatDuration(flight.duration) : '',
             flight.fareFamily ? `Tarifa ${flight.fareFamily}` : '',
+            flight.baggage ?? '',
         ].filter(Boolean);
         return `<div class="card">
 <p class="label">${legLabel(index)} · ${departure.day}</p>
@@ -153,6 +160,20 @@ function flightsSection(flights: ProposalContent['flights']): string {
 </div>`;
     });
     return `<section aria-labelledby="voos"><h2 id="voos">Voos</h2>${cards.join('')}</section>`;
+}
+
+function notesSection(notes: ProposalContent['notes']): string {
+    if (!notes?.length) return '';
+    return `<section aria-labelledby="bom-saber"><h2 id="bom-saber">Bom saber</h2>${list(notes)}</section>`;
+}
+
+/** The price block: reais, or dollars first and reais below for a customer abroad (#1905). */
+function totalAmount(total: ProposalContent['total']): string {
+    const brl = BRL.format(total.amount);
+    if (!total.usd) return `<p class="amount">${escapeHtml(brl)}</p>`;
+    const usd = USD.format(total.usd.amount);
+    const [main, other] = total.usd.primary ? [usd, brl] : [brl, usd];
+    return `<p class="amount">${escapeHtml(main)}</p>\n<p class="amount-alt">${escapeHtml(other)}</p>`;
 }
 
 function transfersSection(transfers: ProposalContent['transfers']): string {
@@ -226,6 +247,8 @@ summary{cursor:pointer;font-weight:600;color:#0056D2;min-height:44px;display:fle
 .total{margin-top:24px;padding:24px;border-radius:16px;color:rgba(255,255,255,.9);background:#0f172a}
 .total .label{color:#7dd3fc}
 .amount{margin:4px 0;font-size:clamp(2rem,9vw,2.75rem);font-weight:900;line-height:1.1;color:#fff}
+.amount-alt{margin:0 0 8px;font-size:1.125rem;font-weight:700;color:#fff}
+.total-note{margin:8px 0 0;font-size:.875rem}
 .total ul{margin:12px 0 20px}
 .cta{display:flex;align-items:center;justify-content:center;min-height:52px;padding:12px 24px;border-radius:16px;font-weight:700;color:#0f172a;text-decoration:none;background:#FFD600;box-shadow:4px 4px 0 0 #7dd3fc;transition:transform .15s,box-shadow .15s}
 .cta:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 0 #7dd3fc;background:#E5C000}
@@ -266,16 +289,18 @@ ${options.internalPreview ? `<p class="notice" role="note">${escapeHtml(INTERNAL
 ${heroPhoto ? `<img class="hero" src="${escapeHtml(heroPhoto)}" alt="${escapeHtml(hotel.name)}">` : ''}
 <div class="total">
 <p class="label">Valor total</p>
-<p class="amount">${escapeHtml(BRL.format(content.total.amount))}</p>
+${totalAmount(content.total)}
 <p>para ${escapeHtml(travelersLabel(content.travelers))}, com tudo o que está incluso:</p>
 ${list(includedSummary(content))}
 <a class="cta" href="${escapeHtml(cta)}" rel="noopener noreferrer" target="_blank">Quero fechar pelo WhatsApp</a>
 <p class="valid">Proposta válida até ${escapeHtml(validUntil)}</p>
+${content.total.note ? `<p class="total-note">${escapeHtml(content.total.note)}</p>` : ''}
 </div>
 ${hotel ? hotelSection(hotel) : ''}
 ${flightsSection(content.flights)}
 ${transfersSection(content.transfers)}
 ${extrasSection(content.extras)}
+${notesSection(content.notes)}
 <section aria-labelledby="condicoes"><h2 id="condicoes">Condições</h2><p>${escapeHtml(CONDITIONS_TEXT)}</p></section>
 <footer>
 <p>${escapeHtml(PRIVACY_NOTICE)} <a href="${PRIVACY_POLICY_URL}" rel="noopener noreferrer" target="_blank">Política de Privacidade</a>.</p>
