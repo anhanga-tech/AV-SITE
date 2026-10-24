@@ -1,0 +1,138 @@
+{
+  "data_cotacao": "20/10/2026",
+  "titulo": "São Paulo e Miami",
+  "destaque": "Miami",
+  "passageiros": "2 adultos + 1 bebê (8 meses)",
+  "complemento": "com 1 mala despachada por adulto",
+  "moedas": [
+    "USD",
+    "BRL"
+  ],
+  "cambio": {
+    "USD": 5.2,
+    "data": "20/10/2026"
+  },
+  "opcoes": [
+    {
+      "nome": "Opção 1",
+      "recomendada": true,
+      "total_obs": "Ida e volta na **mesma reserva**.",
+      "trechos": [
+        {
+          "rotulo": "Ida",
+          "cia": "Companhia Exemplo",
+          "obs_cia": "reserva única",
+          "de": {
+            "codigo": "SAO",
+            "cidade": "São Paulo"
+          },
+          "para": {
+            "codigo": "MIA",
+            "cidade": "Miami"
+          },
+          "voos": [
+            {
+              "numero": "XX 1001",
+              "origem": "São Paulo (GRU)",
+              "destino": "Miami (MIA)",
+              "partida": "2026-12-10T23:10",
+              "chegada": "2026-12-11T06:05",
+              "duracao": "8h55"
+            }
+          ],
+          "nota": "Chegada **cedo**.",
+          "bagagem": "1 mala de 23 kg por adulto",
+          "preco": {
+            "USD": 1234.567
+          },
+          "remuneracao": {
+            "moeda": "USD",
+            "rav": 86.42,
+            "fee": 25,
+            "du": 0
+          }
+        },
+        {
+          "rotulo": "Volta",
+          "cia": "Companhia Exemplo",
+          "de": {
+            "codigo": "MIA",
+            "cidade": "Miami"
+          },
+          "para": {
+            "codigo": "SAO",
+            "cidade": "São Paulo"
+          },
+          "voos": [
+            {
+              "numero": "XX 1002",
+              "origem": "Miami (MIA)",
+              "destino": "Orlando (MCO)",
+              "partida": "2026-12-20T09:00",
+              "chegada": "2026-12-20T10:05",
+              "duracao": "1h05"
+            },
+            {
+              "numero": "XX 1003",
+              "origem": "Orlando (MCO)",
+              "destino": "São Paulo (GRU)",
+              "partida": "2026-12-20T20:00",
+              "chegada": "2026-12-21T06:30",
+              "duracao": "8h30"
+            }
+          ],
+          "bagagem": "1 mala de 23 kg por adulto",
+          "preco": {
+            "BRL": 4321.99
+          },
+          "remuneracao": {
+            "moeda": "BRL",
+            "rav": 302.54,
+            "fee": 0,
+            "du": 432
+          }
+        }
+      ]
+    },
+    {
+      "nome": "Opção 2",
+      "trechos": [
+        {
+          "rotulo": "Ida e volta",
+          "cia": "Outra Companhia",
+          "de": {
+            "codigo": "SAO",
+            "cidade": "São Paulo"
+          },
+          "para": {
+            "codigo": "MIA",
+            "cidade": "Miami"
+          },
+          "voos": [
+            {
+              "numero": "YY 2001",
+              "origem": "São Paulo (GRU)",
+              "destino": "Miami (MIA)",
+              "partida": "2026-12-10T22:00",
+              "chegada": "2026-12-11T05:10",
+              "duracao": "9h10"
+            }
+          ],
+          "bagagem": "Sem mala despachada",
+          "preco": {
+            "USD": 9876.54
+          },
+          "remuneracao": {
+            "moeda": "USD",
+            "rav": 691.36,
+            "fee": 25,
+            "du": 0
+          }
+        }
+      ]
+    }
+  ],
+  "observacoes": [
+    "Embarque pelo **Terminal 3**."
+  ]
+}

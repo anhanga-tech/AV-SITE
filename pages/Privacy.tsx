@@ -11,8 +11,8 @@ import {
 
 const CANONICAL = "https://www.anhanga.tur.br/politica-privacidade/";
 const DESCRIPTION = "Política de Privacidade e Proteção de Dados da Anhangá Turismo: coleta, tratamento, armazenamento e direitos dos titulares.";
-const UPDATED = "23 de outubro de 2026";
-const UPDATED_ISO = "2026-10-23";
+const UPDATED = "24 de outubro de 2026";
+const UPDATED_ISO = "2026-10-24";
 
 const Privacy = () => (
     <>

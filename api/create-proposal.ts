@@ -12,7 +12,10 @@
  * - `infotravel`: reads the Infotravel quotation behind the link and stores a
  *   page (#1906). Any failure — API down, unexpected data, a total that doesn't
  *   add up — or pages switched off (PROPOSAL_PAGES_ENABLED) falls back to the
- *   tracked redirect for the same link; `mode` and `fallbackReason` say which.
+ *   tracked redirect for the same link; `mode` and `fallbackReason` say which;
+ * - `aereo`: the JSON of the air quotation skill, for one chosen option, stored
+ *   as a page (#1905). There is no operator link to fall back to, so an invalid
+ *   quotation or pages switched off is an error. Valid for 3 days at most.
  *
  * Never log the body, the id, the lead id or the operator URL: the URL holds
  * the booking token and the id opens the proposal.
@@ -28,6 +31,7 @@ import { InfotravelNormalizeError, normalizeInfotravelQuotation } from '../lib/i
 import { buildProposalSentNote, postProposalNote, type ProposalOdooNotesDeps } from '../lib/proposal-odoo-notes';
 import type { ProposalContent } from '../lib/proposal-content';
 import { fromInfotravelNormalized } from '../lib/proposal-infotravel';
+import { fromAereoQuotation } from '../lib/proposal-aereo';
 import { fetchInfotravelQuotation, InfotravelError, type InfotravelDeps } from '../services/infotravel';
 import { PROPOSAL_VALIDITY_SECONDS, saveProposal, type ProposalStoreDeps } from '../lib/proposal-store';
 import { timingSafeEqual } from '../lib/security';
@@ -37,15 +41,23 @@ const PROPOSAL_BASE_URL = 'https://www.anhanga.tur.br/proposta';
 const MAX_VALIDITY_DAYS = PROPOSAL_VALIDITY_SECONDS / (24 * 60 * 60);
 const RATE_LIMIT_MAX_REQUESTS = 30;
 const RATE_LIMIT_WINDOW_MS = 60_000;
-const MAX_BODY_BYTES = 8_192;
+// The air quotation carries every option's legs; 3 options fit well under this.
+const MAX_BODY_BYTES = 32_768;
 // No CORS headers on purpose: no page may call this.
 const RESPONSE_HEADERS = { 'Cache-Control': 'no-store' };
 
 const INFOTRAVEL_HOST = 'premium.infotravel.com.br';
 
+// Air fares change fast: an air proposal is valid for 3 days (Felipe, 24/10/2026).
+const AEREO_VALIDITY_DAYS = 3;
+
+const leadId = z.number().int().positive().max(Number.MAX_SAFE_INTEGER);
+// The customer's name comes from the bot only. The page keeps just the first word (D6).
+const firstName = z.string().trim().min(1).max(300).optional();
+
 const commonFields = {
     redirectUrl: z.string().min(1).max(4096),
-    leadId: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+    leadId,
     // D5: links are valid for 15 days; the bot may shorten that, never extend it.
     validityDays: z.number().int().min(1).max(MAX_VALIDITY_DAYS).optional(),
 };
@@ -55,9 +67,18 @@ const BodySchema = z.discriminatedUnion('type', [
     z.strictObject({
         type: z.literal('infotravel'),
         ...commonFields,
-        // The customer's name comes from the bot only: the quotation's contact
-        // is the agent. The page keeps just the first word (D6).
-        firstName: z.string().trim().min(1).max(300).optional(),
+        // The quotation's contact is the agent, not the customer.
+        firstName,
+    }),
+    z.strictObject({
+        type: z.literal('aereo'),
+        leadId,
+        validityDays: z.number().int().min(1).max(AEREO_VALIDITY_DAYS).optional(),
+        firstName,
+        // 1-based, as the skill numbers them; required when there are several.
+        option: z.number().int().min(1).max(10).optional(),
+        // Shape checked by lib/proposal-aereo.ts, which keeps only what the page shows.
+        quotation: z.unknown(),
     }),
 ]);
 
@@ -104,14 +125,16 @@ type ErrorCode =
     | 'VALIDATION_ERROR'
     | 'REDIRECT_NOT_ALLOWED'
     | 'QUOTATION_EXPIRED'
+    | 'INVALID_QUOTATION'
+    | 'PAGES_DISABLED'
     | 'STORE_UNAVAILABLE';
 
 function json(body: Record<string, unknown>, status: number, requestId: string, headers: Record<string, string> = {}): Response {
     return buildJsonResponse(body, status, { ...RESPONSE_HEADERS, ...headers }, { requestId });
 }
 
-function fail(requestId: string, status: number, code: ErrorCode, error: string, headers?: Record<string, string>): Response {
-    return json({ ok: false, requestId, code, error }, status, requestId, headers);
+function fail(requestId: string, status: number, code: ErrorCode, error: string, headers?: Record<string, string>, reason?: string): Response {
+    return json({ ok: false, requestId, code, error, ...(reason ? { reason } : {}) }, status, requestId, headers);
 }
 
 function getApiSecret(): string | null {
@@ -138,6 +161,66 @@ async function readJson(request: Request): Promise<{ ok: true; value: unknown } 
 export interface CreateProposalDeps extends ProposalStoreDeps {
     odoo?: ProposalOdooNotesDeps;
     infotravel?: InfotravelDeps;
+}
+
+type CreateProposalBody = z.output<typeof BodySchema>;
+
+/** What to store: page content or the operator link, and for how long. */
+interface ProposalPlan {
+    content?: ProposalContent;
+    redirectUrl?: string;
+    validitySeconds: number;
+    fallbackReason?: FallbackReason;
+}
+
+/** `redirect` and `infotravel`: the operator link, read as a page when possible. */
+async function planOperatorProposal(
+    body: Exclude<CreateProposalBody, { type: 'aereo' }>,
+    requestId: string,
+    deps: CreateProposalDeps,
+): Promise<ProposalPlan | Response> {
+    // Checked here so anything saveProposal throws afterwards is storage.
+    const redirectUrl = parseAllowedRedirectUrl(body.redirectUrl);
+    if (!redirectUrl || (body.type === 'infotravel' && new URL(redirectUrl).hostname !== INFOTRAVEL_HOST)) {
+        logger.warn('CREATE_PROPOSAL', { requestId, stage: 'redirect_not_allowed' });
+        return fail(requestId, 400, 'REDIRECT_NOT_ALLOWED', 'Link da operadora não permitido.');
+    }
+
+    // The link as the bot sent it is what the operator's own page sends as `clientUrl`.
+    const built = body.type === 'infotravel' ? await buildInfotravelContent(body.redirectUrl, body.firstName, deps.infotravel ?? {}) : null;
+    // Measured after the operator calls, on the clock saveProposal uses: the
+    // page never says "válida até" past the operator's own quotation deadline.
+    const now = (deps.now ?? Date.now)();
+    const requestedSeconds = (body.validityDays ?? MAX_VALIDITY_DAYS) * 24 * 60 * 60;
+    const quotationExpiresAt = built && 'content' in built ? built.quotationExpiresAt : undefined;
+    const remainingSeconds = quotationExpiresAt === undefined ? requestedSeconds : Math.floor((quotationExpiresAt - now) / 1000);
+    if (remainingSeconds < 1) {
+        // A redirect would keep the operator's booking token live past the
+        // quotation itself (#1925): the bot needs a new quotation instead.
+        logger.warn('CREATE_PROPOSAL', { requestId, stage: 'quotation_expired' });
+        return fail(requestId, 409, 'QUOTATION_EXPIRED', 'A cotação da operadora já venceu.');
+    }
+    const content = built && 'content' in built ? built.content : undefined;
+    return {
+        ...(content ? { content } : { redirectUrl }),
+        validitySeconds: Math.min(requestedSeconds, remainingSeconds),
+        fallbackReason: built && 'fallbackReason' in built ? built.fallbackReason : undefined,
+    };
+}
+
+/** `aereo`: the skill's quotation as a page. No operator link, so no fallback. */
+function planAereoProposal(body: Extract<CreateProposalBody, { type: 'aereo' }>, requestId: string): ProposalPlan | Response {
+    if (!arePagesEnabled()) {
+        logger.warn('CREATE_PROPOSAL', { requestId, stage: 'pages_disabled' });
+        return fail(requestId, 503, 'PAGES_DISABLED', 'Páginas de proposta desligadas.');
+    }
+    const mapped = fromAereoQuotation(body.quotation, { option: body.option, firstName: body.firstName });
+    if ('error' in mapped) {
+        // The reason only: the quotation holds prices and the commission.
+        logger.warn('CREATE_PROPOSAL', { requestId, stage: 'aereo_invalid', reason: mapped.error });
+        return fail(requestId, 400, 'INVALID_QUOTATION', 'Cotação aérea inválida.', undefined, mapped.error);
+    }
+    return { content: mapped.content, validitySeconds: (body.validityDays ?? AEREO_VALIDITY_DAYS) * 24 * 60 * 60 };
 }
 
 export async function handleCreateProposal(request: Request, deps: CreateProposalDeps = {}): Promise<Response> {
@@ -195,30 +278,9 @@ export async function handleCreateProposal(request: Request, deps: CreateProposa
     }
 
     const body = parsed.data;
-    // Checked here so anything saveProposal throws afterwards is storage.
-    const redirectUrl = parseAllowedRedirectUrl(body.redirectUrl);
-    if (!redirectUrl || (body.type === 'infotravel' && new URL(redirectUrl).hostname !== INFOTRAVEL_HOST)) {
-        logger.warn('CREATE_PROPOSAL', { requestId, stage: 'redirect_not_allowed' });
-        return fail(requestId, 400, 'REDIRECT_NOT_ALLOWED', 'Link da operadora não permitido.');
-    }
-
-    // The link as the bot sent it is what the operator's own page sends as `clientUrl`.
-    const built = body.type === 'infotravel' ? await buildInfotravelContent(body.redirectUrl, body.firstName, deps.infotravel ?? {}) : null;
-    // Measured after the operator calls, on the clock saveProposal uses: the
-    // page never says "válida até" past the operator's own quotation deadline.
-    const now = (deps.now ?? Date.now)();
-    const requestedSeconds = (body.validityDays ?? MAX_VALIDITY_DAYS) * 24 * 60 * 60;
-    const quotationExpiresAt = built && 'content' in built ? built.quotationExpiresAt : undefined;
-    const remainingSeconds = quotationExpiresAt === undefined ? requestedSeconds : Math.floor((quotationExpiresAt - now) / 1000);
-    if (remainingSeconds < 1) {
-        // A redirect would keep the operator's booking token live past the
-        // quotation itself (#1925): the bot needs a new quotation instead.
-        logger.warn('CREATE_PROPOSAL', { requestId, stage: 'quotation_expired' });
-        return fail(requestId, 409, 'QUOTATION_EXPIRED', 'A cotação da operadora já venceu.');
-    }
-    const content = built && 'content' in built ? built.content : undefined;
-    const validitySeconds = Math.min(requestedSeconds, remainingSeconds);
-    const fallbackReason = built && 'fallbackReason' in built ? built.fallbackReason : undefined;
+    const plan = body.type === 'aereo' ? planAereoProposal(body, requestId) : await planOperatorProposal(body, requestId, deps);
+    if (plan instanceof Response) return plan;
+    const { content, redirectUrl, validitySeconds, fallbackReason } = plan;
     const mode = content ? 'page' : 'redirect';
 
     let saved: { id: string; expiresAt: number };
