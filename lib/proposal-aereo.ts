@@ -10,7 +10,8 @@
  * Totals follow the skill's own script (`gerar_proposta.py`), so the page
  * shows the same amounts as the PDF and the WhatsApp text: each leg's price
  * is rounded per currency, a missing currency is converted at the
- * quotation's rate and marked approximate, and the total is their sum.
+ * quotation's rate, and the total is their sum. Like the PDF, the total
+ * carries no approximation mark; the exchange note explains the conversion.
  */
 import { z } from 'zod';
 
@@ -125,7 +126,7 @@ function exchangeNote(quotation: z.output<typeof quotationSchema>, approximate: 
     const day = quotation.cambio?.data || quotation.data_cotacao;
     const reference = `câmbio ${day ? `de ${day} ` : ''}(US$ 1,00 = R$ ${rate.toFixed(4).replace('.', ',')})`;
     return approximate
-        ? `Valor aproximado, convertido pelo ${reference}. A cobrança é feita na moeda original do trecho.`
+        ? `Valores convertidos pelo ${reference}. A cobrança é feita na moeda original de cada trecho.`
         : `Valores de referência pelo ${reference}.`;
 }
 
@@ -197,8 +198,7 @@ export function fromAereoQuotation(
         total: {
             amount: brl.amount,
             currency: 'BRL',
-            ...(brl.approximate ? { approximate: true } : {}),
-            ...(usd ? { usd: { amount: usd.amount, ...(usd.approximate ? { approximate: true } : {}), primary: shown[0] === 'USD' } } : {}),
+            ...(usd ? { usd: { amount: usd.amount, primary: shown[0] === 'USD' } } : {}),
             note: AEREO_PRICE_NOTE,
         },
         notes,

@@ -72,8 +72,7 @@ function contentOf(option: number) {
 test('the totals are the ones the skill prints in the PDF and WhatsApp', () => {
     // From `gerar_proposta.py` on this fixture: per-leg rounding, conversion at 5,20.
     assert.deepEqual(contentOf(1).total.amount, 10741.74);
-    assert.deepEqual(contentOf(1).total.usd, { amount: 2065.72, approximate: true, primary: true });
-    assert.equal(contentOf(1).total.approximate, true);
+    assert.deepEqual(contentOf(1).total.usd, { amount: 2065.72, primary: true });
     assert.deepEqual(contentOf(2).total.usd, { amount: 9876.54, primary: true });
     assert.equal(contentOf(2).total.amount, 51358.01);
 });
@@ -148,7 +147,7 @@ test('the page shows dollars first, reais below, infants, legs and the price not
     const { data } = await (await handleCreateProposal(create(AEREO_BODY), deps)).json();
     const page = await (await handleProposalRequest(openPage(data.url), data.id, deps)).text();
 
-    assert.match(page, /<p class="amount">US\$\s2\.065,72\*<\/p>\n<p class="amount-alt">R\$\s10\.741,74\*<\/p>/);
+    assert.match(page, /<p class="amount">US\$\s2\.065,72<\/p>\n<p class="amount-alt">R\$\s10\.741,74<\/p>/);
     assert.match(page, /Ana, sua viagem para São Paulo e Miami/);
     assert.match(page, /2 adultos e 1 bebê/);
     assert.match(page, /<p class="label">Volta · 20\/12<\/p>/);
@@ -156,7 +155,8 @@ test('the page shows dollars first, reais below, infants, legs and the price not
     assert.ok(page.includes(AEREO_PRICE_NOTE));
     assert.match(page, /<h2 id="bom-saber">Bom saber<\/h2>/);
     assert.match(page, /Embarque pelo Terminal 3\./);
-    assert.match(page, /US\$ 1,00 = R\$ 5,2000/);
+    assert.match(page, /Valores convertidos pelo câmbio de 20\/10\/2026 \(US\$ 1,00 = R\$ 5,2000\)/);
+    assert.match(page, /<li>Voos de ida e volta<\/li>/);
 });
 
 test('an air proposal is valid for 3 days; the bot may shorten it, never extend it', async (t) => {

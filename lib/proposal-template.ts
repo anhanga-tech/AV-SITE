@@ -125,8 +125,10 @@ function city(place: string): string {
     return place.replace(/\(.*\)/, '').trim().toLocaleLowerCase('pt-BR');
 }
 
-/** Two flights that leave from where the other one lands: outbound and return. */
+/** Two flights that leave from where the other one lands, or legs named Ida and Volta. */
 function isRoundTrip(flights: ProposalContent['flights']): boolean {
+    const legs = [...new Set(flights.map((flight) => flight.leg?.toLocaleLowerCase('pt-BR')))];
+    if (legs.length === 2 && legs[0] === 'ida' && legs[1] === 'volta') return true;
     if (flights.length !== 2) return false;
     const [outbound, inbound] = flights;
     return city(outbound.from) === city(inbound.to) && city(outbound.to) === city(inbound.from);
@@ -165,14 +167,11 @@ function notesSection(notes: ProposalContent['notes']): string {
     return `<section aria-labelledby="bom-saber"><h2 id="bom-saber">Bom saber</h2>${list(notes)}</section>`;
 }
 
-/**
- * The price block: reais, or dollars first and reais below for a customer
- * abroad (#1905). `*` marks an amount converted at the quotation's rate.
- */
+/** The price block: reais, or dollars first and reais below for a customer abroad (#1905). */
 function totalAmount(total: ProposalContent['total']): string {
-    const brl = `${BRL.format(total.amount)}${total.approximate ? '*' : ''}`;
+    const brl = BRL.format(total.amount);
     if (!total.usd) return `<p class="amount">${escapeHtml(brl)}</p>`;
-    const usd = `${USD.format(total.usd.amount)}${total.usd.approximate ? '*' : ''}`;
+    const usd = USD.format(total.usd.amount);
     const [main, other] = total.usd.primary ? [usd, brl] : [brl, usd];
     return `<p class="amount">${escapeHtml(main)}</p>\n<p class="amount-alt">${escapeHtml(other)}</p>`;
 }

@@ -105,12 +105,9 @@ export const proposalContentSchema = z.strictObject({
     total: z.strictObject({
         amount: z.number().positive().max(10_000_000),
         currency: z.literal('BRL'),
-        // Converted at the quotation's exchange rate, not charged in reais.
-        approximate: z.boolean().optional(),
         // A customer abroad sees dollars too, first when `primary` (#1905).
         usd: z.strictObject({
             amount: z.number().positive().max(10_000_000),
-            approximate: z.boolean().optional(),
             primary: z.boolean(),
         }).optional(),
         // Shown with the price: e.g. that an air fare is only final when booked.
