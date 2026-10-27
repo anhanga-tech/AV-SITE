@@ -63,16 +63,23 @@ async function deadlineOf(key: string, prefix: string): Promise<number | undefin
   return proposalKeyDeadline(prefix, { expiresAt: epochMs(await redis('GET', `proposta:exp:${id}`)) });
 }
 
+// Each key's TTL (+ deadline) lookup is independent of every other key's, so
+// a SCAN page's keys are audited concurrently instead of one Redis round
+// trip at a time — a page of 200 keys was ~400 sequential REST calls before.
+async function auditKey(key: string): Promise<{ prefix: string | null; outcome: RetentionCheck }> {
+  const ttl = Number(await redis('TTL', key));
+  const prefix = proposalKeyPrefix(key);
+  const deadline = prefix && ttl >= 0 ? await deadlineOf(key, prefix) : undefined;
+  return { prefix, outcome: checkProposalKeyRetention(key, ttl, { now: Date.now(), deadline }) };
+}
+
 const counts = new Map<string, Record<RetentionCheck, number>>();
 let violations = 0;
 let cursor = '0';
 do {
   const [next, keys] = (await redis('SCAN', cursor, 'MATCH', 'proposta:*', 'COUNT', 200)) as [string, string[]];
-  for (const key of keys) {
-    const ttl = Number(await redis('TTL', key));
-    const prefix = proposalKeyPrefix(key);
-    const deadline = prefix && ttl >= 0 ? await deadlineOf(key, prefix) : undefined;
-    const outcome = checkProposalKeyRetention(key, ttl, { now: Date.now(), deadline });
+  const results = await Promise.all(keys.map(auditKey));
+  for (const { prefix, outcome } of results) {
     // Only a known prefix is printed: any other key name may carry an id.
     const label = prefix ?? 'outras';
     const row = counts.get(label) ?? { ok: 0, gone: 0, no_ttl: 0, over_limit: 0, unknown_key: 0 };
