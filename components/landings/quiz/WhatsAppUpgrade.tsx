@@ -91,20 +91,28 @@ export function WhatsAppUpgrade({ profileName, mainDestName, firstName, baseWaUr
                 <input
                     type="tel"
                     className="quiz-wa-input"
+                    inputMode="tel"
+                    autoComplete="tel-national"
                     placeholder="(11) 99999-9999"
                     value={phone}
                     onChange={(e) => setPhone(maskPhone(e.target.value))}
                     aria-label="Número de WhatsApp (opcional)"
+                    aria-describedby="quiz-wa-hint"
                 />
                 <button
                     type="button"
                     className={`quiz-btn quiz-btn-primary ${isValid ? 'quiz-btn--ready' : ''}`}
                     onClick={handleSubmit}
                     disabled={!isValid}
+                    aria-describedby="quiz-wa-hint"
                 >
                     Enviar
                 </button>
             </div>
+            {/* Botão nasce desabilitado até haver DDD + número; o texto é a instrução, não só o estado desabilitado. */}
+            <p id="quiz-wa-hint" className="m-0 text-xs text-slate-500" aria-live="polite">
+                {isValid ? ' ' : 'Digite o DDD e o número para enviar'}
+            </p>
             <a
                 className="btn-whatsapp btn-specialist quiz-wa-skip"
                 href={baseWaUrl}
