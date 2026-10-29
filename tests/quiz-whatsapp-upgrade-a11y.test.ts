@@ -25,12 +25,11 @@ function renderUpgrade() {
     );
 }
 
-test('telefone incompleto mostra instrução ligada ao input e ao botão desabilitado', () => {
+test('instrução fica ligada ao input e ao botão desabilitado', () => {
     const { container, getByText } = renderUpgrade();
     const hint = container.querySelector('#quiz-wa-hint');
     assert.ok(hint, 'hint deve existir');
-    assert.equal(hint!.textContent, 'Digite o DDD e o número para enviar');
-    assert.equal(hint!.getAttribute('aria-live'), 'polite');
+    assert.equal(hint!.textContent, 'Opcional: digite o DDD e o número para enviar');
     assert.equal(container.querySelector('input')!.getAttribute('aria-describedby'), 'quiz-wa-hint');
     const button = getByText('Enviar') as HTMLButtonElement;
     assert.equal(button.disabled, true);
@@ -38,10 +37,11 @@ test('telefone incompleto mostra instrução ligada ao input e ao botão desabil
     cleanup();
 });
 
-test('telefone válido limpa a instrução e habilita o botão', () => {
+test('telefone válido habilita o botão e mantém a instrução como descrição do campo', () => {
     const { container, getByText } = renderUpgrade();
     fireEvent.change(container.querySelector('input')!, { target: { value: '11999998888' } });
-    assert.equal(container.querySelector('#quiz-wa-hint')!.textContent!.trim(), '');
+    assert.ok(container.querySelector('#quiz-wa-hint')!.textContent!.length > 0);
+    assert.equal(container.querySelector('input')!.getAttribute('aria-describedby'), 'quiz-wa-hint');
     assert.equal((getByText('Enviar') as HTMLButtonElement).disabled, false);
     cleanup();
 });

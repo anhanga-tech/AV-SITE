@@ -109,9 +109,10 @@ export function WhatsAppUpgrade({ profileName, mainDestName, firstName, baseWaUr
                     Enviar
                 </button>
             </div>
-            {/* Botão nasce desabilitado até haver DDD + número; o texto é a instrução, não só o estado desabilitado. */}
-            <p id="quiz-wa-hint" className="m-0 text-xs text-slate-500" aria-live="polite">
-                {isValid ? ' ' : 'Digite o DDD e o número para enviar'}
+            {/* Botão nasce desabilitado até haver DDD + número; o texto é a instrução, não só o estado desabilitado.
+                Fica sempre visível: sumir aos 10 dígitos zeraria a descrição do campo antes do 11º dígito do celular. */}
+            <p id="quiz-wa-hint" className="m-0 text-xs text-slate-500">
+                Opcional: digite o DDD e o número para enviar
             </p>
             <a
                 className="btn-whatsapp btn-specialist quiz-wa-skip"
