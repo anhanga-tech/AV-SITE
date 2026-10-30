@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import handler, { buildGeminiErrorResponse } from '../api/generate.ts';
+import { resetErrorTrackerForTests, setErrorTrackerForTests } from '../lib/error-tracking.ts';
 import { buildCorsHeaders } from '../lib/network.ts';
 
 const originalEnv = {
@@ -281,4 +282,71 @@ test('buildGeminiErrorResponse maps unknown errors (no status) to GEMINI_INTERNA
 
     assert.equal(response.status, 500);
     assert.equal(body.code, 'GEMINI_INTERNAL_ERROR');
+});
+
+test('buildGeminiErrorResponse maps Gemini 402 billing exhaustion to GEMINI_BILLING_ERROR', async () => {
+    const corsHeaders = buildCorsHeaders();
+    const captured: Array<{ error: unknown; context?: { tags?: Record<string, string>; extra?: { message?: string } } }> = [];
+    setErrorTrackerForTests((error, context) => {
+        captured.push({ error, context });
+    });
+
+    try {
+        const upstream = new Error(JSON.stringify({
+            error: {
+                code: 402,
+                message: 'prepayment credits are depleted',
+                status: 'RESOURCE_EXHAUSTED',
+            },
+        }));
+        upstream.name = 'ApiError';
+        (upstream as Error & { status: number }).status = 402;
+
+        const response = buildGeminiErrorResponse(upstream, corsHeaders);
+        const body = await response.json() as { code: string; error: string };
+
+        assert.equal(response.status, 503);
+        assert.equal(body.code, 'GEMINI_BILLING_ERROR');
+        assert.match(body.error, /indisponível/i);
+        assert.doesNotMatch(body.error, /prepayment|RESOURCE_EXHAUSTED|depleted/i);
+
+        assert.equal(captured.length, 1);
+        assert.equal((captured[0]?.error as Error).message, 'Gemini billing credits exhausted');
+        assert.equal(captured[0]?.context?.extra?.message, 'Gemini billing credits exhausted');
+        assert.equal(captured[0]?.context?.tags?.gemini_error_code, 'GEMINI_BILLING_ERROR');
+        assert.equal(captured[0]?.context?.tags?.upstream_status, '402');
+        assert.doesNotMatch((captured[0]?.error as Error).message, /prepayment|RESOURCE_EXHAUSTED/);
+    } finally {
+        resetErrorTrackerForTests();
+    }
+});
+
+test('buildGeminiErrorResponse maps a billing JSON body without a numeric status to GEMINI_BILLING_ERROR', async () => {
+    const corsHeaders = buildCorsHeaders();
+    const response = buildGeminiErrorResponse({
+        message: JSON.stringify({
+            error: {
+                code: 402,
+                message: 'prepayment credits are depleted',
+                status: 'RESOURCE_EXHAUSTED',
+            },
+        }),
+    }, corsHeaders);
+    const body = await response.json() as { code: string; error: string };
+
+    assert.equal(response.status, 503);
+    assert.equal(body.code, 'GEMINI_BILLING_ERROR');
+    assert.doesNotMatch(body.error, /prepayment|RESOURCE_EXHAUSTED/i);
+});
+
+test('buildGeminiErrorResponse keeps RESOURCE_EXHAUSTED rate limits as GEMINI_RATE_LIMIT', async () => {
+    const corsHeaders = buildCorsHeaders();
+    const response = buildGeminiErrorResponse({
+        status: 429,
+        message: 'RESOURCE_EXHAUSTED',
+    }, corsHeaders);
+    const body = await response.json() as { code: string };
+
+    assert.equal(response.status, 429);
+    assert.equal(body.code, 'GEMINI_RATE_LIMIT');
 });

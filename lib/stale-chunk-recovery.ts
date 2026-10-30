@@ -18,11 +18,64 @@ export function isStaleChunkErrorMessage(message: string | null | undefined): bo
 }
 
 // Sentry tag set on the deliberate report below. lib/sentry-client.ts's
-// beforeSend checks for it and lets the event through unconditionally,
+// beforeSend checks for it and lets a real browser's event through
 // *before* running isStaleChunkMessage — the report's own Error necessarily
 // still mentions the original stale-chunk wording (for a readable message),
 // so the ordinary message-pattern filter would otherwise self-filter this
-// exact signal right back out.
+// exact signal right back out. Known crawlers are dropped instead: they
+// request superseded hashed assets after every deploy and are not a person
+// stuck on a broken build.
+// Named fetchers only. A bare "bot" also matches phone brands such as CUBOT
+// in a real browser's user agent.
+const KNOWN_CRAWLER_UA_PATTERN = new RegExp(
+    [
+        'meta-webindexer',
+        'facebookexternalhit',
+        'Facebot',
+        'facebookcatalog',
+        'meta-external(?:agent|fetcher)',
+        'Googlebot',
+        'Google-InspectionTool',
+        'GoogleOther',
+        'AdsBot-Google',
+        'Mediapartners-Google',
+        'Storebot-Google',
+        'bingbot',
+        'BingPreview',
+        'Applebot',
+        'DuckDuckBot',
+        'YandexBot',
+        'Baiduspider',
+        'Bytespider',
+        'PetalBot',
+        'Amazonbot',
+        'AhrefsBot',
+        'SemrushBot',
+        'DotBot',
+        'Twitterbot',
+        'LinkedInBot',
+        'Pinterestbot',
+        'Slackbot',
+        'Discordbot',
+        'TelegramBot',
+        'Slurp',
+        'ia_archiver',
+    ].join('|'),
+    'i',
+);
+
+export function isKnownCrawlerUserAgent(userAgent: string | null | undefined): boolean {
+    return !!userAgent && KNOWN_CRAWLER_UA_PATTERN.test(userAgent);
+}
+
+function currentUserAgent(): string {
+    try {
+        if (typeof navigator === 'undefined') return '';
+        return typeof navigator.userAgent === 'string' ? navigator.userAgent : '';
+    } catch {
+        return '';
+    }
+}
 export const STALE_CHUNK_EXHAUSTED_TAG_KEY = 'stale_chunk_exhausted';
 export const STALE_CHUNK_EXHAUSTED_TAG_VALUE = 'true';
 
@@ -87,10 +140,14 @@ const handledKeysThisPageLoad = new Set<string>();
 // or observe Vite's own re-thrown error either.
 //
 // Tagged with STALE_CHUNK_EXHAUSTED_TAG_KEY so lib/sentry-client.ts's
-// beforeSend lets it through unconditionally — its message necessarily still
-// contains the original stale-chunk wording, which the ordinary
-// message-pattern filter would otherwise drop right back out.
+// beforeSend lets a real browser's report through — its message necessarily
+// still contains the original stale-chunk wording, which the ordinary
+// message-pattern filter would otherwise drop right back out. Crawlers are
+// skipped here and again in beforeSend (the event's own user agent), so a
+// bot that exhausts the one-reload budget never opens a Sentry issue.
 function reportUnrecoveredStaleChunk(message: string | null | undefined): void {
+    if (isKnownCrawlerUserAgent(currentUserAgent())) return;
+
     const originalMessage = message || 'Unknown stale-chunk failure (no message, or sessionStorage unavailable)';
 
     captureLoggerError(

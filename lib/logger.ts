@@ -42,8 +42,8 @@ export const logger = {
         writeLog('warn', '[warn]', message, data);
     },
 
-    error(message: string, data?: LoggerData): void {
-        captureLoggerError(message, data);
+    error(message: string, data?: LoggerData, tags?: Record<string, string>): void {
+        captureLoggerError(message, data, tags);
         writeLog('error', '[error]', message, data);
     },
 };
