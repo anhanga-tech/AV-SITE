@@ -247,6 +247,37 @@ test('logger.error captura erros no error tracker registrado', () => {
     }
 });
 
+test('logger.error encaminha tags ao error tracker sem colocá-las no console', () => {
+    const error = captureConsole('error');
+    const captured: Array<{ error: unknown; context?: ErrorCaptureContext }> = [];
+
+    try {
+        setErrorTrackerForTests((capturedError, context) => {
+            captured.push({ error: capturedError, context });
+        });
+
+        const cause = new Error('Gemini billing credits exhausted');
+        logger.error('Gemini billing credits exhausted', cause, {
+            gemini_error_code: 'GEMINI_BILLING_ERROR',
+            upstream_status: '402',
+        });
+
+        assert.equal(captured.length, 1);
+        assert.equal(captured[0]?.error, cause);
+        assert.deepEqual(captured[0]?.context, {
+            extra: { message: 'Gemini billing credits exhausted' },
+            tags: {
+                gemini_error_code: 'GEMINI_BILLING_ERROR',
+                upstream_status: '402',
+            },
+        });
+        assert.deepEqual(error.calls[0], ['[error]', 'Gemini billing credits exhausted', cause]);
+    } finally {
+        resetErrorTrackerForTests();
+        error.restore();
+    }
+});
+
 test('logger.error omite captura externa sem tracker registrado e mascara PII obvia no contexto', () => {
     const error = captureConsole('error');
     const captured: Array<{ error: unknown; context?: ErrorCaptureContext }> = [];

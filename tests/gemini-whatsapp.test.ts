@@ -163,6 +163,28 @@ test('chatbot should show non-clickable fallback when server returns 500', async
     assert.doesNotMatch(response.text || '', /wa\.me/i);
 });
 
+test('chatbot explains a Gemini billing outage in PT-BR without leaking the upstream reason', async (t) => {
+    t.after(() => {
+        global.fetch = originalFetch;
+    });
+
+    global.fetch = async () => new Response(
+        JSON.stringify({
+            code: 'GEMINI_BILLING_ERROR',
+            error: 'Serviço de IA temporariamente indisponível',
+        }),
+        { status: 503, headers: { 'Content-Type': 'application/json' } },
+    );
+
+    const response = await getTravelAdvice([{ role: 'user', text: 'teste' }]);
+    const text = response.text || '';
+
+    assert.match(text, /O chat está fora do ar por alguns instantes/);
+    assert.match(text, /fale com a gente no WhatsApp/i);
+    assert.doesNotMatch(text, /prepayment|crédito|billing|RESOURCE_EXHAUSTED|indisponível no servidor/i);
+    assert.doesNotMatch(text, /\p{Extended_Pictographic}/u);
+});
+
 test('chatbot should explain config error without clickable WhatsApp CTA when server config is broken', async (t) => {
     t.after(() => {
         global.fetch = originalFetch;
@@ -210,6 +232,8 @@ test('chatbot error fallbacks should use brand voice without emoji', async (t) =
     const scenarios: Array<() => Promise<Response>> = [
         async () => new Response(JSON.stringify({ code: 'RATE_LIMITED', retryAfter: 30 }), { status: 429, headers: { 'Content-Type': 'application/json' } }),
         async () => new Response(JSON.stringify({ code: 'UNAVAILABLE' }), { status: 503, headers: { 'Content-Type': 'application/json' } }),
+        async () => new Response(JSON.stringify({ code: 'GEMINI_BILLING_ERROR', error: 'Serviço de IA temporariamente indisponível' }), { status: 503, headers: { 'Content-Type': 'application/json' } }),
+        async () => new Response(JSON.stringify({ code: 'GEMINI_BILLING_ERROR', error: 'Serviço de IA temporariamente indisponível' }), { status: 402, headers: { 'Content-Type': 'application/json' } }),
         async () => new Response(JSON.stringify({ code: 'SERVER_CONFIG_ERROR' }), { status: 500, headers: { 'Content-Type': 'application/json' } }),
         async () => new Response(JSON.stringify({ code: 'GEMINI_INTERNAL_ERROR' }), { status: 500, headers: { 'Content-Type': 'application/json' } }),
         async () => { throw new TypeError('Failed to fetch'); },

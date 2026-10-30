@@ -24,7 +24,7 @@ import {
     setCurrentClient,
     startSpan,
 } from '@sentry/react';
-import { STALE_CHUNK_EXHAUSTED_TAG_KEY, STALE_CHUNK_EXHAUSTED_TAG_VALUE } from '../lib/stale-chunk-recovery';
+import { isKnownCrawlerUserAgent, STALE_CHUNK_EXHAUSTED_TAG_KEY, STALE_CHUNK_EXHAUSTED_TAG_VALUE } from '../lib/stale-chunk-recovery';
 import type { ErrorEvent as SentryErrorEvent } from '@sentry/react';
 
 type SentryLog = Parameters<typeof sentryBeforeSendLog>[0];
@@ -111,6 +111,49 @@ test('sentryBeforeSend drops an ordinary (untagged) stale-chunk exception', () =
     assert.equal(sentryBeforeSend(event), null);
 });
 
+test('isKnownCrawlerUserAgent matches indexers and not real browsers or phone brands', () => {
+    const crawlers = [
+        'meta-webindexer/1.1',
+        'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)',
+        'Mozilla/5.0 (compatible; Googlebot/2.1; +https://www.google.com/bot.html)',
+        'Mozilla/5.0 (compatible; bingbot/2.0; +https://www.bing.com/bingbot.htm)',
+        'Mozilla/5.0 (compatible; Applebot/0.1; +http://www.apple.com/go/applebot)',
+    ];
+    const people = [
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:158.0) Gecko/20100101 Firefox/158.0',
+        'Mozilla/5.0 (Linux; Android 10; CUBOT KINGKONG) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36',
+        '',
+    ];
+
+    for (const userAgent of crawlers) {
+        assert.equal(isKnownCrawlerUserAgent(userAgent), true, userAgent);
+    }
+    for (const userAgent of people) {
+        assert.equal(isKnownCrawlerUserAgent(userAgent), false, userAgent);
+    }
+    assert.equal(isKnownCrawlerUserAgent(undefined), false);
+});
+
+function exhaustedStaleChunkEvent(overrides: {
+    headers?: Record<string, string>;
+    tags?: Record<string, string>;
+    browserName?: string;
+} = {}): SentryErrorEvent {
+    return {
+        type: undefined,
+        tags: {
+            [STALE_CHUNK_EXHAUSTED_TAG_KEY]: STALE_CHUNK_EXHAUSTED_TAG_VALUE,
+            ...overrides.tags,
+        },
+        request: overrides.headers ? { headers: overrides.headers } : undefined,
+        contexts: overrides.browserName ? { browser: { name: overrides.browserName } } : undefined,
+        exception: {
+            values: [{ value: `Stale-chunk reload did not recover the app: ${STALE_ASSET_MESSAGE}` }],
+        },
+    } as SentryErrorEvent;
+}
+
 test('sentryBeforeSend lets a tagged exhausted-budget report through even though its message still matches the stale-chunk pattern', () => {
     // Mirrors exactly what reportUnrecoveredStaleChunk (lib/stale-chunk-recovery.ts)
     // produces: an Error whose message embeds the original stale-chunk wording
@@ -128,6 +171,41 @@ test('sentryBeforeSend lets a tagged exhausted-budget report through even though
     } as SentryErrorEvent;
 
     assert.equal(sentryBeforeSend(event), event);
+});
+
+test('sentryBeforeSend drops exhausted stale-chunk reports from known crawlers and keeps real browsers', () => {
+    const crawlerCases = [
+        exhaustedStaleChunkEvent({ headers: { 'User-Agent': 'meta-webindexer/1.1' } }),
+        exhaustedStaleChunkEvent({ headers: { 'user-agent': 'facebookexternalhit/1.1' } }),
+        exhaustedStaleChunkEvent({
+            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +https://www.google.com/bot.html)' },
+        }),
+        exhaustedStaleChunkEvent({
+            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; bingbot/2.0; +https://www.bing.com/bingbot.htm)' },
+        }),
+        exhaustedStaleChunkEvent({ tags: { browser: 'meta-webindexer 1.1', 'browser.name': 'meta-webindexer' } }),
+        exhaustedStaleChunkEvent({ browserName: 'Googlebot' }),
+    ];
+
+    for (const event of crawlerCases) {
+        assert.equal(sentryBeforeSend(event), null);
+    }
+
+    const browser = exhaustedStaleChunkEvent({
+        headers: {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:158.0) Gecko/20100101 Firefox/158.0',
+        },
+        tags: { browser: 'Firefox 158.0', 'browser.name': 'Firefox' },
+        browserName: 'Firefox',
+    });
+    assert.equal(sentryBeforeSend(browser), browser);
+
+    const phoneBrand = exhaustedStaleChunkEvent({
+        headers: {
+            'User-Agent': 'Mozilla/5.0 (Linux; Android 10; CUBOT KINGKONG) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36',
+        },
+    });
+    assert.equal(sentryBeforeSend(phoneBrand), phoneBrand);
 });
 
 test('sentryBeforeSendLog drops stale-chunk console noise from the separate Logs pipeline', () => {
@@ -209,6 +287,65 @@ test('handleStaleChunkPreloadError reloads once for a failing asset, then report
         const context = reported[0].context as { tags?: Record<string, string> };
         assert.equal(context.tags?.[STALE_CHUNK_EXHAUSTED_TAG_KEY], STALE_CHUNK_EXHAUSTED_TAG_VALUE);
     } finally {
+        restoreWindow();
+        resetErrorTrackerForTests();
+    }
+});
+
+test('a real browser still reports once the stale-chunk reload budget is spent', async () => {
+    const { handleStaleChunkPreloadError, resetStaleChunkRecoveryForTests } = await import('../lib/stale-chunk-recovery');
+    resetStaleChunkRecoveryForTests();
+    const state = stubWindow();
+    const reported: unknown[] = [];
+    setErrorTrackerForTests((error) => { reported.push(error); });
+    const previousNavigator = globalThis.navigator;
+    Object.defineProperty(globalThis, 'navigator', {
+        configurable: true,
+        value: { userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:158.0) Gecko/20100101 Firefox/158.0' },
+    });
+
+    try {
+        handleStaleChunkPreloadError({ payload: new Error(STALE_ASSET_MESSAGE) });
+        resetStaleChunkRecoveryForTests();
+        handleStaleChunkPreloadError({ payload: new Error(STALE_ASSET_MESSAGE) });
+        assert.equal(state.reloadCalls, 1);
+        assert.equal(reported.length, 1);
+    } finally {
+        Object.defineProperty(globalThis, 'navigator', {
+            configurable: true,
+            value: previousNavigator,
+        });
+        restoreWindow();
+        resetErrorTrackerForTests();
+    }
+});
+
+test('a known crawler exhausts the stale-chunk reload budget without reporting to Sentry', async () => {
+    const { handleStaleChunkPreloadError, resetStaleChunkRecoveryForTests } = await import('../lib/stale-chunk-recovery');
+    resetStaleChunkRecoveryForTests();
+    const state = stubWindow();
+    const reported: unknown[] = [];
+    setErrorTrackerForTests((error) => { reported.push(error); });
+    const previousNavigator = globalThis.navigator;
+    Object.defineProperty(globalThis, 'navigator', {
+        configurable: true,
+        value: { userAgent: 'meta-webindexer/1.1' },
+    });
+
+    try {
+        handleStaleChunkPreloadError({ payload: new Error(STALE_ASSET_MESSAGE) });
+        assert.equal(state.reloadCalls, 1, 'crawlers still get the one reload that fetches the new build');
+        assert.equal(reported.length, 0);
+
+        resetStaleChunkRecoveryForTests();
+        handleStaleChunkPreloadError({ payload: new Error(STALE_ASSET_MESSAGE) });
+        assert.equal(state.reloadCalls, 1, 'must not reload again once the budget is spent');
+        assert.equal(reported.length, 0, 'must not report crawler exhaustion to Sentry');
+    } finally {
+        Object.defineProperty(globalThis, 'navigator', {
+            configurable: true,
+            value: previousNavigator,
+        });
         restoreWindow();
         resetErrorTrackerForTests();
     }

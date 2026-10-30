@@ -8,6 +8,7 @@ import {
     setErrorTracker,
 } from './error-tracking';
 import {
+    isKnownCrawlerUserAgent,
     isStaleChunkErrorMessage,
     STALE_CHUNK_EXHAUSTED_TAG_KEY,
     STALE_CHUNK_EXHAUSTED_TAG_VALUE,
@@ -48,6 +49,45 @@ export function sentryBeforeBreadcrumb(breadcrumb: Sentry.Breadcrumb): Sentry.Br
     return scrubBreadcrumbUrls(breadcrumb);
 }
 
+function pushString(target: string[], value: unknown): void {
+    if (typeof value === 'string' && value.length > 0) target.push(value);
+}
+
+// Signals Sentry may already have attached, plus the live navigator. Ingest
+// later copies the UA into tags like `browser` / `browser.name`; those tags
+// are checked too so a constructed event that only has them (the shape of a
+// stored issue) is classified the same way.
+function staleChunkUserAgentSignals(event: Sentry.ErrorEvent): string[] {
+    const signals: string[] = [];
+    const headers = event.request?.headers;
+
+    if (headers) {
+        for (const [name, value] of Object.entries(headers)) {
+            if (name.toLowerCase() === 'user-agent') pushString(signals, value);
+        }
+    }
+
+    pushString(signals, event.tags?.browser);
+    pushString(signals, event.tags?.['browser.name']);
+
+    const browser = event.contexts?.browser;
+    if (browser && typeof browser === 'object') {
+        pushString(signals, (browser as { name?: unknown }).name);
+    }
+
+    try {
+        if (typeof navigator !== 'undefined') pushString(signals, navigator.userAgent);
+    } catch {
+        // navigator can throw in locked-down embeds; the event signals above still apply.
+    }
+
+    return signals;
+}
+
+function isCrawlerStaleChunkExhaustion(event: Sentry.ErrorEvent): boolean {
+    return staleChunkUserAgentSignals(event).some((signal) => isKnownCrawlerUserAgent(signal));
+}
+
 // Exported standalone (rather than left inline in Sentry.init below) so it
 // can be exercised directly in tests against constructed event objects,
 // instead of only through a stubbed error tracker — a stubbed tracker can't
@@ -58,9 +98,15 @@ export function sentryBeforeSend(event: Sentry.ErrorEvent): Sentry.ErrorEvent | 
     // A deliberate report from lib/stale-chunk-recovery.ts once its reload
     // budget is exhausted — its message necessarily still contains the
     // stale-chunk wording (for readability), which isStaleChunkMessage below
-    // would otherwise drop right back out. Let it through unconditionally,
-    // before any other filter runs.
+    // would otherwise drop right back out. Let a real browser through before
+    // any other filter runs. Crawlers (meta-webindexer, Googlebot, …) exhaust
+    // that budget after every deploy without a person waiting on the page, so
+    // their exhaustion reports are dropped here even if recovery already
+    // captured one. The check uses the event's user agent and the live
+    // navigator, because Sentry's browser tags are often applied only after
+    // ingest.
     if (event.tags?.[STALE_CHUNK_EXHAUSTED_TAG_KEY] === STALE_CHUNK_EXHAUSTED_TAG_VALUE) {
+        if (isCrawlerStaleChunkExhaustion(event)) return null;
         return event;
     }
 
