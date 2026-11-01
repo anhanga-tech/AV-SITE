@@ -53,3 +53,15 @@ test('CTA da banda de WhatsApp é um link wa.me, não um botão sem destino', as
   assert.ok(band, 'banda de WhatsApp deve renderizar um <a>');
   assert.match(band[0], /href="https:\/\/wa\.me\//);
 });
+
+test('links do bloco de contato têm alvo de toque de 44px', () => {
+  const html = renderToStaticMarkup(React.createElement(OrlandoFooter));
+  const contactLinks = [...html.matchAll(/<a[^>]*href="(tel:[^"]*|https:\/\/wa\.me[^"]*|https:\/\/cadastur[^"]*)"[^>]*>/g)];
+
+  assert.ok(contactLinks.length >= 3);
+  for (const [tag] of contactLinks) {
+    // O link de WhatsApp do bloco "Siga-nos" do OrlandoFooter tem regra própria no orlando.css.
+    if (tag.includes('footer-whatsapp-orlando')) continue;
+    assert.match(tag, /\bmin-h-11\b/, tag);
+  }
+});

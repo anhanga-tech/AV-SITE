@@ -26,11 +26,15 @@ interface LandingContactLinksProps {
 const DEFAULT_LINK_CLASS =
     'underline underline-offset-2 hover:opacity-100 transition-opacity focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action rounded-sm';
 
+// Alvo de toque de 44px do PRODUCT.md: fica fora de `linkClassName` para que um
+// rodapé que troque o estilo visual não perca a área de toque junto.
+const TOUCH_TARGET_CLASS = 'inline-flex min-h-11 items-center';
+
 export function LandingContactLinks({ source, className = '', linkClassName = DEFAULT_LINK_CLASS }: LandingContactLinksProps) {
     return (
-        <div className={`flex flex-col items-center gap-1 text-xs ${className}`}>
-            <p className="flex flex-wrap justify-center gap-x-3 gap-y-1">
-                <a href={LANDING_PHONE_HREF} className={linkClassName}>
+        <div className={`flex flex-col items-center text-xs ${className}`}>
+            <p className="flex flex-wrap justify-center gap-x-4">
+                <a href={LANDING_PHONE_HREF} className={`${TOUCH_TARGET_CLASS} ${linkClassName}`}>
                     {LANDING_PHONE_LABEL}
                 </a>
                 <a
@@ -41,16 +45,16 @@ export function LandingContactLinks({ source, className = '', linkClassName = DE
                         event.preventDefault();
                         openContactModal({ source });
                     }}
-                    className={`btn-whatsapp btn-specialist ${linkClassName}`}
+                    className={`btn-whatsapp btn-specialist ${TOUCH_TARGET_CLASS} ${linkClassName}`}
                     data-contact-intent
                     data-tracking={`footer-contact-whatsapp-${source}`}
                 >
                     WhatsApp
                 </a>
             </p>
-            <p>
+            <p className="flex flex-wrap items-center justify-center gap-x-1">
                 ANHANGA TURISMO LTDA • CNPJ/Cadastur:{' '}
-                <a href={CADASTUR_URL} target="_blank" rel="noopener noreferrer" className={linkClassName}>
+                <a href={CADASTUR_URL} target="_blank" rel="noopener noreferrer" className={`${TOUCH_TARGET_CLASS} ${linkClassName}`}>
                     37.036.732/0001-41<span className="sr-only"> (abre em nova aba)</span>
                 </a>
             </p>
