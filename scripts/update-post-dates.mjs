@@ -54,7 +54,6 @@ if (files.length === 0) {
   process.exit(0);
 }
 
-let updated = false;
 
 for (const file of files) {
   const content = readFileSync(file, 'utf8');
@@ -90,7 +89,6 @@ for (const file of files) {
 
   writeFileSync(file, newContent, 'utf8');
   console.log(`✓ dateModified → ${today}  (${file})`);
-  updated = true;
 
   if (!processAll) {
     // No modo hook, re-adiciona o arquivo ao stage após a edição
@@ -98,10 +96,11 @@ for (const file of files) {
   }
 }
 
-if (updated || processAll) {
-  run('node', ['--experimental-strip-types', 'scripts/generate-blog-manifest.ts'], { stdio: 'inherit' });
+// Regenera os manifests para qualquer MDX staged, não só quando a data mudou:
+// mudança só de frontmatter (título, crédito de imagem) também muda o manifest,
+// e pular o bump não pode deixar o artefato commitado desatualizado.
+run('node', ['--experimental-strip-types', 'scripts/generate-blog-manifest.ts'], { stdio: 'inherit' });
 
-  if (!processAll) {
-    run('git', ['add', 'data/blogManifest.ts', 'data/blogManifestHomeTeaser.ts']);
-  }
+if (!processAll) {
+  run('git', ['add', 'data/blogManifest.ts', 'data/blogManifestHomeTeaser.ts', 'data/blogMarkdown.ts']);
 }

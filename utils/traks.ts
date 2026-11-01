@@ -68,6 +68,11 @@ export function installTraksWhatsAppClickListener(): void {
         // `auxclick` só interessa no botão do meio (open in new tab); right-click
         // também dispara auxclick mas não navega — não é conversão.
         if (event.type === 'auxclick' && event.button !== 1) return;
+        // CTA com href wa.me de fallback cujo onClick faz preventDefault e abre o
+        // ContactModal (landings, /links): o clique não chegou ao WhatsApp. O handoff
+        // real conta depois, via trackTraksWhatsAppHandoff — contar aqui duplicaria.
+        // O React 19 escuta no #root, abaixo do document, então já marcou o evento.
+        if (event.defaultPrevented) return;
         const target = event.target as { closest?: unknown } | null;
         if (!target || typeof target.closest !== 'function') return;
         const anchor = target.closest('a[href]') as { getAttribute?: (name: string) => string | null } | null;
