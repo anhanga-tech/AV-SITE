@@ -1,5 +1,5 @@
-import { getWhatsAppLink } from '@/utils/whatsapp';
 import { openContactModal } from '@/utils/contactForm';
+import { CADASTUR_URL, LANDING_PHONE_HREF, LANDING_PHONE_LABEL, landingWhatsAppHref } from './landing-contact';
 
 /*
   Bloco de confiança dos rodapés de landing (auditoria 01/11/2026, #1969): as landings
@@ -9,13 +9,6 @@ import { openContactModal } from '@/utils/contactForm';
   O WhatsApp é um <a href="wa.me"> de verdade: sem JS (ou antes da hidratação) ele
   navega; com JS o clique abre o modal de contato, que qualifica o lead antes do chat.
 */
-
-export const LANDING_PHONE_HREF = 'tel:+551152833309';
-export const LANDING_PHONE_LABEL = '(11) 5283-3309';
-export const CADASTUR_URL = 'https://cadastur.turismo.gov.br/hotsite/';
-export const LANDING_WHATSAPP_MESSAGE = 'Olá! Vim pelo site da Anhangá e quero falar com um consultor.';
-
-export const landingWhatsAppHref = (): string => getWhatsAppLink(LANDING_WHATSAPP_MESSAGE);
 
 interface LandingContactLinksProps {
     source: string;

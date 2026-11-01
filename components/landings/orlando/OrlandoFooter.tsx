@@ -6,7 +6,8 @@
 import { useFooterRuntimeMetadata } from "../../../lib/footer-runtime";
 import { BRAND_LOGO_BLUE_URL } from "../../../lib/media-assets";
 import { openContactModal } from "../../../utils/contactForm";
-import { LandingContactLinks, landingWhatsAppHref } from "../shared/LandingContactLinks";
+import { LandingContactLinks } from "../shared/LandingContactLinks";
+import { landingWhatsAppHref } from "../shared/landing-contact";
 
 const LOGO_URL = BRAND_LOGO_BLUE_URL;
 

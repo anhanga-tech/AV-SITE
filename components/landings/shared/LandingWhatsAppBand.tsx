@@ -1,6 +1,6 @@
 import { AirplaneTilt, WhatsappLogo } from '@phosphor-icons/react';
 import { openContactModal } from '@/utils/contactForm';
-import { landingWhatsAppHref } from './LandingContactLinks';
+import { landingWhatsAppHref } from './landing-contact';
 
 interface LandingWhatsAppBandProps {
     source: string;
