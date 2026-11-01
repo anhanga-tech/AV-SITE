@@ -50,7 +50,7 @@ test('About FAQ dá presença ao segmento Corporativo/Eventos (PRODUCT.md)', asy
 
 test('CtaSection da /sobre sinaliza o atendimento corporativo', async () => {
   const source = await readRepoFile('components/about/CtaSection.tsx');
-  assert.match(source, /to="\/corporativo"/, 'CtaSection não linka para /corporativo');
+  assert.match(source, /to="\/corporativo\/"/, 'CtaSection não linka para /corporativo/');
   assert.match(source, /corporativa ou em grupo/i, 'CtaSection não menciona viagem corporativa/em grupo');
 });
 
