@@ -18,35 +18,35 @@ const AI_ASSISTANTS: readonly AIAssistant[] = [
   {
     id: 'chatgpt',
     name: 'ChatGPT',
-    logoUrl: 'https://api.iconify.design/logos:openai-icon.svg',
+    logoUrl: 'https://api.iconify.design/logos/openai-icon.svg',
     baseUrl: 'https://chatgpt.com/',
     queryParameter: 'q',
   },
   {
     id: 'gemini',
     name: 'Gemini',
-    logoUrl: 'https://api.iconify.design/simple-icons:googlegemini.svg',
+    logoUrl: 'https://api.iconify.design/simple-icons/googlegemini.svg',
     baseUrl: 'https://www.google.com/search?udm=50&source=searchlabs',
     queryParameter: 'q',
   },
   {
     id: 'claude',
     name: 'Claude',
-    logoUrl: 'https://api.iconify.design/simple-icons:claude.svg',
+    logoUrl: 'https://api.iconify.design/simple-icons/claude.svg',
     baseUrl: 'https://claude.ai/new',
     queryParameter: 'q',
   },
   {
     id: 'perplexity',
     name: 'Perplexity',
-    logoUrl: 'https://api.iconify.design/simple-icons:perplexity.svg',
+    logoUrl: 'https://api.iconify.design/simple-icons/perplexity.svg',
     baseUrl: 'https://www.perplexity.ai/search/new',
     queryParameter: 'q',
   },
   {
     id: 'grok',
     name: 'Grok',
-    logoUrl: 'https://api.iconify.design/logos:grok-icon.svg',
+    logoUrl: 'https://api.iconify.design/logos/grok-icon.svg',
     baseUrl: 'https://grok.com/',
     queryParameter: 'q',
   },
@@ -64,7 +64,7 @@ const AIResearchBar: React.FC = () => {
     <div
       role="group"
       aria-label="Pesquisar sobre a Anhangá com uma IA"
-      className="mt-8 w-full max-w-3xl"
+      className="mt-8 w-full max-w-3xl min-h-[5.5rem]"
     >
       <p className="mb-3 text-sm font-medium text-white/75">
         Quer pesquisar antes de conversar? Pergunte sobre a Anhangá:
