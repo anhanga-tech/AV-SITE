@@ -7,6 +7,7 @@
 
 import { spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
+import { shouldBumpDateModified } from './post-date-diff.mjs';
 
 const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
 
@@ -17,6 +18,20 @@ function run(cmd, args, opts = {}) {
   const result = spawnSync(cmd, args, { encoding: 'utf8', ...opts });
   if (result.error) throw result.error;
   return result.stdout ?? '';
+}
+
+// `rev` é `HEAD` ou `` (índice/stage). Devolve `null` se o arquivo não existe nessa revisão.
+function readGitVersion(rev, file) {
+  const result = spawnSync('git', ['show', `${rev}:${file}`], { encoding: 'utf8' });
+  if (result.error) throw result.error;
+  return result.status === 0 ? result.stdout : null;
+}
+
+// Compara o que vai para o commit (stage), não a árvore de trabalho com edições não staged.
+function bodyChangedInCommit(file) {
+  const staged = readGitVersion('', file);
+  if (staged === null) return true;
+  return shouldBumpDateModified(readGitVersion('HEAD', file), staged);
 }
 
 function getStagedMdxFiles() {
@@ -43,6 +58,9 @@ let updated = false;
 
 for (const file of files) {
   const content = readFileSync(file, 'utf8');
+
+  // No modo hook, só o corpo conta como atualização; o --all segue forçando o bump.
+  if (!processAll && !bodyChangedInCommit(file)) continue;
 
   // Extrai a data de publicação original
   const dateMatch = content.match(/^date:\s*["']?(\d{4}-\d{2}-\d{2})["']?/m);
