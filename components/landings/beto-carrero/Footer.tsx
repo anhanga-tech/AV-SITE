@@ -2,6 +2,7 @@ import React from 'react';
 import { getBetoAssetUrl } from './assetPath';
 import { useFooterRuntimeMetadata } from '../../../lib/footer-runtime';
 import { triggerResetBanner } from '@/lib/consent';
+import { LandingContactLinks } from '../shared/LandingContactLinks';
 
 const Footer: React.FC = () => {
   const runtimeMetadata = useFooterRuntimeMetadata();
@@ -30,6 +31,8 @@ const Footer: React.FC = () => {
           Levando alegria sem burocracia para suas férias.
         </p>
         
+        <LandingContactLinks source="beto-carrero" className="mb-6 opacity-80" />
+
         <p className="text-sm opacity-40">
           &copy; {runtimeMetadata ? `${runtimeMetadata.currentYear} ` : ''}Anhangá Viagens. Todos os direitos reservados.
         </p>

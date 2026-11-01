@@ -69,7 +69,7 @@ const CorporativoLanding: React.FC = () => {
                         </div>
                     </div>
                 </nav>
-                <CorpFooter />
+                <CorpFooter source="corporativo" />
             </div>
             </MotionConfig>
         </>

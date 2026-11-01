@@ -2,6 +2,7 @@ import React from 'react';
 import { useFooterRuntimeMetadata } from '../../../lib/footer-runtime';
 import { BRAND_LOGO_WHITE_URL } from '../../../lib/media-assets';
 import { triggerResetBanner } from '@/lib/consent';
+import { LandingContactLinks } from '../shared/LandingContactLinks';
 
 const Footer: React.FC = () => {
   const logoUrl = BRAND_LOGO_WHITE_URL;
@@ -29,6 +30,7 @@ const Footer: React.FC = () => {
             <br className="md:hidden" />
             Pacotes de viagem para eventos e festivais.
           </p>
+          <LandingContactLinks source="lollapalooza" className="mt-4 md:items-start" />
           <p className="mt-4 text-xs opacity-50">
             Nota: Este site comercializa pacotes de viagem (hospedagem, transporte e turismo). Ingressos para o evento não estão inclusos no pacote base.
           </p>

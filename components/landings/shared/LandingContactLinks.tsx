@@ -1,0 +1,59 @@
+import { getWhatsAppLink } from '@/utils/whatsapp';
+import { openContactModal } from '@/utils/contactForm';
+
+/*
+  Bloco de confiança dos rodapés de landing (auditoria 01/11/2026, #1969): as landings
+  não têm o Footer do site principal, então ficavam sem telefone, sem WhatsApp navegável
+  e sem o Cadastur — sinais que o crawler e quem desconfia de agência online procuram.
+
+  O WhatsApp é um <a href="wa.me"> de verdade: sem JS (ou antes da hidratação) ele
+  navega; com JS o clique abre o modal de contato, que qualifica o lead antes do chat.
+*/
+
+export const LANDING_PHONE_HREF = 'tel:+551152833309';
+export const LANDING_PHONE_LABEL = '(11) 5283-3309';
+export const CADASTUR_URL = 'https://cadastur.turismo.gov.br/hotsite/';
+export const LANDING_WHATSAPP_MESSAGE = 'Olá! Vim pelo site da Anhangá e quero falar com um consultor.';
+
+export const landingWhatsAppHref = (): string => getWhatsAppLink(LANDING_WHATSAPP_MESSAGE);
+
+interface LandingContactLinksProps {
+    source: string;
+    className?: string;
+    linkClassName?: string;
+}
+
+const DEFAULT_LINK_CLASS =
+    'underline underline-offset-2 hover:opacity-100 transition-opacity focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action rounded-sm';
+
+export function LandingContactLinks({ source, className = '', linkClassName = DEFAULT_LINK_CLASS }: LandingContactLinksProps) {
+    return (
+        <div className={`flex flex-col items-center gap-1 text-xs ${className}`}>
+            <p className="flex flex-wrap justify-center gap-x-3 gap-y-1">
+                <a href={LANDING_PHONE_HREF} className={linkClassName}>
+                    {LANDING_PHONE_LABEL}
+                </a>
+                <a
+                    href={landingWhatsAppHref()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(event) => {
+                        event.preventDefault();
+                        openContactModal({ source });
+                    }}
+                    className={`btn-whatsapp btn-specialist ${linkClassName}`}
+                    data-contact-intent
+                    data-tracking={`footer-contact-whatsapp-${source}`}
+                >
+                    WhatsApp
+                </a>
+            </p>
+            <p>
+                ANHANGA TURISMO LTDA • CNPJ/Cadastur:{' '}
+                <a href={CADASTUR_URL} target="_blank" rel="noopener noreferrer" className={linkClassName}>
+                    37.036.732/0001-41<span className="sr-only"> (abre em nova aba)</span>
+                </a>
+            </p>
+        </div>
+    );
+}

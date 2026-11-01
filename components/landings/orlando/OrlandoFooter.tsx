@@ -6,6 +6,7 @@
 import { useFooterRuntimeMetadata } from "../../../lib/footer-runtime";
 import { BRAND_LOGO_BLUE_URL } from "../../../lib/media-assets";
 import { openContactModal } from "../../../utils/contactForm";
+import { LandingContactLinks, landingWhatsAppHref } from "../shared/LandingContactLinks";
 
 const LOGO_URL = BRAND_LOGO_BLUE_URL;
 
@@ -45,8 +46,10 @@ export function OrlandoFooter() {
             >
               Facebook
             </a>
-            <button
-              type="button"
+            <a
+              href={landingWhatsAppHref()}
+              target="_blank"
+              rel="noopener noreferrer"
               onClick={(e) => {
                 e.preventDefault();
                 openContactModal({ source: 'orlando', destination: 'Orlando' });
@@ -55,12 +58,13 @@ export function OrlandoFooter() {
               data-tracking="footer-whatsapp-orlando"
             >
               WhatsApp
-            </button>
+            </a>
           </div>
         </div>
       </div>
 
       <div className="footer-bottom">
+        <LandingContactLinks source="orlando" className="mb-4" />
         <p>
           &copy; {runtimeMetadata ? `${runtimeMetadata.currentYear} ` : ""}
           ANHANGÁ TURISMO - TODOS OS DIREITOS RESERVADOS.

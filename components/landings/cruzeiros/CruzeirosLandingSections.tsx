@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { fadeUp } from '@/components/landings/shared/constants';
 import type { CruiseOffer } from '@/data/cruiseOffers';
 import { openContactModal } from '@/utils/contactForm';
+import { LandingContactLinks } from '@/components/landings/shared/LandingContactLinks';
 import { FeaturedOffer, OfferCard } from './CruiseOfferCards';
 
 const VIEWPORT_REVEAL = { once: true, amount: 0.2, margin: '0px 0px 100% 0px' } as const;
@@ -432,6 +433,7 @@ export function CruiseLandingFooter(): React.ReactElement {
   return (
     <footer className="py-8 bg-anhanga-light border-t border-anhanga-blue/10 text-center text-sm text-zinc-600">
       <p>Anhangá Viagens · Agência de viagens de São Paulo para todo o Brasil</p>
+      <LandingContactLinks source="cruzeiros" className="mt-3" />
     </footer>
   );
 }
