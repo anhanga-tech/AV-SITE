@@ -164,7 +164,7 @@ test('o hub emite um ItemList com os destinos comparáveis', async () => {
       description: park.claim,
       city: park.city,
       state: park.state,
-      url: park.href ? `https://www.anhanga.tur.br${park.href}/` : undefined,
+      url: park.href ? `https://www.anhanga.tur.br${park.href}` : undefined,
     })),
   );
 });
@@ -229,5 +229,11 @@ test('o FAQ não promete credenciamento nos parques aquáticos', () => {
       /não temos credenciamento/.test(sentenceWithPark),
       `a frase que cita ${name} precisa deixar claro que não há credenciamento`,
     );
+  }
+});
+
+test('links internos do hub já terminam em barra (sem 308 no crawl)', () => {
+  for (const park of PARKS.filter((item) => item.href)) {
+    assert.match(park.href as string, /\/$/, `${park.name}: ${park.href}`);
   }
 });
