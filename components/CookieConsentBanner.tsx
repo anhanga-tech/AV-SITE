@@ -69,7 +69,10 @@ const CookieConsentBanner: React.FC = () => {
       className="fixed bottom-0 left-0 right-0 z-[10000] m-0 w-full max-w-none border-0 p-0 bg-anhanga-dark border-t border-white/10 shadow-lg"
     >
       <div className="container mx-auto px-4 py-2.5 sm:px-6 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
-        <p className="text-xs sm:text-sm text-zinc-300 leading-snug sm:leading-relaxed max-w-2xl">
+        {/* min-h-[4lh] no mobile: com a fonte de fallback o texto cabia em 3 linhas entre
+            390 e 640px e passava a 4 quando a Poppins chegava — o banner crescia ~16px e o
+            Lighthouse contava como layout shift (#1969). Só reserva espaço; copy intacta. */}
+        <p className="min-h-[4lh] sm:min-h-0 text-xs sm:text-sm text-zinc-300 leading-snug sm:leading-relaxed max-w-2xl">
           Usamos cookies de marketing para te mostrar ofertas de viagem mais relevantes.
           Analytics continua ativo por interesse legítimo {'—'}{' '}
           <a
