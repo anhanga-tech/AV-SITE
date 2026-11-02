@@ -7,6 +7,7 @@
 
 import { spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
+import { blogSourcesOutsideStage, shouldBumpDateModified } from './post-date-diff.mjs';
 
 const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
 
@@ -17,6 +18,20 @@ function run(cmd, args, opts = {}) {
   const result = spawnSync(cmd, args, { encoding: 'utf8', ...opts });
   if (result.error) throw result.error;
   return result.stdout ?? '';
+}
+
+// `rev` é `HEAD` ou `` (índice/stage). Devolve `null` se o arquivo não existe nessa revisão.
+function readGitVersion(rev, file) {
+  const result = spawnSync('git', ['show', `${rev}:${file}`], { encoding: 'utf8' });
+  if (result.error) throw result.error;
+  return result.status === 0 ? result.stdout : null;
+}
+
+// Compara o que vai para o commit (stage), não a árvore de trabalho com edições não staged.
+function bodyChangedInCommit(file) {
+  const staged = readGitVersion('', file);
+  if (staged === null) return true;
+  return shouldBumpDateModified(readGitVersion('HEAD', file), staged);
 }
 
 function getStagedMdxFiles() {
@@ -39,10 +54,27 @@ if (files.length === 0) {
   process.exit(0);
 }
 
-let updated = false;
+if (!processAll) {
+  const lines = (args) => run('git', args).trim().split('\n').filter(Boolean);
+  const outside = blogSourcesOutsideStage(
+    lines(['diff', '--name-only', '--', 'content/blog/']),
+    lines(['ls-files', '--others', '--exclude-standard', '--', 'content/blog/']),
+  );
+  if (outside.length > 0) {
+    // Não bloqueia o commit; só não toca em nada. Datas e manifests ficam para
+    // `pnpm update:dates` / o build depois que o stage estiver completo.
+    console.warn('⚠ dateModified e manifests do blog NÃO atualizados: posts com conteúdo fora do stage:');
+    for (const file of outside) console.warn(`  - ${file}`);
+    process.exit(0);
+  }
+}
+
 
 for (const file of files) {
   const content = readFileSync(file, 'utf8');
+
+  // No modo hook, só o corpo conta como atualização; o --all segue forçando o bump.
+  if (!processAll && !bodyChangedInCommit(file)) continue;
 
   // Extrai a data de publicação original
   const dateMatch = content.match(/^date:\s*["']?(\d{4}-\d{2}-\d{2})["']?/m);
@@ -72,7 +104,6 @@ for (const file of files) {
 
   writeFileSync(file, newContent, 'utf8');
   console.log(`✓ dateModified → ${today}  (${file})`);
-  updated = true;
 
   if (!processAll) {
     // No modo hook, re-adiciona o arquivo ao stage após a edição
@@ -80,10 +111,11 @@ for (const file of files) {
   }
 }
 
-if (updated || processAll) {
-  run('node', ['--experimental-strip-types', 'scripts/generate-blog-manifest.ts'], { stdio: 'inherit' });
+// Regenera os manifests para qualquer MDX staged, não só quando a data mudou:
+// mudança só de frontmatter (título, crédito de imagem) também muda o manifest,
+// e pular o bump não pode deixar o artefato commitado desatualizado.
+run('node', ['--experimental-strip-types', 'scripts/generate-blog-manifest.ts'], { stdio: 'inherit' });
 
-  if (!processAll) {
-    run('git', ['add', 'data/blogManifest.ts', 'data/blogManifestHomeTeaser.ts']);
-  }
+if (!processAll) {
+  run('git', ['add', 'data/blogManifest.ts', 'data/blogManifestHomeTeaser.ts', 'data/blogMarkdown.ts']);
 }

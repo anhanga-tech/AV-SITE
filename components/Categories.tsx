@@ -13,7 +13,7 @@ const POPULAR_DESTINATIONS = [
     tag: "Destino dos Sonhos",
     rotate: "-rotate-2",
     color: "bg-blue-100 text-blue-600",
-    link: "/orlando"
+    link: "/orlando/"
   },
   {
     title: "Beto Carrero",
@@ -22,7 +22,7 @@ const POPULAR_DESTINATIONS = [
     tag: "Radical",
     rotate: "rotate-3",
     color: "bg-yellow-100 text-yellow-700",
-    link: "/beto-carrero"
+    link: "/beto-carrero/"
   },
   {
     title: "Lollapalooza",
@@ -31,7 +31,7 @@ const POPULAR_DESTINATIONS = [
     tag: "Festival",
     rotate: "-rotate-1",
     color: "bg-emerald-100 text-emerald-600",
-    link: "/lollapalooza"
+    link: "/lollapalooza/"
   }
 ];
 

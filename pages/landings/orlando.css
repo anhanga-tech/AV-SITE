@@ -1481,6 +1481,12 @@
         flex-wrap: wrap;
         justify-content: center;
         gap: 0 1.25rem;
+        /* Com a Space Mono a nav sempre ocupa duas linhas de 44px aqui; com a fonte
+           de fallback (antes do swap) cabia numa só, e a troca empurrava o hero
+           inteiro 44px para baixo — o CLS de ~0,12 que o Lighthouse atribuía à
+           .sticker-gallery (auditoria 01/11/2026, #1969). */
+        min-height: 88px;
+        align-content: flex-start;
     }
 
     .landing-orlando header {

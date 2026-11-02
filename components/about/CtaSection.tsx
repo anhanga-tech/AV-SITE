@@ -35,7 +35,7 @@ export const CtaSection: React.FC = () => (
       </div>
       <p className="mt-6 text-sm text-zinc-500 font-medium">
         Viagem corporativa ou em grupo?{' '}
-        <Link to="/corporativo" className="text-anhanga-action font-bold hover:underline">
+        <Link to="/corporativo/" className="text-anhanga-action font-bold hover:underline">
           Conheça o atendimento para empresas
         </Link>
       </p>

@@ -1,8 +1,13 @@
 import { Link } from 'react-router-dom';
 import { BRAND_LOGO_BLUE_URL } from '@/lib/media-assets';
 import { triggerResetBanner } from '@/lib/consent';
+import { LandingContactLinks } from './LandingContactLinks';
 
-export function LandingFooter() {
+interface LandingFooterProps {
+    source?: string;
+}
+
+export function LandingFooter({ source = 'landing-footer' }: LandingFooterProps) {
     return (
         <footer className="bg-brand-dark text-zinc-300 py-10">
             <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
@@ -13,9 +18,7 @@ export function LandingFooter() {
                     height="62"
                     className="h-8 w-auto object-contain brightness-0 invert"
                 />
-                <p className="text-xs text-white/50 font-medium text-center">
-                    ANHANGA TURISMO LTDA • CNPJ 37.036.732/0001-41
-                </p>
+                <LandingContactLinks source={source} className="text-white/60 font-medium text-center" />
                 <Link
                     to="/"
                     className="text-xs text-white/50 hover:text-white transition-colors duration-150 font-medium underline underline-offset-2"

@@ -101,7 +101,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
           title="Dúvidas sobre consultoria de viagem"
           subtitle="Tire suas dúvidas sobre como funciona a consultoria personalizada da Anhangá."
         />
-        <LandingFooter />
+        <LandingFooter source="consultoria-viagem-gratuito" />
       </div>
       </MotionConfig>
     </>

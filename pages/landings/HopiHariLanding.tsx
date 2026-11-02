@@ -73,7 +73,7 @@ const HopiHariLanding: React.FC = () => {
         subtitle="Tire suas dúvidas antes de fechar seu pacote."
       />
       <HopiHariFinalCta />
-      <LandingFooter />
+      <LandingFooter source="hopi-hari" />
     </div>
   );
 };

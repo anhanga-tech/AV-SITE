@@ -1,5 +1,6 @@
 import { AirplaneTilt, WhatsappLogo } from '@phosphor-icons/react';
 import { openContactModal } from '@/utils/contactForm';
+import { landingWhatsAppHref } from './landing-contact';
 
 interface LandingWhatsAppBandProps {
     source: string;
@@ -36,16 +37,22 @@ export function LandingWhatsAppBand({ source, subtitle, headline }: LandingWhats
                             {headline}
                         </h2>
                     </div>
-                    <button
-                        type="button"
-                        onClick={() => openContactModal({ source })}
+                    {/* <a> com href wa.me: sem JS navega direto; com JS abre o modal (#1969). */}
+                    <a
+                        href={landingWhatsAppHref()}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(event) => {
+                            event.preventDefault();
+                            openContactModal({ source });
+                        }}
                         className="btn-whatsapp btn-specialist shrink-0 flex items-center gap-3 bg-brand-yellow text-brand-dark px-10 py-5 rounded-2xl font-bold text-lg shadow-[4px_4px_0px_rgba(255,255,255,0.15)] hover:shadow-[2px_2px_0px_rgba(255,255,255,0.15)] hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                         data-contact-intent
                         data-tracking={`whatsapp-band-${source}`}
                     >
                         <WhatsappLogo className="size-6" weight="fill" />
                         Abrir WhatsApp
-                    </button>
+                    </a>
                 </div>
             </div>
         </section>

@@ -112,5 +112,5 @@ test('o link de achados do /links aponta para a página', () => {
   const link = linksPageConfig.links.find((item) => item.id === 'achados');
   assert.ok(link, 'link achados ausente de data/linksPage.ts');
   assert.equal(link.type, 'internal');
-  assert.equal(link.href, '/achados');
+  assert.equal(link.href, '/achados/');
 });

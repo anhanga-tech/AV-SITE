@@ -81,7 +81,7 @@ export const PARKS: Park[] = [
       source: 'https://unsplash.com/photos/cKKX0uq5DKs',
       license: { name: 'Licença Unsplash', url: 'https://unsplash.com/license', author: 'Pietra K.' },
     },
-    href: '/beto-carrero',
+    href: '/beto-carrero/',
   },
   {
     slug: 'hopi-hari',
@@ -103,7 +103,7 @@ export const PARKS: Park[] = [
       source: 'https://unsplash.com/photos/vONaJDxcI3c',
       license: { name: 'Licença Unsplash', url: 'https://unsplash.com/license', author: 'Blond Fox' },
     },
-    href: '/hopi-hari',
+    href: '/hopi-hari/',
   },
   {
     slug: 'thermas-dos-laranjais',

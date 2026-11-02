@@ -49,8 +49,8 @@ function setupFakeDom(options: { href?: string } = {}) {
         win,
         traksCalls,
         dataLayer: win.dataLayer,
-        click(target: unknown, type = 'click', button = 0) {
-            handlers[type]?.({ target, type, button });
+        click(target: unknown, type = 'click', button = 0, defaultPrevented = false) {
+            handlers[type]?.({ target, type, button, defaultPrevented });
         },
         cleanup() {
             (globalThis as { window?: unknown }).window = realWindow;
@@ -147,6 +147,11 @@ test('listener: auxclick (botão do meio) conta como clique no WhatsApp', () => 
 
         // Hrefs protocol-relative (//wa.me) também são contato.
         env.click(anchor('//wa.me/5511955021519'));
+        assert.equal(env.traksCalls.length, 4);
+
+        // wa.me de fallback cujo onClick fez preventDefault e abriu o ContactModal
+        // (#1969): não chegou ao WhatsApp, o handoff conta depois.
+        env.click(anchor('https://wa.me/5511955021519?text=oi'), 'click', 0, true);
         assert.equal(env.traksCalls.length, 4);
     } finally {
         env.cleanup();
