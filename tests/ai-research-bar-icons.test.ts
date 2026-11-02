@@ -32,5 +32,8 @@ test('grupo da barra reserva altura mínima para não deslocar o hero', () => {
   const group = container.querySelector('[role="group"]');
 
   assert.ok(group);
-  assert.match(group.className, /\bmin-h-\[5\.5rem\]/);
+  // 80px = texto (20px) + mb-3 (12px) + botões size-12 (48px): reserva a altura real
+  // da barra numa linha. Um valor maior abria espaço vazio no desktop e quebrava o
+  // snapshot visual da home (5.5rem = 88px, +8px).
+  assert.match(group.className, /\bmin-h-20\b/);
 });

@@ -64,7 +64,7 @@ const AIResearchBar: React.FC = () => {
     <div
       role="group"
       aria-label="Pesquisar sobre a Anhangá com uma IA"
-      className="mt-8 w-full max-w-3xl min-h-[5.5rem]"
+      className="mt-8 w-full max-w-3xl min-h-20"
     >
       <p className="mb-3 text-sm font-medium text-white/75">
         Quer pesquisar antes de conversar? Pergunte sobre a Anhangá:
