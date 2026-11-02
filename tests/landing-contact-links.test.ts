@@ -65,3 +65,11 @@ test('links do bloco de contato têm alvo de toque de 44px', () => {
     assert.match(tag, /\bmin-h-11\b/, tag);
   }
 });
+
+test('WhatsApp do bloco de contato não infla whatsapp_cta_click (só abre o modal)', () => {
+  const html = renderToStaticMarkup(React.createElement(LollapaloozaFooter));
+  const link = html.match(/<a[^>]*data-tracking="footer-contact-whatsapp-[^"]*"[^>]*>/);
+
+  assert.ok(link, 'link de WhatsApp do bloco de contato não encontrado');
+  assert.match(link[0], /data-no-whatsapp-cta/);
+});

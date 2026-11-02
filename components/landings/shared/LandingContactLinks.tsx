@@ -40,6 +40,11 @@ export function LandingContactLinks({ source, className = '', linkClassName = DE
                     }}
                     className={`btn-whatsapp btn-specialist ${TOUCH_TARGET_CLASS} ${linkClassName}`}
                     data-contact-intent
+                    // Link novo (#1969): o clique abre o ContactModal, não o WhatsApp, e o
+                    // public/utm-tracking.js contaria como whatsapp_cta_click (match em
+                    // .btn-whatsapp/wa.me). Mesmo opt-out do /links; o handoff real conta
+                    // depois do envio (hooks/useContactForm.ts).
+                    data-no-whatsapp-cta
                     data-tracking={`footer-contact-whatsapp-${source}`}
                 >
                     WhatsApp
