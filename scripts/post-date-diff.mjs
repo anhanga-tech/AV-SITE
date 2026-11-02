@@ -12,17 +12,22 @@ export function bodyAfterFrontmatter(source) {
   return normalized.replace(FRONTMATTER, '').trim();
 }
 
+// Mesmo critério de lib/blog-manifest.ts (readParsedPosts): todo .mdx de content/blog
+// que não começa com `_`.
+const isBlogSource = (file) => /^content\/blog\/[^/_][^/]*\.mdx$/.test(file);
+
 /**
- * Arquivos staged que também têm edições fora do stage (ex.: `git add -p`). O hook lê
- * a árvore de trabalho e faz `git add`, então reescrever um desses — ou embutir o corpo
- * dele em data/blogMarkdown.ts — levaria para o commit o que a pessoa não pôs no stage.
+ * Posts do blog cujo conteúdo na árvore de trabalho difere do que vai para o commit:
+ * edições fora do stage (`git add -p`, ou outro post nem adicionado) e arquivos não
+ * rastreados. O hook reescreve a partir da árvore e faz `git add`, e o gerador lê TODOS
+ * os MDX do diretório — então qualquer um desses entraria no commit, ao menos pelo corpo
+ * embutido em data/blogMarkdown.ts, sem a pessoa ter posto no stage.
  *
- * @param {string[]} staged
  * @param {string[]} unstaged Saída de `git diff --name-only` (árvore vs. índice).
+ * @param {string[]} untracked Saída de `git ls-files --others --exclude-standard`.
  */
-export function partiallyStagedFiles(staged, unstaged) {
-  const dirty = new Set(unstaged);
-  return staged.filter((file) => dirty.has(file));
+export function blogSourcesOutsideStage(unstaged, untracked) {
+  return [...new Set([...unstaged, ...untracked])].filter(isBlogSource).sort();
 }
 
 /**

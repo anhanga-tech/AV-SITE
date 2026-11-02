@@ -7,7 +7,7 @@
 
 import { spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
-import { partiallyStagedFiles, shouldBumpDateModified } from './post-date-diff.mjs';
+import { blogSourcesOutsideStage, shouldBumpDateModified } from './post-date-diff.mjs';
 
 const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
 
@@ -55,13 +55,16 @@ if (files.length === 0) {
 }
 
 if (!processAll) {
-  const unstaged = run('git', ['diff', '--name-only']).trim().split('\n').filter(Boolean);
-  const partial = partiallyStagedFiles(files, unstaged);
-  if (partial.length > 0) {
+  const lines = (args) => run('git', args).trim().split('\n').filter(Boolean);
+  const outside = blogSourcesOutsideStage(
+    lines(['diff', '--name-only', '--', 'content/blog/']),
+    lines(['ls-files', '--others', '--exclude-standard', '--', 'content/blog/']),
+  );
+  if (outside.length > 0) {
     // Não bloqueia o commit; só não toca em nada. Datas e manifests ficam para
     // `pnpm update:dates` / o build depois que o stage estiver completo.
-    console.warn('⚠ dateModified e manifests do blog NÃO atualizados: MDX com edições fora do stage:');
-    for (const file of partial) console.warn(`  - ${file}`);
+    console.warn('⚠ dateModified e manifests do blog NÃO atualizados: posts com conteúdo fora do stage:');
+    for (const file of outside) console.warn(`  - ${file}`);
     process.exit(0);
   }
 }

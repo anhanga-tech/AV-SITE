@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { bodyAfterFrontmatter, partiallyStagedFiles, shouldBumpDateModified } from '../scripts/post-date-diff.mjs';
+import { blogSourcesOutsideStage, bodyAfterFrontmatter, shouldBumpDateModified } from '../scripts/post-date-diff.mjs';
 
 /*
   #1969 — o pre-commit atualizava `dateModified` de qualquer MDX staged, inclusive
@@ -43,10 +43,11 @@ test('dashes de tabela no corpo não são confundidos com o fim do frontmatter',
   assert.equal(bodyAfterFrontmatter(source), '| a | b |\n|---|---|\n| 1 | 2 |\n\n---\n\nRodapé');
 });
 
-test('detecta MDX com stage parcial para o hook não vazar edições não staged', () => {
-  const staged = ['content/blog/a.mdx', 'content/blog/b.mdx'];
-  const unstaged = ['content/blog/b.mdx', 'components/Hero.tsx'];
+test('qualquer post fora do stage (parcial, outro post ou não rastreado) trava o hook', () => {
+  // O gerador lê todos os MDX do diretório, então não basta olhar os staged.
+  const unstaged = ['content/blog/b.mdx', 'components/Hero.tsx', 'content/blog/_template.mdx'];
+  const untracked = ['content/blog/rascunho.mdx', 'content/blog/README.md'];
 
-  assert.deepEqual(partiallyStagedFiles(staged, unstaged), ['content/blog/b.mdx']);
-  assert.deepEqual(partiallyStagedFiles(staged, []), []);
+  assert.deepEqual(blogSourcesOutsideStage(unstaged, untracked), ['content/blog/b.mdx', 'content/blog/rascunho.mdx']);
+  assert.deepEqual(blogSourcesOutsideStage(['components/Hero.tsx'], []), []);
 });
