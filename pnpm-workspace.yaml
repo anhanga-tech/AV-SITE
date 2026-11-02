@@ -78,13 +78,14 @@ overrides:
   # host de forma inconsistente para octetos percent-encoded, mesma árvore
   # dev-only acima. 3.1.8 (publicado 2026-09-15, cooldown vencido em
   # 2026-09-22) corrige.
-  "fast-uri@3": "^3.1.8"
+  "fast-uri@3": "^3.1.9"
   # pnpm audit (low): GHSA-v422-hmwv-36x6 — body-parser < 1.20.6 desabilita
   # silenciosamente o enforcement de tamanho quando recebe um `limit` inválido
   # (DoS). Transitivo dev-only via decap-server > express@4 > body-parser
   # (proxy local do Decap CMS, `pnpm cms:proxy`). 1.20.6 corrige; escopado a
   # "@1" porque express 4.x consome a linha 1.x — a 2.x quebraria a API.
-  "body-parser@1": "^1.20.6"
+  "body-parser@1": "^1.20.9"
+  "body-parser@2": "^2.4.0"
   # pnpm audit (high): GHSA-2v37-7h3g-55p8 — nanoid < 3.3.18 loops
   # indefinitely when a custom generator receives size 0 (CWE-835 DoS).
   # Transitivo via postcss (build/dev-time: tailwindcss, autoprefixer,
