@@ -146,6 +146,63 @@ function buildEmptyModelResponseMessage(): string {
     return 'Não consegui gerar uma resposta agora. Pode reformular sua pergunta de viagem e tentar novamente?';
 }
 
+const GEMINI_BILLING_ERROR_CODE = 'GEMINI_BILLING_ERROR';
+const GEMINI_BILLING_SENTRY_MESSAGE = 'Gemini billing credits exhausted';
+const GEMINI_UPSTREAM_UNAVAILABLE_MESSAGE = 'Serviço de IA temporariamente indisponível';
+
+// Gemini uses HTTP 402, and sometimes only the JSON body (`code: 402` /
+// "prepayment credits are depleted" / RESOURCE_EXHAUSTED), when the project
+// has no prepaid credits left. RESOURCE_EXHAUSTED on its own is also how
+// rate limits are spelled, so a 429 stays a rate limit.
+function isGeminiBillingExhausted(normalized: { status?: number; message: string }): boolean {
+    if (normalized.status === 402) return true;
+    if (normalized.status === 429 || normalized.status === 401 || normalized.status === 403) return false;
+
+    const message = normalized.message;
+    if (/"code"\s*:\s*402\b/.test(message)) return true;
+    if (/prepayment credits|credits are depleted/i.test(message)) return true;
+    return /RESOURCE_EXHAUSTED/i.test(message) && /credit|billing|prepay|depleted/i.test(message);
+}
+
+function reportGeminiProxyError(
+    error: unknown,
+    normalized: { status?: number; message: string },
+    billingExhausted: boolean,
+): void {
+    if (billingExhausted) {
+        // The SDK's ApiError message is the raw upstream JSON. Capturing that
+        // object makes the Sentry issue title a billing blob. A dedicated
+        // Error keeps one stable title, and the tags say which code it is.
+        const upstreamStatus = normalized.status === 402 || /"code"\s*:\s*402\b/.test(normalized.message)
+            ? '402'
+            : 'billing_exhausted';
+        logger.error(
+            GEMINI_BILLING_SENTRY_MESSAGE,
+            new Error(GEMINI_BILLING_SENTRY_MESSAGE),
+            {
+                gemini_error_code: GEMINI_BILLING_ERROR_CODE,
+                upstream_status: upstreamStatus,
+            },
+        );
+        return;
+    }
+
+    // Pass the original Error instance to preserve instanceof checks in Sentry.
+    // Define toJSON so the logger serializes the extra properties we care about.
+    if (error instanceof Error) {
+        const errorClass = error.constructor.name;
+        Object.defineProperty(error, 'toJSON', {
+            value: () => ({ ...normalized, errorClass, stack: error.stack }),
+            configurable: true,
+            writable: true,
+        });
+        logger.error('SERVER: Error proxying to Gemini', error);
+        return;
+    }
+
+    logger.error('SERVER: Error proxying to Gemini', { ...normalized, errorClass: 'UnknownError' });
+}
+
 function normalizeError(error: unknown): { status?: number; message: string } {
     if (!error || typeof error !== 'object') {
         return { message: 'Unknown error' };
@@ -556,19 +613,8 @@ export async function buildGenerateSuccessBody(
 
 export function buildGeminiErrorResponse(error: unknown, corsHeaders: Record<string, string>): Response {
     const normalized = normalizeError(error);
-    // Pass the original Error instance to preserve instanceof checks in Sentry.
-    // Define toJSON so the logger serializes the extra properties we care about.
-    if (error instanceof Error) {
-        const errorClass = error.constructor.name;
-        Object.defineProperty(error, 'toJSON', {
-            value: () => ({ ...normalized, errorClass, stack: error.stack }),
-            configurable: true,
-            writable: true,
-        });
-        logger.error('SERVER: Error proxying to Gemini', error);
-    } else {
-        logger.error('SERVER: Error proxying to Gemini', { ...normalized, errorClass: 'UnknownError' });
-    }
+    const billingExhausted = isGeminiBillingExhausted(normalized);
+    reportGeminiProxyError(error, normalized, billingExhausted);
 
     if (normalized.status === 401 || normalized.status === 403) {
         return buildJsonResponse({
@@ -584,6 +630,17 @@ export function buildGeminiErrorResponse(error: unknown, corsHeaders: Record<str
         }, 429, corsHeaders);
     }
 
+    // Upstream 402 is our Gemini account running out of prepaid credits, not a
+    // problem the traveler can fix. Keep HTTP 503 so the chat treats it as a
+    // temporary outage (api conventions: upstream failures are 5xx) and use a
+    // distinct code so Sentry and logs are not a generic GEMINI_UPSTREAM_ERROR.
+    if (billingExhausted) {
+        return buildJsonResponse({
+            code: GEMINI_BILLING_ERROR_CODE,
+            error: GEMINI_UPSTREAM_UNAVAILABLE_MESSAGE,
+        }, 503, corsHeaders);
+    }
+
     if (normalized.status === 404 && /model/i.test(normalized.message)) {
         return buildJsonResponse({
             code: 'GEMINI_MODEL_ERROR',
@@ -596,7 +653,7 @@ export function buildGeminiErrorResponse(error: unknown, corsHeaders: Record<str
     if (normalized.status && normalized.status >= 400) {
         return buildJsonResponse({
             code: 'GEMINI_UPSTREAM_ERROR',
-            error: 'Serviço de IA temporariamente indisponível'
+            error: GEMINI_UPSTREAM_UNAVAILABLE_MESSAGE,
         }, 503, corsHeaders);
     }
 

@@ -29,7 +29,15 @@ overrides:
   # HTTP (desync de resposta, injeção de header/cookie via Cache-Control e
   # setCookie, CRLF via body 'type'). undici@7.29.0 (publicado 2026-07-24,
   # cooldown vencido em 2026-07-31) corrige; pinado em ^7.29.0.
-  undici: "^7.29.0"
+  # pnpm audit (high): GHSA-xjj6-f33q-929c — DoS via unhandled error em
+  # content-encodings excessivos na linha <7.30.1.
+  # pnpm audit (moderate): GHSA-4qv8-2p9j-2685 — DoS por memória não limitada
+  # no parser de EventSource (<7.30.1); GHSA-f72v-6w45-q472 — bypass de
+  # Subresource Integrity via tokens de algoritmo não normalizados (<7.30.1).
+  # Transitivo dev-only via @semantic-release/github (pipeline de release,
+  # não entra no bundle da app). undici@7.30.1 (publicado 2026-10-15,
+  # cooldown vencido em 2026-10-22) corrige as três; pinado em ^7.30.1.
+  undici: "^7.30.1"
   # Dependabot #45 (moderate): GHSA-h67p-54hq-rp68 — DoS quadrático em merge
   # keys do js-yaml via aliases repetidos. Transitivo build/dev-time via
   # gray-matter (scripts/blog-manifest) e bundlesize2 > cosmiconfig@5 — ambos

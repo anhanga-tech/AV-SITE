@@ -76,7 +76,11 @@ const buildServerErrorResponse = (status: number, errorData: GenerateApiResponse
     );
   }
 
-  if (status === 503) {
+  // 503 is a temporary outage. Billing exhaustion uses that status plus
+  // GEMINI_BILLING_ERROR; a raw 402 is the same account problem if it ever
+  // reaches the chat. Either way the traveler gets the outage message, not
+  // the generic technical fallback (which would also report a second time).
+  if (status === 402 || status === 503 || errorData.code === 'GEMINI_BILLING_ERROR') {
     return buildContactFallbackResponse(
       'O chat está fora do ar por alguns instantes.'
     );
