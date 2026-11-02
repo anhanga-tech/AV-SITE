@@ -21,7 +21,7 @@
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { decompress } from 'wawoff2';
-import { chromium } from 'playwright';
+import { chromium } from '@playwright/test';
 
 const FONTS_DIR = 'src/fonts';
 const OUT_FILE = 'src/font-fallbacks.css';
