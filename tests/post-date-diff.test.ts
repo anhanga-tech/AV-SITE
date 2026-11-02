@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { bodyAfterFrontmatter, shouldBumpDateModified } from '../scripts/post-date-diff.mjs';
+import { bodyAfterFrontmatter, partiallyStagedFiles, shouldBumpDateModified } from '../scripts/post-date-diff.mjs';
 
 /*
   #1969 — o pre-commit atualizava `dateModified` de qualquer MDX staged, inclusive
@@ -41,4 +41,12 @@ test('dashes de tabela no corpo não são confundidos com o fim do frontmatter',
   const source = post('title: "T"', '| a | b |\n|---|---|\n| 1 | 2 |\n\n---\n\nRodapé');
 
   assert.equal(bodyAfterFrontmatter(source), '| a | b |\n|---|---|\n| 1 | 2 |\n\n---\n\nRodapé');
+});
+
+test('detecta MDX com stage parcial para o hook não vazar edições não staged', () => {
+  const staged = ['content/blog/a.mdx', 'content/blog/b.mdx'];
+  const unstaged = ['content/blog/b.mdx', 'components/Hero.tsx'];
+
+  assert.deepEqual(partiallyStagedFiles(staged, unstaged), ['content/blog/b.mdx']);
+  assert.deepEqual(partiallyStagedFiles(staged, []), []);
 });

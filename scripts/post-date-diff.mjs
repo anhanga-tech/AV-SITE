@@ -13,6 +13,19 @@ export function bodyAfterFrontmatter(source) {
 }
 
 /**
+ * Arquivos staged que também têm edições fora do stage (ex.: `git add -p`). O hook lê
+ * a árvore de trabalho e faz `git add`, então reescrever um desses — ou embutir o corpo
+ * dele em data/blogMarkdown.ts — levaria para o commit o que a pessoa não pôs no stage.
+ *
+ * @param {string[]} staged
+ * @param {string[]} unstaged Saída de `git diff --name-only` (árvore vs. índice).
+ */
+export function partiallyStagedFiles(staged, unstaged) {
+  const dirty = new Set(unstaged);
+  return staged.filter((file) => dirty.has(file));
+}
+
+/**
  * @param {string | null} previous Conteúdo no HEAD; `null` quando o arquivo é novo.
  * @param {string} next Conteúdo que vai para o commit.
  */
