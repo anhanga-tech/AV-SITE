@@ -48,10 +48,14 @@ export default {
                 },
             },
             fontFamily: {
-                sans: ['Poppins', 'sans-serif'],
+                sans: ['Poppins', 'Poppins Fallback', 'sans-serif'],
                 // 'Anhanga Serif' É o Merriweather, renomeado por exigência da OFL
                 // (Reserved Font Name) ao ser subsetado — ver src/fonts.css.
                 serif: ['Anhanga Serif', 'Georgia', 'serif'], // Fonte editorial para o blog
+                // Sem o Poppins Fallback de propósito (#1972): o size-adjust é medido em texto
+                // corrido, e em caixa alta a Poppins Black é ~8% mais estreita que a Arial Bold —
+                // ajustado, o fallback deixava títulos como o "É SURREAL." da /orlando/ 18% mais
+                // largos, estourando a tela a 320px e deslocando o H1 inteiro no swap.
                 display: ['Poppins', 'sans-serif'], // Headings principais (Poppins 900)
             },
             boxShadow: {

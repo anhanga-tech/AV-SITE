@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./fonts.css";
+@import "./font-fallbacks.css";
 @config "../tailwind.config.mjs";
 
 @layer base {
