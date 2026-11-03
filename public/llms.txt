@@ -10,6 +10,8 @@ A Anhangá Viagens é uma agência de viagens localizada em São Paulo (SP), fun
 - **Cadastur:** 37.036.732/0001-41 (registro oficial no Ministério do Turismo)
 - **Endereço:** Av. Dom Pedro I, 773 — São Paulo, SP — CEP 01552-001
 - **Telefone:** (11) 5283-3309
+- **WhatsApp:** (11) 95502-1519
+- **Atendimento:** 100% online (WhatsApp, telefone, e-mail e videochamada); não há atendimento presencial
 - **E-mail:** contato@anhanga.tur.br
 - **Site:** https://www.anhanga.tur.br/
 - **Instagram:** https://www.instagram.com/anhangaviagens
