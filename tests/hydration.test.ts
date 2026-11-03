@@ -167,3 +167,27 @@ test('Home prerender includes the below-the-fold H2 sections in the first-respon
     `expected at least 5 non-empty H2 headings in the first-response HTML, found ${h2Matches.length}`
   );
 });
+
+// Rotas lazy() passam por renderToPipeableStream. Se o chunk da página ainda não estava
+// resolvido, o React emite o fallback dentro do <main> e o conteúdo real num
+// `<div hidden id="S:n">` que só um script inline revela: crawlers sem JS (GPTBot,
+// ClaudeBot, IsAgentReady) liam /sobre e /politica-privacidade como páginas vazias.
+test('Lazy route prerender ships page content inside <main> without the streaming reveal', async () => {
+  const cases = [
+    { url: '/sobre', marker: /<h1[^>]*>/ },
+    { url: '/politica-privacidade', marker: /<h1[^>]*>/ },
+    { url: '/termos-de-uso', marker: /<h1[^>]*>/ }
+  ];
+
+  for (const { url, marker } of cases) {
+    const { appHtml } = await render(url);
+    assert.doesNotMatch(appHtml, /hidden id="S:/, `${url} still streams hidden content`);
+    assert.doesNotMatch(appHtml, /<template id="B:/, `${url} still ships a Suspense fallback`);
+
+    const main = appHtml.match(/<main\b[^>]*>([\s\S]*?)<\/main>/);
+    assert.ok(main, `${url} has no <main>`);
+    assert.match(main[1], marker, `${url} has no heading inside <main>`);
+    const text = main[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    assert.ok(text.length >= 500, `${url} <main> has only ${text.length} chars of text`);
+  }
+});
