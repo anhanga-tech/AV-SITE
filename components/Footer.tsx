@@ -26,10 +26,10 @@ const Footer: React.FC = () => {
             </div>
 
             <div className="container mx-auto px-6 relative z-10">
-                <div className="grid md:grid-cols-4 gap-12 mb-16">
+                <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)] gap-12 mb-16">
 
                     {/* Brand */}
-                    <div className="md:col-span-2">
+                    <div>
                         <a
                             href="/"
                             className="inline-block mb-6 rounded-lg focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-cyan focus-visible:ring-offset-4"
@@ -52,7 +52,7 @@ const Footer: React.FC = () => {
                     {/* Links */}
                     <div>
                         <p className="font-bold text-white mb-6 uppercase tracking-wider text-xs">Menu</p>
-                        <ul className="space-y-3 font-medium">
+                        <ul className="columns-2 gap-x-6 text-sm md:text-base font-medium [&>li]:mb-3 [&>li]:break-inside-avoid">
                             <li><a href="/" className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Agência de viagens em São Paulo</a></li>
                             <li><a href="/sobre/" className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Sobre a Anhangá</a></li>
                             <li><a href={getBlogHomeUrl()} className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Blog de viagens e roteiros</a></li>
