@@ -2,6 +2,112 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
+    "title": "Cruzeiro fluvial ou roteiro terrestre na Europa: qual escolher depois dos 60",
+    "excerpt": "Navio no Reno, no Danúbio ou no Douro, ou trem e hotel? Ritmo, mobilidade, bagagem e custo comparados para quem viaja à Europa depois dos 60.",
+    "date": "2026-11-11",
+    "dateModified": "2026-11-11",
+    "author": "felipe-william",
+    "category": "Cruzeiros",
+    "image": "https://media.anhanga.tur.br/images/blog/cruzeiro-fluvial-europa-melhor-idade.jpg",
+    "imageCreditStatus": "confirmed",
+    "imageCredit": "hrs51 / Wikimedia Commons",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Douro_Cruiser_in_Pinhao.jpg",
+    "imageLicense": "CC BY-SA 2.0",
+    "imageLicenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "imageAdaptation": "Redimensionada para até 1600 px e comprimida; mantém a licença CC BY-SA 2.0",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Melhor Idade",
+    "tags": [
+      "cruzeiro-fluvial",
+      "melhor-idade",
+      "europa",
+      "cruzeiros",
+      "escapista",
+      "roteiro-terrestre"
+    ],
+    "seoTitle": "Cruzeiro fluvial na Europa: melhor idade",
+    "seoDescription": "Cruzeiro fluvial na Europa para a melhor idade ou trem e hotel? Ritmo, acessibilidade, bagagem e custo no Reno, Danúbio e Douro para quem tem mais de 60.",
+    "faq": [
+      {
+        "question": "Cruzeiro fluvial é uma boa opção para quem tem mobilidade reduzida?",
+        "answer": "Depende do navio e do grau da limitação. A vantagem é desfazer a mala uma vez só e ter a cabine sempre perto. Mas nem todo navio fluvial tem elevador para todos os andares, a rampa de embarque pode ficar íngreme conforme o nível do rio e, em portos cheios, o navio às vezes atraca ao lado de outro e você atravessa o saguão vizinho para descer. Para quem usa cadeira de rodas, vale confirmar cabine adaptada, elevador e o tipo de excursão antes de fechar."
+      },
+      {
+        "question": "Qual a melhor época para um cruzeiro fluvial na Europa?",
+        "answer": "A temporada costuma ir da primavera ao fim do outono, com roteiros de mercados de Natal no Reno e no Danúbio em dezembro. Abril, maio, setembro e outubro têm temperatura mais amena. No auge do verão, o vale do Douro esquenta bastante, e em verões secos o Reno e o Danúbio já baixaram a ponto de mudar trechos do roteiro."
+      },
+      {
+        "question": "Cruzeiro fluvial sai mais caro que um roteiro de trem e hotel?",
+        "answer": "A diária do navio costuma ser maior que a de um hotel, mas inclui hospedagem, refeições a bordo, o deslocamento entre cidades e, em muitas companhias, uma excursão por porto. Na conta fechada, a diferença diminui. O roteiro terrestre tende a sair mais em conta para quem come de forma simples e fica mais dias em cada cidade."
+      },
+      {
+        "question": "Preciso de visto ou ETIAS para um cruzeiro fluvial na Europa?",
+        "answer": "Brasileiro não precisa de visto para turismo no Espaço Schengen e pode ficar até 90 dias em cada período de 180. O ETIAS é uma autorização eletrônica com previsão de início no último trimestre de 2026, com transição de pelo menos seis meses; o pedido custa 20 euros e é gratuito para maiores de 70. Roteiros que descem o Danúbio até a Sérvia saem do Schengen por alguns dias, então confira os documentos do trecho."
+      },
+      {
+        "question": "Dá para combinar cruzeiro fluvial com dias em terra?",
+        "answer": "Dá, e costuma ser o melhor desenho para a primeira vez. Um exemplo: três ou quatro noites em Lisboa, trem até o Porto e uma semana de navio pelo Douro. Ou alguns dias em Praga antes de embarcar no Danúbio em Passau. Os dias em terra dão liberdade, e o navio entra quando o cansaço de trocar de hotel começaria a pesar."
+      }
+    ],
+    "slug": "cruzeiro-fluvial-europa-melhor-idade",
+    "readingTime": "13 min de leitura"
+  },
+  {
+    "title": "Roteiro Europa 10 dias: Lisboa, Madri ou Roma como base?",
+    "excerpt": "Dez dias na Europa rendem mais com uma cidade-base. Comparamos Lisboa, Madri e Roma em ritmo, passeios de um dia e custo, com um roteiro para cada uma.",
+    "date": "2026-11-06",
+    "dateModified": "2026-11-06",
+    "author": "felipe-william",
+    "category": "Destinos",
+    "image": "https://media.anhanga.tur.br/images/blog/roteiro-europa-10-dias-lisboa-capa.jpg",
+    "imageCreditStatus": "confirmed",
+    "imageCredit": "NorbertNagel / Wikimedia Commons",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Praca_do_Comercio_-_Lisbon_-_Portugal.jpg",
+    "imageLicense": "CC BY-SA 4.0",
+    "imageLicenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "imageAdaptation": "Redimensionada para até 1600 px e comprimida; mantém a licença CC BY-SA 4.0",
+    "featured": true,
+    "showChatCTA": true,
+    "chatCTADestination": "Europa",
+    "tags": [
+      "europa",
+      "roteiro",
+      "lisboa",
+      "madri",
+      "roma",
+      "portugal",
+      "espanha",
+      "italia"
+    ],
+    "seoTitle": "Roteiro Europa 10 dias: qual cidade-base?",
+    "seoDescription": "Roteiro Europa 10 dias com Lisboa, Madri ou Roma como base: ritmo, passeios de um dia, custo relativo e um esboço dia a dia para cada cidade.",
+    "faq": [
+      {
+        "question": "Qual a melhor cidade-base para um roteiro de 10 dias na Europa?",
+        "answer": "Depende do seu ritmo. Lisboa é a mais tranquila e a que custa menos no dia a dia, com Sintra e Cascais a cerca de 40 minutos de trem. Madri tem os trens rápidos mais úteis para passeios de um dia, como Toledo e Segóvia, a cerca de meia hora. Roma tem a cidade mais densa para explorar e Florença e Nápoles a pouco mais de uma hora de trem."
+      },
+      {
+        "question": "Dá para conhecer Lisboa, Madri e Roma na mesma viagem de 10 dias?",
+        "answer": "Dá, mas a gente não recomenda. São três trocas de hotel e dois voos internos, e entre check-out, aeroporto e check-in você perde perto de dois dias inteiros. Com 10 dias, escolha uma base e, se quiser, uma segunda cidade perto dela."
+      },
+      {
+        "question": "Quantas cidades cabem num roteiro de Europa de 10 dias?",
+        "answer": "No máximo duas. Uma base com 6 ou 7 noites e uma segunda cidade com 3 ou 4 noites funciona bem: Lisboa com Porto, Madri com Sevilha, Roma com Florença. Os passeios de um dia completam o roteiro sem trocar de hotel."
+      },
+      {
+        "question": "Brasileiro precisa de visto ou de ETIAS para Portugal, Espanha e Itália?",
+        "answer": "Visto, não: brasileiros entram sem visto no Espaço Schengen para turismo, por até 90 dias em cada período de 180. O ETIAS, autorização eletrônica de 20 euros, tem início previsto pela União Europeia para o último trimestre de 2026, com período de transição de pelo menos seis meses depois do lançamento. Confira o site oficial perto da data da viagem."
+      },
+      {
+        "question": "Qual a melhor época para um roteiro de 10 dias por Lisboa, Madri ou Roma?",
+        "answer": "De abril a junho e de setembro a outubro. Em julho e agosto, Madri e Roma passam com frequência dos 35 graus à tarde, e Roma fica mais vazia de moradores perto do feriado de 15 de agosto. Lisboa sofre um pouco menos com o calor por causa do Atlântico."
+      }
+    ],
+    "slug": "roteiro-europa-10-dias-lisboa-madrid-roma",
+    "readingTime": "16 min de leitura"
+  },
+  {
     "title": "Lua de mel na Europa: Lisboa ou Paris para quem não quer só museus",
     "excerpt": "Lisboa ou Paris na lua de mel? Comparamos clima, ritmo, passeios fora dos museus e custos escondidos, com um roteiro que junta as duas cidades.",
     "date": "2026-10-02",
