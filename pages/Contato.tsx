@@ -70,8 +70,24 @@ const Contato: React.FC = () => {
         <ul className="mb-12 grid gap-4 md:grid-cols-2">
           <Channel icon={<MessageCircle className="size-6" aria-hidden="true" />} title="WhatsApp">
             <p>
-              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className={linkClass}>
-                (11) 95502-1519<span className="sr-only"> (abre em nova aba)</span>
+              {/* <a> com href wa.me: sem JS navega direto; com JS abre o modal de contato, como nas
+                  landings (#1969). `data-no-whatsapp-cta`: o clique não é handoff, que só conta
+                  depois do envio do modal (hooks/useContactForm.ts). */}
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(event) => {
+                  event.preventDefault();
+                  openContactModal({ source: 'contato-whatsapp', message: WHATSAPP_MESSAGE });
+                }}
+                className={linkClass}
+                data-contact-intent
+                data-no-whatsapp-cta
+                data-tracking="contato-whatsapp"
+                aria-haspopup="dialog"
+              >
+                (11) 95502-1519<span className="sr-only"> (abre o formulário de contato)</span>
               </a>
             </p>
             <p>O canal mais rápido para cotações, dúvidas e suporte durante a viagem.</p>
