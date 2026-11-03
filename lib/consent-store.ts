@@ -121,9 +121,16 @@ function upstashStore(): ConsentStore {
             });
         },
         async append(draft) {
-            const existingRaw = await upstash(['GET', eventKey(draft.id)]);
+            // Perf: the replay-check GET and the subject LRANGE don't depend on
+            // each other, and each is a separate Upstash REST round trip on the
+            // user-waited form-submit path (prepareSubmissionConsent runs before
+            // the Odoo RPCs). Issuing them together saves one round trip (~one
+            // Upstash RTT, typically 20-60 ms) per marketing-opt-in submission.
+            const [existingRaw, current] = await Promise.all([
+                upstash(['GET', eventKey(draft.id)]),
+                this.readSubject(draft.subjectKey),
+            ]);
             const existingEvent = parseEvent(existingRaw);
-            const current = await this.readSubject(draft.subjectKey);
             if (existingEvent) {
                 const events = current.some((event) => event.id === draft.id)
                     ? current
