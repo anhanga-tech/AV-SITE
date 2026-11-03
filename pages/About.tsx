@@ -35,7 +35,7 @@ const TRUST_FAQ_ITEMS = [
   {
     question: 'A Anhangá Viagens é confiável?',
     answer:
-      'Sim. A Anhangá Viagens é uma agência de turismo registrada no Cadastur (Ministério do Turismo) sob o CNPJ 37.036.732/0001-41, com sede física em São Paulo, na Av. Dom Pedro I, 773 — Vila Monumento. É agente credenciado do Beto Carrero World e do Hopi Hari e parceira da Norwegian Cruise Line (NCL). O atendimento é consultivo e humano, com suporte 24h por WhatsApp durante toda a viagem.',
+      'Sim. A Anhangá Viagens é uma agência de turismo registrada no Cadastur (Ministério do Turismo) sob o CNPJ 37.036.732/0001-41, com endereço registrado em São Paulo, na Av. Dom Pedro I, 773 — Vila Monumento. É agente credenciado do Beto Carrero World e do Hopi Hari e parceira da Norwegian Cruise Line (NCL). O atendimento é consultivo e humano, com suporte 24h por WhatsApp durante toda a viagem.',
   },
   {
     question: 'A Anhangá é registrada no Cadastur?',
@@ -50,12 +50,12 @@ const TRUST_FAQ_ITEMS = [
   {
     question: 'Como funciona o atendimento da Anhangá?',
     answer:
-      'O atendimento é consultivo, não de balcão. Um consultor humano desenha o roteiro dia a dia conforme seu perfil e orçamento — sem pacotes prontos de prateleira. Você aprova a proposta com todos os custos listados antes de qualquer emissão e conta com suporte 24h por WhatsApp durante a viagem. O primeiro contato pode ser pelo chat com IA no site, por WhatsApp ou presencialmente em São Paulo.',
+      'O atendimento é consultivo, não de balcão. Um consultor humano desenha o roteiro dia a dia conforme seu perfil e orçamento — sem pacotes prontos de prateleira. Você aprova a proposta com todos os custos listados antes de qualquer emissão e conta com suporte 24h por WhatsApp durante a viagem. O primeiro contato pode ser pelo chat com IA no site ou por WhatsApp, e todo o atendimento é online.',
   },
   {
-    question: 'A Anhangá tem sede física e atendimento presencial?',
+    question: 'A Anhangá tem atendimento presencial?',
     answer:
-      'Sim. A sede fica na Av. Dom Pedro I, 773 — Vila Monumento, São Paulo (SP), CEP 01552-001. O atendimento pode ser presencial, por WhatsApp no (11) 5283-3309 ou pelo chat com IA disponível no site.',
+      'Não. A Anhangá trabalha 100% online e não recebe clientes no local. O atendimento é por WhatsApp, telefone, e-mail ou pelo chat com IA do site, para viajantes de todo o Brasil. O endereço registrado da empresa é Av. Dom Pedro I, 773 — Vila Monumento, São Paulo (SP), CEP 01552-001.',
   },
   {
     question: 'A Anhangá atende viagens corporativas e em grupo?',
