@@ -1,22 +1,31 @@
 /**
- * Gera src/font-fallbacks.css: faces `Poppins Fallback` com métricas ajustadas,
- * usadas enquanto a Poppins (font-display: swap) ainda não chegou.
+ * Gera src/font-fallbacks.css: faces com métricas da Poppins, usadas enquanto a
+ * Poppins (font-display: swap) ainda não chegou.
  *
  * Sem isso o fallback é o `sans-serif` genérico do sistema, mais estreito que a
  * Poppins: textos quebravam em uma linha a menos e ganhavam uma linha no swap,
  * empurrando a página (CLS da home no mobile, #1972).
  *
- * - size-adjust: razão de largura medida no Chromium entre cada peso da Poppins e
- *   a Arial (via Liberation Sans/Arimo, métricas idênticas), sobre textos reais do
- *   site. Uma face por peso que a Poppins tem (400/600/700/900): o browser escolhe
- *   o peso do fallback como escolhe o do webfont, e ≥600 usa a Arial Bold em vez de
- *   negrito sintético.
+ * Duas famílias, porque o size-adjust é por face e não por fonte de `src`:
+ * - `Poppins Fallback`: sobre a Arial (ou Liberation Sans/Arimo, mesmas métricas).
+ *   Windows, macOS, iOS e Linux. Medida contra o local() da máquina que roda o script.
+ * - `Poppins Fallback Android`: sobre a Roboto, a única fonte de sistema do Android
+ *   (#1982). Medida contra os woff2 da Roboto baixados do fontsource em versão fixa,
+ *   para não depender de a Roboto estar instalada em quem roda o script. Vem depois
+ *   da Arial no stack: um desktop com Roboto instalada continua usando a face da Arial.
+ *
+ * Em cada família:
+ * - size-adjust: razão de largura medida no Chromium entre cada peso da Poppins e a
+ *   fonte local, sobre textos reais do site. Uma face por peso que a Poppins tem
+ *   (400/600/700/900): o browser escolhe o peso do fallback como escolhe o do webfont,
+ *   e ≥600 usa um bold de verdade em vez de negrito sintético.
  * - ascent/descent/line-gap-override: hhea da Poppins ÷ unitsPerEm ÷ size-adjust,
  *   para a linha do fallback ter a mesma altura e baseline da Poppins.
  *
  * Uso: node scripts/build-font-fallbacks.mjs
- * Requer uma fonte com métricas da Arial instalada (Arial, Liberation Sans ou Arimo);
- * aborta se o local() não resolver, em vez de gravar valores medidos contra outra fonte.
+ * Requer uma fonte com métricas da Arial instalada (Arial, Liberation Sans ou Arimo) e
+ * acesso a cdn.jsdelivr.net; aborta se o local() da Arial não resolver, em vez de gravar
+ * valores medidos contra outra fonte.
  */
 
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -27,8 +36,34 @@ const FONTS_DIR = 'src/fonts';
 const OUT_FILE = 'src/font-fallbacks.css';
 const WEIGHTS = [400, 600, 700, 900];
 
-const REGULAR_SOURCES = ['Arial', 'ArialMT', 'Liberation Sans', 'LiberationSans', 'Arimo'];
-const BOLD_SOURCES = ['Arial Bold', 'Arial-BoldMT', 'Liberation Sans Bold', 'LiberationSans-Bold', 'Arimo Bold'];
+// Roboto v3 (a do Android 12+); o latin cobre os acentos do português.
+const ROBOTO_URL = (weight) =>
+  `https://cdn.jsdelivr.net/npm/@fontsource/roboto@5.2.8/files/roboto-latin-${weight}-normal.woff2`;
+
+/*
+  `sources`: nomes para o local() da face final, por peso (full name e PostScript).
+  `measure`: 'local' mede contra o próprio local(); um número mede contra o woff2 da
+  Roboto daquele peso, que é o que o local() resolve no aparelho.
+*/
+const FAMILIES = [
+  {
+    name: 'Poppins Fallback',
+    faces: (weight) => (weight >= 600
+      ? { sources: ['Arial Bold', 'Arial-BoldMT', 'Liberation Sans Bold', 'LiberationSans-Bold', 'Arimo Bold'], measure: 'local' }
+      : { sources: ['Arial', 'ArialMT', 'Liberation Sans', 'LiberationSans', 'Arimo'], measure: 'local' }),
+  },
+  {
+    // No Android 12+ a Roboto do sistema é variável, com full name "Roboto"; até o 11 são
+    // arquivos estáticos ("Roboto Regular", "Roboto Bold", "Roboto Black"). A Roboto não
+    // tem 600: 600 e 700 usam a Bold, como o sans-serif do Android já resolve hoje.
+    name: 'Poppins Fallback Android',
+    faces: (weight) => {
+      if (weight === 900) return { sources: ['Roboto Black', 'Roboto-Black'], measure: 900 };
+      if (weight >= 600) return { sources: ['Roboto Bold', 'Roboto-Bold'], measure: 700 };
+      return { sources: ['Roboto', 'Roboto Regular', 'Roboto-Regular'], measure: 400 };
+    },
+  },
+];
 
 // Textos que de fato aparecem acima da dobra (hero, barra de IA, banner) e um
 // parágrafo típico do blog. Acentos e pontuação do português contam na largura.
@@ -42,8 +77,14 @@ const SAMPLES = [
 ];
 
 const fontFile = (weight) => `${FONTS_DIR}/poppins-${weight}-latin.woff2`;
-const localSources = (weight) =>
-  (weight >= 600 ? BOLD_SOURCES : REGULAR_SOURCES).map((name) => `local('${name}')`).join(', ');
+const localSrc = (sources) => sources.map((name) => `local('${name}')`).join(', ');
+const dataUrl = (buffer) => `url(data:font/woff2;base64,${buffer.toString('base64')}) format('woff2')`;
+
+async function fetchRoboto(weight) {
+  const response = await fetch(ROBOTO_URL(weight));
+  if (!response.ok) throw new Error(`Roboto ${weight}: HTTP ${response.status} em ${ROBOTO_URL(weight)}`);
+  return Buffer.from(await response.arrayBuffer());
+}
 
 async function readVerticalMetrics(weight) {
   const sfnt = Buffer.from(await decompress(readFileSync(fontFile(weight))));
@@ -60,25 +101,32 @@ async function readVerticalMetrics(weight) {
   };
 }
 
-async function measureSizeAdjust() {
-  const faces = WEIGHTS.map((weight) => {
-    const data = readFileSync(fontFile(weight)).toString('base64');
-    return `
-      @font-face { font-family: 'Webfont'; font-weight: ${weight}; src: url(data:font/woff2;base64,${data}) format('woff2'); }
-      @font-face { font-family: 'Fallback'; font-weight: ${weight}; src: ${localSources(weight)}; }`;
-  }).join('\n');
+async function measureSizeAdjust(family) {
+  const robotoCache = new Map();
+  const faces = [];
+  for (const weight of WEIGHTS) {
+    const { sources, measure } = family.faces(weight);
+    let src = localSrc(sources);
+    if (measure !== 'local') {
+      if (!robotoCache.has(measure)) robotoCache.set(measure, await fetchRoboto(measure));
+      src = dataUrl(robotoCache.get(measure));
+    }
+    faces.push(`
+      @font-face { font-family: 'Webfont'; font-weight: ${weight}; src: ${dataUrl(readFileSync(fontFile(weight)))}; }
+      @font-face { font-family: 'Fallback'; font-weight: ${weight}; src: ${src}; }`);
+  }
 
   const browser = await chromium.launch();
   try {
     const page = await browser.newPage();
-    await page.setContent(`<style>${faces}
+    await page.setContent(`<style>${faces.join('\n')}
       @font-face { font-family: 'Missing'; src: local('Nenhuma Fonte Com Este Nome'); }
       body { font-synthesis: none; } span { white-space: nowrap; font-size: 100px; }</style>`);
 
-    return await page.evaluate(async ({ weights, samples }) => {
-      const width = (family, weight, text) => {
+    return await page.evaluate(async ({ weights, samples, familyName }) => {
+      const width = (fontFamily, weight, text) => {
         const span = document.createElement('span');
-        Object.assign(span.style, { fontFamily: family, fontWeight: String(weight) });
+        Object.assign(span.style, { fontFamily, fontWeight: String(weight) });
         span.textContent = text;
         document.body.appendChild(span);
         const value = span.getBoundingClientRect().width;
@@ -91,13 +139,13 @@ async function measureSizeAdjust() {
         const fallbackFaces = await document.fonts.load(`${weight} 100px Fallback`);
         const unresolved = width("'Fallback', 'Missing'", weight, samples[0]) === width("'Missing'", weight, samples[0]);
         if (fallbackFaces.length === 0 || unresolved) {
-          throw new Error(`local() do peso ${weight} não resolveu: instale Arial, Liberation Sans ou Arimo`);
+          throw new Error(`${familyName}: a fonte do peso ${weight} não carregou (para a Arial, instale Arial, Liberation Sans ou Arimo)`);
         }
-        const total = (family) => samples.reduce((sum, text) => sum + width(family, weight, text), 0);
+        const total = (fontFamily) => samples.reduce((sum, text) => sum + width(fontFamily, weight, text), 0);
         results[weight] = total("'Webfont'") / total("'Fallback'");
       }
       return results;
-    }, { weights: WEIGHTS, samples: SAMPLES });
+    }, { weights: WEIGHTS, samples: SAMPLES, familyName: family.name });
   } finally {
     await browser.close();
   }
@@ -105,35 +153,39 @@ async function measureSizeAdjust() {
 
 const percent = (value) => `${(value * 100).toFixed(2)}%`;
 
-const sizeAdjust = await measureSizeAdjust();
 const blocks = [];
-for (const weight of WEIGHTS) {
-  const { unitsPerEm, ascender, descender, lineGap } = await readVerticalMetrics(weight);
-  const adjust = sizeAdjust[weight];
-  blocks.push(`@font-face {
-    font-family: 'Poppins Fallback';
+const summary = [];
+for (const family of FAMILIES) {
+  const sizeAdjust = await measureSizeAdjust(family);
+  for (const weight of WEIGHTS) {
+    const { unitsPerEm, ascender, descender, lineGap } = await readVerticalMetrics(weight);
+    const adjust = sizeAdjust[weight];
+    blocks.push(`@font-face {
+    font-family: '${family.name}';
     font-style: normal;
     font-weight: ${weight};
-    src: ${localSources(weight)};
+    src: ${localSrc(family.faces(weight).sources)};
     size-adjust: ${percent(adjust)};
     ascent-override: ${percent(ascender / unitsPerEm / adjust)};
     descent-override: ${percent(Math.abs(descender) / unitsPerEm / adjust)};
     line-gap-override: ${percent(lineGap / unitsPerEm / adjust)};
 }`);
+  }
+  summary.push(`${family.name}: ${WEIGHTS.map((weight) => `${weight} → ${percent(sizeAdjust[weight])}`).join(', ')}`);
 }
 
 writeFileSync(OUT_FILE, `/* Gerado por \`node scripts/build-font-fallbacks.mjs\` — não editar à mão.
  *
- * Fallback com métricas da Poppins sobre a Arial (ou Liberation Sans/Arimo, que têm
- * as mesmas métricas). Enquanto a Poppins não chega, o texto já ocupa a largura e a
- * altura de linha finais, e o swap não muda a quebra de linha (CLS, #1972).
+ * Fallbacks com métricas da Poppins. Enquanto a Poppins não chega, o texto já ocupa a
+ * largura e a altura de linha finais, e o swap não muda a quebra de linha (CLS, #1972).
+ * - Poppins Fallback: sobre a Arial (ou Liberation Sans/Arimo, mesmas métricas).
+ * - Poppins Fallback Android: sobre a Roboto, que é a fonte do Android, onde não há
+ *   Arial (#1982).
  *
- * Limitações conhecidas: Android não tem Arial, então ali o local() não resolve e o
- * fallback continua sendo o sans-serif do sistema (Roboto), como antes. Safari < 17
- * ignora size-adjust.
+ * Limitação conhecida: Safari < 17 ignora size-adjust.
  */
 
 ${blocks.join('\n')}
 `);
 
-console.log(`✓ ${OUT_FILE}: ${WEIGHTS.map((weight) => `${weight} → ${percent(sizeAdjust[weight])}`).join(', ')}`);
+console.log(`✓ ${OUT_FILE}\n  ${summary.join('\n  ')}`);

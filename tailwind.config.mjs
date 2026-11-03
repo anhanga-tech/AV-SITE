@@ -49,7 +49,9 @@ export default {
                 },
             },
             fontFamily: {
-                sans: ['Poppins', 'Poppins Fallback', 'sans-serif'],
+                // Arial antes da Roboto (#1982): um desktop com Roboto instalada continua na face
+                // medida contra a Arial; no Android, sem Arial, cai na face medida contra a Roboto.
+                sans: ['Poppins', 'Poppins Fallback', 'Poppins Fallback Android', 'sans-serif'],
                 // 'Anhanga Serif' É o Merriweather, renomeado por exigência da OFL
                 // (Reserved Font Name) ao ser subsetado — ver src/fonts.css.
                 serif: ['Anhanga Serif', 'Georgia', 'serif'], // Fonte editorial para o blog
