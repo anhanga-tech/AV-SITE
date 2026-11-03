@@ -79,7 +79,7 @@ const Contato: React.FC = () => {
                 rel="noopener noreferrer"
                 onClick={(event) => {
                   event.preventDefault();
-                  openContactModal({ source: 'contato-whatsapp' });
+                  openContactModal({ source: 'contato-whatsapp', message: WHATSAPP_MESSAGE });
                 }}
                 className={linkClass}
                 data-contact-intent
