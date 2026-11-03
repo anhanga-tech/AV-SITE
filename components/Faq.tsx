@@ -63,6 +63,9 @@ const FAQItem = memo(({ question, answer, idx }: FAQItemProps) => {
             <div
                 id={panelId}
                 className={`overflow-hidden transition-[max-height,opacity] duration-500 ease-in-out ${isOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}
+                // Fechado, o painel some só visualmente: `inert` o tira da árvore de acessibilidade
+                // e do foco (links da resposta), sem trocar a transição por `hidden`.
+                inert={!isOpen}
             >
                 <div className="px-6 pb-8 pt-4 text-zinc-700 font-medium leading-relaxed text-lg bg-white/40">
                     {/* The answer content is injected here */}

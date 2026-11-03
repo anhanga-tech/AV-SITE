@@ -51,3 +51,10 @@ test('each visible FAQ question is a heading wrapping its toggle, followed by th
   assert.equal(items.length, FAQ_SCHEMA_ITEMS.length, 'every FAQ item should follow the heading > button > panel pattern');
   for (const [, , controls, panelId] of items) assert.equal(controls, panelId);
 });
+
+test('collapsed FAQ answers are inert, so assistive tech and focus skip them', () => {
+  const html = renderToStaticMarkup(React.createElement(Faq));
+  const panels = [...html.matchAll(/<div id="[^"]+" class="overflow-hidden[^"]*"([^>]*)>/g)];
+  assert.equal(panels.length, FAQ_SCHEMA_ITEMS.length);
+  for (const [, attrs] of panels) assert.match(attrs, /\binert=""/);
+});

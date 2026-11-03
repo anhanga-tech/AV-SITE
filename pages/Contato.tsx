@@ -110,8 +110,8 @@ const Contato: React.FC = () => {
         <section className="rounded-[2rem] bg-white p-8 text-center shadow-sm md:p-12">
           <h2 className="mb-4 text-2xl font-black text-anhanga-dark md:text-3xl">Prefere que a gente chame você?</h2>
           <p className="mx-auto mb-8 max-w-xl text-zinc-600">
-            Conte para onde quer ir e como prefere ser contatado. Um consultor responde com as primeiras ideias de
-            roteiro. Viagem corporativa ou em grupo?{' '}
+            Deixe seu nome e WhatsApp e a conversa continua por lá, onde você conta para onde quer ir. Um consultor
+            responde com as primeiras ideias de roteiro. Viagem corporativa ou em grupo?{' '}
             <Link to="/corporativo/" className={linkClass}>
               Conheça o atendimento para empresas
             </Link>
