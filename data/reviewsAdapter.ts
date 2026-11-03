@@ -63,6 +63,22 @@ export function formatRelativeDate(isoDate: string): string {
   return `há ${diffYears} anos`;
 }
 
+const MONTHS_PT_BR = [
+  'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+  'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro',
+];
+
+/**
+ * Data absoluta ("agosto de 2025") que não depende do relógio nem do fuso: sai igual no
+ * prerender e na hidratação. `formatRelativeDate` muda a cada dia, então só pode ser
+ * renderizada depois da montagem — senão o HTML do build diverge do primeiro render do cliente.
+ */
+export function formatReviewMonthYear(isoDate: string): string {
+  const date = new Date(isoDate);
+  if (isNaN(date.getTime())) return '';
+  return `${MONTHS_PT_BR[date.getUTCMonth()]} de ${date.getUTCFullYear()}`;
+}
+
 export function getInitials(name: string): string {
   const parts = name
     .replace(/[&.]/g, ' ')

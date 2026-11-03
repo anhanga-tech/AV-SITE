@@ -168,6 +168,37 @@ test('Home prerender includes the below-the-fold H2 sections in the first-respon
   );
 });
 
+// #1971: o mural de depoimentos e o bloco de contato ficavam atrás de uma gate de
+// scroll/timeout, e o HTML do build trazia só `<section id="depoimentos" … />` vazia.
+test('Home prerender ships real testimonials and the contact block in the first-response HTML', async () => {
+  const reviews = JSON.parse(
+    await readFile(path.join(process.cwd(), 'data/googleReviews.json'), 'utf8')
+  ) as { reviews: Array<{ authorName: string }> };
+  const { appHtml } = await render('/');
+
+  assert.doesNotMatch(appHtml, /<section id="depoimentos"[^>]*><\/section>/);
+  assert.doesNotMatch(appHtml, /<section id="contato"[^>]*><\/section>/);
+  assert.match(appHtml, /itemProp="reviewBody"|itemprop="reviewBody"/);
+  assert.ok(reviews.reviews.length > 0, 'fixture de reviews vazia');
+  assert.ok(
+    appHtml.includes(reviews.reviews[0].authorName),
+    `expected reviewer "${reviews.reviews[0].authorName}" in the prerendered home`
+  );
+  assert.match(appHtml, /Anhangá Airlines/);
+});
+
+test('Home prerender renders review dates independently of the build clock', async () => {
+  const first = withMockedNow('2026-11-03T12:00:00.000Z', () => render('/'));
+  const later = withMockedNow('2027-06-15T12:00:00.000Z', () => render('/'));
+  const extractDates = (html: string) =>
+    Array.from(html.matchAll(/<time dateTime="[^"]*"[^>]*>([^<]*)<\/time>/gi)).map((m) => m[1]);
+
+  const [a, b] = [(await first).appHtml, (await later).appHtml].map(extractDates);
+  assert.ok(a.length > 0, 'expected <time> elements in the testimonials');
+  assert.deepEqual(a, b);
+  assert.ok(a.every((text) => !text.startsWith('há ') && text !== 'hoje' && text !== 'ontem'));
+});
+
 // Rotas fora da home passam por renderToPipeableStream. Sem `progressiveChunkSize: Infinity`,
 // o React terceiriza todo boundary concluído maior que ~12,8 KB: fallback dentro do <main>
 // e o conteúdo real num `<div hidden id="S:n">` que só um script inline revela. Crawlers

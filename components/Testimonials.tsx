@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback, memo } from 'react';
+import React, { useState, useEffect, useCallback, useSyncExternalStore, memo } from 'react';
 import { ChevronLeft, ChevronRight, Quote, MessageSquareHeart } from 'lucide-react';
 import { BRAND_LOGO_PNG_URL } from '../lib/media-assets';
 import { SectionHeader } from './ui/SectionHeader';
 import { ReviewAvatar } from './ui/ReviewAvatar';
 import { GoogleIcon } from './ui/GoogleIcon';
 import { ReviewSummaryBar } from './ReviewSummaryBar';
-import { getDisplayReviews, getReviewSummary, formatRelativeDate } from '../data/reviewsAdapter';
+import { getDisplayReviews, getReviewSummary, formatRelativeDate, formatReviewMonthYear } from '../data/reviewsAdapter';
 import type { GoogleReviewsData } from '../types/reviews';
 import googleReviewsRaw from '../data/googleReviews.json';
 
@@ -20,7 +20,13 @@ const ROTATIONS = ['-rotate-2', 'rotate-1', '-rotate-1', 'rotate-2', '-rotate-1'
 const SECTION_BADGE_ICON = <MessageSquareHeart className="size-4 text-red-500 fill-red-500" />;
 const SECTION_TITLE = <>Mural do Amor <span aria-hidden="true">❤️</span></>;
 
+// O mural sai no HTML do prerender (#1971). "há N dias" depende do relógio, então o
+// prerender e o render de hidratação usam a data absoluta, e a relativa entra só depois
+// de montar — o mesmo `useSyncExternalStore` do `ClientOnly`.
+const subscribeNoop = () => () => {};
+
 const Testimonials: React.FC = memo(() => {
+  const isMounted = useSyncExternalStore(subscribeNoop, () => true, () => false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -148,9 +154,9 @@ const Testimonials: React.FC = memo(() => {
                               {stars}
                             </span>
                             <span className="size-[3px] rounded-full bg-slate-300 shrink-0" aria-hidden="true" />
-                            <span className="text-[0.7rem] text-gray-500 font-sans leading-none">
-                              {formatRelativeDate(review.date)}
-                            </span>
+                            <time dateTime={review.date} className="text-[0.7rem] text-gray-500 font-sans leading-none">
+                              {isMounted ? formatRelativeDate(review.date) : formatReviewMonthYear(review.date)}
+                            </time>
                           </div>
 
                           <Quote className="size-7 text-brand-cyan/20 mx-auto md:mx-0 mb-1.5 fill-current" />
