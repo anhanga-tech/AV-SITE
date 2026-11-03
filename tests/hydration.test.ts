@@ -185,6 +185,14 @@ test('Home prerender ships real testimonials and the contact block in the first-
     `expected reviewer "${reviews.reviews[0].authorName}" in the prerendered home`
   );
   assert.match(appHtml, /Anhangá Airlines/);
+
+  // Abaixo da dobra: os avatares não podem disputar banda com o topo da home.
+  const testimonialsHtml = appHtml.slice(appHtml.indexOf('id="depoimentos"'), appHtml.indexOf('id="contato"'));
+  const avatarImgs = testimonialsHtml.match(/<img\b[^>]*>/g) ?? [];
+  assert.ok(avatarImgs.length > 0, 'expected review avatar <img> in the testimonials');
+  for (const img of avatarImgs) {
+    assert.match(img, /loading="lazy"/, `avatar sem loading="lazy": ${img.slice(0, 120)}`);
+  }
 });
 
 test('Home prerender renders review dates independently of the build clock', async () => {
