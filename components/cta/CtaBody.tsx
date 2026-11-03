@@ -144,7 +144,7 @@ export function CtaBody() {
       <div className="mb-8">
         <h2 className="text-4xl md:text-5xl font-black text-brand-dark mb-4 leading-tight">
           Próxima parada: <br />
-          <span className="text-brand-vibrant">aquele lugar que você sempre adiou.</span>
+          <span className="text-anhanga-actionInk">aquele lugar que você sempre adiou.</span>
         </h2>
         <p className="text-zinc-500 font-medium text-lg max-w-md">
           Orçamento gratuito. Roteiro feito do zero, só pra você.

@@ -37,7 +37,7 @@ const DestinationField = memo(({
       className="w-full md:flex-[1.5] p-3 md:p-6 relative group text-left cursor-text hover:bg-zinc-50/80 transition duration-300 rounded-t-[2rem] md:rounded-tl-[2rem] md:rounded-tr-none"
       ref={destRef}
     >
-      <label htmlFor="destination-input" className="block text-[10px] font-black text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-focus-within:text-brand-cyan transition-colors">
+      <label htmlFor="destination-input" className="block text-[10px] font-black text-zinc-500 uppercase tracking-wider mb-1 flex items-center gap-1 group-focus-within:text-anhanga-actionInk transition-colors">
         <MapPin className="size-3" /> Para onde?
       </label>
       <div className="relative flex items-center">

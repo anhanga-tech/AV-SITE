@@ -53,7 +53,7 @@ export function WaitlistFormFields({
       </div>
 
       <div className="group relative space-y-2">
-        <label htmlFor="lolla-waitlist-email" className="block text-[10px] font-black text-anhanga-blue uppercase tracking-[0.2em] transition-colors group-focus-within:text-white">
+        <label htmlFor="lolla-waitlist-email" className="block text-[10px] font-black text-anhanga-action uppercase tracking-[0.2em] transition-colors group-focus-within:text-white">
           Seu melhor E-mail
         </label>
         <div className="relative">
@@ -96,7 +96,7 @@ export function WaitlistFormFields({
         </span>
       </label>
 
-      <p className="text-xs text-zinc-500 leading-relaxed">
+      <p className="text-xs text-zinc-400 leading-relaxed">
         Ao entrar na lista, seus dados serão usados para avisar você sobre pacotes do Lollapalooza 2027. O checkbox acima é opcional e serve apenas para novidades de marketing. Consulte a{' '}
           <a
             href="/politica-privacidade/"

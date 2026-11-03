@@ -61,7 +61,7 @@ function ProfileTags({ perfis }: { perfis: string[] }): React.ReactElement {
 
 function RegionBadge({ regiao, saida }: { regiao: string; saida: string }): React.ReactElement {
   return (
-    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-anhanga-action">
+    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-anhanga-actionInk">
       <span>{regiao}</span>
       <span className="text-zinc-300" aria-hidden="true">·</span>
       <span className="text-zinc-500">{saida}</span>

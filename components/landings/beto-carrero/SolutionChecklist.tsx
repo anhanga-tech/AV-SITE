@@ -23,7 +23,7 @@ export function SolutionChecklist({ onOpenModal }: SolutionChecklistProps) {
             </svg>
           </span>
         </h2>
-        <p className="text-xl md:text-2xl font-sans mb-10 text-blue-100 leading-relaxed max-w-lg">
+        <p className="text-xl md:text-2xl font-sans mb-10 text-blue-50 leading-relaxed max-w-lg">
           Enquanto você sonha, a Anhangá organiza. Seu pacote completo chega pronto no seu WhatsApp.
         </p>
       </div>

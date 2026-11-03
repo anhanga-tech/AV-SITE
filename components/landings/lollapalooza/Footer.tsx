@@ -31,10 +31,10 @@ const Footer: React.FC = () => {
             Pacotes de viagem para eventos e festivais.
           </p>
           <LandingContactLinks source="lollapalooza" className="mt-4 md:items-start" />
-          <p className="mt-4 text-xs opacity-50">
+          <p className="mt-4 text-xs opacity-80">
             Nota: Este site comercializa pacotes de viagem (hospedagem, transporte e turismo). Ingressos para o evento não estão inclusos no pacote base.
           </p>
-          <p className="mt-3 text-xs opacity-50">
+          <p className="mt-3 text-xs opacity-80">
             <button
               type="button"
               onClick={triggerResetBanner}

@@ -33,11 +33,11 @@ export function useHeaderStyles(isScrolled: boolean, isInternalPage: boolean): H
             ctaPaddingClass: isInternalPage ? 'px-4 py-2' : 'px-5 py-2.5',
 
             navTextClass: useSolidHeader
-                ? 'text-zinc-600 hover:text-brand-vibrant'
+                ? 'text-zinc-600 hover:text-anhanga-actionInk'
                 : 'text-white/90 hover:text-white',
 
             buttonClass: useSolidHeader
-                ? 'bg-brand-vibrant hover:bg-brand-blue text-white'
+                ? 'bg-anhanga-action hover:bg-anhanga-blue text-anhanga-dark hover:text-white'
                 : 'bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white border border-white/30',
 
             mobileToggleClass: useSolidHeader ? 'text-zinc-700' : 'text-white',

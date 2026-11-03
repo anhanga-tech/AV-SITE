@@ -168,10 +168,10 @@ export function CorpContactForm({ whatsappUrl }: CorpContactFormProps) {
                     {/* Honeypot: hidden from humans, blind form-fillers populate it. */}
                     <input {...honeypotProps} />
                     <div className="flex justify-between items-center px-6 sm:px-8 py-5 border-b-2 border-dashed border-zinc-100 gap-4">
-                        <span className="text-brand-cyan font-black tracking-widest text-xs sm:text-sm uppercase flex items-center gap-2 min-w-0">
+                        <span className="text-anhanga-actionInk font-black tracking-widest text-xs sm:text-sm uppercase flex items-center gap-2 min-w-0">
                             <AirplaneTilt className="size-4 shrink-0" weight="fill" /> Contato
                         </span>
-                        <span className="text-zinc-400 font-bold text-xs uppercase shrink-0">Corporativo</span>
+                        <span className="text-zinc-500 font-bold text-xs uppercase shrink-0">Corporativo</span>
                     </div>
 
                     <div className="p-6 sm:p-8 space-y-5">

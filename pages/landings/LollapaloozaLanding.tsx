@@ -72,7 +72,7 @@ const LollapaloozaLanding: React.FC = () => {
             </p>
             <p className="text-zinc-700 text-lg leading-relaxed mb-5">
               Se você quer chegar antes da próxima abertura, entre na <strong>Lista de Espera Lolla 2027</strong>. A <strong>Anhangá Viagens</strong> é uma{' '}
-              <Link to="/" className="text-brand-cyan font-semibold hover:underline">
+              <Link to="/" className="text-anhanga-actionInk font-semibold hover:underline">
                 agência de viagens em São Paulo
               </Link>{' '}
               com foco em atendimento consultivo e <strong>viagens personalizadas</strong>, do planejamento inicial ao suporte no destino.
@@ -102,7 +102,7 @@ const LollapaloozaLanding: React.FC = () => {
                   e.preventDefault();
                   openContactModal({ source: 'lollapalooza' });
                 }}
-                className="btn-whatsapp btn-specialist px-5 py-3 rounded-full bg-brand-cyan text-white font-bold hover:bg-brand-cyan/90 transition-colors"
+                className="btn-whatsapp btn-specialist px-5 py-3 rounded-full bg-anhanga-action text-anhanga-dark font-bold hover:brightness-105 transition-colors"
                 data-tracking="footer-lollapalooza-whatsapp"
               >
                 Falar com especialista

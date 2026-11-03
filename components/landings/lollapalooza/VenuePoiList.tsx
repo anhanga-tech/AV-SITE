@@ -20,7 +20,7 @@ export function VenuePoiList({ pois, activeIndex, listContainerRef, itemsRef, on
       </div>
 
       <h3 className="text-2xl font-black text-anhanga-darkBlue mb-2 leading-tight">
-        Explore os arredores de <br /><span className="text-anhanga-yellow">Interlagos</span>
+        Explore os arredores de <br /><span className="bg-anhanga-yellow px-1 box-decoration-clone">Interlagos</span>
       </h3>
 
       <p className="text-gray-500 text-sm mb-6">

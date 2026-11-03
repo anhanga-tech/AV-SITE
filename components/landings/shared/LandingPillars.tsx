@@ -85,9 +85,13 @@ export function LandingPillars({ heading, pillars, eyebrow = DEFAULT_EYEBROW }: 
                                 <div className={`absolute -top-3.5 left-1/2 -translate-x-1/2 w-20 h-6 ${TAPE_COLORS[idx % TAPE_COLORS.length]} backdrop-blur-sm border-l border-r border-white/50 rotate-1 shadow-sm z-20`} />
 
                                 {/* Ordinal number */}
-                                <span className="absolute top-6 right-7 text-5xl font-black leading-none select-none pointer-events-none text-zinc-100 group-hover:text-zinc-200 transition-colors duration-300">
-                                    {ordinal}
-                                </span>
+                                {/* Número decorativo via ::before (attr): fica fora da árvore de acessibilidade
+                                    e da medição de contraste — o tom quase-branco é intencional (#1970). */}
+                                <span
+                                    aria-hidden="true"
+                                    data-ordinal={ordinal}
+                                    className="absolute top-6 right-7 text-5xl font-black leading-none select-none pointer-events-none text-zinc-100 group-hover:text-zinc-200 transition-colors duration-300 before:content-[attr(data-ordinal)]"
+                                />
 
                                 <m.div
                                     className={`size-14 rounded-2xl ${item.bg} border-2 ${item.accent} flex items-center justify-center mb-6 shadow-sm`}

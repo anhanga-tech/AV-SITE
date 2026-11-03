@@ -140,7 +140,8 @@ export function HopiHariFinalCta() {
           >
             Falar com especialista
           </Button>
-          <Button asChild variant="ghost" size="lg" className="text-white hover:text-white/80">
+          {/* `!`: o variant ghost traz text-zinc-500 e o Button não faz merge de classes — sem ele o link ficava cinza sobre o azul (1.3:1, #1970). */}
+          <Button asChild variant="ghost" size="lg" className="text-white! hover:text-white/80!">
             <a href="https://www.hopihari.com.br/" target="_blank" rel="noopener noreferrer">
               Site oficial Hopi Hari
             </a>

@@ -130,7 +130,7 @@ function SocialShareFull({ url, title, excerpt, className = "" }: ShareVariantPr
                 type="button"
                 onClick={() => void handleNativeShare()}
                 onMouseEnter={prefetchHaptics}
-                className="flex items-center gap-2 px-5 py-2.5 bg-brand-cyan text-white font-bold rounded-xl hover:bg-brand-cyanDark transition shadow-[0_4px_0px_#0369a1] active:shadow-none active:translate-y-1 lg:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-cyan"
+                className="flex items-center gap-2 px-5 py-2.5 bg-anhanga-action text-anhanga-dark font-bold rounded-xl hover:brightness-105 transition shadow-[0_4px_0px_#0369a1] active:shadow-none active:translate-y-1 lg:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-cyan"
             >
                 <Share2 className="size-5" /> Compartilhar
             </button>
