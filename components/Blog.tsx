@@ -41,7 +41,7 @@ const Blog: React.FC = memo(() => {
                         <BookOpen className="size-4" /> Diário de Bordo
                     </div>
                     <h2 className="text-4xl md:text-5xl font-black text-brand-dark mb-4">
-                        Histórias & <span className="text-brand-cyan border-b-8 border-brand-cyan/20 px-1 inline-block">Dicas</span>
+                        Histórias & <span className="text-anhanga-actionInk border-b-8 border-brand-cyan/20 px-1 inline-block">Dicas</span>
                     </h2>
                     <p className="text-zinc-500 font-medium text-lg max-w-2xl mx-auto">
                         Inspiração real para sua próxima aventura. Sem filtros, só verdades.
@@ -84,7 +84,7 @@ const Blog: React.FC = memo(() => {
 
                                 {/* Featured Content */}
                                 <div className="w-full md:w-1/2 md:pr-8">
-                                    <div className="flex items-center gap-3 mb-4 text-sm font-bold text-zinc-400">
+                                    <div className="flex items-center gap-3 mb-4 text-sm font-bold text-zinc-500">
                                         <span className={`px-3 py-1 rounded-full border ${getCategoryColor(featuredPost.category)}`}>
                                             {featuredPost.category}
                                         </span>
@@ -102,11 +102,11 @@ const Blog: React.FC = memo(() => {
                                                 {(AUTHORS[featuredPost.author]?.name ?? featuredPost.author).charAt(0).toUpperCase()}
                                             </div>
                                             <div className="flex flex-col">
-                                                <span className="text-xs font-bold text-zinc-400 uppercase">Escrito por</span>
+                                                <span className="text-xs font-bold text-zinc-500 uppercase">Escrito por</span>
                                                 <span className="text-sm font-black text-brand-dark">{AUTHORS[featuredPost.author]?.name ?? featuredPost.author}</span>
                                             </div>
                                         </div>
-                                        <span className="flex items-center gap-2 text-brand-cyan font-black uppercase tracking-wide group-hover:gap-4 transition-[gap,color]">
+                                        <span className="flex items-center gap-2 text-anhanga-actionInk font-black uppercase tracking-wide group-hover:gap-4 transition-[gap,color]">
                                             Ler Agora <ArrowRight className="size-5" />
                                         </span>
                                     </div>
@@ -162,7 +162,7 @@ const Blog: React.FC = memo(() => {
                                 </p>
 
                                 <div className="pt-4 border-t border-dashed border-zinc-100 flex items-center justify-between">
-                                    <span className="text-xs font-bold text-zinc-400 flex items-center gap-2">
+                                    <span className="text-xs font-bold text-zinc-500 flex items-center gap-2">
                                         <div className="size-5 rounded-full bg-brand-dark flex items-center justify-center text-white text-[10px] font-black shrink-0">
                                             {(AUTHORS[post.author]?.name ?? post.author).charAt(0).toUpperCase()}
                                         </div>

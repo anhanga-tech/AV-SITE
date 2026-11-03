@@ -26,7 +26,7 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
                     <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest border ${getCategoryColor(post.category)}`}>
                         {post.category}
                     </span>
-                    <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{formatDate(post.date)}</span>
+                    <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider">{formatDate(post.date)}</span>
                 </div>
                 <SocialShare
                     minimal
@@ -57,7 +57,7 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
                         prose md:prose-lg max-w-none
                         prose-headings:font-sans prose-headings:font-black prose-headings:tracking-tight prose-headings:text-brand-dark
                         prose-p:font-serif prose-p:text-zinc-600 prose-p:leading-relaxed prose-p:mb-6
-                        prose-a:text-brand-cyan prose-a:font-bold prose-a:no-underline prose-a:border-b-2 prose-a:border-brand-cyan/30 hover:prose-a:border-brand-cyan hover:prose-a:text-brand-cyanDark hover:prose-a:bg-brand-cyan/5 prose-a:transition
+                        prose-a:text-anhanga-actionInk prose-a:font-bold prose-a:no-underline prose-a:border-b-2 prose-a:border-brand-cyan/30 hover:prose-a:border-brand-cyan hover:prose-a:text-anhanga-dark hover:prose-a:bg-brand-cyan/5 prose-a:transition
                         prose-strong:text-brand-dark prose-strong:font-black
                         prose-ul:list-disc prose-ul:pl-6 prose-ul:marker:text-brand-yellow
                         prose-li:font-serif prose-li:text-zinc-600
@@ -70,7 +70,7 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
             ) : (
                 <div className="prose md:prose-lg max-w-none prose-p:font-serif prose-p:text-zinc-600 prose-p:leading-relaxed">
                     <p>{post.excerpt}</p>
-                    <p className="text-zinc-400 italic">Conteúdo completo em breve…</p>
+                    <p className="text-zinc-500 italic">Conteúdo completo em breve…</p>
                 </div>
             )}
 
@@ -107,10 +107,10 @@ export const BlogPostContent: React.FC<BlogPostContentProps> = ({ post, canonica
                                 <BlogImageCredit post={related} compact />
                             </div>
                             <div className="p-4">
-                                <h5 className="font-bold text-zinc-800 leading-tight group-hover:text-brand-cyan transition-colors text-base mb-2">
+                                <h4 className="font-bold text-zinc-800 leading-tight group-hover:text-brand-cyan transition-colors text-base mb-2">
                                     {related.title}
-                                </h5>
-                                <div className="flex items-center gap-3 text-xs text-zinc-400 font-bold">
+                                </h4>
+                                <div className="flex items-center gap-3 text-xs text-zinc-500 font-bold">
                                     <span className="flex items-center gap-1"><Clock className="size-3" /> {related.readingTime}</span>
                                     <span>•</span>
                                     <span>{formatDate(related.date)}</span>

@@ -64,15 +64,17 @@ const HopiHariLanding: React.FC = () => {
       <FAQPageSchema items={HOPI_FAQ_ITEMS} />
 
       <LandingNav source="hopi-hari" />
-      <HopiHariHero />
-      <HopiHariContent />
-      <HopiHariOtherServices />
-      <LandingFAQ
-        items={HOPI_FAQ_ITEMS}
-        title="Dúvidas sobre o Hopi Hari"
-        subtitle="Tire suas dúvidas antes de fechar seu pacote."
-      />
-      <HopiHariFinalCta />
+      <main id="main-content">
+        <HopiHariHero />
+        <HopiHariContent />
+        <HopiHariOtherServices />
+        <LandingFAQ
+          items={HOPI_FAQ_ITEMS}
+          title="Dúvidas sobre o Hopi Hari"
+          subtitle="Tire suas dúvidas antes de fechar seu pacote."
+        />
+        <HopiHariFinalCta />
+      </main>
       <LandingFooter source="hopi-hari" />
     </div>
   );

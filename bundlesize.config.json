@@ -5,6 +5,10 @@
       "maxSize": "130 kB"
     },
     {
+      "path": "dist/assets/router-vendor-*.js",
+      "maxSize": "25 kB"
+    },
+    {
       "path": "dist/assets/index-*.js",
       "maxSize": "120 kB"
     },

@@ -29,7 +29,7 @@ const TripTypeField = memo(({
       aria-haspopup="true"
       data-testid="trip-type-filter-btn"
     >
-      <span className="block text-[10px] font-black text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan group-focus-within:text-brand-cyan transition-colors">
+      <span className="block text-[10px] font-black text-zinc-500 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-anhanga-actionInk group-focus-within:text-anhanga-actionInk transition-colors">
         <Briefcase className="size-3" /> Tipo de Viagem
       </span>
       <div className="flex items-center justify-between">

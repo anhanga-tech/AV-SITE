@@ -89,18 +89,20 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
         <FAQPageSchema items={FAQ_ITEMS} />
 
         <LandingNav source="consultoria-viagem" />
-        <ConsultoriaHero />
-        <ConsultoriaBenefits />
-        <ConsultoriaAudience />
-        <ConsultoriaProcess />
-        <ConsultoriaAbout />
-        <ConsultoriaFinalCta />
-        <ConsultoriaOtherServices />
-        <LandingFAQ
-          items={FAQ_ITEMS}
-          title="Dúvidas sobre consultoria de viagem"
-          subtitle="Tire suas dúvidas sobre como funciona a consultoria personalizada da Anhangá."
-        />
+        <main id="main-content">
+          <ConsultoriaHero />
+          <ConsultoriaBenefits />
+          <ConsultoriaAudience />
+          <ConsultoriaProcess />
+          <ConsultoriaAbout />
+          <ConsultoriaFinalCta />
+          <ConsultoriaOtherServices />
+          <LandingFAQ
+            items={FAQ_ITEMS}
+            title="Dúvidas sobre consultoria de viagem"
+            subtitle="Tire suas dúvidas sobre como funciona a consultoria personalizada da Anhangá."
+          />
+        </main>
         <LandingFooter source="consultoria-viagem-gratuito" />
       </div>
       </MotionConfig>

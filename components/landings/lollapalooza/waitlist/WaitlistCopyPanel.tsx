@@ -48,7 +48,7 @@ export function WaitlistCopyPanel() {
           </div>
           <div>
             <h3 className="font-black text-white uppercase tracking-wider mb-2">Prioridade Total</h3>
-            <p className="text-sm text-zinc-500 leading-relaxed font-medium">Recepção de ofertas antes do lançamento público geral.</p>
+            <p className="text-sm text-zinc-400 leading-relaxed font-medium">Recepção de ofertas antes do lançamento público geral.</p>
           </div>
         </m.div>
 
@@ -58,7 +58,7 @@ export function WaitlistCopyPanel() {
           </div>
           <div>
             <h3 className="font-black text-white uppercase tracking-wider mb-2">Logística Hardcore</h3>
-            <p className="text-sm text-zinc-500 leading-relaxed font-medium">Saiba primeiro os hotéis mais próximos e as rotas mais eficientes.</p>
+            <p className="text-sm text-zinc-400 leading-relaxed font-medium">Saiba primeiro os hotéis mais próximos e as rotas mais eficientes.</p>
           </div>
         </m.div>
       </div>

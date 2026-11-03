@@ -138,7 +138,7 @@ const SearchForm = memo(({ onDestinationMatch }: SearchFormProps) => {
               data-testid="trip-type-reveal-btn"
               className="w-full p-3 md:p-6 text-left hover:bg-zinc-50/80 transition duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan flex items-center"
             >
-              <span className="text-zinc-400 font-bold text-sm">+ Tipo de viagem</span>
+              <span className="text-zinc-500 font-bold text-sm">+ Tipo de viagem</span>
             </button>
           )}
         </div>

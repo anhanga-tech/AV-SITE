@@ -48,27 +48,29 @@ const CorporativoLanding: React.FC = () => {
             <MotionConfig reducedMotion="user">
             <div data-corp-landing className="bg-brand-surface min-h-screen font-sans">
                 <CorpNav />
-                <CorpHero />
-                <CorpPillars />
-                <CorpProcess />
-                <CorpWhatsAppBand />
-                <CorpContactSection />
-                <nav aria-label="Outros serviços" className="bg-brand-surface py-12 border-t border-zinc-100">
-                    <div className="container mx-auto px-6 text-center">
-                        <p className="text-sm text-zinc-500 font-medium mb-4">Conheça também</p>
-                        <div className="flex flex-wrap justify-center gap-3">
-                            <Link to="/consultoria-de-viagem/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
-                                Consultoria de Viagem
-                            </Link>
-                            <Link to="/melhor-idade/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
-                                Viagens Melhor Idade
-                            </Link>
-                            <Link to="/cruzeiros/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
-                                Cruzeiros pelo Brasil
-                            </Link>
+                <main id="main-content">
+                    <CorpHero />
+                    <CorpPillars />
+                    <CorpProcess />
+                    <CorpWhatsAppBand />
+                    <CorpContactSection />
+                    <nav aria-label="Outros serviços" className="bg-brand-surface py-12 border-t border-zinc-100">
+                        <div className="container mx-auto px-6 text-center">
+                            <p className="text-sm text-zinc-500 font-medium mb-4">Conheça também</p>
+                            <div className="flex flex-wrap justify-center gap-3">
+                                <Link to="/consultoria-de-viagem/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
+                                    Consultoria de Viagem
+                                </Link>
+                                <Link to="/melhor-idade/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
+                                    Viagens Melhor Idade
+                                </Link>
+                                <Link to="/cruzeiros/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action">
+                                    Cruzeiros pelo Brasil
+                                </Link>
+                            </div>
                         </div>
-                    </div>
-                </nav>
+                    </nav>
+                </main>
                 <CorpFooter source="corporativo" />
             </div>
             </MotionConfig>

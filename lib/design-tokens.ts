@@ -2,6 +2,7 @@ export const tokens = {
     color: {
         action:      'anhanga-action',      // #0ea5e9 — botões, links, foco
         actionDark:  'anhanga-actionDark',  // #0284c7 — hover de ação
+        actionInk:   'anhanga-actionInk',   // #0369a1 — texto/links em Céu Vivo sobre fundo claro (AA)
         accent:      'anhanga-yellow',      // #FFD600 — CTAs principais
         accentHover: 'anhanga-yellowHover', // #E5C000
         brand:       'anhanga-blue',        // #0056D2 — identidade (logo, footer)

@@ -94,15 +94,15 @@ const Hero: React.FC = () => {
         {/* Dynamic Headliner Title */}
         <div className="mb-2 md:mb-4 min-h-[5rem] md:min-h-[7rem] flex flex-col items-center justify-center w-full px-2">
             <p className="text-zinc-300 text-[10px] sm:text-xs md:text-sm lg:text-lg uppercase tracking-[0.2em] mb-1 md:mb-2">Prepare-se para ver</p>
-            <h2 
+            <p
                 aria-live="polite"
-                className={`text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase italic tracking-tighter text-anhanga-yellow transition duration-500 transform text-center break-words w-full max-w-5xl leading-[0.9] sm:leading-tight pb-2 ${
+                className={`font-display text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase italic tracking-tighter text-anhanga-yellow transition duration-500 transform text-center break-words w-full max-w-5xl leading-[0.9] sm:leading-tight pb-2 ${
                     isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'
                 }`}
                 style={{ paddingRight: '0.1em' }}
             >
                 {HEADLINERS[currentIndex]}
-            </h2>
+            </p>
         </div>
 
         {/* Main Value Proposition — h1 is visibly rendered to avoid sr-only cloaking risk */}

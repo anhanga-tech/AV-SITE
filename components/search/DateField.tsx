@@ -41,7 +41,7 @@ const DateField = memo(({
       aria-haspopup="grid"
       data-testid="dates-filter-btn"
     >
-      <span className="block text-[10px] font-black text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan group-focus-within:text-brand-cyan transition-colors">
+      <span className="block text-[10px] font-black text-zinc-500 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-anhanga-actionInk group-focus-within:text-anhanga-actionInk transition-colors">
         <Calendar className="size-3" /> Quando?
       </span>
       <div className="flex items-center justify-between">

@@ -201,7 +201,7 @@ const AIChat: React.FC = memo(() => {
         className={`fixed ${isOpen ? 'translate-y-32 opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
                     bottom-[calc(1rem+var(--cookie-banner-h,0px))] right-4 sm:bottom-[calc(1.5rem+var(--cookie-banner-h,0px))] sm:right-6 z-[9990]
                     flex items-center justify-center gap-3
-                    bg-brand-vibrant text-white
+                    bg-anhanga-action text-anhanga-dark
                     shadow-[0_8px_30px_theme(colors.brand.cyan/30%)] hover:shadow-[0_8px_30px_theme(colors.brand.cyan/50%)] hover:-translate-y-1
                     transition-[bottom,transform,opacity,box-shadow] duration-300
                     size-16 rounded-2xl sm:w-auto sm:h-auto sm:px-6 sm:py-3.5 sm:rounded-full
@@ -217,7 +217,7 @@ const AIChat: React.FC = memo(() => {
         </div>
 
         <div className="text-left hidden sm:flex sm:flex-col">
-          <span className="text-[10px] font-bold tracking-widest text-white/90 uppercase opacity-90">Roteiro IA</span>
+          <span className="text-[10px] font-bold tracking-widest text-anhanga-dark/80 uppercase">Roteiro IA</span>
           <span className="text-sm font-bold leading-none capitalize mt-0.5">Ajuda & Cotação</span>
         </div>
       </button>
