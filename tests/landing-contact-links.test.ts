@@ -73,3 +73,14 @@ test('WhatsApp do bloco de contato não infla whatsapp_cta_click (só abre o mod
   assert.ok(link, 'link de WhatsApp do bloco de contato não encontrado');
   assert.match(link[0], /data-no-whatsapp-cta/);
 });
+
+test('WhatsApp de /contato/ é wa.me sem JS e abre o modal de contato com JS', async () => {
+  const { appHtml } = await render('/contato/');
+  const link = appHtml.match(/<a[^>]*data-tracking="contato-whatsapp"[^>]*>/);
+
+  assert.ok(link, '/contato/ deve renderizar o link de WhatsApp');
+  assert.match(link[0], /href="https:\/\/wa\.me\/5511955021519\?text=/);
+  assert.match(link[0], /data-contact-intent/, 'marca a intenção que abre o modal');
+  assert.match(link[0], /data-no-whatsapp-cta/, 'clique não conta como handoff de WhatsApp');
+  assert.match(link[0], /aria-haspopup="dialog"/, 'leitor de tela anuncia o modal');
+});
