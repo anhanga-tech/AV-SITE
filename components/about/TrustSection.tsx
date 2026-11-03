@@ -7,7 +7,7 @@ const CREDENTIAL_BADGES = [
   { icon: Award, title: 'Beto Carrero World', subtitle: 'Agente credenciado' },
   { icon: Award, title: 'Hopi Hari', subtitle: 'Agente credenciado' },
   { icon: Anchor, title: 'Norwegian Cruise Line', subtitle: 'Parceira (NCL)' },
-  { icon: MapPin, title: 'São Paulo - SP', subtitle: 'Atendimento presencial' },
+  { icon: MapPin, title: 'São Paulo - SP', subtitle: 'Atendimento online' },
 ];
 
 // Seção "Agência Certificada": credenciamentos como fatos verificáveis em texto
@@ -49,7 +49,7 @@ export const TrustSection: React.FC = () => (
               <div className="size-2 rounded-full bg-anhanga-action"></div>
             </div>
             <div>
-              <p className="font-bold text-lg leading-none mb-1">Sede Própria em São Paulo</p>
+              <p className="font-bold text-lg leading-none mb-1">Endereço registrado em São Paulo</p>
               <p className="text-white/60">Av. Dom Pedro I, 773 - Vila Monumento, CEP 01552-001</p>
             </div>
           </li>

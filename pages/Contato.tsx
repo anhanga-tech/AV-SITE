@@ -10,7 +10,7 @@ import { useWhatsAppLink } from '../utils/whatsapp';
 
 const CANONICAL = 'https://www.anhanga.tur.br/contato/';
 const DESCRIPTION =
-  'Fale com a Anhangá Viagens por WhatsApp, telefone, e-mail ou presencialmente em São Paulo. Atendimento consultivo e humano para montar sua viagem sob medida.';
+  'Fale com a Anhangá Viagens por WhatsApp, telefone ou e-mail. Atendimento 100% online, consultivo e humano, para montar sua viagem sob medida.';
 const WHATSAPP_MESSAGE = 'Olá! Vim pela página de contato e quero planejar uma viagem.';
 
 const linkClass =
@@ -97,13 +97,13 @@ const Contato: React.FC = () => {
               </a>
             </p>
           </Channel>
-          <Channel icon={<MapPin className="size-6" aria-hidden="true" />} title="Endereço">
+          <Channel icon={<MapPin className="size-6" aria-hidden="true" />} title="Endereço comercial">
             <address className="not-italic">
               Av. Dom Pedro I, 773 — Vila Monumento
               <br />
               São Paulo (SP), CEP 01552-001
             </address>
-            <p>Sede da agência, com atendimento presencial em São Paulo.</p>
+            <p>Endereço de registro da empresa. Não recebemos clientes no local: todo o atendimento é online.</p>
           </Channel>
         </ul>
 

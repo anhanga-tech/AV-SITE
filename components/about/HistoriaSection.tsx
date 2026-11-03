@@ -58,7 +58,7 @@ export const HistoriaSection: React.FC = () => (
             Fundada por especialistas apaixonados pelo setor, nossa agência foca no <strong>atendimento consultivo</strong>. Não somos apenas um motor de busca; somos curadores de experiências.
           </p>
           <p>
-            Do primeiro café (virtual ou presencial) até o seu retorno para casa, cuidamos de cada detalhe como se a viagem fosse nossa. É esse cuidado artesanal que nos define.
+            Da primeira conversa (por WhatsApp ou videochamada) até o seu retorno para casa, cuidamos de cada detalhe como se a viagem fosse nossa. É esse cuidado artesanal que nos define.
           </p>
         </div>
       </m.div>
