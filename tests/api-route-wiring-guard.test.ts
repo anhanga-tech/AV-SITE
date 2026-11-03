@@ -14,6 +14,12 @@ const DEV_ROUTE_EXCEPTIONS: Record<string, string> = {
     'auth/callback': 'Decap CMS OAuth; local CMS editing uses `pnpm cms:proxy` instead',
     'purchase-dispatch': 'inbound n8n webhook; never called by the browser',
     'create-proposal': 'internal endpoint for the sales bot; never called by the browser',
+    'not-found': 'catch-all for unknown /api/ routes; it has no path of its own to register',
+};
+
+// Handlers whose Pages adapter is not functions/api/<name>.ts.
+const ADAPTER_FILES: Record<string, string> = {
+    'not-found': '[[path]]',
 };
 
 // Discovery endpoints are served under /.well-known/ rather than /api/.
@@ -40,7 +46,7 @@ function readDevRoutes(): Set<string> {
 const handlers = listHandlers(path.join(ROOT, 'api'));
 
 test('every api handler has a Cloudflare Pages adapter in functions/api', () => {
-    const missing = handlers.filter((name) => !existsSync(path.join(ROOT, 'functions', 'api', `${name}.ts`)));
+    const missing = handlers.filter((name) => !existsSync(path.join(ROOT, 'functions', 'api', `${ADAPTER_FILES[name] ?? name}.ts`)));
     assert.deepEqual(missing, []);
 });
 

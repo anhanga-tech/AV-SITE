@@ -173,7 +173,7 @@ test('Home prerender includes the below-the-fold H2 sections in the first-respon
 // e o conteúdo real num `<div hidden id="S:n">` que só um script inline revela. Crawlers
 // sem JS (GPTBot, ClaudeBot, IsAgentReady) liam /sobre e /politica-privacidade vazias.
 test('Lazy route prerender ships page content inside <main> without the streaming reveal', async () => {
-  for (const url of ['/sobre', '/politica-privacidade', '/termos-de-uso']) {
+  for (const url of ['/sobre', '/contato', '/politica-privacidade', '/termos-de-uso']) {
     const { appHtml } = await render(url);
     assert.doesNotMatch(appHtml, /hidden id="S:/, `${url} still streams hidden content`);
     assert.doesNotMatch(appHtml, /<template id="B:/, `${url} still ships a Suspense fallback`);

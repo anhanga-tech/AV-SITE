@@ -7,6 +7,7 @@ import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 const CORE_LINKS = [
   { to: '/', label: 'Agência de viagens em São Paulo' },
   { to: '/sobre/', label: 'Sobre a Anhangá Viagens' },
+  { to: '/contato/', label: 'Contato' },
   { to: getBlogHomeUrl(), label: 'Blog de viagens e roteiros', external: true },
   { to: '/orlando/', label: 'Pacotes para Orlando' },
   { to: '/parques-brasil/', label: 'Parques do Brasil: qual escolher' },

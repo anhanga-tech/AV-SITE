@@ -129,6 +129,7 @@ test('buildOpenApiPaths should preserve multiple HTTP methods for the same path'
         {
             anchor: 'https://www.anhanga.tur.br/api/example',
             method: 'get',
+            operationId: 'readExample',
             summary: 'Read example',
             description: 'Reads an example resource.',
             responses: {
@@ -148,6 +149,7 @@ test('buildOpenApiPaths should preserve multiple HTTP methods for the same path'
         {
             anchor: 'https://www.anhanga.tur.br/api/example',
             method: 'post',
+            operationId: 'writeExample',
             summary: 'Create example',
             description: 'Creates an example resource.',
             requestBody: {
@@ -266,4 +268,16 @@ test('openapi.json is served directly by a Pages Function, with .well-known redi
 
     const viteConfig = await readFile(new URL('../vite.config.ts', import.meta.url), 'utf8');
     assert.match(viteConfig, /'\/openapi\.json': \(\) => import\('\.\/api\/openapi\.ts'\)/);
+});
+
+// Agentes usam o operationId como nome de ferramenta (IsAgentReady `ia.openapi-quality`):
+// toda operação publicada precisa de um, e sem repetição.
+test('every published OpenAPI operation has a unique operationId', async () => {
+    const response = await openapiHandler(new Request('https://www.anhanga.tur.br/api/openapi'));
+    const document = await response.json() as { paths: Record<string, Record<string, { operationId?: string }>> };
+    const ids = Object.values(document.paths).flatMap((methods) => Object.values(methods).map((operation) => operation.operationId));
+
+    assert.ok(ids.length >= 8, `expected the full API surface, found ${ids.length} operations`);
+    for (const id of ids) assert.match(id ?? '', /^[a-z][A-Za-z]+$/, `invalid operationId: ${id}`);
+    assert.equal(new Set(ids).size, ids.length, 'operationIds must be unique');
 });

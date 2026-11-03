@@ -33,6 +33,8 @@ interface OpenApiResponseDefinition {
 export interface ApiEndpointDefinition {
     anchor: string;
     method: string;
+    /** Nome estável e único da operação no OpenAPI; agentes o usam como nome de ferramenta. */
+    operationId: string;
     summary: string;
     description: string;
     requestBody?: OpenApiRequestBody;
@@ -108,6 +110,7 @@ const API_ENDPOINTS: readonly ApiEndpointDefinition[] = [
     {
         anchor: `${SITE_ORIGIN}/api/generate`,
         method: 'post',
+        operationId: 'generateAssistantResponse',
         summary: 'Generate travel assistant responses',
         description: 'Accepts the website chat history and returns the next assistant response plus optional chips and handoff data.',
         requestBody: {
@@ -143,6 +146,7 @@ const API_ENDPOINTS: readonly ApiEndpointDefinition[] = [
     {
         anchor: `${SITE_ORIGIN}/api/submit-lead`,
         method: 'post',
+        operationId: 'submitLead',
         summary: 'Submit a qualified travel lead',
         description: 'Receives normalized lead data from the first-party chatbot flow and forwards it to configured downstream systems.',
         requestBody: {
@@ -187,6 +191,7 @@ const API_ENDPOINTS: readonly ApiEndpointDefinition[] = [
     {
         anchor: `${SITE_ORIGIN}/api/submit-waitlist`,
         method: 'post',
+        operationId: 'submitWaitlist',
         summary: 'Submit a waitlist registration',
         description: 'Accepts first-party waitlist registrations and forwards the sanitized payload to the configured automation endpoint.',
         requestBody: {
@@ -224,6 +229,7 @@ const API_ENDPOINTS: readonly ApiEndpointDefinition[] = [
     {
         anchor: `${SITE_ORIGIN}/api/submit-nps`,
         method: 'post',
+        operationId: 'submitNps',
         summary: 'Submit a post-trip NPS rating',
         description: 'Accepts a Net Promoter Score submission from a traveller holding a signed invitation and records it on their CRM contact. Browser-only: opening the invite link sets the invitation in an HttpOnly cookie named `nps_invite_<ref>` and redirects to `/nps/?i=<ref>`; the body\'s `inviteRef` is that `ref`, and the request must carry the matching cookie. The cookie name is per invite, so it is not declared as a fixed OpenAPI cookie parameter. The token never travels in the body, and identity is taken from the verified invitation.',
         requestBody: {
@@ -255,6 +261,7 @@ const API_ENDPOINTS: readonly ApiEndpointDefinition[] = [
     {
         anchor: `${SITE_ORIGIN}/api/submit-contact`,
         method: 'post',
+        operationId: 'submitContact',
         summary: 'Submit a quick contact request',
         description: 'Accepts the site-wide quick contact form and records the contact and a sales opportunity in the CRM.',
         requestBody: {
@@ -302,6 +309,7 @@ const API_ENDPOINTS: readonly ApiEndpointDefinition[] = [
     {
         anchor: `${SITE_ORIGIN}/api/submit-quiz`,
         method: 'post',
+        operationId: 'submitQuiz',
         summary: 'Submit a travel quiz result',
         description: 'Accepts a completed travel-profile quiz and records the traveller profile in the CRM.',
         requestBody: {
@@ -353,6 +361,7 @@ const API_ENDPOINTS: readonly ApiEndpointDefinition[] = [
     {
         anchor: `${SITE_ORIGIN}/api/consent`,
         method: 'post',
+        operationId: 'recordConsent',
         summary: 'Record or revoke a consent decision',
         description: 'Append-only LGPD consent ledger. Ads measurement can be granted or revoked. Email marketing can only be revoked here; the grant happens on a form submission. The response does not reveal whether an email exists in the CRM.',
         requestBody: {
@@ -469,6 +478,7 @@ export function buildOpenApiPaths(endpoints: readonly ApiEndpointDefinition[]): 
         paths[path] = {
             ...paths[path],
             [endpoint.method]: {
+                operationId: endpoint.operationId,
                 summary: endpoint.summary,
                 description: endpoint.description,
                 requestBody: endpoint.requestBody,
@@ -488,6 +498,7 @@ export const buildOpenApiDocument = memoize0((): Record<string, unknown> => {
 
     paths[HEALTH_PATH] = {
         get: {
+            operationId: 'getHealth',
             summary: 'Read service health',
             description: 'Checks required rate-limit configuration on managed runtimes. Does not probe Redis connectivity or other providers.',
             responses: {

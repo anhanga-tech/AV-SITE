@@ -41,6 +41,17 @@
 # CMS admin trailing-slash normalisation
 /admin  /admin/  301
 
+# Páginas de confiança nos caminhos em inglês
+# Agentes e scanners (IsAgentReady, checkpoint ia.trust-pages) não reconhecem /sobre e
+# /politica-privacidade pelo link do rodapé e tentam /about, /contact e /privacy direto.
+# Destino COM barra pelo mesmo motivo dos blocos acima.
+/about      /sobre/                 301
+/about/     /sobre/                 301
+/contact    /contato/               301
+/contact/   /contato/               301
+/privacy    /politica-privacidade/  301
+/privacy/   /politica-privacidade/  301
+
 # .well-known API discovery (redirects to function handlers)
 # Host-based redirects (anhanga.tur.br → www, beto.anhanga.tur.br → /beto-carrero)
 # must be configured as Cloudflare Redirect Rules in the dashboard.
