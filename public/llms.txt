@@ -51,7 +51,7 @@ suporte a viagens já compradas com outra agência, ou perguntas sem relação c
 ## Recursos para agentes e desenvolvedores
 
 - Catálogo de API (RFC 9727): https://www.anhanga.tur.br/.well-known/api-catalog
-- Especificação OpenAPI: https://www.anhanga.tur.br/.well-known/openapi.json
+- Especificação OpenAPI: https://www.anhanga.tur.br/openapi.json
 - Documentação legível: https://www.anhanga.tur.br/.well-known/api-docs
 - Negociação de conteúdo: a home, as páginas de destino (Orlando, Beto Carrero, Melhor Idade,
   Lollapalooza), o índice do blog e cada post do blog respondem em Markdown para requisições

@@ -4,6 +4,8 @@ import { StructuredData } from './StructuredData';
 export interface PersonWorksFor {
     name: string;
     url?: string;
+    // @id da organização no grafo JSON-LD (ex.: ORGANIZATION_ID), para ligar a pessoa a ela.
+    id?: string;
 }
 
 export interface PersonSchemaProps {
@@ -41,6 +43,7 @@ export const PersonSchema: React.FC<PersonSchemaProps> = ({
         ...(worksFor && {
             "worksFor": {
                 "@type": "TravelAgency",
+                ...(worksFor.id && { "@id": worksFor.id }),
                 "name": worksFor.name,
                 ...(worksFor.url && { "url": worksFor.url })
             }

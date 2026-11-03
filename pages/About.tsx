@@ -6,6 +6,7 @@ import { OrganizationSchema } from '../components/schemas/OrganizationSchema';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../components/schemas/FAQPageSchema';
 import { PersonSchema } from '../components/schemas/PersonSchema';
+import { ORGANIZATION_ID } from '../components/schemas/schema-ids';
 import { HeroSection } from '../components/about/HeroSection';
 import { HistoriaSection } from '../components/about/HistoriaSection';
 import { ExpertiseSection } from '../components/about/ExpertiseSection';
@@ -114,7 +115,7 @@ const About: React.FC = () => {
           description={member.bio}
           jobTitle={member.role}
           sameAs={member.social ? (Object.values(member.social).filter(Boolean) as string[]) : undefined}
-          worksFor={{ name: ORG_NAME, url: ORG_URL }}
+          worksFor={{ name: ORG_NAME, url: ORG_URL, id: ORGANIZATION_ID }}
         />
       ))}
       <BreadcrumbSchema

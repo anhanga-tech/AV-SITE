@@ -169,14 +169,16 @@ test('Cloudflare page redirects should target the canonical trailing-slash form'
   // O site normaliza trailing slash com um 308, então um destino sem barra
   // encadeia 301 → 308 → 200 e dilui link equity. Só o pathname importa: a query
   // não isenta da normalização (/x?a=1 → 308 → /x/?a=1), mas a raiz sim.
-  // Handlers de função (/api/*) e splats não passam por ela.
+  // Handlers de função (/api/*), splats e arquivos com extensão (/openapi.json, /llms.txt)
+  // não passam por ela: o Pages só acrescenta a barra em rotas de página.
   const pathnameOf = (target: string): string => target.split('?')[0].split('#')[0];
+  const isFilePath = (target: string): boolean => /\.[a-z0-9]+$/i.test(pathnameOf(target));
 
   const pageRedirects = collectRedirectRules(redirects)
     .map((line) => line.split(/\s+/))
     .filter(([from, target]) => {
       if (!from?.startsWith('/') || !target?.startsWith('/')) return false;
-      if (target.startsWith('/api/') || target.includes('*')) return false;
+      if (target.startsWith('/api/') || target.includes('*') || isFilePath(target)) return false;
       return pathnameOf(target) !== '/';
     });
 
@@ -238,6 +240,22 @@ test('Cloudflare Pages headers should include HSTS on the global route', async (
   const hsts = globalHeaders.get('Strict-Transport-Security');
   assert.ok(hsts, 'Strict-Transport-Security header must be present in /* block');
   assert.match(hsts, /^max-age=\d+/i, 'Strict-Transport-Security must start with max-age=<number>');
+});
+
+// Scanners (IsAgentReady `hsts`, HSTS preload) e a recomendação da MDN pedem pelo menos
+// 1 ano. A página de proposta monta seus próprios headers e precisa acompanhar o global.
+const HSTS_MIN_MAX_AGE = 31536000;
+
+test('HSTS max-age is at least one year on the global route and on the proposal page', async () => {
+  const headers = await readFile(new URL('../public/_headers', import.meta.url), 'utf8');
+  const globalHsts = collectHeadersBlocks(headers).get('/*')?.get('Strict-Transport-Security') ?? '';
+  const proposalSource = await readFile(new URL('../lib/proposal-page.ts', import.meta.url), 'utf8');
+  const proposalHsts = proposalSource.match(/'Strict-Transport-Security':\s*'([^']+)'/)?.[1] ?? '';
+
+  for (const [where, value] of [['_headers /*', globalHsts], ['lib/proposal-page.ts', proposalHsts]]) {
+    const maxAge = Number(value.match(/max-age=(\d+)/i)?.[1] ?? 0);
+    assert.ok(maxAge >= HSTS_MIN_MAX_AGE, `${where} HSTS max-age=${maxAge} is below ${HSTS_MIN_MAX_AGE}`);
+  }
 });
 
 test('Cloudflare Pages HSTS should not include subdomains until subdomain inventory is complete', async () => {

@@ -37,7 +37,7 @@ const SECURITY_HEADERS: Readonly<Record<string, string>> = {
     'X-Content-Type-Options': 'nosniff',
     'X-Frame-Options': 'DENY',
     'Cross-Origin-Opener-Policy': 'same-origin',
-    'Strict-Transport-Security': 'max-age=15768000',
+    'Strict-Transport-Security': 'max-age=31536000',
     'Permissions-Policy':
         'camera=(), microphone=(), geolocation=(), payment=(), usb=(), bluetooth=(), midi=(), serial=(), hid=(), magnetometer=(), gyroscope=(), accelerometer=(), xr-spatial-tracking=()',
 };
