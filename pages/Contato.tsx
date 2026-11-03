@@ -85,8 +85,9 @@ const Contato: React.FC = () => {
                 data-contact-intent
                 data-no-whatsapp-cta
                 data-tracking="contato-whatsapp"
+                aria-haspopup="dialog"
               >
-                (11) 95502-1519<span className="sr-only"> (abre em nova aba)</span>
+                (11) 95502-1519<span className="sr-only"> (abre o formulário de contato)</span>
               </a>
             </p>
             <p>O canal mais rápido para cotações, dúvidas e suporte durante a viagem.</p>

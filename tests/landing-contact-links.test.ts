@@ -82,4 +82,5 @@ test('WhatsApp de /contato/ é wa.me sem JS e abre o modal de contato com JS', a
   assert.match(link[0], /href="https:\/\/wa\.me\/5511955021519\?text=/);
   assert.match(link[0], /data-contact-intent/, 'marca a intenção que abre o modal');
   assert.match(link[0], /data-no-whatsapp-cta/, 'clique não conta como handoff de WhatsApp');
+  assert.match(link[0], /aria-haspopup="dialog"/, 'leitor de tela anuncia o modal');
 });
