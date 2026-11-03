@@ -12,7 +12,7 @@ Disallow: /_next/
 
 # AI Crawlers - Explicitly Allowed for AEO (Answer Engine Optimization)
 # Search/answer bots (OAI-SearchBot, ChatGPT-User, PerplexityBot, Bingbot) and training
-# bots (GPTBot, ClaudeBot, Google-Extended, Applebot-Extended, Amazonbot, Meta-ExternalAgent)
+# bots (GPTBot, ClaudeBot, Google-Extended, Applebot-Extended, Amazonbot, Meta-ExternalAgent; CCBot via `*`)
 # are both allowed on purpose: being in model training helps a small brand be recognized,
 # matching `Content-Signal: ai-train=yes` below. Claude-SearchBot/Claude-User fall under `*`.
 User-agent: GPTBot
@@ -39,9 +39,10 @@ Disallow: /staging/
 Disallow: /cdn-cgi/
 Disallow: /_next/
 
-# Bulk scrapers - blocked to reduce load (CCBot = Common Crawl, Bytespider = ByteDance)
+# Bulk scrapers - blocked to reduce load (Bytespider = ByteDance).
+# CCBot (Common Crawl) is allowed on purpose: it feeds the training data of many models.
+# Watch its load; if it becomes a problem, throttle it before blocking it.
 # FacebookBot excluded: responsible for Open Graph previews on Facebook/Instagram
-User-agent: CCBot
 User-agent: Bytespider
 Disallow: /
 

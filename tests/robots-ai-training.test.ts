@@ -21,13 +21,13 @@ const blocksSite = (rules: string[]) => rules.some((line) => /^Disallow:\s*\/\s*
 // deliberate choice (small brand recognition), declared as `ai-train=yes`.
 const AI_CRAWLERS = [
   'GPTBot', 'ClaudeBot', 'anthropic-ai', 'Claude-Web', 'Google-Extended', 'Applebot-Extended',
-  'Amazonbot', 'Meta-ExternalAgent', 'OAI-SearchBot', 'ChatGPT-User', 'PerplexityBot',
+  'Amazonbot', 'Meta-ExternalAgent', 'CCBot', 'OAI-SearchBot', 'ChatGPT-User', 'PerplexityBot',
   'Perplexity-User', 'Claude-SearchBot', 'Claude-User', 'Bingbot', 'Googlebot', 'Applebot',
   'FacebookBot'
 ];
 
 // Bulk scrapers stay blocked to reduce load.
-const BLOCKED_SCRAPERS = ['CCBot', 'Bytespider'];
+const BLOCKED_SCRAPERS = ['Bytespider'];
 
 test('robots.txt allows AI search, answer and training crawlers', async () => {
   for (const agent of AI_CRAWLERS) {
