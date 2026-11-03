@@ -1,33 +1,43 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { getConsentStore } from '../lib/consent-store.ts';
+import { ConsentLedgerUnavailable, getConsentStore } from '../lib/consent-store.ts';
 import { effectiveAction } from '../lib/consent-ledger.ts';
 
 const ENV_KEYS = ['UPSTASH_REDIS_REST_URL', 'UPSTASH_REDIS_REST_TOKEN'] as const;
 
+interface MockRequest {
+    path: string;
+    /** Commands carried by the request: one for a plain call, many for /pipeline. */
+    commands: string[][];
+}
+
+/**
+ * Fake Upstash REST endpoint. `respond` answers one command at a time, in the
+ * order the server would run them; a /pipeline request is answered as the
+ * array of per-command `{ result }` objects, like the real API.
+ */
 async function withUpstashMock<T>(
     respond: (command: string[]) => unknown,
-    run: (commands: string[][], stats: { maxInFlight: number }) => Promise<T>,
+    run: (requests: MockRequest[]) => Promise<T>,
+    options: { failPipeline?: boolean } = {},
 ): Promise<T> {
     const savedEnv = Object.fromEntries(ENV_KEYS.map((key) => [key, process.env[key]]));
     const savedFetch = globalThis.fetch;
-    const commands: string[][] = [];
-    const stats = { maxInFlight: 0 };
-    let inFlight = 0;
+    const requests: MockRequest[] = [];
     process.env.UPSTASH_REDIS_REST_URL = 'https://upstash.test';
     process.env.UPSTASH_REDIS_REST_TOKEN = 'test-token';
-    globalThis.fetch = (async (_url: unknown, init?: RequestInit) => {
-        const command = JSON.parse(String(init?.body)) as string[];
-        commands.push(command);
-        inFlight += 1;
-        stats.maxInFlight = Math.max(stats.maxInFlight, inFlight);
-        // Yield so a serial caller and a concurrent caller are distinguishable.
-        await new Promise((resolve) => setTimeout(resolve, 5));
-        inFlight -= 1;
-        return new Response(JSON.stringify({ result: respond(command) }), { status: 200 });
+    globalThis.fetch = (async (url: unknown, init?: RequestInit) => {
+        const path = new URL(String(url)).pathname;
+        const body = JSON.parse(String(init?.body)) as string[] | string[][];
+        const isPipeline = path === '/pipeline';
+        const commands = isPipeline ? (body as string[][]) : [body as string[]];
+        requests.push({ path, commands });
+        if (isPipeline && options.failPipeline) return new Response('{}', { status: 500 });
+        const results = commands.map((command) => ({ result: respond(command) }));
+        return new Response(JSON.stringify(isPipeline ? results : results[0]), { status: 200 });
     }) as typeof fetch;
     try {
-        return await run(commands, stats);
+        return await run(requests);
     } finally {
         globalThis.fetch = savedFetch;
         for (const key of ENV_KEYS) {
@@ -47,36 +57,36 @@ const draft = {
     occurredAt: '2026-10-13T12:00:00.000Z',
 };
 
-test('upstash append issues the replay GET and the subject LRANGE together', async () => {
+test('upstash append reads the replay check and the subject list in one ordered request', async () => {
     await withUpstashMock(
         (command) => (command[0] === 'SET' ? 'OK' : command[0] === 'LRANGE' ? [] : null),
-        async (commands, stats) => {
+        async (requests) => {
             const outcome = await getConsentStore().append(draft);
             assert.equal(outcome.status, 'appended');
-            // Both reads must be in flight at once; a serial await chain peaks at 1.
-            assert.equal(stats.maxInFlight, 2);
-            assert.deepEqual(commands.slice(0, 2).map((c) => c[0]).sort(), ['GET', 'LRANGE']);
-            assert.deepEqual(commands.slice(2).map((c) => c[0]), ['SET', 'RPUSH', 'EXPIRE']);
+            // One round trip carries both reads, GET first: the server runs a
+            // pipeline in order, so the LRANGE snapshot is taken after the
+            // replay check (a serial-await version would use two requests).
+            assert.equal(requests[0]?.path, '/pipeline');
+            assert.deepEqual(requests[0]?.commands.map((c) => c[0]), ['GET', 'LRANGE']);
+            assert.deepEqual(requests.slice(1).map((r) => r.commands[0]?.[0]), ['SET', 'RPUSH', 'EXPIRE']);
         },
     );
 });
 
-test('upstash append still reports a replay when the event already exists', async () => {
+test('upstash append still reports a replay when the event already exists, with no writes', async () => {
     const stored = JSON.stringify({ ...draft, recordedAt: '2026-10-13T12:00:01.000Z' });
     await withUpstashMock(
         (command) => (command[0] === 'GET' ? stored : command[0] === 'LRANGE' ? [stored] : null),
-        async (commands) => {
+        async (requests) => {
             const outcome = await getConsentStore().append(draft);
             assert.equal(outcome.status, 'replay');
             assert.equal(outcome.events.length, 1);
-            // The subject list is read again after the replay check, so a
-            // revocation landing in between is still seen (no re-grant).
-            assert.deepEqual(commands.map((c) => c[0]), ['GET', 'LRANGE', 'LRANGE']);
+            assert.equal(requests.length, 1);
         },
     );
 });
 
-test('upstash append replay sees a revocation that lands after the replay check', async () => {
+test('upstash append replay reflects a revocation that is already in the list', async () => {
     const stored = JSON.stringify({ ...draft, recordedAt: '2026-10-13T12:00:01.000Z' });
     const revoke = JSON.stringify({
         ...draft,
@@ -85,18 +95,22 @@ test('upstash append replay sees a revocation that lands after the replay check'
         occurredAt: '2026-10-13T12:05:00.000Z',
         recordedAt: '2026-10-13T12:05:01.000Z',
     });
-    let lranges = 0;
     await withUpstashMock(
-        (command) => {
-            if (command[0] === 'GET') return stored;
-            // First (speculative) read predates the revocation; the re-read sees it.
-            if (command[0] === 'LRANGE') return ++lranges === 1 ? [stored] : [stored, revoke];
-            return null;
-        },
+        (command) => (command[0] === 'GET' ? stored : command[0] === 'LRANGE' ? [stored, revoke] : null),
         async () => {
             const outcome = await getConsentStore().append(draft);
             assert.equal(outcome.status, 'replay');
             assert.equal(effectiveAction(outcome.events, 'email_marketing'), 'revoke');
         },
+    );
+});
+
+test('upstash append fails closed when the pipeline request fails', async () => {
+    await withUpstashMock(
+        () => null,
+        async () => {
+            await assert.rejects(() => getConsentStore().append(draft), ConsentLedgerUnavailable);
+        },
+        { failPipeline: true },
     );
 });
