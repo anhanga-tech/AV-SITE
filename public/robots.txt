@@ -11,7 +11,11 @@ Disallow: /cdn-cgi/
 Disallow: /_next/
 
 # AI Crawlers - Explicitly Allowed for AEO (Answer Engine Optimization)
-# These bots power recommendations in ChatGPT, Claude, Perplexity, Apple Intelligence, etc.
+# Search/answer bots (OAI-SearchBot, ChatGPT-User, PerplexityBot, Bingbot) and training
+# bots (GPTBot, ClaudeBot, Google-Extended, Applebot-Extended, Amazonbot, Meta-ExternalAgent)
+# are both allowed on purpose: being in model training helps a small brand be recognized,
+# matching `Content-Signal: ai-train=yes` below. CCBot, Claude-SearchBot, Claude-User and
+# FacebookBot (Open Graph previews on Facebook/Instagram) fall under `*` and are allowed too.
 User-agent: GPTBot
 User-agent: ChatGPT-User
 User-agent: OAI-SearchBot
@@ -36,9 +40,9 @@ Disallow: /staging/
 Disallow: /cdn-cgi/
 Disallow: /_next/
 
-# Training-only scrapers - No recommendation benefit, block to reduce load
-# FacebookBot excluded: responsible for Open Graph previews on Facebook/Instagram
-User-agent: CCBot
+# Bulk scrapers - blocked to reduce load (Bytespider = ByteDance).
+# CCBot (Common Crawl) is allowed on purpose: it feeds the training data of many models.
+# Watch its load; if it becomes a problem, throttle it before blocking it.
 User-agent: Bytespider
 Disallow: /
 
@@ -58,4 +62,4 @@ Disallow: /proposta/
 Sitemap: https://www.anhanga.tur.br/sitemap.xml
 
 # Content Signals - AI usage preferences (https://contentsignals.org/)
-Content-Signal: ai-train=no, search=yes, ai-input=yes
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
