@@ -116,3 +116,8 @@ test('validateHtml não confunde data-id com o id do segmento de streaming', () 
   const html = `${headHtml()}<main><h1>Sobre</h1><div data-id="S:3">x</div></main>`;
   assert.doesNotThrow(() => validateHtml('/sobre', html));
 });
+
+test('validateHtml só trata como reveal o div S:n escondido', () => {
+  const visivel = `${headHtml()}<main><h1>Sobre</h1><div id="S:3">x</div><div class="hidden-md" id="S:4">y</div></main>`;
+  assert.doesNotThrow(() => validateHtml('/sobre', visivel));
+});
