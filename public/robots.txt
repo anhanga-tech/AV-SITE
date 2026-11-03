@@ -30,9 +30,10 @@ Disallow: /cdn-cgi/
 Disallow: /_next/
 
 # AI training crawlers - blocked, matching `Content-Signal: ai-train=no` below.
-# Blocking them does not affect search or answer visibility: those use the bots above
-# (and Googlebot/Applebot, which are separate from Google-Extended/Applebot-Extended).
-# FacebookBot excluded: responsible for Open Graph previews on Facebook/Instagram
+# Google Search, Applebot and the AI search/answer crawlers above use separate user
+# agents and stay allowed. Tradeoff accepted: Google-Extended also gates Gemini Apps and
+# Vertex AI grounding, so Gemini answers cannot ground on this site.
+# FacebookBot is deliberately not listed: it renders Open Graph previews on Facebook/Instagram.
 User-agent: GPTBot
 User-agent: ClaudeBot
 User-agent: anthropic-ai
