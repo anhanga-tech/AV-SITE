@@ -42,7 +42,10 @@ export default async function handler(req: Request): Promise<Response> {
         return buildJsonError(429, 'RATE_LIMIT_EXCEEDED', 'Too many requests. Please try again later.');
     }
 
-    logger.info('AUTH: initiating OAuth flow', { clientIP });
+    // Log the HMAC subjectKey, never the raw IP: rate-limit.ts deliberately keeps
+    // raw IPs out of Redis and logs, and `clientIP` is not matched by the log/Sentry
+    // redaction net, so a raw address here would reach console + Sentry Logs.
+    logger.info('AUTH: initiating OAuth flow', { subjectKey: rateLimit.subjectKey });
 
     const state = crypto.randomUUID();
 

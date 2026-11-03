@@ -68,6 +68,11 @@ function renderApp(url: string, headManager: HeadManager): React.ReactElement {
 // streaming descartável antes do `renderToString` final, para que `React.lazy` os devolva já
 // resolvidos e nunca suspenda) — não tentado aqui por ser uma mudança de arquitetura no
 // prerender da página mais importante do site, sem cobertura de teste ainda para validar.
+//
+// Atualização: o fallback + `hidden id="S:n"` não vem de `lazy()` pendente, e sim do
+// outlining por tamanho do Fizz (boundary concluído > `progressiveChunkSize`). Com
+// `progressiveChunkSize: Infinity` em `renderStreamingHtml` ele some. Isso abre o caminho
+// para a home voltar ao streaming, mas fica fora desta mudança.
 function isHomeRoute(url: string): boolean {
   const pathname = url.split(QUERY_HASH_REGEX)[0];
   return pathname.replace(TRAILING_SLASH_REGEX, '') === '';
@@ -119,6 +124,11 @@ async function renderStreamingHtml(url: string, headManager: HeadManager): Promi
     const { pipe, abort } = renderToPipeableStream(
       renderApp(url, headManager),
       {
+        // Sem isto, o React "terceiriza" todo boundary concluído maior que ~12,8 KB: emite o
+        // fallback no lugar e o conteúdo num `<div hidden id="S:n">` revelado por script
+        // inline, mesmo com `onAllReady`. Crawler sem JS lia /sobre e /politica-privacidade
+        // vazias. No prerender não há streaming progressivo a ganhar: tudo vai inline.
+        progressiveChunkSize: Number.POSITIVE_INFINITY,
         onAllReady() {
           if (startedPiping) {
             return;
