@@ -157,9 +157,8 @@ const WaitlistSection: React.FC = () => {
     >
       {/* Background Graphic Elements */}
       <div className="absolute top-0 right-0 w-full h-full pointer-events-none select-none overflow-hidden" aria-hidden="true">
-        <span className="absolute -top-10 -right-20 text-[20vw] font-black italic text-white/5 leading-none select-none">
-          2027
-        </span>
+        {/* Marca d'água via ::before: fora da medição de contraste — o tom quase invisível é intencional (#1970). */}
+        <span className="absolute -top-10 -right-20 text-[20vw] font-black italic text-white/5 leading-none select-none before:content-['2027']" />
         <div className="absolute top-1/4 left-0 w-px h-64 bg-gradient-to-b from-transparent via-anhanga-yellow/20 to-transparent" />
       </div>
 

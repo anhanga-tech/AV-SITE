@@ -51,7 +51,7 @@ const Footer: React.FC = () => {
 
                     {/* Links */}
                     <div>
-                        <h3 className="font-bold text-white mb-6 uppercase tracking-wider text-xs">Menu</h3>
+                        <p className="font-bold text-white mb-6 uppercase tracking-wider text-xs">Menu</p>
                         <ul className="space-y-3 font-medium">
                             <li><a href="/" className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Agência de viagens em São Paulo</a></li>
                             <li><a href="/sobre/" className="hover:text-brand-yellow transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 rounded px-1 -mx-1">Sobre a Anhangá</a></li>
@@ -75,7 +75,7 @@ const Footer: React.FC = () => {
 
                     {/* Contact */}
                     <div>
-                        <h3 className="font-bold text-white mb-6 uppercase tracking-wider text-xs">Fale Conosco</h3>
+                        <p className="font-bold text-white mb-6 uppercase tracking-wider text-xs">Fale Conosco</p>
                         <ul className="space-y-4 font-medium text-sm">
                             <li className="flex items-center gap-3">
                                 <Phone className="size-5 text-brand-cyan" weight="fill" />

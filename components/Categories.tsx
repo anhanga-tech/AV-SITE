@@ -12,7 +12,7 @@ const POPULAR_DESTINATIONS = [
     image: optimizeRemoteImageUrl('images/categories/orlando-home.jpg', 600, 600),
     tag: "Destino dos Sonhos",
     rotate: "-rotate-2",
-    color: "bg-blue-100 text-blue-600",
+    color: "bg-blue-100 text-blue-700",
     link: "/orlando/"
   },
   {
@@ -30,7 +30,7 @@ const POPULAR_DESTINATIONS = [
     image: optimizeRemoteImageUrl('images/categories/lollapalooza-2026.webp', 600, 600),
     tag: "Festival",
     rotate: "-rotate-1",
-    color: "bg-emerald-100 text-emerald-600",
+    color: "bg-emerald-100 text-emerald-700",
     link: "/lollapalooza/"
   }
 ];

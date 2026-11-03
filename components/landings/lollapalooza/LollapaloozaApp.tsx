@@ -39,25 +39,33 @@ const VenueMapFallback: React.FC = () => (
   </section>
 );
 
-function LollapaloozaApp() {
+interface LollapaloozaAppProps {
+  /** Conteúdo extra da página (FAQ, bloco evergreen) — entra no fim do <main>, antes do Footer. */
+  children?: React.ReactNode;
+}
+
+function LollapaloozaApp({ children }: LollapaloozaAppProps) {
   const shouldRenderInteractiveMap = typeof window !== 'undefined';
 
   return (
     <div className="landing-lollapalooza font-sans antialiased text-zinc-800 bg-white selection:bg-anhanga-yellow selection:text-anhanga-darkBlue">
       <Navbar />
-      <Hero />
-      <WaitlistSection />
-      {shouldRenderInteractiveMap ? (
-        <Suspense fallback={<VenueMapFallback />}>
-          <VenueMap />
-        </Suspense>
-      ) : (
-        <VenueMapFallback />
-      )}
-      <PackageFeatures />
-      <LineupSection />
-      <WhyUs />
-      <CTASection />
+      <main id="main-content">
+        <Hero />
+        <WaitlistSection />
+        {shouldRenderInteractiveMap ? (
+          <Suspense fallback={<VenueMapFallback />}>
+            <VenueMap />
+          </Suspense>
+        ) : (
+          <VenueMapFallback />
+        )}
+        <PackageFeatures />
+        <LineupSection />
+        <WhyUs />
+        <CTASection />
+        {children}
+      </main>
       <Footer />
       <WhatsAppFloating />
     </div>

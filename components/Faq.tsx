@@ -208,12 +208,12 @@ const Faq = memo(() => {
 
             <div className="container mx-auto px-6 max-w-4xl">
                 <div className="text-center mb-16">
-                    <div className="inline-block bg-brand-vibrant text-white px-4 py-1.5 rounded-full font-black text-xs uppercase tracking-widest mb-4 shadow-sm transform -rotate-1">
+                    <div className="inline-block bg-anhanga-action text-anhanga-dark px-4 py-1.5 rounded-full font-black text-xs uppercase tracking-widest mb-4 shadow-sm transform -rotate-1">
                         Tire suas dúvidas
                     </div>
                     <h2 className="text-4xl md:text-5xl font-black text-brand-dark tracking-tight mb-4">
                         Tá na cabeça?<br />
-                        <span className="text-brand-cyan">
+                        <span className="text-anhanga-actionInk">
                             A gente responde.
                         </span>
                     </h2>
@@ -237,7 +237,7 @@ const Faq = memo(() => {
                         <div className="text-center md:text-left">
                             <h4 className="font-bold text-brand-dark text-xl mb-1">Ainda tem dúvidas?</h4>
                             <p className="text-zinc-600">
-                                Nosso <span className="font-bold text-brand-cyan">assistente inicial</span> ajuda a organizar sua ideia.
+                                Nosso <span className="font-bold text-anhanga-actionInk">assistente inicial</span> ajuda a organizar sua ideia.
                                 Chame no chat aqui no canto e nossa equipe continua com você.
                             </p>
                         </div>

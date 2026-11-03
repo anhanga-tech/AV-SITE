@@ -90,21 +90,23 @@ const CruzeirosLanding: React.FC = () => {
           <FAQPageSchema items={FAQ_ITEMS} />
 
           <CruiseMiniHeader />
-          <CruiseHero />
-          <CruiseOffersSection
-            featuredOffer={FEATURED_OFFER}
-            secondaryOffers={SECONDARY_OFFERS}
-          />
-          <CruiseProcess />
-          <CruiseCurationBenefits />
-          <CruiseAbout />
-          <CruiseFinalCta />
-          <CruiseOtherServices />
-          <LandingFAQ
-            items={FAQ_ITEMS}
-            title="Dúvidas sobre cruzeiros"
-            subtitle="Tire suas dúvidas antes de escolher seu cruzeiro."
-          />
+          <main id="main-content">
+            <CruiseHero />
+            <CruiseOffersSection
+              featuredOffer={FEATURED_OFFER}
+              secondaryOffers={SECONDARY_OFFERS}
+            />
+            <CruiseProcess />
+            <CruiseCurationBenefits />
+            <CruiseAbout />
+            <CruiseFinalCta />
+            <CruiseOtherServices />
+            <LandingFAQ
+              items={FAQ_ITEMS}
+              title="Dúvidas sobre cruzeiros"
+              subtitle="Tire suas dúvidas antes de escolher seu cruzeiro."
+            />
+          </main>
           <CruiseLandingFooter />
         </div>
       </MotionConfig>

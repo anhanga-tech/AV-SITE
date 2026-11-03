@@ -11,7 +11,7 @@ test('tokens exporta as categorias esperadas', () => {
 });
 
 test('tokens.color contém todos os papéis semânticos', () => {
-    const expectedKeys = ['action', 'actionDark', 'accent', 'accentHover', 'brand', 'surface', 'surfaceAlt', 'dark', 'muted'];
+    const expectedKeys = ['action', 'actionDark', 'actionInk', 'accent', 'accentHover', 'brand', 'surface', 'surfaceAlt', 'dark', 'muted'];
     for (const key of expectedKeys) {
         assert.ok(key in tokens.color, `tokens.color.${key} deve existir`);
     }

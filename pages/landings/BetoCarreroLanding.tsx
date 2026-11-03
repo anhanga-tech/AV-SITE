@@ -70,7 +70,7 @@ const BetoCarreroLanding: React.FC = () => {
                 e.preventDefault();
                 openContactModal({ source: 'beto-carrero' });
               }}
-              className="btn-whatsapp btn-specialist px-5 py-3 rounded-full bg-brand-cyan text-white font-bold hover:bg-brand-cyan/90 transition-colors"
+              className="btn-whatsapp btn-specialist px-5 py-3 rounded-full bg-anhanga-action text-anhanga-dark font-bold hover:brightness-105 transition-colors"
               data-tracking="footer-betocarrero"
               data-testid="cta-betocarrero-specialist"
             >

@@ -61,7 +61,10 @@ function collectRootFiles(): string[] {
 // ao ligar a página ao hub /parques-brasil).
 // 2026-07-29: 508 → 506 (CTA "Falar com especialista" da /orlando migrado ao
 // corrigir o contraste do par branco-sobre-Céu-Vivo).
-const BRAND_NAMESPACE_BASELINE = 506;
+// 2026-11-03: 506 → 476 (contraste AA da auditoria #1970: textos em Céu Vivo
+// migrados para anhanga-actionInk e botões branco-sobre-Céu-Vivo para
+// anhanga-action + texto Ardósia; baseline na contagem real).
+const BRAND_NAMESPACE_BASELINE = 476;
 
 test('legacy brand-* namespace does not grow (ratchet)', () => {
   const files = [...SCAN_DIRS.flatMap(collectTailwindFiles), ...collectRootFiles()];

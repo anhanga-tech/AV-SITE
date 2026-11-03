@@ -30,14 +30,15 @@ export default {
                     surface: '#fffdf5', // Superfície Quente — warm cream background
                 },
                 'fun-yellow': '#FFD23F',
-                'fun-blue': '#3B82F6',
-                'fun-pink': '#EE4266',
-                'fun-green': '#0EAD69',
+                'fun-blue': '#2563EB', // #1970: era #3B82F6 (3.7:1 sob texto branco)
+                'fun-pink': '#D02A50', // #1970: era #EE4266 (3.7:1 sob texto branco)
+                'fun-green': '#087F4D', // #1970: era #0EAD69 (2.9:1 sob texto branco)
                 'fun-dark': '#0F172A',
                 'fun-white': '#F8FAFC',
                 anhanga: {
                     action:     '#0ea5e9',   // cor de ação (antigo brand-cyan / brand-vibrant)
                     actionDark: '#0284c7',   // hover de ação (antigo brand-cyanDark)
+                    actionInk:  '#0369a1',   // Céu Vivo como TEXTO em fundo claro (5.9:1; #0ea5e9 mede 2.8:1)
                     dark:       '#0f172a',   // necessário para text-anhanga-dark / bg-anhanga-dark
                     blue: '#0056D2',
                     darkBlue: '#003B8E',

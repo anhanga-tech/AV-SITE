@@ -4,6 +4,7 @@ description: Agência boutique de viagens — cada roteiro nasce de uma conversa
 colors:
   action: "#0ea5e9"
   action-dark: "#0284c7"
+  action-ink: "#0369a1"
   brand-blue: "#0056D2"
   brand-blue-deep: "#003B8E"
   brand-yellow: "#FFD600"
@@ -124,6 +125,7 @@ Uma paleta que evoca lugares reais, não categorias de produto. Azul de oceano p
 ### Primary
 - **Céu Vivo** (#0ea5e9): Cor de ação principal. Botões `action`, links ativos, ring de foco, border de input em foco. Referência visual imediata de que algo responde ao toque. Sky 500 no Tailwind; OKLCH canonical: `oklch(66% 0.17 233)`.
 - **Céu Fundo** (#0284c7): Estado hover e pressed de Céu Vivo. Sempre acompanha como par de profundidade. Sky 600; OKLCH: `oklch(57% 0.17 235)`.
+- **Céu Tinta** (#0369a1): Céu Vivo quando ele é **texto** sobre fundo claro (links, destaques em títulos, rótulos). Sky 700, 5.9:1 sobre branco; Céu Vivo como texto mede 2.8:1 e reprova no WCAG AA. Classe `text-anhanga-actionInk`. Fundos, bordas e anéis de foco continuam em Céu Vivo.
 
 ### Secondary
 - **Safira Profunda** (#0056D2): Cor de identidade institucional. Presente no logo, badges azuis, superfícies que precisam de peso de marca sem a leveza do Céu Vivo. OKLCH: `oklch(45% 0.19 262)`.

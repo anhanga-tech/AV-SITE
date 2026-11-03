@@ -23,11 +23,11 @@ const CallToActionComponent: React.FC = () => {
 
                         {/* Header Strip */}
                         <div className="flex justify-between items-center mb-8 border-b-2 border-dashed border-gray-100 pb-4">
-                            <div className="flex items-center gap-2 text-brand-cyan font-black tracking-widest text-sm uppercase" title="Estilo Boarding Pass">
+                            <div className="flex items-center gap-2 text-anhanga-actionInk font-black tracking-widest text-sm uppercase" title="Estilo Boarding Pass">
                                 <AirplaneTilt className="size-5" weight="fill" /> Anhangá Airlines
-                                <span className="text-[10px] opacity-40 ml-1 hidden lg:inline">(Boarding Pass)</span>
+                                <span className="text-[10px] text-zinc-500 ml-1 hidden lg:inline">(Boarding Pass)</span>
                             </div>
-                            <div className="text-gray-400 font-bold text-xs uppercase">First Class Experience</div>
+                            <div className="text-gray-500 font-bold text-xs uppercase">First Class Experience</div>
                         </div>
 
                         <CtaBody />

@@ -37,7 +37,7 @@ const GuestsField = memo(({
       aria-haspopup="true"
       data-testid="guests-filter-btn"
     >
-      <span className="block text-[10px] font-black text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-brand-cyan group-focus-within:text-brand-cyan transition-colors">
+      <span className="block text-[10px] font-black text-zinc-500 uppercase tracking-wider mb-1 flex items-center gap-1 group-hover:text-anhanga-actionInk group-focus-within:text-anhanga-actionInk transition-colors">
         <User className="size-3" /> Quem vai?
       </span>
       <div className="flex items-center justify-between">
@@ -116,7 +116,7 @@ const GuestsField = memo(({
           </div>
         )}
 
-        <button type="button" onClick={onClose} className="w-full mt-2 bg-brand-cyan text-white rounded-xl py-3 font-bold hover:bg-brand-cyanDark transition active:scale-95 shadow-[0_4px_0px_#0284c7] hover:shadow-[0_2px_0px_#0284c7] hover:translate-y-[2px]">Pronto</button>
+        <button type="button" onClick={onClose} className="w-full mt-2 bg-anhanga-action text-anhanga-dark rounded-xl py-3 font-bold hover:brightness-105 transition active:scale-95 shadow-[0_4px_0px_#0284c7] hover:shadow-[0_2px_0px_#0284c7] hover:translate-y-[2px]">Pronto</button>
       </div>
     )}
   </div>

@@ -337,8 +337,14 @@ export default defineConfig(({ mode, isSsrBuild }) => {
               ? 'assets/blog/[name]-[hash].js'
               : 'assets/[name]-[hash].js',
           manualChunks: isSsrBuild ? undefined : (id: string) => {
-            if (id.includes('/node_modules/react/') || id.includes('/node_modules/react-dom/') || id.includes('/node_modules/react-router-dom/')) {
+            if (id.includes('/node_modules/react/') || id.includes('/node_modules/react-dom/') || id.includes('/node_modules/scheduler/')) {
               return 'react-vendor';
+            }
+            // O core `react-router/` do v7 não casava com o antigo teste de `react-router-dom/`
+            // e caía no chunk de entrada, que muda a cada deploy (#1970). Chunk próprio: cache
+            // longo como vendor, sem estourar o orçamento do react-vendor (bundlesize).
+            if (id.includes('/node_modules/react-router/') || id.includes('/node_modules/react-router-dom/')) {
+              return 'router-vendor';
             }
             if (id.includes('/node_modules/@google/genai/')) {
               return 'ai-vendor';
