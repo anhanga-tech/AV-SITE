@@ -25,8 +25,9 @@ test('/orlando/ reserva as duas linhas da nav no mobile estreito', () => {
   assert.match(navRule[1], /min-height:\s*88px/);
 });
 
-test('parágrafo do banner de cookies reserva 4 linhas no mobile', () => {
+test('parágrafo do banner de cookies reserva as linhas do mobile (5 abaixo de 360px, 4 até o sm)', () => {
   const source = read('components/CookieConsentBanner.tsx');
 
-  assert.match(source, /<p className="min-h-\[4lh\] sm:min-h-0 /);
+  // 5 linhas abaixo de 360px: ali o Poppins Fallback (#1972) quebra numa linha a mais.
+  assert.match(source, /<p className="min-h-\[5lh\] min-\[360px\]:min-h-\[4lh\] sm:min-h-0 /);
 });
