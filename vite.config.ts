@@ -238,6 +238,8 @@ function stripMdxFrontmatterPlugin() {
   };
 }
 
+const REACT_DOM_SERVER_RE = /\/node_modules\/react-dom\/(server|cjs\/react-dom-server)/;
+
 const visualizerModule = process.env.ANALYZE === 'true'
   ? await import('rollup-plugin-visualizer')
   : null;
@@ -337,6 +339,12 @@ export default defineConfig(({ mode, isSsrBuild }) => {
               ? 'assets/blog/[name]-[hash].js'
               : 'assets/[name]-[hash].js',
           manualChunks: isSsrBuild ? undefined : (id: string) => {
+            // `react-dom/server` só é usado no cliente pelo VenueMap (lazy, /lollapalooza). No
+            // react-vendor ele baixava em toda página e era ~60 KiB de JS não usado na home
+            // (#1988); fora dele, cai no chunk lazy de quem o importa.
+            if (REACT_DOM_SERVER_RE.test(id)) {
+              return undefined;
+            }
             if (id.includes('/node_modules/react/') || id.includes('/node_modules/react-dom/') || id.includes('/node_modules/scheduler/')) {
               return 'react-vendor';
             }

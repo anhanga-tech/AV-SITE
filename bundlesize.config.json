@@ -2,7 +2,7 @@
   "files": [
     {
       "path": "dist/assets/react-vendor-*.js",
-      "maxSize": "130 kB"
+      "maxSize": "75 kB"
     },
     {
       "path": "dist/assets/router-vendor-*.js",
