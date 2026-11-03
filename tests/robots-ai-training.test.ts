@@ -15,7 +15,10 @@ async function groupFor(agent: string): Promise<string[]> {
   return groups.find((lines) => named(lines, agent)) ?? groups.find((lines) => named(lines, '*')) ?? [];
 }
 
-const blocksSite = (rules: string[]) => rules.some((line) => /^Disallow:\s*\/\s*$/i.test(line));
+// RFC 9309: on equal-length matches `Allow` wins, so `Allow: /` cancels `Disallow: /`.
+const blocksSite = (rules: string[]) =>
+  rules.some((line) => /^Disallow:\s*\/\s*$/i.test(line)) &&
+  !rules.some((line) => /^Allow:\s*\/\s*$/i.test(line));
 
 // Search, answer and training crawlers all keep access: being in model training is a
 // deliberate choice (small brand recognition), declared as `ai-train=yes`.
