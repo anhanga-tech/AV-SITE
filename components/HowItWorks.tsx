@@ -164,9 +164,13 @@ const HowItWorks = memo(() => {
                                     <div className={`size-16 rounded-2xl ${step.color} shadow-lg flex items-center justify-center transform -rotate-6 group-hover:rotate-0 transition-transform duration-300`}>
                                         {step.icon}
                                     </div>
-                                    <span className="font-black text-6xl text-zinc-100 select-none absolute top-4 right-6 z-0">
-                                        0{step.id}
-                                    </span>
+                                    {/* Numeral decorativo (1.09:1 de propósito): via ::before e não como
+                                        nó de texto, porque o axe mede contraste até de texto aria-hidden (#1998). */}
+                                    <span
+                                        aria-hidden="true"
+                                        data-ordinal={`0${step.id}`}
+                                        className="font-black text-6xl text-zinc-100 select-none absolute top-4 right-6 z-0 before:content-[attr(data-ordinal)]"
+                                    />
                                 </div>
 
                                 {/* Content */}
