@@ -8,6 +8,8 @@ import { ClientOnly } from '../components/ClientOnly';
 import Footer from '../components/Footer';
 import { isNotFoundPrerenderMarker, shouldHydratePrerenderedRoute } from '../lib/hydration.ts';
 import { render } from '../ssr.tsx';
+import { getDisplayReviews } from '../data/reviewsAdapter.ts';
+import type { GoogleReviewsData } from '../types/reviews.ts';
 
 function withMockedNow<T>(iso: string, callback: () => T): T {
   const RealDate = Date;
@@ -171,25 +173,30 @@ test('Home prerender includes the below-the-fold H2 sections in the first-respon
 // #1971: o mural de depoimentos e o bloco de contato ficavam atrás de uma gate de
 // scroll/timeout, e o HTML do build trazia só `<section id="depoimentos" … />` vazia.
 test('Home prerender ships real testimonials and the contact block in the first-response HTML', async () => {
-  const reviews = JSON.parse(
-    await readFile(path.join(process.cwd(), 'data/googleReviews.json'), 'utf8')
-  ) as { reviews: Array<{ authorName: string }> };
+  // Passa pelo adapter: um refresh do Google pode gravar a lista vazia, e aí o mural cai
+  // nos depoimentos manuais — estado suportado, não falha.
+  const displayReviews = getDisplayReviews(
+    JSON.parse(await readFile(path.join(process.cwd(), 'data/googleReviews.json'), 'utf8')) as GoogleReviewsData
+  );
   const { appHtml } = await render('/');
 
   assert.doesNotMatch(appHtml, /<section id="depoimentos"[^>]*><\/section>/);
   assert.doesNotMatch(appHtml, /<section id="contato"[^>]*><\/section>/);
   assert.match(appHtml, /itemProp="reviewBody"|itemprop="reviewBody"/);
-  assert.ok(reviews.reviews.length > 0, 'fixture de reviews vazia');
+  assert.ok(displayReviews.length > 0, 'nenhum depoimento para exibir');
+  // O HTML traz o nome escapado ("Ana &amp; João"); compara com o mesmo escape do React.
+  const expectedName = renderToStaticMarkup(React.createElement(React.Fragment, null, displayReviews[0].authorName));
   assert.ok(
-    appHtml.includes(reviews.reviews[0].authorName),
-    `expected reviewer "${reviews.reviews[0].authorName}" in the prerendered home`
+    appHtml.includes(expectedName),
+    `expected reviewer "${displayReviews[0].authorName}" in the prerendered home`
   );
   assert.match(appHtml, /Anhangá Airlines/);
 
   // Abaixo da dobra: os avatares não podem disputar banda com o topo da home.
   const testimonialsHtml = appHtml.slice(appHtml.indexOf('id="depoimentos"'), appHtml.indexOf('id="contato"'));
   const avatarImgs = testimonialsHtml.match(/<img\b[^>]*>/g) ?? [];
-  assert.ok(avatarImgs.length > 0, 'expected review avatar <img> in the testimonials');
+  const withPhoto = displayReviews.filter((review) => review.photoUrl).length;
+  assert.ok(avatarImgs.length >= withPhoto, `expected ${withPhoto} avatar <img>, found ${avatarImgs.length}`);
   for (const img of avatarImgs) {
     assert.match(img, /loading="lazy"/, `avatar sem loading="lazy": ${img.slice(0, 120)}`);
   }
