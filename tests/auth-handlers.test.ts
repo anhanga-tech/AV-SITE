@@ -91,6 +91,29 @@ test('auth: returns 429 once the request limit is exceeded', async () => {
     }
 });
 
+test('auth: does not write the raw client IP to logs when initiating OAuth', async () => {
+    setOAuthEnv();
+    const ip = '198.51.100.213';
+    const lines: string[] = [];
+    const originalInfo = console.info;
+    const originalLog = console.log;
+    const capture = (...args: unknown[]) => {
+        lines.push(args.map((arg) => (typeof arg === 'string' ? arg : JSON.stringify(arg))).join(' '));
+    };
+    console.info = capture;
+    console.log = capture;
+    try {
+        const res = await authHandler(authRequest(ip));
+        assert.equal(res.status, 302);
+        assert.ok(lines.some((line) => line.includes('AUTH: initiating OAuth flow')));
+        assert.ok(lines.every((line) => !line.includes(ip)), 'raw client IP must not be logged');
+    } finally {
+        console.info = originalInfo;
+        console.log = originalLog;
+        restoreEnv();
+    }
+});
+
 test('auth: rejects initiation with a missing referer (fail closed)', async () => {
     setOAuthEnv();
     try {
