@@ -58,13 +58,15 @@ const MelhorIdadeLanding: React.FC = () => {
       <FAQPageSchema items={MELHOR_IDADE_FAQ_ITEMS} />
 
       <MelhorIdadeNav />
-      <MelhorIdadeHero />
-      <MelhorIdadePillars />
-      <MelhorIdadeRhythm />
-      <MelhorIdadeAdvisory />
-      <MelhorIdadeContent />
-      <LandingFAQ items={MELHOR_IDADE_FAQ_ITEMS} />
-      <MelhorIdadeFinalCta />
+      <main id="main-content">
+        <MelhorIdadeHero />
+        <MelhorIdadePillars />
+        <MelhorIdadeRhythm />
+        <MelhorIdadeAdvisory />
+        <MelhorIdadeContent />
+        <LandingFAQ items={MELHOR_IDADE_FAQ_ITEMS} />
+        <MelhorIdadeFinalCta />
+      </main>
     </div>
   );
 };

@@ -316,7 +316,7 @@ export default function QuizAnhangaLanding() {
                     { name: 'Quiz de Destinos', item: 'https://www.anhanga.tur.br/quiz/' },
                 ]}
             />
-            <div className="quiz-page">
+            <main id="main-content" className="quiz-page">
                 <div className="quiz-app">
                     <div className={`quiz-stage quiz-stage--slide quiz-stage--${direction}`}>
                         <div className="quiz-stage-inner" key={stageKey}>
@@ -342,7 +342,7 @@ export default function QuizAnhangaLanding() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </main>
         </>
     );
 }

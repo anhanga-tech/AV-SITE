@@ -32,7 +32,7 @@ export const BlogPostSidebar: React.FC<BlogPostSidebarProps> = ({ author, author
                         </div>
                     )}
                 </div>
-                <h4 className="font-black text-2xl text-brand-dark mb-1">{author?.name || authorFallbackName}</h4>
+                <p className="font-black text-2xl text-brand-dark mb-1">{author?.name || authorFallbackName}</p>
                 <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-6 bg-zinc-50 inline-block px-3 py-1 rounded-full">{author?.role || 'Especialista em Viagens'}</p>
                 <p className="text-zinc-600 font-serif italic text-base mb-8 leading-relaxed">
                     {author?.bio ? `"${author.bio}"` : '"Apaixonado por descobrir lugares novos e compartilhar dicas que não estão nos guias turísticos."'}
@@ -68,9 +68,9 @@ export const BlogPostSidebar: React.FC<BlogPostSidebarProps> = ({ author, author
                                             {related.category}
                                         </span>
                                     </div>
-                                    <h5 className="font-bold text-zinc-800 leading-tight group-hover:text-brand-cyan transition-colors text-base mb-2 font-sans">
+                                    <h4 className="font-bold text-zinc-800 leading-tight group-hover:text-brand-cyan transition-colors text-base mb-2 font-sans">
                                         {related.title}
-                                    </h5>
+                                    </h4>
                                     <span className="text-xs text-zinc-400 font-bold flex items-center gap-1">
                                         <Clock className="size-3" /> {related.readingTime}
                                     </span>

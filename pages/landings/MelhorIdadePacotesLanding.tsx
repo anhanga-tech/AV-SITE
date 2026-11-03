@@ -57,12 +57,14 @@ const MelhorIdadePacotesLanding: React.FC = () => {
           />
 
           <PastorePacotesMiniHeader />
-          <PastorePacotesHero />
-          <PastorePacotesList
-            featuredPackage={FEATURED_PACKAGE}
-            secondaryPackages={SECONDARY_PACKAGES}
-          />
-          <PastorePacotesFinalCta />
+          <main id="main-content">
+            <PastorePacotesHero />
+            <PastorePacotesList
+              featuredPackage={FEATURED_PACKAGE}
+              secondaryPackages={SECONDARY_PACKAGES}
+            />
+            <PastorePacotesFinalCta />
+          </main>
           <PastorePacotesFooter />
         </div>
       </MotionConfig>

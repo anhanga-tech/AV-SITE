@@ -62,63 +62,64 @@ const LollapaloozaLanding: React.FC = () => {
         </div>
       </div>
 
-      <LollapaloozaApp />
-      <LandingFAQ items={LOLLAPALOOZA_FAQ_ITEMS} />
-      <section className="bg-brand-surface border-t border-brand-cyan/10 py-14">
-        <div className="container mx-auto px-6 max-w-5xl">
-          <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">2026 encerrou forte. 2027 já está no radar.</h2>
-          <p className="text-zinc-700 text-lg leading-relaxed mb-5">
-            A página do <strong>Lollapalooza Brasil</strong> continua no ar porque a campanha 2026 foi um sucesso e segue relevante para quem pesquisa logística, hotel e planejamento de festival em São Paulo. Agora, o foco é transformar essa procura em prioridade para a próxima edição.
-          </p>
-          <p className="text-zinc-700 text-lg leading-relaxed mb-5">
-            Se você quer chegar antes da próxima abertura, entre na <strong>Lista de Espera Lolla 2027</strong>. A <strong>Anhangá Viagens</strong> é uma{' '}
-            <Link to="/" className="text-brand-cyan font-semibold hover:underline">
-              agência de viagens em São Paulo
-            </Link>{' '}
-            com foco em atendimento consultivo e <strong>viagens personalizadas</strong>, do planejamento inicial ao suporte no destino.
-          </p>
-          <h3 className="text-xl md:text-2xl font-extrabold text-brand-dark mb-3">O que segue valendo para quem quer ir ao festival</h3>
-          <ul className="list-disc list-inside text-zinc-700 space-y-1 mb-6">
-            <li>Hospedagem próxima a rotas de acesso ao festival</li>
-            <li>Transporte com melhor custo-benefício (Linha 9 – Esmeralda ou Lolla Express)</li>
-            <li>Planejamento diário para os três dias de evento</li>
-            <li>Suporte rápido para ajustes durante a viagem</li>
-            <li>Curadoria de restaurantes e experiências em São Paulo ao redor do festival</li>
-          </ul>
-          <p className="text-zinc-700 text-lg leading-relaxed mb-6">
-            Enquanto a próxima edição não abre, você também pode explorar outros roteiros da Anhangá e continuar pesquisando o festival com a referência desta landing evergreen.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <a
-              href={`#${WAITLIST_SECTION_ID}`}
-              className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors"
-              data-tracking="footer-lollapalooza-waitlist"
-            >
-              Entrar na lista de espera 2027
-            </a>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                openContactModal({ source: 'lollapalooza' });
-              }}
-              className="btn-whatsapp btn-specialist px-5 py-3 rounded-full bg-brand-cyan text-white font-bold hover:bg-brand-cyan/90 transition-colors"
-              data-tracking="footer-lollapalooza-whatsapp"
-            >
-              Falar com especialista
-            </button>
-            <Link to="/orlando/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
-              Ver pacotes para Orlando
-            </Link>
-            <Link to="/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
-              Conhecer a Anhangá Viagens
-            </Link>
-            <Link to="/blog/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
-              Ler guia de festivais
-            </Link>
+      <LollapaloozaApp>
+        <LandingFAQ items={LOLLAPALOOZA_FAQ_ITEMS} />
+        <section className="bg-brand-surface border-t border-brand-cyan/10 py-14">
+          <div className="container mx-auto px-6 max-w-5xl">
+            <h2 className="text-3xl md:text-4xl font-black text-brand-dark mb-4">2026 encerrou forte. 2027 já está no radar.</h2>
+            <p className="text-zinc-700 text-lg leading-relaxed mb-5">
+              A página do <strong>Lollapalooza Brasil</strong> continua no ar porque a campanha 2026 foi um sucesso e segue relevante para quem pesquisa logística, hotel e planejamento de festival em São Paulo. Agora, o foco é transformar essa procura em prioridade para a próxima edição.
+            </p>
+            <p className="text-zinc-700 text-lg leading-relaxed mb-5">
+              Se você quer chegar antes da próxima abertura, entre na <strong>Lista de Espera Lolla 2027</strong>. A <strong>Anhangá Viagens</strong> é uma{' '}
+              <Link to="/" className="text-brand-cyan font-semibold hover:underline">
+                agência de viagens em São Paulo
+              </Link>{' '}
+              com foco em atendimento consultivo e <strong>viagens personalizadas</strong>, do planejamento inicial ao suporte no destino.
+            </p>
+            <h3 className="text-xl md:text-2xl font-extrabold text-brand-dark mb-3">O que segue valendo para quem quer ir ao festival</h3>
+            <ul className="list-disc list-inside text-zinc-700 space-y-1 mb-6">
+              <li>Hospedagem próxima a rotas de acesso ao festival</li>
+              <li>Transporte com melhor custo-benefício (Linha 9 – Esmeralda ou Lolla Express)</li>
+              <li>Planejamento diário para os três dias de evento</li>
+              <li>Suporte rápido para ajustes durante a viagem</li>
+              <li>Curadoria de restaurantes e experiências em São Paulo ao redor do festival</li>
+            </ul>
+            <p className="text-zinc-700 text-lg leading-relaxed mb-6">
+              Enquanto a próxima edição não abre, você também pode explorar outros roteiros da Anhangá e continuar pesquisando o festival com a referência desta landing evergreen.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <a
+                href={`#${WAITLIST_SECTION_ID}`}
+                className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors"
+                data-tracking="footer-lollapalooza-waitlist"
+              >
+                Entrar na lista de espera 2027
+              </a>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  openContactModal({ source: 'lollapalooza' });
+                }}
+                className="btn-whatsapp btn-specialist px-5 py-3 rounded-full bg-brand-cyan text-white font-bold hover:bg-brand-cyan/90 transition-colors"
+                data-tracking="footer-lollapalooza-whatsapp"
+              >
+                Falar com especialista
+              </button>
+              <Link to="/orlando/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+                Ver pacotes para Orlando
+              </Link>
+              <Link to="/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+                Conhecer a Anhangá Viagens
+              </Link>
+              <Link to="/blog/" className="px-5 py-3 rounded-full bg-white border border-zinc-200 text-brand-dark font-semibold hover:border-brand-cyan/40 transition-colors">
+                Ler guia de festivais
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </LollapaloozaApp>
     </>
   );
 };
