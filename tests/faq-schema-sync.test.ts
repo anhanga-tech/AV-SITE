@@ -39,3 +39,15 @@ test('the FAQ comparison is case and punctuation sensitive', () => {
   assert.notEqual(normalize('R$ 50.000+'), normalize('R$ 50.000'));
   assert.equal(normalize('Hopi Hari .  Isso'), 'Hopi Hari. Isso');
 });
+
+// Padrão de accordion do WAI-ARIA: o heading envolve o botão e a resposta vem logo depois do
+// heading. Com o <h3> dentro do <button>, scanners não ligavam a pergunta à resposta e o
+// FAQPage reprovava mesmo com o texto idêntico.
+test('each visible FAQ question is a heading wrapping its toggle, followed by the answer panel', () => {
+  const html = renderToStaticMarkup(React.createElement(Faq));
+  assert.doesNotMatch(html, /<button\b(?:(?!<\/button>)[\s\S])*<h[1-6]\b/, 'a heading must not sit inside a button');
+
+  const items = [...html.matchAll(/<h3>(<button[^>]*aria-expanded="false"[^>]*aria-controls="([^"]+)"[\s\S]*?<\/button>)<\/h3><div id="([^"]+)"/g)];
+  assert.equal(items.length, FAQ_SCHEMA_ITEMS.length, 'every FAQ item should follow the heading > button > panel pattern');
+  for (const [, , controls, panelId] of items) assert.equal(controls, panelId);
+});

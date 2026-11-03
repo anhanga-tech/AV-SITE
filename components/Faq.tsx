@@ -1,5 +1,5 @@
 
-import React, { useState, memo, useCallback } from 'react';
+import React, { useState, memo, useCallback, useId } from 'react';
 import {
     CaretDown,
     CaretUp,
@@ -18,6 +18,7 @@ interface FAQItemProps {
 
 const FAQItem = memo(({ question, answer, idx }: FAQItemProps) => {
     const [isOpen, setIsOpen] = useState(false);
+    const panelId = useId();
 
     const handleToggle = useCallback(() => {
         setIsOpen(prev => !prev);
@@ -28,32 +29,39 @@ const FAQItem = memo(({ question, answer, idx }: FAQItemProps) => {
         <div
             className={`mb-4 rounded-2xl overflow-hidden transition duration-300 border border-white/40 shadow-sm custom-backdrop ${isOpen ? 'shadow-md scale-[1.01]' : ''}`}
         >
-            <button
-                type="button"
-                className="w-full px-6 py-5 flex justify-between items-center text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan group bg-white/60 hover:bg-white/80 transition-colors"
-                onClick={handleToggle}
-                aria-expanded={isOpen}
-            >
-                <div className="flex items-center gap-3">
-                    {/* Semantic icon visual aid (optional but nice) */}
-                    <span className="hidden md:flex items-center justify-center size-8 rounded-full bg-brand-light text-brand-cyan text-xs font-bold">
-                        {idx + 1}
+            {/* Padrão de accordion do WAI-ARIA: o botão fica dentro do heading, e a resposta é o
+                elemento seguinte ao heading. Com o heading dentro do botão (HTML inválido), leitores
+                de tela e agentes não ligavam a pergunta à resposta, e o FAQPage reprovava no
+                IsAgentReady. O número vem de CSS para não entrar no texto da pergunta. */}
+            <h3>
+                <button
+                    type="button"
+                    className="w-full px-6 py-5 flex justify-between items-center text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-cyan group bg-white/60 hover:bg-white/80 transition-colors"
+                    onClick={handleToggle}
+                    aria-expanded={isOpen}
+                    aria-controls={panelId}
+                >
+                    <span className="flex items-center gap-3">
+                        <span
+                            aria-hidden="true"
+                            data-ordinal={idx + 1}
+                            className="hidden md:flex items-center justify-center size-8 rounded-full bg-brand-light text-brand-cyan text-xs font-bold before:content-[attr(data-ordinal)]"
+                        />
+                        <span className="font-bold text-lg md:text-xl text-brand-dark group-hover:text-brand-cyan transition-colors">
+                            {question}
+                        </span>
                     </span>
-                    <h3
-                        className="font-bold text-lg md:text-xl text-brand-dark group-hover:text-brand-cyan transition-colors"
-                    >
-                        {question}
-                    </h3>
-                </div>
 
-                <div className={`size-10 rounded-xl flex items-center justify-center transition duration-300 ${isOpen
-                    ? 'bg-brand-cyan text-white rotate-180'
-                    : 'bg-white text-zinc-400 group-hover:text-brand-cyan'
-                    }`}>
-                    {isOpen ? <CaretUp className="size-6" weight="bold" /> : <CaretDown className="size-6" weight="bold" />}
-                </div>
-            </button>
+                    <span className={`size-10 rounded-xl flex items-center justify-center transition duration-300 ${isOpen
+                        ? 'bg-brand-cyan text-white rotate-180'
+                        : 'bg-white text-zinc-400 group-hover:text-brand-cyan'
+                        }`}>
+                        {isOpen ? <CaretUp className="size-6" weight="bold" /> : <CaretDown className="size-6" weight="bold" />}
+                    </span>
+                </button>
+            </h3>
             <div
+                id={panelId}
                 className={`overflow-hidden transition-[max-height,opacity] duration-500 ease-in-out ${isOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}
             >
                 <div className="px-6 pb-8 pt-4 text-zinc-700 font-medium leading-relaxed text-lg bg-white/40">
