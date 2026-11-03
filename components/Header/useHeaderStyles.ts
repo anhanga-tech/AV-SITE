@@ -37,7 +37,7 @@ export function useHeaderStyles(isScrolled: boolean, isInternalPage: boolean): H
                 : 'text-white/90 hover:text-white',
 
             buttonClass: useSolidHeader
-                ? 'bg-anhanga-action hover:bg-anhanga-blue text-anhanga-dark hover:text-white'
+                ? 'bg-anhanga-action text-anhanga-dark hover:brightness-105'
                 : 'bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white border border-white/30',
 
             mobileToggleClass: useSolidHeader ? 'text-zinc-700' : 'text-white',
