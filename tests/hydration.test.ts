@@ -168,25 +168,19 @@ test('Home prerender includes the below-the-fold H2 sections in the first-respon
   );
 });
 
-// Rotas lazy() passam por renderToPipeableStream. Se o chunk da página ainda não estava
-// resolvido, o React emite o fallback dentro do <main> e o conteúdo real num
-// `<div hidden id="S:n">` que só um script inline revela: crawlers sem JS (GPTBot,
-// ClaudeBot, IsAgentReady) liam /sobre e /politica-privacidade como páginas vazias.
+// Rotas fora da home passam por renderToPipeableStream. Sem `progressiveChunkSize: Infinity`,
+// o React terceiriza todo boundary concluído maior que ~12,8 KB: fallback dentro do <main>
+// e o conteúdo real num `<div hidden id="S:n">` que só um script inline revela. Crawlers
+// sem JS (GPTBot, ClaudeBot, IsAgentReady) liam /sobre e /politica-privacidade vazias.
 test('Lazy route prerender ships page content inside <main> without the streaming reveal', async () => {
-  const cases = [
-    { url: '/sobre', marker: /<h1[^>]*>/ },
-    { url: '/politica-privacidade', marker: /<h1[^>]*>/ },
-    { url: '/termos-de-uso', marker: /<h1[^>]*>/ }
-  ];
-
-  for (const { url, marker } of cases) {
+  for (const url of ['/sobre', '/politica-privacidade', '/termos-de-uso']) {
     const { appHtml } = await render(url);
     assert.doesNotMatch(appHtml, /hidden id="S:/, `${url} still streams hidden content`);
     assert.doesNotMatch(appHtml, /<template id="B:/, `${url} still ships a Suspense fallback`);
 
     const main = appHtml.match(/<main\b[^>]*>([\s\S]*?)<\/main>/);
     assert.ok(main, `${url} has no <main>`);
-    assert.match(main[1], marker, `${url} has no heading inside <main>`);
+    assert.match(main[1], /<h1\b/, `${url} has no heading inside <main>`);
     const text = main[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
     assert.ok(text.length >= 500, `${url} <main> has only ${text.length} chars of text`);
   }
