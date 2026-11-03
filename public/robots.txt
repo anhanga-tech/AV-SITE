@@ -10,21 +10,14 @@ Disallow: /staging/
 Disallow: /cdn-cgi/
 Disallow: /_next/
 
-# AI Crawlers - Explicitly Allowed for AEO (Answer Engine Optimization)
-# These bots power recommendations in ChatGPT, Claude, Perplexity, Apple Intelligence, etc.
-User-agent: GPTBot
+# AI search and answer crawlers - Explicitly Allowed for AEO (Answer Engine Optimization)
+# These bots power answers in ChatGPT, Perplexity, Copilot, etc. Claude-SearchBot and
+# Claude-User fall under `*` above. None of them is a training crawler.
 User-agent: ChatGPT-User
 User-agent: OAI-SearchBot
 User-agent: PerplexityBot
-User-agent: ClaudeBot
-User-agent: anthropic-ai
-User-agent: Claude-Web
-User-agent: Google-Extended
 User-agent: Bingbot
-User-agent: Applebot-Extended
 User-agent: YouBot
-User-agent: Amazonbot
-User-agent: Meta-ExternalAgent
 Allow: /
 Disallow: /api/
 Disallow: /proposta/
@@ -36,8 +29,18 @@ Disallow: /staging/
 Disallow: /cdn-cgi/
 Disallow: /_next/
 
-# Training-only scrapers - No recommendation benefit, block to reduce load
+# AI training crawlers - blocked, matching `Content-Signal: ai-train=no` below.
+# Blocking them does not affect search or answer visibility: those use the bots above
+# (and Googlebot/Applebot, which are separate from Google-Extended/Applebot-Extended).
 # FacebookBot excluded: responsible for Open Graph previews on Facebook/Instagram
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: anthropic-ai
+User-agent: Claude-Web
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: Amazonbot
+User-agent: Meta-ExternalAgent
 User-agent: CCBot
 User-agent: Bytespider
 Disallow: /
