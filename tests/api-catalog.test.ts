@@ -53,7 +53,7 @@ test('api-catalog should return application/linkset+json with required RFC 9727 
 
         assert.deepEqual(entry['service-desc'], [
             {
-                href: 'https://www.anhanga.tur.br/.well-known/openapi.json',
+                href: 'https://www.anhanga.tur.br/openapi.json',
                 type: 'application/json',
             },
         ]);
@@ -245,4 +245,25 @@ test('vite dev routing should expose the same discovery endpoints locally', asyn
     assert.match(viteConfig, /'\/\.well-known\/api-docs'/);
     assert.match(viteConfig, /let pathname = '\/';/);
     assert.match(viteConfig, /if \(req\.url\) \{/);
+});
+
+// O checkpoint de OpenAPI (IsAgentReady `ia.openapi`) faz `curl -sf /openapi.json` sem -L:
+// precisa de 200 direto, fora de /api/ (bloqueado no robots.txt).
+test('openapi.json is served directly by a Pages Function, with .well-known redirecting to it', async () => {
+    const fn = await readFile(new URL('../functions/openapi.json.ts', import.meta.url), 'utf8');
+    assert.match(fn, /import handler from '\.\.\/api\/openapi'/);
+    assert.match(fn, /export const onRequest/);
+
+    const redirects = (await readFile(new URL('../public/_redirects', import.meta.url), 'utf8'))
+        .split('\n').map((line) => line.replace(/#.*/, '').trim().split(/\s+/)).filter((parts) => parts.length >= 2);
+    assert.ok(!redirects.some(([source]) => source === '/openapi.json'), '/openapi.json must not be redirected');
+    assert.deepEqual(redirects.find(([source]) => source === '/.well-known/openapi.json')?.slice(1, 2), ['/openapi.json']);
+
+    const vercelConfig = JSON.parse(await readFile(new URL('../vercel.json', import.meta.url), 'utf8')) as {
+        rewrites?: Array<{ source?: string; destination?: string }>;
+    };
+    assert.ok(vercelConfig.rewrites?.some((rule) => rule.source === '/openapi.json' && rule.destination === '/api/openapi'));
+
+    const viteConfig = await readFile(new URL('../vite.config.ts', import.meta.url), 'utf8');
+    assert.match(viteConfig, /'\/openapi\.json': \(\) => import\('\.\/api\/openapi\.ts'\)/);
 });

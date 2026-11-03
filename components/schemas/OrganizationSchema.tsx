@@ -2,6 +2,7 @@ import React from 'react';
 import { StructuredData } from './StructuredData';
 import { BRAND_LOGO_BLUE_URL } from '../../lib/media-assets';
 import { CREDENTIALED_PARKS } from '../parques-brasil/constants';
+import { ORGANIZATION_ID } from './schema-ids';
 
 interface AggregateRatingProps {
   ratingValue: number;
@@ -18,6 +19,7 @@ export const OrganizationSchema: React.FC<OrganizationSchemaProps> = ({ aggregat
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": ["TravelAgency", "Organization"],
+    "@id": ORGANIZATION_ID,
     "name": "Anhangá Viagens",
     "alternateName": "Anhangá Turismo",
     "url": "https://www.anhanga.tur.br/",

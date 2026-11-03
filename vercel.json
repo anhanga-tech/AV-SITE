@@ -67,6 +67,10 @@
       "destination": "/api/openapi"
     },
     {
+      "source": "/openapi.json",
+      "destination": "/api/openapi"
+    },
+    {
       "source": "/api/keystatic/:path*",
       "destination": "/api/keystatic/[...params]"
     },

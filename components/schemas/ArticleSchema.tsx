@@ -1,5 +1,6 @@
 import React from 'react';
 import { StructuredData } from './StructuredData';
+import { ORGANIZATION_ID } from './schema-ids';
 import { BRAND_LOGO_BLUE_URL } from '../../lib/media-assets';
 
 interface ArticleSchemaProps {
@@ -37,6 +38,7 @@ export const ArticleSchema: React.FC<ArticleSchemaProps> = ({
       },
       "publisher": {
         "@type": "Organization",
+        "@id": ORGANIZATION_ID,
         "name": "Anhangá Viagens",
         "logo": {
           "@type": "ImageObject",

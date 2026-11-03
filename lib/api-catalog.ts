@@ -3,7 +3,9 @@ import { memoize0 } from './memoize';
 const SITE_ORIGIN = 'https://www.anhanga.tur.br';
 const API_CATALOG_PATH = '/.well-known/api-catalog';
 const API_DOCS_PATH = '/.well-known/api-docs';
-const OPENAPI_PATH = '/.well-known/openapi.json';
+// /openapi.json serve com 200 direto (functions/openapi.json.ts); /.well-known/openapi.json
+// redireciona para cá. Scanners de agent readiness não seguem redirect nem entram em /api/.
+const OPENAPI_PATH = '/openapi.json';
 const HEALTH_PATH = '/api/health';
 const RFC_9727_PROFILE = 'https://www.rfc-editor.org/info/rfc9727';
 

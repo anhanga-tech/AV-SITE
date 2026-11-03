@@ -17,6 +17,7 @@ const DEV_API_ROUTES: Record<string, () => Promise<{ default: ApiHandler }>> = {
   '/.well-known/api-catalog': () => import('./api/api-catalog.ts'),
   '/.well-known/api-docs': () => import('./api/api-docs.ts'),
   '/.well-known/openapi.json': () => import('./api/openapi.ts'),
+  '/openapi.json': () => import('./api/openapi.ts'),
   '/api/markdown': () => import('./api/markdown.ts'),
   '/api/generate': () => import('./api/generate.ts'),
   '/api/health': () => import('./api/health.ts'),

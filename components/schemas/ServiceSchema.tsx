@@ -1,5 +1,6 @@
 import React from 'react';
 import { StructuredData } from './StructuredData';
+import { ORGANIZATION_ID } from './schema-ids';
 
 interface ServiceSchemaProps {
   name: string;
@@ -28,6 +29,7 @@ export const ServiceSchema: React.FC<ServiceSchemaProps> = ({
     areaServed,
     provider: {
       '@type': 'TravelAgency',
+      '@id': ORGANIZATION_ID,
       name: 'Anhangá Viagens',
       url: 'https://www.anhanga.tur.br/',
       telephone: '+55-11-52833309',
