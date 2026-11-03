@@ -33,7 +33,7 @@ function UnknownNotice({ compact }: { compact: boolean }) {
                 Crédito da imagem em verificação. Se você é o autor ou titular dos direitos,{' '}
                 <a
                     href="/creditos-de-imagens/"
-                    className="font-bold text-anhanga-action underline decoration-anhanga-action/40 underline-offset-2 hover:text-anhanga-actionDark"
+                    className="font-bold text-anhanga-actionInk underline decoration-anhanga-actionInk/40 underline-offset-2 hover:text-anhanga-dark"
                 >
                     veja como falar conosco
                 </a>{' '}

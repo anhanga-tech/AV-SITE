@@ -64,7 +64,9 @@ function collectRootFiles(): string[] {
 // 2026-11-03: 506 → 476 (contraste AA da auditoria #1970: textos em Céu Vivo
 // migrados para anhanga-actionInk e botões branco-sobre-Céu-Vivo para
 // anhanga-action + texto Ardósia; baseline na contagem real).
-const BRAND_NAMESPACE_BASELINE = 476;
+// 2026-11-03: 476 → 475 ("Saiba Mais" dos cards de destino migrado para
+// anhanga-actionInk no contraste do axe-core 4.14, #1998).
+const BRAND_NAMESPACE_BASELINE = 475;
 
 test('legacy brand-* namespace does not grow (ratchet)', () => {
   const files = [...SCAN_DIRS.flatMap(collectTailwindFiles), ...collectRootFiles()];

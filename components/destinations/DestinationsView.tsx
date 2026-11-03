@@ -145,13 +145,13 @@ function DestinationCards({ destinations, onDestinationSelect }: DestinationCard
                     <div className="px-2 pb-6">
                         <div className="flex justify-between items-center mb-2">
                             <h3 className="text-2xl font-black text-zinc-800">{destination.city}</h3>
-                            <div className="flex items-center gap-1 text-yellow-500 font-bold text-sm bg-yellow-50 px-2 py-1 rounded-full border border-yellow-100">
+                            <div className="flex items-center gap-1 text-yellow-700 font-bold text-sm bg-yellow-50 px-2 py-1 rounded-full border border-yellow-100">
                                 <Star className="size-3 fill-current" /> {destination.rating}
                             </div>
                         </div>
                         <p className="text-zinc-500 text-sm font-medium mb-4">{destination.description}</p>
 
-                        <div className="flex items-center gap-2 text-brand-cyan font-bold text-sm uppercase tracking-wide group-hover:gap-3 transition-[gap,color]">
+                        <div className="flex items-center gap-2 text-anhanga-actionInk font-bold text-sm uppercase tracking-wide group-hover:gap-3 transition-[gap,color]">
                             Saiba Mais <ArrowRight className="size-4" />
                         </div>
                     </div>
