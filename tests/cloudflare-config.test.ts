@@ -417,3 +417,19 @@ test('the HTML shell should not inject a Cloudflare Web Analytics beacon', async
     'do not hand-roll a data-cf-beacon script tag in the HTML shell',
   );
 });
+
+// IsAgentReady `ia.trust-pages` não reconhece /sobre e /politica-privacidade pelo link e
+// tenta /about, /contact e /privacy direto: os três precisam cair nas páginas em português.
+test('English trust-page paths redirect to the Portuguese pages', async () => {
+  const redirects = await readFile(new URL('../public/_redirects', import.meta.url), 'utf8');
+  const rules = collectRedirectRules(redirects).map((line) => line.split(/\s+/));
+  const expected: Record<string, string> = { '/about': '/sobre/', '/contact': '/contato/', '/privacy': '/politica-privacidade/' };
+
+  for (const [from, target] of Object.entries(expected)) {
+    for (const source of [from, `${from}/`]) {
+      const rule = rules.find(([origin]) => origin === source);
+      assert.ok(rule, `${source} has no redirect`);
+      assert.deepEqual(rule.slice(1, 3), [target, '301'], `${source} redirect`);
+    }
+  }
+});

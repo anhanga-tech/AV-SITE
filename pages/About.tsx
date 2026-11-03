@@ -6,6 +6,7 @@ import { OrganizationSchema } from '../components/schemas/OrganizationSchema';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../components/schemas/FAQPageSchema';
 import { PersonSchema } from '../components/schemas/PersonSchema';
+import { WebPageSchema } from '../components/schemas/WebPageSchema';
 import { ORGANIZATION_ID } from '../components/schemas/schema-ids';
 import { HeroSection } from '../components/about/HeroSection';
 import { HistoriaSection } from '../components/about/HistoriaSection';
@@ -21,6 +22,8 @@ import type { GoogleReviewsData } from '../types/reviews';
 
 const ORG_NAME = 'Anhangá Viagens';
 const ORG_URL = 'https://www.anhanga.tur.br/';
+const ABOUT_DESCRIPTION =
+  'Agência de viagens em São Paulo com atendimento consultivo e roteiros sob medida — sem pacote pronto. Credenciada Cadastur, agente Beto Carrero World.';
 
 const reviewSummary = getReviewSummary(googleReviewsRaw as GoogleReviewsData);
 
@@ -96,7 +99,7 @@ const About: React.FC = () => {
       </noscript>
       <Seo
         title="Sobre a Anhangá Viagens | Agência de Viagens em São Paulo"
-        description="Agência de viagens em São Paulo com atendimento consultivo e roteiros sob medida — sem pacote pronto. Credenciada Cadastur, agente Beto Carrero World."
+        description={ABOUT_DESCRIPTION}
         canonical="https://www.anhanga.tur.br/sobre/"
       />
       <OrganizationSchema
@@ -104,6 +107,13 @@ const About: React.FC = () => {
           ratingValue: reviewSummary.averageRating,
           reviewCount: reviewSummary.totalReviews,
         } : undefined}
+      />
+      <WebPageSchema
+        type="AboutPage"
+        name="Sobre a Anhangá Viagens"
+        url="https://www.anhanga.tur.br/sobre/"
+        description={ABOUT_DESCRIPTION}
+        aboutOrganization
       />
       <FAQPageSchema items={TRUST_FAQ_ITEMS} />
       {TEAM.map((member) => (

@@ -64,3 +64,13 @@ test('consultants on /sobre link worksFor to the Organization @id', async () => 
     assert.equal(refId(person.worksFor), ORGANIZATION_ID, `${String(person.name)} worksFor`);
   }
 });
+
+// Páginas de confiança (IsAgentReady `ia.trust-pages`): /sobre e /contato se declaram
+// AboutPage e ContactPage e apontam para a Organization, em vez de WebPage genérico.
+test('/sobre is an AboutPage and /contato a ContactPage about the Organization', async () => {
+  for (const [url, type] of [['/sobre', 'AboutPage'], ['/contato', 'ContactPage']] as const) {
+    const page = (await jsonLdFor(url)).find((node) => hasType(node, type));
+    assert.ok(page, `${url} has no ${type} node`);
+    assert.equal(refId(page.about), ORGANIZATION_ID, `${url} ${type} about`);
+  }
+});
