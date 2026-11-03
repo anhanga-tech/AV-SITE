@@ -17,28 +17,34 @@ async function groupFor(agent: string): Promise<string[]> {
 
 const blocksSite = (rules: string[]) => rules.some((line) => /^Disallow:\s*\/\s*$/i.test(line));
 
-const TRAINING_CRAWLERS = [
-  'GPTBot', 'ClaudeBot', 'anthropic-ai', 'Claude-Web', 'Applebot-Extended', 'Amazonbot', 'Meta-ExternalAgent', 'CCBot', 'Bytespider'
+// Search, answer and training crawlers all keep access: being in model training is a
+// deliberate choice (small brand recognition), declared as `ai-train=yes`.
+const AI_CRAWLERS = [
+  'GPTBot', 'ClaudeBot', 'anthropic-ai', 'Claude-Web', 'Google-Extended', 'Applebot-Extended',
+  'Amazonbot', 'Meta-ExternalAgent', 'OAI-SearchBot', 'ChatGPT-User', 'PerplexityBot',
+  'Perplexity-User', 'Claude-SearchBot', 'Claude-User', 'Bingbot', 'Googlebot', 'Applebot',
+  'FacebookBot'
 ];
 
-// Search and user-initiated fetchers drive AI answer visibility: they must keep access.
-// Google-Extended is here on purpose: the same token gates Gemini training and Gemini
-// grounding, and Gemini answer visibility was chosen over the training opt-out.
-const SEARCH_AND_ANSWER_CRAWLERS = [
-  'Google-Extended', 'OAI-SearchBot', 'ChatGPT-User', 'PerplexityBot', 'Perplexity-User', 'Claude-SearchBot',
-  'Claude-User', 'Bingbot', 'Googlebot', 'Applebot', 'FacebookBot'
-];
+// Bulk scrapers stay blocked to reduce load.
+const BLOCKED_SCRAPERS = ['CCBot', 'Bytespider'];
 
-test('robots.txt blocks every AI training crawler, matching Content-Signal ai-train=no', async () => {
-  const robots = await readFile(new URL('../public/robots.txt', import.meta.url), 'utf8');
-  assert.match(robots, /Content-Signal:.*ai-train=no/);
-  for (const agent of TRAINING_CRAWLERS) {
+test('robots.txt allows AI search, answer and training crawlers', async () => {
+  for (const agent of AI_CRAWLERS) {
+    assert.ok(!blocksSite(await groupFor(agent)), `${agent} must not be disallowed from /`);
+  }
+});
+
+test('robots.txt keeps bulk scrapers blocked', async () => {
+  for (const agent of BLOCKED_SCRAPERS) {
     assert.ok(blocksSite(await groupFor(agent)), `${agent} should be disallowed from /`);
   }
 });
 
-test('robots.txt keeps AI search and answer crawlers allowed', async () => {
-  for (const agent of SEARCH_AND_ANSWER_CRAWLERS) {
-    assert.ok(!blocksSite(await groupFor(agent)), `${agent} must not be disallowed from /`);
-  }
+// The Content-Signal must not contradict the crawler rules above (the old file said
+// ai-train=no while allowing GPTBot, ClaudeBot and Google-Extended).
+test('robots.txt Content-Signal matches the training crawler policy', async () => {
+  const robots = await readFile(new URL('../public/robots.txt', import.meta.url), 'utf8');
+  assert.match(robots, /^Content-Signal:.*\bai-train=yes\b/m);
+  assert.doesNotMatch(robots, /ai-train=no/);
 });

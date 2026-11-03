@@ -10,17 +10,24 @@ Disallow: /staging/
 Disallow: /cdn-cgi/
 Disallow: /_next/
 
-# AI search and answer crawlers - Explicitly Allowed for AEO (Answer Engine Optimization)
-# These bots power answers in ChatGPT, Perplexity, Copilot, etc. Claude-SearchBot and
-# Claude-User fall under `*` above. Google-Extended is the exception: Google uses the same
-# token for Gemini training and for Gemini Apps/Vertex AI grounding, with no split, and
-# Gemini answer visibility wins here.
-User-agent: Google-Extended
+# AI Crawlers - Explicitly Allowed for AEO (Answer Engine Optimization)
+# Search/answer bots (OAI-SearchBot, ChatGPT-User, PerplexityBot, Bingbot) and training
+# bots (GPTBot, ClaudeBot, Google-Extended, Applebot-Extended, Amazonbot, Meta-ExternalAgent)
+# are both allowed on purpose: being in model training helps a small brand be recognized,
+# matching `Content-Signal: ai-train=yes` below. Claude-SearchBot/Claude-User fall under `*`.
+User-agent: GPTBot
 User-agent: ChatGPT-User
 User-agent: OAI-SearchBot
 User-agent: PerplexityBot
+User-agent: ClaudeBot
+User-agent: anthropic-ai
+User-agent: Claude-Web
+User-agent: Google-Extended
 User-agent: Bingbot
+User-agent: Applebot-Extended
 User-agent: YouBot
+User-agent: Amazonbot
+User-agent: Meta-ExternalAgent
 Allow: /
 Disallow: /api/
 Disallow: /proposta/
@@ -32,17 +39,8 @@ Disallow: /staging/
 Disallow: /cdn-cgi/
 Disallow: /_next/
 
-# AI training crawlers - blocked, matching `Content-Signal: ai-train=no` below.
-# Google Search, Applebot and the AI search/answer crawlers above use separate user
-# agents and stay allowed. Google-Extended is allowed above (Gemini grounding).
-# FacebookBot is deliberately not listed: it renders Open Graph previews on Facebook/Instagram.
-User-agent: GPTBot
-User-agent: ClaudeBot
-User-agent: anthropic-ai
-User-agent: Claude-Web
-User-agent: Applebot-Extended
-User-agent: Amazonbot
-User-agent: Meta-ExternalAgent
+# Bulk scrapers - blocked to reduce load (CCBot = Common Crawl, Bytespider = ByteDance)
+# FacebookBot excluded: responsible for Open Graph previews on Facebook/Instagram
 User-agent: CCBot
 User-agent: Bytespider
 Disallow: /
@@ -63,4 +61,4 @@ Disallow: /proposta/
 Sitemap: https://www.anhanga.tur.br/sitemap.xml
 
 # Content Signals - AI usage preferences (https://contentsignals.org/)
-Content-Signal: ai-train=no, search=yes, ai-input=yes
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
