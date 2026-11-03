@@ -95,3 +95,13 @@ test('validateHtml ignora rotas de blog com slug fora da gramática aceita', () 
   assert.doesNotThrow(() => validateHtml('/blog/foo_bar', headHtml()));
   assert.doesNotThrow(() => validateHtml('/blog/foo.bar', headHtml()));
 });
+
+test('validateHtml recusa conteúdo escondido atrás do reveal de streaming do React', () => {
+  const html = `${headHtml()}<main><template id="B:0"></template></main><div hidden id="S:0"><h1>Sobre</h1></div>`;
+  assert.throws(() => validateHtml('/sobre', html), /Content hidden behind React streaming reveal/);
+});
+
+test('validateHtml aceita atributo hidden comum fora do reveal de streaming', () => {
+  const html = `${headHtml()}<main><h1>Sobre</h1><div id="mobile-menu" hidden=""></div></main>`;
+  assert.doesNotThrow(() => validateHtml('/sobre', html));
+});
