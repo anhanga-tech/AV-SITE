@@ -7,6 +7,8 @@ import Categories from '../components/Categories';
 import HowItWorks from '../components/HowItWorks';
 import Faq from '../components/Faq';
 import Blog from '../components/Blog';
+import Testimonials from '../components/Testimonials';
+import CallToAction from '../components/CallToAction';
 
 import { OrganizationSchema } from '../components/schemas/OrganizationSchema';
 import { FAQPageSchema } from '../components/schemas/FAQPageSchema';
@@ -21,13 +23,12 @@ const reviewSummary = getReviewSummary(googleReviewsRaw as GoogleReviewsData);
 
 import { Seo } from '../components/Seo';
 
-// Highlights, Categories, HowItWorks, Faq e Blog carregam de forma eager: contêm os H2
-// reais da home e precisam existir no HTML da primeira resposta para crawlers sem JS
-// (GPTBot, ClaudeBot, PerplexityBot) — ver issue #1248. Testimonials/CallToAction não
-// têm heading relevante para SEO/GEO, então continuam lazy + reveladas sob demanda.
+// Highlights, Categories, HowItWorks, Faq, Blog, Testimonials e CallToAction carregam de
+// forma eager: a home é prerenderizada com `renderToString`, que não espera `React.lazy`, e
+// esse conteúdo precisa estar no HTML da primeira resposta para crawlers sem JS (GPTBot,
+// ClaudeBot, PerplexityBot) — ver #1248 (H2 da home) e #1971 (depoimentos e contato).
+// Só Destinations segue lazy, revelada por intenção do usuário + IntersectionObserver.
 const Destinations = lazy(() => import('../components/Destinations'));
-const Testimonials = lazy(() => import('../components/Testimonials'));
-const CallToAction = lazy(() => import('../components/CallToAction'));
 
 const Home: React.FC = () => {
   const location = useLocation();
@@ -147,21 +148,9 @@ const Home: React.FC = () => {
       )}
       <HowItWorks />
       <Faq />
-      {shouldRenderBelowFold ? (
-        <Suspense fallback={<section id="depoimentos" className="min-h-[500px] bg-brand-surface" />}>
-          <Testimonials />
-        </Suspense>
-      ) : (
-        <section id="depoimentos" className="min-h-[500px] bg-brand-surface" />
-      )}
+      <Testimonials />
       <Blog />
-      {shouldRenderBelowFold ? (
-        <Suspense fallback={<section id="contato" className="min-h-[400px] bg-brand-surface" />}>
-          <CallToAction />
-        </Suspense>
-      ) : (
-        <section id="contato" className="min-h-[400px] bg-brand-surface" />
-      )}
+      <CallToAction />
     </>
   );
 };
