@@ -126,11 +126,16 @@ function upstashStore(): ConsentStore {
             // user-waited form-submit path (prepareSubmissionConsent runs before
             // the Odoo RPCs). Issuing them together saves one round trip (~one
             // Upstash RTT, typically 20-60 ms) per marketing-opt-in submission.
-            const [existingRaw, current] = await Promise.all([
+            const [existingRaw, speculative] = await Promise.all([
                 upstash(['GET', eventKey(draft.id)]),
                 this.readSubject(draft.subjectKey),
             ]);
             const existingEvent = parseEvent(existingRaw);
+            // On a replay the subject snapshot must be taken *after* the replay
+            // check, as before: a revocation that lands in between would
+            // otherwise be missed and the retry would re-grant consent. Replays
+            // are the rare path, so the common path keeps the saved round trip.
+            const current = existingEvent ? await this.readSubject(draft.subjectKey) : speculative;
             if (existingEvent) {
                 const events = current.some((event) => event.id === draft.id)
                     ? current

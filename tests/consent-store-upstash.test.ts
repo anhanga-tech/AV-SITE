@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { getConsentStore } from '../lib/consent-store.ts';
+import { effectiveAction } from '../lib/consent-ledger.ts';
 
 const ENV_KEYS = ['UPSTASH_REDIS_REST_URL', 'UPSTASH_REDIS_REST_TOKEN'] as const;
 
@@ -68,7 +69,34 @@ test('upstash append still reports a replay when the event already exists', asyn
             const outcome = await getConsentStore().append(draft);
             assert.equal(outcome.status, 'replay');
             assert.equal(outcome.events.length, 1);
-            assert.deepEqual(commands.map((c) => c[0]).sort(), ['GET', 'LRANGE']);
+            // The subject list is read again after the replay check, so a
+            // revocation landing in between is still seen (no re-grant).
+            assert.deepEqual(commands.map((c) => c[0]), ['GET', 'LRANGE', 'LRANGE']);
+        },
+    );
+});
+
+test('upstash append replay sees a revocation that lands after the replay check', async () => {
+    const stored = JSON.stringify({ ...draft, recordedAt: '2026-10-13T12:00:01.000Z' });
+    const revoke = JSON.stringify({
+        ...draft,
+        id: 'evt-upstash-revoke',
+        action: 'revoke',
+        occurredAt: '2026-10-13T12:05:00.000Z',
+        recordedAt: '2026-10-13T12:05:01.000Z',
+    });
+    let lranges = 0;
+    await withUpstashMock(
+        (command) => {
+            if (command[0] === 'GET') return stored;
+            // First (speculative) read predates the revocation; the re-read sees it.
+            if (command[0] === 'LRANGE') return ++lranges === 1 ? [stored] : [stored, revoke];
+            return null;
+        },
+        async () => {
+            const outcome = await getConsentStore().append(draft);
+            assert.equal(outcome.status, 'replay');
+            assert.equal(effectiveAction(outcome.events, 'email_marketing'), 'revoke');
         },
     );
 });
