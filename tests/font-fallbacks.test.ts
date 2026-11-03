@@ -18,8 +18,9 @@ const faces = [...css.matchAll(/@font-face\s*\{([\s\S]*?)\}/g)].map(([, body]) =
 
 const families = (tailwindConfig as { theme: { extend: { fontFamily: Record<string, string[]> } } }).theme.extend.fontFamily;
 
-test('stack sans (texto corrido) passa pelo Poppins Fallback antes do sans-serif genérico', () => {
-  assert.deepEqual(families.sans, ['Poppins', 'Poppins Fallback', 'sans-serif']);
+test('stack sans (texto corrido) passa pelos fallbacks de Arial e de Android antes do sans-serif genérico', () => {
+  // A Arial vem antes: um desktop com Roboto instalada fica na face medida contra a Arial (#1982).
+  assert.deepEqual(families.sans, ['Poppins', 'Poppins Fallback', 'Poppins Fallback Android', 'sans-serif']);
 });
 
 test('stack display fica sem o fallback ajustado (caixa alta não segue a razão do texto corrido)', () => {
@@ -34,25 +35,45 @@ test('index.css importa os fallbacks junto com as faces da Poppins', () => {
   assert.ok(index.indexOf('@import "./font-fallbacks.css"') > index.indexOf('@import "./fonts.css"'));
 });
 
-test('uma face de fallback por peso da Poppins, só local() e com métricas ajustadas', () => {
-  const weights = faces.map((face) => face.match(/font-weight:\s*(\d+)/)?.[1]);
-  assert.deepEqual(weights, ['400', '600', '700', '900']);
+const familyOf = (face: string) => face.match(/font-family:\s*'([^']+)'/)?.[1];
+const weightOf = (face: string) => Number(face.match(/font-weight:\s*(\d+)/)?.[1]);
+const srcOf = (face: string) => face.match(/src:\s*([^;]+);/)?.[1] ?? '';
+const facesOf = (family: string) => faces.filter((face) => familyOf(face) === family);
 
+test('só as duas famílias de fallback, cada uma com uma face por peso da Poppins', () => {
+  assert.deepEqual([...new Set(faces.map(familyOf))], ['Poppins Fallback', 'Poppins Fallback Android']);
+  for (const family of ['Poppins Fallback', 'Poppins Fallback Android']) {
+    assert.deepEqual(facesOf(family).map(weightOf), [400, 600, 700, 900], family);
+  }
+});
+
+test('toda face de fallback usa só local() e traz as quatro métricas ajustadas', () => {
   for (const face of faces) {
-    assert.match(face, /font-family:\s*'Poppins Fallback'/);
     assert.doesNotMatch(face, /url\(/, 'fallback não pode baixar arquivo');
-    assert.match(face, /src:\s*local\('Arial[^']*'\)/);
+    assert.match(srcOf(face), /^local\('[^']+'\)(,\s*local\('[^']+'\))*$/);
     for (const descriptor of ['size-adjust', 'ascent-override', 'descent-override', 'line-gap-override']) {
       assert.match(face, new RegExp(`${descriptor}:\\s*\\d+(\\.\\d+)?%`), descriptor);
     }
   }
 });
 
-test('pesos ≥ 600 usam a Arial Bold, não negrito sintético da Regular', () => {
-  for (const face of faces) {
-    const weight = Number(face.match(/font-weight:\s*(\d+)/)?.[1]);
-    const src = face.match(/src:\s*([^;]+);/)?.[1] ?? '';
-    if (weight >= 600) assert.match(src, /local\('Arial Bold'\)/, String(weight));
-    else assert.doesNotMatch(src, /Bold/, String(weight));
+test('Poppins Fallback: Arial, com Arial Bold nos pesos ≥ 600 em vez de negrito sintético', () => {
+  for (const face of facesOf('Poppins Fallback')) {
+    const src = srcOf(face);
+    assert.match(src, /local\('Arial[^']*'\)/);
+    if (weightOf(face) >= 600) assert.match(src, /local\('Arial Bold'\)/, String(weightOf(face)));
+    else assert.doesNotMatch(src, /Bold/, String(weightOf(face)));
+  }
+});
+
+test('Poppins Fallback Android: Roboto, com Bold em 600/700 e Black em 900 (#1982)', () => {
+  const expected: Record<number, RegExp> = {
+    400: /^local\('Roboto'\), local\('Roboto Regular'\), local\('Roboto-Regular'\)$/,
+    600: /^local\('Roboto Bold'\), local\('Roboto-Bold'\)$/,
+    700: /^local\('Roboto Bold'\), local\('Roboto-Bold'\)$/,
+    900: /^local\('Roboto Black'\), local\('Roboto-Black'\)$/,
+  };
+  for (const face of facesOf('Poppins Fallback Android')) {
+    assert.match(srcOf(face), expected[weightOf(face)], String(weightOf(face)));
   }
 });

@@ -1,12 +1,12 @@
 /* Gerado por `node scripts/build-font-fallbacks.mjs` — não editar à mão.
  *
- * Fallback com métricas da Poppins sobre a Arial (ou Liberation Sans/Arimo, que têm
- * as mesmas métricas). Enquanto a Poppins não chega, o texto já ocupa a largura e a
- * altura de linha finais, e o swap não muda a quebra de linha (CLS, #1972).
+ * Fallbacks com métricas da Poppins. Enquanto a Poppins não chega, o texto já ocupa a
+ * largura e a altura de linha finais, e o swap não muda a quebra de linha (CLS, #1972).
+ * - Poppins Fallback: sobre a Arial (ou Liberation Sans/Arimo, mesmas métricas).
+ * - Poppins Fallback Android: sobre a Roboto, que é a fonte do Android, onde não há
+ *   Arial (#1982).
  *
- * Limitações conhecidas: Android não tem Arial, então ali o local() não resolve e o
- * fallback continua sendo o sans-serif do sistema (Roboto), como antes. Safari < 17
- * ignora size-adjust.
+ * Limitação conhecida: Safari < 17 ignora size-adjust.
  */
 
 @font-face {
@@ -48,4 +48,44 @@
     ascent-override: 96.33%;
     descent-override: 32.11%;
     line-gap-override: 9.17%;
+}
+@font-face {
+    font-family: 'Poppins Fallback Android';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Roboto'), local('Roboto Regular'), local('Roboto-Regular');
+    size-adjust: 114.16%;
+    ascent-override: 91.98%;
+    descent-override: 30.66%;
+    line-gap-override: 8.76%;
+}
+@font-face {
+    font-family: 'Poppins Fallback Android';
+    font-style: normal;
+    font-weight: 600;
+    src: local('Roboto Bold'), local('Roboto-Bold');
+    size-adjust: 113.80%;
+    ascent-override: 92.27%;
+    descent-override: 30.76%;
+    line-gap-override: 8.79%;
+}
+@font-face {
+    font-family: 'Poppins Fallback Android';
+    font-style: normal;
+    font-weight: 700;
+    src: local('Roboto Bold'), local('Roboto-Bold');
+    size-adjust: 114.71%;
+    ascent-override: 91.53%;
+    descent-override: 30.51%;
+    line-gap-override: 8.72%;
+}
+@font-face {
+    font-family: 'Poppins Fallback Android';
+    font-style: normal;
+    font-weight: 900;
+    src: local('Roboto Black'), local('Roboto-Black');
+    size-adjust: 115.94%;
+    ascent-override: 90.57%;
+    descent-override: 30.19%;
+    line-gap-override: 8.63%;
 }
