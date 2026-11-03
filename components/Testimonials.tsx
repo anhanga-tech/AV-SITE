@@ -140,14 +140,14 @@ const Testimonials: React.FC = memo(() => {
 
                         {/* Content */}
                         <div className="text-center md:text-left flex-1 min-w-0">
-                          <h4
+                          <p
                             itemProp="author"
                             itemScope
                             itemType="https://schema.org/Person"
                             className="font-black text-sm text-brand-dark uppercase tracking-wide leading-none"
                           >
                             <span itemProp="name">{review.authorName}</span>
-                          </h4>
+                          </p>
 
                           <div className="flex items-center gap-2 mt-1.5 mb-4 justify-center md:justify-start">
                             <span className="text-brand-yellow text-sm leading-none tracking-widest" aria-label={`${review.rating} de 5 estrelas`}>
