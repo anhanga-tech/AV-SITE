@@ -18,13 +18,14 @@ async function groupFor(agent: string): Promise<string[]> {
 const blocksSite = (rules: string[]) => rules.some((line) => /^Disallow:\s*\/\s*$/i.test(line));
 
 const TRAINING_CRAWLERS = [
-  'GPTBot', 'ClaudeBot', 'anthropic-ai', 'Claude-Web', 'Google-Extended',
-  'Applebot-Extended', 'Amazonbot', 'Meta-ExternalAgent', 'CCBot', 'Bytespider'
+  'GPTBot', 'ClaudeBot', 'anthropic-ai', 'Claude-Web', 'Applebot-Extended', 'Amazonbot', 'Meta-ExternalAgent', 'CCBot', 'Bytespider'
 ];
 
 // Search and user-initiated fetchers drive AI answer visibility: they must keep access.
+// Google-Extended is here on purpose: the same token gates Gemini training and Gemini
+// grounding, and Gemini answer visibility was chosen over the training opt-out.
 const SEARCH_AND_ANSWER_CRAWLERS = [
-  'OAI-SearchBot', 'ChatGPT-User', 'PerplexityBot', 'Perplexity-User', 'Claude-SearchBot',
+  'Google-Extended', 'OAI-SearchBot', 'ChatGPT-User', 'PerplexityBot', 'Perplexity-User', 'Claude-SearchBot',
   'Claude-User', 'Bingbot', 'Googlebot', 'Applebot', 'FacebookBot'
 ];
 
