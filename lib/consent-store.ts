@@ -87,6 +87,39 @@ async function upstash(command: unknown[]): Promise<unknown> {
     return payload.result;
 }
 
+/**
+ * Several commands in ONE REST request (Upstash `/pipeline`). The server runs
+ * them in order, so a later command observes the effects of earlier writes
+ * and of anything that landed before it — same ordering as awaiting them one
+ * by one, for a single round trip.
+ */
+async function upstashPipeline(commands: unknown[][]): Promise<unknown[]> {
+    const url = process.env.UPSTASH_REDIS_REST_URL;
+    const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+    if (!url || !token) throw new ConsentLedgerUnavailable();
+
+    const response = await fetch(`${url.replace(/\/+$/, '')}/pipeline`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(commands),
+    });
+    if (!response.ok) throw new ConsentLedgerUnavailable();
+    const payload = (await response.json()) as UpstashResult[];
+    if (!Array.isArray(payload) || payload.length !== commands.length) throw new ConsentLedgerUnavailable();
+    return payload.map((entry) => {
+        if (!entry || entry.error) throw new ConsentLedgerUnavailable();
+        return entry.result;
+    });
+}
+
+function parseEvents(rows: unknown): ConsentEvent[] {
+    if (!Array.isArray(rows)) return [];
+    return rows.flatMap((row) => {
+        const event = parseEvent(row);
+        return event ? [event] : [];
+    });
+}
+
 function subjectListKey(subjectKey: string): string {
     return `${KEY_PREFIX}:subject:${subjectKey}`;
 }
@@ -113,17 +146,22 @@ function parseEvent(raw: unknown): ConsentEvent | null {
 function upstashStore(): ConsentStore {
     return {
         async readSubject(subjectKey) {
-            const rows = await upstash(['LRANGE', subjectListKey(subjectKey), '0', '-1']);
-            if (!Array.isArray(rows)) return [];
-            return rows.flatMap((row) => {
-                const event = parseEvent(row);
-                return event ? [event] : [];
-            });
+            return parseEvents(await upstash(['LRANGE', subjectListKey(subjectKey), '0', '-1']));
         },
         async append(draft) {
-            const existingRaw = await upstash(['GET', eventKey(draft.id)]);
+            // Perf: the replay-check GET and the subject LRANGE go out as ONE
+            // Upstash pipeline request (one round trip instead of two) on the
+            // user-waited form-submit path. The server runs them in order, so
+            // the subject snapshot is still taken *after* the replay check — a
+            // revocation landing in between is seen, exactly as with two
+            // sequential requests (issuing them as two concurrent requests
+            // would not guarantee that order).
+            const [existingRaw, subjectRows] = await upstashPipeline([
+                ['GET', eventKey(draft.id)],
+                ['LRANGE', subjectListKey(draft.subjectKey), '0', '-1'],
+            ]);
             const existingEvent = parseEvent(existingRaw);
-            const current = await this.readSubject(draft.subjectKey);
+            const current = parseEvents(subjectRows);
             if (existingEvent) {
                 const events = current.some((event) => event.id === draft.id)
                     ? current
