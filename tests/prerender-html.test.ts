@@ -111,3 +111,8 @@ test('validateHtml pega o reveal de streaming mesmo com outra serialização de 
     assert.throws(() => validateHtml('/sobre', `${headHtml()}${fragment}`), /Content hidden behind React streaming reveal/);
   }
 });
+
+test('validateHtml não confunde data-id com o id do segmento de streaming', () => {
+  const html = `${headHtml()}<main><h1>Sobre</h1><div data-id="S:3">x</div></main>`;
+  assert.doesNotThrow(() => validateHtml('/sobre', html));
+});
