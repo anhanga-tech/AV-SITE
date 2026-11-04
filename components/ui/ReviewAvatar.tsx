@@ -54,6 +54,10 @@ export const ReviewAvatar: React.FC<ReviewAvatarProps> = memo(({
       alt={name}
       width={size}
       height={size}
+      // O mural sai no HTML da primeira resposta (#1971), abaixo da dobra: sem lazy,
+      // os avatares competiriam com os recursos do topo da home.
+      loading="lazy"
+      decoding="async"
       className={`rounded-full object-cover shrink-0 ${className}`}
       onError={() => setHasImageError(true)}
     />

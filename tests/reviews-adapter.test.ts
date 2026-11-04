@@ -7,6 +7,7 @@ import {
   getDisplayReviews,
   getReviewSummary,
   formatRelativeDate,
+  formatReviewMonthYear,
   getInitials,
 } from '../data/reviewsAdapter.ts';
 
@@ -124,5 +125,19 @@ describe('reviewsAdapter', () => {
     d.setFullYear(d.getFullYear() - 1);
     const result = formatRelativeDate(d.toISOString().split('T')[0]);
     assert.equal(result, 'há 1 ano');
+  });
+
+  test('formatReviewMonthYear returns month and year in pt-BR', () => {
+    assert.equal(formatReviewMonthYear('2025-08-06'), 'agosto de 2025');
+    assert.equal(formatReviewMonthYear('2026-03-01'), 'março de 2026');
+  });
+
+  test('formatReviewMonthYear ignores the local timezone on date-only strings', () => {
+    assert.equal(formatReviewMonthYear('2026-01-01'), 'janeiro de 2026');
+    assert.equal(formatReviewMonthYear('2025-12-31'), 'dezembro de 2025');
+  });
+
+  test('formatReviewMonthYear returns empty string for invalid date', () => {
+    assert.equal(formatReviewMonthYear('not-a-date'), '');
   });
 });
