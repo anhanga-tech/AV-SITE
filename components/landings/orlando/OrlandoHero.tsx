@@ -158,7 +158,7 @@ export function OrlandoHero() {
           {/* h1 is unified to include both descriptive keywords and visual branding */}
           <h1>
             <span className="hero-label">
-              Pacote para Orlando 2026: Roteiro Personalizado Disney e Universal
+              Pacote para Orlando 2027: Roteiro Personalizado Disney e Universal
             </span>
             <span className="title-collage">
               <span className="highlight-blue">Orlando</span>
@@ -205,7 +205,7 @@ export function OrlandoHero() {
               undefined,
               CARD_QUALITY,
             )}
-            imgAlt="Rollercoaster"
+            imgAlt="Visitantes na montanha-russa Pipeline, do SeaWorld Orlando"
             label="ADRENALINA 100%"
             tape={{
               style: {
@@ -230,7 +230,7 @@ export function OrlandoHero() {
               undefined,
               CARD_QUALITY,
             )}
-            imgAlt="Magic Kingdom style"
+            imgAlt="Castelo da Cinderela, no Magic Kingdom"
             label="O CASTELO É NOSSO"
             tape={{
               style: {
@@ -255,7 +255,7 @@ export function OrlandoHero() {
               undefined,
               CARD_QUALITY,
             )}
-            imgAlt="Palm Trees"
+            imgAlt="Vulcão e piscina do parque aquático Volcano Bay, da Universal Orlando"
             label="SUMMER VIBES ONLY"
           />
 

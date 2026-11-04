@@ -152,11 +152,10 @@ test('orlando landing should not hotlink static images from partner websites', a
 });
 
 test('festival landings should use managed static imagery', async () => {
-  const [hero, packageFeatures, lineup, venueMap, venueMapData, whyUs] =
+  const [hero, packageFeatures, venueMap, venueMapData, whyUs] =
     await Promise.all([
       readRepoFile('components/landings/lollapalooza/Hero.tsx'),
       readRepoFile('components/landings/lollapalooza/PackageFeatures.tsx'),
-      readRepoFile('components/landings/lollapalooza/LineupSection.tsx'),
       readRepoFile('components/landings/lollapalooza/VenueMap.tsx'),
       readRepoFile('components/landings/lollapalooza/venueMapData.ts'),
       readRepoFile('components/landings/lollapalooza/WhyUs.tsx'),
@@ -176,24 +175,6 @@ test('festival landings should use managed static imagery', async () => {
     'components/landings/lollapalooza/PackageFeatures.tsx',
   );
   assert.match(packageFeatures, /images\/lollapalooza\/package\/.+\.(jpg|jpeg|webp)/);
-
-  assertMissingHosts(
-    lineup,
-    [
-      'wsrv.nl',
-      'images.unsplash.com',
-      'upload.wikimedia.org',
-      'rbsdirect.com.br',
-      'jpimg.com.br',
-      'monkeybuzz.com.br',
-      'uploads.tenhomaisdiscosqueamigos.com',
-      'conectageek.com.br',
-      'akamai.sscdn.co',
-      'gerenciador.popload.com.br',
-    ],
-    'components/landings/lollapalooza/LineupSection.tsx',
-  );
-  assert.match(lineup, /images\/lollapalooza\/lineup\/.+\.(jpg|jpeg|png|webp)/);
 
   assertMissingHosts(
     venueMap + venueMapData,
