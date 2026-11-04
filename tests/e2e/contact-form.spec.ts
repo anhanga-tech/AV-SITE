@@ -57,6 +57,18 @@ test.describe('Contact form modal', () => {
     await expect(page.getByRole('button', { name: /^prefiro que me chamem$/i })).toBeDisabled();
   });
 
+  test('explica por que os botões estão desabilitados e some ao preencher', async ({ page, isMobile }) => {
+    await openHeaderContactModal(page, isMobile);
+
+    const hint = page.locator('#contact-submit-hint');
+    await expect(hint).toHaveText('Preencha nome e WhatsApp para continuar.');
+
+    await page.locator('#contact-firstName').fill('Maria Silva');
+    await page.locator('#contact-whatsapp').fill('11999998888');
+
+    await expect(hint).toBeEmpty();
+  });
+
   test('habilita botões após preencher nome e WhatsApp', async ({ page, isMobile }) => {
     await openHeaderContactModal(page, isMobile);
 
