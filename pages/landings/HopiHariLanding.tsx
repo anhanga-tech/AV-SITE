@@ -41,7 +41,7 @@ const HopiHariLanding: React.FC = () => {
     <div className="bg-white min-h-screen font-sans">
       <Seo
         title="Pacote Hopi Hari"
-        description="Garanta seu pacote para o Hopi Hari com ingresso oficial, hospedagem e transporte. Planejamento completo com o suporte da Anhangá Viagens, agente credenciado do parque."
+        description="Pacote Hopi Hari com ingresso oficial, hotel e transporte. Planejamento com a Anhangá, agente credenciado do parque."
         canonical="https://www.anhanga.tur.br/hopi-hari/"
         noHreflang
       />

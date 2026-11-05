@@ -270,6 +270,11 @@ const ContactModal: React.FC = () => {
                             </p>
                         ) : null}
 
+                        {/* Os botões nascem desabilitados; o texto visível é a instrução (aria-describedby num botão disabled não é lido). */}
+                        <p id="contact-submit-hint" className="text-xs text-zinc-500" aria-live="polite">
+                            {canAttemptSubmit ? '' : 'Preencha nome e WhatsApp para continuar.'}
+                        </p>
+
                         {/*
                           As duas ações usam raízes de verbo distintas ("Abrir" vs. "chamem")
                           e pesos visuais diferentes de propósito: a primária (preenchida,
@@ -283,6 +288,7 @@ const ContactModal: React.FC = () => {
                             <button
                                 type="submit"
                                 disabled={!canAttemptSubmit || isSubmitting}
+                                aria-describedby="contact-submit-hint"
                                 // Texto Ardósia, não branco: branco sobre o verde WhatsApp mede
                                 // ~2.0:1 (piso WCAG AA: 4.5:1 em text-sm) — mesmo par acessível
                                 // dos variants `cta`/`action` do Button (bg saturado + texto
@@ -295,6 +301,7 @@ const ContactModal: React.FC = () => {
                                 type="button"
                                 onClick={() => void submit('callback')}
                                 disabled={!canAttemptSubmit || isSubmitting}
+                                aria-describedby="contact-submit-hint"
                                 className="w-full rounded-xl border-2 border-zinc-200 bg-white py-3 text-sm font-bold text-zinc-600 transition-colors hover:border-anhanga-action hover:text-anhanga-action focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action disabled:cursor-not-allowed disabled:opacity-40"
                             >
                                 {isSubmitting ? 'Enviando…' : 'Prefiro que me chamem'}

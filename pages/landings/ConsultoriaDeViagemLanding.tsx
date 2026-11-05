@@ -69,7 +69,7 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
       <div data-consultoria-landing className="bg-white min-h-screen font-sans">
         <Seo
           title="Consultoria de Viagem com Especialista — Anhangá Viagens"
-          description="Sessão de 50 min com um consultor para diagnosticar sua viagem: destino, roteiro, milhas, orçamento. Você sai com um plano por escrito. R$ 250, abatidos na consultoria completa."
+          description="Consultoria de viagem: sessão de 50 min com plano por escrito. R$ 250, abatidos na consultoria completa. Anhangá Viagens."
           canonical="https://www.anhanga.tur.br/consultoria-de-viagem/"
           noHreflang
         />
