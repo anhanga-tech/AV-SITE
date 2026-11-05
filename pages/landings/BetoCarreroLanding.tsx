@@ -12,13 +12,13 @@ const BetoCarreroLanding: React.FC = () => {
   return (
     <>
       <Seo
-        title="Pacote Beto Carrero World 2026"
+        title="Pacote Beto Carrero World 2027"
         description="Garanta seu pacote para o Beto Carrero com hotel, passagens e ingressos. Planejamento completo para famílias com o suporte da Anhangá Viagens."
         canonical="https://www.anhanga.tur.br/beto-carrero/"
         noHreflang
       />
       <ServiceSchema
-        name="Pacote Beto Carrero 2026"
+        name="Pacote Beto Carrero 2027"
         description="Planejamento de pacote para o Beto Carrero World com hotel, ingressos, transporte e suporte especializado."
         serviceUrl="https://www.anhanga.tur.br/beto-carrero/"
         serviceType="Pacote de viagem para parque temático"

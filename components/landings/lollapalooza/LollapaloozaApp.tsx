@@ -2,7 +2,6 @@ import React, { Suspense, lazy } from 'react';
 import Navbar from './Navbar';
 import Hero from './Hero';
 import WaitlistSection from './WaitlistSection';
-import LineupSection from './LineupSection';
 import PackageFeatures from './PackageFeatures';
 import WhyUs from './WhyUs';
 import CTASection from './CTASection';
@@ -61,7 +60,6 @@ function LollapaloozaApp({ children }: LollapaloozaAppProps) {
           <VenueMapFallback />
         )}
         <PackageFeatures />
-        <LineupSection />
         <WhyUs />
         <CTASection />
         {children}

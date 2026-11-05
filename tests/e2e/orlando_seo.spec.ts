@@ -15,7 +15,7 @@ test.describe("Orlando Landing SEO", () => {
 
     // Check content (both descriptive and branding)
     const h1Text = await h1s.innerText();
-    expect(h1Text).toMatch(/Pacote para Orlando 2026/i);
+    expect(h1Text).toMatch(/Pacote para Orlando 2027/i);
     expect(h1Text).toMatch(/Orlando/i);
     expect(h1Text).toMatch(/É SURREAL/i);
 

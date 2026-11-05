@@ -1,36 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Button from './Button';
 import { Calendar, MapPin, Music2, Share2, Check } from 'lucide-react';
 import { WAITLIST_CTA_LABEL, WAITLIST_SECTION_ID } from './constants';
 import { getMediaUrl } from '../../../data/mediaConfig';
 
-const HEADLINERS = [
-  "SABRINA CARPENTER",
-  "CHAPPELL ROAN",
-  "TYLER, THE CREATOR",
-  "LORDE",
-  "SKRILLEX",
-  "DOECHII",
-  "LEWIS CAPALDI",
-  "TURNSTILE",
-];
-
 const Hero: React.FC = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isVisible, setIsVisible] = useState(true);
   const [shareStatus, setShareStatus] = useState<'idle' | 'copied'>('idle');
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsVisible(false); // Start fade out
-      setTimeout(() => {
-        setCurrentIndex((prev) => (prev + 1) % HEADLINERS.length);
-        setIsVisible(true); // Start fade in
-      }, 500); // Wait for fade out to finish
-    }, 3500); // Change every 3.5 seconds
-
-    return () => clearInterval(interval);
-  }, []);
 
     const handleShare = async () => {
     const shareData = {
@@ -84,27 +59,13 @@ const Hero: React.FC = () => {
         {/* Pills */}
         <div className="inline-flex flex-col sm:flex-row items-center gap-2 sm:gap-4 mb-6 md:mb-8 animate-fade-in">
           <span className="py-1.5 px-4 rounded-full bg-anhanga-yellow text-anhanga-darkBlue font-black text-xs md:text-sm uppercase tracking-widest flex items-center gap-2 shadow-[0_0_15px_rgba(255,214,0,0.5)]">
-            <Calendar size={14} strokeWidth={3} aria-hidden="true" /> 20, 21 e 22 de Março
+            <Calendar size={14} strokeWidth={3} aria-hidden="true" /> Lista de espera 2027
           </span>
           <span className="py-1.5 px-4 rounded-full bg-white/10 backdrop-blur-md text-white font-bold text-xs md:text-sm uppercase tracking-widest flex items-center gap-2 border border-white/20">
             <MapPin size={14} aria-hidden="true" /> Autódromo de Interlagos - SP
           </span>
         </div>
         
-        {/* Dynamic Headliner Title */}
-        <div className="mb-2 md:mb-4 min-h-[5rem] md:min-h-[7rem] flex flex-col items-center justify-center w-full px-2">
-            <p className="text-zinc-300 text-[10px] sm:text-xs md:text-sm lg:text-lg uppercase tracking-[0.2em] mb-1 md:mb-2">Prepare-se para ver</p>
-            <p
-                aria-live="polite"
-                className={`font-display text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase italic tracking-tighter text-anhanga-yellow transition duration-500 transform text-center break-words w-full max-w-5xl leading-[0.9] sm:leading-tight pb-2 ${
-                    isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'
-                }`}
-                style={{ paddingRight: '0.1em' }}
-            >
-                {HEADLINERS[currentIndex]}
-            </p>
-        </div>
-
         {/* Main Value Proposition — h1 is visibly rendered to avoid sr-only cloaking risk */}
         <h1 className="text-sm font-semibold uppercase tracking-normal text-white/70 mb-2 md:mb-4">Lollapalooza Brasil: campanha 2026 esgotada e lista de espera 2027</h1>
         <div aria-hidden="true" className="flex flex-col items-center justify-center mb-6 md:mb-8 text-white max-w-5xl mx-auto">
@@ -117,7 +78,7 @@ const Hero: React.FC = () => {
                     height="112"
                     className="h-12 sm:h-20 md:h-28 w-auto object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]"
                 />
-                <span className="text-xl sm:text-3xl md:text-5xl font-bold drop-shadow-2xl">2026 com</span>
+                <span className="text-xl sm:text-3xl md:text-5xl font-bold drop-shadow-2xl">2027 com</span>
             </div>
             
             <span className="text-xl sm:text-3xl md:text-5xl font-bold leading-tight bg-white text-anhanga-darkBlue px-2 sm:px-4 py-1 sm:py-2 rounded-sm shadow-xl box-decoration-clone">
