@@ -69,6 +69,7 @@ export function CtaBody() {
           id="cta-whatsapp"
           label="WhatsApp"
           type="tel"
+          autoComplete="tel"
           value={fields.whatsapp}
           onChange={(value) => setField('whatsapp', value)}
           required
@@ -81,6 +82,7 @@ export function CtaBody() {
           id="cta-email"
           label="E-mail"
           type="email"
+          autoComplete="email"
           value={fields.email}
           onChange={(value) => setField('email', value)}
           inputClassName={FIELD_CLASSNAME}
@@ -112,10 +114,16 @@ export function CtaBody() {
           <p className="text-red-500 text-xs font-medium" role="alert">{error}</p>
         )}
 
+        {/* Os botões nascem desabilitados; o texto visível é a instrução (aria-describedby num botão disabled não é lido). */}
+        <p id="cta-submit-hint" className="text-xs text-zinc-500" aria-live="polite">
+          {canAttemptSubmit ? '' : 'Preencha nome e WhatsApp para continuar.'}
+        </p>
+
         <div className="flex flex-col sm:flex-row gap-3">
           <button
             type="submit"
             disabled={!canAttemptSubmit || isSubmitting}
+            aria-describedby="cta-submit-hint"
             className="w-full sm:flex-1 flex items-center justify-center gap-2 bg-[#25D366] text-white text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-[#1fba59] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             {isSubmitting ? (
@@ -129,6 +137,7 @@ export function CtaBody() {
             type="button"
             onClick={() => void submit('callback')}
             disabled={!canAttemptSubmit || isSubmitting}
+            aria-describedby="cta-submit-hint"
             className="w-full sm:flex-1 bg-brand-dark text-white text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-brand-vibrant disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             Me chamem
