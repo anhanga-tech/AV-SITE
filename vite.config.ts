@@ -27,6 +27,8 @@ const DEV_API_ROUTES: Record<string, () => Promise<{ default: ApiHandler }>> = {
   '/api/submit-contact': () => import('./api/submit-contact.ts'),
   '/api/submit-quiz': () => import('./api/submit-quiz.ts'),
   '/api/consent': () => import('./api/consent.ts'),
+  '/api/create-offer-link': () => import('./api/create-offer-link.ts'),
+  '/api/offer-link-stats': () => import('./api/offer-link-stats.ts'),
 };
 
 const METHODS_WITH_BODY = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
@@ -157,28 +159,41 @@ function apiDevPlugin() {
   };
 }
 
-// Mirrors functions/[[path]].ts: the NPS invite token (issue #1666) and the
-// /quiz pre-fill are swapped for cookies before the page HTML loads, so dev and
-// e2e exercise the same flow.
+// Mirrors the edge routes that must run before the SPA: the NPS invite token
+// (issue #1666), the /quiz pre-fill, and the offer short link /o/<slug>.
 function edgeRedirectsDevPlugin() {
   return {
     name: 'edge-redirects-dev-plugin',
     apply: 'serve' as const,
     configureServer(server: { middlewares: { use: (handler: (req: IncomingMessage, res: ServerResponse, next: (error?: Error) => void) => void | Promise<void>) => void } }) {
       server.middlewares.use(async (req, res, next) => {
-        const pathname = new URL(req.url || '/', 'http://vite.local').pathname.toLowerCase();
+        const url = new URL(req.url || '/', 'http://vite.local');
+        const pathname = url.pathname.toLowerCase();
+        const offerMatch = /^\/o\/([^/]+)\/?$/.exec(url.pathname);
         // Cheap prefilter; the handlers do the exact (case-insensitive) match.
-        if (!pathname.startsWith('/nps') && !pathname.startsWith('/quiz')) {
+        if (!pathname.startsWith('/nps') && !pathname.startsWith('/quiz') && !offerMatch) {
           next();
           return;
         }
 
         try {
+          const request = await toWebRequest(req, `http://${req.headers.host || 'localhost:3000'}`);
+          if (offerMatch) {
+            let slug = offerMatch[1];
+            try {
+              slug = decodeURIComponent(slug);
+            } catch {
+              next();
+              return;
+            }
+            const { handleOfferLinkRequest } = await import('./lib/offer-link-page.ts');
+            await sendWebResponse(await handleOfferLinkRequest(request, slug), res);
+            return;
+          }
           const [{ handleNpsInviteRequest }, { handleQuizPrefillRequest }] = await Promise.all([
             import('./lib/nps-invite-redirect.ts'),
             import('./lib/quiz-prefill-redirect.ts'),
           ]);
-          const request = await toWebRequest(req, `http://${req.headers.host || 'localhost:3000'}`);
           const response = (await handleNpsInviteRequest(request)) ?? handleQuizPrefillRequest(request);
           if (!response) {
             next();
