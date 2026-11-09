@@ -17,19 +17,32 @@ interface DatedPost {
 }
 
 /**
- * lastmod da listagem do blog: a data mais recente (`dateModified ?? date`) entre os
- * posts já publicados em `today`. Posts agendados (date futura) não contam, e o
- * resultado nunca passa de `today`, já que o manifest commitado inclui agendados.
+ * Posts já no ar em `today` (ISO, fuso de São Paulo). O manifest commitado, o dev e os
+ * previews incluem agendados (lib/blog-schedule.js); o sitemap não deve anunciá-los
+ * antes da publicação (#2041). Mesma regra de isFuturePost: `date` > hoje é futuro.
+ */
+export function publishedPosts<T extends DatedPost>(posts: readonly T[], today: string): T[] {
+  return posts.filter((post) => Boolean(post.date) && (post.date as string) <= today);
+}
+
+/** lastmod de um post: `dateModified ?? date`, nunca depois de `today`. */
+export function blogPostLastmod(post: DatedPost, today: string): string | undefined {
+  const value = post.dateModified ?? post.date;
+  if (!value) return undefined;
+  return value > today ? today : value;
+}
+
+/**
+ * lastmod da listagem do blog: a data mais recente entre os posts já publicados em
+ * `today`, limitada a `today` (#2039).
  */
 export function latestPublishedPostDate(posts: readonly DatedPost[], today: string): string | undefined {
   let latest: string | undefined;
-  for (const post of posts) {
-    if (!post.date || post.date > today) continue;
-    const candidate = post.dateModified ?? post.date;
-    if (!latest || candidate > latest) latest = candidate;
+  for (const post of publishedPosts(posts, today)) {
+    const candidate = blogPostLastmod(post, today);
+    if (candidate && (!latest || candidate > latest)) latest = candidate;
   }
-  if (!latest) return undefined;
-  return latest > today ? today : latest;
+  return latest;
 }
 
 export function escapeXml(value: string | null | undefined): string {
