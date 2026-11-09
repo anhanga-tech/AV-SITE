@@ -14,6 +14,7 @@ import { OrganizationSchema } from '../components/schemas/OrganizationSchema';
 import { FAQPageSchema } from '../components/schemas/FAQPageSchema';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
 import { ServiceSchema } from '../components/schemas/ServiceSchema';
+import { WebSiteSchema } from '../components/schemas/WebSiteSchema';
 import { FAQ_SCHEMA_ITEMS } from '../data/faqData';
 import { getReviewSummary } from '../data/reviewsAdapter';
 import type { GoogleReviewsData } from '../types/reviews';
@@ -116,6 +117,7 @@ const Home: React.FC = () => {
         description="Agência de viagens em São Paulo. Cada roteiro começa do zero — sem pacote pronto. Orlando, Beto Carrero, Europa e muito mais. Orçamento gratuito."
         canonical="https://www.anhanga.tur.br/"
       />
+      <WebSiteSchema />
       <OrganizationSchema
         aggregateRating={reviewSummary ? {
           ratingValue: reviewSummary.averageRating,

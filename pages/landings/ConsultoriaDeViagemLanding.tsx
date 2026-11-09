@@ -5,6 +5,7 @@ import { LandingFAQ } from '@/components/LandingFAQ';
 import { BreadcrumbSchema } from '@/components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '@/components/schemas/FAQPageSchema';
 import { ServiceSchema } from '@/components/schemas/ServiceSchema';
+import { CONSULTORIA_SESSION_PRICE_BRL } from '@/components/landings/consultoria/pricing';
 import { LandingNav } from '@/components/landings/shared/LandingNav';
 import { LandingFooter } from '@/components/landings/shared/LandingFooter';
 import {
@@ -79,6 +80,10 @@ const ConsultoriaDeViagemLanding: React.FC = () => {
           serviceUrl="https://www.anhanga.tur.br/consultoria-de-viagem/"
           serviceType="Consultoria de Viagem"
           areaServed="São Paulo e Brasil"
+          offer={{
+            price: CONSULTORIA_SESSION_PRICE_BRL,
+            url: 'https://www.anhanga.tur.br/consultoria-de-viagem/'
+          }}
         />
         <BreadcrumbSchema
           items={[
