@@ -247,6 +247,27 @@ test('the endpoint is rate limited per client', async (t) => {
     assert.ok(Number(limited.headers.get('Retry-After')) > 0);
 });
 
+test('wrong-secret attempts are rate limited too, so the bearer secret cannot be brute-forced', async (t) => {
+    withSecrets(t);
+    const upstash = { url: process.env.UPSTASH_REDIS_REST_URL, token: process.env.UPSTASH_REDIS_REST_TOKEN };
+    delete process.env.UPSTASH_REDIS_REST_URL;
+    delete process.env.UPSTASH_REDIS_REST_TOKEN;
+    t.after(() => {
+        if (upstash.url !== undefined) process.env.UPSTASH_REDIS_REST_URL = upstash.url;
+        if (upstash.token !== undefined) process.env.UPSTASH_REDIS_REST_TOKEN = upstash.token;
+    });
+    const { deps } = setup();
+    const ip = '203.0.113.78';
+
+    const statuses: number[] = [];
+    for (let attempt = 0; attempt < 31; attempt += 1) {
+        statuses.push((await handleCreateProposal(create(VALID_BODY, { ip, auth: `Bearer guess-${attempt}` }), deps)).status);
+    }
+
+    assert.deepEqual(statuses.slice(0, 30), Array(30).fill(401));
+    assert.equal(statuses[30], 429);
+});
+
 test('a storage failure answers 503 without leaking the id or the operator link to the logs', async (t) => {
     withSecrets(t);
     const logged: string[] = [];

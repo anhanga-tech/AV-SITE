@@ -230,6 +230,24 @@ export async function handleCreateProposal(request: Request, deps: CreateProposa
         return fail(requestId, 405, 'METHOD_NOT_ALLOWED', 'Método não permitido.', { Allow: 'POST' });
     }
 
+    // Security: throttle BEFORE checking the bearer secret, so wrong-secret
+    // guesses are bounded too (an authenticated-only limit allows brute force).
+    const rate = await checkRateLimit(getClientIP(request), {
+        limit: RATE_LIMIT_MAX_REQUESTS,
+        windowMs: RATE_LIMIT_WINDOW_MS,
+        prefix: 'ratelimit:create-proposal',
+    });
+    if (!rate.allowed) {
+        logger.warn('CREATE_PROPOSAL', { requestId, stage: 'rate_limited', subjectKey: rate.subjectKey });
+        if (rate.serviceUnavailable) {
+            return fail(requestId, 503, 'SERVICE_UNAVAILABLE', 'Serviço temporariamente indisponível.');
+        }
+        return fail(requestId, 429, 'RATE_LIMIT_EXCEEDED', 'Muitas requisições. Tente novamente em breve.', {
+            'Retry-After': String(Math.ceil(rate.resetIn / 1000)),
+            ...buildRateLimitHeaders({ ...rate, remaining: 0 }, RATE_LIMIT_MAX_REQUESTS),
+        });
+    }
+
     const apiSecret = getApiSecret();
     const previewSecret = getProposalPreviewSecret();
     if (!apiSecret || !previewSecret) {
@@ -245,22 +263,6 @@ export async function handleCreateProposal(request: Request, deps: CreateProposa
     if (!isAuthorized(request, apiSecret)) {
         logger.warn('CREATE_PROPOSAL', { requestId, stage: 'unauthorized' });
         return fail(requestId, 401, 'UNAUTHORIZED', 'Não autorizado.', { 'WWW-Authenticate': 'Bearer' });
-    }
-
-    const rate = await checkRateLimit(getClientIP(request), {
-        limit: RATE_LIMIT_MAX_REQUESTS,
-        windowMs: RATE_LIMIT_WINDOW_MS,
-        prefix: 'ratelimit:create-proposal',
-    });
-    if (!rate.allowed) {
-        logger.warn('CREATE_PROPOSAL', { requestId, stage: 'rate_limited', subjectKey: rate.subjectKey });
-        if (rate.serviceUnavailable) {
-            return fail(requestId, 503, 'SERVICE_UNAVAILABLE', 'Serviço temporariamente indisponível.');
-        }
-        return fail(requestId, 429, 'RATE_LIMIT_EXCEEDED', 'Muitas requisições. Tente novamente em breve.', {
-            'Retry-After': String(Math.ceil(rate.resetIn / 1000)),
-            ...buildRateLimitHeaders({ ...rate, remaining: 0 }, RATE_LIMIT_MAX_REQUESTS),
-        });
     }
 
     const raw = await readJson(request);
