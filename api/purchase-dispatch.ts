@@ -428,6 +428,14 @@ export default async function handler(request: Request): Promise<Response> {
     return methodError;
   }
 
+  // Security: throttle BEFORE checking the shared secret. Rate limiting only
+  // authenticated callers leaves wrong-secret guesses unbounded, i.e. an
+  // online brute-force oracle on X-Webhook-Secret.
+  const rateLimitError = await enforceRateLimit(request, requestId);
+  if (rateLimitError) {
+    return rateLimitError;
+  }
+
   const authError = validateAuthorization(request, requestId);
   if (authError) {
     return authError;
@@ -439,11 +447,6 @@ export default async function handler(request: Request): Promise<Response> {
       { ok: false, requestId, code: 'DISPATCH_DISABLED', error: 'Conversion dispatch disabled' },
       503,
     );
-  }
-
-  const rateLimitError = await enforceRateLimit(request, requestId);
-  if (rateLimitError) {
-    return rateLimitError;
   }
 
   const parsedPayload = await parseValidatedPayload(request, requestId);

@@ -64,6 +64,27 @@ test('purchase-dispatch should reject invalid webhook secret', async (t) => {
   assert.equal(response.status, 401);
 });
 
+test('purchase-dispatch should rate limit wrong-secret attempts so the secret cannot be brute-forced', async (t) => {
+  const clientIp = `198.51.100.${Math.floor(Math.random() * 200) + 1}`;
+
+  t.after(() => {
+    restoreEnv();
+  });
+
+  process.env.N8N_WEBHOOK_SECRET = 'expected-secret';
+  delete process.env.UPSTASH_REDIS_REST_URL;
+  delete process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  const statuses: number[] = [];
+  for (let index = 0; index < 31; index += 1) {
+    const response = await handler(buildRequest({ dealId: 'deal-1' }, `guess-${index}`, { 'x-real-ip': clientIp }));
+    statuses.push(response.status);
+  }
+
+  assert.deepEqual(statuses.slice(0, 30), Array(30).fill(401));
+  assert.equal(statuses[30], 429);
+});
+
 test('purchase-dispatch should hide missing webhook secret configuration', async (t) => {
   t.after(() => {
     restoreEnv();
