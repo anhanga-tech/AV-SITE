@@ -11,6 +11,27 @@ export interface SitemapEntry {
   images?: SitemapImage[];
 }
 
+interface DatedPost {
+  date?: string;
+  dateModified?: string;
+}
+
+/**
+ * lastmod da listagem do blog: a data mais recente (`dateModified ?? date`) entre os
+ * posts já publicados em `today`. Posts agendados (date futura) não contam, e o
+ * resultado nunca passa de `today`, já que o manifest commitado inclui agendados.
+ */
+export function latestPublishedPostDate(posts: readonly DatedPost[], today: string): string | undefined {
+  let latest: string | undefined;
+  for (const post of posts) {
+    if (!post.date || post.date > today) continue;
+    const candidate = post.dateModified ?? post.date;
+    if (!latest || candidate > latest) latest = candidate;
+  }
+  if (!latest) return undefined;
+  return latest > today ? today : latest;
+}
+
 export function escapeXml(value: string | null | undefined): string {
   if (!value) return '';
 
