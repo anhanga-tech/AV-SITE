@@ -35,14 +35,14 @@ const STYLES = `
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;font-family:Poppins,ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;line-height:1.6;color:#0f172a;background:#F4F8FF}
 main{width:100%;max-width:32rem;padding:32px 24px;border-radius:16px;background:#fff;box-shadow:0 10px 40px -10px rgba(0,0,0,.15)}
-.logo{display:block;width:auto;height:7rem;max-width:100%;margin:0 0 24px;object-fit:contain;object-position:left center}
+.logo{display:block;width:auto;height:3.25rem;max-width:160px;margin:0 0 16px;object-fit:contain;object-position:left center}
 h1{margin:0 0 12px;font-size:clamp(1.5rem,5vw,2rem);font-weight:800;line-height:1.1}
 p{margin:0 0 28px;color:#475569}
 .cta{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 24px;border-radius:16px;font-weight:700;color:#0f172a;text-decoration:none;background:#FFD600;box-shadow:4px 4px 0 0 #0f172a;transition:transform .15s,box-shadow .15s}
 .cta:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 0 #0f172a;background:#E5C000}
 .cta:active{transform:translate(4px,4px);box-shadow:none}
 .cta:focus-visible{outline:3px solid #0ea5e9;outline-offset:3px}
-@media (min-width:480px){.logo{height:8rem}}
+@media (min-width:480px){.logo{height:4rem}}
 @media (prefers-reduced-motion:reduce){.cta{transition:none}}
 `;
 

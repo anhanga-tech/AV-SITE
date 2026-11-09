@@ -117,6 +117,8 @@ test('WhatsApp preview, curl, HEAD and prefetch do not count', async () => {
     assert.match(html, /property="og:image" content="https:\/\/media\.anhanga\.tur\.br\/images\/brand\/Anhang%C3%A1%20Viagens%20-%20logo\.png"/);
     assert.match(html, /property="og:image:alt" content="Anhangá Viagens"/);
     assert.match(html, /<img class="logo" src="https:\/\/media\.anhanga\.tur\.br\/images\/brand\/LOGO%20ANHANGA%20VIAGENS%20-%20AZUL\.svg" alt="Anhangá Viagens"/);
+    assert.match(html, /\.logo\{[^}]*height:3\.25rem;max-width:160px/);
+    assert.match(html, /@media \(min-width:480px\)\{\.logo\{height:4rem\}\}/);
     assert.match(html, /<title>Gramado — férias janeiro 2027<\/title>/);
     assert.match(html, /noindex, nofollow/);
     assert.doesNotMatch(html, /<p class="brand">/);
