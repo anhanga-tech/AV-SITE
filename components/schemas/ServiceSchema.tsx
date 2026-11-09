@@ -8,6 +8,11 @@ interface ServiceSchemaProps {
   serviceUrl: string;
   serviceType?: string;
   areaServed?: string;
+  /** Só para serviço com preço público na página; nunca inventar valor. */
+  offer?: {
+    price: number;
+    url: string;
+  };
 }
 
 // "keywords" não é propriedade válida de Service no schema.org (só CreativeWork/Event)
@@ -18,6 +23,7 @@ export const ServiceSchema: React.FC<ServiceSchemaProps> = ({
   serviceUrl,
   serviceType,
   areaServed = 'Brasil',
+  offer,
 }) => {
   const schemaData: Record<string, unknown> = {
     '@context': 'https://schema.org',
@@ -41,7 +47,18 @@ export const ServiceSchema: React.FC<ServiceSchemaProps> = ({
         postalCode: '01552-001',
         addressCountry: 'BR'
       }
-    }
+    },
+    ...(offer
+      ? {
+          offers: {
+            '@type': 'Offer',
+            price: offer.price.toFixed(2),
+            priceCurrency: 'BRL',
+            availability: 'https://schema.org/InStock',
+            url: offer.url
+          }
+        }
+      : {})
   };
 
   return <StructuredData id="service" data={schemaData} />;

@@ -32,3 +32,25 @@ test('sitemap excludes operational noindex routes', async () => {
     assert.equal(locs.has(routeToCanonicalUrl(route)), false);
   }
 });
+
+// Issue #1981: lastmod estático é mantido à mão (ver política em lib/site-routes.js).
+// Garante formato ISO e que nenhuma data fica no futuro, o que sinalizaria freshness falsa.
+test('static sitemap lastmod values are ISO dates not in the future', () => {
+  const today = new Date().toISOString().slice(0, 10);
+  for (const entry of STATIC_SITEMAP_ENTRIES) {
+    assert.match(entry.lastmod, /^\d{4}-\d{2}-\d{2}$/, `${entry.route} lastmod format`);
+    assert.ok(!Number.isNaN(Date.parse(entry.lastmod)), `${entry.route} lastmod is not a real date`);
+    assert.ok(entry.lastmod <= today, `${entry.route} lastmod ${entry.lastmod} is in the future`);
+  }
+});
+
+test('regenerated sitemap carries the static lastmod from site-routes', async () => {
+  const sitemap = await readFile(new URL('../public/sitemap.xml', import.meta.url), 'utf8');
+  for (const entry of STATIC_SITEMAP_ENTRIES) {
+    if (entry.noindex) continue;
+    const loc = routeToCanonicalUrl(entry.route);
+    const block = sitemap.split('<url>').find((chunk) => chunk.includes(`<loc>${loc}</loc>`));
+    assert.ok(block, `missing ${loc}`);
+    assert.match(block, new RegExp(`<lastmod>${entry.lastmod}</lastmod>`), `${entry.route} lastmod out of sync`);
+  }
+});
