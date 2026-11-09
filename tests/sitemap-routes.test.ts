@@ -4,6 +4,8 @@ import { readFile } from 'node:fs/promises';
 
 import { BLOG_POST_MANIFEST } from '../data/blogManifest.ts';
 import { NOINDEX_ROUTES, STATIC_SITEMAP_ENTRIES, routeToCanonicalUrl } from '../lib/site-routes.js';
+import { todayInSaoPaulo } from '../lib/blog-schedule.js';
+import { latestPublishedPostDate } from '../lib/sitemap.ts';
 
 function collectSitemapLocs(source: string): Set<string> {
   return new Set(Array.from(source.matchAll(/<loc>(.*?)<\/loc>/g)).map((match) => match[1]));
@@ -38,6 +40,7 @@ test('sitemap excludes operational noindex routes', async () => {
 test('static sitemap lastmod values are ISO dates not in the future', () => {
   const today = new Date().toISOString().slice(0, 10);
   for (const entry of STATIC_SITEMAP_ENTRIES) {
+    if (entry.lastmodFromBlog) continue;
     assert.match(entry.lastmod, /^\d{4}-\d{2}-\d{2}$/, `${entry.route} lastmod format`);
     assert.ok(!Number.isNaN(Date.parse(entry.lastmod)), `${entry.route} lastmod is not a real date`);
     assert.ok(entry.lastmod <= today, `${entry.route} lastmod ${entry.lastmod} is in the future`);
@@ -51,6 +54,23 @@ test('regenerated sitemap carries the static lastmod from site-routes', async ()
     const loc = routeToCanonicalUrl(entry.route);
     const block = sitemap.split('<url>').find((chunk) => chunk.includes(`<loc>${loc}</loc>`));
     assert.ok(block, `missing ${loc}`);
-    assert.match(block, new RegExp(`<lastmod>${entry.lastmod}</lastmod>`), `${entry.route} lastmod out of sync`);
+    const expected = entry.lastmodFromBlog
+      ? latestPublishedPostDate(BLOG_POST_MANIFEST, todayInSaoPaulo())
+      : entry.lastmod;
+    assert.match(block, new RegExp(`<lastmod>${expected}</lastmod>`), `${entry.route} lastmod out of sync`);
   }
+});
+
+// Issue #2039: /blog não tem data à mão; deriva do manifest e nunca fica no futuro.
+test('/blog lastmod is derived from the blog manifest, not a literal', async () => {
+  const blog = STATIC_SITEMAP_ENTRIES.find((entry) => entry.route === '/blog');
+  assert.ok(blog, '/blog missing from STATIC_SITEMAP_ENTRIES');
+  assert.equal(blog.lastmodFromBlog, true);
+  assert.equal('lastmod' in blog, false, '/blog should not carry a hand-written lastmod');
+
+  const sitemap = await readFile(new URL('../public/sitemap.xml', import.meta.url), 'utf8');
+  const block = sitemap.split('<url>').find((chunk) => chunk.includes(`<loc>${routeToCanonicalUrl('/blog')}</loc>`));
+  const lastmod = block?.match(/<lastmod>(.*?)<\/lastmod>/)?.[1];
+  assert.ok(lastmod, '/blog has no lastmod in sitemap.xml');
+  assert.ok(lastmod <= todayInSaoPaulo(), `/blog lastmod ${lastmod} is in the future`);
 });

@@ -3,16 +3,19 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { BLOG_POST_MANIFEST } from '../data/blogManifest.ts';
+import { todayInSaoPaulo } from '../lib/blog-schedule.js';
 import { STATIC_SITEMAP_ENTRIES, routeToCanonicalUrl } from '../lib/site-routes.js';
-import { renderSitemap, type SitemapEntry } from '../lib/sitemap.ts';
+import { latestPublishedPostDate, renderSitemap, type SitemapEntry } from '../lib/sitemap.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const OUTPUT_PATH = path.resolve(__dirname, '../public/sitemap.xml');
 
+const blogListingLastmod = latestPublishedPostDate(BLOG_POST_MANIFEST, todayInSaoPaulo());
+
 const staticEntries: SitemapEntry[] = STATIC_SITEMAP_ENTRIES.filter((entry) => !entry.noindex).map((entry) => ({
   loc: routeToCanonicalUrl(entry.route),
-  lastmod: entry.lastmod,
+  lastmod: entry.lastmodFromBlog ? blogListingLastmod : entry.lastmod,
   changefreq: entry.changefreq,
   priority: entry.priority,
   images: entry.images
