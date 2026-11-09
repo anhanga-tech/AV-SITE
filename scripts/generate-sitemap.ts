@@ -5,13 +5,20 @@ import { fileURLToPath } from 'node:url';
 import { BLOG_POST_MANIFEST } from '../data/blogManifest.ts';
 import { todayInSaoPaulo } from '../lib/blog-schedule.js';
 import { STATIC_SITEMAP_ENTRIES, routeToCanonicalUrl } from '../lib/site-routes.js';
-import { latestPublishedPostDate, renderSitemap, type SitemapEntry } from '../lib/sitemap.ts';
+import {
+  blogPostLastmod,
+  latestPublishedPostDate,
+  publishedPosts,
+  renderSitemap,
+  type SitemapEntry
+} from '../lib/sitemap.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const OUTPUT_PATH = path.resolve(__dirname, '../public/sitemap.xml');
 
-const blogListingLastmod = latestPublishedPostDate(BLOG_POST_MANIFEST, todayInSaoPaulo());
+const today = todayInSaoPaulo();
+const blogListingLastmod = latestPublishedPostDate(BLOG_POST_MANIFEST, today);
 
 const staticEntries: SitemapEntry[] = STATIC_SITEMAP_ENTRIES.filter((entry) => !entry.noindex).map((entry) => ({
   loc: routeToCanonicalUrl(entry.route),
@@ -21,9 +28,10 @@ const staticEntries: SitemapEntry[] = STATIC_SITEMAP_ENTRIES.filter((entry) => !
   images: entry.images
 }));
 
-const blogEntries: SitemapEntry[] = BLOG_POST_MANIFEST.map((post) => ({
+// Agendados ficam fora em qualquer ambiente (#2041); entram no rebuild diário do dia.
+const blogEntries: SitemapEntry[] = publishedPosts(BLOG_POST_MANIFEST, today).map((post) => ({
   loc: routeToCanonicalUrl(`/blog/${post.slug}`),
-  lastmod: post.dateModified ?? post.date,
+  lastmod: blogPostLastmod(post, today),
   changefreq: 'monthly',
   priority: post.featured ? '0.8' : '0.7',
   images: post.image

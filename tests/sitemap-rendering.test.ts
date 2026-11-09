@@ -1,7 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { escapeXml, latestPublishedPostDate, renderSitemapEntry } from '../lib/sitemap.ts';
+import {
+  blogPostLastmod,
+  escapeXml,
+  latestPublishedPostDate,
+  publishedPosts,
+  renderSitemapEntry
+} from '../lib/sitemap.ts';
 
 test('escapeXml tolerates optional metadata values', () => {
   assert.equal(escapeXml(undefined), '');
@@ -61,4 +67,23 @@ test('latestPublishedPostDate never returns a date after today', () => {
 test('latestPublishedPostDate returns undefined when nothing is published', () => {
   assert.equal(latestPublishedPostDate([], '2026-11-09'), undefined);
   assert.equal(latestPublishedPostDate([{ date: '2026-12-01' }], '2026-11-09'), undefined);
+});
+
+// Issue #2041 (opção A): post agendado fica fora do sitemap até a publicação.
+test('publishedPosts drops posts dated after today and keeps today', () => {
+  const posts = [
+    { slug: 'publicado', date: '2026-11-01' },
+    { slug: 'hoje', date: '2026-11-09' },
+    { slug: 'agendado', date: '2026-11-11' }
+  ];
+  assert.deepEqual(
+    publishedPosts(posts, '2026-11-09').map((post) => post.slug),
+    ['publicado', 'hoje']
+  );
+});
+
+test('blogPostLastmod uses dateModified ?? date, capped at today', () => {
+  assert.equal(blogPostLastmod({ date: '2026-10-01' }, '2026-11-09'), '2026-10-01');
+  assert.equal(blogPostLastmod({ date: '2026-10-01', dateModified: '2026-10-20' }, '2026-11-09'), '2026-10-20');
+  assert.equal(blogPostLastmod({ date: '2026-10-01', dateModified: '2026-12-01' }, '2026-11-09'), '2026-11-09');
 });

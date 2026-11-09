@@ -5,7 +5,8 @@ import { readFile } from 'node:fs/promises';
 import { BLOG_POST_MANIFEST } from '../data/blogManifest.ts';
 import { NOINDEX_ROUTES, STATIC_SITEMAP_ENTRIES, routeToCanonicalUrl } from '../lib/site-routes.js';
 import { todayInSaoPaulo } from '../lib/blog-schedule.js';
-import { latestPublishedPostDate } from '../lib/sitemap.ts';
+import { latestPublishedPostDate, publishedPosts } from '../lib/sitemap.ts';
+import { isFuturePost } from '../lib/blog-schedule.js';
 
 function collectSitemapLocs(source: string): Set<string> {
   return new Set(Array.from(source.matchAll(/<loc>(.*?)<\/loc>/g)).map((match) => match[1]));
@@ -20,7 +21,7 @@ test('sitemap includes every indexable static route and blog post', async () => 
     assert.ok(locs.has(routeToCanonicalUrl(entry.route)), `missing static route ${entry.route}`);
   }
 
-  for (const post of BLOG_POST_MANIFEST) {
+  for (const post of publishedPosts(BLOG_POST_MANIFEST, todayInSaoPaulo())) {
     const canonical = routeToCanonicalUrl(`/blog/${post.slug}`);
     assert.ok(locs.has(canonical), `missing blog post ${post.slug}`);
   }
@@ -77,4 +78,24 @@ test('/blog lastmod is derived from the blog manifest, not a literal', async () 
   const lastmod = block?.match(/<lastmod>(.*?)<\/lastmod>/)?.[1];
   assert.ok(lastmod, '/blog has no lastmod in sitemap.xml');
   assert.ok(lastmod <= todayInSaoPaulo(), `/blog lastmod ${lastmod} is in the future`);
+});
+
+// Issue #2041 (opção A): o sitemap gerado, em qualquer ambiente, não anuncia post agendado
+// nem carrega lastmod depois do dia da geração.
+test('sitemap omits scheduled blog posts', async () => {
+  const sitemap = await readFile(new URL('../public/sitemap.xml', import.meta.url), 'utf8');
+  const locs = collectSitemapLocs(sitemap);
+  const today = todayInSaoPaulo();
+  for (const post of BLOG_POST_MANIFEST) {
+    if (!isFuturePost(post.date, today)) continue;
+    assert.equal(locs.has(routeToCanonicalUrl(`/blog/${post.slug}`)), false, `scheduled post ${post.slug} is in the sitemap`);
+  }
+});
+
+test('no sitemap lastmod is after the generation day', async () => {
+  const sitemap = await readFile(new URL('../public/sitemap.xml', import.meta.url), 'utf8');
+  const today = todayInSaoPaulo();
+  for (const [, lastmod] of sitemap.matchAll(/<lastmod>(.*?)<\/lastmod>/g)) {
+    assert.ok(lastmod <= today, `lastmod ${lastmod} is in the future`);
+  }
 });
