@@ -1,25 +1,63 @@
 /**
- * HTML of a proposal page (#1901): hero, stay, gallery, flights, transfers,
- * extras, total and conditions, from the validated content
- * (lib/proposal-content.ts). No JavaScript: the page's CSP has no
- * `script-src`, which also keeps Cloudflare-injected trackers out.
+ * HTML of a proposal page (#1901, polished in #1926): a hero with the
+ * destination and the period, the trip's summary with the total and the
+ * WhatsApp button, then the stay, flights (as boarding passes), transfers,
+ * extras and conditions, from the validated content (lib/proposal-content.ts).
  *
- * Every value is escaped through `escapeHtml`. Calendar days (`YYYY-MM-DD`)
- * and flight times are formatted from their own digits, never through a
- * Date in UTC, so a hotel night or a 18:35 departure never shifts a day or
- * an hour with the runtime's time zone.
+ * No JavaScript: the page's CSP has no `script-src`, which also keeps
+ * Cloudflare-injected trackers out. "Ler mais" and the amenities are
+ * `<details>`; the gallery is a CSS scroll-snap row.
+ *
+ * Every value is escaped through `escapeHtml`. The operator's ALL-CAPS text
+ * is toned down before that, for display only; dates and times are read from
+ * their own digits (lib/proposal-format.ts).
  */
 import type { ProposalContent } from './proposal-content';
+import {
+    airportCode,
+    bulletItems,
+    displayCase,
+    flightMoment,
+    formatDay,
+    formatDuration,
+    formatMinutes,
+    formatPeriod,
+    minutesBetween,
+    nameCase,
+    nightsBetween,
+    placeName,
+    plural,
+    sameCity,
+    shortDay,
+    splitExcerpt,
+    splitTitle,
+    stripMarkdown,
+    travelersLabel,
+} from './proposal-format';
+import { icon, iconShapes, type IconName } from './proposal-icons';
+import { PROPOSAL_FONT_PRELOADS, PROPOSAL_STYLES } from './proposal-styles';
 
 export const WHATSAPP_NUMBER = '5511955021519';
 const PRIVACY_POLICY_URL = 'https://www.anhanga.tur.br/politica-privacidade';
-const GALLERY_PHOTOS = 9;
+const GALLERY_PHOTOS = 12;
+const MAX_LAYOVER_MINUTES = 24 * 60;
+// Past this many characters the destination steps down a size, so a long
+// "Gramado, Canela e Bento Gonçalves" doesn't fill the whole photo.
+const LONG_DESTINATION = 28;
 
 // The operator's payment terms never reach the page (D7: the deal is closed
 // with the Anhangá); this is the Anhangá's own wording.
-const CONDITIONS_TEXT = 'Valores sujeitos a disponibilidade e a alteração até a confirmação da reserva. Para fechar ou tirar dúvidas, fale com a gente pelo WhatsApp.';
+const CONDITIONS_TEXT = 'Valores sujeitos a disponibilidade e a alteração até a confirmação da reserva.';
 const PRIVACY_NOTICE = 'Para acompanhar sua proposta, registramos quando esta página é aberta. O registro guarda só a data e a hora: não inclui seu IP, sua localização nem dados do seu aparelho.';
 const INTERNAL_PREVIEW_NOTICE = 'Prévia interna: esta visita não conta como abertura do cliente.';
+
+type Flight = ProposalContent['flights'][number];
+type Hotel = NonNullable<ProposalContent['hotel']>;
+
+interface Journey {
+    label: string;
+    flights: Flight[];
+}
 
 const BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 const USD = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'USD' });
@@ -48,39 +86,10 @@ export function escapeHtml(value: string): string {
         .replace(/'/g, '&#39;');
 }
 
-/** `2026-12-06` → `06/12/2026`. */
-function formatDay(day: string): string {
-    const [year, month, date] = day.split('-');
-    return `${date}/${month}/${year}`;
-}
-
-function nightsBetween(checkin: string, checkout: string): number {
-    return Math.round((Date.parse(`${checkout}T00:00:00Z`) - Date.parse(`${checkin}T00:00:00Z`)) / 86_400_000);
-}
-
-/** Local airport time from `2026-12-06T18:35:00-03:00`: `{ day: '06/12', time: '18:35' }`. */
-function flightMoment(value: string): { day: string; time: string } {
-    const [, month, date, hour, minute] = /^\d{4}-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(value) ?? [];
-    return { day: `${date}/${month}`, time: `${hour}:${minute}` };
-}
-
-/** `01:05` → `1h05min`, `02:00` → `2h`. */
-function formatDuration(value: string): string {
-    const [hours, minutes] = value.split(':').map(Number);
-    if (hours === 0) return `${minutes}min`;
-    return minutes === 0 ? `${hours}h` : `${hours}h${String(minutes).padStart(2, '0')}min`;
-}
-
-function plural(count: number, one: string, many: string): string {
-    return `${count} ${count === 1 ? one : many}`;
-}
-
-function travelersLabel(travelers: ProposalContent['travelers']): string {
-    const parts = [plural(travelers.adults, 'adulto', 'adultos')];
-    if (travelers.children > 0) parts.push(plural(travelers.children, 'criança', 'crianças'));
-    if (travelers.infants) parts.push(plural(travelers.infants, 'bebê', 'bebês'));
-    return parts.length > 2 ? `${parts.slice(0, -1).join(', ')} e ${parts[parts.length - 1]}` : parts.join(' e ');
-}
+/** A name from the operator (hotel, room, excursion), toned down and escaped. */
+const name = (value: string) => escapeHtml(displayCase(value));
+/** Running text from the operator (descriptions, cancellation terms). */
+const prose = (value: string) => displayCase(stripMarkdown(value), 'sentence');
 
 function whatsappUrl(text: string): string {
     return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
@@ -91,80 +100,140 @@ function list(items: string[], className = ''): string {
     return `<ul${className ? ` class="${className}"` : ''}>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
 }
 
-function stars(count: number | undefined): string {
-    if (!count) return '';
-    return ` <span class="stars" aria-label="${count} estrelas">${'★'.repeat(count)}</span>`;
+function disclosure(summary: string, body: string, openLabel?: string): string {
+    const label = openLabel
+        ? `<span class="when-closed">${summary}</span><span class="when-open">${openLabel}</span>`
+        : summary;
+    return `<details><summary>${label}${icon('chevron')}</summary>${body}</details>`;
 }
 
-function hotelSection(hotel: NonNullable<ProposalContent['hotel']>): string {
-    const { room } = hotel;
-    const nights = nightsBetween(room.checkin, room.checkout);
-    const gallery = hotel.photos.slice(1, 1 + GALLERY_PHOTOS);
-    const times = [
-        `Entrada ${formatDay(room.checkin)}${hotel.checkinTime ? ` a partir das ${escapeHtml(hotel.checkinTime)}` : ''}`,
-        `Saída ${formatDay(room.checkout)}${hotel.checkoutTime ? ` até as ${escapeHtml(hotel.checkoutTime)}` : ''}`,
-    ];
-    return `<section aria-labelledby="hospedagem">
-<p class="label">Hospedagem · ${plural(nights, 'noite', 'noites')}</p>
-<h2 id="hospedagem">${escapeHtml(hotel.name)}${stars(hotel.stars)}</h2>
-${hotel.address ? `<p class="muted">${escapeHtml(hotel.address)}</p>` : ''}
-<div class="card">
-<p class="item-title">${escapeHtml(room.type)}</p>
-${room.board ? `<p>${escapeHtml(room.board)}</p>` : ''}
-<p class="muted">${times.join('<br>')}</p>
-${list(room.cancellation.length || room.refundable === undefined ? room.cancellation : [room.refundable ? 'Tarifa reembolsável' : 'Tarifa não reembolsável'], 'fine')}
-</div>
-${hotel.description ? `<p>${escapeHtml(hotel.description)}</p>` : ''}
-${gallery.length ? `<div class="gallery">${gallery.map((photo) => `<img src="${escapeHtml(photo)}" alt="" loading="lazy" decoding="async">`).join('')}</div>` : ''}
-${hotel.amenities.length ? `<details><summary>Comodidades do hotel (${hotel.amenities.length})</summary>${list(hotel.amenities, 'amenities')}</details>` : ''}
-</section>`;
+/** A title and, after ` - ` or ` | `, its subtitle: `Reserva Praia Hotel` / `Balneário Camboriú`. */
+function titled(value: string, tag: 'h3' | 'p', className: string): string {
+    const { title, subtitle } = splitTitle(displayCase(value));
+    return `<${tag} class="${className}">${escapeHtml(title)}</${tag}>${subtitle ? `<p class="subtitle">${escapeHtml(subtitle)}</p>` : ''}`;
 }
 
-/** `São Paulo (CGH)` → `são paulo`: São Paulo out of CGH and back into GRU is still a return. */
-function city(place: string): string {
-    return place.replace(/\(.*\)/, '').trim().toLocaleLowerCase('pt-BR');
+/** A connection: next flight from the same city within a day, in the same leg. */
+function isConnection(previous: Flight, next: Flight): boolean {
+    if (previous.leg !== next.leg || !sameCity(previous.to, next.from)) return false;
+    const layover = minutesBetween(previous.arrival, next.departure);
+    return layover > 0 && layover < MAX_LAYOVER_MINUTES;
 }
 
-/** Two flights that leave from where the other one lands, or legs named Ida and Volta. */
-function isRoundTrip(flights: ProposalContent['flights']): boolean {
-    const legs = [...new Set(flights.map((flight) => flight.leg?.toLocaleLowerCase('pt-BR')))];
+function groupFlights(flights: Flight[]): Flight[][] {
+    const groups: Flight[][] = [];
+    for (const flight of flights) {
+        const group = groups[groups.length - 1];
+        if (group && isConnection(group[group.length - 1], flight)) group.push(flight);
+        else groups.push([flight]);
+    }
+    return groups;
+}
+
+/** Legs named Ida and Volta, or two journeys that leave from where the other one lands. */
+function isRoundTrip(groups: Flight[][]): boolean {
+    const legs = [...new Set(groups.map((group) => group[0].leg?.toLocaleLowerCase('pt-BR')))];
     if (legs.length === 2 && legs[0] === 'ida' && legs[1] === 'volta') return true;
-    if (flights.length !== 2) return false;
-    const [outbound, inbound] = flights;
-    return city(outbound.from) === city(inbound.to) && city(outbound.to) === city(inbound.from);
+    if (groups.length !== 2) return false;
+    const [outbound, inbound] = groups;
+    return sameCity(outbound[0].from, inbound[inbound.length - 1].to) && sameCity(outbound[outbound.length - 1].to, inbound[0].from);
 }
 
-function flightsSection(flights: ProposalContent['flights']): string {
-    if (flights.length === 0) return '';
-    const roundTrip = isRoundTrip(flights);
-    const legLabel = (index: number) => {
-        const named = flights[index].leg;
-        if (named) return escapeHtml(named);
+function journeysOf(flights: Flight[]): { roundTrip: boolean; journeys: Journey[] } {
+    const groups = groupFlights(flights);
+    const roundTrip = isRoundTrip(groups);
+    const label = (group: Flight[], index: number) => {
+        if (group[0].leg) return displayCase(group[0].leg);
         if (roundTrip) return index === 0 ? 'Ida' : 'Volta';
         return `Trecho ${index + 1}`;
     };
-    const cards = flights.map((flight, index) => {
-        const departure = flightMoment(flight.departure);
-        const arrival = flightMoment(flight.arrival);
-        const details = [
-            flight.stops === undefined ? '' : flight.stops === 0 ? 'Voo direto' : plural(flight.stops, 'parada', 'paradas'),
-            flight.duration ? formatDuration(flight.duration) : '',
-            flight.fareFamily ? `Tarifa ${flight.fareFamily}` : '',
-            flight.baggage ?? '',
-        ].filter(Boolean);
-        return `<div class="card">
-<p class="label">${legLabel(index)} · ${departure.day}</p>
-<p class="item-title">${escapeHtml(flight.airline)} ${escapeHtml(flight.number)}</p>
-<p class="route"><span>${departure.time}<br><small>${escapeHtml(flight.from)}</small></span><span aria-hidden="true">→</span><span>${arrival.time}${arrival.day === departure.day ? '' : ` <small>(chega ${arrival.day})</small>`}<br><small>${escapeHtml(flight.to)}</small></span></p>
-<p class="muted">${escapeHtml(details.join(' · '))}</p>
-</div>`;
-    });
-    return `<section aria-labelledby="voos"><h2 id="voos">Voos</h2>${cards.join('')}</section>`;
+    return { roundTrip, journeys: groups.map((group, index) => ({ label: label(group, index), flights: group })) };
 }
 
-function notesSection(notes: ProposalContent['notes']): string {
-    if (!notes?.length) return '';
-    return `<section aria-labelledby="bom-saber"><h2 id="bom-saber">Bom saber</h2>${list(notes)}</section>`;
+/**
+ * The whole trip, from the earliest to the latest day of the stay, every
+ * flight's departure and arrival, and the dated extras. `YYYY-MM-DD` strings
+ * sort chronologically.
+ */
+function travelDays(content: ProposalContent): { first: string; last: string } | undefined {
+    const days = [
+        ...(content.hotel ? [content.hotel.room.checkin, content.hotel.room.checkout] : []),
+        ...content.flights.flatMap((flight) => [flight.departure.slice(0, 10), flight.arrival.slice(0, 10)]),
+        ...content.extras.flatMap((extra) => (extra.date ? [extra.date] : [])),
+    ].sort();
+    return days.length ? { first: days[0], last: days[days.length - 1] } : undefined;
+}
+
+function placeLabel(place: string): string {
+    return displayCase(placeName(place));
+}
+
+/** Big airport codes over a dotted arc: the hero of a proposal with no photo. */
+function routeArt(journey: Journey): string {
+    const from = journey.flights[0].from;
+    const to = journey.flights[journey.flights.length - 1].to;
+    const end = (place: string) => {
+        const code = airportCode(place);
+        return code
+            ? `<p class="code">${code}<small>${escapeHtml(placeLabel(place))}</small></p>`
+            : `<p class="code">${escapeHtml(placeLabel(place))}</p>`;
+    };
+    return `<div class="route-art" aria-hidden="true">${end(from)}<svg class="route-arc" viewBox="0 0 200 64" preserveAspectRatio="xMidYMax meet"><path class="arc" d="M6 58 Q100 -12 194 58"/><circle cx="6" cy="58" r="3.5"/><circle cx="194" cy="58" r="3.5"/><g class="route-plane" transform="translate(88 11) rotate(45 12 12)">${iconShapes('plane')}</g></svg>${end(to)}</div>`;
+}
+
+function hero(content: ProposalContent, journeys: Journey[]): string {
+    const photo = content.hotel?.photos[0];
+    const days = travelDays(content);
+    const lead = content.firstName ? `${nameCase(content.firstName)}, sua viagem para` : 'Sua viagem para';
+    const meta = [
+        days ? `<li>${icon('calendar')}${escapeHtml(formatPeriod(days.first, days.last))}</li>` : '',
+        `<li>${icon('users')}${escapeHtml(travelersLabel(content.travelers))}</li>`,
+    ].join('');
+    const image = photo && content.hotel
+        ? `<img class="hero-photo" src="${escapeHtml(photo)}" alt="${escapeHtml(splitTitle(displayCase(content.hotel.name)).title)}" width="1200" height="800" fetchpriority="high" decoding="async">\n`
+        : '';
+    const art = !photo && journeys.length ? routeArt(journeys[0]) : '';
+    return `<section class="hero ${photo ? 'hero--photo' : 'hero--plain'}" aria-labelledby="titulo">
+${image}<div class="hero-text">
+${art}<h1 id="titulo"><span class="hero-lead">${escapeHtml(lead)}</span> <span class="hero-place${content.destination.length > LONG_DESTINATION ? ' hero-place--long' : ''}">${name(content.destination)}</span></h1>
+<ul class="hero-meta">${meta}</ul>
+</div>
+</section>`;
+}
+
+interface SummaryItem {
+    icon: IconName;
+    title: string;
+    detail?: string;
+}
+
+function summaryItems(content: ProposalContent, flights: { roundTrip: boolean; journeys: Journey[] }): SummaryItem[] {
+    const items: SummaryItem[] = [];
+    const { hotel, transfers, extras } = content;
+    if (hotel) {
+        const nights = nightsBetween(hotel.room.checkin, hotel.room.checkout);
+        const stay = splitTitle(displayCase(hotel.name)).title;
+        items.push({ icon: 'bed', title: `Hospedagem por ${plural(nights, 'noite', 'noites')}`, detail: hotel.room.board ? `${stay} · ${displayCase(hotel.room.board)}` : stay });
+    }
+    const { journeys } = flights;
+    if (journeys.length) {
+        const first = journeys[0].flights[0];
+        const lastJourney = journeys[flights.roundTrip ? 0 : journeys.length - 1].flights;
+        const airlines = [...new Set(content.flights.map((flight) => displayCase(flight.airline)))].join(', ');
+        items.push({
+            icon: 'plane',
+            title: flights.roundTrip ? 'Voos de ida e volta' : plural(content.flights.length, 'voo', 'voos'),
+            detail: `${placeLabel(first.from)} – ${placeLabel(lastJourney[lastJourney.length - 1].to)} · ${airlines}`,
+        });
+    }
+    if (transfers.length) {
+        items.push({ icon: 'car', title: plural(transfers.length, 'traslado', 'traslados'), detail: transfers.length === 1 ? splitTitle(displayCase(transfers[0].name)).title : undefined });
+    }
+    if (extras.length) {
+        const names = extras.map((extra) => splitTitle(displayCase(extra.name)).title);
+        items.push({ icon: 'ticket', title: plural(extras.length, 'passeio ou ingresso', 'passeios e ingressos'), detail: names.length <= 3 ? names.join(' · ') : undefined });
+    }
+    return items;
 }
 
 /** The price block: reais, or dollars first and reais below for a customer abroad (#1905). */
@@ -176,137 +245,195 @@ function totalAmount(total: ProposalContent['total']): string {
     return `<p class="amount">${escapeHtml(main)}</p>\n<p class="amount-alt">${escapeHtml(other)}</p>`;
 }
 
+/** "Resumo da viagem" and the total: what the customer reads before any detail. */
+function voucher(content: ProposalContent, flights: { roundTrip: boolean; journeys: Journey[] }, validUntil: string): string {
+    const items = summaryItems(content, flights).map((item) => `<li><span class="summary-icon">${icon(item.icon)}</span><div><p class="summary-title">${escapeHtml(item.title)}</p>${item.detail ? `<p class="summary-sub">${escapeHtml(item.detail)}</p>` : ''}</div></li>`);
+    const cta = whatsappUrl(`Olá! Vi minha proposta para ${content.destination} e quero conversar.`);
+    return `<div class="voucher">
+<section class="summary" aria-labelledby="resumo">
+<h2 id="resumo">Sua viagem em resumo</h2>
+<ul class="summary-list">${items.join('')}</ul>
+</section>
+<section class="price" aria-labelledby="valor">
+<h2 id="valor" class="label">Valor total</h2>
+${totalAmount(content.total)}
+<p class="price-for">para ${escapeHtml(travelersLabel(content.travelers))}, com tudo o que está no resumo</p>
+<a class="cta" href="${escapeHtml(cta)}" rel="noopener noreferrer" target="_blank">${icon('message')}Quero fechar pelo WhatsApp</a>
+<p class="valid">${icon('clock')}Proposta válida até ${escapeHtml(validUntil)}</p>
+${content.total.note ? `<p class="price-note">${escapeHtml(content.total.note)}</p>` : ''}
+</section>
+</div>`;
+}
+
+function stars(count: number | undefined): string {
+    if (!count) return '';
+    return ` <span class="stars" role="img" aria-label="${count} estrelas">${'★'.repeat(count)}</span>`;
+}
+
+function aboutHotel(description: string): string {
+    const { excerpt, rest } = splitExcerpt(prose(description));
+    const more = rest ? disclosure('Ler mais', `<p>${escapeHtml(rest)}</p>`, 'Ler menos') : '';
+    return `<div class="about"><p>${escapeHtml(excerpt)}</p>${more}</div>`;
+}
+
+function hotelSection(hotel: Hotel): string {
+    const { room } = hotel;
+    const nights = nightsBetween(room.checkin, room.checkout);
+    const { title, subtitle } = splitTitle(displayCase(hotel.name));
+    const gallery = hotel.photos.slice(1, 1 + GALLERY_PHOTOS);
+    const cancellation = room.cancellation.length || room.refundable === undefined
+        ? room.cancellation
+        : [room.refundable ? 'Tarifa reembolsável' : 'Tarifa não reembolsável'];
+    // Check-in and check-out side by side; the rest on full rows.
+    const facts: { term: string; value: string; wide?: boolean }[] = [
+        { term: 'Quarto', value: `<strong>${name(room.type)}</strong>`, wide: true },
+        ...(room.board ? [{ term: 'Regime', value: name(room.board), wide: true }] : []),
+        { term: 'Entrada', value: `${shortDay(room.checkin)}${hotel.checkinTime ? `, a partir das ${escapeHtml(hotel.checkinTime)}` : ''}` },
+        { term: 'Saída', value: `${shortDay(room.checkout)}${hotel.checkoutTime ? `, até as ${escapeHtml(hotel.checkoutTime)}` : ''}` },
+        ...(cancellation.length
+            ? [{ term: 'Cancelamento', value: cancellation.length === 1 ? escapeHtml(prose(cancellation[0])) : list(cancellation.map(prose)), wide: true }]
+            : []),
+    ];
+
+    return `<section class="section" aria-labelledby="hospedagem">
+<h2 id="hospedagem">${icon('bed')}Hospedagem</h2>
+<p class="lead">${plural(nights, 'noite', 'noites')}, de ${escapeHtml(formatPeriod(room.checkin, room.checkout))}</p>
+<div class="hotel-head">
+<h3 class="hotel-name">${escapeHtml(title)}${stars(hotel.stars)}</h3>
+${subtitle ? `<p class="subtitle">${escapeHtml(subtitle)}</p>\n` : ''}${hotel.address ? `<p class="address">${icon('pin')}${name(hotel.address)}</p>` : ''}
+</div>
+${gallery.length ? `<div class="gallery" role="region" aria-label="Fotos do hotel" tabindex="0">${gallery.map((photo) => `<img src="${escapeHtml(photo)}" alt="" width="800" height="600" loading="lazy" decoding="async">`).join('')}</div>
+${gallery.length > 1 ? `<p class="gallery-hint">Deslize para ver as ${gallery.length} fotos</p>` : ''}` : ''}
+<div class="box stay"><dl class="facts">${facts.map((fact) => `<div${fact.wide ? ' class="wide"' : ''}><dt>${fact.term}</dt><dd>${fact.value}</dd></div>`).join('')}</dl></div>
+${hotel.description ? aboutHotel(hotel.description) : ''}
+${hotel.amenities.length ? disclosure(`Comodidades do hotel (${hotel.amenities.length})`, list(hotel.amenities.map((amenity) => displayCase(amenity)), 'amenities')) : ''}
+</section>`;
+}
+
+function endpoint(place: string, moment: { day: string; time: string }, side: 'from' | 'to', departureDay?: string): string {
+    const code = airportCode(place);
+    const label = escapeHtml(placeLabel(place));
+    const arrivesLater = side === 'to' && departureDay !== undefined && moment.day !== departureDay;
+    return `<div class="end end--${side}"><span class="sr">${side === 'from' ? 'Partida' : 'Chegada'}: </span>`
+        + (code ? `<span class="code">${code}</span>` : `<span class="code code--name">${label}</span>`)
+        + `<span class="time">${moment.time}</span>`
+        + (arrivesLater ? `<span class="next-day">chega ${formatDay(moment.day).slice(0, 5)}</span>` : '')
+        + (code ? `<span class="place">${label}</span>` : '')
+        + '</div>';
+}
+
+function flightBlock(flight: Flight): string {
+    const departure = flightMoment(flight.departure);
+    const arrival = flightMoment(flight.arrival);
+    const stops = flight.stops === undefined ? '' : flight.stops === 0 ? 'Voo direto' : plural(flight.stops, 'parada', 'paradas');
+    const duration = flight.duration ? `<span><span class="sr">Duração: </span>${formatDuration(flight.duration)}</span>` : '';
+    return `<div class="flight">
+<p class="flight-meta"><strong>${name(flight.airline)} ${escapeHtml(flight.number)}</strong>${stops ? `<span>${stops}</span>` : ''}</p>
+<div class="leg">${endpoint(flight.from, departure, 'from')}<div class="path"><span class="path-line">${icon('plane')}</span>${duration}</div>${endpoint(flight.to, arrival, 'to', departure.day)}</div>
+</div>`;
+}
+
+function connection(previous: Flight, next: Flight): string {
+    const code = airportCode(previous.to);
+    const where = `${placeLabel(previous.to)}${code ? ` (${code})` : ''}`;
+    return `<p class="connection">${icon('clock')}<span><strong>Conexão em ${escapeHtml(where)}</strong><small>${formatMinutes(minutesBetween(previous.arrival, next.departure))} entre os voos</small></span></p>`;
+}
+
+function boardingPass(journey: Journey): string {
+    const { flights } = journey;
+    const day = flightMoment(flights[0].departure).day;
+    const body = flights.map((flight, index) => (index === 0 ? '' : connection(flights[index - 1], flight)) + flightBlock(flight)).join('\n');
+    const fares = [...new Set(flights.flatMap((flight) => (flight.fareFamily ? [displayCase(flight.fareFamily)] : [])))];
+    const baggage = [...new Set(flights.flatMap((flight) => (flight.baggage ? [flight.baggage] : [])))];
+    const stub = [
+        ...fares.map((fare) => `<span>Tarifa ${escapeHtml(fare)}</span>`),
+        ...baggage.map((item) => `<span>${icon('luggage')}${escapeHtml(item)}</span>`),
+    ];
+    return `<article class="pass">
+<header class="pass-head"><h3 class="label">${escapeHtml(journey.label)}</h3><p class="pass-date">${shortDay(day)}</p></header>
+<div class="pass-body">
+${body}
+</div>
+${stub.length ? `<p class="pass-stub">${stub.join('')}</p>` : ''}
+</article>`;
+}
+
+function flightsSection(journeys: Journey[]): string {
+    if (journeys.length === 0) return '';
+    return `<section class="section" aria-labelledby="voos"><h2 id="voos">${icon('plane')}Voos</h2>
+${journeys.map(boardingPass).join('\n')}
+</section>`;
+}
+
 function transfersSection(transfers: ProposalContent['transfers']): string {
     if (transfers.length === 0) return '';
-    const cards = transfers.map((transfer) => `<div class="card"><p class="item-title">${escapeHtml(transfer.name)}</p>${transfer.provider ? `<p class="fine">Operado por ${escapeHtml(transfer.provider)}</p>` : ''}${list(transfer.cancellation, 'fine')}</div>`);
-    return `<section aria-labelledby="traslados"><h2 id="traslados">Traslados</h2>${cards.join('')}</section>`;
+    const cards = transfers.map((transfer) => `<div class="box">${titled(transfer.name, 'h3', 'title')}${transfer.provider ? `<p class="fine">Operado por ${name(transfer.provider)}</p>` : ''}${list(transfer.cancellation.map(prose), 'fine')}</div>`);
+    return `<section class="section" aria-labelledby="traslados"><h2 id="traslados">${icon('car')}Traslados</h2>${cards.join('')}</section>`;
+}
+
+function extraDetails(description: string): string {
+    const { intro, items } = bulletItems(prose(description));
+    return `${intro ? `<p>${escapeHtml(intro)}</p>` : ''}${list(items)}`;
 }
 
 function extrasSection(extras: ProposalContent['extras']): string {
     if (extras.length === 0) return '';
-    const cards = extras.map((extra) => `<div class="card">
-${extra.date ? `<p class="label">${formatDay(extra.date)}</p>` : ''}<p class="item-title">${escapeHtml(extra.name)}</p>
-${extra.description ? `<details><summary>Detalhes</summary><p>${escapeHtml(extra.description)}</p></details>` : ''}
+    const cards = extras.map((extra) => `<div class="box">
+${extra.date ? `<p class="when">${icon('calendar')}${shortDay(extra.date)}</p>` : ''}${titled(extra.name, 'h3', 'title')}
+${extra.description ? disclosure('Detalhes', extraDetails(extra.description)) : ''}
 </div>`);
-    return `<section aria-labelledby="extras"><h2 id="extras">Passeios e ingressos</h2>${cards.join('')}</section>`;
+    return `<section class="section" aria-labelledby="extras"><h2 id="extras">${icon('ticket')}Passeios e ingressos</h2>${cards.join('')}</section>`;
 }
 
-/**
- * `06/12/2026 a 09/12/2026 · `: the whole trip, from the earliest to the
- * latest day of the stay, every flight's departure and arrival, and the
- * dated extras. `YYYY-MM-DD` strings sort chronologically.
- */
-function travelPeriod(content: ProposalContent): string {
-    const days = [
-        ...(content.hotel ? [content.hotel.room.checkin, content.hotel.room.checkout] : []),
-        ...content.flights.flatMap((flight) => [flight.departure.slice(0, 10), flight.arrival.slice(0, 10)]),
-        ...content.extras.flatMap((extra) => (extra.date ? [extra.date] : [])),
-    ].sort();
-    if (days.length === 0) return '';
-    const first = formatDay(days[0]);
-    const last = formatDay(days[days.length - 1]);
-    return first === last ? `${first} · ` : `${first} a ${last} · `;
+function notesSection(notes: ProposalContent['notes']): string {
+    if (!notes?.length) return '';
+    return `<section class="section" aria-labelledby="bom-saber"><h2 id="bom-saber">Bom saber</h2>${list(notes, 'notes')}</section>`;
 }
 
-function includedSummary(content: ProposalContent): string[] {
-    const items: string[] = [];
-    if (content.hotel) items.push(`Hospedagem por ${plural(nightsBetween(content.hotel.room.checkin, content.hotel.room.checkout), 'noite', 'noites')}`);
-    if (content.flights.length) items.push(isRoundTrip(content.flights) ? 'Voos de ida e volta' : plural(content.flights.length, 'voo', 'voos'));
-    if (content.transfers.length) items.push(plural(content.transfers.length, 'traslado', 'traslados'));
-    if (content.extras.length) items.push(plural(content.extras.length, 'passeio ou ingresso', 'passeios e ingressos'));
-    return items;
+function conditionsSection(destination: string): string {
+    const contact = whatsappUrl(`Olá! Tenho uma dúvida sobre a minha proposta para ${destination}.`);
+    return `<section class="section conditions" aria-labelledby="condicoes"><h2 id="condicoes">Condições</h2><p>${escapeHtml(CONDITIONS_TEXT)} Para fechar ou tirar dúvidas, <a href="${escapeHtml(contact)}" rel="noopener noreferrer" target="_blank">fale com a gente pelo WhatsApp</a>.</p></section>`;
 }
-
-const STYLES = `
-*{box-sizing:border-box}
-body{margin:0;font-family:Poppins,ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;line-height:1.6;color:#0f172a;background:#F4F8FF}
-main{max-width:42rem;margin:0 auto;padding:24px 16px 48px}
-img{display:block;max-width:100%}
-h1{margin:4px 0 8px;font-size:clamp(1.75rem,6vw,2.5rem);font-weight:800;line-height:1.1}
-h2{margin:0 0 12px;font-size:1.375rem;font-weight:800;line-height:1.2}
-section{margin-top:40px}
-p{margin:0 0 12px}
-ul{margin:8px 0 0;padding-left:20px}
-small{font-size:.8125rem;color:#475569}
-.label{margin:0 0 4px;font-size:.75rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:#0056D2}
-.muted{color:#475569;font-size:.9375rem}
-.fine{font-size:.8125rem;color:#475569}
-.notice{padding:8px 12px;border-radius:8px;font-size:.875rem;font-weight:600;background:#e0f2fe}
-.hero{width:100%;aspect-ratio:16/10;object-fit:cover;margin:20px 0 0;border-radius:16px;background:#e2e8f0}
-.card{margin:0 0 12px;padding:20px;border-radius:16px;background:#fff;box-shadow:0 10px 40px -10px rgba(0,0,0,.15)}
-.card>:last-child{margin-bottom:0}
-.item-title{margin:0 0 4px;font-weight:700}
-.stars{color:#b45309;font-size:1rem;letter-spacing:2px}
-.route{display:flex;align-items:flex-start;gap:12px;font-size:1.25rem;font-weight:700;line-height:1.3}
-.route span:nth-child(2){padding-top:2px;color:#94a3b8}
-.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:16px 0}
-.gallery img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;background:#e2e8f0}
-details{margin:12px 0 0}
-summary{cursor:pointer;font-weight:600;color:#0056D2;min-height:44px;display:flex;align-items:center}
-.amenities{columns:2;column-gap:24px;font-size:.875rem}
-.total{margin-top:24px;padding:24px;border-radius:16px;color:rgba(255,255,255,.9);background:#0f172a}
-.total .label{color:#7dd3fc}
-.amount{margin:4px 0;font-size:clamp(2rem,9vw,2.75rem);font-weight:900;line-height:1.1;color:#fff}
-.amount-alt{margin:0 0 8px;font-size:1.125rem;font-weight:700;color:#fff}
-.total-note{margin:8px 0 0;font-size:.875rem}
-.total ul{margin:12px 0 20px}
-.cta{display:flex;align-items:center;justify-content:center;min-height:52px;padding:12px 24px;border-radius:16px;font-weight:700;color:#0f172a;text-decoration:none;background:#FFD600;box-shadow:4px 4px 0 0 #7dd3fc;transition:transform .15s,box-shadow .15s}
-.cta:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 0 #7dd3fc;background:#E5C000}
-.cta:active{transform:translate(4px,4px);box-shadow:none}
-.cta:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid #0ea5e9;outline-offset:3px}
-.valid{margin:12px 0 0;font-size:.875rem;text-align:center}
-footer{margin-top:48px;padding-top:20px;border-top:1px solid #e5e7eb;font-size:.8125rem;color:#475569}
-footer a{color:#0056D2}
-@media (prefers-reduced-motion:reduce){.cta{transition:none}}
-`;
 
 export function renderProposalContent(
     content: ProposalContent,
     options: { expiresAt: number; internalPreview?: boolean },
 ): string {
-    const { hotel } = content;
-    const greeting = content.firstName ? `${content.firstName}, sua viagem para ${content.destination}` : `Sua viagem para ${content.destination}`;
-    const period = travelPeriod(content);
-    const heroPhoto = hotel?.photos[0];
-    const validUntil = formatValidUntil(options.expiresAt);
-    const cta = whatsappUrl(`Olá! Vi minha proposta para ${content.destination} e quero conversar.`);
+    const flights = journeysOf(content.flights);
 
     return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F4F8FF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
 <title>Sua proposta | Anhangá Viagens</title>
-<style>${STYLES}</style>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+${PROPOSAL_FONT_PRELOADS}
+<style>${PROPOSAL_STYLES}</style>
 </head>
 <body>
+${options.internalPreview ? `<p class="notice" role="note">${escapeHtml(INTERNAL_PREVIEW_NOTICE)}</p>\n` : ''}<header class="shell top"><p class="brand">Anhangá Viagens</p><p class="label">Proposta</p></header>
 <main>
-${options.internalPreview ? `<p class="notice" role="note">${escapeHtml(INTERNAL_PREVIEW_NOTICE)}</p>\n` : ''}<p class="label">Anhangá Viagens · Proposta</p>
-<h1>${escapeHtml(greeting)}</h1>
-<p class="muted">${period}${escapeHtml(travelersLabel(content.travelers))}</p>
-${heroPhoto ? `<img class="hero" src="${escapeHtml(heroPhoto)}" alt="${escapeHtml(hotel.name)}">` : ''}
-<div class="total">
-<p class="label">Valor total</p>
-${totalAmount(content.total)}
-<p>para ${escapeHtml(travelersLabel(content.travelers))}, com tudo o que está incluso:</p>
-${list(includedSummary(content))}
-<a class="cta" href="${escapeHtml(cta)}" rel="noopener noreferrer" target="_blank">Quero fechar pelo WhatsApp</a>
-<p class="valid">Proposta válida até ${escapeHtml(validUntil)}</p>
-${content.total.note ? `<p class="total-note">${escapeHtml(content.total.note)}</p>` : ''}
-</div>
-${hotel ? hotelSection(hotel) : ''}
-${flightsSection(content.flights)}
+${hero(content, flights.journeys)}
+<div class="shell">
+${voucher(content, flights, formatValidUntil(options.expiresAt))}
+${content.hotel ? hotelSection(content.hotel) : ''}
+${flightsSection(flights.journeys)}
 ${transfersSection(content.transfers)}
 ${extrasSection(content.extras)}
 ${notesSection(content.notes)}
-<section aria-labelledby="condicoes"><h2 id="condicoes">Condições</h2><p>${escapeHtml(CONDITIONS_TEXT)}</p></section>
-<footer>
+${conditionsSection(content.destination)}
+</div>
+</main>
+<footer><div class="shell">
 <p>${escapeHtml(PRIVACY_NOTICE)} <a href="${PRIVACY_POLICY_URL}" rel="noopener noreferrer" target="_blank">Política de Privacidade</a>.</p>
 <p>Anhangá Viagens</p>
-</footer>
-</main>
+</div></footer>
 </body>
 </html>`;
 }

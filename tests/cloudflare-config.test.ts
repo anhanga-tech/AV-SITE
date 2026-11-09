@@ -222,6 +222,16 @@ test('Cloudflare Pages headers should cache hashed Vite assets immutably', async
   assert.notEqual(globalHeaders.get('Cache-Control'), assetHeaders.get('Cache-Control'));
 });
 
+test('Cloudflare Pages headers cache the proposal page fonts, whose path carries a version', async () => {
+  const headers = await readFile(new URL('../public/_headers', import.meta.url), 'utf8');
+  const fontHeaders = collectHeadersBlocks(headers).get('/fonts/*');
+
+  // Immutable is only safe because a changed font goes to a new /fonts/vN/ (lib/proposal-styles.ts).
+  assert.equal(fontHeaders?.get('Cache-Control'), 'public, max-age=31536000, immutable');
+  const styles = await readFile(new URL('../lib/proposal-styles.ts', import.meta.url), 'utf8');
+  assert.match(styles, /`\/fonts\/v\d+\/poppins-\$\{weight\}-latin\.woff2`/);
+});
+
 test('Cloudflare Pages headers should keep NPS routes out of search results', async () => {
   const headers = await readFile(new URL('../public/_headers', import.meta.url), 'utf8');
   const blocks = collectHeadersBlocks(headers);

@@ -185,6 +185,9 @@ Uma proposta guarda **ou** `redirectUrl` (redirect rastreado) **ou** `content` (
 - **Datas:** diárias (`2027-03-10T00:00:00`) são tratadas como dia de calendário, e horários de voo como hora local do aeroporto. Nenhuma das duas passa por fuso horário, então não "voltam um dia" no servidor.
 - **Prévias de link** (WhatsApp etc.) continuam recebendo a página genérica, sem nome, hotel ou preço. A prévia interna (`?previa=`) mostra a página completa com o aviso.
 - **Rodapé:** aviso de que a abertura é registrada só com data e hora (sem IP, localização ou aparelho), com link para `/politica-privacidade` (seção 5.10).
+- **Visual (#1926):** identidade "O Diário de Bordo" (`DESIGN.md`). Ordem: hero com destino e período (foto do hotel, ou a rota em códigos de aeroporto quando não há foto), resumo da viagem com o valor total e o único botão do WhatsApp, e só depois os detalhes: hospedagem (galeria que rola de lado, descrição curta com "Ler mais"), voos como cartão de embarque (conexões no mesmo cartão), traslados, passeios, "Bom saber" e condições. Segue o modo escuro do sistema. Sem JavaScript: "Ler mais" e comodidades são `<details>`; a galeria é scroll-snap em CSS. Estilos em `lib/proposal-styles.ts`, ícones SVG inline em `lib/proposal-icons.ts` (Lucide, ISC).
+- **Textos da operadora em CAIXA ALTA:** atenuados só na exibição (`displayCase` em `lib/proposal-format.ts`), como `PASSEIO AO BETO CARRERO WORLD` → `Passeio ao Beto Carrero World`. Códigos entre parênteses (`(NVT)`) e siglas curtas soltas (`BRL`, `VIP`) ficam como estão. O conteúdo gravado não muda.
+- **Fonte:** Poppins servida do próprio domínio (`/fonts/v1/`, CSP `font-src 'self'`), cópia dos arquivos `latin` de `src/fonts/` (o teste confere que são idênticos). `/fonts/*` tem cache `immutable`: se um arquivo mudar, ele vai para `/fonts/v2/`, nunca sobrescreve o `v1`.
 - **Conversão:** `fromInfotravelNormalized` (`lib/proposal-infotravel.ts`) transforma o JSON normalizado da Infotravel (`main.getBooking` + `main.getHotel`) nesse conteúdo. O adaptador que gera o normalizado a partir da API é a P11 (#1906). O fixture em `tests/fixtures/` é a cotação de teste com o roteiro deslocado e números fictícios. Os arquivos brutos da API têm dados reais do cliente e não entram no repositório.
 
 ## Proposta aérea (P10)
@@ -245,7 +248,7 @@ O endpoint é síncrono: até 6 s na operadora + até 8 s no Odoo. O timeout do 
 
 ## Headers
 
-Respostas de Pages Functions não recebem o `public/_headers`, então `lib/proposal-page.ts` define todos: `X-Robots-Tag: noindex, nofollow`, `Cache-Control: private, no-store`, `Referrer-Policy: no-referrer`, CSP, `X-Frame-Options`, `nosniff`, HSTS e `Permissions-Policy`. `/proposta/` também está em `Disallow` em todos os grupos do `public/robots.txt` e fora do sitemap.
+Respostas de Pages Functions não recebem o `public/_headers`, então `lib/proposal-page.ts` define todos: `X-Robots-Tag: noindex, nofollow`, `Cache-Control: private, no-store`, `Referrer-Policy: no-referrer`, CSP, `X-Frame-Options`, `nosniff`, HSTS e `Permissions-Policy`. A CSP só libera estilo inline, as fotos dos hosts da operadora (`img-src`) e as fontes do próprio domínio (`font-src 'self'`); não há `script-src`. `/proposta/` também está em `Disallow` em todos os grupos do `public/robots.txt` e fora do sitemap.
 
 ## Rastreadores injetados pela Cloudflare
 

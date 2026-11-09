@@ -7,6 +7,7 @@ import { AEREO_PRICE_NOTE, fromAereoQuotation, parseTravelers } from '../lib/pro
 import { proposalContentSchema } from '../lib/proposal-content.ts';
 import { handleProposalRequest } from '../lib/proposal-page.ts';
 import { createFakeProposalRedis } from './helpers/fake-proposal-redis.ts';
+import { pageText } from './helpers/page-text.ts';
 
 // P10 (#1905): the air quotation skill's JSON becomes a proposal page, one
 // option per link, with the same totals as the skill's PDF and WhatsApp text.
@@ -167,16 +168,44 @@ test('the page shows dollars first, reais below, infants, legs and the price not
     const { data } = await (await handleCreateProposal(create(AEREO_BODY), deps)).json();
     const page = await (await handleProposalRequest(openPage(data.url), data.id, deps)).text();
 
+    const text = pageText(page);
+
     assert.match(page, /<p class="amount">US\$\s2\.065,72<\/p>\n<p class="amount-alt">R\$\s10\.741,74<\/p>/);
-    assert.match(page, /Ana, sua viagem para São Paulo e Miami/);
-    assert.match(page, /2 adultos e 1 bebê/);
-    assert.match(page, /<p class="label">Volta · 20\/12<\/p>/);
-    assert.match(page, /1 mala de 23 kg por adulto/);
+    assert.match(text, /Ana, sua viagem para São Paulo e Miami/);
+    assert.match(text, /2 adultos e 1 bebê/);
+    assert.ok(text.includes('Volta dom, 20 dez'), 'the leg name and its day head the boarding pass');
+    assert.match(text, /1 mala de 23 kg por adulto/);
     assert.ok(page.includes(AEREO_PRICE_NOTE));
     assert.match(page, /<h2 id="bom-saber">Bom saber<\/h2>/);
-    assert.match(page, /Embarque pelo Terminal 3\./);
-    assert.match(page, /Valores convertidos pelo câmbio de 20\/10\/2026 \(US\$ 1,00 = R\$ 5,2000\)/);
-    assert.match(page, /<li>Voos de ida e volta<\/li>/);
+    assert.match(text, /Embarque pelo Terminal 3\./);
+    assert.match(text, /Valores convertidos pelo câmbio de 20\/10\/2026 \(US\$ 1,00 = R\$ 5,2000\)/);
+    assert.match(text, /Voos de ida e volta São Paulo – Miami · Companhia Exemplo/);
+});
+
+test('a leg with a connection is one boarding pass, with the time between the flights', async (t) => {
+    const { deps } = setup(t);
+    const { data } = await (await handleCreateProposal(create(AEREO_BODY), deps)).json();
+    const page = await (await handleProposalRequest(openPage(data.url), data.id, deps)).text();
+
+    // Ida (one flight) and Volta (MIA → MCO → GRU): two passes, not three.
+    assert.equal(page.match(/<article class="pass">/g)?.length, 2);
+    const volta = pageText(page.slice(page.lastIndexOf('<article class="pass">')));
+    assert.ok(volta.startsWith('Volta dom, 20 dez'), volta);
+    assert.ok(volta.includes('MIA 09:00 Miami'), volta);
+    assert.ok(volta.includes('Conexão em Orlando (MCO) 9h55min entre os voos'), volta);
+    assert.ok(volta.includes('GRU 06:30 chega 21/12 São Paulo'), volta);
+});
+
+test('with no hotel photo the hero draws the route from the airport codes', async (t) => {
+    const { deps } = setup(t);
+    const { data } = await (await handleCreateProposal(create(AEREO_BODY), deps)).json();
+    const page = await (await handleProposalRequest(openPage(data.url), data.id, deps)).text();
+
+    assert.match(page, /<section class="hero hero--plain"/);
+    assert.match(page, /<div class="route-art" aria-hidden="true"><p class="code">GRU<small>São Paulo<\/small><\/p><svg class="route-arc"/);
+    assert.match(page, /<p class="code">MIA<small>Miami<\/small><\/p><\/div>/);
+    // D4: no photo means no image at all, not a stock one.
+    assert.doesNotMatch(page, /<img /);
 });
 
 test('an air proposal is valid for 3 days; the bot may shorten it, never extend it', async (t) => {
