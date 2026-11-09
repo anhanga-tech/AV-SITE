@@ -14,6 +14,7 @@ export function PrivacySection10TransferenciaInternacional() {
                     <li>Continuidade do atendimento por WhatsApp: ao clicar em nossos botões de WhatsApp, o link abre a conversa com uma mensagem já preenchida — no encaminhamento do assistente virtual, com o e-mail informado e os dados da viagem pesquisada —, o que transmite esses dados à Meta antes mesmo de a conversa começar, com base na execução de procedimentos preliminares solicitados pelo titular (Art. 7º, V, LGPD)</li>
                     <li>Hospedagem do código do website e publicação dos depoimentos de clientes</li>
                     <li>Acompanhamento dos links de proposta comercial pelo assistente comercial automatizado (Seção 5.10)</li>
+                    <li>Medição dos links de oferta do canal: só a data e a hora de cada clique, guardadas no Upstash (Seção 5.11)</li>
                 </ul>
                 <h3 className="font-merriweather font-semibold">10.2 Garantias</h3>
                 <p>As transferências internacionais devem estar amparadas em uma das hipóteses do art. 33 da LGPD. A Anhangá Turismo está consolidando o inventário dos fornecedores, dos países de destino e do mecanismo aplicável a cada um, com a revisão dos respectivos instrumentos contratuais.</p>

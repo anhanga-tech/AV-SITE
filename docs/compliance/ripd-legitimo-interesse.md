@@ -9,9 +9,9 @@
 | **Endereço** | Av. Dom Pedro I, 773, Vila Monumento, São Paulo-SP, CEP 01552-001 |
 | **Encarregado (DPO)** | Felipe William Rodrigues Silva |
 | **E-mail DPO** | privacidade@anhanga.tur.br |
-| **Versão** | 1.15 |
+| **Versão** | 1.16 |
 | **Data de elaboração** | 02/06/2026 |
-| **Última revisão** | 23/10/2026 |
+| **Última revisão** | 09/11/2026 |
 | **Próxima revisão** | 03/06/2027 |
 | **Status** | Rascunho — pendente de revisão jurídica e aprovação do DPO |
 
@@ -21,13 +21,14 @@
 
 Este relatório documenta a avaliação de impacto sobre as atividades de tratamento de dados pessoais realizadas pela **Anhangá Turismo Ltda.** com fundamento em **legítimo interesse** (Art. 7º, IX da LGPD), conforme exigido pelo Art. 38 da mesma Lei e pelas orientações da Autoridade Nacional de Proteção de Dados (ANPD).
 
-O relatório cobre **cinco atividades de tratamento** identificadas:
+O relatório cobre **seis atividades de tratamento** identificadas:
 
 1. Análise comportamental agregada via Google Analytics 4 (GA4)
 2. Atribuição UTM e click IDs para mensuração de campanhas de tráfego pago
 3. Armazenamento de histórico de qualificação BANT no CRM para atendimento ao cliente
 4. Customer Match — criação de públicos personalizados no Google Ads e Meta Ads
 5. Registro de aberturas do link de proposta comercial e aviso ao assistente comercial
+6. Registro de cliques no link de oferta do canal, sem aviso ao CRM
 
 **Decisão arquitetural relevante (v1.1, substituída na v1.9):** A Anhangá Turismo adotou o **Stape.io** como plataforma de server-side tagging (sGTM gerenciado, servidores hospedados no Brasil). Todo o rastreamento de analytics e conversões passava pelo container server-side antes de chegar às plataformas de terceiros (Google, Meta).
 
@@ -378,15 +379,70 @@ A **exibição** da proposta tem base em procedimentos preliminares a contrato, 
 
 ---
 
-## 7. Conclusão geral e aprovação
+## 7. Atividade 6 — Cliques no link de oferta do canal
 
-As cinco atividades de tratamento avaliadas são:
+Autorizado pelo controlador em 09/11/2026. Política de Privacidade, seção 5.11.
+
+Abrir o link (`/o/<slug>`) leva a pessoa ao WhatsApp da Anhangá com o texto daquela oferta. Esta atividade avalia só o que vai além disso: **registrar o clique**, com base em legítimo interesse. Não há nota no CRM nem aviso ao assistente comercial.
+
+### 7.1 Descrição do tratamento
+
+| Campo | Detalhe |
+|---|---|
+| **Dados tratados** | Por clique humano: só o instante (UTC) — `lib/offer-link-store.ts`. O cadastro da oferta (texto da mensagem, título e data de encerramento) não é dado de pessoa |
+| **Titulares** | Quem abre o link publicado no canal. Não há identificação: o registro não distingue uma pessoa de outra |
+| **Não registrado** | Prévias de link, prefetch, pedido sem User-Agent e `HEAD` — `lib/offer-link-page.ts`. Oferta encerrada também não conta |
+| **Operadores** | Upstash, Inc. (cadastro e cliques). O redirecionamento seguinte é a conversa no WhatsApp, já descrita na matriz de operadores |
+| **Retenção** | Cliques: 90 dias a partir do primeiro clique. Cadastro: até a data de encerramento mais 30 dias, ou 366 dias sem data, renovados a cada atualização |
+| **Transferência internacional** | Upstash, Inc. (EUA, com banco primário em São Paulo) — ver matriz de operadores, 2.6 |
+
+### 7.2 Interesse legítimo identificado
+
+- Saber se a oferta publicada no canal foi aberta, para decidir se ela teve adesão
+- Fazer isso sem identificar a pessoa e sem gerar contato automático
+
+### 7.3 Teste de necessidade e proporcionalidade
+
+**É necessário?** Sim. Sem o registro, a única leitura de adesão seria perguntar no WhatsApp quem chegou por qual oferta, o que pede mais dado, não menos.
+
+**É proporcional?** Sim. Cada clique guarda só o instante: sem IP (nem hash), localização, aparelho ou user agent. O texto da oferta é definido pela equipe, não pelo titular.
+
+**Poderia ser menos invasivo?** Não sem perder a contagem. Um campo novo só volta com a funcionalidade que o usa e com a revisão desta avaliação.
+
+### 7.4 Balancing test
+
+| Fator | Avaliação |
+|---|---|
+| Natureza dos dados | Data e hora de acesso a um link público; não sensíveis e sem identificador |
+| Expectativa razoável do titular | Quem toca no link de uma oferta espera abrir o WhatsApp. O registro é só o horário desse toque e está na política, seção 5.11. A pessoa não vê uma página antes do redirecionamento |
+| Impacto sobre o titular | Baixo. Nenhuma decisão automatizada, nenhum perfil e nenhum contato disparado pelo clique |
+| Iniciativa do titular | O titular escolhe abrir o link |
+| Salvaguardas | Ver 7.5 |
+
+**Conclusão:** Interesse legítimo prevalece. O texto da seção 5.11 segue neste mesmo conjunto de mudanças para o Encarregado aceitar ao revisar.
+
+### 7.5 Salvaguardas implementadas
+
+- [x] Cada clique guarda só o instante: sem IP, hash de IP, localização ou aparelho (`lib/offer-link-store.ts`)
+- [x] Prévias de link, prefetch e `HEAD` não contam (`lib/offer-link-page.ts`)
+- [x] Oferta encerrada não conta
+- [x] Expiração automática por TTL: cliques em 90 dias; cadastro até o encerramento mais 30 dias, ou 366 dias
+- [x] Nenhum aviso ao CRM ou ao assistente comercial
+- [x] Logs sem a mensagem guardada e sem o segredo da API
+- [x] Página `noindex` e `Disallow: /o/`
+- [ ] **Pendente de aceite do Encarregado:** a seção 5.11 da política, incluída nesta mudança
+
+---
+
+## 8. Conclusão geral e aprovação
+
+As seis atividades de tratamento avaliadas são:
 
 1. **Proporcionais** — limitadas ao mínimo necessário para as finalidades declaradas
 2. **Necessárias** — não há alternativas igualmente eficazes com menor impacto
 3. **Balanceadas / Consentidas** — o impacto sobre os titulares é baixo ou moderado, com salvaguardas adequadas e opt-out disponível
 
-O balancing test favorece o legítimo interesse nas Atividades 1, 2, 3 e 5. A Atividade 4 é baseada em consentimento específico do titular com segmentação obrigatória de opt-in antes de qualquer upload.
+O balancing test favorece o legítimo interesse nas Atividades 1, 2, 3, 5 e 6. A Atividade 4 é baseada em consentimento específico do titular com segmentação obrigatória de opt-in antes de qualquer upload.
 
 ### Pendências antes da vigência do RIPD
 
@@ -414,10 +470,11 @@ O balancing test favorece o legítimo interesse nas Atividades 1, 2, 3 e 5. A At
 
 ---
 
-## 8. Histórico de versões
+## 9. Histórico de versões
 
 | Versão | Data | Alterações |
 |---|---|---|
+| 1.16 | 09/11/2026 | Atividade 6 adicionada: cliques no link de oferta do canal (`/o/<slug>`), só o instante, sem IP e sem aviso ao CRM; conclusão renumerada para a seção 8 e histórico para a 9. Seção 5.11 da política segue pendente de aceite do Encarregado |
 | 1.0 | 02/06/2026 | Versão inicial — rascunho para revisão |
 | 1.1 | 02/06/2026 | Incorporada decisão de adoção do Stape.io (sGTM); atualização das Atividades 1 e 2 com nova arquitetura server-side, operadores, riscos e salvaguardas; Stape OÜ adicionado como subprocessador |
 | 1.2 | 03/06/2026 | Revisão pós issue #782: atualização de §3.5 e §3.6 da Atividade 2; `initializeTracking()` mantido sob legítimo interesse; canal de oposição documentado |

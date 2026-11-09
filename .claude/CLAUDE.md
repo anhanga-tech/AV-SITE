@@ -64,6 +64,7 @@ NPS_INVITE_SECRET=            # HMAC-SHA256 key (lib/nps-invite.ts) — ver docs
 # Proposal preview (required in prod): link interno /proposta/<id>?previa=… que não conta abertura
 PROPOSAL_PREVIEW_SECRET=      # HMAC-SHA256 key (lib/proposal-preview.ts) — ver docs/ops/proposta-link.md
 PROPOSAL_API_SECRET=          # Bearer do bot comercial em /api/create-proposal — ver docs/ops/proposta-link.md
+OFFER_LINK_SECRET=            # Bearer de /api/create-offer-link e /api/offer-link-stats — ver docs/ops/oferta-link.md. Segredo novo, separado de PROPOSAL_API_SECRET
 PROPOSAL_PAGES_ENABLED=       # 'true' libera propostas com página (type infotravel); padrão desligado até a #1925
 PROPOSAL_WEBHOOK_URL=         # Receptor (https) do aviso de abertura de proposta (lib/proposal-webhook.ts)
 PROPOSAL_WEBHOOK_KEY=         # Bearer da automação receptora (chave de envio do painel da Clara)
@@ -133,6 +134,8 @@ Handlers rodam como Cloudflare Pages Functions (via `functions/`). O campo `expo
 | `submit-quiz.ts` | Travel quiz results → Odoo `res.partner` (ToFu, sem oportunidade) |
 | `purchase-dispatch.ts` | Receives n8n purchase events; validates `N8N_WEBHOOK_SECRET` |
 | `create-proposal.ts` | Internal: sales bot creates a `/proposta/<id>` link (Bearer `PROPOSAL_API_SECRET`); returns the customer and signed preview links |
+| `create-offer-link.ts` | Internal: registers `/o/<slug>` for the offers channel (Bearer `OFFER_LINK_SECRET`, not the proposal secret) |
+| `offer-link-stats.ts` | Internal: click count and last human open for one offer slug (same Bearer) |
 | `auth.ts` / `auth/callback.ts` | GitHub OAuth for Decap CMS `/admin` |
 | `health.ts` | Health check |
 | `markdown.ts` | Serves blog content as Markdown (content negotiation) |

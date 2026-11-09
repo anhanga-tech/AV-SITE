@@ -10,6 +10,7 @@ export function PrivacySection7Armazenamento() {
                     <li><strong>Cookie de atribuição:</strong> o cookie próprio <code>anhanga_ga_cid</code>, quando criado, pode permanecer por até 2 (dois) anos; o identificador é pseudonimizado e pode ser registrado no CRM quando o titular envia um formulário</li>
                     <li><strong>Registros de prevenção de abuso:</strong> o controle de volume de requisições por endereço IP expira em até 10 (dez) minutos; o registro de uso único do convite da pesquisa de satisfação (identificador do convite, sem dados de contato) é mantido até o vencimento do convite, em no máximo 30 (trinta) dias</li>
                     <li><strong>Link de proposta comercial:</strong> o conteúdo da proposta é apagado no vencimento do link, em até 15 (quinze) dias; os registros de abertura são mantidos por até 90 (noventa) dias contados da primeira abertura (ver Seção 5.10)</li>
+                    <li><strong>Link de oferta do canal:</strong> o cadastro da oferta é apagado na data de encerramento, com até 30 (trinta) dias adicionais para informar que ela encerrou, ou em até 366 (trezentos e sessenta e seis) dias sem data de encerramento; os cliques são mantidos por até 90 (noventa) dias contados do primeiro clique (ver Seção 5.11)</li>
                     <li><strong>Cookie de campanha:</strong> o cookie <code>tracking_data</code> permanece por até 30 (trinta) dias</li>
                 </ul>
                 <h3 className="font-merriweather font-semibold">7.2 Critérios para Retenção</h3>

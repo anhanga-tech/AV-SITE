@@ -1,3 +1,4 @@
+import type { OfferLinkRedis } from '../../lib/offer-link-store.ts';
 import type { ProposalOpensRedis } from '../../lib/proposal-opens.ts';
 
 /**
@@ -22,7 +23,7 @@ export function createFakeProposalRedis(clock: { now: number }) {
         }
     };
 
-    const redis: ProposalOpensRedis = {
+    const redis: ProposalOpensRedis & Pick<OfferLinkRedis, 'llen' | 'lindex'> = {
         async set(key: string, value: string, opts: { nx?: true; ex: number }) {
             if (opts.nx && read(key) !== null) return null;
             strings.set(key, { value, expiresAt: clock.now + opts.ex * 1000 });
@@ -30,6 +31,15 @@ export function createFakeProposalRedis(clock: { now: number }) {
         },
         async mget(...keys) {
             return keys.map(read);
+        },
+        async llen(key: string) {
+            return live(lists.get(key))?.values.length ?? 0;
+        },
+        async lindex(key: string, index: number) {
+            const values = live(lists.get(key))?.values ?? [];
+            const value = values.at(index);
+            if (value === undefined) return null;
+            return JSON.parse(value);
         },
         multi() {
             // Queued, then applied together on exec() — like MULTI/EXEC.
