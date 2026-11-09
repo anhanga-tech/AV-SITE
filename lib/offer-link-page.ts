@@ -11,6 +11,7 @@
  * from running on the HTML responses.
  */
 import { isLinkPreviewRequest, isPrefetchRequest } from './link-preview-agents';
+import { BRAND_LOGO_BLUE_URL, BRAND_LOGO_PNG_URL } from './media-assets';
 import { containsUrl, genericWhatsAppUrl, offerWhatsAppUrl } from './offer-link';
 import { loadOffer, recordOfferClick, type OfferLinkStoreDeps, type OfferRecord } from './offer-link-store';
 
@@ -21,7 +22,7 @@ const SECURITY_HEADERS: Readonly<Record<string, string>> = {
     'Referrer-Policy': 'no-referrer',
     'X-Robots-Tag': 'noindex, nofollow',
     'Content-Security-Policy':
-        "default-src 'none'; style-src 'unsafe-inline'; img-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+        "default-src 'none'; style-src 'unsafe-inline'; img-src https://media.anhanga.tur.br; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
     'X-Content-Type-Options': 'nosniff',
     'X-Frame-Options': 'DENY',
     'Cross-Origin-Opener-Policy': 'same-origin',
@@ -34,15 +35,22 @@ const STYLES = `
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;font-family:Poppins,ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;line-height:1.6;color:#0f172a;background:#F4F8FF}
 main{width:100%;max-width:32rem;padding:32px 24px;border-radius:16px;background:#fff;box-shadow:0 10px 40px -10px rgba(0,0,0,.15)}
-.brand{margin:0 0 24px;font-size:.75rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:#0056D2}
+.logo{display:block;width:auto;height:7rem;max-width:100%;margin:0 0 24px;object-fit:contain;object-position:left center}
 h1{margin:0 0 12px;font-size:clamp(1.5rem,5vw,2rem);font-weight:800;line-height:1.1}
 p{margin:0 0 28px;color:#475569}
 .cta{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 24px;border-radius:16px;font-weight:700;color:#0f172a;text-decoration:none;background:#FFD600;box-shadow:4px 4px 0 0 #0f172a;transition:transform .15s,box-shadow .15s}
 .cta:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 0 #0f172a;background:#E5C000}
 .cta:active{transform:translate(4px,4px);box-shadow:none}
 .cta:focus-visible{outline:3px solid #0ea5e9;outline-offset:3px}
+@media (min-width:480px){.logo{height:8rem}}
 @media (prefers-reduced-motion:reduce){.cta{transition:none}}
 `;
+
+const LOGO_ALT = 'Anhangá Viagens';
+
+function logoMarkup(): string {
+    return `<img class="logo" src="${escapeHtml(BRAND_LOGO_BLUE_URL)}" alt="${escapeHtml(LOGO_ALT)}" width="375" height="195">`;
+}
 
 function escapeHtml(value: string): string {
     return value
@@ -97,6 +105,8 @@ function renderPage(content: PageContent, openGraphTitle?: string): string {
         ? `<a class="cta" href="${escapeHtml(genericWhatsAppUrl())}" rel="noopener noreferrer" target="_blank">Falar no WhatsApp</a>`
         : '';
     const ogTitle = openGraphTitle ?? content.title;
+    // The page shows the same blue SVG as the header. Crawlers skip SVG in
+    // og:image, so the card uses the PNG of that logo and keeps og:title as the offer.
     return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -105,6 +115,8 @@ function renderPage(content: PageContent, openGraphTitle?: string): string {
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
 <meta property="og:title" content="${escapeHtml(ogTitle)}">
+<meta property="og:image" content="${escapeHtml(BRAND_LOGO_PNG_URL)}">
+<meta property="og:image:alt" content="${escapeHtml(LOGO_ALT)}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Anhangá Viagens">
 <title>${escapeHtml(content.title)}</title>
@@ -112,7 +124,7 @@ function renderPage(content: PageContent, openGraphTitle?: string): string {
 </head>
 <body>
 <main>
-<p class="brand">Anhangá Viagens</p>
+${logoMarkup()}
 <h1>${escapeHtml(content.heading)}</h1>
 <p>${escapeHtml(content.message)}</p>
 ${whatsapp}

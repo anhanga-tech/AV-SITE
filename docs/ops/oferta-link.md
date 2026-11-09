@@ -42,7 +42,7 @@ O TTL faz o expurgo. A auditoria diária das chaves `proposta:*` (`.github/workf
 | Quem | Resposta | Conta? |
 |---|---|---|
 | Pessoa (GET com User-Agent de navegador) | 302 para `https://wa.me/5511955021519?text=<mensagem guardada>` | Sim |
-| Prévia (WhatsApp, Facebook, Telegram e os demais em `lib/link-preview-agents.ts`), `HEAD`, pedido sem User-Agent | 200, HTML leve com `og:title` e `noindex` | Não |
+| Prévia (WhatsApp, Facebook, Telegram e os demais em `lib/link-preview-agents.ts`), `HEAD`, pedido sem User-Agent | 200, HTML leve com o logo, `og:title`, `og:image` e `noindex` | Não |
 | Prefetch do navegador | 503 | Não |
 | Slug inexistente ou malformado | 404, título "Link inválido" | Não |
 | `expiresAt` já passou | 410, "Esta oferta encerrou", com link para `https://wa.me/5511955021519` (sem texto da oferta) | Não |

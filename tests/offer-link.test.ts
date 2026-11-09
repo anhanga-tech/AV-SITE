@@ -114,12 +114,17 @@ test('WhatsApp preview, curl, HEAD and prefetch do not count', async () => {
     assert.equal(preview.status, 200);
     const html = await preview.text();
     assert.match(html, /property="og:title" content="Gramado — férias janeiro 2027"/);
+    assert.match(html, /property="og:image" content="https:\/\/media\.anhanga\.tur\.br\/images\/brand\/Anhang%C3%A1%20Viagens%20-%20logo\.png"/);
+    assert.match(html, /property="og:image:alt" content="Anhangá Viagens"/);
+    assert.match(html, /<img class="logo" src="https:\/\/media\.anhanga\.tur\.br\/images\/brand\/LOGO%20ANHANGA%20VIAGENS%20-%20AZUL\.svg" alt="Anhangá Viagens"/);
     assert.match(html, /<title>Gramado — férias janeiro 2027<\/title>/);
     assert.match(html, /noindex, nofollow/);
+    assert.doesNotMatch(html, /<p class="brand">/);
     assert.doesNotMatch(html, /wa\.me/);
     assert.doesNotMatch(html, /Quero a oferta/);
     assert.doesNotMatch(html, /<script/i);
     assert.match(preview.headers.get('Content-Security-Policy') ?? '', /default-src 'none'/);
+    assert.match(preview.headers.get('Content-Security-Policy') ?? '', /img-src https:\/\/media\.anhanga\.tur\.br/);
     assert.doesNotMatch(preview.headers.get('Content-Security-Policy') ?? '', /script-src/);
 
     const head = await handleOfferLinkRequest(visit(SLUG, { method: 'HEAD' }), SLUG, deps);
@@ -157,6 +162,8 @@ test('an unknown slug is 404 Link inválido and a malformed slug never touches R
     assert.equal(missing.status, 404);
     const html = await missing.text();
     assert.match(html, /<h1>Link inválido<\/h1>/);
+    assert.match(html, /alt="Anhangá Viagens"/);
+    assert.match(html, /LOGO%20ANHANGA%20VIAGENS%20-%20AZUL\.svg/);
     assert.match(html, /href="https:\/\/wa\.me\/5511955021519"/);
     assert.doesNotMatch(html, /wa\.me\/5511955021519\?/);
 
@@ -188,6 +195,8 @@ test('an ended offer explains that and does not count', async () => {
     assert.equal(ended.status, 410);
     const html = await ended.text();
     assert.match(html, /<h1>Esta oferta encerrou<\/h1>/);
+    assert.match(html, /alt="Anhangá Viagens"/);
+    assert.match(html, /LOGO%20ANHANGA%20VIAGENS%20-%20AZUL\.svg/);
     assert.match(html, /href="https:\/\/wa\.me\/5511955021519"/);
     assert.doesNotMatch(html, /Quero a oferta/);
     assert.doesNotMatch(html, /text=/);
@@ -465,6 +474,7 @@ test('a title is escaped on the preview page', async () => {
     assert.equal((await handleCreateOfferLink(createRequest({ slug: SLUG, message: MESSAGE, title }), deps)).status, 201);
     const preview = await handleOfferLinkRequest(visit(SLUG, { userAgent: WHATSAPP }), SLUG, deps);
     const html = await preview.text();
-    assert.doesNotMatch(html, /<img/);
+    assert.doesNotMatch(html, /<img alt="x"/);
     assert.match(html, /&lt;img alt=&quot;x&quot;/);
+    assert.match(html, /<img class="logo" [^>]*alt="Anhangá Viagens"/);
 });
