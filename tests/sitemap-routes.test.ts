@@ -40,10 +40,14 @@ test('sitemap excludes operational noindex routes', async () => {
 test('static sitemap lastmod values are ISO dates not in the future', () => {
   const today = new Date().toISOString().slice(0, 10);
   for (const entry of STATIC_SITEMAP_ENTRIES) {
-    if (entry.lastmodFromBlog) continue;
-    assert.match(entry.lastmod, /^\d{4}-\d{2}-\d{2}$/, `${entry.route} lastmod format`);
-    assert.ok(!Number.isNaN(Date.parse(entry.lastmod)), `${entry.route} lastmod is not a real date`);
-    assert.ok(entry.lastmod <= today, `${entry.route} lastmod ${entry.lastmod} is in the future`);
+    if (entry.lastmodFromBlog) continue; // /blog: derivado do manifest (#2039)
+    const { lastmod } = entry;
+    if (!lastmod) {
+      assert.fail(`${entry.route} has no lastmod`);
+    }
+    assert.match(lastmod, /^\d{4}-\d{2}-\d{2}$/, `${entry.route} lastmod format`);
+    assert.ok(!Number.isNaN(Date.parse(lastmod)), `${entry.route} lastmod is not a real date`);
+    assert.ok(lastmod <= today, `${entry.route} lastmod ${lastmod} is in the future`);
   }
 });
 
