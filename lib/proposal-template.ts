@@ -35,7 +35,7 @@ import {
     travelersLabel,
 } from './proposal-format';
 import { icon, iconShapes, type IconName } from './proposal-icons';
-import { logo } from './proposal-logo';
+import { logo, techLogo } from './proposal-logo';
 import { PROPOSAL_FONT_PRELOADS, PROPOSAL_STYLES } from './proposal-styles';
 
 export const WHATSAPP_NUMBER = '5511955021519';
@@ -48,8 +48,9 @@ const LONG_DESTINATION = 28;
 
 // The operator's payment terms never reach the page (D7: the deal is closed
 // with the Anhangá); this is the Anhangá's own wording.
-const CONDITIONS_TEXT = 'Valores sujeitos a disponibilidade e a alteração até a confirmação da reserva.';
-const PRIVACY_NOTICE = 'Para acompanhar sua proposta, registramos quando esta página é aberta. O registro guarda só a data e a hora: não inclui seu IP, sua localização nem dados do seu aparelho.';
+const CONDITIONS_TEXT = 'Os valores podem mudar e dependem de disponibilidade até a reserva ser confirmada.';
+// Mirrors the purpose in section 5.10 of the privacy policy.
+const PRIVACY_NOTICE = 'Registramos quando esta página é aberta, para saber se você já viu a proposta e dar retorno na hora certa. Guardamos só a data e a hora, sem seu IP, sua localização ou dados do aparelho.';
 const INTERNAL_PREVIEW_NOTICE = 'Prévia interna: esta visita não conta como abertura do cliente.';
 
 type Flight = ProposalContent['flights'][number];
@@ -76,6 +77,11 @@ const SAO_PAULO_DATE_TIME = new Intl.DateTimeFormat('pt-BR', {
 function formatValidUntil(ms: number): string {
     const parts = Object.fromEntries(SAO_PAULO_DATE_TIME.formatToParts(ms).map((part) => [part.type, part.value]));
     return `${parts.day}/${parts.month}/${parts.year} às ${parts.hour}:${parts.minute}`;
+}
+
+/** The year in São Paulo, for the copyright line. */
+function yearIn(ms: number): string {
+    return SAO_PAULO_DATE_TIME.formatToParts(ms).find((part) => part.type === 'year')?.value ?? '';
 }
 
 export function escapeHtml(value: string): string {
@@ -214,7 +220,7 @@ function summaryItems(content: ProposalContent, flights: { roundTrip: boolean; j
     if (hotel) {
         const nights = nightsBetween(hotel.room.checkin, hotel.room.checkout);
         const stay = splitTitle(displayCase(hotel.name)).title;
-        items.push({ icon: 'bed', title: `Hospedagem por ${plural(nights, 'noite', 'noites')}`, detail: hotel.room.board ? `${stay} · ${displayCase(hotel.room.board)}` : stay });
+        items.push({ icon: 'bed', title: `${plural(nights, 'noite', 'noites')} de hospedagem`, detail: hotel.room.board ? `${stay} · ${displayCase(hotel.room.board)}` : stay });
     }
     const { journeys } = flights;
     if (journeys.length) {
@@ -249,7 +255,7 @@ function totalAmount(total: ProposalContent['total']): string {
 /** "Resumo da viagem" and the total: what the customer reads before any detail. */
 function voucher(content: ProposalContent, flights: { roundTrip: boolean; journeys: Journey[] }, validUntil: string): string {
     const items = summaryItems(content, flights).map((item) => `<li><span class="summary-icon">${icon(item.icon)}</span><div><p class="summary-title">${escapeHtml(item.title)}</p>${item.detail ? `<p class="summary-sub">${escapeHtml(item.detail)}</p>` : ''}</div></li>`);
-    const cta = whatsappUrl(`Olá! Vi minha proposta para ${content.destination} e quero conversar.`);
+    const cta = whatsappUrl(`Olá! Vi minha proposta para ${displayCase(content.destination)} e quero conversar.`);
     return `<div class="voucher">
 <section class="summary" aria-labelledby="resumo">
 <h2 id="resumo">Sua viagem em resumo</h2>
@@ -392,13 +398,13 @@ function notesSection(notes: ProposalContent['notes']): string {
 }
 
 function conditionsSection(destination: string): string {
-    const contact = whatsappUrl(`Olá! Tenho uma dúvida sobre a minha proposta para ${destination}.`);
+    const contact = whatsappUrl(`Olá! Tenho uma dúvida sobre a minha proposta para ${displayCase(destination)}.`);
     return `<section class="section conditions" aria-labelledby="condicoes"><h2 id="condicoes">Condições</h2><p>${escapeHtml(CONDITIONS_TEXT)} Para fechar ou tirar dúvidas, <a href="${escapeHtml(contact)}" rel="noopener noreferrer" target="_blank">fale com a gente pelo WhatsApp</a>.</p></section>`;
 }
 
 export function renderProposalContent(
     content: ProposalContent,
-    options: { expiresAt: number; internalPreview?: boolean },
+    options: { expiresAt: number; internalPreview?: boolean; now?: number },
 ): string {
     const flights = journeysOf(content.flights);
 
@@ -433,7 +439,8 @@ ${conditionsSection(content.destination)}
 </main>
 <footer><div class="shell">
 <p>${escapeHtml(PRIVACY_NOTICE)} <a href="${PRIVACY_POLICY_URL}" rel="noopener noreferrer" target="_blank">Política de Privacidade</a>.</p>
-<p>Anhangá Viagens</p>
+<div class="credits"><p>© ${yearIn(options.now ?? Date.now())} Anhangá Viagens. Todos os direitos reservados.</p>
+<p class="made">Feito com ${icon('heart', 'icon heart')}<span class="sr">carinho</span> pela ${techLogo()}</p></div>
 </div></footer>
 </body>
 </html>`;

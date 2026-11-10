@@ -56,13 +56,13 @@ const PAGES = {
     active: {
         title: 'Sua proposta | Anhangá Viagens',
         heading: 'Sua proposta está quase pronta',
-        message: 'Estamos finalizando os detalhes desta página. Enquanto isso, fale com a gente pelo WhatsApp que enviamos tudo por lá.',
-        whatsappText: 'Olá! Recebi o link da minha proposta e gostaria de falar sobre ela.',
+        message: 'Ainda estamos terminando esta página. Enquanto isso, fale com a gente no WhatsApp e mandamos a proposta por lá.',
+        whatsappText: 'Olá! Recebi o link da minha proposta e quero falar sobre ela.',
     },
     expired: {
         title: 'Proposta expirada | Anhangá Viagens',
         heading: 'Esta proposta expirou',
-        message: 'Os valores e a disponibilidade de uma viagem mudam rápido, por isso cada proposta vale por um prazo curto. Chama a gente no WhatsApp que preparamos uma atualizada.',
+        message: 'Os valores e a disponibilidade de uma viagem mudam rápido, por isso cada proposta vale por pouco tempo. Fale com a gente no WhatsApp e preparamos uma atualizada.',
         whatsappText: 'Olá! O link da minha proposta expirou. Podem me enviar uma atualizada?',
     },
     not_found: {
@@ -74,7 +74,7 @@ const PAGES = {
     unavailable: {
         title: 'Proposta indisponível | Anhangá Viagens',
         heading: 'Não conseguimos abrir sua proposta agora',
-        message: 'Tivemos um problema temporário. Tente de novo em alguns minutos ou fale com a gente no WhatsApp.',
+        message: 'Tivemos um problema do nosso lado. Tente de novo em alguns minutos ou fale com a gente no WhatsApp.',
         whatsappText: 'Olá! Não consegui abrir o link da minha proposta.',
     },
 } as const satisfies Record<string, PageContent>;
@@ -137,9 +137,9 @@ function htmlResponse(kind: PageKind, method: string, internalPreview = false): 
 }
 
 /** The proposal page, or the holding page for a proposal stored without content. */
-function proposalResponse(proposal: ProposalRecord, method: string, internalPreview = false): Response {
+function proposalResponse(proposal: ProposalRecord, method: string, now: number, internalPreview = false): Response {
     if (!proposal.content) return htmlResponse('active', method, internalPreview);
-    const body = method === 'HEAD' ? null : renderProposalContent(proposal.content, { expiresAt: proposal.expiresAt, internalPreview });
+    const body = method === 'HEAD' ? null : renderProposalContent(proposal.content, { expiresAt: proposal.expiresAt, internalPreview, now });
     return new Response(body, { status: 200, headers: SECURITY_HEADERS });
 }
 
@@ -203,7 +203,7 @@ export async function handleProposalRequest(
     if (isLinkPreviewRequest(request)) return htmlResponse('active', request.method);
 
     if (await isProposalPreviewRequest(request, id)) {
-        return redirectUrl ? redirectResponse(redirectUrl) : proposalResponse(proposal, request.method, true);
+        return redirectUrl ? redirectResponse(redirectUrl) : proposalResponse(proposal, request.method, deps.now?.() ?? Date.now(), true);
     }
 
     // After the response via waitUntil, which keeps the isolate alive until the
@@ -213,5 +213,5 @@ export async function handleProposalRequest(
     // Without waitUntil (tests, local dev) the response waits for the webhook too.
     else await recording;
 
-    return redirectUrl ? redirectResponse(redirectUrl) : proposalResponse(proposal, request.method);
+    return redirectUrl ? redirectResponse(redirectUrl) : proposalResponse(proposal, request.method, deps.now?.() ?? Date.now());
 }

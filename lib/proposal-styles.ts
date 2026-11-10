@@ -175,5 +175,10 @@ details[open]>summary .when-open{display:inline}
 .conditions{max-width:68ch}
 footer{margin-top:56px;padding:24px 0 40px;border-top:1px solid var(--line);font-size:.8125rem;color:var(--muted)}
 footer p{max-width:68ch}
+.credits{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 24px;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.credits p{margin:0}
+.made{display:inline-flex;align-items:center;gap:5px}
+.heart{width:1em;height:1em;fill:currentColor;color:#ef4444}
+.tech-logo{display:block;width:auto;height:16px;color:var(--ink)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 `;

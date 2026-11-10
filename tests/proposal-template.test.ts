@@ -23,6 +23,7 @@ const ORIGIN = 'https://www.anhanga.tur.br';
 const IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.1 Mobile/15E148 Safari/604.1';
 const PREVIEW_SECRET = 'test-proposal-preview-secret';
 const EXPIRES_AT = Date.UTC(2027, 1, 4, 15, 0);
+const NOW = Date.UTC(2027, 0, 20, 15, 30);
 
 function content(firstName = 'Ana Maria Silva') {
     return fromInfotravelNormalized(NORMALIZED, { firstName });
@@ -30,7 +31,7 @@ function content(firstName = 'Ana Maria Silva') {
 
 /** Intl puts a no-break space after "R$"; compare on plain spaces. */
 function render(value = content(), internalPreview = false): string {
-    return renderProposalContent(value, { expiresAt: EXPIRES_AT, internalPreview }).replace(/\u00a0/g, ' ');
+    return renderProposalContent(value, { expiresAt: EXPIRES_AT, internalPreview, now: NOW }).replace(/\u00a0/g, ' ');
 }
 
 function setup() {
@@ -84,7 +85,7 @@ test('the trip summary and the total come before any detail', () => {
     assert.deepEqual(order, [...order].sort((a, b) => a - b));
     for (const expected of [
         'Sua viagem em resumo',
-        'Hospedagem por 3 noites Reserva Praia Hotel · Café da manhã com buffet incluido',
+        '3 noites de hospedagem Reserva Praia Hotel · Café da manhã com buffet incluido',
         'Voos de ida e volta São Paulo – Navegantes · Latam',
         '1 traslado',
         '2 passeios e ingressos Passeio ao Beto Carrero World (sem ingresso) · P. 01 Dia Antecipado',
@@ -153,6 +154,30 @@ test('the header shows the Anhangá logo, drawn inline in the brand colors', () 
     assert.match(html, /@media \(prefers-color-scheme:dark\)\{:root\{[^}]*--logo:#fff;/);
 });
 
+test('the footer carries the copyright and the Anhangá.tech credit, as on the site', () => {
+    const html = render();
+    const footer = /<footer>([\s\S]*)<\/footer>/.exec(html)?.[1] ?? '';
+
+    // The year of the visit, in São Paulo.
+    assert.ok(pageText(footer).includes('© 2027 Anhangá Viagens. Todos os direitos reservados.'), pageText(footer));
+    assert.ok(pageText(footer).includes('Feito com carinho pela'), pageText(footer));
+    assert.match(footer, /<svg class="tech-logo" [^>]*role="img" aria-label="Anhangá\.tech"/);
+    assert.doesNotMatch(footer.replace(/<a href="https:\/\/www\.anhanga\.tur\.br\/politica-privacidade"/, ''), /https?:|<img|<use/);
+    // New Year's Eve in São Paulo is already the next year in UTC.
+    const newYearsEve = renderProposalContent(content(), { expiresAt: EXPIRES_AT, now: Date.UTC(2028, 0, 1, 2, 0) });
+    assert.match(newYearsEve, /© 2027 Anhangá Viagens/);
+});
+
+test('the WhatsApp messages carry the destination toned down, never in ALL CAPS', () => {
+    const html = render({ ...content(), destination: 'BALNEÁRIO CAMBORIÚ' });
+    const messages = [...html.matchAll(/href="https:\/\/wa\.me\/5511955021519\?text=([^"]+)"/g)].map((match) => decodeURIComponent(match[1]));
+
+    assert.deepEqual(messages, [
+        'Olá! Vi minha proposta para Balneário Camboriú e quero conversar.',
+        'Olá! Tenho uma dúvida sobre a minha proposta para Balneário Camboriú.',
+    ]);
+});
+
 test('every font the page references is served from public/ and matches src/fonts', () => {
     const html = render();
 
@@ -185,7 +210,7 @@ test('only the first name, the total and what is included reach the page (D2, D6
 test('the conditions are the Anhangá\'s own, never the operator\'s payment terms (D7)', () => {
     const html = render();
 
-    assert.match(html, /Valores sujeitos a disponibilidade/);
+    assert.match(html, /Os valores podem mudar e dependem de disponibilidade até a reserva ser confirmada\./);
     assert.doesNotMatch(html, /Formas de Pagamento|Parcelado|PIX/i);
     // The single call to action is the Anhangá's WhatsApp.
     assert.equal(html.match(/class="cta"/g)?.length, 1);
@@ -238,9 +263,11 @@ test('the page has no script and a privacy notice linking to the policy', () => 
     const html = render();
 
     assert.doesNotMatch(html, /<script/i);
-    // The notice must match what lib/proposal-opens.ts stores: the instant only.
-    assert.match(html, /registramos quando esta página é aberta/);
-    assert.match(html, /O registro guarda só a data e a hora: não inclui seu IP, sua localização nem dados do seu aparelho/);
+    // The notice must match what lib/proposal-opens.ts stores (the instant
+    // only) and the purpose in section 5.10 of the privacy policy.
+    const footer = pageText(/<footer>[\s\S]*<\/footer>/.exec(html)?.[0] ?? '');
+    assert.ok(footer.includes('Registramos quando esta página é aberta, para saber se você já viu a proposta'), footer);
+    assert.ok(footer.includes('Guardamos só a data e a hora, sem seu IP, sua localização ou dados do aparelho.'), footer);
     assert.match(html, /href="https:\/\/www\.anhanga\.tur\.br\/politica-privacidade"/);
 });
 
