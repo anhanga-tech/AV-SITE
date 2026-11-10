@@ -2,7 +2,13 @@ import { logger } from './logger';
 
 /** Subset of the Upstash Redis client surface used across `lib/` (rate limiting, idempotency locks, proposals). */
 export interface RedisClientLike {
-    pipeline(): { incr(key: string): void; ttl(key: string): void; exec(): Promise<unknown[]> };
+    pipeline(): {
+        incr(key: string): void;
+        /** `NX`: only set a TTL when the key has none. */
+        expire(key: string, seconds: number, option?: 'NX'): void;
+        ttl(key: string): void;
+        exec(): Promise<unknown[]>;
+    };
     expire(key: string, seconds: number): Promise<unknown>;
     /** MULTI/EXEC: the queued commands go in one request and apply together. */
     multi(): RedisTransactionLike;

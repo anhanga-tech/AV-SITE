@@ -134,14 +134,20 @@ export async function checkRateLimit(
     try {
       const windowSeconds = Math.ceil(windowMs / 1000);
 
-      // Batch reads to reduce network roundtrips; expiry is handled explicitly below.
+      // One round trip for the whole check. INCR creates a missing key with no
+      // TTL, so a first hit used to see TTL = -1 and pay a second, sequential
+      // EXPIRE round trip (~1 RTT on every new client per window, the common
+      // case). EXPIRE NX sets the window only when the key has none, so it is a
+      // no-op on later hits and also repairs keys that lost their expiry; TTL
+      // runs after it in the same pipeline and already sees the window.
       const p = redis.pipeline();
       p.incr(storageKey);
+      p.expire(storageKey, windowSeconds, 'NX');
       p.ttl(storageKey);
-      const [count, ttlResult] = await p.exec() as [number, number];
+      const [count, , ttlResult] = await p.exec() as [number, unknown, number];
       let ttl = ttlResult;
 
-      // Recover from keys with missing expiry to avoid permanent blocks.
+      // Defensive: should be unreachable now that EXPIRE NX is pipelined.
       if (ttl < 0) {
         await redis.expire(storageKey, windowSeconds);
         ttl = windowSeconds;

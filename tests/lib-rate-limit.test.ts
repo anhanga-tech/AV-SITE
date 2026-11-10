@@ -241,11 +241,17 @@ interface FakeRedis {
     client: RateLimitRedis;
     incrKeys: string[];
     incrCalls: number;
+    /** Number of `exec()` round trips (one per limiter check). */
+    execCalls: number;
+    /** Standalone `expire()` round trips outside the pipeline. */
+    standaloneExpireCalls: number;
 }
 
 function createFakeRedis(options?: { failExec?: boolean }): FakeRedis {
     const counts = new Map<string, { count: number; ttl: number }>();
     const incrKeys: string[] = [];
+    let execCalls = 0;
+    let standaloneExpireCalls = 0;
     const client: RateLimitRedis = {
         pipeline() {
             const ops: Array<() => number> = [];
@@ -257,16 +263,27 @@ function createFakeRedis(options?: { failExec?: boolean }): FakeRedis {
                     counts.set(key, entry);
                     ops.push(() => entry.count);
                 },
+                expire(key: string, seconds: number, option?: 'NX') {
+                    ops.push(() => {
+                        const entry = counts.get(key);
+                        if (!entry) return 0;
+                        if (option === 'NX' && entry.ttl >= 0) return 0;
+                        entry.ttl = seconds;
+                        return 1;
+                    });
+                },
                 ttl(key: string) {
                     ops.push(() => counts.get(key)?.ttl ?? -1);
                 },
                 async exec() {
+                    execCalls += 1;
                     if (options?.failExec) throw new Error('redis unavailable');
                     return ops.map((op) => op());
                 },
             };
         },
         async expire(key: string, seconds: number) {
+            standaloneExpireCalls += 1;
             const entry = counts.get(key);
             if (entry) entry.ttl = seconds;
             return 1;
@@ -278,8 +295,30 @@ function createFakeRedis(options?: { failExec?: boolean }): FakeRedis {
         get incrCalls() {
             return incrKeys.length;
         },
+        get execCalls() {
+            return execCalls;
+        },
+        get standaloneExpireCalls() {
+            return standaloneExpireCalls;
+        },
     };
 }
+
+test('first hit in a window sets the expiry inside the same Redis round trip', async (t) => {
+    useRateLimitSecret(t, 'test-rate-limit-secret');
+    const redis = createFakeRedis();
+    const ip = `203.0.113.${uid()}`;
+    const prefix = `test-rl-one-rtt-${uid()}`;
+
+    const first = await checkRateLimit(ip, { limit: 5, windowMs: 60_000, prefix }, redis.client);
+    const second = await checkRateLimit(ip, { limit: 5, windowMs: 60_000, prefix }, redis.client);
+
+    assert.equal(redis.execCalls, 2, 'one pipeline round trip per check');
+    assert.equal(redis.standaloneExpireCalls, 0, 'no extra sequential EXPIRE round trip');
+    assert.equal(first.resetIn, 60_000, 'first hit reports the full window');
+    assert.equal(second.resetIn, 60_000);
+    assert.equal(second.remaining, 3);
+});
 
 test('redis key is an HMAC of the IP, stable per client, and distinct across clients', async (t) => {
     useRateLimitSecret(t, 'test-rate-limit-secret');
