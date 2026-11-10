@@ -2,6 +2,62 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
+    "title": "Turismo regenerativo no Brasil: 5 experiências que valem a pena",
+    "excerpt": "Turismo regenerativo é deixar o lugar melhor do que você encontrou. Cinco viagens no Brasil em que o dinheiro fica com quem cuida da floresta, do rio e do mar.",
+    "date": "2026-11-13",
+    "dateModified": "2026-11-13",
+    "author": "felipe-william",
+    "category": "Experiencias",
+    "image": "https://media.anhanga.tur.br/images/blog/turismo-regenerativo-brasil-capa.jpg",
+    "imageCreditStatus": "confirmed",
+    "imageCredit": "Mateus S. Figueiredo / Wikimedia Commons",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Passarela_e_quartos_da_Pousada_Uacari.jpg",
+    "imageLicense": "CC BY-SA 4.0",
+    "imageLicenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "imageAdaptation": "Recorte adaptado à capa",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Brasil",
+    "tags": [
+      "turismo-regenerativo",
+      "brasil",
+      "ecoturismo",
+      "experiencias",
+      "turismo-de-base-comunitaria",
+      "amazonia",
+      "pantanal",
+      "chapada-dos-veadeiros",
+      "jalapao",
+      "ceara"
+    ],
+    "seoTitle": "Turismo regenerativo: 5 experiências",
+    "seoDescription": "Turismo regenerativo no Brasil: 5 experiências na Amazônia, no Pantanal, na Chapada, no Jalapão e no Ceará, com época certa e como checar o que é de verdade.",
+    "faq": [
+      {
+        "question": "O que é turismo regenerativo?",
+        "answer": "É a viagem planejada para deixar o lugar melhor do que estava antes da sua chegada. Na prática, o dinheiro do turismo financia conservação, pesquisa ou a vida de uma comunidade que cuida daquele território. Quando a experiência é de base comunitária, quem decide como o lugar recebe visitantes é quem mora lá."
+      },
+      {
+        "question": "Qual a diferença entre turismo regenerativo, sustentável e ecoturismo?",
+        "answer": "Ecoturismo descreve o tipo de passeio: natureza, trilha, observação de fauna. Turismo sustentável tenta reduzir o estrago que a viagem causa. O regenerativo mira um saldo positivo: a sua visita paga por algo que melhora o lugar, como a vigilância de uma reserva, a pesquisa com onças ou a renda que mantém uma comunidade no território."
+      },
+      {
+        "question": "Turismo regenerativo é mais caro?",
+        "answer": "Depende da experiência. Um lodge na Amazônia com traslado de barco desde Tefé custa a partir de R$ 4.960 por pessoa em três noites (tarifário 2026, quarto quádruplo, outubro a dezembro), enquanto um dia no território Kalunga sai por ingresso de R$ 65 mais guia local dividido pelo grupo. O que muda é para onde o dinheiro vai, e nem sempre quanto você gasta."
+      },
+      {
+        "question": "Como saber se uma experiência é regenerativa de verdade ou só marketing?",
+        "answer": "Pergunte quem é dono ou quem gere o negócio, que parte do valor fica na comunidade, se existe limite de visitantes e se o guia é de lá. Desconfie de selo verde sem explicação e de quem fala em sustentabilidade sem mostrar nenhum número."
+      },
+      {
+        "question": "Qual a melhor época para fazer turismo regenerativo no Brasil?",
+        "answer": "Cada bioma tem a sua. O Pantanal é melhor para fauna de julho a outubro. A Chapada dos Veadeiros e o Jalapão pedem a seca, entre maio e setembro. A várzea de Mamirauá muda de cara entre a cheia (dezembro a julho) e a seca (agosto a novembro). No litoral do Ceará, o segundo semestre costuma ter menos chuva."
+      }
+    ],
+    "slug": "turismo-regenerativo-brasil",
+    "readingTime": "13 min de leitura"
+  },
+  {
     "title": "Cruzeiro fluvial ou roteiro terrestre na Europa: qual escolher depois dos 60",
     "excerpt": "Navio no Reno, no Danúbio ou no Douro, ou trem e hotel? Ritmo, mobilidade, bagagem e custo comparados para quem viaja à Europa depois dos 60.",
     "date": "2026-11-11",

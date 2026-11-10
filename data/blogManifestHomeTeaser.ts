@@ -5,6 +5,21 @@ import type { HomeTeaserPost } from '../types/blog';
 
 export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
   {
+    "slug": "turismo-regenerativo-brasil",
+    "title": "Turismo regenerativo no Brasil: 5 experiências que valem a pena",
+    "excerpt": "Turismo regenerativo é deixar o lugar melhor do que você encontrou. Cinco viagens no Brasil em que o dinheiro fica com quem cuida da floresta, do rio e do mar.",
+    "date": "2026-11-13",
+    "category": "Experiencias",
+    "author": "felipe-william",
+    "image": "https://media.anhanga.tur.br/images/blog/turismo-regenerativo-brasil-capa.jpg",
+    "imageCreditStatus": "confirmed",
+    "imageCredit": "Mateus S. Figueiredo / Wikimedia Commons",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Passarela_e_quartos_da_Pousada_Uacari.jpg",
+    "imageLicense": "CC BY-SA 4.0",
+    "imageLicenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "imageAdaptation": "Recorte adaptado à capa"
+  },
+  {
     "slug": "cruzeiro-fluvial-europa-melhor-idade",
     "title": "Cruzeiro fluvial ou roteiro terrestre na Europa: qual escolher depois dos 60",
     "excerpt": "Navio no Reno, no Danúbio ou no Douro, ou trem e hotel? Ritmo, mobilidade, bagagem e custo comparados para quem viaja à Europa depois dos 60.",
@@ -49,20 +64,5 @@ export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
     "imageLicense": "CC BY-SA 2.0",
     "imageLicenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
     "imageAdaptation": "Recorte adaptado à capa · pôr do sol visto do Miradouro da Senhora do Monte, Lisboa, 2015"
-  },
-  {
-    "slug": "disney-ou-universal-orlando-qual-escolher",
-    "title": "Disney ou Universal em Orlando: qual escolher?",
-    "excerpt": "Disney ou Universal em Orlando? Compare o ritmo, as atrações, a idade das crianças, o custo da fila rápida e o tipo de viagem que cada complexo entrega.",
-    "date": "2026-09-22",
-    "category": "Planejamento",
-    "author": "felipe-william",
-    "image": "https://media.anhanga.tur.br/images/blog/onde-ficar-em-orlando.jpg",
-    "imageCreditStatus": "confirmed",
-    "imageCredit": "Nielsoncaetanosalmeron / Wikimedia Commons",
-    "imageSource": "https://commons.wikimedia.org/wiki/File:Embassy_Suites_by_Hilton_Orlando_International_Drive_Convention_Center_-_exterior_view.jpg",
-    "imageLicense": "CC BY 4.0",
-    "imageLicenseUrl": "https://creativecommons.org/licenses/by/4.0/",
-    "imageAdaptation": "Recorte adaptado à capa"
   }
 ];
