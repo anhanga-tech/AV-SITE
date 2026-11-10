@@ -5,6 +5,7 @@
  * apply: every security header is set here. The CSP has no `script-src`,
  * which also keeps Cloudflare-injected tags (Zaraz Pageview, Web Analytics
  * beacon) from running and shipping the URL — the id is the credential.
+ * `font-src 'self'` loads Poppins from our own `/fonts/` (#1926).
  *
  * An active proposal renders its page (lib/proposal-template.ts, #1901) or,
  * for a tracked redirect (#1896), answers 302 to the operator. One with
@@ -21,6 +22,8 @@ import { notifyProposalOpen, shouldNotifyProposalOpen, type ProposalWebhookDeps 
 import { isProposalPreviewRequest } from './proposal-preview';
 import { loadProposal, type ProposalRecord } from './proposal-store';
 import { PROPOSAL_PHOTO_HOSTS } from './proposal-content';
+import { PROPOSAL_FONT_FACES, PROPOSAL_FONT_STACK } from './proposal-styles';
+import { logo } from './proposal-logo';
 import { escapeHtml, renderProposalContent, WHATSAPP_NUMBER } from './proposal-template';
 
 // D4: hotel photos load from the operator's servers (lib/proposal-content.ts).
@@ -33,7 +36,7 @@ const SECURITY_HEADERS: Readonly<Record<string, string>> = {
     'Referrer-Policy': 'no-referrer',
     'X-Robots-Tag': 'noindex, nofollow',
     'Content-Security-Policy':
-        `default-src 'none'; style-src 'unsafe-inline'; img-src ${IMG_SRC}; base-uri 'none'; form-action 'none'; frame-ancestors 'none'`,
+        `default-src 'none'; style-src 'unsafe-inline'; img-src ${IMG_SRC}; font-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'`,
     'X-Content-Type-Options': 'nosniff',
     'X-Frame-Options': 'DENY',
     'Cross-Origin-Opener-Policy': 'same-origin',
@@ -53,13 +56,13 @@ const PAGES = {
     active: {
         title: 'Sua proposta | Anhangá Viagens',
         heading: 'Sua proposta está quase pronta',
-        message: 'Estamos finalizando os detalhes desta página. Enquanto isso, fale com a gente pelo WhatsApp que enviamos tudo por lá.',
-        whatsappText: 'Olá! Recebi o link da minha proposta e gostaria de falar sobre ela.',
+        message: 'Ainda estamos terminando esta página. Enquanto isso, fale com a gente no WhatsApp e mandamos a proposta por lá.',
+        whatsappText: 'Olá! Recebi o link da minha proposta e quero falar sobre ela.',
     },
     expired: {
         title: 'Proposta expirada | Anhangá Viagens',
         heading: 'Esta proposta expirou',
-        message: 'Os valores e a disponibilidade de uma viagem mudam rápido, por isso cada proposta vale por um prazo curto. Chama a gente no WhatsApp que preparamos uma atualizada.',
+        message: 'Os valores e a disponibilidade de uma viagem mudam rápido, por isso cada proposta vale por pouco tempo. Fale com a gente no WhatsApp e preparamos uma atualizada.',
         whatsappText: 'Olá! O link da minha proposta expirou. Podem me enviar uma atualizada?',
     },
     not_found: {
@@ -71,7 +74,7 @@ const PAGES = {
     unavailable: {
         title: 'Proposta indisponível | Anhangá Viagens',
         heading: 'Não conseguimos abrir sua proposta agora',
-        message: 'Tivemos um problema temporário. Tente de novo em alguns minutos ou fale com a gente no WhatsApp.',
+        message: 'Tivemos um problema do nosso lado. Tente de novo em alguns minutos ou fale com a gente no WhatsApp.',
         whatsappText: 'Olá! Não consegui abrir o link da minha proposta.',
     },
 } as const satisfies Record<string, PageContent>;
@@ -88,11 +91,12 @@ const STATUS_BY_PAGE: Record<PageKind, number> = {
 // Palette and button treatment from DESIGN.md: Ardósia Profunda text,
 // Névoa de Amanhecer background, a single Âmbar Vivo CTA with the hard shadow.
 const STYLES = `
+${PROPOSAL_FONT_FACES}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;font-family:Poppins,ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;line-height:1.6;color:#0f172a;background:#F4F8FF}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;font-family:${PROPOSAL_FONT_STACK};line-height:1.6;color:#0f172a;background:#F4F8FF}
 main{width:100%;max-width:32rem;padding:32px 24px;border-radius:16px;background:#fff;box-shadow:0 10px 40px -10px rgba(0,0,0,.15)}
-.brand{margin:0 0 24px;font-size:.75rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:#0056D2}
-h1{margin:0 0 12px;font-size:clamp(1.5rem,5vw,2rem);font-weight:800;line-height:1.1}
+.logo{display:block;width:auto;height:36px;margin:0 0 24px;color:#1762a7}
+h1{margin:0 0 12px;font-size:clamp(1.5rem,5vw,2rem);font-weight:900;line-height:1.1}
 p{margin:0 0 28px;color:#475569}
 .cta{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 24px;border-radius:16px;font-weight:700;color:#0f172a;text-decoration:none;background:#FFD600;box-shadow:4px 4px 0 0 #0f172a;transition:transform .15s,box-shadow .15s}
 .cta:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 0 #0f172a;background:#E5C000}
@@ -118,7 +122,7 @@ function renderPage(content: PageContent, internalPreview: boolean): string {
 </head>
 <body>
 <main>
-${internalPreview ? `<p class="notice" role="note">${escapeHtml(INTERNAL_PREVIEW_NOTICE)}</p>\n` : ''}<p class="brand">Anhangá Viagens</p>
+${internalPreview ? `<p class="notice" role="note">${escapeHtml(INTERNAL_PREVIEW_NOTICE)}</p>\n` : ''}${logo()}
 <h1>${escapeHtml(content.heading)}</h1>
 <p>${escapeHtml(content.message)}</p>
 <a class="cta" href="${escapeHtml(whatsappUrl)}" rel="noopener noreferrer" target="_blank">Falar no WhatsApp</a>
@@ -133,9 +137,9 @@ function htmlResponse(kind: PageKind, method: string, internalPreview = false): 
 }
 
 /** The proposal page, or the holding page for a proposal stored without content. */
-function proposalResponse(proposal: ProposalRecord, method: string, internalPreview = false): Response {
+function proposalResponse(proposal: ProposalRecord, method: string, now: number, internalPreview = false): Response {
     if (!proposal.content) return htmlResponse('active', method, internalPreview);
-    const body = method === 'HEAD' ? null : renderProposalContent(proposal.content, { expiresAt: proposal.expiresAt, internalPreview });
+    const body = method === 'HEAD' ? null : renderProposalContent(proposal.content, { expiresAt: proposal.expiresAt, internalPreview, now });
     return new Response(body, { status: 200, headers: SECURITY_HEADERS });
 }
 
@@ -199,7 +203,7 @@ export async function handleProposalRequest(
     if (isLinkPreviewRequest(request)) return htmlResponse('active', request.method);
 
     if (await isProposalPreviewRequest(request, id)) {
-        return redirectUrl ? redirectResponse(redirectUrl) : proposalResponse(proposal, request.method, true);
+        return redirectUrl ? redirectResponse(redirectUrl) : proposalResponse(proposal, request.method, deps.now?.() ?? Date.now(), true);
     }
 
     // After the response via waitUntil, which keeps the isolate alive until the
@@ -209,5 +213,5 @@ export async function handleProposalRequest(
     // Without waitUntil (tests, local dev) the response waits for the webhook too.
     else await recording;
 
-    return redirectUrl ? redirectResponse(redirectUrl) : proposalResponse(proposal, request.method);
+    return redirectUrl ? redirectResponse(redirectUrl) : proposalResponse(proposal, request.method, deps.now?.() ?? Date.now());
 }

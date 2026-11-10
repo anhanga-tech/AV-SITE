@@ -9,6 +9,7 @@ import { handleProposalRequest } from '../lib/proposal-page.ts';
 import { loadProposal } from '../lib/proposal-store.ts';
 import { companyCodeFromToken, extractInfotravelToken, fetchInfotravelQuotation } from '../services/infotravel.ts';
 import { createFakeProposalRedis } from './helpers/fake-proposal-redis.ts';
+import { pageText } from './helpers/page-text.ts';
 
 // Issue #1906: an Infotravel link becomes a proposal page, read from the
 // operator's public tRPC API; any failure falls back to the tracked redirect.
@@ -26,7 +27,9 @@ const LINK = `https://premium.infotravel.com.br/orcamento-web/pt/link?token=${TO
 const API_SECRET = 'test-proposal-api-secret';
 const PREVIEW_SECRET = 'test-proposal-preview-secret';
 const IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.1 Mobile/15E148 Safari/604.1';
-const FORBIDDEN = /Agente Ficticio|agente\.ficticio|AGENCIA FICTICIA|00\.000\.000|UNIDADE FICTICIA|Plantão|990000|9900005|9900007|Santander|Parcelado|rcaturismo|152[.,]85|RklDVElDSU8/;
+// Case-insensitive: the page tones down the operator's ALL CAPS (#1926), so
+// a leaked "AGENCIA FICTICIA" would show as "Agencia Ficticia".
+const FORBIDDEN = /Agente Ficticio|agente\.ficticio|AGENCIA FICTICIA|00\.000\.000|UNIDADE FICTICIA|Plantão|990000|9900005|9900007|Santander|Parcelado|rcaturismo|152[.,]85|RklDVElDSU8/i;
 
 type Route = (url: URL) => Response | Promise<Response>;
 
@@ -209,7 +212,7 @@ test('an Infotravel link becomes a page proposal with the customer\'s first name
     const page = await handleProposalRequest(new Request(data.url, { headers: { 'user-agent': IPHONE } }), data.id, deps);
     const html = (await page.text()).replace(/\u00a0/g, ' ');
     assert.equal(page.status, 200);
-    assert.ok(html.includes('Ana, sua viagem para Balneario Camboriu'));
+    assert.ok(pageText(html).includes('Ana, sua viagem para Balneario Camboriu'));
     assert.ok(html.includes('R$ 6.633,45'));
     assert.ok(!html.includes('Paula') && !html.includes('Souza'));
     assert.doesNotMatch(html, FORBIDDEN);

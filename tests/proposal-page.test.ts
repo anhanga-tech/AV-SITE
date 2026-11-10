@@ -83,6 +83,7 @@ test('the proposal is valid for 15 days, then answers 410 with a WhatsApp button
     assert.equal(response.headers.get('X-Robots-Tag'), 'noindex, nofollow');
     const html = await response.text();
     assert.match(html, /Esta proposta expirou/);
+    assert.match(html, /<svg class="logo" [^>]*role="img" aria-label="Anhangá Viagens"/);
     assert.match(html, /href="https:\/\/wa\.me\/5511955021519\?text=/);
 });
 
@@ -203,6 +204,8 @@ test('the page sets its own security headers and a CSP that runs no script', asy
     assert.match(csp, /default-src 'none'/);
     assert.doesNotMatch(csp, /script-src/);
     assert.match(csp, /frame-ancestors 'none'/);
+    // Poppins from our own /fonts/ only (#1926): no third-party or data: fonts.
+    assert.match(csp, /; font-src 'self';/);
     assert.equal(response.headers.get('X-Content-Type-Options'), 'nosniff');
     assert.equal(response.headers.get('X-Frame-Options'), 'DENY');
     assert.doesNotMatch(await response.text(), /<script/i);

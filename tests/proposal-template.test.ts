@@ -10,6 +10,7 @@ import { opensKey } from '../lib/proposal-opens.ts';
 import { saveProposal } from '../lib/proposal-store.ts';
 import { renderProposalContent } from '../lib/proposal-template.ts';
 import { createFakeProposalRedis } from './helpers/fake-proposal-redis.ts';
+import { pageText } from './helpers/page-text.ts';
 
 // Issue #1901: the proposal page, rendered from the normalized Infotravel
 // quotation. The fixture is the real test quotation with the itinerary
@@ -22,6 +23,7 @@ const ORIGIN = 'https://www.anhanga.tur.br';
 const IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.1 Mobile/15E148 Safari/604.1';
 const PREVIEW_SECRET = 'test-proposal-preview-secret';
 const EXPIRES_AT = Date.UTC(2027, 1, 4, 15, 0);
+const NOW = Date.UTC(2027, 0, 20, 15, 30);
 
 function content(firstName = 'Ana Maria Silva') {
     return fromInfotravelNormalized(NORMALIZED, { firstName });
@@ -29,7 +31,7 @@ function content(firstName = 'Ana Maria Silva') {
 
 /** Intl puts a no-break space after "R$"; compare on plain spaces. */
 function render(value = content(), internalPreview = false): string {
-    return renderProposalContent(value, { expiresAt: EXPIRES_AT, internalPreview }).replace(/\u00a0/g, ' ');
+    return renderProposalContent(value, { expiresAt: EXPIRES_AT, internalPreview, now: NOW }).replace(/\u00a0/g, ' ');
 }
 
 function setup() {
@@ -46,32 +48,143 @@ function open(id: string, options: { userAgent?: string; query?: string; method?
 }
 
 test('the Infotravel test quotation renders hotel, flights, transfer, extras and the total', () => {
-    const html = render();
+    const text = pageText(render());
 
     for (const expected of [
         'Ana, sua viagem para Balneario Camboriu',
-        '10/03/2027 a 13/03/2027 · 2 adultos',
+        '10 a 13 de março de 2027 2 adultos',
         'R$ 6.633,45',
-        'Reserva Praia Hotel - Balneário Camboriú',
-        'Suíte com Vista ao Mar',
-        'Café da manhã com buffet incluido',
-        'Hospedagem · 3 noites',
-        'Entrada 10/03/2027 a partir das 15:00',
-        'Saída 13/03/2027 até as 12:00',
-        'Tarifa não reembolsável',
-        'Ida · 10/03',
-        'Volta · 13/03',
-        'Latam 9101',
-        '18:35',
-        '19:40',
-        'Voo direto · 1h05min · Tarifa LIGHT',
-        'Traslado IDA (IN) + RETORNO (OUT) Aeroporto Navegantes (NVT) | Balneário Camboriú',
-        'PASSEIO AO BETO CARRERO WORLD',
+        'Reserva Praia Hotel ★★★★ Balneário Camboriú',
+        'Quarto Suíte com Vista ao Mar',
+        'Regime Café da manhã com buffet incluido',
+        'Hospedagem 3 noites, de 10 a 13 de março de 2027',
+        'Entrada qua, 10 mar, a partir das 15:00',
+        'Saída sáb, 13 mar, até as 12:00',
+        'Cancelamento Tarifa não reembolsável',
+        'Ida qua, 10 mar',
+        'Volta sáb, 13 mar',
+        'Latam 9101 Voo direto Partida: CGH 18:35 São Paulo Duração: 1h05min Chegada: NVT 19:40 Navegantes',
+        'Tarifa Light',
+        'Traslado Ida (IN) + Retorno (OUT) Aeroporto Navegantes (NVT) Balneário Camboriú',
+        'qui, 11 mar Passeio ao Beto Carrero World (sem ingresso) Saindo dos hotéis de Balneário Camboriú',
+        'P. 01 Dia Antecipado 2º Lote',
         'Comodidades do hotel (62)',
         // The exact cutoff (12:00 in São Paulo), not just the day.
         'Proposta válida até 04/02/2027 às 12:00',
     ]) {
-        assert.ok(html.includes(expected), `missing: ${expected}`);
+        assert.ok(text.includes(expected), `missing: ${expected}`);
+    }
+});
+
+test('the trip summary and the total come before any detail', () => {
+    const html = render();
+    const text = pageText(html);
+
+    const order = ['id="titulo"', 'id="resumo"', 'id="valor"', 'id="hospedagem"', 'id="voos"', 'id="traslados"', 'id="extras"', 'id="condicoes"'].map((id) => html.indexOf(id));
+    assert.ok(order.every((index) => index > 0), String(order));
+    assert.deepEqual(order, [...order].sort((a, b) => a - b));
+    for (const expected of [
+        'Sua viagem em resumo',
+        '3 noites de hospedagem Reserva Praia Hotel · Café da manhã com buffet incluido',
+        'Voos de ida e volta São Paulo – Navegantes · Latam',
+        '1 traslado',
+        '2 passeios e ingressos Passeio ao Beto Carrero World (sem ingresso) · P. 01 Dia Antecipado',
+        'Valor total R$ 6.633,45 para 2 adultos',
+    ]) {
+        assert.ok(text.includes(expected), `missing: ${expected}`);
+    }
+});
+
+test('the operator\'s ALL-CAPS names are toned down for display only', () => {
+    const value = content();
+    const text = pageText(render(value));
+
+    assert.doesNotMatch(text, /PASSEIO AO BETO|RETORNO|ANTECIPADO|TURISMO|LIGHT|CANCELAMENTO|PASSAPORTE ACESSO/);
+    // Airport codes and short acronyms stay as they are.
+    assert.match(text, /\(NVT\)/);
+    assert.match(text, /BRL 380,00/);
+    // The stored content keeps the operator's own text.
+    assert.equal(value.extras[0].name, 'PASSEIO AO BETO CARRERO WORLD (sem ingresso) - Saindo dos hotéis de Balneário Camboriú');
+});
+
+test('a long hotel description is cut at a sentence, with the rest behind "Ler mais"', () => {
+    const html = render();
+
+    const about = /<div class="about"><p>([^<]+)<\/p><details><summary><span class="when-closed">Ler mais<\/span><span class="when-open">Ler menos<\/span>/.exec(html);
+    assert.ok(about, 'missing the excerpt and its "Ler mais"');
+    assert.match(about[1], /e sauna\.$/);
+    assert.ok(about[1].length < 260, String(about[1].length));
+    assert.ok(pageText(html).includes('Os hóspedes também podem desfrutar de uma piscina infantil.'), 'the rest of the description is still on the page');
+});
+
+test('the gallery scrolls without JavaScript and every photo has its size', () => {
+    const html = render();
+
+    assert.match(html, /<div class="gallery" role="region" aria-label="Fotos do hotel" tabindex="0">/);
+    const images = html.match(/<img [^>]+>/g) ?? [];
+    // The hero plus 12 gallery photos.
+    assert.equal(images.length, 13);
+    for (const image of images) assert.match(image, /width="\d+" height="\d+"/);
+    assert.match(images[0], /class="hero-photo"[^>]+fetchpriority="high"/);
+    for (const image of images.slice(1)) assert.match(image, /loading="lazy"/);
+});
+
+test('the page follows the system dark mode and loads Poppins from its own origin', () => {
+    const html = render();
+
+    assert.match(html, /<meta name="color-scheme" content="light dark">/);
+    assert.match(html, /@media \(prefers-color-scheme:dark\)\{:root\{--bg:#0f172a;/);
+    const fonts = [...html.matchAll(/url\((\/fonts\/[^)]+)\)/g)].map((match) => match[1]);
+    assert.deepEqual(fonts, ['/fonts/v1/poppins-400-latin.woff2', '/fonts/v1/poppins-700-latin.woff2', '/fonts/v1/poppins-900-latin.woff2']);
+    for (const font of fonts) assert.ok(html.includes(`<link rel="preload" href="${font}" as="font" type="font/woff2" crossorigin>`), font);
+    // Nothing else outside the page: no stylesheet, script or third-party font.
+    assert.doesNotMatch(html, /<link rel="stylesheet"|<script|fonts\.googleapis|@import/);
+});
+
+test('the header shows the Anhangá logo, drawn inline in the brand colors', () => {
+    const html = render();
+    const header = /<header class="shell top">([\s\S]*?)<\/header>/.exec(html)?.[1] ?? '';
+
+    assert.match(header, /^<svg class="logo" viewBox="[\d .]+" width="\d+" height="\d+" role="img" aria-label="Anhangá Viagens"/);
+    assert.match(header, /<g fill="currentColor"><path /);
+    // Inline shapes only: nothing for the CSP to load, no link out of the page.
+    assert.doesNotMatch(header, /https?:|<img|<image|<use|href=/);
+    // Official blue lettering in light mode, the white of the BRANCO file in dark mode.
+    assert.match(html, /:root\{[^}]*--logo:#1762a7;/);
+    assert.match(html, /@media \(prefers-color-scheme:dark\)\{:root\{[^}]*--logo:#fff;/);
+});
+
+test('the footer carries the copyright and the Anhangá.tech credit, as on the site', () => {
+    const html = render();
+    const footer = /<footer>([\s\S]*)<\/footer>/.exec(html)?.[1] ?? '';
+
+    // The year of the visit, in São Paulo.
+    assert.ok(pageText(footer).includes('© 2027 Anhangá Viagens. Todos os direitos reservados.'), pageText(footer));
+    assert.ok(pageText(footer).includes('Feito com carinho pela'), pageText(footer));
+    assert.match(footer, /<svg class="tech-logo" [^>]*role="img" aria-label="Anhangá\.tech"/);
+    assert.doesNotMatch(footer.replace(/<a href="https:\/\/www\.anhanga\.tur\.br\/politica-privacidade"/, ''), /https?:|<img|<use/);
+    // New Year's Eve in São Paulo is already the next year in UTC.
+    const newYearsEve = renderProposalContent(content(), { expiresAt: EXPIRES_AT, now: Date.UTC(2028, 0, 1, 2, 0) });
+    assert.match(newYearsEve, /© 2027 Anhangá Viagens/);
+});
+
+test('the WhatsApp messages carry the destination toned down, never in ALL CAPS', () => {
+    const html = render({ ...content(), destination: 'BALNEÁRIO CAMBORIÚ' });
+    const messages = [...html.matchAll(/href="https:\/\/wa\.me\/5511955021519\?text=([^"]+)"/g)].map((match) => decodeURIComponent(match[1]));
+
+    assert.deepEqual(messages, [
+        'Olá! Vi minha proposta para Balneário Camboriú e quero conversar.',
+        'Olá! Tenho uma dúvida sobre a minha proposta para Balneário Camboriú.',
+    ]);
+});
+
+test('every font the page references is served from public/ and matches src/fonts', () => {
+    const html = render();
+
+    for (const [, path] of html.matchAll(/url\((\/fonts\/v\d+\/([^)]+))\)/g)) {
+        const served = readFileSync(new URL(`../public${path}`, import.meta.url));
+        const source = readFileSync(new URL(`../src/fonts/${path.split('/').pop()}`, import.meta.url));
+        assert.ok(served.equals(source), `${path} differs from src/fonts: copy it to a new /fonts/vN/`);
     }
 });
 
@@ -86,8 +199,8 @@ test('only the first name, the total and what is included reach the page (D2, D6
     // Nothing about the operator or its agency unit; no booking id or ages.
     assert.doesNotMatch(html, /\bRCA\b|rcaturismo|Santander|CNPJ|9900001|QUOTATION/i);
     // The transfer's local supplier is named once, discreetly, in fine print.
-    assert.equal(html.match(/VIP MAR/g)?.length, 1);
-    assert.ok(html.includes('<p class="fine">Operado por VIP MAR TURISMO &amp; RECEPTIVO</p>'));
+    assert.equal(html.match(/VIP MAR/gi)?.length, 1);
+    assert.ok(html.includes('<p class="fine">Operado por Vip Mar Turismo &amp; Receptivo</p>'));
     const stored = JSON.stringify(content());
     // No key for any of them, so nothing about them can be stored.
     assert.doesNotMatch(stored, /"(?:idades|booking_id|ajuste_comissao|valor|voos_valor|logo|condicoes)"/);
@@ -97,7 +210,7 @@ test('only the first name, the total and what is included reach the page (D2, D6
 test('the conditions are the Anhangá\'s own, never the operator\'s payment terms (D7)', () => {
     const html = render();
 
-    assert.match(html, /Valores sujeitos a disponibilidade/);
+    assert.match(html, /Os valores podem mudar e dependem de disponibilidade até a reserva ser confirmada\./);
     assert.doesNotMatch(html, /Formas de Pagamento|Parcelado|PIX/i);
     // The single call to action is the Anhangá's WhatsApp.
     assert.equal(html.match(/class="cta"/g)?.length, 1);
@@ -108,8 +221,8 @@ test('calendar days and flight times never shift with the time zone', () => {
     const html = render();
 
     // `2027-03-10T00:00:00` read as UTC and shown in São Paulo would be 09/03.
-    assert.ok(!html.includes('09/03/2027'));
-    assert.ok(html.includes('Ida · 10/03'));
+    assert.ok(!html.includes('09/03/2027') && !html.includes('ter, 9 mar') && !html.includes('9 a 13 de março'));
+    assert.ok(pageText(html).includes('Ida qua, 10 mar'));
 });
 
 test('photos load over https from the operator hosts only', () => {
@@ -150,9 +263,11 @@ test('the page has no script and a privacy notice linking to the policy', () => 
     const html = render();
 
     assert.doesNotMatch(html, /<script/i);
-    // The notice must match what lib/proposal-opens.ts stores: the instant only.
-    assert.match(html, /registramos quando esta página é aberta/);
-    assert.match(html, /O registro guarda só a data e a hora: não inclui seu IP, sua localização nem dados do seu aparelho/);
+    // The notice must match what lib/proposal-opens.ts stores (the instant
+    // only) and the purpose in section 5.10 of the privacy policy.
+    const footer = pageText(/<footer>[\s\S]*<\/footer>/.exec(html)?.[0] ?? '');
+    assert.ok(footer.includes('Registramos quando esta página é aberta, para saber se você já viu a proposta'), footer);
+    assert.ok(footer.includes('Guardamos só a data e a hora, sem seu IP, sua localização ou dados do aparelho.'), footer);
     assert.match(html, /href="https:\/\/www\.anhanga\.tur\.br\/politica-privacidade"/);
 });
 
@@ -161,15 +276,17 @@ test('a stored page proposal is served to the customer and counts the open', asy
     const { id } = await saveProposal({ content: content(), leadId: 4821 }, deps);
 
     const response = await handleProposalRequest(open(id), id, deps);
-    const html = (await response.text()).replace(/\u00a0/g, ' ');
+    const text = pageText(await response.text());
 
     assert.equal(response.status, 200);
-    assert.ok(html.includes('Ana, sua viagem para Balneario Camboriu'));
-    assert.ok(html.includes('R$ 6.633,45'));
+    assert.ok(text.includes('Ana, sua viagem para Balneario Camboriu'));
+    assert.ok(text.includes('R$ 6.633,45'));
     assert.equal(listOf(opensKey(id)).length, 1);
     const csp = response.headers.get('Content-Security-Policy') ?? '';
     assert.match(csp, /img-src 'self' https:\/\/media\.staticontent\.com https:\/\/media\.infotravel\.com\.br;/);
-    assert.doesNotMatch(csp, /script-src/);
+    // Fonts from our own origin only (#1926); still no script of any kind.
+    assert.match(csp, /; font-src 'self';/);
+    assert.doesNotMatch(csp, /script-src|font-src[^;]*(?:https?:|data:)/);
     assert.equal(response.headers.get('Referrer-Policy'), 'no-referrer');
 });
 
@@ -226,12 +343,12 @@ test('flights: real round trips only, overnight arrivals dated, impossible times
     const value = content();
     const [outbound, inbound] = value.flights;
 
-    const oneWay = render({ ...value, flights: [outbound, { ...inbound, from: 'Navegantes (NVT)', to: 'Porto Alegre (POA)' }] });
+    const oneWay = pageText(render({ ...value, flights: [outbound, { ...inbound, from: 'Navegantes (NVT)', to: 'Porto Alegre (POA)' }] }));
     assert.ok(oneWay.includes('Trecho 1') && oneWay.includes('Trecho 2'));
     assert.ok(!oneWay.includes('Volta') && !oneWay.includes('Voos de ida e volta'));
 
-    const overnight = render({ ...value, flights: [{ ...outbound, departure: '2027-03-10T23:50:00-03:00', arrival: '2027-03-11T08:10:00+01:00' }] });
-    assert.match(overnight, /08:10 <small>\(chega 11\/03\)<\/small>/);
+    const overnight = pageText(render({ ...value, flights: [{ ...outbound, departure: '2027-03-10T23:50:00-03:00', arrival: '2027-03-11T08:10:00+01:00' }] }));
+    assert.ok(overnight.includes('08:10 chega 11/03'), overnight);
 
     for (const departure of ['2027-02-31T10:00:00-03:00', '2027-03-10T25:00:00-03:00', '2027-03-10T10:61:00-03:00']) {
         assert.equal(proposalContentSchema.safeParse({ ...value, flights: [{ ...outbound, departure }] }).success, false, departure);
@@ -257,11 +374,11 @@ test('partial data never turns into a false claim', () => {
 
     // Flights only: the year still shows, from the flights.
     const { hotel: _hotel, ...withoutHotel } = value;
-    assert.ok(render({ ...withoutHotel, flights: [outbound, inbound] }).includes('10/03/2027 a 13/03/2027 · 2 adultos'));
+    assert.ok(pageText(render({ ...withoutHotel, flights: [outbound, inbound] })).includes('10 a 13 de março de 2027 2 adultos'));
 
     // The whole trip: an overnight flight the day before check-in widens the period.
     const earlyFlight = { ...outbound, departure: '2027-03-09T23:30:00-03:00', arrival: '2027-03-10T07:05:00-03:00' };
-    assert.ok(render({ ...value, flights: [earlyFlight, inbound] }).includes('09/03/2027 a 13/03/2027 · 2 adultos'));
+    assert.ok(pageText(render({ ...value, flights: [earlyFlight, inbound] })).includes('9 a 13 de março de 2027 2 adultos'));
 
     // Impossible or incomplete data: refused instead of rendered.
     assert.equal(proposalContentSchema.safeParse({ ...value, flights: [{ ...outbound, arrival: '2027-03-10T17:40:00-03:00' }] }).success, false);
