@@ -35,6 +35,7 @@ import {
     travelersLabel,
 } from './proposal-format';
 import { icon, iconShapes, type IconName } from './proposal-icons';
+import { logo } from './proposal-logo';
 import { PROPOSAL_FONT_PRELOADS, PROPOSAL_STYLES } from './proposal-styles';
 
 export const WHATSAPP_NUMBER = '5511955021519';
@@ -417,7 +418,7 @@ ${PROPOSAL_FONT_PRELOADS}
 <style>${PROPOSAL_STYLES}</style>
 </head>
 <body>
-${options.internalPreview ? `<p class="notice" role="note">${escapeHtml(INTERNAL_PREVIEW_NOTICE)}</p>\n` : ''}<header class="shell top"><p class="brand">Anhangá Viagens</p><p class="label">Proposta</p></header>
+${options.internalPreview ? `<p class="notice" role="note">${escapeHtml(INTERNAL_PREVIEW_NOTICE)}</p>\n` : ''}<header class="shell top">${logo()}<p class="label">Proposta</p></header>
 <main>
 ${hero(content, flights.journeys)}
 <div class="shell">

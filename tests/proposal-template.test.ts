@@ -140,6 +140,19 @@ test('the page follows the system dark mode and loads Poppins from its own origi
     assert.doesNotMatch(html, /<link rel="stylesheet"|<script|fonts\.googleapis|@import/);
 });
 
+test('the header shows the Anhangá logo, drawn inline in the brand colors', () => {
+    const html = render();
+    const header = /<header class="shell top">([\s\S]*?)<\/header>/.exec(html)?.[1] ?? '';
+
+    assert.match(header, /^<svg class="logo" viewBox="[\d .]+" width="\d+" height="\d+" role="img" aria-label="Anhangá Viagens"/);
+    assert.match(header, /<g fill="currentColor"><path /);
+    // Inline shapes only: nothing for the CSP to load, no link out of the page.
+    assert.doesNotMatch(header, /https?:|<img|<image|<use|href=/);
+    // Official blue lettering in light mode, the white of the BRANCO file in dark mode.
+    assert.match(html, /:root\{[^}]*--logo:#1762a7;/);
+    assert.match(html, /@media \(prefers-color-scheme:dark\)\{:root\{[^}]*--logo:#fff;/);
+});
+
 test('every font the page references is served from public/ and matches src/fonts', () => {
     const html = render();
 

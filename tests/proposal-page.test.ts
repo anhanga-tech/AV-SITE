@@ -83,6 +83,7 @@ test('the proposal is valid for 15 days, then answers 410 with a WhatsApp button
     assert.equal(response.headers.get('X-Robots-Tag'), 'noindex, nofollow');
     const html = await response.text();
     assert.match(html, /Esta proposta expirou/);
+    assert.match(html, /<svg class="logo" [^>]*role="img" aria-label="Anhangá Viagens"/);
     assert.match(html, /href="https:\/\/wa\.me\/5511955021519\?text=/);
 });
 
