@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildSearchMessage } from '../components/search/helpers.ts';
+import { buildSearchMessage, formatDateLabel } from '../components/search/helpers.ts';
 
 test('buildSearchMessage uses flexible dates when no start date is selected', () => {
   const message = buildSearchMessage({
@@ -16,4 +16,11 @@ test('buildSearchMessage uses flexible dates when no start date is selected', ()
 
   assert.match(message, /Destino:\* Orlando/);
   assert.match(message, /Ida:\* Datas flexíveis/);
+});
+
+test('formatDateLabel spells out weekday, day, month and year for screen readers', () => {
+  const label = formatDateLabel(new Date(2026, 10, 12));
+
+  assert.match(label, /quinta-feira/);
+  assert.match(label, /12 de novembro de 2026/);
 });

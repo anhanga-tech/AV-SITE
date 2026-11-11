@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { ChevronDown, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { MONTH_NAMES, WEEK_DAYS } from '../../data/destinations';
-import { formatDateDisplay, isDateInPast } from './helpers';
+import { formatDateDisplay, formatDateLabel, isDateInPast } from './helpers';
 
 interface DateFieldProps {
   calendarRef: React.RefObject<HTMLDivElement | null>;
@@ -87,6 +87,8 @@ const DateField = memo(({
                 onClick={() => onDateClick(date)}
                 disabled={past}
                 aria-disabled={past}
+                aria-label={formatDateLabel(date)}
+                aria-pressed={selected}
                 className={`size-9 mx-auto flex items-center justify-center text-sm rounded-full transition duration-200 border-2
                   ${past ? 'border-transparent text-zinc-300 cursor-not-allowed' : selected ? 'bg-brand-cyan border-brand-cyan text-white font-bold scale-110' : inRange ? 'bg-brand-light border-transparent text-brand-cyan font-bold' : 'border-transparent text-zinc-600 hover:bg-zinc-100'}`}
               >

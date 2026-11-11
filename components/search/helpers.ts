@@ -11,6 +11,10 @@ export const formatDateDisplay = (date: Date | null): string => {
   return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' });
 };
 
+/** Rótulo falado para leitor de tela: "quinta-feira, 12 de novembro de 2026". */
+export const formatDateLabel = (date: Date): string =>
+  date.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
 export const getGuestSummary = (adults: number, children: number): string => {
   return `${adults} Adulto${adults !== 1 ? 's' : ''}${children > 0 ? `, ${children} Chd` : ''}`;
 };
