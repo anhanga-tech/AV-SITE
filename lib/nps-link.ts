@@ -21,6 +21,12 @@
  * never overwrites a link (so never triggers a second e-mail). To re-issue,
  * clear the field in Odoo and fire the webhook again.
  *
+ * Overlapping calls for the same lead share a Redis lock. It is released when
+ * the attempt finishes (issued, skipped, or failed), so a correction can be
+ * retried at once. The 10-minute TTL only covers a process that dies before
+ * that release. The release deletes the key only when it still holds this
+ * call's token, so a late release cannot unlock a newer holder.
+ *
  * A skipped lead gets an internal note saying why, so the team sees it; the
  * note never carries the link or the token. Never log the lead id, the e-mail,
  * the name or the URL.
@@ -74,8 +80,13 @@ type LeadSession = Pick<OdooSession, 'readLead' | 'writeLead' | 'postLeadNote'>;
 export interface NpsLinkDeps {
     getConfig?: () => OdooConfig | null;
     openSession?: (config: OdooConfig) => Promise<LeadSession>;
-    /** Returns true when this call owns the lead for the lock window. */
+    /**
+     * Returns true when this call owns the lead until the attempt finishes.
+     * A false result is `busy`: another call is between its read and its write.
+     */
     acquireLock?: (leadId: number) => Promise<boolean>;
+    /** Runs after the attempt, success or failure. Only the owner may delete the lock. */
+    releaseLock?: (leadId: number) => Promise<void>;
     secret?: string | null;
     now?: () => number;
     /**
@@ -191,11 +202,50 @@ export function buildNpsLinkUrl(token: string, origin: string = NPS_LINK_PRODUCT
     return url.toString();
 }
 
-async function defaultAcquireLock(leadId: number): Promise<boolean> {
-    const redis = await getRedisClient();
-    if (!redis) return !isEdgeRuntime();
-    const result = await redis.set(`${LOCK_PREFIX}:${leadId}`, '1', { nx: true, ex: LOCK_TTL_SECONDS });
+/**
+ * Deletes the lock only when it still holds this call's token. A blind `DEL`
+ * after the 10-minute TTL would remove a lock a later call already owns.
+ */
+export const NPS_LINK_LOCK_RELEASE_SCRIPT =
+    'if redis.call("get", KEYS[1]) == ARGV[1] then return redis.call("del", KEYS[1]) else return 0 end';
+
+/** Upstash proxies `EVAL`; it is not on the shared `RedisClientLike` surface. */
+export interface NpsLinkLockRedis {
+    set(key: string, value: string, opts: { nx: true; ex: number }): Promise<string | null>;
+    eval(script: string, keys: string[], args: string[]): Promise<unknown>;
+}
+
+export function npsLinkLockKey(leadId: number): string {
+    return `${LOCK_PREFIX}:${leadId}`;
+}
+
+export async function acquireNpsLinkLock(redis: NpsLinkLockRedis, leadId: number, token: string): Promise<boolean> {
+    const result = await redis.set(npsLinkLockKey(leadId), token, { nx: true, ex: LOCK_TTL_SECONDS });
     return result === 'OK';
+}
+
+export async function releaseOwnedNpsLinkLock(redis: NpsLinkLockRedis, leadId: number, token: string): Promise<void> {
+    await redis.eval(NPS_LINK_LOCK_RELEASE_SCRIPT, [npsLinkLockKey(leadId)], [token]);
+}
+
+async function obtainLock(leadId: number, deps: NpsLinkDeps): Promise<(() => Promise<void>) | null> {
+    if (deps.acquireLock) {
+        if (!(await deps.acquireLock(leadId))) return null;
+        const release = deps.releaseLock;
+        return release ? () => release(leadId) : async () => {};
+    }
+
+    const client = await getRedisClient();
+    if (!client) {
+        // Same fail-closed rule as the rate limiter: no in-memory lock on the edge.
+        if (isEdgeRuntime()) return null;
+        return async () => {};
+    }
+
+    const redis = client as unknown as NpsLinkLockRedis;
+    const token = crypto.randomUUID();
+    if (!(await acquireNpsLinkLock(redis, leadId, token))) return null;
+    return () => releaseOwnedNpsLinkLock(redis, leadId, token);
 }
 
 /**
@@ -203,6 +253,7 @@ async function defaultAcquireLock(leadId: number): Promise<boolean> {
  * `waitUntil`, after Odoo already has its answer.
  */
 export async function issueNpsLinkForLead(leadId: number, deps: NpsLinkDeps = {}): Promise<NpsLinkOutcome> {
+    let release: (() => Promise<void>) | null = null;
     try {
         const secret = deps.secret === undefined ? getNpsInviteSecret() : deps.secret || null;
         const config = (deps.getConfig ?? getOdooConfig)();
@@ -211,7 +262,8 @@ export async function issueNpsLinkForLead(leadId: number, deps: NpsLinkDeps = {}
             return { status: 'not_configured' };
         }
 
-        if (!(await (deps.acquireLock ?? defaultAcquireLock)(leadId))) {
+        release = await obtainLock(leadId, deps);
+        if (!release) {
             logger.warn('NPS_LINK', { stage: 'busy' });
             return { status: 'busy' };
         }
@@ -241,5 +293,18 @@ export async function issueNpsLinkForLead(leadId: number, deps: NpsLinkDeps = {}
             errorName: error instanceof Error ? error.name : typeof error,
         });
         return { status: 'failed' };
+    } finally {
+        if (release) {
+            try {
+                await release();
+            } catch (error) {
+                // The attempt already finished. A release error must not turn a
+                // success into a failure; the TTL still drops the key.
+                logger.error('NPS_LINK', {
+                    stage: 'lock_release_failed',
+                    errorName: error instanceof Error ? error.name : typeof error,
+                });
+            }
+        }
     }
 }

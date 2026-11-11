@@ -3,13 +3,18 @@ import assert from 'node:assert/strict';
 
 import { handleNpsLinkHook } from '../api/nps-link-hook.ts';
 import {
+    acquireNpsLinkLock,
     buildNpsLinkSkippedNote,
     checkNpsLinkEligibility,
     firstNameOf,
     issueNpsLinkForLead,
+    npsLinkLockKey,
     npsLinkOriginFor,
     NPS_LINK_FIELD,
+    NPS_LINK_LOCK_RELEASE_SCRIPT,
+    releaseOwnedNpsLinkLock,
     type NpsLinkDeps,
+    type NpsLinkLockRedis,
 } from '../lib/nps-link.ts';
 import { verifyNpsInviteToken } from '../lib/nps-invite.ts';
 import { scrubSensitiveUrl } from '../lib/error-tracking.ts';
@@ -181,16 +186,132 @@ test('first name comes from the partner, then the contact name; company contacts
 });
 
 test('does nothing when another call holds the lead lock', async () => {
-    const { linkDeps, writes, reads } = deps(wonLead(), { acquireLock: async () => false });
+    const released: number[] = [];
+    const { linkDeps, writes, reads } = deps(wonLead(), {
+        acquireLock: async () => false,
+        releaseLock: async (leadId) => {
+            released.push(leadId);
+        },
+    });
     assert.deepEqual(await issueNpsLinkForLead(61, linkDeps), { status: 'busy' });
     assert.equal(reads.length + writes.length, 0);
+    assert.deepEqual(released, []);
+});
+
+test('releases the lock after a success, a skip, and a failure', async () => {
+    const released: string[] = [];
+    function tracking(extra: Partial<NpsLinkDeps> = {}) {
+        return {
+            acquireLock: async () => true,
+            releaseLock: async () => {
+                released.push('release');
+            },
+            ...extra,
+        };
+    }
+
+    const issued = deps(wonLead(), tracking());
+    assert.equal((await issueNpsLinkForLead(61, issued.linkDeps)).status, 'issued');
+
+    const skipped = deps(wonLead({ [NPS_LINK_FIELD]: 'https://www.anhanga.tur.br/nps?token=old' }), tracking());
+    assert.deepEqual(await issueNpsLinkForLead(61, skipped.linkDeps), { status: 'skipped', reason: 'already_issued' });
+
+    const failed = deps(wonLead(), tracking({
+        openSession: async () => {
+            throw new Error('ODOO_ERROR:502:boom');
+        },
+    }));
+    assert.deepEqual(await issueNpsLinkForLead(61, failed.linkDeps), { status: 'failed' });
+    assert.deepEqual(released, ['release', 'release', 'release']);
+});
+
+test('a repeat after the lock is released does not overwrite x_nps_link', async () => {
+    const lead = wonLead();
+    let held = false;
+    const writes: Record<string, unknown>[] = [];
+    const linkDeps: NpsLinkDeps = {
+        getConfig: () => ({ url: 'https://odoo.test', db: 'db', login: 'bot', apiKey: 'key' }),
+        openSession: async () => ({
+            async readLead() {
+                return { ...lead };
+            },
+            async writeLead(_leadId: number, fields: Record<string, unknown>) {
+                writes.push(fields);
+                lead[NPS_LINK_FIELD] = fields[NPS_LINK_FIELD];
+            },
+            async postLeadNote() {},
+        }),
+        acquireLock: async () => {
+            if (held) return false;
+            held = true;
+            return true;
+        },
+        releaseLock: async () => {
+            held = false;
+        },
+        secret: INVITE_SECRET,
+        now: () => NOW,
+    };
+
+    assert.equal((await issueNpsLinkForLead(61, linkDeps)).status, 'issued');
+    assert.equal(held, false);
+    assert.deepEqual(await issueNpsLinkForLead(61, linkDeps), { status: 'skipped', reason: 'already_issued' });
+    assert.equal(writes.length, 1);
+});
+
+test('a release that throws does not hide an issued link', async () => {
+    const { linkDeps, writes } = deps(wonLead(), {
+        releaseLock: async () => {
+            throw new Error('redis down');
+        },
+    });
+    assert.equal((await issueNpsLinkForLead(61, linkDeps)).status, 'issued');
+    assert.equal(writes.length, 1);
+});
+
+function memoryLockRedis(): NpsLinkLockRedis & { values: Map<string, string> } {
+    const values = new Map<string, string>();
+    return {
+        values,
+        async set(key, value, opts) {
+            if (opts.nx && values.has(key)) return null;
+            values.set(key, value);
+            return 'OK';
+        },
+        async eval(script, keys, args) {
+            assert.equal(script, NPS_LINK_LOCK_RELEASE_SCRIPT);
+            const key = keys[0] ?? '';
+            if (values.get(key) !== args[0]) return 0;
+            values.delete(key);
+            return 1;
+        },
+    };
+}
+
+test('only the owner releases the lead lock, and a later holder stays covered', async () => {
+    const redis = memoryLockRedis();
+    const key = npsLinkLockKey(61);
+    assert.equal(await acquireNpsLinkLock(redis, 61, 'owner-a'), true);
+    assert.equal(await acquireNpsLinkLock(redis, 61, 'owner-b'), false);
+    await releaseOwnedNpsLinkLock(redis, 61, 'stale-owner');
+    assert.equal(redis.values.get(key), 'owner-a');
+    await releaseOwnedNpsLinkLock(redis, 61, 'owner-a');
+    assert.equal(redis.values.has(key), false);
+    assert.equal(await acquireNpsLinkLock(redis, 61, 'owner-c'), true);
 });
 
 test('refuses to run without the invite secret or the Odoo config', async () => {
     for (const extra of [{ secret: null }, { getConfig: () => null }] as Partial<NpsLinkDeps>[]) {
-        const { linkDeps, reads } = deps(wonLead(), extra);
+        let released = 0;
+        const { linkDeps, reads } = deps(wonLead(), {
+            ...extra,
+            releaseLock: async () => {
+                released += 1;
+            },
+        });
         assert.deepEqual(await issueNpsLinkForLead(61, linkDeps), { status: 'not_configured' });
         assert.equal(reads.length, 0);
+        assert.equal(released, 0);
     }
 });
 

@@ -38,7 +38,7 @@ Autorizado pelo Felipe em 11/11/2026: "Autorizo o Otto a construir o link de NPS
 
 Quando falta algo, o site não grava nada e deixa uma nota interna "Link de NPS não gerado: <motivo>. Corrija e dispare o envio de novo.". Lead inexistente, arquivado ou que já tem link não ganha nota.
 
-O link nunca volta na resposta do webhook. Se alguém descobrir o segredo, o máximo que consegue é fazer o site gerar, uma única vez, o link de um cliente elegível, e esse link fica gravado no lead dele. Um webhook repetido não sobrescreve o link, então não sai um segundo e-mail. Um lock no Redis (10 min por lead) cobre duas chamadas simultâneas.
+O link nunca volta na resposta do webhook. Se alguém descobrir o segredo, o máximo que consegue é fazer o site gerar, uma única vez, o link de um cliente elegível, e esse link fica gravado no lead dele. Um webhook repetido não sobrescreve o link, então não sai um segundo e-mail. Duas chamadas ao mesmo tempo: a segunda encontra a trava e não faz nada. A trava é liberada quando a tentativa termina (link gerado, nota de recusa ou falha), então dá para corrigir o lead e disparar de novo na hora. Se o processo morrer no meio, a trava expira sozinha em 10 min. A liberação só apaga a chave se ela ainda for a desta tentativa, para um atraso não derrubar a trava de uma chamada mais nova.
 
 **Reenviar:** apague `x_nps_link` no lead e rode a ação 817 de novo (ou espere a regra). O link antigo continua valendo até expirar ou ser usado.
 
@@ -55,7 +55,7 @@ Em 11/11/2026, `GET /nps?token=abc.def` em produção devolveu os cookies do con
 
 Os valores não vão para chat, template, planilha nem para o repositório. O `NPS_LINK_WEBHOOK_SECRET` vai também para a URL da ação 817 no Odoo (passo 2 abaixo), e só para lá. Depois de criar ou mudar variável, é preciso um deploy novo para a função ler o valor.
 
-Nada muda em `wrangler.toml`, Redis ou banco. As chaves novas no Redis são só o lock `nps:link:lead:<id>` (TTL 10 min) e o rate limit `ratelimit:nps-link-hook`.
+Nada muda em `wrangler.toml`, Redis ou banco. As chaves novas no Redis são só o lock `nps:link:lead:<id>` (sai ao terminar a tentativa; o TTL de 10 min só vale se o processo morrer antes) e o rate limit `ratelimit:nps-link-hook`.
 
 ## O que muda no Odoo (Amadeus)
 
@@ -77,7 +77,7 @@ Primeiro no preview do PR (`https://<branch>.av-site-8ex.pages.dev`), com os doi
 3. Abrir o link: o formulário cumprimenta pelo primeiro nome. Responder e conferir `x_nps_score` no contato.
 4. Abrir o link de novo e responder: "link inválido ou expirado".
 5. Rodar a ação 817 de novo: nada muda e não sai segundo e-mail.
-6. Retorno há 40 dias, ou sem e-mail: nota "Link de NPS não gerado…" e nenhum e-mail.
+6. Em leads novos, cada um com `x_nps_link` vazio: um com retorno há 40 dias e outro sem e-mail. Esperado em cada um: nota "Link de NPS não gerado…" e nenhum e-mail. Não reutilize o lead dos passos 1–5. Ele já tem link, então o site fica em silêncio (`already_issued`) e não avalia a data nem o e-mail.
 7. `curl -X POST '<site>/api/nps-link-hook?secret=errado' -d '{}'`: `401`.
 
 Depois, apontar a ação 817 para `https://www.anhanga.tur.br/...` e repetir os passos 1 a 3 em produção antes do primeiro envio real (por volta de 02/12).
