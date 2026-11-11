@@ -79,7 +79,11 @@ yet because it needs server-side invite storage.
 
 ## Generating a link
 
-Run once a trip is completed (manually, or wired into whatever ops workflow
+**Automatically, per customer (Odoo post-trip e-mail):** the Odoo rule calls
+`POST /api/nps-link-hook`, and the site writes the ready link to
+`crm.lead.x_nps_link` for template 54. See [nps-link-odoo.md](nps-link-odoo.md).
+
+**By hand** (a one-off, or re-sending outside the automation): run once a trip is completed (manually, or wired into whatever ops workflow
 tracks trip completion):
 
 ```bash
