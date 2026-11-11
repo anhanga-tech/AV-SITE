@@ -206,6 +206,10 @@ export interface OdooSession {
      * team, never e-mailed to followers — so it can't reach the customer.
      */
     postLeadNote: (leadId: number, body: string) => Promise<void>;
+    /** Reads named fields of one `crm.lead` (archived included); `null` when the id doesn't exist. */
+    readLead: (leadId: number, fields: readonly string[]) => Promise<Record<string, unknown> | null>;
+    /** Writes fields on one `crm.lead` (the caller owns which fields; no public form reaches this). */
+    writeLead: (leadId: number, fields: Record<string, unknown>) => Promise<void>;
 }
 
 export async function openOdooSession(config: OdooConfig): Promise<OdooSession> {
@@ -328,6 +332,21 @@ export async function openOdooSession(config: OdooConfig): Promise<OdooSession> 
                 deadline,
                 { body, message_type: 'comment', subtype_xmlid: 'mail.mt_note' },
             );
+        },
+        async readLead(leadId, fields) {
+            const rows = await executeKw<Record<string, unknown>[]>(
+                config,
+                uid,
+                'crm.lead',
+                'search_read',
+                [[['id', '=', leadId]], [...fields]],
+                deadline,
+                { limit: 1, context: { active_test: false } },
+            );
+            return rows[0] ?? null;
+        },
+        async writeLead(leadId, fields) {
+            await executeKw<boolean>(config, uid, 'crm.lead', 'write', [[leadId], fields], deadline);
         },
         async writePartnerConsent(partnerId, granted) {
             await executeKw<boolean>(

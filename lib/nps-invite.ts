@@ -20,7 +20,8 @@
  */
 import { timingSafeEqual } from './security';
 
-const DEFAULT_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+/** Default invite validity: 30 days, a post-trip survey window. */
+export const NPS_INVITE_DEFAULT_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 
 export interface NpsInvitePayload {
     email: string;
@@ -69,7 +70,7 @@ export async function createNpsInviteToken(
     const payload: NpsInvitePayload = {
         email: params.email.trim().toLowerCase(),
         firstname: params.firstname.trim(),
-        exp: Date.now() + (params.expiresInMs ?? DEFAULT_MAX_AGE_MS),
+        exp: Date.now() + (params.expiresInMs ?? NPS_INVITE_DEFAULT_MAX_AGE_MS),
         jti: crypto.randomUUID(),
     };
     const payloadB64 = base64UrlEncode(new TextEncoder().encode(JSON.stringify(payload)));

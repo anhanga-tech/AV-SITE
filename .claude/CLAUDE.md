@@ -60,6 +60,7 @@ N8N_WEBHOOK_SECRET=           # Shared HMAC secret validado por /api/purchase-di
 
 # NPS Invitation (required in prod): assina/verifica o link de convite de /api/submit-nps
 NPS_INVITE_SECRET=            # HMAC-SHA256 key (lib/nps-invite.ts) — ver docs/ops/nps-invite.md
+NPS_LINK_WEBHOOK_SECRET=      # ?secret= do webhook do Odoo em /api/nps-link-hook — ver docs/ops/nps-link-odoo.md
 
 # Proposal preview (required in prod): link interno /proposta/<id>?previa=… que não conta abertura
 PROPOSAL_PREVIEW_SECRET=      # HMAC-SHA256 key (lib/proposal-preview.ts) — ver docs/ops/proposta-link.md
@@ -132,6 +133,7 @@ Handlers rodam como Cloudflare Pages Functions (via `functions/`). O campo `expo
 | `submit-waitlist.ts` | Event waitlist → Odoo `res.partner` (ToFu, sem oportunidade) |
 | `submit-nps.ts` | Post-trip NPS form → Odoo `res.partner` (`x_nps_score` + nota; sem oportunidade). Requer convite assinado (`token`, `lib/nps-invite.ts`) — identidade nunca vem do corpo da requisição |
 | `submit-quiz.ts` | Travel quiz results → Odoo `res.partner` (ToFu, sem oportunidade) |
+| `nps-link-hook.ts` | Internal: Odoo webhook (`?secret=NPS_LINK_WEBHOOK_SECRET`) → writes the customer's signed `/nps` link to `crm.lead.x_nps_link` for template 54 (`lib/nps-link.ts`) |
 | `purchase-dispatch.ts` | Receives n8n purchase events; validates `N8N_WEBHOOK_SECRET` |
 | `create-proposal.ts` | Internal: sales bot creates a `/proposta/<id>` link (Bearer `PROPOSAL_API_SECRET`); returns the customer and signed preview links |
 | `create-offer-link.ts` | Internal: registers `/o/<slug>` for the offers channel (Bearer `OFFER_LINK_SECRET`, not the proposal secret) |

@@ -14,6 +14,7 @@ const DEV_ROUTE_EXCEPTIONS: Record<string, string> = {
     'auth/callback': 'Decap CMS OAuth; local CMS editing uses `pnpm cms:proxy` instead',
     'purchase-dispatch': 'inbound n8n webhook; never called by the browser',
     'create-proposal': 'internal endpoint for the sales bot; never called by the browser',
+    'nps-link-hook': 'inbound Odoo webhook; never called by the browser',
     'not-found': 'catch-all for unknown /api/ routes; it has no path of its own to register',
 };
 
