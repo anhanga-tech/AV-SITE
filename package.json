@@ -78,7 +78,7 @@
     "globals": "^17.14.0",
     "gray-matter": "^4.0.3",
     "react-doctor": "^0.9.22",
-    "rollup-plugin-visualizer": "^7.1.1",
+    "rollup-plugin-visualizer": "^7.1.2",
     "semantic-release": "25.0.9",
     "sharp": "^0.35.5",
     "subset-font": "^2.9.0",
