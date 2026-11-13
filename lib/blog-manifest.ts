@@ -166,8 +166,9 @@ function toFaqMarkdownSection(meta: PostMeta): string {
 // Comentários MDX ({/* ... */}) são notas editoriais: o MDX não os renderiza no HTML,
 // então também não podem sair no markdown público (/api/markdown, llms.txt).
 // Comentário em linha própria sai junto com a linha e uma linha em branco seguinte.
-const MDX_COMMENT_LINE = /^[ \t]*\{\/\*[\s\S]*?\*\/\}[ \t]*\r?\n(?:[ \t]*\r?\n)?/gm;
-const MDX_COMMENT_INLINE = /\{\/\*[\s\S]*?\*\/\}/g;
+// O corpo não atravessa `*/}`: senão um comentário seguido de texto se estenderia até o próximo.
+const MDX_COMMENT_LINE = /^[ \t]*\{\/\*(?:(?!\*\/\})[\s\S])*\*\/\}[ \t]*\r?\n(?:[ \t]*\r?\n)?/gm;
+const MDX_COMMENT_INLINE = /\{\/\*(?:(?!\*\/\})[\s\S])*\*\/\}/g;
 
 function stripMdxComments(content: string): string {
     return content.replace(MDX_COMMENT_LINE, '').replace(MDX_COMMENT_INLINE, '');

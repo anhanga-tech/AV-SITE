@@ -281,6 +281,10 @@ Antes.
 em duas linhas */}
 
 Depois {/* PENDENTE: inline */}fim.
+
+{/* PENDENTE: primeira */}Parágrafo visível.
+
+{/* PENDENTE: segunda */}
 `;
 
   try {
@@ -292,7 +296,7 @@ Depois {/* PENDENTE: inline */}fim.
 
     assert.ok(!markdown.includes('PENDENTE'));
     assert.ok(!markdown.includes('{/*'));
-    assert.ok(markdown.endsWith('\nAntes.\n\nDepois fim.\n'));
+    assert.ok(markdown.endsWith('\nAntes.\n\nDepois fim.\n\nParágrafo visível.\n'));
   } finally {
     await rm(blogDir, { recursive: true, force: true });
   }
