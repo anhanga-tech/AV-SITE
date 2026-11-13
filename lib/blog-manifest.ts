@@ -153,6 +153,16 @@ export const HOME_TEASER_POSTS: HomeTeaserPost[] = ${JSON.stringify(teaserPosts,
 `;
 }
 
+// Paridade com o HTML: quando o MDX não tem a seção de FAQ, o template renderiza o bloco
+// (BlogPostFaq) a partir do frontmatter; a versão markdown anexa as mesmas perguntas e respostas.
+function toFaqMarkdownSection(meta: PostMeta): string {
+    if (!meta.faqMissingFromBody || !meta.faq?.length) return '';
+
+    return `\n## Perguntas Frequentes\n\n${meta.faq
+        .map((item) => `### ${item.question}\n\n${item.answer}`)
+        .join('\n\n')}\n`;
+}
+
 // Versão markdown dos posts para consumo por LLMs/agentes via /api/markdown.
 // Gerada em módulo separado do manifest para não inflar o bundle do cliente —
 // apenas a edge function importa este arquivo.
@@ -173,7 +183,7 @@ function toPostMarkdown(meta: PostMeta, content: string): string {
         '',
     ].join('\n');
 
-    return `${header}\n${content.trim()}\n`;
+    return `${header}\n${content.trim()}\n${toFaqMarkdownSection(meta)}`;
 }
 
 function serializeBlogPostMarkdown(entries: Record<string, string>): string {

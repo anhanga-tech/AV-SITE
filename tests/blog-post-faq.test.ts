@@ -8,6 +8,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { BlogPostContent } from '../components/blog/BlogPostContent.tsx';
 import { BlogPostSchemas } from '../components/blog/BlogPostSchemas.tsx';
 import { BLOG_POST_MANIFEST } from '../data/blogManifest.ts';
+import { BLOG_POST_MARKDOWN } from '../data/blogMarkdown.ts';
 import { HeadContext, createHeadManager } from '../lib/head.tsx';
 import { hasVisibleFaqHeading } from '../lib/blog-faq.ts';
 import type { PostMeta } from '../types/blog.ts';
@@ -168,4 +169,34 @@ test('the two template-FAQ posts expose the questions listed in the acceptance c
     'Vale a pena evitar a época de furacões na Flórida?',
     'Dezembro em Orlando vale o preço mais alto?',
   ]);
+});
+
+// /api/markdown serve data/blogMarkdown.ts a agentes/LLMs: o markdown tem de refletir a mesma
+// seção de FAQ que o HTML mostra.
+for (const slug of TEMPLATE_FAQ_SLUGS) {
+  test(`${slug} markdown ends with the frontmatter FAQ as ## / ### sections`, () => {
+    const post = BLOG_POST_MANIFEST.find((candidate) => candidate.slug === slug);
+    assert.ok(post?.faq?.length);
+    const markdown = BLOG_POST_MARKDOWN[slug];
+    assert.ok(markdown, `${slug} missing from the markdown module`);
+
+    const expectedSection = `\n## Perguntas Frequentes\n\n${post.faq.map((item) => `### ${item.question}\n\n${item.answer}`).join('\n\n')}\n`;
+    assert.ok(markdown.endsWith(expectedSection), 'markdown must end with the FAQ section from the frontmatter, verbatim');
+    assert.equal(markdown.split('## Perguntas Frequentes').length - 1, 1);
+  });
+}
+
+test('markdown of every post with faq has exactly one FAQ heading', () => {
+  for (const post of postsWithFaq) {
+    const headings = (BLOG_POST_MARKDOWN[post.slug] ?? '').match(/^#{2,3} (?:perguntas frequentes|perguntas mais frequentes|faq)\b/gim) ?? [];
+    assert.equal(headings.length, 1, `${post.slug} markdown should have exactly one FAQ heading`);
+  }
+});
+
+test(`${CONTROL_SLUG} (control) markdown keeps its own FAQ once and gets no appended section`, async () => {
+  const markdown = BLOG_POST_MARKDOWN[CONTROL_SLUG];
+  assert.equal(markdown.split('Perguntas Frequentes').length - 1, 1);
+  assert.equal(markdown, markdown.trimEnd() + '\n');
+  const body = await readBody(CONTROL_SLUG);
+  assert.ok(markdown.endsWith(`${body.trim()}\n`), 'markdown body must be the untouched MDX body');
 });

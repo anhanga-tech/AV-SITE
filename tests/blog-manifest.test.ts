@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { mkdtemp, readdir, rm, writeFile } from 'node:fs/promises';
-import { collectBlogPostMeta } from '../lib/blog-manifest.ts';
+import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { collectBlogPostMeta, writeBlogMarkdown } from '../lib/blog-manifest.ts';
 
 test('collectBlogPostMeta reads MDX frontmatter and ignores template files', async () => {
   const blogDir = await mkdtemp(path.join(os.tmpdir(), 'blog-manifest-'));
@@ -220,6 +220,44 @@ ${extra}faq:
       forcado: undefined,
       'sem-faq': undefined,
     });
+  } finally {
+    await rm(blogDir, { recursive: true, force: true });
+  }
+});
+
+test('writeBlogMarkdown appends the frontmatter FAQ only when the MDX body lacks the FAQ section', async () => {
+  const blogDir = await mkdtemp(path.join(os.tmpdir(), 'blog-markdown-faq-'));
+  const outputFile = path.join(blogDir, 'out', 'blogMarkdown.ts');
+  const frontmatter = `---
+title: "Post"
+excerpt: "Excerpt"
+date: "2026-04-01"
+author: "equipe-anhanga"
+category: "Planejamento"
+image: "https://example.com/post.jpg"
+faq:
+  - question: "Pergunta um?"
+    answer: "Resposta um."
+  - question: "Pergunta dois?"
+    answer: "Resposta dois."
+---
+`;
+
+  try {
+    await writeFile(path.join(blogDir, 'sem-secao.mdx'), `${frontmatter}\nCorpo.\n`, 'utf8');
+    await writeFile(path.join(blogDir, 'com-secao.mdx'), `${frontmatter}\nCorpo.\n\n## Perguntas Frequentes\n\nTexto próprio.\n`, 'utf8');
+
+    await writeBlogMarkdown(blogDir, outputFile, { hideFuture: false });
+    const { BLOG_POST_MARKDOWN } = (await import(`${outputFile}?t=${Date.now()}`)) as { BLOG_POST_MARKDOWN: Record<string, string> };
+
+    assert.ok(
+      BLOG_POST_MARKDOWN['sem-secao'].endsWith(
+        '\nCorpo.\n\n## Perguntas Frequentes\n\n### Pergunta um?\n\nResposta um.\n\n### Pergunta dois?\n\nResposta dois.\n',
+      ),
+    );
+    assert.ok(BLOG_POST_MARKDOWN['com-secao'].endsWith('## Perguntas Frequentes\n\nTexto próprio.\n'));
+    assert.equal(BLOG_POST_MARKDOWN['com-secao'].split('Perguntas Frequentes').length - 1, 1);
+    assert.ok((await readFile(outputFile, 'utf8')).includes('BLOG_POST_MARKDOWN'));
   } finally {
     await rm(blogDir, { recursive: true, force: true });
   }
