@@ -24,13 +24,16 @@ export interface BlogPostFrontmatter {
   tags?: string[];
   seoTitle?: string;       // opcional: título diferente para <title> tag SEO
   seoDescription?: string; // opcional: meta description diferente do excerpt
-  faq?: BlogPostFaqItem[]; // perguntas/respostas já presentes no corpo do post — alimenta o FAQPageSchema sem duplicar texto
+  faq?: BlogPostFaqItem[]; // perguntas/respostas do FAQPageSchema; devem reproduzir o texto visível (no corpo MDX ou, se o corpo não tiver a seção, no bloco do template)
 }
 
 export type PostMeta = Omit<BlogPostFrontmatter, 'tags'> & {
   tags: string[];      // normalizado: nunca undefined
   slug: string;        // derivado do filename, ex: "dicas-disney-2026"
   readingTime: string; // ex: "4 min de leitura"
+  // Derivado no build (lib/blog-faq.ts), nunca do frontmatter: true quando o post tem `faq` mas o
+  // MDX não tem a seção "Perguntas Frequentes". O template renderiza o FAQ nesse caso.
+  faqMissingFromBody?: true;
 };
 
 // Subconjunto de PostMeta para o teaser da home (components/Blog.tsx): só os campos que

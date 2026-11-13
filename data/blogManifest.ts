@@ -1071,7 +1071,8 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       }
     ],
     "slug": "como-planejar-viagem-orlando-sob-medida",
-    "readingTime": "5 min de leitura"
+    "readingTime": "5 min de leitura",
+    "faqMissingFromBody": true
   },
   {
     "title": "Melhor Época para Viajar para Orlando: Guia por Perfil de Viajante",
@@ -1118,7 +1119,8 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       }
     ],
     "slug": "melhor-epoca-viajar-orlando-guia-perfil-viajante",
-    "readingTime": "3 min de leitura"
+    "readingTime": "3 min de leitura",
+    "faqMissingFromBody": true
   },
   {
     "title": "Cancún, Punta Cana ou Aruba para Lua de Mel? Comparação Honesta",

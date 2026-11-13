@@ -3,6 +3,7 @@ import matter from 'gray-matter';
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import type { BlogPostFrontmatter, HomeTeaserPost, PostMeta } from '../types/blog';
 import { resolveMediaUrl } from './media-url.ts';
+import { hasVisibleFaqHeading } from './blog-faq.ts';
 import { isFuturePost, shouldHideFuturePosts, todayInSaoPaulo } from './blog-schedule.js';
 
 // Opções de agendamento compartilhadas pelo manifest e pelo módulo markdown.
@@ -69,6 +70,10 @@ function toPostMeta(filepath: string, parsed: ReturnType<typeof matter>): PostMe
     tags: normalizeTags(frontmatter.tags),
     slug,
     readingTime: `${calcReadingTime(content)} min de leitura`,
+    // Só quando há faq no frontmatter e o MDX não tem a seção visível: o template
+    // (BlogPostFaq) renderiza o bloco, para o FAQPage nunca ficar sem texto na página.
+    // `undefined` descarta qualquer valor vindo do frontmatter (JSON.stringify omite a chave).
+    faqMissingFromBody: frontmatter.faq?.length && !hasVisibleFaqHeading(content) ? true : undefined,
   };
 }
 

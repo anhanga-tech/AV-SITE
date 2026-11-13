@@ -185,6 +185,46 @@ Body with a FAQ section.
   }
 });
 
+test('collectBlogPostMeta flags faqMissingFromBody only when the MDX body lacks a FAQ heading', async () => {
+  const blogDir = await mkdtemp(path.join(os.tmpdir(), 'blog-manifest-faq-flag-'));
+  const frontmatter = (extra = '') => `---
+title: "Post"
+excerpt: "Excerpt"
+date: "2026-04-01"
+author: "equipe-anhanga"
+category: "Planejamento"
+image: "https://example.com/post.jpg"
+${extra}faq:
+  - question: "Pergunta?"
+    answer: "Resposta."
+---
+`;
+
+  try {
+    await writeFile(path.join(blogDir, 'sem-secao.mdx'), `${frontmatter()}\nCorpo sem FAQ.\n`, 'utf8');
+    await writeFile(path.join(blogDir, 'com-secao.mdx'), `${frontmatter()}\nCorpo.\n\n## Perguntas frequentes\n\nPergunta?\n`, 'utf8');
+    // O flag é derivado do corpo: um valor no frontmatter não pode forçá-lo.
+    await writeFile(path.join(blogDir, 'forcado.mdx'), `${frontmatter('faqMissingFromBody: true\n')}\n## Perguntas Frequentes\n`, 'utf8');
+    await writeFile(
+      path.join(blogDir, 'sem-faq.mdx'),
+      `---\ntitle: "Post"\nexcerpt: "Excerpt"\ndate: "2026-04-01"\nauthor: "equipe-anhanga"\ncategory: "Planejamento"\nimage: "https://example.com/post.jpg"\n---\n\nCorpo.\n`,
+      'utf8',
+    );
+
+    const posts = await collectBlogPostMeta(blogDir);
+    const bySlug = Object.fromEntries(posts.map((post) => [post.slug, post.faqMissingFromBody]));
+
+    assert.deepEqual(bySlug, {
+      'sem-secao': true,
+      'com-secao': undefined,
+      forcado: undefined,
+      'sem-faq': undefined,
+    });
+  } finally {
+    await rm(blogDir, { recursive: true, force: true });
+  }
+});
+
 test('collectBlogPostMeta leaves faq undefined when frontmatter omits it', async () => {
   const blogDir = await mkdtemp(path.join(os.tmpdir(), 'blog-manifest-no-faq-'));
 
