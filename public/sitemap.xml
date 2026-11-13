@@ -143,9 +143,29 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/</loc>
-    <lastmod>2026-11-06</lastmod>
+    <lastmod>2026-11-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.anhanga.tur.br/blog/turismo-regenerativo-brasil/</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/turismo-regenerativo-brasil-capa.jpg</image:loc>
+      <image:caption>Turismo regenerativo no Brasil: 5 experiências que valem a pena</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.anhanga.tur.br/blog/cruzeiro-fluvial-europa-melhor-idade/</loc>
+    <lastmod>2026-11-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/cruzeiro-fluvial-europa-melhor-idade.jpg</image:loc>
+      <image:caption>Cruzeiro fluvial ou roteiro terrestre na Europa: qual escolher depois dos 60</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/roteiro-europa-10-dias-lisboa-madrid-roma/</loc>
@@ -329,7 +349,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/quanto-custa-viagem-disney-2026/</loc>
-    <lastmod>2026-09-22</lastmod>
+    <lastmod>2026-11-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
