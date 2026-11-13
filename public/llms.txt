@@ -76,6 +76,7 @@ suporte a viagens já compradas com outra agência, ou perguntas sem relação c
 Feed RSS: https://www.anhanga.tur.br/feed.xml
 Versão markdown de qualquer página: https://www.anhanga.tur.br/api/markdown?path=/blog/{slug}/
 
+- [Roteiro Machu Picchu: Peru em 7 a 10 dias](https://www.anhanga.tur.br/blog/roteiro-machu-picchu/) (2026-11-30)
 - [Carnaval 2027 data: quando é, feriado e onde curtir](https://www.anhanga.tur.br/blog/carnaval-2027-data/) (2026-11-23)
 - [Natal Luz Gramado 2026: data, programação e ingressos](https://www.anhanga.tur.br/blog/natal-luz-gramado-2026/) (2026-11-16)
 - [Turismo regenerativo no Brasil: 5 experiências que valem a pena](https://www.anhanga.tur.br/blog/turismo-regenerativo-brasil/) (2026-11-13)

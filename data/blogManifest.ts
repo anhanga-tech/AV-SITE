@@ -2,6 +2,70 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
+    "title": "Roteiro Machu Picchu: Peru em 7 a 10 dias",
+    "excerpt": "Roteiro de 7 a 10 dias por Lima, Cusco, Vale Sagrado e Machu Picchu, com trem, ingresso por circuito, altitude e a melhor época para ir.",
+    "date": "2026-11-30",
+    "dateModified": "2026-11-30",
+    "author": "felipe-william",
+    "category": "Destinos",
+    "image": "https://media.anhanga.tur.br/images/blog/roteiro-machu-picchu-capa.jpg",
+    "imageCreditStatus": "confirmed",
+    "imageCredit": "Jorge Castro Ruso / Wikimedia Commons",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Machu_Picchu_Panorama_2025.jpg",
+    "imageLicense": "CC BY-SA 2.0",
+    "imageLicenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "imageAdaptation": "Redimensionada para 1600 px de largura",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Machu Picchu e Cusco",
+    "tags": [
+      "machu-picchu",
+      "peru",
+      "cusco",
+      "vale-sagrado",
+      "america-do-sul",
+      "roteiro"
+    ],
+    "seoTitle": "Roteiro Machu Picchu: 7 a 10 dias",
+    "seoDescription": "Roteiro Machu Picchu de 7 a 10 dias: Lima, Cusco, Vale Sagrado, trem até Aguas Calientes, ingresso oficial, altitude e melhor época para ir.",
+    "faq": [
+      {
+        "question": "Como chegar em Machu Picchu?",
+        "answer": "Do Brasil, o caminho mais comum é voar até Lima e de lá até Cusco. Da região de Cusco ou de Ollantaytambo, no Vale Sagrado, você pega o trem até Aguas Calientes (Machu Picchu Pueblo). A subida final até o santuário é feita de ônibus ou a pé."
+      },
+      {
+        "question": "Quantos dias são necessários para conhecer Machu Picchu?",
+        "answer": "Sete dias bastam para Lima, Cusco, Vale Sagrado e Machu Picchu. Com dez dias, você aclimata com mais calma, ganha tempo em Lima e em Cusco e pode incluir um passeio extra, como o Lago Titicaca."
+      },
+      {
+        "question": "Qual a melhor época para visitar Machu Picchu?",
+        "answer": "A temporada seca vai de maio a agosto, segundo o SENAMHI, e é a mais procurada. De setembro a abril é a época úmida, com mais chuva de janeiro a março. Na alta temporada, compre ingresso e trem com antecedência."
+      },
+      {
+        "question": "Como ir de Cusco até Machu Picchu?",
+        "answer": "De trem. A PeruRail sai de Poroy (Cusco) e de Ollantaytambo, e também tem serviço bimodal com ônibus até a estação de Pachar. A Inca Rail sai de Cusco ou de Ollantaytambo. Todos chegam a Aguas Calientes, de onde se sobe ao santuário de ônibus ou a pé."
+      },
+      {
+        "question": "O que é o soroche e como evitar o mal de altitude em Cusco?",
+        "answer": "Soroche é o nome local do mal de altitude. Os sintomas comuns são dor de cabeça, cansaço, tontura, náusea e falta de ar. Ajuda subir aos poucos, ter um primeiro dia leve, beber água e evitar álcool e esforço nas primeiras 48 horas. Converse com seu médico antes da viagem."
+      },
+      {
+        "question": "O ingresso de Machu Picchu está incluído no bilhete de trem?",
+        "answer": "Não. O ingresso é comprado à parte, no site oficial tuboleto.cultura.pe, com data, circuito e horário de entrada definidos."
+      },
+      {
+        "question": "Quanto custa o ingresso de Machu Picchu?",
+        "answer": "Em 2026, a tarifa geral para estrangeiros é de S/ 152 para adultos, S/ 77 para estudantes de ensino superior e S/ 70 para menores de 3 a 17 anos, mais a taxa do SERNANP de S/ 11. Confira as tarifas de 2027 no TuBoleto antes de comprar."
+      },
+      {
+        "question": "Brasileiro precisa de passaporte para ir a Machu Picchu?",
+        "answer": "Não. O Peru aceita passaporte com pelo menos seis meses de validade ou o RG emitido pelas secretarias de segurança ou polícias civis dos estados, em bom estado e com foto que identifique o titular, para quem chega vindo de um país do Mercosul, como o Brasil. CNH e certidão de nascimento não são aceitas."
+      }
+    ],
+    "slug": "roteiro-machu-picchu",
+    "readingTime": "16 min de leitura"
+  },
+  {
     "title": "Carnaval 2027 data: quando é, feriado e onde curtir",
     "excerpt": "O Carnaval 2027 vai de sábado, 6, a terça, 9 de fevereiro. Veja se é feriado e as datas já confirmadas em Salvador, Rio, Recife e Olinda.",
     "date": "2026-11-23",
@@ -1910,7 +1974,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "seoTitle": "América do Sul: Destinos Imperdíveis",
     "excerpt": "Argentina, Chile, Peru, Colômbia e Bolívia: o que cada destino oferece ao viajante brasileiro, com documentação, custos e como chegar de verdade.",
     "date": "2026-04-29",
-    "dateModified": "2026-09-22",
+    "dateModified": "2026-11-13",
     "author": "felipe-william",
     "category": "Destinos",
     "image": "https://media.anhanga.tur.br/images/destinations/cartagena.jpg",
@@ -1934,7 +1998,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "Preciso de visto para viajar para o Peru?",
-        "answer": "Não. Brasileiros podem entrar no Peru apenas com RG (em bom estado e com menos de 10 anos de emissão) ou passaporte válido, graças ao acordo do Mercosul."
+        "answer": "Não. Brasileiros podem entrar no Peru apenas com RG (em bom estado e com foto que permita identificar o titular; o RG não tem prazo de validade) ou passaporte válido, graças ao acordo do Mercosul."
       },
       {
         "question": "A Argentina exige seguro viagem?",
