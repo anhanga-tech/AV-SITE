@@ -2,10 +2,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import {
-  BlogCollectionSchema,
-  buildBlogCollectionData,
-} from '../components/schemas/BlogCollectionSchema';
+import { BlogCollectionSchema } from '../components/schemas/BlogCollectionSchema';
+import { buildBlogCollectionData } from '../components/schemas/blog-collection-data';
 import { ORGANIZATION_ID, WEBSITE_ID } from '../components/schemas/schema-ids';
 import { HeadContext, createHeadManager, renderHeadTags } from '../lib/head';
 import { render } from '../ssr.tsx';
