@@ -443,3 +443,18 @@ test('English trust-page paths redirect to the Portuguese pages', async () => {
     }
   }
 });
+
+// Typo de slug ("do-50" em vez de "dos-50"): sem a regra, o link errado cai no 404.
+test('typo slug /blog/viagem-solo-depois-do-50 redirects 301 to the real post', async () => {
+  const redirects = await readFile(new URL('../public/_redirects', import.meta.url), 'utf8');
+  await readFile(new URL('../content/blog/viagem-solo-depois-dos-50.mdx', import.meta.url), 'utf8');
+  const rules = collectRedirectRules(redirects).map((line) => line.split(/\s+/));
+  const from = '/blog/viagem-solo-depois-do-50';
+  const target = '/blog/viagem-solo-depois-dos-50/';
+
+  for (const source of [from, `${from}/`]) {
+    const rule = rules.find(([origin]) => origin === source);
+    assert.ok(rule, `${source} has no redirect`);
+    assert.deepEqual(rule.slice(1, 3), [target, '301'], `${source} redirect`);
+  }
+});

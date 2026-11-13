@@ -3,6 +3,7 @@ import matter from 'gray-matter';
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import type { BlogPostFrontmatter, HomeTeaserPost, PostMeta } from '../types/blog';
 import { resolveMediaUrl } from './media-url.ts';
+import { hasVisibleFaqHeading } from './blog-faq.ts';
 import { isFuturePost, shouldHideFuturePosts, todayInSaoPaulo } from './blog-schedule.js';
 
 // Opções de agendamento compartilhadas pelo manifest e pelo módulo markdown.
@@ -69,6 +70,10 @@ function toPostMeta(filepath: string, parsed: ReturnType<typeof matter>): PostMe
     tags: normalizeTags(frontmatter.tags),
     slug,
     readingTime: `${calcReadingTime(content)} min de leitura`,
+    // Só quando há faq no frontmatter e o MDX não tem a seção visível: o template
+    // (BlogPostFaq) renderiza o bloco, para o FAQPage nunca ficar sem texto na página.
+    // `undefined` descarta qualquer valor vindo do frontmatter (JSON.stringify omite a chave).
+    faqMissingFromBody: frontmatter.faq?.length && !hasVisibleFaqHeading(content) ? true : undefined,
   };
 }
 
@@ -148,6 +153,16 @@ export const HOME_TEASER_POSTS: HomeTeaserPost[] = ${JSON.stringify(teaserPosts,
 `;
 }
 
+// Paridade com o HTML: quando o MDX não tem a seção de FAQ, o template renderiza o bloco
+// (BlogPostFaq) a partir do frontmatter; a versão markdown anexa as mesmas perguntas e respostas.
+function toFaqMarkdownSection(meta: PostMeta): string {
+    if (!meta.faqMissingFromBody || !meta.faq?.length) return '';
+
+    return `\n## Perguntas Frequentes\n\n${meta.faq
+        .map((item) => `### ${item.question}\n\n${item.answer}`)
+        .join('\n\n')}\n`;
+}
+
 // Versão markdown dos posts para consumo por LLMs/agentes via /api/markdown.
 // Gerada em módulo separado do manifest para não inflar o bundle do cliente —
 // apenas a edge function importa este arquivo.
@@ -168,7 +183,7 @@ function toPostMarkdown(meta: PostMeta, content: string): string {
         '',
     ].join('\n');
 
-    return `${header}\n${content.trim()}\n`;
+    return `${header}\n${content.trim()}\n${toFaqMarkdownSection(meta)}`;
 }
 
 function serializeBlogPostMarkdown(entries: Record<string, string>): string {
