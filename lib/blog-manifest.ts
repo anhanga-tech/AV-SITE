@@ -163,6 +163,16 @@ function toFaqMarkdownSection(meta: PostMeta): string {
         .join('\n\n')}\n`;
 }
 
+// Comentários MDX ({/* ... */}) são notas editoriais: o MDX não os renderiza no HTML,
+// então também não podem sair no markdown público (/api/markdown, llms.txt).
+// Comentário em linha própria sai junto com a linha e uma linha em branco seguinte.
+const MDX_COMMENT_LINE = /^[ \t]*\{\/\*[\s\S]*?\*\/\}[ \t]*\r?\n(?:[ \t]*\r?\n)?/gm;
+const MDX_COMMENT_INLINE = /\{\/\*[\s\S]*?\*\/\}/g;
+
+function stripMdxComments(content: string): string {
+    return content.replace(MDX_COMMENT_LINE, '').replace(MDX_COMMENT_INLINE, '');
+}
+
 // Versão markdown dos posts para consumo por LLMs/agentes via /api/markdown.
 // Gerada em módulo separado do manifest para não inflar o bundle do cliente —
 // apenas a edge function importa este arquivo.
@@ -183,7 +193,7 @@ function toPostMarkdown(meta: PostMeta, content: string): string {
         '',
     ].join('\n');
 
-    return `${header}\n${content.trim()}\n${toFaqMarkdownSection(meta)}`;
+    return `${header}\n${stripMdxComments(content).trim()}\n${toFaqMarkdownSection(meta)}`;
 }
 
 function serializeBlogPostMarkdown(entries: Record<string, string>): string {

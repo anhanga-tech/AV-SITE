@@ -263,6 +263,41 @@ faq:
   }
 });
 
+test('writeBlogMarkdown drops MDX comments so editorial notes never reach the public markdown', async () => {
+  const blogDir = await mkdtemp(path.join(os.tmpdir(), 'blog-markdown-comments-'));
+  const outputFile = path.join(blogDir, 'out', 'blogMarkdown.ts');
+  const source = `---
+title: "Post"
+excerpt: "Excerpt"
+date: "2026-04-01"
+author: "equipe-anhanga"
+category: "Planejamento"
+image: "https://example.com/post.jpg"
+---
+
+Antes.
+
+{/* PENDENTE: nota interna
+em duas linhas */}
+
+Depois {/* PENDENTE: inline */}fim.
+`;
+
+  try {
+    await writeFile(path.join(blogDir, 'com-notas.mdx'), source, 'utf8');
+
+    await writeBlogMarkdown(blogDir, outputFile, { hideFuture: false });
+    const { BLOG_POST_MARKDOWN } = (await import(`${outputFile}?t=${Date.now()}`)) as { BLOG_POST_MARKDOWN: Record<string, string> };
+    const markdown = BLOG_POST_MARKDOWN['com-notas'];
+
+    assert.ok(!markdown.includes('PENDENTE'));
+    assert.ok(!markdown.includes('{/*'));
+    assert.ok(markdown.endsWith('\nAntes.\n\nDepois fim.\n'));
+  } finally {
+    await rm(blogDir, { recursive: true, force: true });
+  }
+});
+
 test('collectBlogPostMeta leaves faq undefined when frontmatter omits it', async () => {
   const blogDir = await mkdtemp(path.join(os.tmpdir(), 'blog-manifest-no-faq-'));
 
