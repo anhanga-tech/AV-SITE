@@ -54,6 +54,15 @@ test('base prerender routes cover the indexable static sitemap routes', () => {
   assert.ok(BASE_PRERENDER_ROUTES.includes('/corporativo'));
 });
 
+// Páginas de autor (/autor/<id>/): HTML estático e sitemap. A correspondência com as chaves de
+// AUTHORS é travada em tests/author-page.test.ts.
+test('páginas de autor entram no prerender e no sitemap', () => {
+  for (const route of ['/autor/felipe-william', '/autor/queila-oliveira']) {
+    assert.ok(BASE_PRERENDER_ROUTES.includes(route), `${route} fora do prerender`);
+    assert.ok(STATIC_SITEMAP_ENTRIES.some((entry) => entry.route === route && !entry.noindex), `${route} fora do sitemap`);
+  }
+});
+
 // /links é prerenderizada para pintar de imediato (é o destino do link da bio), mas é
 // `noindex, follow` por natureza e não pode ser anunciada à busca. As duas metades desse
 // invariante precisam falhar no CI: sem isso, remover a rota de NOINDEX_PRERENDER_ROUTES

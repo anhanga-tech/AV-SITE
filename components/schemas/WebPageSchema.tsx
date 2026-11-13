@@ -3,7 +3,7 @@ import { StructuredData } from './StructuredData';
 import { ORGANIZATION_ID } from './schema-ids';
 
 // Subtipos de WebPage que marcam as páginas de confiança (sobre, contato) para agentes.
-type WebPageType = 'WebPage' | 'AboutPage' | 'ContactPage';
+type WebPageType = 'WebPage' | 'AboutPage' | 'ContactPage' | 'ProfilePage';
 
 interface WebPageSchemaProps {
   name: string;
@@ -14,6 +14,8 @@ interface WebPageSchemaProps {
   type?: WebPageType;
   /** Liga a página à Organization (@id) quando ela fala da própria agência. */
   aboutOrganization?: boolean;
+  /** @id da entidade que a página descreve (ex.: o Person de uma ProfilePage). */
+  mainEntityId?: string;
 }
 
 export const WebPageSchema: React.FC<WebPageSchemaProps> = ({
@@ -24,6 +26,7 @@ export const WebPageSchema: React.FC<WebPageSchemaProps> = ({
   inLanguage = 'pt-BR',
   type = 'WebPage',
   aboutOrganization = false,
+  mainEntityId,
 }) => (
   <StructuredData
     id="webpage"
@@ -36,6 +39,7 @@ export const WebPageSchema: React.FC<WebPageSchemaProps> = ({
       ...(dateModified ? { dateModified } : {}),
       inLanguage,
       ...(aboutOrganization ? { about: { "@id": ORGANIZATION_ID }, mainEntity: { "@id": ORGANIZATION_ID } } : {}),
+      ...(mainEntityId && !aboutOrganization ? { mainEntity: { "@id": mainEntityId } } : {}),
     }}
   />
 );
