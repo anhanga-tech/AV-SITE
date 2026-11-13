@@ -1019,7 +1019,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       }
     ],
     "slug": "quanto-custa-viagem-disney-2026",
-    "readingTime": "12 min de leitura"
+    "readingTime": "13 min de leitura"
   },
   {
     "title": "Como Planejar uma Viagem para Orlando Sob Medida: o Guia Completo",
