@@ -5,6 +5,8 @@ import { Seo } from '../../components/Seo';
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../../components/schemas/FAQPageSchema';
 import { ServiceSchema } from '../../components/schemas/ServiceSchema';
+import { LandingBlogGuides } from '../../components/landings/shared/LandingBlogGuides';
+import { BETO_BLOG_GUIDES } from '../../components/landings/beto-carrero/betoBlogGuides';
 import { openContactModal } from '../../utils/contactForm';
 import { BETO_FAQ_ITEMS } from '../../components/landings/beto-carrero/betoFaqItems';
 
@@ -88,6 +90,7 @@ const BetoCarreroLanding: React.FC = () => {
           </div>
         </div>
       </section>
+      <LandingBlogGuides guides={BETO_BLOG_GUIDES} />
     </>
   );
 };

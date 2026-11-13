@@ -16,6 +16,8 @@ import {
   CruiseOtherServices,
   CruiseProcess,
 } from '@/components/landings/cruzeiros/CruzeirosLandingSections';
+import { LandingBlogGuides } from '@/components/landings/shared/LandingBlogGuides';
+import { CRUZEIROS_BLOG_GUIDES } from '@/components/landings/cruzeiros/cruzeirosBlogGuides';
 import { CRUISE_OFFERS } from '@/data/cruiseOffers';
 import { getActiveOffers } from '@/lib/cruise-offers-schedule.js';
 
@@ -99,6 +101,10 @@ const CruzeirosLanding: React.FC = () => {
             <CruiseProcess />
             <CruiseCurationBenefits />
             <CruiseAbout />
+            <LandingBlogGuides
+              guides={CRUZEIROS_BLOG_GUIDES}
+              className="py-20 bg-white"
+            />
             <CruiseFinalCta />
             <CruiseOtherServices />
             <LandingFAQ

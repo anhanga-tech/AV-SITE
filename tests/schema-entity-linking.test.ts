@@ -3,6 +3,9 @@ import test from 'node:test';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { ArticleSchema } from '../components/schemas/ArticleSchema';
+import { BlogPostSchemas } from '../components/blog/BlogPostSchemas';
+import { AUTHORS } from '../data/blogData';
+import { BLOG_POST_MANIFEST } from '../data/blogManifest';
 import { HeadContext, createHeadManager, renderHeadTags } from '../lib/head';
 import { render } from '../ssr.tsx';
 
@@ -72,5 +75,74 @@ test('/sobre is an AboutPage and /contato a ContactPage about the Organization',
     const page = (await jsonLdFor(url)).find((node) => hasType(node, type));
     assert.ok(page, `${url} has no ${type} node`);
     assert.equal(refId(page.about), ORGANIZATION_ID, `${url} ${type} about`);
+  }
+});
+
+// Página de autor (/autor/<id>/): a URL do Person e do BlogPosting.author é a da página do
+// autor — nunca a do post nem a /sobre/ — e os dois nós compartilham o mesmo @id.
+function postJsonLd(slug: string): { nodes: Node[]; postUrl: string } {
+  const post = BLOG_POST_MANIFEST.find((entry) => entry.slug === slug);
+  assert.ok(post, `post ${slug} ausente do manifesto`);
+  const postUrl = `https://www.anhanga.tur.br/blog/${slug}/`;
+  const headManager = createHeadManager();
+  renderToStaticMarkup(
+    React.createElement(HeadContext.Provider, { value: headManager },
+      React.createElement(BlogPostSchemas, { post, author: AUTHORS[post.author] ?? null, canonicalUrl: postUrl }))
+  );
+  return { nodes: parseJsonLd(renderHeadTags(headManager.getTags())), postUrl };
+}
+
+for (const [slug, authorId] of [
+  ['como-planejar-viagem-orlando-sob-medida', 'felipe-william'],
+  ['melhor-epoca-viajar-orlando-guia-perfil-viajante', 'queila-oliveira'],
+] as const) {
+  test(`${slug}: Person.url e BlogPosting.author.url apontam para a página do autor`, () => {
+    const { nodes, postUrl } = postJsonLd(slug);
+    const author = AUTHORS[authorId];
+    const authorUrl = `https://www.anhanga.tur.br/autor/${authorId}/`;
+    const posting = nodes.find((node) => hasType(node, 'BlogPosting'));
+    const person = nodes.find((node) => hasType(node, 'Person'));
+    assert.ok(posting && person, 'BlogPosting e Person são esperados');
+
+    const postingAuthor = posting.author as Node;
+    assert.equal(person.url, authorUrl);
+    assert.equal(postingAuthor.url, authorUrl);
+    assert.notEqual(person.url, postUrl, 'Person.url não pode ser a URL do post');
+    assert.ok(!String(person.url).includes('/sobre'), 'Person.url não pode ser /sobre/');
+    assert.equal(postingAuthor['@id'], person['@id'], 'mesma entidade nos dois nós');
+    assert.equal(person['@id'], `${authorUrl}#person`);
+
+    const expectedSameAs = Object.values(author.social ?? {});
+    assert.ok(expectedSameAs.length > 0, 'fixture: autor com redes');
+    assert.deepEqual(person.sameAs, expectedSameAs);
+    assert.deepEqual(postingAuthor.sameAs, expectedSameAs);
+    assert.equal(refId(person.worksFor), ORGANIZATION_ID);
+  });
+}
+
+test('post com autor fora de AUTHORS não inventa página de autor', () => {
+  const [base] = BLOG_POST_MANIFEST;
+  const headManager = createHeadManager();
+  renderToStaticMarkup(
+    React.createElement(HeadContext.Provider, { value: headManager },
+      React.createElement(BlogPostSchemas, {
+        post: { ...base, author: 'alguem-sem-cadastro' }, author: null,
+        canonicalUrl: 'https://www.anhanga.tur.br/blog/x/'
+      }))
+  );
+  const nodes = parseJsonLd(renderHeadTags(headManager.getTags()));
+  const posting = nodes.find((node) => hasType(node, 'BlogPosting'));
+  assert.ok(posting);
+  assert.equal((posting.author as Node).name, 'alguem-sem-cadastro');
+  assert.equal('url' in (posting.author as Node), false);
+  assert.equal(nodes.some((node) => hasType(node, 'Person')), false);
+});
+
+test('consultants on /sobre share the author page url and @id', async () => {
+  const people = (await jsonLdFor('/sobre')).filter((node) => hasType(node, 'Person'));
+  assert.equal(people.length, 2);
+  for (const person of people) {
+    assert.match(String(person.url), /^https:\/\/www\.anhanga\.tur\.br\/autor\/[a-z-]+\/$/);
+    assert.equal(person['@id'], `${String(person.url)}#person`);
   }
 });

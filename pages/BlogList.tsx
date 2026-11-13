@@ -9,6 +9,7 @@ import { optimizeRemoteImageUrl } from '../data/mediaConfig';
 import { getCategoryColor } from '../utils/categoryColors';
 import { Seo } from '../components/Seo';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
+import { BlogCollectionSchema } from '../components/schemas/BlogCollectionSchema';
 import { openContactModal } from '../utils/contactForm';
 import { BlogImageCredit } from '../components/blog/BlogImageCredit';
 
@@ -41,6 +42,10 @@ const blogCards = allPosts.map((post) => ({
     authorName: AUTHORS[post.author]?.name ?? post.author,
 }));
 
+// JSON-LD da listagem: sempre o acervo completo (não depende do filtro de busca, que é
+// estado de cliente e não existe no prerender). Não há paginação em /blog/.
+const collectionItems = blogCards.map((post) => ({ name: post.title, url: post.shareUrl }));
+
 // Lowercased search haystacks are built once at module load, not per keystroke.
 const searchIndex = buildBlogSearchIndex(blogCards);
 
@@ -67,6 +72,12 @@ const BlogList: React.FC = () => {
                 { name: 'Home', item: 'https://www.anhanga.tur.br/' },
                 { name: 'Blog', item: getBlogHomeUrl() }
             ]} />
+            <BlogCollectionSchema
+                name="Blog de Viagens e Dicas Práticas"
+                url={getBlogHomeUrl()}
+                description="Roteiros práticos, dicas de insider e destinos que valem cada centavo. Planejamento de viagem do jeito que deveria ser."
+                items={collectionItems}
+            />
             <div className="min-h-screen bg-brand-surface pt-32 md:pt-36 lg:pt-40 pb-24">
                 <div className="container mx-auto px-6">
 

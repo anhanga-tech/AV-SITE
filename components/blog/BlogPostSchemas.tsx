@@ -4,9 +4,26 @@ import { ArticleSchema } from '../schemas/ArticleSchema';
 import { BreadcrumbSchema } from '../schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../schemas/FAQPageSchema';
 import { PersonSchema } from '../schemas/PersonSchema';
+import { ORGANIZATION_ID } from '../schemas/schema-ids';
+import type { ArticleImageCredit } from '../schemas/article-image';
 import type { Author } from '../../data/blogData';
 import type { PostMeta } from '../../lib/mdx';
+import { getAuthorEntityId, getAuthorUrl } from '../../utils/author';
 import { getBlogHomeUrl } from '../../utils/blog';
+
+const ORG_NAME = 'Anhangá Viagens';
+const ORG_URL = 'https://www.anhanga.tur.br/';
+
+// Só crédito confirmado vira ImageObject com autoria. `unknown` (ou sem texto de crédito)
+// devolve undefined e o schema mantém a URL pura da capa.
+function getConfirmedImageCredit(post: PostMeta): ArticleImageCredit | undefined {
+    if (post.imageCreditStatus !== 'confirmed' || !post.imageCredit) return undefined;
+    return {
+        credit: post.imageCredit,
+        source: post.imageSource,
+        licenseUrl: post.imageLicenseUrl
+    };
+}
 
 interface BlogPostSchemasProps {
     post: PostMeta;
@@ -16,6 +33,8 @@ interface BlogPostSchemasProps {
 
 export const BlogPostSchemas: React.FC<BlogPostSchemasProps> = ({ post, author, canonicalUrl }) => {
     const sameAs = author?.social ? (Object.values(author.social).filter(Boolean) as string[]) : [];
+    const authorUrl = author ? getAuthorUrl(author.id) : undefined;
+    const authorEntityId = author ? getAuthorEntityId(author.id) : undefined;
 
     return (
         <>
@@ -27,6 +46,10 @@ export const BlogPostSchemas: React.FC<BlogPostSchemasProps> = ({ post, author, 
                 dateModified={post.dateModified}
                 authorName={author?.name || post.author}
                 authorImage={author?.image}
+                authorUrl={authorUrl}
+                authorEntityId={authorEntityId}
+                authorSameAs={sameAs}
+                imageCredit={getConfirmedImageCredit(post)}
                 url={canonicalUrl}
             />
             {author && (
@@ -35,8 +58,10 @@ export const BlogPostSchemas: React.FC<BlogPostSchemasProps> = ({ post, author, 
                     image={author.image}
                     description={author.bio}
                     jobTitle={author.role}
-                    url={canonicalUrl}
+                    url={authorUrl}
+                    entityId={authorEntityId}
                     sameAs={sameAs}
+                    worksFor={{ name: ORG_NAME, url: ORG_URL, id: ORGANIZATION_ID }}
                 />
             )}
             {post.faq && post.faq.length > 0 && <FAQPageSchema items={post.faq} />}

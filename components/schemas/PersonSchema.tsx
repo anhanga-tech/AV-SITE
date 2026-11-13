@@ -19,6 +19,8 @@ export interface PersonSchemaProps {
     // Unique head-tag id — required when a page renders more than one Person
     // (StructuredData keys tags by id, so duplicates would collide/dedupe).
     id?: string;
+    // @id do nó no grafo JSON-LD (distinto do `id` acima, que só chaveia a tag no head).
+    entityId?: string;
 }
 
 export const PersonSchema: React.FC<PersonSchemaProps> = ({
@@ -29,11 +31,13 @@ export const PersonSchema: React.FC<PersonSchemaProps> = ({
     url,
     sameAs,
     worksFor,
-    id = "person"
+    id = "person",
+    entityId
 }) => {
     const schema = {
         "@context": "https://schema.org",
         "@type": "Person",
+        ...(entityId && { "@id": entityId }),
         "name": name,
         ...(image && { "image": image }),
         ...(description && { "description": description }),

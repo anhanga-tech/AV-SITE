@@ -35,6 +35,11 @@
 /indica    /links/?utm_source=indicacao&utm_medium=whatsapp&utm_campaign=nps_promotor    302
 /indica/   /links/?utm_source=indicacao&utm_medium=whatsapp&utm_campaign=nps_promotor    302
 
+# Typo de slug: "depois-do-50" (sem o "s") nunca existiu como post; o slug real é
+# "depois-dos-50". Destino COM barra pelo mesmo motivo dos blocos acima.
+/blog/viagem-solo-depois-do-50    /blog/viagem-solo-depois-dos-50/    301
+/blog/viagem-solo-depois-do-50/   /blog/viagem-solo-depois-dos-50/    301
+
 # Exclusão de dados trailing-slash normalisation
 /exclusao-de-dados  /exclusao-de-dados/  301
 

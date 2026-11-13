@@ -18,11 +18,7 @@ interface BlogImageCreditProps {
     compact?: boolean;
 }
 
-function UnknownNotice({ compact }: { compact: boolean }) {
-    if (compact) {
-        return <p className="mt-2 text-[10px] font-semibold leading-tight text-zinc-500">Crédito da imagem em verificação</p>;
-    }
-
+function UnknownNotice() {
     return (
         <aside
             className="mb-8 flex gap-3 rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-600"
@@ -84,7 +80,11 @@ function ConfirmedCredit({ post, compact }: { post: ImageCreditFields; compact: 
 
 export const BlogImageCredit: React.FC<BlogImageCreditProps> = ({ post, compact = false }) => {
     if (post.imageCreditStatus === 'unknown') {
-        return <UnknownNotice compact={compact} />;
+        // O aviso "em verificação" fica só na capa do próprio post. Nos cards compactos
+        // (home, lista, relacionados, sidebar) ele se repetia nos posts legados e poluía a
+        // leitura sem informar nada de acionável; o texto completo, com o link para
+        // /creditos-de-imagens/, está na página do post.
+        return compact ? null : <UnknownNotice />;
     }
 
     if (post.imageCreditStatus === 'confirmed' && post.imageCredit) {
