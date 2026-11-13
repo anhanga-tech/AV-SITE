@@ -5,6 +5,21 @@ import type { HomeTeaserPost } from '../types/blog';
 
 export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
   {
+    "slug": "roteiro-machu-picchu",
+    "title": "Roteiro Machu Picchu: Peru em 7 a 10 dias",
+    "excerpt": "Roteiro de 7 a 10 dias por Lima, Cusco, Vale Sagrado e Machu Picchu, com trem, ingresso por circuito, altitude e a melhor época para ir.",
+    "date": "2026-11-30",
+    "category": "Destinos",
+    "author": "felipe-william",
+    "image": "https://media.anhanga.tur.br/images/blog/roteiro-machu-picchu-capa.jpg",
+    "imageCreditStatus": "confirmed",
+    "imageCredit": "Jorge Castro Ruso / Wikimedia Commons",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Machu_Picchu_Panorama_2025.jpg",
+    "imageLicense": "CC BY-SA 2.0",
+    "imageLicenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "imageAdaptation": "Redimensionada para 1600 px de largura"
+  },
+  {
     "slug": "turismo-regenerativo-brasil",
     "title": "Turismo regenerativo no Brasil: 5 experiências que valem a pena",
     "excerpt": "Turismo regenerativo é deixar o lugar melhor do que você encontrou. Cinco viagens no Brasil em que o dinheiro fica com quem cuida da floresta, do rio e do mar.",
@@ -49,20 +64,5 @@ export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
     "imageLicense": "CC BY-SA 4.0",
     "imageLicenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
     "imageAdaptation": "Redimensionada para até 1600 px e comprimida; mantém a licença CC BY-SA 4.0"
-  },
-  {
-    "slug": "lua-de-mel-europa-lisboa-ou-paris",
-    "title": "Lua de mel na Europa: Lisboa ou Paris para quem não quer só museus",
-    "excerpt": "Lisboa ou Paris na lua de mel? Comparamos clima, ritmo, passeios fora dos museus e custos escondidos, com um roteiro que junta as duas cidades.",
-    "date": "2026-10-02",
-    "category": "Romance",
-    "author": "felipe-william",
-    "image": "https://media.anhanga.tur.br/images/blog/lua-de-mel-europa-lisboa-ou-paris.jpg",
-    "imageCreditStatus": "confirmed",
-    "imageCredit": "Marcus Holland-Moritz (mhx) / Wikimedia Commons",
-    "imageSource": "https://commons.wikimedia.org/wiki/File:Lisbon_Sunset_(16542598054).jpg",
-    "imageLicense": "CC BY-SA 2.0",
-    "imageLicenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
-    "imageAdaptation": "Recorte adaptado à capa · pôr do sol visto do Miradouro da Senhora do Monte, Lisboa, 2015"
   }
 ];
