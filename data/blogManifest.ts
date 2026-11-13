@@ -66,6 +66,66 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "16 min de leitura"
   },
   {
+    "title": "Natal Luz Gramado 2026: data, programação e ingressos",
+    "excerpt": "O Natal Luz Gramado 2026 vai de 22 de outubro a 17 de janeiro. Veja a programação, o preço de cada ingresso e o que é gratuito na Serra Gaúcha.",
+    "date": "2026-11-16",
+    "dateModified": "2026-11-16",
+    "author": "felipe-william",
+    "category": "Festivais",
+    "image": "https://media.anhanga.tur.br/images/blog/natal-luz-gramado-2026-capa.jpg",
+    "imageCreditStatus": "confirmed",
+    "imageCredit": "Foto: Felipe Valduga / Wikimedia Commons (CC BY 2.0)",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Natal_Luz_2016_-_31148576241.jpg",
+    "imageLicense": "CC BY 2.0",
+    "imageLicenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+    "imageAdaptation": "Redimensionada para até 1600 px e comprimida · foto de arquivo do Natal Luz 2016",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Gramado",
+    "tags": [
+      "natal-luz",
+      "gramado",
+      "serra-gaucha",
+      "rio-grande-do-sul",
+      "festivais",
+      "natal"
+    ],
+    "seoTitle": "Natal Luz Gramado 2026: data e ingressos",
+    "seoDescription": "Natal Luz Gramado 2026: data, programação, preço de cada ingresso, atrações gratuitas, o que vestir e quantos dias ficar para ver o Desfile e o Nativitaten.",
+    "faq": [
+      {
+        "question": "Quando começa o Natal Luz em Gramado?",
+        "answer": "O Natal Luz Gramado 2026, 41ª edição do evento, começou em 22 de outubro de 2026. Os espetáculos pagos têm sessões desde 23 de outubro, e as atrações gratuitas diárias seguem até 10 de janeiro (Show de Acendimento) e 17 de janeiro (Vila de Natal)."
+      },
+      {
+        "question": "Até quando vai o Natal Luz Gramado 2026?",
+        "answer": "O evento vai até 17 de janeiro de 2027. As últimas sessões dos espetáculos pagos são em 10 de janeiro, a mesma data em que termina o Show de Acendimento diário. A Vila de Natal segue até 17 de janeiro."
+      },
+      {
+        "question": "Quanto custa o ingresso do Natal Luz Gramado?",
+        "answer": "Os valores de inteira por pessoa, sem a taxa da tiqueteira, vão de R$ 420 a R$ 900 no Grande Desfile de Natal, de R$ 360 a R$ 520 no Nativitaten e de R$ 120 a R$ 380 em O Brilho do Natal e no Natal Luz in Concert. Há setor TEA com valor único de R$ 210 no Desfile e R$ 180 no Nativitaten. Estudantes, pessoas com 60 anos ou mais e pessoas com deficiência pagam meia-entrada, com comprovação na entrada; o Passaporte Experience não tem meia. O site oficial indica entrada gratuita para crianças de até 4 anos, conforme regulamento do evento; confira a regra no momento da compra."
+      },
+      {
+        "question": "O Natal Luz é gratuito?",
+        "answer": "Em parte. A Vila de Natal, o Show de Acendimento, o Palco Rua Coberta, a Parada de Natal e o Caminho de Luzes são gratuitos. Os quatro espetáculos (Grande Desfile de Natal, Nativitaten, O Brilho do Natal e Natal Luz in Concert) são pagos, e a Corrida e Caminhada do Noel tem inscrição paga."
+      },
+      {
+        "question": "Que roupas usar em Gramado no Natal Luz?",
+        "answer": "Vista-se em camadas e use calçado confortável, porque boa parte da programação gratuita é na rua, no centro. Para o Nativitaten, que é ao ar livre e tem setor VIP descoberto, o site oficial recomenda agasalho e acompanhar a previsão do tempo; a gente levaria também uma peça impermeável. O Grande Desfile e os espetáculos do Palácio dos Festivais são em locais cobertos."
+      },
+      {
+        "question": "O que fazer em Gramado no Natal Luz?",
+        "answer": "Escolha as noites do Grande Desfile e do Nativitaten, que nunca coincidem nas datas restantes, e preencha o resto com a programação gratuita: Vila de Natal na Praça das Etnias, Parada de Natal na Av. Borges de Medeiros, Palco Rua Coberta e Show de Acendimento às 20h. O Brilho do Natal cabe numa tarde e o Natal Luz in Concert só acontece às segundas."
+      },
+      {
+        "question": "Quantos dias ficar em Gramado para o Natal Luz?",
+        "answer": "A gente recomenda de 3 a 4 noites para ver o Grande Desfile e o Nativitaten em noites diferentes, encaixar O Brilho do Natal numa tarde e aproveitar as atrações gratuitas. Para quem só quer a programação gratuita, 2 noites resolvem."
+      }
+    ],
+    "slug": "natal-luz-gramado-2026",
+    "readingTime": "15 min de leitura"
+  },
+  {
     "title": "Turismo regenerativo no Brasil: 5 experiências que valem a pena",
     "excerpt": "Turismo regenerativo é deixar o lugar melhor do que você encontrou. Cinco viagens no Brasil em que o dinheiro fica com quem cuida da floresta, do rio e do mar.",
     "date": "2026-11-13",
