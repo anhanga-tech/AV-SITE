@@ -34,3 +34,29 @@ test('crédito completo do post mantém links para fonte e licença', () => {
     assert.ok(html.includes(`href="${CONFIRMED_WITH_LINKS.imageSource}"`));
     assert.ok(html.includes(`href="${CONFIRMED_WITH_LINKS.imageLicenseUrl}"`));
 });
+
+// Mudança intencional (PR de autor/schema): o aviso "Crédito da imagem em verificação" saiu dos
+// cards compactos (home, lista, relacionados, sidebar) e fica só na capa do próprio post.
+const UNKNOWN = { imageCreditStatus: 'unknown' as const };
+
+test('crédito unknown no modo compacto não renderiza o aviso "em verificação"', () => {
+    const html = renderToStaticMarkup(
+        React.createElement(BlogImageCredit, { post: UNKNOWN, compact: true })
+    );
+    assert.equal(html, '');
+});
+
+test('crédito unknown na capa do próprio post mantém o aviso completo com o link de correção', () => {
+    const html = renderToStaticMarkup(
+        React.createElement(BlogImageCredit, { post: UNKNOWN })
+    );
+    assert.ok(html.includes('Crédito da imagem em verificação'));
+    assert.ok(html.includes('href="/creditos-de-imagens/"'));
+});
+
+test('crédito compacto confirmado continua visível no card', () => {
+    const html = renderToStaticMarkup(
+        React.createElement(BlogImageCredit, { post: CONFIRMED_WITH_LINKS, compact: true })
+    );
+    assert.ok(html.includes('Foto: Autor Exemplo / Wikimedia Commons'));
+});
