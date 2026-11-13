@@ -17,7 +17,7 @@ export const HistoricalNoticeText: React.FC<HistoricalNoticeTextProps> = ({ text
         const start = match.index ?? 0;
         if (start > cursor) nodes.push(text.slice(cursor, start));
         nodes.push(
-            <a key={start} href={href} className="font-bold underline underline-offset-2 hover:text-brand-dark/80">
+            <a key={start} href={href} className="font-bold underline underline-offset-2 hover:text-anhanga-dark/80">
                 {label}
             </a>
         );
