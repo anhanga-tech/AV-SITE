@@ -17,6 +17,7 @@ import { TrustFaqSection } from '../components/about/TrustFaqSection';
 import { CtaSection } from '../components/about/CtaSection';
 import { getReviewSummary } from '../data/reviewsAdapter';
 import { AUTHORS } from '../data/blogData';
+import { getAuthorEntityId, getAuthorUrl } from '../utils/author';
 import googleReviewsRaw from '../data/googleReviews.json';
 import type { GoogleReviewsData } from '../types/reviews';
 
@@ -120,6 +121,8 @@ const About: React.FC = () => {
         <PersonSchema
           key={member.id}
           id={`person-${member.id}`}
+          entityId={getAuthorEntityId(member.id)}
+          url={getAuthorUrl(member.id)}
           name={member.name}
           image={member.image}
           description={member.bio}

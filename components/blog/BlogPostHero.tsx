@@ -24,9 +24,11 @@ const HERO_QUALITY = 72;
 interface BlogPostHeroProps {
     post: PostMeta;
     authorName: string;
+    /** Página do autor (/autor/<id>/). Sem ela (autor fora de AUTHORS) o nome fica em texto. */
+    authorHref?: string;
 }
 
-export const BlogPostHero: React.FC<BlogPostHeroProps> = ({ post, authorName }) => {
+export const BlogPostHero: React.FC<BlogPostHeroProps> = ({ post, authorName, authorHref }) => {
     return (
         <div
             data-testid="blog-post-hero"
@@ -79,7 +81,13 @@ export const BlogPostHero: React.FC<BlogPostHeroProps> = ({ post, authorName }) 
                                 <div className="p-1.5 bg-white/10 rounded-lg backdrop-blur-md">
                                     <User className="size-4" />
                                 </div>
-                                <span>Por <span className="font-bold text-white border-b-2 border-brand-yellow/50">{authorName}</span></span>
+                                <span>Por{' '}
+                                    {authorHref ? (
+                                        <Link to={authorHref} className="font-bold text-white border-b-2 border-brand-yellow/50 hover:border-brand-yellow">{authorName}</Link>
+                                    ) : (
+                                        <span className="font-bold text-white border-b-2 border-brand-yellow/50">{authorName}</span>
+                                    )}
+                                </span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <div className="p-1.5 bg-white/10 rounded-lg backdrop-blur-md">

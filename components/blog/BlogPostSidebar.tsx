@@ -1,6 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Clock } from 'lucide-react';
 import { PostMeta } from '../../lib/mdx';
+import { getAuthorPath } from '../../utils/author';
 import { getBlogPostUrl } from '../../utils/blog';
 import { optimizeRemoteImageUrl } from '../../data/mediaConfig';
 import { getCategoryColor } from '../../utils/categoryColors';
@@ -9,6 +11,7 @@ import { BlogImageCredit } from './BlogImageCredit';
 
 interface BlogPostSidebarProps {
     author: {
+        id?: string;
         name: string;
         role?: string;
         bio?: string;
@@ -32,7 +35,13 @@ export const BlogPostSidebar: React.FC<BlogPostSidebarProps> = ({ author, author
                         </div>
                     )}
                 </div>
-                <p className="font-black text-2xl text-brand-dark mb-1">{author?.name || authorFallbackName}</p>
+                <p className="font-black text-2xl text-brand-dark mb-1">
+                    {author?.id ? (
+                        <Link to={getAuthorPath(author.id)} className="hover:text-brand-cyan transition-colors">{author.name}</Link>
+                    ) : (
+                        author?.name || authorFallbackName
+                    )}
+                </p>
                 <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6 bg-zinc-50 inline-block px-3 py-1 rounded-full">{author?.role || 'Especialista em Viagens'}</p>
                 <p className="text-zinc-600 font-serif italic text-base mb-8 leading-relaxed">
                     {author?.bio ? `"${author.bio}"` : '"Apaixonado por descobrir lugares novos e compartilhar dicas que não estão nos guias turísticos."'}

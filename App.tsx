@@ -40,6 +40,7 @@ const BlogRedirect = lazy(() => import('./pages/BlogRedirect'));
 const Terms = lazy(() => import('./pages/Terms'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 const About = lazy(() => import('./pages/About'));
+const Author = lazy(() => import('./pages/Author'));
 const Contato = lazy(() => import('./pages/Contato'));
 const SiteMap = lazy(() => import('./pages/SiteMap'));
 const ParquesBrasil = lazy(() => import('./pages/ParquesBrasil'));
@@ -163,6 +164,7 @@ const MainSiteShell: React.FC = () => {
             <Route path="/exclusao-de-dados" element={<ExclusaoDados />} />
             <Route path="/creditos-de-imagens" element={<ImageCredits />} />
             <Route path="/sobre" element={<About />} />
+            <Route path="/autor/:authorId" element={<Author />} />
             <Route path="/contato" element={<Contato />} />
             {/* Hub de conteúdo, não landing de campanha: fica no MainSiteShell
                 para herdar Header, Footer e navegação interna — é por onde a

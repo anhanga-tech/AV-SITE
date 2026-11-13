@@ -11,6 +11,7 @@ import { BlogPostSchemas } from '../components/blog/BlogPostSchemas';
 import { BlogPostSidebar } from '../components/blog/BlogPostSidebar';
 import { AUTHORS } from '../data/blogData';
 import { getAllPosts, type PostMeta } from '../lib/mdx';
+import { getAuthorPath } from '../utils/author';
 import { readBlogPostMdx } from '../lib/blog-mdx';
 import { getBlogHomeUrl, getBlogPostUrl } from '../utils/blog';
 
@@ -100,7 +101,11 @@ const BlogPost: React.FC = () => {
             />
             <BlogPostSchemas post={post} author={author} canonicalUrl={canonicalUrl} />
 
-            <BlogPostHero post={post} authorName={author?.name || post.author} />
+            <BlogPostHero
+                post={post}
+                authorName={author?.name || post.author}
+                authorHref={author ? getAuthorPath(author.id) : undefined}
+            />
 
             <div className="container mx-auto px-6 relative z-10 mt-8 mb-24">
                 <div className="flex flex-col lg:flex-row gap-12">
