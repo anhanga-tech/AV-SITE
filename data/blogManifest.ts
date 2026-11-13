@@ -31,11 +31,11 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "faq": [
       {
         "question": "Quando começa o Natal Luz em Gramado?",
-        "answer": "O Natal Luz Gramado 2026, 41ª edição do evento, começou em 22 de outubro de 2026. Os espetáculos pagos têm sessões desde 23 de outubro, e as atrações gratuitas diárias, como a Vila de Natal e o Show de Acendimento, seguem até 10 de janeiro."
+        "answer": "O Natal Luz Gramado 2026, 41ª edição do evento, começou em 22 de outubro de 2026. Os espetáculos pagos têm sessões desde 23 de outubro, e as atrações gratuitas diárias seguem até 10 de janeiro (Show de Acendimento) e 17 de janeiro (Vila de Natal)."
       },
       {
         "question": "Até quando vai o Natal Luz Gramado 2026?",
-        "answer": "O evento vai até 17 de janeiro de 2027. As últimas sessões dos espetáculos pagos são em 10 de janeiro, a mesma data em que terminam a Vila de Natal e o Show de Acendimento diários."
+        "answer": "O evento vai até 17 de janeiro de 2027. As últimas sessões dos espetáculos pagos são em 10 de janeiro, a mesma data em que termina o Show de Acendimento diário. A Vila de Natal segue até 17 de janeiro."
       },
       {
         "question": "Quanto custa o ingresso do Natal Luz Gramado?",
