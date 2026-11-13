@@ -76,6 +76,10 @@ suporte a viagens já compradas com outra agência, ou perguntas sem relação c
 Feed RSS: https://www.anhanga.tur.br/feed.xml
 Versão markdown de qualquer página: https://www.anhanga.tur.br/api/markdown?path=/blog/{slug}/
 
+- [Natal Luz Gramado 2026: data, programação e ingressos](https://www.anhanga.tur.br/blog/natal-luz-gramado-2026/) (2026-11-16)
+- [Turismo regenerativo no Brasil: 5 experiências que valem a pena](https://www.anhanga.tur.br/blog/turismo-regenerativo-brasil/) (2026-11-13)
+- [Cruzeiro fluvial ou roteiro terrestre na Europa: qual escolher depois dos 60](https://www.anhanga.tur.br/blog/cruzeiro-fluvial-europa-melhor-idade/) (2026-11-11)
+- [Roteiro Europa 10 dias: Lisboa, Madri ou Roma como base?](https://www.anhanga.tur.br/blog/roteiro-europa-10-dias-lisboa-madrid-roma/) (2026-11-06)
 - [Lua de mel na Europa: Lisboa ou Paris para quem não quer só museus](https://www.anhanga.tur.br/blog/lua-de-mel-europa-lisboa-ou-paris/) (2026-10-02)
 - [Disney ou Universal em Orlando: qual escolher?](https://www.anhanga.tur.br/blog/disney-ou-universal-orlando-qual-escolher/) (2026-09-22)
 - [Epic Universe em Orlando: vale a pena em 2026?](https://www.anhanga.tur.br/blog/epic-universe-orlando-2026-vale-a-pena/) (2026-09-22)
