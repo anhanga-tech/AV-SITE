@@ -5,6 +5,21 @@ import type { HomeTeaserPost } from '../types/blog';
 
 export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
   {
+    "slug": "carnaval-2027-data",
+    "title": "Carnaval 2027 data: quando é, feriado e onde curtir",
+    "excerpt": "O Carnaval 2027 vai de sábado, 6, a terça, 9 de fevereiro. Veja se é feriado e as datas já confirmadas em Salvador, Rio, Recife e Olinda.",
+    "date": "2026-11-23",
+    "category": "Carnaval",
+    "author": "queila-oliveira",
+    "image": "https://media.anhanga.tur.br/images/blog/carnaval-2027-data-capa.jpg",
+    "imageCreditStatus": "confirmed",
+    "imageCredit": "Foto: Raphael David / Agência Brasil, via Wikimedia Commons (CC BY 3.0 BR)",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Pequenos_sambistas_fecham_desfiles_na_Marqu%C3%AAs_de_Sapuca%C3%AD_18.jpg",
+    "imageLicense": "CC BY 3.0 BR",
+    "imageLicenseUrl": "https://creativecommons.org/licenses/by/3.0/br/",
+    "imageAdaptation": "Redimensionada para até 1600 px e comprimida · foto de arquivo do desfile das escolas mirins de 2015"
+  },
+  {
     "slug": "turismo-regenerativo-brasil",
     "title": "Turismo regenerativo no Brasil: 5 experiências que valem a pena",
     "excerpt": "Turismo regenerativo é deixar o lugar melhor do que você encontrou. Cinco viagens no Brasil em que o dinheiro fica com quem cuida da floresta, do rio e do mar.",
@@ -49,20 +64,5 @@ export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
     "imageLicense": "CC BY-SA 4.0",
     "imageLicenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
     "imageAdaptation": "Redimensionada para até 1600 px e comprimida; mantém a licença CC BY-SA 4.0"
-  },
-  {
-    "slug": "lua-de-mel-europa-lisboa-ou-paris",
-    "title": "Lua de mel na Europa: Lisboa ou Paris para quem não quer só museus",
-    "excerpt": "Lisboa ou Paris na lua de mel? Comparamos clima, ritmo, passeios fora dos museus e custos escondidos, com um roteiro que junta as duas cidades.",
-    "date": "2026-10-02",
-    "category": "Romance",
-    "author": "felipe-william",
-    "image": "https://media.anhanga.tur.br/images/blog/lua-de-mel-europa-lisboa-ou-paris.jpg",
-    "imageCreditStatus": "confirmed",
-    "imageCredit": "Marcus Holland-Moritz (mhx) / Wikimedia Commons",
-    "imageSource": "https://commons.wikimedia.org/wiki/File:Lisbon_Sunset_(16542598054).jpg",
-    "imageLicense": "CC BY-SA 2.0",
-    "imageLicenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
-    "imageAdaptation": "Recorte adaptado à capa · pôr do sol visto do Miradouro da Senhora do Monte, Lisboa, 2015"
   }
 ];
