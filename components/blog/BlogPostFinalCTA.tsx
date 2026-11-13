@@ -10,10 +10,13 @@ export const BlogPostFinalCTA: React.FC<BlogPostFinalCTAProps> = ({ post }) => {
     return (
         <div className="mt-24 bg-brand-dark rounded-[3rem] p-10 md:p-16 text-center shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 size-64 bg-brand-cyan/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-            <h2 className="text-3xl md:text-5xl font-black text-white mb-6 relative z-10">
+            {/* <p>, não <h2>: é chamada de conversão, não seção do artigo — o outline do post
+                não pode terminar num heading de CTA. `font-display` replica o que o reset
+                global de h1/h2 (src/index.css) aplicava; o peso vem de `font-black`. */}
+            <p className="font-display text-3xl md:text-5xl font-black text-white mb-6 relative z-10">
                 Gostou do conteúdo? <br />
                 <span className="text-brand-cyan">Sua viagem começa aqui.</span>
-            </h2>
+            </p>
             <p className="text-xl text-zinc-300 mb-10 max-w-2xl mx-auto relative z-10">
                 Transformamos essas inspirações em um roteiro real e exclusivo para você.
             </p>
