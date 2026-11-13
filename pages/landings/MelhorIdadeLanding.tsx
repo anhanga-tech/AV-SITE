@@ -4,6 +4,8 @@ import { LandingFAQ } from '@/components/LandingFAQ';
 import { BreadcrumbSchema } from '@/components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '@/components/schemas/FAQPageSchema';
 import { ServiceSchema } from '@/components/schemas/ServiceSchema';
+import { LandingBlogGuides } from '@/components/landings/shared/LandingBlogGuides';
+import { MELHOR_IDADE_BLOG_GUIDES } from '@/components/landings/melhor-idade/melhorIdadeBlogGuides';
 import {
   MelhorIdadeAdvisory,
   MelhorIdadeContent,
@@ -64,6 +66,10 @@ const MelhorIdadeLanding: React.FC = () => {
         <MelhorIdadeRhythm />
         <MelhorIdadeAdvisory />
         <MelhorIdadeContent />
+        <LandingBlogGuides
+          guides={MELHOR_IDADE_BLOG_GUIDES}
+          className="py-20 md:py-28 bg-white"
+        />
         <LandingFAQ items={MELHOR_IDADE_FAQ_ITEMS} />
         <MelhorIdadeFinalCta />
       </main>

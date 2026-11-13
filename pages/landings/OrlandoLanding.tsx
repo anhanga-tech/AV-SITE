@@ -8,6 +8,8 @@ import { ORLANDO_FAQ_ITEMS } from '../../components/landings/orlando/orlandoFaqI
 import { BreadcrumbSchema } from '../../components/schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../../components/schemas/FAQPageSchema';
 import { ServiceSchema } from '../../components/schemas/ServiceSchema';
+import { LandingBlogGuides } from '../../components/landings/shared/LandingBlogGuides';
+import { ORLANDO_BLOG_GUIDES } from '../../components/landings/orlando/orlandoBlogGuides';
 import { openContactModal } from '../../utils/contactForm';
 import './orlando.css';
 
@@ -78,6 +80,7 @@ const OrlandoLanding: React.FC = () => {
           </div>
         </div>
       </section>
+      <LandingBlogGuides guides={ORLANDO_BLOG_GUIDES} />
     </>
   );
 };
