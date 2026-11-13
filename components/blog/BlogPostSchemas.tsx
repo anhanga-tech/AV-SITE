@@ -5,7 +5,7 @@ import { BreadcrumbSchema } from '../schemas/BreadcrumbSchema';
 import { FAQPageSchema } from '../schemas/FAQPageSchema';
 import { PersonSchema } from '../schemas/PersonSchema';
 import { ORGANIZATION_ID } from '../schemas/schema-ids';
-import type { ArticleImageCredit } from '../schemas/ArticleSchema';
+import type { ArticleImageCredit } from '../schemas/article-image';
 import type { Author } from '../../data/blogData';
 import type { PostMeta } from '../../lib/mdx';
 import { getAuthorEntityId, getAuthorUrl } from '../../utils/author';

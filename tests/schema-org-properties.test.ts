@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { BlogPostSchemas } from '../components/blog/BlogPostSchemas';
-import { parseImageCreator } from '../components/schemas/ArticleSchema';
+import { parseImageCreator } from '../components/schemas/article-image';
 import { AUTHORS } from '../data/blogData';
 import { BLOG_POST_MANIFEST } from '../data/blogManifest';
 import { HeadContext, createHeadManager, renderHeadTags } from '../lib/head';
