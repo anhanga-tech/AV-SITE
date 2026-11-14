@@ -63,7 +63,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       }
     ],
     "slug": "roteiro-machu-picchu",
-    "readingTime": "16 min de leitura"
+    "readingTime": "17 min de leitura"
   },
   {
     "title": "Carnaval 2027 data: quando é, feriado e onde curtir",
