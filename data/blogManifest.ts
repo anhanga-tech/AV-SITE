@@ -66,6 +66,67 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "readingTime": "16 min de leitura"
   },
   {
+    "title": "Carnaval 2027 data: quando é, feriado e onde curtir",
+    "excerpt": "O Carnaval 2027 vai de sábado, 6, a terça, 9 de fevereiro. Veja se é feriado e as datas já confirmadas em Salvador, Rio, Recife e Olinda.",
+    "date": "2026-11-23",
+    "dateModified": "2026-11-23",
+    "author": "queila-oliveira",
+    "category": "Carnaval",
+    "image": "https://media.anhanga.tur.br/images/blog/carnaval-2027-data-capa.jpg",
+    "imageCreditStatus": "confirmed",
+    "imageCredit": "Foto: Raphael David / Agência Brasil, via Wikimedia Commons (CC BY 3.0 BR)",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Pequenos_sambistas_fecham_desfiles_na_Marqu%C3%AAs_de_Sapuca%C3%AD_18.jpg",
+    "imageLicense": "CC BY 3.0 BR",
+    "imageLicenseUrl": "https://creativecommons.org/licenses/by/3.0/br/",
+    "imageAdaptation": "Redimensionada para até 1600 px e comprimida · foto de arquivo do desfile das escolas mirins de 2015",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Carnaval",
+    "tags": [
+      "carnaval",
+      "carnaval-2027",
+      "feriado",
+      "salvador",
+      "rio-de-janeiro",
+      "recife",
+      "olinda"
+    ],
+    "seoTitle": "Carnaval 2027 data e feriado",
+    "seoDescription": "Carnaval 2027 data: de 6 a 9 de fevereiro, com Cinzas no dia 10. Veja se é feriado e o que já está confirmado em Salvador, Rio, Recife e Olinda.",
+    "faq": [
+      {
+        "question": "Quando será o Carnaval em 2027?",
+        "answer": "O Carnaval de 2027 vai do sábado, 6 de fevereiro, à terça-feira, 9 de fevereiro. A Quarta-feira de Cinzas cai em 10 de fevereiro. Em Salvador, a abertura oficial está prevista para a quinta-feira, 4 de fevereiro."
+      },
+      {
+        "question": "O Carnaval 2027 cai quando?",
+        "answer": "Cai no começo de fevereiro: sábado 6/2, domingo 7/2, segunda 8/2 e terça 9/2, com Quarta-feira de Cinzas em 10/2. A data muda todo ano porque a terça de Carnaval fica 47 dias antes da Páscoa, que em 2027 é em 28 de março."
+      },
+      {
+        "question": "Carnaval 2027 é feriado?",
+        "answer": "Não é feriado nacional. No governo federal, segunda e terça de Carnaval costumam ser ponto facultativo, mas a portaria de 2027 ainda não foi publicada até 13/11/2026. Alguns estados e municípios têm feriado por lei própria, e empresas privadas seguem a lei local, a convenção coletiva ou o acordo com o empregado."
+      },
+      {
+        "question": "Quando são os desfiles do Rio em 2027 e quanto custa o ingresso?",
+        "answer": "O Grupo Especial desfila no Sambódromo no domingo 7/2, na segunda 8/2 e na terça 9/2. O Desfile das Campeãs é no sábado 13/2. Na venda oficial da Liesa pela Ticketmaster, a arquibancada especial avulsa sai a R$ 250 por noite (meia R$ 125) e o Passaporte Rio Carnaval, para as três noites, a R$ 499. A venda é por etapas e até o esgotamento."
+      },
+      {
+        "question": "Quando começa o Carnaval de Salvador 2027?",
+        "answer": "O prefeito Bruno Reis anunciou que a abertura oficial será na quinta-feira seguinte à Festa de Iemanjá, que em 2027 cai na terça, 2 de fevereiro. Ou seja, quinta-feira, 4 de fevereiro de 2027. A programação oficial de circuitos e atrações ainda não foi publicada até 13/11/2026."
+      },
+      {
+        "question": "Quando sai o Galo da Madrugada em 2027?",
+        "answer": "No sábado de Zé Pereira, 6 de fevereiro de 2027, a partir das 9h, com concentração no Forte das Cinco Pontas, no centro do Recife. O tema de 2027 é \"Ao Canto do Galo, a Espora é a Lança\", em homenagem ao caboclo de lança do maracatu rural."
+      },
+      {
+        "question": "Vale a pena comprar pacote de Carnaval 2027?",
+        "answer": "Vale quando o pacote cobre os dias certos da cidade escolhida e deixa claro o que está incluído: aéreo, hospedagem com regra de cancelamento, traslados e, se for o caso, ingresso oficial do Sambódromo ou bloco em Salvador. Compare o que cada proposta entrega, e não só o valor final."
+      }
+    ],
+    "slug": "carnaval-2027-data",
+    "readingTime": "13 min de leitura"
+  },
+  {
     "title": "Natal Luz Gramado 2026: data, programação e ingressos",
     "excerpt": "O Natal Luz Gramado 2026 vai de 22 de outubro a 17 de janeiro. Veja a programação, o preço de cada ingresso e o que é gratuito na Serra Gaúcha.",
     "date": "2026-11-16",
@@ -1913,7 +1974,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "seoTitle": "América do Sul: Destinos Imperdíveis",
     "excerpt": "Argentina, Chile, Peru, Colômbia e Bolívia: o que cada destino oferece ao viajante brasileiro, com documentação, custos e como chegar de verdade.",
     "date": "2026-04-29",
-    "dateModified": "2026-09-22",
+    "dateModified": "2026-11-13",
     "author": "felipe-william",
     "category": "Destinos",
     "image": "https://media.anhanga.tur.br/images/destinations/cartagena.jpg",
@@ -2109,7 +2170,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "featured": false,
     "showChatCTA": true,
     "chatCTADestination": "Carnaval",
-    "historicalNotice": "Este artigo foi publicado para o Carnaval 2026. As informações de datas e eventos refletem aquela edição.",
+    "historicalNotice": "Este artigo foi publicado para o Carnaval 2026. As informações de datas e eventos refletem aquela edição. Para as datas de 2027, veja o [guia do Carnaval 2027](/blog/carnaval-2027-data/).",
     "tags": [
       "carnaval",
       "brasil",
