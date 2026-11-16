@@ -10,6 +10,47 @@ export function createRequestId(): string {
     return `req_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
+/**
+ * Reads and parses a JSON body, refusing anything above `maxBytes`.
+ *
+ * Security: `request.json()` buffers the whole body before any schema runs, so
+ * an unauthenticated caller could make every request cost a multi-MB parse.
+ * The cap is enforced on the declared Content-Length first and again while
+ * streaming (a client can lie or use chunked encoding). Throws on oversize or
+ * invalid JSON, so existing `try { request.json() } catch` call sites keep
+ * their 400 path unchanged.
+ */
+export async function readJsonBodyWithLimit(request: Request, maxBytes: number): Promise<unknown> {
+    const declared = Number(request.headers.get('content-length'));
+    if (Number.isFinite(declared) && declared > maxBytes) {
+        throw new RangeError('PAYLOAD_TOO_LARGE');
+    }
+
+    const reader = request.body?.getReader();
+    if (!reader) throw new SyntaxError('EMPTY_BODY');
+
+    const chunks: Uint8Array[] = [];
+    let received = 0;
+    for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        received += value.byteLength;
+        if (received > maxBytes) {
+            await reader.cancel().catch(() => undefined);
+            throw new RangeError('PAYLOAD_TOO_LARGE');
+        }
+        chunks.push(value);
+    }
+
+    const merged = new Uint8Array(received);
+    let offset = 0;
+    for (const chunk of chunks) {
+        merged.set(chunk, offset);
+        offset += chunk.byteLength;
+    }
+    return JSON.parse(new TextDecoder().decode(merged));
+}
+
 const DEFAULT_ALLOWED_ORIGIN = 'https://www.anhanga.tur.br';
 const LOCAL_ORIGIN_HOSTNAMES = new Set(['localhost', '127.0.0.1', '[::1]']);
 

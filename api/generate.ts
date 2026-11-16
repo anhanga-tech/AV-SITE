@@ -1,6 +1,6 @@
 import type { ContentListUnion } from '@google/genai';
 import { checkRateLimit } from '../lib/rate-limit';
-import { buildCorsHeaders, buildRateLimitHeaders as buildStandardRateLimitHeaders, getClientIP } from '../lib/network';
+import { buildCorsHeaders, buildRateLimitHeaders as buildStandardRateLimitHeaders, getClientIP, readJsonBodyWithLimit } from '../lib/network';
 import { logger } from '../lib/logger';
 import { budgetTool } from '../lib/ai/tools';
 import { SYSTEM_INSTRUCTION } from '../lib/ai/prompt';
@@ -28,6 +28,8 @@ import {
 import { GenerateRequestSchema } from '../lib/schemas/generate';
 
 // Configuration
+// Upper bound on the raw body (MAX_CONTENTS_TOTAL_LENGTH is 200k chars; JSON escapes/UTF-8 can inflate it).
+const MAX_REQUEST_BODY_BYTES = 1_048_576;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
 const RATE_LIMIT_MAX_REQUESTS = 10; // Max 10 requests per minute per IP
 const GEMINI_3_DEFAULT_TEMPERATURE = 1.0;
@@ -294,7 +296,7 @@ async function parseGenerateContents(
 ): Promise<unknown[] | Response> {
     let body: unknown;
     try {
-        body = await request.json();
+        body = await readJsonBodyWithLimit(request, MAX_REQUEST_BODY_BYTES);
     } catch {
         return buildJsonResponse({ error: 'VALIDATION_ERROR', details: { formErrors: ['Corpo JSON inválido'], fieldErrors: {} } }, 400, corsHeaders);
     }
