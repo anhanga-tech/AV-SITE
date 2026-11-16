@@ -5,7 +5,7 @@
  * cadastro existe.
  */
 import { z } from 'zod';
-import { buildCorsHeaders, buildJsonResponse, createRequestId, getClientIP } from '../lib/network';
+import { buildCorsHeaders, buildJsonResponse, createRequestId, getClientIP, readJsonBodyWithLimit } from '../lib/network';
 import { checkRateLimit } from '../lib/rate-limit';
 import { isValidEmail } from '../lib/lead-logic';
 import { logger } from '../lib/logger';
@@ -19,6 +19,9 @@ import {
 import { ADS_NOTICE_VERSION, EMAIL_NOTICE_VERSION } from '../lib/consent-notices';
 import { ConsentLedgerUnavailable, emailSubjectKey, getConsentStore } from '../lib/consent-store';
 import { getOdooConfig, openOdooSession } from '../services/odoo';
+
+// Real payloads are < 1 KB; 8 KB leaves headroom without letting junk be parsed.
+const MAX_BODY_BYTES = 8_192;
 
 const BodySchema = z.object({
     purpose: z.enum(['ads_measurement', 'email_marketing']),
@@ -59,7 +62,7 @@ export default async function handler(request: Request): Promise<Response> {
 
     let raw: unknown;
     try {
-        raw = await request.json();
+        raw = await readJsonBodyWithLimit(request, MAX_BODY_BYTES);
     } catch {
         return json({ ok: false, requestId, code: 'VALIDATION_ERROR', error: 'JSON inválido.' }, 400, requestId, cors);
     }

@@ -15,7 +15,7 @@
  * historical reasons (pre cut-over, every form posted to n8n); `ODOO_ERROR:...`
  * is matched the same way via the `errorPattern` option each handler supplies.
  */
-import { buildCorsHeaders, buildJsonResponse, buildRateLimitHeaders, createRequestId, getClientIP } from './network';
+import { buildCorsHeaders, buildJsonResponse, buildRateLimitHeaders, createRequestId, getClientIP, readJsonBodyWithLimit } from './network';
 import { checkRateLimit } from './rate-limit';
 import { detectBot } from './bot-detection';
 import { logger } from './logger';
@@ -25,6 +25,8 @@ import { logger } from './logger';
 const N8N_WEBHOOK_ERROR_PATTERN = /^N8N_WEBHOOK_ERROR:(\d+):(.*)$/s;
 
 const DEFAULT_DETAIL_MAX_LENGTH = 600;
+// Public form payloads are a few KB; capped before parse so junk bodies are never buffered whole.
+const MAX_SUBMIT_BODY_BYTES = 65_536;
 
 /**
  * Collapses provider error detail into a single, length-bounded line safe for
@@ -308,7 +310,7 @@ export function createSubmitHandler<TData, TPayload = unknown>(
 
         let rawBody: unknown;
         try {
-            rawBody = await request.json();
+            rawBody = await readJsonBodyWithLimit(request, MAX_SUBMIT_BODY_BYTES);
         } catch {
             return buildJsonResponse(
                 { ok: false, requestId, code: 'VALIDATION_ERROR', error: options.parse.invalidJsonError },
