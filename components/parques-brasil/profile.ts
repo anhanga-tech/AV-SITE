@@ -79,7 +79,8 @@ export function matchParks(profile: ParquesProfile, slugs: readonly string[]): s
   return slugs.filter((slug) => {
     const fit = PARK_FIT[slug];
     if (!fit) return false;
-    const agesOk = profile.ages.every((age) => fit.ages.includes(age));
+    const fitAges = new Set(fit.ages);
+    const agesOk = profile.ages.every((age) => fitAges.has(age));
     const daysOk = profile.days === null || fit.days.includes(profile.days);
     return agesOk && daysOk;
   });
@@ -88,7 +89,8 @@ export function matchParks(profile: ParquesProfile, slugs: readonly string[]): s
 /** Texto que vai para os campos "Idade das crianças" e "Quantos dias" do modal. */
 export function profileToTripDetails(profile: ParquesProfile): { childrenAges?: string; tripDays?: string } {
   const details: { childrenAges?: string; tripDays?: string } = {};
-  const ages = AGE_OPTIONS.filter((option) => profile.ages.includes(option.value)).map((option) => option.detail);
+  const chosen = new Set(profile.ages);
+  const ages = AGE_OPTIONS.filter((option) => chosen.has(option.value)).map((option) => option.detail);
   if (ages.length > 0) details.childrenAges = ages.join(', ');
   const days = DAYS_OPTIONS.find((option) => option.value === profile.days);
   if (days) details.tripDays = days.label;
