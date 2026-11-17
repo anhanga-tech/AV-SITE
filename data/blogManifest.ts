@@ -42,7 +42,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "Preciso pagar gorjeta no cruzeiro?",
-        "answer": "Na Costa, não. A Tarifa de Serviço de Hotelaria é obrigatória, já faz parte do preço e não é gorjeta. A companhia não trabalha com sistema de gorjetas e os tripulantes não podem receber gorjeta. Bar e room service têm acréscimo de 15%, pago no fim do cruzeiro."
+        "answer": "Na Costa, não. A Tarifa de Serviço de Hotelaria é obrigatória e não é gorjeta. Ela costuma vir incluída no preço, mas em tarifas promocionais, como Black Friday, a Costa pode deixá-la de fora e cobrar por dia, a bordo. A companhia não trabalha com sistema de gorjetas e os tripulantes não podem receber gorjeta. Bar e room service têm acréscimo de 15%, pago no fim do cruzeiro."
       },
       {
         "question": "Cruzeiro é uma boa opção para idosos?",
@@ -50,7 +50,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "Que documento preciso para embarcar em um cruzeiro?",
-        "answer": "Na Costa, em cruzeiro só pelo Brasil, o adulto brasileiro embarca com RG em bom estado ou outro documento original com foto válido no país, como a CNH. Se o roteiro passa por Argentina ou Uruguai, valem só o RG físico original em bom estado, que a Costa recomenda ter sido emitido há menos de 10 anos, ou o passaporte válido, que evita discussão no embarque; CNH e carteiras funcionais não são aceitas."
+        "answer": "Na Costa, em cruzeiro só pelo Brasil, vale o RG emitido há menos de 10 anos ou outro documento oficial com foto, como a CNH. Em roteiros que passam pela Argentina ou pelo Uruguai, a Costa exige RG original em bom estado, emitido há menos de 10 anos, ou passaporte válido. CNH e carteiras funcionais não valem."
       },
       {
         "question": "O que levar no cruzeiro?",
@@ -655,7 +655,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "Preciso de passaporte para cruzeiro para Buenos Aires e Montevidéu?",
-        "answer": "Brasileiro pode entrar na Argentina e no Uruguai com a carteira de identidade (RG) física e em bom estado. A versão digital não é aceita na fronteira. A Costa recomenda RG emitido há menos de 10 anos para roteiros pelo Mercosul; se o seu é mais antigo, leve o passaporte, que evita discussão no embarque e também simplifica o desembarque nos portos."
+        "answer": "Brasileiro pode entrar na Argentina e no Uruguai com a carteira de identidade (RG) física e em bom estado. A versão digital não é aceita na fronteira. Em roteiros que passam pela Argentina ou pelo Uruguai, a Costa exige RG original em bom estado, emitido há menos de 10 anos, ou passaporte válido. CNH e carteiras funcionais não valem."
       }
     ],
     "slug": "cruzeiros-costa-brasileira-2026-2027",
