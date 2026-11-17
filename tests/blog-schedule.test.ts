@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import os from 'node:os';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 
 import { isFuturePost, shouldHideFuturePosts, todayInSaoPaulo } from '../lib/blog-schedule.js';
 import { collectBlogPostMeta, writeBlogMarkdown } from '../lib/blog-manifest.ts';
@@ -37,6 +37,21 @@ test('todayInSaoPaulo converte UTC para o dia civil de São Paulo (UTC-3)', () =
   assert.equal(todayInSaoPaulo(new Date('2026-07-14T02:59:00Z')), '2026-07-13');
   assert.equal(todayInSaoPaulo(new Date('2026-07-14T03:00:00Z')), '2026-07-14');
   assert.equal(todayInSaoPaulo(new Date('2026-07-14T12:00:00Z')), '2026-07-14');
+});
+
+test('todayInSaoPaulo mantém o dia anterior entre 21h e 24h em Brasília (UTC já virou o dia)', () => {
+  // 22h30 de 16/11 em Brasília; em UTC já é 17/11.
+  assert.equal(todayInSaoPaulo(new Date('2026-11-17T01:30:00Z')), '2026-11-16');
+  assert.equal(todayInSaoPaulo(new Date('2026-11-17T00:00:00Z')), '2026-11-16');
+  assert.equal(todayInSaoPaulo(new Date('2026-11-17T02:59:59Z')), '2026-11-16');
+  assert.equal(todayInSaoPaulo(new Date('2026-11-17T03:00:00Z')), '2026-11-17');
+});
+
+test('update-post-dates.mjs calcula "hoje" com todayInSaoPaulo, não com UTC', async () => {
+  const source = await readFile(new URL('../scripts/update-post-dates.mjs', import.meta.url), 'utf8');
+  assert.match(source, /import \{ todayInSaoPaulo \} from '\.\.\/lib\/blog-schedule\.js';/);
+  assert.match(source, /const today = todayInSaoPaulo\(\);/);
+  assert.doesNotMatch(source, /toISOString\(\)\.slice\(0, 10\)/);
 });
 
 test('isFuturePost compara datas ISO em relação a hoje', () => {
