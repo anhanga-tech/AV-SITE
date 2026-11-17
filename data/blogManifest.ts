@@ -1593,7 +1593,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Seguro viagem internacional: quando é obrigatório, quando vale a pena e quanto custa em 2026",
     "excerpt": "Saiba em quais países o seguro viagem é obrigatório, quanto custa por dia, qual cobertura contratar e os erros comuns que podem arruinar suas férias.",
     "date": "2026-06-10",
-    "dateModified": "2026-09-14",
+    "dateModified": "2026-11-17",
     "author": "queila-oliveira",
     "category": "Planejamento",
     "image": "https://media.anhanga.tur.br/images/blog/seguro-viagem-2026.jpg",
@@ -1636,10 +1636,14 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       {
         "question": "O ETIAS substitui o seguro viagem na Europa?",
         "answer": "Não. O ETIAS é uma autorização eletrônica com lançamento previsto para o último trimestre de 2026; a data exata ainda não foi divulgada. Depois haverá pelo menos seis meses de transição e pelo menos mais seis meses de graça, com regras diferentes. O seguro é um documento separado e sua exigência de entrada depende do destino."
+      },
+      {
+        "question": "Seguro viagem para idoso tem limite de idade?",
+        "answer": "Tem, e ele muda por seguradora e por plano. Na Porto Seguro, por exemplo, dá para contratar até 90 anos em viagens de até 120 dias, e até 70 anos nos planos de longa permanência. No seguro internacional, a crise de doença preexistente em urgência ou emergência tem cobertura de estabilização garantida pela SUSEP, mas a continuidade do tratamento não entra."
       }
     ],
     "slug": "seguro-viagem-internacional-2026",
-    "readingTime": "9 min de leitura"
+    "readingTime": "14 min de leitura"
   },
   {
     "title": "Férias de Julho 2026: 10 Destinos Para Reservar nos Próximos 15 Dias",
