@@ -47,8 +47,11 @@ beforeEach(() => {
   repo = mkdtempSync(path.join(tmpdir(), 'update-post-dates-'));
   mkdirSync(path.join(repo, 'content', 'blog'), { recursive: true });
   mkdirSync(path.join(repo, 'scripts'), { recursive: true });
+  mkdirSync(path.join(repo, 'lib'), { recursive: true });
   copyFileSync(path.join(SCRIPTS, 'update-post-dates.mjs'), path.join(repo, 'scripts', 'update-post-dates.mjs'));
   copyFileSync(path.join(SCRIPTS, 'post-date-diff.mjs'), path.join(repo, 'scripts', 'post-date-diff.mjs'));
+  // O script importa ../lib/blog-schedule.js; o fixture precisa da mesma árvore relativa.
+  copyFileSync(path.join(SCRIPTS, '..', 'lib', 'blog-schedule.js'), path.join(repo, 'lib', 'blog-schedule.js'));
   // O gerador real depende do repo inteiro; aqui só interessa que o script o chame.
   write('scripts/generate-blog-manifest.ts', '// stub\n');
 
