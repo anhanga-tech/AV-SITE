@@ -87,3 +87,13 @@ test('blogPostLastmod uses dateModified ?? date, capped at today', () => {
   assert.equal(blogPostLastmod({ date: '2026-10-01', dateModified: '2026-10-20' }, '2026-11-09'), '2026-10-20');
   assert.equal(blogPostLastmod({ date: '2026-10-01', dateModified: '2026-12-01' }, '2026-11-09'), '2026-11-09');
 });
+
+test('lastmod dos posts reais é dateModified ?? date, e nenhum post anuncia revisão anterior à publicação', async () => {
+  const { BLOG_POST_MANIFEST } = await import('../data/blogManifest.ts');
+  const today = '2999-01-01'; // sem teto: aqui interessa só a regra dateModified ?? date
+
+  for (const post of BLOG_POST_MANIFEST) {
+    assert.equal(blogPostLastmod(post, today), post.dateModified ?? post.date, post.slug);
+    if (post.dateModified) assert.ok(post.dateModified >= post.date, `${post.slug}: dateModified < date`);
+  }
+});

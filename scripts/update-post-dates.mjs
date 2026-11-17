@@ -1,8 +1,14 @@
 /**
- * Atualiza `dateModified` no frontmatter de posts MDX modificados e
+ * Atualiza `dateModified` no frontmatter de posts MDX cujo CORPO mudou e
  * regenera o blogManifest.ts.
  *
- * Usado pelo pre-commit hook e pelo script `pnpm update:dates`.
+ * Usado pelo pre-commit hook e pelo script `pnpm update:dates` (`--all`).
+ * Os dois modos usam o mesmo critério (`shouldBumpDateModified`): só o corpo
+ * conta. A diferença é a origem da comparação:
+ *  - hook (sem args): índice (stage) vs. HEAD, só nos MDX staged;
+ *  - `--all`: árvore de trabalho vs. HEAD, em todos os MDX rastreados.
+ * `--all` NÃO é "pôr a data de hoje em todo mundo": numa árvore sem mudança de
+ * corpo ele não reescreve nenhuma data (isso inflava o `lastmod` do sitemap).
  */
 
 import { spawnSync } from 'node:child_process';
@@ -27,11 +33,16 @@ function readGitVersion(rev, file) {
   return result.status === 0 ? result.stdout : null;
 }
 
-// Compara o que vai para o commit (stage), não a árvore de trabalho com edições não staged.
+// Modo hook: compara o que vai para o commit (stage), não a árvore de trabalho com edições não staged.
 function bodyChangedInCommit(file) {
   const staged = readGitVersion('', file);
   if (staged === null) return true;
   return shouldBumpDateModified(readGitVersion('HEAD', file), staged);
+}
+
+// Modo --all: compara a árvore de trabalho com o HEAD (arquivo novo/sem HEAD = bump).
+function bodyChangedInWorkingTree(file, content) {
+  return shouldBumpDateModified(readGitVersion('HEAD', file), content);
 }
 
 function getStagedMdxFiles() {
@@ -73,8 +84,9 @@ if (!processAll) {
 for (const file of files) {
   const content = readFileSync(file, 'utf8');
 
-  // No modo hook, só o corpo conta como atualização; o --all segue forçando o bump.
-  if (!processAll && !bodyChangedInCommit(file)) continue;
+  // Nos dois modos só o corpo conta como atualização; --all compara a árvore de trabalho com o HEAD.
+  const bodyChanged = processAll ? bodyChangedInWorkingTree(file, content) : bodyChangedInCommit(file);
+  if (!bodyChanged) continue;
 
   // Extrai a data de publicação original
   const dateMatch = content.match(/^date:\s*["']?(\d{4}-\d{2}-\d{2})["']?/m);
