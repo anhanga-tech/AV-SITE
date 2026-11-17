@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildCorsHeaders, buildJsonResponse, buildRateLimitHeaders, getClientIP } from '../lib/network.ts';
+import { buildCorsHeaders, buildJsonResponse, buildRateLimitHeaders, getClientIP, readJsonBodyWithLimit } from '../lib/network.ts';
 
 test('getClientIP uses Cloudflare connecting IP before spoofable headers', () => {
     const request = new Request('https://example.com/api/generate', {
@@ -134,4 +134,35 @@ test('buildCorsHeaders exposes RateLimit-* headers to browser clients', () => {
     assert.match(headers['Access-Control-Expose-Headers'], /\bRateLimit-Limit\b/);
     assert.match(headers['Access-Control-Expose-Headers'], /\bRateLimit-Remaining\b/);
     assert.match(headers['Access-Control-Expose-Headers'], /\bRateLimit-Reset\b/);
+});
+
+test('readJsonBodyWithLimit parses a body under the cap', async () => {
+    const request = new Request('https://example.com', { method: 'POST', body: JSON.stringify({ ok: 1 }) });
+    assert.deepEqual(await readJsonBodyWithLimit(request, 100), { ok: 1 });
+});
+
+test('readJsonBodyWithLimit rejects a declared Content-Length above the cap', async () => {
+    const request = new Request('https://example.com', {
+        method: 'POST',
+        headers: { 'content-length': '500' },
+        body: '{}',
+    });
+    await assert.rejects(() => readJsonBodyWithLimit(request, 100), /PAYLOAD_TOO_LARGE/);
+});
+
+test('readJsonBodyWithLimit rejects an oversized body that omits Content-Length', async () => {
+    const stream = new ReadableStream({
+        start(controller) {
+            controller.enqueue(new TextEncoder().encode('{"a":"' + 'x'.repeat(200)));
+            controller.enqueue(new TextEncoder().encode('"}'));
+            controller.close();
+        },
+    });
+    const request = new Request('https://example.com', { method: 'POST', body: stream, duplex: 'half' } as RequestInit);
+    await assert.rejects(() => readJsonBodyWithLimit(request, 100), /PAYLOAD_TOO_LARGE/);
+});
+
+test('readJsonBodyWithLimit still throws on invalid JSON', async () => {
+    const request = new Request('https://example.com', { method: 'POST', body: '{nope' });
+    await assert.rejects(() => readJsonBodyWithLimit(request, 100), SyntaxError);
 });
