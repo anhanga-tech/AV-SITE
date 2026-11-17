@@ -14,8 +14,10 @@
 import { spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { blogSourcesOutsideStage, shouldBumpDateModified } from './post-date-diff.mjs';
+import { todayInSaoPaulo } from '../lib/blog-schedule.js';
 
-const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+// "YYYY-MM-DD" no fuso de São Paulo: em UTC, entre 21h e 24h em Brasília o dia já virou.
+const today = todayInSaoPaulo();
 
 // Em modo hook (sem args) lê apenas arquivos staged; com --all processa todos os MDX.
 const processAll = process.argv.includes('--all');
