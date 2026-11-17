@@ -62,7 +62,8 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       }
     ],
     "slug": "primeiro-cruzeiro",
-    "readingTime": "17 min de leitura"
+    "readingTime": "14 min de leitura",
+    "faqMissingFromBody": true
   },
   {
     "title": "Roteiro Machu Picchu: Peru em 7 a 10 dias",
