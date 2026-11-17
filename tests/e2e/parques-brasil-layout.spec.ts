@@ -165,13 +165,33 @@ test.describe('layout do hub /parques-brasil', () => {
     await expect(dialog.getByText('Parques do Brasil · Beach Park', { exact: true })).toBeVisible();
   });
 
-  test('o hero tem CTA visível na primeira dobra do mobile', async ({ page }) => {
+  // A ação da primeira dobra agora é o seletor "Quem vai?": o primeiro toque
+  // já é uma resposta sobre a família. O botão do seletor vem logo abaixo.
+  test('o hero mostra o seletor "Quem vai?" na primeira dobra do mobile', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/parques-brasil/');
 
+    await expect(page.getByRole('button', { name: 'Crianças até 6 anos' })).toBeInViewport();
     const heroCta = page.getByRole('button', { name: 'Quero ajuda para escolher' });
-    await expect(heroCta).toBeInViewport();
     await heroCta.click();
+    await expect(page.getByRole('dialog', { name: 'Fale com um consultor' })).toBeVisible();
+  });
+
+  test('no celular, a barra de orçamento aparece depois do hero e some no CTA final', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('/parques-brasil/');
+
+    const bar = page.getByRole('button', { name: 'Quero um orçamento' });
+    await expect(bar).toHaveCount(0);
+
+    await page.locator('#parque-hopi-hari').scrollIntoViewIfNeeded();
+    await expect(bar).toBeVisible();
+
+    await page.locator('#parques-cta').scrollIntoViewIfNeeded();
+    await expect(bar).toHaveCount(0);
+
+    await page.locator('#parque-beach-park').scrollIntoViewIfNeeded();
+    await bar.click();
     await expect(page.getByRole('dialog', { name: 'Fale com um consultor' })).toBeVisible();
   });
 });

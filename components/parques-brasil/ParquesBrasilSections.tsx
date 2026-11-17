@@ -66,7 +66,9 @@ export const ParquesHero: React.FC = () => (
         <h1 className="mt-4 font-display text-4xl sm:text-5xl font-black leading-[0.95] tracking-tight text-anhanga-dark">
           Cinco parques, e só um serve para a sua família
         </h1>
-        <p className="mt-6 text-lg leading-relaxed text-zinc-700 max-w-[65ch]">
+        {/* text-base no celular: o primeiro chip do "Quem vai?" precisa caber
+            na primeira dobra de 375x667 (e2e de layout). */}
+        <p className="mt-6 text-base leading-relaxed text-zinc-700 max-w-[65ch] sm:text-lg">
           Beto Carrero, Hopi Hari, Thermas dos Laranjais, Beach Park e Hot Park resolvem
           problemas diferentes. A idade dos seus filhos, quantos dias você tem e a época do
           ano importam mais do que qualquer ranking. Conte quem vai e a gente mostra
