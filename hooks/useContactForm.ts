@@ -12,7 +12,7 @@ import { extractUtms, normalizeLeadTracking } from '../lib/tracking-normalizatio
 import { readAdsConsentReceipt } from '../lib/consent';
 import type { ContactFormFields, SubmitContactRequest, SubmitContactResponse } from '../types/contactCapture';
 import type { LeadTracking } from '../types/leadCapture';
-import { appendTripDetailsToMessage, type ContactModalOptions } from '../utils/contactForm';
+import { appendTripDetailsToMessage, type ContactModalOptions, type ContactTripDetails } from '../utils/contactForm';
 import { pushFormAnalyticsEvent } from '../utils/formAnalytics';
 import { pushGenerateLeadConversionEvent } from '../utils/generate-lead-analytics';
 import { trackTraksWhatsAppHandoff } from '../utils/traks';
@@ -138,6 +138,17 @@ export function useContactForm(options: ContactModalOptions = {}) {
         },
         [formId],
     );
+
+    // Preenche sem disparar form_start: quem preencheu foi a página (perfil do
+    // "Quem vai?" no hub de parques), não a pessoa digitando no modal.
+    const prefillTripDetails = useCallback((details: ContactTripDetails | undefined) => {
+        if (!details) return;
+        setFieldsState((prev) => ({
+            ...prev,
+            childrenAges: details.childrenAges?.slice(0, 60) ?? prev.childrenAges,
+            tripDays: details.tripDays?.slice(0, 60) ?? prev.tripDays,
+        }));
+    }, []);
 
     const reset = useCallback(() => {
         activeHandoffRef.current?.cancel();
@@ -373,5 +384,5 @@ export function useContactForm(options: ContactModalOptions = {}) {
         [fields, options.askTripDetails, options.destination, options.message, options.source, getAntiBotFields, formId],
     );
 
-    return { fields, setField, canAttemptSubmit, isSubmitting, error, fieldErrors, submitted, lastAction, whatsappUrl, submit, reset, honeypotProps };
+    return { fields, setField, canAttemptSubmit, isSubmitting, error, fieldErrors, submitted, lastAction, whatsappUrl, submit, reset, prefillTripDetails, honeypotProps };
 }

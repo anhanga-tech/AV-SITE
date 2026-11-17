@@ -20,8 +20,11 @@ const ContactModal: React.FC = () => {
     const closeButtonRef = useRef<HTMLButtonElement>(null);
     const previousBodyOverflow = useRef<string>('');
 
-    const { fields, setField, canAttemptSubmit, isSubmitting, error, fieldErrors, submitted, lastAction, whatsappUrl, submit, reset, honeypotProps } =
+    const { fields, setField, canAttemptSubmit, isSubmitting, error, fieldErrors, submitted, lastAction, whatsappUrl, submit, reset, prefillTripDetails, honeypotProps } =
         useContactForm(options);
+
+    const prefillRef = useRef(prefillTripDetails);
+    useEffect(() => { prefillRef.current = prefillTripDetails; });
 
     const close = useCallback(() => {
         setIsOpen(false);
@@ -33,7 +36,9 @@ const ContactModal: React.FC = () => {
 
     useEffect(() => {
         const handleOpen = (event: Event) => {
-            setOptions((event as CustomEvent<ContactModalOptions>).detail ?? {});
+            const detail = (event as CustomEvent<ContactModalOptions>).detail ?? {};
+            setOptions(detail);
+            prefillRef.current(detail.tripDetails);
             setIsOpen(true);
         };
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, MapPin, BadgeCheck, CalendarClock, Clock, HardHat, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowRight, MapPin, BadgeCheck, CalendarClock, Check, Clock, HardHat, ShieldCheck, Sparkles } from 'lucide-react';
 import {
   BOOKABLE_PARKS,
   CREDENTIALED_PARKS,
@@ -12,7 +12,11 @@ import {
 } from './constants';
 import { openParquesContact } from './contact';
 import { CacauWaitlist } from './CacauWaitlist';
+import { PARQUES_FINAL_CTA_ID, PARQUES_HERO_ID } from './MobileQuoteBar';
 import { ParkPhoto } from './ParkPhoto';
+import { useParquesProfile } from './ProfileContext';
+import { ProfileSelector } from './ProfileSelector';
+import { matchParks } from './profile';
 
 /*
   Hierarquia visual deliberada (DESIGN.md proíbe cards idênticos em grade):
@@ -26,9 +30,22 @@ import { ParkPhoto } from './ParkPhoto';
 */
 
 interface SectionProps {
-  onCtaClick: () => void;
   whatsappUrl: string;
 }
+
+/** Slugs que encaixam no perfil do "Quem vai?"; vazio enquanto ninguém respondeu. */
+function useMatchedSlugs(): Set<string> {
+  const { profile } = useParquesProfile();
+  return new Set(matchParks(profile, BOOKABLE_PARKS.map((park) => park.slug)));
+}
+
+// Mesmo selo nos dois tipos de card. Céu Tinta, não Âmbar: é destaque, não ação.
+const MatchBadge: React.FC = () => (
+  <span className="inline-flex items-center gap-1.5 rounded-full bg-anhanga-light px-3 py-1 text-sm font-semibold text-anhanga-actionInk">
+    <Check className="size-4" aria-hidden="true" />
+    Combina com a sua família
+  </span>
+);
 
 const HERO_PARKS = HERO_PARK_SLUGS.map((slug) => PARKS.find((park) => park.slug === slug)).filter(
   (park): park is Park => Boolean(park),
@@ -38,10 +55,10 @@ const HERO_PARKS = HERO_PARK_SLUGS.map((slug) => PARKS.find((park) => park.slug 
 // é `fixed` com 72px, e qualquer coisa acima disso some atrás dele no topo da
 // página — o eyebrow ficava coberto em mobile.
 export const ParquesHero: React.FC = () => (
-  <section className="bg-anhanga-light pt-32 pb-16 sm:pt-36 sm:pb-24">
+  <section id={PARQUES_HERO_ID} className="bg-anhanga-light pt-32 pb-16 sm:pt-36 sm:pb-24">
     {/* max-w-5xl em todas as seções: larguras diferentes deslocam o eixo
         esquerdo entre uma seção e outra, e a coluna "pula" ao rolar. */}
-    <div className="container mx-auto grid max-w-5xl items-center gap-10 px-6 lg:grid-cols-[1.15fr_1fr]">
+    <div className="container mx-auto grid max-w-5xl items-start gap-10 px-6 lg:grid-cols-[1.15fr_1fr]">
       <div>
         <p className="font-display text-xs font-black uppercase tracking-[0.1em] text-anhanga-actionDark">
           Parques do Brasil
@@ -52,18 +69,12 @@ export const ParquesHero: React.FC = () => (
         <p className="mt-6 text-lg leading-relaxed text-zinc-700 max-w-[65ch]">
           Beto Carrero, Hopi Hari, Thermas dos Laranjais, Beach Park e Hot Park resolvem
           problemas diferentes. A idade dos seus filhos, quantos dias você tem e a época do
-          ano importam mais do que qualquer ranking. Abaixo está o que separa um do outro —
-          e onde a gente emite ingresso oficial.
+          ano importam mais do que qualquer ranking. Conte quem vai e a gente mostra
+          o que separa um do outro.
         </p>
-        {/* Quem já chega decidido não precisa rolar seis seções até o CTA final. */}
-        <button
-          type="button"
-          onClick={() => openParquesContact()}
-          className="mt-8 inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-anhanga-dark px-6 py-3 font-semibold text-white transition-transform duration-150 ease-out hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action sm:w-auto"
-        >
-          Quero ajuda para escolher
-          <ArrowRight className="size-4" aria-hidden="true" />
-        </button>
+        {/* O mecanismo que o h1 promete. O botão dele é também o CTA de quem já
+            chega decidido: sem seleção, abre o modal sem parque. */}
+        <ProfileSelector />
       </div>
 
       {/* Mosaico: a página pede para escolher entre parques sem mostrar nenhum.
@@ -94,186 +105,216 @@ const ParkQuoteLabel: React.FC<{ park: Park }> = ({ park }) => (
   </>
 );
 
-const CredentialedPark: React.FC<{ park: Park; index: number }> = ({ park, index }) => (
-  <article
-    className={`overflow-hidden rounded-2xl bg-white shadow-float ${
-      index === 0 ? 'lg:col-span-3' : 'lg:col-span-2'
-    }`}
-  >
-    {/* Mesma altura nos dois cards, de propósito: com proporção fixa a foto do
-        card largo ficaria mais alta e derrubaria o título dele. */}
-    <ParkPhoto park={park} maxWidth={1200} className="h-48 sm:h-56" />
-    <div className="p-6 sm:p-8">
-      {/* Badge e local em linhas próprias, não lado a lado: no card estreito o
-          par quebrava e derrubava o título 20px abaixo do card vizinho, o que
-          lê como acidente e não como a assimetria pretendida. */}
-      <div className="flex flex-col items-start gap-2">
-        {/* Selo cheio: é o diferencial real frente a OTA e operadora grande. */}
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-anhanga-darkBlue px-3 py-1 font-display text-xs font-black uppercase tracking-[0.1em] text-white/90">
-          <BadgeCheck className="size-3.5" aria-hidden="true" />
-          Agente credenciado
-        </span>
-        <span className="inline-flex items-center gap-1.5 text-sm text-zinc-500">
-          <MapPin className="size-4" aria-hidden="true" />
-          {park.city}, {park.state}
-        </span>
-      </div>
-
-      <h3
-        className={`mt-5 font-display font-extrabold leading-tight text-anhanga-dark ${
-          index === 0 ? 'text-3xl sm:text-4xl' : 'text-2xl sm:text-3xl'
-        }`}
-      >
-        {park.name}
-      </h3>
-      <p className="mt-4 text-base leading-relaxed text-zinc-700 max-w-[65ch]">{park.claim}</p>
-
-      <dl className="mt-6 space-y-4 border-t border-zinc-100 pt-6">
-        <div>
-          <dt className="font-display text-xs font-black uppercase tracking-[0.1em] text-zinc-500">
-            Rende mais para
-          </dt>
-          <dd className="mt-1.5 text-base leading-relaxed text-zinc-700">{park.bestFor}</dd>
+const CredentialedPark: React.FC<{ park: Park; index: number; matched: boolean }> = ({ park, index, matched }) => {
+  const { profile } = useParquesProfile();
+  return (
+    <article
+      id={`parque-${park.slug}`}
+      className={`scroll-mt-28 overflow-hidden rounded-2xl bg-white shadow-float ${
+        matched ? 'ring-2 ring-anhanga-action ' : ''
+      }${
+        index === 0 ? 'lg:col-span-3' : 'lg:col-span-2'
+      }`}
+    >
+      {/* Mesma altura nos dois cards, de propósito: com proporção fixa a foto do
+          card largo ficaria mais alta e derrubaria o título dele. */}
+      <ParkPhoto park={park} maxWidth={1200} className="h-48 sm:h-56" />
+      <div className="p-6 sm:p-8">
+        {/* Badge e local em linhas próprias, não lado a lado: no card estreito o
+            par quebrava e derrubava o título 20px abaixo do card vizinho, o que
+            lê como acidente e não como a assimetria pretendida. */}
+        <div className="flex flex-col items-start gap-2">
+          {/* Selo cheio: é o diferencial real frente a OTA e operadora grande. */}
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-anhanga-darkBlue px-3 py-1 font-display text-xs font-black uppercase tracking-[0.1em] text-white/90">
+            <BadgeCheck className="size-3.5" aria-hidden="true" />
+            Agente credenciado
+          </span>
+          <span className="inline-flex items-center gap-1.5 text-sm text-zinc-500">
+            <MapPin className="size-4" aria-hidden="true" />
+            {park.city}, {park.state}
+          </span>
+          {matched ? <MatchBadge /> : null}
         </div>
-        <div>
-          <dt className="font-display text-xs font-black uppercase tracking-[0.1em] text-zinc-500">
-            Quantos dias
-          </dt>
-          <dd className="mt-1.5 text-base text-zinc-700">{park.days}</dd>
-        </div>
-        {/* No celular a tabela comparativa some; a época tem de estar aqui. */}
-        <div>
-          <dt className="font-display text-xs font-black uppercase tracking-[0.1em] text-zinc-500">
-            Melhor época
-          </dt>
-          <dd className="mt-1.5 text-base leading-relaxed text-zinc-700">{park.when}</dd>
-        </div>
-      </dl>
 
-      {/* Uma ação com peso de botão por card: o orçamento, que é o que gera
-          lead aqui. A landing do parque fica como link de texto; com dois
-          botões empilhados, quem chega pela primeira vez não sabia qual apertar. */}
-      <div className="mt-7 flex flex-col items-start gap-2">
-        <button
-          type="button"
-          onClick={() => openParquesContact(park)}
-          className="inline-flex min-h-[44px] items-center rounded-xl bg-anhanga-dark px-6 py-3 font-semibold text-white transition-transform duration-150 ease-out hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
+        <h3
+          className={`mt-5 font-display font-extrabold leading-tight text-anhanga-dark ${
+            index === 0 ? 'text-3xl sm:text-4xl' : 'text-2xl sm:text-3xl'
+          }`}
         >
-          <ParkQuoteLabel park={park} />
-        </button>
-        {park.href ? (
-          <Link
-            to={park.href}
-            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg font-semibold text-anhanga-action transition-colors hover:text-anhanga-actionDark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
+          {park.name}
+        </h3>
+        <p className="mt-4 text-base leading-relaxed text-zinc-700 max-w-[65ch]">{park.claim}</p>
+
+        <dl className="mt-6 space-y-4 border-t border-zinc-100 pt-6">
+          <div>
+            <dt className="font-display text-xs font-black uppercase tracking-[0.1em] text-zinc-500">
+              Rende mais para
+            </dt>
+            <dd className="mt-1.5 text-base leading-relaxed text-zinc-700">{park.bestFor}</dd>
+          </div>
+          <div>
+            <dt className="font-display text-xs font-black uppercase tracking-[0.1em] text-zinc-500">
+              Quantos dias
+            </dt>
+            <dd className="mt-1.5 text-base text-zinc-700">{park.days}</dd>
+          </div>
+          {/* No celular a tabela comparativa some; a época tem de estar aqui. */}
+          <div>
+            <dt className="font-display text-xs font-black uppercase tracking-[0.1em] text-zinc-500">
+              Melhor época
+            </dt>
+            <dd className="mt-1.5 text-base leading-relaxed text-zinc-700">{park.when}</dd>
+          </div>
+        </dl>
+
+        {/* Uma ação com peso de botão por card: o orçamento, que é o que gera
+            lead aqui. A landing do parque fica como link de texto; com dois
+            botões empilhados, quem chega pela primeira vez não sabia qual apertar. */}
+        <div className="mt-7 flex flex-col items-start gap-2">
+          <button
+            type="button"
+            onClick={() => openParquesContact(park, profile)}
+            className="inline-flex min-h-[44px] items-center rounded-xl bg-anhanga-dark px-6 py-3 font-semibold text-white transition-transform duration-150 ease-out hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
           >
-            Conhecer a página do {park.name}
-            <ArrowRight className="size-4" aria-hidden="true" />
-          </Link>
-        ) : null}
+            <ParkQuoteLabel park={park} />
+          </button>
+          {park.href ? (
+            <Link
+              to={park.href}
+              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg font-semibold text-anhanga-action transition-colors hover:text-anhanga-actionDark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
+            >
+              Conhecer a página do {park.name}
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </Link>
+          ) : null}
+        </div>
       </div>
-    </div>
-  </article>
-);
+    </article>
+  );
+};
 
-export const CredentialedSection: React.FC = () => (
-  <section className="bg-white py-16 sm:py-24">
-    <div className="container mx-auto px-6 max-w-5xl">
-      <h2 className="font-display text-3xl sm:text-4xl font-extrabold leading-tight text-anhanga-dark">
-        Onde emitimos o ingresso oficial
-      </h2>
-      <p className="mt-4 text-lg leading-relaxed text-zinc-700 max-w-[65ch]">
-        A Anhangá é agente credenciado destes dois parques. Na prática, o ingresso sai
-        emitido direto, sem revenda no meio do caminho, e qualquer problema de data ou
-        remarcação a gente resolve com o parque.
-      </p>
-      <p className="mt-4 inline-flex items-start gap-2 text-sm text-zinc-600">
-        <ShieldCheck className="mt-0.5 size-4 shrink-0 text-anhanga-actionDark" aria-hidden="true" />
-        <span>
-          Agência registrada no Cadastur, o cadastro do Ministério do Turismo:{' '}
-          <a
-            href="https://cadastur.turismo.gov.br/hotsite/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-semibold text-anhanga-dark underline underline-offset-2 hover:text-anhanga-actionDark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
-          >
-            37.036.732/0001-41
-          </a>
-        </span>
-      </p>
+export const CredentialedSection: React.FC = () => {
+  const matchedSlugs = useMatchedSlugs();
+  return (
+    <section className="bg-white py-16 sm:py-24">
+      <div className="container mx-auto px-6 max-w-5xl">
+        <h2 className="font-display text-3xl sm:text-4xl font-extrabold leading-tight text-anhanga-dark">
+          Onde emitimos o ingresso oficial
+        </h2>
+        <p className="mt-4 text-lg leading-relaxed text-zinc-700 max-w-[65ch]">
+          A Anhangá é agente credenciado destes dois parques. Na prática, o ingresso sai
+          emitido direto, sem revenda no meio do caminho, e qualquer problema de data ou
+          remarcação a gente resolve com o parque.
+        </p>
+        <p className="mt-4 inline-flex items-start gap-2 text-sm text-zinc-600">
+          <ShieldCheck className="mt-0.5 size-4 shrink-0 text-anhanga-actionDark" aria-hidden="true" />
+          <span>
+            Agência registrada no Cadastur, o cadastro do Ministério do Turismo:{' '}
+            <a
+              href="https://cadastur.turismo.gov.br/hotsite/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-anhanga-dark underline underline-offset-2 hover:text-anhanga-actionDark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
+            >
+              37.036.732/0001-41
+            </a>
+          </span>
+        </p>
 
-      <div className="mt-10 grid gap-6 lg:grid-cols-5 lg:items-start">
-        {CREDENTIALED_PARKS.map((park, index) => (
-          <CredentialedPark key={park.slug} park={park} index={index} />
-        ))}
+        <div className="mt-10 grid gap-6 lg:grid-cols-5 lg:items-start">
+          {/* Ordem fixa aqui: a assimetria 3/5 + 2/5 é do peso comercial, não
+              do perfil. O destaque fica no anel e no selo. */}
+          {CREDENTIALED_PARKS.map((park, index) => (
+            <CredentialedPark key={park.slug} park={park} index={index} matched={matchedSlugs.has(park.slug)} />
+          ))}
+        </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
-export const PackageSection: React.FC = () => (
-  <section className="bg-anhanga-light py-16 sm:py-24">
-    <div className="container mx-auto px-6 max-w-5xl">
-      <h2 className="font-display text-3xl sm:text-4xl font-extrabold leading-tight text-anhanga-dark">
-        Os aquáticos, com a viagem inteira montada
-      </h2>
-      <p className="mt-4 text-lg leading-relaxed text-zinc-700 max-w-[65ch]">
-        Nestes três não temos credenciamento — e preferimos dizer isso a inventar
-        autoridade. O que fazemos é a viagem completa: aéreo, hospedagem, transfer e
-        ingresso, com um consultor acompanhando do orçamento ao retorno.
-      </p>
+export const PackageSection: React.FC = () => {
+  const { profile } = useParquesProfile();
+  const matchedSlugs = useMatchedSlugs();
+  // Na lista os que combinam sobem: no celular são ~3 telas de rolagem, e o
+  // parque recomendado não pode ficar por último. sort é estável.
+  const parks = [...PACKAGE_PARKS].sort(
+    (a, b) => Number(matchedSlugs.has(b.slug)) - Number(matchedSlugs.has(a.slug)),
+  );
+  return (
+    <section className="bg-anhanga-light py-16 sm:py-24">
+      <div className="container mx-auto px-6 max-w-5xl">
+        <h2 className="font-display text-3xl sm:text-4xl font-extrabold leading-tight text-anhanga-dark">
+          Os aquáticos, com a viagem inteira montada
+        </h2>
+        <p className="mt-4 text-lg leading-relaxed text-zinc-700 max-w-[65ch]">
+          Nestes três não temos credenciamento — e preferimos dizer isso a inventar
+          autoridade. O que fazemos é a viagem completa: aéreo, hospedagem, transfer e
+          ingresso, com um consultor acompanhando do orçamento ao retorno.
+        </p>
 
-      <ul className="mt-10 divide-y divide-zinc-200/80">
-        {PACKAGE_PARKS.map((park) => (
-          <li key={park.slug} className="flex flex-col gap-5 py-7 first:pt-0 last:pb-0 sm:flex-row">
-            <ParkPhoto park={park} maxWidth={640} className="h-36 w-full shrink-0 rounded-xl sm:h-32 sm:w-44" />
-            <div className="min-w-0">
-              <h3 className="font-display text-xl font-bold text-anhanga-dark">{park.name}</h3>
-              <p className="mt-3 text-base leading-relaxed text-zinc-700 max-w-[65ch]">
-                {park.claim}
-              </p>
-              <p className="mt-3 text-base leading-relaxed text-zinc-600 max-w-[65ch]">
-                <span className="font-semibold text-anhanga-dark">Rende mais para:</span>{' '}
-                {park.bestFor}
-              </p>
-              {/* Local, duração e época são a mesma classe de informação — na
-                  mesma linha. Jogado na borda oposta do container, o local
-                  abria um vazio no meio em telas largas. */}
-              <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-zinc-600">
-                {park.highlight ? (
-                  <span className="inline-flex items-center gap-1.5 font-semibold text-anhanga-dark">
-                    <Sparkles className="size-4 text-anhanga-actionDark" aria-hidden="true" />
-                    {park.highlight}
-                  </span>
+        <ul className="mt-10 divide-y divide-zinc-200/80">
+          {parks.map((park) => (
+            <li
+              key={park.slug}
+              id={`parque-${park.slug}`}
+              className="flex scroll-mt-28 flex-col gap-5 py-7 first:pt-0 last:pb-0 sm:flex-row"
+            >
+              <ParkPhoto park={park} maxWidth={640} className="h-36 w-full shrink-0 rounded-xl sm:h-32 sm:w-44" />
+              <div className="min-w-0">
+                {matchedSlugs.has(park.slug) ? (
+                  <div className="mb-2">
+                    <MatchBadge />
+                  </div>
                 ) : null}
-                <span className="inline-flex items-center gap-1.5">
-                  <MapPin className="size-4 text-anhanga-actionDark" aria-hidden="true" />
-                  {park.city}, {park.state}
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <Clock className="size-4 text-anhanga-actionDark" aria-hidden="true" />
-                  {park.days}
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <CalendarClock className="size-4 text-anhanga-actionDark" aria-hidden="true" />
-                  {park.when}
-                </span>
+                <h3 className="font-display text-xl font-bold text-anhanga-dark">{park.name}</h3>
+                <p className="mt-3 text-base leading-relaxed text-zinc-700 max-w-[65ch]">
+                  {park.claim}
+                </p>
+                <p className="mt-3 text-base leading-relaxed text-zinc-600 max-w-[65ch]">
+                  <span className="font-semibold text-anhanga-dark">Rende mais para:</span>{' '}
+                  {park.bestFor}
+                </p>
+                {/* Local, duração e época são a mesma classe de informação — na
+                    mesma linha. Jogado na borda oposta do container, o local
+                    abria um vazio no meio em telas largas. */}
+                <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-zinc-600">
+                  {park.highlight ? (
+                    <span className="inline-flex items-center gap-1.5 font-semibold text-anhanga-dark">
+                      <Sparkles className="size-4 text-anhanga-actionDark" aria-hidden="true" />
+                      {park.highlight}
+                    </span>
+                  ) : null}
+                  <span className="inline-flex items-center gap-1.5">
+                    <MapPin className="size-4 text-anhanga-actionDark" aria-hidden="true" />
+                    {park.city}, {park.state}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <Clock className="size-4 text-anhanga-actionDark" aria-hidden="true" />
+                    {park.days}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <CalendarClock className="size-4 text-anhanga-actionDark" aria-hidden="true" />
+                    {park.when}
+                  </span>
+                </div>
+                {/* Peso de link, não de botão: a lista é a seção "menor" da página. */}
+                <button
+                  type="button"
+                  onClick={() => openParquesContact(park, profile)}
+                  className="mt-4 inline-flex min-h-[44px] items-center gap-1.5 rounded-lg font-semibold text-anhanga-action transition-colors hover:text-anhanga-actionDark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
+                >
+                  <ParkQuoteLabel park={park} />
+                  <ArrowRight className="size-4" aria-hidden="true" />
+                </button>
               </div>
-              {/* Peso de link, não de botão: a lista é a seção "menor" da página. */}
-              <button
-                type="button"
-                onClick={() => openParquesContact(park)}
-                className="mt-4 inline-flex min-h-[44px] items-center gap-1.5 rounded-lg font-semibold text-anhanga-action transition-colors hover:text-anhanga-actionDark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action"
-              >
-                <ParkQuoteLabel park={park} />
-                <ArrowRight className="size-4" aria-hidden="true" />
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
-  </section>
-);
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+};
 
 // Só a partir de md. No celular os cards de parque logo acima já mostram
 // cidade, dias e época, um embaixo do outro; repetir os cinco em formato de
@@ -352,36 +393,39 @@ export const UpcomingSection: React.FC = () => (
   </section>
 );
 
-export const ParquesCta: React.FC<SectionProps> = ({ onCtaClick, whatsappUrl }) => (
-  <section className="bg-white py-16 sm:py-24">
-    <div className="container mx-auto px-6 max-w-3xl text-center">
-      <h2 className="font-display text-3xl sm:text-4xl font-extrabold leading-tight text-anhanga-dark">
-        Ainda em dúvida entre dois?
-      </h2>
-      <p className="mt-4 text-lg leading-relaxed text-zinc-700">
-        Conte a idade das crianças e quantos dias você tem. A gente responde qual dos
-        cinco faz sentido — mesmo que a resposta seja esperar o ano que vem.
-      </p>
-      <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-        <button
-          type="button"
-          onClick={onCtaClick}
-          className="inline-flex min-h-[44px] w-full items-center justify-center rounded-2xl bg-anhanga-yellow px-8 py-4 font-display font-bold text-anhanga-dark shadow-hard transition-[transform,box-shadow] duration-150 ease-out hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] active:translate-x-1 active:translate-y-1 active:shadow-none motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action sm:w-auto"
-        >
-          Falar com um consultor
-        </button>
-        <a
-          href={whatsappUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex min-h-[44px] w-full items-center justify-center rounded-lg px-6 py-3 font-semibold text-zinc-600 transition-colors hover:text-anhanga-action focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action sm:w-auto"
-        >
-          Prefiro WhatsApp
-        </a>
+export const ParquesCta: React.FC<SectionProps> = ({ whatsappUrl }) => {
+  const { profile } = useParquesProfile();
+  return (
+    <section id={PARQUES_FINAL_CTA_ID} className="bg-white py-16 sm:py-24">
+      <div className="container mx-auto px-6 max-w-3xl text-center">
+        <h2 className="font-display text-3xl sm:text-4xl font-extrabold leading-tight text-anhanga-dark">
+          Ainda em dúvida entre dois?
+        </h2>
+        <p className="mt-4 text-lg leading-relaxed text-zinc-700">
+          Conte a idade das crianças e quantos dias você tem. A gente responde qual dos
+          cinco faz sentido — mesmo que a resposta seja esperar o ano que vem.
+        </p>
+        <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <button
+            type="button"
+            onClick={() => openParquesContact(undefined, profile)}
+            className="inline-flex min-h-[44px] w-full items-center justify-center rounded-2xl bg-anhanga-yellow px-8 py-4 font-display font-bold text-anhanga-dark shadow-hard transition-[transform,box-shadow] duration-150 ease-out hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] active:translate-x-1 active:translate-y-1 active:shadow-none motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action sm:w-auto"
+          >
+            Falar com um consultor
+          </button>
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-[44px] w-full items-center justify-center rounded-lg px-6 py-3 font-semibold text-zinc-600 transition-colors hover:text-anhanga-action focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-anhanga-action sm:w-auto"
+          >
+            Prefiro WhatsApp
+          </a>
+        </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 /*
   Atribuição completa das fotos de terceiros. A legenda sobre a foto é curta
@@ -393,27 +437,27 @@ export const PhotoCredits: React.FC = () => {
   if (credited.length === 0) return null;
 
   return (
-    <section aria-labelledby="parques-photo-credits" className="bg-white pb-10">
-      <div className="container mx-auto max-w-5xl border-t border-zinc-100 px-6 pt-6">
-        <h2 id="parques-photo-credits" className="font-display text-xs font-bold text-zinc-500">
-          Créditos das fotos
-        </h2>
-        <ul className="mt-2 text-xs text-zinc-500">
-          {credited.map(({ slug, name, image }) => (
-            <li key={slug} className="flex flex-wrap items-center gap-x-2">
-              <span>
-                {name}: {image?.license?.author}, foto recortada.
-              </span>
-              <a href={image?.source} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center underline underline-offset-2 hover:text-anhanga-actionDark">
-                Original
-              </a>
-              <a href={image?.license?.url} target="_blank" rel="noopener noreferrer license" className="inline-flex min-h-[44px] items-center underline underline-offset-2 hover:text-anhanga-actionDark">
-                {image?.license?.name}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
+      <section aria-labelledby="parques-photo-credits" className="bg-white pb-10">
+        <div className="container mx-auto max-w-5xl border-t border-zinc-100 px-6 pt-6">
+          <h2 id="parques-photo-credits" className="font-display text-xs font-bold text-zinc-500">
+            Créditos das fotos
+          </h2>
+          <ul className="mt-2 text-xs text-zinc-500">
+            {credited.map(({ slug, name, image }) => (
+              <li key={slug} className="flex flex-wrap items-center gap-x-2">
+                <span>
+                  {name}: {image?.license?.author}, foto recortada.
+                </span>
+                <a href={image?.source} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center underline underline-offset-2 hover:text-anhanga-actionDark">
+                  Original
+                </a>
+                <a href={image?.license?.url} target="_blank" rel="noopener noreferrer license" className="inline-flex min-h-[44px] items-center underline underline-offset-2 hover:text-anhanga-actionDark">
+                  {image?.license?.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
   );
 };

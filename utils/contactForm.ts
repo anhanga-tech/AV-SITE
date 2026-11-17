@@ -7,6 +7,8 @@ export interface ContactModalOptions {
      * Para CTAs cuja copy promete responder com base nisso (hub /parques-brasil).
      */
     askTripDetails?: boolean;
+    /** Valores iniciais de "Idade das crianças" e "Quantos dias" (perfil do hub de parques). */
+    tripDetails?: ContactTripDetails;
 }
 
 export function openContactModal(options: ContactModalOptions = {}): void {
