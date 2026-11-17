@@ -2,6 +2,69 @@ import type { PostMeta } from '../types/blog';
 
 export const BLOG_POST_MANIFEST: PostMeta[] = [
   {
+    "title": "Primeiro cruzeiro: quanto custa, como funciona e o que levar",
+    "excerpt": "Preços oficiais da Costa na temporada 2026/2027, taxas, o que está incluso e o que levar na mala. Um guia para quem vai fazer o primeiro cruzeiro no Brasil.",
+    "date": "2026-12-07",
+    "author": "felipe-william",
+    "category": "Cruzeiros",
+    "image": "https://media.anhanga.tur.br/images/blog/primeiro-cruzeiro-capa.jpg",
+    "imageCreditStatus": "confirmed",
+    "imageCredit": "Alberto-g-rovi / Wikimedia Commons",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Costa_Diadema-Exterior_(3).jpg",
+    "imageLicense": "CC BY 4.0",
+    "imageLicenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "imageAdaptation": "Redimensionada para 1600 px de largura",
+    "featured": false,
+    "showChatCTA": true,
+    "chatCTADestination": "Cruzeiros",
+    "tags": [
+      "cruzeiros",
+      "primeiro-cruzeiro",
+      "brasil-2027",
+      "melhor-idade",
+      "familia",
+      "dicas-de-viagem"
+    ],
+    "seoTitle": "Quanto custa um cruzeiro: guia 2026/27",
+    "seoDescription": "Quanto custa um cruzeiro na temporada 2026/2027: preços oficiais da Costa, taxas, o que está incluso, o que levar e dicas para o primeiro cruzeiro.",
+    "faq": [
+      {
+        "question": "Quanto custa um cruzeiro na temporada brasileira 2026/2027?",
+        "answer": "No site da Costa, em 13/11/2026, o minicruzeiro de 4 dias no Costa Diadema saindo de Santos aparecia a partir de R$ 1.999 por pessoa, e o roteiro de 8 dias até Buenos Aires e Montevidéu custava R$ 3.981 por pessoa na saída de fevereiro de 2027, com tarifas marítimas, taxas de serviço e portuárias inclusas. Preço consultado em 13/11/2026, pode mudar: ele varia por data, cabine e número de hóspedes."
+      },
+      {
+        "question": "Como funciona um cruzeiro para quem nunca fez?",
+        "answer": "Você reserva a cabine e a tarifa, faz o web check-in, se apresenta no porto no horário de check-in e passa os dias entre navegação e escalas. As refeições principais, os shows e as piscinas estão no preço. Os gastos extras vão para a conta de bordo, vinculada a um cartão de crédito, e são acertados até a noite anterior ao desembarque."
+      },
+      {
+        "question": "Cruzeiro é tudo incluso?",
+        "answer": "Não. Na Costa, o preço cobre cabine, quatro refeições por dia, entretenimento, piscinas e academia. Bebidas, excursões, internet, restaurantes temáticos, spa, room service e atendimento médico são cobrados à parte. Mesmo a tarifa All Inclusive, que traz bebidas, não cobre excursões, internet ou spa, salvo se a tarifa disser o contrário."
+      },
+      {
+        "question": "Preciso pagar gorjeta no cruzeiro?",
+        "answer": "Na Costa, não. A Tarifa de Serviço de Hotelaria é obrigatória, já faz parte do preço e não é gorjeta. A companhia não trabalha com sistema de gorjetas e os tripulantes não podem receber gorjeta. Bar e room service têm acréscimo de 15%, pago no fim do cruzeiro."
+      },
+      {
+        "question": "Cruzeiro é uma boa opção para idosos?",
+        "answer": "Pode ser, porque a pessoa desfaz a mala uma vez só e tem refeições e lazer no mesmo lugar. Na Costa, quem tem mobilidade reduzida, inclusive por causa da idade, ou precisa de assistência especial deve informar isso na reserva. As cabines adaptadas são limitadas e dependem de disponibilidade, e em alguns casos a companhia pode exigir acompanhante."
+      },
+      {
+        "question": "Que documento preciso para embarcar em um cruzeiro?",
+        "answer": "Na Costa, em cruzeiro só pelo Brasil, o adulto brasileiro embarca com RG expedido há menos de 10 anos ou outro documento original com foto válido no país, como a CNH. Se o roteiro passa por Argentina ou Uruguai, valem só o RG físico original em bom estado ou o passaporte válido; CNH e carteiras funcionais não são aceitas."
+      },
+      {
+        "question": "O que levar no cruzeiro?",
+        "answer": "Roupas leves, trajes de banho, chinelo e tênis, uma roupa mais arrumada para a noite, remédios de uso contínuo para a viagem inteira, protetor solar, itens de higiene, carregadores, documentos originais e um cartão de crédito para a conta de bordo. Não leve bebidas nem aparelhos como ferro de passar, chaleira ou secador de cabelo: a Costa proíbe."
+      },
+      {
+        "question": "Cruzeiro vale a pena para quem nunca foi?",
+        "answer": "Na pesquisa FGV e CLIA no Brasil sobre a temporada 2025/2026, 98,5% dos cruzeiristas disseram que a viagem atendeu ou superou as expectativas e 91,7% pretendem fazer outro cruzeiro. Para testar, um minicruzeiro de 3 ou 4 noites é o caminho mais curto."
+      }
+    ],
+    "slug": "primeiro-cruzeiro",
+    "readingTime": "17 min de leitura"
+  },
+  {
     "title": "Roteiro Machu Picchu: Peru em 7 a 10 dias",
     "excerpt": "Roteiro de 7 a 10 dias por Lima, Cusco, Vale Sagrado e Machu Picchu, com trem, ingresso por circuito, altitude e a melhor época para ir.",
     "date": "2026-11-30",
@@ -555,7 +618,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
     "title": "Cruzeiros Costa Brasileira 2026/2027: rotas, datas e preços",
     "excerpt": "A temporada da Costa no Brasil tem dois navios, três portos de embarque e roteiros regulares de 2 a 9 noites. As rotas, as datas e o que cada faixa de preço inclui.",
     "date": "2026-09-15",
-    "dateModified": "2026-09-22",
+    "dateModified": "2026-11-13",
     "author": "felipe-william",
     "category": "Cruzeiros",
     "image": "https://media.anhanga.tur.br/images/destinations/natal.jpg",
@@ -591,7 +654,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "Preciso de passaporte para cruzeiro para Buenos Aires e Montevidéu?",
-        "answer": "Brasileiro pode entrar na Argentina e no Uruguai com a carteira de identidade (RG) física, expedida há menos de 10 anos e em bom estado. A versão digital não é aceita na fronteira, e RG mais antigo não passa no embarque internacional: nesse caso, leve o passaporte, que também simplifica o desembarque nos portos."
+        "answer": "Brasileiro pode entrar na Argentina e no Uruguai com a carteira de identidade (RG) física e em bom estado. A versão digital não é aceita na fronteira. A Costa recomenda RG emitido há menos de 10 anos para roteiros pelo Mercosul; se o seu é mais antigo, leve o passaporte, que evita discussão no embarque e também simplifica o desembarque nos portos."
       }
     ],
     "slug": "cruzeiros-costa-brasileira-2026-2027",

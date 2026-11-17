@@ -155,9 +155,19 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/</loc>
-    <lastmod>2026-11-13</lastmod>
+    <lastmod>2026-11-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.anhanga.tur.br/blog/natal-luz-gramado-2026/</loc>
+    <lastmod>2026-11-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://media.anhanga.tur.br/images/blog/natal-luz-gramado-2026-capa.jpg</image:loc>
+      <image:caption>Natal Luz Gramado 2026: data, programação e ingressos</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/turismo-regenerativo-brasil/</loc>
@@ -231,7 +241,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/cruzeiros-costa-brasileira-2026-2027/</loc>
-    <lastmod>2026-09-22</lastmod>
+    <lastmod>2026-11-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
@@ -531,7 +541,7 @@
   </url>
   <url>
     <loc>https://www.anhanga.tur.br/blog/destinos-america-do-sul-latam/</loc>
-    <lastmod>2026-09-22</lastmod>
+    <lastmod>2026-11-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
