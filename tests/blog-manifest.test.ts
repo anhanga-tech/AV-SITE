@@ -340,3 +340,39 @@ test('blog content filenames stay ASCII slug-safe for canonical URLs', async () 
 
   assert.deepEqual(invalidFilenames, []);
 });
+
+// #1726 espalhou `dateModified: "2026-09-22"` em 40 posts sem mudança de corpo. Uma data de
+// revisão igual ou anterior à publicação não informa nada e polui o lastmod do sitemap.
+// Estes posts já nasceram com dateModified == date (redundante, mas inofensivo: a UI não
+// mostra "Atualizado em" e o lastmod é o mesmo). Ficam tolerados até alguém limpar o
+// frontmatter; qualquer post NOVO nessa situação, ou qualquer dateModified < date, falha.
+const REDUNDANT_DATE_MODIFIED_LEGACY = new Set([
+  'roteiro-machu-picchu',
+  'carnaval-2027-data',
+  'natal-luz-gramado-2026',
+  'turismo-regenerativo-brasil',
+  'cruzeiro-fluvial-europa-melhor-idade',
+  'roteiro-europa-10-dias-lisboa-madrid-roma',
+  'lua-de-mel-europa-lisboa-ou-paris',
+]);
+
+test('nenhum post tem dateModified anterior a date, nem igual a date fora da lista legada', async () => {
+  const posts = await collectBlogPostMeta(new URL('../content/blog', import.meta.url).pathname, { hideFuture: false });
+
+  const invalid = posts
+    .filter((post) => post.dateModified !== undefined)
+    .filter((post) => post.dateModified! < post.date || (post.dateModified === post.date && !REDUNDANT_DATE_MODIFIED_LEGACY.has(post.slug)))
+    .map((post) => `${post.slug}: date=${post.date} dateModified=${post.dateModified}`);
+
+  assert.deepEqual(invalid, []);
+});
+
+test('o manifest commitado reflete o frontmatter: mesmas datas e dateModified', async () => {
+  const { BLOG_POST_MANIFEST } = await import('../data/blogManifest.ts');
+  const posts = await collectBlogPostMeta(new URL('../content/blog', import.meta.url).pathname, { hideFuture: false });
+
+  const pick = (list: { slug: string; date: string; dateModified?: string }[]) =>
+    list.map(({ slug, date, dateModified }) => ({ slug, date, dateModified })).sort((a, b) => a.slug.localeCompare(b.slug));
+
+  assert.deepEqual(pick(BLOG_POST_MANIFEST), pick(posts));
+});

@@ -44,7 +44,7 @@ Use `_template.mdx` como ponto de partida para novos posts. Ele já inclui `show
 | `title`         | string    | sim         | Título do post                                     |
 | `excerpt`       | string    | sim         | Resumo (máx. 160 chars) — usado em SEO e nos cards |
 | `date`          | string    | sim         | Data de publicação (ISO 8601: `YYYY-MM-DD`)        |
-| `dateModified`  | string    | não         | Data da última revisão significativa               |
+| `dateModified`  | string    | não         | Data da última revisão significativa (só mudança de corpo; o hook e `pnpm update:dates` não bumpam por mudança só de frontmatter) |
 | `author`        | string    | sim         | Chave do autor em `data/blogData.ts`               |
 | `category`      | string    | sim         | Categoria do post                                  |
 | `image`         | string    | sim         | URL da imagem de capa                              |

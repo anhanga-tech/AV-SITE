@@ -4,7 +4,7 @@ import { ArrowLeft, Tag, User, Calendar, Clock } from 'lucide-react';
 import { PostMeta } from '../../lib/mdx';
 import { optimizeRemoteImageUrl } from '../../data/mediaConfig';
 import { getCategoryColor } from '../../utils/categoryColors';
-import { formatDate } from '../../utils/blog';
+import { PostDates } from './PostDates';
 
 /**
  * Phones only. Matches Tailwind's `sm` boundary: above it the hero is wide
@@ -93,7 +93,7 @@ export const BlogPostHero: React.FC<BlogPostHeroProps> = ({ post, authorName, au
                                 <div className="p-1.5 bg-white/10 rounded-lg backdrop-blur-md">
                                     <Calendar className="size-4" />
                                 </div>
-                                <span>{formatDate(post.date)}</span>
+                                <PostDates date={post.date} dateModified={post.dateModified} />
                             </div>
                             <div className="flex items-center gap-2">
                                 <div className="p-1.5 bg-white/10 rounded-lg backdrop-blur-md">
