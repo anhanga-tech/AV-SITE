@@ -22,6 +22,7 @@ const CANONICAL = 'https://www.anhanga.tur.br/blog/post-de-teste/';
 const TEMPLATE_FAQ_SLUGS = [
   'como-planejar-viagem-orlando-sob-medida',
   'melhor-epoca-viajar-orlando-guia-perfil-viajante',
+  'primeiro-cruzeiro',
 ];
 const CONTROL_SLUG = 'quanto-custa-viagem-disney-2026';
 
@@ -141,7 +142,7 @@ test(`${CONTROL_SLUG} (control) keeps its own MDX FAQ and gets no template FAQ`,
   assert.equal(html.split('Perguntas Frequentes').length - 1, 1);
 });
 
-test('FAQPage JSON-LD stays on the three posts with the frontmatter questions', () => {
+test('FAQPage JSON-LD stays on the template-FAQ posts and the control with the frontmatter questions', () => {
   for (const slug of [...TEMPLATE_FAQ_SLUGS, CONTROL_SLUG]) {
     const post = BLOG_POST_MANIFEST.find((candidate) => candidate.slug === slug);
     assert.ok(post?.faq?.length);
@@ -154,7 +155,7 @@ test('FAQPage JSON-LD stays on the three posts with the frontmatter questions', 
   }
 });
 
-test('the two template-FAQ posts expose the questions listed in the acceptance criteria', () => {
+test('the two Orlando template-FAQ posts expose the questions listed in the acceptance criteria', () => {
   const questions = (slug: string) => BLOG_POST_MANIFEST.find((post) => post.slug === slug)?.faq?.map((item) => item.question);
   assert.deepEqual(questions(TEMPLATE_FAQ_SLUGS[0]), [
     'Por onde começar o planejamento de uma viagem para Orlando?',

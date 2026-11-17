@@ -5,6 +5,21 @@ import type { HomeTeaserPost } from '../types/blog';
 
 export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
   {
+    "slug": "primeiro-cruzeiro",
+    "title": "Primeiro cruzeiro: quanto custa, como funciona e o que levar",
+    "excerpt": "Preços oficiais da Costa na temporada 2026/2027, taxas, o que está incluso e o que levar na mala. Um guia para quem vai fazer o primeiro cruzeiro no Brasil.",
+    "date": "2026-12-07",
+    "category": "Cruzeiros",
+    "author": "felipe-william",
+    "image": "https://media.anhanga.tur.br/images/blog/primeiro-cruzeiro-capa.jpg",
+    "imageCreditStatus": "confirmed",
+    "imageCredit": "Alberto-g-rovi / Wikimedia Commons",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Costa_Diadema-Exterior_(3).jpg",
+    "imageLicense": "CC BY 4.0",
+    "imageLicenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "imageAdaptation": "Redimensionada para 1600 px de largura"
+  },
+  {
     "slug": "roteiro-machu-picchu",
     "title": "Roteiro Machu Picchu: Peru em 7 a 10 dias",
     "excerpt": "Roteiro de 7 a 10 dias por Lima, Cusco, Vale Sagrado e Machu Picchu, com trem, ingresso por circuito, altitude e a melhor época para ir.",
@@ -48,20 +63,5 @@ export const HOME_TEASER_POSTS: HomeTeaserPost[] = [
     "imageLicense": "CC BY 2.0",
     "imageLicenseUrl": "https://creativecommons.org/licenses/by/2.0/",
     "imageAdaptation": "Redimensionada para até 1600 px e comprimida · foto de arquivo do Natal Luz 2016"
-  },
-  {
-    "slug": "turismo-regenerativo-brasil",
-    "title": "Turismo regenerativo no Brasil: 5 experiências que valem a pena",
-    "excerpt": "Turismo regenerativo é deixar o lugar melhor do que você encontrou. Cinco viagens no Brasil em que o dinheiro fica com quem cuida da floresta, do rio e do mar.",
-    "date": "2026-11-13",
-    "category": "Experiencias",
-    "author": "felipe-william",
-    "image": "https://media.anhanga.tur.br/images/blog/turismo-regenerativo-brasil-capa.jpg",
-    "imageCreditStatus": "confirmed",
-    "imageCredit": "Mateus S. Figueiredo / Wikimedia Commons",
-    "imageSource": "https://commons.wikimedia.org/wiki/File:Passarela_e_quartos_da_Pousada_Uacari.jpg",
-    "imageLicense": "CC BY-SA 4.0",
-    "imageLicenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-    "imageAdaptation": "Recorte adaptado à capa"
   }
 ];
