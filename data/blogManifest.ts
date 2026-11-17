@@ -50,7 +50,7 @@ export const BLOG_POST_MANIFEST: PostMeta[] = [
       },
       {
         "question": "Que documento preciso para embarcar em um cruzeiro?",
-        "answer": "Na Costa, em cruzeiro só pelo Brasil, o adulto brasileiro embarca com RG expedido há menos de 10 anos ou outro documento original com foto válido no país, como a CNH. Se o roteiro passa por Argentina ou Uruguai, valem só o RG físico original em bom estado ou o passaporte válido; CNH e carteiras funcionais não são aceitas."
+        "answer": "Na Costa, em cruzeiro só pelo Brasil, o adulto brasileiro embarca com RG em bom estado ou outro documento original com foto válido no país, como a CNH. Se o roteiro passa por Argentina ou Uruguai, valem só o RG físico original em bom estado, que a Costa recomenda ter sido emitido há menos de 10 anos, ou o passaporte válido, que evita discussão no embarque; CNH e carteiras funcionais não são aceitas."
       },
       {
         "question": "O que levar no cruzeiro?",
