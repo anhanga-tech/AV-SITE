@@ -182,6 +182,17 @@ overrides:
   # GHSA-xw65-4hp5-5hc7 (templates pré-compilados embutidos de forma
   # insegura); único major na árvore, sem downgrade.
   handlebars: "^4.7.10"
+  # pnpm audit (moderate/low): GHSA-4m76-xfj5-7975, GHSA-h7mg-cq63-vhpq,
+  # GHSA-3gg2-335m-rxc6, GHSA-46wx-v44x-9hh2, GHSA-4h7h-rv7c-7m2v — hono
+  # <= 4.13.15; GHSA-qv5m-9pm6-hqp3 + GHSA-jpvv-r467-5p4w — @hono/node-server
+  # >=2.0.0 <2.1.6. Transitivo via @modelcontextprotocol/sdk, consumido por
+  # @google/genai (dependência de produção) e decap-server > @decap/cli (dev).
+  # O app não sobe servidor MCP/Hono, mas o pacote entra na árvore de prod.
+  # hono@4.13.16 (2026-11-01) e @hono/node-server@2.1.6 (2026-11-02) corrigem,
+  # ambos fora do cooldown de 7 dias; bumps dentro do range já declarado pela
+  # SDK (hono ^4.11.4, @hono/node-server ^1.19.9 || ^2.0.5), sem downgrade.
+  hono: "^4.13.16"
+  "@hono/node-server": "^2.1.6"
 
 legacyPeerDeps: true
 nodeLinker: hoisted
