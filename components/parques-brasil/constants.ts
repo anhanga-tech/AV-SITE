@@ -126,6 +126,19 @@ export const PARKS: Park[] = [
     days: '2 a 3 dias',
     when: 'O ano todo. É o único parque aquático daqui que não perde a graça em julho.',
     highlight: 'Água termal natural',
+    // CC BY-SA 4.0, publicada pela conta oficial do parque no Commons:
+    // crédito visível e, em PhotoCredits, link para a origem e a licença.
+    image: {
+      src: `${PARK_PHOTO_BASE}/thermas-dos-laranjais.jpg`,
+      alt: 'Piscina de ondas do Thermas dos Laranjais, em Olímpia (SP), vista de drone',
+      credit: 'Foto: Thermas dos Laranjais / CC BY-SA 4.0',
+      source: 'https://commons.wikimedia.org/wiki/File:THERMAS_DOS_LARANJAIS_AGO_22_-_DRONE_(13).jpg',
+      license: {
+        name: 'CC BY-SA 4.0',
+        url: 'https://creativecommons.org/licenses/by-sa/4.0/deed.pt',
+        author: 'Thermas dos Laranjais',
+      },
+    },
     short: { tagline: 'Piscina de água quente o dia todo, faça sol ou não.', age: 'Todas', days: '2 a 3', when: 'O ano todo' },
   },
   {
