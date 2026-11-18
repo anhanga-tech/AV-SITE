@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { Seo } from '../components/Seo';
 import { LandingFAQ } from '../components/LandingFAQ';
 import { BreadcrumbSchema } from '../components/schemas/BreadcrumbSchema';
@@ -14,7 +14,9 @@ import {
   UpcomingSection,
 } from '../components/parques-brasil/ParquesBrasilSections';
 import { BOOKABLE_PARKS, PARQUES_FAQ_ITEMS } from '../components/parques-brasil/constants';
-import { UNDECIDED_WHATSAPP_MESSAGE, openParquesContact } from '../components/parques-brasil/contact';
+import { UNDECIDED_WHATSAPP_MESSAGE } from '../components/parques-brasil/contact';
+import { MobileQuoteBar } from '../components/parques-brasil/MobileQuoteBar';
+import { ParquesProfileProvider } from '../components/parques-brasil/ProfileContext';
 import { useWhatsAppLink } from '../utils/whatsapp';
 
 const PAGE_URL = 'https://www.anhanga.tur.br/parques-brasil/';
@@ -22,12 +24,8 @@ const PAGE_URL = 'https://www.anhanga.tur.br/parques-brasil/';
 const ParquesBrasil: React.FC = () => {
   const whatsappUrl = useWhatsAppLink(UNDECIDED_WHATSAPP_MESSAGE);
 
-  const handleCtaClick = useCallback(() => {
-    openParquesContact();
-  }, []);
-
   return (
-    <>
+    <ParquesProfileProvider>
       <Seo
         title="Parques do Brasil: qual escolher"
         description="Beto Carrero, Hopi Hari, Thermas dos Laranjais, Beach Park e Hot Park comparados por perfil, duração e época. Agente credenciado Beto Carrero e Hopi Hari."
@@ -66,9 +64,10 @@ const ParquesBrasil: React.FC = () => {
         subtitle="O que costuma decidir entre um parque e outro."
       />
 
-      <ParquesCta onCtaClick={handleCtaClick} whatsappUrl={whatsappUrl} />
+      <ParquesCta whatsappUrl={whatsappUrl} />
       <PhotoCredits />
-    </>
+      <MobileQuoteBar whatsappUrl={whatsappUrl} />
+    </ParquesProfileProvider>
   );
 };
 

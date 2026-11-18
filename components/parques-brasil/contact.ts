@@ -1,5 +1,6 @@
 import { openContactModal, type ContactModalOptions } from '../../utils/contactForm';
 import type { Park } from './constants';
+import { profileToTripDetails, type ParquesProfile } from './profile';
 
 export const PARQUES_CTA_SOURCE = 'parques-brasil';
 export const PARQUES_DESTINATION_LABEL = 'Parques do Brasil';
@@ -19,21 +20,28 @@ export const UNDECIDED_WHATSAPP_MESSAGE =
   Todos pedem idade das crianças e dias: é o que a copy do CTA final promete
   usar para responder.
 */
-export function parquesContactOptions(park?: Pick<Park, 'name' | 'city' | 'state'>): ContactModalOptions {
-  if (!park) {
-    return {
-      source: PARQUES_CTA_SOURCE,
-      destination: `${PARQUES_DESTINATION_LABEL} · ainda escolhendo`,
-      message: UNDECIDED_WHATSAPP_MESSAGE,
-      askTripDetails: true,
-    };
-  }
-  return {
-    source: PARQUES_CTA_SOURCE,
-    destination: `${PARQUES_DESTINATION_LABEL} · ${park.name}`,
-    message: `Olá! Quero ajuda para montar uma viagem ao ${park.name}, em ${park.city} (${park.state}).`,
-    askTripDetails: true,
-  };
+export function parquesContactOptions(
+  park?: Pick<Park, 'name' | 'city' | 'state'>,
+  profile?: ParquesProfile,
+): ContactModalOptions {
+  const options: ContactModalOptions = park
+    ? {
+        source: PARQUES_CTA_SOURCE,
+        destination: `${PARQUES_DESTINATION_LABEL} · ${park.name}`,
+        message: `Olá! Quero ajuda para montar uma viagem ao ${park.name}, em ${park.city} (${park.state}).`,
+        askTripDetails: true,
+      }
+    : {
+        source: PARQUES_CTA_SOURCE,
+        destination: `${PARQUES_DESTINATION_LABEL} · ainda escolhendo`,
+        message: UNDECIDED_WHATSAPP_MESSAGE,
+        askTripDetails: true,
+      };
+  // O que a família respondeu no "Quem vai?" chega preenchido no modal: o
+  // consultor recebe idade e dias sem a pessoa digitar de novo.
+  const tripDetails = profile ? profileToTripDetails(profile) : {};
+  if (tripDetails.childrenAges || tripDetails.tripDays) options.tripDetails = tripDetails;
+  return options;
 }
 
 /*
@@ -42,6 +50,6 @@ export function parquesContactOptions(park?: Pick<Park, 'name' | 'city' | 'state
   Com `park`, o modal mostra "Sobre: Parques do Brasil · <parque>"; sem ele, é
   a dúvida genérica de "qual escolher".
 */
-export function openParquesContact(park?: Pick<Park, 'name' | 'city' | 'state'>): void {
-  openContactModal(parquesContactOptions(park));
+export function openParquesContact(park?: Pick<Park, 'name' | 'city' | 'state'>, profile?: ParquesProfile): void {
+  openContactModal(parquesContactOptions(park, profile));
 }
