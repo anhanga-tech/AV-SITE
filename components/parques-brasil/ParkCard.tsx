@@ -56,17 +56,25 @@ export const ParkCard: React.FC<ParkCardProps> = ({ park, matched, tilt, as = 'a
       >
         <div className="relative">
           <ParkPhoto park={park} maxWidth={900} className={photoClassName} />
-          {credentialed ? (
-            <span className="absolute right-3 top-3 rotate-6 rounded-lg border-2 border-anhanga-darkBlue bg-white/95 px-2 py-1 text-center font-display text-[10px] font-black uppercase leading-tight tracking-[0.12em] text-anhanga-darkBlue">
-              Agente
-              <br />
-              credenciado
-            </span>
-          ) : null}
-          {matched ? (
-            <span className="absolute left-3 top-3 -rotate-3 rounded-full border-2 border-anhanga-dark bg-anhanga-yellow px-3 py-1 font-display text-sm font-extrabold text-anhanga-dark">
-              Combina com a sua família
-            </span>
+          {/* Selo e carimbo dividem uma linha que quebra: em 320px, lado a lado
+              e posicionados cada um num canto, os dois se sobrepunham. */}
+          {credentialed || matched ? (
+            <div className="absolute inset-x-3 top-3 flex flex-wrap items-start justify-between gap-2">
+              {matched ? (
+                <span className="-rotate-3 rounded-full border-2 border-anhanga-dark bg-anhanga-yellow px-3 py-1 font-display text-sm font-extrabold text-anhanga-dark">
+                  Combina com a sua família
+                </span>
+              ) : (
+                <span />
+              )}
+              {credentialed ? (
+                <span className="rotate-6 rounded-lg border-2 border-anhanga-darkBlue bg-white/95 px-2 py-1 text-center font-display text-[10px] font-black uppercase leading-tight tracking-[0.12em] text-anhanga-darkBlue">
+                  Agente
+                  <br />
+                  credenciado
+                </span>
+              ) : null}
+            </div>
           ) : null}
         </div>
 
