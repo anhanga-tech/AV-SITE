@@ -129,7 +129,7 @@ export const PARKS: Park[] = [
     // CC BY-SA 4.0, publicada pela conta oficial do parque no Commons:
     // crédito visível e, em PhotoCredits, link para a origem e a licença.
     image: {
-      src: `${PARK_PHOTO_BASE}/thermas-dos-laranjais.jpg`,
+      src: `${PARK_PHOTO_BASE}/thermas-laranjais.jpg`,
       alt: 'Piscina de ondas do Thermas dos Laranjais, em Olímpia (SP), vista de drone',
       credit: 'Foto: Thermas dos Laranjais / CC BY-SA 4.0',
       source: 'https://commons.wikimedia.org/wiki/File:THERMAS_DOS_LARANJAIS_AGO_22_-_DRONE_(13).jpg',
