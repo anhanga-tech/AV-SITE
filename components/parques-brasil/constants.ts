@@ -171,6 +171,15 @@ export const PARKS: Park[] = [
     days: '3 a 4 dias',
     when: 'Maio a setembro, a seca goiana. Chove pouco e a água quente compensa a noite fria.',
     highlight: 'Água termal e resort',
+    // Domínio público (Public Domain Mark do próprio autor no Flickr). No
+    // Brasil o direito moral de autoria não se renuncia (Lei 9.610/98, art.
+    // 24), então o crédito fica visível mesmo sem licença que o exija.
+    image: {
+      src: `${PARK_PHOTO_BASE}/hot-park.jpg`,
+      alt: 'Vista aérea do Hot Park, em Rio Quente (GO)',
+      credit: 'Foto: Pablo Regino / domínio público',
+      source: 'https://commons.wikimedia.org/wiki/File:PabloRegino_HotPark_A%C3%A9rea_RioQuente_GO_(39731945210).jpg',
+    },
     short: { tagline: 'Rio de água quente no meio do cerrado.', age: 'Todas', days: '3 a 4', when: 'Mai a set' },
   },
   {

@@ -65,9 +65,11 @@ test('toda foto de parque diz de onde veio e quem fez', () => {
     if (!park.image) continue;
     assert.match(park.image.source ?? '', /^https:\/\//, `${park.slug} sem página de origem`);
     assert.ok(park.image.credit, `${park.slug} sem crédito`);
-    // Licença CC exige o nome da licença junto do crédito.
+    // Fora do Unsplash, o crédito diz sob qual licença a foto entra: CC
+    // exige o nome dela, e domínio público precisa estar dito para não
+    // parecer foto sem origem.
     if (!park.image.source?.includes('unsplash.com')) {
-      assert.match(park.image.credit, /CC BY/, `${park.slug} sem a licença no crédito`);
+      assert.match(park.image.credit, /CC BY|domínio público/, `${park.slug} sem a licença no crédito`);
     }
   }
 });
